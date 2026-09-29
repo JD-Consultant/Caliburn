@@ -12,6 +12,7 @@
 | 節點 | 保存／動作 | 禁止 |
 |---|---|---|
 | `prepare_context` | 核新工作綁定、已採用基底；追加一次 App 資料及必要輸入；保存原位置 | 同工作恢復刷新 maps、重複員工原話 |
+| `count_input` | 用固定 request 計數；外送沿共同額度；保存結果後才作容量准入 | 計數失敗當零、重查已保存計數、把計數當模型 Step |
 | `request_model` | 容量／外送資格通過後呼叫 SDK；保存完整 R、原 calls 與 App 操作身分 | 同一未持久 node 內直接做寫入工具 |
 | `account_response` | R 已保存後，以原 attempt 冪等結算；失敗恢復不重呼模型 | 把記帳失敗變成原 R 遺失、把取消當未付費 |
 | `prepare_tool` | 有業務效果的 call 先解析目前目標，形成固定命令與有界回傳，可靠保存後才執行；純讀取可直接走讀取路徑 | 工具重入重新解析舊 title、把預期成功文字當已提交 |
@@ -119,7 +120,7 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 ### 4.5 已落地的固定請求、一次外送與保存後結算（T06 第七切片）
 
-此切片把已有 executions 額度與 Step 接成**首次生成的受控路徑**。`workflows/model_requests.py` 協調公開業務服務、短交易與 SDK；共用 Graph 仍不 import features，不增加 ResponseStore、重試平台或第二套回執。第八切片已加 §4.6 的有界 loop；完整容量檢查／多次 attempt 政策與 compact 尚待接線，這個元件不能單獨充作正式產品 runner。
+此切片把已有 executions 額度與 Step 接成**首次生成的受控路徑**。`workflows/model_requests.py` 協調公開業務服務、短交易與 SDK；共用 Graph 仍不 import features，不增加 ResponseStore、重試平台或第二套回執。第八切片已加 §4.6 的有界 loop，第九切片在生成前加入 §5.2 的計數／容量准入；多次 attempt 政策與 compact 尚待接線，這個元件不能單獨充作正式產品 runner。下圖聚焦生成階段，不表示可略過計數。
 
 ```mermaid
 flowchart TD
@@ -150,15 +151,18 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  I["保存初始 request、身分與本次限制"] --> R["模型回應 → 保存 R → 結算"]
+  I["保存初始 request、身分與本次限制"] --> C["計數准入 → 遠端 count → 保存計數"]
+  C --> G{"容量足夠，且無需中途 compact？"}
+  G -->|是| R["模型回應 → 保存 R → 結算"]
+  G -->|否| E["保留可靠位置；停止並交回原因"]
   R --> T["依原順序保存各工具結果"]
   T --> S["finish_step：完整窗口＋完成步數"]
   S --> F{"無待處理 call 且有正式答覆？"}
   F -->|是| D["交回結果；不是產品提交"]
   F -->|否| N{"資格仍有效且未達模型步數上限？"}
-  N -->|否| E["保留可靠位置；停止並交回原因"]
+  N -->|否| E
   N -->|是| P["保存下一 request；只追加原生 items"]
-  P --> R
+  P --> C
 ```
 
 - 每次模型 Step 可有多工具，全部依序完成後才接下一請求；工具旁有 final 文字仍先處理 calls，只有 commentary 的完整回應則繼續。下一請求只替換 input 為已完成窗口，不重新取 maps／指令／模型設定，不改歷史、不重加起始輸入。
@@ -168,7 +172,7 @@ flowchart TD
 - 初始 input checkpoint 可能尚未展開成 State（`values` 空、`next=__start__`）；由原生 Graph 恢復原輸入，於 request node 外送前核對原限制。不因尚未展開便拒絕正常恢復，也不讓恢復參數改寫初始限制。
 - 已完成 loop 再 resume 不新增模型／工具／items。恢復不指定舊 checkpoint ID；工具失敗只承接當前 prepared command。全部共用單步原 R 保存、結算與業務冪等責任，沒有新增保存系統。
 
-真 PG 兩程序已驗：第一程序完成一個工具 Step、保存第二個 R 後中斷，第二程序從結算接到 final，模型與先前工具均不重跑。原生歷史、固定 request 及恢復故障的具體證據見 [T06 §8](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#8-第八切片有界多-step-接續)。目前仍是非串流的共用 loop 元件；容量／compact、使用者 pause、角色／正式提交及自動重試 supervisor 未整合，不能拿圖中結果返回當成完整 A Turn／Memory batch 完成。
+真 PG 兩程序已驗：第一程序完成一個工具 Step、保存第二個 R 後中斷，第二程序從結算接到 final，模型與先前工具均不重跑。原生歷史、固定 request 及恢復故障的具體證據見 [T06 §8](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#8-第八切片有界多-step-接續)。圖已補第九切片的計數准入；目前仍是非串流的共用 loop 元件，compact、使用者 pause、角色／正式提交及自動重試 supervisor 未整合，不能拿圖中結果返回當成完整 A Turn／Memory batch 完成。
 
 ## 5. 容量、重試與恢復不是同一政策
 
@@ -229,6 +233,19 @@ erDiagram
 - SQL 禁止改寫／刪除固定 budget，禁止清除／改寫 attempt 身分與已知成本；不存另一份可失同步的計數器。FK 及 scope 查詢維持檔案隔離，成本採固定精度 Decimal，不用 float。
 
 已驗兩連線競爭最後額度、未知預留、每 request 重試上限、count／compact 分計、取消後記帳、writer 更換及新程序不歸零、DDL／ORM 一致。完整 HTTP 准入→原結果保存→結算／採用、Retry-After、compact 真實費用預留尚待後續；不能把此元件通過當 E15 全通過。設計借鑑 [PostgreSQL 行鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)及 [Azure 單一重試責任](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)，兩張表及原結果不等於重送許可是本案取捨。
+
+### 5.2 已落地的固定請求計數與容量准入（T06 第九切片）
+
+每個新 request 先走 `count_input → request_model`，沿現有 StateGraph 的 sync 保存，不增永久計數 cache、資料表或另一份模型窗口。`ResponseStepRuntime` 必填計數 callback 與模型容量；測試替身明確提供合成容量，不在 production 類別內設繞過開關。
+
+- 初始 checkpoint 保存 `ModelCapacityLimits`（模型、最大輸入、context window、最大輸出），恢復不能換較寬設定。已知模型不符／輸出超限於 count 外送前拒絕；實際容量仍須與當前官方模型契約校準，不把 fixture 數值當真實容量。
+- 計數取得同一固定 `ResponseRequest.count_payload()`，含 instructions、tools、reasoning 設定與完整原生 input。計數 logical ID 由本次 request 身分派生，`TOKEN_COUNT` 原 attempt 由 executions owner 管；換新 Step 才清除舊計數，不能把前一 request 的數字套到已增長窗口。
+- count 返回的 `input_tokens` 與原 attempt 保存在 checkpoint，之後才檢查非負整數、input 上限及 `input + max_output_tokens ≤ context window`；reasoning 已在 output 預留中，不另加一次。計數失敗／不合法即停止，不降成零、不裁歷史、不自動換模型。
+- 模型／後續節點失敗時承接已保存的 count；計數本身若已有 attempt 但原結果不可得，`PriorInputCountAttemptError` 交回核對，不盲目重送。現在沒有 count 原件的 process-local Held 補存或重試 supervisor；同時失去 checkpoint／pending writes 時不能宣稱原 count 一定能恢復。這不影響已保存 R 的原 Held 契約。
+- 遠端 count 也須先在原工作額度預留，短交易提交確認後才 HTTP；不增加模型 Step 數。不配置正數 `token_count_reservation_usd` 就拒絕 count。計數回應沒有計費 usage，故目前保留未知預留、不假定免費；該行政預留不是 provider 的硬帳單上限。沒有第二份計數器／收據。
+- 完成至少一個 Step 後的下一請求達 272K，回報 `CompactionRequiredError`，保存原窗口但不發生成。**本切片尚未呼叫 compact**；正式採用、再計數、輪前 128K、pause 優先及取消相容基底仍由後續 compact／控制切片完成。首請求不受此中途門檻誤擋；合法 final／步數已耗盡不額外發 count。
+
+依據：2026-09-30 取得 [OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting) 與 [每次工作額度控制範例](https://developers.openai.com/cookbook/articles/per_run_spending_controller_responses_api)。借鑑 exact payload、先預留後 HTTP、未知費用不歸零及 reasoning 不重算；範例模型／價格是示意，不照抄成真實費率，也不把其 process-local lock 取代本案既有 PostgreSQL owner。結果保存先於記帳的既定交界維持不變。真實 provider／動態價格與 compact 費用仍未驗收；[實測與下一步](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#9-第九切片固定計數與容量准入)。
 
 ## 6. Memory 背景工作
 

@@ -9,13 +9,13 @@ from uuid import UUID, uuid4
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from openai.types.responses import Response, ResponseFunctionToolCall
+from response_capacity import synthetic_response_runtime
 
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import response_input_items
 from caliburn.agent_execution.tool_steps import (
     ReceivedModelResponse,
-    ResponseStepRuntime,
     _build_response_step,
     run_response_loop,
 )
@@ -76,7 +76,7 @@ async def run(mode: str, thread_id: str) -> None:
         if mode == "write" and received.response.id == final.id:
             raise ConnectionError("synthetic interruption after saving second response")
 
-    runtime = ResponseStepRuntime(
+    runtime = synthetic_response_runtime(
         request_model=request_model,
         prepare_tool=prepare_tool,
         execute_tool=execute_tool,

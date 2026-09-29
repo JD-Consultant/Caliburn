@@ -74,6 +74,7 @@
 - **直連預檢準備（2026-09-30）：**承接 `44828016`，新增固定兩次生成的合成協定腳本及[批次 manifest](evidence/t06-agent-execution.md#6-第六切片有界直連協定預檢)。指定檔案缺 `OPENAI_API_KEY`，於外送前停止，HTTP／模型費用均 0；不以第三方 key 替代。靜態檢查通過，遠端 gate 待憑證，不阻止其餘 T06 施工。
 - **第七切片（2026-09-30）：**承接 `946c663f`，checkpoint 固定完整 request／logical ID，首次 HTTP 前提交預留；原 R／attempt 先保存，後做可恢復結算，再按資格派工具。真 PG 驗准入／記帳確認遺失、取消與零重呼；受影響 **525 passed**，獨立複核取消補存 P2 已修。[實測與未驗範圍](evidence/t06-agent-execution.md#7-第七切片固定請求與保存後計量)。費率／容量、更多 attempts 的 supervisor、loop／compact／角色控制仍待交付，T06 不勾完成。
 - **第八切片（2026-09-30）：**承接 `082d4d5f`，同一 Graph 接上有界多模型 Step，完整原生歷史與有序工具接到 final；原限額／request 恢復不重置。獨立審查的初始 checkpoint P2 已以 Red 修正；真 PG 新程序承接第二個 R、零重呼，受影響 **534 passed**。[本切片與限制](evidence/t06-agent-execution.md#8-第八切片有界多-step-接續)。容量／compact、重試 supervisor、角色控制與 provider 仍未完成。
+- **第九切片（2026-09-30）：**承接 `62e463fe`，count 接既有外送額度、原 request 與 checkpoint；同次恢復不重計、容量超限不生成、完整 Step 間達272K明確交回 compact 需求。[證據與限制](evidence/t06-agent-execution.md#9-第九切片固定計數與容量准入)。compact 執行／控制、重試及真 provider 仍未完成，不勾 T06。
 - **契約：**[共用執行](../../specs/2026-09-27-shared-agent-execution-and-state-design.md)、[Agent 接線](../../implementation/agent-execution.md)。
 - **程式／交付：**`agent_execution`、Responses／saver adapter、typed State／serializer、窄工具 handler 介面、單一 retry／計量責任；先使用測試工具與 fake Responses，不依賴產品工具完成。
 - **Red：**R 已保存卻重呼模型、只存 output_text、兩工具平行／配錯 call、公開文字誤判 final、serializer 丟 opaque／phase、role namespace 污染、SDK 隱含 retry。

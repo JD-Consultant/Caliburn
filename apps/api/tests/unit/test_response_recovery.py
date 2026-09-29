@@ -17,6 +17,7 @@ from caliburn.agent_execution.tool_steps import (
     ResponseStepSaveError,
     run_response_step,
 )
+from tests.fixtures.response_capacity import synthetic_response_runtime
 
 
 async def ensure_active() -> None:
@@ -77,7 +78,7 @@ async def test_public_step_preserves_original_response_when_both_saver_writes_fa
             EntireResponseSaveFault(),
             thread_id="original-response",
             request=make_request([{"role": "user", "content": "synthetic"}]),
-            runtime=ResponseStepRuntime(
+            runtime=synthetic_response_runtime(
                 request_model=request,
                 prepare_tool=prepare,
                 execute_tool=execute,
@@ -108,7 +109,7 @@ def recording_runtime(events: list[str]) -> ResponseStepRuntime:
     async def execute(prepared):
         pytest.fail("Read-only fixture")
 
-    return ResponseStepRuntime(
+    return synthetic_response_runtime(
         request_model=request,
         prepare_tool=prepare,
         execute_tool=execute,

@@ -20,6 +20,7 @@ from caliburn.agent_execution.tool_steps import (
     run_response_loop,
     run_response_step,
 )
+from tests.fixtures.response_capacity import synthetic_response_runtime
 
 
 def response_at(index: int, *, final: bool = False, tools: int = 0) -> Response:
@@ -83,7 +84,7 @@ class LoopProbe:
         self.accounted.append(received.response.id)
 
     def runtime(self) -> ResponseStepRuntime:
-        return ResponseStepRuntime(
+        return synthetic_response_runtime(
             request_model=self.request,
             prepare_tool=self.prepare,
             execute_tool=self.execute,

@@ -12,6 +12,8 @@ const knowledgeId = '30000000-0000-4000-8000-000000000003';
 const taskId = '40000000-0000-4000-8000-000000000004';
 const skillId = '50000000-0000-4000-8000-000000000005';
 const original: JdWorkView = {
+  collaborators: [],
+  conditions: [],
   revision_id: revision,
   areas: [],
   tasks: [

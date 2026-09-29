@@ -1,5 +1,6 @@
 """Reserve outbound work in a short transaction, independently of model result adoption."""
 
+from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -15,6 +16,7 @@ from caliburn.features.executions.budget_models import (
     ExecutionBudget,
     OutboundAdmission,
     OutboundAttempt,
+    OutboundFailure,
     OutboundKind,
     OutboundRequest,
     validate_cost,
@@ -73,6 +75,37 @@ async def reserve_outbound_attempt(
     existing = await storage.read_attempt(session, writer.scope.execution_id, attempt_id)
     if existing is not None:
         return _existing_admission(existing, request, reserved_cost_usd)
+    await check_outbound_capacity(
+        session, writer, request=request, reserved_cost_usd=reserved_cost_usd
+    )
+    record = storage.OutboundAttemptRecord(
+        execution_id=writer.scope.execution_id,
+        attempt_id=attempt_id,
+        request_id=request.request_id,
+        kind=request.kind.value,
+        fingerprint=request.fingerprint,
+        writer_id=writer.writer_id,
+        reserved_cost_usd=reserved_cost_usd,
+    )
+    session.add(record)
+    await session.flush()
+    return OutboundAdmission(_attempt(record), created=True)
+
+
+async def check_outbound_capacity(
+    session: AsyncSession,
+    writer: ExecutionWriter,
+    *,
+    request: OutboundRequest,
+    reserved_cost_usd: Decimal,
+) -> None:
+    """Fail exhausted work before backoff; checking is NOT permission to send.
+
+    Admission uses this same rule under the same execution lock. The workflow must still
+    obtain a newly committed admission after any waiting; no separate budget validator.
+    """
+    validate_cost(reserved_cost_usd, positive=True)
+    await service.lock_active_writer(session, writer)
     policy = await storage.read_budget(session, writer.scope.execution_id)
     if policy is None:
         raise BudgetConflictError("Fix the execution budget before outbound work")
@@ -98,23 +131,17 @@ async def reserve_outbound_attempt(
             raise BudgetExceededError(BudgetLimit.COMPACTIONS)
     if usage.accounted_cost_usd + reserved_cost_usd > policy.max_cost_usd:
         raise BudgetExceededError(BudgetLimit.COST)
-    record = storage.OutboundAttemptRecord(
-        execution_id=writer.scope.execution_id,
-        attempt_id=attempt_id,
-        request_id=request.request_id,
-        kind=request.kind.value,
-        fingerprint=request.fingerprint,
-        writer_id=writer.writer_id,
-        reserved_cost_usd=reserved_cost_usd,
-    )
-    session.add(record)
-    await session.flush()
-    return OutboundAdmission(_attempt(record), created=True)
 
 
 async def read_budget_usage(session: AsyncSession, scope: ExecutionScope) -> BudgetUsage:
     await service.read_execution(session, scope)
     return await storage.read_usage(session, scope.execution_id)
+
+
+async def read_execution_time(session: AsyncSession, scope: ExecutionScope) -> datetime:
+    """Read the DB clock after scope validation; callers hold the lock for retry decisions."""
+    await service.read_execution(session, scope)
+    return await storage.current_time(session)
 
 
 async def read_execution_budget(
@@ -163,6 +190,36 @@ async def record_attempt_cost(
     return _attempt(record)
 
 
+async def record_attempt_failure(
+    session: AsyncSession,
+    scope: ExecutionScope,
+    attempt_id: UUID,
+    *,
+    failure: OutboundFailure,
+) -> OutboundAttempt:
+    """Preserve an observed failure even after cancellation; never authorize another send.
+
+    The caller supplies a classified code and any aware retry deadline. Failure alone does
+    not release the cost reservation, and replay cannot replace or clear the original.
+    """
+    if await persistence.read_execution(session, scope, lock=True) is None:
+        raise ExecutionNotFoundError("Execution not found in the requested scope")
+    record = await storage.read_attempt(session, scope.execution_id, attempt_id)
+    if record is None:
+        raise BudgetConflictError("Cannot record failure for an unknown outbound attempt")
+    original = _attempt(record)
+    if original.failure is not None:
+        if original.failure != failure:
+            raise BudgetConflictError("An observed failure cannot be replaced")
+        return original
+    if record.reported_cost_usd is not None:
+        raise BudgetConflictError("An accounted successful attempt cannot become a failure")
+    record.failure_code = failure.failure_code
+    record.retry_not_before = failure.retry_not_before
+    await session.flush()
+    return _attempt(record)
+
+
 def _attempt(record: storage.OutboundAttemptRecord) -> OutboundAttempt:
     return OutboundAttempt(
         record.attempt_id,
@@ -170,6 +227,9 @@ def _attempt(record: storage.OutboundAttemptRecord) -> OutboundAttempt:
         record.writer_id,
         record.reserved_cost_usd,
         record.reported_cost_usd,
+        OutboundFailure(record.failure_code, record.retry_not_before)
+        if record.failure_code is not None
+        else None,
     )
 
 

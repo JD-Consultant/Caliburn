@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T04 已完成；T05 施工中；T06–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T05 已完成；T06–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -55,8 +55,8 @@
 
 ## T05 Memory 讀寫工具與唯一 V4A
 
-- [ ] T05；依賴：T04。
-- **進度（2026-09-30）：**受限 V4A 純編輯器已提交 `3dc82ff7`。續完成 read schema／生成資源、三角色讀取 handlers、固定快照／候選最新位置及來源導航；受影響 unit／contract／真 PG 共 444 passed。寫入工具／候選多欄交易接線與實際效果回傳仍待完成。[切片證據與下一步](evidence/t05-memory-tools.md)，不先勾 T05／V19 或 provider 整體通過。
+- [x] T05；依賴：T04。
+- **完成證據（2026-09-30）：**V4A `3dc82ff7`、讀取 `40dc7d7c`，第三切片接上 scoped create/update/delete、原命令 prepare/execute、多欄共同採用與真實效果回傳。受影響 unit／contract／真 PG **518 passed**；含提交確認遺失、改名／重用、過時候選與歧義反例。獨立審查發現 diff 分行不一致，先 Red 再修正。詳見[第三切片與未驗邊界](evidence/t05-memory-tools.md#4-第三切片受限寫入與原操作接續2026-09-30)。完成的是 T05 元件及 V19 確定性層；V20 的 JD 下鑽與真模型 gate 仍屬 T07／T16，未宣稱整項 V20 通過。T06 持久接續、T10 角色／交接 diff、T16 provider 仍未完成。
 - **契約：**[共同工具規範](../../specs/2026-09-27-agent-tool-contract-design-research.md)、[讀取](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[更新](../../specs/2026-09-27-memory-object-update-tool-contract.md)；修改語意時須完整讀相應章節。
 - **程式／交付：**schema、角色可用 handlers、Memory 投影與受限 V4A adapter；沿既有研究定位 parser／helper，鎖來源及 license。
 - **Red：**零／多處精確或近似匹配、兩個相似段落、multi-hunk 後段失敗、正文外 path 操作、跨層越權、title 改名重用後原 operation 重入。

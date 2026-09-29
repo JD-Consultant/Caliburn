@@ -1,6 +1,6 @@
 # 實作驗證與需求追溯
 
-- 狀態：**全部產品測試待執行**；本頁只建立對照，不以文件審查勾選產品通過。
+- 狀態：**分層施工與驗證進行中**；本頁只建立對照，已執行範圍沿任務 evidence；不以文件審查或元件測試勾選整體產品通過。
 - 需求效果唯一來源：[V01–V28](../architecture/verification.md)、[E01–E15](../specs/2026-09-27-shared-agent-execution-and-state-design.md#71-職責異常測試映射全部待執行)、[JDT-01–09](../specs/2026-09-29-jd-model-tool-contract-review.md#7-剩餘工程-gate全部待實作驗證)。任務完成狀態在[task list](../plans/2026-09-29-target-rebuild/tasks.md)。
 
 ## 1. 分層測試，不以 mock 冒充產品

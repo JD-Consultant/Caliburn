@@ -1,6 +1,6 @@
 # 介面、公開訊息與本機交付
 
-- 狀態：**工程設計／未實作**。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
+- 狀態：**工程設計；T02 檔案建立／選取／開場回讀已實作，其餘依任務 gate**。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
 
 ## 1. API 與 UI 的責任
 
@@ -11,6 +11,41 @@ Web 採 React Router 管頁面定位，TanStack Query 管正式／候選資料 c
 UI 是後端狀態投影：執行中或暫停時人工修改 JD 被後端拒絕；前端禁用按鈕只改善體驗。一次第二筆輸入不排無界隊列，返回既定在途狀態；不同檔案可並行使用，不需要每個檔案一個程序。
 
 元件按 feature 組織：interview 負責訊息與 A 控制；jd-editor 負責關聯式欄位及候選預覽；source-viewer 負責依據、待核對與詳細差異。不讓共用 UI component import database／provider 或決定來源版本。
+
+### 1.1 T02 已落地的讀寫邊界
+
+[App](../../apps/web/src/app/App.tsx)只組裝路由；[檔案 feature](../../apps/web/src/features/job-files/JobFilesPage.tsx)管建立／清單，[訪談 feature](../../apps/web/src/features/interview/InterviewHistory.tsx)只呈現正式歷史。檔案 ID 進 URL 與 query key，同名標籤不混成同一份資料；切換不保留另一檔案的 placeholder。HTTP 回傳先由 Ajv 驗證同一份 `apps/api/contracts/http` schema，再進 Query cache；TS 型別仍由該 schema 生成，不新增手寫 wire 規格。原文以轉義文字顯示，保留換行，不當 HTML 執行。
+
+**建立命令的未確認重送（已實作；不是 A Turn 恢復圖）：**
+
+```mermaid
+sequenceDiagram
+  participant UI as 建立表單
+  participant Tab as 本分頁 sessionStorage
+  participant API as 檔案 HTTP／Workflow
+  participant DB as PostgreSQL
+  UI->>Tab: 保留原命令識別及原輸入
+  UI->>API: POST 原命令
+  API->>DB: 原子建立檔案與正式開場，或查回原結果
+  DB-->>API: 原操作結果
+  alt 前端取得合法成功結果
+    API-->>UI: 原檔案識別
+    UI->>Tab: 清除待確認命令
+    UI->>API: 按檔案 ID 回讀 metadata／正式訪談
+  else 回應遺失或結果格式無法採用
+    UI->>Tab: 保留原命令，禁止改 payload
+    Note over UI,Tab: 同分頁 reload／重開表單<br/>重新確認原請求
+    UI->>API: 重送同一命令，不另建新識別
+  end
+```
+
+`sessionStorage` 僅為**本分頁尚未確認的 transport command**，不是正式檔案／交易的第二個 owner。保存 command ID、檔案名稱、員工姓名；先保留才送出，儲存不可用則明示未送出。不明結果不自動重送、不解除原 payload；明確拒絕後才可改字重新提交。確認成功清除；即使清除失敗，殘留命令也只查回原結果，不把原建立時 metadata 覆蓋到最新 cache。關閉分頁／清除瀏覽器資料不保證保留此暫存；此時先查清單，不能宣稱跨裝置或永久恢復。取消建立表單不是撤銷可能已成立的後端建立。
+
+此方案沿[共同保存審查](../specs/2026-09-27-shared-agent-execution-and-state-design.md)的「先列具體保證」：避免未確認時換新命令造成重複檔案，未新增 DB 回執或 browser database。它不決定後續訪談輸入的控制／重送策略。T02 目前沒有 AI 傳送、JD、SSE 或 Memory 控制；列表改名仍待同一任務補齊。
+
+框架依據：[React Router 路由](https://reactrouter.com/start/declarative/installation)、[Query key 必須包含查詢變數](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)、[Ajv 型別守衛](https://ajv.js.org/guide/typescript.html)。本案關閉隱含 query／mutation retry，由 UI 明確重讀／確認；不把 cache 當正式資料。MUI 9 已移除 system props 與 `disableEscapeKeyDown`，使用 `sx` 及受控 `onClose`；焦點在 transition `onEntered` 後定位，保留框架焦點陷阱及關閉恢復，不移除 StrictMode。[MUI migration](https://mui.com/material-ui/migration/upgrade-to-v9/)
+
+實測與限制見 [T02 evidence §8](../plans/2026-09-29-target-rebuild/evidence/t02-job-files-and-interviews.md#8-第四切片建立選取與正式開場-ui2026-09-29)。目前 Ajv 在 runtime 編譯 schema；嚴格 CSP／standalone codegen 與整體 bundle 效能須在 T15 評估，不為此放寬未來 CSP。這不是宣告前端安全／效能 gate 已完成。
 
 ## 2. 串流不是保存權威
 

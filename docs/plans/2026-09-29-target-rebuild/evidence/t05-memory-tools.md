@@ -1,6 +1,6 @@
 # T05：Memory 工具與唯一 V4A
 
-- 日期：2026-09-30；狀態：**施工中**。本頁記實測與後續接縫，任務完成狀態在 [tasks](../tasks.md#t05-memory-讀寫工具與唯一-v4a)。
+- 日期：2026-09-30；範圍：**工具元件的實測與接續界線**。任務完成狀態在 [tasks](../tasks.md#t05-memory-讀寫工具與唯一-v4a)，以下各切片保留當時的證據，不作第二份進度表。
 - 上位：共同工具、Memory read/update 契約由任務表路由；編輯機制的唯一說明在 [正文編輯接線](../../../implementation/memory-body-editing.md)。無 production 切換、無舊資料搬遷。
 
 ## 1. 研究與取捨
@@ -56,8 +56,40 @@ $env:PYTHONUTF8 = '1'
 
 上述沒有付費 API、外送員工資料或讀取金鑰。Native tool-call 保存／配對、模型接續、真 provider strict 與模型導航品質尚未驗證；單次讀取的字元上限不是 T06 token 預算。
 
-## 4. 下一個可執行切片
+## 4. 第三切片：受限寫入與原操作接續（2026-09-30）
 
-保持 T05 未完成。讀取已接；下一步承接 T04 候選公開介面，建立 create/update/delete 模型契約及薄寫入工具。用原操作重入／title 重用、跨層拒絕及多欄後段 hunk 失敗作真 PG 反例。薄工具不複製資料 owner、版本或原操作結果。Update 成功必須返回真實採用位置與差異，不能把請求 echo 成效果。
+主代理負責固定命令準備／候選採用／回傳與真 PG；子代理限定 schema、生成物及契約測試，再獨立唯讀審查整體接線。先讀 Goal、工程規範與原 CRUD／更新契約，沒有自行變更模型欄位或新造保存 owner。共同 wire 載入／拒絕格式由讀寫工具共用，領域不依賴生成 DTO。
 
-本輪不呼叫付費模型、不讀密鑰／原始員工資料；無 provider strict／真模型品質證據。後續接線須依 T06／T16 有界 preflight 與 T17 品質 gate，不能用離線通過替代。
+### 研究、反例與修正
+
+- Schema 延續前切片已核的官方 strict 契約，採 closed objects／required／巢狀分支。正文真實效果重用 Python 3.14.7 標準庫 `difflib.unified_diff`；主代理檢查已安裝標準庫原碼，未自製差異算法。此次 LangGraph／Python 網頁工具未返回並已停止等待，不能記作新的已讀官方證據；不據此新增框架保證。
+- 行為 Red：準備函式先不產生修改，title＋V4A 案例 **1 failed**；實作純變更準備後通過，再加入 all-or-nothing／來源／權限／重入接線。
+- 獨立審查找到 P2：diff 用 `splitlines()`，編輯器只認 LF／CRLF，會將 Unicode separator／VT／獨立 CR 誤報新行。正文保存正確但回傳行號失真。主代理補三個反例得到 **3 failed、7 passed**；共用 `split_body_lines` 後通過，未放寬定位或修改原文。
+- 兩項測試 fixture 修正保留原因：歧義訊息應查 typed code 而非猜英文措辭；短 header 內部空白差異不符既有模糊政策，長文案例改用實際允許的行首空白差異，未降門檻讓錯例通過。
+- 沒有新增依賴、資料表、收據或 checkpoint engine。工程接線、完整結果先驗及未知提交交 Runtime 的界線，只在 [Memory 工具 §4](../../../implementation/memory-tools.md#4-寫入準備採用與原結果接續)維護。
+
+### 驗證
+
+新增 10 項純準備案例、54 項 schema／generated contracts、10 項真 PG 寫入場景。真 PG 涵蓋：prepare 無副作用；title／description／body／references 共同採用；後段 hunk／引用／重名拒絕；原命令改名後 title 重用；準備後位置已變；B2 空／新增／移除來源；非法跨層；超過十萬字元 Markdown 的受控模糊修改與多處拒絕；CRUD／no-op 精簡結果；容量在採用前拒絕；真提交後注入確認遺失、原命令重入仍回原結果。未啟動 Graph 故障恢復。
+
+在 `apps/api` 執行：
+
+```powershell
+$env:PYTHONUTF8 = '1'
+$env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/caliburn_t01_test'
+$memoryToolTests = @(rg --files tests/integration | Where-Object { $_ -match 'test_(memory|interview)' })
+./.venv-target/Scripts/python.exe -B -m pytest tests/unit tests/contracts @memoryToolTests -q -p no:cacheprovider --tb=short
+```
+
+- 上列 **518 passed in 82.27s**，全部 unit／contracts 加 Memory／Interview 整合；不是全部後端、UI 或產品測試。PG 每測試獨立 schema，保留共享 DB 程序。
+- 審查修正後的正文／準備／寫入 PG 定向測試另為 **79 passed in 7.62s**，包含既有 59 項正文案例，不重複累加成新覆蓋數。
+- Ruff check／format 通過（152 files）；mypy 通過（134 source files）；生成器 `--check`、前端 TypeScript 通過。新增 6 個 schema及相應 Python／TS／package resources 全從唯一來源生成。
+- uv wheel 建置通過，包內 **14** 個工具 schema 與正式來源逐 byte 相同。首次受既有 uv cache 沙盒 ACL 限制，經授權本地建置重驗，未修改 cache 權限或產品程式。文件檢查 **19 檔／306 連結／0 errors**，`git diff --check` 通過。
+
+本切片無付費 API、無秘密或真人資料外送。V19 的確定性機制與候選採用已驗；V20 只有 Memory 元件部分，完整 JD 導覽與自然模型按需使用仍待 T07／T16／T17。模型真正選對物件、strict 遠端接受、效果品質不能從這 518 項推得。
+
+## 5. 下一個可執行切片
+
+進入 T06 共用原生執行：可靠保存完整模型結果與 App 操作身分，再保存原 prepared command，之後執行工具並接回原 `call_id`。先用假 provider＋真 saver／PG 驗證 R 已存不重呼模型、多 call 依序、原命令重入與原生 opaque／phase metadata 保留；不新增 ResponseStore 或把 pending command 當第二份候選。
+
+T06 須依已有授權建立有界全合成 provider 預檢；尚未進行的 API／checkpoint／模型品質 gate 仍明列，不能用函式／交易測試替代。

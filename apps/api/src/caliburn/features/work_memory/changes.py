@@ -8,7 +8,9 @@ from caliburn.features.work_memory.models import (
     MemoryContentChanges,
     MemoryMapEntry,
     MemoryMapInconsistencyError,
+    MemoryReferenceNotFoundError,
     MemoryTargetNotFoundError,
+    MemoryTitleConflictError,
     ReferenceChanges,
     validate_memory_text,
 )
@@ -39,7 +41,7 @@ def apply_reference_changes(
     if not changes.add <= allowed:
         raise InvalidMemoryChangeError("Added references must belong to the allowed source set")
     if not changes.remove <= current:
-        raise InvalidMemoryChangeError(
+        raise MemoryReferenceNotFoundError(
             "Removed references must belong to the current reference set"
         )
     return (current - changes.remove) | changes.add
@@ -71,6 +73,6 @@ def require_unique_title(
     This check neither reads another layer nor guarantees uniqueness at commit time.
     """
     if any(entry.object_id != target_id and entry.title == content.title for entry in entries):
-        raise InvalidMemoryChangeError(
+        raise MemoryTitleConflictError(
             "Another object in the supplied layer already has this title"
         )

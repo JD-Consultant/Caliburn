@@ -1,6 +1,6 @@
 # Memory 正文編輯接線
 
-- 日期：2026-09-30；狀態：**T05 施工切片；純字串編輯器已驗，尚未接模型工具及候選交易**。完整進度／驗證見 [T05 evidence](../plans/2026-09-29-target-rebuild/evidence/t05-memory-tools.md)。
+- 日期：2026-09-30；狀態：**純字串編輯器及 T05 模型工具／候選交易接線已驗；Runtime／真模型尚未交付**。完整進度／驗證見 [T05 evidence](../plans/2026-09-29-target-rebuild/evidence/t05-memory-tools.md)。
 - 產品契約：[單物件更新](../specs/2026-09-27-memory-object-update-tool-contract.md)、[共同工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md)。本頁只決定既有 V4A 能力的解析、定位與套用機制，不重定產品效果或資料 owner。
 
 ## 1. 重用來源與有限補強
@@ -43,11 +43,10 @@ App 已綁定的一份候選正文 + body diff
 
 初始上限集中 `BodyMatchPolicy`：來源及結果 body 均至多 2,000,000 字元、diff 64,000 字元、128 hunks、估算完整掃描 20,000,000 字元工作量。估算涵蓋 context 與 anchors；超限整次拒絕，不只掃前段，也不能成功產生編輯器自身無法再處理的正文。這不是 token 門檻或時間保證；工具描述及工作總容量仍須後續接線。政策由 App 配置，不是模型參數；測例可用較小界線驗拒絕。
 
-## 4. 尚未完成的接縫
+## 4. 接縫及驗證層級
 
-- 讀取 schema／generated DTO、B1／B2/A 的讀取 handlers、map／read 與 title → ID 已交付，見 [工具接線](memory-tools.md)；尚未接模型執行。
-- 寫入工具的原操作綁定、正文與 metadata／來源同次採用，及已提交後工具回傳恢復。
-- Update 回傳真實前後差異與實際定位，不能只 echo 輸入 patch；這不是只返回編輯器的新正文就已完成。
-- 寫入工具的真 PostgreSQL 接線、provider strict 接受與模型修正效果。純字串或讀取測例不證明上述能力。
+讀寫 schema／generated DTO、B1／B2 權限、map／read、title → ID、原操作命令、正文與 metadata／來源共同採用已接真 PostgreSQL；Update 回真實前後差異與定位，不 echo 模糊輸入。單物件寫入接線及容量在 [工具接線](memory-tools.md)維護。
+
+上述只證明可呼叫的工具元件。原命令可靠保存、完整 Step／程序重啟恢復仍待 T06；B1／B2 工作交接與語意差異仍待 T10；provider strict 與模型修正效果仍待 T16／T17。未將已提交後確認遺失的工具重入測試當成完整 Graph 恢復。
 
 既有規格的欄位與例子維持單一權威；本頁不另複製所有工具 JSON。

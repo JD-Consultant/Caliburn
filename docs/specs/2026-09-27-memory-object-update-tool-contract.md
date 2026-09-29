@@ -1,4 +1,6 @@
-# Memory 單物件更新工具契約（工程設計／未實作驗證）
+# Memory 單物件更新工具契約
+
+> **2026-09-30 施工註記：**T05 已實作 schema、角色讀寫元件、V4A 多欄共同採用及原操作重入，並通過契約／真 PostgreSQL 驗證。工程接線見 [Memory 工具](../implementation/memory-tools.md)，實測見 [T05 evidence](../plans/2026-09-29-target-rebuild/evidence/t05-memory-tools.md)。下列日期狀態保留設計沿革；不是目前完全未施工，也不表示 Runtime、provider strict 或模型品質已驗收。施工授權來自 Goal，不來自本契約。
 
 > **有效目標：**Memory 不做逐條 `confirm_reference_alignment`；來源集合可空，情境刪除同步解除候選綁定，各層內標題唯一。本文已按[最新決策](../current-decisions.md)與[背景生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md#候選操作快照與三個安全點目標已確認未實作)整理；明標歷史的替代方案不作施工依據。本文不決定資料表，也不授權實作。
 

@@ -43,8 +43,35 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/ca
 
 修正後同一 unit／contract／跨程序 PG 集合 **413 passed in 7.84s**、無 warning。Ruff／format 156 files、mypy 137 source files 通過；文件 20 份／312 links 零錯、`git diff --check` 通過。mock 明確比對 compact 原 JSON 與回讀，仍不是 provider 真實 compact 接受性驗收。子代理已關閉，無付費或私人資料外送。
 
-## 2. 下一個可執行切片
+## 2. 第二切片：單一模型／工具 Step 與候選原效果接續
 
-先接小型共用 StateGraph 的 `request_model → prepare_tool → execute_tool` 保存交界，每筆工具依序；以原生 saver／既有候選操作承接，不加第二份 owner。待執行命令型別須能嚴格往返，未知／降型結果不能進 execute。先做 E02／E03 的保存失敗／確認遺失反例及 E04 的真 PG 原工具重入，再接有界計量／compact／角色控制。
+原生回應切片已提交 `5cfbb1da`。本切片直接重用官方 StateGraph，不手寫框架；主代理讀官方 durable execution／checkpointers 與 `pregel/main.py` 的 sync 等待位置。模型與工具依賴僅為窄 callable，Graph 不 import JD／Memory 業務。通過 R 保存才在下一 node 檢查／prepare，通過命令保存才 execute；恢復以 None、不用 checkpoint_id replay。
+
+子代理分工實作 `graph_checkpointer.py` 與 serializer 契約測試，先讀 Goal／責任文件／coding standard，查官方 4.2.0 原碼；主代理審 code 及實際原碼後整合。未允許 constructor 的 Red **1 failed**，allowlist／三種命令／兩 layer／巢狀型別等 **28 passed**。官方 tuple 會還原為 list，即使 allowlist tuple 也不改變；不為此自造 codec，prepared payload 不含 tuple，原生 State 用 list。無 DB schema 或依賴變更。
+
+### 實際反例與結果
+
+- Graph 尚未派工具的初版：**3 failed** 行為 Red；完成 prepare／execute／finish 接線後通過。較早缺 API 名稱的 collection error 不算行為 Red。
+- 單一 Step 兩筆工具按序執行；每個 handler 觀察到 R／prepared 已在 saver。第二筆失敗後只重入第二筆，model 與第一筆不重跑。未知 phase 保留 R 後才拒絕。
+- 真 PG 模型 checkpoint：`aput` 寫前拋錯、寫後確認遺失都使工具派送為零；重開 saver 後以原生 pending writes／checkpoint 接回，模型總呼叫仍 1。沒有推論成「pending writes 也失敗仍保證可恢復」。測例最初錯誤期待不存在的 caller，已按 fixture 修正，不更動 product 行為掩蓋錯誤。
+- 真 PG Memory：先 create 盤點，業務提交後人工注入確認遺失；恢復拿同一 prepared command，得到原建立結果，再 prepare／execute 改名月末盤點。呼叫序列是 model、prepare create、execute create、execute create、prepare update、execute update；原業務操作只有 start＋create＋revise 三筆、物件一筆，沒有正式 snapshot。未自建 receipt。
+- 既有跨程序 worker 改用實際 Step 的私有 builder，不是另寫能力示範圖；第二程序模型 0、觀察 1、原生 items 與 opaque metadata 完整。Static interrupt 只用於測試切斷，不冒充使用者暫停。
+- 完成 Step 關閉／重開 saver 再 resume 不重新添加 context；完整 final 只是交回下一層責任，不呼叫正式發布。
+
+測試命令（同 §1 loopback test DB）：
+
+```powershell
+./.venv-target/Scripts/python.exe -B -m pytest tests/unit tests/contracts tests/integration/test_graph_postgres.py tests/integration/test_response_step_postgres.py tests/integration/test_memory_tool_step.py -q -p no:cacheprovider --tb=short
+```
+
+初次整合 **449 passed in 9.73s**；針對集合 **37 passed in 4.52s**。獨立唯讀審查指出：只靠 caller 記住 sync 不足，重送新 input 至未完成 thread 也會重新呼叫模型。新增公開 `run_response_step` 強制 sync／有界 recursion，拒絕既有 thread 的新 input，以及不存在 thread 的 resume；同原呼叫恢复只接受 None。每 Step 的 call 上限在任何工具派送前檢查。這些准入檢查不取代執行 owner 的單 writer／租約。
+
+追加雙保存失敗反例時，原方案透過 `astream` 捕獲 update 得到 **1 failed**：保存拋錯可以先於 update 交付。改在實際 request callback 捕獲完整 SDK R，核對 saver 無原結果，透過官方 `aupdate_state(as_node="request_model")` 補存後 resume；模型總呼叫 1。這是能力證據，正式 supervisor／保留與工作資格核對尚未接線；不宣告 E03 完成，也不假設程序崩潰後記憶體 R 仍在。
+
+上述追加後同集合 **452 passed in 9.40s**。Ruff check／format **162 files**、mypy **139 source files** 通過，文件 20 份／312 links 零錯、diff check 通過。獨立代理複核兩個 P2 已修，指定 4 tests 與 9 組有界離線 probe 通過（含 call 數恰達上限、完成後公開入口恢復），無新增重大發現。真正 DB 僅使用測例建立的隨機 schema，測後移除該 schema；共享 55439 server／database 留存。無付費、無 `.env`、無真員工外送。本段不是完整 E01–E04 或 T06 完成。
+
+## 3. 下一個可執行切片
+
+繼續外層共用 loop 與單一有界計量／外送資格，將「checkpoint＋pending writes 都失敗，但原 R 還在」的能力證據接入有資格檢查的正式恢復路徑，再接 compact／角色控制。正常 Step 入口已固定 sync／recursion／新輸入與恢復界線。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執。工具接線需核對還原巢狀型別；目前只有 Memory 的 prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢仍需另備全合成 request／費用 manifest，目前無付費、無金鑰讀取、無真人資料外送。

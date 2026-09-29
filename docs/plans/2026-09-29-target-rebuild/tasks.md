@@ -82,6 +82,7 @@
 - **第十四切片（2026-09-30）：**承接 `bbe55f59`，輪前歷史計數／門檻／Agent 意圖共用原 C 保存流程；未壓縮決定亦可恢復，原 count／C 不因保存故障重送。[證據與限制](evidence/t06-agent-execution.md#14-第十四切片輪前歷史的門檻判斷與可恢復準備)。合法基底跨工作選用、角色資料綁定與取消回退尚未接完，不宣稱 T06 或產品安全點完成。
 - **第十五切片（2026-09-30）：**承接 `62d547f9`，沿 executions 管理 reference-only 歷史資格，原生完整窗口仍由官方 saver 保存；取消後新工作重用輪前基底、不帶被取消輸入、不重壓。[證據與限制](evidence/t06-agent-execution.md#15-第十五切片跨工作合法歷史與取消後基底)。角色固定資料、正式業務完成及背景回退調度仍待接線，T06 施工中。
 - **第十六切片（2026-09-30）：**承接 `cc564072`，借既有 Tenacity 為原 R／C／count 的 typed handoff 接有限保存重試；沿原 thread 核對，不重送原模型請求、不重設持久外送預算。[證據與限制](evidence/t06-agent-execution.md#16-第十六切片原件補存的有限自動恢復)。程序遺失後的未知 attempt、角色調度及真 provider 仍待接線，T06 未完成。
+- **第十七切片（2026-09-30）：**承接 `7c4a383d`，固定官方文字費率與模型綁定接原 budget，分算 cache read／write 與長 context，未明 usage 保留預留；受影響 **755 passed**。[證據與界線](evidence/t06-agent-execution.md#17-第十七切片固定費率與原-usage-結算)。是 usage 成本估算、非已核 provider 帳單；角色組裝與未知 attempt 調度仍未完成，不勾 T06。
 - **契約：**[共用執行](../../specs/2026-09-27-shared-agent-execution-and-state-design.md)、[Agent 接線](../../implementation/agent-execution.md)。
 - **程式／交付：**`agent_execution`、Responses／saver adapter、typed State／serializer、窄工具 handler 介面、單一 retry／計量責任；先使用測試工具與 fake Responses，不依賴產品工具完成。
 - **Red：**R 已保存卻重呼模型、只存 output_text、兩工具平行／配錯 call、公開文字誤判 final、serializer 丟 opaque／phase、role namespace 污染、SDK 隱含 retry。

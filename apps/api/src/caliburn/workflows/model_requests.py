@@ -16,6 +16,7 @@ from openai.types.responses.compacted_response import CompactedResponse
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from caliburn.adapters.openai_failures import ResponseFailure, classify_response_failure
+from caliburn.adapters.openai_pricing import TextResponsePricing
 from caliburn.adapters.openai_responses import (
     ResponseRequest,
     compact_context,
@@ -51,6 +52,7 @@ class ModelRequestAccounting:
     token_count_reservation_usd: Decimal | None = None
     compaction_reservation_usd: Decimal | None = None
     observed_compaction_cost: Callable[[CompactedResponse], Decimal | None] | None = None
+    model: str | None = None
 
     def __post_init__(self) -> None:
         validate_cost(self.reserved_cost_usd, positive=True)
@@ -60,6 +62,28 @@ class ModelRequestAccounting:
             validate_cost(self.compaction_reservation_usd, positive=True)
         if not self.cost_basis.strip():
             raise ValueError("An explicit cost basis is required")
+        if self.model is not None and not self.model.strip():
+            raise ValueError("An explicit accounting model cannot be empty")
+
+    @classmethod
+    def from_text_pricing(
+        cls,
+        pricing: TextResponsePricing,
+        *,
+        reserved_cost_usd: Decimal,
+        token_count_reservation_usd: Decimal | None = None,
+        compaction_reservation_usd: Decimal | None = None,
+    ) -> ModelRequestAccounting:
+        """Bind the researched Standard rates; reserves remain explicit administrative limits."""
+        return cls(
+            cost_basis=pricing.cost_basis,
+            reserved_cost_usd=reserved_cost_usd,
+            observed_cost=pricing.estimate_response_cost,
+            token_count_reservation_usd=token_count_reservation_usd,
+            compaction_reservation_usd=compaction_reservation_usd,
+            observed_compaction_cost=pricing.estimate_compaction_cost,
+            model=pricing.model,
+        )
 
 
 class PriorModelAttemptError(RuntimeError):
@@ -161,6 +185,8 @@ class ModelRequestExecutor:
         Only a caught provider failure can authorize the next attempt. A crash or lost
         admission acknowledgement leaves an unresolved record and stops on re-entry.
         """
+        if self.accounting.model is not None and payload.get("model") != self.accounting.model:
+            raise BudgetConflictError("The request model does not match its pinned pricing")
         while True:
             try:
                 attempt_id = await self._reserve_request(request_id, kind, payload, reservation)

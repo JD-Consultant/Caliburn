@@ -12,10 +12,14 @@ from caliburn.adapters.database import Base
 from caliburn.features.job_description import (
     area_persistence,
     capability_persistence,
+    collaborator_persistence,
+    condition_persistence,
     task_persistence,
 )
 from caliburn.features.job_description.areas import ResponsibilityArea
 from caliburn.features.job_description.capabilities import Capability, TaskCapabilityLink
+from caliburn.features.job_description.collaborators import Collaborator
+from caliburn.features.job_description.conditions import JobCondition
 from caliburn.features.job_description.models import JdProfile, JdProfileRevision
 from caliburn.features.job_description.tasks import WorkTask
 
@@ -78,7 +82,8 @@ class JdOperationRecord(Base):
             name="fk_jd_operations_result_revision",
         ),
         CheckConstraint(
-            "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities')",
+            "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
+            "'edit_collaborators', 'edit_conditions')",
             name="kind",
         ),
     )
@@ -133,6 +138,8 @@ async def insert_revision(
     tasks: tuple[WorkTask, ...] | None = None,
     capabilities: tuple[Capability, ...] | None = None,
     task_links: tuple[TaskCapabilityLink, ...] | None = None,
+    collaborators: tuple[Collaborator, ...] | None = None,
+    conditions: tuple[JobCondition, ...] | None = None,
 ) -> None:
     session.add(
         JdRevisionRecord(
@@ -172,5 +179,21 @@ async def insert_revision(
         )
     elif parent_revision_id is not None:
         await capability_persistence.copy_task_links(
+            session, job_file_id, parent_revision_id, revision.revision_id
+        )
+    if collaborators is not None:
+        await collaborator_persistence.select_collaborators(
+            session, job_file_id, revision.revision_id, collaborators
+        )
+    elif parent_revision_id is not None:
+        await collaborator_persistence.copy_collaborator_selection(
+            session, job_file_id, parent_revision_id, revision.revision_id
+        )
+    if conditions is not None:
+        await condition_persistence.select_conditions(
+            session, job_file_id, revision.revision_id, conditions
+        )
+    elif parent_revision_id is not None:
+        await condition_persistence.copy_condition_selection(
             session, job_file_id, parent_revision_id, revision.revision_id
         )

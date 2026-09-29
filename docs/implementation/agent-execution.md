@@ -367,7 +367,7 @@ flowchart TD
 
 依據：2026-09-30 查[OpenAI 錯誤與 Retry-After 指引](https://developers.openai.com/api/docs/guides/error-codes#python-library-error-types)、核本機 SDK 3.20.0 header／jitter 原碼；借鑑 [Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)的單一責任、分類及整體交易考量。未直接啟用 SDK／LangGraph／通用 decorator，是因它們的隱含 attempts 不承接本案持久費用准入；純等待計算不需要新依賴。這是本案接線，不聲稱業界共同採同一資料表。
 
-**未完成邊界：**沒有失敗紀錄、但原程序確已遺失的 attempt，仍需角色 supervisor 核原 Graph／在途資格後決定是否准許新 attempt；DB 原件補存的有界調度、完整角色恢復／UI 通知、真費率及 provider gate 亦未完成。不得將本節當作 T06／T08／T11 完整驗收。實测與反例見 [T06 §13](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#13-第十三切片共同外送的持久有界重試)。
+**未完成邊界：**沒有失敗紀錄、但原程序確已遺失的 attempt，仍需角色 supervisor 核原 Graph／在途資格後決定是否准許新 attempt；完整角色恢復／UI 通知、真費率及 provider gate 亦未完成。原件補存的有限調度見 §5.6，不能取代這些責任。不得將本節當作 T06／T08／T11 完整驗收。實测與反例見 [T06 §13](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#13-第十三切片共同外送的持久有界重試)。
 
 ### 5.5 輪前歷史準備元件（T06 第十四切片）
 
@@ -395,6 +395,35 @@ flowchart TD
 **產品接線邊界：**本元件仍不自行決定哪個歷史 checkpoint 可跨取消採用；第十五切片的 §3.1 已由 executions owner 管理合法基底並驗取消後重用。它不提供取消後繞過舊 writer guard 的入口。角色固定 maps／來源、本工作資料只追加一次，以及 B 整批安全點與各角色私有歷史共同回退仍由 T08／T10／T11 完成；不能由本元件測試宣稱 E09／E10 全完成。
 
 依據：重新核 [OpenAI standalone compaction 的完整窗口接續](https://developers.openai.com/api/docs/guides/compaction#user-journey-for-standalone-compaction)及 [LangGraph checkpoint／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)。框架負責保存執行結果，128K／角色準備時點與取消效果是 Caliburn 已確認政策，不稱為供應商共同規定。驗證層級及限制見 [T06 §14](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#14-第十四切片輪前歷史的門檻判斷與可恢復準備)。
+
+### 5.6 原件補存的有限自動恢復（T06 第十六切片）
+
+四個既有入口 `run_response_step`、`run_response_loop`、`prepare_context_history`、`run_context_compaction` 共用 `result_save_retries.py` 的有限調度。它只承接 **typed save error 仍持有的完整 R／C／count**，回到原 thread 的既有核對／補存入口；不是對所有 Graph 失敗重新 invoke，也不重跑原付費請求。
+
+```mermaid
+flowchart TD
+  R[完整原結果仍在程序內] --> S[官方 saver 保存]
+  S -->|成功| N[既有結算與接續流程]
+  S -->|失敗| G{原件 handoff＋暫時性 DB 錯誤？}
+  G -->|否／次數用盡| E[交回原錯誤與可用 handoff；停止自動嘗試]
+  G -->|是且仍有次數| W[交易外有界退避]
+  W --> C[原恢復入口核 writer、原請求與已存結果]
+  C -->|已存| N
+  C -->|尚未保存且仍可採用| S
+  C -->|取消／失去資格／不一致| E
+```
+
+- **借現成機制、不疊乘：**使用已在 lock 中的 Tenacity 9.1.4（Apache-2.0），改列直接相依；`AsyncRetrying` 僅負責有限次數與 cancellable jitter。沒有 Graph node retry、第二套 saver、表或 durable scheduler。外送仍只由 §5.4 管；工具結果不明仍交原業務 owner 核對。
+- **准入很窄：**外層必須是原件保存錯誤；直接原因才交 `adapters/checkpoint_failures.py` 判斷 Psycopg SQLSTATE。已知連線、服務暫停、連線耗盡與交易暫時衝突可有限重試；明確認證／schema／約束／序列化／查詢取消等錯誤不自動碰撞。不沿任意例外鏈猜原因，也不解析可能含 DSN 的訊息。無 SQLSTATE 的 `OperationalError` 無法完全區分連線與認證設定故障，採**有限允許**，不是保證故障暫時性。
+- **工程初值：**每次入口呼叫最多 3 次嘗試（含首次），0.25 秒起的 full jitter、等待上限 1 秒；`max_attempts=1` 可停用自動補存。這是程序內保存重試配置，不是模型外送「5 次」政策；不增加、重置或釋放持久外送額度。I/O timeout 由連線 owner 管，這個數量上限不冒充整輪硬 deadline。
+- **原件優先：**每次先查原 checkpoint／pending writes；已存就接續，未存才以同一原件、request／operation seed 補存。回應重入不重送新 input；已消耗的 pause resume 不再重送。C 完整窗口保留，沒有重新生成摘要或刷新 maps。
+- **失敗界線不變：**保存後的結算／工具錯誤不納入這個 retry。取消與 writer 更替由原恢復入口阻止採用及後續效果；程序取消會傳遞，不當成業務取消完成。用盡仍拋原 typed error 與 handoff，不轉成成功、不丟掉仍可取得的原件。上位流程不能藉反覆呼叫本入口無限重設保存嘗試。
+- **等待中取消仍交回原件：**Tenacity backoff 收到 task cancellation 時，拋 `ResultSaveCancelledError`（仍是 `asyncio.CancelledError`），其 `save_error` 保留原 typed save error 與 `.recovery`；不吞取消、不 `uncancel`、不重送 provider。直接呼叫方須在傳遞取消前承接需要的原件；不能假設 TaskGroup 或再次 await 已取消 task 仍會替它保留這個 handoff。等待結束就清除等待層的暫存參照，後續節點被取消不能帶回已失效的舊補存資料。這只是程序內交接，未授權恢復被取消的業務工作。
+- **仍未涵蓋：**程序整個遺失且未存下的 R／C／count、未明外送 attempt、一般業務 COMMIT 對帳調度、角色回退／UI 通知。手上的原件不是跨程序備份；此切片也不把整體 T06 或產品恢復勾完成。
+
+依據：[LangGraph node retry](https://docs.langchain.com/oss/python/langgraph/use-graph-api#add-retry-policies)針對節點執行，不替本案持有原結果與 saver 交接；[Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)要求故障分類、有限嘗試與單一責任；[Tenacity](https://tenacity.readthedocs.io/en/latest/)提供既有異步退避；[Psycopg SQLSTATE](https://www.psycopg.org/psycopg3/docs/api/errors.html)提供機器可判斷原因。具體分類、初值及原件接線是 Caliburn 取捨，不宣稱業界一致採此數字。證據見 [T06 §16](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#16-第十六切片原件補存的有限自動恢復)。
+
+取消交接沿 [Python task cancellation](https://docs.python.org/3/library/asyncio-task.html#task-cancellation) 的傳遞語意及 [Tenacity 公開 sleep hook](https://tenacity.readthedocs.io/en/latest/api.html#tenacity.AsyncRetrying)，不是攔截整個 Graph 的 `BaseException` 或另建結果儲存。
 
 ## 6. Memory 背景工作
 

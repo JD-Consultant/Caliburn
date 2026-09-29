@@ -1,5 +1,11 @@
 # JD-R002／MEM-L001：分層工作案例與工作理解 Memory 對齊
 
+> **2026-09-25 B1／B2 職責 successor（目標／WORKING，未施工）：**B1 只負責案例層；B2 只負責工作理解層，不審核案例對錯。B2 若在理解分析中發現所需資訊未寫進案例，向 B1 交流缺口；B1 核對原話，有依據就補案例，仍無法釐清就把已知與未知寫進相關案例；B2 再處理自己的理解。下文 `case_rework_required`、「B2 發現 B1 案例錯誤」及重開 B1 attempt 是當時設計／現行程式，不能直接當作新目標的固定語意或施工指令。有效責任與未決生命週期見[目前決策](../current-decisions.md)及[架構導覽](2026-09-24-caliburn-layered-architecture-map.md)。
+
+> **2026-09-24 後續裁決（WORKING，未施工）：**目標架構退役 C；下方 C 修補及「背景期間禁用 C」僅保留為歷史設計／現行程式背景，不再作新施工指令。Memory 物件版本與 JD 引用的最新方向見[分層架構導覽](2026-09-24-caliburn-layered-architecture-map.md)及[決策入口](../current-decisions.md)。
+
+> **2026-09-24 Owner successor（WORKING，未施工）：**B2 可由候選案例按需沿引用回查原話；JD 可直接引用已核對原話，只有已正式發布的案例／理解可作 JD 的 Memory 引用，背景未發布不阻止依原話寫 JD。候選不外露、整版原子發布及 stale 後重新判斷維持。新的背景優先規則從同文件通知被 App 正式接收起，至目標完成或明確處置前禁用 C，包含 queued／running／待恢復／blocked；下文「C 與背景競爭，先成功者成立」是歷史設計，不再指導後續施工。此決策尚未實作，版本與引用新架構仍待可審設計。現行狀態以[決策入口](../current-decisions.md)為準。
+
 - 日期：2026-09-16
 - Stage：**G7 分段施工；package 完整背景 workflow、App A 分層讀取、App B1／B2 request-only compaction、正式 role factory、managed callback 及 layered C 已完成離線驗證**
 - 取代：Q019 在 Caliburn 採用的「B1 固定訪談窗口詳記＋B2 只維護 knowledge／guide」產品映射

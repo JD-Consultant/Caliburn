@@ -1,5 +1,11 @@
 # 分層 Memory 完整背景 Workflow 設計
 
+> **2026-09-25 B1／B2 職責 successor（目標／WORKING，未施工）：**正常路徑仍是 B1 維護案例、B2 依案例維護工作理解、候選一致後共同發布。B2 不再被定義為案例錯誤的審核者；它若在分析理解時發現所需資訊未寫在案例裡，只向 B1 交流缺口，B1 在案例層寫明可核實的已知及未能釐清的未知。下方 `case_rework_required`、新 B1 attempt 及「B2 退回 B1」是現行實作與歷史證據；可否沿用及如何接續須按新語意另議，不能按舊 §5 直接施工。詳見[目前決策](../current-decisions.md)與[架構導覽](2026-09-24-caliburn-layered-architecture-map.md)。
+
+> **2026-09-24 後續裁決（WORKING，未施工）：**目標架構退役 C；下方 C 准入／修補／impact 接力是歷史實作與驗收紀錄，不再作新施工指令。B1／B2 的共同背景流程仍供參考；最新方向見[分層架構導覽](2026-09-24-caliburn-layered-architecture-map.md)及[決策入口](../current-decisions.md)。
+
+> **2026-09-24 Owner successor（WORKING，未施工）：**同文件 B1／B2 通知成功工具收據已持久保存，即開始背景生命週期；直到目標完成或明確處置（包含尚未安全收尾／准入、queued、running、待恢復、blocked），C 不得使用。第 17 輪新更正不在此前固定的背景來源中；CAS 擋下過期候選仍不足以保證舊背景重做時知道這句更正。原有 C 與背景 publication 競爭／stale 重整只作歷史實作與安全證據，不能代替新的優先規則。B2 仍可沿案例引用按需回查原話，候選不外露、整版原子發布與 stale 後重新判斷不變。[現行決策入口](../current-decisions.md)記錄效力與未施工界線。
+
 > **2026-09-20 successor 路由：**本稿的 B1→B2 workflow、attempt、rework、CAS／receipt 與後續 App 接線都保留；文中「layered C／managed callback 尚未完成」是當時狀態，兩者現已由後續切片完成。目前待施工的是[A／Working State／JD 的短-key證據對齊](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)，不是重做本 workflow。
 
 **Topic：**`JD-R002 / MEM-L001`

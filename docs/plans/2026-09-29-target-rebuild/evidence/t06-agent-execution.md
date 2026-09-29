@@ -338,10 +338,27 @@ Ruff check／format **223 files**、mypy **154 source files** 通過。文件 **
 
 `uv sync --locked --offline` 通過（86 個既有相依，重建本地 target package）；僅將已鎖定 Tenacity 列為直接依賴。全部測試仍為離線模型／SDK 合成資料與真測試 DB，不是 OpenAI 遠端／訪談品質驗收。T06 與整個 Goal 均未完成；原件可恢復不等於完整角色 supervisor 已接好。
 
-## 17. 下一個可執行切片
+## 17. 第十七切片：固定費率與原 usage 結算
 
-接角色控制、真實費率配置及未明 attempt 的恢復調度。共同 loop 已有完整 request、sync／局部步數、原 R／C／count 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用、完整 Step pause 與已確認 provider 故障的有界重試；未配置 compact 接縫仍明確停止。第十四、十五切片已有輪前可恢復準備與合法跨工作基底；準備後固定並追加角色資料、B 兩角色與候選安全點共同回退，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度仍須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
+承接 `7c4a383d`。主代理使用既有 SDD／TDD 計畫，核官方 pricing、cache read／write 算式及 SDK 3.20.0 usage；研究子代理獨立查 compact 與 count 收費契約，主代理再讀 compact reference 的 default 條件。採小型不可變費率配置及 Decimal 計算，接原 `ModelRequestAccounting`；不用新增費用平台／依賴／資料庫保存。責任、估算限制與來源由[工程 §5.7](../../../implementation/agent-execution.md#57-固定費率與-usage-成本估算t06-第十七切片)維護。
+
+- 算術骨架 Red **11 failed／13 passed**，涵蓋正常／快取／寫入、長 context 門檻、輸出、費率身分與預留。首輪實作 **1 failed／23 passed**：SDK `construct` 已把測試的 bool 轉成 int，原測例並未保留其聲稱測試的非法值。改用 SDK `model_copy` 保留該值測邊界，不修改產品算式；追加缺失欄／合法零後 **29 passed**。
+- Compact 與 factory 接線最初七案缺少方法，不算有效行為 Red。補 factory 骨架後 **6 failed／34 passed**：compact 未估算，模型不符仍抵達 HTTP。補實作後 **40 passed in 3.90s**，含真 PG 七案：原 usage 結算重入、compact 原模型配置、缺 cache-write 保留預留、三種請求模型不符均零准入／零 HTTP，以及不同費率依據不得結算舊工作。
+- 真 PG fixture 的 budget 改為使用傳入 accounting 的既有 `cost_basis`，舊合成政策不變；沒有新增 receipt、原件副本或假 provider 帳單。使用 SDK MockTransport，未知費用不改零；這不是遠端接受、程序 kill 或模型品質測試。
+- 主代理受影響回歸：unit／contracts 全部＋price/model/compact/budget/result-save 真 PG，**755 passed in 32.99s**。不是完整後端回歸，不重複宣稱前次 1229 項涵蓋本增量。mypy **157 source files** 通過；最終靜態／文件檢查及獨立審查接續補記。
+
+當次未讀 `.env`、無付費 API、無 production migration、無新依賴。Count 端點費用查不到明確官方承諾後停止廣搜，保留既有行政預留；Compact default 使用標準費率有文件依據，但當前 SDK 沒有回傳模型／tier 的正式欄位，仍標示推估，不冒充核帳。T06 及整體 Goal 未完成。
+
+最終 Ruff check／format **231 files**、mypy **157 source files** 通過；文件 **20 份／354 links** 零錯、`git diff --check` 通過。本次只補計價接線文字，既有 R→結算→資格→工具流程與圖不變，不為未改圖重跑 renderer。
+
+獨立 reviewer 未發現可重現的實質缺陷，專項 **57 passed**，另驗 **34 組異常 SDK usage** 與原生序列化往返、cost basis 跨程序穩定。它是窄審查補充，不與主代理 755 項加總、不當作新程序完整產品恢復或真帳單驗證。研究與審查子代理均已完成，無額外檔案變更。
+
+## 18. 下一個可執行切片
+
+接角色控制、費率／容量配置的正式組裝及未明 attempt 的恢復調度。共同 loop 已有完整 request、sync／局部步數、原 R／C／count 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用、完整 Step pause 與已確認 provider 故障的有界重試；未配置 compact 接縫仍明確停止。第十四、十五切片已有輪前可恢復準備與合法跨工作基底；準備後固定並追加角色資料、B 兩角色與候選安全點共同回退，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度仍須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。第十六切片已為仍完整的原 R／C／count 接上有限補存，不重呼原付費請求；不能據此跳過未知 attempt 或角色恢復責任。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。
 
-下一切片費率的查證入口（2026-09-30，僅研究、未實作）：[官方 pricing](https://developers.openai.com/api/docs/pricing)明確區分 Standard／其他 tier、短／長 context、cache read／write；[prompt caching 的成本範例](https://developers.openai.com/api/docs/guides/prompt-caching#monitor-cache-performance)將普通輸入視為 input 減去 cached 與 cache-write tokens。已核本機 SDK 3.20.0 `ResponseUsage` 也有兩欄；不得只用 input／output 兩個數字算費用或把 cache writes 當免費。`CompactedResponse.usage` 亦為 `ResponseUsage`，但壓縮的實際適用費率、token-count 計費、模型／tier 綁定與行政預留仍須再核官方契約；不能由型別一樣推定帳單相同。沿既有 `ModelRequestAccounting` 接線，不另建費用服務，不據本研究自動改模型選擇。
+第十七切片已接公開費率估算與模型綁定，實際帳戶／invoice 尚未驗。後續依原 capacity 和 fee manifest 組裝行政預留，不把 create 輸出上限搬給 compact、不因 SDK usage 型別相同推定帳單已核實；T16 必須辨明這些界線。
+
+先按任務表的 T06 完成契約收斂剩餘缺口：共用機制在 T06，正式 A 控制／提交屬 T08，B 角色／批次屬 T10／T11，不能把所有角色交付無限併入本任務。T07 的 T03／T04／T05 前置條件已滿足，可繼續 JD／來源工具垂直切片；未驗 provider gate 必須保留，不阻止不依賴它的工作。

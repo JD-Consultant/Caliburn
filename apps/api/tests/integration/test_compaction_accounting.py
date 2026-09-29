@@ -145,7 +145,7 @@ async def admitted_executor(
                     3,
                     datetime.now(UTC) + timedelta(hours=1),
                     Decimal("1"),
-                    "synthetic-v1",
+                    accounting.cost_basis,
                 ),
             )
         async with create_responses_client(

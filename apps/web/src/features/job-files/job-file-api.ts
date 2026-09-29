@@ -2,6 +2,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import type { CreateJobFileRequest } from '../../shared/api/generated/create-job-file-request';
 import type { JobFile } from '../../shared/api/generated/job-file-list';
+import type { RenameJobFileRequest } from '../../shared/api/generated/rename-job-file-request';
 import { requestJson } from '../../shared/api/http';
 import { isJobFile, isJobFileList } from '../../shared/api/validation';
 
@@ -20,6 +21,14 @@ export function jobFileQuery(jobFileId: string) {
 
 export function createJobFile(command: CreateJobFileRequest): Promise<JobFile> {
   return requestJson('/api/job-files', isJobFile, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(command),
+  });
+}
+
+export function renameJobFile(jobFileId: string, command: RenameJobFileRequest): Promise<JobFile> {
+  return requestJson(`/api/job-files/${encodeURIComponent(jobFileId)}/rename`, isJobFile, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(command),

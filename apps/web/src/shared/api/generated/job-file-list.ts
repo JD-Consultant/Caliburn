@@ -9,6 +9,10 @@ export interface JobFileList {
 export interface JobFile {
   job_file_id: string;
   display_name: string;
+  /**
+   * Opaque freshness counter for the display label, not a JD or Memory revision.
+   */
+  name_revision: number;
   employee_name: string;
   created_at: string;
 }

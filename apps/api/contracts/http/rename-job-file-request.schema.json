@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RenameJobFileRequest",
+  "description": "Rename only the label at the observed name_revision. Reuse the same command and payload to recover its original result.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command_id", "expected_name_revision", "display_name"],
+  "properties": {
+    "command_id": {"type": "string", "format": "uuid"},
+    "expected_name_revision": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+    "display_name": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"}
+  }
+}

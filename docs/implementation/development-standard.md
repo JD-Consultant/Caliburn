@@ -110,4 +110,6 @@ Prompt／Skill／工具說明與程式一起版本管理、審查及測試；只
 
 遇到插入問題先處理，再回未完主線；一般工程細節自主完成。真正影響產品效果／資料權責／跨層契約、重要安全保證、不可逆結果或明顯費用擴張時，帶問題、證據、影響、選項及建議提問，並繼續不受影響的工作。環境或外部限制如實標記，不能繞過安全限制或把無法驗證說成通過。
 
+2026-09-29 Owner 明確允許使用 subagent。委派前先分出可並行的有界工作，提示詞須載明 Goal／任務、適用責任文件及規範、明確讀寫範圍、非目標、驗證與輸出要求；不是只貼一句「做完功能」。寫入範圍互斥，保留其他人的變更；主代理仍負責跨層整合、審核與如實區分實測／轉述。研究同樣遵循 §3.1、§5；不因委派省略契約查證，也不要求每個小步都多一輪 Agent 審核。
+
 依據：OpenAI 的[長任務](https://learn.chatgpt.com/docs/long-running-work)說明成果、限制與驗證；[GPT-6 Astra 提示建議](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra)支持精簡入口及按需深入；[Exec Plans 範例](https://developers.openai.com/cookbook/articles/codex_exec_plans)示範可持續更新的計畫／進度。本案借鑑這些原則，**不照搬單一文件模板，也不宣稱官方有固定 Goal 字數上限或已證明本次縮短提升模型品質**。

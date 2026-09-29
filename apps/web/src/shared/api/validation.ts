@@ -12,6 +12,8 @@ import jdTasksSchema from '../../../../api/contracts/http/jd-tasks-view.schema.j
 import jdWorkSchema from '../../../../api/contracts/http/jd-work-view.schema.json' with { type: 'json' };
 import editJdAreasSchema from '../../../../api/contracts/http/edit-jd-areas-request.schema.json' with { type: 'json' };
 import editJdTasksSchema from '../../../../api/contracts/http/edit-jd-tasks-request.schema.json' with { type: 'json' };
+import jdCapabilitiesSchema from '../../../../api/contracts/http/jd-capabilities-view.schema.json' with { type: 'json' };
+import editJdCapabilitiesSchema from '../../../../api/contracts/http/edit-jd-capabilities-request.schema.json' with { type: 'json' };
 import type { CreateJobFileRequest } from './generated/create-job-file-request';
 import type { InterviewHistory } from './generated/interview-history';
 import type { JobFile, JobFileList } from './generated/job-file-list';
@@ -23,11 +25,14 @@ import type { JdTasksView } from './generated/jd-tasks-view';
 import type { JdWorkView } from './generated/jd-work-view';
 import type { EditJdAreasRequest } from './generated/edit-jd-areas-request';
 import type { EditJdTasksRequest } from './generated/edit-jd-tasks-request';
+import type { JdCapabilitiesView } from './generated/jd-capabilities-view';
+import type { EditJdCapabilitiesRequest } from './generated/edit-jd-capabilities-request';
 
 const validator = new Ajv2020();
 addFormats(validator);
 validator.addSchema(jdAreasSchema, 'jd-areas-view.schema.json');
 validator.addSchema(jdTasksSchema, 'jd-tasks-view.schema.json');
+validator.addSchema(jdCapabilitiesSchema, 'jd-capabilities-view.schema.json');
 
 export const isJobFileList = validator.compile<JobFileList>(jobFileListSchema);
 export const isJobFile = validator.compile<JobFile>({
@@ -45,3 +50,6 @@ export const isJdTasksView = validator.compile<JdTasksView>(jdTasksSchema);
 export const isJdWorkView = validator.compile<JdWorkView>(jdWorkSchema);
 export const isEditJdAreasRequest = validator.compile<EditJdAreasRequest>(editJdAreasSchema);
 export const isEditJdTasksRequest = validator.compile<EditJdTasksRequest>(editJdTasksSchema);
+export const isJdCapabilitiesView = validator.compile<JdCapabilitiesView>(jdCapabilitiesSchema);
+export const isEditJdCapabilitiesRequest =
+  validator.compile<EditJdCapabilitiesRequest>(editJdCapabilitiesSchema);

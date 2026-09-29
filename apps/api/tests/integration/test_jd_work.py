@@ -24,6 +24,7 @@ def test_work_view_pins_revision_even_when_head_changes_between_reads(
     empty = client.get(f"{url}/work")
     assert empty.status_code == 200
     assert empty.json()["areas"] == empty.json()["tasks"] == []
+    assert empty.json()["capabilities"] == empty.json()["task_links"] == []
     area = client.post(
         f"{url}/areas",
         json={
@@ -48,6 +49,33 @@ def test_work_view_pins_revision_even_when_head_changes_between_reads(
             },
         },
     ).json()
+    capability = client.post(
+        f"{url}/capabilities",
+        json={
+            "command_id": str(uuid4()),
+            "expected_revision_id": task["revision_id"],
+            "change": {
+                "action": "create_capability",
+                "kind": "knowledge",
+                "name": "資料介面",
+                "description": None,
+            },
+        },
+    ).json()
+    capability_id = capability["capabilities"][0]["capability_id"]
+    linked = client.post(
+        f"{url}/capabilities",
+        json={
+            "command_id": str(uuid4()),
+            "expected_revision_id": capability["revision_id"],
+            "change": {
+                "action": "set_task_capability",
+                "task_id": task["tasks"][0]["task_id"],
+                "capability_id": capability_id,
+                "linked": True,
+            },
+        },
+    ).json()
     read_areas = area_persistence.read_areas
     changed = False
 
@@ -64,25 +92,58 @@ def test_work_view_pins_revision_even_when_head_changes_between_reads(
                 f"{url}/areas",
                 json={
                     "command_id": str(uuid4()),
-                    "expected_revision_id": task["revision_id"],
+                    "expected_revision_id": linked["revision_id"],
                     "change": {"action": "delete_area", "area_id": area_id},
                 },
             )
             assert deleted.status_code == 200
+            renamed = await asyncio.to_thread(
+                client.post,
+                f"{url}/capabilities",
+                json={
+                    "command_id": str(uuid4()),
+                    "expected_revision_id": deleted.json()["revision_id"],
+                    "change": {
+                        "action": "revise_capability",
+                        "capability_id": capability_id,
+                        "changes": [{"field": "name", "value": "新版介面知識"}],
+                    },
+                },
+            )
+            assert renamed.status_code == 200
+            unlinked = await asyncio.to_thread(
+                client.post,
+                f"{url}/capabilities",
+                json={
+                    "command_id": str(uuid4()),
+                    "expected_revision_id": renamed.json()["revision_id"],
+                    "change": {
+                        "action": "set_task_capability",
+                        "task_id": task["tasks"][0]["task_id"],
+                        "capability_id": capability_id,
+                        "linked": False,
+                    },
+                },
+            )
+            assert unlinked.status_code == 200
         return result
 
     monkeypatch.setattr(area_persistence, "read_areas", change_after_areas)
     combined = client.get(f"{url}/work")
     assert combined.status_code == 200
     assert combined.json() == {
-        "revision_id": task["revision_id"],
+        "revision_id": linked["revision_id"],
         "areas": area["areas"],
         "tasks": task["tasks"],
+        "capabilities": capability["capabilities"],
+        "task_links": linked["task_links"],
     }
     current = client.get(f"{url}/work").json()
     assert current["revision_id"] != task["revision_id"]
     assert current["areas"] == []
     assert current["tasks"][0]["area_id"] is None
+    assert current["capabilities"][0]["name"] == "新版介面知識"
+    assert current["task_links"] == []
 
 
 def test_work_view_missing_file_is_not_an_empty_document(client: TestClient) -> None:

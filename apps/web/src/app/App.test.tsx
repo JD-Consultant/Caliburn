@@ -24,7 +24,13 @@ const emptyProfile = {
   revision_id: '40000000-0000-4000-8000-000000000004',
   profile: { job_title: null, organization_unit: null, reports_to: null, purpose: null },
 };
-const emptyWork = { revision_id: emptyProfile.revision_id, areas: [], tasks: [] };
+const emptyWork = {
+  revision_id: emptyProfile.revision_id,
+  areas: [],
+  tasks: [],
+  capabilities: [],
+  task_links: [],
+};
 
 function renderApp(path = '/') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });

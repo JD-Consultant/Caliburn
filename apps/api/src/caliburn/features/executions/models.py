@@ -46,6 +46,7 @@ class ExecutionInfo:
     scope: ExecutionScope
     status: ExecutionStatus
     writer_id: UUID | None
+    pause_requested: bool = False
 
 
 @dataclass(frozen=True, slots=True)

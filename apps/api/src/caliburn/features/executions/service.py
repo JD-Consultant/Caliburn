@@ -19,7 +19,9 @@ from caliburn.features.executions.models import (
 
 
 def _project(record: persistence.ExecutionRecord, scope: ExecutionScope) -> ExecutionInfo:
-    return ExecutionInfo(scope, ExecutionStatus(record.status), record.writer_id)
+    return ExecutionInfo(
+        scope, ExecutionStatus(record.status), record.writer_id, record.pause_requested
+    )
 
 
 async def admit_execution(session: AsyncSession, scope: ExecutionScope) -> ExecutionInfo:
@@ -62,7 +64,7 @@ async def claim_writer(
 
 
 async def lock_active_writer(session: AsyncSession, writer: ExecutionWriter) -> None:
-    """Hold eligibility through the SAME transaction as the dependent business effect."""
+    """Hold eligibility in the effect's transaction; pending pause permits in-flight work."""
     record = await _lock_writer(session, writer)
     if record.status != ExecutionStatus.ACTIVE:
         raise ExecutionStateError("The execution is no longer active")
@@ -75,8 +77,23 @@ async def lock_unfinished_writer(session: AsyncSession, writer: ExecutionWriter)
         raise ExecutionStateError("The execution has already finished")
 
 
+async def request_pause(session: AsyncSession, scope: ExecutionScope) -> None:
+    """Record UI intent without fencing in-flight Step effects or claiming a Graph stop."""
+    record = await _lock_execution(session, scope)
+    if scope.kind != ExecutionKind.CONSULTANT_TURN or record.status not in (
+        ExecutionStatus.ACTIVE,
+        ExecutionStatus.PAUSED,
+    ):
+        raise ExecutionStateError("This execution cannot request a pause")
+    record.pause_requested = True
+    await session.flush()
+
+
 async def pause_execution(session: AsyncSession, writer: ExecutionWriter) -> None:
-    """Called after reaching a safe boundary, not on receipt of a UI pause request."""
+    """Idempotently acknowledge a native Graph interrupt already durably saved by the caller.
+
+    This owner cannot verify Graph state; accepting a UI request only records pause intent.
+    """
     record = await _lock_writer(session, writer)
     if writer.scope.kind != ExecutionKind.CONSULTANT_TURN or record.status not in (
         ExecutionStatus.ACTIVE,
@@ -88,6 +105,7 @@ async def pause_execution(session: AsyncSession, writer: ExecutionWriter) -> Non
 
 
 async def resume_execution(session: AsyncSession, writer: ExecutionWriter) -> None:
+    """Clear pause intent under writer fencing before the caller resumes native Graph work."""
     record = await _lock_writer(session, writer)
     if writer.scope.kind != ExecutionKind.CONSULTANT_TURN or record.status not in (
         ExecutionStatus.ACTIVE,
@@ -95,6 +113,7 @@ async def resume_execution(session: AsyncSession, writer: ExecutionWriter) -> No
     ):
         raise ExecutionStateError("This execution cannot resume")
     record.status = ExecutionStatus.ACTIVE.value
+    record.pause_requested = False
     await session.flush()
 
 
@@ -115,10 +134,12 @@ async def finish_execution(
         return
     allowed = (ExecutionStatus.ACTIVE, ExecutionStatus.PAUSED)
     if record.status not in allowed or (
-        record.status == ExecutionStatus.PAUSED and outcome == ExecutionStatus.COMPLETED
+        outcome == ExecutionStatus.COMPLETED
+        and (record.status == ExecutionStatus.PAUSED or record.pause_requested)
     ):
         raise ExecutionStateError("The requested terminal outcome cannot replace the current state")
     record.status = outcome.value
+    record.pause_requested = False
     await session.flush()
 
 

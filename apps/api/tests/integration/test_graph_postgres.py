@@ -19,6 +19,7 @@ from psycopg.conninfo import conninfo_to_dict, make_conninfo
     [
         ("checkpoint_worker.py", [(1, 0), (0, 1)]),
         ("response_loop_worker.py", [(2, 1), (0, 0)]),
+        ("compaction_worker.py", [(1, 1), (1, 0)]),
     ],
 )
 def test_native_items_survive_process_restart_without_reexecuting_saved_node(

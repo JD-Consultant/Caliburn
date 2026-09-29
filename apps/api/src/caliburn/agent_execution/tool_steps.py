@@ -25,8 +25,10 @@ from caliburn.adapters.response_serialization import (
     snapshot_response,
 )
 from caliburn.agent_execution.request_capacity import (
+    CompactionRequiredError,
     ModelCapacityLimits,
     ReceivedInputCount,
+    RequestCapacityError,
     require_request_capacity,
     require_request_limits,
     validate_capacity_limits,
@@ -50,6 +52,8 @@ class ResponseStepState(TypedDict, total=False):
     capacity_limits: ModelCapacityLimits
     input_count: ReceivedInputCount | None
     counted_request_id: UUID | None
+    compacted_request_id: UUID | None
+    request_admission: Literal["request_model", "compact_window"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,7 +66,12 @@ class ReceivedModelResponse:
 
 @dataclass(frozen=True, slots=True)
 class ResponseStepRuntime:
-    """Injected I/O, not persisted State. The tool owner validates its prepared command type."""
+    """Injected I/O, not persisted State. The tool owner validates its prepared command type.
+
+    compact_window binds run_context_compaction to the same work guard and capacity
+    policy. Re-entry must reconcile that boundary before any new external request;
+    inactive work can settle its saved C, but cannot send, adopt or return a new window.
+    """
 
     request_model: Callable[[ResponseRequest, UUID], Awaitable[ReceivedModelResponse]]
     prepare_tool: Callable[[ResponseFunctionToolCall, UUID], Awaitable[object]]
@@ -71,6 +80,9 @@ class ResponseStepRuntime:
     account_response: Callable[[ReceivedModelResponse], Awaitable[None]]
     count_input: Callable[[ResponseRequest, UUID], Awaitable[ReceivedInputCount]]
     capacity_limits: ModelCapacityLimits
+    compact_window: (
+        Callable[[ResponseRequest, ReceivedInputCount, UUID], Awaitable[NativeItems]] | None
+    ) = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -193,7 +205,7 @@ async def _run_response_flow(
     )
     config: RunnableConfig = {
         "configurable": {"thread_id": thread_id},
-        "recursion_limit": (2 * max_tool_calls + 8) * (max_model_steps or 1),
+        "recursion_limit": (2 * max_tool_calls + 11) * (max_model_steps or 1),
     }
     try:
         saved = await graph.aget_state(config)
@@ -250,6 +262,18 @@ async def _run_response_flow(
     try:
         await runtime.ensure_active()
     except Exception:
+        if saved.next == ("compact_window",) and runtime.compact_window is not None:
+            # The private compaction graph may already hold paid C, even though the
+            # parent still has W. Re-enter its guarded recovery to settle that result.
+            count = saved.values.get("input_count")
+            if count is not None and saved.values.get("counted_request_id") == saved.values.get(
+                "request_id"
+            ):
+                await runtime.compact_window(
+                    ResponseRequest.from_snapshot(saved.values["request_snapshot"]),
+                    count,
+                    saved.values["request_id"],
+                )
         if saved.values.get("response_snapshot"):
             await runtime.account_response(
                 ReceivedModelResponse(
@@ -332,7 +356,7 @@ def _build_response_step(
             ResponseRequest.from_snapshot(state["request_snapshot"]),
             count,
             state["capacity_limits"],
-            completed_steps=state.get("completed_steps", 0),
+            completed_steps=0,  # The post-count route enforces the middle-Step policy.
         )
         received = await runtime.context.request_model(
             ResponseRequest.from_snapshot(state["request_snapshot"]), state["request_id"]
@@ -348,6 +372,55 @@ def _build_response_step(
         if retain_response is not None:
             retain_response(state, update)
         return update
+
+    async def check_capacity(
+        state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
+    ) -> ResponseStepState:
+        await runtime.context.ensure_active()
+        count = state.get("input_count")
+        if count is None or state.get("counted_request_id") != state["request_id"]:
+            raise ValueError("The exact request needs a saved input count before admission")
+        try:
+            require_request_capacity(
+                ResponseRequest.from_snapshot(state["request_snapshot"]),
+                count,
+                state["capacity_limits"],
+                completed_steps=state.get("completed_steps", 0),
+            )
+        except CompactionRequiredError as error:
+            if state.get("compacted_request_id") == state["request_id"]:
+                raise RequestCapacityError(
+                    "The compacted window still exceeds the boundary threshold"
+                ) from error
+            return {"request_admission": "compact_window"}
+        return {"request_admission": "request_model"}
+
+    def route_counted(state: ResponseStepState) -> Literal["request_model", "compact_window"]:
+        return state["request_admission"]
+
+    async def compact_window(
+        state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
+    ) -> ResponseStepState:
+        await runtime.context.ensure_active()
+        compact = runtime.context.compact_window
+        if compact is None:
+            raise CompactionRequiredError("The next request requires explicit boundary compaction")
+        count = state.get("input_count")
+        if count is None or state.get("counted_request_id") != state["request_id"]:
+            raise ValueError("Compaction requires the saved count for this exact window")
+        items = await compact(
+            ResponseRequest.from_snapshot(state["request_snapshot"]), count, state["request_id"]
+        )
+        await runtime.context.ensure_active()
+        next_id = uuid5(state["request_id"], "compacted")
+        return {
+            "request_id": next_id,
+            "request_snapshot": {**deepcopy(state["request_snapshot"]), "input": deepcopy(items)},
+            "input_items": deepcopy(items),
+            "compacted_request_id": next_id,
+            "input_count": None,
+            "counted_request_id": None,
+        }
 
     async def account_response(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
@@ -442,8 +515,14 @@ def _build_response_step(
         # Change only input. Instructions, tools, model, reasoning and the existing
         # maps remain those of the original execution, not today's configuration.
         next_request = {**deepcopy(state["request_snapshot"]), "input": state["input_items"]}
+        next_id = uuid4()
+        unchanged_compaction = (
+            state.get("compacted_request_id") == state["request_id"]
+            and state["input_items"] == state["request_snapshot"]["input"]
+        )
         return {
-            "request_id": uuid4(),
+            "request_id": next_id,
+            "compacted_request_id": next_id if unchanged_compaction else None,
             "request_snapshot": next_request,
             "response_snapshot": {},
             "response_attempt_id": None,
@@ -460,13 +539,17 @@ def _build_response_step(
 
     graph = StateGraph(ResponseStepState, context_schema=ResponseStepRuntime)
     graph.add_node("count_input", count_input)
+    graph.add_node("check_capacity", check_capacity)
+    graph.add_node("compact_window", compact_window)
     graph.add_node("request_model", request_model)
     graph.add_node("account_response", account_response)
     graph.add_node("prepare_tool", prepare_tool)
     graph.add_node("execute_tool", execute_tool)
     graph.add_node("finish_step", finish_step)
     graph.add_edge(START, "count_input")
-    graph.add_edge("count_input", "request_model")
+    graph.add_edge("count_input", "check_capacity")
+    graph.add_conditional_edges("check_capacity", route_counted)
+    graph.add_edge("compact_window", "count_input")
     graph.add_edge("request_model", "account_response")
     graph.add_edge("account_response", "prepare_tool")
     graph.add_conditional_edges("prepare_tool", route_prepared)

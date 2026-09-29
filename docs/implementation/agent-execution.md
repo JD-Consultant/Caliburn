@@ -152,9 +152,13 @@ flowchart TD
 ```mermaid
 flowchart TD
   I["保存初始 request、身分與本次限制"] --> C["計數准入 → 遠端 count → 保存計數"]
-  C --> G{"容量足夠，且無需中途 compact？"}
-  G -->|是| R["模型回應 → 保存 R → 結算"]
-  G -->|否| E["保留可靠位置；停止並交回原因"]
+  C --> G["check_capacity：可恢復的容量准入"]
+  G --> Q{"准入結果"}
+  Q -->|生成| R["模型回應 → 保存 R → 結算"]
+  Q -->|完整 Step 後達272K| CP["資格核對 → 完整 C 保存 → 結算 → 採用"]
+  CP --> NC["保存新 request；不追加輸入或 maps"]
+  NC --> C
+  G -->|超容量或同一 C 仍超門檻| E["保留可靠位置；停止並交回原因"]
   R --> T["依原順序保存各工具結果"]
   T --> S["finish_step：完整窗口＋完成步數"]
   S --> F{"無待處理 call 且有正式答覆？"}
@@ -172,7 +176,7 @@ flowchart TD
 - 初始 input checkpoint 可能尚未展開成 State（`values` 空、`next=__start__`）；由原生 Graph 恢復原輸入，於 request node 外送前核對原限制。不因尚未展開便拒絕正常恢復，也不讓恢復參數改寫初始限制。
 - 已完成 loop 再 resume 不新增模型／工具／items。恢復不指定舊 checkpoint ID；工具失敗只承接當前 prepared command。全部共用單步原 R 保存、結算與業務冪等責任，沒有新增保存系統。
 
-真 PG 兩程序已驗：第一程序完成一個工具 Step、保存第二個 R 後中斷，第二程序從結算接到 final，模型與先前工具均不重跑。原生歷史、固定 request 及恢復故障的具體證據見 [T06 §8](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#8-第八切片有界多-step-接續)。圖已補第九切片的計數准入；目前仍是非串流的共用 loop 元件，compact、使用者 pause、角色／正式提交及自動重試 supervisor 未整合，不能拿圖中結果返回當成完整 A Turn／Memory batch 完成。
+真 PG 兩程序已驗：第一程序完成一個工具 Step、保存第二個 R 後中斷，第二程序從結算接到 final，模型與先前工具均不重跑。原生歷史、固定 request 及恢復故障的具體證據見 [T06 §8](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#8-第八切片有界多-step-接續)。圖已補第十切片的顯式 compact；仍是非串流共用元件，使用者 pause、輪前準備、角色／正式提交及自動重試 supervisor 未整合，不能拿圖中返回當成完整 A Turn／Memory batch 完成。
 
 ## 5. 容量、重試與恢復不是同一政策
 
@@ -243,9 +247,26 @@ erDiagram
 - count 返回的 `input_tokens` 與原 attempt 保存在 checkpoint，之後才檢查非負整數、input 上限及 `input + max_output_tokens ≤ context window`；reasoning 已在 output 預留中，不另加一次。計數失敗／不合法即停止，不降成零、不裁歷史、不自動換模型。
 - 模型／後續節點失敗時承接已保存的 count；計數本身若已有 attempt 但原結果不可得，`PriorInputCountAttemptError` 交回核對，不盲目重送。現在沒有 count 原件的 process-local Held 補存或重試 supervisor；同時失去 checkpoint／pending writes 時不能宣稱原 count 一定能恢復。這不影響已保存 R 的原 Held 契約。
 - 遠端 count 也須先在原工作額度預留，短交易提交確認後才 HTTP；不增加模型 Step 數。不配置正數 `token_count_reservation_usd` 就拒絕 count。計數回應沒有計費 usage，故目前保留未知預留、不假定免費；該行政預留不是 provider 的硬帳單上限。沒有第二份計數器／收據。
-- 完成至少一個 Step 後的下一請求達 272K，回報 `CompactionRequiredError`，保存原窗口但不發生成。**本切片尚未呼叫 compact**；正式採用、再計數、輪前 128K、pause 優先及取消相容基底仍由後續 compact／控制切片完成。首請求不受此中途門檻誤擋；合法 final／步數已耗盡不額外發 count。
+- 完成至少一個 Step 後的下一請求達 272K，進 §5.3 的明確 compact 接縫；尚未配置接縫則回報 `CompactionRequiredError`，保留原窗口、不發生成。首請求不受此中途門檻誤擋；合法 final／步數已耗盡不額外發 count。輪前128K、pause與取消相容基底仍須後續角色控制接線。
 
 依據：2026-09-30 取得 [OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting) 與 [每次工作額度控制範例](https://developers.openai.com/cookbook/articles/per_run_spending_controller_responses_api)。借鑑 exact payload、先預留後 HTTP、未知費用不歸零及 reasoning 不重算；範例模型／價格是示意，不照抄成真實費率，也不把其 process-local lock 取代本案既有 PostgreSQL owner。結果保存先於記帳的既定交界維持不變。真實 provider／動態價格與 compact 費用仍未驗收；[實測與下一步](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#9-第九切片固定計數與容量准入)。
+
+### 5.3 已落地的完整 C 保存、採用與中途接續（T06 第十切片）
+
+`agent_execution/context_compaction.py` 使用既有 saver 的小型私有 Graph：`request_compaction → account_compaction → adopt_compaction`。獨立責任是**一次已選定邊界的 W→C 安全交接**，不負責選擇 A／B 的輪前時機、產品取消或重試政策；不是另一個儲存服務。每次 compact 邊界有穩定 thread 身分，同一 request／count／capacity policy 可重入，不得以新資料覆寫該位置。
+
+- 原 W／固定參數先保存；完整 C／原 attempt 先經 sync 保存，再冪等結算、核資格及保存採用結果。返回全部 `compacted.output`，不剔除保留 user message，不重貼 maps／原話。空 C 不得替換非空歷史。SDK 的窄 output union 不適合重驗保留的輸入項目；恢復沿 SDK 本身的遞迴 `CompactedResponse.construct`，原件仍完整保留，沒有 App 自造摘要。
+- C／pending writes 都未能保存但原件仍在程序內，`CompactionSaveError.recovery` 帶回完整原件；核對原 thread、request 與保存位置後補存。既有保存優先，不能回退已採用／後續位置。程序內原件不是遠端備份；真正遺失時仍依尚待接線的有界重試政策，不宣稱能憑 response ID 取回。
+- 取消後仍可結算已保存 C，但不得採用或發新外送。父 loop 若停在 `compact_window`，其恢復入口亦須重入原受資格保護的子流程，才能核對子圖已有 C；不能只檢查父圖已清空的 R。接縫必須綁同一工作資格與 capacity policy，不接受另一套自動重送流程。
+- 中途透過 `ResponseStepRuntime.compact_window` 組合該流程；子圖 C 已採用、父圖尚未保存時，父節點重入可直接取原 C。父圖以確定的新 request ID 保存整份 C，清除舊 count，再計數實際下一請求；instructions／tools／模型及其他固定設定不換。
+- `check_capacity` 是獨立可恢復 node；條件路由只讀其已保存結果，不在路由內拋出容量拒絕。已實測條件路由錯誤可能留下已完成前置 node，重入不再執行原 gate；因此拒絕必須保留在可重入節點。
+- 新 request 記錄來自哪個已採用 C。尚未增長且仍達272K時明確停止，不再 compact；空模型 output 即使換 request ID，仍保留該判定，不能把換 ID 當成資料增長。完成後續 Step、窗口確有新增項目時才可再次觸發。final、步數耗盡或資格失效不新增 compact。這不代表完整產品 pause 已接線。
+
+外送沿 `ModelRequestExecutor` 與原 executions 預算：`COMPACTION` 預留短交易確認後才 HTTP，完整 C 先交 Graph，再結算。`compaction_payload()` 是指紋與 wire 的共用組裝來源，明確使用 `service_tier="default"`；SDK 預設 auto 可能跟隨遠端 Project 設定。compact 需顯式行政預留與成本計算器；沒有 usage／計算結果時保留未知預留，不歸零。無新增資料表，實際費率、遠端硬費用上限及真 provider 相容仍未驗。
+
+**目前限制：**只對已計數且仍符合完整 create 容量的 W 作保守 compact 准入，不宣稱能搶救任意超長輸入；壓後重新核完整 create。A128K／Agent 意圖及 B 輪前準備、pause、取消／回退挑選合法基底、count 原件雙保存失敗、單一 retry supervisor 與角色整合仍待後續切片。以上限制不移出 T06／對應產品任務。
+
+依據：2026-09-30 重讀 [OpenAI standalone compact](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)、核本機 OpenAI 3.20.0 compact 參數及 SDK construct 實作；借鑑 [LangGraph 私有 State 的明確輸入輸出轉換](https://docs.langchain.com/oss/python/langgraph/use-subgraphs)及[持久執行](https://docs.langchain.com/oss/python/langgraph/persistence)。子圖以明確 thread 固定一次壓縮身分，是本案機制取捨；不是新增一份產品歷史。實測範圍見 [T06 §10](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#10-第十切片完整-c-安全採用與中途接續)。
 
 ## 6. Memory 背景工作
 

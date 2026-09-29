@@ -12,7 +12,7 @@ from openai.types.responses.function_tool_param import FunctionToolParam
 from openai.types.responses.input_token_count_response import InputTokenCountResponse
 from openai.types.shared.reasoning_effort import ReasoningEffort
 
-from caliburn.adapters.response_serialization import NativeItems
+from caliburn.adapters.response_serialization import NativeItems, NativeSnapshot
 
 
 class ResponseRequest:
@@ -117,8 +117,13 @@ async def compact_context(
 ) -> CompactedResponse:
     """Return full C without adopting it; the caller supplies the eligible complete window."""
     _require_direct_client(client)
-    payload: dict[str, Any] = {"model": model, "input": deepcopy(input_items)}
+    payload = compaction_payload(model=model, input_items=input_items)
     return await client.responses.compact(**payload)
+
+
+def compaction_payload(*, model: str, input_items: NativeItems) -> NativeSnapshot:
+    """One canonical compact payload for both admission fingerprint and SDK transport."""
+    return {"model": model, "input": deepcopy(input_items), "service_tier": "default"}
 
 
 def _require_direct_client(client: AsyncOpenAI) -> None:

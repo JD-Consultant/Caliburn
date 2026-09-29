@@ -9,13 +9,17 @@ from uuid import UUID, uuid4
 
 from openai import AsyncOpenAI
 from openai.types.responses import Response
+from openai.types.responses.compacted_response import CompactedResponse
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from caliburn.adapters.openai_responses import (
     ResponseRequest,
+    compact_context,
+    compaction_payload,
     count_response_input,
     create_response,
 )
+from caliburn.agent_execution.context_compaction import ReceivedCompaction
 from caliburn.agent_execution.request_capacity import ReceivedInputCount
 from caliburn.agent_execution.tool_steps import ReceivedModelResponse
 from caliburn.features.executions import budgets, service
@@ -36,11 +40,15 @@ class ModelRequestAccounting:
     reserved_cost_usd: Decimal
     observed_cost: Callable[[Response], Decimal | None]
     token_count_reservation_usd: Decimal | None = None
+    compaction_reservation_usd: Decimal | None = None
+    observed_compaction_cost: Callable[[CompactedResponse], Decimal | None] | None = None
 
     def __post_init__(self) -> None:
         validate_cost(self.reserved_cost_usd, positive=True)
         if self.token_count_reservation_usd is not None:
             validate_cost(self.token_count_reservation_usd, positive=True)
+        if self.compaction_reservation_usd is not None:
+            validate_cost(self.compaction_reservation_usd, positive=True)
         if not self.cost_basis.strip():
             raise ValueError("An explicit cost basis is required")
 
@@ -55,6 +63,10 @@ class ModelUsageUnavailableError(RuntimeError):
 
 class PriorInputCountAttemptError(RuntimeError):
     """Reconcile the original counting attempt; do not blindly repeat a remote count."""
+
+
+class PriorCompactionAttemptError(RuntimeError):
+    """Reconcile the original compaction attempt; an admission never permits a resend."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -89,6 +101,26 @@ class ModelRequestExecutor:
         # and persist the returned count before capacity interpretation or another HTTP call.
         return {"input_tokens": response.input_tokens, "attempt_id": attempt_id}
 
+    async def request_compaction(
+        self, request: ResponseRequest, request_id: UUID
+    ) -> ReceivedCompaction:
+        reservation = self.accounting.compaction_reservation_usd
+        if reservation is None or self.accounting.observed_compaction_cost is None:
+            raise ValueError("Configure an explicit compaction reservation and cost calculator")
+        context = request.count_payload()
+        payload = compaction_payload(model=context["model"], input_items=context["input"])
+        attempt_id = await self._reserve_request(
+            request_id,
+            OutboundKind.COMPACTION,
+            payload,
+            reservation,
+        )
+        response = await compact_context(
+            self.client, model=payload["model"], input_items=payload["input"]
+        )
+        # Hand intact C to Graph before any DB work or fallible cost calculation.
+        return ReceivedCompaction(response, attempt_id)
+
     async def _reserve_request(
         self,
         request_id: UUID,
@@ -104,9 +136,11 @@ class ModelRequestExecutor:
             allow_nan=False,
         )
         outbound = OutboundRequest(request_id, kind, sha256(payload.encode("utf-8")).hexdigest())
-        prior_error = (
-            PriorModelAttemptError if kind == OutboundKind.MODEL else PriorInputCountAttemptError
-        )
+        prior_error = {
+            OutboundKind.MODEL: PriorModelAttemptError,
+            OutboundKind.TOKEN_COUNT: PriorInputCountAttemptError,
+            OutboundKind.COMPACTION: PriorCompactionAttemptError,
+        }[kind]
         attempt_id = uuid4()
         async with self.sessions.begin() as session:
             # Same-request competitors serialize here. No Python lock or HTTP transaction.
@@ -144,6 +178,27 @@ class ModelRequestExecutor:
             )
             if attempt is None or attempt.request.kind != OutboundKind.MODEL:
                 raise BudgetConflictError("The model result has no matching admitted attempt")
+            await budgets.record_attempt_cost(
+                session, self.writer.scope, received.attempt_id, cost_usd=cost
+            )
+
+    async def account_compaction(self, received: ReceivedCompaction) -> None:
+        """Settle saved C independently of eligibility to adopt its compacted window."""
+        observed_cost = self.accounting.observed_compaction_cost
+        if observed_cost is None:
+            raise ValueError("Configure an explicit compaction cost calculator")
+        cost = observed_cost(received.response)
+        if cost is None:
+            raise ModelUsageUnavailableError(
+                "Original compaction usage is unavailable; retain the reservation"
+            )
+        async with self.sessions.begin() as session:
+            await self._require_cost_basis(session)
+            attempt = await budgets.read_outbound_attempt(
+                session, self.writer.scope, received.attempt_id
+            )
+            if attempt is None or attempt.request.kind != OutboundKind.COMPACTION:
+                raise BudgetConflictError("The compaction result has no matching admitted attempt")
             await budgets.record_attempt_cost(
                 session, self.writer.scope, received.attempt_id, cost_usd=cost
             )

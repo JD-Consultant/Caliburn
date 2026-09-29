@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T03 已完成；T04–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T03 已完成；T04 施工中；T05–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -43,6 +43,7 @@
 ## T04 Memory 可變候選、不可變修訂與快照
 
 - [ ] T04；依賴：T02。
+- **進度：**接續 T03 `4e673cf8`，先完成內容、精確標題與引用集合純規則；[保存接線](../../implementation/memory-storage.md)記錄官方機制比較及下一個 PG 垂直切片。[實際證據／未驗邊界](evidence/t04-work-memory.md)。候選／快照 SQL、發布、角色／來源資格與恢復尚未完成，不把純值測試當 Memory 產品可用。
 - **契約：**[資料保存 §2–4](../../architecture/persistence.md)、[B1／B2 生命週期](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[凍結接線](../../implementation/data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 - **程式／交付：**`features/work_memory` 的候選 CRUD、位置／階段快照、發布及固定 map／read；原操作結果與同 transaction 修改；schema 圖及 migrations。
 - **Red：**相同物件不同引用路徑得到不同修訂、修改歷史、只改下層引用卻沿用上層舊修訂、回改舊文字冒充原修訂、刪情境破壞歷史。

@@ -31,7 +31,7 @@ afterEach(() => {
 });
 
 test('建立職責只送表單內容與捕捉基底，成功後讀取同版職責任務', async () => {
-  const current = { revision_id: revision, areas: [], tasks: [] };
+  const current = { revision_id: revision, areas: [], tasks: [], capabilities: [], task_links: [] };
   const updated = {
     ...current,
     areas: [{ area_id: areaId, title: '網站交付', scope_text: '約定前端範圍' }],
@@ -64,6 +64,8 @@ test('建立職責只送表單內容與捕捉基底，成功後讀取同版職�
 
 const original: JdWorkView = {
   revision_id: revision,
+  capabilities: [],
+  task_links: [],
   areas: [{ area_id: areaId, title: '網站交付', scope_text: '原範圍' }],
   tasks: [
     {
@@ -119,7 +121,13 @@ test('原目標後來已刪除仍能 remount 重新確認同命令，不復活�
   fetch.mockImplementation((_path, options) => {
     if (options?.method === 'POST') {
       attempt += 1;
-      current = { revision_id: '70000000-0000-4000-8000-000000000007', areas: [], tasks: [] };
+      current = {
+        revision_id: '70000000-0000-4000-8000-000000000007',
+        areas: [],
+        tasks: [],
+        capabilities: [],
+        task_links: [],
+      };
       return attempt === 1
         ? Promise.reject(new TypeError('lost response'))
         : Promise.resolve(Response.json({ revision_id: revision, areas: original.areas }));

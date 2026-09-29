@@ -2,26 +2,15 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
-import type { EditJdAreasRequest } from '../../shared/api/generated/edit-jd-areas-request';
-import type { EditJdTasksRequest } from '../../shared/api/generated/edit-jd-tasks-request';
 import type { Detail, JdWorkView, WorkTask } from '../../shared/api/generated/jd-work-view';
 import { describeReadError } from '../../shared/api/http';
-import { jdWorkQuery } from './jd-work-api';
-import type { WorkCommand } from './jd-work-api';
+import { commandFor, jdWorkQuery } from './jd-work-api';
+import type { WorkIntent } from './jd-work-api';
 import { useWorkCommand } from './useWorkCommand';
 import { WorkEditDialog } from './WorkEditDialog';
 import type { WorkEditing } from './WorkEditDialog';
-
-type WorkIntent =
-  | { collection: 'areas'; change: EditJdAreasRequest['change'] }
-  | { collection: 'tasks'; change: EditJdTasksRequest['change'] };
-
-function commandFor(revisionId: string, intent: WorkIntent): WorkCommand {
-  const base = { command_id: crypto.randomUUID(), expected_revision_id: revisionId };
-  return intent.collection === 'areas'
-    ? { collection: 'areas', request: { ...base, change: intent.change } }
-    : { collection: 'tasks', request: { ...base, change: intent.change } };
-}
+import { CapabilitiesSection } from './CapabilitiesSection';
+import { TaskCapabilities } from './TaskCapabilities';
 
 function TaskDetails({
   label,
@@ -116,7 +105,13 @@ function TaskCard({
     });
   }
   return (
-    <Paper variant="outlined" component="article" aria-label={name} sx={{ p: 2 }}>
+    <Paper
+      variant="outlined"
+      component="article"
+      id={`jd-task-${task.task_id}`}
+      aria-label={name}
+      sx={{ p: 2, scrollMarginTop: 16 }}
+    >
       <Stack spacing={1}>
         <Typography variant="subtitle1" component="h4">
           {name}
@@ -158,6 +153,12 @@ function TaskCard({
           details={task.requirements}
           disabled={disabled}
           onMove={reorderDetail}
+        />
+        <TaskCapabilities
+          taskId={task.task_id}
+          baseline={baseline}
+          disabled={disabled}
+          onChange={onChange}
         />
       </Stack>
     </Paper>
@@ -354,6 +355,30 @@ export function JdWorkEditor({ jobFileId }: { jobFileId: string }) {
                 {renderTasks(null)}
               </Stack>
             </Paper>
+            {(['knowledge', 'skill'] as const).map((kind) => (
+              <CapabilitiesSection
+                key={kind}
+                kind={kind}
+                baseline={current}
+                disabled={disabled}
+                onEdit={setEditing}
+                onChange={submitIntent}
+                onDelete={(capability) => {
+                  const label = capability.kind === 'knowledge' ? '知識' : '技能';
+                  confirm(
+                    `刪除${label}`,
+                    `移除「${capability.name ?? `尚未命名的${label}`}」；已保存的歷史不改寫。`,
+                    {
+                      collection: 'capabilities',
+                      change: {
+                        action: 'delete_capability',
+                        capability_id: capability.capability_id,
+                      },
+                    },
+                  );
+                }}
+              />
+            ))}
           </>
         )}
       </Stack>

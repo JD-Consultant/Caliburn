@@ -18,7 +18,7 @@ function restoreCommand(key: string): {
     if (!isWorkCommand(value)) throw new Error('Invalid pending command');
     return {
       pending: value,
-      message: '有尚未確認的職責／任務修改，請先取得原結果。',
+      message: '有尚未確認的 JD 集合修改，請先取得原結果。',
       blocked: false,
     };
   } catch {

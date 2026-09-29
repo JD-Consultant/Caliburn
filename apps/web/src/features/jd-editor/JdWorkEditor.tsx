@@ -11,6 +11,8 @@ import { WorkEditDialog } from './WorkEditDialog';
 import type { WorkEditing } from './WorkEditDialog';
 import { CapabilitiesSection } from './CapabilitiesSection';
 import { TaskCapabilities } from './TaskCapabilities';
+import { CollaboratorsSection } from './CollaboratorsSection';
+import { ConditionsSection } from './ConditionsSection';
 
 function TaskDetails({
   label,
@@ -379,6 +381,37 @@ export function JdWorkEditor({ jobFileId }: { jobFileId: string }) {
                 }}
               />
             ))}
+            <CollaboratorsSection
+              baseline={current}
+              disabled={disabled}
+              onEdit={setEditing}
+              onChange={submitIntent}
+              onDelete={(item) =>
+                confirm(
+                  '刪除協作對象',
+                  `移除「${item.name ?? '名稱尚未提供的協作對象'}」及其協作範圍；已保存的歷史不改寫。`,
+                  {
+                    collection: 'collaborators',
+                    change: {
+                      action: 'delete_collaborator',
+                      collaborator_id: item.collaborator_id,
+                    },
+                  },
+                )
+              }
+            />
+            <ConditionsSection
+              baseline={current}
+              disabled={disabled}
+              onEdit={setEditing}
+              onChange={submitIntent}
+              onDelete={(item) =>
+                confirm('刪除條件', `移除「${item.text}」；不改變任務內容或已保存的歷史。`, {
+                  collection: 'conditions',
+                  change: { action: 'delete_condition', condition_id: item.condition_id },
+                })
+              }
+            />
           </>
         )}
       </Stack>

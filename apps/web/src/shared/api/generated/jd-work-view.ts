@@ -1,7 +1,7 @@
 /* Generated from apps/api/contracts; do not edit. */
 
 /**
- * Responsibility areas, tasks, shared knowledge/skills and their links from one fixed formal JD revision, for the manual grouped editor.
+ * All manual JD editor collections from one fixed formal revision; profile is read separately. Not a model navigation map.
  */
 export interface JdWorkView {
   revision_id: string;
@@ -9,6 +9,8 @@ export interface JdWorkView {
   tasks: WorkTask[];
   capabilities: Capability[];
   task_links: TaskLink[];
+  collaborators: Collaborator[];
+  conditions: Condition[];
 }
 export interface Area {
   area_id: string;
@@ -36,4 +38,19 @@ export interface Capability {
 export interface TaskLink {
   task_id: string;
   capability_id: string;
+}
+export interface Collaborator {
+  collaborator_id: string;
+  name: string | null;
+  scope_text: string | null;
+}
+export interface Condition {
+  condition_id: string;
+  kind:
+    | 'work_environment'
+    | 'schedule_travel'
+    | 'shared_authority'
+    | 'shared_collaboration'
+    | 'qualification';
+  text: string;
 }

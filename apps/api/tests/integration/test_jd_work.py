@@ -25,6 +25,7 @@ def test_work_view_pins_revision_even_when_head_changes_between_reads(
     assert empty.status_code == 200
     assert empty.json()["areas"] == empty.json()["tasks"] == []
     assert empty.json()["capabilities"] == empty.json()["task_links"] == []
+    assert empty.json()["collaborators"] == empty.json()["conditions"] == []
     area = client.post(
         f"{url}/areas",
         json={
@@ -77,6 +78,26 @@ def test_work_view_pins_revision_even_when_head_changes_between_reads(
         },
     ).json()
     read_areas = area_persistence.read_areas
+    collaborator = client.post(
+        f"{url}/collaborators",
+        json={
+            "command_id": str(uuid4()),
+            "expected_revision_id": linked["revision_id"],
+            "change": {"action": "create_collaborator", "name": "設計同事", "scope_text": None},
+        },
+    ).json()
+    condition = client.post(
+        f"{url}/conditions",
+        json={
+            "command_id": str(uuid4()),
+            "expected_revision_id": collaborator["revision_id"],
+            "change": {
+                "action": "create_condition",
+                "kind": "schedule_travel",
+                "text": "依約支援上線。",
+            },
+        },
+    ).json()
     changed = False
 
     async def change_after_areas(
@@ -92,7 +113,7 @@ def test_work_view_pins_revision_even_when_head_changes_between_reads(
                 f"{url}/areas",
                 json={
                     "command_id": str(uuid4()),
-                    "expected_revision_id": linked["revision_id"],
+                    "expected_revision_id": condition["revision_id"],
                     "change": {"action": "delete_area", "area_id": area_id},
                 },
             )
@@ -126,17 +147,46 @@ def test_work_view_pins_revision_even_when_head_changes_between_reads(
                 },
             )
             assert unlinked.status_code == 200
+            deleted_collaborator = await asyncio.to_thread(
+                client.post,
+                f"{url}/collaborators",
+                json={
+                    "command_id": str(uuid4()),
+                    "expected_revision_id": unlinked.json()["revision_id"],
+                    "change": {
+                        "action": "delete_collaborator",
+                        "collaborator_id": collaborator["collaborators"][0]["collaborator_id"],
+                    },
+                },
+            )
+            assert deleted_collaborator.status_code == 200
+            reclassified = await asyncio.to_thread(
+                client.post,
+                f"{url}/conditions",
+                json={
+                    "command_id": str(uuid4()),
+                    "expected_revision_id": deleted_collaborator.json()["revision_id"],
+                    "change": {
+                        "action": "revise_condition",
+                        "condition_id": condition["conditions"][0]["condition_id"],
+                        "changes": [{"field": "kind", "value": "shared_collaboration"}],
+                    },
+                },
+            )
+            assert reclassified.status_code == 200
         return result
 
     monkeypatch.setattr(area_persistence, "read_areas", change_after_areas)
     combined = client.get(f"{url}/work")
     assert combined.status_code == 200
     assert combined.json() == {
-        "revision_id": linked["revision_id"],
+        "revision_id": condition["revision_id"],
         "areas": area["areas"],
         "tasks": task["tasks"],
         "capabilities": capability["capabilities"],
         "task_links": linked["task_links"],
+        "collaborators": collaborator["collaborators"],
+        "conditions": condition["conditions"],
     }
     current = client.get(f"{url}/work").json()
     assert current["revision_id"] != task["revision_id"]
@@ -144,6 +194,8 @@ def test_work_view_pins_revision_even_when_head_changes_between_reads(
     assert current["tasks"][0]["area_id"] is None
     assert current["capabilities"][0]["name"] == "新版介面知識"
     assert current["task_links"] == []
+    assert current["collaborators"] == []
+    assert current["conditions"][0]["kind"] == "shared_collaboration"
 
 
 def test_work_view_missing_file_is_not_an_empty_document(client: TestClient) -> None:

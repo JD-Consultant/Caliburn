@@ -30,6 +30,8 @@ const emptyWork = {
   tasks: [],
   capabilities: [],
   task_links: [],
+  collaborators: [],
+  conditions: [],
 };
 
 function renderApp(path = '/') {

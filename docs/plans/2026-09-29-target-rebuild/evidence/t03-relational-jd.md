@@ -310,3 +310,36 @@ DB 測例直接驗證：固定正文／選用不能 UPDATE／DELETE；目前、�
 沿 §2 PG18.6／Python 工具鏈，每測例只建立並清理其自有隨機 schema；沒有讀取／遷移原產品資料、載入秘密或呼叫模型，provider 費用 0。沒有啟動新 API／Vite 服務；本輪未重跑瀏覽器旅程或 provider gate，之前的瀏覽器證據仍屬 §9。
 
 `/jd/work` 尚只含既有集合，下一切片須把協作／條件一併放在同版組合查詢，再接人工 UI 與相應真 PG 瀏覽器。之後續做候選，T07 接來源／模型工具，T08 接共同正式完成；**T03 和 Goal 仍未完成，正式入口不切換**。
+
+## 11. 第九切片：協作與條件人工 UI（2026-09-29）
+
+### 11.1 範圍與研究
+
+接續 `ad6211af`，兩集合接入同一 `/jd/work` 固定修訂投影、人工編輯器及原命令恢復。不新增框架、表、持久 owner 或通用表單引擎。先核 JD 欄位指南、工程規範及 React／TanStack Query／MUI Select 的當前官方契約；取捨與程式路由維護於[介面 §1.5](../../../implementation/interface-and-delivery.md#15-t03-協作對象與共通條件的人工編輯)。
+
+使用者可新增、局部修改、排序及刪除協作對象／條件；條件分類明確更正並保留 ID。新增協作只知道範圍也能保存，不猜名稱；條件不自動複製至任務要求。畫面本身不增加來源核對或正式事實承諾。
+
+### 11.2 反例與驗證
+
+- 先擴充同版 PG 測例：原 `/work` 缺 `collaborators`，**1 failed／1 passed**。前三項 UI 測例均因缺少對應操作而失敗。不是把環境錯誤當功能 Red。
+- 補 schema 引用、生成型別、同版查詢及兩組表單／呈現；不自行改生成物。TypeScript 找到舊測例完整投影缺新陣列，補齊 fixture，不放寬正式 schema。
+- 同版測例在 GET 途中由另一請求刪職責／解除能力關係／刪協作對象／更正條件分類；此次 GET 仍回原固定修訂，下次才取得新結果。沒有另外加投影儲存或全域鎖。
+
+| 層級 | 實際結果 |
+|---|---|
+| 後端受影響範圍 | **166 passed**，15.78 秒；123 單元／契約＋43 真 PG（同版查詢及協作／條件）。未改底層交易／schema，沒有再次重跑第八切片全套 381；其證據留在 §10 |
+| 前端 | **49 passed**，8 檔；新增 5 項涵蓋範圍單獨建立、明確重新分類、no-op／空白拒絕及兩集合的原命令 remount |
+| 真 PG 瀏覽器 | **16 passed**，37.8 秒，無自動 retry；新增 2 旅程，原有 14 旅程回歸 |
+| 靜態／生成／build | Ruff lint／format 115 檔、mypy 85 source files、完整生成比對、TypeScript／ESLint／Prettier／正式 build 通過 |
+
+新增瀏覽器旅程驗增修刪、排序、重新分類保留身分、不改其他分類、reload；另以真 POST 提交後丟回應，再由另一請求更正分類，重新開頁後確認原命令，不複製條件或回寫舊稿。無 pageerror／正常旅程 console error；桌面及 390px 截圖實際檢查，Dialog 焦點、固定底部保存與換行可讀，無水平溢出。
+
+保存頁六張 Mermaid 均渲染；更新的同版讀取時序圖實際檢視，已包含協作／條件且固定 R 直到完整返回。獨立 subagent 依 Goal、工程與產品責任章節審查指定程式差異，**未找到阻擋本切片的缺陷**；其工作為靜態程式／測試內容審查，不冒稱再次執行上述測試。
+
+### 11.3 環境、限制及下一步
+
+沿既有 PG18.6、Python3.14.7、Node24.19、Playwright1.63／Chromium153 環境；新瀏覽器 namespace `t03_context_ui_20260929_2310`，loopback API／Vite。只用合成資料，零秘密讀取、零 provider 呼叫；資料保留，不刪既有 namespace。命令沿 App README，單跑新瀏覽器 `jd-context.spec.ts`；後端範圍是 `tests/unit tests/contracts tests/integration/test_jd_work.py tests/integration/test_jd_collaborators_conditions.py`。
+
+正式 JS bundle 755.47 kB（gzip 225.44 kB），仍有既有 500 kB 提示；T15 量測／分割最佳化未完成，不放寬閥值掩蓋。前端人工集合已可用，不表示候選、來源、模型分析、PDF 或安全 gate 已完成。
+
+**下一步：**T03 候選工作稿與正式修訂隔離，沿已確認 Turn／Step 恢復契約研究及實作；不把人工正式 API 交給 A 直接寫。T07 接來源／工具，T08 接正式訪談＋JD＋答覆共同完成，T12 接全鏈故障；T03／Goal 保持未完成。

@@ -88,9 +88,9 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 已驗：完整 R 保存後跨程序零重呼；兩工具有序；第一筆候選已提交但確認遺失，重入得到原效果後才進第二筆；model checkpoint 寫入前／寫入後拋錯均不先派工具，若 pending writes 已保存則由原框架承接；完成 Step 再 resume 不重加 items。以假 provider＋真 PG 驗證，無真實模型品質宣稱。
 
-另以真 PG 注入 checkpoint 與 pending writes 同時失敗：`astream` 不保證還來得及交出 node update，不能依賴它保住原回應。測例在 provider callback 保留已取得原 R，重開 saver 核無原結果後，使用官方 `aupdate_state(..., as_node="request_model")` 補存，再以 `None` 接續，模型總呼叫 1。這只證明官方機制可承接原 R，**正式 supervisor 的保留／資格核對與採用尚未接線**；不能把測例中的人工補存當完整恢復產品。
+第二切片曾以真 PG 注入 checkpoint 與 pending writes 同時失敗：`astream` 不保證還來得及交出 node update，不能依賴它保住原回應。當時只以測例人工補存證明官方能力；**第五切片已接為 §4.4 的公開恢復路徑**，不再要求呼叫方手寫 Graph update。外層有界 supervisor 與完整產品採用仍待接線。
 
-尚未完成：上述雙保存失敗的正式接線、執行／預算准入、取消與暫停、角色 thread／候選安全點整合、compact 安全採用及官方 API。不能因上述 Step 可恢復就宣告 T06 或產品生命週期已完成。依據：[官方 durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)、[saver／sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)，及鎖定框架原碼與本切片反例。
+尚未完成：外層執行／預算准入、取消與暫停控制流程、角色 thread／候選安全點整合、compact 安全採用及官方 API。不能因上述 Step 可恢復就宣告 T06 或產品生命週期已完成。依據：[官方 durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)、[saver／sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)，及鎖定框架原碼與本切片反例。
 
 ### 4.3 已落地的直連請求與失敗分類（T06 第三切片）
 
@@ -102,6 +102,19 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 - `adapters/openai_failures.py` 區分遠端結果不明、暫時服務問題、權限／額度阻塞、容量、請求與回應協定問題；不複製可能含原話／秘密的 error body 到 State 或 UI。分類不等於已准許重試，更不代表該次免費。
 
 此切片目前是**非串流傳輸接線**；公開中間訊息／UI 串流、Retry-After 排程、持久額度與原結果採用仍待後續。離線官方 SDK MockTransport 已驗一次外送、同 payload 及 redirect 拒絕；不是遠端接受或產品恢復驗收。依據：[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[錯誤分類](https://developers.openai.com/api/docs/guides/error-codes)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)，並核鎖定 SDK 3.20.0 的 client／retry／compact 原碼。
+
+### 4.4 已落地的原回應補存與資格接線（T06 第五切片）
+
+`run_response_step` 在模型 node 返回前保留完整原 R、原 input 及同一 operation seed；僅在尚未進入下游節點的保存失敗時，以 `ResponseStepSaveError.recovery` 交還程序內的 `HeldModelResponse`。一般工具／協定／資格錯誤仍保持原分類，不一律轉為可重試保存錯誤。這不是另一份持久 ResponseStore，不寫入業務表、模型 context 或一般 log。
+
+- 仍握有 recovery 時，以同一 thread、`input_items=None`、`recovery=...` 回到公開入口。入口先核有效工作資格，再查官方 saver；不呼叫模型、不由呼叫方自行改 Graph State。
+- 原 R／seed 已在 checkpoint 或 pending writes 時核對相符，沿目前位置恢復，**不覆寫之後的 prepared command、工具結果或完成視窗**。此時立即釋放該次呼叫的暫存保存責任，避免直接恢復 execute node 的工具／資格錯誤被誤分類。
+- 原 R 尚未保存時，必須仍在原 `request_model` 邊界、原 input 相同且無後續效果資料；再查資格，以官方 `aupdate_state(as_node="request_model")` 補存原 update，然後正常 `None` 接續。不同 thread、不同 input、不同已存 R／seed 或不相容位置拒絕，不猜測、不回退。
+- 查詢／補存再次失敗，仍交還同一原件；沒有自行循環、重新推論或增加付費請求。是否與何時重試由工作 supervisor 的單一有界政策承接；程序整個消失且兩種保存皆失敗時，不保證記憶體原件可恢復。`store=false` 不能靠 response ID 補取遺失內容。
+- `ResponseStepRuntime.ensure_active` 是必要注入，入口、模型／工具 I/O 前、完成 Step 及交回結果前均檢查。產品接線用 execution owner 的原 scope／writer，短交易結束後才做模型 I/O；不把 DB session 或 writer 狀態塞入模型 input。單一 writer 調度仍由外層負責，這不是新的租約實作。
+- Guard 與 saver／provider 不共用原子交易：取消後晚到 R 仍可能物理保存，但不能派送工具或交付有效結果。業務工具還須在自己的提交交易內核資格；T08／T11 才決定有效 Turn／批次基底，不能把任意 latest checkpoint 當成可採用歷史。
+
+已驗公開恢復入口、重複 handoff、原 R 確認遺失、雙保存失敗、後續工具錯誤不誤分類；真 PG 取消／writer 替換拒絕舊 worker，新有效 writer 可承接同一原 R。完整模型外送准入／費用結算、自動恢復調度、產品暫停／取消及 compaction 仍未因此完成。機制依 [LangGraph 狀態更新與接續](https://docs.langchain.com/oss/python/langgraph/use-time-travel)；本案只在核對原位置後補存既有 R，不以舊 checkpoint replay 重算外部工作。
 
 ## 5. 容量、重試與恢復不是同一政策
 

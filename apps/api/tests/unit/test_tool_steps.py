@@ -19,6 +19,10 @@ from caliburn.agent_execution.tool_steps import (
 )
 
 
+async def ensure_active() -> None:
+    """This isolated graph fixture has no product execution owner."""
+
+
 def model_response() -> Response:
     raw = json.loads(
         (Path(__file__).parents[1] / "fixtures/native-response.json").read_text(encoding="utf-8")
@@ -62,7 +66,7 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
     result = await graph.ainvoke(
         {"input_items": input_items},
         config,
-        context=ResponseStepRuntime(request, prepare, execute),
+        context=ResponseStepRuntime(request, prepare, execute, ensure_active),
         durability="sync",
     )
     assert events == [
@@ -111,7 +115,7 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
             assert prepared == prepared_second
         return "original result:" + prepared["call_id"]
 
-    runtime = ResponseStepRuntime(request, prepare, execute)
+    runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
     with pytest.raises(ConnectionError):
         await graph.ainvoke({"input_items": []}, config, context=runtime, durability="sync")
     assert (await graph.aget_state(config)).next == ("execute_tool",)
@@ -145,7 +149,7 @@ async def test_read_or_rejection_is_saved_as_result_without_executing() -> None:
     result = await graph.ainvoke(
         {"input_items": []},
         {"configurable": {"thread_id": "read-only"}},
-        context=ResponseStepRuntime(request, prepare, execute),
+        context=ResponseStepRuntime(request, prepare, execute, ensure_active),
         durability="sync",
     )
     assert len(result["tool_results"]) == 2
@@ -173,7 +177,7 @@ async def test_unsupported_response_is_preserved_before_routing_rejects_it() -> 
         await graph.ainvoke(
             {"input_items": []},
             config,
-            context=ResponseStepRuntime(request, prepare, execute),
+            context=ResponseStepRuntime(request, prepare, execute, ensure_active),
             durability="sync",
         )
     saved = await graph.aget_state(config)
@@ -207,7 +211,7 @@ async def test_public_entry_rejects_restarted_input_and_resumes_same_operation()
         operations.append(prepared["operation_id"])
         return "done"
 
-    runtime = ResponseStepRuntime(request, prepare, execute)
+    runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
     options = {"thread_id": "protected-entry", "runtime": runtime, "max_tool_calls": 16}
     with pytest.raises(ValueError, match="no saved Step"):
         await run_response_step(saver, input_items=None, **options)
@@ -237,6 +241,6 @@ async def test_configured_tool_bound_rejects_before_any_effect() -> None:
             InMemorySaver(),
             thread_id="limited-step",
             input_items=[],
-            runtime=ResponseStepRuntime(request, prepare, execute),
+            runtime=ResponseStepRuntime(request, prepare, execute, ensure_active),
             max_tool_calls=1,
         )

@@ -398,8 +398,9 @@ def test_upgrade_preserves_existing_operations_and_downgrade_refuses_history_los
                 "request_payload, created_at FROM jd_operations ORDER BY command_id"
             )
             original = connection.execute(original_query).all()
-            command.upgrade(config, "head")
-            command.upgrade(config, "head")
+            # Test this migration's upgrade/downgrade contract, not future heads.
+            command.upgrade(config, "0010_jd_candidates")
+            command.upgrade(config, "0010_jd_candidates")
             assert connection.execute(original_query).all() == original
             assert (
                 connection.execute(

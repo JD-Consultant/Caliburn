@@ -15,6 +15,7 @@ from caliburn.features.interviews.persistence import (
 from caliburn.features.job_description.candidate_persistence import JdCandidateRecord
 from caliburn.features.job_description.persistence import JdRevisionRecord
 from caliburn.features.job_files.persistence import JobFileRecord
+from caliburn.features.work_memory.revision_persistence import MemoryObjectRevisionRecord
 from caliburn.settings import Settings
 
 config = context.config
@@ -28,6 +29,7 @@ assert InterviewReplyRecord.__table__.metadata is target_metadata
 assert ExecutionRecord.__table__.metadata is target_metadata
 assert JdRevisionRecord.__table__.metadata is target_metadata
 assert JdCandidateRecord.__table__.metadata is target_metadata
+assert MemoryObjectRevisionRecord.__table__ is target_metadata.tables["memory_object_revisions"]
 
 
 def migrate(connection: Connection, schema: str) -> None:

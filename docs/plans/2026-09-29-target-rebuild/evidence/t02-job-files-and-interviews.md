@@ -62,7 +62,7 @@ python scripts/generate_contracts.py --check
 
 ## 5. 下一個可執行切片
 
-1. T02 建立／列表 UI：沿 React Router／Query 的既定責任及來源 schema，完成檔案選取／開場回讀與隔離測例；之後才能補齊 T02 gate。不要重做已成立的建立／接受交易，不在 UI 暴露尚無 runner 的輸入入口。
+1. T02 建立／列表 UI 已於 §8 接上；下一切片補產品概念已定的**列表改名**：只變 display name，不變員工姓名／JD／原訪談，重送、競爭與 UI 都要驗。既有任務摘要漏列不等於需求消失；不重做已成立的建立／接受交易，不在 UI 暴露尚無 runner 的輸入入口。
 2. T08 使用 §7 的正式化參與介面與當前 writer／准入，接完整 JD／背景意圖的同次完成，並固定 K／H／F；只有全體效果成立才提交。禁止另開 HTTP 任意正式化 endpoint。
 3. 控制意圖、Graph 恢復、候選與原生基底回退仍須 T06／T08／T12 驗；不能把 §6／§7 的資料交易競爭當完整 A final／取消已驗。
 
@@ -112,3 +112,32 @@ python scripts/generate_contracts.py --check
 資料圖以 Mermaid 11.17.2＋Playwright 1.62.1 隔離 headless Chrome 實際渲染及檢視；六表、七條關係皆可讀，改為橫向配置避免連線遮住表格，無裁切。9 份相關文件、112 個本機連結／錨點及 fences／行尾空白檢查通過；Git diff 空白檢查通過。圖與文件只表示本切片已實作的底層，不提前宣告 T02 UI 或 T08 完成。
 
 目前只有內部 `record_formal_interview` 參與介面，不 commit、不單獨完成整輪；合成 harness 的終態提交不能替代 T08 的 JD／來源／背景意圖完整協調。模型工具 wire、容量不足策略及固定基準注入仍依原任務驗收。本次未讀 `.env`、沒有付費模型請求；專用 PG 的測例只清理自己建立的合成 namespace，正式資料未動。
+
+## 8. 第四切片：建立、選取與正式開場 UI（2026-09-29）
+
+接續 `f51d6ccf`；以既有建立／清單／正式歷史 API 為唯一後端，不增設假模型或任意正式化入口。研究與實現責任見[介面 §1.1](../../../implementation/interface-and-delivery.md#11-t02-已落地的讀寫邊界)，使用方式見[frontend README](../../../../apps/web/README.md)。
+
+**Red → Green：**先測空清單應有建立入口，原施工頁找不到「職務檔案」heading；新增路由、Query、受控表單與正式歷史回讀後轉綠。再補不明結果重送、格式驗證、同名／晚到回應隔離等反例。瀏覽器另發現初始焦點在 Dialog paper 而非名稱欄，核對 MUI 9.4 的 FocusTrap 與 StrictMode effect lifecycle 後，改在框架 transition `onEntered` 定位 input；不刪測例、不關閉 StrictMode／焦點陷阱。
+
+| 驗證層級 | 已成立效果／限制 |
+|---|---|
+| Vitest＋Testing Library，12 項 | 空清單、GET 失敗／重讀、非法 schema 拒絕、建立後開場／真出處、同名檔案切換與遲到結果、404 不漏 debug、原話 HTML 字串不執行；建立命令先保留／不明結果重開仍同 ID、確認後新命令、送出期間不重送／Escape 不關閉、空白及儲存失敗不送、明確拒絕與無法採用結果分開 |
+| 真 PG＋Playwright Test，3 項 | 真建立／同名選取／reload、Dialog 鍵盤焦點及 Escape 恢復、390px 無整頁水平溢出；POST 真提交後故意丟回應，reload 後原命令回 200 且同名合成檔案只一份；離線列表有重讀入口而非假空白 |
+| 靜態與建置 | TypeScript strict、typed ESLint、Prettier、Vite build；不以 build 成功代替旅程 |
+| 視覺 | 實際檢視 desktop 1280px 清單及 mobile 390px 正式開場截圖，標籤、按鈕、角色／序號及換行可讀；不是全裝置或可及性完整認證 |
+
+新增直接依賴：React Router 8.4.0、TanStack Query 5.104.0、MUI Core 9.4.0、Emotion 11.14.x、Ajv 8.20.0／formats 3.0.1、user-event 14.6.7（MIT），Playwright Test 1.63.0（Apache-2.0）。registry peer metadata 與 strict peer 安裝通過；精確版本仍以 lock 為準。沒有另加全域 store、form engine 或 UI 付費套件，舊產品 importer 未變。
+
+實際沿 Node 24.19.0／pnpm 12.5.1，命令見 frontend README。PG 為原專用 `caliburn_t01_test`，本輪另建 `t02_ui_20260929_1816` namespace；API／Web 僅綁 loopback 8100／5173，未用舊 `.env`／正式資料。瀏覽器為 Playwright 1.63.0 對應 **Chrome for Testing 153.0.8010.12（revision 1243）**，不是拿舊 browser revision 冒充相容。
+
+環境／工程修正紀錄：
+
+- sandbox 的 Vite／Vitest 子程序 EPERM 經工具權限審查重跑；不是行為 Red。
+- MUI 9 移除 Stack system props／`disableEscapeKeyDown`，依目前 API 改 `sx`／受控關閉，不套用舊教學。
+- Node 24 執行 E2E 時要求 JSON import attributes；同一 schema import 加 `with { type: 'json' }`，不複製第二套 test schema。
+- Playwright 內建 Node 下載器逾時；curl 對同一官方 CDN 跟隨到 Google storage 成功，下載到 `.research-tmp`，核對 server MD5（只作傳輸完整性、不宣稱簽章）、binary 版本後，以明確 executable path 跑隔離 headless。沒有改個人瀏覽器或偷降 Playwright 版本。
+- 專用 PG 初次啟動漏帶測試埠，診斷 log／PID 後停止該自有 cluster，再明配 `-p 55439 -h 127.0.0.1`；未對 5432 的其他 DB 發命令。
+
+**仍待後續 gate：**列表改名先補 T02；A 訪談／JD 尚未接線。首個 bundle 約 692 KB（gzip 212 KB）有 Vite 500 KB 警告，未調高警告門檻掩蓋；T15 衡量 route／validator 分割與嚴格 CSP，Ajv runtime compile 不能當嚴格 CSP 已通過。T15／T18 的 Host／Origin／CSRF、正式交付與資料安全仍待完成。此輪不呼叫 OpenAI、不讀金鑰、費用 0，不把三項 UI 測試宣稱完整產品或模型品質驗收。
+
+最後回歸：12 項 Vitest、3 項真 PG 瀏覽器旅程再次通過；strict peer／frozen lock 離線安裝、型別、lint、格式、build、原 schema 再生檢查通過。4 份受影響文件、65 個本機連結／錨點、fences 與 Git 空白檢查通過。新增 sequence diagram 以 Mermaid 11.17.2 實際渲染並檢視；首次註記過長已換行修正，最終四個參與者／兩條結果分支可讀無裁切。檢查後精確停止自有前後端與 PG；只清除本次 namespace 的 8 筆合成檔案及其測試關聯，這些臨時測資未備份不可回復；未刪 cluster／DB／既有資料。

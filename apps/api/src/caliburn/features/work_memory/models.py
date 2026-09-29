@@ -8,6 +8,14 @@ class InvalidMemoryChangeError(ValueError):
     """Memory content or an explicit change violates a domain invariant."""
 
 
+class MemoryTitleConflictError(InvalidMemoryChangeError):
+    """Another current object in the same layer owns the requested title."""
+
+
+class MemoryReferenceNotFoundError(InvalidMemoryChangeError):
+    """An explicitly removed source is not among this object's current bindings."""
+
+
 class MemoryTargetNotFoundError(LookupError):
     """No exact title match exists in the caller's visible layer map."""
 

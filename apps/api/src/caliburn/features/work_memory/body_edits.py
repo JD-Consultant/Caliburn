@@ -38,7 +38,7 @@ def apply_body_diff(
     if len(hunks) > policy.max_hunks:
         raise BodyEditError("patch_limit_exceeded", "Too many hunks; use smaller edits")
     # Only LF/CRLF are line separators. Other Unicode separators are source text.
-    raw_lines = re.findall(r"[^\n]*\n|[^\n]+$", body)
+    raw_lines = split_body_lines(body)
     lines = tuple(_line_content(line) for line in raw_lines)
     scan_characters = sum(
         len(lines) * sum(len(line) for line in (*hunk.context, *hunk.anchors))
@@ -87,6 +87,11 @@ def apply_body_diff(
             "invalid_patch", "Body must remain nonblank; use delete for object removal"
         )
     return revised
+
+
+def split_body_lines(body: str) -> list[str]:
+    """Preserve exact source lines; Unicode separators and lone CR are content, not LF."""
+    return re.findall(r"[^\n]*\n|[^\n]+$", body)
 
 
 def _line_content(line: str) -> str:

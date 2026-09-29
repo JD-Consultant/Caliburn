@@ -13,6 +13,7 @@
 |---|---|---|
 | `prepare_context` | 核新工作綁定、已採用基底；追加一次 App 資料及必要輸入；保存原位置 | 同工作恢復刷新 maps、重複員工原話 |
 | `request_model` | 容量／外送資格通過後呼叫 SDK；保存完整 R、原 calls 與 App 操作身分 | 同一未持久 node 內直接做寫入工具 |
+| `prepare_tool` | 有業務效果的 call 先解析目前目標，形成固定命令與有界回傳，可靠保存後才執行；純讀取可直接走讀取路徑 | 工具重入重新解析舊 title、把預期成功文字當已提交 |
 | `execute_tool` | 每次處理一個已存 call；原業務核對／執行，保存配對結果；按原 output 次序前進 | 多個相依寫入平行；用最新資料冒充舊讀取結果 |
 | `finish_step` | 確認所有 calls 有確定結果；保存可用 Step 位置 | unresolved call 當完成、將此點當正式提交 |
 | `apply_control` | 查持久取消／暫停資格，合法時原生 interrupt；否則 route 完成或下一步 | interrupt 前放不可重複副作用；UI 已按暫停就宣稱已停妥 |
@@ -28,6 +29,8 @@ Graph State 保存：不可變工作綁定的參照、原生有效窗口／採�
 原生窗口 channel 使用明確的「追加 items」與「可靠採用完整 compacted output」操作；不能套會按 message ID 合併覆寫的通用 MessagesState／`add_messages`。serializer 保存 JSON-compatible 原生資料；output→input 轉換只按官方契約，不刪 reasoning／phase／call metadata。`status` 等 output-only 欄位按實際 SDK input 規則轉型，**保存原輸出**與**合法重送表示**分開驗，不能機械送所有 response envelope。[OpenAI 原生接續範例](https://developers.openai.com/api/docs/guides/deployment-checklist#use-reasoningencrypted_content)
 
 SDK client、DB session、工具實作與密鑰由依賴注入，不進 State。候選正文由領域保存，State 不存另一份可寫副本。Runtime context、Graph State、模型 input 明確分型別。
+
+T05 的 [Memory 寫入接縫](memory-tools.md#4-寫入準備採用與原結果接續)提供 immutable prepared command，可能含已計算的新正文及成功回傳。這是待執行原操作，不是另建可編輯候選。T06 須在業務 execute 前可靠保存它；恢復用同一命令核對原結果，不重新 prepare、更不重新解析已改指別人的 title。純讀工具的結果也須保存後沿原 call 接續，不能以重新讀到的現在資料冒充當時觀察。這是框架接線要求，尚未由 T05 的函式測試證明 checkpoint／程序恢復。
 
 ## 3. thread／私有歷史與回退接線
 

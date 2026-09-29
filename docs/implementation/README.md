@@ -20,7 +20,7 @@
 | 已實作的 JD 修訂、原結果與人工編輯如何保存 | [JD 保存接線](jd-storage.md)；全部人工集合、候選／正式隔離、位置回退及交易內採用；完整 Agent／來源／候選 UI 另依 T07–T09 |
 | Memory 候選與固定快照如何接入保存 | [Memory 保存接線](memory-storage.md)；T04 候選／固定修訂、回復與原子發布已驗；模型工具／diff／背景 Agent 依 T05／T10／T11 |
 | Memory V4A 長文怎麼解析、唯一定位、保留未改正文 | [正文編輯接線](memory-body-editing.md)；T05 純編輯器與工具／交易接線分開驗證 |
-| Memory 模型工具如何生成、綁角色與可見基準、按需回查 | [模型工具接線](memory-tools.md)；讀取已驗，寫入及 Runtime 接續仍依 T05／T06 |
+| Memory 模型工具如何生成、綁角色與可見基準、按需回查 | [模型工具接線](memory-tools.md)；T05 讀寫元件已驗，持久執行與角色接續仍依 T06／T10 |
 | Graph、原生 Responses、恢復與取消如何接 | [Agent 執行接線](agent-execution.md) |
 | UI、串流、PDF、啟停及安全如何交付 | [介面與交付](interface-and-delivery.md) |
 | 哪個需求由哪個任務與測試證明 | [驗證對照](verification-plan.md) |

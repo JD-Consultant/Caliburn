@@ -1,9 +1,7 @@
 """Compact read tools: App binds role/baseline; the model selects titles or sequences."""
 
-from importlib.resources import files
-
 from openai.types.responses import FunctionToolParam
-from pydantic import BaseModel, TypeAdapter, ValidationError
+from pydantic import BaseModel, ValidationError
 
 from caliburn.contracts.generated.tools.historical_interview import (
     HistoricalInterview,
@@ -19,7 +17,6 @@ from caliburn.contracts.generated.tools.read_interview_arguments import (
 from caliburn.contracts.generated.tools.read_memory_object_arguments import (
     ReadMemoryObjectArguments,
 )
-from caliburn.contracts.generated.tools.tool_rejection import ToolRejection
 from caliburn.contracts.generated.tools.work_situation_view import (
     InterviewReference,
     WorkSituationView,
@@ -37,6 +34,7 @@ from caliburn.features.work_memory.candidates import (
 )
 from caliburn.features.work_memory.models import InvalidMemoryChangeError, MemoryTargetNotFoundError
 from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionNotFoundError
+from caliburn.transport.model_tools.contracts import function_definition, reject_tool_call
 from caliburn.workflows.memory_reads import (
     CandidateMemoryRead,
     MemoryReadBinding,
@@ -114,26 +112,12 @@ class MemoryReadTools:
                 if name.endswith("_map")
                 else "read-memory-object-arguments"
             )
-            schema = TypeAdapter(dict[str, object]).validate_json(
-                files("caliburn.contracts.generated.tools")
-                .joinpath(f"{schema_name}.schema.json")
-                .read_text(encoding="utf-8")
-            )
-            schema.pop("$schema", None)
-            result.append(
-                {
-                    "type": "function",
-                    "name": name,
-                    "description": _DESCRIPTIONS[name],
-                    "parameters": schema,
-                    "strict": True,
-                }
-            )
+            result.append(function_definition(name, _DESCRIPTIONS[name], schema_name))
         return result
 
     async def invoke(self, name: str, arguments: str) -> str:
         if name not in self.names:
-            return _reject(
+            return reject_tool_call(
                 "scope_not_allowed", "本角色沒有這項讀取能力。", "使用本角色提供的工具。"
             )
         try:
@@ -150,30 +134,30 @@ class MemoryReadTools:
             MemoryPermissionError,
             InterviewScopeError,
         ):
-            return _reject(
+            return reject_tool_call(
                 "scope_not_allowed",
                 "目前執行資格、層級或訪談範圍不允許這次讀取。",
                 "不要更改 scope 或猜版本；只使用本工作允許的來源，執行資格由 App 處理。",
             )
         except MemoryCandidateStateError:
-            return _reject(
+            return reject_tool_call(
                 "target_stale", "本次候選階段已失效。", "由 App 接續有效階段，不重送過時請求。"
             )
         except MemoryTargetNotFoundError:
-            return _reject(
+            return reject_tool_call(
                 "target_not_found",
                 "目前可見導覽中沒有這個精確標題。",
                 "重讀相應導覽，再選目前 target_title；不要猜歷史名稱。",
             )
         except MemoryRevisionNotFoundError, InterviewSourceNotAvailableError:
-            return _reject(
+            return reject_tool_call(
                 "source_not_available",
                 "至少一個來源無法在本工作允許的範圍完整讀取。",
                 "未回傳部分內容；核對來源選取，保存資料問題由 App 處理。",
             )
         output = result.model_dump_json()
         if len(output) > self.max_result_characters:
-            return _reject(
+            return reject_tool_call(
                 "read_limit_exceeded",
                 "完整結果超過本次工具輸出容量，未回傳截斷內容。",
                 "訪談請縮小選取範圍；導覽或單物件仍超量時交 App 處理容量，不視為已讀。",
@@ -245,14 +229,8 @@ def _parse_arguments(name: str, arguments: str) -> ReadArguments:
 
 
 def _invalid_arguments() -> str:
-    return _reject(
+    return reject_tool_call(
         "invalid_arguments",
         "參數不符合本工具的選取契約。",
         "只提交宣告欄位；標題須精確且非空，序號為正整數，區間起點不得晚於終點。",
     )
-
-
-def _reject(code: str, message: str, next_action: str) -> str:
-    return ToolRejection(
-        status="rejected", code=code, message=message, next_action=next_action
-    ).model_dump_json()

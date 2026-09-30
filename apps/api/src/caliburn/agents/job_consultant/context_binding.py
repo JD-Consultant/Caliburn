@@ -38,6 +38,8 @@ from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.workflows.context_history import RoleContextHistory
 from caliburn.workflows.memory_reads import PublishedMemoryRead
 
+REFERENCE_DATA_KIND = "consultant_turn_reference"
+
 
 @dataclass(frozen=True, slots=True)
 class TurnContext:
@@ -181,7 +183,7 @@ async def _capture_data(work: RoleContextHistory, request: ResponseRequest) -> _
         ],
     )
     app_data = {
-        "data_kind": "consultant_turn_reference",
+        "data_kind": REFERENCE_DATA_KIND,
         **maps,
         "historical_interview": historical.model_dump(mode="json"),
         "interview_read_boundary": {

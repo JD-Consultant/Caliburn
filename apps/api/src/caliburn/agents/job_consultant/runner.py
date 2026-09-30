@@ -1,6 +1,7 @@
 """Compose A from shared native execution and existing product owners."""
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
@@ -14,7 +15,13 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from caliburn.adapters.openai_pricing import GPT_6_LUNA_STANDARD_2026_09_30
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import NativeItems, restore_response
-from caliburn.agent_execution.context_compaction import CompactionRuntime, run_context_compaction
+from caliburn.adapters.response_streaming import PublicCommentaryUpdate
+from caliburn.agent_execution.context_compaction import (
+    CompactionRuntime,
+    HeldCompaction,
+    HeldPreparationCount,
+    run_context_compaction,
+)
 from caliburn.agent_execution.request_capacity import (
     ModelCapacityLimits,
     ReceivedInputCount,
@@ -43,8 +50,17 @@ from caliburn.features.executions.budget_models import (
     BudgetExceededError,
     ExecutionBudget,
 )
-from caliburn.features.executions.history_models import AgentRole
-from caliburn.features.executions.models import ExecutionInfo, ExecutionStatus, ExecutionWriter
+from caliburn.features.executions.history_models import (
+    AgentRole,
+    HistoryWindowKind,
+    context_thread_id,
+)
+from caliburn.features.executions.models import (
+    ExecutionInfo,
+    ExecutionScope,
+    ExecutionStatus,
+    ExecutionWriter,
+)
 from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import ModelSettings
 from caliburn.transport.model_tools.jd_changes import JdChangesTools
@@ -74,6 +90,8 @@ from caliburn.workflows.model_requests import (
 
 _LOG = logging.getLogger(__name__)
 
+type ConsultantRecovery = HeldModelResponse | HeldInputCount | HeldCompaction | HeldPreparationCount
+
 _CAPACITY: ModelCapacityLimits = {
     "model": "gpt-6-luna",
     "max_input_tokens": 922_000,
@@ -88,13 +106,14 @@ class ConsultantRunner:
     checkpointer: BaseCheckpointSaver[str]
     client: AsyncOpenAI
     settings: ModelSettings
+    on_commentary: Callable[[ExecutionScope, PublicCommentaryUpdate], None] | None = None
 
     async def run_supervised(
         self,
         writer: ExecutionWriter,
         *,
         resume_interrupt_id: str | None = None,
-        recovery: HeldModelResponse | HeldInputCount | None = None,
+        recovery: ConsultantRecovery | None = None,
     ) -> FormalInterviewExchange | PausedResponseLoop | ExecutionInfo:
         """Known terminal limitations roll back this Turn; unknown saves remain recoverable.
 
@@ -131,20 +150,38 @@ class ConsultantRunner:
         writer: ExecutionWriter,
         *,
         resume_interrupt_id: str | None = None,
-        recovery: HeldModelResponse | HeldInputCount | None = None,
+        recovery: ConsultantRecovery | None = None,
     ) -> FormalInterviewExchange | PausedResponseLoop:
         """One supervised writer; reentry resumes native work, never rebuilds its context.
 
         The supervisor reconciles terminal/uncertain outcomes and authorizes pause resume.
         This role does not implement a second retry engine or start background Memory.
-        A caller may explicitly return an intact response-Step handoff; the shared
+        A caller may explicitly return an intact response/count/compaction handoff; the shared
         boundary validates its original request and keeps pause authority separate.
         """
-        policy = await self._fix_budget(writer)
         role_history = RoleContextHistory(
             self.sessions, writer, AgentRole.JOB_CONSULTANT, self.checkpointer
         )
+        preparation_thread = context_thread_id(
+            writer.scope, AgentRole.JOB_CONSULTANT, HistoryWindowKind.PREPARED_HISTORY
+        )
+        if recovery is not None:
+            if resume_interrupt_id is not None:
+                raise ValueError(
+                    "Explicit resume requires the original paused loop with no handoff"
+                )
+            if isinstance(recovery, (HeldModelResponse, HeldInputCount)):
+                matches = recovery.thread_id == role_history.response_thread_id
+            else:
+                matches = recovery.thread_id == preparation_thread or (
+                    isinstance(recovery, HeldCompaction)
+                    and recovery.thread_id.startswith(f"{role_history.response_thread_id}:compact:")
+                )
+            if not matches:
+                raise ValueError("Recovery must retain the original Step or preparation boundary")
+        policy = await self._fix_budget(writer)
         pricing = GPT_6_LUNA_STANDARD_2026_09_30
+        commentary = self.on_commentary
         executor = ModelRequestExecutor(
             self.sessions,
             writer,
@@ -158,6 +195,9 @@ class ConsultantRunner:
                 token_count_reservation_usd=Decimal("0.0001"),
                 compaction_reservation_usd=Decimal("0.50"),
             ),
+            on_commentary=(lambda update: commentary(writer.scope, update))
+            if commentary is not None
+            else None,
         )
         compaction = CompactionRuntime(
             executor.request_compaction,
@@ -172,6 +212,7 @@ class ConsultantRunner:
             tools=consultant_tool_definitions(),
             reasoning_effort=self.settings.reasoning_effort,
             max_output_tokens=self.settings.max_output_tokens,
+            stream=commentary is not None,
         )
         prepared = await role_history.prepare_history(
             template=template,
@@ -179,6 +220,10 @@ class ConsultantRunner:
             compact_requested=False,
             count_input=executor.count_input,
             runtime=compaction,
+            recovery=recovery
+            if isinstance(recovery, (HeldCompaction, HeldPreparationCount))
+            and recovery.thread_id == preparation_thread
+            else None,
         )
         context = await capture_turn_context(
             role_history, template=template, prepared_history=prepared
@@ -194,6 +239,10 @@ class ConsultantRunner:
                 request=request,
                 input_count=count,
                 runtime=compaction,
+                recovery=recovery
+                if isinstance(recovery, HeldCompaction)
+                and recovery.thread_id == f"{role_history.response_thread_id}:compact:{request_id}"
+                else None,
             )
 
         runtime = ResponseStepRuntime(
@@ -210,16 +259,19 @@ class ConsultantRunner:
             "configurable": {"thread_id": role_history.response_thread_id, "checkpoint_ns": ""}
         }
         saved = await self.checkpointer.aget_tuple(config)
+        step_recovery = (
+            recovery if isinstance(recovery, (HeldModelResponse, HeldInputCount)) else None
+        )
         result = await run_response_loop(
             self.checkpointer,
             thread_id=role_history.response_thread_id,
-            request=context.request if saved is None and recovery is None else None,
+            request=context.request if saved is None and step_recovery is None else None,
             runtime=runtime,
             max_tool_calls=self.settings.max_tool_calls_per_step,
             max_model_steps=policy.max_model_steps,
             controls=ConsultantExecutionControls(self.sessions, writer).loop_controls(),
             resume_interrupt_id=resume_interrupt_id,
-            recovery=recovery,
+            recovery=step_recovery,
         )
         if isinstance(result, PausedResponseLoop):
             return result

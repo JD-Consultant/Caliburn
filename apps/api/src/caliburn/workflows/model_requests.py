@@ -25,10 +25,19 @@ from caliburn.adapters.openai_responses import (
     count_response_input,
     create_response,
 )
+from caliburn.adapters.response_streaming import (
+    PublicCommentaryUpdate,
+    ResponseStreamCancelledError,
+    ResponseStreamCleanupError,
+)
 from caliburn.agent_execution.context_compaction import ReceivedCompaction
 from caliburn.agent_execution.request_capacity import ReceivedInputCount
 from caliburn.agent_execution.response_retries import ResponseRetryPolicy
-from caliburn.agent_execution.tool_steps import ReceivedModelResponse
+from caliburn.agent_execution.tool_steps import (
+    ReceivedModelResponse,
+    ReceivedModelResponseCancelledError,
+    ReceivedModelResponseError,
+)
 from caliburn.features.executions import budgets, service
 from caliburn.features.executions.budget_models import (
     BudgetConflictError,
@@ -157,6 +166,7 @@ class ModelRequestExecutor:
         Callable[[ExecutionWriter, tuple[OutboundAttempt, ...]], Awaitable[PriorAttemptRecovery]]
         | None
     ) = None
+    on_commentary: Callable[[PublicCommentaryUpdate], None] | None = None
 
     async def request_model(
         self, request: ResponseRequest, request_id: UUID
@@ -166,7 +176,7 @@ class ModelRequestExecutor:
             OutboundKind.MODEL,
             request.create_payload(),
             self.accounting.reserved_cost_usd,
-            lambda: create_response(self.client, request),
+            lambda: create_response(self.client, request, on_commentary=self.on_commentary),
         )
         # No DB or cost calculation after the HTTP await: hand intact R to Graph first.
         return ReceivedModelResponse(response, attempt_id)
@@ -255,6 +265,14 @@ class ModelRequestExecutor:
                 continue
             try:
                 response = await send()
+            except ResponseStreamCancelledError as error:
+                raise ReceivedModelResponseCancelledError(
+                    ReceivedModelResponse(error.response, attempt_id)
+                ) from None
+            except ResponseStreamCleanupError as error:
+                raise ReceivedModelResponseError(
+                    ReceivedModelResponse(error.response, attempt_id)
+                ) from None
             except APIError as error:
                 try:
                     retryable = await self._record_failure(attempt_id, error)

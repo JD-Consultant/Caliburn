@@ -1,11 +1,15 @@
 """Public consultant status and App controls; execution internals never enter the response."""
 
+import asyncio
+from collections.abc import AsyncIterator
 from dataclasses import asdict
 from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi.sse import EventSourceResponse, ServerSentEvent
 
+from caliburn.contracts.generated.commentary_update import CommentaryUpdate
 from caliburn.contracts.generated.consultant_turn import ConsultantTurn
 from caliburn.features.executions.models import (
     ExecutionKind,
@@ -16,6 +20,11 @@ from caliburn.features.executions.models import (
 )
 from caliburn.features.interviews.models import InterviewInputNotFoundError
 from caliburn.transport.http.jd_work import work_view
+from caliburn.workflows.consultant_commentary import (
+    CommentaryCapacityError,
+    ConsultantCommentaryHub,
+    PublicCommentaryUpdate,
+)
 from caliburn.workflows.consultant_controls import ConsultantControlWorkflow
 from caliburn.workflows.consultant_status import (
     ConsultantStatusWorkflow,
@@ -34,6 +43,68 @@ def get_consultant_status_workflow(request: Request) -> ConsultantStatusWorkflow
 
 
 ConsultantStatus = Annotated[ConsultantStatusWorkflow, Depends(get_consultant_status_workflow)]
+
+
+async def subscribe_consultant_commentary(
+    job_file_id: UUID,
+    execution_id: UUID,
+    request: Request,
+    response: Response,
+    workflow: ConsultantStatus,
+) -> AsyncIterator[asyncio.Queue[PublicCommentaryUpdate] | None]:
+    """Validate with the original status owner before headers or hub subscription."""
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        status = await workflow.read(job_file_id, execution_id)
+    except (ExecutionNotFoundError, InterviewInputNotFoundError) as error:
+        raise HTTPException(
+            status_code=404, detail={"code": "consultant_turn_not_found"}
+        ) from error
+    except ConsultantTurnUnavailableError as error:
+        raise HTTPException(
+            status_code=503, detail={"code": "consultant_result_unavailable"}
+        ) from error
+    if status.status in {
+        ExecutionStatus.COMPLETED,
+        ExecutionStatus.CANCELLED,
+        ExecutionStatus.FAILED,
+    }:
+        response.status_code = 204
+        yield None
+        return
+    hub = getattr(request.app.state, "consultant_commentary_hub", None)
+    if not isinstance(hub, ConsultantCommentaryHub):
+        raise HTTPException(status_code=503, detail={"code": "commentary_stream_not_configured"})
+    try:
+        with hub.subscribe(job_file_id, execution_id) as queue:
+            yield queue
+    except CommentaryCapacityError as error:
+        raise HTTPException(
+            status_code=503, detail={"code": "commentary_stream_capacity"}
+        ) from error
+
+
+CommentarySubscription = Annotated[
+    asyncio.Queue[PublicCommentaryUpdate] | None, Depends(subscribe_consultant_commentary)
+]
+
+
+@router.get(
+    "/{job_file_id}/consultant-turns/{execution_id}/commentary-stream",
+    response_class=EventSourceResponse,
+)
+async def stream_consultant_commentary(
+    subscription: CommentarySubscription,
+) -> AsyncIterator[ServerSentEvent]:
+    """Presentation only: no replay, execution control, SDK event, or private content."""
+    if subscription is None:
+        return
+    while True:
+        update = await subscription.get()
+        yield ServerSentEvent(
+            event="commentary",
+            data=CommentaryUpdate.model_validate(asdict(update)),
+        )
 
 
 def find_consultant_controls(request: Request) -> ConsultantControlWorkflow | None:

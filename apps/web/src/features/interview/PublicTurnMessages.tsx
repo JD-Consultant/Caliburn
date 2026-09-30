@@ -1,6 +1,51 @@
-/** Already-saved public commentary is distinct from the formal interview transcript. */
+/** Public commentary stays nonformal; only the active Turn may add transient display. */
 import { Alert, Box, Typography } from '@mui/material';
 import type { PublicCommentary } from '../../shared/api/generated/consultant-turn';
+import { useConsultantCommentaryStream } from './use-consultant-commentary-stream';
+
+/** Mount only for a server-verified active Turn, keyed by its file/execution identity. */
+export function StreamingPublicTurnMessages({
+  jobFileId,
+  executionId,
+  messages,
+}: {
+  jobFileId: string;
+  executionId: string;
+  messages: PublicCommentary[] | null;
+}) {
+  const live = useConsultantCommentaryStream(jobFileId, executionId);
+  const pending = live.messages.filter(
+    (item) =>
+      !messages?.some(
+        (saved) => saved.response_id === item.response_id && saved.message_id === item.message_id,
+      ),
+  );
+  return (
+    <>
+      <PublicTurnMessages messages={messages} terminal={false} />
+      {live.disconnected && (
+        <Typography variant="body2" color="text.secondary">
+          即時顯示中斷；不代表處理已停止，仍以伺服器狀態為準。
+        </Typography>
+      )}
+      {pending.length > 0 && (
+        <Box>
+          <Typography variant="body2" color="text.secondary">
+            即時公開訊息（尚未保存、非正式訪談、不可引用）
+          </Typography>
+          {pending.map((item) => (
+            <Typography
+              key={JSON.stringify([item.response_id, item.message_id])}
+              sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+            >
+              {item.text}
+            </Typography>
+          ))}
+        </Box>
+      )}
+    </>
+  );
+}
 
 export function PublicTurnMessages({
   messages,

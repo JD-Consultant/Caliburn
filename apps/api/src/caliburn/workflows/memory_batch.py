@@ -49,6 +49,7 @@ from caliburn.workflows.memory_analysis.results import (
     SituationRework,
     parse_outcome,
 )
+from caliburn.workflows.memory_analysis.runner import AnalysisRecovery
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
 from caliburn.workflows.memory_stage_changes import read_situation_handoff_changes
 from caliburn.workflows.model_requests import ModelRequestFailedError
@@ -63,6 +64,7 @@ class MemoryRoleRunner(Protocol):
         previous: MemoryAnalysisResult | None = None,
         gaps: tuple[SituationGap, ...] = (),
         situation_changes: list[dict[str, JsonValue]] | None = None,
+        recovery: AnalysisRecovery | None = None,
     ) -> MemoryAnalysisResult: ...
 
 
@@ -88,9 +90,11 @@ class MemoryBatchWorkflow:
         self.max_feedback_rounds = max_feedback_rounds
         self.requests = MemoryConsolidationWorkflow(sessions)
 
-    async def run_supervised(self, writer: ExecutionWriter) -> MemorySnapshot | None:
+    async def run_supervised(
+        self, writer: ExecutionWriter, *, recovery: AnalysisRecovery | None = None
+    ) -> MemorySnapshot | None:
         try:
-            return await self.run(writer)
+            return await self.run(writer, recovery=recovery)
         except (
             ModelRequestFailedError,
             BudgetExceededError,
@@ -110,7 +114,9 @@ class MemoryBatchWorkflow:
             await self.requests.fail(writer, reason=reason)
             return None
 
-    async def run(self, writer: ExecutionWriter) -> MemorySnapshot:
+    async def run(
+        self, writer: ExecutionWriter, *, recovery: AnalysisRecovery | None = None
+    ) -> MemorySnapshot:
         while True:
             async with self.sessions() as session:
                 execution = await executions.read_execution(session, writer.scope)
@@ -133,8 +139,15 @@ class MemoryBatchWorkflow:
                     else None
                 )
             result = await self.run_role(
-                writer, work.position, previous=previous, gaps=feedback, situation_changes=changes
+                writer,
+                work.position,
+                previous=previous,
+                gaps=feedback,
+                situation_changes=changes,
+                **({"recovery": recovery} if recovery is not None else {}),
             )
+            # A held original belongs to this stage only, never the next role/handoff.
+            recovery = None
             snapshot = await self._complete_stage(writer, work.position, result)
             if snapshot is not None:
                 return snapshot

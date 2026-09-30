@@ -21,7 +21,7 @@ import {
   submitInterviewInput,
 } from './interview-turn-api';
 import type { TurnHint } from './interview-turn-api';
-import { PublicTurnMessages } from './PublicTurnMessages';
+import { PublicTurnMessages, StreamingPublicTurnMessages } from './PublicTurnMessages';
 import { ConsultantTurnControls } from './ConsultantTurnControls';
 
 const statusText: Record<ConsultantTurn['status'], string> = {
@@ -216,10 +216,19 @@ function ComposerForFile({ jobFileId, renderCandidate }: ComposerProps) {
               : statusText[verified.status]}
           </Alert>
           <ConsultantTurnControls key={verified.execution_id} turn={verified} />
-          <PublicTurnMessages
-            messages={verified.commentary}
-            terminal={isTerminalTurn(verified.status)}
-          />
+          {verified.status === 'active' ? (
+            <StreamingPublicTurnMessages
+              key={`${jobFileId}:${verified.execution_id}`}
+              jobFileId={jobFileId}
+              executionId={verified.execution_id}
+              messages={verified.commentary}
+            />
+          ) : (
+            <PublicTurnMessages
+              messages={verified.commentary}
+              terminal={isTerminalTurn(verified.status)}
+            />
+          )}
           {(verified.status === 'active' || verified.status === 'paused') &&
             verified.candidate &&
             renderCandidate?.(verified.candidate)}

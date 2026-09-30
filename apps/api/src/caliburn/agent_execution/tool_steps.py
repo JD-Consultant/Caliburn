@@ -1,5 +1,6 @@
 """Durable native model/tool Steps; product completion and control remain outside them."""
 
+from asyncio import CancelledError
 from collections.abc import Awaitable, Callable, Mapping
 from copy import deepcopy
 from dataclasses import dataclass, field
@@ -36,7 +37,11 @@ from caliburn.agent_execution.request_capacity import (
     validate_capacity_limits,
 )
 from caliburn.agent_execution.response_steps import ResponseAction, inspect_response_step
-from caliburn.agent_execution.result_save_retries import ResultSaveRetryPolicy, retry_result_save
+from caliburn.agent_execution.result_save_retries import (
+    ResultSaveCancelledError,
+    ResultSaveRetryPolicy,
+    retry_result_save,
+)
 
 
 async def read_completed_response_history(
@@ -106,6 +111,22 @@ class ReceivedModelResponse:
 
     response: Response = field(repr=False)
     attempt_id: UUID
+
+
+class ReceivedModelResponseError(RuntimeError):
+    """An intact R and admitted attempt must reach the shared original-result owner."""
+
+    def __init__(self, received: ReceivedModelResponse) -> None:
+        self.received = received
+        super().__init__("The original response is available after stream cleanup failure")
+
+
+class ReceivedModelResponseCancelledError(CancelledError):
+    """Cancellation carrying an intact R; it grants no authority to resume work."""
+
+    def __init__(self, received: ReceivedModelResponse) -> None:
+        self.received = received
+        super().__init__("The original response is available after stream cancellation")
 
 
 @dataclass(frozen=True, slots=True)
@@ -360,12 +381,20 @@ async def _run_response_flow_once(
     # Release only after the next node confirms the preceding sync save, so later
     # capacity/accounting/tool failures are not mistaken for result-save failures.
     held = recovery
+    response_interruption: (
+        ReceivedModelResponseError | ReceivedModelResponseCancelledError | None
+    ) = None
 
-    def retain(state: ResponseStepState, update: ResponseStepState) -> None:
-        nonlocal held
+    def retain(
+        state: ResponseStepState,
+        update: ResponseStepState,
+        interruption: ReceivedModelResponseError | ReceivedModelResponseCancelledError | None,
+    ) -> None:
+        nonlocal held, response_interruption
         held = HeldModelResponse(
             thread_id, state["request_id"], deepcopy(state["request_snapshot"]), deepcopy(update)
         )
+        response_interruption = interruption
 
     def retain_count(state: ResponseStepState, update: ResponseStepState) -> None:
         nonlocal held
@@ -393,6 +422,10 @@ async def _run_response_flow_once(
     }
     try:
         saved = await graph.aget_state(config)
+    except CancelledError as error:
+        if held is not None:
+            raise ResultSaveCancelledError(_result_save_error(held)) from error
+        raise
     except Exception as error:
         if held is not None:
             raise _result_save_error(held) from error
@@ -446,6 +479,8 @@ async def _run_response_flow_once(
                     await graph.aupdate_state(
                         config, deepcopy(recovery.update), as_node="count_input"
                     )
+                except CancelledError as error:
+                    raise ResultSaveCancelledError(InputCountSaveError(recovery)) from error
                 except Exception as error:
                     raise InputCountSaveError(recovery) from error
         elif saved.values.get("response_snapshot"):
@@ -475,6 +510,8 @@ async def _run_response_flow_once(
                 await graph.aupdate_state(
                     config, deepcopy(recovery.update), as_node="request_model"
                 )
+            except CancelledError as error:
+                raise ResultSaveCancelledError(ResponseStepSaveError(recovery)) from error
             except Exception as error:
                 raise ResponseStepSaveError(recovery) from error
     try:
@@ -542,8 +579,16 @@ async def _run_response_flow_once(
             durability="sync",
             version="v2",
         )
+    except CancelledError as error:
+        if held is not None:
+            raise ResultSaveCancelledError(_result_save_error(held)) from error
+        raise
     except Exception as error:
         if held is not None:
+            if isinstance(response_interruption, ReceivedModelResponseCancelledError):
+                # Native graph cancellation can surface as NodeCancelledError or a
+                # concurrent saver failure. Neither authorizes a cancelled work retry.
+                raise ResultSaveCancelledError(_result_save_error(held)) from error
             raise _result_save_error(held) from error
         raise
     if result.interrupts:
@@ -563,7 +608,15 @@ def _build_response_step(
     *,
     max_tool_calls: int,
     max_model_steps: int | None = None,
-    retain_response: Callable[[ResponseStepState, ResponseStepState], None] | None = None,
+    retain_response: Callable[
+        [
+            ResponseStepState,
+            ResponseStepState,
+            ReceivedModelResponseError | ReceivedModelResponseCancelledError | None,
+        ],
+        None,
+    ]
+    | None = None,
     release_response: Callable[[], None] | None = None,
     retain_count: Callable[[ResponseStepState, ResponseStepState], None] | None = None,
     release_count: Callable[[], None] | None = None,
@@ -574,6 +627,9 @@ def _build_response_step(
     """Shared graph; public entry points enforce thread identity and saved limits."""
     if type(max_tool_calls) is not int or max_tool_calls < 1:
         raise ValueError("Configure a positive per-response tool bound")
+    response_interruption: (
+        ReceivedModelResponseError | ReceivedModelResponseCancelledError | None
+    ) = None
 
     async def count_input(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
@@ -603,6 +659,7 @@ def _build_response_step(
     async def request_model(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
+        nonlocal response_interruption
         _require_execution_limits(state, max_tool_calls, max_model_steps)
         await runtime.context.ensure_active()
         count = state.get("input_count")
@@ -614,9 +671,15 @@ def _build_response_step(
             state["capacity_limits"],
             completed_steps=0,  # The post-count route enforces the middle-Step policy.
         )
-        received = await runtime.context.request_model(
-            ResponseRequest.from_snapshot(state["request_snapshot"]), state["request_id"]
-        )
+        try:
+            received = await runtime.context.request_model(
+                ResponseRequest.from_snapshot(state["request_snapshot"]), state["request_id"]
+            )
+        except (ReceivedModelResponseError, ReceivedModelResponseCancelledError) as error:
+            # Only a typed complete original may cross this path. Return its update
+            # through the normal sync boundary before surfacing cleanup/cancellation.
+            response_interruption = error
+            received = error.received
         update: ResponseStepState = {
             "response_snapshot": snapshot_response(received.response),
             "response_attempt_id": received.attempt_id,
@@ -626,7 +689,7 @@ def _build_response_step(
             "next_action": None,
         }
         if retain_response is not None:
-            retain_response(state, update)
+            retain_response(state, update, response_interruption)
         return update
 
     async def check_capacity(
@@ -683,6 +746,10 @@ def _build_response_step(
     async def account_response(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
+        if response_interruption is not None:
+            # The predecessor's complete R is now saved. Stop before any accounting,
+            # tools or delivery; an explicit qualified reentry can use this original.
+            raise response_interruption
         if release_response is not None:
             release_response()
         # R is durable before usage parsing / SQL. Accounting is idempotent and must

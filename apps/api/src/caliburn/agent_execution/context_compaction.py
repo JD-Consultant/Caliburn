@@ -4,6 +4,7 @@ The caller chooses an eligible boundary and owns its cancellation/rollback scope
 This flow does not add new input, change maps, count the new window or publish a Turn.
 """
 
+from asyncio import CancelledError
 from collections.abc import Awaitable, Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
@@ -30,7 +31,11 @@ from caliburn.agent_execution.request_capacity import (
     require_request_capacity,
     require_request_limits,
 )
-from caliburn.agent_execution.result_save_retries import ResultSaveRetryPolicy, retry_result_save
+from caliburn.agent_execution.result_save_retries import (
+    ResultSaveCancelledError,
+    ResultSaveRetryPolicy,
+    retry_result_save,
+)
 
 
 async def read_prepared_history(
@@ -345,6 +350,10 @@ async def _run_context_boundary_once(
     payload = request.create_payload()
     try:
         saved = await graph.aget_state(config)
+    except CancelledError as error:
+        if held is not None:
+            raise ResultSaveCancelledError(_result_save_error(held)) from error
+        raise
     except Exception as error:
         if held is not None:
             raise _result_save_error(held) from error
@@ -387,6 +396,8 @@ async def _run_context_boundary_once(
                     await graph.aupdate_state(
                         config, deepcopy(recovery.update), as_node="count_history"
                     )
+                except CancelledError as error:
+                    raise ResultSaveCancelledError(PreparationCountSaveError(recovery)) from error
                 except Exception as error:
                     raise PreparationCountSaveError(recovery) from error
         elif saved.values.get("compaction_snapshot"):
@@ -405,6 +416,8 @@ async def _run_context_boundary_once(
                 await graph.aupdate_state(
                     config, deepcopy(recovery.update), as_node="request_compaction"
                 )
+            except CancelledError as error:
+                raise ResultSaveCancelledError(CompactionSaveError(recovery)) from error
             except Exception as error:
                 raise CompactionSaveError(recovery) from error
     try:
@@ -438,6 +451,10 @@ async def _run_context_boundary_once(
         result = await graph.ainvoke(
             initial, config, context=runtime, durability="sync", version="v2"
         )
+    except CancelledError as error:
+        if held is not None:
+            raise ResultSaveCancelledError(_result_save_error(held)) from error
+        raise
     except Exception as error:
         if held is not None:
             raise _result_save_error(held) from error

@@ -11,14 +11,14 @@ from caliburn.adapters.checkpoint_failures import is_transient_checkpoint_failur
 
 
 class ResultSaveCancelledError(CancelledError):
-    """Cancellation during backoff with the original process-local save handoff.
+    """Cancellation during saving/backoff with the original process-local save handoff.
 
     The immediate caller can retain save_error.recovery before propagating task
     cancellation. This grants neither resume authority nor a durable backup.
     """
 
     def __init__(self, save_error: Exception) -> None:
-        super().__init__("Result-save waiting was cancelled; the original handoff is held")
+        super().__init__("Result saving was cancelled; the original handoff is held")
         self.save_error = save_error
 
 

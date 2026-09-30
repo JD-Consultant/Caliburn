@@ -1,11 +1,12 @@
 """Direct SDK transport only; execution admission, persistence and retry belong to callers."""
 
+from collections.abc import Callable
 from copy import deepcopy
 from math import isfinite
 from typing import Any
 
 import httpx2
-from openai import AsyncOpenAI, DefaultAsyncHttpxClient
+from openai import AsyncOpenAI, AsyncStream, DefaultAsyncHttpxClient
 from openai.types.responses import Response
 from openai.types.responses.compacted_response import CompactedResponse
 from openai.types.responses.function_tool_param import FunctionToolParam
@@ -13,6 +14,7 @@ from openai.types.responses.input_token_count_response import InputTokenCountRes
 from openai.types.shared.reasoning_effort import ReasoningEffort
 
 from caliburn.adapters.response_serialization import NativeItems, NativeSnapshot
+from caliburn.adapters.response_streaming import PublicCommentaryUpdate, consume_response_stream
 
 
 class ResponseRequest:
@@ -27,10 +29,14 @@ class ResponseRequest:
         tools: list[FunctionToolParam],
         reasoning_effort: ReasoningEffort,
         max_output_tokens: int,
+        stream: bool = False,
     ) -> None:
         if not model.strip() or type(max_output_tokens) is not int or max_output_tokens < 1:
             raise ValueError("A model and positive output limit are required")
         self._max_output_tokens = max_output_tokens
+        if type(stream) is not bool:
+            raise ValueError("Stream mode must be an explicit boolean")
+        self._stream = stream
         self._context: dict[str, Any] = deepcopy(
             {
                 "model": model,
@@ -51,7 +57,7 @@ class ResponseRequest:
     def create_payload(self) -> dict[str, Any]:
         return {
             **self.count_payload(),
-            "stream": False,
+            "stream": self._stream,
             "max_output_tokens": self._max_output_tokens,
             "store": False,
             "background": False,
@@ -70,6 +76,7 @@ class ResponseRequest:
                 tools=snapshot["tools"],
                 reasoning_effort=snapshot["reasoning"]["effort"],
                 max_output_tokens=snapshot["max_output_tokens"],
+                stream=snapshot["stream"],
             )
         except (KeyError, TypeError, AttributeError) as error:
             raise ValueError("The saved model request is incomplete") from error
@@ -95,10 +102,17 @@ def create_responses_client(
     )
 
 
-async def create_response(client: AsyncOpenAI, request: ResponseRequest) -> Response:
+async def create_response(
+    client: AsyncOpenAI,
+    request: ResponseRequest,
+    *,
+    on_commentary: Callable[[PublicCommentaryUpdate], None] | None = None,
+) -> Response:
     """Return the original SDK response; no routing, model fallback or business completion."""
     _require_direct_client(client)
     response = await client.responses.create(**request.create_payload())
+    if isinstance(response, AsyncStream):
+        return await consume_response_stream(response, on_commentary=on_commentary)
     if not isinstance(response, Response):
         raise TypeError("The non-streaming SDK call did not return a Response")
     return response

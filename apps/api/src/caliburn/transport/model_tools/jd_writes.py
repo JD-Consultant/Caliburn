@@ -223,7 +223,15 @@ class JdWriteTools:
             return _invalid_arguments()
         except CapabilityInUseError:
             return _in_use()
-        except ExecutionNotFoundError, ExecutionStateError, InterviewScopeError:
+        except InterviewScopeError:
+            return reject_tool_call(
+                "scope_not_allowed",
+                "引用的 interview_sequence 超出本輪正式訪談上界，本次未改。",
+                "若依據是本次員工輸入，改用 current_input，不預測其序號；"
+                "若依據來自歷史，先用 read_interview 核對支持內容的正式序號再提交。"
+                "不要更改範圍、刪掉必要來源或改引不相關訊息。",
+            )
+        except ExecutionNotFoundError, ExecutionStateError:
             return reject_tool_call(
                 "scope_not_allowed",
                 "本輪資格或固定來源範圍不允許此次修改。",

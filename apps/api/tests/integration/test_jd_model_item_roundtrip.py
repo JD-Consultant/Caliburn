@@ -68,6 +68,30 @@ def test_create_revise_delete_use_the_actual_model_codec(client: TestClient) -> 
             assert await tools.execute(restored) == result
             return result
 
+        # The current employee input has no formal sequence yet. Reject the guessed
+        # future sequence without writing, but explain the legal repair to the model.
+        before = await candidates.read(scope)
+        rejected = await tools.prepare(
+            "create_jd_item",
+            json.dumps(
+                {
+                    "item": {
+                        "kind": "responsibility_area",
+                        "title": "盤點",
+                        "scope_text": "月底庫存盤點",
+                        "supporting_sources": [{"kind": "interview", "interview_sequence": 2}],
+                    }
+                }
+            ),
+            uuid4(),
+        )
+        assert isinstance(rejected, str)
+        rejection = json.loads(rejected)
+        assert rejection["code"] == "scope_not_allowed"
+        assert "current_input" in rejection["next_action"]
+        assert "read_interview" in rejection["next_action"]
+        assert await candidates.read(scope) == before
+
         created = await call(
             "create_jd_item",
             {

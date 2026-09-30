@@ -1,18 +1,12 @@
 /** Message log scrolls; the composer / Turn controls dock stays reachable at the bottom. */
 import { useQueryClient } from '@tanstack/react-query';
-import type { ConsultantTurn } from '../shared/api/generated/consultant-turn';
 import { InterviewComposer } from '../features/interview/InterviewComposer';
 import { InterviewHistory } from '../features/interview/InterviewHistory';
 import { consultantTurnQuery } from '../features/interview/interview-turn-api';
 import { UndoTurnJd } from '../features/jd-editor/UndoTurnJd';
 import { useStickToBottom } from '../shared/ui/use-stick-to-bottom';
 
-interface Props {
-  jobFileId: string;
-  onTurnChange: (turn: ConsultantTurn | null) => void;
-}
-
-export function InterviewPane({ jobFileId, onTurnChange }: Props) {
+export function InterviewPane({ jobFileId }: { jobFileId: string }) {
   const queryClient = useQueryClient();
   const scroller = useStickToBottom<HTMLDivElement>();
   return (
@@ -37,7 +31,7 @@ export function InterviewPane({ jobFileId, onTurnChange }: Props) {
               />
             )}
           />
-          <InterviewComposer jobFileId={jobFileId} onTurnChange={onTurnChange} />
+          <InterviewComposer jobFileId={jobFileId} />
         </div>
       </div>
     </>

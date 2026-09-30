@@ -242,6 +242,14 @@
   flex-direction: column;
   gap: 24px;
 }
+.jd-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.jd-stack[hidden] {
+  display: none;
+}
 .jd-note {
   margin: 0;
   font-size: 0.75rem;

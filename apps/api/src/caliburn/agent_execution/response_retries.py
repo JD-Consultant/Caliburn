@@ -12,7 +12,7 @@ from caliburn.adapters.openai_failures import ResponseFailureKind, classify_resp
 
 @dataclass(frozen=True, slots=True)
 class ResponseRetryPolicy:
-    initial_backoff_seconds: float = 1.0
+    initial_backoff_seconds: float = 2.0
     maximum_backoff_seconds: float = 30.0
 
     def __post_init__(self) -> None:

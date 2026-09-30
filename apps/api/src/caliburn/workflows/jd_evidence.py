@@ -51,6 +51,7 @@ class EvidenceEntry:
     source_kind: str
     source_label: str
     needs_recheck: bool
+    target: JdSourceTarget
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,6 +133,7 @@ class JdEvidenceWorkflow:
                         "interview" if isinstance(source, InterviewSource) else source.layer.value,
                         label,
                         reference.needs_review or changed,
+                        reference.target,
                     )
                 )
             return EvidenceOverview(revision_id, tuple(entries))

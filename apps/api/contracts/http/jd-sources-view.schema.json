@@ -17,9 +17,43 @@
       "properties": {
         "citation_id": {"type": "string", "format": "uuid"},
         "target_label": {"type": "string"},
+        "target": {"$ref": "#/$defs/Target"},
         "source_kind": {"enum": ["interview", "work_situation", "work_understanding"]},
         "source_label": {"type": "string"},
         "needs_recheck": {"type": "boolean"}
+      }
+    },
+    "Target": {
+      "description": "The JD item this reference supports, by identity. target_label is only its human label; never resolve a target by label. Absent when the server predates this field.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "field", "item_id", "task_id"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "profile_field",
+            "area",
+            "task",
+            "detail",
+            "capability",
+            "collaborator",
+            "condition",
+            "task_capability"
+          ]
+        },
+        "field": {
+          "description": "Set only for profile_field.",
+          "anyOf": [
+            {"enum": ["job_title", "organization_unit", "reports_to", "purpose"]},
+            {"type": "null"}
+          ]
+        },
+        "item_id": {"type": ["string", "null"], "format": "uuid"},
+        "task_id": {
+          "description": "The owning task, set only for detail and task_capability.",
+          "type": ["string", "null"],
+          "format": "uuid"
+        }
       }
     }
   }

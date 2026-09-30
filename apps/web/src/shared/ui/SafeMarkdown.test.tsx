@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { expect, test } from 'vitest';
-import { SafeSourceMarkdown } from './SafeSourceMarkdown';
+import { SafeMarkdown } from './SafeMarkdown';
 
 test('renders headings, paragraphs and literal diff code without active HTML or URLs', () => {
   const markdown = [
@@ -23,7 +23,7 @@ test('renders headings, paragraphs and literal diff code without active HTML or 
     '',
     '![追蹤圖片](https://evil.example/pixel.png)',
   ].join('\n');
-  const { container } = render(<SafeSourceMarkdown markdown={markdown} />);
+  const { container } = render(<SafeMarkdown markdown={markdown} />);
   expect(screen.getByRole('heading', { name: '來源差異' })).toBeVisible();
   expect(container.querySelector('strong')).toHaveTextContent('重點');
   expect(container.querySelector('pre code')?.textContent).toBe(

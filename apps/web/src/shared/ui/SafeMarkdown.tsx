@@ -1,8 +1,8 @@
-/** Source Markdown has no active content. */
+/** Read-only Markdown has no active HTML, navigable links or remote media. */
 import { Box } from '@mui/material';
 import Markdown from 'react-markdown';
 
-export function SafeSourceMarkdown({ markdown }: { markdown: string }) {
+export function SafeMarkdown({ markdown }: { markdown: string }) {
   return (
     <Box
       sx={{

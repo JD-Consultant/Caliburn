@@ -16,7 +16,7 @@ from caliburn.features.job_description.conditions import ConditionKind, JobCondi
 from caliburn.features.job_description.models import JdProfile
 from caliburn.features.job_description.tasks import DetailKind, TaskDetail, WorkTask
 from caliburn.features.job_description.work_queries import JdWorkRevision
-from caliburn.transport.model_tools.jd_full_text import project_jd_full_text
+from caliburn.transport.jd_full_text import project_jd_full_text
 
 
 @pytest.fixture

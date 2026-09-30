@@ -373,6 +373,14 @@ flowchart LR
 
 HTTP 型別由 `contracts/http/jd-sources-view.schema.json`、`jd-source-content-view.schema.json`、`jd-source-changes-view.schema.json`生成，不手寫第二份 wire 契約。沒有新表、遷移、來源版本參數或確認工具；UI 呈現与實測見[介面 §3.1](interface-and-delivery.md#31-正式-jd-來源的唯讀下鑽t09)及 [T09 來源回查證據](../plans/2026-09-29-target-rebuild/evidence/t09-source-viewer.md)。
 
+### 3.8 完成 Turn 的 JD 變更檢視（T09）
+
+[Turn 變更 workflow](../../apps/api/src/caliburn/workflows/turn_jd_changes.py)以職務檔案與 execution 查原執行 owner，僅 completed 可讀；再由 JD `read_adopted_turn_changes` 讀原候選保留的 `base_revision_id` 與採用後 `current_revision_id`。沿既有不可變修訂取得兩端完整 profile／work／sources，不另外存 diff、複製正文或掃目前正式 head。
+
+查詢不修改候選、來源核對或正式資料。後續人工改稿、撤回產生新修訂，均不影響原兩端內容；讀取缺少端點不能回假空差異。來源摘要以既存 citation 身分比較完整引用值，包含來源版本、所屬目標及核對位置／狀態；不因成品正文未改而忽略來源調整。這不是 A 的人工差異或來源差異工具，沒有新增模型任意歷史入口。
+
+HTTP／UI 只投影這兩份原資料；成品 Markdown 與模型全文讀取共用 `transport/jd_full_text.py`。第一版只提供正文淨差異與來源筆數摘要，呈現、限制與驗證路由見[介面 §3.2](interface-and-delivery.md#32-完成後查看這輪-jd-變更t09)。
+
 ## 4. 初始化、演進與保證界線
 
 新建職務檔案、開場與空 JD 同一短交易；任一失敗不留下半套檔案。0005 為已存在的**新目標 0004** 檔案補一份空 JD，重跑 upgrade 不重建；沒有讀舊 production／搬舊資料。已知檔案卻缺少 JD head 是保存不一致，不在 GET 偷修成空白；缺 schema 的啟動仍 fail fast。

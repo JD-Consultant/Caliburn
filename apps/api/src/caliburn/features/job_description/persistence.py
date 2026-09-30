@@ -10,6 +10,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Text,
     func,
+    or_,
     select,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -92,7 +93,7 @@ class JdOperationRecord(Base):
         CheckConstraint(
             "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
             "'edit_collaborators', 'edit_conditions', 'restore_candidate', "
-            "'discard_candidate', 'adopt_candidate', 'edit_sources')",
+            "'discard_candidate', 'adopt_candidate', 'edit_sources', 'undo_completed_turn')",
             name="kind",
         ),
         ForeignKeyConstraint(
@@ -146,6 +147,56 @@ async def read_operation(
     session: AsyncSession, job_file_id: UUID, command_id: UUID
 ) -> JdOperationRecord | None:
     return await session.get(JdOperationRecord, (job_file_id, command_id))
+
+
+async def read_revision_interval(
+    session: AsyncSession, job_file_id: UUID, *, base_revision_id: UUID, end_revision_id: UUID
+) -> tuple[tuple[UUID, UUID | None], ...]:
+    """JD-owned ancestry only, stopping at the App-selected base."""
+    chain = (
+        select(JdRevisionRecord.revision_id, JdRevisionRecord.parent_revision_id)
+        .where(
+            JdRevisionRecord.job_file_id == job_file_id,
+            JdRevisionRecord.revision_id == end_revision_id,
+        )
+        .cte("manual_jd_ancestry", recursive=True)
+    )
+    chain = chain.union_all(
+        select(JdRevisionRecord.revision_id, JdRevisionRecord.parent_revision_id)
+        .join(chain, JdRevisionRecord.revision_id == chain.c.parent_revision_id)
+        .where(JdRevisionRecord.job_file_id == job_file_id, chain.c.revision_id != base_revision_id)
+    )
+    return tuple((row[0], row[1]) for row in (await session.execute(select(chain))).all())
+
+
+async def read_manual_operations(
+    session: AsyncSession,
+    job_file_id: UUID,
+    revision_ids: tuple[UUID, ...],
+    *,
+    created_before: datetime,
+    created_since: datetime | None,
+) -> tuple[JdOperationRecord, ...]:
+    """Read original manual effects, including no-op receipts, never candidate edits."""
+    record = JdOperationRecord
+    statement = select(record).where(
+        record.job_file_id == job_file_id,
+        record.candidate_execution_id.is_(None),
+        record.expected_revision_id.in_(revision_ids),
+        record.result_revision_id.in_(revision_ids),
+        record.created_at <= created_before,
+    )
+    if created_since is not None:
+        # Changed revisions are identified by ancestry. No-op records need an interval
+        # boundary because they leave no new revision. No manual writes are admitted
+        # during the prior candidate's lifetime; use its start, not completion txn time.
+        statement = statement.where(
+            or_(
+                record.expected_revision_id != record.result_revision_id,
+                record.created_at >= created_since,
+            )
+        )
+    return tuple(await session.scalars(statement.order_by(record.created_at, record.command_id)))
 
 
 async def is_revision_ancestor(

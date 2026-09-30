@@ -113,6 +113,8 @@ def test_wrong_migration_head_fails_startup_without_automatically_migrating(
         pytest.raises(DatabaseSchemaError, match="migrations"),
         TestClient(
             create_app(Settings(database=database_settings)),
+            base_url="http://127.0.0.1:8100",
+            headers={"Origin": "http://127.0.0.1:8100"},
             backend_options={"loop_factory": asyncio.SelectorEventLoop},
         ),
     ):
@@ -147,6 +149,8 @@ def test_empty_namespace_does_not_start_or_create_tables(
         pytest.raises(DatabaseSchemaError),
         TestClient(
             create_app(Settings(database=empty_database_settings)),
+            base_url="http://127.0.0.1:8100",
+            headers={"Origin": "http://127.0.0.1:8100"},
             backend_options={"loop_factory": asyncio.SelectorEventLoop},
         ),
     ):

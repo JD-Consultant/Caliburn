@@ -2,13 +2,17 @@
 
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, ForeignKey, ForeignKeyConstraint, Text, select
+from sqlalchemy import CheckConstraint, ForeignKey, ForeignKeyConstraint, Text, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
-from caliburn.features.executions.history_models import AgentRole
+from caliburn.features.executions.history_models import (
+    AgentRole,
+    ContextPosition,
+    HistoryWindowKind,
+)
 from caliburn.features.executions.models import ExecutionScope
 
 
@@ -130,3 +134,31 @@ async def lock_head(
     if record is None:
         raise RuntimeError("The context head disappeared within its transaction")
     return record
+
+
+async def read_position_origin(
+    session: AsyncSession, job_file_id: UUID, role: AgentRole, position: ContextPosition
+) -> ContextHistoryBindingRecord | None:
+    """Resolve a saved reference by equality, not by decoding native thread identifiers.
+
+    Cancelled Turns may reuse a prepared window. Their self-referential copies are
+    not the producer; only the original binding has a different (possibly empty) base.
+    """
+    record = ContextHistoryBindingRecord
+    statement = select(record).where(record.job_file_id == job_file_id, record.role == role.value)
+    if position.kind == HistoryWindowKind.COMPLETED_WORK:
+        statement = statement.where(
+            record.completed_thread_id == position.thread_id,
+            record.completed_checkpoint_id == position.checkpoint_id,
+        )
+    else:
+        statement = statement.where(
+            record.prepared_thread_id == position.thread_id,
+            record.prepared_checkpoint_id == position.checkpoint_id,
+            or_(
+                record.base_thread_id.is_(None),
+                record.base_thread_id != position.thread_id,
+                record.base_checkpoint_id != position.checkpoint_id,
+            ),
+        )
+    return (await session.scalars(statement)).one_or_none()

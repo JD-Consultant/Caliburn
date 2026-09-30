@@ -155,6 +155,7 @@
 ## T12 真 PostgreSQL 故障與競爭整合
 
 - [ ] T12；依賴：T09、T11。
+- **跨程序已保存工作恢復（2026-09-30）：**正式 A Runner／控制 wrapper＋真 PG，四個 hard-exit 邊界與全新程序承接通過；已存 count／R 不重呼、工具交易不重複修訂、正式完成保留原引用。是合成 SDK 傳輸與明確 writer 接管，不是未知原件遺失的自動恢復；[證據與未完範圍](evidence/t12-consultant-process-recovery.md)。T12 不勾完成。
 - **契約：**[E01–E15](../../specs/2026-09-27-shared-agent-execution-and-state-design.md#71-職責異常測試映射全部待執行)、[驗證矩陣](../../implementation/verification-plan.md)。
 - **程式／交付：**整合／程序故障 harness；兩連線受控交錯、獨立程序重啟、COMMIT 確認遺失；必要缺口回原 owner 修。
 - **Red：**逐一注入 R 已存／工具已 commit／Step 已存／final 已 commit／C 採用／B交接後故障；舊 writer 恢復與新 runner 競爭。

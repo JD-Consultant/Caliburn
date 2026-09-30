@@ -18,6 +18,7 @@ from caliburn.agent_execution.tool_steps import (
 )
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.features.executions import service as executions
+from caliburn.features.executions.budget_models import BudgetConflictError
 from caliburn.features.executions.models import ExecutionStateError, ExecutionStatus
 from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import ModelSettings
@@ -97,6 +98,12 @@ def test_explicit_recovery_saves_original_result_without_repeating_outbound_work
                 )
             with pytest.raises(ValueError, match="original paused loop"):
                 await runner.run(writer, recovery=recovery, resume_interrupt_id="not-authorized")
+            assert tuple(calls) == original_calls
+
+            with pytest.raises(BudgetConflictError, match="original pricing"):
+                await replace(
+                    runner, settings=ModelSettings(api_key="synthetic", model="gpt-6.1-sol")
+                ).run(writer, recovery=recovery)
             assert tuple(calls) == original_calls
 
             result = await runner.run(writer, recovery=recovery)

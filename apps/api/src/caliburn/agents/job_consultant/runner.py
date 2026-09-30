@@ -11,7 +11,7 @@ from langgraph.checkpoint.base import BaseCheckpointSaver
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from caliburn.adapters.openai_pricing import GPT_6_LUNA_STANDARD_2026_09_30
+from caliburn.adapters.openai_models import model_profile
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import NativeItems, restore_response
 from caliburn.adapters.response_streaming import PublicCommentaryUpdate
@@ -22,7 +22,6 @@ from caliburn.agent_execution.context_compaction import (
     run_context_compaction,
 )
 from caliburn.agent_execution.request_capacity import (
-    ModelCapacityLimits,
     ReceivedInputCount,
 )
 from caliburn.agent_execution.response_steps import (
@@ -82,13 +81,6 @@ from caliburn.workflows.model_requests import (
 
 type ConsultantRecovery = HeldModelResponse | HeldInputCount | HeldCompaction | HeldPreparationCount
 
-_CAPACITY: ModelCapacityLimits = {
-    "model": "gpt-6-luna",
-    "max_input_tokens": 922_000,
-    "context_window_tokens": 1_050_000,
-    "max_output_tokens": 128_000,
-}
-
 
 @dataclass(frozen=True, slots=True)
 class ConsultantRunner:
@@ -133,14 +125,14 @@ class ConsultantRunner:
             if not matches:
                 raise ValueError("Recovery must retain the original Step or preparation boundary")
         policy = await self._fix_budget(writer)
-        pricing = GPT_6_LUNA_STANDARD_2026_09_30
+        profile = model_profile(self.settings.model)
         commentary = self.on_commentary
         executor = ModelRequestExecutor(
             self.sessions,
             writer,
             self.client,
             ModelRequestAccounting.from_text_pricing(
-                pricing,
+                profile.pricing,
                 token_count_reservation_usd=Decimal("0.0001"),
                 compaction_reservation_usd=Decimal("0.50"),
             ),
@@ -152,7 +144,7 @@ class ConsultantRunner:
             executor.request_compaction,
             executor.account_compaction,
             role_history.ensure_active,
-            _CAPACITY,
+            profile.capacity_limits(),
         )
         template = ResponseRequest(
             model=self.settings.model,
@@ -201,7 +193,7 @@ class ConsultantRunner:
             ensure_active=role_history.ensure_active,
             account_response=executor.account_response,
             count_input=executor.count_input,
-            capacity_limits=_CAPACITY,
+            capacity_limits=profile.capacity_limits(),
             compact_window=compact_window,
             fit_first_request=fit_recent_interview_preload,
         )
@@ -262,7 +254,7 @@ class ConsultantRunner:
 
     async def _fix_budget(self, writer: ExecutionWriter) -> ExecutionBudget:
         """Retain counters/deadline after restart; configuration cannot reset spent allowance."""
-        pricing = GPT_6_LUNA_STANDARD_2026_09_30
+        pricing = model_profile(self.settings.model).pricing
         async with self.sessions.begin() as session:
             await executions.lock_active_writer(session, writer)
             policy = await budgets.read_execution_budget(session, writer.scope)

@@ -570,3 +570,69 @@ Memory 最新快照另作唯讀抽查：3 情境、1 理解保留已知工作、
 使用者本輪要求的 Prompt／Tool descriptions／實際 Context 審查結論，應與前述成果一起讀：已修正的具體指引矛盾有原測試證據；已查請求未發現錯放資料或丟失舊來源；自然長歷史重組的漏引、Memory 不受原文支持的精確化／冗長仍屬品質限制。不要用新 schema 排序、固定 reviewer 或自動猜來源繞過它們。後續只在新的可辨別假說或實際產品反例出現時驗證，保留原 T14／T17 gate，不能把本次否決候選算成產品品質通過。
 
 本輪僅改證據與任務路由；`git diff --check` 及兩檔 140 個相對檔案連結檢查通過，不為純文件重跑全產品。獨立唯讀審查核對後未提出阻擋性問題，同意上述不採用及因果／未執行邊界；它不是額外的模型品質測試。
+
+## 2026-10-01：較高能力模型的核心 App 旅程對照
+
+### 執行前 manifest
+
+基準 `26e03967`。短例兩模型皆可選來源，長歷史來源優先排序未證明改善，本片停止提示詞微調，依 [OpenAI 模型選擇指南](https://developers.openai.com/api/docs/guides/model-selection)在原 App 流程評估 `gpt-6.1-sol`／high。不是直接切換預設模型，也不宣稱模型能力已確定為根因。
+
+- 同一組全合成課程行政員工前四則資料，加既有能力／收尾兩則，共六輪；App 自行組裝實際 Context、提供全部現行工具、保存正式 JD／來源及背景 Memory。新隔離 schema／新職務檔案，**不把 Luna 的加密 reasoning 或舊執行 checkpoint 交給另一模型**。這是腳本化輸入，不是假稱真人自適應訪談。
+- Luna 既有 high 旅程是歷史參考；本次新模型會自己產生提問、讀取與編輯歷史，故不是後續每 Step 相同 payload 的嚴格 A/B，也不能由單次結果估算成功率。主指引、工具說明／schema、Context owner 不變。
+- 官方 [模型頁](https://developers.openai.com/api/docs/models/gpt-6.1-sol)確認 1,050,000 context／922,000 input／128,000 output、high 支援；[標準費率](https://developers.openai.com/api/docs/pricing)為短輸入／cache read／cache write／輸出 US$2／0.1／2.5／10 每百萬，超過 272K 為 4／0.2／5／15。程式以單一明確 profile 對齊兩個 runner 的容量、effort 與費率，不複製 loop；產品仍預設 Luna／high，無 UI 選型、自動 fallback 或 provider 變更。
+- 每執行至多 16 create、48 次總外送、每請求一次外送（零傳輸重試）、一次 compact、8,192 output、120 秒單請求、240 秒執行、估算 US$0.75；A 串行，至多一個既有背景 Memory 工作併行。六輪至多六個 A、六個 Memory 批次；合計保守上界 192 create／576 outbound／12 compact、估算預留 US$9，不是實際花費預告或 provider 帳單硬上限。每輪等待至多250秒、最後背景等待250秒；不增加重試／額度補跑。任何 A 未完成即停止後續輸入，已啟動工作依現有上限收尾。
+- 腳本沿 `.research-tmp/eval/verify_core_journey.py`，使用 `--model gpt-6.1-sol --reasoning-effort high --include-capabilities`；獨占建立 `core-journey-sol-20261001.json`，已有檔案即不再外送。新 schema 存在專用 `caliburn_t01_test`／55439，Demo 不變；不寫公開 repo 原件或憑證。只有六則合成訪談及本 App 固定指引外送。
+- 審核正式結果：主要工作覆蓋／更正邊界、任務及 O/P 的逐項來源、K/S 是否從實際行動分析而非臆測、B1 數量／權責不精確化、B2 精煉與引用。成功請求、JSON 合法或 Memory 發布不直接等於品質通過。未觸發背景或容量情境如實保留未驗，不以強制工具或補答案冒充自然結果。
+
+### 實際結果與內容審核
+
+六輪 A 全部完成，最後一輪於累計 **541.34 秒**完成；此數字含逐輪輪詢、DB 讀回及背景併行，不是純模型延遲。三批背景 Memory 也全部完成，沒有 active／failed 殘留。最後正式 JD 有 **1 個職責、5 項任務、1 項知識、4 項技能、6 個任務能力關係、4 個協作對象**；54 筆引用逐一經產品 API 讀回，再與正式訪談逐字比對原文／說話者，全部相符。沒有人工代寫或腳本直接補引用。
+
+依[工作分析指南](../../../specs/2026-09-09-complete-work-analysis-guide.md)及[JD 欄位指南](../../../specs/2026-09-09-jd-field-and-writing-guide.md)逐項審讀，結果如下；這是工程代理對明示合成事實的核對，不冒充真人領域校準。
+
+| 檢查面向 | 本次觀察與界線 |
+|---|---|
+| 主要工作與粒度 | 報名核對、課前資料交付、時間異動通知、每日出席整理、季度彙整分成五項任務；不像前一 Luna 旅程將多項不同交付長期合在一項。O／P 分開，沒有靠填滿欄位冒充完整 |
+| 更正與責任界線 | 每月→每季正確；每日出席／課前兩工作天未被連帶改掉。財務確認入帳、組長確認時間、場地處理設備沒有改成本人決定；沒有臆造教室調度、學歷、證照或數字 KPI |
+| 原跨輪漏引反例 | 出席任務引訪談 8＋10；指定資料夾成果仍引 8，新班別／日期核對要求引 10。季度任務及新彙總成果引 8＋10；新增技能按實際方法提煉。54 筆引用按其目標與原話審讀，未見先前的收尾輸入取代事實來源或新事實覆蓋有效舊來源問題；只代表本次樣本，不推定所有長歷史都已修復 |
+| 訪談引導 | 每輪保存完整正式答覆；最後說明已涵蓋**已說明的**五項工作，列待確認的資料準備、未回應處理、教室異動和值勤條件，未宣稱已掌握員工所有工作。最後仍有可回答的下一步問題 |
+| B1 事實保存 | 5 個工作情境；攝影班「兩人重複報名、另有付款不符」沒有補成一名付款者。未知案例結案狀態、權限及異動細節保留，不把一般工作流程冒充已完成個案 |
+| B2 延續分析 | 3 個理解，引用目前情境；新核對方法與季度更正已吸收，沒有把通知責任擴大成決策權。**仍偏長**：跨情境整合有價值，但重述多項情境細節及未知，未達理想的最小高訊號；記作後續精簡，不追加固定 reviewer 或提示補丁 |
+
+全部 JD 引用在本次自然路徑均選原始訪談，故這次不另宣稱真模型已驗過 JD→Memory 換版 diff 核對。也沒有發生取消、恢復或門檻 compaction；既有對應證據不重算成本次驗收。UI／PDF 未在這批重跑，本批是 TestClient→真 App→真 PostgreSQL→真 provider，不是假稱真瀏覽器操作。
+
+### 實際 Context，不只檢查 Prompt 常數
+
+唯讀解碼已保存的 `request_snapshot`，不讀出／輸出 opaque reasoning 內容。去除重複快照後 A／B1／B2 分別有 37／13／18 份非空請求視窗（**含準備計數，不等於 create 次數**），最大 161／64／91 items。角色 instructions 與提供的 tool schemas／descriptions 均與現行版本完全相符；所有視窗為本次 Sol／high、all_turns、store=false、無 previous_response_id，input 未含 system／developer 資料訊息。
+
+再對照六輪及三批實際輸入，確認：
+
+- A 每輪最後一則 user 是該輪員工原句；前一則 App 資料含情境／理解 map、近期歷史與讀取邊界，**沒有重新塞 JD map**。近期序列依次為 1、1–3、1–5、1–7、5–9、9–11；當時已發布處理邊界依次 0、0、0、0、4、8，未將尚未發布 Memory 當已完成。每輪後續 Step 的本輪 App 資料指紋不變。
+- B1 三批必處理範圍為 1–4、5–8、9–12，原話／說話者／順序與正式訪談一致，沒有越過本批上界或混入未完成輸入；不含理解 map／B2 變更資料。
+- B2 各批收到情境 map、理解 map、實際情境 changes（5／5／4項），沒有另塞員工當次輸入或整批原話；按需讀取仍走角色工具。階段內 App 資料指紋不變，原生模型／工具接續繼續追加。
+- 這份核對涵蓋本樣本實際保存視窗與產品 API 原文回讀；不是所有資料量、故障或惡意輸入情境的完整證明。沒有發現足以支持「context 放錯／來源被 App 丟掉」的反例，故不改既有 Context owner。
+
+### 工程驗證、成本與停止條件
+
+模型 profile 改動以原失敗反例先 Red：設定／容量 3 failed、8 passed；兩角色真 PG 接線 3 failed、3 passed。Green 階段曾因沿用 Luna 小額測試預留而正確拒絕 Sol；合成回應很短，測試明確設 output 上限 1,024 後通過，沒有調高產品金額上限或取消防護。
+
+- 設定／計價、A 執行／原件恢復、B1→B2／下一批及回報用量測試：**68 passed，16.99s**。真 PG＋合成 HTTP provider；另驗原 execution 更換模型在任何新外送前拒絕。
+- 容量與 import 邊界：**35 passed，1.24s**；最後設定及角色指引組裝：**22 passed，1.44s**，其中設定測例與前組重疊，不相加成獨立測例數。
+- Ruff check／format check、mypy **275 source files** 通過。獨立唯讀程式審查未發現阻擋新合成檔案對照的問題；它未另執行測試，不算新增執行證據。
+
+提交前將上述受影響測試合併重跑：`pytest tests/unit/test_model_settings.py tests/unit/test_openai_pricing.py tests/integration/test_consultant_runner.py tests/integration/test_consultant_runner_recovery.py tests/integration/test_memory_parent_roles.py tests/integration/test_response_pricing_accounting.py tests/unit/test_request_capacity.py tests/unit/test_import_boundaries.py tests/unit/test_role_prompt_contracts.py -q -p no:cacheprovider --basetemp <本次獨立暫存目錄>`，**114 passed，16.78s**；Ruff check／226 檔 format check、mypy 275 檔再次通過。五份變更文件的 178 個相對檔案連結及 `git diff --check` 通過；沒有為這個有界選型接線重跑全產品或付費比較。
+
+實際 59 create（A 32、Memory 27）、68 count（A 37、Memory 31），零 compact、零已登錄外送失敗、零重試。依 provider usage 及上述官方標準分項費率，A generation 估算 **US$0.395471900**、Memory **US$0.397781100**，合計 **US$0.793253000**；不是帳單，也不把未回報的 count 計費當已證實免費。少數 GC 清理時再次出現 `BoundAsyncStream.__aiter__` 的 `async generator already executing` 警告；本次九個執行與全部正式結果可讀，未證實資料丟失或呼叫失敗。沿前述已知串流警告記錄，不因相鄰堆疊就認定 serde 為根因，也不改框架私有欄位。
+
+隔離 schema `core_journey_20261001_2331dc65`、職務檔案 `3450e704-3cb5-4b38-8d10-c2aae7156416`；正式 JD `4ee14de2-f1cd-4893-9f96-912071f83c58`，最新 Memory `cb81cce1-e813-459c-bc51-b54048d83b24`涵蓋至正式序號 12。程序已退出，Demo 未改動。以下本機診斷原件在 `.research-tmp/eval/`，不提交原生推理／憑證：
+
+| 原件 | SHA-256 |
+|---|---|
+| `verify_core_journey.py` | `4331ae31d0840907d4c450e1f498b15dc192d0ebc3f6fd26f7c0ea7277a4d0ca` |
+| `core-journey-sol-20261001.json` | `3dacfee30041966f834bf06bf4ed21bde203b7bbfd871cd194cd846f5d866d05` |
+| `read_sol_journey.py` | `11183e015a9284ee71d706d904cafa3fa6ee56055cb00f7c9e303a196f509575` |
+| `core-journey-sol-review-20261001.json` | `1507f61b6ad4a718327778b3c658a7df11194a3f8a47b34620be3fe97302d4b7` |
+| `audit_sol_context.py` | `82914c3c481da9408bf9895cd7a2fbf91d5d3546d3bc62a17569991f25318b26` |
+| `core-journey-sol-context-20261001.json` | `451b975916ad1a1f4e1ac2430acbec9452e21760c09bb423905a95857f5ee441` |
+
+**收斂：本批核心成稿及逐項原話引用結果可用，但不把一次旅程當全面可靠率。停止本輪付費比較與 Prompt 微調，保留原 T14／T16／T17 未驗範圍。**先前 Luna 的長歷史漏引限制沒有因 Sol 成功而消失；Sol 是有證據的後續選型候選，不默默改預設、費用或既有歷史。若採用，先處理[模型切換的真實接縫](../../../implementation/technology-decisions.md#1-首選工具鏈)：原 execution 有保護，但跨已完成 execution 的歷史尚未具備模型相容性 gate。本次不為未開放的切換功能新增平台。

@@ -1,4 +1,4 @@
-"""Finished-product Markdown projection of one visible JD revision."""
+"""Shared finished-product Markdown projection of one visible JD revision."""
 
 from uuid import UUID
 

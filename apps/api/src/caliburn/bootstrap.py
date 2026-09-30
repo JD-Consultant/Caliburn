@@ -35,6 +35,7 @@ from caliburn.transport.http.jd_undo import router as jd_undo_router
 from caliburn.transport.http.jd_work import router as jd_work_router
 from caliburn.transport.http.job_files import router as job_file_router
 from caliburn.transport.http.security import LocalHttpSecurityMiddleware
+from caliburn.transport.http.turn_jd_changes import router as turn_jd_changes_router
 from caliburn.workflows.consultant_commentary import ConsultantCommentaryHub
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.consultant_controls import (
@@ -53,6 +54,7 @@ from caliburn.workflows.job_files import JobFileWorkflow
 from caliburn.workflows.memory_analysis.tools import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.memory_batch import MemoryBatchWorkflow
 from caliburn.workflows.memory_supervisor import MemorySupervisor
+from caliburn.workflows.turn_jd_changes import TurnJdChangesWorkflow
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -67,6 +69,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.jd_editing_workflow = JdEditingWorkflow(database.sessions) if database else None
         app.state.jd_evidence_workflow = JdEvidenceWorkflow(database.sessions) if database else None
         app.state.jd_undo_workflow = JdUndoWorkflow(database.sessions) if database else None
+        app.state.turn_jd_changes_workflow = (
+            TurnJdChangesWorkflow(database.sessions) if database else None
+        )
         app.state.interview_input_workflow = (
             InterviewInputWorkflow(database.sessions) if database else None
         )
@@ -206,4 +211,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(jd_evidence_router)
     app.include_router(jd_export_router)
     app.include_router(jd_undo_router)
+    app.include_router(turn_jd_changes_router)
     return app

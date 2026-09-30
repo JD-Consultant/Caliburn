@@ -6,7 +6,7 @@ import type { Reference } from '../../shared/api/generated/jd-sources-view';
 import type { InterviewContent } from '../../shared/api/generated/jd-source-content-view';
 import { describeSourceError, jdSourceContentQuery, jdSourceChangesQuery } from './source-api';
 import type { SourceScope } from './source-api';
-import { SafeSourceMarkdown } from './SafeSourceMarkdown';
+import { SafeMarkdown } from '../../shared/ui/SafeMarkdown';
 
 const speakerLabels: Record<InterviewContent['speaker'], string> = {
   app: '系統',
@@ -54,7 +54,7 @@ export function SourceDetails({ scope, reference }: { scope: SourceScope; refere
             <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
               {content.description}
             </Typography>
-            <SafeSourceMarkdown markdown={content.body} />
+            <SafeMarkdown markdown={content.body} />
             {content.references.map((link) => (
               <Box key={link.source_ref}>
                 <Button onClick={() => setSourceRef(link.source_ref)}>{link.label}</Button>
@@ -88,7 +88,7 @@ function SourceChanges({ scope }: { scope: SourceScope }) {
       ) : changes.isError ? (
         <Alert severity="error">{describeSourceError(changes.error)}</Alert>
       ) : (
-        changes.data && <SafeSourceMarkdown markdown={changes.data.markdown} />
+        changes.data && <SafeMarkdown markdown={changes.data.markdown} />
       )}
     </Stack>
   );

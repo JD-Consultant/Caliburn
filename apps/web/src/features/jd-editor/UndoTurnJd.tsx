@@ -15,6 +15,7 @@ import { ApiError } from '../../shared/api/http';
 import { jdProfileQuery } from './jd-profile-api';
 import { jdWorkQuery } from './jd-work-api';
 import { undoTurnJd } from './jd-undo-api';
+import { TurnJdChanges } from './TurnJdChanges';
 
 interface Props {
   jobFileId: string;
@@ -68,6 +69,11 @@ export function UndoTurnJd({ jobFileId, executionId, onUndone }: Props) {
 
   return (
     <Stack spacing={1} sx={{ mt: 2 }}>
+      <TurnJdChanges
+        key={`${jobFileId}:${executionId}`}
+        jobFileId={jobFileId}
+        executionId={executionId}
+      />
       {undo.isSuccess ? (
         <Alert severity="success">這輪 JD 撤回已確認；訪談與工作記憶未撤回。</Alert>
       ) : (

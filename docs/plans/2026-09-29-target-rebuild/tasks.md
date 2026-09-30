@@ -116,6 +116,8 @@
 
 ## T09 訪談 UI、候選即時預覽與重連
 
+- **2026-09-30 本輪 JD 變更檢視：**補上已交接缺口 2：完成回答可按需讀原輪前／採用 JD 的正文淨 diff 與來源變更筆數；沿既有修訂，無新增表／模型呼叫。後續人工修改或撤回不換比較端點；未完成候選不外露。局部測試與限制見[本輪變更證據](evidence/t09-turn-jd-changes.md)，未重啟 Demo、未驗新入口的真瀏覽器旅程，T09 不勾完成。
+
 - **2026-09-30 UI 發現接線與審查修正：**無 hint 使用 current 發現工作後承接原 execution；未知不當 idle，頁面與 Composer 共用 hint 訂閱／query cache，已開啟 JD 表單也隨未知狀態唯讀且保留草稿。27 檔／160 前端測試通過；Demo 真 API 與固定訪談來源面板唯讀確認。保留基本多分頁，沿後端資格與版本衝突保護，不新增分頁鎖／同步平台。完整跨瀏覽器、故障與真模型 gate 仍未完，見[後續證據](evidence/t09-current-turn-discovery.md#ui-承接與多分頁取捨2026-09-30)。
 
 - **2026-09-30 UI 交接後端增量：**已提供依職務檔案查目前 active／paused A 的唯讀 `/consultant-turns/current`，沒有則 null；重用 execution owner、公開 DTO 與來源 schema，不新增執行／保存權威。獨立審核發現含知識／技能候選的 Enum 轉接缺陷，已先重現再修正；主線最後相關真 PG＋contract **55 passed**，既有訪談前端 **43 passed**、新 Ajv **9 passed**及 tsc 通過。UI 尚未使用此 API、跨瀏覽器旅程尚未驗，T09 不勾完成。見[發現入口證據](evidence/t09-current-turn-discovery.md)。

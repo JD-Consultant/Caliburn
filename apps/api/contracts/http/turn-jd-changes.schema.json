@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TurnJdChanges",
+  "description": "Read-only net JD changes between one completed Turn's retained start and adopted result, not today's formal JD.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["execution_id", "markdown"],
+  "properties": {
+    "execution_id": {"type": "string", "format": "uuid"},
+    "markdown": {"type": "string"}
+  }
+}

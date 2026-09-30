@@ -36,6 +36,22 @@
   padding: 64px 32px;
   text-align: center;
 }
+.file-avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--cb-accent-soft);
+  color: var(--cb-accent);
+  font-weight: 700;
+}
+.loading-note {
+  margin: 0;
+  color: var(--cb-text-muted);
+  font-size: 0.8125rem;
+}
 .file-identity {
   display: block;
   color: var(--cb-text-muted);

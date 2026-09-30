@@ -1,6 +1,6 @@
 # 介面、公開訊息與本機交付
 
-- 狀態：**工程設計；T02 檔案 UI、T03 JD 基本資料與全部集合人工編輯已實作，候選及其餘依任務 gate**。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
+- 狀態：**新目標部分已實作，未正式切換**。檔案、JD 人工編輯、A 訪談／候選預覽／暫停取消／公開歷史、正式 PDF／條件撤回已接線；串流與其餘驗收依[任務表](../plans/2026-09-29-target-rebuild/tasks.md)，不可從下文目標規格推定已完成。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
 
 ## 1. API 與 UI 的責任
 
@@ -99,6 +99,8 @@ sequenceDiagram
 
 ## 2. 串流不是保存權威
 
+**2026-09-30 已落地範圍：**公開完整 commentary 從原生 checkpoint／pending writes 投影，status polling 呈現候選／控制；歷史回答透過原 execution 定位按需回看。沒有訊息時明示空，不由 App 編造進度。新增 direct Responses typed stream → 有界程序內投影 → 同源 SSE → UI 的即時公開文字接線；真產品驗收與限制分見 [provider 證據](../plans/2026-09-29-target-rebuild/evidence/t09-response-streaming.md)、[傳輸證據](../plans/2026-09-29-target-rebuild/evidence/t09-commentary-transport.md)、[UI 證據](../plans/2026-09-29-target-rebuild/evidence/t09-commentary-ui.md)，不因此宣告 T09 全部完成。
+
 首選 HTTP commands＋同源 SSE 公開事件，無需 WebSocket 雙向協議。瀏覽器收到 event 只更新呈現，正式狀態仍可 GET 重取。SSE 的 event ID／重連不是完整產品恢復的唯一依據，斷線後先查當前 Turn 狀態、已保存公開內容與 JD 正式／候選位置，不因事件遺失就重新送員工原話。事件傳送使用標準 SSE framing／框架支援，不自製流式 JSON 切割協議。[WHATWG SSE](https://html.spec.whatwg.org/multipage/server-sent-events.html)
 
 - 生成中可顯示短公開中間訊息；完整正式答覆保存完成後成為主要回覆，之前完整公開訊息可展開回看。
@@ -108,6 +110,25 @@ sequenceDiagram
 - 暫停請求先顯示正在停妥，直到安全點確認；取消與失敗文案分開，不能失敗後默默重送新輸入。
 
 SSE 可丟的暫態進度與必須保留的公開歷史分開，**不為每個事件另造永久事件表**。中間完整訊息若從 checkpoint 投影後需獨立保留，僅保存必要公開文字與原 item identity；compaction 不刪歷史回看承諾。
+
+目前只即時投影明示 `assistant`／`commentary` 的訊息；依 response／message 身分送累積文字，phase 取自 item 而非猜測 delta。最終答覆仍等正式 Turn 完成保存後呈現，不以串流終止、訊息 completed 或 Response completed 宣告完成。新 A 請求啟用串流；恢復既有 request 保留原 transport 設定。未啟用的 B 角色不因共用能力自動變成公開串流。
+
+程序內 hub 不持久化、不回放，沒有訂閱者時不保留；慢讀者丟棄過時暫態更新，不能阻塞模型／工具。SSE scope 由原 status owner 驗證，瀏覽器關閉只移除訂閱。重新連線以既有 GET 補取已保存公開訊息；未保存片段可能消失，不能重送原輸入或重跑模型來填補。HTTP 型別與 UI guard 由 canonical schema 生成。
+
+```mermaid
+sequenceDiagram
+  participant SDK as Responses typed stream
+  participant Run as 共用執行／原件保存
+  participant Hub as 暫態公開投影
+  participant UI as 訪談畫面
+  SDK-->>Hub: assistant commentary 累積文字（不是 reasoning）
+  Hub-->>UI: scoped SSE：暫時顯示
+  SDK-->>Run: 完整原生 Response，保留 phase
+  Run->>Run: 可靠保存，依原規則執行工具／下一 Step
+  UI->>Run: GET 已保存公開內容與 Turn 狀態
+  Run-->>UI: 原公開中間訊息，可歷史回看
+  Note over Run,UI: 只有正式完成交易成立，才顯示最終答覆與已完成
+```
 
 ## 3. 顯示與來源
 

@@ -127,6 +127,19 @@ async def read_change_snapshot(
     )
 
 
+async def read_adopted_turn_changes(
+    session: AsyncSession, job_file_id: UUID, execution_id: UUID
+) -> tuple[JdChangeSnapshot, JdChangeSnapshot]:
+    """Read retained before/after values; caller qualifies this as a completed Turn."""
+    candidate = await candidate_persistence.read_candidate(session, job_file_id, execution_id)
+    if candidate is None or candidate.status != "adopted":
+        raise JdChangeHistoryUnavailableError("The Turn has no retained adopted JD endpoints")
+    return (
+        await read_change_snapshot(session, job_file_id, candidate.base_revision_id),
+        await read_change_snapshot(session, job_file_id, candidate.current_revision_id),
+    )
+
+
 def _operation(record: persistence.JdOperationRecord) -> ManualJdOperation:
     """Project target hints only; original bodies stay in the immutable revision owner."""
     item_ids: set[UUID] = set()

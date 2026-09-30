@@ -20,6 +20,7 @@ from caliburn.features.work_memory.candidates import (
     MemoryPermissionError,
 )
 from caliburn.features.work_memory.revisions import MemoryRevisionNotFoundError
+from caliburn.transport.jd_full_text import project_jd_full_text
 from caliburn.transport.model_tools.contracts import function_definition, reject_tool_call
 from caliburn.transport.model_tools.jd_detail_projection import (
     InvalidJdReadSelectionError,
@@ -28,7 +29,6 @@ from caliburn.transport.model_tools.jd_detail_projection import (
     project_jd_profile,
     select_jd_items,
 )
-from caliburn.transport.model_tools.jd_full_text import project_jd_full_text
 from caliburn.transport.model_tools.jd_navigation import project_jd_map
 from caliburn.workflows.jd_reads import JdReadWorkflow
 from caliburn.workflows.memory_reads import PublishedMemoryRead

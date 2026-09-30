@@ -45,7 +45,7 @@ apps/
       features/
         job-files/ interview/ jd-editor/ source-viewer/
       shared/api/               # generated 型別、HTTP／串流 transport
-      shared/ui/                # 確有多處使用的元件：icons、IconAction、對話捲動 hook；非業務元件大倉庫
+      shared/ui/                # 多處使用：icons、IconAction、SafeMarkdown、對話捲動 hook；非業務元件大倉庫
     tests/e2e/
 ```
 

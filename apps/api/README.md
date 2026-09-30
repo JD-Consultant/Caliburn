@@ -2,7 +2,7 @@
 
 本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。已提供隔離職務檔案、正式訪談保存、關聯式 JD 人工管理與候選／正式隔離。Memory 候選、固定修訂及原子快照發布底層通過真 PG，模型讀寫工具元件亦已驗。這不是完整產品完成：進度以[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)為準，現行正式入口不變。目前僅供隔離本機開發，完整安全與交付 gate 未完成，不對外開放。
 
-模型預設仍為 `gpt-6-luna`／`high`。程式化 `ModelSettings` 另接受明確的 `gpt-6.1-sol`，僅供**新合成檔案**對照；沒有新增環境／UI 切換，不能以更換設定將既有原生歷史交給另一模型。已核對能力與限制以[選型文件](../../docs/implementation/technology-decisions.md#1-首選工具鏈)為準，不把 isolated eval 當正式模型採用。
+產品使用 `gpt-6-luna`／`high`（2026-10-01 Owner 因成本確認），不採用 Sol 或自動 fallback。程式化 `ModelSettings` 的 Sol 接縫僅保留既有隔離研究，不再推進切換或追加 Sol 外送；沒有環境／UI 模型切換，不能將既有原生歷史交給另一模型。能力與限制以[選型文件](../../docs/implementation/technology-decisions.md#1-首選工具鏈)為準。
 
 **2026-09-30 接線狀態：**已完成四次全合成真模型訪談，其中第三輪固定已發布 Memory、暫停／重開／同輪接續後更正 JD；三次 B1／B2 背景批次正式發布。來源與快照選用修訂經 DB 核對；正式中文 PDF 已渲染。JD 八個模型入口、候選預覽、取消、完整公開中間訊息的歷史回看，以及 typed stream→SSE 的暫態公開文字已接線。真 A 已保存 commentary，但尚未截得完成前的真串流畫面，不能宣告整體時序驗收完成。`POST /inputs` 只在模型與 supervisor 就緒時接受新工作；原已接受命令可先查回原結果，不因目前無模型設定而失去辨識。狀態可經 `/consultant-turns/{execution_id}` 或 `/consultant-turns/by-command/{command_id}` 重取。這不是長訪談品質或完整恢復 gate 已通過；分別見 [A 接線證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t08-consultant-turn.md)、[Memory 編排證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)與任務表。
 

@@ -29,18 +29,31 @@ from caliburn.settings import Settings
 config = context.config
 # Explicit imports register each owned table for autogenerate, not application startup.
 target_metadata = Base.metadata
-assert JobFileRecord.__table__.metadata is target_metadata
-assert InterviewTextRecord.__table__.metadata is target_metadata
-assert FormalInterviewRecord.__table__.metadata is target_metadata
-assert InterviewInputRecord.__table__.metadata is target_metadata
-assert InterviewReplyRecord.__table__.metadata is target_metadata
-assert ExecutionRecord.__table__.metadata is target_metadata
-assert ExecutionBudgetRecord.__table__.metadata is target_metadata
-assert ContextHistoryHeadRecord.__table__.metadata is target_metadata
-assert ContextHistoryBindingRecord.__table__.metadata is target_metadata
-assert JdRevisionRecord.__table__.metadata is target_metadata
-assert JdSourceReferenceRecord.__table__.metadata is target_metadata
-assert JdCandidateRecord.__table__.metadata is target_metadata
+assert JobFileRecord.__table__ is target_metadata.tables[JobFileRecord.__tablename__]
+assert InterviewTextRecord.__table__ is target_metadata.tables[InterviewTextRecord.__tablename__]
+assert (
+    FormalInterviewRecord.__table__ is target_metadata.tables[FormalInterviewRecord.__tablename__]
+)
+assert InterviewInputRecord.__table__ is target_metadata.tables[InterviewInputRecord.__tablename__]
+assert InterviewReplyRecord.__table__ is target_metadata.tables[InterviewReplyRecord.__tablename__]
+assert ExecutionRecord.__table__ is target_metadata.tables[ExecutionRecord.__tablename__]
+assert (
+    ExecutionBudgetRecord.__table__ is target_metadata.tables[ExecutionBudgetRecord.__tablename__]
+)
+assert (
+    ContextHistoryHeadRecord.__table__
+    is target_metadata.tables[ContextHistoryHeadRecord.__tablename__]
+)
+assert (
+    ContextHistoryBindingRecord.__table__
+    is target_metadata.tables[ContextHistoryBindingRecord.__tablename__]
+)
+assert JdRevisionRecord.__table__ is target_metadata.tables[JdRevisionRecord.__tablename__]
+assert (
+    JdSourceReferenceRecord.__table__
+    is target_metadata.tables[JdSourceReferenceRecord.__tablename__]
+)
+assert JdCandidateRecord.__table__ is target_metadata.tables[JdCandidateRecord.__tablename__]
 assert MemoryObjectRevisionRecord.__table__ is target_metadata.tables["memory_object_revisions"]
 assert MemoryPositionRecord.__table__ is target_metadata.tables["memory_positions"]
 assert MemoryBatchRecord.__table__ is target_metadata.tables["memory_batches"]

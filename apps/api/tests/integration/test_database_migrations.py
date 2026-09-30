@@ -4,6 +4,7 @@ import asyncio
 import os
 import subprocess
 import sys
+from pathlib import Path
 from uuid import uuid4
 
 import psycopg
@@ -14,11 +15,12 @@ from alembic.runtime.migration import MigrationContext
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 
-from caliburn.adapters.database import API_ROOT, Base, DatabaseSchemaError, migration_config
+from caliburn.adapters.database import Base, DatabaseSchemaError, migration_config
 from caliburn.bootstrap import create_app
 from caliburn.settings import DatabaseSettings, Settings
 
 pytestmark = pytest.mark.postgres
+API_ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_jd_upgrade_initializes_prior_target_files_only_once(

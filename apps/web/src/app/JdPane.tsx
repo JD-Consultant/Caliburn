@@ -21,8 +21,16 @@ import { SourceViewer } from '../features/source-viewer/SourceViewer';
 
 type JdView = 'candidate' | 'formal';
 
-export function JdPane({ jobFileId, turn }: { jobFileId: string; turn: ConsultantTurn | null }) {
-  const readOnly = isJdReadOnlyDuring(turn);
+export function JdPane({
+  jobFileId,
+  turn,
+  turnVerified,
+}: {
+  jobFileId: string;
+  turn: ConsultantTurn | null;
+  turnVerified: boolean;
+}) {
+  const readOnly = !turnVerified || isJdReadOnlyDuring(turn);
   const candidate = readOnly ? (turn?.candidate ?? null) : null;
   const [view, setView] = useState<JdView>('candidate');
   const showCandidate = candidate !== null && view === 'candidate';
@@ -97,9 +105,11 @@ export function JdPane({ jobFileId, turn }: { jobFileId: string; turn: Consultan
                 )
               }
             >
-              {turn?.status === 'paused'
-                ? '這輪處理已暫停，JD 仍為唯讀；繼續完成或取消後才能人工修改。'
-                : '顧問處理中，JD 暫時唯讀；完成或取消後才能人工修改。'}
+              {!turnVerified
+                ? '尚未確認顧問處理狀態，JD 暫時唯讀；請在訪談區確認狀態。'
+                : turn?.status === 'paused'
+                  ? '這輪處理已暫停，JD 仍為唯讀；繼續完成或取消後才能人工修改。'
+                  : '顧問處理中，JD 暫時唯讀；完成或取消後才能人工修改。'}
             </Alert>
           )}
           {/* Both views stay mounted and only one is shown, so the formal JD never reloads. */}

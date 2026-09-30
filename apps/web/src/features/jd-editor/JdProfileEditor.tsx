@@ -108,6 +108,7 @@ export function JdProfileEditor({
         <EditJdProfileDialog
           jobFileId={jobFileId}
           baseline={editing}
+          readOnly={readOnly}
           onClose={() => setEditing(null)}
           onRefresh={refresh}
         />

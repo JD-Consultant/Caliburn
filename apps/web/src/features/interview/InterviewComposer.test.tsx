@@ -23,6 +23,14 @@ const active = {
 const clients: QueryClient[] = [];
 
 function renderComposer() {
+  // These command-recovery fixtures predate discovery. They have no other in-flight Turn;
+  // discovery-specific and shared-page behavior is exercised in the adjacent discovery suite.
+  const commandFetch = globalThis.fetch;
+  vi.stubGlobal('fetch', (path: RequestInfo | URL, options?: RequestInit) =>
+    path === `/api/job-files/${fileId}/consultant-turns/current`
+      ? Promise.resolve(Response.json({ turn: null }))
+      : commandFetch(path, options),
+  );
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
   return {
@@ -249,7 +257,7 @@ test.each([
     expect(screen.queryByText(/private data/)).not.toBeInTheDocument();
     first.unmount();
     renderComposer();
-    expect(screen.getByRole('button', { name: '送出訪談' })).toBeEnabled();
+    await waitFor(() => expect(screen.getByRole('button', { name: '送出訪談' })).toBeEnabled());
     expect(fetch).toHaveBeenCalledTimes(1);
   },
 );

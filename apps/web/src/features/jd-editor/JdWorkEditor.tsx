@@ -248,11 +248,19 @@ export function JdWorkEditor({
         <WorkEditDialog
           editing={editing}
           locked={command.locked}
+          readOnly={readOnly}
           isSending={command.isSending}
           canRetry={!command.blocked}
-          message={command.message}
+          message={
+            command.message ??
+            (readOnly ? 'JD 暫時唯讀，草稿仍保留；待處理狀態確認後再儲存。' : null)
+          }
           pending={command.pending}
-          onSubmit={command.send}
+          onSubmit={async (requested) => {
+            // Original-command reconciliation remains available; only new changes are blocked.
+            if (readOnly && requested !== command.pending) return;
+            await command.send(requested);
+          }}
           onClose={() => setEditing(null)}
           onReload={command.reload}
         />

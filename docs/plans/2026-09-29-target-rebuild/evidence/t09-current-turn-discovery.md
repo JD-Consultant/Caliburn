@@ -108,3 +108,42 @@ git -c core.safecrlf=false diff --check
 最後主線合併命令包含前述六個 integration 檔、新 current contract，以及 `test_dev_origin_settings.py`、`test_local_http_security.py`、`test_bootstrap.py`、`test_settings.py`：**130 passed，21.87s**（本片 PG／contract **55**＋安全片 **75**）。兩片 Ruff check 通過。API 仍未在 Demo 重啟載入，前端接線仍未實作；不把合成整合驗證寫成真模型或換瀏覽器旅程已通過。
 
 獨立 reviewer 複核兩項修正後關閉原 important／minor，未發現新增問題；主線 scoped mypy（6 source files）通過。審核未代替尚未做的 UI／完整 PG／真模型驗收。
+
+## UI 承接與多分頁取捨（2026-09-30）
+
+本節接續上述 API 切片；前文「UI 尚未接線／Demo 未重啟」是當時狀態，現已完成下列增量。T09 整體仍未完成。
+
+### 研究與責任
+
+- 依 [TanStack dependent queries](https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries)及 [useQuery](https://tanstack.com/query/latest/docs/framework/react/reference/functions/useQuery)，無 hint 時先 GET current；取得 execution 後由原 by-execution query 追到終態。discovery 不另設輪詢，retry 關閉，失敗提供唯讀重查。
+- 依 [React useSyncExternalStore](https://react.dev/reference/react/useSyncExternalStore)及[避免重複 state](https://react.dev/learn/you-might-not-need-an-effect)，Composer 與頁面訂閱同一既有 hint store，server state 保留在 Query cache；頁面的 disabled observers 不另發請求。pending 輸入只在原 command 身分匹配時採用。
+- Owner 將多分頁成本取捨委由工程判斷。已比較 [Web Locks](https://www.w3.org/TR/web-locks/)：可協調同源同儲存範圍，不能作跨瀏覽器的全 App 排他保證。本案已有後端同檔 A 准入、人工修改資格、修訂衝突與原命令恢復，因此保留基本多分頁，不加單分頁鎖、心跳租約、即時協作或跨頁快取廣播。這是 Caliburn 的成本取捨，不宣稱大廠一致採同一方案。
+
+### 可觀察效果
+
+1. 缺少本機 hint 時可發現 active／paused A；找到後保持原 execution，不因後續 current=null 丟失終態。
+2. 未知原 command 仍先 by-command 核對；404 不表示可以另送原輸入。查詢失敗或檔案身分不符不當 idle，也不 POST 恢復。
+3. 啟動未確認時保留可輸入的局部草稿，暫不准送出；JD 正式稿可讀但不能新改。已開啟 profile／work 表單同樣唯讀，草稿與讀取基準保留；原 pending 命令仍可核對。
+4. 終態的下一輪／取回原文操作清理原提示並重查 current；確認閒置才可送新輸入。沒有 hint 的發現路徑也可使用。
+5. canonical envelope 由 Ajv 編譯，先註冊既有 Turn schema；沒有手改生成檔或另建 DTO／保存權威。
+
+### Red–Green 與審查
+
+- discovery 七項測例先跑 **6 failed／1 passed**；失敗包含無 hint 無法發現工作、未核 idle 即可送出、錯誤未呈現與錯檔資格。實作後 **7 passed**。首次 sandbox spawn EPERM 屬環境失敗，不計 Red。
+- 獨立 reviewer 找出兩項 important：Composer 只讀初始 hint 而頁面已訂閱新 hint；已開啟表單沒有隨未知狀態鎖定。先補跨頁 E1→E2 身分與 profile／work 草稿反例，組合執行 **3 failed／12 passed**；修正為共同外部訂閱及原表單的唯讀 guard。異步 Query 通知的 disabled/enabled assertion 使用 waitFor，不用 sleep 猜時序。修正後 interview **51 passed**、workspace **7 passed**。
+- 全前端新跑 **27 檔／160 passed，12.02s**；tsc 通過。ESLint 發現測試未用參數，後續去除並保留 fetch 型別；Prettier 交既有 formatter 處理，不關 lint 規則。
+- production build 通過：JS **951.03 kB／gzip 283.51 kB**；既有 >500 kB 警告仍在，列 T15 效能工作，不透過提高門檻掩蓋。
+
+後續複核關閉前兩項後，再指出將 `readOnly` 混入命令 `locked` 會誤顯示「讀取目前 JD」，點擊可關閉並丟棄未送草稿。加回歸先 **1 failed／6 passed**，明確失敗於該按鈕不應出現；`WorkEditDialog` 現分開命令鎖與唯讀，合併值僅控制新編輯，原命令重讀路徑不變。相關 JD／workspace **46 passed**。最終全前端再次 **27 檔／160 passed，13.48s**，tsc、全 ESLint／Prettier 通過；build **951.06 kB／gzip 283.52 kB**，同一既有大小警告保留。
+
+本 UI 切片重現命令（於 `apps/web`，使用前述 Node runtime）：`node node_modules/vitest/vitest.mjs run --reporter=dot`、`node node_modules/typescript/bin/tsc --noEmit`、`node node_modules/eslint/bin/eslint.js .`、`node node_modules/prettier/bin/prettier.cjs --check src tests scripts *.json *.ts *.js index.html`、`node node_modules/vite/bin/vite.js build`。sandbox 的子程序權限問題使用已獲准範圍重跑，不藉此停用隔離／測試。
+
+最後獨立靜態複核關閉三項 important，未發現修正範圍新增問題；未代主線執行測試。可延後測例為「已有 pending 時切換另一 command」及「唯讀期間原 pending 對帳」的組合，現有分支審查與各自恢復測試不冒充該組合已驗。修改文件的本機連結目標、秘密格式掃描與 `git diff --check` 通過。
+
+### Demo 唯讀核對
+
+先確認 Demo 無 active／paused 工作，辨識原後端程序後使用相同 DB／PDF 配置安全重啟，載入新 API；沒有重建資料或停止 Vite／PG。直連 8100 health、current，以及 5173 proxy current 均 **200**，後兩者為 `{"turn":null}`。重啟後既有 execution 統計維持 A completed 5／failed 1、Memory completed 3，沒有新增模型工作。
+
+IAB 臨時分頁讀同一全合成 Demo：先呈現「核對處理狀態」與 JD 唯讀，取得原終態後顯示「已完成並保存」，人工入口恢復。真 API 的來源徽章可展開職務名稱依據，看到固定訪談序號 2 與原話；未攔截回應、未送訪談或修改 JD。驗證後關閉臨時頁，未碰使用者原分頁。這證明 Demo 基本讀取與真來源面板，不等於真瀏覽器中 active／paused、跨瀏覽器競爭或付費模型旅程全驗。
+
+未驗項保留：完整鍵盤／焦點走查、全矩陣瀏覽器競爭、T12 程序故障、T17 長訪談品質；「本輪 AI 改了什麼」另為 UI 缺口，不因本切片完成而關閉。

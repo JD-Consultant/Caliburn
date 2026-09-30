@@ -32,6 +32,7 @@ export type WorkEditing =
 interface Props {
   editing: WorkEditing;
   locked: boolean;
+  readOnly?: boolean;
   isSending: boolean;
   canRetry: boolean;
   message: string | null;
@@ -75,6 +76,7 @@ function formAction(editing: WorkEditing): { id: string; label: string } | null 
 export function WorkEditDialog({
   editing,
   locked,
+  readOnly = false,
   isSending,
   canRetry,
   message,
@@ -87,6 +89,7 @@ export function WorkEditDialog({
   const titleInput = useRef<HTMLInputElement>(null);
   const title = dialogTitle(editing);
   const action = formAction(editing);
+  const editingDisabled = locked || readOnly;
   return (
     <Dialog
       open
@@ -104,7 +107,7 @@ export function WorkEditDialog({
             titleInput={titleInput}
             revisionId={editing.baseline.revision_id}
             area={editing.area}
-            disabled={locked}
+            disabled={editingDisabled}
             onSubmit={onSubmit}
             onError={setLocalError}
           />
@@ -115,7 +118,7 @@ export function WorkEditDialog({
             baseline={editing.baseline}
             task={editing.task}
             areaId={editing.areaId}
-            disabled={locked}
+            disabled={editingDisabled}
             onSubmit={onSubmit}
             onError={setLocalError}
           />
@@ -125,7 +128,7 @@ export function WorkEditDialog({
             <p>{editing.description}</p>
             <Button
               variant="contained"
-              disabled={locked}
+              disabled={editingDisabled}
               onClick={() => {
                 void onSubmit(editing.command);
               }}
@@ -140,7 +143,7 @@ export function WorkEditDialog({
             revisionId={editing.baseline.revision_id}
             kind={editing.capabilityKind}
             capability={editing.capability}
-            disabled={locked}
+            disabled={editingDisabled}
             onSubmit={onSubmit}
             onError={setLocalError}
           />
@@ -150,7 +153,7 @@ export function WorkEditDialog({
             titleInput={titleInput}
             revisionId={editing.baseline.revision_id}
             collaborator={editing.collaborator}
-            disabled={locked}
+            disabled={editingDisabled}
             onSubmit={onSubmit}
             onError={setLocalError}
           />
@@ -160,7 +163,7 @@ export function WorkEditDialog({
             titleInput={titleInput}
             revisionId={editing.baseline.revision_id}
             condition={editing.condition}
-            disabled={locked}
+            disabled={editingDisabled}
             onSubmit={onSubmit}
             onError={setLocalError}
           />
@@ -171,7 +174,7 @@ export function WorkEditDialog({
           返回 JD
         </Button>
         {action && !pending && (
-          <Button type="submit" form={action.id} variant="contained" disabled={locked}>
+          <Button type="submit" form={action.id} variant="contained" disabled={editingDisabled}>
             {action.label}
           </Button>
         )}

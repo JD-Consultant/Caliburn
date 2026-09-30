@@ -1,10 +1,14 @@
 /** Page composition joins metadata and interview features; neither imports the other's internals. */
 import { Link as RouterLink, useParams } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { InterviewHistory } from '../features/interview/InterviewHistory';
+import { InterviewComposer } from '../features/interview/InterviewComposer';
+import { consultantTurnQuery } from '../features/interview/interview-turn-api';
 import { JdProfileEditor } from '../features/jd-editor/JdProfileEditor';
 import { JdWorkEditor } from '../features/jd-editor/JdWorkEditor';
+import { JdCandidatePreview } from '../features/jd-editor/JdCandidatePreview';
+import { UndoTurnJd } from '../features/jd-editor/UndoTurnJd';
 import { jobFileQuery } from '../features/job-files/job-file-api';
 import { describeReadError } from '../shared/api/http';
 
@@ -15,6 +19,7 @@ export function JobFilePage() {
 
 function JobFileContent({ jobFileId }: { jobFileId: string }) {
   const file = useQuery(jobFileQuery(jobFileId));
+  const queryClient = useQueryClient();
   return (
     <Stack spacing={3}>
       <div>
@@ -40,19 +45,53 @@ function JobFileContent({ jobFileId }: { jobFileId: string }) {
           {describeReadError(file.error)}
         </Alert>
       )}
-      {file.data && !file.isError && (
+      {file.data && (
         <>
           <header>
             <Typography variant="h4" component="h1">
               {file.data.display_name}
             </Typography>
             <p>受訪員工：{file.data.employee_name}</p>
+            <Button
+              component="a"
+              href={`/api/job-files/${encodeURIComponent(jobFileId)}/jd/export.pdf`}
+              download
+              variant="outlined"
+              aria-describedby="jd-pdf-export-note"
+            >
+              匯出目前 JD（PDF）
+            </Button>
+            <Typography
+              id="jd-pdf-export-note"
+              variant="body2"
+              color="text.secondary"
+              sx={{ mt: 1 }}
+            >
+              匯出目前已正式保存的版本，不包含本輪候選預覽。
+            </Typography>
           </header>
           <Alert severity="info">
-            已可編輯 JD 基本資料、職責、任務及共用知識／技能，並回看開場。協作／條件等其餘欄位及 AI
-            訪談仍在開發，這裡不會送出模型請求。
+            訪談原輸入會先保留；顧問完成並保存後，才會列入正式訪談並更新 JD。
           </Alert>
-          <InterviewHistory jobFileId={jobFileId} />
+          <InterviewHistory
+            jobFileId={jobFileId}
+            renderTurnActions={(executionId) => (
+              <UndoTurnJd
+                jobFileId={jobFileId}
+                executionId={executionId}
+                onUndone={() =>
+                  queryClient.invalidateQueries(
+                    { queryKey: consultantTurnQuery(jobFileId, executionId).queryKey, exact: true },
+                    { throwOnError: true },
+                  )
+                }
+              />
+            )}
+          />
+          <InterviewComposer
+            jobFileId={jobFileId}
+            renderCandidate={(candidate) => <JdCandidatePreview candidate={candidate} />}
+          />
           <JdProfileEditor jobFileId={jobFileId} />
           <JdWorkEditor jobFileId={jobFileId} />
         </>

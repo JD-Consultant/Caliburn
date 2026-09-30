@@ -15,6 +15,7 @@ import {
 import type { CreateJobFileRequest } from '../../shared/api/generated/create-job-file-request';
 import { ApiError } from '../../shared/api/http';
 import { isCreateJobFileRequest } from '../../shared/api/validation';
+import { focusDialogInput } from '../../shared/ui/dialog-focus';
 import {
   clearPendingCreation,
   readPendingCreation,
@@ -107,7 +108,7 @@ export function CreateJobFileDialog({ onClose, onCreated }: Props) {
       slotProps={{
         transition: {
           onEntered: () => {
-            nameInput.current?.focus();
+            focusDialogInput(nameInput.current);
           },
         },
       }}

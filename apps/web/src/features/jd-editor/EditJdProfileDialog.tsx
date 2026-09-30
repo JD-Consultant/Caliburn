@@ -16,8 +16,8 @@ import type { JdProfileView } from '../../shared/api/generated/jd-profile-view';
 import type { ReviseJdProfileRequest } from '../../shared/api/generated/revise-jd-profile-request';
 import { ApiError } from '../../shared/api/http';
 import { isReviseJdProfileRequest } from '../../shared/api/validation';
+import { focusDialogInput } from '../../shared/ui/dialog-focus';
 import { reviseJdProfile } from './jd-profile-api';
-import { focusDialogInput } from './dialog-focus';
 import {
   clearPendingProfile,
   makeProfileDraft,

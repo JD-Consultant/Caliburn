@@ -8,13 +8,13 @@ import type {
   JdWorkView,
   WorkTask,
 } from '../../shared/api/generated/jd-work-view';
+import { focusDialogInput } from '../../shared/ui/dialog-focus';
 import type { WorkCommand } from './jd-work-api';
 import { AreaFields } from './AreaFields';
 import { TaskFields } from './TaskFields';
 import { CapabilityFields } from './CapabilityFields';
 import { CollaboratorFields } from './CollaboratorFields';
 import { ConditionFields } from './ConditionFields';
-import { focusDialogInput } from './dialog-focus';
 
 export type WorkEditing =
   | { kind: 'area'; baseline: JdWorkView; area?: Area }

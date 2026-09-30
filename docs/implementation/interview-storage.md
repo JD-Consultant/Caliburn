@@ -2,7 +2,7 @@
 
 - 狀態：**T02 已實作／真 PostgreSQL 與檔案 UI 已驗**，2026-09-29。已有檔案建立／列表／改名／開場、輸入接受、持久執行准入、正式化交易參與介面及有界原話查詢；尚無完整 A 完成、Graph 控制／恢復。範圍與實測見[任務及證據](../plans/2026-09-29-target-rebuild/evidence/t02-job-files-and-interviews.md)。
 - 語意仍由[資料保存](../architecture/persistence.md)及[正式來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
-- 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/migrations/versions/0001_job_files_and_interviews.py)。
+- 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/src/caliburn/migrations/versions/0001_job_files_and_interviews.py)。
 
 ## 1. 原文、正式資格與執行身分分開，不複製原話
 
@@ -217,7 +217,7 @@ T09 歷史回看以 `read_public_interview_history` 投影正式資格、原文�
 
 - `name_revision` 只代表此 label 的新鮮度，從 1 開始。DB trigger 在 label 真正改變時加一；改回同字仍前進，不讓舊分頁繞過檢查。同值命令可確認，但不增加修訂。
 - 過期基準回 409，不默默覆蓋；同命令不同 payload 亦拒絕。原命令先查，所以即使後來已有新名稱，重送仍回原結果而**不再次改名**。UI 成功後須 GET 最新 metadata，不把舊結果寫成目前名稱。
-- 建立重送仍用不可變 `initial_display_name`、初始修訂 1 及原建立資料，不受 rename 結果影響。新欄位由 [0004 migration](../../apps/api/migrations/versions/0004_job_file_renames.py)加入，不重寫舊 migration。
+- 建立重送仍用不可變 `initial_display_name`、初始修訂 1 及原建立資料，不受 rename 結果影響。新欄位由 [0004 migration](../../apps/api/src/caliburn/migrations/versions/0004_job_file_renames.py)加入，不重寫舊 migration。
 - 只存最小的原命令及結果欄位；現行表頭無法證明某個舊命令是否已提交，因此此資料不能只放 UI。這是原 job-files owner 的結果，不是新通用收據服務、Graph checkpoint 或全文版本平台。首版不清除可重送命令結果。
 
 研究借鑑 [Google AIP-154](https://google.aip.dev/154)的資源新鮮度檢查與 [PostgreSQL row lock](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)；本案採明確 label counter 而非完整資源 ETag，原操作重送保證沿本案既有交易契約。測例涵蓋舊命令重送、同基準競爭、同名隔離、改回同字、原結果不可改、後段失敗一起回滾；不由此宣稱全產品程序故障或交付安全已完成。

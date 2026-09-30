@@ -1,7 +1,5 @@
 """Own engines and short sessions, not feature SQL or business decisions."""
 
-from pathlib import Path
-
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
@@ -10,8 +8,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from caliburn.settings import DatabaseSettings
-
-API_ROOT = Path(__file__).resolve().parents[3]
 
 
 class Base(DeclarativeBase):
@@ -31,7 +27,9 @@ class DatabaseSchemaError(RuntimeError):
 
 
 def migration_config() -> Config:
-    return Config(str(API_ROOT / "alembic.ini"))
+    config = Config()
+    config.set_main_option("script_location", "caliburn:migrations")
+    return config
 
 
 class Database:

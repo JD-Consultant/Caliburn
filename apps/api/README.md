@@ -64,6 +64,8 @@ uv run --project apps/api --locked alembic -c apps/api/alembic.ini check
 
 migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade head` 不重建原資料。應用啟動只檢查 migration head，不默默升級。未配置新 DB 時 health 仍可用、檔案 API 回 503；已配置但結構未初始化／不相符則啟動失敗。初始 schema 包含不可變原文，不提供破壞性 downgrade；需要資料處置應另行核對精確範圍。
 
+完整 migration 位於 `src/caliburn/migrations` 並隨 Python wheel 交付；CLI 與程式都用 Alembic 的 `caliburn:migrations` 套件資源定位，不依賴 checkout 的相對路徑。非 editable 安裝可使用 `uv sync --project apps/api --locked --no-editable`，後續 `uv run` 也帶 `--no-editable`，避免重新同步成開發模式。2026-10-01 已驗新 venv／實際 wheel、空測試 schema、同源建置、人工 JD 保存與重啟；不是另一台電腦、模型／PDF 乾淨交付或正式切換全部通過，見[證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#乾淨安裝與套件化-migration2026-10-01)。
+
 目前資料入口（具體 DTO 由 `/openapi.json` 與 `contracts/http/` 生成）：
 
 - `POST /api/job-files`：`command_id`、`display_name`、`employee_name`；新建立回 201，同一命令重送回原結果／200，不同輸入重用命令回 409。

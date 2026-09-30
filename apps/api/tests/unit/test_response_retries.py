@@ -7,6 +7,7 @@ import pytest
 from openai import APIStatusError, APITimeoutError
 
 from caliburn.agent_execution.response_retries import ResponseRetryPolicy
+from caliburn.settings import ModelSettings
 
 
 def failure(headers, *, status=429, code="rate_limit_exceeded"):
@@ -30,8 +31,8 @@ def failure(headers, *, status=429, code="rate_limit_exceeded"):
         ({"retry-after-ms": "1250", "retry-after": "5"}, 1.25),
         ({"retry-after": "Wed, 30 Sep 2026 00:02:00 GMT"}, 120.0),
         ({"retry-after": "Tue, 29 Sep 2026 00:00:00 GMT"}, 0.0),
-        ({"retry-after": "not a date"}, 1.5),
-        ({"retry-after": "-2"}, 1.5),
+        ({"retry-after": "not a date"}, 3.0),
+        ({"retry-after": "-2"}, 3.0),
         ({"retry-after": "1e999"}, None),
         ({"retry-after": "nan"}, None),
     ],
@@ -81,3 +82,17 @@ def test_permanent_or_explicitly_refused_request_cannot_be_made_retryable(status
         )
         is None
     )
+
+
+def test_default_schedule_outlasts_a_one_minute_rate_limit_window():
+    """A tokens-per-minute limit refills over about a minute, and rejected retries also count
+    against it (OpenAI rate-limit guide), so patience matters more than a fast first retry."""
+    error = APITimeoutError(request=httpx2.Request("POST", "https://api.openai.com/v1/responses"))
+    attempts = ModelSettings(api_key="synthetic-not-sent").max_attempts_per_request
+    shortest_waits = [
+        ResponseRetryPolicy().delay_seconds(
+            error, attempt_number=n, now=datetime.now(UTC), random_fraction=1
+        )
+        for n in range(1, attempts)
+    ]
+    assert sum(shortest_waits) >= 60

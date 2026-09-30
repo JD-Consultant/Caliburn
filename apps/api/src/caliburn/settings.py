@@ -36,7 +36,7 @@ class ModelSettings:
     max_output_tokens: int = 16_384
     max_model_steps: int = 64
     max_tool_calls_per_step: int = 32
-    max_attempts_per_request: int = 5
+    max_attempts_per_request: int = 8
     max_outbound_attempts: int = 512
     max_compactions: int = 4
     turn_timeout_seconds: int = 900

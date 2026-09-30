@@ -300,3 +300,61 @@ Owner 要求一起檢查 Agent prompt、tool description、參數 description �
 - `scripts/generate_contracts.py --check` 通過；首輪 sandbox 暫存寫入被拒後，使用同一既有生成器的核准環境完成，未手改生成檔。
 - 四份 canonical schema 與 HEAD 作遞迴比較，僅排除字串型 `description` 註解後完全一致；未刪除名為 description 的業務欄位。確認此次 wire shape 不變。
 - 前端在 `apps/web` 執行既有 `node node_modules/typescript/bin/tsc --noEmit` 通過。`pnpm typecheck` 在編譯前因套件管理器欲重整依賴、無互動終端而退出，未允許移除／重裝依賴；因此只聲明直接 TypeScript 檢查通過，不宣稱 pnpm wrapper 成功或重跑前端全套。
+
+## 2026-10-01：來源保留的 reasoning effort 對照
+
+基準 `adbbb922`。上一片已定位原生請求、完整舊來源和 App 操作語意；模型仍主動送出 `remove_source`，不是 DB 隱性清除。停止重複調提示後，本片只檢查**同一模型在較高 reasoning effort 下的來源判斷**，不改產品、不裁歷史、不換模型、不自動補引或增 reviewer。
+
+研究：[Luna 官方規格](https://developers.openai.com/api/docs/models/gpt-6-luna)支持 medium／high；[部署指引](https://developers.openai.com/api/docs/guides/deployment-checklist#set-up-reasoningeffort)要求針對品質、延遲及成本驗證 effort，而非預設越高越好；[模型選擇](https://developers.openai.com/api/docs/guides/model-selection)同樣建議以相同輸入比較。這些只支持驗證方法，不保證 high 修復錯引，也不構成改採 Astra／Sol 的授權或證據。
+
+### 執行前 manifest
+
+沿上節已核明全合成的兩個請求，重用現行 canonical tools。兩次 partial、一次 whole-field，順序 partial → whole-field → partial；只將 `reasoning.effort` 從 medium 改成 high，深比較其餘完整 payload 必須相等。舊模型原件／phase 原序保留，不改資料庫 checkpoint；whole-field 是明示合成的工具選擇 fixture，不冒充真產品已執行的工具結果。
+
+- 上限：3 次 create＋3 次 count、零自動重試／compact；仍 `gpt-6-luna`、store=false、all_turns、direct SDK 3.20.0。每次 input ≤40K、output ≤8,192、120 秒、全批 600 秒，管理預算 US$1。
+- 只讀隔離 `_test` DB 中既有合成 fixture；只經安全 loader 讀 OpenAI key，不讀／改 Demo 或私人資料。只記公開工具參數、用量、延遲及 hash，不保存 opaque reasoning，不执行模型寫入工具。
+- `.research-tmp/eval/reasoning-effort-high-20261001.jsonl` 獨占建立；錯誤／超限立即停止，不換模型或增加試次。沒有目標修改記未觀察，不把重新讀取或 API 200 算來源成功。
+- 基準重用上節 medium 的原件（partial 0/2、whole-field 2/2），不再付費重跑已重現的基準；這不是同批隨機比較或顯著性證明。判準仍是剩餘來源共同支持保留的完整內容，且合法整欄更正不受阻；不要求固定 ID 或唯一工具序列。
+- 本片只是診斷校準，不是產品設定改動／TDD。若有改善仍須短產品接續驗證才能採納；無改善就保留限制，不能因同一案例試到成功便關閉 T14／T17。
+
+### 局部結果與產品接續 manifest
+
+三次均正常完成；兩次 partial 保留舊來源＋新增本次更正，未再移除仍支持報名／課前／異動等工作的引用。其中一次職責用「定期」，但新建任務明確寫每季；另一次職責與任務均明確寫每季。whole-field 只更正直接主管為校長、移除該欄失效來源，職稱／單位未動。主代理核對公開參數與合成原文，獨立代理覆核輸入指紋及來源語意：partial 由 medium 0/2 變為 high 2/2，觀察到局部工具選擇改善；whole-field 的 medium 原已 2/2，high 1/1 只表示未觀察到退步。未作獨立領域評分、未執行工具，不宣稱穩定修復。
+
+兩次 partial latency 13.802／19.745 秒，output 1,511／2,089（reasoning 897／1,511）；whole-field 2.859 秒、output 181（reasoning 64）。原 medium partial output 276／750 等為較早試次，不宣稱嚴格同批延遲比較；本片 high 的完整參數選擇與原件存於上述 JSONL。
+
+**下一階段在執行前另限：**沿既有 `verify_core_journey.py` 真 App／PG probe，新隨機 `core_journey_20261001_*` schema，只用 b0-2 已核明的前四則合成員工原文，最多 4 A Turn、4 自然啟動 Memory 批次。A／B1／B2 使用既有共同 ModelSettings，僅本次測試改為 Luna／high（**不是只改 A 的因果對照**），Prompt／工具／Context／產品預設不變。每 execution ≤16 steps、48 outbound attempts、每請求最多1次、1次compact、240秒、output≤8,192；每 execution 測試上限 US$0.25，整批≤US$2，無自動重跑。失敗停止該旅程並等自有工作收尾；不擴到其他人設、不重跑 medium、不重驗未修改的 PDF／UI。
+
+新結果 `.research-tmp/eval/core-journey-high-20261001.json` 不覆寫原證據；回讀保存的 JD、逐筆來源與背景結果，檢查同一來源保留反例、既有工作及責任邊界是否仍成立。沒有真保存或來源缺漏就不採納新預設；即使此片通過，也不單憑四轮宣告所有長訪談、T14／T17 過關。
+
+### 真 App 保存結果與採納界線
+
+一次執行，沒有重跑至通過。隔離 schema `core_journey_20261001_635da286`、職務檔案 `a40b19dc-da6f-4105-9a4c-2c068edcaafa`；4 A Turn、3 自然 Memory 批次均 completed，無 active／failed 殘留。最新 Memory 處理至訪談序號 6，**沒有宣稱已吸收序號 8 的季度更正**；A 直接引用本輪原話，後续仍須保留尚未整理的近期原話。
+
+正式 JD revision `d6c4160e-dd83-4476-8a95-54e5e9962353` 有 1 職責、2 任務、4 協作對象。主代理逐項閱讀 JD／訪談／來源，獨立代理另行覆核：
+
+| 檢查 | 保存結果 |
+|---|---|
+| 身分／職務範圍與不授課、不決定開課收費 | 4 profile 欄位及職責引用序號 2，沒有錯引後輪 |
+| 保留綜合行政任務 | 同一任務保留序號 2／4／6，新增序號 8；沒有因新出席細節刪掉報名、課前、異動的有效依據 |
+| 季度更正 | 出席彙整任務、成果及要求引用 8；行政組長協作內容也改每季，沒有把課前两工作天或每日工作一起改掉 |
+| 來源回讀 | 28 筆引用均成功讀取；正文、角色與對應正式訪談逐字相符。序號 2／4／6／8 分別 8／7／5／8 筆 |
+| 訪談引導 | 每轮有後續問題；最後詢問課後紀錄是否就是出席紀錄、是否還有其他紀錄，沒有假稱已完成全稿 |
+
+Memory 最新快照另作唯讀抽查：3 情境、1 理解保留已知工作、權責與未知；月度說法仍是其截止於序號 6 的歷史，不是未吸收序號 8 仍假稱已更新。**限制：**理解仍大量複述情境；情境／理解把原話「還有人付款資料對不起來」写成「另有一人」，原話未明示確切人數，不能把此語意細節當成已核實。此片不以 Graph completed 宣告 Memory 分析品質全過。
+
+持久外送紀錄：A 27 次 model＋30 次 count、Memory 28 次 model＋32 次 count，無 compact／重試／已記錄 provider failure；55 次 model 均有本機費率估算，A US$0.020545710、Memory US$0.012881840，合計 **US$0.033427550**，不是供應商帳單。前三次工具選擇探針 input 39,080、output 3,781、reasoning 2,472，依現有費率估 US$0.004100260；兩階段合計估 US$0.037527810，未超 manifest。
+
+原件：`core-journey-high-20261001.json` SHA-256 `dbb1d46495ce6367119c224d98e34be15f5dd22649b46ab245258c12fb48e644`；`reasoning-effort-high-20261001.jsonl` SHA-256 `ba820af92bc913d8a3a9deb0cd736bc2d7644f17c71244f259c56253102db3ab`。探針及隔離資料保留於既有忽略位置，不輸出憑證／opaque reasoning，也不改 Demo。
+
+**採納：**在原 `ModelSettings` 將預設 medium 改 high，保留顯式較低 effort 的測試／校準能力；無角色設定平台、新欄位、新 Agent、自動补引用或額外 prompt。產品重啟後的新請求才使用新預設，已保存原生請求／歷史不改。改善證據限於上述已知反例及一次短旅程；不宣稱所有角色都有提升或來源失誤已根治。行政任務偏大、知識／技能未分析、長訪談穩定性仍由原品質 gate 管理。
+
+**串流清理待釐清：**真旅程 stdout 一次出現 `Exception ignored while closing generator ... AsyncResponseStream.__aiter__`／`ValueError: async generator already executing`。正式結果、工具來源及全部工作均可取得，未見本次工作失敗；但不能宣稱無警告或已修復。已對照鎖定 SDK 的 stream 關閉實作及原 adapter，現有資料尚不足定位警告原因，不猜是 saver／provider 故障、不修改框架私有欄位、不為此再跑付費旅程。保留至原串流接線範圍做有限離線重現，非新恢復平台。
+
+### 設定接線驗證
+
+在既有 `test_role_prompt_contracts.py` 的實際角色組裝邊界補預設／明確 override 檢查，不用 prompt 文字比對宣稱品質：舊碼 A／B1／B2 三個預設例均因送 medium 而 Red，三個 low override 例通過；只改一行設定後：
+
+`./.venv-target/Scripts/python.exe -B -m pytest tests/unit/test_role_prompt_contracts.py tests/unit/test_model_settings.py tests/unit/test_response_streaming.py tests/unit/test_terminal_response_handoff.py tests/contracts/test_openai_responses.py -q -p no:cacheprovider --tb=short`
+
+**59 passed，1.94s**；Ruff check 與 format --check 通過。這只證明設定、角色、公開串流及原件交接契約未被本改動破壞，不能消除上面的真旅程清理警告。未改 PDF／UI／資料庫交易，沿風險分層不重跑其全套。T14／T16／T17 維持未完成。

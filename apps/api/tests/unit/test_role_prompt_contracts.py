@@ -45,8 +45,9 @@ class CapturedPreparationError(Exception):
     ids=["consultant", "work_situation", "work_understanding"],
 )
 @pytest.mark.asyncio
+@pytest.mark.parametrize("effort", [None, "low"], ids=["calibrated_default", "explicit_override"])
 async def test_real_role_assembly_passes_its_prompt_to_history_template(
-    runner_class, instructions, layer, monkeypatch
+    runner_class, instructions, layer, effort, monkeypatch
 ) -> None:
     async def capture(self, *, template, **kwargs):
         raise CapturedPreparationError(template.create_payload())
@@ -65,7 +66,12 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
         ExecutionKind.CONSULTANT_TURN if layer is None else ExecutionKind.MEMORY_BATCH,
     )
     writer = ExecutionWriter(scope, uuid4())
-    runner = runner_class(sessions, Mock(), Mock(), ModelSettings(api_key="synthetic-never-sent"))
+    settings = (
+        ModelSettings(api_key="synthetic-never-sent")
+        if effort is None
+        else ModelSettings(api_key="synthetic-never-sent", reasoning_effort=effort)
+    )
+    runner = runner_class(sessions, Mock(), Mock(), settings)
     with pytest.raises(CapturedPreparationError) as captured:
         if layer is None:
             await runner.run(writer)
@@ -77,6 +83,7 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
             await runner.run(writer, stage, **kwargs)
     payload = captured.value.payload
     assert payload["instructions"] == instructions
+    assert payload["reasoning"]["effort"] == ("high" if effort is None else "low")
     assert payload["input"] == []
     assert payload["tools"]
     assert all(definition["strict"] for definition in payload["tools"])

@@ -1,0 +1,369 @@
+"""Memory scheduling uses completed A sources, existing candidates and real PG commits."""
+
+import asyncio
+from collections.abc import Awaitable, Callable
+from uuid import UUID, uuid4
+
+import pytest
+from pydantic import JsonValue
+
+from caliburn.adapters.database import Database
+from caliburn.features.executions import history
+from caliburn.features.executions import service as executions
+from caliburn.features.executions.history_models import (
+    AgentRole,
+    ContextPosition,
+    HistoryWindowKind,
+    context_thread_id,
+)
+from caliburn.features.executions.models import (
+    ExecutionKind,
+    ExecutionScope,
+    ExecutionStatus,
+    ExecutionWriter,
+)
+from caliburn.features.interviews import service as interviews
+from caliburn.features.interviews.models import SubmitInterviewInput
+from caliburn.features.job_files import service as job_files
+from caliburn.features.job_files.models import CreateJobFile
+from caliburn.features.work_memory.candidates import CreateMemoryObject, MemoryBatchPosition
+from caliburn.features.work_memory.models import MemoryContent
+from caliburn.features.work_memory.revisions import MemoryLayer
+from caliburn.settings import DatabaseSettings
+from caliburn.workflows.interview_completion import record_formal_interview
+from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+
+pytestmark = pytest.mark.postgres
+
+
+def execute[T](settings: DatabaseSettings, action: Callable[[Database], Awaitable[T]]) -> T:
+    async def run() -> T:
+        database = Database(settings)
+        try:
+            return await action(database)
+        finally:
+            await database.close()
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        return runner.run(run())
+
+
+async def start_turn(database: Database, file_id: UUID | None = None) -> ExecutionWriter:
+    async with database.sessions.begin() as session:
+        if file_id is None:
+            created = await job_files.create_job_file(
+                session, CreateJobFile(uuid4(), "Memory 整理", "合成人員")
+            )
+            file_id = created.job_file.job_file_id
+            await interviews.create_opening(session, file_id)
+        scope = ExecutionScope(file_id, uuid4(), ExecutionKind.CONSULTANT_TURN)
+        await executions.admit_execution(session, scope)
+        await interviews.accept_input(
+            session,
+            SubmitInterviewInput(file_id, uuid4(), "每月盤點庫存。"),
+            execution_id=scope.execution_id,
+        )
+        return await executions.claim_writer(session, scope, writer_id=uuid4())
+
+
+async def complete_turn(database: Database, writer: ExecutionWriter) -> None:
+    # Only source eligibility is under test here; full A completion is tested separately.
+    async with database.sessions.begin() as session:
+        await record_formal_interview(session, writer, reply_text="盤點發現異常怎麼處理？")
+        await executions.finish_execution(session, writer, ExecutionStatus.COMPLETED)
+
+
+async def role_context(
+    database: Database, writer: ExecutionWriter, stage: MemoryBatchPosition
+) -> ContextPosition:
+    role = (
+        AgentRole.WORK_SITUATION_ANALYST
+        if stage.phase == MemoryLayer.WORK_SITUATION
+        else AgentRole.WORK_UNDERSTANDING_ANALYST
+    )
+    async with database.sessions.begin() as session:
+        binding = await history.bind_context_history(session, writer, role)
+        if binding.prepared is None:
+            await history.adopt_prepared_context(
+                session,
+                writer,
+                role,
+                ContextPosition(
+                    context_thread_id(writer.scope, role, HistoryWindowKind.PREPARED_HISTORY),
+                    "prepared",
+                    HistoryWindowKind.PREPARED_HISTORY,
+                ),
+            )
+    root = context_thread_id(writer.scope, role, HistoryWindowKind.COMPLETED_WORK)
+    return ContextPosition(
+        f"{root}:stage:{stage.generation_id}:{stage.stage_id}",
+        "completed",
+        HistoryWindowKind.COMPLETED_WORK,
+    )
+
+
+def test_intent_requires_success_and_frontier_is_employee_not_reply(
+    database_settings: DatabaseSettings,
+) -> None:
+    async def scenario(database: Database) -> None:
+        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+
+        requests = MemoryConsolidationWorkflow(database.sessions)
+        cancelled = await start_turn(database)
+        command = uuid4()
+        assert await requests.request(cancelled, command) == await requests.request(
+            cancelled, command
+        )
+        assert await requests.discover() == ()
+        async with database.sessions.begin() as session:
+            await executions.finish_execution(session, cancelled, ExecutionStatus.CANCELLED)
+        assert await requests.discover() == ()
+        successful = await start_turn(database, cancelled.scope.job_file_id)
+        await requests.request(successful, uuid4())
+        await complete_turn(database, successful)
+        # No completion hook/wakeup is necessary to recover a persisted intent.
+        restarted = MemoryConsolidationWorkflow(database.sessions)
+        pending = await restarted.discover()
+        assert len(pending) == 1
+        work = await restarted.claim(pending[0], writer_id=uuid4())
+        assert work is not None
+        assert work.source_window.through_sequence == 2
+        assert work.source_window.covered_through_sequence == 0
+        later = await start_turn(database, cancelled.scope.job_file_id)
+        await requests.request(later, uuid4())
+        await complete_turn(database, later)
+        assert (await restarted.read_work(work.writer.scope)).source_window.through_sequence == 2
+
+    execute(database_settings, scenario)
+
+
+def test_parent_publishes_once_and_coalesces_next_frontier(
+    database_settings: DatabaseSettings,
+) -> None:
+    async def scenario(database: Database) -> None:
+        from caliburn.agents.memory_analysis.results import (
+            AnalysisComplete,
+            MemoryAnalysisResult,
+            SituationGap,
+        )
+        from caliburn.workflows.memory_batch import MemoryBatchWorkflow
+        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+
+        requests = MemoryConsolidationWorkflow(database.sessions)
+        turn = await start_turn(database)
+        await requests.request(turn, uuid4())
+        await complete_turn(database, turn)
+        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        assert work is not None
+        for _ in range(2):
+            later = await start_turn(database, turn.scope.job_file_id)
+            await requests.request(later, uuid4())
+            await complete_turn(database, later)
+        calls: list[MemoryLayer] = []
+        candidates = MemoryCandidateWorkflow(database.sessions)
+
+        async def run_role(
+            writer: ExecutionWriter,
+            stage: MemoryBatchPosition,
+            *,
+            previous: MemoryAnalysisResult | None = None,
+            gaps: tuple[SituationGap, ...] = (),
+            situation_changes: list[dict[str, JsonValue]] | None = None,
+        ) -> MemoryAnalysisResult:
+            calls.append(stage.phase)
+            if stage.phase == MemoryLayer.WORK_SITUATION:
+                edited = await candidates.edit(
+                    writer,
+                    CreateMemoryObject(
+                        uuid4(),
+                        stage,
+                        stage.phase,
+                        MemoryContent("盤點", "每月盤點", "核對帳物。"),
+                        frozenset({work.source_window.through_source_id}),
+                    ),
+                )
+                stage = edited.position
+                assert situation_changes is None
+            else:
+                assert situation_changes is not None and len(situation_changes) == 1
+                assert situation_changes[0]["change"] == "added"
+                assert situation_changes[0]["affected_understanding_titles"] == []
+                assert "核對帳物" in situation_changes[0]["diff"]
+            return MemoryAnalysisResult(
+                stage,
+                AnalysisComplete(status="complete"),
+                await role_context(database, writer, stage),
+            )
+
+        parent = MemoryBatchWorkflow(database.sessions, run_role=run_role)
+        published = await parent.run(work.writer)
+        assert published is not None and published.covered_through_sequence == 2
+        assert await parent.run(work.writer) == published
+        assert calls == [MemoryLayer.WORK_SITUATION, MemoryLayer.WORK_UNDERSTANDING]
+        pending = await requests.discover()
+        next_work = await requests.claim(pending[0], writer_id=uuid4())
+        assert next_work is not None
+        assert next_work.source_window.covered_through_sequence == 2
+        assert next_work.source_window.through_sequence == 6
+
+    execute(database_settings, scenario)
+
+
+def test_final_failure_blocks_repeated_notifications_not_consultant(
+    database_settings: DatabaseSettings,
+) -> None:
+    async def scenario(database: Database) -> None:
+        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+
+        requests = MemoryConsolidationWorkflow(database.sessions)
+        turn = await start_turn(database)
+        await requests.request(turn, uuid4())
+        await complete_turn(database, turn)
+        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        assert work is not None
+        await requests.fail(work.writer, reason="quota_exhausted")
+        later = await start_turn(database, turn.scope.job_file_id)
+        await requests.request(later, uuid4())
+        await complete_turn(database, later)
+        assert await MemoryConsolidationWorkflow(database.sessions).discover() == ()
+        assert (
+            await MemoryCandidateWorkflow(database.sessions).read_latest_snapshot(
+                turn.scope.job_file_id
+            )
+            is None
+        )
+        await requests.release_block(work.writer.scope, condition_change_id=uuid4())
+        next_work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        assert next_work is not None
+        assert next_work.source_window.covered_through_sequence == 0
+        assert next_work.source_window.through_sequence == 4
+
+    execute(database_settings, scenario)
+
+
+def test_reentry_after_b1_handoff_skips_b1_and_preserves_work(
+    database_settings: DatabaseSettings,
+) -> None:
+    async def scenario(database: Database) -> None:
+        from caliburn.agents.memory_analysis.results import (
+            AnalysisComplete,
+            MemoryAnalysisResult,
+            SituationGap,
+        )
+        from caliburn.workflows.memory_batch import MemoryBatchWorkflow
+        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+
+        requests = MemoryConsolidationWorkflow(database.sessions)
+        turn = await start_turn(database)
+        await requests.request(turn, uuid4())
+        await complete_turn(database, turn)
+        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        assert work is not None
+        calls: list[MemoryLayer] = []
+        interrupted = False
+
+        async def role(
+            writer: ExecutionWriter,
+            stage: MemoryBatchPosition,
+            *,
+            previous: MemoryAnalysisResult | None = None,
+            gaps: tuple[SituationGap, ...] = (),
+            situation_changes: list[dict[str, JsonValue]] | None = None,
+        ) -> MemoryAnalysisResult:
+            nonlocal interrupted
+            calls.append(stage.phase)
+            if stage.phase == MemoryLayer.WORK_UNDERSTANDING and not interrupted:
+                interrupted = True
+                raise ConnectionError("Synthetic worker interruption before B2")
+            return MemoryAnalysisResult(
+                stage,
+                AnalysisComplete(status="complete"),
+                await role_context(database, writer, stage),
+            )
+
+        with pytest.raises(ConnectionError):
+            await MemoryBatchWorkflow(database.sessions, run_role=role).run(work.writer)
+        resumed = await requests.claim(turn.scope.job_file_id, writer_id=uuid4())
+        assert resumed is not None and resumed.position.phase == MemoryLayer.WORK_UNDERSTANDING
+        result = await MemoryBatchWorkflow(database.sessions, run_role=role).run(resumed.writer)
+        assert result.covered_through_sequence == 2
+        assert calls.count(MemoryLayer.WORK_SITUATION) == 1
+        assert await requests.discover() == ()
+
+    execute(database_settings, scenario)
+
+
+def test_b2_gap_roundtrip_keeps_its_existing_understanding(
+    database_settings: DatabaseSettings,
+) -> None:
+    async def scenario(database: Database) -> None:
+        from caliburn.agents.memory_analysis.results import (
+            AnalysisComplete,
+            MemoryAnalysisResult,
+            SituationGap,
+            SituationRework,
+        )
+        from caliburn.workflows.memory_batch import MemoryBatchWorkflow
+        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+
+        requests = MemoryConsolidationWorkflow(database.sessions)
+        turn = await start_turn(database)
+        await requests.request(turn, uuid4())
+        await complete_turn(database, turn)
+        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        assert work is not None
+        candidates = MemoryCandidateWorkflow(database.sessions)
+        b2_calls = 0
+        saw_gap = False
+
+        async def role(
+            writer: ExecutionWriter,
+            stage: MemoryBatchPosition,
+            *,
+            previous: MemoryAnalysisResult | None = None,
+            gaps: tuple[SituationGap, ...] = (),
+            situation_changes: list[dict[str, JsonValue]] | None = None,
+        ) -> MemoryAnalysisResult:
+            nonlocal b2_calls, saw_gap
+            context = await role_context(database, writer, stage)
+            if stage.phase == MemoryLayer.WORK_SITUATION:
+                if gaps:
+                    assert gaps[0].target_title == "盤點"
+                    assert previous is not None and previous.stage.phase == stage.phase
+                    saw_gap = True
+            else:
+                b2_calls += 1
+                if b2_calls == 1:
+                    edited = await candidates.edit(
+                        writer,
+                        CreateMemoryObject(
+                            uuid4(),
+                            stage,
+                            stage.phase,
+                            MemoryContent("庫存管理", "盤點與回報", "頻率待確認。"),
+                        ),
+                    )
+                    return MemoryAnalysisResult(
+                        edited.position,
+                        SituationRework(
+                            status="needs_situation",
+                            gaps=(
+                                SituationGap(
+                                    target_title="盤點",
+                                    question="频率？",
+                                    needed_clarification="請核對原話中的月頻率",
+                                    interview_sequences=(2,),
+                                ),
+                            ),
+                        ),
+                        context,
+                    )
+                entries = await candidates.read_map(writer.scope, stage=stage, layer=stage.phase)
+                assert [item.title for item in entries] == ["庫存管理"]
+                assert previous is not None and previous.stage.phase == stage.phase
+            return MemoryAnalysisResult(stage, AnalysisComplete(status="complete"), context)
+
+        result = await MemoryBatchWorkflow(database.sessions, run_role=role).run(work.writer)
+        assert result.covered_through_sequence == 2 and saw_gap and b2_calls == 2
+
+    execute(database_settings, scenario)

@@ -3,7 +3,10 @@
 import os
 import re
 from dataclasses import dataclass, field
+from decimal import Decimal
+from pathlib import Path
 
+from openai.types.shared.reasoning_effort import ReasoningEffort
 from sqlalchemy.engine import URL, make_url
 
 
@@ -24,17 +27,81 @@ class DatabaseSettings:
 
 
 @dataclass(frozen=True, slots=True)
+class ModelSettings:
+    """Researched direct model and bounded operational defaults; no provider fallback."""
+
+    api_key: str = field(repr=False)
+    model: str = "gpt-6-luna"
+    reasoning_effort: ReasoningEffort = "medium"
+    max_output_tokens: int = 16_384
+    max_model_steps: int = 64
+    max_tool_calls_per_step: int = 32
+    max_attempts_per_request: int = 5
+    max_outbound_attempts: int = 512
+    max_compactions: int = 4
+    turn_timeout_seconds: int = 900
+    request_timeout_seconds: float = 120.0
+    max_cost_usd: Decimal = Decimal("1.00")
+
+    def __post_init__(self) -> None:
+        if not self.api_key.strip() or self.model != "gpt-6-luna":
+            raise ValueError(
+                "Configure an OpenAI key and a model with a researched capacity policy"
+            )
+        if self.reasoning_effort not in {"none", "low", "medium", "high", "xhigh", "max"}:
+            raise ValueError("Unsupported reasoning effort")
+        for value in (
+            self.max_output_tokens,
+            self.max_model_steps,
+            self.max_tool_calls_per_step,
+            self.max_attempts_per_request,
+            self.max_outbound_attempts,
+            self.max_compactions,
+            self.turn_timeout_seconds,
+        ):
+            if type(value) is not int or value < 1:
+                raise ValueError("Model limits must be positive integers")
+        if self.max_output_tokens > 128_000 or not 0 < self.request_timeout_seconds <= 900:
+            raise ValueError("Model output or timeout exceeds the configured capacity")
+        if not self.max_cost_usd.is_finite() or self.max_cost_usd <= 0:
+            raise ValueError("Configure a finite positive per-Turn cost budget")
+
+
+@dataclass(frozen=True, slots=True)
+class PdfSettings:
+    font_path: Path
+    executable_path: Path | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class Settings:
     database: DatabaseSettings | None = None
+    model: ModelSettings | None = None
+    pdf: PdfSettings | None = None
 
     @classmethod
     def from_environment(cls) -> Settings:
         database_url = os.environ.get("CALIBURN_DATABASE_URL")
-        if not database_url:
-            return cls()
+        openai_key = os.environ.get("OPENAI_API_KEY")
+        pdf_font = os.environ.get("CALIBURN_PDF_FONT_PATH")
+        pdf_browser = os.environ.get("CALIBURN_PDF_CHROMIUM_PATH")
         return cls(
             database=DatabaseSettings(
                 url=database_url,
                 schema=os.environ.get("CALIBURN_DATABASE_SCHEMA", "caliburn"),
             )
+            if database_url
+            else None,
+            model=ModelSettings(
+                api_key=openai_key,
+                max_cost_usd=Decimal(os.environ.get("CALIBURN_TURN_MAX_COST_USD", "1.00")),
+            )
+            if openai_key
+            else None,
+            pdf=PdfSettings(
+                font_path=Path(pdf_font),
+                executable_path=Path(pdf_browser) if pdf_browser else None,
+            )
+            if pdf_font
+            else None,
         )

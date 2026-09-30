@@ -518,3 +518,7 @@ $env:PYTHONUTF8='1'
 **修正（單一分類點，沒有新機制）：**串流錯誤事件與 HTTP 狀態錯誤共用同一組封鎖與容量代碼判斷；只有 `rate_limit_exceeded`、`server_error`、`server_is_overloaded`、`slow_down`、`service_unavailable` 視為暫時性，交給既有的有界重試、額度與 `retry_not_before`；沒有這些代碼或讀不到明確代碼的仍終止，不猜為可重試。重試前沒有已保存的原結果與工具效果，重送安全；失敗的嘗試與其預留仍保留在原預算。
 
 **限制：**是依 OpenAI 實際回傳的欄位與 SDK 3.20.0 行為修正，代碼清單只含目前見到與文件記載的暫時性類型；串流事件的官方完整錯誤代碼表未逐項核對。限額本身不消失：重試最多依原政策（每請求 5 次、退避 1–30 秒），持續限流仍會使 Turn 失敗，評測改為低並行避免長時間貼著限額。
+
+**後續（同日，修正上面之後仍有 Turn 失敗）：**改成一次只跑一個訪談後，Turn 仍偶爾失敗，失敗紀錄是**同一請求連續 5 次 `transient_service`、約 20 秒內用盡**，且發生時都有背景整理批次同時在跑（修正後這是被重試而非直接失敗，證明分類修正有效，但重試耐心不足）。讀回應標頭確認帳號對 `gpt-6-luna` 是 **200,000 token／分鐘、500 請求／分鐘**；官方[限流指南](https://developers.openai.com/api/docs/guides/rate-limits)（經工具轉述，未逐字核對原頁）說限流用量取 `max(max_tokens, 依字元估算的輸入)`，且**失敗的請求也計入每分鐘額度**，建議降低 `max_tokens` 與退避重試。我們的 A 請求輸入約一萬多 token（14 個工具的 schema 就佔大宗）、`max_output_tokens=16,384`，一個訪談加背景整理很容易貼近上限。
+
+取捨：降低 `max_output_tokens` 收益有限（輸入本身已接近 16K），且截斷（`incomplete`）會讓整個 Turn 失敗，風險大於收益，維持 16,384。改的是**重試耐心**：預設初始退避 1 秒→2 秒、每請求上限 5 次→8 次，最短總等待由約 11 秒增至約 90 秒（先寫測試 `test_default_schedule_outlasts_a_one_minute_rate_limit_window`，修改前 **1 failed**：`assert 11.25 >= 60`；同步兩個以舊預設數字當例子的既有測例）。相關 unit／contracts／重試與預算整合 **1134 passed**。限制：更高的 TPM 等級才是根本解；這只讓單一使用者的訪談在偶發限流下撐得過去，持續超量仍會失敗；沒有做用戶端節流或依 `x-ratelimit-reset-tokens` 的精準等待（HTTP 429 有 header 時仍用既有的 `Retry-After` 邏輯）。

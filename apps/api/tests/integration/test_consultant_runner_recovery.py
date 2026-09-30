@@ -3,6 +3,7 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import replace
+from uuid import uuid4
 
 import httpx2
 import pytest
@@ -10,13 +11,18 @@ from fastapi.testclient import TestClient
 from psycopg.errors import UndefinedTable
 
 from caliburn.adapters.openai_responses import create_responses_client
-from caliburn.agent_execution.tool_steps import InputCountSaveError, ResponseStepSaveError
+from caliburn.agent_execution.tool_steps import (
+    InputCountSaveError,
+    PausedResponseLoop,
+    ResponseStepSaveError,
+)
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionStateError, ExecutionStatus
 from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import ModelSettings
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_controls import run_consultant_with_controls
 from tests.integration.test_jd_source_edits import start
 from tests.unit.test_response_loop import response_at
 from tests.unit.test_result_save_retries import TransientResultFault
@@ -119,7 +125,13 @@ def test_held_result_cannot_restart_a_cancelled_turn(client: TestClient) -> None
             completion = ConsultantCompletionWorkflow(client.app.state.database.sessions)
             await completion.stop(writer, ExecutionStatus.CANCELLED)
             with pytest.raises(ExecutionStateError):
-                await runner.run_supervised(writer, recovery=failed.value.recovery)
+                await run_consultant_with_controls(
+                    writer,
+                    sessions=runner.sessions,
+                    checkpointer=runner.checkpointer,
+                    run=runner.run_supervised,
+                    recovery=failed.value.recovery,
+                )
             assert calls == ["/v1/responses/input_tokens", "/v1/responses"]
             async with client.app.state.database.sessions() as session:
                 assert (
@@ -129,3 +141,65 @@ def test_held_result_cannot_restart_a_cancelled_turn(client: TestClient) -> None
     client.portal.call(scenario)
     history = client.get(f"/api/job-files/{writer.scope.job_file_id}/interviews").json()
     assert len(history["messages"]) == 1
+
+
+@pytest.mark.parametrize("pause_requested", [False, True])
+@pytest.mark.parametrize(
+    ("channel", "failure_type"),
+    [("response_snapshot", ResponseStepSaveError), ("input_count", InputCountSaveError)],
+)
+def test_supervised_handoff_preserves_original_response_and_pending_pause(
+    client: TestClient,
+    pause_requested: bool,
+    channel: str,
+    failure_type: type[ResponseStepSaveError | InputCountSaveError],
+) -> None:
+    """A process-local saved-result handoff must survive the production control wrapper."""
+    writer = start(client)
+
+    async def scenario() -> None:
+        async with faulting_runner(client, channel) as (runner, calls):
+            with pytest.raises(failure_type) as failed:
+                await run_consultant_with_controls(
+                    writer,
+                    sessions=runner.sessions,
+                    checkpointer=runner.checkpointer,
+                    run=runner.run_supervised,
+                )
+            async with runner.sessions.begin() as session:
+                if pause_requested:
+                    await executions.request_pause(session, writer.scope)
+                replacement = await executions.claim_writer(
+                    session, writer.scope, writer_id=uuid4(), replaces_writer_id=writer.writer_id
+                )
+            result = await run_consultant_with_controls(
+                replacement,
+                sessions=runner.sessions,
+                checkpointer=runner.checkpointer,
+                run=runner.run_supervised,
+                recovery=failed.value.recovery,
+            )
+            if pause_requested:
+                assert isinstance(result, PausedResponseLoop)
+                async with runner.sessions() as session:
+                    assert (
+                        await executions.read_execution(session, writer.scope)
+                    ).status == ExecutionStatus.PAUSED
+                async with runner.sessions.begin() as session:
+                    await executions.resume_execution(session, replacement)
+                # Once adopted, the handoff is consumed. Explicit resume uses the
+                # saved interrupt, not another copy of the earlier model result.
+                result = await run_consultant_with_controls(
+                    replacement,
+                    sessions=runner.sessions,
+                    checkpointer=runner.checkpointer,
+                    run=runner.run_supervised,
+                )
+                assert isinstance(result, FormalInterviewExchange)
+                assert result.consultant_reply.interview_text == ORIGINAL_REPLY
+            else:
+                assert isinstance(result, FormalInterviewExchange)
+                assert result.consultant_reply.interview_text == ORIGINAL_REPLY
+            assert calls == ["/v1/responses/input_tokens", "/v1/responses"]
+
+    client.portal.call(scenario)

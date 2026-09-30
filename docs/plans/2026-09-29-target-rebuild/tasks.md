@@ -104,6 +104,7 @@
 ## T08 A Turn：固定資料、正式完成與控制
 
 - [ ] T08；依賴：T02、T06、T07。
+- **控制入口恢復增量：**typed 原件可交回既有 runner；換 writer、pending pause／續作、取消保護有定向證據，見 [T08 §6](evidence/t08-consultant-turn.md#6-原件交接穿過正式控制入口2026-09-30)。尚非 supervisor 自動交回／跨程序遺失再准入完成。
 - **最新整合：**`76f99867` 接通正式完成／控制、原生接續、背景要求與公開歷史；三輪真模型、兩批 Memory、暫停重開同輪續作、902 unit/contracts、725 PG integration（另補兩項真 Chromium）及重啟證據見 [T08 §5](evidence/t08-consultant-turn.md#5-顧問--背景整理的整合2026-09-30-1057-台北)。未知 attempt 的 production 核對接線、廣泛故障／品質仍未完成。
 - **2026-09-30 第一切片：**固定起始資料、共用模型／工具 loop、正式答覆／JD／歷史共同完成及 HTTP 派送通過合成 provider＋真 PG；缺模型設定不接受無法執行的輸入。控制、公開進度、背景要求及真 provider 仍待接線，見 [T08／T09 evidence](evidence/t08-consultant-turn.md)，不提前勾完成。
 - **契約：**[A context](../../specs/2026-09-26-consultant-context-and-state-design.md)、[閉環](../../specs/2026-09-29-core-value-loop-lifecycle.md)、[資料接線](../../implementation/data-and-contracts.md)。

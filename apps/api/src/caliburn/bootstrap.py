@@ -178,7 +178,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 await database.close()
 
     app = FastAPI(title="Caliburn", version="0.1.0", lifespan=lifespan)
-    app.add_middleware(LocalHttpSecurityMiddleware)
+    app.add_middleware(LocalHttpSecurityMiddleware, dev_origin=configured.dev_origin)
     app.include_router(health_router)
     app.include_router(job_file_router)
     app.include_router(interview_input_router)

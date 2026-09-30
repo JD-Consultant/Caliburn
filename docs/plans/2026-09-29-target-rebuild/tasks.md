@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**Owner 要求安全點暫停；T01–T05 已完成；T06–T11、T13–T15 已有施工／局部驗證，完整 gate 仍未完成**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。恢復入口見[暫停交接](evidence/2026-09-30-pause-handoff.md)。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**Goal 已恢復 active；T01–T05 已完成；T06–T11、T13–T15 已有施工／局部驗證，完整 gate 仍未完成**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。先前安全點與已驗範圍保留於[暫停交接](evidence/2026-09-30-pause-handoff.md)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -179,6 +179,7 @@
 ## T15 安全、容量與維護性審查
 
 - [ ] T15；依賴：T12、T13。
+- **2026-09-30 UI 交接修正：**隔離 Vite proxy 改為保留原 Origin，後端可顯式配置一個精確 loopback dev Origin；預設安全邊界不變。新增 red→green 代理與配置測試、原安全測例回歸見 [HTTP 證據](evidence/t15-local-http-security.md#隔離前端的來源保留修正2026-09-30)。僅修此接縫，不勾選整個 T15。
 - **契約：**[運作責任](../../architecture/delivery-and-operations.md)、[程式規範](../../implementation/code-organization.md)、V24／V26／V27。
 - **程式／交付：**同源／Host、敏感 log、prompt injection／跨檔案反例；大資料投影量測；import 邊界、慢查詢與實際保存容量報告。
 - **Red：**偽造 tool 範圍、user-role 內容誘使越權、history JSON 洩漏密鑰、前端不同檔案 cache 串用、compact 後清掉回退／公開歷史依據。

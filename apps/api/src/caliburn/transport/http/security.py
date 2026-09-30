@@ -36,8 +36,16 @@ class LocalHttpSecurityMiddleware:
     process that can forge headers, or script running in the trusted UI origin.
     """
 
-    def __init__(self, app: ASGIApp) -> None:
+    def __init__(self, app: ASGIApp, *, dev_origin: str | None = None) -> None:
         self._app = app
+        # Settings validates the optional origin at startup. Keep trust per app,
+        # never mutate global defaults when an isolated test server is created.
+        # Browser Origin serialization omits the default HTTP port.
+        if dev_origin is not None:
+            dev_origin = dev_origin.removesuffix(":80")
+        self._allowed_origins = (
+            _LOCAL_ORIGINS | {dev_origin} if dev_origin is not None else _LOCAL_ORIGINS
+        )
         self._host_guard = TrustedHostMiddleware(
             self._check_request, allowed_hosts=_LOCAL_HOSTS, www_redirect=False
         )
@@ -49,7 +57,9 @@ class LocalHttpSecurityMiddleware:
         await self._host_guard(scope, receive, send)
 
     async def _check_request(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] == "http" and not _request_allowed(Headers(scope=scope), scope["method"]):
+        if scope["type"] == "http" and not _request_allowed(
+            Headers(scope=scope), scope["method"], self._allowed_origins
+        ):
             await PlainTextResponse(
                 "Local request provenance required",
                 status_code=403,
@@ -59,9 +69,9 @@ class LocalHttpSecurityMiddleware:
         await self._app(scope, receive, send)
 
 
-def _request_allowed(headers: Headers, method: str) -> bool:
+def _request_allowed(headers: Headers, method: str, allowed_origins: frozenset[str]) -> bool:
     origins = headers.getlist("origin")
-    if len(origins) > 1 or (origins and origins[0] not in _LOCAL_ORIGINS):
+    if len(origins) > 1 or (origins and origins[0] not in allowed_origins):
         return False
     if method in _SAFE_METHODS:
         return True

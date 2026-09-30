@@ -8,6 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:proxy": "node --test scripts/dev-proxy.test.mjs",
     "test:e2e": "playwright test",
     "lint": "eslint .",
     "format:check": "prettier --check src tests scripts *.json *.ts *.js index.html",

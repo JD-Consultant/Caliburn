@@ -85,3 +85,39 @@ $env:PYTHONDONTWRITEBYTECODE='1'
 結果 **163 passed，60.40s**，涵蓋共用 HTTP fixture 的建檔／改名、輸入准入與 F2 重送、無正文 pause／resume／cancel、範圍拒絕、正式歷史、JD 編輯／讀取／匯出、migration 啟動 gate，以及 A→Memory 發布→下一輪固定快照的合成 provider 旅程。8 個本次變更測試檔的 Ruff check／format check 通過，相關 tracked diff 無 whitespace error。
 
 production allowlist 未增加 `testserver` 或任何例外；本次沒有改 middleware policy、bootstrap、F2 owner、schema、generated、registry 或 runner。仍未重跑完整 PG suite／真瀏覽器；未 commit。
+
+## 隔離前端的來源保留修正（2026-09-30）
+
+UI 交接的 `7d8d7eb4` 為第二組 Vite 加入 `CALIBURN_API_PROXY`，但同時將所有請求的 Origin 改寫成受信任的 5173。真 Vite→臨時 HTTP server 反例顯示：未允許的 9999、真正的 5174、原本沒有 Origin，三者都變成 5173。這破壞後端的來源判斷；不是所有 cross-site 請求都因此通過，因 Fetch Metadata 的拒絕仍在。Demo 未設該 proxy override，這不是 Demo 已被利用的證據。
+
+重新核對 [OWASP 的來源檢查與 proxy 配置建議](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#using-standard-headers-to-verify-origin)：來源判斷須保留真實來源，環境可在伺服器端明確配置。Caliburn 採最小修正：
+
+- Vite 只選擇 API target，不改寫／補上 Origin；Fetch Metadata 同樣沿原請求傳送。
+- `Settings.dev_origin`／`CALIBURN_DEV_ORIGIN` 可選擇增加一個精確 HTTP loopback Origin，由 Settings 在啟動前驗證 hostname、語法與 1–65535 埠；不可帶 path、userinfo、query、fragment、wildcard 或多個 origin。
+- `create_app` 傳入該配置；middleware 的 allowlist 是每個 app 的 immutable set，不污染預設六個 Origin，也不取消 Host、cross-site 或 ambiguous header 防護。constructor 新增選用 keyword `dev_origin`，無參數接法相容。
+- 不新增 CORS、外部認證、DB、model 或 frontend security owner。隔離環境的設定步驟由 App README 維護。
+
+這更新前文「Vite 只能固定 5173」的操作限制：預設仍固定；其他埠只能經精確啟動設定允許，不能由 proxy 偽裝來源。
+
+### 本片 Red–Green 與驗證
+
+- 先寫 `test_dev_origin_settings.py`：**15 failed**，其中三種 loopback 配置未生效（403≠200）、12 種非法配置未在啟動拒絕。修正後連既有安全／bootstrap／settings 共 **72 passed**。
+- 先寫 `scripts/dev-proxy.test.mjs`，依 [Vite JavaScript API](https://vite.dev/guide/api-javascript.html) 啟動實際 `vite.config.ts` 與臨時 echo backend：三個原始標頭案例均失敗，實際收到 5173。移除 rewrite 後三個子測例全過（Node runner 含父項 **4 passed**）。不是 config 字串比對，也不連 Demo。獨立 cache／臨時埠，完成即關閉自有 server。
+- Ruff check／format、scoped mypy（settings、security）及前端此片 ESLint／Prettier 通過。初次 Node sandbox `spawn EPERM` 是環境失敗，重用相同測例於准許的本機執行後才取得上述有效 red／green。
+
+```powershell
+# apps/api
+.venv-target/Scripts/python.exe -m pytest tests/unit/test_dev_origin_settings.py tests/unit/test_local_http_security.py tests/unit/test_bootstrap.py tests/unit/test_settings.py -q --tb=short -p no:cacheprovider
+.venv-target/Scripts/python.exe -m ruff check src/caliburn/settings.py src/caliburn/transport/http/security.py src/caliburn/bootstrap.py tests/unit/test_dev_origin_settings.py
+.venv-target/Scripts/python.exe -m mypy src/caliburn/settings.py src/caliburn/transport/http/security.py --follow-imports=silent
+# apps/web（使用既有 Node 24／pnpm）
+pnpm test:proxy
+```
+
+本片未動資料 owner，沒有真 PG／付費模型請求；沒有重跑完整 UI e2e 或宣告整個安全 gate 完成。先前 UI 的 15/17 瀏覽器結果保留原證據與限制，不冒充本次回歸。
+
+### 獨立審核補正
+
+獨立 reviewer 確認核心 Origin 修正成立，另指出明確配置 `http://localhost:80` 與瀏覽器實送 `http://localhost` 不同。主線依 [WHATWG URL 預設埠](https://url.spec.whatwg.org/#default-port) 核對，先新增三種 loopback host 的反例，得到 **3 failed（403≠200）**。Settings 仍要求明確配置埠；middleware 只將已驗證配置的 `:80` 正規化為瀏覽器使用的 Origin 後加入精確集合，不放寬其他埠，亦不改写請求。原 72 項加此 3 項列入最後整合回歸。
+
+主線修正後與 T09 current Turn 切片合併執行：安全／bootstrap／settings **75 項**＋相關 PG／contract **55 項**，共 **130 passed，21.87s**。這次 PG 是 T09 切片的隔離測試，不是安全修正新增 DB 邏輯。兩片 Ruff check 與 scoped mypy（6 source files）通過；獨立 reviewer 複核此修正後無未解決發現。沒有重啟 Demo 或操作 Demo 資料。

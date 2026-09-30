@@ -55,4 +55,6 @@ pnpm --filter @caliburn/frontend test:e2e
 
 Playwright 依 lock 的 Chromium 版本執行，另開隔離 context、不使用個人瀏覽器 profile。若安裝器受環境限制，`CALIBURN_E2E_CHROMIUM_PATH` 可明確提供已核對該 release 版本的 binary；未驗的跨版本不能視為等價證據。`test-results` 的故障 trace／截圖不入版控，僅供合成測試，避免對真實員工資料留無限紀錄。
 
-目前 `tests/e2e` 驗建立／同名選取／reload／鍵盤／窄螢幕、列表改名不改訪談／姓名、POST 真提交後故意丟回應再確認、舊改名重送不覆蓋較新名稱、列表連線失敗；另驗 JD 四欄／局部清空、職責／任務 CRUD／排序／移動、刪職責保留任務、共用知識／技能 CRUD 及多任務使用、反向用途、獨立排序、共用修訂刷新、協作與條件 CRUD／更正分類、過期基底與 A 准入拒絕新人工修改，以及 JD 提交回應遺失後沿原命令確認且呈現最新稿。後端是真 PostgreSQL；fault injection 用 Playwright network routing，不以 mock 成功回應代替 DB 提交。此 gate 不驗模型、A Turn／Memory 恢復、完整安全、PDF 或品質。
+目前 `tests/e2e` 驗建立／同名選取／reload／鍵盤／窄螢幕、列表改名不改訪談／姓名、POST 真提交後故意丟回應再確認、舊改名重送不覆蓋較新名稱、列表連線失敗；另驗 JD 四欄／局部清空、職責／任務 CRUD／排序／移動、刪職責保留任務、共用知識／技能 CRUD 及多任務使用、反向用途、獨立排序、共用修訂刷新、協作與條件 CRUD／更正分類、過期基底與 A 准入拒絕新人工修改，以及 JD 提交回應遺失後沿原命令確認且呈現最新稿。後端是真 PostgreSQL；fault injection 用 Playwright network routing，不以 mock 成功回應代替 DB 提交。此 gate 不驗模型品質、Memory 恢復或完整安全。
+
+顧問處理中的畫面行為（即時公開訊息、JD 唯讀、重開與另一分頁找回、暫停／續作、取消、被拒絕、PDF）用 `consultant-journey.spec.ts`，對象是**腳本化模型的隔離後端**（`apps/api/tests/fixtures/scripted_backend.py`，只替換 SDK 的 HTTP transport，其餘為真後端與 PostgreSQL），需另設 `CALIBURN_E2E_SCRIPT_URL`；沒設就 skip，skip 不代表通過。它是合成替身，不驗模型品質。步驟與結果見 [T09 旅程證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t09-consultant-journeys.md)。

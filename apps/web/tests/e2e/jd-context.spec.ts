@@ -84,6 +84,10 @@ test('協作與共通條件增修刪、分類內排序、更正分類、重開�
         )[0]?.text,
     )
     .toBe('必要時配合跨區會議。');
+  // The API already has the new order; edit only after the page has rendered it too.
+  await expect(page.getByRole('article', { name: '工時與出差 1' })).toContainText(
+    '必要時配合跨區會議。',
+  );
   const secondCondition = page.getByRole('article', { name: '工時與出差 2' });
   await secondCondition.getByRole('button', { name: '編輯條件' }).click();
   await page.getByRole('combobox', { name: '條件分類' }).click();

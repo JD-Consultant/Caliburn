@@ -13,18 +13,24 @@ import { CapabilitiesSection } from './CapabilitiesSection';
 import { TaskCapabilities } from './TaskCapabilities';
 import { CollaboratorsSection } from './CollaboratorsSection';
 import { ConditionsSection } from './ConditionsSection';
+import { detailTarget, itemTarget, useSourceBadge } from './source-badge-context';
+import { IconAction } from '../../shared/ui/IconAction';
+import { AddIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon, EditIcon } from '../../shared/ui/icons';
 
 function TaskDetails({
+  taskId,
   label,
   details,
   disabled,
   onMove,
 }: {
+  taskId: string;
   label: string;
   details: Detail[];
   disabled: boolean;
   onMove: (detailId: string, beforeId: string | null) => void;
 }) {
+  const badge = useSourceBadge();
   return (
     <Box>
       <Typography component="h5" variant="subtitle2">
@@ -35,26 +41,31 @@ function TaskDetails({
       ) : (
         <Box component="ol" sx={{ pl: 3, my: 1 }}>
           {details.map((detail, index) => (
-            <li key={detail.detail_id}>
-              <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+            <li key={detail.detail_id} className="item">
+              <Typography
+                sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', display: 'inline' }}
+              >
                 {detail.text}
               </Typography>
-              <Button
-                size="small"
-                disabled={disabled || index === 0}
-                aria-label={`上移${label} ${String(index + 1)}`}
-                onClick={() => onMove(detail.detail_id, details[index - 1]?.detail_id ?? null)}
-              >
-                上移
-              </Button>
-              <Button
-                size="small"
-                disabled={disabled || index === details.length - 1}
-                aria-label={`下移${label} ${String(index + 1)}`}
-                onClick={() => onMove(detail.detail_id, details[index + 2]?.detail_id ?? null)}
-              >
-                下移
-              </Button>
+              {badge(detailTarget(taskId, detail.detail_id))}
+              <span className="item-actions">
+                <Button
+                  size="small"
+                  disabled={disabled || index === 0}
+                  aria-label={`上移${label} ${String(index + 1)}`}
+                  onClick={() => onMove(detail.detail_id, details[index - 1]?.detail_id ?? null)}
+                >
+                  上移
+                </Button>
+                <Button
+                  size="small"
+                  disabled={disabled || index === details.length - 1}
+                  aria-label={`下移${label} ${String(index + 1)}`}
+                  onClick={() => onMove(detail.detail_id, details[index + 2]?.detail_id ?? null)}
+                >
+                  下移
+                </Button>
+              </span>
             </li>
           ))}
         </Box>
@@ -83,6 +94,7 @@ function TaskCard({
   onChange: (intent: WorkIntent) => void;
 }) {
   const name = task.title ?? '尚未命名的任務';
+  const badge = useSourceBadge();
   function move(beforeId: string | null): void {
     onChange({
       collection: 'tasks',
@@ -107,50 +119,62 @@ function TaskCard({
     });
   }
   return (
-    <Paper
-      variant="outlined"
+    <Box
       component="article"
       id={`jd-task-${task.task_id}`}
       aria-label={name}
-      sx={{ p: 2, scrollMarginTop: 16 }}
+      sx={{ pt: 2, borderTop: 1, borderColor: 'divider', scrollMarginTop: 16 }}
     >
-      <Stack spacing={1}>
-        <Typography variant="subtitle1" component="h4">
-          {name}
-        </Typography>
+      <Stack spacing={1} className="item">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+          <Typography variant="subtitle1" component="h4">
+            {name}
+          </Typography>
+          {badge(itemTarget('task', task.task_id))}
+        </Stack>
         <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
           {task.description ?? '工作內容尚未提供'}
         </Typography>
-        <Stack direction="row" sx={{ flexWrap: 'wrap' }}>
-          <Button
+        <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
+          <IconAction
+            label="編輯任務"
             disabled={disabled}
             onClick={() => onEdit({ kind: 'task', baseline, task, areaId: task.area_id })}
           >
-            編輯任務
-          </Button>
-          <Button
+            <EditIcon />
+          </IconAction>
+          <IconAction
+            label="上移任務"
             disabled={disabled || index === 0}
             onClick={() => move(group[index - 1]?.task_id ?? null)}
           >
-            上移任務
-          </Button>
-          <Button
+            <ArrowUpIcon />
+          </IconAction>
+          <IconAction
+            label="下移任務"
             disabled={disabled || index === group.length - 1}
             onClick={() => move(group[index + 2]?.task_id ?? null)}
           >
-            下移任務
-          </Button>
-          <Button color="error" disabled={disabled} onClick={() => onDelete(task)}>
-            刪除任務
-          </Button>
+            <ArrowDownIcon />
+          </IconAction>
+          <IconAction
+            label="刪除任務"
+            color="error"
+            disabled={disabled}
+            onClick={() => onDelete(task)}
+          >
+            <DeleteIcon />
+          </IconAction>
         </Stack>
         <TaskDetails
+          taskId={task.task_id}
           label="工作成果"
           details={task.outcomes}
           disabled={disabled}
           onMove={reorderDetail}
         />
         <TaskDetails
+          taskId={task.task_id}
           label="工作要求"
           details={task.requirements}
           disabled={disabled}
@@ -163,16 +187,24 @@ function TaskCard({
           onChange={onChange}
         />
       </Stack>
-    </Paper>
+    </Box>
   );
 }
 
-export function JdWorkEditor({ jobFileId }: { jobFileId: string }) {
+export function JdWorkEditor({
+  jobFileId,
+  readOnly = false,
+}: {
+  jobFileId: string;
+  /** A Turn owns the JD: show it, but offer no manual edit (the App also refuses writes). */
+  readOnly?: boolean;
+}) {
   const work = useQuery(jdWorkQuery(jobFileId));
   const [editing, setEditing] = useState<WorkEditing | null>(null);
   const command = useWorkCommand(jobFileId, () => setEditing(null));
+  const badge = useSourceBadge();
   const current = work.data;
-  const disabled = command.locked || work.isFetching || work.isError;
+  const disabled = command.locked || work.isFetching || work.isError || readOnly;
 
   function submitIntent(intent: WorkIntent): void {
     if (current && !disabled) void command.send(commandFor(current.revision_id, intent));
@@ -213,6 +245,8 @@ export function JdWorkEditor({ jobFileId }: { jobFileId: string }) {
         ))}
         <div>
           <Button
+            size="small"
+            startIcon={<AddIcon />}
             disabled={disabled}
             onClick={() => setEditing({ kind: 'task', baseline: current, areaId })}
           >
@@ -263,6 +297,8 @@ export function JdWorkEditor({ jobFileId }: { jobFileId: string }) {
           <>
             <div>
               <Button
+                size="small"
+                startIcon={<AddIcon />}
                 variant="outlined"
                 disabled={disabled}
                 onClick={() => setEditing({ kind: 'area', baseline: current })}
@@ -279,21 +315,30 @@ export function JdWorkEditor({ jobFileId }: { jobFileId: string }) {
                 aria-label={area.title ?? '尚未命名的職責'}
                 sx={{ p: { xs: 1.5, sm: 2 } }}
               >
-                <Stack spacing={2}>
-                  <Typography component="h3" variant="h6">
-                    {area.title ?? '尚未命名的職責'}
-                  </Typography>
+                <Stack spacing={2} className="item">
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{ alignItems: 'center', flexWrap: 'wrap' }}
+                  >
+                    <Typography component="h3" variant="h6">
+                      {area.title ?? '尚未命名的職責'}
+                    </Typography>
+                    {badge(itemTarget('area', area.area_id))}
+                  </Stack>
                   <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
                     {area.scope_text ?? '職責範圍尚未提供'}
                   </Typography>
-                  <Stack direction="row" sx={{ flexWrap: 'wrap' }}>
-                    <Button
+                  <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
+                    <IconAction
+                      label="編輯職責"
                       disabled={disabled}
                       onClick={() => setEditing({ kind: 'area', baseline: current, area })}
                     >
-                      編輯職責
-                    </Button>
-                    <Button
+                      <EditIcon />
+                    </IconAction>
+                    <IconAction
+                      label="上移職責"
                       disabled={disabled || index === 0}
                       onClick={() =>
                         submitIntent({
@@ -306,9 +351,10 @@ export function JdWorkEditor({ jobFileId }: { jobFileId: string }) {
                         })
                       }
                     >
-                      上移職責
-                    </Button>
-                    <Button
+                      <ArrowUpIcon />
+                    </IconAction>
+                    <IconAction
+                      label="下移職責"
                       disabled={disabled || index === current.areas.length - 1}
                       onClick={() =>
                         submitIntent({
@@ -321,9 +367,10 @@ export function JdWorkEditor({ jobFileId }: { jobFileId: string }) {
                         })
                       }
                     >
-                      下移職責
-                    </Button>
-                    <Button
+                      <ArrowDownIcon />
+                    </IconAction>
+                    <IconAction
+                      label="刪除職責"
                       color="error"
                       disabled={disabled}
                       onClick={() =>
@@ -337,8 +384,8 @@ export function JdWorkEditor({ jobFileId }: { jobFileId: string }) {
                         )
                       }
                     >
-                      刪除職責
-                    </Button>
+                      <DeleteIcon />
+                    </IconAction>
                   </Stack>
                   {renderTasks(area.area_id)}
                 </Stack>

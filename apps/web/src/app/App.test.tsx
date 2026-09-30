@@ -410,10 +410,13 @@ test('cancelling a candidate removes only the preview and keeps the formal JD', 
   renderApp(`/job-files/${firstFile.job_file_id}`);
   expect(await screen.findByRole('region', { name: 'JD 候選預覽' })).toBeVisible();
   expect(screen.getByText('候選工程師')).toBeVisible();
-  expect(await screen.findByText('原正式工程師')).toBeVisible();
   expect(
     screen.getByText('尚未正式保存；完成前不會取代正式 JD，PDF 仍匯出正式版本。'),
   ).toBeVisible();
+  // The candidate is a separate view: the formal draft is one click away and never replaced.
+  await userEvent.click(screen.getByRole('button', { name: '正式稿' }));
+  expect(await screen.findByText('原正式工程師')).toBeVisible();
+  expect(screen.queryByRole('region', { name: 'JD 候選預覽' })).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'JD 基本資料' })).toBeVisible();
   await userEvent.click(screen.getByRole('button', { name: '取消處理' }));
   expect(await screen.findByText(/這次處理已取消/, {}, { timeout: 3_000 })).toBeVisible();

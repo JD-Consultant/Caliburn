@@ -3,6 +3,9 @@ import { Box, Button, Link, Paper, Stack, Typography } from '@mui/material';
 import type { Capability, JdWorkView } from '../../shared/api/generated/jd-work-view';
 import type { WorkIntent } from './jd-work-api';
 import type { WorkEditing } from './WorkEditDialog';
+import { itemTarget, useSourceBadge } from './source-badge-context';
+import { IconAction } from '../../shared/ui/IconAction';
+import { AddIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon, EditIcon } from '../../shared/ui/icons';
 
 interface Props {
   kind: Capability['kind'];
@@ -22,6 +25,7 @@ export function CapabilitiesSection({
   onDelete,
 }: Props) {
   const label = kind === 'knowledge' ? '知識' : '技能';
+  const badge = useSourceBadge();
   const group = baseline.capabilities.filter((item) => item.kind === kind);
   function move(capabilityId: string, beforeId: string | null): void {
     onChange({
@@ -62,11 +66,15 @@ export function CapabilitiesSection({
               aria-label={`${label}：${name}`}
               id={`jd-capability-${capability.capability_id}`}
               key={capability.capability_id}
+              className="item"
               sx={{ borderTop: 1, borderColor: 'divider', pt: 2, scrollMarginTop: 16 }}
             >
-              <Typography component="h4" variant="subtitle1" sx={{ overflowWrap: 'anywhere' }}>
-                {name}
-              </Typography>
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+                <Typography component="h4" variant="subtitle1" sx={{ overflowWrap: 'anywhere' }}>
+                  {name}
+                </Typography>
+                {badge(itemTarget('capability', capability.capability_id))}
+              </Stack>
               <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
                 {capability.description ?? '說明尚未提供'}
               </Typography>
@@ -88,38 +96,42 @@ export function CapabilitiesSection({
                   ))}
                 </Box>
               )}
-              <Stack direction="row" sx={{ flexWrap: 'wrap' }}>
-                <Button
+              <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
+                <IconAction
+                  label={`編輯${label}`}
                   disabled={disabled}
                   onClick={() =>
                     onEdit({ kind: 'capability', baseline, capabilityKind: kind, capability })
                   }
                 >
-                  編輯{label}
-                </Button>
-                <Button
+                  <EditIcon />
+                </IconAction>
+                <IconAction
+                  label={`上移${label}`}
                   disabled={disabled || index === 0}
                   onClick={() =>
                     move(capability.capability_id, group[index - 1]?.capability_id ?? null)
                   }
                 >
-                  上移{label}
-                </Button>
-                <Button
+                  <ArrowUpIcon />
+                </IconAction>
+                <IconAction
+                  label={`下移${label}`}
                   disabled={disabled || index === group.length - 1}
                   onClick={() =>
                     move(capability.capability_id, group[index + 2]?.capability_id ?? null)
                   }
                 >
-                  下移{label}
-                </Button>
-                <Button
+                  <ArrowDownIcon />
+                </IconAction>
+                <IconAction
+                  label={`刪除${label}`}
                   color="error"
                   disabled={disabled || users.length > 0}
                   onClick={() => onDelete(capability)}
                 >
-                  刪除{label}
-                </Button>
+                  <DeleteIcon />
+                </IconAction>
               </Stack>
               {users.length > 0 && (
                 <Typography variant="caption">
@@ -131,6 +143,8 @@ export function CapabilitiesSection({
         })}
         <div>
           <Button
+            size="small"
+            startIcon={<AddIcon />}
             disabled={disabled}
             onClick={() => onEdit({ kind: 'capability', baseline, capabilityKind: kind })}
           >

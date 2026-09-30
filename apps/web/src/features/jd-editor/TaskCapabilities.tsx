@@ -1,7 +1,9 @@
 /** Ordered usage links, not copies of shared capability text. */
-import { Box, Button, Link, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Box, Link, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import type { Capability, JdWorkView } from '../../shared/api/generated/jd-work-view';
 import type { WorkIntent } from './jd-work-api';
+import { IconAction } from '../../shared/ui/IconAction';
+import { ArrowDownIcon, ArrowUpIcon, CloseIcon } from '../../shared/ui/icons';
 
 interface Props {
   taskId: string;
@@ -51,7 +53,7 @@ export function TaskCapabilities({ taskId, baseline, disabled, onChange }: Props
       return `${String(index + 1)}. ${item.name ?? `尚未命名的${label}`}${item.description ? ` — ${item.description}` : ''}`;
     }
     return (
-      <Box component="section" aria-label={`${label}關聯`} key={kind}>
+      <Box component="section" aria-label={`${label}關聯`} key={kind} className="item">
         <Typography component="h5" variant="subtitle2">
           所需{label}
         </Typography>
@@ -62,7 +64,7 @@ export function TaskCapabilities({ taskId, baseline, disabled, onChange }: Props
             {linked.map((item, index) => {
               const name = item.name ?? `尚未命名的${label}`;
               return (
-                <li key={item.capability_id}>
+                <li key={item.capability_id} className="item">
                   <Link
                     href={`#jd-capability-${item.capability_id}`}
                     sx={{ overflowWrap: 'anywhere' }}
@@ -77,35 +79,32 @@ export function TaskCapabilities({ taskId, baseline, disabled, onChange }: Props
                       {item.description}
                     </Typography>
                   )}
-                  <Stack direction="row" sx={{ flexWrap: 'wrap' }}>
-                    <Button
-                      size="small"
+                  <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
+                    <IconAction
+                      label={`上移${label}關聯 ${name}`}
                       disabled={disabled || index === 0}
-                      aria-label={`上移${label}關聯 ${name}`}
                       onClick={() =>
                         move(item.capability_id, linked[index - 1]?.capability_id ?? null)
                       }
                     >
-                      上移
-                    </Button>
-                    <Button
-                      size="small"
+                      <ArrowUpIcon />
+                    </IconAction>
+                    <IconAction
+                      label={`下移${label}關聯 ${name}`}
                       disabled={disabled || index === linked.length - 1}
-                      aria-label={`下移${label}關聯 ${name}`}
                       onClick={() =>
                         move(item.capability_id, linked[index + 2]?.capability_id ?? null)
                       }
                     >
-                      下移
-                    </Button>
-                    <Button
-                      size="small"
+                      <ArrowDownIcon />
+                    </IconAction>
+                    <IconAction
+                      label={`解除${label} ${name}`}
                       disabled={disabled}
-                      aria-label={`解除${label} ${name}`}
                       onClick={() => setLink(item.capability_id, false)}
                     >
-                      解除關聯
-                    </Button>
+                      <CloseIcon />
+                    </IconAction>
                   </Stack>
                 </li>
               );
@@ -113,28 +112,30 @@ export function TaskCapabilities({ taskId, baseline, disabled, onChange }: Props
           </Box>
         )}
         {available.length > 0 ? (
-          <TextField
-            select
-            fullWidth
-            size="small"
-            id={`task-${taskId}-${kind}`}
-            label={`新增${label}關聯`}
-            value=""
-            disabled={disabled}
-            onChange={(event) => setLink(event.target.value, true)}
-            helperText="選取後即保存關聯；解除關聯不會刪除共用定義。"
-            sx={{ mt: 1 }}
-          >
-            {available.map((item, index) => (
-              <MenuItem
-                key={item.capability_id}
-                value={item.capability_id}
-                sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}
-              >
-                {choiceLabel(item, index)}
-              </MenuItem>
-            ))}
-          </TextField>
+          <div className="item-actions">
+            <TextField
+              select
+              fullWidth
+              size="small"
+              id={`task-${taskId}-${kind}`}
+              label={`新增${label}關聯`}
+              value=""
+              disabled={disabled}
+              onChange={(event) => setLink(event.target.value, true)}
+              helperText="選取後即保存關聯；解除關聯不會刪除共用定義。"
+              sx={{ mt: 1 }}
+            >
+              {available.map((item, index) => (
+                <MenuItem
+                  key={item.capability_id}
+                  value={item.capability_id}
+                  sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}
+                >
+                  {choiceLabel(item, index)}
+                </MenuItem>
+              ))}
+            </TextField>
+          </div>
         ) : (
           <Typography variant="caption">
             沒有其他可選{label}；可到下方所需{label}區新增。

@@ -13,6 +13,8 @@ pnpm --filter @caliburn/frontend dev
 
 開發站固定 `127.0.0.1:5173`；`/api` 代理到 `127.0.0.1:8100`。後端啟動依[backend README](../api/README.md)。Ctrl+C 停止前景程序；不載入舊 Next.js 或 `.next` 生成物。
 
+不使用 Vite 的本機建置模式：先 `build`，再由後端以 `CALIBURN_WEB_BUILD_DIRECTORY` 指向此 App 的 `dist` 絕對目錄，同一個 loopback 8100 提供畫面與 API；見[同源啟動說明](../api/README.md#使用建置後的同源畫面)。現有 `/`、`/job-files/:jobFileId` 可直接開啟及重新整理；新增頂層 UI 路由須同步後端的明確 fallback 前綴。此功能不是 T18 正式切換，不改根 scripts。
+
 ```powershell
 pnpm --filter @caliburn/frontend test
 pnpm --filter @caliburn/frontend test:proxy

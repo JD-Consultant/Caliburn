@@ -241,6 +241,7 @@
 ## T18 新產品入口切換與舊程式退役
 
 - [ ] T18；依賴：T17；依[本 Goal 的條件式切換授權](README.md)執行，先核對 gate、精確 tracked 退役清單及可恢復性，不擴張刪除範圍。
+- **2026-10-01 交付接線預備：**按既定單程序同源方案，使用 FastAPI 原生 frontend 接通已建置 UI；6 個行為反例修正後，相關 83 測試、mypy 與真 Web build／ASGI 資源深連結檢查通過。[範圍與限制](evidence/t18-same-origin-web.md)。只是可提前完成的隔離接線，不勾 T18、不更換正式入口／退役舊碼；T14／T16／T17 前置 gate 仍保留。
 - **契約：**[決策流程](../../decision-process.md)、ADR0077 的正式權責沿革、[交付規則](../../implementation/interface-and-delivery.md#5-安全與新舊切換)。
 - **交付：**新 successor ADR、根 pnpm scripts／workspace、App READMEs／runbook／CONTRIBUTING、架構現況 map；列出舊 tracked 程式與依賴逐項退役。正式 authority 不在此前任務偷換。
 - **先驗：**乾淨 clone 安裝／建庫／啟動／重開，production build 不引用 experiments；新入口故障可保留原環境及完整證據，不做舊資料 ETL。

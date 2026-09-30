@@ -43,15 +43,13 @@ function restoreHint(jobFileId: string): { hint: TurnHint | null; error: string 
 
 interface ComposerProps {
   jobFileId: string;
-  /** Reports the server-verified Turn (null when unknown) so siblings can show state. */
-  onTurnChange?: (turn: ConsultantTurn | null) => void;
 }
 
 export function InterviewComposer(props: ComposerProps) {
   return <ComposerForFile key={props.jobFileId} {...props} />;
 }
 
-function ComposerForFile({ jobFileId, onTurnChange }: ComposerProps) {
+function ComposerForFile({ jobFileId }: ComposerProps) {
   const [restored] = useState(() => restoreHint(jobFileId));
   const [hint, setHint] = useState(restored.hint);
   const [draft, setDraft] = useState('');
@@ -69,10 +67,6 @@ function ComposerForFile({ jobFileId, onTurnChange }: ComposerProps) {
     retry: false,
   });
   const verified = turn.isError ? undefined : (turn.data ?? recovery.data);
-
-  useEffect(() => {
-    onTurnChange?.(verified ?? null);
-  }, [verified, onTurnChange]);
 
   useEffect(() => {
     if (!recoveringCommand || !recovery.data) return;

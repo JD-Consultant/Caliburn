@@ -8,7 +8,7 @@ import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn'
 import type { AcceptedInterviewInput } from '../../shared/api/generated/accepted-interview-input';
 import type { SubmitInterviewInput } from '../../shared/api/generated/submit-interview-input';
 import { ApiError, requestJson } from '../../shared/api/http';
-import { isConsultantTurn } from '../../shared/api/validation';
+import { isConsultantTurn, isCurrentConsultantTurn } from '../../shared/api/validation';
 
 const validator = new Ajv2020();
 addFormats(validator);
@@ -210,5 +210,27 @@ export function consultantTurnQuery(jobFileId: string, executionId: string | nul
       query.state.error || (query.state.data && isTerminalTurn(query.state.data.status))
         ? false
         : 1_000,
+  });
+}
+
+/** Discover only; after a match the caller follows that execution, including its terminal result. */
+export function currentConsultantTurnQuery(jobFileId: string) {
+  return queryOptions({
+    queryKey: ['current-consultant-turn', jobFileId],
+    queryFn: async ({ signal }) => {
+      const current = await requestJson(
+        `/api/job-files/${encodeURIComponent(jobFileId)}/consultant-turns/current`,
+        isCurrentConsultantTurn,
+        { signal, cache: 'no-store' },
+      );
+      if (current.turn && current.turn.job_file_id !== jobFileId) {
+        throw new ApiError('收到的處理狀態不屬於這份職務檔案，尚未採用。');
+      }
+      return current;
+    },
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
   });
 }

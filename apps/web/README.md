@@ -31,6 +31,8 @@ pnpm --filter @caliburn/frontend codegen:check
 
 `src/shared/api/generated` 只由後端 schema 生成，runtime guards 也使用相同 JSON Schema。不要為 TypeScript 另外手寫相同 wire 型別。路由在 `src/app`，檔案與訪談畫面分在 `src/features`；保存／快取／重送界線見[介面設計 §1.1](../../docs/implementation/interface-and-delivery.md#11-t02-已落地的讀寫邊界)。
 
+沒有本機 Turn 提示時，訪談區會先查後端 `/consultant-turns/current`，找回原進行中／暫停工作與控制，不重送訪談。未確認狀態前 JD 暫時唯讀、新輸入不能送出；失敗可按「重新查詢進行中處理」。既有未知命令仍查回原請求，不被空 current 取代。此版須搭配包含 current 入口的後端；只更新前端而未重啟舊後端可能得到 422／查詢錯誤，不應以忽略錯誤解鎖。證據與限制見[發現入口](../../docs/plans/2026-09-29-target-rebuild/evidence/t09-current-turn-discovery.md)。
+
 開啟職務檔案後，「編輯基本資料」可改職務名稱、所屬單位／工作範圍、匯報關係與職務目的。只提交改動欄位，全部刪空為清空；舊表單衝突須重讀，不自動覆蓋。結果不明時重開或 reload 可用原命令確認，再讀目前稿。此為本分頁有限恢復，不承諾清除瀏覽器資料後保留暫存；具體責任見[介面 §1.2](../../docs/implementation/interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)。
 
 「JD 職責與任務」支援新增、修改、排序、跨職責移動及刪除；刪職責會把任務保留在「未歸屬任務」，不刪內容。成果與要求分組維護、可獨立排序。編輯表單固定讀取基底；未知結果的原命令可由區塊入口重新確認，即使原目標後來已刪除也不會被舊回傳復活。詳見[介面 §1.3](../../docs/implementation/interface-and-delivery.md#13-t03-職責與任務的人工編輯)。

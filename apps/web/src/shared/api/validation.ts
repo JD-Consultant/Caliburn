@@ -5,6 +5,8 @@ import commentaryUpdateSchema from '../../../../api/contracts/http/commentary-up
 import type { CommentaryUpdate } from './generated/commentary-update';
 import consultantTurnSchema from '../../../../api/contracts/http/consultant-turn.schema.json' with { type: 'json' };
 import type { ConsultantTurn } from './generated/consultant-turn';
+import currentConsultantTurnSchema from '../../../../api/contracts/http/current-consultant-turn.schema.json' with { type: 'json' };
+import type { CurrentConsultantTurn } from './generated/current-consultant-turn';
 import createJobFileSchema from '../../../../api/contracts/http/create-job-file-request.schema.json' with { type: 'json' };
 import interviewHistorySchema from '../../../../api/contracts/http/interview-history.schema.json' with { type: 'json' };
 import jobFileListSchema from '../../../../api/contracts/http/job-file-list.schema.json' with { type: 'json' };
@@ -49,8 +51,12 @@ validator.addSchema(jdCollaboratorsSchema, 'jd-collaborators-view.schema.json');
 validator.addSchema(jdConditionsSchema, 'jd-conditions-view.schema.json');
 validator.addSchema(jdProfileSchema, 'jd-profile-view.schema.json');
 validator.addSchema(jdWorkSchema, 'jd-work-view.schema.json');
+validator.addSchema(consultantTurnSchema, 'consultant-turn.schema.json');
 
 export const isConsultantTurn = validator.compile<ConsultantTurn>(consultantTurnSchema);
+export const isCurrentConsultantTurn = validator.compile<CurrentConsultantTurn>(
+  currentConsultantTurnSchema,
+);
 export const isCommentaryUpdate = validator.compile<CommentaryUpdate>(commentaryUpdateSchema);
 
 export const isJobFileList = validator.compile<JobFileList>(jobFileListSchema);

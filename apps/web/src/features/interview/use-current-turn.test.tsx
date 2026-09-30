@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import { clearTurnHint, retainTurnHint } from './interview-turn-api';
+import { clearTurnHint, consultantTurnQuery, retainTurnHint } from './interview-turn-api';
 import { useCurrentTurn } from './use-current-turn';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
@@ -35,17 +35,26 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test('reports the verified Turn of the stored hint and follows the hint being cleared', async () => {
+test('observes the composer cache without fetching and follows the hint being cleared', async () => {
   retainTurnHint(fileId, hint);
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(turn)));
+  const fetch = vi.fn().mockResolvedValue(Response.json(turn));
+  vi.stubGlobal('fetch', fetch);
   const { result } = renderHook(() => useCurrentTurn(fileId), { wrapper });
-  expect(result.current).toBeNull();
-  await waitFor(() => expect(result.current?.status).toBe('active'));
+  expect(result.current).toEqual({ turn: null, isVerified: false });
+  expect(fetch).not.toHaveBeenCalled();
+  const client = clients[0];
+  if (!client) throw new Error('Expected query client');
+  await act(async () => {
+    await client.fetchQuery(consultantTurnQuery(fileId, executionId));
+  });
+  await waitFor(() => expect(result.current.turn?.status).toBe('active'));
+  expect(result.current.isVerified).toBe(true);
 
   act(() => {
     clearTurnHint(fileId, hint.command_id);
   });
-  await waitFor(() => expect(result.current).toBeNull());
+  await waitFor(() => expect(result.current).toEqual({ turn: null, isVerified: false }));
+  expect(fetch).toHaveBeenCalledTimes(1);
 });
 
 test('a hint still waiting for its execution id has nothing to verify and sends no request', () => {
@@ -53,7 +62,7 @@ test('a hint still waiting for its execution id has nothing to verify and sends 
   const fetch = vi.fn();
   vi.stubGlobal('fetch', fetch);
   const { result } = renderHook(() => useCurrentTurn(fileId), { wrapper });
-  expect(result.current).toBeNull();
+  expect(result.current).toEqual({ turn: null, isVerified: false });
   expect(fetch).not.toHaveBeenCalled();
 });
 
@@ -62,6 +71,10 @@ test('an unreadable status is not reported as a Turn', async () => {
   const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 503 }));
   vi.stubGlobal('fetch', fetch);
   const { result } = renderHook(() => useCurrentTurn(fileId), { wrapper });
-  await waitFor(() => expect(fetch).toHaveBeenCalled());
-  expect(result.current).toBeNull();
+  const client = clients[0];
+  if (!client) throw new Error('Expected query client');
+  await act(async () => {
+    await expect(client.fetchQuery(consultantTurnQuery(fileId, executionId))).rejects.toThrow();
+  });
+  expect(result.current).toEqual({ turn: null, isVerified: false });
 });

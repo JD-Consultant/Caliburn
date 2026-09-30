@@ -6,7 +6,7 @@
 
 ## 安裝與執行
 
-**UI 交接增量：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 已可依職務檔案找回進行中／暫停的 A，不需瀏覽器先保存 execution／command ID；回傳 `{"turn": <既有公開狀態>}` 或明確 `{"turn": null}`，未知檔案 404。不啟動／恢復模型、不返回 Memory 或終態歷史。前端消費與跨瀏覽器驗收仍待接線，見[證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t09-current-turn-discovery.md)。
+**UI 交接增量：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 已可依職務檔案找回進行中／暫停的 A，不需瀏覽器先保存 execution／command ID；回傳 `{"turn": <既有公開狀態>}` 或明確 `{"turn": null}`，未知檔案 404。不啟動／恢復模型、不返回 Memory 或終態歷史。前端已接上發現與原 execution 控制；分層驗證及未驗邊界見[證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t09-current-turn-discovery.md)。
 
 從 repo root 執行。使用 Python 3.14、uv 0.12.20；先安裝根 `package.json` 指定的 Node 24／pnpm，前端生成器也需要該環境。精確依賴由 `uv.lock` 保存。
 

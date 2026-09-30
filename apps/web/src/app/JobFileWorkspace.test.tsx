@@ -1,6 +1,6 @@
 /** Workspace behavior: JD read-only lock, Turn state badge and narrow-screen pane switching. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
@@ -34,13 +34,16 @@ const clients: QueryClient[] = [];
 function renderJobFile() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
-  return render(
-    <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={[`/job-files/${file.job_file_id}`]}>
-        <App />
-      </MemoryRouter>
-    </QueryClientProvider>,
-  );
+  return {
+    client,
+    ...render(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={[`/job-files/${file.job_file_id}`]}>
+          <App />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    ),
+  };
 }
 
 function turnBody(status: 'active' | 'paused' | 'cancelled') {
@@ -66,39 +69,45 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test('JD stays readable but read-only while a Turn owns it, and reopens after cancellation', async () => {
-  retainTurnHint(file.job_file_id, {
-    command_id: '60000000-0000-4000-8000-000000000006',
-    execution_id: executionId,
-  });
-  let cancelled = false;
-  vi.stubGlobal(
-    'fetch',
-    vi.fn((path: string, options?: RequestInit) => {
-      if (path.endsWith('/cancel') && options?.method === 'POST') cancelled = true;
-      if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(work));
-      if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(profile));
-      if (path.includes('/consultant-turns/'))
-        return Promise.resolve(Response.json(turnBody(cancelled ? 'cancelled' : 'active')));
-      if (path.endsWith('/interviews')) return Promise.resolve(Response.json({ messages: [] }));
-      return Promise.resolve(Response.json(file));
-    }),
-  );
-  renderJobFile();
-  expect(await screen.findByText(/顧問處理中，JD 暫時唯讀/)).toBeVisible();
-  expect(screen.getByText('顧問處理中')).toBeVisible();
-  await userEvent.click(screen.getByRole('button', { name: '正式稿' }));
-  expect(await screen.findByText('原正式工程師')).toBeVisible();
-  expect(screen.getByRole('button', { name: '編輯基本資料' })).toBeDisabled();
-  expect(screen.getByRole('button', { name: '新增職責' })).toBeDisabled();
+test.each([true, false])(
+  'JD locks and previews the active Turn, then reopens after cancel (local hint: %s)',
+  async (hasHint) => {
+    if (hasHint)
+      retainTurnHint(file.job_file_id, {
+        command_id: '60000000-0000-4000-8000-000000000006',
+        execution_id: executionId,
+      });
+    let cancelled = false;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((path: string, options?: RequestInit) => {
+        if (path.endsWith('/cancel') && options?.method === 'POST') cancelled = true;
+        if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(work));
+        if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(profile));
+        if (path.endsWith('/consultant-turns/current'))
+          return Promise.resolve(Response.json({ turn: cancelled ? null : turnBody('active') }));
+        if (path.includes('/consultant-turns/'))
+          return Promise.resolve(Response.json(turnBody(cancelled ? 'cancelled' : 'active')));
+        if (path.endsWith('/interviews')) return Promise.resolve(Response.json({ messages: [] }));
+        return Promise.resolve(Response.json(file));
+      }),
+    );
+    renderJobFile();
+    expect(await screen.findByText(/顧問處理中，JD 暫時唯讀/)).toBeVisible();
+    expect(screen.getByText('顧問處理中')).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: '正式稿' }));
+    expect(await screen.findByText('原正式工程師')).toBeVisible();
+    expect(screen.getByRole('button', { name: '編輯基本資料' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '新增職責' })).toBeDisabled();
 
-  await userEvent.click(screen.getByRole('button', { name: '取消處理' }));
-  expect(await screen.findByText(/這次處理已取消/, {}, { timeout: 3_000 })).toBeVisible();
-  expect(screen.queryByText(/顧問處理中，JD 暫時唯讀/)).not.toBeInTheDocument();
-  expect(screen.getByRole('button', { name: '編輯基本資料' })).toBeEnabled();
-  expect(screen.getByRole('button', { name: '新增職責' })).toBeEnabled();
-  expect(screen.getByText('已取消')).toBeVisible();
-});
+    await userEvent.click(screen.getByRole('button', { name: '取消處理' }));
+    expect(await screen.findByText(/這次處理已取消/, {}, { timeout: 3_000 })).toBeVisible();
+    expect(screen.queryByText(/顧問處理中，JD 暫時唯讀/)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '編輯基本資料' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: '新增職責' })).toBeEnabled();
+    expect(screen.getByText('已取消')).toBeVisible();
+  },
+);
 
 test('a paused Turn keeps the JD read-only and says why', async () => {
   retainTurnHint(file.job_file_id, {
@@ -125,6 +134,8 @@ test('narrow-screen tabs switch panes without unmounting either one', async () =
   vi.stubGlobal(
     'fetch',
     vi.fn((path: string) => {
+      if (path.endsWith('/consultant-turns/current'))
+        return Promise.resolve(Response.json({ turn: null }));
       if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(work));
       if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(profile));
       if (path.endsWith('/interviews')) return Promise.resolve(Response.json({ messages: [] }));
@@ -144,8 +155,78 @@ test('narrow-screen tabs switch panes without unmounting either one', async () =
   expect(workspace).toHaveAttribute('data-active-pane', 'jd');
   // Switching is presentation only: the unsent draft is still mounted and intact.
   expect(screen.getByRole('textbox', { name: '訪談內容' })).toHaveValue('尚未送出');
-  await act(async () => {
-    await userEvent.click(interviewTab);
-  });
+  await userEvent.click(interviewTab);
   expect(workspace).toHaveAttribute('data-active-pane', 'interview');
 });
+
+test('unknown discovery keeps the formal JD readable but not editable until a successful check', async () => {
+  let discoveryFailed = true;
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((path: string) => {
+      if (path.endsWith('/consultant-turns/current'))
+        return Promise.resolve(
+          discoveryFailed ? new Response(null, { status: 503 }) : Response.json({ turn: null }),
+        );
+      if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(work));
+      if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(profile));
+      if (path.endsWith('/interviews')) return Promise.resolve(Response.json({ messages: [] }));
+      return Promise.resolve(Response.json(file));
+    }),
+  );
+  renderJobFile();
+  expect(await screen.findByText('原正式工程師')).toBeVisible();
+  expect(screen.getByRole('button', { name: '編輯基本資料' })).toBeDisabled();
+  const retry = await screen.findByRole('button', { name: '重新查詢進行中處理' });
+  expect(screen.getByText(/尚未確認顧問處理狀態/)).toBeVisible();
+  discoveryFailed = false;
+  await userEvent.click(retry);
+  expect(await screen.findByRole('button', { name: '編輯基本資料' })).toBeEnabled();
+});
+
+test.each([
+  { open: '編輯基本資料', field: '職務名稱', save: '儲存基本資料' },
+  { open: '新增職責', field: '職責名稱', save: '儲存職責' },
+])(
+  'an open $open draft cannot submit a new change while Turn status is unknown',
+  async ({ open, field, save }) => {
+    let unavailable = false;
+    const fetch = vi.fn<typeof globalThis.fetch>((input) => {
+      const path =
+        typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+      if (path.endsWith('/consultant-turns/current'))
+        return Promise.resolve(
+          unavailable ? new Response(null, { status: 503 }) : Response.json({ turn: null }),
+        );
+      if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(work));
+      if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(profile));
+      if (path.endsWith('/interviews')) return Promise.resolve(Response.json({ messages: [] }));
+      return Promise.resolve(Response.json(file));
+    });
+    vi.stubGlobal('fetch', fetch);
+    const { client } = renderJobFile();
+    await waitFor(() => expect(screen.getByRole('button', { name: open })).toBeEnabled());
+    await userEvent.click(screen.getByRole('button', { name: open }));
+    const input = await screen.findByRole('textbox', { name: field });
+    await userEvent.clear(input);
+    await userEvent.type(input, '保留的人工草稿');
+    unavailable = true;
+    await act(() =>
+      client.invalidateQueries({ queryKey: ['current-consultant-turn', file.job_file_id] }),
+    );
+    const submit = screen.getByRole('button', { name: save });
+    await waitFor(() => expect(submit).toBeDisabled());
+    expect(screen.queryByRole('button', { name: '讀取目前 JD' })).not.toBeInTheDocument();
+    const form = input.closest('form');
+    if (!form) throw new Error('expected the open draft form');
+    fireEvent.submit(form);
+    expect(fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+    expect(input).toHaveValue('保留的人工草稿');
+    unavailable = false;
+    await act(() =>
+      client.invalidateQueries({ queryKey: ['current-consultant-turn', file.job_file_id] }),
+    );
+    await waitFor(() => expect(submit).toBeEnabled());
+    expect(input).toHaveValue('保留的人工草稿');
+  },
+);

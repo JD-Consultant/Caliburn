@@ -22,6 +22,12 @@ const active = {
 const clients: QueryClient[] = [];
 
 function renderComposer() {
+  const commandFetch = globalThis.fetch;
+  vi.stubGlobal('fetch', (url: RequestInfo | URL, options?: RequestInit) =>
+    url === `/api/job-files/${fileId}/consultant-turns/current`
+      ? Promise.resolve(Response.json({ turn: null }))
+      : commandFetch(url, options),
+  );
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
   return {

@@ -33,6 +33,20 @@ uv run --project apps/api --locked python apps/api/scripts/run_backend.py --key-
 
 另一個終端：`pnpm --dir apps/web dev`；開啟 `http://127.0.0.1:5173`。後端固定 loopback 8100，單程序，不自動遷移／建立範例資料／接舊 DB；Ctrl+C 停止前景程序。這是隔離開發入口，尚不是 T18 正式交付切換。程式與 supervisor 恢復已接受工作可能繼續使用模型額度；僅要操作人工 JD 時，不提供 key-file 且不設定 `OPENAI_API_KEY`。
 
+### 使用建置後的同源畫面
+
+此入口已接通，但正式入口切換與乾淨安裝仍待 T18。先沿上節設定**新目標 DB**，使用所定 Node／pnpm 與 Python 環境，從 repo root 執行：
+
+```powershell
+pnpm --filter @caliburn/frontend build
+$env:CALIBURN_WEB_BUILD_DIRECTORY = (Resolve-Path 'apps/web/dist').Path
+uv run --project apps/api --locked python apps/api/scripts/run_backend.py --key-file S:/caliburn/apps/api/.env
+```
+
+開啟 `http://127.0.0.1:8100`，不需另外啟動 Vite；職務頁可以直接開啟或重新整理。只使用人工 JD 時省略 `--key-file` 並勿設定 `OPENAI_API_KEY`。PDF 字型／Chromium 仍依下節配置；靜態入口不會代為建庫、遷移或提供模型憑證。
+
+只指定可信的**公開建置目錄**，不要指向 repo、原始碼或秘密目錄；缺目錄／`index.html` 會啟動失敗。未設定此變數時維持 API-only。既有程序不會自動切換；先確認身分再停止自己啟動的程序，勿為此中斷別人的 Demo。更換建置時重新啟動自有服務，不使用 `vite preview` 作交付 server。接線與驗證界線見[交付預備證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md)。
+
 ## 驗證
 
 正常產品不再使用預估美元金額攔截 A／B1／B2；`CALIBURN_TURN_MAX_COST_USD` 已退役，不再讀取。token 容量、壓縮門檻、呼叫／重試及時間限制仍有效。用量估算可作診斷，不是 provider 帳單。付費驗證腳本須依 manifest 明確配置自身的有限預算；技術界線見[執行 §5.8](../../docs/implementation/agent-execution.md#58-產品與付費驗證的金額界線2026-09-30)。套用新程式前，依下方命令明確升級至含 `0019_optional_cost_limit` 的 schema；不靠啟動自動改 DB，不重寫舊工作限制。

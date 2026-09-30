@@ -63,7 +63,9 @@ class LoopProbe:
         self.accounted: list[str] = []
         self.active = True
 
-    async def request(self, request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        self, request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         self.requests.append(request.create_payload())
         self.request_ids.append(request_id)
         return ReceivedModelResponse(self.responses[len(self.requests) - 1], uuid4())

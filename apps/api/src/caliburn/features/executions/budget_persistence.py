@@ -42,7 +42,7 @@ class ExecutionBudgetRecord(Base):
     max_outbound_attempts: Mapped[int] = mapped_column()
     max_attempts_per_request: Mapped[int] = mapped_column()
     deadline_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    max_cost_usd: Mapped[Decimal] = mapped_column(Numeric(18, 9))
+    max_cost_usd: Mapped[Decimal | None] = mapped_column(Numeric(18, 9))
     cost_basis: Mapped[str] = mapped_column(Text)
 
 

@@ -130,6 +130,7 @@ def test_unknown_attempt_reserves_cost_and_reentry_is_not_permission_to_send(
     assert usage.model_steps == 1
 
 
+@pytest.mark.parametrize("max_cost_usd", [None, Decimal("1")])
 @pytest.mark.parametrize(
     "limit, changes, kind",
     [
@@ -143,9 +144,13 @@ def test_unknown_attempt_reserves_cost_and_reentry_is_not_permission_to_send(
     ],
 )
 def test_independent_limits_are_enforced(
-    client: TestClient, limit: BudgetLimit, changes: dict[str, object], kind: OutboundKind
+    client: TestClient,
+    limit: BudgetLimit,
+    changes: dict[str, object],
+    kind: OutboundKind,
+    max_cost_usd: Decimal | None,
 ) -> None:
-    writer = admit(client, policy(**changes))
+    writer = admit(client, policy(max_cost_usd=max_cost_usd, **changes))
     if limit != BudgetLimit.DEADLINE:
         reserve(client, writer, request=OutboundRequest(uuid4(), kind, "a" * 64))
     with pytest.raises(BudgetExceededError) as error:
@@ -182,6 +187,24 @@ def test_count_and_compact_share_money_not_model_steps(client: TestClient) -> No
     usage = transact(client, lambda s: budgets.read_budget_usage(s, writer.scope))
     assert (usage.model_steps, usage.compactions, usage.outbound_attempts) == (1, 1, 3)
     assert usage.accounted_cost_usd == Decimal("0.3")
+
+
+def test_no_monetary_limit_keeps_accounting_and_attempt_limits(client: TestClient) -> None:
+    writer = admit(client, policy(max_cost_usd=None, max_outbound_attempts=3))
+    for kind in OutboundKind:
+        assert reserve(
+            client, writer, request=OutboundRequest(uuid4(), kind, "a" * 64), cost="100"
+        ).created
+    usage = transact(client, lambda s: budgets.read_budget_usage(s, writer.scope))
+    assert usage.accounted_cost_usd == Decimal("300")
+    assert (usage.model_steps, usage.compactions, usage.outbound_attempts) == (1, 1, 3)
+    assert (
+        transact(client, lambda s: budgets.read_execution_budget(s, writer.scope)).max_cost_usd
+        is None
+    )
+    with pytest.raises(BudgetExceededError) as error:
+        reserve(client, writer, cost="100")
+    assert error.value.limit == BudgetLimit.OUTBOUND_ATTEMPTS
 
 
 def test_cancelled_work_accepts_original_accounting_but_no_new_send(client: TestClient) -> None:

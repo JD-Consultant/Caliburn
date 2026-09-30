@@ -46,7 +46,7 @@ def test_saved_pause_reopens_without_generation_and_keeps_execution_fencing(
             binding = ConsultantExecutionControls(database.sessions, writer)
             provider = CapacityProbe([100, 100], final=False)
 
-            async def model(request, request_id):
+            async def model(request, request_id, input_tokens: int):
                 # The control request must finish while model I/O is still active;
                 # retaining an execution transaction across I/O would deadlock this.
                 if not provider.model_requests:
@@ -55,7 +55,7 @@ def test_saved_pause_reopens_without_generation_and_keeps_execution_fencing(
                         info = await executions.read_execution(session, scope)
                         assert info.status == ExecutionStatus.ACTIVE
                         assert info.pause_requested
-                return await provider.model(request, request_id)
+                return await provider.model(request, request_id, input_tokens)
 
             options = dict(
                 thread_id=str(scope.execution_id),

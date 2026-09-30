@@ -3,6 +3,7 @@
 import asyncio
 import json
 from dataclasses import FrozenInstanceError, asdict
+from decimal import Decimal
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
@@ -222,7 +223,7 @@ async def test_executor_handoff_attaches_original_attempt_without_failure_retry(
     record = AsyncMock(side_effect=AssertionError("An intact R must not enter provider retry"))
     monkeypatch.setattr(model_requests.ModelRequestExecutor, "_reserve_request", reserve)
     monkeypatch.setattr(model_requests.ModelRequestExecutor, "_record_failure", record)
-    accounting = Mock(model=None, reserved_cost_usd=1)
+    accounting = Mock(model=None, reserve_response_cost=lambda *_: Decimal("1"))
     async with client_for(WireStream(wire_events(raw), close_error=failure), captured) as client:
         executor = model_requests.ModelRequestExecutor(
             Mock(), Mock(), client, accounting, on_commentary=updates.append
@@ -233,7 +234,7 @@ async def test_executor_handoff_attaches_original_attempt_without_failure_retry(
             else model_requests.ReceivedModelResponseError
         )
         with pytest.raises(error_type) as caught:
-            await executor.request_model(request(stream=True), uuid4())
+            await executor.request_model(request(stream=True), uuid4(), 100)
     assert caught.value.received.attempt_id == attempt_id
     assert snapshot_response(caught.value.received.response) == raw
     assert len(captured) == 1
@@ -385,7 +386,7 @@ async def test_sdk_executor_shared_step_saves_terminal_before_surfacing_cleanup(
     failure = asyncio.CancelledError() if cancelled else OSError("synthetic cleanup")
     async with client_for(WireStream(wire_events(raw), close_error=failure), captured) as client:
         executor = model_requests.ModelRequestExecutor(
-            Mock(), Mock(), client, Mock(model=None, reserved_cost_usd=1)
+            Mock(), Mock(), client, Mock(model=None, reserve_response_cost=lambda *_: Decimal("1"))
         )
         runtime = synthetic_response_runtime(
             request_model=executor.request_model,

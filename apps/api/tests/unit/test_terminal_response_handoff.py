@@ -25,9 +25,9 @@ async def test_terminal_carrier_saves_or_holds_original_without_effects(cancelle
     accounted = []
     received = None
 
-    async def model(request, request_id):
+    async def model(request, request_id, input_tokens: int):
         nonlocal received
-        received = await probe.model(request, request_id)
+        received = await probe.model(request, request_id, input_tokens)
         kind = ReceivedModelResponseCancelledError if cancelled else ReceivedModelResponseError
         raise kind(received)
 
@@ -71,8 +71,8 @@ async def test_real_task_cancellation_after_terminal_retains_original_without_ef
     closing = asyncio.Event()
     accounted = []
 
-    async def model(request, request_id):
-        original = await probe.model(request, request_id)
+    async def model(request, request_id, input_tokens: int):
+        original = await probe.model(request, request_id, input_tokens)
         closing.set()
         try:
             await asyncio.Future()
@@ -114,8 +114,10 @@ async def test_terminal_cancel_plus_transient_save_fault_never_becomes_automatic
     saver = TransientResultFault("response_snapshot")
     probe = CapacityProbe([100])
 
-    async def model(request, request_id):
-        raise ReceivedModelResponseCancelledError(await probe.model(request, request_id))
+    async def model(request, request_id, input_tokens: int):
+        raise ReceivedModelResponseCancelledError(
+            await probe.model(request, request_id, input_tokens)
+        )
 
     with pytest.raises(ResultSaveCancelledError) as stopped:
         await run_response_step(

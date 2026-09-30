@@ -38,7 +38,7 @@ async def run(mode, thread_id):
     final["output"] = first["output"][:2]
     final["output"][1]["phase"] = "final_answer"
 
-    async def model(request, request_id):
+    async def model(request, request_id, input_tokens: int):
         calls["model"] += 1
         if mode == "write":
             assert calls["model"] == 1, "Must stop after durable C, before next generation"

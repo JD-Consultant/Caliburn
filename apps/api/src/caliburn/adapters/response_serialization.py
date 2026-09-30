@@ -10,6 +10,7 @@ from typing import Any
 from openai.types.responses import Response, ResponseFunctionToolCall
 from openai.types.responses.compacted_response import CompactedResponse
 from openai.types.responses.response_input_item_param import FunctionCallOutput
+from openai.types.responses.response_usage import ResponseUsage
 
 type NativeSnapshot = dict[str, Any]
 type NativeItems = list[dict[str, Any]]
@@ -21,7 +22,12 @@ def snapshot_response(response: Response) -> dict[str, Any]:
 
 
 def restore_response(snapshot: dict[str, Any]) -> Response:
-    """Validate the stored original with the same native SDK schema; do not reduce it to text."""
+    """Validate executable content; preserve partial billing data with native SDK semantics."""
+    usage = snapshot.get("usage")
+    if isinstance(usage, dict):
+        # SDK replies may omit billing details. Keep them absent, not fabricated as zero;
+        # the pricing owner separately decides whether they support a cost estimate.
+        snapshot = {**snapshot, "usage": ResponseUsage.model_construct(**usage)}
     return Response.model_validate(snapshot)
 
 

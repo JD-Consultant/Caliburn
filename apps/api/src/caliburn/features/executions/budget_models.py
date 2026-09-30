@@ -50,7 +50,7 @@ class ExecutionBudget:
     max_outbound_attempts: int
     max_attempts_per_request: int
     deadline_at: datetime
-    max_cost_usd: Decimal
+    max_cost_usd: Decimal | None
     cost_basis: str
 
     def __post_init__(self) -> None:
@@ -64,7 +64,8 @@ class ExecutionBudget:
                 raise ValueError("Execution limits must be positive integers")
         if self.deadline_at.utcoffset() is None or not self.cost_basis.strip():
             raise ValueError("An aware deadline and explicit cost basis are required")
-        validate_cost(self.max_cost_usd, positive=True)
+        if self.max_cost_usd is not None:
+            validate_cost(self.max_cost_usd, positive=True)
 
 
 @dataclass(frozen=True, slots=True)

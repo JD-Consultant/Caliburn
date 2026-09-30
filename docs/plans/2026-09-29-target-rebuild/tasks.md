@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T13 已完成；T14、T15 已有施工／局部驗證，完整 gate 仍未完成；T16–T18 未完成。2026-09-30 晚 Owner 以新 Goal 恢復施工（先前為純文件推送後的安全暫停）**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T13、T15 已完成；T14、T16–T18 未完成。2026-09-30 晚 Owner 以新 Goal 恢復施工（先前為純文件推送後的安全暫停）**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - **恢復範圍 successor（2026-09-30）：**T06／T08／T11／T12 依[共用執行 §6.4](../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)保留核心接續與安全退出；罕見原件遺失的全面追蹤／同工作再准入不再列為首版阻擋條件。已保存的結果及資料安全測試不刪減；本次最外層收尾證據見 [T12 §6](evidence/t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)，尚未勾選整項任務。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
@@ -198,7 +198,8 @@
 
 ## T15 安全、容量與維護性審查
 
-- [ ] T15；依賴：T12、T13。
+- [x] T15；依賴：T12、T13。
+- **2026-10-01 有界完成審查：**已逐項核對安全拒絕、隔離、token／查詢／保存量及依賴邊界；本次主線連容量／compaction 回歸 44 passed，原證據不重算成新驗收。無須先加 cache／索引／GC，完成依據與未驗範圍見[條件對照](evidence/t15-capacity-measurements.md#6-t15-完成對照2026-10-01-有界收尾)。本項完成不代表 T14／T16／T17 品質通過。
 - **2026-10-01 容量收斂：**重用合成旅程完成 token／查詢／保存量測，最大已保存 A 請求 42,524 tokens；JD 投影約 5–14 ms，較慢的是 commentary history 投影。沿 Owner 指示不為非核心慢點加 cache／新儲存；原容量與 import 邊界 41 passed，詳見[量測與限制](evidence/t15-capacity-measurements.md)。大視窗 provider 與完整品質仍非本片證據。
 - **2026-10-01 接手收尾：**既有憑證隔離草稿完成有限驗收：合成 key 不進 request body、真 PG checkpoint／產品資料、公開讀取及 log；provider 回顯秘密也不外露。4 例連既有局部安全回歸 69 passed，範圍見 [T15 末節](evidence/t15-local-http-security.md#2026-10-01-接手收尾憑證不進接續歷史與公開資料)。不新增產品子系統，不將整個容量／安全 gate 勾選。
 - **2026-09-30 UI 交接修正：**隔離 Vite proxy 改為保留原 Origin，後端可顯式配置一個精確 loopback dev Origin；預設安全邊界不變。新增 red→green 代理與配置測試、原安全測例回歸見 [HTTP 證據](evidence/t15-local-http-security.md#隔離前端的來源保留修正2026-09-30)。僅修此接縫，不勾選整個 T15。
@@ -211,6 +212,7 @@
 ## T16 有界官方模型／schema／容量驗證
 
 - [ ] T16；依賴：T14、T15。
+- **2026-10-01 接續容量補驗：**141,777-token 合成工具視窗成功 compact，完整返回 C 續接更正、帶真 reasoning 再 compact，兩次答覆三項事實均正確；首輪探針過嚴假設、一次補跑及成本完整記錄於 [T16 證據](evidence/t16-compaction-continuity.md)。不勾整項、不等同正式 A/B 自動觸發或 JD 分析品質；272K／512K 真視窗仍未驗。
 - **契約：**[選型與參數](../../implementation/technology-decisions.md)、JDT-01／08／09、V05／V06／V22／V26。
 - **交付：**先寫測試 manifest：模型／有效 reasoning、SDK／prompt hash、資料範圍、次數／token／時間／費用限額、停止條件，再用有效授權外送。缺付費授權不阻塞離線工作，但不能進此 gate。
 - **驗證：**strict wire 真接受、原生多 call 與跨 Turn 更正、compact 完整返回／重播、實際 request 計量、門檻與預留、工具選對及恢復成本；依同 fixtures 校準候選數值。

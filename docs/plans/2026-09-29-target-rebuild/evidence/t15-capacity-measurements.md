@@ -80,3 +80,25 @@ $env:CALIBURN_TEST_DATABASE_URL='postgresql://caliburn_test@127.0.0.1:55439/cali
 **41 passed，4.56s**。涵蓋原 request count／預留限制、計數保存前後故障接續及高價值 import 邊界；不是全產品 regression。更早單跑 import 的 15 例通過但有 pytest cache 權限警告；上述合併執行關閉非必要 cache，沒有修改產品權限來消除警告。
 
 本片結論是「已有實際 token／查詢／保存量，目前代表資料可讀，已定位非核心優化點」。未驗：冷啟動／磁碟滿、多人負載、128K／272K 真大視窗與所有提示注入語意。是否關閉 T15 仍由任務表依完整安全證據判斷，不以此片自動替 T16／T17 放行。
+
+## 6. T15 完成對照（2026-10-01 有界收尾）
+
+查核基準 `63c0e5d6`，依 [T15 自身完成條件](../tasks.md#t15-安全容量與維護性審查)及 Owner 適度驗收指示：**現有證據足以收斂 T15，無須新增平台或先做效能優化**。本節更新前節尚待整合判斷的狀態，交主線核對並更新唯一任務表；本片不改 tasks、不提交，也不宣告整體產品或 V26 全部完成。
+
+| T15 條件／風險 | 實際證據與界線 |
+|---|---|
+| HTTP／憑證拒絕可觀察 | 沿[安全證據](t15-local-http-security.md)：Host／Origin 在 route 副作用前拒絕、proxy 保留來源；合成 key／provider 回顯不進 request body、PG checkpoint、公開讀取或 log。已核當前 bootstrap 安裝 middleware；既有 69 例等紀錄本次未重跑，不加總成新驗收數。 |
+| V24 資料不升權、偽造 scope 拒絕 | 本次重跑下列既有測例：App 參考資料／員工正文維持 user role、A／B 工具白名單拒絕未授權呼叫、真 PG 拒絕跨檔案 JD 定位及偽造 scope、B1 拒絕讀／寫理解及超界訪談。這是組裝、dispatch 與 owner 的確定性安全證據，不是模型面對所有語意誘導都不犯錯的證明；[A dispatch](../../../../apps/api/src/caliburn/agents/job_consultant/tools.py)不靠 prompt 決定資格。 |
+| 前端不同檔案 cache 不串用 | 沿[T09 來源 UI 實測](t09-source-viewer-ui.md#tdd-與驗證證據)，本次核對 [source-api](../../../../apps/web/src/features/source-viewer/source-api.ts)及 [SourceViewer 測例](../../../../apps/web/src/features/source-viewer/SourceViewer.test.tsx)：key 含檔案／修訂／引用／來源；同 ID 換檔與舊檔晚到回應均有反例。前端本次只讀 code／既有結果，未重跑。 |
+| V26 在 T15 的容量／成本觀測部分 | 本頁 §2–4 已量實際 count、SQL 次數、延遲及保存 bytes；慢點已定位，尚無需新增 cache／索引。§5 的 41 例與 [import 邊界](../../../../apps/api/tests/unit/test_import_boundaries.py)證據沿用，核對當前 AST 檢查仍拒絕底稿 package／錯誤依賴方向；不把量測或靜態規則當作完整模型工具效果。SDK context／工具效果及 128K／272K 真 provider 容量仍由 T16 承接。 |
+| V27 回退與公開歷史保留 | 本次真 PG 重跑取消後基底重用（含採用交易 rollback）及 saver 重連公開回看；公開訊息從原 response 白名單投影，不從 compact input 猜回。Memory ①／②沿已完成 T04，核對 [候選還原測例](../../../../apps/api/tests/integration/test_memory_candidates.py)保留第二安全點、拒絕遲到分支。[保存 §6](../../../architecture/persistence.md#6-保留失效與清理)允許首版不清理；目前未新增 checkpoint GC，故沒有「刪掉唯一原件仍可回看」的主張。將來啟用清理須另驗可達性，不能先刪回退／diff／原操作依據。 |
+
+本次僅補上述安全／保留的既有反例重跑，**12 passed，4.52s，無 skip**；不是新缺陷的 Red–Green，也不是全後端回歸。`apps/api` 執行：
+
+```powershell
+$env:CALIBURN_TEST_DATABASE_URL='postgresql://caliburn_test@127.0.0.1:55439/caliburn_t01_test'
+$env:PYTHONDONTWRITEBYTECODE='1'
+./.venv-target/Scripts/python.exe -B -m pytest tests/unit/test_consultant_tools.py::test_definitions_can_be_built_before_binding_and_match_the_bound_handlers tests/unit/test_consultant_tools.py::test_unknown_tool_is_rejected_without_dispatching_any_handler tests/unit/test_memory_analysis_tools.py::test_existing_contracts_route_reads_and_writes_without_call_id_as_operation tests/unit/test_public_commentary.py tests/integration/test_consultant_context_binding.py::test_initial_request_separates_raw_input_and_hidden_binding_without_jd_map tests/integration/test_jd_reads.py::test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_align tests/integration/test_memory_read_workflow.py::test_model_read_rejections_are_actionable_not_partial_or_false_empty_success tests/integration/test_memory_write_tools.py::test_model_create_update_delete_reports_real_effects_and_isolates_permission tests/integration/test_role_context_history.py tests/integration/test_interview_history_turns.py::test_completed_history_locator_reopens_saved_public_commentary_only -q -p no:cacheprovider --tb=short
+```
+
+每例只建立／清理自身隨機測試 schema；合成模型結果不外送，未讀 `.env`、未改 Demo／啟停其程序。**無新增 T15 阻擋項**；冷啟動／磁碟滿／多人負載未驗，無已知相應使用阻塞，暫不擴測。真模型抗誘導與 JD 事實／引用品質、native compaction 大視窗及正式切換仍屬 T14／T16／T17／T18，不以這 12 例、既有總數或 API 200 代替。

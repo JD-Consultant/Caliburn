@@ -115,7 +115,9 @@ def test_saved_response_is_settled_after_ack_loss_without_querying_model_again(
                     writer,
                     client,
                     ModelRequestAccounting(
-                        "synthetic-v1", Decimal("0.1"), lambda _: Decimal("0.01")
+                        "synthetic-v1",
+                        lambda input_tokens, max_output_tokens: Decimal("0.1"),
+                        lambda _: Decimal("0.01"),
                     ),
                 )
                 observations = []
@@ -246,7 +248,7 @@ def test_resume_keeps_unknown_admission_blocked_and_confirmed_timeouts_bounded(
                     client,
                     ModelRequestAccounting(
                         "synthetic-v1",
-                        Decimal("0.1"),
+                        lambda input_tokens, max_output_tokens: Decimal("0.1"),
                         lambda _: Decimal("0.01"),
                         token_count_reservation_usd=Decimal("0.001"),
                     ),

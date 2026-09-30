@@ -58,7 +58,7 @@ class ModelRequestAccounting:
     """Explicit per-work cost policy, not a claim about provider billing precision."""
 
     cost_basis: str
-    reserved_cost_usd: Decimal
+    reserve_response_cost: Callable[[int, int], Decimal]
     observed_cost: Callable[[Response], Decimal | None]
     token_count_reservation_usd: Decimal | None = None
     compaction_reservation_usd: Decimal | None = None
@@ -66,7 +66,6 @@ class ModelRequestAccounting:
     model: str | None = None
 
     def __post_init__(self) -> None:
-        validate_cost(self.reserved_cost_usd, positive=True)
         if self.token_count_reservation_usd is not None:
             validate_cost(self.token_count_reservation_usd, positive=True)
         if self.compaction_reservation_usd is not None:
@@ -81,14 +80,17 @@ class ModelRequestAccounting:
         cls,
         pricing: TextResponsePricing,
         *,
-        reserved_cost_usd: Decimal,
         token_count_reservation_usd: Decimal | None = None,
         compaction_reservation_usd: Decimal | None = None,
     ) -> ModelRequestAccounting:
-        """Bind the researched Standard rates; reserves remain explicit administrative limits."""
+        """Price each exact counted request with the execution's pinned Standard rates."""
         return cls(
             cost_basis=pricing.cost_basis,
-            reserved_cost_usd=reserved_cost_usd,
+            reserve_response_cost=lambda input_tokens, max_output_tokens: (
+                pricing.reserve_response_cost(
+                    input_tokens=input_tokens, max_output_tokens=max_output_tokens
+                )
+            ),
             observed_cost=pricing.estimate_response_cost,
             token_count_reservation_usd=token_count_reservation_usd,
             compaction_reservation_usd=compaction_reservation_usd,
@@ -169,13 +171,19 @@ class ModelRequestExecutor:
     on_commentary: Callable[[PublicCommentaryUpdate], None] | None = None
 
     async def request_model(
-        self, request: ResponseRequest, request_id: UUID
+        self, request: ResponseRequest, request_id: UUID, input_tokens: int
     ) -> ReceivedModelResponse:
+        """Reuse Graph's saved count for this request; do not count or change its payload."""
+        payload = request.create_payload()
+        reservation = self.accounting.reserve_response_cost(
+            input_tokens, payload["max_output_tokens"]
+        )
+        validate_cost(reservation, positive=True)
         response, attempt_id = await self._send(
             request_id,
             OutboundKind.MODEL,
-            request.create_payload(),
-            self.accounting.reserved_cost_usd,
+            payload,
+            reservation,
             lambda: create_response(self.client, request, on_commentary=self.on_commentary),
         )
         # No DB or cost calculation after the HTTP await: hand intact R to Graph first.
@@ -383,17 +391,19 @@ class ModelRequestExecutor:
     async def account_response(self, received: ReceivedModelResponse) -> None:
         """Settle the original attempt even if its writer is no longer eligible to adopt R."""
         cost = self.accounting.observed_cost(received.response)
-        if cost is None:
-            raise ModelUsageUnavailableError(
-                "Original usage is unavailable; retain the reservation"
-            )
         async with self.sessions.begin() as session:
-            await self._require_cost_basis(session)
+            policy = await self._require_cost_basis(session)
             attempt = await budgets.read_outbound_attempt(
                 session, self.writer.scope, received.attempt_id
             )
             if attempt is None or attempt.request.kind != OutboundKind.MODEL:
                 raise BudgetConflictError("The model result has no matching admitted attempt")
+            if cost is None:
+                if policy.max_cost_usd is not None:
+                    raise ModelUsageUnavailableError(
+                        "Original usage is unavailable; retain the reservation"
+                    )
+                return  # Product diagnostics stay unknown without blocking valid R.
             await budgets.record_attempt_cost(
                 session, self.writer.scope, received.attempt_id, cost_usd=cost
             )
@@ -404,17 +414,19 @@ class ModelRequestExecutor:
         if observed_cost is None:
             raise ValueError("Configure an explicit compaction cost calculator")
         cost = observed_cost(received.response)
-        if cost is None:
-            raise ModelUsageUnavailableError(
-                "Original compaction usage is unavailable; retain the reservation"
-            )
         async with self.sessions.begin() as session:
-            await self._require_cost_basis(session)
+            policy = await self._require_cost_basis(session)
             attempt = await budgets.read_outbound_attempt(
                 session, self.writer.scope, received.attempt_id
             )
             if attempt is None or attempt.request.kind != OutboundKind.COMPACTION:
                 raise BudgetConflictError("The compaction result has no matching admitted attempt")
+            if cost is None:
+                if policy.max_cost_usd is not None:
+                    raise ModelUsageUnavailableError(
+                        "Original compaction usage is unavailable; retain the reservation"
+                    )
+                return  # Billing diagnostics do not determine C's usability.
             await budgets.record_attempt_cost(
                 session, self.writer.scope, received.attempt_id, cost_usd=cost
             )

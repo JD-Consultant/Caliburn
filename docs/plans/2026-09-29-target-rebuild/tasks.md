@@ -67,6 +67,7 @@
 ## T06 共用原生模型／工具執行機制
 
 - [ ] T06；依賴：T01。
+- **2026-09-30 金額減法：**Owner 確認正常產品不設金額 gate、付費驗證保留 manifest 限額；沿既有共用 owner 調整，保留容量、次數、deadline 與恢復。接線與實際測試見 [T06 §19](evidence/t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)，不據此勾完整 T06／T17，不宣稱 Demo 已遷移。
 - **第一切片（2026-09-30）：**接續 T05 寫入提交 `d87b3c86`，實作原生回應原件／重送投影、phase／多 call 路由及對應配對。獨立審查後補空白 final／compact 保留 user 反例；Unit／contracts＋真 saver 新程序 **413 passed**。目前只是元件與正常保存往返，沒有宣稱 E01–E04 整體、完整 Graph、費用／取消或 provider 已驗收。[研究、反例及下一步](evidence/t06-agent-execution.md)。
 - **第二切片（2026-09-30）：**承接 `5cfbb1da`，單一原生模型／有序工具 Step、官方 serializer 明確 allowlist，接上實際 Memory 候選寫入與跨程序 saver。公開入口統一 sync／有界呼叫／恢復准入；模型保存故障／確認遺失、部分工具恢復與元件集合 **452 passed**。雙保存失敗的官方補存已有能力反例；正式 supervisor、完整 loop、預算／compact 與 provider 仍未完成。
 - **第三切片（2026-09-30）：**承接 `a52d76d9`，官方直連 SDK 關閉隱含 retry／redirect，count／create 共用固定 payload；新增不洩漏原文的錯誤分類。Unit／contract **469 passed**，獨立複核 redirect P2 已修；[第三切片證據](evidence/t06-agent-execution.md#3-第三切片直連請求與安全失敗分類)。持久額度、完整 loop、串流與 provider 仍待交付，T06 不勾選。

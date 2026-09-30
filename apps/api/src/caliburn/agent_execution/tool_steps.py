@@ -138,7 +138,7 @@ class ResponseStepRuntime:
     inactive work can settle its saved C, but cannot send, adopt or return a new window.
     """
 
-    request_model: Callable[[ResponseRequest, UUID], Awaitable[ReceivedModelResponse]]
+    request_model: Callable[[ResponseRequest, UUID, int], Awaitable[ReceivedModelResponse]]
     prepare_tool: Callable[[ResponseFunctionToolCall, UUID], Awaitable[object]]
     execute_tool: Callable[[object], Awaitable[str]]
     ensure_active: Callable[[], Awaitable[None]]
@@ -673,7 +673,9 @@ def _build_response_step(
         )
         try:
             received = await runtime.context.request_model(
-                ResponseRequest.from_snapshot(state["request_snapshot"]), state["request_id"]
+                ResponseRequest.from_snapshot(state["request_snapshot"]),
+                state["request_id"],
+                count["input_tokens"],
             )
         except (ReceivedModelResponseError, ReceivedModelResponseCancelledError) as error:
             # Only a typed complete original may cross this path. Return its update

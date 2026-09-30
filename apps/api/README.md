@@ -35,6 +35,8 @@ uv run --project apps/api --locked python apps/api/scripts/run_backend.py --key-
 
 ## 驗證
 
+正常產品不再使用預估美元金額攔截 A／B1／B2；`CALIBURN_TURN_MAX_COST_USD` 已退役，不再讀取。token 容量、壓縮門檻、呼叫／重試及時間限制仍有效。用量估算可作診斷，不是 provider 帳單。付費驗證腳本須依 manifest 明確配置自身的有限預算；技術界線見[執行 §5.8](../../docs/implementation/agent-execution.md#58-產品與付費驗證的金額界線2026-09-30)。套用新程式前，依下方命令明確升級至含 `0019_optional_cost_limit` 的 schema；不靠啟動自動改 DB，不重寫舊工作限制。
+
 ### 目標資料庫初始化
 
 先建立**專用的新空白 PostgreSQL database**，不填舊產品連線。以下從 repo root 執行；密碼由本機秘密管理注入，勿提交。僅使用新的配置名稱，不自動載入 `.env`。

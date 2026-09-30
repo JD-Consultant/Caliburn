@@ -114,7 +114,7 @@ async def retry_executor(
                 client,
                 ModelRequestAccounting(
                     "synthetic-v1",
-                    Decimal("0.1"),
+                    lambda input_tokens, max_output_tokens: Decimal("0.1"),
                     lambda _: Decimal("0.01"),
                     token_count_reservation_usd=Decimal("0.001"),
                     compaction_reservation_usd=Decimal("0.2"),
@@ -189,7 +189,9 @@ def test_transient_rejection_retries_same_payload_with_new_budgeted_attempt(
                     writer,
                     client,
                     ModelRequestAccounting(
-                        "synthetic-v1", Decimal("0.1"), lambda _: Decimal("0.01")
+                        "synthetic-v1",
+                        lambda input_tokens, max_output_tokens: Decimal("0.1"),
+                        lambda _: Decimal("0.01"),
                     ),
                 )
                 request = ResponseRequest(
@@ -201,7 +203,7 @@ def test_transient_rejection_retries_same_payload_with_new_budgeted_attempt(
                     max_output_tokens=512,
                 )
                 request_id = uuid4()
-                result = await executor.request_model(request, request_id)
+                result = await executor.request_model(request, request_id, 100)
                 assert result.response.id == response_json["id"]
                 assert len(requests) == 2
                 assert requests[0] == requests[1] == request.create_payload()
@@ -283,9 +285,9 @@ def test_blocked_provider_failure_does_not_retry_on_reentry(
         async with retry_executor(database_settings, retry_file_id, respond) as executor:
             request_id = uuid4()
             with pytest.raises(ModelRequestFailedError):
-                await executor.request_model(request_fixture(), request_id)
+                await executor.request_model(request_fixture(), request_id, 100)
             with pytest.raises(PriorModelAttemptError):
-                await replace(executor).request_model(request_fixture(), request_id)
+                await replace(executor).request_model(request_fixture(), request_id, 100)
             async with executor.sessions.begin() as session:
                 attempts = await budgets.read_request_attempts(
                     session, executor.writer.scope, request_id
@@ -332,7 +334,7 @@ def test_retry_uses_original_limits_across_executor_reentry(
             request_id = uuid4()
             for active_executor in (executor, replace(executor)):
                 with pytest.raises(BudgetExceededError) as caught:
-                    await active_executor.request_model(request_fixture(), request_id)
+                    await active_executor.request_model(request_fixture(), request_id, 100)
                 assert caught.value.limit == expected_limit
             async with executor.sessions.begin() as session:
                 usage = await budgets.read_budget_usage(session, executor.writer.scope)
@@ -379,7 +381,7 @@ def test_retry_delay_survives_restart_and_cancellation_is_checked_before_resend(
             with monkeypatch.context() as patch:
                 patch.setattr(model_requests, "sleep", interrupt_wait)
                 with pytest.raises(ConnectionError, match="interrupted while backing off"):
-                    await executor.request_model(request_fixture(), request_id)
+                    await executor.request_model(request_fixture(), request_id, 100)
             assert len(calls) == 1
             async with executor.sessions.begin() as session:
                 attempts = await budgets.read_request_attempts(
@@ -391,10 +393,10 @@ def test_retry_delay_survives_restart_and_cancellation_is_checked_before_resend(
             resumed = replace(executor, retry_policy=ResponseRetryPolicy(0.0001, 0.0001))
             if cancel_during_wait:
                 with pytest.raises(ExecutionStateError):
-                    await resumed.request_model(request_fixture(), request_id)
+                    await resumed.request_model(request_fixture(), request_id, 100)
                 assert len(calls) == 1
             else:
-                await resumed.request_model(request_fixture(), request_id)
+                await resumed.request_model(request_fixture(), request_id, 100)
                 assert len(calls) == 2
             async with executor.sessions.begin() as session:
                 original = await budgets.read_outbound_attempt(
@@ -432,7 +434,7 @@ def test_exhausted_work_budget_stops_before_retry_wait(
         ) as executor:
             monkeypatch.setattr(model_requests, "sleep", forbidden_wait)
             with pytest.raises(BudgetExceededError) as caught:
-                await executor.request_model(request_fixture(), uuid4())
+                await executor.request_model(request_fixture(), uuid4(), 100)
             assert caught.value.limit == expected_limit
             assert len(calls) == 1
             async with executor.sessions.begin() as session:
@@ -473,17 +475,18 @@ def test_failure_save_must_be_confirmed_or_reconciled_before_resend(
                 await replace(executor, sessions=FaultedFailureSave()).request_model(
                     request_fixture(),
                     request_id,
+                    100,
                 )
             assert "sensitive synthetic detail" not in "".join(
                 traceback.format_exception(caught.value)
             )
             assert len(calls) == 1
             if failure_was_committed:
-                await replace(executor).request_model(request_fixture(), request_id)
+                await replace(executor).request_model(request_fixture(), request_id, 100)
                 assert len(calls) == 2
             else:
                 with pytest.raises(PriorModelAttemptError):
-                    await replace(executor).request_model(request_fixture(), request_id)
+                    await replace(executor).request_model(request_fixture(), request_id, 100)
                 assert len(calls) == 1
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
@@ -574,13 +577,13 @@ def test_cancelled_failure_save_stops_without_leaking_provider_body(
                                     await asyncio.Event().wait()
 
                     await replace(executor, sessions=CancelledFailureSave()).request_model(
-                        request_fixture(), request_id
+                        request_fixture(), request_id, 100
                     )
             assert "sensitive synthetic detail" not in "".join(
                 traceback.format_exception(caught.value)
             )
             with pytest.raises(PriorModelAttemptError):
-                await executor.request_model(request_fixture(), request_id)
+                await executor.request_model(request_fixture(), request_id, 100)
             assert len(calls) == 1
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
@@ -613,13 +616,15 @@ def test_two_retry_runners_cannot_both_send_after_one_recorded_failure(
             with monkeypatch.context() as patch:
                 patch.setattr(model_requests, "sleep", interrupted_wait)
                 with pytest.raises(ConnectionError, match="synthetic stop"):
-                    await executor.request_model(request_fixture(), request_id)
+                    await executor.request_model(request_fixture(), request_id, 100)
             async with asyncio.timeout(5), asyncio.TaskGroup() as group:
-                first = group.create_task(executor.request_model(request_fixture(), request_id))
+                first = group.create_task(
+                    executor.request_model(request_fixture(), request_id, 100)
+                )
                 await entered.wait()
                 try:
                     with pytest.raises(PriorModelAttemptError):
-                        await replace(executor).request_model(request_fixture(), request_id)
+                        await replace(executor).request_model(request_fixture(), request_id, 100)
                 finally:
                     release.set()
             assert first.result().response.id == success_fixture()["id"]

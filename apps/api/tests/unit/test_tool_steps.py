@@ -61,7 +61,9 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
     config = {"configurable": {"thread_id": "ordered-step"}}
     input_items = [{"role": "user", "content": "synthetic"}]
 
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         assert model_request.count_payload()["input"] == input_items
         events.append("model")
         return ReceivedModelResponse(response=response, attempt_id=uuid4())
@@ -113,8 +115,15 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
 
 
 @pytest.mark.asyncio
-async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare() -> None:
+@pytest.mark.parametrize("missing_billing_detail", [False, True])
+async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
+    missing_billing_detail: bool,
+) -> None:
     response = model_response()
+    if missing_billing_detail:
+        raw = snapshot_response(response)
+        del raw["usage"]["input_tokens_details"]["cache_write_tokens"]
+        response = Response.model_construct(**raw)
     events = []
     attempts = 0
     prepared_second = None
@@ -124,7 +133,9 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
     graph = _build_response_step(saver, max_tool_calls=16)
     config = {"configurable": {"thread_id": "recover-second"}}
 
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         events.append("model")
         return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
@@ -166,6 +177,8 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
         )
     assert (await graph.aget_state(config)).next == ("execute_tool",)
     result = await graph.ainvoke(None, config, context=runtime, durability="sync")
+    assert result["response_snapshot"] == snapshot_response(response)
+    assert result["completed_steps"] == 1
     assert events == [
         "model",
         "prepare:call_synthetic",
@@ -183,7 +196,9 @@ async def test_read_or_rejection_is_saved_as_result_without_executing() -> None:
     saver = InMemorySaver()
     graph = _build_response_step(saver, max_tool_calls=16)
 
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
@@ -222,7 +237,9 @@ async def test_unsupported_response_is_preserved_before_routing_rejects_it() -> 
     graph = _build_response_step(saver, max_tool_calls=16)
     config = {"configurable": {"thread_id": "unsupported-phase"}}
 
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
@@ -263,7 +280,9 @@ async def test_public_entry_rejects_restarted_input_and_resumes_same_operation()
     operations = []
     saver = InMemorySaver()
 
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         nonlocal requests
         requests += 1
         return ReceivedModelResponse(response=response, attempt_id=uuid4())
@@ -303,7 +322,9 @@ async def test_public_entry_rejects_restarted_input_and_resumes_same_operation()
 
 @pytest.mark.asyncio
 async def test_configured_tool_bound_rejects_before_any_effect() -> None:
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         return ReceivedModelResponse(response=model_response(), attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:

@@ -48,7 +48,9 @@ async def run(mode: str, thread_id: str) -> None:
     model_calls = 0
     observation_calls = 0
 
-    async def request_model(request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request_model(
+        request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         nonlocal model_calls
         model_calls += 1
         assert mode == "write", "Restoring saved R must not reissue either model request"

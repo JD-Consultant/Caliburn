@@ -47,6 +47,7 @@ async def test_saved_count_survives_next_node_failure_and_matches_exact_request(
     result = await run_response_loop(saver, request=None, **options)
     assert len(probe.count_requests) == len(probe.model_requests) == 1
     assert result["input_count"]["input_tokens"] == 488
+    assert probe.model_input_tokens == [488]
     assert probe.count_requests[0][1] == request_fixture().count_payload()
     assert probe.model_requests == [request_fixture().create_payload()]
 
@@ -160,3 +161,4 @@ async def test_below_middle_threshold_continues_and_final_needs_no_more_count():
     assert result["next_action"] == "deliver_answer"
     assert len(probe.count_requests) == len(probe.model_requests) == 2
     assert probe.count_requests[0][0] != probe.count_requests[1][0]
+    assert probe.model_input_tokens == [10, 271_999]

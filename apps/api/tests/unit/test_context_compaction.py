@@ -229,8 +229,8 @@ async def test_grown_window_can_compact_again_after_another_complete_step():
     args = options(events)
     boundaries = []
 
-    async def model(request, request_id):
-        received = await probe.model(request, request_id)
+    async def model(request, request_id, input_tokens: int):
+        received = await probe.model(request, request_id, input_tokens)
         received.response.output[1].phase = (
             "final_answer" if len(probe.model_requests) == 3 else "commentary"
         )
@@ -255,6 +255,7 @@ async def test_grown_window_can_compact_again_after_another_complete_step():
         max_model_steps=3,
     )
     assert result["completed_steps"] == 3
+    assert probe.model_input_tokens == [100, 100, 100]
     assert len(boundaries) == len(set(boundaries)) == 2
     assert [event[0] for event in events] == ["compact", "account", "compact", "account"]
     assert len(events[2][1]) == 4  # Previous C plus the newly completed Step.
@@ -336,8 +337,8 @@ async def test_empty_response_does_not_make_unchanged_c_eligible_for_compaction_
     # Even if the remote counter changes, a new request ID is not new information.
     probe = CapacityProbe([100, 272000, 100, 272000], final=False)
 
-    async def model(request, request_id):
-        received = await probe.model(request, request_id)
+    async def model(request, request_id, input_tokens: int):
+        received = await probe.model(request, request_id, input_tokens)
         if len(probe.model_requests) == 2:
             received.response.output = []
         return received

@@ -140,10 +140,6 @@ class ConsultantRunner:
             self.client,
             ModelRequestAccounting.from_text_pricing(
                 pricing,
-                reserved_cost_usd=pricing.reserve_response_cost(
-                    input_tokens=_CAPACITY["max_input_tokens"],
-                    max_output_tokens=self.settings.max_output_tokens,
-                ),
                 token_count_reservation_usd=Decimal("0.0001"),
                 compaction_reservation_usd=Decimal("0.50"),
             ),

@@ -261,6 +261,8 @@ flowchart TD
 
 ### 5.1 已落地的工作額度保存（T06 第四切片）
 
+> 金額規則已由 §5.8 收斂：新產品工作 `max_cost_usd=NULL`，只有明確啟用的付費驗證仍核金額；下方原有額度／預留機制不代表產品仍有金額 gate。
+
 `features/executions/budgets.py` 沿既有 execution 身分與 writer fencing 維護額度，migration `0013_execution_budgets` 建立下圖兩表。**這是可組合的准入／記帳元件，尚未接成所有 HTTP 呼叫的共同 runner。**不含 R／C、prompt、Graph cursor、候選正文或秘密；沒有第二套 ResponseStore。
 
 ```mermaid
@@ -429,6 +431,8 @@ flowchart TD
 
 ### 5.7 固定費率與 usage 成本估算（T06 第十七切片）
 
+> §5.8 區分成本診斷與付費測試攔截，並取代舊的固定最大輸入預留接法；本節費率算式仍有效，不要求產品先估出金額才可接續有效結果。
+
 `adapters/openai_pricing.py` 只處理 **Standard／default、文字 Responses＋本機 function tools** 的 token 算術；`ModelRequestAccounting.from_text_pricing()` 接回既有外送／結算 owner。沒有新帳單服務、價格網路查詢、資料表或 provider 抽象。提供經 2026-09-30 官方資料核對的 `GPT_6_LUNA_STANDARD_2026_09_30` 不可變配置；組裝方須明確選用，不在 import 時啟動模型、不自行換模型。
 
 - **同一費率依據：**`cost_basis` 含來源修訂、估算法版本與完整 rates／模型／長 context 門檻指紋。execution 原有 budget 固定它；重開時若提供不同配置，原 owner 拒絕結算／新准入，不能用今天價格改算舊工作。後續更新價格須保留在途工作所需原配置；完整 supervisor 的配置選用仍待接線。
@@ -442,6 +446,19 @@ flowchart TD
 以上 `reported_cost_usd` 仍是原系統依 usage 及固定規則計算的成本估算，**不是 provider 確認帳單或硬性帳單上限**；區域、合約、其他模態／內建工具、服務 tier 不在此配置支援範圍。真正帳戶適用性、compact wire metadata 與校準仍由 T06 預檢／T16 驗證，尚未發生真模型外送。不可因算術通過就宣稱產品或費用 gate 通過。
 
 依據：[官方 pricing](https://developers.openai.com/api/docs/pricing)、[cache read／write 算式](https://developers.openai.com/api/docs/guides/prompt-caching#monitor-cache-performance)、[Compact default tier 與回傳契約](https://developers.openai.com/api/reference/python/resources/responses/methods/compact)、[input token count](https://developers.openai.com/api/docs/guides/token-counting)。查證日期 2026-09-30；官方定義費率／usage，本案選擇固定配置、九位向上捨入及未知預留。實測見 [T06 §17](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#17-第十七切片固定費率與原-usage-結算)。
+
+### 5.8 產品與付費驗證的金額界線（2026-09-30）
+
+依[共用政策 §6.5](../specs/2026-09-27-shared-agent-execution-and-state-design.md#65-容量與費用分開產品不設金額攔截)，正常 `ModelSettings` 的 `max_cost_usd=None`；環境載入與 `scripts/run_backend.py` 都不再讀取 `CALIBURN_TURN_MAX_COST_USD`。A、B1、B2 沿同一設定及 executions owner，不各自繞過錯誤。付費驗證可由程式明確給有限正數預算；不暴露成產品／模型可改的參數。
+
+- `ExecutionBudget.max_cost_usd` 可為 `None`，DB 為 `NULL`。只有非空時檢查累計金額；模型步數、總 attempts、每請求 attempts、compact 次數、deadline、writer／取消及固定 request 的檢查無條件保留。既有用量與預估紀錄只供診斷，不以巨大假上限替代空值。
+- migration `0019_optional_cost_limit` 只放寬既有欄位的 nullability，不新增表、不改寫既有 budget／attempt、不刪資料。明確測試預算仍須正數；固定配置保護 trigger 不移除。啟動前仍須明確 upgrade，App 不自動遷移。已受理舊工作的原限制維持；新產品工作採新政策。
+- Graph 將已保存、與當前 request 配對的 `input_tokens` 傳給 executor；若需預留估算，使用該 count 與同一 payload 的 `max_output_tokens`，不再一律把 922K 最大輸入當成本次輸入。壓縮後重新計數，恢復沿保存值；沒有額外一次 count HTTP、永久 cache 或新 context 欄位。
+- R／C 仍先保存後處理 usage。產品缺計費明細時保持 `reported_cost_usd=NULL`，不阻止有效原件接續、不補零、不重發模型；明確啟用費用上限的評測則保留既有保守停止。結果對應、資料庫／原件保存、模型容量與 context 格式檢查不放寬。
+- 原 R 還原時，僅計費 `usage` 以 SDK `ResponseUsage.model_construct()` 保留其實際收到／缺省的欄位；其餘 envelope／output 仍走 `Response.model_validate()`，工具與 phase 仍由原執行檢查。這與 SDK 3.20.0 接收部分明細的行為一致，不為缺欄補零、不修改保存原件、不將整個回應改成無驗證還原。C 已沿既有原生還原與完整 output window 檢查，不另加一套序列化。
+- 記錄的金額不是 OpenAI 帳單；供應商金鑰／實際帳戶額度失敗仍依原錯誤分類停止無效重試。沒有產品金額 gate 不等於 API 免費或工程測試可無限外送。
+
+官方機制：使用 [Alembic `alter_column(nullable=True)`](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.alter_column)與 [SQLAlchemy nullable mapping](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#mapped-column-derives-the-datatype-and-nullability-from-the-mapped-annotation)，不手改舊 migration／另造配置引擎；完整 request 計數沿 [OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting)。政策是 Owner 決策，不宣稱供應商要求取消費用 gate。驗證與限制見 [T06 §19](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)。
 
 ## 6. 本機 A Supervisor（T08 有界接線）
 

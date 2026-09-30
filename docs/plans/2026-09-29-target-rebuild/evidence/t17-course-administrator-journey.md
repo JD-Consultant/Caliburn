@@ -135,3 +135,11 @@ baseline 的歷史 trial 1 未觀察、trial 2 只寫職稱及主管且引用 2 
 提交前在 `apps/api` 執行 `python -B -m pytest tests/unit/test_role_prompt_contracts.py tests/unit/test_consultant_tools.py tests/unit/test_job_analysis_quality_fixtures.py -q -p no:cacheprovider`：**56 passed**；兩個變動 Python 檔的 Ruff check／format check 通過，`git diff --check` 無空白錯誤。只驗此切片，不冒稱完整測試套件或十三例自然品質通過。
 
 接續優先：依同一 rubric 解決漏附來源及局部更正泛化，先檢查既有工具／context／方法指引責任，不連續堆提醒、不替模型自動配來源。Memory 預算限制是否影響正常旅程留待有界核對，不為它增建全面恢復系統。先前 T16／T17／T18 未完項保持未完。
+
+### 後續唯讀診斷：Memory 的 App 金額預留誤攔（2026-09-30）
+
+核對原隔離 schema 的 `ead82a17-95f5-43db-97fb-ce5ea53ba905`，再對照當時 runner 算式：已記模型估算 0.005708160＋17 次 count 行政預留 0.001700000＝0.007408160；舊接線對下一次生成固定預留 0.242788000（把 922K 最大輸入當成實際輸入），合計 **0.250196160 > 0.25**。因此已具體定位 App 金額 gate 的反例；不是 API 帳戶額度不足，也不是 24-step 限制耗盡。這是後續 DB／程式核對，原失敗回執本身仍未記錄 budget subtype。
+
+Owner 隨後採納「正常產品不設金額攔截，保留 token 容量、次數與時間限制；付費測試另定預算」。共用接線及確定性證據見 [T06 §19](t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)。明示付費測試保留上限並改用同一請求已保存的實際 count 預留；不為產品設巨大假上限。
+
+沒有重跑或修改原 trial，原批次仍 failed、候選 discarded；沒有將來源品質 fail 改成 pass。這次全為離線模型／真測試 DB 驗證，不新增付費 manifest；profile 漏來源與局部更正泛化仍須另行驗證，不能因移除金額 gate 宣稱整條訪談旅程已驗收。

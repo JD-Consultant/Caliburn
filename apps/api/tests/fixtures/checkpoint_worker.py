@@ -50,7 +50,9 @@ async def run(mode: str, thread_id: str) -> None:
         max_output_tokens=512,
     )
 
-    async def request_model(request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request_model(
+        request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         nonlocal model_calls
         model_calls += 1
         return ReceivedModelResponse(response=response, attempt_id=uuid4())

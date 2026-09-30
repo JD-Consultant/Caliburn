@@ -5,9 +5,7 @@ This does not migrate, erase, seed or start PostgreSQL, and does not switch prod
 """
 
 import argparse
-import os
 from dataclasses import replace
-from decimal import Decimal
 from pathlib import Path
 
 import uvicorn
@@ -29,10 +27,7 @@ def main() -> None:
             parser.error("The selected file must contain exactly one plain OPENAI_API_KEY.")
         configured = replace(
             configured,
-            model=ModelSettings(
-                api_key=key,
-                max_cost_usd=Decimal(os.environ.get("CALIBURN_TURN_MAX_COST_USD", "1.00")),
-            ),
+            model=ModelSettings(api_key=key),
         )
     if configured.database is None:
         parser.error("Configure CALIBURN_DATABASE_URL for the isolated target database.")

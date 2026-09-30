@@ -10,6 +10,7 @@ from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from openai import AsyncOpenAI
 from openai.types.responses import Response, ResponseFunctionToolCall
 from openai.types.responses.compacted_response import CompactedResponse
+from pydantic import ValidationError
 
 from caliburn.adapters.response_serialization import (
     compaction_input_items,
@@ -151,11 +152,15 @@ def test_saved_result_prefix_cannot_skip_repeat_or_exceed_calls(result_ids: list
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("missing_billing_detail", [False, True])
 async def test_real_sdk_mock_transport_sends_preserved_items_and_exact_result(
     response: Response,
+    missing_billing_detail: bool,
 ) -> None:
     captured = []
     raw = snapshot_response(response)
+    if missing_billing_detail:
+        del raw["usage"]["input_tokens_details"]["cache_write_tokens"]
 
     def reply(request: httpx2.Request) -> httpx2.Response:
         assert request.url.host == "openai.invalid"
@@ -172,6 +177,7 @@ async def test_real_sdk_mock_transport_sends_preserved_items_and_exact_result(
             model="gpt-6-luna", input="合成問題", store=False, reasoning={"context": "all_turns"}
         )
         restored = restore_response(snapshot_response(first))
+        assert snapshot_response(restored) == raw
         history = [{"role": "user", "content": "合成問題"}, *response_input_items(restored)]
         call = ResponseFunctionToolCall.model_validate(raw["output"][2])
         history.append(function_result_item(call, "原工具結果"))
@@ -182,3 +188,12 @@ async def test_real_sdk_mock_transport_sends_preserved_items_and_exact_result(
     assert captured[1]["input"][1]["encrypted_content"] == raw["output"][0]["encrypted_content"]
     assert captured[1]["input"][2]["phase"] == "commentary"
     assert len(captured) == 2
+
+
+def test_missing_billing_detail_does_not_relax_output_validation(response: Response) -> None:
+    raw = snapshot_response(response)
+    del raw["usage"]["input_tokens_details"]["cache_write_tokens"]
+    raw["output"][2]["call_id"] = []
+    with pytest.raises(ValidationError) as failure:
+        restore_response(raw)
+    assert any(error["loc"][0] == "output" for error in failure.value.errors())

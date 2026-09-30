@@ -41,7 +41,8 @@ class ModelSettings:
     max_compactions: int = 4
     turn_timeout_seconds: int = 900
     request_timeout_seconds: float = 120.0
-    max_cost_usd: Decimal = Decimal("1.00")
+    # Product entrypoints leave this unset. Paid evaluation harnesses may opt in.
+    max_cost_usd: Decimal | None = None
 
     def __post_init__(self) -> None:
         if not self.api_key.strip() or self.model != "gpt-6-luna":
@@ -63,8 +64,10 @@ class ModelSettings:
                 raise ValueError("Model limits must be positive integers")
         if self.max_output_tokens > 128_000 or not 0 < self.request_timeout_seconds <= 900:
             raise ValueError("Model output or timeout exceeds the configured capacity")
-        if not self.max_cost_usd.is_finite() or self.max_cost_usd <= 0:
-            raise ValueError("Configure a finite positive per-Turn cost budget")
+        if self.max_cost_usd is not None and (
+            not self.max_cost_usd.is_finite() or self.max_cost_usd <= 0
+        ):
+            raise ValueError("An explicit evaluation cost budget must be finite and positive")
 
 
 @dataclass(frozen=True, slots=True)
@@ -104,12 +107,7 @@ class Settings:
             )
             if database_url
             else None,
-            model=ModelSettings(
-                api_key=openai_key,
-                max_cost_usd=Decimal(os.environ.get("CALIBURN_TURN_MAX_COST_USD", "1.00")),
-            )
-            if openai_key
-            else None,
+            model=ModelSettings(api_key=openai_key) if openai_key else None,
             pdf=PdfSettings(
                 font_path=Path(pdf_font),
                 executable_path=Path(pdf_browser) if pdf_browser else None,

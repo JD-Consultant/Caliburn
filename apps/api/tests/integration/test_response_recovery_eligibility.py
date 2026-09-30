@@ -78,7 +78,7 @@ def test_late_or_held_response_requires_current_writer_before_tools(
                     await executions.lock_active_writer(session, writer)
 
             async def request(
-                model_request: ResponseRequest, request_id: UUID
+                model_request: ResponseRequest, request_id: UUID, input_tokens: int
             ) -> ReceivedModelResponse:
                 events.append("model")
                 if interruption == "cancel_during_model":

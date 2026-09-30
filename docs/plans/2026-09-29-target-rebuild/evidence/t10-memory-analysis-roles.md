@@ -57,3 +57,24 @@ B1 為 `read_work_situation_map`、`read_work_situation`、`read_interview`、`c
 交付前再驗同組 **31 passed（1.58s）**；五個改動 Python 檔案 Ruff 通過，三個 runtime module 與探針共四個檔案 mypy 通過；未放寬 import boundary 測試。
 
 未判定／未宣稱：真訪談分析品質、真生成工具選擇、全 T10／T16／全部 gates。這些不是 count endpoint 可驗的效果；本次不啟動訪談、不接觸 DB、不發布候選。
+
+## 任務完成對照（2026-09-30 恢復後）
+
+沿[任務表 T10 的 Red 與完成條件](../tasks.md#t10-b1b2-私有角色與-context)逐條對照既有測試；只補了一個缺口（V14 的情境差異專項測試）。路徑相對 `apps/api/tests`。
+
+| T10 Red | 代表測例（真 PG，除註明外） |
+|---|---|
+| B1 透過錯誤／gap 看理解 | `unit/test_memory_analysis_outcomes.py::test_b1_rework_final_is_not_allowed_outcome`、`unit/test_role_prompt_contracts.py::test_analysis_prompt_roles_only_offer_their_permitted_write_layer`（B1 沒有任何理解讀取入口）、`integration/test_memory_read_workflow.py::test_candidate_reads_enforce_role_stage_and_fixed_interview_frontier` |
+| B2 修改情境 | `integration/test_memory_candidates.py::test_role_and_stage_permissions_are_enforced_beyond_tool_registration`、`integration/test_memory_write_tools.py::test_model_create_update_delete_reports_real_effects_and_isolates_permission` |
+| 回交重置分析／compact | `integration/test_memory_analysis_runners.py::test_b1_b2_rework_retains_candidate_private_history_and_original_frontier`、`integration/test_memory_batch_orchestration.py::test_b2_gap_roundtrip_keeps_its_existing_understanding`、`integration/test_memory_candidates.py::test_b1_return_keeps_b2_work_and_restore_retains_second_safe_point` |
+| B2 只看已有引用而漏新增情境 | **本次新增** `integration/test_memory_stage_changes.py`：B2 收到的差異涵蓋新增（含尚無理解引用者）、刪除、改名（附 `previous_title`）、改正文、改回（淨文字與來源相同時明說，不給空 diff），已受影響的理解標題隨附，未動的情境不列；只有 B2 階段能取得（B1 階段被拒）。另 `integration/test_memory_read_workflow.py::test_candidate_map_includes_changes_after_its_stage_started` |
+| 原話上界偷偷用 A 最新輪 | `integration/test_memory_source_windows.py::test_required_window_ends_at_requested_employee_not_final_reply_or_latest_history` |
+
+| T10 完成條件 | 對照 |
+|---|---|
+| V10／V11／V14 的角色層 | V10：見 [T11 對照](t11-memory-batch.md#任務完成對照2026-09-30-恢復後)；V11：上表；V14：新增的差異專項測試＋既有 `test_memory_revisions.py::test_same_edit_is_noop_but_changing_back_creates_a_new_revision` |
+| fixed F、共同訪談 read | `integration/test_memory_source_windows.py`（6 案）、`integration/test_memory_read_workflow.py`（7 案） |
+| B2 讀現在情境＋必要 diff、只改理解；gap 具體、不要求固定互審 | 上表；`unit/test_role_prompt_contracts.py::test_model_copying_prompt_json_examples_will_satisfy_actual_outcome_parser` |
+| 真模型證據 | 三批 A→B1→B2 正式發布（[T08 §5.2](t08-consultant-turn.md#52-真-a--b1--b2--正式快照1109-台北核對)）、課程行政旅程 4 批背景 Memory（[T17](t17-course-administrator-journey.md)；其中 1 批因已移除的金額預留攔截失敗）、之後的模擬員工評測中背景批次照常發布 |
+
+**結論：**T10 的角色權限、固定資料與 context 在其範圍內成立，勾選。**不含**：背景整理品質是否讓長訪談更好（T14／T17）、按需差異在超長批次的容量（T15／T16）、跨程序故障矩陣（T12）。

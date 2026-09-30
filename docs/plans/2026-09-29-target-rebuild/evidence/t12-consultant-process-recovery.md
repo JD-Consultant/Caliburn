@@ -111,3 +111,29 @@ $recoveryTests = @(
 結果 **89 passed in 94.76s**（包含本次 8 案，不與先前 47／22／11 案相加）。11 個異動 Python 檔 Ruff check／format 通過，4 個主要接線檔依專案 mypy 規範通過。本次六份文件的連結檢查另比對 HEAD：935 個本地連結，**零新增錯誤**；決策登記舊條目已有 87 個失效連結／anchor（多為已移除 worktree），不冒稱全文件零錯誤，也不在本切片改寫歷史。
 
 未使用 `.env`、未外送模型、未改 Demo DB／程序，沒有新 migration 或部署。未跑新的瀏覽器／真模型品質驗收，不把本次收尾與故障測試當成 T16–T18 完成。後續回到核心產品旅程與既有 UI 差異檢視缺口；不再為同一罕見原件遺失擴建證明系統。
+
+## 7. 任務完成對照（2026-09-30 恢復後）
+
+沿[任務表 T12 的 Red 與完成條件](../tasks.md#t12-真-postgresql-故障與競爭整合)及 [E01–E15](../../../specs/2026-09-27-shared-agent-execution-and-state-design.md#71-職責異常測試映射全部待執行)逐條對照既有測試，範圍依 Owner 的[首版恢復減法](#6-首版恢復減法與最外層失敗收尾2026-09-30)：能續作的續作，不能續作就安全退出。路徑相對 `apps/api/tests`；除註明外皆為真 PostgreSQL。
+
+| Gate | 對照 |
+|---|---|
+| E01 R／C 序列化及下一 request | `contracts/test_response_serialization.py`、`contracts/test_openai_native_items.py`、`contracts/test_graph_serialization.py`、`integration/test_graph_postgres.py`；遠端接受性見 [T06 §6、§20](t06-agent-execution.md#20-真-compact-協定預檢2026-09-30-恢復後) |
+| E02 R 已存、工具未做 crash | 本頁四個**真子程序 `os._exit`** 案（`integration/test_consultant_process_recovery.py`）；`integration/test_response_step_postgres.py::test_saved_step_reopens_without_repeating_window_items` |
+| E03 R 在但保存失敗／確認遺失 | `integration/test_response_step_postgres.py::test_public_step_recovery_saves_held_model_result_after_both_writes_fail`、`integration/test_result_save_retries_postgres.py`、`integration/test_consultant_runner_recovery.py` |
+| E04 P1 提交後、Graph 結果前 crash | 本頁「JD 工具交易已提交、tool result 尚未保存」案（比較全部 JD 修訂 ID）；`integration/test_memory_tool_step.py::test_committed_first_write_recovers_original_before_dependent_second_write` |
+| E05 原操作查不到／同 ID 不同參數 | `integration/test_input_acceptance.py::test_command_scope_is_per_file_and_conflicting_payload_is_rejected`、`integration/test_jd_candidates.py::test_candidate_command_identity_cannot_be_used_for_a_manual_edit`、`integration/test_jd_candidates.py::test_new_writer_can_recover_but_old_writer_cannot_write` |
+| E06 Step 已存但確認遺失；存在更晚候選 | `integration/test_response_recovery_eligibility.py`、`integration/test_consultant_context_binding.py::test_reconnect_restores_exact_request_and_bindings_after_memory_and_candidate_advance` |
+| E07 暫停到達各控制點 | `integration/test_execution_control.py`（13 案）、`integration/test_consultant_controls.py`、`unit/test_response_pause.py`；瀏覽器：[T09 旅程](t09-consultant-journeys.md) |
+| E08 取消與正式完成同時發生 | `integration/test_consultant_completion.py::test_complete_and_cancel_race_has_one_atomic_outcome`、`integration/test_interview_completion.py::test_cancel_racing_completion_cannot_leave_a_half_formal_exchange`、`integration/test_execution_admission.py::test_cancel_and_complete_compete_for_one_durable_terminal_outcome` |
+| E09 取消／失敗後改送 b | `integration/test_role_context_history.py::test_cancelled_work_cannot_replace_prepared_history_for_new_input`、`integration/test_execution_failure_boundary.py::test_escaped_consultant_failure_discards_draft_and_allows_new_input`；瀏覽器：T09 旅程的取消與被拒絕後重新開始 |
+| E10 B1／B2 回交後 crash | `integration/test_memory_batch_orchestration.py::test_reentry_after_b1_handoff_skips_b1_and_preserves_work`、`test_memory_analysis_runners.py::test_b1_b2_rework_retains_candidate_private_history_and_original_frontier` |
+| E11 C 返回未存／已存未明採用／已採用又取消 | `integration/test_compaction_accounting.py`、`integration/test_context_preparation_postgres.py`、`unit/test_context_compaction.py` |
+| E12 A 完成或 Memory ③ COMMIT 後確認遺失 | `integration/test_execution_failure_boundary.py::test_completion_acknowledgement_failure_preserves_original_result`、本頁「final R 已保存、產品尚未完成」案 |
+| E13 A 完成後 B 未領取／領取確認遺失／新上界並行 | `integration/test_memory_supervisor.py`、`test_memory_batch_orchestration.py`、`test_memory_candidates.py::test_concurrent_reentry_has_one_effect_and_competing_position_is_rejected` |
+| E14 候選預覽、匯出、嘗試改稿 | 後端：`integration/test_consultant_status.py::test_status_preview_reads_fixed_candidate_without_changing_formal_jd`、`integration/test_jd_export.py`；瀏覽器：T09 旅程（候選預覽與正式 PDF、處理中 JD 唯讀）與既有 `jd-profile`／`jd-work` 的「A 已准入拒絕人工修改」 |
+| E15 不疊 retry、不重置預算、容量超限、DB 等待 | [T06 §21](t06-agent-execution.md#21-任務完成對照2026-09-30-恢復後)；**本輪另發現並修正串流中的限流被誤判為終止性失敗**（[T06 §22](t06-agent-execution.md#22-串流中的限流被誤判為協定錯誤2026-09-30-恢復後的診斷與修正)） |
+
+Red 清單（R 已存、工具已 commit、Step 已存、final 已 commit、C 採用、B 交接後故障；舊 writer 與新 runner 競爭）：上表逐項有對照；舊 writer 競爭見 `integration/test_execution_admission.py::test_replacement_fences_old_writer_and_cannot_be_silently_replaced_again`、`integration/test_consultant_leader_release.py`。
+
+**結論：**在首版恢復範圍內，T12 的故障與競爭整合成立，勾選。**明確不含（依 Owner 減法，不是遺漏）：**未明 attempt 的 production 再准入與原件遺失證明、任意位置的自動續作；程序被外力硬殺時若尚未保存任何原件，新 Turn 需使用者主動重送。**仍歸其他任務：**大視窗 compact 延遲與容量（T16）、真 provider 故障行為（T16／T17，例如串流限流已由本輪實測暴露並修正）、長時間 soak 與 UI 全跨瀏覽器（T15／T17）。

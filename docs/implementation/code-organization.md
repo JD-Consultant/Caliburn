@@ -41,11 +41,11 @@ apps/
   web/
     package.json
     src/
-      app/                      # 路由、啟動、providers、頁面組裝
+      app/                      # 路由、啟動、providers、theme、工作畫面組裝（WorkspaceLayout、各 Pane）
       features/
         job-files/ interview/ jd-editor/ source-viewer/
       shared/api/               # generated 型別、HTTP／串流 transport
-      shared/ui/                # 確有多處使用的元件，非業務元件大倉庫
+      shared/ui/                # 確有多處使用的元件：icons、IconAction、對話捲動 hook；非業務元件大倉庫
     tests/e2e/
 ```
 
@@ -77,7 +77,7 @@ flowchart TD
 3. `agent_execution` 不 import A／B1／B2 角色、JD 或 Memory ORM；由角色提供具名工具 handler 與起始資料。角色可依賴它，不能互相 import 私有 prompt／state。
 4. 跨 feature 協調放 workflows；讀別的領域走具體公開查詢／typed result，不直查別人的表。共享交易由 workflow 開啟，把同一 session 交給指定 service；內層不私自 commit。不是微服務，也不需要把同庫內呼叫變 HTTP。
 5. 需要替換外部 I/O 做測試時用窄 `Protocol`／callable；純 Python 少數消費者直接使用明確型別。不建每類一套抽象 factory、BaseRepository 或萬用 UnitOfWork 註冊表。
-6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。
+6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。跨 feature 需要的畫面狀態不用 Effect 複製到上層 state：本分頁追蹤的 Turn 識別是外部儲存（`useSyncExternalStore`），頁面以唯讀 query 觀察者讀同一份 cache；feature 要在另一 feature 的項目旁放內容時，由 app 提供 render 函式（context），feature 不互相 import。詳見[介面 §1.6](interface-and-delivery.md#16-工作畫面組裝t09-ui-改版)。
 
 T01 用 lint import 限制與小型 AST／import 測試鎖住上述幾條高價值規則；不自行開發架構分析平台。需要例外先說出實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴。
 

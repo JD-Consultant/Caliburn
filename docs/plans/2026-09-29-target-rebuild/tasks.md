@@ -118,6 +118,7 @@
 
 - **2026-09-30 公開串流切片：**原生 typed events／phase 白名單接有界暫態 hub、同源 SSE 及 scoped UI，原完整訊息仍由 checkpoint 投影回看；terminal 清理取消承接原 R，不改正式完成邊界。945 unit／contract、21 專項真 PG、95 前端測試通過。真 A 已產生並保存可回看的 commentary，但未截得完成前即時畫面，不宣稱完整真串流時序／T09 完成。見 [T08 §5.7](evidence/t08-consultant-turn.md#57-串流接線後的第四個真-a-turn1202-台北核對) 與 [provider／shared 接線](evidence/t09-response-streaming.md)。
 
+- **2026-09-30 UI 改版（粗版）：**主畫面改為左訪談／右 JD 並排、窄螢幕分頁；JD 唯讀鎖、候選獨立檢視、來源滑出面板與項目徽章（後端小改：`Reference.target`）、章節導覽與可收合職責、檔案清單改版。前端 25 檔／138 測試、tsc／ESLint／Prettier／build 通過；Playwright e2e、真後端徽章、完整鍵盤走查、真模型旅程未驗，不勾 T09。見 [UI 改版證據與 API 缺口](evidence/t09-ui-redesign.md)。
 - [ ] T09；依賴：T08。
 - **最新切片：**`b8fb4a62` 接上輸入、候選、控制、按歷史答覆回看公開訊息及條件撤回 UI；前端 86 項、型別與 build 通過，[證據](evidence/t09-consultant-preview.md)。目前以 status polling 顯示已保存訊息；逐字 SSE 正在後續切片，不宣稱已可用。
 - **契約：**[介面設計](../../implementation/interface-and-delivery.md)、閉環公開訊息／控制邊界。

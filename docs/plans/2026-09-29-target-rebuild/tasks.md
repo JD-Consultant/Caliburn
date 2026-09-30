@@ -114,6 +114,8 @@
 
 ## T09 訪談 UI、候選即時預覽與重連
 
+- **2026-09-30 UI 交接後端增量：**已提供依職務檔案查目前 active／paused A 的唯讀 `/consultant-turns/current`，沒有則 null；重用 execution owner、公開 DTO 與來源 schema，不新增執行／保存權威。獨立審核發現含知識／技能候選的 Enum 轉接缺陷，已先重現再修正；主線最後相關真 PG＋contract **55 passed**，既有訪談前端 **43 passed**、新 Ajv **9 passed**及 tsc 通過。UI 尚未使用此 API、跨瀏覽器旅程尚未驗，T09 不勾完成。見[發現入口證據](evidence/t09-current-turn-discovery.md)。
+
 - **2026-09-30 正式来源唯讀切片：**共享固定來源查詢、三個 GET、生成契約及按需 UI 已接線；946 unit／contract、13 專項真 PG、20 來源 UI 測試及型別／生成檢查通過。Demo 瀏覽器已讀正式來源列表與訪談原文，重新下載正式 PDF；尚未以此 Demo 驗 Memory 來源鏈 UI（目前直接來源均為原話），不冒稱全旅程通過。見[整合證據](evidence/t09-source-viewer.md)。
 
 - **2026-09-30 公開串流切片：**原生 typed events／phase 白名單接有界暫態 hub、同源 SSE 及 scoped UI，原完整訊息仍由 checkpoint 投影回看；terminal 清理取消承接原 R，不改正式完成邊界。945 unit／contract、21 專項真 PG、95 前端測試通過。真 A 已產生並保存可回看的 commentary，但未截得完成前即時畫面，不宣稱完整真串流時序／T09 完成。見 [T08 §5.7](evidence/t08-consultant-turn.md#57-串流接線後的第四個真-a-turn1202-台北核對) 與 [provider／shared 接線](evidence/t09-response-streaming.md)。

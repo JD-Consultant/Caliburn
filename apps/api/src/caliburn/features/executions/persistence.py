@@ -104,6 +104,23 @@ async def has_active_consultant(session: AsyncSession, job_file_id: UUID) -> boo
     ) is not None
 
 
+async def read_current_consultant(
+    session: AsyncSession, job_file_id: UUID
+) -> ExecutionRecord | None:
+    """The admission index allows at most one active/paused A per file; no writer claim."""
+    return (
+        await session.scalars(
+            select(ExecutionRecord)
+            .where(
+                ExecutionRecord.job_file_id == job_file_id,
+                ExecutionRecord.kind == "consultant_turn",
+                ExecutionRecord.status.in_((ExecutionStatus.ACTIVE, ExecutionStatus.PAUSED)),
+            )
+            .execution_options(populate_existing=True)
+        )
+    ).one_or_none()
+
+
 async def list_active_consultants(session: AsyncSession) -> tuple[ExecutionRecord, ...]:
     records = await session.scalars(
         select(ExecutionRecord)

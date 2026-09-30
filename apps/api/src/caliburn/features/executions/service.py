@@ -52,6 +52,15 @@ async def list_active_consultants(session: AsyncSession) -> tuple[ExecutionInfo,
     )
 
 
+async def read_current_consultant(session: AsyncSession, job_file_id: UUID) -> ExecutionInfo | None:
+    """Read this file's nonterminal A, including pending pause; not supervisor discovery."""
+    record = await persistence.read_current_consultant(session, job_file_id)
+    if record is None:
+        return None
+    scope = ExecutionScope(job_file_id, record.execution_id, ExecutionKind.CONSULTANT_TURN)
+    return _project(record, scope)
+
+
 async def claim_writer(
     session: AsyncSession,
     scope: ExecutionScope,

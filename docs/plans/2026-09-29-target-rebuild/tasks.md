@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T05 已完成；T06–T07 施工中；T08–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T05 已完成；T06–T11、T13–T15 已有施工／局部驗證，完整 gate 仍未完成**。T08 已有三輪真模型訪談、兩批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -93,6 +93,7 @@
 ## T07 A 的 JD／來源／差異按需工具
 
 - [ ] T07；依賴：T03、T04、T05。
+- **最新切片（2026-09-30）：**八入口、完整集合編輯／來源與兩類 diff 已接上；提交 `4b20f1ed`、`a2168f63`。真 A3 使用當次原文及引用對齊完成更正；工具完整覆蓋與產品 gate 仍依 [T07 寫入](evidence/t07-jd-tools.md)、[來源／差異](evidence/t07-jd-changes-source.md)，不以一輪成功代全部驗收。
 - **第一切片（2026-09-30）：**承接 `79b773ee`，接既有候選／固定修訂的精簡 JD map 與同範圍物件定位；不新增 map 儲存、名稱 ID 或 LLM 摘要。專項 **14 passed**，unit／contracts 與受影響候選真 PG **731 passed**；[證據與未完範圍](evidence/t07-jd-tools.md)。完整 read／編輯／來源及兩類 diff 尚未接好，不勾 T07、不當作 A 已可用。
 - **契約：**[JD 八入口與分支](../../specs/2026-09-29-jd-model-tool-contract-review.md)、[A 的 read／map](../../specs/2026-09-26-consultant-context-and-state-design.md)、共同工具規範。
 - **程式／交付：**`agents/job_consultant` 工具 schema／handler；JD service 的 source links、兩類 diff、精確來源確認；全稿 Markdown、map 精簡 JSON、局部讀取定位與下鑽。
@@ -103,6 +104,8 @@
 ## T08 A Turn：固定資料、正式完成與控制
 
 - [ ] T08；依賴：T02、T06、T07。
+- **最新整合：**`76f99867` 接通正式完成／控制、原生接續、背景要求與公開歷史；三輪真模型、兩批 Memory、暫停重開同輪續作、902 unit/contracts、725 PG integration（另補兩項真 Chromium）及重啟證據見 [T08 §5](evidence/t08-consultant-turn.md#5-顧問--背景整理的整合2026-09-30-1057-台北)。未知 attempt 的 production 核對接線、廣泛故障／品質仍未完成。
+- **2026-09-30 第一切片：**固定起始資料、共用模型／工具 loop、正式答覆／JD／歷史共同完成及 HTTP 派送通過合成 provider＋真 PG；缺模型設定不接受無法執行的輸入。控制、公開進度、背景要求及真 provider 仍待接線，見 [T08／T09 evidence](evidence/t08-consultant-turn.md)，不提前勾完成。
 - **契約：**[A context](../../specs/2026-09-26-consultant-context-and-state-design.md)、[閉環](../../specs/2026-09-29-core-value-loop-lifecycle.md)、[資料接線](../../implementation/data-and-contracts.md)。
 - **程式／交付：**`workflows/consultant_turn.py`、A 起始 projector、控制 API；原生基底／128K／272K、Memory pin、有效近期歷史、正式完成交易及取消 fencing。
 - **Red：**Memory 半途換版、恢復重加輸入／maps、A final 尚未保存就宣告完成、取消與 final 同時成立、含 a 的輪中 C 帶入新 b、input 取消仍成正式序號。
@@ -111,7 +114,10 @@
 
 ## T09 訪談 UI、候選即時預覽與重連
 
+- **2026-09-30 公開串流切片：**原生 typed events／phase 白名單接有界暫態 hub、同源 SSE 及 scoped UI，原完整訊息仍由 checkpoint 投影回看；terminal 清理取消承接原 R，不改正式完成邊界。945 unit／contract、21 專項真 PG、95 前端測試通過。真 A 已產生並保存可回看的 commentary，但未截得完成前即時畫面，不宣稱完整真串流時序／T09 完成。見 [T08 §5.7](evidence/t08-consultant-turn.md#57-串流接線後的第四個真-a-turn1202-台北核對) 與 [provider／shared 接線](evidence/t09-response-streaming.md)。
+
 - [ ] T09；依賴：T08。
+- **最新切片：**`b8fb4a62` 接上輸入、候選、控制、按歷史答覆回看公開訊息及條件撤回 UI；前端 86 項、型別與 build 通過，[證據](evidence/t09-consultant-preview.md)。目前以 status polling 顯示已保存訊息；逐字 SSE 正在後續切片，不宣稱已可用。
 - **契約：**[介面設計](../../implementation/interface-and-delivery.md)、閉環公開訊息／控制邊界。
 - **程式／交付：**interview／jd-editor UI、SSE transport、公開歷史讀取、重連狀態查詢；A 控制的狀態呈現。
 - **Red：**斷流自動重送輸入、公開中間訊息消失／拿去引用、UI 私有 reasoning 洩漏、兩個 tab 人工改稿突破鎖定、候選顯示成正式稿。
@@ -121,6 +127,7 @@
 ## T10 B1／B2 私有角色與 context
 
 - [ ] T10；依賴：T05、T06。
+- **最新切片：**`8eb469e1` 接兩個私有角色與同一共用 runtime，保留分層寫入權限；兩批真模型已共同發布，[T10 證據](evidence/t10-memory-analysis-roles.md)。局部真模型成功不代完整異常與品質 gate。
 - **契約：**[B1／B2 分責](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[原話 read](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[工作分析 §9](../../specs/2026-09-09-complete-work-analysis-guide.md#9-工作理解正文要寫到多清楚2026-09-25-研究補核對)。
 - **程式／交付：**兩角色 instructions、handlers、起始投影與私有 graph history；typed gap／完成輸出；fake provider 分工測試。
 - **Red：**B1 透過錯誤／gap 看理解、B2 修改情境、回交重置分析／compact、B2 只看已有引用而漏新增情境、原話上界偷偷用 A 最新輪。
@@ -130,6 +137,7 @@
 ## T11 背景調度、交接與共同發布
 
 - [ ] T11；依賴：T08、T10。
+- **最新切片：**`8eb469e1` 接 Parent／固定範圍、差異交接、共同發布；`76f99867` 接 A 成功完成後登記與啟動重掃，[證據](evidence/t11-memory-batch.md)。已發布到正式員工序號 4、6；完整冷啟未知結果恢復仍未完成。
 - **契約：**背景生命週期的①②③、[保存 §5](../../architecture/persistence.md#5-背景要求不能只留在記憶體)、共用執行 §5–7。
 - **程式／交付：**`workflows/memory_batch.py`、Parent、App lifespan 調度；pending frontier／單批資格、交接快照diff、完成／失敗投影。
 - **Red：**A 完成後 crash 漏通知、在途批次擴大 F、B2 gap後回到初始工作稿、發布確認遺失重發新版、失敗後跳過未發布區間、quota 未變仍無限重跑。
@@ -148,6 +156,7 @@
 ## T13 正式 PDF 與條件撤回
 
 - [ ] T13；依賴：T03。
+- 2026-09-30：PDF renderer／正式版讀取／UI 下載、條件撤回已接通。真 Chromium 中文長短版與 IAB 下載已驗；撤回限原基準、保留訪談／Memory 並拒絕覆蓋後續修改，見 [PDF 證據](evidence/t13-pdf-export.md)及[撤回證據](evidence/t13-jd-undo.md)。乾淨交付與完整 UI 旅程 gate 仍未完。
 - **契約：**[介面交付](../../implementation/interface-and-delivery.md)、[驗證 V21／V23](../../architecture/verification.md)。
 - **程式／交付：**PDF endpoint／renderer／UI；已完成 JD 修改的條件撤回 API。T09 完成後追加候選預覽中匯出旅程測例。
 - **Red：**匯出候選／姓名、中文缺字、長任務斷頁遺失、撤回覆蓋後續人工改稿或倒退訪談／Memory。
@@ -157,6 +166,7 @@
 ## T14 訪談方法、角色指引與品質試例
 
 - [ ] T14；依賴：T07、T10。
+- **最新材料：**11 個合成品質情境、oracle／rubric、角色組裝契約及固定 Demo 樣本人工式審讀，見 [T14 證據](evidence/t14-job-analysis-quality.md)。離線契約通過不代表模型品質已達標；獨立領域校準、全部情境真模型及長訪談仍待驗。
 - **契約：**[工作分析指南](../../specs/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作](../../specs/2026-09-09-jd-field-and-writing-guide.md)、[方法研究入口](../../specs/2026-09-09-job-analysis-and-jd-content-research.md)。
 - **程式／交付：**版本化角色 prompt／方法內容與全合成 fixtures／rubric；基於既有研究裁取適用內容，不複製整套指南到每次請求。
 - **先驗：**fixture 必須能辨責任混淆、舊案更正、沒有主語、低頻工作、只掌握 10% 案例、人工稿不等於事實；離線驗指引組裝／工具權限；自然品質標待 provider。

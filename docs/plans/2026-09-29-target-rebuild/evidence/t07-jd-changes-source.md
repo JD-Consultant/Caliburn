@@ -1,6 +1,6 @@
 # T07 `read_jd_changes`：來源與人工差異窄切片
 
-2026-09-30；狀態：**manual/source 完整工具已驗證，可由主線註冊；本切片不修改 registry，不代替整體 T07 gate 驗收**。Owner 後續已授權擴充原 feature 公開查詢。
+2026-09-30；狀態：**manual/source 完整工具已驗證，後由主線註冊；不代替整體 T07 gate 驗收**。主線依 Goal 授權分派擴充原 feature 公開查詢。
 
 ## 交付與邊界
 

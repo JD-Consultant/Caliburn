@@ -7,7 +7,13 @@ from uuid import uuid4
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from caliburn.agent_execution.tool_steps import read_completed_response_history, read_response_pause
+from caliburn.agent_execution.context_compaction import HeldCompaction, HeldPreparationCount
+from caliburn.agent_execution.tool_steps import (
+    HeldInputCount,
+    HeldModelResponse,
+    read_completed_response_history,
+    read_response_pause,
+)
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import (
     AgentRole,
@@ -109,7 +115,15 @@ class ConsultantControlWorkflow:
 
 class ConsultantRun(Protocol):
     def __call__(
-        self, writer: ExecutionWriter, *, resume_interrupt_id: str | None = None
+        self,
+        writer: ExecutionWriter,
+        *,
+        resume_interrupt_id: str | None = None,
+        recovery: HeldModelResponse
+        | HeldInputCount
+        | HeldCompaction
+        | HeldPreparationCount
+        | None = None,
     ) -> Awaitable[object]: ...
 
 
@@ -119,24 +133,33 @@ async def run_consultant_with_controls(
     sessions: async_sessionmaker[AsyncSession],
     checkpointer: BaseCheckpointSaver[str],
     run: ConsultantRun,
+    recovery: HeldModelResponse
+    | HeldInputCount
+    | HeldCompaction
+    | HeldPreparationCount
+    | None = None,
 ) -> object:
     """Resolve authorized resume from persistent facts, then use the original runner.
 
     Only a proven final/pause arbitration failure gets one control-only reentry.
-    Recovery handoffs and other errors remain owned by the runner; fixed context,
-    native continuation and original budgets are never replaced here.
+    An intact handoff is passed to the original runner before any interrupt resume;
+    it grants no new retry or pause authority. Once adopted, callers continue from
+    saved state without resupplying it. Other errors remain owned by the runner;
+    fixed context, native continuation and original budgets are never replaced here.
     """
     _require_consultant(writer.scope)
     async with sessions.begin() as session:
         await executions.lock_active_writer(session, writer)
         info = await executions.read_execution(session, writer.scope)
     resume_id = None
-    if not info.pause_requested:
+    if recovery is None and not info.pause_requested:
         paused = await read_response_pause(checkpointer, thread_id=_thread_id(writer.scope))
         if paused is not None:
             resume_id = paused.interrupt_id
         del paused
     try:
+        if recovery is not None:
+            return await run(writer, recovery=recovery)
         return await run(writer, resume_interrupt_id=resume_id)
     except ExecutionStateError:
         # A pause can win AFTER Graph final returns but BEFORE the product completion

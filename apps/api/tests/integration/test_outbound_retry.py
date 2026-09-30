@@ -40,6 +40,7 @@ from caliburn.workflows.model_requests import (
     PriorModelAttemptError,
 )
 from tests.fixtures.response_capacity import synthetic_response_runtime
+from tests.fixtures.response_transport import response_http_reply
 
 pytestmark = pytest.mark.postgres
 
@@ -632,6 +633,82 @@ def test_two_retry_runners_cannot_both_send_after_one_recorded_failure(
             async with executor.sessions.begin() as session:
                 usage = await budgets.read_budget_usage(session, executor.writer.scope)
             assert usage.outbound_attempts == 2
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
+def stream_error_reply(code="rate_limit_exceeded", error_type="tokens"):
+    """A provider error delivered as an event inside an already open HTTP 200 stream."""
+    frame = {
+        "error": {
+            "message": "sensitive synthetic detail",
+            "type": error_type,
+            "param": None,
+            "code": code,
+        }
+    }
+    return httpx2.Response(
+        200, headers={"Content-Type": "text/event-stream"}, content=f"data: {json.dumps(frame)}\n\n"
+    )
+
+
+def streaming_request():
+    return ResponseRequest(
+        model="gpt-6-luna",
+        instructions="synthetic role",
+        input_items=[],
+        tools=[],
+        reasoning_effort="low",
+        max_output_tokens=512,
+        stream=True,
+    )
+
+
+def test_rate_limit_inside_a_stream_is_retried_like_any_transient_failure(
+    database_settings, retry_file_id
+):
+    calls = []
+
+    def respond(request):
+        calls.append(json.loads(request.content))
+        if len(calls) == 1:
+            return stream_error_reply()
+        return response_http_reply(request, success_fixture())
+
+    async def scenario():
+        async with retry_executor(database_settings, retry_file_id, respond) as executor:
+            request, request_id = streaming_request(), uuid4()
+            result = await executor.request_model(request, request_id, 100)
+            assert result.response.id == success_fixture()["id"]
+            # The same payload is sent again under a new, budgeted attempt.
+            assert len(calls) == 2
+            assert calls[0] == calls[1] == request.create_payload()
+            async with executor.sessions.begin() as session:
+                attempts = await budgets.read_request_attempts(
+                    session, executor.writer.scope, request_id
+                )
+            failures = [a.failure for a in attempts if a.failure is not None]
+            assert [f.failure_code for f in failures] == ["transient_service"]
+            assert failures[0].retry_not_before is not None
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
+def test_unknown_error_inside_a_stream_stops_without_retry(database_settings, retry_file_id):
+    calls = []
+
+    def respond(request):
+        calls.append(request)
+        return stream_error_reply("invalid_prompt", "invalid_request_error")
+
+    async def scenario():
+        async with retry_executor(database_settings, retry_file_id, respond) as executor:
+            with pytest.raises(ModelRequestFailedError) as stopped:
+                await executor.request_model(streaming_request(), uuid4(), 100)
+            assert stopped.value.failure.kind.value == "response_protocol"
+            assert len(calls) == 1
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())

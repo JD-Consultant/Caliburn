@@ -5,6 +5,27 @@ from enum import StrEnum
 
 from openai import APIConnectionError, APIError, APIResponseValidationError, APIStatusError
 
+_BLOCKED_CODES = frozenset(
+    {
+        "credit_balance_exhausted",
+        "organization_spend_limit_exceeded",
+        "project_spend_limit_exceeded",
+        "organization_usage_limit_exceeded",
+        "insufficient_quota",
+    }
+)
+# An error event inside an open HTTP 200 stream has no status, so only its code can say that
+# it is a provider hiccup or a rate limit. Anything not named here stays a terminal failure.
+_TRANSIENT_STREAM_CODES = frozenset(
+    {
+        "rate_limit_exceeded",
+        "server_error",
+        "server_is_overloaded",
+        "slow_down",
+        "service_unavailable",
+    }
+)
+
 
 class ResponseFailureKind(StrEnum):
     REMOTE_RESULT_UNKNOWN = "remote_result_unknown"
@@ -32,27 +53,21 @@ def classify_response_failure(error: APIError) -> ResponseFailure:
         return ResponseFailure(ResponseFailureKind.REMOTE_RESULT_UNKNOWN)
     if isinstance(error, APIResponseValidationError):
         return ResponseFailure(ResponseFailureKind.RESPONSE_PROTOCOL, error.status_code)
-    if not isinstance(error, APIStatusError):
-        return ResponseFailure(ResponseFailureKind.RESPONSE_PROTOCOL)
-    if (
-        error.status_code in (401, 403)
-        or error.code
-        in {
-            "credit_balance_exhausted",
-            "organization_spend_limit_exceeded",
-            "project_spend_limit_exceeded",
-            "organization_usage_limit_exceeded",
-            "insufficient_quota",
-        }
-        or error.type == "insufficient_quota"
-    ):
+    status = error.status_code if isinstance(error, APIStatusError) else None
+    if status in (401, 403) or error.code in _BLOCKED_CODES or error.type == "insufficient_quota":
         kind = ResponseFailureKind.ACCESS_BLOCKED
     elif error.code == "context_length_exceeded":
         kind = ResponseFailureKind.CAPACITY_EXCEEDED
+    elif not isinstance(error, APIStatusError):
+        kind = (
+            ResponseFailureKind.TRANSIENT_SERVICE
+            if error.code in _TRANSIENT_STREAM_CODES
+            else ResponseFailureKind.RESPONSE_PROTOCOL
+        )
     elif error.response.headers.get("x-should-retry") == "false":
         kind = ResponseFailureKind.REQUEST_REJECTED
     elif error.status_code in (408, 409, 429) or error.status_code >= 500:
         kind = ResponseFailureKind.TRANSIENT_SERVICE
     else:
         kind = ResponseFailureKind.REQUEST_REJECTED
-    return ResponseFailure(kind, error.status_code)
+    return ResponseFailure(kind, status)

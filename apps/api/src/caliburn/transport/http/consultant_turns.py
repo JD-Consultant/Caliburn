@@ -11,6 +11,7 @@ from fastapi.sse import EventSourceResponse, ServerSentEvent
 
 from caliburn.contracts.generated.commentary_update import CommentaryUpdate
 from caliburn.contracts.generated.consultant_turn import ConsultantTurn
+from caliburn.contracts.generated.current_consultant_turn import CurrentConsultantTurn
 from caliburn.features.executions.models import (
     ExecutionKind,
     ExecutionNotFoundError,
@@ -19,6 +20,7 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
 )
 from caliburn.features.interviews.models import InterviewInputNotFoundError
+from caliburn.features.job_files.models import JobFileNotFoundError
 from caliburn.transport.http.jd_work import work_view
 from caliburn.workflows.consultant_commentary import (
     CommentaryCapacityError,
@@ -113,6 +115,27 @@ def find_consultant_controls(request: Request) -> ConsultantControlWorkflow | No
 
 
 OptionalControls = Annotated[ConsultantControlWorkflow | None, Depends(find_consultant_controls)]
+
+
+@router.get("/{job_file_id}/consultant-turns/current", response_model=CurrentConsultantTurn)
+async def read_current_consultant_turn(
+    job_file_id: UUID,
+    response: Response,
+    workflow: ConsultantStatus,
+    controls: OptionalControls,
+) -> CurrentConsultantTurn:
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        status = await workflow.read_current(job_file_id)
+    except JobFileNotFoundError as error:
+        raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
+    except (InterviewInputNotFoundError, ConsultantTurnUnavailableError) as error:
+        raise HTTPException(
+            status_code=503, detail={"code": "consultant_result_unavailable"}
+        ) from error
+    return CurrentConsultantTurn.model_validate(
+        {"turn": None if status is None else turn_view(status, controls).model_dump(mode="json")}
+    )
 
 
 @router.get("/{job_file_id}/consultant-turns/{execution_id}", response_model=ConsultantTurn)

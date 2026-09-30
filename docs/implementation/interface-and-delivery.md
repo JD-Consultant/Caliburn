@@ -111,6 +111,10 @@ sequenceDiagram
 
 ## 2. 串流不是保存權威
 
+**目前 Turn 發現入口（T09，後端已接線、UI 待接）：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 從該檔案的既有 execution 准入資料找出唯一 active／paused 顧問，回 `{"turn": <既有 ConsultantTurn>}`；無進行中顧問回 `{"turn": null}`，不存在檔案回 404。pending pause 仍是 active＋`pause_requested`。沿用既有公開狀態、候選與 commentary 白名單，不返回 terminal 歷史或 Memory 工作；GET 不啟動模型、不取得 writer、不 resume，回應 no-store。這只是讀取時的觀察，控制操作仍重新核資格。
+
+前端後續應在缺少本機識別時用此入口發現工作，再沿同一 execution 的既有查詢／控制接續；不能為找回畫面重送原輸入，也不能以空結果證明某個未確認命令從未被接受。已保存的未知原命令仍沿 by-command 核對。頁面徽章、候選與 JD 唯讀狀態維持同一 query cache，避免另一份 state 或第二個輪詢。此段定義接線方向，**不表示現有 UI 已使用 `/current`**。契約與真 PG 證據見[本切片](../plans/2026-09-29-target-rebuild/evidence/t09-current-turn-discovery.md)。
+
 **2026-09-30 已落地範圍：**公開完整 commentary 從原生 checkpoint／pending writes 投影，status polling 呈現候選／控制；歷史回答透過原 execution 定位按需回看。沒有訊息時明示空，不由 App 編造進度。新增 direct Responses typed stream → 有界程序內投影 → 同源 SSE → UI 的即時公開文字接線；真產品驗收與限制分見 [provider 證據](../plans/2026-09-29-target-rebuild/evidence/t09-response-streaming.md)、[傳輸證據](../plans/2026-09-29-target-rebuild/evidence/t09-commentary-transport.md)、[UI 證據](../plans/2026-09-29-target-rebuild/evidence/t09-commentary-ui.md)，不因此宣告 T09 全部完成。
 
 首選 HTTP commands＋同源 SSE 公開事件，無需 WebSocket 雙向協議。瀏覽器收到 event 只更新呈現，正式狀態仍可 GET 重取。SSE 的 event ID／重連不是完整產品恢復的唯一依據，斷線後先查當前 Turn 狀態、已保存公開內容與 JD 正式／候選位置，不因事件遺失就重新送員工原話。事件傳送使用標準 SSE framing／框架支援，不自製流式 JSON 切割協議。[WHATWG SSE](https://html.spec.whatwg.org/multipage/server-sent-events.html)

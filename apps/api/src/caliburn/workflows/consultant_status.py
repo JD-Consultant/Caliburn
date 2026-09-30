@@ -13,13 +13,19 @@ from caliburn.features.executions.history_models import (
     HistoryWindowKind,
     context_thread_id,
 )
-from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
+from caliburn.features.executions.models import (
+    ExecutionInfo,
+    ExecutionKind,
+    ExecutionScope,
+    ExecutionStatus,
+)
 from caliburn.features.interviews import queries as interviews
 from caliburn.features.interviews import service as interview_service
 from caliburn.features.interviews.models import InterviewInputNotFoundError
 from caliburn.features.job_description import candidate_service
 from caliburn.features.job_description.candidate_service import JdCandidatePreview
 from caliburn.features.job_description.candidates import CandidateStateError
+from caliburn.features.job_files import queries as job_files
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,7 +54,18 @@ class ConsultantStatusWorkflow:
 
     async def read(self, job_file_id: UUID, execution_id: UUID) -> ConsultantTurnStatus:
         async with self.sessions.begin() as session:
-            status = await _read_status(session, job_file_id, execution_id)
+            scope = ExecutionScope(job_file_id, execution_id, ExecutionKind.CONSULTANT_TURN)
+            status = await _read_status(session, await executions.read_execution(session, scope))
+        return await self._with_commentary(status)
+
+    async def read_current(self, job_file_id: UUID) -> ConsultantTurnStatus | None:
+        """Discover the admitted nonterminal Turn without claiming or resuming execution."""
+        async with self.sessions.begin() as session:
+            await job_files.read_job_file(session, job_file_id)
+            execution = await executions.read_current_consultant(session, job_file_id)
+            if execution is None:
+                return None
+            status = await _read_status(session, execution)
         return await self._with_commentary(status)
 
     async def read_by_command(self, job_file_id: UUID, command_id: UUID) -> ConsultantTurnStatus:
@@ -58,7 +75,10 @@ class ConsultantStatusWorkflow:
             )
             if accepted is None:
                 raise InterviewInputNotFoundError("No accepted command exists in this job file")
-            status = await _read_status(session, job_file_id, accepted.execution_id)
+            scope = ExecutionScope(
+                job_file_id, accepted.execution_id, ExecutionKind.CONSULTANT_TURN
+            )
+            status = await _read_status(session, await executions.read_execution(session, scope))
         return await self._with_commentary(status)
 
     async def _with_commentary(self, status: ConsultantTurnStatus) -> ConsultantTurnStatus:
@@ -76,11 +96,8 @@ class ConsultantStatusWorkflow:
         return replace(status, commentary=messages)
 
 
-async def _read_status(
-    session: AsyncSession, job_file_id: UUID, execution_id: UUID
-) -> ConsultantTurnStatus:
-    scope = ExecutionScope(job_file_id, execution_id, ExecutionKind.CONSULTANT_TURN)
-    execution = await executions.read_execution(session, scope)
+async def _read_status(session: AsyncSession, execution: ExecutionInfo) -> ConsultantTurnStatus:
+    job_file_id, execution_id = execution.scope.job_file_id, execution.scope.execution_id
     original = await interviews.read_execution_input(
         session, job_file_id=job_file_id, execution_id=execution_id
     )

@@ -24,9 +24,11 @@ from tests.unit.test_response_loop import response_at
 pytestmark = pytest.mark.postgres
 
 
+@pytest.mark.parametrize("by_current", [False, True])
 def test_reopened_native_history_exposes_only_public_commentary_in_original_order(
     client: TestClient,
     database_settings: DatabaseSettings,
+    by_current: bool,
 ) -> None:
     file_id = UUID(
         client.post(
@@ -97,14 +99,16 @@ def test_reopened_native_history_exposes_only_public_commentary_in_original_orde
     ) as reopened:
         workflow = ConsultantStatusWorkflow(client.app.state.database.sessions, reopened)
         client.app.dependency_overrides[get_consultant_status_workflow] = lambda: workflow
-        response = client.get(f"/api/job-files/{file_id}/consultant-turns/{scope.execution_id}")
+        locator = "current" if by_current else str(scope.execution_id)
+        response = client.get(f"/api/job-files/{file_id}/consultant-turns/{locator}")
         assert response.status_code == 200
         assert response.headers["cache-control"] == "no-store"
-        assert response.json()["commentary"] == [
+        body = response.json()["turn"] if by_current else response.json()
+        assert body["commentary"] == [
             {"response_id": "response_1", "message_id": "message_1", "text": "公開訊息 1"},
             {"response_id": "response_3", "message_id": "message_3", "text": "公開訊息 3"},
         ]
-        assert set(response.json()) == {
+        assert set(body) == {
             "job_file_id",
             "execution_id",
             "status",
@@ -114,8 +118,8 @@ def test_reopened_native_history_exposes_only_public_commentary_in_original_orde
             "candidate",
             "commentary",
         }
-        assert response.json()["pause_requested"] is False
-        assert response.json()["candidate"] is None
+        assert body["pause_requested"] is False
+        assert body["candidate"] is None
         for private in (
             "PRIVATE_",
             "synthetic-opaque",
@@ -125,7 +129,7 @@ def test_reopened_native_history_exposes_only_public_commentary_in_original_orde
             "source_id",
         ):
             assert private not in response.text
-        missing = client.get(f"/api/job-files/{uuid4()}/consultant-turns/{scope.execution_id}")
+        missing = client.get(f"/api/job-files/{uuid4()}/consultant-turns/{locator}")
         assert missing.status_code == 404
         assert "公開訊息" not in missing.text
         assert len(client.get(f"/api/job-files/{file_id}/interviews").json()["messages"]) == 1

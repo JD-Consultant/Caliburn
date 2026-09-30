@@ -32,7 +32,7 @@ class ModelSettings:
 
     api_key: str = field(repr=False)
     model: str = "gpt-6-luna"
-    reasoning_effort: ReasoningEffort = "medium"
+    reasoning_effort: ReasoningEffort = "high"
     max_output_tokens: int = 16_384
     max_model_steps: int = 64
     max_tool_calls_per_step: int = 32

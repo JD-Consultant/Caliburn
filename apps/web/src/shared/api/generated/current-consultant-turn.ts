@@ -1,9 +1,5 @@
 /* Generated from apps/api/contracts; do not edit. */
 
-/**
- * Public status of one scoped consultant execution. Original input text alone does not grant formal interview identity.
- */
-export type ConsultantTurn = ConsultantTurn1;
 export type Areas = Area[];
 export type Tasks = WorkTask[];
 export type Capabilities = Capability[];
@@ -11,7 +7,13 @@ export type TaskLinks = TaskLink[];
 export type Collaborators = Collaborator[];
 export type Conditions = Condition[];
 
-export interface ConsultantTurn1 {
+/**
+ * Read-only discovery for an existing job file. Turn is the admitted active or paused consultant (including pending pause), or explicit null when none exists. Excludes terminal history and Memory work. A missing job file is HTTP 404.
+ */
+export interface CurrentConsultantTurn {
+  turn: ConsultantTurn | null;
+}
+export interface ConsultantTurn {
   job_file_id: string;
   execution_id: string;
   status: 'active' | 'paused' | 'completed' | 'cancelled' | 'failed';

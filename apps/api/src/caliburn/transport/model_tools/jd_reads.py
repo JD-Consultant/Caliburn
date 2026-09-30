@@ -20,7 +20,7 @@ from caliburn.features.work_memory.candidates import (
     MemoryPermissionError,
 )
 from caliburn.features.work_memory.revisions import MemoryRevisionNotFoundError
-from caliburn.transport.model_tools.contracts import reject_tool_call
+from caliburn.transport.model_tools.contracts import function_definition, reject_tool_call
 from caliburn.transport.model_tools.jd_detail_projection import (
     InvalidJdReadSelectionError,
     jd_read_source_targets,
@@ -44,15 +44,7 @@ _DESCRIPTION = (
 
 def jd_read_definitions() -> list[FunctionToolParam]:
     """Build unbound definitions without reading storage or requiring a Turn binding."""
-    return [
-        {
-            "type": "function",
-            "name": "read_jd",
-            "description": _DESCRIPTION,
-            "parameters": ReadJdArguments.model_json_schema(),
-            "strict": True,
-        }
-    ]
+    return [function_definition("read_jd", _DESCRIPTION, "read-jd-arguments")]
 
 
 class JdReadTools:

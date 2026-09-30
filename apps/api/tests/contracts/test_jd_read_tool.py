@@ -1,7 +1,7 @@
 """Generated input and all read-view dispatch; no provider or database calls here."""
 
 import json
-from pathlib import Path
+from importlib.resources import files
 from uuid import UUID
 
 import pytest
@@ -42,19 +42,20 @@ def test_definition_uses_generated_two_field_contract() -> None:
     properties = schema["properties"]
     assert isinstance(properties, dict)
     assert set(properties) == {"view", "read_ref"}
-    definitions = schema["$defs"]
-    assert isinstance(definitions, dict)
-    assert properties["view"]["$ref"] == "#/$defs/View"
-    assert len(definitions["View"]["enum"]) == 11
+    assert properties["view"]["type"] == "string"
+    assert len(properties["view"]["enum"]) == 11
 
 
-def test_unbound_definitions_need_no_binding_or_file_reads(monkeypatch: pytest.MonkeyPatch) -> None:
-    def no_read(*args: object, **kwargs: object) -> str:
-        raise AssertionError("Definitions must be built from the generated type in memory")
-
-    monkeypatch.setattr(Path, "read_text", no_read)
+def test_unbound_definition_preserves_the_single_packaged_wire_schema() -> None:
+    schema = json.loads(
+        files("caliburn.contracts.generated.tools")
+        .joinpath("read-jd-arguments.schema.json")
+        .read_text(encoding="utf-8")
+    )
+    schema.pop("$schema")
     definitions = jd_read_definitions()
     assert len(definitions) == 1
+    assert definitions[0]["parameters"] == schema
     assert definitions == make_tools().definitions()
     definitions.clear()
     assert len(jd_read_definitions()) == 1

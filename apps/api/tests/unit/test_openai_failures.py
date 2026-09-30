@@ -2,7 +2,13 @@
 
 import httpx2
 import pytest
-from openai import APIConnectionError, APIResponseValidationError, APIStatusError, APITimeoutError
+from openai import (
+    APIConnectionError,
+    APIError,
+    APIResponseValidationError,
+    APIStatusError,
+    APITimeoutError,
+)
 
 from caliburn.adapters.openai_failures import ResponseFailureKind, classify_response_failure
 
@@ -49,3 +55,42 @@ def test_lost_transport_is_unknown_not_a_known_unexecuted_or_free_request() -> N
         assert failure.status_code is None
     invalid = APIResponseValidationError(httpx2.Response(200, request=request), {"raw": "private"})
     assert classify_response_failure(invalid).kind == ResponseFailureKind.RESPONSE_PROTOCOL
+
+
+@pytest.mark.parametrize(
+    ("code", "error_type", "expected"),
+    [
+        # Observed live: a tokens-per-minute limit arrives as an event inside an open stream.
+        ("rate_limit_exceeded", "tokens", ResponseFailureKind.TRANSIENT_SERVICE),
+        ("rate_limit_exceeded", "requests", ResponseFailureKind.TRANSIENT_SERVICE),
+        ("server_error", "server_error", ResponseFailureKind.TRANSIENT_SERVICE),
+        ("server_is_overloaded", None, ResponseFailureKind.TRANSIENT_SERVICE),
+        ("slow_down", "rate_limit_error", ResponseFailureKind.TRANSIENT_SERVICE),
+        # A known block or capacity signal still wins, exactly as for an HTTP status error.
+        ("insufficient_quota", "insufficient_quota", ResponseFailureKind.ACCESS_BLOCKED),
+        ("credit_balance_exhausted", None, ResponseFailureKind.ACCESS_BLOCKED),
+        ("new_quota_code", "insufficient_quota", ResponseFailureKind.ACCESS_BLOCKED),
+        ("context_length_exceeded", None, ResponseFailureKind.CAPACITY_EXCEEDED),
+        # Unknown or missing detail stays a terminal protocol failure: never guess retryable.
+        ("invalid_prompt", "invalid_request_error", ResponseFailureKind.RESPONSE_PROTOCOL),
+        (None, None, ResponseFailureKind.RESPONSE_PROTOCOL),
+    ],
+)
+def test_error_event_inside_a_stream_is_classified_by_its_code(code, error_type, expected) -> None:
+    request = httpx2.Request("POST", "https://api.openai.com/v1/responses")
+    error = APIError(
+        "SENSITIVE MUST NOT BE PROJECTED",
+        request,
+        body={"code": code, "type": error_type, "message": "SENSITIVE MUST NOT BE PROJECTED"},
+    )
+    failure = classify_response_failure(error)
+    assert failure.kind == expected
+    assert failure.status_code is None
+    assert "SENSITIVE" not in repr(failure)
+
+
+@pytest.mark.parametrize("body", [None, "not a mapping", ["rate_limit_exceeded"]])
+def test_stream_error_without_a_readable_code_is_never_retryable(body) -> None:
+    request = httpx2.Request("POST", "https://api.openai.com/v1/responses")
+    failure = classify_response_failure(APIError("SENSITIVE", request, body=body))
+    assert failure.kind == ResponseFailureKind.RESPONSE_PROTOCOL

@@ -129,6 +129,8 @@ flowchart TD
 
 已驗：完整 R 保存後跨程序零重呼；兩工具有序；第一筆候選已提交但確認遺失，重入得到原效果後才進第二筆；model checkpoint 寫入前／寫入後拋錯均不先派工具，若 pending writes 已保存則由原框架承接；完成 Step 再 resume 不重加 items。以假 provider＋真 PG 驗證，無真實模型品質宣稱。
 
+2026-09-30 T12 追加正式 A Runner／控制 wrapper 的四個 hard-exit 邊界：count 保存、R 保存、JD 工具已提交但 result 未存、final R 保存後中斷。全新程序以官方 saver 恢復，原外送不重複、已提交候選的修訂 ID 集合不變、原輸入引用保留；[證據與限制](../plans/2026-09-29-target-rebuild/evidence/t12-consultant-process-recovery.md)。此處仍不是未保存原件遺失後的自動再准入，亦不把 `sync` 說成跨 provider／業務／checkpoint 的共同交易。
+
 第二切片曾以真 PG 注入 checkpoint 與 pending writes 同時失敗：`astream` 不保證還來得及交出 node update，不能依賴它保住原回應。當時只以測例人工補存證明官方能力；**第五切片已接為 §4.4 的公開恢復路徑**，不再要求呼叫方手寫 Graph update。外層有界 supervisor 與完整產品採用仍待接線。
 
 尚未完成：外層執行／預算准入、取消與暫停控制流程、角色 thread／候選安全點整合、compact 安全採用及官方 API。不能因上述 Step 可恢復就宣告 T06 或產品生命週期已完成。依據：[官方 durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)、[saver／sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)，及鎖定框架原碼與本切片反例。

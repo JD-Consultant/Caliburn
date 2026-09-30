@@ -1,8 +1,8 @@
 # Caliburn backend（新目標施工中）
 
-本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。目前提供 health、職務檔案建立／清單／改名／回讀、App 開場正式訪談、JD profile／職責／任務／共用知識／技能及任務關係、協作對象／共通條件的人工讀寫與生成契約；候選／正式隔離、回退與交易內採用底層亦已實作。Memory 候選、固定修訂、快照读取及原子發布保存已通過真 PG；其模型讀寫工具元件已驗，B1→B2 交接 diff、AI 訪談、背景 Agent、JD 來源與候選預覽 UI 尚未交付。底層採用不是獨立的 Turn 完成端點。現行正式產品入口不變，進度見[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)。目前僅供隔離開發／合成測試，完整瀏覽器入口安全與正式交付 gate 尚未完成，不對外開放。
+本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。已提供隔離職務檔案、正式訪談保存、關聯式 JD 人工管理與候選／正式隔離。Memory 候選、固定修訂及原子快照發布底層通過真 PG，模型讀寫工具元件亦已驗。這不是完整產品完成：進度以[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)為準，現行正式入口不變。目前僅供隔離本機開發，完整安全與交付 gate 未完成，不對外開放。
 
-T05 續進度：Memory 模型讀寫工具在內部接線，固定基準／權限／來源導航、多欄全成或全拒、原命令重入及 V4A 真實效果回傳通過真 PG。工具契約由單一 schema 生成；T06 仍須可靠保存待執行命令、接續原生工具結果。尚未接通模型 runner、背景執行或真模型品質，見 [Memory 工具接線](../../docs/implementation/memory-tools.md)。
+**2026-09-30 接線狀態：**已完成三次全合成真模型訪談，其中第三輪固定已發布 Memory、暫停／重開／同輪接續後更正 JD；兩次 B1／B2 背景批次正式發布。來源與快照選用修訂經 DB 核對；正式中文 PDF 已渲染。JD 八個模型入口、候選預覽、取消與完整公開中間訊息的歷史回看已接線，**目前為保存後查詢，尚非生成中的逐片段串流**。`POST /inputs` 只在模型與 supervisor 就緒時接受新工作；原已接受命令可先查回原結果，不因目前無模型設定而失去辨識。狀態可經 `/consultant-turns/{execution_id}` 或 `/consultant-turns/by-command/{command_id}` 重取。這不是長訪談品質或完整恢復 gate 已通過；分別見 [A 接線證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t08-consultant-turn.md)、[Memory 編排證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)與任務表。
 
 ## 安裝與執行
 
@@ -17,7 +17,17 @@ uv run --project apps/api --locked uvicorn caliburn.bootstrap:create_app --facto
 
 `GET /api/health` 回傳 `{"status":"ok"}`，只表示程序存活，不表示 DB／模型可用。Ctrl+C 停止前景開發程序。新應用不在 import 時讀取 `.env`，這組命令不需模型金鑰，也不使用現行產品資料。
 
-Windows 的 psycopg async 不支援預設 Proactor loop，因此明確使用 Python／Uvicorn 支援的 Selector factory，而非已棄用的全域 event-loop policy。這尚不代表 PDF 的 Windows 子程序接線已驗證；後續 T13 必須處理其不同 loop 需求，見[介面交付](../../docs/implementation/interface-and-delivery.md#4-pdf-與程序)。
+Windows 的 psycopg async 不支援預設 Proactor loop，因此明確使用 Python／Uvicorn 支援的 Selector factory，而非已棄用的全域 event-loop policy。PDF renderer 使用獨立擁有的瀏覽器執行環境；Windows 中文短／長版已驗，乾淨安裝仍待交付 gate，見[介面交付](../../docs/implementation/interface-and-delivery.md#4-pdf-與程序)。
+
+### 本機 AI Demo 啟動
+
+先依下節初始化隔離的新目標 DB，保留 `CALIBURN_DATABASE_URL`／schema 環境變數；PDF 另配置下方兩個路徑。明確載入指定 `.env` 的 **OpenAI key 一項**，不套入其他旧配置、不在命令列貼金鑰：
+
+```powershell
+uv run --project apps/api --locked python apps/api/scripts/run_backend.py --key-file S:/caliburn/apps/api/.env
+```
+
+另一個終端：`pnpm --dir apps/web dev`；開啟 `http://127.0.0.1:5173`。後端固定 loopback 8100，單程序，不自動遷移／建立範例資料／接舊 DB；Ctrl+C 停止前景程序。這是隔離開發入口，尚不是 T18 正式交付切換。程式與 supervisor 恢復已接受工作可能繼續使用模型額度；僅要操作人工 JD 時，不提供 key-file 且不設定 `OPENAI_API_KEY`。
 
 ## 驗證
 
@@ -47,9 +57,11 @@ migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade h
 - `GET /api/job-files/{job_file_id}/jd/capabilities`：同一固定修訂的共用知識／技能定義與有序 `task_links`；正文不在任務內複製。`POST` 同路徑以 `change.action` 增修刪定義、概覽排序、連結／解除任務或排序任務關係。仍被使用的定義刪除回 409 `capability_in_use`；刪任務保留定義。知識與技能不能跨類排序或改類別，命令／基底／准入沿原規則；原結果按原修訂回讀。完整形狀以 `edit-jd-capabilities-request.schema.json` 為準；已接人工 UI，模型工具仍待 T07，不將本端點直接提供給 Agent。
 - `GET /api/job-files/{job_file_id}/jd/work`：供人工 UI 組合讀取同一固定修訂的職責、任務及明細、知識／技能與任務關係、協作對象與共通條件；先固定 head，重用既有投影，不另存資料。各集合的獨立 GET 不承諾跨請求相同修訂；需要一個集合編輯畫面基底時使用此入口。
 - `GET/POST /api/job-files/{job_file_id}/jd/collaborators`：主要協作對象的固定集合及新增、局部修訂、排序、刪除。名稱／合作範圍至少一欄有內容；未指定保留、null 清空不能清成空項。`GET/POST .../jd/conditions`：全職務共通條件，五類各自排序；明確修訂分類保留身分並放目的類末尾，不自動套到任務。兩者沿同一 JD 命令／基底／准入與歷史規則，完整 shape 依 `contracts/http/`；已接人工 UI 與同版 `/jd/work`，不是模型候選入口。
-- `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，重送原命令回原接受結果／200，改內容重用命令或已有其他 A 回 409。重新提交已取消原文須用新命令，不是重送舊命令。**目前只做持久接受，尚無模型 runner／控制 UI，不會生成答覆**；不提供任意正式化 API。接線及未完邊界見[訪談保存](../../docs/implementation/interview-storage.md#6-輸入接受重送與新提交)。
+- `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，原命令重送回原接受結果／200；不同內容重用命令或已有其他 A 回 409。提交後 supervisor 執行既有 runner；未配置模型回 503，不接受無法執行的工作。取消後重新提交須用新命令；不提供任意正式化 API。接線／驗證界線見上方更新。
 
 ### 測試與檢查
+
+PDF 使用 `CALIBURN_PDF_FONT_PATH` 指定已授權的中文字型；可選 `CALIBURN_PDF_CHROMIUM_PATH` 指定與已鎖 Playwright 相容的 Chromium，未指定時使用套件已安裝的瀏覽器。`GET /api/job-files/{id}/jd/export.pdf` 固定讀正式 JD，候選不匯出；缺配置明確回 503，不下載空檔假成功。乾淨交付安裝及跨平台驗證仍屬 T13／T18，見 [PDF 證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t13-pdf-export.md)。
 
 保持前述 `UV_PROJECT_ENVIRONMENT`；不要意外使用舊 `apps/api/.venv`。
 

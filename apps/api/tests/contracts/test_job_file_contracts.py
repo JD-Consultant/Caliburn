@@ -69,6 +69,7 @@ SCHEMAS = Path(__file__).parents[2] / "contracts/http"
                         "interview_sequence": 1,
                         "speaker": "app",
                         "interview_text": "您平常主要負責哪些工作？",
+                        "execution_id": None,
                     }
                 ]
             },
@@ -98,6 +99,7 @@ def test_formal_sequence_is_a_positive_integer_not_a_coerced_value(sequence: obj
                 "interview_sequence": sequence,
                 "speaker": "employee",
                 "interview_text": "員工原話",
+                "execution_id": None,
             }
         ]
     }
@@ -105,6 +107,34 @@ def test_formal_sequence_is_a_positive_integer_not_a_coerced_value(sequence: obj
     assert not Draft202012Validator(schema).is_valid(payload)
     with pytest.raises(ValidationError):
         InterviewHistory.model_validate(payload)
+
+
+@pytest.mark.parametrize("execution_id", [None, str(uuid4())])
+def test_history_reply_locator_round_trips_without_private_fields(execution_id: str | None) -> None:
+    payload = {
+        "messages": [
+            {
+                "source_id": str(uuid4()),
+                "interview_sequence": 3,
+                "speaker": "consultant",
+                "interview_text": "正式答覆",
+                "execution_id": execution_id,
+            }
+        ]
+    }
+    schema = json.loads((SCHEMAS / "interview-history.schema.json").read_text(encoding="utf-8"))
+    validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    validator.validate(payload)
+    assert json.loads(InterviewHistory.model_validate(payload).model_dump_json()) == payload
+    for name, value in (
+        ("execution_id", "not-a-uuid"),
+        ("checkpoint_id", "private"),
+        ("command_id", str(uuid4())),
+    ):
+        invalid = {"messages": [{**payload["messages"][0], name: value}]}
+        assert not validator.is_valid(invalid)
+        with pytest.raises(ValidationError):
+            InterviewHistory.model_validate(invalid)
 
 
 @pytest.mark.parametrize("text", ["", " \n\t", "\u3000", "abc\x00"])

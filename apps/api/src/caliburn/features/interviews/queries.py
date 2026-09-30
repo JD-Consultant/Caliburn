@@ -1,4 +1,4 @@
-"""Formal history only; execution originals without formal membership stay invisible."""
+"""Formal source reads and separate private App recovery queries without source eligibility."""
 
 from uuid import UUID
 
@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.interviews import persistence
 from caliburn.features.interviews.models import (
+    AcceptedInterviewInput,
+    InterviewHistoryEntry,
     InterviewInputNotFoundError,
     InterviewMessage,
     InterviewReadError,
@@ -25,6 +27,13 @@ async def read_interview_history(
     return await persistence.list_formal_interviews(session, job_file_id)
 
 
+async def read_public_interview_history(
+    session: AsyncSession, job_file_id: UUID
+) -> list[InterviewHistoryEntry]:
+    """UI-only reply locator; no native context or extra formal-source qualification."""
+    return await persistence.list_public_interview_history(session, job_file_id)
+
+
 async def read_execution_input(
     session: AsyncSession, *, job_file_id: UUID, execution_id: UUID
 ) -> StoredInterviewInput:
@@ -35,6 +44,21 @@ async def read_execution_input(
     if original is None:
         raise InterviewInputNotFoundError("No accepted input exists in this execution scope")
     return StoredInterviewInput(original.source_id, original.interview_text)
+
+
+async def read_accepted_input(
+    session: AsyncSession, *, job_file_id: UUID, command_id: UUID
+) -> AcceptedInterviewInput | None:
+    """Private App recovery by original command, not a formal history/source lookup."""
+    found = await persistence.read_input_submission(
+        session, job_file_id=job_file_id, command_id=command_id
+    )
+    if found is None:
+        return None
+    record, _original = found
+    return AcceptedInterviewInput(
+        record.job_file_id, record.command_id, record.source_id, record.execution_id
+    )
 
 
 async def read_history_frontier(session: AsyncSession, job_file_id: UUID) -> int:

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from caliburn.features.interviews import queries as interview_queries
 from caliburn.features.interviews import service as interview_service
-from caliburn.features.interviews.models import InterviewMessage
+from caliburn.features.interviews.models import InterviewHistoryEntry
 from caliburn.features.job_description import service as jd_service
 from caliburn.features.job_files import queries as job_file_queries
 from caliburn.features.job_files import service as job_file_service
@@ -42,7 +42,7 @@ class JobFileWorkflow:
         async with self.sessions() as session:
             return await job_file_queries.read_job_file(session, job_file_id)
 
-    async def read_interviews(self, job_file_id: UUID) -> list[InterviewMessage]:
+    async def read_interviews(self, job_file_id: UUID) -> list[InterviewHistoryEntry]:
         async with self.sessions() as session:
             await job_file_queries.read_job_file(session, job_file_id)
-            return await interview_queries.read_interview_history(session, job_file_id)
+            return await interview_queries.read_public_interview_history(session, job_file_id)

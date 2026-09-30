@@ -15,6 +15,15 @@ class InterviewInputWorkflow:
     def __init__(self, sessions: async_sessionmaker[AsyncSession]) -> None:
         self.sessions = sessions
 
+    async def read_accepted(self, command: SubmitInterviewInput) -> InputAcceptance | None:
+        """Reconcile immutable original text/result without requiring a live model.
+
+        Absence grants no admission: accept() rechecks under the existing file lock.
+        """
+        async with self.sessions() as session:
+            original = await interview_service.find_accepted_input(session, command)
+        return InputAcceptance(original, is_new=False) if original is not None else None
+
     async def accept(self, command: SubmitInterviewInput) -> InputAcceptance:
         async with self.sessions.begin() as session:
             await job_file_service.lock_job_file(session, command.job_file_id)

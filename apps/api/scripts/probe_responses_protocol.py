@@ -16,6 +16,7 @@ from typing import Any
 from openai import APIError, AsyncOpenAI
 from openai.types.responses.function_tool_param import FunctionToolParam
 
+from caliburn.adapters.openai_credentials import read_openai_api_key
 from caliburn.adapters.openai_failures import classify_response_failure
 from caliburn.adapters.openai_responses import (
     ResponseRequest,
@@ -54,21 +55,6 @@ TOOL: FunctionToolParam = {
     },
     "strict": True,
 }
-
-
-def read_api_key(path: Path) -> str:
-    """Load only the explicitly authorized key; never evaluate or apply other env values."""
-    values = []
-    for line in path.read_text(encoding="utf-8-sig").splitlines():
-        name, separator, value = line.strip().partition("=")
-        if separator and name.strip() == "OPENAI_API_KEY":
-            value = value.strip()
-            if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
-                value = value[1:-1]
-            values.append(value)
-    if len(values) != 1 or not re.fullmatch(r"[A-Za-z0-9_-]+", values[0]):
-        raise ValueError("Exactly one plain OPENAI_API_KEY value is required")
-    return values[0]
 
 
 async def run_preflight(client: AsyncOpenAI, emit: Callable[[dict[str, Any]], None]) -> None:
@@ -147,7 +133,7 @@ async def execute(key_file: Path, output: Path) -> int:
 
         emit({"event": "started", "model": MODEL, "data": "synthetic-only"})
         try:
-            api_key = read_api_key(key_file)
+            api_key = read_openai_api_key(key_file)
             async with create_responses_client(
                 api_key=api_key, timeout_seconds=REQUEST_TIMEOUT_SECONDS
             ) as client:

@@ -13,6 +13,7 @@ from psycopg.conninfo import make_conninfo
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.agents.job_consultant.runner import ConsultantRunner
+from caliburn.features.executions import budgets
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 from caliburn.features.job_description.source_persistence import read_source_references
@@ -23,10 +24,12 @@ pytestmark = pytest.mark.postgres
 
 
 @pytest.mark.parametrize("max_cost_usd", [None, Decimal("0.02")])
+@pytest.mark.parametrize("model", ["gpt-6-luna", "gpt-6.1-sol"])
 def test_native_model_tools_then_atomic_completion(
     client: TestClient,
     database_settings: DatabaseSettings,
     max_cost_usd: Decimal | None,
+    model: str,
 ) -> None:
     file_id = UUID(
         client.post(
@@ -50,6 +53,7 @@ def test_native_model_tools_then_atomic_completion(
 
     def respond(request: httpx2.Request) -> httpx2.Response:
         payload = json.loads(request.content)
+        assert payload["model"] == model
         if request.url.path.endswith("/input_tokens"):
             return httpx2.Response(
                 200, json={"object": "response.input_tokens", "input_tokens": 500}
@@ -60,6 +64,7 @@ def test_native_model_tools_then_atomic_completion(
             len(sent), final=len(sent) == 2, tools=1 if len(sent) == 1 else 0
         ).model_dump(mode="json")
         raw["service_tier"] = "default"
+        raw["model"] = model
         if len(sent) == 1:
             raw["output"][-1].update(
                 name="revise_jd_profile",
@@ -101,7 +106,12 @@ def test_native_model_tools_then_atomic_completion(
                     sessions,
                     saver,
                     sdk,
-                    ModelSettings(api_key="synthetic", max_cost_usd=max_cost_usd),
+                    ModelSettings(
+                        api_key="synthetic",
+                        model=model,
+                        max_cost_usd=max_cost_usd,
+                        max_output_tokens=1024,
+                    ),
                 )
                 exchange = await runner.run(writer)
             finally:
@@ -110,6 +120,9 @@ def test_native_model_tools_then_atomic_completion(
             assert (
                 await executions.read_execution(session, scope)
             ).status == ExecutionStatus.COMPLETED
+            if model == "gpt-6.1-sol":
+                policy = await budgets.read_execution_budget(session, scope)
+                assert policy.cost_basis.startswith("openai-standard-2026-10-01:")
         return exchange
 
     result = client.portal.call(scenario)

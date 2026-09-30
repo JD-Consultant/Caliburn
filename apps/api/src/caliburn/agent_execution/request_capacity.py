@@ -4,18 +4,12 @@ from dataclasses import dataclass
 from typing import TypedDict
 from uuid import UUID
 
+from caliburn.adapters.openai_models import ModelCapacityLimits as ModelCapacityLimits
 from caliburn.adapters.openai_responses import ResponseRequest
 
 # Each attempt costs one more exact count, so the owner of an oversized first request
 # gets a small fixed number of reductions before the work is reported as capacity-blocked.
 MAX_FIRST_REQUEST_FITS = 3
-
-
-class ModelCapacityLimits(TypedDict):
-    model: str
-    max_input_tokens: int
-    context_window_tokens: int
-    max_output_tokens: int
 
 
 class ReceivedInputCount(TypedDict):

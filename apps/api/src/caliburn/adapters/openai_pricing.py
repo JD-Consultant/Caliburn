@@ -142,3 +142,12 @@ GPT_6_LUNA_STANDARD_2026_09_30 = TextResponsePricing(
     short_context=TokenRates(Decimal("0.10"), Decimal("0.01"), Decimal("0.125"), Decimal("0.50")),
     long_context=TokenRates(Decimal("0.20"), Decimal("0.02"), Decimal("0.25"), Decimal("0.75")),
 )
+
+
+# Explicit evaluation option; does not change the product's default model.
+GPT_6_1_SOL_STANDARD_2026_10_01 = TextResponsePricing(
+    model="gpt-6.1-sol",
+    source_revision="openai-standard-2026-10-01",
+    short_context=TokenRates(Decimal("2.00"), Decimal("0.10"), Decimal("2.50"), Decimal("10.00")),
+    long_context=TokenRates(Decimal("4.00"), Decimal("0.20"), Decimal("5.00"), Decimal("15.00")),
+)

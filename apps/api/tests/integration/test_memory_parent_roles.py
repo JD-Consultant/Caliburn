@@ -16,7 +16,7 @@ from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
 from caliburn.agents.memory_analysis.tools import MEMORY_CHECKPOINT_TYPES
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
-from caliburn.features.executions import history
+from caliburn.features.executions import budgets, history
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import AgentRole
 from caliburn.features.executions.models import ExecutionStatus
@@ -32,13 +32,15 @@ from tests.unit.test_response_loop import response_at
 pytestmark = pytest.mark.postgres
 
 
+@pytest.mark.parametrize("model", ["gpt-6-luna", "gpt-6.1-sol"])
 def test_actual_roles_publish_atomically_and_continue_next_batch(
-    database_settings: DatabaseSettings, monkeypatch: pytest.MonkeyPatch
+    database_settings: DatabaseSettings, monkeypatch: pytest.MonkeyPatch, model: str
 ) -> None:
     sent: list[dict] = []
 
     def respond(request: httpx2.Request) -> httpx2.Response:
         payload = json.loads(request.content)
+        assert payload["model"] == model
         if request.url.path.endswith("/input_tokens"):
             return httpx2.Response(
                 200, json={"object": "response.input_tokens", "input_tokens": 500}
@@ -77,6 +79,7 @@ def test_actual_roles_publish_atomically_and_continue_next_batch(
             )
         raw = response_at(step, final=tool is None, tools=0).model_dump(mode="json")
         raw["service_tier"] = "default"
+        raw["model"] = model
         if tool:
             raw["output"] = [
                 {
@@ -112,7 +115,7 @@ def test_actual_roles_publish_atomically_and_continue_next_batch(
                 dsn, serde=create_graph_serializer(allowed_types=MEMORY_CHECKPOINT_TYPES)
             ) as saver:
                 await saver.setup()
-                settings = ModelSettings(api_key="synthetic")
+                settings = ModelSettings(api_key="synthetic", model=model)
                 parent = MemoryBatchWorkflow(
                     database.sessions,
                     run_role=MemoryRoleDispatch(
@@ -140,6 +143,9 @@ def test_actual_roles_publish_atomically_and_continue_next_batch(
                 assert first.covered_through_sequence == 2 and len(sent) == 4
                 assert await parent.run(work.writer) == first and len(sent) == 4
                 async with database.sessions() as session:
+                    if model == "gpt-6.1-sol":
+                        policy = await budgets.read_execution_budget(session, work.writer.scope)
+                        assert policy.cost_basis.startswith("openai-standard-2026-10-01:")
                     for role in (
                         AgentRole.WORK_SITUATION_ANALYST,
                         AgentRole.WORK_UNDERSTANDING_ANALYST,

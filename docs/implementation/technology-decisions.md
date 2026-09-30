@@ -14,6 +14,7 @@
 | 原件補存退避 | Tenacity（既有 lock 9.1.4，列為直接相依） | 僅調度仍持有原 R／C／count 的有限保存重試，不用來重送模型或業務操作；故障分類、次數及接線見[執行 §5.6](agent-execution.md#56-原件補存的有限自動恢復t06-第十六切片)。不建重試平台，不取代持久外送預算 |
 | 模型 | OpenAI 官方 Python SDK，直接 Async Responses | 保留原生 items；`store=false`、`all_turns` 與顯式 compact。GPT-6 Luna 按既定方向做帳戶能力 gate，不擅換模型／provider。[官方接續](https://developers.openai.com/api/docs/guides/deployment-checklist#use-reasoningencrypted_content) |
 | 推理設定 | A／B1／B2 共用既有 `ModelSettings`，預設 `high` | 2026-10-01 有限校準：同 payload 的局部更正來源選擇有改善，四輪真 App 旅程保存與來源回讀成立；不改模型、Prompt 或 Context，不新增角色切換器。較高推理額度可能增加輸出量／延遲；未作嚴格同批延遲比較，也不是每個角色品質都已證明改善。比較、限制及可回退範圍見 [T14 證據](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#2026-10-01來源保留的-reasoning-effort-對照)。既有執行保留已保存請求，設定變更不改寫歷史。 |
+| 隔離模型對照 | 明確指定 `ModelSettings(model="gpt-6.1-sol")`，僅供新合成檔案評測 | `adapters/openai_models.py` 統一已核對的容量、推理等級與計價配置，A／B1／B2 使用同一資料來源；不新增 provider／模型路由框架。產品環境入口仍用 Luna／high，未提供模型切換介面；不將評測能力視為跨模型歷史相容性。不得拿既有檔案的 opaque reasoning 換模型續跑；原執行的 model／pricing 保護不變。官規、manifest 及結果見 [T14 核心 App 對照](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#2026-10-01較高能力模型的核心-app-旅程對照)。 |
 | 模型費用估算 | 版本化官方費率配置＋Decimal，接既有 executions budget | 不為單一 provider 引入代理平台或線上價格服務；輸入／cache read／write／輸出分算，未知不當零。公開費率配置、compact 推估與未驗帳單界線見[執行 §5.7](agent-execution.md#57-固定費率與-usage-成本估算t06-第十七切片) |
 | Web | React＋TypeScript strict＋Vite；React Router 僅管理路由；TanStack Query 管 server state | 本機 SPA 無 SEO／SSR 需求；相比 Next.js 不引入第二套 server action／業務層。React 官方列出這些成熟選項，**不是聲稱官方首選所有專案用 SPA**。[React](https://react.dev/learn/build-a-react-app-from-scratch)、[Vite](https://vite.dev/guide/) |
 | UI 元件 | MUI Core；原生受控欄位 | 使用既有表單、Dialog、鍵盤可操作元件，不從底層重造 widget；不選付費 Data Grid 或全文富文字編輯器，JD 是分欄編輯。[MUI](https://mui.com/material-ui/getting-started/) |
@@ -23,6 +24,8 @@
 | 靜態品質 | Ruff format／lint、mypy；TypeScript strict、ESLint＋Prettier | 統一工具化風格；Google 命名原則不代表需整套照搬其 lint 工具。生成碼用再生檢查，不手修 |
 
 Node 用受支援 24 LTS 系列及相容 pnpm 穩定版，依[官方 release 狀態](https://nodejs.org/en/about/previous-releases)選 LTS，不以 Current／prerelease 優先。**本頁不捏造當日最新版 patch**；T01 將 registry、官方支援矩陣、license 與相容性結果寫入 lock／證據。同一任務不用因新 patch 發布無限重開；之後升版是獨立受測變更。
+
+模型對照的限制：原 execution 的固定模型／計價保護，**不等於跨 execution 的歷史已具備模型相容性保護**。目前改用不同程式化設定啟動既有檔案，仍可能將已完成的舊模型 items 帶入新請求；因此上述對照只用新 schema／新檔案，不開放既有檔案切換。若後續採用新產品模型，須先處理這個實際接縫，而非以修改預設字串當完成。
 
 T01 已發現 TS 7 超出 [typescript-eslint 支援範圍](https://typescript-eslint.io/users/dependency-versions/)，目前鎖 TS 6.0.3＋typescript-eslint 8.70.1 並以 strict peer 檢查；不保留自動加出的 release-age 排除項。OpenAI SDK 3.20.0 的 transport 使用 httpx2，與 FastAPI 測試的 HTTPX 分開；不以同名概念假定型別互換。Windows saver 的 Selector／PDF Proactor 接縫見[交付設計](interface-and-delivery.md#4-pdf-與程序)；具體通過／未驗範圍在 [T01 證據](../plans/2026-09-29-target-rebuild/evidence/t01-foundation.md)。
 

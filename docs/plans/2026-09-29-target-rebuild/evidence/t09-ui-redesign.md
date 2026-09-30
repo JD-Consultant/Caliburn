@@ -31,13 +31,15 @@
 
 | 項目 | 結果 |
 | --- | --- |
-| 前端 Vitest | 25 檔／**138** 通過（基線 18／115）。Red 先行：`turn-hint-store`、`use-current-turn`（5 項行為失敗後實作）、`JdOutline`、職責收合。事後補測（**非 TDD**）：`source-index`、`turn-summary`、`SourceViewer.sheet`、`JobFileWorkspace`（JD 唯讀鎖、分頁不卸載）；對 `targetKey` 做變異檢查（忽略 `task_id`）確認索引測試會失敗。`App.test.tsx` 1 項因候選改為獨立檢視而先切「正式稿」再驗 |
+| 前端 Vitest | 25 檔／**139** 通過（基線 18／115）。Red 先行：`turn-hint-store`、`use-current-turn`（5 項行為失敗後實作）、`JdOutline`、職責收合。事後補測（**非 TDD**）：`source-index`、`turn-summary`、`SourceViewer.sheet`、`JobFileWorkspace`（JD 唯讀鎖、分頁不卸載）；對 `targetKey` 做變異檢查（忽略 `task_id`）確認索引測試會失敗。`App.test.tsx` 1 項因候選改為獨立檢視而先切「正式稿」再驗 |
 | 前端 tsc／ESLint／Prettier | 皆通過 |
 | 後端 | `tests/contracts/test_jd_sources_target_contract.py` 通過（八種目標形狀、同名標籤以身分區分）；`generate_contracts.py --check` 無漂移；ruff、ruff format、mypy（`jd_evidence.py`）通過 |
+| 真 PG（隔離叢集） | `test_jd_source_http.py`、`test_jd_source_persistence.py`、`test_jd_shared_source_queries.py` **15 通過**（含新的 `target` 預期）。叢集：repo 內可攜 PostgreSQL 18.6 於新資料夾、127.0.0.1:55450、空白 `_test` 資料庫；不接 Demo DB |
+| Playwright e2e（隔離後端 8101＋第二組 dev server 5174） | 17 項中 **15 通過**（含新的 `workspace.spec.ts`：整頁不捲動、章節導覽、收合、窄螢幕分頁保草稿）。**2 項未通過且無法在本環境驗**：`jd-profile:86`、`jd-work:209` 需要「A 已准入」，隔離後端未設模型（`POST /inputs` 回 503 `model_not_configured`），依規不啟動付費模型。既有窄螢幕案例改為先切「JD」分頁。瀏覽器為系統 Chrome，**不是** lock 的 Playwright Chromium revision，不能視為等價證據 |
 | 瀏覽器（Chrome，桌面 1440×900、手機 390，Demo 唯讀，非 GET 請求 0） | 整頁不捲動（文件高 900）；訪談欄 518px／JD 欄 922px；輸入區固定；無頁面錯誤。改版前同一檔案頁高 8,014px、79 顆按鈕 |
 | 徽章畫面 | **合成**：Demo 後端尚是舊程式，沒有 `target`，此處在瀏覽器端依標籤對照後攔截回應，只驗視覺，**不是後端結果** |
 
-**未驗**：Playwright e2e（需獨立空白 `_test` 資料庫與另一組後端埠，Demo 不動）；PG 整合測試 `test_jd_source_http.py`（已更新預期，未執行：無 `CALIBURN_TEST_DATABASE_URL`）；真後端回傳 `target` 的徽章（需重啟 Demo 後端載入新程式）；完整鍵盤／焦點走查；窄螢幕 JD 分頁最終截圖；長訪談（200+ 則）效能；色彩對比只做計算（內文 #1b2420／#4d5b55 對白底約 15:1／7:1），未做工具掃描；未使用真模型。
+**未驗**：需模型的兩項 e2e（見上）；真後端回傳 `target` 的徽章畫面（隔離環境沒有 AI 產生的來源；HTTP 層已由真 PG 測試驗證，畫面需重啟 Demo 後端載入新程式後看）；鎖定版 Playwright Chromium；完整鍵盤／焦點走查；窄螢幕 JD 分頁最終截圖；長訪談（200+ 則）效能；色彩對比只做計算（內文 #1b2420／#4d5b55 對白底約 15:1／7:1），未做工具掃描；未使用真模型。
 
 ## 4. 已知限制
 

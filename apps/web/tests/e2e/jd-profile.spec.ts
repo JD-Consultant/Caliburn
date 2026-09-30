@@ -58,6 +58,8 @@ test('人工編輯四欄、局部清空、重開、鍵盤與窄螢幕保持正�
   await expect(page.locator('.interview-text')).toHaveText(opening ?? '');
   await page.screenshot({ path: testInfo.outputPath('jd-profile-desktop.png'), fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
+  // Narrow screens show one pane at a time; the JD lives in its own tab.
+  await page.getByRole('tab', { name: 'JD' }).click();
   await edit.click();
   await expect(page.getByRole('textbox', { name: '職務名稱' })).toBeFocused();
   await page.getByRole('textbox', { name: '職務目的' }).fill('');

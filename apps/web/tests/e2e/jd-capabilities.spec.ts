@@ -132,6 +132,8 @@ test('共用定義與兩任務關係 CRUD、獨立排序、反向用途、重開
     animations: 'disabled',
   });
   await page.setViewportSize({ width: 390, height: 844 });
+  // Narrow screens show one pane at a time; the JD lives in its own tab.
+  await page.getByRole('tab', { name: 'JD' }).click();
   await renamed.getByRole('button', { name: '編輯知識' }).click();
   await expect(page.getByRole('textbox', { name: '知識名稱' })).toBeFocused();
   await expect(page.getByRole('button', { name: '儲存知識' })).toBeInViewport();

@@ -122,6 +122,8 @@ test('職責任務 CRUD、排序、跨組移動及刪職責保留任務，reload
     animations: 'disabled',
   });
   await page.setViewportSize({ width: 390, height: 844 });
+  // Narrow screens show one pane at a time; the JD lives in its own tab.
+  await page.getByRole('tab', { name: 'JD' }).click();
   await unassigned.getByRole('button', { name: '編輯任務' }).click();
   await expect(page.getByRole('textbox', { name: '任務名稱' })).toHaveValue('實作網頁');
   await expect(page.getByRole('combobox', { name: '所屬職責' })).toContainText('未歸屬任務');

@@ -75,9 +75,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.interview_input_workflow = (
             InterviewInputWorkflow(database.sessions) if database else None
         )
-        app.state.consultant_status_workflow = (
-            ConsultantStatusWorkflow(database.sessions) if database else None
-        )
+        app.state.consultant_status_workflow = None
         app.state.consultant_supervisor = None
         commentary_hub = ConsultantCommentaryHub()
         app.state.consultant_commentary_hub = commentary_hub
@@ -95,25 +93,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                         )
                         resources.push_async_callback(renderer.aclose)
                         app.state.jd_export_workflow = JdExportWorkflow(database.sessions, renderer)
+                    # Saved public history remains readable without model credentials.
+                    dsn = make_conninfo(
+                        database.settings.sqlalchemy_url.set(
+                            drivername="postgresql"
+                        ).render_as_string(hide_password=False),
+                        options=f"-c search_path={database.settings.schema}",
+                    )
+                    saver = await resources.enter_async_context(
+                        AsyncPostgresSaver.from_conn_string(
+                            dsn,
+                            serde=create_graph_serializer(allowed_types=MEMORY_CHECKPOINT_TYPES),
+                        )
+                    )
+                    await saver.setup()
+                    app.state.consultant_status_workflow = ConsultantStatusWorkflow(
+                        database.sessions, saver
+                    )
                     if configured.model is not None:
-                        dsn = make_conninfo(
-                            database.settings.sqlalchemy_url.set(
-                                drivername="postgresql"
-                            ).render_as_string(hide_password=False),
-                            options=f"-c search_path={database.settings.schema}",
-                        )
-                        saver = await resources.enter_async_context(
-                            AsyncPostgresSaver.from_conn_string(
-                                dsn,
-                                serde=create_graph_serializer(
-                                    allowed_types=MEMORY_CHECKPOINT_TYPES
-                                ),
-                            )
-                        )
-                        await saver.setup()
-                        app.state.consultant_status_workflow = ConsultantStatusWorkflow(
-                            database.sessions, saver
-                        )
                         sdk = create_responses_client(
                             api_key=configured.model.api_key,
                             timeout_seconds=configured.model.request_timeout_seconds,

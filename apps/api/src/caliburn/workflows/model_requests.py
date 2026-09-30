@@ -6,6 +6,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
+from enum import StrEnum
 from hashlib import sha256
 from random import random
 from uuid import UUID, uuid4
@@ -34,6 +35,7 @@ from caliburn.features.executions.budget_models import (
     BudgetExceededError,
     BudgetLimit,
     ExecutionBudget,
+    OutboundAttempt,
     OutboundFailure,
     OutboundKind,
     OutboundRequest,
@@ -86,7 +88,30 @@ class ModelRequestAccounting:
         )
 
 
-class PriorModelAttemptError(RuntimeError):
+class PriorAttemptRecovery(StrEnum):
+    """App reconciliation of local originals, not a statement about remote billing."""
+
+    ORIGINAL_AVAILABLE = "original_available"
+    IN_FLIGHT_OR_UNKNOWN = "in_flight_or_unknown"
+    LOCAL_ORIGINAL_UNRECOVERABLE = "local_original_unrecoverable"
+
+
+class PriorOutboundAttemptError(RuntimeError):
+    """Keep the original result/recovery route distinct from permission for a new send."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        attempts: tuple[OutboundAttempt, ...] = (),
+        recovery: PriorAttemptRecovery = PriorAttemptRecovery.IN_FLIGHT_OR_UNKNOWN,
+    ) -> None:
+        self.attempts = attempts
+        self.recovery = recovery
+        super().__init__(message)
+
+
+class PriorModelAttemptError(PriorOutboundAttemptError):
     """The logical request has a prior send; reconcile it rather than blindly sending again."""
 
 
@@ -102,11 +127,11 @@ class ModelRequestFailedError(RuntimeError):
         super().__init__(f"Outbound model request stopped: {failure.kind.value}")
 
 
-class PriorInputCountAttemptError(RuntimeError):
+class PriorInputCountAttemptError(PriorOutboundAttemptError):
     """Reconcile the original counting attempt; do not blindly repeat a remote count."""
 
 
-class PriorCompactionAttemptError(RuntimeError):
+class PriorCompactionAttemptError(PriorOutboundAttemptError):
     """Reconcile the original compaction attempt; an admission never permits a resend."""
 
 
@@ -123,6 +148,15 @@ class ModelRequestExecutor:
     client: AsyncOpenAI
     accounting: ModelRequestAccounting
     retry_policy: ResponseRetryPolicy = ResponseRetryPolicy()
+    # Trusted App-only seam. The owner must inspect native checkpoint/pending writes
+    # and retained R/C/count handoffs, and establish the original producers are no
+    # longer capable of returning a result before reporting UNRECOVERABLE. A writer
+    # takeover, empty checkpoint, or acquired process lock alone is insufficient.
+    # Consult outside DB locks; uncertain/failed checks must never authorize a send.
+    reconcile_prior_attempts: (
+        Callable[[ExecutionWriter, tuple[OutboundAttempt, ...]], Awaitable[PriorAttemptRecovery]]
+        | None
+    ) = None
 
     async def request_model(
         self, request: ResponseRequest, request_id: UUID
@@ -182,14 +216,38 @@ class ModelRequestExecutor:
     ) -> tuple[T, UUID]:
         """One retry owner for local-function Responses/count/compact, never for tool effects.
 
-        Only a caught provider failure can authorize the next attempt. A crash or lost
-        admission acknowledgement leaves an unresolved record and stops on re-entry.
+        Caught transient failures use the existing retry policy. Unknown attempts stop
+        unless the App explicitly establishes that their local originals are lost.
         """
         if self.accounting.model is not None and payload.get("model") != self.accounting.model:
             raise BudgetConflictError("The request model does not match its pinned pricing")
+        reconciled = False
+        unrecoverable: tuple[OutboundAttempt, ...] = ()
         while True:
             try:
-                attempt_id = await self._reserve_request(request_id, kind, payload, reservation)
+                attempt_id = await self._reserve_request(
+                    request_id, kind, payload, reservation, unrecoverable=unrecoverable
+                )
+            except PriorOutboundAttemptError as prior:
+                reconcile = self.reconcile_prior_attempts
+                if reconciled or reconcile is None or not prior.attempts:
+                    raise
+                reconciled = True
+                disposition = await reconcile(self.writer, prior.attempts)
+                if disposition is not PriorAttemptRecovery.LOCAL_ORIGINAL_UNRECOVERABLE:
+                    raise type(prior)(
+                        "Recover the original result or keep the unresolved request stopped",
+                        attempts=prior.attempts,
+                        recovery=(
+                            PriorAttemptRecovery.ORIGINAL_AVAILABLE
+                            if disposition is PriorAttemptRecovery.ORIGINAL_AVAILABLE
+                            else PriorAttemptRecovery.IN_FLIGHT_OR_UNKNOWN
+                        ),
+                    ) from None
+                # Scoped to the exact immutable observations, not a reusable request-wide
+                # permit. Never re-probe a newly admitted competitor in this invocation.
+                unrecoverable = prior.attempts
+                continue
             except _RetryNotReadyError as delay:
                 # No DB transaction across waiting. Recheck cancellation/writer/deadline;
                 # the persisted timestamp, not this process's timer, authorizes sending.
@@ -242,6 +300,8 @@ class ModelRequestExecutor:
         kind: OutboundKind,
         request_payload: dict[str, object],
         reservation: Decimal,
+        *,
+        unrecoverable: tuple[OutboundAttempt, ...] = (),
     ) -> UUID:
         payload = json.dumps(
             request_payload,
@@ -264,12 +324,20 @@ class ModelRequestExecutor:
             prior = await budgets.read_request_attempts(session, self.writer.scope, request_id)
             if any(attempt.request != outbound for attempt in prior):
                 raise BudgetConflictError("An outbound request cannot change its saved payload")
-            if prior:
-                retry_times = []
-                for attempt in prior:
-                    if attempt.failure is None or attempt.failure.retry_not_before is None:
-                        raise prior_error("Reconcile the original outbound attempt before retrying")
-                    retry_times.append(attempt.failure.retry_not_before)
+            retry_times = []
+            for attempt in prior:
+                if attempt.failure is None:
+                    continue
+                if attempt.failure.retry_not_before is None:
+                    raise prior_error("A terminal provider failure cannot be readmitted")
+                retry_times.append(attempt.failure.retry_not_before)
+            unresolved = tuple(attempt for attempt in prior if attempt.failure is None)
+            if frozenset(unresolved) != frozenset(unrecoverable):
+                raise prior_error(
+                    "Reconcile the original outbound attempt before retrying",
+                    attempts=unresolved,
+                )
+            if retry_times:
                 now = await budgets.read_execution_time(session, self.writer.scope)
                 retry_at = max(retry_times)
                 if now >= policy.deadline_at or retry_at >= policy.deadline_at:

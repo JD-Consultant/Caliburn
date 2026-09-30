@@ -112,7 +112,7 @@ export function TaskCapabilities({ taskId, baseline, disabled, onChange }: Props
           </Box>
         )}
         {available.length > 0 ? (
-          <div className="item-actions">
+          <div className="item-actions item-actions--float">
             <TextField
               select
               fullWidth

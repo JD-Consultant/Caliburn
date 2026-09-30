@@ -31,6 +31,7 @@ export function ConditionsSection({ baseline, disabled, onEdit, onChange, onDele
   return (
     <Paper
       component="section"
+      id="jd-conditions"
       aria-label="工作條件與責任邊界"
       variant="outlined"
       sx={{ p: { xs: 1.5, sm: 2 } }}
@@ -65,7 +66,11 @@ export function ConditionsSection({ baseline, disabled, onEdit, onChange, onDele
                     {item.text}
                   </Typography>
                   {badge(itemTarget('condition', item.condition_id))}
-                  <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
+                  <Stack
+                    direction="row"
+                    className="item-actions item-actions--corner"
+                    sx={{ flexWrap: 'wrap' }}
+                  >
                     <IconAction
                       label="編輯條件"
                       disabled={disabled}

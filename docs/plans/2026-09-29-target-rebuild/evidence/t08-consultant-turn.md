@@ -152,3 +152,38 @@ A 在執行中提出整理要求，完成後 background execution `1d709227-d539
 接線後主線 fresh：unit／contracts **945 passed**；SSE／原件角色 handoff／A HTTP／Memory HTTP journey 真 PG **21 passed**；前端 **95 passed**、tsc 通過；Ruff check／format **361 files**、mypy **239 source files**、canonical codegen `--check` 通過。sandbox 的暫存目錄／spawn 錯誤以同命令升權重跑，不改驗證標準。這輪未重跑整套 PG；先前 725 項全 PG 結果仍只代表當時版本。
 
 先確認無 active／paused 工作，再重啟已核身分的自有 backend；現於 loopback 8100／5173，沒有資料清除、舊碼切換或對外部署。瀏覽器確認序號 1–9 與歷史公開訊息，Demo 可操作；Goal 仍未完成，未知 attempt 自動恢復、長訪談品質及最終交付 gate 留原任務。
+
+## 6. 原件交接穿過正式控制入口（2026-09-30）
+
+`ConsultantRunner` 原本已能接回完整 R／count／C，但正式組裝使用的
+`run_consultant_with_controls` 沒有同一參數。這次只補 typed handoff 的薄接線：App
+提供原件時，先交既有 runner 驗證並保存，不同時當成 interrupt resume；後續仍沿原
+Step 的 pause／正式完成仲裁。沒有新表、第二套結果儲存、重試器或 HTTP 控制。
+
+Red：補參數骨架但尚未轉交時，兩個行為測例均停在 `PriorModelAttemptError`，因原 R
+沒有到达既有恢復入口；最初 unexpected-keyword 的失敗不算行為 Red。Green 後擴至
+R／count × 有／無暫停四種路徑，真 PG execution writer 取代後承接原件，SDK
+MockTransport 合計仍只有一次 count、一次 model；pending pause 先停妥，正式授權
+resume 後才完成原答覆。取消後由 wrapper 拒絕採用。成功交回後 handoff 已消耗，不能
+將舊 handoff 再當 pause-resume 的輸入；這不是逐 token 恢復。
+
+最終定向驗證：`test_consultant_runner_recovery.py`、`test_consultant_controls.py`、
+`test_response_recovery_eligibility.py`、`test_consultant_supervisor.py` 合計
+**22 passed in 13.68s**；Ruff check／format check **2 files**、mypy（含 bootstrap）
+**2 source files**、`test_import_boundaries.py` **15 passed in 0.21s**、
+`git diff --check` 與三份改動文件的本地連結目標檢查通過。使用明確 loopback
+`_test` DB、每案獨立 schema，模型為 synthetic SDK transport；新增保存故障使用
+既有記憶體 saver fault fixture，真 PG 驗 execution／writer／候選與完成交易，不將它
+當成 PG saver 故障耐久性證據。不是全套、真模型或跨程序強殺證據。獨立只讀 review
+未發現已證實的 Critical／Important；C／輪前 count 的 wrapper 故障旅程仍未專項驗。
+正式 wrapper 已有可組合入口，**supervisor 自動交回 retained failures
+與未知 attempt 的可信再准入仍未接好**，T08／T06 不勾完成。本次未讀金鑰、未重啟或
+修改 Demo 資料。
+
+研究接續：沿 [LangGraph checkpoint／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)
+與 [OpenAI `store=false`](https://developers.openai.com/api/docs/guides/conversation-state)
+契約；writer／鎖取得不構成原件遺失證明。只讀審查及
+[PostgreSQL 斷線偵測契約](https://www.postgresql.org/docs/18/runtime-config-connection.html#GUC-CLIENT-CONNECTION-CHECK-INTERVAL)
+指出原 App 程序退出後，舊 saver 的資料庫工作也須確認已結束，才可把新查詢無原件
+當遺失依據。程序／連線來源欄位是
+下一切片的候選解法，尚未新增或定案；不因本次薄接線擴張成通用程序 registry。

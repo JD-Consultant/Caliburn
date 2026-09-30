@@ -489,6 +489,11 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 - final 離開 Graph 後才收到 pause，若完成交易被原 owner 拒絕，wrapper 僅在原 writer 仍有效、
   pending pause、完整 final Graph 已確認時，重入一次既有純控制交界；不重送模型。不攔截
   response-save recovery handoff、不加外送 retry，不重建 pinned context／budget。
+- wrapper 可接受 App 仍持有的 typed `recovery`，先交原 runner 核對原 thread／request／
+  checkpoint（含 pending writes），不將它轉成新模型請求或 interrupt resume。採用後若有
+  pause 要求仍停在完整 Step；之後按原 interrupt 續作，不重傳已消耗的 handoff。取消／
+  失效 writer 仍由原 execution owner 拒絕。這是內部原件交接，不是新的 HTTP 重試操作，
+  也不代表 supervisor 已能自動判定跨程序遺失或啟用再推論。
 
 證據：`tests/integration/test_consultant_controls.py` 覆蓋上述交界、缺原 interrupt 拒絕、
 resume 已提交但通知前重開，以及既存 budget／使用量不重置；模型為 synthetic transport。

@@ -5,7 +5,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert,
   Button,
+  Link,
   Paper,
+  Skeleton,
   Stack,
   Table,
   TableBody,
@@ -16,6 +18,8 @@ import {
   Typography,
 } from '@mui/material';
 import { describeReadError } from '../../shared/api/http';
+import { IconAction } from '../../shared/ui/IconAction';
+import { AddIcon, EditIcon } from '../../shared/ui/icons';
 import type { JobFile } from '../../shared/api/generated/job-file-list';
 import { CreateJobFileDialog } from './CreateJobFileDialog';
 import { RenameJobFileDialog } from './RenameJobFileDialog';
@@ -56,11 +60,20 @@ export function JobFilesPage() {
           </Typography>
           <p>以訪談理解工作，逐步形成有依據的職務說明書。</p>
         </div>
-        <Button variant="contained" onClick={() => setIsCreating(true)}>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setIsCreating(true)}>
           建立職務檔案
         </Button>
       </div>
-      {files.isPending && <p role="status">正在讀取職務檔案…</p>}
+      {files.isPending && (
+        <Stack spacing={1}>
+          <p role="status" className="loading-note">
+            正在讀取職務檔案…
+          </p>
+          {[0, 1, 2].map((row) => (
+            <Skeleton key={row} variant="rounded" height={56} />
+          ))}
+        </Stack>
+      )}
       {files.isError && (
         <Alert
           severity="error"
@@ -102,44 +115,53 @@ export function JobFilesPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {files.data.job_files.map((file) => (
-                  <TableRow key={file.job_file_id}>
-                    <TableCell>
-                      <strong>{file.display_name}</strong>
-                      <small className="file-identity" title={file.job_file_id}>
-                        識別 {file.job_file_id.slice(0, 8)}
-                      </small>
-                    </TableCell>
-                    <TableCell sx={{ minWidth: { xs: '4em', sm: 'auto' } }}>
-                      {file.employee_name}
-                    </TableCell>
-                    <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                      <time dateTime={file.created_at}>
-                        {new Date(file.created_at).toLocaleString('zh-TW')}
-                      </time>
-                    </TableCell>
-                    <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                      <Stack
-                        direction={{ xs: 'column', sm: 'row' }}
-                        sx={{ alignItems: 'flex-end', justifyContent: 'flex-end' }}
+                {files.data.job_files.map((file) => {
+                  const identity = `${file.employee_name}，${file.job_file_id.slice(0, 8)}`;
+                  return (
+                    <TableRow key={file.job_file_id} hover>
+                      <TableCell>
+                        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+                          <span className="file-avatar" aria-hidden="true">
+                            {[...file.display_name][0]}
+                          </span>
+                          <div>
+                            <Link
+                              component={RouterLink}
+                              to={`/job-files/${file.job_file_id}`}
+                              underline="hover"
+                              color="text.primary"
+                              sx={{ fontWeight: 600 }}
+                              aria-label={`開啟 ${file.display_name}（${identity}）`}
+                            >
+                              {file.display_name}
+                            </Link>
+                            <small className="file-identity" title={file.job_file_id}>
+                              識別 {file.job_file_id.slice(0, 8)}
+                            </small>
+                          </div>
+                        </Stack>
+                      </TableCell>
+                      <TableCell sx={{ minWidth: { xs: '4em', sm: 'auto' } }}>
+                        {file.employee_name}
+                      </TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', sm: 'table-cell' }, color: 'text.secondary' }}
                       >
-                        <Button
-                          component={RouterLink}
-                          to={`/job-files/${file.job_file_id}`}
-                          aria-label={`開啟 ${file.display_name}（${file.employee_name}，${file.job_file_id.slice(0, 8)}）`}
-                        >
-                          開啟
-                        </Button>
-                        <Button
+                        <time dateTime={file.created_at}>
+                          {new Date(file.created_at).toLocaleString('zh-TW')}
+                        </time>
+                      </TableCell>
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                        <IconAction
+                          label={`重新命名 ${file.display_name}（${identity}）`}
                           onClick={() => setRenaming(file)}
-                          aria-label={`重新命名 ${file.display_name}（${file.employee_name}，${file.job_file_id.slice(0, 8)}）`}
                         >
-                          重新命名
-                        </Button>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                          <EditIcon />
+                        </IconAction>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>

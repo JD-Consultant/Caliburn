@@ -241,6 +241,7 @@
 ## T18 新產品入口切換與舊程式退役
 
 - [ ] T18；依賴：T17；依[本 Goal 的條件式切換授權](README.md)執行，先核對 gate、精確 tracked 退役清單及可恢復性，不擴張刪除範圍。
+- **2026-10-01 PDF 交付續驗：**獨立非 editable wheel、同機新下載的鎖定 headless Chromium／繁中字型，透過真 HTTP 正式保存及匯出 1 頁／3 頁 PDF；逐頁目視及 80 段文字完整性通過。CLI 下載逾時，改以同一官方 ZIP＋既有顯式路徑完成，不宣稱 installer／跨平台已驗。[範圍與限制](evidence/t18-same-origin-web.md#非-editable-安裝的中文-pdf2026-10-01-續驗)。僅補安裝文件、零模型費用，不勾 T18 或前置品質 gate。
 - **2026-10-01 交付接線預備：**按既定單程序同源方案，使用 FastAPI 原生 frontend 接通已建置 UI；6 個行為反例修正後，相關 83 測試、mypy 與真 Web build／ASGI 資源深連結檢查通過。[範圍與限制](evidence/t18-same-origin-web.md)。只是可提前完成的隔離接線，不勾 T18、不更換正式入口／退役舊碼；T14／T16／T17 前置 gate 仍保留。
 - **2026-10-01 乾淨安裝預驗：**從固定 Git 匯出、獨立非 editable venv 與新測試 schema，重现 migration 依賴 checkout 而無法啟動；改用 Alembic 套件資源，19 份 revision 不變。30 項局部／真 PG 回歸、實際 wheel 啟動、人工 JD 保存／重開及真建置深連結通過。[證據與未驗範圍](evidence/t18-same-origin-web.md#乾淨安裝與套件化-migration2026-10-01)。無付費呼叫、不動 Demo，模型品質／PDF 乾淨交付與正式切換仍待驗，不勾 T18。
 - **契約：**[決策流程](../../decision-process.md)、ADR0077 的正式權責沿革、[交付規則](../../implementation/interface-and-delivery.md#5-安全與新舊切換)。

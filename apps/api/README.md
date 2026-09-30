@@ -21,7 +21,7 @@ uv run --project apps/api --locked uvicorn caliburn.bootstrap:create_app --facto
 
 預設精確信任本機 5173／8100 Origin。隔離測試若使用第二個前端埠，可在**該後端啟動前**指定 `CALIBURN_DEV_ORIGIN=http://127.0.0.1:5174`；只接受一個帶明確埠的 HTTP loopback Origin（`127.0.0.1`、`localhost` 或 `[::1]`），非法配置在啟動前拒絕，不放寬其他埠、Host 或 cross-site 防護。前端 proxy 必須保留原始 Origin，具體隔離啟動見[前端 README](../web/README.md#合成資料瀏覽器驗收)。這不是對外部署／認證方案。
 
-Windows 的 psycopg async 不支援預設 Proactor loop，因此明確使用 Python／Uvicorn 支援的 Selector factory，而非已棄用的全域 event-loop policy。PDF renderer 使用獨立擁有的瀏覽器執行環境；Windows 中文短／長版已驗，乾淨安裝仍待交付 gate，見[介面交付](../../docs/implementation/interface-and-delivery.md#4-pdf-與程序)。
+Windows 的 psycopg async 不支援預設 Proactor loop，因此明確使用 Python／Uvicorn 支援的 Selector factory，而非已棄用的全域 event-loop policy。PDF renderer 使用獨立擁有的瀏覽器執行環境；Windows 中文短／長版及同機獨立 wheel／新 PDF 資源已驗，完整交付 gate 與跨平台仍未完成，見[介面交付](../../docs/implementation/interface-and-delivery.md#4-pdf-與程序)及 [PDF 交付續驗](../../docs/plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#非-editable-安裝的中文-pdf2026-10-01-續驗)。
 
 ### 本機 AI Demo 啟動
 
@@ -64,7 +64,7 @@ uv run --project apps/api --locked alembic -c apps/api/alembic.ini check
 
 migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade head` 不重建原資料。應用啟動只檢查 migration head，不默默升級。未配置新 DB 時 health 仍可用、檔案 API 回 503；已配置但結構未初始化／不相符則啟動失敗。初始 schema 包含不可變原文，不提供破壞性 downgrade；需要資料處置應另行核對精確範圍。
 
-完整 migration 位於 `src/caliburn/migrations` 並隨 Python wheel 交付；CLI 與程式都用 Alembic 的 `caliburn:migrations` 套件資源定位，不依賴 checkout 的相對路徑。非 editable 安裝可使用 `uv sync --project apps/api --locked --no-editable`，後續 `uv run` 也帶 `--no-editable`，避免重新同步成開發模式。2026-10-01 已驗新 venv／實際 wheel、空測試 schema、同源建置、人工 JD 保存與重啟；不是另一台電腦、模型／PDF 乾淨交付或正式切換全部通過，見[證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#乾淨安裝與套件化-migration2026-10-01)。
+完整 migration 位於 `src/caliburn/migrations` 並隨 Python wheel 交付；CLI 與程式都用 Alembic 的 `caliburn:migrations` 套件資源定位，不依賴 checkout 的相對路徑。非 editable 安裝可使用 `uv sync --project apps/api --locked --no-editable`，後續 `uv run` 也帶 `--no-editable`，避免重新同步成開發模式。2026-10-01 已驗新 venv／實際 wheel、空測試 schema、同源建置、人工 JD 保存與重啟，續驗已補同機 PDF；不是另一台電腦、模型品質或正式切換全部通過，見[證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#乾淨安裝與套件化-migration2026-10-01)。
 
 目前資料入口（具體 DTO 由 `/openapi.json` 與 `contracts/http/` 生成）：
 
@@ -81,9 +81,22 @@ migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade h
 - `GET/POST /api/job-files/{job_file_id}/jd/collaborators`：主要協作對象的固定集合及新增、局部修訂、排序、刪除。名稱／合作範圍至少一欄有內容；未指定保留、null 清空不能清成空項。`GET/POST .../jd/conditions`：全職務共通條件，五類各自排序；明確修訂分類保留身分並放目的類末尾，不自動套到任務。兩者沿同一 JD 命令／基底／准入與歷史規則，完整 shape 依 `contracts/http/`；已接人工 UI 與同版 `/jd/work`，不是模型候選入口。
 - `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，原命令重送回原接受結果／200；不同內容重用命令或已有其他 A 回 409。提交後 supervisor 執行既有 runner；未配置模型回 503，不接受無法執行的工作。取消後重新提交須用新命令；不提供任意正式化 API。接線／驗證界線見上方更新。
 
-### 測試與檢查
+### PDF 執行依賴
 
-PDF 使用 `CALIBURN_PDF_FONT_PATH` 指定已授權的中文字型；可選 `CALIBURN_PDF_CHROMIUM_PATH` 指定與已鎖 Playwright 相容的 Chromium，未指定時使用套件已安裝的瀏覽器。`GET /api/job-files/{id}/jd/export.pdf` 固定讀正式 JD，候選不匯出；缺配置明確回 503，不下載空檔假成功。乾淨交付安裝及跨平台驗證仍屬 T13／T18，見 [PDF 證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t13-pdf-export.md)。
+Python 套件安裝不包含瀏覽器執行檔或中文字型。依 [Playwright 官方做法](https://playwright.dev/python/docs/browsers)，在後端所用的同一 Python 環境安裝其鎖定版本的 headless Chromium；本 renderer 不需要系統 Chrome、Firefox 或 WebKit：
+
+```powershell
+uv run --project apps/api --locked python -m playwright install chromium --only-shell
+$env:CALIBURN_PDF_FONT_PATH = 'C:/path/to/licensed/NotoSansTC-VF.ttf'
+```
+
+字型路徑須換成實際可讀的檔案；可從 [Noto CJK 官方下載指南](https://github.com/notofonts/noto-cjk/blob/main/Sans/README.md)取得繁體中文臺灣字型，保留其來源、版本及授權，不依賴本機碰巧已安裝的字型。若沿前節使用非 editable 環境，上述 `uv run` 同樣加 `--no-editable`，或直接使用該 venv 的 Python。
+
+可選 `CALIBURN_PDF_CHROMIUM_PATH` 指定與已鎖 Playwright 相容的 Chromium **執行檔**；未指定時使用 Playwright 已安裝的瀏覽器。若安裝時自訂 `PLAYWRIGHT_BROWSERS_PATH`，啟動後端時也保留同一值。下載失敗先依官方文件檢查網路／代理與版本，不改用任意系統瀏覽器冒充已驗環境、不關閉 TLS 檢查。
+
+配置須在啟動後端前提供。`GET /api/job-files/{id}/jd/export.pdf` 固定讀正式 JD，候選不匯出；缺配置明確回 503，不下載空檔假成功。實際驗證及文字抽取限制見 [PDF 證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t13-pdf-export.md)；乾淨交付與跨平台範圍另依 T18，不由本節安裝命令宣告通過。
+
+### 測試與檢查
 
 保持前述 `UV_PROJECT_ENVIRONMENT`；不要意外使用舊 `apps/api/.venv`。
 

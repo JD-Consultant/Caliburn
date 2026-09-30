@@ -198,6 +198,7 @@
 ## T15 安全、容量與維護性審查
 
 - [ ] T15；依賴：T12、T13。
+- **2026-10-01 接手收尾：**既有憑證隔離草稿完成有限驗收：合成 key 不進 request body、真 PG checkpoint／產品資料、公開讀取及 log；provider 回顯秘密也不外露。4 例連既有局部安全回歸 69 passed，範圍見 [T15 末節](evidence/t15-local-http-security.md#2026-10-01-接手收尾憑證不進接續歷史與公開資料)。不新增產品子系統，不將整個容量／安全 gate 勾選。
 - **2026-09-30 UI 交接修正：**隔離 Vite proxy 改為保留原 Origin，後端可顯式配置一個精確 loopback dev Origin；預設安全邊界不變。新增 red→green 代理與配置測試、原安全測例回歸見 [HTTP 證據](evidence/t15-local-http-security.md#隔離前端的來源保留修正2026-09-30)。僅修此接縫，不勾選整個 T15。
 - **契約：**[運作責任](../../architecture/delivery-and-operations.md)、[程式規範](../../implementation/code-organization.md)、V24／V26／V27。
 - **程式／交付：**同源／Host、敏感 log、prompt injection／跨檔案反例；大資料投影量測；import 邊界、慢查詢與實際保存容量報告。
@@ -217,6 +218,7 @@
 ## T17 長訪談與完整產品旅程
 
 - [ ] T17；依賴：T16。
+- **2026-10-01 接手核心品質：**六組 b0 共 64 個完成 Turn，仍有一份空任務稿及一筆收尾錯引；只修工具可操作的錯誤回饋，拒絕把提示詞候選的一次成功當成可靠改善。局部 probe、真後端短旅程、限制及下一步見[接手紀錄](evidence/t17-course-administrator-journey.md#2026-10-01-接手只處理影響成稿的兩個反例)。不重新開始全部長訪談，不以 API 成功代替品質通過。
 - **2026-09-30 課程行政真模型切片：**7 成功訪談 Turn、4 背景 Memory、正式 JD 與 3 頁 PDF 已完成；周期更正及既有工作保留成立。但 3 個身分欄位引用錯輪，品質 trial **fail**，未勾本任務；接續優先處理來源選擇反例，詳見[有界旅程證據](evidence/t17-course-administrator-journey.md)。首次沙箱連線失敗已正常收尾，未擴充恢復系統。
 - **來源選擇續驗：**僅澄清 A 逐項定位出處的既有指引，不新增機制；定向 probe 與主管更正的真保存有改善，但另一例仍漏 profile 來源，且月報收件人被局部更正擴大影響，品質未全過。背景 1 批發布、1 批預算失敗已收尾，無 active 殘留；詳見[結果與下一步](evidence/t17-course-administrator-journey.md#真後端保存確認結果與保留缺口)，不勾本任務。
 - **契約：**[架構驗收](../../architecture/verification.md)、全部 V01–V28（V25 依試點範圍）、JDT-09。

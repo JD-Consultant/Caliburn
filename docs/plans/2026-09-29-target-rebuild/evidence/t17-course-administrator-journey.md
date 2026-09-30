@@ -176,3 +176,43 @@ Owner 在恢復後提醒**不要過度設計、以核心分析效果為主**。�
 | 停止／重跑 | 任何 Turn failed／逾時（單 Turn 900 秒）即停止該次並診斷，不自動重跑；同一版本同一人設失敗兩次即停，先找原因；不因結果不好無界重試，也不挑最好一次呈現 |
 | 環境 | 隔離 loopback `_test` DB 的新 schema `eval_a`、後端 8102（`scripts/run_backend.py --port 8102`）；不動 Demo 8100／5173；憑證只由既有 loader 從 `apps/api/.env` 取 `OPENAI_API_KEY`，不輸出、不記錄 |
 | 紀錄 | 每次一個 JSON（公開逐字稿、完整 JD、來源全文、檢查結果）在忽略區 `.research-tmp/eval/`；不含 opaque reasoning 與金鑰 |
+
+### 2026-10-01 接手：只處理影響成稿的兩個反例
+
+Owner 要求以核心分析效果為主、避免過度設計。本輪不重跑六組完整訪談、不增建 reviewer／恢復平台；先讀六份 b0 產物及原工具軌跡。64 個 A Turn 都 completed，不等於品質皆通過：五份有任務草稿，一份只有 profile；另有一筆協作對象來源錯引。
+
+- `b0-course_admin-2`：第二輪 `create_jd_item` 將本次輸入猜成尚未正式成立的序號 4，App 正確拒絕；但 `InterviewScopeError` 與執行資格错误共用「由 App 處理」提示，模型之後十輪未再建立任務。只分開錯誤回覆，維持 `scope_not_allowed` 與原範圍：本次事實用 `current_input`，歷史事實先讀原序號，不刪必要來源或改引無關訊息。
+- `b0-course_admin-1`：協作對象「主任」的具體事實出自序號 14；收尾新增時模型選 `current_input`，實際映射為僅說沒有補充的序號 18。這是模型語意選擇錯誤，不是 App 映射或保存錯誤。現有主指引已區分來源時點；僅比較一句「收尾沒有補充不支持先前具體事實」的補強，不重試已否決的 schema description 方案。
+
+依 OpenAI [工具指令與參數設計](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)及[任務型 eval](https://developers.openai.com/api/docs/guides/evaluation-best-practices)以實際參數選擇驗證。官方建議清楚說明使用與不使用時機，但不保證提示詞能消除錯引。
+
+**有限外送 manifest（執行前）**：原合成案例保存的請求作唯讀對照；2 次錯誤後接續（改為實際新拒絕回覆），1 次原收尾基準＋2 次收尾指引候選，共最多 5 次生成與 5 次 count。`gpt-6-luna`／medium、store=false、all_turns，保留原 native items／phase；單次最多 8,192 output tokens、120 秒、零自動重試／compact；count 超過 32K 即停止，總測試預算 US$1。只在新診斷請求中替換待比較部分，不改任何既有 checkpoint／JD／Memory。使用全套原工具，不強迫指定工具；首次回應即停止、不執行寫入、不偽造工具成功。輸出只含公開工具參數、用量與指紋。未發生目標操作記未觀察，不算成功；這是局部模型選擇驗證，不是新的完整產品旅程。
+
+容量預檢補記：前三次生成完成；候選多一句後的 count 為 32,029，較原基準 31,992 多 37，依原 32K 上界停止，未生成。僅將剩餘兩次候選的上界調至 33K，仍最多 5 次生成、總共最多 6 次 count，時間／US$1 不變；不重跑前三次、不裁切歷史。最初沙箱連線失敗未取得任何 API 結果，改在准許聯網的執行環境人工啟動，沒有 SDK 自動重試。
+
+局部 probe 結果：兩次錯誤後接續均重新選擇有效來源建立職責，無未成立的序號；一次只用本次、一次保留歷史 2＋本次。原收尾 baseline 改選讀取，未觀察新增來源。收尾候選一次仍將主任錯指 `current_input`，另一次正確指 14，**不採納候選、不修改主指引、不宣告來源品質修復**。保留全部試次於 ignored `core-corrections-20261001.json` 與 `core-corrections-source-20261001.json`。
+
+**短真後端確認 manifest（執行前）**：新隨機 `core_journey_20261001_*` schema，同一 loopback `_test` DB；只重用課程行政 b0-2 前四則合成員工原文，最多 4 A Turn 及自然觸發的最多 4 批 Memory，不人工代寫、不指定模型工具或修改原案例。不使用模擬員工模型；此為工作流程／更正的定向重播，不是自然訪談能力對照。A／B1／B2 沿 `gpt-6-luna` medium、原串流／all_turns，每 execution 最多 16 steps／48 outbound attempts／1 attempt per request／1 compact／240 秒、僅評測配置 US$0.25 上限，整組最多 US$2；失敗停止、不重跑。保留已發布內容、回讀逐項來源及背景狀態，等自有工作收尾再關閉 App；不動 Demo、原 eval 資料或現行程序。不重驗未改動的 PDF 視覺與 UI；沿 T13 原有效證據。
+
+#### 本片結果與收斂
+
+程式反例先加到既有 `test_jd_model_item_roundtrip.py`：猜本次輸入的未成立序號被拒、候選不變，且回傳合法修正方向。產品修正前 **1 failed**（提示缺 `current_input`）；分開錯誤處理後，JD 寫入／建立／來源相關 **16 passed**。再與憑證／HTTP 安全測試合併，提交前 **85 passed，14.35s**；三個變更 Python 檔 Ruff check／format 通過，`jd_writes.py` scoped mypy 通過。獨立 reviewer 無 blocking；提示語句的更细粒度契約測試屬可延期 minor，本輪不擴測試框架。
+
+短真後端結果（新 schema `core_journey_20261001_c2e1fcd8`，檔案 `c0aaed2f-22e5-40fa-98f5-a6bc12c0a2ef`）：
+
+| 核心效果 | 實際證據 | 限制 |
+|---|---|---|
+| 訪談逐步成稿與保存 | 4 A completed；正式 JD 有 1 職責、5 任務、6 成果、8 要求；修訂 `df1c8fb3-8868-4db8-8f75-021c1193eaba` 可由 HTTP 回讀 | 四輪仍在訪談，不是完整職務品質驗收；不能推定所有空稿都被消除 |
+| 更正而不抹除既有工作 | 出席彙整改為每季；日常出席整理、課前兩個工作天交付、財務／主管權限界線仍保留 | 本片只驗這個明確更正，不外推任意跨主題更正 |
+| 引用可回查 | 25 筆來源全部 HTTP 回讀成功；profile 三欄及目的引用 2，任務／明細使用相應 4／6／8 原文 | **可回查不等於來源涵蓋完整**：修改綜合職責時，模型明確移除舊來源、只留 8；8 不足以單獨支持保留的全部範圍，記為來源品質缺口，不由 App 猜補 |
+| 背景 Memory | 2 批 completed，已發布快照涵蓋至序號 8；正式訪談 1–9，沒有 active 殘留 | 沒有在本片窮舉 Memory 正文品質或換版 diff |
+
+真後端共 33 次生成、38 次 token count、零 compact，attempt 無 failure_code；正式回執的模型估算合计 **US$0.015535370**，不是帳單。自有 TestClient App 已正常關閉，合成 schema 保留供回查；Demo 程序及原 eval schema 未動。局部 probe 共 5 次生成／6 次 count，生成用量合計 input 113,082、output 5,042（含 reasoning；快取另見原件），不把 count 當成免費保證。
+
+ignored 證據指紋（均全合成；不提交原 native reasoning）：
+
+- `core-corrections-20261001.json`：`aa192bcfdbfea93d03721b259926deca6abec628ffb2533f989d05e4840b6b5a`。
+- `core-corrections-source-20261001.json`：`08bd988753e4dab58e8467aa21e70e1e2cc7a137d274aa6e465571ca315da89f`。
+- `core-journey-20261001.json`：`ef47ac8ee2246c6f2376059c96b489e9e3a7c075291dce0084209b3cfec80652`。
+
+**本輪到此收斂，不無限跑到綠。**採用的產品改動只有可操作的來源越界拒絕提示；主指引／schema／Context／資料 owner 均未改。空任務稿的已定位接縫有局部修復證據，核心成稿／保存／背景流程可用；收尾錯引、綜合內容更新時漏保留依據仍待改善。T14／T17 品質與 T18 切換不勾選。下一個分析品質切片應沿既有原件研究「多項事實的來源保留與選擇」，不要再堆相同提醒或自動猜引用；部署／完整容量屬原 gate，不以本片替代。

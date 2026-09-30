@@ -13,6 +13,7 @@ from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.bootstrap import create_app
 from caliburn.settings import ModelSettings, Settings
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from tests.fixtures.response_transport import response_http_reply
 from tests.unit.test_response_loop import response_at
 
 pytestmark = pytest.mark.postgres
@@ -70,7 +71,7 @@ def test_completed_notification_publishes_two_layers_and_next_turn_sees_maps(
             raw["output"][1]["content"][0]["text"] = (
                 '{"status":"complete"}' if number in (4, 6) else "遇到庫存差異時怎麼處理？"
             )
-        return httpx2.Response(200, json=raw)
+        return response_http_reply(request, raw)
 
     def synthetic_client(**kwargs):
         return create_responses_client(

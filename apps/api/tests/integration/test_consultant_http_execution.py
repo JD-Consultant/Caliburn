@@ -1,6 +1,7 @@
 """HTTP admission starts the durable consultant without a second, UI-owned model loop."""
 
 import asyncio
+import json
 import time
 from uuid import uuid4
 
@@ -10,6 +11,7 @@ from fastapi.testclient import TestClient
 
 from caliburn.bootstrap import create_app
 from caliburn.settings import DatabaseSettings, ModelSettings, Settings
+from tests.fixtures.response_transport import response_http_reply
 from tests.unit.test_response_loop import response_at
 
 pytestmark = pytest.mark.postgres
@@ -54,7 +56,20 @@ def test_http_input_reaches_saved_formal_answer(
         response = response_at(1, final=True, tools=0).model_dump(mode="json")
         response["service_tier"] = "default"
         response["output"][1]["content"][0]["text"] = "最近一次盤點，您負責哪些部分？"
-        return httpx2.Response(200, json=response)
+        response["output"].insert(
+            1,
+            {
+                "type": "message",
+                "id": "message_progress",
+                "role": "assistant",
+                "phase": "commentary",
+                "status": "completed",
+                "content": [
+                    {"type": "output_text", "text": "我先確認目前工作範圍。", "annotations": []}
+                ],
+            },
+        )
+        return response_http_reply(request, response)
 
     def synthetic_client(**kwargs):
         return create_responses_client(
@@ -87,6 +102,14 @@ def test_http_input_reaches_saved_formal_answer(
             pytest.fail("The accepted consultant did not finish")
         assert result["status"] == "completed", result
         assert len(model_calls) == 1
+        assert json.loads(model_calls[0].content)["stream"] is True
+        assert result["commentary"] == [
+            {
+                "response_id": "response_1",
+                "message_id": "message_progress",
+                "text": "我先確認目前工作範圍。",
+            }
+        ]
         history = client.get(f"/api/job-files/{file_id}/interviews").json()["messages"]
         assert history[-1]["interview_text"] == "最近一次盤點，您負責哪些部分？"
         assert [message["interview_sequence"] for message in history] == [1, 2, 3]

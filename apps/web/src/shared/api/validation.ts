@@ -1,6 +1,8 @@
 /** Runtime guards use the same SSOT as generated types; no second field definitions. */
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import commentaryUpdateSchema from '../../../../api/contracts/http/commentary-update.schema.json' with { type: 'json' };
+import type { CommentaryUpdate } from './generated/commentary-update';
 import consultantTurnSchema from '../../../../api/contracts/http/consultant-turn.schema.json' with { type: 'json' };
 import type { ConsultantTurn } from './generated/consultant-turn';
 import createJobFileSchema from '../../../../api/contracts/http/create-job-file-request.schema.json' with { type: 'json' };
@@ -49,6 +51,7 @@ validator.addSchema(jdProfileSchema, 'jd-profile-view.schema.json');
 validator.addSchema(jdWorkSchema, 'jd-work-view.schema.json');
 
 export const isConsultantTurn = validator.compile<ConsultantTurn>(consultantTurnSchema);
+export const isCommentaryUpdate = validator.compile<CommentaryUpdate>(commentaryUpdateSchema);
 
 export const isJobFileList = validator.compile<JobFileList>(jobFileListSchema);
 export const isJobFile = validator.compile<JobFile>({

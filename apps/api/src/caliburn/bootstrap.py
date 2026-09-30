@@ -13,10 +13,12 @@ from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.adapters.pdf_renderer import PdfRenderer
 from caliburn.adapters.process_lock import PostgresProcessLock
+from caliburn.adapters.response_streaming import PublicCommentaryUpdate
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
+from caliburn.features.executions.models import ExecutionScope
 from caliburn.settings import Settings
 from caliburn.transport.http.consultant_turns import router as consultant_turn_router
 from caliburn.transport.http.health import router as health_router
@@ -32,6 +34,7 @@ from caliburn.transport.http.jd_undo import router as jd_undo_router
 from caliburn.transport.http.jd_work import router as jd_work_router
 from caliburn.transport.http.job_files import router as job_file_router
 from caliburn.transport.http.security import LocalHttpSecurityMiddleware
+from caliburn.workflows.consultant_commentary import ConsultantCommentaryHub
 from caliburn.workflows.consultant_controls import (
     ConsultantControlWorkflow,
     run_consultant_with_controls,
@@ -66,6 +69,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             ConsultantStatusWorkflow(database.sessions) if database else None
         )
         app.state.consultant_supervisor = None
+        commentary_hub = ConsultantCommentaryHub()
+        app.state.consultant_commentary_hub = commentary_hub
         app.state.memory_supervisor = None
         app.state.consultant_control_workflow = None
         app.state.jd_export_workflow = None
@@ -104,7 +109,25 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                             timeout_seconds=configured.model.request_timeout_seconds,
                         )
                         resources.push_async_callback(sdk.close)
-                        runner = ConsultantRunner(database.sessions, saver, sdk, configured.model)
+
+                        def publish_commentary(
+                            scope: ExecutionScope, update: PublicCommentaryUpdate
+                        ) -> None:
+                            commentary_hub.publish(
+                                scope.job_file_id,
+                                scope.execution_id,
+                                update.response_id,
+                                update.message_id,
+                                update.text,
+                            )
+
+                        runner = ConsultantRunner(
+                            database.sessions,
+                            saver,
+                            sdk,
+                            configured.model,
+                            on_commentary=publish_commentary,
+                        )
                         leader_lock = PostgresProcessLock(database.settings)
                         memory_batch = MemoryBatchWorkflow(
                             database.sessions,

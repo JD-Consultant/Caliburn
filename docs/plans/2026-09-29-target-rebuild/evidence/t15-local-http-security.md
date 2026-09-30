@@ -121,3 +121,22 @@ pnpm test:proxy
 獨立 reviewer 確認核心 Origin 修正成立，另指出明確配置 `http://localhost:80` 與瀏覽器實送 `http://localhost` 不同。主線依 [WHATWG URL 預設埠](https://url.spec.whatwg.org/#default-port) 核對，先新增三種 loopback host 的反例，得到 **3 failed（403≠200）**。Settings 仍要求明確配置埠；middleware 只將已驗證配置的 `:80` 正規化為瀏覽器使用的 Origin 後加入精確集合，不放寬其他埠，亦不改写請求。原 72 項加此 3 項列入最後整合回歸。
 
 主線修正後與 T09 current Turn 切片合併執行：安全／bootstrap／settings **75 項**＋相關 PG／contract **55 項**，共 **130 passed，21.87s**。這次 PG 是 T09 切片的隔離測試，不是安全修正新增 DB 邏輯。兩片 Ruff check 與 scoped mypy（6 source files）通過；獨立 reviewer 複核此修正後無未解決發現。沒有重啟 Demo 或操作 Demo 資料。
+
+## 2026-10-01 接手收尾：憑證不進接續歷史與公開資料
+
+接續前一代理留下的 `tests/integration/test_credential_containment.py`，沒有改動產品實作或新增安全子系統。本片是**既有實作的事後驗收，非 TDD Red–Green**。只用明確合成的 key、SDK MockTransport 與真 PostgreSQL；不讀 `.env`、不送付費模型請求，也不掃描 Demo 或既有訪談資料。
+
+四例核對：掃描器能在刻意植入的 text／jsonb／bytea 欄位找到合成秘密；空 schema 不誤報；成功 Turn 的憑證只出現在 provider 請求的 Authorization header、不在請求正文、該次測試 schema（含 checkpoint）、公開 HTTP 讀取或捕捉的 log；provider 401 即使回顯 key，也不將秘密保存或交给 UI。每個公開讀取都須 HTTP 200，避免用錯誤頁冒充安全的正常回傳。
+
+研究依據：[OWASP Logging「Data to exclude」](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#data-to-exclude)要求排除 token／主要秘密；測試的動態欄位查詢沿 [Psycopg SQL composition](https://www.psycopg.org/psycopg3/docs/api/sql.html)，識別字由 `sql.Identifier` 組裝，值仍參數化。這是針對憑證的有限驗收，不是完整滲透測試或所有私人資料永不外洩的保證。
+
+工作目錄 `apps/api`：
+
+```powershell
+$env:CALIBURN_TEST_DATABASE_URL='postgresql://caliburn_test@127.0.0.1:55439/caliburn_t01_test'
+.\.venv-target\Scripts\python.exe -B -m pytest tests/integration/test_credential_containment.py tests/unit/test_local_http_security.py tests/unit/test_dev_origin_settings.py -q -p no:cacheprovider --tb=short
+.\.venv-target\Scripts\python.exe -B -m ruff check tests/integration/test_credential_containment.py
+.\.venv-target\Scripts\python.exe -B -m ruff format --check tests/integration/test_credential_containment.py
+```
+
+結果 **69 passed，3.87s**；Ruff check／format 通過。PG fixture 只建立與清理自身新 schema。原草稿的四例也先獨立執行通過；本次只補型別及 HTTP 成功斷言，未把既有成功說成產品缺陷修復。不因本片勾選整個 T15；容量／大資料量測及其餘 gate 保留原責任。Owner 要求核心分析效果優先，本片到此收斂，不新增通用秘密掃描平台。

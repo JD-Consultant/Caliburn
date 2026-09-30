@@ -28,9 +28,7 @@ function isUuid(value: unknown): value is string {
   return typeof value === 'string' && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(value);
 }
 
-export function readTurnHint(jobFileId: string): TurnHint | null {
-  const raw = localStorage.getItem(hintKey(jobFileId));
-  if (raw === null) return null;
+function parseHint(raw: string): TurnHint {
   const hint: unknown = JSON.parse(raw);
   if (
     typeof hint !== 'object' ||
@@ -44,6 +42,17 @@ export function readTurnHint(jobFileId: string): TurnHint | null {
   return { command_id: hint.command_id, execution_id: hint.execution_id };
 }
 
+export function readTurnHint(jobFileId: string): TurnHint | null {
+  const raw = localStorage.getItem(hintKey(jobFileId));
+  return raw === null ? null : parseHint(raw);
+}
+
+const HINT_CHANGED = 'caliburn:interview-turn-hint-changed';
+
+function notifyHintChanged(): void {
+  window.dispatchEvent(new Event(HINT_CHANGED));
+}
+
 export function retainTurnHint(jobFileId: string, hint: TurnHint): void {
   localStorage.setItem(
     hintKey(jobFileId),
@@ -52,11 +61,50 @@ export function retainTurnHint(jobFileId: string, hint: TurnHint): void {
       execution_id: hint.execution_id,
     }),
   );
+  notifyHintChanged();
 }
 
 export function clearTurnHint(jobFileId: string, commandId: string): void {
-  if (readTurnHint(jobFileId)?.command_id === commandId)
-    localStorage.removeItem(hintKey(jobFileId));
+  if (readTurnHint(jobFileId)?.command_id !== commandId) return;
+  localStorage.removeItem(hintKey(jobFileId));
+  notifyHintChanged();
+}
+
+/** Same-tab writes and other tabs' `storage` events; for `useSyncExternalStore`. */
+export function subscribeTurnHint(onChange: () => void): () => void {
+  window.addEventListener(HINT_CHANGED, onChange);
+  window.addEventListener('storage', onChange);
+  return () => {
+    window.removeEventListener(HINT_CHANGED, onChange);
+    window.removeEventListener('storage', onChange);
+  };
+}
+
+const snapshots = new Map<string, { raw: string | null; hint: TurnHint | null }>();
+
+/**
+ * Snapshot for `useSyncExternalStore`: never throws and returns one object while the stored text is
+ * unchanged. A corrupt hint reads as null here; the composer reports the corruption itself.
+ */
+export function readTurnHintSnapshot(jobFileId: string): TurnHint | null {
+  let raw: string | null;
+  try {
+    raw = localStorage.getItem(hintKey(jobFileId));
+  } catch {
+    return null;
+  }
+  const cached = snapshots.get(jobFileId);
+  if (cached?.raw === raw) return cached.hint;
+  let hint: TurnHint | null = null;
+  if (raw !== null) {
+    try {
+      hint = parseHint(raw);
+    } catch {
+      hint = null;
+    }
+  }
+  snapshots.set(jobFileId, { raw, hint });
+  return hint;
 }
 
 /** These input-route errors occur before acceptance; generic 503/404 do not prove that. */

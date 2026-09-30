@@ -1,9 +1,8 @@
 /** Page composition: metadata gate, then the workspace. Features never import each other. */
-import { useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Button, Container, Stack } from '@mui/material';
-import type { ConsultantTurn } from '../shared/api/generated/consultant-turn';
+import { useCurrentTurn } from '../features/interview/use-current-turn';
 import { jobFileQuery } from '../features/job-files/job-file-api';
 import { describeReadError } from '../shared/api/http';
 import { FileBar } from './FileBar';
@@ -18,8 +17,7 @@ export function JobFilePage() {
 
 function JobFileContent({ jobFileId }: { jobFileId: string }) {
   const file = useQuery(jobFileQuery(jobFileId));
-  // Server-verified Turn state, reported by the interview feature and read by the JD pane.
-  const [turn, setTurn] = useState<ConsultantTurn | null>(null);
+  const turn = useCurrentTurn(jobFileId);
   const retry = (
     <Button
       color="inherit"
@@ -61,7 +59,7 @@ function JobFileContent({ jobFileId }: { jobFileId: string }) {
           </div>
         ) : null
       }
-      interview={<InterviewPane jobFileId={jobFileId} onTurnChange={setTurn} />}
+      interview={<InterviewPane jobFileId={jobFileId} />}
       document={<JdPane jobFileId={jobFileId} turn={turn} />}
     />
   );

@@ -24,6 +24,7 @@ export function JdPane({ jobFileId, turn }: { jobFileId: string; turn: Consultan
   const readOnly = isJdReadOnlyDuring(turn);
   const candidate = readOnly ? (turn?.candidate ?? null) : null;
   const [view, setView] = useState<JdView>('candidate');
+  const showCandidate = candidate !== null && view === 'candidate';
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [sourceFilter, setSourceFilter] = useState<readonly string[] | null>(null);
   const sources = useQuery(jdSourcesQuery(jobFileId));
@@ -100,14 +101,18 @@ export function JdPane({ jobFileId, turn }: { jobFileId: string; turn: Consultan
                 : '顧問處理中，JD 暫時唯讀；完成或取消後才能人工修改。'}
             </Alert>
           )}
-          {candidate && view === 'candidate' ? (
-            <JdCandidatePreview candidate={candidate} />
-          ) : (
+          {/* Both views stay mounted and only one is shown, so the formal JD never reloads. */}
+          {candidate && (
+            <div className="jd-stack" hidden={!showCandidate}>
+              <JdCandidatePreview candidate={candidate} />
+            </div>
+          )}
+          <div className="jd-stack" hidden={showCandidate}>
             <SourceBadgeContext.Provider value={renderBadge}>
               <JdProfileEditor jobFileId={jobFileId} readOnly={readOnly} />
               <JdWorkEditor jobFileId={jobFileId} readOnly={readOnly} />
             </SourceBadgeContext.Provider>
-          )}
+          </div>
         </div>
       </div>
     </>

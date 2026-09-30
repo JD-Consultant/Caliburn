@@ -265,10 +265,10 @@ async def test_resumed_interrupt_is_not_replayed_when_next_response_needs_resavi
     provider = CapacityProbe([100, 100], final=False)
     control = PauseProbe()
 
-    async def model(request, request_id):
+    async def model(request, request_id, input_tokens: int):
         if provider.model_requests:
             saver.available = False
-        return await provider.model(request, request_id)
+        return await provider.model(request, request_id, input_tokens)
 
     args = dict(
         thread_id="resume-then-save-retry",

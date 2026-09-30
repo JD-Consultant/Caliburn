@@ -408,3 +408,35 @@ Ruff check／format **223 files**、mypy **154 source files** 通過。文件 **
 ```
 
 結果 **48 passed in 26.44s**（16 新增＋32 既有，不與前述歷次數量相加）；Ruff check／format check **2 files**、mypy `--follow-imports=silent` **1 source file**、本次 tracked 差異 `git diff --check` 通過。不是全套回歸、production owner 組裝、kill／跨程序 handoff 或真 provider 證據。下一個安全動作是 owner 以既有 task／原生恢復／handoff 證據實作上述 callback，先驗「舊 runner 已退出但仍有完整 R」仍走原件，而非僅因 takeover 啟用再推論。
+
+## 19. 產品移除金額攔截與按請求計數預留（2026-09-30）
+
+承接 `459d0b57`。Owner 明確採納「產品不再用預估金額攔截執行，保留 token 容量、呼叫／重試次數與時間上限；付費測試另行控管預算」。政策只維護於[共用執行 §6.5](../../../specs/2026-09-27-shared-agent-execution-and-state-design.md#65-容量與費用分開產品不設金額攔截)，接線、migration 及官方依據見[工程 §5.8](../../../implementation/agent-execution.md#58-產品與付費驗證的金額界線2026-09-30)；本節記證據，不另造規格。
+
+### 原反例與最小修正
+
+T17 失敗批次的唯讀核對發現，舊 runner 每次以最大可用輸入 922K 預留金額，並非當次 context 大小。模型估算累計 0.005708160、count 行政預留 0.001700000，合計 0.007408160；下一個固定預留 0.242788000 使總額 0.250196160 超過該測試的 0.25 上限。這是 App 預留算法造成的攔截，不是 provider 額度不足；原 trial 仍為失敗，不因診斷或修正改成通過。
+
+- A／B1／B2 共用正常 `ModelSettings` 的空金額上限，沿既有 executions owner 檢查所有非金額限制。新增 nullable migration，不新增表、第二套保存或巨大假上限；既有執行的固定政策不被改写。
+- 付費測試明確設定上限時仍攔截。其生成預留改用已保存且配對同一請求的 count 與實際 output cap；不多呼叫一次 count，不改送出 payload、compaction 或歷史組裝。
+- 產品的 R／C 若缺完整計費明細，原件照常接續，金額保持未知；明確有限額的評測仍保守停止。未放寬原件保存、attempt 配對、writer 或資料庫失敗。
+
+### Red／Green 與實際範圍
+
+1. 先用 A／B 真 PG runner 的小額明示測試上限重現固定最大輸入誤攔：**2 failed／4 passed**；改按已保存 count 後同組 **6 passed in 11.41s**。
+2. 新產品預設、舊環境變數不再啟用 gate、無金額政策三案在修改前 **3 failed**（其中 `None` 政策尚不能建立）；接線後設定／budget／runner 定向 **26 passed in 16.02s**。
+3. 產品缺計費明細但已有完整 R／C 的兩案，修改前 **2 failed**，均為 `ModelUsageUnavailableError`；修正後包含於下方最終回歸。既有明示預算的缺失 usage 停止測例保留，沒有把未知費用補零。
+
+最後回歸使用既有 `.venv-target`、loopback `_test` PostgreSQL，每案獨立 schema；模型走 SDK MockTransport，不是遠端 provider：
+
+```powershell
+./.venv-target/Scripts/python.exe -B -m pytest tests/unit tests/contracts tests/integration/test_execution_budgets.py tests/integration/test_database_migrations.py tests/integration/test_response_pricing_accounting.py tests/integration/test_consultant_runner.py tests/integration/test_memory_analysis_runners.py tests/integration/test_compaction_accounting.py tests/integration/test_model_request_accounting.py tests/integration/test_request_capacity_postgres.py tests/integration/test_outbound_retry.py tests/integration/test_unknown_attempt_readmission.py tests/integration/test_response_step_postgres.py tests/integration/test_response_loop_controls.py tests/integration/test_response_recovery_eligibility.py tests/integration/test_memory_tool_step.py -q -p no:cacheprovider --tb=line --basetemp=<新建且事先確認不存在的測試暫存路徑>
+```
+
+首次整合結果 **1105 passed in 78.83s**。涵蓋 nullable 新建／migration、原有限額、無限額仍受模型步數／attempts／deadline 限制、A／B runner、容量計數、compaction 與原恢復接縫。前次 sandbox 對 pytest 暫存目錄拒絕存取，出現 fixture／session cleanup 環境錯誤，不算通過；以正常權限和新 GUID 路徑重跑取得上述結果，未刪舊暫存目錄。Ruff check／format **406 files**、mypy **252 source files** 通過；以下為審查後補正，不把本次 1105 當補正後證據。
+
+獨立 reviewer 發現 P2：僅直接測 accounting 會漏過 Graph 原件還原；SDK 可以收到缺少 `cache_write_tokens` 的部分 usage，但原 `Response.model_validate` 會先擋住，尚未進到放行分支。主代理新增 SDK 原件往返及部分工具後 Graph 恢復反例，先取得 **2 failed／16 passed**；核已安裝 SDK 3.20.0 `_models.py` 的原生 `model_construct` 後，僅對 `usage` 借用此能力，其他回應欄位仍驗證。補驗缺計費明細時壞 `call_id` 仍拒絕，兩檔 **18 passed in 1.07s**。原件／reasoning／phase／工具配對保持相同，恢復不重呼模型或重準備已完成工具；沒有新增資料欄位、服務或依賴。
+
+補正後重跑上述同一回歸命令：**1108 passed in 88.64s**；Ruff check／format **406 files**、mypy **252 source files** 通過。新增本地文件連結 11 處及 diff check 通過。Reviewer 窄複核原件往返、未知成本、Step／部分工具恢復及壞 call_id，關閉 P2，無新增發現；未冒稱 reviewer 重跑完整套件。這是本切片最終證據，不與前次 1105 加總。
+
+本切片未讀 `.env`、未呼叫真模型、未修改／重啟 Demo 8100／5173、未對 Demo 執行 migration，也未重驗 UI／PDF／自然訪談品質。舊資料與已受理測試仍保留原限制；本次測試不證明 T17 的漏引／更正泛化已修好。T06、T16、T17、T18 及 Goal 未據此勾選完成。

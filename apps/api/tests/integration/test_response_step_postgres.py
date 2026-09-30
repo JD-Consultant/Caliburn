@@ -82,7 +82,7 @@ def test_model_checkpoint_failure_does_not_dispatch_and_pending_writes_recover_o
         serde = JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None)
 
         async def request(
-            model_request: ResponseRequest, request_id: UUID
+            model_request: ResponseRequest, request_id: UUID, input_tokens: int
         ) -> ReceivedModelResponse:
             events.append("model")
             return ReceivedModelResponse(response=response, attempt_id=uuid4())
@@ -156,7 +156,7 @@ def test_saved_step_reopens_without_repeating_window_items(
         requests = 0
 
         async def request(
-            model_request: ResponseRequest, request_id: UUID
+            model_request: ResponseRequest, request_id: UUID, input_tokens: int
         ) -> ReceivedModelResponse:
             nonlocal requests
             requests += 1
@@ -222,7 +222,7 @@ def test_public_step_recovery_saves_held_model_result_after_both_writes_fail(
         calls = []
 
         async def request(
-            model_request: ResponseRequest, request_id: UUID
+            model_request: ResponseRequest, request_id: UUID, input_tokens: int
         ) -> ReceivedModelResponse:
             calls.append("model")
             return ReceivedModelResponse(response=response, attempt_id=uuid4())

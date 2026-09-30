@@ -109,7 +109,7 @@ def test_saved_count_reconnects_without_recount_and_reserves_its_actual_outbound
                 # Explicit administrative reservation; do not call the counting endpoint free.
                 accounting = ModelRequestAccounting(
                     "synthetic-v1",
-                    Decimal("0.1"),
+                    lambda input_tokens, max_output_tokens: Decimal("0.1"),
                     lambda _: Decimal("0.01"),
                     token_count_reservation_usd=Decimal("0.001"),
                 )

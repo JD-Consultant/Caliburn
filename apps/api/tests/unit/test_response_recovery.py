@@ -63,7 +63,9 @@ async def test_public_step_preserves_original_response_when_both_saver_writes_fa
     )
     calls = []
 
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         calls.append("model")
         return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
@@ -93,7 +95,9 @@ async def test_public_step_preserves_original_response_when_both_saver_writes_fa
 
 
 def recording_runtime(events: list[str]) -> ResponseStepRuntime:
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         events.append("model")
         response = Response.model_validate_json(
             (Path(__file__).parents[1] / "fixtures/native-response.json").read_text(
@@ -252,8 +256,10 @@ async def test_reused_recovery_handoff_does_not_reclassify_later_failure(fail_gu
 async def test_invalid_response_protocol_is_not_treated_as_unsaved_result() -> None:
     runtime = recording_runtime([])
 
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
-        received = await runtime.request_model(model_request, request_id)
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
+        received = await runtime.request_model(model_request, request_id, input_tokens)
         received.response.output[1].phase = None
         return received
 
@@ -277,9 +283,11 @@ async def test_late_model_result_cannot_dispatch_after_execution_becomes_inactiv
         if not active:
             raise PermissionError("Synthetic execution cancelled")
 
-    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+    async def request(
+        model_request: ResponseRequest, request_id: UUID, input_tokens: int
+    ) -> ReceivedModelResponse:
         nonlocal active
-        received = await runtime.request_model(model_request, request_id)
+        received = await runtime.request_model(model_request, request_id, input_tokens)
         active = False
         return received
 

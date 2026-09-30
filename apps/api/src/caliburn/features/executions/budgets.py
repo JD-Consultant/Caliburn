@@ -129,7 +129,10 @@ async def check_outbound_capacity(
             raise BudgetExceededError(BudgetLimit.MODEL_STEPS)
         if request.kind == OutboundKind.COMPACTION and usage.compactions >= policy.max_compactions:
             raise BudgetExceededError(BudgetLimit.COMPACTIONS)
-    if usage.accounted_cost_usd + reserved_cost_usd > policy.max_cost_usd:
+    if (
+        policy.max_cost_usd is not None
+        and usage.accounted_cost_usd + reserved_cost_usd > policy.max_cost_usd
+    ):
         raise BudgetExceededError(BudgetLimit.COST)
 
 

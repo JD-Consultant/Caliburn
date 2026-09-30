@@ -2,6 +2,8 @@
 
 > 同日條目依上到下為 successor 順序；較下方的 16K／待驗文字是當時 gate 的歷史狀態，不得覆蓋上方較新的正式設定與驗收邊界。
 
+**2026-09-30 產品移除金額攔截（Owner 已確認）：**A／B1／B2 保留 token 容量、壓縮、次數／重試及時間控制，不以預估美元金額阻止正常執行；工程付費驗證仍獨立遵守 manifest 預算。政策見[共用執行 §6.5](specs/2026-09-27-shared-agent-execution-and-state-design.md#65-容量與費用分開產品不設金額攔截)，接線見[執行 §5.8](implementation/agent-execution.md#58-產品與付費驗證的金額界線2026-09-30)，實測與未驗事項見 [T06 §19](plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)。不擴大付費測試授權、不重設既有工作限制、不宣稱 Demo 已更新。
+
 **2026-09-30 首版恢復減法（Owner 已確認；局部實作驗證，不是完整產品驗收）：**保留已保存 Step 接續、正式結果及安全回退；少見原件遺失不必擴成全面原地恢復系統。有限恢復後允許由原 owner 安全結束並讓顧問接受新輸入，Memory 失敗不阻塞訪談。唯一政策見[共用執行 §6.4](specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)，接線與實測見[執行 §6.2](implementation/agent-execution.md#62-最外層失敗收尾2026-09-30)及 [T12 證據](plans/2026-09-29-target-rebuild/evidence/t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)。不改資料庫安全、取消、已採用 compaction 或正式保存保證；不因簡化而宣稱零 bug。
 
 **2026-09-29 程式撰寫規範補充（工程規則／不變更產品契約）：**依 Owner 要求補齊架構分層以外的 code 寫法。新增[程式撰寫規範](implementation/coding-standard.md)，研究並區分語言／框架建議與本案取捨，涵蓋命名、函式／實例、Service／依賴注入、錯誤、非同步、React 及反過度抽象；沿既有工程入口與 Refactor／Review 路由。Ruff／typed ESLint 的有界增補與驗證記入 [T01 evidence](plans/2026-09-29-target-rebuild/evidence/t01-foundation.md#5-程式撰寫規範與自動檢查補強2026-09-29)。不重置 Goal、不改產品狀態機、不把風格檢查當產品驗收。

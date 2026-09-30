@@ -119,7 +119,7 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
             committed = None
 
             async def request(
-                model_request: ResponseRequest, request_id: UUID
+                model_request: ResponseRequest, request_id: UUID, input_tokens: int
             ) -> ReceivedModelResponse:
                 calls.append("model")
                 return ReceivedModelResponse(response=response, attempt_id=uuid4())

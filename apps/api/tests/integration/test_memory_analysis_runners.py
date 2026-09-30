@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from decimal import Decimal
 from uuid import uuid4
 
 import httpx2
@@ -35,14 +36,21 @@ pytestmark = pytest.mark.postgres
 
 
 @pytest.mark.parametrize(
-    ("handoff_tokens", "recover_first_response"),
-    [(271_999, False), (272_000, False), (271_999, True)],
+    ("handoff_tokens", "recover_first_response", "max_cost_usd"),
+    [
+        (271_999, False, Decimal("1.00")),
+        (272_000, False, Decimal("1.00")),
+        (271_999, True, Decimal("1.00")),
+        (500, False, Decimal("0.02")),
+        (500, False, None),
+    ],
 )
 def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
     database_settings: DatabaseSettings,
     database_connection: psycopg.Connection,
     handoff_tokens: int,
     recover_first_response: bool,
+    max_cost_usd: Decimal | None,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     file_id, source_id = uuid4(), uuid4()
@@ -211,10 +219,16 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
             ) as saver:
                 await saver.setup()
                 b1 = WorkSituationAnalystRunner(
-                    database.sessions, saver, sdk, ModelSettings(api_key="synthetic")
+                    database.sessions,
+                    saver,
+                    sdk,
+                    ModelSettings(api_key="synthetic", max_cost_usd=max_cost_usd),
                 )
                 b2 = WorkUnderstandingAnalystRunner(
-                    database.sessions, saver, sdk, ModelSettings(api_key="synthetic")
+                    database.sessions,
+                    saver,
+                    sdk,
+                    ModelSettings(api_key="synthetic", max_cost_usd=max_cost_usd),
                 )
                 if recover_first_response:
                     original_put, original_writes = saver.aput, saver.aput_writes

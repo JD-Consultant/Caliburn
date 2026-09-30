@@ -54,7 +54,7 @@ def test_available_or_unknown_original_never_resends(database_settings, retry_fi
     async def scenario():
         async with retry_executor(database_settings, retry_file_id, respond) as executor:
             request_id = uuid4()
-            original = await executor.request_model(request_fixture(), request_id)
+            original = await executor.request_model(request_fixture(), request_id, 100)
             checks = []
 
             async def reconcile(writer, attempts):
@@ -68,7 +68,7 @@ def test_available_or_unknown_original_never_resends(database_settings, retry_fi
 
             with pytest.raises(PriorModelAttemptError) as stopped:
                 await replace(executor, reconcile_prior_attempts=reconcile).request_model(
-                    request_fixture(), request_id
+                    request_fixture(), request_id, 100
                 )
             assert stopped.value.recovery is disposition
             assert len(checks) == 1
@@ -108,7 +108,8 @@ def test_confirmed_lost_original_adds_budgeted_attempt_without_erasing_old_one(
     async def scenario():
         async with retry_executor(database_settings, retry_file_id, respond) as executor:
             request_id = uuid4()
-            await getattr(executor, operation)(request_fixture(), request_id)
+            arguments = (100,) if operation == "request_model" else ()
+            await getattr(executor, operation)(request_fixture(), request_id, *arguments)
             original = await attempts_for(executor, request_id)
             async with executor.sessions.begin() as session:
                 replacement = await service.claim_writer(
@@ -126,7 +127,7 @@ def test_confirmed_lost_original_adds_budgeted_attempt_without_erasing_old_one(
                     PriorCompactionAttemptError,
                 )
             ):
-                await getattr(executor, operation)(request_fixture(), request_id)
+                await getattr(executor, operation)(request_fixture(), request_id, *arguments)
 
             async def reconcile(writer, attempts):
                 assert attempts == original
@@ -134,7 +135,7 @@ def test_confirmed_lost_original_adds_budgeted_attempt_without_erasing_old_one(
                 return PriorAttemptRecovery.LOCAL_ORIGINAL_UNRECOVERABLE
 
             recovered = replace(executor, reconcile_prior_attempts=reconcile)
-            await getattr(recovered, operation)(request_fixture(), request_id)
+            await getattr(recovered, operation)(request_fixture(), request_id, *arguments)
             attempts = await attempts_for(executor, request_id)
             assert len(attempts) == len(calls) == 2
             assert original[0] in attempts  # No fake failure, deletion, or settlement.
@@ -170,14 +171,14 @@ def test_reconciliation_does_not_reset_original_budget(
     async def scenario():
         async with retry_executor(database_settings, retry_file_id, respond, **options) as executor:
             request_id = uuid4()
-            await executor.request_model(request_fixture(), request_id)
+            await executor.request_model(request_fixture(), request_id, 100)
 
             async def reconcile(writer, attempts):
                 return PriorAttemptRecovery.LOCAL_ORIGINAL_UNRECOVERABLE
 
             with pytest.raises(BudgetExceededError) as stopped:
                 await replace(executor, reconcile_prior_attempts=reconcile).request_model(
-                    request_fixture(), request_id
+                    request_fixture(), request_id, 100
                 )
             assert stopped.value.limit is limit
             assert len(await attempts_for(executor, request_id)) == len(calls) == 1
@@ -195,7 +196,7 @@ def test_cancel_during_reconciliation_prevents_readmission(database_settings, re
     async def scenario():
         async with retry_executor(database_settings, retry_file_id, respond) as executor:
             request_id = uuid4()
-            await executor.request_model(request_fixture(), request_id)
+            await executor.request_model(request_fixture(), request_id, 100)
 
             async def reconcile(writer, attempts):
                 async with executor.sessions.begin() as session:
@@ -206,7 +207,7 @@ def test_cancel_during_reconciliation_prevents_readmission(database_settings, re
 
             with pytest.raises(ExecutionStateError):
                 await replace(executor, reconcile_prior_attempts=reconcile).request_model(
-                    request_fixture(), request_id
+                    request_fixture(), request_id, 100
                 )
             assert len(await attempts_for(executor, request_id)) == len(calls) == 1
 
@@ -225,7 +226,7 @@ def test_two_reconciliations_cannot_authorize_duplicate_new_attempts(
     async def scenario():
         async with retry_executor(database_settings, retry_file_id, respond) as executor:
             request_id = uuid4()
-            await executor.request_model(request_fixture(), request_id)
+            await executor.request_model(request_fixture(), request_id, 100)
             original = await attempts_for(executor, request_id)
             barrier = asyncio.Barrier(2)
             checks = []
@@ -239,8 +240,8 @@ def test_two_reconciliations_cannot_authorize_duplicate_new_attempts(
             recovered = replace(executor, reconcile_prior_attempts=reconcile)
             async with asyncio.timeout(5):
                 outcomes = await asyncio.gather(
-                    recovered.request_model(request_fixture(), request_id),
-                    recovered.request_model(request_fixture(), request_id),
+                    recovered.request_model(request_fixture(), request_id, 100),
+                    recovered.request_model(request_fixture(), request_id, 100),
                     return_exceptions=True,
                 )
             assert sum(isinstance(value, PriorModelAttemptError) for value in outcomes) == 1
@@ -269,7 +270,7 @@ def test_recheck_after_owner_await_rejects_stale_evidence(database_settings, ret
             deadline_seconds=2 if change == "deadline" else 60,
         ) as executor:
             request_id = uuid4()
-            await executor.request_model(request_fixture(), request_id)
+            await executor.request_model(request_fixture(), request_id, 100)
 
             async def reconcile(writer, attempts):
                 async with executor.sessions.begin() as session:
@@ -299,7 +300,7 @@ def test_recheck_after_owner_await_rejects_stale_evidence(database_settings, ret
             }[change]
             with pytest.raises(error) as stopped:
                 await replace(executor, reconcile_prior_attempts=reconcile).request_model(
-                    request_fixture(), request_id
+                    request_fixture(), request_id, 100
                 )
             if change == "deadline":
                 assert stopped.value.limit is BudgetLimit.DEADLINE
@@ -319,7 +320,7 @@ def test_failed_or_untyped_owner_check_fails_closed(database_settings, retry_fil
     async def scenario():
         async with retry_executor(database_settings, retry_file_id, respond) as executor:
             request_id = uuid4()
-            await executor.request_model(request_fixture(), request_id)
+            await executor.request_model(request_fixture(), request_id, 100)
 
             async def reconcile(writer, attempts):
                 if fault == "unavailable":
@@ -330,7 +331,7 @@ def test_failed_or_untyped_owner_check_fails_closed(database_settings, retry_fil
                 ConnectionError if fault == "unavailable" else PriorModelAttemptError
             ):
                 await replace(executor, reconcile_prior_attempts=reconcile).request_model(
-                    request_fixture(), request_id
+                    request_fixture(), request_id, 100
                 )
             assert len(await attempts_for(executor, request_id)) == len(calls) == 1
 
@@ -351,7 +352,7 @@ def test_known_failure_after_readmission_still_uses_existing_retry_budget(
     async def scenario():
         async with retry_executor(database_settings, retry_file_id, respond) as executor:
             request_id = uuid4()
-            await executor.request_model(request_fixture(), request_id)
+            await executor.request_model(request_fixture(), request_id, 100)
             checks = []
 
             async def reconcile(writer, attempts):
@@ -359,7 +360,7 @@ def test_known_failure_after_readmission_still_uses_existing_retry_budget(
                 return PriorAttemptRecovery.LOCAL_ORIGINAL_UNRECOVERABLE
 
             await replace(executor, reconcile_prior_attempts=reconcile).request_model(
-                request_fixture(), request_id
+                request_fixture(), request_id, 100
             )
             attempts = await attempts_for(executor, request_id)
             assert len(attempts) == len(calls) == 3

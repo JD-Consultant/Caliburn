@@ -112,7 +112,7 @@ def accounting_fixture(
 ) -> ModelRequestAccounting:
     return ModelRequestAccounting(
         "synthetic-v1",
-        Decimal("0.1"),
+        lambda input_tokens, max_output_tokens: Decimal("0.1"),
         lambda _: pytest.fail("Compaction must not use model pricing"),
         token_count_reservation_usd=Decimal("0.001"),
         compaction_reservation_usd=Decimal("0.2"),
@@ -128,6 +128,7 @@ async def admitted_executor(
     accounting: ModelRequestAccounting,
     *,
     max_compactions: int = 4,
+    max_cost_usd: Decimal | None = Decimal("1"),
 ) -> AsyncIterator[ModelRequestExecutor]:
     database = Database(settings)
     try:
@@ -144,7 +145,7 @@ async def admitted_executor(
                     32,
                     3,
                     datetime.now(UTC) + timedelta(hours=1),
-                    Decimal("1"),
+                    max_cost_usd,
                     accounting.cost_basis,
                 ),
             )

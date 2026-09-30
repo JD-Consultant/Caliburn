@@ -50,6 +50,7 @@ class CapacityProbe:
         self.counts = counts
         self.count_requests = []
         self.model_requests = []
+        self.model_input_tokens = []
         self.fail_model = False
         self.final = final
 
@@ -60,10 +61,11 @@ class CapacityProbe:
             "attempt_id": uuid4(),
         }
 
-    async def model(self, request, request_id):
+    async def model(self, request, request_id, input_tokens: int):
         if self.fail_model:
             raise ConnectionError("synthetic before generation admission")
         self.model_requests.append(request.create_payload())
+        self.model_input_tokens.append(input_tokens)
         payload = json.loads(Path(__file__).with_name("native-response.json").read_text("utf-8"))
         payload["output"] = payload["output"][:2]
         payload["output"][1]["phase"] = (

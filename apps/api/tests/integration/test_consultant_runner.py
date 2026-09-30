@@ -1,6 +1,7 @@
 """A uses real scoped tools and PostgreSQL completion, with a synthetic SDK transport."""
 
 import json
+from decimal import Decimal
 from uuid import UUID, uuid4
 
 import httpx2
@@ -21,9 +22,11 @@ from tests.unit.test_response_loop import response_at
 pytestmark = pytest.mark.postgres
 
 
+@pytest.mark.parametrize("max_cost_usd", [None, Decimal("0.02")])
 def test_native_model_tools_then_atomic_completion(
     client: TestClient,
     database_settings: DatabaseSettings,
+    max_cost_usd: Decimal | None,
 ) -> None:
     file_id = UUID(
         client.post(
@@ -94,7 +97,12 @@ def test_native_model_tools_then_atomic_completion(
                 http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond)),
             )
             try:
-                runner = ConsultantRunner(sessions, saver, sdk, ModelSettings(api_key="synthetic"))
+                runner = ConsultantRunner(
+                    sessions,
+                    saver,
+                    sdk,
+                    ModelSettings(api_key="synthetic", max_cost_usd=max_cost_usd),
+                )
                 exchange = await runner.run(writer)
             finally:
                 await sdk.close()

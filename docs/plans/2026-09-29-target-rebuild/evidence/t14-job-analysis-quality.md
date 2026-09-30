@@ -442,3 +442,57 @@ Memory 最新快照另作唯讀抽查：3 情境、1 理解保留已知工作、
 補驗中自然再現 `Response.aiter_raw` 及 `BoundAsyncStream.__aiter__` 的 generator 清理警告，兩者都以 `ValueError: async generator already executing` 出現在 serde 觸發 GC 的堆疊；尚未證明是本次服務錯誤原因，不新增恢復機制或改框架私有碼。
 
 原件 SHA-256：首次 `8e8eac0228e141d374cf6a3ac8a31cd0e99915d19c63927393c8c14a4b96675b`；補驗 `49037d17f1d8e93c2019402fbfa1d2b2a7dc50dbb2d3772aeba554345860fe7a`。本片維持現行 Prompt／工具／Context：不能因服務失敗猜提示有錯，也不因個案有技能就宣稱品質全過。T14／T16／T17 未完成，下一切片沿既有跨輪來源品質問題處理，避免再無界擴測或重跑整套訪談。
+
+## 2026-10-01：來源選項的參數語意對照
+
+### 反例定位與執行前 manifest
+
+基準 `e4fac6ef`。唯讀上述成功第 5 輪的原生 request／公開工具結果，發現模型在拆分前已讀到原大任務的完整內容與序號 2／4／6／8 的依據，其中出席成果清楚引用 8。下一次 `create_jd_task` 卻將新拆任務及含「指定資料夾」的成果只引用 `current_input`。後來模型重讀 2／4／6／8，仍只核對兩項舊任務，沒有補上新任務來源。這不是來源未提供、工具保存掉資料，也不代表內容捏造。
+
+角色指引已有出處原則，先前加「保留來源」句未穩定改善，本片不重試相同假說。三種 Source 選項本身仍缺 description；**候選假說**是模型將 `current_input` 選項誤用為整輪已知資訊。只補三個來源選項的語意：本次一則原話／歷史指定發話／固定 Memory 物件；不加新工具、例外驗證器、自動補引用、固定工具順序或 reviewer。這是待測解釋，不宣稱已查明模型內部原因。
+
+依 [OpenAI 函式說明建議](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)將容易誤用的語意放在參數附近；[GPT-6 提示指引](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices)要求在選用模型及實際負載驗證。官方並未保證加 description 必定改善，也提示範例可能反而傷害 reasoning 模型表現，故本片不堆範例或照抄工程代理自主權限。
+
+- 只重播隔離合成 request：184 items、14 tools，原件 SHA-256 `d16389f573d8f3ca82ff0e2efc50db27a8a973047a487acb690b8d53fc60e931`；不改歷史、主指引或模型設定。兩組均改非串流、output 上限 8,192，維持 Luna／high／all_turns、store=false。
+- 基準／候選交替各 2 次；至多 4 次 count＋4 次 model，單請求 120 秒、零重試、串行。input 上限 70,000 tokens、總費用預留 US$1；任一外送失敗即停，不重跑旅程。不執行返回的業務工具、不寫業務 DB、不操作 Demo。
+- 觀察跨來源任務／成果是否保留真實依據，也檢查其他內容／來源不因補引而錯配；若改為先讀取，記為尚不能判定，不能把「沒有犯錯」當作已完成編輯。不用唯一工具序列或正文逐字一致評分。
+- 只在有改善時才納入唯一 schema 並驗生成／接線及原局部更正反例；沒有改善就不採用。此為自然模型的有限品質比較，非單元 TDD 或普遍可靠性證明。原件寫入 ignored `source-scope-20261001.jsonl`，獨占建立避免無意重跑；腳本 `probe_source_scope.py`。
+
+### 實際結果：未採用候選，不追加重跑
+
+外送前核對固定 request hash、隔離合成 job、五則員工輸入逐字等於既有合成素材及五份 App 參考資料；沒有私人訪談或憑證輸出。完成 4 次 count、4 次 model，沒有執行返回工具或寫業務資料。
+
+| 試次 | 變體 | 實際行為／判斷 | input／output tokens |
+|---|---|---|---|
+| 1 | 原說明 | 只讀協作對象；尚未觀察到編輯，不判通過 | 49,412／3,507 |
+| 2 | 三種來源補 description | 同樣只讀協作對象；尚未觀察到編輯 | 49,694／4,775 |
+| 3 | 原說明 | 修改既有任務、建立技能；新合併要求仍只引本次輸入，未證明跨輪來源問題消失 | 49,412／4,726 |
+| 4 | 三種來源補 description | `incomplete`，8,192 output 全為 reasoning tokens，沒有可執行呼叫；不算品質通過 | 49,694／8,192 |
+
+本片只是自然下一 Step 比較，不執行工具續跑整個 Turn；模型先閱讀是合法選擇。結果**不足以證明描述候選有效或無效**，依 manifest 不納入產品、不再自動加長上限或重播。試次 4 是本探針的輸出上限，不能由此推導正式產品的 Context 容量錯誤。按既有本機費率與已回報 usage 估算 US$0.018297665，不作供應商帳單保證。原件 SHA-256：`76d45370064a6e0ac8d1ad0d5110853024275c4070426c83132c88bff018039c`。
+
+### B1／B2 實際 Context 與接線回歸
+
+唯讀已完成合成批次 `2df56253-82c0-4afe-b778-539579ea7404` 的原生 stage request；排除只計量舊歷史的 preparation snapshot，避免誤判新資料遺漏。以下核對於本節末的指引修正**之前**執行，對照基準 `e4fac6ef`，不以新指引冒充過去請求。探針 `audit_memory_context.py` 零 provider 呼叫、零 DB 寫入。
+
+- B1：4 份相異請求，78→101 items；本批 App 資料是情境 map（3 項）、必處理 9–10、顧問 9／員工 10 的原話。無理解 map、無 B2 私人歷史；6 項工具與現行定義全等。
+- B2：6 份相異請求，93→123 items；本批 App 資料是情境 map（3）、理解 map（1）、3 筆上游變更概覽；沒有預載整批原話，仍有按需歷史讀取工具。8 項工具與現行定義全等。
+- 每份請求的 instructions 與各自現行角色原文全等；`store=false`、high／all_turns、無 `previous_response_id`。App 資料均為 user，不升為 system／developer；各自原生 reasoning、工具呼叫與結果、assistant `phase` 保留。沒有把本次資料反覆新增到每 Step。此批沒有回交／壓縮，不冒稱其實際 provider 行為已驗。
+- 首份 stage request SHA-256（排序 key 的 UTF-8 JSON，沿探針序列化）：B1 `beb84bf74c539c4067bf11abfb8ec012e6337485b53db71b6d34e68377789bb0`；B2 `78589592a21bcba6a6fed45e5d301085325117b0b6e05bcebed944124a1649b7`。
+
+本次在 `apps/api` 執行 `./.venv-target/Scripts/python.exe -B -m pytest tests/unit/test_role_prompt_contracts.py tests/integration/test_consultant_context_binding.py tests/integration/test_memory_source_windows.py tests/integration/test_memory_parent_roles.py -q -p no:cacheprovider --tb=short`：**31 passed，11.72s**。PG fixture 只建立及清理本次隨機測試 schema，Demo 與既有旅程不變。覆蓋角色接線、A 固定資料／重連、B 取材上界及正常／回交續批，模型輸出為合成；不等於自然分析品質全部通過。
+
+### 指引審查後的兩項小修
+
+平行唯讀審查分開查 B1／B2 方法、模型工具文字；主代理核對原契約後只修兩項：
+
+1. `revise_jd_item` 原說明「排序／移動另用 move_jd_item」與既有 `reorder_capability` 不一致。現在區分**任務內 K/S 引用順序**與**共用項目／明細順序、任務移動**，對齊 [JD 工具契約 §4.1](../../../specs/2026-09-29-jd-model-tool-contract-review.md#41-有限修訂動作與精確來源目標推薦設計待實作驗證)。不改 schema、實際操作或增加工具。
+2. B1／B2 已有保留未知、局部補充不刪舊工作的要求，但未明述未解衝突不能以最後一句為準。各補一行一般判準，依 [工作分析指南 §4](../../../specs/2026-09-09-complete-work-analysis-guide.md#4-案例工作理解與-jd如何取捨而不丟失)區分時期／條件／更正，只改明確範圍，未解矛盾保留說法、來源與待釐清。不加固定回交、禁止正常更正或特定樣本答案。
+
+沒有對「另有一人」再追加案例專用禁令，也不重複既有 B2 精簡規則。已保存的歷史請求不改寫；新指引適用後續新準備，既有恢復仍承接其原設定。
+
+先新增公開工具文字與實際角色組裝的契約檢查：**5 failed、13 passed**，失敗均指向上述缺句；修正後連既有 wire／來源接線：**22 passed，1.62s**。命令為 `./.venv-target/Scripts/python.exe -X utf8 -B -m pytest tests/contracts/test_jd_item_revision_schema.py tests/unit/test_role_prompt_contracts.py tests/unit/test_jd_item_revision_wire.py tests/contracts/test_jd_source_actions_wire.py -q -p no:cacheprovider --tb=short`。五個受影響 Python 檔 Ruff check／format check 通過。
+
+這是**文字契約缺口的修正與接線驗證**，不是證明自然模型更懂衝突或引用：沒有以字串 assertion 冒充語意評測，也沒有為文案小修追加付費長旅程。前述新拆任務漏依據、Memory 精確化及精煉問題仍列 T14 品質限制，未勾全項完成。
+
+提交前獨立工程審查五份程式／測試差異，未發現須先修的權責或契約問題；審查未另跑測試，不計成另一份執行證據。

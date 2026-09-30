@@ -6,6 +6,8 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
+from caliburn.transport.model_tools.jd_writes import jd_write_definitions
+
 
 @pytest.fixture
 def validator():
@@ -91,3 +93,10 @@ def test_finite_changes_keep_each_direct_source_owner(validator):
 )
 def test_unrelated_fields_and_empty_shell_actions_are_rejected(validator, change):
     assert list(validator.iter_errors({"read_ref": "task_app", "changes": [change]}))
+
+
+def test_revision_tool_guidance_routes_task_capability_order_to_its_own_action():
+    definition = next(tool for tool in jd_write_definitions() if tool["name"] == "revise_jd_item")
+    # Public contract wording, not a claim that the model will always select correctly.
+    assert "任務內 K/S 引用排序用本工具的 reorder_capability 動作" in definition["description"]
+    assert "項目／明細排序及任務移動用 move_jd_item" in definition["description"]

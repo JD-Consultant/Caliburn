@@ -187,3 +187,19 @@ resume 後才完成原答覆。取消後由 wrapper 拒絕採用。成功交回�
 指出原 App 程序退出後，舊 saver 的資料庫工作也須確認已結束，才可把新查詢無原件
 當遺失依據。程序／連線來源欄位是
 下一切片的候選解法，尚未新增或定案；不因本次薄接線擴張成通用程序 registry。
+
+## 7. 近期訪談預載超量的有界縮減（2026-09-30 恢復後）
+
+**問題：**[暫停交接](2026-09-30-pause-handoff.md)靜態對照定位的缺口——規格要求完整近期訪談使請求無法容納時，A 仍能繼續並自行回讀未預載範圍；現行 `_capture_data` 一律組入全部近期原話，超量時 `RequestCapacityError` 使該輪停住（V05「超量」）。極端才會觸發（首請求超過約 92 萬 token），但 Memory 長期無法發布或員工貼入大量文字時，同一檔案的每個新 Turn 都會被擋。
+
+**接線與取捨**（工程細節見[執行文件 §5.9](../../../implementation/agent-execution.md#59-首請求超量的近期訪談縮減t082026-09-30)）：不在 capture 階段另呼叫 count（正常 Turn 會多一次付費計數），而是沿共用迴圈既有的「count → 容量檢查 → compact」模式，讓首請求的精確 count 超過硬上限時走一條有界縮減路由：A 提供純函式，只保留最新完整訊息、員工回答的必要前問，並在 `interview_read_boundary` 明示 `preloaded`／`not_preloaded`。最多三次、每次一個精確 count，仍超量就照原行為以容量受阻結束。B1／B2、中途 Step、272K compact 路徑未變。不採用 OpenAI 伺服器端 `truncation: "auto"`（靜默丟輸入項，與規格不符；官方原頁未逐字核對，見執行文件的標註）。
+
+**Red（骨架：型別、`fit_first_request` 欄位與 `NotImplementedError` 函式先加入，避免把 import 錯誤當反例）：**`tests/unit/test_recent_preload.py`＋`tests/unit/test_request_capacity.py` 新增 23 個行為測例，**23 failed／15 passed**（另 15 個為原有容量測例）。失敗原因是函式尚未實作與迴圈仍丟 `RequestOverCapacityError`，不是環境錯誤。
+
+**Green：**同兩檔 **38 passed**。涵蓋：只留整則訊息的最新後綴且不改原文、員工回答帶回前一則問題（即使問題很大）、縮減必然真的變小（不因補前問而留下全部）、後續嘗試嚴格更小、不丟最新一則、未預載範圍只計 Memory 尚未涵蓋的序號、其餘輸入與原 request 不被改動、同輸入同輸出、單則已不能再縮則明確拒絕，以及迴圈端：縮減後以新 request 重新計數且只生成一次、最多三次、耗盡或回呼拒絕即停止且不生成、縮減後 count 失敗重開不再呼叫回呼、完成一個 Step 後的超量不走此路徑、未超量不打擾 owner。
+
+**真 PG 整合**（`test_consultant_context_binding.py`，隔離 `_test` schema；合成計數與模型，不是 provider）：三輪正式訪談後建立新 Turn，完整請求按字元計數為上限 1.25 倍；驗證完整 → 縮減 → 重新計數共 2 次 count、1 次生成；送出的 App 資料只含最新後綴，`not_preloaded` 與實際遺漏範圍一致；該範圍以 `read_interview_range` 在 A 的固定讀取上界內可完整讀回原文；正式完成後序號 8，重開迴圈不再 count 或生成。校準過程中，第一版測資讓固定部分（前輪原生歷史、工具、指引）佔請求 78%，縮到最小仍超量，函式因此明確回報「沒有更小的合法預載」——證明錯誤路徑真的走過；調整測資讓預載成為主要部分並改以動態倍率，不放寬斷言。
+
+**回歸與靜態：**unit＋contracts＋會走共用迴圈與 A runner 的 10 個真 PG 整合檔（context binding／runner／capacity／step／controls／preparation／memory runners／process recovery／supervisor／graph）**1058 passed in 84.45s**；Ruff format／check **384 files**、mypy **253 source files**、`git diff --check` 通過。命令沿[T06 §19](t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)（`CALIBURN_TEST_DATABASE_URL` 指向 loopback 55439 的 `caliburn_t01_test`，每案獨立 schema）。
+
+**未驗與限制：**（1）字元比例只是估計，正確性靠下一次精確 count；沒有真 provider 的 count／容量驗證。（2）沒有真模型驗證 A 看見 `not_preloaded` 會回讀而不是猜（歸 T14／T16 情境）；指引只加一句，未做 prompt 迭代。（3）固定部分或單一輸入本身超量、compact 後仍超量不屬此例外，維持容量受阻。（4）未重啟 Demo 8100／5173，Demo 仍跑舊程式。T08 不因本切片勾選。

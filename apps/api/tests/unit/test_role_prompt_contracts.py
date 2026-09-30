@@ -93,6 +93,11 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
         assert "保留有助辨認本人角色、服務範圍或責任界線的已知工作背景" in payload["instructions"]
         assert "共用背景不必每案重複完整職務資料" in payload["instructions"]
         assert "未說明的背景仍是未知，不為填滿職務資料而補造" in payload["instructions"]
+    if layer is not None:
+        # Required analysis boundary reaches the real role assembly. Natural adherence
+        # is evaluated separately; these literals do not grade employee facts.
+        assert "更正只套用明確涉及的範圍" in payload["instructions"]
+        assert "不能自動採信最後一句" in payload["instructions"]
 
 
 @pytest.mark.parametrize(

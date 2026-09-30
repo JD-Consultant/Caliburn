@@ -460,6 +460,19 @@ flowchart TD
 
 官方機制：使用 [Alembic `alter_column(nullable=True)`](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.alter_column)與 [SQLAlchemy nullable mapping](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#mapped-column-derives-the-datatype-and-nullability-from-the-mapped-annotation)，不手改舊 migration／另造配置引擎；完整 request 計數沿 [OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting)。政策是 Owner 決策，不宣稱供應商要求取消費用 gate。驗證與限制見 [T06 §19](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)。
 
+### 5.9 首請求超量的近期訪談縮減（T08，2026-09-30）
+
+產品規則見[顧問 context 規格「超量組裝」](../specs/2026-09-26-consultant-context-and-state-design.md#開始一輪)：正常仍完整預載近期訪談，只有完整資料使首個請求無法容納才例外。本節只記共用迴圈與 A 的接線，不重述規則。
+
+- **共用迴圈只多一條有界路由。**`check_capacity` 對超過硬上限（`allowed_input_tokens = min(max_input, context_window − max_output)`，由 `request_capacity.py` 單一計算）的精確 count 丟出 `RequestOverCapacityError`（仍是 `RequestCapacityError`）。僅當**尚無完成 Step**、runtime 提供 `fit_first_request`，且已縮減少於 `MAX_FIRST_REQUEST_FITS`（3）次時，改走 `fit_first_request → count_input → check_capacity`；其餘情況與先前相同：B1／B2 不提供回呼、中途 Step 的原生歷史與工具結果不由 loop 縮短、272K compact 路徑不變。每次縮減換新 request ID 並重新精確 count，已縮減次數存於 State（`first_request_fits`）；耗盡仍超量就以容量受阻結束，不生成。
+- **縮減是資料 owner 的純函式。**`agents/job_consultant/recent_preload.py` 只讀已保存 request 與 count，不查 DB、時間或模型；同輸入得同輸出，crash 後節點重跑不需 Held 交接，也不改任何業務資料。回傳完整替換 input items，loop 不知道訪談結構。
+- **保留什麼。**最新的完整訊息後綴，加上員工回答所回應的前一則顧問／App 訊息（不論多大）；至少保留最新一則；不切任何一句原文；App 資料訊息以外的歷史與本輪員工原話原樣保留。若保留結果會等於全部，改丟最舊訊息，確保真的縮減。`interview_read_boundary` 追加 `preloaded` 與 `not_preloaded`（後者只列 Memory 尚未涵蓋的序號範圍）；A 指引說明這代表尚未讀到、以 `read_interview` 在同一固定讀取上界內按需讀取，不當作已讀或已整理。完整預載時兩欄不出現，既有輸出不變。
+- **大小怎麼估。**精確 count 是唯一權威。縮減只用「整份請求字元數／該次 count」估每字元 token，目標為硬上限的 80%，之後每次再減半（80%、40%、20%）；估錯由下一次精確 count 抓到，不用估算放行。
+
+研究取捨：OpenAI Responses 另有伺服器端 `truncation: "auto"`（依搜尋所得轉述為由伺服器丟棄輸入項，未逐字核對原頁，且有社群回報早於上限截斷與破壞快取，均為尚未驗證），會靜默改變 A 看到的資料，與「不靜默截斷、讓 A 知道未預載」相反，故不採用。App 只給範圍識別、讓模型以工具按需載入，符合 Anthropic 的 [just-in-time context](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) 建議（公開共通原則，不是廠商保證）。
+
+不做／未驗：單一員工輸入、工具結果或固定部分（指引、工具、原生歷史、導覽）本身超量不屬此例外，仍回報容量受阻；沒有以真模型驗證 A 看到 `not_preloaded` 會實際回讀（歸 T14／T16），也沒有以 provider 驗證真實 count 與容量。實測見 [T08 §7](../plans/2026-09-29-target-rebuild/evidence/t08-consultant-turn.md#7-近期訪談預載超量的有界縮減2026-09-30-恢復後)。
+
 ## 6. 本機 A Supervisor（T08 有界接線）
 
 `workflows/consultant_supervisor.py` 借入 `runner.run` 與 session factory，擁有

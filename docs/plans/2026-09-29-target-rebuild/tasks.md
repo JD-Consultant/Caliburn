@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**Owner 要求純文件推送後安全暫停；T01–T05 已完成；T06–T11、T13–T15 已有施工／局部驗證，完整 gate 仍未完成**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T05 已完成；T06–T11、T13–T15 已有施工／局部驗證，完整 gate 仍未完成。2026-09-30 晚 Owner 以新 Goal 恢復施工（先前為純文件推送後的安全暫停）**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - **恢復範圍 successor（2026-09-30）：**T06／T08／T11／T12 依[共用執行 §6.4](../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)保留核心接續與安全退出；罕見原件遺失的全面追蹤／同工作再准入不再列為首版阻擋條件。已保存的結果及資料安全測試不刪減；本次最外層收尾證據見 [T12 §6](evidence/t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)，尚未勾選整項任務。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
@@ -106,6 +106,7 @@
 ## T08 A Turn：固定資料、正式完成與控制
 
 - [ ] T08；依賴：T02、T06、T07。
+- **2026-09-30 恢復後：**補上暫停交接定位的缺口——首請求超量時的有界近期訪談縮減（V05「超量」）。共用迴圈只多一條有界路由，A 以純函式保留最新完整訊息、員工回答的必要前問，並在起始資料明示未預載範圍，A 用既有 `read_interview` 回讀。unit／contracts＋10 個真 PG 整合檔 **1058 passed**；[證據與未驗範圍](evidence/t08-consultant-turn.md#7-近期訪談預載超量的有界縮減2026-09-30-恢復後)。真模型是否實際回讀、未知 attempt 的 production 核對仍未完成，不勾 T08。
 - **控制入口恢復增量：**typed 原件可交回既有 runner；換 writer、pending pause／續作、取消保護有定向證據，見 [T08 §6](evidence/t08-consultant-turn.md#6-原件交接穿過正式控制入口2026-09-30)。尚非 supervisor 自動交回／跨程序遺失再准入完成。
 - **最新整合：**`76f99867` 接通正式完成／控制、原生接續、背景要求與公開歷史；三輪真模型、兩批 Memory、暫停重開同輪續作、902 unit/contracts、725 PG integration（另補兩項真 Chromium）及重啟證據見 [T08 §5](evidence/t08-consultant-turn.md#5-顧問--背景整理的整合2026-09-30-1057-台北)。未知 attempt 的 production 核對接線、廣泛故障／品質仍未完成。
 - **2026-09-30 第一切片：**固定起始資料、共用模型／工具 loop、正式答覆／JD／歷史共同完成及 HTTP 派送通過合成 provider＋真 PG；缺模型設定不接受無法執行的輸入。控制、公開進度、背景要求及真 provider 仍待接線，見 [T08／T09 evidence](evidence/t08-consultant-turn.md)，不提前勾完成。

@@ -28,10 +28,14 @@ from caliburn.adapters.response_serialization import (
 )
 from caliburn.agent_execution.context_windows import SavedContextWindow, read_context_checkpoint
 from caliburn.agent_execution.request_capacity import (
+    MAX_FIRST_REQUEST_FITS,
     CompactionRequiredError,
     ModelCapacityLimits,
     ReceivedInputCount,
     RequestCapacityError,
+    RequestOverCapacityError,
+    RequestOverflow,
+    allowed_input_tokens,
     require_request_capacity,
     require_request_limits,
     validate_capacity_limits,
@@ -100,7 +104,8 @@ class ResponseStepState(TypedDict, total=False):
     input_count: ReceivedInputCount | None
     counted_request_id: UUID | None
     compacted_request_id: UUID | None
-    request_admission: Literal["request_model", "compact_window"]
+    first_request_fits: int
+    request_admission: Literal["request_model", "compact_window", "fit_first_request"]
     pause_enabled: bool
     control_action: Literal["pause", "continue"]
 
@@ -136,6 +141,12 @@ class ResponseStepRuntime:
     compact_window binds run_context_compaction to the same work guard and capacity
     policy. Re-entry must reconcile that boundary before any new external request;
     inactive work can settle its saved C, but cannot send, adopt or return a new window.
+
+    fit_first_request is the data owner's pure, deterministic reduction of a counted first
+    request that exceeds the hard input limit. It returns the complete replacement input
+    items (never a partial edit) or raises RequestCapacityError when nothing smaller is
+    legal. The loop recounts the result exactly; without this seam an oversized first
+    request stays capacity-blocked.
     """
 
     request_model: Callable[[ResponseRequest, UUID, int], Awaitable[ReceivedModelResponse]]
@@ -148,6 +159,7 @@ class ResponseStepRuntime:
     compact_window: (
         Callable[[ResponseRequest, ReceivedInputCount, UUID], Awaitable[NativeItems]] | None
     ) = None
+    fit_first_request: Callable[[ResponseRequest, RequestOverflow], NativeItems] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -716,10 +728,51 @@ def _build_response_step(
                     "The compacted window still exceeds the boundary threshold"
                 ) from error
             return {"request_admission": "compact_window"}
+        except RequestOverCapacityError:
+            # Only a first request may be reduced by its data's owner: later requests carry
+            # native history and tool results that this loop must never shorten.
+            if (
+                runtime.context.fit_first_request is None
+                or state.get("completed_steps", 0) != 0
+                or state.get("first_request_fits", 0) >= MAX_FIRST_REQUEST_FITS
+            ):
+                raise
+            return {"request_admission": "fit_first_request"}
         return {"request_admission": "request_model"}
 
-    def route_counted(state: ResponseStepState) -> Literal["request_model", "compact_window"]:
+    def route_counted(
+        state: ResponseStepState,
+    ) -> Literal["request_model", "compact_window", "fit_first_request"]:
         return state["request_admission"]
+
+    async def fit_first_request(
+        state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
+    ) -> ResponseStepState:
+        await runtime.context.ensure_active()
+        fit = runtime.context.fit_first_request
+        count = state.get("input_count")
+        if fit is None or count is None or state.get("counted_request_id") != state["request_id"]:
+            raise ValueError(
+                "A first-request reduction needs the saved count of this exact request"
+            )
+        request = ResponseRequest.from_snapshot(state["request_snapshot"])
+        fits = state.get("first_request_fits", 0)
+        # Pure and deterministic, so re-entry after a crash recomputes the same items.
+        items = fit(
+            request,
+            RequestOverflow(
+                input_tokens=count["input_tokens"],
+                allowed_input_tokens=allowed_input_tokens(request, state["capacity_limits"]),
+                attempt=fits + 1,
+            ),
+        )
+        return {
+            "request_id": uuid5(state["request_id"], "fitted"),
+            "request_snapshot": {**deepcopy(state["request_snapshot"]), "input": deepcopy(items)},
+            "input_count": None,
+            "counted_request_id": None,
+            "first_request_fits": fits + 1,
+        }
 
     async def compact_window(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
@@ -896,6 +949,7 @@ def _build_response_step(
     graph.add_node("count_input", count_input)
     graph.add_node("check_capacity", check_capacity)
     graph.add_node("compact_window", compact_window)
+    graph.add_node("fit_first_request", fit_first_request)
     graph.add_node("request_model", request_model)
     graph.add_node("account_response", account_response)
     graph.add_node("prepare_tool", prepare_tool)
@@ -905,6 +959,7 @@ def _build_response_step(
     graph.add_edge("count_input", "check_capacity")
     graph.add_conditional_edges("check_capacity", route_counted)
     graph.add_edge("compact_window", "count_input")
+    graph.add_edge("fit_first_request", "count_input")
     graph.add_edge("request_model", "account_response")
     graph.add_edge("account_response", "prepare_tool")
     graph.add_conditional_edges("prepare_tool", route_prepared)

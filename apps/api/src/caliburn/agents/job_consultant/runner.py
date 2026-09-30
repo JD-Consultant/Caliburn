@@ -37,6 +37,7 @@ from caliburn.agent_execution.tool_steps import (
 )
 from caliburn.agents.job_consultant.context_binding import TurnContext, capture_turn_context
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
+from caliburn.agents.job_consultant.recent_preload import fit_recent_interview_preload
 from caliburn.agents.job_consultant.tools import ConsultantTools, consultant_tool_definitions
 from caliburn.features.executions import budgets
 from caliburn.features.executions import service as executions
@@ -202,6 +203,7 @@ class ConsultantRunner:
             count_input=executor.count_input,
             capacity_limits=_CAPACITY,
             compact_window=compact_window,
+            fit_first_request=fit_recent_interview_preload,
         )
         config: RunnableConfig = {
             "configurable": {"thread_id": role_history.response_thread_id, "checkpoint_ns": ""}

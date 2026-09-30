@@ -15,6 +15,7 @@ from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agent_execution.context_compaction import CompactionRuntime
 from caliburn.agent_execution.tool_steps import run_response_loop
 from caliburn.agents.job_consultant.context_binding import TurnContext, capture_turn_context
+from caliburn.agents.job_consultant.recent_preload import fit_recent_interview_preload
 from caliburn.features.executions import history
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import AgentRole
@@ -27,7 +28,7 @@ from caliburn.features.executions.models import (
     StaleWriterError,
 )
 from caliburn.features.interviews import queries as interviews
-from caliburn.features.interviews.models import SubmitInterviewInput
+from caliburn.features.interviews.models import InterviewReadScope, SubmitInterviewInput
 from caliburn.features.job_description.models import ProfileField, ReviseJdProfile, SetProfileField
 from caliburn.features.job_files.models import CreateJobFile
 from caliburn.features.work_memory import candidate_queries as memory
@@ -438,6 +439,126 @@ def test_capture_commit_ack_loss_recovers_saved_request_without_refresh(
                 assert "原請求只能追加一次" not in json.dumps(
                     fresh.request.create_payload(), ensure_ascii=False
                 )
+        finally:
+            await database.close()
+
+    runner.run(scenario())
+
+
+def test_oversized_recent_interviews_shrink_to_the_newest_and_the_rest_stays_readable(
+    database_settings: DatabaseSettings, runner: asyncio.Runner
+) -> None:
+    async def scenario() -> None:
+        database = Database(database_settings)
+        dsn = make_conninfo(
+            database_settings.url, options=f"-c search_path={database_settings.schema}"
+        )
+        counted: list[dict] = []
+
+        try:
+            async with AsyncPostgresSaver.from_conn_string(dsn) as saver:
+                saver.serde = create_graph_serializer()
+                await saver.setup()
+                role = AgentRole.JOB_CONSULTANT
+                first = await start(database, "每月盤點時，我先核對系統庫存。" + "甲" * 3_000)
+                file_id = first.scope.job_file_id
+                await finish_seed(RoleContextHistory(database.sessions, first, role, saver), 1)
+                for ordinal, text in enumerate(
+                    ("每季補貨要看安全庫存。" + "乙" * 3_000, "年底清點倉庫。" + "丙" * 3_000),
+                    start=2,
+                ):
+                    seeded = await start(database, text, file_id)
+                    await finish_seed(
+                        RoleContextHistory(database.sessions, seeded, role, saver), ordinal
+                    )
+                writer = await start(database, "另一個也一樣。", file_id)
+                work = RoleContextHistory(database.sessions, writer, role, saver)
+                context = await capture(work, PreparationProbe())
+                full = json.loads(context.request.create_payload()["input"][-2]["content"])
+                everything = full["historical_interview"]["messages"]
+                assert [message["interview_sequence"] for message in everything] == list(
+                    range(1, 8)
+                )
+
+                # A synthetic model whose count is proportional to the request text: the full
+                # request is 1.25 times the input limit, so only a smaller preload can fit.
+                full_chars = len(json.dumps(context.request.count_payload(), ensure_ascii=False))
+                tokens_per_character = (
+                    1.25 * synthetic_capacity_limits()["max_input_tokens"] / full_chars
+                )
+
+                async def count_per_character(request: ResponseRequest, request_id: UUID):
+                    payload = request.count_payload()
+                    counted.append(payload)
+                    return {
+                        "input_tokens": int(
+                            len(json.dumps(payload, ensure_ascii=False)) * tokens_per_character
+                        ),
+                        "attempt_id": uuid4(),
+                    }
+
+                response = response_at(9, final=True)
+                model = LoopProbe([response])
+                runtime = replace(
+                    model.runtime(),
+                    count_input=count_per_character,
+                    fit_first_request=fit_recent_interview_preload,
+                )
+                options = {
+                    "thread_id": work.response_thread_id,
+                    "runtime": runtime,
+                    "max_tool_calls": 4,
+                    "max_model_steps": 2,
+                }
+                await run_response_loop(saver, request=context.request, **options)
+
+                assert len(counted) == 2
+                assert len(model.requests) == 1
+                sent = model.requests[0]["input"]
+                assert sent[-1] == {"role": "user", "content": "另一個也一樣。"}
+                assert sent[:-2] == context.request.create_payload()["input"][:-2]
+                data = json.loads(sent[-2]["content"])
+                kept = data["historical_interview"]["messages"]
+                assert 1 <= len(kept) < len(everything)
+                assert kept == everything[-len(kept) :]
+                boundary = data["interview_read_boundary"]
+                omitted = everything[: len(everything) - len(kept)]
+                assert boundary["through_sequence"] == 7
+                assert boundary["not_preloaded"] == [
+                    {
+                        "from_sequence": omitted[0]["interview_sequence"],
+                        "through_sequence": omitted[-1]["interview_sequence"],
+                    }
+                ]
+                assert boundary["preloaded"]["through_sequence"] == 7
+                # The omitted range is still a valid read inside A's fixed boundary.
+                async with database.sessions() as session:
+                    readable = await interviews.read_interview_range(
+                        session,
+                        InterviewReadScope(file_id, 7),
+                        start_sequence=omitted[0]["interview_sequence"],
+                        end_sequence=omitted[-1]["interview_sequence"],
+                    )
+                assert [
+                    {
+                        "interview_sequence": message.interview_sequence,
+                        "text": message.interview_text,
+                    }
+                    for message in readable
+                ] == [
+                    {"interview_sequence": message["interview_sequence"], "text": message["text"]}
+                    for message in omitted
+                ]
+
+                # The reduced window is the saved native history; reopening changes nothing.
+                completed = await work.read_completed_position()
+                exchange = await ConsultantCompletionWorkflow(database.sessions).complete(
+                    writer, context.candidate_position, response.output_text, completed
+                )
+                assert exchange.employee_input.interview_sequence == 8
+                await run_response_loop(saver, request=None, **options)
+                assert len(counted) == 2
+                assert len(model.requests) == 1
         finally:
             await database.close()
 

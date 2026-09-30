@@ -1,6 +1,6 @@
 # JD 保存接線
 
-- 狀態：**T03 已驗；T07 已接來源保存、完整按需讀取與 profile／建立任務的候選工具，尚非全部八入口。T08 共同完成已有真 PG＋合成模型接線，候選 UI／真模型品質仍待驗**。2026-09-30。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。歷次切片中的「尚未」是當時狀態，最新增量見 §3.3。
+- 狀態：**T03 已驗；T07 八入口已接上來源、按需讀取、局部寫入及兩類差異。T08 共同完成有真 PG 與三轮合成資料的真模型旅程；T13 条件撤回已接後端與 UI。長訪談品質及完整 gate 仍未完成**。2026-09-30。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。歷次切片中的「尚未」是當時狀態，最新增量見 §3.4–3.6。
 - 上位契約：[JD 欄位指南](../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
 
 ## 1. 本切片範圍與程式責任
@@ -342,7 +342,25 @@ flowchart LR
   Candidate --> Complete
 ```
 
-**尚未因此完成：**其餘模型寫入入口、兩類 diff、候選預覽 UI、provider strict／自然內容品質及完整故障矩陣。A 共同完成由 [consultant completion](../../apps/api/src/caliburn/workflows/consultant_completion.py)協調，不讓工具提交整輪；背景意圖未接入前不註冊通知工具。測試與審核見 [T07 證據 §3](../plans/2026-09-29-target-rebuild/evidence/t07-jd-tools.md#3-第二切片來源按需讀取與有據候選寫入2026-09-30)。
+**本切片當時尚未完成：**移動入口、兩類 diff、候選預覽 UI、provider strict／自然內容品質及完整故障矩陣。後續接線分見 §3.4–3.6 及 [T08 證據](../plans/2026-09-29-target-rebuild/evidence/t08-consultant-turn.md)。A 共同完成由 [consultant completion](../../apps/api/src/caliburn/workflows/consultant_completion.py)協調，不讓工具提交整輪；背景意圖必須等 A 正式完成才具有整理資格。
+
+### 3.4 建立、局部修訂與刪除模型項目
+
+`create_jd_item` 由 [建立 workflow](../../apps/api/src/caliburn/workflows/jd_item_creation.py) 接回既有職責／能力／協作／條件 owner；`revise_jd_item` 由 [修訂 workflow](../../apps/api/src/caliburn/workflows/jd_item_revision.py) 協調同項目文字、直屬明細、能力關係與直接依據；`delete_jd_item` 由 [刪除 workflow](../../apps/api/src/caliburn/workflows/jd_item_deletion.py) 沿既有刪除規則處理。不另存模型版 JD，也不把正式人工端點借給 A。
+
+各入口先將模型選擇解析為含原操作身分、候選位置與固定來源的 prepared value；Graph 保存型別化 JSON 後才執行。單工具內所有子操作共用一個短交易，重入用原 operation 的結果，不用目前最新稿替代原結果。成功只回精簡狀態／新定位，模型已有的全文不重複回送。可修正的語意參數錯誤回工具拒絕；DB／提交結果不明及失效 writer 不吞成一般參數錯誤。
+
+刪職責保留任務並转未歸屬；刪任務保留共用 K/S。仍被任務使用的 K/S 先拒絕並指引處理關係。修訂與刪除都保留其他項目及正式稿；只有整輪成功保存才採用候選。schema 仍為 `contracts/tools/` 唯一 wire 權威，不在此手抄參數。
+
+`move_jd_item` 沿 [移動 workflow](../../apps/api/src/caliburn/workflows/jd_item_movement.py) 接既有順序／歸屬 owner；任務可跨職責與未歸屬，其他項目只在同集合排序。任務換歸屬必要的相關短文修訂與結構同交易完成；不刪除重建身分、不自動確認來源。相對位置由當前候選解析，prepared command 固定後恢復沿原結果。模型選錯集合或不相關文字明確拒絕，無第二套位置／回執儲存。
+
+### 3.5 來源及人工改稿差異
+
+`read_jd_changes` 沿 [差異 workflow](../../apps/api/src/caliburn/workflows/jd_changes.py) 組合原 JD／Memory／執行歷史 owner 的只讀結果。來源比較該筆固定舊依據與本 Turn 的固定 Memory，展開相關引用鏈差異；人工比較上一個成功 Turn 的已採用 JD 與本輪起點，保留改回、no-op 與來源資格變化。不把取消當完成、不以同名接替舊物件、不給模型任意歷史全文入口，讀取不解除待核對。回傳沿既定 Markdown／有界拒絕契約，沒有第二份 diff 儲存。研究與反例見 [T07 差異證據](../plans/2026-09-29-target-rebuild/evidence/t07-jd-changes-source.md)。
+
+### 3.6 完成後的 JD 條件撤回
+
+[撤回 workflow](../../apps/api/src/caliburn/workflows/jd_undo.py) 先鎖原職務檔案，核對 completed Turn、原操作及人工准入。只在正式 JD 仍等於該輪採用修訂時，沿原輪前資料建立新的正式修訂；不倒轉訪談、Memory 或 context。後續有人工／AI 修改即拒絕，不推測反向合併。重送承接原撤回結果、不覆蓋後續新稿，UI 再讀目前正式稿。沿既有 JD operation，不另造 undo ledger；[T13 證據](../plans/2026-09-29-target-rebuild/evidence/t13-jd-undo.md)列出競爭／確認遺失及遷移反例。
 
 ## 4. 初始化、演進與保證界線
 

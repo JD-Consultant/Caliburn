@@ -66,6 +66,39 @@ async def read_adopted_context(
     return _head_position(record) if record is not None else None
 
 
+async def read_previous_completed_execution(
+    session: AsyncSession, scope: ExecutionScope, role: AgentRole
+) -> ExecutionScope | None:
+    """Follow this execution's fixed history ancestry through prepared-only windows.
+
+    Reads no native context bodies and does not advance history. An unavailable
+    reference is an error, never permission to substitute an empty initial baseline.
+    """
+    binding = await read_context_history(session, scope, role)
+    if binding is None:
+        raise HistoryConflictError("The current execution has no fixed context binding")
+    position = binding.base
+    visited: set[ContextPosition] = set()
+    while position is not None:
+        if position in visited:
+            raise HistoryConflictError("The context ancestry contains a cycle")
+        visited.add(position)
+        origin = await storage.read_position_origin(session, scope.job_file_id, role, position)
+        if origin is None:
+            raise HistoryConflictError("A fixed context ancestor is unavailable")
+        previous = ExecutionScope(scope.job_file_id, origin.execution_id, scope.kind)
+        if position.kind == HistoryWindowKind.COMPLETED_WORK:
+            if (
+                await service.read_execution(session, previous)
+            ).status != ExecutionStatus.COMPLETED:
+                raise HistoryConflictError(
+                    "A completed history reference lacks completed execution"
+                )
+            return previous
+        position = _binding(origin).base
+    return None
+
+
 async def adopt_prepared_context(
     session: AsyncSession, writer: ExecutionWriter, role: AgentRole, position: ContextPosition
 ) -> ContextBinding:
@@ -126,10 +159,8 @@ async def complete_context_histories(
     records: dict[AgentRole, storage.ContextHistoryBindingRecord] = {}
     for role in roles:
         position = positions[role]
-        if (
-            position.kind != HistoryWindowKind.COMPLETED_WORK
-            or position.thread_id
-            != context_thread_id(writer.scope, role, HistoryWindowKind.COMPLETED_WORK)
+        if position.kind != HistoryWindowKind.COMPLETED_WORK or not _belongs_to_completed_role(
+            writer.scope, role, position.thread_id
         ):
             raise HistoryConflictError(
                 "The completed window does not belong to this execution role"
@@ -163,6 +194,27 @@ async def complete_context_histories(
         records[role].completed_thread_id = position.thread_id
         records[role].completed_checkpoint_id = position.checkpoint_id
     await session.flush()
+
+
+def _belongs_to_completed_role(scope: ExecutionScope, role: AgentRole, thread_id: str) -> bool:
+    """A uses its root; Memory may adopt a role's exact native stage window.
+
+    The Memory parent separately proves that this is the completed current candidate
+    stage. This owner checks execution/role ownership, not candidate business semantics.
+    """
+    root = context_thread_id(scope, role, HistoryWindowKind.COMPLETED_WORK)
+    if thread_id == root:
+        return True
+    prefix = f"{root}:stage:"
+    if scope.kind != ExecutionKind.MEMORY_BATCH or not thread_id.startswith(prefix):
+        return False
+    parts = thread_id.removeprefix(prefix).split(":")
+    if len(parts) != 2:
+        return False
+    try:
+        return all(str(UUID(value)) == value for value in parts)
+    except ValueError:
+        return False
 
 
 def _required_roles(kind: ExecutionKind) -> tuple[AgentRole, ...]:

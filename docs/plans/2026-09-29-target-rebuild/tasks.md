@@ -188,6 +188,7 @@
 ## T14 訪談方法、角色指引與品質試例
 
 - [ ] T14；依賴：T07、T10。
+- **2026-10-01 跨面向審核：**核角色指引／工具說明／參數與實際 Context；補四份 JD schema 的欄位、增刪來源及逐筆確認語意，不改角色權限或歷史組裝。71 契約／接線測試及 13 真 PG 測試通過；有限模型檢查仍重現綜合職責漏保留來源，**未宣告品質修復**。審核範圍、研究、正反例及 Context 證據見 [T14 續頁](evidence/t14-job-analysis-quality.md#2026-10-01指引參數語意與實際-context-交叉審核)。停止同假說的提示微調，後續沿原品質 gate 判斷，不加來源猜補或新審核平台。
 - **最新材料：**13 個合成品質情境、oracle／rubric、角色組裝契約及固定 Demo 樣本人工式審讀，見 [T14 證據](evidence/t14-job-analysis-quality.md)；v3 新增跨輪來源兩例，實際對照與仍未通過的邊界見 [T17 來源驗證](evidence/t17-course-administrator-journey.md#真後端保存確認結果與保留缺口)。離線契約通過不代表模型品質已達標；獨立領域校準、全部情境真模型及長訪談仍待驗。
 - **契約：**[工作分析指南](../../specs/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作](../../specs/2026-09-09-jd-field-and-writing-guide.md)、[方法研究入口](../../specs/2026-09-09-job-analysis-and-jd-content-research.md)。
 - **程式／交付：**版本化角色 prompt／方法內容與全合成 fixtures／rubric；基於既有研究裁取適用內容，不複製整套指南到每次請求。

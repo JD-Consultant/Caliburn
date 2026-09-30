@@ -24,7 +24,11 @@ class SetItemText(BaseModel):
         ...,
         description="任務 title/description；職責 title/scope_text；K/S name/description；協作 name/scope_text；條件 text。",
     )
-    value: StrictStr = Field(..., min_length=1)
+    value: StrictStr = Field(
+        ...,
+        description="此欄完整的新文字，不是 patch；保留本次未更正的有效事實。這個動作不更改來源。",
+        min_length=1,
+    )
 
 
 class Field1(StrEnum):
@@ -72,7 +76,11 @@ class ReviseTaskDetail(BaseModel):
     )
     action: Literal["revise_detail"]
     detail_read_ref: StrictStr = Field(..., min_length=1)
-    text: StrictStr = Field(..., min_length=1)
+    text: StrictStr = Field(
+        ...,
+        description="此成果或要求的完整新文字；其他明細與既有來源保留，來源變動另列。",
+        min_length=1,
+    )
 
 
 class RemoveTaskDetail(BaseModel):
@@ -190,7 +198,10 @@ class AddTaskDetail(BaseModel):
         extra="forbid",
     )
     action: Literal["add_detail"]
-    kind: Kind
+    kind: Kind = Field(
+        ...,
+        description="outcome：交付或維持的結果與用途；requirement：已知的完成判準、執行條件或責任界線。不能把一次作法推定為固定要求。",
+    )
     text: StrictStr = Field(..., min_length=1)
     supporting_sources: list[Source]
 
@@ -209,7 +220,10 @@ class AddSource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["add_source"]
+    action: Literal["add_source"] = Field(
+        ...,
+        description="增加支持此內容的直接依據，不替換既有來源。綜合內容可由多則原話共同支持。",
+    )
     target: SourceTarget
     source: Source
 
@@ -218,18 +232,30 @@ class RemoveSource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["remove_source"]
+    action: Literal["remove_source"] = Field(
+        ...,
+        description="移除此 target 的整筆引用，不是只排除原文中被更正的一句。局部更正後，仍須留下共同支持本項保留事實的依據；失效、重複或已有充分替代的引用可移除。",
+    )
     target: SourceTarget
-    citation_ref: StrictStr = Field(..., min_length=1)
+    citation_ref: StrictStr = Field(
+        ...,
+        description="read_jd 返回、屬於此 target 的既有引用定位；不是訪談序號或 Memory 標題。",
+        min_length=1,
+    )
 
 
 class AlignSource(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    action: Literal["confirm_reference_alignment"]
+    action: Literal["confirm_reference_alignment"] = Field(
+        ...,
+        description="明確宣告已重評此筆引用仍支持所選 target 的目前內容，並完成必要修訂。不是確認其他引用或整項完成；僅讀過 diff、或此筆支持關係仍有未解衝突時不確認。",
+    )
     target: SourceTarget
-    citation_ref: StrictStr = Field(..., min_length=1)
+    citation_ref: StrictStr = Field(
+        ..., description="read_jd 返回、這次確實完成核對的既有引用定位。", min_length=1
+    )
 
 
 class ReviseJdItemArguments(BaseModel):
@@ -254,4 +280,8 @@ class ReviseJdItemArguments(BaseModel):
         | AddSource
         | RemoveSource
         | AlignSource
-    ] = Field(..., min_length=1)
+    ] = Field(
+        ...,
+        description="只列本次要執行的變更；未列的內容與來源保留。改文字不等於替換來源集合，新增來源也不需要先刪除既有來源。",
+        min_length=1,
+    )

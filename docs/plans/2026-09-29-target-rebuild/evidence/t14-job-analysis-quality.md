@@ -226,3 +226,77 @@ B1 檔案 SHA-256：`159ea1f626bd3f48b8a05f4eadb431665c971fa61931aa081c655ac9d38
 本次重讀 B1 instructions，檔案 SHA-256 仍為第三輪的 `a0a36a70a778fe7f23c8a386226f2501a4ac4f760c1edb33c1d39b7d48ca298c`。**檔案現況不證明生成此 snapshot 時載入了同一提示。**本輪沒有查模型請求歷史、啟動程序版本或重新呼叫 provider；[主線 T08 §5.4](t08-consultant-turn.md#54-第三輪更正真模型暫停接續1129-台北核對)記錄的是新 I6 加入後的第二批生成，不是提示 A/B 對照。因此：有新 Memory 產物品質證據，**沒有足以歸因新 B1 背景提示改善 G1 的證據**；其背景缺口在此快照仍可見。不得把 I6 新增事實帶來的改善，算成三句提示的效果，也不反推新提示必然失效。
 
 本輪僅以既有合成資料做代理審讀，沒有獨立領域專家校準、長訪談／其他職種測試、延遲成本對照或新 provider 驗證。前兩輪歷史結論保留；只追加本輪固定產物證據，另依主線要求將文首兩處 Owner 歸因更正為主線分派／回報。
+
+## 2026-10-01：指引、參數語意與實際 Context 交叉審核
+
+Owner 要求一起檢查 Agent prompt、tool description、參數 description 與實際 Context；不把品質問題一律歸因模型、不無限加提示。沿上述指南及共同工具規範，重新取得 [GPT-6 prompting 指引](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices)與 [function calling 參數設計建議](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)。官方支持排除互相矛盾的指令、清楚說明參數用途及限制、在實際型號評測；不保證某句提示消除錯引。本片維持 `gpt-6-luna`／medium，不把 Astra 建議當 Luna 品質保證，也不複製 coding agent 的廣泛自主權限。
+
+### 改動範圍與非改動
+
+- A／B1／B2 主指引、工具權限、14 項 A 工具集合與既有 Context 組裝不變。B1 只寫情境、B2 只寫理解、A 只讀 Memory 的分界無本片證據要求改動。
+- 四份 JD canonical schema 只補 `description`：職責／任務／成果／要求／K/S 關係的意義、文字更新與來源增刪的差別、整筆移除引用的語意，以及 App 提供的引用定位。Profile 明說直接匯報對象不是所有成果收件人。沒有增加參數、必填欄、來源數量門檻或新的保存機制。
+- 說明放在發生選擇的位置，不把所有工具語意再次抄入角色指引。既有 tool description 已有讀／寫時機與候選效果，本片不另加一份。來源選擇仍由模型依原話判斷，App 不猜補、不禁用合法刪除；`confirm_reference_alignment` 仍只作用於指定引用，不代表全項完成。
+- 參數契約由既有 generator 同步 Python、TypeScript 與 packaged schema；不手改生成檔。這是提示／契約澄清，不是新 Domain 行為，不用中文 exact-match 單元測試冒充模型品質 Red–Green。
+
+### 有界 provider 檢查（執行前 manifest）
+
+最多 4 次生成＋4 次 count、總預算 US$1，每次 input ≤40K／output ≤8,192、120 秒、零自動重試／compact，仍為 direct Responses、store=false／all_turns。兩次取 T17 已保存的第四輪「讀 JD 後」合成請求，只替換當前 canonical tool definitions；保留原生歷史及 instructions，不重寫原 checkpoint。另兩次使用全合成、無私人資料的相反情境：舊主管被明確更正，舊來源確實不再支持該欄，不能因保留指引而禁止合法移除。這兩次是乾淨構造的工具選擇 fixture，不冒充保存過的產品旅程。
+
+只讀模型公開工具選擇、文字與使用量，不執行寫入、不偽造成功、不輸出 opaque reasoning；只選讀取或沒有目標修訂時記未觀察。判準為「剩餘來源共同支持修改後的內容」，不是強制某個操作序列或引用數量。沿原自然失敗作基準，本片不再次廣跑 baseline。無穩定改善即停止，不改原 fail，也不宣告 T14／T17 通過。忽略目錄原件預定為 `jd-tool-descriptions-20261001.json`。
+
+首試在 sandbox 的 count 呼叫回 `APIConnectionError`，未開始生成，錯誤原件保留、不覆寫。改經已授權的網路執行環境作上述四次有限檢查，輸出另為 `jd-tool-descriptions-direct-20261001.json`；最多 4 次生成及 5 次 count 嘗試（含該連線失敗），不提高 US$1 上界、不啟用 SDK 自動重試。
+
+首次外送審查因保存 Context 可能含私人資料而拒絕，未換路徑繞過。先唯讀核對出處：`verify_core_journey.py` 新建隔離 `_test` DB schema、四個輸入逐字等於 `simulate_interview.py` 從 repo `personas.json` 的 `course_admin` 合成人設產生的 b0 第 2 試次（4/4 相等）；實際 Context 的歷史亦與同一合成檔案相符。提供此新增證據後，原有界執行獲准，沒有傳 Demo、真員工資料或金鑰正文。
+
+### 實際 Context：A 的固定請求審核
+
+唯讀核對 `core_journey_20261001_c2e1fcd8`、檔案 `c0aaed2f-22e5-40fa-98f5-a6bc12c0a2ef` 的第四輪，沒有改 DB 或呼叫 provider：
+
+- **48 項順序**：前三輪合法原生歷史 42 項 → App 參考資料（user）→ 本次員工原話（user）→ reasoning → assistant commentary → `read_jd` → 配對結果。12 組 call/result 完整、無重複 call ID、phase 保留；本次原話只出現一次，不在歷史訪談中。
+- 正式歷史保留說話者、訪談序號及歷史標記，原文與正式訪談一致。舊原生發言與後來 App 歷史投影有重複，但都是原順序中的歷史，不是重新加工成當次新輸入；本片不擅刪歷史以減 token。
+- 起始固定資料比首版 Memory 發布約早 7 秒；本 Turn 繼續用空快照基底和未整理訪談是正確 pin，不是漏刷新。讀 JD 的結果確實包含原引用及序號 2，不能把刪引用歸因來源沒提供。
+- 最初指定 checkpoint `1f1bcf19-6520-6c9d-8007-e9acb8a5dc69` 的**主 snapshot**仍是 44 項，但前次 probe 查的是 `checkpoint_writes.request_snapshot`，為完整 48 項；與後繼 `1f1bcf19-652f-6cc8-8008-8e4080d47cde` 主 snapshot 完全一致。另重算前次四個 request 指紋，皆與原件相符；不存在誤讀前置造成假對照的問題。
+
+未在這個自然樣本測 cancelled Turn 或 compact；取消隔離另以本次重跑的既有 `test_role_context_history.py` 提供確定性證據，不把它冒充壓縮後語意品質。
+
+### 實際 Context：B1／B2 的批次起始審核
+
+同一合成職務檔案的兩批 Memory，共四份已保存且具有外送紀錄的起始請求，唯讀比對角色指引、工具集合、原生歷史與 App 資料：
+
+| 批次 ID 前綴 | 角色 | input 項數 | 新增 App 參考資料 |
+|---|---|---|---|
+| `eeb6f87d…` | B1 | 1 | 情境導覽 0 筆、正式訪談序號 1–4 |
+| 同上 | B2 | 1 | 情境導覽 1 筆、理解導覽 0 筆、1 筆新增情境差異 |
+| `86b9dbd7…` | B1 | 9＝既有 8＋本批 1 | 情境導覽 1 筆、正式訪談序號 5–8 |
+| 同上 | B2 | 18＝既有 17＋本批 1 | 情境導覽 3 筆、理解導覽 1 筆、2 筆新增與 1 筆修改差異 |
+
+- 實際 instructions 與各自角色常數一致。B1 六項工具只含情境導覽／讀寫及訪談讀取；B2 八項工具含兩層導覽／讀取、理解寫入及訪談讀取，沒有情境寫入。未見 B1 混入理解資料或另一角色私有歷史。
+- 後一批請求前綴逐項承接該角色先前完成的原生歷史，再追加一則 user-role App 資料，明標非員工新發話。B2 收到非空 Markdown diff 及受影響理解；第二批修改指出一筆既有理解依賴。
+- 兩批固定訪談邊界分別為 `(K,F]=(0,4]`、`(4,8]`，截止於觸發整理且已完成的 A 輪之員工輸入。B1 原話與正式訪談逐項一致，B2 訪談讀取上限也沿用本批 F。
+
+本抽查未見角色資料、順序或批次邊界偏差；**不是四份請求之外所有中途請求的保證**，也未驗回交 B1、壓縮或語意分析品質。不因沒有發現組裝錯誤，就把自然模型的引用失敗判成已解決。
+
+### 真模型結果、審核與取捨
+
+最終描述經獨立覆核修正兩項過度表述：移除來源不能被寫成「只要仍有支持力就永遠不得移除」；確認引用不能被寫成整項／整欄核對。主代理對照既有來源行為測例後採用修正。最終資料形狀、權限及 Domain 操作未變。
+
+| 情境 | 試次 | 結果 |
+|---|---|---|
+| 綜合職責只更正出席彙整頻率 | 1、3 | 兩次均正確改為每季，但仍移除支持其他保留工作的原引用，只加本次更正。**來源語意缺口仍在，不採作已修復證據。**第 3 次另提出兩個有據任務，不抵銷這項失敗。 |
+| 直接匯報對象整欄由主任更正為校長 | 2、4 | 兩次均只改該欄、移除原主管引用、增加本次來源；職稱／單位引用保留。沒有因保留指引而禁止合法移除，也未把全部交接對象一起改掉。 |
+
+共 **4 次生成、4 次成功 count＋1 次連線失敗 count**；零工具執行、零自動重試／compact。成功生成 input 47,160、output 1,449（含 reasoning）。綜合職責請求由前次 baseline 的 14,109 增為 15,500 input tokens（約 +9.9%）；不能宣稱此次已降低 Context 耗用。增加的是可讀參數語意，不是更多業務欄位或載入全部指南。
+
+原件 `jd-tool-descriptions-direct-20261001.json` SHA-256 `ff53b45f375e6cd221a18fc746cb162452e4194ff3bc886bbe1851161ce5b847`；兩種 request SHA-256 分別為 `53e0e53473e2422f58407e838701732d5b40053738c4cb50095ff21afca29cd8`、`1151a6ac468ca2e5ac6895c3e22d0967c0f0f4051b062db0bab0e8e4e2e98fcd`。沒有保存或輸出私人 reasoning 明文。這是工具選擇檢查，沒有正式保存／PDF／UI 新旅程，不以 API completed 代替產品驗收。
+
+**採用界線：**保留參數契約的可讀性澄清，不把它標成錯引修復；A／B1／B2 主 prompt／工具集合／Context 均不為此再改一次。局部更正缺口需要後續獨立品質取捨，停止同假說的重試，不加 MUST、來源自動猜補、reviewer 或強制每輪全稿核對。T14／T17 維持未完成。
+
+### 確定性驗證
+
+在 `apps/api` 使用 `.venv-target/Scripts/python.exe -B`：
+
+- `-m pytest tests/contracts/test_tool_schema_strictness.py tests/contracts/test_jd_source_actions_wire.py tests/contracts/test_jd_item_revision_schema.py tests/contracts/test_jd_item_creation_wire.py tests/unit/test_role_prompt_contracts.py tests/unit/test_consultant_tools.py -q -p no:cacheprovider --tb=short`：最終措辭 **71 passed，1.81s**。實際定義載入 canonical 生成資源，所有角色 strict schema 保留；不是中文片語測試。
+- 設定隔離 `CALIBURN_TEST_DATABASE_URL` 後，`-m pytest tests/integration/test_jd_model_item_roundtrip.py tests/integration/test_jd_item_revision.py tests/integration/test_jd_source_tool_actions.py tests/integration/test_role_context_history.py -q -p no:cacheprovider --tb=short`：**13 passed，9.48s**。驗實際編碼／候選修改、逐筆來源確認、保存結果接續和取消歷史隔離；假模型，不證明自然來源品質。最終第二次文案修正未改任何資料形狀／Domain，沿用此結果。
+- `scripts/generate_contracts.py --check` 通過；首輪 sandbox 暫存寫入被拒後，使用同一既有生成器的核准環境完成，未手改生成檔。
+- 四份 canonical schema 與 HEAD 作遞迴比較，僅排除字串型 `description` 註解後完全一致；未刪除名為 description 的業務欄位。確認此次 wire shape 不變。
+- 前端在 `apps/web` 執行既有 `node node_modules/typescript/bin/tsc --noEmit` 通過。`pnpm typecheck` 在編譯前因套件管理器欲重整依賴、無互動終端而退出，未允許移除／重裝依賴；因此只聲明直接 TypeScript 檢查通過，不宣稱 pnpm wrapper 成功或重跑前端全套。

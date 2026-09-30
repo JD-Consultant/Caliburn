@@ -1,6 +1,5 @@
 """Compose A from shared native execution and existing product owners."""
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import timedelta
@@ -25,17 +24,13 @@ from caliburn.agent_execution.context_compaction import (
 from caliburn.agent_execution.request_capacity import (
     ModelCapacityLimits,
     ReceivedInputCount,
-    RequestCapacityError,
 )
 from caliburn.agent_execution.response_steps import (
-    IncompleteModelResponseError,
-    UnsupportedModelResponseError,
     inspect_response_step,
 )
 from caliburn.agent_execution.tool_steps import (
     HeldInputCount,
     HeldModelResponse,
-    ModelStepLimitError,
     PausedResponseLoop,
     ResponseStepRuntime,
     run_response_loop,
@@ -47,7 +42,6 @@ from caliburn.features.executions import budgets
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.budget_models import (
     BudgetConflictError,
-    BudgetExceededError,
     ExecutionBudget,
 )
 from caliburn.features.executions.history_models import (
@@ -56,9 +50,7 @@ from caliburn.features.executions.history_models import (
     context_thread_id,
 )
 from caliburn.features.executions.models import (
-    ExecutionInfo,
     ExecutionScope,
-    ExecutionStatus,
     ExecutionWriter,
 )
 from caliburn.features.interviews.models import FormalInterviewExchange
@@ -85,10 +77,7 @@ from caliburn.workflows.memory_reads import MemoryReadWorkflow
 from caliburn.workflows.model_requests import (
     ModelRequestAccounting,
     ModelRequestExecutor,
-    ModelRequestFailedError,
 )
-
-_LOG = logging.getLogger(__name__)
 
 type ConsultantRecovery = HeldModelResponse | HeldInputCount | HeldCompaction | HeldPreparationCount
 
@@ -107,43 +96,6 @@ class ConsultantRunner:
     client: AsyncOpenAI
     settings: ModelSettings
     on_commentary: Callable[[ExecutionScope, PublicCommentaryUpdate], None] | None = None
-
-    async def run_supervised(
-        self,
-        writer: ExecutionWriter,
-        *,
-        resume_interrupt_id: str | None = None,
-        recovery: ConsultantRecovery | None = None,
-    ) -> FormalInterviewExchange | PausedResponseLoop | ExecutionInfo:
-        """Known terminal limitations roll back this Turn; unknown saves remain recoverable.
-
-        No retry here: the shared request executor already owns its bounded retry policy.
-        An arbitrary exception, lost DB acknowledgement or held native result is NOT
-        proof of final failure and must stay available to the recovery supervisor.
-        """
-        try:
-            return await self.run(
-                writer, resume_interrupt_id=resume_interrupt_id, recovery=recovery
-            )
-        except (
-            ModelRequestFailedError,
-            BudgetExceededError,
-            ModelStepLimitError,
-            RequestCapacityError,
-            IncompleteModelResponseError,
-            UnsupportedModelResponseError,
-        ) as error:
-            result = await ConsultantCompletionWorkflow(self.sessions).stop(
-                writer, ExecutionStatus.FAILED
-            )
-            _LOG.warning(
-                "Consultant stopped at a known terminal boundary",
-                extra={
-                    "execution_id": str(writer.scope.execution_id),
-                    "failure_kind": type(error).__name__,
-                },
-            )
-            return result
 
     async def run(
         self,

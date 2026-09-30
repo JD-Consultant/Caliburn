@@ -485,7 +485,7 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 - resume 和 supervisor claim／launch 序列化，先等舊 paused invocation 退出，再沿公開
   `read_response_pause` 以原 builder／validator 查當前原生 interrupt。無原 interrupt 不放行。
   正式受理仍是原 owner 的 ACTIVE＋清除 pause intent；不新增控制表、State 或模型參數。
-- bootstrap 將 `runner.run_supervised` 經 `run_consultant_with_controls` 注入 supervisor。
+- bootstrap 將 `runner.run` 經 `run_consultant_with_controls` 及 §6.2 的唯一失敗收尾注入 supervisor。
   wrapper 從原 execution＋原 Graph 重讀已授權的 interrupt，因此 resume COMMIT 後、喚醒前
   中斷仍可接續。只由受控 resume 清除 `_attempted`，普通 notify 不授權重送或復活取消工作。
 - final 離開 Graph 後才收到 pause，若完成交易被原 owner 拒絕，wrapper 僅在原 writer 仍有效、
@@ -501,6 +501,27 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 resume 已提交但通知前重開，以及既存 budget／使用量不重置；模型為 synthetic transport。
 `tests/unit/test_response_pause_read.py` 核唯讀及已消耗 interrupt 不重現。HTTP／UI 整合由主線
 負責；這不是完整 T08、真模型或所有 crash／未知 COMMIT 矩陣的驗收。
+
+### 6.2 最外層失敗收尾（2026-09-30）
+
+依 [Owner 收斂的核心恢復範圍](../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)，`bootstrap.py` 在 A 的控制 wrapper 與 Memory batch 外共用 `workflows/execution_failures.py::run_with_failure_boundary`。它不是第二個恢復引擎；不增表、重試、模型參數或 UI 控制。
+
+```text
+既有角色執行／checkpoint 接續／有界恢復
+  ├─ 正常返回 → 保留既有完成或暫停結果
+  ├─ task cancellation → 向上傳遞，保留重開進度
+  └─ 未處理 Exception → 原業務 owner 核對並收尾
+       ├─ 已正式完成 → 保留原完成
+       ├─ 尚未完成 → 放棄本次候選，提交 failed
+       └─ 收尾未確認 → 向 supervisor 回報，不偽造終態
+```
+
+- A 沿 `ConsultantCompletionWorkflow.stop(FAILED)`；Memory 經 `MemoryBatchWorkflow.settle_failure` 保留既有 provider／分析結果／容量等原因分類，再沿 `MemoryConsolidationWorkflow.fail` 收尾；未分類錯誤只用安全代碼 `execution_interrupted`。候選丟棄與終態仍是原有短交易，正式完成競爭由原 job lock／writer fence 決定，不以 Python 例外推翻成功。
+- 原生已存資料照常接續；仍握有的原回應先走既有有界補存。最終離開原恢復流程後，本邊界可結束該次工作，不再為同一未明外送增加新的恢復平台或盲目重送。既有低層 typed recovery API 保留，但不宣稱所有原件都要永久救回。
+- `except Exception` 不攔 `asyncio.CancelledError`；正常關閉、控制取消及失鎖清理仍走原生命週期。原件補存的 cancellation subclass 同樣傳遞。
+- 日誌僅記 execution identity、kind、exception type，不記原錯誤訊息、provider body、原文或 reasoning。收尾自身失敗向上傳遞，不能顯示假 failed；DB 全面故障時仍需恢復服務，不承諾離線提交。
+- 通用 supervisor 只擁有 task／領導資格，不新增 JD／Memory 判斷；bootstrap 明確注入各自既有的業務收尾。實測範圍及限制見 [T12 §6](../plans/2026-09-29-target-rebuild/evidence/t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)。
+- 已移除 A／Memory 內層原 `run_supervised` 收尾 wrapper；原件接續與故障注入直接呼叫 `run`，產品正式執行只在最外層收尾一次。收尾本身拋錯直接回 supervisor，不再次分類、不第二次提交，也不把原 Memory failure reason 改成通用原因。
 
 ## 7. Memory 背景工作
 

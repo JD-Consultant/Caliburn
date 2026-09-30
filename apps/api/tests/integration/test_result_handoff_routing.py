@@ -142,7 +142,7 @@ def test_roles_reuse_all_four_originals_without_reissuing_or_resetting_budget(cl
         try:
             writer = await new_work()
             if kind in ("preparation_count", "compaction"):
-                await runner.run_supervised(writer)
+                await runner.run(writer)
                 writer = await new_work(writer.scope.job_file_id)
                 large_next = kind == "compaction"
             saver.available = False
@@ -154,21 +154,19 @@ def test_roles_reuse_all_four_originals_without_reissuing_or_resetting_budget(cl
                 "in_loop_compaction": CompactionSaveError,
             }[kind]
             with pytest.raises(failure_type) as failed:
-                await runner.run_supervised(writer)
+                await runner.run(writer)
             before = tuple(paths)
             async with database.sessions() as session:
                 policy = await budgets.read_execution_budget(session, writer.scope)
             with pytest.raises(ValueError):
-                await runner.run_supervised(
+                await runner.run(
                     writer, recovery=replace(failed.value.recovery, thread_id="foreign-scope")
                 )
             assert tuple(paths) == before
             with pytest.raises(ExecutionStateError):
-                await runner.run_supervised(
-                    replace(writer, writer_id=uuid4()), recovery=failed.value.recovery
-                )
+                await runner.run(replace(writer, writer_id=uuid4()), recovery=failed.value.recovery)
             assert tuple(paths) == before
-            await runner.run_supervised(writer, recovery=failed.value.recovery)
+            await runner.run(writer, recovery=failed.value.recovery)
             async with database.sessions() as session:
                 assert await budgets.read_execution_budget(session, writer.scope) == policy
             # Only work after the held boundary is allowed; the original call is never repeated.

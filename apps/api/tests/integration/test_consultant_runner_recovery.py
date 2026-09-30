@@ -82,7 +82,7 @@ def test_explicit_recovery_saves_original_result_without_repeating_outbound_work
     async def scenario() -> None:
         async with faulting_runner(client, channel) as (runner, calls):
             with pytest.raises(failure_type) as failed:
-                await runner.run_supervised(writer)
+                await runner.run(writer)
             recovery = failed.value.recovery
             original_calls = tuple(calls)
             async with client.app.state.database.sessions() as session:
@@ -92,16 +92,14 @@ def test_explicit_recovery_saves_original_result_without_repeating_outbound_work
 
             # Handoffs cannot pick another Step or double as pause-resume authority.
             with pytest.raises(ValueError, match="original Step"):
-                await runner.run_supervised(
+                await runner.run(
                     writer, recovery=replace(recovery, thread_id="not-the-original-step")
                 )
             with pytest.raises(ValueError, match="original paused loop"):
-                await runner.run_supervised(
-                    writer, recovery=recovery, resume_interrupt_id="not-authorized"
-                )
+                await runner.run(writer, recovery=recovery, resume_interrupt_id="not-authorized")
             assert tuple(calls) == original_calls
 
-            result = await runner.run_supervised(writer, recovery=recovery)
+            result = await runner.run(writer, recovery=recovery)
             assert isinstance(result, FormalInterviewExchange)
             assert result.consultant_reply.interview_text == ORIGINAL_REPLY
             assert result.employee_input.interview_sequence == 2
@@ -121,7 +119,7 @@ def test_held_result_cannot_restart_a_cancelled_turn(client: TestClient) -> None
     async def scenario() -> None:
         async with faulting_runner(client, "response_snapshot") as (runner, calls):
             with pytest.raises(ResponseStepSaveError) as failed:
-                await runner.run_supervised(writer)
+                await runner.run(writer)
             completion = ConsultantCompletionWorkflow(client.app.state.database.sessions)
             await completion.stop(writer, ExecutionStatus.CANCELLED)
             with pytest.raises(ExecutionStateError):
@@ -129,7 +127,7 @@ def test_held_result_cannot_restart_a_cancelled_turn(client: TestClient) -> None
                     writer,
                     sessions=runner.sessions,
                     checkpointer=runner.checkpointer,
-                    run=runner.run_supervised,
+                    run=runner.run,
                     recovery=failed.value.recovery,
                 )
             assert calls == ["/v1/responses/input_tokens", "/v1/responses"]
@@ -164,7 +162,7 @@ def test_supervised_handoff_preserves_original_response_and_pending_pause(
                     writer,
                     sessions=runner.sessions,
                     checkpointer=runner.checkpointer,
-                    run=runner.run_supervised,
+                    run=runner.run,
                 )
             async with runner.sessions.begin() as session:
                 if pause_requested:
@@ -176,7 +174,7 @@ def test_supervised_handoff_preserves_original_response_and_pending_pause(
                 replacement,
                 sessions=runner.sessions,
                 checkpointer=runner.checkpointer,
-                run=runner.run_supervised,
+                run=runner.run,
                 recovery=failed.value.recovery,
             )
             if pause_requested:
@@ -193,7 +191,7 @@ def test_supervised_handoff_preserves_original_response_and_pending_pause(
                     replacement,
                     sessions=runner.sessions,
                     checkpointer=runner.checkpointer,
-                    run=runner.run_supervised,
+                    run=runner.run,
                 )
                 assert isinstance(result, FormalInterviewExchange)
                 assert result.consultant_reply.interview_text == ORIGINAL_REPLY

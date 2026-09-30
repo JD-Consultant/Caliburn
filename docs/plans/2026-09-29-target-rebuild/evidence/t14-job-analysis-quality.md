@@ -358,3 +358,34 @@ Memory 最新快照另作唯讀抽查：3 情境、1 理解保留已知工作、
 `./.venv-target/Scripts/python.exe -B -m pytest tests/unit/test_role_prompt_contracts.py tests/unit/test_model_settings.py tests/unit/test_response_streaming.py tests/unit/test_terminal_response_handoff.py tests/contracts/test_openai_responses.py -q -p no:cacheprovider --tb=short`
 
 **59 passed，1.94s**；Ruff check 與 format --check 通過。這只證明設定、角色、公開串流及原件交接契約未被本改動破壞，不能消除上面的真旅程清理警告。未改 PDF／UI／資料庫交易，沿風險分層不重跑其全套。T14／T16／T17 維持未完成。
+
+## 2026-10-01：指南覆蓋與下一個品質缺口收斂
+
+基準 `d0d9452b`；本片是審查與既有測例驗證，**未再改角色指引、schema、模型設定或 Context**。完整回讀三份內容指南及三角色 instructions，對照既有 13 個品質情境、rubric 和前節實際請求證據；不因方法素材齊備就勾選 T14，也不要求每個簡單案例再重跑完整旅程。
+
+| 責任 | 目前已表達／已交付 | 不能因此推導的效果 |
+|---|---|---|
+| A 訪談與成稿 | 全工作廣度、本人責任、條件、未知、按需讀取、足夠即寫、主動引導；13 例有更正、無主語、低頻、人工稿及部分覆蓋反例 | 有指令不等於每次提問皆中立，或完整 JD 已達標 |
+| B1 情境 | 已知工作背景、具體處理、條件、未知與原話來源；不讀理解、不造新事實 | 四輪樣本的「還有人」變「另有一人」仍是未經支持的精確化，不能算已核實 |
+| B2 理解 | 跨情境共同模式、必要邊界、可下查依據；不逐案複製，不因新資料未提就刪舊工作 | 指令已禁止過度複製，不代表本次理解正文已足夠精煉 |
+| Tool／參數 | 工作內容與來源分開，參數明示語意、修改與確認界線；既有知識／技能建立與任務關聯入口俱在 | 工具可用不等於模型會適時選用；不因集合空白就自動填入公版能力 |
+| Context／評分材料 | 真請求抽查見前節；fixture 只把 input 作資料，oracle 明確限 reviewer 使用 | 不把 oracle、理想答案或下一輪資訊塞進產品 Context 來取得通過 |
+
+### 知識／技能：先分清未觀察與功能故障
+
+唯讀六份既有 `b0-*.json`：它們保存的 `jd.work.capabilities` 都為空。這是**先前 medium 配置的有限訪談樣本**，不是 high 新預設的對照結果。另完整讀 `b0-warehouse-2` 的 12 輪公開訪談與 JD：員工已說明採購／送貨單核對、儲位規則、掃碼、先進先出、盤點及退貨分工；後幾輪多次表示交接或作法尚不清楚，顧問仍詢問未明細節，尚未進入知識／技能的專業整理。不能把 12 輪截點當成模型已宣告整份完成，也不能因沒有 K/S 項目就推論 DB 丟資料。
+
+目前 `create_jd_item` 公開說明、`CapabilityItem.description` 與 parser 已提供 `knowledge`／`skill`，而且明示「從實際工作推得」；不是缺少工具或只能等員工自己說出 K/S 術語。指南要求的下一個品質問題是：**能否由已確認的實際工作提煉必要專業及用途，缺會改變結論的資料才中立追問，而非重抄任務、從職稱猜能力或為填空而寫。**本片沒有改成強制 K/S、每輪收尾清單或固定問卷；是否要改 Prompt 仍須由這項行為的有限對照決定。
+
+本片在 `apps/api` 重跑：
+
+- `./.venv-target/Scripts/python.exe -B -m pytest tests/unit/test_job_analysis_quality_fixtures.py tests/unit/test_role_prompt_contracts.py -q -p no:cacheprovider --tb=short`：**40 passed，1.58s**。驗素材、角色組裝及預設／override 接線，不代表 13 例自然模型皆通過。
+- 指定既有 loopback `_test` DB 後，`./.venv-target/Scripts/python.exe -B -m pytest tests/integration/test_jd_item_creation.py tests/integration/test_jd_model_item_roundtrip.py tests/contracts/test_jd_item_creation_wire.py -q -p no:cacheprovider --tb=short`：**14 passed，6.59s**。覆蓋知識／技能候選、來源、任務關聯及原操作重入，也驗模型 codec 的既有職責往返；不冒稱每種 K/S 都已真模型自然產生。fixture 只建立、清理自己新建的隨機 schema，原合成旅程和 Demo 不變。
+
+### 串流警告的有限離線診斷
+
+依 systematic-debugging 先找 owner／反例，而非看到關閉警告就加恢復包裝。獨立診斷回報：現有 streaming／terminal handoff **26 passed**；160 次離線合成串流比較 adapter、SDK 直接迭代及 httpx2 transport wrapper，terminal 均完整，GC／排程收尾後沒有重現終結警告或殘留 task。探針為 ignored `stream-finalization-probe-20261001-0243.py`；此結果由診斷代理執行，不算主代理另跑一輪。
+
+產品呼叫走 SDK `AsyncStream`；httpx2 transport 也有名為 `AsyncResponseStream` 的 generator。因此原警告的類名與 `jsonplus` 堆疊不足以歸責 SDK 高階 helper、serializer、`break` 或 effort。**根因仍未證實、不修改產品碼**；真 socket、連線池及實際並行 GC 時序未覆蓋。若自然再現，才取去敏完整 traceback／原碼位置與資源狀態；不為此再跑付費長旅程、改框架私有欄位或新建 cleanup／恢復機制。
+
+本片零 provider 外送、零 Demo 操作，沒有新增測試平台。T14 保持未完成：先補「專業提煉及成稿品質」的代表性觀察，再決定是否需要提示調整；不把「全部素材未逐一跑模型」當成必須無限擴測的理由，也不把獨立代理審讀冒充人類領域校準。

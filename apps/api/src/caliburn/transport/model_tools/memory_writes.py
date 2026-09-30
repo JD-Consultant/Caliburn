@@ -47,6 +47,45 @@ class PreparedMemoryToolCall:
     success_output: str
 
 
+def memory_write_names(layer: MemoryLayer) -> tuple[str, ...]:
+    return tuple(f"{action}_{layer.value}" for action in ("create", "update", "delete"))
+
+
+def memory_write_definitions(layer: MemoryLayer) -> list[FunctionToolParam]:
+    """Expose the canonical role contracts before a runtime candidate binding exists."""
+    subject = "工作情境" if layer == MemoryLayer.WORK_SITUATION else "工作理解"
+    references = (
+        "interview_references 的正式訪談序號"
+        if layer == MemoryLayer.WORK_SITUATION
+        else "work_situation_references 的目前情境標題"
+    )
+    descriptions = (
+        f"建立本批一項{subject}候選。提供完整 title、description、Markdown body"
+        f" 與{references}；"
+        "可無來源，但不能猜事實。來源不放正文。同層標題不得重複，成功不代表發布。",
+        f"修訂本批一項{subject}候選。target_title 精確選修改前物件；changes 只列要改的欄位，"
+        "每欄一次。title／description 給完整新值；body 給真實上下文的 V4A diff。"
+        f"{references}按需 add／remove，未列保留。全欄、全 hunk 通過才採用；"
+        "歧義拒絕，依回饋重讀／補上下文，不原樣盲重送。",
+        f"刪除本批一項{subject}候選，精確指定 target_title；不刪歷史快照或發布新版。"
+        + (
+            "同時解除指向它的候選理解關係，不刪理解。"
+            if layer == MemoryLayer.WORK_SITUATION
+            else "同時移除它自己的關係，不刪上游情境。"
+        ),
+    )
+    return [
+        function_definition(
+            name,
+            description,
+            "delete-memory-object-arguments"
+            if name.startswith("delete_")
+            else name.replace("_", "-") + "-arguments",
+        )
+        for name, description in zip(memory_write_names(layer), descriptions, strict=True)
+    ]
+
+
 class MemoryWriteTools:
     def __init__(
         self,
@@ -69,42 +108,10 @@ class MemoryWriteTools:
 
     @property
     def names(self) -> tuple[str, ...]:
-        layer = self.binding.stage.phase.value
-        return tuple(f"{action}_{layer}" for action in ("create", "update", "delete"))
+        return memory_write_names(self.binding.stage.phase)
 
     def definitions(self) -> list[FunctionToolParam]:
-        layer = self.binding.stage.phase
-        subject = "工作情境" if layer == MemoryLayer.WORK_SITUATION else "工作理解"
-        references = (
-            "interview_references 的正式訪談序號"
-            if layer == MemoryLayer.WORK_SITUATION
-            else "work_situation_references 的目前情境標題"
-        )
-        descriptions = (
-            f"建立本批一項{subject}候選。提供完整 title、description、Markdown body"
-            f" 與{references}；"
-            "可無來源，但不能猜事實。來源不放正文。同層標題不得重複，成功不代表發布。",
-            f"修訂本批一項{subject}候選。target_title 精確選修改前物件；changes 只列要改的欄位，"
-            "每欄一次。title／description 給完整新值；body 給真實上下文的 V4A diff。"
-            f"{references}按需 add／remove，未列保留。全欄、全 hunk 通過才採用；"
-            "歧義拒絕，依回饋重讀／補上下文，不原樣盲重送。",
-            f"刪除本批一項{subject}候選，精確指定 target_title；不刪歷史快照或發布新版。"
-            + (
-                "同時解除指向它的候選理解關係，不刪理解。"
-                if layer == MemoryLayer.WORK_SITUATION
-                else "同時移除它自己的關係，不刪上游情境。"
-            ),
-        )
-        return [
-            function_definition(
-                name,
-                description,
-                "delete-memory-object-arguments"
-                if name.startswith("delete_")
-                else name.replace("_", "-") + "-arguments",
-            )
-            for name, description in zip(self.names, descriptions, strict=True)
-        ]
+        return memory_write_definitions(self.binding.stage.phase)
 
     async def prepare(
         self, name: str, arguments: str, *, command_id: UUID

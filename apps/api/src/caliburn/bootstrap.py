@@ -27,6 +27,7 @@ from caliburn.transport.http.jd_areas import router as jd_areas_router
 from caliburn.transport.http.jd_capabilities import router as jd_capabilities_router
 from caliburn.transport.http.jd_collaborators import router as jd_collaborators_router
 from caliburn.transport.http.jd_conditions import router as jd_conditions_router
+from caliburn.transport.http.jd_evidence import router as jd_evidence_router
 from caliburn.transport.http.jd_export import router as jd_export_router
 from caliburn.transport.http.jd_profile import router as jd_profile_router
 from caliburn.transport.http.jd_tasks import router as jd_tasks_router
@@ -43,6 +44,7 @@ from caliburn.workflows.consultant_status import ConsultantStatusWorkflow
 from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
 from caliburn.workflows.interview_inputs import InterviewInputWorkflow
 from caliburn.workflows.jd_editing import JdEditingWorkflow
+from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
 from caliburn.workflows.jd_export import JdExportWorkflow
 from caliburn.workflows.jd_undo import JdUndoWorkflow
 from caliburn.workflows.job_files import JobFileWorkflow
@@ -61,6 +63,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.database = database
         app.state.job_file_workflow = JobFileWorkflow(database.sessions) if database else None
         app.state.jd_editing_workflow = JdEditingWorkflow(database.sessions) if database else None
+        app.state.jd_evidence_workflow = JdEvidenceWorkflow(database.sessions) if database else None
         app.state.jd_undo_workflow = JdUndoWorkflow(database.sessions) if database else None
         app.state.interview_input_workflow = (
             InterviewInputWorkflow(database.sessions) if database else None
@@ -187,6 +190,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(jd_conditions_router)
     app.include_router(jd_tasks_router)
     app.include_router(jd_work_router)
+    app.include_router(jd_evidence_router)
     app.include_router(jd_export_router)
     app.include_router(jd_undo_router)
     return app

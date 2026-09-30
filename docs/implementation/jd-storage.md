@@ -362,6 +362,17 @@ flowchart LR
 
 [撤回 workflow](../../apps/api/src/caliburn/workflows/jd_undo.py) 先鎖原職務檔案，核對 completed Turn、原操作及人工准入。只在正式 JD 仍等於該輪採用修訂時，沿原輪前資料建立新的正式修訂；不倒轉訪談、Memory 或 context。後續有人工／AI 修改即拒絕，不推測反向合併。重送承接原撤回結果、不覆蓋後續新稿，UI 再讀目前正式稿。沿既有 JD operation，不另造 undo ledger；[T13 證據](../plans/2026-09-29-target-rebuild/evidence/t13-jd-undo.md)列出競爭／確認遺失及遷移反例。
 
+### 3.7 人的正式來源回查（T09 增量）
+
+[來源回查 workflow](../../apps/api/src/caliburn/workflows/jd_evidence.py)只接受目前正式 JD 的直接引用，與 A 的候選工具准入分開。列表固定一次正式 head，返回各引用所屬欄位／項目、原来源名稱及待核對狀態；詳讀帶回該正式修訂和引用定位。若正式 JD 已更換，拒絕並要求重讀列表，不把舊定位改接新稿。候選修訂、未完成輸入、另一職務檔案及引用鏈以外的訊息均不能經此入口讀取。
+
+- 人回查的是「當時依據」：Memory 引用讀原快照所選修訂，再沿其中固定的情境／原話引用下鑽。標題後來改名、同名重建或物件不再出現在最新版，都不改寫原引用。這不是提供任意歷史 Memory 瀏覽器。
+- 人的差異比較以本次讀取捕捉的最新已發布 Memory 為新基準；A 仍以該 Turn 已固定的 Memory 為新基準。兩種准入／基準選取各自清楚，之後共用 [source queries](../../apps/api/src/caliburn/workflows/jd_source_queries.py) 與 [Markdown 投影](../../apps/api/src/caliburn/transport/jd_source_markdown.py)，不另存 diff、不複製來源。
+- 查詢先選 Memory 基準，再取得有效訪談上界，避免並行發布時用較早上界驗證較新快照。鏈路依物件與固定修訂辨認，不用標題匹配。比較正文改回原樣但修訂不同時，仍明示修訂變化；沒有淨文字差異不能當成已核對。
+- 閱讀、展開差異、重新載入都沒有寫入；不解除 `needs_review`、不變更原引用或其已核對 JD 基底。來源損壞／不再可讀需明示錯誤，不偽裝為空列表或無差異。
+
+HTTP 型別由 `contracts/http/jd-sources-view.schema.json`、`jd-source-content-view.schema.json`、`jd-source-changes-view.schema.json`生成，不手寫第二份 wire 契約。沒有新表、遷移、來源版本參數或確認工具；UI 呈現与實測見[介面 §3.1](interface-and-delivery.md#31-正式-jd-來源的唯讀下鑽t09)及 [T09 來源回查證據](../plans/2026-09-29-target-rebuild/evidence/t09-source-viewer.md)。
+
 ## 4. 初始化、演進與保證界線
 
 新建職務檔案、開場與空 JD 同一短交易；任一失敗不留下半套檔案。0005 為已存在的**新目標 0004** 檔案補一份空 JD，重跑 upgrade 不重建；沒有讀舊 production／搬舊資料。已知檔案卻缺少 JD head 是保存不一致，不在 GET 偷修成空白；缺 schema 的啟動仍 fail fast。

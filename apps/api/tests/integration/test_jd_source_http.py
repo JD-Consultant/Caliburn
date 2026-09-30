@@ -75,6 +75,12 @@ def test_only_completed_jd_evidence_can_be_read_and_no_pending_input_is_exposed(
         {
             "citation_id": str(citation_id),
             "target_label": "職務名稱",
+            "target": {
+                "kind": "profile_field",
+                "field": "job_title",
+                "item_id": None,
+                "task_id": None,
+            },
             "source_kind": "interview",
             "source_label": "訪談序號 2 · 員工",
             "needs_recheck": False,

@@ -4,7 +4,7 @@
 from enum import Enum
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 
 
 class SourceKind(Enum):
@@ -13,12 +13,43 @@ class SourceKind(Enum):
     WORK_UNDERSTANDING = "work_understanding"
 
 
+class Kind(Enum):
+    PROFILE_FIELD = "profile_field"
+    AREA = "area"
+    TASK = "task"
+    DETAIL = "detail"
+    CAPABILITY = "capability"
+    COLLABORATOR = "collaborator"
+    CONDITION = "condition"
+    TASK_CAPABILITY = "task_capability"
+
+
+class FieldModel(Enum):
+    JOB_TITLE = "job_title"
+    ORGANIZATION_UNIT = "organization_unit"
+    REPORTS_TO = "reports_to"
+    PURPOSE = "purpose"
+
+
+class Target(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    kind: Kind
+    field: FieldModel | None = Field(..., description="Set only for profile_field.")
+    item_id: UUID | None
+    task_id: UUID | None = Field(
+        ..., description="The owning task, set only for detail and task_capability."
+    )
+
+
 class Reference(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
     citation_id: UUID
     target_label: StrictStr
+    target: Target | None = None
     source_kind: SourceKind
     source_label: StrictStr
     needs_recheck: StrictBool

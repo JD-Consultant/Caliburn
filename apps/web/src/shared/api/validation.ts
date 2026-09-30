@@ -1,6 +1,8 @@
 /** Runtime guards use the same SSOT as generated types; no second field definitions. */
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import consultantTurnSchema from '../../../../api/contracts/http/consultant-turn.schema.json' with { type: 'json' };
+import type { ConsultantTurn } from './generated/consultant-turn';
 import createJobFileSchema from '../../../../api/contracts/http/create-job-file-request.schema.json' with { type: 'json' };
 import interviewHistorySchema from '../../../../api/contracts/http/interview-history.schema.json' with { type: 'json' };
 import jobFileListSchema from '../../../../api/contracts/http/job-file-list.schema.json' with { type: 'json' };
@@ -43,6 +45,10 @@ validator.addSchema(jdTasksSchema, 'jd-tasks-view.schema.json');
 validator.addSchema(jdCapabilitiesSchema, 'jd-capabilities-view.schema.json');
 validator.addSchema(jdCollaboratorsSchema, 'jd-collaborators-view.schema.json');
 validator.addSchema(jdConditionsSchema, 'jd-conditions-view.schema.json');
+validator.addSchema(jdProfileSchema, 'jd-profile-view.schema.json');
+validator.addSchema(jdWorkSchema, 'jd-work-view.schema.json');
+
+export const isConsultantTurn = validator.compile<ConsultantTurn>(consultantTurnSchema);
 
 export const isJobFileList = validator.compile<JobFileList>(jobFileListSchema);
 export const isJobFile = validator.compile<JobFile>({

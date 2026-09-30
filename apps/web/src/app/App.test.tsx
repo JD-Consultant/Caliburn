@@ -6,6 +6,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import type { JobFile } from '../shared/api/generated/job-file-list';
 import { isRenameJobFileRequest } from '../shared/api/validation';
 import { App } from './App';
+import { retainTurnHint } from '../features/interview/interview-turn-api';
 
 const firstFile: JobFile = {
   job_file_id: '10000000-0000-4000-8000-000000000001',
@@ -37,13 +38,14 @@ const emptyWork = {
 function renderApp(path = '/') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
-  return render(
+  const view = render(
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={[path]}>
         <App />
       </MemoryRouter>
     </QueryClientProvider>,
   );
+  return { ...view, client };
 }
 
 function history(text: string): Response {
@@ -54,12 +56,16 @@ function history(text: string): Response {
         interview_sequence: 1,
         speaker: 'app',
         interview_text: text,
+        execution_id: null,
       },
     ],
   });
 }
 
-beforeEach(() => sessionStorage.clear());
+beforeEach(() => {
+  sessionStorage.clear();
+  localStorage.clear();
+});
 afterEach(() => {
   clients.splice(0).forEach((client) => client.clear());
   vi.unstubAllGlobals();
@@ -114,7 +120,8 @@ test('建立後開啟原檔案並回讀正式開場，不生成員工輸入', as
   expect(await screen.findByRole('heading', { name: firstFile.display_name })).toBeVisible();
   expect(await screen.findByText('請談談最近一次完整的工作。')).toBeVisible();
   expect(screen.getByRole('heading', { name: 'App 開場引導 · 訪談序號 1' })).toBeVisible();
-  expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: '訪談內容' })).toHaveValue('');
+  expect(screen.getByRole('button', { name: '送出訪談' })).toBeEnabled();
   expect(fetch.mock.calls.filter(([, options]) => options?.method === 'POST')).toHaveLength(1);
 });
 
@@ -310,4 +317,260 @@ test('職務檔案提供 JD 基本資料讀取與人工編輯入口', async () =
   expect(await screen.findByRole('heading', { name: 'JD 職責與任務' })).toBeVisible();
   expect(await screen.findByRole('button', { name: '新增職責' })).toBeEnabled();
   expect(consoleError).not.toHaveBeenCalled();
+});
+
+test('PDF 下載入口使用同檔案正式稿網址並明示不含候選預覽', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((path: string) => {
+      if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
+      if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(emptyProfile));
+      return Promise.resolve(
+        path.endsWith('/interviews') ? history('請說明工作。') : Response.json(firstFile),
+      );
+    }),
+  );
+  renderApp(`/job-files/${firstFile.job_file_id}`);
+  const download = await screen.findByRole('link', { name: '匯出目前 JD（PDF）' });
+  expect(download).toHaveAttribute('href', `/api/job-files/${firstFile.job_file_id}/jd/export.pdf`);
+  expect(download).toHaveAttribute('download');
+  expect(screen.getByText('匯出目前已正式保存的版本，不包含本輪候選預覽。')).toBeVisible();
+});
+
+test('metadata 背景讀取失敗不卸載尚未送出的訪談與 JD 表單草稿', async () => {
+  const user = userEvent.setup();
+  let metadataUnavailable = false;
+  const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>((path) => {
+    if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
+    if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(emptyProfile));
+    if (path.endsWith('/interviews')) return Promise.resolve(history('正式開場'));
+    return Promise.resolve(
+      metadataUnavailable ? new Response(null, { status: 503 }) : Response.json(firstFile),
+    );
+  });
+  vi.stubGlobal('fetch', fetch);
+  const { client } = renderApp(`/job-files/${firstFile.job_file_id}`);
+  await user.type(await screen.findByRole('textbox', { name: '訪談內容' }), '尚未送出的原話');
+  await user.click(await screen.findByRole('button', { name: '編輯基本資料' }));
+  await user.type(screen.getByRole('textbox', { name: '職務名稱' }), '尚未保存的職稱');
+
+  metadataUnavailable = true;
+  await act(async () => {
+    await client.refetchQueries({ queryKey: ['job-file', firstFile.job_file_id], exact: true });
+  });
+  expect(await screen.findByText('暫時無法取得服務結果，請稍後再試。')).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: '職務名稱' })).toHaveValue('尚未保存的職稱');
+  await user.click(screen.getByRole('button', { name: '返回 JD' }));
+  expect(screen.getByRole('textbox', { name: '訪談內容' })).toHaveValue('尚未送出的原話');
+  expect(screen.getByText('暫時無法取得服務結果，請稍後再試。')).toBeVisible();
+
+  metadataUnavailable = false;
+  await user.click(screen.getByRole('button', { name: '重新讀取' }));
+  expect(screen.getByRole('textbox', { name: '訪談內容' })).toHaveValue('尚未送出的原話');
+  expect(fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+});
+
+test('cancelling a candidate removes only the preview and keeps the formal JD', async () => {
+  const executionId = '50000000-0000-4000-8000-000000000005';
+  const formalProfile = {
+    ...emptyProfile,
+    profile: { ...emptyProfile.profile, job_title: '原正式工程師' },
+  };
+  retainTurnHint(firstFile.job_file_id, {
+    command_id: '60000000-0000-4000-8000-000000000006',
+    execution_id: executionId,
+  });
+  let cancelled = false;
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((path: string, options?: RequestInit) => {
+      if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
+      if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(formalProfile));
+      if (path.endsWith('/cancel') && options?.method === 'POST') cancelled = true;
+      if (path.includes('/consultant-turns/'))
+        return Promise.resolve(
+          Response.json({
+            job_file_id: firstFile.job_file_id,
+            execution_id: executionId,
+            status: cancelled ? 'cancelled' : 'active',
+            pause_requested: false,
+            input_text: '尚非正式的輸入',
+            allowed_controls: cancelled ? [] : ['cancel'],
+            commentary: [],
+            candidate: !cancelled
+              ? { profile: { ...emptyProfile.profile, job_title: '候選工程師' }, work: emptyWork }
+              : null,
+          }),
+        );
+      return Promise.resolve(
+        path.endsWith('/interviews') ? history('正式開場') : Response.json(firstFile),
+      );
+    }),
+  );
+  renderApp(`/job-files/${firstFile.job_file_id}`);
+  expect(await screen.findByRole('region', { name: 'JD 候選預覽' })).toBeVisible();
+  expect(screen.getByText('候選工程師')).toBeVisible();
+  expect(await screen.findByText('原正式工程師')).toBeVisible();
+  expect(
+    screen.getByText('尚未正式保存；完成前不會取代正式 JD，PDF 仍匯出正式版本。'),
+  ).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'JD 基本資料' })).toBeVisible();
+  await userEvent.click(screen.getByRole('button', { name: '取消處理' }));
+  expect(await screen.findByText(/這次處理已取消/, {}, { timeout: 3_000 })).toBeVisible();
+  expect(screen.queryByRole('region', { name: 'JD 候選預覽' })).not.toBeInTheDocument();
+  expect(screen.queryByText('候選工程師')).not.toBeInTheDocument();
+  expect(screen.getByText('原正式工程師')).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'JD 基本資料' })).toBeVisible();
+});
+
+test('狀態查詢失敗不沿用候選或控制；查回 failed 仍保留正式 JD 且不重送輸入', async () => {
+  const executionId = '50000000-0000-4000-8000-000000000005';
+  retainTurnHint(firstFile.job_file_id, {
+    command_id: '60000000-0000-4000-8000-000000000006',
+    execution_id: executionId,
+  });
+  let state: 'active' | 'unavailable' | 'failed' = 'active';
+  const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>((path) => {
+    if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
+    if (path.endsWith('/jd/profile'))
+      return Promise.resolve(
+        Response.json({
+          ...emptyProfile,
+          profile: { ...emptyProfile.profile, job_title: '原正式工程師' },
+        }),
+      );
+    if (path.includes('/consultant-turns/'))
+      return Promise.resolve(
+        state === 'unavailable'
+          ? Response.json({ detail: 'private diagnostic' }, { status: 503 })
+          : Response.json({
+              job_file_id: firstFile.job_file_id,
+              execution_id: executionId,
+              status: state,
+              pause_requested: false,
+              input_text: '尚非正式的輸入',
+              allowed_controls: state === 'active' ? ['pause', 'cancel'] : [],
+              commentary: [],
+              candidate:
+                state === 'active'
+                  ? {
+                      profile: { ...emptyProfile.profile, job_title: '候選工程師' },
+                      work: emptyWork,
+                    }
+                  : null,
+            }),
+      );
+    return Promise.resolve(
+      path.endsWith('/interviews') ? history('正式開場') : Response.json(firstFile),
+    );
+  });
+  vi.stubGlobal('fetch', fetch);
+  const { client } = renderApp(`/job-files/${firstFile.job_file_id}`);
+  expect(await screen.findByRole('region', { name: 'JD 候選預覽' })).toBeVisible();
+  expect(screen.getByRole('button', { name: '暫停處理' })).toBeVisible();
+  state = 'unavailable';
+  await act(async () => {
+    await client.refetchQueries({
+      queryKey: ['consultant-turn', firstFile.job_file_id, executionId],
+    });
+  });
+  const retry = await screen.findByRole('button', { name: '重新讀取狀態' });
+  expect(screen.queryByRole('region', { name: 'JD 候選預覽' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /暫停處理|取消處理/ })).not.toBeInTheDocument();
+  expect(screen.queryByText('private diagnostic')).not.toBeInTheDocument();
+  expect(screen.getByText('原正式工程師')).toBeVisible();
+
+  state = 'failed';
+  await userEvent.click(retry);
+  expect(await screen.findByText(/這次處理未能完成/)).toBeVisible();
+  expect(screen.getByText('尚非正式的輸入')).toBeVisible();
+  expect(screen.getByText('原正式工程師')).toBeVisible();
+  expect(screen.queryByRole('region', { name: 'JD 候選預覽' })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole('button', { name: /暫停處理|取消處理|繼續處理/ }),
+  ).not.toBeInTheDocument();
+  expect(screen.getAllByRole('heading', { name: /訪談序號/ })).toHaveLength(1);
+  expect(fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+});
+
+test('歷史回答按需確認撤回只送原 Turn，成功重讀正式稿而不採用舊回傳覆蓋後來稿', async () => {
+  const executionId = '50000000-0000-4000-8000-000000000005';
+  const turnUrl = `/api/job-files/${firstFile.job_file_id}/consultant-turns/${executionId}`;
+  let undone = false;
+  let statusReads = 0;
+  let workReads = 0;
+  const writes: string[] = [];
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((path: string, options?: RequestInit) => {
+      if (options?.method === 'POST') {
+        expect(path).toBe(`${turnUrl}/undo-jd`);
+        expect(options.body).toBeUndefined();
+        writes.push(path);
+        undone = true;
+        return Promise.resolve(Response.json(emptyProfile));
+      }
+      if (path.endsWith('/jd/work')) {
+        workReads += 1;
+        return Promise.resolve(Response.json(emptyWork));
+      }
+      if (path.endsWith('/jd/profile'))
+        return Promise.resolve(
+          Response.json({
+            ...emptyProfile,
+            profile: {
+              ...emptyProfile.profile,
+              job_title: undone ? '撤回後其他頁面修改' : '原輪正式職稱',
+            },
+          }),
+        );
+      if (path.endsWith('/interviews'))
+        return Promise.resolve(
+          Response.json({
+            messages: [
+              {
+                source_id: '30000000-0000-4000-8000-000000000003',
+                interview_sequence: 3,
+                speaker: 'consultant',
+                interview_text: '應一直保留的正式回答',
+                execution_id: executionId,
+              },
+            ],
+          }),
+        );
+      if (path === turnUrl) {
+        statusReads += 1;
+        return Promise.resolve(
+          Response.json({
+            job_file_id: firstFile.job_file_id,
+            execution_id: executionId,
+            status: 'completed',
+            pause_requested: false,
+            allowed_controls: [],
+            input_text: '不重複顯示',
+            commentary: [],
+            candidate: null,
+          }),
+        );
+      }
+      return Promise.resolve(Response.json(firstFile));
+    }),
+  );
+  renderApp(`/job-files/${firstFile.job_file_id}`);
+  expect(await screen.findByText('應一直保留的正式回答')).toBeVisible();
+  expect(await screen.findByText('原輪正式職稱')).toBeVisible();
+  expect(screen.queryByRole('button', { name: '撤回這輪 JD' })).not.toBeInTheDocument();
+  expect(statusReads).toBe(0);
+  await userEvent.click(screen.getByRole('button', { name: /回看本次公開處理訊息/ }));
+  await userEvent.click(await screen.findByRole('button', { name: '撤回這輪 JD' }));
+  expect(screen.getByRole('dialog')).toHaveTextContent('不撤回訪談或工作記憶');
+  expect(screen.getByRole('dialog')).toHaveTextContent('後續人工修改');
+  expect(writes).toEqual([]);
+  await userEvent.click(screen.getByRole('button', { name: '確認只撤回這輪 JD' }));
+  expect(await screen.findByText(/這輪 JD 撤回已確認/)).toBeVisible();
+  expect(await screen.findByText('撤回後其他頁面修改')).toBeVisible();
+  expect(screen.getByText('應一直保留的正式回答')).toBeVisible();
+  expect(statusReads).toBeGreaterThanOrEqual(2);
+  expect(workReads).toBeGreaterThanOrEqual(2);
+  expect(writes).toEqual([`${turnUrl}/undo-jd`]);
 });

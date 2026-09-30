@@ -1,9 +1,11 @@
-/** Only formal source history; private reasoning and execution progress do not enter here. */
+/** Formal transcript with a separate, non-source disclosure of saved public commentary. */
 import { useQuery } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
 import { Alert, Button, Paper, Stack, Typography } from '@mui/material';
 import type { InterviewMessage } from '../../shared/api/generated/interview-history';
 import { describeReadError } from '../../shared/api/http';
 import { interviewHistoryQuery } from './interview-api';
+import { HistoricalTurnMessages } from './HistoricalTurnMessages';
 
 const speakerLabels: Record<InterviewMessage['speaker'], string> = {
   app: 'App 開場引導',
@@ -11,7 +13,13 @@ const speakerLabels: Record<InterviewMessage['speaker'], string> = {
   consultant: '職務顧問',
 };
 
-export function InterviewHistory({ jobFileId }: { jobFileId: string }) {
+export function InterviewHistory({
+  jobFileId,
+  renderTurnActions,
+}: {
+  jobFileId: string;
+  renderTurnActions?: (executionId: string) => ReactNode;
+}) {
   const history = useQuery(interviewHistoryQuery(jobFileId));
   return (
     <section aria-labelledby="interview-heading">
@@ -49,6 +57,13 @@ export function InterviewHistory({ jobFileId }: { jobFileId: string }) {
                 {speakerLabels[message.speaker]} · 訪談序號 {message.interview_sequence}
               </Typography>
               <p className="interview-text">{message.interview_text}</p>
+              {message.speaker === 'consultant' && message.execution_id !== null && (
+                <HistoricalTurnMessages
+                  jobFileId={jobFileId}
+                  executionId={message.execution_id}
+                  renderTurnActions={renderTurnActions}
+                />
+              )}
             </Paper>
           ))}
         </Stack>

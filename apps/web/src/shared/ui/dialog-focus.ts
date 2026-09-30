@@ -1,4 +1,4 @@
-/** Transition completion must not steal focus from a user who already started editing. */
+/** Initialize dialog focus after transition without stealing an existing user selection. */
 export function focusDialogInput(input: HTMLInputElement | null): void {
   if (!input) return;
   const active = document.activeElement;

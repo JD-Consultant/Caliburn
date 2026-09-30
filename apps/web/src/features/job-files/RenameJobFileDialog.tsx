@@ -16,6 +16,7 @@ import type { JobFile } from '../../shared/api/generated/job-file-list';
 import type { RenameJobFileRequest } from '../../shared/api/generated/rename-job-file-request';
 import { ApiError } from '../../shared/api/http';
 import { isRenameJobFileRequest } from '../../shared/api/validation';
+import { focusDialogInput } from '../../shared/ui/dialog-focus';
 import { renameJobFile } from './job-file-api';
 import { clearPendingRename, readPendingRename, retainPendingRename } from './rename-command';
 
@@ -108,7 +109,7 @@ export function RenameJobFileDialog({ file, onClose, onRefresh }: Props) {
       fullWidth
       maxWidth="sm"
       aria-labelledby="rename-file-title"
-      slotProps={{ transition: { onEntered: () => nameInput.current?.focus() } }}
+      slotProps={{ transition: { onEntered: () => focusDialogInput(nameInput.current) } }}
     >
       <form
         onSubmit={(event) => {

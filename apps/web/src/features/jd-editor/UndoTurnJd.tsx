@@ -1,0 +1,131 @@
+/** A conditional JD-only command; the server decides eligibility and preserves its original result. */
+import { useId, useRef, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  Typography,
+} from '@mui/material';
+import { ApiError } from '../../shared/api/http';
+import { jdProfileQuery } from './jd-profile-api';
+import { jdWorkQuery } from './jd-work-api';
+import { undoTurnJd } from './jd-undo-api';
+
+interface Props {
+  jobFileId: string;
+  executionId: string;
+  onUndone: () => Promise<void>;
+}
+
+export function UndoTurnJd({ jobFileId, executionId, onUndone }: Props) {
+  const [open, setOpen] = useState(false);
+  const [refreshFailed, setRefreshFailed] = useState(false);
+  const titleId = useId();
+  const inFlight = useRef(false);
+  const queryClient = useQueryClient();
+  const undo = useMutation({
+    mutationFn: () => undoTurnJd(jobFileId, executionId),
+    retry: false,
+    networkMode: 'always',
+  });
+  const rejected =
+    undo.error instanceof ApiError && [404, 409, 422].includes(undo.error.status ?? 0);
+
+  async function confirmUndo(): Promise<void> {
+    if (inFlight.current || rejected) return;
+    inFlight.current = true;
+    try {
+      await undo.mutateAsync();
+    } catch {
+      inFlight.current = false;
+      return;
+    }
+    setOpen(false);
+    // The operation's original result may predate later edits. Always read the current formal JD.
+    try {
+      await Promise.all([
+        queryClient.invalidateQueries(
+          { queryKey: jdProfileQuery(jobFileId).queryKey },
+          { throwOnError: true },
+        ),
+        queryClient.invalidateQueries(
+          { queryKey: jdWorkQuery(jobFileId).queryKey },
+          { throwOnError: true },
+        ),
+        onUndone(),
+      ]);
+    } catch {
+      setRefreshFailed(true);
+    } finally {
+      inFlight.current = false;
+    }
+  }
+
+  return (
+    <Stack spacing={1} sx={{ mt: 2 }}>
+      {undo.isSuccess ? (
+        <Alert severity="success">這輪 JD 撤回已確認；訪談與工作記憶未撤回。</Alert>
+      ) : (
+        <Button
+          color="warning"
+          onClick={() => {
+            undo.reset();
+            setOpen(true);
+          }}
+        >
+          撤回這輪 JD
+        </Button>
+      )}
+      {refreshFailed && (
+        <Alert severity="warning">撤回已保存，但畫面尚未更新。請重新開啟這份職務檔案。</Alert>
+      )}
+      <Dialog
+        open={open}
+        onClose={undo.isPending ? undefined : () => setOpen(false)}
+        aria-labelledby={titleId}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle id={titleId}>確認撤回這輪 JD 修改</DialogTitle>
+        <DialogContent>
+          <Typography>只撤回這輪對 JD 的修改，不撤回訪談或工作記憶（Memory）。</Typography>
+          <Typography sx={{ mt: 1 }}>
+            若已有後續人工修改或其他 JD
+            修改，伺服器將拒絕撤回，不覆蓋目前內容。是否可撤回由伺服器確認。
+          </Typography>
+          {undo.isError && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              {rejected
+                ? '這輪目前不允許撤回，可能已有後續修改或處理中的訪談。沒有覆蓋目前 JD；請重讀目前稿後再判斷。'
+                : '撤回結果尚未確認，不會自動重送。可重新確認同一輪撤回；關閉視窗不代表撤回未生效。'}
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={undo.isPending} onClick={() => setOpen(false)}>
+            關閉
+          </Button>
+          <Button
+            color="warning"
+            variant="contained"
+            disabled={undo.isPending || rejected}
+            onClick={() => {
+              void confirmUndo();
+            }}
+          >
+            {undo.isPending
+              ? '正在確認撤回…'
+              : undo.isError && !rejected
+                ? '重新確認同輪撤回'
+                : '確認只撤回這輪 JD'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Stack>
+  );
+}

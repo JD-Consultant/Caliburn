@@ -237,3 +237,43 @@ ignored 證據指紋（均全合成；不提交原 native reasoning）：
 候選只補充「局部更正不使整則舊原話失效，仍支持保留內容的來源應保留」，未改 schema、模型或工具權限。兩次中僅一次改善，不足以採用；**不再堆提示詞、不禁止合法刪來源，也不由程式猜補事實依據**。本輪到此停止品質試驗，保留此已知限制供後續品質切片，不把 API completed 當作 T17 通過。
 
 共 4 次生成、4 次 count、零重試／compact；生成 input 合計 56,592、output 2,298（含 reasoning），沒有讀取私有推理。ignored 原件 SHA-256：`a1e0377aadafa9ff44ca863fc1d9014fc1a351516cbf2b71482d484d06563185`。本次沒有產品 Prompt／Tool 程式變更，既有可操作拒絕提示修正仍維持。
+
+## 2026-10-01：既有真模型產物的 UI 與 PDF 續驗
+
+沿 [T14 六輪核心 App 對照](t14-job-analysis-quality.md#2026-10-01較高能力模型的核心-app-旅程對照)已保存的同一份 JD 補完整交付路徑；**零新模型外送、沒有人工補稿或改寫原產物**。這份原產物來自 Sol，不能冒充 Luna 品質證據；Owner 隨後已因成本決定產品維持 Luna／high，見 [T14 決策補記](t14-job-analysis-quality.md#2026-10-01owner-決定維持-luna)。
+
+### 環境與唯讀旅程
+
+新自有 loopback 58142 程序使用同一隔離 `core_journey_20261001_2331dc65` schema，**明確 `model=None`、不載入憑證**；使用目前 Web build、已驗 Chromium／中文字型，Demo 8100／5173 及其資料不變。瀏覽器只回看及匯出，不送新訪談、改稿或撤回。
+
+- 職務檔案 `3450e704-3cb5-4b38-8d10-c2aae7156416` 的正式訪談序號 1–13、五項任務及能力／協作資料可顯示；正式 JD 仍為 `4ee14de2-f1cd-4893-9f96-912071f83c58`。
+- 來源面板列出 54 筆依據；按出席紀錄任務的序號 8 讀回原話，日常出席、指定資料夾、每月→每季、人次口徑及不連帶變更其他工作均與保存原文相符。全部 54 筆逐字回讀已在 T14 驗過，本次不冒稱逐一點擊全部項目。
+- 最後一輪「查看這輪 JD 變更」能顯示新增報名資料核對與異常分流技能及關係；這是該輪已保存的淨變更，不是推理或逐 Step trace。
+- 已保存兩則公開中間訊息經下述修正後可展開，明示「非正式訪談、不可引用」；不新增正式訪談序號、不重新產生回答。
+
+### 真實接縫：無模型設定意外停用了歷史投影
+
+首次瀏覽器展開已完成回答時顯示「公開處理訊息目前無法讀取」。不是原訊息遺失：HTTP status 返回 `commentary:null`；`ConsultantStatusWorkflow` 沒有 checkpointer 時不投影。根因是 composition root 把既有 PG saver／status 接線放在 model 配置分支內，使**只讀已保存歷史**意外依賴模型金鑰。
+
+依 [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/)的共用資源生命週期與 [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence) 的已保存 state 查詢機制，將 saver 的既有建立／setup／關閉放到 DB lifespan，模型 client／runner／supervisor 仍留在 model guard。這是 Caliburn 的權責修正，不是聲稱官方強制此分檔。沒有增加新 store、快取、歷史副本或恢復平台。
+
+既有 `test_http_input_reaches_saved_formal_answer_and_reopens_without_model` 先完成一次真 PG＋合成 provider 的顧問答覆，再關閉 App，以無模型設定重開同 DB：
+
+1. 原 execution 應回原 commentary 與 completed；不能因無 key 丟失回看能力。
+2. 模型呼叫仍只有一次；新員工輸入返回 `503 model_not_configured`。
+
+修正前 **1 failed、2 deselected**（commentary 為 null），修正後相關 **22 passed、13.68s**；涵蓋 HTTP execution／status／controls／commentary stream、bootstrap 與公開投影。scoped mypy、兩檔 Ruff check／format 通過。真瀏覽器重開後，原兩則 commentary 亦可讀；此測例使用合成 HTTP provider，不是新的真模型品質驗收。
+
+提交前唯讀審查另指出 `/current` 的舊測試仍期待 `commentary:null`；實跑 **1 failed、12 passed**，只有此項不符。現在 saver 已可讀、尚無訊息，正確表示應為 `[]`（不是不可用的 null）；只更新該預期，未放寬契約。合併上述六檔與 `test_current_consultant_turn.py`、`test_interview_history_turns.py`，提交前 **37 passed、21.65s**，scoped mypy、三個變更 Python 檔 Ruff check／format 通過。審查確認 SDK／supervisors 仍受模型配置 guard；額外建構次數 spy 屬非阻擋補強，未增加測試框架。
+
+### 同份 JD 的正式 PDF
+
+從畫面「匯出目前 JD（PDF）」實際下載 `job-description (3).pdf`，SHA-256 `f016a1114052cea96f4d4722fb560406adc3dfc6f2bda5e3f6613413cc48e2a9`，**754,092 bytes／3 頁 A4**。Poppler 逐頁渲染並檢視全部三頁：中文可讀，無遮疊或截斷；跨頁任務及成果／要求、知識／技能、四個協作對象均保留，頁碼正確，不含員工姓名。沒有來源鏈／中間訊息混入 JD 成品。
+
+pypdf 抽取後對照原保存 JD 的 **49 個非空文字欄位**，經明示的 Unicode NFKC、`⻑`→`長` 及空白正規化後全部可找到。**這只是比對方式，不修改 PDF，也不是原文字元完全相同的證明**；未正規化有 37 欄因既有字型 cmap 部首字元而不相同，沿 [T13 已知文字層限制](t13-pdf-export.md#任務完成對照與-pdf-文字層診斷2026-09-30-恢復後)，不新增字型加工系統。三頁 PNG 留於 ignored `.research-tmp/eval/core-journey-sol-pdf-1.png` 至 `-3.png`；原下載留在本機 Downloads。瀏覽器下載橋接回應耗時異常，未取得可靠端到端耗時量測，不能將工具等待時間當產品匯出延遲。
+
+### 結論與未驗
+
+本片確認**同一已保存產物 → UI 回看／來源 → PDF**可用，並修正無模型時的歷史投影接線。沒有修改 Prompt／Tool descriptions／Context 組裝、產品模型或正式資料；不把機制通過當成 Luna 的來源語意缺口已修復。JD→Memory 換版 diff 的真模型判斷、廣泛長訪談品質及 T16／T18 原 gate 仍按原文件，T17 不勾選完成。後續以 Luna 及既有原件處理核心缺口，不再追加 Sol 比較。
+
+自有驗證程序已正常完成 shutdown，唯讀分頁關閉；合成 DB／PDF／PNG 保留，沒有停止 Demo 或刪除資料。本次新增／修改的 12 個相對文件連結均可找到目標，`git diff --check` 通過；全檔檢查所見舊 worktree 歷史連結失效不在本片改寫。

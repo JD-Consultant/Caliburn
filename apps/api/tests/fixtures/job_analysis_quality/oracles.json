@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "audience": "reviewer_only_never_model_input",
   "cases": {
     "correction_keeps_other_case": {
@@ -118,6 +118,32 @@
       },
       "hard_failures": ["未確認職務背景被肯定化", "把交接誤寫成匯報權責或增添拆機責任"],
       "acceptable_variation": "可將受理與回覆放在一項或多項情境；不要求固定未知欄位、完整profile或立即追問，已知服務範圍不能因背景未知而消失。"
+    },
+    "historical_fact_keeps_historical_source": {
+      "guide_sections": {"analysis": [4, 9], "writing": [2, 7], "interview": [3, 4]},
+      "basis": ["interview:2", "current_input"],
+      "must_preserve": ["職稱課程行政專員、單位成人教育中心、主管行政組長由歷史訊息2提供", "本輪只補工作，沒有重新提供職務身分", "付款確認仍由財務負責"],
+      "must_not_assert": ["本輪才寫入就代表本輪提供該事實", "職稱或單位可引用本輪工作細節代替原出處", "本次輸入可預先引用為正式序號4"],
+      "roles": {
+        "A": {"accept": "若寫身分欄位，逐欄回指訊息2；本輪工作可引用current_input。實際保存與回讀相符。", "reject": "將身分欄位一律指向current_input，或僅寫文字但沒有來源就宣稱引用完整。"},
+        "B1": {"accept": "整理時保留身分及工作各自原話來源，可引用多則正式訊息。", "reject": "只引用最新工作訊息，讓其中不存在的職務背景失去真正出處。"},
+        "B2": {"accept": "按情境理解本人角色與權責，正式引用仍經情境。", "reject": "把財務查帳升為本人判定款項入帳，或繞過情境建立直接訪談引用。"}
+      },
+      "hard_failures": ["身分欄位來源錯輪", "猜造尚未有效的訪談序號", "將財務確認權轉給本人"],
+      "acceptable_variation": "不強制單次write或固定工具順序；但未寫或未附來源不能當來源驗收通過。職務目的與工作可依支持範圍引用多則原話。"
+    },
+    "current_correction_keeps_other_sources": {
+      "guide_sections": {"analysis": [4, 9], "writing": [2, 7], "interview": [3, 4]},
+      "basis": ["interview:2", "current_input"],
+      "must_preserve": ["職稱及單位仍依訊息2", "目前主管已明確更正為教務主任，依據是本次原話", "不改變未被更正的職責界線"],
+      "must_not_assert": ["全部身分欄位的來源都改為current_input", "主管仍是行政組長", "引用來源存在就等於已支持新文字"],
+      "roles": {
+        "A": {"accept": "職稱及單位用歷史訊息2；主管使用current_input。若已有舊引用，按現稿處理，不用舊主管原話支持新主管。", "reject": "主管文字改對但仍僅引用舊訊息2，或其餘兩欄也改用本輪來源。"},
+        "B1": {"accept": "吸收主管更正並保留可追溯的先後脈絡；其他身分與工作不因更正被刪。", "reject": "把後補當全盤否定，抹除職稱、單位或其他有效工作。"},
+        "B2": {"accept": "由更新後情境調整理解的匯報界線，保留仍有效的背景與工作。", "reject": "未依更正更新仍肯定舊主管，或要求員工重答已明確更正的同一問題。"}
+      },
+      "hard_failures": ["新主管仍引用不支持它的舊原話", "局部更正污染其他欄位來源", "發明尚未有效的訪談序號"],
+      "acceptable_variation": "身分可先前寫入或本輪建立；同批多欄來源可不同，不要求特定工具次序。未取得實際引用不得判pass。"
     },
     "known_work_does_not_need_forced_rewrite": {
       "guide_sections": {"analysis": [3, 4, 6], "writing": [3, 4], "interview": [3, 6]},

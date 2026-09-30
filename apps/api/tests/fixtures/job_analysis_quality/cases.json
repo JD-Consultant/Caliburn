@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "data_origin": "fully_synthetic",
   "cases": [
     {
@@ -148,6 +148,36 @@
           {"sequence": 3, "speaker": "consultant", "text": "交給維修同事後，你還負責什麼？"}
         ],
         "current_input": "我收到維修同事通知處理完成後，就回覆原報修人。正式職稱、單位與固定匯報對象仍未確認，不能由交給維修同事推成向他報告；目前只確認這段北館的接收與回覆工作。",
+        "seed_work_situations": [],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "historical_fact_keeps_historical_source",
+      "split": "development",
+      "risks": ["cross_turn_source", "work_background"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "請介紹目前的職位及主要工作。"},
+          {"sequence": 2, "speaker": "employee", "text": "我是成人教育中心的課程行政專員，向行政組長報告，處理成人進修班的報名與課前名冊。我不授課，也不決定開課或收費。"},
+          {"sequence": 3, "speaker": "consultant", "text": "核對報名時，遇到重複登記或付款資料不符，您會如何處理？"}
+        ],
+        "current_input": "我每天核對姓名、聯絡方式與課程。重複登記就聯絡本人確認要保留哪筆；付款資料不符就交財務查帳，財務確認後我才更新繳費狀態。我整理課前使用的報名名冊，但不能自己認定款項已入帳。",
+        "seed_work_situations": [],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "current_correction_keeps_other_sources",
+      "split": "development",
+      "risks": ["cross_turn_source", "correction", "scope_preservation"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "請介紹目前的職位及主要工作。"},
+          {"sequence": 2, "speaker": "employee", "text": "我是成人教育中心的課程行政專員，向行政組長報告，處理成人進修班的報名與課前名冊。我不授課，也不決定開課或收費。"},
+          {"sequence": 3, "speaker": "consultant", "text": "目前還有需要補充或更正的資訊嗎？"}
+        ],
+        "current_input": "更正一下，目前直接向教務主任匯報，不是前面說的行政組長。另外，付款資料不符時，我會交財務查帳，財務確認後才更新繳費狀態。",
         "seed_work_situations": [],
         "jd_draft": []
       }

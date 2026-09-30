@@ -1,6 +1,6 @@
-# T14 小型工作分析品質資料集 v2
+# T14 小型工作分析品質資料集 v3
 
-這是 **11 個全合成案例的評測素材與待人工校準 rubric**，不是模型通過紀錄。9 個 development、2 個 holdout_candidate；保留候選未用來調整 prompt，但編寫者已看過，不能稱盲測、獨立樣本或代表真實流量。v1 的九例未改 prompt；v2 新增兩例並小幅澄清 B1 背景取捨指引，只有離線契約驗證，沒有真 provider、LLM judge 或 DB 操作。獨立的既有 Demo 唯讀審讀見 evidence，不等於這十一例已跑模型。
+這是 **13 個全合成案例的評測素材與待人工校準 rubric**，不是模型通過紀錄。11 個 development、2 個 holdout_candidate；保留候選未用來調整 prompt，但編寫者已看過，不能稱盲測、獨立樣本或代表真實流量。v1 的九例未改 prompt；v2 新增兩例並小幅澄清 B1 背景取捨指引，當時只有離線契約驗證。v3 將真模型旅程發現的跨輪來源選擇問題縮小為兩個回歸素材；原旅程、候選對照與實際保存結果見 [T17 證據](../../../../../docs/plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md)，不等於這十三例皆已跑模型或通過。
 
 ## 文件與責任
 
@@ -11,7 +11,7 @@
 
 內容責任仍是 [工作分析指南](../../../../../docs/specs/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](../../../../../docs/specs/2026-09-09-jd-field-and-writing-guide.md)、[訪談校準](../../../../../docs/specs/2026-09-09-customized-jd-depth-and-interview-calibration.md)。oracle 的 `analysis`／`writing`／`interview` 數字對應這三份文件章節。本文不是第二份指南，也不以案例中的格式／件數定義所有職位。
 
-## 十一個案例各辨別什麼
+## 案例各辨別什麼
 
 | case id | 要辨別的失敗 | 不應被錯罰的行為 |
 | --- | --- | --- |
@@ -24,6 +24,8 @@
 | `daily_vs_month_end_recount_scope` | 每日現場複點泛化成全職位本人不複點，吞掉月底本人先複點 | 同任務分條件或分項；共用 collaborator 不必複製 |
 | `shared_work_background_is_not_per_case_profile` | 全部情境只剩動作，漏掉已知角色／服務範圍；或每案強塞相同 profile | 適當情境承接共用背景，各案保留必要局部範圍即可 |
 | `unconfirmed_background_is_not_a_profile_blank` | 用稱呼猜正式職稱、用工作交接猜匯報或單位 | 背景未知可保留，已知工作照常承接，不造必填 profile |
+| `historical_fact_keeps_historical_source` | 本輪寫入的舊事實錯指 current_input，或猜正式序號 | 延後寫入仍回指歷史原話；多來源按支持範圍選擇 |
+| `current_correction_keeps_other_sources` | 只更正主管卻把職稱／單位來源也改成本輪；新主管仍引舊說法 | 各欄分別處理，局部更正不污染其餘來源 |
 | `known_work_does_not_need_forced_rewrite` | 為展示動作重複新增／逼問，或刪掉已確認期限 | 不改準確現稿；保留有據數字 |
 | `one_off_event_does_not_change_regular_scope` | 顧問假設蓋過更正，一次清窗升為每日或被完全抹除 | 保留案例但不升成固定 JD 責任 |
 
@@ -79,7 +81,7 @@
 
 每例保留 case id、trial、階段、資料及 prompt hash、App execution／revision 參考、公開對話及實際結果證據、各維度 verdict、hard failure、評者／分歧、工具錯誤、用量、成本與延遲。缺資料就標 unavailable；不保存／解讀 opaque reasoning，不輸出秘密。不新增另一個產品保存 owner。
 
-固定同一版本比較基準／候選；保留每次失敗及 `not_observed`，不要只報多次中的最佳一次。9 個 development 可用於調整；2 個保留候選一旦用來調 prompt 就改列 development，補真正未參與調整的案例。十一例只能揭露定向風險，不足以估計普遍成功率、節時 ROI 或代表全部職業；T01–T18 原 gates 與最終 Goal 不縮減。
+固定同一版本比較基準／候選；保留每次失敗及 `not_observed`，不要只報多次中的最佳一次。11 個 development 可用於調整；2 個保留候選一旦用來調 prompt 就改列 development，補真正未參與調整的案例。十三例只能揭露定向風險，不足以估計普遍成功率、節時 ROI 或代表全部職業；T01–T18 原 gates 與最終 Goal 不縮減。
 
 ## 官方評測建議如何採用
 

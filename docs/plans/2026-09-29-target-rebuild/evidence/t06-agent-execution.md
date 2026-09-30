@@ -159,6 +159,14 @@ $env:PYTHONUTF8='1'
 ./.venv-target/Scripts/python.exe -B scripts/probe_responses_protocol.py --key-file S:/caliburn/apps/api/.env --output S:/caliburn/.research-tmp/t06-protocol-preflight-02.jsonl
 ```
 
+### 憑證就緒後的真直連結果（2026-09-30 10:31 台北）
+
+Owner 確認已在指定檔案放置直連憑證。第一次在 sandbox 的 count 發送遇 `APIConnectionError`；無憑證 GET 同樣得到 Socket `ConnectionRefused`，判定本機網路環境限制，不改 provider、schema 或模型。經工具批准，使用相同 manifest、另一個 exclusive-create 結果檔重跑；沒有 SDK／腳本自動重試。
+
+正常網路批次 **4 HTTP／2 生成／0 重試** 通過：count 92、123；原生 `function_call` → 原 `function_call_output` → `message(phase=final_answer)`；原 R JSON round trip 相同；`store=false`、`reasoning.context=all_turns`、strict 與 default tier 被接受。生成 usage 合計 input 215、output 22，以已核費率估 US$0.0000325；計數費用仍不冒稱零。合成任務沒有產生 reasoning item，因此只確認參數接受及工具接續，**未驗加密 reasoning 跨步／跨輪、compact 或分析品質**。安全結果在忽略區 `.research-tmp/openai-protocol-20260930-b.jsonl`，未保存或列印金鑰／opaque。
+
+為本機 Demo 共用既有 key-only parser，將其移至 `adapters/openai_credentials.py`，新增 `scripts/run_backend.py --key-file` 明確入口；不載入其餘舊配置。合成 parser **5 passed**、Ruff／mypy 通過；最初缺 module 及暫存 ACL 錯誤不算產品行為 Red。程序啟動與完整產品結果另由 T08 記錄。
+
 ## 7. 第七切片：固定請求與保存後計量
 
 預檢脚本／限制已提交 `946c663f`，仍缺直連 key、零外送。同步推進本切片：主代理先沿既有 executions／saver／SDK，唯讀子代理比較官方耐久 node、同 node Held 與原生 task 三種方式。選 **R 先保存，再獨立結算 node**，因為既有 StateGraph 已有合適交界，無須重作 serializer／ResponseStore。子代理記憶體 probe 證明若把記費放在 request callback 返回前，記費拋錯會使 R 無法交給 Held，續跑重呼模型；這是錯誤組合方式的反例，不是已接 production 的故障宣稱。
@@ -366,3 +374,35 @@ Ruff check／format **223 files**、mypy **154 source files** 通過。文件 **
 2026-09-30 獨立只讀範圍審查進一步定位：`workflows/model_requests.py` 的 `_reserve_request` 對已存在但没有 failure 記錄的原 attempt 會明確停止；目前 reopen 整合測例只驗停止，未驗核對後的受控再准入。**最小共用缺口是區分原結果可承接、仍在途／不明、已確認本機原件不可恢復，並僅在最後一類及工作／額度仍有效時准許新 attempt。**不能直接刪舊 reservation、重置預算或將查不到視為未送出。觸發／接管／角色通知仍屬 T08／T11，不另建 retry framework；T12 驗 kill／競爭，T16 驗 provider。
 
 審查者另跑 13 個相關離線單元／契約檔 **210 passed in 2.81s**；沒有新 PG、provider 或程式修改，不與前述主代理數量相加。本輪轉進 T07 導覽以推進 M2，沒有把此缺口視為已修復或將 T06 勾選完成。
+
+### 18.1 未明 attempt 的受控再准入接縫（2026-09-30）
+
+本次只補 `workflows/model_requests.py` 的共用准入；不修改 bootstrap／supervisor／runner、不新增表、failure code 或另一套原件保存。既有 execution 行鎖、request payload fingerprint、工作 budget 仍是唯一准入權威。**共用接縫已實作，角色 owner 的可信核對與正式調度尚未接入，不據此勾選 T06 或宣稱自動重啟恢復已完成。**
+
+公開接縫為 `ModelRequestExecutor(..., reconcile_prior_attempts=callback)`；callback 的型別為 `async (ExecutionWriter, tuple[OutboundAttempt, ...]) -> PriorAttemptRecovery`，只給 App 注入，不是模型／HTTP 的可填旗標：
+
+| 本次對原 attempts 的核對 | 共用端行為 |
+|---|---|
+| `ORIGINAL_AVAILABLE` | 不新增 reservation／HTTP；原 kind 的 `Prior*AttemptError.recovery` 回報可承接，沿既有 Held／原生 Graph 恢復。callback 不搬運或另存 R／C／count。 |
+| `IN_FLIGHT_OR_UNKNOWN`／未配置 callback／核對失敗 | 保留原件、預留及停止狀態；不拿空查詢、writer 取代、timeout 或重啟當重送許可。未型別化字串也不准入。 |
+| `LOCAL_ORIGINAL_UNRECOVERABLE` | 只對此次已核對的原 attempts 有效；重新取得 execution 行鎖，重核 active writer、相同 payload／kind、原 attempts 的完整觀察及全部原工作 budget，再新增獨立 attempt。 |
+
+核對 await 不持 DB transaction；重新准入時比較未明 attempts 的集合（不依 SQL 回傳順序）。競爭者新建未明 attempt、原 attempt 新結算或 writer 被取代會使舊判定失效；同次呼叫不再對新出現的不明 attempt 反覆詢問核對器。後續明確 transient failure 仍走原 retry policy／Retry-After 和原預算，不新增第二套重試。原預留不刪除、不偽造 provider failure、不把未知費用當零；新 attempt 的 COMMIT 確認後才外送，SDK 返回後仍立即交原結果給 Graph。
+
+**Process owner 可提供的證據與缺口：**目前 `ConsultantSupervisor.has_runner`／`wait_for_runner` 可觀察該 supervisor 的本地 task，`failures` 保留 typed result handoff，`hold_dispatch` 可阻止交錯派送；`PostgresProcessLock` 的本機 OS fence＋專用 PG session 防止同一部署的重疊 owner。它們各自不是「原結果遺失證明」：`test_response_recovery_eligibility.py::test_late_or_held_response_requires_current_writer_before_tools[replace]` 明確驗過 writer 已取代，完整 R 仍可交新 writer 補存。新 supervisor 的空 failures 也不能證明前一個同程序 owner 沒有保留原件。
+
+故 owner callback 必須在排除原 producer 仍可返回／寫入及新的競爭派送後，核對原生最新狀態（包含 pending writes）與仍保留的 R／C／count handoff；有原件先承接，查詢失敗或原 producer 來源不明則停在 UNKNOWN。需要跨 owner 的核對時，不能在 `allow_reentry` 清除 failure handoff 後才猜測它是否存在。目前沒有把 writer UUID 當 process generation，也沒有將 lock 成功硬轉成不可恢復。這是 T08／T11 owner 接線的明確前置條件，不新增產品重試按鈕或新的身份 registry。
+
+**2026-09-30 官方複核：**[LangGraph checkpointers](https://docs.langchain.com/oss/python/langgraph/checkpointers)承接 checkpoints 與 pending writes，成功 task 的原生待整合輸出可在恢復時重用；不能只查 checkpoint `channel_values` 就宣告原件不存在，也不以歷史 checkpoint replay 代替普通恢復。[OpenAI conversation state](https://developers.openai.com/api/docs/guides/conversation-state)說明 `store=false` 關閉供後續取回的 response 保存；本案不能把 response ID 當遺失原件的遠端備份。這不證明遠端停止計算或沒有收費，故仍保留未知費用。上述是官方機制；三態核對與 exact-attempt 再准入是本案既定 §6.1／E03／E15 的工程實作。
+
+**本次新證據：**`tests/integration/test_unknown_attempt_readmission.py` 新增 16 個真 PG＋SDK MockTransport 案例，涵蓋可承接／不明零重送、writer takeover 本身不准重送、R／count／C 新 attempt 舊預留保留、總次數／每請求次數／cost／deadline 不重置、核對中取消／換 writer／原件結算、核對失敗、競爭者只一個新准入，以及再准入後仍共用既有 transient retry。型別骨架後的行為 Red 為 **9 failed／1 passed**；不是將最初缺少 enum 的 import error 當有效 Red。
+
+本次定向回歸包含上述新檔，以及既有 `test_outbound_retry.py`、`test_response_recovery_eligibility.py`、`test_model_request_accounting.py`。既有測試仍負責 native Saver／Held 原 R 的承接、commit ack 遺失、已知 timeout 的有界重試和保存後結算；新測試的 callback 是合成 owner 判定，不冒充已驗 process-death 證據產生器。最終命令結果另附於本節；未使用 `.env`、未外送 provider、未 commit，也未執行 Demo migration。
+
+最終驗證（工作目錄 `apps/api`，既有 `.venv-target` Python、隔離 loopback `_test` DB；每案自建／回收獨立測試 schema）：
+
+```powershell
+./.venv-target/Scripts/python.exe -B -m pytest tests/integration/test_unknown_attempt_readmission.py tests/integration/test_outbound_retry.py tests/integration/test_response_recovery_eligibility.py tests/integration/test_model_request_accounting.py -q -p no:cacheprovider --tb=short
+```
+
+結果 **48 passed in 26.44s**（16 新增＋32 既有，不與前述歷次數量相加）；Ruff check／format check **2 files**、mypy `--follow-imports=silent` **1 source file**、本次 tracked 差異 `git diff --check` 通過。不是全套回歸、production owner 組裝、kill／跨程序 handoff 或真 provider 證據。下一個安全動作是 owner 以既有 task／原生恢復／handoff 證據實作上述 callback，先驗「舊 runner 已退出但仍有完整 R」仍走原件，而非僅因 takeover 啟用再推論。

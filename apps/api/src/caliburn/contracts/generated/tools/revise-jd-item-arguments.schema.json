@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReviseJdItemArguments",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "read_ref": {"type": "string", "minLength": 1, "description": "read_jd 提供的既有項目定位；明細與能力關係以所屬 task 為外層目標。"},
+    "changes": {
+      "type": "array", "minItems": 1,
+      "items": {"anyOf": [
+        {"$ref": "#/$defs/SetItemText"},
+        {"$ref": "#/$defs/ClearItemText"},
+        {"$ref": "#/$defs/SetConditionKind"},
+        {"$ref": "#/$defs/AddTaskDetail"},
+        {"$ref": "#/$defs/ReviseTaskDetail"},
+        {"$ref": "#/$defs/RemoveTaskDetail"},
+        {"$ref": "#/$defs/LinkCapability"},
+        {"$ref": "#/$defs/UnlinkCapability"},
+        {"$ref": "#/$defs/ReorderCapability"},
+        {"$ref": "#/$defs/AddSource"},
+        {"$ref": "#/$defs/RemoveSource"},
+        {"$ref": "#/$defs/AlignSource"}
+      ]}
+    }
+  },
+  "required": ["read_ref", "changes"],
+  "$defs": {
+    "SetItemText": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "set_field", "type": "string"},
+        "field": {"type": "string", "enum": ["title", "description", "scope_text", "name", "text"], "description": "任務 title/description；職責 title/scope_text；K/S name/description；協作 name/scope_text；條件 text。"},
+        "value": {"type": "string", "minLength": 1}
+      }, "required": ["action", "field", "value"]
+    },
+    "ClearItemText": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "clear_field", "type": "string"},
+        "field": {"type": "string", "enum": ["title", "description", "scope_text", "name"], "description": "僅可清空該型別可空欄；仍須保留有意義內容。不以空文字刪項。"}
+      }, "required": ["action", "field"]
+    },
+    "SetConditionKind": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "set_field", "type": "string"},
+        "field": {"const": "kind", "type": "string"},
+        "value": {"type": "string", "enum": ["work_environment", "schedule_travel", "shared_authority", "shared_collaboration", "qualification"]}
+      }, "required": ["action", "field", "value"]
+    },
+    "AddTaskDetail": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "add_detail", "type": "string"},
+        "kind": {"type": "string", "enum": ["outcome", "requirement"]},
+        "text": {"type": "string", "minLength": 1},
+        "supporting_sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}}
+      }, "required": ["action", "kind", "text", "supporting_sources"]
+    },
+    "ReviseTaskDetail": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "revise_detail", "type": "string"},
+        "detail_read_ref": {"type": "string", "minLength": 1},
+        "text": {"type": "string", "minLength": 1}
+      }, "required": ["action", "detail_read_ref", "text"]
+    },
+    "RemoveTaskDetail": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "remove_detail", "type": "string"},
+        "detail_read_ref": {"type": "string", "minLength": 1}
+      }, "required": ["action", "detail_read_ref"]
+    },
+    "LinkCapability": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "set_capability", "type": "string"},
+        "capability_read_ref": {"type": "string", "minLength": 1},
+        "relationship": {"const": "link", "type": "string"},
+        "supporting_sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}}
+      }, "required": ["action", "capability_read_ref", "relationship", "supporting_sources"]
+    },
+    "UnlinkCapability": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "set_capability", "type": "string"},
+        "capability_read_ref": {"type": "string", "minLength": 1},
+        "relationship": {"const": "unlink", "type": "string"}
+      }, "required": ["action", "capability_read_ref", "relationship"]
+    },
+    "ReorderCapability": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "reorder_capability", "type": "string"},
+        "capability_read_ref": {"type": "string", "minLength": 1},
+        "position": {"anyOf": [{"$ref": "#/$defs/EdgePosition"}, {"$ref": "#/$defs/RelativePosition"}]}
+      }, "required": ["action", "capability_read_ref", "position"]
+    },
+    "EdgePosition": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"kind": {"type": "string", "enum": ["first", "last"]}},
+      "required": ["kind"]
+    },
+    "RelativePosition": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "enum": ["before", "after"]},
+        "capability_read_ref": {"type": "string", "minLength": 1}
+      }, "required": ["kind", "capability_read_ref"]
+    },
+    "AddSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "add_source", "type": "string"},
+        "target": {"$ref": "#/$defs/SourceTarget"},
+        "source": {"$ref": "#/$defs/Source"}
+      }, "required": ["action", "target", "source"]
+    },
+    "RemoveSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "remove_source", "type": "string"},
+        "target": {"$ref": "#/$defs/SourceTarget"},
+        "citation_ref": {"type": "string", "minLength": 1}
+      }, "required": ["action", "target", "citation_ref"]
+    },
+    "AlignSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "confirm_reference_alignment", "type": "string"},
+        "target": {"$ref": "#/$defs/SourceTarget"},
+        "citation_ref": {"type": "string", "minLength": 1}
+      }, "required": ["action", "target", "citation_ref"]
+    },
+    "SourceTarget": {"anyOf": [{"$ref": "#/$defs/ItemTarget"}, {"$ref": "#/$defs/DetailTarget"}, {"$ref": "#/$defs/CapabilityTarget"}]},
+    "ItemTarget": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"kind": {"const": "item", "type": "string"}}, "required": ["kind"]
+    },
+    "DetailTarget": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"const": "detail", "type": "string"},
+        "detail_read_ref": {"type": "string", "minLength": 1}
+      }, "required": ["kind", "detail_read_ref"]
+    },
+    "CapabilityTarget": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"const": "capability_relation", "type": "string"},
+        "capability_read_ref": {"type": "string", "minLength": 1}
+      }, "required": ["kind", "capability_read_ref"]
+    },
+    "Source": {"anyOf": [{"$ref": "#/$defs/CurrentInputSource"}, {"$ref": "#/$defs/InterviewSource"}, {"$ref": "#/$defs/MemorySource"}]},
+    "CurrentInputSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"kind": {"const": "current_input", "type": "string"}}, "required": ["kind"]
+    },
+    "InterviewSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"const": "interview", "type": "string"},
+        "interview_sequence": {"type": "integer", "minimum": 1}
+      }, "required": ["kind", "interview_sequence"]
+    },
+    "MemorySource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "enum": ["work_situation", "work_understanding"]},
+        "target_title": {"type": "string", "minLength": 1}
+      }, "required": ["kind", "target_title"]
+    }
+  }
+}

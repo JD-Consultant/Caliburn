@@ -16,6 +16,10 @@ from caliburn.features.job_description.source_persistence import read_source_ref
 from caliburn.features.job_description.sources import InvalidJdSourceError, JdSourceReference
 from caliburn.transport.model_tools.jd_writes import JdWriteTools
 from caliburn.workflows.jd_candidates import JdCandidateWorkflow
+from caliburn.workflows.jd_item_creation import JdItemCreationWorkflow
+from caliburn.workflows.jd_item_deletion import JdItemDeletionWorkflow
+from caliburn.workflows.jd_item_movement import JdItemMovementWorkflow
+from caliburn.workflows.jd_item_revision import JdItemRevisionWorkflow
 from caliburn.workflows.jd_profile_writes import (
     AddProfileSource,
     AlignProfileSource,
@@ -62,10 +66,17 @@ def test_profile_text_and_current_input_evidence_are_one_recoverable_effect(
     workflow = JdProfileWriteWorkflow(client.app.state.database.sessions)
     binding = PublishedMemoryRead(scope, None, 1)
     tools = JdWriteTools(
-        workflow, JdTaskWriteWorkflow(client.app.state.database.sessions), binding, writer
+        workflow,
+        JdTaskWriteWorkflow(client.app.state.database.sessions),
+        binding,
+        writer,
+        creations=JdItemCreationWorkflow(client.app.state.database.sessions),
+        revisions=JdItemRevisionWorkflow(client.app.state.database.sessions),
+        deletions=JdItemDeletionWorkflow(client.app.state.database.sessions),
+        movements=JdItemMovementWorkflow(client.app.state.database.sessions),
     )
     definitions = tools.definitions()
-    assert {item["name"] for item in definitions} == {"revise_jd_profile", "create_jd_task"}
+    assert {item["name"] for item in definitions} == set(tools.names)
     assert all(item["strict"] for item in definitions)
 
     async def prepare(text: str, *, missing: bool = False):

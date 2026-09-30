@@ -176,4 +176,12 @@ class JdProfileWriteWorkflow:
                         group.changes,
                     ),
                 )
-            return "unchanged" if revision == prepared.expected_revision_id else "updated"
+            if revision == prepared.expected_revision_id:
+                return "unchanged"
+            if not prepared.changes and all(
+                isinstance(change, AlignJdSource)
+                for group in prepared.sources
+                for change in group.changes
+            ):
+                return "aligned"
+            return "updated"

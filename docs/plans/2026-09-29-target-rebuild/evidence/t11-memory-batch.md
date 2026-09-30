@@ -95,7 +95,7 @@ dispatch 移動後重跑三個本切片整合檔：**8 passed**。接著 James �
 
 ## 6. 模型 final 不合法的 typed 終態失敗（2026-09-30）
 
-Owner 要求已落地；只改 `workflows/memory_analysis/results.py`、`runner.py`、`workflows/memory_batch.py`，未改 A／bootstrap。
+主線分派的修正已落地；只改 `workflows/memory_analysis/results.py`、`runner.py`、`workflows/memory_batch.py`，未改 A／bootstrap。
 
 - `AnalysisOutcomeError(ValueError)` 帶有限安全 `reason_code`：`analysis_outcome_malformed`、`analysis_outcome_refused`、`analysis_outcome_not_allowed`。
 - parser 只轉譯自身 Pydantic `ValidationError`；refusal 的具體分支直接拋 typed error。其他 `ValueError` 不被 parent catch 成模型失敗。繼承 ValueError 保留原 parser 例外大類，並不放寬捕捉範圍。
@@ -130,7 +130,7 @@ CONFIRMED: replacement leader acquired; old Memory task live and writer active
 
 風險是新 leader 已能接管，而舊 Memory coroutine 尚未停止；業務 writer 在接管後雖會 fenced，但不等於原生 Graph checkpoint 寫入也有同一個 fence。不得用縮短 polling 取代「舊任務全退出才釋放本機鎖」。
 
-當時提出的最小修法（後續 Owner 授權及實作見 §8）：
+當時提出的最小修法（後續主線依 Goal 分派及實作見 §8）：
 
 1. A supervisor 注入單一具名 `before_leader_release: Callable[[], Awaitable[None]]`，bootstrap 傳 `memory_supervisor.close`；不是新 supervisor 框架。
 2. 啟動失敗、monitor finally、顯式 close 的所有釋鎖路徑，先 await 依赖 Memory 收尾，再 close leader；正常重複 close 沿既有冪等 shutdown task。
@@ -139,7 +139,7 @@ CONFIRMED: replacement leader acquired; old Memory task live and writer active
 
 ## 8. 共享 leader 的依賴收尾 callback（已修正，局部驗證）
 
-Owner 隨後明確授權修改 `workflows/consultant_supervisor.py`；本輪只修改該 source、新增 `tests/integration/test_consultant_leader_release.py` 及本 evidence。bootstrap 由主線同步接線，本切片未編輯；未新增 lock／registry／外部依賴。
+主線隨後明確分派修改 `workflows/consultant_supervisor.py`；本輪只修改該 source、新增 `tests/integration/test_consultant_leader_release.py` 及本 evidence。bootstrap 由主線同步接線，本切片未編輯；未新增 lock／registry／外部依賴。
 
 ```python
 ConsultantSupervisor(

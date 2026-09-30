@@ -132,3 +132,23 @@ A 在執行中提出整理要求，完成後 background execution `1d709227-d539
 - 確認 Demo 無執行中／暫停工作後，僅重啟已確認身分的自有後端，不動 DB。health 200、非法 Host 400、跨站 Origin 寫入 403。IAB 重開仍讀回正式序號 1–7、原完成狀態與更正後兩種工作，不新增模型請求。
 
 這是目前整合版本的回歸，不等於 T06–T17 全部 gate。新發現的取消期間完整原件 handoff 與跨程序未明 attempt 調度仍待修；T09 即時逐片段公開串流仍待接線，目前只有已保存完整 commentary 的查詢／歷史回看。全套輸出保留本機 `.research-tmp/target-full-pg-20260930c.log`、`target-unit-20260930i.log`、`target-web-20260930f.log`，不提交原生推理或合成產物。
+
+### 5.6 公開 commentary 真產品驗證 manifest（執行前）
+
+承接 §5.3 尚餘 **1 次 A 輸入**，不增加 A 次數；若該輪自然通知整理，增加最多 **1 次 B 批次**。本次剩餘工作總管理預算最多 US$2，其餘模型、reasoning、輸出、Steps、calls、attempts、900 秒與資料範圍沿 §5.3。只在 shared 原件 handoff、HTTP／UI 串流專項及整合測試完成後重啟自有 Demo 服務；不改舊的已保存 request transport。
+
+在同一合成檔案補充一項低頻工作，觀察公開 commentary 是否在正式完成前出現、候選與正式結果是否區分、完成後公開中間訊息是否可回看。模型可能不產生 commentary；不得以 App 編造文字或重跑直到出現來冒充成功。不顯示 reasoning／工具參數；不為此啟用另一個 reviewer／judge。失敗先保存證據診斷，不自動加測或提高預算。
+
+此批目的為新串流整合，不代表全部職務分析品質、所有程序故障、T09 或 Goal 完成；實際結果另外追加。
+
+### 5.7 串流接線後的第四個真 A Turn（12:02 台北核對）
+
+以 UI 補充每季財務抽查佐證整理、缺漏補件及不負責查核結論／核准的界線；A execution `e1178998-0df0-44da-929d-bbef0ce33ae0` 正式完成，5 次 model、6 次 count、零失敗，usage 生成估算 US$0.007175850。完整公開 commentary 已可從該輪歷史回答展開，內容為核對 JD 架構並保留財務／本人責任界線；正式訪談只增加員工 8／顧問 9，commentary 無正式序號、不可引用。
+
+正式 JD 新增季度抽查任務、調整職責與目的；最終答覆繼續詢問資料缺漏交主管後的責任，沒有自行猜測。A 自然通知整理，B execution `07be6b4c-d230-4c93-beb9-2d5fd1f710d5` 完成，6 次 model、8 次 count、零失敗，usage 生成估算 US$0.005738715；snapshot `48c31c96-f1db-4fc2-a099-89c6a23103e6`、position `17bf6b90-f80b-45f6-a9f2-3c1b1e79cfd4`、F=8。此批已消耗 §5.6 全部 A／B 額度；count 費用未核，以上不是完整帳單。
+
+真 SDK 已使用 streaming request，瀏覽器 scoped SSE 連線回 200，原生完整 commentary 經原保存路徑成為歷史。**本次再次觀察畫面時 Turn 已完成，沒有截到完成前的即時 delta；不可宣稱已目視驗證真模型的逐片段顯示或斷線重連。**離線實際 SDK wire／ASGI SSE／UI 測試各自驗了該段傳輸，但不能替代尚未觀察的完整真產品時序。
+
+接線後主線 fresh：unit／contracts **945 passed**；SSE／原件角色 handoff／A HTTP／Memory HTTP journey 真 PG **21 passed**；前端 **95 passed**、tsc 通過；Ruff check／format **361 files**、mypy **239 source files**、canonical codegen `--check` 通過。sandbox 的暫存目錄／spawn 錯誤以同命令升權重跑，不改驗證標準。這輪未重跑整套 PG；先前 725 項全 PG 結果仍只代表當時版本。
+
+先確認無 active／paused 工作，再重啟已核身分的自有 backend；現於 loopback 8100／5173，沒有資料清除、舊碼切換或對外部署。瀏覽器確認序號 1–9 與歷史公開訊息，Demo 可操作；Goal 仍未完成，未知 attempt 自動恢復、長訪談品質及最終交付 gate 留原任務。

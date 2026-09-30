@@ -75,4 +75,4 @@ UI 改檔：`InterviewHistory.tsx`、`PublicTurnMessages.tsx`、`App.test.tsx` f
 
 建立／改名 Dialog 的 transition 完成時原本會搶回焦點，可能讓已在姓名欄輸入的後半段落到檔案名稱。以受控轉場重現兩個反例後，共用既有保護語意的 `shared/ui/dialog-focus`；已在對話框內操作時不再搶焦點，保留 MUI focus trap。JD 編輯器也使用同一 helper，沒有新增表單框架。
 
-主線獨立執行全前端：**15 files、86 passed**；TypeScript 與 production build exit 0。bundle 約 777.47 kB（gzip 231.22 kB）的既有警告留 T15，不宣称已完成效能驗收。真模型三輪訪談、兩批 Memory 及第三輪暫停→重開→同輪續作的證據見 [T08 §5](t08-consultant-turn.md#5-真模型-demo-驗收2026-09-30)。以上沒有宣稱逐字 SSE 已接通。
+主線獨立執行全前端：**15 files、86 passed**；TypeScript 與 production build exit 0。bundle 約 777.47 kB（gzip 231.22 kB）的既有警告留 T15，不宣稱已完成效能驗收。真模型三輪訪談、兩批 Memory 及第三輪暫停→重開→同輪續作的證據見 [T08 §5](t08-consultant-turn.md#5-顧問--背景整理的整合2026-09-30-1057-台北)。以上沒有宣稱逐字 SSE 已接通。

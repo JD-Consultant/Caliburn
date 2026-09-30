@@ -54,3 +54,20 @@
 - Runner＋settings mypy 通過；生成器已生成 schema／Python／TS（Windows 暫存 ACL 以已批准的相同命令處理）。各分工的 Ruff／型別通過，最終合併檢查另記。
 
 未付費外送。官方 OpenAI key 尚未提供至授權位置，真模型 preflight／品質保持未驗。Demo 與整個 Goal 未完成；此證據不表示八入口、UI、來源 diff 或 T08 全部控制／恢復已完成。
+
+## 4. 第三切片：其餘項目的建立、修訂與刪除
+
+`create_jd_item`、`revise_jd_item`、`delete_jd_item` 已接 A registry 與原生 Step 的 prepared／execute 邊界。沿原 owner 完成五類非任務建立、同項目的欄位／成果要求／K/S 關係／來源修訂，以及有明確影響規則的刪除；未新增保存系統。各分工先驗既有 domain 和契約，主線再驗真實模型工具 codec，非只各自單元測試。
+
+- create workflow＋wire：分工交付後以正式生成 DTO 回歸；5 類 item／原結果／來源與 scope 等測例由 `test_jd_item_creation.py` 留存。
+- revise owner／wire／schema：13 passed；有來源原子性、跨任務 detail 拒絕、逐項修訂与原操作重入。
+- delete：真 PG 一例驗刪組保留任務、K/S 在用拒絕、同 prepared 重入不前進及正式稿隔離。
+- 整合 Red：`JdWriteTools` 尚无三個 handler 注入；接線後 `test_jd_model_item_roundtrip.py` 真 PG 驗 create → JSON 保存還原 → 重入 → revise → 重入 → delete → 重入，候選／正式隔離成立。曾因測例使用錯誤 action／HTTP 欄名失敗，改成契約實際 `set_field`／`areas`，未放寬 schema。
+- `test_consultant_tools.py`＋上述 roundtrip＋profile tool＋runner 合計 **20 passed in 2.67s**；tool handler／codec strict mypy 與 Ruff 通過。
+- 全 unit／contracts 第一次 **779 passed、1 failed**：舊拒絕測例未補新 constructor 依賴；補齊測試組裝後該例通過。完整新回歸於後續增量記錄，不把第一次當全過。
+
+仍未宣稱移動、兩類 diff、真 provider schema／自然品質或全部 T07 已完成。
+
+### 接續增量：移動及完整模型 codec
+
+`move_jd_item` 已接同一 registry／JSON codec，具體效果見 [移動切片](t07-jd-item-movement.md)。主代理串驗 create → revise → move → delete，每步先 JSON 保存還原、再同命令重入；正式稿仍隔離。受影響 workflow／wire／schema／拒絕／role routing **63 passed in 19.50s**（含真 PostgreSQL）；全部 unit／contracts **791 passed in 11.24s**。handler／codec／bootstrap strict mypy 通過，正式生成器重新同步 Python／TS／包內 schema，未手改生成物。兩類 diff 正在接入，T07 尚未勾完成；真 provider 協定已由 T06 通過，但不代表所有 JD schema 與自然模型品質均已驗。

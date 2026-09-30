@@ -2,6 +2,50 @@
 
 Owner 明確要求暫停 Goal；本記錄是恢復入口，不是另一份產品規格或完成宣告。任務唯一狀態在[任務表](../tasks.md)。**收到明確恢復指示前，不繼續施工、付費測試或背景開發。**Demo 程序留給使用者試用，不等於 Goal 持續執行。
 
+## 最新補記：文件推送與再次安全暫停
+
+本節取代下方較早暫停時的「下一步」優先序；下方真旅程、程序 PID、DB 版本及資料筆數均為當時觀察，不是本次重新驗證的即時狀態。Owner 先要求只推送文件，接著明確要求推送後安全暫停以便交接。
+
+### 接手位置與推送邊界
+
+- **實作工作目錄／分支：**`S:\caliburn` 的 `target-rebuild`。最新程式提交 `595dc097`（產品取消金額攔截，付費測試仍可明設預算）；本補記只另作文件提交。接手先核 `git status`、`git log`，不要 reset 或重做既有成果。
+- **文件分支：**`docs/target-rebuild-architecture-2026-09-30`，從既有遠端 `origin/main` 建立，只帶架構及相關規劃／證據 Markdown 差異。新程式、測試腳本、生成契約、`.env`、DB 及本機暫態資料不在本次上傳範圍；不 push `target-rebuild`、不 merge、不部署。
+- **遠端文件不等於遠端程式：**文件描述的是本機實作與驗證；相對 `main` 未推送的程式仍只在本機實作分支。其他機器的實作者若需要接續程式，須另安排程式交接；不能在文件分支重做全部或宣稱取得最新可執行版本。文件中的程式／測試連結及研究腳本可能尚未存在於此遠端分支。
+- **暫停狀態：**本次已啟動的測試已結束，沒有留下本代理待續測試或子代理開發；沒有啟動新付費模型呼叫，沒有切換／重啟 Demo、執行 Demo migration 或清理使用者資料。Demo 保留供使用者操作；接手須重新核對實際程序與 DB，不能依本文件舊 PID 執行停止。
+
+### 已完成增量與本次驗證
+
+前次暫停後已完成 UI 改版、目前 Turn 發現入口、本輪 JD 變更檢視、首版恢復減法與安全退出，以及產品取消金額 gate。各責任與歷次證據仍分別沿 [T09 UI](t09-ui-redesign.md)、[目前 Turn](t09-current-turn-discovery.md)、[本輪 JD 變更](t09-turn-jd-changes.md)、[T12](t12-consultant-process-recovery.md)及 [T06 §19](t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)，不在交接頁重寫規格。
+
+本次針對程式 `595dc097` 做唯讀審查與以下新回歸，未改程式。命令工作目錄為 `apps/api`，既有 `.venv-target`；`CALIBURN_TEST_DATABASE_URL` 指向 loopback 55439 的 `caliburn_t01_test`，每案建立及回收自身測試 schema，非 Demo DB。模型使用合成／mock，不是新真模型品質驗證。
+
+```powershell
+# 共用執行、原件／工具、容量、壓縮與恢復
+./.venv-target/Scripts/python.exe -B -m pytest tests/integration/test_graph_postgres.py tests/integration/test_response_step_postgres.py tests/integration/test_memory_tool_step.py tests/integration/test_context_preparation_postgres.py tests/integration/test_model_request_accounting.py tests/integration/test_execution_budgets.py tests/integration/test_request_capacity_postgres.py tests/integration/test_outbound_retry.py tests/integration/test_response_recovery_eligibility.py tests/integration/test_role_context_history.py -q -p no:cacheprovider --tb=line
+# 67 passed in 59.34s
+
+# unit／contracts 與 JD 真 PG（PDF、Undo 另有自身 gate，不在此命令）
+$jdGateFiles = @(rg --files tests/integration | Where-Object { $_ -match '[\\/]test_jd.*\.py$' -and $_ -notmatch 'export|undo' })
+$jdGateTemp = 'S:\caliburn\.research-tmp\pytest-t07-closeout-' + [guid]::NewGuid().ToString('N')
+if (Test-Path -LiteralPath $jdGateTemp) { throw 'Fresh test path unexpectedly exists' }
+./.venv-target/Scripts/python.exe -B -m pytest tests/unit tests/contracts @jdGateFiles -q -p no:cacheprovider --tb=line --basetemp=$jdGateTemp
+# 1218 passed in 145.58s
+```
+
+前次同組 JD 回歸遇 sandbox 暫存目錄 ACL 錯誤，不能算通過；上述 1,218 是另用新 GUID 暫存路徑、正常權限重跑的成功結果。錯誤嘗試沒有當作產品 Red，也未刪除原暫存。兩組結果不代表整套 integration、UI、真 provider、PDF 或長訪談已在本次重新驗過。
+
+### 未完成與建議接續順序
+
+1. **收斂 T06／T07 gate。**本次共用執行審查未發現新的框架阻擋項；JD 八入口、來源與 diff 已有程式及上述回歸。因收到暫停指示，未完成最後逐條 gate 對照與狀態收尾，任務表仍不勾選。接手沿原 evidence 完成對照，可重用本次證據，不必重寫工具或另建驗證平台。完整真模型品質仍歸 T16／T17。
+2. **T08 已定位缺口：近期訪談預載超量的有界回退。**[顧問 context 規格](../../../specs/2026-09-26-consultant-context-and-state-design.md)已要求在確實超過模型完整請求容量時，保留完整訊息的近期尾段與必要前問、說明未預載範圍，讓 A 用既有 `read_interview` 按需讀；不是到 128K 就刪歷史。現行 `context_binding.py` `_capture_data` 仍組装全部近期原話，`request_capacity.py` 超限會拒絕，尚未接上述 fallback。須先補行為反例再沿既有 owner 接線；不得刪本輪輸入、改寫原生接續歷史或取消同輪固定 Memory。這是靜態對照找到的實作缺口，尚未建立／執行專項 Red。
+3. **T09–T15 尚有整合／交付驗收。**新的 UI／API 增量、來源下鑽／diff 的真瀏覽器旅程、完整故障競爭與容量、安全及乾淨環境 PDF 交付，依各任務未完範圍核對。不要因 API 已存在就勾完整旅程，也不要恢復已被 Owner 減去的罕見恢復系統。
+4. **T16／T17 真模型與成果品質。**原代表旅程仍有漏引、更正泛化與失敗批次等品質缺口；金額 gate 的工程修正不會把舊失敗改成通過，見 [T17](t17-course-administrator-journey.md)。之後以有界 manifest 驗證，不拿 mock 或 API 200 代替 JD 效果。
+5. **T18 未完成。**正式入口切換、精確舊碼退役與可重現交付仍待前置 gate；目前不改 production authority。接手以整體可用及計畫 §5 為完成標準，不能把此次文件推送當作產品交付。
+
+恢復範圍以任務表頂部的 successor 與共用執行 §6.4／§6.5 為準；下方歷史「未明結果全面再准入」不再是首版必做項。**先核現況，再完成目前切片，不從 T01 重來；未收到恢復授權前停止施工。**
+
+## 前次暫停紀錄（歷史觀察）
+
 ## 現在可用到哪裡
 
 [開啟本機全合成 Demo](http://127.0.0.1:5173/job-files/b6e76e87-817c-4c9e-8c82-3564b329c7f2)。可以查看已保存內容、匯出 PDF，或由使用者自行開始下一次訪談。

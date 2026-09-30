@@ -72,3 +72,24 @@ $env:CALIBURN_TEST_PDF_OUTPUT = 'S:/caliburn/.research-tmp/t13-pdf'
 2026-09-30 本機 `caliburn_target_demo`、Web 5173／API 8100：以 IAB 建立合成職務檔案、人工編輯職稱與目的，重新載入確認仍在，再從 UI 真下載 `job-description.pdf`（134,119 bytes）。Poppler 渲染 1 頁並視檢，中文／分隔／頁碼正常；文字抽取確認職稱與目的存在、示範員工姓名不在 PDF。這不是 AI 產稿或全部 T13 驗收。
 
 下載 browser tool 發生異常長等待，約 02:20 UTC 才返回；雖呼叫已指定 30 秒事件／45 秒工具界線，實際工具延遲超出。後续驗證改用有界命令讀取下載產物；未以工具超时推導產品後端失敗，也未重複建立／匯出。產物與 QA PNG 留本機未提交。
+
+## 任務完成對照與 PDF 文字層診斷（2026-09-30 恢復後）
+
+沿[任務表 T13 的 Red 與完成條件](../tasks.md#t13-正式-pdf-與條件撤回)對照既有測試；只補一項瀏覽器驗證與一項診斷。路徑相對 `apps/api/tests`（除註明）。
+
+| T13 Red／完成 | 代表測例 |
+|---|---|
+| 匯出候選／姓名 | `integration/test_jd_export.py::test_export_reads_formal_not_active_candidate_or_employee_name`；瀏覽器：[T09 旅程](t09-consultant-journeys.md)（有候選時 PDF 仍是正式版、200） |
+| 中文缺字、長任務斷頁遺失、短／長實際渲染 | `integration/test_pdf_rendering.py::test_chinese_short_and_long_pdf_from_selector_loop`（真 Chromium；本輪設 `CALIBURN_TEST_PDF_FONT`／`CALIBURN_TEST_PDF_CHROMIUM` 後與另 5 案共 **6 passed**）、`unit/test_pdf_renderer.py`（缺字型明確拒絕、取消不放行第二個 worker）、`unit/test_jd_export_projection.py`；T17 課程行政 3 頁 PDF 逐頁目視 |
+| 渲染失敗不冒充空 PDF | `integration/test_jd_export.py::test_renderer_failure_is_not_an_empty_pdf_or_success` |
+| 正式版本固定 | 匯出讀固定正式修訂（上列匯出測例）；UI 說明「匯出目前已正式保存的版本，不包含本輪候選預覽」 |
+| UI 下載 | **本次新增**：`apps/web/tests/e2e/consultant-journey.spec.ts` 第一個旅程在真 Chromium 點頁面上的「匯出目前 JD（PDF）」連結，取得 `.pdf` 檔且開頭為 `%PDF-` |
+| 撤回只對允許基準成立、衝突明示不覆蓋、不倒退訪談／Memory | `integration/test_jd_undo.py`（10 案，含 `test_later_manual_edit_conflicts_without_overwriting_it`、`test_undo_restores_base_as_new_revision_without_rewinding_interview_or_context`、`test_undo_restores_relations_and_sources_but_keeps_new_memory`）、`test_jd_undo_migration.py`；前端 `UndoTurnJd.test.tsx` |
+
+### PDF 文字層診斷（已知限制，不擴大處理）
+
+T17 曾發現 PDF 文字抽取把「長」抽成部首字「⻑」。本輪用 `pypdf` 抽取產品的 `PdfRenderer` 輸出重現並定位原因：**取決於字型的 cmap，而非本案程式或 Chromium 版本**。Noto Sans／Serif（TC、HK、SC 變體字型）與微軟正黑體把 CJK／康熙部首字元也對到同一個字形，Chromium 產生 PDF 時反查 glyph→Unicode 就取到部首字，常見字如「長」「目」「黃」「齊」「鬼」「龍」「麥」「黑」「鼠」都受影響（康熙部首可經 NFKC 還原，CJK 部首「⻑」不行）；同一份內容改用標楷體（`kaiu.ttf`）抽出完全一致。**視覺輸出正確**，影響的是從 PDF 複製或搜尋文字。
+
+取捨（Owner 要求不過度設計）：不新增字型加工或另一套 PDF 引擎。已知限制如實記錄；若之後認定需要，最小做法是操作者用字型工具移除字型 cmap 中 U+2E80–U+2FDF 的重複對應後再交給 `CALIBURN_PDF_FONT_PATH`（需先確認該字型授權允許修改與嵌入），或改用沒有此重複對應的字型；本輪不提供或驗證該加工流程。
+
+**結論：**T13 在其範圍內成立，勾選。**不含**：乾淨環境安裝／建置／啟停的交付驗證（歸 T18）、PDF 文字層的複製／搜尋一致性（上述已知限制）。

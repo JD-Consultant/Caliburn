@@ -40,6 +40,7 @@ export function CapabilitiesSection({
   return (
     <Paper
       component="section"
+      id={`jd-${kind}`}
       aria-label={`所需${label}`}
       variant="outlined"
       sx={{ p: { xs: 1.5, sm: 2 } }}
@@ -96,7 +97,11 @@ export function CapabilitiesSection({
                   ))}
                 </Box>
               )}
-              <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
+              <Stack
+                direction="row"
+                className="item-actions item-actions--corner"
+                sx={{ flexWrap: 'wrap' }}
+              >
                 <IconAction
                   label={`編輯${label}`}
                   disabled={disabled}

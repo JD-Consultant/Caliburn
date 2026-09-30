@@ -280,6 +280,52 @@ span.item-actions {
   }
 }
 
+/* Floating item toolbar (Notion / Linear hover toolbar): out of flow, so hidden actions leave no gap. */
+.jd-doc [id^='jd-'] {
+  scroll-margin-top: 64px;
+}
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
+  .item {
+    position: relative;
+  }
+  .item > .item-actions--corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    padding: 2px;
+    background: var(--cb-surface);
+    border: 1px solid var(--cb-border);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgb(27 36 32 / 8%);
+  }
+  /* The add-link select floats at the section's top-right; its helper text stays for screen readers. */
+  .item > .item-actions--float {
+    position: absolute;
+    top: -6px;
+    right: 0;
+    z-index: 1;
+    width: 240px;
+  }
+  .item-actions--float .MuiFormHelperText-root {
+    display: none;
+  }
+}
+
+/* ---- JD outline: sticky section chips (SAP Fiori anchor bar) ---- */
+.jd-outline {
+  position: sticky;
+  top: -24px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  margin: -24px -24px 0;
+  padding: 12px 24px;
+  overflow-x: auto;
+  background: var(--cb-canvas);
+  border-bottom: 1px solid var(--cb-border);
+}
+
 /* ---- source side sheet: slides over the JD pane, the document stays in view ---- */
 .pane-actions {
   display: flex;
@@ -391,6 +437,11 @@ span.item-actions {
   }
   .jd-scroll {
     padding: 16px 16px 48px;
+  }
+  .jd-outline {
+    top: -16px;
+    margin: -16px -16px 0;
+    padding: 10px 16px;
   }
   .page-heading {
     align-items: stretch;

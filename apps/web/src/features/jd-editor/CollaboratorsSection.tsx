@@ -31,6 +31,7 @@ export function CollaboratorsSection({ baseline, disabled, onEdit, onChange, onD
   return (
     <Paper
       component="section"
+      id="jd-collaborators"
       aria-label="主要協作對象"
       variant="outlined"
       sx={{ p: { xs: 1.5, sm: 2 } }}
@@ -60,7 +61,11 @@ export function CollaboratorsSection({ baseline, disabled, onEdit, onChange, onD
             <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
               {item.scope_text ?? '協作範圍尚未提供'}
             </Typography>
-            <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
+            <Stack
+              direction="row"
+              className="item-actions item-actions--corner"
+              sx={{ flexWrap: 'wrap' }}
+            >
               <IconAction
                 label="編輯協作對象"
                 disabled={disabled}

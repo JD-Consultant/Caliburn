@@ -17,10 +17,8 @@ from caliburn.features.job_description.sources import (
     JdSourceTarget,
     MemorySource,
 )
-from caliburn.features.work_memory import candidate_queries, read_queries
-from caliburn.features.work_memory.candidates import MemoryPermissionError
-from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionNotFoundError
 from caliburn.workflows.jd_candidates import JdCandidateWorkflow
+from caliburn.workflows.jd_source_queries import read_memory_source_titles
 from caliburn.workflows.memory_reads import PublishedMemoryRead
 
 
@@ -74,7 +72,13 @@ class JdReadWorkflow:
                     )
                     continue
                 if source not in memory_titles:
-                    memory_titles[source] = await _memory_titles(session, binding, source)
+                    memory_titles[source] = await read_memory_source_titles(
+                        session,
+                        job_file_id=binding.scope.job_file_id,
+                        source=source,
+                        snapshot_id=binding.snapshot_id,
+                        interview_through_sequence=binding.interview_through_sequence,
+                    )
                 title, historical_title, changed = memory_titles[source]
                 readings.append(
                     JdSourceReading(
@@ -121,46 +125,6 @@ async def _interview_sequences(
     if current_id is not None:
         result[InterviewSource(current_id)] = None
     return result
-
-
-async def _memory_titles(
-    session: AsyncSession, binding: PublishedMemoryRead, source: MemorySource
-) -> tuple[str | None, str | None, bool]:
-    """Return current/historical names and recheck state by fixed identity, never title lookup."""
-    file_id = binding.scope.job_file_id
-    original_snapshot = await candidate_queries.read_snapshot(session, file_id, source.snapshot_id)
-    if original_snapshot.covered_through_sequence > binding.interview_through_sequence:
-        raise MemoryPermissionError("The original source exceeds this Turn's interview scope")
-    original_members = await candidate_queries.read_members(
-        session, file_id, original_snapshot.position_id
-    )
-    original = await candidate_queries.read_selected(
-        session, file_id, original_members, source.object_id
-    )
-    if original.revision_id != source.revision_id or original.layer.value != source.layer.value:
-        raise MemoryRevisionNotFoundError("The citation does not match its original fixed snapshot")
-    current_view = await read_queries.bind_published_view(
-        session, file_id, binding.snapshot_id, MemoryLayer(source.layer.value)
-    )
-    if current_view.through_sequence > binding.interview_through_sequence:
-        raise MemoryPermissionError("The pinned Memory exceeds this Turn's interview scope")
-    current_members = (
-        await candidate_queries.read_members(session, file_id, current_view.position_id)
-        if current_view.position_id is not None
-        else {}
-    )
-    if source.object_id not in current_members:
-        # Absence is proven against complete fixed membership, not a failed body lookup.
-        return None, original.content.title, True
-    current = await candidate_queries.read_selected(
-        session, file_id, current_members, source.object_id
-    )
-    if current.layer != original.layer:
-        raise MemoryRevisionNotFoundError("The fixed source changed its Memory layer")
-    historical_title = (
-        original.content.title if original.content.title != current.content.title else None
-    )
-    return current.content.title, historical_title, current.revision_id != original.revision_id
 
 
 def resolve_jd_citation_ref(

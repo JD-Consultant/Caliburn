@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdSourcesView",
+  "description": "Direct evidence belonging to one currently formal JD revision. Reading never confirms alignment.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["revision_id", "references"],
+  "properties": {
+    "revision_id": {"type": "string", "format": "uuid"},
+    "references": {"type": "array", "items": {"$ref": "#/$defs/Reference"}}
+  },
+  "$defs": {
+    "Reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["citation_id", "target_label", "source_kind", "source_label", "needs_recheck"],
+      "properties": {
+        "citation_id": {"type": "string", "format": "uuid"},
+        "target_label": {"type": "string"},
+        "source_kind": {"enum": ["interview", "work_situation", "work_understanding"]},
+        "source_label": {"type": "string"},
+        "needs_recheck": {"type": "boolean"}
+      }
+    }
+  }
+}

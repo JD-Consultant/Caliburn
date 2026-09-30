@@ -138,6 +138,37 @@ JD 顯示正式稿；A 活躍時可即時預覽該 Turn 候選，明示未完成
 
 資料載入失敗不能用 `[]` 假裝內容全空；小量欄位修改不重送完整 JD。每次改動後使對應正式／候選 query 失效，再取後端結果，不讓 optimistic preview 宣告提交成功。鍵盤操作、焦點恢復、清楚的暫停／取消文字與錯誤下一步列 UI 測例。
 
+### 3.1 正式 JD 來源的唯讀下鑽（T09）
+
+來源區按需讀正式 JD 的直接依據，不從候選預覽推導正式來源。後端列表提供引用定位與所屬欄位／項目；前端只帶回定位，不按名稱解析物件。工作理解 → 工作情境 → 訪談的按需讀取沿**原引用的固定快照**；只有「來源差異」與讀取時選定的最新已發布 Memory 比較。這與 A 的「本 Turn 固定 Memory＋舊新 diff、無任意舊全文入口」不同，不把人用 API 暴露成 A tool。
+
+```mermaid
+sequenceDiagram
+  participant UI as 正式 JD 來源區
+  participant Query as 來源讀取 workflow
+  participant JD as JD 正式修訂／直接引用
+  participant Memory as Memory 固定快照／原始訪談
+  UI->>Query: 展開來源列表
+  Query->>JD: 捕捉正式 head，讀該版引用與目標標籤
+  Query->>Memory: 比較原引用與本次最新已發布基準
+  Query-->>UI: 正式修訂、引用定位、名稱、待核對
+  UI->>Query: 帶回正式修訂及引用，按需讀子來源
+  Query->>JD: 確認仍是目前正式修訂及其直接引用
+  alt 正式修訂已改變
+    Query-->>UI: 409，要求重新讀來源列表
+  else 引用仍可用
+    Query->>Memory: 沿原快照的固定引用鏈讀正文／原話
+    Query-->>UI: 正文與可下鑽定位
+  end
+  Note over UI,Memory: 全程只讀；查看不解除待核對、不採用候選、不改寫引用
+```
+
+Query key 帶職務檔案、正式 JD 修訂、引用及子來源用途；切檔／重新取列表後，舊的展開與差異狀態不能混入新的選取。GET 錯誤需明示，不顯示空結果假裝成功；409 提供回列表重讀，不自动改基準。Memory 更新可以使同一 JD 的來源變成待核對，因此不能將來源列表視為僅由 JD 修訂決定的永久 cache。
+
+正文和差異使用 `react-markdown` 的安全 React 呈現，不啟用 raw HTML；來源內容中的連結／圖片不作外部導覽或遠端載入，真正下鑽只經 App 提供的來源按鈕。長 diff 區可水平捲動，不撐破頁面。資料結構由後端 canonical schema 同時生成 Python／TS，UI 驗證後才採用；不手刻另一套契約。
+
+依據：[TanStack Query keys](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)、[react-markdown security](https://github.com/remarkjs/react-markdown#security)、[FastAPI response model](https://fastapi.tiangolo.com/tutorial/response-model/)。框架提供查詢／呈現機制；原引用資格、固定鏈與正式／候選隔離由 Caliburn 的[來源責任](jd-storage.md#37-人的正式來源回查t09-增量)維護。接線與驗證狀態以 [T09 來源證據](../plans/2026-09-29-target-rebuild/evidence/t09-source-viewer.md)為準，不據此宣告 T09 全部完成。
+
 ## 4. PDF 與程序
 
 PDF renderer 收固定正式 JD 的成品投影，模板分離可讀內容與 print CSS；顯示姓名依既定首版政策不輸出。使用受控字型、escape 所有文字，不允許外部網路載入；Chromium 用受控生命週期、有限並行，渲染完關閉 page。字型缺失、超時或匯出失敗有明確錯誤，不把空 PDF 當成功。

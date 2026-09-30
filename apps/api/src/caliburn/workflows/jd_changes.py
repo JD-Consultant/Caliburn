@@ -16,16 +16,13 @@ from caliburn.features.job_description import candidate_service, change_queries,
 from caliburn.features.job_description.change_queries import JdChangeSnapshot, ManualJdRange
 from caliburn.features.job_description.models import ProfileField
 from caliburn.features.job_description.navigation import resolve_jd_read_ref
-from caliburn.features.job_description.sources import InterviewSource, JdSourceReference
+from caliburn.features.job_description.sources import InterviewSource
 from caliburn.features.job_description.work_queries import read_work_at
-from caliburn.features.work_memory import candidate_queries as memory
-from caliburn.features.work_memory.candidates import MemoryPermissionError
-from caliburn.features.work_memory.revisions import (
-    MemoryLayer,
-    MemoryObjectRevision,
-    MemoryRevisionNotFoundError,
-)
+from caliburn.features.work_memory.revisions import MemoryRevisionNotFoundError
 from caliburn.workflows.jd_reads import resolve_jd_citation_ref
+from caliburn.workflows.jd_source_queries import JdSourceChanges as JdSourceChanges
+from caliburn.workflows.jd_source_queries import MemorySourceChange as MemorySourceChange
+from caliburn.workflows.jd_source_queries import read_memory_source_changes
 from caliburn.workflows.memory_reads import PublishedMemoryRead
 
 
@@ -79,20 +76,6 @@ type JdChangeQuery = ManualChangeQuery | SourceChangeQuery
 
 class UnsupportedJdSourceKindError(ValueError):
     """The safe message points back to current input or an authorized formal sequence."""
-
-
-@dataclass(frozen=True, slots=True)
-class MemorySourceChange:
-    before: MemoryObjectRevision | None
-    after: MemoryObjectRevision | None
-    before_interviews: tuple[int, ...]
-    after_interviews: tuple[int, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class JdSourceChanges:
-    reference: JdSourceReference
-    changes: tuple[MemorySourceChange, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -178,52 +161,13 @@ class JdChangesWorkflow:
                 )
             if binding.snapshot_id is None:
                 raise MemoryRevisionNotFoundError("No published comparison endpoint is pinned")
-            old_snapshot = await memory.read_snapshot(session, file_id, source.snapshot_id)
-            new_snapshot = await memory.read_snapshot(session, file_id, binding.snapshot_id)
-            if (
-                max(old_snapshot.covered_through_sequence, new_snapshot.covered_through_sequence)
-                > binding.interview_through_sequence
-            ):
-                raise MemoryPermissionError("The source exceeds this Turn's interview boundary")
-            old_members = await memory.read_members(session, file_id, old_snapshot.position_id)
-            new_members = await memory.read_members(session, file_id, new_snapshot.position_id)
-            before = await memory.read_selected(session, file_id, old_members, source.object_id)
-            if before.revision_id != source.revision_id or before.layer.value != source.layer.value:
-                raise MemoryRevisionNotFoundError("The citation does not match its fixed snapshot")
-            after = (
-                await memory.read_selected(session, file_id, new_members, source.object_id)
-                if source.object_id in new_members
-                else None
+            return await read_memory_source_changes(
+                session,
+                job_file_id=file_id,
+                reference=reference,
+                snapshot_id=binding.snapshot_id,
+                interview_through_sequence=binding.interview_through_sequence,
             )
-            if after is not None and after.layer != before.layer:
-                raise MemoryRevisionNotFoundError("The same source identity changed layer")
-            changes = [await _source_change(session, binding, before, after)]
-            # A changed understanding may retain the same text but depend on changed situations.
-            old_links = {ref.object_id: ref for ref in before.work_situation_references}
-            new_links = (
-                {ref.object_id: ref for ref in after.work_situation_references} if after else {}
-            )
-            for object_id in sorted(old_links.keys() | new_links.keys()):
-                old = (
-                    await memory.read_selected(session, file_id, old_members, object_id)
-                    if object_id in old_links
-                    else None
-                )
-                new = (
-                    await memory.read_selected(session, file_id, new_members, object_id)
-                    if object_id in new_links
-                    else None
-                )
-                for selected, links in ((old, old_links), (new, new_links)):
-                    if selected is not None and (
-                        selected.layer != MemoryLayer.WORK_SITUATION
-                        or selected.revision_id != links[object_id].revision_id
-                    ):
-                        raise MemoryRevisionNotFoundError(
-                            "The published source chain is incomplete"
-                        )
-                changes.append(await _source_change(session, binding, old, new))
-            return JdSourceChanges(reference, tuple(changes))
 
 
 async def _require_read(session: AsyncSession, binding: PublishedMemoryRead) -> None:
@@ -231,22 +175,3 @@ async def _require_read(session: AsyncSession, binding: PublishedMemoryRead) -> 
         await executions.read_execution(session, binding.scope)
     ).status not in (ExecutionStatus.ACTIVE, ExecutionStatus.PAUSED):
         raise ExecutionStateError("This Turn cannot read JD changes")
-
-
-async def _source_change(
-    session: AsyncSession,
-    binding: PublishedMemoryRead,
-    before: MemoryObjectRevision | None,
-    after: MemoryObjectRevision | None,
-) -> MemorySourceChange:
-    async def sequences(value: MemoryObjectRevision | None) -> tuple[int, ...]:
-        if value is None or not value.interview_references:
-            return ()
-        selected = await interviews.read_interview_sources(
-            session,
-            InterviewReadScope(binding.scope.job_file_id, binding.interview_through_sequence),
-            source_ids=tuple(value.interview_references),
-        )
-        return tuple(sorted(message.interview_sequence for message in selected))
-
-    return MemorySourceChange(before, after, await sequences(before), await sequences(after))

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdSourceChangesView",
+  "description": "Relevant fixed original source-chain changes against one published Memory endpoint selected at read time. Does not align references.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["revision_id", "citation_id", "markdown"],
+  "properties": {
+    "revision_id": {"type": "string", "format": "uuid"},
+    "citation_id": {"type": "string", "format": "uuid"},
+    "markdown": {"type": "string"}
+  }
+}

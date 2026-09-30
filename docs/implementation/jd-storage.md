@@ -31,7 +31,7 @@
 
 ## 2. 固定修訂與目前正式頭
 
-以下為**已實作資料關係**，非完整未來 schema。`job_files` 是既有 owner；圖的複合識別均含 `job_file_id`。簡化屬性只列識別／關係及已實作欄位，完整 DDL 以 [0005](../../apps/api/migrations/versions/0005_jd_profile_revisions.py)及 [0006 migration](../../apps/api/migrations/versions/0006_jd_area_selections.py)為準。
+以下為**已實作資料關係**，非完整未來 schema。`job_files` 是既有 owner；圖的複合識別均含 `job_file_id`。簡化屬性只列識別／關係及已實作欄位，完整 DDL 以 [0005](../../apps/api/src/caliburn/migrations/versions/0005_jd_profile_revisions.py)及 [0006 migration](../../apps/api/src/caliburn/migrations/versions/0006_jd_area_selections.py)為準。
 
 ```mermaid
 erDiagram
@@ -105,7 +105,7 @@ UUID 是身分，不表示時間大小；先後由父修訂與原操作表達。
 
 ### 2.2 任務內容、獨立明細及歸屬
 
-以下為第四切片已實作關係，與上圖共用同一份 `jd_revisions`、職責選用及原操作；不是第二套版本服務。完整 DDL 見 [0007 migration](../../apps/api/migrations/versions/0007_jd_task_selections.py)。
+以下為第四切片已實作關係，與上圖共用同一份 `jd_revisions`、職責選用及原操作；不是第二套版本服務。完整 DDL 見 [0007 migration](../../apps/api/src/caliburn/migrations/versions/0007_jd_task_selections.py)。
 
 ```mermaid
 erDiagram
@@ -221,11 +221,11 @@ erDiagram
 
 `GET /jd/capabilities` 只讀一次 head，再讀該固定修訂的定義與連結，故兩次 SQL 間有其他提交也不混版。它和 `/jd/work` **不同 HTTP 請求不承諾同版**；人工 UI 已統一使用 §2.3 的組合讀取，任務及反向用途均由同一份資料投影。模型入口仍待 T07。
 
-完整 DDL 見 [0008](../../apps/api/migrations/versions/0008_jd_capability_relations.py)，資料形狀見 [edit request](../../apps/api/contracts/http/edit-jd-capabilities-request.schema.json)與 [view](../../apps/api/contracts/http/jd-capabilities-view.schema.json)。每次命令處理一筆定義或一條任務關係及其排序，沿原 workflow 的准入、鎖、原結果及 CAS；HTTP UUID 不是模型的 `read_ref`／`title_target`。
+完整 DDL 見 [0008](../../apps/api/src/caliburn/migrations/versions/0008_jd_capability_relations.py)，資料形狀見 [edit request](../../apps/api/contracts/http/edit-jd-capabilities-request.schema.json)與 [view](../../apps/api/contracts/http/jd-capabilities-view.schema.json)。每次命令處理一筆定義或一條任務關係及其排序，沿原 workflow 的准入、鎖、原結果及 CAS；HTTP UUID 不是模型的 `read_ref`／`title_target`。
 
 ### 2.5 協作對象與全職務共通條件
 
-這兩個集合仍在同一 JD feature、同一正式修訂、原操作及 workflow 內。沒有另建 CRUD service／泛型 repository、進度表或全文 JSON 副本。新 target migration [0009](../../apps/api/migrations/versions/0009_jd_collaborators_conditions.py) 加入內容及選用；原新 target 資料自然為空集合，不搬舊產品資料。
+這兩個集合仍在同一 JD feature、同一正式修訂、原操作及 workflow 內。沒有另建 CRUD service／泛型 repository、進度表或全文 JSON 副本。新 target migration [0009](../../apps/api/src/caliburn/migrations/versions/0009_jd_collaborators_conditions.py) 加入內容及選用；原新 target 資料自然為空集合，不搬舊產品資料。
 
 ```mermaid
 flowchart LR
@@ -283,7 +283,7 @@ sequenceDiagram
 
 ### 3.1 本輪候選與可恢復位置
 
-**本節為已實作的 JD 底層，不表示完整 A Turn 已可用。** [0010 migration](../../apps/api/migrations/versions/0010_jd_candidates.py) 為每個 A execution 增加一個候選指標；不複製整份正文，不建立第二份收據或長時間 SQL transaction。
+**本節為已實作的 JD 底層，不表示完整 A Turn 已可用。** [0010 migration](../../apps/api/src/caliburn/migrations/versions/0010_jd_candidates.py) 為每個 A execution 增加一個候選指標；不複製整份正文，不建立第二份收據或長時間 SQL transaction。
 
 候選保存 `base_revision_id`、`current_revision_id`、`generation_id` 及 `open/adopted/discarded` 狀態。base 為開始時正式修訂；current 選用同一套不可變 JD 修訂。建立候選只讓兩指標指向正式基底，重入取得目前候選，不重設工作。execution／修訂 FK 限同檔案，已關閉候選不能以同 execution 重開。
 

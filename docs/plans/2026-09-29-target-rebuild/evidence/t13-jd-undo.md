@@ -28,7 +28,7 @@ app.include_router(jd_undo.router)
 | 503 `jd_undo_unconfirmed` | DB 操作／commit 確認失敗；沿同一 Turn 路徑重試確認，不改基準 |
 | 503 `database_not_configured` | 尚未注入 workflow |
 
-新增 [0018 migration](../../../../apps/api/migrations/versions/0018_jd_completed_undo.py) **只擴充**既有 `jd_operations.kind` CHECK，沒有新增資料表、改正文、刪資料或自動 migration。既有 App namespace 須由主線明示升到 head；本切片僅在 fresh `_test` schema 執行。
+新增 [0018 migration](../../../../apps/api/src/caliburn/migrations/versions/0018_jd_completed_undo.py) **只擴充**既有 `jd_operations.kind` CHECK，沒有新增資料表、改正文、刪資料或自動 migration。既有 App namespace 須由主線明示升到 head；本切片僅在 fresh `_test` schema 執行。
 
 共用 ORM `features/job_description/persistence.py` 的同名 kind CHECK 需同步加入 `undo_completed_turn`。該檔由其他代理修改，本切片未碰；已通知主線接線時同步。正式 DDL 已由 0018 驗證。
 

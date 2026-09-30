@@ -11,8 +11,8 @@ apps/
   api/
     pyproject.toml / uv.lock
     contracts/                  # JSON Schema 唯一來源，依 http、tools 分用途
-    migrations/                 # Alembic；業務 schema，不手改框架 checkpoint 表
     src/caliburn/
+      migrations/               # 隨套件交付的唯一 Alembic 歷史；不手改框架 checkpoint 表
       bootstrap.py              # 唯一組裝根：settings、DB、clients、services、graphs
       settings.py               # 啟動配置驗證；不在 import 時讀密鑰或啟動程序
       features/
@@ -52,6 +52,8 @@ apps/
 不先建立所有空資料夾／檔案。每個 feature 先以 `models.py`（純型別與不變量）、`service.py`（用例）、`persistence.py`（該領域 SQL）、`queries.py`（讀取投影）按實際需要建立；大了再依業務責任拆，例如 `citations.py`、`snapshots.py`。不是每功能必須四個檔案，也不為一個函式包 class。測試依受測責任命名，不做一份幾千行全產品測試。
 
 業務表的 SQL 留在各 feature 的 persistence，不塞進全域 database.py；交易與連線機制才共用。`executions` 只擁有正式准入／控制資格與預算，不能再存一份 Graph node 游標、候選全文或模型對話。
+
+Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位同一套件資源；不可由 `__file__` 向上猜 checkout 或另複製一份 migration。安裝成 wheel 後也必須能取得完整歷史。啟動仍只檢查版本，升級需明確執行；見[交付驗證](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#乾淨安裝與套件化-migration2026-10-01)。
 
 ## 2. 依賴方向與可檢查限制
 

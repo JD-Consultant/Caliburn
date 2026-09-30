@@ -242,6 +242,7 @@
 
 - [ ] T18；依賴：T17；依[本 Goal 的條件式切換授權](README.md)執行，先核對 gate、精確 tracked 退役清單及可恢復性，不擴張刪除範圍。
 - **2026-10-01 交付接線預備：**按既定單程序同源方案，使用 FastAPI 原生 frontend 接通已建置 UI；6 個行為反例修正後，相關 83 測試、mypy 與真 Web build／ASGI 資源深連結檢查通過。[範圍與限制](evidence/t18-same-origin-web.md)。只是可提前完成的隔離接線，不勾 T18、不更換正式入口／退役舊碼；T14／T16／T17 前置 gate 仍保留。
+- **2026-10-01 乾淨安裝預驗：**從固定 Git 匯出、獨立非 editable venv 與新測試 schema，重现 migration 依賴 checkout 而無法啟動；改用 Alembic 套件資源，19 份 revision 不變。30 項局部／真 PG 回歸、實際 wheel 啟動、人工 JD 保存／重開及真建置深連結通過。[證據與未驗範圍](evidence/t18-same-origin-web.md#乾淨安裝與套件化-migration2026-10-01)。無付費呼叫、不動 Demo，模型品質／PDF 乾淨交付與正式切換仍待驗，不勾 T18。
 - **契約：**[決策流程](../../decision-process.md)、ADR0077 的正式權責沿革、[交付規則](../../implementation/interface-and-delivery.md#5-安全與新舊切換)。
 - **交付：**新 successor ADR、根 pnpm scripts／workspace、App READMEs／runbook／CONTRIBUTING、架構現況 map；列出舊 tracked 程式與依賴逐項退役。正式 authority 不在此前任務偷換。
 - **先驗：**乾淨 clone 安裝／建庫／啟動／重開，production build 不引用 experiments；新入口故障可保留原環境及完整證據，不做舊資料 ETL。

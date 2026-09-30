@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T05 已完成；T06–T11、T13–T15 已有施工／局部驗證，完整 gate 仍未完成。2026-09-30 晚 Owner 以新 Goal 恢復施工（先前為純文件推送後的安全暫停）**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T08 已完成；T09–T15 已有施工／局部驗證，完整 gate 仍未完成；T16–T18 未完成。2026-09-30 晚 Owner 以新 Goal 恢復施工（先前為純文件推送後的安全暫停）**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - **恢復範圍 successor（2026-09-30）：**T06／T08／T11／T12 依[共用執行 §6.4](../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)保留核心接續與安全退出；罕見原件遺失的全面追蹤／同工作再准入不再列為首版阻擋條件。已保存的結果及資料安全測試不刪減；本次最外層收尾證據見 [T12 §6](evidence/t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)，尚未勾選整項任務。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
@@ -66,7 +66,8 @@
 
 ## T06 共用原生模型／工具執行機制
 
-- [ ] T06；依賴：T01。
+- [x] T06；依賴：T01。
+- **完成（2026-09-30 恢復後）：**共用原生模型／工具執行機制已逐條對照 Red 與 E01–E04（框架部分）、E11／E15 的既有測試，見 [T06 §21](evidence/t06-agent-execution.md#21-任務完成對照2026-09-30-恢復後)；補上任務要求但一直缺的**真 API compact 協定預檢**（5 次 HTTP、零重試，遠端接受 compact 視窗並可續作，[§20](evidence/t06-agent-execution.md#20-真-compact-協定預檢2026-09-30-恢復後)）。完整後端 **1847 passed、2 skipped**（跳過的是需字型的 PDF 渲染，歸 T13）。**不含**：A 控制／完成（T08）、B1／B2 調度（T10／T11）、跨程序故障矩陣（T12）、大視窗 compact 延遲與費用及帳單核對（T16／T17）；Owner 首版恢復 successor 已把「未明 attempt 的 production 再准入」移出必做，共用接縫保留未接線。以下為各切片的歷史紀錄。
 - **2026-09-30 金額減法：**Owner 確認正常產品不設金額 gate、付費驗證保留 manifest 限額；沿既有共用 owner 調整，保留容量、次數、deadline 與恢復。接線與實際測試見 [T06 §19](evidence/t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)，不據此勾完整 T06／T17，不宣稱 Demo 已遷移。
 - **第一切片（2026-09-30）：**接續 T05 寫入提交 `d87b3c86`，實作原生回應原件／重送投影、phase／多 call 路由及對應配對。獨立審查後補空白 final／compact 保留 user 反例；Unit／contracts＋真 saver 新程序 **413 passed**。目前只是元件與正常保存往返，沒有宣稱 E01–E04 整體、完整 Graph、費用／取消或 provider 已驗收。[研究、反例及下一步](evidence/t06-agent-execution.md)。
 - **第二切片（2026-09-30）：**承接 `5cfbb1da`，單一原生模型／有序工具 Step、官方 serializer 明確 allowlist，接上實際 Memory 候選寫入與跨程序 saver。公開入口統一 sync／有界呼叫／恢復准入；模型保存故障／確認遺失、部分工具恢復與元件集合 **452 passed**。雙保存失敗的官方補存已有能力反例；正式 supervisor、完整 loop、預算／compact 與 provider 仍未完成。
@@ -94,7 +95,8 @@
 
 ## T07 A 的 JD／來源／差異按需工具
 
-- [ ] T07；依賴：T03、T04、T05。
+- [x] T07；依賴：T03、T04、T05。
+- **完成（2026-09-30 恢復後）：**八個 JD 入口、來源與兩類 diff 已逐條對照 Red 與 JDT-01～06、V17／V18／V20 的既有測試，見 [T07 §5](evidence/t07-jd-tools.md#5-任務完成對照2026-09-30-恢復後)；補上兩個缺口的守門測試：A／B1／B2 全部 28 個工具的遞迴 strict schema 檢查（32 案），以及模型工具路徑刪除任務／協作對象／共通條件（連明細與知識連結清除、共用知識保留、重送不多刪）。完整後端 **1847 passed、2 skipped**。**不含**：官方 API 逐 schema 接受（T16 wire gate）、模型是否先讀再寫等行為（T14／T16）、A 完整 Turn 的恢復與競爭（T08／T12）、JDT-09 的模型比較。以下為各切片的歷史紀錄。
 - **最新切片（2026-09-30）：**八入口、完整集合編輯／來源與兩類 diff 已接上；提交 `4b20f1ed`、`a2168f63`。真 A3 使用當次原文及引用對齊完成更正；工具完整覆蓋與產品 gate 仍依 [T07 寫入](evidence/t07-jd-tools.md)、[來源／差異](evidence/t07-jd-changes-source.md)，不以一輪成功代全部驗收。
 - **第一切片（2026-09-30）：**承接 `79b773ee`，接既有候選／固定修訂的精簡 JD map 與同範圍物件定位；不新增 map 儲存、名稱 ID 或 LLM 摘要。專項 **14 passed**，unit／contracts 與受影響候選真 PG **731 passed**；[證據與未完範圍](evidence/t07-jd-tools.md)。完整 read／編輯／來源及兩類 diff 尚未接好，不勾 T07、不當作 A 已可用。
 - **契約：**[JD 八入口與分支](../../specs/2026-09-29-jd-model-tool-contract-review.md)、[A 的 read／map](../../specs/2026-09-26-consultant-context-and-state-design.md)、共同工具規範。
@@ -105,7 +107,8 @@
 
 ## T08 A Turn：固定資料、正式完成與控制
 
-- [ ] T08；依賴：T02、T06、T07。
+- [x] T08；依賴：T02、T06、T07。
+- **完成（2026-09-30 恢復後）：**A Turn 的固定資料、正式完成與控制已逐條對照 Red 與 V04–V09／E07–E09／E12，見 [T08 §8](evidence/t08-consultant-turn.md#8-任務完成對照2026-09-30-恢復後)；四輪真模型、三批背景 Memory、暫停後同輪續作與重啟為實測證據，另補首請求超量的近期訪談縮減（§7）。**不含**：廣泛故障競爭矩陣（T12）、UI 與斷線重連的瀏覽器旅程（T09）、A 的自然訪談品質與來源選擇（T14／T16／T17；T17 的品質 trial 仍是 fail）。以下為各切片的歷史紀錄。
 - **2026-09-30 恢復後：**補上暫停交接定位的缺口——首請求超量時的有界近期訪談縮減（V05「超量」）。共用迴圈只多一條有界路由，A 以純函式保留最新完整訊息、員工回答的必要前問，並在起始資料明示未預載範圍，A 用既有 `read_interview` 回讀。unit／contracts＋10 個真 PG 整合檔 **1058 passed**；[證據與未驗範圍](evidence/t08-consultant-turn.md#7-近期訪談預載超量的有界縮減2026-09-30-恢復後)。真模型是否實際回讀、未知 attempt 的 production 核對仍未完成，不勾 T08。
 - **控制入口恢復增量：**typed 原件可交回既有 runner；換 writer、pending pause／續作、取消保護有定向證據，見 [T08 §6](evidence/t08-consultant-turn.md#6-原件交接穿過正式控制入口2026-09-30)。尚非 supervisor 自動交回／跨程序遺失再准入完成。
 - **最新整合：**`76f99867` 接通正式完成／控制、原生接續、背景要求與公開歷史；三輪真模型、兩批 Memory、暫停重開同輪續作、902 unit/contracts、725 PG integration（另補兩項真 Chromium）及重啟證據見 [T08 §5](evidence/t08-consultant-turn.md#5-顧問--背景整理的整合2026-09-30-1057-台北)。未知 attempt 的 production 核對接線、廣泛故障／品質仍未完成。

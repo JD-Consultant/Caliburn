@@ -440,3 +440,69 @@ T17 失敗批次的唯讀核對發現，舊 runner 每次以最大可用輸入 9
 補正後重跑上述同一回歸命令：**1108 passed in 88.64s**；Ruff check／format **406 files**、mypy **252 source files** 通過。新增本地文件連結 11 處及 diff check 通過。Reviewer 窄複核原件往返、未知成本、Step／部分工具恢復及壞 call_id，關閉 P2，無新增發現；未冒稱 reviewer 重跑完整套件。這是本切片最終證據，不與前次 1105 加總。
 
 本切片未讀 `.env`、未呼叫真模型、未修改／重啟 Demo 8100／5173、未對 Demo 執行 migration，也未重驗 UI／PDF／自然訪談品質。舊資料與已受理測試仍保留原限制；本次測試不證明 T17 的漏引／更正泛化已修好。T06、T16、T17、T18 及 Goal 未據此勾選完成。
+
+## 20. 真 compact 協定預檢（2026-09-30 恢復後）
+
+### 批次 manifest（執行前設定）
+
+任務表要求 T06「提前消除遠端風險」含 compact，但 §6 第一批因無法為單次 compact 設硬成本上限而刻意不送，至今**沒有任何一次真 API 的 compact 證據**；離線測例（§10、§14）只證明本機序列化與採用流程。本批只驗遠端是否接受：一步原生工具視窗 → standalone compact → 經本專案 serializer 的 JSON 往返取出完整 output window → 作為下一個 count／create 的前綴。不驗分析品質、輪前／輪中時點、取消或成本上限。沿計畫既有的有界真模型授權；腳本為 `apps/api/scripts/probe_responses_protocol.py --stage compaction`（原 `protocol` 階段行為與輸出事件不變），直接呼叫已測 adapter／serializer，不建立第二套 runner。
+
+| 項目 | 本批界線 |
+|---|---|
+| 模型／資料 | `gpt-6-luna`、`low`、`service_tier=default`；只有腳本內合成協定文字及一個無參數虛擬唯讀工具（沿 §6）；不送 repo／員工／JD 內容 |
+| 請求 | `count → create`（一步工具視窗）→ `compact`（該完整視窗）→ `count → create`（compact 返回視窗＋一則新 user 訊息）；共 **5 次 HTTP**（2 生成、1 compact、2 count）；SDK／腳本重試 0、並行 1；任何未預期結果立即停止 |
+| 容量／時間 | 第一次 count ≤ 4,096、compact 後 count ≤ 8,192 tokens 才續送；create `max_output_tokens=512`；每次 60 秒、整批 240 秒 |
+| 金額 | 管理預算 US$0.05，不是 provider 帳單保證；官方未提供 compact 單次硬上限，故實質界線是「視窗只有數百 token 的合成內容」；生成沿 §6 的估算約 US$0.0001 量級；count 與 compact 費用未知不記成零 |
+| 停止／重跑 | 任何錯誤、逾時、模型不可用、item 形狀不符即停；不換模型、不自動重跑；追加批次須先診斷並另記理由與上限 |
+| 憑證／紀錄 | 僅取 `apps/api/.env`（git 忽略）的 `OPENAI_API_KEY`；結果檔 exclusive-create 於忽略區 `.research-tmp/`，只記次數、item 型別、usage 與安全錯誤碼，不記 key／opaque／原始 body |
+
+腳本靜態：Ruff check／format、mypy（連同 src **254 source files**）通過，`--help` 可執行；程式為有限相容性 probe，不是產品新行為，故不製造假 TDD Red，實際 serializer 已由 §10 與 `test_response_serialization.py` 覆蓋離線往返。
+
+### 實際結果（2026-09-30 23:04 台北）
+
+```powershell
+$env:PYTHONUTF8='1'
+./.venv-target/Scripts/python.exe -B scripts/probe_responses_protocol.py --stage compaction --key-file S:/caliburn/apps/api/.env --output S:/caliburn/.research-tmp/openai-compaction-20260930-a.jsonl
+```
+
+**5 HTTP／2 生成／1 compact／0 重試，全部被接受，約 7 秒，未觸及任何停止條件。**安全結果檔在忽略區 `.research-tmp/openai-compaction-20260930-a.jsonl`，沒有 key、opaque 或原始 body。
+
+| 步驟 | 觀察 |
+|---|---|
+| 一步原生工具視窗 | count 92 tokens；create 回 `function_call`，usage 92 入／16 出；`store=false`、`all_turns`、strict 被接受；原 R JSON 往返相同 |
+| standalone compact | 輸入視窗型別 `message, function_call, function_call_output`；**返回 `message`（保留的原 user 訊息）＋ 一個帶加密內容的 `compaction`**，usage 61 入／42 出；工具呼叫與結果已被折進 `compaction`，沒有另留可讀的摘要 |
+| 本專案 serializer | `snapshot_compaction` → JSON 往返 → `compaction_input_items` 取回 **2 個完整 output items**，可直接作下一請求的前綴 |
+| 從 C 續作 | 以「返回視窗＋一則新 user 訊息」count＝132（遠低於 8,192）被接受；create 回 `reasoning`（含加密內容）＋ `message(phase=final_answer)`，內容如指示為 `compact-ok`，usage 132 入／24 出（16 為 reasoning）；原 R 往返相同 |
+
+生成估算沿 §6 費率約 US$0.00004，compact 用量僅 61／42 tokens；count 與 compact 的實際計費未由 API 回傳，**不記為零**，也不是帳單核對。合計 usage 約 367 tokens，遠小於 manifest 的 US$0.05 管理預算。
+
+**因此確認的遠端契約：**standalone compact 接受本專案送出的 payload（`model`、完整 `input`、`service_tier=default`）；返回視窗須以完整 output 原型別、原順序承接（此例是 2 項，其中之一是不可讀的 `compaction`），與 §10 的採用設計一致；count 與 create 都接受含 `compaction` 的視窗。**未驗證：**大視窗（數十萬 token）的 compact 延遲與費用、視窗內已有 `reasoning` 加密項時的 compact、對已含 `compaction` 的視窗再次 compact、compact 後的長期品質（細節損失）與不同 `service_tier`。這些歸 T16／T17，不能由此單次推定。無憑證外洩；未動 Demo。
+
+## 21. 任務完成對照（2026-09-30 恢復後）
+
+沿[任務表 T06 的 Red 與完成條件](../tasks.md#t06-共用原生模型工具執行機制)逐條對照**既有**測試，沒有新增機制。路徑相對 `apps/api/tests`；同一測例只列代表，不重複貼各切片已記的命令輸出。
+
+| T06 Red | 代表測例（層級） |
+|---|---|
+| R 已保存卻重呼模型 | `integration/test_response_step_postgres.py::test_model_checkpoint_failure_does_not_dispatch_and_pending_writes_recover_original`、`integration/test_graph_postgres.py::test_native_items_survive_process_restart_without_reexecuting_saved_node`（真 PG＋新程序）；`integration/test_model_request_accounting.py::test_saved_response_is_settled_after_ack_loss_without_querying_model_again` |
+| 只存 output_text | `contracts/test_response_serialization.py::test_snapshot_and_replay_are_distinct_without_losing_received_metadata`、`contracts/test_openai_native_items.py::test_sdk_replays_all_native_items_without_remote_storage`（真 SDK mock transport） |
+| 兩工具平行／配錯 call | `unit/test_response_steps.py::test_multiple_calls_remain_ordered_even_when_final_text_coexists`、`test_duplicate_call_identity_is_not_silently_deduplicated`；`contracts/test_response_serialization.py::test_saved_result_prefix_cannot_skip_repeat_or_exceed_calls`、`test_results_keep_call_identity_and_direct_caller` |
+| 公開文字誤判 final | `unit/test_response_steps.py::test_commentary_and_calls_do_not_complete_the_turn`、`test_missing_phase_is_not_guessed_from_visible_text` |
+| serializer 丟 opaque／phase | 上列 serialization／native items 契約、`contracts/test_graph_serialization.py`（含拒絕 pickle 與明確 allowlist）、`integration/test_graph_postgres.py`（官方 PostgresSaver 往返） |
+| role namespace 污染 | `integration/test_context_histories.py::test_thread_identity_separates_roles_and_window_kinds`、`test_roles_cannot_cross_execution_kind`、`test_database_rejects_cross_job_bindings_and_partial_references` |
+| SDK 隱含 retry | `contracts/test_openai_responses.py::test_transient_failure_is_one_outbound_attempt_not_sdk_retries`、`test_injected_redirecting_client_is_rejected_before_dispatch`、`test_default_client_does_not_forward_post_body_to_redirect` |
+
+| T06 完成條件／E gate（框架部分） | 對照 |
+|---|---|
+| E01 原生 R／C 序列化與下一 request | 同上契約與 saver 往返；遠端接受性另有 §6（create／count／工具接續／strict／`store=false`／`all_turns`）與 §20（compact 視窗） |
+| E02 R 已存、工具未做 | `integration/test_response_step_postgres.py::test_saved_step_reopens_without_repeating_window_items`、`unit/test_tool_steps.py::test_saved_first_result_and_pending_second_do_not_recall_or_reprepare`；跨程序 hard-exit 見 [T12 §6](t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30) 的 `integration/test_consultant_process_recovery.py` |
+| E03 R 在但保存失敗／確認遺失 | `unit/test_response_recovery.py::test_public_step_preserves_original_response_when_both_saver_writes_fail`、`integration/test_response_step_postgres.py::test_public_step_recovery_saves_held_model_result_after_both_writes_fail`、`integration/test_result_save_retries_postgres.py::test_saved_original_survives_automatic_recovery_and_saver_reopen` |
+| E04 框架部分、`sync` 先 R 後工具 | `unit/test_tool_steps.py::test_model_and_each_prepared_operation_are_saved_before_effects`、`integration/test_memory_tool_step.py`；候選 owner 的原操作效果歸 T05／T07 |
+| E11 compact 採用／中途接續 | `unit/test_context_compaction.py`、`integration/test_compaction_accounting.py`、`integration/test_context_preparation_postgres.py::test_reopened_preparation_reuses_original_history_count_and_next_context` |
+| E15 不疊 retry、不重置預算、未知不算零、模型等待不持交易 | `integration/test_outbound_retry.py`（10 案）、`integration/test_execution_budgets.py`（10 案）、`integration/test_request_capacity_postgres.py`、`integration/test_response_recovery_eligibility.py`（若模型 I/O 期間持有交易，該測例會死鎖）；首請求超量的有界縮減見 [T08 §7](t08-consultant-turn.md#7-近期訪談預載超量的有界縮減2026-09-30-恢復後) |
+| 零／一／多 call | `unit/test_response_steps.py`、`unit/test_response_loop.py`、`unit/test_tool_steps.py` |
+| 真 PG 新程序 round trip | `integration/test_graph_postgres.py`、各 `tests/fixtures/*_worker.py` 驅動的獨立程序案例 |
+
+**結論：**T06 的共用機制成立，勾選。仍有的相關工作都已有 owner，不併入本任務：A 的正式控制／完成屬 T08；B1／B2 角色與調度屬 T10／T11；跨程序故障矩陣屬 T12；官方 API 的大視窗 compact 延遲與費用、加密 reasoning 跨輪的 gate、實際帳單核對屬 T16／T17。Owner 2026-09-30 的首版恢復 successor（[共用執行 §6.4](../../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)）已把「未明 attempt 的 production 原件核對」移出首版必做；§18.1 的共用再准入接縫與 16 案保留，未接 production owner，不宣稱自動恢復。
+
+**完整後端回歸（提交 `478abcf8` 之上）：**`pytest tests`（真 PG `caliburn_t01_test` 的隔離 schema、合成 SDK transport）**1847 passed、2 skipped in 600.46s**；跳過的是 `test_pdf_rendering.py` 兩案（需 `CALIBURN_TEST_PDF_FONT`，T13 另驗）。命令與環境同 [T08 §8](t08-consultant-turn.md#8-任務完成對照2026-09-30-恢復後)。Ruff format／check 384 files、mypy 254 files（含 probe 腳本）通過。

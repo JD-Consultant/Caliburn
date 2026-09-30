@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T09 已完成；T10–T15 已有施工／局部驗證，完整 gate 仍未完成；T16–T18 未完成。2026-09-30 晚 Owner 以新 Goal 恢復施工（先前為純文件推送後的安全暫停）**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T12 已完成；T13–T15 已有施工／局部驗證，完整 gate 仍未完成；T16–T18 未完成。2026-09-30 晚 Owner 以新 Goal 恢復施工（先前為純文件推送後的安全暫停）**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - **恢復範圍 successor（2026-09-30）：**T06／T08／T11／T12 依[共用執行 §6.4](../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)保留核心接續與安全退出；罕見原件遺失的全面追蹤／同工作再准入不再列為首版阻擋條件。已保存的結果及資料安全測試不刪減；本次最外層收尾證據見 [T12 §6](evidence/t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)，尚未勾選整項任務。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
@@ -143,7 +143,8 @@
 
 ## T10 B1／B2 私有角色與 context
 
-- [ ] T10；依賴：T05、T06。
+- [x] T10；依賴：T05、T06。
+- **完成（2026-09-30 恢復後）：**B1／B2 私有角色權限、固定資料與 context 已逐條對照 Red 與 V10／V11／V14，見 [T10 完成對照](evidence/t10-memory-analysis-roles.md#任務完成對照2026-09-30-恢復後)；補了 V14 的缺口：B2 收到的情境差異專項測試（新增含未被引用者、刪除、改名、改正文、改回、只有 B2 階段可取得）。真模型：三批 A→B1→B2 正式發布與課程行政旅程的背景批次。**不含**：背景整理是否讓長訪談更好（T14／T17）、按需差異在超長批次的容量（T15／T16）。以下為歷史紀錄。
 - **最新切片：**`8eb469e1` 接兩個私有角色與同一共用 runtime，保留分層寫入權限；兩批真模型已共同發布，[T10 證據](evidence/t10-memory-analysis-roles.md)。局部真模型成功不代完整異常與品質 gate。
 - **契約：**[B1／B2 分責](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[原話 read](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[工作分析 §9](../../specs/2026-09-09-complete-work-analysis-guide.md#9-工作理解正文要寫到多清楚2026-09-25-研究補核對)。
 - **程式／交付：**兩角色 instructions、handlers、起始投影與私有 graph history；typed gap／完成輸出；fake provider 分工測試。
@@ -153,7 +154,8 @@
 
 ## T11 背景調度、交接與共同發布
 
-- [ ] T11；依賴：T08、T10。
+- [x] T11；依賴：T08、T10。
+- **完成（2026-09-30 恢復後）：**背景調度、交接與共同發布已逐條對照 Red 與 V10–V15／E10／E13，見 [T11 完成對照](evidence/t11-memory-batch.md#任務完成對照2026-09-30-恢復後)。**已知限制（如實記錄，待 Owner 確認）：**`release_block` 沒有 production 呼叫者，背景整理一旦最終失敗該檔案就不再自動整理（A 仍可用近期原話與 `read_interview` 繼續；規格把解除偵測列為待細設），附有界建議。以下為歷史紀錄。
 - **最新切片：**`8eb469e1` 接 Parent／固定範圍、差異交接、共同發布；`76f99867` 接 A 成功完成後登記與啟動重掃，[證據](evidence/t11-memory-batch.md)。已發布到正式員工序號 4、6；完整冷啟未知結果恢復仍未完成。
 - **契約：**背景生命週期的①②③、[保存 §5](../../architecture/persistence.md#5-背景要求不能只留在記憶體)、共用執行 §5–7。
 - **程式／交付：**`workflows/memory_batch.py`、Parent、App lifespan 調度；pending frontier／單批資格、交接快照diff、完成／失敗投影。
@@ -163,7 +165,8 @@
 
 ## T12 真 PostgreSQL 故障與競爭整合
 
-- [ ] T12；依賴：T09、T11。
+- [x] T12；依賴：T09、T11。
+- **完成（2026-09-30 恢復後）：**在 Owner 的首版恢復減法範圍內，E01–E15 已逐項對照既有真 PG／真程序測試，見 [T12 完成對照](evidence/t12-consultant-process-recovery.md#7-任務完成對照2026-09-30-恢復後)；本輪另在真模型評測中發現並修正兩個真實故障：串流中的限流被誤判為不可重試（[T06 §22](evidence/t06-agent-execution.md#22-串流中的限流被誤判為協定錯誤2026-09-30-恢復後的診斷與修正)）與重試耐心不足。**明確不含**（依 Owner 減法）：未明 attempt 的 production 再准入、任意位置自動續作；不含長時間 soak 與完整跨瀏覽器。以下為歷史紀錄。
 - **跨程序已保存工作恢復（2026-09-30）：**正式 A Runner／控制 wrapper＋真 PG，四個 hard-exit 邊界與全新程序承接通過；已存 count／R 不重呼、工具交易不重複修訂、正式完成保留原引用。是合成 SDK 傳輸與明確 writer 接管，不是未知原件遺失的自動恢復；[證據與未完範圍](evidence/t12-consultant-process-recovery.md)。T12 不勾完成。
 - **契約：**[E01–E15](../../specs/2026-09-27-shared-agent-execution-and-state-design.md#71-職責異常測試映射全部待執行)、[驗證矩陣](../../implementation/verification-plan.md)。
 - **程式／交付：**整合／程序故障 harness；兩連線受控交錯、獨立程序重啟、COMMIT 確認遺失；必要缺口回原 owner 修。

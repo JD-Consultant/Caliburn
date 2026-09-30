@@ -170,3 +170,26 @@ $env:CALIBURN_TEST_DATABASE_URL='postgresql://caliburn_test@127.0.0.1:55439/cali
 ```
 
 結果 **41 passed in 17.34s**（含 HTTP A→B1/B2→publish→下一輪接線與 import-boundary）、Ruff／format／mypy 通過；`git diff --check` 無 whitespace error，既有工作區有 CRLF 提示。未跑全庫、未付費呼叫模型、未重啟主線 App、未 commit。主線若較早已載入舊 constructor，其測試中的 `unexpected keyword argument` 不能當新版結果，需重新啟動測試程序；本輪不宣稱主線另一次全庫 session 已完成。
+
+## 任務完成對照（2026-09-30 恢復後）
+
+沿[任務表 T11 的 Red 與完成條件](../tasks.md#t11-背景調度交接與共同發布)逐條對照既有測試。路徑相對 `apps/api/tests/integration`。
+
+| T11 Red | 代表測例（真 PG） |
+|---|---|
+| A 完成後 crash 漏通知 | `test_memory_supervisor.py::test_shutdown_preserves_active_batch_and_restart_resumes_same_scope`、`test_memory_batch_orchestration.py::test_intent_requires_success_and_frontier_is_employee_not_reply` |
+| 在途批次擴大 F | `test_memory_batch_orchestration.py::test_parent_publishes_once_and_coalesces_next_frontier`、`test_memory_candidates.py::test_batch_reentry_keeps_original_source_boundary` |
+| B2 gap 後回到初始工作稿 | `test_memory_batch_orchestration.py::test_b2_gap_roundtrip_keeps_its_existing_understanding`、`test_memory_candidates.py::test_restore_invalidates_late_branch_and_preserves_prior_candidate` |
+| 發布確認遺失重發新版 | `test_memory_candidates.py::test_publish_is_one_fixed_graph_and_replay_returns_original_snapshot`、`test_replay_retains_original_identity_after_rename_and_title_reuse`、`test_memory_parent_roles.py::test_actual_roles_publish_atomically_and_continue_next_batch` |
+| 失敗後跳過未發布區間 | `test_memory_batch_orchestration.py::test_final_failure_blocks_repeated_notifications_not_consultant`、`test_memory_outcome_failure.py::test_invalid_b2_final_is_durable_failure_without_publish_or_retry`；系統解除後從已發布涵蓋處續處理、不跳號（本頁 §4 自有測例） |
+| quota 未變仍無限重跑 | `test_memory_supervisor.py::test_unknown_runner_error_is_not_poll_retry`、上列最終失敗阻塞案 |
+
+| T11 完成條件 | 對照 |
+|---|---|
+| V10–V15／E10／E13 | 上表；`test_memory_batch_orchestration.py::test_reentry_after_b1_handoff_skips_b1_and_preserves_work`（E10）；E13 的重啟自動找回、同檔唯一在途、舊批上界固定：supervisor／orchestration 各案 |
+| B 讀寫同一候選、A 只讀已發布 | `test_memory_candidates.py::test_candidate_binding_tracks_new_situation_but_old_snapshot_never_changes`、`test_memory_read_workflow.py::test_navigation_follows_candidate_identity_but_consultant_stays_on_published_snapshot` |
+| 系統重啟承接、最終失敗 A 可用原話工具繼續 | `test_memory_supervisor.py`、`test_consultant_context_binding.py::test_unresolved_memory_failure_is_reference_data_not_a_model_instruction`；真模型下 A 在背景整理失敗批次後仍完成同一旅程（[T17](t17-course-administrator-journey.md)） |
+
+**結論：**T11 的背景調度、交接與共同發布在其範圍內成立，勾選。
+
+**已知限制（如實記，不擅自設計新機制）：**`MemoryConsolidationWorkflow.release_block` 只在測試中被呼叫，**沒有 production 呼叫者**：背景整理一旦最終失敗，該檔案之後不再自動整理，直到有人呼叫這個系統掛鉤。規格把「怎麼偵測阻塞解除」明列為待細設（[產品概念](../../../product-concept.md)：不開放手動重跑、不無限自動重試）。實務影響有界：A 仍可用固定的已發布 Memory、完整近期原話與 `read_interview` 繼續（超過容量時走 [T08 §7](t08-consultant-turn.md#7-近期訪談預載超量的有界縮減2026-09-30-恢復後) 的縮減）；但單次模型失敗就永久停止整理，對很長的訪談偏嚴格。建議（待 Owner 確認，未實作）：後續完成的 A Turn 累積足夠新訪談（例如數輪）後，以一次新批次自然嘗試，失敗就再阻塞——這是以新資料為條件的有界重試，不是通知重設額度。

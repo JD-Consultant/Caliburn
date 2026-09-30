@@ -52,7 +52,7 @@ Owner 要求優先借鑑成熟框架並減少非必要自訂機制。本輪複�
 ## 4. 邊界與後續
 
 - 這裡的 writer 接管由測試明確呼叫，**不證明 production supervisor 已能自動辨識所有冷啟動狀態**。
-- 不涵蓋 R／C／count 未保存且程序已消失的原件遺失判定；可信核對 callback 與受控再准入仍沿 [T06 §18.1](t06-agent-execution.md#181-未明-attempt-的受控再准入接縫2026-09-30)完成，不能以取得鎖／新的 writer／查不到結果直接授權重送。
+- 不涵蓋 R／C／count 未保存且程序已消失的原件遺失判定；當時後續建議為 [T06 §18.1](t06-agent-execution.md#181-未明-attempt-的受控再准入接縫2026-09-30)的可信核對 callback。**本檔 §6 已依 Owner 新指示收斂：首版允許安全結束，不要求完成此自動再准入。**取得鎖／新 writer／查不到結果仍不直接授權重送。
 - 本輪不新增 Memory pin 交錯、B1／B2 回交、compaction、取消競爭、正式提交確認遺失或 HTTP／UI 自動重連的驗證。已有相應元件證據不能冒稱這四案已驗全部角色旅程；依原 T12 gate 補齊。
 - 語意品質、真 provider 串流／容量、完整訪談到 PDF 與乾淨交付仍在原 T16–T18；本輪不勾選任何完整任務。
 
@@ -69,3 +69,45 @@ Owner 要求優先借鑑成熟框架並減少非必要自訂機制。本輪複�
 獨立審查指出一個 P2 **測試缺口**：原 SDK 替身只要看到 `function_call_output` 就回覆，遺失原 `function_call` 仍可能通過；兩請求 hash 相同不代表內容完整。審查者在恢復子程序記憶體中包裝 `tool_steps.response_input_items`，只濾掉 `function_call`，原測例仍為 **1 passed、3 deselected**，證明原斷言不足，而非正式程式已發生此錯誤。
 
 修正僅在測試 fixture：用獨立的明確期望核對四項原生資料的順序，以及 reasoning 的 encrypted content／未知 metadata、commentary 的 phase／原文、工具 name／arguments／call ID、工具結果。主代理重播相同的程序內變異，得到 **1 failed、3 deselected in 5.52s**，錯誤正是缺失原 model／tool exchange；取消變異後四案通過。沒有改正式 serializer、業務操作或持久資料來配合測試，變異亦未寫入產品檔案。
+
+## 6. 首版恢復減法與最外層失敗收尾（2026-09-30）
+
+Owner 指示「核心有就好，不用太嚴格，避免卡住」。有效政策在[共用執行 §6.4](../../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)，本節只記實作與證據。
+
+**根因：**原 A／Memory supervisor 會保存 runner 例外，並避免同程序無限派送；但 bootstrap 未接最終業務收尾。無法由既有機制恢復的錯誤可能留下沒有 runner 的 `active` execution。不是缺另一套 durable workflow，而是既有 owner 未接到最後一層。
+
+**最小修正：**新增一個共用 `run_with_failure_boundary`，bootstrap 分別注入 A／Memory 的原收尾交易。有限恢復仍在原層，最後才核對正式完成／丟棄候選；不攔 task cancellation、不新增自動再推論、資料表、依賴、回執或恢復 UI。記錄安全錯誤分類，不記訪談及 provider 原文。業務收尾若不可確認仍拋錯，不能把資料庫離線說成已回滾。
+
+**研究：**2026-09-30 複核 [LangGraph fault tolerance](https://docs.langchain.com/oss/python/langgraph/fault-tolerance)的有限重試與末端處置，以及 [Python cancellation](https://docs.python.org/3/library/asyncio-task.html#task-cancellation)。未改用 node-level `error_handler`，因本次收尾涵蓋 Graph 外的正式提交及控制 wrapper；放最外層才能核對已提交結果。沒有重寫框架內的 retry／checkpoint。
+
+**TDD 與範圍：**先寫 production bootstrap＋真 PG 的三個反例，得到 **3 failed in 10.87s**（A 一般錯誤／未明舊 attempt 仍為 active，Memory 無持久 failure）；補接線後 **3 passed in 2.31s**。初次從 repo root 執行的 import collection error 不算 Red，改以文件規定 `apps/api` 工作目錄執行。再加完成已提交／正常 shutdown／收尾本身失敗三案，六案 **6 passed in 3.53s**；後三案屬事後回歸，不宣稱全部先測後寫。
+
+這些反例使用合成角色／故障注入，但保留真 HTTP、lifespan、supervisor、PostgreSQL 與原業務 owner，證明接線效果，不冒充模型能力。A 失敗候選不污染正式 JD／訪談，可再接受不同 Turn；Memory 本批 discarded、有持久阻塞、不輪詢重跑，A 仍可准入。原正式完成及輪前基底保持不變，task shutdown 不變成產品取消。收尾 DB 故障仍需恢復服務，未實作自動健康修復或 Memory 條件監測器。
+
+**獨立審查與修正：**審查找出初稿的 P2：A／Memory 的舊 `run_supervised` 內層已會收尾，外層再次捕捉其收尾例外，導致第二次收尾，Memory 還可能以同操作身分換成另一個原因碼。主代理先保留實際內層，在兩角色注入「收尾 COMMIT 後確認遺失」，得到 **2 failed in 2.10s**，兩案均觀察到收尾兩次。修正是移除內層 wrapper，而非增加旗標：bootstrap 只包 raw `run`；Memory 的已知原因分類集中於 `settle_failure`；收尾自身例外直接傳遞。既有原件恢復測試／fixture 改叫 `run`，沒有刪減斷言。複審未發現新的可行動 P1／P2；審查者未另跑 PG，以下結果由主代理執行。
+
+最終回歸（工作目錄 `apps/api`，同前述隔離 `_test` DB）：
+
+```powershell
+$recoveryTests = @(
+  'tests/integration/test_execution_failure_boundary.py',
+  'tests/unit/test_execution_failures.py',
+  'tests/integration/test_consultant_process_recovery.py',
+  'tests/integration/test_consultant_runner_recovery.py',
+  'tests/integration/test_consultant_completion.py',
+  'tests/integration/test_consultant_controls.py',
+  'tests/integration/test_consultant_supervisor.py',
+  'tests/integration/test_memory_supervisor.py',
+  'tests/integration/test_consultant_http_execution.py',
+  'tests/integration/test_consultant_memory_http_journey.py',
+  'tests/integration/test_memory_outcome_failure.py',
+  'tests/integration/test_memory_batch_orchestration.py',
+  'tests/integration/test_memory_candidates.py',
+  'tests/integration/test_result_handoff_routing.py'
+)
+./.venv-target/Scripts/python.exe -B -m pytest @recoveryTests -q -p no:cacheprovider --tb=short
+```
+
+結果 **89 passed in 94.76s**（包含本次 8 案，不與先前 47／22／11 案相加）。11 個異動 Python 檔 Ruff check／format 通過，4 個主要接線檔依專案 mypy 規範通過。本次六份文件的連結檢查另比對 HEAD：935 個本地連結，**零新增錯誤**；決策登記舊條目已有 87 個失效連結／anchor（多為已移除 worktree），不冒稱全文件零錯誤，也不在本切片改寫歷史。
+
+未使用 `.env`、未外送模型、未改 Demo DB／程序，沒有新 migration 或部署。未跑新的瀏覽器／真模型品質驗收，不把本次收尾與故障測試當成 T16–T18 完成。後續回到核心產品旅程與既有 UI 差異檢視缺口；不再為同一罕見原件遺失擴建證明系統。

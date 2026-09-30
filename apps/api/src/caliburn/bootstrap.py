@@ -18,7 +18,7 @@ from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
-from caliburn.features.executions.models import ExecutionScope
+from caliburn.features.executions.models import ExecutionScope, ExecutionStatus
 from caliburn.settings import Settings
 from caliburn.transport.http.consultant_turns import router as consultant_turn_router
 from caliburn.transport.http.health import router as health_router
@@ -36,12 +36,14 @@ from caliburn.transport.http.jd_work import router as jd_work_router
 from caliburn.transport.http.job_files import router as job_file_router
 from caliburn.transport.http.security import LocalHttpSecurityMiddleware
 from caliburn.workflows.consultant_commentary import ConsultantCommentaryHub
+from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.consultant_controls import (
     ConsultantControlWorkflow,
     run_consultant_with_controls,
 )
 from caliburn.workflows.consultant_status import ConsultantStatusWorkflow
 from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
+from caliburn.workflows.execution_failures import run_with_failure_boundary
 from caliburn.workflows.interview_inputs import InterviewInputWorkflow
 from caliburn.workflows.jd_editing import JdEditingWorkflow
 from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
@@ -145,16 +147,27 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                         )
                         memory_supervisor = MemorySupervisor(
                             database.sessions,
-                            run=memory_batch.run_supervised,
+                            run=partial(
+                                run_with_failure_boundary,
+                                run=memory_batch.run,
+                                settle_failure=memory_batch.settle_failure,
+                            ),
                             check_leadership=leader_lock.check,
                         )
+                        completion = ConsultantCompletionWorkflow(database.sessions)
                         supervisor = ConsultantSupervisor(
                             sessions=database.sessions,
                             run=partial(
-                                run_consultant_with_controls,
-                                sessions=database.sessions,
-                                checkpointer=saver,
-                                run=runner.run_supervised,
+                                run_with_failure_boundary,
+                                run=partial(
+                                    run_consultant_with_controls,
+                                    sessions=database.sessions,
+                                    checkpointer=saver,
+                                    run=runner.run,
+                                ),
+                                settle_failure=lambda writer, _error: completion.stop(
+                                    writer, ExecutionStatus.FAILED
+                                ),
                             ),
                             process_lock=leader_lock,
                             before_leader_release=memory_supervisor.close,

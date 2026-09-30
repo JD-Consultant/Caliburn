@@ -17,6 +17,7 @@ from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingA
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionStatus
 from caliburn.settings import DatabaseSettings, ModelSettings
+from caliburn.workflows.execution_failures import run_with_failure_boundary
 from caliburn.workflows.memory_analysis.tools import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.memory_batch import MemoryBatchWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
@@ -85,7 +86,12 @@ def test_invalid_b2_final_is_durable_failure_without_publish_or_retry(
                         WorkUnderstandingAnalystRunner(database.sessions, saver, client, settings),
                     ),
                 )
-                assert await parent.run_supervised(work.writer) is None
+                assert (
+                    await run_with_failure_boundary(
+                        work.writer, run=parent.run, settle_failure=parent.settle_failure
+                    )
+                    is None
+                )
             assert calls == 2
             assert (
                 await MemoryCandidateWorkflow(database.sessions).read_latest_snapshot(
@@ -132,7 +138,7 @@ def test_unrelated_value_error_is_not_classified_as_model_outcome(
 
             parent = MemoryBatchWorkflow(database.sessions, run_role=invalid_local_contract)
             with pytest.raises(ValueError, match="local programming error"):
-                await parent.run_supervised(work.writer)
+                await parent.run(work.writer)
             assert await requests.failure_reason(turn.scope.job_file_id) is None
             async with database.sessions() as session:
                 assert (await executions.read_execution(session, work.writer.scope)).status == (

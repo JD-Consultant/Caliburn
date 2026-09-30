@@ -364,7 +364,7 @@ flowchart LR
 
 ### 3.7 人的正式來源回查（T09 增量）
 
-[來源回查 workflow](../../apps/api/src/caliburn/workflows/jd_evidence.py)只接受目前正式 JD 的直接引用，與 A 的候選工具准入分開。列表固定一次正式 head，返回各引用所屬欄位／項目、原来源名稱及待核對狀態；詳讀帶回該正式修訂和引用定位。若正式 JD 已更換，拒絕並要求重讀列表，不把舊定位改接新稿。候選修訂、未完成輸入、另一職務檔案及引用鏈以外的訊息均不能經此入口讀取。
+[來源回查 workflow](../../apps/api/src/caliburn/workflows/jd_evidence.py)只接受目前正式 JD 的直接引用，與 A 的候選工具准入分開。列表固定一次正式 head，返回各引用所屬欄位／項目、原来源名稱及待核對狀態。所屬項目同時以人可讀 `target_label` 與選用的結構化 `target`（沿用 [`JdSourceTarget`](../../apps/api/src/caliburn/features/job_description/sources.py) 的 kind／field／item_id／task_id）公開；`target_label` 只供閱讀，同名項目會有相同標籤，**UI 只以 `target` 身分連結各 JD 項目，不按標籤解析**。`target` 為選用，僅為讓尚在執行的舊程序仍可讀，新程序一律回傳；詳讀帶回該正式修訂和引用定位。若正式 JD 已更換，拒絕並要求重讀列表，不把舊定位改接新稿。候選修訂、未完成輸入、另一職務檔案及引用鏈以外的訊息均不能經此入口讀取。
 
 - 人回查的是「當時依據」：Memory 引用讀原快照所選修訂，再沿其中固定的情境／原話引用下鑽。標題後來改名、同名重建或物件不再出現在最新版，都不改寫原引用。這不是提供任意歷史 Memory 瀏覽器。
 - 人的差異比較以本次讀取捕捉的最新已發布 Memory 為新基準；A 仍以該 Turn 已固定的 Memory 為新基準。兩種准入／基準選取各自清楚，之後共用 [source queries](../../apps/api/src/caliburn/workflows/jd_source_queries.py) 與 [Markdown 投影](../../apps/api/src/caliburn/transport/jd_source_markdown.py)，不另存 diff、不複製來源。

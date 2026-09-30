@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CreateJdItemArguments",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "item": {
+      "description": "建立一個職責、共用知識／技能、協作對象或共通條件；任務及其成果／要求使用其他既定入口。",
+      "anyOf": [
+        {"$ref": "#/$defs/ResponsibilityAreaItem"},
+        {"$ref": "#/$defs/CapabilityItem"},
+        {"$ref": "#/$defs/CollaboratorItem"},
+        {"$ref": "#/$defs/JobWideConditionItem"}
+      ]
+    }
+  },
+  "required": ["item"],
+  "$defs": {
+    "ResponsibilityAreaItem": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "const": "responsibility_area"},
+        "title": {"type": ["string", "null"], "minLength": 1},
+        "scope_text": {"type": ["string", "null"], "minLength": 1},
+        "supporting_sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}}
+      },
+      "required": ["kind", "title", "scope_text", "supporting_sources"]
+    },
+    "CapabilityItem": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "enum": ["knowledge", "skill"]},
+        "name": {"type": ["string", "null"], "minLength": 1},
+        "description": {"type": ["string", "null"], "minLength": 1},
+        "supporting_sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}}
+      },
+      "required": ["kind", "name", "description", "supporting_sources"]
+    },
+    "CollaboratorItem": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "const": "collaborator"},
+        "name": {"type": ["string", "null"], "minLength": 1},
+        "scope_text": {"type": ["string", "null"], "minLength": 1},
+        "supporting_sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}}
+      },
+      "required": ["kind", "name", "scope_text", "supporting_sources"]
+    },
+    "JobWideConditionItem": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "const": "job_wide_condition"},
+        "condition_kind": {
+          "type": "string",
+          "enum": ["work_environment", "schedule_travel", "shared_authority", "shared_collaboration", "qualification"]
+        },
+        "text": {"type": "string", "minLength": 1},
+        "supporting_sources": {"type": "array", "items": {"$ref": "#/$defs/Source"}}
+      },
+      "required": ["kind", "condition_kind", "text", "supporting_sources"]
+    },
+    "Source": {"anyOf": [
+      {"$ref": "#/$defs/CurrentInputSource"},
+      {"$ref": "#/$defs/InterviewSource"},
+      {"$ref": "#/$defs/MemorySource"}
+    ]},
+    "CurrentInputSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"kind": {"type": "string", "const": "current_input"}},
+      "required": ["kind"]
+    },
+    "InterviewSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "const": "interview"},
+        "interview_sequence": {"type": "integer", "minimum": 1}
+      },
+      "required": ["kind", "interview_sequence"]
+    },
+    "MemorySource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "enum": ["work_situation", "work_understanding"]},
+        "target_title": {"type": "string", "minLength": 1}
+      },
+      "required": ["kind", "target_title"]
+    }
+  }
+}

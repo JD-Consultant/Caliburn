@@ -18,6 +18,8 @@ from caliburn.settings import ModelSettings, Settings
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--key-file", type=Path)
+    # The default is the Demo port; isolated evaluation backends choose another one.
+    parser.add_argument("--port", type=int, default=8100)
     arguments = parser.parse_args()
     configured = Settings.from_environment()
     if arguments.key_file is not None:
@@ -32,7 +34,10 @@ def main() -> None:
     if configured.database is None:
         parser.error("Configure CALIBURN_DATABASE_URL for the isolated target database.")
     uvicorn.run(
-        create_app(configured), host="127.0.0.1", port=8100, loop="asyncio:SelectorEventLoop"
+        create_app(configured),
+        host="127.0.0.1",
+        port=arguments.port,
+        loop="asyncio:SelectorEventLoop",
     )
 
 

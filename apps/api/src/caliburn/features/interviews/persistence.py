@@ -15,7 +15,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
-from caliburn.features.interviews.models import InterviewMessage, InterviewSpeaker
+from caliburn.features.interviews.models import (
+    InterviewHistoryEntry,
+    InterviewMessage,
+    InterviewSpeaker,
+)
 
 
 class InterviewTextRecord(Base):
@@ -263,6 +267,37 @@ async def list_formal_interviews(
             interview_text=original.interview_text,
         )
         for formal, original in rows
+    ]
+
+
+async def list_public_interview_history(
+    session: AsyncSession, job_file_id: UUID
+) -> list[InterviewHistoryEntry]:
+    """One scoped read from formal membership and its existing immutable reply relation."""
+    rows = await session.execute(
+        select(FormalInterviewRecord, InterviewTextRecord, InterviewReplyRecord.execution_id)
+        .select_from(FormalInterviewRecord)
+        .join(InterviewTextRecord)
+        .outerjoin(
+            InterviewReplyRecord,
+            (InterviewReplyRecord.job_file_id == FormalInterviewRecord.job_file_id)
+            & (InterviewReplyRecord.source_id == FormalInterviewRecord.source_id)
+            & (InterviewTextRecord.speaker == InterviewSpeaker.CONSULTANT.value),
+        )
+        .where(FormalInterviewRecord.job_file_id == job_file_id)
+        .order_by(FormalInterviewRecord.interview_sequence)
+    )
+    return [
+        InterviewHistoryEntry(
+            message=InterviewMessage(
+                source_id=original.source_id,
+                interview_sequence=formal.interview_sequence,
+                speaker=InterviewSpeaker(original.speaker),
+                interview_text=original.interview_text,
+            ),
+            execution_id=execution_id,
+        )
+        for formal, original, execution_id in rows
     ]
 
 

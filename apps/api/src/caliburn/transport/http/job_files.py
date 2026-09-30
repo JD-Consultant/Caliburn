@@ -76,7 +76,12 @@ async def read_interview_history(job_file_id: UUID, workflow: JobFiles) -> Inter
     except JobFileNotFoundError as error:
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
     return InterviewHistory(
-        messages=[InterviewMessage.model_validate(asdict(message)) for message in messages]
+        messages=[
+            InterviewMessage.model_validate(
+                {**asdict(entry.message), "execution_id": entry.execution_id}
+            )
+            for entry in messages
+        ]
     )
 
 

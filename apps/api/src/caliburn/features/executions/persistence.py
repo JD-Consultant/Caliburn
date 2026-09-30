@@ -102,3 +102,12 @@ async def has_active_consultant(session: AsyncSession, job_file_id: UUID) -> boo
             .limit(1)
         )
     ) is not None
+
+
+async def list_active_consultants(session: AsyncSession) -> tuple[ExecutionRecord, ...]:
+    records = await session.scalars(
+        select(ExecutionRecord)
+        .where(ExecutionRecord.kind == "consultant_turn", ExecutionRecord.status == "active")
+        .order_by(ExecutionRecord.created_at, ExecutionRecord.execution_id)
+    )
+    return tuple(records)

@@ -10,6 +10,7 @@ from caliburn.features.job_description.capabilities import JdCapabilitiesRevisio
 from caliburn.features.job_description.collaborators import JdCollaboratorsRevision
 from caliburn.features.job_description.conditions import JdConditionsRevision
 from caliburn.features.job_description.tasks import JdTasksRevision
+from caliburn.features.job_description.work_queries import JdWorkRevision
 from caliburn.features.job_files.models import JobFileNotFoundError
 from caliburn.transport.http.jd_areas import areas_view
 from caliburn.transport.http.jd_capabilities import capabilities_view
@@ -27,6 +28,11 @@ async def read_work(job_file_id: UUID, workflow: JdEditing) -> JdWorkView:
         result = await workflow.read_work(job_file_id)
     except JobFileNotFoundError as error:
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
+    return work_view(result)
+
+
+def work_view(result: JdWorkRevision) -> JdWorkView:
+    """The same fixed-revision wire mapping serves formal and explicitly candidate views."""
     # Recompose wire values, not distinct generated Enum classes, from one revision.
     areas = areas_view(JdAreasRevision(result.revision_id, result.areas))
     tasks = tasks_view(JdTasksRevision(result.revision_id, result.tasks))

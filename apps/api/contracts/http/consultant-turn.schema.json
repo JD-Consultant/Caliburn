@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ConsultantTurn",
+  "description": "Public status of one scoped consultant execution. Original input text alone does not grant formal interview identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["job_file_id", "execution_id", "status", "pause_requested", "input_text", "allowed_controls", "commentary", "candidate"],
+  "properties": {
+    "job_file_id": {"type": "string", "format": "uuid"},
+    "execution_id": {"type": "string", "format": "uuid"},
+    "status": {"type": "string", "enum": ["active", "paused", "completed", "cancelled", "failed"]},
+    "pause_requested": {
+      "description": "Persisted pause intent, not a safe-Step acknowledgement. Active plus true means waiting for a safe Step; paused remains true until resume or cancellation clears it. False does not imply supervisor availability.",
+      "type": "boolean"
+    },
+    "input_text": {"type": "string", "minLength": 1},
+    "commentary": {
+      "description": "Complete saved assistant commentary in original order; not formal interview sources. Null means the reader is not configured, not an empty history.",
+      "type": ["array", "null"],
+      "items": {"$ref": "#/$defs/PublicCommentary"}
+    },
+    "candidate": {
+      "description": "A read-only candidate from one fixed revision, only while active or paused. Null also covers the interval before candidate initialization. Never the formal JD or PDF source.",
+      "anyOf": [{"$ref": "#/$defs/CandidateJdPreview"}, {"type": "null"}]
+    },
+    "allowed_controls": {
+      "description": "Currently available App controls; each request rechecks the scoped execution. Pause records intent until a safe Step acknowledges it. Empty when terminal or controls are not configured.",
+      "type": "array",
+      "items": {"type": "string", "enum": ["pause", "cancel", "resume"]},
+      "uniqueItems": true,
+      "maxItems": 3
+    }
+  },
+  "$defs": {
+    "PublicCommentary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["response_id", "message_id", "text"],
+      "properties": {
+        "response_id": {"type": "string", "minLength": 1},
+        "message_id": {"type": "string", "minLength": 1},
+        "text": {"type": "string", "minLength": 1}
+      }
+    },
+    "CandidateJdPreview": {
+      "type": "object", "additionalProperties": false,
+      "required": ["profile", "work"],
+      "properties": {
+        "profile": {"$ref": "jd-profile-view.schema.json#/$defs/Profile"},
+        "work": {
+          "type": "object", "additionalProperties": false,
+          "required": ["revision_id", "areas", "tasks", "capabilities", "task_links", "collaborators", "conditions"],
+          "properties": {
+            "revision_id": {"$ref": "jd-work-view.schema.json#/properties/revision_id"},
+            "areas": {"$ref": "jd-work-view.schema.json#/properties/areas"},
+            "tasks": {"$ref": "jd-work-view.schema.json#/properties/tasks"},
+            "capabilities": {"$ref": "jd-work-view.schema.json#/properties/capabilities"},
+            "task_links": {"$ref": "jd-work-view.schema.json#/properties/task_links"},
+            "collaborators": {"$ref": "jd-work-view.schema.json#/properties/collaborators"},
+            "conditions": {"$ref": "jd-work-view.schema.json#/properties/conditions"}
+          }
+        }
+      }
+    }
+  }
+}

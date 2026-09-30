@@ -1,11 +1,11 @@
 # Agent 原生接續與可恢復接線
 
-- 狀態：**T06 施工中；原生回應、有序工具、有界多 Step、完整 C 及 Step 暫停已有恢復元件證據，完整 Runtime 仍未交付**。實測與限制見 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)。產品生命週期以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準，這裡不另造安全點。
+- 狀態：**T06–T12 持續整合；A／B1／B2 共用執行已接上本機產品，完整恢復矩陣尚未驗收**。A 真模型訪談、Step 暫停／重開／接續及兩次背景發布見 [T08 evidence](../plans/2026-09-29-target-rebuild/evidence/t08-consultant-turn.md) §5。共用機制的分切片證據與限制見 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)。下方標明切片次序的實測是演進紀錄，當時的未接線說明不覆蓋本頁 §6–7 及最新任務 evidence；產品生命週期仍以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準。
 - T06–T12 先以假 provider＋真 saver／PG 驗證；T06 可依[本 Goal 授權及分批上限](../plans/2026-09-29-target-rebuild/README.md#3-狀態與施工順序)提前做少量協定預檢，T16 才做完整有界模型驗收。LLM 推理內容不可解讀作驗收。
 
 ## 1. 執行圖與業務資格分開
 
-目標由 `agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；目前已有單一模型／工具 Step 與 §4.6 的有界接續，不能把本節完整節點表當已接好的 runner。角色只提供 instructions、允許工具、起始資料 projector 及結束結果轉譯；不各寫 loop。Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。
+`agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；角色 runner 經 bootstrap 接上相同 SDK、官方 saver 及持久預算。角色只提供 instructions、允許工具、起始資料 projector 及結束結果轉譯，不各寫 loop。Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。本節節點表描述責任切點，不要求程式恰好採同名 node；實際接線與驗證分見 §6–7 及相關 evidence。
 
 建議節點切法如下，節點名稱是工程名稱，不是對模型公開的新工具：
 
@@ -441,9 +441,63 @@ flowchart TD
 
 依據：[官方 pricing](https://developers.openai.com/api/docs/pricing)、[cache read／write 算式](https://developers.openai.com/api/docs/guides/prompt-caching#monitor-cache-performance)、[Compact default tier 與回傳契約](https://developers.openai.com/api/reference/python/resources/responses/methods/compact)、[input token count](https://developers.openai.com/api/docs/guides/token-counting)。查證日期 2026-09-30；官方定義費率／usage，本案選擇固定配置、九位向上捨入及未知預留。實測見 [T06 §17](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#17-第十七切片固定費率與原-usage-結算)。
 
-## 6. Memory 背景工作
+## 6. 本機 A Supervisor（T08 有界接線）
 
-A 完成交易持久化要求的 F（通知該 Turn 最後員工輸入的正式序號），調度器由待處理事實領取；同檔案只一批，後來要求合併待處理上界但不擴大在途 F。沒有 broker、沒有只存記憶體通知。
+`workflows/consultant_supervisor.py` 借入 `runner.run` 與 session factory，擁有
+`adapters/process_lock.py` 及所有 asyncio task：`start()` 先取鎖再掃描、`notify(scope=None)`
+只喚醒持久查詢、`close()` 先取消並等待本機 runner 退出，最後關閉鎖。HTTP／lifespan
+組裝由 bootstrap 負責，不把 HTTP BackgroundTasks 當隊列；未配置模型不啟動。
+
+- executions 公開 `list_active_consultants()` 只列 active A，不恢復 paused／終態／Memory。
+  專用非 pooled PG session advisory lock＋同一主機帳戶/temp 目錄的 OS file lock 是 writer
+  替換的准入依據；所有 A runner 必須走此入口。OS lock 補足「PG session 已斷，但舊 task
+  還在清理」的實測反例；不能只靠 writer CAS 宣称 checkpoint 分支沒有並行寫入。
+- 強參照保存 monitor／runner／shutdown tasks，預設至多四個不同 Turn 並行，同 scope 一次。
+  啟動立即關閉也須收尾；取消等待中的 caller 不讓鎖提前釋放。清理尚未退出則不放鎖。
+- DB 監督 I/O 一次失敗即停止准入並收尾，不自動重連接管；scan 有 10 秒界線、鎖 I/O 5 秒。
+  runner 例外／含原件的取消 handoff 留在 `failures`；`stopped_reason(scope)` 僅給安全原因碼。
+  重複通知不重跑未知外送，不重置 budget，不判定產品 Turn 已取消／失敗／完成。
+- 範圍是單機同帳戶部署，不宣稱多主機網路分割接管。明確 interrupt resume 見下節；失敗
+  終局及 UI 呈現由上位協調。本切片不把 T08 或整體恢復標為完成。lock file 不含資料，
+  不刪除以避免刪除重建後出現兩份 inode；OS handle 關閉／程序退出釋放實際鎖。
+
+2026-09-30 新跑 `tests/integration/test_consultant_supervisor.py`：5 個真 PG／合成 runner
+測例通過，覆蓋鎖互斥、active-only／舊 writer fencing、重複通知、未知失敗不重送、失鎖
+清理期間仍禁止接管、立即 shutdown 不漏鎖。Windows 使用既有 SelectorEventLoop。
+未作真模型、多主機、OS 強殺及完整產品驗收。
+
+依據：[Python Task 強參照與取消](https://docs.python.org/3.14/library/asyncio-task.html)、
+[PG session advisory lock](https://www.postgresql.org/docs/18/explicit-locking.html#ADVISORY-LOCKS)、
+[Windows 非阻塞 file locking](https://docs.python.org/3.14/library/msvcrt.html#msvcrt.locking)。
+官方提供鎖／task 語意；雙鎖生命週期及有界停止策略是本機部署取捨。
+
+### 6.1 A pause／cancel／resume 控制
+
+`ConsultantControlWorkflow(sessions, checkpointer, supervisor)` 提供 `pause(scope)`、
+`cancel(scope)`、`resume(scope)`，回傳原 execution owner 的 `ExecutionInfo`。App 綁定 scope；
+UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
+
+- pause 只記持久意圖，未 claim writer 也合法；Graph 沿既有完整 Step interrupt 才確認 PAUSED。
+  cancel 先由 `ConsultantCompletionWorkflow.stop` 同交易 fence／discard，確認後才中止本機 task；
+  若正式完成已先成立，回原 COMPLETED，不回滾 JD／訪談／歷史。
+- resume 和 supervisor claim／launch 序列化，先等舊 paused invocation 退出，再沿公開
+  `read_response_pause` 以原 builder／validator 查當前原生 interrupt。無原 interrupt 不放行。
+  正式受理仍是原 owner 的 ACTIVE＋清除 pause intent；不新增控制表、State 或模型參數。
+- bootstrap 將 `runner.run_supervised` 經 `run_consultant_with_controls` 注入 supervisor。
+  wrapper 從原 execution＋原 Graph 重讀已授權的 interrupt，因此 resume COMMIT 後、喚醒前
+  中斷仍可接續。只由受控 resume 清除 `_attempted`，普通 notify 不授權重送或復活取消工作。
+- final 離開 Graph 後才收到 pause，若完成交易被原 owner 拒絕，wrapper 僅在原 writer 仍有效、
+  pending pause、完整 final Graph 已確認時，重入一次既有純控制交界；不重送模型。不攔截
+  response-save recovery handoff、不加外送 retry，不重建 pinned context／budget。
+
+證據：`tests/integration/test_consultant_controls.py` 覆蓋上述交界、缺原 interrupt 拒絕、
+resume 已提交但通知前重開，以及既存 budget／使用量不重置；模型為 synthetic transport。
+`tests/unit/test_response_pause_read.py` 核唯讀及已消耗 interrupt 不重現。HTTP／UI 整合由主線
+負責；這不是完整 T08、真模型或所有 crash／未知 COMMIT 矩陣的驗收。
+
+## 7. Memory 背景工作
+
+`request_memory_consolidation` 先沿共用工具機制保存原 intent，再交 `MemoryConsolidationWorkflow` 持久記錄本次要求。**此時尚無正式訪談資格**。A 正式完成交易保存有效訪談後，調度器從這個既存要求、已完成 execution 與該輪正式員工輸入推得 F；不另設完成交易雙寫的 frontier／通知表。取消／失敗的 A 不具資格。同檔案只一批，後來要求合併待處理上界但不擴大在途 F；重啟可從持久事實重新發現要求，不靠記憶體通知或 broker。
 
 B1 完成 → 保存②及變更概覽 → B2 分析；有具體 gap 才回 B1，回交內容不洩露理解正文。B1 從自己已改好的候選續改；B2 續自己的合法歷史，拿新交接差異與當前工作稿，完成資格綁本階段。沒有固定互審／第二個審核 Agent。
 

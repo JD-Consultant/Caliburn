@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T08 已完成；T09–T15 已有施工／局部驗證，完整 gate 仍未完成；T16–T18 未完成。2026-09-30 晚 Owner 以新 Goal 恢復施工（先前為純文件推送後的安全暫停）**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T09 已完成；T10–T15 已有施工／局部驗證，完整 gate 仍未完成；T16–T18 未完成。2026-09-30 晚 Owner 以新 Goal 恢復施工（先前為純文件推送後的安全暫停）**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。最新安全點、T06／T07 收尾驗證及 T08 已定位缺口見[暫停交接最新補記](evidence/2026-09-30-pause-handoff.md#最新補記文件推送與再次安全暫停)，接續不重置。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - **恢復範圍 successor（2026-09-30）：**T06／T08／T11／T12 依[共用執行 §6.4](../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)保留核心接續與安全退出；罕見原件遺失的全面追蹤／同工作再准入不再列為首版阻擋條件。已保存的結果及資料安全測試不刪減；本次最外層收尾證據見 [T12 §6](evidence/t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)，尚未勾選整項任務。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
@@ -132,7 +132,8 @@
 - **2026-09-30 公開串流切片：**原生 typed events／phase 白名單接有界暫態 hub、同源 SSE 及 scoped UI，原完整訊息仍由 checkpoint 投影回看；terminal 清理取消承接原 R，不改正式完成邊界。945 unit／contract、21 專項真 PG、95 前端測試通過。真 A 已產生並保存可回看的 commentary，但未截得完成前即時畫面，不宣稱完整真串流時序／T09 完成。見 [T08 §5.7](evidence/t08-consultant-turn.md#57-串流接線後的第四個真-a-turn1202-台北核對) 與 [provider／shared 接線](evidence/t09-response-streaming.md)。
 
 - **2026-09-30 UI 改版（粗版）：**主畫面改為左訪談／右 JD 並排、窄螢幕分頁；JD 唯讀鎖、候選獨立檢視、來源滑出面板與項目徽章（後端小改：`Reference.target`）、章節導覽與可收合職責、檔案清單改版。前端 25 檔／138 測試、tsc／ESLint／Prettier／build 通過；Playwright e2e、真後端徽章、完整鍵盤走查、真模型旅程未驗，不勾 T09。見 [UI 改版證據與 API 缺口](evidence/t09-ui-redesign.md)。
-- [ ] T09；依賴：T08。
+- [x] T09；依賴：T08。
+- **完成（2026-09-30 恢復後）：**補上最後缺口——A 已准入時的畫面行為。用最小的離線腳本化模型（只替換 SDK 的 HTTP transport，其餘為真後端／PostgreSQL）在真 Chromium 驗：即時公開訊息、JD 唯讀、重開與另一分頁找回同一處理且不重送輸入、暫停停妥後續作不多打模型、取消丟棄候選並可取回原文、模型拒絕後可重新開始、PDF、畫面不含私有推理或工具內容。整套 e2e **21 passed**（含先前無法驗的兩項「A 已准入」），見 [T09 旅程證據](evidence/t09-consultant-journeys.md)。**不含**：真模型完成前的逐片段畫面、完整鍵盤走查、跨瀏覽器、長訪談效能（非核心分析效果，留 T15／T17 依需要驗）；腳本化模型是合成替身，不證明模型品質。以下為各切片的歷史紀錄。
 - **最新切片：**`b8fb4a62` 接上輸入、候選、控制、按歷史答覆回看公開訊息及條件撤回 UI；前端 86 項、型別與 build 通過，[證據](evidence/t09-consultant-preview.md)。目前以 status polling 顯示已保存訊息；逐字 SSE 正在後續切片，不宣稱已可用。
 - **契約：**[介面設計](../../implementation/interface-and-delivery.md)、閉環公開訊息／控制邊界。
 - **程式／交付：**interview／jd-editor UI、SSE transport、公開歷史讀取、重連狀態查詢；A 控制的狀態呈現。

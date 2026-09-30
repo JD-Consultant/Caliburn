@@ -76,6 +76,28 @@ _DESCRIPTIONS = {
 type ReadArguments = MemoryMapArguments | ReadMemoryObjectArguments | ReadInterviewArguments
 
 
+def memory_read_names(layer: MemoryLayer | None = None) -> tuple[str, ...]:
+    """Select existing role permissions without selecting a candidate or published view."""
+    if layer == MemoryLayer.WORK_SITUATION:
+        return ("read_work_situation_map", "read_work_situation", "read_interview")
+    return (*_READ_LAYERS, "read_interview")
+
+
+def memory_read_definitions(*, names: tuple[str, ...]) -> list[FunctionToolParam]:
+    """Build the selected read contracts without choosing a runtime Memory binding."""
+    result: list[FunctionToolParam] = []
+    for name in names:
+        schema_name = (
+            "read-interview-arguments"
+            if name == "read_interview"
+            else "memory-map-arguments"
+            if name.endswith("_map")
+            else "read-memory-object-arguments"
+        )
+        result.append(function_definition(name, _DESCRIPTIONS[name], schema_name))
+    return result
+
+
 class MemoryReadTools:
     """No persistence, retries or context rewriting; infrastructure failures go to Runtime."""
 
@@ -94,26 +116,12 @@ class MemoryReadTools:
 
     @property
     def names(self) -> tuple[str, ...]:
-        if (
-            isinstance(self.binding, CandidateMemoryRead)
-            and self.binding.stage.phase == MemoryLayer.WORK_SITUATION
-        ):
-            return ("read_work_situation_map", "read_work_situation", "read_interview")
-        return (*_READ_LAYERS, "read_interview")
+        layer = self.binding.stage.phase if isinstance(self.binding, CandidateMemoryRead) else None
+        return memory_read_names(layer)
 
     def definitions(self) -> list[FunctionToolParam]:
         """Use generated copies of the single schema source, including in installed wheels."""
-        result: list[FunctionToolParam] = []
-        for name in self.names:
-            schema_name = (
-                "read-interview-arguments"
-                if name == "read_interview"
-                else "memory-map-arguments"
-                if name.endswith("_map")
-                else "read-memory-object-arguments"
-            )
-            result.append(function_definition(name, _DESCRIPTIONS[name], schema_name))
-        return result
+        return memory_read_definitions(names=self.names)
 
     async def invoke(self, name: str, arguments: str) -> str:
         if name not in self.names:

@@ -182,7 +182,7 @@ async def run(boundary: str, schema: str, job_file: str, execution: str, writer:
                 identity,
                 sessions=database.sessions,
                 checkpointer=saver,
-                run=runner.run_supervised,
+                run=runner.run,
             )
             assert isinstance(result, FormalInterviewExchange)
             print(

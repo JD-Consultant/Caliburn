@@ -377,6 +377,8 @@ Ruff check／format **223 files**、mypy **154 source files** 通過。文件 **
 
 ### 18.1 未明 attempt 的受控再准入接縫（2026-09-30）
 
+**後續 Owner 收斂範圍：**以下保留為當時的低層能力與限制，不再要求首版完成 production 原件遺失證明 callback。既有結果照常恢復；不能安全接續時由原業務 owner 核對並結束本次工作，依[共用執行 §6.4](../../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)及 [T12 §6](t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)。下方「下一步完成 callback」是歷史建議，不覆蓋此 successor。
+
 本次只補 `workflows/model_requests.py` 的共用准入；不修改 bootstrap／supervisor／runner、不新增表、failure code 或另一套原件保存。既有 execution 行鎖、request payload fingerprint、工作 budget 仍是唯一准入權威。**共用接縫已實作，角色 owner 的可信核對與正式調度尚未接入，不據此勾選 T06 或宣稱自動重啟恢復已完成。**
 
 公開接縫為 `ModelRequestExecutor(..., reconcile_prior_attempts=callback)`；callback 的型別為 `async (ExecutionWriter, tuple[OutboundAttempt, ...]) -> PriorAttemptRecovery`，只給 App 注入，不是模型／HTTP 的可填旗標：

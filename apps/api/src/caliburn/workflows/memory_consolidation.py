@@ -115,7 +115,11 @@ class MemoryConsolidationWorkflow:
             return await requests.read_block(session, job_file_id)
 
     async def fail(self, writer: ExecutionWriter, *, reason: str) -> None:
-        """Known terminal failure only; unknown saves/COMMIT propagate for reconciliation."""
+        """Settle abandoned work, preserving any publication that already committed.
+
+        An unknown commit is reconciled under the same job lock; query or settlement
+        failure still propagates and never proves the candidate was discarded.
+        """
         if writer.scope.kind != ExecutionKind.MEMORY_BATCH or not reason or len(reason) > 100:
             raise ValueError("A Memory failure requires a short classified reason code")
         async with self.sessions.begin() as session:

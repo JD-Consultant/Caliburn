@@ -72,7 +72,8 @@ class MemoryBatchWorkflow:
     """The role callable resumes its saved native stage; the parent never retries a model.
 
     ModelRequestExecutor already owns bounded outbound retry and persistent budgets. A
-    process/DB interruption propagates intact: no discard just because a save is uncertain.
+    process/DB interruption propagates to the outer work boundary, which reconciles the
+    original publication before abandoning a batch. Task shutdown preserves saved work.
     Run only with a writer claimed by the supervised local leader.
     """
 
@@ -90,29 +91,27 @@ class MemoryBatchWorkflow:
         self.max_feedback_rounds = max_feedback_rounds
         self.requests = MemoryConsolidationWorkflow(sessions)
 
-    async def run_supervised(
-        self, writer: ExecutionWriter, *, recovery: AnalysisRecovery | None = None
-    ) -> MemorySnapshot | None:
-        try:
-            return await self.run(writer, recovery=recovery)
-        except (
-            ModelRequestFailedError,
-            BudgetExceededError,
-            ModelStepLimitError,
-            RequestCapacityError,
-            IncompleteModelResponseError,
-            UnsupportedModelResponseError,
-            MemoryFeedbackLimitError,
-            AnalysisOutcomeError,
-        ) as error:
-            if isinstance(error, ModelRequestFailedError):
-                reason = error.failure.kind.value
-            elif isinstance(error, AnalysisOutcomeError):
-                reason = error.reason_code
-            else:
-                reason = type(error).__name__
-            await self.requests.fail(writer, reason=reason)
-            return None
+    async def settle_failure(self, writer: ExecutionWriter, error: Exception) -> None:
+        """Classify once, then let the existing owner reconcile the real outcome."""
+        if isinstance(error, ModelRequestFailedError):
+            reason = error.failure.kind.value
+        elif isinstance(error, AnalysisOutcomeError):
+            reason = error.reason_code
+        elif isinstance(
+            error,
+            (
+                BudgetExceededError,
+                ModelStepLimitError,
+                RequestCapacityError,
+                IncompleteModelResponseError,
+                UnsupportedModelResponseError,
+                MemoryFeedbackLimitError,
+            ),
+        ):
+            reason = type(error).__name__
+        else:
+            reason = "execution_interrupted"
+        await self.requests.fail(writer, reason=reason)
 
     async def run(
         self, writer: ExecutionWriter, *, recovery: AnalysisRecovery | None = None

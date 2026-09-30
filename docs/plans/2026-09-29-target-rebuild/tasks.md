@@ -178,7 +178,7 @@
 ## T14 訪談方法、角色指引與品質試例
 
 - [ ] T14；依賴：T07、T10。
-- **最新材料：**11 個合成品質情境、oracle／rubric、角色組裝契約及固定 Demo 樣本人工式審讀，見 [T14 證據](evidence/t14-job-analysis-quality.md)。離線契約通過不代表模型品質已達標；獨立領域校準、全部情境真模型及長訪談仍待驗。
+- **最新材料：**13 個合成品質情境、oracle／rubric、角色組裝契約及固定 Demo 樣本人工式審讀，見 [T14 證據](evidence/t14-job-analysis-quality.md)；v3 新增跨輪來源兩例，實際對照與仍未通過的邊界見 [T17 來源驗證](evidence/t17-course-administrator-journey.md#真後端保存確認結果與保留缺口)。離線契約通過不代表模型品質已達標；獨立領域校準、全部情境真模型及長訪談仍待驗。
 - **契約：**[工作分析指南](../../specs/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作](../../specs/2026-09-09-jd-field-and-writing-guide.md)、[方法研究入口](../../specs/2026-09-09-job-analysis-and-jd-content-research.md)。
 - **程式／交付：**版本化角色 prompt／方法內容與全合成 fixtures／rubric；基於既有研究裁取適用內容，不複製整套指南到每次請求。
 - **先驗：**fixture 必須能辨責任混淆、舊案更正、沒有主語、低頻工作、只掌握 10% 案例、人工稿不等於事實；離線驗指引組裝／工具權限；自然品質標待 provider。
@@ -208,6 +208,7 @@
 
 - [ ] T17；依賴：T16。
 - **2026-09-30 課程行政真模型切片：**7 成功訪談 Turn、4 背景 Memory、正式 JD 與 3 頁 PDF 已完成；周期更正及既有工作保留成立。但 3 個身分欄位引用錯輪，品質 trial **fail**，未勾本任務；接續優先處理來源選擇反例，詳見[有界旅程證據](evidence/t17-course-administrator-journey.md)。首次沙箱連線失敗已正常收尾，未擴充恢復系統。
+- **來源選擇續驗：**僅澄清 A 逐項定位出處的既有指引，不新增機制；定向 probe 與主管更正的真保存有改善，但另一例仍漏 profile 來源，且月報收件人被局部更正擴大影響，品質未全過。背景 1 批發布、1 批預算失敗已收尾，無 active 殘留；詳見[結果與下一步](evidence/t17-course-administrator-journey.md#真後端保存確認結果與保留缺口)，不勾本任務。
 - **契約：**[架構驗收](../../architecture/verification.md)、全部 V01–V28（V25 依試點範圍）、JDT-09。
 - **交付：**獨立 fresh DB 的代表旅程：早期情境後期補充、Memory未發布續談、來源換版與人工改稿同時出現、取消／重試／重啟、JD 完成及 PDF；必要時瀏覽器真操作。
 - **驗證：**員工只訪談、無人工代寫也可逐步產出有據 JD；工作範圍與責任不失真、關鍵差異保留；參照可追讀；定量記品質缺陷、模型／工具步數、context 與費用。

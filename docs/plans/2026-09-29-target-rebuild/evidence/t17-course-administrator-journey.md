@@ -86,3 +86,52 @@
 唯讀側線審查 `01a0f260-8367-7771-aefc-f07a979f8c61` 的下一步候選：`revise-jd-profile-arguments.schema.json` 已用互斥 kind 正確分開 current_input／interview，但來源分支沒有局部 description；先單獨補清「本輪才寫入的舊事實仍應引用歷史來源」，經 SSOT 生成並有限對照，而非再次加入籠統的正確引用指令。次選才比較 context 邊界，不同時改兩處導致無法歸因。這是**可驗假說，尚未採納為已修正方案**。依據是 OpenAI 的[工具參數說明建議](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)及[context 邊界建議](https://developers.openai.com/api/docs/guides/prompt-engineering#message-formatting-with-markdown-and-xml)，不是官方保證能消除此例。
 
 驗收至少對照：① 前輪提供三個身分欄位、本輪只補工作，三欄須回指前輪；② 本輪只更正主管，職稱／單位維持前輪來源、主管使用本輪。實際產物、工具選擇、回讀原文三者比對；空白不寫、schema 接受與模型自評都不算來源品質通過。這位工程代理的覆核不是 rubric 所要求的人類領域專家校準。
+
+## 跨輪來源選擇對照的外送範圍
+
+2026-09-30 接續，基底 `9ea7ffb8`。先作有界選擇 probe，不改寫上方 trial 或正式資料。假說是 current_input／interview 的參數說明不足以區分「本輪寫入」與「本輪提供事實」；先只比較來源分支 description，不同時改 Context 或主指引。候選若無改善，不升格為修復。
+
+- 原案例的已保存合成歷史作唯讀基底；另設本次只更正主管的變體。兩組各 baseline／candidate、各 2 次，共 8 trials，每 trial 最多 3 次生成；最多 24 次生成及 24 次 count、零自動重試／compact、每次 120 秒、16,384 output tokens。模型仍為 `gpt-6-luna`／medium，direct Responses、store=false、all_turns。候選只改模型看到的來源說明，無版本／ID 參數變動。
+- 沿已保存的原生項目保留 phase／reasoning；變體只在尚未呼叫本次模型的輸入位置替換合成原文，不重用原本對另一輸入產生的本輪 reasoning。讀取 JD 工具以原案例空 JD 的真實保存回傳作固定 observation；不执行修改、不偽造寫入成功。這是**來源選擇評測，不是完整產品旅程或正式保存驗收**。
+- 只輸出公開 tool call、使用量、指紋與判斷；opaque reasoning 不輸出。每 trial 首次 profile 修改後停止；未修改記未觀察，不算成功。以逐欄來源和實際文字評，不以是否出現某句 prompt 評。
+- 使用隔離測試原件，不動 Demo。依既有模型費率，以 24 次均未命中快取的輸入與最大輸出先核上界，總預算 US$2；超過即不外送。僅在有改善時另行記錄必要的正式保存驗證範圍，不將這份 manifest 當無限測試授權。
+
+### 第一個候選未採用；第二個有界假說
+
+baseline／來源分支 description 候選各 4 trials、各 7 次生成及 7 次 count。原工具組 SHA-256 如上；候選為 `c13cb503af9907b8f14a197be97290ad4e9bb4bad4462bbc0ad5b9cd23f5fc8f`。候選沒有消除錯誤：歷史背景 trial 2 仍把三欄全部選成 current_input；trial 1 三欄回指 2 正確，卻在另外的目的／職責引用尚無正式資格的序號 4，正式工具會拒絕。主管更正 trial 2 選對兩個歷史欄位與當次主管，trial 1 因選擇 probe 未接其他工具而未觀察 profile。
+
+baseline 的歷史 trial 1 未觀察、trial 2 只寫職稱及主管且引用 2 正確；兩個主管更正 trial 的首次 profile 修改有正確文字但未附來源。後兩者是本 probe 的未完成證據，不推定後續 Turn 必然不補來源。所有公開原呼叫保留於 ignored `t17-source-{baseline,candidate}.json`，不只保留每欄最後一筆來源。**不採用 description 候選、不修改原失敗資料、不宣告修復。**
+
+第二個假說：主指引只以「當次／正式」列來源種類，沒有把逐項事實定位與一次多欄修改的選擇順序講清楚。沿 OpenAI [清楚組織指令](https://developers.openai.com/api/docs/guides/prompt-engineering#message-formatting-with-markdown-and-xml)及 [GPT-6 prompting guidance](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices)，僅**替換**既有來源段落為「先定位支持各項內容的原話 → 按出處選來源；寫入時點不改變出處」，不堆加 reviewer／validator，不改 schema、context、模型或 effort。官方沒有保證此改動可解決語意錯引，須實測。
+
+外送上界另限同兩情境各 2 trials，共 4 trials、最多 12 次生成及 12 次 count、US$1；其餘 timeout、output、零重試、停止與資料保護沿前一 manifest。只改尚未開始的測試請求 instructions，不覆寫保存歷史；同樣在首次 profile 工具選擇停止。若仍有錯誤，不繼續無限微調；須重新評估 context／模型能力與產品取捨。
+
+第二個候選實際 4 trials／7 次生成及 7 次 count：三次觀察到 profile 修改，逐欄來源皆正確（歷史背景一次、只更正主管兩次）；另一次因同回應含背景整理請求，本選擇 probe 沒接續，標為未觀察。沒有把 3/3 外推成普遍成功率。instructions SHA-256（原文字串 UTF-8）為 `cc24662697dc920a9553267430ab15655a214765f23ce4232d0d46b66fafe90a`；原工具組未改。公開結果在 `t17-source-source_guidance.json`。
+
+### 真後端保存確認的範圍
+
+採相同最小指引變更作兩個全新職務檔案的正式 HTTP 檢查，各最多兩輪員工輸入；歷史背景與本輪只更正主管各一例。先送原合成背景，再送工作細節（或追加主管更正），不人工代寫 JD、補來源或操控模型工具序列。新 `t17_sources_20260930a` schema，既有 loopback `_test` DB、獨立 8102 程序；不動 Demo 或原 course schema。模型／串流／output 不變，每 execution 最多 24 steps、64 outbound attempts、同請求 1 attempt、1 compaction、480 秒及 US$0.25；至多 4 A＋4 背景批次，整體預留上界 US$2。失敗停止，無額外付費重跑。沿既有正式 owner／supervisor，不自造恢復接線。
+
+讀回正式 JD 每欄來源全文與訪談，核對選擇確實保存；第一輪若已寫 profile，第二輪驗其保留／更正，不冒稱必然重現「延後寫入」路徑，後者仍由上述固定前置 probe 提供證據。不勾完整 T17，不改寫原失敗結果。
+
+### 真後端保存確認結果與保留缺口
+
+兩個新檔案各兩輪、共 4 A Turn 均完成並可回讀正式 JD。本輪只採用較清楚的既有來源指引，**不是宣告錯引已根治**；沒有新增 validator、reviewer、來源猜測、schema 或保存系統。
+
+| 情境 | 保存後實際結果 | 判斷 |
+| --- | --- | --- |
+| 歷史職務背景＋本輪工作細節 | 檔案 `8ce3ce9e-5125-4188-aad2-9db0af925ebd` 第一輪就寫入 profile；第二輪後三個身分欄位及目的仍無來源。工作部分 2 職責／2 任務／5 細節，共 9 筆来源均指向本輪序號 4 | 流程成立，但 profile 引用缺漏，**品質不通過**；不是延後寫入 probe 的完整重演 |
+| 本輪只更正主管 | 檔案 `28f798ee-52ce-41d4-b404-668a355860a7` 的職稱／單位維持序號 2，主管「教務主任」正確指向序號 4；正式回讀原文相符 | 指定三欄來源驗證通過，不能外推所有欄位或所有職務 |
+| 更正作用範圍 | 同一原文仍說每月彙整出席給「組長」，只另更正直接匯報對象；實際任務／成果把月報收件人也改為教務主任 | 尚未取得「收件人也變更」的確認，有過度泛化風險；不能以主管欄正確抵銷 |
+
+最後 JD revisions 分別為 `8ac4f9c6-7d84-42d3-8377-b015a7c880cf`、`1f2fcca2-2a1a-4a92-aad9-e2f2e076f3f7`。第二例工作部分 1 職責／2 任務／4 細節，連 profile 共 12 筆來源。兩例原始公開輸入、答覆、正式 JD 及來源全文保留於 ignored `t17-source-journey.json`，SHA-256 `17154cd278787c2a1ac5604e2e36bcfcccbf53fd890bd9a782077d956df48b1e`；不手動補正測試產物。
+
+背景 Memory 自然觸發兩批：`c442efe9-35ff-480c-afea-393f937b1fdb` 發布 snapshot `e32fecf2-644f-49a5-b10d-948da6452cd0`，涵蓋至有效序號 4；`ead82a17-95f5-43db-97fb-ce5ea53ba905` 在理解階段以 `BudgetExceededError` 收尾，候選 `discarded`、execution `failed`，第二檔案沒有被誤標成已發布 Memory。既有安全回執僅保存錯誤類別，未保存哪一項 budget limit，**不能猜成 API 額度不足、24-step 耗盡或逾時**；本輪不擴充診斷平台或付費重跑。
+
+最後唯讀核對：4 A completed、1 Memory completed、1 Memory failed，**零 active**。背景失敗沒有撤銷已保存 A／JD；沒有繼續送新輸入，故本輪不另宣稱已真測「失敗後下一輪訪談」。本輪 44 次模型生成、49 次 token count，無 compaction、provider 嘗試的 failure_code 均為 null；模型估算用量成本 US$0.013316090，不是帳單。失敗批次實際生成 14 次、count 17 次，不能把失敗簡化成模型呼叫數達 24。已核對並停止自有 8102 程序（PID 33576），保留隔離資料；Demo 8100／5173 未動。本輪未重驗 PDF 或瀏覽器。
+
+版本化品質素材升 v3：新增 `historical_fact_keeps_historical_source` 與 `current_correction_keeps_other_sources`，只把失敗模式縮成可重跑全合成案例，oracle 仍僅供審讀。實驗先固定觀察再改指引，屬非確定性品質 eval，**不是宣稱單元測試 TDD Red–Green 已證明 prompt 語意**。來源 fixture integrity 與既有角色／工具契約離線檢查另列，不取代上述品質結果。
+
+提交前在 `apps/api` 執行 `python -B -m pytest tests/unit/test_role_prompt_contracts.py tests/unit/test_consultant_tools.py tests/unit/test_job_analysis_quality_fixtures.py -q -p no:cacheprovider`：**56 passed**；兩個變動 Python 檔的 Ruff check／format check 通過，`git diff --check` 無空白錯誤。只驗此切片，不冒稱完整測試套件或十三例自然品質通過。
+
+接續優先：依同一 rubric 解決漏附來源及局部更正泛化，先檢查既有工具／context／方法指引責任，不連續堆提醒、不替模型自動配來源。Memory 預算限制是否影響正常旅程留待有界核對，不為它增建全面恢復系統。先前 T16／T17／T18 未完項保持未完。

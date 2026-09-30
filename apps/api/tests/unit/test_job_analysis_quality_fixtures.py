@@ -17,11 +17,11 @@ ORACLES = json.loads((FIXTURES / "oracles.json").read_text(encoding="utf-8"))
 def test_small_dataset_covers_requested_risks_without_claiming_blind_holdout() -> None:
     cases = CASES["cases"]
     ids = [case["id"] for case in cases]
-    assert len(ids) == len(set(ids)) == 11
+    assert len(ids) == len(set(ids)) == 13
     assert set(ids) == ORACLES["cases"].keys()
     assert CASES["data_origin"] == "fully_synthetic"
     assert ORACLES["audience"] == "reviewer_only_never_model_input"
-    assert sum(case["split"] == "development" for case in cases) == 9
+    assert sum(case["split"] == "development" for case in cases) == 11
     assert sum(case["split"] == "holdout_candidate" for case in cases) == 2
     risks = {risk for case in cases for risk in case["risks"]}
     assert {
@@ -39,6 +39,7 @@ def test_small_dataset_covers_requested_risks_without_claiming_blind_holdout() -
         "shared_collaborator_scope",
         "work_background",
         "no_profile_repetition",
+        "cross_turn_source",
     } <= risks
 
 

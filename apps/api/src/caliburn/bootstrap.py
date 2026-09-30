@@ -212,4 +212,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(jd_export_router)
     app.include_router(jd_undo_router)
     app.include_router(turn_jd_changes_router)
+    if configured.web_build_directory is not None:
+        app.frontend("/", directory=configured.web_build_directory, fallback=None, check_dir=True)
+        # Only UI navigation gets the SPA fallback; missing APIs/assets stay 404.
+        app.frontend(
+            "/job-files",
+            directory=configured.web_build_directory,
+            fallback="index.html",
+            check_dir=True,
+        )
     return app

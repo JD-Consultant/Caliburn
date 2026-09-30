@@ -82,8 +82,11 @@ class Settings:
     model: ModelSettings | None = None
     pdf: PdfSettings | None = None
     dev_origin: str | None = None
+    web_build_directory: Path | None = None
 
     def __post_init__(self) -> None:
+        if self.web_build_directory is not None and not self.web_build_directory.is_absolute():
+            raise ValueError("Web build directory must be an explicit absolute path")
         if self.dev_origin is None:
             return
         match = re.fullmatch(
@@ -99,8 +102,10 @@ class Settings:
         openai_key = os.environ.get("OPENAI_API_KEY")
         pdf_font = os.environ.get("CALIBURN_PDF_FONT_PATH")
         pdf_browser = os.environ.get("CALIBURN_PDF_CHROMIUM_PATH")
+        web_build = os.environ.get("CALIBURN_WEB_BUILD_DIRECTORY")
         return cls(
             dev_origin=os.environ.get("CALIBURN_DEV_ORIGIN"),
+            web_build_directory=Path(web_build) if web_build is not None else None,
             database=DatabaseSettings(
                 url=database_url,
                 schema=os.environ.get("CALIBURN_DATABASE_SCHEMA", "caliburn"),

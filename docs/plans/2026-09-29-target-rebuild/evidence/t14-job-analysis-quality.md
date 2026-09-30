@@ -535,3 +535,38 @@ Memory 最新快照另作唯讀抽查：3 情境、1 理解保留已知工作、
 同一基準的程式追查確認 `jd_detail_projection` 在任務、成果、要求各自回傳其直接來源；`JdTaskWriteWorkflow` 在原候選交易中分別保存模型指定的來源，不因建立新任務就自動繼承父項或改為本輪。既有 `move_jd_item` 是保留身分的移動／排序，不是跨任務複製明細的工具。此為唯讀責任審查，不是新真模型證據；尚無依據改保存 owner、添加自動補引或新 copy 工具。
 
 獨立工程審查同意：長歷史漏引仍阻擋相應品質驗收，但不要把 T17 全部長旅程塞回 T14。T14 已有方法／判準／素材與部分效果證據，未完品質仍明示；T16 wire／容量、T17 整體旅程及真人試點分屬原 gate，不以未觀察到知識欄位直接推定故障。停止同假說提示加字，本輪零新增 provider 呼叫，不改產品模型或已保存歷史；其他不受影響的交付接線可以繼續。
+
+## 2026-10-01：長 Context 的來源欄位順序診斷
+
+### 執行前 manifest
+
+基準 `ac75493b`。原高推理旅程已證實模型讀到舊任務和來源，保存 owner 也依原呼叫保存；本片只檢查 **schema 先列來源、再列內容是否有幫助**，不再補來源說明或改訪談資料。唯讀比對本 execution 全部 request snapshot，確認 184 items 後至漏引呼叫前只有模型 reasoning items，沒有遺漏另一份更近的工具觀察；沿用原 `d16389f573d8f3ca82ff0e2efc50db27a8a973047a487acb690b8d53fc60e931` 請求。
+
+依據及限制：
+
+- [GPT-6 提示建議](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra#prompting-best-practices)要求檢查衝突指引並在所選型號／工作負載評估；該頁主要觀察 Astra，不直接推導 Luna 品質。
+- [OpenAI Structured Outputs key ordering](https://developers.openai.com/api/docs/guides/structured-outputs#key-ordering)說明輸出與 schema key 順序相同，**沒有保證先產生來源欄位就能提高語意引用正確率**。
+- [Anthropic 長 Context 建議](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)提出先定位相關引文再處理任務；只用來形成這次「證據先行」假設，不將 Claude 建議或欄位排序稱為 GPT-6 已驗證解法。
+
+兩次自然下一 Step：原順序、來源欄位優先各一次；候選只將各工具 schema 的 `supporting_sources` property 移到同層開頭，欄位內容、required、主指引、歷史及工具選擇不變。保留全部 184 個原生 input items，Luna／high／all_turns、auto tool choice、store=false。兩組均非串流且 output≤16,384，讓本探針有足夠輸出空間；不改產品上限，也不把過去 8,192 上限結果冒充同條件基準。
+
+上限：2 count＋2 create、input≤70,000、零重試、串行、每請求 150 秒／整批 480 秒、預留 US$1；外送失敗或未完整輸出即停止，不加額重跑。沿原素材逐字確認全合成來源後才讀憑證；不執行返回工具、不寫業務 DB、不動 Demo、不保存 opaque reasoning。只觀察返回的寫入意圖正文及逐項來源；合法先讀取仍屬未判定，不能算通過。
+
+腳本 `.research-tmp/eval/probe_source_order.py`，結果以獨占建立 `source-order-20261001.jsonl` 保護；同記忽略 key 順序的內容指紋與保留順序的 wire 指紋，避免排序 JSON 的 hash 掩蓋本次唯一變因。若沒有可判定改善，就不修改產品 schema、不續跑更多同類探針。本片是有限非確定品質診斷，不是 TDD、正式旅程或產品通過。
+
+### 結果與採用決定
+
+兩次 count、兩次 create 均完成，零重試、零工具執行／業務寫入。原指引與現行 A 完全相同；候選只改 schema property 順序，兩組忽略順序的 request 指紋同為 `325c39c952fa3e4a8b3f7c697637ff73c91c8e8ea91536bf392550f6d5fd519e`。本次不控制隨機生成，單次觀察不能估計成功率或因果。
+
+| 變體 | 實際返回的編輯意圖 | input／output tokens | count＋create 秒數 |
+|---|---|---|---|
+| 原順序 | 5 個呼叫；拆出的出席任務／成果仍保留「有開課的每天、老師交表、指定資料夾」，卻只引本次輸入，未納入來源 8 | 49,412／8,422 | 65.62 |
+| 來源欄位優先 | 3 個呼叫；修改原綜合任務，未拆分，不能直接比較新任務的來源承接；新增明細僅描述本次事實，仍可只引本次。另產生 `job_wide_condition`、`work_environment`、正文 `q`，無有效工作依據 | 49,410／8,162 | 44.98 |
+
+候選的明細／條件參數確實先輸出 `supporting_sources`，但八個呼叫全部可通過現行生成模型的 wire 驗證，仍含上述語意問題。這證明「schema 合法／欄位順序符合」不足以充當內容品質；**不證明排序造成 `q`，也不能因未做拆分就說漏引已修復**。候選組對既有任務加本次來源不抹除舊來源，本輪未執行工具，沒有建立新的正式 JD 或驗證完整 Turn 後是否修正。
+
+**決定：不採用來源優先排序、不改產品 Prompt／schema／Context／模型，結束本假說探針，不繼續加字或付費重播。**按已保存的 usage 與本機 2026-09-30 Luna 標準費率（普通／cache read／cache write／output 分計），兩次 generation 估算 US$0.020644600；不是供應商帳單，count 計費未另證實。腳本 SHA-256 `7853396ebff8687122eaba9a090b0a7ebbadbd081add586fdd168092348e088f`；結果 `507e9762827f2a52b75561557b0fd817f26c04f56bcb1484d5aad1d9c63ba342`。兩組 ordered request 指紋留本機原件，沒有輸出憑證或 opaque reasoning。
+
+使用者本輪要求的 Prompt／Tool descriptions／實際 Context 審查結論，應與前述成果一起讀：已修正的具體指引矛盾有原測試證據；已查請求未發現錯放資料或丟失舊來源；自然長歷史重組的漏引、Memory 不受原文支持的精確化／冗長仍屬品質限制。不要用新 schema 排序、固定 reviewer 或自動猜來源繞過它們。後續只在新的可辨別假說或實際產品反例出現時驗證，保留原 T14／T17 gate，不能把本次否決候選算成產品品質通過。
+
+本輪僅改證據與任務路由；`git diff --check` 及兩檔 140 個相對檔案連結檢查通過，不為純文件重跑全產品。獨立唯讀審查核對後未提出阻擋性問題，同意上述不採用及因果／未執行邊界；它不是額外的模型品質測試。

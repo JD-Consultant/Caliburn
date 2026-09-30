@@ -506,3 +506,15 @@ $env:PYTHONUTF8='1'
 **結論：**T06 的共用機制成立，勾選。仍有的相關工作都已有 owner，不併入本任務：A 的正式控制／完成屬 T08；B1／B2 角色與調度屬 T10／T11；跨程序故障矩陣屬 T12；官方 API 的大視窗 compact 延遲與費用、加密 reasoning 跨輪的 gate、實際帳單核對屬 T16／T17。Owner 2026-09-30 的首版恢復 successor（[共用執行 §6.4](../../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)）已把「未明 attempt 的 production 原件核對」移出首版必做；§18.1 的共用再准入接縫與 16 案保留，未接 production owner，不宣稱自動恢復。
 
 **完整後端回歸（提交 `478abcf8` 之上）：**`pytest tests`（真 PG `caliburn_t01_test` 的隔離 schema、合成 SDK transport）**1847 passed、2 skipped in 600.46s**；跳過的是 `test_pdf_rendering.py` 兩案（需 `CALIBURN_TEST_PDF_FONT`，T13 另驗）。命令與環境同 [T08 §8](t08-consultant-turn.md#8-任務完成對照2026-09-30-恢復後)。Ruff format／check 384 files、mypy 254 files（含 probe 腳本）通過。
+
+## 22. 串流中的限流被誤判為協定錯誤（2026-09-30 恢復後的診斷與修正）
+
+**問題與影響：**用模擬員工對真後端同時跑 6 個訪談做品質評測時（[T17](t17-course-administrator-journey.md#核心分析品質模擬員工基準與有界改善2026-09-30-恢復後)），6 個 Turn 各失敗一次，失敗碼都是 `response_protocol`，且集中在同一個約 10 秒窗口。這不是評測工具的問題：使用者的訪談 Turn 會因此直接失敗，長訪談（上下文大、每輪多次請求）更容易撞到限額。
+
+**診斷（先量證據，不猜）：**同批 18 個 6 路並行的直接串流請求全部成功，排除單純並行；在評測後端外包一層只印安全欄位的診斷（類別、狀態、錯誤 `code`／`type`，不印訊息或金鑰），同樣情境重跑，記到 **10 次** `APIError status=None code=rate_limit_exceeded type=tokens`（串流途中的錯誤事件）與 6 次 `RateLimitError status=429`（HTTP 層），全是 token 每分鐘限額。原因在 [`classify_response_failure`](../../../../apps/api/src/caliburn/adapters/openai_failures.py)：HTTP 狀態錯誤會依狀態與 `code` 分類（429 → 暫時性，會依單一重試責任有界退避重試），但**串流已開始（HTTP 200）後才送出的錯誤事件**，SDK 只丟沒有狀態的一般 `APIError`，原邏輯一律歸為不可重試的 `response_protocol`，忽略 `error.code`。
+
+**Red／Green：**新增 `tests/unit/test_openai_failures.py` 兩個測例（11＋3 個參數化案例：限流／伺服器錯誤／過載類代碼應為暫時性、額度耗盡與容量代碼沿用與 HTTP 相同的判斷、未知或讀不到代碼仍是終止性）與 `tests/integration/test_outbound_retry.py` 兩案（真 PostgreSQL＋真 SDK 串流路徑，MockTransport 在 HTTP 200 串流中送出限流事件）。修改前 **10 failed**，整合案直接重現現場症狀（`ModelRequestFailedError … response_protocol`）；「未知代碼不重試」的守門案修改前就通過。修改後同組加既有分類／重試／契約測試 **109 passed**；Ruff、mypy（253 files）通過。
+
+**修正（單一分類點，沒有新機制）：**串流錯誤事件與 HTTP 狀態錯誤共用同一組封鎖與容量代碼判斷；只有 `rate_limit_exceeded`、`server_error`、`server_is_overloaded`、`slow_down`、`service_unavailable` 視為暫時性，交給既有的有界重試、額度與 `retry_not_before`；沒有這些代碼或讀不到明確代碼的仍終止，不猜為可重試。重試前沒有已保存的原結果與工具效果，重送安全；失敗的嘗試與其預留仍保留在原預算。
+
+**限制：**是依 OpenAI 實際回傳的欄位與 SDK 3.20.0 行為修正，代碼清單只含目前見到與文件記載的暫時性類型；串流事件的官方完整錯誤代碼表未逐項核對。限額本身不消失：重試最多依原政策（每請求 5 次、退避 1–30 秒），持續限流仍會使 Turn 失敗，評測改為低並行避免長時間貼著限額。

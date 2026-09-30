@@ -363,6 +363,7 @@ flowchart TD
 
 - **原結果優先不變：**Graph 已保存的 R／C／count 直接接續；仍握有原件則走既有補存。此迴圈只 catch SDK 外送的 `APIError`，不包整個 Graph、不把保存／結算／工具錯誤當成 provider retry。成功收到完整結果後、交給 Graph 之前仍沒有 DB 操作。
 - **允許重試的證據：**原本地 HTTP 呼叫已返回錯誤，分類為短暫服務或遠端结果未知，且安全故障記錄已提交。逾時仍可能已收費、曾遠端生成，但本機沒有完整 R；新推論是新 attempt，不冒充原結果。程序崩潰、准入 COMMIT 確認不明，或原失敗尚未可靠保存時仍維持 `Prior*AttemptError`，不靠不存在的遠端備份／時間到自動放行。
+- **串流中的錯誤事件與 HTTP 狀態錯誤同樣分類（2026-09-30）：**串流開始（HTTP 200）後才送出的錯誤事件在 SDK 3.20.0 只成為沒有狀態的一般 `APIError`，原本一律歸為不可重試的 `response_protocol`，使真實限流（`rate_limit_exceeded`）直接讓整個 Turn 失敗。現在 `classify_response_failure` 對它們用同一組封鎖／容量代碼判斷，並把 `rate_limit_exceeded`、`server_error`、`server_is_overloaded`、`slow_down`、`service_unavailable` 視為暫時性，走上述同一條有界重試（無 header，用 capped backoff）；沒有這些代碼、或讀不到明確代碼的仍終止，不猜為可重試。證據與限制見 [T06 §22](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#22-串流中的限流被誤判為協定錯誤2026-09-30-恢復後的診斷與修正)。
 - migration `0015_outbound_failures` 只在既有 attempt 增加 `failure_code`、`retry_not_before`。不保存 error body、prompt、token、模型輸出或另造 Graph cursor。故障原件不可覆寫／清除，重入相同結果冪等；晚到故障可記錄，但不恢復被取消的工作。報告成本仍獨立，不因失败釋放未知預留。
 - **錯誤出口也須安全：**停止重試時拋 `ModelRequestFailedError`，只攜帶既有安全分類，不把 SDK 原始 error 傳給 Graph 持久保存。保存失敗／取消仍保留本地錯誤型別、停止外送，抑制供應商例外鏈進入標準 traceback；取消不能被吞掉或當成 provider retry。這不宣稱任意第三方 tracing 的 frame locals 安全；不得啟用未經遮罩的原文／憑證紀錄。
 - **尊重服務端等待：**支援 `retry-after-ms`、秒數及 HTTP-date；不把有效長等待截短到本機 backoff 上限。無有效 header 才作 capped exponential backoff＋jitter。工程初值為 1 秒起、30 秒封頂、0–25% jitter；不是新增每工作「五次」產品決策，所有實際次數仍由原 budget 決定。不可表示的超大等待明確停止，不退回短等待。

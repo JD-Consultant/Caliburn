@@ -103,11 +103,19 @@ test('一輪訪談：顧問把職稱與主管寫進 JD，答覆與 JD 重開後�
   await expect(changes.getByText(/李主任/)).toBeVisible();
   await changes.getByRole('button', { name: '關閉' }).click();
 
-  // The formal version exports as a PDF.
-  const pdf = await page.request.get(`/api/job-files/${fileId}/jd/export.pdf`);
-  expect(pdf.status()).toBe(200);
-  expect(pdf.headers()['content-type']).toContain('application/pdf');
-  expect((await pdf.body()).subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  // The formal version downloads through the page's own export link as a real PDF.
+  const downloading = page.waitForEvent('download');
+  await page.getByRole('link', { name: '匯出目前 JD（PDF）' }).click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toMatch(/\.pdf$/);
+  const stream = await download.createReadStream();
+  const head = await new Promise<string>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+    stream.on('end', () => resolve(Buffer.concat(chunks).subarray(0, 5).toString('latin1')));
+    stream.on('error', reject);
+  });
+  expect(head).toBe('%PDF-');
   // Only public messages reach the page: no private reasoning payload, no raw tool call.
   const visible = (await page.locator('body').innerText()) + (await page.content());
   expect(visible).not.toContain('synthetic-opaque');

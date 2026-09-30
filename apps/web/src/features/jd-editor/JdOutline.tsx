@@ -21,8 +21,19 @@ function currentSectionId(scroller: Element): string | null {
   return current;
 }
 
+function isInView(scroller: Element, id: string): boolean {
+  const section = document.getElementById(id);
+  if (!section) return false;
+  const view = scroller.getBoundingClientRect();
+  const box = section.getBoundingClientRect();
+  return box.top < view.bottom && box.bottom > view.top;
+}
+
 export function JdOutline() {
   const nav = useRef<HTMLElement>(null);
+  // A section near the end cannot be scrolled up to the top, so the chosen one stays current
+  // for as long as it is on screen.
+  const chosen = useRef<string | null>(null);
   const [current, setCurrent] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,7 +42,14 @@ export function JdOutline() {
     let frame = 0;
     const update = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setCurrent(currentSectionId(scroller)));
+      frame = requestAnimationFrame(() => {
+        if (chosen.current !== null && isInView(scroller, chosen.current)) {
+          setCurrent(chosen.current);
+          return;
+        }
+        chosen.current = null;
+        setCurrent(currentSectionId(scroller));
+      });
     };
     update();
     scroller.addEventListener('scroll', update, { passive: true });
@@ -42,6 +60,12 @@ export function JdOutline() {
       window.removeEventListener('resize', update);
     };
   }, []);
+
+  function choose(id: string): void {
+    chosen.current = id;
+    setCurrent(id);
+    document.getElementById(id)?.scrollIntoView({ block: 'start' });
+  }
 
   return (
     <nav ref={nav} className="jd-outline" aria-label="JD 章節導覽">
@@ -54,7 +78,7 @@ export function JdOutline() {
           color={current === id ? 'primary' : 'default'}
           variant={current === id ? 'filled' : 'outlined'}
           aria-current={current === id ? 'location' : undefined}
-          onClick={() => document.getElementById(id)?.scrollIntoView({ block: 'start' })}
+          onClick={() => choose(id)}
         />
       ))}
     </nav>

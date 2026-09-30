@@ -496,3 +496,36 @@ Memory 最新快照另作唯讀抽查：3 情境、1 理解保留已知工作、
 這是**文字契約缺口的修正與接線驗證**，不是證明自然模型更懂衝突或引用：沒有以字串 assertion 冒充語意評測，也沒有為文案小修追加付費長旅程。前述新拆任務漏依據、Memory 精確化及精煉問題仍列 T14 品質限制，未勾全項完成。
 
 提交前獨立工程審查五份程式／測試差異，未發現須先修的權責或契約問題；審查未另跑測試，不計成另一份執行證據。
+
+## 2026-10-01：來源參數選擇的模型能力診斷
+
+### 執行前 manifest
+
+基準 `ebc9bd10`。前一組補 description 的自然下一 Step 比較未證明改善，停止同假說加字。原件已證實舊任務及真實來源在 Context 內；本片改問一個有限問題：**現行角色與工具文字，在短而明確的新舊合成訪談下能否選對來源，換模型是否出現差異？**不是先宣稱 Luna 能力不足或切換產品模型。
+
+依本次已搜尋並取得的 [OpenAI 模型選擇指南](https://developers.openai.com/api/docs/guides/model-selection)、[GPT-6 提示建議](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices)，以相同工作負載比較，不由型號／宣傳推定效果。[GPT-6.1 Sol 官方模型頁](https://developers.openai.com/api/docs/models/gpt-6.1-sol)列支援 high 及 function calling；僅列為診斷對照，產品仍是 Luna。新請求不攜帶其他型號的加密推理，不測跨模型 reasoning 相容性。
+
+- 兩個全合成案例：歷史出席工作＋本次新核對方法；歷史設備工作＋本次獨立的通知工作。後者用來檢查是否過度借用無關舊來源。各由 Luna／high、GPT-6.1 Sol／high 執行一次，最多 4 count＋4 create、零重試、串行。
+- 共用現行 `CONSULTANT_INSTRUCTIONS` 與 `create_jd_task` 原 schema／description，只有模型不同。使用腳本化空 JD map 讀取結果與官方 [指定 function](https://developers.openai.com/api/docs/guides/function-calling#tool-choice)選項，隔離「填參數」；**不是自然讀取／規劃、既有任務拆分或完整 App 旅程**，不將合成讀取冒充真 DB 效果。只有訪談資料傳模型，評分標籤／判準不傳。
+- store=false、all_turns，input≤16,000／output≤8,192、單請求120秒／整批600秒、預留 US$1。任一外送失敗、非 completed 或非單一指定工具回應即停，不自動加額補跑。官方標準費率以 [Pricing](https://developers.openai.com/api/docs/pricing)當日 Sol input US$2／output US$10 每百萬、Luna US$0.1／US$0.5 估算；實際 usage／帳單分開。
+- 不執行返回工具、不寫 DB、不動 Demo、不改正式模型／設定。沿既有 parser 檢查 wire，語意另看正文與逐項來源，schema 有效不等於引用正確。只保存公開文字／參數、指紋與用量，無 opaque reasoning／憑證／原始錯誤。
+- 腳本 `.research-tmp/eval/probe_source_model.py`、獨占建立結果 `source-model-20261001.jsonl`。若短例成功，只能排除「連基本選項都無法辨認」，不能消除長 Context 拆分反例；若模型間有差異，也先保留樣本限制，不直接採用新模型或新增自動補引。
+
+### 實際結果與取捨
+
+4 次 count、4 次 create 全部完成，零重試；各模型各案例只有一次，不估計成功率。四個呼叫均由現行 `parse_task_write` 接受；未執行業務工具。
+
+| 案例／模型 | 逐項來源與正文審讀 | input／output tokens | count＋create 秒數 |
+|---|---|---|---|
+| 舊出席工作＋新方法／Luna | 任務引歷史 2＋本次；「老師交表、逐堂人數／缺席、指定資料夾、主管查看」成果引 2；新核對要求只引本次，未混淆 | 3,086／330 | 5.57 |
+| 同例／Sol | 相同來源分工；將新要求分兩項，各引本次，合法等價寫法 | 3,086／614 | 15.19 |
+| 新通知工作／Luna | 任務、成果、要求只引本次；沒有把設備清單舊事實／來源借入新任務 | 3,063／315 | 4.51 |
+| 同例／Sol | 同樣只引本次，保留主管確認新教室及未回覆電話追蹤的界線 | 3,063／507 | 10.89 |
+
+本表是工程代理依原話逐項核對，不冒充人類領域校準。這次短輸入約 3K，且強制建立指定任務，**與原 49K、184 items、多工具、拆分既有任務的自然執行不同**。兩者都能選對基本來源，沒有依據直接換模型、增加來源描述，或宣稱原拆分漏引已修復；也不能由短／長例差異直接認定 Context 長度是根因。Luna 本次沒有公開 commentary，Sol 有；強制呼叫的結果不取代自然串流／對話行為驗收。
+
+事後對照 `read_recent_interviews` 發現探針的 `context_sequences=[1,2,3]` 把所有合成歷史列為前問脈絡；正式投影在本例 covered=0 時應是空集合。這是**診斷素材的邊界 metadata 不準確，不是產品 Context 錯放**。原話、說話者、正式序號本身及兩模型的可見資料相同，仍可觀察四次參數選擇，但不據此推導正式 Context 行為或模型優劣；不修資料後悄悄覆蓋／挑掉原結果，也不為此重付費。後續 App 品質驗證沿實際 owner 投影或完整保存請求，避免手抄正式邊界。
+
+沿已回報 cache read／write／uncached input／output 分項，以前述官方費率估算四次 generation 合計 **US$0.02104171**；不是帳單，亦未證實 count 的計費。腳本 SHA-256 `15318886dc1e5ba9f776cdc53c2a1b32f2f299837985446a2a9eae1c923a94e1`；結果 SHA-256 `bc07dbc4d139943fd0aa5da3bc2121713711e7125dce60951bb1a1623f0d4f65`。各 request 指紋、公開參數與 usage 留本機原件；本批已關閉，不以重複短例堆 pass 數。
+
+本片**不改產品 Prompt／Tool／Context／模型**；只更新證據和任務路由。下一個有價值的品質驗證須回到既有任務重組及逐項來源承接的真實負載，先選能辨別原因的單一變因，不再重做「基本來源會不會選」或相同 description 微調。未驗的知識提煉、Memory 精確化／精簡及完整旅程仍留原 T14／T17，不擴建 reviewer／來源自動猜補。T14／T16／T17 維持未完成。

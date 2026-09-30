@@ -9,6 +9,7 @@ import { JdProfileEditor } from '../features/jd-editor/JdProfileEditor';
 import { JdWorkEditor } from '../features/jd-editor/JdWorkEditor';
 import { JdCandidatePreview } from '../features/jd-editor/JdCandidatePreview';
 import { UndoTurnJd } from '../features/jd-editor/UndoTurnJd';
+import { SourceViewer } from '../features/source-viewer/SourceViewer';
 import { jobFileQuery } from '../features/job-files/job-file-api';
 import { describeReadError } from '../shared/api/http';
 
@@ -94,6 +95,7 @@ function JobFileContent({ jobFileId }: { jobFileId: string }) {
           />
           <JdProfileEditor jobFileId={jobFileId} />
           <JdWorkEditor jobFileId={jobFileId} />
+          <SourceViewer jobFileId={jobFileId} />
         </>
       )}
     </Stack>

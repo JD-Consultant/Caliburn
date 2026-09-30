@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T05 已完成；T06–T11、T13–T15 已有施工／局部驗證，完整 gate 仍未完成**。T08 已有三輪真模型訪談、兩批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**Owner 要求安全點暫停；T01–T05 已完成；T06–T11、T13–T15 已有施工／局部驗證，完整 gate 仍未完成**。T08 已有四輪真模型訪談、三批背景 Memory、同輪暫停／重開／接續及正式 PDF 證據；不等於 T16／T17 長訪談與完整產品驗收。恢復入口見[暫停交接](evidence/2026-09-30-pause-handoff.md)。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -113,6 +113,8 @@
 - **不做：**把網路中斷視為取消、對所有失敗自動新 Turn 重送、逐 token 恢復、JD map 起始預載。
 
 ## T09 訪談 UI、候選即時預覽與重連
+
+- **2026-09-30 正式来源唯讀切片：**共享固定來源查詢、三個 GET、生成契約及按需 UI 已接線；946 unit／contract、13 專項真 PG、20 來源 UI 測試及型別／生成檢查通過。Demo 瀏覽器已讀正式來源列表與訪談原文，重新下載正式 PDF；尚未以此 Demo 驗 Memory 來源鏈 UI（目前直接來源均為原話），不冒稱全旅程通過。見[整合證據](evidence/t09-source-viewer.md)。
 
 - **2026-09-30 公開串流切片：**原生 typed events／phase 白名單接有界暫態 hub、同源 SSE 及 scoped UI，原完整訊息仍由 checkpoint 投影回看；terminal 清理取消承接原 R，不改正式完成邊界。945 unit／contract、21 專項真 PG、95 前端測試通過。真 A 已產生並保存可回看的 commentary，但未截得完成前即時畫面，不宣稱完整真串流時序／T09 完成。見 [T08 §5.7](evidence/t08-consultant-turn.md#57-串流接線後的第四個真-a-turn1202-台北核對) 與 [provider／shared 接線](evidence/t09-response-streaming.md)。
 

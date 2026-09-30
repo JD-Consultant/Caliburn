@@ -40,7 +40,7 @@ def test_unconfigured_model_does_not_accept_an_unrunnable_turn(database_settings
         assert response.json()["detail"]["code"] == "model_not_configured"
 
 
-def test_http_input_reaches_saved_formal_answer(
+def test_http_input_reaches_saved_formal_answer_and_reopens_without_model(
     database_settings: DatabaseSettings, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from caliburn.adapters.openai_responses import create_responses_client
@@ -113,6 +113,31 @@ def test_http_input_reaches_saved_formal_answer(
         history = client.get(f"/api/job-files/{file_id}/interviews").json()["messages"]
         assert history[-1]["interview_text"] == "最近一次盤點，您負責哪些部分？"
         assert [message["interview_sequence"] for message in history] == [1, 2, 3]
+
+    # Reading saved work needs its durable owner, not a configured model client.
+    with TestClient(
+        create_app(Settings(database=database_settings)),
+        base_url="http://127.0.0.1:8100",
+        headers={"Origin": "http://127.0.0.1:8100"},
+        backend_options={"loop_factory": asyncio.SelectorEventLoop},
+    ) as reopened:
+        recovered = reopened.get(f"/api/job-files/{file_id}/consultant-turns/{execution_id}")
+        assert recovered.status_code == 200
+        assert recovered.json()["commentary"] == [
+            {
+                "response_id": "response_1",
+                "message_id": "message_progress",
+                "text": "我先確認目前工作範圍。",
+            }
+        ]
+        assert recovered.json()["status"] == "completed"
+        assert len(model_calls) == 1
+        rejected = reopened.post(
+            f"/api/job-files/{file_id}/inputs",
+            json={"command_id": str(uuid4()), "text": "沒有模型時不可開始新工作"},
+        )
+        assert rejected.status_code == 503
+        assert rejected.json()["detail"]["code"] == "model_not_configured"
 
 
 def test_known_provider_rejection_finishes_failed_without_formalizing_input(

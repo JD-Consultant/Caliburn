@@ -10,6 +10,8 @@
 
 **UI 交接增量：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 已可依職務檔案找回進行中／暫停的 A，不需瀏覽器先保存 execution／command ID；回傳 `{"turn": <既有公開狀態>}` 或明確 `{"turn": null}`，未知檔案 404。不啟動／恢復模型、不返回 Memory 或終態歷史。前端已接上發現與原 execution 控制；分層驗證及未驗邊界見[證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t09-current-turn-discovery.md)。
 
+**離線回看：**只要原 DB 可用，即使未配置模型，也會接上既有 PostgreSQL checkpointer 以讀取已保存的公開中間訊息；不建立模型 client、不啟動執行 supervisor。新輸入仍回 `503 model_not_configured`，不是為了回看而重跑模型。真保存→無模型重啟及 UI／PDF 續驗見 [T17 證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md#2026-10-01既有真模型產物的-ui-與-pdf-續驗)。
+
 從 repo root 執行。使用 Python 3.14、uv 0.12.20；先安裝根 `package.json` 指定的 Node 24／pnpm，前端生成器也需要該環境。精確依賴由 `uv.lock` 保存。
 
 ```powershell

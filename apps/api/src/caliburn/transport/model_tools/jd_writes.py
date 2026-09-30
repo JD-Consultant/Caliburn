@@ -126,7 +126,8 @@ def jd_write_definitions() -> list[FunctionToolParam]:
             "以 read_jd 的 read_ref 修訂一項 JD：短文用完整新值；任務可增刪修成果／要求、"
             "連接既有 K/S 與調整來源。changes 按需列出；不同直接內容各用真正依據。"
             "核對目前內容與新版來源後才 confirm_reference_alignment；讀過不等於核對。"
-            "一次全成或全拒，只修改候選。排序／移動另用 move_jd_item。",
+            "一次全成或全拒，只修改候選。任務內 K/S 引用排序用本工具的 reorder_capability 動作；"
+            "項目／明細排序及任務移動用 move_jd_item。",
             "revise-jd-item-arguments",
         ),
         function_definition(

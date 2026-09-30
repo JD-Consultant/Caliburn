@@ -191,6 +191,8 @@ def test_acceptance_replays_after_app_instance_is_recreated(
     original = client.post(f"/api/job-files/{file_id}/inputs", json=payload).json()
     with TestClient(
         create_app(Settings(database=database_settings)),
+        base_url="http://127.0.0.1:8100",
+        headers={"Origin": "http://127.0.0.1:8100"},
         backend_options={"loop_factory": asyncio.SelectorEventLoop},
     ) as reconnected:
         replay = reconnected.post(f"/api/job-files/{file_id}/inputs", json=payload)

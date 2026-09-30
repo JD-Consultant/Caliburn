@@ -21,6 +21,10 @@ class InterviewMessage(BaseModel):
     interview_sequence: StrictInt = Field(..., ge=1)
     speaker: Speaker
     interview_text: StrictStr = Field(..., min_length=1)
+    execution_id: UUID | None = Field(
+        ...,
+        description="The original consultant Turn for this formal reply, for scoped public commentary lookup. Null for App/employee messages or when no reply association exists. Navigation only; not a source or private context reference.",
+    )
 
 
 class InterviewHistory(BaseModel):

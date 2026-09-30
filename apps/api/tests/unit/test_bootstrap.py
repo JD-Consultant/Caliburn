@@ -9,7 +9,11 @@ from caliburn.bootstrap import create_app
 def test_health_and_openapi_without_credentials(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("DATABASE_URL", raising=False)
-    with TestClient(create_app()) as client:
+    with TestClient(
+        create_app(),
+        base_url="http://127.0.0.1:8100",
+        headers={"Origin": "http://127.0.0.1:8100"},
+    ) as client:
         response = client.get("/api/health")
         assert response.status_code == 200
         assert response.json() == {"status": "ok"}

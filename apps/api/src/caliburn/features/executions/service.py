@@ -41,6 +41,17 @@ async def read_execution(session: AsyncSession, scope: ExecutionScope) -> Execut
     return _project(record, scope)
 
 
+async def list_active_consultants(session: AsyncSession) -> tuple[ExecutionInfo, ...]:
+    """Discovery only: paused/terminal Turns and all Memory work are excluded."""
+    return tuple(
+        _project(
+            record,
+            ExecutionScope(record.job_file_id, record.execution_id, ExecutionKind.CONSULTANT_TURN),
+        )
+        for record in await persistence.list_active_consultants(session)
+    )
+
+
 async def claim_writer(
     session: AsyncSession,
     scope: ExecutionScope,

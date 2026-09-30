@@ -189,6 +189,43 @@ class PausedResponseLoop:
     state: ResponseStepState = field(repr=False)
 
 
+async def read_response_pause(
+    checkpointer: BaseCheckpointSaver[str], *, thread_id: str
+) -> PausedResponseLoop | None:
+    """Read the current native pause without invoking nodes, acknowledging or authorizing it.
+
+    Reuse the execution graph and its pause validator, including native pending-write
+    interpretation. A missing/new/unpaused thread has no interrupt to consume. The
+    application must separately authorize resume and exclude concurrent graph writers.
+    """
+    if not thread_id:
+        raise ValueError("A pause read requires the original thread identity")
+    config: RunnableConfig = {"configurable": {"thread_id": thread_id, "checkpoint_ns": ""}}
+    saved = await checkpointer.aget_tuple(config)
+    if saved is None:
+        return None
+    values = saved.checkpoint["channel_values"]
+    if not values.get("pause_enabled", False):
+        return None
+
+    async def read_only_pause() -> bool:
+        raise RuntimeError("A pause reader must never execute Graph controls")
+
+    async def read_only_acknowledge() -> None:
+        raise RuntimeError("A pause reader must never acknowledge a product pause")
+
+    graph = _build_response_step(
+        checkpointer,
+        max_tool_calls=values["tool_call_limit"],
+        max_model_steps=values["model_step_limit"],
+        controls=ResponseLoopControls(read_only_pause, read_only_acknowledge),
+    )
+    snapshot = await graph.aget_state(config)
+    if not snapshot.interrupts:
+        return None
+    return _paused_result(cast(ResponseStepState, snapshot.values), snapshot.interrupts)
+
+
 async def run_response_loop(
     checkpointer: BaseCheckpointSaver[str],
     *,

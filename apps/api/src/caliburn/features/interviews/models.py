@@ -19,6 +19,14 @@ class InterviewMessage:
     interview_text: str
 
 
+@dataclass(frozen=True, slots=True)
+class InterviewHistoryEntry:
+    """UI history navigation, separate from the shared formal-source message."""
+
+    message: InterviewMessage
+    execution_id: UUID | None
+
+
 class InputCommandConflictError(RuntimeError):
     """The same submission command cannot be reused for different original text."""
 

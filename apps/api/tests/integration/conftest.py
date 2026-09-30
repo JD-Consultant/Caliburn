@@ -16,6 +16,7 @@ from sqlalchemy import create_engine
 from caliburn.adapters.database import migration_config
 from caliburn.bootstrap import create_app
 from caliburn.settings import DatabaseSettings, Settings
+from caliburn.transport.http.interview_inputs import get_consultant_dispatch
 
 
 @pytest.fixture
@@ -57,8 +58,14 @@ def database_settings(empty_database_settings: DatabaseSettings) -> DatabaseSett
 
 @pytest.fixture
 def client(database_settings: DatabaseSettings) -> Iterator[TestClient]:
+    app = create_app(Settings(database=database_settings))
+    # Owner-level tests drive execution explicitly; they do not start a real model daemon.
+    # Full HTTP tests construct an app without this deliberate admission-only override.
+    app.dependency_overrides[get_consultant_dispatch] = lambda: lambda scope: None
     with TestClient(
-        create_app(Settings(database=database_settings)),
+        app,
+        base_url="http://127.0.0.1:8100",
+        headers={"Origin": "http://127.0.0.1:8100"},
         backend_options={"loop_factory": asyncio.SelectorEventLoop},
     ) as test_client:
         yield test_client

@@ -1,0 +1,250 @@
+"""Capture A's initial request once; the response loop owns every later continuation.
+
+Call before starting the response loop, with one live invocation per execution (the
+supervisor must quiesce a replaced writer). Preparation is adopted before new data is
+read. Only a durably captured request may reach the model; no business table copies it.
+This module neither resumes the response loop nor declares a Turn complete.
+"""
+
+import json
+from dataclasses import dataclass, field
+from typing import Literal, TypedDict
+from uuid import UUID
+
+from langchain_core.runnables import RunnableConfig
+from langgraph.graph import END, START, StateGraph
+from pydantic import ConfigDict, JsonValue, TypeAdapter, with_config
+
+from caliburn.adapters.openai_responses import ResponseRequest
+from caliburn.adapters.response_serialization import NativeItems, NativeSnapshot
+from caliburn.contracts.generated.tools.historical_interview import (
+    HistoricalInterview,
+    HistoricalInterviewMessage,
+    Speaker,
+)
+from caliburn.contracts.generated.tools.memory_map import MemoryMap, MemoryMapItem
+from caliburn.features.executions import history
+from caliburn.features.executions import service as executions
+from caliburn.features.executions.history_models import AgentRole
+from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStateError
+from caliburn.features.interviews import queries as interviews
+from caliburn.features.interviews.models import InterviewReadScope
+from caliburn.features.job_description import candidate_service
+from caliburn.features.job_description.candidates import JdCandidatePosition, JdCandidateScope
+from caliburn.features.job_files import service as job_files
+from caliburn.features.work_memory import candidate_queries as memory
+from caliburn.features.work_memory import consolidation_requests, read_queries
+from caliburn.features.work_memory.revisions import MemoryLayer
+from caliburn.workflows.context_history import RoleContextHistory
+from caliburn.workflows.memory_reads import PublishedMemoryRead
+
+
+@dataclass(frozen=True, slots=True)
+class TurnContext:
+    request: ResponseRequest = field(repr=False)
+    memory_binding: PublishedMemoryRead
+    candidate_position: JdCandidatePosition
+    current_input_source_id: UUID
+
+    @property
+    def manual_jd_start_revision_id(self) -> UUID:
+        return self.candidate_position.base_revision_id
+
+
+@with_config(ConfigDict(strict=True, extra="forbid"))
+class _BindingSnapshot(TypedDict):
+    version: Literal[1]
+    job_file_id: str
+    execution_id: str
+    snapshot_id: str | None
+    interview_through_sequence: int
+    current_input_source_id: str
+    candidate_generation_id: str
+    candidate_base_revision_id: str
+    candidate_revision_id: str
+
+
+class _CaptureState(TypedDict, total=False):
+    request_snapshot: NativeSnapshot
+    binding: _BindingSnapshot
+
+
+_BINDING = TypeAdapter(_BindingSnapshot)
+_REQUEST = TypeAdapter(dict[str, JsonValue])
+
+
+async def capture_turn_context(
+    role_history: RoleContextHistory,
+    *,
+    template: ResponseRequest,
+    prepared_history: NativeItems,
+) -> TurnContext:
+    """Pin data after RoleContextHistory.prepare_history, using its exact returned items.
+
+    Reentry restores the original request/settings, even if today's template differs.
+    An interrupted capture uses native pending writes/None resume, not time travel.
+    The caller owns preparation/recovery and supplies a template with empty input and
+    complete role settings/tool definitions; handlers can be built after binding.
+
+    Capacity checking belongs to the response loop; this normal path loads the entire
+    recent range without truncation. No role prompt or notification tool is added here.
+    """
+    scope = role_history.writer.scope
+    if scope.kind != ExecutionKind.CONSULTANT_TURN or role_history.role != AgentRole.JOB_CONSULTANT:
+        raise ExecutionStateError("Only the consultant can capture Turn context")
+    await role_history.ensure_active()
+
+    async def capture_context(state: _CaptureState) -> _CaptureState:
+        request = _restore_request(state.get("request_snapshot"))
+        return await _capture_data(role_history, request)
+
+    builder = StateGraph(_CaptureState)
+    builder.add_node("capture_context", capture_context)
+    builder.add_edge(START, "capture_context")
+    builder.add_edge("capture_context", END)
+    graph = builder.compile(checkpointer=role_history.checkpointer)
+    # Never share channels with the preparation/response graphs or depend on writer ID.
+    config: RunnableConfig = {
+        "configurable": {
+            "thread_id": f"{scope.job_file_id}:{scope.execution_id}:job_consultant:initial_context",
+            "checkpoint_ns": "",
+        }
+    }
+    saved = await graph.aget_state(config)
+    initial: _CaptureState | None = None
+    if saved.created_at is None:
+        if template.create_payload()["input"]:
+            raise ValueError("The role template must not contain history, maps or current input")
+        async with role_history.sessions() as session:
+            prepared = await history.read_context_history(session, scope, role_history.role)
+            if prepared is None or prepared.prepared is None:
+                raise ValueError("Adopt role history preparation before capturing new Turn data")
+        initial = {"request_snapshot": {**template.create_payload(), "input": prepared_history}}
+    if initial is not None or saved.next or saved.tasks:
+        await graph.ainvoke(initial, config, durability="sync")
+    # get_state may project pending writes. Return only the complete persisted boundary,
+    # never a node result that has not reached the saver (nor an arbitrary latest graph).
+    raw = await role_history.checkpointer.aget_tuple(config)
+    if raw is None:
+        raise ValueError("The initial context checkpoint is unavailable")
+    checkpoint = await graph.aget_state(raw.config)
+    if checkpoint.next or checkpoint.tasks:
+        raise ValueError("The initial context checkpoint has unfinished capture work")
+    values = raw.checkpoint["channel_values"]
+    result = _restore_context(values.get("binding"), values.get("request_snapshot"), scope)
+    await role_history.ensure_active()
+    return result
+
+
+async def _capture_data(work: RoleContextHistory, request: ResponseRequest) -> _CaptureState:
+    scope = work.writer.scope
+    async with work.sessions.begin() as session:
+        await job_files.lock_job_file(session, scope.job_file_id)
+        await executions.lock_active_writer(session, work.writer)
+        snapshot = await memory.read_latest_snapshot(session, scope.job_file_id)
+        snapshot_id = snapshot.snapshot_id if snapshot is not None else None
+        frontier = await interviews.read_history_frontier(session, scope.job_file_id)
+        original = await interviews.read_execution_input(
+            session, job_file_id=scope.job_file_id, execution_id=scope.execution_id
+        )
+        position = await candidate_service.start_candidate(
+            session, scope.job_file_id, scope.execution_id
+        )
+        maps = {}
+        for layer in MemoryLayer:
+            view = await read_queries.bind_published_view(
+                session, scope.job_file_id, snapshot_id, layer
+            )
+            entries = await read_queries.read_map(session, view)
+            maps[f"{layer.value}_map"] = MemoryMap(
+                items=[
+                    MemoryMapItem(target_title=item.title, description=item.description)
+                    for item in entries
+                ]
+            ).model_dump(mode="json")
+        covered = snapshot.covered_through_sequence if snapshot is not None else 0
+        recent = await interviews.read_recent_interviews(
+            session,
+            InterviewReadScope(scope.job_file_id, frontier),
+            covered_through_sequence=covered,
+        )
+        memory_failure = await consolidation_requests.read_block(session, scope.job_file_id)
+    historical = HistoricalInterview(
+        data_kind="historical_interview",
+        messages=[
+            HistoricalInterviewMessage(
+                interview_sequence=message.interview_sequence,
+                speaker=Speaker(message.speaker.value),
+                text=message.interview_text,
+            )
+            for message in recent.messages
+        ],
+    )
+    app_data = {
+        "data_kind": "consultant_turn_reference",
+        **maps,
+        "historical_interview": historical.model_dump(mode="json"),
+        "interview_read_boundary": {
+            "covered_through_sequence": covered,
+            "through_sequence": frontier,
+            "context_sequences": list(recent.context_sequences),
+        },
+    }
+    if memory_failure is not None:
+        app_data["memory_consolidation"] = {
+            "status": "blocked",
+            "failure_reason": memory_failure,
+            "next_action": (
+                "繼續訪談；使用目前已發布記憶、近期原話與 read_interview，不宣稱已更新。"
+            ),
+        }
+    payload = request.create_payload()
+    payload["input"] = [
+        *payload["input"],
+        {"role": "user", "content": json.dumps(app_data, ensure_ascii=False)},
+        {"role": "user", "content": original.interview_text},
+    ]
+    binding: _BindingSnapshot = {
+        "version": 1,
+        "job_file_id": str(scope.job_file_id),
+        "execution_id": str(scope.execution_id),
+        "snapshot_id": str(snapshot_id) if snapshot_id is not None else None,
+        "interview_through_sequence": frontier,
+        "current_input_source_id": str(original.source_id),
+        "candidate_generation_id": str(position.scope.generation_id),
+        "candidate_base_revision_id": str(position.base_revision_id),
+        "candidate_revision_id": str(position.revision_id),
+    }
+    _restore_context(binding, payload, scope)
+    return {"request_snapshot": payload, "binding": binding}
+
+
+def _restore_request(value: object) -> ResponseRequest:
+    snapshot = _REQUEST.validate_python(value, strict=True)
+    return ResponseRequest.from_snapshot(snapshot)
+
+
+def _restore_context(
+    binding_value: object, request_value: object, scope: ExecutionScope
+) -> TurnContext:
+    binding = _BINDING.validate_python(binding_value)
+    if (UUID(binding["job_file_id"]), UUID(binding["execution_id"])) != (
+        scope.job_file_id,
+        scope.execution_id,
+    ):
+        raise ExecutionStateError("The initial context belongs to another Turn")
+    snapshot_id = binding["snapshot_id"]
+    return TurnContext(
+        request=_restore_request(request_value),
+        memory_binding=PublishedMemoryRead(
+            scope,
+            UUID(snapshot_id) if snapshot_id is not None else None,
+            binding["interview_through_sequence"],
+        ),
+        candidate_position=JdCandidatePosition(
+            JdCandidateScope(scope.execution_id, UUID(binding["candidate_generation_id"])),
+            UUID(binding["candidate_base_revision_id"]),
+            UUID(binding["candidate_revision_id"]),
+        ),
+        current_input_source_id=UUID(binding["current_input_source_id"]),
+    )

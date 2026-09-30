@@ -78,6 +78,17 @@ class Settings:
     database: DatabaseSettings | None = None
     model: ModelSettings | None = None
     pdf: PdfSettings | None = None
+    dev_origin: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.dev_origin is None:
+            return
+        match = re.fullmatch(
+            r"http://(?:127\.0\.0\.1|localhost|\[::1\]):([1-9][0-9]{0,4})",
+            self.dev_origin,
+        )
+        if match is None or int(match[1]) > 65_535:
+            raise ValueError("Dev origin must be one exact loopback HTTP origin with a port")
 
     @classmethod
     def from_environment(cls) -> Settings:
@@ -86,6 +97,7 @@ class Settings:
         pdf_font = os.environ.get("CALIBURN_PDF_FONT_PATH")
         pdf_browser = os.environ.get("CALIBURN_PDF_CHROMIUM_PATH")
         return cls(
+            dev_origin=os.environ.get("CALIBURN_DEV_ORIGIN"),
             database=DatabaseSettings(
                 url=database_url,
                 schema=os.environ.get("CALIBURN_DATABASE_SCHEMA", "caliburn"),

@@ -15,6 +15,7 @@ pnpm --filter @caliburn/frontend dev
 
 ```powershell
 pnpm --filter @caliburn/frontend test
+pnpm --filter @caliburn/frontend test:proxy
 pnpm --filter @caliburn/frontend typecheck
 pnpm --filter @caliburn/frontend lint
 pnpm --filter @caliburn/frontend format:check
@@ -48,6 +49,8 @@ $env:CALIBURN_E2E_BASE_URL = 'http://127.0.0.1:5173'
 pnpm --filter @caliburn/frontend test:e2e
 ```
 
-第二組前端可指向另一個隔離後端：`$env:CALIBURN_API_PROXY = 'http://127.0.0.1:8101'` 後另開 `vite --port 5174`（proxy 只在此設定下轉送後端信任的 dev Origin；後端安全設定不變）。Playwright 依 lock 的 Chromium 版本執行，另開隔離 context、不使用個人瀏覽器 profile。若安裝器受環境限制，`CALIBURN_E2E_CHROMIUM_PATH` 可明確提供已核對該 release 版本的 binary；未驗的跨版本不能視為等價證據。`test-results` 的故障 trace／截圖不入版控，僅供合成測試，避免對真實員工資料留無限紀錄。
+第二組前端可指向另一個隔離後端。在**隔離後端的終端**先設定 `$env:CALIBURN_DEV_ORIGIN = 'http://127.0.0.1:5174'` 再啟動 8101；在**第二組前端的終端**設定 `$env:CALIBURN_API_PROXY = 'http://127.0.0.1:8101'` 後另開 `vite --host 127.0.0.1 --port 5174 --strictPort`，並將測試 URL 設為 5174。後端只增加這一個精確 loopback Origin，不允許任意本機埠；proxy 保留原 Origin，不偽裝成 5173，也不新增 CORS 許可。`test:proxy` 用實際 Vite config 與臨時 loopback HTTP server 驗證標頭保留，不接 Demo／資料庫／模型。
+
+Playwright 依 lock 的 Chromium 版本執行，另開隔離 context、不使用個人瀏覽器 profile。若安裝器受環境限制，`CALIBURN_E2E_CHROMIUM_PATH` 可明確提供已核對該 release 版本的 binary；未驗的跨版本不能視為等價證據。`test-results` 的故障 trace／截圖不入版控，僅供合成測試，避免對真實員工資料留無限紀錄。
 
 目前 `tests/e2e` 驗建立／同名選取／reload／鍵盤／窄螢幕、列表改名不改訪談／姓名、POST 真提交後故意丟回應再確認、舊改名重送不覆蓋較新名稱、列表連線失敗；另驗 JD 四欄／局部清空、職責／任務 CRUD／排序／移動、刪職責保留任務、共用知識／技能 CRUD 及多任務使用、反向用途、獨立排序、共用修訂刷新、協作與條件 CRUD／更正分類、過期基底與 A 准入拒絕新人工修改，以及 JD 提交回應遺失後沿原命令確認且呈現最新稿。後端是真 PostgreSQL；fault injection 用 Playwright network routing，不以 mock 成功回應代替 DB 提交。此 gate 不驗模型、A Turn／Memory 恢復、完整安全、PDF 或品質。

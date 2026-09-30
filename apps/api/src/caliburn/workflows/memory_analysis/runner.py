@@ -11,7 +11,7 @@ from openai import AsyncOpenAI
 from pydantic import JsonValue
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from caliburn.adapters.openai_pricing import GPT_6_LUNA_STANDARD_2026_09_30
+from caliburn.adapters.openai_models import model_profile
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import NativeItems, restore_response
 from caliburn.agent_execution.context_compaction import (
@@ -22,7 +22,6 @@ from caliburn.agent_execution.context_compaction import (
     run_context_compaction,
 )
 from caliburn.agent_execution.request_capacity import (
-    ModelCapacityLimits,
     ReceivedInputCount,
     RequestCapacityError,
 )
@@ -66,12 +65,6 @@ from caliburn.workflows.memory_writes import MemoryWritePreparation
 from caliburn.workflows.model_requests import ModelRequestAccounting, ModelRequestExecutor
 
 HISTORY_THRESHOLD_TOKENS = 512_000  # Explicit T10 operational initial value, not provider policy.
-_CAPACITY: ModelCapacityLimits = {
-    "model": "gpt-6-luna",
-    "max_input_tokens": 922_000,
-    "context_window_tokens": 1_050_000,
-    "max_output_tokens": 128_000,
-}
 type AnalysisRecovery = HeldModelResponse | HeldInputCount | HeldCompaction | HeldPreparationCount
 
 
@@ -143,19 +136,22 @@ class MemoryAnalysisRunner:
                 writer,
             ),
         )
-        pricing = GPT_6_LUNA_STANDARD_2026_09_30
+        profile = model_profile(self.settings.model)
         executor = ModelRequestExecutor(
             self.sessions,
             writer,
             self.client,
             ModelRequestAccounting.from_text_pricing(
-                pricing,
+                profile.pricing,
                 token_count_reservation_usd=Decimal("0.0001"),
                 compaction_reservation_usd=Decimal("0.50"),
             ),
         )
         compaction = CompactionRuntime(
-            executor.request_compaction, executor.account_compaction, ensure_active, _CAPACITY
+            executor.request_compaction,
+            executor.account_compaction,
+            ensure_active,
+            profile.capacity_limits(),
         )
         template = ResponseRequest(
             model=self.settings.model,
@@ -247,7 +243,7 @@ class MemoryAnalysisRunner:
             ensure_active=ensure_active,
             account_response=executor.account_response,
             count_input=count_input,
-            capacity_limits=_CAPACITY,
+            capacity_limits=profile.capacity_limits(),
             compact_window=compact_window,
         )
         step_recovery = (
@@ -288,7 +284,7 @@ class MemoryAnalysisRunner:
         )
 
     async def _fix_budget(self, writer: ExecutionWriter) -> ExecutionBudget:
-        pricing = GPT_6_LUNA_STANDARD_2026_09_30
+        pricing = model_profile(self.settings.model).pricing
         async with self.sessions.begin() as session:
             await executions.lock_active_writer(session, writer)
             policy = await budgets.read_execution_budget(session, writer.scope)

@@ -9,6 +9,8 @@ from pathlib import Path
 from openai.types.shared.reasoning_effort import ReasoningEffort
 from sqlalchemy.engine import URL, make_url
 
+from caliburn.adapters.openai_models import model_profile
+
 
 @dataclass(frozen=True, slots=True)
 class DatabaseSettings:
@@ -45,11 +47,10 @@ class ModelSettings:
     max_cost_usd: Decimal | None = None
 
     def __post_init__(self) -> None:
-        if not self.api_key.strip() or self.model != "gpt-6-luna":
-            raise ValueError(
-                "Configure an OpenAI key and a model with a researched capacity policy"
-            )
-        if self.reasoning_effort not in {"none", "low", "medium", "high", "xhigh", "max"}:
+        if not self.api_key.strip():
+            raise ValueError("Configure an OpenAI key")
+        profile = model_profile(self.model)
+        if self.reasoning_effort not in profile.reasoning_efforts:
             raise ValueError("Unsupported reasoning effort")
         for value in (
             self.max_output_tokens,
@@ -62,7 +63,10 @@ class ModelSettings:
         ):
             if type(value) is not int or value < 1:
                 raise ValueError("Model limits must be positive integers")
-        if self.max_output_tokens > 128_000 or not 0 < self.request_timeout_seconds <= 900:
+        if (
+            self.max_output_tokens > profile.max_output_tokens
+            or not 0 < self.request_timeout_seconds <= 900
+        ):
             raise ValueError("Model output or timeout exceeds the configured capacity")
         if self.max_cost_usd is not None and (
             not self.max_cost_usd.is_finite() or self.max_cost_usd <= 0

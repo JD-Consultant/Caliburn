@@ -48,3 +48,17 @@ test('choosing a section that has not loaded yet does nothing instead of failing
   await userEvent.click(screen.getByRole('button', { name: '工作條件' }));
   expect(scrollIntoView).not.toHaveBeenCalled();
 });
+
+test('a chosen section is marked current at once, even one too near the end to reach the top', async () => {
+  stubScrollIntoView();
+  render(
+    <>
+      <JdOutline />
+      <section id="jd-conditions">條件區</section>
+    </>,
+  );
+  const chip = screen.getByRole('button', { name: '工作條件' });
+  expect(chip).not.toHaveAttribute('aria-current');
+  await userEvent.click(chip);
+  expect(chip).toHaveAttribute('aria-current', 'location');
+});

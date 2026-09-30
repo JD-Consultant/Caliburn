@@ -82,3 +82,42 @@ Ruff 檢查／格式通過，mypy **274 source files 無問題**。未重跑與�
 ### 仍未完成
 
 本片沒有另機／容器、乾淨 PDF 字型與 Chromium 安裝、真模型整體旅程或正式入口切換。T14 的拆分漏依據／Memory 表述問題、T16 的高容量 provider gate、T17 品質與 T18 最後切換仍依原 evidence，不以本次安裝成功勾選。工程代理已提出「先試用並明列品質限制」或「修好品質再交付」的取捨，**尚未收到裁決，不改原完成標準**。
+
+## 非 editable 安裝的中文 PDF（2026-10-01 續驗）
+
+承接 `166dd960`，沿用上述獨立 venv、實際 wheel 與 `delivery_clean_20261001_7b3e`，本片只補 PDF 交付接縫。沒有修改 renderer／模型／工具／Prompt，也沒有付費外送、另造容器或更換 Demo 程序。
+
+### 執行依賴與研究
+
+[Playwright 官方瀏覽器文件](https://playwright.dev/python/docs/browsers)說明每版套件對應特定瀏覽器、headless-only 安裝及自訂下載路徑。鎖定 Python Playwright 1.63.0 的本機 `browsers.json` 指定 headless shell **153.0.8010.12、revision 1243**。不以系統 Chrome 冒充這個組合。
+
+- 在全新 `PLAYWRIGHT_BROWSERS_PATH` 執行 `python -m playwright install chromium --only-shell --no-remove --no-progress`；CLI 內建的 5 次下載均於 30 秒逾時，命令失敗，沒有宣稱原生 installer 成功。
+- 同一官方 CDN URL 的 PowerShell HEAD 為 200；遂以 `Invoke-WebRequest` **一次**下載該相同 ZIP，再 `Expand-Archive` 至獨立目錄。沿產品原有 `CALIBURN_PDF_CHROMIUM_PATH` 明確指定其中的執行檔，沒有改 Playwright、關閉 TLS 或新增產品 fallback。未查明 Node CLI 與 PowerShell 的網路行為差異，不斷言是代理原因。
+- 字型從 [Noto CJK 官方下載指南](https://github.com/notofonts/noto-cjk/blob/main/Sans/README.md)選繁體中文臺灣 subset variable TTF；固定 repo commit `f8d157532fbfaeda587e826d4cd5b21a49186f7c`，下載 `Sans/Variable/TTF/Subset/NotoSansTC-VF.ttf` 及同版 `Sans/LICENSE` 至隔離目錄，不依賴 Windows 已安裝字型。首次誤取根目錄 LICENSE 得 404，查官方位置後補正；不是字型下載／產品故障。
+
+| 本機依賴原件 | Bytes | SHA-256 |
+|---|---:|---|
+| 官方 headless shell ZIP | 120,200,717 | `7aec872f3090e639c4237467624ea863c20fe2878914c93a6556bdbb52aa6c4c` |
+| NotoSansTC-VF.ttf | 11,942,800 | `ac091cc8cd19e848202afc8fe6d3809b4526c8fdbdb4be82da20c4f785949591` |
+| Sans/LICENSE | — | `6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2` |
+
+以上是下載後的辨識雜湊，不宣稱為廠商簽章驗證。原件、字型授權及 PDF 保留於 ignored `.research-tmp/delivery-clean-cae4f960-7b3e`，不提交二進位或更動系統字型。
+
+### 真 HTTP、保存與頁面檢查
+
+確認 `caliburn.__file__` 來自獨立 venv 的 `site-packages`，使用 Selector loop、同源靜態 build、loopback 58141 啟動真 Uvicorn，**不提供 API key**。PDF 字型與瀏覽器指向上述新下載原件。
+
+1. 讀回上片人工保存的職務 `fee3a9f6-cb35-4e66-9f68-6d5ec7d7e9b6`，確認仍是修訂 `976830b9-3d36-42f0-b940-bb45d8a1ad49`，經正式 `GET .../jd/export.pdf` 匯出短稿。
+2. 透過正式 HTTP 建立長稿用合成職務 `75edfe61-49e0-4d69-826f-fcf8482fc4d2`；保存 profile 及一個含 80 段文字的未歸屬任務，再由正式端點匯出。內容沿既有 `test_pdf_rendering.py` 的分頁素材，不是把人工編稿算成真模型品質。
+3. 首次驗證命令誤用 `job_purpose`，HTTP 422 拒絕，未寫入 profile；讀 canonical `revise-jd-profile-request.schema.json` 後改用正確 `purpose`，保存成功。這是探針輸入錯誤，沒有為了讓測試通過修改契約。最終正式長稿修訂 `d7ea6ad5-922a-497d-bf86-50f904d86596`。
+4. 兩次匯出均 HTTP 200、`application/pdf`、`Cache-Control: no-store`。Poppler 確認 tagged A4、無 JavaScript；短稿 **1 頁／83,093 bytes**，長稿 **3 頁／268,380 bytes**。
+5. Poppler 將全部四頁轉 PNG 並逐頁目視：中文可讀，無遮疊、缺字或截斷；長稿步驟在 20→21、65→66 正常跨頁，末尾成果仍在第 3 頁。另用 pypdf 驗步驟 0–79 依序完整、末尾成果存在、合成員工姓名／檔案名未輸出。既有字型 cmap 的文字複製／搜尋限制仍依 [T13](t13-pdf-export.md#任務完成對照與-pdf-文字層診斷2026-09-30-恢復後)，不以視覺成功消除該限制。
+
+| 產物（ignored `pdf/`） | SHA-256 |
+|---|---|
+| `jd-short.pdf` | `6e5181c07ec637dc54334b25509434e124089d5e1d5000f8dfaa9bbcfd9fb661` |
+| `jd-long.pdf` | `a1f3bf7a31d65a31b0aa34a64dd5b21d389767149341a9caa02b95a792e7ce0a` |
+
+自有 server PID 36024 已 Ctrl+C 完成 lifespan 關閉；58141 不再監聽。測試資料保留，未刪舊資料或停止其他程序。只補 README 的 PDF 安裝／配置步驟及本證據，沒有新產品程式行為，因此不重跑無關全套測試。
+
+**結論：**已證實同機獨立 wheel 環境＋新下載指定版本瀏覽器／字型可以由正式後端匯出短／長中文 PDF。原生 Playwright CLI 下載仍未成功，另機／Linux 未驗；不以此勾 T18 或宣告 T14／T16／T17 的品質／容量問題已解決。

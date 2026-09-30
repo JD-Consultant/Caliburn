@@ -1,195 +1,19 @@
 /** Grouped manual editing over one formal revision; all mutations use original command recovery. */
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
-import type { Detail, JdWorkView, WorkTask } from '../../shared/api/generated/jd-work-view';
+import { Alert, Button, Paper, Stack, Typography } from '@mui/material';
 import { describeReadError } from '../../shared/api/http';
+import { AddIcon } from '../../shared/ui/icons';
 import { commandFor, jdWorkQuery } from './jd-work-api';
 import type { WorkIntent } from './jd-work-api';
 import { useWorkCommand } from './useWorkCommand';
 import { WorkEditDialog } from './WorkEditDialog';
 import type { WorkEditing } from './WorkEditDialog';
+import { AreaSection } from './AreaSection';
 import { CapabilitiesSection } from './CapabilitiesSection';
-import { TaskCapabilities } from './TaskCapabilities';
 import { CollaboratorsSection } from './CollaboratorsSection';
 import { ConditionsSection } from './ConditionsSection';
-import { detailTarget, itemTarget, useSourceBadge } from './source-badge-context';
-import { IconAction } from '../../shared/ui/IconAction';
-import { AddIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon, EditIcon } from '../../shared/ui/icons';
-
-function TaskDetails({
-  taskId,
-  label,
-  details,
-  disabled,
-  onMove,
-}: {
-  taskId: string;
-  label: string;
-  details: Detail[];
-  disabled: boolean;
-  onMove: (detailId: string, beforeId: string | null) => void;
-}) {
-  const badge = useSourceBadge();
-  return (
-    <Box>
-      <Typography component="h5" variant="subtitle2">
-        {label}
-      </Typography>
-      {details.length === 0 ? (
-        <Typography color="text.secondary">尚未提供</Typography>
-      ) : (
-        <Box component="ol" sx={{ pl: 3, my: 1 }}>
-          {details.map((detail, index) => (
-            <li key={detail.detail_id} className="item">
-              <Typography
-                sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', display: 'inline' }}
-              >
-                {detail.text}
-              </Typography>
-              {badge(detailTarget(taskId, detail.detail_id))}
-              <span className="item-actions">
-                <Button
-                  size="small"
-                  disabled={disabled || index === 0}
-                  aria-label={`上移${label} ${String(index + 1)}`}
-                  onClick={() => onMove(detail.detail_id, details[index - 1]?.detail_id ?? null)}
-                >
-                  上移
-                </Button>
-                <Button
-                  size="small"
-                  disabled={disabled || index === details.length - 1}
-                  aria-label={`下移${label} ${String(index + 1)}`}
-                  onClick={() => onMove(detail.detail_id, details[index + 2]?.detail_id ?? null)}
-                >
-                  下移
-                </Button>
-              </span>
-            </li>
-          ))}
-        </Box>
-      )}
-    </Box>
-  );
-}
-
-function TaskCard({
-  task,
-  index,
-  group,
-  baseline,
-  disabled,
-  onEdit,
-  onDelete,
-  onChange,
-}: {
-  task: WorkTask;
-  index: number;
-  group: WorkTask[];
-  baseline: JdWorkView;
-  disabled: boolean;
-  onEdit: (editing: WorkEditing) => void;
-  onDelete: (task: WorkTask) => void;
-  onChange: (intent: WorkIntent) => void;
-}) {
-  const name = task.title ?? '尚未命名的任務';
-  const badge = useSourceBadge();
-  function move(beforeId: string | null): void {
-    onChange({
-      collection: 'tasks',
-      change: {
-        action: 'move_task',
-        task_id: task.task_id,
-        area_id: task.area_id,
-        before_task_id: beforeId,
-        changes: [],
-      },
-    });
-  }
-  function reorderDetail(detailId: string, beforeId: string | null): void {
-    onChange({
-      collection: 'tasks',
-      change: {
-        action: 'reorder_detail',
-        task_id: task.task_id,
-        detail_id: detailId,
-        before_detail_id: beforeId,
-      },
-    });
-  }
-  return (
-    <Box
-      component="article"
-      id={`jd-task-${task.task_id}`}
-      aria-label={name}
-      sx={{ pt: 2, borderTop: 1, borderColor: 'divider', scrollMarginTop: 16 }}
-    >
-      <Stack spacing={1} className="item">
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
-          <Typography variant="subtitle1" component="h4">
-            {name}
-          </Typography>
-          {badge(itemTarget('task', task.task_id))}
-        </Stack>
-        <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-          {task.description ?? '工作內容尚未提供'}
-        </Typography>
-        <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
-          <IconAction
-            label="編輯任務"
-            disabled={disabled}
-            onClick={() => onEdit({ kind: 'task', baseline, task, areaId: task.area_id })}
-          >
-            <EditIcon />
-          </IconAction>
-          <IconAction
-            label="上移任務"
-            disabled={disabled || index === 0}
-            onClick={() => move(group[index - 1]?.task_id ?? null)}
-          >
-            <ArrowUpIcon />
-          </IconAction>
-          <IconAction
-            label="下移任務"
-            disabled={disabled || index === group.length - 1}
-            onClick={() => move(group[index + 2]?.task_id ?? null)}
-          >
-            <ArrowDownIcon />
-          </IconAction>
-          <IconAction
-            label="刪除任務"
-            color="error"
-            disabled={disabled}
-            onClick={() => onDelete(task)}
-          >
-            <DeleteIcon />
-          </IconAction>
-        </Stack>
-        <TaskDetails
-          taskId={task.task_id}
-          label="工作成果"
-          details={task.outcomes}
-          disabled={disabled}
-          onMove={reorderDetail}
-        />
-        <TaskDetails
-          taskId={task.task_id}
-          label="工作要求"
-          details={task.requirements}
-          disabled={disabled}
-          onMove={reorderDetail}
-        />
-        <TaskCapabilities
-          taskId={task.task_id}
-          baseline={baseline}
-          disabled={disabled}
-          onChange={onChange}
-        />
-      </Stack>
-    </Box>
-  );
-}
+import { TaskCard } from './TaskCard';
 
 export function JdWorkEditor({
   jobFileId,
@@ -202,7 +26,6 @@ export function JdWorkEditor({
   const work = useQuery(jdWorkQuery(jobFileId));
   const [editing, setEditing] = useState<WorkEditing | null>(null);
   const command = useWorkCommand(jobFileId, () => setEditing(null));
-  const badge = useSourceBadge();
   const current = work.data;
   const disabled = command.locked || work.isFetching || work.isError || readOnly;
 
@@ -258,7 +81,7 @@ export function JdWorkEditor({
   }
 
   return (
-    <section aria-labelledby="jd-work-heading">
+    <section id="jd-work" aria-labelledby="jd-work-heading">
       <Stack spacing={2}>
         <Typography variant="h6" component="h2" id="jd-work-heading">
           JD 職責與任務
@@ -308,88 +131,47 @@ export function JdWorkEditor({
             </div>
             {current.areas.length === 0 && <p>尚無職責。可先記錄任務，再整理歸屬。</p>}
             {current.areas.map((area, index) => (
-              <Paper
-                variant="outlined"
-                component="section"
+              <AreaSection
                 key={area.area_id}
-                aria-label={area.title ?? '尚未命名的職責'}
-                sx={{ p: { xs: 1.5, sm: 2 } }}
+                area={area}
+                isFirst={index === 0}
+                isLast={index === current.areas.length - 1}
+                taskCount={current.tasks.filter((task) => task.area_id === area.area_id).length}
+                disabled={disabled}
+                onEdit={() => setEditing({ kind: 'area', baseline: current, area })}
+                onMoveUp={() =>
+                  submitIntent({
+                    collection: 'areas',
+                    change: {
+                      action: 'reorder_area',
+                      area_id: area.area_id,
+                      before_area_id: current.areas[index - 1]?.area_id ?? null,
+                    },
+                  })
+                }
+                onMoveDown={() =>
+                  submitIntent({
+                    collection: 'areas',
+                    change: {
+                      action: 'reorder_area',
+                      area_id: area.area_id,
+                      before_area_id: current.areas[index + 2]?.area_id ?? null,
+                    },
+                  })
+                }
+                onDelete={() =>
+                  confirm(
+                    '刪除職責',
+                    `移除「${area.title ?? '尚未命名的職責'}」。所屬任務會保留並移到未歸屬任務，不會刪除任務內容。`,
+                    {
+                      collection: 'areas',
+                      change: { action: 'delete_area', area_id: area.area_id },
+                    },
+                  )
+                }
               >
-                <Stack spacing={2} className="item">
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    sx={{ alignItems: 'center', flexWrap: 'wrap' }}
-                  >
-                    <Typography component="h3" variant="h6">
-                      {area.title ?? '尚未命名的職責'}
-                    </Typography>
-                    {badge(itemTarget('area', area.area_id))}
-                  </Stack>
-                  <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-                    {area.scope_text ?? '職責範圍尚未提供'}
-                  </Typography>
-                  <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
-                    <IconAction
-                      label="編輯職責"
-                      disabled={disabled}
-                      onClick={() => setEditing({ kind: 'area', baseline: current, area })}
-                    >
-                      <EditIcon />
-                    </IconAction>
-                    <IconAction
-                      label="上移職責"
-                      disabled={disabled || index === 0}
-                      onClick={() =>
-                        submitIntent({
-                          collection: 'areas',
-                          change: {
-                            action: 'reorder_area',
-                            area_id: area.area_id,
-                            before_area_id: current.areas[index - 1]?.area_id ?? null,
-                          },
-                        })
-                      }
-                    >
-                      <ArrowUpIcon />
-                    </IconAction>
-                    <IconAction
-                      label="下移職責"
-                      disabled={disabled || index === current.areas.length - 1}
-                      onClick={() =>
-                        submitIntent({
-                          collection: 'areas',
-                          change: {
-                            action: 'reorder_area',
-                            area_id: area.area_id,
-                            before_area_id: current.areas[index + 2]?.area_id ?? null,
-                          },
-                        })
-                      }
-                    >
-                      <ArrowDownIcon />
-                    </IconAction>
-                    <IconAction
-                      label="刪除職責"
-                      color="error"
-                      disabled={disabled}
-                      onClick={() =>
-                        confirm(
-                          '刪除職責',
-                          `移除「${area.title ?? '尚未命名的職責'}」。所屬任務會保留並移到未歸屬任務，不會刪除任務內容。`,
-                          {
-                            collection: 'areas',
-                            change: { action: 'delete_area', area_id: area.area_id },
-                          },
-                        )
-                      }
-                    >
-                      <DeleteIcon />
-                    </IconAction>
-                  </Stack>
-                  {renderTasks(area.area_id)}
-                </Stack>
-              </Paper>
+                {renderTasks(area.area_id)}
+              </AreaSection>
             ))}
             <Paper
               variant="outlined"

@@ -30,6 +30,7 @@ export function JdProfileEditor({
   return (
     <Paper
       component="section"
+      id="jd-profile"
       variant="outlined"
       aria-labelledby="jd-profile-heading"
       sx={{ p: { xs: 1.5, sm: 2 } }}

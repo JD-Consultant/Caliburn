@@ -282,3 +282,24 @@ test('損壞的待確認命令阻止新寫入，不默默丟棄', async () => {
   expect(await screen.findByRole('button', { name: '新增職責' })).toBeDisabled();
   expect(sessionStorage.getItem(`caliburn.pending-jd-work.${fileId}`)).toBe('{broken');
 });
+
+test('a responsibility collapses to its header with a task count and expands again', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(Response.json(original))),
+  );
+  renderEditor();
+  const collapse = await screen.findByRole('button', { name: '收合職責 網站交付' });
+  expect(collapse).toHaveAttribute('aria-expanded', 'true');
+  expect(screen.getByRole('heading', { name: '實作網頁' })).toBeVisible();
+
+  await userEvent.click(collapse);
+  expect(screen.queryByRole('heading', { name: '實作網頁' })).not.toBeInTheDocument();
+  expect(screen.getByText('1 項任務')).toBeVisible();
+  const expand = screen.getByRole('button', { name: '展開職責 網站交付' });
+  expect(expand).toHaveAttribute('aria-expanded', 'false');
+
+  await userEvent.click(expand);
+  expect(await screen.findByRole('heading', { name: '實作網頁' })).toBeVisible();
+  expect(screen.queryByText('1 項任務')).not.toBeInTheDocument();
+});

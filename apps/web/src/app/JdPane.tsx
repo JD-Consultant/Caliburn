@@ -10,6 +10,7 @@ import { DownloadIcon } from '../shared/ui/icons';
 import type { ConsultantTurn } from '../shared/api/generated/consultant-turn';
 import { isJdReadOnlyDuring } from '../features/interview/turn-summary';
 import { JdCandidatePreview } from '../features/jd-editor/JdCandidatePreview';
+import { JdOutline } from '../features/jd-editor/JdOutline';
 import { JdProfileEditor } from '../features/jd-editor/JdProfileEditor';
 import { JdWorkEditor } from '../features/jd-editor/JdWorkEditor';
 import { SourceBadgeContext } from '../features/jd-editor/source-badge-context';
@@ -108,6 +109,7 @@ export function JdPane({ jobFileId, turn }: { jobFileId: string; turn: Consultan
             </div>
           )}
           <div className="jd-stack" hidden={showCandidate}>
+            <JdOutline />
             <SourceBadgeContext.Provider value={renderBadge}>
               <JdProfileEditor jobFileId={jobFileId} readOnly={readOnly} />
               <JdWorkEditor jobFileId={jobFileId} readOnly={readOnly} />

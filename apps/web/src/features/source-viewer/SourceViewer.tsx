@@ -6,26 +6,77 @@ import type { JdSourcesView, Reference } from '../../shared/api/generated/jd-sou
 import { describeSourceError, jdSourcesQuery } from './source-api';
 import { SourceDetails } from './SourceDetails';
 
-export function SourceViewer({ jobFileId }: { jobFileId: string }) {
-  return <SourceDisclosure key={jobFileId} jobFileId={jobFileId} />;
+interface ViewerProps {
+  jobFileId: string;
+  /** Optional control from the page, e.g. a badge on a JD item opens the sheet for that item. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onlyCitationIds?: readonly string[] | null;
+  onClearFilter?: () => void;
 }
 
-function SourceDisclosure({ jobFileId }: { jobFileId: string }) {
-  const [open, setOpen] = useState(false);
+export function SourceViewer(props: ViewerProps) {
+  return <SourceDisclosure key={props.jobFileId} {...props} />;
+}
+
+function SourceDisclosure({
+  jobFileId,
+  open: controlledOpen,
+  onOpenChange,
+  onlyCitationIds = null,
+  onClearFilter,
+}: ViewerProps) {
+  const [innerOpen, setInnerOpen] = useState(false);
+  const open = controlledOpen ?? innerOpen;
+  const setOpen = (next: boolean) => {
+    if (onOpenChange) onOpenChange(next);
+    else setInnerOpen(next);
+  };
   const contentId = useId();
   return (
     <Box component="section" sx={{ minWidth: 0 }}>
-      <Button aria-expanded={open} aria-controls={contentId} onClick={() => setOpen(!open)}>
+      <Button
+        size="small"
+        variant="outlined"
+        aria-expanded={open}
+        aria-controls={contentId}
+        onClick={() => setOpen(!open)}
+      >
         正式 JD 來源（唯讀）
       </Button>
-      <Box id={contentId} hidden={!open}>
-        {open && <SourceList jobFileId={jobFileId} />}
+      {/* A side sheet over the JD pane keeps the document in view (Airtable/Attio side panel). */}
+      <Box id={contentId} hidden={!open} className="source-sheet">
+        {open && (
+          <>
+            <div className="source-sheet-header">
+              <h3 className="pane-title">JD 來源回查</h3>
+              <Button size="small" onClick={() => setOpen(false)}>
+                關閉來源面板
+              </Button>
+            </div>
+            <div className="source-sheet-body">
+              <SourceList
+                jobFileId={jobFileId}
+                onlyCitationIds={onlyCitationIds}
+                onClearFilter={onClearFilter}
+              />
+            </div>
+          </>
+        )}
       </Box>
     </Box>
   );
 }
 
-function SourceList({ jobFileId }: { jobFileId: string }) {
+function SourceList({
+  jobFileId,
+  onlyCitationIds,
+  onClearFilter,
+}: {
+  jobFileId: string;
+  onlyCitationIds: readonly string[] | null;
+  onClearFilter: (() => void) | undefined;
+}) {
   const sources = useQuery(jdSourcesQuery(jobFileId));
   return (
     <Stack spacing={2}>
@@ -50,6 +101,8 @@ function SourceList({ jobFileId }: { jobFileId: string }) {
             key={`${sources.data.revision_id}:${sources.dataUpdatedAt}`}
             jobFileId={jobFileId}
             view={sources.data}
+            onlyCitationIds={onlyCitationIds}
+            onClearFilter={onClearFilter}
           />
         )
       )}
@@ -57,28 +110,29 @@ function SourceList({ jobFileId }: { jobFileId: string }) {
   );
 }
 
-function SourceReferences({ jobFileId, view }: { jobFileId: string; view: JdSourcesView }) {
+function SourceReferences({
+  jobFileId,
+  view,
+  onlyCitationIds,
+  onClearFilter,
+}: {
+  jobFileId: string;
+  view: JdSourcesView;
+  onlyCitationIds: readonly string[] | null;
+  onClearFilter: (() => void) | undefined;
+}) {
+  const shown = onlyCitationIds
+    ? view.references.filter((reference) => onlyCitationIds.includes(reference.citation_id))
+    : view.references;
   // Remounting after every list read drops the entire old navigation/diff state.
-  const [selected, setSelected] = useState<Reference | null>(null);
+  const [selected, setSelected] = useState<Reference | null>(() =>
+    onlyCitationIds && shown.length === 1 ? (shown[0] ?? null) : null,
+  );
   return (
     <Stack spacing={2}>
       {view.references.length === 0 && (
         <Typography>目前正式 JD 沒有附帶引用；這不代表內容錯誤或已完成核對。</Typography>
       )}
-      {view.references.map((reference) => (
-        <Box key={reference.citation_id}>
-          <Typography component="h3" variant="subtitle1">
-            {reference.target_label}
-          </Typography>
-          <Button
-            aria-pressed={selected?.citation_id === reference.citation_id}
-            onClick={() => setSelected(reference)}
-          >
-            {reference.source_label}
-          </Button>
-          {reference.needs_recheck && <Chip label="待核對" size="small" color="warning" />}
-        </Box>
-      ))}
       {selected && (
         <SourceDetails
           key={selected.citation_id}
@@ -86,6 +140,43 @@ function SourceReferences({ jobFileId, view }: { jobFileId: string; view: JdSour
           reference={selected}
         />
       )}
+      {onlyCitationIds && (
+        <Typography variant="body2" color="text.secondary">
+          只顯示所選 JD 項目的來源。{' '}
+          {onClearFilter && (
+            <Button size="small" onClick={onClearFilter}>
+              顯示全部來源
+            </Button>
+          )}
+        </Typography>
+      )}
+      {shown.map((reference) => (
+        <Box key={reference.citation_id} sx={{ pb: 1.5, borderBottom: 1, borderColor: 'divider' }}>
+          <Typography
+            component="h3"
+            variant="subtitle2"
+            sx={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              overflowWrap: 'anywhere',
+            }}
+          >
+            {reference.target_label}
+          </Typography>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+            <Button
+              size="small"
+              aria-pressed={selected?.citation_id === reference.citation_id}
+              onClick={() => setSelected(reference)}
+            >
+              {reference.source_label}
+            </Button>
+            {reference.needs_recheck && <Chip label="待核對" size="small" color="warning" />}
+          </Stack>
+        </Box>
+      ))}
     </Stack>
   );
 }

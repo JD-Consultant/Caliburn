@@ -4,6 +4,9 @@ import type { Condition, JdWorkView } from '../../shared/api/generated/jd-work-v
 import type { WorkIntent } from './jd-work-api';
 import type { WorkEditing } from './WorkEditDialog';
 import { conditionLabels } from './condition-labels';
+import { itemTarget, useSourceBadge } from './source-badge-context';
+import { IconAction } from '../../shared/ui/IconAction';
+import { AddIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon, EditIcon } from '../../shared/ui/icons';
 
 interface Props {
   baseline: JdWorkView;
@@ -14,6 +17,7 @@ interface Props {
 }
 
 export function ConditionsSection({ baseline, disabled, onEdit, onChange, onDelete }: Props) {
+  const badge = useSourceBadge();
   function move(conditionId: string, beforeId: string | null): void {
     onChange({
       collection: 'conditions',
@@ -52,37 +56,49 @@ export function ConditionsSection({ baseline, disabled, onEdit, onChange, onDele
                   component="article"
                   key={item.condition_id}
                   aria-label={`${label} ${String(index + 1)}`}
+                  className="item"
                   sx={{ mt: 1 }}
                 >
-                  <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+                  <Typography
+                    sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', display: 'inline' }}
+                  >
                     {item.text}
                   </Typography>
-                  <Stack direction="row" sx={{ flexWrap: 'wrap' }}>
-                    <Button
+                  {badge(itemTarget('condition', item.condition_id))}
+                  <Stack direction="row" className="item-actions" sx={{ flexWrap: 'wrap' }}>
+                    <IconAction
+                      label="編輯條件"
                       disabled={disabled}
                       onClick={() => onEdit({ kind: 'condition', baseline, condition: item })}
                     >
-                      編輯條件
-                    </Button>
-                    <Button
+                      <EditIcon />
+                    </IconAction>
+                    <IconAction
+                      label="上移條件"
                       disabled={disabled || index === 0}
                       onClick={() =>
                         move(item.condition_id, group[index - 1]?.condition_id ?? null)
                       }
                     >
-                      上移條件
-                    </Button>
-                    <Button
+                      <ArrowUpIcon />
+                    </IconAction>
+                    <IconAction
+                      label="下移條件"
                       disabled={disabled || index === group.length - 1}
                       onClick={() =>
                         move(item.condition_id, group[index + 2]?.condition_id ?? null)
                       }
                     >
-                      下移條件
-                    </Button>
-                    <Button disabled={disabled} color="error" onClick={() => onDelete(item)}>
-                      刪除條件
-                    </Button>
+                      <ArrowDownIcon />
+                    </IconAction>
+                    <IconAction
+                      label="刪除條件"
+                      disabled={disabled}
+                      color="error"
+                      onClick={() => onDelete(item)}
+                    >
+                      <DeleteIcon />
+                    </IconAction>
                   </Stack>
                 </Box>
               ))}
@@ -90,7 +106,12 @@ export function ConditionsSection({ baseline, disabled, onEdit, onChange, onDele
           );
         })}
         <div>
-          <Button disabled={disabled} onClick={() => onEdit({ kind: 'condition', baseline })}>
+          <Button
+            size="small"
+            startIcon={<AddIcon />}
+            disabled={disabled}
+            onClick={() => onEdit({ kind: 'condition', baseline })}
+          >
             新增條件
           </Button>
         </div>

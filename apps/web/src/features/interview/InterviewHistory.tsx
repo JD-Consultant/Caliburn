@@ -1,7 +1,7 @@
 /** Formal transcript with a separate, non-source disclosure of saved public commentary. */
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { Alert, Button, Paper, Stack, Typography } from '@mui/material';
+import { Alert, Button } from '@mui/material';
 import type { InterviewMessage } from '../../shared/api/generated/interview-history';
 import { describeReadError } from '../../shared/api/http';
 import { interviewHistoryQuery } from './interview-api';
@@ -11,6 +11,12 @@ const speakerLabels: Record<InterviewMessage['speaker'], string> = {
   app: 'App 開場引導',
   employee: '受訪員工',
   consultant: '職務顧問',
+};
+
+const speakerAvatars: Record<InterviewMessage['speaker'], string> = {
+  app: '系',
+  employee: '員',
+  consultant: '顧',
 };
 
 export function InterviewHistory({
@@ -23,13 +29,18 @@ export function InterviewHistory({
   const history = useQuery(interviewHistoryQuery(jobFileId));
   return (
     <section aria-labelledby="interview-heading">
-      <Typography id="interview-heading" variant="h6" component="h2" sx={{ mb: 2 }}>
+      <p id="interview-heading" className="interview-heading">
         歷史訪談
-      </Typography>
-      {history.isPending && <p role="status">正在讀取這份檔案的訪談…</p>}
+      </p>
+      {history.isPending && (
+        <p role="status" className="interview-heading">
+          正在讀取這份檔案的訪談…
+        </p>
+      )}
       {history.isError && (
         <Alert
           severity="error"
+          sx={{ mx: 2, mt: 1 }}
           action={
             <Button
               color="inherit"
@@ -45,17 +56,15 @@ export function InterviewHistory({
         </Alert>
       )}
       {history.data && !history.isError && (
-        <Stack component="ol" spacing={2} className="interview-history">
+        <ol className="interview-history">
           {history.data.messages.map((message) => (
-            <Paper
-              component="li"
-              variant="outlined"
-              key={message.source_id}
-              className="interview-message"
-            >
-              <Typography component="h3" variant="subtitle2">
+            <li key={message.source_id} className={`msg msg--${message.speaker}`}>
+              <h3 className="msg-meta">
+                <span className="msg-avatar" aria-hidden="true">
+                  {speakerAvatars[message.speaker]}
+                </span>
                 {speakerLabels[message.speaker]} · 訪談序號 {message.interview_sequence}
-              </Typography>
+              </h3>
               <p className="interview-text">{message.interview_text}</p>
               {message.speaker === 'consultant' && message.execution_id !== null && (
                 <HistoricalTurnMessages
@@ -64,9 +73,9 @@ export function InterviewHistory({
                   renderTurnActions={renderTurnActions}
                 />
               )}
-            </Paper>
+            </li>
           ))}
-        </Stack>
+        </ol>
       )}
     </section>
   );

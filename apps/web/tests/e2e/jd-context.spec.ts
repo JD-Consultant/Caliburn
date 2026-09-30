@@ -109,6 +109,8 @@ test('協作與共通條件增修刪、分類內排序、更正分類、重開�
     .getByRole('region', { name: '工作條件與責任邊界', exact: true })
     .screenshot({ path: testInfo.outputPath('conditions-desktop.png'), animations: 'disabled' });
   await page.setViewportSize({ width: 390, height: 844 });
+  // Narrow screens show one pane at a time; the JD lives in its own tab.
+  await page.getByRole('tab', { name: 'JD' }).click();
   await page
     .getByRole('article', { name: '共通協作界線 1' })
     .getByRole('button', { name: '編輯條件' })

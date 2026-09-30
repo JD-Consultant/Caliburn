@@ -103,6 +103,8 @@ test('建立後開啟原檔案並回讀正式開場，不生成員工輸入', as
   const user = userEvent.setup();
   const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>();
   fetch.mockImplementation((path, options) => {
+    if (path.endsWith('/consultant-turns/current'))
+      return Promise.resolve(Response.json({ turn: null }));
     if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
     if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(emptyProfile));
     if (path.endsWith('/interviews')) return Promise.resolve(history('請談談最近一次完整的工作。'));
@@ -135,6 +137,8 @@ test('同名檔案按身分切換，遲到的甲檔訪談不可顯示在乙檔',
   });
   const fetch = vi.fn<(path: string) => Promise<Response>>();
   fetch.mockImplementation((path) => {
+    if (path.endsWith('/consultant-turns/current'))
+      return Promise.resolve(Response.json({ turn: null }));
     if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
     if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(emptyProfile));
     if (path === '/api/job-files')
@@ -182,6 +186,8 @@ test('歷史訪談以原文字串顯示，不解析成 HTML', async () => {
   vi.stubGlobal(
     'fetch',
     vi.fn((path: string) => {
+      if (path.endsWith('/consultant-turns/current'))
+        return Promise.resolve(Response.json({ turn: null }));
       if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
       if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(emptyProfile));
       return Promise.resolve(
@@ -291,6 +297,8 @@ test('職務檔案提供 JD 基本資料讀取與人工編輯入口', async () =
   vi.stubGlobal(
     'fetch',
     vi.fn((path: string) => {
+      if (path.endsWith('/consultant-turns/current'))
+        return Promise.resolve(Response.json({ turn: null }));
       if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
       if (path.endsWith('/jd/profile')) {
         return Promise.resolve(
@@ -323,6 +331,8 @@ test('PDF 下載入口使用同檔案正式稿網址並明示不含候選預覽'
   vi.stubGlobal(
     'fetch',
     vi.fn((path: string) => {
+      if (path.endsWith('/consultant-turns/current'))
+        return Promise.resolve(Response.json({ turn: null }));
       if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
       if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(emptyProfile));
       return Promise.resolve(
@@ -341,6 +351,8 @@ test('metadata 背景讀取失敗不卸載尚未送出的訪談與 JD 表單草�
   const user = userEvent.setup();
   let metadataUnavailable = false;
   const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>((path) => {
+    if (path.endsWith('/consultant-turns/current'))
+      return Promise.resolve(Response.json({ turn: null }));
     if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(emptyWork));
     if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(emptyProfile));
     if (path.endsWith('/interviews')) return Promise.resolve(history('正式開場'));

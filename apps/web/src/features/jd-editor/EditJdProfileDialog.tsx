@@ -30,6 +30,7 @@ import {
 interface Props {
   jobFileId: string;
   baseline: JdProfileView;
+  readOnly?: boolean;
   onClose: () => void;
   onRefresh: () => void;
 }
@@ -48,7 +49,13 @@ function restoreProfile(jobFileId: string): {
   }
 }
 
-export function EditJdProfileDialog({ jobFileId, baseline, onClose, onRefresh }: Props) {
+export function EditJdProfileDialog({
+  jobFileId,
+  baseline,
+  readOnly = false,
+  onClose,
+  onRefresh,
+}: Props) {
   const [restored] = useState(() => restoreProfile(jobFileId));
   const [pending, setPending] = useState(restored.command);
   const [draft, setDraft] = useState(() => makeProfileDraft(baseline.profile, restored.command));
@@ -64,6 +71,7 @@ export function EditJdProfileDialog({ jobFileId, baseline, onClose, onRefresh }:
   async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     if (inFlight.current || restored.error || isRejected) return;
+    if (readOnly && !pending) return;
     const changes = profileFields
       .filter((field) => draft[field] !== (baseline.profile[field] ?? ''))
       .map((field) =>
@@ -140,6 +148,9 @@ export function EditJdProfileDialog({ jobFileId, baseline, onClose, onRefresh }:
           <Stack spacing={2} sx={{ pt: 1 }}>
             <p>只儲存修改的欄位。未知可留空；刪除全部文字會清空該欄，不影響其他內容。</p>
             {message && <Alert severity="warning">{message}</Alert>}
+            {readOnly && (
+              <Alert severity="info">JD 暫時唯讀，草稿仍保留；待處理狀態確認後再儲存。</Alert>
+            )}
             {pending && !message && !mutation.isPending && (
               <Alert severity="info">有尚未確認的 JD 修改，請先取得原結果。</Alert>
             )}
@@ -154,7 +165,7 @@ export function EditJdProfileDialog({ jobFileId, baseline, onClose, onRefresh }:
                 onChange={(event) =>
                   setDraft((previous) => ({ ...previous, [field]: event.target.value }))
                 }
-                disabled={pending !== null || !!restored.error || isRejected}
+                disabled={pending !== null || !!restored.error || isRejected || readOnly}
                 helperText={
                   field === 'purpose' ? '簡短說明替誰、透過哪類工作、達成什麼持續價值。' : undefined
                 }
@@ -172,7 +183,7 @@ export function EditJdProfileDialog({ jobFileId, baseline, onClose, onRefresh }:
             <Button
               type="submit"
               variant="contained"
-              disabled={mutation.isPending || !!restored.error}
+              disabled={mutation.isPending || !!restored.error || (readOnly && !pending)}
             >
               {mutation.isPending ? '確認中…' : pending ? '重新確認修改結果' : '儲存基本資料'}
             </Button>

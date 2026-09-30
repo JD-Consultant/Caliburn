@@ -17,7 +17,7 @@ export function JobFilePage() {
 
 function JobFileContent({ jobFileId }: { jobFileId: string }) {
   const file = useQuery(jobFileQuery(jobFileId));
-  const turn = useCurrentTurn(jobFileId);
+  const { turn, isVerified } = useCurrentTurn(jobFileId);
   const retry = (
     <Button
       color="inherit"
@@ -60,7 +60,7 @@ function JobFileContent({ jobFileId }: { jobFileId: string }) {
         ) : null
       }
       interview={<InterviewPane jobFileId={jobFileId} />}
-      document={<JdPane jobFileId={jobFileId} turn={turn} />}
+      document={<JdPane jobFileId={jobFileId} turn={turn} turnVerified={isVerified} />}
     />
   );
 }

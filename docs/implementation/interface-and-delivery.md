@@ -102,18 +102,22 @@ sequenceDiagram
 證據、設計依據與已驗／未驗範圍見 [T09 UI 改版證據](../plans/2026-09-29-target-rebuild/evidence/t09-ui-redesign.md)；本節只記責任與不變式，不重抄視覺數值（單一來源為 [`theme.ts`](../../apps/web/src/app/theme.ts) 與 [`styles.css`](../../apps/web/src/app/styles.css)）。
 
 - **版面**：職務檔案頁為左訪談、右 JD 並排（`WorkspaceLayout`），各自捲動、整頁不捲動；窄螢幕（<900px）以分頁切換。切換只用 CSS，**兩區保持掛載**，輪詢、SSE 與未送出草稿不因切換而丟失。訪談輸入與 Turn 控制固定在訪談欄底部；訊息記錄只在使用者接近底部時跟到最新，回看舊訊息不被打斷。
-- **Turn 狀態的讀取**：頁面需要「目前處理狀態」（檔案列徽章、JD 唯讀）。本分頁追蹤的 Turn 識別（[localStorage 提示](../../apps/web/src/features/interview/interview-turn-api.ts)）是外部儲存，以 `useSyncExternalStore` 訂閱（同分頁事件＋跨分頁 `storage`）；頁面用 `useCurrentTurn` 以**唯讀** query 觀察者讀同一份 cache，不另設輪詢、不把 server state 用 Effect 複製進 component state。啟動、恢復與輪詢仍只由 `InterviewComposer` 負責；狀態未確認（讀取失敗、識別尚無 execution）時不宣稱有 Turn。
-- **JD 唯讀鎖**：Turn 為 active 或 paused 時，JD 顯示原因並停用人工編輯入口；這只改善體驗，寫入仍由後端拒絕（§1）。取消／完成／失敗後才恢復。
+- **Turn 狀態的讀取**：頁面需要「目前處理狀態」（檔案列徽章、JD 唯讀）。[localStorage 提示](../../apps/web/src/features/interview/interview-turn-api.ts)以 `useSyncExternalStore` 訂閱（同分頁事件＋跨分頁 `storage`）；沒有提示則由 `/current` 發現工作，見 §2。頁面用 `useCurrentTurn` 的停用 query 觀察者讀同一份 cache，不另發 GET／輪詢、不把 server state 用 Effect 複製進 component state。啟動、恢復與輪詢只由 `InterviewComposer` 負責；回傳同時區分已核狀態與未知，沒有 Turn 資料不等於已確認閒置。
+- **JD 唯讀鎖**：Turn 為 active 或 paused，或處理狀態尚未確認時，JD 顯示原因並停用人工編輯入口；已開啟的表單也保留草稿但禁止新修改，仍可核對既有待確認命令。正式內容仍可閱讀。已核終態或已確認沒有進行中工作才解除。這只改善體驗，寫入仍由後端拒絕（§1），不把一次 GET 當長期寫入資格。
 - **候選與正式稿**：候選預覽在 JD 欄，用獨立「候選」樣式（「AI 層」）並註明尚未正式保存，可一鍵切到正式稿；兩個檢視都保持掛載，切換不重新載入正式稿。PDF 入口在 JD 欄，仍只匯出正式版本。取消後候選消失、回到正式稿。
 - **來源**：來源回查是 JD 欄右側滑出面板（詳情在列表上方）；JD 各項目旁的「來源 n 筆／待核對」徽章只用 `Reference.target` 身分連結（見 [JD 保存 §3.7](jd-storage.md#37-人的正式來源回查t09-增量)），沒有 `target` 就不顯示徽章，絕不按標籤猜。徽章點擊只把面板篩到該項目的引用；查看不解除待核對。
 - **長 JD 導覽與降噪**：章節導覽列（sticky、標示目前章節）、職責可收合（收合只是呈現，任務保持掛載）。編輯動作為圖示按鈕（無障礙名稱不變），在滑鼠環境於 hover／聚焦時才浮現，觸控環境常駐，不靠 hover 才可操作。
 - **不變**：所有命令識別／原命令恢復、版本衝突、待確認命令、跨職務檔案 query key 隔離、公開訊息非正式來源等規則不因版面改變；重排時以既有測試的「角色＋名稱」為護欄，標題、按鈕名稱與 region 名稱視同契約。
 
+**多分頁的最小支援（2026-09-30 Owner 委由工程取捨）：**保留一般多分頁開啟，不新增全 App 單分頁鎖、即時協作、草稿同步或跨頁 Query cache 廣播。各頁向原 API 讀取；同瀏覽器既有 hint 變動透過外部儲存訂閱承接，處理區與頁面觀察同一識別。畫面可能短暫落後，最終仍由後端同檔 A 排他、人工寫入資格及 JD 修訂條件拒絕過期寫入，不能靜默以新版基底重送。這不是即時同步或跨瀏覽器單一視窗承諾；相關取捨、官方依據與驗證見[發現入口證據](../plans/2026-09-29-target-rebuild/evidence/t09-current-turn-discovery.md#ui-承接與多分頁取捨2026-09-30)。
+
 ## 2. 串流不是保存權威
 
-**目前 Turn 發現入口（T09，後端已接線、UI 待接）：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 從該檔案的既有 execution 准入資料找出唯一 active／paused 顧問，回 `{"turn": <既有 ConsultantTurn>}`；無進行中顧問回 `{"turn": null}`，不存在檔案回 404。pending pause 仍是 active＋`pause_requested`。沿用既有公開狀態、候選與 commentary 白名單，不返回 terminal 歷史或 Memory 工作；GET 不啟動模型、不取得 writer、不 resume，回應 no-store。這只是讀取時的觀察，控制操作仍重新核資格。
+**目前 Turn 發現入口（T09，後端與 UI 已接線）：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 從該檔案的既有 execution 准入資料找出唯一 active／paused 顧問，回 `{"turn": <既有 ConsultantTurn>}`；無進行中顧問回 `{"turn": null}`，不存在檔案回 404。pending pause 仍是 active＋`pause_requested`。沿用既有公開狀態、候選與 commentary 白名單，不返回 terminal 歷史或 Memory 工作；GET 不啟動模型、不取得 writer、不 resume，回應 no-store。這只是讀取時的觀察，控制操作仍重新核資格。
 
-前端後續應在缺少本機識別時用此入口發現工作，再沿同一 execution 的既有查詢／控制接續；不能為找回畫面重送原輸入，也不能以空結果證明某個未確認命令從未被接受。已保存的未知原命令仍沿 by-command 核對。頁面徽章、候選與 JD 唯讀狀態維持同一 query cache，避免另一份 state 或第二個輪詢。此段定義接線方向，**不表示現有 UI 已使用 `/current`**。契約與真 PG 證據見[本切片](../plans/2026-09-29-target-rebuild/evidence/t09-current-turn-discovery.md)。
+前端缺少本機識別時用此入口發現工作，再沿同一 execution 的既有查詢／控制接續；找到後停止 discovery，保留原 execution 至終態，不因 `/current` 後來變空而丟掉結果。查詢中允許輸入局部草稿，但未確認閒置前不送出；查詢失敗明示錯誤與唯讀重查，不吞成 null。回應須通過同一 schema 及檔案身分核對。
+
+已保存的未知原命令優先沿 by-command 核對，不能以 current 空結果證明它從未被接受；不為找回畫面重送原輸入或另造 command ID。終態後按「開始下一次訪談／取回原文編輯」才清理原提示、重查 current，再准入新輸入。無提示也可走同一終態操作，不把伺服器原輸入另存到瀏覽器。頁面徽章、候選與 JD 唯讀狀態維持同一 query cache，沒有另一份 state 或第二個輪詢。契約與分層驗證見[本切片](../plans/2026-09-29-target-rebuild/evidence/t09-current-turn-discovery.md)。
 
 **2026-09-30 已落地範圍：**公開完整 commentary 從原生 checkpoint／pending writes 投影，status polling 呈現候選／控制；歷史回答透過原 execution 定位按需回看。沒有訊息時明示空，不由 App 編造進度。新增 direct Responses typed stream → 有界程序內投影 → 同源 SSE → UI 的即時公開文字接線；真產品驗收與限制分見 [provider 證據](../plans/2026-09-29-target-rebuild/evidence/t09-response-streaming.md)、[傳輸證據](../plans/2026-09-29-target-rebuild/evidence/t09-commentary-transport.md)、[UI 證據](../plans/2026-09-29-target-rebuild/evidence/t09-commentary-ui.md)，不因此宣告 T09 全部完成。
 

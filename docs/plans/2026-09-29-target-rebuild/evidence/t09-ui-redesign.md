@@ -61,3 +61,5 @@
 - 隔離 proxy 不再覆寫 Origin。需在隔離後端明確設定 `CALIBURN_DEV_ORIGIN`，步驟沿 [web README](../../../../apps/web/README.md#合成資料瀏覽器驗收)；red→green、官方依據與安全邊界見 [T15 修正](t15-local-http-security.md#隔離前端的來源保留修正2026-09-30)。
 - 缺口 1 的後端 `/consultant-turns/current` 已交付並通過相關真 PG／契約回歸，詳細回傳與限制見[發現入口證據](t09-current-turn-discovery.md)。**UI 尚待接線**：不要把有 API 說成換瀏覽器已可控制；未知原輸入仍走 by-command，不因 current=null 自動重新送出。
 - 缺口 2「本輪 JD 變更」、完整鍵盤走查、兩項模型依賴 e2e 與真模型品質等仍未完成；訊息 Markdown 呈現不在本輪變更範圍。
+
+後續：缺口 1 的 UI 已接線；Demo 後端已載入新 API，真來源徽章與訪談回查已唯讀確認。包含未知狀態、跨頁 hint 與已開啟草稿鎖定的修正／限制統一見[發現入口後續證據](t09-current-turn-discovery.md#ui-承接與多分頁取捨2026-09-30)，不將前文歷史驗證改寫成完整跨瀏覽器旅程已通過。

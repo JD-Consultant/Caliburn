@@ -22,7 +22,12 @@ function TurnDisclosure(props: HistoryTurnProps) {
   const contentId = useId();
   return (
     <Box>
-      <Button aria-expanded={open} aria-controls={contentId} onClick={() => setOpen(!open)}>
+      <Button
+        size="small"
+        aria-expanded={open}
+        aria-controls={contentId}
+        onClick={() => setOpen(!open)}
+      >
         {props.renderTurnActions ? '回看本次公開處理訊息／JD 操作' : '回看本次公開處理訊息'}
       </Button>
       <Box id={contentId} hidden={!open}>

@@ -70,11 +70,15 @@ export function JdCandidatePreview({ candidate }: { candidate: CandidateJdPrevie
       component="section"
       aria-label="JD 候選預覽"
       spacing={2}
-      sx={{ p: 2, border: 1, borderColor: 'divider', overflowWrap: 'anywhere' }}
+      className="ai-layer"
+      sx={{ p: { xs: 2, sm: 3 }, overflowWrap: 'anywhere' }}
     >
-      <Typography component="h2" variant="h6">
-        JD 候選預覽
-      </Typography>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+        <span className="ai-label">候選</span>
+        <Typography component="h2" variant="h6">
+          JD 候選預覽
+        </Typography>
+      </Stack>
       <Alert severity="info">尚未正式保存；完成前不會取代正式 JD，PDF 仍匯出正式版本。</Alert>
       <Box component="dl" sx={{ m: 0 }}>
         {(

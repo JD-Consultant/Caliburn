@@ -3,11 +3,13 @@ import { useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
+import { CloseIcon, PauseIcon, PlayIcon } from '../../shared/ui/icons';
 import { ApiError } from '../../shared/api/http';
 import { consultantTurnQuery, controlConsultantTurn, isTerminalTurn } from './interview-turn-api';
 import type { ConsultantControl } from './interview-turn-api';
 
 const labels = { pause: '暫停處理', resume: '繼續處理', cancel: '取消處理' };
+const icons = { pause: <PauseIcon />, resume: <PlayIcon />, cancel: <CloseIcon /> };
 
 export function ConsultantTurnControls({ turn }: { turn: ConsultantTurn }) {
   const queryClient = useQueryClient();
@@ -53,6 +55,9 @@ export function ConsultantTurnControls({ turn }: { turn: ConsultantTurn }) {
             <Button
               key={control}
               color={control === 'cancel' ? 'warning' : 'primary'}
+              variant="outlined"
+              size="small"
+              startIcon={icons[control]}
               disabled={command.isPending}
               onClick={() => {
                 void act(control);

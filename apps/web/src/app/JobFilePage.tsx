@@ -1,17 +1,15 @@
-/** Page composition joins metadata and interview features; neither imports the other's internals. */
+/** Page composition: metadata gate, then the workspace. Features never import each other. */
+import { useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Alert, Button, Stack, Typography } from '@mui/material';
-import { InterviewHistory } from '../features/interview/InterviewHistory';
-import { InterviewComposer } from '../features/interview/InterviewComposer';
-import { consultantTurnQuery } from '../features/interview/interview-turn-api';
-import { JdProfileEditor } from '../features/jd-editor/JdProfileEditor';
-import { JdWorkEditor } from '../features/jd-editor/JdWorkEditor';
-import { JdCandidatePreview } from '../features/jd-editor/JdCandidatePreview';
-import { UndoTurnJd } from '../features/jd-editor/UndoTurnJd';
-import { SourceViewer } from '../features/source-viewer/SourceViewer';
+import { useQuery } from '@tanstack/react-query';
+import { Alert, Button, Container, Stack } from '@mui/material';
+import type { ConsultantTurn } from '../shared/api/generated/consultant-turn';
 import { jobFileQuery } from '../features/job-files/job-file-api';
 import { describeReadError } from '../shared/api/http';
+import { FileBar } from './FileBar';
+import { InterviewPane } from './InterviewPane';
+import { JdPane } from './JdPane';
+import { WorkspaceLayout } from './WorkspaceLayout';
 
 export function JobFilePage() {
   const { jobFileId } = useParams();
@@ -20,84 +18,51 @@ export function JobFilePage() {
 
 function JobFileContent({ jobFileId }: { jobFileId: string }) {
   const file = useQuery(jobFileQuery(jobFileId));
-  const queryClient = useQueryClient();
+  // Server-verified Turn state, reported by the interview feature and read by the JD pane.
+  const [turn, setTurn] = useState<ConsultantTurn | null>(null);
+  const retry = (
+    <Button
+      color="inherit"
+      onClick={() => {
+        void file.refetch();
+      }}
+    >
+      重新讀取
+    </Button>
+  );
+  if (!file.data) {
+    return (
+      <Container component="main" maxWidth="lg" sx={{ py: 3 }}>
+        <Stack spacing={2}>
+          <div>
+            <Button component={RouterLink} to="/">
+              ← 職務檔案清單
+            </Button>
+          </div>
+          {file.isPending && <p role="status">正在開啟職務檔案…</p>}
+          {file.isError && (
+            <Alert severity="error" action={retry}>
+              {describeReadError(file.error)}
+            </Alert>
+          )}
+        </Stack>
+      </Container>
+    );
+  }
   return (
-    <Stack spacing={3}>
-      <div>
-        <Button component={RouterLink} to="/">
-          ← 職務檔案清單
-        </Button>
-      </div>
-      {file.isPending && <p role="status">正在開啟職務檔案…</p>}
-      {file.isError && (
-        <Alert
-          severity="error"
-          action={
-            <Button
-              color="inherit"
-              onClick={() => {
-                void file.refetch();
-              }}
-            >
-              重新讀取
-            </Button>
-          }
-        >
-          {describeReadError(file.error)}
-        </Alert>
-      )}
-      {file.data && (
-        <>
-          <header>
-            <Typography variant="h4" component="h1">
-              {file.data.display_name}
-            </Typography>
-            <p>受訪員工：{file.data.employee_name}</p>
-            <Button
-              component="a"
-              href={`/api/job-files/${encodeURIComponent(jobFileId)}/jd/export.pdf`}
-              download
-              variant="outlined"
-              aria-describedby="jd-pdf-export-note"
-            >
-              匯出目前 JD（PDF）
-            </Button>
-            <Typography
-              id="jd-pdf-export-note"
-              variant="body2"
-              color="text.secondary"
-              sx={{ mt: 1 }}
-            >
-              匯出目前已正式保存的版本，不包含本輪候選預覽。
-            </Typography>
-          </header>
-          <Alert severity="info">
-            訪談原輸入會先保留；顧問完成並保存後，才會列入正式訪談並更新 JD。
-          </Alert>
-          <InterviewHistory
-            jobFileId={jobFileId}
-            renderTurnActions={(executionId) => (
-              <UndoTurnJd
-                jobFileId={jobFileId}
-                executionId={executionId}
-                onUndone={() =>
-                  queryClient.invalidateQueries(
-                    { queryKey: consultantTurnQuery(jobFileId, executionId).queryKey, exact: true },
-                    { throwOnError: true },
-                  )
-                }
-              />
-            )}
-          />
-          <InterviewComposer
-            jobFileId={jobFileId}
-            renderCandidate={(candidate) => <JdCandidatePreview candidate={candidate} />}
-          />
-          <JdProfileEditor jobFileId={jobFileId} />
-          <JdWorkEditor jobFileId={jobFileId} />
-          <SourceViewer jobFileId={jobFileId} />
-        </>
-      )}
-    </Stack>
+    <WorkspaceLayout
+      bar={<FileBar file={file.data} turn={turn} />}
+      banner={
+        file.isError ? (
+          <div className="workspace-banner">
+            <Alert severity="error" action={retry}>
+              {describeReadError(file.error)}
+            </Alert>
+          </div>
+        ) : null
+      }
+      interview={<InterviewPane jobFileId={jobFileId} onTurnChange={setTurn} />}
+      document={<JdPane jobFileId={jobFileId} turn={turn} />}
+    />
   );
 }

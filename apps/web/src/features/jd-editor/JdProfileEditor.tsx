@@ -1,17 +1,26 @@
 /** Show only server-confirmed profile data; opening the form captures its edit baseline. */
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Alert, Box, Button, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import type { JdProfileView } from '../../shared/api/generated/jd-profile-view';
 import { describeReadError } from '../../shared/api/http';
 import { EditJdProfileDialog } from './EditJdProfileDialog';
 import { jdProfileQuery } from './jd-profile-api';
 import { jdWorkQuery } from './jd-work-api';
 import { profileFields, profileLabels } from './profile-command';
+import { profileTarget, useSourceBadge } from './source-badge-context';
 
-export function JdProfileEditor({ jobFileId }: { jobFileId: string }) {
+export function JdProfileEditor({
+  jobFileId,
+  readOnly = false,
+}: {
+  jobFileId: string;
+  /** A Turn owns the JD: show it, but offer no manual edit (the App also refuses writes). */
+  readOnly?: boolean;
+}) {
   const queryClient = useQueryClient();
   const profile = useQuery(jdProfileQuery(jobFileId));
+  const badge = useSourceBadge();
   const [editing, setEditing] = useState<JdProfileView | null>(null);
   function refresh(): void {
     setEditing(null);
@@ -19,7 +28,12 @@ export function JdProfileEditor({ jobFileId }: { jobFileId: string }) {
     void queryClient.invalidateQueries({ queryKey: jdWorkQuery(jobFileId).queryKey });
   }
   return (
-    <section aria-labelledby="jd-profile-heading">
+    <Paper
+      component="section"
+      variant="outlined"
+      aria-labelledby="jd-profile-heading"
+      sx={{ p: { xs: 1.5, sm: 2 } }}
+    >
       <Stack spacing={2}>
         <Typography variant="h6" component="h2" id="jd-profile-heading">
           JD 基本資料
@@ -55,14 +69,22 @@ export function JdProfileEditor({ jobFileId }: { jobFileId: string }) {
             >
               {profileFields.map((field) => (
                 <Box key={field} sx={{ display: 'contents' }}>
-                  <Typography component="dt" sx={{ fontWeight: 600 }}>
+                  <Typography
+                    component="dt"
+                    sx={{
+                      fontWeight: 500,
+                      color: 'text.secondary',
+                      fontSize: '0.8125rem',
+                      pt: 0.25,
+                    }}
+                  >
                     {profileLabels[field]}
                   </Typography>
                   <Typography
                     component="dd"
                     sx={{ m: 0, mb: 1, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
                   >
-                    {profile.data.profile[field] ?? '尚未提供'}
+                    {profile.data.profile[field] ?? '尚未提供'} {badge(profileTarget(field))}
                   </Typography>
                 </Box>
               ))}
@@ -70,7 +92,7 @@ export function JdProfileEditor({ jobFileId }: { jobFileId: string }) {
             <div>
               <Button
                 variant="outlined"
-                disabled={profile.isFetching}
+                disabled={profile.isFetching || readOnly}
                 onClick={() => {
                   if (profile.data) setEditing(profile.data);
                 }}
@@ -89,6 +111,6 @@ export function JdProfileEditor({ jobFileId }: { jobFileId: string }) {
           onRefresh={refresh}
         />
       )}
-    </section>
+    </Paper>
   );
 }

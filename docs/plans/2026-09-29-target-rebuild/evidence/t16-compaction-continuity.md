@@ -81,3 +81,40 @@ ignored 探針 `.research-tmp/eval/probe_compaction_continuity.py` SHA-256：`78
 ### 收斂
 
 已補足大工具結果 compact、完整 C 接續，以及 C＋真 reasoning 再 compact 的協定反例；本片到此停止，不為 coverage 再造測試平台。仍未驗 272K／512K 真視窗、實際 A/B 自動觸發下的全旅程及跨主題資訊保留品質；沿原任務判斷必要性，不宣告整體 gate 通過。已知 JD 局部更正來源保留問題仍由 T14／T17 處理，不能由這個合成三事實案例抵銷。
+
+## 5. 共用 Runtime 的 272K／512K 有界補驗
+
+2026-10-01，基準 `de4d0bc8`。前批已關閉，不重跑原 adapter 探針；本批只驗既有 `run_response_loop` 的完整 Step 間 272K 路由，以及 `prepare_context_history` 的 512K 工程配置。2026-10-01 重核本頁列出的官方 compact／Luna 規格：容量仍如前述；完整返回不得裁剪。測試使用同一產品 runtime 和 serializer，**InMemorySaver 僅驗本程序接續，不冒充 PostgreSQL 耐久、取消、A/B 完整旅程或品質 gate**。
+
+### 執行前 manifest
+
+- 全合成常數，沿前批庫存規則與資料生成器，沒有讀取職務 DB、私人訪談或 Demo。安全 loader 只載入 `.env` 中 OpenAI 憑證。模型 Luna、medium、output 2,048；store=false、all_turns、truncation disabled，零 SDK／應用重試。
+- 最多 **3 create、2 compact、6 count**，序列；每請求 120 秒、整批 600 秒；管理預算 **US$1**。create input ≤32K；首次工具結果固定 3,800 列、完整 count 必須在 272K–320K；獨立輪前歷史 fixture 為 6,900 列、必須在 512K–570K。超出便停止，不盲目外送 compact。兩者均小於模型硬容量，不能據此推定帳戶 TPM 足夠。
+- 首個模型原生工具呼叫 → 合成工具結果 → **Runtime 自動**觸發 compact → 完整 C 重計數 → 模型答覆。再重入已完成 loop，應不新增 HTTP。第二個獨立合成 fixture 沿用真 call 形狀但使用新合成結果，交輪前準備 → count 判門檻 → compact → 同準備重入不新增 HTTP → 追加季度更正 → 回答三項規則；不改前一執行的已存歷史。
+- 任一傳輸、限流、協定、容量或本機錯誤立即停整批；不換模型、不縮門檻、不增重試。事實正確與協定接受分開審讀。若 272K 已受阻，不再支付 512K 嘗試。未測帳戶升級、DB 交易、role maps 或 JD。
+- ignored 探針 `.research-tmp/eval/probe_runtime_compaction.py`；獨占輸出 `.research-tmp/eval/runtime-compaction-20261001.jsonl`。僅安全 usage、型別、雜湊、公開合成答覆、呼叫數；不保存 opaque 原件、秘密或原始 SDK 錯誤。以下另記實際結果，不回寫前置限制。
+
+### 實際結果：272K 路由成立，遠端壓縮限流而停止
+
+`2026-09-30T19:49:03Z–19:49:10Z`（本地 10-01）執行；退出碼 1、零重試，共 **2 count、1 create、1 compact**。沒有進入 512K 階段，沒有取得 C 或壓後答覆。
+
+| 檢查位置 | 實際觀察 | 判定 |
+|---|---|---|
+| 原生模型請求 | count 133；create input 133／output 17，完整 function call，JSON 往返相等 | 起始 native call 可用；本次沒有 reasoning |
+| 完整 Step | 真 call 與 3,800 列合成工具結果配對；完整 request count **285,204** | 超過272K，仍低於模型硬輸入上限 |
+| Runtime 下一請求路由 | 自動進 `run_context_compaction`，未直接發第二次 create | 本次真正驗到共用 Step 間門檻路由，不只是 adapter 手動呼叫 |
+| Compact | 約3.008秒後 `RateLimitError`，HTTP **429**，安全分類 `transient_service` | **未通過**大窗口遠端壓縮；按 manifest 立即停整批 |
+| 512K、C 重入、壓後更正 | 均未執行 | 不從離線結果或前批142K推定通過 |
+
+這次只保留安全錯誤分類，沒有保存 SDK 原始 body／headers，故無法單憑429判定是每分鐘暫時額度、單請求大於帳戶 TPM 或其他細項。先前任務記過200K帳戶限額，但不能冒充本請求的遠端確認；也不能把模型922K輸入能力等同帳戶可送922K。**不修改已確認272K政策，不以刪歷史、換模型或反覆付費探測解決。**日後確有帳戶容量證據或新失敗診斷需求，再以新 manifest 驗該缺口；本批關閉。
+
+已回報 usage 僅首個 create：input133／output17，按既有本機 Standard 費率估 US$0.0000218。失敗 compact 無 usage、count 無帳務回傳，不把它們當免費或將上述視為完整帳單。原件只存程序內 InMemorySaver，本程序已結束；沒有持久產品保存、DB／Demo 操作或進行中工作。這是驗收受限，不是新增產品錯誤修補。
+
+腳本 SHA-256：`92846b3b4f2c998b6cbcaa6f684ffa14ca531fbee24c00837b821e5888dd79fb`；安全 JSONL `b6f470fe0505e7c9c5a31f114c479eb50e944d764bf31266531cb6eebbd0ebbf`；instructions `6a99e2dfde402a22439c65d18e14654b58dd64293faf9535c9f7c2a4c0defc13`；tool 與 §4 相同。重現須沿本節 manifest 另建獨占輸出，不能覆寫或再次使用本批：
+
+```powershell
+# apps/api；下列是已執行命令，不是再次外送授權。
+./.venv-target/Scripts/python.exe -X utf8 -B ../../.research-tmp/eval/probe_runtime_compaction.py --key-file .env --output ../../.research-tmp/eval/runtime-compaction-20261001.jsonl
+```
+
+受影響既有容量／完整 C／原生序列化回歸：`tests/unit/test_request_capacity.py`、`tests/unit/test_context_compaction.py`、`tests/contracts/test_response_serialization.py` **43 passed，1.43s**（`python -X utf8 -B -m pytest ... -q -p no:cacheprovider --tb=short`）。探針 Ruff E/F/I 通過、import／CLI 說明可載入。沒有產品程式變更，不製造 TDD 宣稱；離線43例不抵銷本次真provider未通過。

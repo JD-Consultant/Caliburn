@@ -203,3 +203,33 @@ resume 後才完成原答覆。取消後由 wrapper 拒絕採用。成功交回�
 **回歸與靜態：**unit＋contracts＋會走共用迴圈與 A runner 的 10 個真 PG 整合檔（context binding／runner／capacity／step／controls／preparation／memory runners／process recovery／supervisor／graph）**1058 passed in 84.45s**；Ruff format／check **384 files**、mypy **253 source files**、`git diff --check` 通過。命令沿[T06 §19](t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)（`CALIBURN_TEST_DATABASE_URL` 指向 loopback 55439 的 `caliburn_t01_test`，每案獨立 schema）。
 
 **未驗與限制：**（1）字元比例只是估計，正確性靠下一次精確 count；沒有真 provider 的 count／容量驗證。（2）沒有真模型驗證 A 看見 `not_preloaded` 會回讀而不是猜（歸 T14／T16 情境）；指引只加一句，未做 prompt 迭代。（3）固定部分或單一輸入本身超量、compact 後仍超量不屬此例外，維持容量受阻。（4）未重啟 Demo 8100／5173，Demo 仍跑舊程式。T08 不因本切片勾選。
+
+## 8. 任務完成對照（2026-09-30 恢復後）
+
+沿[任務表 T08 的 Red 與完成條件](../tasks.md#t08-a-turn固定資料正式完成與控制)逐條對照既有測試；缺口只補測試或程式（§7），不新增機制。路徑相對 `apps/api/tests`。
+
+| T08 Red | 代表測例（皆為真 PG，除註明外） |
+|---|---|
+| Memory 半途換版 | `integration/test_consultant_context_binding.py::test_reconnect_restores_exact_request_and_bindings_after_memory_and_candidate_advance`（Memory 在 Turn 中換版、候選位置前進後重連，request 與綁定仍是原本） |
+| 恢復重加輸入／maps | 同上（重連時把 prepare／讀 map／讀輸入替換成必拋錯，證明沒有重讀）、`test_capture_commit_ack_loss_recovers_saved_request_without_refresh` |
+| A final 尚未保存就宣告完成 | `integration/test_consultant_completion.py::test_complete_adopts_jd_and_formal_exchange_and_replays_after_new_history`、`integration/test_consultant_status.py::test_completed_status_requires_actual_formal_exchange` |
+| 取消與 final 同時成立 | `integration/test_consultant_completion.py::test_complete_and_cancel_race_has_one_atomic_outcome`、`integration/test_interview_completion.py::test_cancel_racing_completion_cannot_leave_a_half_formal_exchange`、`integration/test_consultant_controls.py::test_cancel_returns_completed_winner_without_rolling_back` |
+| 含 a 的輪中 C 帶入新 b | `integration/test_role_context_history.py::test_cancelled_work_cannot_replace_prepared_history_for_new_input`、`integration/test_context_histories.py::test_cancelled_prepared_base_can_be_reused_but_other_foreign_references_cannot`、`integration/test_context_preparation_postgres.py` |
+| input 取消仍成正式序號 | `integration/test_interview_completion.py::test_abandoned_input_never_becomes_formal_or_consumes_a_number`、`integration/test_input_acceptance.py::test_cancelled_input_replay_never_reactivates_or_grants_formal_eligibility` |
+
+| T08 完成條件 | 對照 |
+|---|---|
+| V04 固定 Memory 與背景發布交錯 | 上列 context binding 兩案；`integration/test_consultant_memory_http_journey.py::test_completed_notification_publishes_two_layers_and_next_turn_sees_maps` |
+| V05 128K／272K、超量、完整 compact 採用 | `integration/test_context_preparation_postgres.py`、`integration/test_request_capacity_postgres.py`、`unit/test_request_capacity.py`、`unit/test_context_compaction.py`；**超量的近期訪談縮減見 §7**；真 API compact 協定見 [T06 §20](t06-agent-execution.md#20-真-compact-協定預檢2026-09-30-恢復後) |
+| V06 native output→input | 沿 T06 §21 |
+| V07 R／tool／Step 各位置重啟 | `integration/test_consultant_process_recovery.py`（四個 hard-exit 邊界，見 [T12 §6](t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)）、`integration/test_consultant_runner_recovery.py`（3 案） |
+| V08 暫停／取消／final／晚到 writer | `integration/test_execution_control.py`（13 案）、`integration/test_consultant_controls.py`（5 案）、`integration/test_consultant_http_controls.py`（9 案）、`integration/test_execution_admission.py` |
+| V09 正式完成原子性、斷線後同答覆 | `integration/test_consultant_completion.py`（9 案，含 exception 全體回滾可重試、暫停中不可完成但可 stop）、`integration/test_interview_completion.py`（11 案）、`integration/test_consultant_status.py`、`integration/test_consultant_http_execution.py` |
+| 原本候選與有效來源、答覆、background intent 原子完成 | `integration/test_consultant_completion.py::test_complete_formalizes_current_input_without_rewriting_its_jd_source`、`test_unformal_source_blocks_whole_completion_even_after_current_input_formalization`；背景要求只在成功完成後登記：`integration/test_memory_batch_orchestration.py::test_intent_requires_success_and_frontier_is_employee_not_reply` |
+| 同 Step 內部保存可續、暫停停在下一請求前 | `unit/test_response_pause.py`、`integration/test_consultant_controls.py::test_resume_original_interrupt_without_new_model_request_or_budget`、`integration/test_response_loop_controls.py` |
+| E12 完成確認遺失後查回原結果 | `integration/test_execution_failure_boundary.py::test_completion_acknowledgement_failure_preserves_original_result`、`integration/test_interview_completion.py::test_completion_replay_keeps_original_pair_after_later_interviews` |
+| 真模型旅程證據 | 本頁 §4–§5：四輪真 A、三批背景 Memory、暫停後同輪續作與重啟；T17 課程行政 7 輪見 [T17](t17-course-administrator-journey.md) |
+
+**結論：**T08 的 A Turn 固定資料、正式完成與控制在其任務範圍內成立，勾選。**不因此宣稱**：跨程序「未明 attempt」的 production 再准入（Owner 已縮減，歸 T12 §6 的安全退出）、廣泛故障競爭矩陣（T12）、UI 呈現與斷線重連的瀏覽器旅程（T09）、A 的自然訪談品質與來源選擇（T14／T16／T17，T17 的品質 trial 仍是 fail）。
+
+**完整後端回歸（提交 `478abcf8` 之上）**：`pytest tests -q -p no:cacheprovider --tb=short --basetemp=<新 GUID 路徑>`，工作目錄 `apps/api`、既有 `.venv-target`、`CALIBURN_TEST_DATABASE_URL` 指向 loopback 55439 的 `caliburn_t01_test`（每案獨立 schema，非 Demo DB）：**1847 passed、2 skipped in 600.46s**。跳過的 2 案是 `integration/test_pdf_rendering.py`，需 `CALIBURN_TEST_PDF_FONT` 才做真 Chromium 渲染，本輪未設定，PDF 渲染另歸 T13。之後才新增的 33 案（`contracts/test_tool_schema_strictness.py` 32、`test_jd_item_deletion.py` 1）另跑通過，不算入上述數字。模型為合成 SDK transport 或 mock，不是 provider 品質證據。

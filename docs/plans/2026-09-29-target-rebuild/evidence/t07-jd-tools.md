@@ -71,3 +71,32 @@
 ### 接續增量：移動及完整模型 codec
 
 `move_jd_item` 已接同一 registry／JSON codec，具體效果見 [移動切片](t07-jd-item-movement.md)。主代理串驗 create → revise → move → delete，每步先 JSON 保存還原、再同命令重入；正式稿仍隔離。受影響 workflow／wire／schema／拒絕／role routing **63 passed in 19.50s**（含真 PostgreSQL）；全部 unit／contracts **791 passed in 11.24s**。handler／codec／bootstrap strict mypy 通過，正式生成器重新同步 Python／TS／包內 schema，未手改生成物。兩類 diff 正在接入，T07 尚未勾完成；真 provider 協定已由 T06 通過，但不代表所有 JD schema 與自然模型品質均已驗。
+
+## 5. 任務完成對照（2026-09-30 恢復後）
+
+沿[任務表 T07 的 Red 與完成條件](../tasks.md#t07-a-的-jd來源差異按需工具)及[JDT-01～06](../../../specs/2026-09-29-jd-model-tool-contract-review.md#7-剩餘工程-gate全部待實作驗證)逐條對照既有測試；缺口只補測試，不新增機制。路徑相對 `apps/api/tests`。
+
+| T07 Red | 代表測例 |
+|---|---|
+| 同名新建被當舊來源 | `unit/test_jd_navigation.py::test_ref_follows_same_identity_after_rename_but_not_deleted_replacement`、`integration/test_jd_source_tool_memory.py::test_alignment_uses_pinned_revision_and_rejects_later_same_title_replacement`、`integration/test_jd_reads.py::test_memory_citations_keep_fixed_identity_after_rename_removal_and_late_publication` |
+| 人工改待核對 JD 後丟舊基準 | `integration/test_jd_changes.py::test_source_diff_is_pinned_same_identity_with_related_changes_and_no_alignment`、`integration/test_turn_jd_changes.py::test_changes_keep_original_endpoints_after_undo_and_later_manual_edit` |
+| 只讀 diff 解除待核對 | `unit/test_consultant_tools.py::test_diff_is_a_read_observation_not_a_write_or_alignment`、`integration/test_jd_source_http.py::test_fixed_chain_survives_upstream_rename_and_diff_does_not_align_reference` |
+| 確認後再改文字仍視為已核對 | `unit/test_jd_source_rules.py::test_text_changes_remain_pending_after_revert_until_explicit_alignment`、`integration/test_jd_source_edits.py::test_candidate_source_edit_replay_content_change_and_explicit_alignment` |
+| current_input 取消仍被引用 | `integration/test_jd_source_http.py::test_only_completed_jd_evidence_can_be_read_and_no_pending_input_is_exposed`、`integration/test_turn_jd_changes.py::test_uncompleted_turn_does_not_expose_candidate_as_formal_change`、`integration/test_jd_candidates.py::test_abandonment_can_join_execution_cancellation_from_pause` |
+| 全稿重貼全部關係鏈 | 沒有「整份重寫」入口（產品「不做」）；讀取端 `unit/test_jd_full_text.py::test_full_preserves_all_content_grouping_and_relationship_order`、`test_dangling_relationship_is_not_silently_omitted` |
+
+| Gate | 對照 |
+|---|---|
+| JDT-01 契約與 wire | **本次新增** `contracts/test_tool_schema_strictness.py`（32 案）：A／B1／B2 全部 28 個工具都是 root object、每個 object 封閉且所有欄位 required、`$ref` 只指本地且無 sibling 與遞迴、不含 `oneOf`／`allOf`／`not`、`strict: true`，並以七種違規的反向案證明檢查會報錯；各工具自己的契約測例（`test_jd_read_tool`、`test_jd_changes_wire`、`test_jd_item_creation_wire`、`test_jd_item_revision_schema`、`test_jd_source_actions_wire`）保留。**官方 API 是否逐 schema 接受仍是 T16 的 wire gate**；實務上 A 的 14 個工具已隨四輪真模型 Turn 送出且被接受（[T08 §4–5](t08-consultant-turn.md#4-有界真產品-demo-批次執行前2026-09-30-1032-台北)），但不等於逐項驗證 |
+| JDT-02 欄位與 CRUD | `integration/test_jd_item_creation.py`、`test_jd_item_revision.py`、`test_jd_item_movement.py`、`test_jd_profile_tool_write.py`、`test_jd_task_tool_write.py`、`test_jd_model_item_roundtrip.py`；同名 K／S 與相同明細文字不混淆：`unit/test_jd_navigation.py::test_same_names_and_same_detail_text_do_not_merge_identity` |
+| JDT-03 定位與內容基準 | `unit/test_jd_navigation.py`（7 案，含越界／無效 ref 不退回名稱）、`integration/test_jd_candidate_navigation.py`、`integration/test_jd_item_revision.py::test_detail_reference_cannot_escape_its_outer_task` |
+| JDT-04 來源粒度與確認 | `unit/test_jd_source_rules.py`（6 案）、`integration/test_jd_source_persistence.py`、`test_jd_source_edits.py`、`test_jd_source_tool_actions.py`、`test_jd_source_tool_memory.py` |
+| JDT-05 刪除、移動與單次完整效果 | 刪職責保留任務、在用 K／S 拒刪：`integration/test_jd_item_deletion.py::test_area_delete_preserves_tasks_replays_original_and_rejects_used_capability`；**本次新增**同檔 `test_task_collaborator_and_condition_delete_keep_shared_knowledge_and_replay_once`，補齊模型工具路徑對任務（連明細與知識連結一併清除、共用知識保留）、協作對象、共通條件的刪除，重送同一命令不再多刪；移動與後段失敗全拒：`integration/test_jd_item_movement.py`（6 案）、`integration/test_jd_item_revision.py::test_late_domain_rejection_rolls_back_text_and_rejects_conflicting_effects` |
+| JDT-06 兩類差異與容量 | `integration/test_jd_changes.py`、`integration/test_turn_jd_changes.py`（5 案，含「只有來源變更不報無變更」）、`unit/test_jd_source_markdown.py`、`unit/test_turn_jd_markdown.py`；完整 read 不靜默裁切：`contracts/test_jd_read_tool.py::test_empty_collections_full_markdown_capacity_and_storage_failure` |
+| scope／kind 非法明確拒絕 | `contracts/test_jd_read_tool.py::test_illegal_selection_never_reaches_database`、`contracts/test_jd_changes_wire.py::test_cross_variant_null_unknown_and_version_arguments_never_fall_back_to_all`、`contracts/test_jd_item_creation_wire.py::test_wire_rejects_other_kinds_missing_fields_cross_variant_fields_and_app_identity` |
+| 來源屬正確 field／item／detail／relation | `unit/test_jd_read_projection.py::test_task_sources_belong_to_item_detail_or_relation_never_inherited`、`test_profile_sources_are_per_field_and_only_pending_status_is_visible` |
+| V17／V18／V20 | V17：`test_jd_changes.py`、`test_jd_source_edits.py`；V18：`test_jd_reads.py`、`test_jd_source_tool_memory.py`；V20（JD 導覽與局部下鑽）：`test_jd_navigation.py`、`test_jd_read_projection.py`、`test_jd_full_text.py`。Memory 側的 V20 屬 T05 |
+
+**結論：**T07 的離線層、真 PG 與 SDK 序列化層成立，勾選。**未驗證且明確歸屬**：JDT-01 的逐 schema 官方 API 接受、JDT-03 中「map 預覽不足不准寫」「已有充分觀察不重讀」這類**模型行為**（工具只提供 `read_ref`，不強制讀過；歸 T14／T16 的情境與工具使用量測）、JDT-07 的恢復與正式效果在 A 的完整 Turn（T08／T12）、JDT-09 的同資料模型比較（T14／T16／T17）。
+
+**驗證：**完整後端 `pytest tests` **1847 passed、2 skipped in 600.46s**（命令與環境見 [T08 §8](t08-consultant-turn.md#8-任務完成對照2026-09-30-恢復後)；跳過的是需字型設定的 PDF 渲染，歸 T13）。本節新增的 `test_tool_schema_strictness.py`（**32 passed in 1.02s**）與 `test_jd_item_deletion.py`（**2 passed in 1.60s**）在該回歸啟動後才加入，另行執行；Ruff／format／mypy 通過。

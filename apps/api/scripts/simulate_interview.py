@@ -9,6 +9,16 @@ gap (a fact never came up) from a recording gap (it came up but is not in the JD
 The checks are coarse marker checks meant for comparing prompt versions on the same personas.
 They do not replace reading the transcript and JD against the analysis and JD guides.
 Personas: tests/fixtures/job_analysis_quality/personas.json. Authorization and limits: T17 evidence.
+
+Typical run, from apps/api: start a backend on its own database schema and port
+(`scripts/run_backend.py --key-file .env --port 8103`, database and PDF variables per the README),
+then `python scripts/simulate_interview.py --persona warehouse --base-url http://127.0.0.1:8103
+--key-file .env --output <new file>.json`. Every run creates a new job file; the output file must
+not exist yet, and `<output>.progress.jsonl` gets one line per Turn so a crashed run keeps its
+transcript. The journey options (--human-edit-at, --cancel-during, --kill-during with
+--restart-command, --export-pdf, --think-seconds, --retry-failed) are meant for the long
+persona, whose entry may also set `late_correction` (a correction of something said earlier)
+and `min_turns`.
 """
 
 import argparse
@@ -23,6 +33,7 @@ from typing import Any
 from uuid import uuid4
 
 import httpx2
+from openai import APIConnectionError, RateLimitError
 
 from caliburn.adapters.openai_credentials import read_openai_api_key
 from caliburn.adapters.openai_responses import (
@@ -33,10 +44,12 @@ from caliburn.adapters.openai_responses import (
 
 PERSONAS = Path(__file__).parents[1] / "tests/fixtures/job_analysis_quality/personas.json"
 EMPLOYEE_MODEL = "gpt-6-luna"
-TURN_TIMEOUT_SECONDS = 900
+TURN_TIMEOUT_SECONDS = 2_100
 POLL_SECONDS = 2.0
+EMPLOYEE_ATTEMPTS = 6
 LEADING = re.compile(r"是不是|是否|對不對|對嗎|沒錯吧|應該是")
 HISTORY_WORDS = re.compile(r"(以前|原本|過去|先前|舊)")
+TRAILING_FLAG = re.compile(r"\s*\{[^{}]*\"nothing_more\"[^{}]*\}\s*$")
 
 EMPLOYEE_RULES = "\n".join(
     [
@@ -93,13 +106,25 @@ async def employee_reply(
         reasoning_effort="low",
         max_output_tokens=2_000,
     )
-    text = (await create_response(sdk, request)).output_text.strip()
+    # The product's own requests can use up the account's tokens-per-minute; a person would just
+    # wait a moment and answer, so the employee model is retried instead of ending the run.
+    for attempt in range(1, EMPLOYEE_ATTEMPTS + 1):
+        try:
+            text = (await create_response(sdk, request)).output_text.strip()
+            break
+        except RateLimitError, APIConnectionError:
+            if attempt == EMPLOYEE_ATTEMPTS:
+                raise
+            await asyncio.sleep(min(60, 5 * attempt))
     match = re.search(r"\{.*\}", text, re.DOTALL)
     try:
         parsed = json.loads(match.group(0)) if match else {}
         return str(parsed["reply"]).strip(), bool(parsed.get("nothing_more", False))
     except ValueError, KeyError:
-        return text, False
+        # The model sometimes answers in plain text and appends only the flag; the flag is not
+        # something the employee said, so it must not reach the consultant.
+        flag = TRAILING_FLAG.search(text)
+        return TRAILING_FLAG.sub("", text).strip(), bool(flag and "true" in flag.group(0))
 
 
 class Backend:
@@ -219,6 +244,7 @@ async def run_interview(
     turns: list[dict[str, Any]] = []
     text = persona["opening"]
     correction = persona["correction"]
+    late_done = False
     for number in range(1, max_turns + 1):
         started = time.monotonic()
         if options.human_edit_at == number:
@@ -242,6 +268,15 @@ async def run_interview(
             await backend.wait_healthy()
             events.append({"turn": number, "event": "backend_killed_mid_turn_and_restarted"})
         status = await backend.wait_for_turn(execution_id)
+        # A Turn that ends in an error is shown to the employee, who sends the same sentence again
+        # as a person would. The restart of the kill Turn may end it safely, so it gets one more.
+        resends_left = options.retry_failed + (1 if options.kill_during == number else 0)
+        while resends_left and (
+            status == "failed" or (options.kill_during == number and status != "completed")
+        ):
+            resends_left -= 1
+            events.append({"turn": number, "event": "turn_ended_then_resent", "first": status})
+            status = await backend.wait_for_turn(await backend.send(text))
         messages = await backend.interviews()
         reply = next((m for m in reversed(messages) if m["speaker"] == "consultant"), None)
         turns.append(
@@ -254,12 +289,27 @@ async def run_interview(
             }
         )
         print(f"turn {number}: {status} in {turns[-1]['seconds']}s", flush=True)
+        with options.output.with_suffix(".progress.jsonl").open("a", encoding="utf-8") as progress:
+            progress.write(json.dumps(turns[-1], ensure_ascii=False) + "\n")
         if status != "completed":
             break
         text, done = await employee_reply(sdk, persona, messages)
+        await asyncio.sleep(options.think_seconds)  # a person takes time to type the answer
         if number + 1 == correction["turn"] and correction["text"] not in text:
             text = f"{text} {correction['text']}"
-        if done and number + 1 > correction["turn"]:
+        late = persona.get("late_correction")
+        said = " ".join(m["interview_text"] for m in messages if m["speaker"] == "employee")
+        if (
+            late
+            and not late_done
+            and number + 1 >= late["turn"]
+            and any(key in said for key in late["requires"])
+        ):
+            # The employee only corrects something that was actually said earlier.
+            text = f"{text} {late['text']}"
+            late_done = True
+            events.append({"turn": number + 1, "event": "late_correction_sent"})
+        if done and number + 1 > correction["turn"] and number + 1 >= persona.get("min_turns", 0):
             turns.append({"turn": number + 1, "employee": text, "consultant": None, "final": True})
             status = await backend.wait_for_turn(await backend.send(text))
             messages = await backend.interviews()
@@ -376,6 +426,24 @@ def evaluate(persona: dict[str, Any], collected: dict[str, Any]) -> dict[str, An
         for m in re.finditer(re.escape(word), jd_text)
         if not HISTORY_WORDS.search(jd_text[max(0, m.start() - 12) : m.start()])
     ]
+    late = persona.get("late_correction")
+    late_check = None
+    if late:
+        late_old = [
+            m.start()
+            for word in late["old"]
+            for m in re.finditer(re.escape(word), jd_text)
+            if not HISTORY_WORDS.search(jd_text[max(0, m.start() - 12) : m.start()])
+        ]
+        late_check = {
+            "sent": any(
+                late["text"] in m["interview_text"]
+                for m in collected["interviews"]
+                if m["speaker"] == "employee"
+            ),
+            "new_present": any(word in jd_text for word in late["new"]),
+            "old_left_as_current": len(late_old),
+        }
     contents = collected["source_contents"]
     profile_sources = {}
     for field, expected in persona["checks"]["source_expect"].items():
@@ -405,6 +473,7 @@ def evaluate(persona: dict[str, Any], collected: dict[str, Any]) -> dict[str, An
                 any(word in jd_text for word in group) for group in correction["unchanged"]
             ],
         },
+        "late_correction": late_check,
         "profile_sources": profile_sources,
         "citations": citation_audit(persona, collected),
         "collaborators_in_text": [
@@ -440,6 +509,8 @@ async def execute(arguments: argparse.Namespace) -> int:
     ):
         backend = Backend(http)
         await backend.create_file(f"模擬訪談 {arguments.persona} {arguments.label}")
+        # The result file is written only at the end; the id lets a crashed run be re-collected.
+        print(f"job file {backend.file_id}", flush=True)
         events: list[dict[str, Any]] = []
         turns = await run_interview(backend, sdk, persona, max_turns, arguments, events)
         collected = await collect(backend)
@@ -485,4 +556,10 @@ if __name__ == "__main__":
     parser.add_argument("--restart-command", default="", help="shell command that restarts it")
     parser.add_argument("--human-edit-at", type=int, default=0, help="hand-edit the JD before it")
     parser.add_argument("--export-pdf", action="store_true", help="save the formal PDF at the end")
+    parser.add_argument(
+        "--think-seconds", type=float, default=0.0, help="pause before each next employee message"
+    )
+    parser.add_argument(
+        "--retry-failed", type=int, default=0, help="resend the sentence of a Turn that failed"
+    )
     raise SystemExit(asyncio.run(execute(parser.parse_args())))

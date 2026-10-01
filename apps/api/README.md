@@ -124,6 +124,8 @@ uv run --project apps/api --locked pytest apps/api/tests/integration -m postgres
 
 SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG probe 只驗框架原生字典及既存 node 接續，不能替代 T06／T12 的業務副作用、取消與故障驗收。真 API 測試必須另外依[有界授權](../../docs/plans/2026-09-29-target-rebuild/README.md#3-狀態與施工順序)執行。
 
+長訪談評測由 `scripts/simulate_interview.py` 明示啟動，不在測試或 App 啟動時自動執行。已診斷的中斷可保留原輸出路徑及旅程參數，以 `--resume-job-file`、`--resume-execution`、原絕對 `--deadline` 接續；先核對並等待指定原執行，只有已確認終止才依原旅程的重送政策處理，不因查詢失敗自行重送。完整參數見 `--help`，批准範圍、費用／時間與實際結果見 [T17 續跑修訂 A2](../../docs/plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md#續跑修訂-a2最小-harness-恢復2026-10-02新增付費請求前)。`.progress.jsonl` 與 `.events.jsonl` 是評測證據，不能代替產品的正式訪談／執行保存。
+
 ### 模型失敗診斷
 
 後端 logger `caliburn.workflows.model_requests` 以 `Provider request failed` 記錄實際外送失敗：操作、安全分類、HTTP status、白名單 provider code，以及 **App 本地** execution／request／attempt ID。可依這些 ID 核對既有執行紀錄；它們不是可向 OpenAI 取回遺失回應的遠端 ID。`None` 表示未取得 HTTP status 或 code 不在白名單，不能據此推定沒有錯誤。

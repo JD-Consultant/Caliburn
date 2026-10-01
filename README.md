@@ -5,78 +5,76 @@
 Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書（JD）應用程式。目標是讓不熟悉 JD 寫作的員工，只需說明工作、回答釐清問題，也能由 AI 逐步產出精簡、完整、符合實際工作的 JD；人仍可編輯同一份工作稿。
 
 - **第一次認識產品：**[產品專題介紹](docs/product-introduction.md)——問題、使用流程、核心設計與待驗證的價值。
-- **準備理解或開發新架構：**[目標架構地圖](docs/target-architecture-map.md)——由全貌逐層深入責任、生命週期、工具與保存。
+- **準備理解或開發：**[目標架構地圖](docs/target-architecture-map.md)——由全貌逐層深入責任、生命週期、工具與保存。
 - **找檔案或接手工作：**[Repo／文件分類](docs/README.md)、[收尾任務](docs/plans/2026-09-29-target-rebuild/tasks.md#收尾分類與下一步)、[驗收與實驗資料](docs/plans/2026-09-29-target-rebuild/evidence/README.md)。
 - **教授與技術評閱者：**[系統架構報告](docs/reports/system-architecture/README.md)——含流程圖、內部分工與設計取捨；有固定基準，不代替最新開發契約。
 
-介紹與目標文件描述重構方向，**不代表已全部實作**。下面是現行正式程式及使用方式；兩者不混為同一個完成狀態。
-
 ## 正式產品
 
-唯一正式 App 位於 [`experiments/jd-relational-app`](experiments/jd-relational-app/README.md)：
+唯一正式 App 是 `apps/api`（後端）與 `apps/web`（介面）；正式權責與切換見 [ADR 0079](docs/adr/0079-target-rebuild-production-cutover.md)。
 
-- FastAPI／PostgreSQL 18.6 關聯式 JD 後端；
-- Next.js／React／TypeScript 同頁訪談與六章 JD 編輯畫面；
-- A 主顧問、B1 案例整理、B2 工作理解、C 即時修補與分層 Memory；
-- OpenRouter 的 OpenAI-only Luna 路徑與 App-side continuation compaction；
-- 查看本輪 JD 改動、來源原話，以及只撤回本輪 JD。
+- FastAPI 單程序後端、PostgreSQL 18.6 關聯式 JD／訪談／Memory，LangGraph 官方 PostgreSQL saver 保存原生模型接續；
+- OpenAI 直連 Responses API，模型固定 `gpt-6-luna`／high，`store=false`，完整原生 items 與 compaction；
+- A 主顧問訪談並逐步改稿、B1／B2 背景整理工作情境與理解（Memory），員工只需回答；
+- React／MUI 同頁訪談與 JD 編輯，查看本輪 JD 變更與來源原話、撤回本輪 JD，人工與 AI 編輯同一份稿；
+- 正式 JD 的中文 PDF 匯出；後端同源提供建置後的 Web，單一程序即可使用。
 
-目錄名稱 `experiments` 是專案迭代沿革，不表示這套程式是範例。正式權責與硬切換見 [ADR 0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。原 `apps/api`、`apps/web` 與 `packages/job-analysis-contract` 的舊接線已退役；現在的 [`apps/api`](apps/api/README.md)／[`apps/web`](apps/web/README.md) 是另行重建的新目標程式，並非只剩歷史 README，也不整合舊資料。其進度依[任務表](docs/plans/2026-09-29-target-rebuild/tasks.md)，正式入口待 T18 通過才切換。以下環境與命令仍屬現行正式產品。
+舊的 `experiments/jd-relational-app` 與 `packages/consultant-memory` 程式已退役，只保留研究與沿革文件；精確退役清單與取回方式見 [ADR 0079](docs/adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。不提供舊資料搬移或相容層。
+
+## 已知限制（請先讀）
+
+品質與容量驗證的**實際結果與未過項目**記在 [T14 品質證據](docs/plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md)、[T16 容量證據](docs/plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)與 [T17 旅程證據](docs/plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md)。最重要的是：JD 項目的來源引用在跨輪綜合內容時偶爾漏引；每次來源都可回查，但不保證涵蓋完整，使用者應在來源檢視中核對。PDF 畫面正確，部分字型的文字複製／搜尋會出現部首字元。
 
 ## 執行環境
 
-- Node.js `>=24.19.0 <25`
-- pnpm `12.5.1`
-- Python `>=3.12 <3.13` 與 uv
-- 本機 PostgreSQL `18.6`
+- Node.js `>=24.19.0 <25`、pnpm `12.5.1`
+- Python `3.14`，由 uv `0.12.20` 管理
+- 本機 PostgreSQL `18.6`（獨立程序，容器或本機安裝皆可）
+- OpenAI API key（沒有 key 時人工 JD 編輯仍可用，AI 訪談停用）
+- PDF 匯出：授權的中文字型與 Playwright Chromium（見 [後端 README](apps/api/README.md#pdf-匯出)）
 
-Node／TypeScript workspace 使用根目錄 `pnpm-lock.yaml`；Python 使用 App 自己的 `uv.lock`。根目錄 Compose 只保留明示啟用的隔離 RAG 服務，不會建立 JD App 資料庫。
+Node／TypeScript workspace 使用根目錄 `pnpm-lock.yaml`；Python 使用 `apps/api/uv.lock`。根目錄 Compose 只保留明示啟用的隔離 RAG 服務，不會建立 JD App 資料庫。
 
 ## 第一次設定
 
-先準備空的 PostgreSQL 18.6 資料庫，再於根目錄執行：
+先建立一個**空的**專用 PostgreSQL database，然後在根目錄執行（PowerShell）：
 
 ```powershell
 pnpm install --frozen-lockfile
-uv sync --project experiments/jd-relational-app --frozen
-pnpm app:status
-pnpm app:init
-pnpm app:set-key
+uv sync --project apps/api --locked
+
+$env:CALIBURN_DATABASE_URL = 'postgresql://帳號:密碼@127.0.0.1:5432/caliburn'   # 密碼由本機秘密管理注入，勿提交
+$env:CALIBURN_DATABASE_SCHEMA = 'caliburn'                                       # 預設即此值
+pnpm app:migrate        # 建立／升級到最新 schema；啟動時只核對，不自動升級
+pnpm app:status         # 只診斷，不啟動、不改資料；不印出密碼或 key
+pnpm build              # 建置 Web，供後端同源提供
 ```
 
-`app:init` 只用於空資料庫，會互動詢問連線資料、API port 與 Web origin。OpenRouter key 只存 Windows 認證管理員，不進 `.env`、資料庫或 Git。初始化中斷時使用 `pnpm app:resume-init`，不要重新初始化已有內容的資料庫。
+OpenAI key 二擇一：設定環境變數 `OPENAI_API_KEY`，或在 `apps/api/.env`（已被 Git 忽略）放**唯一一行** `OPENAI_API_KEY=...`；後端只讀這一項，不讀其他舊設定。
 
 ## 日常啟動
 
-先啟動已設定的 PostgreSQL，再於根目錄執行：
-
 ```powershell
-pnpm dev
+pnpm start    # 單一後端程序，同源提供建置後的 Web；開啟 http://127.0.0.1:8100/
+pnpm dev      # 開發：後端與 Vite 同時啟動；開啟 http://127.0.0.1:5173/
 ```
 
-開啟 <http://127.0.0.1:3002/>。啟動器會從受保護的 App 設定取得正確 API origin，同時以前景程序啟動 API 與 Web；按 Ctrl+C 正常停止與排空。Production build 使用：
-
-```powershell
-pnpm build
-pnpm start
-```
-
-完整初始化、credential、備份與故障排除見 [`docs/runbook.md`](docs/runbook.md)。
+按 Ctrl+C 正常停止；暫停、取消與重開後的接續依 [共用執行說明](docs/implementation/agent-execution.md)。完整啟停、備份與故障排除見 [`docs/runbook.md`](docs/runbook.md)。
 
 ## 驗證
 
 ```powershell
-pnpm check
+pnpm check    # lint、型別、單元／契約測試（不需資料庫）、前端測試與 production build
 ```
 
-這會執行正式 Python 測試、Web 測試、TypeScript typecheck、契約生成核對與 production build。真 PostgreSQL、真瀏覽器及真模型的證據仍分開記錄，見 [`docs/current-decisions.md`](docs/current-decisions.md) 與 [實驗證據](docs/experiments/legacy-evidence/README.md)。
+真 PostgreSQL 整合測試、真瀏覽器與真模型結果分開記錄；PostgreSQL 測試需明確指定隔離的 `_test` 資料庫，見 [後端 README](apps/api/README.md#測試與檢查)。
 
 ## 文件與 RAG
 
 - 文件地圖與迭代順序：[`docs/README.md`](docs/README.md)
 - 目前有效決策：[`docs/current-decisions.md`](docs/current-decisions.md)
-- 正式架構決策：[`docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md`](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)
-- 最新完整 App 證據：[`docs/experiments/legacy-evidence/2026-09-22-jd-component-first-acceptance.md`](docs/experiments/legacy-evidence/2026-09-22-jd-component-first-acceptance.md)
+- 正式架構決策：[ADR 0079](docs/adr/0079-target-rebuild-production-cutover.md)（歷史：[ADR 0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)）
+- 施工計畫、任務與驗證證據：[`docs/plans/2026-09-29-target-rebuild/`](docs/plans/2026-09-29-target-rebuild/README.md)
 - 舊 worktree 與文件沿革：[`docs/archive/worktree-history-index.md`](docs/archive/worktree-history-index.md)
 
 `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder` 與 `packages/ocs-contract` 是保留但隔離的 RAG bounded context，不是 JD App runtime 依賴。只有明確執行 `pnpm rag:up`／`pnpm rag:dev` 才會啟動；細節見 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)。

@@ -592,7 +592,7 @@ Owner 已指示接續上述切片。A2 取代 A1 的 harness 接法，不改產�
 - 本檔案 checkpoint blobs＋writes 的序列化 payload 合計約 **402,359 KiB（393 MiB）**，不是整個DB磁碟用量，也未證明有洩漏。保留為容量觀察，不為這次驗收新增GC／存儲平台。
 - PDF用 Poppler 渲染4頁逐頁查看，並以 pypdf 對85個非空成品欄位核對；先去空白仍有53欄不完全相等，沿既有T13文字層限制，明示使用 NFKC、`⻑`→`長` 和空白正規化後皆可找到。沒有改 PDF 或 JD 原文；不把此比對宣稱文字抽取逐字無損。
 
-**保存與下一步：**最終JSON、逐字稿、事件、PDF及4頁PNG留在本機 ignored `.research-tmp/eval/long-procurement-1*`；後端8103與PG55439保留供唯讀查看，harness已結束。主線沿 `target-rebuild`；教授報告與切換候選 worktree 原樣保留，沒有 merge／push／切換。T16–T18仍未勾：先用本次證據核對剩餘 gate，若要改善分析效果，優先診斷「改稿後既有依據未明確核對」及探索／精簡，不再從零跑另一份長訪談。本次結果不擴張後續付費範圍。
+**保存與下一步：**最終JSON（含逐字稿）、逐輪progress、事件與PDF已於2026-10-02原樣補入[既有實驗資料包](data/instruction-experiments-2026-10-01/README.md#採購長旅程原件)，逐一核對下列雜湊，避免只依賴 ignored 暫存；不是已推送或整個資料庫已備份。暫存原件與4頁PNG仍保留在 `.research-tmp/eval/long-procurement-1*`。收尾時後端8103與PG55439保留供唯讀查看，harness已結束。主線沿 `target-rebuild`；教授報告與切換候選 worktree 原樣保留，沒有 merge／push／切換。T16–T18仍未勾：先用本次證據核對剩餘 gate，若要改善分析效果，優先診斷「改稿後既有依據未明確核對」及探索／精簡，不再從零跑另一份長訪談。本次結果不擴張後續付費範圍。
 
 | 本機原件（`.research-tmp/eval/`） | SHA-256 |
 |---|---|

@@ -7,7 +7,7 @@
 Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。員工透過訪談讓 AI 理解實際工作；人與 AI 可編輯同一份 JD。單一操作者可管理多份資料隔離的職務檔案。具體功能、非目標及目前進度以有效決策與責任文件為準，不從本檔推導新需求。
 
 - **現行正式產品**：[`experiments/jd-relational-app`](experiments/jd-relational-app/README.md)（含 `web`）與 `packages/consultant-memory`；正式權責見 [ADR0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。目錄名中的 `experiments` 不表示它仍是實驗產品。
-- **目標架構不等於現況**：目前程式仍有 A／B1／B2／C 等接線；新架構已決定退役 C、重新釐清受訪者工作記憶與引用，但尚未完成正式施工。討論或圖稿須標明「現行」「目標／未實作」「候選」或「歷史」，不能把其中一種冒充另一種。
+- **目標架構不等於正式產品**：ADR0077 的現行產品仍有 A／B1／B2／C 等接線；新目標已在 `apps/api`／`apps/web` 實作與驗收中，完成範圍查[任務表](docs/plans/2026-09-29-target-rebuild/tasks.md)，不能概稱全部未實作，也不等於 T18 已切換。討論或圖稿須分清「現行正式」「目標及其實作／驗收狀態」「候選」或「歷史」，不能把其中一種冒充另一種。
 - **舊架構與獨立範圍**：原 `apps/api`、`apps/web`、`packages/job-analysis-contract` 已退役，不接回舊接線；2026-09-29 Owner 允許以 `apps/api`、`apps/web` 作新目標重建位置，規劃見[實作入口](docs/implementation/README.md)，不是現行 production 已切換。RAG 是獨立範圍，不是目前 JD App 的依賴。
 
 ## 自主工作與提問界線

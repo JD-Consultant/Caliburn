@@ -8,6 +8,8 @@
 
 [共用問題分析與實驗案例集](research-casebook.md)是其中幾個案例的較完整摘要，不代表全部發展史。各校共用真實證據，在[備審準備](admissions/README.md)另核對送件要求；本人、他人與 AI 的貢獻分界待本人確認。
 
+**從能力找材料：**[系所／教授公開資料的判準](admissions/research-readiness.md) → [按能力查證據](development-history/evidence-by-capability.md)。補找文獻誤讀修正、測量可信度、程式診斷與未採用方案，不用最終架構或功能數量取代研究過程。
+
 ## 介紹產品與程式設計
 
 | 要說明什麼 | 閱讀入口 |

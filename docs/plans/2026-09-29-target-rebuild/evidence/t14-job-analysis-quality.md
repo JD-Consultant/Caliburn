@@ -986,6 +986,6 @@ Q1 資料出來後、候選尚未執行前，做三項登記，**不改變採用
 
 | 項目 | 界線 |
 |---|---|
-| 對照 | Q1（舊指引）與 Q2（c1）對 Q2b（c1b `<C1B_COMMIT>`）；只改 `agents/job_consultant/instructions.py` 一處文字，其餘（B1／B2、工具、Context、模型／effort、harness）與 Q1／Q2 相同 |
+| 對照 | Q1（舊指引）與 Q2（c1）對 Q2b（c1b `4b9da041`）；只改 `agents/job_consultant/instructions.py` 一處文字，其餘（B1／B2、工具、Context、模型／effort、harness）與 Q1／Q2 相同 |
 | 模型／資料／次數 | 同 Q1／Q2：Luna／high、員工模擬 Luna／low、同兩人設各 3 次、每次最多 12 個 A Turn、依序執行、同一 `eval_b`／8103（重啟載入 c1b） |
 | 費用／停止 | 每份約 US$0.04–0.12，本批估 ≤ US$0.6，**停止上界 US$2**；停止條件同 Q1／Q2（Turn failed／逾時即停並診斷、不挑結果、不加跑）；不再有第二次補跑 |

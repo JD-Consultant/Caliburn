@@ -23,7 +23,7 @@ Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書（JD�
 
 ## 已知限制（請先讀）
 
-品質與容量驗證的**實際結果與未過項目**記在 [T14 品質證據](docs/plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md)、[T16 容量證據](docs/plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)與 [T17 旅程證據](docs/plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md)。最重要的是：JD 項目的來源引用在跨輪綜合內容時偶爾漏引；每次來源都可回查，但不保證涵蓋完整，使用者應在來源檢視中核對。PDF 畫面正確，部分字型的文字複製／搜尋會出現部首字元。
+品質與容量驗證的**實際結果與未過項目**記在 [T14 品質證據](docs/plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md)、[T16 容量證據](docs/plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)與 [T17 旅程證據](docs/plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md)。最重要的是：JD 項目的來源引用在跨輪綜合內容時偶爾漏引；每次來源都可回查，但不保證涵蓋完整，使用者應在來源檢視中核對。PDF 畫面正確，部分字型的文字複製／搜尋會出現部首字元。速度與穩定受 OpenAI 帳戶的每分鐘 token 上限（TPM）影響：被限流時系統會自動多等、不算失敗；在 200K TPM 的帳戶上，12 輪訪談約 6–25 分鐘、長訪談要數小時。完整的已知不足與成因見 [T14 證據](docs/plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)。
 
 ## 執行環境
 

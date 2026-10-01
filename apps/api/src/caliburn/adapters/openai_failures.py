@@ -16,17 +16,11 @@ _BLOCKED_CODES = frozenset(
 )
 # An error event inside an open HTTP 200 stream has no status, so only its code can say that
 # it is a provider hiccup or a rate limit. Anything not named here stays a terminal failure.
-_TRANSIENT_STREAM_CODES = frozenset(
-    {
-        "rate_limit_exceeded",
-        "server_error",
-        "server_is_overloaded",
-        "slow_down",
-        "service_unavailable",
-    }
-)
+_RATE_LIMIT_CODES = frozenset({"rate_limit_exceeded", "slow_down"})
+_TRANSIENT_STREAM_CODES = frozenset({"server_error", "server_is_overloaded", "service_unavailable"})
 _DIAGNOSTIC_CODES = (
     _BLOCKED_CODES
+    | _RATE_LIMIT_CODES
     | _TRANSIENT_STREAM_CODES
     | {
         "context_length_exceeded",
@@ -38,6 +32,8 @@ _DIAGNOSTIC_CODES = (
 class ResponseFailureKind(StrEnum):
     REMOTE_RESULT_UNKNOWN = "remote_result_unknown"
     TRANSIENT_SERVICE = "transient_service"
+    # The provider asking us to slow down is waiting, not a fault of the work; see the retry policy.
+    RATE_LIMITED = "rate_limited"
     ACCESS_BLOCKED = "access_blocked"
     CAPACITY_EXCEEDED = "capacity_exceeded"
     REQUEST_REJECTED = "request_rejected"
@@ -68,14 +64,17 @@ def classify_response_failure(error: APIError) -> ResponseFailure:
     elif error.code == "context_length_exceeded":
         kind = ResponseFailureKind.CAPACITY_EXCEEDED
     elif not isinstance(error, APIStatusError):
-        kind = (
-            ResponseFailureKind.TRANSIENT_SERVICE
-            if error.code in _TRANSIENT_STREAM_CODES
-            else ResponseFailureKind.RESPONSE_PROTOCOL
-        )
+        if error.code in _RATE_LIMIT_CODES:
+            kind = ResponseFailureKind.RATE_LIMITED
+        elif error.code in _TRANSIENT_STREAM_CODES:
+            kind = ResponseFailureKind.TRANSIENT_SERVICE
+        else:
+            kind = ResponseFailureKind.RESPONSE_PROTOCOL
     elif error.response.headers.get("x-should-retry") == "false":
         kind = ResponseFailureKind.REQUEST_REJECTED
-    elif error.status_code in (408, 409, 429) or error.status_code >= 500:
+    elif error.status_code == 429:
+        kind = ResponseFailureKind.RATE_LIMITED
+    elif error.status_code in (408, 409) or error.status_code >= 500:
         kind = ResponseFailureKind.TRANSIENT_SERVICE
     else:
         kind = ResponseFailureKind.REQUEST_REJECTED

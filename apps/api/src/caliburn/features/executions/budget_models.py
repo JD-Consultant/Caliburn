@@ -81,6 +81,12 @@ class OutboundRequest:
             raise ValueError("Use the SHA-256 of the exact outbound payload as request fingerprint")
 
 
+# The provider asked us to slow down. Waiting for it is not a fault of the work, so these
+# attempts do not spend the per-request attempt budget (the execution's deadline and overall
+# attempt limit still end an endless wait).
+RATE_LIMITED = "rate_limited"
+
+
 @dataclass(frozen=True, slots=True)
 class OutboundFailure:
     failure_code: str
@@ -90,6 +96,7 @@ class OutboundFailure:
         if self.failure_code not in (
             "remote_result_unknown",
             "transient_service",
+            RATE_LIMITED,
             "access_blocked",
             "capacity_exceeded",
             "request_rejected",
@@ -97,7 +104,11 @@ class OutboundFailure:
         ):
             raise ValueError("Use a recognized outbound failure code without provider payloads")
         if self.retry_not_before is not None:
-            if self.failure_code not in ("remote_result_unknown", "transient_service"):
+            if self.failure_code not in (
+                "remote_result_unknown",
+                "transient_service",
+                RATE_LIMITED,
+            ):
                 raise ValueError("Only retryable outbound failures can carry a retry deadline")
             if self.retry_not_before.utcoffset() is None:
                 raise ValueError("An outbound retry deadline must be timezone-aware")

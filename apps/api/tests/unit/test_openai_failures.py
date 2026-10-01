@@ -22,7 +22,11 @@ from caliburn.adapters.openai_failures import ResponseFailureKind, classify_resp
         (401, None, None, "true", ResponseFailureKind.ACCESS_BLOCKED),
         (403, None, None, None, ResponseFailureKind.ACCESS_BLOCKED),
         (400, "context_length_exceeded", None, "true", ResponseFailureKind.CAPACITY_EXCEEDED),
-        (429, "slow_down", "rate_limit_error", None, ResponseFailureKind.TRANSIENT_SERVICE),
+        # A rate limit is the provider asking us to wait, not a service fault.
+        (429, "slow_down", "rate_limit_error", None, ResponseFailureKind.RATE_LIMITED),
+        (429, "rate_limit_exceeded", "tokens", None, ResponseFailureKind.RATE_LIMITED),
+        (429, None, None, None, ResponseFailureKind.RATE_LIMITED),
+        (429, "rate_limit_exceeded", "tokens", "false", ResponseFailureKind.REQUEST_REJECTED),
         (503, "server_is_overloaded", None, None, ResponseFailureKind.TRANSIENT_SERVICE),
         (503, None, None, "false", ResponseFailureKind.REQUEST_REJECTED),
         (400, None, None, "true", ResponseFailureKind.REQUEST_REJECTED),
@@ -61,11 +65,11 @@ def test_lost_transport_is_unknown_not_a_known_unexecuted_or_free_request() -> N
     ("code", "error_type", "expected"),
     [
         # Observed live: a tokens-per-minute limit arrives as an event inside an open stream.
-        ("rate_limit_exceeded", "tokens", ResponseFailureKind.TRANSIENT_SERVICE),
-        ("rate_limit_exceeded", "requests", ResponseFailureKind.TRANSIENT_SERVICE),
+        ("rate_limit_exceeded", "tokens", ResponseFailureKind.RATE_LIMITED),
+        ("rate_limit_exceeded", "requests", ResponseFailureKind.RATE_LIMITED),
+        ("slow_down", "rate_limit_error", ResponseFailureKind.RATE_LIMITED),
         ("server_error", "server_error", ResponseFailureKind.TRANSIENT_SERVICE),
         ("server_is_overloaded", None, ResponseFailureKind.TRANSIENT_SERVICE),
-        ("slow_down", "rate_limit_error", ResponseFailureKind.TRANSIENT_SERVICE),
         # A known block or capacity signal still wins, exactly as for an HTTP status error.
         ("insufficient_quota", "insufficient_quota", ResponseFailureKind.ACCESS_BLOCKED),
         ("credit_balance_exhausted", None, ResponseFailureKind.ACCESS_BLOCKED),

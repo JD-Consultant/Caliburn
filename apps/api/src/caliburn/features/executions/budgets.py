@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from caliburn.features.executions import budget_persistence as storage
 from caliburn.features.executions import persistence, service
 from caliburn.features.executions.budget_models import (
+    RATE_LIMITED,
     BudgetConflictError,
     BudgetExceededError,
     BudgetLimit,
@@ -122,7 +123,9 @@ async def check_outbound_capacity(
         raise BudgetExceededError(BudgetLimit.DEADLINE)
     if usage.outbound_attempts >= policy.max_outbound_attempts:
         raise BudgetExceededError(BudgetLimit.OUTBOUND_ATTEMPTS)
-    if len(previous) >= policy.max_attempts_per_request:
+    if sum(record.failure_code != RATE_LIMITED for record in previous) >= (
+        policy.max_attempts_per_request
+    ):
         raise BudgetExceededError(BudgetLimit.REQUEST_ATTEMPTS)
     if not previous:
         if request.kind == OutboundKind.MODEL and usage.model_steps >= policy.max_model_steps:

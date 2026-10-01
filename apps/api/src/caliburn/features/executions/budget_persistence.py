@@ -61,13 +61,13 @@ class OutboundAttemptRecord(Base):
         ),
         CheckConstraint(
             "failure_code IS NULL OR failure_code IN ('remote_result_unknown', "
-            "'transient_service', 'access_blocked', 'capacity_exceeded', "
+            "'transient_service', 'rate_limited', 'access_blocked', 'capacity_exceeded', "
             "'request_rejected', 'response_protocol')",
             name="failure_code",
         ),
         CheckConstraint(
             "retry_not_before IS NULL OR (failure_code IS NOT NULL AND "
-            "failure_code IN ('remote_result_unknown', 'transient_service'))",
+            "failure_code IN ('remote_result_unknown', 'transient_service', 'rate_limited'))",
             name="failure_retry",
         ),
         Index("ix_execution_outbound_attempts_request", "execution_id", "request_id"),

@@ -33,6 +33,12 @@ def test_default_model_settings_have_no_monetary_stop() -> None:
     assert ModelSettings(api_key="synthetic").max_cost_usd is None
 
 
+def test_a_turn_may_wait_out_a_long_rate_limit_before_its_deadline() -> None:
+    """With a tokens-per-minute limit the wall clock is token-bound: a late turn of a long
+    interview can need many minutes, so the deadline is a safety net, not the expected pace."""
+    assert ModelSettings(api_key="synthetic").turn_timeout_seconds >= 1_800
+
+
 def test_explicit_sol_evaluation_uses_its_own_capacity_and_rates() -> None:
     settings = ModelSettings(api_key="synthetic", model="gpt-6.1-sol")
     profile = model_profile(settings.model)

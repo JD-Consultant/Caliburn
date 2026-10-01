@@ -108,8 +108,10 @@ def record_failure(
     [
         ("remote_result_unknown", RETRY_AT),
         ("transient_service", RETRY_AT),
+        ("rate_limited", RETRY_AT),
         ("remote_result_unknown", None),
         ("transient_service", None),
+        ("rate_limited", None),
         ("access_blocked", None),
         ("capacity_exceeded", None),
         ("request_rejected", None),

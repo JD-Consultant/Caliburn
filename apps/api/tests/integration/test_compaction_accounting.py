@@ -159,7 +159,7 @@ async def admitted_executor(
                 writer,
                 client,
                 accounting,
-                retry_policy=ResponseRetryPolicy(0.001, 0.001),
+                retry_policy=ResponseRetryPolicy(0.001, 0.001, 0.001, 0.001),
             )
     finally:
         await database.close()

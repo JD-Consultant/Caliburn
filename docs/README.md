@@ -55,7 +55,8 @@
 | `scripts/`、`.github/`、根 workspace／lock／設定檔 | 開發、建置與自動檢查入口；不能當雜物搬走 |
 | `.worktrees/`、repo 外的其他 worktree | 獨立分支的工作目錄；先以 `git worktree list` 核對，不在本分支代為整理或刪除 |
 | `.research-tmp/`、`tmp/`、`output/` | 本機研究與輸出區，**可能含測試資料庫、原始實驗或 PDF**；不是全部可丟。本次已移轉的實驗與舊測試暫存見[封存紀錄](archive/repository-organization-2026-10-02.md)；未審查部分仍保留 |
-| `node_modules/`、`.venv*`、各種工具 cache／`.pytest-*` | 本機依賴、快取與測試工作區；不屬閱讀入口，本次不清理 |
+| `node_modules/`、`.venv*` | 現用本機依賴，保留；不當作測試暫存清理 |
+| 工具 cache／`.pytest-*` | 散落根目錄的舊資料已[集中封存或用官方工具清理](archive/repository-organization-2026-10-02.md#根目錄快取與測試暫存整理)；新任務暫存集中在 `.research-tmp/`，不再於根目錄建立每任務一份的 cache |
 | `.env`、本機 agent／IDE 設定 | 私有配置或憑證；不搬入文件、實驗資料包或提交 |
 
 ## 文檔分層

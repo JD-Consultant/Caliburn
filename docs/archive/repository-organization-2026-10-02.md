@@ -61,3 +61,36 @@ Owner 接著核准整理本機分支，基準為上述整理提交 `916862ee`。
 原件保留歷史路徑與連結；選錄未含完整舊 checkout，入口已說明如何從 tag 查完整語境。本次只驗證新整理入口的本地連結與來源完整性，不聲稱全部歷史連結可用。未改動產品程式或重跑產品測試。
 
 收尾核對：6 份整理入口的相對連結檢查通過；原 18 個分支 tip 都可取回，14 個已移除分支的 tag／祖先關係逐項成立，剩餘 4 個分支符合清單。20 份收錄原件在 index 中的 blob 亦逐檔等於原來源。全量 `git diff --cached --check` 指出 3 份歷史計畫原本就有檔尾空白行；為保留原件不修改它們，排除歷史原件後，本次撰寫的索引與保存規則差異檢查通過。
+
+## 根目錄快取與測試暫存整理
+
+Owner 接著指定整理截圖中的根目錄快取／暫存。本輪基準 `target-rebuild@649d9f93`，只處理已逐項列出的根目錄子資料夾，不清空 `.research-tmp`、不啟停程序、不呼叫模型、不改產品程式。
+
+| 類型 | 處理結果 |
+|---|---|
+| 舊 pytest 工作區／cache、mypy／Ruff／Turbo cache、npm cache、舊 pnpm store | 32 個根目錄資料夾移入 `.research-tmp/archive/2026-10-02/root-artifacts/`，保留原名；包含權限受限的測試資料，不把列舉失敗誤判為空目錄 |
+| `.superpowers/sdd/` 已追蹤報告 | 8 份移入 [agent-task-reports](agent-task-reports/README.md)，正文位元組不變 |
+| `.superpowers/` 其餘本機工作材料 | 作為第 33 個目錄移入同一本機封存；不公開未審查的 diff／本機日誌 |
+| 20 個 `.uv-cache*` | 用 `uv cache clean --cache-dir <逐項確認的絕對路徑> --no-config --offline --no-progress` 清理；112,285 個快取檔案，原邏輯大小 1,745,950,428 bytes（約 1.63 GiB）。不是磁碟實際釋放量保證，因檔案可能有硬連結 |
+
+### 安全界線與查核
+
+- 先解析全部來源與目的地，限制為 repo 根目錄指定子項與本次封存目錄；遞迴檢查沒有 reparse point，不靠未核實的萬用字元刪除。
+- 程序清單未查得引用這批根目錄路徑的命令；這不等於完整 open-handle 證明，因此不強制解鎖。uv 使用 `UV_LOCK_TIMEOUT=2`，沒有 `--force`，完成後還原該程序環境設定。uv 清理遵循其[官方 cache safety／clean 契約](https://docs.astral.sh/uv/concepts/cache/#clearing-the-cache)，不用手工刪除內部 bucket。
+- `node_modules/.modules.yaml` 指向 `S:\.pnpm-store\v11`，不是這次移走的 `S:\caliburn\.pnpm-store`。現用 `node_modules`、虛擬環境、全域 uv cache 與 repo 外 pnpm store 保留。
+- 33 個封存目錄內 2,031 個檔案逐檔核對搬移前後 SHA-256；8 份搬入文件區的報告另外核對。根目錄本次指定的 52 個 cache／pytest 子項及 `.superpowers` 均不再散落原處。
+- 原 PostgreSQL、服務程序、`.env`、`.agents`、`.claude`、`.worktrees`、現存實驗證據與其他研究暫存不在清理範圍。沒有為此重跑產品旅程或宣稱產品驗收通過。
+- 收尾重新核對 2,031 份封存檔案與 8 份報告的雜湊／檔數、全部指定根目錄路徑已移除；5 份入口文件的相對連結與錨點檢查無失效。歷史報告保留當時連結，不宣稱全部舊連結仍可用。
+
+### 恢復與保存
+
+本機封存內的 `inventory.csv` 記錄原位置、檔數、大小及處理方式；`preserved-files-sha256.csv` 記錄保留檔案雜湊；`tracked-reports.csv` 記錄 8 份報告新舊路徑。還原封存資料時，先核對原位置沒有後續新產物，再逐項搬回，不整批覆蓋。
+
+uv cache 已清除，不是可原樣還原的封存；需要時由 uv 重新下載／建置，專案 lockfile 與已安裝依賴沒有因此移除。其他舊快取與測例只是搬移，沒有刪掉。ignored 封存不等於遠端備份，報告需要的材料仍應經篩選收進版本管理。
+
+### 後續暫存放置方式
+
+- 新的任務特有暫存使用 `.research-tmp/<清楚的任務名稱>/`，不再在根目錄建立 `.pytest-tmp-<task>`、`.uv-cache-<task>` 等散落目錄。
+- 依賴快取優先沿用工具目前設定；若確有隔離或同磁碟需求，指定 `.research-tmp` 下的專用 cache，不改動全域設定，也不把現用 cache 目錄直接搬走。
+- pytest `--basetemp` 只指向獨占的測試暫存子目錄，不能指向共用 `.research-tmp` 或封存根，因為 pytest 會清理指定目錄。這遵循 [pytest 暫存目錄文件](https://docs.pytest.org/en/stable/how-to/tmp_path.html#temporary-directory-location-and-retention)。
+- 有用的研究結論、測試結果與 Agent 報告寫入相應 `docs` 責任文件；未審查的執行狀態留本機。`.gitignore` 補上 `.uv-cache*/`、`.superpowers/` 防止新暫存誤提交，不把 ignore 當成備份或清理。

@@ -51,7 +51,7 @@
 | 路徑 | 用途與處理方式 |
 |---|---|
 | `apps/api/`、`apps/web/` | 新目標程式、測試與各自啟動說明；程式內部分工沿[程式組織](implementation/code-organization.md) |
-| `experiments/jd-relational-app/`、`packages/consultant-memory/` | 仍屬 ADR0077 的正式產品；不是可直接刪除的實驗或暫存 |
+| `experiments/jd-relational-app/`、`packages/consultant-memory/` | 原正式產品（ADR0077）。本分支已依 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回) 退役其可執行程式，只留研究與沿革文件；原程式由 Git 取回，不再是可啟動的產品 |
 | `apps/`、`packages/` 的其他子目錄 | 各有範圍，包含獨立 RAG 與歷史入口；看子目錄 README，不以目錄名推定可刪 |
 | `docs/` | 產品、設計、工程規範、任務、證據與沿革，分層見下表 |
 | `scripts/`、`.github/`、根 workspace／lock／設定檔 | 開發、建置與自動檢查入口；不能當雜物搬走 |

@@ -53,7 +53,7 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 
 退役範圍是[固定 Git 樹盤點](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#切換範圍盤點與舊依賴防線2026-10-01)的 **379 個 tracked 檔**：`experiments/jd-relational-app` 的 336 個非 Markdown 檔、`packages/consultant-memory` 的 41 個非 Markdown 檔（不含 `adoption.json`），以及 `scripts/run-jd-app.mjs`、`scripts/run-jd-app.test.mjs`。保留 16 個 Markdown／`adoption.json` 沿革檔（兩個 README 於頂端加歷史標記）、`packages/job-analysis-contract` 的歷史 README、全部研究／ADR／證據文件與獨立 RAG。不刪 DB、volume、秘密、ignored 或未追蹤檔；不做舊資料遷移，舊 runtime 也不能讀新 schema。
 
-清單可重建：`git ls-tree -r --name-only d08a3b09 -- experiments/jd-relational-app packages/consultant-memory`，排除 `.md` 與 `packages/consultant-memory/adoption.json`，再加上述兩個啟動器。基準提交 `d08a3b09` 是退役前的完整樹。取回單一檔案：`git show d08a3b09:<路徑>`；整批恢復：`git revert <退役提交>`（它只含上述刪除，與入口／文件切換分開提交）。
+清單可重建：`git ls-tree -r --name-only 6ad33bcb -- experiments/jd-relational-app packages/consultant-memory`，排除 `.md` 與 `packages/consultant-memory/adoption.json`，再加上述兩個啟動器。基準提交 `6ad33bcb` 是退役前的完整樹。取回單一檔案：`git show 6ad33bcb:<路徑>`；整批恢復：`git revert <退役提交>`（它只含上述刪除，與入口／文件切換分開提交）。
 
 ## 回退與後果
 

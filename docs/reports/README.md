@@ -4,13 +4,15 @@
 
 外部官方資料與論文比較見[研究分類](../research/README.md)，工作分析方法見[指南入口](../guides/README.md)。報告說明問題、取捨與成果；研究支援設計，實驗才提供實測證據，三者不互相替代。
 
-**先找素材：[從最早期開始的開發演進索引](development-history/README.md)。**從 3 月前身資料解析、5 月 JobIntel、6 月 monorepo，一路追到多次顧問、Memory、JD 編輯與新架構重建；失敗、未採用與後來翻案也保留引用。先盤點，再決定怎麼寫，不只留下近期成功案例。
+**先找素材：[開發演進的11個面向](development-history/README.md#按問題找素材)。**從3月前身專案追起，整理為產品、檢索、Memory、JD、工程五份主題沿革；資料解析、工作分析、Prompt／Tool、UI／PDF、安全恢復、評測與交付皆有入口。失敗、未採用與後來翻案保留，摘要連回原件，不另存第二份實驗結果。
 
-[共用問題分析與實驗案例集](research-casebook.md)是其中幾個案例的較完整摘要，不代表全部發展史。各校共用真實證據，在[備審準備](admissions/README.md)另核對送件要求；本人、他人與 AI 的貢獻分界待本人確認。
-
-**從能力找材料：**[系所／教授公開資料的判準](admissions/research-readiness.md) → [按能力查證據](development-history/evidence-by-capability.md)。補找文獻誤讀修正、測量可信度、程式診斷與未採用方案，不用最終架構或功能數量取代研究過程。
-
-**從實作找未展開的演進：**[前後程式與測試索引](development-history/code-evolution.md)。補看文件摘要以外的控制權、資料流與保存變化；能由程式確定的事與事後推論分開標示。
+| 查找目的 | 入口 |
+|---|---|
+| 依時間和問題看整個演進 | [分類索引](development-history/README.md) |
+| 從研究能力挑材料 | [公開能力判準](admissions/research-readiness.md) → [按能力查證據](development-history/evidence-by-capability.md) |
+| 文件沒展開，想看實際程式如何改 | [前後程式與測試](development-history/code-evolution.md) |
+| 需要較完整的案例寫法 | [四個案例摘要](research-casebook.md)，不是全部發展史 |
+| 準備實際送件 | [備審準備](admissions/README.md)，另外確認本人、他人與AI的貢獻分界 |
 
 ## 介紹產品與程式設計
 

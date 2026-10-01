@@ -15,6 +15,7 @@ import argparse
 import asyncio
 import json
 import re
+import subprocess
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -135,23 +136,112 @@ class Backend:
     async def wait_for_turn(self, execution_id: str) -> str:
         deadline = time.monotonic() + TURN_TIMEOUT_SECONDS
         while time.monotonic() < deadline:
-            turn = await self.get(f"/api/job-files/{self.file_id}/consultant-turns/{execution_id}")
+            try:
+                turn = await self.get(
+                    f"/api/job-files/{self.file_id}/consultant-turns/{execution_id}"
+                )
+            except httpx2.TransportError:  # The backend is restarting; keep waiting.
+                await asyncio.sleep(POLL_SECONDS)
+                continue
             status = str(turn.get("turn", turn)["status"])
             if status in ("completed", "failed", "cancelled"):
                 return status
             await asyncio.sleep(POLL_SECONDS)
         return "timeout"
 
+    async def cancel(self, execution_id: str) -> None:
+        response = await self.http.post(
+            f"/api/job-files/{self.file_id}/consultant-turns/{execution_id}/cancel",
+            headers={"Origin": "http://127.0.0.1:8100"},
+        )
+        response.raise_for_status()
+
+    async def wait_healthy(self, seconds: float = 90.0) -> None:
+        deadline = time.monotonic() + seconds
+        while time.monotonic() < deadline:
+            try:
+                if (await self.http.get("/api/health")).status_code == 200:
+                    return
+            except httpx2.TransportError:
+                pass
+            await asyncio.sleep(1.0)
+        raise TimeoutError("The backend did not become healthy after the restart")
+
+    async def human_edit(self, purpose: str, task_title: str) -> dict[str, Any]:
+        """One person edits the formal JD by hand: the purpose, and one added task."""
+        profile = await self.get(f"/api/job-files/{self.file_id}/jd/profile")
+        edited = await self.http.post(
+            f"/api/job-files/{self.file_id}/jd/profile",
+            json={
+                "command_id": str(uuid4()),
+                "expected_revision_id": profile["revision_id"],
+                "changes": [{"action": "set_field", "field": "purpose", "value": purpose}],
+            },
+        )
+        edited.raise_for_status()
+        tasks = await self.get(f"/api/job-files/{self.file_id}/jd/tasks")
+        added = await self.http.post(
+            f"/api/job-files/{self.file_id}/jd/tasks",
+            json={
+                "command_id": str(uuid4()),
+                "expected_revision_id": tasks["revision_id"],
+                "change": {
+                    "action": "create_task",
+                    "area_id": None,
+                    "title": task_title,
+                    "description": "由人工補充的任務，用來檢查後續的 AI 訪談不會悄悄覆寫它。",
+                    "outcomes": [],
+                    "requirements": [],
+                },
+            },
+        )
+        added.raise_for_status()
+        return {"purpose": purpose, "task_title": task_title}
+
+    async def export_pdf(self) -> bytes:
+        response = await self.http.get(f"/api/job-files/{self.file_id}/jd/export.pdf")
+        response.raise_for_status()
+        return response.content
+
+
+HUMAN_PURPOSE = "（人工撰寫）確保原物料與包材及時、足量且成本合理地供應生產。"
+HUMAN_TASK = "（人工補充）彙整供應商年度績效資料"
+
 
 async def run_interview(
-    backend: Backend, sdk: Any, persona: dict[str, Any], max_turns: int
+    backend: Backend,
+    sdk: Any,
+    persona: dict[str, Any],
+    max_turns: int,
+    options: argparse.Namespace,
+    events: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     turns: list[dict[str, Any]] = []
     text = persona["opening"]
     correction = persona["correction"]
     for number in range(1, max_turns + 1):
         started = time.monotonic()
-        status = await backend.wait_for_turn(await backend.send(text))
+        if options.human_edit_at == number:
+            events.append(
+                {
+                    "turn": number,
+                    "event": "human_edit",
+                    **await backend.human_edit(HUMAN_PURPOSE, HUMAN_TASK),
+                }
+            )
+        execution_id = await backend.send(text)
+        if options.cancel_during == number:
+            await asyncio.sleep(8)
+            await backend.cancel(execution_id)
+            cancelled = await backend.wait_for_turn(execution_id)
+            events.append({"turn": number, "event": "cancelled_then_resent", "first": cancelled})
+            execution_id = await backend.send(text)
+        elif options.kill_during == number:
+            await asyncio.sleep(12)
+            await asyncio.to_thread(subprocess.run, options.restart_command, shell=True, check=True)
+            await backend.wait_healthy()
+            events.append({"turn": number, "event": "backend_killed_mid_turn_and_restarted"})
+        status = await backend.wait_for_turn(execution_id)
         messages = await backend.interviews()
         reply = next((m for m in reversed(messages) if m["speaker"] == "consultant"), None)
         turns.append(
@@ -212,6 +302,57 @@ async def collect(backend: Backend) -> dict[str, Any]:
     }
 
 
+def citation_audit(persona: dict[str, Any], collected: dict[str, Any]) -> dict[str, Any]:
+    """For each JD item that states a persona fact, does one of ITS cited sources say it?
+
+    Coarse marker check, like the rest: it finds the omission where a fact moved into an item but
+    the item cites only the turn that restated something else. A fact the employee never said is
+    not counted; Memory-sourced citations are not read (the harness only sees interview text).
+    """
+    work, profile = collected["work"], collected["profile"]
+    items: dict[tuple[str, str], str] = {}
+    for area in work["areas"]:
+        items["area", area["area_id"]] = f"{area['title']} {area.get('scope_text') or ''}"
+    for task in work["tasks"]:
+        items["task", task["task_id"]] = f"{task['title']} {task['description']}"
+        for detail in task["outcomes"] + task["requirements"]:
+            items["detail", detail["detail_id"]] = detail["text"]
+    for person in work["collaborators"]:
+        items["collaborator", person["collaborator_id"]] = (
+            f"{person.get('name') or ''} {person.get('scope_text') or ''}"
+        )
+    for condition in work["conditions"]:
+        items["condition", condition["condition_id"]] = condition["text"]
+    for field, value in profile.items():
+        if isinstance(value, str):
+            items["profile_field", field] = value
+    cited: dict[tuple[str, str], list[str]] = {}
+    for reference in collected["references"]:
+        target = reference["target"]
+        key = (target["kind"], target["field"] or target["item_id"])
+        content = collected["source_contents"].get(reference["citation_id"], {})
+        cited.setdefault(key, []).append(content.get("interview_text", ""))
+    employee_text = "\n".join(
+        m["interview_text"] for m in collected["interviews"] if m["speaker"] == "employee"
+    )
+    checked, unsupported = 0, []
+    for fact in persona["facts"]:
+        keys = fact["keys"]
+        if not keys or not any(key in employee_text for key in keys):
+            continue
+        for item, text in items.items():
+            if not any(key in text for key in keys):
+                continue
+            checked += 1
+            if not any(any(key in source for key in keys) for source in cited.get(item, [])):
+                unsupported.append({"fact": fact["id"], "item": f"{item[0]}:{text[:30]}"})
+    return {
+        "checked": checked,
+        "unsupported": unsupported,
+        "support_rate": round(1 - len(unsupported) / checked, 2) if checked else None,
+    }
+
+
 def evaluate(persona: dict[str, Any], collected: dict[str, Any]) -> dict[str, Any]:
     jd_text = "\n".join(
         strings_of(collected["profile"])
@@ -265,6 +406,7 @@ def evaluate(persona: dict[str, Any], collected: dict[str, Any]) -> dict[str, An
             ],
         },
         "profile_sources": profile_sources,
+        "citations": citation_audit(persona, collected),
         "collaborators_in_text": [
             any(k in jd_text for k in group) for group in persona["checks"]["collaborators"]
         ],
@@ -298,14 +440,22 @@ async def execute(arguments: argparse.Namespace) -> int:
     ):
         backend = Backend(http)
         await backend.create_file(f"模擬訪談 {arguments.persona} {arguments.label}")
-        turns = await run_interview(backend, sdk, persona, max_turns)
+        events: list[dict[str, Any]] = []
+        turns = await run_interview(backend, sdk, persona, max_turns, arguments, events)
         collected = await collect(backend)
+        if arguments.export_pdf:
+            pdf = await backend.export_pdf()
+            arguments.output.with_suffix(".pdf").write_bytes(pdf)
+            events.append(
+                {"event": "pdf_exported", "bytes": len(pdf), "is_pdf": pdf[:4] == b"%PDF"}
+            )
     result = {
         "persona": arguments.persona,
         "label": arguments.label,
         "started": started,
         "job_file_id": backend.file_id,
         "turns": turns,
+        "events": events,
         "jd": {"profile": collected["profile"], "work": collected["work"]},
         "references": collected["references"],
         "source_contents": collected["source_contents"],
@@ -327,4 +477,12 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--label", default="run")
     parser.add_argument("--max-turns", type=int, default=0)
+    # Journey operations for a long run; each is off by default.
+    parser.add_argument(
+        "--cancel-during", type=int, default=0, help="cancel this turn, then resend"
+    )
+    parser.add_argument("--kill-during", type=int, default=0, help="restart the backend mid-turn")
+    parser.add_argument("--restart-command", default="", help="shell command that restarts it")
+    parser.add_argument("--human-edit-at", type=int, default=0, help="hand-edit the JD before it")
+    parser.add_argument("--export-pdf", action="store_true", help="save the formal PDF at the end")
     raise SystemExit(asyncio.run(execute(parser.parse_args())))

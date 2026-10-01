@@ -16,11 +16,13 @@ secs = [t["seconds"] for t in turns]
 print(f"{path}: persona {run['persona']}, {len(run['turns'])} turns ({sum(t['status']=='completed' for t in run['turns'])} completed)")
 print(f"seconds/turn: mean {statistics.mean(secs):.0f}, median {statistics.median(secs):.0f}, max {max(secs):.0f}; first 10 mean {statistics.mean(secs[:10]):.0f}, last 10 mean {statistics.mean(secs[-10:]):.0f}")
 print("events:", json.dumps(run.get("events", []), ensure_ascii=False))
+print("turn statuses:", {st: sum(t.get("status") == st for t in run["turns"]) for st in {t.get("status") for t in run["turns"]}})
 shape = run["checks"]["shape"]
 print("shape:", shape)
 print("citations:", {k: v for k, v in run["checks"]["citations"].items() if k != "unsupported"}, "unsupported:", run["checks"]["citations"]["unsupported"][:5])
 print("recording gaps:", run["checks"]["recording_gaps"], "| elicitation gaps:", run["checks"]["elicitation_gaps"])
 print("correction:", run["checks"]["correction"])
+print("late correction:", run["checks"].get("late_correction"))
 work = run["jd"]["work"]
 print("human edit preserved? purpose:", run["jd"]["profile"].get("purpose"))
 print("human task present?", any("人工" in t["title"] for t in work["tasks"]))

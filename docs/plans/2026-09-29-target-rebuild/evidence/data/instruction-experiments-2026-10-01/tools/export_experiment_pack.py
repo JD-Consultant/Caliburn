@@ -37,6 +37,7 @@ VERSIONS = {
     "q1": ("c0", "d41e75f7 instructions (baseline)"),
     "q2": ("c1", "ec3c143a"),
     "q2b": ("c1b", "4b9da041"),
+    "q3": ("c3", "1e9edcea"),
     "long": ("final", "see long-journey section"),
 }
 HIDDEN = {"limits", "quality_roster", "risk_peak", "tools", "physical", "license"}
@@ -126,13 +127,16 @@ def database_metrics(conn: psycopg.Connection, file_id: str) -> dict:
         (file_id,),
     ).fetchall()
     sizes: dict[str, int] = defaultdict(int)
+    totals: dict[str, int] = defaultdict(int)
     for thread_id, blob in conn.execute(
         "select thread_id, blob from checkpoint_blobs where thread_id like %s and channel = 'input_count'",
         (f"{file_id}:%",),
     ):
         parts = thread_id.split(":")
         if len(parts) >= 2:
-            sizes[parts[1]] = max(sizes[parts[1]], int(decode(bytes(blob))["input_tokens"]))
+            tokens = int(decode(bytes(blob))["input_tokens"])
+            sizes[parts[1]] = max(sizes[parts[1]], tokens)
+            totals[parts[1]] += tokens
     a_calls = [e[3] for e in executions if e[1] == "consultant_turn"]
     memory = [e for e in executions if e[1] == "memory_batch"]
     return {
@@ -146,6 +150,8 @@ def database_metrics(conn: psycopg.Connection, file_id: str) -> dict:
         "attempts": sum(e[5] for e in executions),
         "failed_attempts": sum(e[6] for e in executions),
         "cost_usd": round(sum(e[7] for e in executions), 4),
+        "counted_input_tokens_a": sum(totals[e[0]] for e in executions if e[1] == "consultant_turn"),
+        "counted_input_tokens_memory": sum(totals[e[0]] for e in memory),
         "max_a_request_tokens": max((sizes[e[0]] for e in executions if e[1] == "consultant_turn"), default=0),
         "max_memory_request_tokens": max((sizes[e[0]] for e in memory), default=0),
     }
@@ -217,7 +223,9 @@ def main() -> None:
                 (OUT / "transcripts" / source.with_suffix(".md").name).write_text(
                     transcript_markdown(run, version, instruction, commit), encoding="utf-8"
                 )
-                rows.append({"version": version, "instruction": instruction, "instruction_commit": commit, **run_metrics(run, database_metrics(conn, run["job_file_id"]))})
+                row = {"version": version, "instruction": instruction, "instruction_commit": commit, **run_metrics(run, database_metrics(conn, run["job_file_id"]))}
+                row["counted_input_tokens_per_minute"] = round((row["counted_input_tokens_a"] + row["counted_input_tokens_memory"]) / max(row["minutes"], 0.1))
+                rows.append(row)
     with (OUT / "metrics.csv").open("w", encoding="utf-8-sig", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
@@ -231,7 +239,7 @@ def main() -> None:
                 f"capabilities mean {statistics.mean(r['capabilities'] for r in group):.2f}, minutes mean {statistics.mean(r['minutes'] for r in group):.1f}, "
                 f"cost sum US${sum(r['cost_usd'] for r in group):.3f}, failed attempts {sum(r['failed_attempts'] for r in group)}/{sum(r['attempts'] for r in group)}"
             )
-    for base, cand, extra in (("q1", "q2", []), ("q1", "q2b", ["--supplemental"])):
+    for base, cand, extra in (("q1", "q2", []), ("q1", "q2b", ["--supplemental"]), ("q1", "q3", ["--supplemental"])):
         if any(r["version"] == cand for r in rows):
             result = subprocess.run([PYTHON, "-B", str(TOOLS / "compare_versions.py"), base, cand, *extra], capture_output=True, text=True, encoding="utf-8", env={**os.environ, "PYTHONUTF8": "1"})
             lines += ["", f"=== compare_versions.py {base} {cand} {' '.join(extra)}", result.stdout.strip() or result.stderr.strip()]

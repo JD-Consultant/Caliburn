@@ -10,7 +10,8 @@
 |---|---|---|---|
 | `q1` | c0＝實驗前的主指引（程式基準 `d41e75f7`） | 課程行政 3、倉庫 3 | 基準線：依序執行，每份最多 12 個 A Turn |
 | `q2` | c1（提交 `ec3c143a`） | 課程行政 3、倉庫 3 | 一次補入四處指南衍生文字：隱藏面向引導、任務粒度與成果／要求不重抄、知識技能／條件／協作對象寫入時機、職務目的早寫 |
-| `q2b` | c1b（提交 `4b9da041`） | 課程行政 3、倉庫 3（進行中時以 `metrics.csv` 實際列數為準） | c1 的唯一補跑：只收窄知識技能那一句 |
+| `q2b` | c1b（提交 `4b9da041`） | 課程行政 3、倉庫 3 | c1 的補跑：只收窄知識技能那一句。倉庫第 3 份的 harness 在第 11 輪因員工模型被限流而終止，**結果檔由產品保存的資料復原**（檔內 `"recovered": true`） |
+| `q3` | c3（提交 `1e9edcea`） | 課程行政 3、倉庫 3（進行中時以 `metrics.csv` 實際列數為準） | 成分拆解：c1 去掉「寫入條件／協作對象／知識技能」那一條 |
 | `long` | 最終採用的指引 | 1 | 採購人設的長訪談（含取消、後端硬停止、人工改稿、更正、PDF）；完成後補入 |
 
 其餘條件各批相同：A、B1、B2 為 `gpt-6-luna`／reasoning `high`（`store=false`、`all_turns`），員工模擬為 `gpt-6-luna`／`low`；隔離的 PostgreSQL 18.6（loopback `caliburn_t01_test` 的 `eval_b` schema）與本機後端 8103；同一時間只有一場訪談。人設在 `apps/api/tests/fixtures/job_analysis_quality/personas.json`，harness 是 `apps/api/scripts/simulate_interview.py`（付費、明確執行）；各批的預先登記判準、停止條件與費用上界寫在 T14 證據的對應小節（先於執行提交）。
@@ -42,6 +43,7 @@
 | `questions_per_turn`／`chars_per_turn`／`leading_phrases` | 顧問每輪問句數、每輪字數、引導式問法片語數 |
 | `citations_checked`／`citations_unsupported` | 引用審計：JD 項目所述的人設事實，其引用來源的原文是否含該事實（粗略標記檢查）；未支持＝該項目引用的來源都不含該事實 |
 | `correction_effective` | 更正是否生效（新值在、舊值不當成現行、其他工作保留） |
+| `counted_input_tokens_a`／`counted_input_tokens_memory`／`counted_input_tokens_per_minute` | 由已保存 checkpoint 讀出、對每個請求計數的輸入 token 加總（A／背景 Memory），以及除以 `minutes` 的每分鐘量；它貼近帳戶的 TPM 上限，是耗時的主因 |
 | `a_model_calls`／`a_max_calls_in_a_turn`／`memory_batches`／`memory_model_calls`／`compactions` | 從資料庫統計的模型呼叫數（A 全部／單輪最大）、背景 Memory 批次數與其呼叫數、壓縮次數 |
 | `attempts`／`failed_attempts` | 對 provider 的送出嘗試總數／失敗的嘗試（絕大多數是 429 `rate_limit_exceeded` 被重試吸收；帳戶 TPM 為 200K） |
 | `cost_usd` | 依產品固定的 Luna 費率與回報的 usage 估算（**估算，不是帳單**） |
@@ -50,7 +52,8 @@
 ## 判讀注意
 
 - 樣本很小（每批 6 份，每份 12 輪）、員工是模型、檢查是粗略標記：這組資料適合比較指引版本在**大效果**上的差異，不能當普遍品質保證，也不能當真人試點（V25）的替代。
-- 每份耗時主要受帳戶 TPM 200K 的限流影響（大量 429 被重試吸收），不只是模型延遲；單份耗時與 `failed_attempts` 要一起看。
+- 每份耗時主要受帳戶 TPM 200K 的限流影響（大量 429 被重試吸收），不只是模型延遲：每份約處理 1.6M–5.4M 輸入 token、每分鐘 20–29 萬；單份耗時、`failed_attempts` 與 `counted_input_tokens_*` 要一起看。
+- 引用審計只問「項目所述的人設事實，其引用來源是否含該事實」。**引用指向顧問的訊息是設計允許的上下文（Owner 2026-10-01 確認），不算誤引**；看的是說出該事實的員工原話有沒有被引到。審計是標記檢查，會有誤判（例如事實的措辭不含標記字），被標記的項目要逐筆讀原文（見 T14 證據的人工判讀）。
 - harness 的已知缺陷：員工模擬偶爾把控制旗標 `{"nothing_more":false}` 附在回答後面（Q1 為 2／48 則、Q2 一份 3／12 則），已在後續 harness 修正；Q1／Q2／Q2b 沿用同一版 harness 以保持對照一致。
 - `source_contents` 內是模擬訪談原文（合成）；JD 的引用只審計人設事實，其他語句的來源品質需人工讀。
 

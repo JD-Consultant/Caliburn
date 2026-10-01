@@ -1,6 +1,7 @@
 """Coordinate existing execution budgets with direct model I/O; no response storage here."""
 
 import json
+import logging
 from asyncio import CancelledError, sleep
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
@@ -51,6 +52,8 @@ from caliburn.features.executions.budget_models import (
     validate_cost,
 )
 from caliburn.features.executions.models import ExecutionWriter
+
+_LOG = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -282,6 +285,18 @@ class ModelRequestExecutor:
                     ReceivedModelResponse(error.response, attempt_id)
                 ) from None
             except APIError as error:
+                failure = classify_response_failure(error)
+                _LOG.warning(
+                    "Provider request failed: operation=%s failure=%s http_status=%s "
+                    "provider_code=%s execution_id=%s request_id=%s attempt_id=%s",
+                    kind.value,
+                    failure.kind.value,
+                    failure.status_code,
+                    failure.provider_code,
+                    self.writer.scope.execution_id,
+                    request_id,
+                    attempt_id,
+                )
                 try:
                     retryable = await self._record_failure(attempt_id, error)
                 except (Exception, CancelledError) as save_error:
@@ -290,7 +305,7 @@ class ModelRequestExecutor:
                     # Cancellation still propagates, including while awaiting a connection.
                     raise save_error from None
                 if not retryable:
-                    raise ModelRequestFailedError(classify_response_failure(error)) from None
+                    raise ModelRequestFailedError(failure) from None
                 continue
             return response, attempt_id
 

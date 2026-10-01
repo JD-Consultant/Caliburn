@@ -2,7 +2,7 @@
 
 - 日期：2026-09-29；狀態：**工程設計進入已授權施工；進度與實際驗證依任務表，不代表產品已完成**。
 - 範圍：將[目標架構](../target-architecture-map.md)轉成可交付程式的設計；不重訂產品需求，不把舊程式接回新產品。本次 Goal 授權與限制見[實作計畫](../plans/2026-09-29-target-rebuild/README.md)。
-- 施工位置：新 `apps/api`、`apps/web`。這是重用路徑名稱，不是復活該路徑已退役的舊產品。現行 production 仍依 ADR0077，直到最後切換 gate。
+- 施工位置：新 `apps/api`、`apps/web`。這是重用路徑名稱，不是復活該路徑已退役的舊產品。本切換候選分支的根命令、workspace、lock 與 CI 已指向此處，舊 App 程式已退役；[ADR0079](../adr/0079-target-rebuild-production-cutover.md) 仍是 Proposed，前置 gate 與 Owner 放行前，ADR0077 仍是 Accepted 的正式權責紀錄。
 
 ## 從哪裡開始
 

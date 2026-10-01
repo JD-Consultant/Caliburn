@@ -1,6 +1,6 @@
 # Caliburn 文件與 Repo 導覽
 
-這裡只維護分類與閱讀路徑，不複製產品規則、任務進度或驗收結論。**新目標正在 `apps/api`／`apps/web` 重建；現行正式入口仍依 ADR0077，尚未完成 T18 切換。**「已有程式」「已有個別證據」與「整體驗收完成」須分開。
+這裡只維護分類與閱讀路徑，不複製產品規則、任務進度或驗收結論。**本分支是切換候選：正式產品是 [`apps/api`](../apps/api/README.md)（後端）與 [`apps/web`](../apps/web/README.md)（介面），根命令與 CI 已指向它們，舊程式已依清單退役（取回方式見 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)）。ADR0079 仍是 Proposed；T14／T16／T17 已結案，Owner 放行前 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 仍是 Accepted 的正式權責紀錄，T18 未完成。**「已有程式」「已有個別證據」與「整體驗收完成」須分開。
 
 ## 先讀
 
@@ -15,8 +15,7 @@
 | 查官方做法、論文、方案比較 | [研究資料](research/README.md)：Agent／Memory、工作分析、工程、檢索四類 |
 | 查分析方法、訪談與 JD 撰寫要求 | [分析指南](guides/README.md)；不是工程規範或測試結果 |
 | 確認哪個決定有效、哪些仍未定 | [目前決策](current-decisions.md) → 該題責任文件／ADR |
-| 啟動新目標開發環境 | [後端 README](../apps/api/README.md)、[前端 README](../apps/web/README.md) |
-| 操作現行正式產品 | [正式 App README](../experiments/jd-relational-app/README.md)、[runbook](runbook.md)；不要套用新目標的啟動方式 |
+| 啟動、操作正式產品 | [後端 README](../apps/api/README.md)、[前端 README](../apps/web/README.md)、[runbook](runbook.md) |
 
 接手只讀本次任務需要的責任文件與最新證據，不從全部歷史重新開始。[AGENTS.md](../AGENTS.md) 管工作方式；本頁不另建規則。
 
@@ -40,7 +39,7 @@
 | 範圍 | 權責與閱讀入口 |
 |---|---|
 | 新目標設計 | [目標架構地圖](target-architecture-map.md)選用的責任文件；實作／驗收狀態查[任務表](plans/2026-09-29-target-rebuild/tasks.md)，不從設計稿推導已完成 |
-| 現行正式產品 | [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)、[現行鳥瞰](../ARCHITECTURE.md)、[產品筆記](product-notes.md)；舊接線不是新目標的選型要求 |
+| 正式產品（切換候選，未放行） | [ADR0079](adr/0079-target-rebuild-production-cutover.md)（Proposed）、[鳥瞰](../ARCHITECTURE.md)、[產品筆記](product-notes.md)；[ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 是切換前的權責紀錄，其程式已在本分支退役 |
 | 決策與變更方法 | [決策流程](decision-process.md)、[架構討論與文件規範](architecture-discussion-standard.md)、[契約策略](contract-strategy.md) |
 | 獨立 RAG 範圍 | [RAG pipeline](design/rag-pipeline.md)，不是目前 JD App 的依賴 |
 | 查較早文件及演進 | [封存入口](archive/README.md) → 原索引、舊計畫、工作樹與搬移對照；先核最新決策再採用 |

@@ -206,6 +206,8 @@ resume 後才完成原答覆。取消後由 wrapper 拒絕採用。成功交回�
 
 ## 8. 任務完成對照（2026-09-30 恢復後）
 
+> 2026-10-01 補審發現 Agent 要求下一輪壓縮尚未接通；§8 原完成對照沒有覆蓋這個既定能力。後續修正與驗證另見 §9，不以原測試數字冒充該工具已存在。
+
 沿[任務表 T08 的 Red 與完成條件](../tasks.md#t08-a-turn固定資料正式完成與控制)逐條對照既有測試；缺口只補測試或程式（§7），不新增機制。路徑相對 `apps/api/tests`。
 
 | T08 Red | 代表測例（皆為真 PG，除註明外） |
@@ -233,3 +235,44 @@ resume 後才完成原答覆。取消後由 wrapper 拒絕採用。成功交回�
 **結論：**T08 的 A Turn 固定資料、正式完成與控制在其任務範圍內成立，勾選。**不因此宣稱**：跨程序「未明 attempt」的 production 再准入（Owner 已縮減，歸 T12 §6 的安全退出）、廣泛故障競爭矩陣（T12）、UI 呈現與斷線重連的瀏覽器旅程（T09）、A 的自然訪談品質與來源選擇（T14／T16／T17，T17 的品質 trial 仍是 fail）。
 
 **完整後端回歸（提交 `478abcf8` 之上）**：`pytest tests -q -p no:cacheprovider --tb=short --basetemp=<新 GUID 路徑>`，工作目錄 `apps/api`、既有 `.venv-target`、`CALIBURN_TEST_DATABASE_URL` 指向 loopback 55439 的 `caliburn_t01_test`（每案獨立 schema，非 Demo DB）：**1847 passed、2 skipped in 600.46s**。跳過的 2 案是 `integration/test_pdf_rendering.py`，需 `CALIBURN_TEST_PDF_FONT` 才做真 Chromium 渲染，本輪未設定，PDF 渲染另歸 T13。之後才新增的 33 案（`contracts/test_tool_schema_strictness.py` 32、`test_jd_item_deletion.py` 1）另跑通過，不算入上述數字。模型為合成 SDK transport 或 mock，不是 provider 品質證據。
+
+## 9. A 要求下一輪壓縮的接線補足（2026-10-01）
+
+**實際缺口：**有效規格允許 Agent 按需要求下一輪壓縮；共用準備元件已有 `compact_requested`，但 A runner 一律傳 false，工具清單沒有入口。這不是新增產品需求，原 §8 的完成判斷少檢了角色接線。
+
+**修正：**新增 A 的零參數 `request_context_compaction`；沿既有工具 prepare／execute 保存邊界與 `RoleContextHistory`，在原 execution history binding 記布林意圖。只有選定的已完成歷史可讓下一輪採用；取消／最終失敗不生效；已採用的 prepared C 重用，不沿舊歷史重複消耗。原生 context 留在 saver，不新增 store／操作帳本或模型摘要。接線 authority 與模型契約見[執行文件 §5.5.1](../../../implementation/agent-execution.md#551-a-要求下一輪壓縮2026-10-01-接線)。
+
+重新核對 [OpenAI standalone compact 契約](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)：送完整歷史，完整採用回傳 output，不只取 compaction item；A 的完成資格與取消規則仍屬本案。產品維持 Luna／high，128K／272K／B 門檻不改，沒有向 B 增加工具或修改分析 Prompt。
+
+### Red–Green 與風險覆蓋
+
+- 先新增 `integration/test_consultant_compaction_intent.py::test_requested_compaction_runs_next_turn_once_and_excludes_new_input`，真 PG＋HTTP 准入／完成＋實際 SDK 模型迴圈（HTTP transport 合成）。Red：`scope_not_allowed`，無壓縮工具。補接後 **1 passed**。
+- 同案檢查低於門檻也依要求在下一輪壓縮、重複呼叫只是一個意圖、本輪不立即壓縮；已完成舊輸入包含在 compact input、新輸入不包含；prepared C 後中斷取消，重新建立 saver／SDK 後換新輸入，完整 C（含 retained item）可重用、沒有取消內容、不再次 compact；後續無新要求不永遠重壓。
+- 實作後補 3 案邊界回歸（非另一次 Red-first）：取消／最終失敗的意圖不進新工作、停止後工具重入拒絕、模型不可提供 scope、未準備歷史不可登記、foreign saved intent 拒絕。沿真執行 owner，不 mock DB。工具路由及 strict schema 合計 **56 passed in 3.17s**；不以此代替真 Luna 的自主選用效果。
+
+### 最終驗證與環境錯誤
+
+工作目錄 `apps/api`；使用 `.venv-target/Scripts/python.exe`，`CALIBURN_TEST_DATABASE_URL=postgresql://caliburn_test@127.0.0.1:55439/caliburn_t01_test`，每案 fresh schema，不動 Demo。
+
+```text
+pytest tests/unit tests/contracts
+  tests/integration/test_consultant_compaction_intent.py
+  tests/integration/test_role_context_history.py
+  tests/integration/test_context_histories.py
+  tests/integration/test_consultant_runner.py
+  tests/integration/test_consultant_runner_recovery.py
+  tests/integration/test_consultant_context_binding.py
+  tests/integration/test_consultant_controls.py
+  tests/integration/test_context_preparation_postgres.py
+  tests/integration/test_memory_analysis_runners.py
+  tests/integration/test_database_migrations.py
+  -q -p no:cacheprovider --tb=short
+```
+
+此為一行命令的換行展示。首次誤寫 Memory runner 檔名，pytest 未執行任何測試；改用現有 `test_memory_analysis_runners.py`。正式執行 **1158 passed、15 setup errors in 69.43s**；15 項全是 Windows 暫存目錄 ACL，來自 `test_openai_credentials.py`、`test_packaged_migrations.py`、`test_web_delivery.py`。在工作區新 basetemp 仍遭相同權限拒絕；最後以授權模式及全新 GUID 路徑重跑這三檔，**15 passed in 3.45s**。合計本次選取的 **1173 項均取得通過證據**，不是單次全後端測試通過，也未重跑完整 PDF／瀏覽器／provider 驗收。
+
+Ruff check／format **417 files**、mypy **278 source files** 通過；canonical codegen `--check` 通過。產生器首次子程序寫系統 Temp 遭拒，授權模式才完成，未手改生成物。fresh schema、repeatable CLI、DDL／ORM 一致性沿 `test_database_migrations.py` 通過；没有聲稱已在 Demo 的既有 DB 遷移。
+
+**獨立唯讀審查：**檢查 completion／stop、writer fencing、原生歷史、工具／schema、migration 及 B 的權限，無 Critical／Important／Minor；審查者另跑 49 項單元測試通過，沒有隔離 PG，DB 證據以上述主代理結果為準。審查未判斷的 T14 品質、T16 配額／大視窗與真模型壓縮品質，仍由原任務持有，不能因此結案。
+
+**交付邊界：**本輪新增付費請求 **0**，未重啟／升級 Demo、未推送、未切換模型。新工具的真 Luna 自主選用及壓縮後分析品質尚未驗，不抹除 T14／T16／T17 的限制。既有安裝使用新碼前需照 runbook 執行 migration 0020；下一步仍是原計畫的 Luna 核心效果與剩餘交付 gate，不擴充恢復平台。

@@ -6,7 +6,7 @@ updated: 2026-08-09
 
 # 現行 Job Analysis 詳細分析流程
 
-> **歷史文件，禁止據此施工（2026-08-28）**：本文件記錄 ADR 0060 hard cut 前的 `app/job_analysis` 流程，所述 `Work Model`、`Proposal`、舊 API 與來源／核准生命週期均不是下一版目標。現行 production 請讀 [`design/consultant-runtime.md`](design/consultant-runtime.md)；下一版目標以 [`adr/0071-revisable-work-understanding-context-and-review-provenance.md`](adr/0071-revisable-work-understanding-context-and-review-provenance.md) 與 [`superpowers/plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md`](superpowers/plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md) 為準。本文只供追溯，不授權恢復舊模組、舊名稱或 compatibility layer。
+> **歷史文件，禁止據此施工（2026-08-28）**：本文件記錄 ADR 0060 hard cut 前的 `app/job_analysis` 流程，所述 `Work Model`、`Proposal`、舊 API 與來源／核准生命週期均不是下一版目標。現行 production 請讀 [`design/consultant-runtime.md`](design/consultant-runtime.md)；下一版目標以 [`adr/0071-revisable-work-understanding-context-and-review-provenance.md`](adr/0071-revisable-work-understanding-context-and-review-provenance.md) 與 [`superpowers/plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md`](archive/implementation-plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md) 為準。本文只供追溯，不授權恢復舊模組、舊名稱或 compatibility layer。
 
 > 本文件只描述現行 `app/job_analysis` 與 `/workspace` 主線。
 > 舊的 `interview`、OCS editor、`job_authoring`、`/dashboard`、`/documents/*` 與

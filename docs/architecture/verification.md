@@ -28,7 +28,7 @@
 | V02 開場與正式來源 | 開場為序號 1；A 未完成／取消的原輸入仍保存但不佔正式號、不供其他 Agent／正式 JD 引用 | [訪談讀取](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、用例＋DB |
 | V03 持續訪談 | 很早提到情境，後期更正頻率；A 可由導覽／原話取回細節，資訊不足先問，不拿舊結論蓋掉新原文 | 工作分析指南＋真模型自然長訪談 |
 | V04 Context 基準 | A 執行中背景發布；map／read／來源 diff 始終依原 pinned Memory，同輪恢復亦同 | [A context](../specs/2026-09-26-consultant-context-and-state-design.md)、組裝＋整合 |
-| V05 超量與壓縮 | 起始近期歷史超量明示未預載範圍；輪前為主，完整 Step 間達 160K 主動 compact；全部返回 items 接續，不重加輸入／導覽。輪前 C 跨取消保留，輪中 C 隨其工作放棄，壓後仍超量不無限循環 | A context／[共用執行 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與-272k-中途保險目標已確認未實作)、provider＋故障注入 |
+| V05 超量與壓縮 | 起始近期歷史超量明示未預載範圍；輪前為主，完整 Step 間達 160K 主動 compact；全部返回 items 接續，不重加輸入／導覽。輪前 C 跨取消保留，輪中 C 隨其工作放棄，壓後仍超量不無限循環 | A context／[共用執行 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與中途保險)、provider＋故障注入 |
 | V06 原生接續 | 輸出含訊息與工具 calls；只完成一次 response 不提前結束 Turn。reasoning／call-output 配對跨 Step、Turn、compact 可接續 | [共用執行](../specs/2026-09-27-shared-agent-execution-and-state-design.md)、鎖定 SDK／真 provider |
 | V07 每 Step 恢復 | 模型回應已存、tool 未做；tool 已做、checkpoint 未前進；完整 Step 已存。均承接可取回原結果，不能重複效果 | 共用執行＋[交易](persistence.md)、真 DB＋程序中斷 |
 | V08 暫停／取消競爭 | 暫停停在下一模型發送前；取消與完成競爭、晚到工具，正式結果只有一個且不能復活取消候選 | 執行＋交易＋Web |

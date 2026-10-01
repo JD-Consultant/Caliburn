@@ -24,7 +24,7 @@
 | V02 | T02、T08 | 開場 1、pending input 與正式序號，取消不引用 |
 | V03 | T14、T17 | 長訪談前案後補／更正與按需回查 |
 | V04 | T08、T12 | pinned Memory 與背景發布交錯 |
-| V05 | T06、T08、T10、T16 | 128K／272K 邊界、超量與完整 compact 採用 |
+| V05 | T06、T08、T10、T16 | 128K／160K 邊界、超量與完整 compact 採用 |
 | V06 | T06、T16 | native output→input、mixed message／calls |
 | V07 | T06、T08、T12 | R／tool／Step 各位置程序重啟 |
 | V08 | T08、T09、T12 | 暫停、取消、final、晚到 writer 競爭 |

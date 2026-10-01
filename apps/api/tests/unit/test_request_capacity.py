@@ -120,7 +120,7 @@ async def test_count_failure_has_no_estimate_fallback():
 
 
 async def test_middle_threshold_stops_before_second_generation_without_rewriting_history():
-    probe = CapacityProbe([10, 272_000], final=False)
+    probe = CapacityProbe([10, 160_000], final=False)
     saver = InMemorySaver()
     options = dict(thread_id="middle", runtime=probe.runtime(), max_tool_calls=2, max_model_steps=3)
     with pytest.raises(ValueError, match="compaction"):
@@ -149,7 +149,7 @@ async def test_first_request_above_middle_threshold_is_not_an_automatic_compacti
 
 
 async def test_below_middle_threshold_continues_and_final_needs_no_more_count():
-    probe = CapacityProbe([10, 271_999], final=False)
+    probe = CapacityProbe([10, 159_999], final=False)
     result = await run_response_loop(
         InMemorySaver(),
         thread_id="below-middle",
@@ -162,7 +162,7 @@ async def test_below_middle_threshold_continues_and_final_needs_no_more_count():
     assert result["next_action"] == "deliver_answer"
     assert len(probe.count_requests) == len(probe.model_requests) == 2
     assert probe.count_requests[0][0] != probe.count_requests[1][0]
-    assert probe.model_input_tokens == [10, 271_999]
+    assert probe.model_input_tokens == [10, 159_999]
 
 
 def reduced(text: str = "reduced") -> list[dict]:

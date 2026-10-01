@@ -115,7 +115,7 @@
 - **最新整合：**`76f99867` 接通正式完成／控制、原生接續、背景要求與公開歷史；三輪真模型、兩批 Memory、暫停重開同輪續作、902 unit/contracts、725 PG integration（另補兩項真 Chromium）及重啟證據見 [T08 §5](evidence/t08-consultant-turn.md#5-顧問--背景整理的整合2026-09-30-1057-台北)。未知 attempt 的 production 核對接線、廣泛故障／品質仍未完成。
 - **2026-09-30 第一切片：**固定起始資料、共用模型／工具 loop、正式答覆／JD／歷史共同完成及 HTTP 派送通過合成 provider＋真 PG；缺模型設定不接受無法執行的輸入。控制、公開進度、背景要求及真 provider 仍待接線，見 [T08／T09 evidence](evidence/t08-consultant-turn.md)，不提前勾完成。
 - **契約：**[A context](../../specs/2026-09-26-consultant-context-and-state-design.md)、[閉環](../../specs/2026-09-29-core-value-loop-lifecycle.md)、[資料接線](../../implementation/data-and-contracts.md)。
-- **程式／交付：**`workflows/consultant_turn.py`、A 起始 projector、控制 API；原生基底／128K／272K、Memory pin、有效近期歷史、正式完成交易及取消 fencing。
+- **程式／交付：**`workflows/consultant_turn.py`、A 起始 projector、控制 API；原生基底／128K／160K、Memory pin、有效近期歷史、正式完成交易及取消 fencing。
 - **Red：**Memory 半途換版、恢復重加輸入／maps、A final 尚未保存就宣告完成、取消與 final 同時成立、含 a 的輪中 C 帶入新 b、input 取消仍成正式序號。
 - **完成：**V04–V09／E07–E09／E12 對應 A；原本候選與有效來源、答覆、background intent 原子完成；同 Step 內部保存可續；暫停停在下一請求前。
 - **不做：**把網路中斷視為取消、對所有失敗自動新 Turn 重送、逐 token 恢復、JD map 起始預載。
@@ -225,6 +225,7 @@
 ## T16 有界官方模型／schema／容量驗證
 
 - [ ] T16；依賴：T14、T15。
+- **2026-10-01 Owner 門檻校準：**輪前 A／B1／B2 為 128K、中途 160K 已確認並接回既有機制；門檻、全視窗採用及真 PG 角色恢復 70 passed。只調數值，不改接續／模型／品質 gate；本次零付費，三角色新門檻下的真長訪談仍未驗。[校準與證據](evidence/t16-compaction-continuity.md#10-owner-確認門檻校準2026-10-01)取代下方 272K／512K 待決狀態，不抹除當時實測。
 - **2026-10-01 A輪前接線補驗通過：**修正後原生 seed 經真 count164,317觸發既有128K壓縮，完整五項C＋App資料＋新輸入接續，真Luna季度更正、正式保存與PG重連核對通過；2 count＋1 compact＋1生成、零重試，usage估US$0.0169852。不改產品、不再重跑此接縫；[證據及受控seed限制](evidence/t16-compaction-continuity.md#9-原生-seed-修正後的有界補驗2026-10-01)。272K／512K與完整品質gate仍未完，不勾整項。
 - **2026-10-01 A 輪前角色接線補驗：**真 PG＋受控 seed 的離線 A Runner／C採用／重連保存通過；真 count 因測例 ID 格式及後續未定的400被拒，未執行真 compact／生成。只修探針原生序列化、不改產品、不續跑，七個隔離 schema 均無 active 殘留；[範圍、失敗及限制](evidence/t16-compaction-continuity.md#8-a-輪前壓縮的正式-runnerpg-接線2026-10-01)。不勾整項或擴張§7證據。
 - **2026-10-01 128K準備機制校準：**165,204-token合成歷史經共用準備Graph成功compact，完整C保存／重入不重發；追加更正後三項規則符合，2生成＋1壓縮、零重試，估US$0.0166326。只驗同程序機制，不是正式A/B交界、PG耐久或JD品質；原門檻未改、不勾整項。[結果與限制](evidence/t16-compaction-continuity.md#7-200k-額度下的輪前準備校準2026-10-01)。

@@ -192,4 +192,6 @@ $env:CALIBURN_TEST_DATABASE_URL='postgresql://caliburn_test@127.0.0.1:55439/cali
 
 **結論：**T11 的背景調度、交接與共同發布在其範圍內成立，勾選。
 
-**已知限制（如實記，不擅自設計新機制）：**`MemoryConsolidationWorkflow.release_block` 只在測試中被呼叫，**沒有 production 呼叫者**：背景整理一旦最終失敗，該檔案之後不再自動整理，直到有人呼叫這個系統掛鉤。規格把「怎麼偵測阻塞解除」明列為待細設（[產品概念](../../../product-concept.md)：不開放手動重跑、不無限自動重試）。實務影響有界：A 仍可用固定的已發布 Memory、完整近期原話與 `read_interview` 繼續（超過容量時走 [T08 §7](t08-consultant-turn.md#7-近期訪談預載超量的有界縮減2026-09-30-恢復後) 的縮減）；但單次模型失敗就永久停止整理，對很長的訪談偏嚴格。建議（待 Owner 確認，未實作）：後續完成的 A Turn 累積足夠新訪談（例如數輪）後，以一次新批次自然嘗試，失敗就再阻塞——這是以新資料為條件的有界重試，不是通知重設額度。
+**2026-10-01 更新（已接線，待 Owner 核對政策）：**下列限制已依文末建議解除——`fail` 在失敗紀錄存入當時的正式訪談前緣，`read_block` 在正式序號再前進 6（三輪完成的訪談）後視為已解除，由既有 discover／claim 自然承接一次新批次，失敗就從新前緣再阻塞；原本沒有 production 呼叫者的 `release_block` 與其操作種類已移除，沒有新表、計時器或手動入口。Red→Green：改寫的 `test_final_failure_blocks_until_the_interview_has_advanced`（無實作時 `assert 'quota_exhausted' is None` 失敗，有實作 6 passed）與舊資料列不自動解除的 `test_a_failure_recorded_before_the_frontier_was_kept_stays_blocked`；舊測例「後續完成的一輪＋新要求仍阻塞」維持其保證，改以三輪為界。以下保留當時的記錄。
+
+**（歷史）已知限制（如實記，不擅自設計新機制）：**`MemoryConsolidationWorkflow.release_block` 只在測試中被呼叫，**沒有 production 呼叫者**：背景整理一旦最終失敗，該檔案之後不再自動整理，直到有人呼叫這個系統掛鉤。規格把「怎麼偵測阻塞解除」明列為待細設（[產品概念](../../../product-concept.md)：不開放手動重跑、不無限自動重試）。實務影響有界：A 仍可用固定的已發布 Memory、完整近期原話與 `read_interview` 繼續（超過容量時走 [T08 §7](t08-consultant-turn.md#7-近期訪談預載超量的有界縮減2026-09-30-恢復後) 的縮減）；但單次模型失敗就永久停止整理，對很長的訪談偏嚴格。建議（待 Owner 確認，未實作）：後續完成的 A Turn 累積足夠新訪談（例如數輪）後，以一次新批次自然嘗試，失敗就再阻塞——這是以新資料為條件的有界重試，不是通知重設額度。

@@ -106,7 +106,7 @@ node node_modules/vitest/vitest.mjs run src/features/interview src/features/jd-e
 
 1. **模型品質：**Luna 的跨輪 JD 來源漏選未解決；未發現 App 丟失來源的新證據，不再以同假說加 Prompt 或付費重試。沿 [T14 來源審閱](evidence/t14-job-analysis-quality.md#2026-10-01來源缺口的獨立收斂審閱)保留品質 gate，不把引用存在或 `needs_recheck=false` 當成語意充分。
 2. **容量：**A 輪前 128K 已有正式 runner／PG 接線證據；帳戶回報的 200K 額度使原 272K／512K 驗收受阻。已提出降低門檻的候選，尚未取得 Owner 裁決；不改產品值、不重送同一大請求。沿 [T16](evidence/t16-compaction-continuity.md)接續。
-3. **背景重新整理：**`release_block` 尚無 production 呼叫者，最終失敗後可繼續 A，但不會自動恢復 Memory。這是 [T11 已知限制](evidence/t11-memory-batch.md#任務完成對照2026-09-30-恢復後)，不是本輪新發現；後續須先明確什麼可觀察條件允許一次新嘗試，不以每次通知／重啟重設額度，也不新增使用者 Memory 控制台。
+3. **背景重新整理（2026-10-01 已處理）：**原 `release_block` 無 production 呼叫者，最終失敗後不會自動恢復 Memory（[T11 已知限制](evidence/t11-memory-batch.md#任務完成對照2026-09-30-恢復後)）。已改為只看訪談進度：失敗時記下當時前緣，之後正式序號再前進 6（三輪完成）才允許一次新批次；不以通知／重啟／時間解除，也沒有使用者 Memory 控制台。政策待 Owner 核對。
 
 文件檢查：本輪修改的 4 份文件中，188 個本機連結、100 個錨點及程式區塊配對通過；`git diff --check` 通過，僅有既有 LF／CRLF 轉換提示。
 

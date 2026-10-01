@@ -37,7 +37,7 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 
 - Luna 仍有跨輪 JD 來源漏選的已知品質反例；維持 Luna 不等於接受該缺口或通過品質 gate。見 [T14 證據](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md)。
 - 大視窗壓縮仍受實測 token 限流影響；已完成的較小視窗不能代替原門檻驗收。見 [T16 證據](../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)。
-- Memory 最終失敗後的 production 解阻接線尚有限制；既有訪談可繼續，不等於背景整理會自行恢復。見 [T11 證據](../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)。
+- Memory 最終失敗後已接線：正式訪談再前進三輪才允許一次新批次（2026-10-01，政策待 Owner 核對）；尚未在真長旅程中實際觸發。見 [T11 證據](../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)。
 
 這些是採用審查時必須查回的狀態，不由本 ADR 升格、豁免或增加新需求。後續變化只在各任務 evidence 與任務表維護，再於正式化時核對本節。
 

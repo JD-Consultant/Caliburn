@@ -5,14 +5,20 @@ coverage from published snapshots, and candidate coordinates from memory_batches
 Caller holds the job-file lock for changes and owns the transaction.
 """
 
-from uuid import UUID, uuid5
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from caliburn.features.interviews import queries as interviews
 from caliburn.features.work_memory import batch_persistence, candidate_operations
 from caliburn.features.work_memory.batch_models import MemoryConsolidationIntent
 from caliburn.features.work_memory.candidates import MemoryCommandConflictError
+
+# A final failure blocks new batches until the interview has advanced this far past the
+# frontier recorded with it: three completed exchanges, each an employee input and a reply.
+# Only interview progress releases it; a new request or the passage of time does not.
+RETRY_AFTER_NEW_MESSAGES = 6
 
 
 async def record_operation(
@@ -66,6 +72,7 @@ async def list_intents(
 
 
 async def read_block(session: AsyncSession, job_file_id: UUID) -> str | None:
+    """The reason of a final failure still in force, or None when a new batch may start."""
     records = await session.scalars(
         select(batch_persistence.MemoryOperationRecord).where(
             batch_persistence.MemoryOperationRecord.job_file_id == job_file_id,
@@ -73,12 +80,20 @@ async def read_block(session: AsyncSession, job_file_id: UUID) -> str | None:
         )
     )
     for row in records:
-        released = await batch_persistence.read_operation(
-            session, job_file_id, uuid5(row.execution_id, "memory.release_block")
-        )
-        if released is None:
-            return candidate_operations.stored_text(_payload(row.result_payload), "reason")
+        failure = _payload(row.result_payload)
+        if not await _interview_advanced(session, job_file_id, failure):
+            return candidate_operations.stored_text(failure, "reason")
     return None
+
+
+async def _interview_advanced(
+    session: AsyncSession, job_file_id: UUID, failure: dict[str, object]
+) -> bool:
+    recorded = failure.get("formal_frontier")
+    if type(recorded) is not int:
+        return False  # An older failure recorded no frontier and never releases by itself.
+    frontier = await interviews.read_history_frontier(session, job_file_id)
+    return frontier - recorded >= RETRY_AFTER_NEW_MESSAGES
 
 
 async def list_stage_results(

@@ -7,7 +7,7 @@
 | 你現在要做什麼 | 從這裡開始 |
 |---|---|
 | 認識產品、準備介紹或報告 | [產品專題介紹](product-introduction.md)、[報告與研究材料入口](reports/README.md) |
-| 寫備審、說明如何解決問題 | [共用實驗案例集](reports/research-casebook.md) → [備審準備與各校要求](reports/admissions/README.md) |
+| 寫備審、追查從最早期如何反覆改進 | [開發演進素材索引](reports/development-history/README.md) → [既有案例摘要](reports/research-casebook.md)；送件要求另見[備審準備](reports/admissions/README.md) |
 | 接手開發，知道接下來做什麼 | [Goal／計畫](plans/2026-09-29-target-rebuild/README.md) → [收尾分類與下一步](plans/2026-09-29-target-rebuild/tasks.md#收尾分類與下一步) |
 | 理解新架構、找元件／工具契約 | [目標架構地圖](target-architecture-map.md) → 該主題的責任文件 |
 | 寫程式、改 Prompt／Tool、安排驗收 | [實作規範入口](implementation/README.md) → [程式組織](implementation/code-organization.md)／[寫法規範](implementation/coding-standard.md)／[開發與實驗規範](implementation/development-standard.md) |

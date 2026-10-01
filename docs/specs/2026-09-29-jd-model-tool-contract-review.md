@@ -1,5 +1,7 @@
 # JD 模型工具：按需讀寫與來源契約（研究／審核與推薦設計）
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 - 日期／最後核對：2026-09-29；狀態：**已定產品效果＋依授權選定的工程設計／未實作驗證**。新增工程細節不是 Owner 逐欄選型，也不再懸為待討論。JD map 的精簡 JSON、按需讀取、最少必要模型輸入、詳細差異用 Markdown，以及既定欄位／UI／關係保持已確認目標。§2 補足最小完整能力組，§6 保留缺口與現況證據，§7 列剩餘 gate；不代表 production 工具已切換或已驗收。
 - 決策者：Product Owner；本稿維護：JD 契約維護者。依[討論規範](../architecture-discussion-standard.md)與[決策流程](../decision-process.md)分開產品決定、工程推薦、實作及驗收；本次為全產品文件整理，不授權 production 修改或切換。
 - 責任範圍：職務顧問 A 對**同一份關聯式 JD 候選**的模型可見讀取、編輯意圖與直接來源。人工編輯、正式保存、原操作回執與 UI 仍由原業務責任承接；Memory／歷史訪談的內容讀取仍由各自來源責任提供。
@@ -110,7 +112,7 @@
 | `remove_source` | 該目標已有的 `citation_ref`；只移除此 JD 引用，不刪 Memory／訪談或改其他項目的依據。 |
 | `confirm_reference_alignment` | 該目標已有的 `citation_ref`；A 已重評仍支持目前 JD 才提出，App 綁到本 Turn 固定可見的同身分新修訂。沒有換版但 JD 被改過時，也須針對目前內容重核；不能僅因讀過或文字相似而解除待核對。 |
 
-來源目標沿既有 Domain，不升級成「每個 JSON 葉節點都可掛來源」：profile 是指定 `field`；一般項目是自身；任務明細用其 `detail_read_ref`；任務－能力關係用外層 task `read_ref`＋`capability_read_ref`。**普通任務的 name／description 屬同一 task 來源目標**，不是新建兩份逐欄來源；依[現行來源目標與 basis](../../experiments/jd-relational-app/src/jd_relational/domain.py)核對。來源動作中的 target 使用有限具型別選擇，不接受任意路徑。
+來源目標沿既有 Domain，不升級成「每個 JSON 葉節點都可掛來源」：profile 是指定 `field`；一般項目是自身；任務明細用其 `detail_read_ref`；任務－能力關係用外層 task `read_ref`＋`capability_read_ref`。**普通任務的 name／description 屬同一 task 來源目標**，不是新建兩份逐欄來源；依現行來源目標與 basis（已退役）核對。來源動作中的 target 使用有限具型別選擇，不接受任意路徑。
 
 同一呼叫不得重複或相反修改同一效果鍵：同欄 set／clear、同明細重複修訂、同關係 link／unlink、同引用 remove／confirm 均拒絕；**同目標的文字修訂＋來源確認則合法**，確認須針對本次最終文字，不以修改前的支持狀態通過。不得一面刪來源或 target、一面確認它；明細必須屬所選任務，關係兩端須同份 JD。App 先組最終候選，再驗全部改動與來源；任一失敗整次拒絕。文字修訂省略來源動作時保留原引用，但由既有規則判斷是否待核對；`add_source` 不暗示取代整份來源集合。空來源表示沒有新增依據，不表示內容已受核實，也不為了讓 schema 通過而補造。
 
@@ -205,11 +207,11 @@ rejected: target_stale；本次未修改。
 |---|---|---|
 | 只給 `read_jd(profile)`，A 無法完成基本資料與目的 | [欄位指南 §2.1](../guides/2026-09-09-jd-field-and-writing-guide.md#21-基本資料與職務目的jd-r001c01)、[profile 與逐欄來源](2026-09-12-jd-relational-schema-and-write-contract.md#32-jd_profile)；現行 `jd_set_text` 可修改 profile | §2／§4 推薦專用 `revise_jd_profile`，不建新表或 validator。限定四個 JD 欄位；資料表已有姓名不代表這次開放 AI 改員工資料。 |
 | 原稿只有明細增刪，未明說改文字、兩組排序與能力引用排序 | [關聯式產品結構](../product-concept.md#jd-的關聯式結構與逐項編輯已確認目標)、[明細及關係](2026-09-12-jd-relational-schema-and-write-contract.md#36-jd_task_detail) | §2.1／§4.1 補覆蓋；成果與要求各自多筆、各自修改排序；關係排序接點仍待實作查驗，不把 position 當模型身分。 |
-| 父任務有來源，不代表其每個成果／要求及 K／S 關係都有依據 | [source link target](2026-09-12-jd-relational-schema-and-write-contract.md#310-jd_source_link)、[Domain 的 `_basis_content`](../../experiments/jd-relational-app/src/jd_relational/domain.py) | §4.1 明列 profile field／item／detail／relation；不新增普通項目的逐欄來源，不將來源全貼父任務。 |
-| 原稿另發 `item_ref`，仍未解釋 map 選擇如何安全成為修改意圖 | [既定 JD `read_ref`](2026-09-26-consultant-context-and-state-design.md#32-jd-導覽的按需定位目標已確認未實作)、[現行完整讀取檢查](../../experiments/jd-relational-app/src/jd_relational/consultant_tools.py) | 依本次指示收斂為同一 JD `read_ref` 選擇；App 另驗權限、內容基準並轉譯。現行 `navigation` ref 仍不可直接進 writer；新接線未驗。Memory 仍只選 `target_title`。 |
-| 只讀現在內容，無法知道人工改稿或來源換版差在哪裡 | [A 的兩類差異](2026-09-26-consultant-context-and-state-design.md#3-資料真相模型可見性與生命週期)；[`NoticeHistoryReader`](../../experiments/jd-relational-app/src/jd_relational/notice_history.py)提供固定修訂邊界與操作概覽，[`ChangeReadService`](../../experiments/jd-relational-app/src/jd_relational/change_reads.py)讀單次操作，`project_revision_changes` 比兩快照 | §4.3 推薦一個受限差異入口；現行單次 JSON 結果不等於跨次人工 Markdown 比較，更不等於新 Memory 來源 diff。沿 owner 投影，精確基準及跨 owner 接點待驗。 |
-| 刪職責或移動若丟掉仍有效的限制，JD 文字與結構會脫節 | [既有操作契約](2026-09-12-jd-relational-agent-tool-contract.md#34-jd_delete_item)、[Domain 的 `_structural_changes`／`_delete_item`／`_move_item`](../../experiments/jd-relational-app/src/jd_relational/domain.py) | 保留既有有界內容調整的單次完整效果；不能僅以「最後整輪才提交」為理由省略。刪職責保留任務，刪任務保留共用 K／S，仍有使用者的 K／S 回 `dependent_items`。 |
-| 呼叫成功容易被誤讀成正式稿成功；一次模型回覆亦可能有多個 call | [共用 Step／完成契約](2026-09-27-shared-agent-execution-and-state-design.md)、[現行 JD 工具接線](../../experiments/jd-relational-app/src/jd_relational/consultant_tools.py) | §5 的結果只描述本次候選；相依寫入依共同執行責任排序及配對，不另造 JD 執行器。現行 `execute_foreground` 正式提交路徑不能冒充新候選語意。 |
+| 父任務有來源，不代表其每個成果／要求及 K／S 關係都有依據 | [source link target](2026-09-12-jd-relational-schema-and-write-contract.md#310-jd_source_link)、Domain 的 `_basis_content`（已退役） | §4.1 明列 profile field／item／detail／relation；不新增普通項目的逐欄來源，不將來源全貼父任務。 |
+| 原稿另發 `item_ref`，仍未解釋 map 選擇如何安全成為修改意圖 | [既定 JD `read_ref`](2026-09-26-consultant-context-and-state-design.md#32-jd-導覽的按需定位目標已確認未實作)、現行完整讀取檢查（已退役） | 依本次指示收斂為同一 JD `read_ref` 選擇；App 另驗權限、內容基準並轉譯。現行 `navigation` ref 仍不可直接進 writer；新接線未驗。Memory 仍只選 `target_title`。 |
+| 只讀現在內容，無法知道人工改稿或來源換版差在哪裡 | [A 的兩類差異](2026-09-26-consultant-context-and-state-design.md#3-資料真相模型可見性與生命週期)；`NoticeHistoryReader`（已退役）提供固定修訂邊界與操作概覽，`ChangeReadService`（已退役）讀單次操作，`project_revision_changes` 比兩快照 | §4.3 推薦一個受限差異入口；現行單次 JSON 結果不等於跨次人工 Markdown 比較，更不等於新 Memory 來源 diff。沿 owner 投影，精確基準及跨 owner 接點待驗。 |
+| 刪職責或移動若丟掉仍有效的限制，JD 文字與結構會脫節 | [既有操作契約](2026-09-12-jd-relational-agent-tool-contract.md#34-jd_delete_item)、Domain 的 `_structural_changes`／`_delete_item`／`_move_item`（已退役） | 保留既有有界內容調整的單次完整效果；不能僅以「最後整輪才提交」為理由省略。刪職責保留任務，刪任務保留共用 K／S，仍有使用者的 K／S 回 `dependent_items`。 |
+| 呼叫成功容易被誤讀成正式稿成功；一次模型回覆亦可能有多個 call | [共用 Step／完成契約](2026-09-27-shared-agent-execution-and-state-design.md)、現行 JD 工具接線（已退役） | §5 的結果只描述本次候選；相依寫入依共同執行責任排序及配對，不另造 JD 執行器。現行 `execute_foreground` 正式提交路徑不能冒充新候選語意。 |
 
 ### 為何推薦這個工具組
 

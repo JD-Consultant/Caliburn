@@ -1,5 +1,7 @@
 # JD 按需導覽與正文讀取：設計審查稿
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 - 日期／階段：2026-09-24；G4 設計完成、G5 離線反例與同稿比較完成；G6／G7 見 [ADR 0078](../adr/0078-current-jd-read-only-locator.md) 與 [施工計畫](../plans/2026-09-24-jd-context-navigation-slice.md)。Owner 後續明確要求完成、驗證此方向並允許必要架構改動，因此本稿早期「不授權 production 施工」只保留為當時 gate 紀錄，不再是目前限制。正式產品效果仍是「按任務定位、按需讀正文、追查關聯、修改後驗證」，不是強制每輪 JD 讀取。
 - 範圍：正式新 App 的 A 主顧問讀取 **current JD**。不改 B1／B2／C、Memory、來源 authority、JD Domain、保存／撤回、Prompt／Skills 或模型路由。
 - 既有權責：[跨顧問來源與 JD 契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)、[完整工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[品質驗收](2026-09-10-jd-product-quality-acceptance.md)、[ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md)及[ADR 0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)不由本稿取代。
@@ -24,7 +26,7 @@
 
 ## 3. 實際接點與三個選項
 
-現行 [`JdNoticeMiddleware`](../../experiments/jd-relational-app/src/jd_relational/consultant_context.py) 每個模型請求重新組裝 notice；[`jd_read` contract](../../experiments/jd-relational-app/contracts/jd-read.schema.json) 的 model 參數是 `view`、`target_ref`、`cursor`，只接受 `current/item/section/history`；[`ReadService`](../../experiments/jd-relational-app/src/jd_relational/reads.py) 由 current snapshot 投影正文與 App-issued refs；`command_context` 只接受 `purpose=current` 的寫入目標。[`ReferenceCodec`](../../experiments/jd-relational-app/src/jd_relational/references.py) 目前沒有導覽用途。[`AiToolSession._read_base`](../../experiments/jd-relational-app/src/jd_relational/consultant_tools.py) 驗可信 `jd_read` ToolMessage、artifact 與 revision，但目前**只證明曾有同版讀取**，尚未證明「此寫入目標的所有正文頁已在模型可見視圖讀完」。這是需要測試的精確界線，不能把概念上的 read-before-write 當成已全面強制。
+現行 `JdNoticeMiddleware`（已退役） 每個模型請求重新組裝 notice；`jd_read` contract（已退役） 的 model 參數是 `view`、`target_ref`、`cursor`，只接受 `current/item/section/history`；`ReadService`（已退役） 由 current snapshot 投影正文與 App-issued refs；`command_context` 只接受 `purpose=current` 的寫入目標。`ReferenceCodec`（已退役） 目前沒有導覽用途。`AiToolSession._read_base`（已退役） 驗可信 `jd_read` ToolMessage、artifact 與 revision，但目前**只證明曾有同版讀取**，尚未證明「此寫入目標的所有正文頁已在模型可見視圖讀完」。這是需要測試的精確界線，不能把概念上的 read-before-write 當成已全面強制。
 
 | 候選 | 好處 | 在本案的問題 |
 |---|---|---|

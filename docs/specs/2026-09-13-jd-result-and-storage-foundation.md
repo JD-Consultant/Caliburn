@@ -1,5 +1,7 @@
 # JD：真實結果契約與關聯資料庫基礎
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 > 後續進度：本稿保留此單位當時的結果與未完成事項；八操作共同保存／永久 snapshot／receipt 已由[交易切片](2026-09-13-jd-transaction-service-slice.md)承接驗證。下述「尚無 service」是本單位歷史界線，最新狀態依續篇及決策入口。
 
 - 日期：2026-09-13；Topic：JD-R002；RS-1／RS-2 局部施工成果。
@@ -17,7 +19,7 @@
 
 ## 2. 結果責任與輕量輸出
 
-SSOT：[mutation result](../../experiments/jd-relational-app/contracts/jd-result.schema.json)；[HTTP Problem](../../experiments/jd-relational-app/contracts/jd-http.schema.json)。`MutationResult` 是具名 union；`ResultCatalog` 是生成入口，不是線上多包一層。
+SSOT：mutation result（已退役）；HTTP Problem（已退役）。`MutationResult` 是具名 union；`ResultCatalog` 是生成入口，不是線上多包一層。
 
 固定八個 keys：`status`、`effect`、`receipt_durability`、`operation_ref`、`result_revision_ref`、`change_ref`、`error`、`next_action`。文字／ref 有長度界線；錯誤碼與 status 相同；純候選與底層例外不能穿過此 adapter。
 

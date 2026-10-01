@@ -1,5 +1,7 @@
 # 關聯式 JD：AI、App 與員工操作契約
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 - 日期：2026-09-12
 - Topic：JD-R002/C02、C03
 - 階段：G4 WORKING；八操作、真 PG 共同保存、读取／原次差異及查詢、人工 writer／Windows 重啟恢復已隔離驗證。[人工 HTTP 接合](2026-09-13-jd-manual-http-slice.md)再接保存／原操作查回／狀態／明示恢復，原結果不因斷線或新版本重做。文件入口 HTTP、持久配置、AI call 綁定、source owner／選區、人工 notice 與完整 App 仍待完成；不是整體 G4 或 production 採用。
@@ -44,7 +46,7 @@ App 將所有 mutation 映入相同 domain command、validator、短交易與結
 
 current read 的 refs 綁定該 revision。正文、head、關係、來源目標狀態及 refs 的一致讀取依[保存契約 §9](2026-09-12-jd-relational-schema-and-write-contract.md#9-歷史diff-與-export-read)：同一次短唯讀交易 materialize 後再產 refs；不得另查最新 head。分頁 cursor 綁 revision，下一頁若 head 改變就要求重讀，不接混版頁面。外部原始問答來源／可讀性另由 source port 查核並分開標示，不承諾跨系統同一快照。名稱可重複，模型靠 ref 定位，不靠名稱搜尋後直接寫。
 
-2026-09-13 局部實作：[讀取 SSOT](../../experiments/jd-relational-app/contracts/jd-read.schema.json)已生成 Python／TS 的 `ReadInput`、`ReadPage`、`ReadFailure`，由[讀取投影](../../experiments/jd-relational-app/src/jd_relational/reads.py)及[兩家 adapter](../../experiments/jd-relational-app/src/jd_relational/read_transport.py)共用。`current` 的 target 必須 null；`item`／`section` 使用同類 issued ref；`history` 的 null target 列出固定上界歷史，revision ref 讀指定舊稿。歷史 item／section 可續讀原版，回 `access=history`；即使該版等於 head，其 refs 仍不可寫。
+2026-09-13 局部實作：讀取 SSOT（已退役）已生成 Python／TS 的 `ReadInput`、`ReadPage`、`ReadFailure`，由讀取投影（已退役）及兩家 adapter（已退役）共用。`current` 的 target 必須 null；`item`／`section` 使用同類 issued ref；`history` 的 null target 列出固定上界歷史，revision ref 讀指定舊稿。歷史 item／section 可續讀原版，回 `access=history`；即使該版等於 head，其 refs 仍不可寫。
 
 `ReadPage` 固定版本 1，交付 `view`、`access`、`revision_ref`、typed records、`start_index`、`total_records`、`has_more`、`next_cursor`、`oversized_unit`。records 包含章節、容器、項目、完整欄位、任務 K/S 關係、來源，歷史索引另含版次／origin／時間／原 producer 的 operation/change refs。頁面按 UTF-8 bytes 有界分段，過大的單一允許欄位用明示單項頁完整交付，不截斷正文。沿原 view／target 與 cursor 續讀，讀完頁不等於專業內容已完整。source 的 `basis_status` 可由本版材料判斷，`readability` 目前回 `not_checked`；source owner 的真正查回另待接線。真 PG 接合與 SDK 離線序列化證據分列於[本輪結果](2026-09-13-jd-read-change-implementation.md)，後續 HTTP 查詢已由[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)驗證；顧問／自然模型仍未接通。
 
@@ -145,7 +147,7 @@ unlink 的 basis_refs 必須為空；不能對已移除的關係新增 current s
 
 App 回確切 before/after revision refs、origin、create/update/delete/move/reorder/link/unlink、field before/after、受影響 item refs、source link 變動及分頁狀態。工具不依 AI 先前摘要重建差異。
 
-2026-09-13 實作：`ChangeReadInput`／`ChangeReadPage` 已由 read SSOT 生成，[ChangeReadService](../../experiments/jd-relational-app/src/jd_relational/change_reads.py)重用原 `HistoryReader` 的 receipt／base／result 與固定 `compare_snapshots`；兩家 adapter／HTTP 查詢／真 PG 及新程序依[切片結果](2026-09-13-jd-query-api-and-recovery-identity-slice.md)通過。結果含原 operation/change/base/result refs、origin、records/counts/cursor。每個 `change_index` 對應一個淨變更，header、前後完整值、來源 basis/position、排序鄰項及受影響任務可跨頁；每個允許欄位不截斷。所有內容 refs 都是唯讀歷史，cursor 綁原 operation/result，不改用目前 head。reorder 比较存活 sibling 的相對順序，鄰項只表示當版順序，不宣稱還原真實拖動動作；插入／刪除引起的 position 正規化不另冒稱使用者修改。實際來源回查仍未接線。
+2026-09-13 實作：`ChangeReadInput`／`ChangeReadPage` 已由 read SSOT 生成，ChangeReadService（已退役）重用原 `HistoryReader` 的 receipt／base／result 與固定 `compare_snapshots`；兩家 adapter／HTTP 查詢／真 PG 及新程序依[切片結果](2026-09-13-jd-query-api-and-recovery-identity-slice.md)通過。結果含原 operation/change/base/result refs、origin、records/counts/cursor。每個 `change_index` 對應一個淨變更，header、前後完整值、來源 basis/position、排序鄰項及受影響任務可跨頁；每個允許欄位不截斷。所有內容 refs 都是唯讀歷史，cursor 綁原 operation/result，不改用目前 head。reorder 比较存活 sibling 的相對順序，鄰項只表示當版順序，不宣稱還原真實拖動動作；插入／刪除引起的 position 正規化不另冒稱使用者修改。實際來源回查仍未接線。
 
 ### 3.8 `jd_create_task`
 
@@ -242,7 +244,7 @@ Web 不向員工顯示 JSON。模型不直接取得這個通用 transport，而�
 | `operation_ref` | document＋原 operation，observation 用途 | 識別原保存結果 | 不因 head 前進改指新操作；只讀 |
 | `change_ref` | document＋原 operation＋原 result revision；base 從原 receipt 查得 | 讀真實差異 | 不因 head 前進失效；只讀 |
 
-refs 是由 App 驗證的固定型別定位字串，不是 writer permission；模型以 opaque token 使用，不能拼接或推導另一個 ref。2026-09-13 [ReferenceCodec](../../experiments/jd-relational-app/src/jd_relational/references.py)已用 ItsDangerous 標準簽章核 document、dataset、revision、purpose 及 ref/cursor 用途；payload 可解碼，沒有加密或身分授權宣稱。`current` refs 才可經 resolver 組成可信 CommandContext；`history`／`observation` 只讀，同版 head 也不升格。source refs 仍由 source owner 發配，不重簽成 JD 來源別名；selection issuer 尚未接線，不將一般 field token 當 selection。宿主 key／dataset 持久化及還原世代仍依 DA-03 完成，不建立第二份資料權威。
+refs 是由 App 驗證的固定型別定位字串，不是 writer permission；模型以 opaque token 使用，不能拼接或推導另一個 ref。2026-09-13 ReferenceCodec（已退役）已用 ItsDangerous 標準簽章核 document、dataset、revision、purpose 及 ref/cursor 用途；payload 可解碼，沒有加密或身分授權宣稱。`current` refs 才可經 resolver 組成可信 CommandContext；`history`／`observation` 只讀，同版 head 也不升格。source refs 仍由 source owner 發配，不重簽成 JD 來源別名；selection issuer 尚未接線，不將一般 field token 當 selection。宿主 key／dataset 持久化及還原世代仍依 DA-03 完成，不建立第二份資料權威。
 
 ## 6. 統一 mutation result
 
@@ -286,7 +288,7 @@ App 從既有持久 run／可信 binding 注入 `ai_run_id`，與每筆 operatio
 
 Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案將它固定成 machine-readable status＋員工可讀 message＋有限 next action，不讓模型從自由文字猜是否重試。[Anthropic Handle tool calls](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)
 
-2026-09-13 精確化：[結果 SSOT](../../experiments/jd-relational-app/contracts/jd-result.schema.json)固定以上八 keys 與合法狀態分支，拒絕 `candidate_ready`。mutation result 保持輕量，移除舊例 `actual_changes`；完整前後文字／結構／來源差異沿原 immutable base/result，公開入口依 §3.7 完成，不以 AI 摘要替代。永久 receipt 只保存穩定身分／結果語意；[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已由真實 `WriteObservation` 發配原 operation／result／change refs 並驗 shared result，未確認仍先 reconcile。此投影不查新 head、不重播、不改 receipt，投影失敗也不改稱保存失敗；寫入 HTTP host 與正式顧問接線仍待完成。永久／對外邊界仍沿[讀取前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md)。
+2026-09-13 精確化：結果 SSOT（已退役）固定以上八 keys 與合法狀態分支，拒絕 `candidate_ready`。mutation result 保持輕量，移除舊例 `actual_changes`；完整前後文字／結構／來源差異沿原 immutable base/result，公開入口依 §3.7 完成，不以 AI 摘要替代。永久 receipt 只保存穩定身分／結果語意；原觀察投影（已退役）已由真實 `WriteObservation` 發配原 operation／result／change refs 並驗 shared result，未確認仍先 reconcile。此投影不查新 head、不重播、不改 receipt，投影失敗也不改稱保存失敗；寫入 HTTP host 與正式顧問接線仍待完成。永久／對外邊界仍沿[讀取前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md)。
 
 [HTTP 投影](2026-09-13-jd-result-and-storage-foundation.md#http-與模型外殼)在寫入回應使用 200 成功、202 待對帳及具名 4xx／5xx Problem；成功查回觀察使用 200，body 保留原結果。查回服務自身失敗另由 host 回報。`operation_conflict` 不接受衝突意圖、無本次 operation ref，原 receipt 保留。未 binding 的內部保存前錯誤可回 `save_failed/unchanged/unconfirmed` 並停止；已 binding 而未確認則一律 reconcile。這些是本案映射，非兩家供應商指定的 HTTP 或資料表格式。
 

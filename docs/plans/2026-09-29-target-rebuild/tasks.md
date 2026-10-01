@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T17 已完成；T18 未完成（切換候選已備，待 Owner 放行）。**T14 依 2026-10-01 Owner 決定、T16／T17 依 2026-10-02 的實測與已知不足清單勾選；勾選所附的限制見各任務最新條目、[T17 V01–V28 對照](evidence/t17-v01-v28-closure.md)與 [T14 已知不足](evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)。2026-10-02原採購長旅程已續完45輪、3批Memory與PDF，結果見 [T17 A2實測結果](evidence/t17-course-administrator-journey.md#a2-實測結果2026-10-02原旅程完成-45-輪)。較早的程式基準、來源品質反例、容量／解阻及交付事項見[前次交接](evidence/2026-09-30-pause-handoff.md#最新交接2026-10-01核心已接通尚未全案驗收)。勾選不等於每個 V 項都有真模型實測（V01–V28 對照逐項標示通過／部分／離線／未驗）；接續不重置，較早切片的「尚未」須依同任務最新證據判讀。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T18 已完成（T18 於 2026-10-02 經 Owner 放行並切換）。**T14 依 2026-10-01 Owner 決定、T16／T17 依 2026-10-02 的實測與已知不足清單勾選；勾選所附的限制見各任務最新條目、[T17 V01–V28 對照](evidence/t17-v01-v28-closure.md)與 [T14 已知不足](evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)。2026-10-02原採購長旅程已續完45輪、3批Memory與PDF，結果見 [T17 A2實測結果](evidence/t17-course-administrator-journey.md#a2-實測結果2026-10-02原旅程完成-45-輪)。較早的程式基準、來源品質反例、容量／解阻及交付事項見[前次交接](evidence/2026-09-30-pause-handoff.md#最新交接2026-10-01核心已接通尚未全案驗收)。勾選不等於每個 V 項都有真模型實測（V01–V28 對照逐項標示通過／部分／離線／未驗）；接續不重置，較早切片的「尚未」須依同任務最新證據判讀。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - **恢復範圍 successor（2026-09-30）：**T06／T08／T11／T12 依[共用執行 §6.4](../../specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)保留核心接續與安全退出；罕見原件遺失的全面追蹤／同工作再准入不再列為首版阻擋條件。已保存的結果及資料安全測試不刪減；本次最外層收尾證據見 [T12 §6](evidence/t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)，尚未勾選整項任務。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
@@ -15,9 +15,9 @@
 | 先核對，缺證據才補測 | 將 T16 要求對照既有 A 128K、共用 160K 與角色接線測試。B1／B2 自然旅程沒達門檻不等於壓縮失敗；若仍缺角色特有保證，再做最小有界測例，不為碰門檻重跑整場長訪談。**已完成（2026-10-02）：**B1／B2 以調低門檻的探針補了真模型證據，T16 已勾 | [T16 容量與接續](evidence/t16-compaction-continuity.md)、[驗證對照](../../implementation/verification-plan.md) |
 | 待分類，不先判成 bug | 長旅程的 10 筆 JD 待核對依據，先查原資料、工具與 context，分清正常未完成核對、已接受品質不足及真正契約錯誤；不把「待核對」當成 10 筆錯引，也不自動清除或加「歸零才交付」門檻。**已完成（2026-10-02）：**[逐筆分類](evidence/t17-v01-v28-closure.md#10-筆待核對依據的分類人工逐筆比對目前-jd-文字與引用原話)，0 筆契約錯誤，T17 已勾 | [T17](evidence/t17-course-administrator-journey.md)、[T14 已知不足](evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01) |
 | 可延後的品質優化 | 已接受的漏引、分析表達／知識技能分類、速度與 PDF 文字層限制如實交代；沒有新反例不再反覆改 Prompt、比較更貴模型或重跑同一試驗。資料安全、錯誤定位等核心契約缺陷不在此豁免 | [有效決策](../../current-decisions.md)、[T14](evidence/t14-job-analysis-quality.md)、[T13 PDF](evidence/t13-pdf-export.md) |
-| 最後才做的交付 | T16／T17 逐項結案後，再對照 T18 切換候選及啟停／入口證據；候選 worktree 不因本次整理被視為已完成或直接合併 | [T18 任務](#t18-新產品入口切換與舊程式退役)、[同源交付證據](evidence/t18-same-origin-web.md) |
+| 最後才做的交付 | **已完成（2026-10-02）：**T16／T17 結案後，切換候選重基、重驗，經 Owner 放行合併；T18 已勾 | [T18 任務](#t18-新產品入口切換與舊程式退役)、[同源交付證據](evidence/t18-same-origin-web.md) |
 
-**接續順序（2026-10-02 更新）：**T16／T17 已依上列結案並列出限制；剩下 T18：把切換候選重基到目前主線、重驗入口與啟停、核對放行條件，**放不放行由 Owner 決定**。查證、修改、付費試驗是不同動作；任何新的模型請求都需要有額度的帳戶（見 [T16 §12](evidence/t16-compaction-continuity.md#12-b1b2-輪前壓縮的真模型觀察2026-10-02執行前-manifest)）。
+**接續順序（2026-10-02 更新）：**T16／T17／T18 均已結案；之後的工作是補額度後的選配補測（B 批次壓後發布、真模型短旅程）與已知不足的後續研究，都不阻擋已完成的 gate。
 
 ## T01 工具鏈、契約生成與可測邊界
 
@@ -277,7 +277,8 @@
 
 ## T18 新產品入口切換與舊程式退役
 
-- [ ] T18；依賴：T17；依[本 Goal 的條件式切換授權](README.md)執行，先核對 gate、精確 tracked 退役清單及可恢復性，不擴張刪除範圍。
+- [x] T18；依賴：T17；依[本 Goal 的條件式切換授權](README.md)執行，先核對 gate、精確 tracked 退役清單及可恢復性，不擴張刪除範圍。
+- **2026-10-02 放行與切換完成：**Owner 在 T14／T16／T17 結案、候選重基並通過最終根檢查（Ruff 與 mypy 乾淨、後端 1,152、前端 162、build，exit 0）後明確放行。`target-cutover-candidate` 以快轉合併進 `target-rebuild`（本機，未 push）：根命令、workspace、lock、CI 指向 `apps/api`／`apps/web`；退役清單核對為精確的 379 檔（336＋41＋2，沒有範圍外刪除，16 個沿革檔保留），切換前基準 `6ad33bcb` 可取回；[ADR0079](../../adr/0079-target-rebuild-production-cutover.md) 轉 Accepted、取代 ADR0077。不刪 DB、volume、秘密或未追蹤檔，不遷移舊資料。候選上的真模型短旅程不是放行條件，因 OpenAI 帳戶額度用完而未跑。[紀錄](evidence/t18-same-origin-web.md#放行與切換2026-10-02)。
 - **2026-10-01 切換候選已備（未放行）：**入口、workspace、lock、CI、診斷命令、379 檔退役清單與根文件已備成獨立分支 `target-cutover-candidate` 的三個提交，原分支入口與 ADR0077 不變。乾淨 worktree 驗證：鎖定安裝、根 `check`（1,113 單元／契約＋162 前端測試＋生成核對＋build）、新 schema 遷移、`app:status`、`pnpm start` 同源 UI、硬停止重啟資料仍在；過程發現並修正「根目錄 pytest 17 個模組收集失敗」（`313acc54`）。不是另機／容器驗證，也不替代 T14／T16／T17 gate；不 merge、不勾 T18。[證據](evidence/t18-same-origin-web.md#乾淨-worktree-的根命令切換候選2026-10-01)。
 - **2026-10-01 切換決策草案：**[ADR0079](../../adr/0079-target-rebuild-production-cutover.md) 補齊 T18 的 successor 草案，標為 Proposed，連到原切換盤點及 gate；13 個本地連結、5 個錨點、3 處入口及未勾 gate 檢查通過。不改 ADR0077、不切根命令／CI、不刪碼、不新增付費驗證；純文件未重跑產品測試。草案不等於採用或驗收，T18 仍未完成。
 - **2026-10-01 核心跨層預審：**A 完成／取消與 UI／API／PDF 兩路獨立審查，主審核對 Memory 編排／固定發布；40 項真 PG 與 63 項離線回歸通過，沒有新阻擋缺陷。Luna 來源品質、容量校準及 Memory 解阻接線限制仍保留；僅校正文檔，不放行切換或勾整體完成。[範圍與驗證](review.md#5-核心旅程跨層審查2026-10-01)。

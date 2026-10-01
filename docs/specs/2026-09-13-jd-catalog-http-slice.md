@@ -1,8 +1,10 @@
 # JD：文件目錄、條件更新與建立查回
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 - 日期：2026-09-13；Topic：JD-R002；RS-1／2→3 隔離實作。承接[人工 HTTP](2026-09-13-jd-manual-http-slice.md)，ADR0075 Proposed／正式 ADR0060 不變。
 - 效果：從空白建立多份 JD、查列表、更名、封存及恢復；同一建立請求不會因回覆遺失而多出文件。只管理目錄資訊，不改 JD 正文、原話或 Memory。
-- 實作：[catalog_service.py](../../experiments/jd-relational-app/src/jd_relational/catalog_service.py)、[catalog_api.py](../../experiments/jd-relational-app/src/jd_relational/catalog_api.py)、[catalog SSOT](../../experiments/jd-relational-app/contracts/jd-catalog-http.schema.json)。仍沒有可操作管理畫面或完整顧問接線。
+- 實作：`catalog_service.py`（已退役）、`catalog_api.py`（已退役）、catalog SSOT（已退役）。仍沒有可操作管理畫面或完整顧問接線。
 
 ## 1. 入口與共同規則
 

@@ -1,5 +1,7 @@
 # JD 人工變更通知與模型回覆保存：RS-4 第一段
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 日期：2026-09-13。範圍：JD-R002／`experiments/jd-relational-app`，隔離施工；本稿記錄本次接點與驗收。完整 AI 回合、Memory／來源採用、聊天 API 及自然訪談尚未完成；不變更 ADR0060 production authority。
 
 ## 1. 本次實際效果
@@ -34,7 +36,7 @@ App 從同一版 JD 歷史取得人工／AI 修改事件，在實際模型請求
 6. `ExtendedModelResponse` 隨該模型步驟保存完整回覆與通知：document／dataset／run、revision、response id／digest、原 notice／digest。這些全由 App 提供，LLM 不填版本、身分或保存欄位。
 7. 外部收尾只接受固定 root checkpoint 中的成對結果與空 next／tasks／interrupts。最新 `get_state` 可能覆疊 pending writes，不能單看其 values 宣稱已保存或完成。JD SQL 與 Saver 仍是不同交易，沒有跨兩者原子性宣稱。
 
-程式落點：[context](../../experiments/jd-relational-app/src/jd_relational/consultant_context.py)、[history](../../experiments/jd-relational-app/src/jd_relational/notice_history.py)、[model](../../experiments/jd-relational-app/src/jd_relational/consultant_model.py)、[root state](../../experiments/jd-relational-app/src/jd_relational/runtime_checkpoints.py)。
+程式落點：context（已退役）、history（已退役）、model（已退役）、root state（已退役）。
 
 ## 4. 已發現失敗與有限修正
 
@@ -56,9 +58,9 @@ stream guard 使用所選版本三組 private seams：`_stream/_astream`、`_cre
 
 | 驗證 | 實際結果與限制 |
 |---|---|
-| [模型與通知](../../experiments/jd-relational-app/tests/test_consultant_context.py)／[串流](../../experiments/jd-relational-app/tests/test_consultant_model.py) | 同步／非同步、thread 不符、完整工具往返與 thinking signature、usage、tool pairing、原話保持、一次回合兩次通知、缺 terminal、cancel／cleanup、交錯隔離；固定模型／SSE，不是真自然顧問。 |
-| [同版事件](../../experiments/jd-relational-app/tests/test_notice_history.py) | A→B→A、不變／失敗排除、H 以後提交不混入、有界事件與省略計數、原歷史可查、基準／producer／receipt 不一致拒絕；真 PostgreSQL 18.6。 |
-| [真 SDK＋Agent＋PG](../../experiments/jd-relational-app/tests/test_consultant_context_postgres.py) | 兩輪人工 A→模型 H2；人工 B→A＋no_change→模型 H4，通知為 2 事件；所有持久 root 的 view 均配對完整 AIMessage。另驗第二輪缺 terminal 保留 H1 與原話；關連線／新 Saver、graph 只讀重開均不發新 HTTP。合計 4 次固定 SDK 請求、0 provider。人工 fixture 的 FakeAuthority 不證明 AI writer／host admission。 |
+| 模型與通知（已退役）／串流（已退役） | 同步／非同步、thread 不符、完整工具往返與 thinking signature、usage、tool pairing、原話保持、一次回合兩次通知、缺 terminal、cancel／cleanup、交錯隔離；固定模型／SSE，不是真自然顧問。 |
+| 同版事件（已退役） | A→B→A、不變／失敗排除、H 以後提交不混入、有界事件與省略計數、原歷史可查、基準／producer／receipt 不一致拒絕；真 PostgreSQL 18.6。 |
+| 真 SDK＋Agent＋PG（已退役） | 兩輪人工 A→模型 H2；人工 B→A＋no_change→模型 H4，通知為 2 事件；所有持久 root 的 view 均配對完整 AIMessage。另驗第二輪缺 terminal 保留 H1 與原話；關連線／新 Saver、graph 只讀重開均不發新 HTTP。合計 4 次固定 SDK 請求、0 provider。人工 fixture 的 FakeAuthority 不證明 AI writer／host admission。 |
 | root／人工流程回歸 | `notice_history`、`manual_runtime_postgres`、`runtime_checkpoints` 合組 88 PASS，含 8 項人工 native PG 接合與 11 項 notice PG。此組與上述 74 有重疊，不加總為獨立案例數。 |
 | Python 全組 | 首跑 1593 PASS／193 PG SKIP／31 setup ERROR；31 全因 Windows pytest 暫存目錄 ACL，尚未進測試。全新專案暫存目錄仍遇 sandbox 權限，沙箱外全新合成目錄僅補跑該檔，31 PASS。合計 1624 非 PG 案例通過，**不是一次全組零錯輸出**；193 個 opt-in 未全跑，僅受影響 PG 組按上列實測。 |
 | 契約／依賴 | Python／TypeScript codegen check PASS；lock 只新增兩套件，不改其他版本。未改 Web，未重跑無關 UI／build。 |

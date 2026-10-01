@@ -1,5 +1,7 @@
 # JD 聊天控制、保存對話與原修改結果接合
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 日期：2026-09-13。Topic JD-R002／RS-4 局部；隔離施工基準 `2734b82b`。此單位已通過離線、真 PG 接合及獨立窄審；不代表完整 App 通過。零產品模型呼叫、沒有新增資料表或更改 production authority；ADR0075 仍 Proposed、正式 ADR0060 不變。
 
 本單位讓同一個 App 接受原訪談請求、查看原回合狀態、取消／恢復並讀取已保存對話。JD 修改直接沿原共同業務保存；聊天 API 回傳真實修改結果，沒有逐次接受流程、另存一份聊天／JD 或新增 LLM 工作區。
@@ -22,7 +24,7 @@ Owner 本輪再次提醒：需求不清楚，或缺依據的做法可能增加�
 | `POST …/chat/runs/{run_id}/recover` | 原執行真正停止後才核回執並收尾；仍活動時只回狀態，不重播模型、來源或命令。 |
 | `GET …/chat/messages` | 固定 root／source 的原話及 AI 公開文字分頁；不暴露工具、thinking、signature 或原 provider payload。 |
 
-Input／RunState／HistoryPage／Problem 來自 [JSON Schema](../../experiments/jd-relational-app/contracts/jd-chat-http.schema.json)，用既有標準工具生成 Python／TypeScript，結果與人工 write state 直接引用原契約。[契約結果](../experiments/legacy-evidence/jd-relational-chat-http/schema-results.md)列版本、首敗與適用限制；不手改生成物或要求模型填 HTTP 身分。
+Input／RunState／HistoryPage／Problem 來自 JSON Schema（已退役），用既有標準工具生成 Python／TypeScript，結果與人工 write state 直接引用原契約。[契約結果](../experiments/legacy-evidence/jd-relational-chat-http/schema-results.md)列版本、首敗與適用限制；不手改生成物或要求模型填 HTTP 身分。
 
 `AiRuntime.inspect_run` 提供原回合事實；`ChatService` 接同一 `ManualService.status` 和結果投影；FastAPI 只做 route／輸入／固定錯誤出口。所有同步保存資料讀取納入同 owner 的關閉排空，實際 Future 仍由 App 持有；HTTP 等待者或斷線不取得 writer 生殺權。Origin、dataset 先於 body parsing，沿原 middleware、lifespan、threadpool、CORS 與安全診斷。保存或回覆遺失不能靠再送一次新 key 猜成功。
 
@@ -54,7 +56,7 @@ LLM 契約承接已核 [OpenAI function calling](https://developers.openai.com/a
 | 聊天 HTTP／真 PG／原生 SDK | [三個情境分批通過](../experiments/legacy-evidence/jd-relational-chat-http/http-results.md)：純訪談不增JD版、AI新增工作後人工改稿仍查回原結果、最後模型故障仍保留已提交JD。TestClient為ASGI接合，非socket／瀏覽器；模型請求由MockTransport攔截，0 provider。 |
 | 原回合 SQL 讀取 | [37個新離線及5個真PG案例通過](../experiments/legacy-evidence/jd-relational-chat-http/operation-results.md)；另既有history25例通過，範圍分開記，未假稱全PG回歸。 |
 | 單一生成格式 | [最後chat91例、codegen check、全生成TS與consumer正反例通過](../experiments/legacy-evidence/jd-relational-chat-http/schema-results.md)。ai_unavailable有獨立出口；沒有升級原套件或手改生成檔。 |
-| 獨立審查 | [CH-R01／P2已修且窄複核關閉](../experiments/legacy-evidence/jd-relational-chat-http/review-results.md)。另一組service／HTTP／scope／排空審查新增[13個反例](../../experiments/jd-relational-app/tests/test_chat_boundary_review.py)，包含原祖先查找缺口仍503、不新准入及查讀結束前不能close；未見新增P1/P2。這13例亦包含於最後完整離線數字。 |
+| 獨立審查 | [CH-R01／P2已修且窄複核關閉](../experiments/legacy-evidence/jd-relational-chat-http/review-results.md)。另一組service／HTTP／scope／排空審查新增13個反例（已退役），包含原祖先查找缺口仍503、不新准入及查讀結束前不能close；未見新增P1/P2。這13例亦包含於最後完整離線數字。 |
 
 首敗如實保留：新inspection port尚不存在時收集ImportError；新契約／SQL接點各自的先行反例詳子報告。主代理另先驗到兩個錯誤出口失配（缺文件與錯run字串被包為service_unavailable，**2 FAIL／3 PASS**），分開型別／HistoryError映射後相同反例通過，相關69例與最終全組均通過。真PG首敗是測試錯把「最新頁anchor」要求固定；人工保存本來會產生新root，修正為核消息不變、且舊cursor續頁仍固定，不放寬產品契約。沒有以刪除失敗紀錄或重跑到偶然成功代替修正。
 

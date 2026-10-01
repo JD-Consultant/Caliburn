@@ -1,8 +1,10 @@
 # JD：人工保存、操作查回與 HTTP 接合
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 - 日期：2026-09-13；Topic：JD-R002；RS-1／2→3 隔離實作。承接[宿主恢復](2026-09-13-jd-host-restart-recovery-slice.md)；不改 ADR0060，ADR0075 仍 Proposed。
 - 產品效果：App 以同一業務操作保存關聯式 JD；重送、斷線與重開後查原結果，不把候選或 HTTP 成功當成已保存。不新增模型呼叫。
-- 新責任檔：[manual_service.py](../../experiments/jd-relational-app/src/jd_relational/manual_service.py)、[manual_api.py](../../experiments/jd-relational-app/src/jd_relational/manual_api.py)、[HTTP SSOT](../../experiments/jd-relational-app/contracts/jd-manual-http.schema.json)。
+- 新責任檔：`manual_service.py`（已退役）、`manual_api.py`（已退役）、HTTP SSOT（已退役）。
 
 ## 1. 介面與責任
 

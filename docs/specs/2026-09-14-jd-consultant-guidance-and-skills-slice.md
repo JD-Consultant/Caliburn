@@ -1,5 +1,7 @@
 # 顧問方法接上新 App：A 指引、三項分析 Skills、Memory 行動指引與背景可用性
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 > **Successor（2026-09-22）：**本文件保留 9/14 當時只採用三項分析 Skills 的歷史證據；「不採用 `write-customized-jd`」已由[JD 撰寫方法 Skill 與主顧問提示審核](2026-09-22-jd-writing-skill-prompt-audit.md)窄幅取代。現行 A 仍不在日常訪談預載 JD 教材，但會在實質撰寫、修訂或全面核對 JD 時按需讀取該 Skill；A／B1／B2、Memory、工具與 Domain 權責不變。
 
 日期：2026-09-14；Topic：JD-R002；[H4 計畫](../plans/2026-09-14-jd-h4-runtime-integration.md) R3 第 3 項與第 6 項的指引部分。隔離 App，ADR0075 Proposed／production ADR0060 不變。零 provider。
@@ -62,11 +64,11 @@
 
 | 交付 | 位置 |
 |---|---|
-| A 指引＋JD 能力段＋Memory 行動指引 | [consultant_guidance.py](../../experiments/jd-relational-app/src/jd_relational/consultant_guidance.py) |
+| A 指引＋JD 能力段＋Memory 行動指引 | `consultant_guidance.py`（已退役） |
 | 三項分析 Skills 與 `SkillAssets`（套件，位元組相同） | `caliburn_memory/skills.py`、`caliburn_memory/skills/*/SKILL.md` |
 | `MEMORY_ACTION_GUIDANCE`（套件，逐字） | `caliburn_memory/guidance.py` |
-| 背景可用性提示 | [background_availability.py](../../experiments/jd-relational-app/src/jd_relational/background_availability.py) |
-| 組裝入口 | [consultant_app.py](../../experiments/jd-relational-app/src/jd_relational/consultant_app.py) |
+| 背景可用性提示 | `background_availability.py`（已退役） |
+| 組裝入口 | `consultant_app.py`（已退役） |
 
 ### 實際差異
 

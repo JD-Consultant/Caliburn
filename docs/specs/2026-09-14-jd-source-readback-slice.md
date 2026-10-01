@@ -1,5 +1,7 @@
 # 從 JD 的來源標記讀回自己說過的話
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 日期：2026-09-14；Topic：JD-R002；[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md) 第 4 項的「來源」。隔離 App，ADR0075 Proposed／production ADR0060 不變。零 provider。
 
 承接[來源標記](2026-09-13-jd-app-open-issues.md)（OI-02 的 2026-09-14 局部）：畫面已經會說「依據你說過的 N 段訪談」，但點不開。這一單位讓它點得開。
@@ -37,10 +39,10 @@
 
 | 交付 | 位置 |
 |---|---|
-| 唯讀路由 `POST /api/documents/{id}/jd/sources/read` | [query_api.py](../../experiments/jd-relational-app/src/jd_relational/query_api.py) |
-| 投影服務（包既有 source owner，沒有第二個擁有者） | [source_reads.py](../../experiments/jd-relational-app/src/jd_relational/source_reads.py) |
+| 唯讀路由 `POST /api/documents/{id}/jd/sources/read` | `query_api.py`（已退役） |
+| 投影服務（包既有 source owner，沒有第二個擁有者） | `source_reads.py`（已退役） |
 | 契約型別（由 SSOT 生成，`--check` 相符） | `contracts/jd-read.schema.json` 的 `SourceReadInput`／`SourceMessageRecord`／`SourceReadPage` |
-| 畫面：來源標記旁的「看第 N 段原話」與逐則標示角色的對話框 | [JdEditor.tsx](../../experiments/jd-relational-app/web/src/components/JdEditor.tsx)、[DocumentWorkspace.tsx](../../experiments/jd-relational-app/web/src/components/DocumentWorkspace.tsx) |
+| 畫面：來源標記旁的「看第 N 段原話」與逐則標示角色的對話框 | `JdEditor.tsx`（已退役）、`DocumentWorkspace.tsx`（已退役） |
 
 **實際行為：**別的文件的引用回 `invalid_ref`（422）。其餘失敗一律回 `read_failed`（500、`stop`）——**這是獨立審查改正的一點**：原本把它們當成 `target_missing`（404、`reread_current`），但 source owner 把「原回合真的不在了」和「讀取當下失敗」都收斂成同一個 `source_not_available`，這一層分不出來。分不出來就不能說「你的訪談不見了」還請員工繼續；不確定就照實說不確定。空陣列一樣不允許，那會被讀成「你從來沒說過」。不合格的請求連 source owner 都不會碰到；錯誤訊息不含連線字串。沒有裝 source owner 的組裝（例如純查詢探針）拒絕作答，不編造。畫面只在拿得到 handler 時才顯示「看第 N 段原話」，不透明 token 永遠不出現在畫面上；對話框底下明說顧問的回覆是當時的整理用語、不是員工確認過的事實。
 

@@ -1,8 +1,8 @@
 # ADR 0079：新目標重建的正式切換與舊程式退役
 
-- 狀態：**Proposed（2026-10-01）；只完成切換決策草案，尚未切換或退役。**
-- 決策者：Product Owner；工程代理依既有 Goal 的條件式授權準備與驗證，不由草案自行放行。
-- 擬取代：[ADR0077](0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 的正式實作、資料初始化及操作入口；Accepted 前 ADR0077 仍有效，原紀錄不改寫。
+- 狀態：**Accepted（2026-10-02；Owner 放行）。**2026-10-01 以 Proposed 草案提出；放行後已完成切換並退役舊程式，見文末「放行與切換紀錄」。
+- 決策者：Product Owner；工程代理依既有 Goal 的條件式授權準備與驗證，不由草案自行放行；2026-10-02 Owner 明確放行。
+- 取代：[ADR0077](0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 的正式實作、資料初始化及操作入口；ADR0077 原紀錄不改寫，索引標為 Superseded by 0079。
 - 範圍：將已授權重建的新產品提升為唯一正式入口。不重新決定領域、工具、Context 或保存契約。
 
 ## 脈絡
@@ -33,13 +33,13 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 
 是否可以正式化以[任務表 T18](../plans/2026-09-29-target-rebuild/tasks.md#t18-新產品入口切換與舊程式退役)、[計畫完成條件](../plans/2026-09-29-target-rebuild/README.md#5-整個-goal-的完成條件)及[驗證對照](../implementation/verification-plan.md)為準，不在本頁另建較寬鬆的驗收表。順序為：前置品質／容量／旅程 gate 成立 → 核定本次精確切換範圍 → 切換並驗證根入口與交付 → 同步正式權責與文件。
 
-截至 2026-10-02，**T14、T16、T17 已依實測與已知不足清單結案，T18 未完成（待 Owner 放行）**。採用時必須查回、不由本 ADR 升格或豁免的限制：
+截至放行（2026-10-02），**T14、T16、T17 已依實測與已知不足清單結案；T18 於 Owner 放行後完成**。採用時查回、不由本 ADR 升格或豁免的限制：
 
 - Luna 跨輪 JD 來源漏選等品質不足由 Owner 決定列為已知不足、不再阻擋；清單與成因見 [T14 已知不足](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)，逐項實測判定見 [T17 V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)（通過 12、部分 6、離線／PG 9、未驗 1）。
 - 壓縮：A 的輪前壓縮有自然觸發的真模型證據，B1／B2 以調低門檻的探針觀察到輪前壓縮被採用，批次因帳戶額度用完未能發布快照；見 [T16 證據](../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md#12-b1b2-輪前壓縮的真模型觀察2026-10-02執行前-manifest)。
 - Memory 最終失敗後已接線：正式訪談再前進三輪才允許一次新批次（2026-10-01，**政策待 Owner 核對**）；沒有在真長旅程中自然觸發。見 [T11 證據](../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)。
 - 資料庫伺服器重啟後必須重啟 App（單一 leader 設計，不自動重連）；見 T14 已知不足第 7 列與 [runbook](../runbook.md#診斷)。
-- 2026-10-02 起 OpenAI 帳戶額度用完，補額度前沒有新的真模型驗證；候選分支上的真模型短旅程尚未執行。
+- 2026-10-02 起 OpenAI 帳戶額度用完，補額度前沒有新的真模型驗證；放行時候選上的真模型短旅程尚未執行（不是放行條件），補額度後可補跑。實驗發現的全部問題見[實驗發現的問題彙整](../reports/experiment-findings.md)。
 
 這些是採用審查時必須查回的狀態，不由本 ADR 升格、豁免或增加新需求。後續變化只在各任務 evidence 與任務表維護，再於正式化時核對本節。
 
@@ -62,3 +62,12 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 收益是正式入口、CI 驗收對象與責任文件一致，後續開發不必維護兩套產品。代價是沒有舊資料／API 相容承諾，新環境需按新說明設定；Luna 的實際分析品質仍必須獨立驗證，切換本身不會改善模型效果。
 
 未採用的路徑：長期雙產品／相容 adapter 會增加資料與維護責任且非 Owner 需求；前置 gate 未過就切換則會把可跑 Demo 冒充完整交付。兩者均不作本次切換方案。
+
+## 放行與切換紀錄（2026-10-02）
+
+- **決定：**T14、T16、T17 結案、候選分支重基並通過最終驗證後，Owner 在「放行／先補額度再放行／先不放行」中選擇**放行**。
+- **執行：**`target-cutover-candidate` 以快轉合併進 `target-rebuild`（只在本機，沒有 push、沒有對外部署）：切換前最後一個提交是 `6ad33bcb`，切換後 head 是 `9438347c`（9 個提交）。根命令、workspace、lock 與 CI 指向 `apps/api`／`apps/web`。
+- **驗證：**`9438347c` 的根 `pnpm run check` exit 0（Ruff 433 檔、mypy strict 280 檔、node 測試 5、後端單元／契約 1,152、前端 162、契約生成核對、production build）；合併後的樹與該提交相同。與主線的差異刪除正好 379 個檔（336＋41＋2），沒有範圍外刪除，16 個沿革檔保留。細節見 [T18 證據](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#放行與切換2026-10-02)。
+- **取回：**舊程式在 `6ad33bcb` 及更早的提交完整存在，例如 `git show 6ad33bcb:experiments/jd-relational-app/README.md`。
+- **沒動的：**DB、volume、秘密、ignored 與未追蹤檔、Demo、RAG；沒有遷移舊資料。
+- **限制不因放行消失：**見上方「採用前條件與目前限制」與[實驗發現的問題彙整](../reports/experiment-findings.md)。

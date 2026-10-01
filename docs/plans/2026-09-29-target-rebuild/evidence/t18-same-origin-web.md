@@ -211,3 +211,18 @@ Ruff 檢查／格式通過，mypy **274 source files 無問題**。未重跑與�
 - 以根 `pnpm start --port 8104` 從重基後的樹重啟（只停止以命令列與埠確認身分的候選後端 3 個程序）：首頁 200 `text/html`、`/job-files/<id>` 深連結在瀏覽器式 `Accept` 下 200、缺失 API 404、`/api/health` ok、先前驗證資料仍在（1 份職務檔案）。探針腳本兩處本機小錯（用了 PowerShell 唯讀的 `$home`、深連結沒帶 `Accept`）已修正，不是產品問題。
 
 **仍未驗：**候選分支上的真模型短旅程與 PDF——**OpenAI 帳戶額度已用完**（2026-10-02 05:16 起，見 [T16 §12](t16-compaction-continuity.md#12-b1b2-輪前壓縮的真模型觀察2026-10-02執行前-manifest)），補額度前不執行；它不在 T18 要求的「先驗」清單內，產品程式碼與原分支相同（重基只帶入文件與 harness 腳本／測試），因此不是放行阻擋條件，但放行前若有額度建議補一次（約 US$0.1）。同機驗證的限制（非另機／容器）不變。**T18 不勾**：放行與否由 Owner 決定。
+
+## 放行與切換（2026-10-02）
+
+**決定：**T14／T16／T17 結案、候選分支重基並通過最終驗證後，Owner 在「放行／先補額度再放行／先不放行」中選擇**放行**。
+
+| 項目 | 結果 |
+|---|---|
+| 合併 | `git merge --ff-only target-cutover-candidate`：`target-rebuild` 由 `6ad33bcb` 快轉到 `9438347c`（9 個提交）；只在本機，沒有 push、沒有對外部署 |
+| 最終檢查 | `9438347c` 的根 `pnpm run check` exit 0：Ruff 433 檔、mypy strict 280 檔、node 測試 5、後端單元／契約 1,152、前端 162（28 檔）、契約生成核對、production build；快轉後的樹與該提交相同，所以不需另跑 |
+| 退役清單 | 與主線 diff：刪除正好 **379** 檔（`experiments/jd-relational-app` 336、`packages/consultant-memory` 41、`scripts` 2），範圍外 0；保留 16 個 Markdown／`adoption.json` 沿革檔；另 5 個新增、19 個修改 |
+| 可取回 | `git show 6ad33bcb:<路徑>`；ADR0079 的清單重建命令實測得 377 個非 Markdown 檔（336＋41）加 2 個啟動器。重基後先前引用的 `d08a3b09` 不在歷史內，已全部改引 `6ad33bcb`（本檔上方表格的舊雜湊是重基前的歷史紀錄） |
+| 沒動的 | DB、volume、秘密、ignored 與未追蹤檔（舊目錄裡的 `node_modules`、cache 等本機殘留檔仍在）、Demo、RAG；沒有遷移舊資料 |
+| 文件同步 | ADR0079 → Accepted、ADR 索引標 0077 為 Superseded by 0079；README／ARCHITECTURE／AGENTS／docs 導覽、目標架構地圖與六份架構文件的狀態、任務表、current-decisions 同步 |
+
+**仍保留：**候選 worktree `S:\caliburn-cutover` 與分支 `target-cutover-candidate`（現與主線同一提交）、候選 app 8104（schema `cutover_verify`）仍在；是否清理由 Owner 決定，本次不刪除。**限制不因放行消失**：候選上的真模型短旅程與 PDF 因 OpenAI 帳戶額度用完未跑（不是放行條件）；同機驗證非另機／容器；其餘見[實驗發現的問題彙整](../../../reports/experiment-findings.md)。

@@ -1,6 +1,6 @@
 # 跨 App 設計與歷史索引
 
-本目錄同時有獨立保留範圍與已退役設計，不因仍有文件就稱為 active。新目標從[架構地圖](../target-architecture-map.md)進入；正式產品權責依 [ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
+本目錄同時有獨立保留範圍與已退役設計，不因仍有文件就稱為 active。現行架構從[架構地圖](../target-architecture-map.md)進入；正式產品權責依 [ADR0079（Accepted）](../adr/0079-target-rebuild-production-cutover.md)，[ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)只作舊產品沿革。
 
 ## 現行設計
 

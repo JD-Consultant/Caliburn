@@ -67,7 +67,7 @@ Caliburn 讓員工與 AI 顧問透過持續訪談，逐步弄清該員工**完�
 
 **PROD-G1-031（2026-09-27，Owner 已確認；同日依既有資料庫設計補正）：JD 採關聯式結構，人應能方便管理各個欄位、項目與關係，不以整份 Markdown 文件作為編輯單位。**這不是只有「任務內 O／P／K／S 四欄」，也不是現在才開始設計 JD 資料庫。AI 與人編修同一份結構化 JD；新增任務可一併建立已知成果／要求及連結適用知識／技能，不要求使用者編修整份長文或資料庫關係。
 
-**既有模型僅作底稿：**[關聯式資料庫契約 §1–3](specs/2026-09-12-jd-relational-schema-and-write-contract.md)、[管理編輯器 §3–4](specs/2026-09-12-jd-relational-editor-design.md)及現行 schema（已退役）。下表借用既有名稱說明關係，不強制新目標沿用表、框架、資料或舊生命週期。現行正式採用由 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)確認；新目標模型可見欄位與工具由[JD 契約](specs/2026-09-29-jd-model-tool-contract-review.md)維護，不能由既有表反推新需求。
+**既有模型僅作底稿：**[關聯式資料庫契約 §1–3](specs/2026-09-12-jd-relational-schema-and-write-contract.md)、[管理編輯器 §3–4](specs/2026-09-12-jd-relational-editor-design.md)及舊 schema 已退役。下表借用既有名稱說明關係，不強制沿用表、框架、資料或舊生命週期。舊產品當時的採用由 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)記錄；現行產品權責依 [ADR0079（Accepted）](adr/0079-target-rebuild-production-cutover.md)，模型可見欄位與工具由[JD 契約](specs/2026-09-29-jd-model-tool-contract-review.md)維護，不能由舊表反推新需求。
 
 | 既有 JD 內容／關係 | 應如何理解與管理 |
 |---|---|

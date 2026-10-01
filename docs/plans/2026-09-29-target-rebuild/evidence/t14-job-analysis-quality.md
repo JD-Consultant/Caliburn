@@ -640,3 +640,42 @@ Memory 最新快照另作唯讀抽查：3 情境、1 理解保留已知工作、
 ### 2026-10-01：Owner 決定維持 Luna
 
 Owner 先答覆「暫留 Luna，先完成其他交付」，再明確指定「本產品就使用 Luna，成本考量」。因此上一段的 Sol 選型候選**不採用於產品**；A／B1／B2 維持 `gpt-6-luna`／high，不推進模型切換、歷史轉換或追加 Sol 付費比較。研究原件保留，實際已發生的成本與品質比較不改寫；Sol 樣本也不能冒充 Luna 已改善。產品選型 authority 路由見[目前決策](../../../current-decisions.md)，T14／T17 原已知品質限制仍有效。
+
+## 2026-10-01：B1 資訊精度的有界診斷
+
+### 執行前 manifest
+
+基準 `cabd9e52`；遵守 Luna 選型，不重播 A 的來源描述／欄位順序假說。唯讀原 high 旅程，首次 B1 批次 `05d4aef7-36cf-47d8-8a79-0f755f9b11d8` 在情境建立呼叫中首次將「還有人付款資料對不起來」寫為「另有一人」。此前 App 資料與 `read_interview` 原文都沒有該數字，亦無顧問正文引入它；之後三次修訂沿用該句。錯誤已存在於模型參數，不能歸因於 DB 改寫或長 Context 遺漏。這只定位失真發生處，不宣稱可知模型內部原因。
+
+依[工作分析指南 §2、4](../../../specs/2026-09-09-complete-work-analysis-guide.md#4-案例工作理解與-jd如何取捨而不丟失)及[欄位指南的數字界線](../../../specs/2026-09-09-jd-field-and-writing-guide.md#p-的建議名稱與數字邊界)，候選只將 B1 原有「印象不升確定」一行擴清為數量／頻率／範圍的資訊精度；已明確數字照實保留，含糊量詞不補成精確值。不加入此案例答案、數字 validator、reviewer 或新工具。官方 [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering)提供指令與示例方法，沒有保證 Luna 語意遵循；本片必須看實際產物，不以提示字串存在為品質證據。
+
+原失真前的六個原生 items 保留，使用現行 B1 指引作基準（不改寫已保存歷史）；另兩個未用於調整候選文字的合成對照為設備數量／估計、收貨精確數量／單次耗時。作者知道素材，非盲測。三例各基準／候選一次，均保留 B1 全部六工具，但以官方 `tool_choice` 限定本次 `create_work_situation` 參數觀察；不是自然完整 Agent 旅程、實際工具寫入或發布。原例可分成多個情境，單一寫入若不涵蓋目標事實只算未觀察。
+
+上限：6 count＋6 create；Luna／high／all_turns、store=false、非串流；每請求 input≤16,000、output≤8,192、120 秒，整批720秒，零重試、串行，估算費用預留 US$0.25。任一外送／wire／完整性失敗即停，不追加同類試次；沒有辨別力或改善就不改產品。只外送已核對的合成輸入及角色契約，不讀私人訪談、不執行工具、不改 Demo。腳本 `.research-tmp/eval/probe_situation_precision.py`，結果獨占建立 `situation-precision-20261001.jsonl`；不保存 opaque reasoning 或憑證。此為有限品質診斷，不是單元 TDD；若採用，再驗正式角色接線與受影響回歸。
+
+外送前環境處置：首次沙箱 count 得 `APIConnectionError`，無 create；無憑證 GET 同樣被 `127.0.0.1:9` 拒絕，確認是本機網路限制，不當作模型失敗。保留原件，申請允許外連後僅重開同六次生成上限，結果獨占建立 `situation-precision-network-20261001.jsonl`；總 count 嘗試上限因此為7，create仍為6。沒有原地覆寫失敗、SDK重試或增加生成試次。
+
+探針修正：第一例基準已生成完成且 wire 合法，但探針把 `list[InterviewReference RootModel]` 直接與 `[2]` 比較而誤停；原結果仍完整。改以 `model_dump()` 的 wire 值比較，離線重驗原結果，**不重送已成功基準**。剩餘五次寫入另一獨占原件 `situation-precision-remaining-20261001.jsonl`，執行前核對原請求指紋；總生成上限仍6。這是測試程式的斷言錯誤，不是產品工具、模型引用或語意失敗。
+
+### 結果與採用決定
+
+6 次生成均完成，0 次模型重試、0 次工具執行、0 次業務寫入；另有前述未達 provider 的沙箱 count 失敗。原始結果仍保留探針誤報的 `AssertionError`，離線以生成模型重新驗證六份原參數皆合法、來源序號均為2，不回寫歷史原件。兩個版本在本次三例的數量／範圍／確定程度均符合已知事實：
+
+| 素材 | 基準與候選的共同結果 | 邊界 |
+|---|---|---|
+| 原攝影班個案 | 兩個人重複報名；「另有人的付款資料對不起來」，沒有補一人 | 單次、強制建立操作；不能抹除原自然批次曾失真 |
+| 北樓設備 | 三台無法啟動；標籤數與是否屬這三台未知；保留「印象中每月」「約兩小時」 | 沒有把主管排程權變成本人權限 |
+| 收貨個案 | 五箱／破損兩箱／完整三箱、約半小時均保留；未推為固定每天五箱 | 已知精確數值沒有被過度模糊化，退貨決定仍屬主管 |
+
+**不採用候選：**此片沒有重現原失真，也沒有顯示增加指引能改善品質；保持產品 Prompt、工具與 Context 不變，停止這個假說，不再追加同類重測。這不是原缺陷已修復、自然 Memory 發布通過或普遍正確率證據。原例兩組仍有重複背景／未知敘述；B2 精煉、A 長歷史跨輪依據及其他 T14／T17 範圍不在本次已驗結論內。後續不再以加同義規則處理此反例；需新的可辨別證據才重開。
+
+回報 generation usage 合計 input **18,022**、output **3,426**；依本機已核對 Luna 普通／cache read／cache write／output 分項費率估算 **US$0.002823710**，不是供應商帳單，count 計費未另證實。原始快照指紋 `bef3c4e31ae23ad69c3fa289bf5126fcd53542e10451dc9c1b032c2e799f2926`。本機診斷原件 SHA-256：
+
+| `.research-tmp/eval/` 原件 | SHA-256 |
+|---|---|
+| `probe_situation_precision.py` | `a868e13ca02a1771832d64cc02a261a61eb7b3301bb3de6338e92b3d0d67265c` |
+| `situation-precision-20261001.jsonl` | `a8a2f95b2fdef4a8302eabe39774e76a34c1e06f65a534a5a00269acea563740` |
+| `situation-precision-network-20261001.jsonl` | `f5579af40e6c86d3d4a68321d00e3fb49ea4cb36b3e4bc975cc1728066e82789` |
+| `situation-precision-remaining-20261001.jsonl` | `fa418c89c22694da32cbd85c1e6a2c5c0e90ad3787edfacf4602a679fccea0ec` |
+
+僅維護本 evidence 與任務路由，不新增產品規則或標記 T14 完成；`git diff --check` 與兩檔 153 個相對檔案連結檢查通過（後者不含片段錨點驗證），不為未採用候選重跑整套程式測試。

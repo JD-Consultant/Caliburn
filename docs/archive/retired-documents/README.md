@@ -13,6 +13,6 @@
 | [Evidence-first 舊候選](specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md) | 原文已於 07-16 明示不再是實作目標；研究推導保留，不沿舊 C0–C2 施工 |
 | [Job Authoring v2 儲存](specs/2026-07-24-job-authoring-v2-relational-storage-research.md) | 原文已於 07-29 明示被取代；不恢復舊資料模型 |
 
-上述舊通知可能指向已不存在的 `task-analysis-engine.md`，是既有歷史斷鏈，不替它虛構目前繼任契約。當前產品分工查 [ADR0077](../../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)，新目標查[架構地圖](../../target-architecture-map.md)。
+上述舊通知可能指向已不存在的 `task-analysis-engine.md`，是既有歷史斷鏈，不替它虛構目前繼任契約。當前產品分工查 [ADR0079（Accepted）](../../adr/0079-target-rebuild-production-cutover.md)與[架構地圖](../../target-architecture-map.md)；ADR0077 只作舊產品沿革。
 
 此分類**不將仍保留的 [RAG pipeline](../../design/rag-pipeline.md) 退役**，也不代表其他尚未逐項核對的舊文件可以刪除。

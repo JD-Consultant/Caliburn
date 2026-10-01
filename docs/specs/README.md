@@ -17,7 +17,7 @@
 | JD 欄位與模型工具 | [JD 工具契約](2026-09-29-jd-model-tool-contract-review.md) |
 | 程式如何實現及測試 | [實作規範](../implementation/README.md) → [施工計畫](../plans/README.md) |
 
-表格只提供按主題的入口；完整責任集合仍由目標架構地圖維護。正式產品（切換候選）另看 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)；舊產品的權責與設計沿革見 [ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)與[舊設計](../design/README.md)，不把兩代架構拼成一套。
+表格只提供按主題的入口；完整責任集合仍由目標架構地圖維護。正式產品切換依 [ADR0079（Accepted）](../adr/0079-target-rebuild-production-cutover.md)；舊產品的權責與設計沿革見 [ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)與[舊設計](../design/README.md)，不把兩代架構拼成一套。
 
 ## 不同用途不要混讀
 

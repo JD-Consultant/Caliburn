@@ -8,12 +8,12 @@
 
 ## 保留原則
 
-**2026-10-02 整理：**教授報告已收錄於 [`docs/reports/system-architecture`](../reports/system-architecture/README.md)，完成的 checkout 已移除；接著依 Owner 授權將歷史分支收斂為封存 tag，詳見本頁下方「本機分支收斂」。新目標實驗原件、舊施工計畫與本機測試暫存的移轉見[整理紀錄](repository-organization-2026-10-02.md)。`target-cutover-candidate` 尚待 gate，工作樹仍保留；下列 2026-09 歷史紀錄不改寫。
+**2026-10-02 整理：**教授報告已收錄於 [`docs/reports/system-architecture`](../reports/system-architecture/README.md)，完成的 checkout 已移除；接著依 Owner 授權將歷史分支收斂為封存 tag，詳見本頁下方「本機分支收斂」。實驗原件、舊施工計畫與本機測試暫存的移轉見[整理紀錄](repository-organization-2026-10-02.md)。ADR0079 正式切換後，`target-cutover-candidate` 亦已收尾，詳見文末「切換後候選工作樹收尾」；下列 2026-09 歷史紀錄不改寫。
 
 - 已提交的研究文件、設計文件、實驗案例、模型輸入／輸出與結果都保留在 Git 歷史中。
 - 舊 worktree 的提交以 archive tag 保存；刪除本機 checkout 或 GitHub 舊分支不等於刪除文件。
 - 下列 tag 是歷史參考，不是目前產品的施工授權，也不能單獨推翻現行決策。
-- 未提交的 `node_modules`、pytest cache、資料庫暫存檔等本機產物不屬於研究證據，未納入封存。
+- 未提交的 `node_modules`、pytest cache 等本機產物不納入 Git 研究封存；需要保留的殘留另存 ignored 本機封存，不等於公開實驗證據。資料庫與秘密不以一般快取處置。
 
 ## Archive tag 對照
 
@@ -41,11 +41,11 @@
 
 ## 目前分支與封存的界線
 
-目前產品正式分支是 `main`。現行 `docs/` 已包含目前可直接查閱的 ADR、design、plans、specs 與 experiments；worktree tag 與 branch snapshot 補足尚未整理進現行入口的歷史研究與實驗資產。未來整理報告時，應新增報告或索引連結，不要把互相衝突的歷史決策直接覆蓋或混回 current 文件。
+目前本機產品工作位於 `target-rebuild`，正式產品權責依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)；`main` 仍保留原分支，不能從分支名稱推定已包含新產品，也未因此更新遠端。現行 `docs/` 已包含目前可直接查閱的 ADR、design、plans、specs 與 experiments；worktree tag 與 branch snapshot 補足歷史研究與實驗資產。未來整理報告時，應新增報告或索引連結，不要把互相衝突的歷史決策直接覆蓋或混回 current 文件。
 
 ## 2026-10-02 本機分支收斂
 
-Owner 核准在保留有用報告與完整歷史後整理本機分支。清理前基準為 `target-rebuild@916862ee`，18 個本機分支收斂為以下 4 個；沒有合併程式、推送、刪除遠端分支或改動兩個仍在使用的工作樹。
+Owner 核准在保留有用報告與完整歷史後整理本機分支。清理前基準為 `target-rebuild@916862ee`，當時 18 個本機分支收斂為以下 4 個；沒有合併程式、推送、刪除遠端分支或改動當時兩個仍在使用的工作樹。這是切換前紀錄，後續狀態見文末。
 
 | 保留分支 | 用途 |
 |---|---|
@@ -99,3 +99,19 @@ git branch docs/professor-architecture refs/tags/archive/professor-architecture-
 ```
 
 這只還原本機分支；若要恢復原 upstream，另外依 CSV 核對目前遠端後設定，不把舊記錄視為仍有效。需要 checkout 時才另建 worktree，不能覆蓋既有工作目錄。沒有執行遠端 prune 或 Git GC；原 tip 及其祖先由上述 refs 保留，恢復不依賴已刪分支的 reflog。
+
+## 切換後候選工作樹收尾（2026-10-02）
+
+Owner 交接確認其他工作已結束後，以 `target-rebuild@b487e883` 核對：`target-cutover-candidate` 的 tip `9438347c8113517d3b4da9c7934bda4861a0c374` 是主線祖先，沒有未提交或未追蹤工作。候選比目前主線早，不稱為兩者 HEAD 相同。
+
+- 先停止交接清單的 8103／8104，再將候選的 36 組 ignored 依賴／快取／建置輸出移入本機封存；確認工作樹不再有未保全檔案後，以 `git worktree remove`（無 force）移除 `S:\caliburn-cutover`，以 `git branch -d` 移除已合併的分支名稱。
+- 保留 `main`、`target-rebuild`、`docs/target-rebuild-architecture-2026-09-30` 三個本機分支，工作樹只剩 `S:\caliburn`。沒有 push、遠端刪除、merge、prune 或 GC，也沒有為已在主線的提交另建 tag。
+- ignored 封存與驗證範圍見[切換後整理紀錄](repository-organization-2026-10-02.md#正式切換後收尾2026-10-02)。資料庫、秘密、報告與實驗證據保留。
+
+需要重看候選 checkout 時，在確認下列路徑及分支名稱均尚未使用後執行：
+
+```powershell
+git worktree add -b target-cutover-candidate S:/caliburn-cutover 9438347c8113517d3b4da9c7934bda4861a0c374
+```
+
+這只恢復提交中的內容；依賴應依 lock 重建。本機封存可按 `relocations.csv` 找回原產物，不將搬移過的虛擬環境當成可直接執行的環境。

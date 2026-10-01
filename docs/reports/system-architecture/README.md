@@ -10,7 +10,7 @@ Caliburn 的目標不是讓員工學會寫職務說明書（Job Description，JD
 
 - 撰寫日期：2026-10-01。
 - 程式與文件基準：`af40ede853c26f6d690b807724ac6adadc58881b`，取自 `target-rebuild`；報告獨立維護於 `docs/professor-architecture`。
-- 收錄紀錄（2026-10-02）：原報告分支 `docs/professor-architecture@c5650c15` 的 34 份文件／圖稿已收進目前 repo 的同一路徑；已完成的工作樹移除，原分支保留。本次只整理位置與入口，不更新本報告的程式基準或驗收結論；詳見[封存紀錄](../../archive/repository-organization-2026-10-02.md)。後續報告編修以本目錄為入口，不維護兩份正文。
+- 收錄紀錄（2026-10-02）：原報告分支 `docs/professor-architecture@c5650c15` 的 34 份文件／圖稿已收進目前 repo 的同一路徑；已完成的工作樹與本機分支移除，原提交以 `archive/professor-architecture-20261002` tag 保留。本次只整理位置與入口，不更新本報告的程式基準或驗收結論；詳見[封存紀錄](../../archive/repository-organization-2026-10-02.md)。後續報告編修以本目錄為入口，不維護兩份正文。
 - 描述對象：新架構 `apps/api`、`apps/web` 的設計與已存在實作，不是舊正式產品的架構圖。
 - 後續確認：第五章與圖六依 Owner 本次確認，採 B1 → B2 → 發布、不回交 B1；與上述程式基準的差異記於[附錄校核紀錄](references.md#本次文件校核範圍)。
 - **交付狀態：核心已接通，尚未全案驗收，也尚未完成正式入口切換。**品質、長旅程及交付限制見第七章。不能用本報告取代驗收結果。

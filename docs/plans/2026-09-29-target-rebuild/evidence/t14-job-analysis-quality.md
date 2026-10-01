@@ -716,3 +716,60 @@ Owner 先答覆「暫留 Luna，先完成其他交付」，再明確指定「本
 | `luna-xhigh-20261001.jsonl` | `cf973fd5d4dcd4eaed283d748494b81c3b193347b37485c72980982f0c3cc2b6` |
 
 本片只維護 evidence 與任務路由，不勾選 T14／T17，也不為未採用的設定重跑全套產品測試。
+
+## 2026-10-01：Luna Memory 部分資訊與跨批更正驗收
+
+### 執行前 manifest
+
+基準 `2778da8e`；沿 Owner 的 Luna／high 定案，不改 Prompt、tool、Context、模型或產品容量政策。依[官方 eval 方法](https://developers.openai.com/api/docs/guides/evaluation-best-practices)檢查任務特定的實際產物、工具參數與交接，而非只看 `complete`；內容依工作分析指南 §4／6／9 及既有品質 rubric，不另造評分服務。
+
+- 使用 fixtures v3 的 `ten_percent_is_not_whole_job`（development）與 `one_off_event_does_not_change_regular_scope`（holdout_candidate；已由工程代理讀過，不宣稱盲測）。前者一次處理兩筆員工原話；後者分兩批，先由真 B1／B2 建立原 Memory，再加入員工更正進行第二批，不注入 fixture 的理想情境。
+- 前置訪談以既有輸入／完成 owner 建立；App 開場沿產品固定文字，取代 fixture 第一則開場，後續員工原話與顧問前問保持原文。顧問回覆為明示的合成 seed；不評 A 引導、JD 或完整產品旅程。oracle、判準及預期成果不送入模型。
+- 直接組合現有 Memory parent、B1／B2 runner、真工具、PostgreSQL saver 與正式發布讀取；只在 `127.0.0.1:55439/caliburn_t01_test` 新建 `memory_quality_20261001_*` schema。每例獨立檔案，所有資料全合成；不接 Demo／私人訪談、不新增產品元件。
+- 最多三批，每批共用 **16 次 model、48 次 outbound、每 request 1 attempt**，不自動重試；output≤8,192、單請求120秒、批次240秒、整組900秒。每批驗證費用界線 US$0.25，合計 US$0.75；沿現有 token count／費用預留，非產品金額攔截。保留原本壓縮政策，本組預期不觸發；若觸發仍受每批最多1次及原費用預留約束，不增加試次。Parent 沿原本至多兩次具體情境回交，仍共用同一批總額度。
+- 任一 provider／協定／容量或結構保存失敗即停止後續批次，由既有 owner 安全收尾，不以重跑挑最佳結果。語意錯誤照實記錄；三批上限不是失敗後另送三批。保留先前已成立快照與原始證據，不清除測試 schema。
+- 腳本 `.research-tmp/eval/verify_memory_quality.py`，輸出獨占建立 `memory-quality-20261001.jsonl`；保存指紋、合成來源、發布正文／引用、交接 diff、公開工具與安全用量，不保存 opaque reasoning 或憑證。這是已有行為的非確定品質驗收，不稱單元 TDD。
+
+判準：部分資訊保留合併／電子郵件去重／交接與未談範圍；不得把一成當工時或完整性分數。跨批更正保留每日桌椅與一次清窗，區分顧問假設、已發生事實及未來責任未知；B2 不泛化為全面日常清潔。實際引用須支持主張，B2 沿真 B1 產物完成；舊快照不可被第二批改寫。分組／工具順序不鎖死，精簡不以字數短為唯一指標。獨立人類領域校準、原跨輪 JD 漏引及整體 T14／T16／T17 gate 仍未完成。
+
+### 實際結果與復核
+
+三批均完成 **真 B1 → B2 → 正式發布**，共6個角色階段、29次 generation、31次 count、0次 compact、0次 HTTP 重試／provider 失敗，批次執行合計122.32秒。隔離 schema `memory_quality_20261001_78306f9a` 保留；沒有啟動 App server、觸碰 Demo 或修改產品程式。
+
+| 實際批次 | 正文與來源效果 | 判定／限制 |
+|---|---|---|
+| 一成案例，F=4 | 情境引用2＋4，保留 Excel 合併、電子郵件去重、交活動承辦及尚未談完；理解明示「一成」是說明進度而非工作占比 | 本例事實／範圍／未知／引用內容 pass；沒有補常見行政工作，未知條目及描述仍偏長 |
+| 清窗首批，F=2 | 真模型建立1情境＋1理解，兼容每日桌椅及一次展覽清窗；清窗未來責任仍未約定，引用2 | 合併分組合法，兩種頻率／責任仍清楚；未要求逐項情境數 |
+| 清窗更正批，F=4 | 情境保留既有身分，新增第4則及更正正文；B2 接到正文與引用變更 diff、受影響理解名稱，讀目前情境／理解後修改原理解 | 未把顧問前問當事實，未刪一次清窗，未把未知責任肯定／否定化；正式引用選用新情境修訂 |
+
+更正批中 B1 一次提交含檔案 envelope 的 body patch，被既有工具以 `invalid_patch` **全筆拒絕**；模型依回傳自行重送合法的局部 diff，後續完成。這是一次模型工具格式錯誤與既有修正路徑，不是零工具錯誤，也不是 App／SDK 自動重試。沒有為此放寬 V4A 邊界或增提示補丁。
+
+離線唯讀核對實際 checkpoint 與已發布圖：
+
+- 29份完整 model request 的模型、high／all_turns、store=false、無 previous_response_id、原 instructions 與角色 tool definitions 符合；資料訊息沒有被提升為 system／developer。
+- B1 只收到情境導覽及合法新訪談；更正批 `(2,4]` 的新區間是3–4，沿用已採用歷史。B2 取得兩層導覽及真實交接 diff，沒有被塞整包訪談或理想 oracle；需要原話時自行使用既有 read tool。兩角色第二批各自延續原歷史，不互換私人 context。
+- 三個快照合計8條引用邊均可在各自固定快照／有效來源內解析；每條理解來源的固定修訂與該快照選用一致。第二批後回讀首批，舊正文／下層引用及快照身分均未變。
+- 模型工具請求與結果逐 `call_id` 配對完整、均在該角色允許清單；跨批歷史中的舊工具不重複算成本批操作。這只證明本次接線，不推論任意長歷史都會正確選來源。
+
+另由乾淨上下文的工程審閱 subagent（Linnaeus，`01a0f540-85f2-7ba2-bb1c-a0e6186b5be6`）依完整分析指南與 rubric，未看主代理候選 verdict，獨立讀兩例／三批原話與 published 正文：事實、更正、責任、未知、有效工作保留、引用內容及角色分工均 pass；B2 必要範圍足以獨立理解。**精簡度記 minor**：一成案例未知細項過多，清窗「尚待確認」重述前文；不因這類措辭反覆加規則或重跑。這不是人類領域校準，不把 subagent 當人審。A 引導、JD 成稿及其他案例均 `not_observed`。
+
+generation usage 合計 input **129,751**、output **7,055**；沿實際 usage 分項估算 generation **US$0.007128355**，不是帳單。31次 count 沒有帳務 usage，保留每次 US$0.0001 的本地管理預留，故執行帳務佔用 **US$0.010228355**；不把 count 宣稱免費，也不混同實際扣款。
+
+本輪先有非外送 preflight，再執行一次；後續核對腳本曾把 Step 間明確清空的 `response_snapshot={}` 當成回應而報 `KeyError`，依既有 `tool_steps` 邊界修正為略過空暫存後重新唯讀核對通過，**沒有重送任何模型請求**。兩腳本 Ruff E4/E7/E9/F 通過；產品程式未改，不跑無關全套或假稱新 TDD。操作命令（已執行，不是再次外送授權）：
+
+```powershell
+# apps/api；--execute 僅執行一次，輸出以 x 模式獨占建立。
+./.venv-target/Scripts/python.exe ../../.research-tmp/eval/verify_memory_quality.py
+./.venv-target/Scripts/python.exe ../../.research-tmp/eval/verify_memory_quality.py --execute
+./.venv-target/Scripts/python.exe -X utf8 -B ../../.research-tmp/eval/audit_memory_quality.py
+```
+
+原件 SHA-256（`.research-tmp/eval/`）：
+
+| 原件 | SHA-256 |
+|---|---|
+| `verify_memory_quality.py` | `bf9e142a037f655369dfd6e12ee048b9e74d00a8c118498f4d52e3a4080196e6` |
+| `audit_memory_quality.py` | `bd3dd4f7034fcd41f64526b6e8bbc3a033c7230184334e38147460a0856952e8` |
+| `memory-quality-20261001.jsonl` | `02e9507b05da8a90a71558a0f956de05adc4758cc667226ccc63de6f955ad884` |
+
+**收斂：**補足 Luna 在本兩例的 Memory 真發布與跨批更正證據，到此停止，不為 minor 再加試次。原長歷史 JD 拆分漏引、首批另一案例的錯誤精確化、其他品質案例及獨立人類校準仍未解／未驗；不能由這兩例抵銷既有失敗。T14／T16／T17／T18 不勾完成，產品仍 Luna／high。

@@ -2,6 +2,8 @@
 
 Owner 要求整理雜亂檔案、封存不再使用的材料、將實驗成果收進文檔，並清理已結束的 worktree。本次基於 `target-rebuild@f2e1c301`，不改產品程式、驗收條件、模型或正式入口，不啟停服務、不呼叫付費模型、不 push／merge。
 
+本頁按發生順序追加紀錄；以上及下列早期段落的「未切換／仍保留候選」是當時狀態。ADR0079 放行後的最新收尾見[正式切換後收尾](#正式切換後收尾2026-10-02)，不反向改寫先前證據。
+
 ## 分類結果
 
 | 類別 | 保存位置與實際動作 |
@@ -174,3 +176,50 @@ uv cache 已清除，不是可原樣還原的封存；需要時由 uv 重新下�
 收尾另檢查本輪 10 份 Markdown 的相對連結與錨點：檢查器報出的三處錨點均有既存 HTML `id`（兩個不同目標），人工核對有效；其餘無失效。差異空白檢查通過，封存清單重讀確認全部 743 個目的地存在、原目錄已移走。
 
 本輪不重跑產品套件、真 PostgreSQL 或真模型旅程。文件更正與 docstring 提示不改產品行為；可整理的範圍已處理，待修程式、未審查的私有暫存及 T18 不冒稱完成。
+
+## 正式切換後收尾（2026-10-02）
+
+### 範圍與結果
+
+Owner 確認新 App 已依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)成為唯一正式產品、其他工作已收尾後，從 `target-rebuild@b487e883` 繼續整理。這次不重判 T01–T18、不改產品規則、不新增功能，也不把交接列出的驗收缺口抹成已通過。
+
+| 範圍 | 處置與保留 |
+|---|---|
+| 候選工作樹及分支 | `S:\caliburn-cutover`／`target-cutover-candidate` 已清除；tip `9438347c` 及祖先仍在主線，見[工作樹收尾與恢復](worktree-history-index.md#切換後候選工作樹收尾2026-10-02) |
+| 候選 ignored 產物 | 36 組依賴、快取、建置輸出移入本機封存，不混入 Git 報告 |
+| 兩個退役程式區域 | `experiments/jd-relational-app` 與 `packages/consultant-memory` 的 126 組非 tracked 殘留封存；16 份 tracked README、研究筆記、Skill 與指南原文保留，雜湊未變 |
+| 本機設定類檔案 | 舊合成測試中的兩份 `host.v1.dpapi` 隨原測試目錄封存、不公開；掃描不搬 `.env` 或 PostgreSQL cluster。現用 DB、volume、秘密不動 |
+| 程序 | 核對埠、PID、啟動時間、父程序及入口後停止 8103／8104；保留 PostgreSQL 55439、未列入本次交接清理的 8101／8102；8100／5173 未啟動 |
+| 現用文件 | 修正前端 README、design／specs／退役入口、產品概念中仍把 ADR0077 當現況或稱未切換的路由；歷史正文保留。實驗發現、教授報告與原始證據不刪改 |
+
+### 可恢復封存與查核
+
+封存根：`S:\caliburn\.research-tmp\archive\2026-10-02\post-cutover`，只在本機且受 Git ignore 保護。
+
+- `candidate-worktree/`、`retired-local-residue/` 保存上述 162 組原產物；`relocations.csv` 列精確新舊路徑，搬移前核對來源／目的地及祖先，不跨越 reparse point、不覆蓋既有封存。
+- `sha256.csv` 覆蓋 **1,838 個非依賴檔、487,294,882 bytes**，搬移後逐檔一致；`.venv`／`node_modules` 以整目錄搬移，不宣稱逐檔雜湊驗證依賴。這些數字不包含依賴，也不表示釋放了磁碟空間。
+- `preserved-tracked.csv` 核對 16 份歷史檔搬移前後一致。原始測試輸出可能包含本機設定與瀏覽器狀態，不直接提交或當作公開報告原件。
+- 封存可按清單復原到**未被重新使用**的原位置；不可覆蓋新資料。它不是遠端備份。舊程式則仍可用 `git show 6ad33bcb:<路徑>` 回查，不從本機編譯快取恢復程式。
+
+### 切換後本機依賴
+
+交接所指的舊 `apps/api/.venv` 實為 Python 3.13；確認未被 8101／8102 使用後，另移入 `main-dependencies/`，位置記於 `dependency-relocations.csv`。兩個保留服務仍使用 `apps/api/.venv-target`，不改該環境。
+
+用現成的 Node 24.19.0、pnpm 12.5.1、uv 0.12.20、Python 3.14.7，依原 lock **離線同步**新正式環境：後端建立 `apps/api/.venv`，前端移除不再屬於 workspace 的 67 個依賴。第一次 pnpm 在一般沙盒因舊 `.pnpm` ACL 被拒，核准權限後同命令成功；不是套件版本或產品缺陷，沒有改 lock 或全域 PATH。
+
+本機正確工具位置如下，僅作這次操作紀錄，不取代 README 的可攜安裝要求：
+
+- Node：`C:\Users\chenb\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`
+- pnpm：`S:\caliburn\.research-tmp\pnpm-12.5.1\package\bin\pnpm.mjs`（以上述 Node 執行）
+- uv：`S:\caliburn\.research-tmp\bin\uv.exe`
+
+預設 shell PATH 仍可能選到舊工具，執行根命令前須依 README 核對版本；不自動變更使用者的全域工具設定。沒有啟動 App、資料庫遷移或付費模型。產品剩餘缺口仍由[實驗發現報告](../reports/experiment-findings.md)與各任務證據維護，不另造「已全部驗過」的結論。
+
+### 本輪驗證與限制
+
+- 搬移後重讀清單：162 組目的地存在、原位置已移走；候選工作樹不存在，16 份 tracked 歷史內容不變。
+- 七份變更 Markdown 的相對連結／錨點檢查：0 失效；`git diff --check` 通過。
+- 新後端環境 `uv pip check`：87 個套件相容。一般沙盒的預設 uv cache ACL 不可讀，明確指定本輪沿用的 `.research-tmp/uv-cache` 後通過。
+- 根 `pnpm build`：契約生成一致性、TypeScript 與 Vite 靜態建置 exit 0。第一次因沙盒下 Python 臨時目錄 ACL 被拒，核准權限重跑同一命令後通過；沒有為了通過而修改生成檔或規範。
+- 建置仍有單一 JS chunk 超過 500 kB 的效能警告（minified 952.67 kB、gzip 284.91 kB）。它不是建置失敗；是否拆包屬後續效能工作，不在整理任務中擴大改碼。
+- 以上不驗真模型品質、DB 恢復或 UI 使用旅程，不取代既有驗收證據。B 壓縮後發布、新入口真模型短旅程、Memory 失敗再准入政策等交接事項仍按原文件狀態保留。

@@ -1,6 +1,6 @@
 # Caliburn frontend
 
-React／TypeScript／Vite／MUI 的新前端。可建立、列出、改名與選取隔離職務檔案；與 AI 顧問訪談（送出輸入、暫停／繼續／取消、即時與已保存的公開訊息、歷史回看與條件撤回）；JD 人工編輯（基本資料、職責與任務、成果／要求、知識／技能、協作、共通條件）；顧問處理中的候選 JD 預覽；正式 JD 來源回查與待核對標示（含 JD 項目旁的來源徽章）；章節導覽與可收合職責；匯出正式 JD 為 PDF。畫面為**左訪談／右 JD 並排**（窄螢幕以分頁切換）：訪談輸入與處理控制固定在訪談欄底部；顧問處理或暫停時 JD 唯讀、候選預覽以獨立的「候選」樣式呈現，不取代正式稿。這不是完整產品驗收：真模型長訪談、故障競爭與品質 gate 仍屬 T12／T14–T17。現行根 `dev/start/build` 仍指向舊正式產品；後續依[任務計畫](../../docs/plans/2026-09-29-target-rebuild/tasks.md)逐步接線，最後才正式切換。視覺規則與已驗／未驗範圍見 [UI 改版證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t09-ui-redesign.md)。
+React／TypeScript／Vite／MUI 的正式前端。可建立、列出、改名與選取隔離職務檔案；與 AI 顧問訪談（送出輸入、暫停／繼續／取消、即時與已保存的公開訊息、歷史回看與條件撤回）；JD 人工編輯（基本資料、職責與任務、成果／要求、知識／技能、協作、共通條件）；顧問處理中的候選 JD 預覽；正式 JD 來源回查與待核對標示（含 JD 項目旁的來源徽章）；章節導覽與可收合職責；匯出正式 JD 為 PDF。畫面為**左訪談／右 JD 並排**（窄螢幕以分頁切換）：訪談輸入與處理控制固定在訪談欄底部；顧問處理或暫停時 JD 唯讀、候選預覽以獨立的「候選」樣式呈現，不取代正式稿。依 [ADR0079（Accepted）](../../docs/adr/0079-target-rebuild-production-cutover.md)，根 `dev/start/build` 已切換至 `apps/api`／`apps/web`，舊正式產品已退役。切換不代表所有品質情境都已驗證；最新任務狀態見[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)，證據與限制見[實驗發現報告](../../docs/reports/experiment-findings.md)。視覺規則與該輪已驗／未驗範圍見 [UI 改版證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t09-ui-redesign.md)。
 
 ## 開發與檢查
 
@@ -13,7 +13,7 @@ pnpm dev      # 後端 :8100 與 Vite :5173 同時啟動（只開前端：pnpm -
 
 開發站固定 `127.0.0.1:5173`；`/api` 代理到 `127.0.0.1:8100`。後端啟動依[backend README](../api/README.md)。Ctrl+C 停止前景程序；不載入舊 Next.js 或 `.next` 生成物。
 
-不使用 Vite 的本機建置模式：先 `build`，再由後端以 `CALIBURN_WEB_BUILD_DIRECTORY` 指向此 App 的 `dist` 絕對目錄，同一個 loopback 8100 提供畫面與 API；見[同源啟動說明](../api/README.md#使用建置後的同源畫面)。現有 `/`、`/job-files/:jobFileId` 可直接開啟及重新整理；新增頂層 UI 路由須同步後端的明確 fallback 前綴。此功能不是 T18 正式切換，不改根 scripts。
+不使用 Vite 的本機建置模式：先 `build`，再由後端以 `CALIBURN_WEB_BUILD_DIRECTORY` 指向此 App 的 `dist` 絕對目錄，同一個 loopback 8100 提供畫面與 API；根 `pnpm build`／`pnpm start` 已接好此流程，見[同源啟動說明](../api/README.md#使用建置後的同源畫面)。現有 `/`、`/job-files/:jobFileId` 可直接開啟及重新整理；新增頂層 UI 路由須同步後端的明確 fallback 前綴。
 
 ```powershell
 pnpm --filter @caliburn/frontend test
@@ -27,7 +27,7 @@ pnpm --filter @caliburn/frontend build
 生成契約還需要 uv 及隔離的 Python 環境：
 
 ```powershell
-$env:UV_PROJECT_ENVIRONMENT = Join-Path $PWD 'apps/api/.venv-target'
+uv sync --project apps/api --locked
 pnpm --filter @caliburn/frontend codegen:check
 ```
 

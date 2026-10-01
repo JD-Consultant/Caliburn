@@ -2,6 +2,8 @@
 
 > 最新狀態：2026-10-01 Owner 已確認輪前 128K／中途 160K，接線與局部驗證見 §10。以下先前「不改門檻／待決」及 272K／512K 試驗保留為當時紀錄，不覆蓋新決策。
 
+> 2026-10-02補充：[T17原45輪旅程](t17-course-administrator-journey.md#a2-實測結果2026-10-02原旅程完成-45-輪)已觀察A自然輪前壓縮與後續更正／早期事實保留；B1／B2最高計數42,259／48,783，未觸發128K輪前或160K中途壓縮。量測、取消期間未確認的壓縮嘗試與限制只在T17維護；不是三角色全部壓縮／接續gate已完成，也不重跑同一旅程。
+
 - 日期：2026-10-01；基準 `63c0e5d6`；**有限 adapter 驗證已完成，T16／T17 整體未完成**。§1–3 保留執行前限制及首輪停止原因，§4 是實際結果。
 - 只補 [T06 §20](t06-agent-execution.md#20-真-compact-協定預檢2026-09-30-恢復後) 未驗的加密 reasoning＋工具結果壓縮、完整 C 接續及含 C 的再次壓縮。T16／T17 仍未完成，不重跑長訪談、不改產品提示或門檻。
 - 官方 [standalone compact](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)要求送入窗口仍可容納、完整 output 原序續接；[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)要求保留原生項目。2026-10-01 取得的 [Luna 規格](https://developers.openai.com/api/docs/models/gpt-6-luna)列 input 922,000、context 1,050,000、output 128,000；不是帳戶 TPM 保證，也不把 Astra 範例等同 Luna 實测。

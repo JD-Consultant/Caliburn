@@ -94,3 +94,27 @@ def test_stream_error_without_a_readable_code_is_never_retryable(body) -> None:
     request = httpx2.Request("POST", "https://api.openai.com/v1/responses")
     failure = classify_response_failure(APIError("SENSITIVE", request, body=body))
     assert failure.kind == ResponseFailureKind.RESPONSE_PROTOCOL
+
+
+@pytest.mark.parametrize(
+    ("code", "expected"),
+    [
+        ("rate_limit_exceeded", "rate_limit_exceeded"),
+        ("server_is_overloaded", "server_is_overloaded"),
+        ("credit_balance_exhausted", "credit_balance_exhausted"),
+        ("context_length_exceeded", "context_length_exceeded"),
+        ("private employee text echoed as code", None),
+        (None, None),
+    ],
+)
+def test_diagnostic_code_preserves_known_cause_without_echoing_provider_data(
+    code, expected
+) -> None:
+    error = APIError(
+        "private input and credential",
+        httpx2.Request("POST", "https://api.openai.com/v1/responses"),
+        body={"code": code, "message": "private input and credential"},
+    )
+    failure = classify_response_failure(error)
+    assert failure.provider_code == expected
+    assert "private" not in repr(failure)

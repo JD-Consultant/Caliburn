@@ -6,7 +6,7 @@ JD-R002/C03，連動 C01／C02；2026-09-09。**S3 討論輸入／G2 補證與�
 
 **最新交接：**Owner 已同意 [Plate](2026-09-09-jd-editor-framework-decision-candidate.md#本次可確認的框架選擇)與[持續工作稿、差異及更正](2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)，沿[接線稿](2026-09-09-jd-editor-app-integration-design.md)完成 App 設計。停止個別 pending 接受／取消與其分組／結算研究；原 B05／B06 的該部分已取代，內容保留與完整修正仍有效。P01、F01、diff／history 及舊待審補證各自限定效力不變，未完成全套設計。下方舊 pending 討論作沿革；不重問框架或審閱路線。
 
-本稿把已同意的「持續訪談、AI 主寫、員工看得見改動並能更正」轉成可驗證情境。官方產品參照詳見 [App 證據稿](evidence/2026-09-09-jd-app-tool-and-review-contracts.md)，固定版本與授權依 [Plate](evidence/2026-09-09-jd-oss-plate.md) 及 [其他 OSS](evidence/2026-09-09-jd-oss-alternatives.md)。不複製三份原始證據，也不由外部產品反推本案 schema。
+本稿把已同意的「持續訪談、AI 主寫、員工看得見改動並能更正」轉成可驗證情境。官方產品參照詳見 [App 證據稿](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md)，固定版本與授權依 [Plate](../experiments/legacy-evidence/2026-09-09-jd-oss-plate.md) 及 [其他 OSS](../experiments/legacy-evidence/2026-09-09-jd-oss-alternatives.md)。不複製三份原始證據，也不由外部產品反推本案 schema。
 
 ## 1. 從概念到證據
 
@@ -17,7 +17,7 @@ JD-R002/C03，連動 C01／C02；2026-09-09。**S3 討論輸入／G2 補證與�
 - **證據效力**：官方明示理由是 Fact；推論它能防哪類錯誤是 Inference；是否適合員工 JD 是 Mapping；未公開內部或尚未測到是 Unknown。不能把產品 UI 說明當資料庫交易契約。
 - **時效**：每項記查閱日與適用產品／版本／成熟度。舊但仍有效的契約可用；退場、過渡及 Preview 分列，不把「今年讀到」當「今年推出」。
 
-本輪的具體時效修正：Canvas 的 2024 發布文已轉介現行 release notes；2026-05-28 公告限定 GPT-5.5 Instant／Thinking 不再支援 Canvas，legacy 僅限時續用。因此不再以舊 Canvas 當現行通用流程，也不推論所有 ChatGPT 平台已全面停止文件編輯。現行 Work 的文件續編另有直接來源，見 [evidence §2.8](evidence/2026-09-09-jd-app-tool-and-review-contracts.md#28-必查補證chatgptcodex-與-claude-的現行文件體驗)。
+本輪的具體時效修正：Canvas 的 2024 發布文已轉介現行 release notes；2026-05-28 公告限定 GPT-5.5 Instant／Thinking 不再支援 Canvas，legacy 僅限時續用。因此不再以舊 Canvas 當現行通用流程，也不推論所有 ChatGPT 平台已全面停止文件編輯。現行 Work 的文件續編另有直接來源，見 [evidence §2.8](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#28-必查補證chatgptcodex-與-claude-的現行文件體驗)。
 
 ## 2. 一份 JD 的完整操作情境
 

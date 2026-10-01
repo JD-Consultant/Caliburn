@@ -8,7 +8,7 @@
 
 ## 歷史設計
 
-- [`interview-engine.md`](interview-engine.md) — 舊訪談 engine，已不在 repo runtime；只供決策追溯。
-- [`editor-knowledge-pack.md`](editor-knowledge-pack.md) — 舊 OCS editor／knowledge seam，已不在 repo runtime；只供決策追溯。
+- [`interview-engine.md`](../../../20260918-shared-current-jd/docs/design/interview-engine.md) — 舊訪談 engine，已不在 repo runtime；只供決策追溯。
+- [`editor-knowledge-pack.md`](../../../20260918-shared-current-jd/docs/design/editor-knowledge-pack.md) — 舊 OCS editor／knowledge seam，已不在 repo runtime；只供決策追溯。
 
 不要從歷史設計恢復舊 route、hook、store、contract、indexer 或 provider。若現行流程改變，更新 `task-analysis-engine.md` 並同 commit 更新 API／Web 文檔。

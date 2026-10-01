@@ -34,7 +34,7 @@
 
 ## 3. 工作與退出條件
 
-**2026-09-10 契約补正交付：**Owner 同意後已完成[責任稽核 §10](../specs/2026-09-10-jd-responsibility-and-evidence-audit.md#10-owner-同意後的契約補正)的有限補正與交叉審查；[86 defs／201 項離線及正式工具 SDK 傳遞](../specs/evidence/jd-contract-closure/README.md)有界通過，DB／恢復方案固定但尚未實作。唯一下一施工單位回到既有隔離 Task 1，不另開產品選型；下方早先狀態仍是沿革，production G6與真人交付PARKED不變。
+**2026-09-10 契約补正交付：**Owner 同意後已完成[責任稽核 §10](../specs/2026-09-10-jd-responsibility-and-evidence-audit.md#10-owner-同意後的契約補正)的有限補正與交叉審查；[86 defs／201 項離線及正式工具 SDK 傳遞](../experiments/legacy-evidence/jd-contract-closure/README.md)有界通過，DB／恢復方案固定但尚未實作。唯一下一施工單位回到既有隔離 Task 1，不另開產品選型；下方早先狀態仍是沿革，production G6與真人交付PARKED不變。
 
 - [x] **S1：有效需求與驗收基線。**更新 register 的免費開源、缺口共同決定及人工待審政策可重議；取代舊付費候選 gate。整理已同意效果、待討論政策與待證明能力，逐項連到代表情境。退出：同意範圍與唯一下一題清楚，不重問既有同意。
 - [x] **S2：官方做法與開源能力比較。**平行核對工具定位／錯誤、共同編輯生命週期、文件結構／序列化／保存；區分原生能力、正式配置接點、必要整合與缺口。退出：有來源可追的能力矩陣、失敗情境及推薦方向，不先寫死 API schema 或資料表。三份證據與綜合稿已完成交叉複核，重大 finding 已處理；詳細界線見主稿 §8。
@@ -57,17 +57,17 @@
 
 ## 5. 文件責任與執行紀錄
 
-**2026-09-10 核心交接：**正式[契約與 schema](../specs/2026-09-10-jd-editor-contract-schema.md)、原生 profile、保存及六切片計畫整包審查通過；[官方契約複核](../specs/evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)補 OpenAI／Anthropic strict 子集與既有 converter 的差異，採有代價的有限 raw binding，沒有自建通用 compiler。[最終 schema 離線核對](../specs/evidence/jd-contract-schema/schema-validation.md)記完整 r2 及代表正反例；SDK 傳遞與實際 provider 接受分開。下一工作單位依六切片 Task1，本輪沒有開始實作。下方是沿革，不再形成待問的產品選擇。
+**2026-09-10 核心交接：**正式[契約與 schema](../specs/2026-09-10-jd-editor-contract-schema.md)、原生 profile、保存及六切片計畫整包審查通過；[官方契約複核](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)補 OpenAI／Anthropic strict 子集與既有 converter 的差異，採有代價的有限 raw binding，沒有自建通用 compiler。[最終 schema 離線核對](../experiments/legacy-evidence/jd-contract-schema/schema-validation.md)記完整 r2 及代表正反例；SDK 傳遞與實際 provider 接受分開。下一工作單位依六切片 Task1，本輪沒有開始實作。下方是沿革，不再形成待問的產品選擇。
 
 **2026-09-10 Owner 裁決：**同意整體包的核心接線；前景 AI 回應期間暫停手改、同 PG 唯一 JD 保存及沿用 Memory 成果列 WORKING。真人交付／核對先不做，HTML／DOCX＋問答包轉 PARKED，不列本版 S4／S5 阻塞。下一單位只完成核心文件／工具正式契約、整體設計 review 與施工交接；不再問相同互動／保存方向，本輪仍不直接修改 production。
 
-**2026-09-10 正式插件與整體評審收斂：**[F02](../specs/evidence/2026-09-10-jd-official-profile-probe.md)四組、15 項斷言通過，首輪子程序缺檔失敗及原碼保留；獨立完整 lock／LICENSE／source 封存，限 headless／JSON／新程序，未驗 DOM／IME、API 或真模型。工具接口修正清單文字定位、空稿首寫與完整快照比較；[交付附件](../specs/2026-09-10-jd-export-and-consultant-handoff.md)已補齊確切 JD 版與完整原始問答。所有剩餘產品取捨集中在[主稿 §9.1](../specs/2026-09-09-jd-editor-app-integration-design.md#91-整體接線評審包)，不再追加插件／pending／codec 微型探針或重選框架。S3 剩餘取捨與完整 S4／S5 尚未退出，後續正式契約及施工計畫依裁決，不改 production／Memory／DB，0 付費模型請求。
+**2026-09-10 正式插件與整體評審收斂：**[F02](../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md)四組、15 項斷言通過，首輪子程序缺檔失敗及原碼保留；獨立完整 lock／LICENSE／source 封存，限 headless／JSON／新程序，未驗 DOM／IME、API 或真模型。工具接口修正清單文字定位、空稿首寫與完整快照比較；[交付附件](../specs/2026-09-10-jd-export-and-consultant-handoff.md)已補齊確切 JD 版與完整原始問答。所有剩餘產品取捨集中在[主稿 §9.1](../specs/2026-09-09-jd-editor-app-integration-design.md#91-整體接線評審包)，不再追加插件／pending／codec 微型探針或重選框架。S3 剩餘取捨與完整 S4／S5 尚未退出，後續正式契約及施工計畫依裁決，不改 production／Memory／DB，0 付費模型請求。
 
 **2026-09-10 接線收斂交付：**[正式文件 profile](../specs/2026-09-10-jd-plate-document-profile.md)與[三工具契約](../specs/2026-09-10-jd-app-tool-contract.md)承接主稿；[Proposed ADR 0073](../adr/0073-plate-jd-app-working-document-and-revision-authority.md)列唯一 JD authority 與完整舊 writer 取代範圍。Owner 不同意目前稿／更正後兩頁，已記錄同一畫面原地編輯及查看實際變更；示意已改。官方清單／表格插件的正式 shape 與舊 probe 差異明列，沒有再造原生編輯器。獨立架構複核已處理三項接點 finding 及只對未閉合 JD 操作對帳的限縮；剩餘整合／匯出與整體取捨依 register，不冒稱完整 S4／S5 或施工許可。未新增安裝／實驗／DB 或付費請求。下列 9/9 下一題均是歷史，不另立競爭 gate。
 
 **最新執行狀態（2026-09-09）：**Owner 已同意 [Plate 文件底座](../specs/2026-09-09-jd-editor-framework-decision-candidate.md#本次可確認的框架選擇)與[持續工作稿、差異及更正](../specs/2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)，G3／WORKING。停止個別 pending 接受／取消及其分組／結算設計；舊正反證全部保留，codec 不再是必裝候選。沿[接線設計](../specs/2026-09-09-jd-editor-app-integration-design.md)收斂正式 profile、三工具／來源、工作稿版本與結果、人工保存／AI 接續及 successor ADR。完整 S3 其他細節／S4／S5 未完成，不重新詢問已選路線，不以原 R01 的未解條件阻塞本版。下列為各次歷史交付。
 
-同日有限整合增量：[SuperJSON 保存四項實證](../specs/evidence/2026-09-09-jd-native-pending-codec-probe.md)4／4 通過；只新增隔離依賴，原 R4 失敗與舊材料未變。工具讀取、同基底寫入、實際變更、唯一回執 owner 與未知提交結果已寫進接線稿；失敗回執及實際 Agent 綁定仍待正式驗證。下一單位聚焦續改成員／整組審閱設計，不追加零碎實驗或宣稱完整 S4／S5 完成。
+同日有限整合增量：[SuperJSON 保存四項實證](../experiments/legacy-evidence/2026-09-09-jd-native-pending-codec-probe.md)4／4 通過；只新增隔離依賴，原 R4 失敗與舊材料未變。工具讀取、同基底寫入、實際變更、唯一回執 owner 與未知提交結果已寫進接線稿；失敗回執及實際 Agent 綁定仍待正式驗證。下一單位聚焦續改成員／整組審閱設計，不追加零碎實驗或宣稱完整 S4／S5 完成。
 
 同日產品裁決包：[審閱工作稿 §7](../specs/2026-09-09-jd-editing-and-review-working-design.md#7-plate-選定後的審閱生命週期取捨)完成三個選項，獨立審查修正過度二分。Owner 隨後明確選 B，效力與停止事項見 §7.7；不再等待回答。此輪未新增實驗，下一 gate 為所選工作稿的統一設計及必要整合驗收。
 
@@ -81,6 +81,6 @@
 
 2026-09-09 必查來源與情境補證：依 Owner 補充加入 OpenAI Codex／ChatGPT、Anthropic Claude 的產品與工具雙層來源要求。已交付[App 能力對照](../specs/2026-09-09-jd-app-native-capability-crosswalk.md)及 evidence §2.8／2.9，分清 Canvas 沿革、Work 與 Claude／Cowork 現行能力。下一單位按該稿 §5 討論先前誤改在後續續編後如何更正／退回；S3 細部與候選仍未選定，S4／S5 未開始。
 
-2026-09-09 收斂選型：Owner 要求依既有 Memory／JD 內容基線進入框架定案，並明確補充按任務理解進度才撰寫。先行完成不依賴待審政策的[原生文件／差異 probe](../specs/evidence/2026-09-09-jd-native-editor-probe.md)，13 案例 11 通過、2 反例；追加當批 operations 觀測 3 項通過。這是 S3 選型實證，非完整 S4 流程或 S5 設計驗收。[定案候選](../specs/2026-09-09-jd-editor-framework-decision-candidate.md)推薦優先驗 Plate，已經三路審查並修正比較公平性、Memory 與文件 authority 邊界。下一個唯一單位是完整 r2 原生比較與保存材料重開；產品取捨集中於候選 §3，不泛問已同意主流程。兩個 diff 反例保留失敗，尚未跑 UI、DB 或真模型。
+2026-09-09 收斂選型：Owner 要求依既有 Memory／JD 內容基線進入框架定案，並明確補充按任務理解進度才撰寫。先行完成不依賴待審政策的[原生文件／差異 probe](../experiments/legacy-evidence/2026-09-09-jd-native-editor-probe.md)，13 案例 11 通過、2 反例；追加當批 operations 觀測 3 項通過。這是 S3 選型實證，非完整 S4 流程或 S5 設計驗收。[定案候選](../specs/2026-09-09-jd-editor-framework-decision-candidate.md)推薦優先驗 Plate，已經三路審查並修正比較公平性、Memory 與文件 authority 邊界。下一個唯一單位是完整 r2 原生比較與保存材料重開；產品取捨集中於候選 §3，不泛問已同意主流程。兩個 diff 反例保留失敗，尚未跑 UI、DB 或真模型。
 
-2026-09-09 完整樣稿有限呈現：[結果及重現入口](../specs/evidence/2026-09-09-jd-native-editor-ui-probe.md)交付 29 項 Node／SSR 限定檢查與瀏覽器實際比較／檔案重開。表格、子清單、同 ID 刪增正文保留；兩個原生 diff 反例仍成立，所有業務欄位可讀未證，未跑 DB／人工輸入／LLM。獨立 review 無阻擋此限定結論，未造 diff／history；隔離 server 已停止。取代上段「下一步跑 UI」：依具體缺口完成有限欄位呈現、原生工具、操作／保存／回執及續編設計，再作必要驗證；S3 取捨與 S4／S5 的完整退出條件仍未達成。
+2026-09-09 完整樣稿有限呈現：[結果及重現入口](../experiments/legacy-evidence/2026-09-09-jd-native-editor-ui-probe.md)交付 29 項 Node／SSR 限定檢查與瀏覽器實際比較／檔案重開。表格、子清單、同 ID 刪增正文保留；兩個原生 diff 反例仍成立，所有業務欄位可讀未證，未跑 DB／人工輸入／LLM。獨立 review 無阻擋此限定結論，未造 diff／history；隔離 server 已停止。取代上段「下一步跑 UI」：依具體缺口完成有限欄位呈現、原生工具、操作／保存／回執及續編設計，再作必要驗證；S3 取捨與 S4／S5 的完整退出條件仍未達成。

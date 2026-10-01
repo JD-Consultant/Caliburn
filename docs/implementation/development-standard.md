@@ -79,7 +79,7 @@ Owner 隨後澄清：**允許廣搜；加速不是限制研究廣度或深度。
 
 ## 7. 分析方法、Prompt、Tool 與 Context 共同驗收
 
-角色／Prompt／工具設計前先讀[完整工作分析](../specs/2026-09-09-complete-work-analysis-guide.md)、[訪談校準](../specs/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[JD 撰寫](../specs/2026-09-09-jd-field-and-writing-guide.md)及相應工具規範。保留已研究方法與防錯意圖，舊接線／歷史 gate 不搬入新架構；A、B1、B2 各取其責任，不把 Memory 當隱藏 JD 草稿。工程代理自主實作不等於顧問可以猜員工事實。
+角色／Prompt／工具設計前先讀[完整工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)、[訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[JD 撰寫](../guides/2026-09-09-jd-field-and-writing-guide.md)及相應工具規範。保留已研究方法與防錯意圖，舊接線／歷史 gate 不搬入新架構；A、B1、B2 各取其責任，不把 Memory 當隱藏 JD 草稿。工程代理自主實作不等於顧問可以猜員工事實。
 
 Prompt／Skill／工具說明與程式一起版本管理、審查及測試；只提供本角色所需目標、限制、判斷準則及必要示例，不每輪載入全指南。按需能力須驗模型實際可取得並使用。對實際 GPT-6 型號查當前官方規範，不跨型號推定能力或照抄工程代理的自主權限。參考 [OpenAI Prompt 工程](https://developers.openai.com/api/docs/guides/prompt-engineering#version-prompts-in-code)與 [GPT-6 指引](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra#prompting-best-practices)；這些是一般提示方法，產品分析仍由本案指南定義。
 

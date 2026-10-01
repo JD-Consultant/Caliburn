@@ -2,7 +2,7 @@
 
 2026-09-07 · LLM-Q019 · **Owner 已同意局部方案 A；改做法前必須查清官方實際底層，再分段施工。**
 
-**接續結果：**已完成方案 A 的隔離提示校準、原文回查及完成判定測試接線；[CT13 結果](2026-09-07-ct13-local-repair-results.md)為目前狀態。580 項含 PG 回歸通過、0付費；語意／長訪談仍待真測。下文原建議與未施工描述保留為沿革。
+**接續結果：**已完成方案 A 的隔離提示校準、原文回查及完成判定測試接線；[CT13 結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-ct13-local-repair-results.md)為目前狀態。580 項含 PG 回歸通過、0付費；語意／長訪談仍待真測。下文原建議與未施工描述保留為沿革。
 
 接續狀態：Owner 回覆「同意」，並要求不能只模仿概念就自行發明底層。以下初次研究的「待審／未核准」是當時狀態，由本段更新；無新付費測試授權。A3 來源回查已完成[官方 producer→consumer 與框架底層核對](2026-09-07-source-read-runtime-resolution-trace.md)，補明「純回查不依賴候選檔」及「前置問答脈絡不能漏」；尚未改工具或其他產品程式。
 
@@ -12,7 +12,7 @@
 
 Owner 最新要求「那要怎麼辦？請你研究」；先前「先保留紀錄，訪談測完再討論」仍有效。因此本輪只讀證據、查官方資料、提出方案，不改 prompt／Skill／工具／配置，不追加付費測試。CT12 的 65 次／US$0.07783077 帳本保持關閉。
 
-閱讀順序：[決策入口](../../../../docs/current-decisions.md) → 本篇 → [CT12 結果](2026-09-07-patch-and-whole-interview-results.md) → [逐字稿](evidence/2026-09-07-patch-and-whole-interview.transcript.md)／[原始 trace](evidence/2026-09-07-patch-and-whole-interview.json)。職務資訊取捨沿用已核准的[工作案例與工作理解研究](../../../../docs/specs/2026-09-07-work-case-and-understanding-information-selection.md)，不重開整套 Memory，不重新閱讀已排除的產品流程長稿。
+閱讀順序：[決策入口](../../../../docs/current-decisions.md) → 本篇 → [CT12 結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-patch-and-whole-interview-results.md) → [逐字稿](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-patch-and-whole-interview.transcript.md)／[原始 trace](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-patch-and-whole-interview.json)。職務資訊取捨沿用已核准的[工作案例與工作理解研究](../../../../docs/specs/2026-09-07-work-case-and-understanding-information-selection.md)，不重開整套 Memory，不重新閱讀已排除的產品流程長稿。
 
 本輪完整讀了上述兩份短研究／結果、現行 B1/B2 提示、三份分析 Skill、主顧問指令、Memory 讀取／引用程式；另逐筆查看 request 1、18、47、59、60、65 及第 7、11–14 輪相關內容。下列「現象」有直接 trace；「哪段提示會改善」仍是假設，不能混稱已修復。
 

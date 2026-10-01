@@ -36,4 +36,4 @@
 
 ### 追到設計依據
 
-[產品介紹](../../product-introduction.md)、[產品概念](../../product-concept.md)、[完整工作分析指南](../../specs/2026-09-09-complete-work-analysis-guide.md)、[JD 欄位與撰寫指南](../../specs/2026-09-09-jd-field-and-writing-guide.md)。分析指南是產品品質的依據；本報告不另造一套「滿分 JD」評分標準。
+[產品介紹](../../product-introduction.md)、[產品概念](../../product-concept.md)、[完整工作分析指南](../../guides/2026-09-09-complete-work-analysis-guide.md)、[JD 欄位與撰寫指南](../../guides/2026-09-09-jd-field-and-writing-guide.md)。分析指南是產品品質的依據；本報告不另造一套「滿分 JD」評分標準。

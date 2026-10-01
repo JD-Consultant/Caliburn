@@ -41,11 +41,11 @@ App 既有的原生回合檢查負責確認操作歸屬與完整性；本次資�
 
 | 實際驗證 | 結果與證據 |
 |---|---|
-| 新純反例 | 首次方法尚未實作時 54 FAIL；落實後 54 PASS。[作者紀錄](evidence/jd-run-change-material/results.md)。 |
+| 新純反例 | 首次方法尚未實作時 54 FAIL；落實後 54 PASS。[作者紀錄](../experiments/legacy-evidence/jd-run-change-material/results.md)。 |
 | 既有 history／run operations 純回歸 | 50 PASS，12 PG 當時未啟用；不冒稱真 DB 通過。 |
-| 獨立撰寫、實際執行的 PostgreSQL 案例 | 首次 13 PASS。反 UUID／時間順序、三次改回、人工／其他 run 插入、指定集合後新增、同讀取交易中另連線提交、六種錯範圍與三種存檔損壞均有反例。[獨立 PG 結果](evidence/jd-run-change-material/postgres-results.md)。 |
-| 主代理受影響回歸 | 差異投影／比較 70 PASS；history 25 PASS，含上列原未跑的 12 真 PG、13 純案例與作者回歸重疊。[實際紀錄](evidence/jd-run-change-material/root-regression.txt)。 |
-| 獨立程式／責任審查 | [有界讀取審查](evidence/jd-run-change-material/review.md)未發現 P1／P2；另實跑新 54＋舊 13 純反例共 67 PASS，與上述數字重疊，不重複計數。 |
+| 獨立撰寫、實際執行的 PostgreSQL 案例 | 首次 13 PASS。反 UUID／時間順序、三次改回、人工／其他 run 插入、指定集合後新增、同讀取交易中另連線提交、六種錯範圍與三種存檔損壞均有反例。[獨立 PG 結果](../experiments/legacy-evidence/jd-run-change-material/postgres-results.md)。 |
+| 主代理受影響回歸 | 差異投影／比較 70 PASS；history 25 PASS，含上列原未跑的 12 真 PG、13 純案例與作者回歸重疊。[實際紀錄](../experiments/legacy-evidence/jd-run-change-material/root-regression.txt)。 |
+| 獨立程式／責任審查 | [有界讀取審查](../experiments/legacy-evidence/jd-run-change-material/review.md)未發現 P1／P2；另實跑新 54＋舊 13 純反例共 67 PASS，與上述數字重疊，不重複計數。 |
 
 真 PG 當場核 `repeatable read`／`transaction_read_only=on`；固定集合不混入另一連線的新提交。1 與 8 筆操作讀取具有相同查詢數，每次最多兩份完整 snapshot，沒有 current head 查詢，該合成文件十三張表的筆數不變。96 筆上限只經純測，沒有宣稱 96 次真保存或壓力測試；中間版本只核 metadata／回執，不冒稱逐份重驗中間 JSON。
 
@@ -55,4 +55,4 @@ App 既有的原生回合檢查負責確認操作歸屬與完整性；本次資�
 
 下一單位把此材料接入原 `ChatService` 的唯讀 owner 範圍，重用既有完整差異投影，使用獨立整輪 envelope，不捏造 operation 身分。先有界驗證執行中增添修改時的固定續頁材料與既有 token 大小限制，再生成 DTO／HTTP 並接同頁呈現；不能先把 96 個 IDs 塞入 token，或每頁重算最新集合。這是工程接點，不另重開已同意的直接改稿／查看差異選擇。
 
-同頁聊天的 Fetch 故障另見[有限診斷](evidence/jd-relational-chat-web/transport-diagnosis.md)：第三組取得 TypeError／13 ms／signal 未 abort 的證據，根因仍 OPEN；沒有證據不改 CORS、延長 timeout 或增加自動重送。
+同頁聊天的 Fetch 故障另見[有限診斷](../experiments/legacy-evidence/jd-relational-chat-web/transport-diagnosis.md)：第三組取得 TypeError／13 ms／signal 未 abort 的證據，根因仍 OPEN；沒有證據不改 CORS、延長 timeout 或增加自動重送。

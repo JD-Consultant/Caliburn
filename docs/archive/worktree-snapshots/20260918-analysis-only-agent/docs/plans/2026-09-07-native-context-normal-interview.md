@@ -91,5 +91,5 @@ if not self.exact_count:
 - 獨立review無Critical／Important；CT02-R01為README native／exact錯誤碼敘述，已對照service修正。沒有藉測試移除framework行為。
 - Task3完成核准範圍：真factory三輪正常訪談／6次模型成功；獨立reader用剩餘6次，沒有最終答案，第13次在transport前被擋。合計12次／usage估算US$0.00642272，停止付費；不是長訪談／全部Memory驗收。
 - 回查提示優化仍待後續：先完整回看OpenAI read-path研究及新查官方來源，核對Deep Agents literal search契約，未因步數自行增工具／上限／改prompt。
-- 完整結果、來源、腳本、已知限制只放[本輪短結果](../specs/2026-09-07-native-context-normal-interview-results.md)及其evidence，不把原始tool軌跡塞進本計畫。保留隔離worktree，不merge／push；舊回查未提交檔案保持獨立。
+- 完整結果、來源、腳本、已知限制只放[本輪短結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-native-context-normal-interview-results.md)及其evidence，不把原始tool軌跡塞進本計畫。保留隔離worktree，不merge／push；舊回查未提交檔案保持獨立。
 - 程式窄修已本地commit `e3b93aa7`；紀錄與證據另作文件commit。Evidence獨立review無finding，不追加真API。

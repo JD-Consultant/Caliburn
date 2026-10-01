@@ -48,12 +48,12 @@
 | 證據層級 | 本次結果與範圍 |
 |---|---|
 | 套件原生工具 | 原核心＋工具 55 PASS；原生 override 補三案後工具14 PASS；MR-R01 的三反例首3 FAIL／4.24s，修正後工具全17 PASS／4.38s。首次缺新模組及 0.7 factory 拒絕皆保留，見[套件紀錄](../../packages/consultant-memory/read-tools-results.md)。 |
-| 來源工具 | 新工具最終 26 PASS；先前新25＋既有54共79 PASS。[首敗與修正](evidence/jd-memory-read-integration/source-tool-results.md)記錄 ToolRuntime 注入／嚴格模型、pytest note 斷言及 malformed summary 分類。 |
+| 來源工具 | 新工具最終 26 PASS；先前新25＋既有54共79 PASS。[首敗與修正](../experiments/legacy-evidence/jd-memory-read-integration/source-tool-results.md)記錄 ToolRuntime 注入／嚴格模型、pytest note 斷言及 malformed summary 分類。 |
 | 固定選版與既有接點 | context／managed 23 PASS；六個受影響檔 114 PASS；補 Memory pending/saved 分類八案後，runtime／inspection／checkpoints／Memory context 140 PASS。測試範圍重疊，不相加成總數。 |
-| native 中斷／原 view | 新23 PASS；先前新21＋既有85共106 PASS。[作者證據](evidence/jd-memory-read-integration/checkpoint-results.md)記原 root/child、START、錯 scope、不同 view 及 ACK 保存錯 view；未讀 Store 恢復。 |
+| native 中斷／原 view | 新23 PASS；先前新21＋既有85共106 PASS。[作者證據](../experiments/legacy-evidence/jd-memory-read-integration/checkpoint-results.md)記原 root/child、START、錯 scope、不同 view 及 ACK 保存錯 view；未讀 Store 恢復。 |
 | 真 SDK＋PostgreSQL | `test_consultant_memory_postgres.py` **1 PASS／9.46s**：九個 MockTransport request、三輪、14工具；原話→合成 fixture 發布→固定 Memory／詳記／原话→共用 JD 新增→下輪取新版本→新連線 inspection 查原結果。真 PG18.6、原 JD 十三表、Saver＋Store＋publication；沒有 setup／清資料。初次 **1 FAIL／10.19s** 是測試把 domain dict 當物件，修正該斷言與查回 API 後通過。 |
 | 真 Windows／PG 宿主回歸 | 原 `test_memory_host_native.py` **1 PASS／41.61s**，一般 managed App＋新程序重開仍可用；既有測試只使用合成 native node／fixture 發布，不冒稱新工具在真模型或瀏覽器通過。 |
-| 獨立審查 | [App／checkpoint 審查](evidence/jd-memory-read-integration/review.md)：218 不重疊案例 PASS，該範圍未發現 P1／P2；套件作者不自算套件獨審。[工具／來源窄審](evidence/jd-memory-read-integration/source-review.md)首54 PASS後另抓 MR-R01；修正後三反例3 PASS／6.18s、原 marker probe PASS，finding CLOSED，無其他 P1／P2。 |
+| 獨立審查 | [App／checkpoint 審查](../experiments/legacy-evidence/jd-memory-read-integration/review.md)：218 不重疊案例 PASS，該範圍未發現 P1／P2；套件作者不自算套件獨審。[工具／來源窄審](../experiments/legacy-evidence/jd-memory-read-integration/source-review.md)首54 PASS後另抓 MR-R01；修正後三反例3 PASS／6.18s、原 marker probe PASS，finding CLOSED，無其他 P1／P2。 |
 
 受影響檢查使用 App 既有 frozen/offline 環境；部分前期命令有 pytest cache 權限警告，後续停用測試 cache。既有 Starlette／AnyIO DeprecationWarning 不影響斷言，沒有把警告稱作新產品缺陷。完整首敗記錄見各責任頁，未執行的 full suite／Web／自然模型未填通過。
 

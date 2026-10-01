@@ -10,7 +10,7 @@
 
 **2026-09-09 執行中補充：**Owner 表示「人改待審內容仍待審，如果不是共識的話也可以改」。下方該條 WORKING 政策現已開放依官方做法、開源原生行為與產品代價重新比較，不再是選型硬門檻；尚不等於已同意自動接受人工修改。其他審核方向保持，局部取捨及證據統一由[免費開源研究](2026-09-09-jd-oss-editor-capabilities-and-gaps.md)銜接，不把不同產品的 review／undo／核准混為同一共識。
 
-JD-R002/C02；2026-09-09；**G3／WORKING：Owner 同意審核粒度方向，並要求先審查整體 AI App 複雜度**。同意是可翻案的產品方向，不等於細部回退演算法、框架或施工核准。本文是操作效果研究，不是實作計畫。承接 [C01 內容與關係](2026-09-09-jd-document-relationships-working-research.md)，成品以[欄位指南](2026-09-09-jd-field-and-writing-guide.md)及[樣稿 r2](2026-09-09-frontend-engineer-jd-sample.md)為準；不受舊程式限制。
+JD-R002/C02；2026-09-09；**G3／WORKING：Owner 同意審核粒度方向，並要求先審查整體 AI App 複雜度**。同意是可翻案的產品方向，不等於細部回退演算法、框架或施工核准。本文是操作效果研究，不是實作計畫。承接 [C01 內容與關係](2026-09-09-jd-document-relationships-working-research.md)，成品以[欄位指南](../guides/2026-09-09-jd-field-and-writing-guide.md)及[樣稿 r2](../guides/2026-09-09-frontend-engineer-jd-sample.md)為準；不受舊程式限制。
 
 **Owner補充的研究優先序：**先前決定均可經討論翻案，優先學習現行主流、大廠共同做法及其理由，不能為保留既有結論而排除更好的方式。下列「已確認／不重問」只表示沒有新證據時不重複爭論；若成熟方案揭示更好的效果、成本或複雜度取捨，應列出差異與影響，交Owner討論，不靜默翻案。官方共同原則、各家不同契約與本產品選擇分開記錄；多家相同不自動證明對所有情境最佳，名稱相同也不代表底層相同。這不是production施工授權。
 
@@ -21,7 +21,7 @@ JD-R002/C02；2026-09-09；**G3／WORKING：Owner 同意審核粒度方向，並
 - 已確認、不重問：人與 AI 編輯同份最新文件；AI 改動可辨識且需明確審核；員工可直接編輯待審內容，編輯不等於接受；不處理仍待審，AI 可在最新內容上繼續工作。[C01 §1、§3、§5](2026-09-09-jd-document-relationships-working-research.md)
 - 本輪新增的是具體分組建議，不是重新決定上述原則。未審核不應阻止繼續訪談；這不等於允許 AI 分析時人機同時寫入。
 - 不做：重開 Memory、增加 JD 欄位、選框架／DB、定工具參數、改 prompt／UI／production、付費測試。匯出、刪除的保留／連帶刪除、操作中鎖定與失敗恢復另題細化。
-- 資料分工：本文管操作候選及情境；[官方證據 §5](../research/engineering/2026-09-09-jd-document-model-official-evidence.md#5-c02-編輯與審核接點複核)管事實、來源及限制；[父入口](2026-09-09-job-analysis-and-jd-content-research.md#2-文檔各負責什麼)管閱讀路由；[register](../current-decisions.md)管效力。
+- 資料分工：本文管操作候選及情境；[官方證據 §5](../research/engineering/2026-09-09-jd-document-model-official-evidence.md#5-c02-編輯與審核接點複核)管事實、來源及限制；[父入口](../guides/2026-09-09-job-analysis-and-jd-content-research.md#2-文檔各負責什麼)管閱讀路由；[register](../current-decisions.md)管效力。
 
 ## 2. 官方能支持什麼，不能代決什麼
 
@@ -104,7 +104,7 @@ JD-R002/C02；2026-09-09；**G3／WORKING：Owner 同意審核粒度方向，並
 | 接受／取消 | 對完整成員在候選 editor 呼叫原生 accept／reject；同 baseline 才提交結果 | R01-F 只證已知三 ID 的特定順序；正序拒絕有殘文與 raw keys。不能泛化成「一律反序」，也不能把查無 ID 當成功 |
 | 讀取目前／已接受內容 | 依選定政策明列投影，與歷次實改分開；刪文不當成現行工作 | 在成員與相依規則未定前，不能由一份乾淨快照推出完整 accepted projection |
 
-依據：[R01／R01-F](evidence/2026-09-09-jd-native-pending-review-comparison.md)、[codec](evidence/2026-09-09-jd-native-pending-codec-probe.md)、[App 工具／保存責任](2026-09-09-jd-editor-app-integration-design.md)。因此「App 關聯資料＋原生命令＋现成 codec」是可研究的組合，尚不是完整解法。新增一個 groupId 欄位不會消除成員隔離和結算的責任。
+依據：[R01／R01-F](../experiments/legacy-evidence/2026-09-09-jd-native-pending-review-comparison.md)、[codec](../experiments/legacy-evidence/2026-09-09-jd-native-pending-codec-probe.md)、[App 工具／保存責任](2026-09-09-jd-editor-app-integration-design.md)。因此「App 關聯資料＋原生命令＋现成 codec」是可研究的組合，尚不是完整解法。新增一個 groupId 欄位不會消除成員隔離和結算的責任。
 
 若保留完整續改待審效果，至少還需交付成員歸屬、相依範圍、原生結算與失敗恢復、員工可讀邊界及其驗收。若實現方法變成通用成員推導／相依圖／排序／before-image 重建，便是本專案自建審閱引擎；不能因叫 adapter 就降低其責任。**現階段沒有足夠證據估成幾個簡單函式，也沒有足夠資料估工時；不虛構精確成本。**
 
@@ -130,7 +130,7 @@ JD-R002/C02；2026-09-09；**G3／WORKING：Owner 同意審核粒度方向，並
 
 推薦 B 的產品理由：員工主要提供工作事實，AI 顧問負責轉寫，持續對話與最新稿是工作中心；員工有能力指出誤解，不必承擔每項修改歸屬的管理。完整差異与历史仍必需，**不是為了容易通過目前 probe 就降低內容保真或隱藏修改**。這是本案推論，沒有實際 UX 試用證明 B 一定優於 A；若 Owner 重視個別取消的操作保證，應保留 A 並正面處理其整合成本。
 
-現行 [Codex review](https://learn.chatgpt.com/docs/code-review)以 Git 狀態、diff 與回饋續改提供檢查能力，也有 file／hunk revert；不能引用它證明「沒有個別取消更好」。[Claude Cowork](https://support.claude.com/en/articles/14729249-use-artifacts-in-claude-cowork)公開後續修改、每次保存新版、比較及還原；未公開任意語意建議分組。[VS Code](https://code.visualstudio.com/docs/agents/run/review-code-edits)同時說明新 Agent Host 直接保存、舊 extension host pending 路線。2026-09-09 定點複核結果集中於[證據 §2.12](evidence/2026-09-09-jd-app-tool-and-review-contracts.md#212-plate-選定後的審閱取捨複核)。**共同原則是可檢查及可修正，不能以「大廠共識」替 Owner 選 A／B／C。**
+現行 [Codex review](https://learn.chatgpt.com/docs/code-review)以 Git 狀態、diff 與回饋續改提供檢查能力，也有 file／hunk revert；不能引用它證明「沒有個別取消更好」。[Claude Cowork](https://support.claude.com/en/articles/14729249-use-artifacts-in-claude-cowork)公開後續修改、每次保存新版、比較及還原；未公開任意語意建議分組。[VS Code](https://code.visualstudio.com/docs/agents/run/review-code-edits)同時說明新 Agent Host 直接保存、舊 extension host pending 路線。2026-09-09 定點複核結果集中於[證據 §2.12](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#212-plate-選定後的審閱取捨複核)。**共同原則是可檢查及可修正，不能以「大廠共識」替 Owner 選 A／B／C。**
 
 ### 7.5 若採 B，完整流程及正式化影響
 

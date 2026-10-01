@@ -17,7 +17,7 @@
 
 **Owner 最新收斂要求：**先大致完成核心流程並收尾，問題集中在[唯一收尾清單](../specs/2026-09-13-jd-app-open-issues.md)；既有採用證據足夠的地方停止廣搜，只針對新反例修正。本次[整輪改動 API／畫面接合](../specs/2026-09-13-jd-run-change-view-slice.md)承接下方材料成果，實際驗證層級與限制以該結果為準；已承諾但未完成的恢復／來源等不默默刪除。
 
-**最新 CV-01 比較材料接點：**[固定 AI 操作集合讀取](../specs/2026-09-13-jd-run-change-material-slice.md)完成單一唯讀交易、版次連續性及首末已保存內容核對；人工／別輪插入不混為同輪，改後改回仍保留操作。新純反例54、獨立真PG13、差異回歸70、原history25（含12真PG）通過，獨審未發現P1／P2。這是內部讀取，公開整輪DTO／HTTP／欄位標記／刪除清單仍待接合。[Fetch有限診斷](../specs/evidence/jd-relational-chat-web/transport-diagnosis.md)另取得第三組TypeError／13ms／未abort；根因OPEN，臨時診斷已移除且乾淨build通過，不再無證據重送。
+**最新 CV-01 比較材料接點：**[固定 AI 操作集合讀取](../specs/2026-09-13-jd-run-change-material-slice.md)完成單一唯讀交易、版次連續性及首末已保存內容核對；人工／別輪插入不混為同輪，改後改回仍保留操作。新純反例54、獨立真PG13、差異回歸70、原history25（含12真PG）通過，獨審未發現P1／P2。這是內部讀取，公開整輪DTO／HTTP／欄位標記／刪除清單仍待接合。[Fetch有限診斷](../experiments/legacy-evidence/jd-relational-chat-web/transport-diagnosis.md)另取得第三組TypeError／13ms／未abort；根因OPEN，臨時診斷已移除且乾淨build通過，不再無證據重送。
 
 **最新 RS-3／4 同頁聊天接點：**[原話保護與已保存改動](../specs/2026-09-13-jd-chat-web-slice.md)已接 Web：手改先保存、原聊天 request 重開保護、最新對話、原 run 查回及逐 operation 前後內容。最後 Web 233 PASS、後端與 helper 219 PASS、生成／TS／build 及分工審查通過；真瀏覽器兩輪後 PG 獨立核 head3／operation2 與原生訪談一致。第一輪 fetch 中斷後明示恢復，限定重現仍有未定位的瀏覽器連線問題，不能稱無故障完成。日常 AI 仍未啟用，完整 CV-01／HR-02、Memory／source、自然品質與完整 App 未完成。
 
@@ -31,7 +31,7 @@
 
 **先前 RS-4 通知接點：**[人工通知與模型回覆保存](../specs/2026-09-13-jd-consultant-context-slice.md)已完成 LangChain／Anthropic adapter 精確相容導入、真正 wire、同版 notice 及原生 Agent／PG Saver 接合。受影響 74 PASS（13 真 PG），全組及 ACL 補跑合計 1624 非 PG 案例通過／193 PG 未全跑；codegen 與獨立審查通過，交錯串流 P2 已修。這是固定離線回覆接點，沒有完整 AI 生命周期或自然品質完成宣稱。
 
-**最新真瀏覽器驗收：**[還原與整輪撤回](../specs/evidence/2026-09-14-jd-restore-and-undo-browser-results.md)在真 Chrome、真 Next production build、原生 Windows 宿主與各自新建的真 PG 上跑完兩條旅程：建立→打字→自動保存→歷史→「還原到第 2 版」→逐項比較→「確認還原」；以及一次真訪談讓 AI 寫入後「撤回這輪 JD 改動」→「確認撤回」。獨立唯讀連線核對各新增一版、被取代版本仍可讀、conversation checkpoint 未減少；還原旅程零模型請求，撤回旅程 3 次請求全走既有離線傳輸、零付費。本次未改任何產品程式，只新增 CDP 測試 helper 與實證腳本。首敗（點擊落到位移後的元素）與未驗範圍見結果稿，**不代表完整成品驗收通過**。
+**最新真瀏覽器驗收：**[還原與整輪撤回](../experiments/legacy-evidence/2026-09-14-jd-restore-and-undo-browser-results.md)在真 Chrome、真 Next production build、原生 Windows 宿主與各自新建的真 PG 上跑完兩條旅程：建立→打字→自動保存→歷史→「還原到第 2 版」→逐項比較→「確認還原」；以及一次真訪談讓 AI 寫入後「撤回這輪 JD 改動」→「確認撤回」。獨立唯讀連線核對各新增一版、被取代版本仍可讀、conversation checkpoint 未減少；還原旅程零模型請求，撤回旅程 3 次請求全走既有離線傳輸、零付費。本次未改任何產品程式，只新增 CDP 測試 helper 與實證腳本。首敗（點擊落到位移後的元素）與未驗範圍見結果稿，**不代表完整成品驗收通過**。
 
 **本次追加驗收：**[回覆遺失與重開查回](../specs/2026-09-13-jd-browser-reply-loss-slice.md)完成真瀏覽器／原生宿主／PG端到端：真提交但回覆未到，重開以原operation GET查回，1POST／1GET／1execute，head2、任務及digest一致。對話框關閉誤落封存分支已修；新build／TS、Web99及helper23通過，獨立審查PASS。此處承接下方先前UI成果，不重跑或重算其全組數字。
 
@@ -87,7 +87,7 @@ RS-5 的還原／撤回 domain 與 DB 基礎在 RS-2 就實作驗證，RS-5 接�
 
 2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合生成／驗證／SDK離線、資料層、signer、查詢／保存／目錄HTTP、Windows宿主、持久配置、六章UI／瀏覽器恢復及本次原生Agent／通知保存接點。RS-1／2共同保存及RS-3／4局部結果以§1為準，DA-03已在UI切片實作驗證，不再列成未選定方案。還原／整輪撤回與AI生命週期仍未完成；RS-3–7尚未通過完整驗收，整體G4、G6及成品狀態不因局部PASS改判。
 
-本輪[分層／錯誤／紀錄官方證據](../specs/evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)已收束。typed result 合法組合及 HTTP 純投影已完成，service 亦驗真 DB 結果、診斷不含正文、sink 故障不蓋原觀察及不同文件獨立保存。宿主 logging 配置／容量／實際接線仍由相依工作補驗，不另開 logging 品牌研究。
+本輪[分層／錯誤／紀錄官方證據](../experiments/legacy-evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)已收束。typed result 合法組合及 HTTP 純投影已完成，service 亦驗真 DB 結果、診斷不含正文、sink 故障不蓋原觀察及不同文件獨立保存。宿主 logging 配置／容量／實際接線仍由相依工作補驗，不另開 logging 品牌研究。
 
 ## 4. 起始工程工作單位（沿革，已完成）
 

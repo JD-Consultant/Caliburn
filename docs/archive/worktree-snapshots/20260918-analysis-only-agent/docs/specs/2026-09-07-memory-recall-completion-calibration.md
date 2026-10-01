@@ -2,7 +2,7 @@
 
 2026-09-07 · LLM-Q019 · G5／G7 isolated；回查單樣本完成，讀取提示局部改善，非完整長訪談驗收。
 
-入口：[current decisions](../../../../docs/current-decisions.md)。前置證據：[CT-02](2026-09-07-native-context-normal-interview-results.md)。本稿只處理回查完成率／局部讀取效率，不重選 ABC、Memory 格式或 Provider。
+入口：[current decisions](../../../../docs/current-decisions.md)。前置證據：[CT-02](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-native-context-normal-interview-results.md)。本稿只處理回查完成率／局部讀取效率，不重選 ABC、Memory 格式或 Provider。
 
 ## 1. 本輪有效決定
 
@@ -29,7 +29,7 @@
 
 ## 4. 結果與下一 gate
 
-合成原訪談、真模型答案、工具輸入／結果、usage、腳本與指紋分開保存於[實測證據](evidence/2026-09-07-memory-recall-completion-calibration.json)。真 OpenAI 直連 `gpt-5.6-luna`／medium；三段共用同一 20 次／US$0.10 帳本。沿用 factory-owned 模型，fixture 的 Saver／Store 在記憶體中；沒有重跑 B1／B2、改寫案例內容或把原訪談預塞新 Context。重新建立文件、來源與檔案地址，是同內容對照，非逐 byte 相同的 seeded 實驗。
+合成原訪談、真模型答案、工具輸入／結果、usage、腳本與指紋分開保存於[實測證據](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-memory-recall-completion-calibration.json)。真 OpenAI 直連 `gpt-5.6-luna`／medium；三段共用同一 20 次／US$0.10 帳本。沿用 factory-owned 模型，fixture 的 Saver／Store 在記憶體中；沒有重跑 B1／B2、改寫案例內容或把原訪談預塞新 Context。重新建立文件、來源與檔案地址，是同內容對照，非逐 byte 相同的 seeded 實驗。
 
 | 測試 | 模型／工具次數 | 結果 | usage 估算費用 | HTTP 耗時合计 |
 |---|---:|---|---:|---:|

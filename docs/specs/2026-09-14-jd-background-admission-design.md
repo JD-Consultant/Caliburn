@@ -6,7 +6,7 @@
 
 ## 1. 為什麼需要一個落點
 
-缺口不是推論，是實測：[真 PG 案例](evidence/jd-b1-adoption/r3-notification-and-background-results.md)逐一列出 B1 Saver state、B2 Saver state、publication head 與 `jd_document` 的全部欄位，`target_reference`、`status`、`error_code`、`recovery_count` 四項都不在其中。
+缺口不是推論，是實測：[真 PG 案例](../experiments/legacy-evidence/jd-b1-adoption/r3-notification-and-background-results.md)逐一列出 B1 Saver state、B2 Saver state、publication head 與 `jd_document` 的全部欄位，`target_reference`、`status`、`error_code`、`recovery_count` 四項都不在其中。
 
 `source_reference`（本批）確實是持久的——兩個 workflow 都存它——但**批次是 target 的前綴，不是 target**。第二條案例證明：丟掉 target 之後只剩目前 head，而從 head 重推的範圍會隨員工繼續講話而變大，已准入的工作因此永遠不會收斂。這正是窗口契約禁止的「用 latest 取代已保存 target」。
 

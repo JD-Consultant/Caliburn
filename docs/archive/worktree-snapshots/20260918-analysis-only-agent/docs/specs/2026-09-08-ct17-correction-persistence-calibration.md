@@ -2,11 +2,11 @@
 
 2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **局部校準與複測完成，品質G8仍OPEN。**
 
-結論：新更正可沿B自然保存，但已有更正的重述仍未補存；C同輪修補未實證。不能宣稱全面修好。[去敏完整證據](evidence/2026-09-08-ct17-correction-persistence.json) · [可見逐字稿](evidence/2026-09-08-ct17-correction-persistence.transcript.md)。
+結論：新更正可沿B自然保存，但已有更正的重述仍未補存；C同輪修補未實證。不能宣稱全面修好。[去敏完整證據](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct17-correction-persistence.json) · [可見逐字稿](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct17-correction-persistence.transcript.md)。
 
 ## 決策與證據邊界
 
-唯一問題：員工更正具體工作資料，但共同工作模式不變時，不能只在回答採用新值，卻讓目前Memory繼續提供舊值。承接[CT16結果](2026-09-08-ct16-notification-live-results.md)，不重新討論Memory分層。最新授權：「同意，一樣研究大廠它們遇到這種情況會怎麼解決」。
+唯一問題：員工更正具體工作資料，但共同工作模式不變時，不能只在回答採用新值，卻讓目前Memory繼續提供舊值。承接[CT16結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct16-notification-live-results.md)，不重新討論Memory分層。最新授權：「同意，一樣研究大廠它們遇到這種情況會怎麼解決」。
 
 CT16 #16–17均有更正訊息、guide舊日期及可用B/C工具；回答採用5日前，卻沒有任何tool call，正文／導覽仍10日前。這是修改前可觀察失敗，不是API／schema失敗。近期對話可以回答正確，不等於Memory已更新；原始訪談仍可回查。
 

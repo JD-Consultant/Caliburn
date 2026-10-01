@@ -1,6 +1,6 @@
 # Plan — F2 後端 app 入口收斂(single composition root + `/healthz` 統一 + 移除 demo)
 
-- 依據:[ADR 0017](../adr/0017-app-entry-single-composition-root.md) · 研究 [`../specs/2026-07-02-app-composition-health-degradation-research.md`](../specs/2026-07-02-app-composition-health-degradation-research.md)。
+- 依據:[ADR 0017](../adr/0017-app-entry-single-composition-root.md) · 研究 [`../specs/2026-07-02-app-composition-health-degradation-research.md`](../../../../../research/engineering/2026-07-02-app-composition-health-degradation-research.md)。
 - 原則:**move-only**;green-before==green-after(baseline:api `uv run pytest` 149 passed);一 task 一 commit。
 
 ## Task 1 — 抽單一 wiring 點,main/live 變薄殼,health 統一 `/healthz`

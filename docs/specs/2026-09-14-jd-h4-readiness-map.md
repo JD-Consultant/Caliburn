@@ -1,6 +1,6 @@
 # 新 JD App：施工順序五項的現況與唯一阻擋
 
-> **2026-09-15 閱讀校正：本稿保存 9/14 的施工結果，但「Anthropic 模型尚未選」不是目前阻擋。產品路徑已確認為 LangChain／LangGraph → OpenRouter → OpenAI-only route → `openai/gpt-5.6-luna`，不重做既有自然模型與 prompt 校準。完整 JD 歷史與整份舊版還原是已完成、可保留的額外能力，不是第一版接線前置，也不需為接線拆除或擴張；首版必要範圍只要求顯示當輪 LLM 的實際 JD 差異，並安全撤回整輪 JD 效果，不撤回對話或 Memory。B2 因 OpenRouter 沒有受支援的 inline compaction 等價接點而進入 Owner 決策門；最新證據與選項見 [接線對齊稿](evidence/2026-09-15-jd-integration-document-reconciliation.md) §7.4。**
+> **2026-09-15 閱讀校正：本稿保存 9/14 的施工結果，但「Anthropic 模型尚未選」不是目前阻擋。產品路徑已確認為 LangChain／LangGraph → OpenRouter → OpenAI-only route → `openai/gpt-5.6-luna`，不重做既有自然模型與 prompt 校準。完整 JD 歷史與整份舊版還原是已完成、可保留的額外能力，不是第一版接線前置，也不需為接線拆除或擴張；首版必要範圍只要求顯示當輪 LLM 的實際 JD 差異，並安全撤回整輪 JD 效果，不撤回對話或 Memory。B2 因 OpenRouter 沒有受支援的 inline compaction 等價接點而進入 Owner 決策門；最新證據與選項見 [接線對齊稿](../experiments/legacy-evidence/2026-09-15-jd-integration-document-reconciliation.md) §7.4。**
 
 日期：2026-09-14；Topic：JD-R002。這份只做一件事：把施工順序的五項，逐項對到**可以自己去看的證據**（tag、結果稿、測試），並說明剩下什麼、為什麼剩下。不重述設計，不代替[收尾清單](2026-09-13-jd-app-open-issues.md)。
 
@@ -10,13 +10,13 @@
 
 **完成。**tag `jd-b1-fixed-target-batch-20260914`、`jd-h4-r1-postgres-batch-20260914`。
 
-source owner 自己發 `purpose=window` 的固定 target，依 publication cursor 切連續有界 batch；caller 不解 token、不拼 first/last、不回 latest。一批 B1 在真 `PostgresSaver`／`PostgresStore` 上保存，故障後關閉重建資源續作，重抽與重複 request 查回都驗過。結果：[批次接點](evidence/jd-b1-adoption/fixed-target-batch-results.md)、[R1 真 PG](evidence/jd-b1-adoption/r1-postgres-batch-results.md)。
+source owner 自己發 `purpose=window` 的固定 target，依 publication cursor 切連續有界 batch；caller 不解 token、不拼 first/last、不回 latest。一批 B1 在真 `PostgresSaver`／`PostgresStore` 上保存，故障後關閉重建資源續作，重抽與重複 request 查回都驗過。結果：[批次接點](../experiments/legacy-evidence/jd-b1-adoption/fixed-target-batch-results.md)、[R1 真 PG](../experiments/legacy-evidence/jd-b1-adoption/r1-postgres-batch-results.md)。
 
 ## 2. H4-R2：B1→B2→publication 有序交接
 
 **完成。**tag `jd-h4-r2-consolidation-20260914`。
 
-B2 逐字採用，兩批有序交接、B2 pending 重建資源續作、發布回覆遺失以原 request 查回、C 較晚更正都在真 PG 上驗過；未發布不推 cursor、不開始下一批。結果：[R2 交接](evidence/jd-b1-adoption/r2-consolidation-handover-results.md)。
+B2 逐字採用，兩批有序交接、B2 pending 重建資源續作、發布回覆遺失以原 request 查回、C 較晚更正都在真 PG 上驗過；未發布不推 cursor、不開始下一批。結果：[R2 交接](../experiments/legacy-evidence/jd-b1-adoption/r2-consolidation-handover-results.md)。
 
 ## 3. H4-R3：通知、准入、宿主生命週期、顧問方法
 
@@ -25,7 +25,7 @@ B2 逐字採用，兩批有序交接、B2 pending 重建資源續作、發布回
 | R3 子項 | 狀態 | 證據 |
 |---|---|---|
 | 1. 明示初始化最小准入狀態 | 完成 | `jd_memory_admission` 依 [ADR0076](../adr/0076-jd-background-admission-record.md)；真 PG 驗保存、對帳、重複喚醒、受阻、封存 |
-| 2. 純通知 call/result 辨識、停止、未知、恢復 | 完成 | [R3 結果](evidence/jd-b1-adoption/r3-notification-and-background-results.md) |
+| 2. 純通知 call/result 辨識、停止、未知、恢復 | 完成 | [R3 結果](../experiments/legacy-evidence/jd-b1-adoption/r3-notification-and-background-results.md) |
 | 3. A 指引／三項分析 Skills／Memory 行動指引；人工與 LLM 同一 writer | 完成 | tag `jd-consultant-guidance-skills-20260914`、[結果稿](2026-09-14-jd-consultant-guidance-and-skills-slice.md) |
 | 4. 安全回合與啟動恢復時喚醒同一背景入口 | 完成 | 同 R3 結果稿；重複喚醒不重跑、不換 target、不重設額度 |
 | 5. 普通關閉與排空 | 完成 | 同上；宿主有限 worker、drain、Saver 關閉 |
@@ -53,7 +53,7 @@ B2 逐字採用，兩批有序交接、B2 pending 重建資源續作、發布回
 
 人工與 LLM 走同一 writer：`manual_command` 與 `model_command` 轉入同一 command，由同一 `JdStorage` 交易保存（`test_command_flow.py` 兩種模式都驗）。schema 由 SSOT 生成，`generate_contract.py --check` 相符。
 
-本輪另外補上的：[整份還原與整輪撤回的真瀏覽器驗收](evidence/2026-09-14-jd-restore-and-undo-browser-results.md)、[還原確認期間暫停手改與新回合](2026-09-13-jd-app-open-issues.md)（OI-06 進度三）、[撤回來源記錄](evidence/2026-09-14-jd-restore-and-undo-browser-results.md)、[來源標記與點回原話](2026-09-14-jd-source-readback-slice.md)。
+本輪另外補上的：[整份還原與整輪撤回的真瀏覽器驗收](../experiments/legacy-evidence/2026-09-14-jd-restore-and-undo-browser-results.md)、[還原確認期間暫停手改與新回合](2026-09-13-jd-app-open-issues.md)（OI-06 進度三）、[撤回來源記錄](../experiments/legacy-evidence/2026-09-14-jd-restore-and-undo-browser-results.md)、[來源標記與點回原話](2026-09-14-jd-source-readback-slice.md)。
 
 ## 5. 產品驗收：已完成與未完成，分開說
 
@@ -70,7 +70,7 @@ B2 逐字採用，兩批有序交接、B2 pending 重建資源續作、發布回
 
 ## 5.1 獨立審查
 
-本階段 19 個提交已由非實作者[獨立審查](evidence/2026-09-14-jd-phase-independent-review.md)：八項發現全部修正（兩項 HIGH 都是「把不知道說成知道」），兩條沒有鑑別力的測試一併重寫，一句在當時不成立的文件宣稱已更正。採用保真度、撤回來源推導與不可偏離的產品效果由審查者獨立核對通過。窄複核進行中。
+本階段 19 個提交已由非實作者[獨立審查](../experiments/legacy-evidence/2026-09-14-jd-phase-independent-review.md)：八項發現全部修正（兩項 HIGH 都是「把不知道說成知道」），兩條沒有鑑別力的測試一併重寫，一句在當時不成立的文件宣稱已更正。採用保真度、撤回來源推導與不可偏離的產品效果由審查者獨立核對通過。窄複核進行中。
 
 ## 6. 2026-09-15 現況：阻擋是正式接線，不是選 Anthropic 模型
 

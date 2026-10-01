@@ -32,7 +32,7 @@ flowchart TD
 
 **記憶不是隱藏版 JD。**「受訪者工作記憶」包含原始訪談層、工作情境層與工作理解層；B2 的理解可支持 JD 職責、任務及 O／P／K／S 的分析，但不按這些成品欄位預寫內容。JD 的分組與措辭由 A 職務顧問依已核對資訊及當時的分析／寫作方法判斷；版型或方法變更不應使原有工作依據失效，缺少的新事實仍要回查或詢問。工作情境的單位與切分方向見[產品概念](../product-concept.md#工作情境的單位與切分名稱已確認細判準待實例核對)，目標用語不表示現行 `case_*` 程式契約已改名。
 
-三層各自**負責什麼、不能代做什麼**，由[產品概念的資訊邊界表](../product-concept.md#三層各自負責與不可代做目標資訊邊界)維護；[完整工作分析指南 §9](2026-09-09-complete-work-analysis-guide.md#9-工作理解正文要寫到多清楚2026-09-25-研究補核對)說明理解正文的分析依據與資訊粒度。本導覽只標出主要流向與負責者，不另存一份細部規則。
+三層各自**負責什麼、不能代做什麼**，由[產品概念的資訊邊界表](../product-concept.md#三層各自負責與不可代做目標資訊邊界)維護；[完整工作分析指南 §9](../guides/2026-09-09-complete-work-analysis-guide.md#9-工作理解正文要寫到多清楚2026-09-25-研究補核對)說明理解正文的分析依據與資訊粒度。本導覽只標出主要流向與負責者，不另存一份細部規則。
 
 工作情境層回答「這件工作實際怎麼做」，工作理解層回答「這些情境支持對本人工作的什麼認識，以及何時適用」；理解沿引用回查細節，不重抄每件情境，也不抹平條件與差異。A／B 網站的具體對照及待核對邊界由[產品概念第二層](../product-concept.md#第二層概念與資訊關係已確認的部分其餘待討論)維護，本導覽不另定正文格式。
 
@@ -114,5 +114,5 @@ flowchart LR
 - [Memory／JD 編輯工具研究 §10](2026-09-09-llm-app-tool-use-and-document-editing-common-practices.md#10-patch-格式與定位執行器分開判斷2026-09-27-續議)：保存格式比較及實際 first-match 反例；較早格式未定的狀態已由[009 最新選型](../product-concept.md#工作情境與工作理解的三個內容欄位目標未實作)承接。**Memory 專用工具＋V4A 方向已定，安全執行器／完整工具接線仍 OPEN**；不由本導覽裁決 DB 身分、來源欄位或發布規則。
 - [Agent 能力與生命週期的跨廠研究／首輪現況對照](../research/agent-systems/2026-09-25-agent-capabilities-and-lifecycle-patterns-research.md)用「能力要解決的問題」對照各家名詞與現碼。**PROD-G1-019 已選 LangGraph＋OpenAI direct Responses SDK**；[007 背景生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md)已定 B1／B2 新批次開始前依門檻壓縮、同批接續與系統管理，不照搬 A 的觸發或使用者控制。State／接續映射見[共用執行](2026-09-27-shared-agent-execution-and-state-design.md)，候選與發布保存見[資料與交易](../architecture/persistence.md)，工具契約沿下方入口；[共通信任邊界](2026-09-26-consultant-context-and-state-design.md#31-app-資料訊息與原生項目的權限邊界目標已確認)不改原生接續型別。其餘責任、資料真相與正常／異常時序仍依[架構討論規範](../architecture-discussion-standard.md)逐層審核，不因框架選定而宣稱已施工。
 - [Working State 的生命週期與 context](2026-09-16-consultant-interview-working-state-design.md)；[證據鍵、引用與 Runtime／模型權責](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)。兩份文件中的 C 相關段落屬舊方向，以本次 Owner 裁決為準。
-- [JD 模型工具與來源／差異](2026-09-29-jd-model-tool-contract-review.md)；[工作分析](2026-09-09-complete-work-analysis-guide.md)；[JD 寫作](2026-09-09-jd-field-and-writing-guide.md)。
+- [JD 模型工具與來源／差異](2026-09-29-jd-model-tool-contract-review.md)；[工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)；[JD 寫作](../guides/2026-09-09-jd-field-and-writing-guide.md)。
 - [目前狀態與後續決策入口](../current-decisions.md)。跨權責的正式切換仍須依[決策流程](../decision-process.md)完成；本圖不取代 Accepted ADR 或既有測試證據。

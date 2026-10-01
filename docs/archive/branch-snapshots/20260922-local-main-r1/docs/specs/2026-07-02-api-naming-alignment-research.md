@@ -6,7 +6,7 @@
 > F7(ksa-pool/task-catalogs 命名重疊)、F5(POST occupations 應 PUT)** 要落實。維護者授權命名調整,
 > 但要求**先研究權威、只用可靠來源**。本輪**只研究、未改碼**。
 > **原則**:對齊規範/大廠(Google AIP、Microsoft/Zalando、monorepo 慣例);命名細節承接
-> [`2026-06-30-api-review-findings.md`](2026-06-30-api-review-findings.md) §F3/F4 的權威比對。
+> [`2026-06-30-api-review-findings.md`](../../../../../specs/2026-06-30-api-review-findings.md) §F3/F4 的權威比對。
 
 ---
 
@@ -105,4 +105,4 @@ F5 之後 `PUT …/occupations` = 「**此檔案已選職類**」(整批取代)�
 - **遷移**:[Snellman — monorepo atomic cross-project commits](https://www.snellman.net/blog/archive/2021-07-21-monorepo-atomic/)(Google monorepo / trunk-based 慣例)
 - **技術可行性**:FastAPI/Starlette 字面冒號路由——**本機 TestClient 實測**(§2)
 - **REST 方法語意**(F5 PUT):冪等整體取代用 PUT(HTTP 語意 / MDN / RFC 9110)
-- 命名比對細節:本 repo [`2026-06-30-api-review-findings.md`](2026-06-30-api-review-findings.md) §F3/F4
+- 命名比對細節:本 repo [`2026-06-30-api-review-findings.md`](../../../../../specs/2026-06-30-api-review-findings.md) §F3/F4

@@ -53,7 +53,7 @@ OpenRouter 公開資料當時列出的七個 Luna endpoint 都沒有宣告 `para
 失敗反證的是**目前 request compilation／capability routing 契約**，不是 Memory 語意、Luna
 品質或 Tool schema。
 
-完整 receipt 與診斷見[實驗報告 §10](../experiments/2026-09-03-memory-routing-canonical-read/report.md#10-trial-revision-3-實際結果)。
+完整 receipt 與診斷見[實驗報告 §10](../../../../../experiments/historical/20260918-memory-routing-spike/experiments/2026-09-03-memory-routing-canonical-read/report.md#10-trial-revision-3-實際結果)。
 
 ## 4. 官方事實
 

@@ -2,11 +2,11 @@
 
 2026-09-09 · LLM-Q019／CT42-R01 · G7/G8隔離局部優化。
 
-**目前結論：局部採用，G8仍OPEN。**續測20次Luna high估US$0.04937714；8模型失敗保留，12模型／11工具完成並保留主要既有細節。採候選提示及B2預設12模型／12工具，不改effort預設。完整證據、官方來源及限制見[CT44結果](../specs/2026-09-09-ct44-preservation-results.md)。下方外傳拒絕／候選還原是採用前歷史，不是目前阻塞。
+**目前結論：局部採用，G8仍OPEN。**續測20次Luna high估US$0.04937714；8模型失敗保留，12模型／11工具完成並保留主要既有細節。採候選提示及B2預設12模型／12工具，不改effort預設。完整證據、官方來源及限制見[CT44結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct44-preservation-results.md)。下方外傳拒絕／候選還原是採用前歷史，不是目前阻塞。
 
 ## 問題與已知證據
 
-[CT42](../specs/2026-09-09-ct42-long-interview-results.md) medium與high皆漏「依案一次主要操作說明」，high另漏「API文件不清楚先問後端／不假定能力」；最後B1並未撤銷。兩組寫入前都看到完整33行正文，產生的write_file本身就漏，非框架截斷。寫後只讀新版不能知道舊子句被省。提高推理與單純回讀不足，**不採原high結果**。
+[CT42](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct42-long-interview-results.md) medium與high皆漏「依案一次主要操作說明」，high另漏「API文件不清楚先問後端／不假定能力」；最後B1並未撤銷。兩組寫入前都看到完整33行正文，產生的write_file本身就漏，非框架截斷。寫後只讀新版不能知道舊子句被省。提高推理與單純回讀不足，**不採原high結果**。
 
 Owner已授權局部持續優化。方法依[OpenAI GPT-5.6官方提示](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6)的 Preserve factual claims／Simplify prompts／Surgical edit：先明確保留標準，修改一組指令後重走相同實例；不是全域max、不另造語意驗證器。
 

@@ -4,8 +4,8 @@
 - 狀態：Approved for implementation（owner 於 2026-08-10 指示研究後直接執行）
 - 範圍：第一階段安全清理與架構規範整理
 
-實作步驟見 [`../plans/2026-08-10-legacy-cleanup-and-monorepo-boundary-plan.md`](../plans/2026-08-10-legacy-cleanup-and-monorepo-boundary-plan.md)。
-Task 1 的逐項 consumer 盤點見 [`2026-08-10-legacy-cleanup-inventory.md`](2026-08-10-legacy-cleanup-inventory.md)。
+實作步驟見 [`../plans/2026-08-10-legacy-cleanup-and-monorepo-boundary-plan.md`](../../../../../plans/2026-08-10-legacy-cleanup-and-monorepo-boundary-plan.md)。
+Task 1 的逐項 consumer 盤點見 [`2026-08-10-legacy-cleanup-inventory.md`](../../../../../specs/2026-08-10-legacy-cleanup-inventory.md)。
 
 ## 1. 目標與不變量
 
@@ -81,4 +81,4 @@ Task 1 的逐項 consumer 盤點見 [`2026-08-10-legacy-cleanup-inventory.md`](2
 - [`docs/README.md`](../README.md)：文檔 taxonomy、擺放與 living docs 規則。
 - [`docs/design/task-analysis-engine.md`](../design/task-analysis-engine.md)：現行 job-analysis durable vertical。
 - [`docs/design/interview-engine.md`](../design/interview-engine.md)：legacy interview engine 的退役禁令。
-- [`docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../plans/2026-07-16-interview-ai-vnext-implementation-plan.md)：vNext 的隔離、切換與 v3 刪除順序。
+- [`docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../../../../../plans/2026-07-16-interview-ai-vnext-implementation-plan.md)：vNext 的隔離、切換與 v3 刪除順序。

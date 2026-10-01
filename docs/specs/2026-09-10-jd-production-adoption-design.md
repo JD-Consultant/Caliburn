@@ -1,6 +1,6 @@
 # JD 成品：既有顧問／Memory 正式採用與本機保存設計
 
-2026-09-10；JD-R002/R5、LLM-Q019。G4 有限設計審查 PASS，結果見[基線審查](evidence/2026-09-10-jd-product-baseline-review.md)與[生命週期補充審查](evidence/2026-09-10-jd-native-lifecycle-review.md)；ADR0074仍Proposed，production尚未採用。依[成品總計畫](../plans/2026-09-10-jd-product-delivery.md)與[主設計§4.1](2026-09-09-jd-editor-app-integration-design.md#41-接合目標與正式切換邊界)，本單位只閉合正式採用接點。原隔離六切片可繼續，production依§5準備核心／P3證據與採用manifest，再通過本設計／successor ADR 的G6。
+2026-09-10；JD-R002/R5、LLM-Q019。G4 有限設計審查 PASS，結果見[基線審查](../experiments/legacy-evidence/2026-09-10-jd-product-baseline-review.md)與[生命週期補充審查](../experiments/legacy-evidence/2026-09-10-jd-native-lifecycle-review.md)；ADR0074仍Proposed，production尚未採用。依[成品總計畫](../plans/2026-09-10-jd-product-delivery.md)與[主設計§4.1](2026-09-09-jd-editor-app-integration-design.md#41-接合目標與正式切換邊界)，本單位只閉合正式採用接點。原隔離六切片可繼續，production依§5準備核心／P3證據與採用manifest，再通過本設計／successor ADR 的G6。
 
 ## 1. 已核對的現況
 
@@ -90,7 +90,7 @@ CT49–51證明的範圍沿原紀錄，不代稱加入JD後的自然模型品質
 
 G6輸入為已授權核心／P3證據、A1採用manifest及A2設計／取代範圍審查；G6之後才執行A2契約實作、A3–A6正式施工／驗證、A7 closure。不能要求先完成正式施工才接受ADR。本文候選A1–A7均未通過；正式API/Web、setup與備份未實作，未呼叫付費模型。核心Task1–6可按既有批准繼續。
 
-2026-09-10 review修正：PDR-01封存／背景政策對齊R2；PDR-02拆G6前後；PDR-04補background admission及全部setup入口。同reviewer定點複核已將四项finding全部CLOSED，有限設計PASS，見[審查紀錄](evidence/2026-09-10-jd-product-baseline-review.md)。ADR0074仍Proposed；尚未實作／驗收正式接線。
+2026-09-10 review修正：PDR-01封存／背景政策對齊R2；PDR-02拆G6前後；PDR-04補background admission及全部setup入口。同reviewer定點複核已將四项finding全部CLOSED，有限設計PASS，見[審查紀錄](../experiments/legacy-evidence/2026-09-10-jd-product-baseline-review.md)。ADR0074仍Proposed；尚未實作／驗收正式接線。
 
 ## 6. 官方依據與效力
 
@@ -102,4 +102,4 @@ G6輸入為已授權核心／P3證據、A1採用manifest及A2設計／取代範�
 - OpenAI／Anthropic工具結果／context／副作用界線沿[現有官方稽核](2026-09-10-jd-responsibility-and-evidence-audit.md)與[context研究](2026-09-10-jd-context-change-and-source-research.md)。未公開vendor內部DB或Memory owner保持未知，不把本稿表名稱為大廠schema。
 
 
-**2026-09-10只讀接合補核：**[A1/A2精確前置](evidence/jd-product-adoption-preparation/README.md)已核170個主／隔離正式產品檔，166 byte一致、4僅換行不同。上文「舊pending」是產品簡稱；實際為Store workspace對checkpoint approved派生review，不是checkpoint pending queue。正式退役須包含模型workspace writers、rebase／恢復與graph direct_edit／workspace_authority_commit，及HTTP/UI舊writers；原話／run／基礎責任逐項映射，不能整檔誤刪。這是既定退出範圍的具體化，不新增產品選擇或現在刪除。Task4接受版89項Git輸入僅预覽，Task5/6後須重建A1最終manifest，G6仍未通過。
+**2026-09-10只讀接合補核：**[A1/A2精確前置](../experiments/legacy-evidence/jd-product-adoption-preparation/README.md)已核170個主／隔離正式產品檔，166 byte一致、4僅換行不同。上文「舊pending」是產品簡稱；實際為Store workspace對checkpoint approved派生review，不是checkpoint pending queue。正式退役須包含模型workspace writers、rebase／恢復與graph direct_edit／workspace_authority_commit，及HTTP/UI舊writers；原話／run／基礎責任逐項映射，不能整檔誤刪。這是既定退出範圍的具體化，不新增產品選擇或現在刪除。Task4接受版89項Git輸入僅预覽，Task5/6後須重建A1最終manifest，G6仍未通過。

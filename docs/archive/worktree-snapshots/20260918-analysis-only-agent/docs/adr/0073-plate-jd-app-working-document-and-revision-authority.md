@@ -4,10 +4,10 @@
 - **日期**：2026-09-10
 - **最新 Owner 裁決**：同意核心接線推薦，真人交付／核對先不做；原 HTML／DOCX 問答交付包改 PARKED，不列本版施工及驗收。正式契約與核心整體 review 已完成，兩項 P2 關閉；本 ADR 仍 Proposed，尚未完成 production G6 或修改 production。
 - **Topic**：JD-R002/C03，連動 C01／C02
-- **2026-09-10 語意契約v2**：Owner同意完整JSONB＋同PG方向，Task成果／要求平行分組、K／S完整item及單向同版引用沿[語意契約](../specs/evidence/2026-09-10-jd-semantic-contract-closure.md)。模型用issued refs、App映ID及推導反向集合；首建先保存items再read/link，兩次各自原子。新profile明示format 2，v1封存不搬移；不增加工具或關係store，不改本ADR Proposed效力。
-- **2026-09-10 契約補正**：Owner 同意依責任稽核補正後接線；同一 SSOT 收斂模型單一輸入意圖、錯誤／未閉合回執動作，並固定單向保存關係及有限執行策略，詳[補正紀錄](../specs/2026-09-10-jd-responsibility-and-evidence-audit.md)。這是本 Proposed 方案的工程閉合，不使 ADR 自動 Accepted，也不把離線契約證據當成 production／自然模型驗收。
-- **產品依據**：Owner 已選 Plate 免費核心、持續工作稿與差異／更正；另明確排除「目前稿／更正後」兩頁。效力見 [register](../current-decisions.md)與[審閱裁決](../specs/2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)。
-- **設計**：[App 接線](../specs/2026-09-09-jd-editor-app-integration-design.md)。Owner 已同意持久化與執行互斥方向；本 ADR 待正式契約及整體審查完成後正式化。
+- **2026-09-10 語意契約v2**：Owner同意完整JSONB＋同PG方向，Task成果／要求平行分組、K／S完整item及單向同版引用沿[語意契約](../../../../../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)。模型用issued refs、App映ID及推導反向集合；首建先保存items再read/link，兩次各自原子。新profile明示format 2，v1封存不搬移；不增加工具或關係store，不改本ADR Proposed效力。
+- **2026-09-10 契約補正**：Owner 同意依責任稽核補正後接線；同一 SSOT 收斂模型單一輸入意圖、錯誤／未閉合回執動作，並固定單向保存關係及有限執行策略，詳[補正紀錄](../../../../../specs/2026-09-10-jd-responsibility-and-evidence-audit.md)。這是本 Proposed 方案的工程閉合，不使 ADR 自動 Accepted，也不把離線契約證據當成 production／自然模型驗收。
+- **產品依據**：Owner 已選 Plate 免費核心、持續工作稿與差異／更正；另明確排除「目前稿／更正後」兩頁。效力見 [register](../current-decisions.md)與[審閱裁決](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)。
+- **設計**：[App 接線](../../../../../specs/2026-09-09-jd-editor-app-integration-design.md)。Owner 已同意持久化與執行互斥方向；本 ADR 待正式契約及整體審查完成後正式化。
 
 ## Context
 
@@ -15,7 +15,7 @@
 
 舊 ADR 保留 Store 中的 JD workspace、Saver 中的 approved document，以及 semantic groups、accept／reject 與 rebase。Owner 現已選擇持續工作稿，不再提供個別待審接受／取消。保留兩份當前 JD 並自動接受，只會沿用已不需要的狀態與效力。這次改動應明確退出舊 JD writers，保留 conversation／Memory 的既有研究成果。
 
-Plate 原生操作、保存重開、history 接點與 Python→Node→PostgreSQL 已有有限正證，另有 diff／normalization／history 反例。[證據及限制](../specs/2026-09-09-jd-editor-app-integration-design.md#1-推薦組合與證據效力)。證據支持使用框架作底座，沒有證明正式人編、所有內容 profile 或顧問品質已完成。OpenAI／Anthropic 公開契約支持模型提出工具操作、App 執行並回真實結果；沒有公開相同的 Plate／資料表內部設計。
+Plate 原生操作、保存重開、history 接點與 Python→Node→PostgreSQL 已有有限正證，另有 diff／normalization／history 反例。[證據及限制](../../../../../specs/2026-09-09-jd-editor-app-integration-design.md#1-推薦組合與證據效力)。證據支持使用框架作底座，沒有證明正式人編、所有內容 profile 或顧問品質已完成。OpenAI／Anthropic 公開契約支持模型提出工具操作、App 執行並回真實結果；沒有公開相同的 Plate／資料表內部設計。
 
 ## Decision
 
@@ -47,11 +47,11 @@ Plate 原生操作、保存重開、history 接點與 Python→Node→PostgreSQL
 
 | 既有決策 | 由本 ADR 取代的部分 | 保留 |
 |---|---|---|
-| [0060](0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) §authority／文件審核 | Saver 是核准 JD 唯一 owner；AI 只能產待審；人編／接受才改 approved | 顧問／框架責任、來源／Memory 邊界、單機及 no-RAG；本 ADR 不自行採用隔離 Memory 的 production 遷移 |
-| [0061](0061-compact-consultant-wire-progressive-skills-and-tools.md)／[0063](0063-hybrid-candidate-edit-tool-and-structured-final-response.md) 未被後續取代的 JD 限制 | 舊 candidate／approved final publication、review dependency 與核准文件寫入政策 | model／App 分工、真實 tool feedback、typed transport 與有界執行原則 |
-| [0064](0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md) 的 JD VFS／resource／publication | `/candidate`、`/workspace`、`/approved`、`/pending`、JD file verbs／固定 JSON resources、semantic review 投影與群組結算 | 來源精確回查與範圍驗證原則；Memory／Skill 的 filesystem 元件不因此退役 |
-| [0066](0066-persistent-ai-jd-working-draft-and-semantic-review.md)／[0067](0067-deep-agents-store-backed-jd-working-draft.md) 的 JD 生命周期 | Store workspace、manifest、approved-first／rebase、derived pending、accept／reject／defer、approved-only export；禁止專用 JD table 的舊選擇 | 同文件接續、按需讀取、有界失敗、來源隔離；Saver／Store 非 JD 事實不遷移 |
-| [0069](0069-shared-current-jd-working-copy-and-semantic-approval.md) 決定 1–4、6–7、11–14 中相關部分 | current↔approved 雙 snapshot、direct-edit 核准、dependency closure、approved-only export、「不增 editor」與 AI 先審後入限制 | 唯一主編輯面、訪談可續、自然聊天更正、保留 browser input、同文件版本檢查 |
+| [0060](../../../../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) §authority／文件審核 | Saver 是核准 JD 唯一 owner；AI 只能產待審；人編／接受才改 approved | 顧問／框架責任、來源／Memory 邊界、單機及 no-RAG；本 ADR 不自行採用隔離 Memory 的 production 遷移 |
+| [0061](../../../20260918-shared-current-jd/docs/adr/0061-compact-consultant-wire-progressive-skills-and-tools.md)／[0063](../../../../../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md) 未被後續取代的 JD 限制 | 舊 candidate／approved final publication、review dependency 與核准文件寫入政策 | model／App 分工、真實 tool feedback、typed transport 與有界執行原則 |
+| [0064](../../../../../adr/0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md) 的 JD VFS／resource／publication | `/candidate`、`/workspace`、`/approved`、`/pending`、JD file verbs／固定 JSON resources、semantic review 投影與群組結算 | 來源精確回查與範圍驗證原則；Memory／Skill 的 filesystem 元件不因此退役 |
+| [0066](../../../../../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)／[0067](../../../../../adr/0067-deep-agents-store-backed-jd-working-draft.md) 的 JD 生命周期 | Store workspace、manifest、approved-first／rebase、derived pending、accept／reject／defer、approved-only export；禁止專用 JD table 的舊選擇 | 同文件接續、按需讀取、有界失敗、來源隔離；Saver／Store 非 JD 事實不遷移 |
+| [0069](../../../../../adr/0069-shared-current-jd-working-copy-and-semantic-approval.md) 決定 1–4、6–7、11–14 中相關部分 | current↔approved 雙 snapshot、direct-edit 核准、dependency closure、approved-only export、「不增 editor」與 AI 先審後入限制 | 唯一主編輯面、訪談可續、自然聊天更正、保留 browser input、同文件版本檢查 |
 | [0070](0070-consultant-workspace-ui-and-explicit-pending-edit-approval.md) Proposed 的 JD 待審方案 | 本次不採 pending 人改／接受 UI 或舊固定欄位投影為新 JD profile | 可用 Web 元件只是既有能力；不重議本案既有非 JD 範圍 |
 
 0065／0068 的 operational budgets 不在此調整。0071／0072 的 Memory／RAG 候選不由本 ADR 批准。若 production 組合必須改 Memory authority，先有其独立 successor，再在切換計畫明列相依；不能夾帶在 JD ADR。
@@ -72,16 +72,16 @@ Plate 原生操作、保存重開、history 接點與 Python→Node→PostgreSQL
 
 ## Acceptance gate
 
-此文件仍是待正式化的 production 架構，不授權直接改 production。[主稿 §9.1](../specs/2026-09-09-jd-editor-app-integration-design.md#91-整體接線評審包)的人工暫停與保存取捨已同意，交付延後；核心正式契約及整體交叉審查已完成，可作 S5 核心設計／隔離施工交接。[F02](../specs/evidence/2026-09-10-jd-official-profile-probe.md)與 schema／SDK 證據仍不是正式 editor 或 Agent 整合。production Accepted／G6 及下述 Memory authority 採用尚未完成；必要能力若須新通用引擎則按停止線處理。施工計畫依已核准方向拆分，真人交付不列阻塞。
+此文件仍是待正式化的 production 架構，不授權直接改 production。[主稿 §9.1](../../../../../specs/2026-09-09-jd-editor-app-integration-design.md#91-整體接線評審包)的人工暫停與保存取捨已同意，交付延後；核心正式契約及整體交叉審查已完成，可作 S5 核心設計／隔離施工交接。[F02](../../../../../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md)與 schema／SDK 證據仍不是正式 editor 或 Agent 整合。production Accepted／G6 及下述 Memory authority 採用尚未完成；必要能力若須新通用引擎則按停止線處理。施工計畫依已核准方向拆分，真人交付不列阻塞。
 
 第一條垂直驗收為「人編保存→既有顧問工具讀取與修改→原畫面顯示真差異→同操作中斷對帳→關頁重開」。同時驗繁中、重複文字、條件／來源保留、過期與部分失敗零發布。免費固定操作驗收與實際付費模型品質驗收分列；本 ADR 不授權付費請求、DB 重建、merge 或 push。
 
-具體邊界由[正式 schema 附件](../specs/2026-09-10-jd-editor-contract-schema.md)承接，[六切片計畫](../plans/2026-09-10-jd-editor-core-implementation.md)只接 CT49–51 隔離顧問。依[主稿 §4.1](../specs/2026-09-09-jd-editor-app-integration-design.md#41-接合目標與正式切換邊界)，production 仍有獨立且有限的 Memory authority 正式化依賴；不透過本 ADR 偷渡不同 Python／模型／Memory 版本。本機 schema 與 SDK serialization 驗收不能代稱真 provider 接受或自然模型品質，兩者按實際驗收範圍分列。
+具體邊界由[正式 schema 附件](../../../../../specs/2026-09-10-jd-editor-contract-schema.md)承接，[六切片計畫](../plans/2026-09-10-jd-editor-core-implementation.md)只接 CT49–51 隔離顧問。依[主稿 §4.1](../../../../../specs/2026-09-09-jd-editor-app-integration-design.md#41-接合目標與正式切換邊界)，production 仍有獨立且有限的 Memory authority 正式化依賴；不透過本 ADR 偷渡不同 Python／模型／Memory 版本。本機 schema 與 SDK serialization 驗收不能代稱真 provider 接受或自然模型品質，兩者按實際驗收範圍分列。
 
 ## Sources
 
-- [官方工具及共同編輯證據](../specs/evidence/2026-09-09-jd-app-tool-and-review-contracts.md)：OpenAI、Anthropic、VS Code 的版本／成熟度與適用邊界，未公開實作保持 unknown。
-- [Plate 免費套件與授權](../specs/evidence/2026-09-09-jd-oss-plate.md)、[固定保存 P01](../specs/evidence/2026-09-09-jd-native-save-probe.md)：限定原生與交易能力。
+- [官方工具及共同編輯證據](../../../../../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md)：OpenAI、Anthropic、VS Code 的版本／成熟度與適用邊界，未公開實作保持 unknown。
+- [Plate 免費套件與授權](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-09-jd-oss-plate.md)、[固定保存 P01](../../../../../experiments/legacy-evidence/2026-09-09-jd-native-save-probe.md)：限定原生與交易能力。
 - [PostgreSQL 16 Transactions](https://www.postgresql.org/docs/16/tutorial-transactions.html)、[Read Committed](https://www.postgresql.org/docs/16/transaction-iso.html)：2026-09-10 查閱，穩定契約；不升級 repo DB。
 - [LangGraph Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)：2026-09-10 查閱；框架 checkpoint 不是外部 JD side effect 已完成的證明。
 - [現行本地 admission](../../apps/api/app/adapters/langgraph/postgres.py)、[隔離顧問取消／close](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/conversation.py)：2026-09-10 唯讀核對；兩者不可冒稱已接妥。

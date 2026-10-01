@@ -26,7 +26,7 @@
 
 **共同原則（跨來源歸納）：**應用程式負責讓模型取得所需的現況；按需要提供詳細資料；分清原始輸入、環境資料及工具結果；可回查的版本與目前內容不能混用。**跨廠未一致：**通知的角色、欄位名稱、大小門檻、偵測時機、模型已看過多少的追蹤，以及何時要求人工介入。
 
-公開原始碼／版本明細分存 [OpenAI 證據](evidence/2026-09-10-jd-context-openai.md)及 [Anthropic 證據](evidence/2026-09-10-jd-context-anthropic.md)。Codex 固定 commit `c1840dc55e3cbb7ef27ccc1fb20b38cdd0e9ef68`（2026-09-09 UTC，Apache-2.0），其 experimental additional-context 會區分 application／untrusted、採不同 message role；每值的 1,000 是以 bytes 近似的 token 預算。Claude Code 當日參照 v2.1.266、公開 Python Agent SDK v0.2.152（MIT，bundled CLI 2.1.259）；不能因此推定 SDK 已含較後 CLI 修正。兩種大小政策與受信任程度處理並不相同。
+公開原始碼／版本明細分存 [OpenAI 證據](../experiments/legacy-evidence/2026-09-10-jd-context-openai.md)及 [Anthropic 證據](../experiments/legacy-evidence/2026-09-10-jd-context-anthropic.md)。Codex 固定 commit `c1840dc55e3cbb7ef27ccc1fb20b38cdd0e9ef68`（2026-09-09 UTC，Apache-2.0），其 experimental additional-context 會區分 application／untrusted、採不同 message role；每值的 1,000 是以 bytes 近似的 token 預算。Claude Code 當日參照 v2.1.266、公開 Python Agent SDK v0.2.152（MIT，bundled CLI 2.1.259）；不能因此推定 SDK 已含較後 CLI 修正。兩種大小政策與受信任程度處理並不相同。
 
 另外三個細節保留作防踩坑依據：[Claude Edit](https://code.claude.com/docs/en/tools-reference#edit-tool-behavior) v2.1.208 起，部分讀後改變情況只要現況精確唯一匹配仍可執行，結果告知另有變更；不能稱所有大廠一律拒絕過期讀取。[SDK approve-with-changes](https://code.claude.com/docs/en/agent-sdk/user-input#respond-to-tool-requests)可修改執行參數，但官方明示模型不會因此被告知改過。[FileChanged hook](https://code.claude.com/docs/en/hooks#filechanged)的終端通知及 Codex `fs/changed` client event，也不能當成模型已收到內容的證明。**本案同版檢查是結構化 JD 的已選取捨，不依這些特定文字工具自動放寬。**
 

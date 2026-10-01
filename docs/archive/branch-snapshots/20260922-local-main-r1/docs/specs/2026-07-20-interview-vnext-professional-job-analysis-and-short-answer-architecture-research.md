@@ -11,11 +11,11 @@ scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一�
 
 > 本文保存 R5 前置研究、產品邊界與後續職務分析／共編方向；**不是 exact implementation authority**。owner 已於
 > 2026-07-20 核准 R5 必要裁決，active 決策為
-> [`ADR 0037`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)，exact build authority 為
-> [`R5 grounded short-answer amendment`](../plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)。
+> [`ADR 0037`](../../../../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)，exact build authority 為
+> [`R5 grounded short-answer amendment`](../../../../../plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)。
 > owner 於 2026-07-22 另行確認 R5 後的 Context Engine、LLM operations、Agenda／Sufficiency、Authoring Core、AI proposal、
 > 公版metadata／retrieval與產品交付順序；active authority為
-> [`ADR 0038`](../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)。
+> [`ADR 0038`](../../../../../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)。
 > 不得因本文存在就自行新增 migration、production route、Web wiring 或 paid live。
 >
 > **Revision 3（owner scope correction）**：現有 editor、深文件契約、API、indexer 與欄位都只是可盤點的既有資產，
@@ -149,7 +149,7 @@ Competency-based Job Model**。
  -> one or more delivery surfaces
 ```
 
-現有 [`ADR 0030`](../adr/0030-ai-coedit-tracked-changes-one-brain.md) 的「AI 不可靜默改動、員工可接受／拒絕」方向可保留，
+現有 [`ADR 0030`](../../../../../adr/0030-ai-coedit-tracked-changes-one-brain.md) 的「AI 不可靜默改動、員工可接受／拒絕」方向可保留，
 但有兩個實作裁決與 Revision 4 衝突：它把 proposal 主要存為文件內 `_pending`，且人改內容只記 trace、不讓後續模型
 知道。新產品需要 canonical proposal/decision 與 `JobStateDigest`，否則 AI 會重問或重提員工已經親手改過的內容。本文
 核准後必須另寫 superseding ADR 指明替換哪些段落，不能讓實作者同時遵循兩套 authority。

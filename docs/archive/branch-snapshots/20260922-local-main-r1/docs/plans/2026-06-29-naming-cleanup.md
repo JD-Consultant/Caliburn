@@ -1,6 +1,6 @@
 # 命名整理執行計畫 — Caliburn rename / 去版號 / 去 jobintel
 
-> 決策見 [ADR 0013](../adr/0013-naming-cleanup-caliburn.md);研究見 [`../specs/2026-06-29-naming-conventions-research.md`](../specs/2026-06-29-naming-conventions-research.md)。
+> 決策見 [ADR 0013](../adr/0013-naming-cleanup-caliburn.md);研究見 [`../specs/2026-06-29-naming-conventions-research.md`](../../../../../research/engineering/2026-06-29-naming-conventions-research.md)。
 > 紀律:**每 task 一 commit**、move-only 為主、**green-before == green-after**、不動 archive/歷史 spec/golden。
 
 **安全網(各 app 綠燈門檻)**

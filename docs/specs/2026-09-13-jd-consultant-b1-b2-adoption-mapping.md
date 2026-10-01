@@ -6,7 +6,7 @@
 
 2026-09-13；JD-R002／OI-01、OI-02。[接續計畫 §5 H4](../plans/2026-09-13-jd-app-continuation-handoff.md) 要求的第一份交付。基準 `b76254f6`／tag `jd-memory-repair-app-review-20260913`。**本稿只做映射與差距判定，沒有改任何產品程式、沒有新增資料表、0 provider、日常 `enable_chat=False`。**
 
-**提交後審查修訂：**原稿提交 `2e243d15`；[審查紀錄](evidence/2026-09-13-jd-b1-b2-adoption-review.md)發現已驗方法／整理通知漏接、背景恢復規則誤套及 source 契約不足，已在本稿改正。完成窗口契約另經[9/12–9/13 文件審查](evidence/2026-09-13-jd-window-source-contract-review.md)，補上觸發與連續範圍、B2 `processed_source` 用途感知驗證、source/context pair、offset 單位及 purpose salt 隔離。下文是接續依據；這是文件修正，不代表新 App 的 B1／B2 已通過驗收，也沒有決定新增背景資料表。
+**提交後審查修訂：**原稿提交 `2e243d15`；[審查紀錄](../experiments/legacy-evidence/2026-09-13-jd-b1-b2-adoption-review.md)發現已驗方法／整理通知漏接、背景恢復規則誤套及 source 契約不足，已在本稿改正。完成窗口契約另經[9/12–9/13 文件審查](../experiments/legacy-evidence/2026-09-13-jd-window-source-contract-review.md)，補上觸發與連續範圍、B2 `processed_source` 用途感知驗證、source/context pair、offset 單位及 purpose salt 隔離。下文是接續依據；這是文件修正，不代表新 App 的 B1／B2 已通過驗收，也沒有決定新增背景資料表。
 
 這是**採用已完成的顧問**，不是重新研究顧問。CT49／CT50 已驗的訪談理解、詳記、整併與即時更正能力一律沿用；新 App 只補「新接點確實需要」的部分。
 
@@ -33,7 +33,7 @@
 | `publication.PublicationStore`／`PublishRequest`／`Receipt` | **已在** `caliburn_memory.publication` | `host_runtime` 的 `memory_engine`（schema-mapped） | 已沿用 | 無 |
 | `live_memory`／`repair`（C） | **已在** `caliburn_memory.repair`（含 `build_repair_graph`） | `memory_repair_session`／`memory_repair_records`／固定 `memory_repair` 節點 | 已沿用 | 已於[C 接合](2026-09-13-jd-memory-repair-app-integration-slice.md)補完 |
 | `memory_tools.readonly_file_tools` | **已在** `caliburn_memory.read_tools` | `memory_context.build_consultant_tools()` 的四個只讀工具 | 已沿用 | 無 |
-| `extraction.ExtractionWorkflow`／`ExtractionOutput`／`INSTRUCTIONS`（B1） | **已在** `caliburn_memory.extraction`；App OpenAI adapter 固定接合完成 | `ExtractionSourceAdapter`／同一 source owner；原生 structured runnable，provider 接受條件由 App 組裝 | 原檔盤點：`test_extraction.py`(450)／`_feedback`(207)／`_role`(164)／`test_summary_reextraction.py`(269)；新實測見[B1 結果](evidence/jd-b1-adoption/app-wiring-results.md) | 有界整批引用、真 PG／新程序、B2 交接與 runtime；不是再做已閉合 pair／W-13 |
+| `extraction.ExtractionWorkflow`／`ExtractionOutput`／`INSTRUCTIONS`（B1） | **已在** `caliburn_memory.extraction`；App OpenAI adapter 固定接合完成 | `ExtractionSourceAdapter`／同一 source owner；原生 structured runnable，provider 接受條件由 App 組裝 | 原檔盤點：`test_extraction.py`(450)／`_feedback`(207)／`_role`(164)／`test_summary_reextraction.py`(269)；新實測見[B1 結果](../experiments/legacy-evidence/jd-b1-adoption/app-wiring-results.md) | 有界整批引用、真 PG／新程序、B2 交接與 runtime；不是再做已閉合 pair／W-13 |
 | `consolidation.ConsolidationWorkflow`／`INSTRUCTIONS`（B2） | **尚未採用** → 建議 `caliburn_memory.consolidation` | 沿既有 `PublicationStore`／CAS；需與 C 的 receipt 權責銜接 | `test_consolidation.py`(503)／`_delivery`(126)／`_feedback`(271)／`_request`(212) | C 更正不被晚到舊候選蓋回的配對案例 |
 | `sources.ConversationReader` 的窗口／批次、`validate_saved_window`、`read`、`unprocessed_source`、`source_covered`／`require_new_source_after` | **不整批採用實作**（綁舊圖）；保留已驗語意 | package source interface＋App `conversation_sources`／`memory_sources` adapter（§3.1） | 原窗口、分頁、角色與範圍案例 | 新簽章引用、逐輪安全終局及有界歷史缺鏈 |
 | `consolidation_request.request_memory_consolidation`／`has_saved_request`、`sources.pending_consolidation_turns`、`live_memory.MEMORY_ACTION_GUIDANCE` | 採用純通知與辨識規則；正常 package／App 接點於接線前具體定名 | 新 Agent 註冊工具、原 call/result 驗證、終局後來源投影（§3.5） | 原整理請求／節奏案例，CT51 自然通知證據 | 不能把終局當整理請求；不能只靠文字冒充成功通知 |
@@ -106,7 +106,7 @@ C 寫 `kind="repair"` 的 publication receipt 並推進 head；B2 寫 `kind="con
 | 原生狀態不足、未知副作用、預算耗盡 | 明示受阻，保留現場與可用性通知；不能每次啟動清零或每次 tick 無限重試 |
 | 詳記重抽 | 原窗口與獨立重抽工作沿原 `reextract`／`resume_reextraction`，不推進正常 B1 輸入位置 |
 
-這是既有流程的移接，不是新增通用重試引擎。LangGraph 的 checkpoint 續作與 AWS 的同一意圖冪等原則支持此區分；並不保證未知副作用可以任意重跑。版本、官方依據與限制見[審查紀錄 §4](evidence/2026-09-13-jd-b1-b2-adoption-review.md)。
+這是既有流程的移接，不是新增通用重試引擎。LangGraph 的 checkpoint 續作與 AWS 的同一意圖冪等原則支持此區分；並不保證未知副作用可以任意重跑。版本、官方依據與限制見[審查紀錄 §4](../experiments/legacy-evidence/2026-09-13-jd-b1-b2-adoption-review.md)。
 
 ### 3.5 何時啟動背景整理
 
@@ -116,7 +116,7 @@ C 寫 `kind="repair"` 的 publication receipt 並推進 head；B2 寫 `kind="con
 
 ### 3.6 固定目標到有界批次（2026-09-14 接續設計）
 
-**狀態（2026-09-14）：**本節設計已由 R1 實作並驗證，見[批次接點結果](evidence/jd-b1-adoption/fixed-target-batch-results.md)與[R1 真 PG 結果](evidence/jd-b1-adoption/r1-postgres-batch-results.md)。下文保留原始設計語意；`through_reference` 只放准入列保存的固定 target，不放上一批的 batch ref。
+**狀態（2026-09-14）：**本節設計已由 R1 實作並驗證，見[批次接點結果](../experiments/legacy-evidence/jd-b1-adoption/fixed-target-batch-results.md)與[R1 真 PG 結果](../experiments/legacy-evidence/jd-b1-adoption/r1-postgres-batch-results.md)。下文保留原始設計語意；`through_reference` 只放准入列保存的固定 target，不放上一批的 batch ref。
 這是尚未接 runtime 的有限缺口，不推翻現有 B1 adapter：`plan_batch()` 現在只回 `{windows, covers_whole_range}`，B1 `start()` 卻需要單一 source ref；舊 `ConversationReader.extraction_batch()` 所做的整批引用投影尚未移接。`unprocessed_source()` 目前只回 `{first_run_id,last_run_id}` bounds，而且沒有契約 §7.1 的 `through_reference` 參數；它是相對目前原話 head 的未處理範圍，不等於某個**已固定 target** 的剩餘範圍。
 
 下一在同一 source owner 補兩個最小公開接點（名稱可依現有 API 慣例調整）：先讓 `unprocessed_source(after_reference, through_reference=None)` 在固定 canonical root 內回連續安全 bounds，並由 owner 發出一個固定的 `purpose="window"` target ref；再由 `plan_saved_batch(target_reference, document_id, *, after_reference=None, max_chars, context_chars, max_windows)` 回 `{source_reference: str | None, covers_whole_range: bool}`。這是 App 內部 port，不是新增 LLM 工具；不可讓 caller 用 first／last 自行拼 token。
@@ -152,9 +152,9 @@ C 寫 `kind="repair"` 的 publication receipt 並推進 head；B2 寫 `kind="con
 
 | 來源 | 映射到 |
 |---|---|
-| [工作完整分析](2026-09-09-complete-work-analysis-guide.md) | 訪談議程與「資料不足追問」的判斷點 |
-| [客製化深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md) | 何時局部足夠可以撰寫、何時繼續追問 |
-| [欄位寫作](2026-09-09-jd-field-and-writing-guide.md) | 十個 JD 工具的欄位寫法，不要求 LLM 填滿內部欄位 |
+| [工作完整分析](../guides/2026-09-09-complete-work-analysis-guide.md) | 訪談議程與「資料不足追問」的判斷點 |
+| [客製化深度與訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md) | 何時局部足夠可以撰寫、何時繼續追問 |
+| [欄位寫作](../guides/2026-09-09-jd-field-and-writing-guide.md) | 十個 JD 工具的欄位寫法，不要求 LLM 填滿內部欄位 |
 | [品質門檻](2026-09-10-jd-product-quality-acceptance.md) | 工作→JD／JD→依據的雙向核對與收尾條件 |
 
 最後一輪訪談尚未進 Memory 時，仍核目前對話與原話，沿用已驗顧問的來源使用原則；**將此原則用到完整 JD 收尾是新接點，須另驗，不宣稱 CT49 已驗自然產出 JD。**

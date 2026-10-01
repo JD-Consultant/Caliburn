@@ -1,9 +1,9 @@
 # AI 層 v3 實作計畫(追蹤修訂直寫+一條腦+品質迴路)— 全細節版
 
-> 依 [ADR 0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)、
+> 依 [ADR 0030](../../../../../adr/0030-ai-coedit-tracked-changes-one-brain.md)、
 > [研究紀錄 §6 已鎖決策清單](../specs/2026-07-12-ai-layer-redesign-research.md)、
-> [現況碼對接附錄](../specs/2026-07-13-ai-layer-v3-code-annex.md)(逐 task 檔:行盤點)、
-> [實作技術驗證](../specs/2026-07-13-ai-redesign-raw-impl-verification.md)(OpenRouter/promptfoo/OTel 官方查證)。
+> [現況碼對接附錄](../../../../../specs/2026-07-13-ai-layer-v3-code-annex.md)(逐 task 檔:行盤點)、
+> [實作技術驗證](../../../../../research/agent-systems/2026-07-13-ai-redesign-raw-impl-verification.md)(OpenRouter/promptfoo/OTel 官方查證)。
 > **設計已逐點鎖定,不要重開設計討論**;本檔每個 task 自足,現況行號以對接附錄為準
 > (若執行時行號漂移,以附錄描述的結構特徵定位)。
 
@@ -223,7 +223,7 @@ context.py 的 build_prompt/ROLE_HEADER 是 v1 死碼(**勿回收其 set_slot �
      當補充)。
    - `probing`:laddering 2–3 層+反 under-probe 觸發清單+holding+覆述三時機(§6.5)。
    原料檔:[iCAP 標準](../specs/2026-07-13-ai-redesign-raw-icap-field-standards.md)、
-   [國際標準](../specs/2026-07-13-ai-redesign-raw-intl-competency-standards.md)。
+   [國際標準](../../../../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md)。
    **SME gate:維護者逐檔審改後才算完成。**
 2. 載入器(純函式):`skills_for(phase, gap_kind)`→檔案清單;對應表=常駐 principles;
    duty/task 缺口→duty-task-structure;O 槽→output-writing;indicator→behavior-indicator;
@@ -306,8 +306,8 @@ T12 拆)。後端 interview:turn 是一次性 POST JSON(interview.py:90)——**
 **現況**:`apps/api/evals/interview_sim.py` 已有受訪者模擬(import 現行引擎介面,T4/T5 改介面後
 要同步);`scripts/validate_select_schema.py` 可參考。無 promptfoo/golden set/Source Score。
 
-**改動**(細節照 [evals 深挖報告](../specs/2026-07-12-ai-redesign-raw-evals-design.md) 附錄 A/B 與
-[驗證報告](../specs/2026-07-13-ai-redesign-raw-impl-verification.md) H3):
+**改動**(細節照 [evals 深挖報告](../../../../../research/agent-systems/2026-07-12-ai-redesign-raw-evals-design.md) 附錄 A/B 與
+[驗證報告](../../../../../research/agent-systems/2026-07-13-ai-redesign-raw-impl-verification.md) H3):
 1. 佈局:`apps/api/evals/{golden/<case_id>/{transcript.txt,reference.md,rubric.yaml},
    source_score.py, assertions/, promptfooconfig.yaml}`。
 2. promptfoo:**Python provider**(`call_api` 包引擎回合;`workers:1` 保狀態)跑單回合斷言;
@@ -355,7 +355,7 @@ T12 拆)。後端 interview:turn 是一次性 POST JSON(interview.py:90)——**
 **現況**:llm_openrouter.py `model_for_role`(:31)五 role;無 models fallback/provider 物件/
 parallel/streaming;agent_loop 假設序列工具回填(:44-55)。
 
-**改動**(參數名照[驗證報告](../specs/2026-07-13-ai-redesign-raw-impl-verification.md)):
+**改動**(參數名照[驗證報告](../../../../../research/agent-systems/2026-07-13-ai-redesign-raw-impl-verification.md)):
 1. 請求體加 `models:[主,備]`(備援先過 T11 考卷)+`provider:{allow_fallbacks:true,
    require_parameters:true}`(**require_parameters 保證只路由到支援 strict/tools 的 provider**)。
 2. `parallel_tool_calls:true`+agent_loop 改支援同輪多 tool_call 成對回填。

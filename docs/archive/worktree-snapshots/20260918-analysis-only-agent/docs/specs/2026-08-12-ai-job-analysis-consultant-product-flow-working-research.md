@@ -4,9 +4,9 @@
 - 狀態：Working Research；隨 owner 討論持續修訂
 - 決策狀態：只記錄已確認的產品方向與待討論問題；不是 ADR，不授權 production 實作
 - 優先順序：先以「產品如何像專業顧問工作」約束架構；核心 runtime 已選 LangChain 1.x＋LangGraph 1.2.x，RAG 明確留待後續另案研究
-- 外部資料查核：截至 2026-08-23 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策。文內早期「固定兩波 lookup」是歷史校準，已由 [ADR 0068](../adr/0068-framework-run-budgets-replace-lookup-wave-cap.md) 以 framework 總 run budgets 取代
+- 外部資料查核：截至 2026-08-23 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策。文內早期「固定兩波 lookup」是歷史校準，已由 [ADR 0068](../../../20260918-shared-current-jd/docs/adr/0068-framework-run-budgets-replace-lookup-wave-cap.md) 以 framework 總 run budgets 取代
 - Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x；§9.19再把候選生命週期收斂為Deep Agents／LangGraph持久working draft＋application semantic review。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例。施工必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等產品目的與framework primitive命名；選型先看效果、功能完整、可靠性與員工體驗，只有效果相當時才比較自寫量
-- 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](2026-08-12-staged-ai-consultant-runtime-framework-research.md) 只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
+- 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](../../../../../specs/2026-08-12-staged-ai-consultant-runtime-framework-research.md) 只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
 
 ## 0. 這份工作稿怎麼使用
 
@@ -200,7 +200,7 @@ Owner 確認第一版產品的產出定位為：
 - 已證明該員工具備文件列出的所有能力；
 - 已通過 iCAP、法規或其他外部效度審查。
 
-未來若組織要正式採用，可把本產品成果送入另一個組織核准或效度程序；目前不因此加入主管帳號、HR workflow、多人核准或外部認證功能。這延續[`專業顧問流程最終反方審查`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md#12-成品能合理宣稱什麼)的聲明上限，避免「專業顧問」被誤讀成已完成組織或甄選效度驗證。
+未來若組織要正式採用，可把本產品成果送入另一個組織核准或效度程序；目前不因此加入主管帳號、HR workflow、多人核准或外部認證功能。這延續[`專業顧問流程最終反方審查`](../../../20260918-shared-current-jd/docs/specs/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md#12-成品能合理宣稱什麼)的聲明上限，避免「專業顧問」被誤讀成已完成組織或甄選效度驗證。
 
 ### 2.14 目標優先、成熟框架優先承接、遷移受控（2026-08-13 已確認）
 
@@ -729,7 +729,7 @@ Owner 於 2026-08-13 確認：員工需要同時知道「大致談了多少」�
 
 ### 5.1 Task：焦點不等於 Task 抽取
 
-依 [`Task Discovery 深入研究`](2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)與[`Task 邊界研究`](2026-07-28-task-boundary-merge-split-and-identity-research.md)：
+依 [`Task Discovery 深入研究`](../../../../../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)與[`Task 邊界研究`](../../../../../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)：
 
 - 員工訊息、Source Claim、未映射線索、故事、Work Unit 與 Task Candidate 是不同層次；
 - 一個故事可支持零到多個工作假說，多個故事也可能支持同一 Task；
@@ -741,7 +741,7 @@ Owner 於 2026-08-13 確認：員工需要同時知道「大致談了多少」�
 
 ### 5.2 Duty：可提早分析，但保持為可變動假說
 
-依 [`專業顧問流程最終反方審查`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)與[`iCAP 欄位標準`](2026-07-13-ai-redesign-raw-icap-field-standards.md)：
+依 [`專業顧問流程最終反方審查`](../../../20260918-shared-current-jd/docs/specs/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)與[`iCAP 欄位標準`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-13-ai-redesign-raw-icap-field-standards.md)：
 
 - 初期責任區域與已出現的工作線索足以啟動 `duty-grouping` Skill，但形成的是可變動 Duty hypothesis，不是固定盒子；
 - Duty 可隨 Task／Work Unit 增加，依共同 purpose、責任、outcome、workflow stage、服務對象或領域動態整併；
@@ -752,7 +752,7 @@ Owner 於 2026-08-13 確認：員工需要同時知道「大致談了多少」�
 
 ### 5.3 O／P／K／S：方法可獨立載入，語意仍互相依賴
 
-依 [`OPKS 設計裁決`](2026-08-01-opks-design-decisions-research.md)、[`OPKS 漸進蒐集`](2026-08-04-opks-progressive-elicitation-research.md)與[`OPKS gap 再分析研究`](2026-08-06-opks-gap-reanalysis-blocking-research.md)：
+依 [`OPKS 設計裁決`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-08-01-opks-design-decisions-research.md)、[`OPKS 漸進蒐集`](../../../20260918-shared-current-jd/docs/specs/2026-08-04-opks-progressive-elicitation-research.md)與[`OPKS gap 再分析研究`](../../../../../specs/2026-08-06-opks-gap-reanalysis-blocking-research.md)：
 
 - 既有「以單一 Current JD Task 為一次 OPKS operation」是控制輸出量、prompt/schema 大小與 durable failure boundary 的現行實作決策，不應升格成產品流程必須等待 Task 穩定的證據；2026-08-04 研究中的獨立 OPKS child 也是當時架構限制下的方案，不是新顧問必須保留的模型呼叫或 profile 邊界；
 - 未來可把 O、P、K、S 拆成各自的 Skill，根據當輪證據與焦點按需載入；Skill 是否獨立，不預先決定是否另開模型呼叫；
@@ -2380,7 +2380,7 @@ AI 可在內部持續形成、修正或撤回暫時理解，不需要員工逐�
 1. **主 runtime 收斂為 LangChain 1.x＋LangGraph 1.2.x family。** LangChain 承接 provider、tool loop、structured output、Skills／middleware 與最小 context 組裝；LangGraph 承接可恢復流程、動態訪談狀態、來源依賴、待審文件變更、必要澄清與核准 artifact 的單一 durable owner。正式版本在施工 ADR pin 到當時 stable patch。
 2. **不再為這四個目的加入 DBOS、Camunda、Microsoft Agent Framework 或另一套 memory／planning framework。** 四個效果皆通過，依 §9.11.5 stop rule，不以「可能功能更多」再堆第二個 workflow owner。若 production 才發現明確硬缺口，只針對該缺口重開候選，不翻掉已通過部分。
 3. **Pydantic AI Harness Planning 0.13.0 不進主路徑。** 它可作單次 run 的短期提醒，但實際 API 不具本產品跨回合訪談所需的 identity、dependency、blocked／defer／reopen 與 durable store。這是版本實查結果，不是偏好。
-4. **停止 spike，進入產品升級。** successor [ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 與[受限 Big-bang implementation plan](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md) 已依本文產品目的起草；owner 明確核准 ADR 後，在新 worktree 建第一條「員工回答 → 動態分析／按需 Skills → 可見焦點與 Gap → 文件 patch 審核／必要澄清 → 核准 artifact」production vertical slice。不移植 spike，也不加舊元件 compatibility layer。
+4. **停止 spike，進入產品升級。** successor [ADR 0060](../../../../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 與[受限 Big-bang implementation plan](../../../../../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md) 已依本文產品目的起草；owner 明確核准 ADR 後，在新 worktree 建第一條「員工回答 → 動態分析／按需 Skills → 可見焦點與 Gap → 文件 patch 審核／必要澄清 → 核准 artifact」production vertical slice。不移植 spike，也不加舊元件 compatibility layer。
 
 本節機制判斷依據為 LangGraph 官方的 [Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)、[Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)、[Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts) 與 [Durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)；版本淘汰依據仍是 [Pydantic AI Harness 0.13.0 release](https://github.com/pydantic/pydantic-ai-harness/releases/tag/v0.13.0) 與 [0.13.0 Planning source](https://github.com/pydantic/pydantic-ai-harness/blob/v0.13.0/pydantic_ai_harness/planning/_capability.py)。
 
@@ -2399,7 +2399,7 @@ AI 可在內部持續形成、修正或撤回暫時理解，不需要員工逐�
 
 ### 9.14 施工前最終北極星與成熟元件覆蓋審核（2026-08-14）
 
-Owner 要求施工前最後一次詳細確認：產品方向必須優先於舊系統；同目的的通用自寫機制應由成熟框架直接替換，只有框架確實不知道的職務分析／員工 authority 語意才可保留。完整逐項結果與日後每個 Task 的防偏紀錄統一寫在 [`2026-08-14-consultant-runtime-north-star-audit-ledger.md`](2026-08-14-consultant-runtime-north-star-audit-ledger.md)。結論為 **Pass**：
+Owner 要求施工前最後一次詳細確認：產品方向必須優先於舊系統；同目的的通用自寫機制應由成熟框架直接替換，只有框架確實不知道的職務分析／員工 authority 語意才可保留。完整逐項結果與日後每個 Task 的防偏紀錄統一寫在 [`2026-08-14-consultant-runtime-north-star-audit-ledger.md`](../../../../../specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md)。結論為 **Pass**：
 
 1. §1–§8 的一位顧問、前景專注／背景吸收、自然離開／續談、Task／Duty／OPKS 動態演化、文件先審後入、澄清／Gap／審核分流、可信進度、單一可強制匯出、source-first 失敗恢復與本輪不做 RAG，已全部在 ADR 0060／plan 有明確 behavior test 或 gate。
 2. LangChain／LangGraph／Deep Agents／FastAPI／TanStack Query／Pydantic／PostgreSQL／OpenTelemetry 已承接 model binding、bounded loop、structured output、retry／limits、Skills、context lifecycle、Store／Saver、routing、interrupt、command、SSE、schema validation、transaction constraint 與 tracing；不再保留舊 Work Model／Focus／Progress／Proposal／Current JD 等通用生命週期。
@@ -2470,7 +2470,7 @@ Anthropic 的 Opus 5 官方指引支持的是**減少過時 scaffolding、明確
 
 `10,317 bytes` 只是症狀，不是 Anthropic 的硬上限。對目前 `ConsultantResult.model_json_schema()` 的離線結構量測為：18 defs、68 object properties、**28 optional parameters、20 個 `anyOf`／union sites、最深約 15 層**。Anthropic Structured Outputs 官方目前明列：單一 request 內 JSON output 與 strict tools 合計最多 **24 optional、16 union parameters**，而且即使個別數字不超標，optional／union／巢狀／tools 的交互組合仍可能超過內部 compiled-grammar limit。故本次 output schema 在不計 tools 前已同時超過兩個公開維度；「tool-free 某 route 成功」不能推翻公開限制，最多只說明 route、轉換、cache 或 endpoint enforcement 可能不同。[Anthropic Structured Outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
 
-repo 已有直接可重用的成功模式：2026-07-31 的 6,818-byte rich schema 也收到相同錯誤；改成 model-facing compact wire＋pure mapper，把 union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes 後，Opus 5 真 request HTTP 200，後續 Opus 5／Luna-Pro／Sonnet 5 三回合場景完成。這證明「保留 rich 產品能力，但換 provider contract 形狀」不是理論猜測。相關權威紀錄是 [`strict schema 研究`](2026-07-31-anthropic-strict-schema-grammar-limit-research.md)、[`model-facing contract 研究`](2026-07-31-context-engineering-model-facing-contract-research.md)、[`compact wire plan`](../plans/2026-07-31-task-analysis-compact-wire-contract-plan.md) 與 [`live smoke`](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)。
+repo 已有直接可重用的成功模式：2026-07-31 的 6,818-byte rich schema 也收到相同錯誤；改成 model-facing compact wire＋pure mapper，把 union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes 後，Opus 5 真 request HTTP 200，後續 Opus 5／Luna-Pro／Sonnet 5 三回合場景完成。這證明「保留 rich 產品能力，但換 provider contract 形狀」不是理論猜測。相關權威紀錄是 [`strict schema 研究`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-31-anthropic-strict-schema-grammar-limit-research.md)、[`model-facing contract 研究`](../../../../../specs/2026-07-31-context-engineering-model-facing-contract-research.md)、[`compact wire plan`](../../../../branch-snapshots/20260922-local-main-r1/docs/plans/2026-07-31-task-analysis-compact-wire-contract-plan.md) 與 [`live smoke`](../../../../../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)。
 
 因此 Anthropic 官方建議的修正順序也應照做：先降低 optional、簡化 nesting／union，再考慮 split requests；不能因 tool-free 呼叫成功就直接把最後一招升格成預設架構。第一版修法改為：
 
@@ -2510,7 +2510,7 @@ Opus 5 可借鑑的精簡不是刪除分析方法，而是把重複 scaffolding 
 
 > **Successor note（2026-08-21）：**上句是 ADR 0062 階段的歷史裁決，已由 §9.18／ADR 0063 取代。現行文件候選走一個 Tool＋final publication reference；model-facing operation 只有 ADD／REVISE／WITHDRAW／REASSIGN／REORDER，沒有 MERGE／SPLIT。
 
-lookup 不再固定「第一波 Skill、第二波 Source」。context 足夠時可以零 Tool call；彼此獨立的 Skill／source 讀取可在同一波平行；只有第一波結果產生新的資料依賴時才使用第二波。此節當時保留最多三次 model call、兩個 lookup waves 與總 Tool／token／timeout budget；其中固定三次上限其後已由 §9.18／ADR 0063 取代，兩個 lookup waves 與其他總預算仍保留。當時完整裁決見 [ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md)。
+lookup 不再固定「第一波 Skill、第二波 Source」。context 足夠時可以零 Tool call；彼此獨立的 Skill／source 讀取可在同一波平行；只有第一波結果產生新的資料依賴時才使用第二波。此節當時保留最多三次 model call、兩個 lookup waves 與總 Tool／token／timeout budget；其中固定三次上限其後已由 §9.18／ADR 0063 取代，兩個 lookup waves 與其他總預算仍保留。當時完整裁決見 [ADR 0062](../../../../../adr/0062-bounded-consultant-read-tools-and-structured-authority.md)。
 
 #### 9.16.4 北極星與施工裁決
 
@@ -2519,7 +2519,7 @@ lookup 不再固定「第一波 Skill、第二波 Source」。context 足夠時�
 - **Skill 已是按需正文**：保留成熟 middleware；把 selected／eligible／loaded 名詞與驗證分清。
 - **Tool 已在 schema 修正後另行裁決**：ADR 0062 收斂為四個唯讀 Tool、精簡 `read_file` 說明與依賴驅動 lookup；沒有 Tool Search、LLM selector 或 business write Tool。
 - **兩段式降為 contingency**：compact wire exact canary 仍失敗才啟用，不預先增加一次 inference 與 handoff。
-- **決策狀態**：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md) 維持 **schema-only**；後續 Tool 授權與實作範圍由 [ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md) 獨立承接。ADR 0060 仍是 runtime 主決策。
+- **決策狀態**：[ADR 0061](../../../20260918-shared-current-jd/docs/adr/0061-compact-consultant-wire-progressive-skills-and-tools.md) 維持 **schema-only**；後續 Tool 授權與實作範圍由 [ADR 0062](../../../../../adr/0062-bounded-consultant-read-tools-and-structured-authority.md) 獨立承接。ADR 0060 仍是 runtime 主決策。
 
 ### 9.17 受限候選成果工作區的框架映射與 ADR 邊界（2026-08-15）
 
@@ -2607,7 +2607,7 @@ Deep Agents 的 `StateBackend` 確實能把虛擬檔案存在 LangGraph state �
 
 比較記錄只看任務是否完成、semantic diff 正確性、工具錯誤後能否修復、authority 是否零繞過、員工審核是否清楚，以及 token／latency；不以 Tool call 越多越好，也不提前做完整品質 eval。
 
-Owner 已接受主方案；[ADR 0063](../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md) 因此正式取代 Accepted ADR 0062 決定 5 的「文件候選不是 business Tool」，並把固定三次 model call 改為受總預算約束、初始上限五步的可驗證 profile。ADR 0062 的四個 read Tool、員工 decision command、必要澄清與 no-RAG 邊界保持有效；Accepted ADR 0061／0062 原文不事後修改。
+Owner 已接受主方案；[ADR 0063](../../../../../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md) 因此正式取代 Accepted ADR 0062 決定 5 的「文件候選不是 business Tool」，並把固定三次 model call 改為受總預算約束、初始上限五步的可驗證 profile。ADR 0062 的四個 read Tool、員工 decision command、必要澄清與 no-RAG 邊界保持有效；Accepted ADR 0061／0062 原文不事後修改。
 
 #### 9.18.5 Task 6 實作校正與產品 canary（2026-08-21）
 
@@ -2625,11 +2625,11 @@ Owner 已接受主方案；[ADR 0063](../adr/0063-hybrid-candidate-edit-tool-and
 
 Owner進一步澄清：候選工作區不是單次run的暫存區，也不應等模型完成publication handshake後才成為可延續狀態。它是一份JD唯一的、可跨訊息／關閉／重啟續編的**非權威working draft**。員工即使尚未接受，下一輪AI仍看得到並能在其上繼續修改；只有員工接受、修改後接受或direct edit，內容才進核准JD。VS Code只用來類比「隔離工作面＋可見差異＋最後由人整合」，不導入Git、branch、commit、PR、檔案中心UI或IDE權限模式。
 
-這項修正不撤回Deep Agents VFS。相反地，它讓成熟框架承接更多同目的機制：canonical resources由`StoreBackend`放入document-scoped LangGraph Postgres Store namespace，讓agent與employee command共用同一份持久workspace；LangGraph checkpointer保留對話、interrupt與run recovery；`CompositeBackend`路由`/skills`、`/sources`、`/approved`、`/workspace`與derived `/review`；validation middleware在每波mutation後自動跑Pydantic／JD／Evidence verifier。需要員工先裁決的衝突才用interrupt，accept／edit-accept／reject／defer走application command。模型仍只使用`ls／read_file／grep／write_file／edit_file／delete`，不新增Duty／Task／OPKS business Tools，也不再顯式呼叫`check_candidate_document`或在final抄回revision／digest／action handles。此mapping修正已由Accepted [ADR 0067](../adr/0067-deep-agents-store-backed-jd-working-draft.md)收斂。
+這項修正不撤回Deep Agents VFS。相反地，它讓成熟框架承接更多同目的機制：canonical resources由`StoreBackend`放入document-scoped LangGraph Postgres Store namespace，讓agent與employee command共用同一份持久workspace；LangGraph checkpointer保留對話、interrupt與run recovery；`CompositeBackend`路由`/skills`、`/sources`、`/approved`、`/workspace`與derived `/review`；validation middleware在每波mutation後自動跑Pydantic／JD／Evidence verifier。需要員工先裁決的衝突才用interrupt，accept／edit-accept／reject／defer走application command。模型仍只使用`ls／read_file／grep／write_file／edit_file／delete`，不新增Duty／Task／OPKS business Tools，也不再顯式呼叫`check_candidate_document`或在final抄回revision／digest／action handles。此mapping修正已由Accepted [ADR 0067](../../../../../adr/0067-deep-agents-store-backed-jd-working-draft.md)收斂。
 
 員工看到的是application由approved↔workspace產生的**semantic change set**，不是file diff或Tool JSON。互不相依項目可個別接受／修改後接受／拒絕／延後；Task拆分、Duty重組或跨Task／OPKS相依變更按atomic group整組決策。接受後approved與workspace重基線；拒絕項退出active draft但保留decision memory；延後項留在workspace。每個review group綁精確approved／workspace revision與digest，後續重疊改動使舊決策fail stale，避免把員工批准套到不同內容。
 
-持久workspace不等於每輪把完整JD塞進prompt；Skills、員工來源與workspace仍依目前訪談焦點按需讀取。第一版不做多workspace、版本歷史UI、auto-accept、RAG／Reference、能力級別／A、多Agent或正式eval平台。完整官方資料、方案比較、成本／checkpoint風險與施工gate見[`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md)；架構裁決見Accepted [ADR 0066](../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)。
+持久workspace不等於每輪把完整JD塞進prompt；Skills、員工來源與workspace仍依目前訪談焦點按需讀取。第一版不做多workspace、版本歷史UI、auto-accept、RAG／Reference、能力級別／A、多Agent或正式eval平台。完整官方資料、方案比較、成本／checkpoint風險與施工gate見[`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](../../../../../specs/2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md)；架構裁決見Accepted [ADR 0066](../../../../../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)。
 
 ### 9.20 共用「目前 JD」編輯面校正（2026-08-25，研究完成、待 owner 核准）
 
@@ -2639,7 +2639,7 @@ Owner進一步澄清：候選工作區不是單次run的暫存區，也不應等
 
 員工直接修改時，其實際 touched semantic component 應同時成為目前值與核准值；若與 AI pending 重疊，員工 after-state 取代該範圍並解決差異，無關 pending 保留。未處理差異自然跨輪存在，不需要 `defer`；pending review 本身也不應鎖聊天，真正缺少只能由員工決定的事實或有重大衝突時，才由獨立 required clarification／LangGraph interrupt 處理。分析失敗後聊天也應保持可輸入，員工可直接用「我剛剛說錯了」等自然語句形成新來源與更正 lineage，不必在主要畫面尋找並操作舊原話。這維持「所有 LLM 文件內容須員工決定、員工直接編輯不審核自己、AI 可跨輪續編、匯出只含核准內容」的大方向。
 
-完整官方來源、方案比較、框架映射、重疊編輯語意與現行 code 差距見 [`2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md`](2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md)。此節尚未取代 Accepted ADR 0066；owner 核准後需另開 successor ADR，不得事後改寫已接受決策。
+完整官方來源、方案比較、框架映射、重疊編輯語意與現行 code 差距見 [`2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md`](../../../../../specs/2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md)。此節尚未取代 Accepted ADR 0066；owner 核准後需另開 successor ADR，不得事後改寫已接受決策。
 
 ### 9.21 顧問工作區 UI、待審編輯與 OPKS 生命週期收斂（2026-08-27，白話方向已核准、書面待複核）
 
@@ -2662,14 +2662,14 @@ Owner 以互動 HTML 模擬完成工作區排版、目前 JD、semantic diff、�
 
 Repo 研究：
 
-- [`AI 專業職務分析顧問流程：最終反方審查與品質設計`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)
-- [`AI 專業職務分析顧問 R1：Task Discovery 深入研究`](2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
-- [`Task 邊界、merge/split 與同一性判準研究`](2026-07-28-task-boundary-merge-split-and-identity-research.md)
-- [`專業顧問第一個最小完整迴圈`](2026-07-30-professional-consultant-minimal-complete-loop-research.md)
-- [`iCAP 逐欄位標準`](2026-07-13-ai-redesign-raw-icap-field-standards.md)
-- [`OPKS 設計裁決研究`](2026-08-01-opks-design-decisions-research.md)
-- [`OPKS 漸進式蒐集研究`](2026-08-04-opks-progressive-elicitation-research.md)
-- [`OPKS 缺口與再分析的封鎖關係`](2026-08-06-opks-gap-reanalysis-blocking-research.md)
+- [`AI 專業職務分析顧問流程：最終反方審查與品質設計`](../../../20260918-shared-current-jd/docs/specs/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)
+- [`AI 專業職務分析顧問 R1：Task Discovery 深入研究`](../../../../../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
+- [`Task 邊界、merge/split 與同一性判準研究`](../../../../../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)
+- [`專業顧問第一個最小完整迴圈`](../../../../../specs/2026-07-30-professional-consultant-minimal-complete-loop-research.md)
+- [`iCAP 逐欄位標準`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-13-ai-redesign-raw-icap-field-standards.md)
+- [`OPKS 設計裁決研究`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-08-01-opks-design-decisions-research.md)
+- [`OPKS 漸進式蒐集研究`](../../../20260918-shared-current-jd/docs/specs/2026-08-04-opks-progressive-elicitation-research.md)
+- [`OPKS 缺口與再分析的封鎖關係`](../../../../../specs/2026-08-06-opks-gap-reanalysis-blocking-research.md)
 
 Stakeholder 草稿（非權威，只作需求來源）：
 

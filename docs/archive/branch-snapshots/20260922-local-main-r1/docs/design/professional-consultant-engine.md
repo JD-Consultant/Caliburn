@@ -215,7 +215,7 @@ indexer-contract         = API 與 indexer 的 Python query contract
 ## 9. 指路
 
 - 產品範圍：[`../product-notes.md`](../product-notes.md)
-- 顧問核心決策：[`../adr/0040-professional-consultant-engine-and-r1-validation-contract.md`](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
+- 顧問核心決策：[`../adr/0040-professional-consultant-engine-and-r1-validation-contract.md`](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
 - 切換決策：[`../adr/0054-document-boundary-single-writer-cutover.md`](../adr/0054-document-boundary-single-writer-cutover.md)
 - 職務發現決策：[`../adr/0055-hybrid-job-discovery-and-ttop-formation.md`](../adr/0055-hybrid-job-discovery-and-ttop-formation.md)
 - Deployment 決策：[`../adr/0057-server-deployed-browser-product.md`](../adr/0057-server-deployed-browser-product.md)

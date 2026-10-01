@@ -3,10 +3,10 @@
 - 日期：2026-09-03
 - 狀態：**G5 trial revision 3 已執行並保存為 `FAIL_UNPROVEN`；Store／embedding 成功，Luna chat 在 model response 前因 frozen provider capability filter 收到 404；等待 Product Owner review，不授權 revision 4 或 production**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
-- 流程：[`../decision-process.md`](../decision-process.md)
+- 流程：[`../decision-process.md`](../../../../../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
 
-> 這份文件不是 successor ADR，也不是施工計畫。Production 仍以現行 code、`AGENTS.md` 與 Accepted ADR 0060 為準。舊的 [`2026-09-02-memory-foundation-isolated-spike.md`](../plans/2026-09-02-memory-foundation-isolated-spike.md) 保持 `PAUSED`，不可直接執行；它的 Store-source leaf 與 exact-inventory 前提已被 `MEM-Q001～Q003` 取代。
+> 這份文件不是 successor ADR，也不是施工計畫。Production 仍以現行 code、`AGENTS.md` 與 Accepted ADR 0060 為準。舊的 [`2026-09-02-memory-foundation-isolated-spike.md`](../../../../../plans/2026-09-02-memory-foundation-isolated-spike.md) 保持 `PAUSED`，不可直接執行；它的 Store-source leaf 與 exact-inventory 前提已被 `MEM-Q001～Q003` 取代。
 
 ## 0. 結論先行
 
@@ -82,9 +82,9 @@ LangGraph PostgreSQL Store
 
 完整理由分別在：
 
-- [`2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md`](./2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md)
-- [`2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md`](./2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md)
-- [`2026-09-03-memory-canonical-conversation-search-read-reconciliation.md`](./2026-09-03-memory-canonical-conversation-search-read-reconciliation.md)
+- [`2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md`](../../../../../specs/2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md)
+- [`2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md`](../../../../../specs/2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md)
+- [`2026-09-03-memory-canonical-conversation-search-read-reconciliation.md`](../../../../../specs/2026-09-03-memory-canonical-conversation-search-read-reconciliation.md)
 
 ## 3. 官方共同邊界與差異
 
@@ -830,7 +830,7 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
   拋出 HTTP 404 `NotFoundResponseError`。沒有 resolved chat model／provider、chat usage、
   model-visible turn 或 Memory tool call。
 - receipt 已保存為
-  [`../experiments/2026-09-03-memory-routing-canonical-read/trials/revision-3-luna-medium.json`](../experiments/2026-09-03-memory-routing-canonical-read/trials/revision-3-luna-medium.json)；
+  [`../experiments/2026-09-03-memory-routing-canonical-read/trials/revision-3-luna-medium.json`](../../../../../experiments/historical/20260918-memory-routing-spike/experiments/2026-09-03-memory-routing-canonical-read/trials/revision-3-luna-medium.json)；
   六項 rubric 均為 `NOT_EVALUATED`，overall verdict 是 `FAIL_UNPROVEN`。
 - `model_calls: 1` 是 invocation 前先扣除的 runtime budget，不代表 provider/model 已開始生成；三個
   保存的 request IDs 皆為 embedding IDs。

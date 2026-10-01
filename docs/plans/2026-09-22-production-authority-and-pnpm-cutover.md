@@ -36,4 +36,4 @@
 - PowerShell 啟動器的首輪 parser／程序問題保留為失敗證據，最終以 Node 24 官方 `child_process.spawn` 的薄協調器取代；pnpm 官方多 filter＋`--parallel --stream` 負責兩個既有長程序，不另造 process manager。
 - 根入口實際啟動 Node 24 的 Next 16.3.5 Web 與 Python API；Web `/`、API `/openapi.json` 均 HTTP 200，API 有 17 條正式路由，Ctrl+C 後 3002／8772 無殘留 listener。
 - `pnpm check` exit 0：launcher 5 tests、Python 3,115 passed／322 skipped、Web 310 passed、TypeScript、codegen 與 production build 全數通過。未重送 Luna，零 provider request／零費用。
-- 提交、push、PR 與 merge 仍是本計畫最後一個外部交付步驟；精確證據見[正式切換證據](../specs/evidence/2026-09-22-production-authority-and-pnpm-cutover.md)。
+- 提交、push、PR 與 merge 仍是本計畫最後一個外部交付步驟；精確證據見[正式切換證據](../experiments/legacy-evidence/2026-09-22-production-authority-and-pnpm-cutover.md)。

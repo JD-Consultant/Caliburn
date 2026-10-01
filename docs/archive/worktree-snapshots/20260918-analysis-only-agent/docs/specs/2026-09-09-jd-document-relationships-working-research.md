@@ -1,12 +1,12 @@
 # JD 可編輯內容與關係研究
 
-**Owner後續裁決（2026-09-10，WORKING）：**[完整格式](2026-09-10-jd-format-review.md)經Owner大致同意，包含任務↔知識、任務↔技能對應。成果與要求固定為任務底下兩組並列，不一對一、不互為父子、不與任務敘述合併；這只固定內容關係，不直接推出每項一張表或新欄位型別。要求推薦名稱為「工作執行要求」，尚待名稱回饋。以下OPEN／可合併等先前狀態依本條及register讀作沿革；下一步補正式分組與引用契約，未啟動施工。
+**Owner後續裁決（2026-09-10，WORKING）：**[完整格式](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-10-jd-format-review.md)經Owner大致同意，包含任務↔知識、任務↔技能對應。成果與要求固定為任務底下兩組並列，不一對一、不互為父子、不與任務敘述合併；這只固定內容關係，不直接推出每項一張表或新欄位型別。要求推薦名稱為「工作執行要求」，尚待名稱回饋。以下OPEN／可合併等先前狀態依本條及register讀作沿革；下一步補正式分組與引用契約，未啟動施工。
 
-**2026-09-10 整體核對補充：**[格式與保存核對](2026-09-10-jd-format-quality-and-storage-review.md)支持多成果／多要求、依真實適用範圍就近表達、未知沿Memory而既有JD草稿保留；不預設獨立未歸屬区。K／S明確引用仍是OPEN推薦，v1尚缺完整項目與關係契約，不能用一般Node ID或來源引用代替。新候選及責任見該報告；以下2026-09-09研究狀態不覆蓋最新register。
+**2026-09-10 整體核對補充：**[格式與保存核對](../../../../../specs/2026-09-10-jd-format-quality-and-storage-review.md)支持多成果／多要求、依真實適用範圍就近表達、未知沿Memory而既有JD草稿保留；不預設獨立未歸屬区。K／S明確引用仍是OPEN推薦，v1尚缺完整項目與關係契約，不能用一般Node ID或來源引用代替。新候選及責任見該報告；以下2026-09-09研究狀態不覆蓋最新register。
 
 **2026-09-10 最新狀態：**Owner 在接線前格式討論中同意主體呈現，並詢問任務引用所需知識／技能是否為多對多。見[本輪討論](#2026-09-10任務與知識技能的明確對應討論)；目前推薦明確對應，尚待 Owner 確認，未修改技術契約。下文原「暫不要求顯式引用」是此次重新檢視的基線；現行審閱為持續工作稿，舊 pending 分支依 register 沿革處理。
 
-JD-R002/C01；研究日 2026-09-09；**G3／WORKING：Owner 已同意 B 的方向，可修訂，不是施工契約**。延續 [JD-R001 成品方向](2026-09-09-job-analysis-and-jd-content-research.md)，不以舊程式、舊 OPKS schema 或 iCAP 版型限制新設計。後續樣稿r2深度獲「大致上同意」，[核心文檔複核](2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)未發現須翻案的內容衝突，可續C02；不是所有樣稿細節或技術契約已驗收。
+JD-R002/C01；研究日 2026-09-09；**G3／WORKING：Owner 已同意 B 的方向，可修訂，不是施工契約**。延續 [JD-R001 成品方向](2026-09-09-job-analysis-and-jd-content-research.md)，不以舊程式、舊 OPKS schema 或 iCAP 版型限制新設計。後續樣稿r2深度獲「大致上同意」，[核心文檔複核](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)未發現須翻案的內容衝突，可續C02；不是所有樣稿細節或技術契約已驗收。
 
 ## 1. 本輪問題與邊界
 
@@ -14,13 +14,13 @@ JD-R002/C01；研究日 2026-09-09；**G3／WORKING：Owner 已同意 B 的方�
 |---|---|
 | Topic／stage | JD-R002/C01；G2 證據與選項已完成，G3 同意 B 作 Working 方向 |
 | 唯一決策題 | 用哪種可編輯內容模型承接已同意的 JD，讓內容可定位修改，又不因分組、共用或排版造成重複及誤改？ |
-| 有效依據 | [欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[工作分析指南](2026-09-09-complete-work-analysis-guide.md)、[完整樣稿](2026-09-09-frontend-engineer-jd-sample.md)及[情境／審查](2026-09-09-jd-sample-basis-and-review.md) |
+| 有效依據 | [欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[工作分析指南](2026-09-09-complete-work-analysis-guide.md)、[完整樣稿](../../../../../guides/2026-09-09-frontend-engineer-jd-sample.md)及[情境／審查](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-sample-basis-and-review.md) |
 | 本輪不做 | 不改 Memory、prompt、模型、production、DB、AI tools、UI 或匯出；不寫實作計畫，不跑付費測試 |
 | 尚待下一題 | AI／員工編輯與審核的完整操作設計，再選框架、儲存及 API |
 
 Owner 要的是高品質 JD，不是指定資料庫形式。人與 AI 應能在同份最新文件上編輯；依後續WORKING裁決採持續工作稿，保留實際差異與更正，不提供逐筆待審接受／拒絕。原先「編輯待審仍待審」是已取代的流程；保存或看過文件均不等於專業品質已核准。
 
-研究程序採 [Decision-to-Product](../decision-process.md)：先承接成果，再比對官方能力、提出候選；不因文檔寫好就進施工。所有外部事實、取用限制與原始連結集中在[官方證據](2026-09-09-jd-document-model-official-evidence.md)。
+研究程序採 [Decision-to-Product](../../../../../decision-process.md)：先承接成果，再比對官方能力、提出候選；不因文檔寫好就進施工。所有外部事實、取用限制與原始連結集中在[官方證據](2026-09-09-jd-document-model-official-evidence.md)。
 
 ## 2. 結論：建議有結構的文件，不把每句話拆成資料表
 
@@ -87,7 +87,7 @@ Owner 要的是高品質 JD，不是指定資料庫形式。人與 AI 應能在�
 
 ## 5. 用樣稿檢查是否能表達真實情境
 
-下表是**設計走查，未執行程式測試**；以[已聲明的虛構情境](2026-09-09-jd-sample-basis-and-review.md)為依據，另列建構中與操作反例。
+下表是**設計走查，未執行程式測試**；以[已聲明的虛構情境](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-sample-basis-and-review.md)為依據，另列建構中與操作反例。
 
 | 情境 | B 應能表達／保留的效果 | 仍未決定的技術 |
 |---|---|---|
@@ -130,7 +130,7 @@ Owner 要的是高品質 JD，不是指定資料庫形式。人與 AI 應能在�
 
 官方來源已足以比較本題三種方向，繼續增加同類頁面不會改變目前選項，故停止本題廣泛搜尋。下一題才深入操作流程與框架完整契約，仍不直接施工。
 
-**C02 粒度方向已同意（G3／WORKING）：**[編輯與審核情境](2026-09-09-jd-editing-and-review-working-design.md)採最小完整審核範圍作可修訂方向。Owner另要求檢查複雜度，故下一題先進[C03整體AI編輯應用](2026-09-09-ai-document-app-composition-research.md)，不先堆疊自訂機制。C01方向不變，未選框架或施工；官方差異及新發現的成熟度限制集中在證據§5–§6。
+**C02 粒度方向已同意（G3／WORKING）：**[編輯與審核情境](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-editing-and-review-working-design.md)採最小完整審核範圍作可修訂方向。Owner另要求檢查複雜度，故下一題先進[C03整體AI編輯應用](2026-09-09-ai-document-app-composition-research.md)，不先堆疊自訂機制。C01方向不變，未選框架或施工；官方差異及新發現的成熟度限制集中在證據§5–§6。
 
 ### 審查紀錄
 

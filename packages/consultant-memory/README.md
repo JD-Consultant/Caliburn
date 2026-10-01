@@ -86,7 +86,7 @@ OpenAI 公開 Sandbox Memory 將 live update 描述為修正 stale Memory 或依
 
 `caliburn_memory.extraction.ExtractionWorkflow` 已自 `4f94fbfb` 採用。三文字欄位、prompt、窗口迴圈、格式更正額度、`start/resume/reextract` 保持已驗語意；`ExtractionSourceReader` 由 App 提供固定窗口與前置消歧，`accepted(raw)` 由 provider adapter 核拒絕／終局。新 B1 已沿用其來源固定、窗口 pair、checkpoint、拒答／截斷與有限恢復原則；舊三欄輸出與「保存詳記／候選即完成」仍只作底層證據，不能接成新案例層的正式完成條件。
 
-歷史採用切片中，App `extraction_app.py` 的固定接合及真 `PostgresSaver`／`PostgresStore` 一批保存、資源重建後續作、重抽與相同 input 查回已驗（[R1 結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)）。這證明可沿用的底層能力，不代表新 B1 已接 App。
+歷史採用切片中，App `extraction_app.py` 的固定接合及真 `PostgresSaver`／`PostgresStore` 一批保存、資源重建後續作、重抽與相同 input 查回已驗（[R1 結果](../../docs/experiments/legacy-evidence/jd-b1-adoption/r1-postgres-batch-results.md)）。這證明可沿用的底層能力，不代表新 B1 已接 App。
 
 ## 舊 B2 兩檔整併核心（底層證據，產品語意已取代）
 
@@ -94,7 +94,7 @@ OpenAI 公開 Sandbox Memory 將 live update 描述為修正 stale Memory 或依
 
 歷史流程唯一 provider 接縫是 `context_middleware=`；舊 B2 從已完成的舊 B1 checkpoint 取 `files`、推進 `processed_source`，而 C 不推進背景游標。這些 provider 分離、游標與恢復原則可沿用，`files`／兩檔 Memory 的產品形狀不可沿用。
 
-歷史 App adapter 在真 `PostgresSaver`／`PostgresStore`／publication 上驗過兩批有序交接、pending 續作、發布回覆遺失查回與 C 較晚更正（[R2 結果](../../docs/specs/evidence/jd-b1-adoption/r2-consolidation-handover-results.md)）。新分層流程仍須在後續 B1／B2 完整背景工作重新接合；不得把這份舊 R2 證據冒稱新 bundle 已發布通過。
+歷史 App adapter 在真 `PostgresSaver`／`PostgresStore`／publication 上驗過兩批有序交接、pending 續作、發布回覆遺失查回與 C 較晚更正（[R2 結果](../../docs/experiments/legacy-evidence/jd-b1-adoption/r2-consolidation-handover-results.md)）。新分層流程仍須在後續 B1／B2 完整背景工作重新接合；不得把這份舊 R2 證據冒稱新 bundle 已發布通過。
 
 ## 顧問方法資產
 

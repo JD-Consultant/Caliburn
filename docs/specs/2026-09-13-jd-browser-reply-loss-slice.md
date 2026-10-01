@@ -29,20 +29,20 @@ ASGI／Starlette／Uvicorn 適用版本、原碼核對與操作步驟見[helper 
 
 | 實際步驟 | 觀察及驗證 |
 |---|---|
-| 建立「保存回覆遺失驗收」 | [初始 DB](evidence/jd-relational-ui-reply-loss/db-catalog.json)：head1、0 任務、0 編輯 operation。 |
-| UI 新增「定期檢查」及一段合成責任範圍，按完成 | 真 storage 已 committed；[回覆仍被暫停](evidence/jd-relational-ui-reply-loss/gate.held.json)時，另一條[唯讀 DB 連線](evidence/jd-relational-ui-reply-loss/db-held.json)確認 head2、1 任務、1 operation，current 與 snapshot/digest 一致。 |
+| 建立「保存回覆遺失驗收」 | [初始 DB](../experiments/legacy-evidence/jd-relational-ui-reply-loss/db-catalog.json)：head1、0 任務、0 編輯 operation。 |
+| UI 新增「定期檢查」及一段合成責任範圍，按完成 | 真 storage 已 committed；[回覆仍被暫停](../experiments/legacy-evidence/jd-relational-ui-reply-loss/gate.held.json)時，另一條[唯讀 DB 連線](../experiments/legacy-evidence/jd-relational-ui-reply-loss/db-held.json)確認 head2、1 任務、1 operation，current 與 snapshot/digest 一致。 |
 | 瀏覽器原生 15 秒 fetch timeout | 畫面「保存結果待確認」／「查回原保存」，暫停新保存；沒有誤報已保存或已回滾。 |
 | 釋放遲到回覆後，關閉 tab，開新 tab 並選回同文件 | 仍顯示原保存待確認；已保存任務可讀，但手改暫停。這次是正常關頁重開，不是 OS crash。 |
-| 按一次「查回原保存」 | 畫面改成「已保存」、恢復欄位編輯，沒有殘留新增表單；[HTTP 計數](evidence/jd-relational-ui-reply-loss/gate.routes.json)為 1 POST／1 原 operation GET，[writer](evidence/jd-relational-ui-reply-loss/writer.observations.json)只執行一次。 |
-| 再核對 DB | [重開後](evidence/jd-relational-ui-reply-loss/db-recovered.json)任務 ID、head、原 operation、digest 都與回覆暫停時相同。獨立 reviewer 另開唯讀連線核對 [PASS](evidence/jd-relational-ui-reply-loss/independent-db-review.json)。 |
-| 對話框修正後重建，開同文件取消更名與建立 | 關閉後 DOM dialog 數為 0，沒有封存標題；[DB](evidence/jd-relational-ui-reply-loss/db-dialog.json)仍只一份文件、原名稱、未封存、metadata_version1，JD head2 不變。 |
+| 按一次「查回原保存」 | 畫面改成「已保存」、恢復欄位編輯，沒有殘留新增表單；[HTTP 計數](../experiments/legacy-evidence/jd-relational-ui-reply-loss/gate.routes.json)為 1 POST／1 原 operation GET，[writer](../experiments/legacy-evidence/jd-relational-ui-reply-loss/writer.observations.json)只執行一次。 |
+| 再核對 DB | [重開後](../experiments/legacy-evidence/jd-relational-ui-reply-loss/db-recovered.json)任務 ID、head、原 operation、digest 都與回覆暫停時相同。獨立 reviewer 另開唯讀連線核對 [PASS](../experiments/legacy-evidence/jd-relational-ui-reply-loss/independent-db-review.json)。 |
+| 對話框修正後重建，開同文件取消更名與建立 | 關閉後 DOM dialog 數為 0，沒有封存標題；[DB](../experiments/legacy-evidence/jd-relational-ui-reply-loss/db-dialog.json)仍只一份文件、原名稱、未封存、metadata_version1，JD head2 不變。 |
 
-重現所需的[唯讀探針](evidence/jd-relational-ui-reply-loss/db_readonly_probe.py)只允許此類新 fixture，輸出不含正文；`catalog → held → recovered → dialog` 分階段執行。正常 helper 停止後，[Saver close](evidence/jd-relational-ui-reply-loss/serve.finished.json)及[程序真退出](evidence/jd-relational-ui-reply-loss/process-exit-check.json)分開核對。沒有刪 DB 或清理 volume。
+重現所需的[唯讀探針](../experiments/legacy-evidence/jd-relational-ui-reply-loss/db_readonly_probe.py)只允許此類新 fixture，輸出不含正文；`catalog → held → recovered → dialog` 分階段執行。正常 helper 停止後，[Saver close](../experiments/legacy-evidence/jd-relational-ui-reply-loss/serve.finished.json)及[程序真退出](../experiments/legacy-evidence/jd-relational-ui-reply-loss/process-exit-check.json)分開核對。沒有刪 DB 或清理 volume。
 
 ## 4. 測試、首敗及審查
 
-- [23 項純 ASGI／CLI 測試](evidence/jd-relational-ui-reply-loss/gate-tests.txt) PASS：200／202、commit＋release 雙條件、有界等待、其他 GET、一次 arm、斷線、原 operation、route 計數與固定 fixture 範圍。pytest cache 有一項 Windows 存取警告，案例全部執行；未改 ACL。
-- [99 項 Web 測試](evidence/jd-relational-ui-reply-loss/web-tests.txt) PASS；[新 production build 與 TypeScript](evidence/jd-relational-ui-reply-loss/web-build.txt) PASS。Python production 沒有改動，未重跑上輪 1540 項全組；本輪不把舊結果列成新執行。
+- [23 項純 ASGI／CLI 測試](../experiments/legacy-evidence/jd-relational-ui-reply-loss/gate-tests.txt) PASS：200／202、commit＋release 雙條件、有界等待、其他 GET、一次 arm、斷線、原 operation、route 計數與固定 fixture 範圍。pytest cache 有一項 Windows 存取警告，案例全部執行；未改 ACL。
+- [99 項 Web 測試](../experiments/legacy-evidence/jd-relational-ui-reply-loss/web-tests.txt) PASS；[新 production build 與 TypeScript](../experiments/legacy-evidence/jd-relational-ui-reply-loss/web-build.txt) PASS。Python production 沒有改動，未重跑上輪 1540 項全組；本輪不把舊結果列成新執行。
 - 首敗保留：helper 開發初次 import collection 錯誤及兩次 pytest 暫存 ACL 失敗；改明示 repo 測試目錄後通過。root 唯讀探針初次缺 `src` import 路徑，補明確路徑後才取得 DB 證據。這些不是產品保存失敗。
 - 獨立審查發現 helper 原設定可能在核對前選到其他 DB；已改為每次真 ConfigFile read 先核 fixture，包含兩讀間換檔反例，窄複核 CLOSED。此修正只在測試 helper。
 - Workspace 關閉修正已由非實作者獨立 diff 審查 PASS，無剩餘 P1／P2；其畫面與 DB 效果由 root 上述瀏覽器窄驗。
@@ -51,6 +51,6 @@ ASGI／Starlette／Uvicorn 適用版本、原碼核對與操作步驟見[helper 
 
 ## 5. 下一施工單位
 
-[顧問 context 前置](evidence/2026-09-13-jd-consultant-context-preflight.md)已核 OpenAI、Anthropic 及 LangChain／LangGraph 官方接點，停止同層廣搜。保留原話、request-only notice、完整回覆及通知邊界共同保存；SDK 缺終端事件仍回 snapshot 的[離線反例](evidence/jd-relational-context/anthropic_stream_closure_probe.py)已保存，不能只凭 SDK 方法名稱宣稱回覆完整。
+[顧問 context 前置](../experiments/legacy-evidence/2026-09-13-jd-consultant-context-preflight.md)已核 OpenAI、Anthropic 及 LangChain／LangGraph 官方接點，停止同層廣搜。保留原話、request-only notice、完整回覆及通知邊界共同保存；SDK 缺終端事件仍回 snapshot 的[離線反例](../experiments/legacy-evidence/jd-relational-context/anthropic_stream_closure_probe.py)已保存，不能只凭 SDK 方法名稱宣稱回覆完整。
 
 **下一單位：**閉合實際 `create_agent`／provider adapter 相容版本及 wire，將人工通知與模型回覆接到原生 graph／Saver；先以固定回應驗 AI 改→人工改→AI 續改、純訪談不改、回覆／保存失敗及重開。不新增第二份 Memory／原始來源權威，不把本前置文件當成 AI 已接好。選區、來源原文、還原／整輪撤回及日常維護沿既定計畫續作，Excel 延後。

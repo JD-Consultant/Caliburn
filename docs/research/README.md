@@ -90,6 +90,6 @@
 
 ## 混合文件與後續研究
 
-有些歷史檔名含 `research`，但已承擔產品規則，仍留在原責任路徑。例如[工具共同規範](../specs/2026-09-27-agent-tool-contract-design-research.md)、[工作分析方法入口](../specs/2026-09-09-job-analysis-and-jd-content-research.md)。它們不能只因檔名就降格為參考資料；沿[規格入口](../specs/README.md)與最新決策判讀。
+有些歷史檔名含 `research`，但已承擔產品規則，仍留在原責任路徑。例如[工具共同規範](../specs/2026-09-27-agent-tool-contract-design-research.md)、[工作分析方法入口](../guides/2026-09-09-job-analysis-and-jd-content-research.md)。它們不能只因檔名就降格為參考資料；沿[規格入口](../specs/README.md)與最新決策判讀。
 
 新增純研究先選上述主題；沿用 `YYYY-MM-DD-明確主題.md`，記錄問題、來源／查閱日、事實與推論、比較、限制及決策去向。研究結論被採用後，規則在責任文件維護，研究保留推導經過，不另抄第二份現行契約。寫法與討論門檻依[既有討論規範](../architecture-discussion-standard.md)。

@@ -12,7 +12,7 @@ ADR 0073 提議以完整 Plate 文件樹、immutable JSONB revisions 與三個�
 
 舊 `ApprovedDocumentEditor` 能新增／刪除 duty/task、移動 task、管理 O/P/K/S 與多任務 K/S 引用，證明需求的具體操作；但其後端仍整份保存 `ApprovedJobDocument`／LangGraph state，並非新的 relational authority。照搬舊碼會重新接入已退役 package 與 lifecycle。
 
-PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與 row locks；OpenAI 與 Anthropic 的現行工具契約都把模型呼叫與 App 執行／結果回饋分開。這些可作機制基礎，但沒有供應商公開 Caliburn 應採的 JD SQL schema。[官方證據與邊界](../specs/evidence/2026-09-12-jd-relational-editor-evidence.md)
+PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與 row locks；OpenAI 與 Anthropic 的現行工具契約都把模型呼叫與 App 執行／結果回饋分開。這些可作機制基礎，但沒有供應商公開 Caliburn 應採的 JD SQL schema。[官方證據與邊界](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md)
 
 2026-09-15 Owner 進一步確認：完整 JD 版本瀏覽、任意 revision diff 與整份舊版還原不是第一版必要需求。已完成且穩定的相關能力不用拆除；既有 revision／snapshot／operation 也可以保留作交易一致性、冪等、故障對帳、當輪差異與安全撤回的內部機制。這些能力不再是接線前置，也不據此擴張、重構或新建通用歷史／復原引擎。原始對話、來源、案例、Memory、工作理解、checkpoint 與 AI 回合紀錄不隨 JD 撤回而倒退。
 
@@ -38,7 +38,7 @@ PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與
 
 9. **來源保留引用，不複製原文。**`jd_source_link` 指向既有來源 owner；目標文字改變後以 basis digest 標成需重新核對，不能讓舊 source 無條件替新文字背書。K/S relation 本身可有來源 link。
 
-10. **刪除政策按 ownership 分開。**刪 task 的 owned details 與 task relations 可在明示 command 中一併移除，共享 capability 保留；仍被引用的 capability 採 RESTRICT。D01 已依 Owner 授權由研究者採[刪職責保留任務](../specs/2026-09-12-jd-relational-editing-requirements.md#8-d01刪除職責時保留任務2026-09-12)：App 同交易解除分組再刪 duty，DB 保留 RESTRICT 防止直接刪除。任務特有必要範圍隨任務卡、職責僅概括；必要內容調整及成果／要求新增與結構操作原子保存，自有來源分開處理、不自動轉掛。人與 AI 共用此業務效果，參照 [AWS 官方分層與生命週期依據](../specs/evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)，不因此採用 AWS 服務。
+10. **刪除政策按 ownership 分開。**刪 task 的 owned details 與 task relations 可在明示 command 中一併移除，共享 capability 保留；仍被引用的 capability 採 RESTRICT。D01 已依 Owner 授權由研究者採[刪職責保留任務](../specs/2026-09-12-jd-relational-editing-requirements.md#8-d01刪除職責時保留任務2026-09-12)：App 同交易解除分組再刪 duty，DB 保留 RESTRICT 防止直接刪除。任務特有必要範圍隨任務卡、職責僅概括；必要內容調整及成果／要求新增與結構操作原子保存，自有來源分開處理、不自動轉掛。人與 AI 共用此業務效果，參照 [AWS 官方分層與生命週期依據](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)，不因此採用 AWS 服務。
 
 11. **同文件寫入依固定順序鎖 document／head rows，不用 service-global mutex。**archive／unarchive／當輪撤回走相同順序；不同 documents 可獨立操作。同文件 manual／AI foreground writer 必須協調進入與安全結束，不要求整合舊 admission 程式。模型與 transaction 外的候選計算不持有 SQL row locks；必要的 canonical snapshot 在短交易內由 current rows 產生。
 
@@ -76,7 +76,7 @@ Accepted 歷史 ADR 不改原文；只有本 ADR Accepted 且 production G6 完�
 
 ## Open decision and acceptance gate
 
-**D01 任務保留政策已依 Owner 授權裁決；完整設計仍 Needs revision。**讀取與回執 JR-R02／03 通過[保存文件窄複核](../specs/evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 通過[完整操作文件複核](../specs/evidence/2026-09-12-jd-business-operations-review.md)；均未實測。2026-09-15 Owner 已把完整 JD 歷史／任意整份還原從首版必要需求降為可保留的既有能力；[歷史與恢復設計](../specs/2026-09-12-jd-history-and-recovery-design.md)不再是接線前置，也不應繼續擴張。[HR-02](../specs/2026-09-12-jd-ai-turn-undo-design.md)則維持必要產品效果，但須依本 ADR 的 current-only 範圍閱讀：撤回整輪 LLM 的 JD 改動，不倒退原始問答或 Memory。其餘 App／LLM 接線、資料集識別與完整 G4 尚待閉合，本 ADR 保持 Proposed。
+**D01 任務保留政策已依 Owner 授權裁決；完整設計仍 Needs revision。**讀取與回執 JR-R02／03 通過[保存文件窄複核](../experiments/legacy-evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 通過[完整操作文件複核](../experiments/legacy-evidence/2026-09-12-jd-business-operations-review.md)；均未實測。2026-09-15 Owner 已把完整 JD 歷史／任意整份還原從首版必要需求降為可保留的既有能力；[歷史與恢復設計](../specs/2026-09-12-jd-history-and-recovery-design.md)不再是接線前置，也不應繼續擴張。[HR-02](../specs/2026-09-12-jd-ai-turn-undo-design.md)則維持必要產品效果，但須依本 ADR 的 current-only 範圍閱讀：撤回整輪 LLM 的 JD 改動，不倒退原始問答或 Memory。其餘 App／LLM 接線、資料集識別與完整 G4 尚待閉合，本 ADR 保持 Proposed。
 
 進 G6／施工前還必須：
 

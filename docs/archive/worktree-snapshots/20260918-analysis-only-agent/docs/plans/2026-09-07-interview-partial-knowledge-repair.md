@@ -7,6 +7,6 @@ Topic LLM-Q019，isolated G5/G7；Owner 已核准先查官方、修復 CT07 兩�
 3. 重播代表性訪談、自然背景整理，再用無近期對話 reader 回查；Luna／medium，最多24次／US$0.10含背景重試，不改產品步數。
 4. 既有離線回歸、review、保存實驗與限制、更新 register；僅提交本輪檔案，不 merge/push。
 
-實際內容驗收、診斷及來源只放 [CT08研究／結果](../specs/2026-09-07-interview-partial-knowledge-repair.md)。不用提示字串存在當語意驗收。
+實際內容驗收、診斷及來源只放 [CT08研究／結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-interview-partial-knowledge-repair.md)。不用提示字串存在當語意驗收。
 
 收尾：四步已完成至限定驗收。第一帳本含一次無效並行診斷，不當通過證據；Owner另准12次／US$0.05，只用9次完成B2與fresh reader。原失敗仍保留，最新結果與剩餘措辭觀察以研究／結果為準；不代表production或長訪談全面驗收。

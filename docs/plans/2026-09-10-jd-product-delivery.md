@@ -4,9 +4,9 @@
 
 > **2026-09-23 優先序更新：**本計畫保留完整產品旅程、自然品質與真人試用 gate；下方 Plate／三工具／「Task 6 是唯一下一單位」是當時起點，已被 relational JD、分層 Memory、完整 App 驗收及 [ADR0077 正式權責切換](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)取代。Owner 現將備份／空庫還原移出首版核心驗收，只要求一般中斷後既有已保存資料與進度可查回。當前短路由以 [`current-decisions.md`](../current-decisions.md) 最上條為準；歷史階段與問題解決順序仍保留。
 
-> **2026-09-23 自然試跑首敗 successor：**[首批 C-W 自然真模型驗收](../specs/evidence/2026-09-23-gpt6-cw-natural-trial.md)已進行 7 次員工輸入；A／B1／B2 真請求與局部 Memory 發布有證據，但第 7 輪 JD 初稿前遇 A 單筆 90 秒結果未知，帳本停止，沒有 JD writer 效果或完整 Browser 證據。前批試跑不能算 P3 通過，也不覆寫下方歷史欄位；先處理可重現的期限／診斷邊界，再於新有界批次驗自然完整旅程。
+> **2026-09-23 自然試跑首敗 successor：**[首批 C-W 自然真模型驗收](../experiments/legacy-evidence/2026-09-23-gpt6-cw-natural-trial.md)已進行 7 次員工輸入；A／B1／B2 真請求與局部 Memory 發布有證據，但第 7 輪 JD 初稿前遇 A 單筆 90 秒結果未知，帳本停止，沒有 JD writer 效果或完整 Browser 證據。前批試跑不能算 P3 通過，也不覆寫下方歷史欄位；先處理可重現的期限／診斷邊界，再於新有界批次驗自然完整旅程。
 
-> **2026-09-23 P3 最新入口：**GPT-6 Luna／OpenRouter Responses 的第二次獨立有界 smoke 已完成 2 筆真實模型請求、合成工具往返與非空 final；同筆回覆提供 OpenAI 路由及成本，逐筆結算。首次 smoke 曾因 test-only `provider_model_mismatch` 停止，舊帳本未重開；兩次結果與邊界皆保留於[GPT-6 接線證據](../specs/evidence/2026-09-23-gpt6-responses-offline.md#第二次獨立有界真實工具往返最新)。這只關閉有限服務端 gate，**自然 C-W／16K 長上下文／B1、B2 真模型／同批 Browser 仍未驗收**。Owner 隨後核准完成本計畫所需的真實模型請求，首批自然 C-W 仍限 **12 次員工輸入、180 次實際外送、US$1.00**；下方 P3 表格的「0 外部 request／未付費授權」及「現行後續」是撰寫時歷史狀態，不可當成最新狀態。
+> **2026-09-23 P3 最新入口：**GPT-6 Luna／OpenRouter Responses 的第二次獨立有界 smoke 已完成 2 筆真實模型請求、合成工具往返與非空 final；同筆回覆提供 OpenAI 路由及成本，逐筆結算。首次 smoke 曾因 test-only `provider_model_mismatch` 停止，舊帳本未重開；兩次結果與邊界皆保留於[GPT-6 接線證據](../experiments/legacy-evidence/2026-09-23-gpt6-responses-offline.md#第二次獨立有界真實工具往返最新)。這只關閉有限服務端 gate，**自然 C-W／16K 長上下文／B1、B2 真模型／同批 Browser 仍未驗收**。Owner 隨後核准完成本計畫所需的真實模型請求，首批自然 C-W 仍限 **12 次員工輸入、180 次實際外送、US$1.00**；下方 P3 表格的「0 外部 request／未付費授權」及「現行後續」是撰寫時歷史狀態，不可當成最新狀態。
 
 ## 1. 成品與範圍
 
@@ -25,13 +25,13 @@
 
 | 階段 | 工作與交付 | 出口 | 狀態 |
 |---|---|---|---|
-| P0 基線 | 本計畫、有效決策、需求／證據／驗收對照；修正舊三表 DOM 驗收，active 全走 v2 | 每項效果有工作包；已決定與待實證分開 | 完成，見[基線審查](../specs/evidence/2026-09-10-jd-product-baseline-review.md) |
+| P0 基線 | 本計畫、有效決策、需求／證據／驗收對照；修正舊三表 DOM 驗收，active 全走 v2 | 每項效果有工作包；已決定與待實證分開 | 完成，見[基線審查](../experiments/legacy-evidence/2026-09-10-jd-product-baseline-review.md) |
 | P1 核心 | 原 Task 1–3：schema 生成、原生 profile／adapter／validator、PG 保存、三工具、手改通知 | 固定操作保存／重開／定位／恢復，錯誤不重複套用或部分發布 | Task 1–3完成；原生／保存／三工具固定工程驗收通過，完整lifecycle仍留P2 |
 | P2 畫面 | 原 Task 4–6：聊天＋JD、手改／真選取、差異／歷史／來源、取消／恢復、單一 JD Skill；入口防重複及未保存保護 | 真瀏覽器完整固定旅程；API／DB／模型所見一致 | Task4–5已接受；接Task6完整固定旅程，OS真人IME未驗 |
-| P3 自然縱切 | 既有真顧問自行訪談→初稿→K／S首建及引用→更正→全稿核對→重開 | 1個不指定 tool calls 的完整案例；結果、來源、失敗、延遲、用量可查 | [C-W v2校準包](../specs/evidence/jd-product-p3-calibration/README.md)及 AI 操作者測法接合 review 通過；[正式新 App 測試入口](../specs/evidence/2026-09-23-jd-p3-trial-entry-offline.md)／OpenRouter 支出閘門、A 單回合 Saver 對帳與固定合成 B1／B2 背景 checkpoint→publication；受影響離線及真 PG **59 項通過**（含逐次 redirect 護欄），可重開的 12 次 chat POST 上限及三角色逐請求記錄已備，0 外部 provider request。非真人／非盲，0 次自然 trial／未付費授權。v3 結果模板已列入入口 hash；正式 Web **310 項**、typecheck／build／codegen 複核通過；仍待同一自然旅程的 A 自主通知與逐輪事件、exact runtime 凍結、真 Browser 與 Owner 付費裁決。 |
+| P3 自然縱切 | 既有真顧問自行訪談→初稿→K／S首建及引用→更正→全稿核對→重開 | 1個不指定 tool calls 的完整案例；結果、來源、失敗、延遲、用量可查 | [C-W v2校準包](../experiments/legacy-evidence/jd-product-p3-calibration/README.md)及 AI 操作者測法接合 review 通過；[正式新 App 測試入口](../experiments/legacy-evidence/2026-09-23-jd-p3-trial-entry-offline.md)／OpenRouter 支出閘門、A 單回合 Saver 對帳與固定合成 B1／B2 背景 checkpoint→publication；受影響離線及真 PG **59 項通過**（含逐次 redirect 護欄），可重開的 12 次 chat POST 上限及三角色逐請求記錄已備，0 外部 provider request。非真人／非盲，0 次自然 trial／未付費授權。v3 結果模板已列入入口 hash；正式 Web **310 項**、typecheck／build／codegen 複核通過；仍待同一自然旅程的 A 自主通知與逐輪事件、exact runtime 凍結、真 Browser 與 Owner 付費裁決。 |
 | P4 正式整合 | 採用已驗 Memory／來源 runtime、獨立 successor ADR；統一依賴／composition／契約 | 正式 API/Web 唯一 JD owner；舊 pending／approved writers、UI 與下載入口退出；無 research/worktree runtime imports | **完成**；ADR0077 Accepted，舊可執行 authority 已移除，正式根入口通過 |
 | P5 日常使用 | 更名、封存／恢復、基本啟停及中斷後查回；備份／空庫還原／跨電腦恢復不作本輪 gate | 已確認保存的原話、JD、進度在一般重開後可查回；未知提交不自動重做副作用 | **部分已驗，非 P3 前置**：新 App 已有更名／封存／恢復真 PG、根入口啟停、Host／Saver 重啟及 Browser 重開證據。剩餘只按核心真實旅程中實際出現的中斷／恢復缺口補驗。9/14 [整庫備份演練](../specs/2026-09-14-jd-backup-and-restore-slice.md)保留為歷史研究，無須為首版補做設定檔副本或還原庫續談。 |
-| P6 品質試用 | 3異質未見職位各2自然流程、長訪談／compaction／晚期更正／手改／重開、3名目標員工操作 | 重大忠實度／資料／旅程問題處理完；固定回歸及失敗保留 | [真人操作空表](../specs/evidence/jd-product-p6-usability/README.md)已備且有限review通過；自然及真人驗收未開始 |
+| P6 品質試用 | 3異質未見職位各2自然流程、長訪談／compaction／晚期更正／手改／重開、3名目標員工操作 | 重大忠實度／資料／旅程問題處理完；固定回歸及失敗保留 | [真人操作空表](../experiments/legacy-evidence/jd-product-p6-usability/README.md)已備且有限review通過；自然及真人驗收未開始 |
 | P7 交付 | 固定版本／依賴、使用及維護說明、獨立審查、驗收與後續清單 | 日常入口可用，不需研究者代操作；code/design/ADR/register 一致 | 技術交付 gate 完成；PR／merge 進行中，P6 真人品質試用仍獨立未完成 |
 
 主依賴 P0→P1→P2→P3→P4→P5→P6→P7。P4採用研究、P5旅程設計、P6評量材料與P1/P2並行，在受影響施工前閉合。P3隔離驗證不代稱正式驗收；P4不跨過核心及authority gates。

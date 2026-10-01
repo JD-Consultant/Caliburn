@@ -5,7 +5,7 @@
 **Goal:** 從空白完成整份接案前端職位的訪談、三層記憶、更正、補充撤銷與原話回查；不做 JD。
 **Architecture:** 既有真 FastAPI、PG Saver/Store、A/B1/B2及自然通知，獨立新DB，固定 `309eaf21` src雜湊。沿CT45已核對driver/ledger，不mock模型／工具／正常背景。
 **Tech Stack:** 原隔離 analysis-agent 的 LangChain/LangGraph/DeepAgents、OpenAI Responses，Luna。
-**Spec:** [CT46–48結果與來源](../specs/2026-09-09-ct46-48-edit-routing-and-budget-results.md)、[完整職位驗收範圍](2026-09-09-ct45-fixed-long-interview.md)及Owner active goal。
+**Spec:** [CT46–48結果與來源](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct46-48-edit-routing-and-budget-results.md)、[完整職位驗收範圍](2026-09-09-ct45-fixed-long-interview.md)及Owner active goal。
 
 ## Preflight／邊界
 
@@ -21,6 +21,6 @@
 - [x] 真服務逐輪問答：按模型實際問題回答，不注入理想分析；涵蓋需求估算、兩個相似網站、開發/串接/測試、發布、維護、週報、交接、低頻升級、責任界線。中途含糊→查證更正，後段新補充與撤銷、無新增重述。
 - [x] 逐段審每次詳記/候選/正文/導覽及引用；仍有效內容不能因新資料沒重述而丟失。CT48引用label與案例段落Minor繼續檢查。
 - [x] 真服務重啟後完整問答相等；全部詳記與原文source/context分頁相等。另用空近期context的既有只讀reader驗案例差異與原句，不把19/18診斷讀者預算當A產品12/11通過。
-- [x] 封存逐輪問答、三層完整產物、已消毒provider/tool trace、usage費用與原失敗；短報告及獨立review完成。結果見[CT49](../specs/2026-09-09-ct49-fixed-long-interview-results.md)。本地保存點與CT50收尾，不push/merge。
+- [x] 封存逐輪問答、三層完整產物、已消毒provider/tool trace、usage費用與原失敗；短報告及獨立review完成。結果見[CT49](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct49-fixed-long-interview-results.md)。本地保存點與CT50收尾，不push/merge。
 
 Pass：有代表性全職位涵蓋、修正正確、低頻與仍有效細節可查回、無重要混案/錯引/漏項。沒有宣稱數學100%完美或跨職位成功率；未通過就G8 OPEN，不改標準。

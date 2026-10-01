@@ -1,6 +1,6 @@
 # CT15：OpenAI 整併模型如何取得本批詳記
 
-2026-09-07 · LLM-Q019／G2 補證。父題：[CT15 診斷與選項](2026-09-07-ct15-grounding-and-memory-freshness-review.md)。本稿只回答整併的實際入料／保存／讀取，不重開 ABC。
+2026-09-07 · LLM-Q019／G2 補證。父題：[CT15 診斷與選項](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-ct15-grounding-and-memory-freshness-review.md)。本稿只回答整併的實際入料／保存／讀取，不重開 ABC。
 
 ## 1. 先修正一個容易誤讀的結論
 
@@ -50,7 +50,7 @@ Python Sandbox Memory 的 manager 先將每份候選／詳記分開保存，再�
 - 原情境 A/B 均未重現錯產品，各5步；前端異職位 B 保留正確餐飲預約／非SSO差異，5步而 A 為6步，但 B 費用略高（US$0.00158132 vs 0.00137154）。是限定證據，不是統計優勝或所有情境最佳。
 - 接法：沿既有24,000字元批次文字預算，候選＋本批完整詳記合計可容納才整批加入 `NEW_DETAILS`；超限則 details 全空，仍以真實地址按需讀取。候選本身超限沿原規則拒絕，不截斷詳記，不新設 knob。完整 Context 計數仍另行涵蓋規則、工具、資料與後續結果。
 - 小測限制：原 CT14 重播的新詳記 header 少了前置 T2 context locator（來源 T3–8不變）。22次原始帳本不回填、不宣稱 source/context 完全等價；未來 fixture 已修正。前端對照無此問題。正式新訪談走真正 B1，另驗證引用。
-- 下一 gate：完整訪談與核准收尾補測已結束，沒有手動填正確 Memory 或手動啟動整理；品質仍有待修項，唯一結果入口為[CT15完整結果](2026-09-08-ct15-grounding-and-whole-interview-results.md)。先討論晚期資訊未觸發整理，不再擴張本題研究。
+- 下一 gate：完整訪談與核准收尾補測已結束，沒有手動填正確 Memory 或手動啟動整理；品質仍有待修項，唯一結果入口為[CT15完整結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct15-grounding-and-whole-interview-results.md)。先討論晚期資訊未觸發整理，不再擴張本題研究。
 - 重開：原碼／工具讀取語意改變，或正確詳記已進 Context 仍串案時，依實測回局部設計；不再重做全部 Memory 研究。
 
 [C1]: https://github.com/openai/codex/blob/9f70e348e0227980de97e361cce830236fb18317/codex-rs/memories/write/src/storage.rs#L22-L135

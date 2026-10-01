@@ -2,13 +2,13 @@
 
 2026-09-10；JD-R002/C03；**G4 可評審設計候選，不是 production authority 或施工計畫**。本稿只定義既有主顧問使用 `jd_read`、`jd_edit`、`jd_change_read` 的責任、結果與恢復語意。Owner 已選 Plate 免費核心＋持續工作稿：AI 與人編輯同一份已保存最新版，完整變更可查，沒有個別 pending accept／reject、長期 suggestion chain 或 accepted projection。
 
-有效產品決策依 [current decision register](../current-decisions.md)，流程 gate 依 [decision process](../decision-process.md)。跨 Python／JavaScript／Web 的 wire shape 見[JSON Schema 附件](2026-09-10-jd-editor-contract-schema.md)，依 [contract strategy](../contract-strategy.md)使用單一 SSOT 與生成型別；本稿負責語意和驗收，不另造手寫 transport contract。文件保存資料模型與交易實體由同期 storage ownership 設計承接，本稿不重複定表。provider 參數與 App 完整文件驗證的能力差異依[官方複核 §2.13](evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)，不能以 JSON Schema 格式相同就宣稱兩家 strict 相容。
+有效產品決策依 [current decision register](../current-decisions.md)，流程 gate 依 [decision process](../decision-process.md)。跨 Python／JavaScript／Web 的 wire shape 見[JSON Schema 附件](2026-09-10-jd-editor-contract-schema.md)，依 [contract strategy](../contract-strategy.md)使用單一 SSOT 與生成型別；本稿負責語意和驗收，不另造手寫 transport contract。文件保存資料模型與交易實體由同期 storage ownership 設計承接，本稿不重複定表。provider 參數與 App 完整文件驗證的能力差異依[官方複核 §2.13](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)，不能以 JSON Schema 格式相同就宣稱兩家 strict 相容。
 
-**現行設計為 v2：**唯一 active schema 是 [jd-editor-v2.schema.json](contracts/jd-editor-v2.schema.json)，105 defs，固定 `format_version:2`／`jd-plate-clean-v2`。Task 的兩個平行群組、同 JD 共享 K／S、首次建立與刪除規則集中於[語意契約 v2](evidence/2026-09-10-jd-semantic-contract-closure.md)；v1 schema／封存是歷史證據，不生成新契約、不做 migration 或雙寫。
+**現行設計為 v2：**唯一 active schema 是 [jd-editor-v2.schema.json](contracts/jd-editor-v2.schema.json)，105 defs，固定 `format_version:2`／`jd-plate-clean-v2`。Task 的兩個平行群組、同 JD 共享 K／S、首次建立與刪除規則集中於[語意契約 v2](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)；v1 schema／封存是歷史證據，不生成新契約、不做 migration 或雙寫。
 
 ## 1. 已決邊界
 
-2026-09-10 補正：[責任稽核](2026-09-10-jd-responsibility-and-evidence-audit.md)的 TF／ER 缺口由本文 §4.3／§6、同一 SSOT 與正式模型說明承接；[模型參數依據](evidence/2026-09-10-jd-model-input-contract-closure.md)、[錯誤與恢復依據](evidence/2026-09-10-jd-error-recovery-contract-closure.md)記選擇理由。新的離線驗證另存，不將旧 placeholder 序列化或格式通過當成自然模型已能正確操作。
+2026-09-10 補正：[責任稽核](2026-09-10-jd-responsibility-and-evidence-audit.md)的 TF／ER 缺口由本文 §4.3／§6、同一 SSOT 與正式模型說明承接；[模型參數依據](../experiments/legacy-evidence/2026-09-10-jd-model-input-contract-closure.md)、[錯誤與恢復依據](../experiments/legacy-evidence/2026-09-10-jd-error-recovery-contract-closure.md)記選擇理由。新的離線驗證另存，不將旧 placeholder 序列化或格式通過當成自然模型已能正確操作。
 
 1. 主顧問仍是現行 LangChain `create_agent` loop；工具以既有 `BaseTool` 注入，不新增 Agent、Memory、Store 或 MCP 依賴。
 2. App 是唯一執行者。模型提出有限操作，不能自填 document、revision、operation ID、engine profile、Slate path、中文字元 offset 或保存結果。
@@ -97,7 +97,7 @@ App 可以返回人工／AI 的 change origin，供顧問判斷內容如何形�
 
 所有模型新增 Element **不得帶 ID 或 K／S links**；App clone 新內容後由固定 NodeId 產生，再驗唯一。新 Task 至少一個 body，恰有一個 `jd_outcomes` 及一個 `jd_requirements` 直屬群組，各可用空 p 保留未知內容；K／S 為相應章節直屬完整 item。既有目標改名／換文字保留外層 ID，移動帶完整既有 subtree；新複本不沿用舊 ID。`replace_block_content`／`replace_selection` 的對象限上列五種文字容器，替換其文字與支持 marks，不藉改標題換整個 Task。source refs 由 Python 交既有 owner 驗證，來源有效性與格式／ID 檢查各負其責。
 
-首次建立或模型複製：先 `insert_content` 建內容並確認保存，再 `jd_read({})` 讀新基底及相關內容，最後用 `set_properties` 連結。兩次編輯各自原子；未連結草稿合法，第二步失敗不撤銷第一步。unknown 先對帳，不重新 insert、不沿用前版 refs 或自造 temporary IDs。完整流程及共享影響見[語意契約 §4](evidence/2026-09-10-jd-semantic-contract-closure.md#4-模型參數及app分工)。
+首次建立或模型複製：先 `insert_content` 建內容並確認保存，再 `jd_read({})` 讀新基底及相關內容，最後用 `set_properties` 連結。兩次編輯各自原子；未連結草稿合法，第二步失敗不撤銷第一步。unknown 先對帳，不重新 insert、不沿用前版 refs 或自造 temporary IDs。完整流程及共享影響見[語意契約 §4](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md#4-模型參數及app分工)。
 
 ### 4.2 預檢、運算與發布
 
@@ -117,9 +117,9 @@ App 可以返回人工／AI 的 change origin，供顧問判斷內容如何形�
 
 僅 Task 可設定 `knowledge_refs`／`skill_refs`；set 替換整個有序、不重複集合，`[]` 清空，unset 移除，省略保留。App 驗已發配、同文件／current base／access 及端點種類，再把 set 值與 unset 欄名都映為保存的 `knowledge_ids`／`skill_ids`。模型與 resolved properties／unset／constraint 在同一 SSOT 分開，Node 不接 opaque semantic refs；來源 `source_refs` 保持原 owner 與用途。
 
-取消 Task 須同批明示 unwrap 兩個專屬群組，再 unwrap Task，保留 body 與順序；單獨 unwrap Task 不自動攤平。仍保留 Task 時移除必需群組，須同批明示同類替代組。刪／unwrap K／S 或其祖先須核全部剩餘引用，必要時同批明示解除／改接；不級聯刪工作或靜默斷線。完整操作後果由[語意契約 §3](evidence/2026-09-10-jd-semantic-contract-closure.md#3-共同編輯與引用邊界)維護。
+取消 Task 須同批明示 unwrap 兩個專屬群組，再 unwrap Task，保留 body 與順序；單獨 unwrap Task 不自動攤平。仍保留 Task 時移除必需群組，須同批明示同類替代組。刪／unwrap K／S 或其祖先須核全部剩餘引用，必要時同批明示解除／改接；不級聯刪工作或靜默斷線。完整操作後果由[語意契約 §3](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md#3-共同編輯與引用邊界)維護。
 
-模型只填 numeric `colSpan/rowSpan`，不能填或 unset `attributes`。保存稿仍保留原生合法 HTML span 表示；Node adapter 取得命令當下 cell，用原生 setNodes／unsetNodes 同步已存在的對應 HTML key，unset 同時清除該 key，空 attributes 物件移除，另一維保留。新增省略 span 的原生有效值為 1，明填 1 保留 numeric 1；不自動合併／拆分鄰格。完整規則與官方原碼見[模型參數附件 §3](evidence/2026-09-10-jd-model-input-contract-closure.md#3-tf02單一-span-意圖與保存映射)。
+模型只填 numeric `colSpan/rowSpan`，不能填或 unset `attributes`。保存稿仍保留原生合法 HTML span 表示；Node adapter 取得命令當下 cell，用原生 setNodes／unsetNodes 同步已存在的對應 HTML key，unset 同時清除該 key，空 attributes 物件移除，另一維保留。新增省略 span 的原生有效值為 1，明填 1 保留 numeric 1；不自動合併／拆分鄰格。完整規則與官方原碼見[模型參數附件 §3](../experiments/legacy-evidence/2026-09-10-jd-model-input-contract-closure.md#3-tf02單一-span-意圖與保存映射)。
 
 来源只在實際附著位置輸入；App 遞迴收集本批明示的新節點及 `set.source_refs` 聯集，交既有來源 owner 驗證。該聯集不是模型所有曾查閱或用來判斷刪除的來源清單。它不覆蓋全文來源，不清掉本批沒有重填的舊 refs，不建立新的查閱紀錄庫。
 
@@ -165,7 +165,7 @@ App 可以返回人工／AI 的 change origin，供顧問判斷內容如何形�
 
 錯誤是否可由模型修正與是否可安全重試分開：參數／過期引用可在重讀後形成**新的** call；unknown 只可對帳原 operation。連續無效 JSON、重複無進展或超過工具／模型額度沿既有 runtime 有界停止，不新增修補 Agent。
 
-v2 的錯 kind、重複 link、非 Task 設 links、非法群組及仍被引用的刪除屬 `invalid_input`；有界 error code／message 指明原因，再按既有動作矩陣修正。受影響 Tasks 沿 `jd_read` 查，不把稍後變動的 current 投影塞進 immutable receipt；若原保存基底已有失效關係則停止並交 App 處理。細則見[語意契約 §5](evidence/2026-09-10-jd-semantic-contract-closure.md#5-錯誤及保存契約)。
+v2 的錯 kind、重複 link、非 Task 設 links、非法群組及仍被引用的刪除屬 `invalid_input`；有界 error code／message 指明原因，再按既有動作矩陣修正。受影響 Tasks 沿 `jd_read` 查，不把稍後變動的 current 投影塞進 immutable receipt；若原保存基底已有失效關係則停止並交 App 處理。細則見[語意契約 §5](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md#5-錯誤及保存契約)。
 
 ### 6.1 狀態與下一步的封閉關係
 
@@ -188,7 +188,7 @@ v2 的錯 kind、重複 link、非 Task 設 links、非法群組及仍被引用�
 
 `jd_read`／`jd_change_read` 共用 `JdReadFailure`：invalid_input→correct_arguments 或 stop；target_missing→reread_current 或 stop；busy→wait 或 stop；unsupported_content／新增 read_failed→stop。read_failed 表示 DB、解碼或唯讀引擎等執行失敗，不代表文件不存在；它不建立 operation。Node 的內部 `ok:false` 仍是內部結果，由 App 映射到這個工具出口，不將 Node 回覆直接當已保存或模型可讀成功。
 
-v2 沿用既有執行策略：各明示 Node 執行、SQL 發布交易、必要失敗回執記錄及 receipt 查詢均最多一次 attempt，零自動重播；provider HTTP 沿既有 SDK，沒有外層整個 Agent／ToolNode retry。明確恢復／重開觸發新一輪對帳，查不到仍保留原 operation，不能推定未執行。控制預算沿[唯一 ER03 策略](evidence/2026-09-10-jd-error-recovery-contract-closure.md)：Node 30 秒及停止／回收 5＋5 秒、單個 SQL 階段總 30 秒，沿既有 connect 5／statement 10／lock 5 秒並依剩餘時間收斂；這是本案可配置起始值，不是大廠規定。取消／超時仍須確認程序停止及交易結果；到期不等於 rollback 已完成。
+v2 沿用既有執行策略：各明示 Node 執行、SQL 發布交易、必要失敗回執記錄及 receipt 查詢均最多一次 attempt，零自動重播；provider HTTP 沿既有 SDK，沒有外層整個 Agent／ToolNode retry。明確恢復／重開觸發新一輪對帳，查不到仍保留原 operation，不能推定未執行。控制預算沿[唯一 ER03 策略](../experiments/legacy-evidence/2026-09-10-jd-error-recovery-contract-closure.md)：Node 30 秒及停止／回收 5＋5 秒、單個 SQL 階段總 30 秒，沿既有 connect 5／statement 10／lock 5 秒並依剩餘時間收斂；這是本案可配置起始值，不是大廠規定。取消／超時仍須確認程序停止及交易結果；到期不等於 rollback 已完成。
 
 保存確認的查詢額度耗盡時，UI 結束無限 spinner、明示仍待確認並可恢復／重試確認，保留只讀和原輸入；有未閉合 operation 時不開新 writer。已確認失敗、writer 停止且必要回執閉合後，依既有流程恢復手編。背景 Memory 不延長 JD gate。
 
@@ -247,14 +247,14 @@ current understanding、歷史詳記及更正 lineage 仍由既有 Memory／conv
 ## 10. 施工驗收與正式化邊界
 
 - [App 接線設計 §5.4](2026-09-09-jd-editor-app-integration-design.md#54-保存資料的具體約束)已固定 JD head／revision／operation／change 的有限保存約束；[Proposed ADR 0073](../adr/0073-plate-jd-app-working-document-and-revision-authority.md)已指定 JD App 為唯一文件 owner 與舊 JD authority 的取代範圍。仍須完成正式 schema review、接受 ADR 與 implementation gate；不再把 durable owner 當成空白選項。
-- v1 核心總審保留歷史效力；本次[語意契約 v2](evidence/2026-09-10-jd-semantic-contract-closure.md)同步[正式 Plate profile](2026-09-10-jd-plate-document-profile.md)、[JSON Schema](2026-09-10-jd-editor-contract-schema.md)與[六切片計畫](../plans/2026-09-10-jd-editor-core-implementation.md)，完成有限閉合後恢復 Task 1。[整體評審包](2026-09-09-jd-editor-app-integration-design.md#91-整體接線評審包)的核心產品取捨已同意、真人交付 PARKED；不重問或重選框架。
+- v1 核心總審保留歷史效力；本次[語意契約 v2](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)同步[正式 Plate profile](2026-09-10-jd-plate-document-profile.md)、[JSON Schema](2026-09-10-jd-editor-contract-schema.md)與[六切片計畫](../plans/2026-09-10-jd-editor-core-implementation.md)，完成有限閉合後恢復 Task 1。[整體評審包](2026-09-09-jd-editor-app-integration-design.md#91-整體接線評審包)的核心產品取捨已同意、真人交付 PARKED；不重問或重選框架。
 - Owner 採用持續工作稿不會自行改寫既有 production authority；Proposed ADR 0073 已明列 0060／0064／0066／0067／0069 的 JD 專屬取代範圍，production 須在其 Accepted 並通過 implementation gate 後才可切換；隔離施工依六切片及 register 已同意範圍。
 - S5 核心設計／隔離施工交接已完成，效力限可驗證設計與計畫。本稿沒有證明 DOM／IME、完整 Agent binding、真 provider 接受、真模型 JD 品質或 production 整合已通過。
 
 ## 11. 證據與效力
 
-- [語意契約 v2](evidence/2026-09-10-jd-semantic-contract-closure.md)：新 grammar、同版 K／S、模型／App 映射、首建及有限驗證的唯一詳細入口；舊 v1 證據不改。
+- [語意契約 v2](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)：新 grammar、同版 K／S、模型／App 映射、首建及有限驗證的唯一詳細入口；舊 v1 證據不改。
 - [JD App 接線設計](2026-09-09-jd-editor-app-integration-design.md)：三工具、Plate headless、結果梯、single-writer 與保存候選。
-- [App／工具／審閱官方證據](evidence/2026-09-09-jd-app-tool-and-review-contracts.md)：OpenAI／Anthropic call-result 關聯、Google revision／atomic batch、失敗與 unknown 邊界，以及既有 runtime 對照。
+- [App／工具／審閱官方證據](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md)：OpenAI／Anthropic call-result 關聯、Google revision／atomic batch、失敗與 unknown 邊界，以及既有 runtime 對照。
 - [審閱生命週期裁決](2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)：B 路線、被取代的 pending 操作要求與仍保留效果。
 - 隔離 runtime source：[`runtime.py`](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/runtime.py)、[`conversation.py`](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/conversation.py)、[`service.py`](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/service.py)、[`live_memory.py`](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/live_memory.py)、[`sources.py`](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/sources.py)、[`publication.py`](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/publication.py)。這些證明可重用機制與責任界線，不是 JD 已實作證據。

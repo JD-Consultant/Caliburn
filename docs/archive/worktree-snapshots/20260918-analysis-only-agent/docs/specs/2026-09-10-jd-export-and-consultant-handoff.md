@@ -2,7 +2,7 @@
 
 **PARKED（2026-09-10 Owner 裁決）：**Owner 同意核心編輯接線，但明確表示「先不用做真人交付核對」。本附件的真人交付／核對功能、HTML／DOCX＋原始問答交付包暫不施工，也不列本版核心編輯器的退出條件；只有 Owner 重新要求時才啟動。下文是保留的研究候選，不是現行施工指令。既有來源回查及一般文件編輯不受影響。
 
-2026-09-10；JD-R002/C03；**G4 設計附件／推薦，尚未核准格式、按鈕或施工。**與 [ADR 0073](../adr/0073-plate-jd-app-working-document-and-revision-authority.md)、[App 接線 §8](2026-09-09-jd-editor-app-integration-design.md#8-可核對的員工情境與匯出)一次審閱。有效方向依 [register](../current-decisions.md)及 [decision process](../decision-process.md)：Plate 免費核心、同一持續工作稿、同畫面聊天與差異、更正形成新版；不恢復個別 pending、approved projection 或舊 iCAP／XLSX／A 級別限制。本輪僅讀文件、官方來源與既有程式；沒有安裝、匯出實驗或產品修改。
+2026-09-10；JD-R002/C03；**G4 設計附件／推薦，尚未核准格式、按鈕或施工。**與 [ADR 0073](../adr/0073-plate-jd-app-working-document-and-revision-authority.md)、[App 接線 §8](../../../../../specs/2026-09-09-jd-editor-app-integration-design.md#8-可核對的員工情境與匯出)一次審閱。有效方向依 [register](../current-decisions.md)及 [decision process](../../../../../decision-process.md)：Plate 免費核心、同一持續工作稿、同畫面聊天與差異、更正形成新版；不恢復個別 pending、approved projection 或舊 iCAP／XLSX／A 級別限制。本輪僅讀文件、官方來源與既有程式；沒有安裝、匯出實驗或產品修改。
 
 ## 1. 推薦及交付效果
 
@@ -10,7 +10,7 @@
 
 App 內仍只有原工作畫面的聊天、唯一可編 JD、可展開差異與歷史。下載檔是某個時間範圍的可攜副本，沒有寫入 authority，不自動跟隨 current，也不成為「更正後」第二操作頁。真人在 App 內核對／修改仍走同一工作稿；若確實要在外部文書軟體續改，採 §4 的 DOCX 替代方向。外部修改回傳／匯入不在此範圍。
 
-輸出只改呈現，不再請模型摘要、專業改寫或補齊。職責、Task 完整敘述與就近要求、成果、K／S 用途、案例差異、責任邊界及重要未知全部依保存值呈現；不可只輸出短標題。依據為 [欄位與寫作指南 §3–§7](2026-09-09-jd-field-and-writing-guide.md)、[正式 profile](2026-09-10-jd-plate-document-profile.md)與 [完整 r2](2026-09-09-frontend-engineer-jd-sample.md)。不要求有固定節數、Task 數或每欄非空，也不把交付標為專業核准。
+輸出只改呈現，不再請模型摘要、專業改寫或補齊。職責、Task 完整敘述與就近要求、成果、K／S 用途、案例差異、責任邊界及重要未知全部依保存值呈現；不可只輸出短標題。依據為 [欄位與寫作指南 §3–§7](2026-09-09-jd-field-and-writing-guide.md)、[正式 profile](../../../../../specs/2026-09-10-jd-plate-document-profile.md)與 [完整 r2](../../../../../guides/2026-09-09-frontend-engineer-jd-sample.md)。不要求有固定節數、Task 數或每欄非空，也不把交付標為專業核准。
 
 ## 2. 固定 JD 版本與訪談範圍
 
@@ -49,7 +49,7 @@ JD 內的 `source_refs` 轉為可讀「依據」與檔案內問答錨點；有�
 | **A：HTML；推薦** | 已有 `platejs@53.3.11`／`@platejs/core@53.3.11` 的 `platejs/static` 與 `serializeHtml`；React／React DOM `19.2.4`。Plate core 及 React 為 MIT。[Plate HTML](https://platejs.org/docs/html)要求 base plugins＋static components，返回內容 HTML，樣式另提供；[React API](https://react.dev/reference/react-dom/server/renderToStaticMarkup)輸出靜態 HTML，不能 hydrate，Suspense 可能只輸出 fallback。[React 固定版 LICENSE](https://github.com/facebook/react/blob/v19.2.4/LICENSE) | 沿正式 profile 的有限靜態 renderer，另把問答／依據呈現為一般語意 HTML；不複製 live editor／Client hooks。嵌入必要 CSS，無 script／remote resource，文字正確 escape；所有資料先讀齊再 render，不能以 loading fallback 當內容。不承諾 Word 直接開啟後可無損續編，也不把瀏覽器另存 PDF 當已驗證的正式匯出 |
 | **B：DOCX；外部續改需求時的替代** | `docx` 官方 **9.7.1 tag** 的 [package](https://github.com/dolanmiu/docx/blob/9.7.1/package.json)及獨立 [MIT LICENSE](https://github.com/dolanmiu/docx/blob/9.7.1/LICENSE)已核對。[Packer 固定 source](https://github.com/dolanmiu/docx/blob/9.7.1/src/export/packer/packer.ts)以 OOXML／ZIP 產生 Buffer／Blob；[官方 Table API](https://docx.js.org/api/classes/Table.html)提供列、格及段落內容。這是 OSS 產生器，非購買 Word／Copilot | 需新增固定依賴與一個針對正式 profile 的有限 OOXML mapper：段落／marks／清單層級／表格及必要屬性／來源錨點。它不直接消費 Plate value 或 React CSS，不能將 HTML 改副檔名當 DOCX。須另驗繁中、長表跨頁、清單、外部文書軟體開啟及保存；使用者選何種文書軟體不由此推定。沒有自動回匯／修改同步／tracked-change 接線 |
 
-**固定本地 source 複核：**[core static bundle](../../.research-tmp/jd-editor-native-probe/node_modules/@platejs/core/dist/static-CTmHK15f.js)的 704–721 行，`serializeHtml` 確實呼叫 `react-dom/server.renderToStaticMarkup`，預設 `PlateStatic`；class／data stripping 是選項。檔案 SHA-256：`ff71ed69820aad0ec2bb150b131182e3a8a5e340e9ddc5d19a441bae51b74c24`。這是 source 核對，不是匯出實驗。完整 body／JD／來源顯示仍須本案 static components；不能由 API 存在推成任意 profile 已保真。正式部署沿 [profile 固定依賴](2026-09-10-jd-plate-document-profile.md#1-固定引擎與官方插件)核對各插件授權。
+**固定本地 source 複核：**[core static bundle](../../.research-tmp/jd-editor-native-probe/node_modules/@platejs/core/dist/static-CTmHK15f.js)的 704–721 行，`serializeHtml` 確實呼叫 `react-dom/server.renderToStaticMarkup`，預設 `PlateStatic`；class／data stripping 是選項。檔案 SHA-256：`ff71ed69820aad0ec2bb150b131182e3a8a5e340e9ddc5d19a441bae51b74c24`。這是 source 核對，不是匯出實驗。完整 body／JD／來源顯示仍須本案 static components；不能由 API 存在推成任意 profile 已保真。正式部署沿 [profile 固定依賴](../../../../../specs/2026-09-10-jd-plate-document-profile.md#1-固定引擎與官方插件)核對各插件授權。
 
 DOCX 的 npm registry 本輪讀取未成功，未確認安裝產物及完整 transitive lock；9.7.1 只以官方 tag／原始碼作本次替代方案版本依據。若改採 B，安裝前固定正式發布版本／完整相依及授權，再做有限驗收，不追 `latest` 或宣稱此 repo 已有 DOCX 能力。沒有增加第三個 PDF／模板引擎候選。
 

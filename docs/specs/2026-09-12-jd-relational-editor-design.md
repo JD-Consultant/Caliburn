@@ -5,7 +5,7 @@
 - 日期：2026-09-12
 - Topic：JD-R002/C01、C03
 - 階段：G4 DRAFT；待 Owner／外部 reviewer 審查
-- 前提：[Owner 方向](2026-09-12-jd-relational-editing-requirements.md)、[官方證據](evidence/2026-09-12-jd-relational-editor-evidence.md)
+- 前提：[Owner 方向](2026-09-12-jd-relational-editing-requirements.md)、[官方證據](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md)
 - 效力：只形成可審設計；沒有改 schema、程式、資料、production authority 或付費模型設定
 
 **保存方向已選定（2026-09-12）：**Owner 已同意[一般文字自動保存、結構操作完成後整組保存](2026-09-12-jd-autosave-research.md)。下方 §3.2／5.1 已依此修訂，輸入與恢復細節由[保存與 AI 交接設計](2026-09-12-jd-autosave-and-handoff-design.md)負責；不把方向同意當成所有工具／撤回流程已定稿。整體仍 G4 Needs revision。
@@ -150,7 +150,7 @@ Owner 確認 AI 可直接修改保存、不逐次接受；App 須提供可見提
 
 ### 7.2 D01 已決：刪職責、保留任務
 
-Owner 已授權研究者裁決，採[需求 §8](2026-09-12-jd-relational-editing-requirements.md#8-d01刪除職責時保留任務2026-09-12)的任務保留政策；[AWS 與 PostgreSQL 依據](evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)支持依物件獨立性分開生命週期，不宣稱通用的刪父留子規範。
+Owner 已授權研究者裁決，採[需求 §8](2026-09-12-jd-relational-editing-requirements.md#8-d01刪除職責時保留任務2026-09-12)的任務保留政策；[AWS 與 PostgreSQL 依據](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)支持依物件獨立性分開生命週期，不宣稱通用的刪父留子規範。
 
 - 員工刪除職責後，原任務出現在「尚未歸入職責」，可繼續閱讀、編輯、重新歸類及匯出。任務 ID、敘述、成果／要求、K/S links 與各自 source links 保留；不連帶刪除工作。
 - App 對人工與 AI 使用同一完整業務操作：解除該職責任務的分組、按既有順序規則放入未分組清單，再刪 duty；current、實際差異、snapshot／head 及成功 receipt 同交易提交。工具不逐項要求模型搬任務或選 SQL 模式。
@@ -178,7 +178,7 @@ relational current projection 可確定性轉成不同輸出，不讓 LLM 生成
 | 所選文字輸入元件 | 單一文字欄位的 selection、IME、paste、undo／redo；具體可用能力須實測 | 整份 JD schema、跨卡 CRUD、關係、DB 保存及歷史 authority |
 | 員工 | 提供自身工作、指出誤解、可直接編輯及確認刪除影響 | 判斷專業 JD 寫作是否完整或維護資料庫關係 |
 
-此分工參考 [AWS ports／adapters 與命令處理](evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)：人工與 AI 的輸入接點可以不同，domain rules 與保存效果共用。只採所需分層，不因此加入 AWS 服務、微服務或另一個資料權威。
+此分工參考 [AWS ports／adapters 與命令處理](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)：人工與 AI 的輸入接點可以不同，domain rules 與保存效果共用。只採所需分層，不因此加入 AWS 服務、微服務或另一個資料權威。
 
 ## 10. 失敗與恢復
 

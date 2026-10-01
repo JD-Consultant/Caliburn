@@ -230,7 +230,7 @@ Tasks 0–5 的離線接線與目前可驗證的整體回歸已完成，且沒�
 - 一次 closure 尚未完成時的查詢得到暫時 `503 service_unavailable`；沒有重送模型或 writer，後續原 run 查回成功。此列為既有查回時序觀察，不改 unknown／receipt 語意。
 - Chrome CDP 本輪在瀏覽器啟動階段得到 `chrome_devtools_unavailable`，沒有取得新的 Stable Chrome 頁面證據；完整 browser journey 維持 `UNVERIFIED`。
 
-完整證據見[after-model state 接線驗收](../specs/evidence/jd-relational-ui-restore/2026-09-22-after-model-state-forwarding.md)。
+完整證據見[after-model state 接線驗收](../experiments/legacy-evidence/jd-relational-ui-restore/2026-09-22-after-model-state-forwarding.md)。
 
 ## 17. 2026-09-22 strict wire model-facing adapter 收斂與下一個 test-only gate
 

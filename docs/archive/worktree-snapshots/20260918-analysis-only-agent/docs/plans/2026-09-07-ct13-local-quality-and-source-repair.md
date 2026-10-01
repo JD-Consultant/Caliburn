@@ -114,4 +114,4 @@ def extraction_window(self, summary_path: str) -> dict:
 
 - Task1：提示候選已修改，沒有新測試答案、欄位、Skill 或模型步驟。語意 red 沿 CT12 Q01–Q04；尚無新的語意 green，保留品質 OPEN。94 項抽取／整併／讀取／API 接線回歸通過（13.93s，1項既有上游 warning）。兩次沙箱測試在 pytest 暫存權限失敗，改用沙箱外隔離暫存重跑，未改產品權限或測試行為。獨立唯讀 spec／quality review 無 finding；最後僅修繁中字形。
 - Task2：測試先行，修正一個未關閉回合的 fixture 後，7 failed／9 passed（7.54s）。失敗是尚無摘要路徑／context 選擇介面，不是來源底層找不到；接續最小實作。
-- Task2 完成：最小 adapter、分頁、direct C、header／隔離／重抽界線通過，73 項相關回歸／16.80s；PG 重開也沿新 source_window 讀回指定原文。Task3 用既有 factory 完成兩項完成判定測試；最終新檔18項、整批580項／0 skipped／118.80s 通過。獨立 review 無待修 finding。詳細測試、fixture／環境問題、來源及品質限制只放[本輪結果](../specs/2026-09-07-ct13-local-repair-results.md)。
+- Task2 完成：最小 adapter、分頁、direct C、header／隔離／重抽界線通過，73 項相關回歸／16.80s；PG 重開也沿新 source_window 讀回指定原文。Task3 用既有 factory 完成兩項完成判定測試；最終新檔18項、整批580項／0 skipped／118.80s 通過。獨立 review 無待修 finding。詳細測試、fixture／環境問題、來源及品質限制只放[本輪結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-ct13-local-repair-results.md)。

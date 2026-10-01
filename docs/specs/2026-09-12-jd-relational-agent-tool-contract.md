@@ -286,7 +286,7 @@ App 從既有持久 run／可信 binding 注入 `ai_run_id`，與每筆 operatio
 
 Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案將它固定成 machine-readable status＋員工可讀 message＋有限 next action，不讓模型從自由文字猜是否重試。[Anthropic Handle tool calls](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)
 
-2026-09-13 精確化：[結果 SSOT](../../experiments/jd-relational-app/contracts/jd-result.schema.json)固定以上八 keys 與合法狀態分支，拒絕 `candidate_ready`。mutation result 保持輕量，移除舊例 `actual_changes`；完整前後文字／結構／來源差異沿原 immutable base/result，公開入口依 §3.7 完成，不以 AI 摘要替代。永久 receipt 只保存穩定身分／結果語意；[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已由真實 `WriteObservation` 發配原 operation／result／change refs 並驗 shared result，未確認仍先 reconcile。此投影不查新 head、不重播、不改 receipt，投影失敗也不改稱保存失敗；寫入 HTTP host 與正式顧問接線仍待完成。永久／對外邊界仍沿[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md)。
+2026-09-13 精確化：[結果 SSOT](../../experiments/jd-relational-app/contracts/jd-result.schema.json)固定以上八 keys 與合法狀態分支，拒絕 `candidate_ready`。mutation result 保持輕量，移除舊例 `actual_changes`；完整前後文字／結構／來源差異沿原 immutable base/result，公開入口依 §3.7 完成，不以 AI 摘要替代。永久 receipt 只保存穩定身分／結果語意；[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已由真實 `WriteObservation` 發配原 operation／result／change refs 並驗 shared result，未確認仍先 reconcile。此投影不查新 head、不重播、不改 receipt，投影失敗也不改稱保存失敗；寫入 HTTP host 與正式顧問接線仍待完成。永久／對外邊界仍沿[讀取前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md)。
 
 [HTTP 投影](2026-09-13-jd-result-and-storage-foundation.md#http-與模型外殼)在寫入回應使用 200 成功、202 待對帳及具名 4xx／5xx Problem；成功查回觀察使用 200，body 保留原結果。查回服務自身失敗另由 host 回報。`operation_conflict` 不接受衝突意圖、無本次 operation ref，原 receipt 保留。未 binding 的內部保存前錯誤可回 `save_failed/unchanged/unconfirmed` 並停止；已 binding 而未確認則一律 reconcile。這些是本案映射，非兩家供應商指定的 HTTP 或資料表格式。
 
@@ -372,7 +372,7 @@ Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案�
 
 ## 11. 本輪 OPEN 與非目標
 
-- JD-R002/D01 任務保留政策已依 Owner 授權裁決；工具與人工共用完整效果。JR-R02／03 已通過[保存文件窄複核](evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 已通過[完整操作文件複核](evidence/2026-09-12-jd-business-operations-review.md)；均未實測。草稿／還原產品選擇已記[需求 §11](2026-09-12-jd-relational-editing-requirements.md#11-本輪裁決草稿歷史與還原2026-09-12)，恢復工程前置與整體 G4 仍待閉合。
+- JD-R002/D01 任務保留政策已依 Owner 授權裁決；工具與人工共用完整效果。JR-R02／03 已通過[保存文件窄複核](../experiments/legacy-evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 已通過[完整操作文件複核](../experiments/legacy-evidence/2026-09-12-jd-business-operations-review.md)；均未實測。草稿／還原產品選擇已記[需求 §11](2026-09-12-jd-relational-editing-requirements.md#11-本輪裁決草稿歷史與還原2026-09-12)，恢復工程前置與整體 G4 仍待閉合。
 - 2026-09-13 Owner 延後 Excel，先完整 App／業務／LLM；匯出不進 model tools，也不阻本輪契約。之後優先 Excel／原話分開輸出的方向保留。
 - 不增加模型用 archive、rename、history restore、DB query 或 raw JSON edit。JD 工具不重建 Memory 寫入入口；顧問仍可沿既有即時修補與背景整併反覆修訂工作理解。
 - 不讓 AI 每輪自動改 JD；是否撰寫由顧問方法與已理解資訊決定。

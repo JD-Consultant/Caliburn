@@ -2,7 +2,7 @@
 
 日期：2026-07-31
 狀態：研究完成，待 owner 裁決；**尚未改任何程式**
-前置事實：[live smoke 實驗紀錄](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)
+前置事實：[live smoke 實驗紀錄](../../../../../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)
 
 ## 1. 問題
 

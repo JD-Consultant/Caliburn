@@ -21,13 +21,13 @@
 
 ## 2. 官方依據與本案取捨
 
-本次沿已選組合，**沒有新增或升級依賴**。適用 LangChain 1.4.0、langchain-core 1.6.3、LangGraph 1.2.11、checkpoint 4.2.0、PG Saver 3.1.2、langchain-anthropic 1.7.2、Anthropic SDK 1.5.0 與 Python 3.12.13；框架套件的 MIT／Python PSF 授權、既有 adapter 精確相容證據沿[前次結果](2026-09-13-jd-consultant-context-slice.md#2-官方依據版本與本案映射)及[版本附件](evidence/jd-relational-context/adapter-versions.json)。商業模型服務與本機套件授權分開，本輪沒有模型費用。
+本次沿已選組合，**沒有新增或升級依賴**。適用 LangChain 1.4.0、langchain-core 1.6.3、LangGraph 1.2.11、checkpoint 4.2.0、PG Saver 3.1.2、langchain-anthropic 1.7.2、Anthropic SDK 1.5.0 與 Python 3.12.13；框架套件的 MIT／Python PSF 授權、既有 adapter 精確相容證據沿[前次結果](2026-09-13-jd-consultant-context-slice.md#2-官方依據版本與本案映射)及[版本附件](../experiments/legacy-evidence/jd-relational-context/adapter-versions.json)。商業模型服務與本機套件授權分開，本輪沒有模型費用。
 
 三份本轮前置各保存其研究範圍、原碼位置與限制：
 
-1. [前景 owner 前置](evidence/jd-relational-ai-runtime/ownership-preflight.md)：同文件 gate、真 Future、取消及程序內／跨宿主證據。
-2. [原生 admission checkpoint 核實](evidence/jd-relational-ai-runtime/admission_checkpoint_notes.md)：`after_model`、`sync`、ToolNode 次序及五個合成探針。
-3. [具名工具前置](evidence/jd-relational-ai-runtime/tool-preflight.md)：generated schema、ToolRuntime 注入、原生 validation／callback 限制與固定錯誤出口。
+1. [前景 owner 前置](../experiments/legacy-evidence/jd-relational-ai-runtime/ownership-preflight.md)：同文件 gate、真 Future、取消及程序內／跨宿主證據。
+2. [原生 admission checkpoint 核實](../experiments/legacy-evidence/jd-relational-ai-runtime/admission_checkpoint_notes.md)：`after_model`、`sync`、ToolNode 次序及五個合成探針。
+3. [具名工具前置](../experiments/legacy-evidence/jd-relational-ai-runtime/tool-preflight.md)：generated schema、ToolRuntime 注入、原生 validation／callback 限制與固定錯誤出口。
 
 以下官方來源均沿上述 2026-09-13 查閱證據，不另作同層品牌比較。
 
@@ -72,19 +72,19 @@
 7. 已綁定而結果未知時，固定 pending 例外停止 graph，保留原 binding，不再叫模型。真正 run／SQL Future 結束後，coordinator 用共用 decoder 核原 AIMessage／call／參數 digest，先查原 receipt；必要時沿 owner 的 failure-only recovery。恢復不需要 live BoundEdit，也不執行原 command。
 8. 已保存的 ToolMessage 與原 receipt 核對；尚未配對的原 call 補真實 committed／失敗／未執行結果，固定 root 閉合並 exact readback 後才解除 gate。當下 codec 的確定性 token 讓同 key／dataset 投影可核原內容；**跨 key rotation 的結果核對未在本輪驗收**。
 
-回合結束由 App 自動收尾，與呼叫者是否仍等待分開。`wait(timeout)` 只觀察完成，不以 timeout 中斷工作或重新執行；自動閉合未確認時保留 gate，`recover()` 是顯式對帳。關閉只對仍未結束的前景工作要求停止，不能把已成功完成的回合改標 cancelled。初始 Saver 的特殊狀態與明示單次閉合依[原生 START 探針](evidence/jd-relational-ai-runtime/initial-checkpoint-probe.md)，不以清 tasks 或 graph resume 冒充恢復。
+回合結束由 App 自動收尾，與呼叫者是否仍等待分開。`wait(timeout)` 只觀察完成，不以 timeout 中斷工作或重新執行；自動閉合未確認時保留 gate，`recover()` 是顯式對帳。關閉只對仍未結束的前景工作要求停止，不能把已成功完成的回合改標 cancelled。初始 Saver 的特殊狀態與明示單次閉合依[原生 START 探針](../experiments/legacy-evidence/jd-relational-ai-runtime/initial-checkpoint-probe.md)，不以清 tasks 或 graph resume 冒充恢復。
 
-本程序 owner 的實際 Future／attempt token 是寫入資格；空 Future、timeout、外部 bool、tool call ID 或 graph 字串 status 都不是停止證明。原生 checkpoint adapter 的 close 只管固定保存位置，caller 仍必須先完成 Future／receipt／完整 call-result 配對。這些接線由[工具與 checkpoint 獨立審查](evidence/jd-relational-ai-runtime/tool-checkpoint-review.md)列明，不能單憑 adapter PASS 宣稱整個 coordinator 已通過。
+本程序 owner 的實際 Future／attempt token 是寫入資格；空 Future、timeout、外部 bool、tool call ID 或 graph 字串 status 都不是停止證明。原生 checkpoint adapter 的 close 只管固定保存位置，caller 仍必須先完成 Future／receipt／完整 call-result 配對。這些接線由[工具與 checkpoint 獨立審查](../experiments/legacy-evidence/jd-relational-ai-runtime/tool-checkpoint-review.md)列明，不能單憑 adapter PASS 宣稱整個 coordinator 已通過。
 
 ## 5. 首敗與審查處理
 
 | 證據 | 首敗／修正與目前界線 |
 |---|---|
-| [原生 admission 探針](evidence/jd-relational-ai-runtime/admission_checkpoint_notes.md#五個可重現結果) | 五個合成探針含 async 反例：預設 async 可讓工具先於 binding 保存，故正式入口必須 sync。初兩個接法錯誤是 probe command key／namespace 用法，修正後取得證據；不是產品 SQL 測試。 |
-| [owner OR-R01](evidence/jd-relational-ai-runtime/ownership-review.md) | 發現已 done recovery 捕捉的 context 在同一 pool thread 重用仍可能過門閘。manual／AI × done／下一 recovery 四紅例後，綁 exact attempt token 並要求本次原生 Future 仍 running。作者受影響回歸 **92 PASS／0.80s**；另由獨立 reviewer 重跑四反例 PASS。 |
+| [原生 admission 探針](../experiments/legacy-evidence/jd-relational-ai-runtime/admission_checkpoint_notes.md#五個可重現結果) | 五個合成探針含 async 反例：預設 async 可讓工具先於 binding 保存，故正式入口必須 sync。初兩個接法錯誤是 probe command key／namespace 用法，修正後取得證據；不是產品 SQL 測試。 |
+| [owner OR-R01](../experiments/legacy-evidence/jd-relational-ai-runtime/ownership-review.md) | 發現已 done recovery 捕捉的 context 在同一 pool thread 重用仍可能過門閘。manual／AI × done／下一 recovery 四紅例後，綁 exact attempt token 並要求本次原生 Future 仍 running。作者受影響回歸 **92 PASS／0.80s**；另由獨立 reviewer 重跑四反例 PASS。 |
 | 工具單測 | 新模組未建立先有 collection error；初實作 **7 FAIL／7 PASS**，主要為測資沿用舊 CreateTask 外形，修成正式 container_ref／after_ref 等後 14 PASS。後續恢復測試曾把已完成後的舊 AIMessage 當作 pending 最新訊息，修測資後 35 PASS；加 current item／section 後 **37 PASS／1.71s**。沒有為過測放寬 schema。 |
 | 本輪真 PG 接合 | 首跑 **2 FAIL／2.66s**，是固定回覆測資錯用 `owner_item_ref`，generated ContainerRecord 實為 `owner_ref`，MockTransport 內 KeyError 被 SDK 包成 connection error；只修測資。修後 **2 PASS／2.89s**，再加純訪談／取消及 tracing 核對後 **4 PASS／3.42s**。 |
-| [coordinator 獨立審查](evidence/jd-relational-ai-runtime/coordinator-review.md) | 前置錯誤、start/close、無 observer 三個紅例 **3 FAIL → PASS**。後續抓到 callback 註冊競爭，再有 **1 FAIL → PASS**；修為明確等待 owner callback 完成。25 個 coordinator 測試含上述、六個初始保存故障、新舊回覆區分及原子唯一 claim。 |
+| [coordinator 獨立審查](../experiments/legacy-evidence/jd-relational-ai-runtime/coordinator-review.md) | 前置錯誤、start/close、無 observer 三個紅例 **3 FAIL → PASS**。後續抓到 callback 註冊競爭，再有 **1 FAIL → PASS**；修為明確等待 owner callback 完成。25 個 coordinator 測試含上述、六個初始保存故障、新舊回覆區分及原子唯一 claim。 |
 | 初始 START 保存 | helper 原本拒絕只有 input checkpoint 的已保存原話，四紅例後新增固定 Saver tuple 讀取，**52 PASS**。另有八個 native 初始情境與一個清 task 反例；coordinator 六例再核 actual owner 關閉與 input_saved 真值。 |
 
 ## 6. 分層驗收紀錄
@@ -93,13 +93,13 @@
 
 | 層級與來源 | 實際結果與可證範圍 |
 |---|---|
-| 原生接法研究 | [admission 五探針](evidence/jd-relational-ai-runtime/admission_checkpoint_notes.md)及[工具 schema／validation probe](evidence/jd-relational-ai-runtime/tool-preflight.md#3-原生框架的三個實際限制)。InMemorySaver／固定回覆／合成 SQL 邊界；不是資料庫或 provider。 |
-| 共同 owner 修正回歸 | [ownership review](evidence/jd-relational-ai-runtime/ownership-review.md)：92 PASS，含真 Future／thread 與合成 storage/checkpoint、人工／目錄／startup 回歸；無真 PG／OS host。 |
+| 原生接法研究 | [admission 五探針](../experiments/legacy-evidence/jd-relational-ai-runtime/admission_checkpoint_notes.md)及[工具 schema／validation probe](../experiments/legacy-evidence/jd-relational-ai-runtime/tool-preflight.md#3-原生框架的三個實際限制)。InMemorySaver／固定回覆／合成 SQL 邊界；不是資料庫或 provider。 |
+| 共同 owner 修正回歸 | [ownership review](../experiments/legacy-evidence/jd-relational-ai-runtime/ownership-review.md)：92 PASS，含真 Future／thread 與合成 storage/checkpoint、人工／目錄／startup 回歸；無真 PG／OS host。 |
 | 原生工具單測 | [test_consultant_tools.py](../../experiments/jd-relational-app/tests/test_consultant_tools.py)：37 PASS。generated 十工具 schema、無 App 參數、先 checkpoint 再模擬 writer、非法參數／錯 scope／history 不可寫、錯 message digest／缺 cache、unknown 停模型、confirmed 不降級、current item／section。真 create_agent／InMemorySaver，history／owner 為合成 ports。 |
-| 工具與 checkpoint 獨立窄審 | [review](evidence/jd-relational-ai-runtime/tool-checkpoint-review.md)：兩測試檔 **71 PASS／2.03s**，範圍無未解 P1／P2；caller preconditions 及 coordinator 明示排除。這包含前列工具單測，不再加總。 |
+| 工具與 checkpoint 獨立窄審 | [review](../experiments/legacy-evidence/jd-relational-ai-runtime/tool-checkpoint-review.md)：兩測試檔 **71 PASS／2.03s**，範圍無未解 P1／P2；caller preconditions 及 coordinator 明示排除。這包含前列工具單測，不再加總。 |
 | 真 PG／Saver／SDK 接合 | [test_ai_runtime_postgres.py](../../experiments/jd-relational-app/tests/test_ai_runtime_postgres.py)：**4 PASS／3.42s**，10 次真 SDK 請求全部 MockTransport，0 provider；細節如下。 |
 | 最終 coordinator 與受影響組 | 最後程式的 **253 PASS／4.04s**：coordinator25、AI checkpoint52、tools37、context17、model30、foreground／manual／catalog／startup92。另重跑真 PG **14 PASS／6.43s**（本輪4、既有manual8、context2），與其他列重疊。 |
-| coordinator 獨立複核 | [最終 review](evidence/jd-relational-ai-runtime/coordinator-review.md) PASS，無未解 P1／P2；先前四檔126 PASS、最後25 coordinator PASS分別記錄不加總。CR-R01／02、callback註冊競爭與OR-R01均保留首敗與修後證據；兩個新增 start-token gate 探針也拒絕重入寫入。 |
+| coordinator 獨立複核 | [最終 review](../experiments/legacy-evidence/jd-relational-ai-runtime/coordinator-review.md) PASS，無未解 P1／P2；先前四檔126 PASS、最後25 coordinator PASS分別記錄不加總。CR-R01／02、callback註冊競爭與OR-R01均保留首敗與修後證據；兩個新增 start-token gate 探針也拒絕重入寫入。 |
 | 全組與生成檢查 | 最後 callback／唯一 claim 窄修前全組 **1766 PASS／197 PG SKIP／1第三方棄用警告**；上述最後253窄組包含新4例及全部受影響元件，不冒稱是全組重跑。生成 Python／TS 一致，專案 tsc --noEmit 通過；未改 UI，不重跑無關 Web build 或自然模型。 |
 
 四個 PG 案例使用明示 opt-in 的 PostgreSQL **18.6**、localhost:55436 專用合成 DB，以及既有 `jd_runtime_test` 原生 PostgresSaver schema。沒有 setup、drop、刪合成資料或讀真設定／provider key；fixture 不使用 FakeAuthority 證明 AI 准入。

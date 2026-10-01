@@ -7,12 +7,12 @@
 
 T12 後任務 widget(`picker:"task"` 帶 precheck)是前端黑洞:引擎發、web 不消費,
 `interview:curation` 端點與 `lib/curation.ts` 疊加層也從未接線。研究紀錄
-[2026-07-13 §7](../specs/2026-07-13-occupation-consent-write-research.md) 曾裁
+[2026-07-13 §7](../../../../../specs/2026-07-13-occupation-consent-write-research.md) 曾裁
 「任務=盤(AI consent-triggered 彈窗)帶預勾+引文」(b 案)。維護者隨即質疑:
 AI 已確定的任務為何不直接加(彈窗=重工)?盤的真價值是不是員工**自報**
 (「第一次訪談讓 AI 知道他大概做什麼」),而非 AI 的審查介面?
 
-重研先例(詳 [2026-07-14 研究紀錄](../specs/2026-07-14-task-carrier-routing-research.md)):
+重研先例(詳 [2026-07-14 研究紀錄](../../../../../specs/2026-07-14-task-carrier-routing-research.md)):
 Copilot ghost text=高把握單筆 inline 直寫、備選面板人拉;PAIR=信任高/風險低→多自動化;
 TurboTax=開場自我分段勾選、訪談只深問勾過的(+11% 續用);recsys 冷啟動=onboarding
 粗勾建 profile、low-burden 必須可跳過。且本系統有**確定性信心判準**:verify ② 逐字
@@ -40,11 +40,11 @@ quote——不需 LLM 自報信心。
   任務;token 成本降(勾選=0 token);黑洞收屍。
 - ⚠️ verify/land 需新增「官方任務落地+官方殼」能力(容器擴限官方 provenance,
   非自由新增職責——fail-closed 原則保持);intake 卡新前端元件。
-- 修正 [0028](0028-interview-flow-shared-ui-curation.md) D1「AI 驅動 pickers」任務段
+- 修正 [0028](../../../../../adr/0028-interview-flow-shared-ui-curation.md) D1「AI 驅動 pickers」任務段
   (AI 不再開任何 picker);廢止 spec 2026-07-13 §7 裁決①③的 AI 彈盤+預勾段
-  (②confirmed 直落與 focal-ask 單槽維持)。[0030](0030-ai-coedit-tracked-changes-one-brain.md)
-  寫入路徑與 [0031](0031-occupation-suggest-card-refset-source.md) 參考集合不變量**不動**。
-- 實作:[plan 2026-07-13 T5(v2)](../plans/2026-07-13-occupation-card-blindspot.md);
+  (②confirmed 直落與 focal-ask 單槽維持)。[0030](../../../../../adr/0030-ai-coedit-tracked-changes-one-brain.md)
+  寫入路徑與 [0031](../../../../../adr/0031-occupation-suggest-card-refset-source.md) 參考集合不變量**不動**。
+- 實作:[plan 2026-07-13 T5(v2)](../../../../../plans/2026-07-13-occupation-card-blindspot.md);
   載體判準表落 [`docs/design/interview-engine.md`](../design/interview-engine.md)。
 
 ## 否決的替代方案

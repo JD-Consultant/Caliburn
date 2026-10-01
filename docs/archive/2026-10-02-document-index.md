@@ -35,7 +35,7 @@
 
 ## JD 核心知識與成品研究
 
-[完整工作分析與高品質 JD 入口](../specs/2026-09-09-job-analysis-and-jd-content-research.md#2-文檔各負責什麼)提供本組的閱讀地圖：分析／訪談方法、欄位語意、客製化深度、國際方法與實際雇主證據、完整樣稿及雙向審查。**這組是新產品如何理解工作、寫出 JD 的核心知識依據，不是可跳過的聊天附錄；也不是目前程式已如此實作的宣告。**
+[完整工作分析與高品質 JD 入口](../guides/2026-09-09-job-analysis-and-jd-content-research.md#2-文檔各負責什麼)提供本組的閱讀地圖：分析／訪談方法、欄位語意、客製化深度、國際方法與實際雇主證據、完整樣稿及雙向審查。**這組是新產品如何理解工作、寫出 JD 的核心知識依據，不是可跳過的聊天附錄；也不是目前程式已如此實作的宣告。**
 
 先看register的狀態，再依入口的「完整閱讀順序」閱讀相關正文。內容規則、來源、樣稿與審查各有負責文件；不把全部內容複製進總索引或某個大計畫。進入prompt、編輯／資料設計或施工前，按入口說明引用適用規則及待決事項，不從歷史程式反推新內容。
 
@@ -56,20 +56,20 @@
 - [`plans/2026-09-16-b1-case-maintainer.md`](../plans/2026-09-16-b1-case-maintainer.md) — **B1 第一施工切片與下一接點**：記錄可沿用的來源／checkpoint／patch 能力、Runtime-owned stage 與工具契約、read-before-write、離線反例及明確未做範圍。
 
 - [`specs/2026-09-12-jd-relational-editing-requirements.md`](../specs/2026-09-12-jd-relational-editing-requirements.md) — **JD-R002/C01／C03 最新 Owner 方向**：關聯式資料與 duty／task／成果／要求／K/S 項目管理取代完整 Plate JSONB 作後續 current-authority 前提；格式不重議。
-- [`specs/evidence/2026-09-12-jd-relational-editor-evidence.md`](../specs/evidence/2026-09-12-jd-relational-editor-evidence.md) — **官方證據層**：OpenAI、Anthropic、PostgreSQL、Plate、iCAP、Microsoft／Notion 與本地新舊實作的事實／推論／本案映射／unknown。
+- [`specs/evidence/2026-09-12-jd-relational-editor-evidence.md`](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md) — **官方證據層**：OpenAI、Anthropic、PostgreSQL、Plate、iCAP、Microsoft／Notion 與本地新舊實作的事實／推論／本案映射／unknown。
 - [`specs/2026-09-12-jd-relational-editor-design.md`](../specs/2026-09-12-jd-relational-editor-design.md) — **G4 整體設計**：同頁結構化管理畫面、六章關係、relational current＋derived history、Plate leaf role、差異／來源／匯出及 D01 OPEN。
 - [`specs/2026-09-12-jd-relational-schema-and-write-contract.md`](../specs/2026-09-12-jd-relational-schema-and-write-contract.md) — **資料庫層**：13 張 JD scope 表、欄位／PK／FK／delete actions／indexes、文件 head、immutable snapshot、operation receipt 與同交易流程。
 - [`specs/2026-09-12-jd-relational-agent-tool-contract.md`](../specs/2026-09-12-jd-relational-agent-tool-contract.md) — **App／AI 契約層**：十個具名 relational JD 業務工具、App-issued target refs、人工變更通知、真實結果、來源與重試邊界；下文已實作的 model-facing `basis_refs` 由 2026-09-20 successor 改為待施工的 `basis_evidence_keys`，domain／DB 不變。
-- [`specs/evidence/2026-09-12-jd-relational-editor-review-brief.md`](../specs/evidence/2026-09-12-jd-relational-editor-review-brief.md) — **第三方審查入口**：固定閱讀順序、審查題、已知 OPEN、自審結果與 finding 格式。
+- [`specs/evidence/2026-09-12-jd-relational-editor-review-brief.md`](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-review-brief.md) — **第三方審查入口**：固定閱讀順序、審查題、已知 OPEN、自審結果與 finding 格式。
 - [`adr/0075-relational-jd-authority-and-structured-editor.md`](../adr/0075-relational-jd-authority-and-structured-editor.md) — **Proposed successor**：若通過，取代 0073 的完整 Plate JSONB current authority；目前等待外部 review 與 duty-delete D01，未授權建表或 production 切換。
 
 - [`specs/2026-09-09-jd-oss-editor-capabilities-and-gaps.md`](../specs/2026-09-09-jd-oss-editor-capabilities-and-gaps.md) — **JD-R002/C03 當前入口**：S1／S2 研究已交付；§6.2 的訪談主導、AI 主寫、多文件與真人後續核對方向已同意，續收斂完整情境與 App 能力。先前付費候選及逐批 pending 優先排序不作採用決定，最新狀態依 register。
 - [`specs/2026-09-09-jd-editor-framework-decision-candidate.md`](../specs/2026-09-09-jd-editor-framework-decision-candidate.md) — **歷史 Plate 文件底座候選**：沿用 Memory／JD 基線、非每輪改稿；選型理由、原生證據及反例保留。2026-09-12 的 relational current 方向已取代整份 Plate authority；是否在單一文字欄位使用 Plate 依 0075 的 leaf spike。
 - [`specs/2026-09-09-jd-editing-and-review-working-design.md`](../specs/2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正) — **持續工作稿已同意（WORKING）**：保留完整差異、聊天／手改更正；個別待審接受／取消不列本版功能，停止分組／結算研究。舊選項與證據保留，未完成事項依 register。
-- [`specs/2026-09-09-jd-editor-app-integration-design.md`](../specs/2026-09-09-jd-editor-app-integration-design.md) — 文件／工具／唯一 JD 交易候選，含 Plate／Deep Agents 分工及保存結果契約；[待審比較](../specs/evidence/2026-09-09-jd-native-pending-review-comparison.md)、[現成 codec 四項實證](../specs/evidence/2026-09-09-jd-native-pending-codec-probe.md)、F01／P01 各自保留限制。完整審閱與 production authority 未採用，下一題依 register。
-- [`specs/2026-09-10-jd-plate-document-profile.md`](../specs/2026-09-10-jd-plate-document-profile.md) — clean 文件、官方清單／表格插件、ID／JSON／normalization 與同畫面 renderer；[F02](../specs/evidence/2026-09-10-jd-official-profile-probe.md)第二輪四組通過，首輪失敗保留，仍未驗 DOM／IME／完整 profile。
+- [`specs/2026-09-09-jd-editor-app-integration-design.md`](../specs/2026-09-09-jd-editor-app-integration-design.md) — 文件／工具／唯一 JD 交易候選，含 Plate／Deep Agents 分工及保存結果契約；[待審比較](../experiments/legacy-evidence/2026-09-09-jd-native-pending-review-comparison.md)、[現成 codec 四項實證](../experiments/legacy-evidence/2026-09-09-jd-native-pending-codec-probe.md)、F01／P01 各自保留限制。完整審閱與 production authority 未採用，下一題依 register。
+- [`specs/2026-09-10-jd-plate-document-profile.md`](../specs/2026-09-10-jd-plate-document-profile.md) — clean 文件、官方清單／表格插件、ID／JSON／normalization 與同畫面 renderer；[F02](../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md)第二輪四組通過，首輪失敗保留，仍未驗 DOM／IME／完整 profile。
 - [`specs/2026-09-10-jd-app-tool-contract.md`](../specs/2026-09-10-jd-app-tool-contract.md) — 三個 JD 工具的已讀引用、來源接點、真實結果及中斷恢復語意；保持同一既有顧問，不另建 Agent／Memory。
-- [`specs/2026-09-10-jd-editor-contract-schema.md`](../specs/2026-09-10-jd-editor-contract-schema.md) — 核心契約總審完成；文件、模型參數、App／Node、人工保存／選取的單一 schema，85 defs 限定離線通過。本機驗證、SDK 傳遞與真 provider 接受分列；[官方複核](../specs/evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)不把本案 mapping 稱為共識。
+- [`specs/2026-09-10-jd-editor-contract-schema.md`](../specs/2026-09-10-jd-editor-contract-schema.md) — 核心契約總審完成；文件、模型參數、App／Node、人工保存／選取的單一 schema，85 defs 限定離線通過。本機驗證、SDK 傳遞與真 provider 接受分列；[官方複核](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)不把本案 mapping 稱為共識。
 - [`plans/2026-09-10-jd-editor-core-implementation.md`](../plans/2026-09-10-jd-editor-core-implementation.md) — 六個核心隔離施工切片：文件／保存／工具／同畫面／恢復／專業方法；未執行，production 的 Memory authority 正式化另有明確依賴。
 - [`specs/2026-09-10-jd-export-and-consultant-handoff.md`](../specs/2026-09-10-jd-export-and-consultant-handoff.md) — **PARKED**：Owner 表示真人交付核對先不做；保留 HTML／DOCX＋原始問答研究，移出本版核心施工與驗收。
 - [`adr/0073-plate-jd-app-working-document-and-revision-authority.md`](../adr/0073-plate-jd-app-working-document-and-revision-authority.md) — **歷史 Proposed；active candidate 已由 0075 取代**：保留完整 Plate JSONB、版本／receipt、單 writer 及故障實證；不得再由此直接推進 adoption。

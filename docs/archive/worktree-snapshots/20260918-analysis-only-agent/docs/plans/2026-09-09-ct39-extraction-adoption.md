@@ -5,7 +5,7 @@
 **Goal:** 採用已有真測支持的 CT37 提示＋B1 high；A／B2 medium，避免把印象改寫成肯定。
 **Architecture:** composition root 建立兩個官方 ChatOpenAI binding，共用原 HTTP／budget；將抽取模型注入既有背景 dispatcher。流程、Saver／Store、重試與排程不變。
 **Tech Stack:** 現有 LangChain／LangGraph／OpenAI SDK，不升依賴。
-**Spec:** [CT38結果與限制](../specs/2026-09-08-ct38-high-extraction-medium-consolidation-results.md) §1、3、5；Owner 2026-09-09「交給你決定」授權本局部選擇，非全角色 high。
+**Spec:** [CT38結果與限制](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct38-high-extraction-medium-consolidation-results.md) §1、3、5；Owner 2026-09-09「交給你決定」授權本局部選擇，非全角色 high。
 
 ## Preflight
 

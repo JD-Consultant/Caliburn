@@ -8,10 +8,10 @@
 
 本文是薄型稽核索引，不重抄既有 Memory 研究。完整產品效果、跨家證據、方案比較與 read contract 分別由下列文件負責：
 
-1. [`framework-independent-memory-contract.md`](2026-09-01-framework-independent-memory-contract.md)：M1～M11 與產品效果；
-2. [`memory-conversation-and-semantic-responsibility-reconciliation.md`](2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md)：conversation／Store 責任；
-3. [`memory-similar-case-detail-and-consolidation-reconciliation.md`](2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md)：相似案例與可修訂理解；
-4. [`memory-canonical-conversation-search-read-reconciliation.md`](2026-09-03-memory-canonical-conversation-search-read-reconciliation.md)：canonical source deep-read；
+1. [`framework-independent-memory-contract.md`](../../../20260918-analysis-only-agent/docs/specs/2026-09-01-framework-independent-memory-contract.md)：M1～M11 與產品效果；
+2. [`memory-conversation-and-semantic-responsibility-reconciliation.md`](../../../../../specs/2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md)：conversation／Store 責任；
+3. [`memory-similar-case-detail-and-consolidation-reconciliation.md`](../../../../../specs/2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md)：相似案例與可修訂理解；
+4. [`memory-canonical-conversation-search-read-reconciliation.md`](../../../../../specs/2026-09-03-memory-canonical-conversation-search-read-reconciliation.md)：canonical source deep-read；
 5. [`memory-routing-canonical-read-and-isolated-spike-research.md`](2026-09-03-memory-routing-canonical-read-and-isolated-spike-research.md)：`MEM-Q004` contract 與 G5 假設。
 
 ## 1. 判定語言

@@ -2,7 +2,7 @@
 
 2026-09-07 · LLM-Q019 · isolated G5/G7 · **局部內容驗收通過，背景操作效率仍OPEN；付費已停止。**
 
-入口：[current decisions](../../../../docs/current-decisions.md)；目的／資訊取捨／職務分析來源由[研究](../../../../docs/specs/2026-09-07-work-case-and-understanding-information-selection.md)持有，施工由[短計畫](../plans/2026-09-07-relevant-work-memory-calibration.md)持有；[完整實驗證據](evidence/2026-09-07-relevant-work-memory-calibration.json)保存合成訪談、請求、工具結果、實際記憶及費用。此頁不複製整份舊研究。
+入口：[current decisions](../../../../docs/current-decisions.md)；目的／資訊取捨／職務分析來源由[研究](../../../../docs/specs/2026-09-07-work-case-and-understanding-information-selection.md)持有，施工由[短計畫](../plans/2026-09-07-relevant-work-memory-calibration.md)持有；[完整實驗證據](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-relevant-work-memory-calibration.json)保存合成訪談、請求、工具結果、實際記憶及費用。此頁不複製整份舊研究。
 
 ## 1. 核准與改動
 

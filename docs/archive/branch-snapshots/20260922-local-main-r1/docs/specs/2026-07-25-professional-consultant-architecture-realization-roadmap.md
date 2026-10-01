@@ -6,8 +6,8 @@
 > 改為 `evidence_origin` × `task_linkage` 兩正交軸 ＋ `source_refs[]` 型別層非空。
 > 原文保留供追溯，**不得據以施工**。
 > OPKS 現行裁決 = **[0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
-> ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
-> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）**，三份一起讀。
+> ＋ [0049](../../../../../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
+> ＋ [0050](../../../../../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）**，三份一起讀。
 
 
 > 日期：2026-07-25
@@ -23,8 +23,8 @@
 > **【2026-07-26 修訂索引｜先讀這裡】**
 >
 > 本文件經外部紅隊複審後有七項修訂，分佈於六個章節。**原文一律保留並就地標記，不得據被否決的原文執行。**
-> 完整依據見 [R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)
-> 與 [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
+> 完整依據見 [R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)
+> 與 [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
 >
 > | 編號 | 位置 | 修訂 |
 > |---|---|---|
@@ -283,7 +283,7 @@ Revision 3：
 >   model × schema 2×2（｛最強, 便宜｝×｛輕, 重 schema｝，架構固定兩階段），以及固定「最強 + 輕 schema」下
 >   **A2 vs A6** 的兩階段／一次呼叫比較；另含 A1（同配置、minimal harness）作 harness 承重對照。
 >   **勝出配置下的 matched comparison 延後到 shortlist 或 shipping model gate。**
->   六個 arm 的定義見 [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 6。
+>   六個 arm 的定義見 [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 6。
 > - 8 個案例保留作**快速篩選**（只用於淘汰明確錯誤設計，**不得用於宣稱架構勝出**）；
 >   **鎖定架構前擴至 20–30 個**，critical case 跑 3 trials 看 pass³。
 > - R1 **不做正式 power analysis**；同一 session 衍生案例共用 `case_family_id`，統計時整組算一個單位。
@@ -292,8 +292,8 @@ Revision 3：
 >   `human_manual_test`；由舊 session 改寫或合成的新案例＝`constructed_edge`（可另留 `source_session_ref`）。
 >   **一律不得升級為 `real_employee_interview`** —— owner 已裁定沒有真實員工訪談資料。
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、§3.3、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–13。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、§3.3、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–13。
 > 以下原文保留供追溯，**不得據原文執行**。
 
 - 第一個切片使用 6–8 個關鍵案例；
@@ -436,7 +436,7 @@ Revision 3：
 > **【2026-07-27 補充｜八案全數為 development set，不切 holdout】**
 >
 > §10.6 已把「八個案例很容易被 Prompt 過度擬合」列為反方六。依
-> [ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md) 決定 13–17：
+> [ADR 0041](../../../../../adr/0041-r1-p0-closure-first-version-context-and-holdout.md) 決定 13–17：
 >
 > - **八案不切 holdout**。§11 的 `TI-R1-01`–`08` 連 `輸入核心`、`預期` 與 `Critical failure` 都已公開，
 >   而本文件是寫 prompt 的人必讀的 authority；答案已曝光的案例標成 holdout 不產生 unseen 證據。
@@ -469,8 +469,8 @@ Revision 3：
 >   兩階段要贏多少才算贏。
 > - 8 案例的結果只能用於淘汰明確錯誤設計，不能宣稱架構勝出（見 §6.3 修訂框）。
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.2、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 9–11。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.2、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 9–11。
 
 - critical negative cases 不把工具、過去、他人與一次性內容誤寫為穩定 Task；
 - 一故事多工作與多故事一工作皆能形成合理候選；
@@ -614,8 +614,8 @@ R5 再加入：
 > 由單一 **Trial Manifest**（一次 trial 一份、寫入後不可變）管理版本來源；
 > `resolved_model`／`resolved_provider+endpoint` 必須取自**回應**，不得由請求推斷。
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.5、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 18–22。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.5、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 18–22。
 > 以下原文保留供追溯；其餘 4 點仍為 R3 待研究題。
 
 - 哪一份 state 是 authority，哪些摘要只作索引；【C-05 已定案，見本節修訂框】
@@ -699,8 +699,8 @@ Duty 在有一批相對穩定 Task 後，依共同 purpose、outcome、responsib
 >   都要追問其 Task、行為、產出或實際判準。
 > - **員工按接受不得被記錄成已有行為證據。**
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.7、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 29–32。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.7、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 29–32。
 
 - O/P/K/S/A 不要求每格都有值；
 - 所有採用的 K/S 都有 Task linkage 與白話理由；【C-08 補充：另需帶支持度標記】
@@ -879,8 +879,8 @@ Retrieval node 只取得候選；`public.challenge` 只比較候選與 Work Mode
 >
 > 且**不得自行產生看起來像官方認證的職能基準代碼**。
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.8、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 33–34。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.8、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 33–34。
 
 至少支援：
 

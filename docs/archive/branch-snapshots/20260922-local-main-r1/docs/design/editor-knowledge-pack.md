@@ -176,14 +176,14 @@ web **所有選單**都從這包讀;使用者勾選/填寫 → **純函式改文
 
 ## 8. 指路(不複製內容,連過去)
 
-- **ADR**:[0021 知識包](../adr/0021-knowledge-pack-single-sync-point.md)(權威)、
-  [**0029 選單三型＋脫鉤＋OPLKS**](../adr/0029-editor-menus-three-types-decoupling.md)(本輪大改;
-  spec [`2026-07-11-editor-menus-redesign-research`](../specs/2026-07-11-editor-menus-redesign-research.md)、
-  plan [`2026-07-11-editor-menus-redesign`](../plans/2026-07-11-editor-menus-redesign.md))、
+- **ADR**:[0021 知識包](../../../../../adr/0021-knowledge-pack-single-sync-point.md)(權威)、
+  [**0029 選單三型＋脫鉤＋OPLKS**](../../../../../adr/0029-editor-menus-three-types-decoupling.md)(本輪大改;
+  spec [`2026-07-11-editor-menus-redesign-research`](../../../../../specs/2026-07-11-editor-menus-redesign-research.md)、
+  plan [`2026-07-11-editor-menus-redesign`](../../../../../plans/2026-07-11-editor-menus-redesign.md))、
   [0018 降級](../adr/0018-indexer-dependency-degradation-policy.md)、
   [0015 樂觀鎖](../adr/0015-document-save-optimistic-concurrency.md)、
-  [0019 命名](../adr/0019-api-naming-alignment.md)、[0011 生成型別](../adr/0011-web-ocs-types-generated.md)。
-- **spec**:[editor-provenance-knowledge-pack-decisions](../specs/2026-07-03-editor-provenance-knowledge-pack-decisions.md)(逐項決策:三分/A4/B4/預勾/借用)、
-  [editor-field-identity-unification](../specs/2026-07-04-editor-field-identity-unification-spec.md)(全欄位身分表/n 碼/改名斷鏈/自動勾選)。
+  [0019 命名](../adr/0019-api-naming-alignment.md)、[0011 生成型別](../../../../../adr/0011-web-ocs-types-generated.md)。
+- **spec**:[editor-provenance-knowledge-pack-decisions](../../../../../specs/2026-07-03-editor-provenance-knowledge-pack-decisions.md)(逐項決策:三分/A4/B4/預勾/借用)、
+  [editor-field-identity-unification](../../../../../specs/2026-07-04-editor-field-identity-unification-spec.md)(全欄位身分表/n 碼/改名斷鏈/自動勾選)。
 - **契約 schema**:`packages/ocs-contract`(OCS 文件單一真相,生 TS)。
-- **README**:[apps/web](../../apps/web/README.md)、[apps/api](../../apps/api/README.md)。
+- **README**:[apps/web](../../apps/web/README.md)、[apps/api](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/README.md)。

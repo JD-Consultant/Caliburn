@@ -7,7 +7,7 @@
 | 主題 | 入口 |
 |---|---|
 | 全系統責任、交易、運作與驗收 | [目標架構地圖](../target-architecture-map.md) → `architecture/` |
-| 工作分析、訪談與 JD 欄位方法 | [指南入口](../guides/README.md)；正文保留既有路徑 |
+| 工作分析、訪談與 JD 欄位方法 | [指南入口](../guides/README.md)，正文集中於 `guides/` |
 | 訪談到 JD、背景整理的整體生命週期 | [核心閉環](2026-09-29-core-value-loop-lifecycle.md) |
 | A 的 Context、固定讀取範圍與工具 | [顧問 Context](2026-09-26-consultant-context-and-state-design.md) |
 | Memory 三層、候選與快照 | [Memory 子圖](2026-09-24-caliburn-layered-architecture-map.md) → [背景生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md) |
@@ -22,7 +22,7 @@
 ## 不同用途不要混讀
 
 - 外部官方做法、論文與方案比較：已歸位的純研究在 [research/](../research/README.md)。兼有契約的研究沿革仍留原處，依最新決策辨認，不只看檔名。
-- 實際測試、事故、修正與原始結果：新目標從[驗收證據](../plans/2026-09-29-target-rebuild/evidence/README.md)進入；較早的 `specs/evidence/` 保留原任務脈絡，不移動或複製原始輸出。
+- 實際測試、事故、修正與原始結果：新目標從[驗收證據](../plans/2026-09-29-target-rebuild/evidence/README.md)進入；原 `specs/evidence/` 已歸位[較早實驗證據](../experiments/legacy-evidence/README.md)，保留原任務脈絡與結果。
 - 較早方案、Proposed 或當時的完成報告：仍保留有相依關係的原件，不能只因日期舊就判退役；可用[整理前索引](../archive/2026-10-02-document-index.md)找線索，再用[搬移對照](../archive/document-classification-2026-10-02.csv)定位本次歸位的文件。
 - 明確退役／已被取代的本批材料：[退役文件](../archive/retired-documents/README.md)，不作當前施工指令。
 

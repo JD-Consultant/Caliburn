@@ -26,7 +26,7 @@
 
 本次使用 Python 標準 `UUID.bytes` 及 URL-safe Base64 保存同一組已確認 IDs：96 個 UUID 為 1536 bytes／2048 Base64 chars。實際 `ReferenceCodec._dump` 在 canonical document/run/dataset 下 raw 上界 3131 bytes，token 2428 bytes，可通過原 4096 限制。正常 256-byte ASCII dataset 上界 3424；大量需要 JSON escape 的控制字元仍可能超限，維持明示拒絕。正式 managed dataset／document／run 為 canonical UUID。
 
-這是私有 continuation 的固定資料表示，沒有新壓縮／簽章算法或通用定位引擎。解碼核 16-byte 分組、最多96、不重複、canonical Base64 回編及嚴格欄位／用途／dataset／document／run；容量不靠壓縮率兜底。標準 signer 依據沿[已核框架接點](evidence/2026-09-13-jd-read-reference-preflight.md)，本輪沒有新套件。
+這是私有 continuation 的固定資料表示，沒有新壓縮／簽章算法或通用定位引擎。解碼核 16-byte 分組、最多96、不重複、canonical Base64 回編及嚴格欄位／用途／dataset／document／run；容量不靠壓縮率兜底。標準 signer 依據沿[已核框架接點](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md)，本輪沒有新套件。
 
 ## 未確認結果及錯誤
 
@@ -40,12 +40,12 @@
 
 | 責任／證據 | 實際結果 |
 |---|---|
-| [正式契約與 client](evidence/jd-run-change-view/contract-client.md) | Python157、client42及原client98各組 PASS；標準全組codegen `--check` PASS，不手改generated |
-| [既有 signer 與新 capture](evidence/jd-run-change-view/cursor-results.md) | 新62、合併原reference155 PASS；容量、嚴格欄位及用途隔離 |
-| [後端公開接合](evidence/jd-run-change-view/server-results.md) | 最後錯誤分界修正後70 PASS；此前含真PG67 PASS，各組重疊不相加 |
-| [獨立真 PG／原生 Agent／SDK](evidence/jd-run-change-view/postgres.md) | 3 PASS：AI新增→較晚人工、純訪談、分頁期間再新增仍固定原捕捉；無provider網路 |
-| [Web 整合](evidence/jd-run-change-view/web-results.md) | 最後全Web293 PASS；完整TS／build PASS；7個真正React/MUI靜態HTML案例，不代稱真瀏覽器 |
-| [server獨審](evidence/jd-run-change-view/server-review.md)／[UI獨審](evidence/jd-run-change-view/ui-review.md) | 內部issuer錯誤歸因與同名要求所屬兩項P2已修並窄複核；限定範圍無剩餘P1/P2。舊輪入口依Owner新範圍覆寫，不假稱修好 |
+| [正式契約與 client](../experiments/legacy-evidence/jd-run-change-view/contract-client.md) | Python157、client42及原client98各組 PASS；標準全組codegen `--check` PASS，不手改generated |
+| [既有 signer 與新 capture](../experiments/legacy-evidence/jd-run-change-view/cursor-results.md) | 新62、合併原reference155 PASS；容量、嚴格欄位及用途隔離 |
+| [後端公開接合](../experiments/legacy-evidence/jd-run-change-view/server-results.md) | 最後錯誤分界修正後70 PASS；此前含真PG67 PASS，各組重疊不相加 |
+| [獨立真 PG／原生 Agent／SDK](../experiments/legacy-evidence/jd-run-change-view/postgres.md) | 3 PASS：AI新增→較晚人工、純訪談、分頁期間再新增仍固定原捕捉；無provider網路 |
+| [Web 整合](../experiments/legacy-evidence/jd-run-change-view/web-results.md) | 最後全Web293 PASS；完整TS／build PASS；7個真正React/MUI靜態HTML案例，不代稱真瀏覽器 |
+| [server獨審](../experiments/legacy-evidence/jd-run-change-view/server-review.md)／[UI獨審](../experiments/legacy-evidence/jd-run-change-view/ui-review.md) | 內部issuer錯誤歸因與同名要求所屬兩項P2已修並窄複核；限定範圍無剩餘P1/P2。舊輪入口依Owner新範圍覆寫，不假稱修好 |
 
 只宣稱上表實際層級。新畫面的真瀏覽器點擊／捲動／晚回競爭未驗，瀏覽器連線根因沿問題清單保持 OPEN；不藉此擴大歷史入口或框架研究。
 

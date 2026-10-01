@@ -13,12 +13,12 @@ purpose: 裁決 OPKS 生成在證據不足時該怎麼辦，並把方案壓到�
 成本與失敗邊界在哪、durable 語意怎麼接。
 
 **不回答**：每個欄位怎麼寫才合格（判準教材已備齊，見
-[iCAP 逐欄位標準](2026-07-13-ai-redesign-raw-icap-field-standards.md)、
-[國際體系欄位定義](2026-07-13-ai-redesign-raw-intl-competency-standards.md)）；
-OPKS 的概念與持久化形狀（已由 ADR [0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)
-＋[0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)
-＋[0050](../adr/0050-opks-proposal-minimal-shape.md)
-＋[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md) 裁決，本文不翻案）。
+[iCAP 逐欄位標準](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-13-ai-redesign-raw-icap-field-standards.md)、
+[國際體系欄位定義](../../../../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md)）；
+OPKS 的概念與持久化形狀（已由 ADR [0048](../../../../branch-snapshots/20260922-local-main-r1/docs/adr/0048-opks-evidence-axes-and-document-level-competencies.md)
+＋[0049](../../../../../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)
+＋[0050](../../../../../adr/0050-opks-proposal-minimal-shape.md)
+＋[0051](../../../../../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md) 裁決，本文不翻案）。
 
 **本輪不動任何程式碼。**
 
@@ -39,7 +39,7 @@ OPKS 的概念與持久化形狀（已由 ADR [0048](../adr/0048-opks-evidence-a
 
 **追問機制本身已存在**，只是 OPKS 沒接上：Task Analysis 每輪產出 `next_question`，
 `OpenIssue` 可由模型關閉（[`transition.py:261`](../../apps/api/app/job_analysis/application/transition.py#L261)），
-`last_asked_turn_id` 兩種 target 都記（ADR [0047](../adr/0047-model-owned-open-issue-closure.md)）。
+`last_asked_turn_id` 兩種 target 都記（ADR [0047](../../../../../adr/0047-model-owned-open-issue-closure.md)）。
 
 ---
 
@@ -77,7 +77,7 @@ SWE-bench 上：完全不問 **54.8%** → 校準式追問 61.2–69.4% → 每�
 
 → OPKS 拆成獨立 operation 成立（自己的 prompt／schema／verifier，ADR 0049 決定 14），
 但**啟動與否由 application 純函式決定，不交給模型 routing**。這與 ADR
-[0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 1 是同一條紀律。
+[0052](../../../../../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md) 決定 1 是同一條紀律。
 
 ### 2.3 pending request 必須持久且可恢復
 
@@ -343,7 +343,7 @@ Task Analysis verifier 的規則集（與 ADR 0048 決定 24 限制 OPKS verifie
 application 直接用當前 turn 的 SourceRef。
 
 **契約成本（已量測）**：`task_analysis_result_v2` 目前 **2 個頂層 property、0 個 `anyOf`、
-0 個 `$defs`、4,668 bytes**（已完全 inline，[2026-07-31 grammar 研究](2026-07-31-anthropic-strict-schema-grammar-limit-research.md)
+0 個 `$defs`、4,668 bytes**（已完全 inline，[2026-07-31 grammar 研究](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-31-anthropic-strict-schema-grammar-limit-research.md)
 當時的 17-union 問題已解決）。新增的是零 union、兩個純量欄位的物件陣列，
 離官方 union 上限 16 有全部空間。**仍應在實作前重量一次**（官方 grammar size 上限未公開）。
 
@@ -467,7 +467,7 @@ POST …/turns  (Idempotency-Key)
 | 29 CFR §1607.14C(2)、Hennink & Kaiser 2022 | 一手／期刊，搜尋層摘要 | — |
 | MELBA 2026（automation bias） | 搜尋層摘要 | **僅輔證，非本產品情境的直接實驗** |
 | ~~HDSR 8.2 (2026)~~ | **已撤回（403，無法核實）** | 全文未據以證成任何規則 |
-| Morgeson et al. (2004) *JAP* 89(4) | 經 [2026-08-01 OPKS 裁決研究](2026-08-01-opks-design-decisions-research.md) 轉引 | 已在 ADR 0048 採納 |
+| Morgeson et al. (2004) *JAP* 89(4) | 經 [2026-08-01 OPKS 裁決研究](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-08-01-opks-design-decisions-research.md) 轉引 | 已在 ADR 0048 採納 |
 
 **資料使用邊界**：O/P/K/S 語意與 evidence 規則只由 iCAP／O\*NET／repo OPKS 研究稿決定；
 大廠文件只支撐 orchestration、clarification、durability 與 HITL，

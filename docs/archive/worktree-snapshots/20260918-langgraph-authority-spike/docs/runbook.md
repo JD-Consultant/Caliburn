@@ -1,6 +1,6 @@
 # Runbook — Caliburn 本機開發
 
-Current 產品只有 PostgreSQL、FastAPI 與 Next.js；`npm run up`／`npm run dev` 只啟動這三者。舊 `app.interview`／`app.interview_vnext`／`app.job_authoring` 服務已移除，不要再啟動或設定它們。repo 另外保留一組與 current 完全隔離、選用（opt-in）的 RAG 供應鏈（Qdrant／embedder／ocs-indexer），見下方「RAG（選用、隔離）」與 [`design/rag-pipeline.md`](design/rag-pipeline.md)。
+Current 產品只有 PostgreSQL、FastAPI 與 Next.js；`npm run up`／`npm run dev` 只啟動這三者。舊 `app.interview`／`app.interview_vnext`／`app.job_authoring` 服務已移除，不要再啟動或設定它們。repo 另外保留一組與 current 完全隔離、選用（opt-in）的 RAG 供應鏈（Qdrant／embedder／ocs-indexer），見下方「RAG（選用、隔離）」與 [`design/rag-pipeline.md`](../../20260918-shared-current-jd/docs/design/rag-pipeline.md)。
 
 ## 埠位
 
@@ -27,7 +27,7 @@ API reload 已關閉；改 Python 後停止並重新啟動 API。`npm run down` 
 
 ## RAG（選用、隔離）
 
-RAG 供應鏈（`apps/pdf-to-json`／`apps/ocs-indexer`／`apps/embedder`／`packages/ocs-contract`／`packages/indexer-contract`）不是 current API/Web 的 runtime dependency，預設不啟動；完整資料流、package 責任與資料落地見 [`design/rag-pipeline.md`](design/rag-pipeline.md)。
+RAG 供應鏈（`apps/pdf-to-json`／`apps/ocs-indexer`／`apps/embedder`／`packages/ocs-contract`／`packages/indexer-contract`）不是 current API/Web 的 runtime dependency，預設不啟動；完整資料流、package 責任與資料落地見 [`design/rag-pipeline.md`](../../20260918-shared-current-jd/docs/design/rag-pipeline.md)。
 
 ```bash
 npm run rag:up      # docker compose --profile rag up -d（Qdrant + GPU embedder）
@@ -57,4 +57,4 @@ cd apps/api && uv run pytest -q
 cd apps/web && npm run test && npx tsc --noEmit && npm run lint
 ```
 
-若 current API import 出現 `app.interview`／`app.interview_vnext`／`app.job_authoring`（已刪除）或 `ocs_contract`／`indexer_contract`／`jd_ocs_indexer`／`jd_pdf_to_json`／`embedder`（RAG 專屬、與 current 隔離）之類的模組，先確認目前 branch、工作目錄與 `uv sync`；不要把舊模組加回來，也不要把 RAG 模組接進 current composition root——`apps/api/tests/test_job_analysis_dependencies.py` 的 AST guard 會擋下這兩種情況。詳細現行邊界見 [`ARCHITECTURE.md`](../ARCHITECTURE.md) 與 [ADR 0057](adr/0057-current-only-runtime-and-data-boundary.md)。
+若 current API import 出現 `app.interview`／`app.interview_vnext`／`app.job_authoring`（已刪除）或 `ocs_contract`／`indexer_contract`／`jd_ocs_indexer`／`jd_pdf_to_json`／`embedder`（RAG 專屬、與 current 隔離）之類的模組，先確認目前 branch、工作目錄與 `uv sync`；不要把舊模組加回來，也不要把 RAG 模組接進 current composition root——`apps/api/tests/test_job_analysis_dependencies.py` 的 AST guard 會擋下這兩種情況。詳細現行邊界見 [`ARCHITECTURE.md`](../ARCHITECTURE.md) 與 [ADR 0057](../../../../adr/0057-current-only-runtime-and-data-boundary.md)。

@@ -51,7 +51,7 @@ from jd_relational.provider_keys import read_key
 from jd_relational.role_models import create_role_models
 
 
-PACKAGE = ROOT / "docs/specs/evidence/jd-product-p3-calibration"
+PACKAGE = ROOT / "docs/experiments/legacy-evidence/jd-product-p3-calibration"
 TEMPLATE = PACKAGE / "results-template-v3.md"
 TRIAL_ID = "p3-c-w"
 TURN_CAP = 12

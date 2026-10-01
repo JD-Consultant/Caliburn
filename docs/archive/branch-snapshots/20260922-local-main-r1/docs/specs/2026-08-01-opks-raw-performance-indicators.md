@@ -9,8 +9,8 @@ source_discipline: 只收官方一手與學術原著；取得失敗與未核實�
 
 > **【現行裁決】** 本檔是**研究原料**，其中對「支持度四級」的歷史分析僅供追溯。
 > OPKS 的現行裁決是 **[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)
-> ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)
-> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md) ＋ [0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)**。**引用本檔任何段落前請先確認未被四份 ADR 取代。**
+> ＋ [0049](../../../../../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)
+> ＋ [0050](../../../../../adr/0050-opks-proposal-minimal-shape.md) ＋ [0051](../../../../../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)**。**引用本檔任何段落前請先確認未被四份 ADR 取代。**
 
 
 ## 0. 取得狀態
@@ -342,7 +342,7 @@ iCAP 審核指標 3.4.3 要求「『行為指標』所描述的能力程度，�
 
 **本輪未取得 AQF／新加坡的等價條文**（站點失敗）。可用的替代品是既有原料裡已逐字核實的
 **SFIA 四軸升階措辭**（autonomy／influence／complexity／knowledge，見
-[2026-07-13 國際體系原料](2026-07-13-ai-redesign-raw-intl-competency-standards.md) §5a）
+[2026-07-13 國際體系原料](../../../../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md) §5a）
 與 **EQF 三維**。
 
 → **判準 D-6：第一版不做自動判級。** 理由：判級需要跨任務比較與級別定義的一致套用，

@@ -84,7 +84,7 @@ Semantic Memory mutation 應由主顧問在目前 agent loop 直接呼叫 Memory
 | JD 變更 | 另一組 JD workspace Tools；若依賴尚未發布的新 Memory，Runtime 在該動作前建立 hard gate。 |
 | 對員工說明 | 主顧問在 canonical assistant message 中自然說明；不得以 prose 假裝 Memory 或 JD 已寫入。 |
 
-這項 mapping 與 [`2026-09-01-framework-independent-memory-contract.md`](./2026-09-01-framework-independent-memory-contract.md) §6 的既有 dependency-aware Working Baseline 一致；本輪新資料沒有提供足以重開它的相反證據。Q014 只補上：**背景 Manager 的窄 mutation artifact 是 structured-output 例外；主顧問自身仍採 Tool-first＋plain final message。**
+這項 mapping 與 [`2026-09-01-framework-independent-memory-contract.md`](../../../20260918-analysis-only-agent/docs/specs/2026-09-01-framework-independent-memory-contract.md) §6 的既有 dependency-aware Working Baseline 一致；本輪新資料沒有提供足以重開它的相反證據。Q014 只補上：**背景 Manager 的窄 mutation artifact 是 structured-output 例外；主顧問自身仍採 Tool-first＋plain final message。**
 
 ### 2.6 尚未決定
 

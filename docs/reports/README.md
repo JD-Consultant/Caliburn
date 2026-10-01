@@ -4,6 +4,8 @@
 
 外部官方資料與論文比較見[研究分類](../research/README.md)，工作分析方法見[指南入口](../guides/README.md)。報告說明問題、取捨與成果；研究支援設計，實驗才提供實測證據，三者不互相替代。
 
+**備審與專題先讀：[共用問題分析與實驗案例集](research-casebook.md)。**以「問題 → 查證 → 原因與取捨 → 修改 → 驗證 → 限制」整理，不只列功能。各校共用同一份真實證據，僅在[備審準備](admissions/README.md)核對文件與截止要求；本人、他人與 AI 的貢獻分界待本人確認。
+
 ## 介紹產品與程式設計
 
 | 要說明什麼 | 閱讀入口 |
@@ -20,8 +22,8 @@
 | 長訪談、程序事故、恢復與 PDF | [T17 旅程紀錄](../plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md) | 同一[長旅程資料包](../plans/2026-09-29-target-rebuild/evidence/data/instruction-experiments-2026-10-01/README.md)的逐字稿、事件與成品 |
 | 原生接續、容量與來源工具探測 | [T16 接續紀錄](../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)及[證據分類](../plans/2026-09-29-target-rebuild/evidence/README.md) | [執行與品質探測原件](../plans/2026-09-29-target-rebuild/evidence/data/runtime-probes-2026-10-01/README.md) |
 | 早期 JD 分析、人工欄位與來源資格、匯出取捨 | [早期研究收錄](../archive/branch-snapshots/20261002-legacy-jd-research/README.md) | 原文、來源提交及 manifest；不是新目標實測 |
-| 候選文件編輯、虛擬工作區與持久工作稿的實作過程 | [早期 Agent 任務報告](../archive/agent-task-reports/README.md) | 8 份既有報告原文，保留測試、限制與當時程式基準 |
-| 舊 JD 編輯整合的失敗、修正及重驗 | [整體審查](../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/evidence/jd-editor-core-review/README.md)、[Task6](../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/evidence/jd-editor-task6/README.md) | 相同目錄保留 review、輸入、輸出、日誌與當時 source；精確 Git 原件見[歷史索引](../archive/worktree-history-index.md) |
+| 候選文件編輯、虛擬工作區與持久工作稿的實作過程 | [早期 Agent 任務報告](../experiments/historical/agent-task-reports/README.md) | 8 份既有報告原文，保留測試、限制與當時程式基準 |
+| 舊 JD 編輯整合的失敗、修正及重驗 | [整體審查](../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-core-review/README.md)、[Task6](../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-task6/README.md) | 相同目錄保留 review、輸入、輸出、日誌與當時 source；精確 Git 原件見[歷史索引](../archive/worktree-history-index.md) |
 
 引用實驗時，同時交代問題、場景、方法、版本、結果與限制。不要只挑最後成功紀錄，也不要把單次合成案例推論成普遍品質；歷史報告中的模型、費用限制與後續工作只代表當時狀態。
 

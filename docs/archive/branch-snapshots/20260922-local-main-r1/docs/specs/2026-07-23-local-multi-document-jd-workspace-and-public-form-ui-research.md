@@ -5,10 +5,10 @@
 - 範圍：本機文件庫、儲存／續作、公版樣式 JD canvas、API／Web seam、既有前端取捨
 - 不包含：SaaS、登入、帳號密碼、多人共編、完整 K/S／指標／匯出實作
 - 上游 authority：
-  - [ADR 0038](../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)
+  - [ADR 0038](../../../../../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)
   - [專業職務分析與共編研究](2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)
   - [最小 Authoring Core 計畫](../plans/2026-07-23-interview-vnext-minimal-authoring-core-plan.md)
-  - [production 顧問 loop 計畫](../plans/2026-07-23-interview-vnext-production-openrouter-consultant-loop-plan.md)
+  - [production 顧問 loop 計畫](../../../../../plans/2026-07-23-interview-vnext-production-openrouter-consultant-loop-plan.md)
 
 > **2026-07-24 scope correction**
 >
@@ -599,9 +599,9 @@ Stage 1–3 先形成可見的本機測試品。Stage 4–7 才逐步提高 JD �
 
 - [ADR 0015 — optimistic concurrency](../adr/0015-document-save-optimistic-concurrency.md)
 - [ADR 0020 — document + interview hybrid UI](../adr/0020-interview-authoring-interaction-model.md)
-- [ADR 0029 — editor tools and public-form layout](../adr/0029-editor-menus-three-types-decoupling.md)
-- [ADR 0037 — employee authority](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
-- [ADR 0038 — Context Engine and canonical authoring](../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)
+- [ADR 0029 — editor tools and public-form layout](../../../../../adr/0029-editor-menus-three-types-decoupling.md)
+- [ADR 0037 — employee authority](../../../../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
+- [ADR 0038 — Context Engine and canonical authoring](../../../../../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)
 - [Product scope](../product-notes.md)
 
 ### 15.2 2026 官方產品資料

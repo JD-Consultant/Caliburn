@@ -2,13 +2,13 @@
 
 2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **G2 官方機制比較完成；修法待審、G8 OPEN。未改產品／prompt，未新增模型請求。**
 
-**最新Owner裁示：**見§9；先不追修零工具即時漏存，交既有背景整理後續處理，不採用§8額外語意完成檢查的建議。其後針對「已嘗試但失敗後不再處理」，Owner要求沿用其他工具的框架機制；[CT35§5](2026-09-08-ct35-attempted-repair-recovery-review.md#5-owner改採共用框架機制實際接線核對與結論)已核對C本來就在官方Agent錯誤回饋路徑，額外final攔截候選PARKED、不施工。既有C工具未刪除，程式／提示未改，不宣稱模型一定會重試；下方研究選項保留為沿革。
+**最新Owner裁示：**見§9；先不追修零工具即時漏存，交既有背景整理後續處理，不採用§8額外語意完成檢查的建議。其後針對「已嘗試但失敗後不再處理」，Owner要求沿用其他工具的框架機制；[CT35§5](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct35-attempted-repair-recovery-review.md#5-owner改採共用框架機制實際接線核對與結論)已核對C本來就在官方Agent錯誤回饋路徑，額外final攔截候選PARKED、不施工。既有C工具未刪除，程式／提示未改，不宣稱模型一定會重試；下方研究選項保留為沿革。
 
 ## 1. 本輪問題與證據邊界
 
 Owner 最新澄清：Patch 只是「參考大廠減少模型錯誤」的例子，要求的是**找能解決漏存的實際做法**，不是補研究原則或重做 Patch 研究。本稿承接 [CT29](2026-09-08-ct29-stale-memory-official-failure-patterns.md)，不重開 Memory 分層、背景整理 B 或即時修補 C 的目的。
 
-[CT28 原始對照](2026-09-08-ct28-live-repair-context-contrast.md)：A2 已收到含「每月10日前」的當前導覽，員工更正為5日；回答5日但0工具，Memory 未變。A1 短 context 能讀取並修補。**Observed：這次失敗在必要動作未執行，不是修補工具拒絕了寫入。**尚不能判定模型為什麼漏選，也不能靠更換 Patch 或提高步數解決零工具。
+[CT28 原始對照](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct28-live-repair-context-contrast.md)：A2 已收到含「每月10日前」的當前導覽，員工更正為5日；回答5日但0工具，Memory 未變。A1 短 context 能讀取並修補。**Observed：這次失敗在必要動作未執行，不是修補工具拒絕了寫入。**尚不能判定模型為什麼漏選，也不能靠更換 Patch 或提高步數解決零工具。
 
 CT25 已有「聊天確認不代表保存、核實後同輪修補」及正反例。本輪不再把同義提示當成新解方。CT29 的 context 隔離仍是有效診斷候選；最新要求增加的是直接研究官方執行控制，不代表已核准新產品機制。
 
@@ -82,7 +82,7 @@ A2 沒有 repair call，也沒有已建立的待修補意圖。不能假設存�
 
 ## 7. 更正何時同輪修補，何時交背景？
 
-**2026-09-08，Owner要求先查清邊界；研究補證，不是新的施工核准。**本節承接[CT24§2–4](2026-09-08-ct24-live-repair-use-and-background-timing-review.md)已有分工，完整回讀CT24及[CT17歷史結果](2026-09-08-ct17-correction-persistence-calibration.md)。CT17曾讓短更正一律通知B，後來已由CT24／CT25對齊Owner「資訊太少先累積」裁決，不能重新把CT17當現行策略。Topic仍為Q019-MEM-CADENCE-01／CT15-R07，G2補證、G8 OPEN；唯一問題是更正的持久化時機，不重開架構／排程、不增加生成請求。
+**2026-09-08，Owner要求先查清邊界；研究補證，不是新的施工核准。**本節承接[CT24§2–4](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct24-live-repair-use-and-background-timing-review.md)已有分工，完整回讀CT24及[CT17歷史結果](2026-09-08-ct17-correction-persistence-calibration.md)。CT17曾讓短更正一律通知B，後來已由CT24／CT25對齊Owner「資訊太少先累積」裁決，不能重新把CT17當現行策略。Topic仍為Q019-MEM-CADENCE-01／CT15-R07，G2補證、G8 OPEN；唯一問題是更正的持久化時機，不重開架構／排程、不增加生成請求。
 
 ### 7.1 官方實際區分，不把產品混成一套
 
@@ -118,7 +118,7 @@ A2 沒有 repair call，也沒有已建立的待修補意圖。不能假設存�
 
 2026-09-08；Owner回覆「可以討論」。**只授權研究／討論，不等於核准新檢查器、prompt、產品變更或付費測試。**
 
-**Preflight：**Topic仍為LLM-Q019／Q019-MEM-CADENCE-01／CT15-R07；G5診斷已完成，回局部G2/G3選項審議，G8 OPEN。已完整回讀[決策流程](../../../../docs/decision-process.md)、本稿及[CT34結果](2026-09-08-ct34-first-correction-and-recovery-results.md)，核對現行`live_memory.py`與`conversation.py`接點。Binding是§7的C/B邊界、保持reasoning／compaction及既有工具；唯一問題是**收尾檢查要只管已失敗的工具，還是也判斷未曾呼叫的必要修補？**不重開Memory分層、Patch介面與B排程。
+**Preflight：**Topic仍為LLM-Q019／Q019-MEM-CADENCE-01／CT15-R07；G5診斷已完成，回局部G2/G3選項審議，G8 OPEN。已完整回讀[決策流程](../../../../docs/decision-process.md)、本稿及[CT34結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct34-first-correction-and-recovery-results.md)，核對現行`live_memory.py`與`conversation.py`接點。Binding是§7的C/B邊界、保持reasoning／compaction及既有工具；唯一問題是**收尾檢查要只管已失敗的工具，還是也判斷未曾呼叫的必要修補？**不重開Memory分層、Patch介面與B排程。
 
 ### 8.1 現在有兩種問題，不能用同一條簡單規則混稱解決
 
@@ -159,7 +159,7 @@ A2 沒有 repair call，也沒有已建立的待修補意圖。不能假設存�
 
 本輪依系統化除錯流程，只核對CT34封存與現行接線；不再重跑測試或泛查其他框架。唯一問題是現行重試究竟做了什麼，而非重開修法選擇。
 
-**Observed：**重讀[CT34封存](evidence/2026-09-08-ct34-first-correction-and-recovery.json)中first第3次模型請求的`function_call_output`：確有`invalid_edit`、`retryable:true`、重讀路徑及「沒有任何內容寫入，請重讀後修正diff」。同次output沒有工具呼叫，而是以「已更正，前面提到的月報期限以這次為準」回答5日。精確描述應是**回答採用了更正，但沒有持久寫回Memory**；這句可見文字未明說「資料庫／Memory已保存」，不擴大解讀成模型明確宣稱資料庫寫入成功。
+**Observed：**重讀[CT34封存](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct34-first-correction-and-recovery.json)中first第3次模型請求的`function_call_output`：確有`invalid_edit`、`retryable:true`、重讀路徑及「沒有任何內容寫入，請重讀後修正diff」。同次output沒有工具呼叫，而是以「已更正，前面提到的月報期限以這次為準」回答5日。精確描述應是**回答採用了更正，但沒有持久寫回Memory**；這句可見文字未明說「資料庫／Memory已保存」，不擴大解讀成模型明確宣稱資料庫寫入成功。
 
 **程式事實：**[`live_memory.py`](../../experiments/analysis-agent/src/analysis_agent/live_memory.py)的`_command`記失敗次數、建立error ToolMessage；第一次可重試，累積兩次失敗後不再接受repair。它是**允許模型修改參數再呼叫**，不是自動修正參數或重送工具。框架確實讓模型收到錯誤後再產生下一步；模型這次選擇final，沒有選擇第二次repair。[`conversation.py`](../../experiments/analysis-agent/src/analysis_agent/conversation.py)的completed只標本輪回應技術結束，不能當寫入成功。CT34只用3次模型／2工具，並未耗尽額度。
 

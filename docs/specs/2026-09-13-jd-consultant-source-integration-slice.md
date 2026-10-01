@@ -8,7 +8,7 @@
 
 先接通「本輪已保存原話 → 顧問取得引用 → JD 共用保存驗證 → 固定原話回查」。原話繼續由同一 native Saver 保存；不新增原話表，不將 JD 當 Memory，不引用可反覆改寫的 Memory 路徑冒充永久原話。本切片不宣稱完整 Memory、背景整理、專業指引或自然訪談品質已完成。
 
-接點稽核：[Memory](evidence/jd-consultant-source-integration/memory-seams.md)、[原話](evidence/jd-consultant-source-integration/source-seams.md)。引用是否可讀由 App 驗證；內容是否忠實、有沒有把顧問的問題當員工事實，仍須顧問判斷及後續品質驗收。`basis_digest` 只表示 JD 目標當時內容，不是語意正確證明。
+接點稽核：[Memory](../experiments/legacy-evidence/jd-consultant-source-integration/memory-seams.md)、[原話](../experiments/legacy-evidence/jd-consultant-source-integration/source-seams.md)。引用是否可讀由 App 驗證；內容是否忠實、有沒有把顧問的問題當員工事實，仍須顧問判斷及後續品質驗收。`basis_digest` 只表示 JD 目標當時內容，不是語意正確證明。
 
 ## 有限實作
 
@@ -42,10 +42,10 @@
 
 ## 實際結果與下一步
 
-- [原生時序](evidence/jd-consultant-source-integration/native-timing.md)：真正 model request 前已同步保存 Human，後續 child 前進不影響固定來源。
-- [來源模組](evidence/jd-consultant-source-integration/source-results.md)：44 PASS；固定來源、角色／全文、跨範圍拒絕、缺來源與故障均有反例。
-- [App／故障](evidence/jd-consultant-source-integration/runtime-results.md)：103 PASS；來源故障不冒充模型參數錯誤、不繼續模型步；人工來源讀取結束前不關 Saver。
-- [真 PG 縱向](evidence/jd-consultant-source-integration/postgres-results.md)：1 PASS；6 次程序內 Mock SDK request、兩輪訪談、手改、最終 JD 版本4／操作3／來源關係5。新 connection／serializer／owner 回查原話及原操作不重發引用。首敗是測試忽略原生讀取續頁，已修測試，沒有放寬產品規則。
-- [獨立審查](evidence/jd-consultant-source-integration/review.md)：CSI-R01／02 故障歸因與讀取排空修正後窄複核；實際界線見審查稿。
+- [原生時序](../experiments/legacy-evidence/jd-consultant-source-integration/native-timing.md)：真正 model request 前已同步保存 Human，後續 child 前進不影響固定來源。
+- [來源模組](../experiments/legacy-evidence/jd-consultant-source-integration/source-results.md)：44 PASS；固定來源、角色／全文、跨範圍拒絕、缺來源與故障均有反例。
+- [App／故障](../experiments/legacy-evidence/jd-consultant-source-integration/runtime-results.md)：103 PASS；來源故障不冒充模型參數錯誤、不繼續模型步；人工來源讀取結束前不關 Saver。
+- [真 PG 縱向](../experiments/legacy-evidence/jd-consultant-source-integration/postgres-results.md)：1 PASS；6 次程序內 Mock SDK request、兩輪訪談、手改、最終 JD 版本4／操作3／來源關係5。新 connection／serializer／owner 回查原話及原操作不重發引用。首敗是測試忽略原生讀取續頁，已修測試，沒有放寬產品規則。
+- [獨立審查](../experiments/legacy-evidence/jd-consultant-source-integration/review.md)：CSI-R01／02 故障歸因與讀取排空修正後窄複核；實際界線見審查稿。
 
 一般入口仍不啟動模型；0 provider、0 新 DB schema、0 正式採用切換。這不是自然模型品質、全 Memory、Windows 新程序恢復或來源 UI 驗收。下一集中接既有 Memory／案例和專業指引的正式模組／保存生命週期、較早原話讀取及 UI，依 OI-01／02 推進；沒有新產品問題需要 Owner 重選。

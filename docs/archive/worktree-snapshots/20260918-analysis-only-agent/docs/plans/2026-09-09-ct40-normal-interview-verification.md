@@ -5,7 +5,7 @@
 **Goal:** 驗 CT39 候選提示＋B1 high 在真正服務入口能否保留不確定、後續核實與未變工作细節。
 **Architecture:** 沿既有 CT15 API／PostgreSQL runner 與 CT37 計費帳本，另建空白隔離文件。使用正常主顧問提問及自然背景通知，不提供 oracle 給模型、不強迫工具、不改任何產品程式。
 **Tech Stack:** 現行 FastAPI／LangChain／LangGraph／DeepAgents／OpenAI Responses；Luna，A/B2 medium、B1 high。
-**Spec:** [CT39 採用結果](../specs/2026-09-09-ct39-extraction-adoption-results.md)。Topic LLM-Q019；G8 bounded verification。
+**Spec:** [CT39 採用結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct39-extraction-adoption-results.md)。Topic LLM-Q019；G8 bounded verification。
 
 ## 範圍與停止條件
 
@@ -28,7 +28,7 @@
 - [x] 建專用資料庫與空白文件，先記零訊息／零Memory。完成5輪（包含自然段落收尾）；內容遵守上列事實。每輪保存完整問答、請求、用量、背景詳記／候選／發布前後快照。
 - [x] 先看不確定的第一版，再補核實及新细節。初次不確定保留；兩批自然B完成，核實由C處理但產生重複／矛盾。**結果不是全部通過**，未為通過而改提示或強制B。
 - [x] 既有只讀／空近期Context診斷完成；讀到兩段互相矛盾的記錄，未消除問題。原始問答、兩個詳記及兩筆修補來源引用分頁逐字一致，重開驗保存。模型未讀更正原文，不宣稱该項通過。
-- [x] 帳本closed，31次估US$0.03033571；[結果／下一問題](../specs/2026-09-09-ct40-normal-interview-results.md)及證據封存。7個既有接線回歸通過；G8仍OPEN。
+- [x] 帳本closed，31次估US$0.03033571；[結果／下一問題](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct40-normal-interview-results.md)及證據封存。7個既有接線回歸通過；G8仍OPEN。
 
 ## 官方依據與適用邊界
 

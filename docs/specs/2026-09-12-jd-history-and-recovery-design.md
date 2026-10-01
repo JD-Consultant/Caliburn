@@ -107,4 +107,4 @@ Owner 原選查看修改前後、直接更正局部、明確確認後整份還�
 
 本稿範圍已閉合；新增快捷依[HR-02](2026-09-12-jd-ai-turn-undo-design.md)，差異預設已選[CV-01 標記＋按需展開](2026-09-12-jd-change-visibility-design.md)，不據此稱整體 G4 通過。接續工程前置是 **瀏覽器恢復記錄的版本／容量、資料集識別的正式發配與備份還原關係，以及 successor DTO／原生瀏覽器有限驗證設計**。來源保持既有唯一權威，不能為填一個識別欄自行新增平行 catalog。完整管理画面／Excel 版型／原始訪談匯出及施工對齊依[剩餘工作盤點](2026-09-12-jd-design-readiness-audit.md)；完整 G4／ADR0075、施工與自然／真人驗收未完成。
 
-本輪只完成研究、需求裁決及責任接合；未建表、改 runtime、安裝套件、執行產品模型或建立 AI 試稿分支。獨立文件審查與首敗／複核結果見[本輪證據](evidence/2026-09-12-jd-history-and-recovery-review.md)。
+本輪只完成研究、需求裁決及責任接合；未建表、改 runtime、安裝套件、執行產品模型或建立 AI 試稿分支。獨立文件審查與首敗／複核結果見[本輪證據](../experiments/legacy-evidence/2026-09-12-jd-history-and-recovery-review.md)。

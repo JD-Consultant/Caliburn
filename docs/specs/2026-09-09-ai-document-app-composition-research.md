@@ -12,7 +12,7 @@ Owner 同意 [C02 最小完整審核範圍](2026-09-09-jd-editing-and-review-wor
 
 **研究題（已交付）：**如何用現成 agent 與編輯框架完成共同最新文件、AI 編輯及員工審核，避免不必要的自訂複雜度？**唯一下一裁決：**是否以 Tiptap 組合作第一驗證候選，先做方案 §7 收斂的無 LLM 文件編輯／審核驗證？
 
-本稿只管短結論與取捨；[可執行方案](2026-09-09-jd-ai-editing-executable-proposal.md)管完整接線、差距與驗證。[E01–E20](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)保留文件產品及最初整合證據；[R01–R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)管 agent／錯誤契約；[F01–F05](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)管三套編輯框架比較。父路由在[研究入口](2026-09-09-job-analysis-and-jd-content-research.md)，效力在[register](../current-decisions.md)。所有方案可經討論翻案，不能用「共同做法」掩蓋不同契約。
+本稿只管短結論與取捨；[可執行方案](2026-09-09-jd-ai-editing-executable-proposal.md)管完整接線、差距與驗證。[E01–E20](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)保留文件產品及最初整合證據；[R01–R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)管 agent／錯誤契約；[F01–F05](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)管三套編輯框架比較。父路由在[研究入口](../guides/2026-09-09-job-analysis-and-jd-content-research.md)，效力在[register](../current-decisions.md)。所有方案可經討論翻案，不能用「共同做法」掩蓋不同契約。
 
 ## 2. 白話結論
 

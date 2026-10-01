@@ -2,7 +2,7 @@
 
 > 可重用的判斷法（2026-06-27 建立並驗證，套 indexer / auth / Postgres 三例皆自洽）。
 > 用途:遇到「這要不要獨立成一個服務 / 一個 repo?」時照這個決定,別憑感覺。
-> 相關:[`specs/2026-06-27-system-architecture-design.md`](specs/2026-06-27-system-architecture-design.md)、[`contract-strategy.md`](contract-strategy.md)。
+> 相關:[`specs/2026-06-27-system-architecture-design.md`](../../../../specs/2026-06-27-system-architecture-design.md)、[`contract-strategy.md`](contract-strategy.md)。
 
 ## 兩條軸不要混
 

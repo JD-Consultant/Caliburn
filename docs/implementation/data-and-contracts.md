@@ -46,7 +46,7 @@ T04 的實作映射、研究與目前未驗邊界維護於 [Memory 保存接線]
 
 ## 4. JD：關聯式候選、來源與正式完成
 
-JD 業務沿既定 profile／職責／任務／成果／要求／知識／技能／關係建立型別模型；schema 不從 Memory Markdown 或 UI widget 反推。欄位意義依[JD 指南](../specs/2026-09-09-jd-field-and-writing-guide.md)。舊 SQL／測例只供參考，沒有相容表名義務。
+JD 業務沿既定 profile／職責／任務／成果／要求／知識／技能／關係建立型別模型；schema 不從 Memory Markdown 或 UI widget 反推。欄位意義依[JD 指南](../guides/2026-09-09-jd-field-and-writing-guide.md)。舊 SQL／測例只供參考，沒有相容表名義務。
 
 T03 已實作上述集合的人工端點／UI、固定修訂、原結果及候選底層；候選位置、分支回退、放棄與交易內採用見 [JD 保存接線 §3.1](jd-storage.md#31-本輪候選與可恢復位置)。來源、Agent 共同完成與候選 UI 仍依 T07–T09 施工，不能將人工正式 API 當作 A 候選寫入，也不因底層可組合而宣稱整輪恢復已驗收。
 

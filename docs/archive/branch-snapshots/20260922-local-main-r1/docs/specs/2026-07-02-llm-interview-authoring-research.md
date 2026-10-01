@@ -26,11 +26,11 @@
 
 | 終局需求 | 現有對應物 | 檔案 |
 |---|---|---|
-| 粗描 → 檢索職類 → 彈選單 | `pick_profile`(search_occupations → **interrupt 候選** → 有序複選 → 落 DB) | [nodes.py](../../apps/api/app/authoring/nodes.py) |
-| 深問工作細節 | `star → five_w2h → indicator` 逐任務 loop(**STAR + 5W2H**,interrupt 驅動;刻意單層) | [deep_nodes.py](../../apps/api/app/authoring/deep_nodes.py)、[graph.py](../../apps/api/app/authoring/graph.py) |
-| 公版反推 + 確認 | `extract_tasks`(自述+公版候選 → LLM 挑 id,**自創 id 丟棄**;額外提及 → custom 候選) | [extract_tasks.py](../../apps/api/app/services/ai/extract_tasks.py) |
-| K/S/態度勾選 | `fetch_ksa_pool → curate_ks → curate_attitudes`(池內 interrupt 勾選) | [curate_nodes.py](../../apps/api/app/authoring/curate_nodes.py) |
-| 人直接改文件 | D27 文件工作台(REST PATCH)+ `ai/*` proposal-apply | [documents.py](../../apps/api/app/api/routes/documents.py) |
+| 粗描 → 檢索職類 → 彈選單 | `pick_profile`(search_occupations → **interrupt 候選** → 有序複選 → 落 DB) | [nodes.py](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/authoring/nodes.py) |
+| 深問工作細節 | `star → five_w2h → indicator` 逐任務 loop(**STAR + 5W2H**,interrupt 驅動;刻意單層) | [deep_nodes.py](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/authoring/deep_nodes.py)、[graph.py](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/authoring/graph.py) |
+| 公版反推 + 確認 | `extract_tasks`(自述+公版候選 → LLM 挑 id,**自創 id 丟棄**;額外提及 → custom 候選) | [extract_tasks.py](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/services/ai/extract_tasks.py) |
+| K/S/態度勾選 | `fetch_ksa_pool → curate_ks → curate_attitudes`(池內 interrupt 勾選) | [curate_nodes.py](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/authoring/curate_nodes.py) |
+| 人直接改文件 | D27 文件工作台(REST PATCH)+ `ai/*` proposal-apply | [documents.py](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/api/routes/documents.py) |
 | 溯源 | 文件 `_ref` provenance + 契約 `CitableItem.code/sources` | ADR 0011/0016 |
 
 **Gap**:訪談 graph(`/copilotkit`,`DocRepo.save` 寫新版本)與文件工作台(REST PATCH 就地更新 draft)

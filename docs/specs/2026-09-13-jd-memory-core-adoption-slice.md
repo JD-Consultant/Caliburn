@@ -1,6 +1,6 @@
 # JD 顧問：既有 Memory 核心採用
 
-2026-09-13；JD-R002／OI-01、OI-02。隔離施工，正式產品 ADR0060 不變；ADR0074／0075 仍 Proposed。沿[計畫](../plans/2026-09-13-jd-relational-app-implementation.md)及[既有成果接點](evidence/jd-consultant-source-integration/memory-seams.md)，接續已完成的當輪原話來源。
+2026-09-13；JD-R002／OI-01、OI-02。隔離施工，正式產品 ADR0060 不變；ADR0074／0075 仍 Proposed。沿[計畫](../plans/2026-09-13-jd-relational-app-implementation.md)及[既有成果接點](../experiments/legacy-evidence/jd-consultant-source-integration/memory-seams.md)，接續已完成的當輪原話來源。
 
 ## 目標與本次接合
 
@@ -38,7 +38,7 @@
 
 ## 實際結果與下一接點
 
-已完成 [獨立套件](../../packages/consultant-memory/README.md)、[原碼採用紀錄](../../packages/consultant-memory/adoption.json)及新 App 的 doc-scoped source adapter。核心 **44 PASS**；來源／context **71 PASS**；受影響接線 **113 PASS**；真 PG 縱向 **1 PASS**；獨立 wheel 安裝／隔離 import／保存發布通過。[整合結果](evidence/jd-memory-core-adoption/integration-results.md)分清測試層級、重疊、首敗及修正；[独立審查](evidence/jd-memory-core-adoption/review.md) **98 PASS**，限定範圍無 P1／P2。
+已完成 [獨立套件](../../packages/consultant-memory/README.md)、[原碼採用紀錄](../../packages/consultant-memory/adoption.json)及新 App 的 doc-scoped source adapter。核心 **44 PASS**；來源／context **71 PASS**；受影響接線 **113 PASS**；真 PG 縱向 **1 PASS**；獨立 wheel 安裝／隔離 import／保存發布通過。[整合結果](../experiments/legacy-evidence/jd-memory-core-adoption/integration-results.md)分清測試層級、重疊、首敗及修正；[独立審查](../experiments/legacy-evidence/jd-memory-core-adoption/review.md) **98 PASS**，限定範圍無 P1／P2。
 
 只為真 PG 驗證明示建立專用 `jd_memory_core_test` 的官方 Store＋原發布四表；public JD／Saver 與日常 host profile 不變。模型工具數／provider 呼叫未增加。此結果證明既有核心能用新來源保存、修正、查回與重開，尚非完整顧問接合。
 

@@ -100,4 +100,4 @@ App 的人工變更通知記本次 `undo_ai_turn`、被撤回回合與 JD 前後
 | AU-09 | 下一輪／重開／context壓縮後仍可查整輪歸屬；不用已被清空的目前 jd_bindings 或 notice.start 判斷起點 |
 | AU-10 | 撤回後只問工作內容／要求重寫；顧問可按現行理解與原話回查，沒有自動抹除事實或無意圖重套原稿 |
 
-既有停止、回執及歷史的已驗成果只是接合基礎；本輪沒有新 runtime／DB／瀏覽器／自然模型實測。核心工程維持零付費。先完成本稿獨立審查及 successor schema／DTO／保存測試設計，再沿既有暫存相容性前置與整體 G4 推進；不因本功能採用就宣布 ADR0075 已 Accepted。[本輪審查與證據](evidence/2026-09-12-jd-ai-turn-undo-review.md)
+既有停止、回執及歷史的已驗成果只是接合基礎；本輪沒有新 runtime／DB／瀏覽器／自然模型實測。核心工程維持零付費。先完成本稿獨立審查及 successor schema／DTO／保存測試設計，再沿既有暫存相容性前置與整體 G4 推進；不因本功能採用就宣布 ADR0075 已 Accepted。[本輪審查與證據](../experiments/legacy-evidence/2026-09-12-jd-ai-turn-undo-review.md)

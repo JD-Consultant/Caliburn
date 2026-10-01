@@ -22,7 +22,7 @@ Caliburn 是本機 Web 應用程式。一位操作者可以管理多份資料隔
 
 「完整」不是越長越好，而是用**最小、高訊號的文字涵蓋大部分實際工作與重要差異**：做什麼、負責到哪裡、形成什麼結果、有哪些必要條件，以及需要什麼知識與技能。缺乏依據時追問或保留未知，不為填滿表格創造 KPI、職責或資格。
 
-這套內容判準來自專案已研究的[完整工作分析方法](specs/2026-09-09-complete-work-analysis-guide.md)與[JD 寫作指南](specs/2026-09-09-jd-field-and-writing-guide.md)，不是由模型臨場猜一套分析標準。
+這套內容判準來自專案已研究的[完整工作分析方法](guides/2026-09-09-complete-work-analysis-guide.md)與[JD 寫作指南](guides/2026-09-09-jd-field-and-writing-guide.md)，不是由模型臨場猜一套分析標準。
 
 ## 3. 使用者會怎麼走過這個流程？
 

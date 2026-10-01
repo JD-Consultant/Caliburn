@@ -4,11 +4,11 @@
 
 ## 1. 單一假設與邊界
 
-依[CT30§6–7](2026-09-08-ct30-missed-memory-write-official-controls.md)已同意的區分，僅比較「先核對目前已存內容，再判定是否處理過」的提示入口。不是根因已確定；[CT28](2026-09-08-ct28-live-repair-context-contrast.md)短context成功、原歷史0工具失敗仍保留。不清空延續context、不加Stop／判斷Agent、不強制tool、不改patch／schema／Memory架構／B時機或模型，不接production／JD。
+依[CT30§6–7](2026-09-08-ct30-missed-memory-write-official-controls.md)已同意的區分，僅比較「先核對目前已存內容，再判定是否處理過」的提示入口。不是根因已確定；[CT28](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct28-live-repair-context-contrast.md)短context成功、原歷史0工具失敗仍保留。不清空延續context、不加Stop／判斷Agent、不強制tool、不改patch／schema／Memory架構／B時機或模型，不接production／JD。
 
 **Official fact：**[OpenAI tool routing](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6#tool-routing)要求不能因答案看似明確而省略必要查閱，且工具應說清用途／時機／回傳／錯誤。2026-09-08重讀該節；是GPT-5.6 Sol文件的一般原則，不是Luna專屬效果保證。[同輪live update及兩家差異](2026-09-08-ct30-missed-memory-write-official-controls.md#71-官方實際區分不把產品混成一套)不重研，仍為OpenAI可寫Memory模式的映射，不能稱精確時機是各家完全共識。
 
-**Candidate（驗前設定，現已不採用）：**[完整獨立提示fixture](evidence/2026-09-08-ct31-memory-routing-candidate.json)。只替換CT25的Live repair段；保留背景段落、正反例、六工具全部描述／schema、patch／來源／案例防錯、角色、Skills、guide及版本規則。未新增模型欄位；runtime仍不讀docs。新入口要求更正曾談工作或guide與證據不一致時查相關已存Memory；已正確不修、無目標不初始化、未釐清先問、已核實過時同輪final前修補。這是驗前假設；實測結果見§3，不能當成有效的新產品規則。
+**Candidate（驗前設定，現已不採用）：**[完整獨立提示fixture](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct31-memory-routing-candidate.json)。只替換CT25的Live repair段；保留背景段落、正反例、六工具全部描述／schema、patch／來源／案例防錯、角色、Skills、guide及版本規則。未新增模型欄位；runtime仍不讀docs。新入口要求更正曾談工作或guide與證據不一致時查相關已存Memory；已正確不修、無目標不初始化、未釐清先問、已核實過時同輪final前修補。這是驗前假設；實測結果見§3，不能當成有效的新產品規則。
 
 ## 2. 本輪執行清單
 
@@ -24,7 +24,7 @@
 
 ## 3. 結果與下一gate
 
-**Observed，候選不採用：**[封存實驗證據](evidence/2026-09-08-ct31-memory-routing-results.json)，包含真實請求可見內容、工具回執、前後Memory、原文回查、使用量與實驗腳本；opaque只保存摘要雜湊，不保存可解讀思考或金鑰。SHA256：`a63f9f5ad2c8c2cbdbed5331bf37d41c42f410672797066e52dc900a667ad913`。
+**Observed，候選不採用：**[封存實驗證據](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct31-memory-routing-results.json)，包含真實請求可見內容、工具回執、前後Memory、原文回查、使用量與實驗腳本；opaque只保存摘要雜湊，不保存可解讀思考或金鑰。SHA256：`a63f9f5ad2c8c2cbdbed5331bf37d41c42f410672797066e52dc900a667ad913`。
 
 | 情境 | 模型／工具次數 | 保存結果 | 判定 |
 |---|---:|---|---|

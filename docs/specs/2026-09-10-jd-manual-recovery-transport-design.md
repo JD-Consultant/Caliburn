@@ -1,6 +1,6 @@
 # Task 5：人工保存未知結果的有限 transport 設計
 
-- 日期：2026-09-10；狀態：有限G4 Spec／quality PASS，MRD-R01／02 CLOSED；root採用於隔離Task5，實作／實測仍待完成。[原候選／差異／獨立closure](evidence/jd-editor-task5/manual-recovery-transport/review.md)保留；正文為受審34004e1e版本，僅本狀態行更新。
+- 日期：2026-09-10；狀態：有限G4 Spec／quality PASS，MRD-R01／02 CLOSED；root採用於隔離Task5，實作／實測仍待完成。[原候選／差異／獨立closure](../experiments/legacy-evidence/jd-editor-task5/manual-recovery-transport/review.md)保留；正文為受審34004e1e版本，僅本狀態行更新。
 - 範圍：只補 lifecycle 已採用的 cache-lost manual 明示恢復效果；0 模型／DB／Job／程序執行。未讀 Task 5 施工 source。
 - 原碼證據：只以接受點 `8eec072d51e97735b22c5f0df598b67101fe570b` 的 `experiments/analysis-agent` 與 `experiments/jd-editor` 指定接點為準。下列 A/W 為這兩個目錄下的 API 與 web。
 - 效力：遵守 current register 本輪唯一 transport 問題；不改 production ADR authority、不擴充三個模型工具、不建立新的 operation store。

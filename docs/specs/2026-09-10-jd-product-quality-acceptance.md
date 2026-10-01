@@ -10,7 +10,7 @@
 - Authority：隔離施工與正式切換分開；production 改 authority 仍須已驗 Memory 的正式採用與 ADR 0073 G6。以 [register](../current-decisions.md)、[決策流程](../decision-process.md)、[總計畫](../plans/2026-09-10-jd-product-delivery.md)為入口。
 - 停止廣搜：已有內容方法、官方 eval 方法、三類職業參考與可操作案例；剩餘是接線、自然效果、等待及真人觀察，不能靠多找文章替代。
 
-本文將既有[完整工作分析](2026-09-09-complete-work-analysis-guide.md)、[欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md)落成驗收，不另建一套內容 SSOT。來源／手改規則沿[context 與來源研究](2026-09-10-jd-context-change-and-source-research.md)，wire 沿[語意 v2](evidence/2026-09-10-jd-semantic-contract-closure.md)。[核心 Task 6](../plans/2026-09-10-jd-editor-core-implementation.md#task-6一份專業方法固定端到端與核心交接)可精煉 §3–4 至既有單一 Skill 與兩份 references；本文完整 rubric 留在測試材料，不全塞進每輪 prompt。
+本文將既有[完整工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)、[欄位與寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[深度與訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)落成驗收，不另建一套內容 SSOT。來源／手改規則沿[context 與來源研究](2026-09-10-jd-context-change-and-source-research.md)，wire 沿[語意 v2](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)。[核心 Task 6](../plans/2026-09-10-jd-editor-core-implementation.md#task-6一份專業方法固定端到端與核心交接)可精煉 §3–4 至既有單一 Skill 與兩份 references；本文完整 rubric 留在測試材料，不全塞進每輪 prompt。
 
 ## 2. 官方依據與已有效果不能混用
 

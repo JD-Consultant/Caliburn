@@ -36,7 +36,7 @@ ACL、quota、billing 或 tenant admin。若 deployment 將由多名使用者或
 本機 Web workspace 的新文件權威是 greenfield `app/job_analysis`：Current JD 保存員工確認或直接編輯的文件內容，
 Current Work Model 保存 AI 可修正的分析。第一版不整合、不雙寫，也不搬遷舊 `job_authoring`／vNext 資料；舊
 `DocumentVersion`／OCS deep JSON／`_pending` 不得恢復為新產品真相。詳細裁決見
-[`ADR 0043`](adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)與
+[`ADR 0043`](../../../../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)與
 [`本機 JD 分層編輯與 PostgreSQL 持久化研究`](specs/2026-07-29-local-jd-authoring-and-postgresql-persistence-research.md)。
 
 第一個成品不做 JD 版本歷史、還原或 revision diff。員工 direct edit 直接更新 Current JD；下次 AI 互動前才
@@ -50,7 +50,7 @@ reconcile，UI 不必顯示內部待對齊狀態。完成的回合、編輯與�
 
 **狀態：已決定（2026-08-03）。**第一版 Current JD 是員工直接編輯或接受／修改 AI proposal 後形成的
 **員工確認 JD 草稿**，可匯出後交主管／HR 審閱，但不宣稱已代表企業正式核准、組織政策或 SME 共識。
-這延伸 [ADR 0037](adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md) 的員工文件權威：
+這延伸 [ADR 0037](../../../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md) 的員工文件權威：
 「current draft truth」只回答目前草稿內容由誰決定，不等於建立企業 approval authority。
 
 現行單企業 deployment 不新增提交、退回、簽核、主管／HR reviewer role 或多人共編。未來可研究多人審閱與共享平台，但
@@ -88,7 +88,7 @@ OIDC／SSO access seam。既有 `tenant_id` 是歷史／FK 相容細節，不是
 > **本節描述的是 legacy OCS editor,不是現行 `job_analysis`。**
 > `OccupationPicker`／`TaskCuratePanel`／`CellFillerPanel`／`services/knowledge/` 的 header-meta
 > 服務都屬舊編輯器。**不得拿來接新的 `job_analysis` header**——後者走 `JdHeader` 的 authority
-> seam(Journal＋generation＋CAS),見 ADR [0053](adr/0053-jd-header-authority-boundary-and-readiness-scope.md)
+> seam(Journal＋generation＋CAS),見 ADR [0053](../../../../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)
 > 決定 2／3／5。下面的 UX 期望仍可當未來討論素材,但**實作路徑不適用**。
 
 **使用者期望的 UX**(2026-06-26 提出,當下決定先不動、晚點討論):

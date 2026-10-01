@@ -1,12 +1,12 @@
 # 0039. 本機多文件 Workspace、Canonical 文件權威與公版樣式 UI
 
-- 狀態：Superseded by [0043](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)（勿據以施工）
+- 狀態：Superseded by [0043](../../../../../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)（勿據以施工）
 - 日期：2026-07-23
 - 範圍：Local Web 文件庫、儲存／續作、API／Web 文件 shape、既有 editor 取捨
 - 前置決策：[0015](0015-document-save-optimistic-concurrency.md)、
   [0020](0020-interview-authoring-interaction-model.md)、
-  [0037](0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)、
-  [0038](0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)
+  [0037](../../../../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)、
+  [0038](../../../../../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)
 - 研究：
   [本機多文件與公版 UI 研究](../specs/2026-07-23-local-multi-document-jd-workspace-and-public-form-ui-research.md)
 
@@ -20,7 +20,7 @@
 
 > **2026-07-29 supersession**
 >
-> 本 ADR 從未升為 Accepted，現由 [ADR 0043](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)
+> 本 ADR 從未升為 Accepted，現由 [ADR 0043](../../../../../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)
 > 完整取代。現行設計採 greenfield `app/job_analysis`、不搬遷／不整合／不雙寫舊資料；本文保留供追溯，
 > 不得據以施工。
 

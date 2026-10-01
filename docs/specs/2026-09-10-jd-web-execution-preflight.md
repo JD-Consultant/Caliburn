@@ -1,6 +1,6 @@
 # JD Task 4：Web 版本與真瀏覽器施工前核對
 
-**主工作單位採用更新（2026-09-10）：**§1–3 與 §4 均已完成[有限獨立審查](evidence/2026-09-10-jd-web-preflight-review.md)，WP-R01 CLOSED。Next16.3.3／工具修補及隔離 Node22.23.2 已寫入 register／Task4.0–4.6；目前 Task3 沿原 runtime 施工，Task4 尚未安裝／驗新版。下文「候選／未採用／Task2」是補證撰寫當時狀態，效力以本更新及 current register 為準，不改寫歷史測試結果。
+**主工作單位採用更新（2026-09-10）：**§1–3 與 §4 均已完成[有限獨立審查](../experiments/legacy-evidence/2026-09-10-jd-web-preflight-review.md)，WP-R01 CLOSED。Next16.3.3／工具修補及隔離 Node22.23.2 已寫入 register／Task4.0–4.6；目前 Task3 沿原 runtime 施工，Task4 尚未安裝／驗新版。下文「候選／未採用／Task2」是補證撰寫當時狀態，效力以本更新及 current register 為準，不改寫歷史測試結果。
 
 - 查閱日：2026-09-10（Asia/Taipei）；topic：JD-R002；狀態：有限 G2 補證，交主線納入施工入口，**不是已實作／安全全認證／IME 驗收**。
 - 依據：[current register](../current-decisions.md)、[decision process](../decision-process.md)、[核心 Task 4](../plans/2026-09-10-jd-editor-core-implementation.md#task-4同頁手編完整實際差異與-session-history)、[員工旅程](2026-09-10-jd-employee-journey-design.md)。當前唯一施工單位仍為 Task 2。

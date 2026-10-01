@@ -6,9 +6,9 @@
 - 適用團隊：一人開發團隊
 - 產品前提：現有手動 JD Web、OCS 文件契約與人工審閱流程可用；重做範圍是 LLM 分析與訪談 runtime
 - 上游研究：[`2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md`](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md)
-- 實作順序：[`../plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../plans/2026-07-16-interview-ai-vnext-implementation-plan.md)
-- Provider 決策修正（2026-07-17）：[`../adr/0035-interview-vnext-openrouter-first-provider-boundary.md`](../adr/0035-interview-vnext-openrouter-first-provider-boundary.md) 已取代「正式主線優先直連 OpenAI／Anthropic」的舊假設；Evidence workflow、Context Engine、Reducer、Capture 與人工 authority boundary 不變
-- 現行 provider 交接規格：[`../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
+- 實作順序：[`../plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../../../../../plans/2026-07-16-interview-ai-vnext-implementation-plan.md)
+- Provider 決策修正（2026-07-17）：[`../adr/0035-interview-vnext-openrouter-first-provider-boundary.md`](../../../../../adr/0035-interview-vnext-openrouter-first-provider-boundary.md) 已取代「正式主線優先直連 OpenAI／Anthropic」的舊假設；Evidence workflow、Context Engine、Reducer、Capture 與人工 authority boundary 不變
+- 現行 provider 交接規格：[`../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../../../../../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
 
 ---
 

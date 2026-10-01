@@ -5,7 +5,7 @@
 **Goal:** 回答 Owner「16,384 試試看？」；比較已驗收 8,192 與 16,384，不能把容量提高等同更聰明。
 **Architecture:** 沿 CT50 真 FastAPI／LangGraph／SDK／PG 入口；由 CT49 closed DB 各建一個新複本。相同來源、high、提示、工具、16模型／15工具、native compaction12,000，只改 `Q019_MAX_OUTPUT_TOKENS`。API/default/source不改。
 **Tech stack:** 現有隔離 analysis-agent 及既有 CT15／CT37 觀測器；觀測器只擴充核准的測試 output bound，不更動產品保護。
-**Spec:** [CT50](../specs/2026-09-09-ct50-tested-profile-results.md)、[CT49](../specs/2026-09-09-ct49-fixed-long-interview-results.md)。
+**Spec:** [CT50](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct50-tested-profile-results.md)、[CT49](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct49-fixed-long-interview-results.md)。
 
 ## Preflight／單一問題
 
@@ -36,4 +36,4 @@
 - [x] 比較completed/incomplete/error、實際reasoning/output tokens、工具錯誤/呼叫、延遲、usage費用、語意；來源引用逐段對照canonical、reader不得改Memory、原CT49DB/帳本不變。
 - [x] 記錄所有成功／失敗／未覆蓋範圍，決定保留8K或採16K作可逆已測配置。單一pair不是統計品質證明；若無截斷或明確品質差異，不聲稱16K更聰明。此輪無production改動，無merge/push。
 
-結果：[CT51結果／證據／下一gate](../specs/2026-09-09-ct51-output-budget-results.md)。兩組均完成；8K維持，16K可用但未採用。Docker與test helper初始化失敗保留，無產品修改。
+結果：[CT51結果／證據／下一gate](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct51-output-budget-results.md)。兩組均完成；8K維持，16K可用但未採用。Docker與test helper初始化失敗保留，無產品修改。

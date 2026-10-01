@@ -14,7 +14,7 @@
 
 ## 2. 官方依據與本案接合
 
-依據於本日核對；具體套件版本、正式／預覽狀態、免費開源授權及限制沿 [React／Next／MUI 前置](evidence/2026-09-13-jd-react-ui-preflight.md)、[瀏覽器候選前置](evidence/2026-09-13-jd-browser-draft-preflight.md)、[API 映射](evidence/2026-09-13-jd-ui-api-mapping.md)。框架保持可替換，不重新以品牌數量判定方案。
+依據於本日核對；具體套件版本、正式／預覽狀態、免費開源授權及限制沿 [React／Next／MUI 前置](../experiments/legacy-evidence/2026-09-13-jd-react-ui-preflight.md)、[瀏覽器候選前置](../experiments/legacy-evidence/2026-09-13-jd-browser-draft-preflight.md)、[API 映射](../experiments/legacy-evidence/2026-09-13-jd-ui-api-mapping.md)。框架保持可替換，不重新以品牌數量判定方案。
 
 | 官方公開原則 | 本案的具體接合與界線 |
 |---|---|
@@ -49,7 +49,7 @@
 | 真瀏覽器移動／刪除 | 未命名任務移入職責，同 UUID／內容／引用保留。刪職責時同次補兩任務範圍；2 任務移為未分組，成果、要求、2 筆共用引用保留。 |
 | 真瀏覽器封存／恢復 | 封存後全文唯讀；恢復後續改職稱為「系統維護工程專員」並自動保存，任務與關係保持。 |
 | 真瀏覽器歷史／尺寸 | 歷史列實際版本及任務改名前後。一般窄畫面堆疊；1440 桌面左右同頁，DOM client／scroll width 均 1425，無水平溢出；測後恢復原 viewport。 |
-| 獨立 DB 快照 | 原 head 7 與[最終 head 11](evidence/jd-relational-ui/browser-db-final-review.json)唯讀核對 **PASS**：11 版本／10 committed 操作，current rows／snapshot／digest／原回執一致；0 職責、2 任務、2 成果、1 要求、1 知識及 2 引用。metadata version 3／archived=false，封存恢復未增加正文版本。中途封存狀態仍以瀏覽器觀察為證。 |
+| 獨立 DB 快照 | 原 head 7 與[最終 head 11](../experiments/legacy-evidence/jd-relational-ui/browser-db-final-review.json)唯讀核對 **PASS**：11 版本／10 committed 操作，current rows／snapshot／digest／原回執一致；0 職責、2 任務、2 成果、1 要求、1 知識及 2 引用。metadata version 3／archived=false，封存恢復未增加正文版本。中途封存狀態仍以瀏覽器觀察為證。 |
 
 固定 Web 純測涵蓋 A 送出後續打 B、晚到舊 refresh、確定失敗／未知、RAM 保存失敗的候選保留、部分恢復及 blocked 出口。尚未用真瀏覽器注入配額／斷線／回覆遺失；不能將純測敘述成原生故障全部通過。
 
@@ -70,7 +70,7 @@
 
 操作員重現入口見 [Web README](../../experiments/jd-relational-app/web/README.md)及[本機設定](2026-09-13-jd-managed-configuration-slice.md)。原 CLI 使用同一受管理設定初始化／開啟；沒有為瀏覽器加入任意 DSN 路由。合成驗收先建立上述唯一空 DB，prepare／initialize／serve 是分開程序；瀏覽器按第 4 節順序操作，最後獨立唯讀核對。
 
-本次本機原始紀錄位於 `S:/caliburn/.research-tmp/jd-ui-d5261157fbcc42897a9f26ef28dba317/`；[保存的證據](evidence/jd-relational-ui/)只包含合成核對 JSON 與必要測試紀錄，沒有 DPAPI、帳密或環境內容。瀏覽器步驟為研究者使用 CUA 操作的觀察紀錄，未提供自動重播測試，不冒稱真人操作。
+本次本機原始紀錄位於 `S:/caliburn/.research-tmp/jd-ui-d5261157fbcc42897a9f26ef28dba317/`；[保存的證據](../experiments/legacy-evidence/jd-relational-ui)只包含合成核對 JSON 與必要測試紀錄，沒有 DPAPI、帳密或環境內容。瀏覽器步驟為研究者使用 CUA 操作的觀察紀錄，未提供自動重播測試，不冒稱真人操作。
 
 驗收結束已停止經身分核對的自有 Next 程序，API 依測試控制正常關閉，`closed=true`／`saver_connection_closed=true` 且原父子 PID 已退出。合成資料庫與候選／歷史證據保留；不是關閉或清空其他服務。
 

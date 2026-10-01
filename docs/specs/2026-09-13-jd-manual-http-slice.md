@@ -35,7 +35,7 @@
 
 | 官方來源／適用版本與授權 | 官方事實及本案採用界線 |
 |---|---|
-| [AWS safe retries](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)；現行 Builders’ Library | caller key 表示意圖，同 key 異參數拒絕、晚到请求仍尊重原操作、token 與 mutation 原子保存。本案 GET／永久 receipt／pending 名稱是產品映射，AWS 沒有規定本案資料表或端點。業務分層沿[既有 AWS 證據](evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)。 |
+| [AWS safe retries](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)；現行 Builders’ Library | caller key 表示意圖，同 key 異參數拒絕、晚到请求仍尊重原操作、token 與 mutation 原子保存。本案 GET／永久 receipt／pending 名稱是產品映射，AWS 沒有規定本案資料表或端點。業務分層沿[既有 AWS 證據](../experiments/legacy-evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)。 |
 | [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/)、[strict Content-Type](https://fastapi.tiangolo.com/advanced/strict-content-type/)；0.141.1、MIT | 使用 lifespan，不混 deprecated startup/shutdown events；typed body 與 strict_content_type 阻無內容類型的 JSON CSRF。資源由 host 注入，endpoint 不讀環境／setup。 |
 | [Starlette lifespan](https://starlette.dev/lifespan/)、[threadpool](https://starlette.dev/threadpool/)、[body limiter](https://starlette.dev/middleware/#requestbodylimitmiddleware)；1.6.0、BSD-3-Clause | startup yield 前不接請求；sync endpoint 用原生 AnyIO threadpool；raw bytes／chunked 超限由原生 middleware 處理。本案 1 MiB mutation 上限不是廠商共識，read parser 仍維持 16 KiB，body limiter 不冒稱慢連線逾時機制。 |
 | [AnyIO threads](https://anyio.readthedocs.io/en/stable/threads.html)；4.15.1、MIT；[ASGI HTTP](https://asgi.readthedocs.io/en/latest/specs/www.html)2.5 | abandon／disconnect 不會殺掉實際同步 worker。本案 await／HTTP 回覆不擁有 SQL Future，禁止拿它作 stopped proof。 |

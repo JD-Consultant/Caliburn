@@ -351,7 +351,7 @@ inventory);等多久=work context;準備什麼材料=inputs+Tools & Technology�
 ### 8.4 實品樣張
 
 骨架+槽位表已填成完整模擬樣張(軟體測試工程師,公版引用取自 repo 真資料 ISD2519-002v2):
-**[`2026-07-05-golden-sample-software-tester.md`](2026-07-05-golden-sample-software-tester.md)**
+**[`2026-07-05-golden-sample-software-tester.md`](../../../../../specs/2026-07-05-golden-sample-software-tester.md)**
 ——同時示範公版/客製兩層分野、抓漏實績、深問預算、覆蓋率自檢四機制。待維護者審。
 
 ### 8.5 兩個設計紅利(合成時浮現)

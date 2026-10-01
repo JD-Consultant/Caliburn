@@ -1,6 +1,6 @@
 # A／B1／B2 角色化 Continuation Compaction Implementation Plan
 
-> **2026-09-22 後續驗收 successor：**本計畫完成後的真 Luna JD 長工具迴圈證明，原本把「A 最新 Human turn」整段鎖住會同時阻止該 Human 之後已完成 wave 壓縮。後續最小修正仍沿本計畫唯一 middleware／profile／summary／digest，只把 A 改為逐字保護最新員工訊息本身，並允許其後 completed waves 進摘要；B1 最新未處理窗口及 B2 fixed task 不變。state v2 的 Runtime-owned `protected_message_id` 與測試結果以[正式設計](../specs/2026-09-16-openrouter-continuation-compaction-design.md)及[驗收證據](../specs/evidence/2026-09-22-jd-component-first-acceptance.md)為準。下方原計畫文字保留當時施工順序，不再作最新 A boundary 權威。
+> **2026-09-22 後續驗收 successor：**本計畫完成後的真 Luna JD 長工具迴圈證明，原本把「A 最新 Human turn」整段鎖住會同時阻止該 Human 之後已完成 wave 壓縮。後續最小修正仍沿本計畫唯一 middleware／profile／summary／digest，只把 A 改為逐字保護最新員工訊息本身，並允許其後 completed waves 進摘要；B1 最新未處理窗口及 B2 fixed task 不變。state v2 的 Runtime-owned `protected_message_id` 與測試結果以[正式設計](../specs/2026-09-16-openrouter-continuation-compaction-design.md)及[驗收證據](../experiments/legacy-evidence/2026-09-22-jd-component-first-acceptance.md)為準。下方原計畫文字保留當時施工順序，不再作最新 A boundary 權威。
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 

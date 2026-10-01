@@ -8,7 +8,7 @@
 
 **Tech Stack:** 現有LangChain 1.4.0、LangGraph 1.2.11、DeepAgents 0.7.13、OpenAI SDK接線；版本不動。
 
-**Spec:** [CT25完整候選](../specs/2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md)與其[已審核JSON](../specs/evidence/2026-09-08-ct25-memory-prompt-candidate.json)。JSON為獨立審核fixture，runtime不讀docs。
+**Spec:** [CT25完整候選](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md)與其[已審核JSON](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct25-memory-prompt-candidate.json)。JSON為獨立審核fixture，runtime不讀docs。
 
 ## Global Constraints／preflight
 

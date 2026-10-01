@@ -22,7 +22,7 @@
 
 ## 2. 沿既有方法逐層核對品質
 
-核對起點為[內容入口 §4](2026-09-09-job-analysis-and-jd-content-research.md#4-滿分改成可以審核的品質目標)、[分析指南 §2／§6](2026-09-09-complete-work-analysis-guide.md)、[深度校準 §4–6](2026-09-09-customized-jd-depth-and-interview-calibration.md)、[樣稿情境與雙向核對](2026-09-09-jd-sample-basis-and-review.md)。這些層次是檢查順序，不是新評分系統或每層固定模型呼叫。
+核對起點為[內容入口 §4](../guides/2026-09-09-job-analysis-and-jd-content-research.md#4-滿分改成可以審核的品質目標)、[分析指南 §2／§6](../guides/2026-09-09-complete-work-analysis-guide.md)、[深度校準 §4–6](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[樣稿情境與雙向核對](../guides/2026-09-09-jd-sample-basis-and-review.md)。這些層次是檢查順序，不是新評分系統或每層固定模型呼叫。
 
 | 核對層 | 本輪實際檢查 | 結論／限制 |
 |---|---|---|
@@ -41,7 +41,7 @@ OpenAI 與 Anthropic 的公開評估方法都支持依任務設計評量，並�
 
 ### 2.1 會不會少欄位
 
-[分析指南十四個面向](2026-09-09-complete-work-analysis-guide.md#2-要完整理解哪些資訊)皆有可表達去處：
+[分析指南十四個面向](../guides/2026-09-09-complete-work-analysis-guide.md#2-要完整理解哪些資訊)皆有可表達去處：
 
 | 分析內容 | 成品去處／保留方式 |
 |---|---|
@@ -69,7 +69,7 @@ OpenAI 與 Anthropic 的公開評估方法都支持依任務設計評量，並�
 | 執行、轉交或核准動作 | 相關敘述或要求 | r2任務2不得自行承諾報價／客戶期限；任務6客戶確認驗收。角色可以出現在表頭，但何時須確認仍要在工作中看得懂 |
 | 多任務真正共通 | 職責說明或全份工作條件，明說範圍 | 「全部維護都依服務範圍」可集中；不能藉分組令沒有月檢合約的工作也按月執行 |
 
-iCAP 的內容定義及 NOS 的 performance criteria／scope 提供可交叉核對的依據，並存不同放置層；詳細版本、原文位置及不能外推的部分見[內容與scope附件](evidence/2026-09-10-jd-content-scope-quality-audit.md)。**本案就近表達原則不是自製條件繼承引擎，也不要求 LLM 判填一個 universal scope enum。**
+iCAP 的內容定義及 NOS 的 performance criteria／scope 提供可交叉核對的依據，並存不同放置層；詳細版本、原文位置及不能外推的部分見[內容與scope附件](../experiments/legacy-evidence/2026-09-10-jd-content-scope-quality-audit.md)。**本案就近表達原則不是自製條件繼承引擎，也不要求 LLM 判填一個 universal scope enum。**
 
 ### 多個成果與多項要求
 
@@ -94,7 +94,7 @@ iCAP 的內容定義及 NOS 的 performance criteria／scope 提供可交叉核�
 | 員工直接輸入的草稿或未完成句子 | 沿原本手編與保存流程保留在JD；AI下一輪知道有人改動，必要時求證 | 不靜默刪除、搬Memory或冒稱已保存；保存失敗仍沿既有輸入恢復規則 |
 | 已知工作仍有會改變責任解讀的不確定性，包括已確認組織本身尚未決定重要權責 | 保持有依據的限定，必要時在相關文字如實說明；不以先前已寫入JD為前提，分析脈絡仍留Memory | 組織確實未決與訪談尚未問清不同；不能把未知寫成確定，也不能擅自縮窄或撤銷有效工作 |
 
-這裡不新設狀態碼、待辦抽屜、審閱權限或另一份工作理解。**「先不撰寫未知結論」與「不能遺失使用者已寫的草稿」可以同時成立。**實際Memory／原文owner及官方使用界線見[Memory／草稿附件](evidence/2026-09-10-jd-memory-draft-boundary-audit.md)。
+這裡不新設狀態碼、待辦抽屜、審閱權限或另一份工作理解。**「先不撰寫未知結論」與「不能遺失使用者已寫的草稿」可以同時成立。**實際Memory／原文owner及官方使用界線見[Memory／草稿附件](../experiments/legacy-evidence/2026-09-10-jd-memory-draft-boundary-audit.md)。
 
 ## 5. 欄位與名稱修訂
 
@@ -124,13 +124,13 @@ iCAP 的內容定義及 NOS 的 performance criteria／scope 提供可交叉核�
 - `source_refs`的責任是訪談依據，不是JD項目間的適用關係；不能借欄混用。
 - 一般字串、標題、表格行或普通節點ID本身，不提供「這是一項完整知識」的契約；名稱、排列序號亦不能作永久身分。
 
-上述由[DB與語意引用附件](evidence/2026-09-10-jd-semantic-relations-storage-audit.md)的實際定義核對與有限AJV反例支持。反例也證明shape通過不會自動抓出文字中不存在的K99或重複Element ID；後者本來就有App唯一性檢查責任，不能改報為新DB漏洞。
+上述由[DB與語意引用附件](../experiments/legacy-evidence/2026-09-10-jd-semantic-relations-storage-audit.md)的實際定義核對與有限AJV反例支持。反例也證明shape通過不會自動抓出文字中不存在的K99或重複Element ID；後者本來就有App唯一性檢查責任，不能改報為新DB漏洞。
 
 ### 6.2 公開共同原則與差異
 
 PostgreSQL官方允許JSON與關聯資料並存，建議JSON有可預期結構，並按不可獨立更新的業務單位考慮範圍；JSONB不會替應用提供內部ID引用外鍵，整row更新亦有鎖定代價。[^pg-json] FK／UNIQUE可以保護關聯表，CHECK不適合作跨row持續一致性驗證。[^pg-constraints]
 
-Microsoft Cosmos DB、MongoDB的公開建模文件依共用、獨立存取、更新方式及關係複雜度討論嵌入或引用；AWS Amazon DocumentDB指引亦要求依查詢模式選模型。它們是不同資料庫的選擇判準，不證明PostgreSQL有相同限制，也不是跨產品同一份JD schema；各原始來源、版本、限制見[DB附件來源表](evidence/2026-09-10-jd-semantic-relations-storage-audit.md)。OpenAI／Anthropic未公開JD編輯內部資料庫，保持未知；不能用其產品行為猜SQL表。
+Microsoft Cosmos DB、MongoDB的公開建模文件依共用、獨立存取、更新方式及關係複雜度討論嵌入或引用；AWS Amazon DocumentDB指引亦要求依查詢模式選模型。它們是不同資料庫的選擇判準，不證明PostgreSQL有相同限制，也不是跨產品同一份JD schema；各原始來源、版本、限制見[DB附件來源表](../experiments/legacy-evidence/2026-09-10-jd-semantic-relations-storage-audit.md)。OpenAI／Anthropic未公開JD編輯內部資料庫，保持未知；不能用其產品行為猜SQL表。
 
 本地與隔離配置是 `postgres:16`，只固定major，未由本輪取得正在運行的patch／digest；PG16仍在官方支援範圍。研究需看現行資料，但不用「較新major」本身當更換資料庫的理由；正式施工前記錄实际版本与运行配置。
 
@@ -152,7 +152,7 @@ A的「整份revision」是本案原子發布需要：員工讀到的任務、K�
 4. 改名／移動保留身分與引用；引用解除不刪共享正文。刪仍被引用項目時須有明確影響處理，不能留下失效引用或靜默刪除其他任務；體驗細節隨格式採用後定稿。
 5. 複製整份／部分文件、跨文件貼上必須核對ID重新分配與內部引用對應；不能只複製字串或只更新節點ID。來源回查仍沿原owner，與內容引用分開。
 6. 拆分／合併Task或K／S時保留有依據的範圍，App不猜專業適用性。單一批次應以最終候選整體驗引用，且清楚區分草稿不完整與失效引用。
-7. 文件、關係、實際差異、版本與回執在同一發布結果閉合。沿既有[保存契約](evidence/2026-09-10-jd-storage-contract-closure.md)的交易、base檢查、no_change與同operation對帳，不繞過先前ER03停止策略。
+7. 文件、關係、實際差異、版本與回執在同一發布結果閉合。沿既有[保存契約](../experiments/legacy-evidence/2026-09-10-jd-storage-contract-closure.md)的交易、base檢查、no_change與同operation對帳，不繞過先前ER03停止策略。
 8. **首次建立及連結仍有契約缺口：**現行工具的目標由保存後讀取發配，模型不能替新K／S或Task猜ID。因此「同批新增項目並互相引用」尚無已證明接點。若允許中間保留未連結草稿，可研究先保存項目、重讀取得引用、再連結；若要求一次原子建立及連結，須再核官方原生／工具能力。不能默默自造批次暫存ID或把多次保存說成同一原子操作。
 
 這些是選定方案需要承擔的責任，不是已完成的實作。以App完整檢查保護JSONB引用是有明確代價的選擇；B也只用FK約束派生關係，仍由App保證投影與正文完全一致。若要求繞過App的任意SQL寫入亦全面阻擋JSON內部失效引用，A與此處的B皆不足，須另評DB機制或C的關聯式authority，不在本輪默默新增trigger。
@@ -199,15 +199,15 @@ A的「整份revision」是本案原子發布需要：員工讀到的任務、K�
 
 內容指南、分析指南、關係研究、主設計、profile及施工計畫已同步上述研究建議及其界線；原樣稿、v1 schema與歷史實驗結果維持原基線。新名稱、引用外觀及關係效果仍待整體格式討論；未把本輪修訂升格為Owner裁決或production authority。
 
-**實際核對結果（2026-09-10）：**三路修後覆核均確認原finding關閉，未留影響本輪研究交付的阻擋。主審直接執行[DB附件§2.2](evidence/2026-09-10-jd-semantic-relations-storage-audit.md#22-六例檢查的可重現程式)內的程式，Node22.12.0／AJV8.20.0得到6例、0 mismatch，輸入未被變更，schema hash與§6.1相同。定點文檔檢查涵蓋12檔、273個本地連結、57個錨點，無缺檔／失效錨點／尾端空白；既有36檔證據檢查亦通過，492連結／87錨點及封存hash一致。該檢查保留歷史原生失敗與限制，**不表示舊實驗全部成功，也未重跑原生產品流程**。`git diff --check`通過；`apps`、`packages`與根package檔未出現tracked diff。未執行模型、資料庫、runtime或新引用操作測試，未安裝套件。
+**實際核對結果（2026-09-10）：**三路修後覆核均確認原finding關閉，未留影響本輪研究交付的阻擋。主審直接執行[DB附件§2.2](../experiments/legacy-evidence/2026-09-10-jd-semantic-relations-storage-audit.md#22-六例檢查的可重現程式)內的程式，Node22.12.0／AJV8.20.0得到6例、0 mismatch，輸入未被變更，schema hash與§6.1相同。定點文檔檢查涵蓋12檔、273個本地連結、57個錨點，無缺檔／失效錨點／尾端空白；既有36檔證據檢查亦通過，492連結／87錨點及封存hash一致。該檢查保留歷史原生失敗與限制，**不表示舊實驗全部成功，也未重跑原生產品流程**。`git diff --check`通過；`apps`、`packages`與根package檔未出現tracked diff。未執行模型、資料庫、runtime或新引用操作測試，未安裝套件。
 
 ## 9. 來源與附件
 
 三份附件各自負責其原始來源、版本及直接核對結果：
 
-- [內容、條件適用層與品質](evidence/2026-09-10-jd-content-scope-quality-audit.md)
-- [Memory、未知與文件草稿](evidence/2026-09-10-jd-memory-draft-boundary-audit.md)
-- [語意引用與資料庫候選](evidence/2026-09-10-jd-semantic-relations-storage-audit.md)
+- [內容、條件適用層與品質](../experiments/legacy-evidence/2026-09-10-jd-content-scope-quality-audit.md)
+- [Memory、未知與文件草稿](../experiments/legacy-evidence/2026-09-10-jd-memory-draft-boundary-audit.md)
+- [語意引用與資料庫候選](../experiments/legacy-evidence/2026-09-10-jd-semantic-relations-storage-audit.md)
 
 本報告補充原始來源均於2026-09-10查閱：
 

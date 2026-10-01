@@ -7,13 +7,13 @@
 
 > **閱讀規則**：後續 Memory 框架比較先以本文為準。需要判斷本文的由來、精確證據、候選取捨或歷史翻案時，再回讀文末連結的研究文檔。若本文與較早研究段落衝突，以本文記錄的現行結論為準；若要改變本文結論，必須先列出新證據、影響與取捨並與 Owner 討論，不得靜默翻案。
 
-> **2026-09-02 重驗校正**：最新官方資料確認 exact-scope 列舉／分頁與可重試副作用不重複是必要效果；但 immutable revision、per-record CAS、operation-receipt table、持久 inventory manifest 與「缺少 lineage 就拒絕」不是跨家共同第一版機制。本文以下已按 [`2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md`](./2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md) 校正；這不否定其成熟價值，只把它們改回有觸發條件的治理強化。
+> **2026-09-02 重驗校正**：最新官方資料確認 exact-scope 列舉／分頁與可重試副作用不重複是必要效果；但 immutable revision、per-record CAS、operation-receipt table、持久 inventory manifest 與「缺少 lineage 就拒絕」不是跨家共同第一版機制。本文以下已按 [`2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md`](../../../../../specs/2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md) 校正；這不否定其成熟價值，只把它們改回有觸發條件的治理強化。
 
-> **2026-09-02 底層機制校正**：功能共識不等於各家使用相同資料庫、鎖、cursor 或 retry loop。single writer、deterministic key、checkpoint worklist 與 LangGraph offset inventory 目前都只是候選映射，尚未獲准進施工計畫；逐項官方 primitive、成熟框架覆蓋與未決選擇見 [`Memory 實作機制與成熟框架共識稽核`](./2026-09-02-memory-implementation-mechanism-and-framework-consensus-audit.md)。
+> **2026-09-02 底層機制校正**：功能共識不等於各家使用相同資料庫、鎖、cursor 或 retry loop。single writer、deterministic key、checkpoint worklist 與 LangGraph offset inventory 目前都只是候選映射，尚未獲准進施工計畫；逐項官方 primitive、成熟框架覆蓋與未決選擇見 [`Memory 實作機制與成熟框架共識稽核`](../../../../../specs/2026-09-02-memory-implementation-mechanism-and-framework-consensus-audit.md)。
 
-> **2026-09-02 最新切片候選校正**：[`Memory Foundation 最小垂直切片設計`](./2026-09-02-memory-foundation-vertical-slice-design.md) 已否決先前把完整 Semantic Memory collection 放進 Checkpointer 的候選，並重寫為 Store-first：Checkpointer 只承接 thread／run state，每份 JD 隔離的 PostgreSQL Store 承接完整來源與目前 Semantic Memory，再用極小對照實驗比較 LangMem core 與 Store manager。這是待 Owner 複核的 Caliburn 映射，不是跨廠商共同底層，也尚未授權 production 改造；本文 M1～M11 效果不因此改變。
+> **2026-09-02 最新切片候選校正**：[`Memory Foundation 最小垂直切片設計`](../../../../../specs/2026-09-02-memory-foundation-vertical-slice-design.md) 已否決先前把完整 Semantic Memory collection 放進 Checkpointer 的候選，並重寫為 Store-first：Checkpointer 只承接 thread／run state，每份 JD 隔離的 PostgreSQL Store 承接完整來源與目前 Semantic Memory，再用極小對照實驗比較 LangMem core 與 Store manager。這是待 Owner 複核的 Caliburn 映射，不是跨廠商共同底層，也尚未授權 production 改造；本文 M1～M11 效果不因此改變。
 
-> **2026-09-03 責任分層 reconciliation**：上段 2026-09-02 Store-first 切片候選已由 [`MEM-Q001`](../current-decisions.md) 的 Working Decision 取代。現行目標設計是：LangGraph Checkpointer 保存每份 JD 的完整員工↔顧問 conversation 與 graph／run／interrupt state；PostgreSQL Store 保存可修訂 Semantic Memory collection；每輪模型 Context 從兩者非破壞性地有界組裝，不另建重複的 employee-source 文字 leaf。這項 Working Decision 尚未越過 ADR 0060 授權 production 施工；本文 M1～M11 的產品效果契約不變。完整證據與方案比較見 [`2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md`](./2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md)。
+> **2026-09-03 責任分層 reconciliation**：上段 2026-09-02 Store-first 切片候選已由 [`MEM-Q001`](../current-decisions.md) 的 Working Decision 取代。現行目標設計是：LangGraph Checkpointer 保存每份 JD 的完整員工↔顧問 conversation 與 graph／run／interrupt state；PostgreSQL Store 保存可修訂 Semantic Memory collection；每輪模型 Context 從兩者非破壞性地有界組裝，不另建重複的 employee-source 文字 leaf。這項 Working Decision 尚未越過 ADR 0060 授權 production 施工；本文 M1～M11 的產品效果契約不變。完整證據與方案比較見 [`2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md`](../../../../../specs/2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md)。
 
 ## 1. 唯一目的
 
@@ -65,7 +65,7 @@ Memory 的價值只有一個：讓 LLM 在長訪談後，仍能取得形成與�
 
 > **反覆修正語意（2026-09-01；Owner 已確認，2026-09-02 校正實作邊界）**：每份 JD scope 具有一組彼此隔離、可持續修訂的 Semantic Memory。新員工訊息先進入耐久 conversation，再與少量可能相關的目前有效 Memory 比較：同一工作主題的新細節或明確更正修訂既有目前內容；可獨立搜尋與修訂的新工作主題建立新 Memory；重複或無關內容可以 no-op；條件／時點／案例不同或尚未釐清的矛盾不得被誤當覆蓋。正常召回只使用目前有效內容，舊說法至少可由 conversation 回查。是否另外保存 immutable revision history 由 substrate 能力與實際 audit／recovery 需求決定；它不是模型欄位，也不是第一切片的跨家共同硬要求。是否屬同一筆 Memory 以「能否獨立搜尋、理解與修訂」判斷，不依 Duty／Task／OPKS 分類。
 
-> **詳細設計進度（2026-09-01；2026-09-02 校正）**：Owner 已確認 A+ 作「單筆 Semantic Memory 的邏輯表徵」目前基線：可信 Store／Runtime metadata 與模型撰寫的 `title／topic＋rich self-contained content` 分離。A+ 不是完整 Memory 架構；物理 schema 與目前有效內容的持久映射仍待 framework 接線驗證，unknown／conflict 則由本節下方的產品語意規則補足。CAS 只在出現重疊 writer／lost update 時重開，inventory snapshot 只在全量盤點期間必須接受並行 mutation 時重開，不能從「仍待比較」誤讀成第一版必做。完整問題、限制與官方依據見 [Memory mapping §9.48](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 與[最小切片重驗](./2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md)。
+> **詳細設計進度（2026-09-01；2026-09-02 校正）**：Owner 已確認 A+ 作「單筆 Semantic Memory 的邏輯表徵」目前基線：可信 Store／Runtime metadata 與模型撰寫的 `title／topic＋rich self-contained content` 分離。A+ 不是完整 Memory 架構；物理 schema 與目前有效內容的持久映射仍待 framework 接線驗證，unknown／conflict 則由本節下方的產品語意規則補足。CAS 只在出現重疊 writer／lost update 時重開，inventory snapshot 只在全量盤點期間必須接受並行 mutation 時重開，不能從「仍待比較」誤讀成第一版必做。完整問題、限制與官方依據見 [Memory mapping §9.48](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 與[最小切片重驗](../../../../../specs/2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md)。
 
 > **Admission 詳細設計進度（2026-09-01）**：Owner 已確認採「職務目的導向 admission＋成熟 extraction／consolidation＋完整原始來源保底」，不採 generic `useful／noteworthy` 預設，也不把全部 transcript 複製成 Semantic Memory。
 >
@@ -105,7 +105,7 @@ Memory 的價值只有一個：讓 LLM 在長訪談後，仍能取得形成與�
 
 直接官方依據：[Anthropic Managed Agent Memory](https://platform.claude.com/docs/en/managed-agents/memory) 讓每次修改形成不可變版本，並提供可選 `content_sha256` precondition；[Google Memory Revisions](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/revisions) 將目前 consolidated Memory 與 revisions 分離、提供 rollback，也明示 revisions 可停用；[AWS ListMemoryRecords](https://docs.aws.amazon.com/bedrock-agentcore/latest/APIReference/API_ListMemoryRecords.html) 與 [LangGraph Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) 提供不同的 persistence／listing primitive，沒有相同 revision／CAS 保證。OpenAI 公開資料只足以確認 extraction／consolidation 分層，未公開 application Semantic Memory 的 current-head／revision 內部實作。
 
-版本、並行與重放的跨家機制差異，以及何時才需要 per-record CAS／operation receipt，見 [`2026-09-02-memory-versioning-concurrency-and-replay-research.md`](./2026-09-02-memory-versioning-concurrency-and-replay-research.md) 與[最小切片重驗](./2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md)。共同硬效果是 replay 不重複；CAS、receipt、immutable history 與 `scope generation` 都依實際觸發條件選用。
+版本、並行與重放的跨家機制差異，以及何時才需要 per-record CAS／operation receipt，見 [`2026-09-02-memory-versioning-concurrency-and-replay-research.md`](../../../../../specs/2026-09-02-memory-versioning-concurrency-and-replay-research.md) 與[最小切片重驗](../../../../../specs/2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md)。共同硬效果是 replay 不重複；CAS、receipt、immutable history 與 `scope generation` 都依實際觸發條件選用。
 
 ### 3.3 小型可重建導覽
 
@@ -296,7 +296,7 @@ Memory 只負責保存、修訂、搜尋、讀取與完整列舉工作資訊。�
 11. 來源處理、Memory 發布、召回、失敗、成本與延遲可觀察；
 12. 有可維護的正式版本政策。
 
-完整候選比較留在：[Memory mapping §9.41～§9.46](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md)。本文本身不預先採用任何候選；其下游 Owner 已核准的 Working Research 選型另見 [`2026-09-02-memory-framework-selection-revalidation.md`](./2026-09-02-memory-framework-selection-revalidation.md)，該選型不得反向降低本文契約。
+完整候選比較留在：[Memory mapping §9.41～§9.46](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md)。本文本身不預先採用任何候選；其下游 Owner 已核准的 Working Research 選型另見 [`2026-09-02-memory-framework-selection-revalidation.md`](../../../../../specs/2026-09-02-memory-framework-selection-revalidation.md)，該選型不得反向降低本文契約。
 
 ## 9. 已排除的提前假設
 

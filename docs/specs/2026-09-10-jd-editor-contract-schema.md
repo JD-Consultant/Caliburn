@@ -2,7 +2,7 @@
 
 2026-09-10；JD-R002/C03；**可審查的 JSON Schema SSOT 候選，不是 production contract 或施工許可。**Owner 已同意 Plate、持續工作稿、同一畫面、前景 AI 回應期間暫停手改，以及同一 PostgreSQL 內的 JD 文件 authority；真人交付核對與 HTML／DOCX 問答包已 PARKED，不在本契約。
 
-唯一 active 設計 schema 是 [`contracts/jd-editor-v2.schema.json`](contracts/jd-editor-v2.schema.json)，共 105 defs，對應 `format_version:2`／`jd-plate-clean-v2`；[v1 schema](contracts/jd-editor-v1.schema.json)與舊 probe 固定為歷史證據，不再生成新契約，也不安排資料搬移或雙寫。新語意及版本效力由[語意契約 v2](evidence/2026-09-10-jd-semantic-contract-closure.md)集中維護。
+唯一 active 設計 schema 是 [`contracts/jd-editor-v2.schema.json`](contracts/jd-editor-v2.schema.json)，共 105 defs，對應 `format_version:2`／`jd-plate-clean-v2`；[v1 schema](contracts/jd-editor-v1.schema.json)與舊 probe 固定為歷史證據，不再生成新契約，也不安排資料搬移或雙寫。新語意及版本效力由[語意契約 v2](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)集中維護。
 
 本契約依 [contract strategy](../contract-strategy.md)採 JSON Schema Draft 2020-12、封閉物件及 `$defs`；未複製到 `packages/job-analysis-contract`，也未生成或手改 Python／TypeScript DTO。隔離接線依 [六切片計畫](../plans/2026-09-10-jd-editor-core-implementation.md)消費同一經審定 SSOT，本輪語意契約閉合後再恢復 Task 1。production 切換另須 ADR 0073 Accepted、有限 Memory authority 正式化與 implementation gate，才把審定內容移入既有 contract package 的單一 SSOT，再由 codegen 產生兩端型別並跑 schema diff／consumer tests；隔離驗收不代替此 gate。
 
@@ -22,7 +22,7 @@
 
 ## 2. clean document 與 profile 分工
 
-`JdDocumentValue` 是非空 root array，root 只允許一般 body 或 `jd_section`。原有文字、classic list、表格及 `hr` grammar 沿正式 profile。v2 的 Task 至少有一個 body，並恰有一個 `jd_outcomes`、一個 `jd_requirements` 直屬群組；各組以 body 承載多項內容，未知可保留空 p。`jd_knowledge`／`jd_skill` 是完整項目，只能直屬相應 knowledge／skills section；不把任意段落或 cell ID 當作項目。完整 grammar 與合法位置見[語意契約 §2](evidence/2026-09-10-jd-semantic-contract-closure.md#2-最小完整文件結構)。
+`JdDocumentValue` 是非空 root array，root 只允許一般 body 或 `jd_section`。原有文字、classic list、表格及 `hr` grammar 沿正式 profile。v2 的 Task 至少有一個 body，並恰有一個 `jd_outcomes`、一個 `jd_requirements` 直屬群組；各組以 body 承載多項內容，未知可保留空 p。`jd_knowledge`／`jd_skill` 是完整項目，只能直屬相應 knowledge／skills section；不把任意段落或 cell ID 當作項目。完整 grammar 與合法位置見[語意契約 §2](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md#2-最小完整文件結構)。
 
 Schema 同時封閉 profile 的有限 props；僅 Task 可保存有序、不重複的 `knowledge_ids`／`skill_ids`，省略或空陣列均無連線。App／Node 另驗所有 Element ID 全文件唯一、同文件同 revision 的 K／S 端點及種類、numeric 與 HTML span 值一致、table 合法 grid、source ref 的 owner／scope／window、current target 是否仍屬 head，以及 normalization 後重開是否穩定。shape 通過不等於引用完整；反向集合由同版 outgoing links 推導，不存第二份可編關係，也不另建 domain normalizer。
 
@@ -56,7 +56,7 @@ Schema 同時封閉 profile 的有限 props；僅 Task 可保存有序、不重�
 
 v2 將模型 properties／unset 與 `JdResolvedEditableProperties`／`JdResolvedUnsettableProperty` 分開；`JdPropertyUpdateConstraint` 與 `JdResolvedPropertyUpdateConstraint` 分別按 refs／IDs 欄名拒絕 set／unset 交集。Task links 的 set 替換整組，`[]` 清空，unset 移除欄位，省略保留；App 仍核同一不變量。模型仍不接受 attributes；numeric span、來源保留及移除依[工具 §4.3](2026-09-10-jd-app-tool-contract.md#43-單一輸入意圖與機械映射)，不新增通用屬性引擎或來源庫。
 
-每次首次建立的兩階段均各自原子；第一步成功後的未連結稿合法，第二步失敗不撤銷第一步，unknown 必先對帳再續作。移除必需群組、取消 Task、刪／unwrap 被引用 K／S，須符合整批最終候選規則，不自動攤平或解除關係；精確順序及失敗出口統一見[語意契約 §3–5](evidence/2026-09-10-jd-semantic-contract-closure.md#3-共同編輯與引用邊界)。
+每次首次建立的兩階段均各自原子；第一步成功後的未連結稿合法，第二步失敗不撤銷第一步，unknown 必先對帳再續作。移除必需群組、取消 Task、刪／unwrap 被引用 K／S，須符合整批最終候選規則，不自動攤平或解除關係；精確順序及失敗出口統一見[語意契約 §3–5](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md#3-共同編輯與引用邊界)。
 
 正式 tool description 固定取各 `*ModelInput.description`，command／參數说明也保存在同一 SSOT。Task 3 factory 與 model-view 不能另寫不一致版本；正式說明有傳到 SDK 不等於自然模型操作已驗證。
 
@@ -90,7 +90,7 @@ Browser 選取不是第四個模型工具。UI 有 dirty 內容時先完成同�
 
 補正後的 `JdWriteResult` 以[工具 §6.1](2026-09-10-jd-app-tool-contract.md#61-狀態與下一步的封閉關係)強制 status×next_action。operation 已綁而 receipt 未確認，優先 `reconcile_operation`，即使 effect 已知 unchanged；confirmed 必有 operation，busy 不配 operation。六種確定 failure／busy 的 result／change refs 為 null，unknown 也不能先聲稱結果版；conflict projection 可指原回執，mapper 須核確實來自同一原操作。no_change 的 native_operations 為 null、affected IDs 為空；base=result=actual before=actual after 的跨值等式由 mapper／交易驗證，不謊稱 schema 能比較 opaque refs。
 
-`JdReadFailure` 新增 read_failed，與 unsupported_content 均只允許 stop；invalid_input／target_missing／busy 的動作各依唯讀矩陣。讀取失敗不配 operation、不當成文件空白。程序／交易／receipt 的單次 attempt、取消、控制預算及恢復責任依[ER03 附件](evidence/2026-09-10-jd-error-recovery-contract-closure.md)；這不是新增 retry 工具。
+`JdReadFailure` 新增 read_failed，與 unsupported_content 均只允許 stop；invalid_input／target_missing／busy 的動作各依唯讀矩陣。讀取失敗不配 operation、不當成文件空白。程序／交易／receipt 的單次 attempt、取消、控制預算及恢復責任依[ER03 附件](../experiments/legacy-evidence/2026-09-10-jd-error-recovery-contract-closure.md)；這不是新增 retry 工具。
 
 commit 後遺失 ToolMessage 時，runtime 先停止並確認 writer 已停，再查同 operation receipt，只補缺失且匹配原 `tool_call_id` 的 ToolMessage。已存在結果不重複；沒有已發配 JD operation 的純訪談 turn 不查 receipt。仍 unknown 時不解鎖、不配新 operation、不讓模型重寫。這是 JD 專屬接線；現行隔離 runtime 的一般 cancel／Memory repair 尚未自然涵蓋。
 
@@ -196,11 +196,11 @@ Browser 人工保存輸入：
 
 ## 7. 有限驗證與未涵蓋範圍
 
-本候選 v2 共 105 defs；語意 grammar、refs／IDs 分流、read 投影及本次有限驗證的實際結果集中於[語意契約 §6–7](evidence/2026-09-10-jd-semantic-contract-closure.md#6-有限工作與通過條件)。定義編譯與固定反例不代表原生、保存或自然模型通過。
+本候選 v2 共 105 defs；語意 grammar、refs／IDs 分流、read 投影及本次有限驗證的實際結果集中於[語意契約 §6–7](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md#6-有限工作與通過條件)。定義編譯與固定反例不代表原生、保存或自然模型通過。
 
-v1 補正前 85 defs 的驗證記錄，及補正後 86 defs／property constraint／參數與結果限制的[封存驗證紀錄](evidence/jd-contract-closure/README.md)，均保持原始效力；前者對應[補正前完整快照](evidence/jd-contract-closure/schema-before.json)。它們是歷史契約證據，不把舊 hash 或結果回填 v2。
+v1 補正前 85 defs 的驗證記錄，及補正後 86 defs／property constraint／參數與結果限制的[封存驗證紀錄](../experiments/legacy-evidence/jd-contract-closure/README.md)，均保持原始效力；前者對應[補正前完整快照](../experiments/legacy-evidence/jd-contract-closure/schema-before.json)。它們是歷史契約證據，不把舊 hash 或結果回填 v2。
 
-F02 完整 r2 [`F02-A-canonical-input.json`](evidence/jd-official-profile-probe/results/2026-09-09T16-26-50-933Z/F02-A-canonical-input.json)仍是 v1 的 canonical 內容基線，不能直接冒充有兩個專屬群組的 v2 fixture。新 fixture 須在新證據中明列固定內容對應與呈現變更，不改原封存，也不稱通用 migration；較早 raw fixtures 的舊 list／metadata 仍不能冒充 clean value。
+F02 完整 r2 [`F02-A-canonical-input.json`](../experiments/legacy-evidence/jd-official-profile-probe/results/2026-09-09T16-26-50-933Z/F02-A-canonical-input.json)仍是 v1 的 canonical 內容基線，不能直接冒充有兩個專屬群組的 v2 fixture。新 fixture 須在新證據中明列固定內容對應與呈現變更，不改原封存，也不稱通用 migration；較早 raw fixtures 的舊 list／metadata 仍不能冒充 clean value。
 
 本完整 Draft 2020-12 schema **不直接宣稱等於 provider 的 strict tool parameters**。CT49–51 的隔離 runtime 由 LangChain `create_agent` 接 `BaseTool`，現行顧問未設定 strict，因此一般工具是 `strict=None`，不是已驗的嚴格契約。本地固定版 [`_convert_json_schema_to_openai_function`](../../.worktrees/analysis-only-agent/experiments/analysis-agent/.venv/Lib/site-packages/langchain_core/utils/function_calling.py) 會先 dereference 再移除 `$defs`；[`dereference_refs`](../../.worktrees/analysis-only-agent/experiments/analysis-agent/.venv/Lib/site-packages/langchain_core/utils/json_schema.py) 遇遞迴 ref 會停止展開。故把本候選直接塞進 `BaseTool.args_schema` 再交 converter，可能把遞迴 new-element 分支剪成空約束，`strict=False` 也不修這個序列化問題。
 
@@ -208,11 +208,11 @@ F02 完整 r2 [`F02-A-canonical-input.json`](evidence/jd-official-profile-probe/
 
 這是固定三工具的 provider renderer，不是通用 schema compiler；其抽取結果須由同一 schema 在 codegen／no-diff 檢查中重生，不能手寫第二份權威。`strict:false` 承認 provider 不保證 shape 的代價，也不是跨廠共識或永久偏好。要切 `strict:true`，須先證明由同一 SSOT 產生符合固定 OpenAI／Anthropic subset 的機械 projection，並驗實際 provider wire。
 
-v1 補正前的[零網路 SDK 序列化觀測](evidence/jd-contract-schema/provider-wire-README.md)保留原 schema 與 placeholder description 的有界結論；原始 `$ref` 4／61／4 及 hash 不改。v1 [補正後核對](evidence/jd-contract-closure/README.md)使用 LangChain 1.4.0／core 1.6.2／langchain-openai 1.6.0／OpenAI 3.8.0，捕捉當時 schema 和正式說明。
+v1 補正前的[零網路 SDK 序列化觀測](../experiments/legacy-evidence/jd-contract-schema/provider-wire-README.md)保留原 schema 與 placeholder description 的有界結論；原始 `$ref` 4／61／4 及 hash 不改。v1 [補正後核對](../experiments/legacy-evidence/jd-contract-closure/README.md)使用 LangChain 1.4.0／core 1.6.2／langchain-openai 1.6.0／OpenAI 3.8.0，捕捉當時 schema 和正式說明。
 
-v2 的[獨立 wire 腳本](evidence/jd-semantic-contract-probe/provider-wire-v2.py)沿同一 SDK 組合，以 MockTransport 捕捉[完整 request](evidence/jd-semantic-contract-probe/provider-wire-v2-captured.json)；[實際結果](evidence/jd-semantic-contract-probe/provider-wire-v2-results.json)確認三工具參數／正式說明與 active SSOT 全等，新的群組、模型 refs／set-unset 限制送達，resolved IDs 未暴露為模型參數。初次探針錯認預期 HTTP 400 的 SDK 包裝例外名，修正 assertion 後通過，沿革保留於結果。這只證明 SDK 序列化；零網路、零工具執行，沒有驗 ReadTarget 實際回覆、真 provider 接受、自然模型品質或 production 接通。
+v2 的[獨立 wire 腳本](../experiments/legacy-evidence/jd-semantic-contract-probe/provider-wire-v2.py)沿同一 SDK 組合，以 MockTransport 捕捉[完整 request](../experiments/legacy-evidence/jd-semantic-contract-probe/provider-wire-v2-captured.json)；[實際結果](../experiments/legacy-evidence/jd-semantic-contract-probe/provider-wire-v2-results.json)確認三工具參數／正式說明與 active SSOT 全等，新的群組、模型 refs／set-unset 限制送達，resolved IDs 未暴露為模型參數。初次探針錯認預期 HTTP 400 的 SDK 包裝例外名，修正 assertion 後通過，沿革保留於結果。這只證明 SDK 序列化；零網路、零工具執行，沒有驗 ReadTarget 實際回覆、真 provider 接受、自然模型品質或 production 接通。
 
-依 2026-09-10 查閱的 [OpenAI strict mode](https://developers.openai.com/api/docs/guides/function-calling#strict-mode)、[OpenAI Structured Outputs subset](https://developers.openai.com/api/docs/guides/structured-outputs)及 [Anthropic strict tool use](https://platform.claude.com/docs/en/agents-and-tools/tool-use/strict-tool-use)，兩家都建議能用時採 strict，但支持的 schema subset 不是完整 Draft 2020-12。完整官方對照與版本效力集中在[既有證據 §2.13](evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)；本附件不重複推測 provider 內部。
+依 2026-09-10 查閱的 [OpenAI strict mode](https://developers.openai.com/api/docs/guides/function-calling#strict-mode)、[OpenAI Structured Outputs subset](https://developers.openai.com/api/docs/guides/structured-outputs)及 [Anthropic strict tool use](https://platform.claude.com/docs/en/agents-and-tools/tool-use/strict-tool-use)，兩家都建議能用時採 strict，但支持的 schema subset 不是完整 Draft 2020-12。完整官方對照與版本效力集中在[既有證據 §2.13](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)；本附件不重複推測 provider 內部。
 
 Schema 不替代以下整合驗收：完整 r2＋正式 list/table plugins、source owner 的真實 scope/window、ID 全文件唯一與 cross-field table span、Node normalization／重開、operation binding／receipt 對帳、manual dirty save／AI writer admission、同畫面 renderer 與真模型 JD 品質。history reference 必為 read-only、current target 必綁仍為 head 的 base、同批 refs 同 revision、no-change 的 before＝after、continuation 固定原 read，以及本批明示來源經既有 owner 驗證／未改舊 refs 保留等不變量，均由 App 以實際 owner／保存資料驗證；schema 本身不保證。它沒有 pending／accepted、handoff、HTML、DOCX、export、登入、ACL、RAG 或第二 Agent。
 

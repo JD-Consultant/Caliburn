@@ -7,7 +7,7 @@
 - Current stage：完整成品已獲 Owner 實作授權；隔離核心 Task 1 起跑，R2／R3 並行閉合。
 - Binding decisions：目前這台電腦、單一操作者、App 內多文件；建立／暫定命名／更名／列表／封存／恢復；保留 JD、訪談、Memory、歷史。Plate OSS、format 2／`jd-plate-clean-v2`、同畫面唯一工作稿、唯讀確切歷史與差異；沒有逐筆接受／拒絕。前景 AI 含純訪談均暫停手改，非每輪改稿。
 - 唯一問題：員工遇到未保存、回覆遺失、取消、切文件、重開或封存時，是否都有真實且可操作的出口，並能讀懂完整 v2 的關係與改動？
-- 已讀：[register](../current-decisions.md)、[decision process](../decision-process.md)、[主接線設計 §5–7](2026-09-09-jd-editor-app-integration-design.md)、[六切片 Task 4–5](../plans/2026-09-10-jd-editor-core-implementation.md)、[profile](2026-09-10-jd-plate-document-profile.md)、[語意 v2](evidence/2026-09-10-jd-semantic-contract-closure.md)、[contract strategy](../contract-strategy.md)，及隔離 `analysis_agent/api.py`／`service.py`／`catalog.py` 現行接點。
+- 已讀：[register](../current-decisions.md)、[decision process](../decision-process.md)、[主接線設計 §5–7](2026-09-09-jd-editor-app-integration-design.md)、[六切片 Task 4–5](../plans/2026-09-10-jd-editor-core-implementation.md)、[profile](2026-09-10-jd-plate-document-profile.md)、[語意 v2](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)、[contract strategy](../contract-strategy.md)，及隔離 `analysis_agent/api.py`／`service.py`／`catalog.py` 現行接點。
 - PARKED：永久刪除、匯出、真人交付、其他電腦安裝、雲端／多人、離線同步、通用草稿合併／rebase／歷史還原引擎、Memory 重設計、自然模型付費驗收。
 
 以下 **F** 是直接官方事實、**E** 是既有 code／probe 證據、**D** 是 Caliburn 有限映射、**V** 是待實作驗收。未列新的 Owner 產品選擇；名稱微調沿「工作執行要求」暫用。
@@ -20,7 +20,7 @@
 | F：[WHATWG BeforeUnloadEvent](https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-beforeunloadevent-interface)、[Mozilla beforeunload](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event)；查閱 2026-09-10，HTML 頁標示更新 2026-09-08 | 有使用者互動時可請 browser 提示離開；字句由 browser 決定、事件不保證所有關閉情境執行。D：未保存時才裝 listener；不能承諾強制關閉／斷電後找回普通 dirty，也不在 unload 偷做保存。 |
 | F：[Chrome Page Lifecycle](https://developer.chrome.com/docs/web-platform/page-lifecycle-api)、[Mozilla AbortController.abort](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort)；查閱 2026-09-10，內建 Web API | 頁面可被 freeze／discard；abort 中止 browser 請求或讀取，不證明服務端工作停止或交易回滾。D：重開及恢復頁面先查 authoritative state；「停止顧問」必須走現有 stop／join／receipt 流程。 |
 | F：[AWS safe retries](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)；查閱 2026-09-10，公開設計文章 | caller request identity、相同身分／不同參數的衝突、原子記錄是防重原則；不規定本案 schema 或永久保存策略。D：create identity 留在既有 catalog row；因本版不刪文件，生命週期隨該 row 保留，不另造通用 receipt 系統。 |
-| E：[固定 Plate profile／來源與授權](2026-09-10-jd-plate-document-profile.md#1-固定引擎與官方插件)、[F03](evidence/jd-semantic-native-probe/README.md) | 沿 Plate 53.3.11、diff 53.0.0、list-classic 53.0.0、table 53.0.9、React 19.2.4 與 exact lock。核心等 MIT；diff 原衍生碼 Apache-2.0、修改部分 Apache-2.0／MIT。既有盤點已核授權，不升版、不採付費 kit。F03 不是 DOM 或正式 copy adapter 已過。 |
+| E：[固定 Plate profile／來源與授權](2026-09-10-jd-plate-document-profile.md#1-固定引擎與官方插件)、[F03](../experiments/legacy-evidence/jd-semantic-native-probe/README.md) | 沿 Plate 53.3.11、diff 53.0.0、list-classic 53.0.0、table 53.0.9、React 19.2.4 與 exact lock。核心等 MIT；diff 原衍生碼 Apache-2.0、修改部分 Apache-2.0／MIT。既有盤點已核授權，不升版、不採付費 kit。F03 不是 DOM 或正式 copy adapter 已過。 |
 | E：隔離 API／catalog，2026-09-10 唯讀核對 | create 只有 title、每次新 UUID，尚無防重；run 有 `(document_id, request_key)` 唯一性，但 digest 只含 text。DocumentOutput 只有 id/title/created_at；無封存、更名、單文件 metadata 查詢。這些是新增接點的具體原因。 |
 
 本輪不引入新的 LLM 機制。顧問、人工變更通知與來源依[OpenAI／Anthropic 既有官方接點研究](2026-09-10-jd-context-change-and-source-research.md)及 Task 3.3a；本稿只閉合 Web／App 入口。Web API 無需新增套件或商業授權；上述是查閱日的規格，不宣稱所有 browser 版本均已測過。
@@ -187,7 +187,7 @@ K／S 的連線變更有可讀 before／after 清單；共享 item 變更的相�
 
 **Decision / finding：**R2／R3 可用原生 browser、既有 catalog／run identity、同一保存 gate 及有限 JD renderer 閉合；新增 create 防重、metadata conditional command、唯讀 chat request lookup，沒有新增 AI 機制或第二 authority。
 
-**Status：**有限 G4 設計已通過主線獨立review，PDR-01／03閉合，§9已納回六切片；[審查證據](evidence/2026-09-10-jd-product-baseline-review.md)。實作、DOM、資料恢復、自然模型及員工試用未驗。
+**Status：**有限 G4 設計已通過主線獨立review，PDR-01／03閉合，§9已納回六切片；[審查證據](../experiments/legacy-evidence/2026-09-10-jd-product-baseline-review.md)。實作、DOM、資料恢復、自然模型及員工試用未驗。
 
 **Why / sources：**新缺口由現行 API／catalog 與已核准旅程逐項對照，官方只核 browser lifecycle／storage／idempotency；正文 §2 與既有 profile／context 責任文件提供證據，無新廣搜議題。
 

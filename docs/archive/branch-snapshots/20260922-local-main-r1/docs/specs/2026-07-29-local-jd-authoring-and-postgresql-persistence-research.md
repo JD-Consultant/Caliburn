@@ -38,10 +38,10 @@
 
 - [專業顧問流程 final red-team](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)
 - [LLM architecture red-team](2026-07-25-professional-job-analysis-consultant-llm-architecture-red-team.md)
-- [Task／Proposal／Context v1 研究](2026-07-28-task-boundary-merge-split-and-identity-research.md)
+- [Task／Proposal／Context v1 研究](../../../../../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)
 - [Task Analysis Engine](../design/task-analysis-engine.md)
-- [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
-- [ADR 0042](../adr/0042-r1-screening-stop-and-a6-first-version-default.md)
+- [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
+- [ADR 0042](../../../../../adr/0042-r1-screening-stop-and-a6-first-version-default.md)
 
 ### 2.2 必須修正的舊文件
 

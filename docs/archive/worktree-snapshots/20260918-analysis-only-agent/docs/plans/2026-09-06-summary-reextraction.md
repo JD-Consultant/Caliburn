@@ -50,7 +50,7 @@ Files（相對 experiments/analysis-agent）：
 - Preflight：已回讀最新 register、process、接法稿、OpenAI source、Memory 設計及實作；Task1各檔案緊密耦合，主 agent 連續 TDD，Task2依賴完成結果；交付前獨立 reviewer。沒有新產品選擇。
 - Baseline：189 passed／20 skipped（尚未注入專用 PG DSN）。
 - Task1：最初8個 missing-feature RED；實作後基本接線 GREEN。新增2個 RED 揭露跨工作重送需查 receipt，以及模型正文不能混入 runtime context header；已修正並 GREEN。來源 header 增明確空值／結束界線，舊實驗格式可讀但不猜測來源重抽；不搬移舊資料。
-- Task2：已增加2個真 PG 斷線重建用例，第一輪全 suite 222 passed／0 skipped；又補案例更正回查與 stale 用例，最新 focused 13 passed。最後 suite／獨立 review 結果見 [results](../specs/2026-09-06-summary-reextraction-results.md)，此處不重複維護最終數字。
+- Task2：已增加2個真 PG 斷線重建用例，第一輪全 suite 222 passed／0 skipped；又補案例更正回查與 stale 用例，最新 focused 13 passed。最後 suite／獨立 review 結果見 [results](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-06-summary-reextraction-results.md)，此處不重複維護最終數字。
 - Publication operation 由文件／來源／immutable artifact 地址決定，沿既有 receipt 對帳；模型不填新欄位，無新表。這是既有協調的延伸，不冒稱 OpenAI 原碼。
 - 獨立 review R1/R2：先重現2 RED，修正文偽裝舊header及放寬context造成重新選窗；focused70 GREEN。最終全 suite **226 passed／0 skipped／28.00秒**；compileall／offline lock／diff check通過，獨立限定複核 R1/R2 CLOSED。
 - Task1／Task2 complete：僅保存本切片 commit/tag；不 merge/push，不開始 API/UI/排程/JD。內容／限制／後續路由見 results。

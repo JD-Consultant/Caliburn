@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
-- Durable authority 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
-- 共用目前 JD 與語意核准：[ADR 0069](../adr/0069-shared-current-jd-working-copy-and-semantic-approval.md)；它取代 ADR 0066／0067 的雙主編輯面、`defer`、review blocker 與 direct-edit conflict 部分，保留 Store-backed workspace、derived review 與 approved-only export
+- Durable authority 決策：[ADR 0060](../../../../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
+- 共用目前 JD 與語意核准：[ADR 0069](../../../../../adr/0069-shared-current-jd-working-copy-and-semantic-approval.md)；它取代 ADR 0066／0067 的雙主編輯面、`defer`、review blocker 與 direct-edit conflict 部分，保留 Store-backed workspace、derived review 與 approved-only export
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 現行 production runtime 是一位 AI 職務分析顧問：它以目前焦點帶領訪談、吸收背景線索，並在員工與 AI 共用的一份持久「目前 JD」中持續整理 Duty、Task 與 O／P／K／S。底層另保留只讀的核准基線作部分接受、拒絕還原與匯出 authority；員工只操作目前 JD，AI 差異仍須員工接受、修改後接受或拒絕才會進入核准基線。

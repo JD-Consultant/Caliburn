@@ -37,7 +37,7 @@
 
 ## 5. 演練結果（2026-09-14）
 
-[演練腳本](evidence/jd-backup-restore/backup_restore_drill.py)、[紀錄](evidence/jd-backup-restore/drill.json)。對象是一個真的安裝（含一次真訪談留下的對話），用容器內與伺服器同版的 `pg_dump 18.6` 備份，還原到**新建的空資料庫**——沒有 drop、沒有覆蓋、沒有清 volume，零 provider。
+[演練腳本](../experiments/legacy-evidence/jd-backup-restore/backup_restore_drill.py)、[紀錄](../experiments/legacy-evidence/jd-backup-restore/drill.json)。對象是一個真的安裝（含一次真訪談留下的對話），用容器內與伺服器同版的 `pg_dump 18.6` 備份，還原到**新建的空資料庫**——沒有 drop、沒有覆蓋、沒有清 volume，零 provider。
 
 | 檢查 | 結果 |
 |---|---|

@@ -102,4 +102,4 @@ ADR 0069 已把員工從「正式 editor＋AI draft editor」收斂到一個共�
 - [RFC 9110 — `If-Match`](https://www.rfc-editor.org/rfc/rfc9110.html#name-if-match)
 - [Kubernetes — Garbage collection](https://kubernetes.io/docs/concepts/architecture/garbage-collection/)
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)
-- [ADR 0048 — OPKS evidence axes and document-level competencies](0048-opks-evidence-axes-and-document-level-competencies.md)
+- [ADR 0048 — OPKS evidence axes and document-level competencies](../../../../branch-snapshots/20260922-local-main-r1/docs/adr/0048-opks-evidence-axes-and-document-level-competencies.md)

@@ -871,7 +871,7 @@ Owner 再次確認：本文討論過的方案、現行 code、Accepted ADR 的�
 
 #### 14.9.1 先更正一個已過時的 Pydantic AI 前提
 
-[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 當時檢查的 Pydantic AI Harness Planning 0.13.0 缺少本產品所需的 stable identity、subtask dependency 與 durable store。最新版官方 [Pydantic AI Harness Planning](https://pydantic.dev/docs/ai/harness/planning/) 已經不同：
+[ADR 0060](../../../../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 當時檢查的 Pydantic AI Harness Planning 0.13.0 缺少本產品所需的 stable identity、subtask dependency 與 durable store。最新版官方 [Pydantic AI Harness Planning](https://pydantic.dev/docs/ai/harness/planning/) 已經不同：
 
 - granular operation 使用 stable task ID；
 - 可選 subtasks、dependency、cycle rejection 與 `blocked`；
@@ -1227,7 +1227,7 @@ Owner 進一步澄清：工作理解不只要「記得完整語意」，還要�
 - O*NET 於 2025 年發布的 [Identification of Emerging Tasks: Revised Approach](https://www.onetcenter.org/dl_files/EmergingTasks_RevisedApproach.pdf) 先收集 incumbents／occupational experts 的 write-in statements，再由分析師區分 non-task、既有 Task 的 duplicate／overlap 與新內容；有重疊的多筆敘述會先找共通與差異，再抽取 action、object、purpose/result、enabler、context 來形成新 Task 或修訂既有 Task。官方明定目標是「足夠廣，能涵蓋敘述中的一般活動；又足夠具體，能準確描述所含行為」，並排除只適用單一職位、過度狹窄的敘述。這是本輪最直接的權威佐證。
 - [O*NET 2026 Web and Digital Interface Designers](https://www.onetonline.org/link/details/15-1255.00) 的正式 Task 也是「Design, build, or maintain Web sites」「Conduct user research to determine design requirements」這類角色層級工作，而不是把某位任職者做過的網站 A、網站 B 各列一條。
 - [LangGraph Memory](https://docs.langchain.com/oss/python/concepts/memory) 區分 semantic memory（目前事實／概念）與 episodic memory（經驗／事件）。這支持在 Context 與檢索時區分「發生過的具體案例」和「目前歸納出的工作模式」，但不要求 Caliburn 建兩個資料庫或兩個 writer；兩者仍屬同一份工作理解 authority。
-- repo 既有 [`2026-07-25 professional consultant red-team`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md) 已確認 Story／Event／Work Unit／Task 不是一對一：故事提供深度，跨故事整併才判斷 add／edit／merge／split／no-op／clarify。本節是把該專業原則落到長訪談記憶形狀，不是另創一套 Task-first pipeline。
+- repo 既有 [`2026-07-25 professional consultant red-team`](../../../20260918-shared-current-jd/docs/specs/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md) 已確認 Story／Event／Work Unit／Task 不是一對一：故事提供深度，跨故事整併才判斷 add／edit／merge／split／no-op／clarify。本節是把該專業原則落到長訪談記憶形狀，不是另創一套 Task-first pipeline。
 
 外部資料沒有替 Caliburn 規定欄位名稱或保證 LLM 能自動做對所有歸納；以下 shape 是把 OPM／O*NET 的工作分析方法、LangGraph 的成熟 memory primitive 與本產品單一員工 authority 結合後的產品推論。
 
@@ -2655,7 +2655,7 @@ Owner 於 2026-08-30 取代本節較早的「第一版僅 lexical／structured r
 
 ### 16.10 窄 spike：先驗證效果與相容，不做正式 eval 或 production migration
 
-> **2026-08-29 實驗結果：** 已完成一次成本封頂的 compatibility／quality probe；現行 adapter 與 Luna medium 相容，固定 synthetic transcript 的細節保留、更正、未知與一次性事件行為通過，但 source／checkpoint rollback／JIT retrieval 尚未驗證。完整證據、成本與限制見 [`2026-08-29-langmem-domain-semantic-memory-spike-experiment.md`](2026-08-29-langmem-domain-semantic-memory-spike-experiment.md)。
+> **2026-08-29 實驗結果：** 已完成一次成本封頂的 compatibility／quality probe；現行 adapter 與 Luna medium 相容，固定 synthetic transcript 的細節保留、更正、未知與一次性事件行為通過，但 source／checkpoint rollback／JIT retrieval 尚未驗證。完整證據、成本與限制見 [`2026-08-29-langmem-domain-semantic-memory-spike-experiment.md`](../../../../../specs/2026-08-29-langmem-domain-semantic-memory-spike-experiment.md)。
 
 這次新研究已構成做 spike 的合理理由：
 

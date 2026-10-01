@@ -23,8 +23,8 @@
 > | C-05 | §16 | 「Event Sourcing」改為「不做以事件為唯一真相、靠 replay 重建 Current State 的完整 Event Sourcing」，允許同交易的 append-only Consultation Journal |
 >
 > 原文一律保留並就地標記，**不得據被否決的原文實作**。依據見
-> [R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、§3.5、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
+> [R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、§3.5、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
 
 ---
 
@@ -1921,8 +1921,8 @@ Skill 是可執行的能力，例如：
 > > 同交易附帶 append-only Consultation Journal。Journal 不被要求足以重建 Current State；
 > > prompt／context／model 的比較重播由 runtime 之外的 eval capture artifacts 負責。
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.5、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 18–22。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.5、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 18–22。
 > 以下原文保留供追溯，**該項不得據原文實作**。
 
 第一版不做：
@@ -2073,8 +2073,8 @@ Task 實驗時保留一個簡單單 Agent baseline，在相同：
 > 且 Task 邊界品質（precision／recall、merge/split correctness）必須有預先定義的實質改善；
 > 若只是持平，選較簡單的 baseline／較少呼叫的架構。可診斷性與員工修改負擔只作加分，
 > 不得單獨替較複雜的架構取得通行證。**
-> 依據：[修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.2、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 9–10。
+> 依據：[修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.2、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 9–10。
 
 ~~推薦架構只有在以下至少一項實質改善、且沒有 critical regression 時才值得保留：~~ ←【C-02 已修正】
 

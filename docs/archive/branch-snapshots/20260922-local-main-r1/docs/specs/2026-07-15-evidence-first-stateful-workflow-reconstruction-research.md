@@ -12,7 +12,7 @@
 > 實作指示都已被
 > [`2026-07-16-interview-ai-vnext-greenfield-architecture.md`](2026-07-16-interview-ai-vnext-greenfield-architecture.md)
 > 與
-> [`../plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../plans/2026-07-16-interview-ai-vnext-implementation-plan.md)
+> [`../plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../../../../../plans/2026-07-16-interview-ai-vnext-implementation-plan.md)
 > 取代。v3 只作黑箱 baseline／暫時 fallback；portable eval/capture 資產繼續使用。
 
 ---

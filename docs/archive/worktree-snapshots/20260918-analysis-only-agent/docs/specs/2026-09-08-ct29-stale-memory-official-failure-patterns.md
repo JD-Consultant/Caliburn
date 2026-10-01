@@ -4,11 +4,11 @@
 
 ## 1. 決策題與既有證據
 
-承接[CT28結果與完整證據](2026-09-08-ct28-live-repair-context-contrast.md)，本輪只回答：OpenAI／Anthropic是否公開處理過相近失敗，以及本案還缺哪個診斷？不重開Memory分層、B段落通知＋字量後備、低資訊量先累積、C即時修補等已核准方向。不讀已排除的2026-08-12大長稿，不以舊production架構約束隔離實驗。
+承接[CT28結果與完整證據](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct28-live-repair-context-contrast.md)，本輪只回答：OpenAI／Anthropic是否公開處理過相近失敗，以及本案還缺哪個診斷？不重開Memory分層、B段落通知＋字量後備、低資訊量先累積、C即時修補等已核准方向。不讀已排除的2026-08-12大長稿，不以舊production架構約束隔離實驗。
 
 **Observed：**CT28失敗A2首請求的當前guide已含「每月10日前」與正文／詳記地址；可見歷史又有AI確認「每月5日前」的回答。本輪再次更正時，A2回答5日但0工具、Memory仍10日。同提示／工具的A1短context能自然讀取、修補。可以排除「10日完全沒有傳入該次請求」，**不能宣稱模型確實注意到、理解為待修補，也不能從opaque推測它如何思考**。日期出現在導覽關鍵詞，不等於完整正文已讀取。
 
-既有CT25早已要求聊天確認不能代替保存，並非本輪才找到這個漏項。完整提示及歷史防錯目的見[CT25§7](2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md#7-核准接線按錯誤類型整理不逐個bug堆句子)；原CT28證據SHA256仍為`6718b012c0d56ce7b82a7f7ce5bd8920c5b8b799ec44df588aabdff256210d6f`。
+既有CT25早已要求聊天確認不能代替保存，並非本輪才找到這個漏項。完整提示及歷史防錯目的見[CT25§7](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md#7-核准接線按錯誤類型整理不逐個bug堆句子)；原CT28證據SHA256仍為`6718b012c0d56ce7b82a7f7ce5bd8920c5b8b799ec44df588aabdff256210d6f`。
 
 ## 2. 官方事實：相近問題、實際處理與限制
 
@@ -34,7 +34,7 @@
 | 工具回饋及恢復 | `status=applied`才確認發布；失敗不發布、可重讀重試。CT28 A1實際走過失敗→重讀→成功 | patch恢復能走通；A2是零工具，沒有進入patch執行器，不以放寬匹配解釋漏選 |
 | 延續中的完成狀態判斷 | 舊可見回答說5日，當前guide仍10日；與opaque一起存在 | **Inference候選**：舊回答／延續使模型把更正當成已完成。還可能有其他context或隨機因素，不能直接定因 |
 
-框架接點沿用[CT27§6](2026-09-08-ct27-live-repair-no-call-evidence-review.md#6-owner同意a追問sandbox介面差異與是否學習)與[CT28§1](2026-09-08-ct28-live-repair-context-contrast.md#1-本輪邊界與依據)：LangChain可在模型呼叫邊界提供有界context；LangGraph工具結果可更新run狀態。它們沒有因此保證模型一定選修補。本輪不改介面、資料authority或provider。
+框架接點沿用[CT27§6](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct27-live-repair-no-call-evidence-review.md#6-owner同意a追問sandbox介面差異與是否學習)與[CT28§1](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct28-live-repair-context-contrast.md#1-本輪邊界與依據)：LangChain可在模型呼叫邊界提供有界context；LangGraph工具結果可更新run狀態。它們沒有因此保證模型一定選修補。本輪不改介面、資料authority或provider。
 
 ## 4. 收斂與下一步：研究不冒充修好
 

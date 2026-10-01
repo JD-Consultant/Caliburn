@@ -6,7 +6,7 @@
 - 不在本輪：RAG／Reference、能力級別、A、auto-accept、多使用者協作、CRDT／OT、版本歷史 UI、正式 eval
 - 前置決策：產品大方向研究、ADR 0060、ADR 0066、ADR 0067
 
-本研究承接 [`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) 與 [`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md)，但重新檢查其中「正式 JD 編輯器＋AI 工作草稿」在員工直接編輯時的產品效果。外部產品只用來辨識成熟機制；Caliburn 不複製 Git、IDE、程式碼 hunk、PR 或多使用者文件協作。
+本研究承接 [`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) 與 [`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](../../../../../specs/2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md)，但重新檢查其中「正式 JD 編輯器＋AI 工作草稿」在員工直接編輯時的產品效果。外部產品只用來辨識成熟機制；Caliburn 不複製 Git、IDE、程式碼 hunk、PR 或多使用者文件協作。
 
 ## 0. 建議結論
 

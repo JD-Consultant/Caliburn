@@ -1,12 +1,12 @@
 # JD App：收尾與未解事項
 
-> **2026-09-15 閱讀校正：本清單保存 9/13–9/14 的施工現況，不是目前產品範圍入口。完整 JD 歷史、任意 revision diff 與整份舊版還原不再是第一版必要要求；已做且穩定的相關能力可以保留，不必拆除，但不再阻擋接線或繼續擴張。OI-05 只保留 canonical conversation／source／Memory 的長訪談連續性問題，不包含使用者 JD 深歷史。OI-06 的必要範圍只保留「撤回一輪 LLM 的 JD 改動」及其安全性；原始對話、來源、案例、Memory、工作理解、checkpoint 與回合紀錄不撤回。模型現況也不再是 Anthropic 未選；以 [目前決策](../current-decisions.md) 與 [接線對齊稿](evidence/2026-09-15-jd-integration-document-reconciliation.md) 為準。**
+> **2026-09-15 閱讀校正：本清單保存 9/13–9/14 的施工現況，不是目前產品範圍入口。完整 JD 歷史、任意 revision diff 與整份舊版還原不再是第一版必要要求；已做且穩定的相關能力可以保留，不必拆除，但不再阻擋接線或繼續擴張。OI-05 只保留 canonical conversation／source／Memory 的長訪談連續性問題，不包含使用者 JD 深歷史。OI-06 的必要範圍只保留「撤回一輪 LLM 的 JD 改動」及其安全性；原始對話、來源、案例、Memory、工作理解、checkpoint 與回合紀錄不撤回。模型現況也不再是 Anthropic 未選；以 [目前決策](../current-decisions.md) 與 [接線對齊稿](../experiments/legacy-evidence/2026-09-15-jd-integration-document-reconciliation.md) 為準。**
 
-**完成窗口最新狀態（2026-09-13）：**[3cbd3ca5 窄複核](evidence/jd-interview-window-source/cursor-lineage-review.md)確認 R-01／R-02 CLOSED，獨立來源／歷史及原探針 59 passed；F-03 source 層已閉合。下列各片數字保留歷史；下一採用 B1，W-13、原 pair 與 reader grant 隨 B1／B2 接線驗收。未新增配對引擎需求，H4 整體仍未完成。
+**完成窗口最新狀態（2026-09-13）：**[3cbd3ca5 窄複核](../experiments/legacy-evidence/jd-interview-window-source/cursor-lineage-review.md)確認 R-01／R-02 CLOSED，獨立來源／歷史及原探針 59 passed；F-03 source 層已閉合。下列各片數字保留歷史；下一採用 B1，W-13、原 pair 與 reader grant 隨 B1／B2 接線驗收。未新增配對引擎需求，H4 整體仍未完成。
 
-**最新複核狀態（2026-09-13）：**H2–H3已完成；H4映射`2e243d15`的[提交後審查](evidence/2026-09-13-jd-b1-b2-adoption-review.md)及完成窗口 `ab483f6c` 的[9/12–9/13 文件審查](evidence/2026-09-13-jd-window-source-contract-review.md)已修正已驗方法／通知漏接、背景恢復誤套、source／publication 接縫、窗口觸發與分頁語意。這些是文件缺口，沒有本輪產品bug或測試通過宣稱。下一按[接續計畫H4](../plans/2026-09-13-jd-app-continuation-handoff.md)依修正版有限實作；OI-01／02整體退出條件仍未完成。
+**最新複核狀態（2026-09-13）：**H2–H3已完成；H4映射`2e243d15`的[提交後審查](../experiments/legacy-evidence/2026-09-13-jd-b1-b2-adoption-review.md)及完成窗口 `ab483f6c` 的[9/12–9/13 文件審查](../experiments/legacy-evidence/2026-09-13-jd-window-source-contract-review.md)已修正已驗方法／通知漏接、背景恢復誤套、source／publication 接縫、窗口觸發與分頁語意。這些是文件缺口，沒有本輪產品bug或測試通過宣稱。下一按[接續計畫H4](../plans/2026-09-13-jd-app-continuation-handoff.md)依修正版有限實作；OI-01／02整體退出條件仍未完成。
 
-**最新整體審查（2026-09-14）：**B1／source固定接合已到 `f160be97`；W-13、F-04、P3 的早期 OPEN 為下方歷史，不重做。[整體審查](evidence/jd-b1-adoption/whole-flow-review.md)補上同 ID 內容替換的 source owner 窄修、批次→B1接縫與背景狀態責任，獨立 B1／來源＋Memory 套件212項通過；未跑B1真PG或新程序。**下一依[H4 runtime計畫 R1](../plans/2026-09-14-jd-h4-runtime-integration.md)**做一批 B1 真PG保存／恢復與固定有界批次，再接B2／通知／宿主。v1 context明示不支援、fresh fixture用v2；沒有舊資料轉換工作，也不因假設中的v1資料阻施工。
+**最新整體審查（2026-09-14）：**B1／source固定接合已到 `f160be97`；W-13、F-04、P3 的早期 OPEN 為下方歷史，不重做。[整體審查](../experiments/legacy-evidence/jd-b1-adoption/whole-flow-review.md)補上同 ID 內容替換的 source owner 窄修、批次→B1接縫與背景狀態責任，獨立 B1／來源＋Memory 套件212項通過；未跑B1真PG或新程序。**下一依[H4 runtime計畫 R1](../plans/2026-09-14-jd-h4-runtime-integration.md)**做一批 B1 真PG保存／恢復與固定有界批次，再接B2／通知／宿主。v1 context明示不支援、fresh fixture用v2；沒有舊資料轉換工作，也不因假設中的v1資料阻施工。
 
 更新：2026-09-14；JD-R002。依[最新決策](../current-decisions.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)及最近結果整理；9/13 詳細切片仍保留作沿革，當前施工以頁首最新狀態及 H4 計畫為準；只集中追蹤，不改需求、保存權責或既有授權。
 
@@ -34,26 +34,26 @@
 - 已驗App接合：[停止收尾、跨程序查回與封裝](2026-09-13-jd-memory-repair-app-integration-slice.md)已修CA-01／02；缺證據仍保持門閘。FH05真新程序＋真PG只憑原receipt對帳，publish／patch為0；乾淨venv完整依賴wheel隔離已通過。實作者最終全組數字與本次獨立窄跑分別見結果稿／複核稿，本清單不再保存另一份易過時的數字。這是C接合可驗收，不是完整顧問或自然品質通過。
 > **以下 source port 與 B1 adapter 條目是 9/13–9/14 沿革，不是目前待辦；目前接續以本頁最新段落及 H4 runtime 計畫為準。**
 - 採用映射已交並修正：[採用映射](2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)保留`4f94fbfb`已驗來源與13模組hash結論；補回A指引／三项分析Skills／整理通知，分清C查回與B有界續作、來源介面及各角色限制。只有文件，不是H4實作通過。
-- 契約已交並完成文件審查：[完成窗口source port契約](2026-09-13-jd-interview-window-source-contract.md)定新增`purpose="window"`簽章引用（`last`不綁run_id）、分頁讀取、逐輪終局改用run record＋`observed.closed`、整理請求辨識、觸發與連續範圍分開、B2 `processed_source` 的用途感知驗證、source/context pair、Unicode offset 及 purpose salt 隔離，並列W-01–W-14固定情境。其後五個隔離切片已完成固定測試，但最新[實作審查](evidence/2026-09-13-jd-window-source-implementation-review.md)指出W-08／W-13／W-14及cursor lineage／boundary仍不完整；不能宣稱H4或B1／B2已接通。
-- 實作第一片已完成：[用途隔離與B2發布驗證](evidence/jd-interview-window-source/purpose-isolation-results.md)閉合審查F2的整合斷點——未用途感知前，B2的完成結果在`PublicationStore._validate`就會被拒，永遠無法發布。離線2748／套件130／真PG14通過。窗口內容讀取、planner與公開發配路徑**刻意未做**（安全終局只有planner能確立），見該稿界線。
-- 實作第二片已完成：[逐輪安全終局、發配與分頁讀取](evidence/jd-interview-window-source/window-read-results.md)。全部放在同一source owner，沿既有`AiRunHistory`逐輪在該輪自己的終局checkpoint核對，lineage以訊息序列精確前綴證明（不靠ID相同）；分頁只切可見文字、`turns`每頁完整、offset為Unicode code point；省略種類具名。已涵蓋W-03／05／07／08與W-04的停在未收尾之前。離線2753／套件130／真PG16通過（另1個既有OI-05分頁缺陷不變）。
-- 實作第三片已完成：[整理通知採用、觸發清單與連續安全範圍](evidence/jd-interview-window-source/trigger-and-coverage-results.md)。整理通知自`4f94fbfb`逐位元採用進`caliburn_memory/requests.py`（工具描述一字未改，已登記adoption）；`pending_windows`只回觸發回合，`unprocessed_source`另回連續安全範圍且納入沒通知的安全回合，範圍止於第一個未收尾回合；游標只接受publication head自己的window引用，離線lineage即停止admission不重設。離線2762／套件130／真PG18通過。已涵蓋W-01–W-05／07／08／11／12。**工具尚未註冊給顧問，顧問目前發不出通知。**
-- 實作第四片已完成：[切分規劃、消歧pair與admission](evidence/jd-interview-window-source/planner-and-admission-results.md)。切分／批次／重抽驗證／admission沿`4f94fbfb`逐條移接：超大回合與放不下的消歧一律失敗不截斷；新增第三個purpose `context`（獨立salt，不得當成待整併來源），用途授予拆成`window_references`／`context_references`兩旗標，因為套件對source與context走同一個`validate_source`；規劃結果固定同一root，有界批次以`covers_whole_range`防止取前綴宣稱完成，尾端由publication游標接續不需額外狀態。離線2770／套件130／真PG14通過。
-- **契約固定情境 W-01–W-14 都已有測試入口，但最新審查不把它們全部標成完整通過。** W-08尚無同ID分支 lineage／合法 mid-turn cursor；W-13尚無B1 `reextract`及正常輸入位置不前進證據；W-14尚無`>256` ancestor fixture。W-14既有缺鏈案例沿`test_ai_history.py`技法通過並明示`original_run_lookup_required`，屬補證據不是改產品；詳見[source port實作審查](evidence/2026-09-13-jd-window-source-implementation-review.md)。
-- 審查F-01／F-03已修：[游標lineage／完整邊界與查找上限](evidence/jd-interview-window-source/cursor-lineage-results.md)。原本的`_after_cursor`／`follows`**從未打開游標自己的固定root**，只比對訊息ID；新增`AiRunHistory.ancestor_of`（沿`find`同一組parent連結與同一上限）與共用的`_cursor_boundary`，要求在游標自身位置讀回、訊息為精確前綴、root為真祖先、`last`正好是安全回合邊界。三個反例：合法簽章但停在回合中間（原本會跳過該輪其後原話）、游標root讀不到、**同內容兄弟鏈**。另補`>MAX_PARENT_LOOKUPS`固定鏈案例。離線2774／套件130／真PG18通過。**W-13（F-02）與pair交叉配對（F-04）仍開著，依審查留給B1 adapter。**
+- 契約已交並完成文件審查：[完成窗口source port契約](2026-09-13-jd-interview-window-source-contract.md)定新增`purpose="window"`簽章引用（`last`不綁run_id）、分頁讀取、逐輪終局改用run record＋`observed.closed`、整理請求辨識、觸發與連續範圍分開、B2 `processed_source` 的用途感知驗證、source/context pair、Unicode offset 及 purpose salt 隔離，並列W-01–W-14固定情境。其後五個隔離切片已完成固定測試，但最新[實作審查](../experiments/legacy-evidence/2026-09-13-jd-window-source-implementation-review.md)指出W-08／W-13／W-14及cursor lineage／boundary仍不完整；不能宣稱H4或B1／B2已接通。
+- 實作第一片已完成：[用途隔離與B2發布驗證](../experiments/legacy-evidence/jd-interview-window-source/purpose-isolation-results.md)閉合審查F2的整合斷點——未用途感知前，B2的完成結果在`PublicationStore._validate`就會被拒，永遠無法發布。離線2748／套件130／真PG14通過。窗口內容讀取、planner與公開發配路徑**刻意未做**（安全終局只有planner能確立），見該稿界線。
+- 實作第二片已完成：[逐輪安全終局、發配與分頁讀取](../experiments/legacy-evidence/jd-interview-window-source/window-read-results.md)。全部放在同一source owner，沿既有`AiRunHistory`逐輪在該輪自己的終局checkpoint核對，lineage以訊息序列精確前綴證明（不靠ID相同）；分頁只切可見文字、`turns`每頁完整、offset為Unicode code point；省略種類具名。已涵蓋W-03／05／07／08與W-04的停在未收尾之前。離線2753／套件130／真PG16通過（另1個既有OI-05分頁缺陷不變）。
+- 實作第三片已完成：[整理通知採用、觸發清單與連續安全範圍](../experiments/legacy-evidence/jd-interview-window-source/trigger-and-coverage-results.md)。整理通知自`4f94fbfb`逐位元採用進`caliburn_memory/requests.py`（工具描述一字未改，已登記adoption）；`pending_windows`只回觸發回合，`unprocessed_source`另回連續安全範圍且納入沒通知的安全回合，範圍止於第一個未收尾回合；游標只接受publication head自己的window引用，離線lineage即停止admission不重設。離線2762／套件130／真PG18通過。已涵蓋W-01–W-05／07／08／11／12。**工具尚未註冊給顧問，顧問目前發不出通知。**
+- 實作第四片已完成：[切分規劃、消歧pair與admission](../experiments/legacy-evidence/jd-interview-window-source/planner-and-admission-results.md)。切分／批次／重抽驗證／admission沿`4f94fbfb`逐條移接：超大回合與放不下的消歧一律失敗不截斷；新增第三個purpose `context`（獨立salt，不得當成待整併來源），用途授予拆成`window_references`／`context_references`兩旗標，因為套件對source與context走同一個`validate_source`；規劃結果固定同一root，有界批次以`covers_whole_range`防止取前綴宣稱完成，尾端由publication游標接續不需額外狀態。離線2770／套件130／真PG14通過。
+- **契約固定情境 W-01–W-14 都已有測試入口，但最新審查不把它們全部標成完整通過。** W-08尚無同ID分支 lineage／合法 mid-turn cursor；W-13尚無B1 `reextract`及正常輸入位置不前進證據；W-14尚無`>256` ancestor fixture。W-14既有缺鏈案例沿`test_ai_history.py`技法通過並明示`original_run_lookup_required`，屬補證據不是改產品；詳見[source port實作審查](../experiments/legacy-evidence/2026-09-13-jd-window-source-implementation-review.md)。
+- 審查F-01／F-03已修：[游標lineage／完整邊界與查找上限](../experiments/legacy-evidence/jd-interview-window-source/cursor-lineage-results.md)。原本的`_after_cursor`／`follows`**從未打開游標自己的固定root**，只比對訊息ID；新增`AiRunHistory.ancestor_of`（沿`find`同一組parent連結與同一上限）與共用的`_cursor_boundary`，要求在游標自身位置讀回、訊息為精確前綴、root為真祖先、`last`正好是安全回合邊界。三個反例：合法簽章但停在回合中間（原本會跳過該輪其後原話）、游標root讀不到、**同內容兄弟鏈**。另補`>MAX_PARENT_LOOKUPS`固定鏈案例。離線2774／套件130／真PG18通過。**W-13（F-02）與pair交叉配對（F-04）仍開著，依審查留給B1 adapter。**
 **目前下一最小動作：**依[H4 runtime 計畫](../plans/2026-09-14-jd-h4-runtime-integration.md)完成 R1→R2→R3；固定批次／真PG保存、B2發布／C競爭、完整通知與背景生命週期。詳細步驟與六欄准入責任不在此重抄。上方各切片的「未接」依本段最新狀態閱讀，不重新安排已完成 source／adapter 測試。
 
 **目前退出條件：**跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋
 - 現象／影響：建立文件與聊天後刷新曾發生 `response_unknown`；服務端 200 不等於瀏覽器取得結果，不能保證員工能順暢自行完成。
-- 證據：[有限診斷與三組紀錄](evidence/jd-relational-chat-web/transport-diagnosis.md)：第三組 TypeError／13 ms／未 aborted 只排除該次 15 秒逾時；原 run 明示查回成功，根因仍未明。
+- 證據：[有限診斷與三組紀錄](../experiments/legacy-evidence/jd-relational-chat-web/transport-diagnosis.md)：第三組 TypeError／13 ms／未 aborted 只排除該次 15 秒逾時；原 run 明示查回成功，根因仍未明。
 - 下一最小動作：本輪先停止無證據重現。取得既有環境可用的 Network 原錯誤階段後再定點處理；其間保留原請求與清楚查回出口，不弱化 CORS 或加入自動重送。
 - 退出條件：原因有可核證據並修正，或明確受支持的日常環境通過同條完整旅程；受影響舊環境仍如實列限制，不改寫首次失敗。
 
 ### OI-04｜CV-01 當輪改動：API／畫面已接，真瀏覽器未驗
 - 現象／影響：當輪淨結果、目前欄位提示、完整前後與直接可見刪除原文／完整所屬已接，分層測試及獨審通過；尚無新畫面的真瀏覽器點擊／捲動／晚回競爭驗收。
-- **2026-09-14 局部：**[整輪撤回的真瀏覽器旅程](evidence/2026-09-14-jd-restore-and-undo-browser-results.md)順帶在真 Chrome 上看過「本輪 JD 改動」面板，逐項顯示這輪的新增（任務／要求／成果）與變動欄位。**只涵蓋新增**；修改／刪除／移動／引用的辨認、捲動與晚回競爭仍未在真瀏覽器驗，本項不因此關閉。
+- **2026-09-14 局部：**[整輪撤回的真瀏覽器旅程](../experiments/legacy-evidence/2026-09-14-jd-restore-and-undo-browser-results.md)順帶在真 Chrome 上看過「本輪 JD 改動」面板，逐項顯示這輪的新增（任務／要求／成果）與變動欄位。**只涵蓋新增**；修改／刪除／移動／引用的辨認、捲動與晚回競爭仍未在真瀏覽器驗，本項不因此關閉。
 - 證據：[當輪接合與分層結果](2026-09-13-jd-run-change-view-slice.md)、[依Owner收斂的呈現需求](2026-09-12-jd-change-visibility-design.md)。舊對話選輪入口不需要，不列未修缺口。
 - 下一最小動作：配合核心顧問旅程與可用的日常瀏覽器環境，集中核對一條當輪查看／更正流程；有新反例才修，不重開架構或追加歷史選輪。
 - 退出條件：真瀏覽器可辨認當輪新增／修改／刪除／移動／引用，改後改回仍可查事件，人工或別輪介入不混算；沒有接受按鈕，開始下一輪後不把舊輪內容冒充當輪。
@@ -66,8 +66,8 @@
 - 退出條件：早期回合與來源仍可定位；超限／缺鏈可處理且不重播，壓縮／重開後早期工作與最新更正不遺失。
 
 ### OI-06｜整輪 LLM 的 JD 撤回：必要能力已接；完整還原為可保留額外能力
-- **2026-09-14 進度（一）：**`restore_revision` 的伺服器端操作已實作並在真 PG 驗收（[結果](evidence/2026-09-14-jd-restore-revision-results.md)）：新修訂、歷史保留、`no_change`／`stale_view`／`target_missing`、同 operation 查回、來源沿用、身分保留；模型永遠沒有這個工具。
-- **2026-09-14 進度（二）：**預覽流程、HTTP／Web 入口與整輪 AI 撤回都已接線，並完成[真瀏覽器驗收](evidence/2026-09-14-jd-restore-and-undo-browser-results.md)：真 Chrome 上建立→打字→自動保存→開歷史→「還原到第 2 版」→看逐項比較→「確認還原」，以及一次真訪談讓 AI 寫入後按「撤回這輪 JD 改動」→「確認撤回」；兩條都由獨立唯讀連線核對 PostgreSQL——還原／撤回各新增一版、被取代的版本仍讀得到、conversation checkpoint 未減少。
+- **2026-09-14 進度（一）：**`restore_revision` 的伺服器端操作已實作並在真 PG 驗收（[結果](../experiments/legacy-evidence/2026-09-14-jd-restore-revision-results.md)）：新修訂、歷史保留、`no_change`／`stale_view`／`target_missing`、同 operation 查回、來源沿用、身分保留；模型永遠沒有這個工具。
+- **2026-09-14 進度（二）：**預覽流程、HTTP／Web 入口與整輪 AI 撤回都已接線，並完成[真瀏覽器驗收](../experiments/legacy-evidence/2026-09-14-jd-restore-and-undo-browser-results.md)：真 Chrome 上建立→打字→自動保存→開歷史→「還原到第 2 版」→看逐項比較→「確認還原」，以及一次真訪談讓 AI 寫入後按「撤回這輪 JD 改動」→「確認撤回」；兩條都由獨立唯讀連線核對 PostgreSQL——還原／撤回各新增一版、被取代的版本仍讀得到、conversation checkpoint 未減少。
 - **2026-09-14 進度（三）：**設計 §4.2 的暫停已實作——比較開著時 JD 欄位與訪談送出都停用，畫面說明「正在確認一次還原，暫停送出。你的輸入會保留。」，取消即恢復；真瀏覽器已驗還原這一側。收據也改為記錄實際被放回的版本，undo 另記被撤回的回合，並由本輪通知轉給下一輪 AI（`took_back_ai_run`），明說對話與工作理解沒有被取回。
 - **2026-09-15 範圍判定：**整輪 LLM 的 JD 撤回已具備伺服器、HTTP／Web 與代表性真瀏覽器證據；完整歷史／整份還原既然已完成可繼續保留。撤回側暫停、`no_change`／失敗解除及多分頁的剩餘覆蓋屬維護風險，隨接線 E2E 有相關反例才定點補，不再作接線前置或擴張完整還原產品。
 - 現象／影響：必須維持「撤回整輪 LLM 的 JD 效果」與「取消尚在執行的 AI」兩種操作不同；前者不能覆蓋較晚 JD 修改，也不能刪除對話、來源、Memory、案例、工作理解、checkpoint 或原回合紀錄。

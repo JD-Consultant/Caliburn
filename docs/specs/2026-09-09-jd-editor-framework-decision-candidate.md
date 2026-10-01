@@ -2,7 +2,7 @@
 
 JD-R002/C03；2026-09-09；**Owner 已同意 Plate 文件底座，並選擇「持續工作稿，保留差異與更正」（審閱 §7 路線 B，G3／WORKING）。**完整設計與實際整合尚未驗收。目標是把既有 Memory、工作分析與 JD 寫作成果接上可由人與 LLM 使用的 App。有效狀態依 [register](../current-decisions.md)，產品效力依[審閱工作稿 §7.7](2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)，不再重問框架、B 流程、成品深度或訪談主流程。
 
-**最新收斂：**目前方向是 Plate 原生 clean working draft、每次實際變更（actual_changes）及可回查的 revision。停止持久 pending 的產品分組／accept／reject 設計；B05／B06 的個別接受／取消部分由審閱 §7.7 明確 supersede，保留同份最新版、獨立內容不誤動、相依內容完整修正、差異／歷史、來源與 JD 深度。這不是人工編輯自動批准文件。[待審實證比較](evidence/2026-09-09-jd-native-pending-review-comparison.md)及 codec 結果保留為沿革；[F01](evidence/2026-09-09-jd-native-content-profile-probe.md)、[P01](evidence/2026-09-09-jd-native-save-probe.md)與 diff／history／UI 仍各有未驗範圍及反例，不能宣稱安裝即完整。
+**最新收斂：**目前方向是 Plate 原生 clean working draft、每次實際變更（actual_changes）及可回查的 revision。停止持久 pending 的產品分組／accept／reject 設計；B05／B06 的個別接受／取消部分由審閱 §7.7 明確 supersede，保留同份最新版、獨立內容不誤動、相依內容完整修正、差異／歷史、來源與 JD 深度。這不是人工編輯自動批准文件。[待審實證比較](../experiments/legacy-evidence/2026-09-09-jd-native-pending-review-comparison.md)及 codec 結果保留為沿革；[F01](../experiments/legacy-evidence/2026-09-09-jd-native-content-profile-probe.md)、[P01](../experiments/legacy-evidence/2026-09-09-jd-native-save-probe.md)與 diff／history／UI 仍各有未驗範圍及反例，不能宣稱安裝即完整。
 
 ## 1. 已選方向與理由
 
@@ -10,7 +10,7 @@ JD-R002/C03；2026-09-09；**Owner 已同意 Plate 文件底座，並選擇「�
 
 理由是本案需要結構化工作內容、完整敘述與人編輯，而 Plate 的免費核心及差異 primitive 已有直接 source 與初步執行證據。官方版本歷史範例也使用兩份乾淨快照、computeDiff 及獨立唯讀 editor；這不是自造 diff 演算法。**官方範例只把版本留在 React state，保存、恢復與業務操作仍需要 App 接線。**[官方範例](https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/apps/www/src/registry/examples/version-history-demo.tsx)、[範例範圍](https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/content/docs/examples/version-history.mdx)
 
-這個已選方向附有已證限制：`computeDiff` 單獨不足以保證所有屬性／空文字格式變動都高亮。原生當批 operations 及乾淨快照已有固定檔案／瀏覽器及[P01 DB 保存](evidence/2026-09-09-jd-native-save-probe.md)的有限正證；所有業務欄位在員工視圖可讀、正式編輯與實際 Agent 接續仍未驗。必須把有限欄位呈現與接線列入設計，不可寫成安裝即全功能完成。[13 項原生驗證與 3 項觀測](evidence/2026-09-09-jd-native-editor-probe.md)、[完整 r2 的 29 項限定檢查及瀏覽器結果](evidence/2026-09-09-jd-native-editor-ui-probe.md)；兩個原生反例沒有改判。
+這個已選方向附有已證限制：`computeDiff` 單獨不足以保證所有屬性／空文字格式變動都高亮。原生當批 operations 及乾淨快照已有固定檔案／瀏覽器及[P01 DB 保存](../experiments/legacy-evidence/2026-09-09-jd-native-save-probe.md)的有限正證；所有業務欄位在員工視圖可讀、正式編輯與實際 Agent 接續仍未驗。必須把有限欄位呈現與接線列入設計，不可寫成安裝即全功能完成。[13 項原生驗證與 3 項觀測](../experiments/legacy-evidence/2026-09-09-jd-native-editor-probe.md)、[完整 r2 的 29 項限定檢查及瀏覽器結果](../experiments/legacy-evidence/2026-09-09-jd-native-editor-ui-probe.md)；兩個原生反例沒有改判。
 
 | 選型沿革 | 適合本案的能力 | 已有比較理由與界線 |
 |---|---|---|
@@ -20,7 +20,7 @@ JD-R002/C03；2026-09-09；**Owner 已同意 Plate 文件底座，並選擇「�
 
 先前排序代表先驗哪套，不代表已證 Plate 全面勝過其他核心；目前已由 Owner 選定 Plate，不繼續比較其他框架。Plate 的原生樹狀 snapshot diff 及免費呈現範例是選擇理由，Python／JavaScript 接線及資料庫交易則是共通 App 工作。若必要能力仍要求自造通用 diff，須列出具體缺口及代價回議，不能把選定底座當成自建引擎授權。
 
-固定實證版是 `platejs@53.3.11`、`@platejs/diff@53.0.0`，不是把 monorepo v53.3.12 套給每個 package。核心 MIT；diff 的 Apache-2.0 衍生授權與修改雙授權另列，免費 registry example 不等於 Plate Plus。[Plate 證據與授權](evidence/2026-09-09-jd-oss-plate.md)、[替代證據](evidence/2026-09-09-jd-oss-alternatives.md)
+固定實證版是 `platejs@53.3.11`、`@platejs/diff@53.0.0`，不是把 monorepo v53.3.12 套給每個 package。核心 MIT；diff 的 Apache-2.0 衍生授權與修改雙授權另列，免費 registry example 不等於 Plate Plus。[Plate 證據與授權](../experiments/legacy-evidence/2026-09-09-jd-oss-plate.md)、[替代證據](../experiments/legacy-evidence/2026-09-09-jd-oss-alternatives.md)
 
 ### 本次可確認的框架選擇
 
@@ -32,7 +32,7 @@ JD-R002/C03；2026-09-09；**Owner 已同意 Plate 文件底座，並選擇「�
 | ProseMirror／Tiptap 免費核心 | 結構 schema／Step 是先前有效備選；免費修訂套件的格式／屬性反例留在研究證據，不當成目前工作稿路線的淘汰理由。停止擴大比較 |
 | Lexical | 文件編輯底座成立，尚無已證完整差異呈現接法；既有比較保留，停止擴大驗證 |
 
-[待審的最後定點補查](evidence/2026-09-09-jd-native-pending-review-comparison.md#6-定點補查已收束公開修復與整合代價)、R01／R01-F 及[SuperJSON 四項有限實證](evidence/2026-09-09-jd-native-pending-codec-probe.md)保留為路線沿革。codec 的固定正證沒有修好原 raw JSON 反例，R01-F 也沒有證明通用分組結算；這些結果不再是 B 流程的 pending 施工單位，也不能改寫成所有格式／保存都已驗收。
+[待審的最後定點補查](../experiments/legacy-evidence/2026-09-09-jd-native-pending-review-comparison.md#6-定點補查已收束公開修復與整合代價)、R01／R01-F 及[SuperJSON 四項有限實證](../experiments/legacy-evidence/2026-09-09-jd-native-pending-codec-probe.md)保留為路線沿革。codec 的固定正證沒有修好原 raw JSON 反例，R01-F 也沒有證明通用分組結算；這些結果不再是 B 流程的 pending 施工單位，也不能改寫成所有格式／保存都已驗收。
 
 目前 G3 效力為 **Plate 文件底座＋持續工作稿 B 流程 WORKING**。接下來研究者負責補齊文件、實際變更、版本保存、工具與人工操作的介面及驗收範圍，不再設計 pending 成員／accept／reject，也不重問 B。若仍須改已選使用效果或自造通用引擎，依既定缺口原則先提具體代價再議。整體 S3／S4／S5 不因此勾完，production authority 仍走 successor ADR。Deep Agents 的相關提問不作更換既有 Agent／Memory 的授權；分工見接線稿。
 
@@ -49,7 +49,7 @@ Owner 最新釐清納入為 WORKING：**先訪談並理解某項任務，資訊�
 5. 不設固定輪數、必填完整度分數或「每次 Memory 更新就改 JD」的機械觸發。
 6. 全份收尾再做工作→JD 與 JD→來源核對；局部已寫不等於全份已完整。
 
-依據：[分析 §3–4、§6](2026-09-09-complete-work-analysis-guide.md)、[深度與訪談校準 §3、§6](2026-09-09-customized-jd-depth-and-interview-calibration.md)、[欄位 §2–3](2026-09-09-jd-field-and-writing-guide.md)。這些將進入既有顧問指引／Skill 的 JD 接點；本輪沒有改 prompt、B／C 時機或新增判斷 Agent。此補充決定 JD 改稿節奏，不另改既有 Memory 生成時機。
+依據：[分析 §3–4、§6](../guides/2026-09-09-complete-work-analysis-guide.md)、[深度與訪談校準 §3、§6](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[欄位 §2–3](../guides/2026-09-09-jd-field-and-writing-guide.md)。這些將進入既有顧問指引／Skill 的 JD 接點；本輪沒有改 prompt、B／C 時機或新增判斷 Agent。此補充決定 JD 改稿節奏，不另改既有 Memory 生成時機。
 
 ### 2.2 Memory 接點
 
@@ -76,7 +76,7 @@ Production ADR 0060 與隔離 analysis-only 成果的實際物理 owner 不同�
 - 改名、改序或移動保留工作身分；複製／拆合需有清楚結果，不能靠畫面序號識別。
 - r2 的完整說明、差異及條件是深度基線；四組八項、表格與標籤不是固定 schema／UI。
 
-依據：[已同意內容關係](2026-09-09-jd-document-relationships-working-research.md)、[欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[完整 r2](2026-09-09-frontend-engineer-jd-sample.md)、[樣稿審查 §10](2026-09-09-jd-sample-basis-and-review.md)。編輯器負責可表達、可編輯及保真；是否符合工作真相仍是顧問／員工及最後專業核對的責任。
+依據：[已同意內容關係](2026-09-09-jd-document-relationships-working-research.md)、[欄位與寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[完整 r2](../guides/2026-09-09-frontend-engineer-jd-sample.md)、[樣稿審查 §10](../guides/2026-09-09-jd-sample-basis-and-review.md)。編輯器負責可表達、可編輯及保真；是否符合工作真相仍是顧問／員工及最後專業核對的責任。
 
 ## 3. 已選的持續工作稿流程
 
@@ -104,11 +104,11 @@ flowchart LR
 
 實際改動由 App 提供確切基底／結果版本、前後內容及比較，顧問說明原因只是輔助。預設呈現最近一次有意義改稿的具體方式仍待設計；完整稿、較早未讀改稿及刪除內容都須可查，不能只留下最近一次摘要。具體比較基準與已看過狀態由 App 管理。未看過、局部手改、繼續聊天都不自動等於確認全部內容。
 
-此為 Owner 明確選擇後的效果變更：B05／B06 的個別接受／取消部分及 B04 的人工續改 pending 分支，依[審閱 §7.7](2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)不再適用；同份最新版、獨立內容保留、相依修正及完整變更可查繼續有效。這不是把工作稿更正宣稱為等效取消，也不新增任意已接受歷史一鍵回退。原生待審[比較結果](evidence/2026-09-09-jd-native-pending-review-comparison.md)原樣保留。真人後續核對仍在本機單人範圍內，不新增角色或審批權限。
+此為 Owner 明確選擇後的效果變更：B05／B06 的個別接受／取消部分及 B04 的人工續改 pending 分支，依[審閱 §7.7](2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)不再適用；同份最新版、獨立內容保留、相依修正及完整變更可查繼續有效。這不是把工作稿更正宣稱為等效取消，也不新增任意已接受歷史一鍵回退。原生待審[比較結果](../experiments/legacy-evidence/2026-09-09-jd-native-pending-review-comparison.md)原樣保留。真人後續核對仍在本機單人範圍內，不新增角色或審批權限。
 
 ## 4. LLM 使用 App 的基本能力與原生映射
 
-兩家的公開共同基礎是模型提操作、App 執行、回傳真實結果與修正通道；**不是共同規定某種 node ID／patch 格式**。OpenAI patch 與 Anthropic exact replacement／行位置並存；本案從結構 editor 能力決定適合的接法。[官方工具／結果證據 §2.1–2.2](evidence/2026-09-09-jd-app-tool-and-review-contracts.md)
+兩家的公開共同基礎是模型提操作、App 執行、回傳真實結果與修正通道；**不是共同規定某種 node ID／patch 格式**。OpenAI patch 與 Anthropic exact replacement／行位置並存；本案從結構 editor 能力決定適合的接法。[官方工具／結果證據 §2.1–2.2](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md)
 
 | 模型需要的能力 | Plate 接點與候選 App 分工 |
 |---|---|
@@ -119,9 +119,9 @@ flowchart LR
 | 回查變更結果 | 乾淨前後 value、computeDiff、必要當批 operations；模型與 UI 讀到已保存的實際影響，不能拿模型摘要當結果 |
 | 發生錯誤後重讀／修正 | App 返回定位不存在、基準過時、格式不支持、保存失敗或結果未知；沿既有 agent tool-error 機制，不新增泛用修補 Agent |
 
-上表是功能契約候選，**不是已定工具 JSON 或所有 transforms 都已測過**。insertText、setNodes、moveNodes、splitNodes、undo／redo、初始化與重開已有固定證據；[F01](evidence/2026-09-09-jd-native-content-profile-probe.md)另補已解析 fragment 與 unwrap 的特定 headless 情境，不能再一概列未測。任務語意拆分、DOM 貼上及任意結構刪除仍未證，原生段落 split 不直接等於任務拆分。
+上表是功能契約候選，**不是已定工具 JSON 或所有 transforms 都已測過**。insertText、setNodes、moveNodes、splitNodes、undo／redo、初始化與重開已有固定證據；[F01](../experiments/legacy-evidence/2026-09-09-jd-native-content-profile-probe.md)另補已解析 fragment 與 unwrap 的特定 headless 情境，不能再一概列未測。任務語意拆分、DOM 貼上及任意結構刪除仍未證，原生段落 split 不直接等於任務拆分。
 
-原生編輯引擎是 JavaScript，而既有已研究顧問是 Python。**推薦先沿既有 LangChain tool 接點呼叫固定本機 headless engine**，讓原生驗證在保存前執行；不在 Python 重寫編輯演算法，也不另建主 Agent。現行 MCP 接點已改為 `langchain.mcp.MCPAdapter`，仍屬 beta，不能沿用舊 MultiServerMCPClient 範例並稱穩定現行做法；本案也不必為了讓模型用 App 就新增 MCP。實際 process／transport 仍依有限呼叫、取消及保存驗證定案，不能把進程記憶體當永久文件。完整版本／接點依[追加官方與本地證據 §2.10](evidence/2026-09-09-jd-app-tool-and-review-contracts.md#210-既有-python-顧問與-javascript-原生編輯器接線)。
+原生編輯引擎是 JavaScript，而既有已研究顧問是 Python。**推薦先沿既有 LangChain tool 接點呼叫固定本機 headless engine**，讓原生驗證在保存前執行；不在 Python 重寫編輯演算法，也不另建主 Agent。現行 MCP 接點已改為 `langchain.mcp.MCPAdapter`，仍屬 beta，不能沿用舊 MultiServerMCPClient 範例並稱穩定現行做法；本案也不必為了讓模型用 App 就新增 MCP。實際 process／transport 仍依有限呼叫、取消及保存驗證定案，不能把進程記憶體當永久文件。完整版本／接點依[追加官方與本地證據 §2.10](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#210-既有-python-顧問與-javascript-原生編輯器接線)。
 
 ## 5. 文件、保存與失敗的責任
 
@@ -138,7 +138,7 @@ App 保存目前版本、必要歷史／變更事實與操作結果；資料庫�
 | 保存結果遺失 | 文件提交效果不明時先對帳同一 operation；tool call ID 不自帶去重，不盲目重送新增，也不把終局回執同鍵改判 |
 | 關頁／重啟 | 從已保存內容與執行狀態恢復，不假設 editor history 或 MCP session 還在 |
 
-這些責任沿[官方證據](evidence/2026-09-09-jd-app-tool-and-review-contracts.md)及既有 Memory／runtime 的成功界線；正式 snapshot 單位、revision／receipt transaction 與工具 I/O 在 headless 接線候選驗證後落成契約。不能用「DB 未定」重開已清楚的內容方向，也不能省略必要交易就稱只剩安裝套件。
+這些責任沿[官方證據](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md)及既有 Memory／runtime 的成功界線；正式 snapshot 單位、revision／receipt transaction 與工具 I/O 在 headless 接線候選驗證後落成契約。不能用「DB 未定」重開已清楚的內容方向，也不能省略必要交易就稱只剩安裝套件。
 
 ## 6. 可收斂與尚不能宣稱的事項
 

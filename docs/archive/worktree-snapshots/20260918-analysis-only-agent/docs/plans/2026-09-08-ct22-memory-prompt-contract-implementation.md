@@ -5,7 +5,7 @@
 **Goal:** 將Owner已核准CT21 A1接入真正模型請求，保留舊保護，驗證原漏存反例。
 **Architecture:** 只改主顧問提示、Memory system、C/B工具說明及共享讀取停止句；模型仍自主選工具，框架仍負責執行／錯誤／保存。
 **Tech Stack:** 現有LangChain／LangGraph／DeepAgents與OpenAI SDK，不升降版本。
-**Spec:** [CT21完整設計](../specs/2026-09-08-ct21-memory-prompt-contract-review.md)，精確文字以其candidate JSON為準；不從本計畫另創prompt。
+**Spec:** [CT21完整設計](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct21-memory-prompt-contract-review.md)，精確文字以其candidate JSON為準；不從本計畫另創prompt。
 
 ## Preflight／不可變更項目
 

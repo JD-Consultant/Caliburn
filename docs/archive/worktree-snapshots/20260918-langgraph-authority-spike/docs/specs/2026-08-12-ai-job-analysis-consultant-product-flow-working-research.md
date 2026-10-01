@@ -200,7 +200,7 @@ Owner 確認第一版產品的產出定位為：
 - 已證明該員工具備文件列出的所有能力；
 - 已通過 iCAP、法規或其他外部效度審查。
 
-未來若組織要正式採用，可把本產品成果送入另一個組織核准或效度程序；目前不因此加入主管帳號、HR workflow、多人核准或外部認證功能。這延續[`專業顧問流程最終反方審查`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md#12-成品能合理宣稱什麼)的聲明上限，避免「專業顧問」被誤讀成已完成組織或甄選效度驗證。
+未來若組織要正式採用，可把本產品成果送入另一個組織核准或效度程序；目前不因此加入主管帳號、HR workflow、多人核准或外部認證功能。這延續[`專業顧問流程最終反方審查`](../../../20260918-shared-current-jd/docs/specs/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md#12-成品能合理宣稱什麼)的聲明上限，避免「專業顧問」被誤讀成已完成組織或甄選效度驗證。
 
 ### 2.14 目標優先、成熟框架優先承接、遷移受控（2026-08-13 已確認）
 
@@ -700,7 +700,7 @@ Owner 於 2026-08-13 確認：員工需要同時知道「大致談了多少」�
 
 ### 5.1 Task：焦點不等於 Task 抽取
 
-依 [`Task Discovery 深入研究`](2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)與[`Task 邊界研究`](2026-07-28-task-boundary-merge-split-and-identity-research.md)：
+依 [`Task Discovery 深入研究`](../../../../../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)與[`Task 邊界研究`](../../../../../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)：
 
 - 員工訊息、Source Claim、未映射線索、故事、Work Unit 與 Task Candidate 是不同層次；
 - 一個故事可支持零到多個工作假說，多個故事也可能支持同一 Task；
@@ -712,7 +712,7 @@ Owner 於 2026-08-13 確認：員工需要同時知道「大致談了多少」�
 
 ### 5.2 Duty：可提早分析，但保持為可變動假說
 
-依 [`專業顧問流程最終反方審查`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)與[`iCAP 欄位標準`](2026-07-13-ai-redesign-raw-icap-field-standards.md)：
+依 [`專業顧問流程最終反方審查`](../../../20260918-shared-current-jd/docs/specs/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)與[`iCAP 欄位標準`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-13-ai-redesign-raw-icap-field-standards.md)：
 
 - 初期責任區域與已出現的工作線索足以啟動 `duty-grouping` Skill，但形成的是可變動 Duty hypothesis，不是固定盒子；
 - Duty 可隨 Task／Work Unit 增加，依共同 purpose、責任、outcome、workflow stage、服務對象或領域動態整併；
@@ -723,7 +723,7 @@ Owner 於 2026-08-13 確認：員工需要同時知道「大致談了多少」�
 
 ### 5.3 O／P／K／S：方法可獨立載入，語意仍互相依賴
 
-依 [`OPKS 設計裁決`](2026-08-01-opks-design-decisions-research.md)、[`OPKS 漸進蒐集`](2026-08-04-opks-progressive-elicitation-research.md)與[`OPKS gap 再分析研究`](2026-08-06-opks-gap-reanalysis-blocking-research.md)：
+依 [`OPKS 設計裁決`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-08-01-opks-design-decisions-research.md)、[`OPKS 漸進蒐集`](../../../20260918-shared-current-jd/docs/specs/2026-08-04-opks-progressive-elicitation-research.md)與[`OPKS gap 再分析研究`](../../../../../specs/2026-08-06-opks-gap-reanalysis-blocking-research.md)：
 
 - 既有「以單一 Current JD Task 為一次 OPKS operation」是控制輸出量、prompt/schema 大小與 durable failure boundary 的現行實作決策，不應升格成產品流程必須等待 Task 穩定的證據；2026-08-04 研究中的獨立 OPKS child 也是當時架構限制下的方案，不是新顧問必須保留的模型呼叫或 profile 邊界；
 - 未來可把 O、P、K、S 拆成各自的 Skill，根據當輪證據與焦點按需載入；Skill 是否獨立，不預先決定是否另開模型呼叫；
@@ -2382,14 +2382,14 @@ Owner 已明確表示審核通過即可開始，故 ADR 0060 改為 Accepted。B
 
 Repo 研究：
 
-- [`AI 專業職務分析顧問流程：最終反方審查與品質設計`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)
-- [`AI 專業職務分析顧問 R1：Task Discovery 深入研究`](2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
-- [`Task 邊界、merge/split 與同一性判準研究`](2026-07-28-task-boundary-merge-split-and-identity-research.md)
-- [`專業顧問第一個最小完整迴圈`](2026-07-30-professional-consultant-minimal-complete-loop-research.md)
-- [`iCAP 逐欄位標準`](2026-07-13-ai-redesign-raw-icap-field-standards.md)
-- [`OPKS 設計裁決研究`](2026-08-01-opks-design-decisions-research.md)
-- [`OPKS 漸進式蒐集研究`](2026-08-04-opks-progressive-elicitation-research.md)
-- [`OPKS 缺口與再分析的封鎖關係`](2026-08-06-opks-gap-reanalysis-blocking-research.md)
+- [`AI 專業職務分析顧問流程：最終反方審查與品質設計`](../../../20260918-shared-current-jd/docs/specs/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)
+- [`AI 專業職務分析顧問 R1：Task Discovery 深入研究`](../../../../../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
+- [`Task 邊界、merge/split 與同一性判準研究`](../../../../../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)
+- [`專業顧問第一個最小完整迴圈`](../../../../../specs/2026-07-30-professional-consultant-minimal-complete-loop-research.md)
+- [`iCAP 逐欄位標準`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-13-ai-redesign-raw-icap-field-standards.md)
+- [`OPKS 設計裁決研究`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-08-01-opks-design-decisions-research.md)
+- [`OPKS 漸進式蒐集研究`](../../../20260918-shared-current-jd/docs/specs/2026-08-04-opks-progressive-elicitation-research.md)
+- [`OPKS 缺口與再分析的封鎖關係`](../../../../../specs/2026-08-06-opks-gap-reanalysis-blocking-research.md)
 
 Stakeholder 草稿（非權威，只作需求來源）：
 

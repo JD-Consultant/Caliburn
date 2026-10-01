@@ -8,7 +8,7 @@
 
 新 JD App 的背景整理是 B1（訪談抽取）→ B2（整併）→ publication 三段。[窗口來源契約](../specs/2026-09-13-jd-interview-window-source-contract.md)與[採用映射 §3.6](../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md) 要求：准入時固定一個 target，之後的批次都從該 target 切出，後續訪談不得擴大它。
 
-問題是這個 target 沒有地方放。[R3 實測](../specs/evidence/jd-b1-adoption/r3-notification-and-background-results.md)在真 PostgreSQL 上逐欄列出既有持久狀態：
+問題是這個 target 沒有地方放。[R3 實測](../experiments/legacy-evidence/jd-b1-adoption/r3-notification-and-background-results.md)在真 PostgreSQL 上逐欄列出既有持久狀態：
 
 - **B1 Saver state**：`source_reference`（本批）、`windows`、`position`、`files`、更正額度
 - **B2 Saver state**：`source_reference`（本批）、`files`、`base_revision`、`attempt`、已用模型步／工具呼叫、`request`、`result`

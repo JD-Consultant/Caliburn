@@ -1,7 +1,7 @@
 # Evidence-first Stateful Interview Architecture——專業顧問 LLM 層研究與候選架構
 
 - 日期：2026-07-15
-- 狀態：**研究紀錄／2026-07-16 起不再是實作目標**。本檔不是現行 runtime 的描述；現行 v3 仍以 [`../design/interview-engine.md`](../design/interview-engine.md) 為準。文中的 C0/C1/C1A/C2 保留為研究假設與歷史推導，不再代表新版的漸進實作順序。
+- 狀態：**研究紀錄／2026-07-16 起不再是實作目標**。本檔不是現行 runtime 的描述；現行 v3 仍以 [`../design/interview-engine.md`](../../docs-cleanup-2026-10-02.md) 為準。文中的 C0/C1/C1A/C2 保留為研究假設與歷史推導，不再代表新版的漸進實作順序。
 - 範圍：Caliburn「訪談式工作分析 → OCS/JD 草稿」的 LLM 層、狀態、工具、驗證與評估。
 - 非範圍：Web 文件編輯／`_pending` 審閱 UX、OCS 公版契約、租戶與權限架構重做。
 - 來源政策：優先採用 OpenAI、Anthropic、Google、O*NET、ESCO、ILO 等一手資料；研究論文僅使用 ACL 等可追溯學術來源。來源截至 2026-07-15 可取得版本。
@@ -106,7 +106,7 @@ LLM 最適合的責任是：辨識可追問之處、從敘事抽取候選事實�
 
 ### 4.1 必須保留的現行資產
 
-現行 [`../design/interview-engine.md`](../design/interview-engine.md) 的下列決策正確，v4 不應倒退：
+現行 [`../design/interview-engine.md`](../../docs-cleanup-2026-10-02.md) 的下列決策正確，v4 不應倒退：
 
 - 顧問無文件寫入權。
 - `scribe/harvest → op → verify → _pending → 人審` 是唯一 AI 寫入路徑。

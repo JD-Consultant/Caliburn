@@ -31,7 +31,7 @@ SSOT：[mutation result](../../experiments/jd-relational-app/contracts/jd-result
 
 `operation_conflict` 的無 binding 指本次衝突意圖未被接納，不表示原操作不存在；原記錄不可覆寫。對結果 DTO 的驗證只查外形與一致性，**資料庫的真實觀察必須由 App 保存／對帳 owner 提供**，不能拿合成 fixture 當持久證明。
 
-永久 receipt 保存穩定 identity／原結果語意，不保存會失效的外部 token。外部 refs 由原材料投影，result revision 不得偷換成最新 head。`actual_changes` 不放在輕量 mutation response；`change_ref` 供取得原 base/result 的完整確切差異。下一次修改須讀 current 取得適用的新 refs。這是本案取捨，兩家供應商均未指定這套 JD 結果欄位。責任與待驗證項目見[讀取與 refs 前置](evidence/2026-09-13-jd-read-reference-preflight.md)。
+永久 receipt 保存穩定 identity／原結果語意，不保存會失效的外部 token。外部 refs 由原材料投影，result revision 不得偷換成最新 head。`actual_changes` 不放在輕量 mutation response；`change_ref` 供取得原 base/result 的完整確切差異。下一次修改須讀 current 取得適用的新 refs。這是本案取捨，兩家供應商均未指定這套 JD 結果欄位。責任與待驗證項目見[讀取與 refs 前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md)。
 
 ### HTTP 與模型外殼
 
@@ -43,7 +43,7 @@ HTTP endpoint 尚未實作；正式接線必提供 operation 查回路由及其�
 
 ## 3. 官方依據與精確範圍
 
-查閱日均為 2026-09-13。資料層精確版本、授權、API 限制及替代比較詳[DB 前置](evidence/2026-09-13-jd-relational-db-preflight.md)，工具／錯誤及安全紀錄沿[前次證據](evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)。
+查閱日均為 2026-09-13。資料層精確版本、授權、API 限制及替代比較詳[DB 前置](../experiments/legacy-evidence/2026-09-13-jd-relational-db-preflight.md)，工具／錯誤及安全紀錄沿[前次證據](../experiments/legacy-evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)。
 
 | 一手依據 | 支持範圍／本案映射 |
 |---|---|

@@ -20,4 +20,4 @@
 
 ## 用法
 
-App 要先由既有 helper 跑起來（`ui_response_gate_server.py` 或 `ui_chat_server.py` 的 `prepare`／`initialize`／`serve`），Web 用 `JD_API_ORIGIN=<該次 API origin> npm run start` 服務於 127.0.0.1:3002。旅程腳本見 [還原與撤回實證](../../../../docs/specs/evidence/jd-relational-ui-restore/)。
+App 要先由既有 helper 跑起來（`ui_response_gate_server.py` 或 `ui_chat_server.py` 的 `prepare`／`initialize`／`serve`），Web 用 `JD_API_ORIGIN=<該次 API origin> npm run start` 服務於 127.0.0.1:3002。旅程腳本見 [還原與撤回實證](../../../../docs/experiments/legacy-evidence/jd-relational-ui-restore)。

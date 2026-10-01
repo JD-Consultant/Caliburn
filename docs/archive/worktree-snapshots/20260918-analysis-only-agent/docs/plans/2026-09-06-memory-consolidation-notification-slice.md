@@ -46,4 +46,4 @@ def request_memory_consolidation() -> tuple[str, dict]:
 
 Topic `Q019-MEM-CADENCE-01`，G4 approved → isolated implementation。本輪沒有需再問的產品選擇。基本通知可先於 API 實作；尚無 worker 故不偽造背景狀態來提前宣稱完成 §5.2。舊 Source／Memory 及 native reasoning regression 保留。來源及政策權威在 spec，不複製長研究。
 
-基線：2026-09-06 offline `204 passed / 22 skipped`（未提供專用 PG DSN）。本段最終 `244 passed / 0 skipped`，含18個新增用例；獨立 review 無 Critical／Important／Minor。完整紅綠、測試資料修正與框架空參數核對見[结果](../specs/2026-09-06-memory-consolidation-notification-results.md)。Task4a 關閉後回到父計畫 Task3／其餘 Task4，不能宣稱服務接線完成。
+基線：2026-09-06 offline `204 passed / 22 skipped`（未提供專用 PG DSN）。本段最終 `244 passed / 0 skipped`，含18個新增用例；獨立 review 無 Critical／Important／Minor。完整紅綠、測試資料修正與框架空參數核對見[结果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-06-memory-consolidation-notification-results.md)。Task4a 關閉後回到父計畫 Task3／其餘 Task4，不能宣稱服務接線完成。

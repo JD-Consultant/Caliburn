@@ -1,6 +1,6 @@
 # JD 跨輪人工變更通知：Task 3.3a 有限設計
 
-2026-09-10；JD-R002/C03；**G4有限設計已通過獨立review並納回register／六切片**，見[審查證據](evidence/2026-09-10-jd-model-view-design-review.md)。本稿只閉合已批准人工變更感知的技術未知，不改production authority。§6.2的SSOT description在Task 3接線前更新及重生，Task 1當前驗收schema不在修正中途變動。
+2026-09-10；JD-R002/C03；**G4有限設計已通過獨立review並納回register／六切片**，見[審查證據](../experiments/legacy-evidence/2026-09-10-jd-model-view-design-review.md)。本稿只閉合已批准人工變更感知的技術未知，不改production authority。§6.2的SSOT description在Task 3接線前更新及重生，Task 1當前驗收schema不在修正中途變動。
 
 ## 1. Preflight 與結論
 
@@ -29,7 +29,7 @@
 | `service.py: CooperativeStop` 與 `conversation.py: close_turn` | after-model stop 可能早於其他 after-model hook；供給紀錄若只在晚期 hook 落盤會遺失。close 的 child→root 搬運也須包含已確認紀錄，不能用結束版本自行補造 |
 | `budget.py: ResponsesBudget` 在最終 SDK request 執行現有 preflight；`truncation=disabled` | 通知必須被現有計數／容量檢查涵蓋。字元／byte 上限只是 App 呈現限制，不是模型 token 上限；不擴大既有 capacity、output、compaction 或模型／工具次数 |
 
-供應商依據沿既有 [OpenAI](evidence/2026-09-10-jd-context-openai.md)／[Anthropic](evidence/2026-09-10-jd-context-anthropic.md) 的當日定點查核；本輪未重新廣搜，也沒有把公開測試碼當已執行測試。正式接點為 [LangChain context engineering](https://docs.langchain.com/oss/python/langchain/context-engineering#messages)；`ExtendedModelResponse` 的可用性另由上述已安裝原碼核對。Codex experimental injection、Claude hook 的大小政策仍只作先例，不成為本案依賴或數值規範。
+供應商依據沿既有 [OpenAI](../experiments/legacy-evidence/2026-09-10-jd-context-openai.md)／[Anthropic](../experiments/legacy-evidence/2026-09-10-jd-context-anthropic.md) 的當日定點查核；本輪未重新廣搜，也沒有把公開測試碼當已執行測試。正式接點為 [LangChain context engineering](https://docs.langchain.com/oss/python/langchain/context-engineering#messages)；`ExtendedModelResponse` 的可用性另由上述已安裝原碼核對。Codex experimental injection、Claude hook 的大小政策仍只作先例，不成為本案依賴或數值規範。
 
 ## 3. 三種基準不能混用
 

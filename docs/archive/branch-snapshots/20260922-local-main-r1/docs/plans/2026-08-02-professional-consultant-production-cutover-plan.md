@@ -2,7 +2,7 @@
 
 - 日期：2026-08-02
 - 狀態：R0 accepted；P1–P8 是後續施工順序，尚未授權實作，且須等待 R1–R5 gate
-- 決策：[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
+- 決策：[ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
   [ADR 0054](../adr/0054-document-boundary-single-writer-cutover.md)、
   [ADR 0055](../adr/0055-hybrid-job-discovery-and-ttop-formation.md)、
   [ADR 0056](../adr/0056-real-employee-pilot-release-gate.md)、

@@ -10,6 +10,8 @@
 
 **從能力找材料：**[系所／教授公開資料的判準](admissions/research-readiness.md) → [按能力查證據](development-history/evidence-by-capability.md)。補找文獻誤讀修正、測量可信度、程式診斷與未採用方案，不用最終架構或功能數量取代研究過程。
 
+**從實作找未展開的演進：**[前後程式與測試索引](development-history/code-evolution.md)。補看文件摘要以外的控制權、資料流與保存變化；能由程式確定的事與事後推論分開標示。
+
 ## 介紹產品與程式設計
 
 | 要說明什麼 | 閱讀入口 |

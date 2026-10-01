@@ -26,6 +26,7 @@
 
 | 主題 | 經過與解讀 | 可核對的原始材料 |
 |---|---|---|
+| 實驗發現了什麼問題（缺口、已修正、環境事故；不含解法） | [實驗發現的問題彙整](experiment-findings.md) | 各項直接連到原證據頁與資料包 |
 | 訪談分析品質、Prompt 比較與來源漏選 | [T14 品質紀錄](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md) | [訪談指引比較資料包](../plans/2026-09-29-target-rebuild/evidence/data/instruction-experiments-2026-10-01/README.md) |
 | 長訪談、程序事故、恢復與 PDF | [T17 旅程紀錄](../plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md) | 同一[長旅程資料包](../plans/2026-09-29-target-rebuild/evidence/data/instruction-experiments-2026-10-01/README.md)的逐字稿、事件與成品 |
 | 原生接續、容量與來源工具探測 | [T16 接續紀錄](../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)及[證據分類](../plans/2026-09-29-target-rebuild/evidence/README.md) | [執行與品質探測原件](../plans/2026-09-29-target-rebuild/evidence/data/runtime-probes-2026-10-01/README.md) |

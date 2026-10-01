@@ -297,3 +297,18 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/ca
 另由 fresh-context 審閱者唯讀檢查指定 2 個產品檔與 4 個測試檔，無新阻擋問題。指出可延後的組合覆蓋：B 角色輪前 127,999 不壓縮，以及 160K 回交壓縮同時保存故障；本片已有共用準備邊界、角色達門檻及恢復各自的反例，未出現需另改機制的反證，因此不擴加整套組合矩陣。審閱不是獨立重跑或真模型驗收。
 
 本片 **零新 OpenAI 請求、零付費**；重用 §7／§9 先前真 Luna 160K–180K 窗口與輪前壓縮證據，不把它們重新計成此次測試。剩餘三角色新數值下的真長旅程與來源品質仍待驗，T16／T17／T18 不勾完成。
+
+## 11. 160K 中途保險的真窗口驗收（2026-10-01）——執行前 manifest
+
+§10 把完整 Step 之間的中途保險由 272K 改為 160K，但測例是在 provider 邊界**合成** token 數；§5 的 272K 嘗試又因帳戶 200K TPM 受阻。所以 160K 這個新常數還沒被真 provider 看過。本片用**產品原常數**（不修補）做一次有界驗收；長旅程中自然發生的壓縮（若有）另在 [T17](t17-course-administrator-journey.md) 記錄。
+
+| 項目 | 界線 |
+|---|---|
+| 內容 | 真 Luna 一次 create 要求唯一的合成工具 → 本機以固定合成紀錄回傳（約 16 萬 token）→ 共用 `run_response_loop` 在下一請求前由 provider 實際計數，跨過 `MID_WORK_COMPACTION_THRESHOLD_TOKENS` → 既有 `run_context_compaction` 一次 → 採用完整返回視窗（驗 compaction item、輸出與保存相等，create 前輸入未被改）→ 壓後視窗 create 最終答覆 → 同一 loop 重入不重發 |
+| 模型／資料 | `gpt-6-luna`；探針固定 reasoning `medium`、輸出上限 2,048（與產品 effort 無關）。資料全是常數合成庫存紀錄，沒有 repo、員工或 Demo 資料 |
+| 次數／上限 | 程式內硬限：token count ≤4、create ≤2、compact ≤1；重試 0；create 輸入 >32,000 token 或壓前視窗不在 160,000–190,000 token 即拒絕；整體逾時 600 秒；輸出檔只能用一次 |
+| 費用 | 沿 §7／§9 同型合成視窗（兩次生成、一次壓縮）約 US$0.017；本片估 ≈ US$0.02–0.03，**停止上界 US$0.20** |
+| 停止 | 任何 provider 錯誤（含 429）或不變量不成立即停止，不重送、不縮小重試；429 則記錄可見的額度後結束 |
+| 前提 | 本機單程序、`InMemorySaver`；**執行時沒有其他模型流量**（帳戶 TPM 200K）；不碰產品 DB／Demo |
+| 腳本 | ignored `.research-tmp/eval/probe_step_compaction_160k.py` SHA-256 `aaa73a8bf02908ffe8b1a7f1c4e4d273896f40e678b703d9eca4e0df5e79f0ff`；匯入夾具 `probe_compaction_continuity.py` `78342e546ddb64df31f0e80e8c81935bc31ecc8cce92148ce2bedbda3d3bd5c6`（同 §9）；輸出 `step-160k-20261001.jsonl` |
+| 不宣稱 | 不證明 JD 品質、正式 A 角色接線（§9 已驗）或 B1／B2 在 160K 的接續；不改產品門檻。成功只代表**同程序**共用迴圈在新常數下，真 provider 接受並能接續 |

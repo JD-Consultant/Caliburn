@@ -5,9 +5,10 @@
 ## 先讀哪裡
 
 1. [各校官方要求與時程](requirements-116.md)：成大、臺大與陽明交大分開核對；不要把一校的推薦函或貢獻證明規定套到另一校。
-2. [共用問題分析與實驗案例集](../research-casebook.md)：已整理四個案例，以及原文、數據與限制的入口。
-3. [教授版架構報告](../system-architecture/README.md)：解說內部設計，含可閱讀的架構圖；先看程式基準與尚未驗收範圍。
-4. [原始實驗資料](../../plans/2026-09-29-target-rebuild/evidence/data/instruction-experiments-2026-10-01/README.md)：逐字稿、成品、事件、指標，不為不同學校複製多份。
+2. [開發演進素材索引](../development-history/README.md)：從最早期追查問題、研究、改動、驗證與改向，先盤點，不現在決定只寫哪兩個故事。
+3. [共用問題分析與實驗案例集](../research-casebook.md)：四個已有較完整摘要的案例；不是全部歷史。
+4. [教授版架構報告](../system-architecture/README.md)：解說內部設計，含可閱讀的架構圖；先看程式基準與尚未驗收範圍。
+5. [原始實驗資料](../../plans/2026-09-29-target-rebuild/evidence/data/instruction-experiments-2026-10-01/README.md)：逐字稿、成品、事件、指標，不為不同學校複製多份。
 
 ## 從官方審查項目推導材料重點
 

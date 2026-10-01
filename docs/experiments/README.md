@@ -49,6 +49,7 @@
 - [歷史工作樹的獨有實驗](historical/README.md)：CT 系列、JD 整合初審與修正、R1 方法資產、Agent 任務報告；重複副本不另存。
 - [新目標證據](../plans/2026-09-29-target-rebuild/evidence/README.md)：T01–T18 各自的判準、結果與限制，仍由該任務維護。
 - [跨校可用的問題分析案例](../reports/research-casebook.md)：給教授與報告讀者的解讀入口，不取代原始結果。
+- [從早期開始的開發演進](../reports/development-history/README.md)：串起原問題、研究、不同架構與實測；含未採用及未執行的方案，不只選近期成功結果。
 
 - [`2026-07-26-r1-p0-context-representation/`](2026-07-26-r1-p0-context-representation/) —
   **Closed／不執行**（[ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)，2026-07-27）。

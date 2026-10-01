@@ -7,13 +7,13 @@ from openai import AsyncOpenAI
 from pydantic import JsonValue
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.agents.memory_analysis.runner import MemoryAnalysisRunner
 from caliburn.agents.work_understanding_analyst.instructions import UNDERSTANDING_INSTRUCTIONS
 from caliburn.features.executions.history_models import AgentRole
 from caliburn.features.executions.models import ExecutionWriter
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.settings import ModelSettings
-from caliburn.workflows.memory_analysis.results import MemoryAnalysisResult
-from caliburn.workflows.memory_analysis.runner import AnalysisRecovery, MemoryAnalysisRunner
+from caliburn.workflows.memory_analysis.results import AnalysisRecovery, MemoryAnalysisResult
 
 
 @dataclass(frozen=True, slots=True)

@@ -10,7 +10,7 @@ from tempfile import gettempdir
 
 from psycopg import AsyncConnection
 
-from caliburn.settings import DatabaseSettings
+from caliburn.adapters.database_settings import DatabaseSettings
 
 
 class ProcessLockUnavailableError(RuntimeError):

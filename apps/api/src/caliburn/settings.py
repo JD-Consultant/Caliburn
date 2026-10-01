@@ -7,25 +7,9 @@ from decimal import Decimal
 from pathlib import Path
 
 from openai.types.shared.reasoning_effort import ReasoningEffort
-from sqlalchemy.engine import URL, make_url
 
+from caliburn.adapters.database_settings import DatabaseSettings
 from caliburn.adapters.openai_models import model_profile
-
-
-@dataclass(frozen=True, slots=True)
-class DatabaseSettings:
-    url: str = field(repr=False)
-    schema: str = "caliburn"
-
-    def __post_init__(self) -> None:
-        if not re.fullmatch(r"[a-z][a-z0-9_]{0,62}", self.schema):
-            raise ValueError("Database schema must be a lowercase PostgreSQL identifier")
-        if make_url(self.url).drivername not in {"postgresql", "postgresql+psycopg"}:
-            raise ValueError("The target database must use PostgreSQL with psycopg")
-
-    @property
-    def sqlalchemy_url(self) -> URL:
-        return make_url(self.url).set(drivername="postgresql+psycopg")
 
 
 @dataclass(frozen=True, slots=True)

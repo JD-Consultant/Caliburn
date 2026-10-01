@@ -6,13 +6,17 @@ from langgraph.checkpoint.base import BaseCheckpointSaver
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.agents.memory_analysis.runner import MemoryAnalysisRunner
 from caliburn.agents.work_situation_analyst.instructions import SITUATION_INSTRUCTIONS
 from caliburn.features.executions.history_models import AgentRole
 from caliburn.features.executions.models import ExecutionWriter
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.settings import ModelSettings
-from caliburn.workflows.memory_analysis.results import MemoryAnalysisResult, SituationGap
-from caliburn.workflows.memory_analysis.runner import AnalysisRecovery, MemoryAnalysisRunner
+from caliburn.workflows.memory_analysis.results import (
+    AnalysisRecovery,
+    MemoryAnalysisResult,
+    SituationGap,
+)
 
 
 @dataclass(frozen=True, slots=True)

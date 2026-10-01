@@ -17,8 +17,8 @@ from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingA
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionStatus
 from caliburn.settings import DatabaseSettings, ModelSettings
+from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.execution_failures import run_with_failure_boundary
-from caliburn.workflows.memory_analysis.tools import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.memory_batch import MemoryBatchWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow

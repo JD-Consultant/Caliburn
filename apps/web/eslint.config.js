@@ -5,6 +5,9 @@ import hooks from 'eslint-plugin-react-hooks';
 import refresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
+// A feature uses shared code only; pages compose features in app (code-organization.md §2.6).
+const features = ['interview', 'jd-editor', 'job-files', 'source-viewer'];
+
 export default defineConfig(
   globalIgnores(['dist', '.next', 'test-results', 'playwright-report', 'src/shared/api/generated']),
   js.configs.recommended,
@@ -52,4 +55,21 @@ export default defineConfig(
       ],
     },
   },
+  ...features.map((feature) => ({
+    files: [`src/features/${feature}/**/*.{ts,tsx}`],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: `^(\\.\\./)+(${features.filter((other) => other !== feature).join('|')})(/|$)`,
+              message: 'feature 不 import 別的 feature；跨 feature 協作由 app 組裝。',
+            },
+            { regex: '^(\\.\\./)+app(/|$)', message: 'feature 不依賴頁面組裝。' },
+          ],
+        },
+      ],
+    },
+  })),
 );

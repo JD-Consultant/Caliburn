@@ -189,3 +189,25 @@ Ruff 檢查／格式通過，mypy **274 source files 無問題**。未重跑與�
 - 候選分支上的真模型旅程與 PDF 另記於 T17／下節（若已執行）；這裡的啟動驗證沒有發送模型請求。
 - 根 `check` 不含真 PostgreSQL 整合測試、瀏覽器旅程與真模型；它們仍依各任務證據分開執行。
 - 尚未更新 `current-decisions.md`、各 App README 的狀態標頭與 ADR 採用狀態——那是放行時的同步動作，不在候選預先改寫。
+
+## 切換候選重基與重驗（2026-10-02）
+
+**重基：**候選分支 `target-cutover-candidate`（原 `5bccf4fb`，基準 `57db0b5f`）重基到目前主線 `target-rebuild`（`2c70f0ef`，主線在候選建立後多了 13 個提交，含 `docs/` 的大規模整理）；新 head `f11f23b6`，8 個提交（原 6 個＋2 個同步），與主線無分歧（`target-rebuild` 的每個提交都在候選裡）。**沒有 merge、push，原分支未動，ADR0079 仍是 Proposed。**
+
+| 衝突 | 解法與理由 |
+|---|---|
+| `experiments/jd-relational-app/tests/support/p3_trial_server.py`（候選刪除、主線改了一個證據路徑） | 刪除：該檔本來就在 379 檔退役清單，主線的修改只是路徑改名 |
+| `experiments/jd-relational-app/README.md` | 保留退役標記，並採主線更新過的連結行 |
+| `ARCHITECTURE.md`、`README.md` | 採候選的「新產品是正式產品」敘述，只併入主線新增的兩條導覽（找檔案／接手工作、教授與技術評閱者）；移除自動併入的「本頁仍描述 ADR0077 的正式產品」句 |
+| `docs/README.md`（主線整份重寫） | 採主線的新結構，把候選的意圖重新套上：導言、啟動入口列、權責表、目錄分類表；另修兩處殘留（目錄分類表與 `docs/specs/README.md` 仍稱舊 App 是現行正式產品） |
+
+另補兩個同步（`f11f23b6`）：ADR0079「採用前條件」改成 2026-10-02 的真實狀態（T14／T16／T17 已結案、T18 待放行、仍須查回的限制），runbook 診斷表新增兩列——額度用完（`credit_balance_exhausted`，不重試、補額度後重送）與資料庫伺服器重啟後須重啟後端。
+
+**實際驗證（候選 worktree，工具鏈沿 [T01 §2](t01-foundation.md#2-可接續的環境與命令)；沒有送任何模型請求）：**
+
+- 根 `pnpm run check` **exit 0**：Ruff 433 檔、mypy strict 280 個來源檔、`tsc`、node 測試 5 項、**1,152 項單元／契約測試（21.5 秒）**、**162 項前端測試（28 檔）**、契約生成核對、production build（952.67 kB JS）。後端測試比先前的 1,141 多 11 項，是主線新增的 harness 續跑測試。
+- 入口文件連結：README、ARCHITECTURE、CONTRIBUTING、docs/README、specs/README、目標架構地圖、實作入口、runbook、current-decisions、兩個 App README、兩個退役 README、ADR0079 共 14 份，只剩 `current-decisions.md` 既有的 11 個歷史壞錨點，與主線同一份的基準數字相同。
+- **`app:status` 先正確地擋下舊 schema：**候選驗證用的 `cutover_verify` 還在重基前的 migration 版本，診斷回報「schema NOT usable，先 `pnpm app:migrate`」；依指示 `app:migrate` 後回報「reachable, migrations at head」（0021）、模型 key 已設定（隱藏）、字型與瀏覽器 ok、Web 建置已找到。
+- 以根 `pnpm start --port 8104` 從重基後的樹重啟（只停止以命令列與埠確認身分的候選後端 3 個程序）：首頁 200 `text/html`、`/job-files/<id>` 深連結在瀏覽器式 `Accept` 下 200、缺失 API 404、`/api/health` ok、先前驗證資料仍在（1 份職務檔案）。探針腳本兩處本機小錯（用了 PowerShell 唯讀的 `$home`、深連結沒帶 `Accept`）已修正，不是產品問題。
+
+**仍未驗：**候選分支上的真模型短旅程與 PDF——**OpenAI 帳戶額度已用完**（2026-10-02 05:16 起，見 [T16 §12](t16-compaction-continuity.md#12-b1b2-輪前壓縮的真模型觀察2026-10-02執行前-manifest)），補額度前不執行；它不在 T18 要求的「先驗」清單內，產品程式碼與原分支相同（重基只帶入文件與 harness 腳本／測試），因此不是放行阻擋條件，但放行前若有額度建議補一次（約 US$0.1）。同機驗證的限制（非另機／容器）不變。**T18 不勾**：放行與否由 Owner 決定。

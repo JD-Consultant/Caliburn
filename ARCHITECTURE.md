@@ -3,6 +3,8 @@
 > 正式權責以 [ADR0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)、
 > [目前決策](docs/current-decisions.md)與各責任設計文件為準。本頁只提供現行鳥瞰，不複製完整規則。
 
+新目標的設計與重建程式請走[目標架構地圖](docs/target-architecture-map.md)及[任務表](docs/plans/2026-09-29-target-rebuild/tasks.md)；本頁下圖仍描述 ADR0077 的正式產品，不是新目標 A／B1／B2 的架構圖。
+
 Caliburn 是本機 Web AI 職務分析與職務說明書（JD）App。員工可直接編輯 JD，也可與顧問持續訪談，
 由 LLM 透過相同的 App 業務規則讀寫 JD。單一操作者可管理多份彼此隔離的文件；目前沒有登入、ACL、
 多租戶、計費、雲端部署或多人協作。
@@ -36,8 +38,8 @@ PostgreSQL 18.6
 | [`experiments/jd-relational-app/web/`](experiments/jd-relational-app/web/README.md) | 同頁訪談、六章 JD 編輯、改動／來源查看與只撤回本輪 JD |
 | [`packages/consultant-memory/`](packages/consultant-memory/README.md) | 分層案例／工作理解 Memory、Skills 與 publication 元件 |
 
-`apps/api`、`apps/web`、`packages/job-analysis-contract` 的舊可執行程式已退役；保留的 README 只供歷史追溯，
-不可成為 import、啟動或契約 authority。
+`apps/api`、`apps/web`、`packages/job-analysis-contract` 的舊接線已退役。目前 `apps/api`／`apps/web` 已用於新目標重建，
+各自的 README 說明新程式的開發操作；這不復活舊接線，也不表示現行正式入口已切換。
 
 ## 權責不變量
 

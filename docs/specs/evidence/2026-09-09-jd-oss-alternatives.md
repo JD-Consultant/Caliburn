@@ -9,7 +9,7 @@
 - **Binding decisions：**C01 的可辨識結構＋完整敘述、AI 與人接續同份最新 JD、AI 改動可辨識且人能續編／接受／退回。只考慮免費開源可採用組合；付費功能只能參考。綠地研究，不以舊產品或架構限制方案；不重做既有 LLM／Memory。
 - **政策更新：**Owner 最新表示「人改待審內容仍待審 如果不是共識的話也可以改」。因此人工續改的待審歸屬是可以研究後再議的政策，**不是本輪硬性淘汰條件**；也不代表 Owner 已同意人工一改即接受。
 - **本輪唯一問題：**Lexical 或 Tiptap／ProseMirror 是否已有可提出完整候選的免費、開源、維護中修訂層？若沒有，缺口能否具體指認，留待共同決定？
-- **已讀前置：**[current register](../../current-decisions.md)頂部、[decision process](../../decision-process.md) G2–G5 與 closure、[F01–F05](../2026-09-09-jd-editor-framework-comparison.md)。register 中原付費推薦及較強待審政策需由主線統一更新，本分工不修改 register。
+- **已讀前置：**[current register](../../current-decisions.md)頂部、[decision process](../../decision-process.md) G2–G5 與 closure、[F01–F05](../../research/engineering/2026-09-09-jd-editor-framework-comparison.md)。register 中原付費推薦及較強待審政策需由主線統一更新，本分工不修改 register。
 - **完成方式：**官方文件、公開作者倉庫、公開 release／npm 中繼資料、原始碼與既有測試的靜態閱讀。下載只進 `.research-tmp/jd-oss/alternatives/`；未安裝依賴、未執行套件／測試、未呼叫模型、未做 runtime spike。
 
 **研究結論（Caliburn mapping）：**兩條路都有可靠的免費編輯底座，但本輪沒有找到足以直接列為「成熟完整 JD 待審方案」的 Lexical 修訂層。Tiptap／ProseMirror 確有真正開源第三方修訂套件，並非只能買付費功能；其中 `sungkhum/tiptap-track-changes` 可列**有限備選／缺口對照**，但程式寫入追蹤、保存重開、語意群組與任意區塊操作仍有明確缺口。`davefowler/prosemirror-suggestion-mode` 的作者仍標 WIP，另有實際定位及 HTML metadata 問題，不能用其測試數量或 API 名稱升格為成熟候選。**不是「沒有滿足全條件的套件，所以立即自造引擎」的結論。**

@@ -5,8 +5,8 @@
 > 新 session 讀 CLAUDE.md + 該 spec + 本 plan 即可獨立開工。
 
 - 依據:[ADR 0015](../adr/0015-document-save-optimistic-concurrency.md)(決策不變)·
-  研究 [`../specs/2026-06-30-web-data-layer-optimization-research.md`](../specs/2026-06-30-web-data-layer-optimization-research.md) §2 ·
-  [`../specs/2026-07-02-llm-interview-authoring-research.md`](../specs/2026-07-02-llm-interview-authoring-research.md)(軸 3/4:回合制 + staged 審閱背書)。
+  研究 [`../specs/2026-06-30-web-data-layer-optimization-research.md`](../research/engineering/2026-06-30-web-data-layer-optimization-research.md) §2 ·
+  [`../specs/2026-07-02-llm-interview-authoring-research.md`](../research/work-analysis/2026-07-02-llm-interview-authoring-research.md)(軸 3/4:回合制 + staged 審閱背書)。
 - **ADR 0015 實作精化(非翻案)**:ADR 說「啟用 version 守衛」;實查發現 draft 就地更新**不動 version**
   (version 只在新 draft/finalize +1,且 UI 顯示「正式版本 vN」)→ 光靠 version 擋不到「兩分頁改同一 draft」。
   故 token 精化為**雙 token**:`version`(文件世系,語意不變)+ 新增 `revision`(單列編輯回合計數)。

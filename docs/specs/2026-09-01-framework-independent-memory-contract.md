@@ -39,7 +39,7 @@ Memory 的價值只有一個：讓 LLM 在長訪談後，仍能取得形成與�
 
 這五項是目前的**框架無關行為契約**，不是五套資料庫，也不預先指定 Markdown、JSON、檔案、向量資料庫、graph 或任何 framework class。
 
-來源：[Memory mapping §9.39～§9.40](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md)、[通用 Memory 研究 §6、§9、§13](./2026-08-30-agent-memory-landscape-and-decision-working-research.md)
+來源：[Memory mapping §9.39～§9.40](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md)、[通用 Memory 研究 §6、§9、§13](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md)
 
 ## 3. 五個部分各自負責什麼
 
@@ -270,7 +270,7 @@ Memory 只負責保存、修訂、搜尋、讀取與完整列舉工作資訊。�
 
 上述資訊由 Runtime／Storage 從可信 Context 產生。Tool 結果必須可區分成功、合法 no-op、輸入錯誤、找不到或已過期，以及可重試失敗；失敗不能偽裝成成功，也不能要求模型猜測系統 ID。
 
-來源：[Memory mapping §9.40.1、§9.40.4～§9.40.7](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md)、[通用 Memory 研究 §13.15](./2026-08-30-agent-memory-landscape-and-decision-working-research.md)
+來源：[Memory mapping §9.40.1、§9.40.4～§9.40.7](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md)、[通用 Memory 研究 §13.15](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md)
 
 ### 7.1 通用 production 治理基線
 
@@ -283,7 +283,7 @@ Memory 只負責保存、修訂、搜尋、讀取與完整列舉工作資訊。�
 - **Memory 是低權限資料。**員工內容、來源、整理後 Memory 與搜尋結果都只能當資料，不得覆蓋 system policy、權限或工具規則。
 - **發布與使用狀態可觀察。**處理中／成功／失敗、重試、召回原因、token、延遲與錯誤不能成為無法診斷的黑盒；若 substrate 啟用版本／revision，再一併記錄，而不是為了觀測先自建版本平台。
 
-來源：[通用 Memory 研究 §6 的 B1～B14、§9](./2026-08-30-agent-memory-landscape-and-decision-working-research.md)
+來源：[通用 Memory 研究 §6 的 B1～B14、§9](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md)
 
 ## 8. 選框架時不可妥協的門檻
 
@@ -355,7 +355,7 @@ Memory 只負責保存、修訂、搜尋、讀取與完整列舉工作資訊。�
 
 ### 12.2 跨 OpenAI、Anthropic、Google、AWS 與框架的通用研究
 
-- [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](./2026-08-30-agent-memory-landscape-and-decision-working-research.md)
+- [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md)
   - §5：各家實際公開作法
   - §6：B1～B14 共同基線與可選能力
   - §7～§9：更新、召回、版本與完整通用流程

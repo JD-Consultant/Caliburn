@@ -22,7 +22,7 @@ JD-R002/C03；查閱日 **2026-09-09**；**共同基礎已獲 Owner 同意，G3�
 
 ## 1. 上次有研究，但交付缺了哪一層
 
-已有 [E16–E20](2026-09-09-jd-document-model-official-evidence.md#6-c03-整體-ai-編輯應用接法) 及 [R01–R10](2026-09-09-jd-ai-app-runtime-official-evidence.md) 覆蓋模型／工具往返、patch／精確替換、錯誤與恢復。問題是內容散在證據表，入口很快轉向 Tiptap 與待審分組，沒有獨立呈現「模型具備哪些能力、App 必須供給什麼、怎樣判斷操作完成」的共同基礎。
+已有 [E16–E20](../research/engineering/2026-09-09-jd-document-model-official-evidence.md#6-c03-整體-ai-編輯應用接法) 及 [R01–R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md) 覆蓋模型／工具往返、patch／精確替換、錯誤與恢復。問題是內容散在證據表，入口很快轉向 Tiptap 與待審分組，沒有獨立呈現「模型具備哪些能力、App 必須供給什麼、怎樣判斷操作完成」的共同基礎。
 
 本輪保留原研究，補上這份先讀稿；[整體接法](2026-09-09-ai-document-app-composition-research.md)與[可執行候選](2026-09-09-jd-ai-editing-executable-proposal.md)接在後面。不是把 editor 原生功能或我們的產品需求冒稱大廠共識。
 
@@ -92,7 +92,7 @@ App 有幾種可供模型操作的介面：
 
 **本輪推論：**初稿生成、局部精修、全文重整可以需要不同操作；不應先要求所有修改都是 patch，也不應每次都強迫重寫全文。應比較目標定位、未改內容保留、格式往返、錯誤恢復與模型成本。文件 JSON、HTML、文字 diff 都只是介面選項，schema 合法不等於資訊完整。
 
-官方 Apply patch 明列原子性由執行方決定；不能把多項 tool calls、一次 batch、undo 或員工的一組審核視為同一概念。原有 F 表已保存[部分成功與審核差距](2026-09-09-jd-editor-framework-comparison.md)，本稿不把它們當已解決。
+官方 Apply patch 明列原子性由執行方決定；不能把多項 tool calls、一次 batch、undo 或員工的一組審核視為同一概念。原有 F 表已保存[部分成功與審核差距](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)，本稿不把它們當已解決。
 
 **Google 的具體差異（Official fact）：**[Docs batchUpdate／WriteControl](https://developers.google.com/workspace/docs/api/reference/rest/v1/documents/batchUpdate) 明列 request 驗證失敗則整批不套用，以及 requiredRevisionId／targetRevisionId 的不同基準版本語意。[Requests](https://developers.google.com/workspace/docs/api/reference/rest/v1/documents/request) 另定 UTF-16 index／range、插入位置限制與樣式操作。這證明結構與版本可由文件 App 提供；不表示所有 editor 都有相同原子性，或模型應自行估算富文字位置。
 

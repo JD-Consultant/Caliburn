@@ -14,7 +14,7 @@ Owner 最新補充：專案非常依賴記憶，但每輪資訊可能很少，�
 - [Memory 設計](2026-09-06-analysis-only-agent-memory-design.md)：五產物、來源視窗、B1／B2／C、回查與發布；仍為內容及流程設計入口。
 - [Runtime 設計](2026-09-06-analysis-only-agent-runtime-design.md)：原生推理、每次請求的 Context 與 Compaction。
 - [背景生命週期研究](2026-09-05-memory-background-cycle-flow-review.md)：抽取／保存／整併分工，不重新研究同一生命週期。
-- [OpenAI 詳記更正證據](2026-09-06-openai-rollout-summary-correction-source-review.md)：已固定版本的程式證據與詳記更新邊界，不把摘要批次當成單一案例主檔。
+- [OpenAI 詳記更正證據](../research/agent-systems/2026-09-06-openai-rollout-summary-correction-source-review.md)：已固定版本的程式證據與詳記更新邊界，不把摘要批次當成單一案例主檔。
 - [應用接線計畫](../plans/2026-09-06-analysis-only-agent-application-wiring.md)：Task3 最小 API、Task4 排程；本題不阻塞 Task3，但 Task4 不能把候選門檻當作已驗證最佳值。
 - [通知接線子稿](2026-09-06-memory-consolidation-request-wiring-design.md)：具體工具／metadata、dispatcher、取消及恢復檢查；本稿只保留策略與成本依據。
 

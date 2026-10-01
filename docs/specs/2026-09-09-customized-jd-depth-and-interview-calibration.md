@@ -1,8 +1,8 @@
 # 客製化 JD：資訊深度與訪談校準
 
-2026-09-09；JD-R001/C06，**示例深度獲可修訂同意（G3／WORKING）**。Owner 在[雇主文件比較](2026-09-09-employer-job-document-comparison.md)後對完整樣稿r2「大致上同意」；[版本同步與核心文檔複核](2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)集中保存最新結果。本文保留深度／追問方法，不重做欄位、Memory或編輯器選型；同意不等於核准prompt或產品修改。
+2026-09-09；JD-R001/C06，**示例深度獲可修訂同意（G3／WORKING）**。Owner 在[雇主文件比較](../research/work-analysis/2026-09-09-employer-job-document-comparison.md)後對完整樣稿r2「大致上同意」；[版本同步與核心文檔複核](2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)集中保存最新結果。本文保留深度／追問方法，不重做欄位、Memory或編輯器選型；同意不等於核准prompt或產品修改。
 
-閱讀分工：[入口](2026-09-09-job-analysis-and-jd-content-research.md)管進度；[分析指南](2026-09-09-complete-work-analysis-guide.md)管完整資訊面向；[欄位指南](2026-09-09-jd-field-and-writing-guide.md)管成品內容；本文只管**實際職位的深度、追問與收尾校準**。[新增原始來源、日期、讀取限制](2026-09-09-job-analysis-international-evidence.md#9-客製化職位與分析深度的補充證據)集中維護，不再複製一份跨國長文。
+閱讀分工：[入口](2026-09-09-job-analysis-and-jd-content-research.md)管進度；[分析指南](2026-09-09-complete-work-analysis-guide.md)管完整資訊面向；[欄位指南](2026-09-09-jd-field-and-writing-guide.md)管成品內容；本文只管**實際職位的深度、追問與收尾校準**。[新增原始來源、日期、讀取限制](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md#9-客製化職位與分析深度的補充證據)集中維護，不再複製一份跨國長文。
 
 ## 1. 先回答：樣稿夠不夠詳細
 
@@ -72,7 +72,7 @@ NHS 的職位分析訪談會補充未答清的資訊與例子，並拿例子反�
 
 ## 4. 實際工作、完成要求與個人表現不混用
 
-來源有一個須保留的張力：有些雇主指引強調描述目前怎麼做，有些同時要求描述合格履行方式；工作設計指引還可能建議重新分配／刪減活動。不能把它們拼成「AI 可以把現況改成理想工作」。差異與原文位置見[證據表§9](2026-09-09-job-analysis-international-evidence.md#9-客製化職位與分析深度的補充證據)。
+來源有一個須保留的張力：有些雇主指引強調描述目前怎麼做，有些同時要求描述合格履行方式；工作設計指引還可能建議重新分配／刪減活動。不能把它們拼成「AI 可以把現況改成理想工作」。差異與原文位置見[證據表§9](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md#9-客製化職位與分析深度的補充證據)。
 
 建議分清三個問題，**不新增三個必填欄位**：
 

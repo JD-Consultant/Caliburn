@@ -175,7 +175,7 @@ LLM runtime 的重試與恢復也必須和 App 的 operation idempotency、保�
 | LLM 顧問已完成 Luna 試用與 prompt 校準 | [`current-decisions.md`](../../current-decisions.md) 最新現況更正；`worktree-progress-map-2026-09-15.md` | 本輪基線 |
 | 模型經 framework／OpenRouter 使用 OpenAI Luna，禁止 fallback | [ADR0060](../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)；[Luna smoke](../2026-08-14-gpt-5-6-luna-live-consultant-smoke.md)；[prompt cache smoke](../2026-08-21-consultant-prompt-cache-live-smoke.md) | 本輪 provider／adapter 基線；不採直連 `ChatOpenAI` |
 | 新 JD App 是 relational 架構候選基線 | [`current-decisions.md`](../../current-decisions.md)；ADR0075 與其設計文件 | 本輪基線；正式 authority 仍依 ADR 狀態 |
-| 顧問與新 App 尚未完成完整日常入口驗收 | [`worktree-progress-map-2026-09-15.md`](../../worktree-progress-map-2026-09-15.md)；guidance／Skills 結果 | 目前真正的整合缺口 |
+| 顧問與新 App 尚未完成完整日常入口驗收 | [`worktree-progress-map-2026-09-15.md`](../../archive/retired-documents/worktree-progress-map-2026-09-15.md)；guidance／Skills 結果 | 目前真正的整合缺口 |
 | B1／B2 是 Memory 背景流程，C 是前景即時修補；皆為 App 內部能力 | H4／B1-B2 adoption 文件與現有 runtime contract | 不得擴大解讀成多產品或第二個 JD writer |
 
 ## 3. 初步發現的接線文件問題

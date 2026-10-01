@@ -18,7 +18,7 @@
 - 相關文件：
   - [專業職務分析與短回答架構研究](2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)
   - [LLM 架構反方審查與工作分析核心修正版](2026-07-24-interview-vnext-llm-architecture-red-team-and-corrected-work-analysis-design.md)
-  - [Job Authoring v2 關聯式儲存研究](2026-07-24-job-authoring-v2-relational-storage-research.md)
+  - [Job Authoring v2 關聯式儲存研究](../archive/retired-documents/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)
 
 ---
 

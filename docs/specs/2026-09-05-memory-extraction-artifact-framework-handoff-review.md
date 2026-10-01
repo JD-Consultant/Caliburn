@@ -15,7 +15,7 @@
 
 **接續證據：**Owner 再問「怎麼知道要開哪份相關摘要」。[摘要路由 source review](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)已追到 Runtime 提供地址→整併模型保留 task-local 引用／可搜尋線索→A 沿引用深讀；B 補查摘要但不讀 raw。這補齊保存用途的實際使用者，不把「可以按需讀取」當成 reader 已接好；本稿 §3.3–3.5 接法仍 OPEN。
 
-- 已回讀：[B 流程全文](2026-09-05-memory-background-cycle-flow-review.md)、[artifact 詳表 §4、§5.1–5.6](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)、[原文小元件 §6](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#6-接續核對同源原文如何供-b-抽取與-a-深查)。不重做 OpenAI 研究，不讀已排除的舊產品長稿。
+- 已回讀：[B 流程全文](2026-09-05-memory-background-cycle-flow-review.md)、[artifact 詳表 §4、§5.1–5.6](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)、[原文小元件 §6](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#6-接續核對同源原文如何供-b-抽取與-a-深查)。不重做 OpenAI 研究，不讀已排除的舊產品長稿。
 - 沿用 A 前台讀取、B extraction→consolidation、C 窄幅修補；**B Phase 2 可查摘要，不直接查 raw sessions**。摘要與候選不是 final Memory，也不是 Compaction continuation。
 - 只補官方 public API／固定 source 所能回答的細節。最終 schema、來源精確粒度、Compaction、排程／並行協調、JD、production 均未選定。
 - 證據標示：**官方事實**＝可查 API／source；**接法建議**＝依公開能力組合，尚非官方現成 pipeline 或 Owner 核准實作。不能把所有能力都存在，寫成組合已跑通。
@@ -58,7 +58,7 @@
 
 **呼叫數不能由產物數量推算：**extraction 與後續 consolidation 是兩階段；Memory 正文與導覽在後者維護。Consolidation 的 Agent loop 可包含多次模型／Tool 往返，不是整個 B 固定兩次 request。官方依據、例子及 I/O／模型成本邊界見 [B §3.4](2026-09-05-memory-background-cycle-flow-review.md#34-呼叫計數釐清兩個階段不是固定兩次-api-request)。這項釐清不代表 §3.3 的保存方案已被核准。
 
-空 candidates 可以成功；不因此強迫新增 current Memory。摘要是否有值得保存的內容，與候選是否為空分開。OpenAI Codex 的「全部空字串＝no output」與已准 B 契約差異已在[artifact §4.3](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#43-phase-1rollout_summaryrollout_slugraw_memory)保留，不假裝所有官方產品都一定產生非空摘要。
+空 candidates 可以成功；不因此強迫新增 current Memory。摘要是否有值得保存的內容，與候選是否為空分開。OpenAI Codex 的「全部空字串＝no output」與已准 B 契約差異已在[artifact §4.3](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#43-phase-1rollout_summaryrollout_slugraw_memory)保留，不假裝所有官方產品都一定產生非空摘要。
 
 ## 3. 保存：BaseStore 紀錄與 StoreBackend 檔案都是官方能力
 
@@ -109,7 +109,7 @@ BaseStore 的一筆 extraction 產物
 
 視圖是一般程式將 record 呈現為文字，**不是再請模型摘要，也不預先另存一份 Markdown**。小型 Memory 導覽與 current Memory 仍依父層後續議題處理，不混進 extraction 產物。
 
-既有 OpenAI 研究已查出 Codex「Stage 1 結果存 DB，Phase 2 將選定輸入整理成模型可讀檔案」的分工；因此不能把「模型用檔案」推成「所有資料一開始都只能是檔案」。本建議學的是保存與使用介面分開；**Codex 實際 materialize 檔案，而這裡建議按讀取呈現，不宣稱物理實作相同**。[既有 artifact 詳表 §4.3–4.4](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#44-phase-2-輸入與控制-artifacts)，原始 OpenAI 證據沿用該稿，不重查。
+既有 OpenAI 研究已查出 Codex「Stage 1 結果存 DB，Phase 2 將選定輸入整理成模型可讀檔案」的分工；因此不能把「模型用檔案」推成「所有資料一開始都只能是檔案」。本建議學的是保存與使用介面分開；**Codex 實際 materialize 檔案，而這裡建議按讀取呈現，不宣稱物理實作相同**。[既有 artifact 詳表 §4.3–4.4](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#44-phase-2-輸入與控制-artifacts)，原始 OpenAI 證據沿用該稿，不重查。
 
 ### 3.5 哪些可直接重用，哪些確實要自己接
 
@@ -176,7 +176,7 @@ File reader 的唯讀限制有官方 wrapper／subclass 接點；不是複製檔
 
 **Q017-REF-F01／P2／已修正文檔、接法仍 OPEN：**上一輪由「A 案例沒有出現在工作理解引用裡」推導前台必須直接探索詳記庫，再以此優先①唯讀視圖；這是尚未證成的應用擴充，不能取代已研究的 OpenAI 寫入／引用流程。Owner 要求先回讀既有研究；本輪**撤回依該假設作出的①優先推薦，不改選③，也不刪掉 B 本來就有的補查能力**。三方案仍只在 §3.3 比較，不再以不存在性假設要求 Owner 立即選 adapter。
 
-本輪完整回讀[摘要路由研究](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)、[09-04 progressive-disclosure 研究](2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)，核對 [artifact §4.3–4.5](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#43-phase-1rollout_summaryrollout_slugraw_memory)及已留存固定 Codex source 的相關段落。沒有新做 OpenAI 網路搜尋，不宣稱重新驗證最新 HEAD；以下限既有研究所記錄的公開實作，不推廣成所有 OpenAI 產品的唯一 schema。
+本輪完整回讀[摘要路由研究](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)、[09-04 progressive-disclosure 研究](../research/agent-systems/2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)，核對 [artifact §4.3–4.5](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#43-phase-1rollout_summaryrollout_slugraw_memory)及已留存固定 Codex source 的相關段落。沒有新做 OpenAI 網路搜尋，不宣稱重新驗證最新 HEAD；以下限既有研究所記錄的公開實作，不推廣成所有 OpenAI 產品的唯一 schema。
 
 ### 7.2 引用不是讀取時才補：producer → 保存 → consumer
 

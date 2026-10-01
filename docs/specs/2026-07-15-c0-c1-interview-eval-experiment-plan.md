@@ -2,7 +2,7 @@
 
 - 日期：2026-07-15
 - 狀態：**部分保留、部分被取代**。case/gold/runner/capture/eval 方法繼續有效；C1 在 v3 內增量實作與「先補 v3 provider trace」已於 2026-07-16 取消。
-- 上游研究：[`2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md`](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md)
+- 上游研究：[`2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md`](../archive/retired-documents/specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md)
 - 比較對象：C0（現行 v3 可重播基線）與 C1（Thin Evidence-first）
 - 本文件不評定：C1A Sufficiency Agenda、C2 Workflow Graph、C2P planner、多 agent、fine-tuning
 - 適用團隊：一人開發團隊；需要少量外部職務分析／HR domain review 時會明確標示，不假裝開發者就是 SME
@@ -67,11 +67,11 @@
 
 本計畫延續上游研究第 14、22、23 節，採用下列方法，不重新發明一套任意分數：
 
-1. OpenAI 2026 eval 指引：task-specific dataset、從歷史／production failures 持續擴充、先用可判別的 pass/fail 或 pairwise、以人工標註校準 model grader；測試資產不可只存在即將退場的舊 Evals platform。[上游 O6](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#agentstatecontext工具與評估一手)
-2. Anthropic 2026 agent eval：區分 trial、trajectory、outcome、grader 與 harness；capability eval 和 regression eval 目的不同；隨機系統要重複 trial。[上游 A5](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#agentstatecontext工具與評估一手)
-3. Anthropic Interviewer：固定研究問題和 adaptive follow-up 並存，分析回到完整 transcript 並保留代表性 quote；分類器需人工驗證，資訊不足不強制分類。[上游 A8/A9](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#agentstatecontext工具與評估一手)
-4. O*NET：task 是否存在、relevance、frequency、importance 分開；來源和不確定性需保留。[上游 S4/S5/S6](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#職務技能標準一手)
-5. 最新訪談研究：追問要評 gap、non-leading、單一焦點與實際資訊價值，不只評 topical relevance；但這屬 C1A，不混入本輪 C1 replay 結論。[上游 R6/R7/R8/R10](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#領域方法與可追溯研究)
+1. OpenAI 2026 eval 指引：task-specific dataset、從歷史／production failures 持續擴充、先用可判別的 pass/fail 或 pairwise、以人工標註校準 model grader；測試資產不可只存在即將退場的舊 Evals platform。[上游 O6](../archive/retired-documents/specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#agentstatecontext工具與評估一手)
+2. Anthropic 2026 agent eval：區分 trial、trajectory、outcome、grader 與 harness；capability eval 和 regression eval 目的不同；隨機系統要重複 trial。[上游 A5](../archive/retired-documents/specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#agentstatecontext工具與評估一手)
+3. Anthropic Interviewer：固定研究問題和 adaptive follow-up 並存，分析回到完整 transcript 並保留代表性 quote；分類器需人工驗證，資訊不足不強制分類。[上游 A8/A9](../archive/retired-documents/specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#agentstatecontext工具與評估一手)
+4. O*NET：task 是否存在、relevance、frequency、importance 分開；來源和不確定性需保留。[上游 S4/S5/S6](../archive/retired-documents/specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#職務技能標準一手)
+5. 最新訪談研究：追問要評 gap、non-leading、單一焦點與實際資訊價值，不只評 topical relevance；但這屬 C1A，不混入本輪 C1 replay 結論。[上游 R6/R7/R8/R10](../archive/retired-documents/specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md#領域方法與可追溯研究)
 
 ---
 

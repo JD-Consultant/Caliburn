@@ -1,6 +1,6 @@
 # 職務說明書欄位與寫作指南
 
-本指南提供 JD-R001 的**內容設計建議（Working recommendation）**，不是已核准的資料結構。Owner 於 2026-09-09 授權自主研究並完成建議與樣稿；不再逐項等 C01–C05 回覆，也不把這項授權當成每個細節均已核准。研究基準、決策效力及閱讀路由見 [研究入口](2026-09-09-job-analysis-and-jd-content-research.md)；完整來源見 [證據表](2026-09-09-job-analysis-international-evidence.md)。
+本指南提供 JD-R001 的**內容設計建議（Working recommendation）**，不是已核准的資料結構。Owner 於 2026-09-09 授權自主研究並完成建議與樣稿；不再逐項等 C01–C05 回覆，也不把這項授權當成每個細節均已核准。研究基準、決策效力及閱讀路由見 [研究入口](2026-09-09-job-analysis-and-jd-content-research.md)；完整來源見 [證據表](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md)。
 
 **2026-09-10 最新格式裁決：**Owner大致同意[完整格式](2026-09-10-jd-format-review.md)，並固定成果、要求在任務底下兩組並列，不配對、不互為父子、不與任務敘述合併；以下同步此WORKING規則。「工作執行要求」為替代原「工作要求」的名稱推薦，未視為Owner已選定新名稱。其他內容研究與保存缺口見[整體核對](2026-09-10-jd-format-quality-and-storage-review.md)，其中舊合併呈現建議不再適用。
 
@@ -53,7 +53,7 @@
 
 **寫在前面不等於訪談第一輪就必須定稿。** 目的要能概括已理解的整份工作；後來發現其他有效責任時可修訂，不能反過來用早期的一句目的排除新工作。這是為符合完整工作分析而提出的產品取捨，不宣稱官方規定固定句長或撰寫順序。
 
-官方依據：SAP JPB 將 Headers、Short／Long Descriptions 及 Job Responsibilities 列為不同內容，並允許按模板配置。它支持識別、概述與詳細責任可以分開呈現；**不證明每家都採同一表頭，也不要求 Caliburn 引入其工作族、職等或物件模型**。[SAP 官方教材：Job Profile Content Types／Dependencies](https://learning.sap.com/courses/sap-successfactors-platform-advanced-and-talent-intelligence-hub-academy/managing-job-architecture-with-job-profile-builder-jpb_ba59a2d8-e04d-41d9-812e-eea5a8387995)。其餘分析原則仍沿用 [研究證據表 US1–3](2026-09-09-job-analysis-international-evidence.md)。
+官方依據：SAP JPB 將 Headers、Short／Long Descriptions 及 Job Responsibilities 列為不同內容，並允許按模板配置。它支持識別、概述與詳細責任可以分開呈現；**不證明每家都採同一表頭，也不要求 Caliburn 引入其工作族、職等或物件模型**。[SAP 官方教材：Job Profile Content Types／Dependencies](https://learning.sap.com/courses/sap-successfactors-platform-advanced-and-talent-intelligence-hub-academy/managing-job-architecture-with-job-profile-builder-jpb_ba59a2d8-e04d-41d9-812e-eea5a8387995)。其餘分析原則仍沿用 [研究證據表 US1–3](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md)。
 
 本題審查標準：讀者看完開頭能知道這是什麼職位、主要為誰做什麼；沒有虛構組織關係、案例堆砌或未確認目標。完整樣稿另採「受雇於網站服務公司的前端工程師」，組織與權限均由明示的虛構情境提供；不是從上面短例猜出部門與主管。新責任無法被目的涵蓋，或樣稿顯示資訊不足時可重開。
 
@@ -83,7 +83,7 @@
 
 拆分判斷看能否分別辨識工作目的、成果、責任與變動範圍；不要因一句有「並」就自動拆。合併也不是只算字詞相似度。O*NET 2025 區分「已涵蓋的重複」與「相似但帶來新細節的重疊」；本產品可學此區別，但不照搬其職業資料庫的收錄門檻。[更新方法 pp.7–10](https://www.onetcenter.org/dl_files/EmergingTasks_RevisedApproach.pdf)
 
-**不逐案立任務，不等於刪除所有產品／系統名稱。** 本人長期負責的固定平台或服務範圍若是辨識責任所必需，應依實際資訊保留；單次案件則通常作分析佐證。此區別及 HDR UK／LEGO／Central Saanich 實例集中見[雇主比較§4](2026-09-09-employer-job-document-comparison.md#4-橫向比較共同可學與不可硬湊的差異)，不能靠名稱本身判斷是否成為獨立任務。
+**不逐案立任務，不等於刪除所有產品／系統名稱。** 本人長期負責的固定平台或服務範圍若是辨識責任所必需，應依實際資訊保留；單次案件則通常作分析佐證。此區別及 HDR UK／LEGO／Central Saanich 實例集中見[雇主比較§4](../research/work-analysis/2026-09-09-employer-job-document-comparison.md#4-橫向比較共同可學與不可硬湊的差異)，不能靠名稱本身判斷是否成為獨立任務。
 
 **同一最終目的不代表同一任務。** 釐清需求、估算、開發、交付、維護都可能為了交付網站，但合成一長句會遮蔽責任。檢查方式是：其中一部分若取消或改由別人負責，還能清楚看出剩餘工作嗎？不能時考慮分項。這是樣稿審查判準，不是官方固定拆分算法；O*NET 寫作附錄允許多動作，也建議複雜行動／目的組合考慮拆分。[US4 pp.7–8](https://www.onetcenter.org/dl_files/GreenTask_AppB.pdf)
 

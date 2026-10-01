@@ -1,7 +1,7 @@
 # ADR 0020 — 訪談式撰寫的互動模式:混合載體(文件常駐 + 精靈化訪談面板)
 
 - **狀態**:Accepted（2026-07-02）。
-- 研究依據:[`../specs/2026-07-02-llm-interview-authoring-research.md`](../specs/2026-07-02-llm-interview-authoring-research.md)(§0 需求、§2 五軸、§7 勞動部指引精讀、§8 載體研究)。
+- 研究依據:[`../specs/2026-07-02-llm-interview-authoring-research.md`](../research/work-analysis/2026-07-02-llm-interview-authoring-research.md)(§0 需求、§2 五軸、§7 勞動部指引精讀、§8 載體研究)。
 
 ## 脈絡
 

@@ -99,7 +99,7 @@
 - [OPM Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)支持分析工作、專業及關係；K／S集中顯示、用文字說用途，是本樣稿的閱讀取捨，不是官方指定的關聯結構。
 - [SAP Job Profile Builder](https://learning.sap.com/courses/sap-successfactors-platform-advanced-and-talent-intelligence-hub-academy/managing-job-architecture-with-job-profile-builder-jpb_ba59a2d8-e04d-41d9-812e-eea5a8387995)提供不同內容區塊的成熟例子；不採用其全部人事資料或物件模型。
 
-完整來源版本與限制仍集中在 [證據表](2026-09-09-job-analysis-international-evidence.md)，不在樣稿正文重複學術引用或加入原始對話。
+完整來源版本與限制仍集中在 [證據表](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md)，不在樣稿正文重複學術引用或加入原始對話。
 
 ## 8. 審查狀態與下一階段
 
@@ -120,7 +120,7 @@ Owner 已授權自主研究及形成建議，沒有授權本輪改 DB、Memory�
 
 ## 9. 客製化深度複核（JD-R001/C06）
 
-2026-09-09，Owner 同意 JD-R002/C01 內容關係方向，同時詢問樣稿是否不夠詳細，重申產品是貼合員工實際職位的客製化 JD。**下列保留原G2複核；後續示例深度獲「應該可以」的可修訂同意，但不是改稿或新增欄位核准。** 最新要求的[各國實際雇主文件比較](2026-09-09-employer-job-document-comparison.md)另存，不把補查寫成新員工事實；不重開 Memory、框架或資料庫研究。
+2026-09-09，Owner 同意 JD-R002/C01 內容關係方向，同時詢問樣稿是否不夠詳細，重申產品是貼合員工實際職位的客製化 JD。**下列保留原G2複核；後續示例深度獲「應該可以」的可修訂同意，但不是改稿或新增欄位核准。** 最新要求的[各國實際雇主文件比較](../research/work-analysis/2026-09-09-employer-job-document-comparison.md)另存，不把補查寫成新員工事實；不重開 Memory、框架或資料庫研究。
 
 ### 複核結果與證據邊界
 
@@ -141,7 +141,7 @@ Owner 已授權自主研究及形成建議，沒有授權本輪改 DB、Memory�
 
 建議區分三種情況：**已知但被省略的重要細節應補回；尚未取得的資訊應釐清而不是 AI 補造；不改變職務範圍／要求的單次事件細節保留於既有案例與記憶，不逐案改寫成永久任務。** 整理案例不等於把職位特有的專業與條件一起抽掉。
 
-**補查已完成：**[客製化深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md)§5以既有情境作三種深度對照，§3、6補充追問及收尾；[方法證據與限制](2026-09-09-job-analysis-international-evidence.md#9-客製化職位與分析深度的補充證據)不以職業公版取代實際職位。示例深度暫同意後，最新[十份文件逐項比較](2026-09-09-employer-job-document-comparison.md#5-與我們的樣稿逐項對照)仍未帶來可直接新增的員工事實，故原樣稿、15筆情境、資料結構與程式均未改。先審比較有無必要內容缺口，再續JD-R002/C02；若資訊確實無處呈現才重開內容關係，不因文字泛就先加欄位。
+**補查已完成：**[客製化深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md)§5以既有情境作三種深度對照，§3、6補充追問及收尾；[方法證據與限制](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md#9-客製化職位與分析深度的補充證據)不以職業公版取代實際職位。示例深度暫同意後，最新[十份文件逐項比較](../research/work-analysis/2026-09-09-employer-job-document-comparison.md#5-與我們的樣稿逐項對照)仍未帶來可直接新增的員工事實，故原樣稿、15筆情境、資料結構與程式均未改。先審比較有無必要內容缺口，再續JD-R002/C02；若資訊確實無處呈現才重開內容關係，不因文字泛就先加欄位。
 
 ## 10. 完整閱讀版 r2 與核心文檔一致性審核
 
@@ -162,11 +162,11 @@ Owner 已授權自主研究及形成建議，沒有授權本輪改 DB、Memory�
 | 不虛構或擴權 | 未增技術棧、證照、目標數字；PM承諾、後端規則／部署、客戶驗收沒有變成本人核准 | 本文情境4、6、10、14–15；[欄位指南§2](2026-09-09-jd-field-and-writing-guide.md#2-內容總覽) |
 | 產出與完成要求 | 任務2／4／7沒有硬補獨立產出；要求包含過程、異常、交接與結果，非個人KPI | [欄位指南§4](2026-09-09-jd-field-and-writing-guide.md#4-成果產出與完成標準不是同一件事)；證據US6、UK1、TW1–2 |
 | 知識／技能與用途 | 知識與應用技能分開、職務層級去重；版本控管知識及版本辨識技能仍在，不把職務要求當個人能力測評 | 本文情境13；[欄位指南§5](2026-09-09-jd-field-and-writing-guide.md#5-知識與技能如何寫) |
-| 客製化與未知 | 維護、權限及異常差異保留；未知技術、資格沒有被擅補，也未寫成「不需要」 | [校準§2、4](2026-09-09-customized-jd-depth-and-interview-calibration.md#2-什麼細節不能被抽掉)；[雇主比較§5](2026-09-09-employer-job-document-comparison.md#5-與我們的樣稿逐項對照) |
+| 客製化與未知 | 維護、權限及異常差異保留；未知技術、資格沒有被擅補，也未寫成「不需要」 | [校準§2、4](2026-09-09-customized-jd-depth-and-interview-calibration.md#2-什麼細節不能被抽掉)；[雇主比較§5](../research/work-analysis/2026-09-09-employer-job-document-comparison.md#5-與我們的樣稿逐項對照) |
 | 閱讀與資料結構分開 | 標題＋說明＋就近條件共同構成完整任務；時機標籤不是每項必填或新資料欄 | [欄位指南§3](2026-09-09-jd-field-and-writing-guide.md#3-職務目的職責任務同一份工作的不同縮放程度)；[R002§3](2026-09-09-jd-document-relationships-working-research.md#3-建議的內容關係) |
 | JD與下游分開 | 不新增招募廣告、考核權重、個人訓練課程或A級別；實際工作要求不因可供下游使用而刪掉 | [欄位指南§6](2026-09-09-jd-field-and-writing-guide.md#6-什麼留在分析什麼進-jd什麼留待下游)；[校準§7](2026-09-09-customized-jd-depth-and-interview-calibration.md#7-為下游鋪墊但不混寫成同一份文件) |
 
-規則旁的證據代號沿[跨國方法證據](2026-09-09-job-analysis-international-evidence.md)查原文、版本與限制；實際雇主例證只在[比較文§7](2026-09-09-employer-job-document-comparison.md#7-來源日期及查核位置)維護。這是依既有研究的內容複核，未重新宣稱本輪全數重驗網站。
+規則旁的證據代號沿[跨國方法證據](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md)查原文、版本與限制；實際雇主例證只在[比較文§7](../research/work-analysis/2026-09-09-employer-job-document-comparison.md#7-來源日期及查核位置)維護。這是依既有研究的內容複核，未重新宣稱本輪全數重驗網站。
 
 ### 發現與處理
 

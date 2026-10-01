@@ -20,7 +20,7 @@ JD-R002/C01；研究日 2026-09-09；**G3／WORKING：Owner 已同意 B 的方�
 
 Owner 要的是高品質 JD，不是指定資料庫形式。人與 AI 應能在同份最新文件上編輯；依後續WORKING裁決採持續工作稿，保留實際差異與更正，不提供逐筆待審接受／拒絕。原先「編輯待審仍待審」是已取代的流程；保存或看過文件均不等於專業品質已核准。
 
-研究程序採 [Decision-to-Product](../decision-process.md)：先承接成果，再比對官方能力、提出候選；不因文檔寫好就進施工。所有外部事實、取用限制與原始連結集中在[官方證據](2026-09-09-jd-document-model-official-evidence.md)。
+研究程序採 [Decision-to-Product](../decision-process.md)：先承接成果，再比對官方能力、提出候選；不因文檔寫好就進施工。所有外部事實、取用限制與原始連結集中在[官方證據](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)。
 
 ## 2. 結論：建議有結構的文件，不把每句話拆成資料表
 
@@ -34,7 +34,7 @@ Owner 要的是高品質 JD，不是指定資料庫形式。人與 AI 應能在�
 | **B 有意義的結構＋完整敘述** | 可定位職責、任務等內容；兼顧閱讀、移動及後續審核；不必所有內容都建關聯邊 | 仍須定義少量內容種類與編輯邊界；不能只裝套件就懂 JD | **Owner 同意作 Working 方向，技術細節未選定** |
 | C 所有內容都建成獨立記錄及細密關係網 | 便於複雜關係查詢、影響追蹤及多種投影 | 要維護更多關係與操作一致性；並非每條關係都改善目前閱讀／編輯效果 | 當明確用途超過 B 可處理範圍時再評估，不先全面採用 |
 
-以上比較的是**內容表徵與關係密度**，不是宣稱 A 沒有底層節點、B 必須一個 JSONB、C 必須圖形資料庫；也不是說三者不能混合。使用者像編輯文件，不代表底層只能存一大段文字。Notion 區分內容與 properties，Tiptap／Lexical 提供結構化編輯模型；SAP 另有職務內容與模板。它們支持這個方向有成熟先例，**不能證明 B 對所有產品最好**。[證據 E01–E05](2026-09-09-jd-document-model-official-evidence.md)
+以上比較的是**內容表徵與關係密度**，不是宣稱 A 沒有底層節點、B 必須一個 JSONB、C 必須圖形資料庫；也不是說三者不能混合。使用者像編輯文件，不代表底層只能存一大段文字。Notion 區分內容與 properties，Tiptap／Lexical 提供結構化編輯模型；SAP 另有職務內容與模板。它們支持這個方向有成熟先例，**不能證明 B 對所有產品最好**。[證據 E01–E05](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)
 
 ## 3. 建議的內容關係
 
@@ -81,9 +81,9 @@ Owner 要的是高品質 JD，不是指定資料庫形式。人與 AI 應能在�
 
 這不要求 LLM 生成 UUID、計算版本或自行猜目標。具體定位方式由後續工具與框架設計決定；需要持久識別時，優先用框架可保存的識別／metadata 能力。複製、拆分、合併的身分如何處理須逐情境確認，不能只根據外觀相同推定是同一項。
 
-官方差異已確認：Tiptap 有可配置的 UniqueID；Lexical 的內部 NodeKey 不序列化，但另有 NodeState 可保存應用 metadata。**不能因 Lexical 有 key 就說永久定位已完成，也不能因此說它必須全部自寫。** [證據 E07–E09](2026-09-09-jd-document-model-official-evidence.md)
+官方差異已確認：Tiptap 有可配置的 UniqueID；Lexical 的內部 NodeKey 不序列化，但另有 NodeState 可保存應用 metadata。**不能因 Lexical 有 key 就說永久定位已完成，也不能因此說它必須全部自寫。** [證據 E07–E09](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)
 
-顏色、縮排、收合、閱讀序號屬呈現；必要的工作範圍及例外屬內容。Google Docs 的 property inheritance 描述外觀，不是工作責任可自動繼承的證據。[證據 E03](2026-09-09-jd-document-model-official-evidence.md)
+顏色、縮排、收合、閱讀序號屬呈現；必要的工作範圍及例外屬內容。Google Docs 的 property inheritance 描述外觀，不是工作責任可自動繼承的證據。[證據 E03](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)
 
 ## 5. 用樣稿檢查是否能表達真實情境
 
@@ -118,7 +118,7 @@ Owner 要的是高品質 JD，不是指定資料庫形式。人與 AI 應能在�
 | 異常結構處理 | Tiptap 初始化內容的 content checking／contentError | 貼上、後續寫入及保存須另核對；schema 合法不等於 JD 事實正確或內容無損 |
 | AI 變更審閱 | Tiptap AI Toolkit review；Tracked Changes 個別／批次接受拒絕 | 持久性、編輯待審內容、整組操作及授權成本；不能把暫時裝飾當成持久待審 |
 
-上列能力不都屬同一免費套件。Tiptap 的 Tracked Changes 是付費獨立產品，AI Toolkit 的另一條 suggestions 路徑是暫時的 decoration；後續須選對路徑。**因此不能先宣稱審核只能自寫，也不能宣稱現成套件已百分之百覆蓋本產品。** [證據 E10–E11](2026-09-09-jd-document-model-official-evidence.md)
+上列能力不都屬同一免費套件。Tiptap 的 Tracked Changes 是付費獨立產品，AI Toolkit 的另一條 suggestions 路徑是暫時的 decoration；後續須選對路徑。**因此不能先宣稱審核只能自寫，也不能宣稱現成套件已百分之百覆蓋本產品。** [證據 E10–E11](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)
 
 ## 7. 本輪收斂與下一題
 

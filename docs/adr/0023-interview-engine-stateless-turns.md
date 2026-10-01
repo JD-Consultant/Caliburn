@@ -1,9 +1,9 @@
 # ADR 0023 — 訪談引擎骨幹:無狀態回合服務 + 軟階段 + 指令詞彙表
 
 - **狀態**:Accepted(2026-07-05)。
-- **研究依據**:[`../specs/2026-07-05-llm-integration-wiring-research.md`](../specs/2026-07-05-llm-integration-wiring-research.md)
+- **研究依據**:[`../specs/2026-07-05-llm-integration-wiring-research.md`](../research/agent-systems/2026-07-05-llm-integration-wiring-research.md)
   (輪 1–10;判別場景、五路權威收斂、需求訪談、指令詞彙表)+ 上游
-  [`../specs/2026-07-02-llm-interview-authoring-research.md`](../specs/2026-07-02-llm-interview-authoring-research.md)。
+  [`../specs/2026-07-02-llm-interview-authoring-research.md`](../research/work-analysis/2026-07-02-llm-interview-authoring-research.md)。
 - **關聯**:互動模式=ADR 0020(不變);並發地基=ADR 0015;**接受後部分翻案 ADR 0007**
   (LangGraph 留用部分——見決定 6;0007 的 12-factor 原則保留且被本 ADR 強化)。
 

@@ -6,7 +6,7 @@
 > 的 Task A→B→C→D(一 task 一 commit,綠了才 commit)。
 > **決策依據**:[ADR 0015](../adr/0015-document-save-optimistic-concurrency.md)(樂觀並發、回合制、minimal 先)。
 > 維護者已拍板(2026-07-02):**新 `revision` 欄位**(非 bump version)+ **409 衝突對話框**(非自動重載)。
-> **背景**(為何值得做):北極星研究([`2026-07-02-llm-interview-authoring-research.md`](2026-07-02-llm-interview-authoring-research.md)
+> **背景**(為何值得做):北極星研究([`2026-07-02-llm-interview-authoring-research.md`](../research/work-analysis/2026-07-02-llm-interview-authoring-research.md)
 > §3/§4)——未來 LLM 訪談 agent 與人回合制共編同一文件,2a 是回合邊界的並發地基;ADR 0020 已定互動模式。
 
 ---

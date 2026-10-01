@@ -11,7 +11,7 @@
 - Owner 最新要求：先研究通用 Memory 流程，以 OpenAI 公開概念為主軸；辨別跨家共同做法與框架真正缺口，不先套 Caliburn／JD。
 - 本輪唯一決策題：**原先「LangMem primitives 已最貼近 OpenAI，只剩薄接線」的判定是否足夠？**
 - 既有 `LLM-Q015／016` 暫時核准仍是歷史有效決策；本文提出有新證據的修正建議，不自行改選、不改 production。
-- 本輪完整回讀：[OpenAI 系統圖](2026-09-05-openai-conversation-context-and-memory-system-map.md)、[框架官方事實圖](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)、[功能交叉表](2026-09-05-openai-memory-flow-to-latest-framework-functional-crosswalk.md)、[逐 artifact 交叉表](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)，以及 current register／decision process。未讀 Owner 排除的 08-12 產品長稿，未以施工計畫或舊 code 決定新流程。
+- 本輪完整回讀：[OpenAI 系統圖](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、[框架官方事實圖](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)、[功能交叉表](../research/agent-systems/2026-09-05-openai-memory-flow-to-latest-framework-functional-crosswalk.md)、[逐 artifact 交叉表](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)，以及 current register／decision process。未讀 Owner 排除的 08-12 產品長稿，未以施工計畫或舊 code 決定新流程。
 - 本文只保存**審核差異、通用流程與方案取捨**；artifact 詳解留在原表，來源細節留在官方事實圖。後續先讀本文，再依需要回查，避免複製另一份大型百科。
 
 ## 1. 先校正「共識」的意思
@@ -219,7 +219,7 @@ C 執行中修補
 - **[Codex 固定快照]** 背景 prompt 要求針對變更候選，在歧義、重複、衝突或需要較強佐證時深讀相關 rollout summaries；並明確禁止這條背景路徑打開 raw sessions／原始 rollout transcripts。所以補查不是任意上網、每次掃全部原話，亦不是要求員工介入。前台原始對話回查不能無條件搬入此處。[候選讀取與 raw 邊界](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/templates/memories/consolidation.md#L159-L167)、[深讀時機](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/templates/memories/consolidation.md#L413-L420)
 - **[資料不存在時的邊界]** 該 prompt 要先盤點真正存在的 summary；缺檔不可自行捏造路徑或冒充已讀。補查也不能保證資料一定能解決矛盾。[summary inventory 與缺漏處理](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/templates/memories/consolidation.md#L824-L839)
 
-以上重用並精確定位[既有 OpenAI 系統圖 §5.7](2026-09-05-openai-conversation-context-and-memory-system-map.md#57-第三個細部邊界phase-2-如何形成-durable-memory)的研究，不另建立一份 OpenAI 百科。Owner 本輪再確認同意能力，要求研究接法；尚未核准元件選型。
+以上重用並精確定位[既有 OpenAI 系統圖 §5.7](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md#57-第三個細部邊界phase-2-如何形成-durable-memory)的研究，不另建立一份 OpenAI 百科。Owner 本輪再確認同意能力，要求研究接法；尚未核准元件選型。
 
 ### 8.5 承接這項能力：可直接重用與仍需接合的責任
 
@@ -231,7 +231,7 @@ C 執行中修補
 | 工具回報一般讀寫錯誤 | 檔案工具將 backend error 回成 `ToolMessage(status="error")`，agent 可據此重讀／調整 | 有界修正策略、未捕捉例外、仍失敗時如何結束，不能假設框架自動修好 |
 | 完成後更新小型導覽 | 同一組工具可修改導覽；依 OpenAI 範例在 Memory 正文之後處理 | 不是 middleware 自動整理；下一次讀者取得新版導覽的 lifecycle 仍需接好 |
 
-工具與載入細節集中於[框架官方事實圖 §5.2／5.4](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md#52-啟動-context)；Agent loop 與紀錄工具來源沿用 §8.2–8.3。
+工具與載入細節集中於[框架官方事實圖 §5.2／5.4](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md#52-啟動-context)；Agent loop 與紀錄工具來源沿用 §8.2–8.3。
 
 **新增接合發現：導覽 freshness。** 固定快照的 `MemoryMiddleware` 在 state 已有 `memory_contents` 時不重新下載；不能將「背景 Memory 已更新」等同「既有前台 context 自動刷新」。這是需要核對外層 lifecycle 的條件限制，不宣稱 production 已有 bug，也不自行新增版本表／同步引擎。背景 agent 透過 `read_file` 另行取得內容，與固定注入導覽是兩個不同讀取動作。
 

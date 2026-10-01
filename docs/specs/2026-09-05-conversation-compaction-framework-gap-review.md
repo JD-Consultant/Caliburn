@@ -35,11 +35,11 @@ Out of scope / parking lot:
 
 OpenAI 基準已由下列兩份既有文件完成，本稿直接引用，不重新依記憶改寫：
 
-1. [`2026-09-05-openai-conversation-context-and-memory-system-map.md`](2026-09-05-openai-conversation-context-and-memory-system-map.md)
-2. [`2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md`](2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)
+1. [`2026-09-05-openai-conversation-context-and-memory-system-map.md`](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)
+2. [`2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md`](../research/agent-systems/2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)
 
 框架端事實以
-[`2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md`](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)
+[`2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md`](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)
 為入口。只有該文件沒有回答，或研究日官方文件已有變化時，本稿才回查官方來源。
 
 ## 2. OpenAI 基準責任

@@ -13,8 +13,8 @@ purpose: 裁決 OPKS 生成在證據不足時該怎麼辦，並把方案壓到�
 成本與失敗邊界在哪、durable 語意怎麼接。
 
 **不回答**：每個欄位怎麼寫才合格（判準教材已備齊，見
-[iCAP 逐欄位標準](2026-07-13-ai-redesign-raw-icap-field-standards.md)、
-[國際體系欄位定義](2026-07-13-ai-redesign-raw-intl-competency-standards.md)）；
+[iCAP 逐欄位標準](../research/work-analysis/2026-07-13-ai-redesign-raw-icap-field-standards.md)、
+[國際體系欄位定義](../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md)）；
 OPKS 的概念與持久化形狀（已由 ADR [0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)
 ＋[0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)
 ＋[0050](../adr/0050-opks-proposal-minimal-shape.md)
@@ -343,7 +343,7 @@ Task Analysis verifier 的規則集（與 ADR 0048 決定 24 限制 OPKS verifie
 application 直接用當前 turn 的 SourceRef。
 
 **契約成本（已量測）**：`task_analysis_result_v2` 目前 **2 個頂層 property、0 個 `anyOf`、
-0 個 `$defs`、4,668 bytes**（已完全 inline，[2026-07-31 grammar 研究](2026-07-31-anthropic-strict-schema-grammar-limit-research.md)
+0 個 `$defs`、4,668 bytes**（已完全 inline，[2026-07-31 grammar 研究](../research/agent-systems/2026-07-31-anthropic-strict-schema-grammar-limit-research.md)
 當時的 17-union 問題已解決）。新增的是零 union、兩個純量欄位的物件陣列，
 離官方 union 上限 16 有全部空間。**仍應在實作前重量一次**（官方 grammar size 上限未公開）。
 

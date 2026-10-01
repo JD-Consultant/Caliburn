@@ -148,7 +148,7 @@ backend history 也**不是完整原始 message object 的無損序列化**：�
 
 **[Official fact]** LangMem 公開匯出的 `create_thread_extractor` 接收 `input["messages"]`；內部 `utils.get_conversation` 先用 `merge_message_runs`，再串接 `pretty_repr()`，包在 conversation prompt 內交給 Trustcall extractor。沒有以 thread ID 自動查 Checkpointer／Store 的程式。[公開匯出](https://github.com/langchain-ai/langmem/blob/f8c7ebd6110c124a36995dab645a8cb0eb0b8210/src/langmem/__init__.py)、[完整 pipeline](https://github.com/langchain-ai/langmem/blob/f8c7ebd6110c124a36995dab645a8cb0eb0b8210/src/langmem/knowledge/extraction.py#L113-L182)、[內部 formatter](https://github.com/langchain-ai/langmem/blob/f8c7ebd6110c124a36995dab645a8cb0eb0b8210/src/langmem/utils.py#L98-L101)
 
-故它能接同源訊息做抽取，但不能稱「原始訊息與所有引用逐欄原封不動送模型」。`get_conversation` 在此只是內部 formatting helper，不把它提升成我們依賴的持久 reader；也不為補 ID 就要求 LLM 重填完整對話。來源定位與片段範圍由 Runtime 接合的具體方式尚待核准。這補充 [artifact 詳表 §5.4](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#54-langmem-create_thread_extractor)，不改選抽取模型或 schema。
+故它能接同源訊息做抽取，但不能稱「原始訊息與所有引用逐欄原封不動送模型」。`get_conversation` 在此只是內部 formatting helper，不把它提升成我們依賴的持久 reader；也不為補 ID 就要求 LLM 重填完整對話。來源定位與片段範圍由 Runtime 接合的具體方式尚待核准。這補充 [artifact 詳表 §5.4](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#54-langmem-create_thread_extractor)，不改選抽取模型或 schema。
 
 ### 6.4 `StateBackend` 不等於對話 reader；公開擴充能接同源資料
 

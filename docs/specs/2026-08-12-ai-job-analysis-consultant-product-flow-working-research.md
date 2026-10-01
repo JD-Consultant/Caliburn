@@ -743,7 +743,7 @@ Owner 於 2026-08-13 確認：員工需要同時知道「大致談了多少」�
 
 ### 5.2 Duty：可提早分析，但保持為可變動假說
 
-依 [`專業顧問流程最終反方審查`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)與[`iCAP 欄位標準`](2026-07-13-ai-redesign-raw-icap-field-standards.md)：
+依 [`專業顧問流程最終反方審查`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)與[`iCAP 欄位標準`](../research/work-analysis/2026-07-13-ai-redesign-raw-icap-field-standards.md)：
 
 - 初期責任區域與已出現的工作線索足以啟動 `duty-grouping` Skill，但形成的是可變動 Duty hypothesis，不是固定盒子；
 - Duty 可隨 Task／Work Unit 增加，依共同 purpose、責任、outcome、workflow stage、服務對象或領域動態整併；
@@ -2476,7 +2476,7 @@ Anthropic 的 Opus 5 官方指引支持的是**減少過時 scaffolding、明確
 
 `10,317 bytes` 只是症狀，不是 Anthropic 的硬上限。對目前 `ConsultantResult.model_json_schema()` 的離線結構量測為：18 defs、68 object properties、**28 optional parameters、20 個 `anyOf`／union sites、最深約 15 層**。Anthropic Structured Outputs 官方目前明列：單一 request 內 JSON output 與 strict tools 合計最多 **24 optional、16 union parameters**，而且即使個別數字不超標，optional／union／巢狀／tools 的交互組合仍可能超過內部 compiled-grammar limit。故本次 output schema 在不計 tools 前已同時超過兩個公開維度；「tool-free 某 route 成功」不能推翻公開限制，最多只說明 route、轉換、cache 或 endpoint enforcement 可能不同。[Anthropic Structured Outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)
 
-repo 已有直接可重用的成功模式：2026-07-31 的 6,818-byte rich schema 也收到相同錯誤；改成 model-facing compact wire＋pure mapper，把 union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes 後，Opus 5 真 request HTTP 200，後續 Opus 5／Luna-Pro／Sonnet 5 三回合場景完成。這證明「保留 rich 產品能力，但換 provider contract 形狀」不是理論猜測。相關權威紀錄是 [`strict schema 研究`](2026-07-31-anthropic-strict-schema-grammar-limit-research.md)、[`model-facing contract 研究`](2026-07-31-context-engineering-model-facing-contract-research.md)、[`compact wire plan`](../plans/2026-07-31-task-analysis-compact-wire-contract-plan.md) 與 [`live smoke`](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)。
+repo 已有直接可重用的成功模式：2026-07-31 的 6,818-byte rich schema 也收到相同錯誤；改成 model-facing compact wire＋pure mapper，把 union 17→0、properties 54→32、nesting 9→6、wire 6,818→4,084 bytes 後，Opus 5 真 request HTTP 200，後續 Opus 5／Luna-Pro／Sonnet 5 三回合場景完成。這證明「保留 rich 產品能力，但換 provider contract 形狀」不是理論猜測。相關權威紀錄是 [`strict schema 研究`](../research/agent-systems/2026-07-31-anthropic-strict-schema-grammar-limit-research.md)、[`model-facing contract 研究`](2026-07-31-context-engineering-model-facing-contract-research.md)、[`compact wire plan`](../plans/2026-07-31-task-analysis-compact-wire-contract-plan.md) 與 [`live smoke`](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)。
 
 因此 Anthropic 官方建議的修正順序也應照做：先降低 optional、簡化 nesting／union，再考慮 split requests；不能因 tool-free 呼叫成功就直接把最後一招升格成預設架構。第一版修法改為：
 
@@ -2705,7 +2705,7 @@ Repo 研究：
 - [`AI 專業職務分析顧問 R1：Task Discovery 深入研究`](2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
 - [`Task 邊界、merge/split 與同一性判準研究`](2026-07-28-task-boundary-merge-split-and-identity-research.md)
 - [`專業顧問第一個最小完整迴圈`](2026-07-30-professional-consultant-minimal-complete-loop-research.md)
-- [`iCAP 逐欄位標準`](2026-07-13-ai-redesign-raw-icap-field-standards.md)
+- [`iCAP 逐欄位標準`](../research/work-analysis/2026-07-13-ai-redesign-raw-icap-field-standards.md)
 - [`OPKS 設計裁決研究`](2026-08-01-opks-design-decisions-research.md)
 - [`OPKS 漸進式蒐集研究`](2026-08-04-opks-progressive-elicitation-research.md)
 - [`OPKS 缺口與再分析的封鎖關係`](2026-08-06-opks-gap-reanalysis-blocking-research.md)

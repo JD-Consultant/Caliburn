@@ -55,7 +55,7 @@ Consolidation Agent：對照目前 Memory
 
 ### 3.1 Extraction：先分清本段互動與可重用知識
 
-**[官方事實]** SDK Phase 1 由對話形成 summary 與 raw memory extract；Phase 2 才整併。`raw_memory` 不是原始逐字對話。Codex 的 `rollout_summary`／`rollout_slug`／`raw_memory` 詳義與固定原始碼，已在[OpenAI 系統圖 §5.6](2026-09-05-openai-conversation-context-and-memory-system-map.md)核對，不另創資料分層。[SDK Phase 1](https://openai.github.io/openai-agents-js/guides/sandbox-agents/memory/#generate-memory)
+**[官方事實]** SDK Phase 1 由對話形成 summary 與 raw memory extract；Phase 2 才整併。`raw_memory` 不是原始逐字對話。Codex 的 `rollout_summary`／`rollout_slug`／`raw_memory` 詳義與固定原始碼，已在[OpenAI 系統圖 §5.6](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)核對，不另創資料分層。[SDK Phase 1](https://openai.github.io/openai-agents-js/guides/sandbox-agents/memory/#generate-memory)
 
 **[組合建議]** 沿用 LangChain structured output 形成兩種語意產物，由 LangGraph step 接續保存：
 
@@ -74,11 +74,11 @@ Consolidation Agent：對照目前 Memory
 
 沿用已准可見範圍：**B Phase 2 可以補查相關 summary，但不直接接 A 的原始對話回查權限。** 所核對 Codex 背景 prompt 明確禁止讀 raw sessions；不能把前台按需回查和背景整併混為一談。[Codex 補查與 raw 限制](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/templates/memories/consolidation.md#L159-L167)
 
-工具回傳實際結果後，B 才判斷是否修正、繼續或結束；由官方 Agent loop 承接，不自造 while-loop。LangMem manager 不等於這個中途補查流程，也不為湊元件而再固定呼叫一次。[LangChain agents](https://docs.langchain.com/oss/python/langchain/agents)、[框架事實圖 §5–6](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)
+工具回傳實際結果後，B 才判斷是否修正、繼續或結束；由官方 Agent loop 承接，不自造 while-loop。LangMem manager 不等於這個中途補查流程，也不為湊元件而再固定呼叫一次。[LangChain agents](https://docs.langchain.com/oss/python/langchain/agents)、[框架事實圖 §5–6](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)
 
 ### 3.3 Guide 與交付：正文先成立，導覽才有依據
 
-**[已准方向]** B 處理正文後維護小型導覽，供 A 找路；不用另叫摘要 Agent，也不把導覽變成另一份獨立知識權威。OpenAI 的正文／guide 分工與 prompt 要求見上述 consolidation source 及[系統圖 §5.7](2026-09-05-openai-conversation-context-and-memory-system-map.md)。
+**[已准方向]** B 處理正文後維護小型導覽，供 A 找路；不用另叫摘要 Agent，也不把導覽變成另一份獨立知識權威。OpenAI 的正文／guide 分工與 prompt 要求見上述 consolidation source 及[系統圖 §5.7](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)。
 
 **[待審的完成邊界]** 交付依實際執行結果，不只採信 B 最後說「完成了」。沒有改動、確實處理完成、或有未完成步驟，要能被 Runtime 分辨；這不是要模型填一整份稽核表。導覽只因正文受影響才需相應維護，不要求每次重寫所有檔案。
 
@@ -97,7 +97,7 @@ A 之後透過既有 hook／Tool 讀取才看到更新；已送出的模型 requ
 | Phase 2 consolidation | 本批候選＋既有 Memory；按需查摘要、去重／補充／修訂 | 是另一個 Agent 工作流程，內部可有多次 model↔Tool 往返；不是固定只有第二次 request |
 | 更新 Memory 導覽 | 讓小型導覽反映整併後的 Memory 正文 | 屬同一 consolidation 工作流程；不必另開第三個專職導覽 Agent，但產生／寫入／確認導覽可能占用該流程的後續 model steps |
 
-Phase 2 的搜尋、讀取、修改及導覽最後更新，沿用既有[OpenAI 系統圖 §5.7](2026-09-05-openai-conversation-context-and-memory-system-map.md#57-第三個細部邊界phase-2-如何形成-durable-memory)及其固定 source，不從檔名推測呼叫數。OpenAI 官方 function calling 也明示：模型提出 Tool call → 程式執行 → **再發 model request 帶回結果** → 模型回答或再呼叫工具。[官方 Tool calling flow](https://developers.openai.com/api/docs/guides/function-calling#the-tool-calling-flow)
+Phase 2 的搜尋、讀取、修改及導覽最後更新，沿用既有[OpenAI 系統圖 §5.7](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md#57-第三個細部邊界phase-2-如何形成-durable-memory)及其固定 source，不從檔名推測呼叫數。OpenAI 官方 function calling 也明示：模型提出 Tool call → 程式執行 → **再發 model request 帶回結果** → 模型回答或再呼叫工具。[官方 Tool calling flow](https://developers.openai.com/api/docs/guides/function-calling#the-tool-calling-flow)
 
 **因此不寫「B 固定兩次 LLM 呼叫」。** 正確是「一次背景整理有 extraction、consolidation 兩個階段，導覽在後者維護」；實際計費要加總兩階段所有 model requests。若某份抽取以單次 structured request 成功，便是該次抽取的 1 次，加上 consolidation 的若干次；這只是計數例子，**不是官方固定次數或本案新 budget**。相同模型可擔任兩階段，不必選兩款不同模型；模型選型仍待相應 gate。
 
@@ -117,7 +117,7 @@ Phase 2 的搜尋、讀取、修改及導覽最後更新，沿用既有[OpenAI �
 
 **[此次重新取得的官方產品證據]** Sandbox Memory 文件同時公開生成順序、`raw_memories/`／`rollout_summaries/` 等保存位置，以及未來 run「導覽→搜尋 Memory→需要細節才開 rollout summary」的讀取流程。因此中間 summary **不是整併完就再也沒人讀的臨時回答**；它也服務後續按需補查。Codex 產品頁同樣說保存 summaries、durable entries、recent inputs 與 supporting evidence，並分開設定 extraction／consolidation model。[Sandbox Memory 的生成、layout 與讀取](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)、[Codex Memory storage／configuration](https://learn.chatgpt.com/docs/customization/memories)
 
-**[沿用已研究的固定實作證據，不宣稱本輪重抓 source]** Codex 的 Stage 1 結果存 DB，Phase 2 再選一批結果、同步候選與 summary，對照上次成功 baseline 決定是否啟動整併；細節及固定來源見 [artifact 詳表 §4.3–4.5](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#43-phase-1rollout_summaryrollout_slugraw_memory)。這說明保存還能供**後續批次重用已有抽取結果**，而不只是當次函式之間傳參數。該 Codex 快照不等於所有 OpenAI 產品的固定 DB／排程契約。
+**[沿用已研究的固定實作證據，不宣稱本輪重抓 source]** Codex 的 Stage 1 結果存 DB，Phase 2 再選一批結果、同步候選與 summary，對照上次成功 baseline 決定是否啟動整併；細節及固定來源見 [artifact 詳表 §4.3–4.5](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md#43-phase-1rollout_summaryrollout_slugraw_memory)。這說明保存還能供**後續批次重用已有抽取結果**，而不只是當次函式之間傳參數。該 Codex 快照不等於所有 OpenAI 產品的固定 DB／排程契約。
 
 | 產物 | 保存後的實際用途／證據邊界 |
 |---|---|
@@ -154,7 +154,7 @@ LangGraph 可保存完成的 task 結果供恢復，但 replay／未完成 task 
 - **方向一致**：A/B 分工；C 仍是 A Tool；B 有 extraction／consolidation 及中途補查，不改成每輪同步 manager。
 - **框架邊界明確**：可重用 structured output、checkpointed workflow、Agent loop、filesystem／StoreBackend；輸入選取、instructions、artifact 接力與調度仍需組裝，不宣稱零自訂。
 - **成本不是零**：B 多出抽取與整併呼叫，補查可能再增加 steps；批次、無新輸入略過、增量整理可減少不必要工作，不能無測試聲稱一定更便宜或品質最好。
-- **不照抄所有預設**：SDK 公開的長對話截斷、最近 N 份保留，以及 Codex retention 參數是各自產品政策；本稿未核准任何原始資料刪除或細節遺失策略。相關差異已有[系統圖 §5.6–5.7](2026-09-05-openai-conversation-context-and-memory-system-map.md)記錄。
+- **不照抄所有預設**：SDK 公開的長對話截斷、最近 N 份保留，以及 Codex retention 參數是各自產品政策；本稿未核准任何原始資料刪除或細節遺失策略。相關差異已有[系統圖 §5.6–5.7](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)記錄。
 - **本輪無 implementation／spike／付費模型測試**。只作文件核對，不宣稱新組合已跑通。
 
 **下一個 gate：** Owner 已同意 B 及[父層 §3.6](2026-09-05-openai-shaped-memory-framework-composition-research.md#36-資料細節應何時討論已同意順序與完整範圍)的資料對照順序；最新先審 §3.5 保存目的／直接接續，再審中間產物接法。其後對照 current Memory／導覽，再串框架流程與 Q018。既有原文對照見 [Conversation gap review §8](2026-09-05-conversation-compaction-framework-gap-review.md#8-q017-對話資料的框架存取對照)。不是各名詞另存一份，不是已核准最終契約；LangMem 局部能力及 manager 邊界見父層 §3.2。只補本次被指出的用途／失敗表達缺口，不重做其餘已完成的概念研究。
@@ -175,7 +175,7 @@ LangGraph 可保存完成的 task 結果供恢復，但 replay／未完成 task 
 
 既有 [G4 §15.2](2026-09-04-llm-machine-effects-and-sibling-results-working-design.md#152-extraction-的責任邊界) 將 extraction 聚焦員工新陳述，禁止背景自行製造 coverage gap、把模型內容當員工事實；這些限制有用途。但若實作者進一步把 assistant 只用來消歧，丟掉前台**已明確提出的待確認工作判斷／未解問題**，就不符合 Owner 此輪的分析延續需求。
 
-**建議澄清，待 Owner：**背景可保留「顧問暫認為 A/B 屬同類工作，已詢問責任是否相同，尚未獲答」這個互動結果；不能寫成「員工已確認 A/B 相同」。員工陳述、AI 暫定解讀、工具確實執行的結果須在內容上分清，無須本輪新增強制狀態欄位。背景不替未回答問題自行補答案，也不負責另做一次 JD 分析。[既有 summary／candidate 用途](2026-09-05-openai-conversation-context-and-memory-system-map.md#兩份-derived-artifact-的責任不同) 已包括結論、脈絡及未明事項；本輪只是檢查其輸入能否實際留下這些內容，不新增第六種 artifact。
+**建議澄清，待 Owner：**背景可保留「顧問暫認為 A/B 屬同類工作，已詢問責任是否相同，尚未獲答」這個互動結果；不能寫成「員工已確認 A/B 相同」。員工陳述、AI 暫定解讀、工具確實執行的結果須在內容上分清，無須本輪新增強制狀態欄位。背景不替未回答問題自行補答案，也不負責另做一次 JD 分析。[既有 summary／candidate 用途](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md#兩份-derived-artifact-的責任不同) 已包括結論、脈絡及未明事項；本輪只是檢查其輸入能否實際留下這些內容，不新增第六種 artifact。
 
 ### 6.3 前輪三種接法與推薦（不足之處由 §6.5 接續）
 

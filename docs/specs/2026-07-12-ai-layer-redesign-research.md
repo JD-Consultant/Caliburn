@@ -11,63 +11,63 @@
 
 **第一輪(原則與趨勢)**:
 
-1. [Agent 架構線](2026-07-12-ai-redesign-raw-agent-architecture.md) —— 單/多 agent、編排、
+1. [Agent 架構線](../research/agent-systems/2026-07-12-ai-redesign-raw-agent-architecture.md) —— 單/多 agent、編排、
    context engineering、工具設計、狀態、anti-pattern、2026 新方向。
-2. [人機共編 UX 線](2026-07-12-ai-redesign-raw-coediting-ux.md) —— 直寫 vs 建議層、修訂呈現、
+2. [人機共編 UX 線](../research/engineering/2026-07-12-ai-redesign-raw-coediting-ux.md) —— 直寫 vs 建議層、修訂呈現、
    審批與自主度、對話擺位、溯源、失敗模式、結構化欄位範式。
-3. [可靠性工程線](2026-07-12-ai-redesign-raw-llm-reliability.md) —— structured outputs、
+3. [可靠性工程線](../research/agent-systems/2026-07-12-ai-redesign-raw-llm-reliability.md) —— structured outputs、
    elicitation、溯源、evals、guardrails、多輪一致性、anti-pattern。
 
 **第二輪(別人實際怎麼蓋;維護者指示「看別人怎麼做 AI 應用」後加開)**:
 
-4. [實戰案例線](2026-07-12-ai-redesign-raw-case-architectures.md) —— 7 家一手案例
+4. [實戰案例線](../research/agent-systems/2026-07-12-ai-redesign-raw-case-architectures.md) —— 7 家一手案例
    (Anthropic/Cognition/Cursor/Intercom/Sierra/GitHub/Notion):分層、寫入路徑、狀態、
    模型編排、生產品質管線、演進教訓;無一手資料者誠實標未取得。
-5. [官方參考架構線](2026-07-12-ai-redesign-raw-reference-architectures.md) —— 模型廠 SDK
+5. [官方參考架構線](../research/agent-systems/2026-07-12-ai-redesign-raw-reference-architectures.md) —— 模型廠 SDK
    (Anthropic/OpenAI/Google ADK)與雲廠架構中心(AWS GenAI Lens/Azure Foundry 基線/
    Secure Multitenant RAG)的標準分層、雙載體做法、檢索定位、守門/觀測、框架邊界、多租戶。
-6. [專業文件生成線](2026-07-12-ai-redesign-raw-professional-docgen.md) —— Harvey/CoCounsel/
+6. [專業文件生成線](../research/work-analysis/2026-07-12-ai-redesign-raw-professional-docgen.md) —— Harvey/CoCounsel/
    Hebbia/Ironclad/Writer 等「錯了有代價」領域:品質管線、引用防幻覺、SME 在迴路、
    evals 與信任、Mata v. Avianca 等演進教訓。
 
 **第三輪(還有什麼技術可用/可優化;維護者指示後加開)**:
 
-7. [生成品質增強線](2026-07-12-ai-redesign-raw-quality-techniques.md) —— reasoning/test-time
+7. [生成品質增強線](../research/agent-systems/2026-07-12-ai-redesign-raw-quality-techniques.md) —— reasoning/test-time
    compute、Best-of-N/verifier、self-refine 定論、few-shot 黃金範本、fine-tune 時機、
    prompt caching、synthetic data、streaming;每項含判定。
-8. [檢索前沿線](2026-07-12-ai-redesign-raw-retrieval-frontier.md) —— contextual retrieval、
+8. [檢索前沿線](../research/retrieval/2026-07-12-ai-redesign-raw-retrieval-frontier.md) —— contextual retrieval、
    reranker、嵌入 SOTA(Qwen3 vs BGE-M3)、GraphRAG、query 端技術、CJK 分詞、
    metadata filtering、retrieval evals;含落地順序。
-9. [工程營運線](2026-07-12-ai-redesign-raw-engineering-optimizations.md) —— OTel GenAI 標準、
+9. [工程營運線](../research/agent-systems/2026-07-12-ai-redesign-raw-engineering-optimizations.md) —— OTel GenAI 標準、
    prompt 版本化+CI 回歸、prompt injection 架構防禦、VLM 文件解析、語意快取、降延遲、
    OpenRouter 容錯、記憶/個人化;每項含判定。
 
 **第四輪(設計細節定案;逐題深挖)**:
 
-10. [evals/裁判設計深挖](2026-07-12-ai-redesign-raw-evals-design.md) —— rubric 二元化+負分、
+10. [evals/裁判設計深挖](../research/agent-systems/2026-07-12-ai-redesign-raw-evals-design.md) —— rubric 二元化+負分、
     judge 工程(CoT 後丟棄/pointwise-against-reference/temp=0)、校準(TPR/TNR+κ、
     grade-then-refine)、偏誤對策表、考題數量門檻、模擬受訪者防坑、meta-eval、
     五大失敗模式;附可抄 rubric YAML 與 judge prompt 骨架。
-11. [審閱事件語意](2026-07-12-ai-redesign-raw-review-event-semantics.md) —— 逐產品查
+11. [審閱事件語意](../research/engineering/2026-07-12-ai-redesign-raw-review-event-semantics.md) —— 逐產品查
     accept/reject 之後的行為:文件寫作類全為無聲 UI;Claude Agent SDK 的 deny-message
     是唯一官方 in-session 回饋先例;Grammarly 分層抑制;HAX G9/G15 主張記帳後用。
-12. [agent 命名與管線健檢](2026-07-12-ai-redesign-raw-agent-naming-pipeline.md) —— 各家組件
+12. [agent 命名與管線健檢](../research/agent-systems/2026-07-12-ai-redesign-raw-agent-naming-pipeline.md) —— 各家組件
     命名對照表、標準 turn 生命週期、UI 事件=event log+state injection(AG-UI/ADK)、
     2026 新模式(write-ahead verifier/成本感知分層驗證);B 段:本引擎與主流同構無重大
     偏差、命名保留+文檔對映、七條可抄優化。
-13. [訪談對話設計](2026-07-12-ai-redesign-raw-interview-conversation-design.md) —— 9 題
+13. [訪談對話設計](../research/work-analysis/2026-07-12-ai-redesign-raw-interview-conversation-design.md) —— 9 題
     (提問/追問/覆述/議程/離題/節奏/收尾/AI vs 人實證/受訪者感受)+10 條可操作規則。
-14. [Claude Code/Codex 互動驗證](2026-07-12-ai-redesign-raw-claudecode-codex-interaction.md)
+14. [Claude Code/Codex 互動驗證](../research/agent-systems/2026-07-12-ai-redesign-raw-claudecode-codex-interaction.md)
     —— 兩家官方的提問門檻/審批模式/進度/打斷/收尾/常設指示+11 條可抄清單。
 
 **第五輪(skill 內容原料;2026-07-13)**:
 
-15. [iCAP 全欄位官方標準](2026-07-13-ai-redesign-raw-icap-field-standards.md) —— 《職能基準
+15. [iCAP 全欄位官方標準](../research/work-analysis/2026-07-13-ai-redesign-raw-icap-field-standards.md) —— 《職能基準
     發展指引》(111.10 版,80 頁)逐欄位逐字核實:級別 1–6 原文+四判定軸、行為指標
     STAR/ABCD、工作產出句式、功能陳述「動詞+受詞+條件」、**共通技能 S01–S24 與態度
     A01–A14 官方目錄逐字**(填 0029「官方態度清單入池」縫)、品質認證三構面 9 指標
     21 要求條件、分析方法四類;誠實列 4 項查不到。
-16. [國際職能框架撰寫標準](2026-07-13-ai-redesign-raw-intl-competency-standards.md) ——
+16. [國際職能框架撰寫標準](../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md) ——
     O*NET Task Writing Guidelines 全文(Action>Object>Purpose 三段式+禁則)、NOS Quality
     Criteria(2023)、Bloom 修訂版官方壞動詞清單與 19 可觀察動詞、ESCO「knowledge=
     名詞化/skill=動作短語」句式、SFIA 四軸逐級措辭、O*NET Work Styles 16 項+ESCO
@@ -80,7 +80,7 @@
     五交叉實錘(scribe 現況直寫/溯源住 DB 表/`_pending` 零碰撞且匯出剝除免費/backstop 現為
     LLM 版/回合順序相反);executor/commands/context 死碼處置表;**intake 頁裁決=保留**
     (純表單零 CopilotKit,活功能)。
-18. [實作技術驗證](2026-07-13-ai-redesign-raw-impl-verification.md) —— OpenRouter 快取透傳
+18. [實作技術驗證](../research/agent-systems/2026-07-13-ai-redesign-raw-impl-verification.md) —— OpenRouter 快取透傳
     成立但 Anthropic 系必帶 `cache_control`;strict/tools 透傳+`require_parameters:true`;
     promptfoo Python provider+**Simulated User provider**(多輪訪談評測官方姿勢);OTel
     `gen_ai.*` 仍 Development、`gen_ai.system`→`gen_ai.provider.name`、建議手埋 span。

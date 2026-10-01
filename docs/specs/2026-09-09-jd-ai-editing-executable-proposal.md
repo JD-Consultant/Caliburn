@@ -10,7 +10,7 @@ JD-R002/C03；2026-09-09；**G2 研究交付／待 G3 審閱**。這是一份有
 
 - [C03 短入口](2026-09-09-ai-document-app-composition-research.md)：目前問題、決策狀態及結論。
 - [C01 文件內容關係](2026-09-09-jd-document-relationships-working-research.md)＋[C02 審核情境](2026-09-09-jd-editing-and-review-working-design.md)：本方案必須服務的效果，不拿套件預設取代它們。
-- [編輯框架事實 F01–F05](2026-09-09-jd-editor-framework-comparison.md)＋[Agent／錯誤事實 R01–R10](2026-09-09-jd-ai-app-runtime-official-evidence.md)：精確 API、來源及限制；[E01–E20](2026-09-09-jd-document-model-official-evidence.md)保留早先產品／文件證據。
+- [編輯框架事實 F01–F05](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)＋[Agent／錯誤事實 R01–R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)：精確 API、來源及限制；[E01–E20](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)保留早先產品／文件證據。
 - [內容核心入口](2026-09-09-job-analysis-and-jd-content-research.md)：JD 寫什麼及訪談方法。不重複搬入本技術稿，更不把全部研究塞進每輪 prompt。
 
 **本輪結論：**共同的工具循環可以直接用成熟 agent 框架；文件也應先用編輯器原生操作及追蹤修訂。較難且沒有現成全覆蓋證據的，是 C02 的持續待審／人工修改／跨位置整組接受拒絕。首選先驗 Tiptap；CKEditor 是明確備選，不直接自寫通用審核引擎。
@@ -58,17 +58,17 @@ JD-R002/C03；2026-09-09；**G2 研究交付／待 G3 審閱**。這是一份有
 
 **Tiptap 3 系列編輯器＋Client AI Toolkit＋持久 Tracked Changes；agent 主線優先 LangChain create_agent／LangGraph。**
 
-- 理由是 Tiptap 有模型讀改工具及執行結果，LangChain 有工具循環、middleware、runtime 注入與前端執行接點；不是因為要保存舊程式。正式取相容版本，不能各自升 latest 後假設互通。[F01–F03](2026-09-09-jd-editor-framework-comparison.md)、[R05–R10](2026-09-09-jd-ai-app-runtime-official-evidence.md)
+- 理由是 Tiptap 有模型讀改工具及執行結果，LangChain 有工具循環、middleware、runtime 注入與前端執行接點；不是因為要保存舊程式。正式取相容版本，不能各自升 latest 後假設互通。[F01–F03](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)、[R05–R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)
 - 本機 embedded client 路徑優先，不先把 JD 送往 Tiptap Cloud；仍須核對付費套件授權、啟動驗證及部署條件。Beta／Alpha 是真實風險，不宣稱全套最成熟。[官方部署選擇](https://tiptap.dev/docs/ai/ai-toolkit/overview)
 - 若採 Python agent，工具 schema 由同版本 Tiptap 官方工具 definitions／CLI 產生，透過 LangChain headless pattern 交 browser toolkit 執行。若選全 TypeScript，可用 Tiptap 官方 LangChain.js 工具定義；**這是不同接線選擇，不同時再跑兩個 agent loop。**Tiptap 該頁示範 bindTools，不是完整 create_agent／headless 端到端成品，仍須對齊 LangChain 正式執行接點。[官方非 TS 後端](https://tiptap.dev/docs/ai/ai-toolkit/client/advanced-guides/non-typescript-backends)、[官方 LangChain.js 工具](https://tiptap.dev/docs/ai/ai-toolkit/client/agents/tools/langchain-js)
 - Python／JS 相容版及本機 transport 尚待最小接線確認。若這段比全 TS 複雜很多，先比較，不為沿用語言硬加另一層通用協議。
 
 ### 備選而非同時堆疊
 
-1. **CKEditor Track Changes＋DocumentCompare**：若 Tiptap 無法可靠承接待審編輯，或授權／成熟度不適合，優先比較。其文件快照→外部處理→內建細粒度差異是不同、合理的修改路線；不是一定要 LLM 自己寫 patch。仍須通過相同審核測試。[F04](2026-09-09-jd-editor-framework-comparison.md#f04-ckeditor持久審閱有直接契約新-ai-patch-路徑另有風險)
-2. **Plate／底層自訂接線**：前兩者具體不適用、且願意承擔更多維護才考慮。不能為避免付費而忽略審核正確性的開發成本。[F05](2026-09-09-jd-editor-framework-comparison.md#f05-plate可擴充底座不等於完整持久-ai-審核)
+1. **CKEditor Track Changes＋DocumentCompare**：若 Tiptap 無法可靠承接待審編輯，或授權／成熟度不適合，優先比較。其文件快照→外部處理→內建細粒度差異是不同、合理的修改路線；不是一定要 LLM 自己寫 patch。仍須通過相同審核測試。[F04](../research/engineering/2026-09-09-jd-editor-framework-comparison.md#f04-ckeditor持久審閱有直接契約新-ai-patch-路徑另有風險)
+2. **Plate／底層自訂接線**：前兩者具體不適用、且願意承擔更多維護才考慮。不能為避免付費而忽略審核正確性的開發成本。[F05](../research/engineering/2026-09-09-jd-editor-framework-comparison.md#f05-plate可擴充底座不等於完整持久-ai-審核)
 
-OpenAI Agents SDK 是正式 runtime 備選；具工具循環、continuation、tracing 等功能，但不自動解決上述 editor 的部分失敗及審核缺口。也不需要 OpenAI SDK＋LangChain＋Vercel 各包一層。SDK 的 provider 支援與原生 Responses 功能另核對，不因更換 SDK 就承諾所有 key 都有完全相同能力。[R03](2026-09-09-jd-ai-app-runtime-official-evidence.md#r03-openaisdk-接循環不替-app-寫產品政策)、[OpenAI Models](https://developers.openai.com/api/docs/guides/agents/models)
+OpenAI Agents SDK 是正式 runtime 備選；具工具循環、continuation、tracing 等功能，但不自動解決上述 editor 的部分失敗及審核缺口。也不需要 OpenAI SDK＋LangChain＋Vercel 各包一層。SDK 的 provider 支援與原生 Responses 功能另核對，不因更換 SDK 就承諾所有 key 都有完全相同能力。[R03](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md#r03-openaisdk-接循環不替-app-寫產品政策)、[OpenAI Models](https://developers.openai.com/api/docs/guides/agents/models)
 
 ## 3. 端到端流程
 
@@ -94,7 +94,7 @@ OpenAI Agents SDK 是正式 runtime 備選；具工具循環、continuation、tr
 
 ### A. 主顧問看到什麼
 
-- 延續已核對的 conversation／reasoning／compaction 接法，不另造重複對話歷史。近期訊息、Memory 導覽／相關內容、已發生工具結果與本輪訊息按既有 context 工程管理。[R03、R10](2026-09-09-jd-ai-app-runtime-official-evidence.md)
+- 延續已核對的 conversation／reasoning／compaction 接法，不另造重複對話歷史。近期訊息、Memory 導覽／相關內容、已發生工具結果與本輪訊息按既有 context 工程管理。[R03、R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)
 - JD 讀取必須包含**目前有效的最新內容，包括 pending 的新增／修改**。供審核顯示的舊刪除文字，要能與目前內容區分，不能讓 AI 當成兩項都還有效的工作。
 - 具體工具 read 是否能提供這個視圖，是驗證項，不先假設 `getText()` 或 `getJSON()` 自然正確。版本、範圍、選取位置由 runtime／編輯器給，不能叫模型自行推算。
 - JD 很小可先完整讀取；變大按範圍讀。日常改一項不必全量重分析，但整體完成檢查需另盤點全文件及相關工作理解。沿原本能力需求，不在此新建檢索系統。
@@ -102,20 +102,20 @@ OpenAI Agents SDK 是正式 runtime 備選；具工具循環、continuation、tr
 
 ### B. 模型怎麼改
 
-先使用 **三個現成文件工具**：read、edit、readSelection。它們是文件操作，不是三次固定呼叫，也不含目前 Memory 工具數。comments 等非必需工具先不開。工作內容拆分由一般操作組成，不新增 duty_split／task_merge 專用工具。[F01](2026-09-09-jd-editor-framework-comparison.md#f01-tiptap-的兩種接法不能混拼)
+先使用 **三個現成文件工具**：read、edit、readSelection。它們是文件操作，不是三次固定呼叫，也不含目前 Memory 工具數。comments 等非必需工具先不開。工作內容拆分由一般操作組成，不新增 duty_split／task_merge 專用工具。[F01](../research/engineering/2026-09-09-jd-editor-framework-comparison.md#f01-tiptap-的兩種接法不能混拼)
 
 - 模型填「已讀到的目標＋新內容／操作」。完整 schema、定位語法、可用操作以鎖定版官方 definitions 為準；不從網頁範例手抄一套簡化文法。
-- 文件 ID、作者、呼叫 ID、版本、是否待審、保存位置及權限由應用注入，不讓模型填，也不讓模型有 accept／approve 工具。[R06](2026-09-09-jd-ai-app-runtime-official-evidence.md#r06-langchain既有參數注入工具格式及前端執行)
+- 文件 ID、作者、呼叫 ID、版本、是否待審、保存位置及權限由應用注入，不讓模型填，也不讓模型有 accept／approve 工具。[R06](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md#r06-langchain既有參數注入工具格式及前端執行)
 - 說明「為什麼改」是模型可產生的簡短內容；如何關聯審核範圍沿框架 metadata／正式接點驗證，不為此先裝完整 Comments 系統。接受後不要求保留成 JD 正文，也不新增人工拒絕理由欄。
-- read 出現同句、多個近似節點或過時目標時，應回查與重新定位，不發明 fuzzy matcher。框架仍可能使用內部 position／hash；**重點不是禁止任何數字，而是不叫模型憑空計算、猜測或把暫時定位當永久 ID。**[R01–R02、R09](2026-09-09-jd-ai-app-runtime-official-evidence.md)
+- read 出現同句、多個近似節點或過時目標時，應回查與重新定位，不發明 fuzzy matcher。框架仍可能使用內部 position／hash；**重點不是禁止任何數字，而是不叫模型憑空計算、猜測或把暫時定位當永久 ID。**[R01–R02、R09](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)
 
 ### C. 執行與保存
 
-瀏覽器有 editor 實例時，優先由它執行原生 client 工具。server 的 headless interrupt 只是「等待前端完成工具」，不需員工點選，亦非內容已審。模型續跑前，工具結果必須已回送。[R06、R10](2026-09-09-jd-ai-app-runtime-official-evidence.md)
+瀏覽器有 editor 實例時，優先由它執行原生 client 工具。server 的 headless interrupt 只是「等待前端完成工具」，不需員工點選，亦非內容已審。模型續跑前，工具結果必須已回送。[R06、R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)
 
-第一版先不將未生成完整的 operations 邊流邊寫入 JD；聊天與處理狀態仍可串流。框架套用後，應用依其 serialization／adapter 保存**目前文件及必要修訂 metadata**，保存失敗要如實表示，不能把畫面已變當資料已落盤。[F02–F04](2026-09-09-jd-editor-framework-comparison.md)
+第一版先不將未生成完整的 operations 邊流邊寫入 JD；聊天與處理狀態仍可串流。框架套用後，應用依其 serialization／adapter 保存**目前文件及必要修訂 metadata**，保存失敗要如實表示，不能把畫面已變當資料已落盤。[F02–F04](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)
 
-本機同一文件在這段期間只有一個寫入者；UI 唯讀不等於後端安全驗證可省略。關頁時不暗中補建另一個 server editor：未執行呼叫按正式暫停／取消語意處理；已執行但結果未知則先查已保存結果再恢復，不重放新增動作。[R08](2026-09-09-jd-ai-app-runtime-official-evidence.md#r08-框架恢復不是外部寫入的-exactly-once-保證)
+本機同一文件在這段期間只有一個寫入者；UI 唯讀不等於後端安全驗證可省略。關頁時不暗中補建另一個 server editor：未執行呼叫按正式暫停／取消語意處理；已執行但結果未知則先查已保存結果再恢復，不重放新增動作。[R08](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md#r08-框架恢復不是外部寫入的-exactly-once-保證)
 
 ## 4. 文件、格式及審核怎麼保存
 
@@ -137,7 +137,7 @@ OpenAI Agents SDK 是正式 runtime 備選；具工具循環、continuation、tr
 
 可先探索的接線是：使用原生 suggestions 作實際修訂單位，應用將相關 suggestion 身分關聯為同一審核範圍；接受／拒絕仍呼叫框架正式命令，不用整文件舊快照回退。群組身分由 runtime 產生；哪些修改語意相依由主顧問判斷、讓員工看清楚，不加額外判斷 Agent。
 
-**以上是候選 Mapping，尚非可保證的演算法。**要證明原生 suggestion 身分／lineage 足以追蹤後續人工修改、block 改動、跨位置刪增，且整組操作不漏內層 pending。Tiptap 目前只有 inline nesting 明文，接受外層不會自動接受內層；CKEditor multi-range 也不涵蓋任意異質群組。[F03–F04](2026-09-09-jd-editor-framework-comparison.md)
+**以上是候選 Mapping，尚非可保證的演算法。**要證明原生 suggestion 身分／lineage 足以追蹤後續人工修改、block 改動、跨位置刪增，且整組操作不漏內層 pending。Tiptap 目前只有 inline nesting 明文，接受外層不會自動接受內層；CKEditor multi-range 也不涵蓋任意異質群組。[F03–F04](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)
 
 因此第一個隔離驗證必須直接包含人改 AI、跨位置移動及組外修改，不能只展示改一句成功就宣稱整體完成。**若需自行重做映射／回退引擎，先停下比較 CKEditor 或與 Owner 討論產品取捨；不以「薄接線」淡化實際工作量。**
 
@@ -153,7 +153,7 @@ OpenAI Agents SDK 是正式 runtime 備選；具工具循環、continuation、tr
 | 部分操作成功、部分失敗 | 原結果留存；重新讀目前文件再修未完成部分 | 已套用／失敗範圍，不只一個模糊 false |
 | 錯誤持續無法修正 | 有界結束、誠實報告、解鎖可恢復操作 | 不說完成；不讓聊天框永久只能重試 |
 
-前五類主要沿 [R04–R08](2026-09-09-jd-ai-app-runtime-official-evidence.md)；部分成功有 [F02／F04](2026-09-09-jd-editor-framework-comparison.md)直接證據。傳給模型的細節應短而可行動，不把 stack trace、金鑰或完整內部環境當錯誤訊息。
+前五類主要沿 [R04–R08](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)；部分成功有 [F02／F04](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)直接證據。傳給模型的細節應短而可行動，不把 stack trace、金鑰或完整內部環境當錯誤訊息。
 
 **重要：**不是所有失敗都保證文件沒動。對單一語意決策的跨位置操作，如果框架可能套一半，必須在群組完整前避免接受半套，並驗證修復／取消能恢復完整性。如何形成可靠邊界是 I3 的硬門檻；本稿未假裝 middleware 或 beforeOperation 已提供整批 rollback。若要 staged copy／額外 transaction adapter，屬需提出實證及範圍的新接法，不能直接施工。
 
@@ -175,7 +175,7 @@ OpenAI Agents SDK 是正式 runtime 備選；具工具循環、continuation、tr
 | UI 及可恢復操作 | 原生編輯、實際 tool state、autosave 狀態及待審；失敗解鎖 | 多人協作、所有進階狀態都放主畫面 |
 | 品質檢查 | 先離線編輯情境及失敗注入，再少量真模型驗證 | 以文件研究冒稱產品已測；這輪不呼叫付費 API |
 
-能力來源以 [R01–R10](2026-09-09-jd-ai-app-runtime-official-evidence.md)為準。安全／保存／審核等是 App 正常責任；可以使用成熟框架接點，但不會因接一個 SDK 就自動具有所有產品政策。
+能力來源以 [R01–R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)為準。安全／保存／審核等是 App 正常責任；可以使用成熟框架接點，但不會因接一個 SDK 就自動具有所有產品政策。
 
 ## 7. 可以怎麼開始，而不掉進無限設計
 

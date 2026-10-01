@@ -15,7 +15,7 @@
 > 本文對本機多文件、雙欄共編、公版樣式 UI、內部 canonical model 與保留前端資產的研究仍有效；所有 immutable
 > revision、head hash、entity version、restore 與 revision CAS 描述不再是第一個成品要求。MVP 只保存每份 JD 的目前
 > relational state，AI proposal 仍須由員工接受、修改後採用或拒絕。active persistence authority 見
-> [Job Authoring v2 本機單一現況儲存設計](2026-07-24-job-authoring-v2-relational-storage-research.md)。
+> [Job Authoring v2 本機單一現況儲存設計](../archive/retired-documents/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 ## 1. 結論先行
 

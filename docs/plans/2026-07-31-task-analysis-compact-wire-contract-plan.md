@@ -2,7 +2,7 @@
 
 **日期**:2026-07-31
 **依據**:[`specs/2026-07-31-context-engineering-model-facing-contract-research.md`](../specs/2026-07-31-context-engineering-model-facing-contract-research.md)
-(原則與量測)、[`specs/2026-07-31-anthropic-strict-schema-grammar-limit-research.md`](../specs/2026-07-31-anthropic-strict-schema-grammar-limit-research.md)(400 的量測)
+(原則與量測)、[`specs/2026-07-31-anthropic-strict-schema-grammar-limit-research.md`](../research/agent-systems/2026-07-31-anthropic-strict-schema-grammar-limit-research.md)(400 的量測)
 **不開 ADR**:維持 `strict: true` 與一次呼叫,ADR 0040 決定 24／26 不變。只有改 non-strict 或拆成兩次呼叫才需要 ADR。
 
 ## 目標

@@ -18,7 +18,7 @@
 
 本文件承接兩類資料，但不把它們混成同一層：
 
-1. [通用 LLM Memory 市場流程、共同基線與方案研究](./2026-08-30-agent-memory-landscape-and-decision-working-research.md)：提供跨 OpenAI、Anthropic、Google、AWS 與成熟框架的共同必要行為、差異選項、成熟度與過時技術清單。
+1. [通用 LLM Memory 市場流程、共同基線與方案研究](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md)：提供跨 OpenAI、Anthropic、Google、AWS 與成熟框架的共同必要行為、差異選項、成熟度與過時技術清單。
 2. [產出高品質職務說明書所需的 LLM 能力與機制分工](./2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md)：提供唯一產品目標、L1～L11、M1～M11，以及 Memory／Skill／Tool／Runtime／員工 authority 的中立責任邊界。
 
 通用研究回答「成熟 LLM Memory 通常需要什麼」；本文回答「其中哪些真的適合 Caliburn、應如何簡化或調整」。
@@ -29,7 +29,7 @@
 
 | 文檔 | 唯一主要責任 | 可以寫 | 不應重複寫 |
 | --- | --- | --- | --- |
-| [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](2026-08-30-agent-memory-landscape-and-decision-working-research.md) | 通用 Memory 市場與技術事實 | 各家目前公開機制、跨家共同點、差異、成熟度、限制與不能推論的內容 | Caliburn 要選哪個方案、產品專屬 retention／conflict 語意 |
+| [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md) | 通用 Memory 市場與技術事實 | 各家目前公開機制、跨家共同點、差異、成熟度、限制與不能推論的內容 | Caliburn 要選哪個方案、產品專屬 retention／conflict 語意 |
 | [`2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md`](2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md) | 高品質 JD 成果需求 | L1～L11、M1～M11 與 Memory／Skill／Tool／authority 的中立效果邊界 | 廠商比較、框架推薦、正式資料形狀 |
 | **本文** | 產品需求對成熟能力的映射與暫定方案 | M1～M11 覆蓋、Caliburn 真缺口、完整候選組合、效果／成本／風險與暫定推薦 | 重抄完整廠商說明、改寫高品質 JD 的定義 |
 | 後續 ADR／design／plan | 經 Owner 核准後的正式決策與施工 | 被接受的架構決策、runtime 邊界、實作步驟與驗證 | 尚未核准的工作研究、所有被淘汰候選的完整歷史 |
@@ -1689,7 +1689,7 @@ LangChain 1.x
 
 ### 9.45 2026-09-01 框架現況重核：第四組「Context、Skill／Tool 漸進揭露、快取、壓縮與成本」
 
-本組承接 [`2026-09-01-framework-independent-memory-contract.md`](./2026-09-01-framework-independent-memory-contract.md) §3.4、§7～§10，先用 [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](./2026-08-30-agent-memory-landscape-and-decision-working-research.md) §6、F8～F9、§9、§13.10～§13.16 的跨家共同基線校正，再比較 framework。目標是讓長訪談持續取得正確 Context，同時控制成本、避免工具選錯與不可逆細節遺失；不是單純追求最少程式碼。
+本組承接 [`2026-09-01-framework-independent-memory-contract.md`](./2026-09-01-framework-independent-memory-contract.md) §3.4、§7～§10，先用 [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md) §6、F8～F9、§9、§13.10～§13.16 的跨家共同基線校正，再比較 framework。目標是讓長訪談持續取得正確 Context，同時控制成本、避免工具選錯與不可逆細節遺失；不是單純追求最少程式碼。
 
 #### 9.45.1 先以跨家共同基線約束比較
 
@@ -1781,7 +1781,7 @@ OpenAI 最新 model guidance 建議精簡 Prompt、只暴露當前相關工具�
 本節整合 §9.42～§9.45，並再次回讀下列兩份上位約束後才下結論：
 
 1. [`2026-09-01-framework-independent-memory-contract.md`](./2026-09-01-framework-independent-memory-contract.md)：產品效果、M1～M11 與 12 項不可妥協門檻；
-2. [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](./2026-08-30-agent-memory-landscape-and-decision-working-research.md)：OpenAI、Anthropic、Google、AWS 與成熟框架的 B1～B14 共同基線、差異設計、Memory 表徵、Prompt／Tool／Runtime 責任。
+2. [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md)：OpenAI、Anthropic、Google、AWS 與成熟框架的 B1～B14 共同基線、差異設計、Memory 表徵、Prompt／Tool／Runtime 責任。
 
 因此本節不是以目前程式、舊元件名稱、少寫多少 code 或單一功能表裁決。框架必須先完整承接產品契約；單項人體工學優勢只能在硬門檻都通過後作次級比較。
 

@@ -4,7 +4,7 @@
 > 自己查文檔自己找資料」,北極星=顧問等級職務說明書;自審紀錄見 §11)。**決策依據**:ADR [0023](../adr/0023-interview-engine-stateless-turns.md)(骨幹)
 > / [0024](../adr/0024-llm-wiring-select-schema.md)(接線)/ [0025](../adr/0025-coedit-authority-dual-channel.md)(共編權限)
 > / [0020](../adr/0020-interview-authoring-interaction-model.md)(載體)/ [0015](../adr/0015-document-save-optimistic-concurrency.md)(樂觀鎖)。
-> **研究依據**:[接線研究](2026-07-05-llm-integration-wiring-research.md)(輪 1–10)·
+> **研究依據**:[接線研究](../research/agent-systems/2026-07-05-llm-integration-wiring-research.md)(輪 1–10)·
 > [黃金範本樣張 v0](2026-07-05-golden-sample-software-tester.md)。
 > **一句話**:員工在側欄面板被 LLM 顧問訪談(盤點→深掘→總審三段軌道),文件在旁邊即時長出;
 > 引擎=無狀態回合服務,寫入走**編輯器同一條 PATCH seam**,人碰過的內容走建議層。
@@ -159,7 +159,7 @@ reranker 觸發條件不變 · MCP 曝露 tools(ADR 0007 沿用)。
 
 - 新深文檔 `docs/design/interview-engine.md`(端到端:面板×引擎×文件 seam;本 spec 定稿後轉寫);
 - `apps/api/README.md`(interview 端點面)· `apps/web/README.md`(面板)·
-  [`editor-knowledge-pack.md`](../design/editor-knowledge-pack.md)(單一寫入路徑不變量補 engine 分句);
+  [`editor-knowledge-pack.md`](../archive/retired-documents/design/editor-knowledge-pack.md)(單一寫入路徑不變量補 engine 分句);
 - ocs-contract 變更走 [`contract-strategy`](../contract-strategy.md) §4 交付生命週期。
 
 ## 11. 自審紀錄(2026-07-05,維護者授權)

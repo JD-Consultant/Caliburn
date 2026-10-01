@@ -16,7 +16,7 @@
 > 每份 document 只有一份 current relational state；員工直接編輯或接受 AI proposal 時更新目前 rows。AI 仍只能先建立
 > proposal，由員工 accept／edit／reject。本文關於本機多文件、內部 canonical model、公版樣式 UI 與保留前端資產的
 > 決策繼續有效；所有「建立 revision」「revision CAS／hash」文字降為後續優化。active storage authority 見
-> [Job Authoring v2 本機單一現況儲存設計](../specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
+> [Job Authoring v2 本機單一現況儲存設計](../archive/retired-documents/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 > **2026-07-29 supersession**
 >

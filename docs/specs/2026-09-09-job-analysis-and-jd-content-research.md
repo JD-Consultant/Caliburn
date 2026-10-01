@@ -6,15 +6,15 @@
 
 **2026-09-10 最新路由：**Owner 要求在 Plate 接線前先討論確認職務說明書格式。依 [register](../current-decisions.md) 的 JD-R001/C06，先以[完整樣稿 r2](2026-09-09-frontend-engineer-jd-sample.md)及[欄位指南](2026-09-09-jd-field-and-writing-guide.md)確認成品章節與任務呈現，Task 1 暫緩；舊成品方向仍為可修訂基線，未視為否定或已核准新格式。編輯技術採 Plate＋持續工作稿，實作路由見[核心接線計畫](../plans/2026-09-10-jd-editor-core-implementation.md)；不再沿早期免費開源選型或 pending 接受／拒絕 gate。
 
-本文是 JD-R001 的研究入口。研究基準日為 2026-09-09；狀態為 **G2 研究完成、G3 內容與樣稿審查完成，Owner 同意成品方向，保留可修訂性**，不是資料庫、工具、介面或 production 施工契約。Owner 先授權「都交給你研究處理」，取代逐題等待 C01–C05 回覆，後回覆「同意」並提供 LED 照明工程師 iCAP 作參考、明確不要求照做；[參考核對及限制](2026-09-09-job-analysis-international-evidence.md#8-owner-提供的-led-照明工程師-icap-參考)集中在證據文件。以下仍是可調整的 Working recommendation，不代表每項技術細節已核准，也不以歷史程式限制新產品。
+本文是 JD-R001 的研究入口。研究基準日為 2026-09-09；狀態為 **G2 研究完成、G3 內容與樣稿審查完成，Owner 同意成品方向，保留可修訂性**，不是資料庫、工具、介面或 production 施工契約。Owner 先授權「都交給你研究處理」，取代逐題等待 C01–C05 回覆，後回覆「同意」並提供 LED 照明工程師 iCAP 作參考、明確不要求照做；[參考核對及限制](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md#8-owner-提供的-led-照明工程師-icap-參考)集中在證據文件。以下仍是可調整的 Working recommendation，不代表每項技術細節已核准，也不以歷史程式限制新產品。
 
-**最新補充：**跨國比較後，Owner 對完整閱讀版回覆「大致上同意」（G3／WORKING，可修訂），並要求以核心研究複核、補好文檔關係。[樣稿 r2](2026-09-09-frontend-engineer-jd-sample.md)已同步聊天展示的版本；[本輪內容與路由審核](2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)未發現須翻案的內容衝突。[十份雇主比較](2026-09-09-employer-job-document-comparison.md)仍為研究證據，不把所有來源當成Owner逐條核准或員工真實資訊；[深度與追問方法](2026-09-09-customized-jd-depth-and-interview-calibration.md)保持原分工。JD-R002/C02審核粒度方向亦獲暫時同意；依複雜度疑問先續C03整體AI編輯應用，不重問同一份樣稿深度，亦未授權施工。
+**最新補充：**跨國比較後，Owner 對完整閱讀版回覆「大致上同意」（G3／WORKING，可修訂），並要求以核心研究複核、補好文檔關係。[樣稿 r2](2026-09-09-frontend-engineer-jd-sample.md)已同步聊天展示的版本；[本輪內容與路由審核](2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)未發現須翻案的內容衝突。[十份雇主比較](../research/work-analysis/2026-09-09-employer-job-document-comparison.md)仍為研究證據，不把所有來源當成Owner逐條核准或員工真實資訊；[深度與追問方法](2026-09-09-customized-jd-depth-and-interview-calibration.md)保持原分工。JD-R002/C02審核粒度方向亦獲暫時同意；依複雜度疑問先續C03整體AI編輯應用，不重問同一份樣稿深度，亦未授權施工。
 
 ## 1. 結論
 
 高品質職務說明書不是把所有訪談塞入最多欄位，而是：**完整理解這個人目前工作的範圍及重要細節，再寫成能代表該職位、沒有虛構或重複的文件。**
 
-本研究沒有找到全球統一的「滿分 JD 模板」。美國 OPM 的職位描述、O*NET 的職業資料、英國 NOS 的職能標準、澳洲的訓練套件，各有不同用途。共同可學的是分析真實工作、成果／合格表現、必要專業及工作情境；不能把某體系的全部欄位、級數或評量程序變成通用 JD 必填。[官方來源與適用邊界](2026-09-09-job-analysis-international-evidence.md)
+本研究沒有找到全球統一的「滿分 JD 模板」。美國 OPM 的職位描述、O*NET 的職業資料、英國 NOS 的職能標準、澳洲的訓練套件，各有不同用途。共同可學的是分析真實工作、成果／合格表現、必要專業及工作情境；不能把某體系的全部欄位、級數或評量程序變成通用 JD 必填。[官方來源與適用邊界](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md)
 
 建議採用的內容骨架是：
 
@@ -30,8 +30,8 @@
 | [JD 欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md) | 成品有哪些內容、各代表什麼、怎麼寫、什麼不該寫 | Memory schema、資料庫／UI 契約 |
 | [完整工作分析指南](2026-09-09-complete-work-analysis-guide.md) | 要理解哪些資訊、如何訪談、案例如何形成職務理解，再如何萃取 JD | 規定模型呼叫次數、強制多 Agent 或固定訪談表單 |
 | [客製化深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md) | 實際職位要多具體、資料不足怎麼追問、如何收尾；三種深度對照 | 另造必填清單、虛構工作細節或直接改 prompt |
-| [實際雇主文件比較](2026-09-09-employer-job-document-comparison.md) | 十份原始職位文件的內容、性質、日期及與樣稿的差異 | 把職族／招聘頁當成個別員工真實全工作，或重開技術設計 |
-| [跨國證據與研究邊界](2026-09-09-job-analysis-international-evidence.md) | 原始資料、版本、精確連結、支持範圍、舊研究更正 | 把推論包裝為官方規定 |
+| [實際雇主文件比較](../research/work-analysis/2026-09-09-employer-job-document-comparison.md) | 十份原始職位文件的內容、性質、日期及與樣稿的差異 | 把職族／招聘頁當成個別員工真實全工作，或重開技術設計 |
+| [跨國證據與研究邊界](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md) | 原始資料、版本、精確連結、支持範圍、舊研究更正 | 把推論包裝為官方規定 |
 | [完整 JD 樣稿](2026-09-09-frontend-engineer-jd-sample.md) | 看成品內容、粒度與閱讀效果 | 假裝是真實員工資料，或直接決定網頁版面 |
 | [樣稿依據與審查](2026-09-09-jd-sample-basis-and-review.md) | 明示虛構完整情境、來源↔成品核對、發現與修正 | 新增來源 schema 或 AI 驗證器 |
 | [JD-R002 可編輯內容與關係](2026-09-09-jd-document-relationships-working-research.md) | 下一層的內容表徵選項、推薦及編輯情境 | 不重定成品欄位，不直接選 DB／框架或施工 |
@@ -39,8 +39,8 @@
 | [JD-R002/C03 AI 編輯應用整體接法](2026-09-09-ai-document-app-composition-research.md) | agent、文件編輯及審核如何整體接線，哪些複雜度必要 | 不重開 Memory、不預設每欄位一工具或直接選定套件 |
 | [C03 App／工具共同基礎](2026-09-09-llm-app-tool-use-and-document-editing-common-practices.md) | 跨廠共同分工及不同編輯方式；已同意 G3／WORKING | 不把共同原則當唯一格式、套件採用或實測成功 |
 | [C03 可執行方案](2026-09-09-jd-ai-editing-executable-proposal.md) | 推薦組合、端到端接法、缺口及有限驗證門檻；§0.1 核對近期真實進度，§7 收斂第一範圍，候選待裁決 | 不把未知當原生覆蓋，不越過採用／施工授權 |
-| [C03 Agent可靠性證據](2026-09-09-jd-ai-app-runtime-official-evidence.md)／[編輯器比較](2026-09-09-jd-editor-framework-comparison.md) | 工具、錯誤、重試與三套editor的正式契約、來源及差異 | 不重抄JD分析方法，不用名稱相似當功能相等 |
-| [JD-R002 官方能力證據](2026-09-09-jd-document-model-official-evidence.md) | 職務系統／文件產品／編輯框架的直接能力及限制 | 不把概念相似當成完整功能等價 |
+| [C03 Agent可靠性證據](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)／[編輯器比較](../research/engineering/2026-09-09-jd-editor-framework-comparison.md) | 工具、錯誤、重試與三套editor的正式契約、來源及差異 | 不重抄JD分析方法，不用名稱相似當功能相等 |
+| [JD-R002 官方能力證據](../research/engineering/2026-09-09-jd-document-model-official-evidence.md) | 職務系統／文件產品／編輯框架的直接能力及限制 | 不把概念相似當成完整功能等價 |
 
 下一輪從本入口及對應指南讀起；遇到理由或方法爭議，沿證據表回原文，不重開全部研究。現行決策效力仍由 [register](../current-decisions.md) 與 [討論流程](../decision-process.md) 管理。
 
@@ -52,7 +52,7 @@
 2. **如何取得與理解工作：**讀[分析指南](2026-09-09-complete-work-analysis-guide.md)及[客製化校準](2026-09-09-customized-jd-depth-and-interview-calibration.md)，理解要問什麼、怎麼分辨案例與持續責任、何時仍缺資訊。
 3. **理解如何成為文件：**讀[欄位指南](2026-09-09-jd-field-and-writing-guide.md)，分清內容定義、完成要求、K／S及下游用途；不把分析面向直接翻成必填表格。
 4. **看成品，再反查：**讀[樣稿 r2](2026-09-09-frontend-engineer-jd-sample.md)及[完整情境／雙向審查](2026-09-09-jd-sample-basis-and-review.md)。檢查已知工作→成品是否漏寫，以及成品→依據是否多寫；版本及最近審核在後者§10。
-5. **核對為什麼這樣做：**讀[國際方法證據](2026-09-09-job-analysis-international-evidence.md)與[實際雇主比較](2026-09-09-employer-job-document-comparison.md)。前者說明方法、版本與適用限制，後者提供實際寫法與反例；有疑點再沿精確引用讀原文，不能只看公司名稱。
+5. **核對為什麼這樣做：**讀[國際方法證據](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md)與[實際雇主比較](../research/work-analysis/2026-09-09-employer-job-document-comparison.md)。前者說明方法、版本與適用限制，後者提供實際寫法與反例；有疑點再沿精確引用讀原文，不能只看公司名稱。
 6. **最後才接下一層：**內容理解一致後，讀[JD-R002](2026-09-09-jd-document-relationships-working-research.md)及其官方能力證據，續談編輯／審核。內容研究不等於技術契約、框架選定或施工核准。
 
 依賴方向是「**證據支撐方法與取捨 → 指南指導分析／成品 → 情境與樣稿檢查方法是否說清楚 → 審核回饋修訂指南／狀態**」；不是用樣稿的四組八項反過來制定所有職位的規格。案例／Memory→JD的概念及下游關係見本文§3，不因此新增實體層或更換記憶流程。
@@ -141,6 +141,6 @@ C01–C05 選擇與未採方案集中在[欄位指南 §8](2026-09-09-jd-field-a
 
 Owner 已同意成品方向並對 r2 深度大致同意；iCAP 與雇主比較及本輪複核未發現必須翻案的內容缺口。其後已續談 C01／C02 與 C03；**目前唯一下一裁決依下方 C03 與 register 的第一候選／有限驗證範圍，不再沿早期「先逐題談完 UI 才選框架」的順序。**不重開已收斂的 Memory 研究，也不直接施工。發現新問題可以翻案，但先記錄哪個效果不足及來源，不靜默改設計。內容規則保留在指南，入口只維護摘要及進度，來源／示例／審查各自有單一位置。
 
-**JD-R002/C01 已獲方向同意（G3／WORKING）：**[可編輯內容與關係](2026-09-09-jd-document-relationships-working-research.md)採「有意義的結構＋完整敘述」作後續方向；[官方證據](2026-09-09-jd-document-model-official-evidence.md)區分內容、定位、呈現與審核，包含現成框架接點與未證明部分。不是已選框架或核准技術契約；其後 C02 方向亦已同意，進度依下段 C03，不重問已明確的編輯不等於接受。
+**JD-R002/C01 已獲方向同意（G3／WORKING）：**[可編輯內容與關係](2026-09-09-jd-document-relationships-working-research.md)採「有意義的結構＋完整敘述」作後續方向；[官方證據](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)區分內容、定位、呈現與審核，包含現成框架接點與未證明部分。不是已選框架或核准技術契約；其後 C02 方向亦已同意，進度依下段 C03，不重問已明確的編輯不等於接受。
 
 **C02 審核粒度及 C03 共同基礎已獲同意（G3／WORKING），目前子題續 [C03 整體 AI 編輯應用](2026-09-09-ai-document-app-composition-research.md)：**近期內容、訪談／Memory、編輯研究已串讀核對，完整範圍與進度在[方案 §0.1](2026-09-09-jd-ai-editing-executable-proposal.md#01-近期研究串讀後的真實進度)；下一裁決是第一 editor 候選及 §7 的有限無 LLM 驗證，仍 OPEN。共同最新文件、編輯不等於接受繼續承接且可經討論翻案；新設計不受舊產品／舊架構限制，不重開已同意內容或 Memory，未授權施工。

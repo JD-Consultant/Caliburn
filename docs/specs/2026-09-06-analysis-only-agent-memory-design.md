@@ -35,7 +35,7 @@
 | `MEMORY.md` | **工作理解正文**：按主題的可修訂知識、適用條件、差異／未知、可搜尋詞與詳記引用 | 每次發布新版本；A 搜尋／讀取、B2 整併、C 局部修補 |
 | `memory_summary.md` | **工作理解導覽**：短路由提示與案例別名，指向正文主題 | 與正文一起發布，A run 開始載入；**沒有第六份額外導覽** |
 
-五產物／producer-consumer 的原始證據沿用[OpenAI 系統圖 §5](2026-09-05-openai-conversation-context-and-memory-system-map.md)、[摘要引用路由](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)、[單訪談流程](2026-09-05-work-understanding-memory-flow-working-design.md)。SDK 官方也明確區分抽取、候選及 layout 整併。[Sandbox Memory](https://openai.github.io/openai-agents-python/sandbox/memory/)
+五產物／producer-consumer 的原始證據沿用[OpenAI 系統圖 §5](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、[摘要引用路由](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)、[單訪談流程](2026-09-05-work-understanding-memory-flow-working-design.md)。SDK 官方也明確區分抽取、候選及 layout 整併。[Sandbox Memory](https://openai.github.io/openai-agents-python/sandbox/memory/)
 
 ### 表徵：用文件承接細節，不先造案例／Task schema
 
@@ -56,7 +56,7 @@
 - **整併／工作理解：**整理員工一般在做什麼、責任範圍、共同模式及成立條件；需要影響理解的差異也保留。相似案例不用機械複製成多項相同工作，但應維持足夠的案例別名、搜尋詞與詳記引用，讓不同案例仍可被找到；不把全部案例正文灌進工作理解或小型導覽。
 - **小額測試重點：**同類A／B案例有不同條件或做法→再補A細節→更正A但不改B→隔數輪重新問兩案。分別檢查詳記保留、候選是否傳遞新增訊號、正文是否誤合併／混用，以及能否沿引用找回正確案例；不能只看最後回答順暢，也不能只因原始對話還在就當整理品質通過。尚未提供細節要如實說未知。
 
-**依據與界線：**已回讀本稿的五產物與原文邊界、[OpenAI詳記內容／整併／回查的固定source研究 §3–4](2026-09-06-openai-rollout-summary-correction-source-review.md#3-不同詳記談同一案例比對與修訂在哪裡發生)，並核對隔離程式的 [B1 prompt](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/extraction.py)與 [B2 prompt](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/consolidation.py)。當日重讀的 [OpenAI local memories官方說明](https://learn.chatgpt.com/docs/customization/memories#how-local-codex-memories-work)支持抽取、整併及不同記憶產物分工，**不保證完整保留所有工作案例細節**；上述資訊保留優先順序是本產品要求，不冒稱 OpenAI 原封採用同一 prompt。
+**依據與界線：**已回讀本稿的五產物與原文邊界、[OpenAI詳記內容／整併／回查的固定source研究 §3–4](../research/agent-systems/2026-09-06-openai-rollout-summary-correction-source-review.md#3-不同詳記談同一案例比對與修訂在哪裡發生)，並核對隔離程式的 [B1 prompt](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/extraction.py)與 [B2 prompt](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/consolidation.py)。當日重讀的 [OpenAI local memories官方說明](https://learn.chatgpt.com/docs/customization/memories#how-local-codex-memories-work)支持抽取、整併及不同記憶產物分工，**不保證完整保留所有工作案例細節**；上述資訊保留優先順序是本產品要求，不冒稱 OpenAI 原封採用同一 prompt。
 
 #### 職務分析研究如何作為 prompt 參考（2026-09-07 Owner 補充）
 

@@ -10,7 +10,7 @@
 
 先讀本文確認「資料是什麼、誰產生、如何接力與找回」；只有需要證據才沿引用深入：
 
-- 官方全貌：[OpenAI 系統圖 §5.6–5.7](2026-09-05-openai-conversation-context-and-memory-system-map.md)、[artifact 詳表 §4](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)。
+- 官方全貌：[OpenAI 系統圖 §5.6–5.7](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、[artifact 詳表 §4](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)。
 - 引用 producer／consumer：[摘要路由 source review §2–4](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)。
 - 兩階段、保存與直接交接：[B 流程 §3.4–3.5](2026-09-05-memory-background-cycle-flow-review.md)。
 - 本文通過後才回到[框架組合提案](2026-09-05-memory-framework-end-to-end-composition-proposal.md)；不重選已研究的通用 Memory 原理。
@@ -36,7 +36,7 @@
 
 我們稱為「**單一訪談抽取 → 同一份工作理解持續整併**」，不使用容易暗示多 thread 的「跨 rollout 整併」。一次背景整理可以處理該訪談的一段已保存範圍；既有 Q014 已准方向是新範圍加必要舊脈絡，不是每輪重讀整個無限成長 thread。精確切段、觸發與重跑方式仍待定，不從名稱偷決定。
 
-**[官方與 mapping 邊界]** Codex 的 rollout 是其具體執行紀錄單位；不能將 Caliburn 每則訊息、每次模型 API request 或每個抽取片段都叫成新的 Codex rollout。背景工作的技術執行紀錄也不等於另開員工聊天室。參考[既有原文／Session 邊界](2026-09-05-openai-conversation-context-and-memory-system-map.md)。
+**[官方與 mapping 邊界]** Codex 的 rollout 是其具體執行紀錄單位；不能將 Caliburn 每則訊息、每次模型 API request 或每個抽取片段都叫成新的 Codex rollout。背景工作的技術執行紀錄也不等於另開員工聊天室。參考[既有原文／Session 邊界](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)。
 
 舊圖的「C 未來讀取」放回已准 **A 的按需讀取**；本文 **C 專指即時修補**，避免同一字母兩種意思。A 的即時 Context 含有界對話／compaction 延續、小型導覽及既定少量相關召回，按需再深讀；不是只讀最近對話。
 
@@ -55,7 +55,7 @@
 
 **五個概念均已納入設計；不等於五個功能均已實作驗證。** `rollout_slug` 在 Codex 是抽取模型產生的短標籤，Runtime 用於組成可讀檔名；本案保留命名用途，**還未決定需要獨立欄位**。不能因沒有一張 slug 資料表就判定漏功能，也不能讓模型靠 slug 自創唯一身份。Codex 資料分工與實際 header 見 [storage source](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/src/storage.rs)。
 
-**「工作理解導覽」就是 `memory_summary.md` 的對應，不是它之外再加一份導航 Memory。** 可調整的是表示，不是多加一層：B 隨正文維護這份小型入口，A 讀取／注入其內容；不是每次模型呼叫再生成一次。它與 Compaction 的對話延續摘要、B 補查用的詳記目錄都不同；後者是查找既存產物的能力，不是另一份語意導覽。Codex 導覽也可含少量 profile／通用提示；本案學其高密度入口與可搜尋線索責任，不宣稱逐欄照抄。詳見[系統圖 §5.8](2026-09-05-openai-conversation-context-and-memory-system-map.md#58-第四個細部邊界三份-read-artifact-各自存什麼何時停止深入)。
+**「工作理解導覽」就是 `memory_summary.md` 的對應，不是它之外再加一份導航 Memory。** 可調整的是表示，不是多加一層：B 隨正文維護這份小型入口，A 讀取／注入其內容；不是每次模型呼叫再生成一次。它與 Compaction 的對話延續摘要、B 補查用的詳記目錄都不同；後者是查找既存產物的能力，不是另一份語意導覽。Codex 導覽也可含少量 profile／通用提示；本案學其高密度入口與可搜尋線索責任，不宣稱逐欄照抄。詳見[系統圖 §5.8](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md#58-第四個細部邊界三份-read-artifact-各自存什麼何時停止深入)。
 
 **[Owner 已確認]**「穩定任務」指逐漸形成、仍可修訂的工作性質／工作模式理解，**不是先建立固定 JD Task**。Owner 以「依客戶需求開發前端網站」說明：此工作性質可進導覽與工作理解，各網站案例的特殊細節由訪談詳記／工作資訊候選承接，必要時再回查原始對話。
 
@@ -127,7 +127,7 @@
     → 依實際寫入結果記錄完成／無需修改／未完成
 ```
 
-「已處理哪些輸入」是 Runtime 的執行資料，不是模型要填的工作理解欄位。不是將每次 `raw_memory` 原樣串接成越來越長的正文；也不是每次全部重寫。Codex Phase 2 有既有 workspace、候選集合、selection／diff 與可讀 summaries；本案沿用責任，**不把其跨 thread 選取、Git baseline、lock 或檔名當成已核准實作**。[完整既有研究 §5.7](2026-09-05-openai-conversation-context-and-memory-system-map.md)、[固定 consolidation prompt](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/templates/memories/consolidation.md)
+「已處理哪些輸入」是 Runtime 的執行資料，不是模型要填的工作理解欄位。不是將每次 `raw_memory` 原樣串接成越來越長的正文；也不是每次全部重寫。Codex Phase 2 有既有 workspace、候選集合、selection／diff 與可讀 summaries；本案沿用責任，**不把其跨 thread 選取、Git baseline、lock 或檔名當成已核准實作**。[完整既有研究 §5.7](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、[固定 consolidation prompt](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/templates/memories/consolidation.md)
 
 已准邊界保留：B2 可以補查詳記，**不直接開原始訪談**；B1 才讀原始問答，A 也能按需深查。這是目前選用的 Codex 背景權限形狀，不宣稱所有 OpenAI 產品一律禁止背景讀原文。若詳記不足，不能捏造內容；是否補做抽取、如何重排，留生命週期設計討論。[B summary-only 的直接證據](2026-09-05-memory-summary-routing-and-deep-read-source-review.md#4-背景-b-的補查不同不能把-a-原封套過去)
 
@@ -195,15 +195,15 @@
 
 | 已討論的細節 | 記錄／證據入口 | 本案尚待決定的接線，不是漏研究 |
 |---|---|---|
-| Conversation、SDK Session、sandbox session、raw rollout 不同責任；訊息／工具事件與持久性 | [系統圖 §3、§5.4–5.5](2026-09-05-openai-conversation-context-and-memory-system-map.md) | 原文 reader、選段與 retention；不依名詞另存副本 |
-| Compaction 延續 Context，不等於逐字來源、詳記或 Memory | [系統圖 §4、§7](2026-09-05-openai-conversation-context-and-memory-system-map.md)、[框架三種替換 §1–3](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md) | 選定摘要引擎、配置與原始問答可回查路徑 |
+| Conversation、SDK Session、sandbox session、raw rollout 不同責任；訊息／工具事件與持久性 | [系統圖 §3、§5.4–5.5](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md) | 原文 reader、選段與 retention；不依名詞另存副本 |
+| Compaction 延續 Context，不等於逐字來源、詳記或 Memory | [系統圖 §4、§7](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、[框架三種替換 §1–3](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md) | 選定摘要引擎、配置與原始問答可回查路徑 |
 | 抽取輸入不只是最新員工一句：instructions、filtered conversation、可信來源／執行脈絡 | 本文 B1；[Stage 1 input](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/templates/memories/stage_one_input.md) | 單一長訪談的具體範圍與必要舊脈絡 |
-| `rollout_summary`、`raw_memory`、`rollout_slug` 的內容、用途、產生者不同 | [系統圖 §5.6](2026-09-05-openai-conversation-context-and-memory-system-map.md)、本文 §2 | 輸出 schema；slug 是否需要獨立欄位 |
+| `rollout_summary`、`raw_memory`、`rollout_slug` 的內容、用途、產生者不同 | [系統圖 §5.6](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、本文 §2 | 輸出 schema；slug 是否需要獨立欄位 |
 | 保存摘要供未來 A／B 深讀，候選供整併重用；可直接交接、不額外叫存檔模型 | [B §3.4–3.5](2026-09-05-memory-background-cycle-flow-review.md) | 產物表示／reader；保存失敗如何續作 |
-| 整併的輸入包含候選、既有 Memory、選取／差異資訊及 instructions；可 no-op | [系統圖 §5.7](2026-09-05-openai-conversation-context-and-memory-system-map.md)、[B §3.2](2026-09-05-memory-background-cycle-flow-review.md) | 本案增量範圍、已處理狀態與觸發方式 |
+| 整併的輸入包含候選、既有 Memory、選取／差異資訊及 instructions；可 no-op | [系統圖 §5.7](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、[B §3.2](2026-09-05-memory-background-cycle-flow-review.md) | 本案增量範圍、已處理狀態與觸發方式 |
 | B 整理途中能補查詳記，不直接讀 raw；不把條件不同一律當重複 | [引用路由 §4](2026-09-05-memory-summary-routing-and-deep-read-source-review.md#4-背景-b-的補查不同不能把-a-原封套過去) | 摘要 inventory／read 接點；不足時的恢復政策 |
 | Runtime 先給真實位置；模型在相關知識旁選擇詳記引用及可搜尋詞 | [引用路由 §2](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)、本文 §4 | 引用的物理表示與 reader；不是逐句 quote／ID 填寫表 |
-| 正文整理後維護小型導覽；保留能搜到的詞，不抹掉案例辨識線索 | [系統圖 §5.7–5.8](2026-09-05-openai-conversation-context-and-memory-system-map.md)、[引用路由 §2.3](2026-09-05-memory-summary-routing-and-deep-read-source-review.md) | guide 載入時機；框架快取不等於自動刷新 |
+| 正文整理後維護小型導覽；保留能搜到的詞，不抹掉案例辨識線索 | [系統圖 §5.7–5.8](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、[引用路由 §2.3](2026-09-05-memory-summary-routing-and-deep-read-source-review.md) | guide 載入時機；框架快取不等於自動刷新 |
 | A：導覽→查正文→相關詳記→必要時原文；足夠就停，不固定讀遍所有層 | [引用路由 §3](2026-09-05-memory-summary-routing-and-deep-read-source-review.md#3-讀取端每次多讀一層都有明確依據) | 讀取界限／成本；不憑空新增 A 全摘要庫搜尋政策 |
 | 框架原文定位、模型可見引用、長內容續讀與不可讀錯誤 | [原文回查契約 §7](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#7-原文回查契約來源定位與有界讀取) | 已有 API 證據與設計基線，非 OpenAI 原封 schema；待 Compaction／retention 接線及後續機制驗證 |
 | C：同輪局部修補，並非重跑 B／第三 Agent；後續 B 仍整理同一訪談 | 本文 C；[Sandbox Memory live update](https://openai.github.io/openai-agents-js/guides/sandbox-agents/memory/)；[Q018 §2](2026-09-05-memory-background-live-repair-coordination-research.md) | C 同輪來源定位、B/C 寫入協調；SDK liveUpdate 不等於 CLI Phase 2 claim |

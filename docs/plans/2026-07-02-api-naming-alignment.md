@@ -1,6 +1,6 @@
 # Plan — API 命名對齊(F3/F4/F5;AIP `:verb` + 根層 occupations + PUT)
 
-- 依據:[ADR 0019](../adr/0019-api-naming-alignment.md) · 研究 [`../specs/2026-07-02-api-naming-alignment-research.md`](../specs/2026-07-02-api-naming-alignment-research.md)。
+- 依據:[ADR 0019](../adr/0019-api-naming-alignment.md) · 研究 [`../specs/2026-07-02-api-naming-alignment-research.md`](../research/engineering/2026-07-02-api-naming-alignment-research.md)。
 - 原則:**monorepo 原子改名**(producer + 全部 caller 同 commit)、不版本化;green-before==green-after;一 task 一 commit。
 - Baseline:api `uv run pytest` = 148 passed;indexer `uv run --all-extras pytest`(執行時記錄數字);web `npx tsc --noEmit` clean。
 

@@ -5,8 +5,9 @@
 ## 現在先看
 
 - [剩餘工作分類](../tasks.md#收尾分類與下一步)：先核對證據，不盲目重跑。
+- [T17 V01–V28 結案對照](t17-v01-v28-closure.md)：28 項逐項判定（通過／部分／離線／未驗）、10 筆待核對依據的分類與結案條件。
 - [T17 長訪談、事故與續跑](t17-course-administrator-journey.md)：45 輪原旅程的成果與未驗範圍。
-- [T16 原生接續與容量](t16-compaction-continuity.md)：門檻、模型／共用 runner／角色的不同驗證層級。
+- [T16 原生接續與容量](t16-compaction-continuity.md)：門檻、模型／共用 runner／角色的不同驗證層級；§12 是 B1／B2 輪前壓縮的真模型觀察。
 - [T14 分析品質與已知不足](t14-job-analysis-quality.md)：Prompt 比較、來源漏選、採用／否決與限制。
 - [T18 交付候選](t18-same-origin-web.md)：不是正式切換已放行。
 
@@ -30,6 +31,7 @@
 | 資料包 | 用途 |
 |---|---|
 | [訪談指引比較與長旅程](data/instruction-experiments-2026-10-01/README.md) | Q1／Q2／Q2b／Q3 比較、可讀逐字稿、指標、失敗與長旅程 JSON／事件／PDF |
+| [B1／B2 輪前壓縮觀察](data/b-role-compaction-2026-10-02/README.md) | 調低門檻的真模型探針：B1／B2 各一次壓縮被採用、之後 9 次成功呼叫；因帳戶額度用完而停止（部分結果，含失敗診斷與工具） |
 | [執行、品質與來源探測](data/runtime-probes-2026-10-01/README.md) | 原先散在本機暫存的模型／容量／來源／合成旅程輸出；含搬移對照與原件雜湊，不重新解讀為通過 |
 
 實驗原件、衍生摘要與報告分開：本目錄解釋如何發現、診斷與驗證；`data/` 保存可核對材料；[教授報告](../../../reports/system-architecture/README.md)負責介紹。不能用一張成功截圖代替失敗紀錄或完整驗收。

@@ -312,3 +312,22 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/ca
 | 前提 | 本機單程序、`InMemorySaver`；**執行時沒有其他模型流量**（帳戶 TPM 200K）；不碰產品 DB／Demo |
 | 腳本 | ignored `.research-tmp/eval/probe_step_compaction_160k.py` SHA-256 `aaa73a8bf02908ffe8b1a7f1c4e4d273896f40e678b703d9eca4e0df5e79f0ff`；匯入夾具 `probe_compaction_continuity.py` `78342e546ddb64df31f0e80e8c81935bc31ecc8cce92148ce2bedbda3d3bd5c6`（同 §9）；輸出 `step-160k-20261001.jsonl` |
 | 不宣稱 | 不證明 JD 品質、正式 A 角色接線（§9 已驗）或 B1／B2 在 160K 的接續；不改產品門檻。成功只代表**同程序**共用迴圈在新常數下，真 provider 接受並能接續 |
+
+### 結果（2026-10-01 20:00，執行一次，成功）
+
+一次執行、零重試、約 10 秒；沒有其他模型流量。輸出 `step-160k-20261001.jsonl`（18 行安全 JSONL，SHA-256 `8e7cddb267740ed7c48d0cbb13b582bf84cf325fbf668522b16b455179dc99d8`）。
+
+| 步驟 | 觀察 |
+|---|---|
+| 起始 token count | 133 tokens |
+| create #1 | 1.1 秒，輸出只有 `function_call`（要求唯一的合成工具）；input 133、output 17 |
+| 工具結果後 token count | **172,704 tokens**（在 160,000–190,000 的預定範圍內，由 provider 實際計數）→ 產品常數 `MID_WORK_COMPACTION_THRESHOLD_TOKENS` 觸發壓縮 |
+| compact #1 | 2.9 秒；input 172,606、output 66；輸出含 `message` 與 `compaction`，`complete_output_equal: true`（返回視窗與保存的完整輸出逐項相等） |
+| 壓後 token count | 201 tokens |
+| create #2 | 2.2 秒；`final_answer`，三項全域規則都正確（每月盤點、只有主管核准調整、未解缺料當天升級）；create 前輸入與 compact 輸出一致，未被修改 |
+| 同 loop 重入 | `same_loop_reused`：呼叫數不變（count 3、create 2、compact 1），沒有重送 |
+
+- 計量：count 3、create 2、compact 1，均在 manifest 上限內；usage 輸入合計 172,940、輸出 159 tokens，以產品固定的 Luna 費率（輸入 US$0.10／百萬）估算約 **US$0.0174**（估算，不是帳單），低於預估與上界。
+- 帳戶額度：172K 的單一請求（count 與 compact 各一次）沒有 429，與 [§6](#6-429-的帳戶容量診斷2026-10-01)的結論一致——單一請求不超過 200K 額度即可通過，§5 的 285K 才受阻。
+- 結論：**新常數 160K 在真 provider 上的同程序行為成立**——跨過門檻、既有壓縮機制被觸發、完整返回視窗被採用、壓後視窗可接續到正確的最終答覆、同 loop 重入不重送。
+- 限制：合成資料；172K 縮到約 200 tokens 是因為合成紀錄重複、指令只要求保留全域規則，不是產品 JD 的壓縮比；同程序 `InMemorySaver`，沒有 PostgreSQL 耐久、角色接線或 JD 品質（角色接線見 [§8](#8-a-輪前壓縮的正式-runnerpg-接線2026-10-01)、[§9](#9-原生-seed-修正後的有界補驗2026-10-01)；自然壓縮另見 T17 長旅程）。不改任何產品常數或程式。

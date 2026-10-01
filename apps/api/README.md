@@ -123,3 +123,9 @@ uv run --project apps/api --locked pytest apps/api/tests/integration -m postgres
 ```
 
 SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG probe 只驗框架原生字典及既存 node 接續，不能替代 T06／T12 的業務副作用、取消與故障驗收。真 API 測試必須另外依[有界授權](../../docs/plans/2026-09-29-target-rebuild/README.md#3-狀態與施工順序)執行。
+
+### 模型失敗診斷
+
+後端 logger `caliburn.workflows.model_requests` 以 `Provider request failed` 記錄實際外送失敗：操作、安全分類、HTTP status、白名單 provider code，以及 **App 本地** execution／request／attempt ID。可依這些 ID 核對既有執行紀錄；它們不是可向 OpenAI 取回遺失回應的遠端 ID。`None` 表示未取得 HTTP status 或 code 不在白名單，不能據此推定沒有錯誤。
+
+此警告不代表故障已保存、重試／回滾已完成。不要為診斷開啟原始 HTTP body、訪談、opaque reasoning 或秘密輸出；既有日誌即可，不需新監控服務。接線與驗證範圍見 [T06 §23](../../docs/plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#23-保留安全-provider-診斷2026-10-01)。

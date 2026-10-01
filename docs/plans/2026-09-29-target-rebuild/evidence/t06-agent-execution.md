@@ -522,3 +522,27 @@ $env:PYTHONUTF8='1'
 **後續（同日，修正上面之後仍有 Turn 失敗）：**改成一次只跑一個訪談後，Turn 仍偶爾失敗，失敗紀錄是**同一請求連續 5 次 `transient_service`、約 20 秒內用盡**，且發生時都有背景整理批次同時在跑（修正後這是被重試而非直接失敗，證明分類修正有效，但重試耐心不足）。讀回應標頭確認帳號對 `gpt-6-luna` 是 **200,000 token／分鐘、500 請求／分鐘**；官方[限流指南](https://developers.openai.com/api/docs/guides/rate-limits)（經工具轉述，未逐字核對原頁）說限流用量取 `max(max_tokens, 依字元估算的輸入)`，且**失敗的請求也計入每分鐘額度**，建議降低 `max_tokens` 與退避重試。我們的 A 請求輸入約一萬多 token（14 個工具的 schema 就佔大宗）、`max_output_tokens=16,384`，一個訪談加背景整理很容易貼近上限。
 
 取捨：降低 `max_output_tokens` 收益有限（輸入本身已接近 16K），且截斷（`incomplete`）會讓整個 Turn 失敗，風險大於收益，維持 16,384。改的是**重試耐心**：預設初始退避 1 秒→2 秒、每請求上限 5 次→8 次，最短總等待由約 11 秒增至約 90 秒（先寫測試 `test_default_schedule_outlasts_a_one_minute_rate_limit_window`，修改前 **1 failed**：`assert 11.25 >= 60`；同步兩個以舊預設數字當例子的既有測例）。相關 unit／contracts／重試與預算整合 **1134 passed**。限制：更高的 TPM 等級才是根本解；這只讓單一使用者的訪談在偶發限流下撐得過去，持續超量仍會失敗；沒有做用戶端節流或依 `x-ratelimit-reset-tokens` 的精準等待（HTTP 429 有 header 時仍用既有的 `Retry-After` 邏輯）。
+
+## 23. 保留安全 provider 診斷（2026-10-01）
+
+基準 `143783e3`。[T17 收尾補驗](t17-course-administrator-journey.md#2026-10-01luna-長訪談收尾的有界接續)只留下 `transient_service`，不足以確認是 HTTP 限流、串流限流或服務錯誤。核對共用 `_send`：原 `APIError` 有可用資訊，但只把粗分類寫入 attempt，沒有安全診斷出口。本次補的是既定[必要觀測](../../../architecture/delivery-and-operations.md#5-必要觀測不先造監控平台)，不是修好 provider 或 JD 漏引。
+
+2026-10-01 查閱 [OpenAI 官方 error codes](https://developers.openai.com/api/docs/guides/error-codes)：429 可能是短暫限流，也可能是額度／用量限制，不能只看 HTTP 狀態。Caliburn 的取捨是保留已知 code 白名單，未知值捨棄；這不是廠商完整代碼表或新增重試分類。
+
+**改動：**`ResponseFailure` 增加可選的安全 code；共用模型外送捕捉例外時記一則標準 warning，含操作、分類、status、code 及 App execution／request／attempt ID。create／count／compact 共用，不新設表或 logger 平台。既有 failure 保存、預算、重試、取消、原生 Context 與產品 Luna／high 均不變。警告先於故障保存，只是觀察，不作恢復權威；沒有 HTTP status／白名單 code 時如實記 `None`。
+
+**TDD：**新增分類診斷六案先見 **6 failed**（缺安全 code 欄位）；HTTP 權限／額度／容量三案及串流限流一案先見 **4 failed**（診斷紀錄為零）。修改後第一組 **54 passed**。隨後為 count／compact 與未知惡意 code 補回歸斷言，這部分是事後補驗，不冒稱全部先 Red。
+
+最終相關回歸從 `apps/api` 執行，使用 `.venv-target`；PG 為 loopback `caliburn_t01_test`，每例隔離隨機 schema，provider 為 SDK MockTransport，沒有真 API 外送：
+
+```powershell
+# CALIBURN_TEST_DATABASE_URL 明確指向隔離的 _test DB；不讀產品 .env。
+./.venv-target/Scripts/python.exe -m pytest tests/unit/test_openai_failures.py tests/unit/test_execution_failures.py tests/contracts/test_openai_responses.py tests/integration/test_outbound_retry.py tests/integration/test_outbound_failures.py tests/integration/test_execution_failure_boundary.py -q -p no:cacheprovider
+# 107 passed in 31.63s
+./.venv-target/Scripts/python.exe -m pytest tests/unit/test_response_streaming.py tests/unit/test_response_retries.py tests/unit/test_import_boundaries.py -q -p no:cacheprovider
+# 52 passed in 1.62s
+```
+
+合計 **159 個相關測試**；文件整理後將上述九檔合併重跑為 **159 passed in 30.64s**。四個改動的 Python 檔 Ruff check／format、兩個 source 檔 mypy 通過。涵蓋原重試／停止行為、串流與 HTTP 錯誤、記錄和 App 原 attempt 配對、例外正文及未知 code 不外洩；不是全產品回歸。主代理另檢查 diff，JD 工具／Context 的平行唯讀審查無可證實的新缺口，未為此更改工具。四份改動文件的214個相對檔案連結存在，新連結錨點已對照標題。
+
+**限制／下一步：**先前遺失的細項無法回補，不把原串流清理警告判為已修。未新增付費測試、未動 Demo／憑證／資料表；後續真實失敗可用此資訊縮小原因，不為取得 log 重播原收尾。T14 品質、T16 容量、T17 整體旅程及 T18 切換仍未完成，不因此擴大恢復要求或放寬 gate。

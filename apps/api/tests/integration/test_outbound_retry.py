@@ -224,7 +224,9 @@ def test_transient_rejection_retries_same_payload_with_new_budgeted_attempt(
 
 
 @pytest.mark.parametrize("operation", ["count_input", "request_compaction"])
-def test_count_and_compaction_share_one_retry_owner(database_settings, retry_file_id, operation):
+def test_count_and_compaction_share_one_retry_owner(
+    database_settings, retry_file_id, operation, caplog
+):
     calls = []
     success = (
         {"object": "response.input_tokens", "input_tokens": 123}
@@ -261,6 +263,12 @@ def test_count_and_compaction_share_one_retry_owner(database_settings, retry_fil
             assert usage.model_steps == 0
             assert usage.compactions == (1 if operation == "request_compaction" else 0)
             assert calls[0] == calls[1]
+            diagnostics = [r for r in caplog.records if r.name == model_requests.__name__]
+            assert len(diagnostics) == 1
+            message = diagnostics[0].getMessage()
+            assert "http_status=503" in message
+            assert "provider_code=rate_limit_exceeded" in message
+            assert "sensitive synthetic detail" not in caplog.text
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())
@@ -273,6 +281,7 @@ def test_count_and_compaction_share_one_retry_owner(database_settings, retry_fil
 def test_blocked_provider_failure_does_not_retry_on_reentry(
     database_settings,
     retry_file_id,
+    caplog,
     status,
     code,
 ):
@@ -296,6 +305,16 @@ def test_blocked_provider_failure_does_not_retry_on_reentry(
             assert len(attempts) == len(calls) == 1
             assert attempts[0].failure.retry_not_before is None
             assert "sensitive" not in repr(attempts)
+            diagnostics = [r for r in caplog.records if r.name == model_requests.__name__]
+            assert len(diagnostics) == 1
+            message = diagnostics[0].getMessage()
+            assert f"http_status={status}" in message
+            assert f"provider_code={code}" in message
+            assert f"request_id={request_id}" in message
+            assert f"attempt_id={attempts[0].attempt_id}" in message
+            assert f"execution_id={executor.writer.scope.execution_id}" in message
+            assert diagnostics[0].exc_info is None
+            assert "sensitive synthetic detail" not in caplog.text
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())
@@ -666,7 +685,7 @@ def streaming_request():
 
 
 def test_rate_limit_inside_a_stream_is_retried_like_any_transient_failure(
-    database_settings, retry_file_id
+    database_settings, retry_file_id, caplog
 ):
     calls = []
 
@@ -691,17 +710,26 @@ def test_rate_limit_inside_a_stream_is_retried_like_any_transient_failure(
             failures = [a.failure for a in attempts if a.failure is not None]
             assert [f.failure_code for f in failures] == ["transient_service"]
             assert failures[0].retry_not_before is not None
+            diagnostics = [r for r in caplog.records if r.name == model_requests.__name__]
+            assert len(diagnostics) == 1
+            message = diagnostics[0].getMessage()
+            assert "provider_code=rate_limit_exceeded" in message
+            assert "http_status=None" in message
+            assert f"request_id={request_id}" in message
+            assert diagnostics[0].exc_info is None
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())
 
 
-def test_unknown_error_inside_a_stream_stops_without_retry(database_settings, retry_file_id):
+def test_unknown_error_inside_a_stream_stops_without_retry(
+    database_settings, retry_file_id, caplog
+):
     calls = []
 
     def respond(request):
         calls.append(request)
-        return stream_error_reply("invalid_prompt", "invalid_request_error")
+        return stream_error_reply("private employee text echoed as code", "invalid_request_error")
 
     async def scenario():
         async with retry_executor(database_settings, retry_file_id, respond) as executor:
@@ -709,6 +737,11 @@ def test_unknown_error_inside_a_stream_stops_without_retry(database_settings, re
                 await executor.request_model(streaming_request(), uuid4(), 100)
             assert stopped.value.failure.kind.value == "response_protocol"
             assert len(calls) == 1
+            diagnostics = [r for r in caplog.records if r.name == model_requests.__name__]
+            assert len(diagnostics) == 1
+            assert "provider_code=None" in diagnostics[0].getMessage()
+            assert "private employee text" not in caplog.text
+            assert diagnostics[0].exc_info is None
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())

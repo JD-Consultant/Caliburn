@@ -25,6 +25,14 @@ _TRANSIENT_STREAM_CODES = frozenset(
         "service_unavailable",
     }
 )
+_DIAGNOSTIC_CODES = (
+    _BLOCKED_CODES
+    | _TRANSIENT_STREAM_CODES
+    | {
+        "context_length_exceeded",
+        "invalid_api_key",
+    }
+)
 
 
 class ResponseFailureKind(StrEnum):
@@ -40,6 +48,7 @@ class ResponseFailureKind(StrEnum):
 class ResponseFailure:
     kind: ResponseFailureKind
     status_code: int | None = None
+    provider_code: str | None = None
 
 
 def classify_response_failure(error: APIError) -> ResponseFailure:
@@ -70,4 +79,6 @@ def classify_response_failure(error: APIError) -> ResponseFailure:
         kind = ResponseFailureKind.TRANSIENT_SERVICE
     else:
         kind = ResponseFailureKind.REQUEST_REJECTED
-    return ResponseFailure(kind, status)
+    # Codes are external strings too. Retain only known constants, never an echoed payload.
+    provider_code = error.code if error.code in _DIAGNOSTIC_CODES else None
+    return ResponseFailure(kind, status, provider_code)

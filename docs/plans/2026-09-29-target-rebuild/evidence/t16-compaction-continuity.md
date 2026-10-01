@@ -177,3 +177,52 @@ ignored 探針 `.research-tmp/eval/probe_compaction_continuity.py` SHA-256：`78
 - instructions、tool雜湊與§5相同。返回C雜湊`394a71f995d2d2e1bc8625b3db33d1757caeb9f1aae4d770e09092fce4482d6c`；接續請求雜湊`edb658b89599b1d2c5307fa24e10d4cef20927fa83877e5c68eb43e4b200c346`。原C只在本次InMemorySaver，不承諾程序結束後取回。
 - apps/api實際執行：`./.venv-target/Scripts/python.exe -X utf8 -B ../../.research-tmp/eval/probe_preparation_quota.py --key-file .env --output ../../.research-tmp/eval/preparation-quota-20261001.jsonl --execute`。這是已執行紀錄，不要求重跑；獨占輸出不可覆寫。
 - 探針Ruff E4/E7/E9/F/I、format check與無外送dry run通過。既有`test_request_capacity.py`、`test_context_compaction.py`、`test_response_serialization.py` **43 passed，1.45s**；無產品程式修改，沒有將既有測試冒充本輪TDD。
+
+## 8. A 輪前壓縮的正式 Runner／PG 接線（2026-10-01）
+
+本片補 §7 未驗的角色接線，不改既有 A 128K／B 512K／Step 272K；也不等待 B 的門檻決策。依[官方 standalone compact 契約](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)完整承接返回窗口。只驗 A Runner 的歷史資格、真 count／compact、PG 保存及新輸入位置，不再做來源漏引 Prompt 比較。
+
+### 外送前 manifest 與預檢
+
+- 只使用全新隔離 schema `a_preparation_20261001_<隨機碼>`，專用 PG `127.0.0.1:55439/caliburn_t01_test`。兩輪 seed 的模型是明示 fake，透過真正 `ConsultantRunner` 完成訪談；一份受控 Memory 情境由既有候選／發布服務建立，正文為三項合成庫存規則與 2,050 列容量示例。第二輪透過真正 `read_work_situation` 取得 839,644 字元正文，再完成正式答覆。這不證明 B1／B2 或先前兩輪的語意品質；沒有假 encrypted reasoning 送往 provider。
+- 關閉 saver 再重連，第三輪才使用真 Luna／high、原 A instructions／14 項工具、`store=false`／`all_turns`。輸入只更正每月為每季，要求保留核准及升級規則，暫不編寫 JD。原始輸入、map 與既有歷史都由正式 A 接線組裝，不注入新 Prompt 或替換 Runtime 方法。
+- 最多 **8 count＋6 create＋1 compact**，零重試、串行；首個歷史 count 須在128K–180K，後續請求不超180K；output≤8,192，單請求120秒、全批720秒，管理預留 **US$1.00**。出界、失敗或不完整即停止，不增加資料／重送；SDK retry 關閉，測試的金額預算不改產品政策。
+- 核對 compact 不含本輪更正；首個真生成 input 精確為「全部 C＋user App 資料＋user 原輸入」，instructions／工具／reasoning 政策不變。成功後關閉並重連 PG，驗相同 C 可回讀、原 seed checkpoint 未被改寫、正式答覆與序號已保存。只以三項規則判本例內容，不主張 2,050 列逐筆記憶或自然長訪談品質。
+- 探針為 ignored `.research-tmp/eval/verify_consultant_preparation.py`；結果檔獨占建立。`--offline` 只走 MockTransport，`--execute` 才載入既有 key loader 並直連 OpenAI。只輸出安全 usage、類型、指紋及合成最終文字；完整 C 由官方 PG saver 保存，不把 opaque 內容、金鑰或原始錯誤寫入公開報告。
+- 離線預檢先發現探針對 UUID 的 JSON 指紋處理不完整及 fake compact usage 缺 `cache_write_tokens`；只修測例。第三次完整預檢通過：真 PG／Runner 路由、完整 C／輸入位置、重新連線回讀、原歷史不變。沒有修改產品程式；這些不是產品故障，也不宣稱本片是功能 TDD。
+
+首次執行在第一個 count 連線失敗，沒有 HTTP 回應、compact 或生成；原執行已安全失敗收尾。額外無金鑰 GET 同一官方端點，在沙箱內回 Windows 10061、獲准的沙箱外檢查回401，定位為本次執行環境的網路差異，不修改產品恢復機制。保留原失敗 JSONL；只允許在可連線環境以全新 schema／獨占結果補驗一次，仍沿上述上限，任何 provider 錯誤即停，不再追加。未收到 usage 不宣稱首次計費為零。
+
+上述為外送前計畫；實際結果見下段，不勾 T16／T17／T18。
+
+沙箱外補驗第一個 count 回400，沒有 compact／生成，已依停止條件安全結束。初次安全 log 未保存 provider 的參數拒絕原因；另作**一次唯讀 count 診斷**，只從這份明確全合成 PG seed 讀既存歷史、同一請求取得錯誤 param／code／400字元內說明；最多1 count、60秒、零重試、另預留US$0.01，禁止 compact／生成／業務写入，不重跑整批。這是定位被拒的夾具／協定欄位，不是對400自動重試策略。
+
+診斷回 `invalid_value`／`input[2].id`：離線 `response_at()` 產生的 `message_1` 不符合遠端 message ID 須以 `msg` 起始的要求。修正**本探針新建 seed** 的 message／function item ID 為 `msg_synthetic_*`／`fc_synthetic_*`，不改既有產品 serializer、任何已保存歷史或離線 fixture 共用函式。已證實夾具原因後，允許一批修正 seed 的新隔離驗證，沿本節原請求／費用上限；遇任何新失敗即停，不再於本輪追加診斷或試次。原兩份外送失敗及診斷結果保留，不將它們說成產品缺陷。
+
+### 結果與收斂
+
+| 範圍 | 實際結果 |
+|---|---|
+| 沙箱首次外送 | 第一個 count 連線被拒，未取得 HTTP／usage；原工作安全失敗收尾 |
+| 沙箱外原 seed | 第一個 count 回400；一次額外 count 診斷證實 `message_1` 格式被拒 |
+| 修正 ID 的新 seed | 第一個 count 仍回400，尚無該次確切拒絕欄位；停止外送，沒有 compact／create |
+| 後續離線檢查 | 探針使用普通 `model_dump()` 將 SDK function-call 的 Python 名稱 `async_` 及未提供的 null 欄位帶進 seed；改為**既有** `snapshot_response()`，六個原始 function-call 欄位完整保留，不再注入上述欄位。這是探針修正，未證明是第二次400的原因 |
+| 修正後真 PG＋fake provider | A Runner 依合成 count 150K 走128K輪前分支，完整 C＋App資料＋本輪輸入順序通過；重連讀回 C、原 seed checkpoint 指紋不變、正式訪談6／7及完成狀態可回查。**count／compact／答覆皆為 fake，不作真模型或更正品質證據** |
+| 安全收尾 | 唯讀查驗本片7個明確測試 schema：沒有 active execution；失敗執行均未完成新的正式訪談。未改 Demo／產品資料、模型／Prompt／工具／門檻 |
+
+本片實際有3次取得400的 count（含1次診斷）及1次未取得HTTP的連線嘗試；**真 compact 0、真生成0**。沒有 provider usage／帳務結果，不能宣稱本片免費。官方遠端與角色PG完整接線 gate **仍未通過**；§7的成功機制證據保持原邊界，不因本片離線通過而擴張。這次兩個 seed 錯誤也不支持修改產品的原生歷史或 serializer。
+
+後續若補本角色 gate，先修正／核對 provider 合法的測試種子與安全錯誤資訊，再做一個明確有界驗證；不要直接重跑本節失敗命令。既有資料保留，原失敗 JSONL 不覆寫。本輪不再外送、不改 B／Step 門檻、不重開來源 Prompt 比較；T14 的來源漏引及 T17／T18 狀態不變。
+
+本機原件均在 ignored `.research-tmp/eval/`；最新腳本是**最後離線修正版**，不是三次先前外送所用版本：
+
+| 原件 | SHA-256 |
+|---|---|
+| `verify_consultant_preparation.py` | `40ab608bcecf51137dac5dc3737fbae3ea148cc2f7118d891b381ce41a362d32` |
+| `a-preparation-provider-20261001.jsonl` | `dc8b84fdbee121020d6dad2bdaf6cf8cf147bb0ba3a94cea6b7c1e5d7fc7ab57` |
+| `a-preparation-provider-network-20261001.jsonl` | `eb945647661d0b2844c2e246f2b5543d34c2b136d7640a58e9fffa046d730fbe` |
+| `a-preparation-provider-valid-20261001.jsonl`（檔名不代表通過） | `1067e9d5573fa3658746fd5c178b2f1e2b02db62bcede2200ac3e81ad0ea3f6b` |
+| `a-preparation-count-diagnostic-20261001.json` | `0cf481b8108db1d06a4d88625bff3763a7333a7c5f894adf24ef95b1c8fff0d8` |
+| `a-preparation-offline-native-20261001.jsonl` | `efe3d4282c1babb71aea2ecd6fdbe795039f95f08293fe960e6f129566f2c349` |
+
+腳本 Ruff E4/E7/E9/F/I、format check與新 seed 欄位檢查通過。只提交 evidence 與任務路由；不新增產品程式或重跑無關全套測試。此片是接線驗證探索，不宣稱功能 TDD 或已修復產品故障。

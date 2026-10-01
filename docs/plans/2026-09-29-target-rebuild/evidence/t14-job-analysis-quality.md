@@ -773,3 +773,54 @@ generation usage 合計 input **129,751**、output **7,055**；沿實際 usage �
 | `memory-quality-20261001.jsonl` | `02e9507b05da8a90a71558a0f956de05adc4758cc667226ccc63de6f955ad884` |
 
 **收斂：**補足 Luna 在本兩例的 Memory 真發布與跨批更正證據，到此停止，不為 minor 再加試次。原長歷史 JD 拆分漏引、首批另一案例的錯誤精確化、其他品質案例及獨立人類校準仍未解／未驗；不能由這兩例抵銷既有失敗。T14／T16／T17／T18 不勾完成，產品仍 Luna／high。
+
+## 2026-10-01：已完成歷史壓縮的來源選擇診斷
+
+### 執行前 manifest
+
+基準`1af49ec0`，固定Luna／high。本片不是再加來源描述或調欄位排序；唯一問題是**較少的舊工具往返／歷史表示，是否會改善已讀到來源的下一步選擇**。前述短例與長例不可直接歸因Context長度，因此本片只作有界診斷，不先認定根因或修改正式門檻。
+
+[OpenAI compaction 說明](https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide#compaction)說明以原生壓縮保留關鍵狀態、減少長軌跡token；這是較早Codex指南，不保證Luna的JD來源品質。[目前GPT-6提示建議](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices)要求依選定模型及負載驗證；不套用Astra表現為Luna保證。既有A已提供`request_context_compaction`作下一輪按需壓縮，本片仍不改該工具或觸發政策。
+
+- 唯讀既有全合成request，原hash仍為`d16389f573d8f3ca82ff0e2efc50db27a8a973047a487acb690b8d53fc60e931`。前158 items屬前四輪，最後為`final_answer`且全部function call已有結果；第158/159索引開始是第五輪原App資料／員工原文。
+- 只將前158 items送原生compact，完整返回C接上**原樣26-item本輪suffix**，其中包含已發生的讀取及結果。不自行摘要、裁切、重寫歷史；不改instructions、14項工具、effort、all_turns、auto tool choice或來源欄位。只沿用既有診斷的非串流、output16,384設定。
+- 這是**反事實輸入比較**：本輪讀取行為來自原未壓縮軌跡，不能把它說成壓縮後自然選出的工具，或正式輪前Graph接線。只判下一個原生模型回應中的內容／來源選擇，不執行返回工具、不寫業務DB、不操作Demo、不改已保存execution。
+- 最多1compact＋2count＋1create，零重試、串行；待壓歷史及接續request各≤70K、output≤16,384，單請求180秒、整批420秒、管理預留US$0.25。任何錯誤或未完整輸出即停；只讀取／不觸及原反例則記未判定，不追加Step逼它寫入。不再發一份baseline，沿既有high原順序失敗，只作非同步單例參考。
+- 判準沿原反例：寫入每個開課日／老師交表／指定資料夾等沿用事實時，來源須支持其出處，不能只引本輪新方法；只写新事實的子項不機械補8。合法Memory來源可作替代依據，須檢查本輪可見正文。其他無據內容同樣列缺陷。
+- ignored探針`probe_source_compaction.py`重用原fixture核對／SDK，`source-compaction-20261001.jsonl`獨占保存；無`--run`只核fixture與manifest，不讀key或外送。保存公開合成tool意圖、安全錯誤、usage及hash，不保存opaque內文。結果另記；沒有產品實作，不宣稱TDD。
+
+### 外送前資料來源複核
+
+第一次外送命令被執行安全審查拒絕，未啟動程序、未建立結果檔，也未送模型請求；原因是尚缺整份歷史的合成來源證明。沒有改用其他通道繞過。唯讀複核補得：
+
+- 原案例來自已追蹤的 `apps/api/tests/fixtures/job_analysis_quality/personas.json`，檔內明示 `Fully synthetic`。`simulate_interview.py` 只以該 persona、合成對話讓模擬員工回答，沒有使用私人資料或外部搜尋工具。
+- `b0-course_admin-2.json` 的 persona 是 `course_admin`，開場逐字等於 fixture；`core-journey-high-20261001.json` 的四則輸入逐字等於該結果前四則。第五則是 `verify_capability_continuation.py` 內明列的合成補充。184-item request 的五則員工輸入逐一相等，原請求 hash 未變。
+- `verify_core_journey.py` 建立全新隔離 schema `core_journey_20261001_635da286` 及「合成員工」檔案 `a40b19dc-da6f-4105-9a4c-2c068edcaafa`；沒有複製 Demo 或舊資料。接續腳本只操作這個 schema／檔案。歷史的57次工具呼叫均屬該檔案的 JD／Memory／訪談工具，無檔案系統、網路搜尋或其他外部讀取工具。
+- 本次探針只唯讀固定 request，業務工具不執行；送往既有 OpenAI 直連，`store=false`、不用 `previous_response_id`，不送 `.env`、金鑰正文或 repo 檔案。原生 opaque items 是這份合成歷史既有 provider 產物，不自行解密、裁切或寫入公開證據。
+
+來源指紋：persona fixture `dd8d6bde407c0a60980fc204f9205c0b36fdd5b2dc1d143dd6607c6aa9a87081`；合成模擬結果 `89f03bcf987f2c8c590e75481914532b422820434b217ceb3c0334e74d42d435`；四輪核心結果 `dbb1d46495ce6367119c224d98e34be15f5dd22649b46ab245258c12fb48e644`。本次仍遵守上方 manifest；補證只用於重新審查同一有界診斷，不擴大外送授權或驗收範圍。
+
+### 實際結果與收斂
+
+補證後同一外送命令獲准；實際 **2 count＋1 compact＋1 create**、零重試、54.889秒，沒有執行業務工具或修改 DB。整份舊歷史的 count 是41,949（含請求指引／工具）；compact 回報 input34,202、output1,332，返回8個保留 message＋1個 compaction item。完整返回視窗加上未改動的26-item當輪 suffix 後，請求 count **19,518**，較既有原順序基準49,412減少約60.5%；沒有刪除單項歷史或只保留壓縮摘要。
+
+Luna 返回三個合法工具請求：建立試算表技能、修改既有綜合任務、修改既有季度彙整任務。以目前生成的參數模型驗證3/3通過，但沒有執行工具或取得後續 final。
+
+- 沒有拆出新的出席任務／成果，故原「新拆項目沿用舊事實卻只引用 current_input」反例 **未判定**，不能宣稱壓縮修復來源品質。
+- 更新既有任務時只追加本次來源、沒有移除原來源；原 `read_jd` 已列第2／4／6／8則，出席成果原本引用第8則且未刪除。這是工具意圖可保留舊依據的證據，不是新拆項目成功繼承或正式保存已驗收。
+- 綜合任務仍很長，報名、通知與出席集中在同一段；後續未執行，不判整輪最終粒度。新技能也尚未觀察到連至任務。只憑本 Step 無法評完整 JD／訪談效果。
+
+**不改產品門檻、Prompt 或工具；停止此假說的追加試次。**本片證明輸入量可下降及原生接續接受，不足以選出來源品質改善方案。之後如改容量設定，須依帳戶容量證據與 Owner 決策，不能用本次未判定的品質結果背書。產品維持 Luna／high；T14／T16／T17／T18 不勾完成，原長歷史漏引限制仍有效。
+
+生成 usage：input19,518（cache write19,515）、output5,182（reasoning4,102）；連 compact 合計 input53,720、output6,514。按既有 Luna Standard 分項費率估計 compact **US$0.0040862**、generation **US$0.005030675**，合計 **US$0.009116875**；非帳單，2次 count 的帳務費用未取得，不宣稱免費。前次未壓縮試例不是同期隨機對照，不能由單次延遲／輸出差异推論品質或普遍節省比例。
+
+本機原件（`.research-tmp/eval/`）及 SHA-256：
+
+| 原件 | SHA-256 |
+|---|---|
+| `probe_source_compaction.py` | `4e5ec3be60180ba32c59b5fe8ac39c4146ad03dad491df800784c3dd910689c5` |
+| `source-compaction-20261001.jsonl` | `bc12cde17a544579f1b8da5d99bc8f33f15fe5f265925c79151fe066fd663a06` |
+
+dry run／Ruff E4/E7/E9/F/I、工具參數離線驗證與來源唯讀核對通過。本次只有 evidence／任務路由更新，不新增產品測試或宣稱 TDD。
+
+文件交付檢查：上述5份來源／探針／結果指紋一致，兩份變更文件的160個相對檔案連結可定位（未驗錨點），`git diff --check` 通過。沒有把 ignored 原始結果或憑證加入提交。

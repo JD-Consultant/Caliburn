@@ -11,7 +11,7 @@
 | `q1` | c0＝實驗前的主指引（程式基準 `d41e75f7`） | 課程行政 3、倉庫 3 | 基準線：依序執行，每份最多 12 個 A Turn |
 | `q2` | c1（提交 `ec3c143a`） | 課程行政 3、倉庫 3 | 一次補入四處指南衍生文字：隱藏面向引導、任務粒度與成果／要求不重抄、知識技能／條件／協作對象寫入時機、職務目的早寫 |
 | `q2b` | c1b（提交 `4b9da041`） | 課程行政 3、倉庫 3 | c1 的補跑：只收窄知識技能那一句。倉庫第 3 份的 harness 在第 11 輪因員工模型被限流而終止，**結果檔由產品保存的資料復原**（檔內 `"recovered": true`） |
-| `q3` | c3（提交 `1e9edcea`） | 課程行政 3、倉庫 3（進行中時以 `metrics.csv` 實際列數為準） | 成分拆解：c1 去掉「寫入條件／協作對象／知識技能」那一條 |
+| `q3` | c3（提交 `1e9edcea`） | 課程行政 3、倉庫 3 | 成分拆解：c1 去掉「寫入條件／協作對象／知識技能」那一條。**依預先登記的規則採用**（單批對照改善，不是普遍保證） |
 | `long` | 最終採用的指引 | 1 | 採購人設的長訪談（含取消、後端硬停止、人工改稿、更正、PDF）；完成後補入 |
 
 其餘條件各批相同：A、B1、B2 為 `gpt-6-luna`／reasoning `high`（`store=false`、`all_turns`），員工模擬為 `gpt-6-luna`／`low`；隔離的 PostgreSQL 18.6（loopback `caliburn_t01_test` 的 `eval_b` schema）與本機後端 8103；同一時間只有一場訪談。人設在 `apps/api/tests/fixtures/job_analysis_quality/personas.json`，harness 是 `apps/api/scripts/simulate_interview.py`（付費、明確執行）；各批的預先登記判準、停止條件與費用上界寫在 T14 證據的對應小節（先於執行提交）。

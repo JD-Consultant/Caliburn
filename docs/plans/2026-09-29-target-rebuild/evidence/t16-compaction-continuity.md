@@ -136,3 +136,44 @@ ignored 探針 `.research-tmp/eval/probe_compaction_continuity.py` SHA-256：`78
 這次取得了新的容量證據，T16 仍未完成；不可把低 token 的 200 當成 272K／512K 通過。其餘品質及交付工作可繼續，不因等待門檻決策重跑相同限流測試。
 
 原件識別：ignored `.research-tmp/eval/probe_luna_rate_headers.py` SHA-256 `99c419aae9d29ee561398963f12f722239d87203cdbd692c9fd31b97d19c9b49`；安全結果 `.research-tmp/eval/luna-rate-headers-20261001.jsonl` SHA-256 `7cd970196c769ebf3a2cc20615d0fa5856d08764274fc05fb3d67d978485b29a`。腳本執行後只有排版調整，Ruff E/F/I 與 format check 通過。沒有模型設定或產品程式變更；本批不重跑，也不將未決門檻校準混同已確認的 Luna 選型。
+
+## 7. 200K 額度下的輪前準備校準（2026-10-01）
+
+基準 `c9a1c55a`。本片不重送 285K／512K，不改產品門檻；只驗共用 `prepare_context_history` 在既有 A 128K（亦為 B 待確認候選）能否接住 160K–180K 完整歷史，保存全部 C，重入不重付壓縮，再追加新資料／更正。Step gate 目前在 `request_capacity.py` 固定 272K，**不 monkeypatch 為160K後宣稱產品接線通過**；中途較低門檻仍待決策與相應實作驗證。
+
+官方依據重核：[限流](https://developers.openai.com/api/docs/guides/rate-limits#how-do-these-rate-limits-work)區分 project TPM 與長 context 配額；[standalone compaction](https://developers.openai.com/api/docs/guides/compaction#user-journey-for-standalone-compaction)要求原窗口適合模型並完整承接返回。200K 不等於任意時間都能送滿200K；本例也不證明並行請求或任意工具回傳大小都適用。
+
+### 執行前 manifest
+
+- 只用合成庫存規則與2,200列生成資料，零職務 DB／Demo／私人資料。Luna／high、store=false／all_turns、直連 SDK，沒有自製摘要、裁歷史或更換 provider。
+- 最多 **2 create、3 count、1 compact**，零重試、串行；create input≤32K、output≤8,192，待壓歷史實際 count 必須在160K–180K；不在範圍即停止，不另調資料補跑。單請求120秒、整批420秒、管理預留US$0.25；失敗即停止，不增加次數。
+- 真模型產出工具呼叫→合成工具結果→原輪前準備 Graph（門檻128K）→完整 C。以同一準備身分重入，應不新增HTTP；其後精確追加一則合成App資料與一則季度更正，再生成答覆。核對原歷史未改、C完整保留、角色／順序及三項規則（季度、主管核准、當日升級）。不鎖答案逐字或要求模型每次有reasoning。
+- 使用 InMemorySaver，只驗同程序Graph保存／重入及真provider接續，不冒充PG耐久、取消恢復、真A/B分析、272K／512K或160K Step自動路由。沒有產品程式變更，不宣稱TDD。
+- 輸入夾具止於完整工具往返，沒有前一輪正式 final；本例刻意直接呼叫共用準備函式，**不驗證產品呼叫端只在合格 Turn 交界啟動的資格判斷**，也不能算真實已完成訪談的輪前端到端驗收。
+- 探針 `.research-tmp/eval/probe_preparation_quota.py`，獨占輸出 `preparation-quota-20261001.jsonl`；無 `--execute` 只列manifest、不讀金鑰或外送。保存安全usage、類型、雜湊及公開合成答覆，不保存原始錯誤／headers／opaque內容。結果另記，不回寫本節上限。
+
+### 結果與證據界線
+
+`2026-10-01T02:40:39Z–02:40:48Z`（本地10:40）完成，退出碼0。實際2次create、3次count、1次compact，零provider重試；程序已結束，未改產品設定或任何職務資料。
+
+| 檢查 | 實際結果 |
+|---|---|
+| 完整待壓歷史 | count **165,204 tokens**；原生工具請求與合成工具結果正確配對 |
+| 128K準備門檻 | `prepare_context_history` 真正路由compact；約2.514秒取得完整message＋compaction |
+| 保存與同身分重入 | 返回完整C與原回傳output相等；重入不新增count／create／compact；原歷史雜湊不變 |
+| 新輸入位置 | 完整C後才追加user角色App資料及user角色更正；沒有替換或裁切C |
+| 更正後接續 | 新請求count247；模型回覆季度盤點、只有主管核准調整、未解短缺當日升級，三項符合夾具；返回reasoning＋message，含encrypted reasoning，未讀解opaque內容 |
+
+由工程代理直接對照夾具原文審核三項事實，沒有用另一個模型自評，也沒有要求答案逐字相同。這是**少量規則＋大量重複列的機制校準**，不能以165K→247的大小差異推論真訪談也有相同壓縮率／細節保留品質。沒有驗證每列SKU可逐筆回想；該能力本來就不屬本例的三項規則目標。
+
+回報usage合計input **165,486**、output **168**，cache read/write均0；依既有`openai-standard-2026-09-30` Luna Standard費率估 **US$0.0166326**，非實際帳單，count沒有usage帳務回傳。本次成功只證明當時此大小請求可執行，不證明200K配額始終有餘額，也不推導429已被永久解決。
+
+原128K輪前機制得到新的真provider證據；**B輪前128K／Step間160K仍是待確認候選，產品512K／272K未改**。下一個容量gate是依Owner門檻決策驗實際角色接線；不要再次重送本例或285K來堆相同證據。T16不勾完成；T14跨輪JD依據缺口、T17完整品質及T18切換仍分別追蹤，模型維持Luna／high。
+
+識別與重現：
+
+- 探針SHA-256：`04d8b192a23a34f4120bca18b2670901d838624d2d572be75e46589416ccf191`；安全JSONL：`30002ff31cde3cc1f4f815fef8d633b21130be7a47f45426adf19c5d4641a9e0`。
+- 匯入夾具`probe_compaction_continuity.py`：`78342e546ddb64df31f0e80e8c81935bc31ecc8cce92148ce2bedbda3d3bd5c6`；`probe_runtime_compaction.py`：`92846b3b4f2c998b6cbcaa6f684ffa14ca531fbee24c00837b821e5888dd79fb`。
+- instructions、tool雜湊與§5相同。返回C雜湊`394a71f995d2d2e1bc8625b3db33d1757caeb9f1aae4d770e09092fce4482d6c`；接續請求雜湊`edb658b89599b1d2c5307fa24e10d4cef20927fa83877e5c68eb43e4b200c346`。原C只在本次InMemorySaver，不承諾程序結束後取回。
+- apps/api實際執行：`./.venv-target/Scripts/python.exe -X utf8 -B ../../.research-tmp/eval/probe_preparation_quota.py --key-file .env --output ../../.research-tmp/eval/preparation-quota-20261001.jsonl --execute`。這是已執行紀錄，不要求重跑；獨占輸出不可覆寫。
+- 探針Ruff E4/E7/E9/F/I、format check與無外送dry run通過。既有`test_request_capacity.py`、`test_context_compaction.py`、`test_response_serialization.py` **43 passed，1.45s**；無產品程式修改，沒有將既有測試冒充本輪TDD。

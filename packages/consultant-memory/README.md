@@ -1,6 +1,6 @@
 # Caliburn Consultant Memory
 
-> **歷史（已退役）：**本目錄的可執行程式已依 [ADR 0079](../../docs/adr/0079-target-rebuild-production-cutover.md#退役範圍與取回) 退役，只保留研究與沿革文件；正式產品是 `apps/api` 與 `apps/web`。退役前的完整程式可由 Git 取回（基準提交 `d08a3b09`，例如 `git show d08a3b09:packages/consultant-memory/README.md`）。下文描述退役前的狀態，不再是操作說明。
+> **歷史（已退役）：**本目錄的可執行程式已依 [ADR 0079](../../docs/adr/0079-target-rebuild-production-cutover.md#退役範圍與取回) 退役，只保留研究與沿革文件；正式產品是 `apps/api` 與 `apps/web`。退役前的完整程式可由 Git 取回（基準提交 `6ad33bcb`，例如 `git show 6ad33bcb:packages/consultant-memory/README.md`）。下文描述退役前的狀態，不再是操作說明。
 
 Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新 JD App 以一般套件依賴使用；不 import 舊 checkout，不含 JD 編輯、HTTP 入口或宿主排程。最新產品語意依 `MEM-L001`：B1 維護完整案例層，B2 維護穩定工作理解層，兩者完成後才共同發布。舊三欄 extraction／兩檔 consolidation 仍保留已驗來源、checkpoint、錯誤與恢復證據，但不再代表新 B1／B2 的最終產物。provider client、金鑰、角色配置及資源生命週期由 App 組裝。
 

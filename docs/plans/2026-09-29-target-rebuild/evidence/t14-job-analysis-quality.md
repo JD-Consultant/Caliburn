@@ -834,3 +834,22 @@ dry run／Ruff E4/E7/E9/F/I、工具參數離線驗證與來源唯讀核對通�
 現有 `create_jd_task` 可逐項選多來源，`revise_jd_item` 的 `add_source` 可對任務／明細補入核對過的來源，無須新工具。**有正確操作可用，不代表已證明模型能可靠自行採用。**不人工補這份測例後把它算成 AI 通過，不自動複製全部父項來源，不要求永遠禁止拆任務，也不擴充跨任務明細搬移來掩蓋模型漏選。
 
 本次未重取完整 DB request、未重跑模型或產品測試，不能判定內部漏選原因、修法有效率或正式長訪談已通過。停止同類提示微調與付費比較；產品保持 Luna／high，不採用 Sol。T14／T17 仍未完成；其餘已成立的接線／保存證據保留，不將本次局部獨立審閱冒充全產品審核或新一次模型驗收。後續若要接受這項限制先試用，須另確認交付取捨，不能默默降低原 gate。
+
+## 2026-10-01：寫入後工具觀察的唯讀排除
+
+**本次新增證據不是另一次模型試跑。**接續前段反例，核對「寫入回傳太短，使模型無從知道已選依據」這個可能原因。原 `create_jd_task` 確實只回 `created · read_ref`，但不能只看單一回傳就認定整個接續流程缺少觀察。
+
+研究先核 [OpenAI function results](https://developers.openai.com/api/docs/guides/function-calling#formatting-results)：格式可依用途選擇，沒有回傳值的操作可只報成敗；以及 [Anthropic 工具設計](https://www.anthropic.com/engineering/writing-tools-for-agents#returning-meaningful-context-from-your-tools)：工具觀察應高訊號、符合後續動作，格式效果要以實測判斷。這些不是「每次寫入都必須複製所有來源」或「增加回傳即可修復漏引」的保證。
+
+從既有全合成 schema `core_journey_20261001_635da286`，以服務端 `default_transaction_read_only=on`、10 秒 statement timeout，唯讀取回 execution `375613cc-87f5-41d5-9b8b-0a809cfde096` 最後一次模型請求；未讀憑證、不啟動 App、不寫 DB。定位為 `checkpoint_writes` 的 `request_snapshot` channel、checkpoint `1f1bd022-9424-6585-805f-1f89a1765327`，沿既有 `create_graph_serializer().loads_typed` 解碼，不輸出 opaque reasoning。請求為 Luna／high／all_turns、238 個 input items；對完整 request 以 UTF-8、`ensure_ascii=False, sort_keys=True` JSON 計算 SHA-256：`40fdefb3a052601a0506fce5e55b08add4b8b5997821a9b3243d1749d3f4817a`。
+
+| 原 input 索引（0 起） | 已核對的可見觀察 |
+|---|---|
+| 198 → 202 | 建立出席紀錄任務時，任務及相關成果只選 `current_input`；工具回傳新任務 `read_ref`。 |
+| 215 → 220 | 模型隨後自行 `read_jd(view="item")` 讀同一任務；完整正文、成果及各自的 `supporting_sources` 都可見，來源仍明列 `current_input`，沒有被投影隱藏。 |
+| 228 → 229 | 模型又讀正式訪談 2、4、6、8；第 8 則的老師交表及指定資料夾等內容確實返回。 |
+| 231–237 | 後續只修舊綜合任務、季度彙整任務並提出整理要求，沒有向新出席任務補來源；前段已保存成稿確認漏引仍在。 |
+
+主審以一次離線斷言逐項核對模型配置、工具參數、原 `call_id` 配對、讀取結果及後續目標，**exit 0**；未改歷史 items，零新 model／count／compact，零業務工具執行。這是原生 trace 的證據核對，不是產品回歸測試或模型品質 PASS。
+
+**結論：本例不能歸因於「寫入後沒有來源可見性」。**不為此擴大每個寫入回傳、強制每步重讀或另增來源 validator；這些改動沒有本例證據支持。實際讀到不等於可靠完成語意核對，深層原因仍未確定，既有品質缺口仍有效。已向 Owner 提出「先交付明列限制的試用版、保留品質 gate」或「繼續改善來源品質」的交付取捨；尚未取得回覆，不因此改 Prompt／Tool／預設模型、放寬 gate 或正式切換。

@@ -1,0 +1,41 @@
+runs exported: 14
+q1: n=6, tasks mean 4.83, capabilities mean 0.33, minutes mean 11.0, cost sum US$0.336, failed attempts 95/1133
+q2: n=6, tasks mean 6.50, capabilities mean 6.17, minutes mean 11.5, cost sum US$0.375, failed attempts 281/1349
+q2b: n=2, tasks mean 6.00, capabilities mean 0.00, minutes mean 10.4, cost sum US$0.114, failed attempts 81/430
+
+=== compare_versions.py q1 q2 
+persona       n        tasks   max_desc        cap       cond     collab     hidden    aspects     q_turn chars_turn record_gaps    seconds       cost
+q1            course_admin  3         2.67     188.67       0.67          0          4          1          0        1.5     111.33          0      707.4       0.06
+q1            warehouse     3            7         67          0          1       1.67          1          0       1.69     114.67          0     612.53       0.05
+q2            course_admin  3            5        107       2.67       0.67       5.33       3.33       2.33       1.39     105.33       0.33     810.23       0.07
+q2            warehouse     3            8      61.33       9.67       1.67       3.33       1.67       0.67        1.5     105.33          0     571.73       0.06
+
+M1 granularity: (a) course_admin tasks 2.67->5 and max task chars 188.67->107: True; (b) warehouse tasks 7->8 not lower: True; (c) runs with tasks >= baseline persona max 5/6 (need >=5): True  => MET
+M2 recording: runs with capabilities 1->6 (gain 5); runs with conditions 3->5 (gain 2); collaborators not fewer=True  => MET
+M3 redundancy: repeated outcomes/requirements 0.379 -> 0.232  => MET
+M4 guidance: hidden aspects asked per run 0 -> 1.5; questions/turn within +30%=True; chars/turn within +30%=True  => MET
+M5 purpose written (informational): 3/6 -> 6/6 (expect >=5/6)
+guardrails: correction effective 6/6 (need all); record gaps <=1 each=True; citation support 1.0 -> 0.989 (not lower=False); failed turns=True; time <=2x=True; cost <=2x=True
+(guardrail not computed here: manual transcript/JD read for fabricated facts or unknowns written as known)
+
+REGISTERED RULE (before the manual read): M1=True, other metrics met=3/3, guardrails computed all pass=False  => DO NOT ADOPT
+
+=== compare_versions.py q1 q2b --supplemental
+persona       n        tasks   max_desc        cap       cond     collab     hidden    aspects     q_turn chars_turn record_gaps    seconds       cost
+q1            course_admin  3         2.67     188.67       0.67          0          4          1          0        1.5     111.33          0      707.4       0.06
+q1            warehouse     3            7         67          0          1       1.67          1          0       1.69     114.67          0     612.53       0.05
+q2b           course_admin  1            5        109          0          1          6          3          2       1.17         92          0      461.5       0.04
+q2b           warehouse     1            7         82          0          2          4          4          3       1.64        116          0      794.4       0.08
+
+M1 granularity: (a) course_admin tasks 2.67->5 and max task chars 188.67->109: True; (b) warehouse tasks 7->7 not lower: True; (c) runs with tasks >= baseline persona max 2/2 (need >=5): False  => NOT MET
+M2 recording: runs with capabilities 1->0 (gain -1); runs with conditions 3->2 (gain -1); collaborators not fewer=True  => NOT MET
+M3 redundancy: repeated outcomes/requirements 0.379 -> 0.273  => MET
+M4 guidance: hidden aspects asked per run 0 -> 2.5; questions/turn within +30%=True; chars/turn within +30%=True  => MET
+M5 purpose written (informational): 3/6 -> 2/2 (expect >=5/6)
+guardrails: correction effective 2/2 (need all); record gaps <=1 each=True; citation support 1.0 -> 1.0 (not lower=True); failed turns=False; time <=2x=True; cost <=2x=True
+(guardrail not computed here: manual transcript/JD read for fabricated facts or unknowns written as known)
+
+REGISTERED RULE (before the manual read): M1=False, other metrics met=2/3, guardrails computed all pass=False  => DO NOT ADOPT
+M6 knowledge/skill noise: 0/0 restate a task (0%, need <=25%); runs with capabilities 0/6 (need >=3)  => NOT MET
+citation guardrail (amended): distinct flagged items 0 (need <=1; read each by hand, none may contradict its source)  => WITHIN
+SUPPLEMENTAL RULE (before the manual read): M1=False, M2-M4 met=2/3, M6=False, citation within=True, other guardrails=False  => DO NOT ADOPT

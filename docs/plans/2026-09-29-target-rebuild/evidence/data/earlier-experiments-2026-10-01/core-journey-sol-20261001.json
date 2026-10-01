@@ -1,0 +1,4785 @@
+{
+  "schema": "core_journey_20261001_2331dc65",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "high",
+  "turns": [
+    {
+      "turn": 1,
+      "execution_id": "b4867a63-78ce-4821-a3b5-12c4bf7f356f",
+      "status": "completed",
+      "employee": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。",
+      "elapsed_seconds": 45.45,
+      "work": {
+        "revision_id": "f588e31d-1e76-4337-bd6f-128867ee88b0",
+        "areas": [
+          {
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "成人進修班課務行政",
+            "scope_text": "服務平日晚上及週末的成人進修班，處理報名、課前名單與教室資料、課程異動通知、課後紀錄及每月出席人次彙整；不負責授課，也不決定開課或收費。"
+          }
+        ],
+        "tasks": [],
+        "capabilities": [],
+        "task_links": [],
+        "collaborators": [],
+        "conditions": []
+      },
+      "sources": {
+        "revision_id": "f588e31d-1e76-4337-bd6f-128867ee88b0",
+        "references": [
+          {
+            "citation_id": "857a4ba0-7162-4b07-ab9b-d4a978755cf0",
+            "target_label": "職務名稱",
+            "target": {
+              "kind": "profile_field",
+              "field": "job_title",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f9702405-e2e7-4509-b699-7fbbb6380bb0",
+            "target_label": "所屬單位",
+            "target": {
+              "kind": "profile_field",
+              "field": "organization_unit",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b796cc36-f11f-45de-ab22-b25c21e8fa60",
+            "target_label": "直屬主管",
+            "target": {
+              "kind": "profile_field",
+              "field": "reports_to",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d2630c83-0ab6-476d-9acb-801a99090c55",
+            "target_label": "職務目的",
+            "target": {
+              "kind": "profile_field",
+              "field": "purpose",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f3e1045d-f4d1-4b25-ba42-6cad34a43581",
+            "target_label": "職責：成人進修班課務行政",
+            "target": {
+              "kind": "area",
+              "field": null,
+              "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          }
+        ]
+      }
+    },
+    {
+      "turn": 2,
+      "execution_id": "ac78bbc6-afc0-4515-8e50-3c2a009b7718",
+      "status": "completed",
+      "employee": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。",
+      "elapsed_seconds": 95.67,
+      "work": {
+        "revision_id": "851fbc1c-d2bf-46d8-b83b-b54db8701342",
+        "areas": [
+          {
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "成人進修班課務行政",
+            "scope_text": "服務平日晚上及週末的成人進修班，處理報名、課前名單與教室資料、課程異動通知、課後紀錄及每月出席人次彙整；不負責授課，也不決定開課或收費。"
+          }
+        ],
+        "tasks": [
+          {
+            "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "核對報名資料並處理重複登記與繳費異常",
+            "description": "每日核對成人進修班報名表的姓名、聯絡方式及課程。發現重複報名時，聯絡本人確認保留哪筆，再取消重複登記；付款資料對不上時，將報名資料與匯款末五碼交財務查帳，待財務確認後更新繳費狀態。",
+            "outcomes": [
+              {
+                "detail_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+                "text": "經本人確認保留並完成重複登記取消的報名資料。"
+              },
+              {
+                "detail_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+                "text": "依財務確認結果更新的繳費狀態。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+                "text": "須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。"
+              },
+              {
+                "detail_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+                "text": "額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。"
+              }
+            ]
+          }
+        ],
+        "capabilities": [],
+        "task_links": [],
+        "collaborators": [
+          {
+            "collaborator_id": "57059663-5256-492c-9f9f-7697778d227d",
+            "name": "財務",
+            "scope_text": "接收報名資料與匯款末五碼，查帳並確認款項入帳；課程行政專員待財務確認後更新繳費狀態。額滿、加開名額或退款事項交行政組長及財務決定。"
+          },
+          {
+            "collaborator_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+            "name": "行政組長",
+            "scope_text": "接收每月出席人次彙整；額滿、加開名額或退款事項交行政組長及財務決定。"
+          }
+        ],
+        "conditions": []
+      },
+      "sources": {
+        "revision_id": "851fbc1c-d2bf-46d8-b83b-b54db8701342",
+        "references": [
+          {
+            "citation_id": "857a4ba0-7162-4b07-ab9b-d4a978755cf0",
+            "target_label": "職務名稱",
+            "target": {
+              "kind": "profile_field",
+              "field": "job_title",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f9702405-e2e7-4509-b699-7fbbb6380bb0",
+            "target_label": "所屬單位",
+            "target": {
+              "kind": "profile_field",
+              "field": "organization_unit",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b796cc36-f11f-45de-ab22-b25c21e8fa60",
+            "target_label": "直屬主管",
+            "target": {
+              "kind": "profile_field",
+              "field": "reports_to",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d2630c83-0ab6-476d-9acb-801a99090c55",
+            "target_label": "職務目的",
+            "target": {
+              "kind": "profile_field",
+              "field": "purpose",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f3e1045d-f4d1-4b25-ba42-6cad34a43581",
+            "target_label": "職責：成人進修班課務行政",
+            "target": {
+              "kind": "area",
+              "field": null,
+              "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "2a18dea9-701e-4d8b-9650-b22de40792cc",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "446f709a-0dfc-42d0-99b4-4d5dce11d1a6",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "15b5e25a-85f6-46a2-98e1-5d1c6b52d2a5",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：經本人確認保留並完成重複登記取消的報名資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "70a85728-e543-4aa1-8aa0-6f50dcc319b4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：依財務確認結果更新的繳費狀態。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "6f54ac7d-d7e1-4371-97fa-1c48f9991dd0",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "0b81775f-23ee-42d1-8216-66b6312773d4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "73fc2064-109b-4417-8d24-d3f4f35f7ae2",
+            "target_label": "協作：財務",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "57059663-5256-492c-9f9f-7697778d227d",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "591f662f-e0b1-4478-a865-cda01606ce85",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "452ec109-3792-4b6d-b08b-fe8545804c4c",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          }
+        ]
+      }
+    },
+    {
+      "turn": 3,
+      "execution_id": "d497bc36-d9d3-460a-9153-d0db081c69a4",
+      "status": "completed",
+      "employee": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。",
+      "elapsed_seconds": 161.7,
+      "work": {
+        "revision_id": "6e97f81d-f4ac-4709-a218-ea9e1e0aec20",
+        "areas": [
+          {
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "成人進修班課務行政",
+            "scope_text": "服務平日晚上及週末的成人進修班，處理報名、課前名單與教室資料、課程異動通知、課後紀錄及每月出席人次彙整；不負責授課，也不決定開課或收費。"
+          }
+        ],
+        "tasks": [
+          {
+            "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "核對報名資料並處理重複登記與繳費異常",
+            "description": "每日核對成人進修班報名表的姓名、聯絡方式及課程。發現重複報名時，聯絡本人確認保留哪筆，再取消重複登記；付款資料對不上時，將報名資料與匯款末五碼交財務查帳，待財務確認後更新繳費狀態。",
+            "outcomes": [
+              {
+                "detail_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+                "text": "經本人確認保留並完成重複登記取消的報名資料。"
+              },
+              {
+                "detail_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+                "text": "依財務確認結果更新的繳費狀態。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+                "text": "須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。"
+              },
+              {
+                "detail_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+                "text": "額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。"
+              }
+            ]
+          },
+          {
+            "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "交付課前報名名冊與教室資料",
+            "description": "將報名名冊與教室資料交給老師及場地窗口，供課前確認名單與處理設備使用。",
+            "outcomes": [
+              {
+                "detail_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+                "text": "提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+                "text": "於課前兩個工作天交付報名名冊與教室資料。"
+              },
+              {
+                "detail_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+                "text": "老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。"
+              }
+            ]
+          },
+          {
+            "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "通知上課時間異動並追蹤學員回應",
+            "description": "老師臨時更改上課時間時，先取得行政組長確認的時間，再以簡訊通知學員，並通知老師與場地窗口；對未回應的學員再以電話確認並記錄結果。",
+            "outcomes": [
+              {
+                "detail_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+                "text": "已發出的上課時間異動通知，以及未回應學員的電話確認結果紀錄。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+                "text": "以行政組長確認的上課時間作為通知依據，不自行決定異動時間。"
+              }
+            ]
+          }
+        ],
+        "capabilities": [],
+        "task_links": [],
+        "collaborators": [
+          {
+            "collaborator_id": "57059663-5256-492c-9f9f-7697778d227d",
+            "name": "財務",
+            "scope_text": "接收報名資料與匯款末五碼，查帳並確認款項入帳；課程行政專員待財務確認後更新繳費狀態。額滿、加開名額或退款事項交行政組長及財務決定。"
+          },
+          {
+            "collaborator_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+            "name": "行政組長",
+            "scope_text": "接收每月出席人次彙整；額滿、加開名額或退款事項交行政組長及財務決定。老師臨時更改上課時間時，由行政組長確認時間，本職務再據以通知。"
+          },
+          {
+            "collaborator_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+            "name": "老師",
+            "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責確認名單；臨時更改上課時間時，接收本職務依行政組長確認時間發出的通知。"
+          },
+          {
+            "collaborator_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+            "name": "場地窗口",
+            "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責處理設備；接收本職務依行政組長確認時間發出的上課時間異動通知。"
+          }
+        ],
+        "conditions": []
+      },
+      "sources": {
+        "revision_id": "6e97f81d-f4ac-4709-a218-ea9e1e0aec20",
+        "references": [
+          {
+            "citation_id": "857a4ba0-7162-4b07-ab9b-d4a978755cf0",
+            "target_label": "職務名稱",
+            "target": {
+              "kind": "profile_field",
+              "field": "job_title",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f9702405-e2e7-4509-b699-7fbbb6380bb0",
+            "target_label": "所屬單位",
+            "target": {
+              "kind": "profile_field",
+              "field": "organization_unit",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b796cc36-f11f-45de-ab22-b25c21e8fa60",
+            "target_label": "直屬主管",
+            "target": {
+              "kind": "profile_field",
+              "field": "reports_to",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d2630c83-0ab6-476d-9acb-801a99090c55",
+            "target_label": "職務目的",
+            "target": {
+              "kind": "profile_field",
+              "field": "purpose",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f3e1045d-f4d1-4b25-ba42-6cad34a43581",
+            "target_label": "職責：成人進修班課務行政",
+            "target": {
+              "kind": "area",
+              "field": null,
+              "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "2a18dea9-701e-4d8b-9650-b22de40792cc",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "446f709a-0dfc-42d0-99b4-4d5dce11d1a6",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "15b5e25a-85f6-46a2-98e1-5d1c6b52d2a5",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：經本人確認保留並完成重複登記取消的報名資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "70a85728-e543-4aa1-8aa0-6f50dcc319b4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：依財務確認結果更新的繳費狀態。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "6f54ac7d-d7e1-4371-97fa-1c48f9991dd0",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "0b81775f-23ee-42d1-8216-66b6312773d4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "73fc2064-109b-4417-8d24-d3f4f35f7ae2",
+            "target_label": "協作：財務",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "57059663-5256-492c-9f9f-7697778d227d",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "591f662f-e0b1-4478-a865-cda01606ce85",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "452ec109-3792-4b6d-b08b-fe8545804c4c",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d7453d07-ee0b-4ac6-8e5f-a0a4a6881342",
+            "target_label": "任務：交付課前報名名冊與教室資料",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "811d11e7-7561-4b44-baba-08a45d0142eb",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 成果：提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "43a0d62e-f637-4f1a-a20a-0f1a220378eb",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 要求：於課前兩個工作天交付報名名冊與教室資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "0918b15c-3505-4588-abe9-2e68e50778f7",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 要求：老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5bd7a566-f51c-4f1f-bd4c-edd12667bdc4",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "847993aa-2f40-4f7b-a598-d0d4def9e512",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 成果：已發出的上課時間異動通知，以及未回應學員的電話確認結果紀錄。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5aebbb3c-4596-4b74-b672-6c733b7c9971",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 要求：以行政組長確認的上課時間作為通知依據，不自行決定異動時間。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "749887c0-2f2a-4d82-8cc4-de2df48f39a3",
+            "target_label": "協作：老師",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b862a17a-ac56-4046-bb5c-cf2d87770917",
+            "target_label": "協作：場地窗口",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "2c2fd38a-42dd-4e56-a62f-5cd4ded553bc",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          }
+        ]
+      }
+    },
+    {
+      "turn": 4,
+      "execution_id": "cb7b9795-40a2-40d3-b629-dfb917262db7",
+      "status": "completed",
+      "employee": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。",
+      "elapsed_seconds": 272.04,
+      "work": {
+        "revision_id": "ffa4ddd2-eb67-4168-b0fd-65e134faeac8",
+        "areas": [
+          {
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "成人進修班課務行政",
+            "scope_text": "服務平日晚上及週末的成人進修班，處理報名、課前名單與教室資料、課程異動通知、課後出席紀錄及每季出席人次彙整；不負責授課，也不決定開課或收費。"
+          }
+        ],
+        "tasks": [
+          {
+            "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "核對報名資料並處理重複登記與繳費異常",
+            "description": "每日核對成人進修班報名表的姓名、聯絡方式及課程。發現重複報名時，聯絡本人確認保留哪筆，再取消重複登記；付款資料對不上時，將報名資料與匯款末五碼交財務查帳，待財務確認後更新繳費狀態。",
+            "outcomes": [
+              {
+                "detail_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+                "text": "經本人確認保留並完成重複登記取消的報名資料。"
+              },
+              {
+                "detail_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+                "text": "依財務確認結果更新的繳費狀態。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+                "text": "須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。"
+              },
+              {
+                "detail_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+                "text": "額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。"
+              }
+            ]
+          },
+          {
+            "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "交付課前報名名冊與教室資料",
+            "description": "將報名名冊與教室資料交給老師及場地窗口，供課前確認名單與處理設備使用。",
+            "outcomes": [
+              {
+                "detail_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+                "text": "提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+                "text": "於課前兩個工作天交付報名名冊與教室資料。"
+              },
+              {
+                "detail_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+                "text": "老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。"
+              }
+            ]
+          },
+          {
+            "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "通知上課時間異動並追蹤學員回應",
+            "description": "老師臨時更改上課時間時，先取得行政組長確認的時間，再以簡訊通知學員，並通知老師與場地窗口；對未回應的學員再以電話確認並記錄結果。",
+            "outcomes": [
+              {
+                "detail_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+                "text": "已發出的上課時間異動通知，以及未回應學員的電話確認結果紀錄。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+                "text": "以行政組長確認的上課時間作為通知依據，不自行決定異動時間。"
+              }
+            ]
+          },
+          {
+            "task_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "整理並存檔課後出席紀錄",
+            "description": "有開課的每一天，接收老師提供的出席表，將每堂出席人數及缺漏整理到試算表；姓名漏填或勾選不清楚時請老師確認，完成後存至中心指定資料夾。",
+            "outcomes": [
+              {
+                "detail_id": "b2acbb81-6308-4e3b-a7ff-b3d31a9b0ffb",
+                "text": "存於中心指定資料夾的每堂出席人數及缺漏試算表紀錄。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "7d1e05b3-f6d8-421b-b15b-41a967d63cb8",
+                "text": "姓名漏填或勾選不清楚須請老師確認，不自行推測出席資料。"
+              }
+            ]
+          },
+          {
+            "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "彙整季度出席人次",
+            "description": "每季彙整出席人次，提供行政組長掌握班級執行情形。",
+            "outcomes": [
+              {
+                "detail_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+                "text": "供行政組長掌握班級執行情形的季度出席人次彙整。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "0d757a78-edb9-443a-8b78-e93d7ba8334b",
+                "text": "按每堂出席累計人次，不以不重複學員人數計算；同一學員出席三堂計為三人次。"
+              }
+            ]
+          }
+        ],
+        "capabilities": [
+          {
+            "capability_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+            "kind": "knowledge",
+            "name": "出席人次統計口徑",
+            "description": "出席人次按每堂出席累計，不以不重複學員人數計算；同一位學員出席三堂計為三人次。"
+          },
+          {
+            "capability_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+            "kind": "skill",
+            "name": "出席紀錄整理與查證",
+            "description": "將每堂出席人數與缺漏整理至試算表，辨識姓名漏填或勾選不清楚的紀錄，並向老師查證後完成紀錄。"
+          }
+        ],
+        "task_links": [
+          {
+            "task_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+            "capability_id": "f9f29079-a539-4dad-aac3-6fb813741ab1"
+          },
+          {
+            "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+            "capability_id": "262fe58f-ad59-4581-a4ac-345777a13414"
+          }
+        ],
+        "collaborators": [
+          {
+            "collaborator_id": "57059663-5256-492c-9f9f-7697778d227d",
+            "name": "財務",
+            "scope_text": "接收報名資料與匯款末五碼，查帳並確認款項入帳；課程行政專員待財務確認後更新繳費狀態。額滿、加開名額或退款事項交行政組長及財務決定。"
+          },
+          {
+            "collaborator_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+            "name": "行政組長",
+            "scope_text": "接收每季出席人次彙整，以掌握班級執行情形；額滿、加開名額或退款事項交行政組長及財務決定。老師臨時更改上課時間時，由行政組長確認時間，本職務再據以通知。"
+          },
+          {
+            "collaborator_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+            "name": "老師",
+            "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責確認名單；臨時更改上課時間時，接收本職務依行政組長確認時間發出的通知。有開課的每一天提供出席表，並確認本職務提出的姓名漏填或勾選不清楚等疑義。"
+          },
+          {
+            "collaborator_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+            "name": "場地窗口",
+            "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責處理設備；接收本職務依行政組長確認時間發出的上課時間異動通知。"
+          }
+        ],
+        "conditions": []
+      },
+      "sources": {
+        "revision_id": "ffa4ddd2-eb67-4168-b0fd-65e134faeac8",
+        "references": [
+          {
+            "citation_id": "857a4ba0-7162-4b07-ab9b-d4a978755cf0",
+            "target_label": "職務名稱",
+            "target": {
+              "kind": "profile_field",
+              "field": "job_title",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f9702405-e2e7-4509-b699-7fbbb6380bb0",
+            "target_label": "所屬單位",
+            "target": {
+              "kind": "profile_field",
+              "field": "organization_unit",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b796cc36-f11f-45de-ab22-b25c21e8fa60",
+            "target_label": "直屬主管",
+            "target": {
+              "kind": "profile_field",
+              "field": "reports_to",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d2630c83-0ab6-476d-9acb-801a99090c55",
+            "target_label": "職務目的",
+            "target": {
+              "kind": "profile_field",
+              "field": "purpose",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f3e1045d-f4d1-4b25-ba42-6cad34a43581",
+            "target_label": "職責：成人進修班課務行政",
+            "target": {
+              "kind": "area",
+              "field": null,
+              "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "2a18dea9-701e-4d8b-9650-b22de40792cc",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "446f709a-0dfc-42d0-99b4-4d5dce11d1a6",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "15b5e25a-85f6-46a2-98e1-5d1c6b52d2a5",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：經本人確認保留並完成重複登記取消的報名資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "70a85728-e543-4aa1-8aa0-6f50dcc319b4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：依財務確認結果更新的繳費狀態。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "6f54ac7d-d7e1-4371-97fa-1c48f9991dd0",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "0b81775f-23ee-42d1-8216-66b6312773d4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "73fc2064-109b-4417-8d24-d3f4f35f7ae2",
+            "target_label": "協作：財務",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "57059663-5256-492c-9f9f-7697778d227d",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "452ec109-3792-4b6d-b08b-fe8545804c4c",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d7453d07-ee0b-4ac6-8e5f-a0a4a6881342",
+            "target_label": "任務：交付課前報名名冊與教室資料",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "811d11e7-7561-4b44-baba-08a45d0142eb",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 成果：提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "43a0d62e-f637-4f1a-a20a-0f1a220378eb",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 要求：於課前兩個工作天交付報名名冊與教室資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "0918b15c-3505-4588-abe9-2e68e50778f7",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 要求：老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5bd7a566-f51c-4f1f-bd4c-edd12667bdc4",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "847993aa-2f40-4f7b-a598-d0d4def9e512",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 成果：已發出的上課時間異動通知，以及未回應學員的電話確認結果紀錄。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5aebbb3c-4596-4b74-b672-6c733b7c9971",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 要求：以行政組長確認的上課時間作為通知依據，不自行決定異動時間。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "749887c0-2f2a-4d82-8cc4-de2df48f39a3",
+            "target_label": "協作：老師",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b862a17a-ac56-4046-bb5c-cf2d87770917",
+            "target_label": "協作：場地窗口",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "2c2fd38a-42dd-4e56-a62f-5cd4ded553bc",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "eeea00c9-8918-4080-b354-a79f6a015494",
+            "target_label": "職責：成人進修班課務行政",
+            "target": {
+              "kind": "area",
+              "field": null,
+              "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "a6485659-5f7f-4d0d-92d0-8d30945afb55",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "3483cae8-4c6d-45e4-9218-c9f6e4d430e5",
+            "target_label": "協作：老師",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b011f436-4a1d-4639-a2ee-e9afe2df1e62",
+            "target_label": "知識：出席人次統計口徑",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "12b14bab-21a2-4977-aeab-22c090189fb9",
+            "target_label": "技能：出席紀錄整理與查證",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "8f6af9e4-b543-41b9-a476-660ae1b9132e",
+            "target_label": "任務：整理並存檔課後出席紀錄",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "c76247c5-3dee-41ad-a4be-3c0373afe1db",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 成果：存於中心指定資料夾的每堂出席人數及缺漏試算表紀錄。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "b2acbb81-6308-4e3b-a7ff-b3d31a9b0ffb",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "fa520811-d6f5-4d7f-a51b-e705010b9db8",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 要求：姓名漏填或勾選不清楚須請老師確認，不自行推測出席資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "7d1e05b3-f6d8-421b-b15b-41a967d63cb8",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "a5353912-2b8e-42ce-b0bb-b46296b12bc6",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 使用：出席紀錄整理與查證",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "12e31379-3482-4bcf-b5e4-f87c283ccbb5",
+            "target_label": "任務：彙整季度出席人次",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "cd12f190-4801-4358-ae50-4e094edab080",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "59f19ca5-6eaf-427b-87e5-723f15cee741",
+            "target_label": "任務：彙整季度出席人次 · 成果：供行政組長掌握班級執行情形的季度出席人次彙整。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "083610a4-8c98-464b-9756-ff1f8634a867",
+            "target_label": "任務：彙整季度出席人次 · 要求：按每堂出席累計人次，不以不重複學員人數計算；同一學員出席三堂計為三人次。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "0d757a78-edb9-443a-8b78-e93d7ba8334b",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "944c21c1-c460-419c-935b-a4a8799ba4ad",
+            "target_label": "任務：彙整季度出席人次 · 使用：出席人次統計口徑",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          }
+        ]
+      }
+    },
+    {
+      "turn": 5,
+      "execution_id": "f82748e0-6f4d-4307-8d43-84f803fe8acb",
+      "status": "completed",
+      "employee": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。",
+      "elapsed_seconds": 412.77,
+      "work": {
+        "revision_id": "57f623fd-a797-4b81-b780-98af51f67aa8",
+        "areas": [
+          {
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "成人進修班課務行政",
+            "scope_text": "服務平日晚上及週末的成人進修班，處理報名、課前名單與教室資料、課程異動通知、課後出席紀錄及每季出席人次彙整；不負責授課，也不決定開課或收費。"
+          }
+        ],
+        "tasks": [
+          {
+            "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "核對報名資料並處理重複登記與繳費異常",
+            "description": "每日核對成人進修班報名表的姓名、聯絡方式及課程。發現重複報名時，聯絡本人確認保留哪筆，再取消重複登記；付款資料對不上時，將報名資料與匯款末五碼交財務查帳，待財務確認後更新繳費狀態。報名聯絡前先核對聯絡資料，說明需確認的事項，將確認結果記入名冊；未回應者以電話追蹤。",
+            "outcomes": [
+              {
+                "detail_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+                "text": "經本人確認保留、完成重複登記取消並記錄聯絡確認結果的報名名冊。"
+              },
+              {
+                "detail_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+                "text": "依財務確認結果更新的繳費狀態。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+                "text": "須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。"
+              },
+              {
+                "detail_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+                "text": "額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。"
+              }
+            ]
+          },
+          {
+            "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "交付課前報名名冊與教室資料",
+            "description": "將報名名冊與教室資料交給老師及場地窗口，供課前確認名單與處理設備使用。",
+            "outcomes": [
+              {
+                "detail_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+                "text": "提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+                "text": "於課前兩個工作天交付報名名冊與教室資料。"
+              },
+              {
+                "detail_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+                "text": "老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。"
+              }
+            ]
+          },
+          {
+            "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "通知上課時間異動並追蹤學員回應",
+            "description": "老師臨時更改上課時間時，先取得行政組長確認的時間；核對聯絡資料後以簡訊通知學員，並通知老師與場地窗口，說明需確認的異動事項。將確認結果記入名冊，對未回應的學員再以電話確認並記錄結果。",
+            "outcomes": [
+              {
+                "detail_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+                "text": "已發出的上課時間異動通知，以及記於名冊的確認與電話追蹤結果。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+                "text": "以行政組長確認的上課時間作為通知依據，不自行決定異動時間。"
+              }
+            ]
+          },
+          {
+            "task_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "整理並存檔課後出席紀錄",
+            "description": "有開課的每一天，接收老師提供的出席表，按課程代碼與上課日期核對，將每堂出席人數及缺漏整理到試算表並篩選缺漏；姓名漏填或勾選不清楚時請老師確認，完成後存至中心指定資料夾。",
+            "outcomes": [
+              {
+                "detail_id": "b2acbb81-6308-4e3b-a7ff-b3d31a9b0ffb",
+                "text": "存於中心指定資料夾的每堂出席人數及缺漏試算表紀錄。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "7d1e05b3-f6d8-421b-b15b-41a967d63cb8",
+                "text": "姓名漏填或勾選不清楚須請老師確認，不自行推測出席資料。"
+              },
+              {
+                "detail_id": "b0579296-0257-4369-b09d-a8c86ff1c1d0",
+                "text": "核對課程代碼及上課日期，避免將不同班或不同日期的出席資料合在一起。"
+              }
+            ]
+          },
+          {
+            "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "彙整季度出席人次",
+            "description": "每季以樞紐分析表按班別加總每堂出席人數，並與原始表總數核對，彙整出席人次供行政組長掌握班級執行情形。",
+            "outcomes": [
+              {
+                "detail_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+                "text": "按班別彙整並經原始表總數核對的季度出席人次，供行政組長掌握班級執行情形。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "0d757a78-edb9-443a-8b78-e93d7ba8334b",
+                "text": "按每堂出席累計人次，不以不重複學員人數計算；同一學員出席三堂計為三人次。"
+              },
+              {
+                "detail_id": "4b3b0d0d-9cc0-4cac-b212-d29f01342cf7",
+                "text": "樞紐分析表的彙總總數須與原始表總數核對。"
+              }
+            ]
+          }
+        ],
+        "capabilities": [
+          {
+            "capability_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+            "kind": "knowledge",
+            "name": "出席人次統計口徑",
+            "description": "出席人次按每堂出席累計，不以不重複學員人數計算；同一位學員出席三堂計為三人次。"
+          },
+          {
+            "capability_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+            "kind": "skill",
+            "name": "出席紀錄整理與查證",
+            "description": "按課程代碼與上課日期核對出席表，避免混入不同班或不同日期的資料；運用試算表篩選缺漏，辨識姓名漏填或勾選不清楚的紀錄，並向老師查證後完成整理。"
+          },
+          {
+            "capability_id": "391ede89-c27d-4695-9887-94a1d3378d94",
+            "kind": "skill",
+            "name": "試算表彙總與原始資料核對",
+            "description": "運用樞紐分析表按班別加總每堂出席人數，並與原始表總數核對，避免將學員人數誤作出席人次。"
+          },
+          {
+            "capability_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+            "kind": "skill",
+            "name": "聯絡確認與回應追蹤",
+            "description": "聯絡前核對聯絡資料，向對方說明需確認的事項，將確認結果記入名冊，並對未回應者進行電話追蹤。"
+          }
+        ],
+        "task_links": [
+          {
+            "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+            "capability_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264"
+          },
+          {
+            "task_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+            "capability_id": "f9f29079-a539-4dad-aac3-6fb813741ab1"
+          },
+          {
+            "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+            "capability_id": "262fe58f-ad59-4581-a4ac-345777a13414"
+          },
+          {
+            "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+            "capability_id": "391ede89-c27d-4695-9887-94a1d3378d94"
+          },
+          {
+            "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+            "capability_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264"
+          }
+        ],
+        "collaborators": [
+          {
+            "collaborator_id": "57059663-5256-492c-9f9f-7697778d227d",
+            "name": "財務",
+            "scope_text": "接收報名資料與匯款末五碼，查帳並確認款項入帳；課程行政專員待財務確認後更新繳費狀態。額滿、加開名額或退款事項交行政組長及財務決定。"
+          },
+          {
+            "collaborator_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+            "name": "行政組長",
+            "scope_text": "接收每季出席人次彙整，以掌握班級執行情形；額滿、加開名額或退款事項交行政組長及財務決定。老師臨時更改上課時間時，由行政組長確認時間，本職務再據以通知。"
+          },
+          {
+            "collaborator_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+            "name": "老師",
+            "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責確認名單；臨時更改上課時間時，接收本職務依行政組長確認時間發出的通知。有開課的每一天提供出席表，並確認本職務提出的姓名漏填或勾選不清楚等疑義。"
+          },
+          {
+            "collaborator_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+            "name": "場地窗口",
+            "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責處理設備；接收本職務依行政組長確認時間發出的上課時間異動通知。"
+          }
+        ],
+        "conditions": []
+      },
+      "sources": {
+        "revision_id": "57f623fd-a797-4b81-b780-98af51f67aa8",
+        "references": [
+          {
+            "citation_id": "857a4ba0-7162-4b07-ab9b-d4a978755cf0",
+            "target_label": "職務名稱",
+            "target": {
+              "kind": "profile_field",
+              "field": "job_title",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f9702405-e2e7-4509-b699-7fbbb6380bb0",
+            "target_label": "所屬單位",
+            "target": {
+              "kind": "profile_field",
+              "field": "organization_unit",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b796cc36-f11f-45de-ab22-b25c21e8fa60",
+            "target_label": "直屬主管",
+            "target": {
+              "kind": "profile_field",
+              "field": "reports_to",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d2630c83-0ab6-476d-9acb-801a99090c55",
+            "target_label": "職務目的",
+            "target": {
+              "kind": "profile_field",
+              "field": "purpose",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f3e1045d-f4d1-4b25-ba42-6cad34a43581",
+            "target_label": "職責：成人進修班課務行政",
+            "target": {
+              "kind": "area",
+              "field": null,
+              "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "2a18dea9-701e-4d8b-9650-b22de40792cc",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "446f709a-0dfc-42d0-99b4-4d5dce11d1a6",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "15b5e25a-85f6-46a2-98e1-5d1c6b52d2a5",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：經本人確認保留、完成重複登記取消並記錄聯絡確認結果的報名名冊。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "70a85728-e543-4aa1-8aa0-6f50dcc319b4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：依財務確認結果更新的繳費狀態。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "6f54ac7d-d7e1-4371-97fa-1c48f9991dd0",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "0b81775f-23ee-42d1-8216-66b6312773d4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "73fc2064-109b-4417-8d24-d3f4f35f7ae2",
+            "target_label": "協作：財務",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "57059663-5256-492c-9f9f-7697778d227d",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "452ec109-3792-4b6d-b08b-fe8545804c4c",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d7453d07-ee0b-4ac6-8e5f-a0a4a6881342",
+            "target_label": "任務：交付課前報名名冊與教室資料",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "811d11e7-7561-4b44-baba-08a45d0142eb",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 成果：提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "43a0d62e-f637-4f1a-a20a-0f1a220378eb",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 要求：於課前兩個工作天交付報名名冊與教室資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "0918b15c-3505-4588-abe9-2e68e50778f7",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 要求：老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5bd7a566-f51c-4f1f-bd4c-edd12667bdc4",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "847993aa-2f40-4f7b-a598-d0d4def9e512",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 成果：已發出的上課時間異動通知，以及記於名冊的確認與電話追蹤結果。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5aebbb3c-4596-4b74-b672-6c733b7c9971",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 要求：以行政組長確認的上課時間作為通知依據，不自行決定異動時間。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "749887c0-2f2a-4d82-8cc4-de2df48f39a3",
+            "target_label": "協作：老師",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b862a17a-ac56-4046-bb5c-cf2d87770917",
+            "target_label": "協作：場地窗口",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "2c2fd38a-42dd-4e56-a62f-5cd4ded553bc",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "eeea00c9-8918-4080-b354-a79f6a015494",
+            "target_label": "職責：成人進修班課務行政",
+            "target": {
+              "kind": "area",
+              "field": null,
+              "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "a6485659-5f7f-4d0d-92d0-8d30945afb55",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "3483cae8-4c6d-45e4-9218-c9f6e4d430e5",
+            "target_label": "協作：老師",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b011f436-4a1d-4639-a2ee-e9afe2df1e62",
+            "target_label": "知識：出席人次統計口徑",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "12b14bab-21a2-4977-aeab-22c090189fb9",
+            "target_label": "技能：出席紀錄整理與查證",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "8f6af9e4-b543-41b9-a476-660ae1b9132e",
+            "target_label": "任務：整理並存檔課後出席紀錄",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "c76247c5-3dee-41ad-a4be-3c0373afe1db",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 成果：存於中心指定資料夾的每堂出席人數及缺漏試算表紀錄。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "b2acbb81-6308-4e3b-a7ff-b3d31a9b0ffb",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "fa520811-d6f5-4d7f-a51b-e705010b9db8",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 要求：姓名漏填或勾選不清楚須請老師確認，不自行推測出席資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "7d1e05b3-f6d8-421b-b15b-41a967d63cb8",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "a5353912-2b8e-42ce-b0bb-b46296b12bc6",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 使用：出席紀錄整理與查證",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "12e31379-3482-4bcf-b5e4-f87c283ccbb5",
+            "target_label": "任務：彙整季度出席人次",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "cd12f190-4801-4358-ae50-4e094edab080",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "59f19ca5-6eaf-427b-87e5-723f15cee741",
+            "target_label": "任務：彙整季度出席人次 · 成果：按班別彙整並經原始表總數核對的季度出席人次，供行政組長掌握班級執行情形。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "083610a4-8c98-464b-9756-ff1f8634a867",
+            "target_label": "任務：彙整季度出席人次 · 要求：按每堂出席累計人次，不以不重複學員人數計算；同一學員出席三堂計為三人次。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "0d757a78-edb9-443a-8b78-e93d7ba8334b",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "944c21c1-c460-419c-935b-a4a8799ba4ad",
+            "target_label": "任務：彙整季度出席人次 · 使用：出席人次統計口徑",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": true
+          },
+          {
+            "citation_id": "1532733e-d7da-4f17-8e17-f52ac45645e1",
+            "target_label": "技能：出席紀錄整理與查證",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "41b4360d-24c3-4953-9736-a410a5acd467",
+            "target_label": "技能：試算表彙總與原始資料核對",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "391ede89-c27d-4695-9887-94a1d3378d94",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "648fa4b8-5226-410d-96de-2cb875d6a7ec",
+            "target_label": "技能：聯絡確認與回應追蹤",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "287e1fc0-8c76-4ae7-b091-0a621cb9f7da",
+            "target_label": "任務：整理並存檔課後出席紀錄",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "225624f5-103b-43a5-b722-9b372ca2d75b",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 使用：出席紀錄整理與查證",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b4331b5a-dc33-492d-ba28-b10c5d25f0ca",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 要求：核對課程代碼及上課日期，避免將不同班或不同日期的出席資料合在一起。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "b0579296-0257-4369-b09d-a8c86ff1c1d0",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "683aa58c-8aa3-4fcd-8255-c2ba36453621",
+            "target_label": "任務：彙整季度出席人次 · 成果：按班別彙整並經原始表總數核對的季度出席人次，供行政組長掌握班級執行情形。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "7574013a-fcf3-4cf4-803f-90361a2d1894",
+            "target_label": "任務：彙整季度出席人次 · 使用：試算表彙總與原始資料核對",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "391ede89-c27d-4695-9887-94a1d3378d94",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5a41b211-6564-4932-9f70-a437ce4472e2",
+            "target_label": "任務：彙整季度出席人次",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "cd12f190-4801-4358-ae50-4e094edab080",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "98cb1adf-30b0-4e23-8663-66d358582a09",
+            "target_label": "任務：彙整季度出席人次 · 要求：樞紐分析表的彙總總數須與原始表總數核對。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "4b3b0d0d-9cc0-4cac-b212-d29f01342cf7",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "ab7c8e2a-7627-49f5-9c98-7869cebbdefd",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：經本人確認保留、完成重複登記取消並記錄聯絡確認結果的報名名冊。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "4259a9db-0d24-4122-b4aa-aa6cefefec62",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 使用：聯絡確認與回應追蹤",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "258d4024-e32f-4291-b79f-0eca6336d794",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "de96a385-1246-42d4-8863-852f40016346",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 成果：已發出的上課時間異動通知，以及記於名冊的確認與電話追蹤結果。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "298037ae-3c93-4844-a6b4-b12da4833938",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 使用：聯絡確認與回應追蹤",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "896cbfd9-3af9-458a-a95e-f5e9b70085c2",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          }
+        ]
+      }
+    },
+    {
+      "turn": 6,
+      "execution_id": "55456d5c-2854-43a3-9969-c849a07c1119",
+      "status": "completed",
+      "employee": "目前我主要做的工作大致都說了。我想先整理目前已談到的工作，其他不清楚的部分先保留未知。請幫我檢查現在的職務說明書還缺什麼。",
+      "elapsed_seconds": 541.34,
+      "work": {
+        "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+        "areas": [
+          {
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "成人進修班課務行政",
+            "scope_text": "服務平日晚上及週末的成人進修班，處理報名、課前名單與教室資料、課程異動通知、課後出席紀錄及每季出席人次彙整；不負責授課，也不決定開課或收費。"
+          }
+        ],
+        "tasks": [
+          {
+            "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "核對報名資料並處理重複登記與繳費異常",
+            "description": "每日核對成人進修班報名表的姓名、聯絡方式及課程。發現重複報名時，聯絡本人確認保留哪筆，再取消重複登記；付款資料對不上時，將報名資料與匯款末五碼交財務查帳，待財務確認後更新繳費狀態。報名聯絡前先核對聯絡資料，說明需確認的事項，將確認結果記入名冊；未回應者以電話追蹤。",
+            "outcomes": [
+              {
+                "detail_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+                "text": "經本人確認保留、完成重複登記取消並記錄聯絡確認結果的報名名冊。"
+              },
+              {
+                "detail_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+                "text": "依財務確認結果更新的繳費狀態。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+                "text": "須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。"
+              },
+              {
+                "detail_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+                "text": "額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。"
+              }
+            ]
+          },
+          {
+            "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "交付課前報名名冊與教室資料",
+            "description": "將報名名冊與教室資料交給老師及場地窗口，供課前確認名單與處理設備使用。",
+            "outcomes": [
+              {
+                "detail_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+                "text": "提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+                "text": "於課前兩個工作天交付報名名冊與教室資料。"
+              },
+              {
+                "detail_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+                "text": "老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。"
+              }
+            ]
+          },
+          {
+            "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "通知上課時間異動並追蹤學員回應",
+            "description": "老師臨時更改上課時間時，先取得行政組長確認的時間；核對聯絡資料後以簡訊通知學員，並通知老師與場地窗口，說明需確認的異動事項。將確認結果記入名冊，對未回應的學員再以電話確認並記錄結果。",
+            "outcomes": [
+              {
+                "detail_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+                "text": "已發出的上課時間異動通知，以及記於名冊的確認與電話追蹤結果。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+                "text": "以行政組長確認的上課時間作為通知依據，不自行決定異動時間。"
+              }
+            ]
+          },
+          {
+            "task_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "整理並存檔課後出席紀錄",
+            "description": "有開課的每一天，接收老師提供的出席表，按課程代碼與上課日期核對，將每堂出席人數及缺漏整理到試算表並篩選缺漏；姓名漏填或勾選不清楚時請老師確認，完成後存至中心指定資料夾。",
+            "outcomes": [
+              {
+                "detail_id": "b2acbb81-6308-4e3b-a7ff-b3d31a9b0ffb",
+                "text": "存於中心指定資料夾的每堂出席人數及缺漏試算表紀錄。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "7d1e05b3-f6d8-421b-b15b-41a967d63cb8",
+                "text": "姓名漏填或勾選不清楚須請老師確認，不自行推測出席資料。"
+              },
+              {
+                "detail_id": "b0579296-0257-4369-b09d-a8c86ff1c1d0",
+                "text": "核對課程代碼及上課日期，避免將不同班或不同日期的出席資料合在一起。"
+              }
+            ]
+          },
+          {
+            "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+            "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+            "title": "彙整季度出席人次",
+            "description": "每季以樞紐分析表按班別加總每堂出席人數，並與原始表總數核對，彙整出席人次供行政組長掌握班級執行情形。",
+            "outcomes": [
+              {
+                "detail_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+                "text": "按班別彙整並經原始表總數核對的季度出席人次，供行政組長掌握班級執行情形。"
+              }
+            ],
+            "requirements": [
+              {
+                "detail_id": "0d757a78-edb9-443a-8b78-e93d7ba8334b",
+                "text": "按每堂出席累計人次，不以不重複學員人數計算；同一學員出席三堂計為三人次。"
+              },
+              {
+                "detail_id": "4b3b0d0d-9cc0-4cac-b212-d29f01342cf7",
+                "text": "樞紐分析表的彙總總數須與原始表總數核對。"
+              }
+            ]
+          }
+        ],
+        "capabilities": [
+          {
+            "capability_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+            "kind": "knowledge",
+            "name": "出席人次統計口徑",
+            "description": "出席人次按每堂出席累計，不以不重複學員人數計算；同一位學員出席三堂計為三人次。"
+          },
+          {
+            "capability_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+            "kind": "skill",
+            "name": "出席紀錄整理與查證",
+            "description": "按課程代碼與上課日期核對出席表，避免混入不同班或不同日期的資料；運用試算表篩選缺漏，辨識姓名漏填或勾選不清楚的紀錄，並向老師查證後完成整理。"
+          },
+          {
+            "capability_id": "391ede89-c27d-4695-9887-94a1d3378d94",
+            "kind": "skill",
+            "name": "試算表彙總與原始資料核對",
+            "description": "運用樞紐分析表按班別加總每堂出席人數，並與原始表總數核對，避免將學員人數誤作出席人次。"
+          },
+          {
+            "capability_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+            "kind": "skill",
+            "name": "聯絡確認與回應追蹤",
+            "description": "聯絡前核對聯絡資料，向對方說明需確認的事項，將確認結果記入名冊，並對未回應者進行電話追蹤。"
+          },
+          {
+            "capability_id": "e337c165-5851-4f80-9f29-ce7dd68b7a60",
+            "kind": "skill",
+            "name": "報名資料核對與異常分流",
+            "description": "核對報名資料的姓名、聯絡方式及課程，辨識重複登記與付款資料差異；依異常類型向本人確認或轉交財務查帳，再依確認結果更新資料。"
+          }
+        ],
+        "task_links": [
+          {
+            "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+            "capability_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264"
+          },
+          {
+            "task_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+            "capability_id": "f9f29079-a539-4dad-aac3-6fb813741ab1"
+          },
+          {
+            "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+            "capability_id": "262fe58f-ad59-4581-a4ac-345777a13414"
+          },
+          {
+            "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+            "capability_id": "391ede89-c27d-4695-9887-94a1d3378d94"
+          },
+          {
+            "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+            "capability_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264"
+          },
+          {
+            "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+            "capability_id": "e337c165-5851-4f80-9f29-ce7dd68b7a60"
+          }
+        ],
+        "collaborators": [
+          {
+            "collaborator_id": "57059663-5256-492c-9f9f-7697778d227d",
+            "name": "財務",
+            "scope_text": "接收報名資料與匯款末五碼，查帳並確認款項入帳；課程行政專員待財務確認後更新繳費狀態。額滿、加開名額或退款事項交行政組長及財務決定。"
+          },
+          {
+            "collaborator_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+            "name": "行政組長",
+            "scope_text": "接收每季出席人次彙整，以掌握班級執行情形；額滿、加開名額或退款事項交行政組長及財務決定。老師臨時更改上課時間時，由行政組長確認時間，本職務再據以通知。"
+          },
+          {
+            "collaborator_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+            "name": "老師",
+            "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責確認名單；臨時更改上課時間時，接收本職務依行政組長確認時間發出的通知。有開課的每一天提供出席表，並確認本職務提出的姓名漏填或勾選不清楚等疑義。"
+          },
+          {
+            "collaborator_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+            "name": "場地窗口",
+            "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責處理設備；接收本職務依行政組長確認時間發出的上課時間異動通知。"
+          }
+        ],
+        "conditions": []
+      },
+      "sources": {
+        "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+        "references": [
+          {
+            "citation_id": "857a4ba0-7162-4b07-ab9b-d4a978755cf0",
+            "target_label": "職務名稱",
+            "target": {
+              "kind": "profile_field",
+              "field": "job_title",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f9702405-e2e7-4509-b699-7fbbb6380bb0",
+            "target_label": "所屬單位",
+            "target": {
+              "kind": "profile_field",
+              "field": "organization_unit",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b796cc36-f11f-45de-ab22-b25c21e8fa60",
+            "target_label": "直屬主管",
+            "target": {
+              "kind": "profile_field",
+              "field": "reports_to",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d2630c83-0ab6-476d-9acb-801a99090c55",
+            "target_label": "職務目的",
+            "target": {
+              "kind": "profile_field",
+              "field": "purpose",
+              "item_id": null,
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "f3e1045d-f4d1-4b25-ba42-6cad34a43581",
+            "target_label": "職責：成人進修班課務行政",
+            "target": {
+              "kind": "area",
+              "field": null,
+              "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "2a18dea9-701e-4d8b-9650-b22de40792cc",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 2 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "446f709a-0dfc-42d0-99b4-4d5dce11d1a6",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "15b5e25a-85f6-46a2-98e1-5d1c6b52d2a5",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：經本人確認保留、完成重複登記取消並記錄聯絡確認結果的報名名冊。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "70a85728-e543-4aa1-8aa0-6f50dcc319b4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：依財務確認結果更新的繳費狀態。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "6f54ac7d-d7e1-4371-97fa-1c48f9991dd0",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "0b81775f-23ee-42d1-8216-66b6312773d4",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "73fc2064-109b-4417-8d24-d3f4f35f7ae2",
+            "target_label": "協作：財務",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "57059663-5256-492c-9f9f-7697778d227d",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "452ec109-3792-4b6d-b08b-fe8545804c4c",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "d7453d07-ee0b-4ac6-8e5f-a0a4a6881342",
+            "target_label": "任務：交付課前報名名冊與教室資料",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "811d11e7-7561-4b44-baba-08a45d0142eb",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 成果：提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "43a0d62e-f637-4f1a-a20a-0f1a220378eb",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 要求：於課前兩個工作天交付報名名冊與教室資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "0918b15c-3505-4588-abe9-2e68e50778f7",
+            "target_label": "任務：交付課前報名名冊與教室資料 · 要求：老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+              "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5bd7a566-f51c-4f1f-bd4c-edd12667bdc4",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "847993aa-2f40-4f7b-a598-d0d4def9e512",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 成果：已發出的上課時間異動通知，以及記於名冊的確認與電話追蹤結果。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5aebbb3c-4596-4b74-b672-6c733b7c9971",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 要求：以行政組長確認的上課時間作為通知依據，不自行決定異動時間。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "749887c0-2f2a-4d82-8cc4-de2df48f39a3",
+            "target_label": "協作：老師",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b862a17a-ac56-4046-bb5c-cf2d87770917",
+            "target_label": "協作：場地窗口",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "2c2fd38a-42dd-4e56-a62f-5cd4ded553bc",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 6 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "eeea00c9-8918-4080-b354-a79f6a015494",
+            "target_label": "職責：成人進修班課務行政",
+            "target": {
+              "kind": "area",
+              "field": null,
+              "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "a6485659-5f7f-4d0d-92d0-8d30945afb55",
+            "target_label": "協作：行政組長",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "3483cae8-4c6d-45e4-9218-c9f6e4d430e5",
+            "target_label": "協作：老師",
+            "target": {
+              "kind": "collaborator",
+              "field": null,
+              "item_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b011f436-4a1d-4639-a2ee-e9afe2df1e62",
+            "target_label": "知識：出席人次統計口徑",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "12b14bab-21a2-4977-aeab-22c090189fb9",
+            "target_label": "技能：出席紀錄整理與查證",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "8f6af9e4-b543-41b9-a476-660ae1b9132e",
+            "target_label": "任務：整理並存檔課後出席紀錄",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "c76247c5-3dee-41ad-a4be-3c0373afe1db",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 成果：存於中心指定資料夾的每堂出席人數及缺漏試算表紀錄。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "b2acbb81-6308-4e3b-a7ff-b3d31a9b0ffb",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "fa520811-d6f5-4d7f-a51b-e705010b9db8",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 要求：姓名漏填或勾選不清楚須請老師確認，不自行推測出席資料。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "7d1e05b3-f6d8-421b-b15b-41a967d63cb8",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "a5353912-2b8e-42ce-b0bb-b46296b12bc6",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 使用：出席紀錄整理與查證",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "12e31379-3482-4bcf-b5e4-f87c283ccbb5",
+            "target_label": "任務：彙整季度出席人次",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "cd12f190-4801-4358-ae50-4e094edab080",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "59f19ca5-6eaf-427b-87e5-723f15cee741",
+            "target_label": "任務：彙整季度出席人次 · 成果：按班別彙整並經原始表總數核對的季度出席人次，供行政組長掌握班級執行情形。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "083610a4-8c98-464b-9756-ff1f8634a867",
+            "target_label": "任務：彙整季度出席人次 · 要求：按每堂出席累計人次，不以不重複學員人數計算；同一學員出席三堂計為三人次。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "0d757a78-edb9-443a-8b78-e93d7ba8334b",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "944c21c1-c460-419c-935b-a4a8799ba4ad",
+            "target_label": "任務：彙整季度出席人次 · 使用：出席人次統計口徑",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 8 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "1532733e-d7da-4f17-8e17-f52ac45645e1",
+            "target_label": "技能：出席紀錄整理與查證",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "41b4360d-24c3-4953-9736-a410a5acd467",
+            "target_label": "技能：試算表彙總與原始資料核對",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "391ede89-c27d-4695-9887-94a1d3378d94",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "648fa4b8-5226-410d-96de-2cb875d6a7ec",
+            "target_label": "技能：聯絡確認與回應追蹤",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "287e1fc0-8c76-4ae7-b091-0a621cb9f7da",
+            "target_label": "任務：整理並存檔課後出席紀錄",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "225624f5-103b-43a5-b722-9b372ca2d75b",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 使用：出席紀錄整理與查證",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "b4331b5a-dc33-492d-ba28-b10c5d25f0ca",
+            "target_label": "任務：整理並存檔課後出席紀錄 · 要求：核對課程代碼及上課日期，避免將不同班或不同日期的出席資料合在一起。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "b0579296-0257-4369-b09d-a8c86ff1c1d0",
+              "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "683aa58c-8aa3-4fcd-8255-c2ba36453621",
+            "target_label": "任務：彙整季度出席人次 · 成果：按班別彙整並經原始表總數核對的季度出席人次，供行政組長掌握班級執行情形。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "7574013a-fcf3-4cf4-803f-90361a2d1894",
+            "target_label": "任務：彙整季度出席人次 · 使用：試算表彙總與原始資料核對",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "391ede89-c27d-4695-9887-94a1d3378d94",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "5a41b211-6564-4932-9f70-a437ce4472e2",
+            "target_label": "任務：彙整季度出席人次",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "cd12f190-4801-4358-ae50-4e094edab080",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "98cb1adf-30b0-4e23-8663-66d358582a09",
+            "target_label": "任務：彙整季度出席人次 · 要求：樞紐分析表的彙總總數須與原始表總數核對。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "4b3b0d0d-9cc0-4cac-b212-d29f01342cf7",
+              "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "ab7c8e2a-7627-49f5-9c98-7869cebbdefd",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：經本人確認保留、完成重複登記取消並記錄聯絡確認結果的報名名冊。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "4259a9db-0d24-4122-b4aa-aa6cefefec62",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 使用：聯絡確認與回應追蹤",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "258d4024-e32f-4291-b79f-0eca6336d794",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "de96a385-1246-42d4-8863-852f40016346",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 成果：已發出的上課時間異動通知，以及記於名冊的確認與電話追蹤結果。",
+            "target": {
+              "kind": "detail",
+              "field": null,
+              "item_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "298037ae-3c93-4844-a6b4-b12da4833938",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應 · 使用：聯絡確認與回應追蹤",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+              "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "896cbfd9-3af9-458a-a95e-f5e9b70085c2",
+            "target_label": "任務：通知上課時間異動並追蹤學員回應",
+            "target": {
+              "kind": "task",
+              "field": null,
+              "item_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 10 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "917698aa-683f-48bb-a788-ab9e79741aaf",
+            "target_label": "技能：報名資料核對與異常分流",
+            "target": {
+              "kind": "capability",
+              "field": null,
+              "item_id": "e337c165-5851-4f80-9f29-ce7dd68b7a60",
+              "task_id": null
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          },
+          {
+            "citation_id": "8ea23343-7a89-4892-83a5-600174bda0a8",
+            "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 使用：報名資料核對與異常分流",
+            "target": {
+              "kind": "task_capability",
+              "field": null,
+              "item_id": "e337c165-5851-4f80-9f29-ce7dd68b7a60",
+              "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+            },
+            "source_kind": "interview",
+            "source_label": "訪談序號 4 · 員工",
+            "needs_recheck": false
+          }
+        ]
+      }
+    }
+  ],
+  "job_file_id": "3450e704-3cb5-4b38-8d10-c2aae7156416",
+  "executions": [
+    [
+      "memory_batch",
+      "completed",
+      3
+    ],
+    [
+      "consultant_turn",
+      "completed",
+      6
+    ]
+  ],
+  "interviews": {
+    "messages": [
+      {
+        "source_id": "d09af2c7-ec14-4c3b-addc-e78bf39ee701",
+        "interview_sequence": 1,
+        "speaker": "app",
+        "interview_text": "這裡會透過訪談，逐步理解您的實際工作並整理職務說明書。您不需要先學會撰寫，也不必一次說完；不確定的地方可以直接說明。\n\n請先說說您目前主要負責哪些工作？可以用自己的說法，從平常大家會找您處理的事情開始。",
+        "execution_id": null
+      },
+      {
+        "source_id": "a52dcf7e-3dfc-4e5f-b437-9a2a0ab7bce2",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。",
+        "execution_id": null
+      },
+      {
+        "source_id": "c5270f10-87e3-41e8-ad36-bdc9f8a9014a",
+        "interview_sequence": 3,
+        "speaker": "consultant",
+        "interview_text": "已先將您的職稱、匯報關係與主要工作範圍納入草稿，並明確保留責任界線：**負責課務行政，不授課，也不決定開課或收費。**\n\n接著想了解報名核對時，您實際怎麼處理問題。先從攝影班付款資料對不起來的那一筆說起：**您拿哪些資料比對，發現差異後又做了什麼？** 如果還沒處理完，說到目前進度即可。",
+        "execution_id": "b4867a63-78ce-4821-a3b5-12c4bf7f356f"
+      },
+      {
+        "source_id": "bf689ab6-fc15-4d7f-868b-b5947f6db22b",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。",
+        "execution_id": null
+      },
+      {
+        "source_id": "36f3bb9e-fba7-4556-a939-2a6d25a1a8ba",
+        "interview_sequence": 5,
+        "speaker": "consultant",
+        "interview_text": "已在草稿中補上每日報名核對、重複登記處理及繳費異常交接，並明確區分：**您負責核對與更新資料，財務確認入帳；名額與退款事項由行政組長及財務決定。**\n\n接著看報名之後的課前準備：以下週攝影班為例，**您會整理哪些名單與教室資料，交給誰使用？**",
+        "execution_id": "ac78bbc6-afc0-4515-8e50-3c2a009b7718"
+      },
+      {
+        "source_id": "c3357d09-856f-4764-ad84-021272959f7b",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。",
+        "execution_id": null
+      },
+      {
+        "source_id": "3cdef92a-7d8e-4e6c-820b-b7c25796aa17",
+        "interview_sequence": 7,
+        "speaker": "consultant",
+        "interview_text": "已補入草稿：**課前兩個工作天交付資料**，以及依行政組長確認的時間發出異動通知、電話追蹤未回應學員並記錄結果。也區分了老師確認名單、場地窗口處理設備的責任。\n\n教室或其他安排變動的細節，先保留待釐清即可。\n\n接著談您提到的課後紀錄：**一堂課結束後，您通常要整理哪些紀錄，資料由誰提供？**",
+        "execution_id": "d497bc36-d9d3-460a-9153-d0db081c69a4"
+      },
+      {
+        "source_id": "e1c6e6cf-5130-4163-a4e1-d5bb239038b1",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。",
+        "execution_id": null
+      },
+      {
+        "source_id": "5a7fd6dd-4ceb-450a-a62d-6673b4fffe35",
+        "interview_sequence": 9,
+        "speaker": "consultant",
+        "interview_text": "已將草稿中的「每月彙整」更正為 **每季彙整**；每天整理出席表、課前兩個工作天交資料的安排都維持不變。\n\n也補上缺漏須請老師確認、完成後存入指定資料夾，以及 **按每堂出席累計人次，而非計算不重複學員人數** 的統計口徑。\n\n接著想確認收尾工作：**一整期課程結束時，除了出席紀錄，您還需要做哪些收尾或交接？** 若沒有其他工作，也可以直接說沒有。",
+        "execution_id": "cb7b9795-40a2-40d3-b629-dfb917262db7"
+      },
+      {
+        "source_id": "4693d39e-3477-421c-b55d-6a6376ef9e85",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。",
+        "execution_id": null
+      },
+      {
+        "source_id": "cf120708-ae61-4cf1-a900-4b12151af18c",
+        "interview_sequence": 11,
+        "speaker": "consultant",
+        "interview_text": "已把班別與日期核對、樞紐分析彙總及原始總數核對補進草稿，也補上聯絡前核對資料、將確認結果記入名冊的做法。**課後紀錄只寫出席紀錄**，不擴增其他紀錄責任。\n\n接著想確認工作範圍是否還有遺漏：**除了這些例行課務，還有沒有偶爾才發生、但仍由您負責的支援工作？** 有的話，可以挑一次說說您做了什麼；沒有也可以直接說沒有。",
+        "execution_id": "f82748e0-6f4d-4307-8d43-84f803fe8acb"
+      },
+      {
+        "source_id": "abee93a0-193d-46a9-b538-36f38118ad2e",
+        "interview_sequence": 12,
+        "speaker": "employee",
+        "interview_text": "目前我主要做的工作大致都說了。我想先整理目前已談到的工作，其他不清楚的部分先保留未知。請幫我檢查現在的職務說明書還缺什麼。",
+        "execution_id": null
+      },
+      {
+        "source_id": "5a129b77-ea1d-48b6-b39f-47307708cca9",
+        "interview_sequence": 13,
+        "speaker": "consultant",
+        "interview_text": "核對後，**目前草稿已涵蓋您已說明的五項主要工作，沒有發現主要職責遺漏**。剩下的主要是尚未確認的執行細節，可以先保留未知，不必現在補齊。\n\n### 已經寫清楚的內容\n- 報名核對、重複登記處理及付款異常轉交。\n- 課前兩個工作天交付名冊與教室資料。\n- 經組長確認後通知上課時間異動，並追蹤回應。\n- 有開課日的出席資料核對、查證與存檔。\n- **每季**按班別彙整出席人次，並與原始總數核對。\n\n職稱、單位、匯報對象及與財務、老師、場地窗口的責任界線也已納入。這次另外補上了有事實依據的「報名資料核對與異常分流」技能。\n\n### 尚待確認的部分\n1. **課前資料的內容與準備責任**：具體包含哪些資料，哪些由您整理、哪些由他人提供。\n2. **無法取得確認時的處理界線**：例如電話追蹤仍無回應，或老師尚未確認出席疑義時，如何回報或交接。\n3. **教室及其他安排異動**：目前只寫已確認的時間異動流程，不推定您負責教室調度或設備處理。\n4. **實際值勤條件**：服務平日晚上及週末的課程，不等於已確認您本人的班表或輪班要求。\n\n學歷、證照、年資及數字 KPI 目前沒有依據，**不需要為了填滿欄位而添加**。\n\n您想下一步先看一份精簡的 JD 文字版，並把上述待確認事項另列在文末嗎？",
+        "execution_id": "55456d5c-2854-43a3-9969-c849a07c1119"
+      }
+    ]
+  },
+  "profile": {
+    "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+    "profile": {
+      "job_title": "課程行政專員",
+      "organization_unit": "成人教育中心",
+      "reports_to": "行政組長",
+      "purpose": "為成人進修班提供課務行政支援與出席人次資訊，支援課程運作。"
+    }
+  },
+  "work": {
+    "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+    "areas": [
+      {
+        "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+        "title": "成人進修班課務行政",
+        "scope_text": "服務平日晚上及週末的成人進修班，處理報名、課前名單與教室資料、課程異動通知、課後出席紀錄及每季出席人次彙整；不負責授課，也不決定開課或收費。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+        "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+        "title": "核對報名資料並處理重複登記與繳費異常",
+        "description": "每日核對成人進修班報名表的姓名、聯絡方式及課程。發現重複報名時，聯絡本人確認保留哪筆，再取消重複登記；付款資料對不上時，將報名資料與匯款末五碼交財務查帳，待財務確認後更新繳費狀態。報名聯絡前先核對聯絡資料，說明需確認的事項，將確認結果記入名冊；未回應者以電話追蹤。",
+        "outcomes": [
+          {
+            "detail_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+            "text": "經本人確認保留、完成重複登記取消並記錄聯絡確認結果的報名名冊。"
+          },
+          {
+            "detail_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+            "text": "依財務確認結果更新的繳費狀態。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+            "text": "須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。"
+          },
+          {
+            "detail_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+            "text": "額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。"
+          }
+        ]
+      },
+      {
+        "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+        "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+        "title": "交付課前報名名冊與教室資料",
+        "description": "將報名名冊與教室資料交給老師及場地窗口，供課前確認名單與處理設備使用。",
+        "outcomes": [
+          {
+            "detail_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+            "text": "提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+            "text": "於課前兩個工作天交付報名名冊與教室資料。"
+          },
+          {
+            "detail_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+            "text": "老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。"
+          }
+        ]
+      },
+      {
+        "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+        "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+        "title": "通知上課時間異動並追蹤學員回應",
+        "description": "老師臨時更改上課時間時，先取得行政組長確認的時間；核對聯絡資料後以簡訊通知學員，並通知老師與場地窗口，說明需確認的異動事項。將確認結果記入名冊，對未回應的學員再以電話確認並記錄結果。",
+        "outcomes": [
+          {
+            "detail_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+            "text": "已發出的上課時間異動通知，以及記於名冊的確認與電話追蹤結果。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+            "text": "以行政組長確認的上課時間作為通知依據，不自行決定異動時間。"
+          }
+        ]
+      },
+      {
+        "task_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+        "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+        "title": "整理並存檔課後出席紀錄",
+        "description": "有開課的每一天，接收老師提供的出席表，按課程代碼與上課日期核對，將每堂出席人數及缺漏整理到試算表並篩選缺漏；姓名漏填或勾選不清楚時請老師確認，完成後存至中心指定資料夾。",
+        "outcomes": [
+          {
+            "detail_id": "b2acbb81-6308-4e3b-a7ff-b3d31a9b0ffb",
+            "text": "存於中心指定資料夾的每堂出席人數及缺漏試算表紀錄。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "7d1e05b3-f6d8-421b-b15b-41a967d63cb8",
+            "text": "姓名漏填或勾選不清楚須請老師確認，不自行推測出席資料。"
+          },
+          {
+            "detail_id": "b0579296-0257-4369-b09d-a8c86ff1c1d0",
+            "text": "核對課程代碼及上課日期，避免將不同班或不同日期的出席資料合在一起。"
+          }
+        ]
+      },
+      {
+        "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+        "area_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+        "title": "彙整季度出席人次",
+        "description": "每季以樞紐分析表按班別加總每堂出席人數，並與原始表總數核對，彙整出席人次供行政組長掌握班級執行情形。",
+        "outcomes": [
+          {
+            "detail_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+            "text": "按班別彙整並經原始表總數核對的季度出席人次，供行政組長掌握班級執行情形。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "0d757a78-edb9-443a-8b78-e93d7ba8334b",
+            "text": "按每堂出席累計人次，不以不重複學員人數計算；同一學員出席三堂計為三人次。"
+          },
+          {
+            "detail_id": "4b3b0d0d-9cc0-4cac-b212-d29f01342cf7",
+            "text": "樞紐分析表的彙總總數須與原始表總數核對。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [
+      {
+        "capability_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+        "kind": "knowledge",
+        "name": "出席人次統計口徑",
+        "description": "出席人次按每堂出席累計，不以不重複學員人數計算；同一位學員出席三堂計為三人次。"
+      },
+      {
+        "capability_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+        "kind": "skill",
+        "name": "出席紀錄整理與查證",
+        "description": "按課程代碼與上課日期核對出席表，避免混入不同班或不同日期的資料；運用試算表篩選缺漏，辨識姓名漏填或勾選不清楚的紀錄，並向老師查證後完成整理。"
+      },
+      {
+        "capability_id": "391ede89-c27d-4695-9887-94a1d3378d94",
+        "kind": "skill",
+        "name": "試算表彙總與原始資料核對",
+        "description": "運用樞紐分析表按班別加總每堂出席人數，並與原始表總數核對，避免將學員人數誤作出席人次。"
+      },
+      {
+        "capability_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+        "kind": "skill",
+        "name": "聯絡確認與回應追蹤",
+        "description": "聯絡前核對聯絡資料，向對方說明需確認的事項，將確認結果記入名冊，並對未回應者進行電話追蹤。"
+      },
+      {
+        "capability_id": "e337c165-5851-4f80-9f29-ce7dd68b7a60",
+        "kind": "skill",
+        "name": "報名資料核對與異常分流",
+        "description": "核對報名資料的姓名、聯絡方式及課程，辨識重複登記與付款資料差異；依異常類型向本人確認或轉交財務查帳，再依確認結果更新資料。"
+      }
+    ],
+    "task_links": [
+      {
+        "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+        "capability_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264"
+      },
+      {
+        "task_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+        "capability_id": "f9f29079-a539-4dad-aac3-6fb813741ab1"
+      },
+      {
+        "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+        "capability_id": "262fe58f-ad59-4581-a4ac-345777a13414"
+      },
+      {
+        "task_id": "cd12f190-4801-4358-ae50-4e094edab080",
+        "capability_id": "391ede89-c27d-4695-9887-94a1d3378d94"
+      },
+      {
+        "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+        "capability_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264"
+      },
+      {
+        "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+        "capability_id": "e337c165-5851-4f80-9f29-ce7dd68b7a60"
+      }
+    ],
+    "collaborators": [
+      {
+        "collaborator_id": "57059663-5256-492c-9f9f-7697778d227d",
+        "name": "財務",
+        "scope_text": "接收報名資料與匯款末五碼，查帳並確認款項入帳；課程行政專員待財務確認後更新繳費狀態。額滿、加開名額或退款事項交行政組長及財務決定。"
+      },
+      {
+        "collaborator_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+        "name": "行政組長",
+        "scope_text": "接收每季出席人次彙整，以掌握班級執行情形；額滿、加開名額或退款事項交行政組長及財務決定。老師臨時更改上課時間時，由行政組長確認時間，本職務再據以通知。"
+      },
+      {
+        "collaborator_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+        "name": "老師",
+        "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責確認名單；臨時更改上課時間時，接收本職務依行政組長確認時間發出的通知。有開課的每一天提供出席表，並確認本職務提出的姓名漏填或勾選不清楚等疑義。"
+      },
+      {
+        "collaborator_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+        "name": "場地窗口",
+        "scope_text": "於課前兩個工作天接收報名名冊與教室資料，並負責處理設備；接收本職務依行政組長確認時間發出的上課時間異動通知。"
+      }
+    ],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+    "references": [
+      {
+        "citation_id": "857a4ba0-7162-4b07-ab9b-d4a978755cf0",
+        "target_label": "職務名稱",
+        "target": {
+          "kind": "profile_field",
+          "field": "job_title",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "f9702405-e2e7-4509-b699-7fbbb6380bb0",
+        "target_label": "所屬單位",
+        "target": {
+          "kind": "profile_field",
+          "field": "organization_unit",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "b796cc36-f11f-45de-ab22-b25c21e8fa60",
+        "target_label": "直屬主管",
+        "target": {
+          "kind": "profile_field",
+          "field": "reports_to",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "d2630c83-0ab6-476d-9acb-801a99090c55",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "f3e1045d-f4d1-4b25-ba42-6cad34a43581",
+        "target_label": "職責：成人進修班課務行政",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "2a18dea9-701e-4d8b-9650-b22de40792cc",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "446f709a-0dfc-42d0-99b4-4d5dce11d1a6",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "15b5e25a-85f6-46a2-98e1-5d1c6b52d2a5",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：經本人確認保留、完成重複登記取消並記錄聯絡確認結果的報名名冊。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+          "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "70a85728-e543-4aa1-8aa0-6f50dcc319b4",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：依財務確認結果更新的繳費狀態。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "f69a0fe1-c405-468d-af94-b88d0f7e880d",
+          "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "6f54ac7d-d7e1-4371-97fa-1c48f9991dd0",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：須待財務確認後才能更新繳費狀態，不得自行認定款項已入帳。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "ac6e8fb5-eee5-4dac-b94c-3445f92cef13",
+          "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "0b81775f-23ee-42d1-8216-66b6312773d4",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 要求：額滿、加開名額或退款事項交行政組長及財務決定，不由本職務自行決定。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "919201aa-7d2e-4a55-ae49-fd8998901dd6",
+          "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "73fc2064-109b-4417-8d24-d3f4f35f7ae2",
+        "target_label": "協作：財務",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "57059663-5256-492c-9f9f-7697778d227d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "452ec109-3792-4b6d-b08b-fe8545804c4c",
+        "target_label": "協作：行政組長",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "d7453d07-ee0b-4ac6-8e5f-a0a4a6881342",
+        "target_label": "任務：交付課前報名名冊與教室資料",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "0b69428a-52f7-401a-9603-c87c6f2c355e",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "811d11e7-7561-4b44-baba-08a45d0142eb",
+        "target_label": "任務：交付課前報名名冊與教室資料 · 成果：提供老師確認名單及場地窗口處理設備所需的報名名冊與教室資料。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "c36aa387-923a-47e3-8782-a569bd7f5c37",
+          "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "43a0d62e-f637-4f1a-a20a-0f1a220378eb",
+        "target_label": "任務：交付課前報名名冊與教室資料 · 要求：於課前兩個工作天交付報名名冊與教室資料。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "b2f38e82-5524-47ce-b5a9-ac5615255a70",
+          "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "0918b15c-3505-4588-abe9-2e68e50778f7",
+        "target_label": "任務：交付課前報名名冊與教室資料 · 要求：老師負責確認名單，場地窗口負責處理設備；本職務負責資料交付。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "2877a43d-ef1a-4e68-9bdd-060d0e721ce6",
+          "task_id": "0b69428a-52f7-401a-9603-c87c6f2c355e"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "5bd7a566-f51c-4f1f-bd4c-edd12667bdc4",
+        "target_label": "任務：通知上課時間異動並追蹤學員回應",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "847993aa-2f40-4f7b-a598-d0d4def9e512",
+        "target_label": "任務：通知上課時間異動並追蹤學員回應 · 成果：已發出的上課時間異動通知，以及記於名冊的確認與電話追蹤結果。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+          "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "5aebbb3c-4596-4b74-b672-6c733b7c9971",
+        "target_label": "任務：通知上課時間異動並追蹤學員回應 · 要求：以行政組長確認的上課時間作為通知依據，不自行決定異動時間。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "52a0240f-08ea-410c-ad00-c5132f4fa536",
+          "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "749887c0-2f2a-4d82-8cc4-de2df48f39a3",
+        "target_label": "協作：老師",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "b862a17a-ac56-4046-bb5c-cf2d87770917",
+        "target_label": "協作：場地窗口",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "8bb6382d-1ee1-4553-95d1-2852c536bbac",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "2c2fd38a-42dd-4e56-a62f-5cd4ded553bc",
+        "target_label": "協作：行政組長",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "eeea00c9-8918-4080-b354-a79f6a015494",
+        "target_label": "職責：成人進修班課務行政",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "22b7a3d7-73c0-4594-8456-9df8c7711dec",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "a6485659-5f7f-4d0d-92d0-8d30945afb55",
+        "target_label": "協作：行政組長",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "2ab0888f-166b-4f2e-936a-c22054b9dec5",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "3483cae8-4c6d-45e4-9218-c9f6e4d430e5",
+        "target_label": "協作：老師",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "adde2e62-17df-49de-8e18-67b2f5907cfd",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "b011f436-4a1d-4639-a2ee-e9afe2df1e62",
+        "target_label": "知識：出席人次統計口徑",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "12b14bab-21a2-4977-aeab-22c090189fb9",
+        "target_label": "技能：出席紀錄整理與查證",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "8f6af9e4-b543-41b9-a476-660ae1b9132e",
+        "target_label": "任務：整理並存檔課後出席紀錄",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "c76247c5-3dee-41ad-a4be-3c0373afe1db",
+        "target_label": "任務：整理並存檔課後出席紀錄 · 成果：存於中心指定資料夾的每堂出席人數及缺漏試算表紀錄。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "b2acbb81-6308-4e3b-a7ff-b3d31a9b0ffb",
+          "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "fa520811-d6f5-4d7f-a51b-e705010b9db8",
+        "target_label": "任務：整理並存檔課後出席紀錄 · 要求：姓名漏填或勾選不清楚須請老師確認，不自行推測出席資料。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "7d1e05b3-f6d8-421b-b15b-41a967d63cb8",
+          "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "a5353912-2b8e-42ce-b0bb-b46296b12bc6",
+        "target_label": "任務：整理並存檔課後出席紀錄 · 使用：出席紀錄整理與查證",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+          "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "12e31379-3482-4bcf-b5e4-f87c283ccbb5",
+        "target_label": "任務：彙整季度出席人次",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "cd12f190-4801-4358-ae50-4e094edab080",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "59f19ca5-6eaf-427b-87e5-723f15cee741",
+        "target_label": "任務：彙整季度出席人次 · 成果：按班別彙整並經原始表總數核對的季度出席人次，供行政組長掌握班級執行情形。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+          "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "083610a4-8c98-464b-9756-ff1f8634a867",
+        "target_label": "任務：彙整季度出席人次 · 要求：按每堂出席累計人次，不以不重複學員人數計算；同一學員出席三堂計為三人次。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "0d757a78-edb9-443a-8b78-e93d7ba8334b",
+          "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "944c21c1-c460-419c-935b-a4a8799ba4ad",
+        "target_label": "任務：彙整季度出席人次 · 使用：出席人次統計口徑",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "262fe58f-ad59-4581-a4ac-345777a13414",
+          "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "1532733e-d7da-4f17-8e17-f52ac45645e1",
+        "target_label": "技能：出席紀錄整理與查證",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "41b4360d-24c3-4953-9736-a410a5acd467",
+        "target_label": "技能：試算表彙總與原始資料核對",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "391ede89-c27d-4695-9887-94a1d3378d94",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "648fa4b8-5226-410d-96de-2cb875d6a7ec",
+        "target_label": "技能：聯絡確認與回應追蹤",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "287e1fc0-8c76-4ae7-b091-0a621cb9f7da",
+        "target_label": "任務：整理並存檔課後出席紀錄",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "906426fc-e22c-479c-a639-026fa835fcc3",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "225624f5-103b-43a5-b722-9b372ca2d75b",
+        "target_label": "任務：整理並存檔課後出席紀錄 · 使用：出席紀錄整理與查證",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "f9f29079-a539-4dad-aac3-6fb813741ab1",
+          "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "b4331b5a-dc33-492d-ba28-b10c5d25f0ca",
+        "target_label": "任務：整理並存檔課後出席紀錄 · 要求：核對課程代碼及上課日期，避免將不同班或不同日期的出席資料合在一起。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "b0579296-0257-4369-b09d-a8c86ff1c1d0",
+          "task_id": "906426fc-e22c-479c-a639-026fa835fcc3"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "683aa58c-8aa3-4fcd-8255-c2ba36453621",
+        "target_label": "任務：彙整季度出席人次 · 成果：按班別彙整並經原始表總數核對的季度出席人次，供行政組長掌握班級執行情形。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "95cfe685-9c19-496d-bd5d-f4960ee1cec3",
+          "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "7574013a-fcf3-4cf4-803f-90361a2d1894",
+        "target_label": "任務：彙整季度出席人次 · 使用：試算表彙總與原始資料核對",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "391ede89-c27d-4695-9887-94a1d3378d94",
+          "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "5a41b211-6564-4932-9f70-a437ce4472e2",
+        "target_label": "任務：彙整季度出席人次",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "cd12f190-4801-4358-ae50-4e094edab080",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "98cb1adf-30b0-4e23-8663-66d358582a09",
+        "target_label": "任務：彙整季度出席人次 · 要求：樞紐分析表的彙總總數須與原始表總數核對。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "4b3b0d0d-9cc0-4cac-b212-d29f01342cf7",
+          "task_id": "cd12f190-4801-4358-ae50-4e094edab080"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "ab7c8e2a-7627-49f5-9c98-7869cebbdefd",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 成果：經本人確認保留、完成重複登記取消並記錄聯絡確認結果的報名名冊。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "bbe5e9ec-8f29-4e22-b927-c3dce673c137",
+          "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "4259a9db-0d24-4122-b4aa-aa6cefefec62",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 使用：聯絡確認與回應追蹤",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+          "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "258d4024-e32f-4291-b79f-0eca6336d794",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "e62bf465-69d5-4f23-a302-5e276cd629db",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "de96a385-1246-42d4-8863-852f40016346",
+        "target_label": "任務：通知上課時間異動並追蹤學員回應 · 成果：已發出的上課時間異動通知，以及記於名冊的確認與電話追蹤結果。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "10d80f20-b589-41cf-8979-6243bf8d34c2",
+          "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "298037ae-3c93-4844-a6b4-b12da4833938",
+        "target_label": "任務：通知上課時間異動並追蹤學員回應 · 使用：聯絡確認與回應追蹤",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "1c0b26e2-ae8b-4916-9b01-d69bf6f21264",
+          "task_id": "16da0fab-907b-42a7-8822-bd930bfcaf31"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "896cbfd9-3af9-458a-a95e-f5e9b70085c2",
+        "target_label": "任務：通知上課時間異動並追蹤學員回應",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "16da0fab-907b-42a7-8822-bd930bfcaf31",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "917698aa-683f-48bb-a788-ab9e79741aaf",
+        "target_label": "技能：報名資料核對與異常分流",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "e337c165-5851-4f80-9f29-ce7dd68b7a60",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false
+      },
+      {
+        "citation_id": "8ea23343-7a89-4892-83a5-600174bda0a8",
+        "target_label": "任務：核對報名資料並處理重複登記與繳費異常 · 使用：報名資料核對與異常分流",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "e337c165-5851-4f80-9f29-ce7dd68b7a60",
+          "task_id": "e62bf465-69d5-4f23-a302-5e276cd629db"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false
+      }
+    ]
+  },
+  "source_contents": {
+    "857a4ba0-7162-4b07-ab9b-d4a978755cf0": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "857a4ba0-7162-4b07-ab9b-d4a978755cf0",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+      }
+    },
+    "f9702405-e2e7-4509-b699-7fbbb6380bb0": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "f9702405-e2e7-4509-b699-7fbbb6380bb0",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+      }
+    },
+    "b796cc36-f11f-45de-ab22-b25c21e8fa60": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "b796cc36-f11f-45de-ab22-b25c21e8fa60",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+      }
+    },
+    "d2630c83-0ab6-476d-9acb-801a99090c55": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "d2630c83-0ab6-476d-9acb-801a99090c55",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+      }
+    },
+    "f3e1045d-f4d1-4b25-ba42-6cad34a43581": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "f3e1045d-f4d1-4b25-ba42-6cad34a43581",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+      }
+    },
+    "2a18dea9-701e-4d8b-9650-b22de40792cc": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "2a18dea9-701e-4d8b-9650-b22de40792cc",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+      }
+    },
+    "446f709a-0dfc-42d0-99b4-4d5dce11d1a6": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "446f709a-0dfc-42d0-99b4-4d5dce11d1a6",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。"
+      }
+    },
+    "15b5e25a-85f6-46a2-98e1-5d1c6b52d2a5": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "15b5e25a-85f6-46a2-98e1-5d1c6b52d2a5",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。"
+      }
+    },
+    "70a85728-e543-4aa1-8aa0-6f50dcc319b4": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "70a85728-e543-4aa1-8aa0-6f50dcc319b4",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。"
+      }
+    },
+    "6f54ac7d-d7e1-4371-97fa-1c48f9991dd0": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "6f54ac7d-d7e1-4371-97fa-1c48f9991dd0",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。"
+      }
+    },
+    "0b81775f-23ee-42d1-8216-66b6312773d4": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "0b81775f-23ee-42d1-8216-66b6312773d4",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。"
+      }
+    },
+    "73fc2064-109b-4417-8d24-d3f4f35f7ae2": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "73fc2064-109b-4417-8d24-d3f4f35f7ae2",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。"
+      }
+    },
+    "452ec109-3792-4b6d-b08b-fe8545804c4c": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "452ec109-3792-4b6d-b08b-fe8545804c4c",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。"
+      }
+    },
+    "d7453d07-ee0b-4ac6-8e5f-a0a4a6881342": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "d7453d07-ee0b-4ac6-8e5f-a0a4a6881342",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "811d11e7-7561-4b44-baba-08a45d0142eb": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "811d11e7-7561-4b44-baba-08a45d0142eb",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "43a0d62e-f637-4f1a-a20a-0f1a220378eb": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "43a0d62e-f637-4f1a-a20a-0f1a220378eb",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "0918b15c-3505-4588-abe9-2e68e50778f7": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "0918b15c-3505-4588-abe9-2e68e50778f7",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "5bd7a566-f51c-4f1f-bd4c-edd12667bdc4": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "5bd7a566-f51c-4f1f-bd4c-edd12667bdc4",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "847993aa-2f40-4f7b-a598-d0d4def9e512": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "847993aa-2f40-4f7b-a598-d0d4def9e512",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "5aebbb3c-4596-4b74-b672-6c733b7c9971": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "5aebbb3c-4596-4b74-b672-6c733b7c9971",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "749887c0-2f2a-4d82-8cc4-de2df48f39a3": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "749887c0-2f2a-4d82-8cc4-de2df48f39a3",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "b862a17a-ac56-4046-bb5c-cf2d87770917": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "b862a17a-ac56-4046-bb5c-cf2d87770917",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "2c2fd38a-42dd-4e56-a62f-5cd4ded553bc": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "2c2fd38a-42dd-4e56-a62f-5cd4ded553bc",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "課前兩個工作天，我會把報名名冊和教室資料交給老師及場地窗口；老師確認名單，場地窗口處理設備。若老師臨時改上課時間，我會先取得行政組長確認的時間，再用簡訊通知學員，也通知老師和場地窗口；沒回應的人會再打電話確認並記錄結果。教室或其他安排變動的細節，我不太確定。"
+      }
+    },
+    "eeea00c9-8918-4080-b354-a79f6a015494": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "eeea00c9-8918-4080-b354-a79f6a015494",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "a6485659-5f7f-4d0d-92d0-8d30945afb55": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "a6485659-5f7f-4d0d-92d0-8d30945afb55",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "3483cae8-4c6d-45e4-9218-c9f6e4d430e5": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "3483cae8-4c6d-45e4-9218-c9f6e4d430e5",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "b011f436-4a1d-4639-a2ee-e9afe2df1e62": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "b011f436-4a1d-4639-a2ee-e9afe2df1e62",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "12b14bab-21a2-4977-aeab-22c090189fb9": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "12b14bab-21a2-4977-aeab-22c090189fb9",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "8f6af9e4-b543-41b9-a476-660ae1b9132e": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "8f6af9e4-b543-41b9-a476-660ae1b9132e",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "c76247c5-3dee-41ad-a4be-3c0373afe1db": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "c76247c5-3dee-41ad-a4be-3c0373afe1db",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "fa520811-d6f5-4d7f-a51b-e705010b9db8": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "fa520811-d6f5-4d7f-a51b-e705010b9db8",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "a5353912-2b8e-42ce-b0bb-b46296b12bc6": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "a5353912-2b8e-42ce-b0bb-b46296b12bc6",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "12e31379-3482-4bcf-b5e4-f87c283ccbb5": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "12e31379-3482-4bcf-b5e4-f87c283ccbb5",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "59f19ca5-6eaf-427b-87e5-723f15cee741": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "59f19ca5-6eaf-427b-87e5-723f15cee741",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "083610a4-8c98-464b-9756-ff1f8634a867": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "083610a4-8c98-464b-9756-ff1f8634a867",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "944c21c1-c460-419c-935b-a4a8799ba4ad": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "944c21c1-c460-419c-935b-a4a8799ba4ad",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "有開課的每一天，老師會交出席表，我把每堂出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚，我會請老師確認，不會自己猜，完成後存到中心指定資料夾。出席人次原本每月彙整，後來改成每季一次，提供行政組長掌握班級執行情形；同一位學員來三堂會算三人次，不是只算一個人。 對了，我剛剛講錯一件事：給行政組長的出席人次彙整現在是每季一次，不是每月，以前才是每月。其他像每天整理出席表、課前兩個工作天交資料都沒有改。"
+      }
+    },
+    "1532733e-d7da-4f17-8e17-f52ac45645e1": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "1532733e-d7da-4f17-8e17-f52ac45645e1",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "41b4360d-24c3-4953-9736-a410a5acd467": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "41b4360d-24c3-4953-9736-a410a5acd467",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "648fa4b8-5226-410d-96de-2cb875d6a7ec": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "648fa4b8-5226-410d-96de-2cb875d6a7ec",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "287e1fc0-8c76-4ae7-b091-0a621cb9f7da": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "287e1fc0-8c76-4ae7-b091-0a621cb9f7da",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "225624f5-103b-43a5-b722-9b372ca2d75b": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "225624f5-103b-43a5-b722-9b372ca2d75b",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "b4331b5a-dc33-492d-ba28-b10c5d25f0ca": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "b4331b5a-dc33-492d-ba28-b10c5d25f0ca",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "683aa58c-8aa3-4fcd-8255-c2ba36453621": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "683aa58c-8aa3-4fcd-8255-c2ba36453621",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "7574013a-fcf3-4cf4-803f-90361a2d1894": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "7574013a-fcf3-4cf4-803f-90361a2d1894",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "5a41b211-6564-4932-9f70-a437ce4472e2": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "5a41b211-6564-4932-9f70-a437ce4472e2",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "98cb1adf-30b0-4e23-8663-66d358582a09": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "98cb1adf-30b0-4e23-8663-66d358582a09",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "ab7c8e2a-7627-49f5-9c98-7869cebbdefd": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "ab7c8e2a-7627-49f5-9c98-7869cebbdefd",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "4259a9db-0d24-4122-b4aa-aa6cefefec62": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "4259a9db-0d24-4122-b4aa-aa6cefefec62",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "258d4024-e32f-4291-b79f-0eca6336d794": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "258d4024-e32f-4291-b79f-0eca6336d794",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "de96a385-1246-42d4-8863-852f40016346": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "de96a385-1246-42d4-8863-852f40016346",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "298037ae-3c93-4844-a6b4-b12da4833938": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "298037ae-3c93-4844-a6b4-b12da4833938",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "896cbfd9-3af9-458a-a95e-f5e9b70085c2": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "896cbfd9-3af9-458a-a95e-f5e9b70085c2",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "課後紀錄目前就是出席紀錄，沒有其他我負責的紀錄。我會先按課程代碼和上課日期核對出席表，確認沒有把不同班或不同天合在一起，再用試算表篩選缺漏，姓名或勾選不清楚就請老師確認。季末用樞紐分析表按班別加總每堂出席人數，再跟原始表的總數核對，避免把學員人數當成人次。報名和通知時，我會先核對聯絡資料，說明要請對方確認哪一件事，再把確認結果記在名冊；沒回應就按前面說的電話追蹤。教室變動其他細節我仍不清楚。"
+      }
+    },
+    "917698aa-683f-48bb-a788-ab9e79741aaf": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "917698aa-683f-48bb-a788-ab9e79741aaf",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。"
+      }
+    },
+    "8ea23343-7a89-4892-83a5-600174bda0a8": {
+      "revision_id": "4ee14de2-f1cd-4893-9f96-912071f83c58",
+      "citation_id": "8ea23343-7a89-4892-83a5-600174bda0a8",
+      "content": {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程；發現重複時，會聯絡本人確認要保留哪筆，再取消重複登記。付款資料對不上，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自己認定款項已入帳。額滿、加開名額或退款則交行政組長和財務決定。"
+      }
+    }
+  },
+  "memory": {
+    "published": true,
+    "covered_through_sequence": 12
+  }
+}

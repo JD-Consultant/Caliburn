@@ -31,7 +31,7 @@ Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書（JD�
 - Python `3.14`，由 uv `0.12.20` 管理
 - 本機 PostgreSQL `18.6`（獨立程序，容器或本機安裝皆可）
 - OpenAI API key（沒有 key 時人工 JD 編輯仍可用，AI 訪談停用）
-- PDF 匯出：授權的中文字型與 Playwright Chromium（見 [後端 README](apps/api/README.md#pdf-匯出)）
+- PDF 匯出：授權的中文字型與 Playwright Chromium（見 [後端 README](apps/api/README.md#pdf-執行依賴)）
 
 Node／TypeScript workspace 使用根目錄 `pnpm-lock.yaml`；Python 使用 `apps/api/uv.lock`。根目錄 Compose 只保留明示啟用的隔離 RAG 服務，不會建立 JD App 資料庫。
 

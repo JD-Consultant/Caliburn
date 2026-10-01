@@ -1,6 +1,6 @@
-# Caliburn backend（新目標施工中）
+# Caliburn backend
 
-本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。已提供隔離職務檔案、正式訪談保存、關聯式 JD 人工管理與候選／正式隔離。Memory 候選、固定修訂及原子快照發布底層通過真 PG，模型讀寫工具元件亦已驗。這不是完整產品完成：進度以[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)為準，現行正式入口不變。目前僅供隔離本機開發，完整安全與交付 gate 未完成，不對外開放。
+正式後端（[ADR0079](../../docs/adr/0079-target-rebuild-production-cutover.md)）：FastAPI 單程序、PostgreSQL、LangGraph 官方 saver 與 OpenAI 直連 Responses；A 主顧問、B1／B2 背景整理 Memory、關聯式 JD 人工與 AI 共用編輯、來源與差異、撤回及中文 PDF 都在此。日常操作從 repository 根目錄的 `pnpm` 命令進入（見[根 README](../../README.md#第一次設定)與 [runbook](../../docs/runbook.md)）；本頁保留後端細節。只綁定 loopback，不對外開放；完成度、已知限制與各項驗證證據以[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)為準，離線測試通過不等於分析品質已達標。
 
 產品使用 `gpt-6-luna`／`high`（2026-10-01 Owner 因成本確認），不採用 Sol 或自動 fallback。程式化 `ModelSettings` 的 Sol 接縫僅保留既有隔離研究，不再推進切換或追加 Sol 外送；沒有環境／UI 模型切換，不能將既有原生歷史交給另一模型。能力與限制以[選型文件](../../docs/implementation/technology-decisions.md#1-首選工具鏈)為準。
 
@@ -15,31 +15,31 @@
 從 repo root 執行。使用 Python 3.14、uv 0.12.20；先安裝根 `package.json` 指定的 Node 24／pnpm，前端生成器也需要該環境。精確依賴由 `uv.lock` 保存。
 
 ```powershell
-$env:UV_PROJECT_ENVIRONMENT = Join-Path $PWD 'apps/api/.venv-target'
 uv sync --project apps/api --locked
-pnpm install --filter @caliburn/frontend --frozen-lockfile --strict-peer-dependencies
-uv run --project apps/api --locked uvicorn caliburn.bootstrap:create_app --factory --host 127.0.0.1 --port 8100 --loop asyncio:SelectorEventLoop
+pnpm install --frozen-lockfile
+pnpm app:status   # 診斷設定（不印出密碼或 key），不啟動、不改資料
+pnpm start        # 單一後端程序（同源提供建置後的 Web）；需先 pnpm build
 ```
 
-`GET /api/health` 回傳 `{"status":"ok"}`，只表示程序存活，不表示 DB／模型可用。Ctrl+C 停止前景開發程序。新應用不在 import 時讀取 `.env`，這組命令不需模型金鑰，也不使用現行產品資料。
+`pnpm start` 轉交本頁下方的後端入口 `scripts/run_backend.py`；只有最低層診斷才直接執行 uvicorn：`uv run --project apps/api --locked uvicorn caliburn.bootstrap:create_app --factory --host 127.0.0.1 --port 8100 --loop asyncio:SelectorEventLoop`（沒有模型金鑰、不載入任何 `.env`）。`GET /api/health` 回傳 `{"status":"ok"}`，只表示程序存活，不表示 DB／模型可用。Ctrl+C 停止前景程序。應用不在 import 時讀取 `.env`。
 
 預設精確信任本機 5173／8100 Origin。隔離測試若使用第二個前端埠，可在**該後端啟動前**指定 `CALIBURN_DEV_ORIGIN=http://127.0.0.1:5174`；只接受一個帶明確埠的 HTTP loopback Origin（`127.0.0.1`、`localhost` 或 `[::1]`），非法配置在啟動前拒絕，不放寬其他埠、Host 或 cross-site 防護。前端 proxy 必須保留原始 Origin，具體隔離啟動見[前端 README](../web/README.md#合成資料瀏覽器驗收)。這不是對外部署／認證方案。
 
 Windows 的 psycopg async 不支援預設 Proactor loop，因此明確使用 Python／Uvicorn 支援的 Selector factory，而非已棄用的全域 event-loop policy。PDF renderer 使用獨立擁有的瀏覽器執行環境；Windows 中文短／長版及同機獨立 wheel／新 PDF 資源已驗，完整交付 gate 與跨平台仍未完成，見[介面交付](../../docs/implementation/interface-and-delivery.md#4-pdf-與程序)及 [PDF 交付續驗](../../docs/plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#非-editable-安裝的中文-pdf2026-10-01-續驗)。
 
-### 本機 AI Demo 啟動
+### 後端入口（`pnpm start`／`pnpm dev` 所用）
 
-先依下節初始化隔離的新目標 DB，保留 `CALIBURN_DATABASE_URL`／schema 環境變數；PDF 另配置下方兩個路徑。明確載入指定 `.env` 的 **OpenAI key 一項**，不套入其他旧配置、不在命令列貼金鑰：
+先依下節初始化資料庫（`pnpm app:migrate`），保留 `CALIBURN_DATABASE_URL`／schema 環境變數；PDF 另配置下方兩個路徑。後端明確載入指定 `.env` 的 **OpenAI key 一項**（根命令在 `apps/api/.env` 存在時自動帶入），不套入其他舊配置、不在命令列貼金鑰：
 
 ```powershell
 uv run --project apps/api --locked python apps/api/scripts/run_backend.py --key-file S:/caliburn/apps/api/.env
 ```
 
-另一個終端：`pnpm --dir apps/web dev`；開啟 `http://127.0.0.1:5173`。後端固定 loopback 8100，單程序，不自動遷移／建立範例資料／接舊 DB；Ctrl+C 停止前景程序。這是隔離開發入口，尚不是 T18 正式交付切換。程式與 supervisor 恢復已接受工作可能繼續使用模型額度；僅要操作人工 JD 時，不提供 key-file 且不設定 `OPENAI_API_KEY`。
+開發時另一個終端執行 `pnpm --dir apps/web dev`（或直接 `pnpm dev`）；開啟 `http://127.0.0.1:5173`。後端預設 loopback 8100（`--port` 可改），單程序，不自動遷移／建立範例資料；Ctrl+C 停止前景程序。程式與 supervisor 恢復已接受工作可能繼續使用模型額度；僅要操作人工 JD 時，不提供 key-file 且不設定 `OPENAI_API_KEY`。
 
 ### 使用建置後的同源畫面
 
-此入口已接通，但正式入口切換與乾淨安裝仍待 T18。先沿上節設定**新目標 DB**，使用所定 Node／pnpm 與 Python 環境，從 repo root 執行：
+正式交付形式。先沿上節設定資料庫，使用所定 Node／pnpm 與 Python 環境，從 repo root 執行（`pnpm build`＋`pnpm start` 已包含下列步驟與環境變數）：
 
 ```powershell
 pnpm --filter @caliburn/frontend build

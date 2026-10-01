@@ -133,7 +133,7 @@ async def test_cancel_after_compact_accounts_but_never_adopts_or_returns_c():
     assert events[-1] == ("account", "cmp_synthetic")
 
 
-@pytest.mark.parametrize("after_tokens", [100, 272000])
+@pytest.mark.parametrize("after_tokens", [100, 160000])
 async def test_loop_adopts_c_recounts_and_never_recompacts_an_unchanged_window(after_tokens):
     from caliburn.agent_execution.context_compaction import run_context_compaction
     from caliburn.agent_execution.request_capacity import RequestCapacityError
@@ -142,7 +142,7 @@ async def test_loop_adopts_c_recounts_and_never_recompacts_an_unchanged_window(a
     saver = InMemorySaver()
     events = []
     args = options(events)
-    probe = CapacityProbe([100, 272000, after_tokens], final=False)
+    probe = CapacityProbe([100, 160000, after_tokens], final=False)
 
     async def compact_window(request, count, request_id):
         return await run_context_compaction(
@@ -155,7 +155,7 @@ async def test_loop_adopts_c_recounts_and_never_recompacts_an_unchanged_window(a
 
     runtime = replace(probe.runtime(), compact_window=compact_window)
     kwargs = dict(thread_id="compact-loop", runtime=runtime, max_tool_calls=2, max_model_steps=3)
-    if after_tokens >= 272000:
+    if after_tokens >= 160000:
         for request in (request_fixture(), None):
             with pytest.raises(RequestCapacityError, match="compacted"):
                 await run_response_loop(saver, request=request, **kwargs)

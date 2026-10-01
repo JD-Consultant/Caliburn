@@ -46,7 +46,7 @@ LangGraph + OpenAI direct Responses SDK 是已確認的方向；不採 LangChain
 
 **上下文控制權（2026-09-29 產品方向補充）：**App 的組裝與接續契約是唯一政策來源；框架／adapter 不另選要保留的歷史、不暗中摘要或換角色。沿用 `store=false`、不使用 `previous_response_id` 的已選方向，由 App 明確提供接續 items。實作須檢查 SDK 邊界的實際請求，不能只看 App 組裝前的資料就宣稱不存在隱含變換；不為此預設永久保存所有請求副本。
 
-這不排斥明確委派給原生能力：[OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)提供顯式呼叫、送入完整視窗及採用完整返回視窗的方式；其加密 compaction item 不供人解讀。2026-09-29 已核對官方頁。本案保留這項已選能力，App 控制觸發／範圍／安全採用，不宣稱可掌握供應商內部取捨。**不啟用的是 server-side 自動壓縮；App 在完整 Step 交界按 272K 主動壓縮已獲確認**，不可再寫成所有 Turn 內壓縮都被否決。唯一門檻及回退語意見[共用執行 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與-272k-中途保險目標已確認未實作)。這是可控的委派，不是未知的對話代管。
+這不排斥明確委派給原生能力：[OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)提供顯式呼叫、送入完整視窗及採用完整返回視窗的方式；其加密 compaction item 不供人解讀。2026-09-29 已核對官方頁，2026-10-01 依 Owner 決策校準門檻。本案保留這項已選能力，App 控制觸發／範圍／安全採用，不宣稱可掌握供應商內部取捨。**不啟用的是 server-side 自動壓縮；App 在完整 Step 交界按 160K 主動壓縮已獲確認**，不可再寫成所有 Turn 內壓縮都被否決。唯一門檻及回退語意見[共用執行 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與-272k-中途保險目標已確認未實作)。這是可控的委派，不是未知的對話代管。
 
 ## 6. 工具與格式：以任務效果選擇，不機械統一
 

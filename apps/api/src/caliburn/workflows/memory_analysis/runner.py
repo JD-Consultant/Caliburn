@@ -22,6 +22,7 @@ from caliburn.agent_execution.context_compaction import (
     run_context_compaction,
 )
 from caliburn.agent_execution.request_capacity import (
+    MID_WORK_COMPACTION_THRESHOLD_TOKENS,
     ReceivedInputCount,
     RequestCapacityError,
 )
@@ -64,7 +65,7 @@ from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkf
 from caliburn.workflows.memory_writes import MemoryWritePreparation
 from caliburn.workflows.model_requests import ModelRequestAccounting, ModelRequestExecutor
 
-HISTORY_THRESHOLD_TOKENS = 512_000  # Explicit T10 operational initial value, not provider policy.
+HISTORY_THRESHOLD_TOKENS = 128_000  # Owner-approved pre-batch policy, not provider capacity.
 type AnalysisRecovery = HeldModelResponse | HeldInputCount | HeldCompaction | HeldPreparationCount
 
 
@@ -194,13 +195,13 @@ class MemoryAnalysisRunner:
         saved = await self.checkpointer.aget_tuple(config)
         if previous is not None and saved is None:
             # A handoff follows a complete Step. Apply the shared compact boundary to
-            # the FULL continuation, including this handoff, not the 512K batch base.
+            # the FULL continuation, including this handoff, not the pre-batch base.
             # This is not adopted as prepared_history and never repeats initial data.
             items = await prepare_context_history(
                 self.checkpointer,
                 thread_id=f"{thread_id}:handoff_capacity",
                 history_request=request,
-                threshold_tokens=272_000,
+                threshold_tokens=MID_WORK_COMPACTION_THRESHOLD_TOKENS,
                 compact_requested=False,
                 count_input=executor.count_input,
                 runtime=compaction,
@@ -214,11 +215,13 @@ class MemoryAnalysisRunner:
                 previous is not None
                 and saved is None
                 and current.create_payload() == request.create_payload()
-                and count["input_tokens"] >= 272_000
+                and count["input_tokens"] >= MID_WORK_COMPACTION_THRESHOLD_TOKENS
             ):
                 # The handoff boundary already compacted this window once. Never send
                 # or repeatedly compact an unchanged still-oversized result.
-                raise RequestCapacityError("The handoff continuation remains above the 272K guard")
+                raise RequestCapacityError(
+                    "The handoff continuation remains above the compact guard"
+                )
             return count
 
         async def compact_window(

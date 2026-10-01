@@ -78,7 +78,8 @@ def test_roles_reuse_all_four_originals_without_reissuing_or_resetting_budget(cl
                 or json.loads(request.content).get("instructions") == UNDERSTANDING_INSTRUCTIONS
             )
             if request.url.path.endswith("/input_tokens"):
-                count = 512_000 if large_next and target else 500
+                threshold = 160_000 if kind == "in_loop_compaction" else 128_000
+                count = threshold if large_next and target else 500
                 if target:
                     large_next = False
                 return httpx2.Response(

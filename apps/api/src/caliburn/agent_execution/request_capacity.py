@@ -10,6 +10,8 @@ from caliburn.adapters.openai_responses import ResponseRequest
 # Each attempt costs one more exact count, so the owner of an oversized first request
 # gets a small fixed number of reductions before the work is reported as capacity-blocked.
 MAX_FIRST_REQUEST_FITS = 3
+# Shared complete-Step/handoff policy; not a provider capacity or rate-limit guarantee.
+MID_WORK_COMPACTION_THRESHOLD_TOKENS = 160_000
 
 
 class ReceivedInputCount(TypedDict):
@@ -91,5 +93,5 @@ def require_request_capacity(
         raise RequestOverCapacityError(input_tokens=tokens, allowed_input_tokens=allowed)
     # Caliburn policy, not a provider context-window guarantee. First-request preparation
     # and actual compact/adoption belong to their own workflow, not to this count gate.
-    if completed_steps > 0 and tokens >= 272_000:
+    if completed_steps > 0 and tokens >= MID_WORK_COMPACTION_THRESHOLD_TOKENS:
         raise CompactionRequiredError("The next request requires explicit boundary compaction")

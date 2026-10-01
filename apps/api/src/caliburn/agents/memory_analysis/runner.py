@@ -1,8 +1,6 @@
 """Coordinate Memory stage owners with native execution; no role prompt or new loop."""
 
 from dataclasses import dataclass
-from datetime import timedelta
-from decimal import Decimal
 from uuid import UUID
 
 from langchain_core.runnables import RunnableConfig
@@ -11,15 +9,13 @@ from openai import AsyncOpenAI
 from pydantic import JsonValue
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from caliburn.adapters.openai_models import model_profile
 from caliburn.adapters.openai_responses import ResponseRequest
-from caliburn.adapters.response_serialization import NativeItems, restore_response
+from caliburn.adapters.response_serialization import restore_response
 from caliburn.agent_execution.context_compaction import (
-    CompactionRuntime,
     HeldCompaction,
     HeldPreparationCount,
+    bind_window_compaction,
     prepare_context_history,
-    run_context_compaction,
 )
 from caliburn.agent_execution.request_capacity import (
     MID_WORK_COMPACTION_THRESHOLD_TOKENS,
@@ -35,9 +31,8 @@ from caliburn.agent_execution.tool_steps import (
     read_completed_response_history,
     run_response_loop,
 )
-from caliburn.features.executions import budgets
+from caliburn.agents.memory_analysis.context import capture_analysis_context, stage_thread_id
 from caliburn.features.executions import service as executions
-from caliburn.features.executions.budget_models import BudgetConflictError, ExecutionBudget
 from caliburn.features.executions.history_models import (
     AgentRole,
     ContextPosition,
@@ -49,24 +44,23 @@ from caliburn.features.work_memory import candidate_queries
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import ModelSettings
+from caliburn.transport.model_tools.memory_analysis import MemoryAnalysisTools
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
 from caliburn.transport.model_tools.memory_writes import MemoryWriteTools
 from caliburn.workflows.context_history import RoleContextHistory
-from caliburn.workflows.memory_analysis.context import capture_analysis_context, stage_thread_id
 from caliburn.workflows.memory_analysis.results import (
     AnalysisOutcomeError,
+    AnalysisRecovery,
     MemoryAnalysisResult,
     SituationGap,
     parse_outcome,
 )
-from caliburn.workflows.memory_analysis.tools import MemoryAnalysisTools
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
 from caliburn.workflows.memory_writes import MemoryWritePreparation
-from caliburn.workflows.model_requests import ModelRequestAccounting, ModelRequestExecutor
+from caliburn.workflows.model_runtime import bind_model_runtime, fix_execution_policy
 
 HISTORY_THRESHOLD_TOKENS = 128_000  # Owner-approved pre-batch policy, not provider capacity.
-type AnalysisRecovery = HeldModelResponse | HeldInputCount | HeldCompaction | HeldPreparationCount
 
 
 @dataclass(frozen=True, slots=True)
@@ -127,7 +121,7 @@ class MemoryAnalysisRunner:
                 await candidate_queries.require_stage(session, stage)
 
         await ensure_active()
-        policy = await self._fix_budget(writer)
+        policy = await fix_execution_policy(self.sessions, writer, self.settings)
         tools = MemoryAnalysisTools(
             MemoryReadTools(MemoryReadWorkflow(self.sessions), binding),
             MemoryWriteTools(
@@ -137,23 +131,10 @@ class MemoryAnalysisRunner:
                 writer,
             ),
         )
-        profile = model_profile(self.settings.model)
-        executor = ModelRequestExecutor(
-            self.sessions,
-            writer,
-            self.client,
-            ModelRequestAccounting.from_text_pricing(
-                profile.pricing,
-                token_count_reservation_usd=Decimal("0.0001"),
-                compaction_reservation_usd=Decimal("0.50"),
-            ),
+        model = bind_model_runtime(
+            self.sessions, writer, self.client, self.settings, ensure_active=ensure_active
         )
-        compaction = CompactionRuntime(
-            executor.request_compaction,
-            executor.account_compaction,
-            ensure_active,
-            profile.capacity_limits(),
-        )
+        executor = model.executor
         template = ResponseRequest(
             model=self.settings.model,
             instructions=instructions,
@@ -171,7 +152,7 @@ class MemoryAnalysisRunner:
                 threshold_tokens=HISTORY_THRESHOLD_TOKENS,
                 compact_requested=False,
                 count_input=executor.count_input,
-                runtime=compaction,
+                runtime=model.compaction,
                 recovery=preparation_recovery,
             )
         else:
@@ -204,7 +185,7 @@ class MemoryAnalysisRunner:
                 threshold_tokens=MID_WORK_COMPACTION_THRESHOLD_TOKENS,
                 compact_requested=False,
                 count_input=executor.count_input,
-                runtime=compaction,
+                runtime=model.compaction,
                 recovery=preparation_recovery,
             )
             request = ResponseRequest.from_snapshot({**request.create_payload(), "input": items})
@@ -224,20 +205,12 @@ class MemoryAnalysisRunner:
                 )
             return count
 
-        async def compact_window(
-            current: ResponseRequest, count: ReceivedInputCount, request_id: UUID
-        ) -> NativeItems:
-            return await run_context_compaction(
-                self.checkpointer,
-                thread_id=f"{thread_id}:compact:{request_id}",
-                request=current,
-                input_count=count,
-                runtime=compaction,
-                recovery=recovery
-                if isinstance(recovery, HeldCompaction)
-                and recovery.thread_id == f"{thread_id}:compact:{request_id}"
-                else None,
-            )
+        compact_window = bind_window_compaction(
+            self.checkpointer,
+            response_thread_id=thread_id,
+            runtime=model.compaction,
+            recovery=recovery,
+        )
 
         runtime = ResponseStepRuntime(
             request_model=executor.request_model,
@@ -246,7 +219,7 @@ class MemoryAnalysisRunner:
             ensure_active=ensure_active,
             account_response=executor.account_response,
             count_input=count_input,
-            capacity_limits=profile.capacity_limits(),
+            capacity_limits=model.capacity_limits,
             compact_window=compact_window,
         )
         step_recovery = (
@@ -285,30 +258,6 @@ class MemoryAnalysisRunner:
             outcome,
             ContextPosition(thread_id, window.checkpoint_id, HistoryWindowKind.COMPLETED_WORK),
         )
-
-    async def _fix_budget(self, writer: ExecutionWriter) -> ExecutionBudget:
-        pricing = model_profile(self.settings.model).pricing
-        async with self.sessions.begin() as session:
-            await executions.lock_active_writer(session, writer)
-            policy = await budgets.read_execution_budget(session, writer.scope)
-            if policy is not None:
-                if policy.cost_basis != pricing.cost_basis:
-                    raise BudgetConflictError("The batch must retain its original pricing policy")
-                return policy
-            now = await budgets.read_execution_time(session, writer.scope)
-            return await budgets.fix_execution_budget(
-                session,
-                writer,
-                ExecutionBudget(
-                    self.settings.max_model_steps,
-                    self.settings.max_compactions,
-                    self.settings.max_outbound_attempts,
-                    self.settings.max_attempts_per_request,
-                    now + timedelta(seconds=self.settings.turn_timeout_seconds),
-                    self.settings.max_cost_usd,
-                    pricing.cost_basis,
-                ),
-            )
 
 
 def _require_previous(

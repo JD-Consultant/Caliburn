@@ -2,27 +2,19 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import timedelta
-from decimal import Decimal
-from uuid import UUID
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from caliburn.adapters.openai_models import model_profile
 from caliburn.adapters.openai_responses import ResponseRequest
-from caliburn.adapters.response_serialization import NativeItems, restore_response
+from caliburn.adapters.response_serialization import restore_response
 from caliburn.adapters.response_streaming import PublicCommentaryUpdate
 from caliburn.agent_execution.context_compaction import (
-    CompactionRuntime,
     HeldCompaction,
     HeldPreparationCount,
-    run_context_compaction,
-)
-from caliburn.agent_execution.request_capacity import (
-    ReceivedInputCount,
+    bind_window_compaction,
 )
 from caliburn.agent_execution.response_steps import (
     inspect_response_step,
@@ -38,12 +30,6 @@ from caliburn.agents.job_consultant.context_binding import TurnContext, capture_
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
 from caliburn.agents.job_consultant.recent_preload import fit_recent_interview_preload
 from caliburn.agents.job_consultant.tools import ConsultantTools, consultant_tool_definitions
-from caliburn.features.executions import budgets
-from caliburn.features.executions import service as executions
-from caliburn.features.executions.budget_models import (
-    BudgetConflictError,
-    ExecutionBudget,
-)
 from caliburn.features.executions.history_models import (
     AgentRole,
     HistoryWindowKind,
@@ -75,10 +61,7 @@ from caliburn.workflows.jd_reads import JdReadWorkflow
 from caliburn.workflows.jd_task_writes import JdTaskWriteWorkflow
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
 from caliburn.workflows.memory_reads import MemoryReadWorkflow
-from caliburn.workflows.model_requests import (
-    ModelRequestAccounting,
-    ModelRequestExecutor,
-)
+from caliburn.workflows.model_runtime import bind_model_runtime, fix_execution_policy
 
 type ConsultantRecovery = HeldModelResponse | HeldInputCount | HeldCompaction | HeldPreparationCount
 
@@ -125,28 +108,19 @@ class ConsultantRunner:
                 )
             if not matches:
                 raise ValueError("Recovery must retain the original Step or preparation boundary")
-        policy = await self._fix_budget(writer)
-        profile = model_profile(self.settings.model)
+        policy = await fix_execution_policy(self.sessions, writer, self.settings)
         commentary = self.on_commentary
-        executor = ModelRequestExecutor(
+        model = bind_model_runtime(
             self.sessions,
             writer,
             self.client,
-            ModelRequestAccounting.from_text_pricing(
-                profile.pricing,
-                token_count_reservation_usd=Decimal("0.0001"),
-                compaction_reservation_usd=Decimal("0.50"),
-            ),
+            self.settings,
+            ensure_active=role_history.ensure_active,
             on_commentary=(lambda update: commentary(writer.scope, update))
             if commentary is not None
             else None,
         )
-        compaction = CompactionRuntime(
-            executor.request_compaction,
-            executor.account_compaction,
-            role_history.ensure_active,
-            profile.capacity_limits(),
-        )
+        executor = model.executor
         template = ResponseRequest(
             model=self.settings.model,
             instructions=CONSULTANT_INSTRUCTIONS,
@@ -160,7 +134,7 @@ class ConsultantRunner:
             template=template,
             threshold_tokens=128_000,
             count_input=executor.count_input,
-            runtime=compaction,
+            runtime=model.compaction,
             recovery=recovery
             if isinstance(recovery, (HeldCompaction, HeldPreparationCount))
             and recovery.thread_id == preparation_thread
@@ -171,20 +145,12 @@ class ConsultantRunner:
         )
         tools = self._tools(writer, context, role_history)
 
-        async def compact_window(
-            request: ResponseRequest, count: ReceivedInputCount, request_id: UUID
-        ) -> NativeItems:
-            return await run_context_compaction(
-                self.checkpointer,
-                thread_id=f"{role_history.response_thread_id}:compact:{request_id}",
-                request=request,
-                input_count=count,
-                runtime=compaction,
-                recovery=recovery
-                if isinstance(recovery, HeldCompaction)
-                and recovery.thread_id == f"{role_history.response_thread_id}:compact:{request_id}"
-                else None,
-            )
+        compact_window = bind_window_compaction(
+            self.checkpointer,
+            response_thread_id=role_history.response_thread_id,
+            runtime=model.compaction,
+            recovery=recovery,
+        )
 
         runtime = ResponseStepRuntime(
             request_model=executor.request_model,
@@ -193,7 +159,7 @@ class ConsultantRunner:
             ensure_active=role_history.ensure_active,
             account_response=executor.account_response,
             count_input=executor.count_input,
-            capacity_limits=profile.capacity_limits(),
+            capacity_limits=model.capacity_limits,
             compact_window=compact_window,
             fit_first_request=fit_recent_interview_preload,
         )
@@ -254,28 +220,3 @@ class ConsultantRunner:
             MemoryConsolidationTools(MemoryConsolidationWorkflow(self.sessions), writer),
             ContextCompactionTools(role_history),
         )
-
-    async def _fix_budget(self, writer: ExecutionWriter) -> ExecutionBudget:
-        """Retain counters/deadline after restart; configuration cannot reset spent allowance."""
-        pricing = model_profile(self.settings.model).pricing
-        async with self.sessions.begin() as session:
-            await executions.lock_active_writer(session, writer)
-            policy = await budgets.read_execution_budget(session, writer.scope)
-            if policy is not None:
-                if policy.cost_basis != pricing.cost_basis:
-                    raise BudgetConflictError("Resume requires the original pricing policy")
-                return policy
-            now = await budgets.read_execution_time(session, writer.scope)
-            return await budgets.fix_execution_budget(
-                session,
-                writer,
-                ExecutionBudget(
-                    self.settings.max_model_steps,
-                    self.settings.max_compactions,
-                    self.settings.max_outbound_attempts,
-                    self.settings.max_attempts_per_request,
-                    now + timedelta(seconds=self.settings.turn_timeout_seconds),
-                    self.settings.max_cost_usd,
-                    pricing.cost_basis,
-                ),
-            )

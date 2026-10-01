@@ -8,8 +8,11 @@ from pydantic import JsonValue
 from caliburn.features.executions.models import ExecutionWriter
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
-from caliburn.workflows.memory_analysis.results import MemoryAnalysisResult, SituationGap
-from caliburn.workflows.memory_analysis.runner import AnalysisRecovery
+from caliburn.workflows.memory_analysis.results import (
+    AnalysisRecovery,
+    MemoryAnalysisResult,
+    SituationGap,
+)
 
 
 class SituationAnalysis(Protocol):

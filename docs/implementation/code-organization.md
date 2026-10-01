@@ -28,14 +28,17 @@ apps/
         job_consultant/         # A：prompt、允許工具與起始投影
         work_situation_analyst/ # B1：只處理情境
         work_understanding_analyst/ # B2：理解與按需情境回交
+        memory_analysis/        # B1／B2 共用組裝（runner、起始 context、角色分派）；不是第三個角色
       agent_execution/          # 共用 node loop、原生 context、Step／恢復／compact
       adapters/
         database.py             # engine／session／短交易機制
+        database_settings.py    # 資料庫位置與 namespace 配置；由 adapter 擁有，settings 只負責組合
         openai_responses.py     # direct SDK；不另造 provider interface family
         openai_models.py        # 已核對的模型容量／推理等級與費率；無自動選型／fallback
         graph_checkpointer.py  # 官方 saver 初始化、序列化與身分綁定
         pdf_renderer.py         # 正式 JD 的受控列印
       transport/http/           # routers、DTO mapping、公開串流；無業務 SQL
+      transport/model_tools/    # 模型工具的薄入口（JD／Memory 讀寫、背景整理、壓縮請求）；與 http 同為邊界
       contracts/generated/     # 生成 Python DTO，只有邊界可用
     tests/
       unit/ contracts/ integration/ journeys/ fixtures/
@@ -82,7 +85,9 @@ flowchart TD
 5. 需要替換外部 I/O 做測試時用窄 `Protocol`／callable；純 Python 少數消費者直接使用明確型別。不建每類一套抽象 factory、BaseRepository 或萬用 UnitOfWork 註冊表。
 6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。跨 feature 需要的畫面狀態不用 Effect 複製到上層 state：Turn 提示來自外部儲存（`useSyncExternalStore`），缺少提示時由 composer 查 current；頁面的唯讀 query 觀察者只訂閱同一份 cache，未知不可當閒置，不另發 GET／輪詢。feature 要在另一 feature 的項目旁放內容時，由 app 提供 render 函式（context），feature 不互相 import。詳見[介面 §1.6](interface-and-delivery.md#16-工作畫面組裝t09-ui-改版)。
 
-T01 用 lint import 限制與小型 AST／import 測試鎖住上述幾條高價值規則；不自行開發架構分析平台。需要例外先說出實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴。
+7. 層只向下 import：`adapters` ← `features` ← `workflows` ← `transport`／`agents` ← `bootstrap`；`agent_execution` 位於 `adapters` 之上，不 import `features`、`workflows`、`transport`、`agents`。`settings` 組合各 adapter 擁有的配置，adapter 不 import `settings`。B1／B2 的共用組裝 `agents/memory_analysis` 可被兩個角色使用，兩個角色之間不互相 import。這些以表格形式鎖在 `test_import_boundaries.py`，新增上行 import 會直接失敗。
+
+T01 用 lint import 限制與小型 AST／import 測試鎖住上述幾條高價值規則；不自行開發架構分析平台。需要例外先說出實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴。2026-10-01 的結構審查把原本只靠慣例的層方向、前端 feature 互不 import 兩條補成可執行檢查，結果見[程式組織審查](../plans/2026-09-29-target-rebuild/evidence/t15-code-organization-review.md)。
 
 本案借鑑 [AWS ports／adapters](https://docs.aws.amazon.com/prescriptive-guidance/latest/hexagonal-architectures/overview.html)的業務與 I/O 分離；不聲稱上述目錄是 AWS 標準模板，也不照搬每層必須 interface 的儀式。
 

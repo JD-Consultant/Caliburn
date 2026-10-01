@@ -13,7 +13,6 @@ from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
-from caliburn.agents.memory_analysis.tools import MEMORY_CHECKPOINT_TYPES
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
 from caliburn.features.executions import budgets, history
@@ -23,6 +22,7 @@ from caliburn.features.executions.models import ExecutionStatus
 from caliburn.features.work_memory import read_queries
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings, ModelSettings
+from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.memory_batch import MemoryBatchWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow

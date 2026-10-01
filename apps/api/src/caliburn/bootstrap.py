@@ -19,7 +19,7 @@ from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
 from caliburn.features.executions.models import ExecutionScope, ExecutionStatus
-from caliburn.settings import Settings
+from caliburn.settings import ModelSettings, Settings
 from caliburn.transport.http.consultant_turns import router as consultant_turn_router
 from caliburn.transport.http.health import router as health_router
 from caliburn.transport.http.interview_inputs import router as interview_input_router
@@ -36,6 +36,7 @@ from caliburn.transport.http.jd_work import router as jd_work_router
 from caliburn.transport.http.job_files import router as job_file_router
 from caliburn.transport.http.security import LocalHttpSecurityMiddleware
 from caliburn.transport.http.turn_jd_changes import router as turn_jd_changes_router
+from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.consultant_commentary import ConsultantCommentaryHub
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.consultant_controls import (
@@ -51,10 +52,28 @@ from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
 from caliburn.workflows.jd_export import JdExportWorkflow
 from caliburn.workflows.jd_undo import JdUndoWorkflow
 from caliburn.workflows.job_files import JobFileWorkflow
-from caliburn.workflows.memory_analysis.tools import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.memory_batch import MemoryBatchWorkflow
 from caliburn.workflows.memory_supervisor import MemorySupervisor
 from caliburn.workflows.turn_jd_changes import TurnJdChangesWorkflow
+
+# Registration order is route-matching order.
+ROUTERS = (
+    health_router,
+    job_file_router,
+    interview_input_router,
+    consultant_turn_router,
+    jd_profile_router,
+    jd_areas_router,
+    jd_capabilities_router,
+    jd_collaborators_router,
+    jd_conditions_router,
+    jd_tasks_router,
+    jd_work_router,
+    jd_evidence_router,
+    jd_export_router,
+    jd_undo_router,
+    turn_jd_changes_router,
+)
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -64,127 +83,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         database = Database(configured.database) if configured.database else None
-        app.state.database = database
-        app.state.job_file_workflow = JobFileWorkflow(database.sessions) if database else None
-        app.state.jd_editing_workflow = JdEditingWorkflow(database.sessions) if database else None
-        app.state.jd_evidence_workflow = JdEvidenceWorkflow(database.sessions) if database else None
-        app.state.jd_undo_workflow = JdUndoWorkflow(database.sessions) if database else None
-        app.state.turn_jd_changes_workflow = (
-            TurnJdChangesWorkflow(database.sessions) if database else None
-        )
-        app.state.interview_input_workflow = (
-            InterviewInputWorkflow(database.sessions) if database else None
-        )
-        app.state.consultant_status_workflow = None
-        app.state.consultant_supervisor = None
-        commentary_hub = ConsultantCommentaryHub()
-        app.state.consultant_commentary_hub = commentary_hub
-        app.state.memory_supervisor = None
-        app.state.consultant_control_workflow = None
-        app.state.jd_export_workflow = None
+        _reset_runtime_state(app, database)
         try:
             async with AsyncExitStack() as resources:
                 if database is not None:
                     await database.verify_schema()
-                    if configured.pdf is not None:
-                        renderer = PdfRenderer(
-                            font_path=configured.pdf.font_path,
-                            executable_path=configured.pdf.executable_path,
-                        )
-                        resources.push_async_callback(renderer.aclose)
-                        app.state.jd_export_workflow = JdExportWorkflow(database.sessions, renderer)
-                    # Saved public history remains readable without model credentials.
-                    dsn = make_conninfo(
-                        database.settings.sqlalchemy_url.set(
-                            drivername="postgresql"
-                        ).render_as_string(hide_password=False),
-                        options=f"-c search_path={database.settings.schema}",
-                    )
-                    saver = await resources.enter_async_context(
-                        AsyncPostgresSaver.from_conn_string(
-                            dsn,
-                            serde=create_graph_serializer(allowed_types=MEMORY_CHECKPOINT_TYPES),
-                        )
-                    )
-                    await saver.setup()
-                    app.state.consultant_status_workflow = ConsultantStatusWorkflow(
-                        database.sessions, saver
-                    )
-                    if configured.model is not None:
-                        sdk = create_responses_client(
-                            api_key=configured.model.api_key,
-                            timeout_seconds=configured.model.request_timeout_seconds,
-                        )
-                        resources.push_async_callback(sdk.close)
-
-                        def publish_commentary(
-                            scope: ExecutionScope, update: PublicCommentaryUpdate
-                        ) -> None:
-                            commentary_hub.publish(
-                                scope.job_file_id,
-                                scope.execution_id,
-                                update.response_id,
-                                update.message_id,
-                                update.text,
-                            )
-
-                        runner = ConsultantRunner(
-                            database.sessions,
-                            saver,
-                            sdk,
-                            configured.model,
-                            on_commentary=publish_commentary,
-                        )
-                        leader_lock = PostgresProcessLock(database.settings)
-                        memory_batch = MemoryBatchWorkflow(
-                            database.sessions,
-                            run_role=MemoryRoleDispatch(
-                                WorkSituationAnalystRunner(
-                                    database.sessions, saver, sdk, configured.model
-                                ),
-                                WorkUnderstandingAnalystRunner(
-                                    database.sessions, saver, sdk, configured.model
-                                ),
-                            ),
-                        )
-                        memory_supervisor = MemorySupervisor(
-                            database.sessions,
-                            run=partial(
-                                run_with_failure_boundary,
-                                run=memory_batch.run,
-                                settle_failure=memory_batch.settle_failure,
-                            ),
-                            check_leadership=leader_lock.check,
-                        )
-                        completion = ConsultantCompletionWorkflow(database.sessions)
-                        supervisor = ConsultantSupervisor(
-                            sessions=database.sessions,
-                            run=partial(
-                                run_with_failure_boundary,
-                                run=partial(
-                                    run_consultant_with_controls,
-                                    sessions=database.sessions,
-                                    checkpointer=saver,
-                                    run=runner.run,
-                                ),
-                                settle_failure=lambda writer, _error: completion.stop(
-                                    writer, ExecutionStatus.FAILED
-                                ),
-                            ),
-                            process_lock=leader_lock,
-                            before_leader_release=memory_supervisor.close,
-                        )
-                        resources.push_async_callback(supervisor.close)
-                        await supervisor.start()
-                        app.state.consultant_supervisor = supervisor
-                        app.state.consultant_control_workflow = ConsultantControlWorkflow(
-                            database.sessions, saver, supervisor
-                        )
-                        # LIFO cleanup stops Memory before releasing the shared leader fence,
-                        # then SDK/saver, then database. No second leader or queue is created.
-                        resources.push_async_callback(memory_supervisor.close)
-                        await memory_supervisor.start()
-                        app.state.memory_supervisor = memory_supervisor
+                    await _start_database_runtime(app, configured, database, resources)
                 yield
         finally:
             app.state.consultant_supervisor = None
@@ -194,21 +98,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(title="Caliburn", version="0.1.0", lifespan=lifespan)
     app.add_middleware(LocalHttpSecurityMiddleware, dev_origin=configured.dev_origin)
-    app.include_router(health_router)
-    app.include_router(job_file_router)
-    app.include_router(interview_input_router)
-    app.include_router(consultant_turn_router)
-    app.include_router(jd_profile_router)
-    app.include_router(jd_areas_router)
-    app.include_router(jd_capabilities_router)
-    app.include_router(jd_collaborators_router)
-    app.include_router(jd_conditions_router)
-    app.include_router(jd_tasks_router)
-    app.include_router(jd_work_router)
-    app.include_router(jd_evidence_router)
-    app.include_router(jd_export_router)
-    app.include_router(jd_undo_router)
-    app.include_router(turn_jd_changes_router)
+    for router in ROUTERS:
+        app.include_router(router)
     if configured.web_build_directory is not None:
         app.frontend("/", directory=configured.web_build_directory, fallback=None, check_dir=True)
         # Only UI navigation gets the SPA fallback; missing APIs/assets stay 404.
@@ -219,3 +110,120 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             check_dir=True,
         )
     return app
+
+
+def _reset_runtime_state(app: FastAPI, database: Database | None) -> None:
+    """Workflows that need only the database exist at once; runtime services start later."""
+    app.state.database = database
+    sessions = database.sessions if database else None
+    app.state.job_file_workflow = JobFileWorkflow(sessions) if sessions else None
+    app.state.jd_editing_workflow = JdEditingWorkflow(sessions) if sessions else None
+    app.state.jd_evidence_workflow = JdEvidenceWorkflow(sessions) if sessions else None
+    app.state.jd_undo_workflow = JdUndoWorkflow(sessions) if sessions else None
+    app.state.turn_jd_changes_workflow = TurnJdChangesWorkflow(sessions) if sessions else None
+    app.state.interview_input_workflow = InterviewInputWorkflow(sessions) if sessions else None
+    app.state.consultant_status_workflow = None
+    app.state.consultant_supervisor = None
+    app.state.consultant_commentary_hub = ConsultantCommentaryHub()
+    app.state.memory_supervisor = None
+    app.state.consultant_control_workflow = None
+    app.state.jd_export_workflow = None
+
+
+async def _start_database_runtime(
+    app: FastAPI, configured: Settings, database: Database, resources: AsyncExitStack
+) -> None:
+    if configured.pdf is not None:
+        renderer = PdfRenderer(
+            font_path=configured.pdf.font_path, executable_path=configured.pdf.executable_path
+        )
+        resources.push_async_callback(renderer.aclose)
+        app.state.jd_export_workflow = JdExportWorkflow(database.sessions, renderer)
+    # Saved public history remains readable without model credentials.
+    dsn = make_conninfo(
+        database.settings.sqlalchemy_url.set(drivername="postgresql").render_as_string(
+            hide_password=False
+        ),
+        options=f"-c search_path={database.settings.schema}",
+    )
+    saver = await resources.enter_async_context(
+        AsyncPostgresSaver.from_conn_string(
+            dsn, serde=create_graph_serializer(allowed_types=MEMORY_CHECKPOINT_TYPES)
+        )
+    )
+    await saver.setup()
+    app.state.consultant_status_workflow = ConsultantStatusWorkflow(database.sessions, saver)
+    if configured.model is not None:
+        await _start_model_runtime(app, configured.model, database, saver, resources)
+
+
+async def _start_model_runtime(
+    app: FastAPI,
+    model: ModelSettings,
+    database: Database,
+    saver: AsyncPostgresSaver,
+    resources: AsyncExitStack,
+) -> None:
+    """Start the consultant and Memory supervisors that share one local leader fence."""
+    sdk = create_responses_client(
+        api_key=model.api_key, timeout_seconds=model.request_timeout_seconds
+    )
+    resources.push_async_callback(sdk.close)
+    hub: ConsultantCommentaryHub = app.state.consultant_commentary_hub
+
+    def publish_commentary(scope: ExecutionScope, update: PublicCommentaryUpdate) -> None:
+        hub.publish(
+            scope.job_file_id,
+            scope.execution_id,
+            update.response_id,
+            update.message_id,
+            update.text,
+        )
+
+    runner = ConsultantRunner(
+        database.sessions, saver, sdk, model, on_commentary=publish_commentary
+    )
+    leader_lock = PostgresProcessLock(database.settings)
+    memory_batch = MemoryBatchWorkflow(
+        database.sessions,
+        run_role=MemoryRoleDispatch(
+            WorkSituationAnalystRunner(database.sessions, saver, sdk, model),
+            WorkUnderstandingAnalystRunner(database.sessions, saver, sdk, model),
+        ),
+    )
+    memory_supervisor = MemorySupervisor(
+        database.sessions,
+        run=partial(
+            run_with_failure_boundary,
+            run=memory_batch.run,
+            settle_failure=memory_batch.settle_failure,
+        ),
+        check_leadership=leader_lock.check,
+    )
+    completion = ConsultantCompletionWorkflow(database.sessions)
+    supervisor = ConsultantSupervisor(
+        sessions=database.sessions,
+        run=partial(
+            run_with_failure_boundary,
+            run=partial(
+                run_consultant_with_controls,
+                sessions=database.sessions,
+                checkpointer=saver,
+                run=runner.run,
+            ),
+            settle_failure=lambda writer, _error: completion.stop(writer, ExecutionStatus.FAILED),
+        ),
+        process_lock=leader_lock,
+        before_leader_release=memory_supervisor.close,
+    )
+    resources.push_async_callback(supervisor.close)
+    await supervisor.start()
+    app.state.consultant_supervisor = supervisor
+    app.state.consultant_control_workflow = ConsultantControlWorkflow(
+        database.sessions, saver, supervisor
+    )
+    # LIFO cleanup stops Memory before releasing the shared leader fence, then SDK/saver,
+    # then database. No second leader or queue is created.
+    resources.push_async_callback(memory_supervisor.close)
+    await memory_supervisor.start()
+    app.state.memory_supervisor = memory_supervisor

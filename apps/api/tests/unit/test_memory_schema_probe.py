@@ -12,9 +12,9 @@ from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
+from caliburn.transport.model_tools import memory_analysis as analysis_tools
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
 from caliburn.transport.model_tools.memory_writes import MemoryWriteTools
-from caliburn.workflows.memory_analysis import tools as analysis_tools
 from caliburn.workflows.memory_reads import CandidateMemoryRead
 from scripts import probe_consultant_tool_schema as schema_probe
 

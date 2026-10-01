@@ -189,6 +189,37 @@ async def run_context_compaction(
     )
 
 
+def bind_window_compaction(
+    checkpointer: BaseCheckpointSaver[str],
+    *,
+    response_thread_id: str,
+    runtime: CompactionRuntime,
+    recovery: object | None,
+) -> Callable[[ResponseRequest, ReceivedInputCount, UUID], Awaitable[NativeItems]]:
+    """The mid-work compaction a role hands to its response loop.
+
+    Each compaction gets its own private thread under the role's response thread. A held
+    result is passed back only to the compaction whose thread it belongs to.
+    """
+
+    async def compact_window(
+        request: ResponseRequest, count: ReceivedInputCount, request_id: UUID
+    ) -> NativeItems:
+        thread_id = f"{response_thread_id}:compact:{request_id}"
+        return await run_context_compaction(
+            checkpointer,
+            thread_id=thread_id,
+            request=request,
+            input_count=count,
+            runtime=runtime,
+            recovery=recovery
+            if isinstance(recovery, HeldCompaction) and recovery.thread_id == thread_id
+            else None,
+        )
+
+    return compact_window
+
+
 async def _run_context_boundary(
     checkpointer: BaseCheckpointSaver[str],
     *,

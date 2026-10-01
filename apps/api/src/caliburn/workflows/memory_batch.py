@@ -44,12 +44,12 @@ from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.workflows.memory_analysis.results import (
     AnalysisComplete,
     AnalysisOutcomeError,
+    AnalysisRecovery,
     MemoryAnalysisResult,
     SituationGap,
     SituationRework,
     parse_outcome,
 )
-from caliburn.workflows.memory_analysis.runner import AnalysisRecovery
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
 from caliburn.workflows.memory_stage_changes import read_situation_handoff_changes
 from caliburn.workflows.model_requests import ModelRequestFailedError

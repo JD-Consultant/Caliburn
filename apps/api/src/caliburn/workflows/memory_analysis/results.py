@@ -5,9 +5,13 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 
+from caliburn.agent_execution.context_compaction import HeldCompaction, HeldPreparationCount
+from caliburn.agent_execution.tool_steps import HeldInputCount, HeldModelResponse
 from caliburn.features.executions.history_models import ContextPosition
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
+
+type AnalysisRecovery = HeldModelResponse | HeldInputCount | HeldCompaction | HeldPreparationCount
 
 
 class AnalysisOutcomeError(ValueError):

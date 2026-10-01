@@ -26,8 +26,8 @@ from caliburn.features.executions.history_models import AgentRole
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings, ModelSettings
+from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.memory_analysis.results import AnalysisComplete, SituationRework
-from caliburn.workflows.memory_analysis.tools import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
 from tests.unit.test_response_loop import response_at

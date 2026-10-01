@@ -722,19 +722,19 @@ Current JD
 
 ### OPKS 五份原料研究
 
-- [OPKS 原始生成與 grounding](specs/2026-08-01-opks-raw-llm-generation-grounding.md)
+- [OPKS 原始生成與 grounding](research/work-analysis/2026-08-01-opks-raw-llm-generation-grounding.md)
   - 模型如何在有員工依據時提出候選，避免從職稱、公版或想像補齊內容。
 
-- [工作產出研究](specs/2026-08-01-opks-raw-work-outputs.md)
+- [工作產出研究](research/work-analysis/2026-08-01-opks-raw-work-outputs.md)
   - O（Output）如何從實際工作結果判斷，而不是把漂亮的職責句改寫成產出。
 
-- [行為指標研究](specs/2026-08-01-opks-raw-performance-indicators.md)
+- [行為指標研究](research/work-analysis/2026-08-01-opks-raw-performance-indicators.md)
   - P（Performance Indicator）如何連回實際可觀察的行為、結果或查核條件。
 
-- [技能與技能分類研究](specs/2026-08-01-opks-raw-skills-taxonomies.md)
+- [技能與技能分類研究](research/work-analysis/2026-08-01-opks-raw-skills-taxonomies.md)
   - K／S 的來源與分類限制；第一版不讓外部 taxonomy 取代員工實際工作證據。
 
-- [效度與 AI 法規研究](specs/2026-08-01-opks-raw-validity-and-ai-regulation.md)
+- [效度與 AI 法規研究](research/work-analysis/2026-08-01-opks-raw-validity-and-ai-regulation.md)
   - 說明 OPKS 內容的效度邊界，以及不能把客製職務分析自動升格成招募或甄選標準。
 
 ### OPKS 漸進式分析與缺口追問

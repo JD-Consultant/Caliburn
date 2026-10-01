@@ -102,6 +102,6 @@ hybrid_search(level="profile"|"task", limit=top_k)
 
 - 面 / 端點 / payload schema:[`../README.md`](../README.md)。
 - ADR:[0003](../../../docs/adr/0003-indexer-stays-separate-service.md)(獨立服務)·[0009](../../../docs/adr/0009-embedding-version-manifest.md)(manifest / 相容)·[0010](../../../docs/adr/0010-indexer-contract-shared-package.md)(契約 #2)·[0012](../../../docs/adr/0012-embedding-as-a-service.md)(embedder 服務化)。
-- 來源 JSON 契約:[`apps/pdf-to-json/README.md`](../../pdf-to-json/README.md) §6.3;取用注意事項 [`docs/ocs-source-json.md`](../../../docs/ocs-source-json.md)。
-- 下游消費(哪個端點餵哪個池):[`apps/api/README.md`](../../api/README.md) + [`docs/design/editor-knowledge-pack.md`](../../../docs/design/editor-knowledge-pack.md)。
+- 來源 JSON 契約:[`apps/pdf-to-json/README.md`](../../pdf-to-json/README.md) §6.3;取用注意事項 [`docs/ocs-source-json.md`](../../../docs/archive/retired-documents/ocs-source-json.md)。
+- 下游消費(哪個端點餵哪個池):[`apps/api/README.md`](../../api/README.md) + [`docs/design/editor-knowledge-pack.md`](../../../docs/archive/retired-documents/design/editor-knowledge-pack.md)。
 - 文檔怎麼寫:[`docs/README.md`](../../../docs/README.md)、[`docs/design/README.md`](../../../docs/design/README.md)。

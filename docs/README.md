@@ -1,6 +1,6 @@
 # Caliburn 文件與 Repo 導覽
 
-這裡只維護分類與閱讀路徑，不複製產品規則、任務進度或驗收結論。**新 App 已於 2026-10-02 經 Owner 放行成為唯一正式產品：[`apps/api`](../apps/api/README.md)（後端）與 [`apps/web`](../apps/web/README.md)（介面），根命令與 CI 指向它們（[ADR0079](adr/0079-target-rebuild-production-cutover.md) Accepted，取代 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)）；舊程式已依清單退役，取回方式見 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。**「已有程式」「已有個別證據」與「整體驗收完成」須分開。
+這裡只維護分類與閱讀路徑，不複製產品規則、任務進度或驗收結論。**新 App 已於 2026-10-02 依正式切換決策成為唯一產品：[`apps/api`](../apps/api/README.md)（後端）與 [`apps/web`](../apps/web/README.md)（介面），根命令與 CI 指向它們（[ADR0079](adr/0079-target-rebuild-production-cutover.md) Accepted，取代 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)）；舊程式已依清單退役，取回方式見 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。**「已有程式」「已有個別證據」與「整體驗收完成」須分開。
 
 ## 先讀
 
@@ -21,9 +21,9 @@
 
 ### 教授版架構報告
 
-直接閱讀[教授版架構報告](reports/system-architecture/README.md)與[圖稿](reports/system-architecture/diagrams/README.md)。2026-10-02 從 `docs/professor-architecture@c5650c15` 收錄既有報告與圖檔，不合併該分支的其他程式，也沒有更新它的程式基準。
+直接閱讀[教授版架構報告](reports/system-architecture/README.md)與[圖稿](reports/system-architecture/diagrams/README.md)。已於 2026-10-02 對照正式產品與最新旅程證據更新，區分本機交付成果、分析品質限制與 B2 單向流程的實作差異。
 
-報告是面向讀者的解說，與開發契約分開。閱讀時先看其基準與限制，不把圖稿當成此分支已實作或已驗收的證據；原分支及工作樹處理見[封存紀錄](archive/repository-organization-2026-10-02.md)。
+報告是面向讀者的解說，與開發契約分開。閱讀時先看其基準與限制，不把示意圖當成所有分支均已實作或驗證的證據；原報告分支的收錄與工作樹處理歷史見[封存紀錄](archive/repository-organization-2026-10-02.md)。
 
 ## JD 核心知識與成品研究
 
@@ -50,7 +50,7 @@
 
 | 路徑 | 用途與處理方式 |
 |---|---|
-| `apps/api/`、`apps/web/` | 新目標程式、測試與各自啟動說明；程式內部分工沿[程式組織](implementation/code-organization.md) |
+| `apps/api/`、`apps/web/` | 正式產品程式、測試與各自啟動說明；程式內部分工沿[程式組織](implementation/code-organization.md) |
 | `experiments/jd-relational-app/`、`packages/consultant-memory/` | 原正式產品（ADR0077）。本分支已依 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回) 退役其可執行程式，只留研究與沿革文件；原程式由 Git 取回，不再是可啟動的產品 |
 | `apps/`、`packages/` 的其他子目錄 | 各有範圍，包含獨立 RAG 與歷史入口；看子目錄 README，不以目錄名推定可刪 |
 | `docs/` | 產品、設計、工程規範、任務、證據與沿革，分層見下表 |
@@ -88,7 +88,7 @@
 
 研究來源、這次 55 份研究歸位與 8 份封存的理由、驗證及限制，見[分類整理紀錄](archive/document-classification-2026-10-02.md)。這是既有[架構文件規範](architecture-discussion-standard.md)的目錄整理，不新增產品或開發授權。
 
-後續依 Owner 要求不再保留整套重複快照：2,396 份副本去重、7 份撤回計畫／退役通知僅留 Git；指南與實驗證據歸位見[去重紀錄與恢復對照](archive/docs-cleanup-2026-10-02.md)。現行與目標契約、獨有研究及有用證據仍保留，沒有因整理改變產品權責。
+後續整理不再保留整套重複快照：2,396 份副本去重、7 份撤回計畫／退役通知僅留 Git；指南與實驗證據歸位見[去重紀錄與恢復對照](archive/docs-cleanup-2026-10-02.md)。現行與目標契約、獨有研究及有用證據仍保留，沒有因整理改變產品權責。
 
 ## 歷史材料使用規則
 

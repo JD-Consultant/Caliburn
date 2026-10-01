@@ -1,7 +1,7 @@
 # 互動、部署、安全與日常運作
 
-- 狀態：**目標設計／未實作、未驗收**；2026-09-29。已確認使用者效果引用產品文件；部署與保護接線是工程建議。
-- **實作與驗證進度（2026-10-02）：**已依本設計施工，T01–T18 已依各任務的驗收層級完成，逐項效果的實測判定與限制見 [T17 V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)、實驗發現的問題見[實驗發現的問題彙整](../reports/experiment-findings.md)；production 切換（T18）已於 2026-10-02 由 Owner 放行並完成（[ADR0079](../adr/0079-target-rebuild-production-cutover.md)）。上方「未實作、未驗收」是 2026-09-29 撰寫當時的狀態，保留作沿革，不是現況。
+- 狀態：**現行產品架構及設計要求**；核對日期：2026-10-02。正式後端為 [`apps/api`](../../apps/api/README.md)，介面為 [`apps/web`](../../apps/web/README.md)；切換依據為 Accepted [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。設計要求不等於逐項已驗證，與實作仍有差異處另行標示。
+- 驗證範圍：T01–T18 已標記完成，但不代表所有驗收情境通過。逐項實測與限制見 [T17 V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)及[實驗發現的問題](../reports/experiment-findings.md)；分析品質、真人使用效果與未覆蓋分支仍須分別評估。
 - 維護者：App 交付維護者；上層：[系統責任](system-boundaries.md)。本頁不是現行啟停指令；現行操作仍見[runbook](../runbook.md)。
 
 ## 1. 使用者看到的主要流程
@@ -24,7 +24,7 @@
 
 ### 畫面、API 與串流的最小交接契約
 
-**工程設計／未實作：**查詢回傳目前可核對的業務／執行狀態，串流只加速顯示，不是另一份權威。API 接受、模型停止輸出、使用者看到字串，都不等於正式提交。模型 tool 的精簡回傳與 Web 呈現是不同介面，不為 UI 把大量狀態塞回 LLM。
+**介面契約：**查詢回傳目前可核對的業務／執行狀態，串流只加速顯示，不是另一份權威。API 接受、模型停止輸出、使用者看到字串，都不等於正式提交。模型 tool 的精簡回傳與 Web 呈現是不同介面，不為 UI 把大量狀態塞回 LLM。
 
 | 互動 | 接受後的可觀察結果 | 重連／重送／競爭 |
 |---|---|---|
@@ -35,9 +35,9 @@
 | 正式完成 | 以原完成結果取得完整答覆與正式 JD；可展開已保存公開訊息 | UI 斷線後讀同一結果，不再生成另一則 final；未保存片段不假裝已恢復 |
 | 人工 JD 寫入／PDF | 寫入遵循 JD 業務；PDF 固定當下正式修訂 | 鎖定檢查在後端，版本不符不盲蓋；匯出期間候選／新版發布不改變同一份輸出 |
 
-傳輸首選伺服器事件串流（SSE）加普通查詢／命令 API，先不引入雙向訊息平台；HTTP 路徑、事件型別與斷線退避由實作契約從本表生成。[MDN SSE 說明](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)提供單向事件與重連機制；重連本身不保證業務事件全保留，因此仍查正式狀態。每個頁面重用一條進度連線，不為每 Step／工具另開串流。中間文字只顯示 API 公開訊息，不展示不可讀 reasoning 或要求模型揭露內部推理。工具活動若提供，僅顯示安全的名稱／進度摘要，不展示金鑰或完整敏感參數。
+現行介面採伺服器事件串流（SSE）加查詢／命令 API；HTTP 路徑、事件型別及重連行為見[介面與交付設計](../implementation/interface-and-delivery.md)，跨語言格式依正式契約來源生成。[MDN SSE 說明](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)提供單向事件與重連機制；重連本身不保證業務事件全保留，因此仍查正式狀態。每個頁面重用一條進度連線，不為每 Step／工具另開串流。中間文字只顯示 API 公開訊息，不展示不可讀 reasoning 或要求模型揭露內部推理。工具活動若提供，僅顯示安全的名稱／進度摘要，不展示金鑰或完整敏感參數。
 
-**完成後撤回的最小工程建議：**App 依原輪操作的前後差異形成條件式反向修改；僅當受影響內容／關係仍符合可安全撤回條件才一次採用。若後續人或 AI 已改同一部分，回報衝突、不覆蓋；不加自動 merge 或任意歷史時間旅行。這不是 Agent 工具，也不撤回正式訪談、獨立 Memory 或 compaction。若要允許覆蓋後續修改，才另請 Owner 裁決。
+**完成後撤回的條件：**App 依原輪操作的前後差異形成條件式反向修改；僅當受影響內容／關係仍符合可安全撤回條件才一次採用。若後續人或 AI 已改同一部分，回報衝突、不覆蓋；不加自動 merge 或任意歷史時間旅行。這不是 Agent 工具，也不撤回正式訪談、獨立 Memory 或 compaction。允許覆蓋後續修改會改變資料保護承諾，須另作產品決策。
 
 ## 2. 最小部署視角
 
@@ -49,7 +49,7 @@ flowchart LR
   app --> file[本機 PDF 匯出]
 ```
 
-首版建議一個後端部署單位，內部可非阻塞地處理 A 與背景 B Graph；不是每 Agent 一個進程。PostgreSQL 是獨立資料庫程序，容器或本機安裝由實作者依支援環境選擇；不複製舊架構部署。正式依賴鎖定受支援的穩定版本，記錄 OpenAI SDK／LangGraph／checkpointer 的相容版本與原生 API 測試結果。
+**現行部署**採 FastAPI 單程序，同源提供建置後的 Web，內部處理 A 與背景 B Graph。PostgreSQL 為獨立資料庫程序；安裝、連線及初始化方式見 [App README](../../apps/api/README.md)與[runbook](../runbook.md)。正式依賴鎖定受支援的穩定版本，記錄 OpenAI SDK／LangGraph／checkpointer 的相容版本與原生 API 測試結果。
 
 多頁籤、同檔案重複提交由後端准入保護；同一操作者多檔案可管理，不混合資料。全域資源數量只是有界執行配置，不因此把不同職務檔案合成同一模型 thread。若未來需多後端程序，再驗證資料庫執行資格與重入，不能把 process-local lock 當跨程序保證。
 
@@ -60,6 +60,8 @@ flowchart LR
 3. A 提供已保存狀態與續作選項；Memory 由系統按有界策略恢復，不要求員工管理背景工作。
 4. 正常關閉先停止新准入，嘗試保存已取得結果並停止在可恢復邊界；強制關閉仍依最後可靠位置恢復，不承諾完成所有在途請求。
 5. 啟動時發現正式結果已提交，就回補執行／畫面，不再生成另一份結果。
+
+**現行恢復限制：**資料庫伺服器重啟後須重啟 App；單一 leader 的現行實作不會自動重連。Memory 最終失敗後，正式訪談再前進三輪才允許一次新批次，此政策仍待產品決策確認，且尚無真長旅程自然觸發的證據。來源見 [ADR0079 的限制](../adr/0079-target-rebuild-production-cutover.md)、[T11 證據](../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)與[runbook](../runbook.md)。
 
 外部 API 及 DB 不可用時，不以未保存結果宣稱完成。故障分類、重試時機與成本界線詳見[共用執行](../specs/2026-09-27-shared-agent-execution-and-state-design.md)；本頁不另維護 retry engine。
 
@@ -72,7 +74,7 @@ flowchart LR
 - API key 僅供後端使用，不進 prompt、模型工具、Web bundle、URL、提交或一般 log；取用與保存使用平台適合的秘密保存方式，不自造加密演算法。
 - 訪談與 JD 可能含個人／企業資訊。只有任務必要資料按核准設定送供應商，記錄外送目的／範圍；不把 `store=false` 寫成所有供應商保留與稽核都為零。
 
-安全研究參考：[OWASP prompt injection prevention](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html)、[secrets management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)。這些支持最小權限、資料／指令區分與秘密管理；本產品角色矩陣是 Caliburn 取捨。施工前核對當前官方契約並測拒絕路徑。
+安全設計參考：[OWASP prompt injection prevention](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html)、[secrets management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)。這些支持最小權限、資料／指令區分與秘密管理；本產品角色矩陣是 Caliburn 取捨。拒絕路徑的實測範圍見[驗收矩陣](verification.md)及其證據。
 
 ## 5. 必要觀測，不先造監控平台
 
@@ -80,8 +82,10 @@ flowchart LR
 
 UI 進度從既有 State／業務結果讀取；診斷保留技術原因供開發者，對員工僅說安全、可操作的內容。只有負載或支援需求證明不足，才增獨立追蹤後端／進度表。
 
-## 6. 取捨與交付順序
+<a id="6-取捨與交付順序"></a>
 
-先交付一條可驗的端到端閉環：**建檔／開場 → 訪談 → 有據改稿 → 保存與中斷接續 → Memory 發布 → 下一輪使用 → PDF**。按風險補取消競爭、來源換版、人工修改及長訪談，不先實作全稿審核、搜尋、跨機備份、事件平台或多種部署。
+## 6. 產品範圍與成效評估
 
-產品價值驗證看「員工能否只靠訪談得到涵蓋主要工作的精簡、高訊號 JD」及成本／時間，不以模型步數多、Memory 資料多或功能數量多代表成功。研究稿中的市場死亡率／百分比只是影片說法，未作本案事實依據；商業價格、客群規模及獲客另行驗證，不阻擋本機產品核心設計。
+核心驗證旅程為：**建檔／開場 → 訪談 → 有據改稿 → 保存與中斷接續 → Memory 發布 → 下一輪使用 → PDF**。取消競爭、來源換版、人工修改及長訪談分層驗證；全稿審核、搜尋、跨機備份、事件平台及多種部署不在首版範圍。
+
+產品價值驗證看「員工能否只靠訪談得到涵蓋主要工作的精簡、高訊號 JD」及成本／時間，不以模型步數多、Memory 資料多或功能數量多代表成功。商業價格、客群規模及獲客成效仍待獨立驗證。

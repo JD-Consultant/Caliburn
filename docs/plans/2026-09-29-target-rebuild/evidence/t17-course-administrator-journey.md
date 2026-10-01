@@ -370,3 +370,46 @@ execution `17ac9ab4-64db-4ff1-bce4-6dc0547dcb78` completed；觀察區間 **33.6
 | `audit_source_only_recheck.py` | `cbc0bb5513c90d6230300d21349accd75a4acb60d62c7b15592e86f56f04d4d9` |
 | `source-only-recheck-luna-20261001.json` | `6d739c480a35f15058a771a7ce8d82aa5091603b8c15e2f9b19825a44184a991` |
 | `source-only-recheck-luna-audit-20261001.json` | `4d6416ed271b6242ea633e2126b7f84e743d0fc3a916712dafc424332eecf956` |
+
+## 2026-10-01：Luna 長訪談收尾的有界接續
+
+### 執行前範圍與判準
+
+沿 [T14 已完成五輪的 high 旅程](t14-job-analysis-quality.md#補驗正式結果與限制)，不重跑訪談、不重測已否決的來源提示候選。第六輪先前因 `transient_service` 最終失敗；其後上節 Luna 已完成六次 Responses，故本片只重新送出尚未成為正式訪談的收尾輸入一次。這是新 Turn，不冒充取回先前遺失的模型結果，也不把服務現已成功當成品質已修復。
+
+沿 [OpenAI 評估指南](https://developers.openai.com/api/docs/guides/evaluation-best-practices)分開工具選擇／參數及最終效果，使用原 App 的真實接續；內容判準依 [工作分析 §6](../../../specs/2026-09-09-complete-work-analysis-guide.md#6-如何檢查整份工作已被適當涵蓋)、[JD 寫作 §3–7](../../../specs/2026-09-09-jd-field-and-writing-guide.md#3-職務目的職責任務同一份工作的不同縮放程度)及 [訪談校準 §6](../../../specs/2026-09-09-customized-jd-depth-and-interview-calibration.md#6-怎樣才是整份工作被理解而非只問透一案)。不使用官方託管 Evals 平台、不新增 reviewer 或驗收子系統。
+
+- 基準 `7d631737`；專用 DB `caliburn_t01_test`、schema `core_journey_20261001_635da286`，職務檔案 `a40b19dc-da6f-4105-9a4c-2c068edcaafa`。已唯讀確認無 active／paused 工作；原稿 `f76545e8-d4b9-43ce-871b-2e72fe07252a`、正式訪談末序號11。只在此 schema 明確升級0019→0020，不動 Demo。
+- 只送既有合成收尾句：「目前我主要做的工作大致都說了。我想先整理目前已談到的工作，其他不清楚的部分先保留未知。請幫我檢查現在的職務說明書還缺什麼。」不加入預期答案、來源序號提示或強制工具選擇。
+- 一個 A Turn、至多一個自然要求的 Memory 批次；Luna／high／all_turns、store=false。每 execution 最多16 model steps、48 outbound attempts、1 compact、16,384 output、120秒單請求／300秒執行、US$0.50，整批預留 US$1，零請求重試。輸出上限沿現行產品預設，不宣称與過去8,192探針完全同條件。
+- 失敗停止，不再重送同句；觀察逾時先核原 execution，不能當成工作已終止。所有外送僅既有合成訪談、App 指引及其產物；原始秘密與 opaque reasoning 不進報告。
+- 檢查既有有效工作是否保留、任務粒度與 K/S 是否有據、已知更正與未知是否忠實、來源是否支持每項主張、答覆是否如實；再查正式保存、原來源回讀、無模型重開及實際 Context／用量。既有拆分漏引或 Memory 精確化若仍在，就保留缺口，不替模型補資料、不降低 gate。
+
+探針 `.research-tmp/eval/verify_luna_closing_turn.py`；結果獨占建立為 `luna-closing-turn-20261001.json`，不覆蓋前次證據。本節先記執行範圍，尚不宣稱通過。
+
+### 結果：第五次模型請求失敗，安全收尾成立，品質未通過
+
+execution `35367359-e385-49c7-b992-a2d44ccda79e` 最終為 `failed`，觀察區間 **52.85 秒**。四次 Responses 完整返回，第五次 model attempt 記為 `transient_service`；五次 count、八次已完成工具、零重試／compact。依 manifest 停止，沒有再次重送收尾句，也沒有切模型、改 Prompt 或工具。
+
+| 檢查 | 實際結果 |
+|---|---|
+| 已完成工作 | 自主讀 JD 全文／map／協作對象、情境／理解 map 及訪談4、6；候選新增協作對象「學員」，提出 Memory 整理意圖。沒有最終正式答覆 |
+| 正式資料與回退 | JD 修訂仍為 `f76545e8-d4b9-43ce-871b-2e72fe07252a`，37筆正式來源仍可回讀；正式訪談維持1–11。候選與整理意圖沒有生效，已發布 Memory 仍為 `0ad00867-27c1-4f28-b8c5-8409a417aa59`、處理至10，沒有新背景批次 |
+| 可繼續使用 | 執行統計為5個完成 A、3個失敗 A、5個完成 Memory，無 active／paused 殘留；無模型重開取回同一正式 JD。這證明本次失敗安全退出，不代表所有失敗都已驗證 |
+| 接續觀察 | 五份已保存請求的本輪 App 資料指紋一致，原生視窗 items 為242→250→261→264→269，均為 `high`／`all_turns`。不是因工具後重建成只有最新問答；本片沒有執行 compaction |
+| 品質反例仍在 | 「學員」候選引用4、6及 `current_input`；當次只是要求整理，未提供協作事實。核對聯絡資料、說明確認事項、名冊記錄的直接出處在10，不在當次輸入。不能以4、6可查到或新增工具成功，就稱整組依據精確。此候選未正式提交，不宣稱正式稿多了一筆錯引 |
+
+**串流診斷：**再次看到 `ValueError: async generator already executing` 的 generator 清理警告。依[官方串流事件契約](https://developers.openai.com/api/docs/guides/streaming-responses)、本機鎖定 OpenAI 3.20.0／httpx2 2.13.1 原碼與現行 adapter，完整 terminal 與串流／HTTP error 是不同路徑；`transient_service` 只由相應 APIError 分類而來，普通 generator `ValueError` 不是該分類的充分原因。既有 ledger 只留下安全類別，沒有這次原 HTTP status／stream code，**無法回推究竟限流或服務錯誤，也不能證明警告與失敗有因果關係**。不憑猜測加 SDK 私有補丁、重試層或恢復系統。
+
+離線執行 `python -m pytest tests/unit/test_openai_failures.py tests/unit/test_response_streaming.py tests/contracts/test_openai_responses.py -q`（`apps/api/.venv-target`，工作目錄 `apps/api`）：**60 passed**。涵蓋 terminal 保存、cleanup／取消交接、stream error 分類與 SDK 零隱式重試；未重現該 generator 警告，不當作修復證據。唯一 pytest warning 是沙箱不能寫既有 cache，不影響測例結果；沒有為此提升權限重跑。
+
+四份完整生成 usage 合計 input **279,841**、output **3,871**；ledger 可核對估算 **US$0.012182045**，不是帳單。第五次失敗請求及 count 的未確認費用不當作零。沒有新 B1／B2 費用紀錄，不追加大視窗測試。
+
+本片只增加驗收證據，沒有產品程式／規則變更，不宣稱 TDD。T14／T16／T17／T18 仍未完成：既有跨輪來源涵蓋、Memory 精確度及成稿粒度限制沒有消除。停止這個收尾案例；下一切片先處理未完成 gate 的具體缺口，不再用同句重跑或同義提示微調求過關。若另有必要的真模型驗收，先讓探針安全保存 HTTP status／已知 stream code 等診斷資訊，再依當時配額與既有有界重試契約訂新 manifest；不外露 provider 原文、秘密或另建產品診斷平台。
+
+本機 ignored 原件 SHA-256（只含合成公開資料、指紋及用量）：
+
+| `.research-tmp/eval/` 原件 | SHA-256 |
+|---|---|
+| `verify_luna_closing_turn.py` | `2d568bedd1260598f949c4b0dd587ee3636191c23e8f9d99f2e4d5756d26c171` |
+| `luna-closing-turn-20261001.json` | `064107372180c046254954dc335c0e42094205c565b8afe2a86763e4bfd04df2` |

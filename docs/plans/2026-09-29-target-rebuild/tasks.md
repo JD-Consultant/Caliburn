@@ -233,6 +233,7 @@
 ## T17 長訪談與完整產品旅程
 
 - [ ] T17；依賴：T16。
+- **2026-10-01 Luna 收尾補驗已停止：**沿五輪既有真歷史，只重送未成正式訪談的收尾句一次；四次模型完成、第五次 `transient_service` 終止，八次工具的候選／整理意圖未生效，正式 JD／訪談／Memory 不變且無 active 殘留。候選仍見把收尾輸入當事實來源的問題；60項串流／分類離線測試通過不等於警告已修復。不再追加同例或提示微調，沒有產品變更、不勾品質 gate；[結果與下一步](evidence/t17-course-administrator-journey.md#2026-10-01luna-長訪談收尾的有界接續)。
 - **2026-10-01 Luna 純來源換版接續：**保留上一真 A 歷史，只追加受控 M3、不人工改 JD；六次模型／十次工具自主讀來源 Markdown diff、正確改稿、明確對齊原引用，正式保存與無模型重開、舊鏈回讀通過。補上前片未觀察的 source 分支，不等同自然長訪談或 B1／B2 品質；[結果與限制](evidence/t17-course-administrator-journey.md#2026-10-01同一合成案例的純來源換版接續)。不追加同例、不勾整體完成。
 - **2026-10-01 Luna 換版／人工改稿：**受控 fixture 下，一個真 Luna／high Turn 正確把每月改為每季、移除誤加核准權，並明確對齊既存 Memory 引用；正式保存、舊引用鏈及無模型重開可回讀。5 次生成、10 次工具，沒有改 Prompt／程式。模型讀人工 diff、新 Memory 全文與原話，**來源 diff 分支未觀察**；短單項案例不消除長訪談品質限制、不勾完成。見[結果與證據邊界](evidence/t17-course-administrator-journey.md#2026-10-01luna-的-memory-換版與人工改稿定向驗收)。
 - **2026-10-01 UI／PDF 續驗：**原 Sol 合成產物以無模型後端唯讀開啟，來源／JD 變更可回看，3 頁 PDF 逐頁及 49 個已填文字欄位核對完成；發現並修正「無模型配置使已保存 commentary 無法回讀」的 bootstrap 接線，37 項相關測試通過。沒有新外送、人工補稿或改資料；這不是 Luna 品質驗收。界線與既有 PDF 文字層限制見[續驗證據](evidence/t17-course-administrator-journey.md#2026-10-01既有真模型產物的-ui-與-pdf-續驗)。Owner 已因成本[決定產品使用 Luna](evidence/t14-job-analysis-quality.md#2026-10-01owner-決定維持-luna)，後續不推進 Sol 切換。

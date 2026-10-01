@@ -42,6 +42,9 @@ required-version = "==0.12.20"
 
 [tool.pytest.ini_options]
 testpaths = ["tests/unit", "tests/contracts", "tests/integration"]
+# Tests import shared fixtures as `tests.fixtures...`; this keeps that working when pytest is
+# started from the repository root (the documented `pnpm test`) and not only from apps/api.
+pythonpath = ["."]
 asyncio_mode = "auto"
 addopts = "--strict-markers"
 markers = ["postgres: requires an explicitly configured isolated PostgreSQL database"]

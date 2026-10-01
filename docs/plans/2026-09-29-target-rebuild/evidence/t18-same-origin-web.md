@@ -121,3 +121,42 @@ Ruff 檢查／格式通過，mypy **274 source files 無問題**。未重跑與�
 自有 server PID 36024 已 Ctrl+C 完成 lifespan 關閉；58141 不再監聽。測試資料保留，未刪舊資料或停止其他程序。只補 README 的 PDF 安裝／配置步驟及本證據，沒有新產品程式行為，因此不重跑無關全套測試。
 
 **結論：**已證實同機獨立 wheel 環境＋新下載指定版本瀏覽器／字型可以由正式後端匯出短／長中文 PDF。原生 Playwright CLI 下載仍未成功，另機／Linux 未驗；不以此勾 T18 或宣告 T14／T16／T17 的品質／容量問題已解決。
+
+## 切換範圍盤點與舊依賴防線（2026-10-01）
+
+以 `4a71e0b1` 的 tracked 樹作唯讀盤點，**不是批准立即刪除或切換**。T14／T16／T17 未通過，現行 ADR0077、根命令、CI、Demo 與資料均保持原狀。產品 Luna／high 決策不變。
+
+### 精確範圍與保留項
+
+| 範圍 | 基準數量 | T18 通過前置 gate 後的處置 |
+|---|---:|---|
+| `experiments/jd-relational-app` 下的 tracked 非 Markdown 檔 | 336 | 舊 App／Web 程式、契約、測試、遷移、設定與 lock 的退役候選 |
+| `packages/consultant-memory` 下的 tracked 非 Markdown 檔，排除 `adoption.json` | 41 | 舊 Memory 程式、測試及套件設定的退役候選 |
+| `scripts/run-jd-app.mjs`、`scripts/run-jd-app.test.mjs` | 2 | 舊啟動器及其測試；新根入口須先驗證再移除 |
+| 上述兩個目錄的 Markdown 及 `packages/consultant-memory/adoption.json` | 16 | 保留研究、方法、結果與採用沿革；原 README／局部指引於切換時標示歷史，不再作執行入口 |
+
+候選共 **379 檔**。可用 `git ls-tree -r --name-only 4a71e0b1 -- experiments/jd-relational-app packages/consultant-memory` 重建：排除 `.md` 與前述 `adoption.json`，再加兩個明列的啟動器檔案。此為固定 Git 樹的選取條件，不是對工作目錄遞迴刪除的命令；執行當天須重新核對 dirty、使用中的程序與逐檔 diff，保留新增／未追蹤／ignored 檔案。`.env`、venv、資料庫、volume、測試產物及其他 experiments／RAG 不在清單。
+
+### 必須共同切換的入口
+
+1. 根 `package.json` 的 JD 開發／建置／測試／啟動及舊 `app:*` 命令、`pnpm-workspace.yaml` 的兩個舊 workspace、相應 `pnpm-lock.yaml` importer。新根命令應轉交既有新 App 入口，不將舊 OpenRouter／Windows 憑證管理移植成相容層。RAG scripts 與獨立套件保留；lock 由 pnpm 更新，不手刪共用傳遞依賴。
+2. `.github/workflows/api-tests.yml` 目前仍安裝舊 Python 專案、執行舊 codegen／測試與 Web typecheck，必須與根命令一起改到新目標，否則綠色 CI 仍只在驗舊產品。切換前不先讓它冒充新產品 gate。
+3. `README.md`、`ARCHITECTURE.md`、`CONTRIBUTING.md`、`AGENTS.md`、runbook、current-decisions、ADR 索引與 successor，以及相關 App README。歷史 ADR0077 不改寫；舊文檔失效入口改連歷史索引或固定 Git 版本，不能保留成看似可執行的現行指令。
+
+本次以 `git grep` 搜 tracked 非 Markdown／非 lock 的反向依賴：除舊產品本身，執行接線命中上述根命令、workspace、CI 及啟動器；新後端只在邊界測試中提及舊套件。這是靜態盤點，不能代替切換後的 frozen install、codegen、建置與完整旅程。套件化 migration、同源交付及 PDF 已有本頁前節證據，不為盤點重跑或重建另一套交付方式。
+
+### 發現並修正的檢查缺口
+
+既有 `tests/unit/test_import_boundaries.py` 禁止 `consultant_memory`，但舊套件 `pyproject.toml` 的 wheel 路徑是 `src/caliburn_memory`，因此原檢查漏攔真正的舊 import。目前新產品沒有該依賴，不是已發生的執行故障。
+
+先在原參數化測例加入 `import caliburn_memory` 與 `from caliburn_memory import publication`：**2 failed、15 passed**，失敗原因是未報違規。僅補正既有 denylist 的套件名後，同檔 **17 passed（0.24s）**，包含實際掃描新後端 source；Ruff check／format check 通過。沒有新增 AST 框架、產品依賴、runtime 行為或付費請求。
+
+重現命令（`apps/api`）：
+
+```powershell
+.\.venv-target\Scripts\python.exe -X utf8 -B -m pytest tests/unit/test_import_boundaries.py -q -p no:cacheprovider --tb=short
+.\.venv-target\Scripts\python.exe -m ruff check tests/unit/test_import_boundaries.py
+.\.venv-target\Scripts\python.exe -m ruff format --check tests/unit/test_import_boundaries.py
+```
+
+依開發規範 §3.1，本片只改測試防線及盤點文件，不重跑未受影響的 DB／模型／UI 全套。**下一步仍先處理前置 gate；本節不勾 T18、不執行清單、不啟動或停止任何產品程序。**

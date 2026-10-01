@@ -160,3 +160,32 @@ Ruff 檢查／格式通過，mypy **274 source files 無問題**。未重跑與�
 ```
 
 依開發規範 §3.1，本片只改測試防線及盤點文件，不重跑未受影響的 DB／模型／UI 全套。**下一步仍先處理前置 gate；本節不勾 T18、不執行清單、不啟動或停止任何產品程序。**
+
+## 乾淨 worktree 的根命令（切換候選，2026-10-01）
+
+基準 `2fdc6cad`。本片把 T18 的入口切換備成一組可審提交，**放在獨立分支 `target-cutover-candidate`（git worktree `S:\caliburn-cutover`）**，原分支 `target-rebuild` 的根入口、舊程式與 ADR0077 效力不變；沒有 merge、push、刪資料，也沒有啟停 Demo。T14／T16／T17 前置 gate 仍是放行條件，本片只證明「切換本身可行且可驗」。
+
+### 內容（候選分支三個提交）
+
+| 提交 | 內容 |
+|---|---|
+| `d08a3b09` | 根 `package.json`（`dev`／`start`／`build`／`lint`／`typecheck`／`test`／`check`／`app:migrate`／`app:status`）、`pnpm-workspace.yaml` 移除舊 workspace、pnpm 重新生成的 lock（importer 只剩 `.` 與 `apps/web`，其餘為 RAG 套件）、`scripts/run-app.mjs`（啟動後端、dev 時加 Vite；`start` 沒有建置就明確失敗；額外參數如 `--port` 轉給後端）及其 5 項 node 測試、`python -m caliburn.status` 與其 6 項測試、CI 改跑同一個根 `check` |
+| `be14f8ba` | 退役固定盤點的 **379 個 tracked 檔**（336＋41＋2 個啟動器檔），兩個 README 加歷史標記與基準提交 |
+| `7f2e0085` | README、ARCHITECTURE、CONTRIBUTING、AGENTS、runbook 改寫；ADR0079 補切換內容、預先驗證及「退役範圍與取回」（仍為 Proposed） |
+
+`app:status` 只讀：列出資料庫（可連線、migration 是否在 head）、模型是否設定（不印 key）、PDF 字型／瀏覽器、Web 建置；`app:migrate` 是唯一改 schema 的命令。沒有移植舊的初始化精靈、OpenRouter 或 Windows 認證管理員接線（ADR0079 明定不做相容層）。
+
+### 實際驗證（工作目錄皆為該 worktree；工具鏈沿 [T01 §2](t01-foundation.md#2-可接續的環境與命令)）
+
+- **鎖定安裝**：`uv sync --project apps/api --locked`（uv 0.12.20）與 `pnpm install --frozen-lockfile`（pnpm 12.5.1、Node 24.19，393 套件）；快取命中，沒有改 lock。
+- **根 `pnpm run check` 通過**（lint → typecheck → test → build）：Ruff check／format（429 檔）、ESLint；mypy strict（279 source files）、`tsc`；node 測試 4 項（當時；後加轉發參數測例為 5 項）、**1,113 項單元／契約測試（16 秒）**、**162 項前端測試**；契約生成核對；production build（952.67 kB JS，沿既有 chunk 警告）。
+- **發現並修正的反例（Red → Green）**：第一次根 `check` 在 Python 測試階段 **17 個單元測試模組收集失敗**（`ModuleNotFoundError: No module named 'tests'`），原因是測試以 `tests.fixtures…` 匯入共用夾具，只有從 `apps/api` 啟動才解析得到；文件原本就寫從 repo root 執行同一命令，所以是文件與設定不一致的潛在缺陷。在 `apps/api/pyproject.toml` 加 `pythonpath = ["."]`（原分支提交 `313acc54`），根命令全數通過；原分支上以 console script 從 repo root 跑單檔也由失敗變為 7 passed。
+- **操作旅程（真 PostgreSQL，新 schema `cutover_verify`，隔離 `_test` DB）**：`app:status` 無設定時回報四項「未設定」且 exit 0；`app:migrate` 建立 namespace 並升到 head（exit 0）；有設定時 `app:status` 顯示「資料庫可連線、migration 在 head／key 已設定（隱藏）／字型與瀏覽器 ok／Web 建置已找到」；`pnpm start --port 8104` 啟動單一程序：首頁 200 `text/html`、`/job-files/<id>` 深連結在瀏覽器式 `Accept: text/html` 下 200、建置資源 200、缺失 API 在接受 HTML 時仍 404、`/api/health` ok；經 HTTP 建立合成職務檔後**硬停止**後端三個程序、以同一根命令重啟，職務檔仍在清單中。
+- **探針誤判（非產品問題）**：PowerShell `Invoke-WebRequest` 預設 `Accept: */*`，深連結得 404，這是 FastAPI frontend 只對 HTML 導覽套用 SPA fallback 的設計；以瀏覽器式 `Accept` 即 200。
+
+### 未驗與限制
+
+- 這是**同機乾淨 worktree**，不是另機網路 clone、容器或 Linux；依賴取自本機快取。
+- 候選分支上的真模型旅程與 PDF 另記於 T17／下節（若已執行）；這裡的啟動驗證沒有發送模型請求。
+- 根 `check` 不含真 PostgreSQL 整合測試、瀏覽器旅程與真模型；它們仍依各任務證據分開執行。
+- 尚未更新 `current-decisions.md`、各 App README 的狀態標頭與 ADR 採用狀態——那是放行時的同步動作，不在候選預先改寫。

@@ -118,7 +118,10 @@ class MemoryConsolidationWorkflow:
         """Settle abandoned work, preserving any publication that already committed.
 
         An unknown commit is reconciled under the same job lock; query or settlement
-        failure still propagates and never proves the candidate was discarded.
+        failure still propagates and never proves the candidate was discarded. The failure
+        keeps new batches blocked until the interview has advanced past the frontier recorded
+        here (`RETRY_AFTER_NEW_MESSAGES`): only progress, never a notification or the clock,
+        allows one new attempt, and the work stays unskipped from the published coverage.
         """
         if writer.scope.kind != ExecutionKind.MEMORY_BATCH or not reason or len(reason) > 100:
             raise ValueError("A Memory failure requires a short classified reason code")
@@ -136,6 +139,7 @@ class MemoryConsolidationWorkflow:
                 await executions.finish_execution(session, writer, ExecutionStatus.FAILED)
             else:
                 await executions.finish_execution(session, writer, ExecutionStatus.FAILED)
+            frontier = await interviews.read_history_frontier(session, writer.scope.job_file_id)
             await requests.record_operation(
                 session,
                 job_file_id=writer.scope.job_file_id,
@@ -143,29 +147,7 @@ class MemoryConsolidationWorkflow:
                 command_id=uuid5(writer.scope.execution_id, "memory.failure"),
                 kind="batch_failure",
                 payload={"reason": reason},
-                result={"reason": reason},
-            )
-
-    async def release_block(self, scope: ExecutionScope, *, condition_change_id: UUID) -> None:
-        """System hook ONLY after verified external condition change; never a UI retry endpoint.
-
-        New notifications cannot call this or reset budgets. The abandoned work stays failed;
-        subsequent admission starts from the still-published coverage, without skipping inputs.
-        """
-        if scope.kind != ExecutionKind.MEMORY_BATCH:
-            raise ExecutionStateError("Only a failed Memory batch can release a block")
-        async with self.sessions.begin() as session:
-            await job_files.lock_job_file(session, scope.job_file_id)
-            if (await executions.read_execution(session, scope)).status != ExecutionStatus.FAILED:
-                raise ExecutionStateError("The Memory batch is not failed")
-            await requests.record_operation(
-                session,
-                job_file_id=scope.job_file_id,
-                execution_id=scope.execution_id,
-                command_id=uuid5(scope.execution_id, "memory.release_block"),
-                kind="batch_block_released",
-                payload={"condition_change_id": str(condition_change_id)},
-                result={},
+                result={"reason": reason, "formal_frontier": frontier},
             )
 
     async def _pending_source(self, session: AsyncSession, job_file_id: UUID) -> UUID | None:

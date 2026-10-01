@@ -156,7 +156,7 @@
 ## T11 背景調度、交接與共同發布
 
 - [x] T11；依賴：T08、T10。
-- **完成（2026-09-30 恢復後）：**背景調度、交接與共同發布已逐條對照 Red 與 V10–V15／E10／E13，見 [T11 完成對照](evidence/t11-memory-batch.md#任務完成對照2026-09-30-恢復後)。**已知限制（如實記錄，待 Owner 確認）：**`release_block` 沒有 production 呼叫者，背景整理一旦最終失敗該檔案就不再自動整理（A 仍可用近期原話與 `read_interview` 繼續；規格把解除偵測列為待細設），附有界建議。以下為歷史紀錄。
+- **完成（2026-09-30 恢復後）：**背景調度、交接與共同發布已逐條對照 Red 與 V10–V15／E10／E13，見 [T11 完成對照](evidence/t11-memory-batch.md#任務完成對照2026-09-30-恢復後)。**2026-10-01 已接線（政策待 Owner 核對）：**背景整理最終失敗後，該檔案的正式訪談再完成三輪才允許一次新批次，只以訪談進度為條件、不加計時器或手動入口，見 [T11 更新](evidence/t11-memory-batch.md#任務完成對照2026-09-30-恢復後)。**（歷史）已知限制：**`release_block` 沒有 production 呼叫者，背景整理一旦最終失敗該檔案就不再自動整理（A 仍可用近期原話與 `read_interview` 繼續；規格把解除偵測列為待細設），附有界建議。以下為歷史紀錄。
 - **最新切片：**`8eb469e1` 接 Parent／固定範圍、差異交接、共同發布；`76f99867` 接 A 成功完成後登記與啟動重掃，[證據](evidence/t11-memory-batch.md)。已發布到正式員工序號 4、6；完整冷啟未知結果恢復仍未完成。
 - **契約：**背景生命週期的①②③、[保存 §5](../../architecture/persistence.md#5-背景要求不能只留在記憶體)、共用執行 §5–7。
 - **程式／交付：**`workflows/memory_batch.py`、Parent、App lifespan 調度；pending frontier／單批資格、交接快照diff、完成／失敗投影。
@@ -214,6 +214,7 @@
 - [x] T15；依賴：T12、T13。
 - **2026-10-01 有界完成審查：**已逐項核對安全拒絕、隔離、token／查詢／保存量及依賴邊界；本次主線連容量／compaction 回歸 44 passed，原證據不重算成新驗收。無須先加 cache／索引／GC，完成依據與未驗範圍見[條件對照](evidence/t15-capacity-measurements.md#6-t15-完成對照2026-10-01-有界收尾)。本項完成不代表 T14／T16／T17 品質通過。
 - **2026-10-01 容量收斂：**重用合成旅程完成 token／查詢／保存量測，最大已保存 A 請求 42,524 tokens；JD 投影約 5–14 ms，較慢的是 commentary history 投影。沿 Owner 指示不為非核心慢點加 cache／新儲存；原容量與 import 邊界 41 passed，詳見[量測與限制](evidence/t15-capacity-measurements.md)。大視窗 provider 與完整品質仍非本片證據。
+- **2026-10-01 程式組織審查（Owner 要求高內聚、低耦合）：**工具鏈全乾淨、模組級無 import 環；找到並修正 6 項有具體反例的結構問題（B1／B2 共用組裝層級倒置與兩個過渡殼、兩個套件環、兩個角色 runner 的重複開頭、組裝根巨大 lifespan、前端 feature 互不 import 未被 lint 鎖住、無呼叫者的 Memory 解阻 API），層方向規則改成表格鎖進測試；長函式等已知債與其觸發條件如實保留。不改產品行為、無新外送，T15 勾選狀態與其他任務不變。見[審查證據](evidence/t15-code-organization-review.md)。
 - **2026-10-01 接手收尾：**既有憑證隔離草稿完成有限驗收：合成 key 不進 request body、真 PG checkpoint／產品資料、公開讀取及 log；provider 回顯秘密也不外露。4 例連既有局部安全回歸 69 passed，範圍見 [T15 末節](evidence/t15-local-http-security.md#2026-10-01-接手收尾憑證不進接續歷史與公開資料)。不新增產品子系統，不將整個容量／安全 gate 勾選。
 - **2026-09-30 UI 交接修正：**隔離 Vite proxy 改為保留原 Origin，後端可顯式配置一個精確 loopback dev Origin；預設安全邊界不變。新增 red→green 代理與配置測試、原安全測例回歸見 [HTTP 證據](evidence/t15-local-http-security.md#隔離前端的來源保留修正2026-09-30)。僅修此接縫，不勾選整個 T15。
 - **契約：**[運作責任](../../architecture/delivery-and-operations.md)、[程式規範](../../implementation/code-organization.md)、V24／V26／V27。

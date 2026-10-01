@@ -71,7 +71,7 @@ flowchart TD
 
 接續先看[收尾分類與下一步](tasks.md#收尾分類與下一步)；依題目從[證據索引](evidence/README.md)找實測與原始資料。這兩個入口不改動下述既有結論與驗收要求。
 
-**2026-10-02 T16／T17 結案入口：**T16、T17 已依實測與已知不足清單勾選（限制與未觀察項見[T17 V01–V28 對照](evidence/t17-v01-v28-closure.md)、[T14 已知不足](evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)、[T16 §12](evidence/t16-compaction-continuity.md#12-b1b2-輪前壓縮的真模型觀察2026-10-02執行前-manifest)）；剩 T18：重基切換候選、重驗、等 Owner 放行。**OpenAI 帳戶額度已用完（2026-10-02 05:16 起 `credit_balance_exhausted`）**，補額度前所有真模型驗證暫停。以下為較早入口。
+**2026-10-02 T16／T17 結案入口：**實驗發現的問題（缺口、已修正、環境事故；不含解法）一頁整理見[實驗發現的問題彙整](../../reports/experiment-findings.md)。T16、T17 已依實測與已知不足清單勾選（限制與未觀察項見[T17 V01–V28 對照](evidence/t17-v01-v28-closure.md)、[T14 已知不足](evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)、[T16 §12](evidence/t16-compaction-continuity.md#12-b1b2-輪前壓縮的真模型觀察2026-10-02執行前-manifest)）；剩 T18：重基切換候選、重驗、等 Owner 放行。**OpenAI 帳戶額度已用完（2026-10-02 05:16 起 `credit_balance_exhausted`）**，補額度前所有真模型驗證暫停。以下為較早入口。
 
 **2026-10-02 續跑收尾入口：**原採購旅程已在同一檔案完成45輪、3批Memory與4頁PDF，沒有重跑；原第25／30輪均安全終止後才新送，無未結束工作。harness修正為 `40f7c1f9`。實際判準、10筆待核對依據、未自然出現JD→Memory引用及下一步見 [T17 A2實測結果](evidence/t17-course-administrator-journey.md#a2-實測結果2026-10-02原旅程完成-45-輪)。本次付費驗收已停止；T16–T18仍未完成，不以單例完成放行切換。教授報告與切換候選工作樹原樣保留。以下為較早交接沿革。
 

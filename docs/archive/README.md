@@ -7,6 +7,7 @@
 | 本次 docs 分類、理由、驗證與原路徑 | [2026-10-02 文件分類紀錄](document-classification-2026-10-02.md)、[路徑／雜湊對照](document-classification-2026-10-02.csv) |
 | 已明示退役或被取代的文件 | [retired-documents](retired-documents/README.md) |
 | 早期獨立施工計畫 | [implementation-plans](implementation-plans/README.md) |
+| 早期 Agent 實作、問題與審查報告 | [agent-task-reports](agent-task-reports/README.md)；從根目錄 `.superpowers/sdd/` 歸位 |
 | 已結束的 worktree、原分支及可恢復提交 | [工作樹／分支歷史索引](worktree-history-index.md) |
 | 工作樹與分支原始材料快照 | [worktree-snapshots](worktree-snapshots/)、[branch-snapshots](branch-snapshots/)；先經上一列查基準 |
 | 舊 JobIntel v3 的原始文件 | [jobintel-v3](jobintel-v3/)；只供歷史追溯 |

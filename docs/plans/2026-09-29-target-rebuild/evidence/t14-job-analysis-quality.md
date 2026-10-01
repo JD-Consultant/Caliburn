@@ -930,7 +930,7 @@ Q1 資料出來後、候選尚未執行前，做三項登記，**不改變採用
 
 | 項目 | 界線 |
 |---|---|
-| 對照 | Q1（`d41e75f7` 程式與舊指引）對 候選 c1（`<C1_COMMIT>`）。候選只改 `agents/job_consultant/instructions.py` 的四處文字；B1／B2 指引、工具描述與 schema、Context、模型／effort、harness 與 Q1 完全相同 |
+| 對照 | Q1（`d41e75f7` 程式與舊指引）對 候選 c1（`ec3c143a`）。候選只改 `agents/job_consultant/instructions.py` 的四處文字；B1／B2 指引、工具描述與 schema、Context、模型／effort、harness 與 Q1 完全相同 |
 | 模型／資料 | 同 Q1：A、B1、B2 為 Luna／high；員工模擬 Luna／low；全合成人設 |
 | 次數 | 同兩人設各 3 次、每次最多 12 個 A Turn、**依序執行**、同一 `eval_b`／8103（重啟載入候選）；不並行（帳戶 TPM 200K） |
 | 費用 | Q1 每份 US$0.04–0.07；本批估 ≤ US$0.6，**停止上界 US$2** |

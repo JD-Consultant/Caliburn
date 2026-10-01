@@ -230,6 +230,7 @@
 ## T17 長訪談與完整產品旅程
 
 - [ ] T17；依賴：T16。
+- **2026-10-01 Luna 換版／人工改稿：**受控 fixture 下，一個真 Luna／high Turn 正確把每月改為每季、移除誤加核准權，並明確對齊既存 Memory 引用；正式保存、舊引用鏈及無模型重開可回讀。5 次生成、10 次工具，沒有改 Prompt／程式。模型讀人工 diff、新 Memory 全文與原話，**來源 diff 分支未觀察**；短單項案例不消除長訪談品質限制、不勾完成。見[結果與證據邊界](evidence/t17-course-administrator-journey.md#2026-10-01luna-的-memory-換版與人工改稿定向驗收)。
 - **2026-10-01 UI／PDF 續驗：**原 Sol 合成產物以無模型後端唯讀開啟，來源／JD 變更可回看，3 頁 PDF 逐頁及 49 個已填文字欄位核對完成；發現並修正「無模型配置使已保存 commentary 無法回讀」的 bootstrap 接線，37 項相關測試通過。沒有新外送、人工補稿或改資料；這不是 Luna 品質驗收。界線與既有 PDF 文字層限制見[續驗證據](evidence/t17-course-administrator-journey.md#2026-10-01既有真模型產物的-ui-與-pdf-續驗)。Owner 已因成本[決定產品使用 Luna](evidence/t14-job-analysis-quality.md#2026-10-01owner-決定維持-luna)，後續不推進 Sol 切換。
 - **2026-10-01 有限續驗已停止：**局部更正的來源保留候選僅 1/2 改善，未採用、不改產品 Prompt、不增機制；[全部四次結果](evidence/t17-course-administrator-journey.md#2026-10-01-續驗局部更正與仍有效的來源)保留。下一切片先對照既有 provider／核心旅程證據，補真正缺口，不重跑全部訪談或重試同一提示；來源語意限制未因此消除。
 - **2026-10-01 接手核心品質：**六組 b0 共 64 個完成 Turn，仍有一份空任務稿及一筆收尾錯引；只修工具可操作的錯誤回饋，拒絕把提示詞候選的一次成功當成可靠改善。局部 probe、真後端短旅程、限制及下一步見[接手紀錄](evidence/t17-course-administrator-journey.md#2026-10-01-接手只處理影響成稿的兩個反例)。不重新開始全部長訪談，不以 API 成功代替品質通過。

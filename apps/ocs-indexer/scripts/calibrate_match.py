@@ -4,7 +4,7 @@
 池量 / exact 收斂 / 跨來源對數 / 分帶結果(自動群、灰區對數)/ 0.1 級距直方 / 高分帶前 10 對。
 輸出貼進 docs/specs/ 當校準紀錄;改門檻 = 改 core.THRESHOLDS + 重跑本腳本留紀錄。
 
-用法(需 embedder 容器,npm run infra):
+用法(需 embedder 容器，先從 repo root 執行 pnpm rag:up):
   cd apps/ocs-indexer && PYTHONUTF8=1 uv run python scripts/calibrate_match.py
 """
 from __future__ import annotations

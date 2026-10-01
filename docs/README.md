@@ -1,6 +1,8 @@
 # Caliburn 文件與 Repo 導覽
 
-這裡只維護分類與閱讀路徑，不複製產品規則、任務進度或驗收結論。**新 App 已於 2026-10-02 依正式切換決策成為唯一產品：[`apps/api`](../apps/api/README.md)（後端）與 [`apps/web`](../apps/web/README.md)（介面），根命令與 CI 指向它們（[ADR0079](adr/0079-target-rebuild-production-cutover.md) Accepted，取代 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)）；舊程式已依清單退役，取回方式見 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。**「已有程式」「已有個別證據」與「整體驗收完成」須分開。
+本頁依用途提供文件入口。產品規則、任務進度與驗收結論由各自文件維護。
+
+自 2026-10-02 起，正式產品為 [`apps/api`](../apps/api/README.md)（後端）與 [`apps/web`](../apps/web/README.md)（介面），根命令及 CI 已切換至這兩個目錄。切換依據為已接受的 [ADR0079](adr/0079-target-rebuild-production-cutover.md)，取代 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。舊程式已依清單退役，取回方式見 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。產品切換與各項效果的驗證分開記錄，不能只因程式存在或個別測試通過，就認定整體已驗收。
 
 ## 先讀
 
@@ -23,7 +25,7 @@
 
 直接閱讀[教授版架構報告](reports/system-architecture/README.md)與[圖稿](reports/system-architecture/diagrams/README.md)。已於 2026-10-02 對照正式產品與最新旅程證據更新，區分本機交付成果、分析品質限制與 B2 單向流程的實作差異。
 
-報告是面向讀者的解說，與開發契約分開。閱讀時先看其基準與限制，不把示意圖當成所有分支均已實作或驗證的證據；原報告分支的收錄與工作樹處理歷史見[封存紀錄](archive/repository-organization-2026-10-02.md)。
+報告解釋設計原因與運作方式，詳細開發契約仍由原文件維護。請連同報告標示的基準及限制閱讀；示意圖未涵蓋所有實作分支或驗證結果。原報告分支的收錄與工作樹處理歷史見[封存紀錄](archive/repository-organization-2026-10-02.md)。
 
 ## JD 核心知識與成品研究
 

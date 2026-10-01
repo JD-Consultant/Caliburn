@@ -1,6 +1,6 @@
 # Memory 保存接線
 
-- 日期：2026-10-01；狀態：**T04 保存切片已完成，T05 工具、T10 角色與 T11 背景編排亦已接線**。本頁維護保存責任；細節中的切片時序不代表後續工作仍未實作。保存證據見 [T04](../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)，端到端接線及「最終失敗後尚無自動解除阻塞呼叫者」的限制見 [T11](../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md#任務完成對照2026-09-30-恢復後)。任務完成狀態仍以[任務表](../plans/2026-09-29-target-rebuild/tasks.md)為準，不等同 T14／T16／T17 的完整模型品質與容量驗收。
+- 日期：2026-10-01；狀態：**T04 保存切片已完成，T05 工具、T10 角色與 T11 背景編排亦已接線**。本頁維護保存責任；細節中的切片時序不代表後續工作仍未實作。保存證據見 [T04](../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)，端到端接線，以及最終失敗後「訪談再前進三輪才允許一次新批次」的解除條件（2026-10-01 接線，政策待 Owner 核對）見 [T11](../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md#任務完成對照2026-09-30-恢復後)。任務完成狀態仍以[任務表](../plans/2026-09-29-target-rebuild/tasks.md)為準，不等同 T14／T16／T17 的完整模型品質與容量驗收。
 - 上位責任：[資料保存 §2–4](../architecture/persistence.md#2-不可變修訂與發布快照)、[B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[內容與引用修改](../specs/2026-09-27-memory-object-update-tool-contract.md)、[title 解析](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#4-未決接縫與停止線)。接線總則見 [data-and-contracts §3](data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 
 ## 1. 實作責任與第一切片

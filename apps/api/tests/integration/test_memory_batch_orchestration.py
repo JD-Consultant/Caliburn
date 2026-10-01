@@ -141,7 +141,7 @@ def test_parent_publishes_once_and_coalesces_next_frontier(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
-        from caliburn.agents.memory_analysis.results import (
+        from caliburn.workflows.memory_analysis.results import (
             AnalysisComplete,
             MemoryAnalysisResult,
             SituationGap,
@@ -209,7 +209,7 @@ def test_parent_publishes_once_and_coalesces_next_frontier(
     execute(database_settings, scenario)
 
 
-def test_final_failure_blocks_repeated_notifications_not_consultant(
+def test_final_failure_blocks_until_the_interview_has_advanced(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
@@ -217,26 +217,69 @@ def test_final_failure_blocks_repeated_notifications_not_consultant(
 
         requests = MemoryConsolidationWorkflow(database.sessions)
         turn = await start_turn(database)
+        file_id = turn.scope.job_file_id
         await requests.request(turn, uuid4())
         await complete_turn(database, turn)
         work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
         assert work is not None
         await requests.fail(work.writer, reason="quota_exhausted")
-        later = await start_turn(database, turn.scope.job_file_id)
+        # One more request and exchange is a notification, not a changed condition.
+        later = await start_turn(database, file_id)
         await requests.request(later, uuid4())
         await complete_turn(database, later)
-        assert await MemoryConsolidationWorkflow(database.sessions).discover() == ()
+        assert await requests.discover() == ()
+        assert await requests.failure_reason(file_id) == "quota_exhausted"
         assert (
-            await MemoryCandidateWorkflow(database.sessions).read_latest_snapshot(
-                turn.scope.job_file_id
-            )
-            is None
+            await MemoryCandidateWorkflow(database.sessions).read_latest_snapshot(file_id) is None
         )
-        await requests.release_block(work.writer.scope, condition_change_id=uuid4())
+        # Enough new interview (three completed exchanges) allows one new attempt, no skipping.
+        for _ in range(2):
+            await complete_turn(database, await start_turn(database, file_id))
+        assert await requests.failure_reason(file_id) is None
         next_work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
         assert next_work is not None
         assert next_work.source_window.covered_through_sequence == 0
         assert next_work.source_window.through_sequence == 4
+        # A retry that fails again blocks again, measured from its own failure.
+        await requests.fail(next_work.writer, reason="transient_service")
+        assert await requests.discover() == ()
+        assert await requests.failure_reason(file_id) == "transient_service"
+
+    execute(database_settings, scenario)
+
+
+def test_a_failure_recorded_before_the_frontier_was_kept_stays_blocked(
+    database_settings: DatabaseSettings,
+) -> None:
+    """Older rows have no recorded frontier; they never release on their own."""
+
+    async def scenario(database: Database) -> None:
+        from caliburn.features.work_memory import batch_persistence, consolidation_requests
+        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+
+        requests = MemoryConsolidationWorkflow(database.sessions)
+        turn = await start_turn(database)
+        file_id = turn.scope.job_file_id
+        await requests.request(turn, uuid4())
+        await complete_turn(database, turn)
+        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        assert work is not None
+        async with database.sessions.begin() as session:
+            session.add(
+                batch_persistence.MemoryOperationRecord(
+                    job_file_id=file_id,
+                    execution_id=work.writer.scope.execution_id,
+                    command_id=uuid4(),
+                    kind="batch_failure",
+                    request_payload={"reason": "legacy"},
+                    result_payload={"reason": "legacy"},
+                )
+            )
+        for _ in range(4):
+            await complete_turn(database, await start_turn(database, file_id))
+        async with database.sessions() as session:
+            assert await consolidation_requests.read_block(session, file_id) == "legacy"
+        assert await requests.discover() == ()
 
     execute(database_settings, scenario)
 
@@ -245,7 +288,7 @@ def test_reentry_after_b1_handoff_skips_b1_and_preserves_work(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
-        from caliburn.agents.memory_analysis.results import (
+        from caliburn.workflows.memory_analysis.results import (
             AnalysisComplete,
             MemoryAnalysisResult,
             SituationGap,
@@ -297,7 +340,7 @@ def test_b2_gap_roundtrip_keeps_its_existing_understanding(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
-        from caliburn.agents.memory_analysis.results import (
+        from caliburn.workflows.memory_analysis.results import (
             AnalysisComplete,
             MemoryAnalysisResult,
             SituationGap,

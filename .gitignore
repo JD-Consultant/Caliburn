@@ -18,6 +18,7 @@ pytest-cache-files-*/
 .coverage
 .npm-cache/
 .pnpm-store/
+.uv-cache*/
 pnpm-debug.log*
 .research-tmp/
 tmp/
@@ -33,6 +34,7 @@ Thumbs.db
 .claude/
 .codex-remote-attachments/
 .worktrees/
+.superpowers/
 
 # personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
 CLAUDE.local.md

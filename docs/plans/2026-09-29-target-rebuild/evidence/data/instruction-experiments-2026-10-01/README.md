@@ -12,7 +12,7 @@
 | `q2` | c1（提交 `ec3c143a`） | 課程行政 3、倉庫 3 | 一次補入四處指南衍生文字：隱藏面向引導、任務粒度與成果／要求不重抄、知識技能／條件／協作對象寫入時機、職務目的早寫 |
 | `q2b` | c1b（提交 `4b9da041`） | 課程行政 3、倉庫 3 | c1 的補跑：只收窄知識技能那一句。倉庫第 3 份的 harness 在第 11 輪因員工模型被限流而終止，**結果檔由產品保存的資料復原**（檔內 `"recovered": true`） |
 | `q3` | c3（提交 `1e9edcea`） | 課程行政 3、倉庫 3 | 成分拆解：c1 去掉「寫入條件／協作對象／知識技能」那一條。**依預先登記的規則採用**（單批對照改善，不是普遍保證） |
-| `long` | 最終採用的指引 | 1 | 採購人設的長訪談（含取消、後端硬停止、人工改稿、更正、PDF）；完成後補入 |
+| `long` | c3 | 1 | 採購人設的長訪談（含取消、後端硬停止、人工改稿、更正、PDF）；跨 2026-10-01–02 完成45輪，續跑與限制見下節及 T17 A2 |
 
 其餘條件各批相同：A、B1、B2 為 `gpt-6-luna`／reasoning `high`（`store=false`、`all_turns`），員工模擬為 `gpt-6-luna`／`low`；隔離的 PostgreSQL 18.6（loopback `caliburn_t01_test` 的 `eval_b` schema）與本機後端 8103；同一時間只有一場訪談。人設在 `apps/api/tests/fixtures/job_analysis_quality/personas.json`，harness 是 `apps/api/scripts/simulate_interview.py`（付費、明確執行）；各批的預先登記判準、停止條件與費用上界寫在 T14 證據的對應小節（先於執行提交）。
 
@@ -26,7 +26,20 @@
 | `summary.txt` | 各批平均與 `compare_versions.py` 依登記規則算出的判定輸出 |
 | `tools/` | 產生這些數字的本機工具的**參考副本**（含絕對路徑，環境特定；用來看定義與算法，不是產品程式） |
 
-`.pdf`（長旅程的正式 PDF 匯出）完成後放在 `runs/`。
+長旅程的正式 PDF 匯出、逐輪 progress 與事件 JSONL 亦放在 `runs/`，雜湊同列 `runs/SHA256SUMS.txt`。以下長旅程原件是後續補入，**尚未加入本資料包既有的 `metrics.csv`、`summary.txt` 或 `transcripts/*.md`**；不要將這些短程對照統計當成已涵蓋長旅程。
+
+## 採購長旅程原件
+
+2026-10-02 將 `.research-tmp/eval/long-procurement-1*` 的下列四份原件原樣複製入庫；複製前後逐一核對 SHA-256，未修改數據或重新生成 PDF。這可避免只靠可清理的暫存目錄保存；目前為本地 Git 保存，不是已推送或已有異地備份。結論、事故發現／查證、修正、測試及未完成項目仍只維護在 [T17 A2 實測結果](../../t17-course-administrator-journey.md#a2-實測結果2026-10-02原旅程完成-45-輪)。
+
+| 原件 | 用途與判讀限制 |
+|---|---|
+| [最終 JSON](runs/long-procurement-1.json) | 45輪公開訪談、最終 JD、來源與粗查結果。`started` 是續跑啟動時間，不是原旅程開始時間；完整時間線見 T17 |
+| [逐輪 progress](runs/long-procurement-1.progress.jsonl) | 保留前24輪並追加後續結果；早期列不具備後來新增的 execution ID，末輪沒有獨立耗時，不補造 |
+| [事件 JSONL](runs/long-procurement-1.events.jsonl) | 人工改稿、取消、事故續跑、硬停止、重送及 PDF 匯出；前兩個事件標記 `reconstructed`，依既有保存結果重建，並非原時刻日誌 |
+| [正式 PDF](runs/long-procurement-1.pdf) | 產品匯出的4頁可見成品；包含刻意人工修改的測試內容，不當成純 AI 自主成果。文字抽取限制見 T17 |
+
+此例仍是 **Luna 合成人設的單次旅程，不是真人顧問效果或普遍成功率**。前段沿 `c1066873` 實驗基準，續跑修正為 `40f7c1f9`（只改 harness／測試／證據），結果紀錄為 `aa5c82fb`。逐字稿可用最終 JSON 的 `turns` 核對；未保存供入庫的原生模型接續 items 或整份資料庫，所以這四檔不能單獨證明每個模型請求的完整 Context。其餘資料庫查核以 T17 記錄的範圍與限制為準，不將缺少的原件說成可完整離線重播。
 
 ## `metrics.csv` 欄位與指標定義
 

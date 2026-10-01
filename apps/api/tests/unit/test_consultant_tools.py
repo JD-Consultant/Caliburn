@@ -15,6 +15,7 @@ from caliburn.agents.job_consultant.tools import (
 from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.models import ProfileField, SetProfileField
 from caliburn.features.job_description.tasks import CreateTask
+from caliburn.transport.model_tools.context_compaction import ContextCompactionTools
 from caliburn.transport.model_tools.contracts import reject_tool_call
 from caliburn.transport.model_tools.jd_changes import JdChangesTools
 from caliburn.transport.model_tools.jd_reads import JdReadTools
@@ -110,6 +111,11 @@ class FakeConsolidationTools(MemoryConsolidationTools):
         return "request recorded"
 
 
+class FakeCompactionTools(ContextCompactionTools):
+    def __init__(self) -> None:
+        pass
+
+
 type Handlers = tuple[ConsultantTools, FakeMemoryReadTools, FakeJdReadTools, FakeJdWriteTools]
 
 
@@ -117,7 +123,14 @@ type Handlers = tuple[ConsultantTools, FakeMemoryReadTools, FakeJdReadTools, Fak
 def handlers() -> Handlers:
     memory, reads, writes = FakeMemoryReadTools(), FakeJdReadTools(), FakeJdWriteTools()
     return (
-        ConsultantTools(memory, reads, writes, FakeJdChangesTools(), FakeConsolidationTools()),
+        ConsultantTools(
+            memory,
+            reads,
+            writes,
+            FakeJdChangesTools(),
+            FakeConsolidationTools(),
+            FakeCompactionTools(),
+        ),
         memory,
         reads,
         writes,
@@ -153,6 +166,7 @@ def test_definitions_can_be_built_before_binding_and_match_the_bound_handlers(
         "delete_jd_item",
         "move_jd_item",
         "request_memory_consolidation",
+        "request_context_compaction",
     )
     tools, _, _, _ = handlers
     assert definitions == tools.definitions()
@@ -166,6 +180,7 @@ def test_advertises_existing_definitions_and_names_without_rewriting(handlers: H
         *tools.jd_changes.definitions(),
         *writes.definitions(),
         *tools.consolidation.definitions(),
+        *tools.compaction.definitions(),
     ]
     assert tools.definitions() == expected
     assert tools.names == (
@@ -174,6 +189,7 @@ def test_advertises_existing_definitions_and_names_without_rewriting(handlers: H
         *tools.jd_changes.names,
         *writes.names,
         *tools.consolidation.names,
+        *tools.compaction.names,
     )
     assert tuple(definition["name"] for definition in tools.definitions()) == tools.names
 

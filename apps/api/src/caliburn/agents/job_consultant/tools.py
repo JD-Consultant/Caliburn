@@ -4,6 +4,10 @@ from uuid import UUID
 
 from openai.types.responses import FunctionToolParam, ResponseFunctionToolCall
 
+from caliburn.transport.model_tools.context_compaction import (
+    ContextCompactionTools,
+    context_compaction_definitions,
+)
 from caliburn.transport.model_tools.contracts import reject_tool_call
 from caliburn.transport.model_tools.jd_changes import JdChangesTools, jd_changes_definitions
 from caliburn.transport.model_tools.jd_reads import JdReadTools, jd_read_definitions
@@ -32,6 +36,7 @@ def consultant_tool_definitions() -> list[FunctionToolParam]:
         *jd_changes_definitions(),
         *jd_write_definitions(),
         *memory_consolidation_definitions(),
+        *context_compaction_definitions(),
     ]
 
 
@@ -43,12 +48,14 @@ class ConsultantTools:
         jd_writes: JdWriteTools,
         jd_changes: JdChangesTools,
         consolidation: MemoryConsolidationTools,
+        compaction: ContextCompactionTools,
     ) -> None:
         self.memory_reads = memory_reads
         self.jd_reads = jd_reads
         self.jd_writes = jd_writes
         self.jd_changes = jd_changes
         self.consolidation = consolidation
+        self.compaction = compaction
 
     @property
     def names(self) -> tuple[str, ...]:
@@ -58,6 +65,7 @@ class ConsultantTools:
             *self.jd_changes.names,
             *self.jd_writes.names,
             *self.consolidation.names,
+            *self.compaction.names,
         )
 
     def definitions(self) -> list[FunctionToolParam]:
@@ -67,6 +75,7 @@ class ConsultantTools:
             *self.jd_changes.definitions(),
             *self.jd_writes.definitions(),
             *self.consolidation.definitions(),
+            *self.compaction.definitions(),
         ]
 
     async def prepare(
@@ -84,6 +93,8 @@ class ConsultantTools:
             return prepared if isinstance(prepared, str) else snapshot_jd_write(prepared)
         if call.name in self.consolidation.names:
             return self.consolidation.prepare(call.arguments, operation_id)
+        if call.name in self.compaction.names:
+            return self.compaction.prepare(call.arguments)
         return reject_tool_call(
             "scope_not_allowed", "本角色沒有這項工具。", "使用本角色已提供的具名工具。"
         )
@@ -92,4 +103,6 @@ class ConsultantTools:
         """Validate the saved command before dispatch; native call/result pairing stays in Graph."""
         if isinstance(prepared, dict) and prepared.get("kind") == "memory_consolidation":
             return await self.consolidation.execute(prepared)
+        if isinstance(prepared, dict) and prepared.get("kind") == "context_compaction":
+            return await self.compaction.execute(prepared)
         return await self.jd_writes.execute(restore_jd_write(prepared))

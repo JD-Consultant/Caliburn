@@ -66,6 +66,44 @@ async def read_adopted_context(
     return _head_position(record) if record is not None else None
 
 
+async def request_context_compaction(
+    session: AsyncSession, writer: ExecutionWriter, role: AgentRole
+) -> None:
+    """Idempotent intent only; completion eligibility decides whether it can be consumed."""
+    await service.lock_active_writer(session, writer)
+    _require_role(writer.scope, role)
+    record = await storage.read_binding(session, writer.scope, role)
+    if record is None or record.prepared_thread_id is None:
+        raise HistoryConflictError("Prepare this role's context before requesting compaction")
+    record.compact_requested = True
+    await session.flush()
+
+
+async def read_completed_compaction_request(
+    session: AsyncSession, job_file_id: UUID, role: AgentRole, position: ContextPosition
+) -> bool:
+    """Only the selected completed work can request the next preparation.
+
+    An adopted prepared position already consumed the request, including after a
+    cancelled Turn. Never walk past it to resurrect the preceding completed intent.
+    """
+    if position.kind != HistoryWindowKind.COMPLETED_WORK:
+        return False
+    origin = await storage.read_position_origin(session, job_file_id, role, position)
+    if origin is None:
+        raise HistoryConflictError("The selected completed context is unavailable")
+    scope = ExecutionScope(
+        job_file_id,
+        origin.execution_id,
+        ExecutionKind.CONSULTANT_TURN
+        if role == AgentRole.JOB_CONSULTANT
+        else ExecutionKind.MEMORY_BATCH,
+    )
+    if (await service.read_execution(session, scope)).status != ExecutionStatus.COMPLETED:
+        raise HistoryConflictError("A context request requires completed execution")
+    return origin.compact_requested
+
+
 async def read_previous_completed_execution(
     session: AsyncSession, scope: ExecutionScope, role: AgentRole
 ) -> ExecutionScope | None:

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RequestContextCompactionArguments",
+  "description": "Request context compaction before the next Turn, after this Turn completes successfully. The App binds the context and execution; supply no arguments.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [],
+  "properties": {}
+}

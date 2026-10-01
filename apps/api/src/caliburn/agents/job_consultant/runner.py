@@ -55,6 +55,7 @@ from caliburn.features.executions.models import (
 )
 from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import ModelSettings
+from caliburn.transport.model_tools.context_compaction import ContextCompactionTools
 from caliburn.transport.model_tools.jd_changes import JdChangesTools
 from caliburn.transport.model_tools.jd_reads import JdReadTools
 from caliburn.transport.model_tools.jd_writes import JdWriteTools
@@ -158,7 +159,6 @@ class ConsultantRunner:
         prepared = await role_history.prepare_history(
             template=template,
             threshold_tokens=128_000,
-            compact_requested=False,
             count_input=executor.count_input,
             runtime=compaction,
             recovery=recovery
@@ -169,7 +169,7 @@ class ConsultantRunner:
         context = await capture_turn_context(
             role_history, template=template, prepared_history=prepared
         )
-        tools = self._tools(writer, context)
+        tools = self._tools(writer, context, role_history)
 
         async def compact_window(
             request: ResponseRequest, count: ReceivedInputCount, request_id: UUID
@@ -230,7 +230,9 @@ class ConsultantRunner:
             writer, candidate.position, reply, position
         )
 
-    def _tools(self, writer: ExecutionWriter, context: TurnContext) -> ConsultantTools:
+    def _tools(
+        self, writer: ExecutionWriter, context: TurnContext, role_history: RoleContextHistory
+    ) -> ConsultantTools:
         return ConsultantTools(
             MemoryReadTools(MemoryReadWorkflow(self.sessions), context.memory_binding),
             JdReadTools(JdReadWorkflow(self.sessions), context.memory_binding),
@@ -250,6 +252,7 @@ class ConsultantRunner:
                 manual_jd_start_revision_id=context.manual_jd_start_revision_id,
             ),
             MemoryConsolidationTools(MemoryConsolidationWorkflow(self.sessions), writer),
+            ContextCompactionTools(role_history),
         )
 
     async def _fix_budget(self, writer: ExecutionWriter) -> ExecutionBudget:

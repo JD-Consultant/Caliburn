@@ -43,12 +43,16 @@ class RoleContextHistory:
         async with self.sessions.begin() as session:
             await service.lock_active_writer(session, self.writer)
 
+    async def request_compaction(self) -> None:
+        async with self.sessions.begin() as session:
+            await history.request_context_compaction(session, self.writer, self.role)
+
     async def prepare_history(
         self,
         *,
         template: ResponseRequest,
         threshold_tokens: int,
-        compact_requested: bool,
+        compact_requested: bool = False,
         count_input: Callable[[ResponseRequest, UUID], Awaitable[ReceivedInputCount]],
         runtime: CompactionRuntime,
         recovery: HeldCompaction | HeldPreparationCount | None = None,
@@ -65,6 +69,13 @@ class RoleContextHistory:
             raise ValueError("Consultant history preparation uses the confirmed 128K threshold")
         async with self.sessions.begin() as session:
             binding = await history.bind_context_history(session, self.writer, self.role)
+            if binding.prepared is None and binding.base is not None:
+                compact_requested = (
+                    compact_requested
+                    or await history.read_completed_compaction_request(
+                        session, self.writer.scope.job_file_id, self.role, binding.base
+                    )
+                )
         if binding.prepared is not None:
             items = await self._read_position(binding.prepared)
             await self.ensure_active()

@@ -33,11 +33,13 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 
 是否可以正式化以[任務表 T18](../plans/2026-09-29-target-rebuild/tasks.md#t18-新產品入口切換與舊程式退役)、[計畫完成條件](../plans/2026-09-29-target-rebuild/README.md#5-整個-goal-的完成條件)及[驗證對照](../implementation/verification-plan.md)為準，不在本頁另建較寬鬆的驗收表。順序為：前置品質／容量／旅程 gate 成立 → 核定本次精確切換範圍 → 切換並驗證根入口與交付 → 同步正式權責與文件。
 
-截至本草案建立時，T14、T16、T17、T18 尚未完成：
+截至 2026-10-02，**T14、T16、T17 已依實測與已知不足清單結案，T18 未完成（待 Owner 放行）**。採用時必須查回、不由本 ADR 升格或豁免的限制：
 
-- Luna 仍有跨輪 JD 來源漏選的已知品質反例；維持 Luna 不等於接受該缺口或通過品質 gate。見 [T14 證據](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md)。
-- 大視窗壓縮仍受實測 token 限流影響；已完成的較小視窗不能代替原門檻驗收。見 [T16 證據](../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)。
-- Memory 最終失敗後已接線：正式訪談再前進三輪才允許一次新批次（2026-10-01，政策待 Owner 核對）；尚未在真長旅程中實際觸發。見 [T11 證據](../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)。
+- Luna 跨輪 JD 來源漏選等品質不足由 Owner 決定列為已知不足、不再阻擋；清單與成因見 [T14 已知不足](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)，逐項實測判定見 [T17 V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)（通過 12、部分 6、離線／PG 9、未驗 1）。
+- 壓縮：A 的輪前壓縮有自然觸發的真模型證據，B1／B2 以調低門檻的探針觀察到輪前壓縮被採用，批次因帳戶額度用完未能發布快照；見 [T16 證據](../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md#12-b1b2-輪前壓縮的真模型觀察2026-10-02執行前-manifest)。
+- Memory 最終失敗後已接線：正式訪談再前進三輪才允許一次新批次（2026-10-01，**政策待 Owner 核對**）；沒有在真長旅程中自然觸發。見 [T11 證據](../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)。
+- 資料庫伺服器重啟後必須重啟 App（單一 leader 設計，不自動重連）；見 T14 已知不足第 7 列與 [runbook](../runbook.md#診斷)。
+- 2026-10-02 起 OpenAI 帳戶額度用完，補額度前沒有新的真模型驗證；候選分支上的真模型短旅程尚未執行。
 
 這些是採用審查時必須查回的狀態，不由本 ADR 升格、豁免或增加新需求。後續變化只在各任務 evidence 與任務表維護，再於正式化時核對本節。
 

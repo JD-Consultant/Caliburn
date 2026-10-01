@@ -329,3 +329,44 @@ pypdf 抽取後對照原保存 JD 的 **49 個非空文字欄位**，經明示�
 - `memory-jd-recheck-luna-audit-20261001.json`：`fbd285d992b9917c3445e846bd55e1f2c9dd7fb6d8e1c22a87cf78d871a86fbc`。
 
 實際 instructions hash `028a05d80d6e71b37094b989ff764576f7ed49eef1610b63b243b27d6b39b3fe`、tools hash `f424fc85dc708422444da3546d8103d29735aec7e44bd11a6b67ba9c3b86b373`；沿現行 Luna／high／all_turns／store=false。其餘既有容量及正式切換 gate 不變。
+
+## 2026-10-01：同一合成案例的純來源換版接續
+
+### 外送前 manifest
+
+基準 `583aec0d`。前片已驗人工差異與新全文修稿，未觀察來源 diff；本片改變的是**前提**，不是 Prompt 或工具：沿同一已完成 Luna 案例及真原生歷史，追加一則合成有效訪談，透過原 domain workflow 發布 M3。已知事實改為每半年盤點、差異交財務專員；本人核對／回報及主管補貨核准不變。JD 不人工修改，保留原 M2 引用，讓來源換版與人工改稿分開。準備資料是 fixture，非 B1／B2 真分析；本片只驗一個後續真 A Turn。只升級此隔離 schema 至目前 migration head，不碰 Demo。
+
+使用既有 `recheck_luna_20261001_7dce0494`，先核對原完成記錄與無 active 執行、JD 及引用；原 M1／M2、舊 JD／原件不改寫。A 新输入只請核對目前盤點 JD，不提示新頻率／交付對象或指定工具名稱。模型自由選完整現行工具；不強制先讀 diff、不用人工完成來源確認。依 [OpenAI 工作流評估](https://developers.openai.com/api/docs/guides/agent-evals)同時檢查實際 trace 與最後效果，不因最後文字正確就假設模型有讀 diff，也不要求唯一工具序列。
+
+限制：Luna／high／all_turns、store=false；一個 A Turn，至多一個自然要求的 Memory 批次；各執行最多16 create／48 outbound、1 compact、8,192 output、120秒單請求／240秒執行、US$0.25，合計預留 US$0.50、32 create／96 outbound，零傳輸重試、不重送同案例。達上限或失敗就記錄、核對原工作狀態並停止，不把觀察逾時當執行結束。只外送合成資料，沿既有憑證 loader，不保存秘密／opaque reasoning。
+
+檢查：按需工具是否讀到來源 Markdown diff；是否用本 Turn 新 Memory 修成每半年、交財務專員，同時保留核對／回報及主管核准界線；是否以明確動作核對既存引用，或如實保留尚未解決；正式保存、舊引用鏈、只讀重開及實際 Context／用量一併核對。來源 diff 未被使用便維持該分支未觀察，不追加提示求過關。本片不重開上一輪 B1 精度假說、不消除長訪談漏引限制、不勾整體 T14／T17。
+
+### 結果：來源 diff → 修稿 → 明確對齊 → 正式保存成立
+
+execution `17ac9ab4-64db-4ff1-bce4-6dc0547dcb78` completed；觀察區間 **33.64 秒**，不是純模型延遲。六次 Responses、七次 count（含歷史準備）、十次工具、零重試／compact；沒有要求新 Memory 批次。fixture 準備與此次真 Turn 結束後均無 active／paused 殘留，沒有啟停 Demo。
+
+| 檢查 | 實際證據 |
+|---|---|
+| 自主按需閱讀 | 讀 JD map／task、新情境及理解全文、訪談6–8；之後以既存 citation 呼叫 `read_jd_changes(query.kind=source)`，未強制 tool choice |
+| 真正差異內容 | 回傳 Markdown 包含理解的描述／正文變更、直接情境改名／描述／正文及新增訪談引用8。不是只列「有更新」，也沒有提供任意歷史 Memory 全文入口 |
+| 精確修改與核對 | 同一 `revise_jd_item` 改任務 description、移除被新做法取代的直接訪談4、引用8，並 `confirm_reference_alignment` 原 Memory citation；然後重讀 task 核對實際結果 |
+| 正式稿 | 「每半年核對庫存帳與實物，將差異清單交給財務專員；本人負責核對與回報，補貨由倉庫主管核准。」其他集合未新增；任務身分保留 |
+| 引用與歷史 | 原 citation 身分不變，從 M2 更新到 M3 理解修訂，已核對 JD 基底為新正式修訂 `a9354a53-32e1-4b22-856e-d7e62ef38894`；兩筆現行引用不再待核對。舊 JD 仍指 M2，M2／M3 的理解及其固定情境修訂皆可回讀 |
+| Context | 六份實際請求的本輪 App 資料 hash 一致、全部 user role，本次原話獨立提供。Memory 處理至8，近期只預載9；8的細節由模型按需查回。原歷史後追加本輪資料，items 33→43→50→54→57→60；五次相鄰請求保留原 input 前綴及既定原生出站投影 |
+| 重開與答覆 | 無模型重新建立 App，HTTP 讀回同一份正式 JD；最後答覆正確交代改動，追問差異清單交出後是否仍須追蹤，沒有假稱整份 JD 完成 |
+
+本片沒有修改產品 Prompt／schema／Context 或規則。instructions hash 與前片相同；tools hash `ba7a05849563dd9c8d26b46d2b342dea9b2c8360b1208467f72473945e794a5e` 反映先前已提交的 A 輪前壓縮要求工具，非本片為驗收改工具。生成 input **83,809**、output **1,727**，ledger 估算 **US$0.003459375**（非帳單，不含未確認的 count 計費）。不以成本低或樣本通過推論普遍可靠。
+
+稽核先出現兩個**探針假設錯誤**，均唯讀核對、不重送模型：泛查 execution 所有 checkpoint 混入 `prepared_history`／`initial_context` 尚未追加本次輸入的快照，改為精確查既有 `completed_work` 模型迴圈；另原 output 直接等同比對出站 items 過嚴，逐欄確認差異只在頂層 `status`，沿 [T06 已驗投影](t06-agent-execution.md)與 `response_input_items` 再核五個接續邊界通過。沒有因此刪歷史、放寬產品或改接續邏輯。
+
+**限定通過與未完：**前片的「source 分支未觀察」由此次實際工具軌跡補上；本案例有來源差異閱讀、正確修稿、明確對齊及正式保存／回查證據。這是受控單項來源換版、沿一次既有真 A 歷史的接續，不是完整工作訪談、自然 B1／B2 分析或長 Context 的跨輪來源保留已達標；T14／T16／T17／T18 保持原未完成狀態。不再重測此案例。
+
+本機 ignored 原件（全合成）SHA-256：
+
+| `.research-tmp/eval/` 原件 | SHA-256 |
+|---|---|
+| `verify_source_only_recheck.py` | `b9626e23abf65b4636740a5ed38d5a7207dfdb8ff76d9e1909c85afd78b313fa` |
+| `audit_source_only_recheck.py` | `cbc0bb5513c90d6230300d21349accd75a4acb60d62c7b15592e86f56f04d4d9` |
+| `source-only-recheck-luna-20261001.json` | `6d739c480a35f15058a771a7ce8d82aa5091603b8c15e2f9b19825a44184a991` |
+| `source-only-recheck-luna-audit-20261001.json` | `4d6416ed271b6242ea633e2126b7f84e743d0fc3a916712dafc424332eecf956` |

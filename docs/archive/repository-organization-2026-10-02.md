@@ -94,3 +94,83 @@ uv cache 已清除，不是可原樣還原的封存；需要時由 uv 重新下�
 - 依賴快取優先沿用工具目前設定；若確有隔離或同磁碟需求，指定 `.research-tmp` 下的專用 cache，不改動全域設定，也不把現用 cache 目錄直接搬走。
 - pytest `--basetemp` 只指向獨占的測試暫存子目錄，不能指向共用 `.research-tmp` 或封存根，因為 pytest 會清理指定目錄。這遵循 [pytest 暫存目錄文件](https://docs.pytest.org/en/stable/how-to/tmp_path.html#temporary-directory-location-and-retention)。
 - 有用的研究結論、測試結果與 Agent 報告寫入相應 `docs` 責任文件；未審查的執行狀態留本機。`.gitignore` 補上 `.uv-cache*/`、`.superpowers/` 防止新暫存誤提交，不把 ignore 當成備份或清理。
+
+## 全專案四類處置清單
+
+本輪接續基準為 `target-rebuild@def9c248`，範圍是目錄用途、文件路由與可保全的舊測試暫存。不是重做產品驗收、改變正式權責，或在整理時順帶重構程式。另一個 `target-cutover-candidate` 工作樹仍在使用，本輪沒有讀取、修改或清理它。
+
+### 需要保留
+
+| 範圍 | 理由與入口 |
+|---|---|
+| `apps/api`、`apps/web` | 新目標實作；任務與未驗範圍以[任務表](../plans/2026-09-29-target-rebuild/tasks.md)為準 |
+| `experiments/jd-relational-app`、`packages/consultant-memory` | T18 尚未切換，本分支仍依 ADR0077 使用；不能因舊架構或 `experiments` 名稱而刪除 |
+| `apps/pdf-to-json`、`apps/ocs-indexer` 與 RAG 契約套件、908 份 RAG JSON | 獨立 RAG 的解析、索引、校準與契約消費用途仍存在，不接回 JD 也不等於無用 |
+| 目標架構、工程／Tool 規範、工作分析與 JD 指南、有效 ADR／任務 | 仍供實作及驗收；由[文件導覽](../README.md)分層，不複製成另一套規則 |
+| 獨有研究、失敗紀錄、實驗原件、演進與教授報告 | 用於說明「問題如何發現、研究、修正、驗證與留下限制」；沿[開發演進索引](../reports/development-history/README.md)查找，包括 Memory／context、檢索、JD 與工程驗證 |
+| `scripts`、`.github`、workspace／lock、正式契約及生成物 | 根命令、CI、套件資源仍有依賴。生成檔即使沒有直接 App consumer，也須核對 generator／exports 後再退役 |
+| DB、`.env`、私人設定、現用依賴與工作樹 | 不是文件雜物；不為目錄整齊改動或公開 |
+
+### 可封存，保留可恢復性
+
+| 範圍 | 本輪處理 |
+|---|---|
+| 9 族已結束的舊合成整合測試工作目錄 | **743 目錄、16,215 檔案已移至本機封存**，詳下節；不是刪除或釋放磁碟空間 |
+| PDF 工具的 `ARCHITECTURE.md`、`SETUP_COMPLETE.md` | 原位保留並明示歷史初始設計／建置紀錄，導向現用 README；避免舊「待實作」與不存在的模組位置誤導施工 |
+| 已完成計畫與歷史架構原件 | 先前分類、去重成果沿用；仍有獨有證據的不再刪除、不再複製一份。追溯入口見[封存導覽](README.md) |
+
+### 多餘或可精簡，不一律立刻刪除
+
+| 項目 | 判斷與處置 |
+|---|---|
+| 整套重複快照、撤回計畫／純退役通知 | 前輪已核對去重 2,396 份、7 份僅留 Git；恢復依[既有去重對照](docs-cleanup-2026-10-02.md)，不是本輪新增刪除 |
+| `apps/pdf-to-json/tests/conftest.py` 的 `expected_output_dir`、`tmp_output_dir` | tracked App 程式查核只見定義，屬刪除候選；本輪保留，待該 App 測試維護時移除並驗證收集／受影響測試，不為整理擴大到程式變更 |
+| 前端生成工具型別、OCS TypeScript 生成型別 | 暫未找到直接 App consumer，但仍有生成／匯出契約；**用途待核，不是已確認可刪** |
+| `.research-tmp` 根層圖檔／JSON／PDF 等疑似副本 | 依檔案大小及 SHA-256 對比 779 份 tracked 圖／資料，未找到完全相同副本；保留。檢查不是涵蓋全部遞迴暫存 |
+| `tmp`、`output` 與其他研究暫存 | 仍有未逐項判定的輸出、PDF、瀏覽器／執行資料；先保留，不把「ignored」當成無價值或可公開的證據 |
+
+### 需要更新
+
+| 項目 | 狀態 |
+|---|---|
+| 根 `AGENTS.md` 將新目標概稱未完成施工 | 已改為實作／驗收中並路由任務表；沒有宣告 T18 完成 |
+| `apps/api/docs/README.md` 仍稱整個 API 已移除 | 已替換為新後端文件入口；舊原文可由 `def9c248` 取回，不再要求維護不存在的 `app/core` 等模組 |
+| PDF／Indexer README 的契約連結實際指向清理紀錄 | 已直連來源欄位語意與機器 schema，區分 RAG 契約與 JD 著作契約 |
+| `current-decisions.md` 的 P3 `App／Saver` 錨點 | 已修正連結，不改歷史實驗內容及結論 |
+| `calibrate_match.py` 的 `npm run infra` 提示 | 只更新 docstring 為根 `pnpm rag:up`；未啟動容器、未跑校準、未改執行邏輯 |
+| `packages/ocs-contract/scripts/check-codegen.sh` | **待修程式缺陷**：直接生成至 tracked 檔，差異分支又 `git checkout --`，會覆寫未提交修改。本輪只在[套件入口](../../packages/ocs-contract/README.md)加警告，未執行腳本；後續應暫存生成再比較，驗證檢查前後工作檔不變 |
+| 正式入口、新舊程式退役、教授報告切換後的現況 | 交給原 T18／報告維護流程，不在清理分支搶先改狀態或改別人的工作樹 |
+
+## 舊合成整合測試目錄封存
+
+本輪將下列「固定前綴＋32 位 hex」目錄移入 `.research-tmp/archive/2026-10-02/closed-integration-fixtures/`：
+
+| 前綴 | 目錄數 |
+|---|---:|
+| `jd-ai-host-recovery` | 183 |
+| `jd-configured-host` | 174 |
+| `jd-host-recovery` | 123 |
+| `jd-b-recovery` | 98 |
+| `jd-ui-gate` | 61 |
+| `jd-manual-http` | 31 |
+| `jd-query-http` | 30 |
+| `jd-catalog-http` | 25 |
+| `jd-layered-recovery` | 18 |
+
+### 如何判定與保全
+
+- 沿 `experiments/jd-relational-app/tests/` 的 `test_ai_host_restart_postgres.py`、`test_configured_host_native.py`、`test_host_recovery_postgres.py`、`test_background_new_process_postgres.py`、`test_layered_background_new_process_postgres.py`、`test_catalog_native_http.py`、`test_manual_http_postgres.py`、`test_query_postgres.py` 與 `support/` 建置路徑查回用途；不是按日期猜成垃圾。
+- 743 個目錄及其內容全部早於 2026-09-25，最新檔案寫入時間為 2026-09-23 21:31:02（UTC+8）。程序 command line 未見這批路徑；這不等於完整 open-handle 證明，不強制解鎖或終止任何程序。
+- 來源、目的地及祖先皆核對絕對路徑與 reparse point；禁止越出本機暫存範圍，拒絕混有 `PG_VERSION`／`.env` 的目錄，不覆蓋既有封存。一般沙盒部分 ACL 不可列舉時，使用核准權限檢查，沒有將讀取失敗當成空目錄。
+- 搬移前後逐檔 SHA-256 與檔數一致；16,215 檔、937,334,315 bytes。這是保留內容的邏輯大小，不是釋放空間或磁碟占用的保證。
+- 內含合成設定及瀏覽器狀態，**本機保存、不直接提交或當作可公開報告原件**。真 DB、現用服務、付費實驗及其他未核實暫存未動。
+
+### 恢復與驗證界線
+
+本機封存內 `relocations.csv` 保存逐目錄新舊位置、檔數與大小，`sha256.csv` 保存逐檔原路徑、新路徑與雜湊。需恢復時先確認原位置沒有新測試產物，按清單逐項還原，不覆蓋。ignored 封存仍不是遠端備份。
+
+文件查核分別看分類／連結與程式入口／依賴：140 份文件的唯讀掃描只找到一個現用入口錨點需修正；已明示歷史的四處舊路徑不猜接到新版，HTML `id` 造成的錨點誤報人工排除。這是本機導覽檢查，不是外部網站有效性或全量歷史完整性驗證。
+
+收尾另檢查本輪 10 份 Markdown 的相對連結與錨點：檢查器報出的三處錨點均有既存 HTML `id`（兩個不同目標），人工核對有效；其餘無失效。差異空白檢查通過，封存清單重讀確認全部 743 個目的地存在、原目錄已移走。
+
+本輪不重跑產品套件、真 PostgreSQL 或真模型旅程。文件更正與 docstring 提示不改產品行為；可整理的範圍已處理，待修程式、未審查的私有暫存及 T18 不冒稱完成。

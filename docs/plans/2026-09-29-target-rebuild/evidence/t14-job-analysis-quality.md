@@ -679,3 +679,40 @@ Owner 先答覆「暫留 Luna，先完成其他交付」，再明確指定「本
 | `situation-precision-remaining-20261001.jsonl` | `fa418c89c22694da32cbd85c1e6a2c5c0e90ad3787edfacf4602a679fccea0ec` |
 
 僅維護本 evidence 與任務路由，不新增產品規則或標記 T14 完成；`git diff --check` 與兩檔 153 個相對檔案連結檢查通過（後者不含片段錨點驗證），不為未採用候選重跑整套程式測試。
+
+## 2026-10-01：Luna xhigh 的單次有界診斷
+
+### 執行前問題與限制
+
+基準 `7482ff3d`。Owner 已選 Luna；本片不切模型，不重新執行剛停止的第六輪收尾。前述來源 description、欄位順序與同義指引沒有足以採用的改善；已確認第五輪拆分前來源8與本次原話均存在，工具及保存也依實際參數執行，不能假稱找到 App 丟資料的程式 bug。
+
+依 [Luna 官方能力](https://developers.openai.com/api/docs/models/gpt-6-luna)支援 `xhigh`，以及 [reasoning effort 指南](https://developers.openai.com/api/docs/guides/reasoning#reasoning-effort)要求較高努力需有足以抵銷延遲／費用的 eval 收益，本片只問：**在原長歷史拆分反例中，Luna 多用推理能否保留跨輪事實來源？**這是可否繼續校準的診斷，不把提高 effort 當品質修復或主要設計策略。
+
+- 沿前述已驗證全合成的184-item request（原 SHA-256 `d16389f573d8f3ca82ff0e2efc50db27a8a973047a487acb690b8d53fc60e931`）；對照來源欄位順序探針中 **high／原順序／16,384 output** 的已保存失敗，不再送一次 high。這不是同時隨機對照，不能估計成功率。
+- 與該 high 請求相比只改 `reasoning.effort=xhigh`；保持原 instructions、tools、全部歷史、auto tool choice、all_turns、非串流、store=false。不修改原生歷史、不注入預期來源序號、不強制寫入工具；工具未執行，DB 唯讀，不動 Demo。
+- 最多1 count＋1 create、input≤70,000、output≤16,384、零重試、180秒單請求／420秒整批，費用預留 US$0.25。失敗／未完整輸出即停；只有讀取或不相關操作記未判定，不為取得寫入而補送另一 Step。不能用無工具執行的 probe 代替正式保存旅程。
+- 判準：若沿用「每個開課日／老師交表／指定資料夾」等來源8的事實，相關新任務／成果的來源需共同支持內容，並保留本次方法補充；不強制拆分、不要求每個只含本次事實的子項都引用8。其他無依據內容也須記缺陷，不能只挑一筆正確引用報成功。
+- ignored 探針 `probe_luna_xhigh.py` 重用既有合成來源核對與 SDK；結果獨占建立 `luna-xhigh-20261001.jsonl`，不保存 opaque reasoning。若 provider 失敗，只保存安全分類、HTTP status 與白名單 code，避免再只剩粗分類，也不將原錯誤訊息／秘密寫進報告。
+
+執行前尚未改產品預設；原 T14／T17 品質 gate 不變。只有先觀察到有判別力的改善，才考慮另一個保留例及真 App 接續，不直接升格為產品設定。
+
+### 結果與採用決定
+
+一次 count、一次 create 完成，零重試、零工具執行、零業務寫入。返回四個工具請求（兩個 `revise_jd_item`、兩個 `create_jd_item`），以正式生成的參數模型離線驗證均合法；沒有最終答覆，本片也沒有執行後續 Step。
+
+- 本次選擇更新既有綜合任務及季度彙整任務、建立試算表技能與學員協作對象，**沒有拆出新的出席任務／成果**，所以原拆分漏引反例在本次未觀察，不判為已改善。
+- 不能因這次 `add_source` 只填 `current_input` 就誤判刪掉舊依據：唯讀核對原 request 中最近的 `read_jd`，綜合任務本已有第2／4／6／8則來源，季度任務已有第8則；本次沒有 `remove_source`，也沒有移除原第8則支持的出席成果。新協作對象另選第4則支持重複報名。這是既有來源保留的參數證據，不是新拆任務已正確繼承的證據。
+- 單次回應仍將報名、課前通知及每日出席集中在同一長任務；新增技能尚未連至任務，但後續 Step 未執行，不以此斷言整輪不會完成關聯。也不能由這一個 Step 宣稱完整成稿、Memory 或 PDF 旅程通過。
+
+**不採用 xhigh、不追加保留例或同例重播。**此片沒有提供足以改設定的判別性收益；產品 A／B1／B2 維持 Luna／high，Prompt、工具、Context 與資料庫均不變。原長歷史拆分的來源涵蓋、Memory 精度與精簡等限制仍有效；停止以增加 effort 追此反例，不新增來源猜補、reviewer 或恢復機制。
+
+回報 input **49,412**（cache write 49,409、cache read 0）、output **5,954**（reasoning 5,015），count＋生成合計 **45.72秒**。依已核對的本機 Luna 標準分項費率估算 generation **US$0.009153425**，不是供應商帳單；count 計費未另證實。前次 high 的輸出量／耗時只作歷史觀察，不能將非同步、單樣本差異推論為 xhigh 一般更快或更省。
+
+本機診斷原件（`.research-tmp/eval/`，不包含 opaque reasoning）及 SHA-256：
+
+| 原件 | SHA-256 |
+|---|---|
+| `probe_luna_xhigh.py` | `a069908cf0f77d692c0f55963759ba35e5c749ec021ddcd57efadbc8d88a14c0` |
+| `luna-xhigh-20261001.jsonl` | `cf973fd5d4dcd4eaed283d748494b81c3b193347b37485c72980982f0c3cc2b6` |
+
+本片只維護 evidence 與任務路由，不勾選 T14／T17，也不為未採用的設定重跑全套產品測試。

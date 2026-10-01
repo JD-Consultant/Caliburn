@@ -512,3 +512,21 @@ execution `35367359-e385-49c7-b992-a2d44ccda79e` 最終為 `failed`，觀察區�
 **研究與取捨：**[PostgreSQL 官方 advisory lock 契約](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)說明 session 結束會釋放 session-level lock；本案 `PostgresProcessLock.check()` 刻意不重連取回舊所有權。bootstrap 使用 `AsyncPostgresSaver.from_conn_string()`，本機鎖定套件原碼建立並持有一條連線；[LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)提供 checkpoint 保存，不等於所有外部連線自動恢復。此處建議先沿既有 App 重啟恢復，不為這次事故擴建熱重連／重新選主平台；是否另補產品故障提示，待完成必要驗收後按影響判斷。
 
 **驗證邊界：**唯讀 SQL 使用 `default_transaction_read_only=on`，只查狀態／計數及 checkpoint metadata，未讀取或輸出 opaque reasoning。已核本機程序、log、相關接線及官方契約；文件變更檢查差異、連結與狀態，不以此代替產品恢復或 T17 真旅程驗收。
+
+### 續跑修訂 A2：最小 harness 恢復（2026-10-02，新增付費請求前）
+
+Owner 已指示接續上述切片。A2 取代 A1 的 harness 接法，不改產品、Luna 模型、c3 指引、量測規則或 J1–J11；仍是同一份採購旅程，不重新起跑。
+
+- **原進度**：保留 `long-procurement-1.progress.jsonl` 的 24 輪，明示原職務檔案及第 25 輪 execution。續跑前比對正式訪談與 progress 前綴；等待原 execution，即使重新接上時它已完成，也不重送。第 14／20 輪不再執行；事故前缺失事件只能標成事後重建。
+- **保存**：既有 progress 仍逐輪追加；新事件即時追加至獨立 `.events.jsonl`。原輸入與 execution 身分留在事件及新 progress；最終報告不存在時不表示前段資料消失。破損或不相符的 progress 停止，不靜默跳過。這些是評測證據，不是產品的第二套執行儲存。
+- **等待**：單輪及本次恢復後第 25 輪等待上限沿既有 2,100 秒，後者从續接等待開始計時，標示 `resumed`，不可拿來當原完整耗時。**總截止仍為 2026-10-02 04:21:58 +08:00**，CLI 必須明示原絕對期限；兩者先到者停止。期限到／查詢失敗／timeout 不授權重送未確認結果。
+- **重啟容錯**：只在本次已知恢復及計畫第 30 輪重啟後，允許最多 90 秒的連線失敗或 HTTP 500／502／503／504；第一次成功讀到原 execution 即結束窗口。其他 HTTP 錯誤、一般執行期間 5xx 均停止並保留錯誤；不把 `/api/health` 的 200 當成 checkpoint 可用。
+- **付費界線**：原 US$4 上界不提高；目前產品 ledger 為 US$0.129711115，不含員工模擬。以現有已固定的 Luna pricing record 作估算、保守預留 US$1 給全部員工模擬（含前段未保存 usage），產品 ledger 接近 US$3 就停止加送並核對，不宣稱 provider 帳單保證。這是本次評測操作界線，不新增產品金額 gate。執行中持續核對外送數、ledger 及 elapsed，若預留不再足夠先停止。
+- **服務隔離**：只以精確 executable／script／port 核對並重啟 8103；新 log 以時間戳命名，舊 log 不覆蓋。不重啟 PG，不改 8101／8102／8104／Demo。忽略目錄中的 `eval/tools/restart-longrun-8103.ps1` 保存本機故障注入指令；不作通用程序管理服務。
+- **剩餘旅程**：原 ≥26 輪晚期更正、第 30 輪故意硬停止、45–50 輪、Memory 與 JD 來源、PDF 均保留；沒有因恢復測試而放寬品質判準。第 25 輪環境事故與第 30 輪注入分開報告。
+
+**實作與離線證據（尚不等於真旅程通過）：**`scripts/simulate_interview.py` 增加明示 job/execution 的續接；評測 progress／event 小工具拆至 `scripts/interview_progress.py`。Red 為 7 failed／15 passed（缺續接與有界重啟方法）；Green 為 24 passed，包含新增的 timeout 不重送與絕對期限檢查。後兩項為補充回歸，不冒稱先 Red。Ruff check／format 與原直接執行 CLI `--help` 通過；Windows sandbox 的 pytest 暫存目錄權限錯誤另以授權的專案內獨立暫存路徑重跑，不算產品 bug。獨立審查及真續跑结果後補。
+
+**參考契約：**依 [HTTPX exception hierarchy](https://www.python-httpx.org/exceptions/) 區分 transport 與 HTTP status error，並以本機鎖定的 `httpx2` MockTransport 驗證实际行為；[官方 transport retry](https://www.python-httpx.org/advanced/transports/) 不把任意 503 視為自動安全重試。本次只對唯讀狀態查詢加有界窗口，POST 不因此重送。全程期限採 [Python asyncio.timeout](https://docs.python.org/3/library/asyncio-task.html#asyncio.timeout)，不重造排程器。
+
+**審查修正：**獨立 reviewer 找到真實開場角色是 `app`，原測試誤用 consultant；另指出重試在 deadline 後仍可能再送，以及 Windows 預設編碼下測試讀 UTF-8 失敗。依實際 persistence 接線更新 fixture／前綴驗證；每次重試前查剩餘期限，該次查詢亦受 `asyncio.timeout` 約束；測試明示 UTF-8。先重現 4 failed／7 passed，再修至 harness＋既有品質檢查 **25 passed**（不依賴 `-X utf8`），Ruff 通過。沒有因此修改產品來源或增加 DB 熱重連機制。

@@ -2,6 +2,8 @@
 
 > 同日條目依上到下為 successor 順序；較下方的 16K／待驗文字是當時 gate 的歷史狀態，不得覆蓋上方較新的正式設定與驗收邊界。
 
+**2026-10-01 壓縮門檻校準（Owner 已確認）：**A 輪前維持 128K，B1／B2 輪前由 512K 測試初值改為 128K，三者完整 Step 間／合法回交的中途保險由 272K 改為 160K。只調數值，原生完整接續、固定工作範圍、安全採用及恢復規則不變；不等於消除所有限流或修復 JD 漏引。唯一政策見[共用執行 §6.3](specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與中途保險)，實作與驗證見 [T16 §10](plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md#10-owner-確認門檻校準2026-10-01)。Luna／high 維持；沒有採納放寬來源品質 gate 或正式切換。
+
 **2026-10-01 目標產品模型定案（Owner 已確認）：**Owner 因成本考量明確指定本產品使用 Luna，不採用 Sol 作產品預設或 fallback。既有 `gpt-6-luna`／high 接線維持，不推進跨模型切換功能或追加 Sol 付費比較；原比較結果只留作研究證據，不抵銷 Luna 的品質限制。有效選型見[技術選型 §1](implementation/technology-decisions.md#1-首選工具鏈)，原試驗及決策界線見 [T14 證據](plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#2026-10-01owner-決定維持-luna)。不改現行正式產品 authority 或 T14–T18 驗收狀態；重開模型選型須再由 Owner 確認。
 
 **2026-10-01 正式切換草案（Proposed／不放行）：**T18 所需的 [ADR0079](adr/0079-target-rebuild-production-cutover.md) 已建立，僅承接既有條件式切換授權、共同入口範圍及不刪資料的界線。ADR0077 仍有效；品質／容量／完整旅程 gate 未通過，不切換入口、不退役舊碼，也不勾 T18。狀態及證據沿[任務表](plans/2026-09-29-target-rebuild/tasks.md#t18-新產品入口切換與舊程式退役)。

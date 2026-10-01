@@ -27,13 +27,13 @@
 | V02 開場與正式來源 | 開場為序號 1；A 未完成／取消的原輸入仍保存但不佔正式號、不供其他 Agent／正式 JD 引用 | [訪談讀取](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、用例＋DB |
 | V03 持續訪談 | 很早提到情境，後期更正頻率；A 可由導覽／原話取回細節，資訊不足先問，不拿舊結論蓋掉新原文 | 工作分析指南＋真模型自然長訪談 |
 | V04 Context 基準 | A 執行中背景發布；map／read／來源 diff 始終依原 pinned Memory，同輪恢復亦同 | [A context](../specs/2026-09-26-consultant-context-and-state-design.md)、組裝＋整合 |
-| V05 超量與壓縮 | 起始近期歷史超量明示未預載範圍；輪前為主，完整 Step 間達 272K 主動 compact；全部返回 items 接續，不重加輸入／導覽。輪前 C 跨取消保留，輪中 C 隨其工作放棄，壓後仍超量不無限循環 | A context／[共用執行 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與-272k-中途保險目標已確認未實作)、provider＋故障注入 |
+| V05 超量與壓縮 | 起始近期歷史超量明示未預載範圍；輪前為主，完整 Step 間達 160K 主動 compact；全部返回 items 接續，不重加輸入／導覽。輪前 C 跨取消保留，輪中 C 隨其工作放棄，壓後仍超量不無限循環 | A context／[共用執行 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與-272k-中途保險目標已確認未實作)、provider＋故障注入 |
 | V06 原生接續 | 輸出含訊息與工具 calls；只完成一次 response 不提前結束 Turn。reasoning／call-output 配對跨 Step、Turn、compact 可接續 | [共用執行](../specs/2026-09-27-shared-agent-execution-and-state-design.md)、鎖定 SDK／真 provider |
 | V07 每 Step 恢復 | 模型回應已存、tool 未做；tool 已做、checkpoint 未前進；完整 Step 已存。均承接可取回原結果，不能重複效果 | 共用執行＋[交易](persistence.md)、真 DB＋程序中斷 |
 | V08 暫停／取消競爭 | 暫停停在下一模型發送前；取消與完成競爭、晚到工具，正式結果只有一個且不能復活取消候選 | 執行＋交易＋Web |
 | V09 A 正式完成 | final 已生成但本地提交失敗；不能顯示正式完成。提交成功 UI 斷線則讀回同一份答覆／JD | 用例＋真 DB＋Web |
 | V10 Memory 取材與派送 | 通知 Turn 成功才成立，截止該 Turn 員工訊息而非 final；重開不漏工作。新要求不擴大正在跑的批次 | [B 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、用例＋DB |
-| V11 B 分責與回交 | B1 不能讀理解、B2 不能寫情境；回交仍在同批，不重做輪前準備／換訪談上界；272K 保險只在完整 Step 交界，不重塞起始資料或混用兩方歷史 | B 流程＋工具隔離 |
+| V11 B 分責與回交 | B1 不能讀理解、B2 不能寫情境；回交仍在同批，不重做輪前準備／換訪談上界；160K 保險只在完整 Step 交界，不重塞起始資料或混用兩方歷史 | B 流程＋工具隔離 |
 | V12 候選與歷史 | 情境修改／改名／刪除，候選關係跟隨或解綁；舊快照所有路徑仍固定，JD 舊依據仍可回查 | Memory 子圖＋真 DB |
 | V13 發布與來源鏈 | 理解正文未變但所引情境變了，發布後須有新的固定修訂；未變物件可重用；同身分不能在同快照有兩個修訂 | [資料與交易](persistence.md)、快照與引用測試 |
 | V14 按需差異分析 | 新增無既有引用情境、刪情境、多次修改後改回、只改引用；B2 概覽不漏，需全文時讀新版；完成不是只調用 read | B 流程＋真模型；差異工具規格 |

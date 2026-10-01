@@ -38,9 +38,9 @@ pytestmark = pytest.mark.postgres
 @pytest.mark.parametrize(
     ("handoff_tokens", "recover_first_response", "max_cost_usd"),
     [
-        (271_999, False, Decimal("1.00")),
-        (272_000, False, Decimal("1.00")),
-        (271_999, True, Decimal("1.00")),
+        (159_999, False, Decimal("1.00")),
+        (160_000, False, Decimal("1.00")),
+        (159_999, True, Decimal("1.00")),
         (500, False, Decimal("0.02")),
         (500, False, None),
     ],
@@ -296,7 +296,7 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
                         thread_id=later.history_position.thread_id,
                         checkpoint_id=later.history_position.checkpoint_id,
                     )
-                    prefix = 1 if handoff_tokens == 272_000 else 0
+                    prefix = 1 if handoff_tokens == 160_000 else 0
                     assert new.items[prefix : prefix + len(old.items)] == old.items
                     assert (
                         sum(
@@ -332,7 +332,7 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())
-    assert len(compactions) == (2 if handoff_tokens == 272_000 else 0)
+    assert len(compactions) == (2 if handoff_tokens == 160_000 else 0)
     assert "LATE_AFTER_FIXED_F" not in json.dumps(sent, ensure_ascii=False)
     initial = json.loads(sent[0]["input"][0]["content"])
     assert initial["required_interview_range"] == {"start_sequence": 1, "end_sequence": 2}

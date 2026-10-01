@@ -1,5 +1,7 @@
 # T16：原生壓縮、再壓縮與接續的有限驗證
 
+> 最新狀態：2026-10-01 Owner 已確認輪前 128K／中途 160K，接線與局部驗證見 §10。以下先前「不改門檻／待決」及 272K／512K 試驗保留為當時紀錄，不覆蓋新決策。
+
 - 日期：2026-10-01；基準 `63c0e5d6`；**有限 adapter 驗證已完成，T16／T17 整體未完成**。§1–3 保留執行前限制及首輪停止原因，§4 是實際結果。
 - 只補 [T06 §20](t06-agent-execution.md#20-真-compact-協定預檢2026-09-30-恢復後) 未驗的加密 reasoning＋工具結果壓縮、完整 C 接續及含 C 的再次壓縮。T16／T17 仍未完成，不重跑長訪談、不改產品提示或門檻。
 - 官方 [standalone compact](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)要求送入窗口仍可容納、完整 output 原序續接；[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)要求保留原生項目。2026-10-01 取得的 [Luna 規格](https://developers.openai.com/api/docs/models/gpt-6-luna)列 input 922,000、context 1,050,000、output 128,000；不是帳戶 TPM 保證，也不把 Astra 範例等同 Luna 實测。
@@ -262,3 +264,36 @@ ignored 探針 `.research-tmp/eval/probe_compaction_continuity.py` SHA-256：`78
 instructions／tools hash與 §8 相同。執行命令（apps/api）：`./.venv-target/Scripts/python.exe -X utf8 -B ../../.research-tmp/eval/verify_consultant_preparation.py --output ../../.research-tmp/eval/a-preparation-native-provider-20261001.jsonl --execute`，另設 `PYTHONPATH=S:/caliburn/apps/api`。這是實際紀錄，不要求覆寫結果或再付費重跑；探針 Ruff check／format check以 apps/api 為 cwd 通過。另一次誤在 repo root 檢查此 ignored 檔得到預設格式／import順序差異；回正確 cwd 確認通過，不因此改 API 以外的 lint 配置或測例。沒有產品行為改動，不作 TDD 修復宣稱、不重跑無關全套。
 
 本接縫至此停止補測；A輪前壓縮／保存已不再是未驗項。**272K／512K的帳戶容量取捨、Luna來源漏引及T17／T18仍未完成**；不因這個窄例通過而改門檻、降低品質要求或正式切換。
+
+## 10. Owner 確認門檻校準（2026-10-01）
+
+Owner 對門檻方案回答「2 同意」：A 輪前保留 128K；B1／B2 輪前由 512K 測試初值改為 128K；三者完整 Step 後的中途保險由 272K 改為 160K。以 `07a2d27a` 為本片基準。這不是同時採納來源品質限制或正式切換；第 1 題的來源可見性診斷另記 [T14](t14-job-analysis-quality.md#2026-10-01早期依據在-context-與-memory-的位置)。
+
+研究重新核對官方 [standalone compaction](https://developers.openai.com/api/docs/guides/compaction#user-journey-for-standalone-compaction) 與 [rate limits](https://developers.openai.com/api/docs/guides/rate-limits#how-do-these-rate-limits-work)：完整窗口必須先能容納，完整返回窗口接續；TPM／RPM 與模型 context 上限不同。128K／160K 是 Caliburn 的已確認留量取捨，不是 OpenAI 指定值，不保證共用帳戶同時執行 A／B 時永不 429。
+
+### 改動與未改動
+
+- 共用 `request_capacity.py` 明列中途常數，Memory 合法回交及其壓後檢查引用同一常數；B1／B2 共用 `MemoryAnalysisRunner` 的輪前值為 128K。沒有新增配置平台、重試器或角色專用迴圈。
+- 原生完整 items、`phase`、加密 reasoning、工具配對與完整 compact output 的組裝方式不變；Memory 上界及角色私有歷史不變，回交不是新批。首請求容量檢查與輪前壓縮分責，不把中途門檻套到所有第一個 create。
+- 不改模型／effort／Prompt／Tool／輸出上限；計價中的 272K 長上下文費率分界及模型 capacity 數字與本政策不同，均未改動。不改寫既有 checkpoint、原件或已採用 C；沒有重啟 Demo 或操作 Demo 資料。
+- 若一次工具結果直接跨過門檻，或壓後仍不能容納，沿原容量失敗／恢復路徑，不截斷、不循環重壓；既有已開始工作的固定準備配置不作就地遷移。新設定部署應在既有安全點進行。
+
+### Red → Green 與驗證
+
+先修改既有測例的實際邊界：159,999／160,000、B 輪前 128,000，以及三角色壓縮原件補存。未改產品前 **9 failed／43 passed**，均在新門檻未觸發或未採用 C；5 個額外 teardown error 是失敗斷言穿過 TestClient portal 後的清理錯誤。修正兩個產品檔案後，加入原輪前準備回歸，**70 passed／0 failed／0 error**。沒有改 fixture 清理或略過失敗測例。
+
+```powershell
+# apps/api；使用既有隔離測試 DB，fixture 各自建立測試 schema。
+$env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/caliburn_t01_test'
+./.venv-target/Scripts/python.exe -X utf8 -B -m pytest tests/unit/test_request_capacity.py tests/unit/test_context_compaction.py tests/unit/test_context_preparation.py tests/integration/test_result_handoff_routing.py tests/integration/test_memory_analysis_runners.py -q --tb=short -p no:cacheprovider
+```
+
+涵蓋：門檻前繼續／達門檻先壓縮、全部 C 採用、壓後重新計數、未增長窗口不重壓；真 PG 業務 owner＋合成 SDK 的 A／B1／B2 輪前及輪中恢復，不重送已保存結果；B1→B2→B1→B2 保留私有歷史、固定訪談範圍與本批候選。測例在 provider 邊界合成 token count／output，**不是 160K 真模型長訪談或新門檻品質證據**。
+
+受影響 6 個 Python 檔案 Ruff check／format 通過；mypy 278 個 source files 通過。額外核對既有 `test_openai_pricing.py`：33 passed，計價門檻仍為 272K，與壓縮門檻分開。沿既有 renderer 實際渲染兩份文件共 9 張 Mermaid，視覺檢查本次變更的共用流程圖及 response loop 圖，160K、完整 Step、取消／完成優先及不重加資料的位置一致。第一次 sandbox 啟動 Chromium 為 EPERM，核准後才渲染；沒有操作現有瀏覽器或 Demo。
+
+文件檢查：12 份變更文件（決策 register 僅新首段，其他全文）403 個相對連結／錨點通過，`git diff --check` 通過。另掃 register 全歷史時發現舊 worktree 連結及 3 個舊錨點缺失，均位於未改動歷史；本片不擴修歷史索引，也不稱整份 register 全部有效。既有實作文件檢查集另有 25 檔／578 連結通過。
+
+另由 fresh-context 審閱者唯讀檢查指定 2 個產品檔與 4 個測試檔，無新阻擋問題。指出可延後的組合覆蓋：B 角色輪前 127,999 不壓縮，以及 160K 回交壓縮同時保存故障；本片已有共用準備邊界、角色達門檻及恢復各自的反例，未出現需另改機制的反證，因此不擴加整套組合矩陣。審閱不是獨立重跑或真模型驗收。
+
+本片 **零新 OpenAI 請求、零付費**；重用 §7／§9 先前真 Luna 160K–180K 窗口與輪前壓縮證據，不把它們重新計成此次測試。剩餘三角色新數值下的真長旅程與來源品質仍待驗，T16／T17／T18 不勾完成。

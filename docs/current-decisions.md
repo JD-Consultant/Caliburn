@@ -4,6 +4,8 @@
 
 **2026-10-01 目標產品模型定案（Owner 已確認）：**Owner 因成本考量明確指定本產品使用 Luna，不採用 Sol 作產品預設或 fallback。既有 `gpt-6-luna`／high 接線維持，不推進跨模型切換功能或追加 Sol 付費比較；原比較結果只留作研究證據，不抵銷 Luna 的品質限制。有效選型見[技術選型 §1](implementation/technology-decisions.md#1-首選工具鏈)，原試驗及決策界線見 [T14 證據](plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#2026-10-01owner-決定維持-luna)。不改現行正式產品 authority 或 T14–T18 驗收狀態；重開模型選型須再由 Owner 確認。
 
+**2026-10-01 正式切換草案（Proposed／不放行）：**T18 所需的 [ADR0079](adr/0079-target-rebuild-production-cutover.md) 已建立，僅承接既有條件式切換授權、共同入口範圍及不刪資料的界線。ADR0077 仍有效；品質／容量／完整旅程 gate 未通過，不切換入口、不退役舊碼，也不勾 T18。狀態及證據沿[任務表](plans/2026-09-29-target-rebuild/tasks.md#t18-新產品入口切換與舊程式退役)。
+
 **2026-09-30 產品移除金額攔截（Owner 已確認）：**A／B1／B2 保留 token 容量、壓縮、次數／重試及時間控制，不以預估美元金額阻止正常執行；工程付費驗證仍獨立遵守 manifest 預算。政策見[共用執行 §6.5](specs/2026-09-27-shared-agent-execution-and-state-design.md#65-容量與費用分開產品不設金額攔截)，接線見[執行 §5.8](implementation/agent-execution.md#58-產品與付費驗證的金額界線2026-09-30)，實測與未驗事項見 [T06 §19](plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#19-產品移除金額攔截與按請求計數預留2026-09-30)。不擴大付費測試授權、不重設既有工作限制、不宣稱 Demo 已更新。
 
 **2026-09-30 首版恢復減法（Owner 已確認；局部實作驗證，不是完整產品驗收）：**保留已保存 Step 接續、正式結果及安全回退；少見原件遺失不必擴成全面原地恢復系統。有限恢復後允許由原 owner 安全結束並讓顧問接受新輸入，Memory 失敗不阻塞訪談。唯一政策見[共用執行 §6.4](specs/2026-09-27-shared-agent-execution-and-state-design.md#64-首版恢復範圍能續作不能續作則安全退出)，接線與實測見[執行 §6.2](implementation/agent-execution.md#62-最外層失敗收尾2026-09-30)及 [T12 證據](plans/2026-09-29-target-rebuild/evidence/t12-consultant-process-recovery.md#6-首版恢復減法與最外層失敗收尾2026-09-30)。不改資料庫安全、取消、已採用 compaction 或正式保存保證；不因簡化而宣稱零 bug。

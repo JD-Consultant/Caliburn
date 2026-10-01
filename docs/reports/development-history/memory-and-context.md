@@ -100,7 +100,7 @@ OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有�
 
 當時還有 C repair，又發現 C 修改並解除舊關係後，下一批若只看 B1 的新變化，可能漏掉 B2 應重評的影響。後續從既有 receipts 和新舊 bindings 接回影響範圍，留下離線反例與回歸；沒有因此完成自然長訪談品質驗收。
 
-**引用：**[分層重設計 §0–§3、§6.1](../../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)、[背景流程 §2.4 的接力修正](../../specs/2026-09-17-layered-memory-background-workflow-design.md)。原件保留多次 successor；C 與 B2 回交等是歷史做法，不能帶入目前新目標。
+**引用：**[分層重設計 §0–§3、§6.1](../../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)、[背景流程 §2.4 的接力修正](../../specs/2026-09-17-layered-memory-background-workflow-design.md)。原件保留多次 successor；C 與 B2 回交等依當時流程解讀，不能由此推定現行產品接線。
 
 ### 2026-09-23：反覆摘要的主要負擔，竟是工具格式與近期回傳
 
@@ -118,11 +118,66 @@ OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有�
 
 **引用：**[reasoning／工具結果／state 研究](../../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md)、[context 設計沿革](../../specs/2026-09-26-consultant-context-and-state-design.md)、[目標架構地圖](../../target-architecture-map.md)、[T01–T18 計畫](../../plans/2026-09-29-target-rebuild/README.md)。最新實驗再遇到的早期依據漏選、Prompt 比較、長旅程中斷與續跑，接[近期案例索引](../research-casebook.md)及其原始證據；不是到此便全面解決。
 
+## 9月底重建前的六個轉折
+
+以下補上前節沒有展開的版本、權責與操作演化。9/24–9/28 是文件記載的討論／事件日期，許多文件於9/29才一起提交；不能用 Git 初次收錄日推算每個方案實際存在多久，也不能把同日多輪討論說成三套均已上線。
+
+### 2026-09-24：先限制 C 與背景競爭，再決定退役 C
+
+**反例：**背景只拿到較早固定訪談，新的第17輪更正若先由 C 發布，舊背景即使因 CAS 衝突重做，也不會憑空取得不在原輸入範圍內的更正。寫入版本安全與分析資料充分是兩件事。
+
+**演化：**當時先提出背景期間禁止 C，再收斂為新目標退役 C；不可變原話及 A 的工作接續承接新資訊，B1／B2 在適當時機整理。候選不作 JD 正式 Memory 來源，背景尚未發布時 A 仍可依原話工作。
+
+**引用／界線：**`7e47c133:docs/current-decisions.md` 中兩條「2026-09-24 MEM-L001／JD-R002」決定，及[分層設計沿革](../../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。這是當時的需求反例與已確認目標，不是本輪重現第17輪事故，也不表示9/24程式已移除 C。
+
+### 2026-09-25：整批返工可以完成，卻把另一個正確案例弄丟
+
+**發現：**零付費固定回覆反例先建立案例甲、乙；B2 只要求修甲，下一次 B1 產出甲′卻未重建乙。結果 `completed`、案例只剩一筆、處理來源進度已前進，乙不在正式 manifest。
+
+**定位：**當時 `_prepare_case_rework` 清空兩層 stage、換 attempt，只帶指定問題；下一次從正式 base 重建，未把其他尚未發布候選視為保留義務。這不是 SQL 原子提交失敗，也不是原始訪談遭刪除，而是「重做的候選集合」與「完成的涵蓋承諾」脫節。
+
+**後續取捨／限制：**原研究比較重建、保留候選及差異對帳，後來又澄清不是讓 B2 主動判錯並要求全批重做，而是限定其分析中的資訊缺口。此測試證明舊流程**允許**靜默漏案，不證明真模型每次都漏，也不要求一則訪談必須對應一個情境。候選操作能力仍須另外設計，不能只把所有舊稿複製回去。
+
+**引用：**[能力與生命週期研究「多案例返工的隔離反例」及其後續澄清](../../research/agent-systems/2026-09-25-agent-capabilities-and-lifecycle-patterns-research.md)；原碼 `7681963d:packages/consultant-memory/src/caliburn_memory/background_workflow.py::_prepare_case_rework`。原研究 Git 路徑為 `a0994d1d:docs/specs/2026-09-25-agent-capabilities-and-lifecycle-patterns-research.md`，不是把新架構問題套在現行程式上。
+
+### 2026-09-26 至 09-27：不把分工做成每批固定雙向互審
+
+**問題／收斂：**上游情境改動後，下游要分析影響；但程式找既有引用，不能找到所有尚未連結的新情境。另一方面，讓 B1／B2 每批互審全部內容，增加重讀與迴圈，沒有 eval 證明值得。
+
+當時收斂稿讓 B1 維護情境且不讀理解，B2 專注理解，不主動審核整個 B1；程式處理身分／範圍／操作有效性，語意由分析角色負責。**當時文件仍保留資訊缺口的例外交回**，這不同於早期「案例錯誤→全批重建」，也不同於固定雙向審核。不能因為都叫 B1／B2，就把三者寫成同一機制。
+
+**引用／界線：**[分責、影響範圍與讀寫權限的歷史稿](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)的 PROD-G2-006／007；原件 `1bf5f1b3:docs/specs/2026-09-25-b1-b2-information-gap-lifecycle.md`。這是設計取捨，沒有證據顯示固定互審曾完整實作再撤下。是否仍保留例外交回須查相應時期的實作／決策，本報告不以舊稿重新決定現行流程。
+
+### 2026-09-28：引用核對也曾做過減法
+
+**討論順序：**先比較 B2 完成階段後由 App 改綁，再討論逐條 `confirm_reference_alignment`，最後改為 **候選關係綁物件身分、正式發布才固定修訂**。工作面上同一物件持續編輯，不要求 B2 為每次換版刪舊引用再加新引用。
+
+**留下與移除：**B2 仍要看上游變更並完成理解分析；去掉的是逐條版本格式確認，不是去掉語意工作。JD 的來源核對則保留，因其可能分段、跨回合處理。`read_ref` 作為所有 Memory 操作必填值亦曾是候選，不能把它寫成已採用後全面改回。
+
+**引用／界線：**[Memory更新契約 §10討論沿革](../../specs/2026-09-27-memory-object-update-tool-contract.md)、[Memory讀取契約 §4](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[JD來源契約 §4](../../specs/2026-09-29-jd-model-tool-contract-review.md)。前兩份原件於 `df4221a5` 收錄；同日方案次序由文內 successor 說明辨認，沒有三個獨立已驗版本可比較。
+
+### 2026-09-28 至 09-29：分清可編輯工作面、交接快照與正式 Memory
+
+**問題：**只說「版本固定」會讓人誤以為 B1／B2 修改後仍只能讀舊 map；只說「永遠最新」又會破壞 A 與 JD 當時依據。這兩種使用者需要不同的讀取邊界。
+
+**設計收斂：**一批整理使用一份邏輯候選，B1／B2 的 map／read 隨已成立操作更新，權限各自限定。改名不改身分；刪情境會解除候選綁定，理解物件本身保留。開始前與 B1 完成後快照供恢復／diff 使用，不是第二份可寫資料。完成後發布不可變 Memory 快照，同一物件在本版只選一個修訂；A 固定一版使用，歷史 JD 來源不被後續編輯覆寫。
+
+**引用／界線：**[生命週期「候選操作、快照與三個安全點」](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[Memory操作契約的刪除及關係規則](../../specs/2026-09-27-memory-object-update-tool-contract.md)。這裡記錄的是重建前契約如何變清楚，不表示該時候 SQL、checkpoint 或原子發布已驗。後來施工與測試沿[T04候選／快照](../../plans/2026-09-29-target-rebuild/tasks.md#t04-memory-可變候選不可變修訂與快照)及[T10背景整理](../../plans/2026-09-29-target-rebuild/tasks.md#t10-b1b2-私有角色與-context)找，不能用圖或一次發布成功替代各項驗收。
+
+### 2026-09-28 至 09-29：從執行 Turn 改成有效訊息序列來界定取材
+
+**問題／收斂：**問答、模型執行回合及單則發話不等同；短答需要前問，員工也會主動補充。於是分開完整訊息的來源身分與固定訪談序號，按需工具可選個別訊息或區間，保留順序、說話者與原文，不另造 LLM 維護的主題分組。
+
+當時新規則只讓成功完成的員工輸入／完整答覆取得正式序號，取消輸入與中間訊息不成為共享來源；App 開場另為第1則。Memory 的**啟動時點**與**資料截止點**分開：X Turn 成功後啟動，但上界取其最後員工輸入，不取其後顧問答覆或延後啟動時的最大序號。Runtime 固定並驗證範圍，模型只選需要讀的訊息。
+
+**引用／界線：**[原話讀取、來源資格與固定上界](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md) §2–3。序號38／39／40是設計示意，不是真實長旅程結果；尚未完成與正式原話的保存也不能混為一談。後來的容量、來源工具與長訪談實驗接[T16](../../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)及[T17](../../plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md)，結果層級各自看原件。
+
 ## 可以連著讀的問題鏈
 
 - **短答與過度概括：**7/20 的前問關係 → CT37 實際入料核對 → CT38 prompt／effort 對照 → CT42／49 長訪談。
 - **能保存與能使用不同：**早期 Graph 歷史 → State 大小比較 → routing spike → CT42 回查效率 → 新目標引用／按需讀取。
 - **工具會影響分析效果：**行號污染 old_string → patch wrapper／hunk 順序 → 引用保留 → 9/23 重複 refs 與 schema 膨脹。
 - **分層本身也在迭代：**固定窗口詳記 → 跨批案例 → 理解與來源影響 → 新目標 Snapshot／工作面；每次都要區分設計決定與已有的實測。
+- **操作有效不等於分析完整：**C與背景的取材反例 → 多案例返工漏案 → 分責與候選接續 → B2看變更、JD按需核對；不靠多加審核者解決所有問題。
 
 這些只是方便回讀的素材路線，不先判定哪條一定要放推甄正文。所有原失敗、未驗項目與外送資料限制仍以各原件為準。

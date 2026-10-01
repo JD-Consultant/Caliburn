@@ -11,9 +11,12 @@ from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.features.work_memory.candidates import CreateMemoryObject, MemoryBatchPosition
 from caliburn.features.work_memory.models import MemoryContent
 from caliburn.features.work_memory.revisions import MemoryLayer
+from caliburn.transport.model_tools.memory_analysis import (
+    MEMORY_CHECKPOINT_TYPES,
+    MemoryAnalysisTools,
+)
 from caliburn.transport.model_tools.memory_writes import PreparedMemoryToolCall
 from caliburn.workflows.memory_analysis.results import AnalysisComplete, SituationGap, parse_outcome
-from caliburn.workflows.memory_analysis.tools import MEMORY_CHECKPOINT_TYPES, MemoryAnalysisTools
 
 
 def prepared() -> PreparedMemoryToolCall:

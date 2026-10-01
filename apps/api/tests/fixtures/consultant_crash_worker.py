@@ -24,8 +24,8 @@ from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import DatabaseSettings, ModelSettings
+from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.consultant_controls import run_consultant_with_controls
-from caliburn.workflows.memory_analysis.tools import MEMORY_CHECKPOINT_TYPES
 from tests.unit.test_response_loop import response_at
 
 ORIGINAL_REPLY = "已記下職務名稱。最近一個頁面你親自做到哪裡？"

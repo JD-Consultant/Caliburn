@@ -8,6 +8,27 @@ import pytest
 
 SOURCE = Path(__file__).parents[2] / "src/caliburn"
 
+# Layers import downward only (code-organization.md §2). Each key lists the top-level packages
+# that sit above it and therefore must never be imported by it. `bootstrap` is the root: nothing
+# imports it. `memory_analysis` is the B1/B2 common assembly that both role packages may use.
+ABOVE = {
+    "adapters": {
+        "features",
+        "agent_execution",
+        "workflows",
+        "transport",
+        "agents",
+        "settings",
+        "bootstrap",
+    },
+    "features": {"workflows", "transport", "agents", "bootstrap"},
+    "agent_execution": {"workflows", "transport", "bootstrap"},
+    "workflows": {"transport", "agents", "bootstrap"},
+    "transport": {"agents", "bootstrap"},
+    "agents": {"bootstrap"},
+}
+COMMON_AGENT_ASSEMBLY = "memory_analysis"
+
 
 def violations(module: str, code: str) -> list[str]:
     found = []
@@ -43,6 +64,8 @@ def violations(module: str, code: str) -> list[str]:
                 forbidden |= dependency[:2] in [["caliburn", "agents"], ["caliburn", "features"]]
             if source[:2] == ["caliburn", "transport"]:
                 forbidden |= dependency[0] in {"sqlalchemy", "psycopg"}
+            if len(source) > 1 and dependency[:1] == ["caliburn"] and len(dependency) > 1:
+                forbidden |= dependency[1] in ABOVE.get(source[1], ())
             for group in ("features", "agents"):
                 if (
                     len(source) > 2
@@ -50,7 +73,10 @@ def violations(module: str, code: str) -> list[str]:
                     and source[:2] == dependency[:2] == ["caliburn", group]
                     and source[2] != dependency[2]
                 ):
-                    forbidden |= group == "agents" or dependency[3] == "persistence"
+                    if group == "agents":
+                        forbidden |= dependency[2] != COMMON_AGENT_ASSEMBLY
+                    else:
+                        forbidden |= dependency[3] == "persistence"
             if forbidden:
                 found.append(f"{module}:{node.lineno} cannot import {target}")
     return found
@@ -77,6 +103,24 @@ def violations(module: str, code: str) -> list[str]:
         ("caliburn.bootstrap", "import jd_relational"),
         ("caliburn.bootstrap", "import caliburn_memory"),
         ("caliburn.bootstrap", "from caliburn_memory import publication"),
+        # Upward imports: a lower layer must not reach a layer that is composed on top of it.
+        ("caliburn.workflows.memory_batch", "from caliburn.transport.model_tools import contracts"),
+        ("caliburn.workflows.memory_batch", "from caliburn.agents.job_consultant import runner"),
+        ("caliburn.features.job_description.service", "from caliburn.workflows import jd_reads"),
+        ("caliburn.adapters.database", "from caliburn.features.executions import models"),
+        ("caliburn.adapters.database", "from caliburn.settings import DatabaseSettings"),
+        ("caliburn.agent_execution.tool_steps", "from caliburn.workflows import model_requests"),
+        ("caliburn.transport.http.jd", "from caliburn.agents.job_consultant import runner"),
+        ("caliburn.transport.http.jd", "from caliburn import bootstrap"),
+        # The common B1/B2 assembly is shared, but the two roles never reach each other.
+        (
+            "caliburn.agents.work_situation_analyst.runner",
+            "from caliburn.agents.work_understanding_analyst import instructions",
+        ),
+        (
+            "caliburn.agents.memory_analysis.runner",
+            "from caliburn.agents.work_situation_analyst import instructions",
+        ),
     ],
 )
 def test_forbidden_dependency_is_detected(module: str, code: str) -> None:
@@ -89,6 +133,17 @@ def test_explicit_service_collaboration_is_allowed() -> None:
     )
     assert not violations(
         "caliburn.agents.job_consultant.tools", "from caliburn.features.work_memory import queries"
+    )
+
+
+def test_both_memory_roles_may_use_the_common_analysis_assembly() -> None:
+    for role in ("work_situation_analyst", "work_understanding_analyst"):
+        assert not violations(
+            f"caliburn.agents.{role}.runner", "from caliburn.agents.memory_analysis import runner"
+        )
+    assert not violations(
+        "caliburn.workflows.memory_batch",
+        "from caliburn.workflows.memory_analysis.results import MemoryAnalysisResult",
     )
 
 

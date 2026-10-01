@@ -7,9 +7,11 @@ from uuid import uuid4
 
 import pytest
 
+from caliburn.agents.job_consultant import runner as consultant_runner
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.job_consultant.tools import consultant_tool_definitions
+from caliburn.agents.memory_analysis import runner as analysis_runner
 from caliburn.agents.work_situation_analyst.instructions import SITUATION_INSTRUCTIONS
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.instructions import UNDERSTANDING_INSTRUCTIONS
@@ -18,10 +20,9 @@ from caliburn.features.executions.models import ExecutionKind, ExecutionScope, E
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import ModelSettings
+from caliburn.transport.model_tools.memory_analysis import memory_analysis_tool_definitions
 from caliburn.workflows.context_history import RoleContextHistory
-from caliburn.workflows.memory_analysis import runner as analysis_runner
 from caliburn.workflows.memory_analysis.results import AnalysisComplete, parse_outcome
-from caliburn.workflows.memory_analysis.tools import memory_analysis_tool_definitions
 
 
 class CapturedPreparationError(Exception):
@@ -54,8 +55,8 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
 
     # Only database/history I/O is replaced. Actual role assembly and definitions run.
     monkeypatch.setattr(RoleContextHistory, "prepare_history", capture)
-    monkeypatch.setattr(ConsultantRunner, "_fix_budget", AsyncMock())
-    monkeypatch.setattr(analysis_runner.MemoryAnalysisRunner, "_fix_budget", AsyncMock())
+    monkeypatch.setattr(consultant_runner, "fix_execution_policy", AsyncMock())
+    monkeypatch.setattr(analysis_runner, "fix_execution_policy", AsyncMock())
     monkeypatch.setattr(analysis_runner.executions, "lock_active_writer", AsyncMock())
     monkeypatch.setattr(analysis_runner.candidate_queries, "require_stage", AsyncMock())
     sessions = Mock()

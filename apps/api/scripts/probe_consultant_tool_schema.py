@@ -19,7 +19,7 @@ from caliburn.adapters.openai_responses import (
 )
 from caliburn.agents.job_consultant.tools import consultant_tool_definitions
 from caliburn.features.work_memory.revisions import MemoryLayer
-from caliburn.workflows.memory_analysis.tools import memory_analysis_tool_definitions
+from caliburn.transport.model_tools.memory_analysis import memory_analysis_tool_definitions
 
 ROLE_LAYERS = {
     "work_situation_analyst": MemoryLayer.WORK_SITUATION,

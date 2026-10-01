@@ -41,6 +41,18 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 
 這些是採用審查時必須查回的狀態，不由本 ADR 升格、豁免或增加新需求。後續變化只在各任務 evidence 與任務表維護，再於正式化時核對本節。
 
+## 切換內容與預先驗證（候選分支 `target-cutover-candidate`）
+
+切換已備成**一組可審提交**，不在原分支放行：根 `package.json`（`dev`／`start`／`build`／`lint`／`typecheck`／`test`／`check`／`app:migrate`／`app:status`，RAG 命令不變）、`pnpm-workspace.yaml` 與 pnpm 重新生成的 lock、CI（改跑同一個根 `check`）、README／ARCHITECTURE／CONTRIBUTING／AGENTS／runbook，以及下節的程式退役。`app:status` 是只讀診斷（`python -m caliburn.status`），不印出密碼或 key；`app:migrate` 是唯一改 schema 的命令。
+
+在乾淨 worktree（只含 tracked 檔案）已驗：鎖定安裝；根 `check`（lint、mypy strict、1,113 單元／契約測試、162 前端測試、契約生成核對、production build）；新 schema 遷移；無設定與有設定的 `app:status`；以根 `start` 啟動的單程序同源 UI（首頁、深連結、資源、API 404）；硬停止後重啟資料仍在。實際輸出與限制見 [T18 證據](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#乾淨-worktree-的根命令切換候選2026-10-01)。這些不取代 T14／T16／T17 的品質、容量與旅程 gate。
+
+## 退役範圍與取回
+
+退役範圍是[固定 Git 樹盤點](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#切換範圍盤點與舊依賴防線2026-10-01)的 **379 個 tracked 檔**：`experiments/jd-relational-app` 的 336 個非 Markdown 檔、`packages/consultant-memory` 的 41 個非 Markdown 檔（不含 `adoption.json`），以及 `scripts/run-jd-app.mjs`、`scripts/run-jd-app.test.mjs`。保留 16 個 Markdown／`adoption.json` 沿革檔（兩個 README 於頂端加歷史標記）、`packages/job-analysis-contract` 的歷史 README、全部研究／ADR／證據文件與獨立 RAG。不刪 DB、volume、秘密、ignored 或未追蹤檔；不做舊資料遷移，舊 runtime 也不能讀新 schema。
+
+清單可重建：`git ls-tree -r --name-only d08a3b09 -- experiments/jd-relational-app packages/consultant-memory`，排除 `.md` 與 `packages/consultant-memory/adoption.json`，再加上述兩個啟動器。基準提交 `d08a3b09` 是退役前的完整樹。取回單一檔案：`git show d08a3b09:<路徑>`；整批恢復：`git revert <退役提交>`（它只含上述刪除，與入口／文件切換分開提交）。
+
 ## 回退與後果
 
 切換前記錄可回查的 Git 基準、精確變更與驗證結果。切換失敗時停止放行，保留新舊資料與證據，修復入口或依精確提交恢復程式；**Git 回退不會回退業務資料，也不能讓舊 runtime 讀取新 schema**。不自動殺程序、刪 DB、清 volume 或重新生成模型結果。

@@ -1,59 +1,50 @@
 # Caliburn 架構
 
-> 正式權責以 [ADR0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)、
-> [目前決策](docs/current-decisions.md)與各責任設計文件為準。本頁只提供現行鳥瞰，不複製完整規則。
-
-新目標的設計與重建程式請走[目標架構地圖](docs/target-architecture-map.md)及[任務表](docs/plans/2026-09-29-target-rebuild/tasks.md)；本頁下圖仍描述 ADR0077 的正式產品，不是新目標 A／B1／B2 的架構圖。
+> 正式權責以 [ADR0079](docs/adr/0079-target-rebuild-production-cutover.md)、
+> [目前決策](docs/current-decisions.md)與各責任設計文件為準。本頁只提供鳥瞰，不複製完整規則；
+> 全產品設計入口見[目標架構地圖](docs/target-architecture-map.md)。
 
 Caliburn 是本機 Web AI 職務分析與職務說明書（JD）App。員工可直接編輯 JD，也可與顧問持續訪談，
-由 LLM 透過相同的 App 業務規則讀寫 JD。單一操作者可管理多份彼此隔離的文件；目前沒有登入、ACL、
-多租戶、計費、雲端部署或多人協作。
+由 AI 透過與人工相同的 App 業務規則讀寫 JD。單一操作者可管理多份彼此隔離的職務檔案；目前沒有登入、
+ACL、多租戶、計費、雲端部署或多人協作，只綁定 loopback。
 
-## 現行組成
+## 組成
 
 ```text
-Next.js／TypeScript Web (:3002)
-              │ HTTP
-              ▼
-FastAPI JD App (loopback；port 由受保護設定提供)
-       │
-       ├─ 關聯式 JD domain／service（人與 LLM 共用）
-       ├─ A 主顧問與 JD／Memory／來源工具
-       ├─ B1 案例整理、B2 工作理解、C 即時更正
-       ├─ App-side continuation compaction 與 Working State
-       ├─ LangGraph Saver／Store、Memory publication
-       └─ OpenRouter → OpenAI-only Luna（無自動 fallback）
-              │
-              ▼
-PostgreSQL 18.6
-  public      關聯式 JD 與背景准入
-  jd_runtime  對話、執行狀態、Memory 與 publication
+瀏覽器（React／MUI，建置後由後端同源提供）
+        │ HTTP／SSE（同源；精確 Host／Origin 檢查）
+        ▼
+FastAPI 單程序（apps/api，loopback :8100）
+  transport     HTTP routers／DTO；模型工具的薄入口
+  agents        A 顧問、B1 情境整理、B2 工作理解（prompt、允許的工具、起始 context）
+  workflows     跨領域用例：訪談輸入、JD 讀寫、Memory 批次、PDF、撤回
+  agent_execution  共用的原生模型／工具迴圈、Step 恢復、暫停／取消、compaction
+  features      領域與其 SQL：職務檔案、訪談、JD、Memory、執行資格與額度
+  adapters      OpenAI Responses（直連 SDK）、LangGraph 官方 PostgreSQL saver、PDF renderer
+        │                     │
+        ▼                     ▼
+PostgreSQL 18.6          OpenAI Responses API（經授權的工作資料；store=false）
+  關聯式 JD／訪談／Memory／執行資格
+  LangGraph checkpoint（原生接續歷史）
 ```
 
-正式程式位於：
-
-| 路徑 | 責任 |
-|---|---|
-| [`experiments/jd-relational-app/`](experiments/jd-relational-app/README.md) | App composition root、API、JD domain、A／B1／B2／C runtime、持久化與驗收 |
-| [`experiments/jd-relational-app/web/`](experiments/jd-relational-app/web/README.md) | 同頁訪談、六章 JD 編輯、改動／來源查看與只撤回本輪 JD |
-| [`packages/consultant-memory/`](packages/consultant-memory/README.md) | 分層案例／工作理解 Memory、Skills 與 publication 元件 |
-
-`apps/api`、`apps/web`、`packages/job-analysis-contract` 的舊接線已退役。目前 `apps/api`／`apps/web` 已用於新目標重建，
-各自的 README 說明新程式的開發操作；這不復活舊接線，也不表示現行正式入口已切換。
+程式位於 `apps/api`（後端）與 `apps/web`（介面）；層次與依賴方向、命名與寫法見
+[程式組織](docs/implementation/code-organization.md)與[程式撰寫規範](docs/implementation/coding-standard.md)，
+其中的層方向由測試鎖定。
 
 ## 權責不變量
 
-- PostgreSQL 是正式資料 owner；Web 不保存第二份正式 JD，也不重算 domain invariant。
-- 人工編輯與 LLM 工具可使用不同 endpoint，但必須經過同一套 JD service、驗證、版本與保存規則。
-- 原始訪談完整保存；案例與工作理解分層整理、可引用回查。Compaction 只管理模型延續 context，不能取代原話或工作理解 Memory。
-- 文件、版本、scope、引用解析、寫入條件與 persistence 由 Runtime／App 管理，不要求模型自行生成。
-- `request_memory_consolidation` 是非等待式通知；背景整理不阻斷 A 的自然回答。
-- 本輪 JD 撤回只撤回該輪 JD effects，不撤回原始對話、來源或 Memory。
-- OpenRouter credential 只存 Windows 認證管理員；無 key 時人工 JD 仍可使用，AI 明示停用。
+- PostgreSQL 的關聯式表是正式資料 owner；LangGraph checkpoint 只保存模型接續位置，不充當正式業務結果；Web 不保存第二份正式 JD，也不重算領域規則。
+- 人工編輯與模型工具可使用不同入口，但經過同一套 JD service、驗證、版本與保存規則；候選（模型本輪的改動）在 Turn 完整成功前不成為正式 JD。
+- 原始訪談完整保存並可引用回查；工作情境與理解（Memory）由背景 B1／B2 分層整理並發布為不可變快照。compaction 只管理模型接續 context，不能取代原話或 Memory。
+- 文件、版本、scope、引用解析與寫入條件由 App 管理，不要求模型自行生成或猜測；訪談、Memory、JD 與工具回傳的文字一律作資料，不能改指令或權限。
+- `request_memory_consolidation` 是非等待式要求；背景整理最終失敗後，訪談再前進三輪才允許一次新批次，A 不因 Memory 失敗而停用。
+- 本輪 JD 撤回只撤回該輪 JD 的效果，不撤回原始訪談、來源或 Memory。
+- OpenAI key 只在後端使用，不進 prompt、工具、Web bundle、URL、log 或資料庫；沒有 key 時人工 JD 仍可使用，AI 明示停用。
 
-詳細責任見 [JD App README](experiments/jd-relational-app/README.md)、
-[跨 Agent 來源與 JD context 契約](docs/specs/2026-09-20-cross-agent-evidence-and-jd-context-contract.md)、
-[分層 Memory 背景流程](docs/specs/2026-09-17-layered-memory-background-workflow-design.md)及
+詳細責任見[系統責任與資料流](docs/architecture/system-boundaries.md)、
+[資料責任與交易](docs/architecture/persistence.md)、
+[共用執行](docs/specs/2026-09-27-shared-agent-execution-and-state-design.md)及
 [runbook](docs/runbook.md)。
 
 ## RAG（保留、隔離）

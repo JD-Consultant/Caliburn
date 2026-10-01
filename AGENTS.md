@@ -6,9 +6,8 @@
 
 Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。員工透過訪談讓 AI 理解實際工作；人與 AI 可編輯同一份 JD。單一操作者可管理多份資料隔離的職務檔案。具體功能、非目標及目前進度以有效決策與責任文件為準，不從本檔推導新需求。
 
-- **現行正式產品**：[`experiments/jd-relational-app`](experiments/jd-relational-app/README.md)（含 `web`）與 `packages/consultant-memory`；正式權責見 [ADR0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。目錄名中的 `experiments` 不表示它仍是實驗產品。
-- **目標架構不等於正式產品**：ADR0077 的現行產品仍有 A／B1／B2／C 等接線；新目標已在 `apps/api`／`apps/web` 實作與驗收中，完成範圍查[任務表](docs/plans/2026-09-29-target-rebuild/tasks.md)，不能概稱全部未實作，也不等於 T18 已切換。討論或圖稿須分清「現行正式」「目標及其實作／驗收狀態」「候選」或「歷史」，不能把其中一種冒充另一種。
-- **舊架構與獨立範圍**：原 `apps/api`、`apps/web`、`packages/job-analysis-contract` 已退役，不接回舊接線；2026-09-29 Owner 允許以 `apps/api`、`apps/web` 作新目標重建位置，規劃見[實作入口](docs/implementation/README.md)，不是現行 production 已切換。RAG 是獨立範圍，不是目前 JD App 的依賴。
+- **現行正式產品**：[`apps/api`](apps/api/README.md)（後端）與 [`apps/web`](apps/web/README.md)（介面）；正式權責見 [ADR0079](docs/adr/0079-target-rebuild-production-cutover.md)。完成度與已知限制以[任務表](docs/plans/2026-09-29-target-rebuild/tasks.md)及其證據為準；文件或測試通過不等於分析品質已達標。
+- **舊架構與獨立範圍**：`experiments/jd-relational-app` 與 `packages/consultant-memory` 的程式已依 ADR0079 退役，只保留研究與沿革文件（退役前的程式可由 Git 歷史取回），不接回舊接線、不遷移舊資料；ADR0077 是歷史。討論或圖稿須標明「現行」「目標／未實作」「候選」或「歷史」，不能把其中一種冒充另一種。RAG 是獨立範圍，不是 JD App 的依賴。
 
 ## 自主工作與提問界線
 
@@ -25,7 +24,7 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 
 ## 實作與驗證
 
-- 新目標的計畫／施工依[SDD／TDD 開發規範](docs/implementation/development-standard.md)及[任務計畫](docs/plans/2026-09-29-target-rebuild/README.md)：直接追溯責任文件，先研究既有成熟機制，再以行為反例 Red–Green–Refactor、小切片交付。命名、模組與依賴沿[程式設計文件](docs/implementation/code-organization.md)；函式／實例／Service、錯誤與非同步寫法沿[程式撰寫規範](docs/implementation/coding-standard.md)。不把計畫完成當實作授權／驗收。
+- 計畫／施工依[SDD／TDD 開發規範](docs/implementation/development-standard.md)及[任務計畫](docs/plans/2026-09-29-target-rebuild/README.md)：直接追溯責任文件，先研究既有成熟機制，再以行為反例 Red–Green–Refactor、小切片交付。命名、模組與依賴沿[程式設計文件](docs/implementation/code-organization.md)；函式／實例／Service、錯誤與非同步寫法沿[程式撰寫規範](docs/implementation/coding-standard.md)。不把計畫完成當實作授權／驗收。
 - 先核現有框架、Domain 與資料權威是否已提供所需能力；有具體反例才增補元件，避免第二套 validator、receipt、persistence 或通用引擎。模型不生成 App 已知的 ID、scope、版本及保存結果。新 API／共用格式依 [契約策略](docs/contract-strategy.md) 從正式來源生成，不手改生成檔。
 - 正確性或保存問題先找可重現反例與真正 owner，再做有界修正；失敗先診斷，不無限重試。依改動風險跑受影響測試，必要時升到真 PostgreSQL、provider、瀏覽器或使用者旅程；不把離線通過說成真模型或完整產品通過，也不因文件修字重跑全套。純文件改動檢查差異、連結、狀態及相互一致性。
 - 動手前確認工作目錄、分支與未提交變更；保留使用者及其他代理的工作。子目錄有局部指引時讀取適用規則。啟停、初始化、資料處置與檢查命令從 [runbook](docs/runbook.md) 及相關 App README 查找；不自動清資料或重建 volume，只停止已確認身分的自有程序。

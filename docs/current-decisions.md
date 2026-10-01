@@ -2,6 +2,8 @@
 
 > 同日條目依上到下為 successor 順序；較下方的 16K／待驗文字是當時 gate 的歷史狀態，不得覆蓋上方較新的正式設定與驗收邊界。
 
+**2026-10-02 Memory 單向流程與文件審核：**再次核對已確認的 **B1 → B2 → 發布、不回交 B1** 設計；此決定不是本次新增候選。背景生命週期中較早的回交要求已由[有效流程補正](specs/2026-09-25-b1-b2-information-gap-lifecycle.md)明示取代。靜態查核發現現行 B2 提示及啟動流程仍接入回交，屬需修正的實作差異，具體依據見[系統責任](architecture/system-boundaries.md#2-app-拆開後有哪些責任)；既有 V11 回交測試不證明單向設計已完成。本次同步教授版報告、產品介紹及工程架構入口的切換狀態與證據限制，未修改產品程式、重跑付費驗證或改寫既有實驗結果。
+
 **2026-10-02 新目標切換放行（Owner 已確認）：**T14／T16／T17 結案、切換候選重基並通過最終根檢查後，Owner 在「放行／先補額度再放行／先不放行」中選擇**放行**。`target-cutover-candidate` 以快轉合併進 `target-rebuild`（只在本機，未 push、未對外部署）：根命令、workspace、lock 與 CI 改指 `apps/api`／`apps/web`；舊 `experiments/jd-relational-app`／`packages/consultant-memory` 的 379 個程式檔退役（16 個沿革檔保留，切換前基準 `6ad33bcb` 可取回）。[ADR0079](adr/0079-target-rebuild-production-cutover.md) 轉 Accepted、取代 ADR0077；不刪 DB、volume、秘密或未追蹤檔，不遷移舊資料。放行不消除既有限制：見 [T14 已知不足](plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)與[實驗發現的問題彙整](reports/experiment-findings.md)；OpenAI 帳戶額度用完，候選上的真模型短旅程與 B 批次探針補測待補額度。證據見 [T18](plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#放行與切換2026-10-02)。
 
 **2026-10-02 文件分類（僅整理／不改產品狀態）：**依 Owner 要求將純研究按主題歸位，新增指南、規格、計畫與封存入口；明示退役或被取代的文件移至歷史區，原件及路徑對照保留。閱讀從[文件導覽](README.md)與[研究分類](research/README.md)開始；判定、來源與驗證見[整理紀錄](archive/document-classification-2026-10-02.md)。有效 Tool 契約、指南、ADR 決策與任務驗收沒有因改分類而變更，未切換 production、未推送。

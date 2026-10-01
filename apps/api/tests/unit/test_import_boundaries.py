@@ -25,7 +25,7 @@ def violations(module: str, code: str) -> list[str]:
             targets = [f"{base}.{alias.name}" for alias in node.names]
         for target in targets:
             dependency = target.split(".")
-            forbidden = dependency[0] in {"jd_relational", "consultant_memory"}
+            forbidden = dependency[0] in {"jd_relational", "caliburn_memory"}
             is_feature = source[:2] == ["caliburn", "features"] and len(source) > 3
             pure_values = source[3] == "models" if is_feature else False
             pure_values |= module in {
@@ -75,6 +75,8 @@ def violations(module: str, code: str) -> list[str]:
         ("caliburn.agents.job_consultant.prompt", "from ..work_situation_analyst import prompt"),
         ("caliburn.features.job_description.queries", "from ..work_memory import persistence"),
         ("caliburn.bootstrap", "import jd_relational"),
+        ("caliburn.bootstrap", "import caliburn_memory"),
+        ("caliburn.bootstrap", "from caliburn_memory import publication"),
     ],
 )
 def test_forbidden_dependency_is_detected(module: str, code: str) -> None:

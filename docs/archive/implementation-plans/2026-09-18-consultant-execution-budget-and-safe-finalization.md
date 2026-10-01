@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.12, LangChain 1.4.0, LangGraph 1.2.11, Pydantic 2, pytest, existing OpenRouter adapter and generated JD contracts.
 
-**Spec:** `docs/specs/2026-09-18-consultant-execution-budget-and-safe-finalization.md` §§1–10; `docs/specs/2026-09-12-jd-relational-agent-tool-contract.md` §§6–7; `docs/specs/evidence/2026-09-10-jd-error-recovery-contract-closure.md` §§2–4
+**Spec:** `docs/specs/2026-09-18-consultant-execution-budget-and-safe-finalization.md` §§1–10; `docs/specs/2026-09-12-jd-relational-agent-tool-contract.md` §§6–7; `docs/experiments/legacy-evidence/2026-09-10-jd-error-recovery-contract-closure.md` §§2–4
 
 ## Decision Preflight
 
@@ -21,7 +21,7 @@
 
 ## Official Facts and Caliburn Mapping
 
-**2026-09-20 correction:** 下方原施工的 `3*steps+6／198` 是歷史估算，已被實測反例推翻，不可再按它施工。現行 A 為 `max(100, 8*64+16)=528`，模型／工具64／63不變；最終 no-tool wire 已補 request-only 傳遞，真 PG 回歸仍待確認。詳見[補驗與修正](../../specs/evidence/2026-09-20-agent-recursion-headroom-review.md)。其餘原施工步驟保留為迭代歷史。
+**2026-09-20 correction:** 下方原施工的 `3*steps+6／198` 是歷史估算，已被實測反例推翻，不可再按它施工。現行 A 為 `max(100, 8*64+16)=528`，模型／工具64／63不變；最終 no-tool wire 已補 request-only 傳遞，真 PG 回歸仍待確認。詳見[補驗與修正](../../experiments/legacy-evidence/2026-09-20-agent-recursion-headroom-review.md)。其餘原施工步驟保留為迭代歷史。
 
 - OpenAI Responses accepts an empty tool surface and `tool_choice="none"`; `max_output_tokens` includes visible and reasoning output. This supports the final no-tools request but does not prescribe 64／63. [OpenAI Responses create](https://developers.openai.com/api/reference/cli/resources/responses/methods/create)
 - Anthropic recommends returning an instructive tool error tied to the original tool ID and reports that invalid or missing tool arguments are commonly corrected two or three times. This supports a bounded correction opportunity, not automatic replay of writes. [Anthropic Handle tool calls](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)

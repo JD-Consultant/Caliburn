@@ -1,10 +1,10 @@
 # 0055. 混合式職務發現與 T–T–O–P 形成順序
 
 - 狀態：**Accepted**（owner 於 2026-08-03 確認）
-- 編號說明：本 ADR 原以 `0042` 起草於離線分支，合併回 `main` 時該編號已由另一條線的[0042-r1-screening-stop-and-a6-first-version-default](0042-r1-screening-stop-and-a6-first-version-default.md) 佔用，故發布為 `0055`。決策內容未更動。
+- 編號說明：本 ADR 原以 `0042` 起草於離線分支，合併回 `main` 時該編號已由另一條線的[0042-r1-screening-stop-and-a6-first-version-default](../../../../../adr/0042-r1-screening-stop-and-a6-first-version-default.md) 佔用，故發布為 `0055`。決策內容未更動。
 - 日期：2026-08-03
 - 範圍：AI 對話如何從職務範圍與員工工作材料形成 Duty／Task／Output／Indicator／KSA
-- 延伸：[0040](0040-professional-consultant-engine-and-r1-validation-contract.md)
+- 延伸：[0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
 - 研究：[AI 對話式職務分析路線研究](../specs/2026-08-03-ai-conversational-job-analysis-discovery-route-research.md)
 
 ## 脈絡

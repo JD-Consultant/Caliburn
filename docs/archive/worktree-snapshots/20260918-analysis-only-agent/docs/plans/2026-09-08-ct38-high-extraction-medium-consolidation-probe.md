@@ -6,7 +6,7 @@
 
 - **Topic／唯一問題：**B1 改 Luna high 後，資料是否保真，並能沿現有 B2 medium 整併與增量更新，避免全面增加訪談成本？
 - **Stage：**G3方向已同意，G4／G5局部驗證；不是production施工。
-- **Binding：**[CT37結果](../specs/2026-09-08-ct37-prompt-effort-comparison-results.md)與[root register](../../../../docs/current-decisions.md)。提示／模型預設均未採用新候選；CT35/C停放、ABC架構、工具與背景通知時機不變。
+- **Binding：**[CT37結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct37-prompt-effort-comparison-results.md)與[root register](../../../../docs/current-decisions.md)。提示／模型預設均未採用新候選；CT35/C停放、ABC架構、工具與背景通知時機不變。
 - **已讀證據：**CT37兩份報告及原8則fixture；現有B1／B2 graph與測試。上一輪`pipeline`固定medium且重跑B1，不能用它冒充high接續。
 - **不做：**JD、Web、production／PostgreSQL資料變更、完整長訪談、增加Agent／欄位／新語意驗證器。
 
@@ -31,7 +31,7 @@ Owner本輪同意續驗；本輪新建CT38帳本，自設**最多20次實際HTTP
 
 ## Closure（2026-09-08）
 
-- [逐段結果、成本與完整證據](../specs/2026-09-08-ct38-high-extraction-medium-consolidation-results.md)持有本輪結論，避免計畫重複堆全文。
+- [逐段結果、成本與完整證據](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct38-high-extraction-medium-consolidation-results.md)持有本輪結論，避免計畫重複堆全文。
 - 步驟1–4完成：現行提示high未過；封存候選high→B2 medium及追加澄清鏈路局部通過，措辭瑕疵明列。未新增第三版prompt或改產品預設。
 - 13請求／usage估US$0.01693435，帳本closed；118離線回歸通過。引用及來源、B1/B2實際交付核驗完成；不外推主顧問／長訪談／PG持久化。
 - 下一唯一gate：Owner審是否在隔離app採用候選並分開B1 high注入；主顧問與B2維持medium，再續正常訪談驗收。

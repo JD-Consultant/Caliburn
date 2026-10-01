@@ -30,7 +30,7 @@ current JD                 = 人與 LLM 共用業務規則編輯的產品文件
 
 ### 2.1 滿分 JD 真正需要顧問持續追蹤的內容
 
-[完整工作分析指南](2026-09-09-complete-work-analysis-guide.md)、[JD 欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[客製化深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md)及[完整樣稿](2026-09-09-frontend-engineer-jd-sample.md)共同要求顧問不能只填表，而要逐步建立：
+[完整工作分析指南](../guides/2026-09-09-complete-work-analysis-guide.md)、[JD 欄位與寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[客製化深度與訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)及[完整樣稿](../guides/2026-09-09-frontend-engineer-jd-sample.md)共同要求顧問不能只填表，而要逐步建立：
 
 - 完整工作範圍：日常、週期、專案、事件、維護、收尾、低頻與支援工作；
 - 每件工作的觸發／輸入、本人實際動作、判斷與選擇、產出／接收者及有效完成要求；

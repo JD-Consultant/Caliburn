@@ -12,7 +12,7 @@ source_discipline: 只收官方一手（勞動部勞動力發展署 iCAP）；�
 > 本檔以 **2022《職能基準發展指引》**（111 年 10 月修正）為基礎，**方法論與各欄位定義／撰寫
 > 標準仍然有效，繼續使用**。但**表格版型、欄位有無與代碼權責，改以
 > 《職能基準品質認證作業手冊》（民國 115 年 1 月 27 日＝2026-01-27）為準**——
-> 見 [`2026-08-02-icap-2026-quality-manual-form-authority.md`](2026-08-02-icap-2026-quality-manual-form-authority.md)
+> 見 [`2026-08-02-icap-2026-quality-manual-form-authority.md`](../../../../../specs/2026-08-02-icap-2026-quality-manual-form-authority.md)
 > （2026-08-02 自官方 URL 下載逐字核對）。
 >
 > **本檔已知須以新版覆蓋的一點：**

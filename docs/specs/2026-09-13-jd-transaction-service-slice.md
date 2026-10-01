@@ -48,7 +48,7 @@ current read 在第一個 query 前設 READ ONLY REPEATABLE READ；讀 document/
 
 ## 3. 官方依據與本案選擇
 
-本輪 2026-09-13 重核以下一手文件；穩定版本／授權沿[資料層前置](evidence/2026-09-13-jd-relational-db-preflight.md)，未新增依賴或升級。SQLAlchemy 2.0.52、Alembic 1.20.0、Psycopg 3.3.5、PostgreSQL 18.6 維持前次精確 lock／image。
+本輪 2026-09-13 重核以下一手文件；穩定版本／授權沿[資料層前置](../experiments/legacy-evidence/2026-09-13-jd-relational-db-preflight.md)，未新增依賴或升級。SQLAlchemy 2.0.52、Alembic 1.20.0、Psycopg 3.3.5、PostgreSQL 18.6 維持前次精確 lock／image。
 
 | 來源 | 有限支持與採用分界 |
 |---|---|
@@ -81,6 +81,6 @@ current read 在第一個 query 前設 READ ONLY REPEATABLE READ；讀 document/
 
 ## 5. 下一工作與尚未完成的成品要求
 
-下一工作接**正式讀取投影／refs／history/change read**，讓員工及 AI 可取得新版正確定位、確切前後差異及人工變更；並將停止／admission port 接實際 run owner。需要有界驗證 signer／游標與資料集還原身分，按[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md)處理，不重開同層品牌比較。
+下一工作接**正式讀取投影／refs／history/change read**，讓員工及 AI 可取得新版正確定位、確切前後差異及人工變更；並將停止／admission port 接實際 run owner。需要有界驗證 signer／游標與資料集還原身分，按[讀取前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md)處理，不重開同層品牌比較。
 
 尚未完成：catalog 更名／封存 API、整份還原／整輪 AI 撤回、HTTP／Web CRUD、自動保存 dirty buffer、顧問接線、OS 取消／重啟恢復、備份還原、自然模型與真人驗收。上述保持原範圍；不得把本切片當完整 App 或正式權責切換。Excel 延後有效。

@@ -1,7 +1,7 @@
 # 0057. 伺服器部署、瀏覽器存取的產品交付邊界
 
 - 狀態：**Accepted**（owner 於 2026-08-03 明確要求校正）
-- 編號說明：本 ADR 原以 `0044` 起草於離線分支，合併回 `main` 時該編號已由另一條線的[0044-partial-jd-task-reconciliation-and-human-confirmation](0044-partial-jd-task-reconciliation-and-human-confirmation.md) 佔用，故發布為 `0057`。決策內容未更動。
+- 編號說明：本 ADR 原以 `0044` 起草於離線分支，合併回 `main` 時該編號已由另一條線的[0044-partial-jd-task-reconciliation-and-human-confirmation](../../../../../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md) 佔用，故發布為 `0057`。決策內容未更動。
 - 日期：2026-08-03
 - 範圍：Caliburn 第一版的執行位置、存取方式與 deployment isolation
 - 部分取代：[0039](0039-local-multi-document-canonical-public-form-workspace.md)、

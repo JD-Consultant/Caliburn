@@ -4,6 +4,8 @@
 
 為了讓不使用 Git 指令、只透過 GitHub 網頁審查專案的人也能找到資料，5 個封存 tag 的已提交 `docs/` 已同步放在 [`worktree-snapshots/`](worktree-snapshots/)。另有只存在於舊本機分支的研究與實驗差異放在 [`branch-snapshots/`](branch-snapshots/)。snapshot 是可直接瀏覽的歷史副本，不是新的決策來源。
 
+**後續去重（2026-10-02）：**上述是首次收錄方式，不再保留整套重複 checkout。相同 Git blob 只留一份；獨有的實驗、失敗與方法資產見[歷史證據](../experiments/historical/README.md)，舊位置查[逐檔對照](docs-cleanup-2026-10-02.csv)。下列 tag 仍保留精確原版本，未改寫。
+
 ## 保留原則
 
 **2026-10-02 整理：**教授報告已收錄於 [`docs/reports/system-architecture`](../reports/system-architecture/README.md)，完成的 checkout 已移除；接著依 Owner 授權將歷史分支收斂為封存 tag，詳見本頁下方「本機分支收斂」。新目標實驗原件、舊施工計畫與本機測試暫存的移轉見[整理紀錄](repository-organization-2026-10-02.md)。`target-cutover-candidate` 尚待 gate，工作樹仍保留；下列 2026-09 歷史紀錄不改寫。

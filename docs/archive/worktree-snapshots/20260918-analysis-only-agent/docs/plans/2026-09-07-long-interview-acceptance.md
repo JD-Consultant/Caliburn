@@ -1,6 +1,6 @@
 # CT09：整份工作長訪談驗收
 
-LLM-Q019 · 2026-09-07 · Owner要求實際扮演員工訪談；基準 a9d87e0a。只測隔離 analysis-only API，不改產品prompt／架構，不製作JD。承接[CT08](../specs/2026-09-07-interview-partial-knowledge-repair.md)，方法見[資訊取捨](../../../../docs/specs/2026-09-07-work-case-and-understanding-information-selection.md)。
+LLM-Q019 · 2026-09-07 · Owner要求實際扮演員工訪談；基準 a9d87e0a。只測隔離 analysis-only API，不改產品prompt／架構，不製作JD。承接[CT08](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-interview-partial-knowledge-repair.md)，方法見[資訊取捨](../../../../docs/specs/2026-09-07-work-case-and-understanding-information-selection.md)。
 
 ## 驗收目的（Owner本輪澄清）
 

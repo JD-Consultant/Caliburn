@@ -4,7 +4,7 @@
 
 ## Preflight 與效力
 
-Owner 本輪要求「開始複測 長 完整 訪談」。承接 [CT13 修復結果](../specs/2026-09-07-ct13-local-repair-results.md)；不重新設計 Memory，不改 prompt／工具／模型或產品上限，不接 JD／UI／production。
+Owner 本輪要求「開始複測 長 完整 訪談」。承接 [CT13 修復結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-ct13-local-repair-results.md)；不重新設計 Memory，不改 prompt／工具／模型或產品上限，不接 JD／UI／production。
 
 - 目的：對整份工作的理解是否完整正確、自然提問與收尾是否可用；不是完成一個 Task。
 - 唯一待驗：修復後自然訪談／背景記憶／回查的技術與語意效果。
@@ -30,4 +30,4 @@ Owner 本輪要求「開始複測 長 完整 訪談」。承接 [CT13 修復結�
 
 ## 狀態
 
-已完成20輪實際訪談、2批自然背景發布、3次獨立回查及完整原話唯讀核對。59次生成／usage估US$0.08724903，帳本關閉。**技術主訪談完成，品質未通過，G8 OPEN**；晚期Memory缺漏、案例混淆、條件泛化及回查未完成等見唯一[CT14結果](../specs/2026-09-07-ct14-whole-interview-retest-results.md)。沒有修改產品或手動補整理，未觸發compaction／live repair／patch；不覆寫CT12歷史。下一步先就CT14-Q02研究局部修法與Owner討論，不自動追加測試。
+已完成20輪實際訪談、2批自然背景發布、3次獨立回查及完整原話唯讀核對。59次生成／usage估US$0.08724903，帳本關閉。**技術主訪談完成，品質未通過，G8 OPEN**；晚期Memory缺漏、案例混淆、條件泛化及回查未完成等見唯一[CT14結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-ct14-whole-interview-retest-results.md)。沒有修改產品或手動補整理，未觸發compaction／live repair／patch；不覆寫CT12歷史。下一步先就CT14-Q02研究局部修法與Owner討論，不自動追加測試。

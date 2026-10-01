@@ -496,7 +496,7 @@ ADR 0023/0024/0025 草案對研究結果逐條覆審(尺=最新/最主流/大廠
 **實作後記(2026-07-05,v1 完成)**:spec([`interview-engine-v1-spec`](../../specs/2026-07-05-interview-engine-v1-spec.md))
 → plan 15 task → **全數實作**(契約 details/四表/human_touched/槽位門檻/指令詞彙表/executor/
 select_schema+對抗驗收 PASS/回合服務/4 端點/web 面板+批審+稽核頁/模擬受訪者校準 #1 PASS
-(關鍵字 0.91、quote 驗證 1.0))。端到端設計=[`design/interview-engine.md`](../../archive/retired-documents/design/interview-engine.md);
+(關鍵字 0.91、quote 驗證 1.0))。端到端設計=[`design/interview-engine.md`](../../archive/docs-cleanup-2026-10-02.md);
 tag `interview-v1`。spike 修正:adapter 用 openai SDK 直傳(非 Pydantic AI,理由=動態 raw
 schema,見驗收紀錄);`:review` 只轉狀態、前端套用(ai-suggestions 不變量 1)。
 

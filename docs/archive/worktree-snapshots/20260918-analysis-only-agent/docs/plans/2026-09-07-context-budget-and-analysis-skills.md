@@ -1,12 +1,12 @@
 # Q019 完整 request 預算＋分析 Skills 接線
 
 > Topic `Q019-CONTEXT-SKILLS-WIRING-01` · 2026-09-07 · Owner 已授權隔離實作；不接 JD。
-> 執行完成：三項Task已完成，最終514項通過且整批獨立審核Approved；[結果、來源及界線](../specs/2026-09-07-context-budget-and-analysis-skills-results.md)。下文保留施工時的步驟，不能把RED敘述當目前未修問題。
+> 執行完成：三項Task已完成，最終514項通過且整批獨立審核Approved；[結果、來源及界線](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-context-budget-and-analysis-skills-results.md)。下文保留施工時的步驟，不能把RED敘述當目前未修問題。
 > For agentic workers: use superpowers:subagent-driven-development. Task reports/reviews are scoped to this plan; durable findings go in the results document, not new long discussion histories.
 
 ## 目標與有效依據
 
-補 CT-01／SK-01；不重設 Memory。最新指路是主 checkout 的 [current decisions](../../../../docs/current-decisions.md)，不是本 worktree 的歷史 register。承接 [Q019 Runtime](../../../../docs/specs/2026-09-06-analysis-only-agent-runtime-design.md)、[Q019 審核](../../../../docs/specs/2026-09-06-analysis-only-agent-design-review.md)、[前段修復結果](../specs/2026-09-07-runtime-recovery-repair-results.md)。Owner 明確同意本輪先接完整預算與 Skill，審核後再測自然模型／調 prompt。
+補 CT-01／SK-01；不重設 Memory。最新指路是主 checkout 的 [current decisions](../../../../docs/current-decisions.md)，不是本 worktree 的歷史 register。承接 [Q019 Runtime](../../../../docs/specs/2026-09-06-analysis-only-agent-runtime-design.md)、[Q019 審核](../../../../docs/specs/2026-09-06-analysis-only-agent-design-review.md)、[前段修復結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-runtime-recovery-repair-results.md)。Owner 明確同意本輪先接完整預算與 Skill，審核後再測自然模型／調 prompt。
 
 基準：`3ba74848`，worktree `codex/analysis-only-agent`；2026-09-07 主審重新跑 **427 passed／0 skipped，67.20s**，只有既有 TestClient deprecation warning。専用 PostgreSQL `127.0.0.1:55433/q019_agent_test`，未重啟 Docker，付費呼叫0。
 

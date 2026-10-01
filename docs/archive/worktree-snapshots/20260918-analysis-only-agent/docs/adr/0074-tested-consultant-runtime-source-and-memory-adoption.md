@@ -3,7 +3,7 @@
 - 狀態：**Proposed**；尚未改production。
 - 日期：2026-09-10。
 - Topic：JD-R002/R5、LLM-Q019。
-- 依據：Owner要求實作[完整成品計畫](../plans/2026-09-10-jd-product-delivery.md)；詳細候選、現行證據、版本及驗收見[正式採用設計](../specs/2026-09-10-jd-production-adoption-design.md)。
+- 依據：Owner要求實作[完整成品計畫](../plans/2026-09-10-jd-product-delivery.md)；詳細候選、現行證據、版本及驗收見[正式採用設計](../../../../../specs/2026-09-10-jd-production-adoption-design.md)。
 
 ## Context
 
@@ -17,7 +17,7 @@
 4. 明示新本機DB及fresh-root initialization；官方Saver/Store.setup與app migration在維護階段執行。日常啟動驗版本不改schema，不搬舊資料、不清現有DB。
 5. 單worker、文件admission、scope與已驗取消／效果對帳保留；前景JD/手改互斥依0073。封存拒絕新前景與人編，保留全部資料及已收到來源的既有背景調度／恢復，不等背景歸零；內部catalog枚舉含封存文件。恢復後續談，不自動剪除來源checkpoint或永久刪除。
 6. 全體資料備份及還原演練是成品交付條件；模型金鑰、資料庫設定、日常啟停、無模型服務時的本機讀写與錯誤出口明列，不因缺模型自動fallback。
-7. 依[原生程序生命週期設計](../specs/2026-09-10-jd-native-process-lifecycle-design.md)採 Windows App 專用 Job Object 與 named mutex：API 在任何 DB／client／native 工作前取得單程序互斥、確認舊 Job 全部退出，再加入新 Job；子程序繼承 membership，不繼承 Job handle、不 breakaway。固定 Windows-only `pywin32==312`，先驗 wheel、授權及實際 bootstrap／crash。新程序以舊 Job 停止證據及 PG head-lock 後的 receipt 查詢恢復，不能從查無結果推定停止。手改 admission 的最多一筆 root-only identity binding 保存 operation／base／digest／request key，不保存候選、不偽造原話／AI run；terminal outcome 仍只由原 JD receipt 決定。依[有限人工恢復接點](../specs/2026-09-10-jd-manual-recovery-transport-design.md)，App以原key唯讀發現及一次明示清理／對帳，server投影完整write gate；無candidate重播或新authority。完整 Task 5 故障證據是採用輸入，不以本條當成已實作。
+7. 依[原生程序生命週期設計](../../../../../specs/2026-09-10-jd-native-process-lifecycle-design.md)採 Windows App 專用 Job Object 與 named mutex：API 在任何 DB／client／native 工作前取得單程序互斥、確認舊 Job 全部退出，再加入新 Job；子程序繼承 membership，不繼承 Job handle、不 breakaway。固定 Windows-only `pywin32==312`，先驗 wheel、授權及實際 bootstrap／crash。新程序以舊 Job 停止證據及 PG head-lock 後的 receipt 查詢恢復，不能從查無結果推定停止。手改 admission 的最多一筆 root-only identity binding 保存 operation／base／digest／request key，不保存候選、不偽造原話／AI run；terminal outcome 仍只由原 JD receipt 決定。依[有限人工恢復接點](../../../../../specs/2026-09-10-jd-manual-recovery-transport-design.md)，App以原key唯讀發現及一次明示清理／對帳，server投影完整write gate；無candidate重播或新authority。完整 Task 5 故障證據是採用輸入，不以本條當成已實作。
 
 ## Consequences
 

@@ -14,11 +14,11 @@ updated: 2026-08-02
 >
 > **主讀者 = coding agent。** 目的:不看 code 也能改對這條線——不亂發明端點、不把信任
 > 機制交給 LLM、不繞過唯一寫入路徑。**living:動到這條線的碼,同 commit 更新本檔。**
-> 決策:**ADR [0033](../adr/0033-episode-agenda-consultant-tools.md)(事件驅動議程:顧問
+> 決策:**ADR [0033](../../../../../adr/0033-episode-agenda-consultant-tools.md)(事件驅動議程:顧問
 > 議程工具 open/close_episode + coverage/agenda 純函式 artifact + harvest 收割 pass;
-> 退役 next_gap 梯子)**、[0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)(v3 六裁決;
+> 退役 next_gap 梯子)**、[0030](../../../../../adr/0030-ai-coedit-tracked-changes-one-brain.md)(v3 六裁決;
 > 部分翻案 0025/0028)、[0032](../adr/0032-task-carrier-routing.md)(任務載體路由,§5.1)、
-> [0027](../adr/0027-interview-engine-v2-consultant-agent.md)(四組件,留用)、
+> [0027](../../../../../adr/0027-interview-engine-v2-consultant-agent.md)(四組件,留用)、
 > [0023](../adr/0023-interview-engine-stateless-turns.md)(無狀態回合)、
 > [0024](../adr/0024-llm-wiring-select-schema.md)(受限解碼)。
 > 研究(單一參照點):[`2026-07-12-ai-layer-redesign-research.md`](../specs/2026-07-12-ai-layer-redesign-research.md) §6;
@@ -188,4 +188,4 @@ Answer Score(rubric 裁判,Phase 2)。promptfoo:Python provider 包引擎回合+
 横切:`apps/api/app/observability.py` · web:`apps/web/src/lib/ocsDoc.ts`(pending 輔助)+
 `components/interview/{PendingMark,AgendaList,InterviewPanel,JobDocTable}.tsx` ·
 契約:`packages/ocs-contract/schema/ocs-document.schema.json`(PendingMark/PendingSrc)·
-技術驗證:[`2026-07-13-ai-redesign-raw-impl-verification.md`](../specs/2026-07-13-ai-redesign-raw-impl-verification.md)。
+技術驗證:[`2026-07-13-ai-redesign-raw-impl-verification.md`](../../../../../research/agent-systems/2026-07-13-ai-redesign-raw-impl-verification.md)。

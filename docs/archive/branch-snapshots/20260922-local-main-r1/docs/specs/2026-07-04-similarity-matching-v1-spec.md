@@ -136,7 +136,7 @@ TaskRowVM.similarTo?: { name: string; score: number }[]  // 灰區對
 | 池 < 2 條 | 直接回空 groups/pairs(不打 embedder) |
 
 - **web 端零新機制**:similarity 是 pack 的一部分,走既有 `request()` → 失敗一律
-  `ApiError(status, message, body)`([api.ts](../../apps/web/src/lib/api.ts));
+  `ApiError(status, message, body)`([api.ts](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/web/src/lib/api.ts));
   降級可見性看 `pack.meta.similarity`,不另設錯誤通道。
 - **api⇄indexer**:`KnowledgeClient.match` 失敗 → log warning + 降級(同 `fetch_one` 模式)。
 

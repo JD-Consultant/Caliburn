@@ -50,7 +50,7 @@ AWS 的 [Hexagonal architectures](https://docs.aws.amazon.com/prescriptive-guida
 
 ## 4. 錯誤、紀錄及研究落地
 
-本次[分層、錯誤與紀錄證據](evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)核對 AWS、IETF RFC 9457、OpenAI、Anthropic、Python logging、OTel 及 OWASP，分開官方事實與本案映射；沒有因查到新品牌而安裝另一套框架。
+本次[分層、錯誤與紀錄證據](../experiments/legacy-evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)核對 AWS、IETF RFC 9457、OpenAI、Anthropic、Python logging、OTel 及 OWASP，分開官方事實與本案映射；沒有因查到新品牌而安裝另一套框架。
 
 - 修正具名失敗被當成 Anthropic 成功結果：明列成功／失敗狀態，未知 status 拒絕；保留 provider call identity。這是外殼，完整 `status/effect/receipt_durability/next_action` 合法組合仍待 SSOT 實作。
 - 修正 Pydantic 驗證例外 cause 在標準 traceback 露出原輸入：不保留對外 cause，加入 synthetic sentinel 反例。不是所有宿主／debug dumps 都已驗證的宣稱。
@@ -74,7 +74,7 @@ AWS 的 [Hexagonal architectures](https://docs.aws.amazon.com/prescriptive-guida
 
 首敗保留：新 domain 入口 **15 FAIL／52 PASS**、結構操作 **11 FAIL／85 PASS**；錯誤旗標／未知狀態 **11 FAIL**；短 sentinel 標準 traceback **1 FAIL**；diagnostic failure **3 FAIL**。最後全部修正。初版較長 sentinel 未成功重現，改用短 synthetic ASCII 後才確認洩漏；不能將最初綠燈當反例已證明。
 
-獨立審查：錯誤／紀錄子例 BEL-R04a 已閉合，審查者另跑 application＋transport **33 PASS**，詳見[證據 §4](evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md#4-本輪實作收斂與獨立窄審)。另一審查者在記憶體執行 **12 組反例 PASS**，含 25 種任務排序位置、D01 資料保留、跨職責原子更正、錯 owner／kind／self-anchor、emoji 後第二個重複字詞、UTF-16／stale 拒絕、共享 K/S 與未完整任務，無待修 finding；另唯讀確認八工具共同旅程的候選界線。首次 inline 因未設定 `PYTHONPATH=src` 而 import 失敗，尚未執行業務；明確設定後才得到 12 組結果。獨立臨時反例不加到 289 項持久回歸測試數。
+獨立審查：錯誤／紀錄子例 BEL-R04a 已閉合，審查者另跑 application＋transport **33 PASS**，詳見[證據 §4](../experiments/legacy-evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md#4-本輪實作收斂與獨立窄審)。另一審查者在記憶體執行 **12 組反例 PASS**，含 25 種任務排序位置、D01 資料保留、跨職責原子更正、錯 owner／kind／self-anchor、emoji 後第二個重複字詞、UTF-16／stale 拒絕、共享 K/S 與未完整任務，無待修 finding；另唯讀確認八工具共同旅程的候選界線。首次 inline 因未設定 `PYTHONPATH=src` 而 import 失敗，尚未執行業務；明確設定後才得到 12 組結果。獨立臨時反例不加到 289 項持久回歸測試數。
 
 交付文件另經獨立唯讀複核 PASS：本稿、README、計畫進度及證據路由沒有把框架寫成產品要求，或將候選宣稱為保存。靜態檢查 7 個文件範圍、78 個本機連結、22 個 anchor 通過；沒有為文件變更重跑已綠的程式測試。
 

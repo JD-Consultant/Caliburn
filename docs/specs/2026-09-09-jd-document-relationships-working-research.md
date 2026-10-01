@@ -6,7 +6,7 @@
 
 **2026-09-10 最新狀態：**Owner 在接線前格式討論中同意主體呈現，並詢問任務引用所需知識／技能是否為多對多。見[本輪討論](#2026-09-10任務與知識技能的明確對應討論)；目前推薦明確對應，尚待 Owner 確認，未修改技術契約。下文原「暫不要求顯式引用」是此次重新檢視的基線；現行審閱為持續工作稿，舊 pending 分支依 register 沿革處理。
 
-JD-R002/C01；研究日 2026-09-09；**G3／WORKING：Owner 已同意 B 的方向，可修訂，不是施工契約**。延續 [JD-R001 成品方向](2026-09-09-job-analysis-and-jd-content-research.md)，不以舊程式、舊 OPKS schema 或 iCAP 版型限制新設計。後續樣稿r2深度獲「大致上同意」，[核心文檔複核](2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)未發現須翻案的內容衝突，可續C02；不是所有樣稿細節或技術契約已驗收。
+JD-R002/C01；研究日 2026-09-09；**G3／WORKING：Owner 已同意 B 的方向，可修訂，不是施工契約**。延續 [JD-R001 成品方向](../guides/2026-09-09-job-analysis-and-jd-content-research.md)，不以舊程式、舊 OPKS schema 或 iCAP 版型限制新設計。後續樣稿r2深度獲「大致上同意」，[核心文檔複核](../guides/2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)未發現須翻案的內容衝突，可續C02；不是所有樣稿細節或技術契約已驗收。
 
 ## 1. 本輪問題與邊界
 
@@ -14,7 +14,7 @@ JD-R002/C01；研究日 2026-09-09；**G3／WORKING：Owner 已同意 B 的方�
 |---|---|
 | Topic／stage | JD-R002/C01；G2 證據與選項已完成，G3 同意 B 作 Working 方向 |
 | 唯一決策題 | 用哪種可編輯內容模型承接已同意的 JD，讓內容可定位修改，又不因分組、共用或排版造成重複及誤改？ |
-| 有效依據 | [欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[工作分析指南](2026-09-09-complete-work-analysis-guide.md)、[完整樣稿](2026-09-09-frontend-engineer-jd-sample.md)及[情境／審查](2026-09-09-jd-sample-basis-and-review.md) |
+| 有效依據 | [欄位與寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[工作分析指南](../guides/2026-09-09-complete-work-analysis-guide.md)、[完整樣稿](../guides/2026-09-09-frontend-engineer-jd-sample.md)及[情境／審查](../guides/2026-09-09-jd-sample-basis-and-review.md) |
 | 本輪不做 | 不改 Memory、prompt、模型、production、DB、AI tools、UI 或匯出；不寫實作計畫，不跑付費測試 |
 | 尚待下一題 | AI／員工編輯與審核的完整操作設計，再選框架、儲存及 API |
 
@@ -73,7 +73,7 @@ Owner 要的是高品質 JD，不是指定資料庫形式。人與 AI 應能在�
 
 員工可能先提成果、方法或問題，再釐清任務；這些訪談線索沿既有Memory保留，資訊足以支持敘述時才寫JD。此處「未歸屬」限定已選擇寫入JD的有效內容或員工直接輸入的草稿，不等於訪談待釐清。**不因此增加第二份工作理解、Gap表、強制候選層或獨立未歸屬區。**
 
-已成稿但未分職責的任務，以及已寫入但尚無Task的成果／要求，不為了階層完整而遺失，也不自動搬去Memory。若已确认組織本身仍未決定重要權責，可就近如實寫明；不能把所有未知假填為工作責任。分界見[Memory及草稿核對](evidence/2026-09-10-jd-memory-draft-boundary-audit.md)，未來匯出仍依PARKED範圍處理。
+已成稿但未分職責的任務，以及已寫入但尚無Task的成果／要求，不為了階層完整而遺失，也不自動搬去Memory。若已确认組織本身仍未決定重要權責，可就近如實寫明；不能把所有未知假填為工作責任。分界見[Memory及草稿核對](../experiments/legacy-evidence/2026-09-10-jd-memory-draft-boundary-audit.md)，未來匯出仍依PARKED範圍處理。
 
 ## 4. 定位與排版要分開
 
@@ -87,7 +87,7 @@ Owner 要的是高品質 JD，不是指定資料庫形式。人與 AI 應能在�
 
 ## 5. 用樣稿檢查是否能表達真實情境
 
-下表是**設計走查，未執行程式測試**；以[已聲明的虛構情境](2026-09-09-jd-sample-basis-and-review.md)為依據，另列建構中與操作反例。
+下表是**設計走查，未執行程式測試**；以[已聲明的虛構情境](../guides/2026-09-09-jd-sample-basis-and-review.md)為依據，另列建構中與操作反例。
 
 | 情境 | B 應能表達／保留的效果 | 仍未決定的技術 |
 |---|---|---|

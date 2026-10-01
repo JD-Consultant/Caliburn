@@ -14,14 +14,14 @@
 ## 1. 現況事實(已讀碼查證,含錨點)
 
 1. **last-write-wins**:`PATCH /job-profiles/{id}/document` → `DocRepo.upsert_draft`
-   ([persistence.py:61](../../apps/api/app/adapters/persistence.py))——最新列是 draft 就**就地覆蓋 content,不做任何檢查**。
+   ([persistence.py:61](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/adapters/persistence.py))——最新列是 draft 就**就地覆蓋 content,不做任何檢查**。
 2. **draft 存檔不動 `version`**:`version` 只在「INSERT 新 draft / finalize」時 +1;就地更新不變。
    → 兩個分頁都拿 v3,拿 version 當守衛**擋不到任何東西**(這是 ADR 0015 文字沒挖到的實作細節,本 spec 的 token 設計即為此而生)。
-3. **`version` 是 user-facing**:[page.tsx:89](../../apps/web/src/app/documents/[id]/page.tsx) 顯示「已產生正式版本 v{n}」
+3. **`version` 是 user-facing**:[page.tsx:89](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/web/src/app/documents/[id]/page.tsx) 顯示「已產生正式版本 v{n}」
    → **不可**改成每次存檔 bump version(會看到 v347 且污染 draft/final 世系)。
-4. **`DocumentVersion` model 無 `updated_at`、無 `revision`**([models/job_profile.py:43-53](../../apps/api/app/models/job_profile.py))。
-5. **web 的 `request()` 丟字串 Error,拿不到 HTTP status**([api.ts:22-34](../../apps/web/src/lib/api.ts))→ 409 偵測需先補。
-6. **autosave**:[useDocument.ts:107-135](../../apps/web/src/hooks/useDocument.ts) `useAutosaveDocument`——
+4. **`DocumentVersion` model 無 `updated_at`、無 `revision`**([models/job_profile.py:43-53](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/models/job_profile.py))。
+5. **web 的 `request()` 丟字串 Error,拿不到 HTTP status**([api.ts:22-34](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/web/src/lib/api.ts))→ 409 偵測需先補。
+6. **autosave**:[useDocument.ts:107-135](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/web/src/hooks/useDocument.ts) `useAutosaveDocument`——
    `commit()` 寫 cache + 500ms debounce PATCH;status 由 mutation 狀態推導(無 dirty 概念、無 no-op skip)。
 7. **document query `refetchOnWindowFocus:false` 必須維持**:重抓會把 server 內容寫進 cache=編輯器狀態,**蓋掉未存編輯**。
 8. **agent 寫入路是另一條**:`LiveDbPersist.save_document` → `DocRepo.save`(INSERT 新 version 列)——**本輪不動**

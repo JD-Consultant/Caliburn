@@ -13,8 +13,8 @@
 **設計 authority：**
 
 - [`MEM-Q004 read contract 與 G5 spike design`](../specs/2026-09-03-memory-routing-canonical-read-and-isolated-spike-research.md)，尤其 §6.4～§7.7。
-- [`Framework-independent Memory contract`](../specs/2026-09-01-framework-independent-memory-contract.md)，尤其 M1～M11、§3.4、§3.5。
-- [`Canonical conversation search/read reconciliation`](../specs/2026-09-03-memory-canonical-conversation-search-read-reconciliation.md)。
+- [`Framework-independent Memory contract`](../../../20260918-analysis-only-agent/docs/specs/2026-09-01-framework-independent-memory-contract.md)，尤其 M1～M11、§3.4、§3.5。
+- [`Canonical conversation search/read reconciliation`](../../../../../specs/2026-09-03-memory-canonical-conversation-search-read-reconciliation.md)。
 - [`Current decision register`](../current-decisions.md) 的 `MEM-Q001～MEM-Q004`。
 - [`Consensus／framework final audit`](../specs/2026-09-03-memory-read-spike-consensus-and-framework-final-audit.md)。
 

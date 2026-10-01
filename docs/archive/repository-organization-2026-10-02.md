@@ -69,7 +69,7 @@ Owner 接著指定整理截圖中的根目錄快取／暫存。本輪基準 `tar
 | 類型 | 處理結果 |
 |---|---|
 | 舊 pytest 工作區／cache、mypy／Ruff／Turbo cache、npm cache、舊 pnpm store | 32 個根目錄資料夾移入 `.research-tmp/archive/2026-10-02/root-artifacts/`，保留原名；包含權限受限的測試資料，不把列舉失敗誤判為空目錄 |
-| `.superpowers/sdd/` 已追蹤報告 | 8 份移入 [agent-task-reports](agent-task-reports/README.md)，正文位元組不變 |
+| `.superpowers/sdd/` 已追蹤報告 | 8 份移入 [agent-task-reports](../experiments/historical/agent-task-reports/README.md)，正文位元組不變 |
 | `.superpowers/` 其餘本機工作材料 | 作為第 33 個目錄移入同一本機封存；不公開未審查的 diff／本機日誌 |
 | 20 個 `.uv-cache*` | 用 `uv cache clean --cache-dir <逐項確認的絕對路徑> --no-config --offline --no-progress` 清理；112,285 個快取檔案，原邏輯大小 1,745,950,428 bytes（約 1.63 GiB）。不是磁碟實際釋放量保證，因檔案可能有硬連結 |
 

@@ -4,7 +4,7 @@
 - 來源：Owner 試看隔離預覽後，明確要求關聯式資料庫、新增職責、任務 CRUD，以及將任務移到另一職責。2026-09-12 再澄清：已確認需求也可因原情境改變重新討論；先查既有理由，不機械地沿用或重問。
 - 本稿只記錄已定方向、既有要求及待完成設計。沒有建表、修改 schema／runtime、搬移或刪除資料；不是實作驗收或 production authority。
 
-**最新需求重審：**Owner 已選「App 統一排版；欄位可寫文字與換行」。以下內容／關係基線保留原背景，可依具體情境調整；13 表仍屬整體候選，原七工具已按完整業務操作修訂。[審查與待討論事項](evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)集中保存局部文件閉合與真正未決，整體 G4 尚未通過。
+**最新需求重審：**Owner 已選「App 統一排版；欄位可寫文字與換行」。以下內容／關係基線保留原背景，可依具體情境調整；13 表仍屬整體候選，原七工具已按完整業務操作修訂。[審查與待討論事項](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)集中保存局部文件閉合與真正未決，整體 G4 尚未通過。
 
 **2026-09-13 最新交付優先序：**Owner 要求依完整／客製化 JD 研究最後審核欄位，再推進 App、共用業務邏輯、LLM 接線及測試；**Excel 延後，本輪 App 驗收不以匯出為門檻**。保留先前「之後優先 Excel、原始訪談分開輸出」的用途，沒有取消需求或恢復舊匯出包；本工作單位亦不安排原始訪談下載。下方 §7 的「第一版先提供 Excel」及較早階段文字按此修正交付時點。欄位結論與可重現檢查見[本輪審核](2026-09-13-jd-field-sufficiency-audit.md)，App 接續工作見[新版計畫](../plans/2026-09-13-jd-relational-app-implementation.md)。正常研究、技術細節及有限修正沿既有授權自主處理；真模型費用與正式 authority 仍按原界線。
 
@@ -24,7 +24,7 @@ Owner 隨後以 TypeScript／React／Next.js／Python 舉例，再明確澄清�
 
 ## 2. 沿用的內容基線
 
-依 [完整格式](2026-09-10-jd-format-review.md)、[內容指南](2026-09-09-jd-field-and-writing-guide.md)及[完整樣稿](2026-09-09-frontend-engineer-jd-sample.md)：
+依 [完整格式](2026-09-10-jd-format-review.md)、[內容指南](../guides/2026-09-09-jd-field-and-writing-guide.md)及[完整樣稿](../guides/2026-09-09-frontend-engineer-jd-sample.md)：
 
 - 六章、完整敘述、實際責任與就近保留適用條件沿用；不自行增加必填分析欄或要求同義重複填寫。
 - 成果與要求是任務下兩組並列內容，各可有多項；不配對、不互為父子、不合併進任務敘述。
@@ -88,13 +88,13 @@ Owner 隨後以 TypeScript／React／Next.js／Python 舉例，再明確澄清�
 
 本稿的下一設計單位已形成下列 **G4 DRAFT**，供 Owner／外部 reviewer 審查；不改變本稿的 G3 需求效力，也不代表實作完成：
 
-- [官方證據與本地現況](evidence/2026-09-12-jd-relational-editor-evidence.md)
+- [官方證據與本地現況](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md)
 - [整體可驗證設計](2026-09-12-jd-relational-editor-design.md)
 - [13 張 JD scope 表與保存交易](2026-09-12-jd-relational-schema-and-write-contract.md)
 - [AI／App／員工操作契約](2026-09-12-jd-relational-agent-tool-contract.md)
 - [Proposed ADR0075](../adr/0075-relational-jd-authority-and-structured-editor.md)
 
-JD-R002/D01 的任務保留政策已依 Owner 授權由研究者裁決，見 §8；不是 Owner 親自選定某個 SQL 策略。後續必要範圍與完整業務操作已通過[文件複核](evidence/2026-09-12-jd-business-operations-review.md)，未實測，整體 G4 尚未通過。
+JD-R002/D01 的任務保留政策已依 Owner 授權由研究者裁決，見 §8；不是 Owner 親自選定某個 SQL 策略。後續必要範圍與完整業務操作已通過[文件複核](../experiments/legacy-evidence/2026-09-12-jd-business-operations-review.md)，未實測，整體 G4 尚未通過。
 
 ## 7. 功能目的與使用方式釐清（2026-09-12，持續討論）
 
@@ -110,7 +110,7 @@ Owner 後續再明確補充「LLM 是可以反覆修正修改 JD、Memory 的」
 
 **顧問與匯出邊界已確認：**JD 與員工／AI 的完整原始訪談可分開匯出；JD 第一版先提供 Excel，方便後續整理與使用；需要理解過程時再取原始訪談。員工可在系統外與真人顧問續談或核對，本系統不實作真人顧問核對流程。Excel 版型、原始訪談格式與施工時點仍待釐清；此決定不採用舊 HTML／DOCX 合併交付包，也不自動加入匯回或外部修改同步。舊附件的效力見[匯出與顧問交付](2026-09-10-jd-export-and-consultant-handoff.md)。
 
-**完整 JD 的內容基準沿既有研究：**Owner 再次提醒完整／高品質 JD 已研究。沿[核心研究入口](2026-09-09-job-analysis-and-jd-content-research.md)查閱分析指南、寫作指南、深度校準、樣稿及其審查，再以[最新完整格式](2026-09-10-jd-format-review.md)核對欄位與呈現。需求訪談只補管理操作及輸出的未決事項；不要求 Owner 從頭定義完整性，也不讓資料表、畫面或 Excel 版型反過來刪減已研究的工作內容。研究定義品質目標，實際個案仍需驗收，不自動宣稱每份產物已滿分。
+**完整 JD 的內容基準沿既有研究：**Owner 再次提醒完整／高品質 JD 已研究。沿[核心研究入口](../guides/2026-09-09-job-analysis-and-jd-content-research.md)查閱分析指南、寫作指南、深度校準、樣稿及其審查，再以[最新完整格式](2026-09-10-jd-format-review.md)核對欄位與呈現。需求訪談只補管理操作及輸出的未決事項；不要求 Owner 從頭定義完整性，也不讓資料表、畫面或 Excel 版型反過來刪減已研究的工作內容。研究定義品質目標，實際個案仍需驗收，不自動宣稱每份產物已滿分。
 
 **研究者據此的優先序：**先驗完整製作、結構管理、看清 AI 改動、修正補充、保存及輸出。定期提醒、持續追蹤工作執行、完成率與長期管理儀表板沒有此用途下的必要性證據，不自行加入。完成第一份 JD 不等於禁止之後編輯，也不因此增加不可逆鎖稿、審核或核准狀態。
 
@@ -126,7 +126,7 @@ Owner 後續再明確補充「LLM 是可以反覆修正修改 JD、Memory 的」
 
 以上是訪談議程，**不是全部要做的功能清單**。每題記錄目的、使用情境、保留／調整／不要／待確認及理由，再回填責任設計；未回答不等於採用推薦。
 
-Owner 提供的[外部研究分享](https://chatgpt.com/s/t_6aa53c079e2081919a9cfa54551e3bb4)已讀取正文，評估與採用界線記於[官方證據 §6](evidence/2026-09-12-jd-relational-editor-evidence.md#6-owner-提供的外部研究參照2026-09-12)。它是研究參照，不代替 Owner 的功能需求或正式採用決策。
+Owner 提供的[外部研究分享](https://chatgpt.com/s/t_6aa53c079e2081919a9cfa54551e3bb4)已讀取正文，評估與採用界線記於[官方證據 §6](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md#6-owner-提供的外部研究參照2026-09-12)。它是研究參照，不代替 Owner 的功能需求或正式採用決策。
 
 ## 8. D01：刪除職責時保留任務（2026-09-12）
 
@@ -140,7 +140,7 @@ Owner 後續已明確同意上述裁決，並補充 JD 製作期間須反覆修�
 
 **必要內容政策（2026-09-12 研究者受權裁決）：**Owner 另授權自行研究決定。採任務卡保留任務特有必要範圍；職責概括群組、整份職位共通條件放第六章。舊有只在職責的必要內容，移動／刪除時完整呈現並於同一候選放回適當任務欄位，缺成果／要求則可新增；不整段自動複製、不把要求塞回任務敘述。來源按目標分開處理，不自動改掛。[業務設計 §3](2026-09-12-jd-business-operations-and-scope-design.md#3-r05-裁決必要範圍隨任務職責摘要不產生繼承)保存取捨及固定例子；裁決不等於已通過操作實測。
 
-**依據與取捨：**[AWS 與關係生命週期證據 §7](evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)。AWS Resource Groups 展示刪群組保留成員；PostgreSQL 說明刪除動作取決於相關物件能否獨立存在。結合本案已有未分組任務、任務可跨職責移動的語意，採保留任務。要求先搬完才可刪會增加整理步驟；連同任務刪除則擴大移除分類的影響，兩者不作預設，也不在第一版另增三模式選單。
+**依據與取捨：**[AWS 與關係生命週期證據 §7](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)。AWS Resource Groups 展示刪群組保留成員；PostgreSQL 說明刪除動作取決於相關物件能否獨立存在。結合本案已有未分組任務、任務可跨職責移動的語意，採保留任務。要求先搬完才可刪會增加整理步驟；連同任務刪除則擴大移除分類的影響，兩者不作預設，也不在第一版另增三模式選單。
 
 **效力與下一 gate：**取代同日初稿 D01 的三選項 OPEN；FK 保護與命令落點見資料庫／工具責任稿。JR-R01–05 已文件閉合，G4 Needs revision 與 Proposed ADR0075 保持，未改 runtime／建表／刪資料。只有新反例才重開 D01；後續草稿、歷史及還原選擇已記 §11，工程恢復前置依該節續辦。
 

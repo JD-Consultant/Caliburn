@@ -3,10 +3,10 @@
 - 日期：2026-09-03
 - 狀態：**G4 read shape、isolated semantic-index mechanism 與兩個模型可見 Tool 名稱已獲 Product Owner 核准；framework contract audit 完成；Product Owner 已於 2026-09-03 核准 Revision 2 進入 G5 隔離實驗，但未授權 production 實作**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
-- 流程：[`../decision-process.md`](../decision-process.md)
+- 流程：[`../decision-process.md`](../../../../../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
 
-> 這份文件不是 successor ADR，也不是施工計畫。Production 仍以現行 code、`AGENTS.md` 與 Accepted ADR 0060 為準。舊的 [`2026-09-02-memory-foundation-isolated-spike.md`](../plans/2026-09-02-memory-foundation-isolated-spike.md) 保持 `PAUSED`，不可直接執行；它的 Store-source leaf 與 exact-inventory 前提已被 `MEM-Q001～Q003` 取代。
+> 這份文件不是 successor ADR，也不是施工計畫。Production 仍以現行 code、`AGENTS.md` 與 Accepted ADR 0060 為準。舊的 [`2026-09-02-memory-foundation-isolated-spike.md`](../../../../../plans/2026-09-02-memory-foundation-isolated-spike.md) 保持 `PAUSED`，不可直接執行；它的 Store-source leaf 與 exact-inventory 前提已被 `MEM-Q001～Q003` 取代。
 
 ## 0. 結論先行
 
@@ -82,9 +82,9 @@ LangGraph PostgreSQL Store
 
 完整理由分別在：
 
-- [`2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md`](./2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md)
-- [`2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md`](./2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md)
-- [`2026-09-03-memory-canonical-conversation-search-read-reconciliation.md`](./2026-09-03-memory-canonical-conversation-search-read-reconciliation.md)
+- [`2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md`](../../../../../specs/2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md)
+- [`2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md`](../../../../../specs/2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md)
+- [`2026-09-03-memory-canonical-conversation-search-read-reconciliation.md`](../../../../../specs/2026-09-03-memory-canonical-conversation-search-read-reconciliation.md)
 
 ## 3. 官方共同邊界與差異
 

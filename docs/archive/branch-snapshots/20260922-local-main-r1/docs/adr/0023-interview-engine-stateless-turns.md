@@ -36,7 +36,7 @@
 4. **停止三重保險**(確定性,LLM 不能繞過):硬上限(每槽追問 ≤2 等)+ 覆蓋率門檻
    (core 任務 12 槽/淺掃 4 槽;`advance` 未達門檻 → 拒絕並回缺口)+ LLM 飽和信號。
 5. **深問預算**:先便宜問完每任務「頻率+比重」,以 O*NET core/supplemental 判準分配
-   全套深問(黃金範本 v0:[`../specs/2026-07-05-golden-sample-software-tester.md`](../specs/2026-07-05-golden-sample-software-tester.md))。
+   全套深問(黃金範本 v0:[`../specs/2026-07-05-golden-sample-software-tester.md`](../../../../../specs/2026-07-05-golden-sample-software-tester.md))。
 6. **全新實作,不整合舊碼**(維護者 2026-07-05 定調):新引擎按本 ADR 重新設計實作,
    **不承諾搬移既有 graph 任何程式碼**;既有圖(含 STAR/5W2H 槽定義、prompts、指標品質分)
    僅為**參考材料**,設計時可借鑑其領域知識、不受其形狀約束。退役時機照 Strangler Fig:

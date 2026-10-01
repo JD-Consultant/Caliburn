@@ -1,10 +1,10 @@
 # 0054. 以文件為邊界的單寫者切換與舊著作路徑退役
 
 - 狀態：**Accepted**（owner 於 2026-08-02 指示執行 R0 架構真相校正與第一條 production vertical 切換／退役設計）
-- 編號說明：本 ADR 原以 `0041` 起草於離線分支，合併回 `main` 時該編號已由另一條線的[0041-r1-p0-closure-first-version-context-and-holdout](0041-r1-p0-closure-first-version-context-and-holdout.md) 佔用，故發布為 `0054`。決策內容未更動。
+- 編號說明：本 ADR 原以 `0041` 起草於離線分支，合併回 `main` 時該編號已由另一條線的[0041-r1-p0-closure-first-version-context-and-holdout](../../../../../adr/0041-r1-p0-closure-first-version-context-and-holdout.md) 佔用，故發布為 `0054`。決策內容未更動。
 - 日期：2026-08-02
 - 範圍：現行 v3、新專業顧問引擎、current-row Authoring、本機 Web 的 coexist、cutover、rollback 與 retirement
-- 延伸：[0040](0040-professional-consultant-engine-and-r1-validation-contract.md)
+- 延伸：[0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
 - 研究：[R0 架構真相與 production cutover](../specs/2026-08-02-r0-architecture-truth-and-production-cutover-research.md)
 
 ## 脈絡

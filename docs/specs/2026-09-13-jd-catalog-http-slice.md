@@ -38,7 +38,7 @@ SQL guard 只認當次同步呼叫、原執行緒、活躍 token 與有效宿主
 
 同源／設定允許的本機 Origin 仍在 unsafe body／admission 前檢查。保留原 API 固定安全診斷與 no-store；CORS 增加 PATCH、If-Match 與 ETag expose，沒有加入登入或遠端存取。wrong patch media type 回 415＋Accept-Patch；缺前置條件 428、版本不符 412、忙碌／資料集不符 409。格式與 driver 故障不回原始輸入、SQL 參數或秘密。
 
-已讀並採[本機配置研究](evidence/2026-09-13-jd-local-configuration-preflight.md)為下一有限驗證方向：Windows KnownFolder＋DPAPI current-user 保護固定安裝／資料集／簽章與本機連線設定，不新增秘密框架或 DB epoch 副本。普通重开不得自行配新身分或環境變數換庫；明示維護流程才更新資料集世代。這是設計方向，尚未實作配置或完整還原。
+已讀並採[本機配置研究](../experiments/legacy-evidence/2026-09-13-jd-local-configuration-preflight.md)為下一有限驗證方向：Windows KnownFolder＋DPAPI current-user 保護固定安裝／資料集／簽章與本機連線設定，不新增秘密框架或 DB epoch 副本。普通重开不得自行配新身分或環境變數換庫；明示維護流程才更新資料集世代。這是設計方向，尚未實作配置或完整還原。
 
 目前真程序測試仍注入固定合成配置；不能據此宣稱日常啟動器完成。無 signed ref 的其他既有 mutation（例如 manual recover）須在持久配置接線時一併閉合預期資料集；本次 catalog gate 不是全 App 跨資料集驗收。IndexedDB 恢復、容量與備份流程仍屬 DA-03 後續。
 
@@ -53,7 +53,7 @@ SQL guard 只認當次同步呼叫、原執行緒、活躍 token 與有效宿主
 | [RFC 9110 §13.1.1](https://www.rfc-editor.org/rfc/rfc9110.html#name-if-match)，現行 HTTP Semantics／IETF 標準，文字依 IETF Trust | If-Match strong comparison 防止過時修改。只接受 GETmetadata 取得的單一實際 tag；本案刻意對每個不符前置條件回 412，不把狀態剛好一致當原操作回執。 |
 | [RFC 5789](https://www.rfc-editor.org/rfc/rfc5789.html)、[RFC 7396](https://www.rfc-editor.org/rfc/rfc7396.html)，現行標準／IETF Trust | PATCH 支援部分修改、可配合 strong ETag；Merge Patch 定義指定屬性更新，server 決定允許的內容。採具名單欄子集，同資源 GET/PATCH 使用相同 metadata 表示與 tag，無通用定位引擎。 |
 | [PostgreSQL 18 Row Locks](https://www.postgresql.org/docs/18/explicit-locking.html)，實際 18.6、穩定／PostgreSQL License | FOR UPDATE 在交易內序列化相同列。採既有 document→head 鎖序及 metadata CAS，不宣稱 DB 列鎖能取代 native writer lifecycle。 |
-| FastAPI 0.141.1 MIT／Starlette 1.6.0 BSD-3／AnyIO 4.15.1 MIT／SQLAlchemy 2.0.52 MIT／Psycopg 3.3.5 LGPL-3.0 | 沿已驗[HTTP 契約](2026-09-13-jd-manual-http-slice.md)及[資料層](evidence/2026-09-13-jd-relational-db-preflight.md)的實際 lock；本次以安裝 metadata 再核版本。同步路由由原生 threadpool 執行，宿主 lifespan 仍擁有資源，不將框架 API 當業務規則。 |
+| FastAPI 0.141.1 MIT／Starlette 1.6.0 BSD-3／AnyIO 4.15.1 MIT／SQLAlchemy 2.0.52 MIT／Psycopg 3.3.5 LGPL-3.0 | 沿已驗[HTTP 契約](2026-09-13-jd-manual-http-slice.md)及[資料層](../experiments/legacy-evidence/2026-09-13-jd-relational-db-preflight.md)的實際 lock；本次以安裝 metadata 再核版本。同步路由由原生 threadpool 執行，宿主 lifespan 仍擁有資源，不將框架 API 當業務規則。 |
 
 AWS 是公開實務參考，不是所有公司的內部實作共識。OpenAI／Anthropic 的模型與 App 責任仍沿既有[工具契約](2026-09-12-jd-relational-agent-tool-contract.md)；本次沒有改模型工具或自然訪談行為，不重開同層品牌研究。
 

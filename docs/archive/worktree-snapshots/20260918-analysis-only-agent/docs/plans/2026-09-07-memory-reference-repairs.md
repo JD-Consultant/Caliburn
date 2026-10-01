@@ -76,6 +76,6 @@ assert [s['text'] for s in h.source.read(receipt.repair_sources[0])['segments']]
 ## Closure gate
 
 - [x] 獨立 review 看新增測試實際能否捕捉原缺陷；不只看測試數。引用2項Important已修正複核CLOSED；MR-02限定review無finding。
-- [x] 更新[結果](../specs/2026-09-07-memory-reference-repair-results.md)：紅→綠、官方原則／本案接法、未驗品質、原有 parked gaps。
+- [x] 更新[結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-memory-reference-repair-results.md)：紅→綠、官方原則／本案接法、未驗品質、原有 parked gaps。
 - [x] 根 register 指向本段結果；確認沒有改 production／額外模型步驟／隱藏語意政策。
 - [x] 全部檢查通過；本地 tag 在本段commit後建立（保存ID由根register記錄），不 merge／push。本段無新的產品blocking decision；未完成能力見結果的下一gate。

@@ -4,7 +4,7 @@
 
 **Goal:** 驗證整份職位的訪談、案例詳記、共同工作理解、修訂與按需回查；不製作JD、不接production。
 **Architecture:** 真FastAPI入口、PG Saver/Store、現有A/B1/B2及自然通知；只換新空白實驗資料庫。固定CT44程式，先驗A/B1/B2 Luna high；不是新增agent或新記憶方式。
-**Spec:** [CT44結果](../specs/2026-09-09-ct44-preservation-results.md)、[CT42驗收範圍](2026-09-09-ct42-final-long-interview.md)、current register及Owner完整goal。
+**Spec:** [CT44結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct44-preservation-results.md)、[CT42驗收範圍](2026-09-09-ct42-final-long-interview.md)、current register及Owner完整goal。
 
 ## Preflight
 
@@ -35,4 +35,4 @@
 
 ## Closure
 
-CT45原始失敗與70次請求已封存，未做的收尾／新補充／撤銷／回查仍未勾選。局部後續轉[CT46–48結果](../specs/2026-09-09-ct46-48-edit-routing-and-budget-results.md)，不在這份固定版計畫混入修後成功。下一次完整驗收另用固定新版本；不重開CT45帳本。
+CT45原始失敗與70次請求已封存，未做的收尾／新補充／撤銷／回查仍未勾選。局部後續轉[CT46–48結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct46-48-edit-routing-and-budget-results.md)，不在這份固定版計畫混入修後成功。下一次完整驗收另用固定新版本；不重開CT45帳本。

@@ -8,7 +8,7 @@ review_note: 本檔供第三方人工審核。§0.2 提供完整重現步驟，�
 
 # 工作產出（O）的權威處理（研究原料）
 
-> **【現行裁決】** 本檔是**研究原料**。OPKS 的現行裁決是 **[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md) ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md) ＋ [0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)**（四份一起讀）。
+> **【現行裁決】** 本檔是**研究原料**。OPKS 的現行裁決是 **[ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) ＋ [0049](../../../../../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md) ＋ [0050](../../../../../adr/0050-opks-proposal-minimal-shape.md) ＋ [0051](../../../../../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)**（四份一起讀）。
 > 本檔的建議凡與四份 ADR 不符者，**一律以 ADR 為準**。
 
 
@@ -213,7 +213,7 @@ pdftotext -layout opm-ja.pdf opm-ja.txt      # → 10 頁
 §1.3 的 6.1 底下連續 **15 條**以 "Understand" 起首。這**直接違反** Bloom 修訂版的可觀察動詞規則
 ——Airasian & Miranda 明言 "Ambiguous verbs such as 'state,' 'list,' 'demonstrate,'… should be used
 with great care"；Krathwohl 更點名 "understand" 可涵蓋從記憶到綜合的任何層次
-（逐字見 [2026-07-13 國際體系原料](2026-07-13-ai-redesign-raw-intl-competency-standards.md) §3a）。
+（逐字見 [2026-07-13 國際體系原料](../../../../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md) §3a）。
 
 **不要假裝各權威一致。** 本 repo 應採 Bloom／O\*NET／OPM 這一系的可觀察動詞要求
 （理由見 §2.1 的 OPM 規則），並把香港的**成果句式**（§1.7）與其**動詞用法**分開採用。
@@ -291,7 +291,7 @@ with great care"；Krathwohl 更點名 "understand" 可涵蓋從記憶到綜合�
 
 **沒有任何體系明文寫「產出缺失 ⇒ Task 邊界有問題」**——這是誠實結論。但有三條可組合的官方依據：
 
-1. **O\*NET 的 task 定義本身**（逐字見 [2026-07-13 原料](2026-07-13-ai-redesign-raw-intl-competency-standards.md) §1a）：
+1. **O\*NET 的 task 定義本身**（逐字見 [2026-07-13 原料](../../../../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md) §1a）：
    > "Tasks are typically conceptualized as **the smallest unit of activity with a meaningful outcome**."
 
    → outcome 是 task **成立的定義要件**，不是可選欄位。寫不出 outcome 的東西不符合 task 的定義
@@ -327,7 +327,7 @@ with great care"；Krathwohl 更點名 "understand" 可涵蓋從記憶到綜合�
 | ESCO／SFIA | ❌ 無 | — |
 
 → **判準 C-4：iCAP 的獨立 O 欄位是國際例外。** 內部模型不必以它為結構主軸；
-它是**匯出時的投影欄位**。這與 [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
+它是**匯出時的投影欄位**。這與 [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
 決定 33–34（匯出只採 iCAP 版型、不自產基準代碼）方向一致。
 
 ---
@@ -371,7 +371,7 @@ HRD Press／ISPI Tribute edition, 1996）提出 behavior 與 accomplishment 的�
 | 1b | 同上（**HKU SPACE 轉載副本**，佐證用） | *Specification of Competency Standards for the Logistics Industry (Terminals, Warehouse, & Logistics Centre)* | 版次未印 | https://hkuspace.hku.hk/f/rpl/103620/e_lo_tw.pdf | curl + `pdftotext -layout`；**內容已與第 1 項逐字比對一致**（§1.3） |
 | 2 | **美國 OPM** | *Delegated Examining Operations Handbook*, Appendix D／G | 現行線上版 | https://www.opm.gov/policy-data-oversight/hiring-information/competitive-hiring/deo_handbook.pdf | curl + `pdftotext -layout`；定位用文件自印 `Page D-1` |
 | 3 | **美國 OPM** | *Job Analysis Template*（DEOH Appendix G 工作表） | 現行 | https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/job_analysis_handout.pdf | curl + `pdftotext -layout`；定位用步驟編號 |
-| 4 | O\*NET（美國勞工部 ETA 資助） | *Appendix B: Task Writing Guidelines* | 引 Cunningham 2000 | https://www.onetcenter.org/dl_files/GreenTask_AppB.pdf | 前輪逐字核實，見 [2026-07-13 原料](2026-07-13-ai-redesign-raw-intl-competency-standards.md) §1a |
+| 4 | O\*NET（美國勞工部 ETA 資助） | *Appendix B: Task Writing Guidelines* | 引 Cunningham 2000 | https://www.onetcenter.org/dl_files/GreenTask_AppB.pdf | 前輪逐字核實，見 [2026-07-13 原料](../../../../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md) §1a |
 | 5 | **台灣勞動部勞動力發展署** | 《職能基準發展指引》 | 102 年 3 月出版、**111 年 10 月修正**，80 頁 | https://icap.wda.gov.tw/ap/get_file.php?t=download&c=%E8%81%B7%E8%83%BD%E5%9F%BA%E6%BA%96%E7%99%BC%E5%B1%95%E6%8C%87%E5%BC%95.pdf | 前輪逐字核實，定位用頁碼 |
 
 > **第 1 項的網域不是政府網域。** 內容為香港 QF 體系的官方 SCS，但取自香港大學專業進修學院轉載頁。

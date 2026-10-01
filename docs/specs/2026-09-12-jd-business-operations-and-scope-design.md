@@ -78,7 +78,7 @@ App 能驗的是關係、目標和原子性，**不能用 SQL、關鍵字或一�
 
 ### 3.4 從完整工作分析核對欄位與操作
 
-已回讀[完整工作分析](2026-09-09-complete-work-analysis-guide.md)、[欄位與寫作](2026-09-09-jd-field-and-writing-guide.md)、[深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md)、[完整样稿](2026-09-09-frontend-engineer-jd-sample.md)與[樣稿依據／審查](2026-09-09-jd-sample-basis-and-review.md)，依[現行格式](2026-09-10-jd-format-review.md)映射。下表只記對操作的約束，不建立第二份欄位定義。
+已回讀[完整工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)、[欄位與寫作](../guides/2026-09-09-jd-field-and-writing-guide.md)、[深度與訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[完整样稿](../guides/2026-09-09-frontend-engineer-jd-sample.md)與[樣稿依據／審查](../guides/2026-09-09-jd-sample-basis-and-review.md)，依[現行格式](2026-09-10-jd-format-review.md)映射。下表只記對操作的約束，不建立第二份欄位定義。
 
 | 內容意義 | 對設計的約束 |
 |---|---|

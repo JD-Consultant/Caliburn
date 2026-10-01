@@ -2,11 +2,11 @@
 
 - 日期／階段：2026-09-24；G4 設計完成、G5 離線反例與同稿比較完成；G6／G7 見 [ADR 0078](../adr/0078-current-jd-read-only-locator.md) 與 [施工計畫](../plans/2026-09-24-jd-context-navigation-slice.md)。Owner 後續明確要求完成、驗證此方向並允許必要架構改動，因此本稿早期「不授權 production 施工」只保留為當時 gate 紀錄，不再是目前限制。正式產品效果仍是「按任務定位、按需讀正文、追查關聯、修改後驗證」，不是強制每輪 JD 讀取。
 - 範圍：正式新 App 的 A 主顧問讀取 **current JD**。不改 B1／B2／C、Memory、來源 authority、JD Domain、保存／撤回、Prompt／Skills 或模型路由。
-- 既有權責：[跨顧問來源與 JD 契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)、[完整工作分析](2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[品質驗收](2026-09-10-jd-product-quality-acceptance.md)、[ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md)及[ADR 0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)不由本稿取代。
+- 既有權責：[跨顧問來源與 JD 契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)、[完整工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[品質驗收](2026-09-10-jd-product-quality-acceptance.md)、[ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md)及[ADR 0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)不由本稿取代。
 
 ## 1. 先定義真正問題與停止線
 
-[2026-09-23 真實續談對照](evidence/2026-09-23-gpt6-cw-natural-trial.md)顯示：同版 `jd_read current` 三頁為 85,893 bytes；六章分讀八步為 88,650 bytes；只讀職責／任務章三步仍有 60,994 bytes。第四次同版全讀前，先前三頁已離開 A 的 request-only 視圖，故不能把它叫作模型無故重讀。當前 JD notice 有 revision／改動訊號，沒有定位六章或項目的輕量導覽。表格化同一批頁面在隔離計算可少 39.6% bytes，但未驗 provider／writer，也不減工具步數。**bytes 不是 tokens；節省不等於品質改善。**
+[2026-09-23 真實續談對照](../experiments/legacy-evidence/2026-09-23-gpt6-cw-natural-trial.md)顯示：同版 `jd_read current` 三頁為 85,893 bytes；六章分讀八步為 88,650 bytes；只讀職責／任務章三步仍有 60,994 bytes。第四次同版全讀前，先前三頁已離開 A 的 request-only 視圖，故不能把它叫作模型無故重讀。當前 JD notice 有 revision／改動訊號，沒有定位六章或項目的輕量導覽。表格化同一批頁面在隔離計算可少 39.6% bytes，但未驗 provider／writer，也不減工具步數。**bytes 不是 tokens；節省不等於品質改善。**
 
 本切片要讓模型在長訪談中知道「JD 有哪些部分、目前要讀哪個」，保留局部足夠才寫、跨案例形成穩定任務、JD 六章與 K／S 關係、手改、來源和全稿雙向核對。Q12「已提交卻在 final 說未保存」是獨立 OPEN，不以本切片結案。完整 JD、真瀏覽器與真人品質仍 OPEN。
 
@@ -58,7 +58,7 @@
 
 ## 6. 首輪離線核對結果（2026-09-24；不改正式接線）
 
-沿已停止的 C-W checkpoint 與 §5 同一口徑複核：第四次同版全稿讀取前，A 的 request-only 視圖沒有 11 個 JD item ref 中任何一個，六章 ref 只剩 `conditions`。在這個**實際可見狀態**，現有 `item/section` 不能直接替代 `current`；不能只用舊 checkpoint 中存在 refs 推論模型當下能指定它們。現有六章逐章讀取對此稿是 8 步／88,650 bytes，較全稿 3 步／85,893 bytes 更大；單一 Task item 是 1 步／25,281 bytes，但前提是已取得當前同版 ref，且這個目標足以回答本次修改問題。這些都是工具回覆 bytes／步數，**不是真模型總 token、延遲或 JD 品質收益**；數據與限制沿用[原始對照](evidence/2026-09-23-gpt6-cw-natural-trial.md#同一已保存-checkpoint-的-jd-request-view聚焦讀取對照零付費)，不複製其整份 trace。
+沿已停止的 C-W checkpoint 與 §5 同一口徑複核：第四次同版全稿讀取前，A 的 request-only 視圖沒有 11 個 JD item ref 中任何一個，六章 ref 只剩 `conditions`。在這個**實際可見狀態**，現有 `item/section` 不能直接替代 `current`；不能只用舊 checkpoint 中存在 refs 推論模型當下能指定它們。現有六章逐章讀取對此稿是 8 步／88,650 bytes，較全稿 3 步／85,893 bytes 更大；單一 Task item 是 1 步／25,281 bytes，但前提是已取得當前同版 ref，且這個目標足以回答本次修改問題。這些都是工具回覆 bytes／步數，**不是真模型總 token、延遲或 JD 品質收益**；數據與限制沿用[原始對照](../experiments/legacy-evidence/2026-09-23-gpt6-cw-natural-trial.md#同一已保存-checkpoint-的-jd-request-view聚焦讀取對照零付費)，不複製其整份 trace。
 
 鎖定 App 的現有測試在不使用共用 uv 快取時通過：`test_reads.py` **10 passed**；`task_item_view_includes_parent_details_shared_definitions_and_sources` 與 `successful_current_item_or_section_is_an_exact_run_read` **3 passed**。它們證明既有 item 投影包含部分關聯、current cursor 會拒絕跨版，以及同版 item／section 的可信讀取能進原 JD writer；**沒有證明自然模型能自行取得已不在 request 視圖的 ref，亦沒有證明局部結果涵蓋一項寫入所需的所有頁面／相鄰任務**。首次測試未執行是 Windows 共用 uv cache `WinError 5`，換 `uv --no-cache` 後同一聚焦測試通過，不列為產品失敗。
 
@@ -77,4 +77,4 @@
 
 定位項由 App 從已保存的同版 JD 產生短名稱／文字線索與上層標籤；它只是候選入口，不是摘要、原話、來源或寫入憑證。模型不填 document、item ID、revision 或 cursor；現有 `ReferenceCodec` 發讀取專用的簽署 ref。`jd_read(item/section)` 以此 ref 回到同版完整正文與關聯，再發原有可寫 current refs。`command_context` 不接受導覽 ref；原 `AiToolSession` 只把同版、模型仍可見且分頁讀完的正文結果作為寫入目標來源，不把 locator 或被 compaction 移出 request 的舊工具結果算進去。跨文件、跨版與 cursor 仍按既有驗證拒絕。未新增 Agent、DB、queue、registry、writer、Memory 變體或第二套 validator。
 
-離線結果：`test_reads.py` 的每項涵蓋、無名稱低頻工作線索、同名不同範圍線索、局部正文／來源讀回、導覽 ref 不可寫、跨文件／跨版／分頁拒絕；`test_consultant_tools.py` 的 locator-only 不綁定、缺頁與讀甲改乙拒絕、完整多頁與定位後讀正文仍可寫、compaction 後舊正文不計入、舊無效讀取不妨礙後來有效讀取、摘要失效與正式模型的完整視圖回退一致。正式 App Python 離線套件 3,207 passed／323 skipped；Web 310 passed、TypeScript typecheck 與 production build 通過；codegen check 一致。[獨立驗收紀錄](evidence/2026-09-24-jd-locator-acceptance.md)另有三筆有界真 GPT-6 Luna 元件檢查：全合成同名職責選擇、帶 10 個 JD 工具的同題選擇，以及在使用者明確准許後，保存 C-W 稿的 11 項中選對相關 Task 並本機讀回正文。完整 App 的自發工具選擇、更多題型命中率、總體費用、跨 K／S／手改及最終專業 JD 品質仍須各自驗證，不能因單題成功或 bytes 減少標 PASS。若模型選錯或局部讀漏影響資料，停止擴大接線、回到 full current 與本稿的停止線。
+離線結果：`test_reads.py` 的每項涵蓋、無名稱低頻工作線索、同名不同範圍線索、局部正文／來源讀回、導覽 ref 不可寫、跨文件／跨版／分頁拒絕；`test_consultant_tools.py` 的 locator-only 不綁定、缺頁與讀甲改乙拒絕、完整多頁與定位後讀正文仍可寫、compaction 後舊正文不計入、舊無效讀取不妨礙後來有效讀取、摘要失效與正式模型的完整視圖回退一致。正式 App Python 離線套件 3,207 passed／323 skipped；Web 310 passed、TypeScript typecheck 與 production build 通過；codegen check 一致。[獨立驗收紀錄](../experiments/legacy-evidence/2026-09-24-jd-locator-acceptance.md)另有三筆有界真 GPT-6 Luna 元件檢查：全合成同名職責選擇、帶 10 個 JD 工具的同題選擇，以及在使用者明確准許後，保存 C-W 稿的 11 項中選對相關 Task 並本機讀回正文。完整 App 的自發工具選擇、更多題型命中率、總體費用、跨 K／S／手改及最終專業 JD 品質仍須各自驗證，不能因單題成功或 bytes 減少標 PASS。若模型選錯或局部讀漏影響資料，停止擴大接線、回到 full current 與本稿的停止線。

@@ -80,5 +80,5 @@ Task 1 的逐項 consumer 盤點見 [`2026-08-10-legacy-cleanup-inventory.md`](2
 - [`ARCHITECTURE.md`](../../ARCHITECTURE.md)：目前 monorepo 高層地圖與 legacy／現行 AI 分界。
 - [`docs/README.md`](../README.md)：文檔 taxonomy、擺放與 living docs 規則。
 - [`docs/design/task-analysis-engine.md`](../design/task-analysis-engine.md)：現行 job-analysis durable vertical。
-- [`docs/design/interview-engine.md`](../archive/retired-documents/design/interview-engine.md)：legacy interview engine 的退役禁令。
+- [`docs/design/interview-engine.md`](../archive/docs-cleanup-2026-10-02.md)：legacy interview engine 的退役禁令。
 - [`docs/plans/2026-07-16-interview-ai-vnext-implementation-plan.md`](../plans/2026-07-16-interview-ai-vnext-implementation-plan.md)：vNext 的隔離、切換與 v3 刪除順序。

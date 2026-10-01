@@ -69,14 +69,14 @@ pnpm start
 pnpm check
 ```
 
-這會執行正式 Python 測試、Web 測試、TypeScript typecheck、契約生成核對與 production build。真 PostgreSQL、真瀏覽器及真模型的證據仍分開記錄，見 [`docs/current-decisions.md`](docs/current-decisions.md) 與 [`docs/specs/evidence`](docs/specs/evidence)。
+這會執行正式 Python 測試、Web 測試、TypeScript typecheck、契約生成核對與 production build。真 PostgreSQL、真瀏覽器及真模型的證據仍分開記錄，見 [`docs/current-decisions.md`](docs/current-decisions.md) 與 [實驗證據](docs/experiments/legacy-evidence/README.md)。
 
 ## 文件與 RAG
 
 - 文件地圖與迭代順序：[`docs/README.md`](docs/README.md)
 - 目前有效決策：[`docs/current-decisions.md`](docs/current-decisions.md)
 - 正式架構決策：[`docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md`](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)
-- 最新完整 App 證據：[`docs/specs/evidence/2026-09-22-jd-component-first-acceptance.md`](docs/specs/evidence/2026-09-22-jd-component-first-acceptance.md)
+- 最新完整 App 證據：[`docs/experiments/legacy-evidence/2026-09-22-jd-component-first-acceptance.md`](docs/experiments/legacy-evidence/2026-09-22-jd-component-first-acceptance.md)
 - 舊 worktree 與文件沿革：[`docs/archive/worktree-history-index.md`](docs/archive/worktree-history-index.md)
 
 `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder` 與 `packages/ocs-contract` 是保留但隔離的 RAG bounded context，不是 JD App runtime 依賴。只有明確執行 `pnpm rag:up`／`pnpm rag:dev` 才會啟動；細節見 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)。

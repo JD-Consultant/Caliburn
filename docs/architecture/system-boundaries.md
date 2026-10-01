@@ -76,7 +76,7 @@ flowchart TB
 
 正常順序 B1 → B2；B2 自身遇到情境問題才回交 B1。完成標記須綁定 App 的本批／交接身分，但不交模型填版號，不用「呼叫過 read」推導分析完成。原生 reasoning／工具結果支援分析延續，App State 保存執行事實；**不預設額外的每 Step 分析筆記**。
 
-工作分析方法只有一份：[完整工作分析指南](../specs/2026-09-09-complete-work-analysis-guide.md)、[訪談校準](../specs/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[JD 寫作](../specs/2026-09-09-jd-field-and-writing-guide.md)。A 依寫作方法選 JD 表達；B1／B2 不預寫 JD 欄位，也不把圖中的箭頭誤當固定模型呼叫次數。
+工作分析方法只有一份：[完整工作分析指南](../guides/2026-09-09-complete-work-analysis-guide.md)、[訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[JD 寫作](../guides/2026-09-09-jd-field-and-writing-guide.md)。A 依寫作方法選 JD 表達；B1／B2 不預寫 JD 欄位，也不把圖中的箭頭誤當固定模型呼叫次數。
 
 ## 4. 跨邊界只傳必要的資訊
 

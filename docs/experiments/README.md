@@ -45,6 +45,11 @@
 
 ## 4. 實驗清單
 
+- [較早實驗與驗收原件](legacy-evidence/README.md)：原 `specs/evidence/` 歸位；涵蓋當時 JD、UI、Memory、工具與保存的反例和驗證。
+- [歷史工作樹的獨有實驗](historical/README.md)：CT 系列、JD 整合初審與修正、R1 方法資產、Agent 任務報告；重複副本不另存。
+- [新目標證據](../plans/2026-09-29-target-rebuild/evidence/README.md)：T01–T18 各自的判準、結果與限制，仍由該任務維護。
+- [跨校可用的問題分析案例](../reports/research-casebook.md)：給教授與報告讀者的解讀入口，不取代原始結果。
+
 - [`2026-07-26-r1-p0-context-representation/`](2026-07-26-r1-p0-context-representation/) —
   **Closed／不執行**（[ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)，2026-07-27）。
   原欲比較 Raw-only、Raw+Spans、Hybrid 與 Structured-only 四種 Context 對 Task 邊界分析的影響；
@@ -61,7 +66,7 @@
   加上一個不使用正式案例的 live plumbing preflight）；
   scripted 48-observation／80-call 骨架已跑通但不具品質結論資格。experiment revision 1，suite hash
   `6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7`；
-  **八個正式案例尚未執行任何 trial**。
+  上述為早期準備狀態；後續 [R1a 結果](2026-07-27-r1-task-discovery/r1a-results.md)已完成八案 × A1／A6／A2 的 24 observations，含兩次中止嘗試與 grader 漏判。A3／A4／A5 未執行；不是六 arm 全跑，也不是 SME 驗證。
   設計 authority 在
   [`2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md`](../specs/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)，
   分段見 [實作計畫](../plans/2026-07-27-r1-task-discovery-implementation-plan.md)。

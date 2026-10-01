@@ -167,7 +167,7 @@ TaskRowVM.similarTo?: { name: string; score: number }[]  // 灰區對
 
 ## 8. 文檔更新義務(同 commit)
 
-- [`docs/design/editor-knowledge-pack.md`](../archive/retired-documents/design/editor-knowledge-pack.md):
+- [`docs/design/editor-knowledge-pack.md`](../archive/docs-cleanup-2026-10-02.md):
   similarity 掛載點、web 顯示變換鐵律、不變量 A/B。
 - `apps/ocs-indexer/README.md`(items:match 端點面)· `apps/web/README.md`(分群顯示)·
   `apps/api/README.md`(similarity 掛載)。

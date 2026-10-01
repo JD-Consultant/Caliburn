@@ -7,8 +7,8 @@
 ## 閱讀路由與本輪邊界
 
 - 目的／方法：[短驗收計畫](../plans/2026-09-07-long-interview-acceptance.md)。基準 `a9d87e0a`；隔離 `codex/analysis-only-agent`，不接 JD／production。
-- 事實：[封存 evidence](evidence/2026-09-07-long-interview-acceptance.json)；員工視角：[9 輪逐字稿](evidence/2026-09-07-long-interview-acceptance.transcript.md)。長 request／工具內容只放 evidence，不貼進決策入口。
-- 承接：[CT08](2026-09-07-interview-partial-knowledge-repair.md)；工作資訊取捨見主工作區 [研究](../../../../docs/specs/2026-09-07-work-case-and-understanding-information-selection.md)。不重開 Memory ABC 分層。
+- 事實：[封存 evidence](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-long-interview-acceptance.json)；員工視角：[9 輪逐字稿](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-long-interview-acceptance.transcript.md)。長 request／工具內容只放 evidence，不貼進決策入口。
+- 承接：[CT08](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-interview-partial-knowledge-repair.md)；工作資訊取捨見主工作區 [研究](../../../../docs/specs/2026-09-07-work-case-and-understanding-information-selection.md)。不重開 Memory ABC 分層。
 - Owner 最新要求是說明「精確修改為何反覆失敗、上限是否過低、官方如何處理」。本段僅診斷與候選，**尚未授權改用 patch、修改讀取格式、提高產品上限或改錯誤恢復政策**。
 
 ## 1. 實際完成與未完成

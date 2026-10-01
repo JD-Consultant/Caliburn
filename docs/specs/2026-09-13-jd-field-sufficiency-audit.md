@@ -11,10 +11,10 @@
 
 | 原始責任文件 | 本次核對的問題 |
 |---|---|
-| [完整工作分析指南](2026-09-09-complete-work-analysis-guide.md) §2–6 | 工作廣度、本人判斷、低頻、情境差異、未知及更正是否保留；十四個分析面向不等於十四個必填欄 |
-| [客製化深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md) §2–7 | 不套公版、不逐案列永久任務、不把實際工作改寫為理想職位；招募／訓練／KPI 分界 |
-| [欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[最新六章格式](2026-09-10-jd-format-review.md) | 核心資訊不是初次保存必填；成果／要求並列；K/S 定義與用途；條件按適用對象落位 |
-| [完整樣稿 r2](2026-09-09-frontend-engineer-jd-sample.md)、[15 筆情境與雙向審查](2026-09-09-jd-sample-basis-and-review.md) | 用已明示內容檢驗落點，不補新員工事實；樣稿不是固定數量／label／DB 模板 |
+| [完整工作分析指南](../guides/2026-09-09-complete-work-analysis-guide.md) §2–6 | 工作廣度、本人判斷、低頻、情境差異、未知及更正是否保留；十四個分析面向不等於十四個必填欄 |
+| [客製化深度與訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md) §2–7 | 不套公版、不逐案列永久任務、不把實際工作改寫為理想職位；招募／訓練／KPI 分界 |
+| [欄位與寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[最新六章格式](2026-09-10-jd-format-review.md) | 核心資訊不是初次保存必填；成果／要求並列；K/S 定義與用途；條件按適用對象落位 |
+| [完整樣稿 r2](../guides/2026-09-09-frontend-engineer-jd-sample.md)、[15 筆情境與雙向審查](../guides/2026-09-09-jd-sample-basis-and-review.md) | 用已明示內容檢驗落點，不補新員工事實；樣稿不是固定數量／label／DB 模板 |
 | [格式品質與保存核對](2026-09-10-jd-format-quality-and-storage-review.md) | 區分後來 Owner 裁決及歷史路線，不恢復已被取代的成果／要求合併或隱藏條件繼承 |
 
 以上研究已記 OPM、O*NET、NOS 等依據與限制；本輪對已有內容作追溯，不把再搜同一來源當進度。工程新主張另在[框架與施工前置](2026-09-13-jd-native-framework-and-integration-preflight.md)核官方現行資料。

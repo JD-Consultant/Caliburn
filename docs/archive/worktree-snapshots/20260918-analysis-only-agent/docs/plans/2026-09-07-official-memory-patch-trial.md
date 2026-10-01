@@ -27,4 +27,4 @@
 
 Owner 已另外核准本輪 Luna／medium **最多 12 次模型請求、US$0.05**，含 B1/B2/C，不重跑長訪談；離線回歸通過才執行。採已有診斷 Ledger，每次 HTTPS 嘗試均計數、預留費用，結束關帳。為直接驗證編輯器，採明示合成 Memory 與原始問答；測試提示要求 C 修補及 B2 使用 patch，不能當作自然選工具或完整訪談品質證據。
 
-執行收尾：上述 1–4 的接線、離線／PG 回歸與審查紀錄已完成，最終 562 passed／0 skipped；Luna 共 12 次，usage 估 US$0.00587412，帳本關閉。C 真測發布成功；B2 當時被過嚴的 terminal marker 檢查阻擋，修正後只完成原模型 patch 本機重播，**B2 真模型完整發布仍未驗收**。下一步只補這一項，須另有明確測試額度；不重跑長訪談。依據與失敗過程見 [CT11 結果](../specs/2026-09-07-official-memory-patch-trial-results.md)。
+執行收尾：上述 1–4 的接線、離線／PG 回歸與審查紀錄已完成，最終 562 passed／0 skipped；Luna 共 12 次，usage 估 US$0.00587412，帳本關閉。C 真測發布成功；B2 當時被過嚴的 terminal marker 檢查阻擋，修正後只完成原模型 patch 本機重播，**B2 真模型完整發布仍未驗收**。下一步只補這一項，須另有明確測試額度；不重跑長訪談。依據與失敗過程見 [CT11 結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-official-memory-patch-trial-results.md)。

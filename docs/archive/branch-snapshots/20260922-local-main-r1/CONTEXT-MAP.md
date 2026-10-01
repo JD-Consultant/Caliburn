@@ -25,7 +25,7 @@ _Avoid_：本機操作者、deployment operator
 
 - **PDF 解析**：OCS PDF 到結構化 JSON；glossary 尚未建立，預定位置為 `apps/pdf-to-json/CONTEXT.md`。
 - **OCS 檢索**：OCS 索引與參考知識查詢；glossary 尚未建立，預定位置為 `apps/ocs-indexer/CONTEXT.md`。
-- [JD 著作](apps/api/CONTEXT.md)：員工訪談、職務分析、工作模型與職務說明書著作；Web 與 API 共用此語言。
+- [JD 著作](../../../experiments/historical/20260922-local-main-r1/assets/apps/api/CONTEXT.md)：員工訪談、職務分析、工作模型與職務說明書著作；Web 與 API 共用此語言。
 
 ## Relationships
 

@@ -86,8 +86,8 @@ LangChain 用 `AIMessage` 表示 provider-neutral 的模型訊息，內容可包
 
 依據：
 
-- [Framework-independent Memory contract](./2026-09-01-framework-independent-memory-contract.md) §3.2、§3.4
-- [相似案例、細節與 consolidation reconciliation](./2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md)
+- [Framework-independent Memory contract](../../../20260918-analysis-only-agent/docs/specs/2026-09-01-framework-independent-memory-contract.md) §3.2、§3.4
+- [相似案例、細節與 consolidation reconciliation](../../../../../specs/2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md)
 
 ## 4. 現行 code diagnosis（只作 migration inventory）
 

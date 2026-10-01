@@ -23,7 +23,7 @@
 
 ## 結果
 
-基線 `2cdb9cb2`。本輪**未改產品程式、prompt、工具或步數**。實際請求、合成訪談全文、回覆、工具結果、兩版Memory、詳記與原文引用、可重現診斷腳本及來源雜湊保存在[CT07證據](evidence/2026-09-07-continuous-interview-trial.json)，不是只保留人工摘要。
+基線 `2cdb9cb2`。本輪**未改產品程式、prompt、工具或步數**。實際請求、合成訪談全文、回覆、工具結果、兩版Memory、詳記與原文引用、可重現診斷腳本及來源雜湊保存在[CT07證據](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-continuous-interview-trial.json)，不是只保留人工摘要。
 
 | 輪次 | 模擬員工情境 | 主訪談 | 主回覆時間 | 長期Memory |
 |---|---|---|---:|---|

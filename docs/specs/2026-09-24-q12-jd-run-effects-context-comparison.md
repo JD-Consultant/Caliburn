@@ -3,7 +3,7 @@
 - 日期：2026-09-24
 - 階段：G5 比較與隔離驗證；**非 production 設計核准，也未修改正式接線**
 - 範圍：新 App 的 A 顧問，本輪 JD 寫入事實。B1／B2／C、JD 導覽、Memory 與 compaction 權責維持既有設計。
-- 原始實例與先前反例：[C-W 續談證據，Q12 兩節](evidence/2026-09-23-gpt6-cw-natural-trial.md#q12-本輪保存真相最後-request-view-的唯讀對照2026-09-24)。
+- 原始實例與先前反例：[C-W 續談證據，Q12 兩節](../experiments/legacy-evidence/2026-09-23-gpt6-cw-natural-trial.md#q12-本輪保存真相最後-request-view-的唯讀對照2026-09-24)。
 
 ## 問題與已知事實
 

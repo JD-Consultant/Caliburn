@@ -58,11 +58,11 @@ OpenRouter model output 時，不必重寫 revision、decision、stale 或 diges
 
 實作衝突時依下列順序判定：
 
-1. [ADR 0038](../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)：產品 workflow、
+1. [ADR 0038](../../../../../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)：產品 workflow、
    Context Engine、Authoring authority、AI proposal 與交付順序；
 2. [2026-07-20 專業職務分析研究](../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)：
    Canonical Job Model、command/proposal/conflict、task/output/K/S 分層；
-3. [R5-D completed handoff](2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md)：
+3. [R5-D completed handoff](../../../../../plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md)：
    Evidence/Capture 完成基線與 post-R5 交付入口；
 4. 本文件：A1 的 exact scope、欄位、交易、migration 與測試。
 

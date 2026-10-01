@@ -23,4 +23,4 @@
 
 ## 後果與升級條件
 
-正式讀取契約新增一個 view 與 record，生成 Python／TypeScript 型別；沒有 DB migration。短線索可截斷，不能單靠它判斷不存在相關工作。三筆有界真模型定位檢查（含同一保存稿的一道題）及離線回傳量減少，不等於完整 A 旅程或最終 JD 品質通過；仍須驗跨關聯擴讀、較長訪談和最終品質。若漏找、關聯讀不全、步數／成本變差，保留全讀回退，先記具體 trace 再考慮受控文字搜尋，不直接升級 RAG。[驗收證據](../specs/evidence/2026-09-24-jd-locator-acceptance.md)。
+正式讀取契約新增一個 view 與 record，生成 Python／TypeScript 型別；沒有 DB migration。短線索可截斷，不能單靠它判斷不存在相關工作。三筆有界真模型定位檢查（含同一保存稿的一道題）及離線回傳量減少，不等於完整 A 旅程或最終 JD 品質通過；仍須驗跨關聯擴讀、較長訪談和最終品質。若漏找、關聯讀不全、步數／成本變差，保留全讀回退，先記具體 trace 再考慮受控文字搜尋，不直接升級 RAG。[驗收證據](../experiments/legacy-evidence/2026-09-24-jd-locator-acceptance.md)。

@@ -154,8 +154,8 @@ Owner 在恢復後提醒**不要過度設計、以核心分析效果為主**。�
 
 先以工作分析／JD 撰寫指南親自審讀上文課程行政旅程的完整逐字稿與 JD（不是看機制測試）。**做得好的**：追問順序自然（先全貌、再挑異動與課後紀錄、再問低頻工作）、界線與未知保留（退款核准不推定）、更正只改該項並保留其他工作、結尾用目的段落確認。**指南有要求、實際卻缺的**：
 
-1. **已知且有影響的工作條件沒有記下。**員工第一句就說「服務平日晚上和週末的成人進修班」，[JD 指南 §2](../../../specs/2026-09-09-jd-field-and-writing-guide.md)的「工作關係與重要條件」要求已知且有影響的輪班／工作時間要寫；最終 JD 的協作對象與工作條件集合都是空的，全文找不到「晚上」或「週末」。原因可定位：`create_jd_item` 的工具說明寫明能建立協作對象與全職務條件，但 A 的主指引**從未說什麼時候該記**，七輪一次都沒用。
-2. **「合格完成要求」與「最容易出錯的情境」幾乎沒問。**[分析指南 §2](../../../specs/2026-09-09-complete-work-analysis-guide.md)列出「哪些狀況會被退回？交付前一定確認什麼？」與「最容易出問題的是什麼情況？」；逐字稿裡 JD 的「要求」多是作業流程與權限界線，不是被退回的情況或交付前檢查。
+1. **已知且有影響的工作條件沒有記下。**員工第一句就說「服務平日晚上和週末的成人進修班」，[JD 指南 §2](../../../guides/2026-09-09-jd-field-and-writing-guide.md)的「工作關係與重要條件」要求已知且有影響的輪班／工作時間要寫；最終 JD 的協作對象與工作條件集合都是空的，全文找不到「晚上」或「週末」。原因可定位：`create_jd_item` 的工具說明寫明能建立協作對象與全職務條件，但 A 的主指引**從未說什麼時候該記**，七輪一次都沒用。
+2. **「合格完成要求」與「最容易出錯的情境」幾乎沒問。**[分析指南 §2](../../../guides/2026-09-09-complete-work-analysis-guide.md)列出「哪些狀況會被退回？交付前一定確認什麼？」與「最容易出問題的是什麼情況？」；逐字稿裡 JD 的「要求」多是作業流程與權限界線，不是被退回的情況或交付前檢查。
 3. **一句誘導式提問**：第 11 則把預期答案放進是非題（「通常是從逐堂出席紀錄加總而來嗎？…是『出席人次』而非不同學員人數嗎？」），員工只是附和；[rubric](../../../../apps/api/tests/fixtures/job_analysis_quality/rubric.md)把「誘導答案」列為 A 引導的失敗型。
 4. 每輪回覆用一大段複述剛改了 JD 的什麼，JD 就在旁邊；[指引](../../../../apps/api/src/caliburn/agents/job_consultant/instructions.py)要的是「必要時簡述」。
 
@@ -223,7 +223,7 @@ ignored 證據指紋（均全合成；不提交原 native reasoning）：
 
 沿上一片保留的 `core_journey_20261001_c2e1fcd8` 原件診斷：A 第四輪完整讀取了職責及其來源 2，之後明確送出 `remove_source`，不是 projection 未給引用或 DB 自行清除。原話 2 同時提供報名、課前與課後工作；本次只更正出席彙整頻率，不能由局部更正推出整則舊原話都失效。
 
-最小假說：把[分析指南 §4](../../../specs/2026-09-09-complete-work-analysis-guide.md#4-案例工作理解與-jd如何取捨而不丟失)「更正看語意範圍」落到既有來源動作的指引，區別局部更正與整筆來源移除。工具與來源模型不變、不強制引用數量、不由程式猜補來源；若原依據確已不適用，仍允許移除。研究沿 [OpenAI 工具設計](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)的清楚時機／限制及任務實測，不宣稱提示能保證正確。
+最小假說：把[分析指南 §4](../../../guides/2026-09-09-complete-work-analysis-guide.md#4-案例工作理解與-jd如何取捨而不丟失)「更正看語意範圍」落到既有來源動作的指引，區別局部更正與整筆來源移除。工具與來源模型不變、不強制引用數量、不由程式猜補來源；若原依據確已不適用，仍允許移除。研究沿 [OpenAI 工具設計](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)的清楚時機／限制及任務實測，不宣稱提示能保證正確。
 
 **局部外送 manifest（執行前）**：只讀上述合成第四輪 `1f1bcf19-6520-6c9d-8007-e9acb8a5dc69` 的原生請求，保留全部接續 items／工具；比較 baseline 2 次、來源保留指引候選 2 次，最多 4 次生成＋4 次 count，`gpt-6-luna`／medium、store=false／all_turns。每次 input ≤ 40K、output ≤ 8,192、120 秒、零自動重試／compact，總預算 US$1。只改新診斷請求中的指引，不寫原 checkpoint、JD 或 Memory；不執行模型要求的工具、不偽造成功。保留每次工具選擇、用量、request 指紋於 ignored `source-retention-20261001.json`；沒有相關修訂則記未觀察。評讀最終文字、更正及剩餘來源是否共同支持完整範圍；不以保留某個固定 ID 當唯一答案。此片不是完整旅程驗收，也不重跑六組 baseline。
 
@@ -379,7 +379,7 @@ execution `17ac9ab4-64db-4ff1-bce4-6dc0547dcb78` completed；觀察區間 **33.6
 
 沿 [T14 已完成五輪的 high 旅程](t14-job-analysis-quality.md#補驗正式結果與限制)，不重跑訪談、不重測已否決的來源提示候選。第六輪先前因 `transient_service` 最終失敗；其後上節 Luna 已完成六次 Responses，故本片只重新送出尚未成為正式訪談的收尾輸入一次。這是新 Turn，不冒充取回先前遺失的模型結果，也不把服務現已成功當成品質已修復。
 
-沿 [OpenAI 評估指南](https://developers.openai.com/api/docs/guides/evaluation-best-practices)分開工具選擇／參數及最終效果，使用原 App 的真實接續；內容判準依 [工作分析 §6](../../../specs/2026-09-09-complete-work-analysis-guide.md#6-如何檢查整份工作已被適當涵蓋)、[JD 寫作 §3–7](../../../specs/2026-09-09-jd-field-and-writing-guide.md#3-職務目的職責任務同一份工作的不同縮放程度)及 [訪談校準 §6](../../../specs/2026-09-09-customized-jd-depth-and-interview-calibration.md#6-怎樣才是整份工作被理解而非只問透一案)。不使用官方託管 Evals 平台、不新增 reviewer 或驗收子系統。
+沿 [OpenAI 評估指南](https://developers.openai.com/api/docs/guides/evaluation-best-practices)分開工具選擇／參數及最終效果，使用原 App 的真實接續；內容判準依 [工作分析 §6](../../../guides/2026-09-09-complete-work-analysis-guide.md#6-如何檢查整份工作已被適當涵蓋)、[JD 寫作 §3–7](../../../guides/2026-09-09-jd-field-and-writing-guide.md#3-職務目的職責任務同一份工作的不同縮放程度)及 [訪談校準 §6](../../../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md#6-怎樣才是整份工作被理解而非只問透一案)。不使用官方託管 Evals 平台、不新增 reviewer 或驗收子系統。
 
 - 基準 `7d631737`；專用 DB `caliburn_t01_test`、schema `core_journey_20261001_635da286`，職務檔案 `a40b19dc-da6f-4105-9a4c-2c068edcaafa`。已唯讀確認無 active／paused 工作；原稿 `f76545e8-d4b9-43ce-871b-2e72fe07252a`、正式訪談末序號11。只在此 schema 明確升級0019→0020，不動 Demo。
 - 只送既有合成收尾句：「目前我主要做的工作大致都說了。我想先整理目前已談到的工作，其他不清楚的部分先保留未知。請幫我檢查現在的職務說明書還缺什麼。」不加入預期答案、來源序號提示或強制工具選擇。

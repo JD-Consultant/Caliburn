@@ -3,7 +3,7 @@
 - 日期：2026-09-12；Topic：JD-R002/C02、C03／保存方式重審。
 - 狀態：G2 研究完成；**Owner 已同意 A 自動保存方向（G3 WORKING）**，見[需求 §9](2026-09-12-jd-relational-editing-requirements.md#9-保存方式重審自動保存已選定2026-09-12)。細節進入 G4，不等於已切換程式。
 - 需求：Owner 確認 JD 會反覆修改到符合本人工作，接著要求研究是否應自動保存。沿[需求 §7](2026-09-12-jd-relational-editing-requirements.md#7-功能目的與使用方式釐清2026-09-12持續討論)；單機單人、多份隔離 JD、一般文字與換行、完整手動 CRUD、人與 AI 共用業務規則。
-- 效力：本稿保存本題證據、選項及取捨；未改程式、DB、模型設定或 production authority。後續細節及新增 AWS 依據見[保存與 AI 交接設計](2026-09-12-jd-autosave-and-handoff-design.md)；findings 狀態以[審查紀錄](evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)為準。
+- 效力：本稿保存本題證據、選項及取捨；未改程式、DB、模型設定或 production authority。後續細節及新增 AWS 依據見[保存與 AI 交接設計](2026-09-12-jd-autosave-and-handoff-design.md)；findings 狀態以[審查紀錄](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)為準。
 
 ## 1. 推薦與產品取捨
 
@@ -67,7 +67,7 @@
 |---|---|
 | [整體設計 §3.2／5.1](2026-09-12-jd-relational-editor-design.md) | 原「全部先入 command buffer、按保存再提交」須改成按編輯種類明確觸發；不能只加 debounce。JR-R01 的完整新增／跨項更正同時閉合 |
 | [原員工旅程 §4–5](2026-09-10-jd-employee-journey-design.md) | 保存時停輸入、普通 dirty 僅記憶體、切頁捨棄與送聊天先保存的銜接需改；原稿仍代表已驗隔離行為，研究推薦不抹去該結果 |
-| [保存交易 §6–9](2026-09-12-jd-relational-schema-and-write-contract.md) | 自動觸發不改唯一 relational current authority；JR-R02／03 已修訂並通過[文件窄複核](evidence/2026-09-12-jd-relational-save-contract-review.md)，仍須實測；保存節奏造成的成本與增長列有限驗證 |
+| [保存交易 §6–9](2026-09-12-jd-relational-schema-and-write-contract.md) | 自動觸發不改唯一 relational current authority；JR-R02／03 已修訂並通過[文件窄複核](../experiments/legacy-evidence/2026-09-12-jd-relational-save-contract-review.md)，仍須實測；保存節奏造成的成本與增長列有限驗證 |
 | [工具契約 §4／8](2026-09-12-jd-relational-agent-tool-contract.md) | 人與 AI 的整組效果一致；人工通知必須涵蓋所有已保存改動，但不能把每次打字暫停當需要顧問回應。通知可有界分組，原始事件仍可追查 |
 | [手改恢復契約](2026-09-10-jd-manual-recovery-transport-design.md) | 保留 exact submission／receipt 對帳，不把更新中的 buffer 改成原請求內容；需明確接上送出後又輸入的新內容與普通草稿恢復 |
 

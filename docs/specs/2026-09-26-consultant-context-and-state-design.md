@@ -9,7 +9,7 @@
 
 ## 1. 要達成的效果與已有決策
 
-顧問透過持續訪談理解員工的完整工作，在足夠且經核對的資訊支持下逐步寫好 JD；跨多個模型步驟、訪談回合與上下文壓縮仍能接續分析，必要時找回細節。不是每輪必須改稿，也不是維護分析表本身就算完成目標。訪談及寫作方法沿用[工作分析指南](2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](2026-09-09-jd-field-and-writing-guide.md)，本稿不改其分析方法或 Prompt。
+顧問透過持續訪談理解員工的完整工作，在足夠且經核對的資訊支持下逐步寫好 JD；跨多個模型步驟、訪談回合與上下文壓縮仍能接續分析，必要時找回細節。不是每輪必須改稿，也不是維護分析表本身就算完成目標。訪談及寫作方法沿用[工作分析指南](../guides/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)，本稿不改其分析方法或 Prompt。
 
 下表只提供**決策路由與設計約束**，完整政策不在本稿另存一份：
 
@@ -90,7 +90,7 @@ Owner 已確認：**App 組裝給 A、B1、B2 及後續 Agent 的動態資料，
 
 ### 3.2 JD 導覽的按需定位（目標已確認／未實作）
 
-**用途與邊界（2026-09-29）：**A 準備閱讀或修改 JD 時，可從**同一個 JD 讀取入口**按需取得導覽、完整 JD，或指定區域／項目的完整內容；不在每輪 App 資料訊息預載 JD 導覽。下節已收斂模型可見的目標讀取方式；最終 provider schema 與 production 接線仍未實作、未驗收。導覽是目前可見 JD 的唯讀定位投影，不另設 JD map 儲存或由模型維護第二份摘要；本 Turn 已成立的候選編輯須反映在後續讀取中，外界正式讀取仍以各自合法基準為準。[JD 關聯式欄位與關係](../product-concept.md#jd-的關聯式結構與逐項編輯已確認目標)、[欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md)仍是內容意義的依據，本節不重定 JD schema。
+**用途與邊界（2026-09-29）：**A 準備閱讀或修改 JD 時，可從**同一個 JD 讀取入口**按需取得導覽、完整 JD，或指定區域／項目的完整內容；不在每輪 App 資料訊息預載 JD 導覽。下節已收斂模型可見的目標讀取方式；最終 provider schema 與 production 接線仍未實作、未驗收。導覽是目前可見 JD 的唯讀定位投影，不另設 JD map 儲存或由模型維護第二份摘要；本 Turn 已成立的候選編輯須反映在後續讀取中，外界正式讀取仍以各自合法基準為準。[JD 關聯式欄位與關係](../product-concept.md#jd-的關聯式結構與逐項編輯已確認目標)、[欄位與寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)仍是內容意義的依據，本節不重定 JD schema。
 
 **回傳表示已確認（目標／未實作）：**JD 導覽採精簡 JSON，保留區域／項目的層級、必要線索及後續按需讀取定位；不為排版重複正文或添加無助定位的描述。這只確定導覽的模型可見表示，不定案其他 `read_jd` view 的格式，也不代表已通過模型或 wire 驗收。
 
@@ -126,7 +126,7 @@ Owner 已確認：**App 組裝給 A、B1、B2 及後續 Agent 的動態資料，
 
 ### 3.3 JD 導覽後的按需深入讀取（Owner 已確認目標／未實作）
 
-**目的：**A 從導覽找相關位置，再以足夠完整的局部讀取判斷是否要編輯；需要比較全稿時也能直接讀成品文字。這是 JD 的模型可見讀取投影，不改關聯式 JD 保存或已定的來源／版本 authority。[現行 `jd_read`](2026-09-24-jd-context-navigation-design.md#3-實際接點與三個選項)已有局部、區域、全稿讀取及分頁，但讀單一職責會自動展開任務，且全稿帶大量結構紀錄與 refs；不能把現行行為冒充本目標已完成。[2026-09-23 的離線診斷](evidence/2026-09-23-gpt6-cw-natural-trial.md#jd-撰寫回合的-context-膨脹與反覆摘要分項唯讀診斷)在一頁約 31.3K 字元回覆中量到五種 signed refs 約 26.9K 字元；這支持審查表示成本，但不等於新版投影已通過模型品質或容量驗收。
+**目的：**A 從導覽找相關位置，再以足夠完整的局部讀取判斷是否要編輯；需要比較全稿時也能直接讀成品文字。這是 JD 的模型可見讀取投影，不改關聯式 JD 保存或已定的來源／版本 authority。[現行 `jd_read`](2026-09-24-jd-context-navigation-design.md#3-實際接點與三個選項)已有局部、區域、全稿讀取及分頁，但讀單一職責會自動展開任務，且全稿帶大量結構紀錄與 refs；不能把現行行為冒充本目標已完成。[2026-09-23 的離線診斷](../experiments/legacy-evidence/2026-09-23-gpt6-cw-natural-trial.md#jd-撰寫回合的-context-膨脹與反覆摘要分項唯讀診斷)在一頁約 31.3K 字元回覆中量到五種 signed refs 約 26.9K 字元；這支持審查表示成本，但不等於新版投影已通過模型品質或容量驗收。
 
 模型可見目標名稱為 `read_jd`，沿用一個**唯讀**入口；模型選 `view`，只有需要定位時才把 map 所發的 `read_ref` 原樣帶回。App 綁定職務檔案、A 此 Turn 可見的 JD／候選、版本及讀取權限；模型不填這些值。下表規定效果與參數意義，不宣稱已完成 OpenAI strict schema 或要求改寫現行 `jd_read`：
 
@@ -338,7 +338,7 @@ App 綁定職務檔案與本次執行，一致取得最新完整 Memory publicat
 
 **安全與驗收（未執行）：**前置回覆必須來自同職務檔案的有效完成歷史，不帶回取消分支；資料投影保留來源角色，不冒充現在的 assistant 回覆。A／B1 起始投影依既定 user 資料封裝，工具結果仍是原生 `function_call_output`。後續須驗「每個月」可連回頻率問句、「不是每月，是每季」不把問句假設當事實、前置回覆也缺指涉時可再往前讀、首輪無前文、取消紀錄不回流，以及補語境不改處理進度。
 
-**研究界線（2026-09-27）：**[Microsoft 的內容重疊指引](https://learn.microsoft.com/en-us/azure/search/vector-search-how-to-chunk-documents#content-overlap-considerations)說明切片保留少量重疊可維持語境，且用量依資料型態決定。它談 RAG 文件切片，不規定訪談必須補一則 AI 回覆；本案只借鑑邊界語境原則，不引入 Azure、embedding、搜尋或照搬其 token 比例。分析限制沿[工作分析指南](2026-09-09-complete-work-analysis-guide.md)，具體回傳選擇仍待 Owner 確認。
+**研究界線（2026-09-27）：**[Microsoft 的內容重疊指引](https://learn.microsoft.com/en-us/azure/search/vector-search-how-to-chunk-documents#content-overlap-considerations)說明切片保留少量重疊可維持語境，且用量依資料型態決定。它談 RAG 文件切片，不規定訪談必須補一則 AI 回覆；本案只借鑑邊界語境原則，不引入 Azure、embedding、搜尋或照搬其 token 比例。分析限制沿[工作分析指南](../guides/2026-09-09-complete-work-analysis-guide.md)，具體回傳選擇仍待 Owner 確認。
 
 ### 同一輪的多個 Step
 

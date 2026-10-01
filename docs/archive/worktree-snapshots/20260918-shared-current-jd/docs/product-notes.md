@@ -36,8 +36,8 @@
 本機 Web workspace 的新文件權威是現行 `app/core`（Current State domain／authority，ADR 0058）：Current JD 保存員工確認或直接編輯的文件內容，
 Current Work Model 保存 AI 可修正的分析。第一版不整合、不雙寫，也不搬遷舊 `job_authoring`／vNext 資料；舊
 `DocumentVersion`／OCS deep JSON／`_pending` 不得恢復為新產品真相。詳細裁決見
-[`ADR 0043`](adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)與
-[`本機 JD 分層編輯與 PostgreSQL 持久化研究`](specs/2026-07-29-local-jd-authoring-and-postgresql-persistence-research.md)。
+[`ADR 0043`](../../../../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)與
+[`本機 JD 分層編輯與 PostgreSQL 持久化研究`](../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-29-local-jd-authoring-and-postgresql-persistence-research.md)。
 
 第一個成品不做 JD 版本歷史、還原或 revision diff。員工 direct edit 直接更新 Current JD；下次 AI 互動前才
 reconcile，UI 不必顯示內部待對齊狀態。完成的回合、編輯與提案決策可恢復，未完成的模型回答可丟棄。
@@ -63,7 +63,7 @@ Evidence provenance、員工決策與關鍵 transaction 的安全網。
 > **本節描述的是 legacy OCS editor,不是現行 `job_analysis`。**
 > `OccupationPicker`／`TaskCuratePanel`／`CellFillerPanel`／`services/knowledge/` 的 header-meta
 > 服務都屬舊編輯器。**不得拿來接新的 `job_analysis` header**——後者走 `JdHeader` 的 authority
-> seam(Journal＋generation＋CAS),見 ADR [0053](adr/0053-jd-header-authority-boundary-and-readiness-scope.md)
+> seam(Journal＋generation＋CAS),見 ADR [0053](../../../../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)
 > 決定 2／3／5。下面的 UX 期望仍可當未來討論素材,但**實作路徑不適用**。
 
 **使用者期望的 UX**(2026-06-26 提出,當下決定先不動、晚點討論):

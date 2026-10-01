@@ -1,6 +1,6 @@
 # Plan — F1 indexer 降級政策顯性化(`meta.partial` + docstring)
 
-- 依據:[ADR 0018](../adr/0018-indexer-dependency-degradation-policy.md) · 研究 [`../specs/2026-07-02-app-composition-health-degradation-research.md`](../specs/2026-07-02-app-composition-health-degradation-research.md)。
+- 依據:[ADR 0018](../adr/0018-indexer-dependency-degradation-policy.md) · 研究 [`../specs/2026-07-02-app-composition-health-degradation-research.md`](../../../../../research/engineering/2026-07-02-app-composition-health-degradation-research.md)。
 - 原則:additive 欄位,幾乎零行為變更;green-before==green-after。
 
 ## Task 3 — enrichment 端點降級加 `meta.partial`

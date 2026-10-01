@@ -3,7 +3,7 @@
 - 日期／最後核對：2026-09-29；狀態：**已定產品效果＋依授權選定的工程設計／未實作驗證**。新增工程細節不是 Owner 逐欄選型，也不再懸為待討論。JD map 的精簡 JSON、按需讀取、最少必要模型輸入、詳細差異用 Markdown，以及既定欄位／UI／關係保持已確認目標。§2 補足最小完整能力組，§6 保留缺口與現況證據，§7 列剩餘 gate；不代表 production 工具已切換或已驗收。
 - 決策者：Product Owner；本稿維護：JD 契約維護者。依[討論規範](../architecture-discussion-standard.md)與[決策流程](../decision-process.md)分開產品決定、工程推薦、實作及驗收；本次為全產品文件整理，不授權 production 修改或切換。
 - 責任範圍：職務顧問 A 對**同一份關聯式 JD 候選**的模型可見讀取、編輯意圖與直接來源。人工編輯、正式保存、原操作回執與 UI 仍由原業務責任承接；Memory／歷史訪談的內容讀取仍由各自來源責任提供。
-- 已確認上位效果：[JD 結構](../product-concept.md#jd-的關聯式結構與逐項編輯已確認目標)、[JD 導覽與讀取 §3.2–3.3](2026-09-26-consultant-context-and-state-design.md#32-jd-導覽的按需定位目標已確認未實作)、[欄位與寫作](2026-09-09-jd-field-and-writing-guide.md)、[共同工具規範](2026-09-27-agent-tool-contract-design-research.md)。本稿不重定這些內容、不把現行 `jd_read`／十個工具冒充新目標。
+- 已確認上位效果：[JD 結構](../product-concept.md#jd-的關聯式結構與逐項編輯已確認目標)、[JD 導覽與讀取 §3.2–3.3](2026-09-26-consultant-context-and-state-design.md#32-jd-導覽的按需定位目標已確認未實作)、[欄位與寫作](../guides/2026-09-09-jd-field-and-writing-guide.md)、[共同工具規範](2026-09-27-agent-tool-contract-design-research.md)。本稿不重定這些內容、不把現行 `jd_read`／十個工具冒充新目標。
 - 本輪問題：怎樣讓 A 在資訊足夠時，以少而清楚的參數讀到相關 JD、修改正確的關聯式項目、選對直接依據，並以最少必要回傳延續分析？
 
 ## 1. 取捨與適用邊界
@@ -203,7 +203,7 @@ rejected: target_stale；本次未修改。
 
 | 發現／反例 | 可核對的基線 | 本次處理與剩餘限制 |
 |---|---|---|
-| 只給 `read_jd(profile)`，A 無法完成基本資料與目的 | [欄位指南 §2.1](2026-09-09-jd-field-and-writing-guide.md#21-基本資料與職務目的jd-r001c01)、[profile 與逐欄來源](2026-09-12-jd-relational-schema-and-write-contract.md#32-jd_profile)；現行 `jd_set_text` 可修改 profile | §2／§4 推薦專用 `revise_jd_profile`，不建新表或 validator。限定四個 JD 欄位；資料表已有姓名不代表這次開放 AI 改員工資料。 |
+| 只給 `read_jd(profile)`，A 無法完成基本資料與目的 | [欄位指南 §2.1](../guides/2026-09-09-jd-field-and-writing-guide.md#21-基本資料與職務目的jd-r001c01)、[profile 與逐欄來源](2026-09-12-jd-relational-schema-and-write-contract.md#32-jd_profile)；現行 `jd_set_text` 可修改 profile | §2／§4 推薦專用 `revise_jd_profile`，不建新表或 validator。限定四個 JD 欄位；資料表已有姓名不代表這次開放 AI 改員工資料。 |
 | 原稿只有明細增刪，未明說改文字、兩組排序與能力引用排序 | [關聯式產品結構](../product-concept.md#jd-的關聯式結構與逐項編輯已確認目標)、[明細及關係](2026-09-12-jd-relational-schema-and-write-contract.md#36-jd_task_detail) | §2.1／§4.1 補覆蓋；成果與要求各自多筆、各自修改排序；關係排序接點仍待實作查驗，不把 position 當模型身分。 |
 | 父任務有來源，不代表其每個成果／要求及 K／S 關係都有依據 | [source link target](2026-09-12-jd-relational-schema-and-write-contract.md#310-jd_source_link)、[Domain 的 `_basis_content`](../../experiments/jd-relational-app/src/jd_relational/domain.py) | §4.1 明列 profile field／item／detail／relation；不新增普通項目的逐欄來源，不將來源全貼父任務。 |
 | 原稿另發 `item_ref`，仍未解釋 map 選擇如何安全成為修改意圖 | [既定 JD `read_ref`](2026-09-26-consultant-context-and-state-design.md#32-jd-導覽的按需定位目標已確認未實作)、[現行完整讀取檢查](../../experiments/jd-relational-app/src/jd_relational/consultant_tools.py) | 依本次指示收斂為同一 JD `read_ref` 選擇；App 另驗權限、內容基準並轉譯。現行 `navigation` ref 仍不可直接進 writer；新接線未驗。Memory 仍只選 `target_title`。 |

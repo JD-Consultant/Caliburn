@@ -126,9 +126,9 @@ Competency-based Job Model**。
 已核對：
 
 - 現行 OCS deep-document authority：[`apps/api/docs/document-of-record.md`](../../apps/api/docs/document-of-record.md)；
-- OCS/JD JSON 欄位：[`docs/ocs-schema.md`](../archive/retired-documents/ocs-schema.md) 與
+- OCS/JD JSON 欄位：[`docs/ocs-schema.md`](../archive/docs-cleanup-2026-10-02.md) 與
   [`packages/ocs-contract`](../../packages/ocs-contract/)；
-- editor 與 knowledge pack：[`docs/design/editor-knowledge-pack.md`](../archive/retired-documents/design/editor-knowledge-pack.md)；
+- editor 與 knowledge pack：[`docs/design/editor-knowledge-pack.md`](../archive/docs-cleanup-2026-10-02.md)；
 - knowledge pack 組裝：[`apps/api/docs/knowledge-pack-assembly.md`](../../apps/api/docs/knowledge-pack-assembly.md)；
 - Qdrant/indexer pipeline：[`apps/ocs-indexer/docs/pipeline.md`](../../apps/ocs-indexer/docs/pipeline.md)；
 - BGE-M3 embedder：[`apps/embedder/README.md`](../../apps/embedder/README.md)；

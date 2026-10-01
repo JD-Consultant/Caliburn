@@ -261,7 +261,7 @@ B2 再基於新的 B1 結果與 v13 理解重整
 /memory/understanding/items/{understanding_id}.md
 ```
 
-案例與工作理解正文使用 Markdown，而不是固定十幾欄的表格。它們須達成[完整工作分析指南](2026-09-09-complete-work-analysis-guide.md)與[資訊取捨研究](2026-09-07-work-case-and-understanding-information-selection.md)的效果，但不把分析面向誤作每筆必填 schema。`manifest.json` 則是 Runtime 產生與驗證的結構資料，不由模型直接編輯，也不是第三層 Memory、摘要或使用者可見歷史。
+案例與工作理解正文使用 Markdown，而不是固定十幾欄的表格。它們須達成[完整工作分析指南](../guides/2026-09-09-complete-work-analysis-guide.md)與[資訊取捨研究](2026-09-07-work-case-and-understanding-information-selection.md)的效果，但不把分析面向誤作每筆必填 schema。`manifest.json` 則是 Runtime 產生與驗證的結構資料，不由模型直接編輯，也不是第三層 Memory、摘要或使用者可見歷史。
 
 第一版可以把未變檔案以相同 bytes 複製進新 Store version；相同內容的 digest 不變，邏輯上仍是同一 artifact。是否做實體去重不是產品效果，也不列為第一切片前置。正常讀取只跟隨 head 指定的 bundle，不掃描舊 version。
 

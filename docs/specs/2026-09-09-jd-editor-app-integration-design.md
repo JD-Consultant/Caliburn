@@ -1,14 +1,14 @@
 # JD App 接線設計候選：文件、操作、保存與人工續編
 
-**2026-09-10 active語意契約v2：**Owner已同意Task成果／要求平行分組、K／S引用及原生JSONB＋同PG保存方向。[語意契約與有限驗證](evidence/2026-09-10-jd-semantic-contract-closure.md)固定新grammar、模型refs／保存IDs及首次建立；本文件active設計已同步v2。v1及F01／F02的實測紀錄保留其舊範圍，不能代稱新增關係已完成runtime驗收。
+**2026-09-10 active語意契約v2：**Owner已同意Task成果／要求平行分組、K／S引用及原生JSONB＋同PG保存方向。[語意契約與有限驗證](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)固定新grammar、模型refs／保存IDs及首次建立；本文件active設計已同步v2。v1及F01／F02的實測紀錄保留其舊範圍，不能代稱新增關係已完成runtime驗收。
 
-前次格式確認及v1無共享引用的診斷見[保存研究](evidence/2026-09-10-jd-semantic-relations-storage-audit.md)；已由v2具體補正，不再等待同一產品決定。尚未完成的原生／DB／DOM／真模型項目仍依六切片逐項驗收。
+前次格式確認及v1無共享引用的診斷見[保存研究](../experiments/legacy-evidence/2026-09-10-jd-semantic-relations-storage-audit.md)；已由v2具體補正，不再等待同一產品決定。尚未完成的原生／DB／DOM／真模型項目仍依六切片逐項驗收。
 
-**核心設計交接完成（2026-09-10）：**正式 profile、[工具及 schema](2026-09-10-jd-editor-contract-schema.md)、保存／單畫面／既有顧問接點與[六切片計畫](../plans/2026-09-10-jd-editor-core-implementation.md)完成獨立審查；人工失敗候選保留及首次 selection capture 兩項 P2 已關閉。schema 最終 85 defs 的[限定離線核對](evidence/jd-contract-schema/schema-validation.md)通過；provider 原格式接法只驗到本地 SDK 序列化。這是核心設計／隔離施工交接，不是產品實作或 production G6 通過。下方較早待定／待收斂紀錄依本條及 register 讀取；真人交付 PARKED，ADR0073 仍 Proposed。
+**核心設計交接完成（2026-09-10）：**正式 profile、[工具及 schema](2026-09-10-jd-editor-contract-schema.md)、保存／單畫面／既有顧問接點與[六切片計畫](../plans/2026-09-10-jd-editor-core-implementation.md)完成獨立審查；人工失敗候選保留及首次 selection capture 兩項 P2 已關閉。schema 最終 85 defs 的[限定離線核對](../experiments/legacy-evidence/jd-contract-schema/schema-validation.md)通過；provider 原格式接法只驗到本地 SDK 序列化。這是核心設計／隔離施工交接，不是產品實作或 production G6 通過。下方較早待定／待收斂紀錄依本條及 register 讀取；真人交付 PARKED，ADR0073 仍 Proposed。
 
 **Owner 最新裁決（2026-09-10，G3／WORKING）：**同意 §9.1 核心接線推薦，並明示「先不用做真人交付核對」。前景 AI 暫停手改及同 PG 唯一 JD 保存已是後續設計依據；真人交付／核對與 HTML／DOCX 問答交付包延後，不列本版驗收／施工。以下交付內容保留為 PARKED 設計，不能因仍有正文就接入產品。Memory／原文回查保持既有功能，正式契約及 ADR 仍需收尾，未修改 production。
 
-**2026-09-10 本單位結果：**[F02 官方插件四組實證](evidence/2026-09-10-jd-official-profile-probe.md)第二輪 4／4、15 項斷言通過；首輪 1／3 的子程序輸出缺檔失敗保留。這補上官方清單／表格及原生格式操作的 JSON／新程序證據，未驗 DOM／IME、API 或真模型。工具接口的三項缺口已收斂，[匯出附件](2026-09-10-jd-export-and-consultant-handoff.md)已齊；[§9.1 整體評審包](#91-整體接線評審包)集中呈現人工暫停、保存與交付取捨。以下較早「尚未新增實驗」等語句是當時紀錄，不取代本條；停止追加微型探針，下一步依 register。
+**2026-09-10 本單位結果：**[F02 官方插件四組實證](../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md)第二輪 4／4、15 項斷言通過；首輪 1／3 的子程序輸出缺檔失敗保留。這補上官方清單／表格及原生格式操作的 JSON／新程序證據，未驗 DOM／IME、API 或真模型。工具接口的三項缺口已收斂，[匯出附件](2026-09-10-jd-export-and-consultant-handoff.md)已齊；[§9.1 整體評審包](#91-整體接線評審包)集中呈現人工暫停、保存與交付取捨。以下較早「尚未新增實驗」等語句是當時紀錄，不取代本條；停止追加微型探針，下一步依 register。
 
 **2026-09-10 收斂：**[§8.1](#81-同一工作畫面owner-釐清)記錄同一畫面、唯一可編稿；[Proposed ADR 0073](../adr/0073-plate-jd-app-working-document-and-revision-authority.md)具體提出唯一 JD 保存 owner 及舊 JD writers 的取代範圍。[§5.4](#54-保存資料的具體約束)與[§7.1](#71-寫入交接與取消的明確接點)補齊有限資料與實際 runtime 接點。[正式 profile 附件](2026-09-10-jd-plate-document-profile.md)定義官方插件／grammar／renderer，[工具附件](2026-09-10-jd-app-tool-contract.md)承接讀寫／來源／重播語意；兩附件的具体範圍優先於本文較早的候選簡表。這是設計收斂，未執行 migration 或新增實驗；尚未稱 S5／production 完成。
 
@@ -18,28 +18,28 @@
 
 ## 1. 推薦組合與證據效力
 
-核心的機器可讀邊界見[JSON Schema 與消費者附件](2026-09-10-jd-editor-contract-schema.md)，交接見[六切片施工計畫](../plans/2026-09-10-jd-editor-core-implementation.md)。[官方契約複核 §2.13](evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)區分文件驗證、provider 參數、工具結果與交易保證；本機 schema 驗證不能取代真實 provider binding 驗收。
+核心的機器可讀邊界見[JSON Schema 與消費者附件](2026-09-10-jd-editor-contract-schema.md)，交接見[六切片施工計畫](../plans/2026-09-10-jd-editor-core-implementation.md)。[官方契約複核 §2.13](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#213-契約定稿前的官方複核參數結果版本與重試)區分文件驗證、provider 參數、工具結果與交易保證；本機 schema 驗證不能取代真實 provider binding 驗收。
 
-2026-09-10 [全流程責任與證據稽核](2026-09-10-jd-responsibility-and-evidence-audit.md)引出的補正已落入工具 §4.3／§6、同一 SSOT、[模型參數附件](evidence/2026-09-10-jd-model-input-contract-closure.md)、[錯誤策略](evidence/2026-09-10-jd-error-recovery-contract-closure.md)及[保存約束](evidence/2026-09-10-jd-storage-contract-closure.md)。模型只填一次來源及單一 span 意圖，App 承擔推導／驗證與恢復；設計閉合與尚未實作的整合能力分開，不重開已同意的產品方向。
+2026-09-10 [全流程責任與證據稽核](2026-09-10-jd-responsibility-and-evidence-audit.md)引出的補正已落入工具 §4.3／§6、同一 SSOT、[模型參數附件](../experiments/legacy-evidence/2026-09-10-jd-model-input-contract-closure.md)、[錯誤策略](../experiments/legacy-evidence/2026-09-10-jd-error-recovery-contract-closure.md)及[保存約束](../experiments/legacy-evidence/2026-09-10-jd-storage-contract-closure.md)。模型只填一次來源及單一 span 意圖，App 承擔推導／驗證與恢復；設計閉合與尚未實作的整合能力分開，不重開已同意的產品方向。
 
 推薦 **Plate 原生結構文件＋既有 Python 顧問工具＋本機無持久副作用的 Node 編輯運算＋同一 PostgreSQL 內唯一 JD 文件交易**。人與 AI 使用同一份乾淨工作稿；保存後的 working revision 是後續編輯、閱讀及比較的權威基底。每次實際改動與其前後版本固定綁定，後續更正產生新版，不改寫較早紀錄；保存不等於員工批准或專業品質通過。原文、理解與 Memory 流程沿既有成果，JD 編輯不兼任 Memory。文件保存採 §5 的 B／WORKING，A 作有反證時的替代；**保存路線 B 與審閱流程 B 是不同決策，目前兩者均已取得方向同意**，正式 schema 與 production authority 依後續 gate 完成。
 
-這不是 OpenAI 或 Anthropic 公開了相同內部架構。兩家的共同可觀察基礎是：工具有明確說明、App 提供可讀狀態、模型提出操作、App 執行並回傳真實結果，失敗後可重讀／修正；不同定位介面仍並存。此处的結構節點及本機程序是本案映射。[OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling)、[OpenAI apply patch](https://developers.openai.com/api/docs/guides/tools-apply-patch)、[Anthropic text editor](https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool)。Codex／ChatGPT 與 Claude 的現行產品能力、模式與沿革已分列於[官方證據 §2.6–2.9](evidence/2026-09-09-jd-app-tool-and-review-contracts.md)，不能從產品介面推定未公開的保存或拒絕演算法。
+這不是 OpenAI 或 Anthropic 公開了相同內部架構。兩家的共同可觀察基礎是：工具有明確說明、App 提供可讀狀態、模型提出操作、App 執行並回傳真實結果，失敗後可重讀／修正；不同定位介面仍並存。此处的結構節點及本機程序是本案映射。[OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling)、[OpenAI apply patch](https://developers.openai.com/api/docs/guides/tools-apply-patch)、[Anthropic text editor](https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool)。Codex／ChatGPT 與 Claude 的現行產品能力、模式與沿革已分列於[官方證據 §2.6–2.9](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md)，不能從產品介面推定未公開的保存或拒絕演算法。
 
 | 已有證據 | 能支持 | 不能代替 |
 |---|---|---|
-| [原生 probe](evidence/2026-09-09-jd-native-editor-probe.md) | 固定結構、原生操作、JSON 保存重開及兩個 diff 反例 | DB 交易、模型定位、所有 schema／貼上／人工輸入 |
-| [完整 r2 呈現](evidence/2026-09-09-jd-native-editor-ui-probe.md) | 完整正文、真表格／子清單、同 ID 刪增呈現、保存材料重開 | 所有業務 metadata 已可讀、正式 editor 或真人試用 |
-| [原生 history／同步](evidence/2026-09-09-jd-native-history-and-sync-probe.md) | 分批接點、固定 ID 配置及危險反例的實際內容結果 | DOM／IME、任意 mixed batch、正式 profile 或 DB 保存 |
-| [P01 固定保存](evidence/2026-09-09-jd-native-save-probe.md) | Python→Node、完整 r2／新程序重開、過期與錯基底、交易回滾、commit 後 writer 退出／回執查回的六組實證 | 同步並發、實際 Agent 身分綁定／來源查證、正式人編或完整工作稿流程 |
-| [F02 官方插件](evidence/2026-09-10-jd-official-profile-probe.md) | 完整 r2 的官方清單／表格組合、插字及原生增刪列、Task 移動／unwrap、canonical JSON 重開；固定格式 operations 的普通 JSON 及新程序 apply | 全 grammar、DOM／IME、剪貼簿、所有表格操作、API／來源 owner、任意歷史比較或全部 operations |
-| [既有顧問接點](evidence/2026-09-09-jd-app-tool-and-review-contracts.md#210-既有-python-顧問與-javascript-原生編輯器接線) | LangChain tools／ToolRuntime、錯誤及已研究的來源／操作對帳原則 | JD 寫入已接妥或 CT49–51 已驗 JD 品質 |
+| [原生 probe](../experiments/legacy-evidence/2026-09-09-jd-native-editor-probe.md) | 固定結構、原生操作、JSON 保存重開及兩個 diff 反例 | DB 交易、模型定位、所有 schema／貼上／人工輸入 |
+| [完整 r2 呈現](../experiments/legacy-evidence/2026-09-09-jd-native-editor-ui-probe.md) | 完整正文、真表格／子清單、同 ID 刪增呈現、保存材料重開 | 所有業務 metadata 已可讀、正式 editor 或真人試用 |
+| [原生 history／同步](../experiments/legacy-evidence/2026-09-09-jd-native-history-and-sync-probe.md) | 分批接點、固定 ID 配置及危險反例的實際內容結果 | DOM／IME、任意 mixed batch、正式 profile 或 DB 保存 |
+| [P01 固定保存](../experiments/legacy-evidence/2026-09-09-jd-native-save-probe.md) | Python→Node、完整 r2／新程序重開、過期與錯基底、交易回滾、commit 後 writer 退出／回執查回的六組實證 | 同步並發、實際 Agent 身分綁定／來源查證、正式人編或完整工作稿流程 |
+| [F02 官方插件](../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md) | 完整 r2 的官方清單／表格組合、插字及原生增刪列、Task 移動／unwrap、canonical JSON 重開；固定格式 operations 的普通 JSON 及新程序 apply | 全 grammar、DOM／IME、剪貼簿、所有表格操作、API／來源 owner、任意歷史比較或全部 operations |
+| [既有顧問接點](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#210-既有-python-顧問與-javascript-原生編輯器接線) | LangChain tools／ToolRuntime、錯誤及已研究的來源／操作對帳原則 | JD 寫入已接妥或 CT49–51 已驗 JD 品質 |
 
-實證固定 `platejs@53.3.11`／`@platejs/diff@53.0.0`，授權依[逐套件證據](evidence/2026-09-09-jd-oss-plate.md)。新增必要套件須逐一核對版本／授權，不以 monorepo release 號推定 package 版本。以下型別與欄名是評審用具體候選，正式跨語言契約依 [contract strategy](../contract-strategy.md)由單一 JSON Schema 生成，不能各端手寫一份。
+實證固定 `platejs@53.3.11`／`@platejs/diff@53.0.0`，授權依[逐套件證據](../experiments/legacy-evidence/2026-09-09-jd-oss-plate.md)。新增必要套件須逐一核對版本／授權，不以 monorepo release 號推定 package 版本。以下型別與欄名是評審用具體候選，正式跨語言契約依 [contract strategy](../contract-strategy.md)由單一 JSON Schema 生成，不能各端手寫一份。
 
 ### 1.1 採 Plate 後，哪些工作仍需本專案完成
 
-Owner 已同意 Plate 文件底座方向；這表示不從零重寫文字／結構編輯器，不表示 JD App 不需開發。分工依[官方與本地核對](evidence/2026-09-09-jd-app-tool-and-review-contracts.md#211-plate-與-deep-agents-的分工不用從零造編輯器app-接線仍必要)：
+Owner 已同意 Plate 文件底座方向；這表示不從零重寫文字／結構編輯器，不表示 JD App 不需開發。分工依[官方與本地核對](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md#211-plate-與-deep-agents-的分工不用從零造編輯器app-接線仍必要)：
 
 | 責任 | 由誰承接 |
 |---|---|
@@ -57,7 +57,7 @@ Deep Agents 在此是顧問側的可用元件，不是 Plate 替代品；其通�
 
 主路線保存一份 **乾淨 Plate working value**，外附 `format_version` 及 `engine_profile`；成功提交後，它是同文件當前 authoritative working revision。這裡的 authority 指接續編輯基底，沒有專業核准效力，也不再另建 accepted projection。`engine_profile` 指固定套件、base plugins、NodeId 與 normalization 配置的組合；不是要求模型填版本。比較用 diff 刪除節點、游標、選取、busy、已看過標記及整個 React editor 不作正文保存。前後版本及真實 actual_changes 供唯讀查閱，比較結果不回灌正文。
 
-**歷史證據保留：**[R01／R01-F](evidence/2026-09-09-jd-native-pending-review-comparison.md)記錄原生 pending 的個別結算、續改及順序限制；[SuperJSON 2.2.6 四項實證](evidence/2026-09-09-jd-native-pending-codec-probe.md)支持完整 json＋meta envelope 保留已測 undefined，原 raw JSON 失敗仍成立。這些 source／codec 材料保留，不改判成框架修復，也不再作審閱 B 的必要接線或繼續分組研究的 gate。主路線不以先產生 pending、剝除 metadata 或自動 accept 模擬工作稿保存。
+**歷史證據保留：**[R01／R01-F](../experiments/legacy-evidence/2026-09-09-jd-native-pending-review-comparison.md)記錄原生 pending 的個別結算、續改及順序限制；[SuperJSON 2.2.6 四項實證](../experiments/legacy-evidence/2026-09-09-jd-native-pending-codec-probe.md)支持完整 json＋meta envelope 保留已測 undefined，原 raw JSON 失敗仍成立。這些 source／codec 材料保留，不改判成框架修復，也不再作審閱 B 的必要接線或繼續分組研究的 gate。主路線不以先產生 pending、剝除 metadata 或自動 accept 模擬工作稿保存。
 
 建議少量 JD 容器承載可辨識範圍，內部仍用原生段落、標題、清單、子清單、表格與文字格式。具體候選為 `jd_section`、`jd_duty`、`jd_task`；專業總覽可在 section 內用原生表格列／清單項，不為每個知識或條件另造必填關係物件。section 的用途可辨識，但數量、名稱、顺序及哪些區塊存在不照 r2 固定。
 
@@ -68,7 +68,7 @@ Deep Agents 在此是顧問側的可用元件，不是 Plate 替代品；其通�
 - Text leaf 僅支持 `text` 與明列的文字格式。數字、真假、條件、來源及核准狀態不掛在 leaf；數字可以完整存在正文，並非禁止 0 或 false 所代表的工作事實。
 - Element metadata 只放確有機器用途的身分、種類及指向既有 owner 的來源引用。同一條件不另存一份隱藏 props 再與正文雙向同步。
 
-這些是 C01 的「可辨識結構＋完整敘述」映射，不是國際統一 JD schema。[內容關係](2026-09-09-jd-document-relationships-working-research.md)、[欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md)。[F01](evidence/2026-09-09-jd-native-content-profile-probe.md)已觀察三種普通容器、normalization 及特定 headless 操作；仍未驗完整 parent／child grammar、任務語意拆分身分或 DOM 編輯。不能把較早普通節點 probe 或 F01 局部正證擴成全套完成。
+這些是 C01 的「可辨識結構＋完整敘述」映射，不是國際統一 JD schema。[內容關係](2026-09-09-jd-document-relationships-working-research.md)、[欄位與寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md)。[F01](../experiments/legacy-evidence/2026-09-09-jd-native-content-profile-probe.md)已觀察三種普通容器、normalization 及特定 headless 操作；仍未驗完整 parent／child grammar、任務語意拆分身分或 DOM 編輯。不能把較早普通節點 probe 或 F01 局部正證擴成全套完成。
 
 ### 2.2 身分、位置、來源與必要呈現
 
@@ -92,7 +92,7 @@ Deep Agents 在此是顧問側的可用元件，不是 Plate 替代品；其通�
 
 ### 3.1 不每輪改稿的顧問接點
 
-沿[寫作時機](2026-09-09-jd-field-and-writing-guide.md#何時開始寫何時修正)：對某項工作已有足夠理解與依據才寫；實質補充／更正才改。新案例、例證或 Memory 技術性更新本身不是改稿事件。不新增完整度評分 Agent、每輪固定工具呼叫或「填滿所有欄位才寫」的 gate。
+沿[寫作時機](../guides/2026-09-09-jd-field-and-writing-guide.md#何時開始寫何時修正)：對某項工作已有足夠理解與依據才寫；實質補充／更正才改。新案例、例證或 Memory 技術性更新本身不是改稿事件。不新增完整度評分 Agent、每輪固定工具呼叫或「填滿所有欄位才寫」的 gate。
 
 主顧問先使用既有 current understanding／詳記／必要原文；需要動 JD 時才讀目前工作稿及受影響範圍。範圍不足就擴讀，找不到不能推定員工沒說。工具結果回到同一 Agent loop。整份收尾做工作→JD、JD→來源雙向核對，不能只因每次格式驗證通過就稱專業內容滿分。
 
@@ -146,7 +146,7 @@ App 另有按 operation 身分讀狀態的端點／port，供重開與對帳；�
 
 | 指引必須承接的內容 | 既有權威與對應效果 |
 |---|---|
-| 寫什麼與深度 | [欄位指南 §1–§5](2026-09-09-jd-field-and-writing-guide.md)及[完整 r2／核對](2026-09-09-jd-sample-basis-and-review.md)：完整工作敘述、要求／產出、專業用途與必要範圍；不只保留短標題，不從樣稿複製員工未提供的工作 |
+| 寫什麼與深度 | [欄位指南 §1–§5](../guides/2026-09-09-jd-field-and-writing-guide.md)及[完整 r2／核對](../guides/2026-09-09-jd-sample-basis-and-review.md)：完整工作敘述、要求／產出、專業用途與必要範圍；不只保留短標題，不從樣稿複製員工未提供的工作 |
 | 何時動稿 | 同指南「何時開始寫、何時修正」與本文 §3.1：某項理解足夠才寫，有實質補充／更正才改；零碎訪談、單一案例或 Memory 技術更新不必觸發 JD |
 | 哪些先保留／追問 | 案例≠永久任務、未知不補造、本人≠團隊全部工作；更正只修受影響範圍，既有獨立工作與必要條件保留。只有真實脈絡不足才追問，不要求補齊固定欄位 |
 | 人改後如何續編 | 先讀已保存目前稿，不以舊 Memory 自動蓋回；辨認可查的更正與措辭差異，必要時回原文。人改／來源存在不自动等於專業核准或重新核實 |
@@ -242,9 +242,9 @@ A 的存取只用正式 graph／Saver API，不直接 INSERT 或修補框架內�
 
 ### 5.4 保存資料的具體約束
 
-2026-09-10 Owner同意保存方向，active格式沿[語意契約v2](evidence/2026-09-10-jd-semantic-contract-closure.md)：Task成果／要求兩組、K／S完整item及Task單向IDs同revision保存。App建立版本、映射issued refs及推導反向對應，完整性由整批候選驗證。新版固定profile為2／`jd-plate-clean-v2`，不新增表、不暗中搬移v1。首次先建立內容、成功後read新base再連結，不能宣稱跨兩次保存全成全敗。
+2026-09-10 Owner同意保存方向，active格式沿[語意契約v2](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)：Task成果／要求兩組、K／S完整item及Task單向IDs同revision保存。App建立版本、映射issued refs及推導反向對應，完整性由整批候選驗證。新版固定profile為2／`jd-plate-clean-v2`，不新增表、不暗中搬移v1。首次先建立內容、成功後read新base再連結，不能宣稱跨兩次保存全成全敗。
 
-三表、完整JSONB快照及保留粒度是本案需求的具體映射；官方可支持的基底／版本／操作結果原則、近期不同保存實例與不可擴張的結論見[共識效力核對§7](evidence/2026-09-10-jd-semantic-relations-storage-audit.md#7-json關聯與三表現行公開證據能支持到哪裡)，不能稱為大廠統一資料表規範。
+三表、完整JSONB快照及保留粒度是本案需求的具體映射；官方可支持的基底／版本／操作結果原則、近期不同保存實例與不可擴張的結論見[共識效力核對§7](../experiments/legacy-evidence/2026-09-10-jd-semantic-relations-storage-audit.md#7-json關聯與三表現行公開證據能支持到哪裡)，不能稱為大廠統一資料表規範。
 
 2026-09-10 工程推薦，供 ADR 0073／正式 schema 審查；只採 §5.2 B，不並建 A。保存完整快照，operation 是去重與结果證據，不是需要重播的文件事件庫。
 
@@ -258,13 +258,13 @@ A 的存取只用正式 graph／Saver API，不直接 INSERT 或修補框架內�
 
 **提交順序：**先查既有同鍵結果；需要運算時在交易外計算。提交交易取得該文件 head row lock，再查一次同鍵結果；若已有結果，先比 digest，匹配則返回原結果、不匹配則 operation_conflict。仍無結果才檢查 head 與 base，依结果同交易寫 revision／head／receipt 或不改正文的 terminal receipt。不能在取得 lock 前判一次 head 就發布。不同 operation 用同 base 競爭，只允許一個更新 head，另一個返回 stale。這是 PostgreSQL 官方鎖與條件重檢的本案映射，P01 只有交錯連線正證，真正同步競爭列入整合驗收。[PostgreSQL 16](https://www.postgresql.org/docs/16/transaction-iso.html)（2026-09-10 查閱）。
 
-**DB02–04 已固定的約束：**所有 FK 即時，operation 單向引用 result revision；committed 的 result 有部分唯一限制，no_change 的 result 可以多筆引用同一 base。新版本實際順序為 revision→receipt→head→commit；不插暫時假回執，也沒有雙向 FK。初版及每父版最多一後繼以限定索引補強，恰有 head／producer 由同一建立／發布交易保證。完整欄位、null／CHECK／mapper 的責任只在[保存契約 §2–4](evidence/2026-09-10-jd-storage-contract-closure.md)維護；JSON Schema 不代替同文件 FK 或跨列不變量。
+**DB02–04 已固定的約束：**所有 FK 即時，operation 單向引用 result revision；committed 的 result 有部分唯一限制，no_change 的 result 可以多筆引用同一 base。新版本實際順序為 revision→receipt→head→commit；不插暫時假回執，也沒有雙向 FK。初版及每父版最多一後繼以限定索引補強，恰有 head／producer 由同一建立／發布交易保證。完整欄位、null／CHECK／mapper 的責任只在[保存契約 §2–4](../experiments/legacy-evidence/2026-09-10-jd-storage-contract-closure.md)維護；JSON Schema 不代替同文件 FK 或跨列不變量。
 
 no_change 以鎖內已核基底與 canonical candidate 的 PostgreSQL JSONB `=` 作最後判據，保留 array 次序，不用 containment／摘要。只寫回執、不造版，actual_changes 的 before／after 均為 base、affected IDs 為空、native operations 為 null。Node.changed 是診斷，不是保存權威。confirmed terminal 只包含成功／no_change 或六種已綁定確定失敗；busy／unknown／conflict projection 不能覆寫原回執。
 
 成功內容版的真實差異由其完整前後快照決定；AI 的 native operations 可幫助同基底 browser 同步與格式說明。人工送完整新 value 時不偽造「逐鍵原生操作」；保留 exact before／after 及 origin，伺服器驗證內容／結構與來源。AI 候選中未發布的 operations 不成為已保存差異。比較 projection 可重算，不另保存第三份可寫 value。
 
-本隔離接合依 §4.1 的實際 catalog 檢查文件存在與 scope；它沒有 active／deleted 欄位或整份文件刪除 API，不將 production 的刪除生命週期列成核心先決條件。整份 catalog 文件的刪除／來源生命週期，留在 production adoption 時對照其正式 authority；不自行新增保留天數、清理或硬刪任務。JD 內職責／任務刪除仍依原有編輯契約。fresh setup／同 scope 驗收由施工計畫負責，本設計不授權清 DB。鍵、版本產生與引用及初版交易的問題沿[資料關係稽核](evidence/2026-09-10-jd-storage-relations-audit.md)保留；單向FK與具體約束已於[保存補正](evidence/2026-09-10-jd-storage-contract-closure.md)固定，Task 2 實作驗收。
+本隔離接合依 §4.1 的實際 catalog 檢查文件存在與 scope；它沒有 active／deleted 欄位或整份文件刪除 API，不將 production 的刪除生命週期列成核心先決條件。整份 catalog 文件的刪除／來源生命週期，留在 production adoption 時對照其正式 authority；不自行新增保留天數、清理或硬刪任務。JD 內職責／任務刪除仍依原有編輯契約。fresh setup／同 scope 驗收由施工計畫負責，本設計不授權清 DB。鍵、版本產生與引用及初版交易的問題沿[資料關係稽核](../experiments/legacy-evidence/2026-09-10-jd-storage-relations-audit.md)保留；單向FK與具體約束已於[保存補正](../experiments/legacy-evidence/2026-09-10-jd-storage-contract-closure.md)固定，Task 2 實作驗收。
 
 ### 5.5 原生操作與比較投影的保存分界
 
@@ -278,7 +278,7 @@ no_change 以鎖內已核基底與 canonical candidate 的 PostgreSQL JSONB `=` 
 
 **官方及固定 source：**[Slate normalization](https://docs.slatejs.org/concepts/11-normalizing)第6／7條要求 nodes 可 JSON 序列化，node 值不使用 `null`；操作以特殊表示處理屬性不存在。既有 lock 的 `slate@0.126.2/dist/index.es.js` 中，`setNodes`（5037–5140）將已移除欄位省略於 `newProperties`；`unsetNodes`（5269起）透過 `setNodes` 完成；apply 的 `set_node`（2174–2211）會刪除 old properties 中新集合已沒有的 key。這與 `computeDiff` 的 update metadata 不同。來源是固定 native lock 可重現的官方套件，不是本案新演算法；查閱 2026-09-10。
 
-**設計選擇與實證界線：**採原生 JSON operation 表示，不新增自製 codec。[F02-D](evidence/2026-09-10-jd-official-profile-probe.md)已實測固定 add underline／remove bold，原生 operations 無 own undefined，普通 JSON 檔案深相等；另一 Node PID 的同基底 fresh editor apply 後整份 value 深相等。這只證該四個原生操作，未證所有變種或 DB／Web 接線，也沒有修好 computeDiff 反例。若插件實際產生不受該表示支持的內容，先保留反例再檢查官方接法；不能直接 `JSON.stringify` 吞欄位、復用 pending codec 當全解或改原操作讓測試通過。先前 native 13／3、history H09 與 pending codec 結果各自保留。
+**設計選擇與實證界線：**採原生 JSON operation 表示，不新增自製 codec。[F02-D](../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md)已實測固定 add underline／remove bold，原生 operations 無 own undefined，普通 JSON 檔案深相等；另一 Node PID 的同基底 fresh editor apply 後整份 value 深相等。這只證該四個原生操作，未證所有變種或 DB／Web 接線，也沒有修好 computeDiff 反例。若插件實際產生不受該表示支持的內容，先保留反例再檢查官方接法；不能直接 `JSON.stringify` 吞欄位、復用 pending codec 當全解或改原操作讓測試通過。先前 native 13／3、history H09 與 pending codec 結果各自保留。
 
 人工保存只有 before／after snapshot 也必須能查真正內容及有限 profile 屬性前後；不能因沒有逐鍵操作就隱藏更改。原生文字差異高亮是便利呈現，完整前後內容與所支持的格式／屬性可读才是驗收要求。比較投影永遠不自動更新 current head。
 
@@ -305,7 +305,7 @@ no_change 以鎖內已核基底與 canonical candidate 的 PostgreSQL JSONB `=` 
 
 同 operation 身分搭配不同 payload 是 `operation_conflict`：保留原回執、拒絕新 payload，不作 upsert 覆寫。確定過期／參數錯誤後若重新讀取並重新規劃，屬新的修改意圖，由 runtime 發配新 operation；網路重送、程序恢復與查結果則沿用原 operation，模型不決定這兩者。失敗候選裡捕捉的部分原生 operations 只能作診斷，不放进表示「已發布變更」的 `actual_changes`。
 
-確定文件未變、但失敗回執尚未保存時，返回已知原因與「回執未確認」，不把文件效果改報未知；runtime 先處理原 operation 閉合。v1 每個明示 Node／SQL／必要失敗回執／lookup 階段一次 attempt、零自動重播，依[ER03](evidence/2026-09-10-jd-error-recovery-contract-closure.md)停止並提供恢復入口。已持久記錄的終局失敗保持原結果；若其後員工重新提交或模型依允許動作重新規劃，才是核對最新基底後的新意圖，由 App 配新 operation。不能由 runtime 自動換新鍵繞過失敗，也不沿同鍵把已終局失敗改成成功。
+確定文件未變、但失敗回執尚未保存時，返回已知原因與「回執未確認」，不把文件效果改報未知；runtime 先處理原 operation 閉合。v1 每個明示 Node／SQL／必要失敗回執／lookup 階段一次 attempt、零自動重播，依[ER03](../experiments/legacy-evidence/2026-09-10-jd-error-recovery-contract-closure.md)停止並提供恢復入口。已持久記錄的終局失敗保持原結果；若其後員工重新提交或模型依允許動作重新規劃，才是核對最新基底後的新意圖，由 App 配新 operation。不能由 runtime 自動換新鍵繞過失敗，也不沿同鍵把已終局失敗改成成功。
 
 可修參數／過期目標走既有 tool error → 同模型修正；超時、取消、重複無效參數與不明寫入結果走既有有界停止／對帳條件，不新增修補 Agent。不對每個回合另作一次「必定用工具」攔截。
 
@@ -315,7 +315,7 @@ no_change 以鎖內已核基底與 canonical candidate 的 PostgreSQL JSONB `=` 
 
 這是可討論的 UX 代價，不是大廠唯一共識。好處是避免員工尚未保存的輸入被 AI 新稿覆盖；單靠 DB revision 檢查看不見 browser buffer。若要 AI 運行中也可手改，必須另驗 dirty buffer 保留、衝突呈現及重新規劃；不能把多 writer 合併藏在「採用 Plate」裡。
 
-正常 AI 更新可在**相同且乾淨的已保存基底**上，用原生 operations 套入既有 browser editor，形成一批可 undo 的改動。新增[原生 history 實證](evidence/2026-09-09-jd-native-history-and-sync-probe.md)已確認：`withNewBatch` 本身不能阻止後續相鄰人編合批；搭配 `setSplittingOnce(true)` 的固定情境分開成功。默认 NodeId 的 redo 会改 split 後項 ID；明設 `reuseId:true`、`initialValueIds:'always'` 的固定 split／異生成序列對照通過，不等於任意 mixed batch 或缺失初始 ID 已驗。正式 browser profile 仍須按這些條件驗證。不能把 `setValue` 當只更新畫面而不影響 history，也不能以 `withoutSaving` 隱藏 AI 變更卻沿用已失效的人編 undo；兩者風險已有實際反例。
+正常 AI 更新可在**相同且乾淨的已保存基底**上，用原生 operations 套入既有 browser editor，形成一批可 undo 的改動。新增[原生 history 實證](../experiments/legacy-evidence/2026-09-09-jd-native-history-and-sync-probe.md)已確認：`withNewBatch` 本身不能阻止後續相鄰人編合批；搭配 `setSplittingOnce(true)` 的固定情境分開成功。默认 NodeId 的 redo 会改 split 後項 ID；明設 `reuseId:true`、`initialValueIds:'always'` 的固定 split／異生成序列對照通過，不等於任意 mixed batch 或缺失初始 ID 已驗。正式 browser profile 仍須按這些條件驗證。不能把 `setValue` 當只更新畫面而不影響 history，也不能以 `withoutSaving` 隱藏 AI 變更卻沿用已失效的人編 undo；兩者風險已有實際反例。
 
 重開以保存的 clean value 初始化，原生 session undo 不承諾跨重開延續。收到的 revision 與本地基底不一致，或原生套入出錯時，先保留本地未保存內容並停止套入；在已證明沒有 dirty buffer 的候選單 writer 流程，才可重載 authoritative clean value、清楚重設 session history。這是可恢復的整體讀回，不是選擇性 rollback 引擎。
 
@@ -428,7 +428,7 @@ G3 核心取捨已固定，接續完成跨語言 schema 與施工切片，對整
 
 每單位先明列固定 profile／操作與失敗注入，保存實際 before／after、結果與界線。固定測試只證明文件能力；真模型付費驗收另列短情境、長訪談及未用於調整的新職位、資料與預算，沿既有 JD 方法評估。不得以虛構 r2 或 Memory CT49–51 當此驗收。
 
-**現行內容證據與歷史審閱證據（2026-09-09）：**[F01](evidence/2026-09-09-jd-native-content-profile-probe.md)六組最終 5／1，原 normalization 空 leaf 差異保留，首輪測試 aliasing 修正另列；正式 grammar 與員工可讀仍須在工作稿主路線核對。[R01／R01-F 待審比較](evidence/2026-09-09-jd-native-pending-review-comparison.md)的 Plate 首次 2／2、已知成員多 ID 順序結果，以及 PM A／B 正證、C 格式／AttrStep 缺口，全部保留為歷史；[codec 四項通過](evidence/2026-09-09-jd-native-pending-codec-probe.md)亦不改原 raw JSON 失敗。審閱 B 已選，停止將 pending 分組／格式結算或 codec 列為正式必要驗證，不為它們追加 probe。實際 diff 的兩個反例與必要呈現驗收仍保留，不能因不再有 pending 就宣稱全部改動已可見。
+**現行內容證據與歷史審閱證據（2026-09-09）：**[F01](../experiments/legacy-evidence/2026-09-09-jd-native-content-profile-probe.md)六組最終 5／1，原 normalization 空 leaf 差異保留，首輪測試 aliasing 修正另列；正式 grammar 與員工可讀仍須在工作稿主路線核對。[R01／R01-F 待審比較](../experiments/legacy-evidence/2026-09-09-jd-native-pending-review-comparison.md)的 Plate 首次 2／2、已知成員多 ID 順序結果，以及 PM A／B 正證、C 格式／AttrStep 缺口，全部保留為歷史；[codec 四項通過](../experiments/legacy-evidence/2026-09-09-jd-native-pending-codec-probe.md)亦不改原 raw JSON 失敗。審閱 B 已選，停止將 pending 分組／格式結算或 codec 列為正式必要驗證，不為它們追加 probe。實際 diff 的兩個反例與必要呈現驗收仍保留，不能因不再有 pending 就宣稱全部改動已可見。
 
 ### P01 固定驗證範圍（歷史執行前紀錄）
 
@@ -440,7 +440,7 @@ G3 核心取捨已固定，接續完成跨語言 schema 與施工切片，對整
 - 判準：逐案記前後內容／雜湊、revision／operation 數及真實结果。注入點必須在對應動作發生之後，不能只 mock 一個錯誤字串。資料庫不可讀、程序超時或腳本錯誤不得算通過；發現問題先保存反例再定點修正 probe 接線。
 - 停止：若需改 Memory、查改框架私有保存表、自造通用差異／回退引擎或實作尚未同意的審閱政策，停止本接法並回報。正證只供 B 定案，不把此研究腳本接入 production。
 
-**P01 執行結果（2026-09-09）：**[保存實證與封存](evidence/2026-09-09-jd-native-save-probe.md)第二輪六組固定情境通過，含完整 r2／新程序重開、去重、錯基底、部分失敗零發布、SQL 回滾、commit 後退出再對帳及交錯 CAS。首輪不足及原碼保留。只新增隔離 DB，未改 Memory／production 或使用付費模型；未證同步並發、Agent durable binding 或正式人工接線。乾淨值保存正證可支援目前工作稿路線的有限保存候選，不等於整套 B 流程或 production owner 已驗收。
+**P01 執行結果（2026-09-09）：**[保存實證與封存](../experiments/legacy-evidence/2026-09-09-jd-native-save-probe.md)第二輪六組固定情境通過，含完整 r2／新程序重開、去重、錯基底、部分失敗零發布、SQL 回滾、commit 後退出再對帳及交錯 CAS。首輪不足及原碼保留。只新增隔離 DB，未改 Memory／production 或使用付費模型；未證同步並發、Agent durable binding 或正式人工接線。乾淨值保存正證可支援目前工作稿路線的有限保存候選，不等於整套 B 流程或 production owner 已驗收。
 
 產品取捨與有限驗證收斂後，將唯一文件 owner、工具 schema、版本／交易與正式 profile 定稿，經獨立審查及 successor ADR，再拆可獨立驗收的核心切片：契約／原生接線、保存與回執、讀取與工具、人工 editor／比較、顧問 Skill 與固定情境驗收。真人交付／核對及 HTML／DOCX 不列本版。付費模型驗收另有資料／預算 gate；production 另有 §4.1 的 Memory 採用依賴。本文列的是依賴順序，**尚不是已核准施工計畫或 S5 完成**。
 

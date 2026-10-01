@@ -3,7 +3,7 @@
 > Topic `Q019-RUNTIME-RECOVERY-REPAIR-01` · 2026-09-07 · Owner「好繼續，一樣可以模仿參考大廠作法」核准既有隔離底座的四項局部修復。不是 production gate。
 > Implementation: use superpowers:subagent-driven-development. Existing worktree `codex/analysis-only-agent`; baseline `1d2be04c`.
 
-當前實作／審核狀態只更新在[本段結果](../specs/2026-09-07-runtime-recovery-repair-results.md)，不要把本計畫的 task 清單當成已完成。
+當前實作／審核狀態只更新在[本段結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-runtime-recovery-repair-results.md)，不要把本計畫的 task 清單當成已完成。
 
 ## Scope and evidence
 

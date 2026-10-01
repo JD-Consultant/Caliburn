@@ -5,9 +5,9 @@
 
 ## 脈絡
 
-per-task 官方 catalog(K/S/O/P/level)來自 [ai.py](../../apps/api/app/api/routes/ai.py) 的
+per-task 官方 catalog(K/S/O/P/level)來自 [ai.py](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/api/routes/ai.py) 的
 `knowledge.competencies(ocs_code)`——**一次撈整個 ocs_code 的能力池**,再在記憶體切某 task
-([task_detail.py](../../apps/api/app/services/knowledge/task_detail.py))。前端每任務各打一次
+([task_detail.py](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/services/knowledge/task_detail.py))。前端每任務各打一次
 `recommend-ks` + 一次 `draft-op` → **同一個 ocs_code 的整池被重撈 N×2 次**(一份 10 同職類任務 = 撈池 20 次)。
 `task-candidates` 回應**不帶 K/S/O/P**,故無法在「選任務當下」push catalog。
 

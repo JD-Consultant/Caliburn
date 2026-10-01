@@ -81,7 +81,7 @@ A 依 JD 方法訪談並使用共用 App 業務工具編輯 current JD
 2. `ToolMessage.artifact` 不會進 model request；
 3. 同一訊息經 LangChain message dict serialization／deserialization 後，artifact 仍能保留 Runtime-private signed reference；2026-09-21 的精確 PostgreSQL Saver／Store＋graph reopen 回歸亦已證明 A 的 layered case／evidence artifacts 可完整恢復。這仍只證明本機鎖定版本與此接線，不代稱 provider、自然模型或完整 App 通過。
 
-精確版本、安裝原碼位置、探針輸入／輸出與限制保存於[ToolMessage private artifact 固定實證](evidence/2026-09-20-toolmessage-private-artifact-probe.md)。
+精確版本、安裝原碼位置、探針輸入／輸出與限制保存於[ToolMessage private artifact 固定實證](../experiments/legacy-evidence/2026-09-20-toolmessage-private-artifact-probe.md)。
 
 ### 跨來源共同原則
 

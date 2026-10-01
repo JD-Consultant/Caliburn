@@ -68,4 +68,4 @@
 
 ## 2026-09-11 O02 有限接點補核
 
-[同安裝 mutex 候選](2026-09-11-jd-maintenance-exclusion-preflight.md)與[獨立文件審查](evidence/2026-09-11-jd-maintenance-exclusion-review.md)一致性 PASS；正常存活時可沿現有 OS 物件排除日常啟動，競爭輸掉則維護返回忙碌、不開始工具。**O02 仍 OPEN、未採用、未實測**：maintenance crash 後子程序、部分更新資產與受控 stop 仍需正式設計及完整生命週期驗證。停止廣搜相同同步原理；不改 Task5／6 或 production。
+[同安裝 mutex 候選](2026-09-11-jd-maintenance-exclusion-preflight.md)與[獨立文件審查](../experiments/legacy-evidence/2026-09-11-jd-maintenance-exclusion-review.md)一致性 PASS；正常存活時可沿現有 OS 物件排除日常啟動，競爭輸掉則維護返回忙碌、不開始工具。**O02 仍 OPEN、未採用、未實測**：maintenance crash 後子程序、部分更新資產與受控 stop 仍需正式設計及完整生命週期驗證。停止廣搜相同同步原理；不改 Task5／6 或 production。

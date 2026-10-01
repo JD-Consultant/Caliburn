@@ -1778,7 +1778,7 @@ OpenAI 最新 model guidance 建議精簡 Prompt、只暴露當前相關工具�
 
 ### 9.46 2026-09-01 四組整合與框架總決選（Owner 已確認）
 
-本節的精簡、可獨立回讀版本與 2026-09-02 security／version 複核，見 [`2026-09-02-memory-framework-selection-revalidation.md`](./2026-09-02-memory-framework-selection-revalidation.md)。完整推導與歷史仍保留在本節，不以精簡版覆寫。
+本節的精簡、可獨立回讀版本與 2026-09-02 security／version 複核，見 [`2026-09-02-memory-framework-selection-revalidation.md`](../../../../../specs/2026-09-02-memory-framework-selection-revalidation.md)。完整推導與歷史仍保留在本節，不以精簡版覆寫。
 
 本節整合 §9.42～§9.45，並再次回讀下列兩份上位約束後才下結論：
 

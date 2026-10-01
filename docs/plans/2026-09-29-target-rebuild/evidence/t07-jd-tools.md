@@ -4,7 +4,7 @@
 
 承接 `79b773ee`；T03／T04／T05 前置已具備，T06 共用恢復接縫仍依原任務續做。此切片完成精簡 map 與精確下鑽的定位基礎，不宣稱完整 `read_jd` 或八入口已交付。
 
-責任來源：[A context](../../../specs/2026-09-26-consultant-context-and-state-design.md) §3.2–3.3、[JD 工具契約](../../../specs/2026-09-29-jd-model-tool-contract-review.md)、[JD 欄位指南](../../../specs/2026-09-09-jd-field-and-writing-guide.md)、[共同工具規範](../../../specs/2026-09-27-agent-tool-contract-design-research.md)及程式／契約規範。欄位的唯一 wire 來源是 `apps/api/contracts/tools/jd-map.schema.json`；接線說明由 [JD 保存接線 §3.2](../../../implementation/jd-storage.md#32-模型導覽與既有物件定位)維護，不在此複製 schema。
+責任來源：[A context](../../../specs/2026-09-26-consultant-context-and-state-design.md) §3.2–3.3、[JD 工具契約](../../../specs/2026-09-29-jd-model-tool-contract-review.md)、[JD 欄位指南](../../../guides/2026-09-09-jd-field-and-writing-guide.md)、[共同工具規範](../../../specs/2026-09-27-agent-tool-contract-design-research.md)及程式／契約規範。欄位的唯一 wire 來源是 `apps/api/contracts/tools/jd-map.schema.json`；接線說明由 [JD 保存接線 §3.2](../../../implementation/jd-storage.md#32-模型導覽與既有物件定位)維護，不在此複製 schema。
 
 ### 實際效果與取捨
 

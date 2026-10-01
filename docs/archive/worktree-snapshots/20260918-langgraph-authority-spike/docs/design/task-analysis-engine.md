@@ -10,24 +10,24 @@ updated: 2026-08-11
 > **主讀者 = coding agent。** 目的:不看 code 也能改對這條線——不亂發明欄位、不把語意判斷
 > 塞進 verifier、不把已退場的舊 AI 路徑接回來。**living:動到這條線的碼,同 commit 更新本檔。**
 >
-> 決策:[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
+> 決策:[ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
 > (決定 3 greenfield、決定 23–28 structured output)、
-> [ADR 0042](../adr/0042-r1-screening-stop-and-a6-first-version-default.md)(A6 為第一版預設;
-> 新增欄位須指出它避免的具體使用者失敗)、[ADR 0035](../adr/0035-interview-vnext-openrouter-first-provider-boundary.md)(OpenRouter-first)。
-> 凍結形狀與判準:[`2026-07-28-task-boundary-merge-split-and-identity-research.md`](../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)
+> [ADR 0042](../../../../../adr/0042-r1-screening-stop-and-a6-first-version-default.md)(A6 為第一版預設;
+> 新增欄位須指出它避免的具體使用者失敗)、[ADR 0035](../../../../../adr/0035-interview-vnext-openrouter-first-provider-boundary.md)(OpenRouter-first)。
+> 凍結形狀與判準:[`2026-07-28-task-boundary-merge-split-and-identity-research.md`](../../../../../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)
 > **§4／§5(判準)、§9(Task)、§10(Proposal)、§11(Context)、§12(Result)**。
-> 計畫:[`2026-07-28-task-analysis-core-implementation-plan.md`](../plans/2026-07-28-task-analysis-core-implementation-plan.md)、
-> [`2026-07-29-job-analysis-postgresql-persistence-plan.md`](../plans/2026-07-29-job-analysis-postgresql-persistence-plan.md)。
+> 計畫:[`2026-07-28-task-analysis-core-implementation-plan.md`](../../../../../plans/2026-07-28-task-analysis-core-implementation-plan.md)、
+> [`2026-07-29-job-analysis-postgresql-persistence-plan.md`](../../../../../plans/2026-07-29-job-analysis-postgresql-persistence-plan.md)。
 > Current State authority 與 greenfield 儲存邊界見
-> [ADR 0043](../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)；
+> [ADR 0043](../../../../../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)；
 > 員工不完整 Task 的 identity 對齊見
-> [ADR 0044](../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)。
+> [ADR 0044](../../../../../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)。
 > Local Web transport 邊界見
-> [ADR 0045](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)；
+> [ADR 0045](../../../../../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)；
 > 最小顧問回合與固定開場見
-> [ADR 0046](../adr/0046-professional-consultant-minimal-durable-loop.md)。OPKS 必須一起讀
-> [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)～
-> [ADR 0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)。
+> [ADR 0046](../../../../../adr/0046-professional-consultant-minimal-durable-loop.md)。OPKS 必須一起讀
+> [ADR 0048](../../../../branch-snapshots/20260922-local-main-r1/docs/adr/0048-opks-evidence-axes-and-document-level-competencies.md)～
+> [ADR 0051](../../../../../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)。
 
 ## 1. 一句話
 
@@ -467,8 +467,8 @@ context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上
 現有的一筆未清:commit `4b75190` 給 `disposition` 補的判準只在 Luna-Pro 上觀測過。
 | prompt 品質調校 | `llm/prompt.py` 已有 Task 判準與彈性顧問行為基線，但尚未用真實員工資料調校 | 有真實使用摩擦後以 rubric／eval 調整，不先加 planner 或第二次呼叫 |
 | duplicate／overlap identity 自動收斂 | 第一版刻意不做；模型保留 issue 並追問員工 | 有真實重複摩擦證據後再研究，不用相似度猜測 |
-| OPKS 真模型品質結論 | **第一切片已接通**：`OpksItem`／`CurrentJdOpks`／獨立六態 `OpksProposal`、0014 兩表、人工編輯、API、Web、單 Task Context、零 union `opks_result_v1`、deterministic verifier、一次 provider operation 與 durable generation receipt 均已落地。七情境 scripted vertical 以真 PostgreSQL 驗證同 key replay 零 call、四種員工決策、A 人工編輯、同一 K 跨 Task reuse、Task delete 清理與無 Evidence 在 provider 前停線；舊 OPKS hint 已退役。裁決見 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)～[0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，**四份一起讀** | scripted provider 不回答真模型的 O/P/K/S 品質；需要品質結論時另做有預算上限的 live smoke，不重開本切片或加 eval framework |
-| 完整 header、匯出 | **Header／readiness、deterministic `ExportDocument` assembly、嚴格單工作表 XLSX renderer 與唯讀下載 API／Web dirty guard 已落地**：`JdHeader`／readiness 純函式、0015 persistence、typed Header direct-edit receipt、`PUT /jd-header`、`DocumentView` 的 `jd_header`／server-provided `readiness`、純 assembly、Excel 可開啟的 renderer 與 `GET /documents/{document_id}/export` 都已接通；Workspace 頂端的匯出按鈕在四個 editor 任一 dirty 時停用並提示先儲存或取消，已保存的 readiness／未連結 K/S 只提示不阻擋。`DocumentMetadataWrite` 仍只有 `title`，表頭不走 metadata PUT。Assembly 依 Duty／Task／OPKS `display_order` 產生 render-time 位置碼，K/S 透過 Task refs 或 Indicator refs 投影、未連結 K/S 不進公版投影，未分組 Task 保留且沒有虛構 Duty；renderer 只輸出官方七欄、態度與說明區，所有文字明確寫成 string cell | **ADR [0052](../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md)／[0056](../adr/0056-strict-public-jd-xlsx-export.md) 已裁決**：readiness 只提示不阻止保存／訪談／匯出；route 只載入已驗證 state、呼叫 assembly／renderer，不寫 journal、不改 authority generation、不依賴 provider；Web 消費 binary `Blob`，不把 readiness、產品聲明或未分組自創標籤寫入 workbook。**header 走 `JdHeader` 的 authority seam，不是擴充 `DocumentMetadataWrite`；readiness 第一版不回 `is_complete`**（ADR [0053](../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)）。`職能基準代碼`／`職類別代碼` 由 iCAP 配發，不開欄位、不列缺漏、不得生成（0040 決定 33–34、0052 決定 8）；`T1`／`O1.1.1` 是匯出版面位置碼，非 identity（0052 決定 10） |
+| OPKS 真模型品質結論 | **第一切片已接通**：`OpksItem`／`CurrentJdOpks`／獨立六態 `OpksProposal`、0014 兩表、人工編輯、API、Web、單 Task Context、零 union `opks_result_v1`、deterministic verifier、一次 provider operation 與 durable generation receipt 均已落地。七情境 scripted vertical 以真 PostgreSQL 驗證同 key replay 零 call、四種員工決策、A 人工編輯、同一 K 跨 Task reuse、Task delete 清理與無 Evidence 在 provider 前停線；舊 OPKS hint 已退役。裁決見 [ADR 0048](../../../../branch-snapshots/20260922-local-main-r1/docs/adr/0048-opks-evidence-axes-and-document-level-competencies.md)～[0051](../../../../../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)，**四份一起讀** | scripted provider 不回答真模型的 O/P/K/S 品質；需要品質結論時另做有預算上限的 live smoke，不重開本切片或加 eval framework |
+| 完整 header、匯出 | **Header／readiness、deterministic `ExportDocument` assembly、嚴格單工作表 XLSX renderer 與唯讀下載 API／Web dirty guard 已落地**：`JdHeader`／readiness 純函式、0015 persistence、typed Header direct-edit receipt、`PUT /jd-header`、`DocumentView` 的 `jd_header`／server-provided `readiness`、純 assembly、Excel 可開啟的 renderer 與 `GET /documents/{document_id}/export` 都已接通；Workspace 頂端的匯出按鈕在四個 editor 任一 dirty 時停用並提示先儲存或取消，已保存的 readiness／未連結 K/S 只提示不阻擋。`DocumentMetadataWrite` 仍只有 `title`，表頭不走 metadata PUT。Assembly 依 Duty／Task／OPKS `display_order` 產生 render-time 位置碼，K/S 透過 Task refs 或 Indicator refs 投影、未連結 K/S 不進公版投影，未分組 Task 保留且沒有虛構 Duty；renderer 只輸出官方七欄、態度與說明區，所有文字明確寫成 string cell | **ADR [0052](../../../../../adr/0052-jd-readiness-assessment-and-official-code-boundaries.md)／[0056](../../../../../adr/0056-strict-public-jd-xlsx-export.md) 已裁決**：readiness 只提示不阻止保存／訪談／匯出；route 只載入已驗證 state、呼叫 assembly／renderer，不寫 journal、不改 authority generation、不依賴 provider；Web 消費 binary `Blob`，不把 readiness、產品聲明或未分組自創標籤寫入 workbook。**header 走 `JdHeader` 的 authority seam，不是擴充 `DocumentMetadataWrite`；readiness 第一版不回 `is_complete`**（ADR [0053](../../../../../adr/0053-jd-header-authority-boundary-and-readiness-scope.md)）。`職能基準代碼`／`職類別代碼` 由 iCAP 配發，不開欄位、不列缺漏、不得生成（0040 決定 33–34、0052 決定 8）；`T1`／`O1.1.1` 是匯出版面位置碼，非 identity（0052 決定 10） |
 | revision-request replacement | revision request 可保存／reload，但不會自動重建 replacement | 後續模型流程 |
 | 一般瀏覽器完整跨埠 smoke | **HTTP 層已逐段驗過**（2026-07-31，api:8001 ＋ web:3000 同時在跑）：文件庫 `GET` 正確回報 `task_count`、consultation view 帶齊 conversation／proposals／tasks、**三筆 `add` 提案連續 `POST …/decisions` 全 200**（正是 `display_order` 缺陷會炸的路徑）、同 `Idempotency-Key` 重送 200 且不重複、reload 後 JD 排序正確；CORS preflight 200 且 `access-control-allow-headers` 含 `idempotency-key`。`/workspace` 與 `/workspace/{id}` 皆 HTTP 200。Web 90 tests／tsc／lint 通過 **已由維護者在一般瀏覽器完成**（2026-07-31）：文件 `b47d6717` 的三筆 `add` 提案**在 UI 上連續按 accept 全部成立**，Current JD 由 0 條變 3 條、`display_order` 0/1/2；同文件被 withdraw 的那筆提案維持 `stale` 且無法接受，因此 Luna-Pro 在 turn 1 誤建的「協助正式環境部署」**沒有進入 JD**——Proposal gate 當安全網首次被真流量驗證 | 本列已無待辦。持續維持:不為測試環境加入 proxy、fake production mode 或 E2E framework |
 
@@ -476,21 +476,21 @@ context 取捨)在 Luna-Pro 上驗過只算「未在生產模型上驗過」,上
 
 ## 9. 指路
 
-- 判準與凍結形狀:[研究稿 §4／§5／§9–§12](../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)
-- 決策:[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
-  [ADR 0042](../adr/0042-r1-screening-stop-and-a6-first-version-default.md)
-- 實作步驟:[T1–T7 計畫](../plans/2026-07-28-task-analysis-core-implementation-plan.md)
+- 判準與凍結形狀:[研究稿 §4／§5／§9–§12](../../../../../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)
+- 決策:[ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、
+  [ADR 0042](../../../../../adr/0042-r1-screening-stop-and-a6-first-version-default.md)
+- 實作步驟:[T1–T7 計畫](../../../../../plans/2026-07-28-task-analysis-core-implementation-plan.md)
 - durable vertical:
-  [`PostgreSQL persistence plan`](../plans/2026-07-29-job-analysis-postgresql-persistence-plan.md)
+  [`PostgreSQL persistence plan`](../../../../../plans/2026-07-29-job-analysis-postgresql-persistence-plan.md)
 - partial Task reconciliation:
-  [`ADR 0044`](../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)、
-  [`implementation plan`](../plans/2026-07-30-job-analysis-partial-task-reconciliation-plan.md)
+  [`ADR 0044`](../../../../../adr/0044-partial-jd-task-reconciliation-and-human-confirmation.md)、
+  [`implementation plan`](../../../../../plans/2026-07-30-job-analysis-partial-task-reconciliation-plan.md)
 - Local Web first slice:
-  [`ADR 0045`](../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)、
-  [`implementation plan`](../plans/2026-07-30-job-analysis-local-web-first-slice-plan.md)
+  [`ADR 0045`](../../../../../adr/0045-job-analysis-local-web-contract-and-shared-authority-commit.md)、
+  [`implementation plan`](../../../../../plans/2026-07-30-job-analysis-local-web-first-slice-plan.md)
 - OPKS first slice:
-  [`ADR 0048`](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)～
-  [`ADR 0051`](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)、
-  [`implementation plan`](../plans/2026-08-01-job-analysis-opks-first-slice-plan.md)
-- 舊路徑(**已退場,勿救回**):[`interview-engine.md`](interview-engine.md)、
-  [ADR 0030](../adr/0030-ai-coedit-tracked-changes-one-brain.md)
+  [`ADR 0048`](../../../../branch-snapshots/20260922-local-main-r1/docs/adr/0048-opks-evidence-axes-and-document-level-competencies.md)～
+  [`ADR 0051`](../../../../../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)、
+  [`implementation plan`](../../../../../plans/2026-08-01-job-analysis-opks-first-slice-plan.md)
+- 舊路徑(**已退場,勿救回**):[`interview-engine.md`](../../../20260918-shared-current-jd/docs/design/interview-engine.md)、
+  [ADR 0030](../../../../../adr/0030-ai-coedit-tracked-changes-one-brain.md)

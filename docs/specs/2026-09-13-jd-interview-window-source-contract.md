@@ -1,6 +1,6 @@
 # 完成訪談窗口 source port：介面契約與固定情境
 
-2026-09-13；JD-R002／OI-01、OI-02。[採用映射 §6 第1項](2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與[審查紀錄 F4](evidence/2026-09-13-jd-b1-b2-adoption-review.md)要求的第一項交付。基準 `a60f4e82`／tag `jd-consultant-adoption-mapping-review-20260913`。
+2026-09-13；JD-R002／OI-01、OI-02。[採用映射 §6 第1項](2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與[審查紀錄 F4](../experiments/legacy-evidence/2026-09-13-jd-b1-b2-adoption-review.md)要求的第一項交付。基準 `a60f4e82`／tag `jd-consultant-adoption-mapping-review-20260913`。
 
 **本稿只定契約與固定情境，沒有實作、沒有測試執行、沒有 provider 呼叫，也沒有新增資料表。**舊程式證據一律以 `git show 4f94fbfb:experiments/analysis-agent/...` 讀固定來源，不用 checkout 最新檔。
 

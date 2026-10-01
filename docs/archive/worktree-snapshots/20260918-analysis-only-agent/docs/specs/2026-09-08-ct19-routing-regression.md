@@ -4,7 +4,7 @@
 
 ## 1. 唯一範圍與依據
 
-Owner核准[CT18§4](2026-09-08-ct18-live-repair-selection-diagnosis.md#4-下一個局部候選待確認未施工)，並提醒修改可能帶回舊BUG。本輪只整理一組讀取／C即時修補／B背景通知的路由及完成條件。不新增Agent、欄位、強制tool choice、字串分類器或排程；不改JD／production。保留[CT17](2026-09-08-ct17-correction-persistence-calibration.md)原失敗與封存。
+Owner核准[CT18§4](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct18-live-repair-selection-diagnosis.md#4-下一個局部候選待確認未施工)，並提醒修改可能帶回舊BUG。本輪只整理一組讀取／C即時修補／B背景通知的路由及完成條件。不新增Agent、欄位、強制tool choice、字串分類器或排程；不改JD／production。保留[CT17](2026-09-08-ct17-correction-persistence-calibration.md)原失敗與封存。
 
 本題目前register持續更新於[主repo入口](../../../../docs/current-decisions.md)，不是worktree內歷史快照；本輪也在worktree登記頁加上閱讀路由，避免誤讀成未記錄。
 
@@ -22,7 +22,7 @@ Owner核准[CT18§4](2026-09-08-ct18-live-repair-selection-diagnosis.md#4-下一
 
 **候選未修好漏存，不採用。** 首個與CT17相同的更正、相同起始Memory，仍只有回答改5日，正文／導覽維持10日。已撤回本輪三處提示到施工前版本，未改其他程式或原資料。
 
-證據：[完整去敏請求、回應、原始Q/A audit、候選diff及來源hash](evidence/2026-09-08-ct19-routing-regression.json) · [可見逐字稿](evidence/2026-09-08-ct19-routing-regression.transcript.md)。JSON SHA256 `7fa37de0ae37638f5f74ddd272789272b4fcec4e611da340f76d6053c4fb740c`；原CT17保持closed且未變。
+證據：[完整去敏請求、回應、原始Q/A audit、候選diff及來源hash](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct19-routing-regression.json) · [可見逐字稿](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct19-routing-regression.transcript.md)。JSON SHA256 `7fa37de0ae37638f5f74ddd272789272b4fcec4e611da340f76d6053c4fb740c`；原CT17保持closed且未變。
 
 | 檢查 | 結果／限制 |
 |---|---|
@@ -46,4 +46,4 @@ Reviewer重看實際input、程式與結果後確認不能promote，也未發現
 
 ## 5. 執行安全與來源
 
-真測安全檢查：第一次執行遭auto-review拒絕，擔心歷史員工敏感資料外傳，尚未送出模型請求。已唯讀追溯：CT19複製CT16，CT16複製CT15資料庫`q019_ct15_b67f0995de`；CT15 runner從空白建立「CT15 合成售後營運專員／整份職務長訪談」，[CT15逐字稿](evidence/2026-09-08-ct15-full.transcript.md)明示「合成案例，非真實員工」。本輪完整讀取CT16中21則員工測試輸入，皆為雲杉／海鷗／石橋／青禾的合成小家電售後情境及後續測試更正；本輪沒有production匯入或真實員工資料。依這項可查證的來源說明再申請同一動作，未繞過拒絕或更換目的地。預定目的地仍為已核准模型測試的OpenAI Responses，金鑰只用授權header，不進payload／紀錄。
+真測安全檢查：第一次執行遭auto-review拒絕，擔心歷史員工敏感資料外傳，尚未送出模型請求。已唯讀追溯：CT19複製CT16，CT16複製CT15資料庫`q019_ct15_b67f0995de`；CT15 runner從空白建立「CT15 合成售後營運專員／整份職務長訪談」，[CT15逐字稿](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct15-full.transcript.md)明示「合成案例，非真實員工」。本輪完整讀取CT16中21則員工測試輸入，皆為雲杉／海鷗／石橋／青禾的合成小家電售後情境及後續測試更正；本輪沒有production匯入或真實員工資料。依這項可查證的來源說明再申請同一動作，未繞過拒絕或更換目的地。預定目的地仍為已核准模型測試的OpenAI Responses，金鑰只用授權header，不進payload／紀錄。

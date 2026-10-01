@@ -23,7 +23,7 @@
 
 ## 離線比較結果
 
-- [可重跑腳本](../../experiments/analysis-agent/scripts/compare_memory_editors.py)、[完整輸入／输出／版本／hash](evidence/2026-09-07-memory-editor-framework-comparison.json)。SDK 以 `uv run --no-sync --no-env-file --with openai-agents==0.22.0` 暫時載入；未加入產品 `pyproject.toml`／`uv.lock`，未修改官方原碼。
+- [可重跑腳本](../../experiments/analysis-agent/scripts/compare_memory_editors.py)、[完整輸入／输出／版本／hash](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-memory-editor-framework-comparison.json)。SDK 以 `uv run --no-sync --no-env-file --with openai-agents==0.22.0` 暫時載入；未加入產品 `pyproject.toml`／`uv.lock`，未修改官方原碼。
 - 使用 `agents.apply_diff` 公開函式，不取私有 parser；DeepAgents 使用目前實際的 `perform_string_replacement`。模型請求 **0**，模型費用 **US$0**，DB 寫入 **0**。
 
 | 情境 | DeepAgents 精確替換 | OpenAI SDK patch |
@@ -85,7 +85,7 @@ SDK 把保留行用來定位，真正套用的 chunk 只含增刪部分；本次
 
 官方公開流程是：**先提供或讀取相關檔案內容 → 模型產生局部 patch（可帶實際 context／定位）→ harness 在 workspace 套用 → 明確回傳成功／失敗 → 模型按需重讀、修正 → 分享檢查結果**。SDK 可作用在記憶體中的文字；檔案地址限制、scratch／備份與發布原子性由應用安排。這些不是 parser 自動處理的。[流程／錯誤／安全](https://developers.openai.com/api/docs/guides/tools-apply-patch)。本案既有 private staging、format／reference validation、revision publication 可保留；不再發明第二個 parser 或新增 LLM verifier。
 
-- [補測腳本](../../experiments/analysis-agent/scripts/probe_patch_context.py)／[完整 fixture 與結果](evidence/2026-09-07-memory-editor-context-followup.json)。10 項特徵觀察：4 個完整定位／context 保留情境正確套用、4 個內容／定位缺失被拒、另保留 2 個反例（合法但選錯 A 的 context 會改 A；不存在的單一 advisory anchor 未必拒絕）。**10 個觀察符合預期不等於 10/10 產品安全通過**。
+- [補測腳本](../../experiments/analysis-agent/scripts/probe_patch_context.py)／[完整 fixture 與結果](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-memory-editor-context-followup.json)。10 項特徵觀察：4 個完整定位／context 保留情境正確套用、4 個內容／定位缺失被拒、另保留 2 個反例（合法但選錯 A 的 context 會改 A；不存在的單一 advisory anchor 未必拒絕）。**10 個觀察符合預期不等於 10/10 產品安全通過**。
 - A/B 重複段落帶實際 B 標題與來源 context 後，正確修改 B；同時允許已重現的行首空白誤差。補測不依賴固定三行或額外自創 guard。
 - 先前省略／填錯定位的反例仍有效，但不能拿它們推論完整 OpenAI 方式較差、不能用，或 Luna 更易誤改。反過來，手工補 context 成功也不能保證 Luna 都會填對。
 - Anthropic 最新文字編輯契約仍要求 `old_str` 連空白／縮排精確一致；DeepAgents 維護者也明說這是刻意選擇。因此「各家都使用同一個寬鬆 matcher」**不是共識**；共同可學的是有內容可讀、局部修改、失敗回饋與再檢查。[Anthropic](https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool#str_replace)、[DeepAgents](https://github.com/langchain-ai/deepagents/issues/403#issuecomment-3997938843)。

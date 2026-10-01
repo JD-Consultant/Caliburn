@@ -1,10 +1,10 @@
 # JD 編輯核心隔離接線 Implementation Plan
 
-**2026-09-10 Task4完整稿效能補核：**真App反證定位同一SSOT重複遞迴驗證。[有限候選2](../specs/2026-09-10-jd-schema-validation-performance.md)經獨立Spec／quality PASS後採用，僅在原`JdSavedElement`已完整檢查children的context引用既有type條件，standalone wrappers／wire欄位／格式不變。Task4須官方重新生成、重建API快取，跑受影響contract/native/API/Web及完整r2 HTTP／表格／子清單保存與重開；候選單段計時不替代實际驗收。本項不引入新validator／schema／framework或改Task5責任，首候選生成失敗保留。
+**2026-09-10 Task4完整稿效能補核：**真App反證定位同一SSOT重複遞迴驗證。[有限候選2](../../../../../specs/2026-09-10-jd-schema-validation-performance.md)經獨立Spec／quality PASS後採用，僅在原`JdSavedElement`已完整檢查children的context引用既有type條件，standalone wrappers／wire欄位／格式不變。Task4須官方重新生成、重建API快取，跑受影響contract/native/API/Web及完整r2 HTTP／表格／子清單保存與重開；候選單段計時不替代實际驗收。本項不引入新validator／schema／framework或改Task5責任，首候選生成失敗保留。
 
 **2026-09-10 成品計畫執行授權：**Owner已要求實作[完整成品總計畫](2026-09-10-jd-product-delivery.md)。本六切片是其中P1/P2的核心依據，現在由Task 1開始隔離接線。文件入口／未保存保護等增補按完整旅程設計在相應切片前閉合；正式採用、自然模型、日常維護及真人試用不以六切片通過代稱完成。0付費及production authority gate不變。
 
-**2026-09-10 語意契約補齊：**Owner已同意完整格式及原生JSONB＋同PG保存方向；[語意契約v2](../specs/evidence/2026-09-10-jd-semantic-contract-closure.md)固定Task平行成果／要求組、完整K／S item及同版單向引用，模型refs與保存IDs分開，首建先內容後重讀／連結。以下active切片已改用v2；有限驗證與獨立review已完成，恢復原Task 1，不重問已同意格式／資料庫。真人交付及production切換仍在原gate之外。
+**2026-09-10 語意契約補齊：**Owner已同意完整格式及原生JSONB＋同PG保存方向；[語意契約v2](../../../../../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)固定Task平行成果／要求組、完整K／S item及同版單向引用，模型refs與保存IDs分開，首建先內容後重讀／連結。以下active切片已改用v2；有限驗證與獨立review已完成，恢復原Task 1，不重問已同意格式／資料庫。真人交付及production切換仍在原gate之外。
 
 v1 schema、F02與原201項契約結果保留歷史效力；新profile不能直接消費v1 fixture。Task 1須用新完整樣稿fixture及關係反例重做原生／生成契約驗收。這不是舊產品資料migration，研究probe不得成為runtime import。
 
@@ -16,11 +16,11 @@ v1 schema、F02與原201項契約結果保留歷史效力；新profile不能直�
 
 **Tech Stack:** Python 3.12.13、隔離 `uv.lock`；LangChain 1.4.0／DeepAgents 0.7.13；Node 22.23.2（Task4起隔離導入；原Task1–3 baseline為22.12.0）、Plate 53.3.11、react／react-dom套件19.2.4、Next／eslint-config-next 16.3.3；PostgreSQL；JSON Schema draft 2020-12 SSOT＋生成 Python／TypeScript DTO。Next App Router內建React／RSC另記實際版本，不視為native單測的同一runtime。
 
-**Spec:** [主設計 §4.1／§9.1](../specs/2026-09-09-jd-editor-app-integration-design.md)、[Proposed ADR 0073](../adr/0073-plate-jd-app-working-document-and-revision-authority.md)、[正式 profile](../specs/2026-09-10-jd-plate-document-profile.md)、[三工具契約](../specs/2026-09-10-jd-app-tool-contract.md)、[正式設計 schema](../specs/contracts/jd-editor-v2.schema.json)。先讀 [register](../current-decisions.md)／[process](../decision-process.md)，上述文件與本計畫一同交接。
+**Spec:** [主設計 §4.1／§9.1](../../../../../specs/2026-09-09-jd-editor-app-integration-design.md)、[Proposed ADR 0073](../adr/0073-plate-jd-app-working-document-and-revision-authority.md)、[正式 profile](../../../../../specs/2026-09-10-jd-plate-document-profile.md)、[三工具契約](../../../../../specs/2026-09-10-jd-app-tool-contract.md)、[正式設計 schema](../../../../../specs/contracts/jd-editor-v2.schema.json)。先讀 [register](../current-decisions.md)／[process](../../../../../decision-process.md)，上述文件與本計畫一同交接。
 
 ## Global Constraints
 
-- 2026-09-10 全面責任稽核補充：對每個影響效果／正確性的設計主動核對 LLM／App／原生／DB owner、現行官方依據／版本／免費授權、參數負擔與具體驗收，不限 Owner 舉例。已知／可推導資料交 App；技術決策由實作者研究處理，不要求 Owner 選資料表／錯誤欄位。[本批補正](../specs/2026-09-10-jd-responsibility-and-evidence-audit.md)已將 TF／ER 參數與結果落入同一 SSOT，並固定模型說明、DB02–04 單向約束、ER03 有限策略；[離線結果](../specs/evidence/jd-contract-closure/README.md)只證設計 shape／SDK 傳遞。下列各切片仍須實際實作驗證；跨輪 context 沿 Task 3.3a，Memory locator 不列必做。不重選 Plate／工作稿或重建 Memory。
+- 2026-09-10 全面責任稽核補充：對每個影響效果／正確性的設計主動核對 LLM／App／原生／DB owner、現行官方依據／版本／免費授權、參數負擔與具體驗收，不限 Owner 舉例。已知／可推導資料交 App；技術決策由實作者研究處理，不要求 Owner 選資料表／錯誤欄位。[本批補正](../../../../../specs/2026-09-10-jd-responsibility-and-evidence-audit.md)已將 TF／ER 參數與結果落入同一 SSOT，並固定模型說明、DB02–04 單向約束、ER03 有限策略；[離線結果](../../../../../experiments/legacy-evidence/jd-contract-closure/README.md)只證設計 shape／SDK 傳遞。下列各切片仍須實際實作驗證；跨輪 context 沿 Task 3.3a，Memory locator 不列必做。不重選 Plate／工作稿或重建 Memory。
 
 - Topic `JD-R002/C03`；本文件沿Owner完整成品授權進入隔離G7，Task 1–5已完成並獨立review通過；Task5保存點44441672後接Task6。各切片依實際結果標記，不以語意v2有限設計驗證代稱接線通過。
 - Owner 已同意 Plate 免費核心＋持續工作稿、同畫面實際差異、前景 AI run 期間暫停手改（含純訪談）、同 PG 唯一 JD 保存；不再提供個別 pending accept／reject 或 accepted projection。
@@ -31,7 +31,7 @@ v1 schema、F02與原201項契約結果保留歷史效力；新profile不能直�
 - 固定 `reuseId:true, initialValueIds:'always'`，保留原生 ID 生成；載入保存稿先驗唯一 ID。所有新 Element 的模型輸入不得帶 ID，正式 value 不含 suggestion／diff／session metadata。
 - clean value、原生 operations、比較 projection 分開；原生 operations 原樣 JSON 安全保存，`computeDiff` 只在記憶體中算，不回灌或保存成正文。反例、首輪失敗及既有封存不改判、不覆寫。
 - 外部 Node 只收固定 entrypoint 的 stdin JSON／回 stdout JSON；不讀 DB／Memory／原文、無主機路徑或程式碼參數，stderr 只放有界診斷。模型／Node 運算不持有 SQL transaction。
-- 遵循 [contract strategy](../contract-strategy.md)：SSOT 生成 DTO，mapper 承接 transport 與內部型別；不手寫第二份 wire schema。所有新增依賴免費 OSS、exact lock，npm 安裝停用 scripts；不改 root production lock。
+- 遵循 [contract strategy](../../../20260918-shared-current-jd/docs/contract-strategy.md)：SSOT 生成 DTO，mapper 承接 transport 與內部型別；不手寫第二份 wire schema。所有新增依賴免費 OSS、exact lock，npm 安裝停用 scripts；不改 root production lock。
 - 每切片先寫指定失敗測試，確認失敗原因，完成最小接線，再跑指定檢查及獨立 review。未通過不往下包裝成功；無新反證不擴充微型研究。
 
 ## 施工位置與開始條件
@@ -49,7 +49,7 @@ v1 schema、F02與原201項契約結果保留歷史效力；新profile不能直�
 
 六個切片按 `1 → 2 → 3 → 4 → 5 → 6` 驗收。Task 3 的工具可由固定呼叫驗，Task 4 的畫面可由 Task 3 已存在的服務及固定 provider 驗；Task 5 才驗完整取消／reconcile 與 writer gate。前項通過後可局部並行寫後項測試，不以未完成接點假裝端到端已通。
 
-v2在原切片的必要接點：Task 1完成全候選grammar／關係及原生映射；Task 2以format 2保存定義與links、歷史同版解析及失敗零發布；Task 3從完整revision發配正反向refs、映射set及unset、實測先建→read→link與unknown不重複新增；Task 4讓兩組可清空但不誤拆、K／S與引用／共享影響可讀，人工copy／貼上走同一完整性邊界。Task 5在兩次首建之間取消／重開時保留已保存中間稿，Task 6整體核對。每項都有[語意契約§2–6](../specs/evidence/2026-09-10-jd-semantic-contract-closure.md#2-最小完整文件結構)對照，不新增平行施工路線。
+v2在原切片的必要接點：Task 1完成全候選grammar／關係及原生映射；Task 2以format 2保存定義與links、歷史同版解析及失敗零發布；Task 3從完整revision發配正反向refs、映射set及unset、實測先建→read→link與unknown不重複新增；Task 4讓兩組可清空但不誤拆、K／S與引用／共享影響可讀，人工copy／貼上走同一完整性邊界。Task 5在兩次首建之間取消／重開時保留已保存中間稿，Task 6整體核對。每項都有[語意契約§2–6](../../../../../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md#2-最小完整文件結構)對照，不新增平行施工路線。
 
 每個 task 的通過條件包含：該切片固定測試、North Star／decision drift 核對、獨立 review 無阻擋 finding、更新其 README。本計畫開始執行須 register 明列允許的隔離施工範圍；不得憑本檔直接取代仍 Proposed 的 production ADR。
 
@@ -75,7 +75,7 @@ v2在原切片的必要接點：Task 1完成全候選grammar／關係及原生�
 
 ## Task 1：同一 schema 與官方原生文件可執行
 
-**完成：**[實作／初審／修正／複核證據](../specs/evidence/2026-09-10-jd-editor-task1-results.md)，68 native／27 Python、codegen/check/build通過，R1/R2 CLOSED。保存点`88eda480`／`jd-editor-core-task1-20260910`。原生與契約限定範圍完成，不代稱後續DB、DOM或模型驗收。
+**完成：**[實作／初審／修正／複核證據](../../../../../experiments/legacy-evidence/2026-09-10-jd-editor-task1-results.md)，68 native／27 Python、codegen/check/build通過，R1/R2 CLOSED。保存点`88eda480`／`jd-editor-core-task1-20260910`。原生與契約限定範圍完成，不代稱後續DB、DOM或模型驗收。
 
 **Files**
 
@@ -89,7 +89,7 @@ v2在原切片的必要接點：Task 1完成全候選grammar／關係及原生�
 
 v2增加同一candidate的有限ID→item索引及Task端點檢查，AI與人工validate-value共用。模型`knowledge_refs`／`skill_refs`在Python映為Node的`knowledge_ids`／`skill_ids`，unset欄名同樣映射；不能共用兩種不同語意的properties DTO。Task1不負責發配opaque refs或操作DB。研究probe只作案例與證據，正式validator在`N/`接線，禁止import probe實作。
 
-- [x] **1.1 建測試與 fixture。** 使用`docs/specs/evidence/jd-semantic-native-probe/fixture.json`及其`fixture-mapping.json`／`fixture-statistics.json`：完整r2文字／marks及來源節點保留，8個Task各有两組，5 K／5 S完整item，兩張K／S表格外框明示退役後剩1張基本資料表。新增links是合成測試配置，不當已核實職務事實。來源handle改用測試會實際發配者，在`J/fixtures/source-map.json`留對照。單Task8 move的完整expected用`task8-move-full-expected.json`（固定oracle），不得混用先copy再move的F03-C after；原生綜合實測見F03封存結果。v1／F02不改、不直接拿來當v2。先加入下表assertions，再執行`npm run test -w @caliburn/jd-editor-native -- tests/profile.test.ts tests/transform.test.ts tests/read-selection.test.ts tests/contract.test.ts`，預期缺正式模組／功能而失敗。
+- [x] **1.1 建測試與 fixture。** 使用`docs/experiments/legacy-evidence/jd-semantic-native-probe/fixture.json`及其`fixture-mapping.json`／`fixture-statistics.json`：完整r2文字／marks及來源節點保留，8個Task各有两組，5 K／5 S完整item，兩張K／S表格外框明示退役後剩1張基本資料表。新增links是合成測試配置，不當已核實職務事實。來源handle改用測試會實際發配者，在`J/fixtures/source-map.json`留對照。單Task8 move的完整expected用`task8-move-full-expected.json`（固定oracle），不得混用先copy再move的F03-C after；原生綜合實測見F03封存結果。v1／F02不改、不直接拿來當v2。先加入下表assertions，再執行`npm run test -w @caliburn/jd-editor-native -- tests/profile.test.ts tests/transform.test.ts tests/read-selection.test.ts tests/contract.test.ts`，預期缺正式模組／功能而失敗。
 
 | 固定測試 | 必須斷言的完整結果 |
 |---|---|
@@ -115,7 +115,7 @@ v2增加同一candidate的有限ID→item索引及Task端點檢查，AI與人工
 
 ## Task 2：同 PG 唯一工作稿、revision 與回執
 
-**完成：**[實作／PG故障／初審及R1複核](../specs/evidence/2026-09-10-jd-editor-task2-results.md)，130項原完整驗收及修正後14focused通過；Spec PASS／quality APPROVED。保存点`23bf0161`／`jd-editor-core-task2-20260910`，20個本task檔案。Task3真來源binding、Task4/5 DOM／admission／取消仍未驗。
+**完成：**[實作／PG故障／初審及R1複核](../../../../../experiments/legacy-evidence/2026-09-10-jd-editor-task2-results.md)，130項原完整驗收及修正後14focused通過；Spec PASS／quality APPROVED。保存点`23bf0161`／`jd-editor-core-task2-20260910`，20個本task檔案。Task3真來源binding、Task4/5 DOM／admission／取消仍未驗。
 
 **Files**
 
@@ -142,24 +142,24 @@ v2增加同一candidate的有限ID→item索引及Task端點檢查，AI與人工
 | `manual_snapshot_has_no_invented_operations` | 人工committed保留不同before/after完整快照；native_operations=null、affected IDs=[]表示未提供可靠定位，不當no_change。candidate normalization紀錄不冒充baseline→manual差異；人工事件仍計入跨輪通知 |
 
 - [x] **2.2 執行紅燈。** 在 `A/` 執行 `uv run pytest -q tests/test_jd_engine.py tests/test_jd_store.py tests/test_jd_postgres.py`，確認未實作的接點失敗；PG 不可用則完成離線部分並明列唯一尚缺的 PG 驗收，不改用 SQLite 充數。
-- [x] **2.3 接固定 subprocess client。** `jd_engine.py` 以無 shell 的固定 argv 啟动 Node；validate request／response，timeout／取消 terminate 並 reap，stdout 截斷或超界回有界錯誤。依[ER03唯一策略](../specs/evidence/2026-09-10-jd-error-recovery-contract-closure.md)每個明示執行一次attempt、不自動重播，Node起始控制預算30秒、terminate／kill回收各5秒；計時不重設，OS spawn不可中斷限制須明列。限額以完整 r2 及有明示規模的 stress 批次實際 wall time／bytes 記錄與驗證；schema 未定命令數上限，不把實驗批次規模當產品最大值，不任意截短 JD。逾時但尚未證明程序停止不能解writer gate；Node 不知道 DSN、canonical 原文或付費模型設定。
-- [x] **2.4 實作唯一 SQL transaction。** 欄位／nullable／PK／FK／部分UNIQUE／CHECK／mapper核值固定依[DB契約補正](../specs/evidence/2026-09-10-jd-storage-contract-closure.md)，不另存revision.producing_operation。catalog 的 `create_document(title,*,session=None)` 增有限既有 session 接點；新文件由 composition 在同一短交易建立 catalog／空稿 revision／head，舊無參數呼叫仍沿原行為，不更動原文／Memory。改稿依 receipt-first → 交易外候選 → lock head row → 再查同 operation／digest → 核 base／head → 同交易 revision→receipt→head→commit。`no_change` 與已知失敗只寫 immutable receipt，不造內容版；已終局不得覆寫。request digest 含 document／base／commands（含明示來源）／profile，不含時間／隨機候選 ID。SQL各明示階段一次attempt、總控制預算30秒，沿現有connect5／statement10／lock5秒收斂剩餘時間；不把statement timeout當transaction總上限。確認rollback才可記失敗receipt，unknown只對帳，故障映射與UI恢復依ER03。測試前核實實際PG16版本／logged tables／fsync／synchronous_commit，不推定設定已正確。
+- [x] **2.3 接固定 subprocess client。** `jd_engine.py` 以無 shell 的固定 argv 啟动 Node；validate request／response，timeout／取消 terminate 並 reap，stdout 截斷或超界回有界錯誤。依[ER03唯一策略](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-10-jd-error-recovery-contract-closure.md)每個明示執行一次attempt、不自動重播，Node起始控制預算30秒、terminate／kill回收各5秒；計時不重設，OS spawn不可中斷限制須明列。限額以完整 r2 及有明示規模的 stress 批次實際 wall time／bytes 記錄與驗證；schema 未定命令數上限，不把實驗批次規模當產品最大值，不任意截短 JD。逾時但尚未證明程序停止不能解writer gate；Node 不知道 DSN、canonical 原文或付費模型設定。
+- [x] **2.4 實作唯一 SQL transaction。** 欄位／nullable／PK／FK／部分UNIQUE／CHECK／mapper核值固定依[DB契約補正](../../../../../experiments/legacy-evidence/2026-09-10-jd-storage-contract-closure.md)，不另存revision.producing_operation。catalog 的 `create_document(title,*,session=None)` 增有限既有 session 接點；新文件由 composition 在同一短交易建立 catalog／空稿 revision／head，舊無參數呼叫仍沿原行為，不更動原文／Memory。改稿依 receipt-first → 交易外候選 → lock head row → 再查同 operation／digest → 核 base／head → 同交易 revision→receipt→head→commit。`no_change` 與已知失敗只寫 immutable receipt，不造內容版；已終局不得覆寫。request digest 含 document／base／commands（含明示來源）／profile，不含時間／隨機候選 ID。SQL各明示階段一次attempt、總控制預算30秒，沿現有connect5／statement10／lock5秒收斂剩餘時間；不把statement timeout當transaction總上限。確認rollback才可記失敗receipt，unknown只對帳，故障映射與UI恢復依ER03。測試前核實實際PG16版本／logged tables／fsync／synchronous_commit，不推定設定已正確。
 - [x] **2.5 接完整人工 value 保存。** `JdManualSaveClientInput` 僅含 `{request_key,base_revision_ref,value}`；browser App 以 `crypto.randomUUID()` 配 key，Python 以 route document／此 key 綁 submission，計算 exact payload digest 並注入 profile／origin，映成 `JdManualSaveRequest`。不加預約 ID endpoint／新 identity store。人工與 AI 共用 scope、base、profile、來源、receipt 與交易邊界。以 `JdPlateValidateValueRequest` 走 `validate-value`；結果 normalization operations 是從送入的人工 candidate 起算，不能冒稱 authoritative baseline→人工稿的逐鍵操作。人工 actual_changes 保留 exact before／after、origin=manual、`native_operations:null`，不補造 events、不靜默修改舊 revision。
 
 人工full-value沒有可靠baseline定位時，`affected_element_ids=[]`只表示未提供定位，不能解讀為沒有變更；不轉用candidate normalization的ID清單。committed／不同revision及完整前後快照仍證明有改，通知必計入事件。這沿既有空array／null契約與完整快照fallback，已經有限review核對；不為人工保存新增diff引擎。
 
-- [x] **2.5a 提供既有歷史的唯讀接點。** 依[跨輪通知設計§6](../specs/2026-09-10-jd-model-view-change-notice-design.md#6-三工具是否需要改-wire)，同store提供revision→唯一creating committed receipt、同文件ancestor區間counts及最新四事件的有限typed read ports。initial無producer、no_change不進建立事件鏈；核scope／直接parent，不以created_at猜lineage。不新增表／已讀服務或公開工具，Task 3再映成既有change_refs語意。驗manual→manual改回仍有兩事件、混ai/manual與非祖先拒絕。
+- [x] **2.5a 提供既有歷史的唯讀接點。** 依[跨輪通知設計§6](../../../../../specs/2026-09-10-jd-model-view-change-notice-design.md#6-三工具是否需要改-wire)，同store提供revision→唯一creating committed receipt、同文件ancestor區間counts及最新四事件的有限typed read ports。initial無producer、no_change不進建立事件鏈；核scope／直接parent，不以created_at猜lineage。不新增表／已讀服務或公開工具，Task 3再映成既有change_refs語意。驗manual→manual改回仍有兩事件、混ai/manual與非祖先拒絕。
 - [x] **2.6 驗收及提交。** 重跑 2.2；檢查每個測試實際輸出 head／revision／receipt 的完整內容及 fresh-process 結果，`A/README.md` 記 fresh setup／文件 scope 與不存在文件拒絕。本Task不驗封存或完整生命週期；更名／封存／恢復沿下方Task 4／5增補及P5。永久刪除已由成品計畫PARKED，不列Memory正式採用前提，也不清空共用DB；各測試使用唯一文件身分。review 後 commit `feat(jd): persist isolated working revisions and receipts`。
 
 **停止線：** 需改 Memory／Saver／Store 的 ownership、operation 已提交卻要新配 ID 重做、或只能靠雙寫舊 approved document 才工作，停止該接線；不是本計畫自行正式化 Memory。
 
 ## Task 3：同一既有顧問的三工具、已發配 refs 與來源
 
-**取消接點有限增補：**依[已審查 lifecycle 設計](../specs/2026-09-10-jd-native-process-lifecycle-design.md)，本 Task 只將同文件 stop Event 實際傳至 JD wrapper／service／engine，並在 Node 前保存 exact operation binding；unconfirmed／reconcile_operation 保留 pending 且停止下一 intent／模型迴圈。可窄改 `jd_service.py`、`jd_engine.py` 的 keyword-only cancel forwarding。完整 Popen owner、Windows Job／mutex、manual descriptor 與 cleanup／重開證據留 Task 5；不注入空 owner 後宣稱已追蹤程序。
+**取消接點有限增補：**依[已審查 lifecycle 設計](../../../../../specs/2026-09-10-jd-native-process-lifecycle-design.md)，本 Task 只將同文件 stop Event 實際傳至 JD wrapper／service／engine，並在 Node 前保存 exact operation binding；unconfirmed／reconcile_operation 保留 pending 且停止下一 intent／模型迴圈。可窄改 `jd_service.py`、`jd_engine.py` 的 keyword-only cancel forwarding。完整 Popen owner、Windows Job／mutex、manual descriptor 與 cleanup／重開證據留 Task 5；不注入空 owner 後宣稱已追蹤程序。
 
-**初審修正範圍：**[T3-R01–04](../specs/evidence/jd-editor-task3/review.md)屬原 Task3 的實際供給／發配要求。R04 可窄改 `A/src/analysis_agent/sources.py`，提供當次原 `ConversationReader` 成功讀取的觀察接點，供既有 JD source acquisition 核對真正返回內容／scope；不改 canonical source window、Memory policy／保存 owner、不新增可寫來源服務。其餘修正沿既有 session／最終公開 middleware／通知 helper，僅跑具體反例與受影響回歸。
+**初審修正範圍：**[T3-R01–04](../../../../../experiments/legacy-evidence/jd-editor-task3/review.md)屬原 Task3 的實際供給／發配要求。R04 可窄改 `A/src/analysis_agent/sources.py`，提供當次原 `ConversationReader` 成功讀取的觀察接點，供既有 JD source acquisition 核對真正返回內容／scope；不改 canonical source window、Memory policy／保存 owner、不新增可寫來源服務。其餘修正沿既有 session／最終公開 middleware／通知 helper，僅跑具體反例與受影響回歸。
 
-**3.3a前置設計已閉合：**依[跨輪通知設計](../specs/2026-09-10-jd-model-view-change-notice-design.md)及[獨立review](../specs/evidence/2026-09-10-jd-model-view-design-review.md)實作：先納§6.2兩處SSOT description並重生／驗最終request；shape不變。最近成功返回請求的有限manifest與AI response同model checkpoint，root／child共用；每次compaction投影後重加有界App資料通知。事件基準不冒充內容已讀，16KiB／4明細／2KiB預覽是本案起始值，沿原token／tool預算。MV01–17／19在本Task實驗，MV18取消傳遞留Task 5；本段不宣稱已通過接線。
+**3.3a前置設計已閉合：**依[跨輪通知設計](../../../../../specs/2026-09-10-jd-model-view-change-notice-design.md)及[獨立review](../../../../../experiments/legacy-evidence/2026-09-10-jd-model-view-design-review.md)實作：先納§6.2兩處SSOT description並重生／驗最終request；shape不變。最近成功返回請求的有限manifest與AI response同model checkpoint，root／child共用；每次compaction投影後重加有界App資料通知。事件基準不冒充內容已讀，16KiB／4明細／2KiB預覽是本案起始值，沿原token／tool預算。MV01–17／19在本Task實驗，MV18取消傳遞留Task 5；本段不宣稱已通過接線。
 
 **Files**
 
@@ -172,14 +172,14 @@ v2增加同一candidate的有限ID→item索引及Task端點檢查，AI與人工
 
 **固定 provider binding：**第一版只接 §4.1 已選 CT49–51 OpenAI Responses runtime。由同一 SSOT 抽取各 ModelInput 與其引用 defs（保留內容，不自行編譯成跨廠 subset）；factory 的三個 `BaseTool(args_schema=dict)` 保留在 ToolNode。`JdToolSession` 的官方 `wrap_model_call` 以 `request.override(tools=...)` **只替換命中原 factory instance identity 的三個 JD model-view 項目**，送原格式 `{type:'function',name,description,parameters,strict:false}`；name 沿同一工具，description 固定取 SSOT 對應 ModelInput.description，parameters 為完整抽出 schema；不得另手寫一份模型說明。其他工具原 instance 保留，不設全模型 `strict=False`，不更改 Memory／provider／parallel_tool_calls。`convert_to_openai_tool` 官方 raw function 直通可保留 `$defs`，避免 BaseTool converter 的 dereference／循環剪枝。沒有新 Agent、工具執行層或通用 compiler。
 
-此為完整參數形狀下的明確 compatibility 選擇，**不是官方推薦所有工具 non-strict**。OpenAI strict 的 subset 與 Anthropic strict 的遞迴限制不同，不能將 App full schema 直接稱為兩家 strict 通用；省略 strict 也不能假定是 non-strict。代價是 provider 不保證參數符合 schema；`jd_contract.py` 必須在任何 operation／Node／SQL 寫入前驗完整 ModelInput，再驗 refs／scope／source／base。dict args_schema 的 BaseTool 本身不驗輸入，不能漏掉這一步。固定 serialize 已證實最終 SDK request 的三份 parameters 全等、JD strict=false／非 JD 仍省略；尚未證真 provider 接受／自然模型品質，見 [原碼與實際輸出](../specs/evidence/jd-contract-schema/provider-wire-README.md)。
+此為完整參數形狀下的明確 compatibility 選擇，**不是官方推薦所有工具 non-strict**。OpenAI strict 的 subset 與 Anthropic strict 的遞迴限制不同，不能將 App full schema 直接稱為兩家 strict 通用；省略 strict 也不能假定是 non-strict。代價是 provider 不保證參數符合 schema；`jd_contract.py` 必須在任何 operation／Node／SQL 寫入前驗完整 ModelInput，再驗 refs／scope／source／base。dict args_schema 的 BaseTool 本身不驗輸入，不能漏掉這一步。固定 serialize 已證實最終 SDK request 的三份 parameters 全等、JD strict=false／非 JD 仍省略；尚未證真 provider 接受／自然模型品質，見 [原碼與實際輸出](../../../../../experiments/legacy-evidence/jd-contract-schema/provider-wire-README.md)。
 
 - [x] **3.1 建紅燈與固定呼叫。** 先實際呼叫 `jd_read({})`，在返回 `targets` 選 fixture 的 Task8 正文 element，取其 `target_ref`；另呼叫 `ConversationReader` 取得實際 saved input 的 source handle。組 `JdEditModelInput.commands` 同批兩命令：`replace_block_content` 用該target及 `content=[{text:'僅對約定服務執行每月檢查；異常依既有故障處理程序交接。'}]`；`set_properties` 對同target明示 `source_refs` 為需保留的原有相關refs加新handle。沒有頂層來源集合，App僅收本批明示附著聯集。不能硬寫字串跳過 read。執行 `uv run pytest -q tests/test_jd_tools.py tests/test_jd_references.py tests/test_jd_sources.py`，先見缺接點失敗。
 
 - [x] **3.2 驗並接 references。** `jd_read({})` 取得 current_base；明示 revision 讀即使碰巧為 head 仍 read_only。refs 綁實際 saved revision／read 種類／target；selection 只取同一支持文字 block 的實際選取。有限 read pagination 返回同 revision continuation，change_read 的 continuation 則綁原確切比較，不能用新 head 偷換後頁。continuation 本身無寫入權；**current 續頁可對該同一 base 新讀到的內容發出 current_base targets**，仍須提交時 head／base 檢查；history 續頁只讀，不升格或換 head。固定測試逐頁收齊原完整內容，current 後頁 target 可按同 base 規則寫、history 後頁 target 不可寫。用既有 checkpointed tool result／binding 驗「已發配」，不建泛用 token／模糊搜尋服務。
 - [x] **3.2a 接首次 selection 發配。** 本切片先在既有 `POST /documents/{document}/runs` 的 `MessageInput` 加 optional `jd_selection`，shape 只引用 SSOT `JdSelectionCaptureClientInput={base_revision_ref,range:SlateRange}`，保留其他原欄位語意。API admission 先驗該 base 仍是 current head；`jd_engine.py` mapper 用 Task 1 的固定 `read-selection` 及 `JdPlateReadSelectionRequest/Result`，原生核同一支持文字 block／range 並取得 fragment，再按 admission 邊界重檢 head，不能由 Python 自製 range matcher 或用假 edit 取文。把 document／本次 run／已保存 input／base／block／range／fragment 的有限 selection context checkpoint 在當次 App runtime，經 SSOT 的 `JdReadRuntimeRequest.jd_selection` adapter 映到內部 read port；不是把選取內容拼进員工原話，沒有第二份 Memory／token store。`jd_read({})` 根據此 context 發 selection_ref 給模型，後续範圍過期依既有 base 規則拒絕；純聊天不帶 selection、沿既有流程，不能沿用上一 run 的選取。Task 3 先以 Task 1 已有的固定 Plate editor 原生選取產生 range，經實際 API input／admission／jd_read 取得 ref，絕不預造 selection_ref；真 browser capture 端到端列 Task 4，不當 Task 3 的退出前提。
 - [x] **3.3 驗並接來源。** 向現有 `sources.py` 的 `ConversationReader`／既有 Memory read owner 解析；同 run 已保存 current input 可用，歷史 extraction window 仍須 completed／safely closed。跨文件、缺 checkpoint、未讀／捏造 handle、把 ToolMessage 當員工原話均拒絕。原始來源內容不複製到 JD 表，source refs 有效不代表人工新文字被 reverified。
-- [x] **3.3a 補齊跨輪人工變更 context。** 依[主設計 §3.1](../specs/2026-09-09-jd-editor-app-integration-design.md#31-不每輪改稿的顧問接點)與[官方定點研究 §3](../specs/2026-09-10-jd-context-change-and-source-research.md#3-本案如何沿官方接點接線)已核對的既有 `wrap_model_call`／`request.override` model-view 接點，寫清楚比較基準、模型先前實際取得版本／範圍、當輪通知的呈現預算、重開／基準未知行為，再作有限審查並接線；不重做廣泛廠商比較，也不採 experimental Codex API 作新依賴。固定 provider request 驗「員工已保存更動」在下一輪模型回應前可見，能沿三工具取得確切前後內容，不只驗 `jd_read` 可以讀最新版。覆蓋跨輪多次手改、先改再改回、AI 改後再手改、下一輪只訪談、另一文件隔離、通知較長內容有明示續讀、保存失敗不冒稱新版，以及關頁重開或 context 縮減後不把未提供內容誤標為已讀；純訪談可不改 JD。通知組裝失敗不能静默略過或假報未改；canonical 員工問句與 Memory extraction 不包含 App 注入的偽造問答。沿既有文件 revisions 與 runtime，不另造 Memory／同步引擎；若需要改公開 wire shape，先更新同一 SSOT 並重驗生成，不在 prompt 偷塞未定義的工具參數。此新增驗收尚未執行，原 schema／provider 離線證據不覆蓋它。
+- [x] **3.3a 補齊跨輪人工變更 context。** 依[主設計 §3.1](../../../../../specs/2026-09-09-jd-editor-app-integration-design.md#31-不每輪改稿的顧問接點)與[官方定點研究 §3](../../../../../specs/2026-09-10-jd-context-change-and-source-research.md#3-本案如何沿官方接點接線)已核對的既有 `wrap_model_call`／`request.override` model-view 接點，寫清楚比較基準、模型先前實際取得版本／範圍、當輪通知的呈現預算、重開／基準未知行為，再作有限審查並接線；不重做廣泛廠商比較，也不採 experimental Codex API 作新依賴。固定 provider request 驗「員工已保存更動」在下一輪模型回應前可見，能沿三工具取得確切前後內容，不只驗 `jd_read` 可以讀最新版。覆蓋跨輪多次手改、先改再改回、AI 改後再手改、下一輪只訪談、另一文件隔離、通知較長內容有明示續讀、保存失敗不冒稱新版，以及關頁重開或 context 縮減後不把未提供內容誤標為已讀；純訪談可不改 JD。通知組裝失敗不能静默略過或假報未改；canonical 員工問句與 Memory extraction 不包含 App 注入的偽造問答。沿既有文件 revisions 與 runtime，不另造 Memory／同步引擎；若需要改公開 wire shape，先更新同一 SSOT 並重驗生成，不在 prompt 偷塞未定義的工具參數。此新增驗收尚未執行，原 schema／provider 離線證據不覆蓋它。
 - [x] **3.4 注入工具及 durable binding。** 在現有 `_context` 的 `tools` 中加入唯一 JD factory instances；保持 `MemorySession`／background／provider／compaction／budget 原設定。JD middleware 在 Node 前保存 input→AI message→tool call→operation／digest／base／command binding，重開同 binding；同名替代工具或 middleware 注入同名工具 fail closed。不接受模型自填 path／offset／document／profile／operation。
 - [x] **3.4a Schema-first 的實際 model transport 驗收。** `test_jd_provider_binding.py` 沿真正 `build_agent`／`ChatOpenAI`／SDK，固定 `httpx.MockTransport` 捕最終 request：三個 JD parameters 與 SSOT＋refs 閉包全等、description 與同一 SSOT 完全相同、root type object、遞迴 refs／必要 constraints 未被剪掉、strict false；非 JD schema／strict 及模型設定維持原樣。用固定 ToolMessage 路徑再驗原 ToolNode 只執行原 factory instance；不合法雙 ref／未知 prop／非法 recursive content 先被 App 完整 validator 拒絕，engine invocation 為 0。執行 `uv run pytest -q tests/test_jd_provider_binding.py tests/test_jd_tools.py`；真 provider 是否接受此 schema 仍列獨立、有預算的接線驗收，不因 MockTransport 400／固定成功回應而冒稱已通過。
 - [x] **3.5 驗收精確負例。** current read→改月檢通過且故障內容完整；同文件 history target 寫入拒絕；混兩版 refs 整批拒絕；猜真 ID 但無已發配 read拒絕；selection 重複文字只改指定處；no-change change_ref 可查空差異；兩版 comparison 不冒稱某一次 AI 修改；source 返回逐字原話。用固定模型回應驗工具注入與 ToolMessage 正確，外部請求數為 0。
@@ -189,9 +189,9 @@ v2增加同一candidate的有限ID→item索引及Task端點檢查，AI與人工
 
 ## Task 4：同頁手編、完整實際差異與 session history
 
-**完成並接受：**[結果及fix1 closure](../specs/evidence/2026-09-10-jd-editor-task4-results.md)，初輪工程及必要真browser、fix1受影響窄檢查通過，T4-R01–04全CLOSED／Spec PASS／quality APPROVED。原clipboard誤判與首敗保留，有限paragraph/marks保真另有實證；OS真人IME NOT RUN。Task5完整生命周期、Task6與自然品質仍後續。
+**完成並接受：**[結果及fix1 closure](../../../../../experiments/legacy-evidence/2026-09-10-jd-editor-task4-results.md)，初輪工程及必要真browser、fix1受影響窄檢查通過，T4-R01–04全CLOSED／Spec PASS／quality APPROVED。原clipboard誤判與首敗保留，有限paragraph/marks保真另有實證；OS真人IME NOT RUN。Task5完整生命周期、Task6與自然品質仍後續。
 
-**成品旅程增補（2026-09-10，獨立設計review通過）：**本Task同時實作[員工旅程§6–10](../specs/2026-09-10-jd-employee-journey-design.md#6-最小-apiwire-增補與回覆遺失)的create／list／reopen及共同metadata接點。§9為精確增補清單，J01–J12為對應驗收；完整更名／封存管理UI在P5完成。普通未提交dirty採頁面buffer與navigation guard；只有送出請求有持久recovery cache，不宣稱普通dirty在crash後可恢復。
+**成品旅程增補（2026-09-10，獨立設計review通過）：**本Task同時實作[員工旅程§6–10](../../../../../specs/2026-09-10-jd-employee-journey-design.md#6-最小-apiwire-增補與回覆遺失)的create／list／reopen及共同metadata接點。§9為精確增補清單，J01–J12為對應驗收；完整更名／封存管理UI在P5完成。普通未提交dirty採頁面buffer與navigation guard；只有送出請求有持久recovery cache，不宣稱普通dirty在crash後可恢復。
 
 **Files**
 
@@ -204,9 +204,9 @@ v2增加同一candidate的有限ID→item索引及Task端點檢查，AI與人工
 
 **Interfaces**：Web 消費 generated DTO；catalog／messages／runs 消費8091 API同源機械生成型別，新create identity／metadata conditional command／run-by-request defs納入active SSOT，再由API Pydantic models引用生成型別，不import 8001 `jobAnalysisApi.ts`。`N/react-profile`＋同一 `JdNode`／`JdLeaf` 用於 current、exact before／after、diff；只有 current 可編輯。
 
-- [x] **4.0 導入已核官方修補runtime。** 依[Web核對§4](../specs/2026-09-10-jd-web-execution-preflight.md#4-node-22-支援與安全修補補核2026-09-10)及[限定review](../specs/evidence/2026-09-10-jd-web-preflight-review.md)採Node22.23.2官方Windows portable distribution，核架構、官方簽署SHASUMS與SHA256，保留Node及附帶元件授權。放專案隔離runtime目錄並排除binary入git；以有限啟動環境／明確executable使用，不替換全機Node/PATH或Task3進行中的程序，不新增版本管理framework。重建API/JdEngine（它在建構時解析node），記self.node、worker process.execPath／version、npm scripts及process.versions，不能只看terminal版本。先在原鎖重驗contract生成bytes/check、native commands／selection／copy／history/build、Python→Node真子程序及錯誤/UTF-8；若涉及保存沿現有專用PG recovery集合。舊Task1–3證據保留原runtime；另記本次新版結果，不能改判歷史。後續W依4.6驗compiledReact／DOM。
+- [x] **4.0 導入已核官方修補runtime。** 依[Web核對§4](../../../../../specs/2026-09-10-jd-web-execution-preflight.md#4-node-22-支援與安全修補補核2026-09-10)及[限定review](../../../../../experiments/legacy-evidence/2026-09-10-jd-web-preflight-review.md)採Node22.23.2官方Windows portable distribution，核架構、官方簽署SHASUMS與SHA256，保留Node及附帶元件授權。放專案隔離runtime目錄並排除binary入git；以有限啟動環境／明確executable使用，不替換全機Node/PATH或Task3進行中的程序，不新增版本管理framework。重建API/JdEngine（它在建構時解析node），記self.node、worker process.execPath／version、npm scripts及process.versions，不能只看terminal版本。先在原鎖重驗contract生成bytes/check、native commands／selection／copy／history/build、Python→Node真子程序及錯誤/UTF-8；若涉及保存沿現有專用PG recovery集合。舊Task1–3證據保留原runtime；另記本次新版結果，不能改判歷史。後續W依4.6驗compiledReact／DOM。
 - [x] **4.1 建同頁與 API 紅燈。** 初版 `/` 只列 catalog 文件／建立文件，選一份到 `/workspace/{document_id}` 的聊天＋JD。測試「選文件 A→讀 A messages/run/head→保存 A→切 B 不帶 A refs」，以及 dirty 保存失敗不發 run；不以兩個 tabs 表示目前稿／更正稿。
-- [x] **4.2 建最小隔離 Next 設定。** 依[Web施工前官方核對](../specs/2026-09-10-jd-web-execution-preflight.md)改用Next／eslint-config-next 16.3.3；react／react-dom宣告與resolved套件保留19.2.4並與native鎖一致，Vitest／mocker沿4.1.11。這是已知官方修補的有限cross-minor升級，不改production鎖。另記Next compiled React／RSC及browser實際React runtime，不override、不強迫版本等於19.2.4；相容性以真DOM證明。`transpilePackages` 明列 `@caliburn/jd-editor-native`／`@caliburn/jd-editor-contract`，不用新 bundler。Web dev 固定 `next dev --hostname 127.0.0.1 --port 3001`，API origin `http://127.0.0.1:8091`。API 同時調整既有 same_origin guard 與 `CORSMiddleware`，只允許 `http://127.0.0.1:3001`、`http://localhost:3001`，`allow_credentials=False`，methods `GET,POST,PATCH`，headers `Content-Type`。保留 TrustedHost localhost／127.0.0.1；未知 Origin 回 403，合法 preflight 通過。production 3000／8001 配置不改。
+- [x] **4.2 建最小隔離 Next 設定。** 依[Web施工前官方核對](../../../../../specs/2026-09-10-jd-web-execution-preflight.md)改用Next／eslint-config-next 16.3.3；react／react-dom宣告與resolved套件保留19.2.4並與native鎖一致，Vitest／mocker沿4.1.11。這是已知官方修補的有限cross-minor升級，不改production鎖。另記Next compiled React／RSC及browser實際React runtime，不override、不強迫版本等於19.2.4；相容性以真DOM證明。`transpilePackages` 明列 `@caliburn/jd-editor-native`／`@caliburn/jd-editor-contract`，不用新 bundler。Web dev 固定 `next dev --hostname 127.0.0.1 --port 3001`，API origin `http://127.0.0.1:8091`。API 同時調整既有 same_origin guard 與 `CORSMiddleware`，只允許 `http://127.0.0.1:3001`、`http://localhost:3001`，`allow_credentials=False`，methods `GET,POST,PATCH`，headers `Content-Type`。保留 TrustedHost localhost／127.0.0.1；未知 Origin 回 403，合法 preflight 通過。production 3000／8001 配置不改。
 - [x] **4.3 接完整路由。** 使用現有 `/documents`、`/documents/{document}/messages`、`/runs`、`/runs/{run_id}`、`/stop`／`/resume`，新增下表固定 JD routes；消費 Task 3 已接的 optional `MessageInput.jd_selection:JdSelectionCaptureClientInput`。每次以 route document 核 scope；server mapper 接內部 ports，Web 不偽造 AI run／tool ID。`export_web_contract.py` 只讀 `api.py` 的 `DocumentInput/DocumentOutput/MessageInput/MessageOutput/RunOutput/MemoryStatusOutput`與旅程§6新增且引用同一生成defs的metadata／request-lookup models，以 Pydantic `TypeAdapter` 聯集的 `json_schema()` 輸出生成資料，再沿 C 既有 `json-schema-to-typescript` 生成 `W/src/generated/analysis-api.ts`；不啟動 `open_service`、不手抄型別，不新增 OpenAPI generator。C 的 check-codegen 一併比對此檔。
 
 | HTTP 入口 | Body → response／責任 |
@@ -240,21 +240,21 @@ v2增加同一candidate的有限ID→item索引及Task端點檢查，AI與人工
 | 真 selection 入口 | Browser 在同一 `p/h1/h2/h3/lic` 中選取第二次出現的相同繁中文字→必要 dirty 保存成功→capture→既有 POST runs→jd_read({}) 取得 selection_ref→replace_selection；只改該範圍且 HumanMessage 原問句全等。錯 head、跨 block、保存後已變選取均拒絕並保留 chat input；不預造 ref、不自動猜 match，純聊天無 selection 仍通過 |
 | API origin | 上述 2 origins 的 GET／POST／PATCH／preflight 通過；外部 origin、3000 origin、錯 document refs 負例拒絕；Network 無 8001 請求 |
 
-- [x] **4.6 驗收與提交。** `A/`：`uv run pytest -q tests/test_jd_api.py`。`J/`：`npm run test -w @caliburn/jd-editor-web`、`npm run typecheck -w @caliburn/jd-editor-web`、`npm run lint -w @caliburn/jd-editor-web`、`npm run build -w @caliburn/jd-editor-web`及native regression。核新增套件resolved／授權／audit，記Node、Next compiled React／RSC、browser React runtime／version／channel／headed狀態。依[Web核對§2–3](../specs/2026-09-10-jd-web-execution-preflight.md#2-真-browser-的可行路徑與不能冒稱的範圍)走真browser selection／clipboard／composition，留畫面／AX／actual request／saved value；CDP只用已核可呼叫的imeSetComposition→insertText，沒有imeCommitComposition。CDP引擎證據與Windows真人IME分列，未操作OS候選則記OS IME NOT RUN，不能勾整列通過或由jsdom代替。review 後 commit `feat(jd): add isolated same-page editor and visible changes`。
+- [x] **4.6 驗收與提交。** `A/`：`uv run pytest -q tests/test_jd_api.py`。`J/`：`npm run test -w @caliburn/jd-editor-web`、`npm run typecheck -w @caliburn/jd-editor-web`、`npm run lint -w @caliburn/jd-editor-web`、`npm run build -w @caliburn/jd-editor-web`及native regression。核新增套件resolved／授權／audit，記Node、Next compiled React／RSC、browser React runtime／version／channel／headed狀態。依[Web核對§2–3](../../../../../specs/2026-09-10-jd-web-execution-preflight.md#2-真-browser-的可行路徑與不能冒稱的範圍)走真browser selection／clipboard／composition，留畫面／AX／actual request／saved value；CDP只用已核可呼叫的imeSetComposition→insertText，沒有imeCommitComposition。CDP引擎證據與Windows真人IME分列，未操作OS候選則記OS IME NOT RUN，不能勾整列通過或由jsdom代替。review 後 commit `feat(jd): add isolated same-page editor and visible changes`。
 
 **停止線：** 需要第二份可編稿、忽略 unsupported 資料或自建 history／diff 才能呈現；保留失敗與 buffer，不扩引擎。只有 headless／jsdom 綠燈時 DOM／IME 仍未通過。
 
 ## Task 5：人工→AI admission、取消與已提交結果對帳
 
-**2026-09-11 已接受：**[最終結果及獨立 closure](../specs/evidence/2026-09-10-jd-editor-task5-results.md)通過，R01–R06 CLOSED。原六項有限證據與真人 IME／自然品質限制保留。完成本地保存點後接 Task6；production gate 不變。
+**2026-09-11 已接受：**[最終結果及獨立 closure](../../../../../experiments/legacy-evidence/2026-09-10-jd-editor-task5-results.md)通過，R01–R06 CLOSED。原六項有限證據與真人 IME／自然品質限制保留。完成本地保存點後接 Task6；production gate 不變。
 
-**2026-09-10 transport設計閉合：**採[有限人工恢復設計](../specs/2026-09-10-jd-manual-recovery-transport-design.md)，MRD-R01/02 CLOSED／Spec與quality PASS。5.1/5.4/5.5納MT01–14：同原key GET/POST、全部status的server write_blocked/can_recover、exact cache/no_pending另次明示原完整提交、晚到結果及clear失敗。Files增加A/scripts/export_web_contract.py、W/src/jd/api.ts及其generated analysis-api.ts，actual Pydantic單一來源，不改三工具／主JD SSOT。Task4原驗收保留，未知load改純GET由Task5承接。
+**2026-09-10 transport設計閉合：**採[有限人工恢復設計](../../../../../specs/2026-09-10-jd-manual-recovery-transport-design.md)，MRD-R01/02 CLOSED／Spec與quality PASS。5.1/5.4/5.5納MT01–14：同原key GET/POST、全部status的server write_blocked/can_recover、exact cache/no_pending另次明示原完整提交、晚到結果及clear失敗。Files增加A/scripts/export_web_contract.py、W/src/jd/api.ts及其generated analysis-api.ts，actual Pydantic單一來源，不改三工具／主JD SSOT。Task4原驗收保留，未知load改純GET由Task5承接。
 
-**原生 lifecycle 有限設計採用：**按[設計§6–8](../specs/2026-09-10-jd-native-process-lifecycle-design.md)及[獨立審查 closure](../specs/evidence/2026-09-10-jd-native-lifecycle-review.md)採 B。API 在任何實際工作前使用私有 Windows Job／mutex，先終止並核對 exact 舊 Job，再加入新 Job；有限 Popen owner 保留 handle／pipe／I/O 清理責任。publish 前重核 cleanup／cancel；重開的 known-none 需舊 API／Node 停止及 PG head-lock 後 receipt 證據。最多一筆 root-only manual identity binding 不存候選、不造 input，終局確認才清除。驗 NL01–13 及 review 所列 root-only descriptor 正反例，使用真 bootstrap／獨立 test installation key；不得由 test harness 代替產品停止證據。Task 3 forwarding 通過不代稱本 Task 安全。
+**原生 lifecycle 有限設計採用：**按[設計§6–8](../../../../../specs/2026-09-10-jd-native-process-lifecycle-design.md)及[獨立審查 closure](../../../../../experiments/legacy-evidence/2026-09-10-jd-native-lifecycle-review.md)採 B。API 在任何實際工作前使用私有 Windows Job／mutex，先終止並核對 exact 舊 Job，再加入新 Job；有限 Popen owner 保留 handle／pipe／I/O 清理責任。publish 前重核 cleanup／cancel；重開的 known-none 需舊 API／Node 停止及 PG head-lock 後 receipt 證據。最多一筆 root-only manual identity binding 不存候選、不造 input，終局確認才清除。驗 NL01–13 及 review 所列 root-only descriptor 正反例，使用真 bootstrap／獨立 test installation key；不得由 test harness 代替產品停止證據。Task 3 forwarding 通過不代稱本 Task 安全。
 
-**成品旅程增補：**同時執行[員工旅程§7／9／J05–J08](../specs/2026-09-10-jd-employee-journey-design.md#7-封存與恢復的-admission)。archive／rename與新run／manual-write共用同文件admission；原terminal receipt及request查詢優先，封存不遮蔽結果。browser abort／關頁不當stop。背景B1／B2／C對已接收來源沿原政策，含未首次排程／部分批次／受控恢復；內部`service.list_documents()`含archived，封存不額外啟動或等待背景歸零。
+**成品旅程增補：**同時執行[員工旅程§7／9／J05–J08](../../../../../specs/2026-09-10-jd-employee-journey-design.md#7-封存與恢復的-admission)。archive／rename與新run／manual-write共用同文件admission；原terminal receipt及request查詢優先，封存不遮蔽結果。browser abort／關頁不當stop。背景B1／B2／C對已接收來源沿原政策，含未首次排程／部分批次／受控恢復；內部`service.list_documents()`含archived，封存不額外啟動或等待背景歸零。
 
-**跨輪通知取消增補：**依[通知設計MV18](../specs/2026-09-10-jd-model-view-change-notice-design.md#8-精確-task-3-增補與驗收)驗兩條close分支均把已確認manifest從child傳root；尚未實際有response的準備紀錄不升格，補ToolMessage不代表下一次模型已取得。沿既有close／reconcile，不加第二取消協調器。
+**跨輪通知取消增補：**依[通知設計MV18](../../../../../specs/2026-09-10-jd-model-view-change-notice-design.md#8-精確-task-3-增補與驗收)驗兩條close分支均把已確認manifest從child傳root；尚未實際有response的準備紀錄不升格，補ToolMessage不代表下一次模型已取得。沿既有close／reconcile，不加第二取消協調器。
 
 **Files**
 
@@ -322,4 +322,4 @@ v2增加同一candidate的有限ID→item索引及Task端點檢查，AI與人工
 
 供該後續單位使用的**只讀路由清單**：`apps/web/src/features/consultant/ApprovedDocumentEditor.tsx`、`DocumentReviewPanel.tsx`、`DocumentChangeEditor.tsx` 及 `shared/api/jobAnalysisApi.ts` 的舊 approved／review writers 要依 successor 退出；API `app/consultant/workspace_state.py`／`workspace_review.py`／`workspace_authority.py`／`document_authority.py` 與 `api/routes/consultant.py` 的 review／approved-document routes 同樣不能雙寫。`app/adapters/langgraph/postgres.py`／`workspace_backend.py` 同含來源或非 JD 責任，不可整檔刪除。`packages/job-analysis-contract` 的舊 generated DTO 必須從其 SSOT 改，不手改生成檔。**以上都不是本計畫的修改清單。**
 
-本地 dev CORS 的官方接點為 [FastAPI CORS](https://fastapi.tiangolo.com/tutorial/cors/)，local package 接點為 [Next transpilePackages](https://nextjs.org/docs/app/api-reference/config/next-config-js/transpilePackages)，均由主線於 2026-09-10 核對；3001／8091 與 allowlist 是本案隔離配置，不稱官方統一端口。原生已驗範圍及限制依 [F02](../specs/evidence/2026-09-10-jd-official-profile-probe.md)、[history](../specs/evidence/2026-09-09-jd-native-history-and-sync-probe.md)、[P01](../specs/evidence/2026-09-09-jd-native-save-probe.md) 原證據；本計畫不增加它們的證明效力。
+本地 dev CORS 的官方接點為 [FastAPI CORS](https://fastapi.tiangolo.com/tutorial/cors/)，local package 接點為 [Next transpilePackages](https://nextjs.org/docs/app/api-reference/config/next-config-js/transpilePackages)，均由主線於 2026-09-10 核對；3001／8091 與 allowlist 是本案隔離配置，不稱官方統一端口。原生已驗範圍及限制依 [F02](../../../../../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md)、[history](../../../../../experiments/legacy-evidence/2026-09-09-jd-native-history-and-sync-probe.md)、[P01](../../../../../experiments/legacy-evidence/2026-09-09-jd-native-save-probe.md) 原證據；本計畫不增加它們的證明效力。

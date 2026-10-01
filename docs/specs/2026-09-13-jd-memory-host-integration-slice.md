@@ -48,7 +48,7 @@ LLM／App 責任仍沿[上一單位的 OpenAI／Anthropic 依據](2026-09-13-jd-
 
 ## 實際結果與下一工作
 
-已完成原生 Store 注入、host 資源排空、Memory schema-mapped publication view 與明示初始化。最後受影響 **154 PASS**、初始化 **33 真 PG PASS**、新 Windows／PG Memory 旅程 **1 PASS**、原 JD／AI 三條新程序回歸 **3 PASS**；[獨立審查](evidence/jd-memory-host-integration/review.md)限定範圍無 P1／P2。[資源／原生結果](evidence/jd-memory-host-integration/runtime-results.md)、[初始化結果](evidence/jd-memory-host-integration/setup-results.md)保留首敗、修正、版本及各自驗證範圍；不累加重疊測試數。
+已完成原生 Store 注入、host 資源排空、Memory schema-mapped publication view 與明示初始化。最後受影響 **154 PASS**、初始化 **33 真 PG PASS**、新 Windows／PG Memory 旅程 **1 PASS**、原 JD／AI 三條新程序回歸 **3 PASS**；[獨立審查](../experiments/legacy-evidence/jd-memory-host-integration/review.md)限定範圍無 P1／P2。[資源／原生結果](../experiments/legacy-evidence/jd-memory-host-integration/runtime-results.md)、[初始化結果](../experiments/legacy-evidence/jd-memory-host-integration/setup-results.md)保留首敗、修正、版本及各自驗證範圍；不累加重疊測試數。
 
 同一設定的另一程序可讀修正後 Memory、原話與原回執；普通重開不建表、Memory 修補不改 JD。沒有新依賴／模型工具／provider 呼叫，production 未切換。
 

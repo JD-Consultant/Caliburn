@@ -505,10 +505,10 @@ M1～M11 的第二輪成熟能力 mapping 已完成，見 [`2026-08-30-caliburn-
 ### 9.1 本 repo 最新討論
 
 - [`2026-08-28-llm-authored-field-contract-audit.md`](2026-08-28-llm-authored-field-contract-audit.md)：核心 JD 成果、用途邊界、Task／完成標準／K／S 與欄位所有權；
-- [`2026-08-28-claude-codex-whole-consultant-flow-audit.md`](2026-08-28-claude-codex-whole-consultant-flow-audit.md)：durable thread、最小 Context、Tool feedback、working workspace 與人類審核的整體循環；
+- [`2026-08-28-claude-codex-whole-consultant-flow-audit.md`](../../../../../specs/2026-08-28-claude-codex-whole-consultant-flow-audit.md)：durable thread、最小 Context、Tool feedback、working workspace 與人類審核的整體循環；
 - [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](2026-08-30-agent-memory-landscape-and-decision-working-research.md)：通用 Memory 共同基線、治理基線、D1～D7 與各家差異；
 - [`2026-08-30-caliburn-memory-requirements-mapping-working-research.md`](2026-08-30-caliburn-memory-requirements-mapping-working-research.md)：既有 JD Memory 效果討論；其中以舊元件去留為問題的段落需後續校正，不能作本文前提；
-- [`2026-07-25-professional-job-analysis-consultant-process-final-red-team.md`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)、[`2026-07-30-professional-consultant-minimal-complete-loop-research.md`](2026-07-30-professional-consultant-minimal-complete-loop-research.md)、[`2026-08-01-opks-design-decisions-research.md`](2026-08-01-opks-design-decisions-research.md)：只承接經研究的職務分析方法，不承接歷史 runtime／schema。
+- [`2026-07-25-professional-job-analysis-consultant-process-final-red-team.md`](../../../20260918-shared-current-jd/docs/specs/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)、[`2026-07-30-professional-consultant-minimal-complete-loop-research.md`](../../../../../specs/2026-07-30-professional-consultant-minimal-complete-loop-research.md)、[`2026-08-01-opks-design-decisions-research.md`](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-08-01-opks-design-decisions-research.md)：只承接經研究的職務分析方法，不承接歷史 runtime／schema。
 
 ### 9.2 主要官方方法來源
 

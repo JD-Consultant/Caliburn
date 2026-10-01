@@ -32,7 +32,7 @@ Owner 已核准本輪局部調整與小測：Luna／medium，最多24次請求�
 
 ## 結果：分開回答「有沒有回答正確」與「有沒有寫進 Memory」
 
-[完整實驗證據](evidence/2026-09-07-incremental-memory-quality-calibration.json)保存請求／工具契約、結果、實際正文、詳記／原文回查、使用量與診斷程式。以下是觀察，不把單一樣本當模型品質保證。
+[完整實驗證據](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-incremental-memory-quality-calibration.json)保存請求／工具契約、結果、實際正文、詳記／原文回查、使用量與診斷程式。以下是觀察，不把單一樣本當模型品質保證。
 
 | 階段 | 真模型請求 | 實際結果與界線 |
 |---|---:|---|

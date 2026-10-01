@@ -970,7 +970,7 @@ coder 還是 projection；若成功，也能證明收益不是模型、prompt、
 
 已完成第一輪 database inventory、保守 private export，以及 owner-confirmed test-data export。詳細
 稽核見
-[`real-candidate-audit-2026-07-15.md`](../../apps/api/evals/interview_v4/reports/real-candidate-audit-2026-07-15.md)，架構解讀見上游研究第 24 節。
+[`real-candidate-audit-2026-07-15.md`](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/evals/interview_v4/reports/real-candidate-audit-2026-07-15.md)，架構解讀見上游研究第 24 節。
 
 ### 22.1 實際資料狀態
 

@@ -4,7 +4,7 @@
 
 ## 前提與唯一問題
 
-Owner授權持續局部優化、重大改變才問。[CT41結果與官方依據](../specs/2026-09-09-ct41-memory-edit-freshness-results.md)已收斂編輯路由；最後版本只跑過3輪新職位，不能將先前失敗後的局部重播算長訪談通過。本輪只問：固定此版本，完整職位訪談／更正／背景整併／保存後回查是否能完成？不重開Memory架構，不疊prompt。
+Owner授權持續局部優化、重大改變才問。[CT41結果與官方依據](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct41-memory-edit-freshness-results.md)已收斂編輯路由；最後版本只跑過3輪新職位，不能將先前失敗後的局部重播算長訪談通過。本輪只問：固定此版本，完整職位訪談／更正／背景整併／保存後回查是否能完成？不重開Memory架構，不疊prompt。
 
 ## 方法
 

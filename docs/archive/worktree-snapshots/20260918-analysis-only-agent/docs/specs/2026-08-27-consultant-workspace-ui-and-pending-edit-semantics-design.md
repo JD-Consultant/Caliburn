@@ -75,7 +75,7 @@ Web 組合採 **Next／React／Tailwind／shadcn＋Base UI 1.7.x＋TanStack Form
 
 ### 2.5 Job Analysis 關係
 
-- [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 依 iCAP F3-3 收斂：O／P 掛 Task；K／S 是文件層 canonical item，與 Task／Indicator 多對多；UI 可以在 Task 下投影 K／S。
+- [ADR 0048](../../../../branch-snapshots/20260922-local-main-r1/docs/adr/0048-opks-evidence-axes-and-document-level-competencies.md) 依 iCAP F3-3 收斂：O／P 掛 Task；K／S 是文件層 canonical item，與 Task／Indicator 多對多；UI 可以在 Task 下投影 K／S。
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/) 強調 Task、competency 與兩者連結；這支持在成為正式職務內容前說清 K／S 支援哪些工作，但不能替代 iCAP 欄位定義。
 
 因此「先發現」不等於「先寫入 JD」：AI 可以先理解任何 O／P／K／S 線索，待 Task 邊界與關係足夠清楚後才形成待審文件變更。

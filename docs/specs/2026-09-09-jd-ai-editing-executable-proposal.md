@@ -11,7 +11,7 @@ JD-R002/C03；2026-09-09；**G2 研究交付／待 G3 審閱**。這是一份有
 - [C03 短入口](2026-09-09-ai-document-app-composition-research.md)：目前問題、決策狀態及結論。
 - [C01 文件內容關係](2026-09-09-jd-document-relationships-working-research.md)＋[C02 審核情境](2026-09-09-jd-editing-and-review-working-design.md)：本方案必須服務的效果，不拿套件預設取代它們。
 - [編輯框架事實 F01–F05](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)＋[Agent／錯誤事實 R01–R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)：精確 API、來源及限制；[E01–E20](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)保留早先產品／文件證據。
-- [內容核心入口](2026-09-09-job-analysis-and-jd-content-research.md)：JD 寫什麼及訪談方法。不重複搬入本技術稿，更不把全部研究塞進每輪 prompt。
+- [內容核心入口](../guides/2026-09-09-job-analysis-and-jd-content-research.md)：JD 寫什麼及訪談方法。不重複搬入本技術稿，更不把全部研究塞進每輪 prompt。
 
 **本輪結論：**共同的工具循環可以直接用成熟 agent 框架；文件也應先用編輯器原生操作及追蹤修訂。較難且沒有現成全覆蓋證據的，是 C02 的持續待審／人工修改／跨位置整組接受拒絕。首選先驗 Tiptap；CKEditor 是明確備選，不直接自寫通用審核引擎。
 
@@ -33,7 +33,7 @@ JD-R002/C03；2026-09-09；**G2 研究交付／待 G3 審閱**。這是一份有
 
 **下一輪必須保留的兩個銜接條件：**
 
-- 內容設計引用[分析指南 §2–§6](2026-09-09-complete-work-analysis-guide.md)、[欄位指南](2026-09-09-jd-field-and-writing-guide.md)及[深度校準 §2–§6](2026-09-09-customized-jd-depth-and-interview-calibration.md)的保留效果：完整工作範圍、案例與持續責任的區分、未知與更正、必要細節、工作↔JD 雙向核對。CT49 的接案前端與 r2 的受僱前端是不同情境；各自保留來源，不把兩者內容直接拼成同一職位。
+- 內容設計引用[分析指南 §2–§6](../guides/2026-09-09-complete-work-analysis-guide.md)、[欄位指南](../guides/2026-09-09-jd-field-and-writing-guide.md)及[深度校準 §2–§6](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)的保留效果：完整工作範圍、案例與持續責任的區分、未知與更正、必要細節、工作↔JD 雙向核對。CT49 的接案前端與 r2 的受僱前端是不同情境；各自保留來源，不把兩者內容直接拼成同一職位。
 - 沿 [MEM-Q005 的 sibling effects 邊界](2026-09-04-memory-persistence-and-jd-effect-reconciliation.md)：未來接上 JD 後，若同一 product run 已形成通過內容驗證的理解，且 JD 候選通過自身驗證，不一律等背景 Memory 落盤才產生增量待審修改；單純 Memory 保存失敗不等於該 JD 候選語意失效。整份最終完成檢查另需核對完整有效依據。這是既有工作決策，並非聲稱目前隔離版已能形成或驗證 JD 候選。
 
 **本輪唯一下一個裁決：**是否以 §2 的 Tiptap 組合作第一驗證候選，先進入 §7 所收斂的無 LLM 文件編輯／審核驗證。框架最終採用、agent 接線及真模型整合仍由結果決定，不重問已同意的內容、Memory 與共同基礎。
@@ -129,7 +129,7 @@ OpenAI Agents SDK 是正式 runtime 備選；具工具循環、continuation、tr
 
 沿 C01 的內容結構，用 editor schema／標題、段落、清單和必要的業務 metadata 表達。先用原生節點能表達的範圍；必要自訂節點才擴充，並測 AI 讀寫、審核與序列化全鏈路，不只測畫面。
 
-任務內容、結果／標準、適用條件保持完整敘述；視覺分組不等於必須逐欄新 API。字型、間距、OPKS 區分與印刷樣式由 UI／樣式管理，不讓 LLM 產生 CSS 或重畫頁面。新增內容不應因不完整就被悄悄捨棄。[C01](2026-09-09-jd-document-relationships-working-research.md)、[欄位指南](2026-09-09-jd-field-and-writing-guide.md)
+任務內容、結果／標準、適用條件保持完整敘述；視覺分組不等於必須逐欄新 API。字型、間距、OPKS 區分與印刷樣式由 UI／樣式管理，不讓 LLM 產生 CSS 或重畫頁面。新增內容不應因不完整就被悄悄捨棄。[C01](2026-09-09-jd-document-relationships-working-research.md)、[欄位指南](../guides/2026-09-09-jd-field-and-writing-guide.md)
 
 ### 審核分組是目前最重要的缺口
 

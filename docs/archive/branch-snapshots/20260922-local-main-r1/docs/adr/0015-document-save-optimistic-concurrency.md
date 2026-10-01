@@ -5,12 +5,12 @@
 
 ## 脈絡
 
-工作台目前以**整份 OcsDocument PATCH** 存草稿([documents.py:63](../../apps/api/app/api/routes/documents.py)
+工作台目前以**整份 OcsDocument PATCH** 存草稿([documents.py:63](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/api/app/api/routes/documents.py)
 `upsert_draft`),後端**不檢查 version** → last-write-wins。即使無 LLM,使用者開兩個分頁即互蓋;
 未來 LLM 會與使用者**共編同一份文件**,模式為**回合制 / 提議套用**(非逐字即時同步)。
 
 並發三層做法(見研究紀錄):樂觀並發(version/ETag→409)、OT(Google Docs)、CRDT(Figma/Notion)。
-本文件是**高度結構化 JSON**、編輯本就是 [ocsDoc.ts](../../apps/web/src/lib/ocsDoc.ts) 的離散不可變操作;
+本文件是**高度結構化 JSON**、編輯本就是 [ocsDoc.ts](../../../../../experiments/historical/20260922-local-main-r1/assets/apps/web/src/lib/ocsDoc.ts) 的離散不可變操作;
 `version` 欄位**全鏈路已存在但未當守衛**。AI agent 產出比人快 25–100×,需 agent 層批次+人類優先。
 
 ## 決定

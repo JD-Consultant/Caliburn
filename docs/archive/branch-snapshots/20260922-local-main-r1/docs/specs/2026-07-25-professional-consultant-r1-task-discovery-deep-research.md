@@ -16,8 +16,8 @@
 > **【2026-07-26 修訂索引｜先讀這裡】**
 >
 > 本文件經外部紅隊複審後有五項修訂，分佈於六個章節。**原文一律保留並就地標記，不得據被否決的原文實作。**
-> 完整依據見 [R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)
-> 與 [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
+> 完整依據見 [R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)
+> 與 [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
 >
 > | 編號 | 位置 | 修訂 |
 > |---|---|---|
@@ -95,8 +95,8 @@ R1 推薦採用：
 > 實驗矩陣固定為 **6 個 arm**，其中 A1 =**最強模型 + 輕 schema + 一次呼叫 + minimal harness**
 > （baseline，算在六個之內，不另計），與 A6（同配置但 full harness）對照以檢驗 **harness bundle**
 > 是否承重；定義見 §12.2 與 ADR 0040 決定 6。
-> 見 [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–8。
+> 見 [修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–8。
 
 概念上有三個責任，但第一版只需要兩次模型呼叫：【C-01：此句為**待實驗假說**，見上方修訂框】
 
@@ -801,8 +801,8 @@ BEI／STAR 擅長取得具體資料，但罕見事故可能比例行工作更容
 > 3. **兩階段拆分降級為待實驗假說**，不再視為已確定架構，持平時選一次呼叫；
 > 4. shipping 模型定案時必須重跑一次該對照，並重審 harness、拆掉不再承重的 scaffolding。
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–8。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–8。
 > 以下原文保留供追溯，**不得據原文執行**。
 
 防線：
@@ -844,8 +844,8 @@ Graph、資料庫與 Web。
 > - R1 **不做正式 power analysis**。
 >
 > 可重用的既有語料與不可沿用的舊 gold 契約，見
-> [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §5。
-> 依據：同文件 §3.3、[ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 11–13。
+> [修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §5。
+> 依據：同文件 §3.3、[ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 11–13。
 
 案例不以數量取勝。第一批固定八類，每類一個主要能力與明確禁止錯誤。
 
@@ -1007,7 +1007,7 @@ turn.understand
 > | 3. Gate | 僅 shortlisted 架構的 **critical subset 跑 pass³** | 決定是否進 R2 |
 >
 > 六個 arm 的定義見
-> [ADR 0040 決定 6](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)：
+> [ADR 0040 決定 6](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)：
 > **A1 = 最強模型 + 輕 schema + 一次呼叫 + minimal harness**（baseline，算在六個之內，不另計）；
 > A2–A5 = 兩階段 + full harness 下的｛最強, 便宜｝×｛輕, 重 schema｝2×2；
 > **A6 = 最強模型 + 輕 schema + 一次呼叫 + full harness**（**固定配置，不是 A2–A5 勝出配置**，
@@ -1020,8 +1020,8 @@ turn.understand
 > （單階段 2 × 8 = 16、兩階段 4 × 8 × 2 = 64），grader 呼叫另計。**不是每個 arm 都跑 pass³。**
 >
 > 原文保留於下，**不得據原文執行**。依據見
-> [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.3、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 11–12。
+> [修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.3、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 11–12。
 
 為避免測試拖慢成品：
 
@@ -1088,8 +1088,8 @@ turn.understand
 > 注意：Anthropic 觀察到的是**執行期**行為，所以 R7 也必須繼承同樣的懷疑工程（乾淨 context、明確 rubric、
 > 硬門檻），否則它在生產環境就是一台自誇機器。
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.4、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 14–17。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.4、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 14–17。
 
 第一版使用：
 
@@ -1117,8 +1117,8 @@ turn.understand
 - ~~相較 baseline，在 Task 邊界或錯誤可診斷性至少一項實質更好；~~
   ←【C-02 已修正：**Task 邊界品質不得退步為必要條件**，可診斷性只加分；且判準須在跑實驗前寫定。
   8 案例的結果只能淘汰明確錯誤設計，不能宣稱架構勝出 —— 見
-  [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.2、
-  [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 9–11】
+  [修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.2、
+  [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 9–11】
 - 不出現足以抵銷改善的新 critical regression。
 
 這不是正式產品 promotion，只是允許進入 R1 prototype 與 R2 多輪研究。
@@ -1134,7 +1134,7 @@ turn.understand
 > Owner 已明確裁定**不採 GPT-5.4 mini**；且 ADR 0040 已把「固定便宜模型先驗架構」改為
 > strongest-first 的六 arm。下列舊 slug 只保留作歷史，不得據以執行。
 > 現行 proposed 配對、endpoint preflight 與裁決方法見
-> [R1 實驗設計與共識草案](2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md) §8；
+> [R1 實驗設計與共識草案](../../../../../specs/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md) §8；
 > 在 owner 與第二位審查者核准、live catalog／endpoint preflight 完成前，不凍結 exact model。
 
 原先依 owner 指示，第一輪固定使用 OpenRouter 的具名模型：
@@ -1155,8 +1155,8 @@ openai/gpt-5.4-mini
 > §13.1 的 exact slug 仍然要固定，但「固定哪一個」由 2×2 ablation 決定。
 > 8 個案例 × 4 種配置的成本仍在個位數美元量級，成本不構成採用弱模型優先的理由。
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–8。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 5–8。
 > 以下原文保留供追溯，**不得據原文執行**。
 
 - 現在要驗證的是責任分工、Task rubric 與 context，而不是選模型冠軍；
@@ -1187,14 +1187,14 @@ openai/gpt-5.4-mini
 >
 > **JSON Schema 容量上限不是架構常數**（OpenAI direct 與 Azure OpenAI 當期數字不同），由 resolved endpoint
 > 決定；核心規格不寫死全域 property／nesting 上限，**以 live preflight 實測為準，文件只是預期值**。
-> 帶日期的 provider 數字見[修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §7。
+> 帶日期的 provider 數字見[修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §7。
 >
 > 「先推理後格式化」**不靠 schema 欄位順序**（可見 rationale ≠ 內部推理、可能先合理化錯誤結論、
 > 增加 token 與 schema 負擔）。依序採用：具原生 reasoning 能力的模型 → 減輕 schema →
 > 避免 forced function calling → 最後才拆兩次呼叫。
 >
-> 依據：[修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.6、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 23–28。
+> 依據：[修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.6、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 23–28。
 
 - 使用 exact model slug，不用 `auto`、`free`、`latest` 等可變 alias；
 - 記錄執行時 resolved model 與 provider endpoint；

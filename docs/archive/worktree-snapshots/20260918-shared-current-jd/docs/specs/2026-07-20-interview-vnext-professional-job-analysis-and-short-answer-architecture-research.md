@@ -11,11 +11,11 @@ scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一�
 
 > 本文保存 R5 前置研究、產品邊界與後續職務分析／共編方向；**不是 exact implementation authority**。owner 已於
 > 2026-07-20 核准 R5 必要裁決，active 決策為
-> [`ADR 0037`](../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)，exact build authority 為
-> [`R5 grounded short-answer amendment`](../plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)。
+> [`ADR 0037`](../../../../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)，exact build authority 為
+> [`R5 grounded short-answer amendment`](../../../../../plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)。
 > owner 於 2026-07-22 另行確認 R5 後的 Context Engine、LLM operations、Agenda／Sufficiency、Authoring Core、AI proposal、
 > 公版metadata／retrieval與產品交付順序；active authority為
-> [`ADR 0038`](../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)。
+> [`ADR 0038`](../../../../../adr/0038-interview-vnext-context-engine-and-professional-consultant-workflow.md)。
 > 不得因本文存在就自行新增 migration、production route、Web wiring 或 paid live。
 >
 > **Revision 3（owner scope correction）**：現有 editor、深文件契約、API、indexer 與欄位都只是可盤點的既有資產，
@@ -50,7 +50,7 @@ scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一�
 > immutable revision、不複製全文件 rows，也不加入 `entity_version`／`link_version`。本文後續所有 revision、restore、
 > revision diff、head hash／CAS 描述一律降為後續可選優化，不是 MVP 實作要求。AI 仍只能提出 proposal，不能繞過員工
 > accept／edit／reject。詳細 current-table authority 見
-> [Job Authoring v2 本機單一現況儲存設計](2026-07-24-job-authoring-v2-relational-storage-research.md)。
+> [Job Authoring v2 本機單一現況儲存設計](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 ## 1. 結論先行
 
@@ -145,7 +145,7 @@ Competency-based Job Model**。
  -> one or more delivery surfaces
 ```
 
-現有 [`ADR 0030`](../adr/0030-ai-coedit-tracked-changes-one-brain.md) 的「AI 不可靜默改動、員工可接受／拒絕」方向可保留，
+現有 [`ADR 0030`](../../../../../adr/0030-ai-coedit-tracked-changes-one-brain.md) 的「AI 不可靜默改動、員工可接受／拒絕」方向可保留，
 但有兩個實作裁決與 Revision 4 衝突：它把 proposal 主要存為文件內 `_pending`，且人改內容只記 trace、不讓後續模型
 知道。新產品需要 canonical proposal/decision 與 `JobStateDigest`，否則 AI 會重問或重提員工已經親手改過的內容。本文
 核准後必須另寫 superseding ADR 指明替換哪些段落，不能讓實作者同時遵循兩套 authority。
@@ -717,7 +717,7 @@ TaskSkillLink
 各自成為不同 entity/table，task linkage 以帶外鍵的兩張 association table 保存。`T1/K01/S01` 只由 projector
 在顯示或匯出時依排序產生。只做同一份 JD 內的重複檢查與 task linkage，不做跨 JD alias、全公司 concept
 identity、發布或 deprecation lifecycle。詳細關聯式設計見
-[Job Authoring v2 關聯式儲存研究](2026-07-24-job-authoring-v2-relational-storage-research.md)。
+[Job Authoring v2 關聯式儲存研究](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 後兩者是不同 domain：
 
@@ -1052,7 +1052,7 @@ revision CAS、多人合併或 Google Docs 等級的同步機制。
 Job Authoring entity rows 暫不持久化逐欄 writer、editor、Evidence refs、source hash 或完整 provenance。既有 Proposal／
 Decision／Revision command 足以維持 AI 不得直接寫入與版本歷史；公版只保存既有 Indexer stable ID
 `ref_urn TEXT NULL`。日後有稽核或可解釋性產品需求再升版，不先建立 generic source graph。資料庫 authority 見
-[Job Authoring v2 關聯式儲存研究](2026-07-24-job-authoring-v2-relational-storage-research.md)。
+[Job Authoring v2 關聯式儲存研究](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 ### 12.8 API 與模組邊界
 

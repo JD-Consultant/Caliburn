@@ -1,6 +1,6 @@
 # JD App 接續施工與交接計畫
 
-**目前接續（2026-09-14）：**H1–H3、完成窗口來源及 B1 核心／OpenAI adapter 固定接合已完成至 `f160be97`。本次[整體審查](../specs/evidence/jd-b1-adoption/whole-flow-review.md)確認方向，修正批次交接、背景責任與文件落差；獨立固定測試211項通過。**下一從[H4 runtime 計畫 R1](2026-09-14-jd-h4-runtime-integration.md)做一批 B1 真 PostgreSQL 保存／恢復及有界 batch 接合**，不是重做來源或採用映射。B2、背景宿主、完整通知及新 App 自然模型仍未完成；日常 AI 未啟用。
+**目前接續（2026-09-14）：**H1–H3、完成窗口來源及 B1 核心／OpenAI adapter 固定接合已完成至 `f160be97`。本次[整體審查](../experiments/legacy-evidence/jd-b1-adoption/whole-flow-review.md)確認方向，修正批次交接、背景責任與文件落差；獨立固定測試211項通過。**下一從[H4 runtime 計畫 R1](2026-09-14-jd-h4-runtime-integration.md)做一批 B1 真 PostgreSQL 保存／恢復及有界 batch 接合**，不是重做來源或採用映射。B2、背景宿主、完整通知及新 App 自然模型仍未完成；日常 AI 未啟用。
 
 本文件負責「下一位從哪裡接、分步怎麼做、如何驗收」。產品總範圍仍由[總施工計畫](2026-09-13-jd-relational-app-implementation.md)負責，未解事項由[唯一清單](../specs/2026-09-13-jd-app-open-issues.md)負責，入口只維護[目前決策](../current-decisions.md)。不要重新讀完整舊聊天才能開工。
 
@@ -54,11 +54,11 @@
 | `ai_runtime.py` | 另核 C 的原request／publication receipt；同owner drain、未知門閘、終局查回 | CA-01／02；C真新宿主恢復；不混JD receipts |
 | `tests/test_consultant_memory_postgres.py` | 8 PASS：真PG＋固定SDK正常C、查回、故障、取消；重新開資源 | 同程序重開不算新程序；unknown中的稍後receipt由測試輔助建立，不是延遲真交易證據 |
 
-路徑未列前綴者位於 `experiments/jd-relational-app/src/jd_relational` 或對應 `tests`。前次交接數字為App435／套件130／PG8；兩案當時仍失敗，見[歷史審核 §3–4](../specs/evidence/jd-memory-repair-integration/continuation-audit.md)。它們不是本次最終驗證，也不代表H2／H3仍未完成；現在的结果見頁首路由。
+路徑未列前綴者位於 `experiments/jd-relational-app/src/jd_relational` 或對應 `tests`。前次交接數字為App435／套件130／PG8；兩案當時仍失敗，見[歷史審核 §3–4](../experiments/legacy-evidence/jd-memory-repair-integration/continuation-audit.md)。它們不是本次最終驗證，也不代表H2／H3仍未完成；現在的结果見頁首路由。
 
 歷史首敗保留：交接前session缺模組，接著3 FAIL／1 PASS（15.18s），三案先止於`invalid_tool_session`；checkpoint首跑12 FAIL／10 PASS。這些已不是目前停點。接续另修過正常C終局誤回`run_recovery_required`與測試資料形狀；不能刪掉真scope／owner檢查只求綠燈。
 
-前置證據仍在本目錄：[原生觀察](../specs/evidence/jd-memory-repair-integration/native-observation-preflight.md)、[原call／結果](../specs/evidence/jd-memory-repair-integration/records-results.md)、[factory](../specs/evidence/jd-memory-repair-integration/graph-factory-results.md)、[停止分類](../specs/evidence/jd-memory-repair-integration/closure-preflight.md)。其中較早推薦由下節已採接法取代，不與最新狀態並列成兩個指令。
+前置證據仍在本目錄：[原生觀察](../experiments/legacy-evidence/jd-memory-repair-integration/native-observation-preflight.md)、[原call／結果](../experiments/legacy-evidence/jd-memory-repair-integration/records-results.md)、[factory](../experiments/legacy-evidence/jd-memory-repair-integration/graph-factory-results.md)、[停止分類](../experiments/legacy-evidence/jd-memory-repair-integration/closure-preflight.md)。其中較早推薦由下節已採接法取代，不與最新狀態並列成兩個指令。
 
 ## 4. 已收斂的 C 接合設計
 
@@ -92,7 +92,7 @@
 
 `invalid_edit`、`stale`、`no_memory` 每個原 call 累計一次；第一個失敗可讓模型讀新資料後更正，第二個 `retryable=false`，第三次直接 `repair_limit`，不執行 C。成功不重置失敗次數，新回合重置。格式错误即使沒進工具函式，也須產生原 call 的同一套有界回覆；未知 I/O／source／SQL 不算模型可修次數。
 
-[早期 read-refresh 前置](../specs/evidence/jd-memory-repair-integration/read-refresh-preflight.md)的「另外持久保存讀 head／failure counter」及固定包裝方式只屬前置推薦，**由本節的 artifact 投影方式取代**。它的讀版／失敗情境仍可作驗收材料，不直接複製其舊 ABI。
+[早期 read-refresh 前置](../experiments/legacy-evidence/jd-memory-repair-integration/read-refresh-preflight.md)的「另外持久保存讀 head／failure counter」及固定包裝方式只屬前置推薦，**由本節的 artifact 投影方式取代**。它的讀版／失敗情境仍可作驗收材料，不直接複製其舊 ABI。
 
 ### 4.3 取消、未知結果與恢复
 
@@ -132,7 +132,7 @@
 
 #### H2a｜先把兩個審核探針轉成期待正確行為的紅測
 
-1. 讀[兩個反例及診斷腳本](../specs/evidence/jd-memory-repair-integration/continuation-audit.md)。它目前斷言會阻擋；直接跑到 PASS 不等於修好。
+1. 讀[兩個反例及診斷腳本](../experiments/legacy-evidence/jd-memory-repair-integration/continuation-audit.md)。它目前斷言會阻擋；直接跑到 PASS 不等於修好。
 2. 在現有 App runtime／session 測試新增兩個命名清楚的案例：`source_before_binding`、`repair_child_start`。使用真正 Agent／Saver，不以手拼「沒有副作用」的snapshot代替原生執行證據。保留原call、原run及原資料庫版本。
 3. 將期望改為：真正工作已停止後，原回合有明確失敗／未發布終局；`effects_settled` 為真但不聲稱Memory更正成功；後續手改及新回合可准入。模型仍1次、seed／publish為0，JD／原話／Memory正文不被改寫。
 4. 首跑保存具體斷言失敗，不能用`raises(Exception)`或手動釋放owner讓測試過關。只在實際已有停止證據的路徑測解鎖，不偽造`proof-of-death`。

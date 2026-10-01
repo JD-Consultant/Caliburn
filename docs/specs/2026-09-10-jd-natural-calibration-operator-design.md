@@ -1,6 +1,6 @@
 # P3 公開自然校準：AI controller 操作方式提案
 
-2026-09-10；JD-R002。**root 已採用為待付費授權的 P3 執行測法／文件同步中／未執行**。2026-09-10 有限獨立 review：spec／quality PASS（僅測法設計與誠實揭露），受審候選 SHA256 為 3016d934f2ad174c83f7925b56e9abe16ec8261f7969b42b62eec2d2eb109d43；review 見[有限審查](evidence/2026-09-10-jd-natural-calibration-operator-review.md)。採用不是 Owner 既有真人豁免、自然驗收通過或付費授權。原候選全文下列保留作設計沿革，其中未採用／尚未同步語句描述受審時點；當前同步與驗證见[同步紀錄](evidence/jd-product-p3-calibration/operator-adoption/task-p3-operator-adoption-sync.md)。不改模型／Memory，不阻擋 Task4／5／6。
+2026-09-10；JD-R002。**root 已採用為待付費授權的 P3 執行測法／文件同步中／未執行**。2026-09-10 有限獨立 review：spec／quality PASS（僅測法設計與誠實揭露），受審候選 SHA256 為 3016d934f2ad174c83f7925b56e9abe16ec8261f7969b42b62eec2d2eb109d43；review 見[有限審查](../experiments/legacy-evidence/2026-09-10-jd-natural-calibration-operator-review.md)。採用不是 Owner 既有真人豁免、自然驗收通過或付費授權。原候選全文下列保留作設計沿革，其中未採用／尚未同步語句描述受審時點；當前同步與驗證见[同步紀錄](../experiments/legacy-evidence/jd-product-p3-calibration/operator-adoption/task-p3-operator-adoption-sync.md)。不改模型／Memory，不阻擋 Task4／5／6。
 
 ## 1. 唯一問題與來源效力
 
@@ -8,7 +8,7 @@ P3 要驗「真顧問自行訪談、自行選工具、形成有依據稿件並�
 
 - [總計畫 §2 P3](../plans/2026-09-10-jd-product-delivery.md)定義「1個不指定 tool calls 的完整案例」；§5.4 要求先1完整自然縱切，§5.5 另列3名目標員工。未直接指定 P3 扮演者必須真人。
 - [品質材料 §6](2026-09-10-jd-product-quality-acceptance.md)在「自然操作與成本提案（待另行授權）」中寫「由人依卡扮演員工」及「無額外 judge／模擬員工 LLM」。這是現行經審測法文字，不能默默忽略，也不能宣稱是 Owner 單獨指定的產品門檻。
-- [基線 review 的品質材料審查](evidence/2026-09-10-jd-product-baseline-review.md)判材料可整合，仍標付費批次待授權；[register](../current-decisions.md)記錄總計畫執行與材料審查閉合，沒有直接記錄禁止 controller 扮演的 Owner 裁決。
+- [基線 review 的品質材料審查](../experiments/legacy-evidence/2026-09-10-jd-product-baseline-review.md)判材料可整合，仍標付費批次待授權；[register](../current-decisions.md)記錄總計畫執行與材料審查閉合，沒有直接記錄禁止 controller 扮演的 Owner 裁決。
 - P6 三異質未見職位各兩次及三名真目標員工，依總計畫與品質材料 §7–8 全部保留。本提案不削減、替代或先算一次 P6 成績。
 
 本提案是澄清並調整執行測法，採用前需有限 review 及責任文件同步；不是改稱 controller 就符合原「無模擬員工 LLM」文字。**Controller 本身是 AI，正在模擬合成員工回答。** 原文須明確調整成容許此一既有 controller 的公開校準用途，仍禁止另啟 provider 員工／評分模型，不能用名稱掩飾實際角色。

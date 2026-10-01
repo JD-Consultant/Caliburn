@@ -45,7 +45,7 @@ FastAPI 的安全 500 handler 不足以保證 server log 安全：Starlette 的 
 
 ## 5. 有界官方依據
 
-查閱日 2026-09-13；精確版本、授權與相容性依[宿主前置](evidence/2026-09-13-jd-http-host-preflight.md)。本輪新增 FastAPI 0.141.1（MIT）、Starlette 1.6.0／Uvicorn 0.52.4（BSD-3-Clause），沿既有 Python 3.12.13、Pydantic 2.13.5、SQLAlchemy 2.0.52、Psycopg 3.3.5；不升級無關依賴。
+查閱日 2026-09-13；精確版本、授權與相容性依[宿主前置](../experiments/legacy-evidence/2026-09-13-jd-http-host-preflight.md)。本輪新增 FastAPI 0.141.1（MIT）、Starlette 1.6.0／Uvicorn 0.52.4（BSD-3-Clause），沿既有 Python 3.12.13、Pydantic 2.13.5、SQLAlchemy 2.0.52、Psycopg 3.3.5；不升級無關依賴。
 
 - [FastAPI error handlers](https://fastapi.tiangolo.com/tutorial/handling-errors/)、[OpenAPI extension](https://fastapi.tiangolo.com/how-to/extending-openapi/)及[additional responses](https://fastapi.tiangolo.com/advanced/additional-responses/)支持明示 handler、生成式契約及有限媒體型別接合；不保證本案所有 middleware 自動輸出同一 shape。
 - [LangGraph checkpointers](https://docs.langchain.com/oss/python/langgraph/checkpointers)的 sync durability／update_state 提供持久接點；replay 可能重跑外部操作，不是本案未知 JD 寫入的重試權限。實際 runtime 組合尚待接合。

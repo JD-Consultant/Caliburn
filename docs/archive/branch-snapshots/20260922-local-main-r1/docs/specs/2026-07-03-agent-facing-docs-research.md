@@ -5,7 +5,7 @@
 - **動機**:維護者要一份「完整寫出流程/架構/model,連底層(點某某會發請求)都清楚,
   別人不看 code 就懂」的文檔,而且**主讀者是 LLM**——讓 agent 知道在幹嘛、**不亂寫**
   (不憑空編端點、不把退役路徑救回來)。
-- **與既有研究的分工**:[`2026-07-03-app-developer-docs-research.md`](./2026-07-03-app-developer-docs-research.md)
+- **與既有研究的分工**:[`2026-07-03-app-developer-docs-research.md`](../../../../../research/engineering/2026-07-03-app-developer-docs-research.md)
   研究的是**人向 per-app README**(matklad/Diátaxis/arc42/Google);本篇補的是
   **agent-primary 的深度 explainer + 交付機制**。兩者是不同 genre,原則互證(見 §2)。
 

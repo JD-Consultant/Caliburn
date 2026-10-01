@@ -6,7 +6,7 @@
 
 - 目標：背景已更新後，A 的修補使用目前受影響正文，確認已回答內容不再留為未知，不新增同義段落。
 - Owner 最新授權：持續優化與測試，局部可自行決定；重大改變才詢問。可比較 high／xhigh／max，但先不全面升級。
-- 已讀：[CT40完整結果與時間線](../specs/2026-09-09-ct40-normal-interview-results.md)、現行 MemorySession／共用讀寫提示、既有接線測試、root current register／decision-process。
+- 已讀：[CT40完整結果與時間線](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct40-normal-interview-results.md)、現行 MemorySession／共用讀寫提示、既有接線測試、root current register／decision-process。
 - 範圍外：JD、production、Memory架構、全域新驗證器、原話保存、重開CT35停放的專用final攔截。
 - 實驗總護欄：Luna最多160次生成／US$0.75（局部最多60／0.25，服務續訪最多100／0.50），不是產品限制；保留失敗、未知費用，不重開舊帳本。
 
@@ -25,7 +25,7 @@
 - [x] 同情境high兩次、未核實／已正確及兩案例反例已完成；不將接線測試當模型必然遵守。
 - [x] medium／high均有保留的失敗；停止單純加effort，改核對既有工具路由。未使用xhigh／max。
 - [x] 最後556離線＋41真PG通過；11輪原訪談、3輪新職位、独立回查與原生compaction均有證據。原11輪失敗後的恢復不能算新長訪談通過。
-- [x] [結果／來源／限制](../specs/2026-09-09-ct41-memory-edit-freshness-results.md)及機器證據、逐輪問答已封存；226次估US$0.30844346，三帳本closed。整體G8仍OPEN；最後版全新長訪談另記CT42。
+- [x] [結果／來源／限制](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct41-memory-edit-freshness-results.md)及機器證據、逐輪問答已封存；226次估US$0.30844346，三帳本closed。整體G8仍OPEN；最後版全新長訪談另記CT42。
 
 本輪不擴張架構；程式只在既有隔離worktree改提示。測試腳本是實验工具，不接產品。
 

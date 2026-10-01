@@ -13,7 +13,7 @@
 
 ## 採用依據與分工
 
-查閱日均為 2026-09-13；精確 SDK 原碼、wheel hash 及首敗由[patch 證據](evidence/jd-memory-repair-core/patch-results.md)負責，原模組與新檔 hash 在[採用清單](../../packages/consultant-memory/adoption.json)。
+查閱日均為 2026-09-13；精確 SDK 原碼、wheel hash 及首敗由[patch 證據](../experiments/legacy-evidence/jd-memory-repair-core/patch-results.md)負責，原模組與新檔 hash 在[採用清單](../../packages/consultant-memory/adoption.json)。
 
 | 依據 | 官方事實／版本與限制 | 本案映射 |
 |---|---|---|
@@ -28,7 +28,7 @@ App 接線時分工如下：模型只提供修改內容 `path`／`diff`；App �
 
 ## 三個缺口的有限修正
 
-[採用前核對](evidence/jd-memory-repair-core/runtime-preflight.md)保留原反例；[獨立審查](evidence/jd-memory-repair-core/review.md)確認 CR-R01／02／03 核心 CLOSED。
+[採用前核對](../experiments/legacy-evidence/jd-memory-repair-core/runtime-preflight.md)保留原反例；[獨立審查](../experiments/legacy-evidence/jd-memory-repair-core/review.md)確認 CR-R01／02／03 核心 CLOSED。
 
 1. `RepairWorkflow.reconcile(request: PublishRequest)` 核對完整原請求及回執；不再接受／回傳 caller edits。回執證明發布內容，不能單憑回執證明某段 patch 文字。App 後續必須使用原生已保存工具呼叫，不能重新構造它。
 2. `_validate` 只將 `StagedMemoryValidationError` 回作可修內容錯誤。SourceReader 新增 `InvalidSourceReference`；App adapter 只轉原 owner 的 `invalid_ref`，既有 read_conversation 兩條入口同步處理。未知 ValueError／OSError／source_not_available 繼續停止。
@@ -47,7 +47,7 @@ App 接線時分工如下：模型只提供修改內容 `path`／`diff`；App �
 | 真 PostgreSQL／原生 Saver／Store | 作者最後 **1 PASS／8.01s**；root 獨立同案 **1 PASS／14.90s**。兩檔 patch、原 request、提交回覆遺失與新連線查回；JD／原話不變。這是同一情境兩次驗證，不相加為兩案。 |
 | 封裝與來源隔離 | offline build 成功；`python -I` 從 wheel 載入修補模組，封鎖 socket 及 HTTP client 建構仍可執行純 patch。未載入舊 analysis_agent 模組，零 provider。 |
 
-真 PostgreSQL 的兩檔修改、發布回覆遺失、原生固定 request 與新連線查回，由[整合結果](evidence/jd-memory-repair-core/postgres-results.md)記錄。這是核心 nested graph 的持久化，不等於新 App 已有 C 工具／取消收尾。
+真 PostgreSQL 的兩檔修改、發布回覆遺失、原生固定 request 與新連線查回，由[整合結果](../experiments/legacy-evidence/jd-memory-repair-core/postgres-results.md)記錄。這是核心 nested graph 的持久化，不等於新 App 已有 C 工具／取消收尾。
 
 root 最後合成 document 為 `c8ee91e8-5954-4aec-ac11-9f011f211cca`、repair thread 為 `538c8c32-9abe-46f1-94aa-1e79a3e62df3`；實際 Memory head3／applied2／回執3／patch2／JD head1，provider0。
 
@@ -57,6 +57,6 @@ root 最後合成 document 為 `c8ee91e8-5954-4aec-ac11-9f011f211cca`、repair t
 
 ## 接續與停止廣搜
 
-目前核心採用所需官方能力及反例已足夠，不重選 matcher／Memory 保存架構。接下來沿[最小接線點](evidence/jd-memory-repair-core/runtime-preflight.md#新-app-必要接線沒有另造資料權威)將 C 接到既有 Agent、同 owner、原生 task／request 觀察及同輪讀取更新，再接 B1／B2／專業指引。未知結果保留原 pending，不能因已讀回 receipt 便假稱 App 已解除門閘。
+目前核心採用所需官方能力及反例已足夠，不重選 matcher／Memory 保存架構。接下來沿[最小接線點](../experiments/legacy-evidence/jd-memory-repair-core/runtime-preflight.md#新-app-必要接線沒有另造資料權威)將 C 接到既有 Agent、同 owner、原生 task／request 觀察及同輪讀取更新，再接 B1／B2／專業指引。未知結果保留原 pending，不能因已讀回 receipt 便假稱 App 已解除門閘。
 
 UI 維持只需知道**當輪 LLM 改了哪些 JD**；不增加從舊對話選輪的入口。Excel 延後，其他未完成事項只在[收尾清單](2026-09-13-jd-app-open-issues.md)追蹤。

@@ -50,7 +50,7 @@ flowchart TD
 
 本次工程選擇由[資料與交易 §5](../architecture/persistence.md#5-背景要求不能只留在記憶體)統一維護：待處理上界與 A 完成一致成立，調度可從正式事實重掃及承接，不先加外部 queue。**不可**只在完成提交後以記憶體旗標啟動 B，因為崩潰會留下「A 已完成、整理要求遺失」的空隙。此處不要求跨整段 LLM 工作開啟資料庫交易，也不將 LangGraph checkpoint 視為業務完成或派送真相。業界的[PostgreSQL 原子交易](https://www.postgresql.org/docs/current/tutorial-transactions.html)可處理同一短提交中的一致生效；[AWS 的 transactional outbox 指引](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)說明提交後另行通知的遺失與重複風險，但不表示本機 App 必須照搬 outbox 表。本節沒有實作或驗收證據。
 
-產品品質的真正終點不是「有一份 JD」或「Memory 已發布」：員工的主要工作與重要差異被問清，JD 以最小高訊號文字涵蓋大部分實際工作，依據可追溯，資訊不足不硬寫。判準由[工作分析指南](2026-09-09-complete-work-analysis-guide.md)維護；**全稿審核 Agent 目前暫緩**，不能把目前稿稱為已通過全稿審核。
+產品品質的真正終點不是「有一份 JD」或「Memory 已發布」：員工的主要工作與重要差異被問清，JD 以最小高訊號文字涵蓋大部分實際工作，依據可追溯，資訊不足不硬寫。判準由[工作分析指南](../guides/2026-09-09-complete-work-analysis-guide.md)維護；**全稿審核 Agent 目前暫緩**，不能把目前稿稱為已通過全稿審核。
 
 ## 四個會打斷閉環的情境
 

@@ -5,7 +5,7 @@
 ## Preflight
 
 - 目的：長訪談後能正確且有效率找回案例／原始問答，不重做Memory架構。
-- 現況：[CT42](../specs/2026-09-09-ct42-long-interview-results.md)封存105次；短地址resolver已存在但模型未優先使用。B2 high修舊未知，其他保留性仍審查中。
+- 現況：[CT42](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct42-long-interview-results.md)封存105次；短地址resolver已存在但模型未優先使用。B2 high修舊未知，其他保留性仍審查中。
 - 唯一阻塞：既有工具路由是否足以讓精確回查不抄錯長碼、減少無關深讀？
 - 不做：新增Agent、資料索引、工具schema、模糊地址修復、強制C、production/JD。CT41／42帳本不重開。
 
@@ -24,7 +24,7 @@
 - [x] 相同CT42 Memory，空近期Context，只讀精確回查，仍Luna high，先使用**產品9模型／8工具額度**；再核對不同案例的精確原話，不預先提供地址答案；失敗與12/11對照分記。
 - [x] 帳本單寫入者、保留所有失敗，38請求／US$0.02671177；請求護欄調整見下方，費用護欄不變。前兩輪封存總US$0.45876694。
 - [x] 審查B2 high對照的保留性，漏重要既有內容故不採用；CT44局部方案另記錄。
-- [x] [結果／問答／軌跡](../specs/2026-09-09-ct43-read-routing-results.md)封存，獨立review無Critical／Important；Minor引文標點差異保留。557離線＋41真PG通過；G8仍OPEN。
+- [x] [結果／問答／軌跡](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct43-read-routing-results.md)封存，獨立review無Critical／Important；Minor引文標點差異保留。557離線＋41真PG通過；G8仍OPEN。
 
 ## 實測後局部對照
 

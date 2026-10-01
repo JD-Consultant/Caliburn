@@ -2,12 +2,12 @@
 
 > **【2026-08-01 現行裁決索引｜先讀這裡】**
 > 本文提到的 **「K/S/A 支持度四級」（`behavior_grounded`／`employee_confirmed`／`reference_candidate`／`unsupported`）
-> 已由 [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 翻案**，
+> 已由 [ADR 0048](../../../../branch-snapshots/20260922-local-main-r1/docs/adr/0048-opks-evidence-axes-and-document-level-competencies.md) 翻案**，
 > 改為 `evidence_origin` × `task_linkage` 兩正交軸 ＋ `source_refs[]` 型別層非空。
 > 原文保留供追溯，**不得據以施工**。
-> OPKS 現行裁決 = **[0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
-> ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
-> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）**，三份一起讀。
+> OPKS 現行裁決 = **[0048](../../../../branch-snapshots/20260922-local-main-r1/docs/adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
+> ＋ [0049](../../../../../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
+> ＋ [0050](../../../../../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）**，三份一起讀。
 
 
 - 日期：2026-07-25
@@ -17,8 +17,8 @@
 - 本文不處理：SaaS、帳號密碼、多人權限、公司級治理、招募／訓練／考核模組、資料表或特定 LLM API
 - 相關文件：
   - [專業職務分析與短回答架構研究](2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)
-  - [LLM 架構反方審查與工作分析核心修正版](2026-07-24-interview-vnext-llm-architecture-red-team-and-corrected-work-analysis-design.md)
-  - [Job Authoring v2 關聯式儲存研究](2026-07-24-job-authoring-v2-relational-storage-research.md)
+  - [LLM 架構反方審查與工作分析核心修正版](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-24-interview-vnext-llm-architecture-red-team-and-corrected-work-analysis-design.md)
+  - [Job Authoring v2 關聯式儲存研究](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)
 
 ---
 
@@ -29,8 +29,8 @@
 > | C-01 | §11 第一優先 #6 | 「用便宜模型跑小批多 trial」**已修正**為先用最強可用模型建天花板，再以 ablation 檢查便宜模型 |
 > | C-08 | §5.9 Step 7 | 補上 K/S/A 與 Indicator 的四級支持度，以可查核方式落實本文既有的「不評估員工個人熟練度」原則 |
 >
-> 依據見 [R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、§3.7、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
+> 依據見 [R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1、§3.7、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)。
 
 ---
 
@@ -593,8 +593,8 @@ Duty 也可以重新分組。
 > `reference_candidate`（只來自公版，僅作候選）／`unsupported`（模型推測，不得入正式 JD）。
 > Attitude 一併適用。**員工按接受不得被記錄成已有行為證據。**
 >
-> 依據：[R1 紅隊複審與修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.7、
-> [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 29–32。
+> 依據：[R1 紅隊複審與修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.7、
+> [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 29–32。
 
 不是四個互不相干的生成工作，也不是一次整包生成。
 
@@ -922,7 +922,7 @@ Context 應區分：
 5. 持續 coverage 與反證；
 6. **先用最強可用模型**跑小批多 trial 建立品質天花板，再以 ablation 檢查便宜模型是否夠用；人工讀 transcript。
    ←【C-01 已修正；原文為「用便宜模型跑小批多 trial」。理由見
-   [修訂裁決](2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1】
+   [修訂裁決](../../../../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md) §3.1】
 
 這一步比先完成全部 K/S、公版匯出或新基礎設施重要。
 

@@ -5,7 +5,7 @@
 **Goal:** 分清現行 CT25 規則在首次更正是否能寫入，與舊口頭確認後的漏存恢復是否同樣失敗。
 **Architecture:** CT16 合成資料建立兩個隔離副本。首次組用官方 LangGraph 歷史 checkpoint 分支；恢復組保留原42則可見問答。均沿用原服務、reasoning、inline compaction、提示與工具，不修改 request view。
 **Tech Stack:** Luna／medium、ChatOpenAI Responses、LangChain、LangGraph PostgreSQL Saver／Store。
-**Spec:** [CT33研究與待驗假設](../specs/2026-09-08-ct33-compaction-provenance-and-recovery-review.md)。Owner本輪同意方向，另明確核准總20次／US$0.10，達上限停止，不重開既有closed帳本。
+**Spec:** [CT33研究與待驗假設](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct33-compaction-provenance-and-recovery-review.md)。Owner本輪同意方向，另明確核准總20次／US$0.10，達上限停止，不重開既有closed帳本。
 
 ## 邊界與官方依據
 

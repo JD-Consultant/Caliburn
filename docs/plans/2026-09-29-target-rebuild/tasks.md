@@ -49,7 +49,7 @@
 - **第八切片：**第七切片已提交 `2bf929e6`；第八切片完成協作對象／共通條件人工後端、固定修訂與重送恢復，後端 **381 項**（258 項真 PG）、前端既有 **44 項**通過；[第八切片證據](evidence/t03-relational-jd.md#10-第八切片協作對象與共通條件後端2026-09-29)。
 - **第九切片：**第八切片已提交 `ad6211af`；第九切片 `f9d710eb` 接上協作／條件人工 UI 與同版集合讀取。受影響後端 **166 項**、前端 **49 項**、真 PG 瀏覽器 **16 項**通過；獨立靜態審核未找到阻擋缺陷。[第九切片證據](evidence/t03-relational-jd.md#11-第九切片協作與條件人工-ui2026-09-29)。
 - **完成證據：**第十切片完成全部 JD 集合共用的候選／固定正式稿隔離、原結果、位置回退與交易內採用；後端全套 **405 項**通過，新增 24 項真 PG。獨立靜態審核未找到阻擋缺陷。[第十切片證據](evidence/t03-relational-jd.md#12-第十切片候選位置與-t03-完成2026-09-29)。T03 的人工垂直切片及候選底層完成；T07 來源／模型工具、T08 完整 A、T09 候選 UI、T12 故障 gate 均未冒充完成。
-- **契約：**[JD 欄位指南](../../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具能力覆蓋 §2.1](../../specs/2026-09-29-jd-model-tool-contract-review.md#21-欄位與操作覆蓋)、[資料接線](../../implementation/data-and-contracts.md)。
+- **契約：**[JD 欄位指南](../../guides/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具能力覆蓋 §2.1](../../specs/2026-09-29-jd-model-tool-contract-review.md#21-欄位與操作覆蓋)、[資料接線](../../implementation/data-and-contracts.md)。
 - **程式／交付：**`features/job_description`、HTTP DTO／mapper、`jd-editor`；profile、職責／未歸屬任務、成果／要求、共用 K／S 與關係、協作／共通條件；候選及固定正式修訂機制。
 - **Red：**刪職責誤刪任務、成果與要求錯配、已用 K／S 被刪、跨任務明細操作、後段 change 失敗留下前半修改、活躍 A 時人工寫入。
 - **完成：**人工 CRUD／移動／排序可用，V16／JDT-02／05 底層通過；正式／候選不同投影；同一命令重入返回原結果。
@@ -161,7 +161,7 @@
 - [x] T10；依賴：T05、T06。
 - **完成（2026-09-30 恢復後）：**B1／B2 私有角色權限、固定資料與 context 已逐條對照 Red 與 V10／V11／V14，見 [T10 完成對照](evidence/t10-memory-analysis-roles.md#任務完成對照2026-09-30-恢復後)；補了 V14 的缺口：B2 收到的情境差異專項測試（新增含未被引用者、刪除、改名、改正文、改回、只有 B2 階段可取得）。真模型：三批 A→B1→B2 正式發布與課程行政旅程的背景批次。**不含**：背景整理是否讓長訪談更好（T14／T17）、按需差異在超長批次的容量（T15／T16）。以下為歷史紀錄。
 - **最新切片：**`8eb469e1` 接兩個私有角色與同一共用 runtime，保留分層寫入權限；兩批真模型已共同發布，[T10 證據](evidence/t10-memory-analysis-roles.md)。局部真模型成功不代完整異常與品質 gate。
-- **契約：**[B1／B2 分責](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[原話 read](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[工作分析 §9](../../specs/2026-09-09-complete-work-analysis-guide.md#9-工作理解正文要寫到多清楚2026-09-25-研究補核對)。
+- **契約：**[B1／B2 分責](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[原話 read](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[工作分析 §9](../../guides/2026-09-09-complete-work-analysis-guide.md#9-工作理解正文要寫到多清楚2026-09-25-研究補核對)。
 - **程式／交付：**兩角色 instructions、handlers、起始投影與私有 graph history；typed gap／完成輸出；fake provider 分工測試。
 - **Red：**B1 透過錯誤／gap 看理解、B2 修改情境、回交重置分析／compact、B2 只看已有引用而漏新增情境、原話上界偷偷用 A 最新輪。
 - **完成：**V10／V11／V14 的角色層；fixed F、共同訪談 read；B2 讀現在情境＋必要 diff、只改理解；gap 具體、不要求固定互審。
@@ -218,7 +218,7 @@
 - **2026-10-01 有限推理校準：**相同請求僅改 Luna effort，partial 0/2→2/2、whole-field 維持通過；四輪真 App／PG 旅程保留原來源並完成季度更正，28 筆可回讀。預設改 `high`，不加 Prompt／reviewer；三角色設定接線 Red→Green，相關 59 passed。仍有任務過大、Memory 語意細節及廣泛品質待驗，不勾完成；見 [比較、取捨與限制](evidence/t14-job-analysis-quality.md#2026-10-01來源保留的-reasoning-effort-對照)。
 - **2026-10-01 跨面向審核：**核角色指引／工具說明／參數與實際 Context；補四份 JD schema 的欄位、增刪來源及逐筆確認語意，不改角色權限或歷史組裝。71 契約／接線測試及 13 真 PG 測試通過；有限模型檢查仍重現綜合職責漏保留來源，**未宣告品質修復**。審核範圍、研究、正反例及 Context 證據見 [T14 續頁](evidence/t14-job-analysis-quality.md#2026-10-01指引參數語意與實際-context-交叉審核)。停止同假說的提示微調，後續沿原品質 gate 判斷，不加來源猜補或新審核平台。
 - **最新材料：**13 個合成品質情境、oracle／rubric、角色組裝契約及固定 Demo 樣本人工式審讀，見 [T14 證據](evidence/t14-job-analysis-quality.md)；v3 新增跨輪來源兩例，實際對照與仍未通過的邊界見 [T17 來源驗證](evidence/t17-course-administrator-journey.md#真後端保存確認結果與保留缺口)。離線契約通過不代表模型品質已達標；獨立領域校準、全部情境真模型及長訪談仍待驗。
-- **契約：**[工作分析指南](../../specs/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作](../../specs/2026-09-09-jd-field-and-writing-guide.md)、[方法研究入口](../../specs/2026-09-09-job-analysis-and-jd-content-research.md)。
+- **契約：**[工作分析指南](../../guides/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作](../../guides/2026-09-09-jd-field-and-writing-guide.md)、[方法研究入口](../../guides/2026-09-09-job-analysis-and-jd-content-research.md)。
 - **程式／交付：**版本化角色 prompt／方法內容與全合成 fixtures／rubric；基於既有研究裁取適用內容，不複製整套指南到每次請求。
 - **先驗：**fixture 必須能辨責任混淆、舊案更正、沒有主語、低頻工作、只掌握 10% 案例、人工稿不等於事實；離線驗指引組裝／工具權限；自然品質標待 provider。
 - **完成：**每角色都有明確品質判準與正反例，JD 精簡不漏重要工作；不以字數／欄位填滿評滿分；T16 可用同資料集重跑。

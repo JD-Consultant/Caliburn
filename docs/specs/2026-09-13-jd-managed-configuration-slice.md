@@ -1,7 +1,7 @@
 # JD 本機配置、初始化與一般開啟
 
 - 日期：2026-09-13；Topic JD-R002，RS-1／2→3 局部接合；狀態：本切片實作、分層驗收與獨立審查通過，完整 App 未完成。
-- 上游：[目前決策](../current-decisions.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)、[配置前置](evidence/2026-09-13-jd-local-configuration-preflight.md)、[初始化前置](evidence/2026-09-13-jd-managed-initialization-preflight.md)。
+- 上游：[目前決策](../current-decisions.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)、[配置前置](../experiments/legacy-evidence/2026-09-13-jd-local-configuration-preflight.md)、[初始化前置](../experiments/legacy-evidence/2026-09-13-jd-managed-initialization-preflight.md)。
 - 隔離 `experiments/jd-relational-app`；無 production 接合、真訪談或產品模型呼叫；ADR0075 Proposed、production ADR0060 不變。
 
 ## 1. 本單位效果
@@ -33,7 +33,7 @@
 
 2026-09-13 重查 [AWS hexagonal architecture](https://docs.aws.amazon.com/prescriptive-guidance/latest/hexagonal-architectures/overview.html) 與 [安全重試](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)：共同 domain 不依賴外部介面；原請求識別與意圖使重試可判斷。這支撐人／AI 共用業務、原結果查回及本單位不另開保存路徑，沒有宣稱 AWS 指定本案 phase、表名或 header。
 
-Windows、Pydantic、Alembic／SQLAlchemy、Psycopg／PG 及 Saver 的版本／授權／限制以兩份前置為來源；未升級任何依賴。OpenAI／Anthropic 工具與模型行為沒有在本單位變更，沿[已完成的兩家契約與 App 分工](evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)，不重開同層廣搜。
+Windows、Pydantic、Alembic／SQLAlchemy、Psycopg／PG 及 Saver 的版本／授權／限制以兩份前置為來源；未升級任何依賴。OpenAI／Anthropic 工具與模型行為沒有在本單位變更，沿[已完成的兩家契約與 App 分工](../experiments/legacy-evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)，不重開同層廣搜。
 
 有限實測發現 **pywin32 b312 ReplaceFile wrapper 把 target／candidate 轉成反向參數**；[官方 b312 原碼](https://raw.githubusercontent.com/mhammond/pywin32/b312/win32/src/win32file.i) 3674–3690 與新合成檔實驗相符。因此僅此 API 用 Python ctypes 薄接 [Microsoft ReplaceFileW](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-replacefilew)，依 target、candidate、backup 正確順序，不在 App 倒填參數依賴上游錯誤、不放寬 ACL、不用不支援的 WRITE_THROUGH。其他 Win32 能力沿 pywin32。
 
@@ -56,7 +56,7 @@ Windows、Pydantic、Alembic／SQLAlchemy、Psycopg／PG 及 Saver 的版本／�
 - 配置最初缺新模組造成收集失敗；擴充測試曾因 pytest 過長參數ID與 PermissionError fixture 不等於 Win32 share violation 失敗，修測試後真 native 31 PASS，等待有界化再窄驗 4 新程序 PASS。
 - 初始化／host orchestration、phase發布回覆遺失以合成邊界反例驗證；真 native 接合另列。managed_app 首輪 1 FAIL 是測試期待內層錯誤，但原 query lifespan 會再遮蔽成固定外層錯誤；確認既有契約後修 test，未放寬產品錯誤處理。
 - 配置／DPAPI 與 HTTP 資料集兩路獨立唯讀審查沒有 P1／P2。獨立 reviewer 重跑 native 配置時在 pytest 暫存目錄受 WinError5 阻擋，31項未執行；不能混稱 reviewer 通過，另用實作者及整合的真 native 證據。
-- schema P2：原 CHECK 只核名字、partial predicate 只核存在，接受同名錯義規則。真 PG `format_version=4`／`WHERE origin='manual'` 兩反例先失敗；改以固定版官方 PG canonical profile 核 **29 CHECK＋12 predicates** 後通過。profile 只作相容性證據，來源 migration／metadata hash 在測試核對，不從日常 DB 重設期望、不新增 SQL parser。[修正實證](evidence/2026-09-13-jd-managed-initialization-preflight.md#10-p2-收尾同名規則也必須有正確意義)
+- schema P2：原 CHECK 只核名字、partial predicate 只核存在，接受同名錯義規則。真 PG `format_version=4`／`WHERE origin='manual'` 兩反例先失敗；改以固定版官方 PG canonical profile 核 **29 CHECK＋12 predicates** 後通過。profile 只作相容性證據，來源 migration／metadata hash 在測試核對，不從日常 DB 重設期望、不新增 SQL parser。[修正實證](../experiments/legacy-evidence/2026-09-13-jd-managed-initialization-preflight.md#10-p2-收尾同名規則也必須有正確意義)
 - pywin32 反向參數現場：`S:/caliburn/tmp/config-api-probe-79964f09c9bd418697272b8c1093f5c5`。native config 測試現場：`S:/caliburn/tmp/jd-cf4`／`jd-cf5`。全部為合成資料，非真設定。
 - 新程序完整旅程證據：`S:/caliburn/.research-tmp/jd-configured-host-7739b05bc0644181907198747f773cbc`；ready ACK 遺失：`jd-configured-host-b8fa515bae6141fe967d58036d0fee2d`。root 完整回歸暫存為 `.research-tmp/jd-managed-full-20260913-01`，窄 native 另保留各自 boot／finished／process 記錄。測試以新 `caliburn_jd_setup_test_<uuid>` DB 保留現場，不 DROP／清原 fixture。
 - P2 修正後 root 三案現場分別為 `.research-tmp/jd-configured-host-68dd94d346e743688b5193e6fef595a3`、`jd-manual-http-a2ca21766aee4ab18f3cee0373bc3fbd`、`jd-catalog-http-43da7420050946e8a47cb111f021e33a`；再讀核 **7 個 zero-exit 與 6 個 finished 紀錄**。27 檔精確單位核對68個相對連結、差異、生成物及依賴未變更；不帶入決策入口原有未提交歷史。

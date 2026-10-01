@@ -3,7 +3,7 @@
 > 2026-09-07；G5 有限實驗 → 兩個已重現接線缺陷的局部修復。**不是 Memory 品質通過、不是產品可用性驗收。**
 > **最新續測：見 §6。**已保存兩修可跑過前兩次 B2，但整組仍未通過。新提示試驗未通過，已撤回這次四檔試改；保留 `04ce14d8` 程式，不提高上限。下方 §1–5 為先前3次試跑沿革，不把它們當最新累計。
 > 最新決策入口：[主 checkout register](../../../../docs/current-decisions.md)。需求與方法：[Memory 設計／prompt 段](../../../../docs/specs/2026-09-06-analysis-only-agent-memory-design.md#2026-09-07memory-prompt-調整與驗收重點)。不重選 ABC 或五產物。
-> **後續底層複核／修復：**[B2 交付研究](2026-09-07-b2-delivery-official-implementation-review.md)方案 A 已獲 Owner 核准；實作與離線驗證見[窄修結果](2026-09-07-b2-delivery-repair-results.md)。本頁保留当時真測、撤回與費用；不是最新程式仍停在 `04ce14d8`，亦無新付費／品質通過證據。
+> **後續底層複核／修復：**[B2 交付研究](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-b2-delivery-official-implementation-review.md)方案 A 已獲 Owner 核准；實作與離線驗證見[窄修結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-b2-delivery-repair-results.md)。本頁保留当時真測、撤回與費用；不是最新程式仍停在 `04ce14d8`，亦無新付費／品質通過證據。
 
 ## 1. 範圍與結果先講
 
@@ -57,7 +57,7 @@ HTTP 成功只代表模型回覆完成，不代表 B2 agent／發布成功。以
 
 **採用的小修：**既有散文地址 delimiter 補全形括號。CommonMark 的明確 link destination、inline code／code fence 仍採原樣精確地址驗證，不能把錯字／錯地址裁切成另一個有效來源；scope／存在性驗證不變。這是已有 controlled-address parser 的窄修正，不是新 Evidence／記憶機制。
 
-依據：[既有 BG-01 引用修復原則](2026-09-07-memory-reference-repair-results.md)、[CommonMark links](https://spec.commonmark.org/0.31.2/#links)。**CommonMark 不替本產品定義散文中的本地路徑詞界**；全形括號的處理由真實失敗與本產品固定地址格式支持，明確記作本案局部實作，非「OpenAI 官方指定這個 regex」。
+依據：[既有 BG-01 引用修復原則](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-memory-reference-repair-results.md)、[CommonMark links](https://spec.commonmark.org/0.31.2/#links)。**CommonMark 不替本產品定義散文中的本地路徑詞界**；全形括號的處理由真實失敗與本產品固定地址格式支持，明確記作本案局部實作，非「OpenAI 官方指定這個 regex」。
 
 ### MP-02c：完成率／額度仍未验收
 
@@ -76,7 +76,7 @@ HTTP 成功只代表模型回覆完成，不代表 B2 agent／發布成功。以
 
 ## 5. 紀錄、限制與下一步
 
-[可攜式去重實驗紀錄 JSON](evidence/2026-09-07-memory-prompt-probe.json)保存每次實際 prompt／hash、合成訪談材料、B1 產物、模型工具呼叫／可見輸出、下一次請求中可见工具回覆、usage／成本與停止原因。刪除重複上下文、未收 headers／金鑰／opaque thinking。**最後一個工具若沒有下一次模型請求，其結果可能未被封包紀錄收錄**，不能由該紀錄自行補猜。
+[可攜式去重實驗紀錄 JSON](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-memory-prompt-probe.json)保存每次實際 prompt／hash、合成訪談材料、B1 產物、模型工具呼叫／可見輸出、下一次請求中可见工具回覆、usage／成本與停止原因。刪除重複上下文、未收 headers／金鑰／opaque thinking。**最後一個工具若沒有下一次模型請求，其結果可能未被封包紀錄收錄**，不能由該紀錄自行補猜。
 
 完整原始 probe JSON 與約200行一次性腳本只留隔離 worktree `.test-tmp/`，不把臨時 client／費用預留寫進產品；可攜紀錄含原始檔 hash 與位置。SQLite／Memory graph 為暫存，引用在這些實驗存活期間真實可讀，不承諾離開程序後可連回測試 Store。既有 canonical 持久性另有先前測試。
 
@@ -128,4 +128,4 @@ HTTP 成功只代表模型回覆完成，不代表 B2 agent／發布成功。以
 - LangChain `create_agent(response_format=...)` 是官方能力，但同時用工具與結構化輸出要求 provider支援；它保證形狀，不保證語意完整或直接替本產品處理原子發布。[Structured output／provider條件](https://docs.langchain.com/oss/python/langchain/structured-output#response-format)不能因看見這個API就宣稱已能承接所有Memory大小。
 - 保留原文、詳記、理解、導覽及逐層回查，ABC責任不翻案；不新增Memory層、不將案例硬拆Task／OPKS、不做JD／UI，不重構或換框架。若確需改 B2輸出契約／資料流，先給 Owner 短設計確認。
 
-[本輪可攜證據](evidence/2026-09-07-memory-prompt-followup.json)包含2次的實際prompt、精確試改diff、B1產物、已發布快照、可見模型／工具結果、成本與停止診斷；無key／headers／opaque reasoning。先前3次證據檔未覆寫。**本輪停止於已知品質缺口，不宣稱Memory已修完。**
+[本輪可攜證據](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-memory-prompt-followup.json)包含2次的實際prompt、精確試改diff、B1產物、已發布快照、可見模型／工具結果、成本與停止診斷；無key／headers／opaque reasoning。先前3次證據檔未覆寫。**本輪停止於已知品質缺口，不宣稱Memory已修完。**

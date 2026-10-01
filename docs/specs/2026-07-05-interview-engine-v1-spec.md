@@ -159,7 +159,7 @@ reranker 觸發條件不變 · MCP 曝露 tools(ADR 0007 沿用)。
 
 - 新深文檔 `docs/design/interview-engine.md`(端到端:面板×引擎×文件 seam;本 spec 定稿後轉寫);
 - `apps/api/README.md`(interview 端點面)· `apps/web/README.md`(面板)·
-  [`editor-knowledge-pack.md`](../archive/retired-documents/design/editor-knowledge-pack.md)(單一寫入路徑不變量補 engine 分句);
+  [`editor-knowledge-pack.md`](../archive/docs-cleanup-2026-10-02.md)(單一寫入路徑不變量補 engine 分句);
 - ocs-contract 變更走 [`contract-strategy`](../contract-strategy.md) §4 交付生命週期。
 
 ## 11. 自審紀錄(2026-07-05,維護者授權)

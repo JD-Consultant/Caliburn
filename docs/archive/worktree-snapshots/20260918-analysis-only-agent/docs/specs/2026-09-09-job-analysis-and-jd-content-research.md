@@ -1,14 +1,14 @@
 # 完整工作分析與高品質職務說明書
 
-**Owner格式回饋（2026-09-10）：**[完整格式](2026-09-10-jd-format-review.md)大致同意，成果與要求固定為任務底下兩組並列、各可多項、不配對、不與任務敘述合併；含任務↔知識／技能對應的整體方向為可修訂WORKING。工作要求另推薦名称「工作執行要求」。下一步補正式分組與引用契約，不再重問整份格式採用；詳情以register與格式／欄位責任文件為準。
+**Owner格式回饋（2026-09-10）：**[完整格式](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-10-jd-format-review.md)大致同意，成果與要求固定為任務底下兩組並列、各可多項、不配對、不與任務敘述合併；含任務↔知識／技能對應的整體方向為可修訂WORKING。工作要求另推薦名称「工作執行要求」。下一步補正式分組與引用契約，不再重問整份格式採用；詳情以register與格式／欄位責任文件為準。
 
-**完整格式檢視入口（2026-09-10）：**Owner 要先一次看完所有欄位及排法，再討論調整；閱讀[完整格式討論稿](2026-09-10-jd-format-review.md)。依[本輪完整性、欄位與保存核對](2026-09-10-jd-format-quality-and-storage-review.md)，任務推薦五類閱讀內容，条件按對象就近，訪談未知與JD既有草稿分清；任務↔知識／技能仍是待確認推薦，新關係尚缺正式契約。此為有證據的研究修訂，不改已同意效力或直接授權接線。
+**完整格式檢視入口（2026-09-10）：**Owner 要先一次看完所有欄位及排法，再討論調整；閱讀[完整格式討論稿](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-10-jd-format-review.md)。依[本輪完整性、欄位與保存核對](../../../../../specs/2026-09-10-jd-format-quality-and-storage-review.md)，任務推薦五類閱讀內容，条件按對象就近，訪談未知與JD既有草稿分清；任務↔知識／技能仍是待確認推薦，新關係尚缺正式契約。此為有證據的研究修訂，不改已同意效力或直接授權接線。
 
-**2026-09-10 最新路由：**Owner 要求在 Plate 接線前先討論確認職務說明書格式。依 [register](../current-decisions.md) 的 JD-R001/C06，先以[完整樣稿 r2](2026-09-09-frontend-engineer-jd-sample.md)及[欄位指南](2026-09-09-jd-field-and-writing-guide.md)確認成品章節與任務呈現，Task 1 暫緩；舊成品方向仍為可修訂基線，未視為否定或已核准新格式。編輯技術採 Plate＋持續工作稿，實作路由見[核心接線計畫](../plans/2026-09-10-jd-editor-core-implementation.md)；不再沿早期免費開源選型或 pending 接受／拒絕 gate。
+**2026-09-10 最新路由：**Owner 要求在 Plate 接線前先討論確認職務說明書格式。依 [register](../current-decisions.md) 的 JD-R001/C06，先以[完整樣稿 r2](../../../../../guides/2026-09-09-frontend-engineer-jd-sample.md)及[欄位指南](2026-09-09-jd-field-and-writing-guide.md)確認成品章節與任務呈現，Task 1 暫緩；舊成品方向仍為可修訂基線，未視為否定或已核准新格式。編輯技術採 Plate＋持續工作稿，實作路由見[核心接線計畫](../plans/2026-09-10-jd-editor-core-implementation.md)；不再沿早期免費開源選型或 pending 接受／拒絕 gate。
 
 本文是 JD-R001 的研究入口。研究基準日為 2026-09-09；狀態為 **G2 研究完成、G3 內容與樣稿審查完成，Owner 同意成品方向，保留可修訂性**，不是資料庫、工具、介面或 production 施工契約。Owner 先授權「都交給你研究處理」，取代逐題等待 C01–C05 回覆，後回覆「同意」並提供 LED 照明工程師 iCAP 作參考、明確不要求照做；[參考核對及限制](2026-09-09-job-analysis-international-evidence.md#8-owner-提供的-led-照明工程師-icap-參考)集中在證據文件。以下仍是可調整的 Working recommendation，不代表每項技術細節已核准，也不以歷史程式限制新產品。
 
-**最新補充：**跨國比較後，Owner 對完整閱讀版回覆「大致上同意」（G3／WORKING，可修訂），並要求以核心研究複核、補好文檔關係。[樣稿 r2](2026-09-09-frontend-engineer-jd-sample.md)已同步聊天展示的版本；[本輪內容與路由審核](2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)未發現須翻案的內容衝突。[十份雇主比較](2026-09-09-employer-job-document-comparison.md)仍為研究證據，不把所有來源當成Owner逐條核准或員工真實資訊；[深度與追問方法](2026-09-09-customized-jd-depth-and-interview-calibration.md)保持原分工。JD-R002/C02審核粒度方向亦獲暫時同意；依複雜度疑問先續C03整體AI編輯應用，不重問同一份樣稿深度，亦未授權施工。
+**最新補充：**跨國比較後，Owner 對完整閱讀版回覆「大致上同意」（G3／WORKING，可修訂），並要求以核心研究複核、補好文檔關係。[樣稿 r2](../../../../../guides/2026-09-09-frontend-engineer-jd-sample.md)已同步聊天展示的版本；[本輪內容與路由審核](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-sample-basis-and-review.md#10-完整閱讀版-r2-與核心文檔一致性審核)未發現須翻案的內容衝突。[十份雇主比較](2026-09-09-employer-job-document-comparison.md)仍為研究證據，不把所有來源當成Owner逐條核准或員工真實資訊；[深度與追問方法](2026-09-09-customized-jd-depth-and-interview-calibration.md)保持原分工。JD-R002/C02審核粒度方向亦獲暫時同意；依複雜度疑問先續C03整體AI編輯應用，不重問同一份樣稿深度，亦未授權施工。
 
 ## 1. 結論
 
@@ -32,17 +32,17 @@
 | [客製化深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md) | 實際職位要多具體、資料不足怎麼追問、如何收尾；三種深度對照 | 另造必填清單、虛構工作細節或直接改 prompt |
 | [實際雇主文件比較](2026-09-09-employer-job-document-comparison.md) | 十份原始職位文件的內容、性質、日期及與樣稿的差異 | 把職族／招聘頁當成個別員工真實全工作，或重開技術設計 |
 | [跨國證據與研究邊界](2026-09-09-job-analysis-international-evidence.md) | 原始資料、版本、精確連結、支持範圍、舊研究更正 | 把推論包裝為官方規定 |
-| [完整 JD 樣稿](2026-09-09-frontend-engineer-jd-sample.md) | 看成品內容、粒度與閱讀效果 | 假裝是真實員工資料，或直接決定網頁版面 |
-| [樣稿依據與審查](2026-09-09-jd-sample-basis-and-review.md) | 明示虛構完整情境、來源↔成品核對、發現與修正 | 新增來源 schema 或 AI 驗證器 |
+| [完整 JD 樣稿](../../../../../guides/2026-09-09-frontend-engineer-jd-sample.md) | 看成品內容、粒度與閱讀效果 | 假裝是真實員工資料，或直接決定網頁版面 |
+| [樣稿依據與審查](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-sample-basis-and-review.md) | 明示虛構完整情境、來源↔成品核對、發現與修正 | 新增來源 schema 或 AI 驗證器 |
 | [JD-R002 可編輯內容與關係](2026-09-09-jd-document-relationships-working-research.md) | 下一層的內容表徵選項、推薦及編輯情境 | 不重定成品欄位，不直接選 DB／框架或施工 |
-| [JD-R002/C02 編輯與審核](2026-09-09-jd-editing-and-review-working-design.md) | 審核分組候選、員工直接編輯的效果與下一個操作問題 | 不把框架預設當產品決策，不重寫內容方法或直接施工 |
+| [JD-R002/C02 編輯與審核](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-editing-and-review-working-design.md) | 審核分組候選、員工直接編輯的效果與下一個操作問題 | 不把框架預設當產品決策，不重寫內容方法或直接施工 |
 | [JD-R002/C03 AI 編輯應用整體接法](2026-09-09-ai-document-app-composition-research.md) | agent、文件編輯及審核如何整體接線，哪些複雜度必要 | 不重開 Memory、不預設每欄位一工具或直接選定套件 |
 | [C03 App／工具共同基礎](2026-09-09-llm-app-tool-use-and-document-editing-common-practices.md) | 跨廠共同分工及不同編輯方式；已同意 G3／WORKING | 不把共同原則當唯一格式、套件採用或實測成功 |
 | [C03 可執行方案](2026-09-09-jd-ai-editing-executable-proposal.md) | 推薦組合、端到端接法、缺口及有限驗證門檻；§0.1 核對近期真實進度，§7 收斂第一範圍，候選待裁決 | 不把未知當原生覆蓋，不越過採用／施工授權 |
 | [C03 Agent可靠性證據](2026-09-09-jd-ai-app-runtime-official-evidence.md)／[編輯器比較](2026-09-09-jd-editor-framework-comparison.md) | 工具、錯誤、重試與三套editor的正式契約、來源及差異 | 不重抄JD分析方法，不用名稱相似當功能相等 |
 | [JD-R002 官方能力證據](2026-09-09-jd-document-model-official-evidence.md) | 職務系統／文件產品／編輯框架的直接能力及限制 | 不把概念相似當成完整功能等價 |
 
-下一輪從本入口及對應指南讀起；遇到理由或方法爭議，沿證據表回原文，不重開全部研究。現行決策效力仍由 [register](../current-decisions.md) 與 [討論流程](../decision-process.md) 管理。
+下一輪從本入口及對應指南讀起；遇到理由或方法爭議，沿證據表回原文，不重開全部研究。現行決策效力仍由 [register](../current-decisions.md) 與 [討論流程](../../../../../decision-process.md) 管理。
 
 ### 完整閱讀順序與文檔關係
 
@@ -51,7 +51,7 @@
 1. **狀態與目標：**先讀[register](../current-decisions.md)的JD-R001／R002及本文，確認同意範圍與本輪問題。
 2. **如何取得與理解工作：**讀[分析指南](2026-09-09-complete-work-analysis-guide.md)及[客製化校準](2026-09-09-customized-jd-depth-and-interview-calibration.md)，理解要問什麼、怎麼分辨案例與持續責任、何時仍缺資訊。
 3. **理解如何成為文件：**讀[欄位指南](2026-09-09-jd-field-and-writing-guide.md)，分清內容定義、完成要求、K／S及下游用途；不把分析面向直接翻成必填表格。
-4. **看成品，再反查：**讀[樣稿 r2](2026-09-09-frontend-engineer-jd-sample.md)及[完整情境／雙向審查](2026-09-09-jd-sample-basis-and-review.md)。檢查已知工作→成品是否漏寫，以及成品→依據是否多寫；版本及最近審核在後者§10。
+4. **看成品，再反查：**讀[樣稿 r2](../../../../../guides/2026-09-09-frontend-engineer-jd-sample.md)及[完整情境／雙向審查](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-sample-basis-and-review.md)。檢查已知工作→成品是否漏寫，以及成品→依據是否多寫；版本及最近審核在後者§10。
 5. **核對為什麼這樣做：**讀[國際方法證據](2026-09-09-job-analysis-international-evidence.md)與[實際雇主比較](2026-09-09-employer-job-document-comparison.md)。前者說明方法、版本與適用限制，後者提供實際寫法與反例；有疑點再沿精確引用讀原文，不能只看公司名稱。
 6. **最後才接下一層：**內容理解一致後，讀[JD-R002](2026-09-09-jd-document-relationships-working-research.md)及其官方能力證據，續談編輯／審核。內容研究不等於技術契約、框架選定或施工核准。
 
@@ -64,7 +64,7 @@
 - **遇到矛盾先辨別層次。** 官方事實、產品取捨、虛構例子與production現況不同。不能只因文件較新就靜默取代Accepted ADR；真正改變內容目的或使用者行為時，先記錄影響並與Owner討論。
 - **避免重複與失聯。** 同一題在原負責章節修訂，審查沿革明標適用版本；新增獨立子題才開新文檔並雙向連回。變更後核對受影響路由、章節與狀態，不要求每次重讀無關舊長稿。
 
-以上沿既有[文檔單一責任與G3／G4／G7](../decision-process.md#2-文件與-authority-的單一責任)落實交接，不新增另一套治理流程。文檔是核心知識，**不代表每份研究都已成為可直接施工的production authority**。
+以上沿既有[文檔單一責任與G3／G4／G7](../../../../../decision-process.md#2-文件與-authority-的單一責任)落實交接，不新增另一套治理流程。文檔是核心知識，**不代表每份研究都已成為可直接施工的production authority**。
 
 ## 3. 先分析工作，再決定 JD 怎麼呈現
 
@@ -122,7 +122,7 @@ OPM 明確將工作分析與訓練、分類、績效等後續用途相連，但�
 
 四份研究文件已全文回讀；另完成兩路唯讀審查，分別核對整體內容與英澳來源，以及台灣／新加坡引用與欄位邊界。審查發現並已修正兩點：補齊實際工作相關的體力、操作、感官與注意要求；縮窄「不放招募門檻」的說法，避免排除真正必要的資格／授權。iCAP 的條件式 O 省略及「建議」措辭、跨國版本與適用範圍亦已核對。
 
-前階段四份研究文件已通過本地連結及空白格式檢查；新增樣稿另作內容與文件檢查，結果寫在[審查紀錄](2026-09-09-jd-sample-basis-and-review.md#8-審查狀態與下一階段)。這不是 JD 生成功能驗收，也不為了多找資料而重做相同原則的研究。
+前階段四份研究文件已通過本地連結及空白格式檢查；新增樣稿另作內容與文件檢查，結果寫在[審查紀錄](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-sample-basis-and-review.md#8-審查狀態與下一階段)。這不是 JD 生成功能驗收，也不為了多找資料而重做相同原則的研究。
 
 ## 7. 進度與下一層，不跳到施工
 

@@ -8,7 +8,7 @@
 
 Owner 要求繼續研究、調整、優化至正常訪談。唯一問題：**已校準讀取提示在真 API factory、PostgreSQL Memory head、員工更正及重新開啟時，能否正常銜接？**
 
-最便宜的測法是重用[已生成合成案例](evidence/2026-09-07-b1-attribution-calibration.json)，只重建真實來源／檔案地址，再透過現有 publication API 發布初始 head。不是手工改成預期答案；不重跑原始 B1/B2。
+最便宜的測法是重用[已生成合成案例](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-b1-attribution-calibration.json)，只重建真實來源／檔案地址，再透過現有 publication API 發布初始 head。不是手工改成預期答案；不重跑原始 B1/B2。
 
 1. 零生成檢查：實際 Saver／Store 與來源引用可保存、關閉資源再開啟；原文沒有移除。已通過，0 次生成。
 2. 真 OpenAI Luna／medium：正常回顧 → 明確更正 B 案權限 → 重新開啟後確認。所有新輸入均走 FastAPI submit／服務執行／狀態／訊息入口。
@@ -54,8 +54,8 @@ Owner 再次核准：C `repair_memory` 與 B2 `edit_file`／`write_file` 共用�
 
 ## 證據與收尾／避免重新討論
 
-- [正常 API 三輪原始證據](evidence/2026-09-07-api-memory-interview-validation.json)：12 次請求、答案、發布 head、詳記與來源回查、opaque reasoning 指紋，以及可重現診斷程式。原始證據不覆寫。
-- [保留細節的兩次復測證據](evidence/2026-09-07-memory-edit-retention-calibration.json)：前帳本第13–20次＋新帳本8次；前12次以檔名與 SHA256 引用，不重複複製。保存实际工具參數、結果、初始／修改後正文及測試限制；沒有 credential 或原生隱藏推理全文。
+- [正常 API 三輪原始證據](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-api-memory-interview-validation.json)：12 次請求、答案、發布 head、詳記與來源回查、opaque reasoning 指紋，以及可重現診斷程式。原始證據不覆寫。
+- [保留細節的兩次復測證據](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-07-memory-edit-retention-calibration.json)：前帳本第13–20次＋新帳本8次；前12次以檔名與 SHA256 引用，不重複複製。保存实际工具參數、結果、初始／修改後正文及測試限制；沒有 credential 或原生隱藏推理全文。
 - 零生成接線核對：由同一 model binding 組裝 HTTP payload，在送出網路前攔截；B2 `edit_file`／`write_file` 的說明均包含共用指引。原付費帳本只記工具名稱，故不偽稱有逐字保存當時的說明。重新讀取 B2 head 仍是 revision 1，沒有將本次未完成草稿發布。
 - 最新三個 source 變更後完整離線回歸：**547 passed／0 skipped，118.95秒**，包含 PostgreSQL；一項既有 Starlette／AnyIO deprecation warning。這是流程與機械契約安全網，不保證模型語意正確。
 - 獨立 reviewer 已核對三個 source 的框架接線、參數與依賴，無新增 Critical／Important 實作問題；既知 B2 語意省略仍列 Important／OPEN。允許保存這次局部校準與未完成證據，不是允許把它標成完整修復或合併 production。

@@ -3,9 +3,9 @@
 > **狀態**：retained future bounded context。**不是** current 產品（`apps/api`／`apps/web`）的一部分，也**不是**已退役的歷史設計。
 > `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract`、`packages/indexer-contract`
 > 都是可獨立安裝、測試、執行的 monorepo 成員，但**不被** current API/Web import、呼叫，也不掛在 current 的
-> production composition root 上。決策依據：[ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md)
+> production composition root 上。決策依據：[ADR 0057](../../../../../adr/0057-current-only-runtime-and-data-boundary.md)
 > Decision 5（Proposed，2026-08-11 修正為保留＋隔離）；設計脈絡與 owner 裁決見
-> [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../specs/2026-08-11-rag-bounded-context-retention-design.md)。
+> [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../../../../../specs/2026-08-11-rag-bounded-context-retention-design.md)。
 > 若要讓 current API/Web 開始消費檢索結果，必須另開 ADR 定義 query contract、index freshness、embedding
 > identity、failure fallback 與 provenance／evidence linkage；本檔不是那個授權。
 
@@ -107,16 +107,16 @@ PDF 不只是測試 fixture，也是未來重新產生 OCS JSON 的來源材料�
   互不相通的資料世界。
 - 若要讓 current API/Web 開始消費檢索結果，必須另開 ADR，明確定義 query contract、index freshness、
   embedding identity、failure fallback、API transaction 外的 provider 呼叫，以及 current JD
-  provenance／evidence linkage；這份文件與 [ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md)
+  provenance／evidence linkage；這份文件與 [ADR 0057](../../../../../adr/0057-current-only-runtime-and-data-boundary.md)
   都不是那個授權。
 
 ## 6. 相關文件
 
-- [ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md) — current-only hard cut，Decision 5
+- [ADR 0057](../../../../../adr/0057-current-only-runtime-and-data-boundary.md) — current-only hard cut，Decision 5
   記錄 RAG 保留＋隔離。
-- [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../specs/2026-08-11-rag-bounded-context-retention-design.md)
+- [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../../../../../specs/2026-08-11-rag-bounded-context-retention-design.md)
   — 恢復範圍、owner 裁決與研究來源。
-- [`docs/plans/2026-08-11-rag-bounded-context-retention-plan.md`](../plans/2026-08-11-rag-bounded-context-retention-plan.md)
+- [`docs/plans/2026-08-11-rag-bounded-context-retention-plan.md`](../../../../../plans/2026-08-11-rag-bounded-context-retention-plan.md)
   — 逐 task 執行計畫與驗收條件。
 - [`apps/pdf-to-json/README.md`](../../apps/pdf-to-json/README.md)、
   [`apps/ocs-indexer/README.md`](../../apps/ocs-indexer/README.md)、

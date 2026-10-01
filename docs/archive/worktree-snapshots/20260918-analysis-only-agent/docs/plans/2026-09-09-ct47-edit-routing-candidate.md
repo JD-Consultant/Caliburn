@@ -1,10 +1,10 @@
 # CT47：編輯指引局部候選
 
-LLM-Q019／G5；Owner已授權局部prompt／同Luna effort調整。沿[CT45](../specs/2026-09-09-ct45-fixed-long-interview-results.md)失敗；CT46 xhigh同12cap仍失敗（12次估US$0.02371122，原PG未變），不再盲目提高effort或cap。
+LLM-Q019／G5；Owner已授權局部prompt／同Luna effort調整。沿[CT45](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct45-fixed-long-interview-results.md)失敗；CT46 xhigh同12cap仍失敗（12次估US$0.02371122，原PG未變），不再盲目提高effort或cap。
 
 ## 已核對與候選
 
-完整閱讀安裝的OpenAI SDK `agents/apply_diff.py`（400行），其`_parse_update_diff`逐hunk更新cursor並只向後找，`_apply_chunks`拒重疊。CT46 #2各ID原本正確，但先改後方案例，再回上方引用，因此Invalid Context17；#6、8才另有ID抄錯。不是所有失敗都同根因，也不改matcher。SDK公開來源及既有接線見[CT11](../specs/2026-09-07-official-memory-patch-trial-results.md)；[官方patch harness](https://developers.openai.com/api/docs/guides/tools-apply-patch#implementing-the-patch-harness)規定回傳精確成功／失敗供模型修訂，不保證會成功。
+完整閱讀安裝的OpenAI SDK `agents/apply_diff.py`（400行），其`_parse_update_diff`逐hunk更新cursor並只向後找，`_apply_chunks`拒重疊。CT46 #2各ID原本正確，但先改後方案例，再回上方引用，因此Invalid Context17；#6、8才另有ID抄錯。不是所有失敗都同根因，也不改matcher。SDK公開來源及既有接線見[CT11](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-official-memory-patch-trial-results.md)；[官方patch harness](https://developers.openai.com/api/docs/guides/tools-apply-patch#implementing-the-patch-harness)規定回傳精確成功／失敗供模型修訂，不保證會成功。
 
 只換一組**編輯操作指引**：短且全文可見、多處與引用要改時用現有write_file；小修改patch帶必要實際context，不抄無關長引用；同diff各hunk按原文先後；失敗後重讀，若仍要大段重抄、全文可見且輸出放得下就改whole-write。保留舊內容／引用与所有既有不確定、案例區分、引用驗證規則。這是依[GPT-5.6提示指南](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6)的局部tool-routing校準，不宣稱每廠prompt相同。
 

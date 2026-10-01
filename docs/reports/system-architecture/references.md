@@ -50,7 +50,7 @@
 | 要追的問題 | 原責任文件 |
 | --- | --- |
 | 產品需求與架構關係 | [產品概念](../../product-concept.md)、[架構 Map](../../target-architecture-map.md) |
-| 職務分析的專業方法 | [完整工作分析](../../specs/2026-09-09-complete-work-analysis-guide.md)、[JD 撰寫](../../specs/2026-09-09-jd-field-and-writing-guide.md) |
+| 職務分析的專業方法 | [完整工作分析](../../guides/2026-09-09-complete-work-analysis-guide.md)、[JD 撰寫](../../guides/2026-09-09-jd-field-and-writing-guide.md) |
 | 工具與模型參數設計 | [共用工具規範](../../specs/2026-09-27-agent-tool-contract-design-research.md)、[Memory 工具](../../implementation/memory-tools.md)、[JD 工具契約](../../specs/2026-09-29-jd-model-tool-contract-review.md) |
 | Context、執行與恢復 | [共用執行實作](../../implementation/agent-execution.md)、[資料保存](../../architecture/persistence.md) |
 | 代碼維護與測試方式 | [程式組織](../../implementation/code-organization.md)、[撰寫規範](../../implementation/coding-standard.md)、[SDD／TDD](../../implementation/development-standard.md) |

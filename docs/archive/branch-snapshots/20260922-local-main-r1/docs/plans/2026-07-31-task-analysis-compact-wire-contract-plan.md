@@ -1,7 +1,7 @@
 # Plan:Task Analysis compact model-facing wire contract
 
 **日期**:2026-07-31
-**依據**:[`specs/2026-07-31-context-engineering-model-facing-contract-research.md`](../specs/2026-07-31-context-engineering-model-facing-contract-research.md)
+**依據**:[`specs/2026-07-31-context-engineering-model-facing-contract-research.md`](../../../../../specs/2026-07-31-context-engineering-model-facing-contract-research.md)
 (原則與量測)、[`specs/2026-07-31-anthropic-strict-schema-grammar-limit-research.md`](../specs/2026-07-31-anthropic-strict-schema-grammar-limit-research.md)(400 的量測)
 **不開 ADR**:維持 `strict: true` 與一次呼叫,ADR 0040 決定 24／26 不變。只有改 non-strict 或拆成兩次呼叫才需要 ADR。
 
@@ -213,7 +213,7 @@ code 時,依 disposition 會產出 `ExcludePayload`,`PAYLOAD_DOES_NOT_MATCH_DISP
 | T2 | ✅ | (本 commit) | v2 成為唯一送出去的形狀;v1 provider schema 與 golden 一併移除(已無人送)。mapper 改為值驅動(見上)。`NextQuestion.purpose`、`TaskAnalysisResult.limitations` 移除 |
 | T3 | ✅ | (本 commit) | 6,203 → 5,090 bytes(−18%);兩段機械規則 2,336 → 1,223(−48%),「輸出規則」整段消失。五段判準逐段位元組數不變,由 `test_job_analysis_prompt.py` 逐段守住 |
 | T5 | ✅ | (本 commit) | 契約層稽核(見下)：修好 1-based 缺陷後,逐條問「模型有沒有途徑知道這條 verifier 規則」,補上 6 個缺口,其中 `task` 的描述原本寫反 |
-| T4 | ✅ | 無碼變更 | run `20260731T120931Z`：HTTP 200、turn 1 `committed`、1 call、0 retry、**US$0.058195**。上限經 owner 同意由 US$0.10 上調至 US$0.20——保守 reserve 是 US$0.155(位元組當 input token ＋ 全額 `max_tokens`),US$0.10 會在 HTTP 之前擋下。實際落在估計的 US$0.06。結果見 [experiments](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md) §0 |
+| T4 | ✅ | 無碼變更 | run `20260731T120931Z`：HTTP 200、turn 1 `committed`、1 call、0 retry、**US$0.058195**。上限經 owner 同意由 US$0.10 上調至 US$0.20——保守 reserve 是 US$0.155(位元組當 input token ＋ 全額 `max_tokens`),US$0.10 會在 HTTP 之前擋下。實際落在估計的 US$0.06。結果見 [experiments](../../../../../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md) §0 |
 
 
 ---

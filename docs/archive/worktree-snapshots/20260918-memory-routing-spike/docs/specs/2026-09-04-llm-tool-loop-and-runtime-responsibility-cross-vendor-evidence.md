@@ -254,8 +254,8 @@ durable semantic state、必要澄清與 authority command 仍由現行 producti
 
 ### 10.1 已被新證據取代的舊主張
 
-1. [`2026-08-23-luna-structured-tools-and-context-official-audit.md`](2026-08-23-luna-structured-tools-and-context-official-audit.md)
-   §4.4 與 [`2026-08-28-llm-authored-field-contract-audit.md`](2026-08-28-llm-authored-field-contract-audit.md)
+1. [`2026-08-23-luna-structured-tools-and-context-official-audit.md`](../../../../../research/agent-systems/2026-08-23-luna-structured-tools-and-context-official-audit.md)
+   §4.4 與 [`2026-08-28-llm-authored-field-contract-audit.md`](../../../20260918-analysis-only-agent/docs/specs/2026-08-28-llm-authored-field-contract-audit.md)
    §11.4 曾要求所有相關 request 保留 `require_parameters: true`。Revision 3 已證明把 optional
    `parallel_tool_calls` 一起升格為硬篩選會讓 request 在模型前 404；這兩段不能再指導新的 adapter。
 2. Anthropic 現已正式提供 `output_config.format` 原生 JSON output，且可與 strict Tool 同 request 使用。
@@ -265,7 +265,7 @@ durable semantic state、必要澄清與 authority command 仍由現行 producti
 
 ### 10.2 仍是 production authority，但不是產業共識
 
-- [ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 對 LangChain、
+- [ADR 0060](../../../../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 對 LangChain、
   LangGraph、Store／Saver 與 Caliburn 的分工仍是 Accepted production authority。
 - 本附錄只指出那些分工是 Caliburn 已接受的架構，不應倒推成 OpenAI／Anthropic／Google 共同標準。
 - 若 G4 Working Decision 日後要改變 Accepted boundary，必須開 successor ADR；research 文件不能直接改 production。

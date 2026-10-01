@@ -535,7 +535,7 @@ v1 依 spec 落地(tag `similarity-v1`)。實作期補充決策與發現:
 3. **架構定案(照 service-split-framework 判準)**:matching 演算法**留 indexer 模組、不抽
    packages**——單一消費者、同 bounded context,共享機制 = 既有 HTTP seam;wire 契約已在
    indexer-contract。校準腳本與生產共用 collapse/score_pairs(校準即生產)。
-4. 出廠校準紀錄:[`2026-07-04-similarity-matching-calibration.md`](2026-07-04-similarity-matching-calibration.md)。
+4. 出廠校準紀錄:[`2026-07-04-similarity-matching-calibration.md`](../../../../../specs/2026-07-04-similarity-matching-calibration.md)。
 
 ### 9.7 本輪新增來源
 

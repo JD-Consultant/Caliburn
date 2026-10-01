@@ -1,7 +1,7 @@
 # ADR 0013 — 命名整理:web 改 Caliburn、內部去版號、容器/DB 去 jobintel
 
 - **狀態**:Accepted（2026-06-29）。
-- 研究依據:[`../specs/2026-06-29-naming-conventions-research.md`](../specs/2026-06-29-naming-conventions-research.md)。
+- 研究依據:[`../specs/2026-06-29-naming-conventions-research.md`](../../../../../research/engineering/2026-06-29-naming-conventions-research.md)。
 
 ## 脈絡
 

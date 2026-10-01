@@ -2,7 +2,7 @@
 
 > 跨 app 鳥瞰，只寫現行產品邊界、真實 runtime 與已決定的 target。產品範圍見
 > [`docs/product-notes.md`](docs/product-notes.md)；顧問核心與切換決策見 ADR
-> [0040](docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md)／
+> [0040](../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)／
 > [0054](docs/adr/0054-document-boundary-single-writer-cutover.md)／
 > [0055](docs/adr/0055-hybrid-job-discovery-and-ttop-formation.md)／
 > [0056](docs/adr/0056-real-employee-pilot-release-gate.md)／
@@ -88,7 +88,7 @@ PDF -> pdf-to-json -> OCS JSON -> ocs-indexer -> Qdrant
 | [`apps/pdf-to-json/`](apps/pdf-to-json/README.md) | PDF→OCS JSON 離線 ETL | Pipes-and-Filters：parser→transformer→writer |
 | [`apps/ocs-indexer/`](apps/ocs-indexer/README.md) | Qdrant 知識／查詢服務（:8000） | ingest pipeline + 無狀態查詢 API；嵌入走 embedder |
 | [`apps/embedder/`](apps/embedder/README.md) | BGE-M3 GPU 嵌入容器（:8082） | FastAPI + FlagEmbedding；torch 只住容器 |
-| [`apps/api/`](apps/api/README.md) | FastAPI 著作後端（:8001） | Hexagonal：core/ports、adapters、services、API；PostgreSQL owner |
+| [`apps/api/`](../../../experiments/historical/20260922-local-main-r1/assets/apps/api/README.md) | FastAPI 著作後端（:8001） | Hexagonal：core/ports、adapters、services、API；PostgreSQL owner |
 | [`apps/web/`](apps/web/README.md) | Next.js 16 前端（:3000） | greenfield `/workspace` 已接通；舊 OCS 工作台暫留 |
 | `packages/` | 共用契約 | `ocs-contract`（JSON Schema→Pydantic/TS）、`indexer-contract`（共用 Pydantic）、`job-analysis-contract`（ADR 0045） |
 | [`docs/`](docs/README.md) | ADR、研究、plan、living design、runbook | 文檔分類與 living 規則見 `docs/README.md` |

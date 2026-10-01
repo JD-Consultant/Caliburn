@@ -39,7 +39,7 @@
 - **產品決策**：外部框架不能替 Caliburn 決定的產品語意或 authority。
 - **Unknown**：公開文件不足，只有 bounded characterization／spike 能回答。
 
-研究停止條件遵守 [`decision-process.md`](../decision-process.md)：新增來源已不再產生新的父層、主要矛盾已列出，剩餘差異可以在最多三個實質方案中比較。
+研究停止條件遵守 [`decision-process.md`](../../../../../decision-process.md)：新增來源已不再產生新的父層、主要矛盾已列出，剩餘差異可以在最多三個實質方案中比較。
 
 ## 3. 跨廠共同的最小整體流程
 

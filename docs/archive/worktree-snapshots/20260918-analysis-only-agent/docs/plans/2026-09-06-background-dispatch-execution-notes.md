@@ -32,4 +32,4 @@
 
 ## Closure
 
-Task4／Checkpoint B 已通過隔離驗收。本段14檔於同一task保存；標籤 `q019-background-dispatch-v1`，實際SHA／工作樹狀態由 main register 持有。[結果](../specs/2026-09-06-background-dispatch-results.md)集中保存測試、finding、官方來源、限制及重開條件，不再重複研究。接續為最小聊天室設計與獨立小額驗收計畫；不自行開付費模型、不merge／push。
+Task4／Checkpoint B 已通過隔離驗收。本段14檔於同一task保存；標籤 `q019-background-dispatch-v1`，實際SHA／工作樹狀態由 main register 持有。[結果](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-06-background-dispatch-results.md)集中保存測試、finding、官方來源、限制及重開條件，不再重複研究。接續為最小聊天室設計與獨立小額驗收計畫；不自行開付費模型、不merge／push。

@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
-- Durable authority 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
-- 持久工作草稿與語意審核決策：[ADR 0066](../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)、[ADR 0067](../adr/0067-deep-agents-store-backed-jd-working-draft.md)；0067 的 `StoreBackend` mapping 取代 0066 原先的 `StateBackend` 假設
+- Durable authority 決策：[ADR 0060](../../../../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
+- 持久工作草稿與語意審核決策：[ADR 0066](../../../../../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)、[ADR 0067](../../../../../adr/0067-deep-agents-store-backed-jd-working-draft.md)；0067 的 `StoreBackend` mapping 取代 0066 原先的 `StateBackend` 假設
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 現行 production runtime 是一位 AI 職務分析顧問：它以目前焦點帶領訪談、吸收背景線索，並在一份持久但非權威的 JD 工作草稿上持續整理 Duty、Task 與 O／P／K／S。模型可以修改工作草稿，不能修改核准職務說明書；所有要進入正式文件的 AI 內容都由員工決定。
@@ -181,7 +181,7 @@ Store file mutation 與 Saver checkpoint 不是同一筆資料庫 transaction，
 - `ChatOpenRouter` 承接 provider wire。compact `ConsultantModelOutput` 只含顧問回覆、可修訂理解、訪談工作、Gap、下一題／必要澄清、足夠性與其 Evidence basis；pure mapper 再還原 application result。
 - 每次模型推論由 middleware 依 Saver snapshot 與 Store 重建最小充分 Context：目前焦點、相關核准 slice、有效理解、Gap、review 摘要、workspace validation 摘要、本輪原話與必要的近期來源。完整 Skills、sources、approved、workspace 與 review details 由模型按需 `read_file／grep`，不把完整 workspace 自動注入 prompt。
 - 本輪原話、required Evidence、必要澄清、blocking Gap、焦點理解與核准 slice 不被非權威對話摘要取代；Context selection receipt 只保存 ID、hash、原因、revision、Skills、token 與降級資訊，不複製員工文字。
-- 每個 run 都從 versioned policy 解析 model／Tool／context／token／cost／elapsed guards；LangChain `ModelCallLimitMiddleware` 與 `ToolCallLimitMiddleware` 分別把每輪總 model calls／Tool calls 固定在十一／四十八的 ceiling，另有 24k 單次 context、160k 累計 raw tokens、US$2、180 秒與窄 retry。依 [ADR 0068](../adr/0068-framework-run-budgets-replace-lookup-wave-cap.md)，不再以自訂 path counter 限制外部資料讀取波數；讀取仍必須有新資料依賴、獨立 reads 要平行、結果足夠時立即停止。
+- 每個 run 都從 versioned policy 解析 model／Tool／context／token／cost／elapsed guards；LangChain `ModelCallLimitMiddleware` 與 `ToolCallLimitMiddleware` 分別把每輪總 model calls／Tool calls 固定在十一／四十八的 ceiling，另有 24k 單次 context、160k 累計 raw tokens、US$2、180 秒與窄 retry。依 [ADR 0068](../../../20260918-shared-current-jd/docs/adr/0068-framework-run-budgets-replace-lookup-wave-cap.md)，不再以自訂 path counter 限制外部資料讀取波數；讀取仍必須有新資料依賴、獨立 reads 要平行、結果足夠時立即停止。
 - callback 為每個真實 provider attempt 保存 payload-free usage／route／cost evidence 與 telemetry。它們用於恢復、成本與診斷，不是職務內容 authority。
 
 同一位主要顧問按需組合工作盤點、故事訪談、Task 邊界、Duty 分組、O、P、K、S 與完成度反方檢查等 Skills。Skill 是方法與 progressive-disclosure 邊界，不是人格化 Agent、固定 stage 或獨立 state owner。

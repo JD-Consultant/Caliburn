@@ -1,6 +1,6 @@
 # JD：同版讀取、受控定位與確切改動
 
-- 日期：2026-09-13；Topic：JD-R002；RS-1／2 隔離施工，承接[保存切片](2026-09-13-jd-transaction-service-slice.md)與[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md)。
+- 日期：2026-09-13；Topic：JD-R002；RS-1／2 隔離施工，承接[保存切片](2026-09-13-jd-transaction-service-slice.md)與[讀取前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md)。
 - 狀態：本單位已實作並通過下列有限驗收；不是完整 App 驗收。框架可替換；沒有新增產品選擇、正式採用、模型費用或私有資料外傳。
 
 ## 1. 要接出的效果
@@ -33,7 +33,7 @@ reorder 只比較同容器／種類兩版存活 sibling 的相對順序。使用
 
 ## 4. 官方依據與停止研究條件
 
-查閱日 2026-09-13；精確套件版本／授權與有限原碼核實接[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md)。
+查閱日 2026-09-13；精確套件版本／授權與有限原碼核實接[讀取前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md)。
 
 - [OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)：清楚工具目的、已知欄位交程式及真實回傳；未指定本案 refs 或表格。
 - [Anthropic writing tools](https://www.anthropic.com/engineering/writing-tools-for-agents)：相關且可行動的內容、明示分頁／截斷與下一步；不能以精簡為由默默漏讀。

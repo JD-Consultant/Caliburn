@@ -18,7 +18,7 @@
 - [HR-02](2026-09-12-jd-ai-turn-undo-design.md)／[CV-01](2026-09-12-jd-change-visibility-design.md)：整輪撤回只 JD，Memory／案例／原話保留；AI 直接保存，預設目前稿標記＋同頁按需展開差異，沒有逐次接受關卡。
 - [專業驗收方法](2026-09-10-jd-product-quality-acceptance.md)：寫稿時機、重要低頻工作、未知／更正、最新訪談尚未進 Memory、工作→JD／JD→依據、Q01–15 與自然／真人測法已有材料。它們不是尚未研究，也不是已取得自然 JD 成效。
 
-[JR-R01–05](evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)均為 DESIGN CLOSED；只代表原反例已在設計閉合，不能稱新 relational 版本通過真 DB／瀏覽器驗收。過去 Plate 隔離核心證據保留其原範圍，不重算成新版本成果。
+[JR-R01–05](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)均為 DESIGN CLOSED；只代表原反例已在設計閉合，不能稱新 relational 版本通過真 DB／瀏覽器驗收。過去 Plate 隔離核心證據保留其原範圍，不重算成新版本成果。
 
 ## 2. 真正剩餘的工作
 

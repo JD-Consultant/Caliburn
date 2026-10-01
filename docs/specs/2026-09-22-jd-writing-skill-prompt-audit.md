@@ -1,6 +1,6 @@
 # JD 撰寫方法 Skill 與主顧問提示審核
 
-日期：2026-09-22；Topic：JD-R002。承接[官方預研](2026-09-11-jd-skill-current-official-preflight.md)、[顧問接線沿革](2026-09-14-jd-consultant-guidance-and-skills-slice.md)、[完整工作分析](2026-09-09-complete-work-analysis-guide.md)、[JD 欄位與成文](2026-09-09-jd-field-and-writing-guide.md)、[深度與訪談校準](2026-09-09-customized-jd-depth-and-interview-calibration.md)及現行 A／B1／B2 分工。本文件是 9/14「暫不採用 `write-customized-jd`」的窄幅 successor；不改寫該日的歷史證據。
+日期：2026-09-22；Topic：JD-R002。承接[官方預研](2026-09-11-jd-skill-current-official-preflight.md)、[顧問接線沿革](2026-09-14-jd-consultant-guidance-and-skills-slice.md)、[完整工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)、[JD 欄位與成文](../guides/2026-09-09-jd-field-and-writing-guide.md)、[深度與訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)及現行 A／B1／B2 分工。本文件是 9/14「暫不採用 `write-customized-jd`」的窄幅 successor；不改寫該日的歷史證據。
 
 ## 1. 問題與結論
 

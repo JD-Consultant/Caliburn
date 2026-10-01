@@ -10,7 +10,7 @@ App 從同一版 JD 歷史取得人工／AI 修改事件，在實際模型請求
 
 ## 2. 官方依據、版本與本案映射
 
-延續[前置研究](evidence/2026-09-13-jd-consultant-context-preflight.md)，不是重新選擇所有框架。以下資料查閱日期皆為 2026-09-13。
+延續[前置研究](../experiments/legacy-evidence/2026-09-13-jd-consultant-context-preflight.md)，不是重新選擇所有框架。以下資料查閱日期皆為 2026-09-13。
 
 | 官方事實 | 本案採用與限制 |
 |---|---|
@@ -22,7 +22,7 @@ App 從同一版 JD 歷史取得人工／AI 修改事件，在實際模型請求
 
 跨來源共同原則是輸入／執行／保存責任明確、完整結果與可查回狀態。以下 notice 格式、digest、run 綁定及停止條件是本案的有限實作，不能稱作大廠共同指定的 schema。
 
-**精確依賴：**新增 `langchain==1.4.0`／`langchain-anthropic==1.7.2`，皆為當日官方非預覽、未撤回的 MIT 套件；官方 wheel SHA、METADATA 相容範圍與發布日期在[版本附件](evidence/jd-relational-context/adapter-versions.json)。安裝只增加兩套件，既有 `langchain-core 1.6.3`、`langgraph 1.2.11`、checkpoint `4.2.0`、PG Saver `3.1.2`、Anthropic `1.5.0` 及 Python `3.12.13` 不升級。服務文件是商業 API 契約，與套件免費開源授權分開。
+**精確依賴：**新增 `langchain==1.4.0`／`langchain-anthropic==1.7.2`，皆為當日官方非預覽、未撤回的 MIT 套件；官方 wheel SHA、METADATA 相容範圍與發布日期在[版本附件](../experiments/legacy-evidence/jd-relational-context/adapter-versions.json)。安裝只增加兩套件，既有 `langchain-core 1.6.3`、`langgraph 1.2.11`、checkpoint `4.2.0`、PG Saver `3.1.2`、Anthropic `1.5.0` 及 Python `3.12.13` 不升級。服務文件是商業 API 契約，與套件免費開源授權分開。
 
 ## 3. 正常流程與責任
 
@@ -43,7 +43,7 @@ App 從同一版 JD 歷史取得人工／AI 修改事件，在實際模型請求
 | 原 SDK／adapter 在少了 `message_stop` 時仍可能回結果，甚至已有 `stop_reason`／`chunk_position=last`。 | 保留原生 SSE parser／mapper，只在 raw event hook 記錄 terminal；正常 EOF 缺 terminal 失敗，不更新通知邊界。不能只看最後文字。 |
 | 關閉 adapter iterator 不一定關閉原 HTTP response。初版兩個 early-close 測試失敗。 | `_create/_acreate`旁存原 response；每次 `_stream/_astream` 的 `finally` 明示 close／aclose。原 SDK error／取消保留，secondary cleanup failure 只加固定安全 note；單獨清理失敗不能算完整成功。 |
 | 獨立審查 CC-R01／P2：同 thread／同 async task 交錯兩條 iterator，跨 yield 的 ContextVar 會將完整 A 的 terminal 記給不完整 B。兩反例先紅。 | 每次原生 next／anext 只在執行期間設定自身 context，yield 前還原；關閉時亦使用自家 context。新增兩反例通過，獨立窄複核 9 PASS，CC-R01 CLOSED。 |
-| root 未宣告 child 的自訂欄位會遺失通知；latest 可能顯示尚未完成的 pending 結果。 | 共同 state＋固定 checkpoint 核对。保存前失敗維持未確認；保存後 ACK 遺失只讀查回原結果，不重叫模型。[四案例原生探針](evidence/jd-relational-context/graph_checkpoint_closure_probe.py)／[結果](evidence/jd-relational-context/graph_checkpoint_closure_probe.stdout.txt)。 |
+| root 未宣告 child 的自訂欄位會遺失通知；latest 可能顯示尚未完成的 pending 結果。 | 共同 state＋固定 checkpoint 核对。保存前失敗維持未確認；保存後 ACK 遺失只讀查回原結果，不重叫模型。[四案例原生探針](../experiments/legacy-evidence/jd-relational-context/graph_checkpoint_closure_probe.py)／[結果](../experiments/legacy-evidence/jd-relational-context/graph_checkpoint_closure_probe.stdout.txt)。 |
 | graph thread 與 context document 不同仍可進模型。新增同步／非同步反例均先失敗。 | middleware 使用已安裝 LangGraph `config.get_config()`原生接點，在讀歷史／呼叫模型前拒絕。graph invocation 前的人類訊息 scope 保護仍由後續 runtime admission 負責。 |
 
 stream guard 使用所選版本三組 private seams：`_stream/_astream`、`_create/_acreate`、`_make_message_chunk_from_anthropic_event`。它們不是穩定公開擴充契約；升級必重驗，不能假設新版保持此形狀。這是已觀察缺口的有界接合，沒有另寫模型工具迴圈、重試器或 SSE parser。替代方案是改走 SDK 直連並重做 Agent 接點，或放棄完整串流保證；目前保留已驗的原生 Agent、限定補終端與清理。API 本身支援某能力也不代表所選 adapter 全數支援。
@@ -64,7 +64,7 @@ stream guard 使用所選版本三組 private seams：`_stream/_astream`、`_cre
 | 契約／依賴 | Python／TypeScript codegen check PASS；lock 只新增兩套件，不改其他版本。未改 Web，未重跑無關 UI／build。 |
 | 獨立審查 | 一項 P2 CC-R01 已修並 9 案窄複核通過，其餘 context/history/root 無未解 P1／P2。審查者未跑 PG；真 PG 結果由主代理及指定實作者另外驗證。 |
 
-首敗保留：新模組未建立的 collection error；thread mismatch 兩案先紅；early-close 兩案先紅；CC-R01 兩案先紅。PG 接合首次兩敗是測試誤用 `codec.read` 及過窄 exception regex，改用正式 `resolve`／固定 error code 後通過，未放寬產品行為。驗收摘要見[結果記錄](evidence/jd-relational-context/validation.txt)。
+首敗保留：新模組未建立的 collection error；thread mismatch 兩案先紅；early-close 兩案先紅；CC-R01 兩案先紅。PG 接合首次兩敗是測試誤用 `codec.read` 及過窄 exception regex，改用正式 `resolve`／固定 error code 後通過，未放寬產品行為。驗收摘要見[結果記錄](../experiments/legacy-evidence/jd-relational-context/validation.txt)。
 
 重現：在隔離 App 使用已鎖定 uv runtime，`pytest -q -p no:cacheprovider`；若 Windows temp 權限不符，指定**尚不存在且位於專案內**的 `--basetemp`，不要指定有資料的目錄。PG 另明示 `JD_RELATIONAL_TEST_DB=1`，執行上述四個新測試檔；不自動 setup／drop／清除合成資料。
 

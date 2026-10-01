@@ -6,7 +6,7 @@
 - Topic：JD-R002/C03
 - 階段：G4 WORKING；十三表、八操作、共同交易／讀取、人工 writer／Windows 重啟恢復已隔離驗證。[人工 HTTP](2026-09-13-jd-manual-http-slice.md)與[文件目錄入口](2026-09-13-jd-catalog-http-slice.md)接保存、查回、更名與封存恢復；沿原 create unique key／metadata version，DB 格式不變。持久配置、AI 回合、source／選區／notice、Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。
 - 上層設計：[JD 關聯式管理編輯器](2026-09-12-jd-relational-editor-design.md)
-- 證據：[官方與本地現況](evidence/2026-09-12-jd-relational-editor-evidence.md)
+- 證據：[官方與本地現況](../experiments/legacy-evidence/2026-09-12-jd-relational-editor-evidence.md)
 
 ## 1. 先回答「有幾張表、各保存什麼」
 
@@ -261,7 +261,7 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 
 同 `(document_id,operation_id)` 同 digest 重送只回原 receipt；不同 digest 回 `operation_conflict`，不能 UPSERT 覆寫。對 `status='committed'` 建部分唯一索引 `(document_id,result_revision_id)`；no_change 可由多個 operation 指同一 revision。
 
-「原 receipt」指原結果、效果、身分、base/result 及錯誤語意固定，並非要求每次 HTTP／tool JSON bytes 相同。對外 operation／revision／change refs 由原材料發配，不能因 head 已前進而改 result；投影失敗不能改寫已保存結果。確切差異由原 immutable base/result snapshots 及 stable IDs 比較，不在 receipt 保存第二份巨大 before/after。request digest 使用 App 已核的固定意圖，不因 JD token 重新簽發而改變原意圖；来源 identity 沿 source owner。永久結果與短期引用的邊界詳[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md#41-永久-receipt-與對外-ref-投影)。外部結果已[生成驗證](2026-09-13-jd-result-and-storage-foundation.md)；永久回執使用[內部 typed module](../../experiments/jd-relational-app/src/jd_relational/storage/receipts.py)，依[交易切片](2026-09-13-jd-transaction-service-slice.md)與 current／revision 同交易保存，只有 COMMIT 確認才回 confirmed。[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已將 `WriteObservation` 的原身分／語意轉為 shared result 與 observation refs；它不查 head、不改 receipt，也不因 token 發配失敗改稱保存失敗。公開 change read 與 HTTP 查詢已依[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)驗證；寫入 HTTP／顧問仍待接線。
+「原 receipt」指原結果、效果、身分、base/result 及錯誤語意固定，並非要求每次 HTTP／tool JSON bytes 相同。對外 operation／revision／change refs 由原材料發配，不能因 head 已前進而改 result；投影失敗不能改寫已保存結果。確切差異由原 immutable base/result snapshots 及 stable IDs 比較，不在 receipt 保存第二份巨大 before/after。request digest 使用 App 已核的固定意圖，不因 JD token 重新簽發而改變原意圖；来源 identity 沿 source owner。永久結果與短期引用的邊界詳[讀取前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md#41-永久-receipt-與對外-ref-投影)。外部結果已[生成驗證](2026-09-13-jd-result-and-storage-foundation.md)；永久回執使用[內部 typed module](../../experiments/jd-relational-app/src/jd_relational/storage/receipts.py)，依[交易切片](2026-09-13-jd-transaction-service-slice.md)與 current／revision 同交易保存，只有 COMMIT 確認才回 confirmed。[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已將 `WriteObservation` 的原身分／語意轉為 shared result 與 observation refs；它不查 head、不改 receipt，也不因 token 發配失敗改稱保存失敗。公開 change read 與 HTTP 查詢已依[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)驗證；寫入 HTTP／顧問仍待接線。
 
 AI 操作的 run 歸屬連同成功／no_change／已確認失敗回執原子保存；必須經既有 run owner 核對同文件，不從 timestamp、actor 或暫態 jd_bindings 猜測。回合 authority 仍是既有 runtime；不在 JD 新建另一套 run 表或跨 owner cascade。尚未形成可信 binding 的請求拒絕不偽造 AI operation。此欄只識別操作歸屬；完整範圍及閉合判斷依[整輪撤回 §4](2026-09-12-jd-ai-turn-undo-design.md#4-何時可撤回)。
 

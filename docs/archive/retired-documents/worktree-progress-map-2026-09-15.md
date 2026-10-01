@@ -6,7 +6,7 @@
 
 ## 先講結論
 
-產品核心目標以 [產品文件](../../product-notes.md) 為準：這是一個 JD App；人與 LLM 可走不同 endpoint，但共用 relational JD 業務邏輯。顧問在 framework 內經 OpenRouter 使用 OpenAI Luna。第一版只要求顯示及安全撤回當輪 LLM 的 JD 變更；已實作的完整 JD 歷史／整份舊版還原可保留，但不作接線前置或繼續擴張。原始對話、案例、Memory 與工作理解保留。本文 worktree 名稱只表示開發用途；「顧問線」也是這個 App 的內部功能開發線。詳細接線盤點見 [對齊工作稿](../../specs/evidence/2026-09-15-jd-integration-document-reconciliation.md)。
+產品核心目標以 [產品文件](../../product-notes.md) 為準：這是一個 JD App；人與 LLM 可走不同 endpoint，但共用 relational JD 業務邏輯。顧問在 framework 內經 OpenRouter 使用 OpenAI Luna。第一版只要求顯示及安全撤回當輪 LLM 的 JD 變更；已實作的完整 JD 歷史／整份舊版還原可保留，但不作接線前置或繼續擴張。原始對話、案例、Memory 與工作理解保留。本文 worktree 名稱只表示開發用途；「顧問線」也是這個 App 的內部功能開發線。詳細接線盤點見 [對齊工作稿](../../experiments/legacy-evidence/2026-09-15-jd-integration-document-reconciliation.md)。
 
 - **LLM 顧問已完成。**目前產品路由基線是 LangChain／LangGraph＋OpenRouter，固定 OpenAI provider 的 `openai/gpt-5.6-luna`；自然模型試用與 prompt 校準不重做。證據主要在 `codex/analysis-only-agent` 的 CT07／CT25／CT37／CT40／CT51 文件；該 worktree 後期出現的直連 `ChatOpenAI` factory 需當接線候選核對，不能覆蓋 Owner 本輪確認的 OpenRouter 邊界。
 - **JD App 的 relational 核心已完成主要新架構施工，作為目前整合基線。**關聯式保存、編輯、當輪差異／撤回、來源與 H4 施工證據集中在 `refactor/current-only-architecture` 線；已額外完成的完整歷史／整份還原不屬目前首版必要需求，不因此成為接線前置。程式現況保全提交是 `5643d586`；目前整理分支 `tmp/save-all-20260914` 在本輪開始前的 HEAD 是後續文件提交 `355c9240`。

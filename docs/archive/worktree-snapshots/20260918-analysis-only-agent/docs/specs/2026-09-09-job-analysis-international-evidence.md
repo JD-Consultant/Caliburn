@@ -79,14 +79,14 @@ US4 的網頁工具 metadata 曾顯示另一份文件名稱；本表依 PDF 實�
 
 | 既有文件／本輪回讀範圍 | 延續的方法 | 本輪不可直接沿用的部分 |
 |---|---|---|
-| [2026-07-13 跨國職能標準](2026-07-13-ai-redesign-raw-intl-competency-standards.md)，八題與來源表 | Task 句構、功能／專業／條件分辨 | NOS2023改核2024；O 無獨立欄位的泛稱過大；Bloom 教學分類不是 JD 的唯一 P 寫法；舊 Work Styles 數量不重用 |
-| [2026-07-25 Task discovery](2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)，§2、4–5 方法相關段落 | 故事非Task、工具非工作、問答語境與範圍 | 不承接舊 WorkUnit／Claim schema、兩次 operation、authority 或模型配置 |
-| [2026-07-30 最小完整訪談](2026-07-30-professional-consultant-minimal-complete-loop-research.md)，問題與方法前半 | 高召回理解、比較重疊、廣度與深度循環 | 不承接舊兩段／固定 context 計畫或舊元件 |
-| [2026-08-01 工作產出](2026-08-01-opks-raw-work-outputs.md)，§3–4 及相關索引 | outcome 不必是一份文件；O欄與成果概念分開 | iCAP 的「建議」不能說成「必須」；不承接舊匯出／verifier 裁決 |
-| [2026-08-01 行為指標](2026-08-01-opks-raw-performance-indicators.md)，數字議題索引與既有結論線索 | 要分清工作要求、評量與下游目標 | 未以索引當全文已核實；已重新用US6／AU2–4核查，不延續「所有工作層都不許數字」 |
+| [2026-07-13 跨國職能標準](../../../../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md)，八題與來源表 | Task 句構、功能／專業／條件分辨 | NOS2023改核2024；O 無獨立欄位的泛稱過大；Bloom 教學分類不是 JD 的唯一 P 寫法；舊 Work Styles 數量不重用 |
+| [2026-07-25 Task discovery](../../../../../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)，§2、4–5 方法相關段落 | 故事非Task、工具非工作、問答語境與範圍 | 不承接舊 WorkUnit／Claim schema、兩次 operation、authority 或模型配置 |
+| [2026-07-30 最小完整訪談](../../../../../specs/2026-07-30-professional-consultant-minimal-complete-loop-research.md)，問題與方法前半 | 高召回理解、比較重疊、廣度與深度循環 | 不承接舊兩段／固定 context 計畫或舊元件 |
+| [2026-08-01 工作產出](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-08-01-opks-raw-work-outputs.md)，§3–4 及相關索引 | outcome 不必是一份文件；O欄與成果概念分開 | iCAP 的「建議」不能說成「必須」；不承接舊匯出／verifier 裁決 |
+| [2026-08-01 行為指標](../../../../branch-snapshots/20260922-local-main-r1/docs/specs/2026-08-01-opks-raw-performance-indicators.md)，數字議題索引與既有結論線索 | 要分清工作要求、評量與下游目標 | 未以索引當全文已核實；已重新用US6／AU2–4核查，不延續「所有工作層都不許數字」 |
 | [2026-08-28 成品欄位討論](2026-08-28-llm-authored-field-contract-audit.md)，§17–18 | 工作理解／JD／下游不同；一段完整Task；條件式內容 | 過去 UI、cardinality、編輯／關聯決策只是歷史方案，不約束這次綠地研究 |
 | [2026-08-31 能力地圖](2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md)，§0–3與能力目的 | 目的先於機制，完整工作→高品質JD | 不以舊框架／Memory候選重開技術選型 |
-| [2026-09-07 資訊取捨](2026-09-07-work-case-and-understanding-information-selection.md)，全文 | 保留工作相關細節，案例差異與確定程度，新批次不能洗掉舊工作 | 本輪把方法詳細化，但未改已驗收提示及隔離產品流程 |
+| [2026-09-07 資訊取捨](../../../../../specs/2026-09-07-work-case-and-understanding-information-selection.md)，全文 | 保留工作相關細節，案例差異與確定程度，新批次不能洗掉舊工作 | 本輪把方法詳細化，但未改已驗收提示及隔離產品流程 |
 
 明確未讀 Owner 排除的 `2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`。沒有為了「回看完整」而擴展到無關舊技術章節。
 
@@ -102,7 +102,7 @@ US4 的網頁工具 metadata 曾顯示另一份文件名稱；本表依 PDF 實�
 
 ## 7. 研究停止線與後續觸發
 
-目前資料已足以討論 JD 成品內容、完整工作分析面向及資訊取捨；不需要為同一原則再增加更多國家。Owner 已授權自主形成建議及完整樣稿，本輪補查集中在任務切分、完成要求、K／S去重及條件／權限的適用邊界，沒有重開完整跨國研究。具體效果見 [樣稿與審查](2026-09-09-jd-sample-basis-and-review.md)。
+目前資料已足以討論 JD 成品內容、完整工作分析面向及資訊取捨；不需要為同一原則再增加更多國家。Owner 已授權自主形成建議及完整樣稿，本輪補查集中在任務切分、完成要求、K／S去重及條件／權限的適用邊界，沒有重開完整跨國研究。具體效果見 [樣稿與審查](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-jd-sample-basis-and-review.md)。
 
 只有以下情況需再針對性研究：新用途／法域、某職類的特殊要求無法表達、兩個有效工作被錯合／漏掉、來源新版推翻重要依據，或後續真實使用顯示方法不合適。資料庫、框架、AI 編輯與 UI 屬下一層，不從本表自行定案。
 

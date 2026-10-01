@@ -1,13 +1,13 @@
 # JD 原生程序生命週期：Task 3／5 有限接線設計
 
-日期／查閱日：2026-09-10。Topic：JD-R002/C03，ER03。狀態：**有限 G4 PASS，主工作單位採用 B 作隔離 Task 5 依據**；[獨立審查](evidence/2026-09-10-jd-native-lifecycle-review.md) NL-R01／NL-R02 CLOSED。不是新 production authority、付費模型授權或實作驗收；Windows／PG 故障證據留 Task 5。相應正式採用範圍記於 Proposed ADR0074，尚未切換 production。
+日期／查閱日：2026-09-10。Topic：JD-R002/C03，ER03。狀態：**有限 G4 PASS，主工作單位採用 B 作隔離 Task 5 依據**；[獨立審查](../experiments/legacy-evidence/2026-09-10-jd-native-lifecycle-review.md) NL-R01／NL-R02 CLOSED。不是新 production authority、付費模型授權或實作驗收；Windows／PG 故障證據留 Task 5。相應正式採用範圍記於 Proposed ADR0074，尚未切換 production。
 
 ## 1. Preflight 與結論
 
 - Current stage：隔離核心 Task 2 已接受，Task 3 三工具接線施工中；完整 lifecycle 屬 Task 5。本次依有限 review 的 NL-R01／NL-R02 修稿，不阻塞 Task 3。
 - Binding decisions：持續工作稿、同 PG 的唯一 JD head／revision／terminal receipt；checkpointed binding；ER03 一次 attempt、零自動重播；必須 writer quiescent＋全部已發配 operation 閉合＋turn closure 才解人工 gate；Memory authority 不變。
 - 本輪唯一問題：工具已返回但 Node 未 reap 時，既有 service 如何保留停止證據，並避免 close／restart 把「沒有 Future／沒有 receipt」誤當已停止？
-- 已讀：[current register](../current-decisions.md)、[decision process](../decision-process.md)、[核心 Task 3／5](../plans/2026-09-10-jd-editor-core-implementation.md)、[ER03](evidence/2026-09-10-jd-error-recovery-contract-closure.md#4-er03執行停止及逾時由-app-負責)、隔離 scratch `task-2-review.md` 的 quiescence handoff；Task 3.4 與既有 `MemorySession.after_model/reconcile` 為 binding 基線。[通知設計](2026-09-10-jd-model-view-change-notice-design.md)只增 manifest 的 child→root 傳遞，不提供原生程序證據。
+- 已讀：[current register](../current-decisions.md)、[decision process](../decision-process.md)、[核心 Task 3／5](../plans/2026-09-10-jd-editor-core-implementation.md)、[ER03](../experiments/legacy-evidence/2026-09-10-jd-error-recovery-contract-closure.md#4-er03執行停止及逾時由-app-負責)、隔離 scratch `task-2-review.md` 的 quiescence handoff；Task 3.4 與既有 `MemorySession.after_model/reconcile` 為 binding 基線。[通知設計](2026-09-10-jd-model-view-change-notice-design.md)只增 manifest 的 child→root 傳遞，不提供原生程序證據。
 - 不做：通用 job／replay／sync engine、Memory 重做、模型新欄位、DB running 表、全面 framework 升級。
 
 **採用：Task 5 採每文件有限 Popen owner，加上 API 啟動前的 App 專用 Windows Job Object／單程序互斥。**前者負責同程序清理，後者以整組程序退出證據覆蓋 API crash 後無法重建的 Popen，包含沒有 AI binding 的 read／manual／create。再按同文件 DB lock、原 receipt 與 checkpoint 關閉操作和 turn。這是已採用於隔離施工的有限工程設計，沒有把 Windows API 成功呼叫當成故障驗收。一般 API 在 transform 中或 publish 前 crash 都可能沒有 receipt；A 的保守維運方案不足以交付一般恢復旅程，不能稱為僅極端 unreap。

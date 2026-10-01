@@ -9,9 +9,9 @@ purpose: 把 2026-08-01 五份原料收斂成可裁決的選項比對，並誠�
 
 > **【2026-08-01 結案】本文的 §3 Q1–Q5 已經裁決完畢。現行裁決為**四份 ADR，缺一不可**：
 > [0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md)（概念）
-> ＋ [0049](../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
-> ＋ [0050](../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）
-> ＋ [0051](../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)（狀態機與 entity ID）。**
+> ＋ [0049](../../../../../adr/0049-opks-derived-axes-evidence-whitelist-and-document-authority.md)（實作形狀）
+> ＋ [0050](../../../../../adr/0050-opks-proposal-minimal-shape.md)（Proposal 形狀）
+> ＋ [0051](../../../../../adr/0051-opks-proposal-status-machine-and-stable-entity-id.md)（狀態機與 entity ID）。**
 >
 > **注意：下表「ADR 0048 的裁決」欄有兩處已被 0049 再修正**——兩軸**不持久化**（改由 refs 推導），
 > 且 `evidence_links` 只收 `employee_turn`／`direct_edit`。以 0049 為準。
@@ -37,7 +37,7 @@ OPKS 就是[實現路線圖](2026-07-25-professional-consultant-architecture-rea
 **本文只做裁決比對。**「每個欄位怎麼寫才合格」的判準教材已經備齊，不重寫：
 
 - [iCAP 逐欄位官方標準](2026-07-13-ai-redesign-raw-icap-field-standards.md)
-- [國際體系欄位定義與撰寫標準](2026-07-13-ai-redesign-raw-intl-competency-standards.md)
+- [國際體系欄位定義與撰寫標準](../../../../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md)
 
 本輪新增三份原料：
 
@@ -55,7 +55,7 @@ OPKS 就是[實現路線圖](2026-07-25-professional-consultant-architecture-rea
 
 | 來源 | 內容 |
 |---|---|
-| [ADR 0040](../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 29–32 | K/S/A 與 Indicator 數值門檻一律帶支持度四級；`unsupported` 不得進正式 JD；`reference_candidate` 只能作候選；**員工按接受不得被記錄成已有行為證據**；Attitude 一併適用 |
+| [ADR 0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 29–32 | K/S/A 與 Indicator 數值門檻一律帶支持度四級；`unsupported` 不得進正式 JD；`reference_candidate` 只能作候選；**員工按接受不得被記錄成已有行為證據**；Attitude 一併適用 |
 | ADR 0040 決定 33–34 | 匯出須標示為採 iCAP 版型的客製 JD；**不得自產職能基準代碼** |
 | [`product-notes`](../product-notes.md) | 第一版**不預建尚無 production contract 的 O/P/K/S/A tables** → 本切片的責任正是先給出 contract |
 | iCAP 官方（指引 p37／p49／p76） | **A 合併呈現於文件層**，不逐任務；**K/S 須對應行為指標**以避免重複；**操作型任務可合法省略 O**，成果併入行為指標 |

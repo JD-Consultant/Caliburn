@@ -8,7 +8,7 @@
 
 ## 已知事實與避免重複研究
 
-[CT28](2026-09-08-ct28-live-repair-context-contrast.md) 中，短 context 7次模型／6工具成功寫回；原延續1次／0工具漏存。[CT31](2026-09-08-ct31-memory-routing-calibration.md) 的提示候選沒有改善並已還原。[CT30](2026-09-08-ct30-missed-memory-write-official-controls.md) 已比較工具描述、prompt 與完成檢查，不重新發明第四版同義提醒。
+[CT28](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct28-live-repair-context-contrast.md) 中，短 context 7次模型／6工具成功寫回；原延續1次／0工具漏存。[CT31](2026-09-08-ct31-memory-routing-calibration.md) 的提示候選沒有改善並已還原。[CT30](2026-09-08-ct30-missed-memory-write-official-controls.md) 已比較工具描述、prompt 與完成檢查，不重新發明第四版同義提醒。
 
 CT28 失敗 wire 中：系統導覽明示 Memory 仍為10日；prior visible tail 是員工重述5日＋AI表示以5日為準；另有一個舊 compaction block。這不證明哪一项造成失敗，故只隔離這兩項。歷史短 context 與完整 context 是參考控制，不是 CT32 同批重測。
 
@@ -47,7 +47,7 @@ CT28 是前次歷史控制，非 CT32 同時重測。每組只有一次，不能
 
 ### 核驗不是只看回答
 
-[封存證據與可重現腳本](evidence/2026-09-08-ct32-context-factor-isolation.json)，SHA256：`4c5586e1552ebbdd0041be369b6c39e8e997b60f4ac9a1c640a4a7d73d5b21f9`。
+[封存證據與可重現腳本](../../../../../experiments/historical/20260918-analysis-only-agent/evidence/2026-09-08-ct32-context-factor-isolation.json)，SHA256：`4c5586e1552ebbdd0041be369b6c39e8e997b60f4ac9a1c640a4a7d73d5b21f9`。
 
 1. 真實 wire 與 CT28 對比：visible_only 的可見訊息與原失敗組完全相同（只正規化 runtime 來源地址），差別為不帶舊 compaction；opaque_only 的 compaction hash 與原失敗組相同，可見部分僅系統＋本輪輸入。每次工具定義、CT25 提示、初始導覽及模型設定均核對。
 2. 同輪新產生的不透明推理逐項原樣回送，沒有刪工具 call／result／phase；只選取舊 request view，未改 canonical。兩組都保存原42則＋新問答2則，重開服務核對相同。

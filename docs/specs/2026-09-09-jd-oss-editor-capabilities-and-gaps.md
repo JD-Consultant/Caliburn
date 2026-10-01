@@ -54,12 +54,12 @@ Google Docs 的批次預檢、原子套用及 requiredRevisionId／targetRevisio
 
 | 顧問情境 | 編輯器／工具需要支援的效果 | 內容依據 |
 |---|---|---|
-| 訪談資訊尚不足 | 可以繼續追問、保留未確認，不強制改稿或補齊所有欄位 | [完整工作分析指南 §2–§6](2026-09-09-complete-work-analysis-guide.md) |
-| 已確認的新責任或條件 | 找到相關工作範圍，提出需要的局部修改；已有條件與未變工作保留 | [欄位與寫作指南](2026-09-09-jd-field-and-writing-guide.md) |
-| 一個新案例 | 可供理解及說明依據，不自動新增一個永久任務 | [資訊取捨](2026-09-07-work-case-and-understanding-information-selection.md)及[深度校準](2026-09-09-customized-jd-depth-and-interview-calibration.md) |
-| 員工更正先前說法 | 修改確實受影響的內容，不能把另一個有效案例或責任一起刪掉 | [深度校準](2026-09-09-customized-jd-depth-and-interview-calibration.md) |
+| 訪談資訊尚不足 | 可以繼續追問、保留未確認，不強制改稿或補齊所有欄位 | [完整工作分析指南 §2–§6](../guides/2026-09-09-complete-work-analysis-guide.md) |
+| 已確認的新責任或條件 | 找到相關工作範圍，提出需要的局部修改；已有條件與未變工作保留 | [欄位與寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md) |
+| 一個新案例 | 可供理解及說明依據，不自動新增一個永久任務 | [資訊取捨](2026-09-07-work-case-and-understanding-information-selection.md)及[深度校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md) |
+| 員工更正先前說法 | 修改確實受影響的內容，不能把另一個有效案例或責任一起刪掉 | [深度校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md) |
 | 員工直接改文件 | 下次顧問讀目前文件；不可只信舊 Memory 或前一份 AI 草稿 | C01／C02 最新文件方向 |
-| 整份完成檢查 | 工作→JD 與 JD→依據雙向盤點；不把每輪局部編輯強制升級成全量重分析 | [樣稿依據與核對](2026-09-09-jd-sample-basis-and-review.md) |
+| 整份完成檢查 | 工作→JD 與 JD→依據雙向盤點；不把每輪局部編輯強制升級成全量重分析 | [樣稿依據與核對](../guides/2026-09-09-jd-sample-basis-and-review.md) |
 
 **銜接建議：**同一主顧問按需要使用文件工具；背景 Memory 整理不變成第二個 JD 編輯者。工具傳回實際文件結果，語意理解不足仍回到訪談；不靠格式檢查器裁定工作事實真假。依[MEM-Q005](2026-09-04-memory-persistence-and-jd-effect-reconciliation.md)，未來同一 run 的理解及 JD 候選已通過自身驗證時，不一律等背景 Memory 落盤才能產生增量修改。
 
@@ -67,7 +67,7 @@ Google Docs 的批次預檢、原子套用及 requiredRevisionId／targetRevisio
 
 ## 4. 免費開源候選與真實差距
 
-以下為原始碼／官方測試閱讀的結果，**不是本機 editor 實測**。精確版本、來源與逐項可證範圍見[Plate 證據](evidence/2026-09-09-jd-oss-plate.md)、[其他開源方案](evidence/2026-09-09-jd-oss-alternatives.md)。
+以下為原始碼／官方測試閱讀的結果，**不是本機 editor 實測**。精確版本、來源與逐項可證範圍見[Plate 證據](../experiments/legacy-evidence/2026-09-09-jd-oss-plate.md)、[其他開源方案](../experiments/legacy-evidence/2026-09-09-jd-oss-alternatives.md)。
 
 | 路線 | 已找到的免費原生能力 | 會改變選擇的差距 | 推薦用途 |
 |---|---|---|---|
@@ -77,15 +77,15 @@ Google Docs 的批次預檢、原子套用及 requiredRevisionId／targetRevisio
 
 Plate 優先的具體理由是：已找到可由程式使用、能產生修訂的公開文字 transforms，以及依 suggestion ID 結算的免費接點；相較之下，T01 的一般 programmatic 文字修改會被追蹤判斷略過，T02 又有執行時取第一文字匹配與審核依 range 的限制。因此先驗 Plate 能較直接回答本案 AI 局部續編的問題；這不是成熟度排名或完整採用結論。
 
-Plate 的官方 AI helper 必須與 SuggestionPlugin 分開：`applyAISuggestions` 的輸入整理會移除既有 suggestion metadata，`acceptAISuggestions` 的實作會接受 transient 修訂；不能把文件中「permanent」的措辭誤讀為「保留長期待審」。該 helper 路線與多組待審文件持續被 AI 改寫不是自然等價。優先候選使用[一般 suggestion transforms 的已知接點](evidence/2026-09-09-jd-oss-plate.md#9-最少整合路線既有-agent-只用-suggestionplugin-已覆蓋的-transforms)；選取定位、目前內容讀取、正確包裝接受／拒絕及結果回報仍是 App 整合工作。
+Plate 的官方 AI helper 必須與 SuggestionPlugin 分開：`applyAISuggestions` 的輸入整理會移除既有 suggestion metadata，`acceptAISuggestions` 的實作會接受 transient 修訂；不能把文件中「permanent」的措辭誤讀為「保留長期待審」。該 helper 路線與多組待審文件持續被 AI 改寫不是自然等價。優先候選使用[一般 suggestion transforms 的已知接點](../experiments/legacy-evidence/2026-09-09-jd-oss-plate.md#9-最少整合路線既有-agent-只用-suggestionplugin-已覆蓋的-transforms)；選取定位、目前內容讀取、正確包裝接受／拒絕及結果回報仍是 App 整合工作。
 
-保存疑點已由[實測 R01-4](evidence/2026-09-09-jd-native-pending-review-comparison.md)證實：移除粗體的 pending metadata 含 `bold:undefined`，JSON 往返丟掉该鍵，reject 不恢復粗體；記憶體控制組可恢復。這阻擋 raw suggestion JSON 直接作完整 durable codec，不否定 Plate 文件底座，也不代表換 DB 即修好。候選現成 codec 的來源與未驗界線已列於該稿 §6，原反例不改判。
+保存疑點已由[實測 R01-4](../experiments/legacy-evidence/2026-09-09-jd-native-pending-review-comparison.md)證實：移除粗體的 pending metadata 含 `bold:undefined`，JSON 往返丟掉该鍵，reject 不恢復粗體；記憶體控制組可恢復。這阻擋 raw suggestion JSON 直接作完整 durable codec，不否定 Plate 文件底座，也不代表換 DB 即修好。候選現成 codec 的來源與未驗界線已列於該稿 §6，原反例不改判。
 
 **結論：Owner 已同意以 Plate 為文件底座，但目前沒有一個完整組合已由證據證明覆蓋所有 JD 效果。**R01、P01、F01 保留限定驗證；下一步是沿選定底座完成必要接線與審閱設計，不重跑原正證，也不由此直接啟動 production。
 
 ## 5. 大廠共同原則與產品政策不能混在一起
 
-完整來源及版本差異見[App／工具／審閱契約](evidence/2026-09-09-jd-app-tool-and-review-contracts.md)。
+完整來源及版本差異見[App／工具／審閱契約](../experiments/legacy-evidence/2026-09-09-jd-app-tool-and-review-contracts.md)。
 
 **共同基礎（跨來源 Inference）：**模型取得合適的狀態與工具說明，提出操作；執行方檢查目標及範圍、執行、保存並回傳真實結果。格式合法不等於工作內容正確；工具呼叫完成不等於文件保存完成。定位不存在或過時時，回可行動資訊讓同一模型修正，不要求模型自行猜測行號或文件版本。
 
@@ -142,7 +142,7 @@ Plate 的官方 AI helper 必須與 SuggestionPlugin 分開：`applyAISuggestion
 
 2026-09-09 Owner 進一步要求說明：產品是 AI 專業 JD 顧問，協助不擅長撰寫 JD 的員工形成符合本人實際職位的客製文件，應如何判斷審閱流程。**本節是研究者補充的產品推論／待討論建議，未取得新的產品裁決。**上方 A／B／C 是初步方案，不應把「底層持久修訂」與「何時、如何請員工確認」當成只能綁定選擇；Plate 先驗的工程理由也不足以證明 A 最適合員工。
 
-**判斷目標：**讓員工能辨認及修正自己的工作被如何表達，讓顧問承擔工作分析、專業轉寫、適當粒度與完整性檢查。員工熟悉親身工作，不代表能一次說齊隱性判斷與低頻責任，也不代表能評估 JD 寫作方法；因此確認、追問與成品品質各有責任，不能用接受按鈕數量證明品質。內容依[分析指南 §3／§6](2026-09-09-complete-work-analysis-guide.md)及[客製化校準](2026-09-09-customized-jd-depth-and-interview-calibration.md)。
+**判斷目標：**讓員工能辨認及修正自己的工作被如何表達，讓顧問承擔工作分析、專業轉寫、適當粒度與完整性檢查。員工熟悉親身工作，不代表能一次說齊隱性判斷與低頻責任，也不代表能評估 JD 寫作方法；因此確認、追問與成品品質各有責任，不能用接受按鈕數量證明品質。內容依[分析指南 §3／§6](../guides/2026-09-09-complete-work-analysis-guide.md)及[客製化校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)。
 
 | 判準 | 對員工與顧問的具體要求 | 不足以證明成功的現象 |
 |---|---|---|
@@ -187,7 +187,7 @@ Plate 的官方 AI helper 必須與 SuggestionPlugin 分開：`applyAISuggestion
 
 ## 7. 有限驗證草案與停止條件
 
-**本節草案的最新效力：**下列三項是早期 source 疑點；其中個別待審取消、AI→人→AI 文字續改與粗體移除 JSON 已由[待審實證比較](evidence/2026-09-09-jd-native-pending-review-comparison.md)部分補證，不能再一概稱未執行。其他較廣情境依該稿限制，並未通過整套生命週期。逐筆接受是否成為員工主流程與原生待審表示分開決定。
+**本節草案的最新效力：**下列三項是早期 source 疑點；其中個別待審取消、AI→人→AI 文字續改與粗體移除 JSON 已由[待審實證比較](../experiments/legacy-evidence/2026-09-09-jd-native-pending-review-comparison.md)部分補證，不能再一概稱未執行。其他較廣情境依該稿限制，並未通過整套生命週期。逐筆接受是否成為員工主流程與原生待審表示分開決定。
 
 首個驗證只用三段合成文件與固定操作，無付費模型；不接 production，也不改 Memory。研究複核及先行方向裁決後，依鎖定版的原生 transforms 執行；這是已核准研究計畫內的必要驗證，毋須另問一般性的「是否繼續」。
 

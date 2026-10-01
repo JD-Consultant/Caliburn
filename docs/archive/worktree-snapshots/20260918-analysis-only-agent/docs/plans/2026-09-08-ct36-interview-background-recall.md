@@ -1,12 +1,12 @@
 # CT36：續談、背景整理與記憶回查驗收
 
-2026-09-08 · LLM-Q019／Q019-MEM-CADENCE-01 · G5完成／整體G8 OPEN，不是新產品設計。結果見[CT36報告](../specs/2026-09-08-ct36-interview-background-recall-results.md)。
+2026-09-08 · LLM-Q019／Q019-MEM-CADENCE-01 · G5完成／整體G8 OPEN，不是新產品設計。結果見[CT36報告](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct36-interview-background-recall-results.md)。
 
 ## 已核准的範圍
 
 Owner核准本次 **Luna／medium，最多40次模型請求、US$0.20保守預留**，共用帳本涵蓋A、B1、B2、回查及SDK重試；達上限停止。只複製CT16合成長訪談資料庫，不動原資料，不接production／JD，不重跑整套訪談，不改產品設定。
 
-依[CT35最新決定](../specs/2026-09-08-ct35-attempted-repair-recovery-review.md#5-owner改採共用框架機制實際接線核對與結論)，沿用官方Agent錯誤→模型修正迴圈。不新增final攔截、不強制工具、不追修零工具C。背景是否真正補存須實測，不能只看回答。
+依[CT35最新決定](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct35-attempted-repair-recovery-review.md#5-owner改採共用框架機制實際接線核對與結論)，沿用官方Agent錯誤→模型修正迴圈。不新增final攔截、不強制工具、不追修零工具C。背景是否真正補存須實測，不能只看回答。
 
 ## 方法與停止規則
 
@@ -22,7 +22,7 @@ Owner核准本次 **Luna／medium，最多40次模型請求、US$0.20保守預�
 ## 來源與回看路由
 
 - [完整職位驗收定義](2026-09-07-long-interview-acceptance.md)：覆蓋職位全範圍，不是單一任務。
-- [CT16真實基準及已知限制](../specs/2026-09-08-ct16-notification-live-results.md)：fixture不是新造Memory；其既有語意缺陷與本輪新增問題分開記錄。
+- [CT16真實基準及已知限制](../../../../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct16-notification-live-results.md)：fixture不是新造Memory；其既有語意缺陷與本輪新增問題分開記錄。
 - [CT17更正／背景前例](../specs/2026-09-08-ct17-correction-persistence-calibration.md)：不將那次7日輸入混入本次5日情境。
 - [OpenAI官方價格](https://developers.openai.com/api/docs/pricing)，2026-09-08核對：Luna標準短context input .20／cached .02／cache-write .25／output1.20美元每百萬token。既有護欄按完整request bytes×2及輸出預留先攔截，實際usage估費，非正式帳單。
 

@@ -1,18 +1,18 @@
 # JD clean Plate document profile
 
-**2026-09-10 active語意契約v2：**Owner已同意Task成果／要求平行分組、K／S引用及原生JSONB＋同PG保存方向。[語意契約與有限驗證](evidence/2026-09-10-jd-semantic-contract-closure.md)固定新grammar、模型refs／保存IDs及首次建立；本文件active設計已同步v2。v1及F01／F02的實測紀錄保留其舊範圍，不能代稱新增關係已完成runtime驗收。
+**2026-09-10 active語意契約v2：**Owner已同意Task成果／要求平行分組、K／S引用及原生JSONB＋同PG保存方向。[語意契約與有限驗證](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)固定新grammar、模型refs／保存IDs及首次建立；本文件active設計已同步v2。v1及F01／F02的實測紀錄保留其舊範圍，不能代稱新增關係已完成runtime驗收。
 
-前次格式確認及v1無共享引用的診斷見[保存研究](evidence/2026-09-10-jd-semantic-relations-storage-audit.md)；已由v2具體補正，不再等待同一產品決定。尚未完成的原生／DB／DOM／真模型項目仍依六切片逐項驗收。
+前次格式確認及v1無共享引用的診斷見[保存研究](../experiments/legacy-evidence/2026-09-10-jd-semantic-relations-storage-audit.md)；已由v2具體補正，不再等待同一產品決定。尚未完成的原生／DB／DOM／真模型項目仍依六切片逐項驗收。
 
 JD-R002/C03；2026-09-10；**可實作設計附件，待 successor ADR 與整合驗收後施工。**依 [current register](../current-decisions.md)、[決策流程](../decision-process.md)、[接線設計 §2](2026-09-09-jd-editor-app-integration-design.md#2-文件格式業務內容在文件中讀得到)及 [Owner 持續工作稿裁決](2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)。本附件收斂文件表示與原生接點，不重開框架／審閱選擇，不改 Memory、工具契約、保存 authority 或現行 production。
 
 **設計採用：**一份 clean Plate working value；每次成功保存形成不可變 revision，留下實際改動及前後內容。員工在同一工作畫面聊天、看同一份可編 JD，也能在當畫面看實際差異；歷史可展開唯讀，不是第二份可編稿。沒有 pending 群組、逐筆接受／取消或 accepted projection。工作稿保存不代表工作事實或專業品質已獲核准。
 
-本文以 **D（設計選擇）／E（既有實證）／S（固定官方 source）／V（整合須驗）** 區分效力。**後續 F02 已完成：**[官方插件四組實證](evidence/2026-09-10-jd-official-profile-probe.md)第二輪 4／4、15 項斷言通過，首輪子程序缺檔的 1／3 保留；有新的獨立 lock／實裝 source／授權封存。下列原生能力可據此補強，但仍不是全 grammar、DOM／IME、來源或產品驗收。本文初稿只有唯讀設計，新增實驗的完整範圍由 F02 報告負責。
+本文以 **D（設計選擇）／E（既有實證）／S（固定官方 source）／V（整合須驗）** 區分效力。**後續 F02 已完成：**[官方插件四組實證](../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md)第二輪 4／4、15 項斷言通過，首輪子程序缺檔的 1／3 保留；有新的獨立 lock／實裝 source／授權封存。下列原生能力可據此補強，但仍不是全 grammar、DOM／IME、來源或產品驗收。本文初稿只有唯讀設計，新增實驗的完整範圍由 F02 報告負責。
 
 ## 1. 固定引擎與官方插件
 
-**D：**active profile採`jd-plate-clean-v2`，對應`format_version:2`及[語意契約v2](evidence/2026-09-10-jd-semantic-contract-closure.md)。v1固定證據保持歷史效力；新Task兩組及K／S引用不是v1已支援功能，不把舊fixture直接冒充v2。套件版本不變，無production migration或相容讀取。完整依賴lock與配置跟識別一起固定，不用npm latest隱性換引擎。
+**D：**active profile採`jd-plate-clean-v2`，對應`format_version:2`及[語意契約v2](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)。v1固定證據保持歷史效力；新Task兩組及K／S引用不是v1已支援功能，不把舊fixture直接冒充v2。套件版本不變，無production migration或相容讀取。完整依賴lock與配置跟識別一起固定，不用npm latest隱性換引擎。
 
 | 用途 | 固定版本／接點 | 證據與邊界 |
 |---|---|---|
@@ -25,13 +25,13 @@ JD-R002/C03；2026-09-10；**可實作設計附件，待 successor ADR 與整合
 
 **D：**保留 core 的 paragraph、history、NodeId 等預設插件；標題使用 `BaseHeadingPlugin`／`HeadingPlugin`，`levels:[1,2,3]`；另接官方 blockquote、horizontal rule、bold、italic、underline、strikethrough 插件。headless 用 `createSlateEditor`，Web 用 `createPlateEditor` 與 React 對應插件，兩端的節點 key、normalization 與 ID 配置一致。React 事件／render 層差異不等於另一套文件 schema。
 
-**S／E：**list-classic／basic-nodes 的 npm gitHead 為 `7b9b204e1e38a20b1f8bec5a900d67c64afbc525`，table 為 `79578fd8ef53237edfc78389594df3ed5c722277`；各 package 版號、MIT 及 peer 範圍於 2026-09-10 核對。F02 的[獨立 lock](evidence/jd-official-profile-probe/package-lock.json)及[48 項授權盤點](evidence/jd-official-profile-probe/license-inventory.json)補齊新組合：40 項實裝附授權，8 項另取固定 gitHead 官方授權，來源分列。實際 headless 四組通過，不等於全部 React／人工功能通過；沒有改 production lock，也不用舊 44 項 inventory 代稱新增插件已核。
+**S／E：**list-classic／basic-nodes 的 npm gitHead 為 `7b9b204e1e38a20b1f8bec5a900d67c64afbc525`，table 為 `79578fd8ef53237edfc78389594df3ed5c722277`；各 package 版號、MIT 及 peer 範圍於 2026-09-10 核對。F02 的[獨立 lock](../experiments/legacy-evidence/jd-official-profile-probe/package-lock.json)及[48 項授權盤點](../experiments/legacy-evidence/jd-official-profile-probe/license-inventory.json)補齊新組合：40 項實裝附授權，8 項另取固定 gitHead 官方授權，來源分列。實際 headless 四組通過，不等於全部 React／人工功能通過；沒有改 production lock，也不用舊 44 項 inventory 代稱新增插件已核。
 
 **E／V：**F01 的 `ul/li/table/tr/td/th` 是普通 element 註冊；UI 也只有有限 renderer，並非官方 list/table kit。本設計選用官方插件後，不再把這些普通註冊覆蓋同 key。官方網站的 `ListKit`／表格 UI 是可參考的原始碼組裝，不是本案已安裝或可直接 import 的虛構套件；不得宣稱存在 `@platejs/diff` 匯出的 `DiffKit`。人工清單、表格能力由官方插件承擔，本案只接命令、有限樣式與顯示。
 
 ## 2. 文件 grammar 與完整 JD
 
-**D：**權威 value 是非空 `Element[]`。以下 `+` 表示至少一個、`*` 可空、`|` 表示擇一；次序有意義，不能為整理格式自行排序。名稱／節數／任務數不固定；[完整 r2](2026-09-09-frontend-engineer-jd-sample.md)是內容驗收樣本，不是每份文件模板。
+**D：**權威 value 是非空 `Element[]`。以下 `+` 表示至少一個、`*` 可空、`|` 表示擇一；次序有意義，不能為整理格式自行排序。名稱／節數／任務數不固定；[完整 r2](../guides/2026-09-09-frontend-engineer-jd-sample.md)是內容驗收樣本，不是每份文件模板。
 
 ```text
 document   = (body | jd_section)+
@@ -62,11 +62,11 @@ hr         = [{ text: '' }]                     # 官方 void 的必要文字 ch
 
 **S／D：**官方 classic list 的內容節點是 `lic`；F01 的 `li→p` 不能原封不動稱為正式 canonical grammar。`normalizeListItem` 會把首個非清單、非 `lic` block 轉成 `lic`，也可能移動不合法 children。正式建稿直接產生 `ul/ol→li→lic`，r2 子清單留在同一 `li` 的 `lic` 之後；不自訂 list normalizer 去保住 probe 舊形狀。不啟用會另寫任務狀態的 `taskList`／checkbox UI；官方父插件即使註冊該型別，App profile 仍拒絕把它當 JD Task。這不影響 JD 工作事實與進度應由既有顧問 state 承擔的邊界。
 
-一般表格仍使用官方cell factory／transforms、th／td及巢狀段落／清單，grid由官方行為處理，不重寫merge引擎。F02的v1三張表實證保留；v2完整樣稿fixture把K／S兩張表的每列明示換成完整item，文字／marks保留，退役外框ID記在[固定映射](evidence/jd-semantic-native-probe/fixture-mapping.json)，現存1張基本資料表。這是新增語意表示的固定fixture調整，不是通用importer，也不宣稱原版面不變。表格編輯及差異仍須按正式插件驗收，不能因樣稿表數減少就刪除表格能力。
+一般表格仍使用官方cell factory／transforms、th／td及巢狀段落／清單，grid由官方行為處理，不重寫merge引擎。F02的v1三張表實證保留；v2完整樣稿fixture把K／S兩張表的每列明示換成完整item，文字／marks保留，退役外框ID記在[固定映射](../experiments/legacy-evidence/jd-semantic-native-probe/fixture-mapping.json)，現存1張基本資料表。這是新增語意表示的固定fixture調整，不是通用importer，也不宣稱原版面不變。表格編輯及差異仍須按正式插件驗收，不能因樣稿表數減少就刪除表格能力。
 
 **S／D：**已核對 `basic-nodes@53.0.0` npm gitHead 的 [BaseBlockquotePlugin](https://github.com/udecode/plate/blob/7b9b204e1e38a20b1f8bec5a900d67c64afbc525/packages/basic-nodes/src/lib/BaseBlockquotePlugin.ts)：其 `toggle` 使用 `toggleBlock(type,{wrap:true})`，normalizer 將直接 Text／inline 包入 `p`、保留既有 block children；不是只改 p 的 type 並永久留下直接 Text。故本 grammar 使用 block children，並允許本 profile 的一般 body blocks，避免只准 `p` 擋住官方包裹清單／表格。引言命令只作用於 body，不包住整個 JD 語意容器；r2 的引言文字及分隔線完整保留。此為固定 source 核對，尚非新插件組合的執行正證。
 
-Task名稱／敘述及其適用條件在一般body，成果與要求各在Task直屬的一個專屬群組內；可含多段、清單或表格，數量不配對、不互為父子、不合併回敘述。K／S各以完整item保存一次，Task引用該版ID。Task4三種異常處理要求、Task8約定服務月檢限制及未指定正文須全文保留。未知內容留空p或既有Memory，不造事實；固定容器不是必須每次訪談填滿內容。詳[語意契約§2–3](evidence/2026-09-10-jd-semantic-contract-closure.md#2-最小完整文件結構)。
+Task名稱／敘述及其適用條件在一般body，成果與要求各在Task直屬的一個專屬群組內；可含多段、清單或表格，數量不配對、不互為父子、不合併回敘述。K／S各以完整item保存一次，Task引用該版ID。Task4三種異常處理要求、Task8約定服務月檢限制及未指定正文須全文保留。未知內容留空p或既有Memory，不造事實；固定容器不是必須每次訪談填滿內容。詳[語意契約§2–3](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md#2-最小完整文件結構)。
 
 ## 3. 空白、未完整與允許欄位
 
@@ -88,7 +88,7 @@ Task名稱／敘述及其適用條件在一般body，成果與要求各在Task�
 | `td/th` | 可選 `colSpan/rowSpan`（正整數）、`size`（有限非負數）、`background:string`、`borders` | `borders` 僅 `top/right/bottom/left`；各邊可有 `size`（有限非負數）、`color:string`、`style:string`，值由有限 UI 選項與安全樣式解析器接受。無任意 DOM attributes |
 | `td/th` 的原生 HTML span 表示 | 可選 `attributes:{colspan?:string,rowspan?:string}` | 只接受正整數字串，與 numeric span 同時存在時須相符。保留官方可產生的表示，禁止事件／任意 HTML props |
 
-本表描述**保存稿**。模型 new-element／set_properties 只填 numeric colSpan／rowSpan，不接受 attributes；App／Node 用原生 setNodes／unsetNodes 同步或清除已存在的對應 HTML key，保留另一維，清空後移除 attributes 物件。新增省略 span 有效值 1，明填 1 保留；不是要求自動拆格。精確當批映射、例子及 table 53.0.9 原碼依[TF02 附件 §3](evidence/2026-09-10-jd-model-input-contract-closure.md#3-tf02單一-span-意圖與保存映射)。saved value／人工貼上仍驗本表所有合法表示；不能因縮小模型輸入而丟棄原生保存內容。
+本表描述**保存稿**。模型 new-element／set_properties 只填 numeric colSpan／rowSpan，不接受 attributes；App／Node 用原生 setNodes／unsetNodes 同步或清除已存在的對應 HTML key，保留另一維，清空後移除 attributes 物件。新增省略 span 有效值 1，明填 1 保留；不是要求自動拆格。精確當批映射、例子及 table 53.0.9 原碼依[TF02 附件 §3](../experiments/legacy-evidence/2026-09-10-jd-model-input-contract-closure.md#3-tf02單一-span-意圖與保存映射)。saved value／人工貼上仍驗本表所有合法表示；不能因縮小模型輸入而丟棄原生保存內容。
 
 上述 table 欄位依固定 `@platejs/utils@53.3.11` 的 `TTableElement/TTableRowElement/TTableCellElement` 與官方 table source；不是宣稱這些欄位都已做 UI／JSON 整合實驗。移除或新增這些有限 props 也屬實際修改，不能僅顯示紅綠文字。
 
@@ -98,7 +98,7 @@ Task名稱／敘述及其適用條件在一般body，成果與要求各在Task�
 
 ## 4. 身分、移動、拆分、複製與引用
 
-v2另外驗同版Task→K／S關係。NodeId不負責links；App只在明示copy時以該次舊→新ID映射重寫複本內連線。含必需兩組的Task不能單獨unwrap後發布；須同批明示unwrap兩組再unwrap Task。刪／unwrap被引用K／S或其祖先須先解除／改接incoming links。完整候選在批次末驗grammar／links，中間暫態不得當成已保存正文；具體copy／刪除規則以[語意契約§3](evidence/2026-09-10-jd-semantic-contract-closure.md#3-共同編輯與引用邊界)為準。
+v2另外驗同版Task→K／S關係。NodeId不負責links；App只在明示copy時以該次舊→新ID映射重寫複本內連線。含必需兩組的Task不能單獨unwrap後發布；須同批明示unwrap兩組再unwrap Task。刪／unwrap被引用K／S或其祖先須先解除／改接incoming links。完整候選在批次末驗grammar／links，中間暫態不得當成已保存正文；具體copy／刪除規則以[語意契約§3](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md#3-共同編輯與引用邊界)為準。
 
 **D／S：**寫入 editor 的 NodeId 固定 `reuseId:true, initialValueIds:'always'`；其餘沿原生 `idKey:'id'`、`filterText:true`、`filterInline:true`、預設 `idCreator:()=>nanoid(10)`。不採 F01／history probe 每次重置的測試 ID 序列。所有可定位 block（包括行、格、list item／lic）都有 ID；文字位置由當前 tree 的原生 API 解析，模型不計算 path／offset。App 定位同時限定 document、revision、ID，重複或不存在都回錯，不能 first-match。
 
@@ -166,7 +166,7 @@ v2另外驗同版Task→K／S關係。NodeId不負責links；App只在明示copy
 | [table npm](https://registry.npmjs.org/@platejs/table/53.0.9)、[BaseTablePlugin](https://github.com/udecode/plate/blob/79578fd8ef53237edfc78389594df3ed5c722277/packages/table/src/lib/BaseTablePlugin.ts)、[resizable npm](https://registry.npmjs.org/@platejs/resizable/53.0.0) | Plate／table53.0.9、resizable53.0.0／MIT；table gitHead `79578fd8…` | 原生 table factory／transforms、span、選取 state 與相依；未核新安裝全部 transitive LICENSE |
 | [React TablePlugin](https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/table/src/react/TablePlugin.tsx)、[官方 table renderer](https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/apps/www/src/registry/ui/table-node.tsx) | Plate／既有固定 source commit `cee7a4ec…` | React keydown 與官方欄位／UI 接點；未直接照搬其全部 toolbar／額外依賴 |
 | [NodeIdPlugin](https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/core/src/lib/plugins/node-id/NodeIdPlugin.ts)、[withNodeId](https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/core/src/lib/plugins/node-id/withNodeId.ts) | Plate／既有 core53.3.11 source／MIT；本機 fixed source 再讀 | NodeIdPlugin 第15–82、324–442行的設定／補缺 ID；withNodeId 第197–224行的 split ID 條件，非語意身分引擎 |
-| [F01 原報告](evidence/2026-09-09-jd-native-content-profile-probe.md)、[engine](evidence/jd-profile-probe/engine.mjs)、[fixture](evidence/jd-profile-probe/fixture.mjs) | 本案／2026-09-09固定實證 | 5／1、普通容器、內容與已知 normalization 邊界 |
-| [native 原報告](evidence/2026-09-09-jd-native-editor-probe.md)、[history](evidence/2026-09-09-jd-native-history-and-sync-probe.md)、[UI](evidence/2026-09-09-jd-native-editor-ui-probe.md) | 本案／2026-09-09固定實證及封存 lock／LICENSE | 兩反例、3項原生觀測、H09、真正唯讀 UI；不改判未測範圍 |
+| [F01 原報告](../experiments/legacy-evidence/2026-09-09-jd-native-content-profile-probe.md)、[engine](../experiments/legacy-evidence/jd-profile-probe/engine.mjs)、[fixture](../experiments/legacy-evidence/jd-profile-probe/fixture.mjs) | 本案／2026-09-09固定實證 | 5／1、普通容器、內容與已知 normalization 邊界 |
+| [native 原報告](../experiments/legacy-evidence/2026-09-09-jd-native-editor-probe.md)、[history](../experiments/legacy-evidence/2026-09-09-jd-native-history-and-sync-probe.md)、[UI](../experiments/legacy-evidence/2026-09-09-jd-native-editor-ui-probe.md) | 本案／2026-09-09固定實證及封存 lock／LICENSE | 兩反例、3項原生觀測、H09、真正唯讀 UI；不改判未測範圍 |
 
-欄位型別另唯讀核對既有安裝 `@platejs/utils@53.3.11/dist/index.d.ts` 第253–283行；檔案由 [native lock](evidence/jd-native-probe/package-lock.json) 重現。初稿未新增實驗；後續 F02 的獨立 source／LICENSE／fixtures／results 依其報告封存，舊材料不變。pending／codec 原證據保留為歷史，不列正式依賴。
+欄位型別另唯讀核對既有安裝 `@platejs/utils@53.3.11/dist/index.d.ts` 第253–283行；檔案由 [native lock](../experiments/legacy-evidence/jd-native-probe/package-lock.json) 重現。初稿未新增實驗；後續 F02 的獨立 source／LICENSE／fixtures／results 依其報告封存，舊材料不變。pending／codec 原證據保留為歷史，不列正式依賴。

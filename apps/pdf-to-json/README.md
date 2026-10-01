@@ -4,7 +4,7 @@
 供 [`apps/ocs-indexer`](../ocs-indexer/) 索引。純離線批次、無伺服器、無狀態。
 
 > **這份 README 一檔兩用**:上半是 **app 指南**(跑 / 架構 / codemap);
-> **下半 §1–10 是權威的 OCS 來源 JSON 契約**——[`docs/ocs-source-json.md`](../../docs/archive/retired-documents/ocs-source-json.md)
+> **下半 §1–10 是權威的 OCS 來源 JSON 契約**——[`docs/ocs-source-json.md`](../../docs/archive/docs-cleanup-2026-10-02.md)
 > 指向此為準;動 indexer/api 的 OCS 欄位前先讀(尤其 §6.3)。
 
 ## Quick Start
@@ -496,6 +496,6 @@ PDF 末頁「說明與補充事項」分為兩個子區塊：
 ## 指路
 
 - 架構鳥瞰:根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md)(Code map:pdf-to-json = Pipes-and-Filters)。
-- 來源契約取用注意事項:[`docs/ocs-source-json.md`](../../docs/archive/retired-documents/ocs-source-json.md)(指向本 §6.3 為權威)。
+- 來源契約取用注意事項:[`docs/ocs-source-json.md`](../../docs/archive/docs-cleanup-2026-10-02.md)(指向本 §6.3 為權威)。
 - transformer 拆解研究:[`docs/specs/2026-06-28-pdf-to-json-transformer-decomposition-research.md`](../../docs/research/retrieval/2026-06-28-pdf-to-json-transformer-decomposition-research.md)。
-- 下游:[`apps/ocs-indexer/README.md`](../ocs-indexer/README.md)(索引消費本輸出);著作端 schema 見 [`docs/ocs-schema.md`](../../docs/archive/retired-documents/ocs-schema.md)。
+- 下游:[`apps/ocs-indexer/README.md`](../ocs-indexer/README.md)(索引消費本輸出);著作端 schema 見 [`docs/ocs-schema.md`](../../docs/archive/docs-cleanup-2026-10-02.md)。

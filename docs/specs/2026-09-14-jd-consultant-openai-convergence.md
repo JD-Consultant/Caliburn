@@ -1,6 +1,6 @@
 # 產品顧問收斂到 OpenAI：修正施工期留下的 provider 接線
 
-> **2026-09-15 最新閱讀校正：本稿的「OpenAI 是模型供應商」有效，但把它推成直連 `ChatOpenAI`、單一 `OPENAI_API_KEY` 或移除 OpenRouter 的部分無效。Owner 已確認目前產品路徑是 LangChain／LangGraph framework → OpenRouter → OpenAI-only route → `openai/gpt-5.6-luna`，禁止 fallback，日後由 profile 換模型。本文只保留 2026-09-14 施工期衝突證據；不得用 §3–§5 直接施工。最新基線見 [目前決策](../current-decisions.md) 與 [接線對齊稿](evidence/2026-09-15-jd-integration-document-reconciliation.md)。**
+> **2026-09-15 最新閱讀校正：本稿的「OpenAI 是模型供應商」有效，但把它推成直連 `ChatOpenAI`、單一 `OPENAI_API_KEY` 或移除 OpenRouter 的部分無效。Owner 已確認目前產品路徑是 LangChain／LangGraph framework → OpenRouter → OpenAI-only route → `openai/gpt-5.6-luna`，禁止 fallback，日後由 profile 換模型。本文只保留 2026-09-14 施工期衝突證據；不得用 §3–§5 直接施工。最新基線見 [目前決策](../current-decisions.md) 與 [接線對齊稿](../experiments/legacy-evidence/2026-09-15-jd-integration-document-reconciliation.md)。**
 
 日期：2026-09-14；Topic：JD-R002。Owner 於 2026-09-14 重新整理正確基線後指示本單位。這不是重選 provider，而是**把施工過程留下的 Anthropic 接線收回到既定產品方向**。
 

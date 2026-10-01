@@ -1,10 +1,10 @@
 # 0056. 真實員工試用是第一版發布門檻
 
 - 狀態：**Accepted**（owner 於 2026-08-03 確認）
-- 編號說明：本 ADR 原以 `0043` 起草於離線分支，合併回 `main` 時該編號已由另一條線的[0043-job-analysis-local-current-state-persistence-and-authoring-authority](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md) 佔用，故發布為 `0056`。決策內容未更動。
+- 編號說明：本 ADR 原以 `0043` 起草於離線分支，合併回 `main` 時該編號已由另一條線的[0043-job-analysis-local-current-state-persistence-and-authoring-authority](../../../../../adr/0043-job-analysis-local-current-state-persistence-and-authoring-authority.md) 佔用，故發布為 `0056`。決策內容未更動。
 - 日期：2026-08-03
 - 範圍：何時可把本機 Web release candidate 稱為可供員工使用的第一版成品
-- 延伸：[0040](0040-professional-consultant-engine-and-r1-validation-contract.md)、[0055](0055-hybrid-job-discovery-and-ttop-formation.md)
+- 延伸：[0040](../../../../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)、[0055](0055-hybrid-job-discovery-and-ttop-formation.md)
 - 研究：[真實員工試用 release gate 研究](../specs/2026-08-03-real-employee-pilot-release-gate-research.md)
 
 ## 脈絡

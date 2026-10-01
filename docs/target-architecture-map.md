@@ -1,13 +1,13 @@
 # Caliburn 全產品目標架構導覽
 
 - 狀態：**目標設計／未實作、未驗收**；產品已確認效果與工程建議分列，不授權施工或 production 切換。維護者：App 架構維護者；更新：2026-09-29。
-- **實作與驗證進度（2026-10-02）：**已依本設計施工，T01–T17 已依各任務的驗收層級完成，逐項效果的實測判定與限制見 [T17 V01–V28 對照](plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)、實驗發現的問題見[實驗發現的問題彙整](reports/experiment-findings.md)；production 切換（T18）待 Owner 放行。上方「未實作、未驗收」是 2026-09-29 撰寫當時的狀態，保留作沿革，不是現況。
+- **實作與驗證進度（2026-10-02）：**已依本設計施工，T01–T18 已依各任務的驗收層級完成，逐項效果的實測判定與限制見 [T17 V01–V28 對照](plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)、實驗發現的問題見[實驗發現的問題彙整](reports/experiment-findings.md)；production 切換（T18）已於 2026-10-02 由 Owner 放行並完成（[ADR0079](adr/0079-target-rebuild-production-cutover.md)）。上方「未實作、未驗收」是 2026-09-29 撰寫當時的狀態，保留作沿革，不是現況。
 - 目的：讓新開發者／Agent 從產品出發，逐層找到職責、資料、流程、介面及驗收，不必遍讀討論歷史或由舊程式猜新規則。
-- 方法：[架構討論規範](architecture-discussion-standard.md)。實際程式結構另讀 [ARCHITECTURE](../ARCHITECTURE.md)，切換狀態讀 [ADR0079](adr/0079-target-rebuild-production-cutover.md)（Proposed；ADR0077 的舊 App 已自本切換候選退役，歷史見 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)）；**新目標不要求舊架構／資料整合**。
+- 方法：[架構討論規範](architecture-discussion-standard.md)。實際程式結構另讀 [ARCHITECTURE](../ARCHITECTURE.md)，切換狀態讀 [ADR0079](adr/0079-target-rebuild-production-cutover.md)（Accepted，2026-10-02 放行；ADR0077 的舊 App 已退役，歷史見 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)）；**新目標不要求舊架構／資料整合**。
 
 **2026-09-29 文件補完基線：**下列責任集合已補到產品效果、跨層契約與正常／異常流程可追讀，架構圖已渲染核對。實際範圍及剩餘工程驗證見[續審紀錄](architecture/verification.md#6-架構文件補完與圖面審查2026-09-29-續審)；後續才規劃實作，不將本頁當施工授權。
 
-**後續施工狀態：**Owner 已另以 Goal 授權[SDD／TDD 實作計畫](plans/2026-09-29-target-rebuild/README.md)，工程代理沿[程式設計文件](implementation/README.md)推進；實際完成與驗證只查[任務表](plans/2026-09-29-target-rebuild/tasks.md)。上方「後續才規劃」是文件補完當時狀態。本頁各圖仍描述目標契約，不能因施工開始就視為能力已完成或 production 已切換。
+**後續施工狀態：**Owner 已另以 Goal 授權[SDD／TDD 實作計畫](plans/2026-09-29-target-rebuild/README.md)，工程代理沿[程式設計文件](implementation/README.md)推進；實際完成與驗證只查[任務表](plans/2026-09-29-target-rebuild/tasks.md)。上方「後續才規劃」是文件補完當時狀態。本頁各圖描述目標契約；能力實際完成度以 [V01–V28 對照](plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)為準，production 已於 2026-10-02 切換（[ADR0079](adr/0079-target-rebuild-production-cutover.md)）。
 
 ## 一眼看懂：產品邊界與主要能力
 

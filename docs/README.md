@@ -1,6 +1,6 @@
 # Caliburn 文件與 Repo 導覽
 
-這裡只維護分類與閱讀路徑，不複製產品規則、任務進度或驗收結論。**本分支是切換候選：正式產品是 [`apps/api`](../apps/api/README.md)（後端）與 [`apps/web`](../apps/web/README.md)（介面），根命令與 CI 已指向它們，舊程式已依清單退役（取回方式見 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)）。ADR0079 仍是 Proposed；T14／T16／T17 已結案，Owner 放行前 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 仍是 Accepted 的正式權責紀錄，T18 未完成。**「已有程式」「已有個別證據」與「整體驗收完成」須分開。
+這裡只維護分類與閱讀路徑，不複製產品規則、任務進度或驗收結論。**新 App 已於 2026-10-02 經 Owner 放行成為唯一正式產品：[`apps/api`](../apps/api/README.md)（後端）與 [`apps/web`](../apps/web/README.md)（介面），根命令與 CI 指向它們（[ADR0079](adr/0079-target-rebuild-production-cutover.md) Accepted，取代 [ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)）；舊程式已依清單退役，取回方式見 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。**「已有程式」「已有個別證據」與「整體驗收完成」須分開。
 
 ## 先讀
 
@@ -39,7 +39,7 @@
 | 範圍 | 權責與閱讀入口 |
 |---|---|
 | 新目標設計 | [目標架構地圖](target-architecture-map.md)選用的責任文件；實作／驗收狀態查[任務表](plans/2026-09-29-target-rebuild/tasks.md)，不從設計稿推導已完成 |
-| 正式產品（切換候選，未放行） | [ADR0079](adr/0079-target-rebuild-production-cutover.md)（Proposed）、[鳥瞰](../ARCHITECTURE.md)、[產品筆記](product-notes.md)；[ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 是切換前的權責紀錄，其程式已在本分支退役 |
+| 正式產品 | [ADR0079](adr/0079-target-rebuild-production-cutover.md)（Accepted）、[鳥瞰](../ARCHITECTURE.md)、[產品筆記](product-notes.md)；[ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 是被取代的歷史權責紀錄，其程式已退役 |
 | 決策與變更方法 | [決策流程](decision-process.md)、[架構討論與文件規範](architecture-discussion-standard.md)、[契約策略](contract-strategy.md) |
 | 獨立 RAG 範圍 | [RAG pipeline](design/rag-pipeline.md)，不是目前 JD App 的依賴 |
 | 查較早文件及演進 | [封存入口](archive/README.md) → 原索引、舊計畫、工作樹與搬移對照；先核最新決策再採用 |

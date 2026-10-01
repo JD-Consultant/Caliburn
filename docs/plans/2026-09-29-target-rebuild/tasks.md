@@ -219,6 +219,7 @@
 ## T16 有界官方模型／schema／容量驗證
 
 - [ ] T16；依賴：T14、T15。
+- **2026-10-01 限流診斷：**各一次小型 Luna 生成與壓縮均回報 200K token 額度，零重試；這不是大視窗成功證據，也不能斷言先前 429 的全部細項。原門檻未改，已提出按配額校準候選，待 Owner 確認；見 [T16 §6](evidence/t16-compaction-continuity.md#6-429-的帳戶容量診斷2026-10-01)。不重送原大請求或增加恢復機制。
 - **2026-10-01 共用 Runtime 大視窗補驗：**真 call＋合成工具結果計數 285,204，實際觸發 272K Step 間壓縮；遠端 compact 回 429 即停止，零重試，512K 未執行。只證實路由，不宣告大窗口壓後接續；原限額、結果與再驗前提見 [T16 §5](evidence/t16-compaction-continuity.md#5-共用-runtime-的-272k512k-有界補驗)。不以未知帳戶細項更動產品門檻。
 - **2026-10-01 接續容量補驗：**141,777-token 合成工具視窗成功 compact，完整返回 C 續接更正、帶真 reasoning 再 compact，兩次答覆三項事實均正確；首輪探針過嚴假設、一次補跑及成本完整記錄於 [T16 證據](evidence/t16-compaction-continuity.md)。不勾整項、不等同正式 A/B 自動觸發或 JD 分析品質；272K／512K 真視窗仍未驗。
 - **契約：**[選型與參數](../../implementation/technology-decisions.md)、JDT-01／08／09、V05／V06／V22／V26。

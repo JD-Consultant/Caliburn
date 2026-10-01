@@ -226,6 +226,7 @@
 ## T16 有界官方模型／schema／容量驗證
 
 - [ ] T16；依賴：T14、T15。
+- **2026-10-01 160K 中途保險真窗口通過：**產品原常數、真 Luna、一次執行零重試：provider 計數 172,704 tokens 跨過門檻 → 既有壓縮機制觸發 → 採用完整返回視窗（輸出逐項相等）→ 壓後 201 tokens 接續到正確最終答覆 → 同 loop 重入不重送；3 count＋2 create＋1 compact，估算約 US$0.0174，沒有 429。同程序合成資料，不證明 JD 品質或 PG 耐久；三角色在長旅程中的自然壓縮仍待 T17 實測。[manifest、結果與限制](evidence/t16-compaction-continuity.md#11-160k-中途保險的真窗口驗收2026-10-01執行前-manifest)。不改產品常數，不勾整項。
 - **2026-10-01 Owner 門檻校準：**輪前 A／B1／B2 為 128K、中途 160K 已確認並接回既有機制；門檻、全視窗採用及真 PG 角色恢復 70 passed。只調數值，不改接續／模型／品質 gate；本次零付費，三角色新門檻下的真長訪談仍未驗。[校準與證據](evidence/t16-compaction-continuity.md#10-owner-確認門檻校準2026-10-01)取代下方 272K／512K 待決狀態，不抹除當時實測。
 - **2026-10-01 A輪前接線補驗通過：**修正後原生 seed 經真 count164,317觸發既有128K壓縮，完整五項C＋App資料＋新輸入接續，真Luna季度更正、正式保存與PG重連核對通過；2 count＋1 compact＋1生成、零重試，usage估US$0.0169852。不改產品、不再重跑此接縫；[證據及受控seed限制](evidence/t16-compaction-continuity.md#9-原生-seed-修正後的有界補驗2026-10-01)。272K／512K與完整品質gate仍未完，不勾整項。
 - **2026-10-01 A 輪前角色接線補驗：**真 PG＋受控 seed 的離線 A Runner／C採用／重連保存通過；真 count 因測例 ID 格式及後續未定的400被拒，未執行真 compact／生成。只修探針原生序列化、不改產品、不續跑，七個隔離 schema 均無 active 殘留；[範圍、失敗及限制](evidence/t16-compaction-continuity.md#8-a-輪前壓縮的正式-runnerpg-接線2026-10-01)。不勾整項或擴張§7證據。

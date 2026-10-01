@@ -192,7 +192,7 @@ Ruff 檢查／格式通過，mypy **274 source files 無問題**。未重跑與�
 
 ## 切換候選重基與重驗（2026-10-02）
 
-**重基：**候選分支 `target-cutover-candidate`（原 `5bccf4fb`，基準 `57db0b5f`）重基到目前主線 `target-rebuild`（`2c70f0ef`，主線在候選建立後多了 13 個提交，含 `docs/` 的大規模整理）；新 head `f11f23b6`，8 個提交（原 6 個＋2 個同步），與主線無分歧（`target-rebuild` 的每個提交都在候選裡）。**沒有 merge、push，原分支未動，ADR0079 仍是 Proposed。**
+**重基：**候選分支 `target-cutover-candidate`（原 `5bccf4fb`，基準 `57db0b5f`）重基到目前主線 `target-rebuild`（`2c70f0ef`，主線在候選建立後多了 13 個提交，含 `docs/` 的大規模整理）；新 head 當時是 `f11f23b6`，8 個提交（原 6 個＋2 個同步），與主線無分歧（`target-rebuild` 的每個提交都在候選裡）；其後主線又增加只動文件的提交，候選已再重基（無衝突，現為 `280a9474`，基於主線 `f51280aa`）。放行前仍須再核對一次是否落後。**沒有 merge、push，原分支未動，ADR0079 仍是 Proposed。**
 
 | 衝突 | 解法與理由 |
 |---|---|

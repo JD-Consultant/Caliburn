@@ -1,6 +1,6 @@
 # LLM provider interface 與 framework 選型研究
 
-> **歷史選型研究，已被取代（2026-08-28）**：本文「不採 LangChain／LangGraph、保留薄自有 port」的結論已由 [Accepted ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 與後續 0061–0068 取代。下一版產品語意與施工以 [Proposed ADR 0071](../adr/0071-revisable-work-understanding-context-and-review-provenance.md) 及 [2026-08-28 實作計畫](../superpowers/plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md) 為準。本文只保留 provider capability／routing 研究脈絡，不得用來恢復舊 adapter-first 架構。
+> **歷史選型研究，已被取代（2026-08-28）**：本文「不採 LangChain／LangGraph、保留薄自有 port」的結論已由 [Accepted ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 與後續 0061–0068 取代。下一版產品語意與施工以 [Proposed ADR 0071](../adr/0071-revisable-work-understanding-context-and-review-provenance.md) 及 [2026-08-28 實作計畫](../archive/implementation-plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md) 為準。本文只保留 provider capability／routing 研究脈絡，不得用來恢復舊 adapter-first 架構。
 
 - 日期：2026-08-11
 - 狀態：研究結論，尚未形成 ADR

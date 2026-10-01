@@ -6,6 +6,8 @@ Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書（JD�
 
 - **第一次認識產品：**[產品專題介紹](docs/product-introduction.md)——問題、使用流程、核心設計與待驗證的價值。
 - **準備理解或開發新架構：**[目標架構地圖](docs/target-architecture-map.md)——由全貌逐層深入責任、生命週期、工具與保存。
+- **找檔案或接手工作：**[Repo／文件分類](docs/README.md)、[收尾任務](docs/plans/2026-09-29-target-rebuild/tasks.md#收尾分類與下一步)、[驗收與實驗資料](docs/plans/2026-09-29-target-rebuild/evidence/README.md)。
+- **教授與技術評閱者：**[系統架構報告](docs/reports/system-architecture/README.md)——含流程圖、內部分工與設計取捨；有固定基準，不代替最新開發契約。
 
 介紹與目標文件描述重構方向，**不代表已全部實作**。下面是現行正式程式及使用方式；兩者不混為同一個完成狀態。
 
@@ -19,7 +21,7 @@ Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書（JD�
 - OpenRouter 的 OpenAI-only Luna 路徑與 App-side continuation compaction；
 - 查看本輪 JD 改動、來源原話，以及只撤回本輪 JD。
 
-目錄名稱 `experiments` 是專案迭代沿革，不表示這套程式是範例。正式權責與硬切換見 [ADR 0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。舊 `apps/api`、`apps/web` 與 `packages/job-analysis-contract` 的可執行程式已移除，只留下醒目標記的歷史文件；不提供舊資料搬移或相容層。
+目錄名稱 `experiments` 是專案迭代沿革，不表示這套程式是範例。正式權責與硬切換見 [ADR 0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。原 `apps/api`、`apps/web` 與 `packages/job-analysis-contract` 的舊接線已退役；現在的 [`apps/api`](apps/api/README.md)／[`apps/web`](apps/web/README.md) 是另行重建的新目標程式，並非只剩歷史 README，也不整合舊資料。其進度依[任務表](docs/plans/2026-09-29-target-rebuild/tasks.md)，正式入口待 T18 通過才切換。以下環境與命令仍屬現行正式產品。
 
 ## 執行環境
 

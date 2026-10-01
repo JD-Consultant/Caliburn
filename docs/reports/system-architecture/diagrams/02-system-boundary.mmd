@@ -1,0 +1,21 @@
+flowchart TB
+    USER[操作者／受訪員工]
+    subgraph LOCAL[本機執行與資料保存]
+        WEB[Web 介面<br/>React・TypeScript]
+        APP[模組化後端<br/>FastAPI・業務流程・Agent 執行]
+        DB[(PostgreSQL<br/>產品資料／執行 Checkpoint)]
+        PDF[受控 PDF 渲染<br/>HTML・CSS・Chromium]
+        WEB <-->|HTTP／串流| APP
+        APP <-->|保存與查詢| DB
+        APP -->|固定正式 JD| PDF
+        PDF -->|PDF 檔| APP
+    end
+    AI[OpenAI Responses API<br/>外部模型服務]
+    USER <-->|訪談、預覽、編輯、下載| WEB
+    APP <-->|Context 外送／模型輸出| AI
+    classDef local fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e;
+    classDef store fill:#dcfce7,stroke:#15803d,color:#14532d;
+    classDef external fill:#fff7ed,stroke:#c2410c,color:#7c2d12;
+    class WEB,APP,PDF local;
+    class DB store;
+    class AI external;

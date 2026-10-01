@@ -6,6 +6,8 @@
 
 ## 保留原則
 
+**2026-10-02 整理：**教授報告已收錄於 [`docs/reports/system-architecture`](../reports/system-architecture/README.md)，完成的 checkout 已移除但分支保留；新目標實驗原件、舊施工計畫與本機測試暫存的移轉見[整理紀錄](repository-organization-2026-10-02.md)。`target-cutover-candidate` 尚待 gate，工作樹仍保留。這次不用新增 tag，也不覆蓋下列 2026-09 歷史紀錄。
+
 - 已提交的研究文件、設計文件、實驗案例、模型輸入／輸出與結果都保留在 Git 歷史中。
 - 舊 worktree 的提交以 archive tag 保存；刪除本機 checkout 或 GitHub 舊分支不等於刪除文件。
 - 下列 tag 是歷史參考，不是目前產品的施工授權，也不能單獨推翻現行決策。

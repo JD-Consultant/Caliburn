@@ -1,0 +1,14 @@
+flowchart TB
+    OLD[JD 保存的既有來源基準] --> D[App 比較來源差異<br/>不是任意讀舊版的入口]
+    NEW[A 本 Turn 固定 Memory] --> D
+    D --> A[A 按需讀 diff 與新版資料]
+    A --> Q{資訊足以核對？}
+    Q -->|不足| ASK[詢問員工<br/>保留待核對]
+    Q -->|足夠| EDIT[維持或調整 JD<br/>明確確認對應依據]
+    EDIT --> SAVE[本輪完成後正式採用<br/>保存新的核對基準]
+    classDef base fill:#f1f5f9,stroke:#475569,color:#0f172a;
+    classDef analysis fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e;
+    classDef result fill:#dcfce7,stroke:#15803d,color:#14532d;
+    class OLD,NEW base;
+    class D,A,EDIT analysis;
+    class SAVE result;

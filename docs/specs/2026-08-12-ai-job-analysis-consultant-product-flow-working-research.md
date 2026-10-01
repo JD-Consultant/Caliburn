@@ -8,7 +8,7 @@
 - Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x；§9.19再把候選生命週期收斂為Deep Agents／LangGraph持久working draft＋application semantic review。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例。施工必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等產品目的與framework primitive命名；選型先看效果、功能完整、可靠性與員工體驗，只有效果相當時才比較自寫量
 - 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](2026-08-12-staged-ai-consultant-runtime-framework-research.md) 只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
 
-> **最新閱讀規則（2026-08-28）**：本文保存完整討論與翻案歷史；遇到 `Gap`、calibration、source correction、JD Evidence、`defer`、`edit-accept`、model-authored `skill_ids` 或把工作理解預先做成 JD 欄位圖等舊形狀時，不得直接施工。最新產品語意由 [Proposed ADR 0071](../adr/0071-revisable-work-understanding-context-and-review-provenance.md) 與 §9.20 之後的 owner 校正收斂，逐 task 作法見 [2026-08-28 實作計畫](../superpowers/plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md)。若歷史段落衝突，以較新的明示取代關係為準。
+> **最新閱讀規則（2026-08-28）**：本文保存完整討論與翻案歷史；遇到 `Gap`、calibration、source correction、JD Evidence、`defer`、`edit-accept`、model-authored `skill_ids` 或把工作理解預先做成 JD 欄位圖等舊形狀時，不得直接施工。最新產品語意由 [Proposed ADR 0071](../adr/0071-revisable-work-understanding-context-and-review-provenance.md) 與 §9.20 之後的 owner 校正收斂，逐 task 作法見 [2026-08-28 實作計畫](../archive/implementation-plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md)。若歷史段落衝突，以較新的明示取代關係為準。
 
 ## 0. 這份工作稿怎麼使用
 

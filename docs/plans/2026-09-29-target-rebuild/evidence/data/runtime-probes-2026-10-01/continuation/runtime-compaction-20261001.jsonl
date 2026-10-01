@@ -1,0 +1,10 @@
+{"time": "2026-09-30T19:49:03.253790+00:00", "event": "started", "model": "gpt-6-luna", "data": "synthetic-constants-only", "instructions_sha256": "6a99e2dfde402a22439c65d18e14654b58dd64293faf9535c9f7c2a4c0defc13", "tool_sha256": "a821de664d24a67c72f302b368d65d5d36c1c022a56318c13bc7880df98ec487"}
+{"time": "2026-09-30T19:49:03.370906+00:00", "event": "request_started", "stage": "step_272k", "kind": "count", "calls": {"count": 1, "create": 0, "compact": 0}}
+{"time": "2026-09-30T19:49:03.851202+00:00", "event": "input_count", "stage": "step_272k", "tokens": 133, "seconds": 0.48}
+{"time": "2026-09-30T19:49:03.852869+00:00", "event": "request_started", "stage": "step_272k", "kind": "create", "calls": {"count": 1, "create": 1, "compact": 0}}
+{"time": "2026-09-30T19:49:05.176198+00:00", "event": "response_received", "stage": "step_272k", "response_id": "resp_0c744804c39994ec016abd67b08f3087d0a91aa3d120c0d883", "seconds": 1.323, "status": "completed", "usage": {"input_tokens": 133, "input_tokens_details": {"cache_write_tokens": 0, "cached_tokens": 0}, "output_tokens": 17, "output_tokens_details": {"reasoning_tokens": 0}, "total_tokens": 150}, "output_types": ["function_call"], "message_phases": [], "answer": "", "request_sha256": "d0e568fe6e62d1dc93e8eb49998bc168495f9e77dbf6a0039197a67533079635"}
+{"time": "2026-09-30T19:49:05.177265+00:00", "event": "response_accounted", "stage": "step_272k"}
+{"time": "2026-09-30T19:49:05.185635+00:00", "event": "request_started", "stage": "step_272k", "kind": "count", "calls": {"count": 2, "create": 1, "compact": 0}}
+{"time": "2026-09-30T19:49:07.083787+00:00", "event": "input_count", "stage": "step_272k", "tokens": 285204, "seconds": 1.898}
+{"time": "2026-09-30T19:49:07.089905+00:00", "event": "request_started", "stage": "step_272k", "kind": "compact", "calls": {"count": 2, "create": 1, "compact": 1}}
+{"time": "2026-09-30T19:49:10.098353+00:00", "event": "failed", "error_class": "RateLimitError", "kind": "transient_service", "status_code": 429}

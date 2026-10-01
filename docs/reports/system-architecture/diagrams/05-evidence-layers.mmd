@@ -1,0 +1,24 @@
+flowchart TB
+    J[JD 任務甲<br/>整理出席紀錄與統計]
+    U[工作理解<br/>課程執行資料管理]
+    S1[工作情境甲<br/>出席紀錄彙整]
+    S2[工作情境乙<br/>季報統計]
+    S3[工作情境丙<br/>漏簽資料補登]
+    I1[訪談對話 1<br/>每個上課日整理簽到表]
+    I2[訪談對話 2<br/>每季統計交主管]
+    I3[訪談對話 3<br/>我會核對補簽申請]
+    I4[訪談對話 4<br/>最近增加了主管複核]
+    J -->|引用工作理解| U
+    J -->|按需引用其他情境| S3
+    J -->|按需引用其他對話| I4
+    U -->|既有來源| S1
+    U -->|既有來源| S2
+    S1 -->|既有來源| I1
+    S2 -->|既有來源| I2
+    S3 -->|既有來源| I3
+    classDef source fill:#f1f5f9,stroke:#475569,color:#0f172a;
+    classDef memory fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e;
+    classDef product fill:#dcfce7,stroke:#15803d,color:#14532d;
+    class I1,I2,I3,I4 source;
+    class U,S1,S2,S3 memory;
+    class J product;

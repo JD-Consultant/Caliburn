@@ -1,0 +1,12 @@
+flowchart LR
+    U[員工描述實際工作] --> A[顧問釐清條件與責任]
+    A --> J[逐步編輯有依據的 JD]
+    J --> F[員工補充或修正]
+    F --> A
+    J --> P[正式保存與 PDF 交付]
+    classDef person fill:#f1f5f9,stroke:#475569,color:#0f172a;
+    classDef analysis fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e;
+    classDef product fill:#dcfce7,stroke:#15803d,color:#14532d;
+    class U,F person;
+    class A analysis;
+    class J,P product;

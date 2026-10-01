@@ -1,0 +1,6 @@
+{"time": "2026-09-30T18:08:28.153953+00:00", "event": "started", "model": "gpt-6-luna", "data": "synthetic-constants-only"}
+{"time": "2026-09-30T18:08:28.264527+00:00", "event": "request_started", "stage": "initial", "kind": "count"}
+{"time": "2026-09-30T18:08:29.370964+00:00", "event": "input_count", "stage": "initial", "tokens": 132, "seconds": 1.106}
+{"time": "2026-09-30T18:08:29.371176+00:00", "event": "request_started", "stage": "initial", "kind": "create", "request_sha256": "018d58439ef29cbefdb39214f23ddbf2e0e88dabd488cb2fb041207c9082ba28"}
+{"time": "2026-09-30T18:08:31.727427+00:00", "event": "response_received", "stage": "initial", "response_id": "resp_00d25144ef4b4a28016abd501e056887d0a3af19455d6c9fc0", "seconds": 2.356, "model": "gpt-6-luna", "output_types": ["function_call"], "message_phases": [], "encrypted_reasoning_present": false, "original_round_trip_equal": true, "usage": {"input_tokens": 132, "input_tokens_details": {"cache_write_tokens": 0, "cached_tokens": 0}, "output_tokens": 17, "output_tokens_details": {"reasoning_tokens": 0}, "total_tokens": 149}, "answer": "", "route": "execute_tools"}
+{"time": "2026-09-30T18:08:31.728276+00:00", "event": "failed", "error_class": "ValueError"}

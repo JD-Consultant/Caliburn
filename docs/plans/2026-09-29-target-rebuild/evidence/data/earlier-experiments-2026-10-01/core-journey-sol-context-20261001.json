@@ -1,0 +1,293 @@
+{
+  "b4867a63-78ce-4821-a3b5-12c4bf7f356f": {
+    "role": "job_consultant",
+    "app_keys": [
+      "data_kind",
+      "work_situation_map",
+      "work_understanding_map",
+      "historical_interview",
+      "interview_read_boundary"
+    ],
+    "interview_sequences": [
+      1
+    ],
+    "boundary": {
+      "covered_through_sequence": 0,
+      "through_sequence": 1,
+      "context_sequences": []
+    },
+    "map_sizes": {
+      "work_situation_map": 0,
+      "work_understanding_map": 0
+    },
+    "changes_count": 0,
+    "app_data_sha256": "262b466670b3a381efdfe609b51d3206c75075f34334cfb1f67bae83452f2226"
+  },
+  "ac78bbc6-afc0-4515-8e50-3c2a009b7718": {
+    "role": "job_consultant",
+    "app_keys": [
+      "data_kind",
+      "work_situation_map",
+      "work_understanding_map",
+      "historical_interview",
+      "interview_read_boundary"
+    ],
+    "interview_sequences": [
+      1,
+      2,
+      3
+    ],
+    "boundary": {
+      "covered_through_sequence": 0,
+      "through_sequence": 3,
+      "context_sequences": []
+    },
+    "map_sizes": {
+      "work_situation_map": 0,
+      "work_understanding_map": 0
+    },
+    "changes_count": 0,
+    "app_data_sha256": "ea5289b2557a1838594d45493e8247a6b9e8a664f1166fec2604c823c97fc6df"
+  },
+  "3450e704-3cb5-4b38-8d10-c2aae7156416:c260f8a4-cecd-4b44-9e4d-f4ed01c29371:work_situation_analyst:completed_work:stage:d253b599-861f-4435-a8ae-cd5c1da7efeb:35e483eb-0e4f-449e-ad66-168d04c0978d": {
+    "role": "work_situation_analyst",
+    "app_keys": [
+      "data_kind",
+      "notice",
+      "work_situation_map",
+      "required_interview_range",
+      "historical_interview"
+    ],
+    "interview_sequences": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "boundary": {
+      "start_sequence": 1,
+      "end_sequence": 4
+    },
+    "map_sizes": {
+      "work_situation_map": 0
+    },
+    "changes_count": 0,
+    "app_data_sha256": "f01e6ff177493ded4adc813fa5221c2ccfdc959a514dda7db764a9bcf1e573b5"
+  },
+  "d497bc36-d9d3-460a-9153-d0db081c69a4": {
+    "role": "job_consultant",
+    "app_keys": [
+      "data_kind",
+      "work_situation_map",
+      "work_understanding_map",
+      "historical_interview",
+      "interview_read_boundary"
+    ],
+    "interview_sequences": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "boundary": {
+      "covered_through_sequence": 0,
+      "through_sequence": 5,
+      "context_sequences": []
+    },
+    "map_sizes": {
+      "work_situation_map": 0,
+      "work_understanding_map": 0
+    },
+    "changes_count": 0,
+    "app_data_sha256": "1fc1424e4984e12552c8f744e65f385b5a128bb3c2865559a4762dd9b8a9981e"
+  },
+  "3450e704-3cb5-4b38-8d10-c2aae7156416:c260f8a4-cecd-4b44-9e4d-f4ed01c29371:work_understanding_analyst:completed_work:stage:d253b599-861f-4435-a8ae-cd5c1da7efeb:8773ee76-25ae-42ed-9414-a49b7f406f69": {
+    "role": "work_understanding_analyst",
+    "app_keys": [
+      "data_kind",
+      "notice",
+      "work_situation_map",
+      "work_understanding_map",
+      "work_situation_changes"
+    ],
+    "interview_sequences": [],
+    "boundary": null,
+    "map_sizes": {
+      "work_situation_map": 5,
+      "work_understanding_map": 0
+    },
+    "changes_count": 5,
+    "app_data_sha256": "bf5090bbe11826233a0c01bdd10cba15f37ea98b1db2eec4195499e73066018c"
+  },
+  "cb7b9795-40a2-40d3-b629-dfb917262db7": {
+    "role": "job_consultant",
+    "app_keys": [
+      "data_kind",
+      "work_situation_map",
+      "work_understanding_map",
+      "historical_interview",
+      "interview_read_boundary"
+    ],
+    "interview_sequences": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "boundary": {
+      "covered_through_sequence": 0,
+      "through_sequence": 7,
+      "context_sequences": []
+    },
+    "map_sizes": {
+      "work_situation_map": 0,
+      "work_understanding_map": 0
+    },
+    "changes_count": 0,
+    "app_data_sha256": "e95a899d0ea151fd499a65d08d7f0afaebe8e14ed5afeb7f96e935e87176d422"
+  },
+  "3450e704-3cb5-4b38-8d10-c2aae7156416:321b519d-691f-4dda-8335-5d91704194cc:work_situation_analyst:completed_work:stage:72b23aeb-8f35-4891-b251-973730a41c16:c1c40f6e-45be-4025-9a40-8040276a2969": {
+    "role": "work_situation_analyst",
+    "app_keys": [
+      "data_kind",
+      "notice",
+      "work_situation_map",
+      "required_interview_range",
+      "historical_interview"
+    ],
+    "interview_sequences": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "boundary": {
+      "start_sequence": 5,
+      "end_sequence": 8
+    },
+    "map_sizes": {
+      "work_situation_map": 5
+    },
+    "changes_count": 0,
+    "app_data_sha256": "82f4db241a714d0fcb20601b2fb5a632b1b375605dde94dd692c8df2b943eb87"
+  },
+  "f82748e0-6f4d-4307-8d43-84f803fe8acb": {
+    "role": "job_consultant",
+    "app_keys": [
+      "data_kind",
+      "work_situation_map",
+      "work_understanding_map",
+      "historical_interview",
+      "interview_read_boundary"
+    ],
+    "interview_sequences": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "boundary": {
+      "covered_through_sequence": 4,
+      "through_sequence": 9,
+      "context_sequences": []
+    },
+    "map_sizes": {
+      "work_situation_map": 5,
+      "work_understanding_map": 3
+    },
+    "changes_count": 0,
+    "app_data_sha256": "c51f50753c5a946a2ec4a888fa83ef1377d042e2c6d11a9f8290f480c8f2d793"
+  },
+  "3450e704-3cb5-4b38-8d10-c2aae7156416:321b519d-691f-4dda-8335-5d91704194cc:work_understanding_analyst:completed_work:stage:72b23aeb-8f35-4891-b251-973730a41c16:5a36b49f-72db-4f3b-82eb-9de5dd3171f3": {
+    "role": "work_understanding_analyst",
+    "app_keys": [
+      "data_kind",
+      "notice",
+      "work_situation_map",
+      "work_understanding_map",
+      "work_situation_changes"
+    ],
+    "interview_sequences": [],
+    "boundary": null,
+    "map_sizes": {
+      "work_situation_map": 5,
+      "work_understanding_map": 3
+    },
+    "changes_count": 5,
+    "app_data_sha256": "77a703101a29d5bf036e6ea83c92ca7ef08cf04e8e3b021689719986669efb1d"
+  },
+  "55456d5c-2854-43a3-9969-c849a07c1119": {
+    "role": "job_consultant",
+    "app_keys": [
+      "data_kind",
+      "work_situation_map",
+      "work_understanding_map",
+      "historical_interview",
+      "interview_read_boundary"
+    ],
+    "interview_sequences": [
+      9,
+      10,
+      11
+    ],
+    "boundary": {
+      "covered_through_sequence": 8,
+      "through_sequence": 11,
+      "context_sequences": []
+    },
+    "map_sizes": {
+      "work_situation_map": 5,
+      "work_understanding_map": 3
+    },
+    "changes_count": 0,
+    "app_data_sha256": "d63e1b1afc39360129e8ca2ba544216a5c23877ee340b346ab7156dcde049662"
+  },
+  "3450e704-3cb5-4b38-8d10-c2aae7156416:cb2220cb-4cb7-48ec-ac96-5157a331bc06:work_situation_analyst:completed_work:stage:f56dd161-3075-4400-b76d-55886e900f56:4d9ae1ab-6642-4a28-8c05-cc2a29cae694": {
+    "role": "work_situation_analyst",
+    "app_keys": [
+      "data_kind",
+      "notice",
+      "work_situation_map",
+      "required_interview_range",
+      "historical_interview"
+    ],
+    "interview_sequences": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "boundary": {
+      "start_sequence": 9,
+      "end_sequence": 12
+    },
+    "map_sizes": {
+      "work_situation_map": 5
+    },
+    "changes_count": 0,
+    "app_data_sha256": "ead6204b781a612a87dd179eba45a124637321927461dd377331894b25343135"
+  },
+  "3450e704-3cb5-4b38-8d10-c2aae7156416:cb2220cb-4cb7-48ec-ac96-5157a331bc06:work_understanding_analyst:completed_work:stage:f56dd161-3075-4400-b76d-55886e900f56:3e926329-6584-4f4b-9d6f-6df13449fce3": {
+    "role": "work_understanding_analyst",
+    "app_keys": [
+      "data_kind",
+      "notice",
+      "work_situation_map",
+      "work_understanding_map",
+      "work_situation_changes"
+    ],
+    "interview_sequences": [],
+    "boundary": null,
+    "map_sizes": {
+      "work_situation_map": 5,
+      "work_understanding_map": 3
+    },
+    "changes_count": 4,
+    "app_data_sha256": "5b52008583841e5ef50dac0698ff74526ee865bb930997d3355c7b654339dab2"
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "schema": "recheck_luna_20261001_7dce0494",
+  "fixture": true,
+  "run_started": true,
+  "input": "盤點次數我前面更正過。我剛剛又自己在 JD 加了核准補貨，但實際還是由倉庫主管核准，我只核對並回報庫存差異。請幫我檢查修正這項工作。",
+  "job_file_id": "4ea25807-4f55-4bdc-8dcc-52f937a9f1bc",
+  "setup": {
+    "old_snapshot": "deda967c-cf92-4d17-bf0c-4a933c27920a",
+    "new_snapshot": "c4033e04-3839-4d46-8afc-d5dc957d3ea3",
+    "task_id": "7b268c12-6ac6-42a6-8ac5-198d82a371d4",
+    "situation_id": "b6d5610c-1357-4923-8f08-c7d1110eddc8",
+    "understanding_id": "429ef4c6-e47b-4b2f-8db2-42fb343a1817",
+    "source_ids": [
+      "389ec524-dc21-4389-b7ae-32c8d3df31d4",
+      "e090bbbe-1d75-4ee2-aeb9-ca32af2c6ee0"
+    ]
+  },
+  "before": {
+    "work": {
+      "revision_id": "fc204c47-3e00-4c7c-a3df-59509e953de2",
+      "areas": [],
+      "tasks": [
+        {
+          "task_id": "7b268c12-6ac6-42a6-8ac5-198d82a371d4",
+          "area_id": null,
+          "title": "庫存盤點",
+          "description": "每月核對庫存帳與實物，將差異清單交倉庫主管，並核准補貨。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "fc204c47-3e00-4c7c-a3df-59509e953de2",
+      "references": [
+        {
+          "citation_id": "69791929-b372-4e55-9677-b69bf0a0c6be",
+          "target_label": "任務：庫存盤點",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "7b268c12-6ac6-42a6-8ac5-198d82a371d4",
+            "task_id": null
+          },
+          "source_kind": "work_understanding",
+          "source_label": "庫存核對與差異回報",
+          "needs_recheck": true
+        }
+      ]
+    },
+    "interviews": {
+      "messages": [
+        {
+          "source_id": "6a462f36-0509-417e-8e07-ed506d1dcfd8",
+          "interview_sequence": 1,
+          "speaker": "app",
+          "interview_text": "這裡會透過訪談，逐步理解您的實際工作並整理職務說明書。您不需要先學會撰寫，也不必一次說完；不確定的地方可以直接說明。\n\n請先說說您目前主要負責哪些工作？可以用自己的說法，從平常大家會找您處理的事情開始。",
+          "execution_id": null
+        },
+        {
+          "source_id": "389ec524-dc21-4389-b7ae-32c8d3df31d4",
+          "interview_sequence": 2,
+          "speaker": "employee",
+          "interview_text": "我每月核對庫存帳與實物，將差異清單交給倉庫主管；補貨由主管核准，我只負責核對和回報。",
+          "execution_id": null
+        },
+        {
+          "source_id": "dca360b3-30dd-48ce-a877-9e8ea6c792c3",
+          "interview_sequence": 3,
+          "speaker": "consultant",
+          "interview_text": "已記錄，若有補充或更正請繼續說明。",
+          "execution_id": "37ad4fa0-230a-42da-b261-dda2fd0d8f31"
+        },
+        {
+          "source_id": "e090bbbe-1d75-4ee2-aeb9-ca32af2c6ee0",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "更正，現在盤點已改為每季一次，不是每月。核對帳物、差異回報倉庫主管以及補貨由主管核准，這些都沒變。",
+          "execution_id": null
+        },
+        {
+          "source_id": "69288328-68dd-4d3b-b237-8a7a5e27d8e1",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "已記錄，若有補充或更正請繼續說明。",
+          "execution_id": "a77f98ea-a4ec-414c-ba51-d44738163dce"
+        }
+      ]
+    }
+  },
+  "execution_id": "40f6bf9f-402d-4b26-8c1f-37a14a87690f",
+  "status": {
+    "job_file_id": "4ea25807-4f55-4bdc-8dcc-52f937a9f1bc",
+    "execution_id": "40f6bf9f-402d-4b26-8c1f-37a14a87690f",
+    "status": "failed",
+    "pause_requested": false,
+    "input_text": "盤點次數我前面更正過。我剛剛又自己在 JD 加了核准補貨，但實際還是由倉庫主管核准，我只核對並回報庫存差異。請幫我檢查修正這項工作。",
+    "commentary": [],
+    "candidate": null,
+    "allowed_controls": []
+  },
+  "elapsed_seconds": 3.39,
+  "executions": [
+    [
+      "memory_batch",
+      "completed",
+      2
+    ],
+    [
+      "consultant_turn",
+      "completed",
+      2
+    ],
+    [
+      "consultant_turn",
+      "failed",
+      1
+    ]
+  ],
+  "after": {
+    "work": {
+      "revision_id": "fc204c47-3e00-4c7c-a3df-59509e953de2",
+      "areas": [],
+      "tasks": [
+        {
+          "task_id": "7b268c12-6ac6-42a6-8ac5-198d82a371d4",
+          "area_id": null,
+          "title": "庫存盤點",
+          "description": "每月核對庫存帳與實物，將差異清單交倉庫主管，並核准補貨。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "fc204c47-3e00-4c7c-a3df-59509e953de2",
+      "references": [
+        {
+          "citation_id": "69791929-b372-4e55-9677-b69bf0a0c6be",
+          "target_label": "任務：庫存盤點",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "7b268c12-6ac6-42a6-8ac5-198d82a371d4",
+            "task_id": null
+          },
+          "source_kind": "work_understanding",
+          "source_label": "庫存核對與差異回報",
+          "needs_recheck": true
+        }
+      ]
+    },
+    "interviews": {
+      "messages": [
+        {
+          "source_id": "6a462f36-0509-417e-8e07-ed506d1dcfd8",
+          "interview_sequence": 1,
+          "speaker": "app",
+          "interview_text": "這裡會透過訪談，逐步理解您的實際工作並整理職務說明書。您不需要先學會撰寫，也不必一次說完；不確定的地方可以直接說明。\n\n請先說說您目前主要負責哪些工作？可以用自己的說法，從平常大家會找您處理的事情開始。",
+          "execution_id": null
+        },
+        {
+          "source_id": "389ec524-dc21-4389-b7ae-32c8d3df31d4",
+          "interview_sequence": 2,
+          "speaker": "employee",
+          "interview_text": "我每月核對庫存帳與實物，將差異清單交給倉庫主管；補貨由主管核准，我只負責核對和回報。",
+          "execution_id": null
+        },
+        {
+          "source_id": "dca360b3-30dd-48ce-a877-9e8ea6c792c3",
+          "interview_sequence": 3,
+          "speaker": "consultant",
+          "interview_text": "已記錄，若有補充或更正請繼續說明。",
+          "execution_id": "37ad4fa0-230a-42da-b261-dda2fd0d8f31"
+        },
+        {
+          "source_id": "e090bbbe-1d75-4ee2-aeb9-ca32af2c6ee0",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "更正，現在盤點已改為每季一次，不是每月。核對帳物、差異回報倉庫主管以及補貨由主管核准，這些都沒變。",
+          "execution_id": null
+        },
+        {
+          "source_id": "69288328-68dd-4d3b-b237-8a7a5e27d8e1",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "已記錄，若有補充或更正請繼續說明。",
+          "execution_id": "a77f98ea-a4ec-414c-ba51-d44738163dce"
+        }
+      ]
+    }
+  }
+}

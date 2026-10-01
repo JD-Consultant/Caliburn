@@ -11,7 +11,7 @@
 | `analysis/b-compaction-analysis.txt` | `tools/analyze_b_compaction.py` 對該職務檔案的唯讀輸出：各批次的外送嘗試、B1／B2 `prepared_history` 計數與被採用的壓縮及其 usage、壓後請求大小、已發布快照 |
 | `analysis/provider-failures.txt` | 後端對三次被擋請求保存的安全診斷（白名單欄位：failure 類別、HTTP status、provider code、本地請求身分），沒有請求或回應內容 |
 | `tools/` | 探針專用啟動器（把 B1／B2 的輪前門檻在該程序內調為 3,000；產品程式不變）、啟停腳本、分析腳本；執行前固定的 SHA-256 見 T16 §12 結果 |
-| `SHA256SUMS.txt` | 本包所有檔案的雜湊（LF 換行） |
+| `SHA256SUMS.txt` | 除本 README 外所有檔案的雜湊（LF 換行；`.gitattributes` 設為不轉換換行） |
 
 **環境：**新 schema `b_compaction_20261002`（loopback `caliburn_t01_test`）、8105（已停止）；產品預設 `gpt-6-luna`／high、員工模擬 `gpt-6-luna`／low；全合成課程行政人設。產品 ledger 累計 US$0.0161（員工模擬不在內）。
 

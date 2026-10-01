@@ -12,7 +12,7 @@ UI 負責訪談、預覽、人工編輯、來源檢視及下載。後端才決�
 
 目前選型為 React／TypeScript 前端，Python／FastAPI 後端，PostgreSQL 保存產品資料，LangGraph 管理可持久接續的執行。模型以 OpenAI direct Responses SDK 呼叫，產品選擇 Luna／high；這是成本與品質的產品取捨，不是宣稱它對所有任務最佳。PDF 使用受控的 HTML／CSS 與 Chromium 渲染。
 
-## 多 Agent，不等於多個微服務
+## 多個分析角色，不等於多個微服務
 
 A、B1、B2 是不同職責、工具集與 Context 的分析角色，共用執行機制。後端採**模組化單體**：以程式模組劃分責任，尚不為每個角色建立獨立服務、網路 API 或佇列平台。
 
@@ -32,7 +32,7 @@ Context 由 App 組裝與接續，但其中的 reasoning／compaction 資料可�
 
 產品以 loopback 本機存取為前提，並檢查請求來源；職務檔案的隔離、A 活躍時的人工寫入限制與 B1／B2 工具權限，仍必須由後端落實。單靠 UI 隱藏按鈕或 Prompt 說「不要越權」不足以建立隔離。
 
-本報告不把這套本機權限模型宣稱為多租戶 SaaS 安全設計。正式根入口及舊架構退役在報告基準仍屬交付 gate，不能因新程式已在 `apps/` 就宣稱正式切換完成。
+本報告不把這套本機權限模型宣稱為多租戶 SaaS 安全設計。根入口已依 [ADR0079](../../adr/0079-target-rebuild-production-cutover.md)切換到本架構，舊產品程式已退役；這是本機產品切換，不是對外部署或多人服務的安全驗證。
 
 ### 追到實作
 

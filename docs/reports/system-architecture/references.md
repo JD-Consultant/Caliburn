@@ -45,7 +45,7 @@
 
 本報告沒有為了新穎而重新選框架，也沒有把單一廠商作法稱為全業界唯一共識。精確依賴版本與鎖檔沿[技術決策](../../implementation/technology-decisions.md)及 repo 的 lock files；示意圖不取代相容性測試。
 
-## 內部權威與證據路由
+## 設計文件與驗證來源
 
 | 要追的問題 | 原責任文件 |
 | --- | --- |
@@ -54,7 +54,7 @@
 | 工具與模型參數設計 | [共用工具規範](../../specs/2026-09-27-agent-tool-contract-design-research.md)、[Memory 工具](../../implementation/memory-tools.md)、[JD 工具契約](../../specs/2026-09-29-jd-model-tool-contract-review.md) |
 | Context、執行與恢復 | [共用執行實作](../../implementation/agent-execution.md)、[資料保存](../../architecture/persistence.md) |
 | 代碼維護與測試方式 | [程式組織](../../implementation/code-organization.md)、[撰寫規範](../../implementation/coding-standard.md)、[SDD／TDD](../../implementation/development-standard.md) |
-| 完成與尚未完成 | [任務表](../../plans/2026-09-29-target-rebuild/tasks.md)、[交接與品質缺口](../../plans/2026-09-29-target-rebuild/evidence/2026-09-30-pause-handoff.md) |
+| 完成範圍與驗證限制 | [任務表](../../plans/2026-09-29-target-rebuild/tasks.md)、[V01–V28 驗證對照](../../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)、[實驗發現彙整](../experiment-findings.md) |
 
 ## 如何維護這份閱讀版
 
@@ -68,8 +68,14 @@
 
 2026-10-01 初版完成八張圖的 Mermaid 渲染與逐張目視檢查，並檢查本地連結、程式碼區塊、圖稿配對及差異格式。初版只看過 HTML 內嵌渲染，沒有驗證獨立 SVG 解析；使用者回報後，重現第 2、3、5、6、7、8 圖因未閉合的 HTML 換行標籤而解析失敗。後續改用 XML 序列化，檢查獨立 SVG 解析及圖片載入，另輸出 PNG 供正文使用，不改圖的架構意義。
 
-另做獨立唯讀事實審查，對照 Context、Memory、JD、完成交易與任務證據；審查指出 Memory 再准入已實作，故修正原稿沿用舊交接而寫成「接線缺口」的兩處描述，保留其政策未核對及真長旅程未驗的限制。
+2026-10-02 以 `83979421` 的程式與既有證據更新本報告、工程架構導覽與產品介紹：同步正式入口切換、45 輪長旅程及 T01–T18 結案狀態，保留品質、壓縮、恢復與跨平台驗證限制。Memory 重新准入已有實作，但三輪等待政策尚未確認，不混同為缺少全部接線。
 
-Owner 後續明確確認「B2 不回交 B1」，第五章與圖六已改為 B1 → B2 → 發布。唯讀核對時，報告基準、`target-rebuild` 及 `target-cutover-candidate` 的 [memory_batch.py](../../../apps/api/src/caliburn/workflows/memory_batch.py) 仍保留 `SituationRework`／`needs_situation` 回交分支，相關工程文件亦有舊描述。這是交接給產品維護者的待對齊差異；本次只修教授版，不更動其他開發工作區，也不宣稱程式已移除該分支。往後更新報告基準時須再核對並移除此過渡註記。
+**B2 不回交 B1 是已確認設計，不是本次提出的候選方案。**第五章與圖六因此採 B1 → B2 → 發布。靜態核對發現實作尚未完全符合：
 
-這次只新增閱讀版報告與圖稿，沒有修改產品、舊責任文件或開發者工作區；也沒有重新執行產品測試、存取 Demo 資料庫或呼叫付費模型。第五、七章的測試結果引用既有紀錄，不是本次新增驗收。
+- [B2 指引](../../../apps/api/src/caliburn/agents/work_understanding_analyst/instructions.py)仍提供 `needs_situation` 結果；[B2 執行器](../../../apps/api/src/caliburn/agents/work_understanding_analyst/runner.py)會載入該指引。
+- [Memory 流程](../../../apps/api/src/caliburn/workflows/memory_batch.py)接受 `SituationRework`，預設最多回交兩次；[階段切換](../../../apps/api/src/caliburn/features/work_memory/candidate_lifecycle.py)可由理解階段切回情境階段。
+- [產品啟動接線](../../../apps/api/src/caliburn/bootstrap.py)將上述流程交給背景執行服務，未關閉回交能力。因此不是只找到未使用的註解；但本次沒有新增執行實驗，也不據此斷言既有長旅程曾實際觸發回交。
+
+這是需修正的實作差異，不重新打開單向流程決策，也不以文件更新冒充已修程式。本次只更新文件，沒有修改產品程式、重跑產品測試、存取 Demo 資料庫或呼叫付費模型。第五、七章的測試結果引用既有紀錄；後續移除回交分支並驗證後，再同步移除此限制。
+
+文件驗證涵蓋本次更新的 17 份報告、架構與入口文件，本機連結與章節定位檢查通過；另在決策及背景生命週期入口補上有效流程註記。八組 Mermaid／SVG／PNG 檔案配對完整，SVG 可作 XML 解析；圖稿原始內容未改，另目視確認圖六仍清楚呈現單向流程。本次未重新渲染整組圖，也未重新核實所有外部網站或全部歷史規格。

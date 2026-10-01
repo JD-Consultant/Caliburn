@@ -45,7 +45,7 @@ quote——不需 LLM 自報信心。
   (②confirmed 直落與 focal-ask 單槽維持)。[0030](0030-ai-coedit-tracked-changes-one-brain.md)
   寫入路徑與 [0031](0031-occupation-suggest-card-refset-source.md) 參考集合不變量**不動**。
 - 實作:[plan 2026-07-13 T5(v2)](../plans/2026-07-13-occupation-card-blindspot.md);
-  載體判準表落 [`docs/design/interview-engine.md`](../design/interview-engine.md)。
+  載體判準表落 [`docs/design/interview-engine.md`](../archive/retired-documents/design/interview-engine.md)。
 
 ## 否決的替代方案
 

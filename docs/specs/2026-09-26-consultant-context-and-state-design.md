@@ -4,7 +4,7 @@
 - 狀態：**目標／WORKING；概念對齊與責任設計，非施工契約。**已確認的產品政策由上位文件維護；PROD-G1-022 已採納 §7.2 的三項目標恢復保證，未實作、未驗收，其餘責任整理、流程推演與實現候選仍供後續核對，不因寫入文件而自動定案。
 - 維護責任：Agent 架構討論；涉及產品效果的取捨由 Product Owner 確認，工程協作者負責研究、反例與文件維護。
 - 範圍：A 職務顧問的模型／工具往返、跨回合接續，以及與受訪者工作記憶、JD、保存責任的交界；另記共通的壓縮能力、訊息信任邊界及框架選擇。**不是整個產品架構已討論完畢**；B1／B2 的工作交界由其生命週期文件維護，不在此重設背景流程、JD Domain、資料庫或審核 Agent。
-- 閱讀路徑：[全產品目標導覽](../target-architecture-map.md) → 本稿 → [原生接續與 State 邊界研究](2026-09-26-reasoning-tool-results-and-state-boundary-research.md)。討論方法依[架構討論規範](../architecture-discussion-standard.md)，正式採納與施工另依[決策流程](../decision-process.md)。
+- 閱讀路徑：[全產品目標導覽](../target-architecture-map.md) → 本稿 → [原生接續與 State 邊界研究](../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md)。討論方法依[架構討論規範](../architecture-discussion-standard.md)，正式採納與施工另依[決策流程](../decision-process.md)。
 - 現況界線：本稿沒有驗證 production 已符合新目標；現行程式／正式權責仍從 [ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)與[目前決策](../current-decisions.md)查找。
 
 ## 1. 要達成的效果與已有決策
@@ -413,7 +413,7 @@ App 綁定職務檔案與本次執行，一致取得最新完整 Memory publicat
 
 ## 7. State 責任與生命週期候選：先找使用方，再決定表示
 
-**019 已選 LangGraph＋OpenAI direct Responses SDK，State 尚未定型。**已核對框架的 State、更新合併、checkpoint／恢復及本機鎖定版本原碼，提出以下實現候選；§7.2 的恢復保證則已由 022 採納為目標，兩者狀態分開，尚未做保存往返或模型驗收。不因範例使用 `MessagesState` 就直接照搬，也不因選直連而重造 graph 引擎。官方能力、版本及比較見[研究 §10](2026-09-26-reasoning-tool-results-and-state-boundary-research.md#10-langgraph-state-保存與恢復的研究結果2026-09-26)。
+**019 已選 LangGraph＋OpenAI direct Responses SDK，State 尚未定型。**已核對框架的 State、更新合併、checkpoint／恢復及本機鎖定版本原碼，提出以下實現候選；§7.2 的恢復保證則已由 022 採納為目標，兩者狀態分開，尚未做保存往返或模型驗收。不因範例使用 `MessagesState` 就直接照搬，也不因選直連而重造 graph 引擎。官方能力、版本及比較見[研究 §10](../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md#10-langgraph-state-保存與恢復的研究結果2026-09-26)。
 
 先用三類**責任問題**檢查，不把它們定成三個元件：
 
@@ -512,7 +512,7 @@ W 可恢復不表示可以跳過原本必要的壓縮。若 W 已不適合下一
 
 **共用接線的後續入口：**[A／B1／B2 共用執行生命週期與 State](2026-09-27-shared-agent-execution-and-state-design.md)把下列交界延伸成共同框架候選、State 責任、完成／取消與首版取捨。本節保留 A 的恢復與暫停推演；共用實現比較不在三個 Agent 各寫一套。兩稿仍為候選，§7.2 的已確認目標保證不受影響。
 
-**2026-09-27 G2／G4 實現候選。**Owner 已補正 026：所有 Step（含 Step 1）已保存的模型回應與工具結果都可在一致核對後接續同輪，不以已有完整 Step 為先決條件；025 暫停、027 壓縮基底及 028 人工編輯限制保留。下列 node／task、保存及暫停控制接法仍是候選，不因恢復目標確認而整包採納。附件只作外部參考；來源與現況證據見[研究 §11](2026-09-26-reasoning-tool-results-and-state-boundary-research.md#11-step-內部恢復與暫停的補核對2026-09-27)。
+**2026-09-27 G2／G4 實現候選。**Owner 已補正 026：所有 Step（含 Step 1）已保存的模型回應與工具結果都可在一致核對後接續同輪，不以已有完整 Step 為先決條件；025 暫停、027 壓縮基底及 028 人工編輯限制保留。下列 node／task、保存及暫停控制接法仍是候選，不因恢復目標確認而整包採納。附件只作外部參考；來源與現況證據見[研究 §11](../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md#11-step-內部恢復與暫停的補核對2026-09-27)。
 
 **三個名詞分開：**內部「恢復紀錄」表示已保存的原回應／工具工作結果；「Step 安全點」表示一次模型／工具迭代已整組一致保存；「Turn 完成點」才表示正式答覆、JD 及訪談資格一致生效。不能僅因存在較新的內部 checkpoint 就宣稱 Step 或 Turn 已完成，也不要求每個內部保存位置都新增 UI 暫停功能。
 
@@ -619,5 +619,5 @@ W 可恢復不表示可以跳過原本必要的壓縮。若 W 已不適合下一
 - **2026-09-27 第 2 類審核與採納狀態：**先前已核對本節官方來源與 §7.2 的逐項連結。官方明文支持 stateless 原生 items、工具配對、完整 compact 視窗及框架重入／保存強度；先保存請求再執行副作用、原操作結果核對與新窗安全採用，現由 022 確認為本案目標保證，不冒稱供應商已替 App 保證。本次僅依 Owner 裁決更新文件狀態，未核新的套件版本、選定實現或執行產品驗收。
 - 官方契約：[OpenAI reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-across-calls)、[conversation state](https://developers.openai.com/api/docs/guides/conversation-state)、[function calling](https://developers.openai.com/api/docs/guides/function-calling)、[compaction](https://developers.openai.com/api/docs/guides/compaction)。這些支持能力與限制，不規定 Caliburn 的 Memory Turn 快照或 State schema。
 - 框架契約：[LangGraph 的 State 設計](https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph#step-3-design-your-state)、[Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)、[Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)。採用方向由 Owner 的 019 確認；文件支持能力與限制，不替 Caliburn 決定 State schema。
-- 跨廠比較、通知／版本反例與外部參考稿審核統一放在[研究文件](2026-09-26-reasoning-tool-results-and-state-boundary-research.md)，本稿不另維護第二套研究結論。
+- 跨廠比較、通知／版本反例與外部參考稿審核統一放在[研究文件](../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md)，本稿不另維護第二套研究結論。
 - 改變本題概念／責任時更新本稿與受影響的圖；改變產品政策先更新相應唯一責任文件與決策路由，圖以連結承接。B1／B2、JD 或保存底層的詳細設計放各自責任文件，只在此更新交界，不把全專案塞進本稿。

@@ -26,7 +26,7 @@
 | verifier 只記 exception class，沒有精確錯誤 | 無法確認最後是哪條驗證失敗 | 記錯誤種類、階段、必要的安全診斷，不只記「分析失敗」 |
 | compaction 後重讀 Skill 被舊一次性限制拒絕 | 有限制與按需重讀需求不相容；不能直接證明它就是最後 verifier 的根因 | 不把成功讀過一次解讀成永遠不需重讀 |
 
-以上是歷史診斷，不恢復舊 JD／Evidence／defer 政策，也不推論新 Q019 已有相同錯誤。原始證據：[08-21 live smoke §§1–3](2026-08-21-virtual-jd-workspace-live-smoke.md)、[08-23 strict/tools/context audit](2026-08-23-luna-structured-tools-and-context-official-audit.md)。工具介面原則另與 [OpenAI function best practices](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions) 核對：清楚描述、減少模型需猜的參數、系統已知的值不交模型填。
+以上是歷史診斷，不恢復舊 JD／Evidence／defer 政策，也不推論新 Q019 已有相同錯誤。原始證據：[08-21 live smoke §§1–3](2026-08-21-virtual-jd-workspace-live-smoke.md)、[08-23 strict/tools/context audit](../research/agent-systems/2026-08-23-luna-structured-tools-and-context-official-audit.md)。工具介面原則另與 [OpenAI function best practices](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions) 核對：清楚描述、減少模型需猜的參數、系統已知的值不交模型填。
 
 新 Q019 也已有一個相關經驗：ToolNode 可把參數驗證失敗轉為 error ToolMessage，而非向外丟 exception。只在最外層 catch 會漏算；先前已修復，不能另寫一套重複處理。[第七切片結果](2026-09-06-analysis-only-agent-live-memory-results.md)
 

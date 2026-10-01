@@ -11,7 +11,7 @@
 
 ## 0. 為什麼另開本文
 
-通用 Memory 的共同設計、治理基線與各家差異能力，已在 [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](2026-08-30-agent-memory-landscape-and-decision-working-research.md) 完成研究。本輪不重新研究各家 Memory，也不討論舊元件保留、替換或刪除。
+通用 Memory 的共同設計、治理基線與各家差異能力，已在 [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md) 完成研究。本輪不重新研究各家 Memory，也不討論舊元件保留、替換或刪除。
 
 正確順序是：
 
@@ -506,7 +506,7 @@ M1～M11 的第二輪成熟能力 mapping 已完成，見 [`2026-08-30-caliburn-
 
 - [`2026-08-28-llm-authored-field-contract-audit.md`](2026-08-28-llm-authored-field-contract-audit.md)：核心 JD 成果、用途邊界、Task／完成標準／K／S 與欄位所有權；
 - [`2026-08-28-claude-codex-whole-consultant-flow-audit.md`](2026-08-28-claude-codex-whole-consultant-flow-audit.md)：durable thread、最小 Context、Tool feedback、working workspace 與人類審核的整體循環；
-- [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](2026-08-30-agent-memory-landscape-and-decision-working-research.md)：通用 Memory 共同基線、治理基線、D1～D7 與各家差異；
+- [`2026-08-30-agent-memory-landscape-and-decision-working-research.md`](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md)：通用 Memory 共同基線、治理基線、D1～D7 與各家差異；
 - [`2026-08-30-caliburn-memory-requirements-mapping-working-research.md`](2026-08-30-caliburn-memory-requirements-mapping-working-research.md)：既有 JD Memory 效果討論；其中以舊元件去留為問題的段落需後續校正，不能作本文前提；
 - [`2026-07-25-professional-job-analysis-consultant-process-final-red-team.md`](2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)、[`2026-07-30-professional-consultant-minimal-complete-loop-research.md`](2026-07-30-professional-consultant-minimal-complete-loop-research.md)、[`2026-08-01-opks-design-decisions-research.md`](2026-08-01-opks-design-decisions-research.md)：只承接經研究的職務分析方法，不承接歷史 runtime／schema。
 
@@ -554,7 +554,7 @@ Owner 再次校正：不得先設計 Memory 資料形狀，也不得把既有工
 
 ### 2026-08-31：後續差異能力與完整方案比較完成，本文能力定義不變
 
-M6 關係表徵、M9 完整盤點、M7 案例／穩定工作界線、完整成熟方案、Memory Prompt／Tool／Context 與最低驗證已集中更新於 [`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9.22～§9.41](2026-08-30-caliburn-memory-requirements-mapping-working-research.md)。框架選擇前的現行結論另見 [`2026-09-01-framework-independent-memory-contract.md`](./2026-09-01-framework-independent-memory-contract.md)；通用供應商事實則留在 [`2026-08-30-agent-memory-landscape-and-decision-working-research.md` §13.14～§13.15](2026-08-30-agent-memory-landscape-and-decision-working-research.md)。
+M6 關係表徵、M9 完整盤點、M7 案例／穩定工作界線、完整成熟方案、Memory Prompt／Tool／Context 與最低驗證已集中更新於 [`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9.22～§9.41](2026-08-30-caliburn-memory-requirements-mapping-working-research.md)。框架選擇前的現行結論另見 [`2026-09-01-framework-independent-memory-contract.md`](./2026-09-01-framework-independent-memory-contract.md)；通用供應商事實則留在 [`2026-08-30-agent-memory-landscape-and-decision-working-research.md` §13.14～§13.15](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md)。
 
 本輪複審沒有改寫 M1～M11：它們仍是與 framework／schema 無關的成果要求。若後續改變「高品質 JD 必須知道什麼」，應先改本文再重做 mapping；若只是換候選框架或資料表徵，不得倒過來改寫本文以迎合工具。
 

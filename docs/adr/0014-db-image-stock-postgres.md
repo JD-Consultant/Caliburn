@@ -1,7 +1,7 @@
 # ADR 0014 — DB image 降回 stock `postgres:16`(移除未使用的 pgvector)
 
 - **狀態**:Accepted（2026-06-30）。
-- 研究依據:[`../specs/2026-06-30-db-image-drop-pgvector-research.md`](../specs/2026-06-30-db-image-drop-pgvector-research.md)。
+- 研究依據:[`../specs/2026-06-30-db-image-drop-pgvector-research.md`](../research/engineering/2026-06-30-db-image-drop-pgvector-research.md)。
 
 ## 脈絡
 

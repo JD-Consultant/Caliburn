@@ -253,7 +253,7 @@ ID：DR-MEM-001
 
 作者在送審前已完成以下機械與一致性檢查；這些不能取代獨立審核：
 
-- 逐份完整回讀 [`滿分 JD 所需 LLM／Memory 能力`](./2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md)、[`各家 Agent Memory landscape`](./2026-08-30-agent-memory-landscape-and-decision-working-research.md)、[`Caliburn Memory requirements mapping`](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 與 [`Framework-independent Memory Contract`](./2026-09-01-framework-independent-memory-contract.md)；
+- 逐份完整回讀 [`滿分 JD 所需 LLM／Memory 能力`](./2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md)、[`各家 Agent Memory landscape`](../research/agent-systems/2026-08-30-agent-memory-landscape-and-decision-working-research.md)、[`Caliburn Memory requirements mapping`](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 與 [`Framework-independent Memory Contract`](./2026-09-01-framework-independent-memory-contract.md)；
 - 逐份完整回讀 [`框架選擇複核`](./2026-09-02-memory-framework-selection-revalidation.md)、[`實作機制與框架共識稽核`](./2026-09-02-memory-implementation-mechanism-and-framework-consensus-audit.md)、[`完整列舉／版本／來源最小切片重驗`](./2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md)、[`版本／並行／重播研究`](./2026-09-02-memory-versioning-concurrency-and-replay-research.md) 與 [`LangMem 既有小實驗`](./2026-08-29-langmem-domain-semantic-memory-spike-experiment.md)；
 - 完整回讀被審設計與本 Review Packet，並核對 Accepted ADR 0060 目前 production authority；
 - 重新開啟 OpenAI Codex Memories與公開 collection cursor API、Anthropic Memory Tool／Managed Memory／List memories、LangGraph Persistence／Stores／Functional API、LangMem Memory API，以及 Google／AWS Memory list 官方資料；

@@ -9,7 +9,7 @@
 
 ## 歷史設計
 
-- [`interview-engine.md`](interview-engine.md) — 已刪訪談 engine，只供決策追溯。
-- [`editor-knowledge-pack.md`](editor-knowledge-pack.md) — 已刪 OCS editor／knowledge seam，只供決策追溯。
+- [`interview-engine.md`](../archive/retired-documents/design/interview-engine.md) — 已刪訪談 engine，只供決策追溯。
+- [`editor-knowledge-pack.md`](../archive/retired-documents/design/editor-knowledge-pack.md) — 已刪 OCS editor／knowledge seam，只供決策追溯。
 
 不要從歷史設計恢復舊 route、hook、store、contract、writer、indexer 或 provider。現行 consultant seam 改變時，同 commit 更新 `consultant-runtime.md` 與對應 app README。

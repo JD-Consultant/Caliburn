@@ -3,7 +3,7 @@
 - **狀態**：Accepted
 - **日期**：2026-08-23
 - **Owner 核准**：owner 於 2026-08-23 核准移除固定兩波 external-data lookup 限制；不得把 2 任意改成另一個未經量測的數字
-- **研究與實測**：[`2026-08-23-luna-structured-tools-and-context-official-audit.md`](../specs/2026-08-23-luna-structured-tools-and-context-official-audit.md)
+- **研究與實測**：[`2026-08-23-luna-structured-tools-and-context-official-audit.md`](../research/agent-systems/2026-08-23-luna-structured-tools-and-context-official-audit.md)
 - **Supersedes**：ADR 0062 決定 8 的固定兩波 lookup、ADR 0065 決定 4 保留的兩波限制，以及 ADR 0067 沿用該限制的 runtime mapping
 - **保留**：依資料需求按需讀取、不要無故重讀、文件 scope／唯讀 root／可編輯 root、11 次 model calls、48 次總 Tool calls、單次 context、總 token、成本、elapsed、retry、workspace validator、Evidence 與員工 authority 邊界
 

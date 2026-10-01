@@ -45,7 +45,7 @@
 
 ### 2.2 必須修正的舊文件
 
-[2026-07-24 storage research](2026-07-24-job-authoring-v2-relational-storage-research.md) 正確保留了
+[2026-07-24 storage research](../archive/retired-documents/specs/2026-07-24-job-authoring-v2-relational-storage-research.md) 正確保留了
 「current rows、無 revision、員工決策後才改 JD」；但它的 bounded module、Task identity 與部分欄位已過時：
 
 - authority 已由 `app.job_authoring` 改為 greenfield `app.job_analysis`；

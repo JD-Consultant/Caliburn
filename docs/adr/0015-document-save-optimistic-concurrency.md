@@ -1,7 +1,7 @@
 # ADR 0015 — 文件存檔採樂觀並發(version 守衛),回合制協作不上 CRDT/OT
 
 - **狀態**:Accepted（2026-06-30）。
-- 研究依據:[`../specs/2026-06-30-web-data-layer-optimization-research.md`](../specs/2026-06-30-web-data-layer-optimization-research.md)(§2)。
+- 研究依據:[`../specs/2026-06-30-web-data-layer-optimization-research.md`](../research/engineering/2026-06-30-web-data-layer-optimization-research.md)(§2)。
 
 ## 脈絡
 

@@ -292,7 +292,7 @@ adapter 分開。
 
 OpenAI 這條 read path 的寫入、四層 artifact、實際文字搜尋、rollout JSONL 深讀、
 成本界線與不可照抄項目，已另以 focused evidence child 完整查證：
-[`2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md`](2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)。
+[`2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md`](../research/agent-systems/2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)。
 該稿補足 A3 的事實基礎，但不自行裁決 A1／A2／A3。
 
 ### 9.4 本節新增直接來源
@@ -305,7 +305,7 @@ OpenAI 這條 read path 的寫入、四層 artifact、實際文字搜尋、rollo
 - [OpenAI Agents SDK — Agent memory：Session、summary、index、rollout progressive disclosure](https://openai.github.io/openai-agents-python/sandbox/memory/)
 - [OpenAI Codex — Memory read path](https://github.com/openai/codex/blob/main/codex-rs/ext/memories/templates/memories/read_path.md)
 - [OpenAI — Responses／Conversations state](https://developers.openai.com/api/reference/cli/resources/responses/methods/create)
-- [OpenAI Codex Memory progressive disclosure 深入查證](2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)
+- [OpenAI Codex Memory progressive disclosure 深入查證](../research/agent-systems/2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)
 
 ## 10. G4.3b-1 Product Owner 裁決：採用 Codex 式責任分層
 
@@ -346,7 +346,7 @@ schema、Tool JSON 或程式碼。
 - [OpenAI — Conversation state：durable conversation](https://developers.openai.com/api/docs/guides/conversation-state)
 - [OpenAI — Compaction：長對話 continuation](https://developers.openai.com/api/docs/guides/compaction)
 - [OpenAI — Codex 本機記憶](https://learn.chatgpt.com/zh-Hant/docs/customization/memories)
-- [OpenAI Conversation／Context／Memory 系統圖](2026-09-05-openai-conversation-context-and-memory-system-map.md)
+- [OpenAI Conversation／Context／Memory 系統圖](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)
 
 ### 10.1 效力與下一個 gate
 

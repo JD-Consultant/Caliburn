@@ -1,13 +1,14 @@
 # Caliburn 模型實驗紀錄
 
 本目錄保存會影響顧問 LLM 架構的**小型實證**：實際測試方法、案例、模型可見的完整輸入、模型最終輸出、
-評分與限制。它不是通用 eval 平台，也不取代 `docs/specs/` 的研究或 `docs/adr/` 的決策。
+評分與限制。它不是通用 eval 平台，也不取代 [research/](../research/README.md) 的研究或 `docs/adr/` 的決策。新目標的逐任務實測沿[計畫證據](../plans/2026-09-29-target-rebuild/evidence/README.md)保存，不為分類再搬一份。
 
 ## 1. 與其他文檔的邊界
 
 | 位置 | 回答的問題 |
 |---|---|
-| `docs/specs/` | 權威資料與理論告訴我們什麼？有哪些設計選項？ |
+| `docs/research/` | 外部資料告訴我們什麼？有哪些設計選項與限制？ |
+| `docs/specs/`／`docs/architecture/` | 本產品的責任、流程與契約是什麼？有效性由決策入口判定 |
 | `docs/experiments/` | 我們實際怎麼測？輸入、輸出與結果是什麼？ |
 | `docs/adr/` | owner 最後採納哪個架構決策？ |
 | `docs/plans/` | 核准後如何實作？ |

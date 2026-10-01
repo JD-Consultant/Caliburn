@@ -435,7 +435,7 @@ Memory 的持續阻塞不建立緊密重試迴圈：短暫故障在原工作預�
 
 現行[checkpoint 接線](../../experiments/jd-relational-app/src/jd_relational/runtime_checkpoints.py)仍有 `MessagesState` 與既有 A／C 接法，不是此目標已施工。現行[業務原結果查詢](../../experiments/jd-relational-app/src/jd_relational/storage/service.py)與[相關測試](../../experiments/jd-relational-app/tests/test_operation_lookup.py)已表達 lookup 不等於舊 writer 停止、原結果與 latest 分離的責任，可作後續取證入口；本輪只讀，未重跑測試，也不把目前正式 JD 收據直接當成目標候選保存已完成。
 
-既有[研究 §10／§11](2026-09-26-reasoning-tool-results-and-state-boundary-research.md#10-langgraph-state-保存與恢復的研究結果2026-09-26)保留較早版本與試例脈絡。本稿不鎖新 SDK 版本；正式試例前核對要採用的穩定版、native items 序列化及 Saver 相容性。
+既有[研究 §10／§11](../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md#10-langgraph-state-保存與恢復的研究結果2026-09-26)保留較早版本與試例脈絡。本稿不鎖新 SDK 版本；正式試例前核對要採用的穩定版、native items 序列化及 Saver 相容性。
 
 ### 8.1 當前官方原生契約：已證實與不能推導
 

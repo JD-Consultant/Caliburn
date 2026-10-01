@@ -1,6 +1,6 @@
 # 完整工作分析與訪談指南
 
-本指南是 JD-R001 的分析方法研究建議。它先回答「顧問需要理解什麼」，再說明如何轉為 [JD 成品](2026-09-09-jd-field-and-writing-guide.md)。**以下資訊面向不是必填 schema、固定問卷或新 Memory 資料層。** 決策狀態見 [入口](2026-09-09-job-analysis-and-jd-content-research.md)，原始依據見 [證據表](2026-09-09-job-analysis-international-evidence.md)。
+本指南是 JD-R001 的分析方法研究建議。它先回答「顧問需要理解什麼」，再說明如何轉為 [JD 成品](2026-09-09-jd-field-and-writing-guide.md)。**以下資訊面向不是必填 schema、固定問卷或新 Memory 資料層。** 決策狀態見 [入口](2026-09-09-job-analysis-and-jd-content-research.md)，原始依據見 [證據表](../research/work-analysis/2026-09-09-job-analysis-international-evidence.md)。
 
 ## 1. 分析的對象是完整工作，不是這一回合的答案
 

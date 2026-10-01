@@ -4,7 +4,7 @@
 - 決策者／最後核對：Product Owner／2026-09-29（在途批次依序發布、後續要求合併上界；同一候選、動態 read、三個安全點及候選關係規則不變）。
 - 範圍：背景整理的分責與可見性、新批次 context／壓縮邊界、同批交流、系統恢復、候選保留與共同發布。本稿較早的「案例」指目標用語「工作情境」，不表示現行 `case_*` 程式已改名。
 - 上游：[產品概念](../product-concept.md)、[架構導覽](2026-09-24-caliburn-layered-architecture-map.md)、[有效決策](../current-decisions.md) `PROD-G2-002／004／005／006／007`。007 是本輪 successor；錯誤分類策略及具體框架接線仍為候選。
-- 詳細研究與現況反例：[Agent 能力／生命週期研究](2026-09-25-agent-capabilities-and-lifecycle-patterns-research.md#b2-資訊缺口交流同一背景工作的接續比較2026-09-25目標語意已確認)。逐物件版本與引用鏈以[分層架構導覽的來源與版本](2026-09-24-caliburn-layered-architecture-map.md#來源與版本)為準，不在此重寫。
+- 詳細研究與現況反例：[Agent 能力／生命週期研究](../research/agent-systems/2026-09-25-agent-capabilities-and-lifecycle-patterns-research.md#b2-資訊缺口交流同一背景工作的接續比較2026-09-25目標語意已確認)。逐物件版本與引用鏈以[分層架構導覽的來源與版本](2026-09-24-caliburn-layered-architecture-map.md#來源與版本)為準，不在此重寫。
 
 ## 必須達成的效果
 

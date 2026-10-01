@@ -15,7 +15,7 @@
 
 先完整回讀 [總覽](2026-09-06-analysis-only-agent-design.md)、[Runtime](2026-09-06-analysis-only-agent-runtime-design.md)、[Memory](2026-09-06-analysis-only-agent-memory-design.md)、[原設計審核](2026-09-06-analysis-only-agent-design-review.md)，並以 [current register](../current-decisions.md) 的 Task4 最新保存點解讀歷史狀態。另回讀 [應用接線](2026-09-06-analysis-only-agent-application-wiring-design.md)、[背景通知／結果接線](2026-09-06-memory-consolidation-request-wiring-design.md)，不把「當時未實作」當成現在未實作。
 
-機制依據：已完整回讀 [OpenAI 系統圖](2026-09-05-openai-conversation-context-and-memory-system-map.md)、[Context／預算核對](2026-09-06-context-window-retention-and-budget-wiring-review.md)、[摘要引用 producer→consumer 研究](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)。獨立 reviewer 另核对[詳記更正 source review](2026-09-06-openai-rollout-summary-correction-source-review.md)及其接法。未讀 Owner 排除的舊產品流程長稿；新網路查核只補原生 reasoning／compaction 的契約疑點。
+機制依據：已完整回讀 [OpenAI 系統圖](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、[Context／預算核對](2026-09-06-context-window-retention-and-budget-wiring-review.md)、[摘要引用 producer→consumer 研究](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)。獨立 reviewer 另核对[詳記更正 source review](../research/agent-systems/2026-09-06-openai-rollout-summary-correction-source-review.md)及其接法。未讀 Owner 排除的舊產品流程長稿；新網路查核只補原生 reasoning／compaction 的契約疑點。
 
 ## 2. 實際 Context，不是概念示意
 

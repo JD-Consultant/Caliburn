@@ -7,7 +7,7 @@
 
 Owner 問：「讀 Memory 覺得不夠清楚，怎麼知道哪份摘要相關？怎麼一路挖到原文？」
 
-[09-04 progressive-disclosure 研究 §4](2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)已研究讀取順序；本輪補齊**寫入時如何建立路由、讀取時誰判斷相關性、誰提供真實地址、框架實際回傳什麼**。不重選 A／B／C，不讀已排除的舊產品長稿。
+[09-04 progressive-disclosure 研究 §4](../research/agent-systems/2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md)已研究讀取順序；本輪補齊**寫入時如何建立路由、讀取時誰判斷相關性、誰提供真實地址、框架實際回傳什麼**。不重選 A／B／C，不讀已排除的舊產品長稿。
 
 **結論：**不是模型憑空猜摘要名稱，也不是搜尋工具自動理解全部關係。Codex 在生成 Memory 時就建立可搜尋的主題線索與摘要引用；模型日後先搜尋命中，再沿已提供的引用讀取。**語意相關性由模型判斷；實際來源位置由 Runtime 提供；搜尋／讀取由工具執行。** 選錯主題或漏查仍可能發生。
 
@@ -51,7 +51,7 @@ Codex 的 `MEMORY.md` 不只是無結構長摘要。其 prompt 規定：
 
 Owner 本輪問的是 **rollout summary／訪談詳記本身**，不是 `MEMORY.md`：同一案例在後續訪談被更正，是否會保存兩份不同說法，以及舊詳記如何處理。
 
-**後續深入核對已完成：**見獨立[Q019-MEM-SUMMARY-01 詳記更正 source review](2026-09-06-openai-rollout-summary-correction-source-review.md)。同 thread 重抽替換 Stage1、跨 rollout 整併與可選詳記清理、live update／讀取邊界已分開核實；不代表全部舊詳記自動同步更正。以下保留首次辨識問題的沿革，最新證據與唯一 next gate 以該子稿為準。
+**後續深入核對已完成：**見獨立[Q019-MEM-SUMMARY-01 詳記更正 source review](../research/agent-systems/2026-09-06-openai-rollout-summary-correction-source-review.md)。同 thread 重抽替換 Stage1、跨 rollout 整併與可選詳記清理、live update／讀取邊界已分開核實；不代表全部舊詳記自動同步更正。以下保留首次辨識問題的沿革，最新證據與唯一 next gate 以該子稿為準。
 
 - **Official source fact（本輪重新取得上述固定 SHA，非宣称最新 main）**：[`storage.rs`](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/src/storage.rs) 的 `sync_rollout_summaries_from_memories` 從選定 Stage1Output 同步詳記；`write_rollout_summary_for_thread` 用檔案寫入更新生成內容，`prune_rollout_summaries` 清理不在保留集合的 `.md`。因此詳記不是永久 append-only 的官方保證。這不證明按案例跨所有 rollout 自動修正，也不證明任何後續訊息都立即觸發重抽。
 - **Official prompt fact（同一固定 SHA，本輪完整重讀）**：[`stage_one_system.md`](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/templates/memories/stage_one_system.md) 禁止改寫的是 raw rollout；對 summary 則要求保留使用者更正、結論形成脈絡與已確認／推論／未定的區別。這是抽取模型的內容指示，不是 Runtime 自動判定矛盾正解。

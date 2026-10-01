@@ -289,7 +289,7 @@ App 在新 Turn 開始時只追加一次這份本輪資料；後續 Step 沿有�
 
 參考稿中的 Prompt、State 欄位與資料結構是理解用途的例子，不是核准的契約；本輪不因此新增元件、固定資料表或改動 Agent／Memory 分工。
 
-**2026-09-26 研究入口：**[原生接續與 State 邊界比較](specs/2026-09-26-reasoning-tool-results-and-state-boundary-research.md)區分模型分析延續、工具觀察、App 狀態與額外工作筆記。它是候選比較，不代表已決定取消或新增 Working State；先確認額外資料由誰使用，再討論欄位與生命週期。
+**2026-09-26 研究入口：**[原生接續與 State 邊界比較](research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md)區分模型分析延續、工具觀察、App 狀態與額外工作筆記。它是候選比較，不代表已決定取消或新增 Working State；先確認額外資料由誰使用，再討論欄位與生命週期。
 
 **本題架構入口：**[職務顧問的上下文與分析延續](specs/2026-09-26-consultant-context-and-state-design.md)集中說明名詞、資料責任、正常／異常流程與未決設計；本頁繼續維護已確認的產品政策，研究稿提供依據。設計稿不是 production 已完成或參考方案已獲採用的宣告。
 
@@ -343,7 +343,7 @@ App 在新 Turn 開始時只追加一次這份本輪資料；後續 Step 沿有�
 - **`all_turns` 需要可取得的相容 reasoning。**不能只設旗標卻丟掉先前 items；App 自行提供的接續內容須讓 API 取得所需的原生 reasoning 與對應互動。本輪工具呼叫與結果保持配對，不改寫成模型自行推測的結果。跨 Turn 接續不把舊 reasoning 升格成事實；新原話、更正及已選定的正式 Memory 仍按各自權責核對。這不表示歷次原始 reasoning 必須無限累加，也不保證壓縮無損。
 - **完整歷史接續，合法壓縮不改業務資料。**未壓縮時按原順序承接；輪前與 272K 中途保險均使用完整原生返回視窗，不改寫已保存原話、Memory、JD 或工具實際執行結果，也不宣稱無損。輪中 compact 不是新 Turn：不重灌起始導覽／訪談、不重加員工輸入、不切換讀取基準。
 - **PROD-G1-019：框架選定 LangGraph＋OpenAI direct Responses SDK。**LangGraph 用於流程與 State 等原生機制，模型經 OpenAI SDK 直連 Responses；不因此選用 OpenAI Agents SDK 或 LangChain 的模型 adapter。State 需先研究 LangGraph 的狀態更新、保存、恢復及原生 items 承接，再討論具體欄位；不預定另一套自訂引擎或重用舊 Working State schema。
-- **PROD-G1-020：可採新版 LangGraph／OpenAI 官方 SDK，目標不使用 LangChain 應用封裝。**Owner 補明可使用最新版本，不受現行 lockfile 的舊版本限制；後續以當時最新穩定版核對相容性並鎖定可重現的版本。目標由 LangGraph 編排，OpenAI 官方 Python SDK 直接呼叫 Responses API，不使用 LangChain `create_agent`、模型 adapter 或 LangChain Message 作模型接續表示，也不改採 OpenAI Agents SDK。LangGraph 必需的底層套件依賴與「採用 LangChain 應用架構」分開看，不能把前者誤稱為已消除；詳見[框架依賴核對](specs/2026-09-26-reasoning-tool-results-and-state-boundary-research.md#103-鎖定版本本機核對與儲存取捨)。這是目標設計補充，不是本輪升級、移除 production 依賴或已通過新版本驗收。
+- **PROD-G1-020：可採新版 LangGraph／OpenAI 官方 SDK，目標不使用 LangChain 應用封裝。**Owner 補明可使用最新版本，不受現行 lockfile 的舊版本限制；後續以當時最新穩定版核對相容性並鎖定可重現的版本。目標由 LangGraph 編排，OpenAI 官方 Python SDK 直接呼叫 Responses API，不使用 LangChain `create_agent`、模型 adapter 或 LangChain Message 作模型接續表示，也不改採 OpenAI Agents SDK。LangGraph 必需的底層套件依賴與「採用 LangChain 應用架構」分開看，不能把前者誤稱為已消除；詳見[框架依賴核對](research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md#103-鎖定版本本機核對與儲存取捨)。這是目標設計補充，不是本輪升級、移除 production 依賴或已通過新版本驗收。
 - **尚未裁決：**B1／B2 輪前門檻、共同計量與容量預留、Agent 提出壓縮的介面、request 層參數映射、自行接續所需的保存及失敗恢復方式；State 分類與欄位仍未定。A 輪前 128K、三者中途 272K 與 B1／B2 工作交界已確認，不再列未決。019 已定完整現有視窗及 A 的追加順序；016／017 的不使用 `previous_response_id`、`store=false` 與 018 的不啟用自動壓縮不再列為候選。不新增摘要 Agent 或第二套 Memory，不把現行 App-side 摘要實作冒充已完成的原生接法。
 - **容量停止線：**中途只依 272K 保險在完整 Step 交界主動壓縮；不靜默丟棄原話／工具結果，也不把未完成工作改名為新 Turn。單筆輸入／結果過大、compact 本身超限或壓縮後仍過門檻，仍須如實處理，不能反覆壓同一未增長視窗或重做成功操作；server-side 自動路徑仍未授權。
 

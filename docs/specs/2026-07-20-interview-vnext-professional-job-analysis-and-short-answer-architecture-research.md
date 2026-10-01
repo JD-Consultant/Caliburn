@@ -50,7 +50,7 @@ scope: R5 前置設計；員工訪談、短回答、即時共編、當下單一�
 > immutable revision、不複製全文件 rows，也不加入 `entity_version`／`link_version`。本文後續所有 revision、restore、
 > revision diff、head hash／CAS 描述一律降為後續可選優化，不是 MVP 實作要求。AI 仍只能提出 proposal，不能繞過員工
 > accept／edit／reject。詳細 current-table authority 見
-> [Job Authoring v2 本機單一現況儲存設計](2026-07-24-job-authoring-v2-relational-storage-research.md)。
+> [Job Authoring v2 本機單一現況儲存設計](../archive/retired-documents/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 ## 1. 結論先行
 
@@ -126,9 +126,9 @@ Competency-based Job Model**。
 已核對：
 
 - 現行 OCS deep-document authority：[`apps/api/docs/document-of-record.md`](../../apps/api/docs/document-of-record.md)；
-- OCS/JD JSON 欄位：[`docs/ocs-schema.md`](../ocs-schema.md) 與
+- OCS/JD JSON 欄位：[`docs/ocs-schema.md`](../archive/retired-documents/ocs-schema.md) 與
   [`packages/ocs-contract`](../../packages/ocs-contract/)；
-- editor 與 knowledge pack：[`docs/design/editor-knowledge-pack.md`](../design/editor-knowledge-pack.md)；
+- editor 與 knowledge pack：[`docs/design/editor-knowledge-pack.md`](../archive/retired-documents/design/editor-knowledge-pack.md)；
 - knowledge pack 組裝：[`apps/api/docs/knowledge-pack-assembly.md`](../../apps/api/docs/knowledge-pack-assembly.md)；
 - Qdrant/indexer pipeline：[`apps/ocs-indexer/docs/pipeline.md`](../../apps/ocs-indexer/docs/pipeline.md)；
 - BGE-M3 embedder：[`apps/embedder/README.md`](../../apps/embedder/README.md)；
@@ -717,7 +717,7 @@ TaskSkillLink
 各自成為不同 entity/table，task linkage 以帶外鍵的兩張 association table 保存。`T1/K01/S01` 只由 projector
 在顯示或匯出時依排序產生。只做同一份 JD 內的重複檢查與 task linkage，不做跨 JD alias、全公司 concept
 identity、發布或 deprecation lifecycle。詳細關聯式設計見
-[Job Authoring v2 關聯式儲存研究](2026-07-24-job-authoring-v2-relational-storage-research.md)。
+[Job Authoring v2 關聯式儲存研究](../archive/retired-documents/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 後兩者是不同 domain：
 
@@ -1052,7 +1052,7 @@ revision CAS、多人合併或 Google Docs 等級的同步機制。
 Job Authoring entity rows 暫不持久化逐欄 writer、editor、Evidence refs、source hash 或完整 provenance。既有 Proposal／
 Decision／Revision command 足以維持 AI 不得直接寫入與版本歷史；公版只保存既有 Indexer stable ID
 `ref_urn TEXT NULL`。日後有稽核或可解釋性產品需求再升版，不先建立 generic source graph。資料庫 authority 見
-[Job Authoring v2 關聯式儲存研究](2026-07-24-job-authoring-v2-relational-storage-research.md)。
+[Job Authoring v2 關聯式儲存研究](../archive/retired-documents/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)。
 
 ### 12.8 API 與模組邊界
 

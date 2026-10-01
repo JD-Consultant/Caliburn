@@ -21,13 +21,13 @@ JD-R002/C02；2026-09-09；**G3／WORKING：Owner 同意審核粒度方向，並
 - 已確認、不重問：人與 AI 編輯同份最新文件；AI 改動可辨識且需明確審核；員工可直接編輯待審內容，編輯不等於接受；不處理仍待審，AI 可在最新內容上繼續工作。[C01 §1、§3、§5](2026-09-09-jd-document-relationships-working-research.md)
 - 本輪新增的是具體分組建議，不是重新決定上述原則。未審核不應阻止繼續訪談；這不等於允許 AI 分析時人機同時寫入。
 - 不做：重開 Memory、增加 JD 欄位、選框架／DB、定工具參數、改 prompt／UI／production、付費測試。匯出、刪除的保留／連帶刪除、操作中鎖定與失敗恢復另題細化。
-- 資料分工：本文管操作候選及情境；[官方證據 §5](2026-09-09-jd-document-model-official-evidence.md#5-c02-編輯與審核接點複核)管事實、來源及限制；[父入口](2026-09-09-job-analysis-and-jd-content-research.md#2-文檔各負責什麼)管閱讀路由；[register](../current-decisions.md)管效力。
+- 資料分工：本文管操作候選及情境；[官方證據 §5](../research/engineering/2026-09-09-jd-document-model-official-evidence.md#5-c02-編輯與審核接點複核)管事實、來源及限制；[父入口](2026-09-09-job-analysis-and-jd-content-research.md#2-文檔各負責什麼)管閱讀路由；[register](../current-decisions.md)管效力。
 
 ## 2. 官方能支持什麼，不能代決什麼
 
-- **Official fact：**Word 支持在文件中逐項或整批接受／拒絕；隱藏標記不等於處理變更。Tiptap 提供保存式追蹤修訂，也另有暫時顯示的建議路徑，不能混用其保存性。[E10–E13](2026-09-09-jd-document-model-official-evidence.md)
-- **重要差異：**本輪查到的 VS Code 現行頁面描述「直接修改並保存，再用 diff／版本控制審閱」，不是逐項 pending approval。共同最新文件可借鑑，但我們的員工明確審核是產品要求，不宣稱各家完全相同。[E12](2026-09-09-jd-document-model-official-evidence.md#e12-vs-code-現行文件不再可當逐項待核准的依據)
-- **框架邊界：**Tiptap 的連續輸入分組、跨作者巢狀修訂與整段拆分有各自規則；不是名稱相近就等於 JD 的跨位置整組審核。尤其跨作者內層修訂可能另待審，不可直接套成「員工修改完接受這組最新版」。[E14–E15](2026-09-09-jd-document-model-official-evidence.md)
+- **Official fact：**Word 支持在文件中逐項或整批接受／拒絕；隱藏標記不等於處理變更。Tiptap 提供保存式追蹤修訂，也另有暫時顯示的建議路徑，不能混用其保存性。[E10–E13](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)
+- **重要差異：**本輪查到的 VS Code 現行頁面描述「直接修改並保存，再用 diff／版本控制審閱」，不是逐項 pending approval。共同最新文件可借鑑，但我們的員工明確審核是產品要求，不宣稱各家完全相同。[E12](../research/engineering/2026-09-09-jd-document-model-official-evidence.md#e12-vs-code-現行文件不再可當逐項待核准的依據)
+- **框架邊界：**Tiptap 的連續輸入分組、跨作者巢狀修訂與整段拆分有各自規則；不是名稱相近就等於 JD 的跨位置整組審核。尤其跨作者內層修訂可能另待審，不可直接套成「員工修改完接受這組最新版」。[E14–E15](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)
 - **Caliburn mapping：**以下「依完整改動效果分組」是延伸既有產品要求的候選；不是官方保證能自動判斷 JD 語意依賴，也不是已決定要自行寫審核引擎。
 
 ## 3. 三種粒度及推薦

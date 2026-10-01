@@ -36,16 +36,16 @@ OPKS 就是[實現路線圖](2026-07-25-professional-consultant-architecture-rea
 
 **本文只做裁決比對。**「每個欄位怎麼寫才合格」的判準教材已經備齊，不重寫：
 
-- [iCAP 逐欄位官方標準](2026-07-13-ai-redesign-raw-icap-field-standards.md)
-- [國際體系欄位定義與撰寫標準](2026-07-13-ai-redesign-raw-intl-competency-standards.md)
+- [iCAP 逐欄位官方標準](../research/work-analysis/2026-07-13-ai-redesign-raw-icap-field-standards.md)
+- [國際體系欄位定義與撰寫標準](../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md)
 
 本輪新增三份原料：
 
 | 代號 | 檔案 | 涵蓋 |
 |---|---|---|
-| A | [`opks-raw-validity-and-ai-regulation`](2026-08-01-opks-raw-validity-and-ai-regulation.md) | SIOP *Principles* 5th ed.、29 CFR §1607.14C、Morgeson 兩篇原著、EU AI Act（含 2026/1744 Omnibus）、NYC LL144、台灣 AI 基本法、證據分級先例 |
-| B | [`opks-raw-skills-taxonomies`](2026-08-01-opks-raw-skills-taxonomies.md) | O\*NET 30.3／ESCO／Lightcast／SFIA 9／iCAP 的版本、授權、繁中支援；Workday／SAP／LinkedIn／Microsoft 官方做法；proficiency 現況 |
-| E | [`opks-raw-llm-generation-grounding`](2026-08-01-opks-raw-llm-generation-grounding.md) | 結構化生成的輸出量上限、abstention、grounding／citation 實證、schema 誘導填表 |
+| A | [`opks-raw-validity-and-ai-regulation`](../research/work-analysis/2026-08-01-opks-raw-validity-and-ai-regulation.md) | SIOP *Principles* 5th ed.、29 CFR §1607.14C、Morgeson 兩篇原著、EU AI Act（含 2026/1744 Omnibus）、NYC LL144、台灣 AI 基本法、證據分級先例 |
+| B | [`opks-raw-skills-taxonomies`](../research/work-analysis/2026-08-01-opks-raw-skills-taxonomies.md) | O\*NET 30.3／ESCO／Lightcast／SFIA 9／iCAP 的版本、授權、繁中支援；Workday／SAP／LinkedIn／Microsoft 官方做法；proficiency 現況 |
+| E | [`opks-raw-llm-generation-grounding`](../research/work-analysis/2026-08-01-opks-raw-llm-generation-grounding.md) | 結構化生成的輸出量上限、abstention、grounding／citation 實證、schema 誘導填表 |
 
 **未完成：C（工作產出的權威處理）與 D（行為指標與數字門檻）**——見 §5。
 
@@ -203,8 +203,8 @@ Morgeson et al. (2004) 的操縱**只是加上 "ability to" 這個詞**就produc
 - **unknown 用可為空的 array 表示**：O/P/K/S/A 天然是清單，空 array 就是最誠實的「沒有」，
   不需要 sentinel、不動用 union 預算，沿用現行零 `anyOf` 紀律。
 
-補查 C／D 後新增（依據見 [工作產出原料](2026-08-01-opks-raw-work-outputs.md)、
-[行為指標原料](2026-08-01-opks-raw-performance-indicators.md)）：
+補查 C／D 後新增（依據見 [工作產出原料](../research/work-analysis/2026-08-01-opks-raw-work-outputs.md)、
+[行為指標原料](../research/work-analysis/2026-08-01-opks-raw-performance-indicators.md)）：
 
 - **K/S 禁 `ability to`／「具備…之能力」句式**——OPM 逐字禁令（避免與 task 混淆）
   與 Morgeson et al. (2004) 的膨脹實證**從兩個方向指向同一條規則**，可寫成 deterministic 檢查。
@@ -230,7 +230,7 @@ Morgeson et al. (2004) 的操縱**只是加上 "ability to" 這個詞**就produc
 ## 5. C／D 補查結果與**仍然**存在的缺口
 
 C 與 D 已於 2026-08-01 補查完成，產出兩份原料：
-[工作產出](2026-08-01-opks-raw-work-outputs.md)、[行為指標](2026-08-01-opks-raw-performance-indicators.md)。
+[工作產出](../research/work-analysis/2026-08-01-opks-raw-work-outputs.md)、[行為指標](../research/work-analysis/2026-08-01-opks-raw-performance-indicators.md)。
 取得方式改為 **curl 直抓 PDF + `pdftotext` 抽字**，繞開 WebFetch 對 PDF 的解析限制。
 
 **已回答：**
@@ -254,7 +254,7 @@ C 與 D 已於 2026-08-01 補查完成，產出兩份原料：
 2. ~~澳洲 Performance Evidence~~ ／ ~~新加坡 Performance Expectations~~ —— **兩者皆已取得**
    （2026-08-01 第二輪）。澳洲改走 `training.gov.au/TrainingComponentFiles/` 靜態路徑，
    新加坡改由 Wayback 對同一官方 URL 的 2025-08-05 快照分段續傳取得。
-   結果見[行為指標原料](2026-08-01-opks-raw-performance-indicators.md) §3b–§3d，
+   結果見[行為指標原料](../research/work-analysis/2026-08-01-opks-raw-performance-indicators.md) §3b–§3d，
    已回寫成 §4 的數值四檔。**取樣仍窄**：澳洲兩個單元、新加坡一個框架（共 38 個 sector）。
 4. **Smith & Kendall (1963) BARS 原著**——付費牆；本輪完全未引用 BARS 建構步驟。
 5. **香港 SCS 的版本與官方出處**——取自 HKU SPACE 轉載，引用前須回 `hkqf.gov.hk` 確認版次。

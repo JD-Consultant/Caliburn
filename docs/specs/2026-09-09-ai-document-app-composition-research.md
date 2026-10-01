@@ -12,7 +12,7 @@ Owner 同意 [C02 最小完整審核範圍](2026-09-09-jd-editing-and-review-wor
 
 **研究題（已交付）：**如何用現成 agent 與編輯框架完成共同最新文件、AI 編輯及員工審核，避免不必要的自訂複雜度？**唯一下一裁決：**是否以 Tiptap 組合作第一驗證候選，先做方案 §7 收斂的無 LLM 文件編輯／審核驗證？
 
-本稿只管短結論與取捨；[可執行方案](2026-09-09-jd-ai-editing-executable-proposal.md)管完整接線、差距與驗證。[E01–E20](2026-09-09-jd-document-model-official-evidence.md)保留文件產品及最初整合證據；[R01–R10](2026-09-09-jd-ai-app-runtime-official-evidence.md)管 agent／錯誤契約；[F01–F05](2026-09-09-jd-editor-framework-comparison.md)管三套編輯框架比較。父路由在[研究入口](2026-09-09-job-analysis-and-jd-content-research.md)，效力在[register](../current-decisions.md)。所有方案可經討論翻案，不能用「共同做法」掩蓋不同契約。
+本稿只管短結論與取捨；[可執行方案](2026-09-09-jd-ai-editing-executable-proposal.md)管完整接線、差距與驗證。[E01–E20](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)保留文件產品及最初整合證據；[R01–R10](../research/agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)管 agent／錯誤契約；[F01–F05](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)管三套編輯框架比較。父路由在[研究入口](2026-09-09-job-analysis-and-jd-content-research.md)，效力在[register](../current-decisions.md)。所有方案可經討論翻案，不能用「共同做法」掩蓋不同契約。
 
 ## 2. 白話結論
 
@@ -31,9 +31,9 @@ Owner 同意 [C02 最小完整審核範圍](2026-09-09-jd-editing-and-review-wor
 ## 3. 複雜度真正在哪裡
 
 - **格式不是全交給模型。**標題、層次與適用欄位會影響內容結構；字型、間距、頁面版式主要由編輯器／樣式配置。多一項顯示內容，不必新增一個 Agent 或工具。
-- **較難的是持續編輯與審核。**AI 待審內容又被人改、之後 AI 再改，最後拒絕一組時不能抹掉別處已做的修改；跨位置移動還要維持同一工作內容。這些是整體契約問題，不能只看有 diff 按鈕就判定完成。[E10–E15、E20](2026-09-09-jd-document-model-official-evidence.md)
+- **較難的是持續編輯與審核。**AI 待審內容又被人改、之後 AI 再改，最後拒絕一組時不能抹掉別處已做的修改；跨位置移動還要維持同一工作內容。這些是整體契約問題，不能只看有 diff 按鈕就判定完成。[E10–E15、E20](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)
 - **保存、模型錯誤與審核是不同結果。**工具失敗不是已修改；改入目前文件不等於員工已接受；provider schema 檢查也不等於 JD 內容真實。使用框架統一接點，但不宣稱它自動代決全部產品行為。
-- **成本目前不能保證。**不需要每個欄位一次模型呼叫；官方有多操作編輯工具先例，但 context、工具往返、額外模型工作、付費擴充與部署依賴仍須在選型時比較。沒有量測不報省多少成本。[E16、E18–E20](2026-09-09-jd-document-model-official-evidence.md)
+- **成本目前不能保證。**不需要每個欄位一次模型呼叫；官方有多操作編輯工具先例，但 context、工具往返、額外模型工作、付費擴充與部署依賴仍須在選型時比較。沒有量測不報省多少成本。[E16、E18–E20](../research/engineering/2026-09-09-jd-document-model-official-evidence.md)
 
 目前沒有理由先加全文件依賴圖、每欄位專用工具、額外審核 Agent、多使用者協作或通用工作流引擎。日後若原生能力不能完成必要情境，先列差距再討論，不先假設一定自寫。
 
@@ -45,13 +45,13 @@ Owner 同意 [C02 最小完整審核範圍](2026-09-09-jd-editing-and-review-wor
 | 模型生成一段／整份內容，再由編輯器替換及比較 | 初稿生成直觀；可與局部工具並存，不必一律排除 | 全文重寫可能擾動未改內容；不能把「能顯示 diff」當成已支援持久的細項拒絕 |
 | 底層編輯框架＋自訂工具／審核接線 | 可避開不合要求的套件契約或服務依賴 | 自訂維護與測試責任較多；只有具體缺口成立後才估算，不預先選此路 |
 
-第一種接法已有官方示例：AI Toolkit 提供讀／改工具，agent SDK 驅動循環，工具執行時由應用啟用追蹤修訂，再讓員工審閱。[E18、E20](2026-09-09-jd-document-model-official-evidence.md) **但成熟編輯器不代表每個 AI／審核擴充都成熟**：本輪發現 Alpha／Beta 及頁面版本標示不一致，留作選型風險，不能為求現成而忽略。
+第一種接法已有官方示例：AI Toolkit 提供讀／改工具，agent SDK 驅動循環，工具執行時由應用啟用追蹤修訂，再讓員工審閱。[E18、E20](../research/engineering/2026-09-09-jd-document-model-official-evidence.md) **但成熟編輯器不代表每個 AI／審核擴充都成熟**：本輪發現 Alpha／Beta 及頁面版本標示不一致，留作選型風險，不能為求現成而忽略。
 
 對 Caliburn 的推薦是：先走官方端到端路徑，能用配置或既有接點滿足就使用；需要改產品效果時提出比較，不為硬保留既有設想而增加一套機制。這不代表現在就購買、安裝或將文件傳給外部編輯服務。
 
 ## 5. 深入比較後的推薦與缺口
 
-**先驗 Tiptap Client AI Toolkit＋Tracked Changes；agent 優先 LangChain create_agent／LangGraph。CKEditor 為第二決選，Plate 為較多自建責任的備援。**這是適配度建議，不是「Tiptap 最成熟」或已獲採用；具體理由、官方來源及限制在[F表](2026-09-09-jd-editor-framework-comparison.md)。OpenAI Agents SDK 為正式 runtime 備選，但換 runtime 不會自動補 editor 的審核缺口。
+**先驗 Tiptap Client AI Toolkit＋Tracked Changes；agent 優先 LangChain create_agent／LangGraph。CKEditor 為第二決選，Plate 為較多自建責任的備援。**這是適配度建議，不是「Tiptap 最成熟」或已獲採用；具體理由、官方來源及限制在[F表](../research/engineering/2026-09-09-jd-editor-framework-comparison.md)。OpenAI Agents SDK 為正式 runtime 備選，但換 runtime 不會自動補 editor 的審核缺口。
 
 已查明可沿官方接點做讀取定位、模型工具操作、執行結果、追蹤修訂及保存整合；不要求模型計算行號、生成核准狀態或每欄位一個 tool。**必要的產品差距仍有四類：**
 

@@ -11,7 +11,7 @@
 >
 > Owner 已決定第一個成品不做 revision history。本文 API、autosave、CAS、DTO 與測試大量綁定
 > `revision_id/revision_hash/entity_version`，不能機械刪欄位後繼續實作。後續應依
-> [current relational storage authority](../specs/2026-07-24-job-authoring-v2-relational-storage-research.md)
+> [current relational storage authority](../archive/retired-documents/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)
 > 另寫更小的 localhost 可見切片計畫。本文僅保留作歷史研究，不是 implementation authority。
 
 ## 1. 這一步要交付什麼

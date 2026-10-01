@@ -2,7 +2,7 @@
 
 **補證狀態（2026-09-09）：**本稿保留早期 source 診斷；[R01 實證比較](2026-09-09-jd-native-pending-review-comparison.md)已執行兩獨立 pending 取消／接受、跨作者續改及移除粗體 JSON。§7.2 的 undefined 保存疑點已成真實反例；§4 的 active key／順序風險也有有限觀測。下方「未執行」僅指原靜態閱讀時點，不能作最新狀態；尚未測的 UI、結構與任意依賴仍未知。
 
-JD-R002/C03；G2 evidence；查閱日 **2026-09-09**。承接[框架比較](../2026-09-09-jd-editor-framework-comparison.md)、[C02 工作稿](../2026-09-09-jd-editing-and-review-working-design.md)與[決策流程](../../decision-process.md)。本稿只研究免費開源範圍，不是選型、安裝、spike 或施工授權；LLM／Memory 已處理，不重做。不受舊產品架構限制。
+JD-R002/C03；G2 evidence；查閱日 **2026-09-09**。承接[框架比較](../../research/engineering/2026-09-09-jd-editor-framework-comparison.md)、[C02 工作稿](../2026-09-09-jd-editing-and-review-working-design.md)與[決策流程](../../decision-process.md)。本稿只研究免費開源範圍，不是選型、安裝、spike 或施工授權；LLM／Memory 已處理，不重做。不受舊產品架構限制。
 
 **Owner 最新研究補充：**「人改待審內容仍待審 如果不是共識的話也可以改」。因此人工續編政策是本輪可比較、可再裁決的選擇，不能只因候選不符合舊政策便淘汰，也不能說 Owner 已接受 auto-accept。本文只證明 Plate 的分支，**單一家 default 不是跨廠共識**；主線負責更新 register 與提出產品裁決。
 

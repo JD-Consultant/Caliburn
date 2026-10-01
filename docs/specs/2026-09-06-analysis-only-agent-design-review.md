@@ -17,7 +17,7 @@
 定向核對的需求／證據：
 
 - [能力研究 §5.2–5.3](2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md)：M1–M11；不是將舊資料結構當需求。
-- [OpenAI 系統圖](2026-09-05-openai-conversation-context-and-memory-system-map.md)、[summary routing 固定 source 研究](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)：CLI 與 SDK 的差別、抽取 producer／consumer、關鍵詞與引用。
+- [OpenAI 系統圖](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)、[summary routing 固定 source 研究](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)：CLI 與 SDK 的差別、抽取 producer／consumer、關鍵詞與引用。
 - [B/C 既有研究](2026-09-05-memory-background-live-repair-coordination-research.md)：Store API 不等於 atomic publication。
 
 沒有以舊 production 施工計畫約束新設計；沒有讀 Owner 排除的 `2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`。新的官方補查只針對原生 reasoning、compaction、原生 SDK 替代、公開框架接點及發布交易，不重做全部 OpenAI Memory 原理。

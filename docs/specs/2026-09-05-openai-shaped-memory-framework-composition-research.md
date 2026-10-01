@@ -28,7 +28,7 @@ Owner 本輪「同意」後，主要設計候選採 `create_agent`＋LangGraph�
 | `MEMORY.md`／小型 guide | 可搜尋的知識與導覽分工；先用便宜入口定位，再讀詳細內容 | 每次固定注入全部正文；或把 guide 當唯一真實資料 |
 | Live repair | 當前 run 發現明確過時內容時，就地修補所需 Memory | 為改一處而同步重跑整個背景流程 |
 
-本表是對既有[OpenAI 系統圖](2026-09-05-openai-conversation-context-and-memory-system-map.md)與[artifact 詳表](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)的用途核對，不另發明資料類型。OpenAI SDK 的 generation／liveUpdate 與 Codex 公開 pipeline 並非每個細節相同；這裡保留共同責任，差異仍在原研究中。[SDK Memory](https://openai.github.io/openai-agents-js/guides/sandbox-agents/memory/)、[Codex pipeline 固定 README](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/README.md)
+本表是對既有[OpenAI 系統圖](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)與[artifact 詳表](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)的用途核對，不另發明資料類型。OpenAI SDK 的 generation／liveUpdate 與 Codex 公開 pipeline 並非每個細節相同；這裡保留共同責任，差異仍在原研究中。[SDK Memory](https://openai.github.io/openai-agents-js/guides/sandbox-agents/memory/)、[Codex pipeline 固定 README](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/README.md)
 
 **背景補查的邊界已確認，不重開：** SDK Phase 2 可按需開 conversation summaries；所核對 Codex 背景 prompt 明確禁止打開 raw sessions／original transcripts。因此前台必要時回查原話，與背景整併補查摘要，是不同的資料可見範圍。[SDK Phase 2](https://openai.github.io/openai-agents-js/guides/sandbox-agents/memory/#generate-memory)、[Codex raw 邊界](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/memories/write/templates/memories/consolidation.md#L159-L167)
 
@@ -79,7 +79,7 @@ StoreBackend 是「Store 內的虛擬檔案」，不是要求開放電腦檔案�
 
 ### 3.2 為什麼沒有強迫每層都使用 LangMem manager？
 
-LangMem manager 的抽取／更新能力有價值，但不會自動提供 Phase 1 雙產物及 Phase 2 中途開 summary 的完整生命週期。若選 Agent＋filesystem，模型整理由官方 Agent loop 完成，**不需要為了湊元件再固定呼叫一次 manager**。若選紀錄型方案，LangMem search／manage tools 可直接交給 Agent；這與「把 store manager 當整條背景流程」不同。[框架事實圖 §6](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md#6-langmemmemory-formation-primitives)、[LangMem tools](https://langchain-ai.github.io/langmem/reference/tools/)
+LangMem manager 的抽取／更新能力有價值，但不會自動提供 Phase 1 雙產物及 Phase 2 中途開 summary 的完整生命週期。若選 Agent＋filesystem，模型整理由官方 Agent loop 完成，**不需要為了湊元件再固定呼叫一次 manager**。若選紀錄型方案，LangMem search／manage tools 可直接交給 Agent；這與「把 store manager 當整條背景流程」不同。[框架事實圖 §6](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md#6-langmemmemory-formation-primitives)、[LangMem tools](https://langchain-ai.github.io/langmem/reference/tools/)
 
 **適用範圍澄清（Owner 追問，2026-09-05）：不是「LangMem 不適合」，而是不能把一個 manager 等同整條 OpenAI 流程。** 官方明列 background formation 與 Agent hot-path tools；`create_thread_extractor` 可用自訂 schema 抽取中間內容，`create_memory_manager` 可修訂傳入紀錄，`create_memory_store_manager` 再串接搜尋及 Store 寫入。這些仍可重用，不因主要候選採 filesystem 便整包排除。[LangMem 官方分工](https://langchain-ai.github.io/langmem/)、[Memory API](https://langchain-ai.github.io/langmem/reference/memory/)
 
@@ -100,7 +100,7 @@ LangMem manager 的抽取／更新能力有價值，但不會自動提供 Phase 
 3. **兩條路徑接力：** B 尚未完成時 A 依靠哪些已可用資料；C 改完之後 B 如何再次讀取與整理；完成結果何時供後續 A 使用。先確定讀寫位置與依賴，再決定需要協調哪段。
 4. **框架接線與缺口：** 逐段區分可直接使用、須組合公開元件、仍需擴充；此時才回 Q018 比較具體協調與恢復方案。
 
-**第 1 項 §3.4 與第 2 項 §3.5 的 B 流程均已由 Owner 暫時同意。** 下一步依 §3.6 已同意順序展開資料細節；不把方向同意當成 schema／存取契約全數核准。已核准的 A／B／C 用途、背景補查與 artifact 分工不從零研究；只對真正未決、矛盾或缺少直接證據的細節補查。原始官方引用仍由 §2、§3.1 與[官方流程事實圖](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)承接，不重複複製成另一份總稿。本節不授權 implementation／spike。
+**第 1 項 §3.4 與第 2 項 §3.5 的 B 流程均已由 Owner 暫時同意。** 下一步依 §3.6 已同意順序展開資料細節；不把方向同意當成 schema／存取契約全數核准。已核准的 A／B／C 用途、背景補查與 artifact 分工不從零研究；只對真正未決、矛盾或缺少直接證據的細節補查。原始官方引用仍由 §2、§3.1 與[官方流程事實圖](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)承接，不重複複製成另一份總稿。本節不授權 implementation／spike。
 
 ### 3.4 主 Agent A 的一輪：資料如何進來、被讀取與完成
 
@@ -110,9 +110,9 @@ LangMem manager 的抽取／更新能力有價值，但不會自動提供 Phase 
 
 1. **接收新訊息，延續同一 conversation。** 本則訊息啟動一次 logical invocation；A 讀取此 conversation 的既有狀態。員工、AI 與必要 Tool 互動由 canonical conversation 保存，不靠背景 B 才能記得上一句。LangGraph Checkpointer 保存實際 graph state，不自行替應用補出未曾保存的歷史；完整保存／有界 model view 是既有需求，不是套上 Checkpointer 就自動達標。[LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)、[OpenAI Session 與 Memory 分工](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)
 2. **組裝本次模型可見的 Context。** 精簡規則、適用工具、近期對話／Compaction continuation、小型 Memory 導覽及本輪訊息，搭配 Q014 已暫准的少量相關召回。不是注入全部 Memory；本輪訊息若已在 messages，不因畫成另一格就再貼一份。LangChain 可用 transient model-context override 而不改已保存 state；Compaction 引擎仍依既有候選待選。導覽載入沿用 §4.1 的公開 model hook 接法，不等於每次另叫 LLM 生成導覽。[Context engineering](https://docs.langchain.com/oss/python/langchain/context-engineering)、[既有 Compaction 候選](2026-09-05-conversation-compaction-framework-gap-review.md)
-3. **同一主 Agent 判斷需要什麼。** 已足夠就回答；缺 Memory 就先搜尋，再讀相關正文；需要互動脈絡才開 summary，需要精確原始內容才回查 conversation。每一層滿足本輪資訊需要即可停止，不必逐層讀到底。OpenAI SDK 明確提供 guide → 搜尋 Memory → 按需 summary；raw fallback／停止提示屬已核對的 Codex 開源 read prompt，不誇大成所有 OpenAI 產品的固定契約。[OpenAI Memory read](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)、[既有 read-path 細節與原始碼路由](2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md#4-讀取每一步到底發生什麼)
+3. **同一主 Agent 判斷需要什麼。** 已足夠就回答；缺 Memory 就先搜尋，再讀相關正文；需要互動脈絡才開 summary，需要精確原始內容才回查 conversation。每一層滿足本輪資訊需要即可停止，不必逐層讀到底。OpenAI SDK 明確提供 guide → 搜尋 Memory → 按需 summary；raw fallback／停止提示屬已核對的 Codex 開源 read prompt，不誇大成所有 OpenAI 產品的固定契約。[OpenAI Memory read](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)、[既有 read-path 細節與原始碼路由](../research/agent-systems/2026-09-04-openai-codex-memory-progressive-disclosure-deep-dive.md#4-讀取每一步到底發生什麼)
 4. **Tool 執行後，實際結果回到同一 Agent。** 讀到的內容、成功或可交由模型處理的錯誤，隨對應 Tool call 回傳；A 據此決定繼續讀取、修正參數、採取下一步或回答。這是 `create_agent` 的 model↔Tool loop，不另造 while-loop。一次 invocation 可以有多次模型呼叫；不是每個流程名詞都多叫一次模型。需繼續推理的 Memory read／repair 不適合 `return_direct=True`，因該設定會跳過模型對結果的後續處理。[OpenAI tool calling flow](https://developers.openai.com/api/docs/guides/function-calling#the-tool-calling-flow)、[LangChain tool returns](https://docs.langchain.com/oss/python/langchain/tools#return-directly-from-a-tool)
-5. **需要 C 時，在上述 loop 中修補；否則不修改 Memory。** 仍沿用已准條件：已讀完整目標、修正對象清楚、內容明確過時、同輪後續需要新版。A 使用 edit Tool 局部修補，讀取結果後才可說已成功寫入；未釐清的矛盾先問使用者，不自行選一方覆寫。這不是固定每回合 extraction，也不是 C 另叫 B。格式／匹配等可修正錯誤回模型；基礎設施失敗、重試與上限依 Q005／§4.5 分流，不保證每次修復成功。[OpenAI live memory updates](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)、[Deep Agents memory](https://docs.langchain.com/oss/python/deepagents/memory)、[工具結果的已核對實作](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md#54-長期-memory)
+5. **需要 C 時，在上述 loop 中修補；否則不修改 Memory。** 仍沿用已准條件：已讀完整目標、修正對象清楚、內容明確過時、同輪後續需要新版。A 使用 edit Tool 局部修補，讀取結果後才可說已成功寫入；未釐清的矛盾先問使用者，不自行選一方覆寫。這不是固定每回合 extraction，也不是 C 另叫 B。格式／匹配等可修正錯誤回模型；基礎設施失敗、重試與上限依 Q005／§4.5 分流，不保證每次修復成功。[OpenAI live memory updates](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)、[Deep Agents memory](https://docs.langchain.com/oss/python/deepagents/memory)、[工具結果的已核對實作](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md#54-長期-memory)
 6. **完成當輪回答，保留對話及實際執行狀態。** 提問也是一次正常回答，使用者下一則訊息另開 invocation；不把所有問句做成 durable interrupt。A 不為了等 B 整理完才一律結束，這是 Owner 已選的分工偏好，不是框架已保證零阻塞。哪些 conversation 片段、何時交給 B，下一節流程審閱才決定；本節不新增「每輪結尾必跑 manager／必等待 B」規則。[LangChain Agent loop](https://docs.langchain.com/oss/python/langchain/agents)、[有效 Q004–Q006／Q017–Q018](../current-decisions.md#4-llmagent-working-baseline)
 
 #### 本輪核對的三個易錯細節
@@ -149,7 +149,7 @@ LangMem manager 的抽取／更新能力有價值，但不會自動提供 Phase 
 
 每項都沿用「既有已准效果 → 原官方／框架資料 → 尚未收斂的契約」；至少回答內容與保存者、讀寫者、查找與回傳、錯誤／成本及可驗證例子。**先講資料與行為契約，具體欄位／SDK 接法在同項後段收斂**，不是先發明 schema 再找框架來套。可由官方契約回答的技術問題不交給 Owner 猜；影響目的、資料保留、成本或複雜度的取捨才請 Owner 決定。
 
-既有材料已有 [artifact 詳表 §4–6、§10.2](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md) 與 [框架事實圖](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)。其中舊 LangMem 優先與 record ID 接法須以 Q017 現行候選判讀，不直接復活。只補缺少或有版本差異的官方證據；不重做整份研究、不為每輪再開一份總稿。本順序依[既有 decision-process G4](../decision-process.md)的先資料流後細節原則提出，不宣稱是 OpenAI 內部逐項流程。
+既有材料已有 [artifact 詳表 §4–6、§10.2](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md) 與 [框架事實圖](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)。其中舊 LangMem 優先與 record ID 接法須以 Q017 現行候選判讀，不直接復活。只補缺少或有版本差異的官方證據；不重做整份研究、不為每輪再開一份總稿。本順序依[既有 decision-process G4](../decision-process.md)的先資料流後細節原則提出，不宣稱是 OpenAI 內部逐項流程。
 
 **完整範圍的檢查入口，不是新增資料表清單：**
 
@@ -215,7 +215,7 @@ LangGraph Functional API 的 task 能恢復已完成結果；恢復 entrypoint �
 
 **建議：下一步以 filesystem 組合作為主要設計候選，紀錄工具保留作對照。** 理由是此輪目標明確包含「補查、深讀、局部修訂」的完整接力，官方檔案元件對這些互動提供較直接的能力；不是因為 Markdown 必然效果最好，也不是 Codex 用檔案所以一定照抄。
 
-版本快照沿用已核對的[框架事實圖 §1](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md#1-版本快照)：LangChain 1.4.0、LangGraph 1.2.11、Deep Agents 0.7.13、LangMem 0.0.30；固定原始碼證據不等同已實測這四個 release 的組合。進施工前才需鎖相容版本。本輪不以 Beta 當 stable，不宣稱檔案組合已通過品質或成本測試。
+版本快照沿用已核對的[框架事實圖 §1](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md#1-版本快照)：LangChain 1.4.0、LangGraph 1.2.11、Deep Agents 0.7.13、LangMem 0.0.30；固定原始碼證據不等同已實測這四個 release 的組合。進施工前才需鎖相容版本。本輪不以 Beta 當 stable，不宣稱檔案組合已通過品質或成本測試。
 
 ## 6. 審核結論與下一步
 
@@ -230,9 +230,9 @@ LangGraph Functional API 的 task 能恢復已完成結果；恢復 entrypoint �
 
 本文旁附原始引用；以下是深入查證的路由，不複製完整研究：
 
-1. [OpenAI 系統圖](2026-09-05-openai-conversation-context-and-memory-system-map.md)：公開 OpenAI 機制、版本差異與未知。
-2. [Artifact 詳表](2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)：Session／rollout／raw_memory／summary／slug 等逐項責任。
-3. [框架官方事實圖](2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)：官方元件，非本輪選型。
+1. [OpenAI 系統圖](../research/agent-systems/2026-09-05-openai-conversation-context-and-memory-system-map.md)：公開 OpenAI 機制、版本差異與未知。
+2. [Artifact 詳表](../research/agent-systems/2026-09-05-openai-memory-artifacts-to-framework-detailed-crosswalk.md)：Session／rollout／raw_memory／summary／slug 等逐項責任。
+3. [框架官方事實圖](../research/agent-systems/2026-09-05-langchain-langgraph-deepagents-langmem-official-memory-flow-map.md)：官方元件，非本輪選型。
 4. [通用審核](2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)：F01–F07、Q017 中途補查與歷史判斷。
 5. 本文：把已證實的能力接成候選，明列接合與剩餘風險。
 

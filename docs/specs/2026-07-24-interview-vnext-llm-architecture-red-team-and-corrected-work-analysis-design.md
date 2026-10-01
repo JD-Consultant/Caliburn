@@ -6,10 +6,10 @@
 - 核心目標：透過專業訪談，逐步形成高品質、客製化且由員工審核的職務說明書
 - 不包含：SaaS、帳號、密碼、多租戶、多人協作、公司職能庫、Graph DB、multi-agent framework
 - 上游文件：
-  - [Evidence-first Stateful Interview Architecture](2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md)
+  - [Evidence-first Stateful Interview Architecture](../archive/retired-documents/specs/2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md)
   - [專業職務分析與短回答架構研究](2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)
   - [下一題選擇與 Context Loop 研究](2026-07-23-interview-vnext-question-selection-context-loop-research.md)
-  - [Job Authoring v2 關聯式儲存研究](2026-07-24-job-authoring-v2-relational-storage-research.md)
+  - [Job Authoring v2 關聯式儲存研究](../archive/retired-documents/specs/2026-07-24-job-authoring-v2-relational-storage-research.md)
 
 ## 1. 結論先行
 

@@ -2,7 +2,7 @@
 
 > 2026-09-06 · **G3 已同意；Owner 後續授權隔離施工，G4 工程接線見 §7。WORKING，不是完成報告。**
 > Owner 最新准「現在就是要實作完整」。採下述已同意接法，工程接線見 §7；實作／驗證進度見[結果紀錄](../../.worktrees/analysis-only-agent/docs/specs/2026-09-06-summary-reextraction-results.md)。文內三方案及 §6 保留前階段決策理由，不重新開啟 Memory 選型。
-> 入口：[current decisions](../current-decisions.md)。官方完整證據：[詳記更正 source review](2026-09-06-openai-rollout-summary-correction-source-review.md)；既有接法：[Q019 Memory](2026-09-06-analysis-only-agent-memory-design.md)。
+> 入口：[current decisions](../current-decisions.md)。官方完整證據：[詳記更正 source review](../research/agent-systems/2026-09-06-openai-rollout-summary-correction-source-review.md)；既有接法：[Q019 Memory](2026-09-06-analysis-only-agent-memory-design.md)。
 
 ## 1. 這次要決定什麼
 
@@ -13,7 +13,7 @@
 - 沿目前 Memory 找到更正，再讀相關詳記／原文：有直接 OpenAI 流程依據。
 - 任意打開一份舊詳記，系統都自動附帶此後所有更正：現有研究沒有證明 OpenAI 提供此保證；本案也尚未提供。
 
-後者不能被前者偷換，也不能只靠一句「以最新理解為準」就宣稱問題已完全解決。[官方讀取指示][R1]、[本案證據界線](2026-09-06-openai-rollout-summary-correction-source-review.md#4-回查舊詳記與-live-update仍有界線)
+後者不能被前者偷換，也不能只靠一句「以最新理解為準」就宣稱問題已完全解決。[官方讀取指示][R1]、[本案證據界線](../research/agent-systems/2026-09-06-openai-rollout-summary-correction-source-review.md#4-回查舊詳記與-live-update仍有界線)
 
 ## 2. 三種接法與推薦
 
@@ -21,7 +21,7 @@
 |---|---|---|
 | 每次重新抽取整個持續中的訪談，替換現行詳記 | 接近 Codex 同 thread 重抽；但來源愈長，輸入／輸出成本愈高，官方抽取還可能截斷，不能保證所有細節都看過 | 不建議用在無限累積的單訪談。[重抽][R7]、[保存][R2]、[輸入上限][R3] |
 | **按段保存詳記，整併時維護目前說法及更正引用；需要時重抽同段** | 學習跨 rollout 整併與漸進回查，不每次重讀全部原文；保留當時脈絡，但依賴模型辨識更正、寫好路由及正確查找 | **Owner 已同意此效果邊界，WORKING。** 分段是本案映射，不稱原廠一模一樣。[整併][R4]、[讀取][R1] |
-| 找出所有受影響舊詳記，逐份重寫／加更正通知 | 可追求直接開舊詳記也看到更正，但需辨識受影響範圍、同步引用與處理漏更新；目前未查到原廠全面傳播的契約 | 有更強需求時才另設計；不把普通檔案編輯能力當作此功能已完成。[證據界線](2026-09-06-openai-rollout-summary-correction-source-review.md#3-不同詳記談同一案例比對與修訂在哪裡發生) |
+| 找出所有受影響舊詳記，逐份重寫／加更正通知 | 可追求直接開舊詳記也看到更正，但需辨識受影響範圍、同步引用與處理漏更新；目前未查到原廠全面傳播的契約 | 有更強需求時才另設計；不把普通檔案編輯能力當作此功能已完成。[證據界線](../research/agent-systems/2026-09-06-openai-rollout-summary-correction-source-review.md#3-不同詳記談同一案例比對與修訂在哪裡發生) |
 
 **推薦演進說明：**前輪優先評估「詳記有可重建現行內容」，仍肯定同一抽取範圍可重建；但它本身解不了跨範圍更正。比較後選第二列，不自動擴成第三列。此推薦原為待審，現已獲 Owner 同意其效果邊界；不是為保留舊程式而拒絕新能力，也不將同意擴大成全面詳記同步或 production 施工。
 
@@ -29,7 +29,7 @@
 
 以下為 **Caliburn WORKING 接法**；引用是依據，不代表 OpenAI 使用相同範圍、檔名或資料庫。
 
-1. **原始訪談保留。**「先前怎麼說、後來怎麼更正」都可回查，不用改寫歷史聊天。[原始紀錄與摘要分工](2026-09-06-openai-rollout-summary-correction-source-review.md#2-同一對話詳記可重新產生不是只累積新副本)
+1. **原始訪談保留。**「先前怎麼說、後來怎麼更正」都可回查，不用改寫歷史聊天。[原始紀錄與摘要分工](../research/agent-systems/2026-09-06-openai-rollout-summary-correction-source-review.md#2-同一對話詳記可重新產生不是只累積新副本)
 2. **B1 整理本批問答。**詳記敘述本批補充／更正與未解事項；候選把會影響記憶使用的變化交 B2。沒看過的舊脈絡不能自行補成事實。原文位置由 Runtime 提供，模型不填假 ID／時間。[詳記內容指示][R5]
 3. **B2 比對相關既有 Memory，必要時讀舊詳記。**有明確更正就更新目前說法；有歧義保留未知，不用「較晚一句」強行覆蓋。[整併衝突／引用規則][R4]
 4. **案例更正也可成為正文的有用知識。**即使一般工作模式沒變，若不記錄就會讓後續誤用舊案例，仍在相關主題下留簡短更正、案例名稱／別名與新詳記引用。不是將所有案例全文塞進正文，不設必填 correction 表單。這是本案內容政策，依原廠保留有用知識、處理衝突及主題引用的方式映射，**不是原廠保證模型一定抽對**。[R4]

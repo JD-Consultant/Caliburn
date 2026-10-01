@@ -1,7 +1,7 @@
 # 相似比對(similarity matching)v1 — 設計 spec
 
 > **類型**:設計 spec(已與維護者逐段確認,2026-07-04)。
-> **研究依據**:[`2026-07-02-multi-ocs-candidate-dedup-research.md`](2026-07-02-multi-ocs-candidate-dedup-research.md)
+> **研究依據**:[`2026-07-02-multi-ocs-candidate-dedup-research.md`](../research/retrieval/2026-07-02-multi-ocs-candidate-dedup-research.md)
 > (五輪;門檻與灰區體積皆有實驗出處)。**決策**:ADR 0022。
 > **一句話**:現有系統一個都不動;indexer 多一個 endpoint,api 組完知識包後多打一通電話,
 > web 多畫幾個徽章。非破壞性——**不刪任何項目**。
@@ -167,7 +167,7 @@ TaskRowVM.similarTo?: { name: string; score: number }[]  // 灰區對
 
 ## 8. 文檔更新義務(同 commit)
 
-- [`docs/design/editor-knowledge-pack.md`](../design/editor-knowledge-pack.md):
+- [`docs/design/editor-knowledge-pack.md`](../archive/retired-documents/design/editor-knowledge-pack.md):
   similarity 掛載點、web 顯示變換鐵律、不變量 A/B。
 - `apps/ocs-indexer/README.md`(items:match 端點面)· `apps/web/README.md`(分群顯示)·
   `apps/api/README.md`(similarity 掛載)。

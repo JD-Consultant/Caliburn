@@ -226,3 +226,39 @@ ignored 探針 `.research-tmp/eval/probe_compaction_continuity.py` SHA-256：`78
 | `a-preparation-offline-native-20261001.jsonl` | `efe3d4282c1babb71aea2ecd6fdbe795039f95f08293fe960e6f129566f2c349` |
 
 腳本 Ruff E4/E7/E9/F/I、format check與新 seed 欄位檢查通過。只提交 evidence 與任務路由；不新增產品程式或重跑無關全套測試。此片是接線驗證探索，不宣稱功能 TDD 或已修復產品故障。
+
+## 9. 原生 seed 修正後的有界補驗（2026-10-01）
+
+接續 §8，不覆寫先前失敗結果。已在本機核對新 seed 經既有 `snapshot_response()` 保存：message 保留 phase；function call 只有六個已提供欄位，不帶 `async_` 或未提供的 null 值。此修正是否解決第二次400仍須實測；不先歸因到產品。OpenAI 官方仍要求[完整承接 C](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)，本片不改接續規則。
+
+本輪只允許**一批新隔離驗證**：沿 §8 manifest（Luna／high，全合成種子，最多8 count＋6 create＋1 compact、零重試、串行、720秒、管理預留US$1.00；歷史128K–180K、後續不超180K）。結果另存 `a-preparation-native-provider-20261001.jsonl`，獨占不可覆寫。探針 response hook 只補記白名單格式的 error `code`／`param`／`type`，不保存錯誤正文、原話回顯或 header。任何錯誤／出界即停止，本輪不補跑第二批、不追加付費診斷；不改模型、Prompt、產品 serializer 或門檻。這是 §8 已查明 seed 序列化差異後的有限驗證，不是遇到同一400就盲重試。
+
+### 實際結果
+
+2026-10-01T03:44:56Z–03:45:09Z（本地11:44–11:45），退出碼0。**正式 A Runner 的128K輪前壓縮與真PG接線在本合成例通過**；2次 count、1次 compact、1次生成，零重試。不是整個 T16 通過，也不重寫 §8 的失敗紀錄。
+
+| 邊界 | 可核對結果 |
+|---|---|
+| 完成歷史與門檻 | 真 count **164,317** tokens，依產品既有128K門檻壓縮；當次員工更正尚未放入 compact input |
+| 全部 C | 遠端 compact 返回4個 message＋1個 compaction，五項全部原序保存／承接，不只取摘要；usage input156,439／output183 |
+| 新 Turn input | 精確比對為全部 C＋user App資料＋user原輸入；instructions、14工具、high／all_turns／store=false維持不變。真 count／生成 input為 **8,803** |
+| 語意觀察 | 正式答覆：「目前三項規則是：每季盤點；庫存調整僅主管可核准；未解決的短缺須當日升級處理。」並追問升級前的處理。主代理對照合成條件3/3符合；沒有人工改稿 |
+| 正式保存與重連 | 輸入6／答覆7保存；關閉再開官方 PG saver，已採用 C 逐值相等，原 seed checkpoint 指紋不變，execution completed |
+| 收尾 | 唯讀 SQL 核本片 schema：3個 A＋1個受控 Memory execution 全部 completed，無 active；沒有修改 Demo、產品程式／Prompt／門檻 |
+
+歷史 count 含 A instructions／tools，compact 只收原窗口，因此164,317與156,439的差異不是丟訪談。最初兩輪是 fake 模型、Memory 也是受控發布；本輪 App資料含規則導覽，**不能據此單獨證明三項事實全靠 opaque C 記住**，也不證明全部2,050列細節無損、自然訪談／來源品質或 B1／B2 分析。真生成包含原生 reasoning＋final message，未檢視加密內容。未觀察本輪工具呼叫或輪中壓縮；取消沿既有獨立證據，不擴張成本／恢復宣稱。
+
+已觀測 compact／create 合計 input165,242、output482，其中cache write8,800、cache read0；按既有 `openai-standard-2026-09-30` 配置估 **US$0.0169852**（compact0.0157354＋create0.0012498）。只是已回 usage 的 token 推算，不是帳單；count未回帳務結果，不自行當零。產品仍不設預估金額攔截。這次原生種子被遠端接受，但沒有取得前一400的原參數，故只確認修正版可用，不倒推所有舊失敗的確切原因。
+
+本機原件定位：schema `a_preparation_20261001_ccb25749`；job `4618f983-9918-48b1-b7f7-5c676d402a4b`；seed Memory `879f5d72-afb1-48b0-a3df-3de2f87718f0`。完整 C 留既有 PG saver；JSONL僅保留安全結果。未清除隔離資料。
+
+| 原件／請求 | SHA-256 |
+|---|---|
+| ignored `verify_consultant_preparation.py`（本批執行版本） | `3748804e1a807dd886a5e616ad4f696eb4a441ef3dc6eb60bcedcefc88f84c73` |
+| ignored `a-preparation-native-provider-20261001.jsonl` | `19403a944ad926dc3f8ecc4f72c40d0d732241ffb84ac362153fd51a3ca28bee` |
+| 完整 C | `6c821e446f4c8ca195f7012c9de7987b19c73c6a538efc74f5c90a384d20e533` |
+| 首次真生成請求 | `c30fbbe66673e374059757e12f0787441f240d1946c5dd81d6c5e857e8ea3602` |
+
+instructions／tools hash與 §8 相同。執行命令（apps/api）：`./.venv-target/Scripts/python.exe -X utf8 -B ../../.research-tmp/eval/verify_consultant_preparation.py --output ../../.research-tmp/eval/a-preparation-native-provider-20261001.jsonl --execute`，另設 `PYTHONPATH=S:/caliburn/apps/api`。這是實際紀錄，不要求覆寫結果或再付費重跑；探針 Ruff check／format check以 apps/api 為 cwd 通過。另一次誤在 repo root 檢查此 ignored 檔得到預設格式／import順序差異；回正確 cwd 確認通過，不因此改 API 以外的 lint 配置或測例。沒有產品行為改動，不作 TDD 修復宣稱、不重跑無關全套。
+
+本接縫至此停止補測；A輪前壓縮／保存已不再是未驗項。**272K／512K的帳戶容量取捨、Luna來源漏引及T17／T18仍未完成**；不因這個窄例通過而改門檻、降低品質要求或正式切換。

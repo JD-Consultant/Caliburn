@@ -252,7 +252,7 @@ def test_resume_keeps_unknown_admission_blocked_and_confirmed_timeouts_bounded(
                         lambda _: Decimal("0.01"),
                         token_count_reservation_usd=Decimal("0.001"),
                     ),
-                    retry_policy=ResponseRetryPolicy(0.001, 0.001),
+                    retry_policy=ResponseRetryPolicy(0.001, 0.001, 0.001, 0.001),
                 )
                 initial_executor = (
                     replace(executor, sessions=CommitAcknowledgementLoss())

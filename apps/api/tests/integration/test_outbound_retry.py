@@ -121,7 +121,7 @@ async def retry_executor(
                     compaction_reservation_usd=Decimal("0.2"),
                     observed_compaction_cost=lambda _: Decimal("0.02"),
                 ),
-                retry_policy=ResponseRetryPolicy(0.001, 0.001),
+                retry_policy=ResponseRetryPolicy(0.001, 0.001, 0.001, 0.001),
             )
     finally:
         await database.close()
@@ -321,16 +321,18 @@ def test_blocked_provider_failure_does_not_retry_on_reentry(
 
 
 @pytest.mark.parametrize(
-    ("max_attempts", "cost", "delay", "expected_limit", "expected_calls"),
+    ("status", "code", "max_attempts", "cost", "delay", "expected_limit", "expected_calls"),
     [
-        (2, "1", "0", BudgetLimit.REQUEST_ATTEMPTS, 2),
-        (5, "0.25", "0", BudgetLimit.COST, 2),
-        (5, "1", "86400", BudgetLimit.DEADLINE, 1),
+        (503, "server_error", 2, "1", "0", BudgetLimit.REQUEST_ATTEMPTS, 2),
+        (429, "rate_limit_exceeded", 5, "0.25", "0", BudgetLimit.COST, 2),
+        (429, "rate_limit_exceeded", 5, "1", "86400", BudgetLimit.DEADLINE, 1),
     ],
 )
 def test_retry_uses_original_limits_across_executor_reentry(
     database_settings,
     retry_file_id,
+    status,
+    code,
     max_attempts,
     cost,
     delay,
@@ -341,7 +343,7 @@ def test_retry_uses_original_limits_across_executor_reentry(
 
     def respond(request):
         calls.append(request.url.path)
-        return rejection(delay=delay)
+        return rejection(status, code, delay=delay)
 
     async def scenario():
         async with retry_executor(
@@ -410,7 +412,9 @@ def test_retry_delay_survives_restart_and_cancellation_is_checked_before_resend(
             nonlocal failure_before_restart
             failure_before_restart = attempts[0].failure
             # New coordinator, no in-process response/attempt needed. Saved delay wins.
-            resumed = replace(executor, retry_policy=ResponseRetryPolicy(0.0001, 0.0001))
+            resumed = replace(
+                executor, retry_policy=ResponseRetryPolicy(0.0001, 0.0001, 0.0001, 0.0001)
+            )
             if cancel_during_wait:
                 with pytest.raises(ExecutionStateError):
                     await resumed.request_model(request_fixture(), request_id, 100)
@@ -684,7 +688,7 @@ def streaming_request():
     )
 
 
-def test_rate_limit_inside_a_stream_is_retried_like_any_transient_failure(
+def test_rate_limit_inside_a_stream_is_retried_and_recorded_as_a_rate_limit(
     database_settings, retry_file_id, caplog
 ):
     calls = []
@@ -708,7 +712,7 @@ def test_rate_limit_inside_a_stream_is_retried_like_any_transient_failure(
                     session, executor.writer.scope, request_id
                 )
             failures = [a.failure for a in attempts if a.failure is not None]
-            assert [f.failure_code for f in failures] == ["transient_service"]
+            assert [f.failure_code for f in failures] == ["rate_limited"]
             assert failures[0].retry_not_before is not None
             diagnostics = [r for r in caplog.records if r.name == model_requests.__name__]
             assert len(diagnostics) == 1
@@ -742,6 +746,83 @@ def test_unknown_error_inside_a_stream_stops_without_retry(
             assert "provider_code=None" in diagnostics[0].getMessage()
             assert "private employee text" not in caplog.text
             assert diagnostics[0].exc_info is None
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
+def test_a_rate_limit_waits_instead_of_spending_the_attempt_budget(
+    database_settings, retry_file_id
+):
+    """The provider asked us to slow down; that is not a failure of the work. Five rejections
+    outlast a budget of two tries, and the sixth send still succeeds."""
+    calls = []
+
+    def respond(request):
+        calls.append(request)
+        if len(calls) <= 5:
+            return rejection()
+        return response_http_reply(request, success_fixture())
+
+    async def scenario():
+        async with retry_executor(
+            database_settings, retry_file_id, respond, attempts=2, outbound_attempts=32
+        ) as executor:
+            request_id = uuid4()
+            result = await executor.request_model(request_fixture(), request_id, 100)
+            assert result.response.id == success_fixture()["id"]
+            assert len(calls) == 6
+            async with executor.sessions.begin() as session:
+                attempts = await budgets.read_request_attempts(
+                    session, executor.writer.scope, request_id
+                )
+            codes = [a.failure.failure_code for a in attempts if a.failure is not None]
+            assert codes == ["rate_limited"] * 5
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
+def test_a_service_fault_still_stops_at_the_attempt_budget_even_after_rate_limits(
+    database_settings, retry_file_id
+):
+    calls = []
+
+    def respond(request):
+        calls.append(request)
+        return rejection() if len(calls) <= 3 else rejection(503, "server_error")
+
+    async def scenario():
+        async with retry_executor(
+            database_settings, retry_file_id, respond, attempts=2, outbound_attempts=32
+        ) as executor:
+            with pytest.raises(BudgetExceededError) as caught:
+                await executor.request_model(request_fixture(), uuid4(), 100)
+            assert caught.value.limit == BudgetLimit.REQUEST_ATTEMPTS
+            # Three rate limits did not count; the two service faults that followed did.
+            assert len(calls) == 5
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
+def test_endless_rate_limits_still_end_at_the_executions_overall_attempt_limit(
+    database_settings, retry_file_id
+):
+    calls = []
+
+    def respond(request):
+        calls.append(request)
+        return rejection()
+
+    async def scenario():
+        async with retry_executor(
+            database_settings, retry_file_id, respond, attempts=2, outbound_attempts=6
+        ) as executor:
+            with pytest.raises(BudgetExceededError) as caught:
+                await executor.request_model(request_fixture(), uuid4(), 100)
+            assert caught.value.limit == BudgetLimit.OUTBOUND_ATTEMPTS
+            assert len(calls) == 6
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())

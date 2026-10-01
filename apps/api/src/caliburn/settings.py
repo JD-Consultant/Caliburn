@@ -25,7 +25,7 @@ class ModelSettings:
     max_attempts_per_request: int = 8
     max_outbound_attempts: int = 512
     max_compactions: int = 4
-    turn_timeout_seconds: int = 900
+    turn_timeout_seconds: int = 1_800
     request_timeout_seconds: float = 120.0
     # Product entrypoints leave this unset. Paid evaluation harnesses may opt in.
     max_cost_usd: Decimal | None = None

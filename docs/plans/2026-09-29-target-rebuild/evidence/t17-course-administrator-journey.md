@@ -277,3 +277,55 @@ pypdf 抽取後對照原保存 JD 的 **49 個非空文字欄位**，經明示�
 本片確認**同一已保存產物 → UI 回看／來源 → PDF**可用，並修正無模型時的歷史投影接線。沒有修改 Prompt／Tool descriptions／Context 組裝、產品模型或正式資料；不把機制通過當成 Luna 的來源語意缺口已修復。JD→Memory 換版 diff 的真模型判斷、廣泛長訪談品質及 T16／T18 原 gate 仍按原文件，T17 不勾選完成。後續以 Luna 及既有原件處理核心缺口，不再追加 Sol 比較。
 
 自有驗證程序已正常完成 shutdown，唯讀分頁關閉；合成 DB／PDF／PNG 保留，沒有停止 Demo 或刪除資料。本次新增／修改的 12 個相對文件連結均可找到目標，`git diff --check` 通過；全檔檢查所見舊 worktree 歷史連結失效不在本片改寫。
+
+## 2026-10-01：Luna 的 Memory 換版與人工改稿定向驗收
+
+### 外送前 manifest
+
+基準 `67ebea87`；Owner 已決定產品使用 Luna。本片補前節尚未驗的 JD→Memory diff 判斷，不重播長訪談、比較 Sol、追加提示詞或自動猜補來源。[OpenAI 完整工作流驗收建議](https://developers.openai.com/cookbook/examples/agent_optimization/optimizing_agents_for_cost_and_quality#track-the-complete-support-workflow)強調同時看實際操作軌跡與結果，不只看最後答覆；本案沿用既有 rubric，沒有另建評測平台。
+
+- **受控前提，非自然成稿證據：**獨立 `recheck_luna_20261001_7dce0494` schema，合成職務檔案 `4ea25807-4f55-4bdc-8dcc-52f937a9f1bc`。透過現有領域／交易入口建立兩則正式員工原話、兩版 Memory 與舊 JD 引用，不捏造原生 reasoning／checkpoint。M1 是每月盤點；M2 根據後續更正改為每季、情境改名，帳物核對／差異清單／主管核准界線不变。理解仍引用同身分的新情境；JD 保留 M1 來源。人工再把 JD 加上不實的「本人核准補貨」。這只是換版接縫的前提，不冒充 B1／B2 真分析或 AI 初始成稿。
+- **實際執行：**只送一則員工請求，說明先前已更正盤點周期，人工誤寫核准補貨、實際由主管核准，請顧問核對修稿。模型自主使用完整現行工具；不強制特定 call，不直接替它完成核對或修稿。開始前先用無模型後端準備並核對前提，尚無付費外送。
+- **上限：**`gpt-6-luna`／high、`store=false`／all_turns，單次執行最多 16 create／48 outbound、零傳輸重試、1 compact、8,192 output、120 秒單請求／240 秒執行；測試預算每執行 US$0.25。一個 A Turn，至多一個由該輪自然要求的背景批次（B1／B2 共用批次上限），總預留 US$0.50、32 create／96 outbound；不使用 Sol、不擴量補跑。A 或背景達上限／非 completed 即記錄並停止新工作；觀察逾時須核對原執行，不能另送一次。
+- **判準：**A 能定位舊 JD 與既存 citation，閱讀需要的人工／來源差異及本 Turn 固定新 Memory；正式稿改為每季，保留核對與差異回報，不把人工新增的核准權當事實。只有實際重評後才確認既存依據對齊，或作有理據的來源變更；不能只讀過 diff 就自動解除待核對。保存後核對來源身分／版本與內容，再檢查舊固定引用仍可讀。若需要追問，允許保留未解狀態，但不能把它記成此案例已完成。
+- **本機重現：**ignored `verify_memory_jd_recheck.py` 預設僅準備；`--run` 才外送且 evidence 已開始就拒絕重跑。新 schema／原件保留，不讀寫 Demo、不輸出憑證／opaque payload；只保存合成公開內容、必要定位及用量。本片是品質驗收，不宣稱 TDD 或整段員工只訪談的旅程通過。
+
+### 網路環境診斷與一次補驗
+
+第一次 A `40f6bf9f-402d-4b26-8c1f-37a14a87690f` 於 3.39 秒失敗，ledger 僅有一次 `token_count / remote_result_unknown`，沒有 model 外送；未重試，沒有正式訪談／JD／引用變化，無 active 殘留。checkpoint 終止原因為 `request_attempts` 上限，不是模型判斷錯誤。無金鑰的同一官方 `/v1/models` 探測：沙箱內 `ConnectError`，沙箱外 HTTP 401，確認是執行網路環境差異；無需改產品重試、Prompt 或資料。
+
+在檢查前後業務資料相同後，追加**一次**沙箱外補驗，仍使用上節模型、內容、單執行限額及 US$0.50 總預留，另存 `memory-jd-recheck-luna-network-20261001.json`。原失敗紀錄保留，不清理 DB 或宣稱遺失請求免費；補驗以同文字新輸入啟動，不冒充恢復舊未產生的回應。若再失敗就停止，不繼續擴量。
+
+### 真 Luna 結果：修稿與引用對齊成立，來源 diff 使用未觀察
+
+補驗 execution `0c21a3fb-d872-4c3f-aec8-33e8812da0dd` completed；觀察區間 32.22 秒（含輪詢，不是純模型延遲）。模型自主完成 5 次 Responses／5 次 token count、10 次工具操作，零傳輸重試／compact，未要求新背景批次。沒有修改產品 Prompt、工具、Context 或程式。
+
+| 檢查面向 | 實際結果 |
+|---|---|
+| 改稿效果 | 原任務身分保留；每月改為每季，保留帳物核對及差異回報，移除員工的補貨核准權，明確由倉庫主管核准 |
+| 實際閱讀 | 讀 JD map、人工差異、訪談 1–4、新版情境與理解全文、任務與既存來源；沒有讀任意舊 Memory 的工具入口 |
+| 明確核對 | `revise_jd_item` 同次修改 description、加入更正原話 4，並對原 citation 明確執行 `confirm_reference_alignment`；之後重讀任務確認結果，不是 App 因讀過內容而自動解除待核對 |
+| 保存及引用 | 正式 JD 修訂 `14b6664d-b2ee-4737-a673-f00750161f46`；原 citation `69791929-b372-4e55-9677-b69bf0a0c6be` 身分不變，已對齊 M2 的理解修訂且不再待核對；新增引用 4 可支持更正後內容 |
+| 舊依據不被改寫 | 原 JD 修訂仍指 M1；M1 理解、情境、原話鏈仍可讀。M2 引用指向其選用的情境修訂，不偷換舊快照 |
+| Context／歷史 | 五次請求的固定 App 資料 hash 相同；App 資料為 user、當次原話另外提供，接續 items 由 2→14→22→26→29 增長，保留原生輸出／工具結果。正式訪談最後為 1–7，失敗輸入未佔正式序號、未混入本次 Context |
+| 重開 | 關閉後以無模型 App 重開，同一正式 JD 可由 HTTP 取回；無 active 執行殘留，不額外呼叫模型 |
+| 尚未觀察 | 模型只呼叫 `read_jd_changes` 的 **manual** 分支，沒有使用 **source** 分支。因此不得將本次記成「來源 diff 已被真模型按需使用」通過 |
+
+實際正式任務正文：
+
+> 每季核對庫存帳與實物，將差異清單交給倉庫主管；本人負責核對與回報，補貨由倉庫主管核准。
+
+最後答覆正確摘要修訂，並追問交付差異清單後是否仍須追蹤，不把整份職務宣稱為完整。兩則公開中間訊息亦可回看，沒有成為正式訪談依據。
+
+**證據邊界：**這是短 Context、單項工作的受控換版／人工改稿接縫，不是自然長訪談。前兩個正式交流及兩批 Memory 為現有 domain workflow 建立的 fixture，非此次模型產物；沒有先前真 A checkpoint，故人工差異比較基準是初始空 JD，包含建立任務、加引用、人工誤改共三個操作。模型有根據新全文及原話修稿與對齊，但未觀察到來源 diff；不藉此消除 Luna 長歷史漏保留依據的已知限制，不勾整體 T14／T17／T18，也不為單例再加提示或強制工具呼叫。
+
+生成 usage 合計 input **50,994**、output **1,926**（含 reasoning）；ledger 模型費用估算 **US$0.002804150**，不是帳單，不含未確認的 count 費用。首次失敗另有一次 count 嘗試，原紀錄保留；沒有把它算成新生成或宣稱免費。
+
+本機 ignored 原件均只含合成資料。結果由 `audit_memory_jd_recheck.py` 唯讀核對已保存請求／輸出、正式引用鏈與重開結果，不輸出 encrypted reasoning。保留以下 SHA-256 供重現比對（前兩項為有界 harness，後兩項為原結果）：
+
+- `verify_memory_jd_recheck.py`：`299482a759ff2377ab7cae3cc560f750c2fd0156fb27539e96e4366c08990195`。
+- `audit_memory_jd_recheck.py`：`81250cf200bd5cc8ecff8670485798ca23ccddfe3cd557bfd32c402f49234022`。
+- `memory-jd-recheck-luna-network-20261001.json`：`07c191f7aa9677e5dea23202b506a0265584b34984497fb7a29413d77dc18bf7`。
+- `memory-jd-recheck-luna-audit-20261001.json`：`fbd285d992b9917c3445e846bd55e1f2c9dd7fb6d8e1c22a87cf78d871a86fbc`。
+
+實際 instructions hash `028a05d80d6e71b37094b989ff764576f7ed49eef1610b63b243b27d6b39b3fe`、tools hash `f424fc85dc708422444da3546d8103d29735aec7e44bd11a6b67ba9c3b86b373`；沿現行 Luna／high／all_turns／store=false。其餘既有容量及正式切換 gate 不變。

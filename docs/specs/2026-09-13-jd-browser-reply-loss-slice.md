@@ -1,5 +1,7 @@
 # JD 原保存回覆遺失、重開查回與顧問接點
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 日期：2026-09-13；Topic：JD-R002；RS-3 局部驗收通過，RS-4 前置收斂。承接[六章手動管理](2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)與[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)。本次仍是隔離 App，ADR0075 Proposed／production ADR0060 不變，零產品模型呼叫。
 
 ## 1. 完成效果
@@ -8,7 +10,7 @@
 
 另外修正文件對話框關閉時的封存 fallback：原先 `dialog=null` 仍在 MUI 退出動畫渲染期間落入封存文案；更名時若名稱非空，按鈕也可能仍可用。現在關閉即卸載 Dialog，metadata 入口只接受更名／封存狀態。取消更名／建立經新 production build 的瀏覽器窄驗；取消不改文件目錄。
 
-這次沒改 domain、資料表、HTTP 契約或保存流程；實作變更只在 [Workspace](../../experiments/jd-relational-app/web/src/components/Workspace.tsx)，其餘為測試 helper、實證與研究紀錄。
+這次沒改 domain、資料表、HTTP 契約或保存流程；實作變更只在 Workspace（已退役），其餘為測試 helper、實證與研究紀錄。
 
 ## 2. 官方依據與本案映射
 

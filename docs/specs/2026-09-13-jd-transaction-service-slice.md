@@ -1,5 +1,7 @@
 # JD：共同編輯到真實保存的交易切片
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 - 日期：2026-09-13；Topic：JD-R002；RS-1／RS-2 隔離實作。
 - 承接[結果與十三表基礎](2026-09-13-jd-result-and-storage-foundation.md)、[保存契約](2026-09-12-jd-relational-schema-and-write-contract.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)。
 - **已接通八個編輯操作、目前內容讀取、版本／操作保存及 failure-only 資料庫收尾。**入口仍是 Python 內部 service；未提供 App 畫面／HTTP endpoint／正式 refs，也未接顧問或真程序停止證明。沒有修改正式 authority 或舊資料，0 產品模型呼叫。
@@ -10,11 +12,11 @@
 
 | 元件 | 本次已完成的責任 | 沒有承擔的責任 |
 |---|---|---|
-| [snapshot SSOT](../../experiments/jd-relational-app/contracts/jd-snapshot.schema.json)／[codec](../../experiments/jd-relational-app/src/jd_relational/snapshots.py) | 固定 v3／jd-relational-v1、完整欄位及穩定 IDs；嚴驗後在 arrays 與 domain keyed rows 間轉換；拒絕未知欄／版本／重複 ID／錯關係 | 不推論工作、不正規化舊稿成新事實、不發 refs 或保存 |
-| [固定意圖](../../experiments/jd-relational-app/src/jd_relational/intents.py) | App 配發 operation ID；固定 command 與可信 context 副本；對穩定目標、base、origin/run 及內容計算 request digest | 不驗外部 token 真偽、不取得 writer gate、不自行呼叫來源 owner |
-| [九組 current mapper](../../experiments/jd-relational-app/src/jd_relational/storage/rows.py) | 同文件增量 INSERT／UPDATE／DELETE；完整 final row 一次更新，未改列不寫；共用 snapshot/domain 驗證 | 不開連線／commit；不做通用 repository 或歷史 restore |
-| [永久回執型別](../../experiments/jd-relational-app/src/jd_relational/storage/receipts.py) | SQL row 擁有 identity/base/result；Python 內部 versioned body 保存 command kind、固定 error／next action；讀回核外部結果 SSOT 的合法組合 | 不保存短效 token；內部 ID 不直接充當 API refs |
-| [transaction service](../../experiments/jd-relational-app/src/jd_relational/storage/service.py) | 新建／查回文件、同版 current read、原 operation 查回、一次保存與 failure-only 收尾；安全診斷 | 不建立第二套 runtime／Memory、不重播 mutation、不替 caller 證明程序停止 |
+| snapshot SSOT（已退役）／codec（已退役） | 固定 v3／jd-relational-v1、完整欄位及穩定 IDs；嚴驗後在 arrays 與 domain keyed rows 間轉換；拒絕未知欄／版本／重複 ID／錯關係 | 不推論工作、不正規化舊稿成新事實、不發 refs 或保存 |
+| 固定意圖（已退役） | App 配發 operation ID；固定 command 與可信 context 副本；對穩定目標、base、origin/run 及內容計算 request digest | 不驗外部 token 真偽、不取得 writer gate、不自行呼叫來源 owner |
+| 九組 current mapper（已退役） | 同文件增量 INSERT／UPDATE／DELETE；完整 final row 一次更新，未改列不寫；共用 snapshot/domain 驗證 | 不開連線／commit；不做通用 repository 或歷史 restore |
+| 永久回執型別（已退役） | SQL row 擁有 identity/base/result；Python 內部 versioned body 保存 command kind、固定 error／next action；讀回核外部結果 SSOT 的合法組合 | 不保存短效 token；內部 ID 不直接充當 API refs |
+| transaction service（已退役） | 新建／查回文件、同版 current read、原 operation 查回、一次保存與 failure-only 收尾；安全診斷 | 不建立第二套 runtime／Memory、不重播 mutation、不替 caller 證明程序停止 |
 
 body 是只有 Python producer/consumer 的內部持久型別，使用既有 Pydantic 明確 model；符合[契約策略](../contract-strategy.md)的 shared typed module 分界。跨語言 snapshot／外部 result 仍是 JSON Schema 生成，沒有改成手寫 Web 型別。snapshot 根保存 document scope，row 不重複 scope；當前 revision 不放 content digest，避免同內容因版號不同被誤認為有變。
 

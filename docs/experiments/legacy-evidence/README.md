@@ -1,5 +1,7 @@
 # 較早實驗與驗收原件
 
+> **2026-10-02 切換後的連結狀態：**本目錄是原件保留的歷史證據，內容不改寫。其中指向 `experiments/jd-relational-app/**`、`packages/consultant-memory/**` 的檔案連結在舊程式退役後失效（約 280 個）；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 本目錄由原 `docs/specs/evidence/` 歸位，保留各次診斷、腳本、合成輸入輸出、畫面與日誌。只調整文件導航，不重算或美化結果。`legacy` 表示較早的資料組，不代表所有相關產品已退役；有效權責仍查 ADR 與目前決策。
 
 閱讀先由[報告案例集](../../reports/research-casebook.md)、[實驗總入口](../README.md)或原規格連入對應子目錄。新架構的驗收沿[目標計畫 evidence](../../plans/2026-09-29-target-rebuild/evidence/README.md)，不新增第二份數據。

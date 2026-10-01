@@ -1,5 +1,7 @@
 # JD 關聯式資料庫與保存契約
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 > **2026-09-15 產品範圍校正：本稿的 relational current rows、共同 writer／validator／transaction、operation receipt 與故障對帳仍是有效技術基線。`jd_revision`／snapshot 可保留作內部一致性、冪等、當輪 LLM 差異與安全整輪撤回；已完成且穩定的完整歷史／整份還原也不必拆除，但不是第一版接線前置，不再為此擴張或重構。原始對話、來源、案例、Memory、工作理解與 checkpoint 不隨 JD 撤回而倒退。以 [產品核心目標](../product-notes.md) 與 [ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md) 為準。**
 
 - 日期：2026-09-12
@@ -243,7 +245,7 @@ Memory／詳記協助查找原始材料，並非此欄另一種任意可變來�
 
 2026-09-13 [欄位／關係審核](2026-09-13-jd-field-sufficiency-audit.md)修正 ERD 多分支與上述線性語意的文件不一致；當時依 [PostgreSQL 16 UNIQUE 與 NULL 規則](https://www.postgresql.org/docs/16/ddl-constraints.html#DDL-CONSTRAINTS-UNIQUE-CONSTRAINTS)。後續[十三表基礎](2026-09-13-jd-result-and-storage-foundation.md)已在 PG18.6 驗同初版不能有兩個 successor；[保存 service](2026-09-13-jd-transaction-service-slice.md)另驗同 base 並行一成功一過時，未擴稱正式 runtime 已接線。
 
-Canonical snapshot 包含 profile、collaborators、duties、tasks、task_details、capabilities、task_capabilities、conditions、source_links；一般列按 `position,id`，junction 按 `position,task_id,capability_id`，source links 按 `position,source_link_id` 排序。精確 [v3 SSOT](../../experiments/jd-relational-app/contracts/jd-snapshot.schema.json)已生成 Python／TS：根含 `format_version`、`engine_profile`、`document_id`，profile 為 object，其餘八組為 arrays；列不重複 document scope，revision 不進內容摘要。明確保存 nullable 欄、IDs 與 relations，未知版本／欄位／錯關係拒絕，不補造值。這份 JSON 是 history／diff／export 的 immutable material，不接受為 Web／模型的 current write payload。§6.4 的具名還原由 server 讀自有 immutable snapshot、驗證後形成 relational 候選，沒有開放任意 JSON 覆蓋；還原入口仍待施工。
+Canonical snapshot 包含 profile、collaborators、duties、tasks、task_details、capabilities、task_capabilities、conditions、source_links；一般列按 `position,id`，junction 按 `position,task_id,capability_id`，source links 按 `position,source_link_id` 排序。精確 v3 SSOT（已退役）已生成 Python／TS：根含 `format_version`、`engine_profile`、`document_id`，profile 為 object，其餘八組為 arrays；列不重複 document scope，revision 不進內容摘要。明確保存 nullable 欄、IDs 與 relations，未知版本／欄位／錯關係拒絕，不補造值。這份 JSON 是 history／diff／export 的 immutable material，不接受為 Web／模型的 current write payload。§6.4 的具名還原由 server 讀自有 immutable snapshot、驗證後形成 relational 候選，沒有開放任意 JSON 覆蓋；還原入口仍待施工。
 
 ### 4.3 `jd_operation`
 
@@ -261,7 +263,7 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 
 同 `(document_id,operation_id)` 同 digest 重送只回原 receipt；不同 digest 回 `operation_conflict`，不能 UPSERT 覆寫。對 `status='committed'` 建部分唯一索引 `(document_id,result_revision_id)`；no_change 可由多個 operation 指同一 revision。
 
-「原 receipt」指原結果、效果、身分、base/result 及錯誤語意固定，並非要求每次 HTTP／tool JSON bytes 相同。對外 operation／revision／change refs 由原材料發配，不能因 head 已前進而改 result；投影失敗不能改寫已保存結果。確切差異由原 immutable base/result snapshots 及 stable IDs 比較，不在 receipt 保存第二份巨大 before/after。request digest 使用 App 已核的固定意圖，不因 JD token 重新簽發而改變原意圖；来源 identity 沿 source owner。永久結果與短期引用的邊界詳[讀取前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md#41-永久-receipt-與對外-ref-投影)。外部結果已[生成驗證](2026-09-13-jd-result-and-storage-foundation.md)；永久回執使用[內部 typed module](../../experiments/jd-relational-app/src/jd_relational/storage/receipts.py)，依[交易切片](2026-09-13-jd-transaction-service-slice.md)與 current／revision 同交易保存，只有 COMMIT 確認才回 confirmed。[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已將 `WriteObservation` 的原身分／語意轉為 shared result 與 observation refs；它不查 head、不改 receipt，也不因 token 發配失敗改稱保存失敗。公開 change read 與 HTTP 查詢已依[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)驗證；寫入 HTTP／顧問仍待接線。
+「原 receipt」指原結果、效果、身分、base/result 及錯誤語意固定，並非要求每次 HTTP／tool JSON bytes 相同。對外 operation／revision／change refs 由原材料發配，不能因 head 已前進而改 result；投影失敗不能改寫已保存結果。確切差異由原 immutable base/result snapshots 及 stable IDs 比較，不在 receipt 保存第二份巨大 before/after。request digest 使用 App 已核的固定意圖，不因 JD token 重新簽發而改變原意圖；来源 identity 沿 source owner。永久結果與短期引用的邊界詳[讀取前置](../experiments/legacy-evidence/2026-09-13-jd-read-reference-preflight.md#41-永久-receipt-與對外-ref-投影)。外部結果已[生成驗證](2026-09-13-jd-result-and-storage-foundation.md)；永久回執使用內部 typed module（已退役），依[交易切片](2026-09-13-jd-transaction-service-slice.md)與 current／revision 同交易保存，只有 COMMIT 確認才回 confirmed。原觀察投影（已退役）已將 `WriteObservation` 的原身分／語意轉為 shared result 與 observation refs；它不查 head、不改 receipt，也不因 token 發配失敗改稱保存失敗。公開 change read 與 HTTP 查詢已依[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)驗證；寫入 HTTP／顧問仍待接線。
 
 AI 操作的 run 歸屬連同成功／no_change／已確認失敗回執原子保存；必須經既有 run owner 核對同文件，不從 timestamp、actor 或暫態 jd_bindings 猜測。回合 authority 仍是既有 runtime；不在 JD 新建另一套 run 表或跨 owner cascade。尚未形成可信 binding 的請求拒絕不偽造 AI operation。此欄只識別操作歸屬；完整範圍及閉合判斷依[整輪撤回 §4](2026-09-12-jd-ai-turn-undo-design.md#4-何時可撤回)。
 
@@ -388,7 +390,7 @@ current UI、AI read、來源目標核對、目前版 Excel export 共用一個�
 
 反例驗收：reader 已讀 r5 的職責後，writer 新增 C、移 T 至 C、提交 r6；本次 reader 的任務、來源目標與 refs 仍全部是 r5。下次 read 才能全部為 r6；不能回沒有職責 C 卻有 T→C 的投影。[交易切片](2026-09-13-jd-transaction-service-slice.md)已驗真 PG reader 首次查詢後停住、writer 提交、reader 仍回完整舊版且新 read 回新版；[讀取切片](2026-09-13-jd-read-change-implementation.md)另驗 issued refs→共同 command→真保存、head 前進後 current cursor／field 拒絕，以及歷史頁保持原版。上述特定「新增職責並移任務」的交錯全旅程仍是驗收義務，不把相鄰反例說成完全相同的實測。
 
-2026-09-13 固定輸出以[讀取 SSOT](../../experiments/jd-relational-app/contracts/jd-read.schema.json)生成 Python／TS；由已 materialize 的內容發配 section／container／item／field refs，正文、關係及來源分成明確 records。current 續頁必須同版，歷史 item／section 續讀指定 immutable revision；即使歷史版等於 head 也保持只讀。欄位完整交付，頁面按 UTF-8 bytes 有界分段；允許的單一大欄位明示 `oversized_unit`，不縮減欄位容量或靜默截句。兩家 SDK 離線、查詢及人工寫入 HTTP／真 PG／新程序已驗，Web 及自然模型尚待接合。
+2026-09-13 固定輸出以讀取 SSOT（已退役）生成 Python／TS；由已 materialize 的內容發配 section／container／item／field refs，正文、關係及來源分成明確 records。current 續頁必須同版，歷史 item／section 續讀指定 immutable revision；即使歷史版等於 head 也保持只讀。欄位完整交付，頁面按 UTF-8 bytes 有界分段；允許的單一大欄位明示 `oversized_unit`，不縮減欄位容量或靜默截句。兩家 SDK 離線、查詢及人工寫入 HTTP／真 PG／新程序已驗，Web 及自然模型尚待接合。
 
 ### 9.2 來源、歷史與輸出
 
@@ -398,9 +400,9 @@ current UI、AI read、來源目標核對、目前版 Excel export 共用一個�
 - change read 由已確認 operation 的 base/result snapshots 按 stable IDs 比較，產出 create/update/delete/move/reorder/link/unlink 及欄位 before/after；失敗或 no_change 不偽造內容差異。
 - current export 使用 §9.1 的版本固定 projection；指定歷史 export 讀該 revision snapshot。兩者使用同一 canonical domain model，標明所輸出版次；Excel renderer 不再查散表或呼叫 LLM。
 
-2026-09-13 歷史 SQL 已在 [HistoryReader](../../experiments/jd-relational-app/src/jd_relational/storage/history.py)落地：每次短唯讀 REPEATABLE READ，核 snapshot format/profile/document/digest、版次／parent 與唯一 committed producer 一致；不需要 writer authority。索引首次同次讀 head 凍結 anchor，後續以原 anchor／版號續頁，不混入新 head；包含 initial、origin、時間及原 producer 識別。`read_change` 只回原 SavedOperation 與已驗 base/result：failure 無 snapshot pair，no_change 指同一原版；缺項／損壞拒絕，不猜 current。
+2026-09-13 歷史 SQL 已在 HistoryReader（已退役）落地：每次短唯讀 REPEATABLE READ，核 snapshot format/profile/document/digest、版次／parent 與唯一 committed producer 一致；不需要 writer authority。索引首次同次讀 head 凍結 anchor，後續以原 anchor／版號續頁，不混入新 head；包含 initial、origin、時間及原 producer 識別。`read_change` 只回原 SavedOperation 與已驗 base/result：failure 無 snapshot pair，no_change 指同一原版；缺項／損壞拒絕，不猜 current。
 
-[純差異](../../experiments/jd-relational-app/src/jd_relational/changes.py)比較完整 snapshot 的 profile、正文、關係與來源，回內部 before/after／改動欄／受影響任務。reorder 比較存活 sibling 相對順序；position 正規化不偽報內容 update，淨差異不代表真實操作順序。公開 `jd_change_read` 已重用原材料與欄位投影，生成唯讀 refs、完整分頁 records 及兩家工具外殼，並接 HTTP 查詢；[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)已驗原操作、head 前進後仍讀原版、歷史 refs 拒寫及字節完整性。没有另建 current authority 或通用 diff 引擎。
+純差異（已退役）比較完整 snapshot 的 profile、正文、關係與來源，回內部 before/after／改動欄／受影響任務。reorder 比較存活 sibling 相對順序；position 正規化不偽報內容 update，淨差異不代表真實操作順序。公開 `jd_change_read` 已重用原材料與欄位投影，生成唯讀 refs、完整分頁 records 及兩家工具外殼，並接 HTTP 查詢；[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)已驗原操作、head 前進後仍讀原版、歷史 refs 拒寫及字節完整性。没有另建 current authority 或通用 diff 引擎。
 
 來源的 basis 狀態已由同版材料投影，並驗人工更正後 `needs_recheck`、明示刷新與歷史保留；readability 仍為 `not_checked`，來源 resolver 的跨 scope／不可讀反例使用合成 Source，實際 owner 查回仍待接線。固定 ref/cursor 的簽章與 document/dataset/revision/purpose 核對已落地；宿主 key／dataset 持久化、還原世代、實際 writer／停止 proof、selection issuer、人工 notice、寫入 HTTP／Web 仍待驗，不新增表或第二份權威。查詢已驗與完整限制沿[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)維護。
 

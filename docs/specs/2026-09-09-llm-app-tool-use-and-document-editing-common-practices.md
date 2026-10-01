@@ -1,5 +1,7 @@
 # LLM 使用 App 與編輯文件：大廠共同做法與差異
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 **2026-09-27 最新共同契約議題：**Owner 要求先確認跨 Agent 的工具設計方式，再收斂個別工具。見[共同工具契約研究與規範候選](2026-09-27-agent-tool-contract-design-research.md)：命名、拆分、模型／App 參數、成功／錯誤、權限及分層驗收。它是 G2 候選，不代表全部規範已採納；本稿保留編輯格式與實驗的專屬責任，不再擴寫第二份共同規範。
 
 **2026-09-27 新目標研究入口：**patch 定位研究與離線證據見 [§10](#10-patch-格式與定位執行器分開判斷2026-09-27-續議)。Owner 已選 Memory 專用工具＋V4A diff 編輯 Markdown body，App 以 title 選物件；唯一目標及最新同版不重名要求見[009](../product-concept.md#工作情境與工作理解的三個內容欄位目標未實作)。安全執行器尚未完成；[§10.7](#107-標題唯一性與建立基本資料更新刪除的候選契約2026-09-27)接續討論建立、基本資料更新及刪除。§9 的「精確替換首選」與 §10 較早「格式未定」保留為沿革，不再作當前選型結論。§0–8 保留 09-09 的研究與當時 gate，不把舊 Tiptap／待審政策當成本輪下一步。本輪不授權 production 施工。
@@ -174,7 +176,7 @@ OpenAI 來源以官方文件工具搜尋並讀取正文／段落；Anthropic、G
 
 - 更新某個欄位、新增完整任務及已知成果／要求、移動任務、連結／解除共用知識技能，分別有明確的業務語意。
 - 短欄位可直接提交該欄位新值；一次邏輯修訂需要數個關係一起成立時，用有限、型別化的操作集合，不要求模型逐張資料表維護。
-- [既有工具契約](2026-09-12-jd-relational-agent-tool-contract.md)已有 `jd_set_text`、`jd_create_task`、`jd_move_item`、`jd_set_task_capability`、`jd_revise_work` 等能力；[現行註冊](../../experiments/jd-relational-app/src/jd_relational/consultant_tools.py)可供後續接線核對。這支持沿用業務能力，不代表保留舊來源契約、LangChain wrapper 或即時正式提交時點。
+- [既有工具契約](2026-09-12-jd-relational-agent-tool-contract.md)已有 `jd_set_text`、`jd_create_task`、`jd_move_item`、`jd_set_task_capability`、`jd_revise_work` 等能力；現行註冊（已退役）可供後續接線核對。這支持沿用業務能力，不代表保留舊來源契約、LangChain wrapper 或即時正式提交時點。
 - 不因附件推薦 `changes[]` 就重造 JD 工具；不新增 generic CRUD、任意 JSON path、SQL tool 或 CodeAct 寫入環境。若之後有具體不足，先補對應業務命令。
 
 ### 9.4 共用保證，不共用一套萬用編輯格式
@@ -186,7 +188,7 @@ OpenAI 來源以官方文件工具搜尋並讀取正文／段落；Anthropic、G
 
 ### 9.5 現況反例與有限下一 gate
 
-靜態檢查 [Memory patch helper](../../packages/consultant-memory/src/caliburn_memory/patch.py)及[測試](../../packages/consultant-memory/tests/test_patch.py)發現：現行重用 OpenAI SDK `apply_diff`，已有重複文字命中第一處、僅 `@@` 標籤不能保證定位的明列測試；加真實周邊上下文可辨別段落。這是**已記錄的 matcher 限制**，不是本輪重現的 production 誤改事件，也不能推論所有 V4A patch 都不安全。本輪未執行這些測試。
+靜態檢查 Memory patch helper（已退役）及測試（已退役）發現：現行重用 OpenAI SDK `apply_diff`，已有重複文字命中第一處、僅 `@@` 標籤不能保證定位的明列測試；加真實周邊上下文可辨別段落。這是**已記錄的 matcher 限制**，不是本輪重現的 production 誤改事件，也不能推論所有 V4A patch 都不安全。本輪未執行這些測試。
 
 採納方向後，下一 gate 只需要有限契約／效果驗證，不先重構：
 
@@ -241,7 +243,7 @@ OpenAI 來源以官方文件工具搜尋並讀取正文／段落；Anthropic、G
 & 'experiments/jd-relational-app/.venv/Scripts/python.exe' -m pytest packages/consultant-memory/tests/test_patch.py -q -p no:cacheprovider
 ```
 
-**結果：22 passed。**其中 [first-match 測試](../../packages/consultant-memory/tests/test_patch.py)是刻意確認現行限制，不是證明新定位要求已滿足；另外覆蓋真實上下文、無匹配、後續 hunk 失敗不寫入前段及候選更新等既有行為。最初嘗試的 Memory 環境沒有 pytest，故改用已具備相同套件與測試工具的 App 環境；未安裝依賴。未執行全產品、provider 或長文模型效果驗收。
+**結果：22 passed。**其中 first-match 測試（已退役）是刻意確認現行限制，不是證明新定位要求已滿足；另外覆蓋真實上下文、無匹配、後續 hunk 失敗不寫入前段及候選更新等既有行為。最初嘗試的 Memory 環境沒有 pytest，故改用已具備相同套件與測試工具的 App 環境；未安裝依賴。未執行全產品、provider 或長文模型效果驗收。
 
 ### 10.4 收斂與下一 gate
 

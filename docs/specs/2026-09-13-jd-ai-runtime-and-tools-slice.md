@@ -1,5 +1,7 @@
 # JD 前景 AI 回合與具名工具：RS-4 局部接合
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 日期：2026-09-13。Topic：JD-R002／`experiments/jd-relational-app`。**本程序 AI 回合與工具局部接合通過，獨立窄複核 PASS。**本文記錄工具、原生 checkpoint、共用 writer 及固定 SDK／真 PG 接合，沒有宣稱整體 RS-4／App 或自然顧問已完成。ADR0075 仍為 Proposed，ADR0060 production authority 不變。
 
 ## 1. 本次效果與目前狀態
@@ -59,7 +61,7 @@
 
 實際 SDK 請求已核 `strict=true`、禁止平行工具，以及模型呼叫所在官方 tracing context 為 disabled。App 另外拒絕一個 AIMessage 帶多於一個 tool call，沒有把 provider 設定當權限保證。此處不新增通用 scrubber 或任意外部 trace sink。
 
-程式落點：[tools](../../experiments/jd-relational-app/src/jd_relational/consultant_tools.py)、[coordinator](../../experiments/jd-relational-app/src/jd_relational/ai_runtime.py)、[AI checkpoint](../../experiments/jd-relational-app/src/jd_relational/ai_checkpoints.py)、[共同 owner](../../experiments/jd-relational-app/src/jd_relational/manual_runtime.py)、[既有保存](../../experiments/jd-relational-app/src/jd_relational/storage/service.py)。
+程式落點：tools（已退役）、coordinator（已退役）、AI checkpoint（已退役）、共同 owner（已退役）、既有保存（已退役）。
 
 ## 4. 已接合的保存與本程序恢復路徑
 
@@ -95,9 +97,9 @@
 |---|---|
 | 原生接法研究 | [admission 五探針](../experiments/legacy-evidence/jd-relational-ai-runtime/admission_checkpoint_notes.md)及[工具 schema／validation probe](../experiments/legacy-evidence/jd-relational-ai-runtime/tool-preflight.md#3-原生框架的三個實際限制)。InMemorySaver／固定回覆／合成 SQL 邊界；不是資料庫或 provider。 |
 | 共同 owner 修正回歸 | [ownership review](../experiments/legacy-evidence/jd-relational-ai-runtime/ownership-review.md)：92 PASS，含真 Future／thread 與合成 storage/checkpoint、人工／目錄／startup 回歸；無真 PG／OS host。 |
-| 原生工具單測 | [test_consultant_tools.py](../../experiments/jd-relational-app/tests/test_consultant_tools.py)：37 PASS。generated 十工具 schema、無 App 參數、先 checkpoint 再模擬 writer、非法參數／錯 scope／history 不可寫、錯 message digest／缺 cache、unknown 停模型、confirmed 不降級、current item／section。真 create_agent／InMemorySaver，history／owner 為合成 ports。 |
+| 原生工具單測 | `test_consultant_tools.py`（已退役）：37 PASS。generated 十工具 schema、無 App 參數、先 checkpoint 再模擬 writer、非法參數／錯 scope／history 不可寫、錯 message digest／缺 cache、unknown 停模型、confirmed 不降級、current item／section。真 create_agent／InMemorySaver，history／owner 為合成 ports。 |
 | 工具與 checkpoint 獨立窄審 | [review](../experiments/legacy-evidence/jd-relational-ai-runtime/tool-checkpoint-review.md)：兩測試檔 **71 PASS／2.03s**，範圍無未解 P1／P2；caller preconditions 及 coordinator 明示排除。這包含前列工具單測，不再加總。 |
-| 真 PG／Saver／SDK 接合 | [test_ai_runtime_postgres.py](../../experiments/jd-relational-app/tests/test_ai_runtime_postgres.py)：**4 PASS／3.42s**，10 次真 SDK 請求全部 MockTransport，0 provider；細節如下。 |
+| 真 PG／Saver／SDK 接合 | `test_ai_runtime_postgres.py`（已退役）：**4 PASS／3.42s**，10 次真 SDK 請求全部 MockTransport，0 provider；細節如下。 |
 | 最終 coordinator 與受影響組 | 最後程式的 **253 PASS／4.04s**：coordinator25、AI checkpoint52、tools37、context17、model30、foreground／manual／catalog／startup92。另重跑真 PG **14 PASS／6.43s**（本輪4、既有manual8、context2），與其他列重疊。 |
 | coordinator 獨立複核 | [最終 review](../experiments/legacy-evidence/jd-relational-ai-runtime/coordinator-review.md) PASS，無未解 P1／P2；先前四檔126 PASS、最後25 coordinator PASS分別記錄不加總。CR-R01／02、callback註冊競爭與OR-R01均保留首敗與修後證據；兩個新增 start-token gate 探針也拒絕重入寫入。 |
 | 全組與生成檢查 | 最後 callback／唯一 claim 窄修前全組 **1766 PASS／197 PG SKIP／1第三方棄用警告**；上述最後253窄組包含新4例及全部受影響元件，不冒稱是全組重跑。生成 Python／TS 一致，專案 tsc --noEmit 通過；未改 UI，不重跑無關 Web build 或自然模型。 |

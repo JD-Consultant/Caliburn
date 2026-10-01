@@ -1,5 +1,7 @@
 # A／B1／B2 共用執行生命週期與 State 責任
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 > **有效狀態（2026-09-29）：**本稿把已確認產品安全點映射到框架機制，具體接線是研究後工程建議、待驗證。B1／B2 的同一可變候選、三個業務安全點、同批 Step 恢復與 compaction 保留以[背景生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md#候選操作快照與三個安全點目標已確認未實作)為準；儲存所有權見[資料與交易](../architecture/persistence.md)。下方摺疊的歷史比較不作待選流程。
 
 - 日期：2026-09-27；最近核對：2026-09-29（官方原生契約、恢復／短交易與主線保存推薦）。
@@ -236,7 +238,7 @@ PostgreSQL 的交易／條件更新可承接原子性與競爭控制，**不是�
 4. 候選／正式效果及原結果在同交易提交；`COMMIT` 的回應遺失，仍標結果不明，先讀回原操作。只有可證明未提交、原資格仍有效且原操作可冪等進入時，才依有界策略重進；不能新建 operation 來繞過未知結果。
 5. Graph 把原結果形成符合工具契約的 observation，配回原 call，保存固定候選位置；若 Graph 寫入又失敗，重進此核對流程，不再修改業務。業務已完成而 Graph 落後時，UI／重開也應能提供原正式結果。
 
-**同一 PostgreSQL 不等於同一交易。**官方 Saver 可共用同一資料庫，但不據此假設與任意 Domain 呼叫共用 connection／transaction。推薦接受明確的「業務短交易 → Graph 保存」交界，以原結果重入解決空隙；不修改 Saver 來強綁整輪，不做兩階段提交。既有 [JdStorage.lookup／交易](../../experiments/jd-relational-app/src/jd_relational/storage/service.py)已提供先查原結果、鎖後重查及未知效果分類的取證入口；**其現行正式 JD 操作不等於目標候選／A 完成／Memory 發布已接好**。
+**同一 PostgreSQL 不等於同一交易。**官方 Saver 可共用同一資料庫，但不據此假設與任意 Domain 呼叫共用 connection／transaction。推薦接受明確的「業務短交易 → Graph 保存」交界，以原結果重入解決空隙；不修改 Saver 來強綁整輪，不做兩階段提交。既有 JdStorage.lookup／交易（已退役）已提供先查原結果、鎖後重查及未知效果分類的取證入口；**其現行正式 JD 操作不等於目標候選／A 完成／Memory 發布已接好**。
 
 #### JD 預覽與正式可見性
 
@@ -433,7 +435,7 @@ Memory 的持續阻塞不建立緊密重試迴圈：短暫故障在原工作預�
 
 初版查閱於 2026-09-27；本輪於 **2026-09-29** 重新取得下列官方頁面及本機套件原碼。它們支持機制，本文的 Step、取消、Memory 工作政策與保存推薦則是 Caliburn 映射。不是單一大廠背書整套架構，也不推測未公開實作。
 
-現行[checkpoint 接線](../../experiments/jd-relational-app/src/jd_relational/runtime_checkpoints.py)仍有 `MessagesState` 與既有 A／C 接法，不是此目標已施工。現行[業務原結果查詢](../../experiments/jd-relational-app/src/jd_relational/storage/service.py)與[相關測試](../../experiments/jd-relational-app/tests/test_operation_lookup.py)已表達 lookup 不等於舊 writer 停止、原結果與 latest 分離的責任，可作後續取證入口；本輪只讀，未重跑測試，也不把目前正式 JD 收據直接當成目標候選保存已完成。
+現行checkpoint 接線（已退役）仍有 `MessagesState` 與既有 A／C 接法，不是此目標已施工。現行業務原結果查詢（已退役）與相關測試（已退役）已表達 lookup 不等於舊 writer 停止、原結果與 latest 分離的責任，可作後續取證入口；本輪只讀，未重跑測試，也不把目前正式 JD 收據直接當成目標候選保存已完成。
 
 既有[研究 §10／§11](../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md#10-langgraph-state-保存與恢復的研究結果2026-09-26)保留較早版本與試例脈絡。本稿不鎖新 SDK 版本；正式試例前核對要採用的穩定版、native items 序列化及 Saver 相容性。
 

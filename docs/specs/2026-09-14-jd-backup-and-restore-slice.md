@@ -1,5 +1,7 @@
 # JD App 備份與還原演練
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 日期：2026-09-14；Topic：JD-R002；[產品交付計畫](../plans/2026-09-10-jd-product-delivery.md) 第 6 項與 P5 的「全體資料備份及還原演練」。隔離 App，ADR0075 Proposed／production ADR0060 不變。零 provider。
 
 > **2026-09-23 現行範圍註記：**本文件以下保留 9/14 當時的目標、演練與限制，作為迭代紀錄；正式產品權責現依 [ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。Owner 已將這次完整驗收的備份還原範圍限定為**目前這台電腦、同一 Windows 使用者**；以下「換一台機器」不是本次已支持或已驗收的效果。現行 `host.v1.dpapi` 使用 current-user DPAPI，[Microsoft 的 `CryptProtectData` 說明](https://learn.microsoft.com/en-us/windows/win32/api/dpapi/nf-dpapi-cryptprotectdata)指出解密通常須在同一台電腦，漫遊設定另有例外；它不是一般可攜備份格式。既有演練證明整庫還原後 JD 版本 digest、operation 與 Saver／Store 列數相同，並以**原本的**設定檔驗證舊引用可解；腳本未複製設定檔副本再還原，且**尚未在還原庫實際再送一輪訪談**。下表「設定檔應備份」是操作要求，不等於該步已驗；不能將資料列數相同寫成完整還原或續談端到端 PASS。跨電腦恢復維持 PARKED，不因此新增匯出金鑰或第二套設定機制。
@@ -58,7 +60,7 @@
 
 ## 7. 啟停與失敗提示
 
-同一批另外固定了操作入口自己的行為（[測試](../../experiments/jd-relational-app/tests/test_operator_entry.py)，7 項通過）：
+同一批另外固定了操作入口自己的行為（測試（已退役），7 項通過）：
 
 - 這台機器上**沒有安裝**時，`status` 與 `serve` 都說「尚未找到本機設定」、回 exit 1，而且**不會順手建立**設定檔或它的資料夾。`serve` 永遠不會偷偷初始化。
 - 未預期的失敗只印固定的安全訊息。反例用一段含 DSN、埠與密碼的驅動錯誤，確認螢幕上不出現其中任何一項；變異驗證：把 `str(error)` 放回輸出，該項立刻失敗（改動後以 `git hash-object` 確認還原）。

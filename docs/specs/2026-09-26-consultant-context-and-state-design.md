@@ -1,5 +1,7 @@
 # 職務顧問的上下文與分析延續（目標架構討論稿）
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 - 日期：2026-09-27；最近核對：2026-09-29（JD 導覽改為按需取得，補明定位投影；未改 Memory 與訪談起始範圍）。
 - 狀態：**目標／WORKING；概念對齊與責任設計，非施工契約。**已確認的產品政策由上位文件維護；PROD-G1-022 已採納 §7.2 的三項目標恢復保證，未實作、未驗收，其餘責任整理、流程推演與實現候選仍供後續核對，不因寫入文件而自動定案。
 - 維護責任：Agent 架構討論；涉及產品效果的取捨由 Product Owner 確認，工程協作者負責研究、反例與文件維護。
@@ -551,17 +553,17 @@ W 可恢復不表示可以跳過原本必要的壓縮。若 W 已不適合下一
 
 **沿革範圍：**下表保留 2026-09-28 的現況盤點及當時缺口，不是新的施工待決清單。2026-09-29 已由 [Memory／訪談 read](2026-09-27-memory-read-and-source-navigation-contract.md)、[JD 工具契約](2026-09-29-jd-model-tool-contract-review.md)、[共用執行](2026-09-27-shared-agent-execution-and-state-design.md)與[資料保存](../architecture/persistence.md)收斂入口、來源、最小 State 及恢復責任；依這四份有效契約實作驗證，不將下方「未定」倒用為重新設計產品的要求。
 
-**本節是唯讀審核，不是新工具清單或施工授權。**現行正式 App 在 [`build_consultant_tools`](../../experiments/jd-relational-app/src/jd_relational/memory_context.py) 註冊 20 個模型可見工具；[組裝測試](../../experiments/jd-relational-app/tests/test_consultant_app.py)核對名稱，[strict schema 測試](../../experiments/jd-relational-app/tests/test_consultant_runtime.py)只證明目前 LangChain→OpenAI-compatible 序列化的離線子集，不證明目標 OpenAI direct Responses 已接線、真模型選用正確或完成 Turn 候選語意。現行詳細工具名、參數及回傳以程式為準，不能把它們複製成目標規範。
+**本節是唯讀審核，不是新工具清單或施工授權。**現行正式 App 在 `build_consultant_tools`（已退役） 註冊 20 個模型可見工具；組裝測試（已退役）核對名稱，strict schema 測試（已退役）只證明目前 LangChain→OpenAI-compatible 序列化的離線子集，不證明目標 OpenAI direct Responses 已接線、真模型選用正確或完成 Turn 候選語意。現行詳細工具名、參數及回傳以程式為準，不能把它們複製成目標規範。
 
-現行 20 個按用途分為：JD 讀取 2、JD 寫入 8、Memory／檔案與證據讀取 6、Working State 讀寫 2、`repair_memory` 1、`request_memory_consolidation` 1。這是[現行組裝測試](../../experiments/jd-relational-app/tests/test_consultant_app.py)的盤點，不是「新目標也要維持 20 個」或「工具數量本身是 bug」的結論。
+現行 20 個按用途分為：JD 讀取 2、JD 寫入 8、Memory／檔案與證據讀取 6、Working State 讀寫 2、`repair_memory` 1、`request_memory_consolidation` 1。這是現行組裝測試（已退役）的盤點，不是「新目標也要維持 20 個」或「工具數量本身是 bug」的結論。
 
 | A 的任務 | 已確認的目標工具效果／限制 | 現行對照與待核事項 |
 |---|---|---|
-| 找相關工作資訊 | 起始有工作情境與工作理解導覽，兩者可按需重讀；JD 導覽從[同一 JD 讀取入口](#32-jd-導覽的按需定位目標已確認未實作)按需取得。Memory map 的模型可見項目用 `target_title`／`description` 標出可深入的目標，A 將所選 `target_title` 交給 read 工具；讀到的物件內容仍用 `title`。A 只讀本 Turn 固定的已發布 Memory，按需深入正文／來源；JD 讀取須看見本 Turn 自己已成立的候選修改。JD 導覽的模型欄位不由 Memory 的 `target_title` 自動決定。 | 現行 `read_case`／`read_work_understanding` 使用導覽 ID；`ls`／`grep`／`read_file` 是舊 Memory／Skills 檔案讀取，不等於新 map／title 契約。[現行 Memory 讀取](../../experiments/jd-relational-app/src/jd_relational/memory_context.py)、[目標 read](2026-09-27-memory-read-and-source-navigation-contract.md)分開。`read_file` 可能仍供按需 Skills，不能因 Memory 改形就一概刪除。 |
+| 找相關工作資訊 | 起始有工作情境與工作理解導覽，兩者可按需重讀；JD 導覽從[同一 JD 讀取入口](#32-jd-導覽的按需定位目標已確認未實作)按需取得。Memory map 的模型可見項目用 `target_title`／`description` 標出可深入的目標，A 將所選 `target_title` 交給 read 工具；讀到的物件內容仍用 `title`。A 只讀本 Turn 固定的已發布 Memory，按需深入正文／來源；JD 讀取須看見本 Turn 自己已成立的候選修改。JD 導覽的模型欄位不由 Memory 的 `target_title` 自動決定。 | 現行 `read_case`／`read_work_understanding` 使用導覽 ID；`ls`／`grep`／`read_file` 是舊 Memory／Skills 檔案讀取，不等於新 map／title 契約。現行 Memory 讀取（已退役）、[目標 read](2026-09-27-memory-read-and-source-navigation-contract.md)分開。`read_file` 可能仍供按需 Skills，不能因 Memory 改形就一概刪除。 |
 | 查原始訪談 | 使用與 B1／B2 共用的正式訪談序號讀取能力：單則、多則不相鄰或有界範圍；回傳序號、說話者、完整原文，App 核對來源資格。當次員工輸入另外原樣提供，尚無正式序號也可作本輪 JD 候選依據。 | 現行 `read_evidence` 使用短 key，舊 `read_file` 可讀詳記；均不等於目標按正式序號／範圍的讀取。完整歷史不從 JD 或 Memory 引用鏈反推有無；見[來源契約](2026-09-27-memory-read-and-source-navigation-contract.md)。具體參數、分頁及本輪來源綁定未定。 |
-| 讀寫 JD | `jd_read` 類能力取回關聯式 JD，模型選有意義的修訂，App 綁定 target、版本、來源及操作；A 本輪修改先為私有候選，整輪成功才正式生效。需要精確知道變更時可查本輪／原操作差異，**是否沿用現行 `jd_change_read` 及其讀取基準仍待對照**；不可由「有此工具」推定目標已滿足。 | 現行八個 JD 寫入入口及 `jd_read`／`jd_change_read` 已註冊，[現行 `execute`](../../experiments/jd-relational-app/src/jd_relational/consultant_tools.py)呼叫正式 `execute_foreground` 並等待已確認業務觀察；這是已提交路徑，與目標 Turn 候選／取消回退不同。現行 JD 關聯式操作及證據鍵有可沿用的設計，不能因新 Memory Markdown 工具而改成全文 patch；見[JD 契約](2026-09-12-jd-relational-agent-tool-contract.md)。 |
+| 讀寫 JD | `jd_read` 類能力取回關聯式 JD，模型選有意義的修訂，App 綁定 target、版本、來源及操作；A 本輪修改先為私有候選，整輪成功才正式生效。需要精確知道變更時可查本輪／原操作差異，**是否沿用現行 `jd_change_read` 及其讀取基準仍待對照**；不可由「有此工具」推定目標已滿足。 | 現行八個 JD 寫入入口及 `jd_read`／`jd_change_read` 已註冊，現行 `execute`（已退役）呼叫正式 `execute_foreground` 並等待已確認業務觀察；這是已提交路徑，與目標 Turn 候選／取消回退不同。現行 JD 關聯式操作及證據鍵有可沿用的設計，不能因新 Memory Markdown 工具而改成全文 patch；見[JD 契約](2026-09-12-jd-relational-agent-tool-contract.md)。 |
 | 維持分析延續 | 跨 Step／Turn 必須能接續，但 State 具體欄位、寫入時機與工具數仍待研究；不得把「發現的問題永久列清單」或現行 Working State schema 當已採納新目標。 | 現行 `read_interview_working_item`／`update_interview_working_state` 已存在；只作現況參考。沿[State 責任 §7](#7-state-責任與生命週期候選先找使用方再決定表示)比較原生接續是否足夠，再決定是否保留同型工具。 |
-| 通知 Memory 整理 | A 可提出整理要求；工具只確認**意圖已被接收**，不謊稱 Memory 已發布，也不等待 B1／B2。只有 A Turn 成功完成後才啟動、固定本批來源上界；失敗且有界恢復後仍影響工作時才提供必要狀態。 | 現行 `request_memory_consolidation` 已是零參數通知且不等待背景，這個語意可借鑑；但其派送／保存須核對新 Turn 完成資格，不能因通知 tool 回 success 就讓未完成輸入供背景讀取。[現行實作](../../packages/consultant-memory/src/caliburn_memory/requests.py)。 |
+| 通知 Memory 整理 | A 可提出整理要求；工具只確認**意圖已被接收**，不謊稱 Memory 已發布，也不等待 B1／B2。只有 A Turn 成功完成後才啟動、固定本批來源上界；失敗且有界恢復後仍影響工作時才提供必要狀態。 | 現行 `request_memory_consolidation` 已是零參數通知且不等待背景，這個語意可借鑑；但其派送／保存須核對新 Turn 完成資格，不能因通知 tool 回 success 就讓未完成輸入供背景讀取。現行實作（已退役）。 |
 | 即時改 Memory／例外修補 | A 不直接維護 Memory；更正由有效訪談與後續 B1／B2 整理承接。 | 現行 `repair_memory` 屬 C 即時修補接線；[目標已退役 C](2026-09-24-caliburn-layered-architecture-map.md#更正與-c-的新界線)。目標 A 不應沿用此工具作寫入入口；正式移除屬後續施工與遷移，不在此節操作。 |
 
 **共用契約審核結論：**業務能力命名清楚，模型只填選擇與內容，App 填職務檔案、權限、固定 Memory／JD 基準、ID、原操作及正式結果；模型輸入須符合所選 provider 的實際 strict 子集，但格式正確不能代替 Domain 驗證。成功回傳要區分「讀到資料」「候選修改成立」「通知已收」「正式完成」，失敗要提供可行動資訊；結果不明不能說成未修改。按需重讀不能改寫先前原生工具觀察，也不必為縮短每次結果建立第二套收據。這些是[共同工具規範](2026-09-27-agent-tool-contract-design-research.md)在 A 的適用邊界；不是要求全部工具共用同一個 JSON envelope。

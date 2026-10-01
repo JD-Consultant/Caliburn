@@ -1,5 +1,7 @@
 # 顧問分析延續：Reasoning、工具結果、Compaction 與 State 的邊界
 
+> 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../../adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
+
 - 狀態：**研究／候選，非施工設計**；不裁決 State 欄位，不宣稱已通過真模型驗收。
 - 查閱／最後核對：2026-09-26。
 - 維護責任：Agent 架構研究；產品取捨由 Product Owner 確認。
@@ -164,12 +166,12 @@
 
 ### 10.3 鎖定版本、本機核對與儲存取捨
 
-- [正式 App pyproject](../../../experiments/jd-relational-app/pyproject.toml)及 [uv.lock](../../../experiments/jd-relational-app/uv.lock)：LangGraph **1.2.11**、checkpoint **4.2.0**、PostgreSQL Saver **3.1.2**、OpenAI SDK **3.13.0**；本機 `.venv` 套件 metadata 相符。這是本次證據基線，不是替未來目標鎖死版本。
+- 正式 App pyproject（已退役）及 `uv.lock`（已退役）：LangGraph **1.2.11**、checkpoint **4.2.0**、PostgreSQL Saver **3.1.2**、OpenAI SDK **3.13.0**；本機 `.venv` 套件 metadata 相符。這是本次證據基線，不是替未來目標鎖死版本。
 - **020 後的版本及依賴界線：**Owner 允許採新版；後續查當時最新穩定 release、相容矩陣及實際所採原碼，再鎖定版本驗證，不把上述已安裝版本當作目標上限，也不把主分支版號當成最新已發布版。依 [OpenAI SDK 文件](https://developers.openai.com/api/docs/libraries)，此處使用官方 Python `openai` 套件直接呼叫 Responses，不是 Agents SDK。[LangGraph 官方 overview](https://docs.langchain.com/oss/python/langgraph/overview)明示可不使用 LangChain；但[官方套件 manifest](https://github.com/langchain-ai/langgraph/blob/main/libs/langgraph/pyproject.toml)與本機 1.2.11 metadata 都包含 `langchain-core` 依賴。因此「不採 LangChain Agent／模型／Message 封裝」成立，不宣稱依賴樹零 `langchain-*`；不為去掉框架內部依賴而自行 fork 或重造框架。本輪未安裝、移除或升級任何套件。
 - 已直接讀安裝套件中的 `langgraph/graph/message.py`、`channels/binop.py`、`channels/delta.py`、`types.py` 與 checkpoint 的 `serde/jsonplus.py`：`add_messages` 會轉換訊息且同 ID 可覆寫；一般 reducer channel 支援 `Overwrite`；序列化預設不開 pickle fallback。這支持上述候選，不代替真實 Responses items 的 round-trip 測試，也不為保存 JSON 資料啟用 pickle。
 - [官方 DeltaChannel](https://docs.langchain.com/oss/python/langgraph/pregel#deltachannel)及鎖定 source 都標 **Beta**：可保存增量再重建累積值，另有快照與讀取成本。原碼亦處理 `Overwrite`，但本次未驗 Postgres 全鏈。公開 guide 的快照預設敘述與本機建構式的 `snapshot_frequency=1000` 不一致，不能直接抄參數；若採用，需以所採版本的原碼／回歸證據明確定值。
 - 模型 compaction 縮小**未來模型視窗**，不自動清理既存 checkpoints。普通累積 channel 的保存量可能隨歷史成長，需量測再比較框架增量能力與保存期限；不現在自製 Git 式差分／事件儲存，不因 context 壓縮刪原話，不先設定無限保留。
-- 現行 [runtime_checkpoints.py](../../../experiments/jd-relational-app/src/jd_relational/runtime_checkpoints.py) 的 `DocumentState(MessagesState)` 與 [ai_checkpoints.py](../../../experiments/jd-relational-app/src/jd_relational/ai_checkpoints.py) 是 **現況參考**，不是 019 的已完成接線；也不由此再建第二套恢復 owner。現行正式權責循 ADR0077，較舊 ADR0060 的舊產品 State 形狀不是目標約束。
+- 現行 `runtime_checkpoints.py`（已退役） 的 `DocumentState(MessagesState)` 與 `ai_checkpoints.py`（已退役） 是 **現況參考**，不是 019 的已完成接線；也不由此再建第二套恢復 owner。現行正式權責循 ADR0077，較舊 ADR0060 的舊產品 State 形狀不是目標約束。
 
 ### 10.4 後續驗證邊界與收斂
 
@@ -193,7 +195,7 @@
 | [AWS safe retries](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)；[PostgreSQL transactions](https://www.postgresql.org/docs/current/tutorial-transactions.html) | AWS 以原請求辨識及一致保存的操作效果／結果處理重送，PostgreSQL 交易提供原子提交。 | 若候選獨立保存，優先由同一候選責任一致保存操作效果與結果；不在 Graph 複製第二份業務真相。若只是 State 內部變換，先評估單一 State 保存，不強加收據表。 |
 | [OpenAI Python SDK retries](https://github.com/openai/openai-python#retries) | 部分連線／HTTP 錯誤預設重試兩次，可用 `max_retries` 設定。 | SDK、Graph、使用者重試須分開計數與協調；「呼叫一次 node」不證明只有一次模型 HTTP 請求。費用／次數政策仍未定，本次不修改 SDK 設定。 |
 
-**不是從零缺少所有能力：**現行 [JdStorage](../../../experiments/jd-relational-app/src/jd_relational/storage/service.py) 的 `lookup` 查原操作回執；`_insert_receipt` 與 JD 修訂在原保存交易中成立，`lookup` 明示找不到不證明 writer 已停止。[原操作查回測試](../../../experiments/jd-relational-app/tests/test_operation_lookup.py)已有後續 JD 變更仍查原結果、查詢失敗不當成不存在等案例；[前景准入測試](../../../experiments/jd-relational-app/tests/test_foreground_runtime.py)已有模型等待期間拒絕同文件人工操作的案例。**本輪只讀取，未重跑，不宣稱目標已通過。**尤其現行 `write_candidate` 是一次正式操作交易內的中間值，不能因名稱相似便當成 024 要求的跨 Step 私有 JD 候選；新的暫停／重啟維持禁寫亦尚待驗。
+**不是從零缺少所有能力：**現行 JdStorage（已退役） 的 `lookup` 查原操作回執；`_insert_receipt` 與 JD 修訂在原保存交易中成立，`lookup` 明示找不到不證明 writer 已停止。原操作查回測試（已退役）已有後續 JD 變更仍查原結果、查詢失敗不當成不存在等案例；前景准入測試（已退役）已有模型等待期間拒絕同文件人工操作的案例。**本輪只讀取，未重跑，不宣稱目標已通過。**尤其現行 `write_candidate` 是一次正式操作交易內的中間值，不能因名稱相似便當成 024 要求的跨 Step 私有 JD 候選；新的暫停／重啟維持禁寫亦尚待驗。
 
 | 比較 | 效果／成本 | 本輪結論 |
 |---|---|---|

@@ -55,7 +55,7 @@
 |---|---|---|---|
 | D1 | **PDF 文字層**：畫面正確，但部分字型的複製／搜尋會出現部首字元 | 長旅程 PDF 85 個非空欄位，先去空白後仍有 53 欄不完全相等；經 NFKC、`⻑`→`長` 與空白正規化後都找得到。原因在字型內嵌子集的 Unicode 對映，不是 JD 內容 | [T13](../plans/2026-09-29-target-rebuild/evidence/t13-pdf-export.md#任務完成對照與-pdf-文字層診斷2026-09-30-恢復後) |
 | D2 | **兩個共用恢復函式很長**（245 行、363 行） | 每個分支對應一個曾失敗的恢復反例；已知、刻意未動 | [T15 程式結構審查](../plans/2026-09-29-target-rebuild/evidence/t15-code-organization-review.md) |
-| D3 | **驗證涵蓋的限制** | 員工是模擬模型、單一長旅程人設、檢查是粗略標記；切換候選只在同一台機器的乾淨 worktree 驗過（非另機、容器或 Linux）；V25（顧問時間與員工學習負擔）需要真人試點，**不宣稱節省了任何時間**；B 批次壓後發布、再壓縮與候選分支的真模型短旅程因額度用完未執行；Memory「失敗後再前進三輪才允許新批次」的政策未在真旅程觸發、待 Owner 核對 | [V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)、[T18](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md) |
+| D3 | **驗證涵蓋的限制** | 員工是模擬模型、單一長旅程人設、檢查是粗略標記；新入口（已於 2026-10-02 經 Owner 放行切換）只在同一台機器的乾淨 worktree 驗過（非另機、容器或 Linux）；V25（顧問時間與員工學習負擔）需要真人試點，**不宣稱節省了任何時間**；B 批次壓後發布、再壓縮與候選分支的真模型短旅程因額度用完未執行；Memory「失敗後再前進三輪才允許新批次」的政策未在真旅程觸發、待 Owner 核對 | [V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)、[T18](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md) |
 
 ## 3. 實驗中發現並已處理的問題
 

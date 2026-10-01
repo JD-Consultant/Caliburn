@@ -1,7 +1,7 @@
 # 目標工程設計取捨
 
 - 狀態：**研究後工程建議／未實作、未驗收**；2026-09-29。Owner 授權整理架構文件與研究，不是施工或切換授權。
-- **實作與驗證進度（2026-10-02）：**已依本設計施工，T01–T17 已依各任務的驗收層級完成，逐項效果的實測判定與限制見 [T17 V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)、實驗發現的問題見[實驗發現的問題彙整](../reports/experiment-findings.md)；production 切換（T18）待 Owner 放行。上方「未實作、未驗收」是 2026-09-29 撰寫當時的狀態，保留作沿革，不是現況。
+- **實作與驗證進度（2026-10-02）：**已依本設計施工，T01–T18 已依各任務的驗收層級完成，逐項效果的實測判定與限制見 [T17 V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)、實驗發現的問題見[實驗發現的問題彙整](../reports/experiment-findings.md)；production 切換（T18）已於 2026-10-02 由 Owner 放行並完成（[ADR0079](../adr/0079-target-rebuild-production-cutover.md)）。上方「未實作、未驗收」是 2026-09-29 撰寫當時的狀態，保留作沿革，不是現況。
 - 維護者：App 架構維護者。產品決策仍以[產品概念](../product-concept.md)與[決策沿革](../current-decisions.md)為準；本頁不改寫 Accepted ADR。
 - 目的：讓後續工程代理知道為何選這個方向、何時才值得重開，不再把成熟機制當作新的產品問題逐項詢問。
 

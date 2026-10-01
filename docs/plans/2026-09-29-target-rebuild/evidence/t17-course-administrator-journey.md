@@ -413,3 +413,18 @@ execution `35367359-e385-49c7-b992-a2d44ccda79e` 最終為 `failed`，觀察區�
 |---|---|
 | `verify_luna_closing_turn.py` | `2d568bedd1260598f949c4b0dd587ee3636191c23e8f9d99f2e4d5756d26c171` |
 | `luna-closing-turn-20261001.json` | `064107372180c046254954dc335c0e42094205c565b8afe2a86763e4bfd04df2` |
+
+## 2026-10-01：結構整理後的核心品質基準（Q1）——執行前 manifest
+
+基準 `d41e75f7`（程式與 `2be43132` 相同；其後只有 lint 設定與評測腳本）。前面的 b0 六份是**舊預設 medium** 的產物；產品現在是 Luna／**high**，且已有結構整理與 Memory 解阻接線，所以先在**目前程式與預設**重量一次基準，再決定是否值得改任何指引。不沿用 b0 結論當作現況。
+
+| 項目 | 界線 |
+|---|---|
+| 目的 | 量現行產品在兩個既有人設上的核心訪談與成稿效果（任務覆蓋、更正、未知、K／S、條件、協作對象、來源支持、簡潔、提問方式），並確認結構整理沒有改變行為 |
+| 模型／資料 | A、B1、B2 為產品預設 `gpt-6-luna`／high（`store=false`、`all_turns`）；員工模擬 `gpt-6-luna`／low；全合成人設，不含任何真實員工或 repo 資料 |
+| 次數 | `course_admin`、`warehouse` 各 3 次，每次最多 12 個 A Turn（人設預設）；背景 Memory 依 A 的要求自然觸發；**依序執行**，同時只有一場訪談（帳戶 TPM 200K，不並行） |
+| 費用 | 以 b0 與 T17 實測推估單次 US$0.1–0.4，本批總上界 **US$4**；產品不設金額攔截，上界由次數與人設決定，不是帳單保證 |
+| 停止／重跑 | 任一 Turn failed／逾時（900 秒）即停止該次並先診斷，不自動重跑；同一人設連續兩次失敗即停止本批；非 provider 的 5xx 或結構錯誤立即停止。不因結果不好無界重試，也不挑最好一次呈現 |
+| 環境 | 隔離 loopback `_test` DB 的新 schema `eval_b`、後端 8103（`scripts/run_backend.py --port 8103`，PDF 字型／Chromium 以環境變數明示）；不動 Demo 8100／5173 及舊 `eval_a`／8102；憑證只經既有 loader 從 `apps/api/.env` 取 OpenAI key，不輸出、不記錄 |
+| 量測 | `scripts/simulate_interview.py` 既有檢查，另加粗略的**引用審計**（JD 項目所述的人設事實，其引用來源是否含該事實）；每次一份 JSON 在 ignored `.research-tmp/eval/q1-*.json`，不含 opaque reasoning 與金鑰。仍須人工讀逐字稿與 JD 對照指南，自動檢查只用來比較 |
+| 判讀 | 只在重複出現且可由指南指出的缺口才考慮最小指引改動，且須另設假說、保留例與停止條件；一次成功不算改善，不重做已被否決的來源說明／欄位順序／effort／壓縮方案 |

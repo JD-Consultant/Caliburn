@@ -1,0 +1,143 @@
+job file 10e262e5-f836-448f-8500-9aedafb598f3
+turn 1: completed in 34.8s
+turn 2: completed in 35.1s
+turn 3: completed in 35.2s
+turn 4: failed in 30.6s
+{
+ "facts": {
+  "schedule": {
+   "kind": "hidden",
+   "surfaced": true,
+   "in_jd": true
+  },
+  "registration_check": {
+   "kind": "core",
+   "surfaced": true,
+   "in_jd": true
+  },
+  "payment": {
+   "kind": "core",
+   "surfaced": true,
+   "in_jd": true
+  },
+  "authority": {
+   "kind": "core",
+   "surfaced": true,
+   "in_jd": true
+  },
+  "roster_handoff": {
+   "kind": "core",
+   "surfaced": true,
+   "in_jd": true
+  },
+  "schedule_change": {
+   "kind": "core",
+   "surfaced": false,
+   "in_jd": false
+  },
+  "typhoon": {
+   "kind": "rare",
+   "surfaced": false,
+   "in_jd": false
+  },
+  "attendance_daily": {
+   "kind": "core",
+   "surfaced": false,
+   "in_jd": false
+  },
+  "attendance_report": {
+   "kind": "core",
+   "surfaced": true,
+   "in_jd": true
+  },
+  "quality_roster": {
+   "kind": "hidden",
+   "surfaced": false,
+   "in_jd": false
+  },
+  "risk_peak": {
+   "kind": "hidden",
+   "surfaced": false,
+   "in_jd": false
+  },
+  "tools": {
+   "kind": "hidden",
+   "surfaced": false,
+   "in_jd": false
+  },
+  "limits": {
+   "kind": "core",
+   "surfaced": false,
+   "in_jd": false
+  }
+ },
+ "recording_gaps": [],
+ "elicitation_gaps": [
+  "attendance_daily",
+  "limits",
+  "quality_roster",
+  "risk_peak",
+  "schedule_change",
+  "tools",
+  "typhoon"
+ ],
+ "correction": {
+  "new_present": false,
+  "old_left_as_current": 2,
+  "unchanged_kept": [
+   false,
+   true
+  ]
+ },
+ "late_correction": null,
+ "profile_sources": {
+  "job_title": {
+   "value": "課程行政專員",
+   "cited": 0,
+   "supported": false
+  },
+  "organization_unit": {
+   "value": "成人教育中心",
+   "cited": 0,
+   "supported": false
+  },
+  "reports_to": {
+   "value": "行政組長",
+   "cited": 0,
+   "supported": false
+  }
+ },
+ "citations": {
+  "checked": 12,
+  "unsupported": [
+   {
+    "fact": "authority",
+    "item": "profile_field:行政組長"
+   }
+  ],
+  "support_rate": 0.92
+ },
+ "collaborators_in_text": [
+  true,
+  true,
+  true,
+  true,
+  false
+ ],
+ "shape": {
+  "areas": 1,
+  "tasks": 4,
+  "outcomes": 3,
+  "requirements": 2,
+  "capabilities": 0,
+  "collaborator_items": 2,
+  "condition_items": 0,
+  "references": 14
+ },
+ "style": {
+  "consultant_turns": 3,
+  "mean_consultant_chars": 126,
+  "questions_per_turn": 1.67,
+  "leading_phrases": 0
+ }
+}

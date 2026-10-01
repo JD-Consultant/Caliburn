@@ -161,3 +161,21 @@ def test_consultant_can_read_both_layers_but_cannot_write_private_memory() -> No
         name.startswith(("create_work_", "update_work_", "delete_work_")) for name in names
     )
     assert all(definition["strict"] for definition in definitions)
+
+
+@pytest.mark.parametrize(
+    "requirement",
+    [
+        "什麼情況會被退回或最容易出錯",  # probe the aspects an interview rarely volunteers
+        "頻率與旺季",
+        "環境、體力、證照等要求",
+        "不憑職稱或行業常識推定",
+        "員工說出主要工作後就可由已知內容",  # the purpose is written early, then corrected
+        "不寫未確認的績效目標",
+        "同一最終目的不代表同一任務",  # task granularity, from the JD writing guide
+        "兩者不重抄任務敘述，沒有新資訊就留空",
+    ],
+)
+def test_consultant_guidance_keeps_the_guide_derived_requirements(requirement: str) -> None:
+    """Adopted after the Q1–Q3 comparison (T14 evidence); a later edit must drop them on purpose."""
+    assert requirement in CONSULTANT_INSTRUCTIONS

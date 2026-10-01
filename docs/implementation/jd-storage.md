@@ -1,7 +1,7 @@
 # JD 保存接線
 
 - 狀態：**T03 已驗；T07 八入口已接上來源、按需讀取、局部寫入及兩類差異。T08 共同完成有真 PG 與三轮合成資料的真模型旅程；T13 条件撤回已接後端與 UI。長訪談品質及完整 gate 仍未完成**。2026-09-30。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。歷次切片中的「尚未」是當時狀態，最新增量見 §3.4–3.6。
-- 上位契約：[JD 欄位指南](../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
+- 上位契約：[JD 欄位指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
 
 ## 1. 本切片範圍與程式責任
 

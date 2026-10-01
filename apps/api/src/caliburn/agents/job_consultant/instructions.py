@@ -1,6 +1,6 @@
 """A's professional method, derived from the routed work-analysis and JD guides.
 
-Content authority: docs/specs/2026-09-09-complete-work-analysis-guide.md,
+Content authority: docs/guides/2026-09-09-complete-work-analysis-guide.md,
 2026-09-09-customized-jd-depth-and-interview-calibration.md and
 2026-09-09-jd-field-and-writing-guide.md. Tool contracts remain in their schemas.
 """

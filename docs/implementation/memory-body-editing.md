@@ -7,7 +7,7 @@
 
 [OpenAI 官方契約](https://developers.openai.com/api/docs/guides/tools-apply-patch)由執行方解讀 V4A。官方 helper 提供 section／chunk 解析，但不承諾多處匹配拒絕，亦不是 Memory Domain。保留其成熟語法算法，不安裝 Agents SDK runner；來源 commit、SHA-256、MIT 聲明及本地差異見 [第三方註記](../../apps/api/THIRD_PARTY_NOTICES.md)。
 
-[RapidFuzz Levenshtein](https://rapidfuzz.github.io/RapidFuzz/Usage/distance/Levenshtein.html)負責文字相似度，鎖定 3.14.6（官方 PyPI 查閱日 2026-09-30；MIT）。候選枚舉、唯一政策與保存不是套件保證。先前 [contextual hunk 探針](../specs/evidence/2026-09-27-memory-fuzzy-edit/README.md)只作案例參考，不將實驗程式或「精確優先」搬成正式規則。
+[RapidFuzz Levenshtein](https://rapidfuzz.github.io/RapidFuzz/Usage/distance/Levenshtein.html)負責文字相似度，鎖定 3.14.6（官方 PyPI 查閱日 2026-09-30；MIT）。候選枚舉、唯一政策與保存不是套件保證。先前 [contextual hunk 探針](../experiments/legacy-evidence/2026-09-27-memory-fuzzy-edit/README.md)只作案例參考，不將實驗程式或「精確優先」搬成正式規則。
 
 選定流程：
 

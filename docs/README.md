@@ -7,6 +7,7 @@
 | 你現在要做什麼 | 從這裡開始 |
 |---|---|
 | 認識產品、準備介紹或報告 | [產品專題介紹](product-introduction.md)、[報告與研究材料入口](reports/README.md) |
+| 寫備審、說明如何解決問題 | [共用實驗案例集](reports/research-casebook.md) → [備審準備與各校要求](reports/admissions/README.md) |
 | 接手開發，知道接下來做什麼 | [Goal／計畫](plans/2026-09-29-target-rebuild/README.md) → [收尾分類與下一步](plans/2026-09-29-target-rebuild/tasks.md#收尾分類與下一步) |
 | 理解新架構、找元件／工具契約 | [目標架構地圖](target-architecture-map.md) → 該主題的責任文件 |
 | 寫程式、改 Prompt／Tool、安排驗收 | [實作規範入口](implementation/README.md) → [程式組織](implementation/code-organization.md)／[寫法規範](implementation/coding-standard.md)／[開發與實驗規範](implementation/development-standard.md) |
@@ -29,10 +30,10 @@
 
 分析方法、Prompt 與工具品質先讀這一組；它們不是因日期較早就失效的舊資料。
 
-- [指南分工與研究入口](specs/2026-09-09-job-analysis-and-jd-content-research.md#2-文檔各負責什麼)。
-- [完整工作分析指南](specs/2026-09-09-complete-work-analysis-guide.md)：理解工作事實、細節、缺口與分析依據。
-- [個別化 JD 深度與訪談校準](specs/2026-09-09-customized-jd-depth-and-interview-calibration.md)。
-- [JD 欄位與寫作指南](specs/2026-09-09-jd-field-and-writing-guide.md)。
+- [指南分工與研究入口](guides/2026-09-09-job-analysis-and-jd-content-research.md#2-文檔各負責什麼)。
+- [完整工作分析指南](guides/2026-09-09-complete-work-analysis-guide.md)：理解工作事實、細節、缺口與分析依據。
+- [個別化 JD 深度與訪談校準](guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)。
+- [JD 欄位與寫作指南](guides/2026-09-09-jd-field-and-writing-guide.md)。
 
 ## 現行設計與決策
 
@@ -67,7 +68,7 @@
 |---|---|---|
 | 產品介紹與目的 | [產品介紹](product-introduction.md)、[產品概念](product-concept.md) | 每次測試結果、實作進度副本 |
 | 研究資料 | [research/](research/README.md)，按 Agent、工作分析、工程、檢索分主題 | 把官方能力、研究建議當成產品已採用／已驗收 |
-| 工作分析與 JD 方法 | [guides/](guides/README.md) 統一導讀，既有指南正文留原路徑 | 外部樣稿冒充員工事實，或複製第二份指南 |
+| 工作分析與 JD 方法 | [guides/](guides/README.md) 保存指南與樣稿正文 | 外部樣稿冒充員工事實，或複製第二份指南 |
 | 開發架構與元件契約 | [目標地圖](target-architecture-map.md) → `architecture/`、[specs/](specs/README.md)；現行另由 [design/](design/README.md) 導讀 | 所有歷史方案混成一份有效規格 |
 | 程式設計與工程規範 | `implementation/`，從其 [README](implementation/README.md) 深入 | 每輪新增另一份命名或工具規則 |
 | 任務、依賴與完成狀態 | [plans/](plans/README.md) → 重建計畫的 [tasks.md](plans/2026-09-29-target-rebuild/tasks.md) | 用報告或單次測試代替任務驗收 |
@@ -75,19 +76,21 @@
 | 面向教授／讀者的報告 | [reports/](reports/README.md)，引用規格與證據解說 | 另定產品規則或重抄全部實驗原件 |
 | 決策與工作規則 | [current-decisions.md](current-decisions.md)、[ADR](adr/README.md)、既有討論／契約／開發規範 | 因搬資料夾而改變決策效力 |
 | 操作與排錯 | 各 App README、[runbook](runbook.md)、[交付與操作設計](architecture/delivery-and-operations.md) | 混用正式產品與重建版命令 |
-| 退役與歷史快照 | [archive/](archive/README.md)，保留原件與恢復路徑 | 把所有舊文件或已完成實驗都當成可刪暫存 |
+| 歷史設計與恢復索引 | [archive/](archive/README.md)；重複快照已去重，獨有實測優先歸入 [experiments/](experiments/README.md) | 把所有舊文件或已完成實驗都當成可刪暫存 |
 
 ## 後續文件放哪裡
 
 1. 先找上述用途對應的既有責任文件。說明外部做法寫研究，決定產品行為改契約，說明測試經過寫證據；不要每次討論另造一份「最新版」。
 2. 純研究以主題歸檔並保留日期；有效規格、指南與任務仍由原入口判讀。含研究與有效契約的混合文件暫留穩定路徑，不靠 `research` 字樣機械搬家。
 3. 封存須有退役／取代／結束依據，記下接續入口與來源。搬動前檢查程式、規格、報告和證據的引用；搬動後檢查連結及內容保全。
-4. 原始結果與 Git／worktree 快照不為美化目錄重寫；報告只引用，不建立另一份可分別修改的原件。
+4. 原始結果不為美化目錄重寫；報告只引用，不建立另一份可分別修改的原件。歷史快照可核對後去重，獨有研究保留；原路徑與恢復提交須可查。
 
 研究來源、這次 55 份研究歸位與 8 份封存的理由、驗證及限制，見[分類整理紀錄](archive/document-classification-2026-10-02.md)。這是既有[架構文件規範](architecture-discussion-standard.md)的目錄整理，不新增產品或開發授權。
+
+後續依 Owner 要求不再保留整套重複快照：2,396 份副本去重、7 份撤回計畫／退役通知僅留 Git；指南與實驗證據歸位見[去重紀錄與恢復對照](archive/docs-cleanup-2026-10-02.md)。現行與目標契約、獨有研究及有用證據仍保留，沒有因整理改變產品權責。
 
 ## 歷史材料使用規則
 
 1. 先區分「目標契約、現行實作、候選、歷史」；較早的「未實作／未驗」是當時狀態，進度以同任務最新證據為準。
 2. 規則改在原責任文件；任務狀態改在任務表；實測經過補進對應證據。入口只更新路由，避免多份互相矛盾的規格。
-3. 原索引與快照保留當時路徑；本次移動有[新舊路徑對照](archive/document-classification-2026-10-02.csv)，不是把原件刪除。仍無法證明已被取代的文件先保留，不宣告整個歷史目錄全部退役。
+3. [第一次分類對照](archive/document-classification-2026-10-02.csv)與[後續去重對照](archive/docs-cleanup-2026-10-02.csv)保留移動順序；精確原件從其中的 Git 基準讀回。未確認無用的獨有文件仍保留，不宣告整個歷史目錄全部退役。

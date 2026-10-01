@@ -7,7 +7,7 @@
 
 | 設計層次 | 已有責任來源 | 剩下由誰做什麼 |
 |---|---|---|
-| 問題與成功條件 | [產品概念](../product-concept.md)、[工作分析](../specs/2026-09-09-complete-work-analysis-guide.md)與[寫作指南](../specs/2026-09-09-jd-field-and-writing-guide.md) | 工程把效果轉成代表資料與 eval；不自造固定滿分數字 |
+| 問題與成功條件 | [產品概念](../product-concept.md)、[工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)與[寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md) | 工程把效果轉成代表資料與 eval；不自造固定滿分數字 |
 | 領域與資訊關係 | [系統邊界](system-boundaries.md)、Memory／JD 責任文件 | 表／索引／函式由工程研究；不改三層、來源資格與候選政策 |
 | 核心閉環與狀態 | [跨層生命週期](../specs/2026-09-29-core-value-loop-lifecycle.md)、A／B 流程、[共用執行](../specs/2026-09-27-shared-agent-execution-and-state-design.md) | 將節點映射與控制競爭做最小驗證；不要把產品 Turn 等同 Graph super-step |
 | 資料與證據 | [持久化](persistence.md)、Memory snapshot、JD 來源／diff | 真 PostgreSQL 驗證固定歷史、原子採用與原結果接續；不造第二套 owner |

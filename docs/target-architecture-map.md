@@ -2,16 +2,16 @@
 
 - 狀態：**現行產品架構導覽，含已採用設計與待對齊事項**；更新：2026-10-02。正式後端為 [`apps/api`](../apps/api/README.md)，介面為 [`apps/web`](../apps/web/README.md)；[ADR0079](adr/0079-target-rebuild-production-cutover.md) 已於 2026-10-02 Accepted，取代 ADR0077 的正式產品權責。
 - 驗證範圍：[任務表](plans/2026-09-29-target-rebuild/tasks.md)的 T01–T18 已標記完成，不等於所有情境均通過驗收。逐項結果依 [T17 V01–V28 對照](plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)，品質與實測限制見[實驗發現的問題](reports/experiment-findings.md)。
-- 目的：從產品目的逐層定位職責、資料、流程、介面與驗證證據。維護角色：App 架構維護者。
-- 閱讀分工：本頁描述能力與責任；實際程式結構見 [ARCHITECTURE](../ARCHITECTURE.md)及[實作文件](implementation/README.md)。[架構討論規範](architecture-discussion-standard.md)提供討論方法，仍為討論稿，不取代正式決策。
+- 目的：從產品目的出發，逐層說明職責、資料、流程、介面與驗證證據。維護者：應用程式架構維護者。
+- 閱讀分工：本頁說明能力與職責；實際程式結構見 [ARCHITECTURE](../ARCHITECTURE.md)及[實作文件](implementation/README.md)。[架構討論規範](architecture-discussion-standard.md)提供討論方法，目前仍是討論稿，不取代正式決策。
 
-**設計與現行差異：**Memory 已確定採單向 B1 → B2 → 發布；現行 supervisor 接入的工作流程及 B2 提示仍啟用回交 B1，程式尚未對齊，並非設計仍待選擇。詳細責任與程式依據見[系統責任](architecture/system-boundaries.md)。舊 `experiments/jd-relational-app` 與 `packages/consultant-memory` 程式已退役，沿革與 Git 歷史保留；不整合舊接線、不遷移舊資料。RAG 為獨立範圍。
+**設計與現行差異：**Memory 已確定採單向 B1 → B2 → 發布；目前背景執行程序所用的流程及 B2 提示仍啟用回交 B1。這是尚未修正的程式差異，設計本身已確定。詳細分工與程式依據見[系統責任](architecture/system-boundaries.md)。舊 `experiments/jd-relational-app` 與 `packages/consultant-memory` 程式已退役，保留沿革文件與 Git 歷史，不重新整合舊架構或遷移舊資料。RAG 為獨立範圍。
 
 2026-09-29 的[文件與圖面審查](architecture/verification.md#6-架構文件補完與圖面審查2026-09-29-續審)是設計沿革；現行實作與驗證範圍以 2026-10-02 的正式切換及任務證據判定。
 
 ## 一眼看懂：產品邊界與主要能力
 
-初次認識產品可先讀[產品專題介紹](product-introduction.md)；本頁提供全產品架構的閱讀入口。下圖是**產品能力關係視圖**，不表示每項品質目標均已驗證，也不是執行順序或服務部署；箭頭表示功能關係，精確生效條件往生命週期深入。
+初次認識產品可先讀[產品專題介紹](product-introduction.md)，再由本頁了解整體架構。下圖以箭頭呈現產品功能之間的關係，不表示每項品質目標均已驗證，也不表示固定執行順序或服務部署方式；各項功能的確切生效條件見生命週期文件。
 
 ```mermaid
 flowchart LR
@@ -27,16 +27,16 @@ flowchart LR
   jd --> pdf[匯出目前正式 JD：PDF]
 ```
 
-圖是**產品能力關係**，不是每輪固定執行順序。核心價值是「員工只需說明工作，顧問逐步產出涵蓋主要工作、精簡而高訊號的 JD」；Memory、Agent 與工具是支援手段。未知／衝突須釐清，不靠模型自行補事實。專用全稿審核近期暫緩，PDF 不表示已通過全稿審核。
+產品的核心價值是「員工只需說明工作，顧問逐步產出涵蓋主要工作、精簡而高訊號的 JD」；Memory、AI 角色與工具用來支援這個目標。未知或矛盾的資訊須經釐清，不能由模型自行補成事實。專用全稿審核近期暫緩，匯出 PDF 不代表已通過全稿審核。
 
 ## 從整體進到各責任
 
-按問題閱讀，不必每次重讀全部。下表的責任文件持續更新；日期檔名不是歷史失效標記。
+可依問題選讀下表的文件，不必一次讀完。這些設計文件持續更新，檔名中的日期不表示文件已失效。
 
 | 視角／要回答的問題 | 唯一詳細入口 |
 |---|---|
 | 為誰、完成什麼、哪些不做；用語與產品約束 | [產品概念](product-concept.md)；品質依[工作分析／JD 研究入口](guides/2026-09-09-job-analysis-and-jd-content-research.md) |
-| App 有哪些責任，Agent／業務／DB 如何互動 | [系統責任與資料流](architecture/system-boundaries.md) |
+| App 如何分工，AI／業務模組／資料庫如何互動 | [系統責任與資料流](architecture/system-boundaries.md) |
 | 使用者一輪到背景發布，正常及異常怎麼走 | [核心閉環與跨層生命週期](specs/2026-09-29-core-value-loop-lifecycle.md) |
 | A 的上下文、固定 Memory、工具及按需閱讀 | [顧問 context 與 State](specs/2026-09-26-consultant-context-and-state-design.md) |
 | Memory 三層、物件／快照、B1／B2 分工 | [Memory 子圖](specs/2026-09-24-caliburn-layered-architecture-map.md) → [背景生命週期](specs/2026-09-25-b1-b2-information-gap-lifecycle.md) |
@@ -46,8 +46,8 @@ flowchart LR
 | JD 的欄位、按需讀寫、依據、人工與來源 diff | [JD 工具與領域契約](specs/2026-09-29-jd-model-tool-contract-review.md)；欄位意義依[寫作指南](guides/2026-09-09-jd-field-and-writing-guide.md) |
 | 保存／版本／交易、候選與 checkpoint、原結果核對 | [資料責任與交易](architecture/persistence.md) |
 | UI 效果、程序、啟停、安全、外送、PDF | [互動與運作](architecture/delivery-and-operations.md) |
-| 為何選這些工程方向，何時值得更換 | [設計取捨](architecture/design-decisions.md) |
-| 如何證明做對、哪些只是文件已定、還差什麼 | [覆蓋與驗收矩陣](architecture/verification.md) |
+| 為何採用這些技術方案，何時需要重新評估 | [設計取捨](architecture/design-decisions.md) |
+| 哪些效果已有證據、哪些僅完成設計、仍有哪些缺口 | [覆蓋與驗收矩陣](architecture/verification.md) |
 
 ### 文件實際如何分層
 
@@ -68,11 +68,11 @@ docs/
   current-decisions.md                ← 最新狀態及演進路由，不複製正文
 ```
 
-現有專題文件不為搬目錄而複製；上表是**架構責任文件集合**。其餘 specs、plans、evidence 按 register 判定為現行、研究或歷史，不因同名／日期較新就覆蓋本集合。後續僅在出現新的獨立責任時分檔，不每次討論新增一份「最新版」。
+上表列出各項架構設計的主要文件，既有專題不因調整目錄而複製。其餘 specs、plans、evidence 的現行、研究或歷史定位，依決策索引判定，不因同名或日期較新就取代上表文件。後續僅在出現新的獨立職責時分檔，不在每次討論後另建一份「最新版」。
 
 ### 架構圖閱讀順序
 
-各圖依所在文件區分現行機制、採用設計與待對齊事項；舊專題若仍標示未實作，須併讀其最新狀態與任務證據。Mermaid 原始碼與正文在同一責任文件維護；不能只改圖、不改契約，或把箭頭推導成另一套權限。先看問題，再選圖，不必一口氣讀完全部細節。
+各圖依所在文件區分現行機制、已採用設計及待修正事項；舊專題若仍標示未實作，須搭配最新狀態與任務證據閱讀。Mermaid 原始碼與正文在同一設計文件維護，圖與契約須保持一致，箭頭也不代表額外授權。讀者可依問題選圖，不必一次讀完所有細節。
 
 | 想知道什麼 | 視圖及唯一位置 |
 |---|---|
@@ -85,7 +85,7 @@ docs/
 | B1／B2 如何分工、交接、恢復及發布 | [三個安全點與背景流程](specs/2026-09-25-b1-b2-information-gap-lifecycle.md#候選操作快照與三個安全點目標已確認未實作) |
 | 本機與外部供應商界線在哪裡 | [部署／外送圖](architecture/delivery-and-operations.md#2-最小部署視角) |
 
-圖面可渲染不等於設計正確；依[驗收矩陣](architecture/verification.md)檢查箭頭條件、資料責任元件、取消／恢復及發布反例。歷史圖留在各自歷史文件，不作新架構的備選路徑。
+圖面能正確顯示，不代表設計正確；仍須依[驗收矩陣](architecture/verification.md)檢查箭頭成立的條件、資料的負責模組，以及取消、恢復與發布的反例。歷史圖保留在歷史文件中，不作為新架構的備選路徑。
 
 ## 必須跨責任追蹤的關係
 
@@ -99,7 +99,7 @@ docs/
 
 ### 業務規則與交易機制
 
-業務決定什麼必須一起成立，App 協調用例，PostgreSQL 接線提供交易安全、原子性、約束及持久結果。Graph 保存執行位置，不充當正式業務結果，也不新增第二套 validator／receipt。詳細責任及工程方向只在[資料與交易](architecture/persistence.md)維護；不跨模型等待開長交易。
+業務規則決定哪些結果必須一起成立，App 協調操作流程，PostgreSQL 提供交易安全、原子性、約束及結果的持久保存。Graph 保存執行位置，不取代正式業務結果，也不另設一套驗證或操作結果判定機制。詳細分工與技術選擇見[資料與交易](architecture/persistence.md)；交易不跨越等待模型回應的期間。
 
 ## 現行、目標與未決不可混畫
 
@@ -109,4 +109,4 @@ docs/
 - **明確後延**：全稿審核、原話語意搜尋及跨機還原。**不採用** C 即時修補、無具體需求的通用規則引擎及舊資料遷移；C 不是等待恢復的功能。
 - **歷史**：ADR0077 及舊架構僅供沿革查考，不作現行執行路徑。
 
-驗證層級見[驗收矩陣](architecture/verification.md#3-施工前與實作後的門檻)。設計變更須有可證偽的效果與相應證據；涉及產品語意、資料承諾或外送範圍的改變，依[決策流程](decision-process.md)記錄取捨。
+驗證層級見[驗收矩陣](architecture/verification.md#3-施工前與實作後的門檻)。設計變更須說明可檢驗的效果，並提出相應證據；涉及產品規則、資料保存承諾或外送範圍的改變，依[決策流程](decision-process.md)記錄取捨。

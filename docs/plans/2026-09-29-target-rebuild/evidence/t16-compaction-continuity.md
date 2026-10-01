@@ -118,3 +118,21 @@ ignored 探針 `.research-tmp/eval/probe_compaction_continuity.py` SHA-256：`78
 ```
 
 受影響既有容量／完整 C／原生序列化回歸：`tests/unit/test_request_capacity.py`、`tests/unit/test_context_compaction.py`、`tests/contracts/test_response_serialization.py` **43 passed，1.43s**（`python -X utf8 -B -m pytest ... -q -p no:cacheprovider --tb=short`）。探針 Ruff E/F/I 通過、import／CLI 說明可載入。沒有產品程式變更，不製造 TDD 宣稱；離線43例不抵銷本次真provider未通過。
+
+## 6. 429 的帳戶容量診斷（2026-10-01）
+
+基準 `d6326bf6`；Owner 已固定產品 Luna。本片不重送 §5 的 285K 請求，只補失敗時沒有保存的限流線索。官方[限流指南](https://developers.openai.com/api/docs/guides/rate-limits)區分模型 context、帳戶／project TPM、長 context 的獨立限流及帳務 429；[HTTP 診斷欄位](https://developers.openai.com/api/reference/overview#debugging-requests)可取得實際 limit／remaining／reset。小請求所得欄位只能代表該次適用額度，不能冒充先前大視窗失敗的完整原因。
+
+**外送前 manifest：**只用不超過 2,000 字元的合成庫存規則，最多 1 次 Luna／high create（output ≤512）及 1 次完整窗口 compact，零 count／重試；每請求 60 秒、整批 120 秒、管理預留 US$0.05。使用現有 direct SDK client／serializer、store=false／all_turns，金鑰只經既有 loader 載入；不讀職務 DB、不外送私人資料。只保存 status、數值限流 headers、安全錯誤分類及 usage，不保存完整 headers、組織 ID、原始錯誤 body 或 opaque 內容。第一個錯誤即停止；沒有欄位就如實記未知，不擴大請求量。ignored `probe_luna_rate_headers.py` 獨占輸出 `luna-rate-headers-20261001.jsonl`，不改產品政策或帳戶設定。
+
+### 結果與下一步
+
+`2026-10-01T00:19:19Z–00:19:23Z`（本地 08:19）完成，退出碼 0。create 及 compact 均 HTTP 200，兩次 headers 一致回報 `x-ratelimit-limit-requests=500`、`x-ratelimit-limit-tokens=200000`；未回 project-token 欄位。沒有重試或重送 §5 大視窗；compact 完整回傳 message＋compaction。usage 合計 input 117、output 83，按既有 Luna Standard 費率估 **US$0.0000532**，非帳單。
+
+**可以確認：**這把金鑰當次小請求適用的 token 限流為 200K，生成與壓縮相同。**不能確認：**先前 285K 失敗的精確細項，以及長 context 是否有另一組可用額度；官方明列長 context 可有獨立限流，小請求 headers 不代替大視窗成功證據。模型硬容量不是帳戶 TPM；不以增加重試、等待或換模型聲稱已解決。
+
+目前 A 輪前 128K、Step 間 272K 與 B 輪前 512K 接線未變。已向 Owner 提出按配額校準候選：A 輪前仍 128K、B1／B2 輪前 128K、Step 間 160K，**待確認／未採用／未驗證**。這是提前使用既定原生 compact，不是裁切歷史或自製摘要；也不能保證任意單次巨大工具結果一定可壓縮。另一選項是保留原政策，由帳戶擁有者確認／調整容量；本代理沒有修改帳戶或擴大費用。
+
+這次取得了新的容量證據，T16 仍未完成；不可把低 token 的 200 當成 272K／512K 通過。其餘品質及交付工作可繼續，不因等待門檻決策重跑相同限流測試。
+
+原件識別：ignored `.research-tmp/eval/probe_luna_rate_headers.py` SHA-256 `99c419aae9d29ee561398963f12f722239d87203cdbd692c9fd31b97d19c9b49`；安全結果 `.research-tmp/eval/luna-rate-headers-20261001.jsonl` SHA-256 `7cd970196c769ebf3a2cc20615d0fa5856d08764274fc05fb3d67d978485b29a`。腳本執行後只有排版調整，Ruff E/F/I 與 format check 通過。沒有模型設定或產品程式變更；本批不重跑，也不將未決門檻校準混同已確認的 Luna 選型。

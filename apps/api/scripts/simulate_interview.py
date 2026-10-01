@@ -13,12 +13,16 @@ Personas: tests/fixtures/job_analysis_quality/personas.json. Authorization and l
 Typical run, from apps/api: start a backend on its own database schema and port
 (`scripts/run_backend.py --key-file .env --port 8103`, database and PDF variables per the README),
 then `python scripts/simulate_interview.py --persona warehouse --base-url http://127.0.0.1:8103
---key-file .env --output <new file>.json`. Every run creates a new job file; the output file must
+--key-file .env --output <new file>.json`. A fresh run creates a new job file; the output file must
 not exist yet, and `<output>.progress.jsonl` gets one line per Turn so a crashed run keeps its
 transcript. The journey options (--human-edit-at, --cancel-during, --kill-during with
 --restart-command, --export-pdf, --think-seconds, --retry-failed) are meant for the long
 persona, whose entry may also set `late_correction` (a correction of something said earlier)
-and `min_turns`.
+and `min_turns`. To resume a diagnosed interruption, supply `--resume-job-file`,
+`--resume-execution` and the original absolute `--deadline` (ISO8601 with timezone), retaining
+the original output path and journey options. The explicit execution may already have completed
+when the harness reconnects. Earlier operations are not replayed. Events append to a separate
+`.events.jsonl`; these local files are evidence, not an alternative product recovery mechanism.
 """
 
 import argparse
@@ -41,6 +45,25 @@ from caliburn.adapters.openai_responses import (
     create_response,
     create_responses_client,
 )
+
+if __package__:
+    from .interview_progress import (
+        JourneyEvents,
+        ResumePoint,
+        append_record,
+        read_records,
+        seconds_until,
+        validate_history,
+    )
+else:  # Also retain the documented `python scripts/simulate_interview.py` entry point.
+    from interview_progress import (
+        JourneyEvents,
+        ResumePoint,
+        append_record,
+        read_records,
+        seconds_until,
+        validate_history,
+    )
 
 PERSONAS = Path(__file__).parents[1] / "tests/fixtures/job_analysis_quality/personas.json"
 EMPLOYEE_MODEL = "gpt-6-luna"
@@ -131,6 +154,33 @@ class Backend:
     def __init__(self, http: httpx2.AsyncClient) -> None:
         self.http = http
         self.file_id = ""
+        self.restart_deadline = 0.0
+
+    def expect_restart(self, seconds: float = 90.0) -> None:
+        self.restart_deadline = time.monotonic() + seconds
+
+    async def read_turn(self, execution_id: str) -> dict[str, Any]:
+        while True:
+            remaining = self.restart_deadline - time.monotonic() if self.restart_deadline else None
+            if remaining is not None and remaining <= 0:
+                raise TimeoutError("The original execution did not become readable within 90s")
+            try:
+                async with asyncio.timeout(remaining):
+                    result = await self.get(
+                        f"/api/job-files/{self.file_id}/consultant-turns/{execution_id}"
+                    )
+                self.restart_deadline = 0.0
+                return dict(result.get("turn", result))
+            except httpx2.TransportError:
+                if time.monotonic() >= self.restart_deadline:
+                    raise
+                print("restart wait: transport unavailable", flush=True)
+            except httpx2.HTTPStatusError as error:
+                code = error.response.status_code
+                if code not in (500, 502, 503, 504) or time.monotonic() >= self.restart_deadline:
+                    raise
+                print(f"restart wait: HTTP {code}", flush=True)
+            await asyncio.sleep(min(POLL_SECONDS, max(0, self.restart_deadline - time.monotonic())))
 
     async def get(self, path: str) -> Any:
         response = await self.http.get(path)
@@ -161,14 +211,8 @@ class Backend:
     async def wait_for_turn(self, execution_id: str) -> str:
         deadline = time.monotonic() + TURN_TIMEOUT_SECONDS
         while time.monotonic() < deadline:
-            try:
-                turn = await self.get(
-                    f"/api/job-files/{self.file_id}/consultant-turns/{execution_id}"
-                )
-            except httpx2.TransportError:  # The backend is restarting; keep waiting.
-                await asyncio.sleep(POLL_SECONDS)
-                continue
-            status = str(turn.get("turn", turn)["status"])
+            turn = await self.read_turn(execution_id)
+            status = str(turn["status"])
             if status in ("completed", "failed", "cancelled"):
                 return status
             await asyncio.sleep(POLL_SECONDS)
@@ -180,17 +224,6 @@ class Backend:
             headers={"Origin": "http://127.0.0.1:8100"},
         )
         response.raise_for_status()
-
-    async def wait_healthy(self, seconds: float = 90.0) -> None:
-        deadline = time.monotonic() + seconds
-        while time.monotonic() < deadline:
-            try:
-                if (await self.http.get("/api/health")).status_code == 200:
-                    return
-            except httpx2.TransportError:
-                pass
-            await asyncio.sleep(1.0)
-        raise TimeoutError("The backend did not become healthy after the restart")
 
     async def human_edit(self, purpose: str, task_title: str) -> dict[str, Any]:
         """One person edits the formal JD by hand: the purpose, and one added task."""
@@ -233,6 +266,24 @@ HUMAN_PURPOSE = "（人工撰寫）確保原物料與包材及時、足量且成
 HUMAN_TASK = "（人工補充）彙整供應商年度績效資料"
 
 
+async def prepare_resume(backend: Backend, output: Path, execution_id: str) -> ResumePoint:
+    turns = read_records(output.with_suffix(".progress.jsonl"))
+    turn = await backend.read_turn(execution_id)
+    if turn["job_file_id"] != backend.file_id or turn["execution_id"] != execution_id:
+        raise ValueError("Resume execution identity does not match")
+    messages = await backend.interviews()
+    validate_history(turns, messages)
+    employees = [m["interview_text"] for m in messages if m["speaker"] == "employee"]
+    # At most the one pending Turn may have completed since the last harness checkpoint.
+    if len(employees) > len(turns) + 1 or (
+        len(employees) > len(turns) and employees[-1] != turn["input_text"]
+    ):
+        raise ValueError("Resume history has advanced beyond the selected execution")
+    if turn.get("status") == "completed" and len(employees) != len(turns) + 1:
+        raise ValueError("Completed execution is not the next entry in the resume history")
+    return ResumePoint(turns, execution_id, turn["input_text"])
+
+
 async def run_interview(
     backend: Backend,
     sdk: Any,
@@ -240,14 +291,18 @@ async def run_interview(
     max_turns: int,
     options: argparse.Namespace,
     events: list[dict[str, Any]],
+    *,
+    resume: ResumePoint | None = None,
 ) -> list[dict[str, Any]]:
-    turns: list[dict[str, Any]] = []
-    text = persona["opening"]
+    turns: list[dict[str, Any]] = list(resume.turns) if resume else []
+    text = resume.input_text if resume else persona["opening"]
     correction = persona["correction"]
-    late_done = False
-    for number in range(1, max_turns + 1):
+    late = persona.get("late_correction")
+    late_done = bool(late and any(late["text"] in t["employee"] for t in turns))
+    for number in range(len(turns) + 1, max_turns + 1):
         started = time.monotonic()
-        if options.human_edit_at == number:
+        resuming = resume is not None
+        if not resuming and options.human_edit_at == number:
             events.append(
                 {
                     "turn": number,
@@ -255,28 +310,63 @@ async def run_interview(
                     **await backend.human_edit(HUMAN_PURPOSE, HUMAN_TASK),
                 }
             )
-        execution_id = await backend.send(text)
-        if options.cancel_during == number:
+        execution_id = resume.execution_id if resume else await backend.send(text)
+        events.append(
+            {
+                "turn": number,
+                "event": "execution_resumed" if resuming else "input_accepted",
+                "execution_id": execution_id,
+                "input_text": text,
+            }
+        )
+        resume = None
+        if not resuming and options.cancel_during == number:
             await asyncio.sleep(8)
             await backend.cancel(execution_id)
             cancelled = await backend.wait_for_turn(execution_id)
-            events.append({"turn": number, "event": "cancelled_then_resent", "first": cancelled})
+            if cancelled not in ("cancelled", "failed"):
+                raise RuntimeError(f"Cancellation did not end safely: {cancelled}; not resending")
+            events.append(
+                {
+                    "turn": number,
+                    "event": "cancelled_then_resent",
+                    "first": cancelled,
+                    "execution_id": execution_id,
+                }
+            )
             execution_id = await backend.send(text)
-        elif options.kill_during == number:
+            events.append(
+                {
+                    "turn": number,
+                    "event": "input_accepted",
+                    "execution_id": execution_id,
+                    "input_text": text,
+                }
+            )
+        elif not resuming and options.kill_during == number:
             await asyncio.sleep(12)
             await asyncio.to_thread(subprocess.run, options.restart_command, shell=True, check=True)
-            await backend.wait_healthy()
+            backend.expect_restart()
             events.append({"turn": number, "event": "backend_killed_mid_turn_and_restarted"})
         status = await backend.wait_for_turn(execution_id)
         # A Turn that ends in an error is shown to the employee, who sends the same sentence again
         # as a person would. The restart of the kill Turn may end it safely, so it gets one more.
         resends_left = options.retry_failed + (1 if options.kill_during == number else 0)
         while resends_left and (
-            status == "failed" or (options.kill_during == number and status != "completed")
+            status == "failed" or (options.kill_during == number and status == "cancelled")
         ):
             resends_left -= 1
             events.append({"turn": number, "event": "turn_ended_then_resent", "first": status})
-            status = await backend.wait_for_turn(await backend.send(text))
+            execution_id = await backend.send(text)
+            events.append(
+                {
+                    "turn": number,
+                    "event": "input_accepted",
+                    "execution_id": execution_id,
+                    "input_text": text,
+                }
+            )
+            status = await backend.wait_for_turn(execution_id)
         messages = await backend.interviews()
         reply = next((m for m in reversed(messages) if m["speaker"] == "consultant"), None)
         turns.append(
@@ -286,18 +376,18 @@ async def run_interview(
                 "seconds": round(time.monotonic() - started, 1),
                 "employee": text,
                 "consultant": reply["interview_text"] if reply and status == "completed" else None,
+                "execution_id": execution_id,
+                **({"resumed": True} if resuming else {}),
             }
         )
         print(f"turn {number}: {status} in {turns[-1]['seconds']}s", flush=True)
-        with options.output.with_suffix(".progress.jsonl").open("a", encoding="utf-8") as progress:
-            progress.write(json.dumps(turns[-1], ensure_ascii=False) + "\n")
-        if status != "completed":
+        append_record(options.output.with_suffix(".progress.jsonl"), turns[-1])
+        if status != "completed" or number == max_turns:
             break
         text, done = await employee_reply(sdk, persona, messages)
         await asyncio.sleep(options.think_seconds)  # a person takes time to type the answer
         if number + 1 == correction["turn"] and correction["text"] not in text:
             text = f"{text} {correction['text']}"
-        late = persona.get("late_correction")
         said = " ".join(m["interview_text"] for m in messages if m["speaker"] == "employee")
         if (
             late
@@ -311,13 +401,24 @@ async def run_interview(
             events.append({"turn": number + 1, "event": "late_correction_sent"})
         if done and number + 1 > correction["turn"] and number + 1 >= persona.get("min_turns", 0):
             turns.append({"turn": number + 1, "employee": text, "consultant": None, "final": True})
-            status = await backend.wait_for_turn(await backend.send(text))
+            execution_id = await backend.send(text)
+            events.append(
+                {
+                    "turn": number + 1,
+                    "event": "input_accepted",
+                    "execution_id": execution_id,
+                    "input_text": text,
+                }
+            )
+            turns[-1]["execution_id"] = execution_id
+            status = await backend.wait_for_turn(execution_id)
             messages = await backend.interviews()
             turns[-1]["status"] = status
             turns[-1]["consultant"] = next(
                 (m["interview_text"] for m in reversed(messages) if m["speaker"] == "consultant"),
                 None,
             )
+            append_record(options.output.with_suffix(".progress.jsonl"), turns[-1])
             break
     return turns
 
@@ -498,7 +599,7 @@ def evaluate(persona: dict[str, Any], collected: dict[str, Any]) -> dict[str, An
     }
 
 
-async def execute(arguments: argparse.Namespace) -> int:
+async def execute_journey(arguments: argparse.Namespace, events: JourneyEvents) -> int:
     persona = json.loads(PERSONAS.read_text(encoding="utf-8"))[arguments.persona]
     max_turns = arguments.max_turns or persona["max_turns"]
     key = read_openai_api_key(arguments.key_file)
@@ -508,11 +609,26 @@ async def execute(arguments: argparse.Namespace) -> int:
         httpx2.AsyncClient(base_url=arguments.base_url, timeout=60) as http,
     ):
         backend = Backend(http)
-        await backend.create_file(f"模擬訪談 {arguments.persona} {arguments.label}")
+        resume = None
+        if arguments.resume_job_file:
+            backend.file_id = arguments.resume_job_file
+            backend.expect_restart()
+            resume = await prepare_resume(backend, arguments.output, arguments.resume_execution)
+        else:
+            await backend.create_file(f"模擬訪談 {arguments.persona} {arguments.label}")
         # The result file is written only at the end; the id lets a crashed run be re-collected.
         print(f"job file {backend.file_id}", flush=True)
-        events: list[dict[str, Any]] = []
-        turns = await run_interview(backend, sdk, persona, max_turns, arguments, events)
+        events.append(
+            {
+                "event": "harness_started",
+                "job_file_id": backend.file_id,
+                "resume_execution": arguments.resume_execution,
+                "deadline": arguments.deadline.isoformat() if arguments.deadline else None,
+            }
+        )
+        turns = await run_interview(
+            backend, sdk, persona, max_turns, arguments, events, resume=resume
+        )
         collected = await collect(backend)
         if arguments.export_pdf:
             pdf = await backend.export_pdf()
@@ -538,6 +654,29 @@ async def execute(arguments: argparse.Namespace) -> int:
     return 0
 
 
+async def execute(arguments: argparse.Namespace) -> int:
+    if bool(arguments.resume_job_file) != bool(arguments.resume_execution):
+        raise ValueError("Resume requires both the job file and original execution")
+    if arguments.resume_job_file and arguments.deadline is None:
+        raise ValueError("Resume must retain the original absolute deadline")
+    if arguments.output.exists():
+        raise FileExistsError(arguments.output)
+    if not arguments.resume_job_file and any(
+        arguments.output.with_suffix(suffix).exists()
+        for suffix in (".progress.jsonl", ".events.jsonl")
+    ):
+        raise ValueError("Existing progress requires explicit resume, not a new job file")
+    remaining = seconds_until(arguments.deadline)
+    events = JourneyEvents(arguments.output)
+    try:
+        async with asyncio.timeout(remaining):
+            return await execute_journey(arguments, events)
+    except (Exception, asyncio.CancelledError) as error:
+        # Do not persist credentials/HTTP bodies from arbitrary exception text.
+        events.append({"event": "harness_stopped", "error_type": type(error).__name__})
+        raise
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -548,6 +687,11 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--label", default="run")
     parser.add_argument("--max-turns", type=int, default=0)
+    parser.add_argument("--resume-job-file", default="", help="continue this existing job file")
+    parser.add_argument("--resume-execution", default="", help="wait for this original execution")
+    parser.add_argument(
+        "--deadline", type=datetime.fromisoformat, help="original absolute deadline"
+    )
     # Journey operations for a long run; each is off by default.
     parser.add_argument(
         "--cancel-during", type=int, default=0, help="cancel this turn, then resend"

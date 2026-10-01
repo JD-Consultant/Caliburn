@@ -2,7 +2,16 @@
 
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, ForeignKey, ForeignKeyConstraint, Text, or_, select
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Text,
+    false,
+    or_,
+    select,
+)
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
@@ -87,6 +96,7 @@ class ContextHistoryBindingRecord(Base):
     prepared_checkpoint_id: Mapped[str | None] = mapped_column(Text)
     completed_thread_id: Mapped[str | None] = mapped_column(Text)
     completed_checkpoint_id: Mapped[str | None] = mapped_column(Text)
+    compact_requested: Mapped[bool] = mapped_column(Boolean, server_default=false())
 
 
 async def read_binding(

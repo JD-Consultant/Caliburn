@@ -1,6 +1,7 @@
 # 資料責任、版本保存與交易邊界
 
 - 狀態：**目標設計／分切片實作中，未完成整體驗收**。保存效果與安全點依已確認產品規則；本頁不自行授權施工，有效 Goal 與進度依[任務計畫](../plans/2026-09-29-target-rebuild/README.md)。已落地的檔案與開場保存見[訪談保存接線](../implementation/interview-storage.md)，不代表其餘生命週期已完成。
+- **實作與驗證進度（2026-10-02）：**已依本設計施工，T01–T17 已依各任務的驗收層級完成，逐項效果的實測判定與限制見 [T17 V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)、實驗發現的問題見[實驗發現的問題彙整](../reports/experiment-findings.md)；production 切換（T18）待 Owner 放行。上方「未實作、未驗收」是 2026-09-29 撰寫當時的狀態，保留作沿革，不是現況。
 - 維護者：資料與業務架構維護者；核對日期：2026-09-29。
 - 上層：[系統責任](system-boundaries.md)；共同審查法：[架構討論規範](../architecture-discussion-standard.md#資料保存與使用的共同審查順序)。本頁不定表名、ORM 或通用 repository。
 

@@ -460,3 +460,55 @@ execution `35367359-e385-49c7-b992-a2d44ccda79e` 最終為 `failed`，觀察區�
 | J11 限流 | 記錄限流等待次數、最長一次等待與 `rate_limited` 嘗試占比；沒有輪次因限流而失敗（新機制的真模型驗證） |
 
 單次、單一人設；通過只說明這條旅程在這份資料上成立，不是普遍保證，也不替代 V25 的真人試點。
+
+### 執行中事故與續跑修訂 A1（2026-10-01 22:57–23:20，在第 25 輪之後的任何付費請求之前寫下）
+
+**交接狀態：**以下保留前位執行者的事故紀錄；A1 是續跑提案，不代表 harness v4 已完成或已重啟續跑。後續唯讀核對及須先釐清的差異見下一節。
+
+**事實（唯讀取得）：**主旅程 22:21:58 起跑，第 1–24 輪全部 completed（含第 14 輪人工改稿、第 20 輪取消後重送、第 20 輪輪前 128K 壓縮）。到此為止 308 次外送嘗試、估算費用 US$0.13；34 次失敗嘗試**全是 `rate_limited` 等待**，沒有別種失敗。第 25 輪 22:56:08 開始，22:57:22 最後一次外送嘗試是限流等待。**22:57:40 前後，本機測試 PostgreSQL（loopback 55439 的原生 EDB 叢集，非 Docker）被外力硬殺**：日誌停在 22:57:26 的 checkpoint 開始、沒有任何關機紀錄，最後一個 WAL 寫入 22:57:39。Demo 的 8100／5173 同時不再監聽（消失時間未確認），Docker Desktop 的 WSL 發行版也是停止狀態。同一秒的 Windows 系統日誌有一組服務設定變更（含 ChatGPT 桌面程式的服務）；**只能說時間吻合，無法證明因果，原因未確認**。我沒有執行任何停止這些程序的命令。
+
+**處置：**23:16 以原參數（`postgres -D .research-tmp/postgresql-t01-data -p 55439 -h 127.0.0.1`）用 `pg_ctl` 重啟；日誌顯示 `not properly shut down; automatic recovery` → `redo done` → `ready to accept connections`，資料未損。評測後端 8103 與 harness 在伺服器消失期間仍活著；資料庫回來的瞬間 harness 因輪詢拿到 HTTP 500 而崩潰（`wait_for_turn` 只把連線錯誤當暫時性）。**登記的停止條件「harness 崩潰」成立**：我停下、沒有再送任何請求，改為診斷。
+
+**診斷：**
+1. **環境事故，不是旅程結果。**第 25 輪沒有完成，也沒有失敗結論；資料庫裡它仍是 `active`，第 1–24 輪的資料完整。
+2. **產品面（列為已知不足，不在跑測期間改 `src`）：**後端的 LangGraph checkpointer 只持有一條資料庫連線，leader lock 設計上「不重連、不重新取得」（`process_lock.py`：原 session 消失即不可恢復所有權）。資料庫**伺服器**被殺後，這條連線永久關閉，讀 checkpoint 的端點（如輪次狀態）持續回 500，即使資料庫已回來也不會自己恢復；`/api/health` 仍回 200（它不檢查這兩條連線）。這與設計一致——文件只規範「程序中斷／重開」，未規範「資料庫伺服器重啟、App 不重啟」——恢復方式是重啟 App，與下面的「硬停止恢復」是同一條路徑。
+3. **harness 面：**輪詢只容忍連線錯誤、不容忍 5xx；事件（人工改稿、取消）只留在記憶體，崩潰時遺失。
+
+**修訂 A1（續跑，不是重跑）：**「只跑這一次、不重跑」的目的是不挑最好一次；本修訂不丟棄任何已完成輪次，也不重來，而是在**同一份職務檔案**上繼續，因此仍是同一次旅程。
+- 重啟 8103（用主工作樹，與計畫中的第 30 輪硬停止同一指令）；產品啟動時恢復那一輪 `active` 的執行。這次**非計畫的強制中斷也成為一次真實的恢復證據**，與第 30 輪的刻意硬停止分開記錄（J3 兩筆）。
+- harness 升 v4（工具修補，不改量測規則）：輪詢容忍 5xx（到該輪逾時為止）；事件逐筆寫進 `.progress.jsonl`；`--resume-job-file` 讀回已有的輪次與事件，用 `consultant-turns/current` 找出進行中那一輪（含原句）接續等待，不重送；之後照原旗標完成：晚期更正（≥第 26 輪）、第 30 輪硬停止、最少 45 輪、PDF。第 25 輪的耗時不可與其他輪比較（含中斷與恢復），資料中標 `resumed`。事故前遺失的兩個事件（第 14 輪人工改稿、第 20 輪取消）依產品資料重建並標明「重建」。
+- 費用／時間上界不變：累積估算 US$4、自 22:21:58 起 6 小時（至 04:21）；到此 US$0.13。其餘判準 J1–J11 不變；J1 另列「第 25 輪的資料庫事故」一筆，不算旅程失敗也不算通過，依恢復結果如實記錄。
+
+### 接手核對與工作樹整理（2026-10-01）
+
+**本次範圍：**Owner 要求先保全他人做到一半的工作、整理分支與 worktree，再討論下一步。本次只做唯讀診斷與文件整理；未呼叫模型、未啟停服務、未修改產品／harness、未合併或推送分支，未刪除資料。T17／T18 仍未完成。
+
+**23:30–23:35（Asia/Taipei）重新核對：**
+
+- `eval_b`／職務檔案 `2be168b7-a13f-4313-bc28-fa9cbee770fa`：24 個 consultant execution completed、1 個 cancelled、1 個 active；2 個 Memory 批次 completed。正式訪談 49 則、序號上界 49；Memory 2 版、處理上界 44。計數與前人交接相符，但這不是全庫逐筆無損驗證。
+- 原第 25 輪 execution 是 `b7e011c1-6090-401c-a753-f0d8585bc4fa`。其 `job_consultant:completed_work` thread 最新 checkpoint 為 `1f1bda86-22cb-6dca-801c-bab70a690695`，保存於 22:57:12，Graph metadata step=28；另有 initial_context／prepared_history。**thread 名稱中的 completed_work 不表示本 Turn 已完成；metadata step 也不直接等於第幾次模型呼叫。**這只證明保存項目存在，尚未驗證能成功續作。
+- 308 次外送嘗試，最後准入 22:57:22；其中有 failure code 的 34 筆全為 `rate_limited`。這個分類只涵蓋外送紀錄，不包含另已確認的 DB／HTTP 500／harness 崩潰，不能概括成「本次沒有其他錯誤」。
+- `reported_cost_usd` 合計約 US$0.130，是**產品端**嘗試紀錄的估算；員工模擬器直接呼叫 provider，不在這份 SQL 合計內。續跑前須另外核對或保守預留員工端費用，不把此數字宣稱為整次帳單。
+- PostgreSQL 55439 的 PID 25700 始於 23:16；8103 的 PID 45876 始於 22:20，仍是 DB 重啟前的後端。8101／8102／8104 也仍在監聽；8100／5173 當時未監聽。未找到命令包含 `simulate_interview` 的存活 Python 程序；未改動任何一個服務。這是時點盤點，之後操作前須重查 PID，不沿用此處 PID 直接停止。
+- 本機 `.research-tmp/eval/long-procurement-1.progress.jsonl` 已保留第 1–24 輪的 completed 紀錄，stdout 與之相符；stderr 指向第 25 輪狀態查詢的 HTTP 500。**既有 harness 已逐輪寫入 transcript，缺的是事件即時落盤與續接模式，不是全部進度都遺失。**原資料與 log 留在原處，不因 Git 整理清除 ignored 目錄。
+
+**分支／工作樹責任（接手時基準）：**
+
+| 工作樹 | 分支／HEAD | 處置 |
+|---|---|---|
+| `S:\caliburn` | `target-rebuild`／`57db0b5f` | 原本僅本頁 A1 未提交；保留原紀錄並提交本次核對與交接路由，後續從此分支繼續 |
+| `S:\caliburn-cutover` | `target-cutover-candidate`／`5bccf4fb` | clean；有 6 個尚未合入主施工線的切換提交，包含舊碼退役；保留隔離，不提前放行 T18 |
+| `S:\caliburn\.worktrees\professor-architecture` | `docs/professor-architecture`／`c5650c15` | clean；保留教授報告與圖檔，與產品施工分開，不重寫／移除使用者正在閱讀的路徑 |
+
+其餘 archive／歷史分支未因名稱或 upstream 消失而刪除。此處「整理乾淨」指保全待提交成果、釐清各工作樹責任與保持 clean，不表示將未整合成果全部合併或刪除。
+
+**下一切片建議（尚未執行）：**
+
+1. 只補評測 harness 必需的續接：依既有職務檔案／execution 等待原第 25 輪，不建立第二份檔案或再次送入同一句話；續用原 24 輪與事件。第 14／20 輪事件如須由產品紀錄重建，明示重建，不能當作當時完整保存的 harness 事件。以離線反例驗「不重送、不重做已發生事件」。
+2. A1 的「容忍 5xx」限已確認服務重啟的有界恢復窗口；保存錯誤，逾界停止，不一律吞掉所有 500 直到 timeout。恢復就緒不能只看 `/api/health`，還須成功讀取原 execution／checkpoint；一般狀態讀取失敗不授權重送輸入。
+3. 先補明等待界線：目前 `TURN_TIMEOUT_SECONDS = 2_100`；本頁 900 秒屬於較早的 Q1 manifest，**不能直接套用於這次長旅程或據此宣稱本次違規**。長旅程 manifest 尚未明列單輪及事故後續等的期限，續跑前補明，不能默默重設計時器。整次六小時界線仍從 2026-10-01 22:21:58 起，至 **2026-10-02 04:21:58**；若不再可行，先記停止／變更原因與修訂，再決定續測。產品與員工模擬器費用合併受原 US$4 測試界線控管。
+4. 核對以上接縫後，只重啟經確認的 8103 後端，保持同一產品版本與模型，不動 DB、Demo 或其他評測服務。啟動可能自動恢復原 execution 並產生費用；不能當成純健康檢查。續跑如成立，再完成原晚期更正、刻意硬停止、Memory／JD／PDF 檢查；事故恢復與原第 30 輪故障注入分列，不混算通過。
+
+**研究與取捨：**[PostgreSQL 官方 advisory lock 契約](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)說明 session 結束會釋放 session-level lock；本案 `PostgresProcessLock.check()` 刻意不重連取回舊所有權。bootstrap 使用 `AsyncPostgresSaver.from_conn_string()`，本機鎖定套件原碼建立並持有一條連線；[LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)提供 checkpoint 保存，不等於所有外部連線自動恢復。此處建議先沿既有 App 重啟恢復，不為這次事故擴建熱重連／重新選主平台；是否另補產品故障提示，待完成必要驗收後按影響判斷。
+
+**驗證邊界：**唯讀 SQL 使用 `default_transaction_read_only=on`，只查狀態／計數及 checkpoint metadata，未讀取或輸出 opaque reasoning。已核本機程序、log、相關接線及官方契約；文件變更檢查差異、連結與狀態，不以此代替產品恢復或 T17 真旅程驗收。

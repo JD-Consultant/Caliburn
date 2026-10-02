@@ -9,7 +9,9 @@ from caliburn.features.interviews import queries as interviews
 from caliburn.features.interviews.models import InterviewMessage, InterviewReadScope
 from caliburn.features.job_description import persistence as jd
 from caliburn.features.job_description import source_persistence
+from caliburn.features.job_description.change_queries import read_change_snapshot
 from caliburn.features.job_description.models import ProfileField
+from caliburn.features.job_description.source_targets import source_target_contents
 from caliburn.features.job_description.sources import (
     InterviewSource,
     JdSourceReference,
@@ -41,7 +43,7 @@ class JdEvidenceStaleError(RuntimeError):
 
 
 class JdEvidenceComparisonError(ValueError):
-    """Immutable interview evidence has no Memory version comparison."""
+    """The citation's reviewed JD target cannot be reconstructed reliably."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,6 +54,8 @@ class EvidenceEntry:
     source_label: str
     needs_recheck: bool
     target: JdSourceTarget
+    jd_changed: bool
+    source_changed: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,6 +75,14 @@ class EvidenceLink:
 class MemoryEvidence:
     revision: MemoryObjectRevision
     references: tuple[EvidenceLink, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class JdEvidenceChanges:
+    reference: JdSourceReference
+    before: tuple[str | None, ...]
+    after: tuple[str | None, ...]
+    source_changes: JdSourceChanges | None
 
 
 SPEAKER_LABELS = {"app": "系統開場", "employee": "員工", "consultant": "顧問"}
@@ -111,11 +123,16 @@ class JdEvidenceWorkflow:
                         )
                         source_labels[source] = (interview_label(message), False)
                     else:
+                        if snapshot is None:
+                            raise MemoryRevisionNotFoundError("Published comparison is unavailable")
+                        # Publication fixes the situation chain in the root revision,
+                        # including a new revision for changed links with identical text.
+                        # Expand child bodies only when the user requests the actual diff.
                         current, historical, changed = await read_memory_source_titles(
                             session,
                             job_file_id=job_file_id,
                             source=source,
-                            snapshot_id=snapshot.snapshot_id if snapshot else None,
+                            snapshot_id=snapshot.snapshot_id,
                             interview_through_sequence=frontier,
                         )
                         # The label describes original evidence, not its current replacement.
@@ -134,6 +151,8 @@ class JdEvidenceWorkflow:
                         label,
                         reference.needs_review or changed,
                         reference.target,
+                        reference.needs_review,
+                        changed,
                     )
                 )
             return EvidenceOverview(revision_id, tuple(entries))
@@ -196,23 +215,70 @@ class JdEvidenceWorkflow:
 
     async def read_changes(
         self, job_file_id: UUID, revision_id: UUID, citation_id: UUID
-    ) -> JdSourceChanges:
+    ) -> JdEvidenceChanges:
         async with self.sessions() as session:
             snapshot = await memory.read_latest_snapshot(session, job_file_id)
             reference, frontier = await _formal_reference(
                 session, job_file_id, revision_id, citation_id
             )
+            before, after = await _reviewed_target_contents(
+                session, job_file_id, revision_id, reference
+            )
             if isinstance(reference.source, InterviewSource):
-                raise JdEvidenceComparisonError("Interview originals are immutable")
+                await interviews.read_interview_sources(
+                    session,
+                    InterviewReadScope(job_file_id, frontier),
+                    source_ids=(reference.source.source_id,),
+                )
+                return JdEvidenceChanges(reference, before, after, None)
             if snapshot is None:
                 raise MemoryRevisionNotFoundError("Published comparison is unavailable")
-            return await read_memory_source_changes(
+            source_changes = await read_memory_source_changes(
                 session,
                 job_file_id=job_file_id,
                 reference=reference,
                 snapshot_id=snapshot.snapshot_id,
                 interview_through_sequence=frontier,
             )
+            return JdEvidenceChanges(reference, before, after, source_changes)
+
+
+async def _reviewed_target_contents(
+    session: AsyncSession,
+    job_file_id: UUID,
+    revision_id: UUID,
+    reference: JdSourceReference,
+) -> tuple[tuple[str | None, ...], tuple[str | None, ...]]:
+    reviewed_id = reference.reviewed_revision_id
+    if reviewed_id is None:
+        raise JdEvidenceComparisonError("The citation has no persisted review baseline")
+    reviewed_references = await source_persistence.read_source_references(
+        session, job_file_id, reviewed_id
+    )
+    reviewed = next(
+        (item for item in reviewed_references if item.citation_id == reference.citation_id), None
+    )
+    if (
+        reviewed is None
+        or reviewed.target != reference.target
+        or reviewed.source != reference.source
+        or reviewed.needs_review
+        or reviewed.reviewed_revision_id != reviewed_id
+    ):
+        raise JdEvidenceComparisonError("The citation does not match its stored review baseline")
+    # Fixed reference FKs guarantee these revisions exist in this file. Read each
+    # endpoint by identity; the previous Turn is unrelated to citation review.
+    before = await read_change_snapshot(session, job_file_id, reviewed_id)
+    after = (
+        before
+        if reviewed_id == revision_id
+        else await read_change_snapshot(session, job_file_id, revision_id)
+    )
+    old_targets = source_target_contents(before.profile, before.work)
+    new_targets = source_target_contents(after.profile, after.work)
+    if reference.target not in old_targets or reference.target not in new_targets:
+        raise JdEvidenceComparisonError("The reviewed JD target is unavailable")
+    return old_targets[reference.target], new_targets[reference.target]
 
 
 async def _formal_reference(

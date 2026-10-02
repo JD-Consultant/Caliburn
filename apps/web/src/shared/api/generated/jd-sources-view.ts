@@ -14,6 +14,14 @@ export interface Reference {
   source_kind: 'interview' | 'work_situation' | 'work_understanding';
   source_label: string;
   needs_recheck: boolean;
+  /**
+   * The JD target has been edited since review, including edits reverted to the reviewed text. Reading does not clear this flag.
+   */
+  jd_changed: boolean;
+  /**
+   * The fixed source revision or relevant source chain differs from latest published Memory, including removal. False for immutable interview evidence.
+   */
+  source_changed: boolean;
 }
 /**
  * The JD item this reference supports, by identity. target_label is only its human label; never resolve a target by label. Absent when the server predates this field.

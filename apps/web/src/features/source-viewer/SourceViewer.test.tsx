@@ -16,6 +16,8 @@ const sources = {
       source_kind: 'work_understanding',
       source_label: '例外處理理解',
       needs_recheck: true,
+      jd_changed: false,
+      source_changed: true,
     },
   ],
 };
@@ -63,7 +65,8 @@ function serveSources(overrides: Record<string, unknown> = {}) {
     [`${basePath}/${citationId}/changes?revision_id=${revisionId}`]: {
       revision_id: revisionId,
       citation_id: citationId,
-      markdown: '## 差異\n\n```diff\n- 舊\n+ 新\n```',
+      jd_markdown: 'JD 沒有淨差異。',
+      source_markdown: '## 差異\n\n```diff\n- 舊\n+ 新\n```',
     },
     ...overrides,
   };
@@ -115,7 +118,7 @@ test('formal sources load only when expanded and show their target and recheck s
   await userEvent.click(screen.getByRole('button', { name: '正式 JD 來源（唯讀）' }));
   expect(await screen.findByText('任務：處理例外')).toBeVisible();
   expect(screen.getByRole('button', { name: '例外處理理解' })).toBeVisible();
-  expect(screen.getByText('待核對')).toBeVisible();
+  expect(screen.getByText('來源已更新')).toBeVisible();
   expect(fetch).toHaveBeenCalledTimes(1);
 });
 
@@ -134,10 +137,11 @@ test('follows only returned source refs through root, child and role-numbered in
   expect(document.querySelector('script')).toBeNull();
   await userEvent.click(screen.getByRole('button', { name: '回到直接來源' }));
   expect(await screen.findByRole('heading', { name: '原引用正文' })).toBeVisible();
-  await userEvent.click(screen.getByRole('button', { name: '查看此引用鏈差異' }));
+  await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
+  await userEvent.click(await screen.findByText('來源變更', { selector: 'summary' }));
   expect(await screen.findByRole('heading', { name: '差異' })).toBeVisible();
-  expect(screen.getByText(/讀取當時最新已發布/)).toBeVisible();
-  expect(screen.getByText('待核對')).toBeVisible();
+  expect(screen.getByText(/最新已發布/)).toBeVisible();
+  expect(screen.getByText('來源已更新')).toBeVisible();
   expect(
     screen.queryByRole('button', { name: /^(確認核對|修改引用|保存)$/ }),
   ).not.toBeInTheDocument();
@@ -147,14 +151,21 @@ test('direct interview sources do not offer Memory changes', async () => {
   serveSources({
     [basePath]: {
       ...sources,
-      references: [{ ...sources.references[0], source_kind: 'interview' }],
+      references: [
+        {
+          ...sources.references[0],
+          source_kind: 'interview',
+          needs_recheck: false,
+          source_changed: false,
+        },
+      ],
     },
     [contentPath]: interview,
   });
   renderViewer();
   await openRoot();
   expect(await screen.findByText('訪談 #3 · 員工')).toBeVisible();
-  expect(screen.queryByRole('button', { name: '查看此引用鏈差異' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '查看差異' })).not.toBeInTheDocument();
 });
 
 test.each(['content', 'changes'])(
@@ -171,7 +182,7 @@ test.each(['content', 'changes'])(
     await openRoot();
     if (kind === 'changes') {
       await screen.findByRole('heading', { name: '原引用正文' });
-      await userEvent.click(screen.getByRole('button', { name: '查看此引用鏈差異' }));
+      await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
     }
     expect(await screen.findByText(/正式 JD 已更新，請重新讀取來源列表/)).toBeVisible();
     expect(screen.queryByText('private diagnostics')).not.toBeInTheDocument();
@@ -234,13 +245,15 @@ test('same citation on a new formal revision never reuses old content or changes
     [`${basePath}/${citationId}/changes?revision_id=${nextRevision}`]: {
       revision_id: nextRevision,
       citation_id: citationId,
-      markdown: '## 新版引用差異',
+      jd_markdown: 'JD 沒有淨差異。',
+      source_markdown: '## 新版引用差異',
     },
   });
   renderViewer();
   await openRoot();
   await screen.findByRole('heading', { name: '原引用正文' });
-  await userEvent.click(screen.getByRole('button', { name: '查看此引用鏈差異' }));
+  await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
+  await userEvent.click(await screen.findByText('來源變更', { selector: 'summary' }));
   await screen.findByRole('heading', { name: '差異' });
   responses[basePath] = { ...sources, revision_id: nextRevision };
   await userEvent.click(screen.getByRole('button', { name: '重新讀取來源列表' }));
@@ -248,7 +261,8 @@ test('same citation on a new formal revision never reuses old content or changes
   expect(await screen.findByText('新版固定正文')).toBeVisible();
   expect(screen.queryByRole('heading', { name: '原引用正文' })).not.toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: '差異' })).not.toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: '查看此引用鏈差異' }));
+  await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
+  await userEvent.click(await screen.findByText('來源變更', { selector: 'summary' }));
   expect(await screen.findByRole('heading', { name: '新版引用差異' })).toBeVisible();
 });
 
@@ -290,8 +304,25 @@ test('unreadable fixed content remains an error and preserves needs_recheck', as
   renderViewer();
   await openRoot();
   expect(await screen.findByRole('alert')).toHaveTextContent('此來源目前無法讀取');
-  expect(screen.getByText('待核對')).toBeVisible();
+  expect(screen.getByText('來源已更新')).toBeVisible();
   expect(screen.queryByText(/找不到這份職務檔案/)).not.toBeInTheDocument();
+});
+
+test('missing review baseline is not presented as a transient outage or an empty comparison', async () => {
+  serveSources({
+    [`${basePath}/${citationId}/changes?revision_id=${revisionId}`]: Response.json(
+      { detail: { code: 'jd_review_baseline_not_available', message: 'private diagnostics' } },
+      { status: 503 },
+    ),
+  });
+  renderViewer();
+  await userEvent.click(screen.getByRole('button', { name: '正式 JD 來源（唯讀）' }));
+  await userEvent.click(await screen.findByRole('button', { name: '查看差異' }));
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    '無法取得此引用的核對基準，尚不能比較 JD 變更。',
+  );
+  expect(screen.queryByText(/private diagnostics|暫時無法使用|沒有淨差異/)).not.toBeInTheDocument();
+  expect(screen.getByText('來源已更新')).toBeVisible();
 });
 
 test.each([404, 503])(

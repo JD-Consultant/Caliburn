@@ -12,7 +12,10 @@ from caliburn.contracts.generated.jd_sources_view import JdSourcesView
 from caliburn.features.interviews.models import InterviewReadError
 from caliburn.features.job_files.models import JobFileNotFoundError
 from caliburn.features.work_memory.revisions import MemoryRevisionNotFoundError
-from caliburn.transport.jd_source_markdown import project_jd_source_changes
+from caliburn.transport.jd_source_markdown import (
+    project_jd_source_changes,
+    project_jd_target_changes,
+)
 from caliburn.workflows.jd_evidence import (
     JdEvidenceComparisonError,
     JdEvidenceNotFoundError,
@@ -51,7 +54,7 @@ def _read_error(error: Exception) -> HTTPException:
     if isinstance(error, JdEvidenceStaleError):
         return HTTPException(status_code=409, detail={"code": "jd_source_view_stale"})
     if isinstance(error, JdEvidenceComparisonError):
-        return HTTPException(status_code=422, detail={"code": "source_kind_not_supported"})
+        return HTTPException(status_code=503, detail={"code": "jd_review_baseline_not_available"})
     return HTTPException(status_code=503, detail={"code": "source_not_available"})
 
 
@@ -108,7 +111,12 @@ async def read_source_changes(
     return JdSourceChangesView(
         revision_id=revision_id,
         citation_id=citation_id,
-        markdown=project_jd_source_changes(
-            result, comparison_label="本次讀取時的最新已發布 Memory"
+        jd_markdown=project_jd_target_changes(result),
+        source_markdown=(
+            project_jd_source_changes(
+                result.source_changes, comparison_label="本次讀取時的最新已發布 Memory"
+            )
+            if result.source_changes is not None
+            else None
         ),
     )

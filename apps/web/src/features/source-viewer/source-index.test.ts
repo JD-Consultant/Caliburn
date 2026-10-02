@@ -18,6 +18,8 @@ function reference(citationId: string, target?: Target, needsRecheck = false): R
     source_kind: 'interview' as const,
     source_label: '訪談序號 2 · 員工',
     needs_recheck: needsRecheck,
+    jd_changed: needsRecheck,
+    source_changed: false,
   };
   return target ? { ...base, target } : base;
 }

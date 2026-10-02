@@ -37,6 +37,8 @@ function requireIdentity(
 
 export function describeSourceError(error: unknown): string {
   if (error instanceof ApiError) {
+    if (error.code === 'jd_review_baseline_not_available')
+      return '無法取得此引用的核對基準，尚不能比較 JD 變更。';
     if (error.status === 409) return '正式 JD 已更新，請重新讀取來源列表。';
     if (error.status === 404) return '此來源目前無法讀取，請重新讀取來源列表。';
     if (error.status === 503) return '來源服務暫時無法使用，請稍後重新讀取來源列表。';

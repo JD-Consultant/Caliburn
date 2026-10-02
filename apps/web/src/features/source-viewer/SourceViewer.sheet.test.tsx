@@ -19,6 +19,8 @@ const sources = {
       source_kind: 'interview',
       source_label: '訪談序號 2 · 員工',
       needs_recheck: false,
+      jd_changed: false,
+      source_changed: false,
     },
     {
       citation_id: second,
@@ -26,6 +28,8 @@ const sources = {
       source_kind: 'interview',
       source_label: '訪談序號 4 · 員工',
       needs_recheck: false,
+      jd_changed: false,
+      source_changed: false,
     },
   ],
 };

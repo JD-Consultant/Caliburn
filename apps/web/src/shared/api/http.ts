@@ -9,13 +9,14 @@ export class ApiError extends Error {
   }
 }
 
-// Only public transport codes needed for explicit input rejection are retained.
+// Only public transport codes needed for explicit rejection/read errors are retained.
 // Never keep arbitrary error bodies, echoed input, or provider diagnostics.
 const publicErrorCodes = new Set([
   'database_not_configured',
   'model_not_configured',
   'consultant_unavailable',
   'job_file_not_found',
+  'jd_review_baseline_not_available',
 ]);
 
 async function readPublicErrorCode(response: Response): Promise<string | undefined> {

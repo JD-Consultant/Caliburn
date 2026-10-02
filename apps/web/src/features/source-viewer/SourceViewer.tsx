@@ -1,10 +1,13 @@
 /** Read-only sources of the formal JD, loaded only on disclosure. */
 import { useId, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Box, Button, Chip, Stack, Typography } from '@mui/material';
-import type { JdSourcesView, Reference } from '../../shared/api/generated/jd-sources-view';
+import { Alert, Box, Button, Stack, Typography } from '@mui/material';
+import type { JdSourcesView } from '../../shared/api/generated/jd-sources-view';
 import { describeSourceError, jdSourcesQuery } from './source-api';
 import { SourceDetails } from './SourceDetails';
+import { SourceChanges } from './SourceChanges';
+import { SourceReferenceList } from './SourceReferenceList';
+import type { SourceSelection } from './SourceReferenceList';
 
 interface ViewerProps {
   jobFileId: string;
@@ -84,10 +87,13 @@ function SourceList({
         此區只回查正式 JD 的來源。待核對不代表確定錯誤；閱讀來源或差異不會解除待核對。
       </Typography>
       <Button
+        size="small"
+        variant="outlined"
         disabled={sources.isFetching}
         onClick={() => {
           void sources.refetch();
         }}
+        sx={{ alignSelf: 'flex-start' }}
       >
         重新讀取來源列表
       </Button>
@@ -125,21 +131,31 @@ function SourceReferences({
     ? view.references.filter((reference) => onlyCitationIds.includes(reference.citation_id))
     : view.references;
   // Remounting after every list read drops the entire old navigation/diff state.
-  const [selected, setSelected] = useState<Reference | null>(() =>
-    onlyCitationIds && shown.length === 1 ? (shown[0] ?? null) : null,
+  const [selected, setSelected] = useState<SourceSelection | null>(() =>
+    onlyCitationIds && shown.length === 1 && shown[0]
+      ? { citationId: shown[0].citation_id, view: 'content' }
+      : null,
   );
+  const reference = shown.find((item) => item.citation_id === selected?.citationId);
   return (
     <Stack spacing={2}>
       {view.references.length === 0 && (
         <Typography>目前正式 JD 沒有附帶引用；這不代表內容錯誤或已完成核對。</Typography>
       )}
-      {selected && (
-        <SourceDetails
-          key={selected.citation_id}
-          scope={{ jobFileId, revisionId: view.revision_id, citationId: selected.citation_id }}
-          reference={selected}
-        />
-      )}
+      {reference &&
+        (selected?.view === 'changes' ? (
+          <SourceChanges
+            key={reference.citation_id}
+            scope={{ jobFileId, revisionId: view.revision_id, citationId: reference.citation_id }}
+            sourceLabel={reference.source_label}
+          />
+        ) : (
+          <SourceDetails
+            key={reference.citation_id}
+            scope={{ jobFileId, revisionId: view.revision_id, citationId: reference.citation_id }}
+            reference={reference}
+          />
+        ))}
       {onlyCitationIds && (
         <Typography variant="body2" color="text.secondary">
           只顯示所選 JD 項目的來源。{' '}
@@ -150,33 +166,7 @@ function SourceReferences({
           )}
         </Typography>
       )}
-      {shown.map((reference) => (
-        <Box key={reference.citation_id} sx={{ pb: 1.5, borderBottom: 1, borderColor: 'divider' }}>
-          <Typography
-            component="h3"
-            variant="subtitle2"
-            sx={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              overflowWrap: 'anywhere',
-            }}
-          >
-            {reference.target_label}
-          </Typography>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
-            <Button
-              size="small"
-              aria-pressed={selected?.citation_id === reference.citation_id}
-              onClick={() => setSelected(reference)}
-            >
-              {reference.source_label}
-            </Button>
-            {reference.needs_recheck && <Chip label="待核對" size="small" color="warning" />}
-          </Stack>
-        </Box>
-      ))}
+      <SourceReferenceList references={shown} selected={selected} onSelect={setSelected} />
     </Stack>
   );
 }

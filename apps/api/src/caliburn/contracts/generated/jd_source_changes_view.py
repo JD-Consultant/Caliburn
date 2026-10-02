@@ -3,7 +3,7 @@
 
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
 
 
 class JdSourceChangesView(BaseModel):
@@ -12,4 +12,8 @@ class JdSourceChangesView(BaseModel):
     )
     revision_id: UUID
     citation_id: UUID
-    markdown: StrictStr
+    jd_markdown: StrictStr
+    source_markdown: StrictStr | None = Field(
+        ...,
+        description="The relevant fixed source-chain diff; null for immutable interview evidence.",
+    )

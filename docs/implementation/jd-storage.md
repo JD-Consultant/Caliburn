@@ -368,6 +368,8 @@ flowchart LR
 
 - 人回查的是「當時依據」：Memory 引用讀原快照所選修訂，再沿其中固定的情境／原話引用下鑽。標題後來改名、同名重建或物件不再出現在最新版，都不改寫原引用。這不是提供任意歷史 Memory 瀏覽器。
 - 人的差異比較以本次讀取捕捉的最新已發布 Memory 為新基準；A 仍以該 Turn 已固定的 Memory 為新基準。兩種准入／基準選取各自清楚，之後共用 [source queries](../../apps/api/src/caliburn/workflows/jd_source_queries.py) 與 [Markdown 投影](../../apps/api/src/caliburn/transport/jd_source_markdown.py)，不另存 diff、不複製來源。
+- 人可同時查看引用所屬 JD 項目的變更：使用此引用保存的 `reviewed_revision_id`，對照目前選定正式修訂中同一結構目標的內容。核對修訂須含同一引用、目標及來源；缺少或不相符即明示無法取得核對基準，不能假裝零差異或改用上一個 Turn。比較範圍沿既有 `source_target_contents`，不把同名項目、兄弟明細或全稿改動混入。訪談原話沒有版本差異，不影響此項 JD 比較。
+- 列表分別投影 `jd_changed`（既有 `needs_review`，包含改回原文但尚未核對）與 `source_changed`（原固定 Memory 來源／相關鏈對最新已發布基準的差異）；`needs_recheck` 為兩者其一成立。前端不自行推算版本或把文字相同當成核對完成。查看差異的回應分為 `jd_markdown` 與 `source_markdown`，訪談後者為空值；完整 wire 格式仍以 canonical schema 為準。
 - 查詢先選 Memory 基準，再取得有效訪談上界，避免並行發布時用較早上界驗證較新快照。鏈路依物件與固定修訂辨認，不用標題匹配。比較正文改回原樣但修訂不同時，仍明示修訂變化；沒有淨文字差異不能當成已核對。
 - 閱讀、展開差異、重新載入都沒有寫入；不解除 `needs_review`、不變更原引用或其已核對 JD 基底。來源損壞／不再可讀需明示錯誤，不偽裝為空列表或無差異。
 

@@ -13,14 +13,22 @@
     "Reference": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["citation_id", "target_label", "source_kind", "source_label", "needs_recheck"],
+      "required": ["citation_id", "target_label", "source_kind", "source_label", "needs_recheck", "jd_changed", "source_changed"],
       "properties": {
         "citation_id": {"type": "string", "format": "uuid"},
         "target_label": {"type": "string"},
         "target": {"$ref": "#/$defs/Target"},
         "source_kind": {"enum": ["interview", "work_situation", "work_understanding"]},
         "source_label": {"type": "string"},
-        "needs_recheck": {"type": "boolean"}
+        "needs_recheck": {"type": "boolean"},
+        "jd_changed": {
+          "type": "boolean",
+          "description": "The JD target has been edited since review, including edits reverted to the reviewed text. Reading does not clear this flag."
+        },
+        "source_changed": {
+          "type": "boolean",
+          "description": "The fixed source revision or relevant source chain differs from latest published Memory, including removal. False for immutable interview evidence."
+        }
       }
     },
     "Target": {

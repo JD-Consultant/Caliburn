@@ -11,13 +11,18 @@ API_ROOT = Path(__file__).resolve().parents[1]
 WEB_ROOT = API_ROOT.parent / "web"
 
 
-def generate(check: bool) -> bool:
+def generate(check: bool, schema_names: list[str] | None = None) -> bool:
     matches = True
     schemas = [
         schema
         for family in ("http", "tools")
         for schema in sorted((API_ROOT / "contracts" / family).glob("*.schema.json"))
     ]
+    if schema_names is not None:
+        available = {schema.name for schema in schemas}
+        if unknown := set(schema_names) - available:
+            raise ValueError(f"Unknown schemas: {sorted(unknown)}")
+        schemas = [schema for schema in schemas if schema.name in schema_names]
     with TemporaryDirectory(prefix="caliburn-codegen-") as directory:
         for schema in schemas:
             stem = schema.name.removesuffix(".schema.json")
@@ -106,4 +111,10 @@ def generate(check: bool) -> bool:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
-    sys.exit(0 if generate(parser.parse_args().check) else 1)
+    parser.add_argument(
+        "--schema",
+        action="append",
+        help="Generate only this schema filename; repeat to select more.",
+    )
+    arguments = parser.parse_args()
+    sys.exit(0 if generate(arguments.check, arguments.schema) else 1)

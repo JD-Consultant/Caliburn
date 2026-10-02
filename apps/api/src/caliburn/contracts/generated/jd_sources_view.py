@@ -53,6 +53,14 @@ class Reference(BaseModel):
     source_kind: SourceKind
     source_label: StrictStr
     needs_recheck: StrictBool
+    jd_changed: StrictBool = Field(
+        ...,
+        description="The JD target has been edited since review, including edits reverted to the reviewed text. Reading does not clear this flag.",
+    )
+    source_changed: StrictBool = Field(
+        ...,
+        description="The fixed source revision or relevant source chain differs from latest published Memory, including removal. False for immutable interview evidence.",
+    )
 
 
 class JdSourcesView(BaseModel):

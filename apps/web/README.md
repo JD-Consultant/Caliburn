@@ -4,6 +4,10 @@ React／TypeScript／Vite／MUI 的正式前端。可建立、列出、改名與
 
 ## 開發與檢查
 
+準備接手前端時，先看 [2026-10-03 來源功能與工作目錄交接](../../docs/plans/2026-09-29-target-rebuild/evidence/t09-source-viewer.md#前端接手入口2026-10-03)：包含本次提交範圍、保留的未提交工作、示範／正式環境及不可更動的來源語意。
+
+正式 JD 來源按項目分組，各筆引用分別標示「JD 已修改」「來源已更新」或兩者；「查看差異」可按需展開 JD 內容與 Memory 來源的比較。JD 從該筆引用上次核對的修訂比較到目前正式稿，不限於上一輪；訪談原話不可改寫，因此只提供 JD 內容比較。查看不解除待核對。契約與驗證見[來源介面規範](../../docs/implementation/interface-and-delivery.md#31-正式-jd-來源的唯讀下鑽t09)與[T09 來源證據](../../docs/plans/2026-09-29-target-rebuild/evidence/t09-source-viewer.md)。新增差異欄位需前後端一起更新，開發程序須載入同一版契約；不放寬前端驗證去接受舊格式。
+
 從 repo root 使用 Node 24 及根 `packageManager` 指定的 pnpm：
 
 ```powershell

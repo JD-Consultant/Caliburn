@@ -108,7 +108,7 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
         (
             UNDERSTANDING_INSTRUCTIONS,
             MemoryLayer.WORK_UNDERSTANDING,
-            ["complete", "needs_situation"],
+            ["complete"],
         ),
     ],
 )
@@ -118,16 +118,7 @@ def test_model_copying_prompt_json_examples_will_satisfy_actual_outcome_parser(
     examples = re.findall(r'\{"status":.*\}', instructions)
     assert [json.loads(example)["status"] for example in examples] == expected_statuses
     for example in examples:
-        outcome = parse_outcome(example, layer)
-        if not isinstance(outcome, AnalysisComplete):
-            assert outcome.gaps
-            for gap in outcome.gaps:
-                assert gap.model_dump().keys() == {
-                    "target_title",
-                    "question",
-                    "needed_clarification",
-                    "interview_sequences",
-                }
+        assert isinstance(parse_outcome(example), AnalysisComplete)
 
 
 @pytest.mark.parametrize("layer", list(MemoryLayer))

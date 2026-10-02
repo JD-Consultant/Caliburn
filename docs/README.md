@@ -23,7 +23,7 @@
 
 ### 教授版架構報告
 
-直接閱讀[教授版架構報告](reports/system-architecture/README.md)與[圖稿](reports/system-architecture/diagrams/README.md)。已於 2026-10-02 對照正式產品與最新旅程證據更新，區分本機交付成果、分析品質限制與 B2 單向流程的實作差異。
+直接閱讀[教授版架構報告](reports/system-architecture/README.md)與[圖稿](reports/system-architecture/diagrams/README.md)。2026-10-02 已同步 Memory 程式修正後的單向 B1 → B2 → 發布流程，無 B2 回交；原先的差異查核保留於報告附錄。本次測試結果見 [T11 單向流程修正紀錄](plans/2026-09-29-target-rebuild/evidence/t11-memory-one-way-correction.md)，既有旅程、品質及驗證限制仍依原證據判讀。
 
 報告解釋設計原因與運作方式，詳細開發契約仍由原文件維護。請連同報告標示的基準及限制閱讀；示意圖未涵蓋所有實作分支或驗證結果。原報告分支的收錄與工作樹處理歷史見[封存紀錄](archive/repository-organization-2026-10-02.md)。
 

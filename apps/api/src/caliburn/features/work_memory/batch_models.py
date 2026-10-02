@@ -20,7 +20,3 @@ class MemoryConsolidationIntent:
     job_file_id: UUID
     execution_id: UUID
     source_id: UUID
-
-
-class MemoryFeedbackLimitError(RuntimeError):
-    """The batch has exhausted its bounded semantic handoffs, not a transport retry."""

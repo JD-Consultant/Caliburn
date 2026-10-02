@@ -5,7 +5,7 @@
 - 目的：從產品目的出發，逐層說明職責、資料、流程、介面與驗證證據。維護者：應用程式架構維護者。
 - 閱讀分工：本頁說明能力與職責；實際程式結構見 [ARCHITECTURE](../ARCHITECTURE.md)及[實作文件](implementation/README.md)。[架構討論規範](architecture-discussion-standard.md)提供討論方法，目前仍是討論稿，不取代正式決策。
 
-**設計與現行差異：**Memory 已確定採單向 B1 → B2 → 發布；目前背景執行程序所用的流程及 B2 提示仍啟用回交 B1。這是尚未修正的程式差異，設計本身已確定。詳細分工與程式依據見[系統責任](architecture/system-boundaries.md)。舊 `experiments/jd-relational-app` 與 `packages/consultant-memory` 程式已退役，保留沿革文件與 Git 歷史，不重新整合舊架構或遷移舊資料。RAG 為獨立範圍。
+**Memory 流程修正（2026-10-02）：**背景流程與 B2 指引已對齊單向 B1 → B2 → 發布，無 B2 回交 B1。詳細分工與修正前的查核沿革見[系統責任](architecture/system-boundaries.md)；本次測試結果見 [T11 單向流程修正紀錄](plans/2026-09-29-target-rebuild/evidence/t11-memory-one-way-correction.md)，不代表真模型品質已重驗。舊 `experiments/jd-relational-app` 與 `packages/consultant-memory` 程式已退役，保留沿革文件與 Git 歷史，不重新整合舊架構或遷移舊資料。RAG 為獨立範圍。
 
 2026-09-29 的[文件與圖面審查](architecture/verification.md#6-架構文件補完與圖面審查2026-09-29-續審)是設計沿革；現行實作與驗證範圍以 2026-10-02 的正式切換及任務證據判定。
 
@@ -104,7 +104,7 @@ docs/
 ## 現行、目標與未決不可混畫
 
 - **現行機制**：`apps/api`／`apps/web` 已為正式產品，採模組化單體、PostgreSQL 業務保存、LangGraph checkpoint 與 OpenAI direct Responses。T01–T18 完成狀態不替代各項效果的實測判定。
-- **已採用設計**：來源資格、候選、固定快照、取消及按需工具等產品契約由各責任文件定義。單向 B1 → B2 → 發布與現行回交分支仍有差異，不能宣稱全部對齊。
+- **已採用設計**：來源資格、候選、固定快照、取消及按需工具等產品契約由各責任文件定義。Memory 已於 2026-10-02 修正為單向 B1 → B2 → 發布，無 B2 回交；驗證以本次修正紀錄為準，不沿用舊回交測試的通過判定。
 - **驗證限制與未決**：依 V01–V28 保留部分通過、離線／資料庫證據與未驗之別；真人時間與學習負擔尚未驗證。Memory 最終失敗後再前進三輪的解阻政策仍待產品決策確認。詳細限制見[覆蓋與驗收](architecture/verification.md)。
 - **明確後延**：全稿審核、原話語意搜尋及跨機還原。**不採用** C 即時修補、無具體需求的通用規則引擎及舊資料遷移；C 不是等待恢復的功能。
 - **歷史**：ADR0077 及舊架構僅供沿革查考，不作現行執行路徑。

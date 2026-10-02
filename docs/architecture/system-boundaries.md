@@ -63,7 +63,7 @@ flowchart TB
 | 工具派送／對應領域模組 | 角色授權、工作身分、模型已保存的意圖、原操作辨識 | 本次實際讀取結果、候選修改結果或確定的拒絕。結果不明時保留待核對狀態，不誤報為工具失敗；重新進入沿用原身分，不重複產生效果。 |
 | A 正式完成／App 協調業務交易 | 完整答覆、本輪當前候選／依據、輸入及完成意圖、背景整理意圖（若有） | 一致的正式答覆、JD、訪談資格、完成結果及待處理上界；若資格已撤銷則不採用。Graph END 不替代此結果。 |
 | B1 交 B2／Memory 上層流程 | 本批綁定、已完成的情境候選位置及 B1 階段結果 | 可恢復的交接、情境差異、既有依賴與當前導覽；不包含 B1 私有推理，也不把 B2 理解內容反傳 B1。 |
-| B2 回交 B1／Memory 上層流程（現行啟用，待對齊） | 現行程式仍接受可定位的情境問題與釐清內容 | 可進入同批情境續作及新交接，理解候選不重置，舊交接的 B2 完成資格不能套用到新交接；此路徑與已採用的單向設計不符，仍待修正。 |
+| B2 完成／Memory 上層流程 | 本批綁定、B1 交接位置與對應 B2 完成結果 | 交由 Memory 業務發布；不回交 B1，也不重新開放本批情境修改。資訊不足或矛盾如實保留，不以返工或猜補處理。 |
 | Memory 發布／Memory 業務 | 本批、最後情境交接與對應 B2 完成結果、當前完整候選、正式基準與來源上界 | 固定發布快照、正式 head、處理進度、原結果一起成立；資格衝突不發布，結果不明查原操作。 |
 | JD 來源比較／JD 業務 | 既存引用身分、A 固定 Memory、目前合法 JD 位置 | 原引用→目前可見來源的差異或明確不可用結果；不按同名偷換來源，不把 read 當成確認。 |
 | 執行恢復／App 與原業務模組 | 原工作綁定、可靠 checkpoint、原操作辨識、控制資格 | 從原結果或可靠位置接續，或明確保留受阻／已放棄狀態。不能以最新資料冒充舊結果或刷新同 Turn 基準。 |
@@ -76,7 +76,9 @@ flowchart TB
 | B1 工作情境分析 | 處理本批指定新原話，整理具體工作實況 | 可回查固定上界以前的全部有效訪談及目前情境；只寫情境，不能讀理解 | 當前情境工作完成、可交接 B2；不是已發布 |
 | B2 工作理解分析 | 從最新情境形成／修訂工作認識 | 當前情境／理解、上游變更、合法原話；只寫理解 | 分析含新增情境及受影響範圍完成；再由 App 發布整版 |
 
-**採用設計已確定為單向 B1 → B2 → 發布，回交不屬於待選方案。**現行執行路徑尚未對齊：[`bootstrap.py`](../../apps/api/src/caliburn/bootstrap.py) 建立 `MemoryBatchWorkflow` 並將其 `run` 接入 supervisor，未覆寫預設的 `max_feedback_rounds=2`；[`memory_batch.py`](../../apps/api/src/caliburn/workflows/memory_batch.py) 的 `SituationRework` 分支呼叫 `handoff`，由 [`candidate_lifecycle.py`](../../apps/api/src/caliburn/features/work_memory/candidate_lifecycle.py) 將 `WORK_UNDERSTANDING` 切回 `WORK_SITUATION`。B2 [instructions](../../apps/api/src/caliburn/agents/work_understanding_analyst/instructions.py) 也仍包含 `needs_situation` 回交要求。這是目前接入執行的設計差異，不是僅存於未使用程式的歷史片段；既有回交測試不能證明單向設計已落實。
+**現行流程（2026-10-02 修正）：Memory 已對齊單向 B1 → B2 → 發布，無 B2 回交 B1。**B1 交接後不再修改本批情境；B2 依交付的情境分析理解，完成後由 App 發布。測試結果與驗證層級見 [T11 單向流程修正紀錄](../plans/2026-09-29-target-rebuild/evidence/t11-memory-one-way-correction.md)；此次流程修正不代表真模型品質已重新驗證。
+
+修正前的靜態查核曾發現：[`bootstrap.py`](../../apps/api/src/caliburn/bootstrap.py) 接入 `MemoryBatchWorkflow` 時未覆寫 `max_feedback_rounds=2`；[`memory_batch.py`](../../apps/api/src/caliburn/workflows/memory_batch.py) 的 `SituationRework` 分支經 [`candidate_lifecycle.py`](../../apps/api/src/caliburn/features/work_memory/candidate_lifecycle.py) 將理解階段切回情境階段，B2 [instructions](../../apps/api/src/caliburn/agents/work_understanding_analyst/instructions.py) 也包含 `needs_situation`。這是當時已接入產品的實作差異，查核沿革見[報告附錄](../reports/system-architecture/references.md#本次文件校核範圍)；舊回交測試不作為單向流程的驗證證據。
 
 完成標記須綁定 App 的批次與交接身分，版號不由模型填寫；呼叫過 read 也不代表分析已完成。原生推理與工具結果支援分析接續，App State 保存執行事實，不要求每個 Step 額外撰寫分析筆記。
 

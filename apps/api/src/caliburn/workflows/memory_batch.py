@@ -34,7 +34,6 @@ from caliburn.features.work_memory import (
     candidate_queries,
     consolidation_requests,
 )
-from caliburn.features.work_memory.batch_models import MemoryFeedbackLimitError
 from caliburn.features.work_memory.candidates import (
     MemoryBatchPosition,
     MemoryCandidateStateError,
@@ -46,8 +45,6 @@ from caliburn.workflows.memory_analysis.results import (
     AnalysisOutcomeError,
     AnalysisRecovery,
     MemoryAnalysisResult,
-    SituationGap,
-    SituationRework,
     parse_outcome,
 )
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
@@ -61,8 +58,6 @@ class MemoryRoleRunner(Protocol):
         writer: ExecutionWriter,
         stage: MemoryBatchPosition,
         *,
-        previous: MemoryAnalysisResult | None = None,
-        gaps: tuple[SituationGap, ...] = (),
         situation_changes: list[dict[str, JsonValue]] | None = None,
         recovery: AnalysisRecovery | None = None,
     ) -> MemoryAnalysisResult: ...
@@ -82,13 +77,9 @@ class MemoryBatchWorkflow:
         sessions: async_sessionmaker[AsyncSession],
         *,
         run_role: MemoryRoleRunner,
-        max_feedback_rounds: int = 2,
     ) -> None:
-        if type(max_feedback_rounds) is not int or not 0 <= max_feedback_rounds <= 10:
-            raise ValueError("Use a bounded Memory feedback allowance")
         self.sessions = sessions
         self.run_role = run_role
-        self.max_feedback_rounds = max_feedback_rounds
         self.requests = MemoryConsolidationWorkflow(sessions)
 
     async def settle_failure(self, writer: ExecutionWriter, error: Exception) -> None:
@@ -105,7 +96,6 @@ class MemoryBatchWorkflow:
                 RequestCapacityError,
                 IncompleteModelResponseError,
                 UnsupportedModelResponseError,
-                MemoryFeedbackLimitError,
             ),
         ):
             reason = type(error).__name__
@@ -129,9 +119,15 @@ class MemoryBatchWorkflow:
             work = await self.requests.read_work(writer.scope)
             if work.writer != writer:
                 raise ExecutionStateError("Memory writer was superseded")
-            feedback = await self._feedback(work.position)
-            previous = await self._previous(work.position)
             async with self.sessions() as session:
+                # Retired handback records are not compatible with the one-way flow.
+                # Preserve history and let the existing failure boundary discard only
+                # this unpublished batch, rather than replaying B1 without its context.
+                records = await consolidation_requests.list_stage_results(
+                    session, writer.scope.job_file_id, writer.scope.execution_id
+                )
+                for record in records:
+                    parse_outcome(json.dumps(record.get("outcome")))
                 changes = (
                     await read_situation_handoff_changes(session, work.position)
                     if work.position.phase == MemoryLayer.WORK_UNDERSTANDING
@@ -140,8 +136,6 @@ class MemoryBatchWorkflow:
             result = await self.run_role(
                 writer,
                 work.position,
-                previous=previous,
-                gaps=feedback,
                 situation_changes=changes,
                 **({"recovery": recovery} if recovery is not None else {}),
             )
@@ -150,40 +144,6 @@ class MemoryBatchWorkflow:
             snapshot = await self._complete_stage(writer, work.position, result)
             if snapshot is not None:
                 return snapshot
-
-    async def _feedback(self, stage: MemoryBatchPosition) -> tuple[SituationGap, ...]:
-        async with self.sessions() as session:
-            records = await consolidation_requests.list_stage_results(
-                session, stage.job_file_id, stage.execution_id
-            )
-        if stage.phase != MemoryLayer.WORK_SITUATION:
-            return ()
-        for record in records:
-            if record.get("next_stage_id") == str(stage.stage_id):
-                outcome = record.get("outcome")
-                if isinstance(outcome, dict) and outcome.get("status") == "needs_situation":
-                    # Public validated gap only; no understanding text or private B2 trace.
-                    return SituationRework.model_validate_json(json.dumps(outcome)).gaps
-        return ()
-
-    async def _previous(self, stage: MemoryBatchPosition) -> MemoryAnalysisResult | None:
-        async with self.sessions() as session:
-            records = await consolidation_requests.list_stage_results(
-                session, stage.job_file_id, stage.execution_id
-            )
-        for record in sorted(records, key=_ordinal, reverse=True):
-            if record.get("role") != _role(stage.phase).value:
-                continue
-            original = record.get("stage")
-            if not isinstance(original, dict):
-                raise MemoryCandidateStateError("Missing original analysis stage")
-            saved_stage = candidate_operations.result_position(original)
-            return MemoryAnalysisResult(
-                saved_stage,
-                parse_outcome(json.dumps(record["outcome"]), saved_stage.phase),
-                _saved_context(record),
-            )
-        return None
 
     async def _complete_stage(
         self, writer: ExecutionWriter, entered: MemoryBatchPosition, result: MemoryAnalysisResult
@@ -206,10 +166,8 @@ class MemoryBatchWorkflow:
             )
         role = _role(entered.phase)
         _require_context(writer, role, result.stage, result.history_position)
-        if entered.phase == MemoryLayer.WORK_SITUATION and not isinstance(
-            result.outcome, AnalysisComplete
-        ):
-            raise MemoryCandidateStateError("B1 cannot request understanding rework")
+        if not isinstance(result.outcome, AnalysisComplete):
+            raise MemoryCandidateStateError("Only completed analysis can advance Memory")
         async with self.sessions.begin() as session:
             await job_files.lock_job_file(session, writer.scope.job_file_id)
             await executions.lock_active_writer(session, writer)
@@ -217,14 +175,8 @@ class MemoryBatchWorkflow:
             records = await consolidation_requests.list_stage_results(
                 session, entered.job_file_id, entered.execution_id
             )
-            if isinstance(result.outcome, SituationRework):
-                rounds = sum(_is_feedback(item) for item in records)
-                if rounds >= self.max_feedback_rounds:
-                    raise MemoryFeedbackLimitError("Memory feedback allowance exhausted")
             next_stage = None
-            if entered.phase == MemoryLayer.WORK_SITUATION or isinstance(
-                result.outcome, SituationRework
-            ):
+            if entered.phase == MemoryLayer.WORK_SITUATION:
                 next_stage = await candidate_lifecycle.handoff(
                     session, result.stage, uuid5(entered.stage_id, "memory.handoff")
                 )
@@ -298,8 +250,3 @@ def _ordinal(record: dict[str, object]) -> int:
     if type(ordinal) is not int:
         raise MemoryCandidateStateError("Invalid saved stage ordinal")
     return ordinal
-
-
-def _is_feedback(record: dict[str, object]) -> bool:
-    outcome = record.get("outcome")
-    return isinstance(outcome, dict) and outcome.get("status") == "needs_situation"

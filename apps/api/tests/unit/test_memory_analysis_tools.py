@@ -16,7 +16,7 @@ from caliburn.transport.model_tools.memory_analysis import (
     MemoryAnalysisTools,
 )
 from caliburn.transport.model_tools.memory_writes import PreparedMemoryToolCall
-from caliburn.workflows.memory_analysis.results import AnalysisComplete, SituationGap, parse_outcome
+from caliburn.workflows.memory_analysis.results import AnalysisComplete, parse_outcome
 
 
 def prepared() -> PreparedMemoryToolCall:
@@ -73,20 +73,16 @@ async def test_official_serializer_and_malformed_nested_command_rejection() -> N
 
 
 def test_typed_final_result_does_not_turn_arbitrary_text_into_completion() -> None:
-    assert isinstance(
-        parse_outcome('{"status":"complete"}', MemoryLayer.WORK_SITUATION), AnalysisComplete
-    )
+    assert isinstance(parse_outcome('{"status":"complete"}'), AnalysisComplete)
     gap = (
         '{"status":"needs_situation","gaps":[{"target_title":"盤點","question":"誰核准？",'
         '"needed_clarification":"本人權限","interview_sequences":[2]}]}'
     )
-    result = parse_outcome(gap, MemoryLayer.WORK_UNDERSTANDING)
-    assert isinstance(result.gaps[0], SituationGap)
-    for text, layer in [
-        (gap, MemoryLayer.WORK_SITUATION),
-        ("done", MemoryLayer.WORK_UNDERSTANDING),
-        ('{"status":"needs_situation","gaps":[]}', MemoryLayer.WORK_UNDERSTANDING),
-        ('{"status":"complete","understanding":"private"}', MemoryLayer.WORK_UNDERSTANDING),
+    for text in [
+        gap,
+        "done",
+        '{"status":"needs_situation","gaps":[]}',
+        '{"status":"complete","understanding":"private"}',
     ]:
         with pytest.raises(ValueError):
-            parse_outcome(text, layer)
+            parse_outcome(text)

@@ -38,7 +38,7 @@ T05 的 [Memory 寫入接縫](memory-tools.md#4-寫入準備採用與原結果�
 
 工程首選：每個 A 執行工作有獨立 Graph thread；Memory Parent 及各角色有可辨認的執行身分。新工作從該角色**已採用的合法歷史位置**取得原生窗口，不從任意最新 checkpoint 猜。跨 Turn 延續的是原生 items，不要求 API `previous_response_id`，也不要求所有 Turn 共用一條可被晚到 callback 污染的 thread。
 
-B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明確 thread 身分的角色 Graph、由 Parent 呼叫並轉譯 input/output；不依賴每次 subgraph invocation 自動生成的新 namespace 恰好能保留上次分析。Parent 只接領域位置、完成／gap 結果，不接對方完整私有 State。對框架 namespace 的實際用法以鎖定版子圖測試確認，不能手改 checkpointer 表。
+B1／B2 各自保留私有歷史；同一階段中斷後沿原 thread 接續，下批再承接各自已採用的歷史。角色 Graph 由 Parent 依 B1 → B2 順序呼叫；Parent 只接領域位置與完成結果，不交換完整私有 State，也不接受 B2 回交。不能手改 checkpointer 表或靠重建 namespace 假裝已恢復。
 
 當前有效工作／已採用基底的參照由執行資格持有，checkpoint 存實際窗口。這不是第二套 session 日誌；只記「哪份既有窗口仍可採用」，不複製模型全文。取消、不可恢復回退或重新領取使舊 writer 失去提交資格；晚到 checkpoint 仍可能物理保存，但不可被下一輪當有效基底。
 
@@ -215,7 +215,7 @@ flowchart TD
 
 - 每次模型 Step 可有多工具，全部依序完成後才接下一請求；工具旁有 final 文字仍先處理 calls，只有 commentary 的完整回應則繼續。下一請求只替換 input 為已完成窗口，不重新取 maps／指令／模型設定，不改歷史、不重加起始輸入。
 - 同一 loop 的模型步數上限、每回應工具上限在初始 checkpoint 固定。`completed_steps` 由完成 Step 前進，恢復不歸零；不能用較大上限或單步入口繞過原 loop 限制。最後准許的一步若有合法 final，仍可交回；需要再呼叫才觸發 `ModelStepLimitError`，保留最後完整窗口，不偽造收尾答覆。
-- 這是**單次角色 loop 的局部上限**；整個工作／Memory batch 的費用、時限、跨 B 回交與重試共用額度仍由 §5.1 的 executions owner 負責。LangGraph `recursion_limit` 只是本次 graph invoke 的 super-step 防護，依有限工具／模型步數配置，不代替產品計量。
+- 這是**單次角色 loop 的局部上限**；整個工作／Memory batch 的計量、時限與重試共用額度仍由 §5.1 的執行模組負責。LangGraph `recursion_limit` 只是本次 graph invoke 的 super-step 防護，依有限工具／模型步數配置，不代替產品計量。
 - 下一 request 的新 logical ID／完整 payload 先經 sync 保存，才可外送；只有完成前一 Step 才產生新 request。清除當前 response 欄位，避免把前一步 R 認成下一步的 R。第二步以後同樣可承接 Held 原件；後來步驟不能拿舊 handoff 倒轉目前位置。
 - 初始 input checkpoint 可能尚未展開成 State（`values` 空、`next=__start__`）；由原生 Graph 恢復原輸入，於 request node 外送前核對原限制。不因尚未展開便拒絕正常恢復，也不讓恢復參數改寫初始限制。
 - 已完成 loop 再 resume 不新增模型／工具／items。恢復不指定舊 checkpoint ID；工具失敗只承接當前 prepared command。全部共用單步原 R 保存、結算與業務冪等責任，沒有新增保存系統。
@@ -257,7 +257,7 @@ flowchart TD
 
 暫時網路／服務故障依 Retry-After、有界 backoff＋jitter；額度、權限、程式錯誤及確定容量問題不原樣重撞。模型原結果不可得時的再推論是新 attempt，不冒充原結果、不視為免費。各層不得各重試五次形成疊乘。[Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)
 
-完整 R 已存則恢復零額外模型呼叫。候選工具提交、checkpoint 尚缺結果則查回原操作；多次進入程式可接受，業務效果只一次。費用資格、次數與原工作相連，重啟／B 回交不歸零。
+完整 R 已存則恢復零額外模型呼叫。候選工具提交、checkpoint 尚缺結果則查回原操作；多次進入程式可接受，業務效果只一次。執行計量、次數與原工作相連，重啟或 B1 → B2 交接不歸零。
 
 ### 5.1 已落地的工作額度保存（T06 第四切片）
 
@@ -378,7 +378,7 @@ flowchart TD
 
 ### 5.5 輪前歷史準備元件（T06 第十四切片）
 
-`prepare_context_history()` 與 §5.3 共用 `context_compaction.py` 的原 C 保存／結算／採用流程。它只接受**已選定的合法歷史**，不讀最新 Memory、不追加本輪 App 資料或員工输入、不產生模型答覆。A／B1／B2 的組裝方均提供 2026-10-01 已確認的 128,000 輪前門檻；原 B 512K 測試初值已被取代。中途及 Memory 合法回交共用 `request_capacity.MID_WORK_COMPACTION_THRESHOLD_TOKENS`（160,000），不是重做輪前準備。見 [T16 校準證據](../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md#10-owner-確認門檻校準2026-10-01)；不因數值校準改寫既有已保存請求／壓縮結果。
+`prepare_context_history()` 與 §5.3 共用 `context_compaction.py` 的原 C 保存／結算／採用流程。它只接受**已選定的合法歷史**，不讀最新 Memory、不追加本輪 App 資料或員工輸入、不產生模型答覆。A／B1／B2 的組裝方均提供 2026-10-01 已確認的 128,000 輪前門檻；原 B 512K 測試初值已被取代。完整 Step 交界共用 `request_capacity.MID_WORK_COMPACTION_THRESHOLD_TOKENS`（160,000），不是重做輪前準備。B2 回交及其專用容量分支已移除；見 [T16 校準證據](../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md#10-owner-確認門檻校準2026-10-01)與[單向修正](../plans/2026-09-29-target-rebuild/evidence/t11-memory-one-way-correction.md)。不改寫既有已保存請求／壓縮結果。
 
 ```mermaid
 flowchart TD
@@ -393,7 +393,7 @@ flowchart TD
   R -.-> P["角色接線：固定新工作資料，追加一次，再計數完整請求"]
 ```
 
-- 準備的歷史 request、門檻、Agent 要求及容量限制先保存；恢復必須使用同一身分及原參數，不能藉回交改門檻、換歷史或再次壓縮。連「未達門檻，沿用 W」也有持久結果。A 的新 Turn／B 的新批首次準備與同批回交如何選身分，仍由上位角色負責，不能每次呼叫便產生新 thread。
+- 準備的歷史 request、門檻、Agent 要求及容量限制先保存；恢復必須使用同一身分及原參數，不能換歷史或再次壓縮。連「未達門檻，沿用 W」也有持久結果。A 的新 Turn／B 的新批首次準備與同階段恢復使用明確身分，不能每次呼叫便產生新 thread。
 - 首次無歷史不呼叫 count／compact，即使有壓縮要求亦不壓空窗口。有歷史時，計數含該角色固定 instructions／tools 及歷史 items；壓縮只送原歷史 items。這是保守的輪前計量接法，不以字元數或上一 response usage 代替；加入新資料後，仍須由共用 loop 計數完整實際請求。
 - `count_history → assess_history` 使用原 saver 的 sync 交界；先保存原 count，再判門檻／容量。計數與 compact 使用不同且穩定的 logical request 身分，共用原工作預算。計數失败不當零；超模型容量不盲目嘗試壓縮。不新增永久 count cache、資料表或另一份候選／模型全文。
 - `PreparationCountSaveError.recovery` 只保留程序內仍完整的原 count。核對 thread／原 request 後，優先承接原 checkpoint 或 pending writes；未保存才補存，不能倒退後面的 C／採用結果。完整 C 的保存故障沿原 `CompactionSaveError`，沒有第二份恢復協定。真正遺失的結果仍需上位核對／重試政策。
@@ -571,6 +571,8 @@ resume 已提交但通知前重開，以及既存 budget／使用量不重置；
 
 `request_memory_consolidation` 先沿共用工具機制保存原 intent，再交 `MemoryConsolidationWorkflow` 持久記錄本次要求。**此時尚無正式訪談資格**。A 正式完成交易保存有效訪談後，調度器從這個既存要求、已完成 execution 與該輪正式員工輸入推得 F；不另設完成交易雙寫的 frontier／通知表。取消／失敗的 A 不具資格。同檔案只一批，後來要求合併待處理上界但不擴大在途 F；重啟可從持久事實重新發現要求，不靠記憶體通知或 broker。
 
-B1 完成 → 保存②及變更概覽 → B2 分析；有具體 gap 才回 B1，回交內容不洩露理解正文。B1 從自己已改好的候選續改；B2 續自己的合法歷史，拿新交接差異與當前工作稿，完成資格綁本階段。沒有固定互審／第二個審核 Agent。
+B1 完成 → 保存②及變更概覽 → B2 分析 → 共同發布。B2 不回交 B1；它按需讀目前情境及合法原話，維護工作理解，資料不足則保留未知或矛盾。兩者都只回傳 `{"status":"complete"}` 表示自己的分析完成，發布仍由 Parent 協調原有短交易。沒有固定互審或額外審核角色。
+
+2026-10-02 已移除回交結果型別、提示、路由、回交次數設定及專用 context 分支。升級後若未完成批次留有舊 `needs_situation` 結果，沿原失敗處理保留已發布快照、不推進整理上界；不改寫舊模型輸出、不將其當完成或重跑 B1。合法的同階段恢復、Step 壓縮與跨批歷史接續保留，驗證見[修正紀錄](../plans/2026-09-29-target-rebuild/evidence/t11-memory-one-way-correction.md)。
 
 最終失敗保留原已發布快照，系統記已知原因與可恢復條件，不自動無限重跑；A 在下一個合法資料交界得簡短必要狀態並繼續訪談／原話回讀。使用者沒有 B 暫停／取消／重試工具。解除阻塞由系統按原資格／未發布有效範圍處理，不跳過未整理資料，也不重新給被取消 A 輸入資格。解除條件只有訪談進度：失敗時 `fail` 把當時的正式訪談前緣存入該失敗紀錄，之後正式序號再前進 6（三輪完成的訪談）才由 `read_block` 視為已解除，一次新批次從已發布涵蓋承接；新要求、重啟或時間不解除，不新增計時器、重設額度或手動入口（`RETRY_AFTER_NEW_MESSAGES`；產品語意見[產品概念](../product-concept.md)）。

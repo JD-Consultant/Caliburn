@@ -15,7 +15,6 @@ from caliburn.settings import ModelSettings
 from caliburn.workflows.memory_analysis.results import (
     AnalysisRecovery,
     MemoryAnalysisResult,
-    SituationGap,
 )
 
 
@@ -31,8 +30,6 @@ class WorkSituationAnalystRunner:
         writer: ExecutionWriter,
         stage: MemoryBatchPosition,
         *,
-        previous: MemoryAnalysisResult | None = None,
-        gaps: tuple[SituationGap, ...] = (),
         recovery: AnalysisRecovery | None = None,
     ) -> MemoryAnalysisResult:
         return await MemoryAnalysisRunner(
@@ -42,7 +39,5 @@ class WorkSituationAnalystRunner:
             stage,
             role=AgentRole.WORK_SITUATION_ANALYST,
             instructions=SITUATION_INSTRUCTIONS,
-            previous=previous,
-            gaps=gaps,
             recovery=recovery,
         )

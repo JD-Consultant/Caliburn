@@ -42,17 +42,15 @@ async def _recover_control(
 async def handoff(
     session: AsyncSession, position: MemoryBatchPosition, command_id: UUID
 ) -> MemoryBatchPosition:
+    if position.phase != MemoryLayer.WORK_SITUATION:
+        raise MemoryCandidateStateError("Memory handoff only advances situations to understandings")
     payload: dict[str, object] = {"position": operations.position_fields(position)}
     prior = await _recover_control(session, position, command_id, "handoff", payload)
     if prior is not None:
         return prior
     record = await queries.require_stage(session, position, exact_position=True)
     await require_base(session, record)
-    record.phase = (
-        MemoryLayer.WORK_UNDERSTANDING.value
-        if position.phase == MemoryLayer.WORK_SITUATION
-        else MemoryLayer.WORK_SITUATION.value
-    )
+    record.phase = MemoryLayer.WORK_UNDERSTANDING.value
     record.stage_id = uuid4()
     result = queries.batch_position(record)
     await operations.record_result(session, result, command_id, "handoff", payload)

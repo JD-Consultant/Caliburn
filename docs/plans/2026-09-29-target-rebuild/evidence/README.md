@@ -4,13 +4,14 @@
 
 ## 現在先看
 
+- [T11 Memory 單向流程修正](t11-memory-one-way-correction.md)：從文件查核找到提示與程式的回交殘留，移除路徑並驗證恢復、權限與發布；未重跑付費模型品質驗證。
 - [剩餘工作分類](../tasks.md#收尾分類與下一步)：先核對證據，不盲目重跑。
 - [實驗發現的問題彙整](../../../reports/experiment-findings.md)：缺口、已修正的問題與環境事故的一頁整理，不含解法；各項連回原證據。
 - [T17 V01–V28 結案對照](t17-v01-v28-closure.md)：28 項逐項判定（通過／部分／離線／未驗）、10 筆待核對依據的分類與結案條件。
 - [T17 長訪談、事故與續跑](t17-course-administrator-journey.md)：45 輪原旅程的成果與未驗範圍。
 - [T16 原生接續與容量](t16-compaction-continuity.md)：門檻、模型／共用 runner／角色的不同驗證層級；§12 是 B1／B2 輪前壓縮的真模型觀察。
 - [T14 分析品質與已知不足](t14-job-analysis-quality.md)：Prompt 比較、來源漏選、採用／否決與限制。
-- [T18 交付候選](t18-same-origin-web.md)：不是正式切換已放行。
+- [T18 交付與切換](t18-same-origin-web.md)：2026-10-02 已放行本機切換；較早候選狀態保留為歷史。
 
 ## 按主題查找
 

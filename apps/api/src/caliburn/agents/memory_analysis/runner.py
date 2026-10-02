@@ -1,7 +1,6 @@
 """Coordinate Memory stage owners with native execution; no role prompt or new loop."""
 
 from dataclasses import dataclass
-from uuid import UUID
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
@@ -15,12 +14,6 @@ from caliburn.agent_execution.context_compaction import (
     HeldCompaction,
     HeldPreparationCount,
     bind_window_compaction,
-    prepare_context_history,
-)
-from caliburn.agent_execution.request_capacity import (
-    MID_WORK_COMPACTION_THRESHOLD_TOKENS,
-    ReceivedInputCount,
-    RequestCapacityError,
 )
 from caliburn.agent_execution.response_steps import inspect_response_step
 from caliburn.agent_execution.tool_steps import (
@@ -52,7 +45,6 @@ from caliburn.workflows.memory_analysis.results import (
     AnalysisOutcomeError,
     AnalysisRecovery,
     MemoryAnalysisResult,
-    SituationGap,
     parse_outcome,
 )
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
@@ -68,8 +60,8 @@ class MemoryAnalysisRunner:
     """Concrete common assembly, not a BaseAgent, scheduler or second tool/model loop.
 
     A stage has an original immutable context thread and native response-loop thread.
-    Parent must retain the same-role result across handoffs, and separately validate
-    completion eligibility before adopting both references and publishing Memory.
+    The same stage resumes its saved items; only a new batch appends fresh initial data.
+    Parent adopts both role histories together with the published Memory snapshot.
     No exception is converted to success, no cancellation caught, no retry here.
     """
 
@@ -85,8 +77,6 @@ class MemoryAnalysisRunner:
         *,
         role: AgentRole,
         instructions: str,
-        previous: MemoryAnalysisResult | None = None,
-        gaps: tuple[SituationGap, ...] = (),
         situation_changes: list[dict[str, JsonValue]] | None = None,
         recovery: AnalysisRecovery | None = None,
     ) -> MemoryAnalysisResult:
@@ -100,10 +90,8 @@ class MemoryAnalysisRunner:
         history = RoleContextHistory(self.sessions, writer, role, self.checkpointer)
         thread_id = stage_thread_id(history, stage)
         if recovery is not None:
-            permitted_boundary = (
-                context_thread_id(writer.scope, role, HistoryWindowKind.PREPARED_HISTORY)
-                if previous is None
-                else f"{thread_id}:handoff_capacity"
+            permitted_boundary = context_thread_id(
+                writer.scope, role, HistoryWindowKind.PREPARED_HISTORY
             )
             if isinstance(recovery, (HeldModelResponse, HeldInputCount)):
                 matches = recovery.thread_id == thread_id
@@ -146,65 +134,23 @@ class MemoryAnalysisRunner:
         preparation_recovery = (
             recovery if isinstance(recovery, (HeldCompaction, HeldPreparationCount)) else None
         )
-        if previous is None:
-            items = await history.prepare_history(
-                template=template,
-                threshold_tokens=HISTORY_THRESHOLD_TOKENS,
-                compact_requested=False,
-                count_input=executor.count_input,
-                runtime=model.compaction,
-                recovery=preparation_recovery,
-            )
-        else:
-            _require_previous(history, stage, previous)
-            window = await read_completed_response_history(
-                self.checkpointer,
-                thread_id=previous.history_position.thread_id,
-                checkpoint_id=previous.history_position.checkpoint_id,
-            )
-            items = window.items
+        items = await history.prepare_history(
+            template=template,
+            threshold_tokens=HISTORY_THRESHOLD_TOKENS,
+            compact_requested=False,
+            count_input=executor.count_input,
+            runtime=model.compaction,
+            recovery=preparation_recovery,
+        )
         request = await capture_analysis_context(
             history,
             stage,
             template=template,
             history_items=items,
-            continuation=previous is not None,
-            gaps=gaps,
             situation_changes=situation_changes,
         )
         config: RunnableConfig = {"configurable": {"thread_id": thread_id, "checkpoint_ns": ""}}
         saved = await self.checkpointer.aget_tuple(config)
-        if previous is not None and saved is None:
-            # A handoff follows a complete Step. Apply the shared compact boundary to
-            # the FULL continuation, including this handoff, not the pre-batch base.
-            # This is not adopted as prepared_history and never repeats initial data.
-            items = await prepare_context_history(
-                self.checkpointer,
-                thread_id=f"{thread_id}:handoff_capacity",
-                history_request=request,
-                threshold_tokens=MID_WORK_COMPACTION_THRESHOLD_TOKENS,
-                compact_requested=False,
-                count_input=executor.count_input,
-                runtime=model.compaction,
-                recovery=preparation_recovery,
-            )
-            request = ResponseRequest.from_snapshot({**request.create_payload(), "input": items})
-
-        async def count_input(current: ResponseRequest, request_id: UUID) -> ReceivedInputCount:
-            count = await executor.count_input(current, request_id)
-            if (
-                previous is not None
-                and saved is None
-                and current.create_payload() == request.create_payload()
-                and count["input_tokens"] >= MID_WORK_COMPACTION_THRESHOLD_TOKENS
-            ):
-                # The handoff boundary already compacted this window once. Never send
-                # or repeatedly compact an unchanged still-oversized result.
-                raise RequestCapacityError(
-                    "The handoff continuation remains above the compact guard"
-                )
-            return count
-
         compact_window = bind_window_compaction(
             self.checkpointer,
             response_thread_id=thread_id,
@@ -218,7 +164,7 @@ class MemoryAnalysisRunner:
             execute_tool=tools.execute,
             ensure_active=ensure_active,
             account_response=executor.account_response,
-            count_input=count_input,
+            count_input=executor.count_input,
             capacity_limits=model.capacity_limits,
             compact_window=compact_window,
         )
@@ -246,7 +192,7 @@ class MemoryAnalysisRunner:
             for part in message.content
             if part.type == "output_text"
         )
-        outcome = parse_outcome(text, stage.phase)
+        outcome = parse_outcome(text)
         window = await read_completed_response_history(self.checkpointer, thread_id=thread_id)
         await ensure_active()
         async with self.sessions() as session:
@@ -258,23 +204,3 @@ class MemoryAnalysisRunner:
             outcome,
             ContextPosition(thread_id, window.checkpoint_id, HistoryWindowKind.COMPLETED_WORK),
         )
-
-
-def _require_previous(
-    history: RoleContextHistory, stage: MemoryBatchPosition, previous: MemoryAnalysisResult
-) -> None:
-    old = previous.stage
-    if (old.job_file_id, old.execution_id, old.generation_id, old.phase) != (
-        stage.job_file_id,
-        stage.execution_id,
-        stage.generation_id,
-        stage.phase,
-    ):
-        raise ValueError("Only the same role's original batch history may continue")
-    if old.stage_id == stage.stage_id:
-        raise ValueError("Resume a saved stage directly, not as a new handoff")
-    if (
-        previous.history_position.kind != HistoryWindowKind.COMPLETED_WORK
-        or previous.history_position.thread_id != stage_thread_id(history, old)
-    ):
-        raise ValueError("The history reference does not belong to this role stage")

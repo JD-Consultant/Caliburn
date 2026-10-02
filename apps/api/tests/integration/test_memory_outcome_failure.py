@@ -16,9 +16,11 @@ from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRu
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionStatus
+from caliburn.features.work_memory import consolidation_requests
 from caliburn.settings import DatabaseSettings, ModelSettings
 from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.execution_failures import run_with_failure_boundary
+from caliburn.workflows.memory_analysis.results import AnalysisOutcomeError
 from caliburn.workflows.memory_batch import MemoryBatchWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
@@ -28,9 +30,74 @@ from tests.unit.test_response_loop import response_at
 pytestmark = pytest.mark.postgres
 
 
+def test_legacy_recorded_rework_fails_before_any_new_model_work(
+    database_settings: DatabaseSettings,
+) -> None:
+    async def scenario() -> None:
+        database = Database(database_settings)
+        try:
+            requests = MemoryConsolidationWorkflow(database.sessions)
+            turn = await start_turn(database)
+            await requests.request(turn, uuid4())
+            await complete_turn(database, turn)
+            work = await requests.claim(turn.scope.job_file_id, writer_id=uuid4())
+            assert work is not None
+            # A persisted outcome from the retired B2→B1 flow must not be silently
+            # treated as a fresh B1 stage with its previous analysis discarded.
+            async with database.sessions.begin() as session:
+                await consolidation_requests.record_operation(
+                    session,
+                    job_file_id=turn.scope.job_file_id,
+                    execution_id=work.writer.scope.execution_id,
+                    command_id=uuid4(),
+                    kind="stage_completion",
+                    payload={},
+                    result={
+                        "outcome": {
+                            "status": "needs_situation",
+                            "gaps": [
+                                {
+                                    "target_title": "盤點",
+                                    "question": "頻率？",
+                                    "needed_clarification": "確認頻率",
+                                    "interview_sequences": [2],
+                                }
+                            ],
+                        }
+                    },
+                )
+
+            async def unexpected_model_work(*args, **kwargs):
+                pytest.fail("Legacy rework must be rejected before model dispatch")
+
+            parent = MemoryBatchWorkflow(database.sessions, run_role=unexpected_model_work)
+            with pytest.raises(AnalysisOutcomeError, match="analysis_outcome_malformed"):
+                await parent.run(work.writer)
+            assert (
+                await run_with_failure_boundary(
+                    work.writer, run=parent.run, settle_failure=parent.settle_failure
+                )
+                is None
+            )
+            assert (
+                await requests.failure_reason(turn.scope.job_file_id)
+                == "analysis_outcome_malformed"
+            )
+            assert await requests.discover() == ()
+        finally:
+            await database.close()
+
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        runner.run(scenario())
+
+
 @pytest.mark.parametrize(
     ("invalid_kind", "reason"),
-    [("malformed", "analysis_outcome_malformed"), ("refusal", "analysis_outcome_refused")],
+    [
+        ("malformed", "analysis_outcome_malformed"),
+        ("refusal", "analysis_outcome_refused"),
+        ("legacy_rework", "analysis_outcome_malformed"),
+    ],
 )
 def test_invalid_b2_final_is_durable_failure_without_publish_or_retry(
     database_settings: DatabaseSettings, invalid_kind: str, reason: str
@@ -53,6 +120,11 @@ def test_invalid_b2_final_is_durable_failure_without_publish_or_retry(
             content[0]["text"] = '{"status":"complete"}'
         elif invalid_kind == "refusal":
             content[:] = [{"type": "refusal", "refusal": "SYNTHETIC_PRIVATE_REFUSAL"}]
+        elif invalid_kind == "legacy_rework":
+            content[0]["text"] = (
+                '{"status":"needs_situation","gaps":[{"target_title":"盤點",'
+                '"question":"頻率？","needed_clarification":"確認頻率","interview_sequences":[2]}]}'
+            )
         else:
             content[0]["text"] = 'SYNTHETIC_PRIVATE_INVALID_FINAL {"status":'
         return httpx2.Response(200, json=raw)

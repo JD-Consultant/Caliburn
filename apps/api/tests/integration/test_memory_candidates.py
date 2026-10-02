@@ -137,6 +137,22 @@ async def build_pair(
     return understanding.position, case.object_id, understanding.object_id
 
 
+def test_understanding_stage_cannot_handoff_back_to_situations(
+    database_settings: DatabaseSettings, source: tuple[UUID, UUID]
+) -> None:
+    async def scenario(database: Database) -> None:
+        workflow, runner, initial = await start(database, source)
+        command = uuid4()
+        b2 = await workflow.handoff(runner, initial, command)
+        assert await workflow.handoff(runner, initial, command) == b2
+        with pytest.raises(MemoryCandidateStateError):
+            await workflow.handoff(runner, b2, uuid4())
+        snapshot = await workflow.publish(runner, b2, uuid4())
+        assert snapshot.covered_through_sequence == 2
+
+    execute(database_settings, scenario)
+
+
 def test_publish_is_one_fixed_graph_and_replay_returns_original_snapshot(
     database_settings: DatabaseSettings, source: tuple[UUID, UUID]
 ) -> None:
@@ -221,12 +237,19 @@ def test_candidate_binding_tracks_new_situation_but_old_snapshot_never_changes(
 
 
 def test_delete_situation_removes_candidate_bindings_not_understandings_or_history(
-    database_settings: DatabaseSettings, source: tuple[UUID, UUID]
+    database_settings: DatabaseSettings,
+    database_connection: psycopg.Connection,
+    source: tuple[UUID, UUID],
 ) -> None:
+    later = uuid4()
+    add_interview(database_connection, source[0], uuid4(), 3, "consultant")
+    add_interview(database_connection, source[0], later, 4, "employee")
+
     async def scenario(database: Database) -> None:
         workflow, runner, initial = await start(database, source)
         position, case_id, understanding_id = await build_pair(workflow, runner, initial, source[1])
-        situation_stage = await workflow.handoff(runner, position, uuid4())
+        original = await workflow.publish(runner, position, uuid4())
+        workflow, runner, situation_stage = await start(database, (source[0], later))
         deleted = await workflow.edit(
             runner, DeleteMemoryObject(uuid4(), situation_stage, SITUATION, case_id)
         )
@@ -239,6 +262,9 @@ def test_delete_situation_removes_candidate_bindings_not_understandings_or_histo
         snapshot = await workflow.publish(runner, position, uuid4())
         assert not (
             await workflow.read_snapshot_object(source[0], snapshot.snapshot_id, understanding_id)
+        ).work_situation_references
+        assert (
+            await workflow.read_snapshot_object(source[0], original.snapshot_id, understanding_id)
         ).work_situation_references
 
     execute(database_settings, scenario)
@@ -529,31 +555,33 @@ def test_new_snapshot_reuses_unchanged_objects_and_keeps_file_scope(
     execute(database_settings, scenario)
 
 
-def test_b1_return_keeps_b2_work_and_restore_retains_second_safe_point(
+def test_restore_retains_understanding_safe_point_and_rejects_abandoned_branch(
     database_settings: DatabaseSettings, source: tuple[UUID, UUID]
 ) -> None:
     async def scenario(database: Database) -> None:
         workflow, runner, initial = await start(database, source)
-        before_return, case_id, understanding_id = await build_pair(
+        safe_point, case_id, understanding_id = await build_pair(
             workflow, runner, initial, source[1]
         )
         before = await workflow.read_object(
-            runner.scope, stage=before_return, layer=UNDERSTANDING, object_id=understanding_id
+            runner.scope, stage=safe_point, layer=UNDERSTANDING, object_id=understanding_id
         )
-        b1 = await workflow.handoff(runner, before_return, uuid4())
         change = await workflow.edit(
             runner,
             ReviseMemoryObject(
-                uuid4(), b1, SITUATION, case_id, MemoryContentChanges(title="每季盤點")
+                uuid4(),
+                safe_point,
+                UNDERSTANDING,
+                understanding_id,
+                MemoryContentChanges(body="尚未確認的新理解"),
             ),
         )
-        b2 = await workflow.handoff(runner, change.position, uuid4())
         after = await workflow.read_object(
-            runner.scope, stage=b2, layer=UNDERSTANDING, object_id=understanding_id
+            runner.scope, stage=change.position, layer=UNDERSTANDING, object_id=understanding_id
         )
-        assert after.content == before.content
-        assert after.work_situation_references != before.work_situation_references
-        restored = await workflow.restore(runner, b2, before_return, uuid4())
+        assert after.content.body == "尚未確認的新理解"
+        assert after.work_situation_references == before.work_situation_references
+        restored = await workflow.restore(runner, change.position, safe_point, uuid4())
         assert restored.phase == UNDERSTANDING
         assert (
             await workflow.read_object(
@@ -562,7 +590,7 @@ def test_b1_return_keeps_b2_work_and_restore_retains_second_safe_point(
             == before
         )
         with pytest.raises(MemoryCandidateStateError):
-            await workflow.publish(runner, b2, uuid4())
+            await workflow.publish(runner, change.position, uuid4())
         snapshot = await workflow.publish(runner, restored, uuid4())
         assert (
             await workflow.read_snapshot_object(source[0], snapshot.snapshot_id, case_id)

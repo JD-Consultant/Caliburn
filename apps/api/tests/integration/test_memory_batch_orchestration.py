@@ -144,7 +144,6 @@ def test_parent_publishes_once_and_coalesces_next_frontier(
         from caliburn.workflows.memory_analysis.results import (
             AnalysisComplete,
             MemoryAnalysisResult,
-            SituationGap,
         )
         from caliburn.workflows.memory_batch import MemoryBatchWorkflow
         from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
@@ -166,8 +165,6 @@ def test_parent_publishes_once_and_coalesces_next_frontier(
             writer: ExecutionWriter,
             stage: MemoryBatchPosition,
             *,
-            previous: MemoryAnalysisResult | None = None,
-            gaps: tuple[SituationGap, ...] = (),
             situation_changes: list[dict[str, JsonValue]] | None = None,
         ) -> MemoryAnalysisResult:
             calls.append(stage.phase)
@@ -291,7 +288,6 @@ def test_reentry_after_b1_handoff_skips_b1_and_preserves_work(
         from caliburn.workflows.memory_analysis.results import (
             AnalysisComplete,
             MemoryAnalysisResult,
-            SituationGap,
         )
         from caliburn.workflows.memory_batch import MemoryBatchWorkflow
         from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
@@ -309,8 +305,6 @@ def test_reentry_after_b1_handoff_skips_b1_and_preserves_work(
             writer: ExecutionWriter,
             stage: MemoryBatchPosition,
             *,
-            previous: MemoryAnalysisResult | None = None,
-            gaps: tuple[SituationGap, ...] = (),
             situation_changes: list[dict[str, JsonValue]] | None = None,
         ) -> MemoryAnalysisResult:
             nonlocal interrupted
@@ -336,15 +330,13 @@ def test_reentry_after_b1_handoff_skips_b1_and_preserves_work(
     execute(database_settings, scenario)
 
 
-def test_b2_gap_roundtrip_keeps_its_existing_understanding(
+def test_b2_can_publish_understanding_with_explicit_unknown_without_rework(
     database_settings: DatabaseSettings,
 ) -> None:
     async def scenario(database: Database) -> None:
         from caliburn.workflows.memory_analysis.results import (
             AnalysisComplete,
             MemoryAnalysisResult,
-            SituationGap,
-            SituationRework,
         )
         from caliburn.workflows.memory_batch import MemoryBatchWorkflow
         from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
@@ -356,57 +348,39 @@ def test_b2_gap_roundtrip_keeps_its_existing_understanding(
         work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
         assert work is not None
         candidates = MemoryCandidateWorkflow(database.sessions)
-        b2_calls = 0
-        saw_gap = False
+        calls: list[MemoryLayer] = []
+        understanding_id = None
 
         async def role(
             writer: ExecutionWriter,
             stage: MemoryBatchPosition,
             *,
-            previous: MemoryAnalysisResult | None = None,
-            gaps: tuple[SituationGap, ...] = (),
             situation_changes: list[dict[str, JsonValue]] | None = None,
         ) -> MemoryAnalysisResult:
-            nonlocal b2_calls, saw_gap
+            nonlocal understanding_id
+            calls.append(stage.phase)
             context = await role_context(database, writer, stage)
-            if stage.phase == MemoryLayer.WORK_SITUATION:
-                if gaps:
-                    assert gaps[0].target_title == "盤點"
-                    assert previous is not None and previous.stage.phase == stage.phase
-                    saw_gap = True
-            else:
-                b2_calls += 1
-                if b2_calls == 1:
-                    edited = await candidates.edit(
-                        writer,
-                        CreateMemoryObject(
-                            uuid4(),
-                            stage,
-                            stage.phase,
-                            MemoryContent("庫存管理", "盤點與回報", "頻率待確認。"),
-                        ),
-                    )
-                    return MemoryAnalysisResult(
-                        edited.position,
-                        SituationRework(
-                            status="needs_situation",
-                            gaps=(
-                                SituationGap(
-                                    target_title="盤點",
-                                    question="频率？",
-                                    needed_clarification="請核對原話中的月頻率",
-                                    interview_sequences=(2,),
-                                ),
-                            ),
-                        ),
-                        context,
-                    )
-                entries = await candidates.read_map(writer.scope, stage=stage, layer=stage.phase)
-                assert [item.title for item in entries] == ["庫存管理"]
-                assert previous is not None and previous.stage.phase == stage.phase
+            if stage.phase == MemoryLayer.WORK_UNDERSTANDING:
+                edited = await candidates.edit(
+                    writer,
+                    CreateMemoryObject(
+                        uuid4(),
+                        stage,
+                        stage.phase,
+                        MemoryContent("庫存管理", "盤點與回報", "頻率待確認。"),
+                    ),
+                )
+                stage = edited.position
+                understanding_id = edited.object_id
             return MemoryAnalysisResult(stage, AnalysisComplete(status="complete"), context)
 
         result = await MemoryBatchWorkflow(database.sessions, run_role=role).run(work.writer)
-        assert result.covered_through_sequence == 2 and saw_gap and b2_calls == 2
+        assert result.covered_through_sequence == 2
+        assert calls == [MemoryLayer.WORK_SITUATION, MemoryLayer.WORK_UNDERSTANDING]
+        assert understanding_id is not None
+        published = await candidates.read_snapshot_object(
+            turn.scope.job_file_id, result.snapshot_id, understanding_id
+        )
+        assert published.content.body == "頻率待確認。"
 
     execute(database_settings, scenario)

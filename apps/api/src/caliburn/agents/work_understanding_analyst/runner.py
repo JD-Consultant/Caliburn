@@ -1,4 +1,4 @@
-"""Public B2 runner; private history is never passed to B1 as gap context."""
+"""Public B2 runner; only the Memory parent publishes the completed batch."""
 
 from dataclasses import dataclass
 
@@ -29,7 +29,6 @@ class WorkUnderstandingAnalystRunner:
         stage: MemoryBatchPosition,
         *,
         situation_changes: list[dict[str, JsonValue]],
-        previous: MemoryAnalysisResult | None = None,
         recovery: AnalysisRecovery | None = None,
     ) -> MemoryAnalysisResult:
         return await MemoryAnalysisRunner(
@@ -39,7 +38,6 @@ class WorkUnderstandingAnalystRunner:
             stage,
             role=AgentRole.WORK_UNDERSTANDING_ANALYST,
             instructions=UNDERSTANDING_INSTRUCTIONS,
-            previous=previous,
             situation_changes=situation_changes,
             recovery=recovery,
         )

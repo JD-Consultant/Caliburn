@@ -27,7 +27,7 @@ from caliburn.features.executions.models import ExecutionKind, ExecutionScope, E
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings, ModelSettings
 from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
-from caliburn.workflows.memory_analysis.results import AnalysisComplete, SituationRework
+from caliburn.workflows.memory_analysis.results import AnalysisComplete
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
 from tests.unit.test_response_loop import response_at
@@ -36,7 +36,7 @@ pytestmark = pytest.mark.postgres
 
 
 @pytest.mark.parametrize(
-    ("handoff_tokens", "recover_first_response", "max_cost_usd"),
+    ("after_tool_tokens", "recover_first_response", "max_cost_usd"),
     [
         (159_999, False, Decimal("1.00")),
         (160_000, False, Decimal("1.00")),
@@ -45,10 +45,10 @@ pytestmark = pytest.mark.postgres
         (500, False, None),
     ],
 )
-def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
+def test_b1_b2_publish_preserves_role_boundaries_native_history_and_fixed_frontier(
     database_settings: DatabaseSettings,
     database_connection: psycopg.Connection,
-    handoff_tokens: int,
+    after_tool_tokens: int,
     recover_first_response: bool,
     max_cost_usd: Decimal | None,
     monkeypatch: pytest.MonkeyPatch,
@@ -90,16 +90,15 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
         paths.append(request.url.path)
         payload = json.loads(request.content)
         if request.url.path.endswith("/input_tokens"):
-            handoff = any(
-                item.get("role") == "user" and "memory_analysis_handoff" in str(item.get("content"))
-                for item in payload["input"]
+            after_tool = any(
+                item.get("type") == "function_call_output" for item in payload["input"]
             )
             compacted = any(item.get("type") == "compaction" for item in payload["input"])
             return httpx2.Response(
                 200,
                 json={
                     "object": "response.input_tokens",
-                    "input_tokens": handoff_tokens if handoff and not compacted else 500,
+                    "input_tokens": after_tool_tokens if after_tool and not compacted else 500,
                 },
             )
         if request.url.path.endswith("/compact"):
@@ -119,20 +118,21 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
                         *payload["input"],
                     ],
                     "usage": {
-                        "input_tokens": handoff_tokens,
+                        "input_tokens": after_tool_tokens,
                         "output_tokens": 100,
                         "input_tokens_details": {"cached_tokens": 0, "cache_write_tokens": 0},
-                        "total_tokens": handoff_tokens + 100,
+                        "total_tokens": after_tool_tokens + 100,
                     },
                 },
             )
         assert request.url.path.endswith("/responses")
         sent.append(payload)
         step = len(sent)
-        raw = response_at(step, final=step in (2, 4, 6, 7), tools=0).model_dump(mode="json")
+        assert 1 <= step <= 4, "Saved role results must not resend model requests"
+        raw = response_at(step, final=step in (2, 4), tools=0).model_dump(mode="json")
         raw["service_tier"] = "default"
         if step == 1:
-            raw["output"] = [
+            raw["output"] += [
                 call(
                     "create_work_situation",
                     {
@@ -148,9 +148,10 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
             raw["output"] += [
                 call("read_work_situation_map", {}, "map"),
                 call("read_work_understanding", {"target_title": "PRIVATE_B2"}, "forbidden"),
+                call("read_interview", {"query": {"kind": "messages", "sequences": [3]}}, "late"),
             ]
         elif step == 3:
-            raw["output"] = [
+            raw["output"] += [
                 call(
                     "create_work_understanding",
                     {
@@ -167,33 +168,8 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
                     "forbidden-b2",
                 ),
             ]
-        elif step == 5:
-            raw["output"] = [
-                call(
-                    "update_work_situation",
-                    {
-                        "target_title": "案例A",
-                        "changes": [{"field": "description", "value": "本人不核准"}],
-                    },
-                    "rework",
-                ),
-                call("read_interview", {"query": {"kind": "messages", "sequences": [3]}}, "late"),
-            ]
         else:
-            outcome = {"status": "complete"}
-            if step == 4:
-                outcome = {
-                    "status": "needs_situation",
-                    "gaps": [
-                        {
-                            "target_title": "案例A",
-                            "question": "誰負責核准？",
-                            "needed_clarification": "保留本人權限邊界",
-                            "interview_sequences": [2],
-                        }
-                    ],
-                }
-            raw["output"][1]["content"][0]["text"] = json.dumps(outcome, ensure_ascii=False)
+            raw["output"][1]["content"][0]["text"] = '{"status":"complete"}'
         return httpx2.Response(200, json=raw)
 
     async def scenario() -> None:
@@ -253,7 +229,10 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
                 else:
                     first = await b1.run(writer, stage)
                 assert isinstance(first.outcome, AnalysisComplete)
+                assert first.stage.phase == MemoryLayer.WORK_SITUATION
+                requests_before_reentry = len(paths)
                 assert await b1.run(writer, stage) == first
+                assert len(paths) == requests_before_reentry
                 assert len(sent) == 2
                 async with database.sessions() as session:
                     prepared_b1 = await history.read_context_history(
@@ -261,6 +240,8 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
                     )
                     budget_before = await budgets.read_execution_budget(session, scope)
                 stage2 = await candidates.handoff(writer, first.stage, uuid4())
+                assert stage2.phase == MemoryLayer.WORK_UNDERSTANDING
+                assert stage2.generation_id == first.stage.generation_id
                 second = await b2.run(
                     writer,
                     stage2,
@@ -269,39 +250,57 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
                         {"kind": "added", "target_title": "案例B"},
                     ],
                 )
-                assert isinstance(second.outcome, SituationRework)
-                stage3 = await candidates.handoff(writer, second.stage, uuid4())
-                third = await b1.run(writer, stage3, previous=first, gaps=second.outcome.gaps)
-                assert isinstance(third.outcome, AnalysisComplete)
-                stage4 = await candidates.handoff(writer, third.stage, uuid4())
-                fourth = await b2.run(
-                    writer,
-                    stage4,
-                    previous=second,
-                    situation_changes=[
-                        {"kind": "changed", "target_title": "案例A", "fields": ["description"]}
-                    ],
-                )
-                assert isinstance(fourth.outcome, AnalysisComplete)
-                assert await b2.run(writer, stage4, previous=second, situation_changes=[]) == fourth
-                assert len(sent) == 7
-                for original, later in [(first, third), (second, fourth)]:
-                    old = await read_completed_response_history(
+                assert isinstance(second.outcome, AnalysisComplete)
+                assert second.stage.phase == MemoryLayer.WORK_UNDERSTANDING
+                requests_before_reentry = len(paths)
+                assert await b2.run(writer, stage2, situation_changes=[]) == second
+                assert len(paths) == requests_before_reentry
+                assert len(sent) == 4
+                assert first.history_position.thread_id != second.history_position.thread_id
+                for result, request_index in [(first, 0), (second, 2)]:
+                    window = await read_completed_response_history(
                         saver,
-                        thread_id=original.history_position.thread_id,
-                        checkpoint_id=original.history_position.checkpoint_id,
+                        thread_id=result.history_position.thread_id,
+                        checkpoint_id=result.history_position.checkpoint_id,
                     )
-                    new = await read_completed_response_history(
-                        saver,
-                        thread_id=later.history_position.thread_id,
-                        checkpoint_id=later.history_position.checkpoint_id,
+                    initial_items = sent[request_index]["input"]
+                    continued_items = sent[request_index + 1]["input"]
+                    prefix = 1 if after_tool_tokens == 160_000 else 0
+                    assert continued_items[prefix : prefix + len(initial_items)] == initial_items
+                    assert window.items[: len(continued_items)] == continued_items
+                    tool_step = request_index + 1
+                    reasoning = next(
+                        item
+                        for item in continued_items
+                        if item.get("id") == f"reasoning_{tool_step}"
                     )
-                    prefix = 1 if handoff_tokens == 160_000 else 0
-                    assert new.items[prefix : prefix + len(old.items)] == old.items
+                    assert reasoning["encrypted_content"] == f"synthetic-opaque-{tool_step}"
+                    assert reasoning["provider_extension"] == {"must_survive": True}
+                    assert (
+                        next(
+                            item
+                            for item in continued_items
+                            if item.get("id") == f"message_{tool_step}"
+                        )["phase"]
+                        == "commentary"
+                    )
+                    assert [
+                        item["call_id"]
+                        for item in continued_items
+                        if item.get("type") == "function_call_output"
+                    ] == [
+                        item["call_id"]
+                        for item in continued_items
+                        if item.get("type") == "function_call"
+                    ]
+                    assert window.items[-1]["phase"] == "final_answer"
+                    assert json.loads(window.items[-1]["content"][0]["text"]) == {
+                        "status": "complete"
+                    }
                     assert (
                         sum(
                             "memory_analysis_input" in str(item.get("content", ""))
-                            for item in new.items
+                            for item in window.items
                         )
                         == 1
                     )
@@ -317,22 +316,42 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
                         await executions.read_execution(session, scope)
                     ).status == ExecutionStatus.ACTIVE
                 reader = MemoryReadWorkflow(database.sessions)
-                binding = CandidateMemoryRead(scope, fourth.stage)
+                binding = CandidateMemoryRead(scope, second.stage)
                 items = await reader.read_map(binding, MemoryLayer.WORK_SITUATION)
                 assert sorted((item.title, item.description) for item in items) == [
-                    ("案例A", "本人不核准"),
+                    ("案例A", "工作案例"),
                     ("案例B", "工作案例"),
                 ]
                 assert (
                     await reader.read_object(binding, MemoryLayer.WORK_UNDERSTANDING, "PRIVATE_B2")
                 ).content.body == "PRIVATE_B2 工作理解"
+                published = await candidates.publish(writer, second.stage, uuid4())
+                assert published.through_source_id == source_id
+                assert published.covered_through_sequence == 2
+                assert await candidates.read_latest_snapshot(file_id) == published
+                assert (
+                    await candidates.read_snapshot_map(
+                        file_id, published.snapshot_id, MemoryLayer.WORK_SITUATION
+                    )
+                    == items
+                )
+                assert [
+                    item.title
+                    for item in await candidates.read_snapshot_map(
+                        file_id, published.snapshot_id, MemoryLayer.WORK_UNDERSTANDING
+                    )
+                ] == ["PRIVATE_B2"]
+                async with database.sessions() as session:
+                    assert (
+                        await executions.read_execution(session, scope)
+                    ).status == ExecutionStatus.COMPLETED
         finally:
             await sdk.close()
             await database.close()
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())
-    assert len(compactions) == (2 if handoff_tokens == 160_000 else 0)
+    assert len(compactions) == (2 if after_tool_tokens == 160_000 else 0)
     assert "LATE_AFTER_FIXED_F" not in json.dumps(sent, ensure_ascii=False)
     initial = json.loads(sent[0]["input"][0]["content"])
     assert initial["required_interview_range"] == {"start_sequence": 1, "end_sequence": 2}
@@ -346,14 +365,29 @@ def test_b1_b2_rework_retains_candidate_private_history_and_original_frontier(
         item["target_title"] for item in understanding_input["work_situation_map"]["items"]
     } == {"案例A", "案例B"}
     assert len(understanding_input["work_situation_changes"]) == 2
-    for index in (0, 1, 4, 5):
+    for index in (0, 1):
         payload = sent[index]
         names = {tool["name"] for tool in payload["tools"]}
         assert "read_work_understanding_map" not in names
+        assert "read_work_understanding" not in names
         assert "create_work_understanding" not in names
         # A forbidden call's model-selected title may persist, but no private body arrives.
         assert "PRIVATE_B2 工作理解" not in json.dumps(payload, ensure_ascii=False)
-    for index in (2, 3, 6):
-        assert "create_work_situation" not in {tool["name"] for tool in sent[index]["tools"]}
-    assert '"scope_not_allowed"' in json.dumps(sent[1]) or "scope_not_allowed" in str(sent[1])
-    assert "source_not_available" in str(sent[5]) or "scope_not_allowed" in str(sent[5])
+    for index in (2, 3):
+        names = {tool["name"] for tool in sent[index]["tools"]}
+        assert "create_work_situation" not in names
+        assert "update_work_situation" not in names
+        assert "delete_work_situation" not in names
+    for request_index, call_id in [(1, "call_forbidden"), (3, "call_forbidden-b2")]:
+        observation = next(
+            item["output"]
+            for item in sent[request_index]["input"]
+            if item.get("type") == "function_call_output" and item["call_id"] == call_id
+        )
+        assert "scope_not_allowed" in observation
+    late_observation = next(
+        item["output"]
+        for item in sent[1]["input"]
+        if item.get("type") == "function_call_output" and item["call_id"] == "call_late"
+    )
+    assert "source_not_available" in late_observation or "scope_not_allowed" in late_observation

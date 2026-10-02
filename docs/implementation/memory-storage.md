@@ -20,7 +20,7 @@
 第二切片 `work_memory/sources.py` 透過 `interviews/queries.py`，重用現有正式訊息保存，不直接讀別的領域表，也不複製原話：
 
 - `bind_memory_source_window` 只供新批次準備：接收原整理要求的員工來源身分，精確解出正式序號 F；K 由呼叫方選定的已發布快照提供。F 與非零 K 均須為同檔案的有效員工發話；首次 K=0。查詢最大序號只用於驗證來源資格，**不是拿最大序號當 F**。有效要求 F≤K 返回「已涵蓋」，不另造空批。
-- `MemorySourceWindow` 明列固定檔案、來源身分及 `(K,F]`；不是模型可填欄位，也不是新的保存 owner。批次保存／恢復後續必須沿原值，不在每次讀取、回交或恢復重呼 bind 取得新範圍。
+- `MemorySourceWindow` 明列固定檔案、來源身分及 `(K,F]`；不是模型可填欄位，也不是新的保存 owner。批次保存／恢復後續必須沿原值，不在每次讀取、交接或恢復重呼 bind 取得新範圍。
 - `read_required_interviews` 共用既有近期歷史組裝，保留完整 `(K,F]`、真實角色及前置語境規則；不含 F 之後即使已正式保存的答覆。`read_reference_sources` 可回讀 `≤F` 的更早有效來源，空引用合法，不把必處理新區間當成唯一可引用範圍。
 - 訪談 owner 的 `read_interview_sources` 在 SQL 同時限定檔案、來源 ID 與上界；有一個來源不存在、未正式化、跨檔案或超界就整組拒絕，不返回部分結果。這是新增的內部 ID 查詢，**不是新增模型工具**。
 
@@ -97,7 +97,7 @@ flowchart TD
 |---|---|---|
 | 內部型別與分層權限 | `candidates.py` | App 綁定檔案、execution、generation、stage、position；不是模型參數。B1 只讀寫情境；B2 讀情境、讀寫理解。 |
 | 工作稿及原操作 | `candidate_service.py`、`candidate_operations.py` | create／revise／delete 全成全拒；有效位置前移及原結果同交易。原意圖用穩定序列化的 SHA-256 判相等，結果保存必要身分／位置，不重複存長篇 Markdown。 |
-| 交接、回復與發布 | `candidate_lifecycle.py` | 回交保留兩層已成立工作稿；恢復只採本批可證明的原位置，換 generation／stage 阻擋遲到寫入。發布固定化理解來源並保存完整快照。 |
+| 交接、回復與發布 | `candidate_lifecycle.py` | 交接只允許 B1 → B2，不允許 B2 回交；恢復只採本批可證明的原位置，換 generation／stage 阻擋遲到寫入。發布固定化理解來源並保存完整快照。 |
 | 可見資料投影 | `candidate_queries.py` | 候選捕捉當前位置後解析身分綁定；正式入口要求 snapshot，沿其固定修訂。map 不讀正文。 |
 | SQL 與保存約束 | `position_persistence.py`、`batch_persistence.py` | 同檔案 FK、每身分一修訂、位置封存、同層精確 title 唯一及引用來源存在。快照要求精確來源 pair 與訪談上界；固定位置、快照與操作結果不可改寫。 |
 | 跨領域短交易 | `workflows/memory_candidates.py` | 鎖檔案、驗既有 writer、呼叫領域操作；發布與 execution 完成共同提交。adapter／領域不自行 commit。 |
@@ -118,7 +118,7 @@ flowchart TD
 2. 同層目前 title 唯一；App 精確解析及 DB 封存約束採相同相等語意。使用明確 `COLLATE "C"`，不因部署環境而改變字串比較；SQL 層仍以 ID 定位，不用 title 作 UPDATE／DELETE 目標。
 3. 情境刪除與候選入邊解除同交易，理解本身保留；B1 結果不外露理解資料。歷史快照不改寫，不用歷史 FK cascade 清除正式來源。
 4. 候選修改後 current read 取得最新已成立狀態；單次物件／map 投影捕捉同一位置。A 只能沿已發布的固定 snapshot 查詢，不能混入候選。
-5. ①／②恢復沿可定位候選；新 writer／回退分支使遲到修改失效。同批 B1↔B2 依序接手，B2 已成立的理解候選不能因回交遺失。
+5. ①／②恢復沿可定位候選；新 writer／回退分支使遲到修改失效。同批只依 B1 → B2 前進，B2 恢復沿自己的原進度，不重跑已完成的 B1。
 6. ③在同一短提交中保存固定選用／關係、涵蓋與原結果；正式 head 最後採用。已成立結果重入回原快照，不重新發一版；未知提交不當未執行。
 
 不另加發布前語意 reviewer、格式修補 loop 或最少引用數。權限與結構在每次操作維持；DB 快照結構 gate 只防止不一致資料落地，不推斷 B2 是否真正理解。T04 的發布入口只接受目前 B2 階段，T10／T11 必須在真正完成該階段後才呼叫，不能將 read 次數、零 diff 或正常返回一個工具當作完成。

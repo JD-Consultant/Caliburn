@@ -1,5 +1,7 @@
 # T11：Memory 意圖、背景領取、B1/B2 交接與共同發布
 
+> **後續修正（2026-10-02）：**現行流程為 B1 → B2 → 發布，不回交。提示、角色結果、批次編排及候選交接一併修正，見[單向流程紀錄](t11-memory-one-way-correction.md)。本頁保留當時的施工及測試結果，較早 gap／回交要求已被取代；最終失敗政策與品質限制另依各自最新紀錄。
+
 - 日期：2026-09-30。
 - 狀態：**T11 背景調度、交接與共同發布已完成其任務級驗證**，見[完成對照](#任務完成對照2026-09-30-恢復後)；最終失敗的系統解除阻塞接線仍有已知限制，不等同完整模型品質驗收。§1–8 保留施工當時的分工、介面示例及驗證時序；目前正式接線見[共用執行 §6.2–7](../../../implementation/agent-execution.md#62-最外層失敗收尾2026-09-30)，不直接照抄早期 `run_supervised` 示例。
 - 責任規格：[Memory 生命週期](../../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[共用執行 §7](../../../implementation/agent-execution.md#7-memory-背景工作)、[Memory 保存](../../../implementation/memory-storage.md)、[程式組織](../../../implementation/code-organization.md)、[程式撰寫](../../../implementation/coding-standard.md)。本頁只記實作、證據及接線，不另立產品規格。

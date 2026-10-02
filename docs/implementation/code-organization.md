@@ -27,7 +27,7 @@ apps/
       agents/
         job_consultant/         # A：prompt、允許工具與起始投影
         work_situation_analyst/ # B1：只處理情境
-        work_understanding_analyst/ # B2：理解與按需情境回交
+        work_understanding_analyst/ # B2：依情境分析理解，不回交 B1
         memory_analysis/        # B1／B2 共用組裝（runner、起始 context、角色分派）；不是第三個角色
       agent_execution/          # 共用 node loop、原生 context、Step／恢復／compact
       adapters/

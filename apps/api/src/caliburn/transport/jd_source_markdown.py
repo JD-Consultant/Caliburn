@@ -2,8 +2,51 @@
 
 import re
 
+from caliburn.features.job_description.sources import SourceTargetKind
 from caliburn.features.work_memory.edit_preparation import describe_body_change
+from caliburn.workflows.jd_evidence import JdEvidenceChanges
 from caliburn.workflows.jd_source_queries import JdSourceChanges, MemorySourceChange
+
+
+def project_jd_target_changes(result: JdEvidenceChanges) -> str:
+    """Render only the exact target's reviewed/current values, never surrounding JD items."""
+    lines = [
+        "## JD 項目差異",
+        "比較：此引用上次核對的 JD 項目 → 目前正式 JD 的同一項目。",
+        "只讀；未確認支持 JD，也未解除待核對。",
+    ]
+    if result.before == result.after:
+        lines.append("此 JD 項目沒有淨差異。")
+        if result.reference.needs_review:
+            lines.append("核對後曾修改，即使改回原文仍保留待核對。")
+        return "\n".join(lines)
+    labels = {
+        SourceTargetKind.PROFILE_FIELD: ("欄位內容",),
+        SourceTargetKind.AREA: ("職責名稱", "職責範圍"),
+        SourceTargetKind.TASK: ("任務名稱", "工作內容"),
+        SourceTargetKind.DETAIL: ("明細類型", "明細內容"),
+        SourceTargetKind.CAPABILITY: ("能力類型", "能力名稱", "能力說明"),
+        SourceTargetKind.TASK_CAPABILITY: (
+            "任務名稱",
+            "工作內容",
+            "能力類型",
+            "能力名稱",
+            "能力說明",
+        ),
+        SourceTargetKind.COLLABORATOR: ("協作對象", "合作範圍"),
+        SourceTargetKind.CONDITION: ("條件分類", "條件內容"),
+    }[result.reference.target.kind]
+    for label, before, after in zip(labels, result.before, result.after, strict=True):
+        if before != after:
+            lines.extend(
+                [f"{label}：", *_fenced_diff(describe_body_change(before or "", after or ""))]
+            )
+    return "\n".join(lines)
+
+
+def _fenced_diff(diff: str) -> list[str]:
+    fence = "`" * max(3, max(map(len, re.findall(r"`+", diff)), default=0) + 1)
+    return [f"{fence}diff", diff, fence]
 
 
 def project_jd_source_changes(
@@ -54,8 +97,7 @@ def _memory_delta(change: MemorySourceChange) -> list[str]:
         new = getattr(after, field) if after else ""
         if old != new:
             diff = describe_body_change(old, new)
-            fence = "`" * max(3, max(map(len, re.findall(r"`+", diff)), default=0) + 1)
-            lines.extend([f"{field}：", f"{fence}diff", diff, fence])
+            lines.extend([f"{field}：", *_fenced_diff(diff)])
     removed = sorted(set(change.before_interviews) - set(change.after_interviews))
     added = sorted(set(change.after_interviews) - set(change.before_interviews))
     if removed:

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdSourceContentView",
+  "description": "Read-only evidence along a citation's original fixed chain, never arbitrary Memory history or candidates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["revision_id", "citation_id", "content"],
+  "properties": {
+    "revision_id": {"type": "string", "format": "uuid"},
+    "citation_id": {"type": "string", "format": "uuid"},
+    "content": {"anyOf": [{"$ref": "#/$defs/MemoryContent"}, {"$ref": "#/$defs/InterviewContent"}]}
+  },
+  "$defs": {
+    "MemoryContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "title", "description", "body", "references"],
+      "properties": {
+        "kind": {"enum": ["work_situation", "work_understanding"]},
+        "title": {"type": "string"},
+        "description": {"type": "string"},
+        "body": {"type": "string"},
+        "references": {"type": "array", "items": {"$ref": "#/$defs/SourceLink"}}
+      }
+    },
+    "InterviewContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "interview_sequence", "speaker", "interview_text"],
+      "properties": {
+        "kind": {"const": "interview"},
+        "interview_sequence": {"type": "integer", "minimum": 1},
+        "speaker": {"enum": ["app", "employee", "consultant"]},
+        "interview_text": {"type": "string"}
+      }
+    },
+    "SourceLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_ref", "kind", "label"],
+      "properties": {
+        "source_ref": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["interview", "work_situation"]},
+        "label": {"type": "string"}
+      }
+    }
+  }
+}

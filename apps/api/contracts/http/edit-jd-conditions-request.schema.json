@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EditJdConditionsRequest",
+  "description": "One bounded job-wide condition edit from a fixed formal base. Reclassification retains identity; it never propagates into task requirements.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "command_id",
+    "expected_revision_id",
+    "change"
+  ],
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "expected_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "change": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/CreateCondition"
+        },
+        {
+          "$ref": "#/$defs/ReviseCondition"
+        },
+        {
+          "$ref": "#/$defs/DeleteCondition"
+        },
+        {
+          "$ref": "#/$defs/ReorderCondition"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "ConditionKind": {
+      "type": "string",
+      "enum": [
+        "work_environment",
+        "schedule_travel",
+        "shared_authority",
+        "shared_collaboration",
+        "qualification"
+      ]
+    },
+    "CreateCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "kind",
+        "text"
+      ],
+      "properties": {
+        "action": {
+          "const": "create_condition"
+        },
+        "kind": {
+          "$ref": "#/$defs/ConditionKind"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"
+        }
+      }
+    },
+    "ReviseCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "condition_id",
+        "changes"
+      ],
+      "properties": {
+        "action": {
+          "const": "revise_condition"
+        },
+        "condition_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "changes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ConditionTextChange"
+              },
+              {
+                "$ref": "#/$defs/ConditionKindChange"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "ConditionTextChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "value"
+      ],
+      "properties": {
+        "field": {
+          "const": "text"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"
+        }
+      }
+    },
+    "ConditionKindChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "value"
+      ],
+      "properties": {
+        "field": {
+          "const": "kind"
+        },
+        "value": {
+          "$ref": "#/$defs/ConditionKind"
+        }
+      }
+    },
+    "DeleteCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "condition_id"
+      ],
+      "properties": {
+        "action": {
+          "const": "delete_condition"
+        },
+        "condition_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "ReorderCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "condition_id",
+        "before_condition_id"
+      ],
+      "properties": {
+        "action": {
+          "const": "reorder_condition"
+        },
+        "condition_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "before_condition_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid",
+          "description": "Within the current condition kind only; null places it last."
+        }
+      }
+    }
+  }
+}

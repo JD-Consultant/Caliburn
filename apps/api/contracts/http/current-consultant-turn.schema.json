@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CurrentConsultantTurn",
+  "description": "Read-only discovery for an existing job file. Turn is the admitted active or paused consultant (including pending pause), or explicit null when none exists. Excludes terminal history and Memory work. A missing job file is HTTP 404.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["turn"],
+  "properties": {
+    "turn": {
+      "anyOf": [
+        {"$ref": "consultant-turn.schema.json#/$defs/ConsultantTurn"},
+        {"type": "null"}
+      ]
+    }
+  }
+}

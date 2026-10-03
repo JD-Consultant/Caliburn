@@ -159,5 +159,5 @@ ADR [0003](../../docs/adr/0003-indexer-stays-separate-service.md)(獨立服務)�
 [0010](../../docs/adr/0010-indexer-contract-shared-package.md)(契約 #2)·
 [0012](../../docs/adr/0012-embedding-as-a-service.md)(embedder 服務化)·
 [0019](../../docs/adr/0019-api-naming-alignment.md)(命名)·
-[`docs/ocs-source-json.md`](../../docs/ocs-source-json.md)(來源 JSON 契約)·
-embedder 細節:[`docs/specs/2026-06-29-embedder-service-bge-m3-research.md`](../../docs/specs/2026-06-29-embedder-service-bge-m3-research.md)。
+[來源 JSON 欄位契約](../pdf-to-json/README.md#6-field-contract)與 [OCS JSON Schema](../../packages/ocs-contract/schema/ocs-document.schema.json)·
+embedder 細節:[`docs/specs/2026-06-29-embedder-service-bge-m3-research.md`](../../docs/research/retrieval/2026-06-29-embedder-service-bge-m3-research.md)。

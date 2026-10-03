@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdProfileView",
+  "description": "The four editable JD profile fields at one fixed revision. Null means no value has been supplied, not a confirmed absence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["revision_id", "profile"],
+  "properties": {
+    "revision_id": {"type": "string", "format": "uuid"},
+    "profile": {"$ref": "#/$defs/Profile"}
+  },
+  "$defs": {
+    "Profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["job_title", "organization_unit", "reports_to", "purpose"],
+      "properties": {
+        "job_title": {"type": ["string", "null"]},
+        "organization_unit": {"type": ["string", "null"]},
+        "reports_to": {"type": ["string", "null"]},
+        "purpose": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

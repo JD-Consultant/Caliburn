@@ -1,5 +1,7 @@
 # Project Architecture
 
+> **歷史初始設計，原位保留供追溯（2026-10-02 標示）：**以下目錄樹與範例不是目前程式契約，包含未採用的模組位置。現在的流程與模組分工請讀 [README 架構](README.md#架構--流程pipes-and-filters)及 [Codemap](README.md#codemap)；不要依本頁補建舊範例模組。
+
 基於 Python `uv` 的模組化設計，支援 PDF 解析→轉換→驗證→輸出流程。
 
 ## 1. Project Structure

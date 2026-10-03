@@ -1,5 +1,6 @@
 node_modules/
 .venv/
+.venv-target/
 __pycache__/
 *.pyc
 .next/
@@ -17,6 +18,7 @@ pytest-cache-files-*/
 .coverage
 .npm-cache/
 .pnpm-store/
+.uv-cache*/
 pnpm-debug.log*
 .research-tmp/
 tmp/
@@ -32,6 +34,11 @@ Thumbs.db
 .claude/
 .codex-remote-attachments/
 .worktrees/
+.superpowers/
+
+# Local historical/editorial archives are not part of the published repository.
+# Reusable research, report figures and reproducible experiment data live outside this directory.
+/docs/archive/
 
 # personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
 CLAUDE.local.md

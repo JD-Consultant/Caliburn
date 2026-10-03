@@ -1,7 +1,7 @@
 # ADR 0026 — 訪談回合獨立模型 role(model_interview,強推理 + strict)
 
 - **狀態**:Accepted(2026-07-06)。
-- **研究依據**:[`../specs/2026-07-06-interview-model-selection.md`](../specs/2026-07-06-interview-model-selection.md)
+- **研究依據**:[`../specs/2026-07-06-interview-model-selection.md`](../history.md#source-f04af250b86d2bc4e139)
   (OpenRouter strict 支援面、gpt-4o-mini 變異證據、選項比對、驗收)。
 - **關聯**:延伸(不翻案)ADR [0024](0024-llm-wiring-select-schema.md)的 per-role 分層與
   「換模型=重跑驗收」紀律;消費者=ADR [0023](0023-interview-engine-stateless-turns.md)訪談引擎。

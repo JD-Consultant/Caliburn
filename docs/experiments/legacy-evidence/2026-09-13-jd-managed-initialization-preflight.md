@@ -2,7 +2,7 @@
 
 - 查閱日期：2026-09-13；Topic：JD-R002／RS-3／DA-03。
 - 狀態：有界官方文件與已安裝原碼核對，後續有限 helper 實證記於 §9；不代表完整日常啟動或產品驗收通過。本輪未讀真實訪談或呼叫模型。
-- 上游：[本機持久配置前置](2026-09-13-jd-local-configuration-preflight.md)、[目前決策](../../current-decisions.md)、[施工計畫](../../plans/2026-09-13-jd-relational-app-implementation.md)、[資料層前置](2026-09-13-jd-relational-db-preflight.md)。正式權責仍依有效 ADR；本輪不改 production authority。
+- 上游：[本機持久配置前置](2026-09-13-jd-local-configuration-preflight.md)、[目前決策](../../current-decisions.md)、[施工計畫](../../archive/implementation-plans/2026-09-13-jd-relational-app-implementation.md)、[資料層前置](2026-09-13-jd-relational-db-preflight.md)。正式權責仍依有效 ADR；本輪不改 production authority。
 
 ## 1. 推薦及初始化界線
 

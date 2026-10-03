@@ -1,6 +1,6 @@
 # B1 OpenAI adapter 與固定接合測試完成
 
-2026-09-14；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與本輪工作單位定義，基準 `353c400b`／tag `jd-b1-core-adoption-20260913`；依[本片審查](app-wiring-review.md) F1–F4 與[複核](app-wiring-followup-review.md) P1／P2／F-04 修正後重寫。
+2026-09-14；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與本輪工作單位定義，基準 `353c400b`／tag `jd-b1-core-adoption-20260913`；依[本片審查](app-wiring-review.md) F1–F4 與[複核](app-wiring-followup-review.md) P1／P2／F-04 修正後重寫。
 
 **B1 是訪談資料整理進 Memory 的既有階段**，不是重新設計 JD 編輯器，也不是另一個使用者頁面。本片只把已完成的 B1 接上新 App 的來源 owner 與 OpenAI，**不重做 B1、不改整個顧問**。
 
@@ -14,7 +14,7 @@
 
 **本片是 H4 的局部進展；不代表日常 App 已可使用 B1，也不代表 H4 或完整旅程完成。**
 
-**審查追補（2026-09-14）：**P1／P2／F-04／P3固定接合已收尾至 `f160be97`。P3 是 InMemoryStore 上的已保存 artifact 讀回反例；變異轉紅由實作者執行，獨立正常重跑不代稱獨立變異測試。最新[整體審查](whole-flow-review.md)獨立受影響組與Memory套件211項通過；真PG／新程序／自然模型未執行。[H4計畫](../../../plans/2026-09-14-jd-h4-runtime-integration.md)接續一批B1真PG、有界batch及其後B2／宿主，不重做source port。
+**審查追補（2026-09-14）：**P1／P2／F-04／P3固定接合已收尾至 `f160be97`。P3 是 InMemoryStore 上的已保存 artifact 讀回反例；變異轉紅由實作者執行，獨立正常重跑不代稱獨立變異測試。最新[整體審查](whole-flow-review.md)獨立受影響組與Memory套件211項通過；真PG／新程序／自然模型未執行。[H4計畫](../../../archive/implementation-plans/2026-09-14-jd-h4-runtime-integration.md)接續一批B1真PG、有界batch及其後B2／宿主，不重做source port。
 
 ## 1. 只新增 App 端適配器
 

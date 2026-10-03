@@ -2,7 +2,7 @@
 
 JD-R002/C03；2026-09-10（Asia/Taipei）；**第二輪四組、十五個斷言全部通過。首輪一組通過、三組子程序結果缺檔的執行失敗完整保留。**只有 headless、普通 JSON 檔案與全新 Node 程序；不代表 DOM／IME、完整 grammar、API、模型或 S5 已通過。
 
-依 [正式文件 profile](../../specs/2026-09-10-jd-plate-document-profile.md)補上一個明確缺口：F01 的基本 list／table 註冊能否換成官方免費插件，仍保留完整 JD 與原生操作結果？本輪不是框架重選、pending 結算、codec 或通用引擎研究；不改 production、Memory、DB 或舊實證，0 付費請求。
+依 [正式文件 profile](../../archive/legacy-specs/2026-09-10-jd-plate-document-profile.md)補上一個明確缺口：F01 的基本 list／table 註冊能否換成官方免費插件，仍保留完整 JD 與原生操作結果？本輪不是框架重選、pending 結算、codec 或通用引擎研究；不改 production、Memory、DB 或舊實證，0 付費請求。
 
 ## 1. 固定版本、授權與真實配置
 

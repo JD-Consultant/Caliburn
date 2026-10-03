@@ -38,7 +38,7 @@ SuperJSON 官方提供 `serialize`／`deserialize`，保存完整 `{json,meta}` 
 
 本次沒有 Python／DB 往返、實際 Agent、DOM／IME、跨版本、全部資料型別、完整 JD profile 或長期相依待審測試。新的 serializer metadata 是傳輸保存表示，不是產品審閱群組、內容來源或接受狀態。C03 的獨立文字案例不能推成任意續改／結構移動的成員發現與安全結算。P01 的 clean-value DB 正證也不替本次補上 pending DB 驗收。
 
-原 R01 **2 PASS／2 FAIL**、R01-F **3 PASS／1 FAIL** 與原 source／lock／結果全部未變；新增 codec 路徑的成功不改判原普通 JSON 路徑。完整審閱分組仍依[接線候選](../../specs/2026-09-09-jd-editor-app-integration-design.md)收斂，production authority 不變。
+原 R01 **2 PASS／2 FAIL**、R01-F **3 PASS／1 FAIL** 與原 source／lock／結果全部未變；新增 codec 路徑的成功不改判原普通 JSON 路徑。完整審閱分組仍依[接線候選](../../archive/legacy-specs/2026-09-09-jd-editor-app-integration-design.md)收斂，production authority 不變。
 
 ## 4. 獨立審查與封存
 

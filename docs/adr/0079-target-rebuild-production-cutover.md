@@ -7,7 +7,7 @@
 
 ## 脈絡
 
-Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不要求整合或遷移。[實作計畫](../plans/2026-09-29-target-rebuild/README.md)已授權施工、本地提交，以及通過最後 gate 後的入口切換和精確舊碼退役；並未授權略過品質驗收或刪除本機資料。
+Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不要求整合或遷移。[實作計畫](../history.md#source-ee8cbce8eb3c303d1765)已授權施工、本地提交，以及通過最後 gate 後的入口切換和精確舊碼退役；並未授權略過品質驗收或刪除本機資料。
 
 目前新程式位於 `apps/api`／`apps/web`，但根命令、CI 與正式權責仍指向 ADR0077 的產品。若只更新 README、只切根命令，或只刪舊目錄，會留下互相矛盾的操作入口與驗收對象。需要一次可追溯的正式切換，不需要新舊相容層。
 
@@ -27,17 +27,17 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 
 根 pnpm scripts／workspace、由套件管理器生成的 lock、CI、App README 與全域文件須在同一交付中指向新產品。根命令轉交既有新產品入口，不另造部署平台或移植舊憑證／provider 接線。正式交付採既定的[單程序同源方案](../implementation/interface-and-delivery.md#41-同源靜態建置入口)；開發入口不冒充已部署的產品。
 
-舊可執行程式僅依 [T18 固定 Git 樹盤點](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#切換範圍盤點與舊依賴防線2026-10-01)逐檔核對後退役。該清單是可重建的候選，不是遞迴刪除目錄的許可；執行前重新確認工作樹、使用中的程序及新增變更。歷史研究、ADR、實驗結果與沿革文件保留，舊操作說明標為歷史。
+舊可執行程式僅依 [T18 固定 Git 樹盤點](../history.md#source-25de60a3e4266687fd86)逐檔核對後退役。該清單是可重建的候選，不是遞迴刪除目錄的許可；執行前重新確認工作樹、使用中的程序及新增變更。歷史研究、ADR、實驗結果與沿革文件保留，舊操作說明標為歷史。
 
 ## 採用前條件與目前限制
 
-是否可以正式化以[任務表 T18](../plans/2026-09-29-target-rebuild/tasks.md#t18-新產品入口切換與舊程式退役)、[計畫完成條件](../plans/2026-09-29-target-rebuild/README.md#5-整個-goal-的完成條件)及[驗證對照](../implementation/verification-plan.md)為準，不在本頁另建較寬鬆的驗收表。順序為：前置品質／容量／旅程 gate 成立 → 核定本次精確切換範圍 → 切換並驗證根入口與交付 → 同步正式權責與文件。
+是否可以正式化以[任務表 T18](../history.md#source-378c7f9480def66d4cde)、[計畫完成條件](../history.md#source-ee8cbce8eb3c303d1765)及[驗證對照](../implementation/verification-plan.md)為準，不在本頁另建較寬鬆的驗收表。順序為：前置品質／容量／旅程 gate 成立 → 核定本次精確切換範圍 → 切換並驗證根入口與交付 → 同步正式權責與文件。
 
 截至放行（2026-10-02），**T14、T16、T17 已依實測與已知不足清單結案；T18 於 Owner 放行後完成**。採用時查回、不由本 ADR 升格或豁免的限制：
 
-- Luna 跨輪 JD 來源漏選等品質不足由 Owner 決定列為已知不足、不再阻擋；清單與成因見 [T14 已知不足](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)，逐項實測判定見 [T17 V01–V28 對照](../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)（通過 12、部分 6、離線／PG 9、未驗 1）。
-- 壓縮：A 的輪前壓縮有自然觸發的真模型證據，B1／B2 以調低門檻的探針觀察到輪前壓縮被採用，批次因帳戶額度用完未能發布快照；見 [T16 證據](../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md#12-b1b2-輪前壓縮的真模型觀察2026-10-02執行前-manifest)。
-- Memory 最終失敗後已接線：正式訪談再前進三輪才允許一次新批次（2026-10-01，**政策待 Owner 核對**）；沒有在真長旅程中自然觸發。見 [T11 證據](../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)。
+- Luna 跨輪 JD 來源漏選等品質不足由 Owner 決定列為已知不足、不再阻擋；清單與成因見 [T14 已知不足](../history.md#source-d3293e9b28c75bbb6616)，逐項實測判定見 [T17 V01–V28 對照](../history.md#source-d58692bbe6b4baa7267f)（通過 12、部分 6、離線／PG 9、未驗 1）。
+- 壓縮：A 的輪前壓縮有自然觸發的真模型證據，B1／B2 以調低門檻的探針觀察到輪前壓縮被採用，批次因帳戶額度用完未能發布快照；見 [T16 證據](../history.md#source-6d2d7ab4abfedbf8416e)。
+- Memory 最終失敗後已接線：正式訪談再前進三輪才允許一次新批次（2026-10-01，**政策待 Owner 核對**）；沒有在真長旅程中自然觸發。見 [T11 證據](../history.md#source-14d692c99a98b4e9954e)。
 - 資料庫伺服器重啟後必須重啟 App（單一 leader 設計，不自動重連）；見 T14 已知不足第 7 列與 [runbook](../runbook.md#診斷)。
 - 2026-10-02 起 OpenAI 帳戶額度用完，補額度前沒有新的真模型驗證；放行時候選上的真模型短旅程尚未執行（不是放行條件），補額度後可補跑。實驗發現的全部問題見[實驗發現的問題彙整](../reports/experiment-findings.md)。
 
@@ -47,11 +47,11 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 
 切換已備成**一組可審提交**，不在原分支放行：根 `package.json`（`dev`／`start`／`build`／`lint`／`typecheck`／`test`／`check`／`app:migrate`／`app:status`，RAG 命令不變）、`pnpm-workspace.yaml` 與 pnpm 重新生成的 lock、CI（改跑同一個根 `check`）、README／ARCHITECTURE／CONTRIBUTING／AGENTS／runbook，以及下節的程式退役。`app:status` 是只讀診斷（`python -m caliburn.status`），不印出密碼或 key；`app:migrate` 是唯一改 schema 的命令。
 
-在乾淨 worktree（只含 tracked 檔案）已驗：鎖定安裝；根 `check`（lint、mypy strict、1,113 單元／契約測試、162 前端測試、契約生成核對、production build）；新 schema 遷移；無設定與有設定的 `app:status`；以根 `start` 啟動的單程序同源 UI（首頁、深連結、資源、API 404）；硬停止後重啟資料仍在。實際輸出與限制見 [T18 證據](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#乾淨-worktree-的根命令切換候選2026-10-01)。這些不取代 T14／T16／T17 的品質、容量與旅程 gate。
+在乾淨 worktree（只含 tracked 檔案）已驗：鎖定安裝；根 `check`（lint、mypy strict、1,113 單元／契約測試、162 前端測試、契約生成核對、production build）；新 schema 遷移；無設定與有設定的 `app:status`；以根 `start` 啟動的單程序同源 UI（首頁、深連結、資源、API 404）；硬停止後重啟資料仍在。實際輸出與限制見 [T18 證據](../history.md#source-25de60a3e4266687fd86)。這些不取代 T14／T16／T17 的品質、容量與旅程 gate。
 
 ## 退役範圍與取回
 
-退役範圍是[固定 Git 樹盤點](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#切換範圍盤點與舊依賴防線2026-10-01)的 **379 個 tracked 檔**：`experiments/jd-relational-app` 的 336 個非 Markdown 檔、`packages/consultant-memory` 的 41 個非 Markdown 檔（不含 `adoption.json`），以及 `scripts/run-jd-app.mjs`、`scripts/run-jd-app.test.mjs`。保留 16 個 Markdown／`adoption.json` 沿革檔（兩個 README 於頂端加歷史標記）、`packages/job-analysis-contract` 的歷史 README、全部研究／ADR／證據文件與獨立 RAG。不刪 DB、volume、秘密、ignored 或未追蹤檔；不做舊資料遷移，舊 runtime 也不能讀新 schema。
+退役範圍是[固定 Git 樹盤點](../history.md#source-25de60a3e4266687fd86)的 **379 個 tracked 檔**：`experiments/jd-relational-app` 的 336 個非 Markdown 檔、`packages/consultant-memory` 的 41 個非 Markdown 檔（不含 `adoption.json`），以及 `scripts/run-jd-app.mjs`、`scripts/run-jd-app.test.mjs`。保留 16 個 Markdown／`adoption.json` 沿革檔（兩個 README 於頂端加歷史標記）、`packages/job-analysis-contract` 的歷史 README、全部研究／ADR／證據文件與獨立 RAG。不刪 DB、volume、秘密、ignored 或未追蹤檔；不做舊資料遷移，舊 runtime 也不能讀新 schema。
 
 清單可重建：`git ls-tree -r --name-only 6ad33bcb -- experiments/jd-relational-app packages/consultant-memory`，排除 `.md` 與 `packages/consultant-memory/adoption.json`，再加上述兩個啟動器。基準提交 `6ad33bcb` 是退役前的完整樹。取回單一檔案：`git show 6ad33bcb:<路徑>`；整批恢復：`git revert <退役提交>`（它只含上述刪除，與入口／文件切換分開提交）。
 
@@ -67,7 +67,7 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 
 - **決定：**T14、T16、T17 結案、候選分支重基並通過最終驗證後，Owner 在「放行／先補額度再放行／先不放行」中選擇**放行**。
 - **執行：**`target-cutover-candidate` 以快轉合併進 `target-rebuild`（只在本機，沒有 push、沒有對外部署）：切換前最後一個提交是 `6ad33bcb`，切換後 head 是 `9438347c`（9 個提交）。根命令、workspace、lock 與 CI 指向 `apps/api`／`apps/web`。
-- **驗證：**`9438347c` 的根 `pnpm run check` exit 0（Ruff 433 檔、mypy strict 280 檔、node 測試 5、後端單元／契約 1,152、前端 162、契約生成核對、production build）；合併後的樹與該提交相同。與主線的差異刪除正好 379 個檔（336＋41＋2），沒有範圍外刪除，16 個沿革檔保留。細節見 [T18 證據](../plans/2026-09-29-target-rebuild/evidence/t18-same-origin-web.md#放行與切換2026-10-02)。
+- **驗證：**`9438347c` 的根 `pnpm run check` exit 0（Ruff 433 檔、mypy strict 280 檔、node 測試 5、後端單元／契約 1,152、前端 162、契約生成核對、production build）；合併後的樹與該提交相同。與主線的差異刪除正好 379 個檔（336＋41＋2），沒有範圍外刪除，16 個沿革檔保留。細節見 [T18 證據](../history.md#source-25de60a3e4266687fd86)。
 - **取回：**舊程式在 `6ad33bcb` 及更早的提交完整存在，例如 `git show 6ad33bcb:experiments/jd-relational-app/README.md`。
 - **沒動的：**DB、volume、秘密、ignored 與未追蹤檔、Demo、RAG；沒有遷移舊資料。
 - **限制不因放行消失：**見上方「採用前條件與目前限制」與[實驗發現的問題彙整](../reports/experiment-findings.md)。

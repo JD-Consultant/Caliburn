@@ -1,6 +1,6 @@
 # H4-R1 第一步：固定 target 到有界批次
 
-2026-09-14；JD-R002／OI-01、OI-02。實作[H4 計畫 §4 R1 第1點](../../../plans/2026-09-14-jd-h4-runtime-integration.md)與[映射 §3.6](../../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md#36-固定目標到有界批次2026-09-14-接續設計)，閉合[整體審查](whole-flow-review.md) HF-02。基準 `f160be97` 加上本輪未提交的 HF-07。0 provider、沒有新增資料表、沒有新 parser／游標／配對引擎。
+2026-09-14；JD-R002／OI-01、OI-02。實作[H4 計畫 §4 R1 第1點](../../../archive/implementation-plans/2026-09-14-jd-h4-runtime-integration.md)與[映射 §3.6](../../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md#36-固定目標到有界批次2026-09-14-接續設計)，閉合[整體審查](whole-flow-review.md) HF-02。基準 `f160be97` 加上本輪未提交的 HF-07。0 provider、沒有新增資料表、沒有新 parser／游標／配對引擎。
 
 ## 範圍與依據
 

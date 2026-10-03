@@ -2,7 +2,7 @@
 
 - **狀態**:Accepted（2026-07-02）。
 - 研究依據:[`../specs/2026-07-02-app-composition-health-degradation-research.md`](../research/engineering/2026-07-02-app-composition-health-degradation-research.md)(§2.5、§4-F1)。
-- 關聯:API review findings F1([`../specs/2026-06-30-api-review-findings.md`](../specs/2026-06-30-api-review-findings.md) §F1)。
+- 關聯:API review findings F1([`../specs/2026-06-30-api-review-findings.md`](../history.md#source-a483b71360c97426e1df) §F1)。
 
 ## 脈絡
 

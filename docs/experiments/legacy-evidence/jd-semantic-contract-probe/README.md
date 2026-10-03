@@ -2,7 +2,7 @@
 
 2026-09-10；JD-R002/C01／C03。只在本目錄建立新證據；v1 SSOT、既有 runner 與封存结果不修改。
 
-唯一候選來源為 [`../../contracts/jd-editor-v2.schema.json`](../../../specs/contracts/jd-editor-v2.schema.json)。本目錄的 [fixtures](fixtures.cjs) 與 [runner](check-contract.cjs) 是固定合成案例及離線檢查，不是 runtime／codegen 的第二份契約，也不是員工資料或正式 JD 樣稿。
+唯一候選來源為 [`../../contracts/jd-editor-v2.schema.json`](../../../history.md#source-bedd18d2494322468e23)。本目錄的 [fixtures](fixtures.cjs) 與 [runner](check-contract.cjs) 是固定合成案例及離線檢查，不是 runtime／codegen 的第二份契約，也不是員工資料或正式 JD 樣稿。
 
 ## 執行狀態
 

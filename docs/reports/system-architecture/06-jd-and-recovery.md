@@ -54,10 +54,10 @@ Checkpoint 提供已保存的 Graph State；業務操作結果回答「資料究
 
 首版保留可接續的工作；無法安全接續時，則結束本輪並解除占用。不承諾找回未保存的模型 token，也不建立通用的自動補償平台。
 
-## PDF 是正式稿的交付投影
+## PDF 是正式稿的匯出版本
 
-匯出時，App 讀取固定的正式 JD 修訂，生成受控 HTML／CSS，再由 Chromium 產生 PDF。PDF 與編輯器使用同一正式來源，不包含候選預覽或模型內部訊息。原話、來源鏈與模型接續資料仍由原模組保存；PDF 是交付文件，不是另一份可獨立修改的資料來源。
+匯出時，App 讀取固定的正式 JD 修訂，生成受控 HTML／CSS，再由 Chromium 產生 PDF。PDF 與編輯器使用同一正式來源，不包含候選預覽或模型內部訊息。原話、來源鏈與模型接續資料仍由原模組保存；PDF 供閱讀與分享，不是另一份可獨立修改的資料來源。
 
-### 追到實作與證據
+### 延伸閱讀
 
-[JD 儲存與來源](../../implementation/jd-storage.md)、[資料交易](../../architecture/persistence.md)、[介面與交付](../../implementation/interface-and-delivery.md)。相關驗證為 [T07 來源動作](../../plans/2026-09-29-target-rebuild/evidence/t07-jd-source-actions.md)、[T09 候選預覽](../../plans/2026-09-29-target-rebuild/evidence/t09-consultant-preview.md)、[T12 恢復](../../plans/2026-09-29-target-rebuild/evidence/t12-consultant-process-recovery.md)、[T13 PDF](../../plans/2026-09-29-target-rebuild/evidence/t13-pdf-export.md)。
+[JD 儲存與來源](../../implementation/jd-storage.md)、[資料交易](../../architecture/persistence.md)及[介面與匯出](../../implementation/interface-and-delivery.md)說明詳細設計。相關實驗見[來源操作](../../history.md#source-d6ecf194836440b9ac30)、[候選預覽](../../history.md#source-16760acbb0da478c095a)、[中斷恢復](../../history.md#source-d4bb8d17c5639690aeb3)與 [PDF 匯出](../../history.md#source-409f20a1c297740aed7d)。

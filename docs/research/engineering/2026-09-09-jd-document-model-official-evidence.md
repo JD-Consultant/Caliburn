@@ -1,6 +1,6 @@
 # JD 文件內容模型：官方證據與適用邊界
 
-支援 [JD-R002/C01 建議](../../specs/2026-09-09-jd-document-relationships-working-research.md)、[C02 編輯／審核](../../specs/2026-09-09-jd-editing-and-review-working-design.md)及[C03 整體 AI 編輯應用](../../specs/2026-09-09-ai-document-app-composition-research.md)。研究／查閱基準日 2026-09-09；本表只保存會影響內容關係或後續框架判斷的直接來源，不重抄 [JD-R001 跨國內容研究](../work-analysis/2026-09-09-job-analysis-international-evidence.md)。§1–§4保留C01依據，§5為C02，§6為C03新增直接查閱結果；不代表每輪重新核驗所有舊來源。
+支援 [JD-R002/C01 建議](../work-analysis/2026-09-09-jd-document-relationships-working-research.md)、[C02 編輯／審核](../../history.md#source-403383b35472e2a3a08d)及[C03 整體 AI 編輯應用](2026-09-09-ai-document-app-composition-research.md)。研究／查閱基準日 2026-09-09；本表只保存會影響內容關係或後續框架判斷的直接來源，不重抄 [JD-R001 跨國內容研究](../work-analysis/2026-09-09-job-analysis-international-evidence.md)。§1–§4保留C01依據，§5為C02，§6為C03新增直接查閱結果；不代表每輪重新核驗所有舊來源。
 
 **Official fact** 是官方公開的能力；**Mapping** 是本產品建議；**Unknown** 是尚未驗證的接法。多家相近原則不等於逐項共同契約，也不能據此宣稱某方案全球最好。
 
@@ -168,4 +168,4 @@
 - **版本資訊不一致：**整合頁明標 extension Alpha；產品 overview 只標付費 add-on，沒有相同 Alpha 標示；AI Toolkit overview 則標 Beta。尚未核定 release／授權契約，不能自行判斷哪頁落後，也不能宣稱完整 AI＋審核組合為已證實穩定版。
 - **Mapping／Unknown：**有「AI 編輯＋追蹤審閱」的實際整合先例，但 C02 所需的組內人改、跨位置拒絕及重開保存仍要核對。E14 的巢狀限制不因這份示例而消失。
 
-**此階段停止點：**E16–E20 已回答是否必須自造重型 AI App。後續深入比較現已另存 [R01–R10：Agent／錯誤](../agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)及[F01–F05：編輯框架](2026-09-09-jd-editor-framework-comparison.md)，結論見[可執行方案](../../specs/2026-09-09-jd-ai-editing-executable-proposal.md)。仍未正式選定／實測套件；不用本段早期「尚未比較」重開已補的研究，也不反過來把建議當已施工。
+**此階段停止點：**E16–E20 已回答是否必須自造重型 AI App。後續深入比較現已另存 [R01–R10：Agent／錯誤](../agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)及[F01–F05：編輯框架](2026-09-09-jd-editor-framework-comparison.md)，結論見[可執行方案](../../history.md#source-81ce3748645d8d8bc468)。仍未正式選定／實測套件；不用本段早期「尚未比較」重開已補的研究，也不反過來把建議當已施工。

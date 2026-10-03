@@ -8,31 +8,31 @@
 
 最初 JobIntel 的訪談節點取最近 20 則訊息，任務萃取則讀保存的訊息；STAR／5W2H／指標等另有 Graph 狀態。它與後來的背景記憶整理不同：當時還沒有「原話、工作情境、工作理解」三層。
 
-**引用：**[初始 Graph §2](../../archive/early-projects/2026-05-20-jobintel-graph-pipeline.md)、[初始架構的 graph_state](../../archive/early-projects/2026-05-20-jobintel-architecture.md)。程式原件為 `9bbfe51b9c2130335065e495f102e84f1e2f6b11:backend/app/graph/nodes/interview.py` 與同提交的 `task_extraction.py`。這只能證明窗口／取料方式，不能推定當時已實測資訊因 20 則窗口而遺失。
+**引用：**[初始 Graph §2](../../history.md#source-f6099bd5a1a81730042d)、[初始架構的 graph_state](../../history.md#source-403e401b5f084bb191fc)。程式原件為 `9bbfe51b9c2130335065e495f102e84f1e2f6b11:backend/app/graph/nodes/interview.py` 與同提交的 `task_extraction.py`。這只能證明窗口／取料方式，不能推定當時已實測資訊因 20 則窗口而遺失。
 
 ### 2026-07-20：短答不能脫離前問解釋
 
 「是」「每週」「主管」單獨看沒有完整指涉，過去頻率也可能被誤當現在。當時因此研究 QuestionFrame 與 contextual evidence，保留顧問問題和員工回答的關係。這是後來原話前後文問題的早期材料，不必等到有 Memory 才出現。
 
-**引用：**[短答及專業分析研究](../../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)、[ADR0037](../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)。這是當時的產品決策，沒有因此要求新架構保留同名結構。
+**引用：**[短答及專業分析研究](../../history.md#source-41f73d8f9e737418f7ea)、[ADR0037](../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)。這是當時的產品決策，沒有因此要求新架構保留同名結構。
 
 ### 2026-08-12 至 08-13：保存得到，不代表 State 不會膨脹
 
 在合成長來源測試中，25 → 50 輪時，完整來源累積於 State 的 PostgreSQL 保存量約由 1.20 MB 增到 3.94 MB（3.281 倍）；Store-first 約 2 倍，Delta 方案也約 2 倍。研究據此區分原始來源與執行工作態；Delta 雖有容量改善，但當時仍是 beta 且重建整份 journal，因此不採作唯一來源權威。
 
-**引用：**[產品流程研究 §9.7.2、§9.8](../../specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md)。這測的是保存／序列化負擔，不是模型 input tokens，也不是長訪談語意品質通過。
+**引用：**[產品流程研究 §9.7.2、§9.8](../../history.md#source-20bcac8af4c10acef7f5)。這測的是保存／序列化負擔，不是模型 input tokens，也不是長訪談語意品質通過。
 
 ### 2026-08-27 至 08-29：不只累積對話，試作可修訂的工作理解
 
 研究開始把跨輪延續、工作理解與來源回查分開，並用 LangMem 做領域語意記憶試驗。最初 subject＋detail 結構會在頻率改變後留下過時標題，因此改成 kind＋body 再測。16 輪合成訪談、六批整理中，更正、未知及一次性事件大致保留，但仍有輕微記錄重疊。
 
-**引用：**[跨輪延續研究](../../specs/2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md)、[LangMem 試驗與限制](../../specs/2026-08-29-langmem-domain-semantic-memory-spike-experiment.md)。此試驗不含正式來源 anchor、完整 checkpoint rollback、程序崩潰或 production 採用，不能寫成整套 Memory 已完成。
+**引用：**[跨輪延續研究](../../research/agent-systems/2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md)、[LangMem 試驗與限制](../../history.md#source-ebaa81dee5721a6f1001)。此試驗不含正式來源 anchor、完整 checkpoint rollback、程序崩潰或 production 採用，不能寫成整套 Memory 已完成。
 
 ### 2026-09-01 至 09-04：分開保存、路由與原話回讀，先被基礎接線擋住
 
 設計進一步區分 canonical 原話、語意工作理解與查找導覽。但隔離 spike 先遇 Windows event loop／Psycopg 不相容；修正後，DB／Store／embedding 可以跑，第一個 chat 請求又因路由與參數組合無可用 endpoint 而失敗，六項語意品質檢查仍是 NOT_EVALUATED。
 
-**引用：**[路由與 canonical 研究](../../specs/2026-09-03-memory-routing-canonical-read-and-isolated-spike-research.md) §7、[原 spike 結果](../../experiments/historical/20260918-memory-routing-spike/experiments/2026-09-03-memory-routing-canonical-read/report.md)。這是基礎設施／provider 相容性失敗，不能說模型記憶品質已被證明不好或已修好。
+**引用：**[路由與 canonical 研究](../../history.md#source-e56a1c076f474bdb39da) §7、[原 spike 結果](../../experiments/historical/20260918-memory-routing-spike/experiments/2026-09-03-memory-routing-canonical-read/report.md)。這是基礎設施／provider 相容性失敗，不能說模型記憶品質已被證明不好或已修好。
 
 ## 分層分析試驗：有工具、有資料，仍可能做錯
 
@@ -40,13 +40,13 @@
 
 當時形成 A 顧問、B1 訪談詳記／候選、B2 工作理解／guide，以及 C 即時修補的設計，並用有限真 API／PG 試驗檢查寫入。後續 readiness audit 又找到 Markdown 引用判定、B2 原話引用驗證與無正常回覆時的前景資訊風險；不能用一筆 CAS 成功就說完整產品已可用。
 
-**引用：**[analysis-only 設計](../../specs/2026-09-06-analysis-only-agent-memory-design.md)、[live 結果](../../specs/2026-09-06-analysis-only-agent-live-memory-results.md)、[接續 readiness audit](../../specs/2026-09-06-analysis-only-context-memory-readiness-audit.md)。這裡的 B1 詳記還不是後來可跨批修訂的工作情境。
+**引用：**[analysis-only 設計](../../history.md#source-7c28c9e58ce7f8268b9f)、[live 結果](../../history.md#source-d35d0f7eca5627081212)、[接續 readiness audit](../../history.md#source-48b4568da315ba701c14)。這裡的 B1 詳記還不是後來可跨批修訂的工作情境。
 
 ### 2026-09-07：長文編輯失敗，不一定是 Memory 分層錯誤
 
 正常訪談試驗先因 token-count API 404 被擋，之後才完成有限前景回合；長訪談又讓 B2 耗盡工具步數。trace 顯示模型把讀取回傳的行號／tab 一起抄入 `old_string`，多次精確替換失敗。接著研究原生 patch helper，但 wrapper 又錯拒合法的結尾標記，須分開修接線。
 
-**引用：**[正常訪談結果](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-native-context-normal-interview-results.md)、[CT09 長訪談](../../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/2026-09-07-long-interview-acceptance.md)、[CT11 patch 試驗](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-official-memory-patch-trial-results.md)。wrapper 的本地 replay 通過不等於完整 B2 真模型發布已通過。
+**引用：**[正常訪談結果](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-native-context-normal-interview-results.md)、[CT09 長訪談](../../history.md#source-b97b3bf78ac49cdc4cc7)、[CT11 patch 試驗](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-official-memory-patch-trial-results.md)。wrapper 的本地 replay 通過不等於完整 B2 真模型發布已通過。
 
 ### 2026-09-08 CT28／32／33：口頭記得更正，卻沒有真的寫入
 
@@ -54,7 +54,7 @@
 
 重要的是，追查確認**目前要求修補的規則與導覽真的已送到模型**，不能再猜是漏注入；但加密內容不可讀，有限對照也不足以證明 compaction 的唯一因果或普遍失敗率。
 
-**引用：**[CT28 原對照](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct28-live-repair-context-contrast.md)、[CT32 因素拆分](../../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/2026-09-08-ct32-context-factor-isolation.md)、[CT33 來源追查與未解界線](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct33-compaction-provenance-and-recovery-review.md)。不能據此寫成「刪掉歷史就解決」。
+**引用：**[CT28 原對照](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct28-live-repair-context-contrast.md)、[CT32 因素拆分](../../history.md#source-e27b12969cabd656ac6a)、[CT33 來源追查與未解界線](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct33-compaction-provenance-and-recovery-review.md)。不能據此寫成「刪掉歷史就解決」。
 
 ### 2026-09-08 CT37／38：原文都在，部分回答仍被過度概括
 
@@ -92,7 +92,7 @@ CT47／48 的候選在局部重播完成並保留重要舊引用，但還有標�
 
 OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有回傳 compaction item。客戶端 fixture 可往返，不代表此 provider／route／模型組合已完成「壓縮 → 保存 → 下次接續」。當時如實標 UNVERIFIED，再研究 request-only 的延續摘要。
 
-**引用：**[服務端 smoke](../../experiments/legacy-evidence/2026-09-15-openrouter-inline-compaction-live-smoke.md)、[9/16 延續壓縮設計及後續修訂](../../specs/2026-09-16-openrouter-continuation-compaction-design.md)。這只是當時組合的結果，不是 OpenRouter 永久不支援的主張；更不是原始訪談可刪除的授權。
+**引用：**[服務端 smoke](../../experiments/legacy-evidence/2026-09-15-openrouter-inline-compaction-live-smoke.md)、[9/16 延續壓縮設計及後續修訂](../../history.md#source-49fa82b26188aad2b075)。這只是當時組合的結果，不是 OpenRouter 永久不支援的主張；更不是原始訪談可刪除的授權。
 
 ### 2026-09-16 至 09-18：固定窗口詳記，不等於完整工作案例
 
@@ -100,7 +100,7 @@ OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有�
 
 當時還有 C repair，又發現 C 修改並解除舊關係後，下一批若只看 B1 的新變化，可能漏掉 B2 應重評的影響。後續從既有 receipts 和新舊 bindings 接回影響範圍，留下離線反例與回歸；沒有因此完成自然長訪談品質驗收。
 
-**引用：**[分層重設計 §0–§3、§6.1](../../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)、[背景流程 §2.4 的接力修正](../../specs/2026-09-17-layered-memory-background-workflow-design.md)。原件保留多次 successor；C 與 B2 回交等依當時流程解讀，不能由此推定現行產品接線。
+**引用：**[分層重設計 §0–§3、§6.1](../../history.md#source-9540bc676045d402f2e8)、[背景流程 §2.4 的接力修正](../../history.md#source-581fea9d87762ea5c453)。原件保留多次 successor；C 與 B2 回交等依當時流程解讀，不能由此推定現行產品接線。
 
 ### 2026-09-23：反覆摘要的主要負擔，竟是工具格式與近期回傳
 
@@ -116,7 +116,7 @@ OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有�
 
 新目標退役 C，重新釐清原始訪談、工作情境、工作理解與 JD；採 LangGraph＋OpenAI direct Responses，App 負責組裝 context、原生項目接續、導覽／按需工具、壓縮與安全點。Memory 版本、候選工作面、diff 與 JD 核對也經多次修訂，不能拿最早討論稿當最後契約。
 
-**引用：**[reasoning／工具結果／state 研究](../../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md)、[context 設計沿革](../../specs/2026-09-26-consultant-context-and-state-design.md)、[目標架構地圖](../../target-architecture-map.md)、[T01–T18 計畫](../../plans/2026-09-29-target-rebuild/README.md)。最新實驗再遇到的早期依據漏選、Prompt 比較、長旅程中斷與續跑，接[近期案例索引](../research-casebook.md)及其原始證據；不是到此便全面解決。
+**引用：**[reasoning／工具結果／state 研究](../../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md)、[context 設計沿革](../../specs/2026-09-26-consultant-context-and-state-design.md)、[目標架構地圖](../../target-architecture-map.md)、[T01–T18 計畫](../../history.md#source-ee8cbce8eb3c303d1765)。最新實驗再遇到的早期依據漏選、Prompt 比較、長旅程中斷與續跑，接[近期案例索引](../research-casebook.md)及其原始證據；不是到此便全面解決。
 
 ## 9月底重建前的六個轉折
 
@@ -128,7 +128,7 @@ OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有�
 
 **演化：**當時先提出背景期間禁止 C，再收斂為新目標退役 C；不可變原話及 A 的工作接續承接新資訊，B1／B2 在適當時機整理。候選不作 JD 正式 Memory 來源，背景尚未發布時 A 仍可依原話工作。
 
-**引用／界線：**`7e47c133:docs/current-decisions.md` 中兩條「2026-09-24 MEM-L001／JD-R002」決定，及[分層設計沿革](../../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。這是當時的需求反例與已確認目標，不是本輪重現第17輪事故，也不表示9/24程式已移除 C。
+**引用／界線：**`7e47c133:docs/current-decisions.md` 中兩條「2026-09-24 MEM-L001／JD-R002」決定，及[分層設計沿革](../../history.md#source-9540bc676045d402f2e8)。這是當時的需求反例與已確認目標，不是本輪重現第17輪事故，也不表示9/24程式已移除 C。
 
 ### 2026-09-25：整批返工可以完成，卻把另一個正確案例弄丟
 
@@ -162,7 +162,7 @@ OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有�
 
 **設計收斂：**一批整理使用一份邏輯候選，B1／B2 的 map／read 隨已成立操作更新，權限各自限定。改名不改身分；刪情境會解除候選綁定，理解物件本身保留。開始前與 B1 完成後快照供恢復／diff 使用，不是第二份可寫資料。完成後發布不可變 Memory 快照，同一物件在本版只選一個修訂；A 固定一版使用，歷史 JD 來源不被後續編輯覆寫。
 
-**引用／界線：**[生命週期「候選操作、快照與三個安全點」](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[Memory操作契約的刪除及關係規則](../../specs/2026-09-27-memory-object-update-tool-contract.md)。這裡記錄的是重建前契約如何變清楚，不表示該時候 SQL、checkpoint 或原子發布已驗。後來施工與測試沿[T04候選／快照](../../plans/2026-09-29-target-rebuild/tasks.md#t04-memory-可變候選不可變修訂與快照)及[T10背景整理](../../plans/2026-09-29-target-rebuild/tasks.md#t10-b1b2-私有角色與-context)找，不能用圖或一次發布成功替代各項驗收。
+**引用／界線：**[生命週期「候選操作、快照與三個安全點」](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[Memory操作契約的刪除及關係規則](../../specs/2026-09-27-memory-object-update-tool-contract.md)。這裡記錄的是重建前契約如何變清楚，不表示該時候 SQL、checkpoint 或原子發布已驗。後來施工與測試沿[T04候選／快照](../../history.md#source-378c7f9480def66d4cde)及[T10背景整理](../../history.md#source-378c7f9480def66d4cde)找，不能用圖或一次發布成功替代各項驗收。
 
 ### 2026-09-28 至 09-29：從執行 Turn 改成有效訊息序列來界定取材
 
@@ -170,7 +170,7 @@ OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有�
 
 當時新規則只讓成功完成的員工輸入／完整答覆取得正式序號，取消輸入與中間訊息不成為共享來源；App 開場另為第1則。Memory 的**啟動時點**與**資料截止點**分開：X Turn 成功後啟動，但上界取其最後員工輸入，不取其後顧問答覆或延後啟動時的最大序號。Runtime 固定並驗證範圍，模型只選需要讀的訊息。
 
-**引用／界線：**[原話讀取、來源資格與固定上界](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md) §2–3。序號38／39／40是設計示意，不是真實長旅程結果；尚未完成與正式原話的保存也不能混為一談。後來的容量、來源工具與長訪談實驗接[T16](../../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)及[T17](../../plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md)，結果層級各自看原件。
+**引用／界線：**[原話讀取、來源資格與固定上界](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md) §2–3。序號38／39／40是設計示意，不是真實長旅程結果；尚未完成與正式原話的保存也不能混為一談。後來的容量、來源工具與長訪談實驗接[T16](../../history.md#source-6d2d7ab4abfedbf8416e)及[T17](../../history.md#source-98d840caa9eed7fb2840)，結果層級各自看原件。
 
 ## 可以連著讀的問題鏈
 

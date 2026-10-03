@@ -1,10 +1,10 @@
 # JD 關聯資料層：版本、交易接點與真 DB 驗證前置
 
-**同日後續實作：**已依本文在新隔離 lock 安裝、固定 migration 並完成十三表真 PG 初始化／22 項驗證，詳[結果與保存基礎](../../specs/2026-09-13-jd-result-and-storage-foundation.md)。本文下列「尚未」描述本研究交付當時；完整 command 保存／恢復仍未通過。
+**同日後續實作：**已依本文在新隔離 lock 安裝、固定 migration 並完成十三表真 PG 初始化／22 項驗證，詳[結果與保存基礎](../../archive/legacy-specs/2026-09-13-jd-result-and-storage-foundation.md)。本文下列「尚未」描述本研究交付當時；完整 command 保存／恢復仍未通過。
 
 - 查閱日：2026-09-13；Topic：JD-R002／RS-F 資料接點、RS-2。
 - 狀態：有界官方研究已收束；可供隔離施工選定依賴，尚未安裝此組合、產生 migration 或驗證真 DB 保存。production authority／G6 不變。
-- 已讀依據：[目前決策](../../current-decisions.md)、[決策流程](../../decision-process.md)、[契約策略](../../contract-strategy.md)、[十三表與保存契約](../../specs/2026-09-12-jd-relational-schema-and-write-contract.md) §3–10、[框架選型](../../specs/2026-09-13-jd-app-stack-selection.md)、[原生接點前置](../../specs/2026-09-13-jd-native-framework-and-integration-preflight.md)、[RS-1–7 計畫](../../plans/2026-09-13-jd-relational-app-implementation.md)。本輪問題僅為既定保存效果有無原生資料層接點；不重選 JD 欄位、刪除政策、回執語意或 Agent loop。
+- 已讀依據：[目前決策](../../current-decisions.md)、[決策流程](../../decision-process.md)、[契約策略](../../contract-strategy.md)、[十三表與保存契約](../../specs/2026-09-12-jd-relational-schema-and-write-contract.md) §3–10、[框架選型](../../specs/2026-09-13-jd-app-stack-selection.md)、[原生接點前置](../../specs/2026-09-13-jd-native-framework-and-integration-preflight.md)、[RS-1–7 計畫](../../archive/implementation-plans/2026-09-13-jd-relational-app-implementation.md)。本輪問題僅為既定保存效果有無原生資料層接點；不重選 JD 欄位、刪除政策、回執語意或 Agent loop。
 
 ## 1. 推薦的精確組合與證據等級
 

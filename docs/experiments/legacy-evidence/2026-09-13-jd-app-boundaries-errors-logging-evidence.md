@@ -2,7 +2,7 @@
 
 - 查閱日：2026-09-13；Topic：JD-R002；供 RS-1 下一單位設計與獨立審查使用。
 - 性質：有界研究與本案映射，非 Accepted ADR、正式接合或實作完成證明。
-- 已讀基線：[目前決策](../../current-decisions.md)、[契約策略](../../contract-strategy.md)、[工具契約 §6–7](../../specs/2026-09-12-jd-relational-agent-tool-contract.md#6-統一-mutation-result)、[保存契約 §4.3／6.2／7](../../specs/2026-09-12-jd-relational-schema-and-write-contract.md#43-jd_operation)、[施工計畫](../../plans/2026-09-13-jd-relational-app-implementation.md)、[首切片範圍](../../specs/2026-09-13-jd-relational-command-slice.md)。
+- 已讀基線：[目前決策](../../current-decisions.md)、[契約策略](../../contract-strategy.md)、[工具契約 §6–7](../../specs/2026-09-12-jd-relational-agent-tool-contract.md#6-統一-mutation-result)、[保存契約 §4.3／6.2／7](../../specs/2026-09-12-jd-relational-schema-and-write-contract.md#43-jd_operation)、[施工計畫](../../archive/implementation-plans/2026-09-13-jd-relational-app-implementation.md)、[首切片範圍](../../archive/legacy-specs/2026-09-13-jd-relational-command-slice.md)。
 - 研究者僅新增本文件，程式由 root 單一寫入者修改；研究者另唯讀窄審 application／transport，執行一組記憶體 logging 故障注入及修正後 33 項窄測試。未改 schema／依賴，未呼叫模型或執行 DB／HTTP 產品測試。網路只查公開官方資料，沒有傳送私有程式或訪談。
 
 ## 1. 結論與適用範圍
@@ -109,7 +109,7 @@ OpenAI 的正文以官方 documentation search／fetch 取得；其餘以官方�
 2. **BEL-R02 的標準 traceback 修正：**原 `model_command()` 對外只有 `invalid_input`，但保留驗證例外 cause。root 用短 synthetic sentinel 透過 Pydantic 驗證錯誤確認標準 traceback 會露出輸入，回報 **1 FAIL**；修正為 `raise TransportError(...) from None`。研究者已讀修正及對應 testcase。這閉合標準 traceback 的該路徑，不宣稱任意 debug dumper／所有宿主 handler 已安全。
 3. **application 的已實作界線：**只記固定 event／message、UUID request ID、可信 context document ID、allowlisted command／outcome／error code 與耗時；不記 args、refs 或 exception object，不 retry。root 回報 application＋transport **30 tests 通過**；本段是實作者結果，獨立驗證另列下一項。
 4. **窄審首敗與閉合 BEL-R04a：**研究者以 `uv --no-cache run --no-sync` 在記憶體替換 `LOG.log`，令它拋出 synthetic handler failure。候選成功被改成 RuntimeError；原 `DomainError('stale_view')` 也被 RuntimeError 蓋掉，`original DomainError preserved=False`。root 隨後在 `record()` 隔離診斷 Exception，不重試／不遞迴記錄。研究者已讀修正，並實跑 `tests/test_application.py`＋`tests/test_transport.py`，**33 passed**；prepared、DomainError、unexpected exception 三路的 logging 故障都保留原結果或原例外物件。此項 **CLOSED／窄審 PASS**，無新增 finding。這是純準備邊界，未證明 DB 提交／真檔案輪替／程序退出後效果。
-5. 八個 CRUD 編輯操作的最後結果與結構／選區獨立審查由[本次切片](../../specs/2026-09-13-jd-management-operations-slice.md)保存，本研究未重審其全套業務；完整 read／HTTP／result DTO 仍依計畫承接，不把 `candidate_ready` 混入持久 mutation terminal。
+5. 八個 CRUD 編輯操作的最後結果與結構／選區獨立審查由[本次切片](../../archive/legacy-specs/2026-09-13-jd-management-operations-slice.md)保存，本研究未重審其全套業務；完整 read／HTTP／result DTO 仍依計畫承接，不把 `candidate_ready` 混入持久 mutation terminal。
 
 獨立窄複核版本：`application.py` SHA-256 `27EDE799D4E84ABA39A43E4116F30C1A30C8F2DCDF5149F32B9858C7C0534451`；`transport.py` SHA-256 `F63816087B320025F2710A7059AE6B6061B747405B726205F7AE806431DA1CA9`。33 項最後結果不與 root 的先前 30 項加總，也不與首切片 128 項累計為新的完整產品驗收數。
 
@@ -127,7 +127,7 @@ OpenAI 的正文以官方 documentation search／fetch 取得；其餘以官方�
 
 ## 6. 計畫大項尚未列成具體驗收的五個風險
 
-以下補強 [RS-1／RS-2](../../plans/2026-09-13-jd-relational-app-implementation.md#3-切片順序與驗收)的既有責任，不另開產品範圍。
+以下補強 [RS-1／RS-2](../../archive/implementation-plans/2026-09-13-jd-relational-app-implementation.md#3-切片順序與驗收)的既有責任，不另開產品範圍。
 
 | ID | 具體失敗觸發 | 承接切片／最小驗收 |
 |---|---|---|

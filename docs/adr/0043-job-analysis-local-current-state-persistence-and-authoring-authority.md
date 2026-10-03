@@ -4,7 +4,7 @@
 - 日期：2026-07-29
 - 取代：[0039](0039-local-multi-document-canonical-public-form-workspace.md)
 - 研究：
-  [本機 JD 分層編輯與 `job_analysis` PostgreSQL 持久化研究](../specs/2026-07-29-local-jd-authoring-and-postgresql-persistence-research.md)
+  [本機 JD 分層編輯與 `job_analysis` PostgreSQL 持久化研究](../history.md#source-d63b331071d2a3ab64ed)
 
 ## 脈絡
 

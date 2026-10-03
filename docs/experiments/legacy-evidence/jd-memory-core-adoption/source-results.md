@@ -1,6 +1,6 @@
 # 新原話 owner → Memory 來源埠驗收
 
-2026-09-13；[本輪設計](../../../specs/2026-09-13-jd-memory-core-adoption-slice.md)的有限 App adapter。作者證據，不代替獨立審查或完整 Memory 接線。
+2026-09-13；[本輪設計](../../../archive/legacy-specs/2026-09-13-jd-memory-core-adoption-slice.md)的有限 App adapter。作者證據，不代替獨立審查或完整 Memory 接線。
 
 ## 實際修改
 

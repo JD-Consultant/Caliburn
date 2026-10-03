@@ -20,7 +20,7 @@ Supersedes：
 - 所有 provider-neutral request/result、ContextBuilder、durable attempt、artifact與 reducer contract。
 
 詳細實作規格：
-[`../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md)
+[`../plans/2026-07-17-interview-vnext-v3-4r-openrouter-first-adapter-plan.md`](../history.md#source-57d9a65a88249392010f)
 
 ## 脈絡
 

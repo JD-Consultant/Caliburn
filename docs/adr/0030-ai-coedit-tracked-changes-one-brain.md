@@ -8,7 +8,7 @@
 0029 §11 把 AI 共編載體延後另裁。現況:三條 AI 路徑並存(訪談引擎/隨叫 `/ai/*`/舊
 LangGraph+CopilotKit,0023 裁退未清);AI 寫入走彈窗建議層(CurationDialog),產業已收斂到
 「直寫+修訂標記」(Word Copilot 2025 被迫補上、Canvas/Gemini/Cursor 同構);evals 整套缺席。
-六輪研究(16 份原始報告,見 [`../specs/2026-07-12-ai-layer-redesign-research.md`](../specs/2026-07-12-ai-layer-redesign-research.md))
+六輪研究(16 份原始報告,見 [`../specs/2026-07-12-ai-layer-redesign-research.md`](../research/agent-systems/2026-07-12-ai-layer-redesign-research.md))
 +逐層討論收斂出本決定;工作紀律新增「設計裁決先找大廠先例,不自己試錯」。
 
 ## 決定
@@ -57,4 +57,4 @@ LangGraph+CopilotKit,0023 裁退未清);AI 寫入走彈窗建議層(CurationDial
   類別級抑制、分區批量、Caliburn-as-MCP-server、fine-tune/蒸餾、檢索升級包(獨立 plan:
   eval 集→metadata filter→中文分詞→reranker→Qwen3 評測)、trace per-tenant 隔離。
 
-細節與全部出處:[`../specs/2026-07-12-ai-layer-redesign-research.md`](../specs/2026-07-12-ai-layer-redesign-research.md) §6(已鎖決策清單)。
+細節與全部出處:[`../specs/2026-07-12-ai-layer-redesign-research.md`](../research/agent-systems/2026-07-12-ai-layer-redesign-research.md) §6(已鎖決策清單)。

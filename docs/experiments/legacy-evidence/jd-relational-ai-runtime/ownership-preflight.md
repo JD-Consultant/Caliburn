@@ -2,7 +2,7 @@
 
 查閱日期：2026-09-13。Topic：JD-R002／RS-4；這是可施工接點與反例清單，尚非 AI 執行／取消／重啟通過報告。範圍是新 relational App，不接回舊顧問程式、不建立第二份聊天、Memory 或 JD 權威。本次唯讀檢查原碼與官方文件，沒有啟動宿主、連接資料庫或呼叫模型。
 
-上位依據：[目前決策](../../../current-decisions.md)、[人工 runtime](../../../specs/2026-09-13-jd-manual-runtime-slice.md)、[保存契約](../../../specs/2026-09-12-jd-relational-schema-and-write-contract.md)、[取消與恢復](../../../specs/2026-09-12-jd-history-and-recovery-design.md)、[整輪 JD 撤回](../../../specs/2026-09-12-jd-ai-turn-undo-design.md)。模型上下文與串流完成證據沿[既有前置](../2026-09-13-jd-consultant-context-preflight.md)，不在本稿重開品牌比較。
+上位依據：[目前決策](../../../current-decisions.md)、[人工 runtime](../../../archive/legacy-specs/2026-09-13-jd-manual-runtime-slice.md)、[保存契約](../../../specs/2026-09-12-jd-relational-schema-and-write-contract.md)、[取消與恢復](../../../specs/2026-09-12-jd-history-and-recovery-design.md)、[整輪 JD 撤回](../../../specs/2026-09-12-jd-ai-turn-undo-design.md)。模型上下文與串流完成證據沿[既有前置](../2026-09-13-jd-consultant-context-preflight.md)，不在本稿重開品牌比較。
 
 ## 1. 結論與適用版本
 

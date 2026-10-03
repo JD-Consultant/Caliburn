@@ -3,8 +3,8 @@
 - 狀態：Accepted（owner 於 2026-07-20 核准研究後寫成實作 authority）
 - 日期：2026-07-20
 - 範圍：R5 grounded short-answer、未來即時 JD 共編的最小相容 seam
-- 詳細實作：[`../plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](../plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md)
-- 研究：[`../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md`](../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)
+- 詳細實作：[`../plans/2026-07-20-interview-vnext-v3-5a-r5-grounded-short-answer-amendment-plan.md`](../history.md#source-041a1d0e64d797351cdc)
+- 研究：[`../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md`](../history.md#source-41f73d8f9e737418f7ea)
 
 ## 脈絡
 

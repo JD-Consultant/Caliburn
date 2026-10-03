@@ -6,7 +6,7 @@
 
 **先接「本輪已保存原話→顧問可用的確切來源→JD 引用→原話回查」，再接已有 Memory 的讀取、即時更正及背景整理。**本輪原話不必等 B1／B2 完成才可成為 JD 依據；原話回查完成也不代表整套 Memory 已完成。先做這條路可立即驗新版來源 owner，沒有理由另建原話表、先複製一份聊天或重跑整套 Memory 研究。
 
-有效路由為[目前決策](../../../current-decisions.md)、[未完清單 OI-01／02](../../../specs/2026-09-13-jd-app-open-issues.md)及[來源契約 §9](../../../specs/2026-09-12-jd-relational-agent-tool-contract.md#9-來源引用契約)。[ADR0074](../../../adr/0074-tested-consultant-runtime-source-and-memory-adoption.md)與 [ADR0075](../../../adr/0075-relational-jd-authority-and-structured-editor.md)仍 Proposed；本文不改正式 ADR0060，不要求整合舊服務或舊 JD 格式。
+有效路由為[目前決策](../../../current-decisions.md)、[未完清單 OI-01／02](../../../archive/legacy-specs/2026-09-13-jd-app-open-issues.md)及[來源契約 §9](../../../specs/2026-09-12-jd-relational-agent-tool-contract.md#9-來源引用契約)。[ADR0074](../../../adr/0074-tested-consultant-runtime-source-and-memory-adoption.md)與 [ADR0075](../../../adr/0075-relational-jd-authority-and-structured-editor.md)仍 Proposed；本文不改正式 ADR0060，不要求整合舊服務或舊 JD 格式。
 
 ## 已驗成果，不能直接移植的結論
 

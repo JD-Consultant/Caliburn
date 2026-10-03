@@ -3,7 +3,7 @@
 - **狀態**：Accepted
 - **日期**：2026-08-22
 - **Owner 對齊**：owner 於 2026-08-22 明確核准本書面版本：「一份 JD 一個持久、非權威的 AI working draft；員工最後以語意差異接受／修改後接受／拒絕／延後」，並澄清 VS Code 只作概念類比
-- **研究**：[`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](../specs/2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md)
+- **研究**：[`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](../history.md#source-3f3df1a71d60e744f504)
 - **Supersedes**：ADR 0064 決定 2 的 namespace、決定 3 的 model-facing `check_candidate_document`、決定 4 的 run-scoped candidate 生命週期、決定 5 的顯式 check wave、決定 6–7 的 publication receipt，以及決定 8 的第二份 pending-bundle 生命週期
 - **保留**：ADR 0064 的 Deep Agents provider-neutral VFS、六個低階 filesystem verbs、canonical JD resources、禁止 business-specific write Tool、split／merge 一般操作組合、確定性 Evidence quote resolver、employee authority、provider-neutral adapter、no-RAG 與窄驗證原則；ADR 0065 的 model／token／cost／elapsed hard guards 先作保險絲保留，待新拓撲實測後才另開 successor 校準
 

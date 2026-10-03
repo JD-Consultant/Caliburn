@@ -1,6 +1,6 @@
 # H4-R1：有界批次的 B1 在真 PostgreSQL 上保存與恢復
 
-2026-09-14；JD-R002／OI-01、OI-02。實作[H4 計畫 §4 R1](../../../plans/2026-09-14-jd-h4-runtime-integration.md) 第2–5點，接續同單位[第1點的批次接點](fixed-target-batch-results.md)。基準 `7a2a381b`。**0 provider、沒有新增資料表、沒有新 parser／游標／B1 流程。**
+2026-09-14；JD-R002／OI-01、OI-02。實作[H4 計畫 §4 R1](../../../archive/implementation-plans/2026-09-14-jd-h4-runtime-integration.md) 第2–5點，接續同單位[第1點的批次接點](fixed-target-batch-results.md)。基準 `7a2a381b`。**0 provider、沒有新增資料表、沒有新 parser／游標／B1 流程。**
 
 ## 範圍
 

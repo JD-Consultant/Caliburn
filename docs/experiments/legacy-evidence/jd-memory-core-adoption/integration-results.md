@@ -1,6 +1,6 @@
 # Memory 核心：套件與真資料庫接合結果
 
-2026-09-13，零 provider 呼叫；[設計](../../../specs/2026-09-13-jd-memory-core-adoption-slice.md)。這是已保存原話→Memory 核心的實證，尚未證明模型會正確整理工作，也未接日常宿主 Store／背景排程。
+2026-09-13，零 provider 呼叫；[設計](../../../archive/legacy-specs/2026-09-13-jd-memory-core-adoption-slice.md)。這是已保存原話→Memory 核心的實證，尚未證明模型會正確整理工作，也未接日常宿主 Store／背景排程。
 
 ## 環境與可重現範圍
 
@@ -32,4 +32,4 @@
 
 原來源故障、context、工具、手改 service、managed App、AI runtime，加新 Memory source，共 **113 PASS／14.43s**。僅上游 Starlette 使用 AnyIO 已棄用 alias 的一則 DeprecationWarning；未因此升級或改動無關框架。核心 **44 PASS**、source **71 PASS** 及獨審 **98 PASS** 的重疊範圍分別見[核心](core-results.md)、[來源](source-results.md)、[審查](review.md)，不累加成獨立案例數。
 
-未跑新畫面／自然模型，未重新執行全部無關 App 測試。未完成的模型 Memory 工具、B1/B2/C、宿主 Store／備份及專業品質仍在[唯一清單 OI-01／02／08／09](../../../specs/2026-09-13-jd-app-open-issues.md)。
+未跑新畫面／自然模型，未重新執行全部無關 App 測試。未完成的模型 Memory 工具、B1/B2/C、宿主 Store／備份及專業品質仍在[唯一清單 OI-01／02／08／09](../../../archive/legacy-specs/2026-09-13-jd-app-open-issues.md)。

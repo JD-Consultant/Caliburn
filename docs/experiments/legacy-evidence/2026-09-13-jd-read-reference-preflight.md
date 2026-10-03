@@ -1,9 +1,9 @@
 # JD 讀取與 App 引用：有界實作前置
 
-**同日後續實作狀態：**本文保留前置研究時點；下文「候選／待施工」不是最新缺口清單。[共同保存交易](../../specs/2026-09-13-jd-transaction-service-slice.md)已完成永久 receipt；[同版讀取切片](../../specs/2026-09-13-jd-read-change-implementation.md)已採 ItsDangerous 2.2.0，驗六章 DTO、refs／cursor、短唯讀 SQL 歷史、固定 JD 差異及原結果投影。宿主 key／dataset、實際來源／writer／selection、公開 change-read 與 HTTP／Web 仍待接線；真實驗證種類與限制依結果稿，不推定全部 App 已完成。
+**同日後續實作狀態：**本文保留前置研究時點；下文「候選／待施工」不是最新缺口清單。[共同保存交易](../../archive/legacy-specs/2026-09-13-jd-transaction-service-slice.md)已完成永久 receipt；[同版讀取切片](../../archive/legacy-specs/2026-09-13-jd-read-change-implementation.md)已採 ItsDangerous 2.2.0，驗六章 DTO、refs／cursor、短唯讀 SQL 歷史、固定 JD 差異及原結果投影。宿主 key／dataset、實際來源／writer／selection、公開 change-read 與 HTTP／Web 仍待接線；真實驗證種類與限制依結果稿，不推定全部 App 已完成。
 
 - 查閱日：2026-09-13；Topic：JD-R002；RS-1 設計建議，尚非讀取／DB／重啟實測結果。
-- 依據：[工具 §3.1／3.7／5／9](../../specs/2026-09-12-jd-relational-agent-tool-contract.md)、[保存 §4.3／9](../../specs/2026-09-12-jd-relational-schema-and-write-contract.md)、[業務 §3–4](../../specs/2026-09-12-jd-business-operations-and-scope-design.md)、[完整六章旅程](../../specs/2026-09-13-jd-complete-app-journey-design.md)、[欄位充分性](../../specs/2026-09-13-jd-field-sufficiency-audit.md)及[施工計畫](../../plans/2026-09-13-jd-relational-app-implementation.md)。
+- 依據：[工具 §3.1／3.7／5／9](../../specs/2026-09-12-jd-relational-agent-tool-contract.md)、[保存 §4.3／9](../../specs/2026-09-12-jd-relational-schema-and-write-contract.md)、[業務 §3–4](../../specs/2026-09-12-jd-business-operations-and-scope-design.md)、[完整六章旅程](../../specs/2026-09-13-jd-complete-app-journey-design.md)、[欄位充分性](../../specs/2026-09-13-jd-field-sufficiency-audit.md)及[施工計畫](../../archive/implementation-plans/2026-09-13-jd-relational-app-implementation.md)。
 - 本單位只新增本文件；未改程式、契約、生成器或依賴，未讀金鑰、呼叫模型、接資料庫。公開官方查閱不含私有 JD 材料。其他作者正在實作的結果契約不以本文冒稱已完成。
 
 ## 1. 可採方向與目前缺口

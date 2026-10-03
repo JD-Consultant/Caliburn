@@ -73,6 +73,6 @@ context 缺 `turns/next_offset` 的問題在此 adapter 完成：無後頁要明
 - [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)：refusal／incomplete 是需另處理的結果，schema 不等於所有回覆必然完整可用。
 - [Anthropic Structured Outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)：原生 output_config.format，refusal／max_tokens 可不符合schema；不能因HTTP200就當成功。
 - 本地 `langchain_anthropic/chat_models.py` 的 `with_structured_output`／`_make_message_chunk_from_anthropic_event`：框架已提供原生schema及解析；忽略extra kwargs與串流metadata差異由本次精確版本原碼、固定SDK探針核對。這是版本限制，不能推論所有framework版本都相同。
-- [採用映射](../../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)、[窗口契約](../../../specs/2026-09-13-jd-interview-window-source-contract.md)、[runtime接合界線](../../../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)：已驗顧問方法可採用，新App接合及跨provider品質仍需另驗。
+- [採用映射](../../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)、[窗口契約](../../../specs/2026-09-13-jd-interview-window-source-contract.md)、[runtime接合界線](../../../archive/legacy-specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)：已驗顧問方法可採用，新App接合及跨provider品質仍需另驗。
 
 共同原則是使用原生結構化輸出、核真實結果、由App保護保存；`accepted` 函式與本案來源adapter是有限整合，不宣稱大廠指定相同介面。

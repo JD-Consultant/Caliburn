@@ -32,4 +32,4 @@
 - ⚠️ URL 從 `/v3` 改 `/documents`——僅 dev、無外部消費者,可接受;舊書籤失效。
 - ⚠️ OTel `service.name` 改名 → 與舊 `jobintel-v3` 的 trace 連續性中斷(早期、可接受);persist key 改名 → 本機 UI 偏好重置(dev)。
 - ⚠️ DB 為**全新空庫**;qdrant `ocs_v4` 保留。
-- 📌 收尾 tag `rename-caliburn`。執行計畫見 [`../plans/2026-06-29-naming-cleanup.md`](../plans/2026-06-29-naming-cleanup.md)。
+- 📌 收尾 tag `rename-caliburn`。執行計畫見 [`../plans/2026-06-29-naming-cleanup.md`](../history.md#source-3a6a7932444f79d8eb39)。

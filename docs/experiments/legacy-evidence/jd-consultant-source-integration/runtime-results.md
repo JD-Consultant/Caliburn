@@ -24,4 +24,4 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 
 ## 效力
 
-這組使用真 native Agent／Saver／Futures 與合成 material ports；不是 PostgreSQL、真瀏覽器、自然模型或真人證據。費用、來源 UI、較早 Memory 回查與完整專業顧問仍按[收尾清單](../../../specs/2026-09-13-jd-app-open-issues.md)推進。本輪沒有 provider 請求，也沒有正式產品採用切換。
+這組使用真 native Agent／Saver／Futures 與合成 material ports；不是 PostgreSQL、真瀏覽器、自然模型或真人證據。費用、來源 UI、較早 Memory 回查與完整專業顧問仍按[收尾清單](../../../archive/legacy-specs/2026-09-13-jd-app-open-issues.md)推進。本輪沒有 provider 請求，也沒有正式產品採用切換。

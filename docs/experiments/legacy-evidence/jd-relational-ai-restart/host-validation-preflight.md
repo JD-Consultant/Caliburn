@@ -4,7 +4,7 @@
 
 後續同日獲授權的有限 owner 實作與非 DB 驗證另記 §7；§1–6 保留前置時點，四個真新程序場景仍未由本作者執行。
 
-有效路由：[目前決策](../../../current-decisions.md)、[AI 回合與工具結果](../../../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)、[人工 Windows 重啟結果](../../../specs/2026-09-13-jd-host-restart-recovery-slice.md)。本輪延續現有鎖定版本，不安裝、升級或重開框架比較。
+有效路由：[目前決策](../../../current-decisions.md)、[AI 回合與工具結果](../../../archive/legacy-specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)、[人工 Windows 重啟結果](../../../archive/legacy-specs/2026-09-13-jd-host-restart-recovery-slice.md)。本輪延續現有鎖定版本，不安裝、升級或重開框架比較。
 
 ## 1. 結論與先接的差異
 
@@ -45,7 +45,7 @@
 | 同頁 PG advisory lock 官方契約 | Advisory lock 由應用程式自訂使用，session／transaction lifetime 不同；也不能證明原 process group 或 checkpoint 已關閉。**現行 relational JdStorage 的這條恢復路徑沒有 advisory lock**，本輪不替舊維護設計的 advisory 機制新增接線或聲稱已使用。 |
 | [AWS safe retries](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/) | 原 key／原意圖／原結果由既有 operation identity／receipt 核對。OS proof 只讓 App 能進 failure-only 對帳，不授權重播原 LLM／mutation。已 committed 保持原 created_at、base/result、status／error 語意，不升到新 head。 |
 
-平台版本沿已驗 Windows 10.0.26200／pywin32 312／PG18.6，以及 App 已鎖的 Python／LangGraph／PG Saver；授權與精確來源見[既有 Windows 結果 §2](../../../specs/2026-09-13-jd-host-restart-recovery-slice.md#2-官方契約與本案映射)。這是公開契約與本案接法，不猜測雲端厂商的內部宿主實作。
+平台版本沿已驗 Windows 10.0.26200／pywin32 312／PG18.6，以及 App 已鎖的 Python／LangGraph／PG Saver；授權與精確來源見[既有 Windows 結果 §2](../../../archive/legacy-specs/2026-09-13-jd-host-restart-recovery-slice.md#2-官方契約與本案映射)。這是公開契約與本案接法，不猜測雲端厂商的內部宿主實作。
 
 **Proof 有效期：**foreign entry 必須仍綁本次真 lease，每次恢復交易開始及 row barrier 後照原 `require_stopped` 再核；若 lease 不再有效、checkpoint scope／原 binding 不符、SQL 結果不明，整個 startup 維持未 ready。不能 cache 一個布林結果到下一 host generation；不能以某一份文件恢復成功代證全 catalog 已掃描。
 

@@ -2,7 +2,7 @@
 
 - 狀態：Accepted
 - 日期：2026-08-02
-- 依據：[`docs/specs/2026-08-02-icap-2026-quality-manual-form-authority.md`](../specs/2026-08-02-icap-2026-quality-manual-form-authority.md)
+- 依據：[`docs/specs/2026-08-02-icap-2026-quality-manual-form-authority.md`](../research/work-analysis/2026-08-02-icap-2026-quality-manual-form-authority.md)
   （2026-01-27 版官方手冊，2026-08-02 自 icap.wda.gov.tw 下載逐字核對）
 - 延續：[0040](0040-professional-consultant-engine-and-r1-validation-contract.md) 決定 33–34（公版匯出措辭）、
   [0048](0048-opks-evidence-axes-and-document-level-competencies.md)（Attitude 預設留空）

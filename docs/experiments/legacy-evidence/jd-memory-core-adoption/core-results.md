@@ -1,6 +1,6 @@
 # Memory 核心採用：實作與離線驗收
 
-日期：2026-09-13。依[本次設計](../../../specs/2026-09-13-jd-memory-core-adoption-slice.md)，採用既有 checkout `033540cef870d1f92baa5c69133a799231c46d48` 的三個核心。結果 **44 PASS／6.86 秒**；真 DeepAgents StoreBackend／LangGraph InMemoryStore、原生圖作用域與 SQLite 發布交易。沒有 provider、PG、服務或新程序驗收。
+日期：2026-09-13。依[本次設計](../../../archive/legacy-specs/2026-09-13-jd-memory-core-adoption-slice.md)，採用既有 checkout `033540cef870d1f92baa5c69133a799231c46d48` 的三個核心。結果 **44 PASS／6.86 秒**；真 DeepAgents StoreBackend／LangGraph InMemoryStore、原生圖作用域與 SQLite 發布交易。沒有 provider、PG、服務或新程序驗收。
 
 ## 實際採用差異
 

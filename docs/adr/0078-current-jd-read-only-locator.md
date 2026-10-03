@@ -2,7 +2,7 @@
 
 - 狀態：Proposed（2026-09-24；分支內施工、離線回歸及三筆有界真模型定位元件檢查通過，不以本文單獨宣稱完整產品驗收）
 - 決策範圍：正式新 App 的 A 顧問讀取目前 JD；不變更 JD、Memory、來源或保存 authority
-- 依據：[設計與比較](../specs/2026-09-24-jd-context-navigation-design.md)、[ADR 0075](0075-relational-jd-authority-and-structured-editor.md)、[ADR 0077](0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)
+- 依據：[設計與比較](../history.md#source-7db271c99e2714eddc65)、[ADR 0075](0075-relational-jd-authority-and-structured-editor.md)、[ADR 0077](0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)
 
 ## 脈絡
 

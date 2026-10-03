@@ -344,7 +344,7 @@ CT49 的錯誤後成功修正與 CT50／51 的訪談、重開、容量證據可�
 
 **跨來源共同原則（Inference）：**工具可理解、App 執行與驗證、原生 call/result 正確配對、格式保證和實際副作用分開。兩家都提供 strict，但子集／預設／適用工具並不相同，不能稱「一份 schema 原樣跨廠」是共識。基底版本與防重複發布另有 Google／AWS 的直接契約支持；這不是 OpenAI／Anthropic 未公開的內部設計。
 
-**對定稿的約束：**[正式 schema 附件](../../specs/2026-09-10-jd-editor-contract-schema.md)須列本機 SSOT、實際模型參數及 runtime 注入的分界，並指定既有 provider 的具體 binding 路徑與未驗限制；施工驗收要查實際送出形狀。模型工具輸入仍須經 App 完整驗證，strict 不替代來源、同文件／同版本、保存或專業品質檢查。文檔引用沒有帶入商業 SDK／服務授權；免費 OSS 採用仍按正式 profile 的逐套件 license 證據。現行 API／契約和成熟度是查閱時狀態，不擅自升級既有 Memory 模型／provider。
+**對定稿的約束：**[正式 schema 附件](../../archive/legacy-specs/2026-09-10-jd-editor-contract-schema.md)須列本機 SSOT、實際模型參數及 runtime 注入的分界，並指定既有 provider 的具體 binding 路徑與未驗限制；施工驗收要查實際送出形狀。模型工具輸入仍須經 App 完整驗證，strict 不替代來源、同文件／同版本、保存或專業品質檢查。文檔引用沒有帶入商業 SDK／服務授權；免費 OSS 採用仍按正式 profile 的逐套件 license 證據。現行 API／契約和成熟度是查閱時狀態，不擅自升級既有 Memory 模型／provider。
 
 ## 3. 跨廠共同原則與產品政策差異
 
@@ -453,7 +453,7 @@ Memory 提供相關理解、未知、更正及可回查的來源上下文，不�
 
 ## 8. 後續研究依賴順序
 
-以下是技術依賴，階段及唯一下一題統一依[執行計畫](../../plans/2026-09-09-jd-editor-research-discussion-design.md)與[App 能力對照 §5](../../specs/2026-09-09-jd-app-native-capability-crosswalk.md#5-下一個可決定的單位)。先在 S3 收斂必要政策並寫出有限驗證的正常／失敗流程；原保存重開、連續修改與組外修訂反例依新政策分層，未預定必採 pending。下面完整清單只在相關政策需要時適用，不要求一次全驗，也不由本證據稿另加安裝許可流程。
+以下是技術依賴，階段及唯一下一題統一依[執行計畫](../../archive/implementation-plans/2026-09-09-jd-editor-research-discussion-design.md)與[App 能力對照 §5](../../specs/2026-09-09-jd-app-native-capability-crosswalk.md#5-下一個可決定的單位)。先在 S3 收斂必要政策並寫出有限驗證的正常／失敗流程；原保存重開、連續修改與組外修訂反例依新政策分層，未預定必採 pending。下面完整清單只在相關政策需要時適用，不要求一次全驗，也不由本證據稿另加安裝許可流程。
 
 1. **固定免費 OSS 候選、版本與授權**：排除 Plus／cloud／commercial-only 能力，鎖定實際可採用 source。
 2. **文件與審閱限界驗證**：不用 LLM，測 serialize/reopen、pending 人工插刪改、交疊變更、局部／整批 accept/reject、undo/redo、history 與作者 metadata。

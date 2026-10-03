@@ -2,7 +2,7 @@
 
 - 狀態：**Rejected（暫不採用，2026-08-06 owner 裁決）**
 - 日期：2026-08-06
-- 依據：[`docs/specs/2026-08-06-opks-gap-reanalysis-blocking-research.md`](../specs/2026-08-06-opks-gap-reanalysis-blocking-research.md)、
+- 依據：[`docs/specs/2026-08-06-opks-gap-reanalysis-blocking-research.md`](../history.md#source-ac1065fee5fe7eab8f68)、
   [Opus 5 與 Luna-Pro 兩次 live smoke](../experiments/2026-08-06-opks-progressive-elicitation-live-smoke/README.md)
 - 修正：[0054](0054-opks-progressive-elicitation-and-scheduled-child-operation.md) 決定 3 的**一條** pre-gate 條件。
   **0054 其餘決策全部不變**，特別是決定 20（specialist 不解決 issue）、決定 22–24（缺口的三條出路）、
@@ -29,7 +29,7 @@ K/S 可能碎片化）。
 
 **要重啟需要的證據是缺口關閉率**：一次 10–15 回合、2–3 件工作的實測，看缺口消得比開得快還是慢。
 在那個數字出現之前不再討論此案。研究紀錄
-[`2026-08-06-opks-gap-reanalysis-blocking-research.md`](../specs/2026-08-06-opks-gap-reanalysis-blocking-research.md)
+[`2026-08-06-opks-gap-reanalysis-blocking-research.md`](../history.md#source-ac1065fee5fe7eab8f68)
 保留完整分析與兩次 live smoke 依據。
 
 以下**脈絡／決定／後果**維持提案當時原樣，作為當初主張的紀錄，不再修改。

@@ -66,8 +66,8 @@ App 呼叫 standalone compaction，採用其完整返回視窗，而不是自行
 
 UI 可呈現 `commentary` 類的公開進度，並在完成後供使用者展開回看。這些文字不是 reasoning 原文，不取得正式訪談序號，也不能作為 Memory／JD 的員工事實來源。正式答覆須依前述流程完成保存；生成中的串流片段則不承諾永久逐 token 恢復。
 
-### 追到實作與證據
+### 延伸閱讀
 
 - Context 與容量：[執行接線](../../implementation/agent-execution.md)、[context_binding.py](../../../apps/api/src/caliburn/agents/job_consultant/context_binding.py)、[request_capacity.py](../../../apps/api/src/caliburn/agent_execution/request_capacity.py)。
 - 完成交易：[consultant_completion.py](../../../apps/api/src/caliburn/workflows/consultant_completion.py)。
-- 已驗與未驗：[T06](../../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)、[T08](../../plans/2026-09-29-target-rebuild/evidence/t08-consultant-turn.md)、[T16](../../plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)。
+- 實驗範圍與限制：[顧問 Context 測試](../../history.md#source-d76bfd79f21fb146c537)、[完整回合與公開進度測試](../../history.md#source-f5df4f496aad7b909036)、[長訪談容量實驗](../../history.md#source-6d2d7ab4abfedbf8416e)。

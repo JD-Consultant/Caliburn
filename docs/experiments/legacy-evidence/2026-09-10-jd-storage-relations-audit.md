@@ -7,7 +7,7 @@
 
 ## 1. 權威與版本範圍
 
-本輪依 [current register](../../current-decisions.md)、[decision process](../../decision-process.md)、[主設計 §4.1／§5.4](../../specs/2026-09-09-jd-editor-app-integration-design.md)、[ADR 0073](../../adr/0073-plate-jd-app-working-document-and-revision-authority.md)、[Task 2](../../plans/2026-09-10-jd-editor-core-implementation.md#task-2同-pg-唯一工作稿revision-與回執)、[schema](../../specs/contracts/jd-editor-v1.schema.json)。Owner 已選同 PG 唯一 JD 工作稿、immutable revisions 與可查差異；來源／Memory 保留既有 owner。ADR 仍 Proposed，隔離接合不等於 production authority 切換。
+本輪依 [current register](../../current-decisions.md)、[decision process](../../decision-process.md)、[主設計 §4.1／§5.4](../../archive/legacy-specs/2026-09-09-jd-editor-app-integration-design.md)、[ADR 0073](../../adr/0073-plate-jd-app-working-document-and-revision-authority.md)、[Task 2](../../archive/implementation-plans/2026-09-10-jd-editor-core-implementation.md#task-2同-pg-唯一工作稿revision-與回執)、[schema](../../archive/legacy-specs/contracts/jd-editor-v1.schema.json)。Owner 已選同 PG 唯一 JD 工作稿、immutable revisions 與可查差異；來源／Memory 保留既有 owner。ADR 仍 Proposed，隔離接合不等於 production authority 切換。
 
 **Fact：**repo [docker-compose.yml](../../../docker-compose.yml:8) 指定 `postgres:16`；官方 current 文件本次解析為 PostgreSQL 18。本文實作依據均另核 PostgreSQL 16 固定文件，不使用 18 才有的能力。未查 DB，不能由浮動 image tag 推定正在執行的 minor 版本或實際 WAL 設定。
 

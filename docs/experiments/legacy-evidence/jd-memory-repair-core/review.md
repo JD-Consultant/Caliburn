@@ -52,7 +52,7 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 
 ## 階段 C：真 PG 證據及切片宣稱的唯讀核對
 
-已唯讀核對 [test_memory_repair_postgres.py](../../../../experiments/jd-relational-app/tests/test_memory_repair_postgres.py)、[作者 PG 結果](postgres-results.md)及[本輪切片](../../../specs/2026-09-13-jd-memory-repair-core-slice.md)。**文件／測試一致性 PASS，沒有具體 P1／P2 阻擋；本審查者沒有重跑 PG。**作者最後單案 `1 PASS／8.01 秒` 保持為作者執行證據，不併入階段 A／B 數字。
+已唯讀核對 [test_memory_repair_postgres.py](../../../../experiments/jd-relational-app/tests/test_memory_repair_postgres.py)、[作者 PG 結果](postgres-results.md)及[本輪切片](../../../archive/legacy-specs/2026-09-13-jd-memory-repair-core-slice.md)。**文件／測試一致性 PASS，沒有具體 P1／P2 阻擋；本審查者沒有重跑 PG。**作者最後單案 `1 PASS／8.01 秒` 保持為作者執行證據，不併入階段 A／B 數字。
 
 測試先於公開 fixed child checkpoint 取得原 `PublishRequest`，明驗無 receipt 的 reconcile 不發布；然後為注入故障才明示 resume，真正 `PublicationStore.publish` 返回後拋合成 ACK lost。兩次 patch／一次 artifact save／一次 publish 的計數與原 request 保留都有斷言。查回階段封鎖 patch、save、Store.put、publish、來源正文 read，仍取得原 applied revision 2；沒有用重播候選換來成功。
 

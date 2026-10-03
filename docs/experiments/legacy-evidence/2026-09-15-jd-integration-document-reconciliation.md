@@ -1,6 +1,6 @@
 # JD App／LLM 顧問接線文件對齊工作稿
 
-> **2026-09-16 最新效力：**Owner 已結束「等待 OpenRouter／A-B2 direct OpenAI／替代策略」三選一，採 [OpenRouter／Luna App-side continuity compaction](../../specs/2026-09-16-openrouter-continuation-compaction-design.md)。canonical 原文不裁，summary＋涵蓋邊界只作 request-only 衍生 Context，不是第二套 Memory；A 按文件保存，B2 按 attempt 保存且 stale 清空。2026-09-15 adapter contract 與真 smoke 的 `SERVER-UNVERIFIED` 結果繼續作 transport 證據，但下文所有「等待 Owner transport 裁決」均已 superseded。此決定不重做顧問 Prompt、Skills、Memory ABC、JD writer 或 publication，也不表示正式 dispatcher／完整 App 驗收已完成。
+> **2026-09-16 最新效力：**Owner 已結束「等待 OpenRouter／A-B2 direct OpenAI／替代策略」三選一，採 [OpenRouter／Luna App-side continuity compaction](../../archive/legacy-specs/2026-09-16-openrouter-continuation-compaction-design.md)。canonical 原文不裁，summary＋涵蓋邊界只作 request-only 衍生 Context，不是第二套 Memory；A 按文件保存，B2 按 attempt 保存且 stale 清空。2026-09-15 adapter contract 與真 smoke 的 `SERVER-UNVERIFIED` 結果繼續作 transport 證據，但下文所有「等待 Owner transport 裁決」均已 superseded。此決定不重做顧問 Prompt、Skills、Memory ABC、JD writer 或 publication，也不表示正式 dispatcher／完整 App 驗收已完成。
 
 日期：2026-09-15
 狀態：CURRENT ALIGNMENT／第一個正式組裝切片已完成、尚未提交；本稿同時是後續接線盤點入口，不是 production authority 切換證明。

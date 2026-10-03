@@ -5,7 +5,7 @@
 ## 範圍與責任
 
 - [實作](../../../../experiments/jd-relational-app/src/jd_relational/storage/history.py)：新增 `RunChangeMaterial`／`read_run_change`，以及共用 `_revision_producer` 的抽取。
-- [54 個新純測試](../../../../experiments/jd-relational-app/tests/test_run_change_material.py)、原歷史讀取反例及[本輪結果稿](../../../specs/2026-09-13-jd-run-change-material-slice.md)。
+- [54 個新純測試](../../../../experiments/jd-relational-app/tests/test_run_change_material.py)、原歷史讀取反例及[本輪結果稿](../../../archive/legacy-specs/2026-09-13-jd-run-change-material-slice.md)。
 - 依[CV-01](../../../specs/2026-09-12-jd-change-visibility-design.md)及[HR-02](../../../specs/2026-09-12-jd-ai-turn-undo-design.md)核對歸屬、固定比較範圍與上層責任；另讀現行 `AiRuntime.inspect_run`、`SavedOperation.from_row` 及 schema 約束。
 
 原生回合與實際 writer 是否閉合、是否取得該回合完整操作集合，仍由 App／runtime 核對。本函式只驗本次已捕捉的 committed ID 集合，不要求它讀 Saver 或額外證明模型回合完成；返回值也沒有 terminal／撤回資格旗標。

@@ -702,7 +702,7 @@ revision history 只能可靠回答前者，不能自動回答後者。若使用
 
 ### D6. 更新一致性與失敗行為（Owner 已確認）
 
-> **2026-09-04 reconciliation：**`MEM-Q005` 進一步區分「使用某份語意內容」與「該內容已持久化成 Memory」。本節原本把所有 durable／對外可觀察 effect 都視為 read-after-publish dependency，範圍過大。同一 Context 與同一份已驗證理解形成的 Memory mutation 和 JD 待審變更是並列 effects；Memory 技術性持久化失敗不會自行使 JD 候選失效。只有真正必須重新讀取新 Memory head 的後續步驟，以及全面完整性宣稱，才保留 publication barrier。完整裁決見 [`2026-09-04-memory-persistence-and-jd-effect-reconciliation.md`](../../specs/2026-09-04-memory-persistence-and-jd-effect-reconciliation.md)。
+> **2026-09-04 reconciliation：**`MEM-Q005` 進一步區分「使用某份語意內容」與「該內容已持久化成 Memory」。本節原本把所有 durable／對外可觀察 effect 都視為 read-after-publish dependency，範圍過大。同一 Context 與同一份已驗證理解形成的 Memory mutation 和 JD 待審變更是並列 effects；Memory 技術性持久化失敗不會自行使 JD 候選失效。只有真正必須重新讀取新 Memory head 的後續步驟，以及全面完整性宣稱，才保留 publication barrier。完整裁決見 [`2026-09-04-memory-persistence-and-jd-effect-reconciliation.md`](../../history.md#source-7e650e490d711d906dd8)。
 
 先拆開四個容易被誤寫成同一件事的時間點：
 
@@ -1837,11 +1837,11 @@ search_memory(query)
 
 這次深潛完成後，下一步才是：
 
-1. **已完成第一輪：**[`2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md` §5](../../specs/2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md) 已從高品質 JD 倒推出 M1～M11，並切開 Memory 與 LLM／Skill／Tool／authority 的責任；
-2. **已完成第二輪：**[`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9](../../specs/2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 已逐項 mapping M1～M11 到共同 primitive 與成熟差異能力；
-3. **已完成第三輪：**[`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9.9～§9.14](../../specs/2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 已比較 retention／admission 差異方案，將來源資格、語意 admission、持久化政策與其後 consolidation 切開；目前只暫定責任分界，未選框架或 Prompt；
-4. **已完成第四輪：**[`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9.15～§9.21](../../specs/2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 已重新核對 D4 並完成 M5 mapping：成熟 lifecycle／revision 可承接基礎能力，但 managed default 不能自動冒充產品 truth policy；目前推薦用成熟 extension seam 承載 unknown／unresolved conflict 語意，尚待 Owner 確認；
-5. **已完成第五輪：**關係表徵、完整盤點與案例／穩定工作界線的產品 mapping 已集中記錄於 [`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9.22～§9.25](../../specs/2026-08-30-caliburn-memory-requirements-mapping-working-research.md)，本文新增 §13.14～§13.15 保存本輪通用事實；
+1. **已完成第一輪：**[`2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md` §5](../work-analysis/2026-08-31-perfect-jd-llm-capability-and-mechanism-working-research.md) 已從高品質 JD 倒推出 M1～M11，並切開 Memory 與 LLM／Skill／Tool／authority 的責任；
+2. **已完成第二輪：**[`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9](2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 已逐項 mapping M1～M11 到共同 primitive 與成熟差異能力；
+3. **已完成第三輪：**[`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9.9～§9.14](2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 已比較 retention／admission 差異方案，將來源資格、語意 admission、持久化政策與其後 consolidation 切開；目前只暫定責任分界，未選框架或 Prompt；
+4. **已完成第四輪：**[`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9.15～§9.21](2026-08-30-caliburn-memory-requirements-mapping-working-research.md) 已重新核對 D4 並完成 M5 mapping：成熟 lifecycle／revision 可承接基礎能力，但 managed default 不能自動冒充產品 truth policy；目前推薦用成熟 extension seam 承載 unknown／unresolved conflict 語意，尚待 Owner 確認；
+5. **已完成第五輪：**關係表徵、完整盤點與案例／穩定工作界線的產品 mapping 已集中記錄於 [`2026-08-30-caliburn-memory-requirements-mapping-working-research.md` §9.22～§9.25](2026-08-30-caliburn-memory-requirements-mapping-working-research.md)，本文新增 §13.14～§13.15 保存本輪通用事實；
 6. **已完成第一輪完整候選比較：**框架、Prompt／Tool、Context、成本與最低驗證的暫定產品建議記錄於 mapping 文檔 §9.26～§9.31；仍須 Owner 核准後才可進 ADR／plan。
 
 本節沒有替 Caliburn 選擇 `MEMORY.md`、atomic fact、profile、topic、LangMem 或任何 schema。

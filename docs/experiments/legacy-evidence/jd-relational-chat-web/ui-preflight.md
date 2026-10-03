@@ -2,7 +2,7 @@
 
 - 查閱日：2026-09-13；Topic：JD-R002／RS-4 局部；狀態：**有界研究與可採設計建議，未實作／未驗收此聊天 Web**。
 - 範圍：聊天輸入、原回合查回、執行／收尾／恢復、唯一結構 JD、CV-01 改動可見性、HR-02 接點。只寫本文件，0 provider；不安裝套件、不執行 DB／瀏覽器／模型，不更動欄位及保存責任。
-- 有效需求：[CV-01 已選 A](../../../specs/2026-09-12-jd-change-visibility-design.md)、[HR-02 整輪 JD 撤回](../../../specs/2026-09-12-jd-ai-turn-undo-design.md)、[完整同頁旅程](../../../specs/2026-09-13-jd-complete-app-journey-design.md)。現況依[聊天 HTTP 結果](../../../specs/2026-09-13-jd-chat-http-slice.md)及實碼；舊研究的當時未完成事項不覆寫目前實作。
+- 有效需求：[CV-01 已選 A](../../../specs/2026-09-12-jd-change-visibility-design.md)、[HR-02 整輪 JD 撤回](../../../specs/2026-09-12-jd-ai-turn-undo-design.md)、[完整同頁旅程](../../../specs/2026-09-13-jd-complete-app-journey-design.md)。現況依[聊天 HTTP 結果](../../../archive/legacy-specs/2026-09-13-jd-chat-http-slice.md)及實碼；舊研究的當時未完成事項不覆寫目前實作。
 
 ## 1. 可採結論與完成界線
 

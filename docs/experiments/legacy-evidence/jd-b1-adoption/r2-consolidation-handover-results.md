@@ -1,6 +1,6 @@
 # H4-R2：B1→B2→publication 的採用與有序交接
 
-2026-09-14；JD-R002／OI-01、OI-02。實作[H4 計畫 §4 R2](../../../plans/2026-09-14-jd-h4-runtime-integration.md)，接續 [R1](r1-postgres-batch-results.md)。基準 `151723ea`／tag `jd-h4-r1-postgres-batch-20260914`。**0 provider、沒有新增資料表、沒有第二個發布權威。**
+2026-09-14；JD-R002／OI-01、OI-02。實作[H4 計畫 §4 R2](../../../archive/implementation-plans/2026-09-14-jd-h4-runtime-integration.md)，接續 [R1](r1-postgres-batch-results.md)。基準 `151723ea`／tag `jd-h4-r1-postgres-batch-20260914`。**0 provider、沒有新增資料表、沒有第二個發布權威。**
 
 ## 1. 先對應，再只採用缺少的
 
@@ -89,7 +89,7 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 ## 6. 限制與未完成
 
 1. **R2 完成的是採用與交接本身。**通知註冊、背景准入、宿主生命週期、真新 Windows 程序全部未做——那是 R3。
-2. **「同文件只能有一筆未交接完的 B 批次」目前仍靠 caller 串行。**本輪示範了正確順序並驗證其耐久性，但**沒有**在程式中加入阻擋門閘。獨立審查已重現具體後果：文件尚無 publication 時，B1 跑完 batch1 後不叫 B2、直接以相鄰的下一個範圍 `start()`，`follows()` 會合法通過並覆寫 `files`；B2 接著發布較後那批，游標永久越過 batch1 的詳記，而映射 §3.2 明文禁止掃 Store 補救。這是 R3 的准入責任，已寫進[H4 計畫 §4 R2 第 3 點](../../../plans/2026-09-14-jd-h4-runtime-integration.md)的移交註記。**不得由本稿推導該情形已被擋下。**
+2. **「同文件只能有一筆未交接完的 B 批次」目前仍靠 caller 串行。**本輪示範了正確順序並驗證其耐久性，但**沒有**在程式中加入阻擋門閘。獨立審查已重現具體後果：文件尚無 publication 時，B1 跑完 batch1 後不叫 B2、直接以相鄰的下一個範圍 `start()`，`follows()` 會合法通過並覆寫 `files`；B2 接著發布較後那批，游標永久越過 batch1 的詳記，而映射 §3.2 明文禁止掃 Store 補救。這是 R3 的准入責任，已寫進[H4 計畫 §4 R2 第 3 點](../../../archive/implementation-plans/2026-09-14-jd-h4-runtime-integration.md)的移交註記。**不得由本稿推導該情形已被擋下。**
 3. 資源重建仍是**同一程序內**關閉再開。真新 Windows 程序取回原 B 工作是 R3 第 7 點。
 4. 固定 SDK 回覆不是自然模型品質；B2 的整併內容由測試指定，不代表模型會自主寫出同樣的理解。**日常 AI 仍未啟用。**
 5. 本輪沒有重建 wheel；`adoption.json` 的 hash 證明的是原始碼，不是已封裝產物。

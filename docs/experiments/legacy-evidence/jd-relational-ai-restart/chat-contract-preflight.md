@@ -6,7 +6,7 @@
 
 ## 1. 有效需求與不可混淆的效果
 
-需求沿[自動保存與 AI 交接](../../../specs/2026-09-12-jd-autosave-and-handoff-design.md#4-與-ai匯出及離開操作交接)、[歷史與恢復](../../../specs/2026-09-12-jd-history-and-recovery-design.md)、[整輪 JD 撤回](../../../specs/2026-09-12-jd-ai-turn-undo-design.md)、[改動呈現](../../../specs/2026-09-12-jd-change-visibility-design.md)及[最新 RS-4 結果](../../../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)。較早文件的實作狀態、舊路徑及舊 PG 版本不是本輪採用依據；只承接仍有效的產品語意。
+需求沿[自動保存與 AI 交接](../../../specs/2026-09-12-jd-autosave-and-handoff-design.md#4-與-ai匯出及離開操作交接)、[歷史與恢復](../../../specs/2026-09-12-jd-history-and-recovery-design.md)、[整輪 JD 撤回](../../../specs/2026-09-12-jd-ai-turn-undo-design.md)、[改動呈現](../../../specs/2026-09-12-jd-change-visibility-design.md)及[最新 RS-4 結果](../../../archive/legacy-specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)。較早文件的實作狀態、舊路徑及舊 PG 版本不是本輪採用依據；只承接仍有效的產品語意。
 
 | 使用者要得到的效果 | App 必須保證 |
 |---|---|
@@ -34,7 +34,7 @@
 | [LangGraph Streaming](https://docs.langchain.com/oss/python/langgraph/streaming)，本案 pin 1.2.11，MIT | 原生 stream 模式區分 messages／updates 等資料，可包含 subgraph；模型 token 與 state update 用途不同。 | 目前 coordinator 是 invoke＋callback，尚無 browser 訂閱 port。後續以 native stream／callback 的有界投影接預覽，不自建 Agent loop、工具 mapper 或持久事件權威。 |
 | [WHATWG SSE](https://html.spec.whatwg.org/multipage/server-sent-events.html)，現行 Living Standard | EventSource 會重新建立連線；event ID／Last-Event-ID 參與重連。 | 重連是重新觀察，不是重新 POST 模型。沒有可重播事件來源時不冒稱 Last-Event-ID 能找回所有 token；以原生保存 snapshot 恢復正確畫面。 |
 
-現有 lock 實核：Python 3.12、LangChain 1.4.0、core 1.6.3、LangGraph 1.2.11、checkpoint 4.2.0、PostgresSaver 3.1.2、langchain-anthropic 1.7.2、Anthropic SDK 1.5.0；FastAPI 0.141.1、Starlette 1.6.0、Uvicorn 0.52.4、Pydantic 2.13.5。套件沿既有免費 OSS 採用與 pin，沒有升級；完整授權與 private adapter 限制沿[前次 context 結果](../../../specs/2026-09-13-jd-consultant-context-slice.md)。
+現有 lock 實核：Python 3.12、LangChain 1.4.0、core 1.6.3、LangGraph 1.2.11、checkpoint 4.2.0、PostgresSaver 3.1.2、langchain-anthropic 1.7.2、Anthropic SDK 1.5.0；FastAPI 0.141.1、Starlette 1.6.0、Uvicorn 0.52.4、Pydantic 2.13.5。套件沿既有免費 OSS 採用與 pin，沒有升級；完整授權與 private adapter 限制沿[前次 context 結果](../../../archive/legacy-specs/2026-09-13-jd-consultant-context-slice.md)。
 
 共同原則是「原請求身分、執行者持有工作、依真結果確認、串流預覽與保存分開」。下列路由、欄位及分頁是本案工程選擇，**不是 AWS／兩家模型共同指定的 App 協定**。
 

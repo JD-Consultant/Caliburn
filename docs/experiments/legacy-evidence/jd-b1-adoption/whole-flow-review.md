@@ -14,8 +14,8 @@
 
 | ID／層級 | 實際證據與影響 | 本次處理／退出條件 |
 |---|---|---|
-| HF-01／交接錯誤 | 接續計畫頁首說 B1 adapter 完成，§1／§3／§8 卻仍要求先做 source port 或採用映射；§7 還要求補已完成 CA-01／02 紅測。package README 說「不含模型執行」、C 尚未接入，與程式不符 | 修正目前路由與 README；歷史 H1–H3 保留並明標不是新任務。H4 只依[執行計畫](../../../plans/2026-09-14-jd-h4-runtime-integration.md)接續 |
-| HF-02／下一片必要接縫，尚非執行中 bug | 新 `plan_batch()` 接 first/last IDs、回窗口前綴與布林；B1 `start()` 接單一固定 source ref，超過 `max_windows` 即拒絕。舊 `extraction_batch()` 則回涵蓋前 N 個窗口的整批 ref。現有 API 未閉合這條交接；而目前 `unprocessed_source()` 只回 bounds dict，尚沒有契約所需的 `through_reference` 固定 target 入口。不能把整個 target 交 B1，或只取最後一個 window 丟掉前面的 | 由同一 source owner 先以 `unprocessed_source(after, through)` 取得連續範圍，再發一個簽章 `purpose="window"` target；再由 owner 以 target＋publication cursor 產生有界 batch ref。語意詳[映射 §3.6](../../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md#36-固定目標到有界批次2026-09-14-接續設計)。以超過一批、追加原話及重開驗收，不重寫 B1 |
+| HF-01／交接錯誤 | 接續計畫頁首說 B1 adapter 完成，§1／§3／§8 卻仍要求先做 source port 或採用映射；§7 還要求補已完成 CA-01／02 紅測。package README 說「不含模型執行」、C 尚未接入，與程式不符 | 修正目前路由與 README；歷史 H1–H3 保留並明標不是新任務。H4 只依[執行計畫](../../../archive/implementation-plans/2026-09-14-jd-h4-runtime-integration.md)接續 |
+| HF-02／下一片必要接縫，尚非執行中 bug | 新 `plan_batch()` 接 first/last IDs、回窗口前綴與布林；B1 `start()` 接單一固定 source ref，超過 `max_windows` 即拒絕。舊 `extraction_batch()` 則回涵蓋前 N 個窗口的整批 ref。現有 API 未閉合這條交接；而目前 `unprocessed_source()` 只回 bounds dict，尚沒有契約所需的 `through_reference` 固定 target 入口。不能把整個 target 交 B1，或只取最後一個 window 丟掉前面的 | 由同一 source owner 先以 `unprocessed_source(after, through)` 取得連續範圍，再發一個簽章 `purpose="window"` target；再由 owner 以 target＋publication cursor 產生有界 batch ref。語意詳[映射 §3.6](../../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md#36-固定目標到有界批次2026-09-14-接續設計)。以超過一批、追加原話及重開驗收，不重寫 B1 |
 | HF-03／背景設計尚未落地 | `ManualHost.close()` 只等待現有登記工作；尚無 B 背景准入／排空。B1 的 `files` 是最近批次狀態，舊 B2 `start()` 從該狀態取材。若 B1-only 持續開始新批，可能覆蓋未整併交接；B1 完成也不能推進 publication cursor | 先以舊 `BackgroundRow` 的六欄責任作候選基線，R3 先驗證現有 Saver／catalog 是否真的不能承載；只有缺口成立才走 migration／ADR。無論落點為何，都要由同一 owner 管理狀態轉移及恢復規則，且 B1→B2→發布完成後才准入下一批。隔離測試可先做一批 B1 的真 PG 恢復，不把它啟用成日常自動整理 |
 | HF-04／過度設計風險 | 前次將 v1 context 一次性轉換寫成啟用前必做。已定 fresh data、不搬舊資料，且 B1 runtime 尚未啟用；沒有查得需要轉換的實際產品資料 | v1 繼續明示拒絕。新 fixture 使用 v2，舊合成 artifact 保留且標不支援重抽即可；不安排 migration、全库掃描或轉換工具。本次未檢視真 DB，不能宣稱其中完全無 v1。若日常啟用時真的遇到需保留的舊工作，先報具體影響再決定，不猜 pair、不換最新來源 |
 | HF-05／證據表述 | P3 使用 `InMemoryStore`，不是「落盤／PG」；移除檢查轉紅是實作者報告，本次及前次記載的獨立正常重跑不等於獨立變異重跑。「不代表完整旅程有進展」又過度否定了有效局部交付 | 改為「局部進展、不代表整體完成」；明列證據作者與測試層級。沒有由文件用詞創造新的產品 bug |
@@ -32,7 +32,7 @@ HF-02／03 是下一片要閉合的工程接縫，**不倒退已通過的 P1／P
 | source 的固定位置／purpose／pair | 針對已重現的換分支、越過回合、交叉配對保留有限驗證；簽章交 ItsDangerous，走鏈交既有 history。App 產生與驗證，模型不手填 token 組成。不是大廠規定相同欄位，也不是任意 DB 竄改的完整防護系統 |
 | OpenAI／Anthropic adapter | 框架共用流程及訊息介面；provider 的拒絕、終局、結構化輸出仍要按其契約處理。B1 用已驗 OpenAI 路線合理，無需寫兩套抽取流程，也不新增雙 provider 切換產品 |
 | 准入小表 | 可記錄尚未發佈目標／批次、阻擋原因與恢復次數，但目前仍是候選責任；先驗證 Saver／catalog 是否無法承載，不能把它當既定必要表。若缺口成立，才由隔離 migration／ADR 引入；不保存第二份原話、Memory 或已整併游標，也不在 constructor 自動 setup |
-| 部分 Store 寫入的未引用產物 | 9/06[抽取驗收 §限制](../../../specs/2026-09-06-analysis-only-agent-extraction-results.md)已實測允許一份未引用 artifact；它不被 A 當目前 Memory。新 PG 驗收應確認這條界線，不能要求「任何中斷零多餘檔」而重造跨 Saver／Store 交易或 GC 引擎 |
+| 部分 Store 寫入的未引用產物 | 9/06[抽取驗收 §限制](../../../archive/legacy-specs/2026-09-06-analysis-only-agent-extraction-results.md)已實測允許一份未引用 artifact；它不被 A 當目前 Memory。新 PG 驗收應確認這條界線，不能要求「任何中斷零多餘檔」而重造跨 Saver／Store 交易或 GC 引擎 |
 | 恢復與重試 | SDK 傳輸 retry、B1 格式更正、B 工作續作與發布查回是不同層。沿已驗預算；不套三層 RetryPolicy、不每次 tick 重置額度。C 的未知結果只讀對帳不能套成 B1 永不續作 |
 | 背景容量與鎖 | 一個本機 B worker 可是有意的容量選擇，不等於全 App 大鎖。不能持鎖等網路而阻擋別份 JD／前景；同文件 B1/B2/重抽不得同時執行。未有吞吐證據，不新增 distributed worker／striping framework |
 
@@ -64,4 +64,4 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 
 來源核對先排除計算範圍誤判：manifest 的檔案 hash 依原始 bytes（部分檔 CRLF），不是全部轉LF；`instructions_sha256` 是 Python assignment 原碼加一個LF，值為 `83b14376…`，不是字串值的 `0f621a77…`。兩種 prompt 計算都與 `4f94fbfb` 相同。初次自寫檢查器把兩者混用，故誤列 publication／references／prompt 不一致；修正檢查器後只有 HF-06 的 `memory.py` 是真缺漏。這是審查工具假設的修正，沒有放寬產品。
 
-下一施工以[H4 runtime 執行計畫](../../../plans/2026-09-14-jd-h4-runtime-integration.md)為唯一詳細順序：先一批 B1 真 PG 保存／恢復和有界 batch 接合，再 B2 交接／C 競爭，最後完整通知與宿主生命週期。廣搜到此停止；只按實際接點缺口补證據，不再以「再核一次窗口」代替產品進度。
+下一施工以[H4 runtime 執行計畫](../../../archive/implementation-plans/2026-09-14-jd-h4-runtime-integration.md)為唯一詳細順序：先一批 B1 真 PG 保存／恢復和有界 batch 接合，再 B2 交接／C 競爭，最後完整通知與宿主生命週期。廣搜到此停止；只按實際接點缺口补證據，不再以「再核一次窗口」代替產品進度。

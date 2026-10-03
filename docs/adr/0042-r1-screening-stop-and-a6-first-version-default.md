@@ -10,7 +10,7 @@
   見下方決定 4）
 - 權威文件：
   [R1a 架構快篩結果](../experiments/2026-07-27-r1-task-discovery/r1a-results.md)、
-  [Task 邊界／merge-split／同一性研究](../specs/2026-07-28-task-boundary-merge-split-and-identity-research.md)
+  [Task 邊界／merge-split／同一性研究](../research/work-analysis/2026-07-28-task-boundary-merge-split-and-identity-research.md)
 
 ## 脈絡
 

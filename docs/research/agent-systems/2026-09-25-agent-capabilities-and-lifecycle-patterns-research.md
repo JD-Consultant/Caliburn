@@ -4,7 +4,7 @@
 - 狀態：研究／候選；**LangGraph 已由 Owner 指定為 Agent 執行框架**，本稿未裁決執行拓撲、資料表或 production 修改
 - 範圍：回答「Caliburn 應如何討論 A／B1／B2 的共同能力與生命週期」，不重做已確認的產品效果
 - 依據：[架構討論規範](../../architecture-discussion-standard.md)、[產品概念](../../product-concept.md)、[目前決策](../../current-decisions.md)、[分層架構導覽](../../specs/2026-09-24-caliburn-layered-architecture-map.md)
-- 關聯歷史：[2026-09-05 harness 審核](../../specs/2026-09-05-agent-harness-framework-gap-review.md)回答當時的框架接線問題；不以其歷史 G3 狀態取代較新的目標決策。
+- 關聯歷史：[2026-09-05 harness 審核](2026-09-05-agent-harness-framework-gap-review.md)回答當時的框架接線問題；不以其歷史 G3 狀態取代較新的目標決策。
 
 > **2026-09-25 後續澄清／Owner 已確認責任原則：**正常路徑是 B1 維護案例、B2 依案例維護工作理解、兩層候選一致後共同發布。B2 不是 B1 的案例審核者，也不負責判定案例對錯。B2 若在自己的理解分析中發現**理解所需資訊未寫在案例裡**，向 B1 交流缺口及受影響的理解；B1 核對原話並在案例層補充已有依據，仍無法釐清時把已知和未知寫進相關案例。B2 後續只調整自己的工作理解；需員工回答則由 A 訪談。下文「B2 指出案例錯誤、退回 B1、返工草稿」的反例與方案描述現行程式和先前研究，**不是新目標的交流語意**或必經審批。交流的具體資料契約、草稿、重試與恢復語意尚未裁決。
 
@@ -99,8 +99,8 @@ Owner 補充的關鍵方法界線：**研究不應排在「責任、資料真相
 | 檢查面向 | 本案目前找到的證據 | 初步判斷／尚缺的證據 |
 |---|---|---|
 | 模型—工具迴圈 | 正式 A 組裝使用 LangChain `create_agent`（`experiments/jd-relational-app/src/jd_relational/consultant_context.py`）；B1／B2 同樣使用 `create_agent`；外層背景用 LangGraph `StateGraph`（`packages/consultant-memory/src/caliburn_memory/background_workflow.py`）。 | **非自行重寫一般 Agent loop。** 外層圖是在編排 B1／B2 與 publication，是否忠實承接新目標須按跨角色場景驗收，不能只因「自訂 graph」就判錯。 |
-| 完整紀錄與本次請求視圖 | `ContinuationCompactionMiddleware` 由 canonical 訊息導出 request-only view，摘要與邊界存入既有 Agent state；[既有框架比較](../../specs/2026-09-05-conversation-compaction-framework-gap-review.md)已研究 LangChain／Deep Agents／LangMem 的限制，[現行設計](../../specs/2026-09-16-openrouter-continuation-compaction-design.md)記錄選材與失敗語意。 | **確實有本案自訂 compaction 接線，但不是自行重寫 loop。** 它是為保留原話權威而選的實作；是否仍為現行最佳選擇，應先核對既有比較的鎖定版本與產品要求，再看新框架能力，不能僅因有 prebuilt summarizer 就換掉。 |
-| 工具結果與業務提交 | [現行背景流程](../../specs/2026-09-17-layered-memory-background-workflow-design.md)把 B1／B2 完成、prepare、publish 分階段；JD effect／final 不同的目標語意見[架構導覽](../../specs/2026-09-24-caliburn-layered-architecture-map.md)。 | **需做實際路徑審核**：工具結果怎樣回到模型、哪些已提交效果有可信收據、final 失敗時如何查回；本輪只查到架構和部分組裝，未據此宣稱所有工具都正確。 |
+| 完整紀錄與本次請求視圖 | `ContinuationCompactionMiddleware` 由 canonical 訊息導出 request-only view，摘要與邊界存入既有 Agent state；[既有框架比較](2026-09-05-conversation-compaction-framework-gap-review.md)已研究 LangChain／Deep Agents／LangMem 的限制，[現行設計](../../history.md#source-49fa82b26188aad2b075)記錄選材與失敗語意。 | **確實有本案自訂 compaction 接線，但不是自行重寫 loop。** 它是為保留原話權威而選的實作；是否仍為現行最佳選擇，應先核對既有比較的鎖定版本與產品要求，再看新框架能力，不能僅因有 prebuilt summarizer 就換掉。 |
+| 工具結果與業務提交 | [現行背景流程](../../history.md#source-581fea9d87762ea5c453)把 B1／B2 完成、prepare、publish 分階段；JD effect／final 不同的目標語意見[架構導覽](../../specs/2026-09-24-caliburn-layered-architecture-map.md)。 | **需做實際路徑審核**：工具結果怎樣回到模型、哪些已提交效果有可信收據、final 失敗時如何查回；本輪只查到架構和部分組裝，未據此宣稱所有工具都正確。 |
 | Session、turn、背景 job、Memory publication | 正式 App 已用 PostgreSQL Saver，外層背景圖有 checkpoint 與 publication node；[架構討論規範](../../architecture-discussion-standard.md)要求正常、異常與並行生命週期分圖。 | **這些時間尺度不得共用一個「成功」判斷。** 目標版本／引用和退役 C 尚未施工；下一輪先畫責任與資料真相，再把已確認的正常及異常流程落成可驗收時序，不預設新 queue、registry 或事件服務。 |
 
 此首輪找到了「已有框架能力」和「本案特有接線」的分界，**尚未找到能證明某項自訂接線用錯的反例**。若後續實測或鎖定版官方能力顯示有可直接取代的成熟方案，就以實際效果、權威資料保留、恢復語意與成本比較，必要時替換；不把既有程式當成必須保護的架構，也不為了像 Codex 而引入其不適用的 shell、sandbox 或整套服務。
@@ -190,7 +190,7 @@ Owner 補充的關鍵方法界線：**研究不應排在「責任、資料真相
 
 此反例證明「**允許**漏案且完成」，不證明真模型必然漏案、所有來源都必須一對一轉成案例，亦不裁決哪種修正最佳。既有單案例返工、B1/B2 checkpoint、發布收據與 CAS 測試仍有效，只是未覆蓋此多案例交錯。下一步候選須以**正確來源、案例差異可回查、不把錯誤 A 留下、B 不靜默消失**為共同驗收，不以「省一次模型呼叫」凌駕完整性：
 
-**與舊設計的明確張力：**[背景 Workflow 設計 §5.2](../../specs/2026-09-17-layered-memory-background-workflow-design.md)要求被拒且尚未發布的 candidate 不直接匯入新 attempt；如仍成立，新 B1 需依原話重新建立，舊 candidate ID 不可冒充正式身分。該文件 §2.4 的「不新增 coverage manifest／第二個 verifier」針對當時 C repair→B2 impact 接點，不是本次漏案已被證明安全；但也不能藉此直接提議新表或通用驗證服務。下列候選若改變「新 attempt 從乾淨 base 開始」的契約，必須先明講這個差異再裁決。
+**與舊設計的明確張力：**[背景 Workflow 設計 §5.2](../../history.md#source-581fea9d87762ea5c453)要求被拒且尚未發布的 candidate 不直接匯入新 attempt；如仍成立，新 B1 需依原話重新建立，舊 candidate ID 不可冒充正式身分。該文件 §2.4 的「不新增 coverage manifest／第二個 verifier」針對當時 C repair→B2 impact 接點，不是本次漏案已被證明安全；但也不能藉此直接提議新表或通用驗證服務。下列候選若改變「新 attempt 從乾淨 base 開始」的契約，必須先明講這個差異再裁決。
 
 | 候選語意（尚未裁決） | 可以沿用的 owner／機制 | 需要驗證的代價與風險 |
 |---|---|---|

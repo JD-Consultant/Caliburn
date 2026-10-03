@@ -10,7 +10,7 @@
 - FH05使用實際新Windows程序，原程序真提交後遺失回覆、在native閉合前退出；新程序不重跑模型、工具、JD execute、setup、publish或patch。Store save與C六節點也有禁止執行的guard。
 - 34檔提交未涉及正式`apps/api`／`apps/web`、migration、JD格式或UI切換；`open_managed_app(enable_chat=False)`保留。沒有重做原顧問、改回文章編輯器、加歷史選輪或開付費模型。
 
-依據為本次程式及實測。再次核對[LangGraph子圖](https://docs.langchain.com/oss/python/langgraph/use-subgraphs)、[持久狀態](https://docs.langchain.com/oss/python/langgraph/persistence)與[AWS安全重試](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)，查閱2026-09-13。沿App鎖定LangChain1.4.0／LangGraph1.2.11，已發布MIT套件；網站不是此版本每個shape的保證。本案binding判定須靠鎖定原碼與反例，不能稱AWS或兩家模型廠商規定的唯一實作。LLM輸入未再修改，沿[C核心已有OpenAI／Anthropic依據](../../../specs/2026-09-13-jd-memory-repair-core-slice.md)，不重开同題廣搜。
+依據為本次程式及實測。再次核對[LangGraph子圖](https://docs.langchain.com/oss/python/langgraph/use-subgraphs)、[持久狀態](https://docs.langchain.com/oss/python/langgraph/persistence)與[AWS安全重試](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)，查閱2026-09-13。沿App鎖定LangChain1.4.0／LangGraph1.2.11，已發布MIT套件；網站不是此版本每個shape的保證。本案binding判定須靠鎖定原碼與反例，不能稱AWS或兩家模型廠商規定的唯一實作。LLM輸入未再修改，沿[C核心已有OpenAI／Anthropic依據](../../../archive/legacy-specs/2026-09-13-jd-memory-repair-core-slice.md)，不重开同題廣搜。
 
 ## 本次真正執行的驗證
 

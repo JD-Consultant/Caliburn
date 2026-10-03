@@ -1,10 +1,10 @@
 # JD 契約補正：離線驗證與 SDK 傳遞
 
-2026-09-10；JD-R002/C03。對應[責任稽核](../../../specs/2026-09-10-jd-responsibility-and-evidence-audit.md) TF01–04／ER01–03／DB02–04 的設計補正。這是有限契約驗證，不是正式編輯器、DB、ToolNode 或自然模型測試。
+2026-09-10；JD-R002/C03。對應[責任稽核](../../../history.md#source-baf0ad507eaf072b0050) TF01–04／ER01–03／DB02–04 的設計補正。這是有限契約驗證，不是正式編輯器、DB、ToolNode 或自然模型測試。
 
 ## 1. 實際修改與結果
 
-唯一可修改的設計 SSOT 仍是[正式候選 schema](../../../specs/contracts/jd-editor-v1.schema.json)。本目錄的 before／after 是歷史證據快照，不能作 runtime／codegen 的第二來源。
+唯一可修改的設計 SSOT 仍是[正式候選 schema](../../../history.md#source-f0f5903612c0dccb586f)。本目錄的 before／after 是歷史證據快照，不能作 runtime／codegen 的第二來源。
 
 | 材料／驗證 | 結果 |
 |---|---|
@@ -39,4 +39,4 @@
 
 SDK 腳本在 `S:/caliburn/.worktrees/analysis-only-agent/experiments/analysis-agent`、既有 `.venv` 下執行本目錄 `provider-wire.py`；它會生成本地 request 材料，後續執行須另開結果位置或先保留本封存，不覆寫歷史觀測。這不啟動服務、也不需要真 API key。
 
-原生 span 更新／來源保存、兩連線交易、取消／關頁重開、錯誤閉合及正式人編，依[六切片計畫](../../../plans/2026-09-10-jd-editor-core-implementation.md)驗收。SQL 與 Node 秒數是本案起始配置，並未在本輪量測效能或驗證 OS／DB 的取消時限；本輪只完成策略與契約閉合。
+原生 span 更新／來源保存、兩連線交易、取消／關頁重開、錯誤閉合及正式人編，依[六切片計畫](../../../history.md#source-ed26da4d894f3423c7f0)驗收。SQL 與 Node 秒數是本案起始配置，並未在本輪量測效能或驗證 OS／DB 的取消時限；本輪只完成策略與契約閉合。

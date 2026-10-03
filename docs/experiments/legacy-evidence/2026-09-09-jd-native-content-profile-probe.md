@@ -1,6 +1,6 @@
 # JD F01：結構容器、內容保留與 normalization 實證
 
-JD-R002/C03；2026-09-09。承接[接線設計 §2／§10](../../specs/2026-09-09-jd-editor-app-integration-design.md)，**六組固定情境，修正一項測試接線後五組通過、一組原始 JSON 精確保留反例仍成立**。這不是正式 schema、完整 F／U、待審取消或框架採用驗收。
+JD-R002/C03；2026-09-09。承接[接線設計 §2／§10](../../archive/legacy-specs/2026-09-09-jd-editor-app-integration-design.md)，**六組固定情境，修正一項測試接線後五組通過、一組原始 JSON 精確保留反例仍成立**。這不是正式 schema、完整 F／U、待審取消或框架採用驗收。
 
 ## 1. 固定表示與範圍
 

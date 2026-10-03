@@ -1,29 +1,36 @@
-# 需求、設計與工具契約
 
-這裡保存具體責任文件及其設計沿革；**不是每個檔案都同時有效**。先讀[目標架構地圖](../target-architecture-map.md)，再沿責任往下讀。[目前決策](../current-decisions.md)與 ADR 判定效力；本索引不改寫狀態、不授權施工。
+# 系統設計與工具介面
 
-## 現在設計與開發從哪裡讀
+本目錄詳細說明 AI 分析、工作記憶、模型上下文與工具的行為。整體關係可先看[架構導覽](../target-architecture-map.md)，再依問題閱讀下面各章；JSON、差異格式與操作範例用來說明模型和 App 如何交換資料。
 
-| 主題 | 入口 |
+
+## 核心系統設計
+
+| 文件 | 主要內容 |
 |---|---|
-| 全系統責任、交易、運作與驗收 | [目標架構地圖](../target-architecture-map.md) → `architecture/` |
-| 工作分析、訪談與 JD 欄位方法 | [指南入口](../guides/README.md)，正文集中於 `guides/` |
-| 訪談到 JD、背景整理的整體生命週期 | [核心閉環](2026-09-29-core-value-loop-lifecycle.md) |
-| A 的 Context、固定讀取範圍與工具 | [顧問 Context](2026-09-26-consultant-context-and-state-design.md) |
-| Memory 三層、候選與快照 | [Memory 子圖](2026-09-24-caliburn-layered-architecture-map.md) → [背景生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md) |
-| 模型與工具共用執行、恢復及壓縮 | [共用執行](2026-09-27-shared-agent-execution-and-state-design.md) |
-| Tool 命名、說明、輸入、回傳與錯誤 | [工具共同規範](2026-09-27-agent-tool-contract-design-research.md)；名稱含 research，但已承擔有效規範，不搬作純研究 |
-| Memory 讀取、來源及編輯 | [讀取契約](2026-09-27-memory-read-and-source-navigation-contract.md)、[更新契約](2026-09-27-memory-object-update-tool-contract.md)、[CRUD 範例](2026-09-28-memory-tools-crud-examples.md) |
-| JD 欄位與模型工具 | [JD 工具契約](2026-09-29-jd-model-tool-contract-review.md) |
-| 程式如何實現及測試 | [實作規範](../implementation/README.md) → [施工計畫](../plans/README.md) |
+| [分層架構](2026-09-24-caliburn-layered-architecture-map.md) | A、B1、B2、JD 與 Memory 的權限、候選及發布關係 |
+| [B1／B2 生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md) | 單向 B1 → B2 → 發布、同一候選、來源範圍及安全點 |
+| [顧問 Context](2026-09-26-consultant-context-and-state-design.md) | A 固定 Memory、按需 JD／原話、Turn／Step 與壓縮恢復 |
+| [共同工具設計](2026-09-27-agent-tool-contract-design-research.md) | 工具命名、輸入、結果、錯誤與設計理由 |
+| [Memory 更新契約](2026-09-27-memory-object-update-tool-contract.md) | 單物件修改、正文 diff、來源集合與操作完整性 |
+| [Memory 讀取與來源](2026-09-27-memory-read-and-source-navigation-contract.md) | 導覽、最新候選／固定發布版、訪談訊息與回查 |
+| [共用執行與 State](2026-09-27-shared-agent-execution-and-state-design.md) | 原生模型接續、保存交界、控制、恢復與執行限制 |
+| [Memory CRUD 範例](2026-09-28-memory-tools-crud-examples.md) | 以合成資料示範建立、讀取、修改、刪除及錯誤處理 |
+| [核心價值閉環](2026-09-29-core-value-loop-lifecycle.md) | 訪談、JD、背景整理的跨層時序與正式生效界線 |
+| [JD 模型工具](2026-09-29-jd-model-tool-contract-review.md) | 按需讀寫、短定位、直接來源與兩類差異；逐筆引用確認限 JD |
 
-表格只提供按主題的入口；完整責任集合仍由目標架構地圖維護。正式產品切換依 [ADR0079（Accepted）](../adr/0079-target-rebuild-production-cutover.md)；舊產品的權責與設計沿革見 [ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)與[舊設計](../design/README.md)，不把兩代架構拼成一套。
+## 獨立 RAG 範圍
 
-## 不同用途不要混讀
+- [相似度匹配 V1](2026-07-04-similarity-matching-v1-spec.md)
+- [RAG bounded context 與 retention](2026-08-11-rag-bounded-context-retention-design.md)
 
-- 外部官方做法、論文與方案比較：已歸位的純研究在 [research/](../research/README.md)。兼有契約的研究沿革仍留原處，依最新決策辨認，不只看檔名。
-- 實際測試、事故、修正與原始結果：新目標從[驗收證據](../plans/2026-09-29-target-rebuild/evidence/README.md)進入；原 `specs/evidence/` 已歸位[較早實驗證據](../experiments/legacy-evidence/README.md)，保留原任務脈絡與結果。
-- 較早方案、Proposed 或當時的完成報告：仍保留有相依關係的原件，不能只因日期舊就判退役；可用[整理前索引](../archive/2026-10-02-document-index.md)找線索，再用[搬移對照](../archive/document-classification-2026-10-02.csv)定位本次歸位的文件。
-- 明確退役／已被取代的本批材料：[退役文件](../archive/retired-documents/README.md)，不作當前施工指令。
+這兩份說明獨立的檢索研究，不是現行 JD App 的執行依賴。
 
-新增或修改規格，先找既有責任文件；只有新的獨立責任才分檔。用途、適用範圍、有效狀態與關係按[架構討論規範](../architecture-discussion-standard.md)維護，不繼續把純研究、實測結果與規則堆在同一份檔案。
+
+## 方法與實驗
+
+- 產品目的與資訊關係：[產品概念](../product-concept.md)。
+- 工作分析、訪談及 JD 欄位方法：[指南入口](../guides/README.md)。
+- 外部方法與方案比較：[研究入口](../research/README.md)。
+- 測試方法、結果與限制：[驗證章節](../architecture/verification.md)、[產品實驗資料](../experiments/product-validation/README.md)。
+- 設計如何隨問題演進：[開發沿革](../reports/development-history/README.md)。

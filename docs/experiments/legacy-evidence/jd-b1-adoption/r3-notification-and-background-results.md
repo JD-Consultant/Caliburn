@@ -1,6 +1,6 @@
 # H4-R3：通知、背景生命週期與顧問方法
 
-2026-09-14；JD-R002／OI-01、OI-02。實作[H4 計畫 §4 R3](../../../plans/2026-09-14-jd-h4-runtime-integration.md)，接續 [R2](r2-consolidation-handover-results.md)。基準 `d0e07d22`／tag `jd-h4-r2-consolidation-20260914`。**本稿隨 R3 分段完成逐節追加；未寫進來的段落就是還沒做。**
+2026-09-14；JD-R002／OI-01、OI-02。實作[H4 計畫 §4 R3](../../../archive/implementation-plans/2026-09-14-jd-h4-runtime-integration.md)，接續 [R2](r2-consolidation-handover-results.md)。基準 `d0e07d22`／tag `jd-h4-r2-consolidation-20260914`。**本稿隨 R3 分段完成逐節追加；未寫進來的段落就是還沒做。**
 
 ## 1. 純通知工具的完整接合
 

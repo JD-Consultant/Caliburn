@@ -4,7 +4,7 @@
 
 2026-09-10；JD-R002/C03；root 另行執行的驗證，不是模型、Node editor 或產品整合測試。
 
-使用既有 Node 22.12.0、AJV 8.20.0 Draft 2020-12 與已安裝的 `ajv-formats`。未安裝依賴，未執行 Plate、DB、ToolNode、DOM 或外部 provider。封存[實際腳本](schema-validation.cjs)與[正式 schema](../../../specs/contracts/jd-editor-v1.schema.json)配對；schema SHA256 為 `6B42BA220C0102590DC651692BE7497AE400BD713CB6F0D86FA1C5103F753F67`。
+使用既有 Node 22.12.0、AJV 8.20.0 Draft 2020-12 與已安裝的 `ajv-formats`。未安裝依賴，未執行 Plate、DB、ToolNode、DOM 或外部 provider。封存[實際腳本](schema-validation.cjs)與[正式 schema](../../../archive/legacy-specs/contracts/jd-editor-v1.schema.json)配對；schema SHA256 為 `6B42BA220C0102590DC651692BE7497AE400BD713CB6F0D86FA1C5103F753F67`。
 
 實際結果：85 個 definitions 皆能編譯解析；11 個檢查皆符合預期，0 errors。未開啟 coercion、預設值補入或額外欄位刪除。
 
@@ -17,7 +17,7 @@
 | 模型新增內容 | 帶既有 element ID 的 new content 被拒絕 |
 | Node read-selection | 固定 request 與 success result 的正例均通過 |
 
-最初 root 檢查未載入 `ajv-formats`，AJV 警告 UUID format 被忽略；因此沒有據此宣稱格式已驗。隨後使用既有官方格式套件，增加非 UUID 反例後重跑上述 11 項，結果如上；未放寬 schema。作者另行執行的代表例及 schema check 見[契約附件 §7](../../../specs/2026-09-10-jd-editor-contract-schema.md#7-有限驗證與未涵蓋範圍)。
+最初 root 檢查未載入 `ajv-formats`，AJV 警告 UUID format 被忽略；因此沒有據此宣稱格式已驗。隨後使用既有官方格式套件，增加非 UUID 反例後重跑上述 11 項，結果如上；未放寬 schema。作者另行執行的代表例及 schema check 見[契約附件 §7](../../../archive/legacy-specs/2026-09-10-jd-editor-contract-schema.md#7-有限驗證與未涵蓋範圍)。
 
 重現：在 `S:/caliburn` 使用相同既有 runtime 執行 `node docs/experiments/legacy-evidence/jd-contract-schema/schema-validation.cjs`。腳本只讀固定材料及輸出檢查結果；其他 checkout 需調整腳本的 root 路徑後另記結果，不改寫本次觀測。
 

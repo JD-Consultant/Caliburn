@@ -7,8 +7,8 @@
 schema 名稱帶點／`$ref` 帶兄弟 keyword），全部已修；後兩個是換 provider 才浮現的**可攜性**
 缺陷，契約原本鎖死 Anthropic。**merge／split／withdraw、supersession 與 Proposal 決策
 仍未被任何 run 觀測到。**
-計畫：[2026-07-31 attributed live smoke plan](../../plans/2026-07-31-job-analysis-attributed-live-smoke-plan.md)
-研究：[OpenRouter 歸因與最小 live smoke](../../specs/2026-07-31-job-analysis-openrouter-attribution-and-live-smoke-research.md)
+計畫：[2026-07-31 attributed live smoke plan](../../history.md#source-1fc3fb320dcfb4e19b01)
+研究：[OpenRouter 歸因與最小 live smoke](../../history.md#source-c80673fda04fb06eaef0)
 
 ## 0. Run 2（2026-07-31 12:09 UTC）：wire 契約修正後，turn 1 通過
 

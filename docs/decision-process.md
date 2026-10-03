@@ -1,9 +1,9 @@
 # Caliburn Decision-to-Product 流程
 
-- 狀態：**Accepted process；2026-09-03 經 Product Owner 核准**
+- 狀態：已採用流程；2026-09-03 經產品決策確認
 - 用途：讓研究與討論可停止、可追溯，並確實轉成可驗證產品
 - 現行狀態入口：[`current-decisions.md`](current-decisions.md)
-- 導入紀錄：[`plans/2026-09-03-decision-to-product-governance.md`](plans/2026-09-03-decision-to-product-governance.md)
+- 導入紀錄：[`plans/2026-09-03-decision-to-product-governance.md`](history.md#source-d6f27eb223ac5be73a34)
 
 ## 1. 為什麼需要這份流程
 
@@ -23,10 +23,11 @@ Caliburn 的研究範圍很大，長對話與多份研究稿容易同時留下�
 |---|---|---|---|
 | Product North Star | 為誰解決什麼問題、最終成果是什麼 | 約束所有方案與驗收 | 指定 framework、資料表或類別 |
 | [`current-decisions.md`](current-decisions.md) | 現在有效、未決、暫停與下一步是什麼 | 作為第一閱讀入口與路由表 | 靜默推翻 Accepted ADR 或現行 code |
-| `docs/specs/` research／design | 官方事實、診斷、選項、推論與細部設計 | 保存完整證據與候選 | 單獨授權 production 施工 |
+| `docs/research/` | 官方事實、診斷、選項與推論 | 保存研究依據與候選方案 | 單獨授權產品變更 |
+| `docs/specs/` | 資料、工具、執行與上下文的詳細契約 | 定義各層行為與介面 | 推翻有效決策或自行授權實作 |
 | `docs/adr/` | 為什麼採用重大、難逆的架構決策 | 形成 Accepted production authority | Accepted 後直接改寫；翻案必須 successor |
 | `docs/plans/` | 已核准設計如何分段施工與驗證 | 指導實作者逐 task 交付 | 自行補產品語意或改架構決策 |
-| `docs/design/`／app README | production 現在實際如何運作 | 描述 current code seam 與不變量 | 保留已退役候選作現行流程 |
+| `docs/architecture/`、`docs/implementation/` 與 App README | 現行產品如何運作 | 說明模組邊界、不變量與操作方式 | 把已退役候選寫成現行流程 |
 | Chat／review comments | 討論、提問與回饋 | 促成決策 | 成為唯一、長期有效的決策紀錄 |
 
 `current-decisions.md` 是**狀態與閱讀路由的單一入口**，不是另一套架構 authority。若 Working Decision 與 Accepted ADR／現行 code 衝突，它只能觸發 successor ADR 與後續施工，不能直接讓 production 改變。
@@ -44,7 +45,7 @@ Caliburn 的研究範圍很大，長對話與多份研究稿容易同時留下�
 
 這一層不放 framework 名稱或既有元件名稱。Amazon 的 Working Backwards 先從客戶問題與最終體驗倒推，在開發前用精簡文件對齊價值與關鍵問題；Caliburn 採用相同的 outcome-first 原則，而不是照抄 PR/FAQ 格式。
 
-**退出條件：** Product Owner 確認問題、成果與不做事項。
+**退出條件：** 產品決策者確認問題、成果與不做事項。
 
 ### G1：建立單一決策題
 
@@ -80,9 +81,9 @@ LLM／agent 技術優先查 OpenAI、Anthropic 與所選 framework 的官方資�
 
 **退出條件：** 最多提出三個實質不同方案，依產品效果、功能完整性、錯誤風險、成本、複雜度與可逆性比較，並給出一個建議。
 
-### G3：Owner 決策
+### G3：產品決策
 
-Product Owner 的裁決必須在同一工作段落內寫入 `current-decisions.md`，不能只留在聊天。狀態分為：
+產品決策須在同一工作段落寫入 `current-decisions.md`，不能只留在聊天。狀態分為：
 
 - `WORKING`：可供後續研究與設計使用；翻案前有約束力，但不越過既有 production authority；
 - `ACCEPTED`：已有 Accepted ADR 或等效 production authority；
@@ -106,7 +107,7 @@ Product Owner 的裁決必須在同一工作段落內寫入 `current-decisions.m
 
 Google 的 review guidance 建議先看變更是否合理及主要設計，再審細節；Caliburn design review 同樣先做 North Star／authority／data flow gate，通過後才看 schema、函式與 UI 細節。
 
-**退出條件：** Reviewer 能只靠設計與引用回答「做成什麼、為什麼、如何證偽」，且沒有尚未交給 Owner 的產品選擇。
+**退出條件：** 審查者能只靠設計與引用回答「做成什麼、為什麼、如何證偽」，且沒有尚未提交確認的產品選擇。
 
 ### G5：必要時做 isolated spike
 
@@ -194,7 +195,7 @@ Next gate:
 
 只有以下事件可以重開 `WORKING` 或 `ACCEPTED` 決策：
 
-1. Product Owner 改變產品目的或限制；
+1. 產品決策者改變產品目的或限制；
 2. 新的官方事實直接推翻原依據；
 3. Spike、測試或 production evidence 證明原假設不成立；
 4. 發現與另一項有效決策、現行 code 或 authority 衝突。
@@ -213,17 +214,17 @@ Next gate:
 
 | 角色 | 負責 | 不負責 |
 |---|---|---|
-| Product Owner | 產品語意、重大取捨、成本／風險接受、翻案 | framework 細節與可由官方契約直接回答的問題 |
-| Researcher／Designer | 查官方資料、分清事實與推論、提出選項、寫回決策 | 靜默替 Owner 選產品行為 |
-| Reviewer | 先審方向，再審設計與實作；用 finding ID 收斂 | 重新發明未進決策表的新需求 |
-| Implementer | 依有效決策、spec 與 plan 施工、測試、回報偏差 | 從聊天或歷史研究猜最新需求 |
+| 產品決策者 | 產品語意、重大取捨、成本與風險接受、翻案 | 框架細節與可由官方契約直接回答的問題 |
+| 研究與設計者 | 查官方資料、分清事實與推論、提出選項、記錄決策 | 未經確認便決定產品行為 |
+| 審查者 | 先審方向，再審設計與實作；依問題編號追蹤結果 | 增加未進決策表的新需求 |
+| 實作者 | 依有效決策、契約與計畫實作、測試、回報偏差 | 從聊天或歷史研究猜最新需求 |
 
-如果可逆、局部且 framework 已有明確預設，Researcher／Implementer 可採成熟預設並記錄；如果選項會改變員工體驗、資料 authority、成本級別、不可逆資料或跨 seam 契約，必須回到 Owner gate。
+可逆、局部且框架已有明確預設的細節，研究者或實作者可採成熟做法並記錄；涉及員工體驗、資料權責、明顯費用、不可逆資料或跨模組契約的變動，須回到產品決策階段。
 
 ## 6. 官方方法來源與適用邊界
 
 - [Amazon／AWS Product Management：Working Backwards](https://aws.amazon.com/executive-insights/content/product-management-at-amazon/) — 支持先從客戶、問題與最終體驗倒推，開發前對齊核心價值與關鍵問題；Caliburn 不照抄其內部模板。
-- [AWS Prescriptive Guidance：ADR process](https://docs.aws.amazon.com/prescriptive-guidance/latest/architectural-decision-records/adr-process.html) — 支持 decision log、owner、Proposed／Accepted／Rejected lifecycle、Accepted immutable 與 successor supersede。
+- [AWS Prescriptive Guidance：ADR process](https://docs.aws.amazon.com/prescriptive-guidance/latest/architectural-decision-records/adr-process.html) — 說明決策紀錄、負責人、Proposed／Accepted／Rejected 狀態，以及採用後以新紀錄取代而非覆寫歷史的做法。
 - [Microsoft Azure Well-Architected：Maintain an ADR](https://learn.microsoft.com/en-us/azure/well-architected/architect-role/architecture-decision-record) — 支持 single source of truth、append-only accepted records、context／options／trade-offs／confidence／status，並直接指出未記錄決策會造成重複爭論。
 - [Google Engineering Practices：Navigating a change](https://google.github.io/eng-practices/review/reviewer/navigate.html) — 支持先審核變更是否合理與主要設計，避免先投入大量細節後才發現方向錯誤。
 - [Google Engineering Practices：Small changes](https://google.github.io/eng-practices/review/developer/small-cls.html) — 支持 self-contained small changes、同切片測試、較完整 review 與較低返工成本。

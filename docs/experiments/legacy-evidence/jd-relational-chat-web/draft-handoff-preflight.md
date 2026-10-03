@@ -1,6 +1,6 @@
 # 同頁聊天草稿與原請求交接前置
 
-日期：2026-09-13。JD-R002／RS-4；責任是本輪 Web 交接的有界研究，並非實作結果。依[目前決策](../../../current-decisions.md)、[施工計畫](../../../plans/2026-09-13-jd-relational-app-implementation.md)及[已完成聊天 HTTP 契約](../../../specs/2026-09-13-jd-chat-http-slice.md)。本輪只讀源碼、既有證據及相關官方文件；沒有改程式、開 DB、啟動服務或呼叫模型。
+日期：2026-09-13。JD-R002／RS-4；責任是本輪 Web 交接的有界研究，並非實作結果。依[目前決策](../../../current-decisions.md)、[施工計畫](../../../archive/implementation-plans/2026-09-13-jd-relational-app-implementation.md)及[已完成聊天 HTTP 契約](../../../archive/legacy-specs/2026-09-13-jd-chat-http-slice.md)。本輪只讀源碼、既有證據及相關官方文件；沒有改程式、開 DB、啟動服務或呼叫模型。
 
 ## 1. 推薦與範圍
 

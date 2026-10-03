@@ -4,7 +4,7 @@
 - 日期：2026-07-30
 - 補充：[0043](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)
 - 研究：
-  [不完整 JD Task 與同一 identity 對齊研究](../specs/2026-07-29-job-analysis-partial-jd-task-reconciliation-research.md)
+  [不完整 JD Task 與同一 identity 對齊研究](../history.md#source-c29ccba15695e81e5a56)
 
 ## 脈絡
 

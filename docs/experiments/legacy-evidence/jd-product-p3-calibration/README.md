@@ -1,6 +1,6 @@
 # P3 首例 C-W 校準資料包
 
-版本2；2026-09-10。**公開 calibration／已曝光／非 held-out；0次自然trial、0次模型執行、0項實測結果。** 本包只把已接受[品質材料](../../../specs/2026-09-10-jd-product-quality-acceptance.md)§5 C-W及§6零付費準備第2／4項拆成可使用材料，不新增雇主事實或改rubric。
+版本2；2026-09-10。**公開 calibration／已曝光／非 held-out；0次自然trial、0次模型執行、0項實測結果。** 本包只把已接受[品質材料](../../../research/work-analysis/2026-09-10-jd-product-quality-acceptance.md)§5 C-W及§6零付費準備第2／4項拆成可使用材料，不新增雇主事實或改rubric。
 
 ## 內容與存取
 
@@ -24,7 +24,7 @@
 
 ## v2 測法沿革
 
-2026-09-10 root 依有限設計 review 的 spec／quality PASS 採用[操作設計](../../../specs/2026-09-10-jd-natural-calibration-operator-design.md)，只作待付費授權的P3執行測法；不是Owner既有真人豁免或自然驗收通過。[archive/v1/snapshot-manifest.json](archive/v1/snapshot-manifest.json)保留v1五檔、原manifest與品質來源的逐byte封存，原W／M／Q不改。
+2026-09-10 root 依有限設計 review 的 spec／quality PASS 採用[操作設計](../../../history.md#source-d2af4642cf43ef2739b4)，只作待付費授權的P3執行測法；不是Owner既有真人豁免或自然驗收通過。[archive/v1/snapshot-manifest.json](archive/v1/snapshot-manifest.json)保留v1五檔、原manifest與品質來源的逐byte封存，原W／M／Q不改。
 
 Controller是AI，已見oracle、非盲；同操作者判讀非獨立人工評量，僅供工程縱切與初步語意校準。不得向待測顧問傳oracle／完整卡／研究指令／expected tools，洩題或錯卡保留首敗並標污染／不可判定。Controller的平台資源不假稱免費，也不假稱已含於App前背景provider的US$1帳本；不新增provider員工／judge呼叫。P6未見案例、三名真員工及原人工評讀缺證仍待驗。
 

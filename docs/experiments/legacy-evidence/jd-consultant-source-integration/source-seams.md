@@ -1,6 +1,6 @@
 # OI-02：原話來源與共同 JD 保存接點
 
-2026-09-13，只讀有界核對；供本輪接線決策。沒有改程式、資料庫或呼叫 provider；下列測試為已存在案例的程式／既有結果核對，本次未重跑。依[目前缺口 OI-02](../../../specs/2026-09-13-jd-app-open-issues.md)及[工具契約 §9](../../../specs/2026-09-12-jd-relational-agent-tool-contract.md#9-來源引用契約)。
+2026-09-13，只讀有界核對；供本輪接線決策。沒有改程式、資料庫或呼叫 provider；下列測試為已存在案例的程式／既有結果核對，本次未重跑。依[目前缺口 OI-02](../../../archive/legacy-specs/2026-09-13-jd-app-open-issues.md)及[工具契約 §9](../../../specs/2026-09-12-jd-relational-agent-tool-contract.md#9-來源引用契約)。
 
 **結論：原話已有唯一的原生保存與固定讀取能力；共同 JD 保存已有來源檢查、target basis 與手改失效標示。先接一個真正的原話 source owner，向實際 model request 發配當輪已保存原話的精確引用，再注入人工／AI 既有 resolver，即可形成第一條可驗縱向流程。不必先做 B1/B2，也不新增 `read_conversation` 工具、原話資料表或通用來源引擎。**這只閉合當輪來源；Memory／較早來源查找仍須後续完成，不能宣布 OI-02 全部結案。
 

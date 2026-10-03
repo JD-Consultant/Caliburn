@@ -2,8 +2,8 @@
 
 - 狀態：Accepted
 - 日期：2026-08-09
-- 依據：[`docs/specs/2026-08-08-unreviewed-branches-review.md`](../specs/2026-08-08-unreviewed-branches-review.md) §12、§16，
-  [`docs/specs/2026-08-02-icap-2026-quality-manual-form-authority.md`](../specs/2026-08-02-icap-2026-quality-manual-form-authority.md)
+- 依據：[`docs/specs/2026-08-08-unreviewed-branches-review.md`](../history.md#source-59cf61a516c7a45d0755) §12、§16，
+  [`docs/specs/2026-08-02-icap-2026-quality-manual-form-authority.md`](../research/work-analysis/2026-08-02-icap-2026-quality-manual-form-authority.md)
 - 延續：[0052](0052-jd-readiness-assessment-and-official-code-boundaries.md) 的 readiness、代碼權責與 deterministic export 邊界
 - 核准：2026-08-09 owner 明確核准選擇性移植 XLSX，並要求匯出與公版一致
 

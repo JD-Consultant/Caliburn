@@ -1,6 +1,6 @@
 # JD AI App：工具執行與可靠性官方證據
 
-JD-R002/C03；查閱日 **2026-09-09**；G2 證據，不是採用或施工授權。承接[整體研究](../../specs/2026-09-09-ai-document-app-composition-research.md)；文件結構與審閱的 E01–E20 留在[原證據表](../engineering/2026-09-09-jd-document-model-official-evidence.md)，不重抄。本文只回答「工具怎麼執行、錯誤怎麼回、框架能省掉什麼」。
+JD-R002/C03；查閱日 **2026-09-09**；G2 證據，不是採用或施工授權。承接[整體研究](../engineering/2026-09-09-ai-document-app-composition-research.md)；文件結構與審閱的 E01–E20 留在[原證據表](../engineering/2026-09-09-jd-document-model-official-evidence.md)，不重抄。本文只回答「工具怎麼執行、錯誤怎麼回、框架能省掉什麼」。
 
 分類：**Fact** 為官方直接契約；**Mapping** 為本案建議；**Unknown** 為尚未公開／未驗證。多家相同的是原則，不代表相同 API，也不證明某方案在所有情況效果最好。
 
@@ -76,4 +76,4 @@ JD-R002/C03；查閱日 **2026-09-09**；G2 證據，不是採用或施工授權
 
 Vercel AI SDK 官方搜尋可見 ToolLoopAgent／prepareStep／stopWhen／experimental_repairToolCall 等能力，但數次直接開頁回 unsupported markdown content-type，本機網路讀取也未成功。只列正式 runtime 備選，不拿未讀完整契約作精確主方案；Tiptap 的 Vercel integration 範例則另依 E18 的直接資料核對。
 
-以上足以排除「所有工具都靠自行寫 loop／所有錯誤都重試／有 approval 就等於文件審核」等錯誤前提。編輯器選擇、部分失敗及 C02 情境的後續證據已寫入 [F01–F05](../engineering/2026-09-09-jd-editor-framework-comparison.md)，整體取捨在[可執行方案](../../specs/2026-09-09-jd-ai-editing-executable-proposal.md)。不重做 Memory、provider 或所有 LLM App 功能研究。
+以上足以排除「所有工具都靠自行寫 loop／所有錯誤都重試／有 approval 就等於文件審核」等錯誤前提。編輯器選擇、部分失敗及 C02 情境的後續證據已寫入 [F01–F05](../engineering/2026-09-09-jd-editor-framework-comparison.md)，整體取捨在[可執行方案](../../history.md#source-81ce3748645d8d8bc468)。不重做 Memory、provider 或所有 LLM App 功能研究。

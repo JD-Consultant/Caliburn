@@ -8,7 +8,7 @@
 
 早期 JobIntel 以 OpenAI embedding＋pgvector 取得 iCAP 參考，按信心程度分 reference／hybrid／company-defined 路線，再進訪談。5/26 的 matcher 又將任務、產出、工具及工作情境納入；不只是用職稱搜尋。
 
-**引用：**[初始架構 §2–§4](../../archive/early-projects/2026-05-20-jobintel-architecture.md)、[初始 Graph](../../archive/early-projects/2026-05-20-jobintel-graph-pipeline.md)。程式線索：`git show 699f53a6383b9786485f4377509542e0164cfca7 -- backend/app/services/icap_matcher.py`。這些說明最初機制，沒有證明信心分數已校準成準確率。
+**引用：**[初始架構 §2–§4](../../history.md#source-403e401b5f084bb191fc)、[初始 Graph](../../history.md#source-f6099bd5a1a81730042d)。程式線索：`git show 699f53a6383b9786485f4377509542e0164cfca7 -- backend/app/services/icap_matcher.py`。這些說明最初機制，沒有證明信心分數已校準成準確率。
 
 ### 05-26 至 05-27：另建 BGE-M3／Qdrant indexer
 
@@ -58,13 +58,13 @@ BGE-M3 在 CLI 可運作，但 Windows API 環境出現 OpenMP／重複載入等
 
 後續 task 灰區下限從 0.7 改到 0.8，三組比較的灰區縮為約 1–3；但 skills 仍有 67–145 對灰區與可疑合併，unit matching 則尚未接線。當時因此暫緩 K/S 的相似合併呈現，而不是把「程式能算分數」當成可用。
 
-**引用：**[校準結果與未決項](../../specs/2026-07-04-similarity-matching-calibration.md)、[前一份研究 §9.6](../../research/retrieval/2026-07-02-multi-ocs-candidate-dedup-research.md)。不同輪次有不同 exact-collapse 數字，使用時需連同該次輸入與設定引用，不能拼成同一輪成果。
+**引用：**[校準結果與未決項](../../research/retrieval/2026-07-04-similarity-matching-calibration.md)、[前一份研究 §9.6](../../research/retrieval/2026-07-02-multi-ocs-candidate-dedup-research.md)。不同輪次有不同 exact-collapse 數字，使用時需連同該次輸入與設定引用，不能拼成同一輪成果。
 
 ### 07-12 至 07-13：拓寬研究，但不把外部 benchmark 當成本專案結果
 
 接著研究 Qwen3 embedding／reranker、contextual retrieval、HyDE、GraphRAG、late interaction 等，也重看 O*NET／ESCO／iCAP 對任務與職能的表示。原研究主張先建立自己的查詢、標準答案與比較條件；並非全部方法都值得導入。
 
-**引用：**[檢索前沿研究與建議順序](../../research/retrieval/2026-07-12-ai-redesign-raw-retrieval-frontier.md)、[國際職能標準與差距](../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md)、[較早整合設計](../../archive/jobintel-v3/specs/2026-06-14-jobintel-ocs-integration-design.md)。尚未找到這些候選在 Caliburn 完整 A/B 評測的證據，也不能寫成已匯入整套 O*NET 資料庫。
+**引用：**[檢索前沿研究與建議順序](../../research/retrieval/2026-07-12-ai-redesign-raw-retrieval-frontier.md)、[國際職能標準與差距](../../research/work-analysis/2026-07-13-ai-redesign-raw-intl-competency-standards.md)、[較早整合設計](../../history.md#source-41cf4c400a51ac696644)。尚未找到這些候選在 Caliburn 完整 A/B 評測的證據，也不能寫成已匯入整套 O*NET 資料庫。
 
 ## 2026-08 之後：參考知識與員工事實分開
 

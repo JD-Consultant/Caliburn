@@ -7,7 +7,7 @@
   [0043](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)、
   [0045](0045-job-analysis-local-web-contract-and-shared-authority-commit.md)
 - 研究：
-  [專業顧問第一個最小完整迴圈](../specs/2026-07-30-professional-consultant-minimal-complete-loop-research.md)
+  [專業顧問第一個最小完整迴圈](../history.md#source-4e53391979e3a8b7d1aa)
 
 ## 脈絡
 

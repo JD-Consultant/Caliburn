@@ -9,7 +9,7 @@
 
 **2026-09-10共識效力補註：**本附件三表與完整revision是本案工程設計，不是OpenAI／Anthropic或共編產品統一資料表規範。JSON／關聯／協作狀態的分層、近期公開實例、版本粒度與token保留的差異見[保存研究§7](2026-09-10-jd-semantic-relations-storage-audit.md#7-json關聯與三表現行公開證據能支持到哪裡)。此次補證不修改以下已固定SQL契約或保留政策，也不把每個工具attempt都列為須永久保存的回執。
 
-依 [current register](../../current-decisions.md)、[流程](../../decision-process.md)、[DB01–04 稽核](../../specs/2026-09-10-jd-responsibility-and-evidence-audit.md)、[完整關係與來源](2026-09-10-jd-storage-relations-audit.md)、[主設計 §5.4](../../specs/2026-09-09-jd-editor-app-integration-design.md#54-保存資料的具體約束)、[ADR 0073](../../adr/0073-plate-jd-app-working-document-and-revision-authority.md)、[施工 Task 2](../../plans/2026-09-10-jd-editor-core-implementation.md#task-2同-pg-唯一工作稿revision-與回執)。持續 clean 工作稿、同文件接續、保存後可查完整差異、失敗零發布及相同 operation 對帳的產品語意不變；Memory／來源沿既有 owner，真人交付 PARKED。
+依 [current register](../../current-decisions.md)、[流程](../../decision-process.md)、[DB01–04 稽核](../../specs/2026-09-10-jd-responsibility-and-evidence-audit.md)、[完整關係與來源](2026-09-10-jd-storage-relations-audit.md)、[主設計 §5.4](../../archive/legacy-specs/2026-09-09-jd-editor-app-integration-design.md#54-保存資料的具體約束)、[ADR 0073](../../adr/0073-plate-jd-app-working-document-and-revision-authority.md)、[施工 Task 2](../../archive/implementation-plans/2026-09-10-jd-editor-core-implementation.md#task-2同-pg-唯一工作稿revision-與回執)。持續 clean 工作稿、同文件接續、保存後可查完整差異、失敗零發布及相同 operation 對帳的產品語意不變；Memory／來源沿既有 owner，真人交付 PARKED。
 
 **D：採單向關係。**`jd_operation.result_revision_id` 指向 `jd_revision`；只對 committed rows 加部分唯一索引，提供「一新版本最多一個產生操作」。反查便能取得 producer，不需要 revision 再存同一個 operation ID。對本案僅新增版本的寫入流程，這比兩邊 FK 加 deferred 檢查少一組重複關係，也讓 revision→receipt→head 的寫入顺序明確。
 

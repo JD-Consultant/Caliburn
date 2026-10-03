@@ -3,7 +3,7 @@
 - **狀態**：Accepted
 - **日期**：2026-08-26
 - **Owner 對齊**：owner 在 2026-08-26 核准依最新官方研究開始施工，並要求 UI 一併改為共用編輯面；外部產品只作機制參考，不要求沿用舊實作或舊名稱
-- **研究**：[`2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md`](../specs/2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md)
+- **研究**：[`2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md`](../history.md#source-0e00a18bd6a443794e33)
 - **Supersedes**：ADR 0066 決定 1／3／7／8 中「AI working draft 與正式 editor 是兩個員工可感知編輯面」、`defer` decision、direct edit 後三方 rebase conflict，以及 pending review 可阻擋後續訪談的部分；ADR 0067 決定 5 中 direct edit rebase 與 `defer` 的部分
 - **保留**：ADR 0060 的 LangGraph durable authority、員工 authority 與 AI 無 approved write edge；ADR 0066／0067 的單一 Store-backed workspace、derived semantic review、低階 VFS Tool、自動驗證、partial authority、stale guard、approved-only export、按需 context 與 no-RAG／no-auto／no-Git 邊界
 

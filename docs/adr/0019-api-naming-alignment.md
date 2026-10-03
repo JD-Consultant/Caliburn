@@ -2,7 +2,7 @@
 
 - **狀態**:Accepted（2026-07-02）。
 - 研究依據:[`../specs/2026-07-02-api-naming-alignment-research.md`](../research/engineering/2026-07-02-api-naming-alignment-research.md)(§1 破壞面實查、§2 冒號路由實證、§4 monorepo 原子遷移、§7 規範原文查核)。
-- 關聯:API review findings F3/F4/F5/F7([`../specs/2026-06-30-api-review-findings.md`](../specs/2026-06-30-api-review-findings.md))。
+- 關聯:API review findings F3/F4/F5/F7([`../specs/2026-06-30-api-review-findings.md`](../history.md#source-a483b71360c97426e1df))。
 
 ## 脈絡
 

@@ -4,7 +4,7 @@
 
 ## 執行
 
-使用 Node 24.19.0、pnpm 12.5.1 與根目錄 lock。API 先依[受管理設定](../../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)明示初始化一次；一般開啟只使用原設定，不能重做 init。後端設定的允許來源必須包含 `http://127.0.0.1:3002`，API port 以該設定為準。
+使用 Node 24.19.0、pnpm 12.5.1 與根目錄 lock。API 先依[受管理設定](../../../docs/history.md#source-d48808fa1c7c98eef3ff)明示初始化一次；一般開啟只使用原設定，不能重做 init。後端設定的允許來源必須包含 `http://127.0.0.1:3002`，API port 以該設定為準。
 
 日常直接在 repository 根目錄執行：
 

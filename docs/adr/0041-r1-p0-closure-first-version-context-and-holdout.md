@@ -8,8 +8,8 @@
 - 補充：[0040](0040-professional-consultant-engine-and-r1-validation-contract.md)
   （六 arm、exit gate、模型策略一律不變；本 ADR 只補 0040 未規定的 Context 表示預設與案例分層規則）
 - 權威文件：
-  [Context 表示外部權威證據審查](../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)、
-  [R1 Task Discovery 深入研究](../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md) §10.6
+  [Context 表示外部權威證據審查](../research/agent-systems/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)、
+  [R1 Task Discovery 深入研究](../research/work-analysis/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md) §10.6
 - 實驗資產：[R1-P0 Context Representation Screening](../experiments/2026-07-26-r1-p0-context-representation/README.md)
 
 ## 脈絡

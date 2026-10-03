@@ -25,4 +25,4 @@
 
 ## 分界
 
-這是後端公開讀取及實際 ASGI／SDK／PG 證據，不是socket瀏覽器、Memory、自然模型或整輪撤回完成。Web／生成／游標及獨立審查各自列結果，不把重疊測試相加。Source schema是本App既有必帶資源；正式封裝要保留該資源，依[收尾 OI-08](../../../specs/2026-09-13-jd-app-open-issues.md)追蹤。
+這是後端公開讀取及實際 ASGI／SDK／PG 證據，不是socket瀏覽器、Memory、自然模型或整輪撤回完成。Web／生成／游標及獨立審查各自列結果，不把重疊測試相加。Source schema是本App既有必帶資源；正式封裝要保留該資源，依[收尾 OI-08](../../../archive/legacy-specs/2026-09-13-jd-app-open-issues.md)追蹤。

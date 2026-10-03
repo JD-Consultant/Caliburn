@@ -104,7 +104,7 @@ JD-R002/C02；2026-09-09；**G3／WORKING：Owner 同意審核粒度方向，並
 | 接受／取消 | 對完整成員在候選 editor 呼叫原生 accept／reject；同 baseline 才提交結果 | R01-F 只證已知三 ID 的特定順序；正序拒絕有殘文與 raw keys。不能泛化成「一律反序」，也不能把查無 ID 當成功 |
 | 讀取目前／已接受內容 | 依選定政策明列投影，與歷次實改分開；刪文不當成現行工作 | 在成員與相依規則未定前，不能由一份乾淨快照推出完整 accepted projection |
 
-依據：[R01／R01-F](../../../../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/evidence/2026-09-09-jd-native-pending-review-comparison.md)、[codec](../../../../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/evidence/2026-09-09-jd-native-pending-codec-probe.md)、[App 工具／保存責任](../../../../specs/2026-09-09-jd-editor-app-integration-design.md)。因此「App 關聯資料＋原生命令＋现成 codec」是可研究的組合，尚不是完整解法。新增一個 groupId 欄位不會消除成員隔離和結算的責任。
+依據：[R01／R01-F](../../../../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/evidence/2026-09-09-jd-native-pending-review-comparison.md)、[codec](../../../../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/evidence/2026-09-09-jd-native-pending-codec-probe.md)、[App 工具／保存責任](../../../../archive/legacy-specs/2026-09-09-jd-editor-app-integration-design.md)。因此「App 關聯資料＋原生命令＋现成 codec」是可研究的組合，尚不是完整解法。新增一個 groupId 欄位不會消除成員隔離和結算的責任。
 
 若保留完整續改待審效果，至少還需交付成員歸屬、相依範圍、原生結算與失敗恢復、員工可讀邊界及其驗收。若實現方法變成通用成員推導／相依圖／排序／before-image 重建，便是本專案自建審閱引擎；不能因叫 adapter 就降低其責任。**現階段沒有足夠證據估成幾個簡單函式，也沒有足夠資料估工時；不虛構精確成本。**
 

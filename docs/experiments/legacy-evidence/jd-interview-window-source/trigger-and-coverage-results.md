@@ -4,7 +4,7 @@
 
 ## 採用，不是重寫
 
-整理通知依[採用映射 §3.5](../../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)取自已驗來源 `4f94fbfb` 的 `consolidation_request.py`，落點 `caliburn_memory/requests.py`，**與固定來源逐位元相同**（`6965d106…`，只改模組名，無 `analysis_agent` 依賴）。模型可見的工具描述是已驗文字，採用時**一字未改**。`adoption.json` 已登記。
+整理通知依[採用映射 §3.5](../../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)取自已驗來源 `4f94fbfb` 的 `consolidation_request.py`，落點 `caliburn_memory/requests.py`，**與固定來源逐位元相同**（`6965d106…`，只改模組名，無 `analysis_agent` 依賴）。模型可見的工具描述是已驗文字，採用時**一字未改**。`adoption.json` 已登記。
 
 工具本身是純通知：無參數、回 `content + artifact{kind}`，不執行 B、不寫 Memory、不宣稱整理完成。
 
@@ -46,7 +46,7 @@ W-12 的「同一 call id 出現兩次」**無法經 App 的保存路徑產生**
 
 ## 明確**沒有**做的（下一片）
 
-- **工具尚未註冊給顧問。**辨識規則已可用，但 `request_memory_consolidation` 還沒加進 `build_consultant_tools()`，所以顧問目前**發不出**通知。註冊會改動模型可見工具清單與既有 `expected_tool_count` 斷言，屬[映射 §6 第5項](../../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)的顧問接合。
+- **工具尚未註冊給顧問。**辨識規則已可用，但 `request_memory_consolidation` 還沒加進 `build_consultant_tools()`，所以顧問目前**發不出**通知。註冊會改動模型可見工具清單與既有 `expected_tool_count` 斷言，屬[映射 §6 第5項](../../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)的顧問接合。
 - **窗口切分與 `context_reference` pair**（§3.3／§7.3）：`max_chars`／`context_chars` 預算、消歧前置問題、`max_windows` 超限保留尾端、重抽回原窗口。`capture_window` 目前一次發配整段安全範圍，**沒有按預算切分**（W-06、W-13）。
 - **B1 admission 的 `follows`**（§7.2 不回退且連續，W-09／W-10）：目前只有游標比較，沒有獨立的 admission 檢查。
 - **W-14**：>256 祖先／缺鏈由既有 `original_run_lookup_required` 明確保留並向上傳遞，仍未建立案例。

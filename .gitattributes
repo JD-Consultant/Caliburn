@@ -22,3 +22,6 @@ docs/plans/2026-09-29-target-rebuild/evidence/data/**/*.ps1 -text
 
 # 本機分支研究原件：保留原 blob 位元組，不讓 Windows 換行轉換改寫歷史。
 docs/archive/branch-snapshots/20261002-legacy-jd-research/**/docs/** -text
+
+# 公開實驗原件：搬移後仍以相同位元組核對既有 SHA-256。
+docs/experiments/product-validation/data/** -text

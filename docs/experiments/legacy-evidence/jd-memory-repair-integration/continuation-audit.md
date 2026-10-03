@@ -1,13 +1,13 @@
 # JD App 接續方向與未提交實作審核
 
-> **2026-09-13 後續：CA-01／02 已修**，見[App 接合結果稿](../../../specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。本稿維持當時的審核狀態；§3 的診斷探針斷言「恢復仍阻擋」，現在會如預期失敗，保留為當時紀錄，產品回歸改看結果稿列出的命名案例。§4 的 wheel 與 adoption 界線也已在該結果稿收尾。
+> **2026-09-13 後續：CA-01／02 已修**，見[App 接合結果稿](../../../archive/legacy-specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。本稿維持當時的審核狀態；§3 的診斷探針斷言「恢復仍阻擋」，現在會如預期失敗，保留為當時紀錄，產品回歸改看結果稿列出的命名案例。§4 的 wheel 與 adoption 界線也已在該結果稿收尾。
 
 2026-09-13；JD-R002／OI-02。Owner 要求核對額度交接前後有沒有理解錯誤，並補詳細施工規範。本次停止新增產品功能，讀取有效需求、完成文件、交接計畫與實際 diff，另做兩個零 provider 反例。**結論：產品方向未見倒退；C 接合仍有兩個可重現的恢復缺口，不能宣稱完成。**本稿是主代理審核，不是新一輪獨立審查通過。
 
 ## 1. 審核基準及能回答的範圍
 
-- 交接依據：[原接續計畫](../../../plans/2026-09-13-jd-app-continuation-handoff.md)；已提交基準 `8403d7e2e7904d2cd9db55a44bdeea26e105fd45`／tag `jd-memory-repair-core-20260913`。核對該基準後目前 working tree，不以檔案是否 tracked 推定有沒有施工。
-- 先讀 [C 核心完成文件](../../../specs/2026-09-13-jd-memory-repair-core-slice.md)、核心採用／宿主／讀取成果，再讀本目錄原生觀察、binding、factory、closure 前置。核心完成與 App 接合是兩個驗收範圍。
+- 交接依據：[原接續計畫](../../../archive/implementation-plans/2026-09-13-jd-app-continuation-handoff.md)；已提交基準 `8403d7e2e7904d2cd9db55a44bdeea26e105fd45`／tag `jd-memory-repair-core-20260913`。核對該基準後目前 working tree，不以檔案是否 tracked 推定有沒有施工。
+- 先讀 [C 核心完成文件](../../../archive/legacy-specs/2026-09-13-jd-memory-repair-core-slice.md)、核心採用／宿主／讀取成果，再讀本目錄原生觀察、binding、factory、closure 前置。核心完成與 App 接合是兩個驗收範圍。
 - Owner 指出此處發生模型交接；Git 與工作檔不能證明每段修改由哪個模型產生。本稿評判交付內容，不把缺口歸因於特定模型名稱。
 - 沒有審查全部歷史程式、所有職位或正式部署；兩個反例只能證明所列缺口，不等於已找到所有錯誤。這輪不重跑無新變動的全部舊實驗。
 
@@ -32,7 +32,7 @@
 
 - [CT49 固定新版長訪談](../../../../.worktrees/analysis-only-agent/docs/specs/2026-09-09-ct49-fixed-long-interview-results.md)：11 輪真模型／FastAPI／PG，工作理解、案例詳記、晚期更正、來源回查，無新資訊的一輪不重做 Memory；有 Minor，並非所有職位或百輪成功率。
 - [CT50 已測配置與續談](../../../../.worktrees/analysis-only-agent/docs/specs/2026-09-09-ct50-tested-profile-results.md)：已測配置接線、真正前景與空近期 context 回查；有獨立審查與固定保存證據。CT49＋50 共 135 次真請求、估算 US$0.16871788，帳本已關閉；本次沒有重跑。
-- [2026-09-13 C 核心](../../../specs/2026-09-13-jd-memory-repair-core-slice.md)：正常套件、官方 patch、原 request 查回已完成。新接手不能重新寫 matcher、另建 Memory schema 或退回較早的 old_text/new_text 設計。
+- [2026-09-13 C 核心](../../../archive/legacy-specs/2026-09-13-jd-memory-repair-core-slice.md)：正常套件、官方 patch、原 request 查回已完成。新接手不能重新寫 matcher、另建 Memory schema 或退回較早的 old_text/new_text 設計。
 
 因此，正確工作名稱是：**把已驗訪談顧問與 Memory 採用到新的關聯式 JD App，補新接點的保存／停止／恢復，再驗自然產出 JD。**
 
@@ -97,7 +97,7 @@ AUDIT child_start_checkpoint: seed=0 model=1 publication=0; recovery blocks
 
 官方支持原生子圖／checkpoint 與保留原請求身分，**不保證任意組合就能恢復，也沒有規定本案十五工具、binding 欄位或判定表**。固定 wrapper 是已完成前置實驗後的本案接法，CA-01／02 是該接法必須補的邊界，不能用「大廠共識」代替測試。
 
-LLM patch／結果契約沿 [C 核心的 OpenAI／Anthropic 官方證據](../../../specs/2026-09-13-jd-memory-repair-core-slice.md)及 [原 call／artifact 驗證](records-results.md)；本次不改模型輸入，沒有以新廣搜推翻已驗方法。只對新恢復反例做有限研究。
+LLM patch／結果契約沿 [C 核心的 OpenAI／Anthropic 官方證據](../../../archive/legacy-specs/2026-09-13-jd-memory-repair-core-slice.md)及 [原 call／artifact 驗證](records-results.md)；本次不改模型輸入，沒有以新廣搜推翻已驗方法。只對新恢復反例做有限研究。
 
 ## 6. 為什麼仍花時間、如何收斂
 
@@ -105,7 +105,7 @@ LLM patch／結果契約沿 [C 核心的 OpenAI／Anthropic 官方證據](../../
 
 其中一部分時間用於必要的跨 Saver／Store／SQL 接點驗證；但測試 fixture 錯誤、環境路徑／cache 問題、狀態沒有及時回寫、將新連線說成新程序，也增加了返工。不能把全部耗時都說成規範所必需，更無證據把它歸因於模型交接。
 
-下一工作單位只處理 CA-01／02、補 C 真新宿主驗證並完成 H3。之後直接採用已驗 B1/B2 與顧問方法，接完整 JD 旅程。逐檔步驟、反例到驗收與停止條件回寫[同一接續計畫 §5](../../../plans/2026-09-13-jd-app-continuation-handoff.md)，不另造競爭計畫、不新增產品範圍。本次未修產品程式，兩個問題維持 OPEN。
+下一工作單位只處理 CA-01／02、補 C 真新宿主驗證並完成 H3。之後直接採用已驗 B1/B2 與顧問方法，接完整 JD 旅程。逐檔步驟、反例到驗收與停止條件回寫[同一接續計畫 §5](../../../archive/implementation-plans/2026-09-13-jd-app-continuation-handoff.md)，不另造競爭計畫、不新增產品範圍。本次未修產品程式，兩個問題維持 OPEN。
 
 ## 7. 本次審核收尾
 

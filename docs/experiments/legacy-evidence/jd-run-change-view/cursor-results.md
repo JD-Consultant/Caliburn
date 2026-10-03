@@ -17,7 +17,7 @@ App 將本次已確認的 operation IDs、捕捉時是否已完整收尾，以�
 
 - 以 Python 標準 `UUID.bytes` 串接固定 16-byte IDs，再用標準 URL-safe Base64。96 個 IDs 為 **1536 bytes／2048 Base64 字元**；沒有存成 96 個帶引號的 UUID 字串。
 - 沿原 signer 的未壓縮 JSON 最壞長度 admission，**不因 ItsDangerous 恰好壓得小就放寬**。本輪高熵合成 96 IDs 的 raw 上界與最終 token 均在既有 4096 限制內；0／1／96 IDs、兩種 settled 值及最大 offset 均完成 round trip。
-- 原容量探針對 UUID 字串版與 packed 版的精確量測，集中見[本輪接線設計](../../../specs/2026-09-13-jd-run-change-view-slice.md#唯一必要的容量驗證)。本檔不把他人的容量探針列成作者另一次實測。
+- 原容量探針對 UUID 字串版與 packed 版的精確量測，集中見[本輪接線設計](../../../archive/legacy-specs/2026-09-13-jd-run-change-view-slice.md#唯一必要的容量驗證)。本檔不把他人的容量探針列成作者另一次實測。
 - 256-byte 普通 ASCII dataset 通過；需要大量 JSON escape 的 256-byte 控制字元 dataset 仍明確拒絕，沒有提高上限。正式 managed dataset／document／run 是 canonical UUID。
 - 解碼使用標準 Base64 嚴格驗證、回編字串 exact 比對、byte 數為 16 的倍數且不超過 1536、IDs 不重複。錯誤 padding、非 canonical pad bits、標準 Base64 的替代字元、97 IDs、錯型別及額外欄位均拒絕。
 

@@ -77,7 +77,7 @@
    ⚠️ **校準#2 修正**:reflect 不可置頂——小模型會把「先回述」當優先序、用回述**代替**
    set_slot(覆蓋 0.91→0.45)。定案=**落槽優先**(set_slot 為不可違反的置頂硬規則,
    回述/追問/問下一題都不得取代);senior 動作降為「在落槽前提下」的次要層。
-   見校準紀錄 [`2026-07-05-interview-sim-calibration.md`](../../specs/2026-07-05-interview-sim-calibration.md) #2。
+   見校準紀錄 [`2026-07-05-interview-sim-calibration.md`](../../history.md#source-bbe1eedda0bb5779480a) #2。
 2. **context 確定性補強**:(a) 缺口顯示扣除 skipped(與 executor `_next_gap_question` 同源);
    (b) 帶入 pending 建議摘要(員工可能在問卡片);(c) 已填槽如實回述供「連舊答」。
 3. **驗證**:單元測 context 狀態組裝(skipped 不再出現在缺口、pending 進 prompt);

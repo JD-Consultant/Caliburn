@@ -2,7 +2,7 @@
 
 - 日期：2026-09-13。
 - 狀態：**限定情境 PASS**；使用真 PG／PostgresSaver／LangChain Agent／Anthropic SDK，以及離線固定模型回覆。不是自然模型、真瀏覽器或新 OS 宿主驗收。
-- 範圍：[本次來源接合](../../../specs/2026-09-13-jd-consultant-source-integration-slice.md)；本文件只記獨立資料庫縱向證據，不取代[原生時序證據](native-timing.md)與來源模組的負面案例。
+- 範圍：[本次來源接合](../../../archive/legacy-specs/2026-09-13-jd-consultant-source-integration-slice.md)；本文件只記獨立資料庫縱向證據，不取代[原生時序證據](native-timing.md)與來源模組的負面案例。
 - 唯一新增測試：[test_conversation_sources_postgres.py](../../../../experiments/jd-relational-app/tests/test_conversation_sources_postgres.py)。未修改產品實作、既有測試、依賴、設定或 schema。
 
 ## 環境與資料界線

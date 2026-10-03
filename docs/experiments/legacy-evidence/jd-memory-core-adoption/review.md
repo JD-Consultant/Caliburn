@@ -1,6 +1,6 @@
 # Memory 核心採用：獨立審查
 
-2026-09-13。結論：**PASS；未發現本切片新增且可重現的 P1／P2**。依[本輪設計](../../../specs/2026-09-13-jd-memory-core-adoption-slice.md)與[既有成果接點](../jd-consultant-source-integration/memory-seams.md)，核對新 package、來源 adapter、App 依賴，以及主代理新增的專用 PG 初始化／縱向測試。審查者未修改產品、契約、測試或環境，未執行 provider、PG、初始化、服務或新程序。
+2026-09-13。結論：**PASS；未發現本切片新增且可重現的 P1／P2**。依[本輪設計](../../../archive/legacy-specs/2026-09-13-jd-memory-core-adoption-slice.md)與[既有成果接點](../jd-consultant-source-integration/memory-seams.md)，核對新 package、來源 adapter、App 依賴，以及主代理新增的專用 PG 初始化／縱向測試。審查者未修改產品、契約、測試或環境，未執行 provider、PG、初始化、服務或新程序。
 
 ## 審查範圍與差異
 

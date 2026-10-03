@@ -19,8 +19,11 @@ from caliburn.features.work_memory.candidates import (
 )
 from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
 from caliburn.features.work_memory.revisions import MemoryLayer
+from caliburn.transport.model_tools.jd_changes import JdChangesTools
+from caliburn.transport.model_tools.jd_reads import JdReadTools
 from caliburn.workflows.jd_candidates import JdCandidateWorkflow
 from caliburn.workflows.jd_changes import JdChangesWorkflow
+from caliburn.workflows.jd_reads import JdReadWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import PublishedMemoryRead
 from tests.integration.test_consultant_completion import complete, start_turn, transact
@@ -147,6 +150,24 @@ def test_alignment_uses_pinned_revision_and_rejects_later_same_title_replacement
     for citation in citations:
         result = client.portal.call(reader.read_source, binding, citation)
         assert result.changes
+    # Public model reads/diffs/confirmations all use the same short citation locator.
+    read_tools = JdReadTools(JdReadWorkflow(sessions), binding)
+    profile = json.loads(
+        client.portal.call(read_tools.invoke, "read_jd", '{"view":"profile","read_ref":null}')
+    )
+    citations = [item["citation_ref"] for item in profile["supporting_sources"]["job_title"]]
+    assert all(len(ref) < 24 for ref in citations)
+    changes_tools = JdChangesTools(
+        reader, binding, manual_jd_start_revision_id=turn.candidate.base_revision_id
+    )
+    for citation in citations:
+        output = client.portal.call(
+            changes_tools.invoke,
+            "read_jd_changes",
+            json.dumps({"query": {"kind": "source", "citation_ref": citation}}),
+        )
+        assert "## JD 來源差異" in output and f"citation_ref: {citation}" in output
+        assert "每季盤點" in output
     # Reading differences and adding the same identity at a new version do not align it.
     assert (
         invoke(

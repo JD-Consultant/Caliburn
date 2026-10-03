@@ -43,6 +43,7 @@ from caliburn.features.work_memory.candidates import (
 from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.transport.model_tools.jd_reads import JdReadTools
+from caliburn.transport.model_tools.jd_reference_fields import resolve_jd_arguments
 from caliburn.workflows.interview_completion import record_formal_interview
 from caliburn.workflows.jd_candidates import JdCandidateWorkflow
 from caliburn.workflows.jd_reads import JdReadWorkflow
@@ -162,6 +163,10 @@ def test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_alig
         client.portal.call(tools.invoke, "read_jd", '{"view":"profile","read_ref":null}')
     )
     assert output["job_title"] == "候選改名"
+    # Compare the resolved UUID identities, not the model-facing representation.
+    output = json.loads(
+        client.portal.call(resolve_jd_arguments, tools.references, json.dumps(output))
+    )
     assert output["supporting_sources"]["job_title"] == [
         {
             "citation_ref": f"citation_{before[0].citation_id.hex}",
@@ -436,7 +441,9 @@ def test_memory_citations_keep_fixed_identity_after_rename_removal_and_late_publ
             )
         tools = JdReadTools(JdReadWorkflow(sessions), binding)
         output = await tools.invoke("read_jd", '{"view":"profile","read_ref":null}')
-        data = json.loads(output)["supporting_sources"]
+        data = json.loads(await resolve_jd_arguments(tools.references, output))[
+            "supporting_sources"
+        ]
         assert data["purpose"] == [
             {
                 "citation_ref": f"citation_{before[0].citation_id.hex}",

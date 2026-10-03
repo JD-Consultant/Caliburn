@@ -3,6 +3,7 @@
 import json
 import subprocess
 import sys
+from pathlib import Path
 from uuid import UUID, uuid4
 
 import pytest
@@ -37,6 +38,9 @@ def invoke_worker(
             str(writer.scope.execution_id),
             str(writer.writer_id),
         ],
+        # pytest's pythonpath applies only to this process. The isolated worker
+        # must find the tests package even when pytest starts at the repo root.
+        cwd=Path(__file__).resolve().parents[2],
         capture_output=True,
         text=True,
         encoding="utf-8",

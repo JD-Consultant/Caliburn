@@ -282,20 +282,25 @@ def test_manual_item_area_and_sources_show_moves_unlinks_deletions_without_align
     assert references[0].needs_review is True
     output = read_manual(client, tools)
     assert "人工操作：4" in output and "刪除（歷史定位，不可編輯）" in output
-    assert f"area_{area_b.area_id.hex}" in output and "新增人工描述" in output
+    canonical = (
+        f"area_{area_a.area_id.hex}",
+        f"area_{area_b.area_id.hex}",
+        f"task_{task.task_id.hex}",
+    )
+    aliases = client.portal.call(tools.references.assign, canonical)
+    area_a_ref, area_b_ref, task_ref = (aliases[ref] for ref in canonical)
+    assert area_b_ref in output and "新增人工描述" in output
     assert "來源改為待核對" in output and "機房工作" in output
     assert any(
-        "來源改為待核對" in line and f"task_{task.task_id.hex}" in line and "citation_" in line
+        "來源改為待核對" in line and task_ref in line and "citation_" in line
         for line in output.splitlines()
     )
-    task_output = read_manual(
-        client, tools, {"kind": "item", "read_ref": f"task_{task.task_id.hex}"}
-    )
+    task_output = read_manual(client, tools, {"kind": "item", "read_ref": task_ref})
     assert "人工操作：2" in task_output and "新增人工描述" in task_output
     assert "介面知識" in task_output and "機房工作" not in task_output
     area_output = read_manual(client, tools, {"kind": "area", "view": "responsibility_areas"})
-    assert f"area_{area_a.area_id.hex}" in area_output and "機房工作" not in area_output
-    deleted = read_manual(client, tools, {"kind": "item", "read_ref": f"area_{area_a.area_id.hex}"})
+    assert area_a_ref in area_output and "機房工作" not in area_output
+    deleted = read_manual(client, tools, {"kind": "item", "read_ref": area_a_ref})
     assert deleted.startswith("rejected: target_not_found")
     assert (
         transact(

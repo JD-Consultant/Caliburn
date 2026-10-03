@@ -33,6 +33,43 @@ pytestmark = pytest.mark.postgres
 ORIGINAL_REPLY = "這是保存失敗前已收到的原完整回應。"
 
 
+def test_summary_upgrade_resumes_saved_preparation_before_database_adoption(client, monkeypatch):
+    from caliburn.adapters.openai_responses import ResponseRequest
+    from caliburn.features.executions import history
+    from caliburn.workflows.context_history import RoleContextHistory
+
+    writer = start(client)
+    original_prepare = RoleContextHistory.prepare_history
+    original_adopt = history.adopt_prepared_context
+
+    async def legacy_prepare(self, **arguments):
+        payload = arguments["template"].create_payload()
+        payload["reasoning"].pop("summary", None)
+        arguments["template"] = ResponseRequest.from_snapshot(payload)
+        return await original_prepare(self, **arguments)
+
+    async def interrupted_adoption(*args, **kwargs):
+        raise RuntimeError("synthetic adoption interruption")
+
+    async def scenario():
+        async with faulting_runner(client, "unused-channel") as (runner, calls):
+            # A previous binary saved preparation without a summary option, then died
+            # before adopting its checkpoint reference into the business database.
+            with monkeypatch.context() as old_binary:
+                old_binary.setattr(RoleContextHistory, "prepare_history", legacy_prepare)
+                old_binary.setattr(history, "adopt_prepared_context", interrupted_adoption)
+                with pytest.raises(RuntimeError, match="adoption interruption"):
+                    await runner.run(writer)
+            assert calls == []
+            result = await runner.run(writer)
+            assert isinstance(result, FormalInterviewExchange)
+            assert result.consultant_reply.interview_text == ORIGINAL_REPLY
+            assert calls == ["/v1/responses/input_tokens", "/v1/responses"]
+        assert history.adopt_prepared_context is original_adopt
+
+    client.portal.call(scenario)
+
+
 @asynccontextmanager
 async def faulting_runner(
     client: TestClient, channel: str

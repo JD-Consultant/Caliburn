@@ -50,7 +50,7 @@ def _fenced_diff(diff: str) -> list[str]:
 
 
 def project_jd_source_changes(
-    result: JdSourceChanges, *, comparison_label: str | None = None
+    result: JdSourceChanges, *, comparison_label: str | None = None, citation_ref: str | None = None
 ) -> str:
     """Only relevant deltas; old unchanged bodies and raw Memory IDs stay private."""
     root, *related = result.changes
@@ -60,7 +60,7 @@ def project_jd_source_changes(
     lines = [
         "## JD 來源差異",
         f"比較：此 JD 引用固定舊來源 → {comparison} 的同一物件。",
-        f"citation_ref: citation_{result.reference.citation_id.hex}",
+        f"citation_ref: {citation_ref or f'citation_{result.reference.citation_id.hex}'}",
         f"歷史名稱：{root.before.content.title}",
         (
             f"可讀 target_title：{root.after.content.title}"

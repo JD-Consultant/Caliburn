@@ -26,6 +26,7 @@ from caliburn.adapters.openai_responses import (
     count_response_input,
     create_response,
 )
+from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
 from caliburn.adapters.response_streaming import (
     PublicCommentaryUpdate,
     ResponseStreamCancelledError,
@@ -172,6 +173,7 @@ class ModelRequestExecutor:
         | None
     ) = None
     on_commentary: Callable[[PublicCommentaryUpdate], None] | None = None
+    on_reasoning_summary: Callable[[PublicReasoningSummary], None] | None = None
 
     async def request_model(
         self, request: ResponseRequest, request_id: UUID, input_tokens: int
@@ -187,7 +189,12 @@ class ModelRequestExecutor:
             OutboundKind.MODEL,
             payload,
             reservation,
-            lambda: create_response(self.client, request, on_commentary=self.on_commentary),
+            lambda: create_response(
+                self.client,
+                request,
+                on_commentary=self.on_commentary,
+                on_reasoning_summary=self.on_reasoning_summary,
+            ),
         )
         # No DB or cost calculation after the HTTP await: hand intact R to Graph first.
         return ReceivedModelResponse(response, attempt_id)

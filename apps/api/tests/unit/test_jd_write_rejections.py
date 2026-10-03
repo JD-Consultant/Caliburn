@@ -5,6 +5,7 @@ from unittest.mock import AsyncMock, create_autospec
 from uuid import uuid4
 
 import pytest
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.features.work_memory.models import InvalidMemoryChangeError
@@ -21,6 +22,7 @@ from caliburn.workflows.memory_reads import PublishedMemoryRead
 @pytest.mark.asyncio
 async def test_invalid_memory_title_becomes_actionable_rejection() -> None:
     profile = create_autospec(JdProfileWriteWorkflow, instance=True)
+    profile.sessions = async_sessionmaker()
     profile.prepare = AsyncMock(side_effect=InvalidMemoryChangeError("invalid source title"))
     tasks = create_autospec(JdTaskWriteWorkflow, instance=True)
     scope = ExecutionScope(uuid4(), uuid4(), ExecutionKind.CONSULTANT_TURN)

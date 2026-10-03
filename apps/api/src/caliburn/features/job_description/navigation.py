@@ -27,7 +27,7 @@ def resolve_jd_read_ref(work: JdWorkRevision, read_ref: str) -> JdReadTarget:
 
 
 def jd_read_ref(target: JdReadTarget) -> str:
-    """Derive the single locator from existing identity; no registry or display-name lookup."""
+    """Internal canonical locator; the model boundary assigns a durable short alias."""
     match target:
         case ResponsibilityArea():
             return f"area_{target.area_id.hex}"
@@ -41,6 +41,10 @@ def jd_read_ref(target: JdReadTarget) -> str:
             return f"collaborator_{target.collaborator_id.hex}"
         case JobCondition():
             return f"condition_{target.condition_id.hex}"
+
+
+def jd_read_refs(work: JdWorkRevision) -> tuple[str, ...]:
+    return tuple(jd_read_ref(target) for target in _read_targets(work))
 
 
 def _read_targets(work: JdWorkRevision) -> Iterator[JdReadTarget]:

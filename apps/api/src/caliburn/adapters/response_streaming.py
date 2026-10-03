@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from openai import APIConnectionError, AsyncStream
 from openai.types.responses import Response, ResponseOutputMessage, ResponseStreamEvent
 
+from caliburn.adapters.reasoning_summaries import PublicReasoningSummary, ReasoningSummaryProjection
+
 _LOG = logging.getLogger(__name__)
 
 
@@ -103,6 +105,7 @@ async def consume_response_stream(
     stream: AsyncStream[ResponseStreamEvent],
     *,
     on_commentary: Callable[[PublicCommentaryUpdate], None] | None = None,
+    on_reasoning_summary: Callable[[PublicReasoningSummary], None] | None = None,
 ) -> Response:
     """Consume one SDK stream, preserving terminal R before any subsequent cleanup await.
 
@@ -111,6 +114,7 @@ async def consume_response_stream(
     """
     terminal: Response | None = None
     projection = _CommentaryProjection(on_commentary)
+    summary_projection = ReasoningSummaryProjection(on_reasoning_summary)
     try:
         try:
             async for event in stream:
@@ -118,6 +122,7 @@ async def consume_response_stream(
                     terminal = event.response
                     break  # Do not wait for EOF after an intact terminal envelope.
                 projection.accept(event)
+                summary_projection.accept(event)
         finally:
             await stream.close()
     except CancelledError:

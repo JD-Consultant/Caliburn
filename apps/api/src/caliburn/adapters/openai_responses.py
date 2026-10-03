@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from copy import deepcopy
 from math import isfinite
-from typing import Any
+from typing import Any, Literal
 
 import httpx2
 from openai import AsyncOpenAI, AsyncStream, DefaultAsyncHttpxClient
@@ -13,6 +13,7 @@ from openai.types.responses.function_tool_param import FunctionToolParam
 from openai.types.responses.input_token_count_response import InputTokenCountResponse
 from openai.types.shared.reasoning_effort import ReasoningEffort
 
+from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
 from caliburn.adapters.response_serialization import NativeItems, NativeSnapshot
 from caliburn.adapters.response_streaming import PublicCommentaryUpdate, consume_response_stream
 
@@ -30,6 +31,7 @@ class ResponseRequest:
         reasoning_effort: ReasoningEffort,
         max_output_tokens: int,
         stream: bool = False,
+        reasoning_summary: Literal["auto"] | None = None,
     ) -> None:
         if not model.strip() or type(max_output_tokens) is not int or max_output_tokens < 1:
             raise ValueError("A model and positive output limit are required")
@@ -50,6 +52,10 @@ class ResponseRequest:
                 "truncation": "disabled",
             }
         )
+        if reasoning_summary is not None:
+            if reasoning_summary != "auto":
+                raise ValueError("Only the provider's automatic reasoning summary is supported")
+            self._context["reasoning"]["summary"] = reasoning_summary
 
     def count_payload(self) -> dict[str, Any]:
         return deepcopy(self._context)
@@ -77,6 +83,7 @@ class ResponseRequest:
                 reasoning_effort=snapshot["reasoning"]["effort"],
                 max_output_tokens=snapshot["max_output_tokens"],
                 stream=snapshot["stream"],
+                reasoning_summary=snapshot["reasoning"].get("summary"),
             )
         except (KeyError, TypeError, AttributeError) as error:
             raise ValueError("The saved model request is incomplete") from error
@@ -107,12 +114,15 @@ async def create_response(
     request: ResponseRequest,
     *,
     on_commentary: Callable[[PublicCommentaryUpdate], None] | None = None,
+    on_reasoning_summary: Callable[[PublicReasoningSummary], None] | None = None,
 ) -> Response:
     """Return the original SDK response; no routing, model fallback or business completion."""
     _require_direct_client(client)
     response = await client.responses.create(**request.create_payload())
     if isinstance(response, AsyncStream):
-        return await consume_response_stream(response, on_commentary=on_commentary)
+        return await consume_response_stream(
+            response, on_commentary=on_commentary, on_reasoning_summary=on_reasoning_summary
+        )
     if not isinstance(response, Response):
         raise TypeError("The non-streaming SDK call did not return a Response")
     return response

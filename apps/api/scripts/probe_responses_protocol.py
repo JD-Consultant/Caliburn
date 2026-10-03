@@ -42,7 +42,7 @@ from caliburn.agent_execution.response_steps import (
     inspect_response_step,
 )
 
-type Stage = Literal["protocol", "compaction"]
+type Stage = Literal["protocol", "compaction", "summary"]
 type Emit = Callable[[dict[str, Any]], None]
 
 MODEL = "gpt-6-luna"
@@ -50,7 +50,11 @@ INPUT_LIMIT = 4096
 COMPACTED_INPUT_LIMIT = 8192
 OUTPUT_LIMIT = 512
 # (per request, whole batch) seconds by stage; compact has no documented latency bound.
-TIMEOUTS: dict[Stage, tuple[int, int]] = {"protocol": (30, 120), "compaction": (60, 240)}
+TIMEOUTS: dict[Stage, tuple[int, int]] = {
+    "protocol": (30, 120),
+    "compaction": (60, 240),
+    "summary": (30, 60),
+}
 INSTRUCTIONS = (
     "This is a synthetic API protocol check. Call read_synthetic_marker exactly once "
     "before answering. The function takes no arguments. After receiving its result, "
@@ -224,7 +228,9 @@ async def execute(key_file: Path, output: Path, stage: Stage) -> int:
                 api_key=api_key, timeout_seconds=request_seconds
             ) as client:
                 async with asyncio.timeout(total_seconds):
-                    if stage == "compaction":
+                    if stage == "summary":
+                        await run_summary_preflight(client, emit)
+                    elif stage == "compaction":
                         await run_compaction_preflight(client, emit)
                     else:
                         await run_preflight(client, emit)
@@ -248,6 +254,86 @@ async def execute(key_file: Path, output: Path, stage: Stage) -> int:
     return 0
 
 
+async def run_summary_preflight(client: AsyncOpenAI, emit: Emit) -> None:
+    """One synthetic count/create pair; no raw summary text or encrypted state in evidence."""
+    from caliburn.adapters.reasoning_summaries import project_reasoning_summaries
+
+    request = ResponseRequest(
+        model=MODEL,
+        instructions="Solve the synthetic scheduling problem and give a concise answer.",
+        input_items=[
+            {
+                "role": "user",
+                "content": (
+                    "Schedule A, B, C, D on one machine. Durations are 2, 3, 1, 2 hours. "
+                    "B follows A; D follows C. Deadlines: A=5, B=6, C=3, D=8. "
+                    "Start at zero, no overlap. Find a feasible order and verify each deadline."
+                ),
+            }
+        ],
+        tools=[],
+        reasoning_effort="high",
+        reasoning_summary="auto",
+        max_output_tokens=1536,
+        stream=True,
+    )
+    counted = await count_response_input(client, request)
+    emit({"event": "input_count", "tokens": counted.input_tokens})
+    if not 0 < counted.input_tokens <= 2048:
+        raise ValueError("Summary probe input exceeded its limit")
+    updates = []
+    response = await create_response(client, request, on_reasoning_summary=updates.append)
+    original = snapshot_response(response)
+    restored = restore_response(json.loads(json.dumps(original)))
+    summaries = project_reasoning_summaries(restored)
+    carried = response_input_items(restored)
+    round_trip_equal = snapshot_response(restored) == original
+    summary_carried_intact = all(
+        item.get("summary") == original["output"][index].get("summary")
+        for index, item in enumerate(carried)
+        if item.get("type") == "reasoning"
+    )
+    emit(
+        {
+            "event": "summary_received",
+            "model": response.model,
+            "status": response.status,
+            "response_id": response.id,
+            "stream_update_count": len(updates),
+            "summary_part_count": len(summaries),
+            "summary_chars": sum(len(s.text) for s in summaries),
+            "original_round_trip_equal": round_trip_equal,
+            "summary_carried_intact": summary_carried_intact,
+            "usage": response.usage.model_dump() if response.usage else None,
+        }
+    )
+    if response.status != "completed" or response.usage is None:
+        raise ValueError("Summary probe did not complete")
+    if not round_trip_equal or not summary_carried_intact:
+        raise ValueError("Summary continuation did not round trip")
+    if not summaries or not updates:
+        emit(
+            {
+                "event": "not_observed",
+                "summary_observed": bool(summaries),
+                "stream_observed": bool(updates),
+                "http_requests": 2,
+                "retries": 0,
+            }
+        )
+        return
+    emit(
+        {
+            "event": "passed",
+            "http_requests": 2,
+            "model_requests": 1,
+            "retries": 0,
+            "summary_observed": bool(summaries),
+            "stream_observed": bool(updates),
+        }
+    )
+
+
 def _safe_identifier(value: object) -> str | None:
     if isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9_.\[\]-]{1,100}", value):
         return value
@@ -258,6 +344,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--key-file", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--stage", choices=["protocol", "compaction"], default="protocol")
+    parser.add_argument(
+        "--stage", choices=["protocol", "compaction", "summary"], default="protocol"
+    )
     arguments = parser.parse_args()
     raise SystemExit(asyncio.run(execute(arguments.key_file, arguments.output, arguments.stage)))

@@ -6,7 +6,12 @@ from uuid import UUID
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from caliburn.agent_execution.public_messages import PublicCommentary, read_public_commentary
+from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
+from caliburn.agent_execution.public_messages import (
+    PublicCommentary,
+    read_public_commentary,
+    read_public_reasoning_summaries,
+)
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import (
     AgentRole,
@@ -67,6 +72,24 @@ class ConsultantStatusWorkflow:
                 return None
             status = await _read_status(session, execution)
         return await self._with_commentary(status)
+
+    async def read_reasoning_summaries(
+        self, job_file_id: UUID, execution_id: UUID
+    ) -> tuple[PublicReasoningSummary, ...]:
+        scope = ExecutionScope(job_file_id, execution_id, ExecutionKind.CONSULTANT_TURN)
+        async with self.sessions.begin() as session:
+            await executions.read_execution(session, scope)
+            await interviews.read_execution_input(
+                session, job_file_id=job_file_id, execution_id=execution_id
+            )
+        if self.checkpointer is None:
+            raise ConsultantTurnUnavailableError("Saved public history is unavailable")
+        return await read_public_reasoning_summaries(
+            self.checkpointer,
+            thread_id=context_thread_id(
+                scope, AgentRole.JOB_CONSULTANT, HistoryWindowKind.COMPLETED_WORK
+            ),
+        )
 
     async def read_by_command(self, job_file_id: UUID, command_id: UUID) -> ConsultantTurnStatus:
         async with self.sessions.begin() as session:

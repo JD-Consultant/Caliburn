@@ -5,6 +5,7 @@ from sqlalchemy import Connection, create_engine, pool, text
 from sqlalchemy.schema import CreateSchema
 
 from caliburn.adapters.database import Base
+from caliburn.diagnostics.persistence import DiagnosticExecutionSnapshot
 from caliburn.features.executions.budget_persistence import ExecutionBudgetRecord
 from caliburn.features.executions.history_persistence import (
     ContextHistoryBindingRecord,
@@ -18,6 +19,7 @@ from caliburn.features.interviews.persistence import (
     InterviewTextRecord,
 )
 from caliburn.features.job_description.candidate_persistence import JdCandidateRecord
+from caliburn.features.job_description.model_reference_persistence import JdModelReferenceRecord
 from caliburn.features.job_description.persistence import JdRevisionRecord
 from caliburn.features.job_description.source_persistence import JdSourceReferenceRecord
 from caliburn.features.job_files.persistence import JobFileRecord
@@ -29,6 +31,10 @@ from caliburn.settings import Settings
 config = context.config
 # Explicit imports register each owned table for autogenerate, not application startup.
 target_metadata = Base.metadata
+assert (
+    DiagnosticExecutionSnapshot.__table__
+    is target_metadata.tables["diagnostic_execution_snapshots"]
+)
 assert JobFileRecord.__table__ is target_metadata.tables[JobFileRecord.__tablename__]
 assert InterviewTextRecord.__table__ is target_metadata.tables[InterviewTextRecord.__tablename__]
 assert (
@@ -49,6 +55,9 @@ assert (
     is target_metadata.tables[ContextHistoryBindingRecord.__tablename__]
 )
 assert JdRevisionRecord.__table__ is target_metadata.tables[JdRevisionRecord.__tablename__]
+assert (
+    JdModelReferenceRecord.__table__ is target_metadata.tables[JdModelReferenceRecord.__tablename__]
+)
 assert (
     JdSourceReferenceRecord.__table__
     is target_metadata.tables[JdSourceReferenceRecord.__tablename__]

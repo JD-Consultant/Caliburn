@@ -97,14 +97,26 @@ test.each([true, false])(
     expect(screen.getByText('顧問處理中')).toBeVisible();
     await userEvent.click(screen.getByRole('button', { name: '正式稿' }));
     expect(await screen.findByText('原正式工程師')).toBeVisible();
-    expect(screen.getByRole('button', { name: '編輯基本資料' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: '新增職責' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '修改職務名稱' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: '新增職責' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
 
     await userEvent.click(screen.getByRole('button', { name: '取消處理' }));
     expect(await screen.findByText(/這次處理已取消/, {}, { timeout: 3_000 })).toBeVisible();
     expect(screen.queryByText(/顧問處理中，JD 暫時唯讀/)).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '編輯基本資料' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: '新增職責' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: '修改職務名稱' })).toHaveAttribute(
+      'aria-disabled',
+      'false',
+    );
+    expect(screen.getByRole('button', { name: '新增職責' })).toHaveAttribute(
+      'aria-disabled',
+      'false',
+    );
     expect(screen.getByText('已取消')).toBeVisible();
   },
 );
@@ -176,57 +188,93 @@ test('unknown discovery keeps the formal JD readable but not editable until a su
   );
   renderJobFile();
   expect(await screen.findByText('原正式工程師')).toBeVisible();
-  expect(screen.getByRole('button', { name: '編輯基本資料' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: '修改職務名稱' })).toHaveAttribute(
+    'aria-disabled',
+    'true',
+  );
   const retry = await screen.findByRole('button', { name: '重新查詢進行中處理' });
   expect(screen.getByText(/尚未確認顧問處理狀態/)).toBeVisible();
   discoveryFailed = false;
   await userEvent.click(retry);
-  expect(await screen.findByRole('button', { name: '編輯基本資料' })).toBeEnabled();
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: '修改職務名稱' })).toHaveAttribute(
+      'aria-disabled',
+      'false',
+    ),
+  );
 });
 
-test.each([
-  { open: '編輯基本資料', field: '職務名稱', save: '儲存基本資料' },
-  { open: '新增職責', field: '職責名稱', save: '儲存職責' },
-])(
-  'an open $open draft cannot submit a new change while Turn status is unknown',
-  async ({ open, field, save }) => {
-    let unavailable = false;
-    const fetch = vi.fn<typeof globalThis.fetch>((input) => {
-      const path =
-        typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
-      if (path.endsWith('/consultant-turns/current'))
-        return Promise.resolve(
-          unavailable ? new Response(null, { status: 503 }) : Response.json({ turn: null }),
-        );
-      if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(work));
-      if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(profile));
-      if (path.endsWith('/interviews')) return Promise.resolve(Response.json({ messages: [] }));
-      return Promise.resolve(Response.json(file));
-    });
-    vi.stubGlobal('fetch', fetch);
-    const { client } = renderJobFile();
-    await waitFor(() => expect(screen.getByRole('button', { name: open })).toBeEnabled());
-    await userEvent.click(screen.getByRole('button', { name: open }));
-    const input = await screen.findByRole('textbox', { name: field });
-    await userEvent.clear(input);
-    await userEvent.type(input, '保留的人工草稿');
-    unavailable = true;
-    await act(() =>
-      client.invalidateQueries({ queryKey: ['current-consultant-turn', file.job_file_id] }),
-    );
-    const submit = screen.getByRole('button', { name: save });
-    await waitFor(() => expect(submit).toBeDisabled());
-    expect(screen.queryByRole('button', { name: '讀取目前 JD' })).not.toBeInTheDocument();
-    const form = input.closest('form');
-    if (!form) throw new Error('expected the open draft form');
-    fireEvent.submit(form);
-    expect(fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
-    expect(input).toHaveValue('保留的人工草稿');
-    unavailable = false;
-    await act(() =>
-      client.invalidateQueries({ queryKey: ['current-consultant-turn', file.job_file_id] }),
-    );
-    await waitFor(() => expect(submit).toBeEnabled());
-    expect(input).toHaveValue('保留的人工草稿');
-  },
-);
+/** A workspace whose Turn-status check can be switched to "unknown" (503) and back. */
+function stubUnknownStatusSwitch() {
+  const state = { unavailable: false };
+  const fetch = vi.fn<typeof globalThis.fetch>((input) => {
+    const path = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    if (path.endsWith('/consultant-turns/current'))
+      return Promise.resolve(
+        state.unavailable ? new Response(null, { status: 503 }) : Response.json({ turn: null }),
+      );
+    if (path.endsWith('/jd/work')) return Promise.resolve(Response.json(work));
+    if (path.endsWith('/jd/profile')) return Promise.resolve(Response.json(profile));
+    if (path.endsWith('/interviews')) return Promise.resolve(Response.json({ messages: [] }));
+    return Promise.resolve(Response.json(file));
+  });
+  vi.stubGlobal('fetch', fetch);
+  return { fetch, state };
+}
+
+test('an open basic-data draft cannot be saved while Turn status is unknown, and survives it', async () => {
+  const { fetch, state } = stubUnknownStatusSwitch();
+  const { client } = renderJobFile();
+  const open = await screen.findByRole('button', { name: '修改職務名稱' });
+  await waitFor(() => expect(open).toHaveAttribute('aria-disabled', 'false'));
+  await userEvent.click(open);
+  const input = await screen.findByRole('textbox', { name: '職務名稱' });
+  await userEvent.clear(input);
+  await userEvent.type(input, '保留的人工草稿');
+  state.unavailable = true;
+  await act(() =>
+    client.invalidateQueries({ queryKey: ['current-consultant-turn', file.job_file_id] }),
+  );
+  const submit = screen.getByRole('button', { name: '儲存' });
+  await waitFor(() => expect(submit).toBeDisabled());
+  expect(screen.queryByRole('button', { name: '讀取目前 JD' })).not.toBeInTheDocument();
+  const form = input.closest('form');
+  if (!form) throw new Error('expected the open draft form');
+  fireEvent.submit(form);
+  expect(fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+  expect(input).toHaveValue('保留的人工草稿');
+  state.unavailable = false;
+  await act(() =>
+    client.invalidateQueries({ queryKey: ['current-consultant-turn', file.job_file_id] }),
+  );
+  await waitFor(() => expect(submit).toBeEnabled());
+  expect(input).toHaveValue('保留的人工草稿');
+});
+
+test('an open new-area field cannot be saved while Turn status is unknown, and survives it', async () => {
+  const { fetch, state } = stubUnknownStatusSwitch();
+  const { client } = renderJobFile();
+  const add = await screen.findByRole('button', { name: '新增職責' });
+  await waitFor(() => expect(add).toHaveAttribute('aria-disabled', 'false'));
+  await userEvent.click(add);
+  const input = await screen.findByRole('textbox', { name: '職責名稱' });
+  await userEvent.type(input, '保留的人工草稿');
+  state.unavailable = true;
+  await act(() =>
+    client.invalidateQueries({ queryKey: ['current-consultant-turn', file.job_file_id] }),
+  );
+  const submit = screen.getByRole('button', { name: '儲存' });
+  await waitFor(() => expect(submit).toBeDisabled());
+  expect(screen.queryByRole('button', { name: '讀取目前 JD' })).not.toBeInTheDocument();
+  const form = input.closest('form');
+  if (!form) throw new Error('expected the open draft form');
+  fireEvent.submit(form);
+  expect(fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+  expect(input).toHaveValue('保留的人工草稿');
+  state.unavailable = false;
+  await act(() =>
+    client.invalidateQueries({ queryKey: ['current-consultant-turn', file.job_file_id] }),
+  );
+  await waitFor(() => expect(submit).toBeEnabled());
+  expect(input).toHaveValue('保留的人工草稿');
+});

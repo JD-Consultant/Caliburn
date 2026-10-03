@@ -94,7 +94,8 @@ test('一輪訪談：顧問把職稱與主管寫進 JD，答覆與 JD 重開後�
   expect((await scriptState(page.request)).responses - started).toBe(2);
 
   // Looking back at this answer offers its public messages and its own JD change view.
-  await page.getByRole('button', { name: '回看本次公開處理訊息／JD 操作' }).click();
+  await page.getByRole('button', { name: '處理紀錄', exact: true }).click();
+  await page.getByText('處理過程', { exact: true }).click();
   // The latest Turn's public messages also stay in the composer, so the text appears twice.
   await expect(page.getByText('我先把你剛說的基本資料記到 JD。').first()).toBeVisible();
   await page.getByRole('button', { name: '查看這輪 JD 變更' }).click();
@@ -135,7 +136,7 @@ test('處理中：即時公開訊息、JD 唯讀、重開與另一分頁找回�
   await expect(badge(page, '顧問處理中')).toBeVisible();
   await expect(page.getByText('我需要一點時間整理，請稍候。')).toBeVisible();
   await expect(page.getByText('顧問處理中，JD 暫時唯讀；完成或取消後才能人工修改。')).toBeVisible();
-  await expect(page.getByRole('button', { name: '編輯基本資料' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '修改職務名稱' })).toHaveCount(0);
   const sent = (await scriptState(page.request)).responses;
 
   // Reload and a second tab both rediscover the same processing Turn and send nothing.
@@ -144,7 +145,7 @@ test('處理中：即時公開訊息、JD 唯讀、重開與另一分頁找回�
   const other = await context.newPage();
   await other.goto(`/job-files/${fileId}`);
   await expect(badge(other, '顧問處理中')).toBeVisible();
-  await expect(other.getByRole('button', { name: '編輯基本資料' })).toHaveCount(0);
+  await expect(other.getByRole('button', { name: '修改職務名稱' })).toHaveCount(0);
   await other.close();
   expect((await scriptState(page.request)).responses).toBe(sent);
 
@@ -156,13 +157,16 @@ test('處理中：即時公開訊息、JD 唯讀、重開與另一分頁找回�
   await expect(
     page.getByText('這輪處理已暫停，JD 仍為唯讀；繼續完成或取消後才能人工修改。'),
   ).toBeVisible();
-  await expect(page.getByRole('button', { name: '編輯基本資料' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '修改職務名稱' })).toHaveCount(0);
 
   // Resuming completes the same answer without another model request.
   await page.getByRole('button', { name: '繼續處理' }).click();
   await expect(badge(page, '已完成並保存')).toBeVisible();
   await expect(page.getByText(/可以說說你最近一次實際做的工作/)).toBeVisible();
-  await expect(page.getByRole('button', { name: '編輯基本資料' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '修改職務名稱' })).toHaveAttribute(
+    'aria-disabled',
+    'false',
+  );
   expect((await scriptState(page.request)).responses).toBe(sent);
   expect(errors).toEqual([]);
 });

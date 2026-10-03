@@ -59,10 +59,9 @@ test('協作與共通條件增修刪、分類內排序、更正分類、重開�
   const initial = await readWork(page.request, fileId);
   const firstId = initial.collaborators[0]?.collaborator_id;
   const unnamed = page.getByRole('article', { name: '協作對象：尚未命名' });
-  await unnamed.getByRole('button', { name: '編輯協作對象' }).click();
+  await unnamed.getByRole('heading', { name: '名稱尚未提供' }).click();
   await page.getByRole('textbox', { name: '協作對象名稱' }).fill('後端同事');
-  await page.getByRole('button', { name: '儲存協作對象' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.keyboard.press('Enter');
   const named = page.getByRole('article', { name: '協作對象：後端同事' });
   await named.getByRole('button', { name: '下移協作對象' }).click();
   await expect
@@ -89,12 +88,13 @@ test('協作與共通條件增修刪、分類內排序、更正分類、重開�
     '必要時配合跨區會議。',
   );
   const secondCondition = page.getByRole('article', { name: '工時與出差 2' });
-  await secondCondition.getByRole('button', { name: '編輯條件' }).click();
-  await page.getByRole('combobox', { name: '條件分類' }).click();
-  await page.getByRole('option', { name: '共通協作界線', exact: true }).click();
+  // The text is edited where it stands; the category is changed from the move menu (the identity stays).
+  await secondCondition.getByText('依排程支援約定上線。').click();
   await page.getByRole('textbox', { name: '條件內容' }).fill('依約配合上線，由產品同事確認排程。');
-  await page.getByRole('button', { name: '儲存條件' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.keyboard.press('Control+Enter');
+  await expect(secondCondition.getByText('依約配合上線，由產品同事確認排程。')).toBeVisible();
+  await secondCondition.getByRole('button', { name: '移到其他分類' }).click();
+  await page.getByRole('menuitemradio', { name: '共通協作界線', exact: true }).click();
   await page.reload();
   const updated = await readWork(page.request, fileId);
   expect(
@@ -115,17 +115,14 @@ test('協作與共通條件增修刪、分類內排序、更正分類、重開�
   await page.setViewportSize({ width: 390, height: 844 });
   // Narrow screens show one pane at a time; the JD lives in its own tab.
   await page.getByRole('tab', { name: 'JD' }).click();
-  await page
-    .getByRole('article', { name: '共通協作界線 1' })
-    .getByRole('button', { name: '編輯條件' })
-    .click();
+  await page.getByRole('article', { name: '共通協作界線 1' }).getByText('依約配合上線').click();
   await expect(page.getByRole('textbox', { name: '條件內容' })).toBeFocused();
-  await expect(page.getByRole('button', { name: '儲存條件' })).toBeInViewport();
+  await expect(page.getByRole('button', { name: '儲存', exact: true })).toBeInViewport();
   await page.screenshot({
     path: testInfo.outputPath('condition-mobile.png'),
     animations: 'disabled',
   });
-  await page.getByRole('button', { name: '返回 JD' }).click();
+  await page.keyboard.press('Escape');
   await named.getByRole('button', { name: '刪除協作對象' }).click();
   await page.getByRole('button', { name: '確認刪除協作對象' }).click();
   await expect(named).toHaveCount(0);

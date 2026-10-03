@@ -125,11 +125,12 @@ test('任務選用既有技能，不複製定義；修定義只送變動欄', as
     expect(within(task).getByRole('combobox', { name: '新增技能關聯' })).toBeEnabled(),
   );
   const definition = screen.getByRole('article', { name: '技能：診斷問題' });
-  await userEvent.click(within(definition).getByRole('button', { name: '編輯技能' }));
+  await userEvent.click(within(definition).getByRole('heading', { name: '診斷問題' }));
   await userEvent.clear(screen.getByRole('textbox', { name: '技能名稱' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '技能名稱' }), '定位前端問題');
-  await userEvent.click(screen.getByRole('button', { name: '儲存技能' }));
-  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  await userEvent.type(screen.getByRole('textbox', { name: '技能名稱' }), '定位前端問題{Enter}');
+  await waitFor(() =>
+    expect(screen.queryByRole('textbox', { name: '技能名稱' })).not.toBeInTheDocument(),
+  );
   const writes = fetch.mock.calls
     .filter(([, o]) => o?.method === 'POST')
     .map(([, o]) => {
@@ -167,9 +168,8 @@ test.each(['definition', 'relation'] as const)(
     const first = renderEditor();
     if (operation === 'definition') {
       const definition = await screen.findByRole('article', { name: '技能：診斷問題' });
-      await userEvent.click(within(definition).getByRole('button', { name: '編輯技能' }));
-      await userEvent.type(screen.getByRole('textbox', { name: '技能名稱' }), '新版');
-      await userEvent.click(screen.getByRole('button', { name: '儲存技能' }));
+      await userEvent.click(within(definition).getByRole('heading', { name: '診斷問題' }));
+      await userEvent.type(screen.getByRole('textbox', { name: '技能名稱' }), '新版{Enter}');
     } else {
       const task = await screen.findByRole('article', { name: '實作網頁' });
       await userEvent.click(within(task).getByRole('button', { name: '解除知識 資料介面' }));
@@ -239,20 +239,17 @@ test('概覽與任務關聯使用不同順序；同名仍操作選定身分', as
   ]);
 });
 
-test('未使用技能刪除需確認，空白定義與無修改不發送', async () => {
+test('未使用技能刪除需確認，空白定義不發送', async () => {
   const fetch = mockServer();
   renderEditor();
   const definition = await screen.findByRole('article', { name: '技能：診斷問題' });
-  await userEvent.click(within(definition).getByRole('button', { name: '編輯技能' }));
-  await userEvent.click(screen.getByRole('button', { name: '儲存技能' }));
-  expect(screen.getByRole('alert')).toHaveTextContent('沒有修改');
+  await userEvent.click(within(definition).getByRole('heading', { name: '診斷問題' }));
   await userEvent.clear(screen.getByRole('textbox', { name: '技能名稱' }));
-  await userEvent.clear(screen.getByRole('textbox', { name: '技能說明' }));
   await userEvent.type(screen.getByRole('textbox', { name: '技能名稱' }), '   ');
-  await userEvent.click(screen.getByRole('button', { name: '儲存技能' }));
-  expect(screen.getByRole('alert')).toHaveTextContent('不能只填空白');
+  await userEvent.click(screen.getByRole('button', { name: '儲存' }));
+  expect(screen.getByRole('alert')).toHaveTextContent('不能是空白');
   expect(fetch).toHaveBeenCalledTimes(1);
-  await userEvent.click(screen.getByRole('button', { name: '返回 JD' }));
+  await userEvent.click(screen.getByRole('button', { name: '取消' }));
   await userEvent.click(within(definition).getByRole('button', { name: '刪除技能' }));
   expect(screen.getByRole('dialog')).toHaveTextContent('已保存的歷史不改寫');
   expect(fetch).toHaveBeenCalledTimes(1);
@@ -262,4 +259,13 @@ test('未使用技能刪除需確認，空白定義與無修改不發送', async
   expect(typeof body === 'string' ? JSON.parse(body) : null).toMatchObject({
     change: { action: 'delete_capability', capability_id: skillId },
   });
+});
+
+test('the section says that changing a shared definition changes it for every task that uses it', async () => {
+  mockServer();
+  renderEditor();
+  const knowledge = await screen.findByRole('region', { name: '所需知識' });
+
+  // The pencil's form used to carry this sentence; the text is edited in place now, so the section does.
+  expect(within(knowledge).getByText(/所有使用它的任務都會顯示新版/)).toBeVisible();
 });

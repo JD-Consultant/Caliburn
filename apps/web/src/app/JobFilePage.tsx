@@ -5,6 +5,7 @@ import { Alert, Button, Container, Stack } from '@mui/material';
 import { useCurrentTurn } from '../features/interview/use-current-turn';
 import { jobFileQuery } from '../features/job-files/job-file-api';
 import { describeReadError } from '../shared/api/http';
+import { AppHeader } from './AppHeader';
 import { FileBar } from './FileBar';
 import { InterviewPane } from './InterviewPane';
 import { JdPane } from './JdPane';
@@ -30,21 +31,24 @@ function JobFileContent({ jobFileId }: { jobFileId: string }) {
   );
   if (!file.data) {
     return (
-      <Container component="main" maxWidth="lg" sx={{ py: 3 }}>
-        <Stack spacing={2}>
-          <div>
-            <Button component={RouterLink} to="/">
-              ← 職務檔案清單
-            </Button>
-          </div>
-          {file.isPending && <p role="status">正在開啟職務檔案…</p>}
-          {file.isError && (
-            <Alert severity="error" action={retry}>
-              {describeReadError(file.error)}
-            </Alert>
-          )}
-        </Stack>
-      </Container>
+      <>
+        <AppHeader />
+        <Container component="main" maxWidth="md" sx={{ py: 4 }}>
+          <Stack spacing={2}>
+            <div>
+              <Button component={RouterLink} to="/">
+                ← 職務檔案清單
+              </Button>
+            </div>
+            {file.isPending && <p role="status">正在開啟職務檔案…</p>}
+            {file.isError && (
+              <Alert severity="error" action={retry}>
+                {describeReadError(file.error)}
+              </Alert>
+            )}
+          </Stack>
+        </Container>
+      </>
     );
   }
   return (

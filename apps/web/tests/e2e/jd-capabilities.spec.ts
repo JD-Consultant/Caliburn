@@ -118,10 +118,9 @@ test('共用定義與兩任務關係 CRUD、獨立排序、反向用途、重開
         )[0]?.capability_id,
     )
     .not.toBe(knowledge.capability_id);
-  await definition.getByRole('button', { name: '編輯知識' }).click();
+  await definition.getByRole('heading', { name: '資料介面' }).click();
   await page.getByRole('textbox', { name: '知識名稱' }).fill('介面錯誤處理');
-  await page.getByRole('button', { name: '儲存知識' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.keyboard.press('Enter');
   await expect(first.getByRole('link', { name: '介面錯誤處理' })).toBeVisible();
   await expect(second.getByRole('link', { name: '介面錯誤處理' })).toBeVisible();
   await page.reload();
@@ -134,14 +133,14 @@ test('共用定義與兩任務關係 CRUD、獨立排序、反向用途、重開
   await page.setViewportSize({ width: 390, height: 844 });
   // Narrow screens show one pane at a time; the JD lives in its own tab.
   await page.getByRole('tab', { name: 'JD' }).click();
-  await renamed.getByRole('button', { name: '編輯知識' }).click();
+  await renamed.getByRole('heading', { name: '介面錯誤處理' }).click();
   await expect(page.getByRole('textbox', { name: '知識名稱' })).toBeFocused();
-  await expect(page.getByRole('button', { name: '儲存知識' })).toBeInViewport();
+  await expect(page.getByRole('button', { name: '儲存', exact: true })).toBeInViewport();
   await page.screenshot({
     path: testInfo.outputPath('knowledge-mobile.png'),
     animations: 'disabled',
   });
-  await page.getByRole('button', { name: '返回 JD' }).click();
+  await page.keyboard.press('Escape');
   await first.getByRole('button', { name: '解除知識 介面錯誤處理' }).click();
   await expect(first.getByRole('link', { name: '介面錯誤處理' })).toHaveCount(0);
   await expect(renamed.getByRole('button', { name: '刪除知識' })).toBeDisabled();

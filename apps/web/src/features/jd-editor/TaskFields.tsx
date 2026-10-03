@@ -1,12 +1,18 @@
+/** A new task with its first outcomes and requirements; once it exists, each of them is edited in place. */
 import { useState } from 'react';
 import type { RefObject } from 'react';
 import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
-import type { TaskChange } from '../../shared/api/generated/edit-jd-tasks-request';
-import type { JdWorkView, WorkTask } from '../../shared/api/generated/jd-work-view';
+import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
 import { isEditJdTasksRequest } from '../../shared/api/validation';
+import { AddIcon } from '../../shared/ui/icons';
+import { UNASSIGNED, areaChoices } from './area-choice';
 import type { WorkCommand } from './jd-work-api';
-import { detailChanges, makeDetailDraft } from './task-draft';
-import type { DetailDraft } from './task-draft';
+
+/** A row typed in this form; `key` only tells rows apart while editing, it never becomes a server ID. */
+interface DetailDraft {
+  key: string;
+  text: string;
+}
 
 function DetailFields({
   label,
@@ -25,7 +31,7 @@ function DetailFields({
         {label}
       </Typography>
       {rows.map((row, index) => (
-        <Stack key={row.key} direction="row" spacing={1} sx={{ alignItems: 'start' }}>
+        <Stack key={row.key} direction="row" spacing={1} useFlexGap sx={{ alignItems: 'start' }}>
           <TextField
             fullWidth
             multiline
@@ -40,18 +46,27 @@ function DetailFields({
               )
             }
           />
+          {/* Add another / Remove are both secondary buttons (MoJ "Add another"). 32px = label 20 +
+              gap 6 + half the 12px by which the 40px field is taller than the 28px button. */}
           <Button
+            variant="outlined"
+            size="small"
             disabled={disabled}
             aria-label={`移除${label} ${String(index + 1)}`}
             onClick={() => onChange(rows.filter((item) => item.key !== row.key))}
+            sx={{ mt: '32px', flex: 'none' }}
           >
             移除
           </Button>
         </Stack>
       ))}
       <Button
+        variant="outlined"
+        size="small"
         disabled={disabled}
+        startIcon={<AddIcon />}
         onClick={() => onChange([...rows, { key: crypto.randomUUID(), text: '' }])}
+        sx={{ alignSelf: 'flex-start' }}
       >
         新增{label}
       </Button>
@@ -61,7 +76,7 @@ function DetailFields({
 
 interface Props {
   baseline: JdWorkView;
-  task: WorkTask | undefined;
+  /** The responsibility the task was added from; null starts it unassigned. */
   areaId: string | null;
   titleInput: RefObject<HTMLInputElement | null>;
   disabled: boolean;
@@ -69,58 +84,24 @@ interface Props {
   onError: (message: string) => void;
 }
 
-export function TaskFields({
-  baseline,
-  task,
-  areaId,
-  titleInput,
-  disabled,
-  onSubmit,
-  onError,
-}: Props) {
-  const [title, setTitle] = useState(task?.title ?? '');
-  const [description, setDescription] = useState(task?.description ?? '');
-  const [selectedArea, setSelectedArea] = useState(areaId ?? 'unassigned');
-  const [outcomes, setOutcomes] = useState(() => makeDetailDraft(task?.outcomes ?? []));
-  const [requirements, setRequirements] = useState(() => makeDetailDraft(task?.requirements ?? []));
+export function TaskFields({ baseline, areaId, titleInput, disabled, onSubmit, onError }: Props) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [selectedArea, setSelectedArea] = useState(areaId ?? UNASSIGNED);
+  const [outcomes, setOutcomes] = useState<DetailDraft[]>([]);
+  const [requirements, setRequirements] = useState<DetailDraft[]>([]);
   function submit(): void {
-    const values = { title: title || null, description: description || null };
-    const changes: TaskChange[] = (['title', 'description'] as const)
-      .filter((field) => values[field] !== task?.[field])
-      .map((field) => ({ action: 'set_field', field, value: values[field] }));
-    changes.push(
-      ...detailChanges(task?.outcomes ?? [], outcomes, 'outcome'),
-      ...detailChanges(task?.requirements ?? [], requirements, 'requirement'),
-    );
-    const destination = selectedArea === 'unassigned' ? null : selectedArea;
-    if (task && changes.length === 0 && task.area_id === destination) {
-      onError('沒有修改任何欄位，尚未送出。');
-      return;
-    }
-    let change: unknown;
-    if (!task) {
-      change = {
-        action: 'create_task',
-        area_id: destination,
-        ...values,
-        outcomes: outcomes.map((row) => row.text),
-        requirements: requirements.map((row) => row.text),
-      };
-    } else if (destination !== task.area_id) {
-      change = {
-        action: 'move_task',
-        task_id: task.task_id,
-        area_id: destination,
-        before_task_id: null,
-        changes,
-      };
-    } else {
-      change = { action: 'revise_task', task_id: task.task_id, changes };
-    }
     const request = {
       command_id: crypto.randomUUID(),
       expected_revision_id: baseline.revision_id,
-      change,
+      change: {
+        action: 'create_task',
+        area_id: selectedArea === UNASSIGNED ? null : selectedArea,
+        title: title || null,
+        description: description || null,
+        outcomes: outcomes.map((row) => row.text),
+        requirements: requirements.map((row) => row.text),
+      },
     };
     if (!isEditJdTasksRequest(request)) {
       onError('任務名稱或工作內容至少填一項；成果與要求不能留空白，未提供的項目請移除。');
@@ -143,12 +124,10 @@ export function TaskFields({
           value={selectedArea}
           disabled={disabled}
           onChange={(event) => setSelectedArea(event.target.value)}
-          helperText="移動會保留任務內容，放在目的職責末尾；需要的文字調整可一併保存。"
         >
-          <MenuItem value="unassigned">未歸屬任務</MenuItem>
-          {baseline.areas.map((area) => (
-            <MenuItem key={area.area_id} value={area.area_id}>
-              {area.title ?? area.scope_text}
+          {areaChoices(baseline.areas).map((choice) => (
+            <MenuItem key={choice.value} value={choice.value}>
+              {choice.label}
             </MenuItem>
           ))}
         </TextField>
@@ -168,7 +147,9 @@ export function TaskFields({
           onChange={(event) => setDescription(event.target.value)}
           helperText="描述實際做什麼、如何完成及適用情況。未知可留空。"
         />
-        <Typography>工作成果與工作要求是兩組獨立項目，不需一一配對。</Typography>
+        <Typography variant="body2" color="text.secondary">
+          工作成果與工作要求是兩組獨立項目，不需一一配對。
+        </Typography>
         <DetailFields label="工作成果" rows={outcomes} onChange={setOutcomes} disabled={disabled} />
         <DetailFields
           label="工作要求"

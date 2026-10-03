@@ -1,45 +1,30 @@
-/** Local draft captures one observed base; unknown names are not invented. */
+/** A new collaborator: the name may stay empty, a name is never invented. */
 import { useState } from 'react';
 import type { RefObject } from 'react';
 import { Stack, TextField } from '@mui/material';
-import type { Collaborator } from '../../shared/api/generated/jd-work-view';
 import { isEditJdCollaboratorsRequest } from '../../shared/api/validation';
 import type { WorkCommand } from './jd-work-api';
 
 interface Props {
   revisionId: string;
-  collaborator: Collaborator | undefined;
   titleInput: RefObject<HTMLInputElement | null>;
   disabled: boolean;
   onSubmit: (command: WorkCommand) => Promise<void>;
   onError: (message: string) => void;
 }
 
-export function CollaboratorFields({
-  revisionId,
-  collaborator,
-  titleInput,
-  disabled,
-  onSubmit,
-  onError,
-}: Props) {
-  const [name, setName] = useState(collaborator?.name ?? '');
-  const [scopeText, setScopeText] = useState(collaborator?.scope_text ?? '');
+export function CollaboratorFields({ revisionId, titleInput, disabled, onSubmit, onError }: Props) {
+  const [name, setName] = useState('');
+  const [scopeText, setScopeText] = useState('');
   function submit(): void {
-    const values = { name: name || null, scope_text: scopeText || null };
-    const changes = (['name', 'scope_text'] as const)
-      .filter((field) => values[field] !== collaborator?.[field])
-      .map((field) => ({ field, value: values[field] }));
-    if (collaborator && changes.length === 0) {
-      onError('沒有修改任何欄位，尚未送出。');
-      return;
-    }
     const request = {
       command_id: crypto.randomUUID(),
       expected_revision_id: revisionId,
-      change: collaborator
-        ? { action: 'revise_collaborator', collaborator_id: collaborator.collaborator_id, changes }
-        : { action: 'create_collaborator', ...values },
+      change: {
+        action: 'create_collaborator',
+        name: name || null,
+        scope_text: scopeText || null,
+      },
     };
     if (!isEditJdCollaboratorsRequest(request)) {
       onError('協作對象名稱或範圍至少填一項，不能只填空白。');

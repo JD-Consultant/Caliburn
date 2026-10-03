@@ -1,30 +1,56 @@
 /*
- * Layout and reading rules. Colors and sizes come from the --cb-* variables emitted by theme.ts,
- * so this file never repeats a token value. Spacing sits on a 4px grid.
+ * Layout and reading rules. Colors, radii, shadows and sizes come from the --cb-* variables
+ * emitted by theme.ts, so this file never repeats a token value. Spacing sits on a 4px grid.
  * Responsive switching is CSS-only (both panes stay mounted) so polling, SSE and drafts survive.
+ * Type: Inter (Latin, numerals) + Noto Sans TC, both self-hosted variable fonts.
  */
+
+/* ---- reading defaults ---- */
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
 
 /* ---- app shell ---- */
 .app-header {
   position: sticky;
-  top: 0;
+  inset-block-start: 0;
   z-index: 20;
   display: flex;
   align-items: center;
   gap: 12px;
   height: var(--cb-header-h);
-  padding-inline: 16px;
+  padding-inline: 20px;
   background: var(--cb-surface);
-  border-bottom: 1px solid var(--cb-border);
+  border-block-end: 1px solid var(--cb-border);
 }
-.app-header .brand {
-  font-size: 1rem;
-  font-weight: 700;
+.brand {
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--cb-accent);
+  text-decoration: none;
+}
+.app-tagline {
+  padding-inline-start: 12px;
+  border-inline-start: 1px solid var(--cb-border);
 }
 .page-heading {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
 }
@@ -33,19 +59,68 @@
   color: var(--cb-text-muted);
 }
 .empty-state {
-  padding: 64px 32px;
+  padding: 72px 32px;
   text-align: center;
+  background: var(--cb-surface);
+}
+.empty-state h2 {
+  margin: 0 0 8px;
+}
+.empty-state p {
+  margin: 0;
+  color: var(--cb-text-muted);
 }
 .file-avatar {
   display: inline-grid;
   flex: none;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--cb-radius-lg);
   background: var(--cb-accent-soft);
-  color: var(--cb-accent);
-  font-weight: 700;
+  color: var(--cb-accent-text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+/* The file list: quiet rows, one large click target per row, the rename action on hover. */
+.file-list {
+  overflow: hidden;
+  background: var(--cb-surface);
+}
+.file-list .MuiTableRow-root:last-child .MuiTableCell-root {
+  border-block-end: 0;
+}
+.file-row {
+  position: relative;
+  transition: background-color var(--cb-dur-fast) var(--cb-ease);
+}
+.file-row:hover {
+  background: var(--cb-hover);
+}
+.row-link {
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+}
+.row-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.row-action {
+  position: relative;
+  z-index: 1;
+}
+@media (hover: hover) and (pointer: fine) {
+  .file-row .row-action {
+    opacity: 0;
+    transition: opacity var(--cb-dur-fast) var(--cb-ease);
+  }
+  .file-row:hover .row-action,
+  .file-row:focus-within .row-action {
+    opacity: 1;
+  }
 }
 .loading-note {
   margin: 0;
@@ -54,45 +129,57 @@
 }
 .file-identity {
   display: block;
+  margin-block-start: 2px;
   color: var(--cb-text-muted);
-  margin-top: 2px;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---- workspace: interview | JD, each pane scrolls on its own ---- */
 .workspace-root {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - var(--cb-header-h));
+  height: 100dvh;
   min-height: 0;
 }
 .file-bar {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: var(--cb-file-bar-h);
-  padding: 8px 16px;
+  gap: 8px;
+  height: var(--cb-header-h);
+  padding-inline: 12px 20px;
   background: var(--cb-surface);
-  border-bottom: 1px solid var(--cb-border);
+  border-block-end: 1px solid var(--cb-border);
+}
+.file-bar .brand {
+  padding-inline: 4px 8px;
 }
 .file-bar-title {
   min-width: 0;
   flex: 1;
+  margin-inline-start: 4px;
+  padding-inline-start: 14px;
+  border-inline-start: 1px solid var(--cb-border);
 }
 .file-bar-title h1 {
   margin: 0;
   overflow: hidden;
-  font-size: 1.125rem;
-  line-height: 1.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .file-bar-meta {
   display: block;
-  font-size: 0.8125rem;
-  line-height: 1.25rem;
+  overflow: hidden;
+  font-size: 0.75rem;
+  line-height: 1rem;
   color: var(--cb-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .workspace-banner {
   flex: none;
@@ -108,9 +195,8 @@
 .workspace-root .workspace-tabs {
   display: none;
   flex: none;
-  min-height: 44px;
   background: var(--cb-surface);
-  border-bottom: 1px solid var(--cb-border);
+  border-block-end: 1px solid var(--cb-border);
 }
 .pane {
   display: flex;
@@ -120,29 +206,58 @@
 }
 .pane--interview {
   background: var(--cb-surface);
-  border-right: 1px solid var(--cb-border);
+  border-inline-end: 1px solid var(--cb-border);
 }
 .pane--jd {
   position: relative;
+  /* The source sheet starts beyond this pane's edge when it slides in; clipping keeps that from
+   * widening the page for the length of the animation. */
+  overflow-x: clip;
   background: var(--cb-canvas);
 }
 .pane-header {
   flex: none;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 4px 12px;
-  min-height: var(--cb-pane-header-h);
-  padding: 4px 16px;
-  border-bottom: 1px solid var(--cb-border);
+  gap: 12px;
+  height: var(--cb-pane-header-h);
+  padding-inline: 20px 16px;
+  border-block-end: 1px solid var(--cb-border-subtle);
+}
+.pane--interview .pane-header {
   background: var(--cb-surface);
 }
+.pane--jd .pane-header {
+  background: var(--cb-canvas);
+}
+.pane-heading {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.pane--interview .pane-heading {
+  gap: 10px;
+}
 .pane-title {
+  flex: none;
   margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.375rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
   font-weight: 600;
+  white-space: nowrap;
+}
+.pane-note {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--cb-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .pane-scroll {
   flex: 1;
@@ -153,233 +268,1244 @@
   flex-direction: column;
 }
 
-/* ---- interview: message log scrolls, the dock (composer / turn controls) stays reachable ---- */
+/* ---- interview: a quiet reading column matching the JD editor. Speaker labels and spacing
+ * establish the hierarchy; the input dock stays reachable at the bottom. ---- */
 .interview-content {
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
 }
 .interview-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin: 0;
-  padding: 16px 16px 0;
+  padding: 20px 24px 0;
   font-size: 0.75rem;
   line-height: 1rem;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   color: var(--cb-text-muted);
+}
+.interview-heading::before,
+.interview-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--cb-border-subtle);
 }
 .interview-history {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
   margin: 0;
-  padding: 12px 16px 8px;
+  padding: 20px 24px 24px;
   list-style: none;
 }
 .msg {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
+  gap: 8px;
   min-width: 0;
 }
 .msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
-  font-size: 0.75rem;
-  line-height: 1rem;
-  font-weight: 600;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  font-weight: 400;
   color: var(--cb-text-muted);
+}
+.msg-name {
+  font-weight: 600;
+  color: var(--cb-text);
 }
 .interview-text {
   margin: 0;
+  max-width: 100%;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-size: 0.9375rem;
   line-height: 1.625rem;
 }
-.msg--employee .interview-text,
-.msg--pending .interview-text {
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: var(--cb-accent-soft);
+
+/* Consultant: plain text on the page, no bubble. */
+.msg--consultant .interview-text {
+  width: 100%;
+  color: var(--cb-text);
+}
+
+/* Cloudscape's side-panel pattern keeps both authors in one column. A fine rule marks
+ * employee statements without turning every long paragraph into a colored card. */
+.msg--employee .interview-text {
+  max-width: 100%;
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid var(--cb-border-strong);
+}
+
+/* The consultant's unfinished work: what it shows spans the column, as it did before it was framed. */
+.msg--work {
+  align-items: stretch;
+}
+
+/* App opening remains identified, with less emphasis than the conversation itself. */
+.msg--app .msg-meta {
+  font-size: 0.75rem;
 }
 .msg--app .interview-text {
   color: var(--cb-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+}
+
+/* An input that is not formal yet: the employee's side, dashed. */
+.msg--pending .interview-text,
+.msg--pending details > p {
+  padding: 9px 15px;
+  border: 1px dashed var(--cb-border-strong);
+  border-radius: var(--cb-radius-md);
+  background: transparent;
+}
+.msg--pending details > p {
+  margin: 8px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.625rem;
 }
 .composer-log {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-inline: 16px;
+  gap: 24px;
+  padding: 0 24px 24px;
 }
 .composer-log:empty {
   display: none;
 }
+
+/* Consultant text is formatted Markdown (see ChatMarkdown): tight, readable blocks. The container
+ * resets white-space, otherwise the newlines between blocks would render as empty lines. */
+.interview-text.md {
+  white-space: normal;
+}
+.md > :first-child {
+  margin-block-start: 0;
+}
+.md > :last-child {
+  margin-block-end: 0;
+}
+.md p {
+  margin: 0 0 10px;
+  white-space: pre-line;
+}
+.md strong {
+  font-weight: 600;
+}
+.md ul,
+.md ol {
+  margin: 0 0 10px;
+  padding-inline-start: 22px;
+}
+.md ul {
+  list-style: disc;
+}
+.md ol {
+  list-style: decimal;
+}
+.md li {
+  margin: 0 0 4px;
+  white-space: pre-line;
+}
+.md li::marker {
+  color: var(--cb-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.md blockquote {
+  margin: 0 0 10px;
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--cb-border-strong);
+  color: var(--cb-text-muted);
+}
+.md code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--cb-pressed);
+  font-family: var(--cb-font-mono);
+  font-size: 0.875em;
+}
+.md pre {
+  margin: 0 0 10px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  border-radius: var(--cb-radius-md);
+  background: var(--cb-hover);
+}
+.md pre code {
+  padding: 0;
+  background: none;
+}
+
+/* A quiet disclosure for non-formal process messages (never a source, never quotable). The native
+ * <details> and the Button that opens a past turn's messages are the same control to the reader,
+ * so they share one look: muted 13px text, a small chevron, a hover tint. */
+details > summary,
+.disclosure {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 0;
+  padding-block: 2px;
+  padding-inline: 4px 8px;
+  border-radius: var(--cb-radius-sm);
+  color: var(--cb-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: normal;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+details > summary:hover,
+.disclosure:hover {
+  background: var(--cb-hover);
+  color: var(--cb-text);
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+.disclosure .MuiButton-startIcon {
+  margin: 0;
+}
+details > summary::before {
+  content: '';
+}
+details > summary::before,
+.disclosure-chevron {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-inline: 6px 4px;
+  /* Physical on purpose: the chevron is a corner turned by `rotate`, which does not mirror. */
+  border-right: 1.5px solid currentcolor;
+  border-bottom: 1.5px solid currentcolor;
+  transform: rotate(-45deg);
+  transition: transform var(--cb-dur-fast) var(--cb-ease);
+}
+details[open] > summary::before,
+.disclosure[aria-expanded='true'] .disclosure-chevron {
+  transform: rotate(45deg);
+}
+details > summary:hover {
+  background: var(--cb-hover);
+  color: var(--cb-text);
+}
+/* The rule sits under the summary's chevron and the text lines up with the summary's label, so a section
+ * and its content read as one column (the chevron is 6px wide at 10px from the summary's edge). */
+.process-log {
+  margin-block-start: 4px;
+  margin-inline-start: 12px;
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid var(--cb-border);
+  color: var(--cb-text-muted);
+  overflow-wrap: anywhere;
+}
+.process-log ol {
+  margin: 8px 0 4px;
+  padding-inline-start: 20px;
+}
+.process-log li {
+  margin-block-end: 6px;
+}
+.process-log li::marker {
+  color: var(--cb-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.process-log .MuiTypography-root {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+}
+.process-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-block-start: 8px;
+}
+
+/* The consultant is working: three pulsing dots where the reply will appear. */
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  height: 36px;
+  padding-inline: 14px;
+  border-radius: 999px;
+  background: var(--cb-pressed);
+}
+.typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cb-text-muted);
+  animation: cb-typing 1.2s var(--cb-ease) infinite;
+}
+.typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes cb-typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* The way back to the newest message, floating just above whatever the dock currently holds. */
+.composer-dock > .jump-latest {
+  position: absolute;
+  inset-block-end: calc(100% + 12px);
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  inline-size: 36px;
+  block-size: 36px;
+  border: 1px solid var(--cb-border);
+  background: var(--cb-surface);
+  color: var(--cb-text);
+  box-shadow: var(--cb-shadow-md);
+}
+.composer-dock > .jump-latest:hover {
+  background: var(--cb-canvas);
+}
 .composer-dock {
   position: sticky;
-  bottom: 0;
+  inset-block-end: 0;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: auto;
-  padding: 12px 16px 16px;
+  gap: 8px;
+  margin-block-start: auto;
+  padding: 12px 24px 16px;
   background: var(--cb-surface);
-  border-top: 1px solid var(--cb-border);
+  border-block-start: 1px solid var(--cb-border-subtle);
+}
+/* The card is the field: its ring (a shadow, so it adds no layout) turns darker on hover and brand-colored on focus. */
+.composer-card {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  min-height: 52px;
+  padding-block: 8px;
+  padding-inline: 14px 8px;
+  border-radius: var(--cb-radius-lg);
+  background: var(--cb-surface);
+  box-shadow: var(--cb-shadow-composer);
+  transition: box-shadow var(--cb-dur-fast) var(--cb-ease);
+}
+.composer-card:hover {
+  box-shadow: var(--cb-shadow-composer-hover);
+}
+.composer-card:focus-within {
+  box-shadow: var(--cb-shadow-composer-focus);
+}
+.composer-input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 0;
+  font-size: 0.9375rem;
+  line-height: 1.625rem;
+}
+.composer-input textarea::placeholder {
+  color: var(--cb-text-muted);
+  opacity: 1;
+}
+.composer-send {
+  flex: none;
+  min-height: 36px;
+  border-radius: 999px;
+}
+.composer-send--icon {
+  min-width: 36px;
+  padding: 0;
+}
+.composer-send--icon .MuiButton-startIcon {
+  margin: 0;
+}
+.composer-hint {
+  margin-block: 8px 0;
+  padding-inline: 2px;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--cb-text-muted);
+}
+.dock-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dock-note {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--cb-text-muted);
 }
 
 /* ---- "AI layer": live or candidate content that is not formal yet ---- */
 .ai-layer {
   background: var(--cb-ai-surface);
   border: 1px solid var(--cb-ai-border);
-  border-radius: 8px;
+  border-radius: var(--cb-radius-lg);
 }
 .ai-label {
   display: inline-flex;
   align-items: center;
   height: 20px;
   padding-inline: 8px;
-  border-radius: 4px;
-  background: var(--cb-ai-text);
-  color: #fff;
+  border-radius: var(--cb-radius-sm);
+  background: var(--cb-ai-solid);
+  color: var(--cb-on-accent);
   font-size: 0.75rem;
-  line-height: 20px;
+  line-height: 1.25rem;
   font-weight: 600;
   white-space: nowrap;
+}
+/* The candidate shares the sheet's typography; only its surface says "not formal yet". */
+.jd-candidate {
+  padding: 32px 40px 40px;
+  box-shadow: var(--cb-shadow-xs);
+}
+.jd-candidate-block {
+  padding-block-start: 20px;
+  border-block-start: 1px solid var(--cb-ai-border);
+}
+.jd-candidate .jd-props {
+  margin-block-end: 0;
+}
+.jd-props {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 12px 24px;
+  align-items: baseline;
+}
+.jd-prop {
+  display: contents;
+}
+.jd-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-inline-start: 16px;
+  border-inline-start: 2px solid var(--cb-ai-border-strong);
+}
+.jd-candidate ul {
+  margin: 4px 0 0;
+  padding-inline-start: 20px;
+}
+.jd-candidate li::marker {
+  color: var(--cb-text-faint);
+}
+.jd-candidate p,
+.jd-candidate li,
+.jd-candidate dd {
+  max-inline-size: var(--cb-measure);
+}
+.live-messages {
+  padding: 8px 12px;
+  border-inline-start: 2px solid var(--cb-ai-border-strong);
+  background: var(--cb-ai-surface);
+  border-start-end-radius: var(--cb-radius-md);
+  border-end-end-radius: var(--cb-radius-md);
 }
 
 /* ---- JD pane: a reading surface first; controls appear on hover / focus / touch ---- */
 .jd-scroll {
-  padding: 24px 24px 64px;
+  padding-block-end: 64px;
 }
 .jd-doc {
   width: 100%;
-  max-width: var(--cb-doc-max-w);
+  max-width: calc(var(--cb-doc-max-w) + 48px);
   margin-inline: auto;
+  padding: 16px 24px 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 .jd-stack {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 .jd-stack[hidden] {
   display: none;
 }
-.jd-note {
-  margin: 0;
-  font-size: 0.75rem;
-  line-height: 1rem;
+
+/* The formal JD: one paper sheet, sections divided by whitespace and hairlines, not by boxes. */
+.jd-sheet {
+  padding: 40px 48px 48px;
+  background: var(--cb-surface);
+  border: 1px solid var(--cb-border);
+  border-radius: var(--cb-radius-lg);
+  box-shadow: var(--cb-shadow-xs);
+}
+.jd-sheet .MuiPaper-outlined {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.jd-sheet #jd-work {
+  margin-block-start: 40px;
+  padding-block-start: 32px;
+  border-block-start: 1px solid var(--cb-border-subtle);
+}
+.jd-sheet #jd-knowledge,
+.jd-sheet #jd-skill,
+.jd-sheet #jd-collaborators,
+.jd-sheet #jd-conditions {
+  padding-block-start: 32px;
+  border-block-start: 1px solid var(--cb-border-subtle);
+}
+.jd-sheet h2,
+.jd-sheet h3 {
+  text-wrap: balance;
+}
+.jd-sheet p,
+.jd-sheet li,
+.jd-sheet dd {
+  max-inline-size: var(--cb-measure);
+}
+.jd-title-value {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.jd-label {
   color: var(--cb-text-muted);
-  text-align: right;
+}
+.jd-empty {
+  color: var(--cb-text-muted);
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.jd-sheet article {
+  border-color: var(--cb-border-subtle);
+}
+/* A ruled item: a hairline above and 16px before its first row, where its toolbar also starts. */
+.jd-ruled-item {
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--cb-border-subtle);
+}
+.jd-sheet ol,
+.jd-sheet ul {
+  margin-block: 4px 0;
+  padding-inline-start: 20px;
+}
+.jd-sheet li {
+  margin-block-end: 4px;
+}
+.jd-sheet li::marker {
+  color: var(--cb-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.jd-sheet li a,
+.jd-sheet a.MuiLink-root {
+  color: var(--cb-accent);
+  text-decoration: none;
+}
+.jd-sheet li a:hover,
+.jd-sheet a.MuiLink-root:hover {
+  text-decoration: underline;
+}
+/* Inline text editing (InlineText.tsx): click a text to change it, as in Atlassian's inline edit and
+ * Cloudscape's editable cells. The wrapper only adds a hover cue; a visually hidden button is the keyboard
+ * and screen-reader path, and its focus ring is drawn around the whole text. */
+.inline-text {
+  position: relative;
+  border-radius: var(--cb-radius-sm);
+}
+.inline-text--inline {
+  display: inline;
+}
+@media (hover: hover) and (pointer: fine) {
+  .inline-text:not([data-disabled]) {
+    cursor: text;
+  }
+  .inline-text:not([data-disabled]):hover {
+    background: var(--cb-hover);
+    /* 4px of tint around the text without moving it. */
+    box-shadow: 0 0 0 4px var(--cb-hover);
+  }
+}
+.inline-text__edit {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.inline-text:has(> .inline-text__edit:focus-visible) {
+  outline: 2px solid var(--cb-focus);
+  outline-offset: 4px;
+}
+.inline-text__edit:focus-visible {
+  outline: none;
+}
+/* The open editor: the field, its status and Save / Cancel at the end of the field (Atlassian, Primer). */
+.inline-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-inline-size: var(--cb-measure);
+}
+.jd-fold-head > .inline-edit {
+  flex: 1 1 16rem;
+  min-inline-size: 0;
+}
+/* Opening an editor scrolls the whole form into view (field, notice, Save and Cancel), not just the field:
+ * clear of the pane's sticky section bar above, with a little air below. */
+.inline-edit {
+  scroll-margin-block: 3.5rem 1rem;
+}
+/* While a title in a fold head is edited, the row is the chevron and the editor: the task count and the
+ * source badge would land beside the buttons. The 2px centres the 28px chevron on the 32px field. */
+.jd-fold-head:has(> .inline-edit) {
+  align-items: flex-start;
+}
+.jd-fold-head:has(> .inline-edit) > :not(.inline-edit, .MuiIconButton-root) {
+  display: none;
+}
+.jd-fold-head:has(> .inline-edit) > .MuiIconButton-root {
+  margin-block-start: 2px;
+}
+.inline-edit__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+/* Save is the one filled control, as PatternFly raises its confirm icon to the brand colour once there is
+ * something to save and as the composer's send button is the only filled control there. */
+.inline-edit__save.MuiIconButton-root {
+  background: var(--cb-accent);
+  color: var(--cb-on-accent);
+}
+.inline-edit__save.MuiIconButton-root:hover {
+  background: var(--cb-accent-hover);
+  color: var(--cb-on-accent);
+}
+.inline-edit__save.MuiIconButton-root.Mui-disabled {
+  background: var(--cb-pressed);
+  color: var(--cb-text-faint);
+}
+/* Touch: a 28px icon is under every touch-target guideline. */
+@media (pointer: coarse) {
+  .inline-edit__actions .MuiIconButton-root {
+    inline-size: 40px;
+    block-size: 40px;
+  }
+}
+/* A list's "+" sits beside its label and only shows while the list is pointed at (Linear's sub-issues header);
+ * it is always there on touch and when the list is empty. It adds no height. */
+.jd-details__head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.jd-add-detail {
+  inline-size: 24px;
+  block-size: 24px;
+  /* 24px button, 16px label line: the negative margins keep the row exactly one label line tall. */
+  margin-block: -4px;
+  font-size: 1rem;
+}
+.jd-add-detail[aria-disabled='true'] {
+  color: var(--cb-text-faint);
+  cursor: default;
+}
+.jd-details > .inline-edit {
+  margin-block-start: 8px;
+}
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
+  .jd-details:has(> ol) .jd-add-detail {
+    opacity: 0;
+    transition: opacity var(--cb-dur-fast) var(--cb-ease);
+  }
+  .jd-details:hover .jd-add-detail,
+  .jd-details:focus-within .jd-add-detail {
+    opacity: 1;
+  }
+}
+/* The pencil used to be the one always-visible "you can edit here"; on touch, where nothing is hovered,
+ * one line says that text can be tapped (Atlassian: inline edit needs a visible affordance). */
+.jd-edit-hint {
+  display: none;
+  margin-block-start: 6px;
+}
+@media (hover: none), (pointer: coarse) {
+  .jd-edit-hint {
+    display: block;
+  }
+}
+/* "Move to" menu: a quiet heading, the current choice checked (Primer ActionMenu single select). */
+.move-menu__heading {
+  padding-block: 0;
+  line-height: 28px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--cb-text-muted);
+  background: transparent;
+}
+.MuiMenu-list .MuiListItemIcon-root {
+  min-inline-size: 24px;
+  color: var(--cb-accent);
 }
 
-/* Quiet controls: item actions appear on hover / focus (pointer devices); always shown on touch. */
+/* A text button that adds an item hangs by its own padding, so its icon lines up with the text column. */
+.add-action {
+  margin-inline-start: -10px;
+}
+/* The add-a-responsibility row stays focusable while the page is busy (aria-disabled), so it needs its own
+ * "not now" look; MUI paints it only for a real `disabled`. */
+.add-action[aria-disabled='true'] {
+  color: var(--cb-text-faint);
+  cursor: default;
+}
+.add-action[aria-disabled='true']:hover {
+  background: none;
+}
+/* A responsibility or a task: its collapse chevron sits in the sheet's left gutter, so titles align with text. */
+.jd-fold-head > .MuiIconButton-root {
+  margin-inline-start: -36px;
+}
+/* "職責與任務" reads as a tree. A responsibility is the parent: an 18px title with its task count, and a
+ * rule above every one after the first. Its tasks sit one level in, so a task's chevron starts under
+ * the parent's title and its own 15px title is the sub-heading (Notion toggles, Linear groups). */
+.jd-area-title {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+.jd-area-scope {
+  margin-block-start: 8px;
+}
+.jd-area-body {
+  padding-inline-start: 36px;
+}
+.jd-sheet .jd-area ~ .jd-area {
+  margin-block-start: 32px;
+  padding-block-start: 32px;
+  border-block-start: 1px solid var(--cb-border);
+}
+
+/* Item actions are a row under their text and always visible. Only a wide pointer layout (>= 900px)
+ * hides them until hover / focus and floats them; narrow windows have no room to spare, and touch
+ * has no hover. */
 .item-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 4px;
+  gap: 0 2px;
 }
 span.item-actions {
-  display: inline-flex;
-  margin-left: 8px;
+  display: flex;
+  margin-block: 2px 0;
+  margin-inline: -4px 0;
 }
-@media (hover: hover) and (pointer: fine) {
-  .item > .item-actions {
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
+  .item > .item-actions,
+  .item > * > .item-actions {
     opacity: 0;
-    transition: opacity 120ms ease;
+    transition: opacity var(--cb-dur-fast) var(--cb-ease);
   }
-  .item:hover > .item-actions,
-  .item:focus-within > .item-actions {
+  /* Only the innermost item under the pointer or focus shows its toolbar: pointing at a task must not
+   * also reveal its responsibility's. */
+  .item:hover:not(:has(.item:hover)) > .item-actions,
+  .item:focus-within:not(:has(.item:focus-within)) > .item-actions,
+  .item > .item-actions:has([aria-expanded='true']) {
     opacity: 1;
   }
 }
 
-/* Floating item toolbar (Notion / Linear hover toolbar): out of flow, so hidden actions leave no gap. */
+/* Floating item toolbar: out of flow, so hidden actions leave no gap; the first element reserves
+ * its width so long text wraps before it instead of running underneath. */
 .jd-doc [id^='jd-'] {
-  scroll-margin-top: 64px;
+  scroll-margin-block-start: 64px;
 }
 @media (hover: hover) and (pointer: fine) and (min-width: 900px) {
   .item {
     position: relative;
   }
+  .item:has(> .item-actions--corner) > :first-child {
+    padding-inline-end: calc(var(--cb-toolbar-w) + 8px);
+  }
   .item > .item-actions--corner {
     position: absolute;
-    top: 0;
-    right: 0;
+    /* Level with the first row; a Stack parent's child margin would push it down by its spacing. */
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    margin: 0;
     z-index: 1;
     padding: 2px;
     background: var(--cb-surface);
-    border: 1px solid var(--cb-border);
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgb(27 36 32 / 8%);
+    border-radius: var(--cb-radius-md);
+    box-shadow: var(--cb-shadow-sm);
   }
-  /* The add-link select floats at the section's top-right; its helper text stays for screen readers. */
+  .jd-ruled-item > .item-actions--corner {
+    inset-block-start: 16px;
+  }
+  .item > .item-actions--corner .MuiIconButton-root {
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+  }
+  /* List rows: the toolbar sits at the row's first line instead of occupying one. */
+  li.item {
+    padding-inline-end: calc(var(--cb-toolbar-w) - 24px);
+  }
+  li.item > .item-actions {
+    position: absolute;
+    inset-block-start: -2px;
+    inset-inline-end: 0;
+    margin: 0;
+    padding: 2px;
+    background: var(--cb-surface);
+    border-radius: var(--cb-radius-md);
+    box-shadow: var(--cb-shadow-sm);
+  }
+  li.item > .item-actions .MuiIconButton-root {
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+  }
+  /* The add-link picker floats at the section's top-right (one 28px line, so it never reaches the
+   * next section's picker); its helper text stays for screen readers. */
   .item > .item-actions--float {
     position: absolute;
-    top: -6px;
-    right: 0;
+    inset-block-start: -6px;
+    inset-inline-end: 0;
     z-index: 1;
-    width: 240px;
+    width: 200px;
   }
   .item-actions--float .MuiFormHelperText-root {
     display: none;
   }
+  .item-actions--float .MuiTextField-root {
+    margin-block-start: 0;
+  }
+  /* Room under the label for the floating picker, so it never touches the first row's toolbar. */
+  .item:has(> .item-actions--float) > ol {
+    margin-block-start: 12px;
+  }
 }
 
-/* ---- JD outline: sticky section chips (SAP Fiori anchor bar) ---- */
+/* The add-link picker is a compact one-line select; its label is only the accessible name. */
+.item-actions--float .MuiInputLabel-root {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.item-actions--float .MuiOutlinedInput-root {
+  background: var(--cb-surface);
+}
+.item-actions--float .MuiOutlinedInput-notchedOutline {
+  border-color: var(--cb-border-strong);
+}
+.item-actions--float .MuiOutlinedInput-root {
+  min-height: 28px;
+}
+.item-actions--float .MuiSelect-select.MuiOutlinedInput-input {
+  padding-block: 3px;
+  padding-inline: 10px 28px;
+  min-height: 0;
+  color: var(--cb-text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.375rem;
+}
+.item-actions--float .MuiSelect-icon {
+  inset-inline-end: 6px;
+}
+
+/* ---- JD outline: sticky section tabs ---- */
 .jd-outline {
   position: sticky;
-  top: -24px;
+  inset-block-start: 0;
   z-index: 4;
+  flex: none;
   display: flex;
-  gap: 8px;
-  margin: -24px -24px 0;
-  padding: 12px 24px;
+  gap: 4px;
+  /* Full-bleed bar whose tabs line up with the document column below. */
+  padding: 10px max(24px, calc((100% - var(--cb-doc-max-w)) / 2));
   overflow-x: auto;
-  background: var(--cb-canvas);
-  border-bottom: 1px solid var(--cb-border);
+  background: color-mix(in srgb, var(--cb-canvas) 86%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  border-block-end: 1px solid var(--cb-border-subtle);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .jd-outline {
+    background: var(--cb-canvas);
+  }
+}
+.jd-outline .MuiChip-root {
+  flex: none;
+  height: 28px;
+  border: 0;
+  border-radius: var(--cb-radius-md);
+  background: transparent;
+  color: var(--cb-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.jd-outline .MuiChip-root:hover {
+  background: var(--cb-hover);
+  color: var(--cb-text);
+}
+.jd-outline .MuiChip-root[aria-current='location'] {
+  background: var(--cb-pressed);
+  color: var(--cb-text);
 }
 
 /* ---- source side sheet: slides over the JD pane, the document stays in view ---- */
 .pane-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 4px;
   justify-content: flex-end;
 }
 .source-sheet {
   position: absolute;
-  top: var(--cb-pane-header-h);
-  right: 0;
-  bottom: 0;
+  inset-block: var(--cb-pane-header-h) 0;
+  inset-inline-end: 0;
   z-index: 6;
   display: flex;
   flex-direction: column;
   width: min(var(--cb-source-w), 100%);
   background: var(--cb-surface);
-  border-left: 1px solid var(--cb-border-strong);
-  box-shadow: -8px 0 24px rgb(27 36 32 / 8%);
+  border-inline-start: 1px solid var(--cb-border);
+  box-shadow: var(--cb-shadow-sheet);
+  /* It slides in each time `hidden` is removed (@starting-style, Baseline 2024). Leaving is instant:
+   * the content unmounts with the click, and an empty sheet sliding away would look broken. */
+  transition:
+    opacity var(--cb-dur-sheet) var(--cb-ease-sheet),
+    transform var(--cb-dur-sheet) var(--cb-ease-sheet);
 }
 .source-sheet[hidden] {
   display: none;
 }
+@starting-style {
+  .source-sheet {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+/* Header: [back] title ... [refresh] [close] (Fluent drawer: title, quick actions such as back and refresh, close). */
 .source-sheet-header {
   flex: none;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--cb-border);
+  gap: 4px;
+  height: var(--cb-pane-header-h);
+  padding-inline: 12px 8px;
+  border-block-end: 1px solid var(--cb-border-subtle);
+}
+.source-sheet-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding-inline-start: 8px;
 }
 .source-sheet-body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px;
+  padding: 16px 20px 32px;
+}
+.source-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.source-note {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--cb-text-muted);
+}
+
+/* The list: groups under the JD item they support; a row is a Primer ActionList item (leading icon, label,
+ * trailing chevron). The whole row opens the source; the reason and "查看差異" sit beneath the label. */
+.source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.source-group__title {
+  margin: 0 0 4px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: var(--cb-text-muted);
+  overflow-wrap: anywhere;
+}
+.source-group__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.source-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  min-block-size: 44px;
+  margin-inline: -8px;
+  padding: 4px 8px;
+  border-radius: var(--cb-radius-md);
+  transition: background-color var(--cb-dur-fast) var(--cb-ease);
+}
+.source-row:hover {
+  background: var(--cb-hover);
+}
+.source-row:has(.source-row__main:focus-visible) {
+  outline: 2px solid var(--cb-focus);
+  outline-offset: -2px;
+}
+.source-row__main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cb-text);
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  text-align: start;
+  cursor: pointer;
+}
+.source-row__main:focus-visible {
+  outline: none;
+}
+/* The button's own box is only the label; this makes the whole row its click target. */
+.source-row__main::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.source-row__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.source-kind,
+.source-row__chevron {
+  flex: none;
+  font-size: 1.125rem;
+  color: var(--cb-text-faint);
+}
+.source-row__meta {
+  position: relative;
+  z-index: 1;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-inline-start: 28px;
+  padding-block-end: 4px;
+}
+/* The reason is a label, not a control: a click on it falls through to the row. */
+.source-row__meta .MuiChip-root {
+  pointer-events: none;
+}
+
+/* One source: the JD item it supports, its title, tabs when it needs recheck, then its text or changes. */
+.source-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.source-detail__context {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--cb-text-muted);
+  overflow-wrap: anywhere;
+}
+.source-detail__context span {
+  margin-inline-end: 4px;
+  font-weight: 600;
+}
+.source-detail__title {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.source-detail__title:focus {
+  outline: none;
+}
+.source-tabs {
+  min-height: 40px;
+  border-block-end: 1px solid var(--cb-border-subtle);
+}
+.source-tabs .MuiTab-root {
+  min-width: 0;
+  min-height: 40px;
+  padding-inline: 12px;
+}
+/* An employee's words are quoted, not boxed (Hypothes.is and Kindle show a highlight as a quotation). */
+.source-quote {
+  margin: 0;
+  padding-inline-start: 16px;
+  border-inline-start: 3px solid var(--cb-accent-border);
+}
+.source-quote figcaption {
+  margin-block-end: 4px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: var(--cb-text-muted);
+}
+.source-quote blockquote {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.75rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.source-body__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+}
+.source-body__description {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  color: var(--cb-text-muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.source-change {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.source-change__title {
+  margin: 0;
+  padding-block-end: 4px;
+  border-block-end: 1px solid var(--cb-border-subtle);
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: var(--cb-text-muted);
+}
+/* Markdown from the server sits in a narrow sheet: headings stay at text size, as the backend's own
+ * "## 差異" lines are labels, not page titles. */
+.source-prose {
+  min-width: 0;
+  font-size: 0.9375rem;
+  line-height: 1.75rem;
+}
+.source-prose :where(h1, h2, h3, h4, h5, h6) {
+  margin: 12px 0 4px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+}
+.source-prose :where(p, ul, ol) {
+  margin: 0 0 8px;
+}
+.source-prose :where(ul, ol) {
+  padding-inline-start: 22px;
+}
+.source-prose :where(h1, h2, h3, h4, h5, h6):first-child,
+.source-prose :where(p):first-child {
+  margin-block-start: 0;
+}
+
+/* A fenced diff, line by line as GitHub's unified view: a tint and a marker per line. The text wraps
+ * (JD sentences are long) instead of scrolling sideways. */
+pre:has(> .diff) {
+  margin: 8px 0;
+  padding: 0;
+  overflow: visible;
+  background: none;
+}
+.diff {
+  display: block;
+  overflow: hidden;
+  white-space: normal;
+  border: 1px solid var(--cb-border);
+  border-radius: var(--cb-radius-md);
+  font-family: var(--cb-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+.diff__line {
+  display: block;
+  min-block-size: 1lh;
+  padding-inline: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.diff__line:is([data-diff-line='add'], [data-diff-line='del'], [data-diff-line='context']) {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+}
+.diff__mark {
+  text-align: center;
+  font-family: var(--cb-font-mono);
+}
+.diff__line[data-diff-line='add'] {
+  background: var(--cb-ok-soft);
+}
+.diff__line[data-diff-line='add'] .diff__mark {
+  color: var(--cb-ok-text);
+  font-weight: 700;
+}
+.diff__line[data-diff-line='del'] {
+  background: var(--cb-danger-soft);
+}
+.diff__line[data-diff-line='del'] .diff__mark {
+  color: var(--cb-danger-text);
+  font-weight: 700;
+}
+.diff__line:is([data-diff-line='hunk'], [data-diff-line='meta']) {
+  color: var(--cb-text-muted);
+}
+.diff__line[data-diff-line='hunk'] {
+  background: var(--cb-hover);
 }
 
 /* ---- source badge: "N sources / needs recheck" beside a JD item ---- */
@@ -388,48 +1514,64 @@ span.item-actions {
   align-items: center;
   gap: 4px;
   height: 20px;
-  padding: 0 8px 0 6px;
+  padding-block: 0;
+  padding-inline: 6px 8px;
   border: 1px solid var(--cb-border);
-  border-radius: 10px;
+  border-radius: 999px;
   background: var(--cb-surface);
   color: var(--cb-text-muted);
   font: inherit;
   font-size: 0.75rem;
+  font-weight: 500;
   line-height: 1;
   vertical-align: middle;
   cursor: pointer;
+  transition:
+    background-color var(--cb-dur-fast) var(--cb-ease),
+    border-color var(--cb-dur-fast) var(--cb-ease);
+}
+.source-badge svg {
+  font-size: 12px;
 }
 .source-badge:hover {
   border-color: var(--cb-border-strong);
-  background: var(--cb-canvas);
+  background: var(--cb-hover);
+  color: var(--cb-text);
 }
 .source-badge--recheck {
   border-color: var(--cb-warn-border);
-  background: var(--cb-warn-surface);
+  background: var(--cb-warn-soft);
+  color: var(--cb-warn-text);
+}
+.source-badge--recheck:hover {
+  border-color: var(--cb-warn-icon);
+  background: var(--cb-warn-soft);
   color: var(--cb-warn-text);
 }
 
 /* ---- speaker avatar in the message log (Cloudscape chat: one avatar per author) ---- */
 .msg-avatar {
   display: inline-grid;
+  flex: none;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  margin-right: 6px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: var(--cb-accent-soft);
-  color: var(--cb-accent);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  vertical-align: middle;
-}
-.msg--consultant .msg-avatar {
-  background: var(--cb-accent);
-  color: #fff;
-}
-.msg--app .msg-avatar {
-  background: var(--cb-border);
+  background: var(--cb-pressed);
   color: var(--cb-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.msg-avatar--consultant {
+  background: var(--cb-accent-soft);
+  color: var(--cb-accent-text);
+}
+.pane-heading .msg-avatar {
+  margin-inline-end: -4px;
+}
+/* MUI forces fill: currentColor on SvgIcon; ours are open strokes. */
+.cb-icon {
+  fill: none;
 }
 
 /* ---- narrow: one pane at a time, switched with tabs ---- */
@@ -445,19 +1587,56 @@ span.item-actions {
     display: none;
   }
   .pane--interview {
-    border-right: 0;
+    border-inline-end: 0;
   }
-  .file-bar {
-    flex-wrap: wrap;
-    row-gap: 4px;
+  /* The JD header grows a second line for the export note; the source sheet then covers the pane. */
+  .pane--jd .pane-header {
+    height: auto;
+    min-height: var(--cb-pane-header-h);
+    padding-block: 8px;
+  }
+  .pane--jd .pane-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .pane--jd .pane-note {
+    white-space: normal;
+  }
+  .source-sheet {
+    inset-block-start: 0;
+  }
+  .jd-fold-head > .MuiIconButton-root {
+    margin-inline-start: 0;
+  }
+  .jd-area-body {
+    padding-inline-start: 16px;
+  }
+  .jd-sheet .jd-area ~ .jd-area {
+    margin-block-start: 24px;
+    padding-block-start: 24px;
   }
   .jd-scroll {
-    padding: 16px 16px 48px;
+    padding-block-end: 48px;
+  }
+  .jd-doc {
+    padding: 12px 12px 0;
+  }
+  .jd-sheet {
+    padding: 24px 20px 32px;
+  }
+  .jd-candidate {
+    padding: 20px 16px 24px;
+  }
+  .jd-props {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .jd-prop dt {
+    margin-block-start: 8px;
   }
   .jd-outline {
-    top: -16px;
-    margin: -16px -16px 0;
-    padding: 10px 16px;
+    padding: 8px 12px;
   }
   .page-heading {
     align-items: stretch;
@@ -468,6 +1647,17 @@ span.item-actions {
   .app-tagline {
     display: none;
   }
+  .file-bar .brand {
+    display: none;
+  }
+  .file-bar-title {
+    margin-inline-start: 0;
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+  .file-bar {
+    padding-inline: 8px 12px;
+  }
 }
 
 /* Keyboard focus must always be visible (WCAG 2.4.7). */
@@ -475,6 +1665,62 @@ a:focus-visible,
 button:focus-visible,
 summary:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--cb-accent);
+  outline: 2px solid var(--cb-focus);
   outline-offset: 2px;
+}
+
+/* ---- Windows High Contrast (forced colors) ----
+ * The browser drops box-shadows and background tints there, so a boundary, selected state or
+ * focus ring drawn only with them disappears: the composer, the primary buttons, the current
+ * section and the focused field did. Borders, outlines and underlines survive. Linear draws solid
+ * outlines in high contrast, and Apple's Inclusivity criteria say nothing may rely on color alone. */
+@media (forced-colors: active) {
+  .composer-card,
+  .msg-avatar,
+  .msg--employee:not(.msg--pending) .interview-text,
+  .MuiToggleButton-root.Mui-selected,
+  .MuiDialog-paper,
+  .MuiMenu-paper,
+  .MuiPopover-paper {
+    border: 1px solid CanvasText;
+  }
+  .MuiButton-contained,
+  .inline-edit__save {
+    border: 1px solid ButtonBorder;
+  }
+  /* A status label is a tinted pill; without the tint it needs an edge to still read as a label. */
+  .MuiChip-root {
+    border: 1px solid CanvasText;
+  }
+  .MuiButton-contained.Mui-disabled {
+    border-color: GrayText;
+  }
+  .composer-card:focus-within,
+  .MuiOutlinedInput-root.Mui-focused {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+  /* A border, not an underline: the chip's label clips overflow, so a decoration below the text is cut off. */
+  .jd-outline .MuiChip-root[aria-current='location'] {
+    border-block-end: 2px solid Highlight;
+  }
+  .MuiTabs-indicator,
+  .typing span {
+    background-color: CanvasText;
+  }
+}
+@media (forced-colors: active) and (hover: hover) and (pointer: fine) and (min-width: 900px) {
+  .item > .item-actions--corner,
+  li.item > .item-actions {
+    border: 1px solid CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
 }

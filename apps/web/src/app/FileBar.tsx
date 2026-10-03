@@ -1,6 +1,6 @@
-/** Identity and navigation of one job file, plus the server-verified state of the current Turn. */
+/** Top bar of one job file: identity, the way back, and the server-verified state of the current Turn. */
 import { Link as RouterLink } from 'react-router';
-import { Chip, IconButton } from '@mui/material';
+import { Chip, IconButton, Link } from '@mui/material';
 import { ArrowBackIcon } from '../shared/ui/icons';
 import type { ConsultantTurn } from '../shared/api/generated/consultant-turn';
 import type { JobFile } from '../shared/api/generated/job-file-list';
@@ -28,6 +28,9 @@ export function FileBar({ file, turn }: { file: JobFile; turn: ConsultantTurn | 
       >
         <ArrowBackIcon />
       </IconButton>
+      <Link component={RouterLink} to="/" underline="none" className="brand" aria-label="Caliburn">
+        Caliburn
+      </Link>
       <div className="file-bar-title">
         <h1>{file.display_name}</h1>
         <span className="file-bar-meta">受訪員工：{file.employee_name}</span>

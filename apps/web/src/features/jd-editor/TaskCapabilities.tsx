@@ -54,11 +54,13 @@ export function TaskCapabilities({ taskId, baseline, disabled, onChange }: Props
     }
     return (
       <Box component="section" aria-label={`${label}關聯`} key={kind} className="item">
-        <Typography component="h5" variant="subtitle2">
+        <Typography component="h5" variant="overline" className="jd-label">
           所需{label}
         </Typography>
         {linked.length === 0 ? (
-          <Typography color="text.secondary">尚未關聯</Typography>
+          <Typography variant="body2" className="jd-empty">
+            尚未關聯
+          </Typography>
         ) : (
           <Box component="ol" sx={{ pl: 3, my: 1 }}>
             {linked.map((item, index) => {
@@ -123,6 +125,15 @@ export function TaskCapabilities({ taskId, baseline, disabled, onChange }: Props
               disabled={disabled}
               onChange={(event) => setLink(event.target.value, true)}
               helperText="選取後即保存關聯；解除關聯不會刪除共用定義。"
+              // A compact one-line picker: the label stays as the accessible name (CSS hides it), and
+              // the closed control reads as the action itself. A tall labelled field overlapped the
+              // next section's picker when floated.
+              slotProps={{
+                select: {
+                  displayEmpty: true,
+                  renderValue: () => <span>＋ 新增{label}關聯</span>,
+                },
+              }}
               sx={{ mt: 1 }}
             >
               {available.map((item, index) => (

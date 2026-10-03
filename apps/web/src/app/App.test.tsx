@@ -121,7 +121,7 @@ test('建立後開啟原檔案並回讀正式開場，不生成員工輸入', as
   await user.click(screen.getByRole('button', { name: '建立' }));
   expect(await screen.findByRole('heading', { name: firstFile.display_name })).toBeVisible();
   expect(await screen.findByText('請談談最近一次完整的工作。')).toBeVisible();
-  expect(screen.getByRole('heading', { name: 'App 開場引導 · 訪談序號 1' })).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'App 開場引導' })).toBeVisible();
   expect(screen.getByRole('textbox', { name: '訪談內容' })).toHaveValue('');
   expect(screen.getByRole('button', { name: '送出訪談' })).toBeEnabled();
   expect(fetch.mock.calls.filter(([, options]) => options?.method === 'POST')).toHaveLength(1);
@@ -173,7 +173,12 @@ test('同名檔案按身分切換，遲到的甲檔訪談不可顯示在乙檔',
 test('不存在的檔案顯示錯誤而非上一份內容或伺服器除錯文字', async () => {
   const fetch = vi
     .fn()
-    .mockResolvedValue(Response.json({ detail: 'private debug' }, { status: 404 }));
+    .mockResolvedValue(
+      Response.json(
+        { detail: { code: 'job_file_not_found', debug: 'private debug' } },
+        { status: 404 },
+      ),
+    );
   vi.stubGlobal('fetch', fetch);
   renderApp(`/job-files/${firstFile.job_file_id}`);
   expect(await screen.findByRole('alert')).toHaveTextContent('找不到這份職務檔案');
@@ -321,9 +326,15 @@ test('職務檔案提供 JD 基本資料讀取與人工編輯入口', async () =
   renderApp(`/job-files/${firstFile.job_file_id}`);
   expect(await screen.findByRole('heading', { name: 'JD 基本資料' })).toBeVisible();
   expect(await screen.findByText('前端工程師')).toBeVisible();
-  expect(screen.getByRole('button', { name: '編輯基本資料' })).toBeEnabled();
+  expect(screen.getByRole('button', { name: '修改職務名稱' })).toHaveAttribute(
+    'aria-disabled',
+    'false',
+  );
   expect(await screen.findByRole('heading', { name: 'JD 職責與任務' })).toBeVisible();
-  expect(await screen.findByRole('button', { name: '新增職責' })).toBeEnabled();
+  expect(await screen.findByRole('button', { name: '新增職責' })).toHaveAttribute(
+    'aria-disabled',
+    'false',
+  );
   expect(consoleError).not.toHaveBeenCalled();
 });
 
@@ -363,7 +374,7 @@ test('metadata 背景讀取失敗不卸載尚未送出的訪談與 JD 表單草�
   vi.stubGlobal('fetch', fetch);
   const { client } = renderApp(`/job-files/${firstFile.job_file_id}`);
   await user.type(await screen.findByRole('textbox', { name: '訪談內容' }), '尚未送出的原話');
-  await user.click(await screen.findByRole('button', { name: '編輯基本資料' }));
+  await user.click(await screen.findByRole('button', { name: '修改職務名稱' }));
   await user.type(screen.getByRole('textbox', { name: '職務名稱' }), '尚未保存的職稱');
 
   metadataUnavailable = true;
@@ -372,7 +383,7 @@ test('metadata 背景讀取失敗不卸載尚未送出的訪談與 JD 表單草�
   });
   expect(await screen.findByText('暫時無法取得服務結果，請稍後再試。')).toBeInTheDocument();
   expect(screen.getByRole('textbox', { name: '職務名稱' })).toHaveValue('尚未保存的職稱');
-  await user.click(screen.getByRole('button', { name: '返回 JD' }));
+  await user.click(screen.getByRole('button', { name: '取消' }));
   expect(screen.getByRole('textbox', { name: '訪談內容' })).toHaveValue('尚未送出的原話');
   expect(screen.getByText('暫時無法取得服務結果，請稍後再試。')).toBeVisible();
 
@@ -504,7 +515,10 @@ test('狀態查詢失敗不沿用候選或控制；查回 failed 仍保留正式
   expect(
     screen.queryByRole('button', { name: /暫停處理|取消處理|繼續處理/ }),
   ).not.toBeInTheDocument();
-  expect(screen.getAllByRole('heading', { name: /訪談序號/ })).toHaveLength(1);
+  // Only the formal opening is a message of the history; the unformal input is not one.
+  expect(
+    screen.getAllByRole('heading', { name: /^(App 開場引導|受訪員工|職務顧問)$/ }),
+  ).toHaveLength(1);
   expect(fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
 });
 
@@ -576,7 +590,7 @@ test('歷史回答按需確認撤回只送原 Turn，成功重讀正式稿而不
   expect(await screen.findByText('原輪正式職稱')).toBeVisible();
   expect(screen.queryByRole('button', { name: '撤回這輪 JD' })).not.toBeInTheDocument();
   expect(statusReads).toBe(0);
-  await userEvent.click(screen.getByRole('button', { name: /回看本次公開處理訊息/ }));
+  await userEvent.click(screen.getByRole('button', { name: '處理紀錄' }));
   await userEvent.click(await screen.findByRole('button', { name: '撤回這輪 JD' }));
   expect(screen.getByRole('dialog')).toHaveTextContent('不撤回訪談或工作記憶');
   expect(screen.getByRole('dialog')).toHaveTextContent('後續人工修改');

@@ -16,7 +16,7 @@ const conditionLabels: Record<Condition['kind'], string> = {
 
 function PreviewTasks({ tasks, work }: { tasks: WorkTask[]; work: CandidateJdPreview['work'] }) {
   return tasks.map((task) => (
-    <Box key={task.task_id} sx={{ pl: 2, borderLeft: 2, borderColor: 'divider' }}>
+    <Box key={task.task_id} className="jd-rail">
       <Typography component="h4" variant="subtitle1">
         {task.title ?? '任務（名稱尚未提供）'}
       </Typography>
@@ -30,7 +30,7 @@ function PreviewTasks({ tasks, work }: { tasks: WorkTask[]; work: CandidateJdPre
         ([label, details]) =>
           details.length > 0 && (
             <Box key={label}>
-              <Typography component="h5" variant="subtitle2">
+              <Typography component="h5" variant="overline" className="jd-label">
                 {label}
               </Typography>
               <ul>
@@ -51,7 +51,7 @@ function PreviewTasks({ tasks, work }: { tasks: WorkTask[]; work: CandidateJdPre
           );
           return (
             capability && (
-              <Typography key={link.capability_id} variant="body2">
+              <Typography key={link.capability_id} variant="body2" color="text.secondary">
                 {capability.kind === 'knowledge' ? '知識' : '技能'}：
                 {capability.name ?? '名稱尚未提供'}
               </Typography>
@@ -69,9 +69,9 @@ export function JdCandidatePreview({ candidate }: { candidate: CandidateJdPrevie
     <Stack
       component="section"
       aria-label="JD 候選預覽"
-      spacing={2}
-      className="ai-layer"
-      sx={{ p: { xs: 2, sm: 3 }, overflowWrap: 'anywhere' }}
+      spacing={3}
+      className="ai-layer jd-candidate"
+      sx={{ overflowWrap: 'anywhere' }}
     >
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <span className="ai-label">候選</span>
@@ -80,7 +80,7 @@ export function JdCandidatePreview({ candidate }: { candidate: CandidateJdPrevie
         </Typography>
       </Stack>
       <Alert severity="info">尚未正式保存；完成前不會取代正式 JD，PDF 仍匯出正式版本。</Alert>
-      <Box component="dl" sx={{ m: 0 }}>
+      <Box component="dl" className="jd-props">
         {(
           [
             ['job_title', '職稱'],
@@ -89,19 +89,23 @@ export function JdCandidatePreview({ candidate }: { candidate: CandidateJdPrevie
             ['purpose', '職務目的'],
           ] as const
         ).map(([field, label]) => (
-          <Box key={field} sx={{ mb: 1 }}>
-            <Typography component="dt" variant="subtitle2">
+          <Box key={field} className="jd-prop">
+            <Typography component="dt" variant="body2" color="text.secondary">
               {label}
             </Typography>
-            <Typography component="dd" sx={{ ml: 0, whiteSpace: 'pre-wrap' }}>
+            <Typography
+              component="dd"
+              className={field === 'job_title' ? 'jd-title-value' : undefined}
+              sx={{ ml: 0, whiteSpace: 'pre-wrap' }}
+            >
               {profile[field] ?? '尚未提供'}
             </Typography>
           </Box>
         ))}
       </Box>
       {work.areas.map((area) => (
-        <Stack key={area.area_id} spacing={1}>
-          <Typography component="h3" variant="subtitle1">
+        <Stack key={area.area_id} spacing={1.5} className="jd-candidate-block">
+          <Typography component="h3" variant="h6" className="jd-area-title">
             {area.title ?? '職責（名稱尚未提供）'}
           </Typography>
           <Typography sx={{ whiteSpace: 'pre-wrap' }}>
@@ -114,15 +118,15 @@ export function JdCandidatePreview({ candidate }: { candidate: CandidateJdPrevie
         </Stack>
       ))}
       {unassigned.length > 0 && (
-        <Stack spacing={1}>
-          <Typography component="h3" variant="subtitle1">
+        <Stack spacing={1.5} className="jd-candidate-block">
+          <Typography component="h3" variant="h6" className="jd-area-title">
             未歸屬任務
           </Typography>
           <PreviewTasks tasks={unassigned} work={work} />
         </Stack>
       )}
       {work.capabilities.map((item) => (
-        <Box key={item.capability_id}>
+        <Box key={item.capability_id} className="jd-candidate-block">
           <Typography component="h3" variant="subtitle1">
             {item.kind === 'knowledge' ? '知識' : '技能'}：{item.name ?? '名稱尚未提供'}
           </Typography>
@@ -132,7 +136,7 @@ export function JdCandidatePreview({ candidate }: { candidate: CandidateJdPrevie
         </Box>
       ))}
       {work.collaborators.map((item) => (
-        <Box key={item.collaborator_id}>
+        <Box key={item.collaborator_id} className="jd-candidate-block">
           <Typography component="h3" variant="subtitle1">
             協作對象：{item.name ?? '名稱尚未提供'}
           </Typography>
@@ -142,7 +146,7 @@ export function JdCandidatePreview({ candidate }: { candidate: CandidateJdPrevie
         </Box>
       ))}
       {work.conditions.map((item) => (
-        <Box key={item.condition_id}>
+        <Box key={item.condition_id} className="jd-candidate-block">
           <Typography component="h3" variant="subtitle1">
             {conditionLabels[item.kind]}
           </Typography>

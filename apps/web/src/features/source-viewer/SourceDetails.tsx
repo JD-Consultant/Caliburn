@@ -1,12 +1,13 @@
 /** Navigate only links supplied by the selected formal citation's fixed chain. */
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Box, Button, Stack, Typography } from '@mui/material';
-import type { Reference } from '../../shared/api/generated/jd-sources-view';
+import { Alert, Button } from '@mui/material';
 import type { InterviewContent } from '../../shared/api/generated/jd-source-content-view';
+import { SafeMarkdown } from '../../shared/ui/SafeMarkdown';
+import { ArrowBackIcon, ChevronRightIcon } from '../../shared/ui/icons';
 import { describeSourceError, jdSourceContentQuery } from './source-api';
 import type { SourceScope } from './source-api';
-import { SafeMarkdown } from '../../shared/ui/SafeMarkdown';
+import { SourceKindIcon } from './SourceKindIcon';
 
 const speakerLabels: Record<InterviewContent['speaker'], string> = {
   app: '系統',
@@ -14,19 +15,23 @@ const speakerLabels: Record<InterviewContent['speaker'], string> = {
   consultant: '顧問',
 };
 
-export function SourceDetails({ scope, reference }: { scope: SourceScope; reference: Reference }) {
+export function SourceDetails({ scope }: { scope: SourceScope }) {
   const [sourceRef, setSourceRef] = useState<string | null>(null);
   const source = useQuery(jdSourceContentQuery(scope, sourceRef));
   const content = source.data?.content;
   return (
-    <Stack spacing={2} className="source-details" sx={{ minWidth: 0 }}>
-      <Typography variant="h6" component="h3">
-        來源回查：{reference.source_label}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        以下正文為原引用當時的固定版本。
-      </Typography>
-      {sourceRef !== null && <Button onClick={() => setSourceRef(null)}>回到直接來源</Button>}
+    <div className="source-body">
+      <p className="source-note">以下正文為原引用當時的固定版本。</p>
+      {sourceRef !== null && (
+        <Button
+          size="small"
+          startIcon={<ArrowBackIcon />}
+          onClick={() => setSourceRef(null)}
+          sx={{ alignSelf: 'flex-start' }}
+        >
+          回到直接來源
+        </Button>
+      )}
       {source.isFetching ? (
         <p role="status">正在讀取來源正文…</p>
       ) : source.isError ? (
@@ -34,31 +39,45 @@ export function SourceDetails({ scope, reference }: { scope: SourceScope; refere
       ) : (
         content &&
         (content.kind === 'interview' ? (
-          <Box>
-            <Typography component="h4" variant="subtitle1">
+          // The employee's own words, set apart as a quotation (Hypothes.is, Kindle highlights).
+          <figure className="source-quote">
+            <figcaption>
               訪談 #{content.interview_sequence} · {speakerLabels[content.speaker]}
-            </Typography>
-            <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-              {content.interview_text}
-            </Typography>
-          </Box>
+            </figcaption>
+            <blockquote>{content.interview_text}</blockquote>
+          </figure>
         ) : (
-          <Stack spacing={1}>
-            <Typography component="h4" variant="subtitle1">
-              {content.title}
-            </Typography>
-            <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-              {content.description}
-            </Typography>
-            <SafeMarkdown markdown={content.body} />
-            {content.references.map((link) => (
-              <Box key={link.source_ref}>
-                <Button onClick={() => setSourceRef(link.source_ref)}>{link.label}</Button>
-              </Box>
-            ))}
-          </Stack>
+          <>
+            <h4 className="source-body__title">{content.title}</h4>
+            {content.description !== '' && (
+              <p className="source-body__description">{content.description}</p>
+            )}
+            <div className="source-prose">
+              <SafeMarkdown markdown={content.body} />
+            </div>
+            {content.references.length > 0 && (
+              <div>
+                <p className="source-note">此來源的依據</p>
+                <ul className="source-group__rows">
+                  {content.references.map((link) => (
+                    <li key={link.source_ref} className="source-row">
+                      <button
+                        type="button"
+                        className="source-row__main"
+                        onClick={() => setSourceRef(link.source_ref)}
+                      >
+                        <SourceKindIcon kind={link.kind} />
+                        <span className="source-row__label">{link.label}</span>
+                      </button>
+                      <ChevronRightIcon className="source-row__chevron" aria-hidden="true" />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
         ))
       )}
-    </Stack>
+    </div>
   );
 }

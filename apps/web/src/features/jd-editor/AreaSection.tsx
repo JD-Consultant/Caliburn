@@ -1,18 +1,14 @@
 /** One responsibility: a collapsible header with its own actions; its tasks arrive as children. */
-import { useId, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Paper, Stack, Typography } from '@mui/material';
 import type { Area } from '../../shared/api/generated/jd-work-view';
 import { IconAction } from '../../shared/ui/IconAction';
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  DeleteIcon,
-  EditIcon,
-  ExpandLessIcon,
-  ExpandMoreIcon,
-} from '../../shared/ui/icons';
+import { ArrowDownIcon, ArrowUpIcon, CloseIcon } from '../../shared/ui/icons';
+import { FoldToggle } from './FoldToggle';
+import { InlineText } from './InlineText';
+import { areaScopeField, areaTitleField } from './inline-fields';
 import { itemTarget, useSourceBadge } from './source-badge-context';
+import { useFold } from './use-fold';
 
 interface AreaSectionProps {
   area: Area;
@@ -20,7 +16,6 @@ interface AreaSectionProps {
   isLast: boolean;
   taskCount: number;
   disabled: boolean;
-  onEdit: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onDelete: () => void;
@@ -33,53 +28,54 @@ export function AreaSection({
   isLast,
   taskCount,
   disabled,
-  onEdit,
   onMoveUp,
   onMoveDown,
   onDelete,
   children,
 }: AreaSectionProps) {
-  // Collapsing is presentation only; the tasks stay mounted so nothing reloads or resets.
-  const [expanded, setExpanded] = useState(true);
+  const fold = useFold();
+  const { expanded } = fold;
   const badge = useSourceBadge();
-  const bodyId = useId();
   const title = area.title ?? '尚未命名的職責';
   return (
-    <Paper variant="outlined" component="section" aria-label={title} sx={{ p: { xs: 1.5, sm: 2 } }}>
+    <Paper
+      variant="outlined"
+      component="section"
+      aria-label={title}
+      className="jd-area"
+      sx={{ p: { xs: 1.5, sm: 2 } }}
+    >
       <Stack spacing={2} className="item">
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
-          <IconAction
-            label={`${expanded ? '收合' : '展開'}職責 ${title}`}
-            aria-expanded={expanded}
-            aria-controls={bodyId}
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </IconAction>
-          <Typography component="h3" variant="h6">
-            {title}
+        <Stack
+          direction="row"
+          spacing={1}
+          className="jd-fold-head"
+          sx={{ alignItems: 'center', flexWrap: 'wrap' }}
+        >
+          <FoldToggle name={`職責 ${title}`} fold={fold} />
+          <InlineText field={areaTitleField(area)}>
+            <Typography component="h3" variant="h6" className="jd-area-title">
+              {title}
+            </Typography>
+          </InlineText>
+          <Typography variant="body2" color="text.secondary">
+            {String(taskCount)} 項任務
           </Typography>
           {badge(itemTarget('area', area.area_id))}
-          {!expanded && (
-            <Typography variant="body2" color="text.secondary">
-              {String(taskCount)} 項任務
-            </Typography>
-          )}
         </Stack>
-        {expanded && (
-          <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-            {area.scope_text ?? '職責範圍尚未提供'}
-          </Typography>
-        )}
+        <div hidden={!expanded} className="jd-area-scope">
+          <InlineText field={areaScopeField(area)}>
+            <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+              {area.scope_text ?? '職責範圍尚未提供'}
+            </Typography>
+          </InlineText>
+        </div>
         {expanded && (
           <Stack
             direction="row"
             className="item-actions item-actions--corner"
             sx={{ flexWrap: 'wrap' }}
           >
-            <IconAction label="編輯職責" disabled={disabled} onClick={onEdit}>
-              <EditIcon />
-            </IconAction>
             <IconAction label="上移職責" disabled={disabled || isFirst} onClick={onMoveUp}>
               <ArrowUpIcon />
             </IconAction>
@@ -87,11 +83,11 @@ export function AreaSection({
               <ArrowDownIcon />
             </IconAction>
             <IconAction label="刪除職責" color="error" disabled={disabled} onClick={onDelete}>
-              <DeleteIcon />
+              <CloseIcon />
             </IconAction>
           </Stack>
         )}
-        <div id={bodyId} hidden={!expanded}>
+        <div id={fold.bodyId} hidden={!expanded} className="jd-area-body">
           {children}
         </div>
       </Stack>

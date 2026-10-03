@@ -14,7 +14,7 @@ async function createFile(page: Page, displayName: string, employeeName: string)
   await page.getByRole('textbox', { name: '受訪員工姓名' }).fill(employeeName);
   await page.getByRole('button', { name: '建立', exact: true }).click();
   await expect(page.getByRole('heading', { name: displayName })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'App 開場引導 · 訪談序號 1' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'App 開場引導' })).toBeVisible();
   return page.url();
 }
 

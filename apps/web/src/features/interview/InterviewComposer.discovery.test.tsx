@@ -61,7 +61,15 @@ test.each(['active', 'paused'] as const)(
       allowed_controls: status === 'paused' ? ['resume', 'cancel'] : ['pause', 'cancel'],
     };
     const fetch = vi.fn((path: string) =>
-      Promise.resolve(Response.json(path === `${baseUrl}/current` ? { turn } : turn)),
+      Promise.resolve(
+        Response.json(
+          path.endsWith('/reasoning-summaries')
+            ? []
+            : path === `${baseUrl}/current`
+              ? { turn }
+              : turn,
+        ),
+      ),
     );
     vi.stubGlobal('fetch', fetch);
     openComposer();
@@ -74,6 +82,7 @@ test.each(['active', 'paused'] as const)(
     expect(fetch.mock.calls.map(([path]) => path)).toEqual([
       `${baseUrl}/current`,
       `${baseUrl}/${executionId}`,
+      `${baseUrl}/${executionId}/reasoning-summaries`,
     ]);
     expect(readTurnHint(fileId)).toBeNull();
   },
@@ -138,9 +147,11 @@ test('follows another tab replacing a finished Turn hint without a second query 
   const fetch = vi.fn((path: string) =>
     Promise.resolve(
       Response.json(
-        path.endsWith(nextId)
-          ? { ...active, execution_id: nextId, input_text: '另一分頁的新輸入' }
-          : { ...active, status: 'cancelled', allowed_controls: [] },
+        path.endsWith('/reasoning-summaries')
+          ? []
+          : path.endsWith(nextId)
+            ? { ...active, execution_id: nextId, input_text: '另一分頁的新輸入' }
+            : { ...active, status: 'cancelled', allowed_controls: [] },
       ),
     ),
   );
@@ -161,7 +172,9 @@ test('follows another tab replacing a finished Turn hint without a second query 
   expect(screen.getByLabelText('頁面處理狀態')).toHaveTextContent('active');
   expect(fetch.mock.calls.map(([path]) => path)).toEqual([
     `${baseUrl}/${executionId}`,
+    `${baseUrl}/${executionId}/reasoning-summaries`,
     `${baseUrl}/${nextId}`,
+    `${baseUrl}/${nextId}/reasoning-summaries`,
   ]);
 });
 

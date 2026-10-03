@@ -65,6 +65,7 @@ test('each historical consultant reply expands its own original turn without a b
           }),
         );
       reads.push(path);
+      if (path.endsWith('/reasoning-summaries')) return Promise.resolve(Response.json([]));
       const executionId = path.endsWith(firstTurn) ? firstTurn : laterTurn;
       return Promise.resolve(
         Response.json({
@@ -99,15 +100,19 @@ test('each historical consultant reply expands its own original turn without a b
   if (!opening || !employee || !earlier || !later) throw new Error('Expected formal history rows');
   expect(within(opening).queryByRole('button')).not.toBeInTheDocument();
   expect(within(employee).queryByRole('button')).not.toBeInTheDocument();
-  expect(screen.getAllByRole('button', { name: '回看本次公開處理訊息' })).toHaveLength(2);
-  await userEvent.click(within(earlier).getByRole('button', { name: '回看本次公開處理訊息' }));
+  expect(screen.getAllByRole('button', { name: '處理紀錄' })).toHaveLength(2);
+  await userEvent.click(within(earlier).getByRole('button', { name: '處理紀錄' }));
+  await userEvent.click(await within(earlier).findByText('處理過程'));
   expect(await within(earlier).findByText('較早公開說明')).toBeVisible();
   expect(within(later).queryByText('較早公開說明')).not.toBeInTheDocument();
-  await userEvent.click(within(later).getByRole('button', { name: '回看本次公開處理訊息' }));
+  await userEvent.click(within(later).getByRole('button', { name: '處理紀錄' }));
+  await userEvent.click(await within(later).findByText('處理過程'));
   expect(await within(later).findByText('較晚公開說明')).toBeVisible();
   expect(reads).toEqual([
     `/api/job-files/${fileId}/consultant-turns/${firstTurn}`,
+    `/api/job-files/${fileId}/consultant-turns/${firstTurn}/reasoning-summaries`,
     `/api/job-files/${fileId}/consultant-turns/${laterTurn}`,
+    `/api/job-files/${fileId}/consultant-turns/${laterTurn}/reasoning-summaries`,
   ]);
   expect(localStorage.length).toBe(0);
 });

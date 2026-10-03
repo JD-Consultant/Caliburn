@@ -44,12 +44,15 @@ export async function requestJson<T>(
   });
   if (!response.ok) {
     // Do not render arbitrary server/debug bodies or private input echoed by an error.
+    const code = await readPublicErrorCode(response);
     throw new ApiError(
       response.status === 404
-        ? '找不到這份職務檔案。請回清單重新選取。'
+        ? code === 'job_file_not_found'
+          ? '找不到這份職務檔案。請回清單重新選取。'
+          : '找不到這項資料或服務。請重新讀取；若持續發生，請確認本機服務。'
         : '暫時無法取得服務結果，請稍後再試。',
       response.status,
-      await readPublicErrorCode(response),
+      code,
     );
   }
   const value: unknown = await response.json();

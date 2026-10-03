@@ -8,3 +8,7 @@ export const conditionLabels: Record<ConditionKind, string> = {
   shared_collaboration: '共通協作界線',
   qualification: '必要資格',
 };
+
+export function isConditionKind(value: string): value is ConditionKind {
+  return Object.hasOwn(conditionLabels, value);
+}

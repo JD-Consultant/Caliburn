@@ -18,7 +18,9 @@ export function TurnJdChanges({
   const changes = useQuery({ ...turnJdChangesQuery(jobFileId, executionId), enabled: open });
   return (
     <>
-      <Button onClick={() => setOpen(true)}>查看這輪 JD 變更</Button>
+      <Button size="small" onClick={() => setOpen(true)}>
+        查看這輪 JD 變更
+      </Button>
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -50,7 +52,9 @@ export function TurnJdChanges({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>關閉</Button>
+          <Button variant="outlined" onClick={() => setOpen(false)}>
+            關閉
+          </Button>
         </DialogActions>
       </Dialog>
     </>

@@ -26,11 +26,17 @@ async function readWork(request: APIRequestContext, fileId: string): Promise<JdW
 }
 async function createArea(page: Page, name: string): Promise<void> {
   await page.getByRole('button', { name: '新增職責', exact: true }).click();
-  await page.getByRole('textbox', { name: '職責名稱' }).fill(name);
-  await page.getByRole('textbox', { name: '職責範圍' }).fill('負責約定範圍的工作。');
-  await page.getByRole('button', { name: '儲存職責' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
+  const field = page.getByRole('textbox', { name: '職責名稱' });
+  await field.fill(name);
+  await field.press('Enter');
+  await expect(field).toHaveCount(0);
+  const area = page.getByRole('region', { name, exact: true });
+  await expect(area.getByRole('heading', { name, exact: true })).toBeVisible();
+  await area.getByText('職責範圍尚未提供').click();
+  const scope = page.getByRole('textbox', { name: '職責範圍' });
+  await scope.fill('負責約定範圍的工作。');
+  await scope.press('Control+Enter');
+  await expect(scope).toHaveCount(0);
 }
 async function createTask(page: Page, area: string, name: string): Promise<void> {
   await page
@@ -87,20 +93,25 @@ test('職責任務 CRUD、排序、跨組移動及刪職責保留任務，reload
           ?.outcomes[0]?.text,
     )
     .toBe('交接說明');
-  await card.getByRole('button', { name: '編輯任務' }).click();
-  await page.getByRole('combobox', { name: '所屬職責' }).click();
-  await page.getByRole('option', { name: '網站維護' }).click();
-  await page.getByRole('textbox', { name: '工作內容' }).fill('維護約定頁面並記錄限制。');
-  await page.getByRole('textbox', { name: '工作成果 1' }).fill('完整交接說明');
-  await page.getByRole('button', { name: '儲存任務' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  // Move it from the menu, then edit its text where it stands: one command each, no form.
+  await card.getByRole('button', { name: '移到其他職責' }).click();
+  await page.getByRole('menuitemradio', { name: '網站維護' }).click();
   const maintenance = page.getByRole('region', { name: '網站維護', exact: true });
   await expect(maintenance.getByRole('article', { name: '實作網頁' })).toBeVisible();
-  await maintenance.getByRole('button', { name: '編輯職責' }).click();
+  const moved = maintenance.getByRole('article', { name: '實作網頁', exact: true });
+  await moved.getByText('依已確認需求實作與交付。').click();
+  await page.getByRole('textbox', { name: '工作內容' }).fill('維護約定頁面並記錄限制。');
+  await page.keyboard.press('Control+Enter');
+  await expect(moved.getByText('維護約定頁面並記錄限制。')).toBeVisible();
+  await moved.getByText('交接說明', { exact: true }).click();
+  await page.getByRole('textbox', { name: '工作成果 1' }).fill('完整交接說明');
+  await page.keyboard.press('Control+Enter');
+  await expect(moved.getByText('完整交接說明')).toBeVisible();
+  await maintenance.getByRole('heading', { name: '網站維護', exact: true }).click();
   await page.getByRole('textbox', { name: '職責名稱' }).fill('前端維護');
-  await page.getByRole('button', { name: '儲存職責' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.keyboard.press('Enter');
   const renamed = page.getByRole('region', { name: '前端維護', exact: true });
+  await expect(renamed).toBeVisible();
   await renamed.getByRole('button', { name: '刪除職責' }).click();
   await expect(page.getByRole('dialog')).toContainText('任務會保留');
   await page.getByRole('button', { name: '確認刪除職責' }).click();
@@ -124,17 +135,17 @@ test('職責任務 CRUD、排序、跨組移動及刪職責保留任務，reload
   await page.setViewportSize({ width: 390, height: 844 });
   // Narrow screens show one pane at a time; the JD lives in its own tab.
   await page.getByRole('tab', { name: 'JD' }).click();
-  await unassigned.getByRole('button', { name: '編輯任務' }).click();
+  await unassigned.getByRole('heading', { name: '實作網頁' }).click();
   await expect(page.getByRole('textbox', { name: '任務名稱' })).toHaveValue('實作網頁');
-  await expect(page.getByRole('combobox', { name: '所屬職責' })).toContainText('未歸屬任務');
   await expect(page.getByRole('textbox', { name: '任務名稱' })).toBeFocused();
-  await expect(page.getByRole('button', { name: '儲存任務' })).toBeInViewport();
+  await expect(page.getByRole('button', { name: '儲存', exact: true })).toBeInViewport();
   await page.screenshot({
     path: testInfo.outputPath('jd-task-mobile.png'),
     animations: 'disabled',
   });
-  await page.getByRole('button', { name: '移除工作要求 1' }).click();
-  await page.getByRole('button', { name: '儲存任務' }).click();
+  await page.keyboard.press('Escape');
+  await unassigned.getByRole('button', { name: '刪除工作要求 1' }).click();
+  await page.getByRole('button', { name: '確認刪除工作要求' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   expect(
     (await readWork(page.request, fileId)).tasks.find((item) => item.task_id === task.task_id)
@@ -157,10 +168,15 @@ test('集合修改後編輯 profile，再新增集合，兩個方向都刷新共
   const fileId = await createFile(page.request);
   await page.goto(`/job-files/${fileId}`);
   await createArea(page, '前端交付');
-  await page.getByRole('button', { name: '編輯基本資料' }).click();
+  const editTitle = page
+    .getByRole('region', { name: 'JD 基本資料' })
+    .getByRole('button', { name: '修改職務名稱' });
+  await expect(editTitle).toHaveAttribute('aria-disabled', 'false');
+  await editTitle.focus();
+  await page.keyboard.press('Enter');
   await page.getByRole('textbox', { name: '職務名稱' }).fill('前端工程師');
-  await page.getByRole('button', { name: '儲存基本資料' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.getByRole('textbox', { name: '職務名稱' }).press('Enter');
+  await expect(page.getByRole('textbox', { name: '職務名稱' })).toHaveCount(0);
   await createArea(page, '前端維護');
   await expect(page.getByText('前端工程師', { exact: true })).toBeVisible();
   expect((await readWork(page.request, fileId)).areas).toHaveLength(2);
@@ -206,11 +222,12 @@ test('任務真提交後丟回應，目標後來已刪除仍可確認原命令�
   expect((await readWork(page.request, fileId)).tasks).toEqual([]);
 });
 
-test('職責表單不覆蓋其他提交，A 已准入也不能新增人工任務', async ({ page }) => {
+test('新增職責的欄位不覆蓋其他提交，A 已准入也不能新增人工任務', async ({ page }) => {
   const fileId = await createFile(page.request);
   await page.goto(`/job-files/${fileId}`);
   await page.getByRole('button', { name: '新增職責', exact: true }).click();
-  await page.getByRole('textbox', { name: '職責名稱' }).fill('過期新增');
+  const newName = page.getByRole('textbox', { name: '職責名稱' });
+  await newName.fill('過期新增');
   const before = await readWork(page.request, fileId);
   expect(
     (
@@ -223,10 +240,10 @@ test('職責表單不覆蓋其他提交，A 已准入也不能新增人工任務
       })
     ).status(),
   ).toBe(200);
-  await page.getByRole('button', { name: '儲存職責' }).click();
-  await expect(page.getByRole('dialog')).toContainText('修改未被接受');
+  await newName.press('Enter');
+  await expect(page.getByText(/修改未被接受/)).toBeVisible();
   await page.getByRole('button', { name: '讀取目前 JD' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(newName).toHaveCount(0);
   await expect(page.getByRole('heading', { name: '其他分頁職責' })).toBeVisible();
   expect(
     (

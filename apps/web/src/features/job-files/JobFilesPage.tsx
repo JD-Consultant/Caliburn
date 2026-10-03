@@ -25,6 +25,16 @@ import { CreateJobFileDialog } from './CreateJobFileDialog';
 import { RenameJobFileDialog } from './RenameJobFileDialog';
 import { jobFileQuery, jobFilesQuery } from './job-file-api';
 
+// "2026/09/29 18:00": 24-hour, no seconds. The default zh-TW form ("2026/9/29 下午6:00:00") wraps.
+const createdFormat = new Intl.DateTimeFormat('zh-TW', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+
 export function JobFilesPage() {
   const files = useQuery(jobFilesQuery);
   const cache = useQueryClient();
@@ -52,7 +62,7 @@ export function JobFilesPage() {
   }
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={4}>
       <div className="page-heading">
         <div>
           <Typography variant="h4" component="h1">
@@ -70,7 +80,7 @@ export function JobFilesPage() {
             正在讀取職務檔案…
           </p>
           {[0, 1, 2].map((row) => (
-            <Skeleton key={row} variant="rounded" height={56} />
+            <Skeleton key={row} variant="rounded" height={68} />
           ))}
         </Stack>
       )}
@@ -101,10 +111,10 @@ export function JobFilesPage() {
             <p>先建立一份職務檔案，記錄受訪者與工作。</p>
           </Paper>
         ) : (
-          <TableContainer component={Paper} variant="outlined">
+          <TableContainer component={Paper} variant="outlined" className="file-list">
             <Table
               aria-label="職務檔案清單"
-              sx={{ '& .MuiTableCell-root': { px: { xs: 1, sm: 2 } } }}
+              sx={{ '& .MuiTableCell-root': { px: { xs: 1.5, sm: 2.5 } } }}
             >
               <TableHead>
                 <TableRow>
@@ -118,19 +128,20 @@ export function JobFilesPage() {
                 {files.data.job_files.map((file) => {
                   const identity = `${file.employee_name}，${file.job_file_id.slice(0, 8)}`;
                   return (
-                    <TableRow key={file.job_file_id} hover>
+                    <TableRow key={file.job_file_id} hover className="file-row">
                       <TableCell>
                         <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
                           <span className="file-avatar" aria-hidden="true">
                             {[...file.display_name][0]}
                           </span>
                           <div>
+                            {/* The link's ::after covers the whole row, so the row is one big target. */}
                             <Link
                               component={RouterLink}
                               to={`/job-files/${file.job_file_id}`}
-                              underline="hover"
+                              underline="none"
                               color="text.primary"
-                              sx={{ fontWeight: 600 }}
+                              className="row-link"
                               aria-label={`開啟 ${file.display_name}（${identity}）`}
                             >
                               {file.display_name}
@@ -147,12 +158,13 @@ export function JobFilesPage() {
                       <TableCell
                         sx={{ display: { xs: 'none', sm: 'table-cell' }, color: 'text.secondary' }}
                       >
-                        <time dateTime={file.created_at}>
-                          {new Date(file.created_at).toLocaleString('zh-TW')}
+                        <time dateTime={file.created_at} className="tabular">
+                          {createdFormat.format(new Date(file.created_at))}
                         </time>
                       </TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         <IconAction
+                          className="row-action"
                           label={`重新命名 ${file.display_name}（${identity}）`}
                           onClick={() => setRenaming(file)}
                         >

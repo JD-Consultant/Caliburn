@@ -27,6 +27,9 @@ export default defineConfig(
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
+      // Current supported APIs only (coding-standard.md §1): a library's `@deprecated` marker is its
+      // own notice that the call goes away, e.g. React's FormEvent and TanStack's fetchQuery.
+      '@typescript-eslint/no-deprecated': 'error',
     },
   },
   {
@@ -36,7 +39,10 @@ export default defineConfig(
       globals: globals.node,
       parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
     },
-    rules: { '@typescript-eslint/consistent-type-imports': 'error' },
+    rules: {
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-deprecated': 'error',
+    },
   },
   {
     files: ['scripts/**/*.mjs', '*.js'],

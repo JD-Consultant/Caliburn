@@ -4,19 +4,15 @@ import type { ReactNode } from 'react';
 import { Alert, Button } from '@mui/material';
 import type { InterviewMessage } from '../../shared/api/generated/interview-history';
 import { describeReadError } from '../../shared/api/http';
+import { ChatMarkdown } from '../../shared/ui/ChatMarkdown';
 import { interviewHistoryQuery } from './interview-api';
 import { HistoricalTurnMessages } from './HistoricalTurnMessages';
+import { SpeakerAvatar } from './SpeakerAvatar';
 
 const speakerLabels: Record<InterviewMessage['speaker'], string> = {
   app: 'App 開場引導',
   employee: '受訪員工',
   consultant: '職務顧問',
-};
-
-const speakerAvatars: Record<InterviewMessage['speaker'], string> = {
-  app: '系',
-  employee: '員',
-  consultant: '顧',
 };
 
 export function InterviewHistory({
@@ -60,12 +56,15 @@ export function InterviewHistory({
           {history.data.messages.map((message) => (
             <li key={message.source_id} className={`msg msg--${message.speaker}`}>
               <h3 className="msg-meta">
-                <span className="msg-avatar" aria-hidden="true">
-                  {speakerAvatars[message.speaker]}
-                </span>
-                {speakerLabels[message.speaker]} · 訪談序號 {message.interview_sequence}
+                {message.speaker !== 'app' && <SpeakerAvatar speaker={message.speaker} />}
+                <span className="msg-name">{speakerLabels[message.speaker]}</span>
               </h3>
-              <p className="interview-text">{message.interview_text}</p>
+              {message.speaker === 'consultant' ? (
+                // Formatted for reading; the verbatim text stays in the formal record and sources.
+                <ChatMarkdown className="interview-text md" markdown={message.interview_text} />
+              ) : (
+                <p className="interview-text">{message.interview_text}</p>
+              )}
               {message.speaker === 'consultant' && message.execution_id !== null && (
                 <HistoricalTurnMessages
                   jobFileId={jobFileId}

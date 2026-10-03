@@ -4,7 +4,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { Chip } from '@mui/material';
-import { jdSections } from './jd-section-ids';
+import { jdSections, revealSectionEvent } from './jd-section-ids';
 
 /** Distance from the top of the scroll area within which a section counts as the current one. */
 const CURRENT_OFFSET_PX = 96;
@@ -64,7 +64,10 @@ export function JdOutline() {
   function choose(id: string): void {
     chosen.current = id;
     setCurrent(id);
-    document.getElementById(id)?.scrollIntoView({ block: 'start' });
+    const section = document.getElementById(id);
+    // A folded section opens itself; the jump goes to its heading either way.
+    section?.dispatchEvent(new Event(revealSectionEvent));
+    section?.scrollIntoView({ block: 'start' });
   }
 
   return (

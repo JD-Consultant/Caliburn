@@ -1,8 +1,8 @@
 /** One file's local draft and server-verified consultant turn. */
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import type { FormEvent } from 'react';
+import type { ReactNode, SubmitEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, InputBase } from '@mui/material';
 import type { SubmitInterviewInput } from '../../shared/api/generated/submit-interview-input';
 import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
 import { ApiError, describeReadError } from '../../shared/api/http';
@@ -22,8 +22,8 @@ import {
   submitInterviewInput,
 } from './interview-turn-api';
 import type { TurnHint } from './interview-turn-api';
-import { PublicTurnMessages, StreamingPublicTurnMessages } from './PublicTurnMessages';
 import { ConsultantTurnControls } from './ConsultantTurnControls';
+import { TurnLog } from './TurnLog';
 
 const statusText: Record<ConsultantTurn['status'], string> = {
   active: '顧問正在處理，尚未正式完成。',
@@ -46,23 +46,25 @@ function restoreHint(jobFileId: string): { hint: TurnHint | null; error: string 
 
 interface ComposerProps {
   jobFileId: string;
+  /** Floats just above the dock (the page's "back to the newest message" button); the dock positions it. */
+  aboveDock?: ReactNode;
 }
 
 export function InterviewComposer(props: ComposerProps) {
   return <ComposerForFile key={props.jobFileId} {...props} />;
 }
 
-function ComposerForFile({ jobFileId }: ComposerProps) {
+function ComposerForFile({ jobFileId, aboveDock }: ComposerProps) {
   const [restored] = useState(() => restoreHint(jobFileId));
   const hint = useSyncExternalStore(subscribeTurnHint, () => readTurnHintSnapshot(jobFileId));
   const [draft, setDraft] = useState('');
   const [pendingInput, setPending] = useState<SubmitInterviewInput | null>(null);
-  const pending = pendingInput?.command_id === hint?.command_id ? pendingInput : null;
+  const retainedInput = pendingInput?.command_id === hint?.command_id ? pendingInput : null;
   const [message, setMessage] = useState(restored.error);
   const inFlight = useRef(false);
   const refreshed = useRef<string | null>(null);
   const queryClient = useQueryClient();
-  const recoveringCommand = hint && !hint.execution_id && !pending ? hint.command_id : null;
+  const recoveringCommand = hint && !hint.execution_id && !retainedInput ? hint.command_id : null;
   const recovery = useQuery(consultantTurnByCommandQuery(jobFileId, recoveringCommand));
   const discovery = useQuery({
     ...currentConsultantTurnQuery(jobFileId),
@@ -79,6 +81,9 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
   const verified = turn.isError ? undefined : turn.data;
   const discovering = !hint && !executionId && !restored.error;
   const readyForNewInput = discovery.isSuccess && !discovery.isFetching && !discovery.data.turn;
+  const canStartNextInput = verified?.status === 'completed';
+  // Completion may be confirmed through another page, not just this POST's acknowledgement.
+  const pending = canStartNextInput ? null : retainedInput;
 
   useEffect(() => {
     if (!recoveringCommand || !recovery.data) return;
@@ -106,11 +111,11 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
     });
   }, [verified?.status, verified?.execution_id, jobFileId, queryClient]);
 
-  async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
+  async function submit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
-    if (inFlight.current || restored.error || executionId) return;
-    if (hint && !pending) return;
-    if (!pending && !readyForNewInput) return;
+    if (inFlight.current || restored.error || (executionId && !canStartNextInput)) return;
+    if (hint && !pending && !canStartNextInput) return;
+    if (!pending && !readyForNewInput && !canStartNextInput) return;
     const command = pending ?? { command_id: crypto.randomUUID(), text: draft };
     if (!isSubmitInterviewInput(command)) {
       setMessage('請填寫訪談內容，不能只有空白或包含無效字元。');
@@ -118,7 +123,11 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
     }
     try {
       const existing = readTurnHint(jobFileId);
-      if (existing && existing.command_id !== command.command_id) {
+      const replacesCompletedHint =
+        canStartNextInput &&
+        existing?.command_id === hint?.command_id &&
+        existing?.execution_id === verified.execution_id;
+      if (existing && existing.command_id !== command.command_id && !replacesCompletedHint) {
         setMessage('另一個頁面已有待確認訪談。請重新開啟這份檔案，先查回原處理狀態。');
         return;
       }
@@ -128,8 +137,16 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
       return;
     }
     setPending(command);
+    setDraft('');
     setMessage(null);
     inFlight.current = true;
+    if (canStartNextInput) {
+      // A rejected new input must rediscover current work, not reuse the old completion.
+      void queryClient.resetQueries({
+        queryKey: currentConsultantTurnQuery(jobFileId).queryKey,
+        exact: true,
+      });
+    }
     try {
       const accepted = await submission.mutateAsync(command);
       const acceptedHint = { command_id: command.command_id, execution_id: accepted.execution_id };
@@ -146,6 +163,7 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
         try {
           clearTurnHint(jobFileId, command.command_id);
           setPending(null);
+          setDraft(command.text);
           setMessage(
             error.code === 'model_not_configured'
               ? '尚未設定模型服務，這次輸入未被接受，文字仍保留。請先完成後端模型設定。'
@@ -161,7 +179,8 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
           '同一檔案已有處理中的訪談，或原命令內容不符。請先核對原請求；不會另建一次輸入。',
         );
       } else {
-        setMessage('送出結果尚未確認，文字仍保留。請重新確認原請求，不會建立新的輸入。');
+        // Render uncertainty from the unresolved command, so a later confirmation retires it.
+        setMessage(null);
       }
     } finally {
       inFlight.current = false;
@@ -187,44 +206,34 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
     });
   }
 
-  const showForm = !executionId && (!hint || pending);
+  const showForm = canStartNextInput || (!executionId && (!hint || pending));
+  const sendLabel = submission.isPending
+    ? '正在確認送出…'
+    : pending
+      ? '重新確認原請求'
+      : '送出訪談';
+  // A plain send is icon-only, as in every chat composer (ChatGPT, Claude, AI Elements' PromptInput);
+  // the two states that need words keep their label.
+  const iconOnlySend = !submission.isPending && !pending;
   return (
     <>
       <div className="composer-log">
-        {verified &&
-          verified.status !== 'completed' &&
-          (verified.status === 'cancelled' ? (
-            <div className="msg msg--pending">
-              <details>
-                <summary>查看原輸入</summary>
-                <p style={{ whiteSpace: 'pre-wrap' }}>{verified.input_text}</p>
-              </details>
-            </div>
-          ) : (
-            <div className="msg msg--pending">
-              <p className="msg-meta">本次原輸入（尚非正式訪談）</p>
-              <p className="interview-text">{verified.input_text}</p>
-            </div>
-          ))}
-        {verified &&
-          (verified.status === 'active' ? (
-            <StreamingPublicTurnMessages
-              key={`${jobFileId}:${verified.execution_id}`}
-              jobFileId={jobFileId}
-              executionId={verified.execution_id}
-              messages={verified.commentary}
-            />
-          ) : (
-            <PublicTurnMessages
-              messages={verified.commentary}
-              terminal={isTerminalTurn(verified.status)}
-            />
-          ))}
+        {verified && verified.status !== 'completed' && (
+          <TurnLog jobFileId={jobFileId} turn={verified} />
+        )}
       </div>
       <Box component="section" aria-label="訪談輸入" className="composer-dock">
+        {aboveDock}
         {message && <Alert severity="warning">{message}</Alert>}
+        {pending && submission.isError && !message && (
+          <Alert severity="warning">
+            送出結果尚未確認，文字仍保留。請重新確認原請求，不會建立新的輸入。
+          </Alert>
+        )}
         {discovering && discovery.isFetching && (
-          <p role="status">正在查詢這份檔案是否有進行中的處理…</p>
+          <p role="status" className="dock-note">
+            正在查詢這份檔案是否有進行中的處理…
+          </p>
         )}
         {discovering && discovery.isError && (
           <Alert
@@ -244,7 +253,9 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
           </Alert>
         )}
         {executionId && turn.isPending && !verified && (
-          <p role="status">正在核對這次訪談的處理狀態…</p>
+          <p role="status" className="dock-note">
+            正在核對這次訪談的處理狀態…
+          </p>
         )}
         {executionId && turn.isError && (
           <Alert
@@ -265,32 +276,34 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
         )}
         {verified && (
           <>
-            <Alert
-              severity={
-                verified.status === 'failed'
-                  ? 'error'
-                  : verified.status === 'completed'
-                    ? 'success'
-                    : 'info'
-              }
-            >
-              {verified.status === 'active' && verified.pause_requested
-                ? '暫停請求已受理，正在等待安全點停妥，尚未暫停。'
-                : statusText[verified.status]}
-            </Alert>
+            {verified.status === 'completed' ? (
+              <p role="status" className="dock-note">
+                {statusText.completed}
+              </p>
+            ) : (
+              <Alert severity={verified.status === 'failed' ? 'error' : 'info'}>
+                {verified.status === 'active' && verified.pause_requested
+                  ? '暫停請求已受理，正在等待安全點停妥，尚未暫停。'
+                  : statusText[verified.status]}
+              </Alert>
+            )}
             <ConsultantTurnControls key={verified.execution_id} turn={verified} />
-            {isTerminalTurn(verified.status) && (
-              <Stack direction="row" spacing={1}>
-                {verified.status !== 'completed' && (
-                  <Button onClick={() => startNext(true)}>取回原文編輯</Button>
-                )}
-                <Button onClick={() => startNext(false)}>開始下一次訪談</Button>
-              </Stack>
+            {isTerminalTurn(verified.status) && verified.status !== 'completed' && (
+              <div className="dock-controls">
+                <Button variant="outlined" size="small" onClick={() => startNext(true)}>
+                  取回原文編輯
+                </Button>
+                <Button variant="contained" size="small" onClick={() => startNext(false)}>
+                  開始下一次訪談
+                </Button>
+              </div>
             )}
           </>
         )}
         {recoveringCommand && !executionId && recovery.isPending && (
-          <p role="status">正在依原請求識別查回伺服器原輸入…</p>
+          <p role="status" className="dock-note">
+            正在依原請求識別查回伺服器原輸入…
+          </p>
         )}
         {recoveringCommand && !executionId && recovery.isError && (
           <Alert
@@ -317,40 +330,38 @@ function ComposerForFile({ jobFileId }: ComposerProps) {
               void submit(event);
             }}
           >
-            <Stack spacing={1}>
-              <TextField
-                label="訪談內容"
+            <div className="composer-card">
+              <InputBase
+                className="composer-input"
                 multiline
-                minRows={2}
+                minRows={1}
                 maxRows={8}
                 fullWidth
+                placeholder="輸入訪談內容…"
+                slotProps={{ input: { 'aria-label': '訪談內容' } }}
                 value={pending?.text ?? draft}
                 onChange={(event) => setDraft(event.target.value)}
-                disabled={hint !== null || restored.error !== null}
+                disabled={(hint !== null && !canStartNextInput) || restored.error !== null}
               />
-              <Stack
-                direction="row"
-                spacing={2}
-                sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+              <Button
+                type="submit"
+                variant="contained"
+                startIcon={<SendIcon />}
+                aria-label={iconOnlySend ? sendLabel : undefined}
+                title={iconOnlySend ? sendLabel : undefined}
+                disabled={
+                  submission.isPending ||
+                  restored.error !== null ||
+                  (!pending && !readyForNewInput && !canStartNextInput)
+                }
+                className={iconOnlySend ? 'composer-send composer-send--icon' : 'composer-send'}
               >
-                <Typography variant="caption" color="text.secondary">
-                  原輸入會先保留；顧問完成並保存後，才會列入正式訪談並更新 JD。
-                </Typography>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  startIcon={<SendIcon />}
-                  disabled={
-                    submission.isPending ||
-                    restored.error !== null ||
-                    (!pending && !readyForNewInput)
-                  }
-                  sx={{ flex: 'none' }}
-                >
-                  {submission.isPending ? '正在確認送出…' : pending ? '重新確認原請求' : '送出訪談'}
-                </Button>
-              </Stack>
-            </Stack>
+                {iconOnlySend ? null : sendLabel}
+              </Button>
+            </div>
+            <p className="composer-hint">
+              原輸入會先保留；顧問完成並保存後，才會列入正式訪談並更新 JD。
+            </p>
           </form>
         )}
       </Box>

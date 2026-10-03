@@ -95,9 +95,9 @@ test('one difference action lazily opens both comparisons without loading source
   await screen.findByRole('button', { name: '範圍管理' });
   expect(fetch).toHaveBeenCalledTimes(1);
   await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
-  await userEvent.click(await screen.findByText('JD 內容變更', { selector: 'summary' }));
+  expect(await screen.findByRole('heading', { name: 'JD 內容變更' })).toBeVisible();
   expect(screen.getByText('JD 差異正文：每月改為每季')).toBeVisible();
-  await userEvent.click(screen.getByText('來源變更', { selector: 'summary' }));
+  expect(screen.getByRole('heading', { name: '來源變更' })).toBeVisible();
   expect(screen.getByText('來源差異正文')).toBeVisible();
   expect(screen.getByText('JD 與來源皆有變更')).toBeVisible();
   expect(fetch).toHaveBeenCalledTimes(2);
@@ -111,7 +111,7 @@ test('an immutable interview exposes JD changes only, never suggests an intervie
   );
   expect(await screen.findByText('JD 已修改')).toBeVisible();
   await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
-  await userEvent.click(await screen.findByText('JD 內容變更', { selector: 'summary' }));
+  expect(await screen.findByRole('heading', { name: 'JD 內容變更' })).toBeVisible();
   expect(screen.getByText('JD 差異正文：每月改為每季')).toBeVisible();
-  expect(screen.queryByText('來源變更', { selector: 'summary' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: '來源變更' })).not.toBeInTheDocument();
 });

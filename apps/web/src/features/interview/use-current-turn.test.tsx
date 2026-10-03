@@ -45,7 +45,7 @@ test('observes the composer cache without fetching and follows the hint being cl
   const client = clients[0];
   if (!client) throw new Error('Expected query client');
   await act(async () => {
-    await client.fetchQuery(consultantTurnQuery(fileId, executionId));
+    await client.query(consultantTurnQuery(fileId, executionId));
   });
   await waitFor(() => expect(result.current.turn?.status).toBe('active'));
   expect(result.current.isVerified).toBe(true);
@@ -74,7 +74,7 @@ test('an unreadable status is not reported as a Turn', async () => {
   const client = clients[0];
   if (!client) throw new Error('Expected query client');
   await act(async () => {
-    await expect(client.fetchQuery(consultantTurnQuery(fileId, executionId))).rejects.toThrow();
+    await expect(client.query(consultantTurnQuery(fileId, executionId))).rejects.toThrow();
   });
   expect(result.current).toEqual({ turn: null, isVerified: false });
 });

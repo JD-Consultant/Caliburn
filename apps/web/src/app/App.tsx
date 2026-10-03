@@ -1,31 +1,33 @@
 /** Route composition only; feature modules own their screens and data queries. */
 import type { ReactNode } from 'react';
-import { Link as RouterLink, Route, Routes } from 'react-router';
-import { Chip, Container, Link, Typography } from '@mui/material';
+import { Link as RouterLink, Outlet, Route, Routes } from 'react-router';
+import { Container, Link } from '@mui/material';
 import { JobFilesPage } from '../features/job-files/JobFilesPage';
+import { AppHeader } from './AppHeader';
 import { JobFilePage } from './JobFilePage';
 
 function PageContainer({ children }: { children: ReactNode }) {
   return (
-    <Container component="main" maxWidth="lg" sx={{ py: 5 }}>
+    <Container component="main" maxWidth="md" sx={{ py: 6 }}>
       {children}
     </Container>
   );
 }
 
-export function App() {
+/** Pages under this layout share the global header; the job-file workspace has its own top bar. */
+function HeaderLayout() {
   return (
     <>
-      <header className="app-header">
-        <Link component={RouterLink} to="/" underline="none" className="brand">
-          Caliburn
-        </Link>
-        <Typography variant="body2" color="text.secondary" className="app-tagline">
-          職務訪談與職務說明書
-        </Typography>
-        <Chip label="新架構開發中" size="small" variant="outlined" />
-      </header>
-      <Routes>
+      <AppHeader />
+      <Outlet />
+    </>
+  );
+}
+
+export function App() {
+  return (
+    <Routes>
+      <Route element={<HeaderLayout />}>
         <Route
           path="/"
           element={
@@ -34,7 +36,6 @@ export function App() {
             </PageContainer>
           }
         />
-        <Route path="/job-files/:jobFileId" element={<JobFilePage />} />
         <Route
           path="*"
           element={
@@ -46,7 +47,8 @@ export function App() {
             </PageContainer>
           }
         />
-      </Routes>
-    </>
+      </Route>
+      <Route path="/job-files/:jobFileId" element={<JobFilePage />} />
+    </Routes>
   );
 }

@@ -9,6 +9,7 @@ import type { Target } from '../shared/api/generated/jd-sources-view';
 import { DownloadIcon } from '../shared/ui/icons';
 import type { ConsultantTurn } from '../shared/api/generated/consultant-turn';
 import { isJdReadOnlyDuring } from '../features/interview/turn-summary';
+import { EditSlots } from '../features/jd-editor/EditSlots';
 import { JdCandidatePreview } from '../features/jd-editor/JdCandidatePreview';
 import { JdOutline } from '../features/jd-editor/JdOutline';
 import { JdProfileEditor } from '../features/jd-editor/JdProfileEditor';
@@ -56,7 +57,13 @@ export function JdPane({
   return (
     <>
       <div className="pane-header">
-        <h2 className="pane-title">職務說明書（JD）</h2>
+        <div className="pane-heading">
+          <h2 className="pane-title">職務說明書（JD）</h2>
+          {/* Stays visible: the export is the formal version, never the candidate preview. */}
+          <p id="jd-pdf-export-note" className="pane-note">
+            匯出目前已正式保存的版本，不包含本輪候選預覽。
+          </p>
+        </div>
         <div className="pane-actions">
           <SourceViewer
             jobFileId={jobFileId}
@@ -75,16 +82,15 @@ export function JdPane({
             aria-label="匯出目前 JD（PDF）"
             title="匯出目前 JD（PDF）"
             aria-describedby="jd-pdf-export-note"
+            size="small"
           >
             <DownloadIcon />
           </IconButton>
         </div>
       </div>
       <div className="pane-scroll jd-scroll">
+        {!showCandidate && <JdOutline />}
         <div className="jd-doc">
-          <p id="jd-pdf-export-note" className="jd-note">
-            匯出目前已正式保存的版本，不包含本輪候選預覽。
-          </p>
           {readOnly && (
             <Alert
               severity="info"
@@ -119,10 +125,14 @@ export function JdPane({
             </div>
           )}
           <div className="jd-stack" hidden={showCandidate}>
-            <JdOutline />
             <SourceBadgeContext.Provider value={renderBadge}>
-              <JdProfileEditor jobFileId={jobFileId} readOnly={readOnly} />
-              <JdWorkEditor jobFileId={jobFileId} readOnly={readOnly} />
+              <div className="jd-sheet">
+                {/* One manual edit at a time across the basic data and the collections. */}
+                <EditSlots>
+                  <JdProfileEditor jobFileId={jobFileId} readOnly={readOnly} />
+                  <JdWorkEditor jobFileId={jobFileId} readOnly={readOnly} />
+                </EditSlots>
+              </div>
             </SourceBadgeContext.Provider>
           </div>
         </div>

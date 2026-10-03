@@ -1,4 +1,4 @@
-/** Shared knowledge/skill text is edited once; task usage is managed separately. */
+/** A new shared knowledge/skill definition; task usage is managed separately, and its text is edited in place. */
 import { useState } from 'react';
 import type { RefObject } from 'react';
 import { Stack, TextField } from '@mui/material';
@@ -9,7 +9,6 @@ import type { WorkCommand } from './jd-work-api';
 interface Props {
   revisionId: string;
   kind: Capability['kind'];
-  capability: Capability | undefined;
   titleInput: RefObject<HTMLInputElement | null>;
   disabled: boolean;
   onSubmit: (command: WorkCommand) => Promise<void>;
@@ -19,30 +18,24 @@ interface Props {
 export function CapabilityFields({
   revisionId,
   kind,
-  capability,
   titleInput,
   disabled,
   onSubmit,
   onError,
 }: Props) {
-  const [name, setName] = useState(capability?.name ?? '');
-  const [description, setDescription] = useState(capability?.description ?? '');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const label = kind === 'knowledge' ? '知識' : '技能';
   function submit(): void {
-    const values = { name: name || null, description: description || null };
-    const changes = (['name', 'description'] as const)
-      .filter((field) => values[field] !== capability?.[field])
-      .map((field) => ({ field, value: values[field] }));
-    if (capability && changes.length === 0) {
-      onError('沒有修改任何欄位，尚未送出。');
-      return;
-    }
     const request = {
       command_id: crypto.randomUUID(),
       expected_revision_id: revisionId,
-      change: capability
-        ? { action: 'revise_capability', capability_id: capability.capability_id, changes }
-        : { action: 'create_capability', kind, ...values },
+      change: {
+        action: 'create_capability',
+        kind,
+        name: name || null,
+        description: description || null,
+      },
     };
     if (!isEditJdCapabilitiesRequest(request)) {
       onError(`${label}名稱或說明至少填一項，不能只填空白。`);
@@ -79,7 +72,6 @@ export function CapabilityFields({
               : '運用方法完成工作或解決問題的能力；不要只把任務換句話說。'
           }
         />
-        <p>修改共用定義後，所有使用此項的任務都會顯示新版；不改變使用關係。</p>
       </Stack>
     </form>
   );

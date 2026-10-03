@@ -1,6 +1,6 @@
 /** A submission keeps its identity until the backend acknowledges the original result. */
 import { useRef, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { SubmitEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import {
   Alert,
@@ -50,7 +50,7 @@ export function CreateJobFileDialog({ onClose, onCreated }: Props) {
   const [message, setMessage] = useState(restored.error);
   const mutation = useMutation({ mutationFn: createJobFile, retry: false });
 
-  async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
+  async function submit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     if (inFlight.current || restored.error) return;
     const command = pending ?? {
@@ -146,7 +146,7 @@ export function CreateJobFileDialog({ onClose, onCreated }: Props) {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={onClose} disabled={mutation.isPending}>
+          <Button variant="outlined" onClick={onClose} disabled={mutation.isPending}>
             返回清單
           </Button>
           <Button

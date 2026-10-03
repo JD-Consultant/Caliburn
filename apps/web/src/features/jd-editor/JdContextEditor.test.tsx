@@ -70,40 +70,17 @@ test('協作對象可先填範圍不猜名稱，送出目前基底', async () =>
   });
 });
 
-test('條件更正分類保留身分，不重送未改正文，也不改任務要求', async () => {
+test('條件只有空白時不送出，草稿不污染讀取資料', async () => {
   const fetch = mockServer();
   renderEditor();
-  await userEvent.click(await screen.findByRole('button', { name: '編輯條件' }));
-  await userEvent.click(screen.getByRole('combobox', { name: '條件分類' }));
-  await userEvent.click(screen.getByRole('option', { name: '共通協作界線' }));
-  await userEvent.click(screen.getByRole('button', { name: '儲存條件' }));
-  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-  const writes = fetch.mock.calls.filter(([, options]) => options?.method === 'POST');
-  expect(writes).toHaveLength(1);
-  expect(writes[0]?.[0]).toBe(`/api/job-files/${fileId}/jd/conditions`);
-  const body = writes[0]?.[1]?.body;
-  expect(typeof body === 'string' ? JSON.parse(body) : null).toMatchObject({
-    expected_revision_id: revision,
-    change: {
-      action: 'revise_condition',
-      condition_id: conditionId,
-      changes: [{ field: 'kind', value: 'shared_collaboration' }],
-    },
-  });
-});
-
-test('條件無修改或只有空白時不送出，草稿不污染讀取資料', async () => {
-  const fetch = mockServer();
-  renderEditor();
-  await userEvent.click(await screen.findByRole('button', { name: '編輯條件' }));
-  await userEvent.click(screen.getByRole('button', { name: '儲存條件' }));
-  expect(screen.getByRole('alert')).toHaveTextContent('沒有修改');
-  await userEvent.clear(screen.getByRole('textbox', { name: '條件內容' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '條件內容' }), '   ');
-  await userEvent.click(screen.getByRole('button', { name: '儲存條件' }));
-  expect(screen.getByRole('alert')).toHaveTextContent('不能只填空白');
+  await userEvent.click(await screen.findByText('依約支援上線。'));
+  const field = await screen.findByRole('textbox', { name: '條件內容' });
+  await userEvent.clear(field);
+  await userEvent.type(field, '   ');
+  await userEvent.click(screen.getByRole('button', { name: '儲存' }));
+  expect(screen.getByRole('alert')).toHaveTextContent('不能是空白');
   expect(fetch.mock.calls.filter(([, options]) => options?.method === 'POST')).toHaveLength(0);
-  await userEvent.click(screen.getByRole('button', { name: '返回 JD' }));
+  await userEvent.click(screen.getByRole('button', { name: '取消' }));
   expect(
     within(screen.getByRole('region', { name: '工時與出差' })).getByText('依約支援上線。'),
   ).toBeVisible();

@@ -68,24 +68,27 @@ export function UndoTurnJd({ jobFileId, executionId, onUndone }: Props) {
   }
 
   return (
-    <Stack spacing={1} sx={{ mt: 2 }}>
-      <TurnJdChanges
-        key={`${jobFileId}:${executionId}`}
-        jobFileId={jobFileId}
-        executionId={executionId}
-      />
-      {undo.isSuccess ? (
+    <Stack spacing={1} sx={{ mt: 1 }}>
+      <div className="process-actions">
+        <TurnJdChanges
+          key={`${jobFileId}:${executionId}`}
+          jobFileId={jobFileId}
+          executionId={executionId}
+        />
+        {!undo.isSuccess && (
+          <Button
+            size="small"
+            onClick={() => {
+              undo.reset();
+              setOpen(true);
+            }}
+          >
+            撤回這輪 JD
+          </Button>
+        )}
+      </div>
+      {undo.isSuccess && (
         <Alert severity="success">這輪 JD 撤回已確認；訪談與工作記憶未撤回。</Alert>
-      ) : (
-        <Button
-          color="warning"
-          onClick={() => {
-            undo.reset();
-            setOpen(true);
-          }}
-        >
-          撤回這輪 JD
-        </Button>
       )}
       {refreshFailed && (
         <Alert severity="warning">撤回已保存，但畫面尚未更新。請重新開啟這份職務檔案。</Alert>
@@ -113,11 +116,11 @@ export function UndoTurnJd({ jobFileId, executionId, onUndone }: Props) {
           )}
         </DialogContent>
         <DialogActions>
-          <Button disabled={undo.isPending} onClick={() => setOpen(false)}>
+          <Button variant="outlined" disabled={undo.isPending} onClick={() => setOpen(false)}>
             關閉
           </Button>
           <Button
-            color="warning"
+            color="error"
             variant="contained"
             disabled={undo.isPending || rejected}
             onClick={() => {

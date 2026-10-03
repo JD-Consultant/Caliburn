@@ -1,6 +1,6 @@
 /** Rename a label from an observed base; never silently upgrade a rejected command. */
 import { useRef, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { SubmitEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import {
   Alert,
@@ -55,7 +55,7 @@ export function RenameJobFileDialog({ file, onClose, onRefresh }: Props) {
     retry: false,
   });
 
-  async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
+  async function submit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     if (inFlight.current || restored.error || isRejected) return;
     const command = pending ?? {
@@ -136,11 +136,13 @@ export function RenameJobFileDialog({ file, onClose, onRefresh }: Props) {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={onClose} disabled={mutation.isPending}>
+          <Button variant="outlined" onClick={onClose} disabled={mutation.isPending}>
             返回清單
           </Button>
           {isRejected ? (
-            <Button onClick={onRefresh}>讀取目前名稱</Button>
+            <Button variant="contained" onClick={onRefresh}>
+              讀取目前名稱
+            </Button>
           ) : (
             <Button
               type="submit"

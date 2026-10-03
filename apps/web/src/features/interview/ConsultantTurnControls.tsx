@@ -1,7 +1,7 @@
 /** Commands target the existing turn; only refreshed server state declares their effect. */
 import { useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Alert, Button, Stack, Typography } from '@mui/material';
+import { Alert, Button } from '@mui/material';
 import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
 import { CloseIcon, PauseIcon, PlayIcon } from '../../shared/ui/icons';
 import { ApiError } from '../../shared/api/http';
@@ -40,7 +40,8 @@ export function ConsultantTurnControls({ turn }: { turn: ConsultantTurn }) {
 
   if (isTerminalTurn(turn.status)) return null;
   return (
-    <Stack spacing={1}>
+    // A fragment: the controls sit in the composer dock, whose gap spaces them like its other rows.
+    <>
       {command.isError && (
         <Alert severity="warning">
           {command.error instanceof ApiError && command.error.status === 409
@@ -48,13 +49,16 @@ export function ConsultantTurnControls({ turn }: { turn: ConsultantTurn }) {
             : '控制結果尚未確認，已重新查詢原處理狀態；不會自動重送。請依目前狀態選擇下一步。'}
         </Alert>
       )}
-      {command.isPending && <Typography role="status">正在確認控制結果…</Typography>}
+      {command.isPending && (
+        <p role="status" className="dock-note">
+          正在確認控制結果…
+        </p>
+      )}
       {turn.allowed_controls.length > 0 && (
-        <Stack direction="row" spacing={1}>
+        <div className="dock-controls">
           {turn.allowed_controls.map((control) => (
             <Button
               key={control}
-              color={control === 'cancel' ? 'warning' : 'primary'}
               variant="outlined"
               size="small"
               startIcon={icons[control]}
@@ -66,13 +70,13 @@ export function ConsultantTurnControls({ turn }: { turn: ConsultantTurn }) {
               {labels[control]}
             </Button>
           ))}
-        </Stack>
+        </div>
       )}
       {turn.allowed_controls.some((control) => control === 'cancel') && (
-        <Typography variant="body2">
+        <p className="dock-note">
           取消會放棄本輪候選與原輸入的正式採用，保留本輪開始前的正式 JD 與工作記憶。
-        </Typography>
+        </p>
       )}
-    </Stack>
+    </>
   );
 }

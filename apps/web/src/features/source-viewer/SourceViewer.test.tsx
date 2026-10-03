@@ -137,9 +137,9 @@ test('follows only returned source refs through root, child and role-numbered in
   expect(document.querySelector('script')).toBeNull();
   await userEvent.click(screen.getByRole('button', { name: '回到直接來源' }));
   expect(await screen.findByRole('heading', { name: '原引用正文' })).toBeVisible();
-  await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
-  await userEvent.click(await screen.findByText('來源變更', { selector: 'summary' }));
+  await userEvent.click(screen.getByRole('tab', { name: '差異' }));
   expect(await screen.findByRole('heading', { name: '差異' })).toBeVisible();
+  expect(screen.getByRole('heading', { name: '來源變更' })).toBeVisible();
   expect(screen.getByText(/最新已發布/)).toBeVisible();
   expect(screen.getByText('來源已更新')).toBeVisible();
   expect(
@@ -166,6 +166,7 @@ test('direct interview sources do not offer Memory changes', async () => {
   await openRoot();
   expect(await screen.findByText('訪談 #3 · 員工')).toBeVisible();
   expect(screen.queryByRole('button', { name: '查看差異' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('tab')).not.toBeInTheDocument();
 });
 
 test.each(['content', 'changes'])(
@@ -182,7 +183,7 @@ test.each(['content', 'changes'])(
     await openRoot();
     if (kind === 'changes') {
       await screen.findByRole('heading', { name: '原引用正文' });
-      await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
+      await userEvent.click(screen.getByRole('tab', { name: '差異' }));
     }
     expect(await screen.findByText(/正式 JD 已更新，請重新讀取來源列表/)).toBeVisible();
     expect(screen.queryByText('private diagnostics')).not.toBeInTheDocument();
@@ -252,8 +253,7 @@ test('same citation on a new formal revision never reuses old content or changes
   renderViewer();
   await openRoot();
   await screen.findByRole('heading', { name: '原引用正文' });
-  await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
-  await userEvent.click(await screen.findByText('來源變更', { selector: 'summary' }));
+  await userEvent.click(screen.getByRole('tab', { name: '差異' }));
   await screen.findByRole('heading', { name: '差異' });
   responses[basePath] = { ...sources, revision_id: nextRevision };
   await userEvent.click(screen.getByRole('button', { name: '重新讀取來源列表' }));
@@ -261,8 +261,7 @@ test('same citation on a new formal revision never reuses old content or changes
   expect(await screen.findByText('新版固定正文')).toBeVisible();
   expect(screen.queryByRole('heading', { name: '原引用正文' })).not.toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: '差異' })).not.toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: '查看差異' }));
-  await userEvent.click(await screen.findByText('來源變更', { selector: 'summary' }));
+  await userEvent.click(screen.getByRole('tab', { name: '差異' }));
   expect(await screen.findByRole('heading', { name: '新版引用差異' })).toBeVisible();
 });
 
@@ -291,6 +290,7 @@ test('two citations with the same child locator keep separate fixed content', as
   await openRoot();
   await userEvent.click(await screen.findByRole('button', { name: '讀取情境' }));
   await screen.findByText('情境正文');
+  await userEvent.click(screen.getByRole('button', { name: '返回來源列表' }));
   await userEvent.click(screen.getByRole('button', { name: '第二條引用' }));
   await userEvent.click(await screen.findByRole('button', { name: '讀取情境' }));
   expect(await screen.findByText('第二條引用的固定情境')).toBeVisible();

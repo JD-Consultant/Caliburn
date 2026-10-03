@@ -2,66 +2,17 @@
 import { Box, Stack, Typography } from '@mui/material';
 import type { Detail, JdWorkView, WorkTask } from '../../shared/api/generated/jd-work-view';
 import { IconAction } from '../../shared/ui/IconAction';
-import { ArrowDownIcon, ArrowUpIcon, DeleteIcon, EditIcon } from '../../shared/ui/icons';
+import { ArrowDownIcon, ArrowUpIcon, CloseIcon } from '../../shared/ui/icons';
+import { FoldToggle } from './FoldToggle';
+import { UNASSIGNED, areaChoices } from './area-choice';
 import type { WorkIntent } from './jd-work-api';
-import { detailTarget, itemTarget, useSourceBadge } from './source-badge-context';
+import { InlineText } from './InlineText';
+import { taskDescriptionField, taskTitleField } from './inline-fields';
+import { MoveMenu } from './MoveMenu';
+import { itemTarget, useSourceBadge } from './source-badge-context';
 import { TaskCapabilities } from './TaskCapabilities';
-import type { WorkEditing } from './WorkEditDialog';
-
-function TaskDetails({
-  taskId,
-  label,
-  details,
-  disabled,
-  onMove,
-}: {
-  taskId: string;
-  label: string;
-  details: Detail[];
-  disabled: boolean;
-  onMove: (detailId: string, beforeId: string | null) => void;
-}) {
-  const badge = useSourceBadge();
-  return (
-    <Box>
-      <Typography component="h5" variant="subtitle2">
-        {label}
-      </Typography>
-      {details.length === 0 ? (
-        <Typography color="text.secondary">尚未提供</Typography>
-      ) : (
-        <Box component="ol" sx={{ pl: 3, my: 1 }}>
-          {details.map((detail, index) => (
-            <li key={detail.detail_id} className="item">
-              <Typography
-                sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', display: 'inline' }}
-              >
-                {detail.text}
-              </Typography>
-              {badge(detailTarget(taskId, detail.detail_id))}
-              <span className="item-actions">
-                <IconAction
-                  label={`上移${label} ${String(index + 1)}`}
-                  disabled={disabled || index === 0}
-                  onClick={() => onMove(detail.detail_id, details[index - 1]?.detail_id ?? null)}
-                >
-                  <ArrowUpIcon />
-                </IconAction>
-                <IconAction
-                  label={`下移${label} ${String(index + 1)}`}
-                  disabled={disabled || index === details.length - 1}
-                  onClick={() => onMove(detail.detail_id, details[index + 2]?.detail_id ?? null)}
-                >
-                  <ArrowDownIcon />
-                </IconAction>
-              </span>
-            </li>
-          ))}
-        </Box>
-      )}
-    </Box>
-  );
-}
+import { TaskDetails } from './TaskDetails';
+import { useFold } from './use-fold';
 
 interface TaskCardProps {
   task: WorkTask;
@@ -69,8 +20,8 @@ interface TaskCardProps {
   group: WorkTask[];
   baseline: JdWorkView;
   disabled: boolean;
-  onEdit: (editing: WorkEditing) => void;
   onDelete: (task: WorkTask) => void;
+  onDeleteDetail: (task: WorkTask, detail: Detail, label: string) => void;
   onChange: (intent: WorkIntent) => void;
 }
 
@@ -80,19 +31,22 @@ export function TaskCard({
   group,
   baseline,
   disabled,
-  onEdit,
   onDelete,
+  onDeleteDetail,
   onChange,
 }: TaskCardProps) {
+  const fold = useFold();
+  const { expanded } = fold;
   const name = task.title ?? '尚未命名的任務';
   const badge = useSourceBadge();
-  function move(beforeId: string | null): void {
+  /** Reorders within the group, or (with another `areaId`) moves to the end of that responsibility. */
+  function move(areaId: string | null, beforeId: string | null): void {
     onChange({
       collection: 'tasks',
       change: {
         action: 'move_task',
         task_id: task.task_id,
-        area_id: task.area_id,
+        area_id: areaId,
         before_task_id: beforeId,
         changes: [],
       },
@@ -114,73 +68,89 @@ export function TaskCard({
       component="article"
       id={`jd-task-${task.task_id}`}
       aria-label={name}
-      sx={{ pt: 2, borderTop: 1, borderColor: 'divider', scrollMarginTop: 16 }}
+      sx={{ pt: 2.5, borderTop: 1, borderColor: 'divider', scrollMarginTop: 16 }}
     >
-      <Stack spacing={1} className="item">
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
-          <Typography variant="subtitle1" component="h4">
-            {name}
-          </Typography>
-          {badge(itemTarget('task', task.task_id))}
-        </Stack>
-        <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-          {task.description ?? '工作內容尚未提供'}
-        </Typography>
+      <Stack spacing={1.5} className="item">
         <Stack
           direction="row"
-          className="item-actions item-actions--corner"
-          sx={{ flexWrap: 'wrap' }}
+          spacing={1}
+          className="jd-fold-head"
+          sx={{ alignItems: 'center', flexWrap: 'wrap' }}
         >
-          <IconAction
-            label="編輯任務"
-            disabled={disabled}
-            onClick={() => onEdit({ kind: 'task', baseline, task, areaId: task.area_id })}
-          >
-            <EditIcon />
-          </IconAction>
-          <IconAction
-            label="上移任務"
-            disabled={disabled || index === 0}
-            onClick={() => move(group[index - 1]?.task_id ?? null)}
-          >
-            <ArrowUpIcon />
-          </IconAction>
-          <IconAction
-            label="下移任務"
-            disabled={disabled || index === group.length - 1}
-            onClick={() => move(group[index + 2]?.task_id ?? null)}
-          >
-            <ArrowDownIcon />
-          </IconAction>
-          <IconAction
-            label="刪除任務"
-            color="error"
-            disabled={disabled}
-            onClick={() => onDelete(task)}
-          >
-            <DeleteIcon />
-          </IconAction>
+          <FoldToggle name={`任務 ${name}`} fold={fold} />
+          <InlineText field={taskTitleField(task)}>
+            <Typography variant="subtitle1" component="h4">
+              {name}
+            </Typography>
+          </InlineText>
+          {badge(itemTarget('task', task.task_id))}
         </Stack>
-        <TaskDetails
-          taskId={task.task_id}
-          label="工作成果"
-          details={task.outcomes}
-          disabled={disabled}
-          onMove={reorderDetail}
-        />
-        <TaskDetails
-          taskId={task.task_id}
-          label="工作要求"
-          details={task.requirements}
-          disabled={disabled}
-          onMove={reorderDetail}
-        />
-        <TaskCapabilities
-          taskId={task.task_id}
-          baseline={baseline}
-          disabled={disabled}
-          onChange={onChange}
-        />
+        <div hidden={!expanded}>
+          <InlineText field={taskDescriptionField(task)}>
+            <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+              {task.description ?? '工作內容尚未提供'}
+            </Typography>
+          </InlineText>
+        </div>
+        {expanded && (
+          <Stack
+            direction="row"
+            className="item-actions item-actions--corner"
+            sx={{ flexWrap: 'wrap' }}
+          >
+            <IconAction
+              label="上移任務"
+              disabled={disabled || index === 0}
+              onClick={() => move(task.area_id, group[index - 1]?.task_id ?? null)}
+            >
+              <ArrowUpIcon />
+            </IconAction>
+            <IconAction
+              label="下移任務"
+              disabled={disabled || index === group.length - 1}
+              onClick={() => move(task.area_id, group[index + 2]?.task_id ?? null)}
+            >
+              <ArrowDownIcon />
+            </IconAction>
+            <MoveMenu
+              label="移到其他職責"
+              heading="移到職責"
+              destinations={areaChoices(baseline.areas)}
+              current={task.area_id ?? UNASSIGNED}
+              disabled={disabled}
+              onMove={(value) => move(value === UNASSIGNED ? null : value, null)}
+            />
+            <IconAction
+              label="刪除任務"
+              color="error"
+              disabled={disabled}
+              onClick={() => onDelete(task)}
+            >
+              <CloseIcon />
+            </IconAction>
+          </Stack>
+        )}
+        <div id={fold.bodyId} hidden={!expanded}>
+          <Stack spacing={1.5}>
+            {(['outcome', 'requirement'] as const).map((kind) => (
+              <TaskDetails
+                key={kind}
+                taskId={task.task_id}
+                kind={kind}
+                details={kind === 'outcome' ? task.outcomes : task.requirements}
+                disabled={disabled}
+                onMove={reorderDetail}
+                onRemove={(detail, label) => onDeleteDetail(task, detail, label)}
+              />
+            ))}
+            <TaskCapabilities
+              taskId={task.task_id}
+              baseline={baseline}
+              disabled={disabled}
+              onChange={onChange}
+            />
+          </Stack>
+        </div>
       </Stack>
     </Box>
   );

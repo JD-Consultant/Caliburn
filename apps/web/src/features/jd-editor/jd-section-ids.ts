@@ -7,3 +7,6 @@ export const jdSections = [
   { id: 'jd-collaborators', label: '協作對象' },
   { id: 'jd-conditions', label: '工作條件' },
 ] as const;
+
+/** Sent to a section element to ask it to open itself; the section bar sends it before jumping there. */
+export const revealSectionEvent = 'jd-reveal-section';

@@ -1,27 +1,34 @@
-/** Group by saved JD identity; presentation never resolves a source by its label. */
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
+/**
+ * Group by saved JD identity; presentation never resolves a source by its label. A row is an action
+ * list item (Primer ActionList): leading kind icon, the source label, a trailing chevron, and — when the
+ * source needs recheck — the reason and a secondary action beneath it.
+ */
+import { useEffect, useId, useRef } from 'react';
+import { Button, Chip } from '@mui/material';
 import type { Reference } from '../../shared/api/generated/jd-sources-view';
+import { ChevronRightIcon } from '../../shared/ui/icons';
+import { changeLabel } from './source-labels';
+import { SourceKindIcon } from './SourceKindIcon';
+import type { SourceSelection } from './source-selection';
 import { targetKey } from './source-index';
-
-export interface SourceSelection {
-  citationId: string;
-  view: 'content' | 'changes';
-}
 
 interface Props {
   references: readonly Reference[];
-  selected: SourceSelection | null;
-  onSelect: (selection: SourceSelection) => void;
+  /** The source the reader just came back from: it takes focus when the list is shown again. */
+  focusCitationId: string | null;
+  onOpen: (selection: SourceSelection) => void;
 }
 
-function changeLabel(reference: Reference): string {
-  if (reference.jd_changed && reference.source_changed) return 'JD 與來源皆有變更';
-  if (reference.jd_changed) return 'JD 已修改';
-  if (reference.source_changed) return '來源已更新';
-  return '待核對';
-}
+export function SourceReferenceList({ references, focusCitationId, onOpen }: Props) {
+  const list = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (focusCitationId === null) return;
+    const row = [...(list.current?.querySelectorAll('[data-citation-id]') ?? [])].find(
+      (item) => item.getAttribute('data-citation-id') === focusCitationId,
+    );
+    row?.querySelector<HTMLButtonElement>('.source-row__main')?.focus();
+  }, [focusCitationId]);
 
-export function SourceReferenceList({ references, selected, onSelect }: Props) {
   const groups = new Map<string, Reference[]>();
   for (const reference of references) {
     // Legacy references without a target stay separate, even if their labels match.
@@ -31,57 +38,50 @@ export function SourceReferenceList({ references, selected, onSelect }: Props) {
     groups.set(key, group);
   }
   return (
-    <Stack>
+    <div ref={list} className="source-list">
       {[...groups].map(([key, group]) => (
-        <Box key={key} className="source-ref">
-          <Typography component="h3" variant="subtitle2" sx={{ overflowWrap: 'anywhere' }}>
-            {group[0]?.target_label}
-          </Typography>
-          <Stack component="ul" spacing={1.5} sx={{ listStyle: 'none', m: 0, p: 0 }}>
+        <section key={key} className="source-group">
+          <h4 className="source-group__title">{group[0]?.target_label}</h4>
+          <ul className="source-group__rows">
             {group.map((reference) => (
-              <Stack
-                component="li"
-                key={reference.citation_id}
-                aria-label={reference.source_label}
-                spacing={0.5}
-              >
-                <Button
-                  size="small"
-                  aria-pressed={
-                    selected?.citationId === reference.citation_id && selected.view === 'content'
-                  }
-                  onClick={() => onSelect({ citationId: reference.citation_id, view: 'content' })}
-                  sx={{ alignSelf: 'flex-start', textAlign: 'left', overflowWrap: 'anywhere' }}
-                >
-                  {reference.source_label}
-                </Button>
-                {reference.needs_recheck && (
-                  <Stack
-                    direction="row"
-                    useFlexGap
-                    spacing={1}
-                    sx={{ alignItems: 'center', flexWrap: 'wrap' }}
-                  >
-                    <Chip label={changeLabel(reference)} size="small" color="warning" />
-                    <Button
-                      size="small"
-                      aria-pressed={
-                        selected?.citationId === reference.citation_id &&
-                        selected.view === 'changes'
-                      }
-                      onClick={() =>
-                        onSelect({ citationId: reference.citation_id, view: 'changes' })
-                      }
-                    >
-                      查看差異
-                    </Button>
-                  </Stack>
-                )}
-              </Stack>
+              <SourceRow key={reference.citation_id} reference={reference} onOpen={onOpen} />
             ))}
-          </Stack>
-        </Box>
+          </ul>
+        </section>
       ))}
-    </Stack>
+    </div>
+  );
+}
+
+function SourceRow({
+  reference,
+  onOpen,
+}: {
+  reference: Reference;
+  onOpen: (selection: SourceSelection) => void;
+}) {
+  const statusId = useId();
+  const citationId = reference.citation_id;
+  return (
+    <li className="source-row" aria-label={reference.source_label} data-citation-id={citationId}>
+      <button
+        type="button"
+        className="source-row__main"
+        aria-describedby={reference.needs_recheck ? statusId : undefined}
+        onClick={() => onOpen({ citationId, view: 'content' })}
+      >
+        <SourceKindIcon kind={reference.source_kind} />
+        <span className="source-row__label">{reference.source_label}</span>
+      </button>
+      <ChevronRightIcon className="source-row__chevron" aria-hidden="true" />
+      {reference.needs_recheck && (
+        <span className="source-row__meta">
+          <Chip id={statusId} label={changeLabel(reference)} size="small" color="warning" />
+          <Button size="small" onClick={() => onOpen({ citationId, view: 'changes' })}>
+            查看差異
+          </Button>
+        </span>
+      )}
+    </li>
   );
 }

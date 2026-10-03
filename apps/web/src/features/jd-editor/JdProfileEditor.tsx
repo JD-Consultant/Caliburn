@@ -1,14 +1,21 @@
-/** Show only server-confirmed profile data; opening the form captures its edit baseline. */
+/** The JD's basic data: server-confirmed values, each edited in place; the command pipeline is the collections' one. */
 import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
-import type { JdProfileView } from '../../shared/api/generated/jd-profile-view';
 import { describeReadError } from '../../shared/api/http';
-import { EditJdProfileDialog } from './EditJdProfileDialog';
+import { isReviseJdProfileRequest } from '../../shared/api/validation';
+import { useEditSlot } from './edit-slots-context';
+import { InlineEditContext } from './inline-edit-context';
+import type { InlineEdit, InlineSaveResult } from './inline-edit-context';
+import { profileTextField } from './inline-fields';
+import type { InlineIntent } from './inline-fields';
+import { draftNoticeOf, statusOf } from './inline-session';
+import { InlineText } from './InlineText';
 import { jdProfileQuery } from './jd-profile-api';
-import { jdWorkQuery } from './jd-work-api';
-import { profileFields, profileLabels } from './profile-command';
+import { profileCommandFor, profileFields, profileLabels } from './profile-command';
 import { profileTarget, useSourceBadge } from './source-badge-context';
+import { useProfileCommand } from './useProfileCommand';
+import { WorkStatus } from './WorkStatus';
 
 export function JdProfileEditor({
   jobFileId,
@@ -18,15 +25,46 @@ export function JdProfileEditor({
   /** A Turn owns the JD: show it, but offer no manual edit (the App also refuses writes). */
   readOnly?: boolean;
 }) {
-  const queryClient = useQueryClient();
   const profile = useQuery(jdProfileQuery(jobFileId));
   const badge = useSourceBadge();
-  const [editing, setEditing] = useState<JdProfileView | null>(null);
-  function refresh(): void {
-    setEditing(null);
-    void queryClient.invalidateQueries({ queryKey: jdProfileQuery(jobFileId).queryKey });
-    void queryClient.invalidateQueries({ queryKey: jdWorkQuery(jobFileId).queryKey });
+  const [inlineKey, setInlineKey] = useState<string | null>(null);
+  // Reported by the open editor itself, so a field that vanished mid-edit cannot leave the page waiting.
+  const [inlineEditorOpen, setInlineEditorOpen] = useState(false);
+  const command = useProfileCommand(jobFileId, () => setInlineKey(null));
+  const current = profile.data;
+  // One edit at a time, here and in the collections: an open editor froze its revision.
+  const { heldByAnother } = useEditSlot(inlineEditorOpen || command.locked);
+  const disabled =
+    command.locked ||
+    profile.isFetching ||
+    profile.isError ||
+    readOnly ||
+    inlineEditorOpen ||
+    heldByAnother;
+  const status = statusOf(command);
+
+  function saveInline(revisionId: string, intent: InlineIntent): InlineSaveResult {
+    // A basic-data field only ever asks for a basic-data change.
+    if (intent.collection !== 'profile') return 'invalid';
+    const next = profileCommandFor(revisionId, intent);
+    if (!isReviseJdProfileRequest(next)) return 'invalid';
+    void command.send(next);
+    return 'submitted';
   }
+  const inlineEdit: InlineEdit | null = current
+    ? {
+        activeKey: inlineKey,
+        open: (key) => setInlineKey(key),
+        close: () => setInlineKey(null),
+        revisionId: current.revision_id,
+        save: saveInline,
+        canOpen: !disabled,
+        canEdit: !command.locked && !readOnly && !profile.isError,
+        status: { ...status, message: draftNoticeOf(command.message, readOnly) },
+        setEditorOpen: setInlineEditorOpen,
+      }
+    : null;
+
   return (
     <Paper
       component="section"
@@ -36,7 +74,7 @@ export function JdProfileEditor({
       sx={{ p: { xs: 1.5, sm: 2 } }}
     >
       <Stack spacing={2}>
-        <Typography variant="h6" component="h2" id="jd-profile-heading">
+        <Typography variant="overline" component="h2" id="jd-profile-heading" className="jd-label">
           JD 基本資料
         </Typography>
         {profile.isPending && <p role="status">正在讀取 JD 基本資料…</p>}
@@ -57,62 +95,55 @@ export function JdProfileEditor({
             {describeReadError(profile.error)}
           </Alert>
         )}
-        {profile.data && !profile.isError && (
-          <>
+        {/* An open editor shows this itself, next to the draft it belongs to. */}
+        {current && !inlineEditorOpen && <WorkStatus {...status} />}
+        {current && (
+          <InlineEditContext.Provider value={inlineEdit}>
             <Box
               component="dl"
               sx={{
                 m: 0,
                 display: 'grid',
-                gridTemplateColumns: { xs: '1fr', sm: '11rem 1fr' },
-                gap: 1,
+                gridTemplateColumns: { xs: '1fr', sm: '8.5rem minmax(0, 1fr)' },
+                columnGap: 3,
+                rowGap: { xs: 0.5, sm: 1.5 },
+                alignItems: 'baseline',
               }}
             >
-              {profileFields.map((field) => (
-                <Box key={field} sx={{ display: 'contents' }}>
-                  <Typography
-                    component="dt"
-                    sx={{
-                      fontWeight: 500,
-                      color: 'text.secondary',
-                      fontSize: '0.8125rem',
-                      pt: 0.25,
-                    }}
-                  >
-                    {profileLabels[field]}
-                  </Typography>
-                  <Typography
-                    component="dd"
-                    sx={{ m: 0, mb: 1, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
-                  >
-                    {profile.data.profile[field] ?? '尚未提供'} {badge(profileTarget(field))}
-                  </Typography>
-                </Box>
-              ))}
+              {profileFields.map((field) => {
+                const value = current.profile[field];
+                const textField = profileTextField(field, value);
+                return (
+                  <Box key={field} sx={{ display: 'contents' }}>
+                    <Typography
+                      component="dt"
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: { xs: 1, sm: 0 } }}
+                    >
+                      {profileLabels[field]}
+                    </Typography>
+                    <Typography
+                      component="dd"
+                      className={field === 'job_title' ? 'jd-title-value' : undefined}
+                      sx={{ m: 0, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                    >
+                      <InlineText field={textField} inline>
+                        {value ?? (
+                          <Typography component="span" color="text.secondary">
+                            尚未提供
+                          </Typography>
+                        )}
+                      </InlineText>{' '}
+                      {inlineKey !== textField.key && badge(profileTarget(field))}
+                    </Typography>
+                  </Box>
+                );
+              })}
             </Box>
-            <div>
-              <Button
-                variant="outlined"
-                disabled={profile.isFetching || readOnly}
-                onClick={() => {
-                  if (profile.data) setEditing(profile.data);
-                }}
-              >
-                編輯基本資料
-              </Button>
-            </div>
-          </>
+          </InlineEditContext.Provider>
         )}
       </Stack>
-      {editing && (
-        <EditJdProfileDialog
-          jobFileId={jobFileId}
-          baseline={editing}
-          readOnly={readOnly}
-          onClose={() => setEditing(null)}
-          onRefresh={refresh}
-        />
-      )}
     </Paper>
   );
 }

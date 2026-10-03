@@ -1,36 +1,26 @@
+/**
+ * The dialog for creating a JD item and for confirming a delete. Existing text is edited in place (InlineText),
+ * so there is no "edit" form: Linear keeps creation apart from in-place editing the same way.
+ */
 import { useRef, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import type {
-  Area,
-  Capability,
-  Collaborator,
-  Condition,
-  JdWorkView,
-  WorkTask,
-} from '../../shared/api/generated/jd-work-view';
+import type { Capability, JdWorkView } from '../../shared/api/generated/jd-work-view';
 import { focusDialogInput } from '../../shared/ui/dialog-focus';
 import type { WorkCommand } from './jd-work-api';
-import { AreaFields } from './AreaFields';
 import { TaskFields } from './TaskFields';
 import { CapabilityFields } from './CapabilityFields';
 import { CollaboratorFields } from './CollaboratorFields';
 import { ConditionFields } from './ConditionFields';
 
-export type WorkEditing =
-  | { kind: 'area'; baseline: JdWorkView; area?: Area }
-  | { kind: 'task'; baseline: JdWorkView; task?: WorkTask; areaId: string | null }
-  | {
-      kind: 'capability';
-      baseline: JdWorkView;
-      capabilityKind: Capability['kind'];
-      capability?: Capability;
-    }
-  | { kind: 'collaborator'; baseline: JdWorkView; collaborator?: Collaborator }
-  | { kind: 'condition'; baseline: JdWorkView; condition?: Condition }
+export type WorkDialogContent =
+  | { kind: 'task'; baseline: JdWorkView; areaId: string | null }
+  | { kind: 'capability'; baseline: JdWorkView; capabilityKind: Capability['kind'] }
+  | { kind: 'collaborator'; baseline: JdWorkView }
+  | { kind: 'condition'; baseline: JdWorkView }
   | { kind: 'confirm'; title: string; description: string; command: WorkCommand };
 
 interface Props {
-  editing: WorkEditing;
+  content: WorkDialogContent;
   locked: boolean;
   readOnly?: boolean;
   isSending: boolean;
@@ -42,27 +32,29 @@ interface Props {
   onReload: () => void;
 }
 
-function dialogTitle(editing: WorkEditing): string {
-  if (editing.kind === 'area') return editing.area ? '編輯職責' : '新增職責';
-  if (editing.kind === 'task') return editing.task ? '編輯任務' : '新增任務';
-  if (editing.kind === 'capability')
-    return `${editing.capability ? '編輯' : '新增'}${editing.capabilityKind === 'knowledge' ? '知識' : '技能'}`;
-  if (editing.kind === 'collaborator')
-    return editing.collaborator ? '編輯協作對象' : '新增協作對象';
-  if (editing.kind === 'condition') return editing.condition ? '編輯條件' : '新增條件';
-  return editing.title;
+function dialogTitle(content: WorkDialogContent): string {
+  switch (content.kind) {
+    case 'task':
+      return '新增任務';
+    case 'capability':
+      return content.capabilityKind === 'knowledge' ? '新增知識' : '新增技能';
+    case 'collaborator':
+      return '新增協作對象';
+    case 'condition':
+      return '新增條件';
+    case 'confirm':
+      return content.title;
+  }
 }
 
-function formAction(editing: WorkEditing): { id: string; label: string } | null {
-  switch (editing.kind) {
-    case 'area':
-      return { id: 'jd-area-form', label: '儲存職責' };
+function formAction(content: WorkDialogContent): { id: string; label: string } | null {
+  switch (content.kind) {
     case 'task':
       return { id: 'jd-task-form', label: '儲存任務' };
     case 'capability':
       return {
         id: 'jd-capability-form',
-        label: editing.capabilityKind === 'knowledge' ? '儲存知識' : '儲存技能',
+        label: content.capabilityKind === 'knowledge' ? '儲存知識' : '儲存技能',
       };
     case 'confirm':
       return null;
@@ -73,8 +65,8 @@ function formAction(editing: WorkEditing): { id: string; label: string } | null 
   }
 }
 
-export function WorkEditDialog({
-  editing,
+export function WorkDialog({
+  content,
   locked,
   readOnly = false,
   isSending,
@@ -87,8 +79,8 @@ export function WorkEditDialog({
 }: Props) {
   const [localError, setLocalError] = useState<string | null>(null);
   const titleInput = useRef<HTMLInputElement>(null);
-  const title = dialogTitle(editing);
-  const action = formAction(editing);
+  const title = dialogTitle(content);
+  const action = formAction(content);
   const editingDisabled = locked || readOnly;
   return (
     <Dialog
@@ -96,73 +88,46 @@ export function WorkEditDialog({
       fullWidth
       maxWidth="sm"
       onClose={isSending ? undefined : onClose}
-      aria-labelledby="work-edit-title"
+      aria-labelledby="work-dialog-title"
       slotProps={{ transition: { onEntered: () => focusDialogInput(titleInput.current) } }}
     >
-      <DialogTitle id="work-edit-title">{title}</DialogTitle>
+      <DialogTitle id="work-dialog-title">{title}</DialogTitle>
       <DialogContent>
         {(message ?? localError) && <Alert severity="warning">{message ?? localError}</Alert>}
-        {editing.kind === 'area' && (
-          <AreaFields
-            titleInput={titleInput}
-            revisionId={editing.baseline.revision_id}
-            area={editing.area}
-            disabled={editingDisabled}
-            onSubmit={onSubmit}
-            onError={setLocalError}
-          />
-        )}
-        {editing.kind === 'task' && (
+        {content.kind === 'task' && (
           <TaskFields
             titleInput={titleInput}
-            baseline={editing.baseline}
-            task={editing.task}
-            areaId={editing.areaId}
+            baseline={content.baseline}
+            areaId={content.areaId}
             disabled={editingDisabled}
             onSubmit={onSubmit}
             onError={setLocalError}
           />
         )}
-        {editing.kind === 'confirm' && (
-          <>
-            <p>{editing.description}</p>
-            <Button
-              variant="contained"
-              disabled={editingDisabled}
-              onClick={() => {
-                void onSubmit(editing.command);
-              }}
-            >
-              確認{title}
-            </Button>
-          </>
-        )}
-        {editing.kind === 'capability' && (
+        {content.kind === 'confirm' && <p>{content.description}</p>}
+        {content.kind === 'capability' && (
           <CapabilityFields
             titleInput={titleInput}
-            revisionId={editing.baseline.revision_id}
-            kind={editing.capabilityKind}
-            capability={editing.capability}
+            revisionId={content.baseline.revision_id}
+            kind={content.capabilityKind}
             disabled={editingDisabled}
             onSubmit={onSubmit}
             onError={setLocalError}
           />
         )}
-        {editing.kind === 'collaborator' && (
+        {content.kind === 'collaborator' && (
           <CollaboratorFields
             titleInput={titleInput}
-            revisionId={editing.baseline.revision_id}
-            collaborator={editing.collaborator}
+            revisionId={content.baseline.revision_id}
             disabled={editingDisabled}
             onSubmit={onSubmit}
             onError={setLocalError}
           />
         )}
-        {editing.kind === 'condition' && (
+        {content.kind === 'condition' && (
           <ConditionFields
             titleInput={titleInput}
-            revisionId={editing.baseline.revision_id}
-            condition={editing.condition}
+            revisionId={content.baseline.revision_id}
             disabled={editingDisabled}
             onSubmit={onSubmit}
             onError={setLocalError}
@@ -170,12 +135,25 @@ export function WorkEditDialog({
         )}
       </DialogContent>
       <DialogActions sx={{ flexWrap: 'wrap', px: 3, pb: 2 }}>
-        <Button disabled={isSending} onClick={onClose}>
+        <Button variant="outlined" disabled={isSending} onClick={onClose}>
           返回 JD
         </Button>
         {action && !pending && (
           <Button type="submit" form={action.id} variant="contained" disabled={editingDisabled}>
             {action.label}
+          </Button>
+        )}
+        {/* Cancel, then the destructive action on the right in red (Primer, shadcn, Cloudscape). */}
+        {content.kind === 'confirm' && !pending && (
+          <Button
+            variant="contained"
+            color="error"
+            disabled={editingDisabled}
+            onClick={() => {
+              void onSubmit(content.command);
+            }}
+          >
+            確認{title}
           </Button>
         )}
         {pending && (

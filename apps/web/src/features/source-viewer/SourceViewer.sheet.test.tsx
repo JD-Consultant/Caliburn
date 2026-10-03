@@ -9,6 +9,7 @@ const fileId = '10000000-0000-4000-8000-000000000001';
 const revisionId = '20000000-0000-4000-8000-000000000002';
 const first = '30000000-0000-4000-8000-000000000003';
 const second = '30000000-0000-4000-8000-000000000004';
+const third = '30000000-0000-4000-8000-000000000005';
 const basePath = `/api/job-files/${fileId}/jd/sources`;
 const sources = {
   revision_id: revisionId,
@@ -27,6 +28,15 @@ const sources = {
       target_label: '任務：處理例外',
       source_kind: 'interview',
       source_label: '訪談序號 4 · 員工',
+      needs_recheck: false,
+      jd_changed: false,
+      source_changed: false,
+    },
+    {
+      citation_id: third,
+      target_label: '任務：另一項',
+      source_kind: 'interview',
+      source_label: '訪談序號 6 · 員工',
       needs_recheck: false,
       jd_changed: false,
       source_changed: false,
@@ -75,19 +85,32 @@ afterEach(() => {
 test('a controlled sheet lists only the chosen item’s citations and can return to all', async () => {
   serve();
   const onClearFilter = vi.fn();
-  renderViewer({ open: true, onOpenChange: vi.fn(), onlyCitationIds: [second], onClearFilter });
+  renderViewer({
+    open: true,
+    onOpenChange: vi.fn(),
+    onlyCitationIds: [first, second],
+    onClearFilter,
+  });
   expect(await screen.findByRole('button', { name: '訪談序號 4 · 員工' })).toBeVisible();
-  expect(screen.queryByRole('button', { name: '訪談序號 2 · 員工' })).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '訪談序號 2 · 員工' })).toBeVisible();
+  expect(screen.queryByRole('button', { name: '訪談序號 6 · 員工' })).not.toBeInTheDocument();
   expect(screen.getByText(/只顯示所選 JD 項目的來源/)).toBeVisible();
 
   await userEvent.click(screen.getByRole('button', { name: '顯示全部來源' }));
   expect(onClearFilter).toHaveBeenCalledTimes(1);
 });
 
-test('a filter that leaves exactly one citation opens its fixed content at once', async () => {
+test('a filter that leaves exactly one citation opens its fixed content at once; Back shows the filtered list', async () => {
   serve();
-  renderViewer({ open: true, onOpenChange: vi.fn(), onlyCitationIds: [first] });
+  const onClearFilter = vi.fn();
+  renderViewer({ open: true, onOpenChange: vi.fn(), onlyCitationIds: [first], onClearFilter });
   expect(await screen.findByText('員工原話')).toBeVisible();
+
+  await userEvent.click(screen.getByRole('button', { name: '返回來源列表' }));
+  expect(await screen.findByRole('button', { name: '訪談序號 2 · 員工' })).toBeVisible();
+  expect(screen.queryByRole('button', { name: '訪談序號 4 · 員工' })).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: '顯示全部來源' }));
+  expect(onClearFilter).toHaveBeenCalledTimes(1);
 });
 
 test('closing is reported to the page rather than hidden internally', async () => {

@@ -1,10 +1,8 @@
-/** File-scoped unconfirmed transport intent, never a second editable JD or official result. */
-import type { Profile } from '../../shared/api/generated/jd-profile-view';
+/** The four basic-data fields and the one command that revises them. */
 import type {
   ProfileField,
   ReviseJdProfileRequest,
 } from '../../shared/api/generated/revise-jd-profile-request';
-import { isReviseJdProfileRequest } from '../../shared/api/validation';
 
 export const profileLabels: Record<ProfileField, string> = {
   job_title: '職務名稱',
@@ -19,40 +17,20 @@ export const profileFields: readonly ProfileField[] = [
   'reports_to',
   'purpose',
 ];
-export type ProfileDraft = Record<ProfileField, string>;
 
-export function makeProfileDraft(
-  profile: Profile,
-  pending: ReviseJdProfileRequest | null,
-): ProfileDraft {
-  const draft = {
-    job_title: profile.job_title ?? '',
-    organization_unit: profile.organization_unit ?? '',
-    reports_to: profile.reports_to ?? '',
-    purpose: profile.purpose ?? '',
+/** What an inline edit of a basic-data field wants done, before it has a command identity or a revision. */
+export interface ProfileIntent {
+  collection: 'profile';
+  changes: ReviseJdProfileRequest['changes'];
+}
+
+export function profileCommandFor(
+  revisionId: string,
+  intent: ProfileIntent,
+): ReviseJdProfileRequest {
+  return {
+    command_id: crypto.randomUUID(),
+    expected_revision_id: revisionId,
+    changes: intent.changes,
   };
-  for (const change of pending?.changes ?? []) {
-    draft[change.field] = change.action === 'set_field' ? change.value : '';
-  }
-  return draft;
-}
-
-function storageKey(jobFileId: string): string {
-  return `caliburn.pending-jd-profile.${jobFileId}`;
-}
-
-export function readPendingProfile(jobFileId: string): ReviseJdProfileRequest | null {
-  const stored = sessionStorage.getItem(storageKey(jobFileId));
-  if (stored === null) return null;
-  const command: unknown = JSON.parse(stored);
-  if (!isReviseJdProfileRequest(command)) throw new Error('Invalid pending JD command');
-  return command;
-}
-
-export function retainPendingProfile(jobFileId: string, command: ReviseJdProfileRequest): void {
-  sessionStorage.setItem(storageKey(jobFileId), JSON.stringify(command));
-}
-
-export function clearPendingProfile(jobFileId: string): void {
-  sessionStorage.removeItem(storageKey(jobFileId));
 }

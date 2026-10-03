@@ -125,7 +125,7 @@ test.each(['failed', 'cancelled'] as const)(
     expect(await screen.findByText(/未列入正式訪談/)).toBeVisible();
     if (status === 'cancelled') await userEvent.click(screen.getByText('查看原輸入'));
     expect(screen.getByText(input)).toBeVisible();
-    expect(screen.queryByText(/訪談序號/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /受訪員工/ })).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /取消處理|暫停處理|繼續處理/ }),
     ).not.toBeInTheDocument();
@@ -208,7 +208,7 @@ test('unresolved command lookup keeps the identity and allows read-only retry', 
   expect(fetch.mock.calls.every(([, options]) => options?.method !== 'POST')).toBe(true);
 });
 
-test('saved commentary is plain nonformal text and remains expandable after completion', async () => {
+test('saved commentary is safe nonformal text and leaves the composer on completion', async () => {
   retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const publicText = '<script>not executable</script> 正在核對職責';
   let reads = 0;
@@ -226,13 +226,12 @@ test('saved commentary is plain nonformal text and remains expandable after comp
   );
   renderComposer();
   expect(await screen.findByText(publicText)).toBeVisible();
-  expect(screen.getByText('公開處理訊息（非正式訪談、不可引用）')).toBeVisible();
+  expect(screen.getByText('本次處理過程')).toBeVisible();
   expect(document.querySelector('script')).toBeNull();
   expect(await screen.findByText('這次訪談已完成並保存。', {}, { timeout: 3_000 })).toBeVisible();
-  expect(screen.getByText(publicText)).not.toBeVisible();
-  await userEvent.click(screen.getByText('回看本次公開處理訊息'));
-  expect(screen.getByText(publicText)).toBeVisible();
-  expect(screen.queryByText(/訪談序號/)).not.toBeInTheDocument();
+  expect(screen.queryByText(publicText)).not.toBeInTheDocument();
+  expect(screen.queryByText('回看本次處理過程')).not.toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: /受訪員工/ })).not.toBeInTheDocument();
 });
 
 test.each([

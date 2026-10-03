@@ -1,7 +1,8 @@
 /** Public commentary stays nonformal; only the active Turn may add transient display. */
 import { Alert, Box, Typography } from '@mui/material';
 import type { PublicCommentary } from '../../shared/api/generated/consultant-turn';
-import { useConsultantCommentaryStream } from './use-consultant-commentary-stream';
+import { useConsultantActivityStream } from './use-consultant-activity-stream';
+import { ReasoningSummaries } from './ReasoningSummaries';
 
 /** Mount only for a server-verified active Turn, keyed by its file/execution identity. */
 export function StreamingPublicTurnMessages({
@@ -13,7 +14,7 @@ export function StreamingPublicTurnMessages({
   executionId: string;
   messages: PublicCommentary[] | null;
 }) {
-  const live = useConsultantCommentaryStream(jobFileId, executionId);
+  const live = useConsultantActivityStream(jobFileId, executionId);
   const pending = live.messages.filter(
     (item) =>
       !messages?.some(
@@ -22,16 +23,27 @@ export function StreamingPublicTurnMessages({
   );
   return (
     <>
+      <ReasoningSummaries
+        jobFileId={jobFileId}
+        executionId={executionId}
+        terminal={false}
+        live={live.summaries}
+      />
       <PublicTurnMessages messages={messages} terminal={false} />
       {live.disconnected && (
         <Typography variant="body2" color="text.secondary">
           即時顯示中斷；不代表處理已停止，仍以伺服器狀態為準。
         </Typography>
       )}
+      <div className="typing" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
       {pending.length > 0 && (
-        <Box>
+        <Box className="live-messages">
           <Typography variant="body2" color="text.secondary">
-            即時公開訊息（尚未保存、非正式訪談、不可引用）
+            即時訊息（尚未保存）
           </Typography>
           {pending.map((item) => (
             <Typography
@@ -58,23 +70,19 @@ export function PublicTurnMessages({
   if (messages.length === 0) return null;
   return (
     <Box component="details" open={!terminal}>
-      <summary>{terminal ? '回看本次公開處理訊息' : '本次公開處理訊息'}</summary>
+      <summary>{terminal ? '回看本次處理過程' : '本次處理過程'}</summary>
       <PublicCommentaryContent messages={messages} />
     </Box>
   );
 }
 
 export function PublicCommentaryContent({ messages }: { messages: PublicCommentary[] | null }) {
-  if (messages === null)
-    return <Alert severity="info">公開處理訊息目前無法讀取；不影響正式訪談記錄。</Alert>;
+  if (messages === null) return <Alert severity="info">目前無法讀取處理過程。</Alert>;
   if (messages.length === 0)
-    return <Typography variant="body2">這次處理沒有已保存的公開中間訊息。</Typography>;
+    return <Typography variant="body2">這次處理沒有已保存的中間訊息。</Typography>;
   return (
-    <>
-      <Typography variant="body2" color="text.secondary">
-        公開處理訊息（非正式訪談、不可引用）
-      </Typography>
-      <Box component="ol" sx={{ pl: 3 }}>
+    <div className="process-log">
+      <ol>
         {messages.map((message) => (
           <li key={`${message.response_id}:${message.message_id}`}>
             <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
@@ -82,7 +90,7 @@ export function PublicCommentaryContent({ messages }: { messages: PublicCommenta
             </Typography>
           </li>
         ))}
-      </Box>
-    </>
+      </ol>
+    </div>
   );
 }

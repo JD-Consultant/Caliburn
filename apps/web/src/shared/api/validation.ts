@@ -3,6 +3,8 @@ import { Ajv2020 } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import commentaryUpdateSchema from '../../../../api/contracts/http/commentary-update.schema.json' with { type: 'json' };
 import type { CommentaryUpdate } from './generated/commentary-update';
+import reasoningSummarySchema from '../../../../api/contracts/http/reasoning-summary.schema.json' with { type: 'json' };
+import type { ReasoningSummary } from './generated/reasoning-summary';
 import consultantTurnSchema from '../../../../api/contracts/http/consultant-turn.schema.json' with { type: 'json' };
 import type { ConsultantTurn } from './generated/consultant-turn';
 import currentConsultantTurnSchema from '../../../../api/contracts/http/current-consultant-turn.schema.json' with { type: 'json' };
@@ -58,6 +60,11 @@ export const isCurrentConsultantTurn = validator.compile<CurrentConsultantTurn>(
   currentConsultantTurnSchema,
 );
 export const isCommentaryUpdate = validator.compile<CommentaryUpdate>(commentaryUpdateSchema);
+export const isReasoningSummary = validator.compile<ReasoningSummary>(reasoningSummarySchema);
+
+export function isReasoningSummaryList(value: unknown): value is ReasoningSummary[] {
+  return Array.isArray(value) && value.every((item: unknown) => isReasoningSummary(item));
+}
 
 export const isJobFileList = validator.compile<JobFileList>(jobFileListSchema);
 export const isJobFile = validator.compile<JobFile>({

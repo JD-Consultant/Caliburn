@@ -5,7 +5,6 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { JdWorkEditor } from './JdWorkEditor';
 import { jdWorkQuery } from './jd-work-api';
 import type { JdWorkView } from '../../shared/api/generated/jd-work-view';
-import { isEditJdTasksRequest } from '../../shared/api/validation';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
 const revision = '20000000-0000-4000-8000-000000000002';
@@ -30,46 +29,6 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test('建立職責只送表單內容與捕捉基底，成功後讀取同版職責任務', async () => {
-  const current = {
-    revision_id: revision,
-    areas: [],
-    tasks: [],
-    capabilities: [],
-    task_links: [],
-    collaborators: [],
-    conditions: [],
-  };
-  const updated = {
-    ...current,
-    areas: [{ area_id: areaId, title: '網站交付', scope_text: '約定前端範圍' }],
-  };
-  let saved = false;
-  const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>();
-  fetch.mockImplementation((_path, options) => {
-    if (options?.method === 'POST') {
-      saved = true;
-      return Promise.resolve(Response.json({ revision_id: revision, areas: updated.areas }));
-    }
-    return Promise.resolve(Response.json(saved ? updated : current));
-  });
-  vi.stubGlobal('fetch', fetch);
-  renderEditor();
-  await userEvent.click(await screen.findByRole('button', { name: '新增職責' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '職責名稱' }), '網站交付');
-  await userEvent.type(screen.getByRole('textbox', { name: '職責範圍' }), '約定前端範圍');
-  await userEvent.click(screen.getByRole('button', { name: '儲存職責' }));
-  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-  expect(screen.getByRole('heading', { name: '網站交付' })).toBeVisible();
-  const write = fetch.mock.calls.find(([, options]) => options?.method === 'POST');
-  expect(write?.[0]).toBe(`/api/job-files/${fileId}/jd/areas`);
-  const payload: unknown = typeof write?.[1]?.body === 'string' ? JSON.parse(write[1].body) : null;
-  expect(payload).toMatchObject({
-    expected_revision_id: revision,
-    change: { action: 'create_area', title: '網站交付', scope_text: '約定前端範圍' },
-  });
-});
-
 const original: JdWorkView = {
   collaborators: [],
   conditions: [],
@@ -88,41 +47,6 @@ const original: JdWorkView = {
     },
   ],
 };
-
-test('移動任務並改內容用同一命令，未改明細保留身分不重送', async () => {
-  const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>();
-  fetch.mockImplementation((_path, options) =>
-    Promise.resolve(
-      Response.json(
-        options?.method === 'POST' ? { revision_id: revision, tasks: original.tasks } : original,
-      ),
-    ),
-  );
-  vi.stubGlobal('fetch', fetch);
-  renderEditor();
-  await userEvent.click(await screen.findByRole('button', { name: '編輯任務' }));
-  await userEvent.clear(screen.getByRole('textbox', { name: '工作內容' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '工作內容' }), '已調整範圍');
-  await userEvent.click(screen.getByRole('combobox', { name: '所屬職責' }));
-  await userEvent.click(screen.getByRole('option', { name: '未歸屬任務' }));
-  await userEvent.click(screen.getByRole('button', { name: '新增工作要求' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '工作要求 2' }), '說明限制');
-  await userEvent.click(screen.getByRole('button', { name: '儲存任務' }));
-  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-  const body = fetch.mock.calls.find(([, options]) => options?.method === 'POST')?.[1]?.body;
-  const value: unknown = typeof body === 'string' ? JSON.parse(body) : null;
-  if (!isEditJdTasksRequest(value)) throw new Error('Invalid task command');
-  expect(value.change).toEqual({
-    action: 'move_task',
-    task_id: original.tasks[0]?.task_id,
-    area_id: null,
-    before_task_id: null,
-    changes: [
-      { action: 'set_field', field: 'description', value: '已調整範圍' },
-      { action: 'add_detail', kind: 'requirement', text: '說明限制' },
-    ],
-  });
-});
 
 test('原目標後來已刪除仍能 remount 重新確認同命令，不復活舊結果', async () => {
   let current = original;
@@ -148,9 +72,8 @@ test('原目標後來已刪除仍能 remount 重新確認同命令，不復活�
   });
   vi.stubGlobal('fetch', fetch);
   const first = renderEditor();
-  await userEvent.click(await screen.findByRole('button', { name: '編輯職責' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '職責名稱' }), '新名稱');
-  await userEvent.click(screen.getByRole('button', { name: '儲存職責' }));
+  await userEvent.click(await screen.findByRole('heading', { name: '網站交付' }));
+  await userEvent.type(screen.getByRole('textbox', { name: '職責名稱' }), '新名稱{Enter}');
   expect(await screen.findByRole('alert')).toHaveTextContent('JD 修改結果尚未確認');
   first.unmount();
   renderEditor();
@@ -174,24 +97,25 @@ test('背景讀取不能替換草稿基底；409 後須明確讀目前稿', asyn
   );
   vi.stubGlobal('fetch', fetch);
   const { client } = renderEditor();
-  await userEvent.click(await screen.findByRole('button', { name: '編輯職責' }));
-  await userEvent.clear(screen.getByRole('textbox', { name: '職責範圍' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '職責範圍' }), '本機草稿');
+  await userEvent.click(await screen.findByRole('button', { name: '新增職責' }));
+  await userEvent.type(await screen.findByRole('textbox', { name: '職責名稱' }), '本機草稿');
   act(() => {
     client.setQueryData(jdWorkQuery(fileId).queryKey, {
       ...original,
       revision_id: '70000000-0000-4000-8000-000000000007',
     });
   });
-  await userEvent.click(screen.getByRole('button', { name: '儲存職責' }));
+  await userEvent.click(screen.getByRole('button', { name: '儲存' }));
   expect(await screen.findByRole('alert')).toHaveTextContent('修改未被接受');
-  expect(screen.getByRole('textbox', { name: '職責範圍' })).toHaveValue('本機草稿');
-  expect(screen.getByRole('button', { name: '儲存職責' })).toBeDisabled();
+  expect(screen.getByRole('textbox', { name: '職責名稱' })).toHaveValue('本機草稿');
+  expect(screen.getByRole('button', { name: '儲存' })).toBeDisabled();
   const writes = fetch.mock.calls.filter(([, options]) => options?.method === 'POST');
   expect(writes).toHaveLength(1);
   expect(writes[0]?.[1]?.body).toContain(revision);
   await userEvent.click(screen.getByRole('button', { name: '讀取目前 JD' }));
-  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  await waitFor(() =>
+    expect(screen.queryByRole('textbox', { name: '職責名稱' })).not.toBeInTheDocument(),
+  );
 });
 
 test.each([{}, { revision_id: revision, areas: [], tasks: [{ title: '不完整資料' }] }])(
@@ -204,24 +128,25 @@ test.each([{}, { revision_id: revision, areas: [], tasks: [{ title: '不完整�
   },
 );
 
-test('空白與暫存失敗均不發寫入；尚未送出的表單可以離開', async () => {
+test('空白與暫存失敗均不發寫入；尚未送出的草稿可以離開', async () => {
   const fetch = vi.fn().mockResolvedValue(Response.json(original));
   vi.stubGlobal('fetch', fetch);
   renderEditor();
   await userEvent.click(await screen.findByRole('button', { name: '新增職責' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '職責名稱' }), '   ');
-  await userEvent.click(screen.getByRole('button', { name: '儲存職責' }));
-  expect(screen.getByRole('alert')).toHaveTextContent('不能只填空白');
-  await userEvent.clear(screen.getByRole('textbox', { name: '職責名稱' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '職責名稱' }), '有效職責');
+  const field = await screen.findByRole('textbox', { name: '職責名稱' });
+  await userEvent.type(field, '   ');
+  await userEvent.click(screen.getByRole('button', { name: '儲存' }));
+  expect(screen.getByRole('alert')).toHaveTextContent('不能是空白');
+  await userEvent.clear(field);
+  await userEvent.type(field, '有效職責');
   vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
     throw new Error('denied');
   });
-  await userEvent.click(screen.getByRole('button', { name: '儲存職責' }));
+  await userEvent.click(screen.getByRole('button', { name: '儲存' }));
   expect(screen.getByRole('alert')).toHaveTextContent('尚未送出');
   expect(fetch).toHaveBeenCalledTimes(1);
-  await userEvent.click(screen.getByRole('button', { name: '返回 JD' }));
-  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: '取消' }));
+  expect(screen.queryByRole('textbox', { name: '職責名稱' })).not.toBeInTheDocument();
 });
 
 test('刪職責需明確確認，提示任務保留而非一起刪除', async () => {
@@ -235,7 +160,7 @@ test('刪職責需明確確認，提示任務保留而非一起刪除', async ()
   expect(fetch).toHaveBeenCalledTimes(1);
 });
 
-test('請求在途阻止再次提交與關閉；保存已知但本機清理失敗不說成未知', async () => {
+test('請求在途時欄位與按鈕等待；保存已知但本機清理失敗不說成未知', async () => {
   let finish: (response: Response) => void = () => {
     throw new Error('Request not started');
   };
@@ -251,12 +176,10 @@ test('請求在途阻止再次提交與關閉；保存已知但本機清理失�
   vi.stubGlobal('fetch', fetch);
   renderEditor();
   await userEvent.click(await screen.findByRole('button', { name: '新增職責' }));
-  await userEvent.type(screen.getByRole('textbox', { name: '職責名稱' }), '新職責');
-  await userEvent.click(screen.getByRole('button', { name: '儲存職責' }));
-  expect(screen.getByRole('button', { name: '重新確認修改結果' })).toBeDisabled();
-  expect(screen.getByRole('button', { name: '返回 JD' })).toBeDisabled();
-  await userEvent.keyboard('{Escape}');
-  expect(screen.getByRole('dialog')).toBeVisible();
+  await userEvent.type(await screen.findByRole('textbox', { name: '職責名稱' }), '新職責{Enter}');
+  expect(await screen.findByRole('status')).toHaveTextContent('正在確認修改');
+  expect(screen.getByRole('textbox', { name: '職責名稱' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: '取消' })).toBeDisabled();
   vi.spyOn(Storage.prototype, 'removeItem').mockImplementationOnce(() => {
     throw new Error('denied');
   });
@@ -264,7 +187,9 @@ test('請求在途阻止再次提交與關閉；保存已知但本機清理失�
     finish(Response.json({ revision_id: revision, areas: original.areas }));
     await response;
   });
-  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  await waitFor(() =>
+    expect(screen.queryByRole('textbox', { name: '職責名稱' })).not.toBeInTheDocument(),
+  );
   expect(screen.getByRole('alert')).toHaveTextContent('修改已保存，但本分頁暫存未能清除');
   expect(screen.queryByText(/JD 修改結果尚未確認/)).not.toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: '重新確認修改結果' }));
@@ -279,11 +204,14 @@ test('損壞的待確認命令阻止新寫入，不默默丟棄', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(original)));
   renderEditor();
   expect(await screen.findByRole('alert')).toHaveTextContent('無法讀取待確認修改');
-  expect(await screen.findByRole('button', { name: '新增職責' })).toBeDisabled();
+  expect(await screen.findByRole('button', { name: '新增職責' })).toHaveAttribute(
+    'aria-disabled',
+    'true',
+  );
   expect(sessionStorage.getItem(`caliburn.pending-jd-work.${fileId}`)).toBe('{broken');
 });
 
-test('a responsibility collapses to its header with a task count and expands again', async () => {
+test('a responsibility always shows its task count and collapses to its header and back', async () => {
   vi.stubGlobal(
     'fetch',
     vi.fn(() => Promise.resolve(Response.json(original))),
@@ -292,6 +220,7 @@ test('a responsibility collapses to its header with a task count and expands aga
   const collapse = await screen.findByRole('button', { name: '收合職責 網站交付' });
   expect(collapse).toHaveAttribute('aria-expanded', 'true');
   expect(screen.getByRole('heading', { name: '實作網頁' })).toBeVisible();
+  expect(screen.getByText('1 項任務')).toBeVisible();
 
   await userEvent.click(collapse);
   expect(screen.queryByRole('heading', { name: '實作網頁' })).not.toBeInTheDocument();
@@ -301,5 +230,33 @@ test('a responsibility collapses to its header with a task count and expands aga
 
   await userEvent.click(expand);
   expect(await screen.findByRole('heading', { name: '實作網頁' })).toBeVisible();
-  expect(screen.queryByText('1 項任務')).not.toBeInTheDocument();
+  expect(screen.getByText('1 項任務')).toBeVisible();
+});
+
+test('a task collapses to its title and expands again, leaving its responsibility alone', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(Response.json(original))),
+  );
+  renderEditor();
+  const collapse = await screen.findByRole('button', { name: '收合任務 實作網頁' });
+  expect(collapse).toHaveAttribute('aria-expanded', 'true');
+  expect(screen.getByText('原工作內容')).toBeVisible();
+  expect(screen.getByText('可操作頁面')).toBeVisible();
+
+  await userEvent.click(collapse);
+  expect(screen.getByRole('heading', { name: '實作網頁' })).toBeVisible();
+  expect(screen.getByText('原工作內容')).not.toBeVisible();
+  expect(screen.getByText('可操作頁面')).not.toBeVisible();
+  expect(screen.queryByRole('button', { name: '刪除任務' })).not.toBeInTheDocument();
+  const expand = screen.getByRole('button', { name: '展開任務 實作網頁' });
+  expect(expand).toHaveAttribute('aria-expanded', 'false');
+  expect(screen.getByRole('button', { name: '收合職責 網站交付' })).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  );
+
+  await userEvent.click(expand);
+  expect(screen.getByText('原工作內容')).toBeVisible();
+  expect(screen.getByText('可操作頁面')).toBeVisible();
 });

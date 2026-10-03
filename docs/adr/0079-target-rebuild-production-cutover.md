@@ -51,6 +51,8 @@ Owner 已要求依新架構重建產品，舊程式與資料僅作參考，不�
 
 ## 退役範圍與取回
 
+**提交識別修正（2026-10-03）：**下文保留決策當時的雜湊。作者資料修正後，退役前基準 `6ad33bcb` 對應 `9754c017`，內容完全相同；新 clone 執行下列取回命令時，請改用 `9754c017`。其他舊／新提交見[對照表](../history-commit-map.csv)。
+
 退役範圍是[固定 Git 樹盤點](../history.md#source-25de60a3e4266687fd86)的 **379 個 tracked 檔**：`experiments/jd-relational-app` 的 336 個非 Markdown 檔、`packages/consultant-memory` 的 41 個非 Markdown 檔（不含 `adoption.json`），以及 `scripts/run-jd-app.mjs`、`scripts/run-jd-app.test.mjs`。保留 16 個 Markdown／`adoption.json` 沿革檔（兩個 README 於頂端加歷史標記）、`packages/job-analysis-contract` 的歷史 README、全部研究／ADR／證據文件與獨立 RAG。不刪 DB、volume、秘密、ignored 或未追蹤檔；不做舊資料遷移，舊 runtime 也不能讀新 schema。
 
 清單可重建：`git ls-tree -r --name-only 6ad33bcb -- experiments/jd-relational-app packages/consultant-memory`，排除 `.md` 與 `packages/consultant-memory/adoption.json`，再加上述兩個啟動器。基準提交 `6ad33bcb` 是退役前的完整樹。取回單一檔案：`git show 6ad33bcb:<路徑>`；整批恢復：`git revert <退役提交>`（它只含上述刪除，與入口／文件切換分開提交）。

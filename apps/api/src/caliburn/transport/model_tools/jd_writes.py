@@ -34,6 +34,10 @@ from caliburn.transport.model_tools.contracts import function_definition, reject
 from caliburn.transport.model_tools.jd_item_creation_wire import parse_item_creation
 from caliburn.transport.model_tools.jd_item_movement_wire import parse_item_movement
 from caliburn.transport.model_tools.jd_item_revision_wire import parse_item_revision
+from caliburn.transport.model_tools.jd_reference_fields import (
+    encode_jd_write_result,
+    resolve_jd_arguments,
+)
 from caliburn.transport.model_tools.jd_write_wire import parse_profile_write, parse_task_write
 from caliburn.workflows.jd_item_creation import JdItemCreationWorkflow, PreparedItemCreation
 from caliburn.workflows.jd_item_deletion import JdItemDeletionWorkflow, PreparedItemDeletion
@@ -47,6 +51,7 @@ from caliburn.workflows.jd_item_revision import (
     JdItemRevisionWorkflow,
     PreparedItemRevision,
 )
+from caliburn.workflows.jd_model_references import JdModelReferences
 from caliburn.workflows.jd_profile_writes import JdProfileWriteWorkflow, PreparedProfileWrite
 from caliburn.workflows.jd_task_writes import JdTaskWriteWorkflow, PreparedTaskWrite
 from caliburn.workflows.memory_reads import PublishedMemoryRead
@@ -174,6 +179,7 @@ class JdWriteTools:
         self.revisions = revisions
         self.deletions = deletions
         self.movements = movements
+        self.references = JdModelReferences(profile.sessions, binding.scope.job_file_id)
 
     @property
     def names(self) -> tuple[str, ...]:
@@ -195,6 +201,7 @@ class JdWriteTools:
                 "scope_not_allowed", "本角色沒有這項 JD 修改能力。", "使用已提供的具名工具。"
             )
         try:
+            arguments = await resolve_jd_arguments(self.references, arguments)
             if name == "revise_jd_profile":
                 changes, sources = parse_profile_write(arguments)
                 return await self.profile.prepare(
@@ -261,14 +268,18 @@ class JdWriteTools:
             if isinstance(prepared, PreparedProfileWrite):
                 return await self.profile.execute(self.writer, prepared)
             if isinstance(prepared, PreparedItemCreation):
-                return await self.creations.execute(self.writer, prepared)
+                return await encode_jd_write_result(
+                    self.references, await self.creations.execute(self.writer, prepared)
+                )
             if isinstance(prepared, PreparedItemRevision):
                 return await self.revisions.execute(self.writer, prepared)
             if isinstance(prepared, PreparedItemDeletion):
                 return await self.deletions.execute(self.writer, prepared)
             if isinstance(prepared, PreparedItemMovement):
                 return await self.movements.execute(self.writer, prepared)
-            return await self.tasks.execute(self.writer, prepared)
+            return await encode_jd_write_result(
+                self.references, await self.tasks.execute(self.writer, prepared)
+            )
         except _INVALID_ARGUMENTS:
             return _invalid_arguments()
         except CapabilityInUseError:

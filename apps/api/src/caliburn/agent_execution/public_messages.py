@@ -1,11 +1,16 @@
 """Read public commentary from original native results, never from carried context."""
 
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from openai.types.responses import Response, ResponseOutputMessage
 
+from caliburn.adapters.reasoning_summaries import (
+    PublicReasoningSummary,
+    project_reasoning_summaries,
+)
 from caliburn.adapters.response_serialization import restore_response
 
 
@@ -40,6 +45,25 @@ def project_commentary(response: Response) -> tuple[PublicCommentary, ...]:
 async def read_public_commentary(
     checkpointer: BaseCheckpointSaver[str], *, thread_id: str
 ) -> tuple[PublicCommentary, ...]:
+    groups = [
+        project_commentary(response) async for response in _saved_responses(checkpointer, thread_id)
+    ]
+    return tuple(message for group in reversed(groups) for message in group)
+
+
+async def read_public_reasoning_summaries(
+    checkpointer: BaseCheckpointSaver[str], *, thread_id: str
+) -> tuple[PublicReasoningSummary, ...]:
+    groups = [
+        project_reasoning_summaries(response)
+        async for response in _saved_responses(checkpointer, thread_id)
+    ]
+    return tuple(summary for group in reversed(groups) for summary in group)
+
+
+async def _saved_responses(
+    checkpointer: BaseCheckpointSaver[str], thread_id: str
+) -> AsyncIterator[Response]:
     """Retained native history survives compaction; no Graph invocation or extra store.
 
     Native saver history is newest first. A saved model pending write is newer than
@@ -47,7 +71,6 @@ async def read_public_commentary(
     """
     config: RunnableConfig = {"configurable": {"thread_id": thread_id, "checkpoint_ns": ""}}
     seen: set[str] = set()
-    groups: list[tuple[PublicCommentary, ...]] = []
     async for saved in checkpointer.alist(config):
         snapshots = [
             value
@@ -65,5 +88,4 @@ async def read_public_commentary(
                 continue
             response = restore_response(snapshot)
             seen.add(response.id)
-            groups.append(project_commentary(response))
-    return tuple(message for group in reversed(groups) for message in group)
+            yield response

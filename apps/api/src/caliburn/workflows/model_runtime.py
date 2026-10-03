@@ -15,6 +15,7 @@ from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from caliburn.adapters.openai_models import ModelCapacityLimits, model_profile
+from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
 from caliburn.adapters.response_streaming import PublicCommentaryUpdate
 from caliburn.agent_execution.context_compaction import CompactionRuntime
 from caliburn.features.executions import budgets
@@ -78,6 +79,7 @@ def bind_model_runtime(
     *,
     ensure_active: Callable[[], Awaitable[None]],
     on_commentary: Callable[[PublicCommentaryUpdate], None] | None = None,
+    on_reasoning_summary: Callable[[PublicReasoningSummary], None] | None = None,
 ) -> ModelRuntime:
     """Build the executor and compaction runtime; `ensure_active` is the role's own eligibility."""
     profile = model_profile(settings.model)
@@ -91,6 +93,7 @@ def bind_model_runtime(
             compaction_reservation_usd=COMPACTION_RESERVATION_USD,
         ),
         on_commentary=on_commentary,
+        on_reasoning_summary=on_reasoning_summary,
     )
     limits = profile.capacity_limits()
     compaction = CompactionRuntime(

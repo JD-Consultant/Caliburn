@@ -13,6 +13,7 @@ from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.adapters.pdf_renderer import PdfRenderer
 from caliburn.adapters.process_lock import PostgresProcessLock
+from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
 from caliburn.adapters.response_streaming import PublicCommentaryUpdate
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
@@ -20,6 +21,7 @@ from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRu
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
 from caliburn.features.executions.models import ExecutionScope, ExecutionStatus
 from caliburn.settings import ModelSettings, Settings
+from caliburn.transport.http.consultant_activity import router as consultant_activity_router
 from caliburn.transport.http.consultant_turns import router as consultant_turn_router
 from caliburn.transport.http.health import router as health_router
 from caliburn.transport.http.interview_inputs import router as interview_input_router
@@ -37,7 +39,11 @@ from caliburn.transport.http.job_files import router as job_file_router
 from caliburn.transport.http.security import LocalHttpSecurityMiddleware
 from caliburn.transport.http.turn_jd_changes import router as turn_jd_changes_router
 from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
+from caliburn.workflows.consultant_activity import ConsultantActivityHub
 from caliburn.workflows.consultant_commentary import ConsultantCommentaryHub
+from caliburn.workflows.consultant_commentary import (
+    PublicCommentaryUpdate as ScopedCommentaryUpdate,
+)
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.consultant_controls import (
     ConsultantControlWorkflow,
@@ -62,6 +68,7 @@ ROUTERS = (
     job_file_router,
     interview_input_router,
     consultant_turn_router,
+    consultant_activity_router,
     jd_profile_router,
     jd_areas_router,
     jd_capabilities_router,
@@ -125,6 +132,7 @@ def _reset_runtime_state(app: FastAPI, database: Database | None) -> None:
     app.state.consultant_status_workflow = None
     app.state.consultant_supervisor = None
     app.state.consultant_commentary_hub = ConsultantCommentaryHub()
+    app.state.consultant_activity_hub = ConsultantActivityHub()
     app.state.memory_supervisor = None
     app.state.consultant_control_workflow = None
     app.state.jd_export_workflow = None
@@ -170,8 +178,23 @@ async def _start_model_runtime(
     )
     resources.push_async_callback(sdk.close)
     hub: ConsultantCommentaryHub = app.state.consultant_commentary_hub
+    activity_hub: ConsultantActivityHub = app.state.consultant_activity_hub
+
+    def publish_reasoning_summary(scope: ExecutionScope, summary: PublicReasoningSummary) -> None:
+        activity_hub.publish(scope.job_file_id, scope.execution_id, summary)
 
     def publish_commentary(scope: ExecutionScope, update: PublicCommentaryUpdate) -> None:
+        activity_hub.publish(
+            scope.job_file_id,
+            scope.execution_id,
+            ScopedCommentaryUpdate(
+                scope.job_file_id,
+                scope.execution_id,
+                update.response_id,
+                update.message_id,
+                update.text,
+            ),
+        )
         hub.publish(
             scope.job_file_id,
             scope.execution_id,
@@ -181,7 +204,12 @@ async def _start_model_runtime(
         )
 
     runner = ConsultantRunner(
-        database.sessions, saver, sdk, model, on_commentary=publish_commentary
+        database.sessions,
+        saver,
+        sdk,
+        model,
+        on_commentary=publish_commentary,
+        on_reasoning_summary=publish_reasoning_summary,
     )
     leader_lock = PostgresProcessLock(database.settings)
     memory_batch = MemoryBatchWorkflow(

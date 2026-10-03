@@ -2,6 +2,7 @@
 
 import json
 import re
+from collections.abc import Callable
 from uuid import UUID
 
 from openai.types.responses import FunctionToolParam
@@ -28,6 +29,7 @@ from caliburn.features.job_description.navigation import (
     JdReadTarget,
     JdReadTargetNotFoundError,
     jd_read_ref,
+    jd_read_refs,
 )
 from caliburn.features.job_description.sources import (
     InterviewSource,
@@ -52,6 +54,10 @@ from caliburn.transport.model_tools.jd_detail_projection import (
     project_jd_item,
     select_jd_items,
 )
+from caliburn.transport.model_tools.jd_reference_fields import (
+    map_jd_reference_fields,
+    resolve_jd_arguments,
+)
 from caliburn.workflows.jd_changes import (
     AllManualChanges,
     AreaManualChanges,
@@ -64,6 +70,7 @@ from caliburn.workflows.jd_changes import (
     SourceChangeQuery,
     UnsupportedJdSourceKindError,
 )
+from caliburn.workflows.jd_model_references import JdModelReferences
 from caliburn.workflows.memory_reads import PublishedMemoryRead
 
 
@@ -98,6 +105,7 @@ class JdChangesTools:
             raise ValueError("Tool result character limit must be positive")
         self.reader = reader
         self.binding = binding
+        self.references = JdModelReferences(reader.sessions, binding.scope.job_file_id)
         self.manual_jd_start_revision_id = manual_jd_start_revision_id
         self.max_result_characters = max_result_characters
 
@@ -112,7 +120,9 @@ class JdChangesTools:
         if name not in self.names:
             return "rejected: scope_not_allowed；使用 read_jd_changes。"
         try:
-            query = parse_jd_changes(arguments)
+            query = parse_jd_changes(await resolve_jd_arguments(self.references, arguments))
+        except JdReadTargetNotFoundError:
+            return "rejected: target_not_found；重讀 read_jd，原樣帶回 App 提供的定位。"
         except ValidationError, ValueError:
             return (
                 "rejected: invalid_arguments；選 manual 的合法 scope "
@@ -144,7 +154,17 @@ class JdChangesTools:
                 "rejected: source_not_available；固定人工比較基底或原操作不可取回，"
                 "不回退成初始／空差異。"
             )
-        output = project_jd_manual_changes(result)
+        aliases = await self.references.assign(
+            {
+                ref
+                for snapshot in result.snapshots.values()
+                for ref in (
+                    *jd_read_refs(snapshot.work),
+                    *(f"citation_{source.citation_id.hex}" for source in snapshot.sources),
+                )
+            }
+        )
+        output = project_jd_manual_changes(result, format_ref=lambda ref: aliases.get(ref, ref))
         if len(output) > self.max_result_characters:
             return (
                 "rejected: read_limit_exceeded；完整人工差異超量，未截斷；"
@@ -153,15 +173,17 @@ class JdChangesTools:
         return output
 
 
-def project_jd_manual_changes(result: JdManualChanges) -> str:
+def project_jd_manual_changes(
+    result: JdManualChanges, *, format_ref: Callable[[str], str] = str
+) -> str:
     interval, snapshots, scope = result.interval, result.snapshots, result.scope
     before, after = snapshots[interval.base_revision_id], snapshots[interval.start_revision_id]
     operations: list[list[str]] = []
     for operation in interval.operations:
         old, new = snapshots[operation.before_revision_id], snapshots[operation.after_revision_id]
-        delta = _manual_delta(old, new, scope)
+        delta = _manual_delta(old, new, scope, format_ref)
         if delta or _operation_touches(operation, old, new, scope):
-            labels = _operation_labels(operation, old, new, scope)
+            labels = tuple(format_ref(ref) for ref in _operation_labels(operation, old, new, scope))
             operations.append(
                 [
                     *([f"受影響範圍：{', '.join(labels)}"] if labels else []),
@@ -181,7 +203,7 @@ def project_jd_manual_changes(result: JdManualChanges) -> str:
         lines.append("### 原操作的實際效果（歷史定位不保證仍存活；可編定位重讀 read_jd）")
         for index, delta in enumerate(operations, 1):
             lines.extend([f"#### 操作 {index}", *delta])
-    net = _manual_delta(before, after, scope)
+    net = _manual_delta(before, after, scope, format_ref)
     lines.extend(
         [
             "### 淨差異",
@@ -279,7 +301,10 @@ def _selected_sources(
 
 
 def _manual_delta(
-    before: JdChangeSnapshot, after: JdChangeSnapshot, scope: ManualChangeScope
+    before: JdChangeSnapshot,
+    after: JdChangeSnapshot,
+    scope: ManualChangeScope,
+    format_ref: Callable[[str], str],
 ) -> list[str]:
     old, new = _snapshot_values(before, scope), _snapshot_values(after, scope)
     lines = []
@@ -294,10 +319,14 @@ def _manual_delta(
             if right is None
             else "變更（文字／順序／歸屬／關聯）"
         )
-        lines.append(f"{effect} · {key}")
+        lines.append(f"{effect} · {format_ref(key)}")
         diff = describe_body_change(
-            json.dumps(left, ensure_ascii=False, indent=2) if left is not None else "",
-            json.dumps(right, ensure_ascii=False, indent=2) if right is not None else "",
+            json.dumps(map_jd_reference_fields(left, format_ref), ensure_ascii=False, indent=2)
+            if left is not None
+            else "",
+            json.dumps(map_jd_reference_fields(right, format_ref), ensure_ascii=False, indent=2)
+            if right is not None
+            else "",
         )
         fence = "`" * max(3, max(map(len, re.findall(r"`+", diff)), default=0) + 1)
         lines.extend([f"{fence}diff", diff, fence])
@@ -321,8 +350,11 @@ def _manual_delta(
             if isinstance(selected.source, InterviewSource)
             else selected.source.layer.value
         )
-        target_label = _source_target_label(after if right_source else before, selected.target)
-        lines.append(f"{effect} · {target_label} · citation_{citation_id.hex} · {kind}")
+        target_label = _source_target_label(
+            after if right_source else before, selected.target, format_ref
+        )
+        citation_ref = format_ref(f"citation_{citation_id.hex}")
+        lines.append(f"{effect} · {target_label} · {citation_ref} · {kind}")
         if (
             left_source is not None
             and right_source is not None
@@ -330,11 +362,13 @@ def _manual_delta(
             and left_source.needs_review != right_source.needs_review
         ):
             review = "待核對" if right_source.needs_review else "原操作已核對"
-            lines.append(f"來源資格：{review} · {target_label} · citation_{citation_id.hex}")
+            lines.append(f"來源資格：{review} · {target_label} · {citation_ref}")
     return lines
 
 
-def _source_target_label(snapshot: JdChangeSnapshot, target: JdSourceTarget) -> str:
+def _source_target_label(
+    snapshot: JdChangeSnapshot, target: JdSourceTarget, format_ref: Callable[[str], str]
+) -> str:
     if target.kind == SourceTargetKind.PROFILE_FIELD:
         assert target.field is not None
         return f"profile.{target.field.value}"
@@ -343,13 +377,13 @@ def _source_target_label(snapshot: JdChangeSnapshot, target: JdSourceTarget) -> 
             item for item in snapshot.work.capabilities if item.capability_id == target.item_id
         )
         assert target.task_id is not None
-        return f"task_{target.task_id.hex} → {jd_read_ref(capability)}"
+        return f"{format_ref(f'task_{target.task_id.hex}')} → {format_ref(jd_read_ref(capability))}"
     items = (
         *_selected_items(snapshot, AllManualChanges()),
         *(detail for task in snapshot.work.tasks for detail in task.details),
     )
     return next(
-        jd_read_ref(item)
+        format_ref(jd_read_ref(item))
         for item in items
         if jd_read_source_targets(snapshot.work, (item,))[0] == target
     )
@@ -421,7 +455,10 @@ async def read_jd_source_changes(
             "rejected: source_not_available；固定來源或比較端點無法完整取回，未回傳假空差異；"
             "請由 App 核對保存資料，不推論來源已刪除。"
         )
-    output = project_jd_source_changes(result)
+    references = JdModelReferences(reader.sessions, binding.scope.job_file_id)
+    canonical = f"citation_{result.reference.citation_id.hex}"
+    assigned = await references.assign((canonical,))
+    output = project_jd_source_changes(result, citation_ref=assigned[canonical])
     if len(output) > max_result_characters:
         return (
             "rejected: read_limit_exceeded；完整相關差異超過容量，未截斷或視為已讀；"

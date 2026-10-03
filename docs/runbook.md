@@ -78,7 +78,7 @@ uv run --project apps/api --locked python -m playwright install chromium --only-
 # 或指定與已鎖 Playwright 相容的 Chromium：$env:CALIBURN_PDF_CHROMIUM_PATH = '...\chrome.exe'
 ```
 
-PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部分字型的文字複製／搜尋會出現部首字元（已知限制，見 [T13](plans/2026-09-29-target-rebuild/evidence/t13-pdf-export.md)）。
+PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部分字型的文字複製／搜尋會出現部首字元（已知限制，見 [T13](history.md#source-409f20a1c297740aed7d)）。
 
 ## 診斷
 
@@ -93,6 +93,74 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 | 一輪訪談很久沒有回應 | 多半是 OpenAI 帳戶的每分鐘 token 上限（TPM）在限流，後端 log 會出現 `Provider request failed: … failure=rate_limited`。系統會照服務建議的時間自動多等（沒有建議時 10 秒起、60 秒封頂），**不算失敗**，單輪最長等到工作期限（預設 30 分鐘）；可隨時取消該輪。TPM 200K 的帳戶上，一場 12 輪訪談約 6–25 分鐘；要更快請改用更高 TPM 的帳戶 |
 | 訪談或背景整理全部立刻失敗，後端 log 為 `failure=access_blocked … provider_code=credit_balance_exhausted` | OpenAI 帳戶儲值額度用完（HTTP 429，但不是限流）。系統不重試、原輸入保留、該次處理標為失敗；補額度後重新送出原輸入 |
 | 資料庫剛重啟（或被外力中止）後，讀訪談狀態的端點回 500，`/api/health` 仍是 ok | **重啟後端**。leader 鎖與 checkpoint 連線各只持一條資料庫連線、不會自動重連，這是刻意的單一 leader 設計；重啟時系統會恢復已保存的進行中工作（能續作則續作，否則安全終止、原輸入保留，之後可重送） |
+
+### 在 DataGrip 查某個職務檔案的 AI 執行紀錄
+
+先連到**正式 App 使用的 PostgreSQL database**，勾選 `caliburn` schema；不是 `public`。5180／8180 的記憶體示範站沒有這份資料。DataGrip 的 schema 選擇、Synchronize 及重新查詢是三件事：看不到 VIEW 先同步 schema，資料更新後再重新執行 SELECT。
+
+這是按需診斷功能：原生 checkpoint 有二進位內容，先解碼成一份可重建的本機副本，再用 VIEW 查閱。只讀原始執行／業務表，寫入的只有 `diagnostic_execution_snapshots`；不執行模型、不續跑 Turn、不修改 JD 或 Memory。
+
+在 repository 根目錄、與正式 App 相同的資料庫環境設定下執行：
+
+```powershell
+pnpm app:migrate
+uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --job-file-id 職務檔案UUID
+# 只更新某一輪，改用：
+uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID
+```
+
+兩個範圍參數擇一；不用 API key。沒有 execution 的既存空檔案回報 0 筆，找不到的 UUID 則報錯。若權限、migration、原生紀錄解碼或並行更新出錯，整次匯入回滾，原診斷副本仍保留。終端只印成功筆數或錯誤類別，避免洩露私人 payload。
+
+DataGrip 展開 `caliburn → views`，可直接雙擊下列 VIEW，再用 `job_file_id` 或 `execution_id` 篩選：
+
+| VIEW | 每列代表什麼 | 主要欄位 |
+|---|---|---|
+| `diagnostic_execution_history` | 一輪 A 或一批 Memory（包含失敗／取消） | 檔案名稱、原輸入、正式答覆、正式序號、狀態、失敗嘗試、JD 候選狀態／修訂、已發布 Memory 快照 |
+| `diagnostic_model_steps` | 一份已保存的原模型回應，不等於業務 Step 已完成 | A／B1／B2 role、response_order、request（含 instructions、input、tools）、response（含輸出與 usage）、thread／checkpoint、snapshot_at |
+| `diagnostic_tool_calls` | 上述回應的一次 function call | 工具名稱、原 arguments、call_id、對應 output、結果是否已保存 |
+
+例如整個檔案的操作：
+
+```sql
+SELECT * FROM caliburn.diagnostic_execution_history
+WHERE job_file_id = '換成職務檔案UUID'::uuid
+ORDER BY created_at, execution_id;
+
+SELECT * FROM caliburn.diagnostic_tool_calls
+WHERE execution_id = '換成執行UUID'::uuid
+ORDER BY response_order, output_index;
+
+SELECT role, response_order, request, response, snapshot_at
+FROM caliburn.diagnostic_model_steps
+WHERE execution_id = '換成執行UUID'::uuid
+ORDER BY response_order;
+```
+
+`request` 就是保存的當時請求（敏感欄位已遮蔽），可在 DataGrip 展開 JSON 看 context、指引與工具說明。`response` 可看公開訊息、可讀推理摘要與原工具要求；舊模型沒有回傳摘要時不會補造。`response_order` 是本次擷取中已保存回應的觀察順序，不是重試次數，也不是跨程序精確時鐘。
+
+要看本輪資料庫實際寫了什麼，再 JOIN 既有操作表；讀工具不一定有業務操作，一次工具也可能產生多筆操作：
+
+```sql
+SELECT h.display_name, h.execution_id, o.kind, o.expected_revision_id,
+       o.result_revision_id, o.request_payload, o.created_at
+FROM caliburn.diagnostic_execution_history h
+JOIN caliburn.jd_operations o
+  ON o.job_file_id = h.job_file_id AND o.candidate_execution_id = h.execution_id
+WHERE h.execution_id = '換成執行UUID'::uuid
+ORDER BY o.created_at, o.command_id;
+```
+
+這個排列用於查閱，不宣稱同時間戳的 command_id 順序就是操作發生順序；修訂因果查 `expected_revision_id → result_revision_id`。`jd_candidate_status = adopted` 才表示本輪候選已採用；工具成功訊息本身不表示整輪已提交。
+
+**判讀界線：**
+
+- 總覽的業務狀態、正式訪談序號與嘗試統計是即時 JOIN；訪談文字、模型／工具正文均經遮蔽，是 `snapshot_at` 那次擷取。`snapshot_at IS NULL` 表示尚未匯入；有時間且回應數 0 表示該次未找到已保存回應。新進展須再次執行匯入命令，DataGrip Refresh 本身不會解碼新增 checkpoint。
+- `recorded` 只表示取得工具回傳，內容仍可能是錯誤；`not_recorded` 表示未找到保存結果，不能推定未執行或失敗。正式效果仍由 JD／Memory 原結果判定。
+- 包含本 execution 各階段留下的原模型回應及 pending writes，可能含後來放棄的工作。不能把診斷項目當成正式訪談來源，或把模型回應 `completed` 當整輪成功。
+- 副本遮蔽 `encrypted_content`、已知憑證欄位及可辨識的 key 字串，**不是完整匿名化**。仍含原訪談與工作內容；不自動匯出、不提交 Git。DataGrip 可將核准的合成結果另存 JSON／CSV 供錄影或報告使用。一般 log 仍不含這些正文。
+- VIEW 沿用查詢者的資料庫權限；建議在 DataGrip 開啟唯讀連線。它不是跨使用者授權或資料隔離 API。
+
+設計取捨、測試及版本見 [T06 診斷查閱證據](history.md#source-6ac54c64f9ded4edcb9e)。
 
 ## 資料庫與備份
 

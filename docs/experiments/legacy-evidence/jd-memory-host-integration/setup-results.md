@@ -1,6 +1,6 @@
 # Memory 宿主：明示初始化與唯讀前置結果
 
-2026-09-13；基準 `8672d93122891a8a1bb47742214374ceb9aeb091`。依[本單位設計](../../../specs/2026-09-13-jd-memory-host-integration-slice.md)，完成固定 schema 前置；**48 純測與 33 真 PG 情境通過**。這裡不包含新程序／真宿主排空驗收，亦沒有 provider 呼叫。
+2026-09-13；基準 `8672d93122891a8a1bb47742214374ceb9aeb091`。依[本單位設計](../../../archive/legacy-specs/2026-09-13-jd-memory-host-integration-slice.md)，完成固定 schema 前置；**48 純測與 33 真 PG 情境通過**。這裡不包含新程序／真宿主排空驗收，亦沒有 provider 呼叫。
 
 ## 實際修改
 

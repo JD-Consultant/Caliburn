@@ -6,10 +6,10 @@
 >
 > 狀態：**歷史 G3；主要元件優先順序已由 Q017 接續修訂，不授權 production 施工**
 >
-> Owner 後續暫時同意[Q017 框架接力](../../specs/2026-09-05-openai-shaped-memory-framework-composition-research.md)：根 `create_agent` 不變，filesystem／StoreBackend 為主要候選，LangMem 紀錄工具為備選；本文保留原方案研究，不重新視為當前唯一組合。
+> Owner 後續暫時同意[Q017 框架接力](2026-09-05-openai-shaped-memory-framework-composition-research.md)：根 `create_agent` 不變，filesystem／StoreBackend 為主要候選，LangMem 紀錄工具為備選；本文保留原方案研究，不重新視為當前唯一組合。
 >
 > 2026-09-05 後續複核發現方案 B 未涵蓋整併中途按需深讀，且低估可獨立使用的
-> Deep Agents filesystem 元件。先讀[通用流程審核 F01–F07](../../specs/2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)；
+> Deep Agents filesystem 元件。先讀[通用流程審核 F01–F07](2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)；
 > 原核准保留作決策歷史，本文「最貼近／只剩薄 gap」不再作已證明結論。
 
 ## 0. Preflight

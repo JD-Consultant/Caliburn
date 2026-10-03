@@ -1,6 +1,6 @@
 # JD 模型輸入減負：TF02／TF03 契約閉合依據
 
-日期：2026-09-10。Topic：JD-R002/C03；屬 Owner 已同意的有限契約補正。責任文件仍是[工具契約](../../specs/2026-09-10-jd-app-tool-contract.md)、[正式 profile](../../specs/2026-09-10-jd-plate-document-profile.md)與[schema 附件](../../specs/2026-09-10-jd-editor-contract-schema.md)。本文固定 TF02／TF03 的依據、選擇與驗收材料；不改變 Plate、單份持續工作稿、來源 owner 或既有保存邊界。
+日期：2026-09-10。Topic：JD-R002/C03；屬 Owner 已同意的有限契約補正。責任文件仍是[工具契約](../../archive/legacy-specs/2026-09-10-jd-app-tool-contract.md)、[正式 profile](../../archive/legacy-specs/2026-09-10-jd-plate-document-profile.md)與[schema 附件](../../archive/legacy-specs/2026-09-10-jd-editor-contract-schema.md)。本文固定 TF02／TF03 的依據、選擇與驗收材料；不改變 Plate、單份持續工作稿、來源 owner 或既有保存邊界。
 
 ## 1. 已讀證據與效力
 
@@ -12,7 +12,7 @@
 | [實際官方 npm dist](jd-official-profile-probe/sources/installed/@platejs__table/constants-6xljcM3U.js) L4–10、L38–53 | 新空 cell 不強制存 span；getter 依 `numeric || Number(attributes小寫欄位) || 1` 取值 | 省略兩種表示時有效值是 1。只 unset numeric 並不能保證回到 1；殘留 HTML 值仍可能生效 |
 | 同一 [dist](jd-official-profile-probe/sources/installed/@platejs__table/constants-6xljcM3U.js) L1176–1182／L1289–1295 | 官方插欄／插行遇到跨格時，更新 numeric；只有既存對應 HTML key 時一起改成字串，再以 `setNodes` 寫入 | 採相同的有限欄位映射。不能由此宣稱裸 `setNodes({colSpan:n})` 會自動同步 attributes |
 | 同一 [dist](jd-official-profile-probe/sources/installed/@platejs__table/constants-6xljcM3U.js) L1331–1377／L1383–1404 | 原生 merge／split 會處理 cell 集合並建立 cell；split 新 cell 明示 numeric span 為 1 | 單一 cell property 的 set／unset 不等於 merge／split，不讓 App 另造表格格線引擎 |
-| [正式 profile §4](../../specs/2026-09-10-jd-plate-document-profile.md#4-身分移動拆分複製與引用)、[工具契約 §8](../../specs/2026-09-10-jd-app-tool-contract.md#8-source-reference-與更正-lineage) | 既有本案要求：移動保留 subtree；unwrap 取消容器、保留子內容；引用只表示曾參考，不替續改文字重新背書 | 引用附著是模型的語意選擇；App 只做同文件／既發 handle／來源窗口等機械檢查，不從正文猜引用 |
+| [正式 profile §4](../../archive/legacy-specs/2026-09-10-jd-plate-document-profile.md#4-身分移動拆分複製與引用)、[工具契約 §8](../../archive/legacy-specs/2026-09-10-jd-app-tool-contract.md#8-source-reference-與更正-lineage) | 既有本案要求：移動保留 subtree；unwrap 取消容器、保留子內容；引用只表示曾參考，不替續改文字重新背書 | 引用附著是模型的語意選擇；App 只做同文件／既發 handle／來源窗口等機械檢查，不從正文猜引用 |
 
 官方 dist 與 `.research-tmp` 中原封存副本 SHA256 同為 `ACE1A1A1A785FE2E4D3758C82E63991AEE265D00688571BBB603B35A6D193ABF`；[source manifest](jd-official-profile-probe/sources/installed-source-manifest.json)記錄其為實際安裝 npm dist，無 vendor patch。本輪據這份已保存的精確版本原碼判斷；GitHub／raw 網路補取未成功，不將未取回頁面另算已讀證據。
 

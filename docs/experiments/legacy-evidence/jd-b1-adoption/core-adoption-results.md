@@ -1,6 +1,6 @@
 # B1 採用（核心）：已驗抽取流程進入正常套件
 
-2026-09-13；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)，基準 `a0320f35`／tag `jd-window-admission-position-20260913`。0 provider、沒有新增資料表、沒有第二份游標、沒有第二個原話 owner。
+2026-09-13；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)，基準 `a0320f35`／tag `jd-window-admission-position-20260913`。0 provider、沒有新增資料表、沒有第二份游標、沒有第二個原話 owner。
 
 **本片只做核心採用**：把已驗 B1 從固定來源搬進 `caliburn_memory.extraction`，並定出它對來源 owner 的實際需求介面。**App 接線（真 `ConversationSourceService` adapter、顧問 runtime、真 provider）不在本片**，沿 C 的 core→app 兩片節奏。
 
@@ -20,7 +20,7 @@
 
 已驗 B1 綁 `ChatOpenAI`：`with_structured_output(..., method="json_schema", strict=True, include_raw=True, max_output_tokens=...)`，接受條件讀 `raw.additional_kwargs["refusal"]`、`content_blocks` 的 refusal 區塊與 `raw.response_metadata["status"] == "completed"`。
 
-**新 App 全線是 Anthropic**（`ConfirmedChatAnthropic`／langchain-anthropic 1.7.2／anthropic 1.5.0），[runtime 切片](../../../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)明載「本輪真 Agent／SDK 接合只有 Anthropic，沒有新增 OpenAI runtime」。本機 `langchain_anthropic` 1.7.2 的 `with_structured_output` 有 `include_raw` 與 `method="json_schema"`，**沒有** `strict=` 參數；終局與拒絕證據在 Anthropic 是 `stop_reason`／`stop_details`，不是 `response_metadata["status"]`。
+**新 App 全線是 Anthropic**（`ConfirmedChatAnthropic`／langchain-anthropic 1.7.2／anthropic 1.5.0），[runtime 切片](../../../archive/legacy-specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)明載「本輪真 Agent／SDK 接合只有 Anthropic，沒有新增 OpenAI runtime」。本機 `langchain_anthropic` 1.7.2 的 `with_structured_output` 有 `include_raw` 與 `method="json_schema"`，**沒有** `strict=` 參數；終局與拒絕證據在 Anthropic 是 `stop_reason`／`stop_details`，不是 `response_metadata["status"]`。
 
 採用映射把 host／組裝／角色配置歸 App（§2 最後一列），所以本片的處理是：套件收下**已配置好的** structured runnable 與一個 `accepted(raw)` 埠，套件本身不出預設。`max_output_tokens` 隨 provider 組裝一起移到呼叫端。其餘拒絕處理邏輯（拒絕／parsing_error／三字串形狀任一不成立即失敗，不得變成空成功）原樣保留在套件內。
 

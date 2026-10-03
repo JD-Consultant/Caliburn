@@ -3,7 +3,7 @@
 - **狀態**：Accepted
 - **日期**：2026-08-22
 - **Owner 對齊**：owner 於 2026-08-22 核准把持久 JD working draft 從 `StateBackend` 修正為 `StoreBackend`；產品效果與其餘 ADR 0066 決策不變
-- **研究**：[`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](../specs/2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md)
+- **研究**：[`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](../history.md#source-3f3df1a71d60e744f504)
 - **Supersedes**：ADR 0066 決定 2 對 `/workspace` 使用 `StateBackend`／同一 files state channel 的指定，以及 Consequences 中「不先採 DeltaChannel」的實作假設
 - **保留**：ADR 0066 的一份 JD 一個非權威 working draft、五個 namespace、六個低階 Tool、自動驗證、derived semantic review、部分決策、stale／rebase、精簡 final、按需 context、no-RAG／no-auto／no-Git 與切片回歸；ADR 0060–0065 未被 0066 取代的全部邊界
 

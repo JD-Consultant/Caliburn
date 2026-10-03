@@ -1,12 +1,12 @@
 # ADR0076：新 JD App 的背景准入列
 
-**2026-09-16 MEM-L001 影響：**本 ADR 是 Proposed，且六欄決策主要承接一份文件的背景准入、固定 target、目前批次、錯誤與恢復次數；這些責任仍可作 G4 基礎。但下文把工作描述成「B1 固定窗口抽取 → B2 兩檔整併 → publication」的部分已由 [MEM-L001](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 取代。新流程為 B1 staged 案例層 → B2 staged 工作理解層 → 一次共同 publication；G4 必須核對現有六欄是否仍能無歧義恢復整個共同工作，不能直接以本 Proposed ADR 宣稱新流程已獲正式 authority 或已完成。
+**2026-09-16 MEM-L001 影響：**本 ADR 是 Proposed，且六欄決策主要承接一份文件的背景准入、固定 target、目前批次、錯誤與恢復次數；這些責任仍可作 G4 基礎。但下文把工作描述成「B1 固定窗口抽取 → B2 兩檔整併 → publication」的部分已由 [MEM-L001](../history.md#source-9540bc676045d402f2e8) 取代。新流程為 B1 staged 案例層 → B2 staged 工作理解層 → 一次共同 publication；G4 必須核對現有六欄是否仍能無歧義恢復整個共同工作，不能直接以本 Proposed ADR 宣稱新流程已獲正式 authority 或已完成。
 
 **狀態：**Proposed（2026-09-14）。隔離 JD App 範圍內採用；不改 production authority，不取代 [ADR0060](0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 的正式顧問。
 
 ## 脈絡
 
-新 JD App 的背景整理是 B1（訪談抽取）→ B2（整併）→ publication 三段。[窗口來源契約](../specs/2026-09-13-jd-interview-window-source-contract.md)與[採用映射 §3.6](../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md) 要求：准入時固定一個 target，之後的批次都從該 target 切出，後續訪談不得擴大它。
+新 JD App 的背景整理是 B1（訪談抽取）→ B2（整併）→ publication 三段。[窗口來源契約](../history.md#source-c3932ec665f7ac366197)與[採用映射 §3.6](../history.md#source-c3f1de64d5f4d4e6a215) 要求：准入時固定一個 target，之後的批次都從該 target 切出，後續訪談不得擴大它。
 
 問題是這個 target 沒有地方放。[R3 實測](../experiments/legacy-evidence/jd-b1-adoption/r3-notification-and-background-results.md)在真 PostgreSQL 上逐欄列出既有持久狀態：
 
@@ -17,7 +17,7 @@
 
 `target_reference`、`status`、`error_code`、`recovery_count` 四項都不在其中。第二條案例進一步證明批次不能代替 target：丟掉 target 後只剩目前 head，而從 head 重推的範圍會隨員工繼續講話而變大，已准入的工作因此永遠不會收斂。
 
-[映射 §3.3](../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md#33-背景排空歸屬) 已把已驗 `BackgroundRow` 的六欄責任列為候選，並要求「先驗證既有 Saver／catalog 是否確實無法承載」。該驗證已完成且缺口成立。
+[映射 §3.3](../history.md#source-c3f1de64d5f4d4e6a215) 已把已驗 `BackgroundRow` 的六欄責任列為候選，並要求「先驗證既有 Saver／catalog 是否確實無法承載」。該驗證已完成且缺口成立。
 
 ## 決策
 
@@ -34,7 +34,7 @@
 
 另加狀態組合約束：`queued` 必有 target；`running` 必有 target 與 source；`idle` 三者皆空。
 
-狀態轉移、失敗分類與重開對帳程序見[背景准入設計](../specs/2026-09-14-jd-background-admission-design.md)。
+狀態轉移、失敗分類與重開對帳程序見[背景准入設計](../history.md#source-2d8abe3d8bcebaec811b)。
 
 ## 界線（這個決策明確不主張什麼）
 

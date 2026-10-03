@@ -6,7 +6,7 @@
 
 ## 1. 固定環境與實際探針
 
-使用既有鎖定的 LangChain 1.4.0、LangGraph 1.2.11、DeepAgents 0.7.13 與已採用的 `caliburn_memory.repair.RepairWorkflow`。沒有升級。原框架採用／授權路由沿 [C 核心結果](../../../specs/2026-09-13-jd-memory-repair-core-slice.md)。
+使用既有鎖定的 LangChain 1.4.0、LangGraph 1.2.11、DeepAgents 0.7.13 與已採用的 `caliburn_memory.repair.RepairWorkflow`。沒有升級。原框架採用／授權路由沿 [C 核心結果](../../../archive/legacy-specs/2026-09-13-jd-memory-repair-core-slice.md)。
 
 [探針](../../../../experiments/jd-relational-app/tests/support/memory_repair_observation_probe.py)使用真正的 `create_agent`、其原生 `ToolNode`、`InMemorySaver`、`InMemoryStore` 與 SQLite in-memory publication。模型為本地 `BaseChatModel` 固定 `AIMessage`，不建立 provider client；全段明示 `tracing_context(enabled=False)`。SQLite setup 只作用於此次一次性記憶體資料庫。輸出只有合成節點／ID定位類型、計數、布林與 request digest，不輸出來源／patch／Memory 全文。
 

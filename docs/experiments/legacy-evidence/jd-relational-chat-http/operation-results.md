@@ -3,7 +3,7 @@
 - 日期：2026-09-13；施工基準 `2734b82b025adcd8a032f947a9a688c7e1ea626f`。
 - 狀態：此唯讀 SQL 接點與有限反例已完成；不是聊天 HTTP／完整 App 或自然模型驗收。
 - 範圍：只新增 `HistoryReader.read_run_operations`、兩份測試及本證據。未改 schema、index、migration、回執格式、依賴或 writer authority，0 provider。
-- 責任沿[既有讀取切片](../../../specs/2026-09-13-jd-read-change-implementation.md)與[共同保存交易](../../../specs/2026-09-13-jd-transaction-service-slice.md)；本文件不另定 run 或 operation 的資料權威。
+- 責任沿[既有讀取切片](../../../archive/legacy-specs/2026-09-13-jd-read-change-implementation.md)與[共同保存交易](../../../archive/legacy-specs/2026-09-13-jd-transaction-service-slice.md)；本文件不另定 run 或 operation 的資料權威。
 
 ## 1. 接點與結果語意
 

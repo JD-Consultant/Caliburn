@@ -4,7 +4,7 @@
 
 ## 1. 結論與施工範圍
 
-**採用既有顧問、先补完成窗口的方向正確；原稿不能不修正就作完整施工指令。**五組文檔問題見下節，已回寫[採用映射](../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)、[接續計畫](../../plans/2026-09-13-jd-app-continuation-handoff.md)與[未解事項](../../specs/2026-09-13-jd-app-open-issues.md)。它們是尚未施工的設計／交接缺口，不是新 App 已發生資料損失的證據。
+**採用既有顧問、先补完成窗口的方向正確；原稿不能不修正就作完整施工指令。**五組文檔問題見下節，已回寫[採用映射](../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)、[接續計畫](../../archive/implementation-plans/2026-09-13-jd-app-continuation-handoff.md)與[未解事項](../../archive/legacy-specs/2026-09-13-jd-app-open-issues.md)。它們是尚未施工的設計／交接缺口，不是新 App 已發生資料損失的證據。
 
 H2–H3 不重開；不新增產品需求、不重寫顧問、不另選框架。下一仍先做完成窗口 source port，先落實其具體介面與固定情境再施工。背景持久狀態的具體落點在背景接線前有限閉合，不以「不新增表」取代責任設計，也不據此直接批准新表。H4 整體仍未通過固定完整旅程，日常 AI 未啟用，ADR0074／0075 Proposed、production ADR0060 不變。
 

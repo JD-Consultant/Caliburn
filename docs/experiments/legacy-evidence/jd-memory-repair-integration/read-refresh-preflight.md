@@ -2,7 +2,7 @@
 
 > **2026-09-15 Owner 校正（取代本稿下方兩項舊候選）：**本稿是 2026-09-13 的施工前證據，不刪除歷史。現在的有效規則是「本回合目前的 Memory 讀取基準」，不是結果回傳時觀察到的最新 head。C 成功時，本回合固定為 C 實際產生的 `applied_head`；若 B 已在 C 保存後發布更晚版本，仍不把本輪推到該背景版。所以下方「`head` 可採較晚 B」以及「C applied 2、取結果時 B 3，則同輪 read 3」已失效，正確結果是同輪 read 2、下一輪 read 3。C 準備修改而發現 head 已變時，仍先 stale、按需讀新版並重新評估；保存用原子版本條件。最新權責見[目前決策](../../../current-decisions.md)與[接線對齊稿 §7.2.1](../2026-09-15-jd-integration-document-reconciliation.md#721-memory-版本正式-head回合起始證據與目前讀取基準)。
 
-**接續校正：**本稿是接線前候選。下方額外持久保存讀版／failure counter與Command更新ABI，由[交接計畫 §4](../../../plans/2026-09-13-jd-app-continuation-handoff.md#4-已收斂的-c-接合設計)的原call綁定＋ToolMessage.artifact投影取代；不新增第二份head／counter。情境及官方事實仍可參考，不能照本稿舊ABI接線。
+**接續校正：**本稿是接線前候選。下方額外持久保存讀版／failure counter與Command更新ABI，由[交接計畫 §4](../../../archive/implementation-plans/2026-09-13-jd-app-continuation-handoff.md#4-已收斂的-c-接合設計)的原call綁定＋ToolMessage.artifact投影取代；不新增第二份head／counter。情境及官方事實仍可參考，不能照本稿舊ABI接線。
 
 查閱：2026-09-13；基準 `8403d7e2`。範圍是既有 C 核心接入顧問的讀版與可修失敗次數；本稿未改產品、未執行模型／DB、未重跑已通過的 124 個核心案例。最終欄位 ABI 由本輪整合設計定稿。
 

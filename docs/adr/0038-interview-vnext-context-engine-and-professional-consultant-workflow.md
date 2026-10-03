@@ -7,7 +7,7 @@
   [`0035`](0035-interview-vnext-openrouter-first-provider-boundary.md)、
   [`0036`](0036-interview-vnext-provider-binding-conformance-and-idless-turn-v2.md)、
   [`0037`](0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)
-- 研究：[`../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md`](../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)
+- 研究：[`../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md`](../history.md#source-41f73d8f9e737418f7ea)
 
 ## 脈絡
 
@@ -332,7 +332,7 @@ prototype準備並行，但production OpenRouter user route前必須完成。若
 review。
 
 詳細施工、root contract、corruption matrix、byte-identity gate與停線條件見
-[`../plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md`](../plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md)。
+[`../plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md`](../history.md#source-7b42c231502a8e960a77)。
 
 ### 15. 產品交付順序
 

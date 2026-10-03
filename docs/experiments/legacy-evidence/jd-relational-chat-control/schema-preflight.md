@@ -6,7 +6,7 @@
 
 ## 1. 依據、效力與版本
 
-本稿細化[前置契約](../jd-relational-ai-restart/chat-contract-preflight.md)，不重開已閉合的品牌調查；[最新有效狀態](../../../current-decisions.md)與[契約策略](../../../contract-strategy.md)維持入口。新宿主恢復已在[結果](../../../specs/2026-09-13-jd-ai-restart-recovery-slice.md)驗收，本稿不再將它列為未實作；聊天 HTTP／Web、Memory／來源與自然品質仍未完成。
+本稿細化[前置契約](../jd-relational-ai-restart/chat-contract-preflight.md)，不重開已閉合的品牌調查；[最新有效狀態](../../../current-decisions.md)與[契約策略](../../../contract-strategy.md)維持入口。新宿主恢復已在[結果](../../../archive/legacy-specs/2026-09-13-jd-ai-restart-recovery-slice.md)驗收，本稿不再將它列為未實作；聊天 HTTP／Web、Memory／來源與自然品質仍未完成。
 
 | 證據 | 可證事實與本案映射 |
 |---|---|

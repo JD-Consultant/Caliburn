@@ -3,9 +3,9 @@
 - **狀態**：Proposed
 - **日期**：2026-08-27
 - **Owner 對齊**：owner 已於 2026-08-27 複核 UI／編輯規格；2026-08-28 的工作理解、來源、Context、拒絕記憶與 required input 最新裁決改由 ADR 0071 承接；2026-08-29 的核心 JD 欄位、關聯與 K／S 最後 link 生命週期以欄位契約稽核 §18 為準。兩份 ADR 均待 implementation gate 全綠後才改為 Accepted
-- **設計與研究**：[`2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md`](../specs/2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md)
+- **設計與研究**：[`2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md`](../history.md#source-470a74687240138cd489)
 - **語意前置**：[`0071-revisable-work-understanding-context-and-review-provenance.md`](0071-revisable-work-understanding-context-and-review-provenance.md)
-- **欄位契約**：[`2026-08-28-llm-authored-field-contract-audit.md`](../specs/2026-08-28-llm-authored-field-contract-audit.md) §18
+- **欄位契約**：[`2026-08-28-llm-authored-field-contract-audit.md`](../history.md#source-a8c23770e54049db0445) §18
 - **Supersedes when Accepted**：ADR 0069 決定 6／7 中「員工編輯重疊 AI pending 就直接更新 approved」與「儲存 AI 新 entity 等同 edit-and-accept」的部分；決定 10 中由 application 判斷 `supersede／qualify／rebut` 並建立來源更正 lineage 的專用流程；決定 13 的「不新增任何 Web framework」；並澄清決定 12 的 running lock 與完整工作區 UI
 - **保留**：ADR 0060／0067 的 LangGraph／Deep Agents Store-backed workspace、Saver／Store authority、AI 無 approved write edge、derived semantic review、stale guard、approved-only export；來源／工作理解／待審理由／execution receipt 的分層以 ADR 0071 為準；ADR 0069 的單一目前 JD 主編輯面、只讀核准基線、移除 defer、一般待審不阻塞訪談，以及失敗後可繼續一般對話
 

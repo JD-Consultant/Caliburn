@@ -32,11 +32,11 @@ Context 由 App 組裝與接續，其中的 reasoning／compaction 項目可能�
 
 產品以 loopback 本機存取為前提，並檢查請求來源；職務檔案的隔離、A 活躍時的人工寫入限制與 B1／B2 工具權限，仍必須由後端落實。單靠 UI 隱藏按鈕或 Prompt 說「不要越權」不足以建立隔離。
 
-本報告不把這套本機權限模型宣稱為多租戶 SaaS 安全設計。根入口已依 [ADR0079](../../adr/0079-target-rebuild-production-cutover.md)切換到本架構，舊產品程式已退役；這是本機產品切換，不是對外部署或多人服務的安全驗證。
+這套權限模型適用於本機產品，尚未驗證多租戶 SaaS 或多人服務的安全性。現行產品採用本章架構，舊產品程式已退役，兩者的沿革見 [ADR0079](../../adr/0079-target-rebuild-production-cutover.md)。
 
-### 追到實作
+### 延伸閱讀
 
-- 責任與選型：[系統邊界](../../architecture/system-boundaries.md)、[技術決策](../../implementation/technology-decisions.md)。
+- 系統範圍與選型：[系統邊界](../../architecture/system-boundaries.md)、[技術決策](../../implementation/technology-decisions.md)。
 - 後端組裝：[bootstrap.py](../../../apps/api/src/caliburn/bootstrap.py)。
 - 供應商介面：[openai_responses.py](../../../apps/api/src/caliburn/adapters/openai_responses.py)。
-- 本機安全證據：[T15](../../plans/2026-09-29-target-rebuild/evidence/t15-local-http-security.md)。
+- 權限與隔離的測試範圍：[本機安全測試紀錄](../../history.md#source-0e25c675694e9744582f)。

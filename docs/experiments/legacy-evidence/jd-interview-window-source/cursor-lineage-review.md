@@ -64,8 +64,8 @@
 ## 文件與官方證據核對
 
 - [9/12 關聯式保存](../../../specs/2026-09-12-jd-relational-schema-and-write-contract.md)、[Agent 工具契約](../../../specs/2026-09-12-jd-relational-agent-tool-contract.md)：App 承擔引用、版本及真實保存結果；JD current 是關聯 rows，Memory／原話不雙寫。
-- [9/13 完成窗口契約 §3／7／9](../../../specs/2026-09-13-jd-interview-window-source-contract.md)、[採用映射 §3–6](../../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)：固定 pair、完整回合、新 admission 與既有重抽分開；採用已驗顧問，不重新設計其 prompt／工作規則。
-- [9/13 C 完成核心](../../../specs/2026-09-13-jd-memory-repair-core-slice.md)、[App 當輪來源](../../../specs/2026-09-13-jd-consultant-source-integration-slice.md)、[接續計畫 H4](../../../plans/2026-09-13-jd-app-continuation-handoff.md)：本次不能倒退 C 的原結果查回、把 C source 當 B1 窗口或新增第二 owner。
+- [9/13 完成窗口契約 §3／7／9](../../../specs/2026-09-13-jd-interview-window-source-contract.md)、[採用映射 §3–6](../../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)：固定 pair、完整回合、新 admission 與既有重抽分開；採用已驗顧問，不重新設計其 prompt／工作規則。
+- [9/13 C 完成核心](../../../archive/legacy-specs/2026-09-13-jd-memory-repair-core-slice.md)、[App 當輪來源](../../../archive/legacy-specs/2026-09-13-jd-consultant-source-integration-slice.md)、[接續計畫 H4](../../../archive/implementation-plans/2026-09-13-jd-app-continuation-handoff.md)：本次不能倒退 C 的原結果查回、把 C source 當 B1 窗口或新增第二 owner。
 - 2026-09-13 重查 [LangGraph checkpointers](https://docs.langchain.com/oss/python/langgraph/checkpointers) 與 [time travel](https://docs.langchain.com/oss/python/langgraph/use-time-travel)：公開 `checkpoint_id` 可指定保存位置，`parent_config` 是前一 checkpoint；`update_state` 從指定位置產生分支，不是刪除／回滾原歷史。本地 lock 為 `langgraph==1.2.11`、`langgraph-checkpoint==4.2.0`，已發布 API、MIT，以上用同版本 native fixture 核對。官方提供原語，**沒有替本案規定 token 欄位或 admission 演算法**；這些是依本案契約的有限整合，不稱跨廠共識。
 - OpenAI／Anthropic 的 App 執行工具與結果責任沿上述 9/12–9/13 已研究契約；本片未改模型契約，無需重選工具或再廣搜相同問題。
 

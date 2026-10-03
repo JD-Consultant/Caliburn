@@ -5,9 +5,9 @@
 - **最新 Owner 裁決**：同意核心接線推薦，真人交付／核對先不做；原 HTML／DOCX 問答交付包改 PARKED，不列本版施工及驗收。正式契約與核心整體 review 已完成，兩項 P2 關閉；本 ADR 仍 Proposed，尚未完成 production G6 或修改 production。
 - **Topic**：JD-R002/C03，連動 C01／C02
 - **2026-09-10 語意契約v2**：Owner同意完整JSONB＋同PG方向，Task成果／要求平行分組、K／S完整item及單向同版引用沿[語意契約](../experiments/legacy-evidence/2026-09-10-jd-semantic-contract-closure.md)。模型用issued refs、App映ID及推導反向集合；首建先保存items再read/link，兩次各自原子。新profile明示format 2，v1封存不搬移；不增加工具或關係store，不改本ADR Proposed效力。
-- **2026-09-10 契約補正**：Owner 同意依責任稽核補正後接線；同一 SSOT 收斂模型單一輸入意圖、錯誤／未閉合回執動作，並固定單向保存關係及有限執行策略，詳[補正紀錄](../specs/2026-09-10-jd-responsibility-and-evidence-audit.md)。這是本 Proposed 方案的工程閉合，不使 ADR 自動 Accepted，也不把離線契約證據當成 production／自然模型驗收。
-- **產品依據**：Owner 已選 Plate 免費核心、持續工作稿與差異／更正；另明確排除「目前稿／更正後」兩頁。效力見 [register](../current-decisions.md)與[審閱裁決](../specs/2026-09-09-jd-editing-and-review-working-design.md#77-owner-裁決持續工作稿保留差異與更正)。
-- **設計**：[App 接線](../specs/2026-09-09-jd-editor-app-integration-design.md)。Owner 已同意持久化與執行互斥方向；本 ADR 待正式契約及整體審查完成後正式化。
+- **2026-09-10 契約補正**：Owner 同意依責任稽核補正後接線；同一 SSOT 收斂模型單一輸入意圖、錯誤／未閉合回執動作，並固定單向保存關係及有限執行策略，詳[補正紀錄](../history.md#source-baf0ad507eaf072b0050)。這是本 Proposed 方案的工程閉合，不使 ADR 自動 Accepted，也不把離線契約證據當成 production／自然模型驗收。
+- **產品依據**：Owner 已選 Plate 免費核心、持續工作稿與差異／更正；另明確排除「目前稿／更正後」兩頁。效力見 [register](../current-decisions.md)與[審閱裁決](../history.md#source-403383b35472e2a3a08d)。
+- **設計**：[App 接線](../history.md#source-635365b09c90c16370d6)。Owner 已同意持久化與執行互斥方向；本 ADR 待正式契約及整體審查完成後正式化。
 
 > 2026-09-12 Owner 試看預覽後要求 relational rows 與結構化 JD 管理編輯器。本文保留完整 Plate JSONB、版本／receipt 及隔離實證作沿革；後續設計、review 與施工以 ADR0075 路由，不能再以本文直接推進 adoption。
 
@@ -17,7 +17,7 @@
 
 舊 ADR 保留 Store 中的 JD workspace、Saver 中的 approved document，以及 semantic groups、accept／reject 與 rebase。Owner 現已選擇持續工作稿，不再提供個別待審接受／取消。保留兩份當前 JD 並自動接受，只會沿用已不需要的狀態與效力。這次改動應明確退出舊 JD writers，保留 conversation／Memory 的既有研究成果。
 
-Plate 原生操作、保存重開、history 接點與 Python→Node→PostgreSQL 已有有限正證，另有 diff／normalization／history 反例。[證據及限制](../specs/2026-09-09-jd-editor-app-integration-design.md#1-推薦組合與證據效力)。證據支持使用框架作底座，沒有證明正式人編、所有內容 profile 或顧問品質已完成。OpenAI／Anthropic 公開契約支持模型提出工具操作、App 執行並回真實結果；沒有公開相同的 Plate／資料表內部設計。
+Plate 原生操作、保存重開、history 接點與 Python→Node→PostgreSQL 已有有限正證，另有 diff／normalization／history 反例。[證據及限制](../history.md#source-635365b09c90c16370d6)。證據支持使用框架作底座，沒有證明正式人編、所有內容 profile 或顧問品質已完成。OpenAI／Anthropic 公開契約支持模型提出工具操作、App 執行並回真實結果；沒有公開相同的 Plate／資料表內部設計。
 
 ## Decision
 
@@ -39,7 +39,7 @@ Plate 原生操作、保存重開、history 接點與 Python→Node→PostgreSQL
 
 9. **來源與職務品質保持原本責任。** 保存來源只記對既有原文 owner 的引用，不複製成第二來源庫；引用有效不等於每個句子已核實，手改不自動重新背書或改寫 Memory。顧問沿既有完整 JD 方法、unknown／案例／更正規則與雙向核對。工具格式正確不等於「滿分」。真人交付／核對功能依 Owner 裁決先不做，不新增角色權限。
 
-10. **讀取與比較固定版本；交付功能延後。** current read 只讀 clean head；指定歷史唯讀。一次實際改動與任意兩版比較分開標示；完整 immutable before／after 是比較的必要資料，native operations 只作額外提示。舊 approved-only export 不接到新工作稿，不把歷史刪文當 current。[交付附件](../specs/2026-09-10-jd-export-and-consultant-handoff.md)及其 HTML／DOCX＋原始問答交付包為 PARKED，不列本版施工、驗收或缺口。重新啟動時再依明示保存版設計，不恢復舊 iCAP／A／級別格式限制新內容。
+10. **讀取與比較固定版本；交付功能延後。** current read 只讀 clean head；指定歷史唯讀。一次實際改動與任意兩版比較分開標示；完整 immutable before／after 是比較的必要資料，native operations 只作額外提示。舊 approved-only export 不接到新工作稿，不把歷史刪文當 current。[交付附件](../history.md#source-91a35023a5b8dcacc842)及其 HTML／DOCX＋原始問答交付包為 PARKED，不列本版施工、驗收或缺口。重新啟動時再依明示保存版設計，不恢復舊 iCAP／A／級別格式限制新內容。
 
 11. **切換採 fresh data、單一 composition root。** 新 migration/setup 只建立需要的 JD 結構；不搬舊 JD、不雙寫、不做 compatibility wrapper。catalog 文件身分可沿用，隔離檢查覆蓋 revision、operation 與歷史 read；本 ADR 不授權此時清空任何 DB。正式切換的完整文件刪除／恢復需與既有來源／Memory 同步定義；隔離 catalog 尚無刪除 API，不在核心編輯器補造它。一次切換移除舊 JD runtime／route／schema／Web 分支，保留受現行邊界保护的 conversation／Memory 及隔離 RAG。
 
@@ -74,11 +74,11 @@ Plate 原生操作、保存重開、history 接點與 Python→Node→PostgreSQL
 
 ## Acceptance gate
 
-此文件仍是待正式化的 production 架構，不授權直接改 production。[主稿 §9.1](../specs/2026-09-09-jd-editor-app-integration-design.md#91-整體接線評審包)的人工暫停與保存取捨已同意，交付延後；核心正式契約及整體交叉審查已完成，可作 S5 核心設計／隔離施工交接。[F02](../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md)與 schema／SDK 證據仍不是正式 editor 或 Agent 整合。production Accepted／G6 及下述 Memory authority 採用尚未完成；必要能力若須新通用引擎則按停止線處理。施工計畫依已核准方向拆分，真人交付不列阻塞。
+此文件仍是待正式化的 production 架構，不授權直接改 production。[主稿 §9.1](../history.md#source-635365b09c90c16370d6)的人工暫停與保存取捨已同意，交付延後；核心正式契約及整體交叉審查已完成，可作 S5 核心設計／隔離施工交接。[F02](../experiments/legacy-evidence/2026-09-10-jd-official-profile-probe.md)與 schema／SDK 證據仍不是正式 editor 或 Agent 整合。production Accepted／G6 及下述 Memory authority 採用尚未完成；必要能力若須新通用引擎則按停止線處理。施工計畫依已核准方向拆分，真人交付不列阻塞。
 
 第一條垂直驗收為「人編保存→既有顧問工具讀取與修改→原畫面顯示真差異→同操作中斷對帳→關頁重開」。同時驗繁中、重複文字、條件／來源保留、過期與部分失敗零發布。免費固定操作驗收與實際付費模型品質驗收分列；本 ADR 不授權付費請求、DB 重建、merge 或 push。
 
-具體邊界由[正式 schema 附件](../specs/2026-09-10-jd-editor-contract-schema.md)承接，[六切片計畫](../plans/2026-09-10-jd-editor-core-implementation.md)只接 CT49–51 隔離顧問。依[主稿 §4.1](../specs/2026-09-09-jd-editor-app-integration-design.md#41-接合目標與正式切換邊界)，production 仍有獨立且有限的 Memory authority 正式化依賴；不透過本 ADR 偷渡不同 Python／模型／Memory 版本。本機 schema 與 SDK serialization 驗收不能代稱真 provider 接受或自然模型品質，兩者按實際驗收範圍分列。
+具體邊界由[正式 schema 附件](../history.md#source-674c8c335cfede3fa734)承接，[六切片計畫](../history.md#source-ed26da4d894f3423c7f0)只接 CT49–51 隔離顧問。依[主稿 §4.1](../history.md#source-635365b09c90c16370d6)，production 仍有獨立且有限的 Memory authority 正式化依賴；不透過本 ADR 偷渡不同 Python／模型／Memory 版本。本機 schema 與 SDK serialization 驗收不能代稱真 provider 接受或自然模型品質，兩者按實際驗收範圍分列。
 
 ## Sources
 

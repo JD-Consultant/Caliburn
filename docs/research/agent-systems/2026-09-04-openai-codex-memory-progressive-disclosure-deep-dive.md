@@ -4,7 +4,7 @@ Status: focused evidence child；不形成 production 決策、不授權施工
 Topic: `LLM-Q014 / G4.3b`  
 Checked: 2026-09-04
 
-> 2026-09-05 接續：讀取順序的研究保留；「摘要位置由誰建立、怎麼成為 Memory 的相關引用、框架回傳什麼」見 [Q017 摘要路由 source review](../../specs/2026-09-05-memory-summary-routing-and-deep-read-source-review.md)。該稿已重新取得固定 Codex source 並核對最新 main 三檔內容相同。最新接法／待決以 [current decisions](../../current-decisions.md) 為準，不從本稿歷史候選自動選型。
+> 2026-09-05 接續：讀取順序的研究保留；「摘要位置由誰建立、怎麼成為 Memory 的相關引用、框架回傳什麼」見 [Q017 摘要路由 source review](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)。該稿已重新取得固定 Codex source 並核對最新 main 三檔內容相同。最新接法／待決以 [current decisions](../../current-decisions.md) 為準，不從本稿歷史候選自動選型。
 
 ## 0. 本稿回答什麼
 
@@ -281,5 +281,5 @@ OpenAI 公開架構同時保留 conversation 與 distilled Memory，目的不同
 ## 9. Stop rule
 
 本稿已回答 OpenAI 路徑「實際怎麼做」。下一步若要推進 production，應回到
-[`2026-09-04-llm-machine-effects-and-sibling-results-working-design.md`](../../specs/2026-09-04-llm-machine-effects-and-sibling-results-working-design.md)
+[`2026-09-04-llm-machine-effects-and-sibling-results-working-design.md`](../../history.md#source-250863bd5cb8fa9a35fc)
 的 G4.3b，逐一比較 A1／A2／A3；不得把本稿直接當成 Caliburn schema 或施工授權。

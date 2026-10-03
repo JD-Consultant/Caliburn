@@ -4,7 +4,7 @@ Status: focused official evidence；不形成 Caliburn production 決策、不�
 Topic: `LLM-Q014 / G4.3b` evidence preflight  
 Checked: 2026-09-05
 
-> 後續來源／映射複核見[通用流程審核](../../specs/2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)。
+> 後續來源／映射複核見[通用流程審核](2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)。
 > OpenAI SDK／Codex CLI 的 artifact 與觸發政策分別看待，不拼成跨產品固定契約。
 
 ## 0. 本稿的問題與邊界

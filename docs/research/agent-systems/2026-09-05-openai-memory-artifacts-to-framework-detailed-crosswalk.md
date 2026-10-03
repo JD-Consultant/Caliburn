@@ -4,7 +4,7 @@
 > Topic：`LLM-Q017`
 > 狀態：**G2 已複核修正；方案調整待 Owner 討論；不授權 production 施工**
 >
-> 後續先讀 [通用流程審核 F01–F07](../../specs/2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)。
+> 後續先讀 [通用流程審核 F01–F07](2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)。
 > 下表保留 artifact 詳解，但 LangMem consolidation 的等價程度、Deep Agents 元件級候選、
 > rollout 粒度與批次寫入保證已校正；不能再把「只剩薄接線」當成審核通過結論。
 
@@ -106,7 +106,7 @@ state DB 的 `selected_for_phase2`／`selected_for_phase2_source_updated_at`，�
 
 ### 3.1 即時讀取 A
 
-這是逐層取資料的概念圖，不是每輪必經的固定呼叫鏈。Sandbox SDK 公開說明是在 run 開始注入導覽；Codex 的具體 read prompt／停止指引見[摘要路由 §3](../../specs/2026-09-05-memory-summary-routing-and-deep-read-source-review.md#3-讀取端每次多讀一層都有明確依據)。不由下圖推論每個 model step 都重貼導覽或讀到 raw。
+這是逐層取資料的概念圖，不是每輪必經的固定呼叫鏈。Sandbox SDK 公開說明是在 run 開始注入導覽；Codex 的具體 read prompt／停止指引見[摘要路由 §3](2026-09-05-memory-summary-routing-and-deep-read-source-review.md#3-讀取端每次多讀一層都有明確依據)。不由下圖推論每個 model step 都重貼導覽或讀到 raw。
 
 ```text
 Conversation／Session append items
@@ -285,7 +285,7 @@ namespace + key + arbitrary JSON value
 
 ### 5.4 LangMem `create_thread_extractor`
 
-**小元件接線補充（2026-09-05）：**它不自行從 Checkpointer 抓原文；實際先將 caller 傳入 messages 經 merge／pretty rendering，再交給 extractor。這不是原始 message object 的無損序列化，也不自動攜帶每則 canonical message ID。共用原文讀取、序列化、模型視圖及 backend 的細節與固定來源集中於[原文 source trace §6](../../specs/2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#6-接續核對同源原文如何供-b-抽取與-a-深查)；不得因高階元件缺 reader 就另存一份原文，亦未選定此 extractor。
+**小元件接線補充（2026-09-05）：**它不自行從 Checkpointer 抓原文；實際先將 caller 傳入 messages 經 merge／pretty rendering，再交給 extractor。這不是原始 message object 的無損序列化，也不自動攜帶每則 canonical message ID。共用原文讀取、序列化、模型視圖及 backend 的細節與固定來源集中於[原文 source trace §6](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#6-接續核對同源原文如何供-b-抽取與-a-深查)；不得因高階元件缺 reader 就另存一份原文，亦未選定此 extractor。
 
 ```text
 messages
@@ -576,7 +576,7 @@ LangMem manage tool 提供 close primitive，但因 0.0.30 hot／background valu
 ### 10.1 研究結論
 
 以下是上一輪暫時核准方向；本輪發現尚未證明它最貼合。新增 agentic consolidation
-元件級候選，待 Owner 討論，詳見[審核 §5](../../specs/2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)：
+元件級候選，待 Owner 討論，詳見[審核 §5](2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)：
 
 ```text
 stable LangChain create_agent
@@ -630,7 +630,7 @@ Next gate:
 - [Codex Stage 1 input](https://github.com/openai/codex/blob/main/codex-rs/memories/write/templates/memories/stage_one_input.md)
 - [Codex consolidation prompt](https://github.com/openai/codex/blob/main/codex-rs/memories/write/templates/memories/consolidation.md)
 - [Codex read-path prompt（已核對正確位置；摘要／原文路由詳見本輪子稿）](https://github.com/openai/codex/blob/574a36ff99f0807a24f5b043f593122bf151908d/codex-rs/ext/memories/templates/memories/read_path.md)
-- [摘要引用的寫入→讀取 source review](../../specs/2026-09-05-memory-summary-routing-and-deep-read-source-review.md)
+- [摘要引用的寫入→讀取 source review](2026-09-05-memory-summary-routing-and-deep-read-source-review.md)
 - [Codex memory state model](https://github.com/openai/codex/blob/main/codex-rs/state/src/model/memories.rs)
 
 ### LangChain／LangGraph／Deep Agents

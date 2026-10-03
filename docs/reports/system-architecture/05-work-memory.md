@@ -34,15 +34,13 @@ JD 通常直接引用工作理解，再沿既有引用鏈回查情境與原話�
 
 ![圖六：B1／B2 的背景批次](diagrams/06-memory-batch.png)
 
-圖六呈現**2026-10-02 程式修正後的單向流程**，省略故障與恢復的細節。A 可在工作中提出整理要求，但只有該 Turn 成功完成後，要求才具備啟動資格。App 固定本批原話上界為觸發輪的最後一則員工輸入，不讓稍後訪談或已取消輸入混入本批。
+圖六呈現背景整理的單向流程，省略故障與恢復的細節。A 可在工作中提出整理要求，但只有該 Turn 成功完成後，要求才具備啟動資格。App 固定本批原話上界為觸發輪的最後一則員工輸入，不讓稍後訪談或已取消輸入混入本批。
 
 B1 先在候選工作稿整理情境。完成後，App 保存結果與變更，由 B2 接手整理理解；此時 B1 不再修改本批情境，讓 B2 能依固定的上游資料分析。現行流程為 **B1 → B2 → 發布**，B2 不修改情境，也不回交 B1 返工。
 
 B2 透過差異資料得知哪些情境新增、刪除或修改，包括尚未被任何理解引用的新情境。差異協助定位需要重新分析的範圍；分析時仍可按需讀取最新版全文及原話，不能只因讀過 diff 就視為完成。
 
 B2 完成後，App 發布整份 Memory 快照。資訊不足或矛盾須如實保留，不藉猜測補齊，也不因此啟動 B2 → B1 的回圈。Memory 是由系統管理的背景工作，使用者不能暫停、取消或重試。
-
-**修正與驗證範圍：**2026-10-02 已將程式與 B2 指引對齊為上述單向流程，無 B2 回交。當日較早曾查出 `needs_situation`／`SituationRework` 回交仍啟用，該次發現保留於[附錄校核紀錄](references.md#本次文件校核範圍)。本次測試結果與驗證層級見 [T11 單向流程修正紀錄](../../plans/2026-09-29-target-rebuild/evidence/t11-memory-one-way-correction.md)；舊回交測試及既有長旅程不代表修正後的真模型品質已重驗。
 
 ## 可變工作稿與固定快照
 
@@ -62,8 +60,8 @@ B1／B2 完成語意整理後，App 將候選與關係一併固定、發布，�
 
 尚未發布的候選不提供給 A。背景整理最終失敗時，A 繼續使用已發布 Memory、近期原話及訪談讀取工具；App 提供整理未完成與已知原因，不能宣稱 Memory 已更新。系統有界處理故障，不能無限重跑。
 
-目前程式已接上「正式訪談進度增加後，再允許一次新批次」：正式序號比失敗時前進 6（一般為三輪完成的訪談）才解除阻塞，再失敗便重新阻塞；舊失敗紀錄若未存當時前緣，不會自動解除。**等待三輪是否適合作為產品政策仍未定案，也未在真模型長旅程中觸發驗證。**實作見 [consolidation_requests.py](../../../apps/api/src/caliburn/features/work_memory/consolidation_requests.py)，證據與限制見 [T11](../../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)及[驗證對照 V15](../../plans/2026-09-29-target-rebuild/evidence/t17-v01-v28-closure.md)。
+背景整理失敗後，現行程式會等待正式訪談進度增加，再允許一次新批次：正式序號比失敗時前進 6（一般為三輪完成的訪談）才解除阻塞，再失敗便重新阻塞；舊失敗紀錄若未存當時前緣，不會自動解除。等待三輪是否適合作為產品政策仍未定案，也未在真模型長旅程中觸發驗證。
 
-### 追到實作與證據
+### 延伸閱讀
 
-[Memory 保存設計](../../implementation/memory-storage.md)、[工具設計](../../implementation/memory-tools.md)、[正文編輯](../../implementation/memory-body-editing.md)；代表程式為 [candidate_lifecycle.py](../../../apps/api/src/caliburn/features/work_memory/candidate_lifecycle.py)、[changes.py](../../../apps/api/src/caliburn/features/work_memory/changes.py)、[memory_batch.py](../../../apps/api/src/caliburn/workflows/memory_batch.py)。底層快照與真背景批次分別見 [T04](../../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)及 [T11](../../plans/2026-09-29-target-rebuild/evidence/t11-memory-batch.md)。
+[Memory 保存設計](../../implementation/memory-storage.md)、[工具設計](../../implementation/memory-tools.md)與[正文編輯](../../implementation/memory-body-editing.md)說明資料及編輯方式。相關程式包括 [candidate_lifecycle.py](../../../apps/api/src/caliburn/features/work_memory/candidate_lifecycle.py)、[changes.py](../../../apps/api/src/caliburn/features/work_memory/changes.py)、[memory_batch.py](../../../apps/api/src/caliburn/workflows/memory_batch.py)及 [consolidation_requests.py](../../../apps/api/src/caliburn/features/work_memory/consolidation_requests.py)。快照、背景批次及失敗後重新整理的實驗範圍見[快照測試紀錄](../../history.md#source-8181e62e2e98ac941ed9)、[背景整理測試紀錄](../../history.md#source-14d692c99a98b4e9954e)與[驗證對照](../../history.md#source-d58692bbe6b4baa7267f)。

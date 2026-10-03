@@ -1,6 +1,6 @@
 # JD P01：Python、原生編輯與 PostgreSQL 保存的有限驗證
 
-JD-R002/C03；查閱／執行日 2026-09-09。承接[接線設計 §10](../../specs/2026-09-09-jd-editor-app-integration-design.md#10-有限驗證與施工交接出口)，只驗候選 B 的固定本機保存接點。**第二輪六組固定情境通過，保存接點得到有限正證；不代表完整 P、S4 或 S5 通過。**框架、審閱政策與 production authority 尚未採用。[重現與授權](jd-save-probe/README.md)
+JD-R002/C03；查閱／執行日 2026-09-09。承接[接線設計 §10](../../archive/legacy-specs/2026-09-09-jd-editor-app-integration-design.md#10-有限驗證與施工交接出口)，只驗候選 B 的固定本機保存接點。**第二輪六組固定情境通過，保存接點得到有限正證；不代表完整 P、S4 或 S5 通過。**框架、審閱政策與 production authority 尚未採用。[重現與授權](jd-save-probe/README.md)
 
 ## 1. 要回答的問題
 

@@ -1,6 +1,6 @@
 # 按研究能力找 Caliburn 的歷史證據
 
-本頁依[系所／教授公開資料的整理判準](../admissions/research-readiness.md)，補找能呈現問題分析、研究、實驗、工程推理與修正的材料。**是素材索引，不是已選定的備審故事，也不是申請者個人能力的認證。**時間線仍見[演進入口](README.md)，原始結論仍由各來源持有。
+本頁依[系所／教授公開資料的整理判準](../../history.md#source-518e00bdc0f3f08d2efa)，補找能呈現問題分析、研究、實驗、工程推理與修正的材料。**是素材索引，不是已選定的備審故事，也不是申請者個人能力的認證。**時間線仍見[演進入口](README.md)，原始結論仍由各來源持有。
 
 盤點基準：2026-10-02，`target-rebuild@edba0685` 與可達 Git 歷史。本輪只讀證據、整理引用，沒有重新執行實驗。下列「結果」均指原紀錄；不同時期的模型、環境、資料與產品要求不能直接合併比較。
 
@@ -31,7 +31,7 @@
 ### 4. 先發現評分程式錯誤，而不是把失敗都算給模型（7/18）
 
 - **材料經過：**當時18個 trial、27次推論的未完成批次，記錄9個提交、8個輸出／本地schema無效、1個路由污染；另查到線上評分與離線重評傳入的失敗原因不一致。批次標為 `harness_invalid`，沒有正式 precision／recall／pass³ 結論，先停止付費呼叫。
-- **去哪裡查：**[true-live 診斷 §23](../../plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md#23-2026-07-18-true-live-診斷證據)；修正提交 `bc24a25c` 的 `apps/api/tests/test_interview_vnext_turn_eval_runner.py`，`test_grading_golden_paths_are_online_offline_byte_equal` 與 `test_tampered_bundle_fails_integrity_or_grader_drift`。
+- **去哪裡查：**[true-live 診斷 §23](../../history.md#source-adde91251a1a00660e92)；修正提交 `bc24a25c` 的 `apps/api/tests/test_interview_vnext_turn_eval_runner.py`，`test_grading_golden_paths_are_online_offline_byte_equal` 與 `test_tampered_bundle_fails_integrity_or_grader_drift`。
 - **可說／不可說：**可展示量測系統也要驗證、三種結果路徑比對、重評不改原件及竄改偵測。這裡核對了當時報告與測試程式，沒有重跑；不能把整批失敗當模型失敗率，也不能沿用當時嚴格路由政策當現在產品需求。
 
 ### 5. 把資訊刪減與表示方式拆開，避免把答案塞給模型（7/26–27）
@@ -43,7 +43,7 @@
 ### 6. 校準答案也會錯；校準通過也不代表正式評分可靠（7/27）
 
 - **材料經過：**只要求澄清、沒有提出 Task 的候選，原 gold 把來源支持設為 `pass`，後改成無可評 claim 的 `unknown`。後續 R1a 正反序評分完整，仍將違反凍結整併期望的三個方案全部判為通過。
-- **去哪裡查：**[實作紀錄「Grader calibration 修訂紀錄」](../../plans/2026-07-27-r1-task-discovery-implementation-plan.md#grader-calibration-修訂紀錄)；[TI-R1-04 原案例與 expected](../../experiments/2026-07-27-r1-task-discovery/cases/TI-R1-04.json)；[R1a結果 §2–3](../../experiments/2026-07-27-r1-task-discovery/r1a-results.md#2-model-grader-結果不能直接當結論)。Git `bf52f713:apps/api/evals/professional_consultant_r1/live_batch.py` 的 `CALIBRATION_GOLD` 只校準兩個維度，可檢查它沒有涵蓋所有正式判準。
+- **去哪裡查：**[實作紀錄「Grader calibration 修訂紀錄」](../../history.md#source-7661202d166acae889f4)；[TI-R1-04 原案例與 expected](../../experiments/2026-07-27-r1-task-discovery/cases/TI-R1-04.json)；[R1a結果 §2–3](../../experiments/2026-07-27-r1-task-discovery/r1a-results.md#2-model-grader-結果不能直接當結論)。Git `bf52f713:apps/api/evals/professional_consultant_r1/live_batch.py` 的 `CALIBRATION_GOLD` 只校準兩個維度，可檢查它沒有涵蓋所有正式判準。
 - **可說／不可說：**深化原 R1a 節點，呈現 gold 審查、評分覆蓋範圍與假通過。正式漏判是原紀錄由 Codex 依凍結期望複核，不是人類SME驗收；缺少原 capture 時也不能冒稱本次重新確認每個模型輸出。
 
 ## 早期資料與程式診斷
@@ -57,13 +57,13 @@
 ### 8. 修掉重複 key 後，仍須解決「位置不是物件身分」（6/21–22）
 
 - **材料經過：**多職類任務撞號造成重複 React key，先修分組與編號；之後拖曳仍有目標定位、重排不更新等問題。再用隨項目移動並保存的 `_uid`／`_tid` 定位，而非 `task:0:1` 這類位置，分開物件身分與目前索引。
-- **去哪裡查：**[D27 e2e bug log第2、4、5項](../../archive/jobintel-v3/specs/2026-06-16-refactor-decision-log.md)；提交 `e9c97dc3` → `4a4ece94`，後者 `frontend/src/components/interview/v3/JobDocTable.tsx` 的 sortable IDs／`resolve`，以及 `frontend/src/lib/ocsDoc.ts` 的 `ensureIds`。
+- **去哪裡查：**[D27 e2e bug log第2、4、5項](../../history.md#source-82781f19e3677da73e3b)；提交 `e9c97dc3` → `4a4ece94`，後者 `frontend/src/components/interview/v3/JobDocTable.tsx` 的 sortable IDs／`resolve`，以及 `frontend/src/lib/ocsDoc.ts` 的 `ensureIds`。
 - **可說／不可說：**可展示為何局部修補沒有處理完資料身分、UI狀態與保存的關係。當時日誌寫使用者確認正確，但只有文字紀錄與改動可查，沒有本次瀏覽器重驗；日誌標6/21、提交日期6/22，兩者分開保留。
 
 ### 9. 測試通過，真實資料卻仍掉值（6/23）
 
 - **材料經過：**D29先記indexer與後端測試通過，使用者對照原始JSON才發現：`job_categories` 本是多組代碼／名稱，normalizer漏名稱，後續投影又與另一個單值職類名稱欄混淆。修正跨 normalizer、payload、service及schema，已遺失的存量資料須重新匯入，不能只修UI。
-- **去哪裡查：**[D29 I1／V1及「使用者比對原始 JSON 抓到」修正段](../../archive/jobintel-v3/specs/2026-06-16-refactor-decision-log.md)；Git `cb175732:tests/test_service_profile.py` 的 `test_get_profile_projects_metadata`、`test_get_profile_tolerates_missing_codes`，及同提交 `tests/test_builder_profile.py`。原反例含職類名稱空值與多組分類。
+- **去哪裡查：**[D29 I1／V1及「使用者比對原始 JSON 抓到」修正段](../../history.md#source-82781f19e3677da73e3b)；Git `cb175732:tests/test_service_profile.py` 的 `test_get_profile_projects_metadata`、`test_get_profile_tolerates_missing_codes`，及同提交 `tests/test_builder_profile.py`。原反例含職類名稱空值與多組分類。
 - **可說／不可說：**可呈現跨層資料追蹤、基數與名稱語意、真實資料校驗和測試盲點；前面的50／141測試通過數字是**修正前**紀錄，不是修正後驗收。此處核對報告及回歸程式，尚不宣稱當時重新匯入完成或本次重新測試。
 
 ## 後續取材方式

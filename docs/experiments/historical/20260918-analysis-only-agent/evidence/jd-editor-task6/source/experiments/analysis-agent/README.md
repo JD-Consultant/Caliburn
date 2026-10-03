@@ -489,7 +489,7 @@ clients and inject process-loss boundaries; they are not an OS power-loss test.
 
 Sources: [APScheduler user guide](https://apscheduler.readthedocs.io/en/3.x/userguide.html),
 [executor](https://apscheduler.readthedocs.io/en/3.x/modules/executors/pool.html),
-[approved local policy](S:/caliburn/docs/specs/2026-09-06-memory-consolidation-request-wiring-design.md).
+[approved local policy](../../../../../../../../history.md#source-a0342f4a411edbc0a506).
 
 ## Application wiring Task4a — consolidation request receipt
 
@@ -537,7 +537,7 @@ block the API: that requires the next service integration test.
 Evidence and remaining gates:
 [Task4a plan](../../../../../../../../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/evidence/jd-editor-task6/source/docs/plans/2026-09-06-memory-consolidation-notification-slice.md),
 [Task4a results](../../../../../../../../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/evidence/jd-editor-task6/source/docs/specs/2026-09-06-memory-consolidation-notification-results.md),
-[approved notification policy](S:/caliburn/docs/specs/2026-09-06-memory-consolidation-request-wiring-design.md).
+[approved notification policy](../../../../../../../../history.md#source-a0342f4a411edbc0a506).
 
 ## Summary re-extraction — Q019-MEM-SUMMARY-01
 
@@ -583,7 +583,7 @@ user-visible thread, source copy or case record.
 
 Sources, tests and scope: [slice results](../../../../../../../../archive/worktree-snapshots/20260918-analysis-only-agent/docs/specs/evidence/jd-editor-task6/source/docs/specs/2026-09-06-summary-reextraction-results.md).
 OpenAI producer/consumer evidence is in the
-[main source review](S:/caliburn/docs/specs/2026-09-06-openai-rollout-summary-correction-source-review.md).
+[main source review](../../../../../../../../research/agent-systems/2026-09-06-openai-rollout-summary-correction-source-review.md).
 This implementation maps the approved concepts onto our frameworks; immutable
 versions, technical job IDs and SQL publication are not claims about identical
 OpenAI internals.
@@ -637,7 +637,7 @@ Docker automatic restart remains an unresolved host issue; do not treat DB tests
 as proof of that fix. At the Task 1 save point, Task 2 / API / scheduler / UI had
 not started. The following section describes the subsequent verified Task 2.
 Full evidence, framework links
-and review findings: [Task 1 results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-conversation-lifecycle-results.md).
+and review findings: [Task 1 results](../../../../../../../../history.md#source-e38cc16f8096e1431b80).
 
 ## Application wiring Task 2 — Checkpoint A passed
 
@@ -830,7 +830,7 @@ database durability test. The code is not connected to the existing application.
   reopen. Model HTTP synthetic, no API spend. B/C generation/concurrency still
   needs the next slice; prepared artifacts aren't a publication authority.
 
-[Memory read results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-memory-read-path-results.md)
+[Memory read results](../../../../../../../../history.md#source-e42ce8166ff5fd059e4a)
 records source links, scoped test cleanup, custom seams and remaining gates.
 
 ## Memory publication slice (2026-09-06)
@@ -861,7 +861,7 @@ Reconciliation-query disconnects preserve the same uncertain-result contract;
 they do not imply a previous attempt failed. The B/C model workflows and
 automatic read-view refresh are still not built.
 
-[Publication results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-memory-publication-results.md)
+[Publication results](../../../../../../../../history.md#source-d5a177b59d3886bc882f)
 contains references, custom seams, test limitations, and the next gate.
 
 ## Interview extraction slice (2026-09-06)
@@ -934,7 +934,7 @@ Real PG tests reopen all connections after injected pre-write/partial-write
 failures. Full suite: **71 passed / zero skipped**, synthetic HTTP, zero paid calls.
 This proves wiring/recovery, not semantic extraction quality.
 
-[Extraction results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-extraction-results.md)
+[Extraction results](../../../../../../../../history.md#source-60d4b94119cd0ac118ef)
 records framework sources, review findings, repairs and the remaining B2/C gates.
 
 ## Design / evidence
@@ -1008,7 +1008,7 @@ No old-job migration, forced replay or rebase is introduced.
 Full suite: **96 passed / 0 skipped**, including actual PG client/Saver/Store
 reopen after tool failure, before artifact save and after lost commit reply.
 Synthetic responses prove wiring/recovery, not real consolidation quality.
-[Consolidation results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-consolidation-results.md)
+[Consolidation results](../../../../../../../../history.md#source-53809af25cf24299c8fc)
 records the review, official sources, limits and next C/A gate.
 
 ### Live repair / primary-agent refresh slice (2026-09-06)
@@ -1053,15 +1053,15 @@ Full suite: **120 passed / 0 skipped**, including four real PG reopen cases.
 Independent review found no Critical/Important blockers for this isolated
 savepoint (reviewer reran live20 tests, not the entire PG suite).
 Verification and boundaries:
-[Live repair results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-live-memory-results.md).
+[Live repair results](../../../../../../../../history.md#source-d35d0f7eca5627081212).
 
 ### Earlier design and provider evidence
 
 Current design lives in the main checkout (not this branch's historical register):
-[Q019](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-design.md),
-[first slice plan](S:/caliburn/docs/plans/2026-09-06-analysis-only-agent-native-continuity-slice.md),
-[second slice plan](S:/caliburn/docs/plans/2026-09-06-analysis-only-agent-durable-conversation-slice.md).
-[Results and Docker recovery record](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-durable-conversation-results.md).
+[Q019](../../../../../../../../history.md#source-a3f4d129a9151c6d2db9),
+[first slice plan](../../../../../../../../history.md#source-613298a84dc6b05c67b5),
+[second slice plan](../../../../../../../../history.md#source-ceec3fb7b255e05052e4).
+[Results and Docker recovery record](../../../../../../../../history.md#source-cc0dd2aad1cc075a9924).
 The branch keeps an execution copy in `docs/plans` for review/reproduction.
 
 - [Native reasoning / preserve all output items](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-across-calls)

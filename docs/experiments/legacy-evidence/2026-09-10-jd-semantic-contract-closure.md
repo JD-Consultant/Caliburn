@@ -3,12 +3,12 @@
 - 日期：2026-09-10；Topic：JD-R001/C06、JD-R002/C01／C03；階段：G4及有限G5，未接production。
 - 有效前提：Owner同意完整格式、Task底下成果及要求平行分組，以及Plate原生內容＋同PG完整JSONB版本。資料候選A的取捨與限制沿[保存研究§4–7](2026-09-10-jd-semantic-relations-storage-audit.md)。名稱暫沿「工作執行要求」，文案微調不影響結構。
 - 唯一問題：把已同意的格式與共享關係變成能生成、編輯、驗證、保存的明確契約，避免靠標題文字猜結構或讓模型配ID。
-- 官方依據：既有[profile來源](../../specs/2026-09-10-jd-plate-document-profile.md#8-來源與核對日期)、[工具責任與證據](../../specs/2026-09-10-jd-responsibility-and-evidence-audit.md)；本次再讀Plate普通element插件與Slate normalization，並重用固定版本原生環境驗證。
+- 官方依據：既有[profile來源](../../archive/legacy-specs/2026-09-10-jd-plate-document-profile.md#8-來源與核對日期)、[工具責任與證據](../../specs/2026-09-10-jd-responsibility-and-evidence-audit.md)；本次再讀Plate普通element插件與Slate normalization，並重用固定版本原生環境驗證。
 - 排除：重選編輯器、通用關係／import／rebase引擎、Memory／來源owner變更、多人／離線副本、DB建表、付費模型、真人交付。ADR0073仍Proposed。
 
 ## 1. 決定與版本效力
 
-**D（本案設計）：**唯一active設計schema改為[汲取v1後的v2](../../specs/contracts/jd-editor-v2.schema.json)，`format_version:2`、`engine_profile:jd-plate-clean-v2`。v1 schema及既有封存固定不改；它們是舊grammar的證據，不能拿來生成新契約。這是尚未接production的設計升版，不是舊資料migration、相容讀取或雙寫。固定原生套件版本不變；語意grammar改變本身就須明示profile版本。
+**D（本案設計）：**唯一active設計schema改為[汲取v1後的v2](../../archive/legacy-specs/contracts/jd-editor-v2.schema.json)，`format_version:2`、`engine_profile:jd-plate-clean-v2`。v1 schema及既有封存固定不改；它們是舊grammar的證據，不能拿來生成新契約。這是尚未接production的設計升版，不是舊資料migration、相容讀取或雙寫。固定原生套件版本不變；語意grammar改變本身就須明示profile版本。
 
 成果／要求及K／S是普通可編輯block，沿Plate `node.isElement:true`；不設void／isContainer、不加入工作內容normalizer。普通文字、清單、表格、selection、ID、history仍由原生插件處理。本案只約束語意容器及引用完整性。[Plate現行插件文件](https://platejs.org/docs/plugin)支持自訂element接點；[Slate normalization](https://docs.slatejs.org/concepts/11-normalizing)說明原生正規化可能改變結構，不能當無副作用驗證器。兩頁查閱2026-09-10；採用版本／免費授權沿profile固定lock，不由滾動網頁推測新版相容性。
 

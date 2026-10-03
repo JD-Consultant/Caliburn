@@ -1,6 +1,6 @@
 # 程式撰寫規範：可讀、明確、可測的實作
 
-- 狀態：**新目標施工規範**；2026-09-29，依 Owner 補充要求建立。適用新程式、測試、腳本及本次改動範圍，不要求全庫格式重寫。
+- 狀態：**現行程式撰寫規範**。適用新程式、測試、腳本與受影響的修改範圍，不要求無關程式全面改寫。
 - 責任：[程式組織](code-organization.md)管模組、依賴方向及共用命名；本頁管函式／實例／Service 的寫法、資源與錯誤處理、範例及審查。產品規則仍由[架構入口](../target-architecture-map.md)路由，不以風格重訂業務契約。
 - 原則：**讓下一位開發者容易判斷輸入、效果、依賴與失敗；不是讓程式看起來抽象、短或用了最多設計模式。**範例只說明寫法，不能取代正式 API／工具 schema 或視為產品已完成。
 
@@ -35,7 +35,7 @@
 
 一個函式維持一個可描述的效果與清楚抽象層次。先處理不合法前置條件，再保留可順讀的正常路徑；不強迫每函式最多若干行／參數，也不為行數把一次交易拆到找不到提交處。簡單 comprehension 可以，多層巢狀、三元式及帶副作用的 comprehension 改成普通迴圈。不要使用可變預設值、隱藏 I/O 的 property、萬用 `**kwargs` 傳整包環境。
 
-例如，以下是**區間型別／前置條件寫法示意**；來源資格與越界判斷仍須資料 owner 驗證，不靠這個型別保證：
+例如，以下是**區間型別／前置條件寫法示意**；來源資格與越界判斷仍須訪談領域模組驗證，不靠這個型別保證：
 
 ```python
 from dataclasses import dataclass
@@ -69,7 +69,7 @@ Service 是**應用用例責任**，不等於必須叫 `SomethingService` 的 cl
 |---|---|---|
 | 純規則、投影、少量無狀態用例 | module-level 具名函式＋明確參數 | 只有 `staticmethod` 的工具 class |
 | 多個操作共用有生命週期的依賴 | 小型實例，建構子明列依賴 | 方法內臨時 new client／engine、全域 service locator |
-| 值與結果 | dataclass／union；必要不變量由資料 owner 維護 | 動態屬性袋、繼承 transport DTO 的領域模型 |
+| 值與結果 | dataclass／union；必要不變量由相應領域模組維護 | 動態屬性袋、繼承 transport DTO 的領域模型 |
 | 外部 I/O 的測試／替換接縫 | 消費者所需的窄 Protocol／callable | 每個 class 都配 interface、AbstractBase／Factory／Impl 三件套 |
 | 跨 feature 的一次業務動作 | workflow 協調公開 service／query | Router／Agent 直碰多個模組的 SQL，或複製 validator |
 
@@ -101,10 +101,10 @@ async def rename_job_file(
 - 輸入不合法用明確驗證／typed error；領域不 raise HTTPException。Transport 再映射 HTTP／模型可見錯誤，不在領域混入 UI 文案。`assert` 用測試／內部開發檢查，不作資料安全／權限檢查。
 - 只 catch 能處理的錯誤，縮小 try 範圍；轉譯例外用 `raise ... from error` 保留原因。最外層隔離可以 catch `Exception`，但須記失敗並清理，不能吞成空清單或 success。錯誤訊息與一般 log 都不得洩露敏感 payload。
 - 回傳 union 適合正常可預期分支；exception 適合異常中斷。每個邊界只選清楚的一種契約，不同一個失敗有時回 `None`、有時 dict、有時 throw。不自行創建全產品 `Result<T>`／錯誤框架。
-- 用 `with`／`async with`、`try/finally` 表達資源釋放；借入的依賴由 owner 關閉，不能隨手 close 共用 client。每個並行工作獨立 session，不跨 coroutine 共用 mutable transaction。
+- 用 `with`／`async with`、`try/finally` 表達資源釋放；借入的依賴由建立並管理其生命週期的模組關閉，不能隨手 close 共用 client。每個並行工作獨立 session，不跨 coroutine 共用 mutable transaction。
 - async 路徑不呼叫 blocking sleep／同步網路；有耗時同步工作則使用已選框架的受控機制。並行要有數量界線且語意獨立；不能為「較新寫法」將已要求順序執行的工具改成 `gather`。
 - 任務需有人等待或持有、觀察失敗並於關閉時收尾；不能裸 `create_task`。`TaskGroup` 適用同一作用域內的並行工作，不等於持久背景工作的恢復機制。
-- `CancelledError` 清理後通常重新拋出；不把程序取消視為產品 Turn 已取消／已回滾。取消、重試、原結果對帳遵循執行 owner，不在 SDK、service、工具各套一層 retry。
+- `CancelledError` 清理後通常重新拋出；不把程序取消視為產品 Turn 已取消／已回滾。取消、重試、原結果對帳遵循執行資格與恢復機制，不在 SDK、service、工具各套一層 retry。
 - DB 交易短且明確，模型／網路等待不持有業務交易。SQL 參數化、識別符用驅動安全機制；程式先查存在不替代 DB constraint／競爭處理。具體提交／恢復沿[資料接線](data-and-contracts.md)，不另造 UnitOfWork 引擎。
 
 ## 6. TypeScript／React 的可讀寫法
@@ -153,7 +153,7 @@ Docstring／註解解釋非顯然的範圍、單位、效果、失敗與原因�
 |---|---|---|
 | Python 格式／基本正確性／命名 | Ruff formatter＋E／F／I／UP／B／ASYNC；補 N、A、RUF006、RUF100 | 名稱是否符合業務、某 task 是否耐久 |
 | Python 型別 | mypy strict；公開邊界及可疑動態值審查 | runtime payload 一定合法 |
-| TS／React | TypeScript strict；ESLint recommended type-checked、Hooks、Promise、型別 import、switch 分支覆蓋；Prettier | 後端已提交、UI 旅程可用 |
+| TS／React | TypeScript strict；ESLint recommended type-checked、Hooks、Promise、型別 import、switch 分支覆蓋、已棄用 API（`no-deprecated`）；Prettier | 後端已提交、UI 旅程可用 |
 | 靜態分層 | 既有 import／AST 邊界檢查 | 任意動態呼叫也安全，或所有責任切分合理 |
 | 用例正確性 | 相應單元／整合／產品反例 | 程式易讀與無過度設計 |
 | 審查 | 本頁責任、名稱、副作用、錯誤／恢復與抽象判準 | 不以個人喜好取代契約／實測 |
@@ -162,6 +162,8 @@ Docstring／註解解釋非顯然的範圍、單位、效果、失敗與原因�
 
 格式交工具，不手排齊空白；不開啟所有 lint 規則，也不新增第二套 formatter。生成物只在來源／生成器修，不為 lint 手改它。例外用最窄的 suppression，列原因及 rule code；禁止全檔 `type: ignore`／大範圍停用 lint 掩蓋缺陷。`RUF100` 用於清理已不需要的 noqa，不保證所有人工理由合理。
 
-依據：[Ruff rules](https://docs.astral.sh/ruff/rules/)、[RUF006](https://docs.astral.sh/ruff/rules/asyncio-dangling-task/)、[typed linting](https://typescript-eslint.io/getting-started/typed-linting/)、[no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises/)、[switch exhaustiveness](https://typescript-eslint.io/rules/switch-exhaustiveness-check/)。這是目前工具鏈的有界增補，非要求換框架。
+依據：[Ruff rules](https://docs.astral.sh/ruff/rules/)、[RUF006](https://docs.astral.sh/ruff/rules/asyncio-dangling-task/)、[typed linting](https://typescript-eslint.io/getting-started/typed-linting/)、[no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises/)、[switch exhaustiveness](https://typescript-eslint.io/rules/switch-exhaustiveness-check/)、[no-deprecated](https://typescript-eslint.io/rules/no-deprecated/)。這是目前工具鏈的有界增補，非要求換框架。
+
+`no-deprecated` 用於 `apps/web`，補足 TypeScript 不會對 `@deprecated` 報錯的檢查。使用方式與其餘型別 lint 規則相同；驗證見[規範稽核](../history.md#source-a75c36d876a672e0f607)。
 
 規則改動時，先有可重現的維護／錯誤案例及官方根據，再改本頁、設定與必要回歸。規範能演進，但不能只為讓某個 patch 過關而關掉檢查；也不因此重啟整個專案的架構討論。

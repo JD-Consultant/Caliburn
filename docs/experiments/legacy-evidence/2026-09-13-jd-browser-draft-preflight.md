@@ -2,7 +2,7 @@
 
 查閱：2026-09-13。狀態：採用方向；本文件不代表真瀏覽器、斷電或真人驗收已通過。
 
-責任路由：[自動保存](../../specs/2026-09-12-jd-autosave-and-handoff-design.md)、[歷史與恢復](../../specs/2026-09-12-jd-history-and-recovery-design.md)、[受管理設定](../../specs/2026-09-13-jd-managed-configuration-slice.md)。原請求／結果沿 [Manual HTTP schema](../../../experiments/jd-relational-app/contracts/jd-manual-http.schema.json) 與 [結果 schema](../../../experiments/jd-relational-app/contracts/jd-result.schema.json)，瀏覽器不得另定一份業務命令格式。
+責任路由：[自動保存](../../specs/2026-09-12-jd-autosave-and-handoff-design.md)、[歷史與恢復](../../specs/2026-09-12-jd-history-and-recovery-design.md)、[受管理設定](../../archive/legacy-specs/2026-09-13-jd-managed-configuration-slice.md)。原請求／結果沿 [Manual HTTP schema](../../../experiments/jd-relational-app/contracts/jd-manual-http.schema.json) 與 [結果 schema](../../../experiments/jd-relational-app/contracts/jd-result.schema.json)，瀏覽器不得另定一份業務命令格式。
 
 ## 1. 決定及適用界線
 

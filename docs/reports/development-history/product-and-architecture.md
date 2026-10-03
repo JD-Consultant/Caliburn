@@ -8,7 +8,7 @@
 
 最早可查提交不是 AI 顧問，而是 `jd-pdf-to-json`：把 OCS／iCAP 的版本、職務概況、工作內容、態度與補充事項轉為結構化 JSON，服務後續交換、檢索與分析。當時已要求代碼與名稱並存、不要把多筆資料串成一個字串。
 
-**引用：**[初始 README 原文](../../archive/early-projects/2026-03-19-pdf-to-json-readme.md) §1–§7；[來源提交](../../archive/early-projects/README.md)。這是元件前身的資料設計，不是 Caliburn 整體產品已完成。
+**引用：**[初始 README 原文](../../history.md#source-addd700822c7b7269a0a) §1–§7；[來源提交](../../history.md#source-662ea57dd88fb5eb0879)。這是元件前身的資料設計，不是 Caliburn 整體產品已完成。
 
 ### 2026-03-27 至 05-15：真實 PDF 版型使解析假設失效
 
@@ -16,7 +16,7 @@
 
 資料模型也在 5/11 改為 **P-centric competency blocks**，同步修改 model、parser、validator、README 與 tests。因此這段不只有 bugfix，也包含「資料應以什麼單位表示」的重設計。
 
-**引用：**[早期修改與精確 Git 出處](../../archive/early-projects/README.md#更早期程式修改線索)。目前能核對提交差異與部分測試程式；本次沒有重跑當時環境，不能聲稱所有歷史 PDF 已通過。
+**引用：**[早期修改與精確 Git 出處](../../history.md#source-662ea57dd88fb5eb0879)。目前能核對提交差異與部分測試程式；本次沒有重跑當時環境，不能聲稱所有歷史 PDF 已通過。
 
 ### 2026-05-20：JobIntel 用固定階段訪談形成 JD
 
@@ -24,7 +24,7 @@
 
 當時文件保留了幾個已修正問題：用戶訊息達三則就前進、靠 AI 特定字串判定 STAR 結束、中文短答長度門檻過高、AI／user phase 過濾不一致造成重問、任務完成後錯誤重跑。也留下關鍵字 readiness 仍可能被亂答拉高的未決問題。
 
-**引用：**[原架構與保存方式](../../archive/early-projects/2026-05-20-jobintel-architecture.md)、[原狀態機及 Review 結論](../../archive/early-projects/2026-05-20-jobintel-graph-pipeline.md)。原文的「已解決」是當時自述，不是本次測試。早期的補答／推斷機制亦不能當成現行允許猜測員工事實的規範。
+**引用：**[原架構與保存方式](../../history.md#source-403e401b5f084bb191fc)、[原狀態機及 Review 結論](../../history.md#source-f6099bd5a1a81730042d)。原文的「已解決」是當時自述，不是本次測試。早期的補答／推斷機制亦不能當成現行允許猜測員工事實的規範。
 
 ### 2026-06-14 至 06-16：從檢索生成改為知識選單與顧問深問分工
 
@@ -32,13 +32,13 @@
 
 控制流則研究以單一 LangGraph、`interrupt/resume` 與深問子圖取代中文關鍵字路由。這是當時選擇，不代表後來一直沿用同一圖。
 
-**引用：**[6/14 流程與讀取分工](../../archive/jobintel-v3/specs/2026-06-14-jd-authoring-flow.md)、[6/16 決策日誌 D2–D9](../../archive/jobintel-v3/specs/2026-06-16-refactor-decision-log.md)、[當時架構](../../archive/jobintel-v3/specs/2026-06-16-jobintel-ai-v3-architecture.md)。檢索本身的問題另見[檢索沿革](retrieval.md)。
+**引用：**[6/14 流程與讀取分工](../../history.md#source-63e4ec03038b45bbe58e)、[6/16 決策日誌 D2–D9](../../history.md#source-82781f19e3677da73e3b)、[當時架構](../../history.md#source-8cc9cf901673fee8ca39)。檢索本身的問題另見[檢索沿革](retrieval.md)。
 
 ### 2026-06-18：保存設計曾由關聯表改向整份 JSONB
 
 6/16 原先選「業務表＋工作態、write-through」，兩天後因實際任務／KSA 尚無獨立查詢需求，改成文件導向 MVP：工作態交 checkpointer，成果保存為有版本 JSONB。設計明記不能用 SQL 方便地查或改各任務，將來需要再正規化。
 
-**引用：**[文件導向重設計](../../archive/jobintel-v3/specs/2026-06-18-db-document-centric-design.md) §1、§5–§6；[D25 及接續紀錄](../../archive/jobintel-v3/specs/2026-06-16-refactor-decision-log.md)。這可與 9 月 relational JD 的實際管理需求對照，不能寫成「JSONB 一定差，關聯式一定好」。
+**引用：**[文件導向重設計](../../history.md#source-f53b67947a8f19e331c2) §1、§5–§6；[D25 及接續紀錄](../../history.md#source-82781f19e3677da73e3b)。這可與 9 月 relational JD 的實際管理需求對照，不能寫成「JSONB 一定差，關聯式一定好」。
 
 ### 2026-06-27 至 06-28：三專案整合，同時釐清共用契約與依賴
 
@@ -46,7 +46,7 @@ PDF parser、indexer、JobIntel 原本分開。整合研究辨認出跨服務資
 
 研究不只提出「拆檔」：parser 文件指出當時只有 11 個測試，宣稱的真實 PDF fixtures 並不存在，先補 characterization／golden 安全網再移動邏輯。Git 有 6/27 subtree 匯入及 6/28 section extractor 拆分；計畫中的 `Expected` 結果仍不能當成已執行 log。
 
-**引用：**[6/27 架構研究](../../specs/2026-06-27-system-architecture-design.md)、[parser 問題、研究與取捨](../../research/retrieval/2026-06-28-pdf-to-json-transformer-decomposition-research.md)、[拆分計畫](../../plans/2026-06-28-phase3b-transformer-decomposition.md)。Git 線索：`91c52237`／`bae48a95`／`01168af7` 匯入三元件，`67041179` 拆 API／Web；`08c2a670`／`13678f13`／`0bfc468d` 拆解析區段。
+**引用：**[6/27 架構研究](../../history.md#source-f661c579036f7cefc3f9)、[parser 問題、研究與取捨](../../research/retrieval/2026-06-28-pdf-to-json-transformer-decomposition-research.md)、[拆分計畫](../../history.md#source-32361077a5b7fd679700)。Git 線索：`91c52237`／`bae48a95`／`01168af7` 匯入三元件，`67041179` 拆 API／Web；`08c2a670`／`13678f13`／`0bfc468d` 拆解析區段。
 
 ## 訪談能跑，不代表會分析工作
 
@@ -56,7 +56,7 @@ PDF parser、indexer、JobIntel 原本分開。整合研究辨認出跨服務資
 
 同一研究文件內又先後提出「顧問＋書記」及統一 agentic 顧問，後續才收斂到 ADR0027。文中的五個對抗案例測到 strict tool 的選項限制，**沒有證明訪談品質已改善**。
 
-**引用：**[診斷、研究及方案翻修](../../specs/2026-07-06-consultant-not-formfiller-redesign-research.md) §1、§3、§7；[當時 v2 決策](../../adr/0027-interview-engine-v2-consultant-agent.md)。
+**引用：**[診斷、研究及方案翻修](../../research/work-analysis/2026-07-06-consultant-not-formfiller-redesign-research.md) §1、§3、§7；[當時 v2 決策](../../adr/0027-interview-engine-v2-consultant-agent.md)。
 
 ### 2026-07-09：修好開場後，再出現零任務與態度轟炸
 
@@ -64,7 +64,7 @@ PDF parser、indexer、JobIntel 原本分開。整合研究辨認出跨服務資
 
 接著研究任務裁剪、既有 UI 選單與彈性流程，並把態度改為整體故事佐證。先前修好一個斷點，後續試訪才露出下一個，不應被壓成「一次設計就解決」。
 
-**引用：**[試訪證據與因果診斷](../../specs/2026-07-09-interview-flow-task-curation-and-flexibility-research.md) §1–§3；[ADR0028](../../adr/0028-interview-flow-shared-ui-curation.md)。目前主要入口是當時診斷文件，不假稱本次已取得原 DB 全部逐字稿。
+**引用：**[試訪證據與因果診斷](../../research/work-analysis/2026-07-09-interview-flow-task-curation-and-flexibility-research.md) §1–§3；[ADR0028](../../adr/0028-interview-flow-shared-ui-curation.md)。目前主要入口是當時診斷文件，不假稱本次已取得原 DB 全部逐字稿。
 
 ### 2026-07-14：長聊不產出，不只是模型能力不足
 
@@ -72,7 +72,7 @@ PDF parser、indexer、JobIntel 原本分開。整合研究辨認出跨服務資
 
 研究轉向事件議程、全寬接收一次回答中的多個訊號，讓固定帳本不再主導所有對話。這段可用來說明：**要檢查模型實際收到什麼，而不是只看 prompt／Skill 檔案寫得好不好。**
 
-**引用：**[事故四項診斷與研究](../../specs/2026-07-14-interview-agenda-architecture-research.md) §1–§2；[事件議程決策](../../adr/0033-episode-agenda-consultant-tools.md)。該議程後來又被 vNext 部分取代，不能說沿用至今。
+**引用：**[事故四項診斷與研究](../../research/work-analysis/2026-07-14-interview-agenda-architecture-research.md) §1–§2；[事件議程決策](../../adr/0033-episode-agenda-consultant-tools.md)。該議程後來又被 vNext 部分取代，不能說沿用至今。
 
 ### 2026-07-16 至 07-20：Evidence workflow 與短答前後文
 
@@ -80,7 +80,7 @@ vNext 明確不再包裝舊 `consultant/scribe/harvest/select`，改以 observat
 
 當時選擇 QuestionFrame 與 literal／contextual support 來保留問題與回答的關係。這是**當時的修訂設計**，不是現在仍要求同名資料結構；與後來歷史訪談前問、原話回讀可一起取材。
 
-**引用：**[vNext 與舊架構差異](../../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md) §1–§2；[短答研究](../../specs/2026-07-20-interview-vnext-professional-job-analysis-and-short-answer-architecture-research.md)；[ADR0037](../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)。
+**引用：**[vNext 與舊架構差異](../../history.md#source-2ec5b8af0b6e160e3656) §1–§2；[短答研究](../../history.md#source-41f73d8f9e737418f7ea)；[ADR0037](../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)。
 
 ### 2026-07-26 至 07-30：用比較與減法收斂，不把複雜當進步
 
@@ -104,19 +104,19 @@ OPKS 研究先把單一支持度等級拆為來源與任務連結兩軸，隨後
 
 當時記錄四個機制目的 probe 與 PostgreSQL Saver／Store 測試，並明說是 **conformance，不是模型品質 eval**。這與後來重建採 direct Responses 的選擇不同，兩者不能合成「一開始就這樣設計」。
 
-**引用：**[產品流程研究](../../specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md)、[ADR0060 脈絡與取代範圍](../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)。
+**引用：**[產品流程研究](../../history.md#source-20bcac8af4c10acef7f5)、[ADR0060 脈絡與取代範圍](../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)。
 
 ### 2026-08-21：巨型工具表單與模型定位錯誤，轉為虛擬工作區
 
 真模型 smoke 先後碰到 integer sentinel、模型自填 UUID、重複 linkage、欄位錯置、quote offsets 不符。當時判斷不該讓模型為大量無關欄位填中性值，或替 App 做字元定位，因此借鑑 coding agent 的編輯方式，以 Deep Agents VFS 與 App 的 Evidence anchor 取代 mega-form。
 
-**引用：**[問題、選型與邊界](../../adr/0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md)、[研究](../../specs/2026-08-21-provider-neutral-virtual-jd-editor-and-evidence-anchor-research.md)、[live smoke](../../specs/2026-08-21-virtual-jd-workspace-live-smoke.md)。這是當時的工具簡化，並非現在要求 JD 一律用檔案工具。
+**引用：**[問題、選型與邊界](../../adr/0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md)、[研究](../../history.md#source-577ba3070035e1f4163c)、[live smoke](../../history.md#source-59f3bfe039c7e9ac5e72)。這是當時的工具簡化，並非現在要求 JD 一律用檔案工具。
 
 ### 2026-08-22 至 08-26：一次性候選，再改為持續且人機共用的工作面
 
 VFS 解決部分編輯問題後，每輪仍從 approved 重建 candidate，未核准工作難以自然接續；因此先改成持久 working draft。接著人工 editor 與 AI workspace 又成為兩份競爭稿，rebase 衝突與 retry-only UI 不符合共同編輯的使用方式，才改成一個「目前 JD」主編輯面。
 
-**引用：**[持久草稿 ADR0066](../../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)、[完成紀錄](../../specs/2026-08-22-persistent-store-backed-jd-working-draft-completion.md)、[共用稿研究](../../specs/2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md)、[ADR0069](../../adr/0069-shared-current-jd-working-copy-and-semantic-approval.md)。當時仍有 approved／semantic approval；後來再被修改，不能當現行 UX。
+**引用：**[持久草稿 ADR0066](../../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)、[完成紀錄](../../history.md#source-55c5ca420e9519d643b6)、[共用稿研究](../../history.md#source-0e00a18bd6a443794e33)、[ADR0069](../../adr/0069-shared-current-jd-working-copy-and-semantic-approval.md)。當時仍有 approved／semantic approval；後來再被修改，不能當現行 UX。
 
 ### 2026-09-09 至 09-12：能編文件，不等於能管理 JD 項目
 
@@ -136,7 +136,7 @@ Plate 候選以完整文件樹、JSONB revisions 與原生編輯承接 JD，曾�
 
 後續留下 Prompt 候選比較、漏引、限流與長旅程中斷等新問題，詳既有近期案例與原始證據。架構文件、程式可跑、有限驗證、正式切換是不同狀態；本次基準下 ADR0079 仍是 Proposed。
 
-**引用：**[分層架構討論](../../specs/2026-09-24-caliburn-layered-architecture-map.md)、[新目標地圖](../../target-architecture-map.md)、[計畫與驗收路由](../../plans/2026-09-29-target-rebuild/README.md)、[近期案例](../research-casebook.md)、[切換草案](../../adr/0079-target-rebuild-production-cutover.md)。
+**引用：**[分層架構討論](../../specs/2026-09-24-caliburn-layered-architecture-map.md)、[新目標地圖](../../target-architecture-map.md)、[計畫與驗收路由](../../history.md#source-ee8cbce8eb3c303d1765)、[近期案例](../research-casebook.md)、[切換草案](../../adr/0079-target-rebuild-production-cutover.md)。
 
 ## 素材怎麼接著使用
 

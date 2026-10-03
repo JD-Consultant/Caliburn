@@ -1,7 +1,7 @@
 # ADR 0027 — 訪談引擎 v2:顧問 agent + 書記 + 確定性覆蓋帳本(四組件)
 
 - **狀態**:Accepted(2026-07-08)。
-- **研究依據**:[`../specs/2026-07-06-consultant-not-formfiller-redesign-research.md`](../specs/2026-07-06-consultant-not-formfiller-redesign-research.md)
+- **研究依據**:[`../specs/2026-07-06-consultant-not-formfiller-redesign-research.md`](../research/work-analysis/2026-07-06-consultant-not-formfiller-redesign-research.md)
   (八輪:§1 診斷、§7–8 架構收斂、§9 核准 UX、§10 三角度驗證、§11 放行標準他山之石、
   §12 實作對權威、§13 反向最終檢驗、§14 帳本門檻 v1)。
 - **關聯**:互動模式=ADR 0020;無狀態回合=ADR 0023(留用);select_schema=ADR 0024(留用);

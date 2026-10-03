@@ -1,0 +1,10 @@
+{
+  "responses_saved": 0,
+  "failure": {
+    "type": "APIConnectionError",
+    "status_code": null
+  },
+  "demo_unchanged": true,
+  "after_sha256": "69beb2613e3dc0dab08f95abbb3725fd848dd4e7505b950600efcc813f24a328",
+  "business_tools_executed": 0
+}

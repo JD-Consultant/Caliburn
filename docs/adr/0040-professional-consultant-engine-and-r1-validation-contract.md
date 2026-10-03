@@ -11,12 +11,12 @@
   operation catalog 與 state 形狀不再沿用）、[0039](0039-local-multi-document-canonical-public-form-workspace.md)
   （本機多文件與公版版型決策保留，儲存語意改由本 ADR 的 Current State + Journal 邊界決定）
 - 權威文件：
-  [顧問流程最終反方審查](../specs/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)、
-  [LLM 程式架構紅隊審查](../specs/2026-07-25-professional-job-analysis-consultant-llm-architecture-red-team.md)、
-  [實現路線圖](../specs/2026-07-25-professional-consultant-architecture-realization-roadmap.md)、
-  [R1 Task Discovery 深入研究](../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
+  [顧問流程最終反方審查](../research/work-analysis/2026-07-25-professional-job-analysis-consultant-process-final-red-team.md)、
+  [LLM 程式架構紅隊審查](../history.md#source-223ad30816dceabbb9f7)、
+  [實現路線圖](../history.md#source-fad86ea5c6d92fe2722b)、
+  [R1 Task Discovery 深入研究](../research/work-analysis/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
 - 複審與修訂：
-  [R1 紅隊複審與修訂裁決](../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)
+  [R1 紅隊複審與修訂裁決](../history.md#source-6e14672dc7f5f32abb3f)
 
 ## 脈絡
 

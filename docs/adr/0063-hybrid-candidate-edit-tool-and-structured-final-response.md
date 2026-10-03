@@ -3,7 +3,7 @@
 - **狀態**：Accepted
 - **日期**：2026-08-15
 - **Owner 核准**：owner 在完成舊／新流程、優缺點與 Structured Output 邊界對照後，明確同意混合方案
-- **研究**：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §3.7.5、§9.17–§9.18
+- **研究**：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../history.md#source-20bcac8af4c10acef7f5) §3.7.5、§9.17–§9.18
 - **Supersedes**：ADR 0062 決定 5；ADR 0062 決定 8 的固定三次 model-call 上限；ADR 0061 決定 1、3、6 中「完整文件候選只由 final response_format 承載」的 provider channel 選擇
 - **保留**：ADR 0060 的 LangChain／LangGraph runtime 與單一 durable authority；ADR 0061 的 compact／union-free wire、Evidence basis、pure mapper 與 verifier；ADR 0062 的四個唯讀 Tool、員工 authority command、必要澄清、依賴驅動 lookup、無 Tool Search 與 no-RAG
 

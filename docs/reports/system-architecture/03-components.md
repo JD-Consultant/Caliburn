@@ -29,7 +29,7 @@
 
 **B1：工作情境分析。**從限定範圍的有效訪談整理具體工作情境，保留條件、過程、例外及未知；能讀寫情境，不能讀寫工作理解。
 
-**B2：工作理解分析。**依目前情境分析跨情境的工作理解，能讀情境、讀寫理解，並可按需回查合法範圍原話；不能修改情境。程式已於 2026-10-02 對齊 B1 → B2 → 發布，不由 B2 要求 B1 返工；資訊不足或矛盾須如實保留，不猜測補齊。流程與本次驗證紀錄入口見[第五章](05-work-memory.md#背景整理如何開始與交接)。
+**B2：工作理解分析。**依目前情境分析跨情境的工作理解，能讀情境、讀寫理解，並可按需回查合法範圍原話；不能修改情境，也不要求 B1 返工。資訊不足或矛盾須如實保留，不猜測補齊。背景整理採 B1 → B2 → 發布，流程見[第五章](05-work-memory.md#背景整理如何開始與交接)。
 
 三者共用模型與工具的執行程式，但各自保有 Context 與工具權限。合作方式由流程與資料介面約束，不採用任意互相對話的模式。
 
@@ -39,6 +39,6 @@
 
 例如「畫面收到一段回覆」與「後端已完成這輪」必須區分。UI 可以先顯示串流與候選，但正式完成要以後端結果為準。跨邊界 DTO 由正式契約生成，避免前後端手抄兩份不同格式。
 
-### 追到實作
+### 延伸閱讀
 
-[程式組織](../../implementation/code-organization.md)與[撰寫規範](../../implementation/coding-standard.md)是維護規則；[契約策略](../../contract-strategy.md)管理跨邊界格式。代表入口為 [A Context 綁定](../../../apps/api/src/caliburn/agents/job_consultant/context_binding.py)、[共用工具 Step](../../../apps/api/src/caliburn/agent_execution/tool_steps.py)、[Memory 批次編排](../../../apps/api/src/caliburn/workflows/memory_batch.py)。
+[系統分工](../../architecture/system-boundaries.md)說明各模組的資料與互動，[契約策略](../../contract-strategy.md)說明前後端如何共用傳輸格式。具體合作方式可參閱 [A Context 綁定](../../../apps/api/src/caliburn/agents/job_consultant/context_binding.py)、[共用工具 Step](../../../apps/api/src/caliburn/agent_execution/tool_steps.py)與 [Memory 批次編排](../../../apps/api/src/caliburn/workflows/memory_batch.py)。

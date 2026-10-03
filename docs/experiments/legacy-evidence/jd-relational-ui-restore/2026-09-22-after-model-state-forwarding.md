@@ -23,5 +23,5 @@ Stable Chrome 的專用 CDP 驗收腳本本輪在啟動 Chrome 時得到 `chrome
 
 依據：
 
-- [A 證據與 JD 來源接線施工計畫](../../../plans/2026-09-20-a-evidence-and-jd-source-alignment.md)
+- [A 證據與 JD 來源接線施工計畫](../../../archive/implementation-plans/2026-09-20-a-evidence-and-jd-source-alignment.md)
 - [LangChain state／ToolRuntime 研究紀錄](../../../specs/2026-09-05-framework-conversation-source-and-summary-primitives-trace.md)

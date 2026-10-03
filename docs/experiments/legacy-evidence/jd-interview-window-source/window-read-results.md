@@ -4,7 +4,7 @@
 
 ## 這一片做了什麼
 
-全部放在**同一個 source owner**（`ConversationSourceService`）上，不另建服務去碰私有 codec，也沒有新 lineage 表——沿[9/13 原回合查回](../../../specs/2026-09-13-jd-chat-admission-and-original-run-slice.md)既定的 `AiRunCheckpoints`／`AiRunHistory`。
+全部放在**同一個 source owner**（`ConversationSourceService`）上，不另建服務去碰私有 codec，也沒有新 lineage 表——沿[9/13 原回合查回](../../../archive/legacy-specs/2026-09-13-jd-chat-admission-and-original-run-slice.md)既定的 `AiRunCheckpoints`／`AiRunHistory`。
 
 | 方法 | 契約對應 | 行為 |
 |---|---|---|

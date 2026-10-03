@@ -12,7 +12,7 @@
 
 **證據／限制：**原研究記 API 330、Web 58 項通過；本次僅讀原件及 diff，沒有重跑。無來源碼的值物件仍按名稱比對，不能說當時已解決所有身分歧義。「保留出處」也不等於保證改後敘述仍被原來源支持。
 
-**引用：**[選單研究 §1–5、§9、§13](../../specs/2026-07-11-editor-menus-redesign-research.md)；前後程式 `f1a76b6f:apps/api/app/api/routes/documents.py`、`5150d2f0:apps/web/src/lib/ocsDoc.ts` 及同提交 `apps/web/src/lib/pack.ts`。早期 autosave 競態另見[程式演進第3例](code-evolution.md)，不在這裡重複。
+**引用：**[選單研究 §1–5、§9、§13](../../history.md#source-17605e43789d1be5d104)；前後程式 `f1a76b6f:apps/api/app/api/routes/documents.py`、`5150d2f0:apps/web/src/lib/ocsDoc.ts` 及同提交 `apps/web/src/lib/pack.ts`。早期 autosave 競態另見[程式演進第3例](code-evolution.md)，不在這裡重複。
 
 ## 2. 2026-08-15 至 08-23：換成檔案工具，仍不等於模型知道如何建立第一筆資料
 
@@ -22,7 +22,7 @@
 
 **證據／限制：**相同模型設定再試，成功修改既有任務、建立兩個任務和第一筆 Output，跨過 first-resource blocker；但第九次模型呼叫超過當時八次上限，仍無員工可見的完成結果，連 candidate check 成功也不能由該次 trace 確認。後續又有 finalization、輸出容量與持久草稿修訂，8/23 的兩輪 smoke 記在同原件後段；不能把其中一次局部成功寫成整套 VFS 或新模型品質全面通過。
 
-**引用：**[ADR0063](../../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md)、[VFS與證據定位研究](../../specs/2026-08-21-provider-neutral-virtual-jd-editor-and-evidence-anchor-research.md)、[原 smoke §1–5](../../specs/2026-08-21-virtual-jd-workspace-live-smoke.md)。quote 的 slice mismatch 是當時的定位反例，不足以單獨證明中文為根因。這一例適合呈現「不是只改 Prompt；工具契約本身也是模型可用性的一部分」。
+**引用：**[ADR0063](../../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md)、[VFS與證據定位研究](../../history.md#source-577ba3070035e1f4163c)、[原 smoke §1–5](../../history.md#source-59f3bfe039c7e9ac5e72)。quote 的 slice mismatch 是當時的定位反例，不足以單獨證明中文為根因。這一例適合呈現「不是只改 Prompt；工具契約本身也是模型可用性的一部分」。
 
 ## 3. 2026-08-26 至 09-13：共用一份目前稿，仍要釐清編輯是否等於核准
 
@@ -32,7 +32,7 @@
 
 **證據／限制：**ADR0070 仍標 Proposed，不能把候選當已切換。9/13 真瀏覽器＋真 SQL／Saver、固定 provider 的兩輪旅程，觀察到單一可編輯 JD、實際差異、人工修改及關頁重開。第一輪 fetch 曾失敗，查回原輪後才完成；根因沒有足夠資料確認，不能補寫已修好。這不是自然模型品質或所有故障驗收。
 
-**引用：**[ADR0069 §Context與決定6–7](../../adr/0069-shared-current-jd-working-copy-and-semantic-approval.md)、[ADR0070](../../adr/0070-consultant-workspace-ui-and-explicit-pending-edit-approval.md)、[9/12設計 §5.5–6](../../specs/2026-09-12-jd-relational-editor-design.md)、[首個瀏覽器旅程](../../experiments/legacy-evidence/jd-relational-chat-web/browser-first.md)。後來新目標的 Turn 候選預覽與成功採用是另一次生命週期設計，接[T09 UI證據](../../plans/2026-09-29-target-rebuild/evidence/t09-ui-redesign.md)，勿沿用上述歷史核准規則。
+**引用：**[ADR0069 §Context與決定6–7](../../adr/0069-shared-current-jd-working-copy-and-semantic-approval.md)、[ADR0070](../../adr/0070-consultant-workspace-ui-and-explicit-pending-edit-approval.md)、[9/12設計 §5.5–6](../../history.md#source-8edfebf03222f20deda7)、[首個瀏覽器旅程](../../experiments/legacy-evidence/jd-relational-chat-web/browser-first.md)。後來新目標的 Turn 候選預覽與成功採用是另一次生命週期設計，接[T09 UI證據](../../history.md#source-072687957bc7ca22325b)，勿沿用上述歷史核准規則。
 
 ## 4. 2026-09-09 至 09-12：原生文件 diff 能畫紅綠，不一定讓人看懂業務變更
 
@@ -52,7 +52,7 @@
 
 **證據／限制：**9/12 finding 先是設計矛盾與反例，文件閉合不等於程式完成。9/30 T07 才逐項串驗工具 codec、候選隔離、修改／移動／刪除／來源及重入；語意上是否保留責任範圍、模型是否適當選工具，仍須產品旅程量測。不能把八個 JD 入口當全部 Agent 工具數，也不能由單項原子性推論任意多工具共同原子。
 
-**引用：**[初審 JR-R01／JR-R05與後續複核路由](../../experiments/legacy-evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)、[9/29工具契約 §1–4、§6–7](../../specs/2026-09-29-jd-model-tool-contract-review.md)、[T07工具串接與完成對照](../../plans/2026-09-29-target-rebuild/evidence/t07-jd-tools.md)。
+**引用：**[初審 JR-R01／JR-R05與後續複核路由](../../experiments/legacy-evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)、[9/29工具契約 §1–4、§6–7](../../specs/2026-09-29-jd-model-tool-contract-review.md)、[T07工具串接與完成對照](../../history.md#source-57a6c655d8755a610427)。
 
 ## 6. 2026-09-10 至 09-30：員工改了 JD，不代表引用也已重新支持它
 
@@ -62,7 +62,7 @@
 
 **證據／限制：**該次 PG 測試首敗是 harness 只讀第一頁便當全文，較大來源回傳有 32 KiB 分頁；修測試跟隨 cursor 後才過。這不是產品語意 bug 已被修復，也不是自然模型自行判斷來源可信。當時的分頁設計屬歷史，不應倒灌為新工具規範。
 
-**引用：**[Context／人工修改／來源研究](../../specs/2026-09-10-jd-context-change-and-source-research.md)、[原PG首敗與結果](../../experiments/legacy-evidence/jd-consultant-source-integration/postgres-results.md)、[T07 §5的只讀diff／明確確認／再改文字反例](../../plans/2026-09-29-target-rebuild/evidence/t07-jd-tools.md)。仍有「模型有資料卻漏選早期依據」的品質限制，接[案例三](../research-casebook.md#案例三-來源已提供但模型仍漏選引用)，不把保存與引用格式通過當語意品質通過。
+**引用：**[Context／人工修改／來源研究](../../research/agent-systems/2026-09-10-jd-context-change-and-source-research.md)、[原PG首敗與結果](../../experiments/legacy-evidence/jd-consultant-source-integration/postgres-results.md)、[T07 §5的只讀diff／明確確認／再改文字反例](../../history.md#source-57a6c655d8755a610427)。仍有「模型有資料卻漏選早期依據」的品質限制，接[案例三](../research-casebook.md#案例三-來源已提供但模型仍漏選引用)，不把保存與引用格式通過當語意品質通過。
 
 ## 7. 2026-09-12 至 10-01：交付不是 API 回 PDF 就結束
 
@@ -72,7 +72,7 @@
 
 **證據／限制：**原 T13 有一頁／三頁真 PDF、四頁逐頁視檢、80 個步驟與末尾成果回查；候選不進正式 PDF。後續文字抽取卻把「長」變成「⻑」，以不同字型對照追到 cmap／glyph 映射：視覺正確不等於複製或搜尋相同。原文選擇保留限制，沒有為此新增字型加工管線。乾淨交付另屬 T18，不能拿本機已有 browser／font 當跨平台通過。
 
-**引用：**[9/12設計 §8及後續延後](../../specs/2026-09-12-jd-relational-editor-design.md)、[T13切片、接線、下載與文字層診斷](../../plans/2026-09-29-target-rebuild/evidence/t13-pdf-export.md)。打包後 migration 找不到的問題與非 editable 安裝驗證，接[工程沿革第7例](engineering-and-verification.md#7-開發環境能跑不代表套件裝好能跑)。
+**引用：**[9/12設計 §8及後續延後](../../history.md#source-8edfebf03222f20deda7)、[T13切片、接線、下載與文字層診斷](../../history.md#source-409f20a1c297740aed7d)。打包後 migration 找不到的問題與非 editable 安裝驗證，接[工程沿革第7例](engineering-and-verification.md#7-開發環境能跑不代表套件裝好能跑)。
 
 ## 可以連著讀的問題鏈
 

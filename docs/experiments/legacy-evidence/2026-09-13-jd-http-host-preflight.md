@@ -1,7 +1,7 @@
 # JD 隔離 API 宿主：官方接點前置核實
 
 - 查閱日：2026-09-13；Topic：JD-R002／RS-F、RS-1–2；性質：有界官方研究與接線建議。
-- 本稿記錄施工前的有界研究，未自行建立宿主或測試。後續[查詢 API／恢復身分結果](../../specs/2026-09-13-jd-query-api-and-recovery-identity-slice.md)已核實依賴與原生接點，包含真 PG／Uvicorn；本稿的寫入、停止／重開及來源測試清單仍是後續責任，不能把查詢 PASS 延伸成完整 host。
+- 本稿記錄施工前的有界研究，未自行建立宿主或測試。後續[查詢 API／恢復身分結果](../../archive/legacy-specs/2026-09-13-jd-query-api-and-recovery-identity-slice.md)已核實依賴與原生接點，包含真 PG／Uvicorn；本稿的寫入、停止／重開及來源測試清單仍是後續責任，不能把查詢 PASS 延伸成完整 host。
 - 基線：[目前決策](../../current-decisions.md)、[決策流程](../../decision-process.md)、[框架方向 §4–5](../../specs/2026-09-13-jd-app-stack-selection.md#4-後端選擇)、[錯誤與紀錄證據](2026-09-13-jd-app-boundaries-errors-logging-evidence.md)、[保存契約 §6／9](../../specs/2026-09-12-jd-relational-schema-and-write-contract.md#6-寫入交易)。
 - 不重選品牌，不變更六章欄位、十三表、來源／Memory、永久 receipt 或 writer authority；不增加登入／ACL、通用 server、背景 DB writer 或 production 入口。
 

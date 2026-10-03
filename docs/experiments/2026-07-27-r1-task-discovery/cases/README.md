@@ -1,7 +1,7 @@
 # R1 八案：建立與凍結規則
 
 素材來源是
-[R1 深入研究 §11](../../../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
+[R1 深入研究 §11](../../../research/work-analysis/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
 的 `TI-R1-01`–`08`。本目錄把那八段描述做成可執行 fixture，沒有新增案例、沒有改變風險意圖。
 
 ## 定位

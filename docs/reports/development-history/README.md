@@ -27,24 +27,24 @@
 ## 三種找法與原件位置
 
 - **依時間及問題找：**本頁五份主題沿革（產品、檢索、Memory、JD、工程），由摘要往原件深入。
-- **依研究能力找：**[按能力找證據](evidence-by-capability.md)，判準來自[系所／教授公開資料研究](../admissions/research-readiness.md)，不是代替學校評分。
+- **依研究能力找：**[按能力找證據](evidence-by-capability.md)，判準來自[系所／教授公開資料研究](../../history.md#source-518e00bdc0f3f08d2efa)，不是代替學校評分。
 - **查文件未展開的實作：**[前後程式與測試](code-evolution.md)，區分直接觀察、當時說明與事後推論。
 
-原始研究仍在 `research/`／歷史 `specs/`，決策在 `adr/`，實驗在 `experiments/`或各任務 `evidence/`，原始輸出在其 `data/`；本區只放摘要及引用。最早原件從[3月／5月存檔](../../archive/early-projects/README.md)找，封存分支從[歷史恢復索引](../../archive/worktree-history-index.md)找。[案例集](../research-casebook.md)僅展開少數案例，不是另一份完整歷史。
+原始研究仍在 `research/`／歷史 `specs/`，決策在 `adr/`，實驗在 `experiments/`或各任務 `evidence/`，原始輸出在其 `data/`；本區只放摘要及引用。最早原件從[3月／5月存檔](../../history.md#source-662ea57dd88fb5eb0879)找，封存分支從[歷史恢復索引](../../history.md#source-7ab1424323b9555aac83)找。[案例集](../research-casebook.md)僅展開少數案例，不是另一份完整歷史。
 
 ## 先看整體變化
 
 | 時期 | 當時架構或研究重點 | 當時暴露的問題／下一次改動 |
 |---|---|---|
-| 3–5 月：前身資料處理 | OCS PDF → 結構化 JSON；解析代碼、任務、產出、指標、知識與技能 | 真實 PDF 的斷行、合併儲存格與跨頁格式破壞解析；資料模型也由 Task 內清單改為 P-centric blocks。[原件](../../archive/early-projects/README.md) |
-| 5 月：JobIntel | pgvector 參考檢索＋LangGraph 固定訪談階段，STAR → 5W2H → 指標 → 文件 | 短答、phase 過濾與切換判定造成重問／提早前進；此時尚非後來 A／B1／B2 架構。[原狀態機](../../archive/early-projects/2026-05-20-jobintel-graph-pipeline.md) |
-| 6 月：知識服務與 monorepo | 獨立 indexer、catalog／精確讀取與向量查詢分工；可編輯選單＋深問；三 repo 整合 | 檢索範圍、輸出資料契約、保存責任與服務依賴要分清。[流程](../../archive/jobintel-v3/specs/2026-06-14-jd-authoring-flow.md)、[整體設計](../../specs/2026-06-27-system-architecture-design.md) |
-| 7 月上旬：顧問而非填表 | 先後研究顧問／書記、工具、追蹤修訂與事件議程 | 真人及 persona 試訪分別出現填槽感、零任務卻有大量態度、長聊不產出 P；不只是換模型。[7/6](../../specs/2026-07-06-consultant-not-formfiller-redesign-research.md)、[7/9](../../specs/2026-07-09-interview-flow-task-curation-and-flexibility-research.md)、[7/14](../../specs/2026-07-14-interview-agenda-architecture-research.md) |
+| 3–5 月：前身資料處理 | OCS PDF → 結構化 JSON；解析代碼、任務、產出、指標、知識與技能 | 真實 PDF 的斷行、合併儲存格與跨頁格式破壞解析；資料模型也由 Task 內清單改為 P-centric blocks。[原件](../../history.md#source-662ea57dd88fb5eb0879) |
+| 5 月：JobIntel | pgvector 參考檢索＋LangGraph 固定訪談階段，STAR → 5W2H → 指標 → 文件 | 短答、phase 過濾與切換判定造成重問／提早前進；此時尚非後來 A／B1／B2 架構。[原狀態機](../../history.md#source-f6099bd5a1a81730042d) |
+| 6 月：知識服務與 monorepo | 獨立 indexer、catalog／精確讀取與向量查詢分工；可編輯選單＋深問；三 repo 整合 | 檢索範圍、輸出資料契約、保存責任與服務依賴要分清。[流程](../../history.md#source-63e4ec03038b45bbe58e)、[整體設計](../../history.md#source-f661c579036f7cefc3f9) |
+| 7 月上旬：顧問而非填表 | 先後研究顧問／書記、工具、追蹤修訂與事件議程 | 真人及 persona 試訪分別出現填槽感、零任務卻有大量態度、長聊不產出 P；不只是換模型。[7/6](../../research/work-analysis/2026-07-06-consultant-not-formfiller-redesign-research.md)、[7/9](../../research/work-analysis/2026-07-09-interview-flow-task-curation-and-flexibility-research.md)、[7/14](../../research/work-analysis/2026-07-14-interview-agenda-architecture-research.md) |
 | 7 月中下旬：證據與分析工作流 | vNext Evidence workflow → 專業顧問 R1 比較 → 最小 one-stage 訪談閉環 | 短答需要前問；複雜的多階段不一定更好，評測器也可能漏判。[短答決策](../../adr/0037-interview-vnext-question-frame-contextual-evidence-and-employee-authority.md)、[R1a 結果](../../experiments/2026-07-27-r1-task-discovery/r1a-results.md) |
 | 8 月：Framework 與編輯工作面 | LangChain／LangGraph、巨型編輯表單 → VFS → 持久草稿 → 共用目前稿 | 模型填無關參數與定位易錯；跨輪草稿與人工修改形成兩份競爭內容。[VFS 決策](../../adr/0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md)、[共用稿決策](../../adr/0069-shared-current-jd-working-copy-and-semantic-approval.md) |
 | 8 月底–9 月：長訪談與分層 Memory | 可修訂理解、routing、canonical 原話、分層分析與壓縮；多批 CT 實驗 | 路由找到候選不代表事實忠實；仍出現漏記、更正未吸收、未知消失等，詳[記憶沿革](memory-and-context.md) |
 | 9 月：JD 編輯器與正式入口 | Plate 文件樹候選 → relational JD 管理編輯器；9/22 以 ADR0077 切正式權責 | 能編一份文件不等於能管理各欄位與關係；舊入口也會讓實作者用錯架構。[0075](../../adr/0075-relational-jd-authority-and-structured-editor.md)、[0077](../../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) |
-| 9 月底–10 月：新目標重建與驗證 | 重新確定原始訪談 → 情境 → 理解 → JD；明確 Snapshot、引用、Context、工具與恢復邊界 | 已有實作與分層證據，但品質／容量及正式切換仍各有界線；不能把計畫寫完或一場長旅程完成當整體通過。[計畫](../../plans/2026-09-29-target-rebuild/README.md)、[0079 草案](../../adr/0079-target-rebuild-production-cutover.md) |
+| 9 月底–10 月：新目標重建與驗證 | 重新確定原始訪談 → 情境 → 理解 → JD；明確 Snapshot、引用、Context、工具與恢復邊界 | 已有實作與分層證據，但品質／容量及正式切換仍各有界線；不能把計畫寫完或一場長旅程完成當整體通過。[計畫](../../history.md#source-ee8cbce8eb3c303d1765)、[0079 草案](../../adr/0079-target-rebuild-production-cutover.md) |
 
 這張表呈現「當時怎麼做、後來改了哪裡」，不把每次改架構都稱為已證明的優化。部分是實測驅動，部分是產品需求修正、研究推論或時程取捨。
 

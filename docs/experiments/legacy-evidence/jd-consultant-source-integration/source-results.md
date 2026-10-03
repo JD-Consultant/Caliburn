@@ -1,6 +1,6 @@
 # 當輪原話來源：來源模組作者驗證
 
-- 日期：2026-09-13；OI-02 局部。設計依[本輪接合切片](../../../specs/2026-09-13-jd-consultant-source-integration-slice.md)及[來源接點核對](source-seams.md)。
+- 日期：2026-09-13；OI-02 局部。設計依[本輪接合切片](../../../archive/legacy-specs/2026-09-13-jd-consultant-source-integration-slice.md)及[來源接點核對](source-seams.md)。
 - 作者：`jd_ref_signer_preflight`；只新增 `experiments/jd-relational-app/src/jd_relational/conversation_sources.py` 與 `tests/test_conversation_sources.py`。root／middleware／人工 API／PG 接合由其他作者負責。
 - 本檔是作者證據，獨立審查另記；未開服務、未寫 DB、未呼叫 SDK／provider 或付費模型，沒有新增依賴、資料表、模型工具或通用 registry。
 

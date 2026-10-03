@@ -1,6 +1,6 @@
 # 業務、資料及契約接線
 
-- 狀態：**工程設計／分切片施工中**。T02 的檔案與開場保存見[實際接線](interview-storage.md)；其餘依任務表，不因此宣稱 JD／Memory／執行均已實作。不在此預先列所有資料表；表名、索引與 DDL 由任務依測例實現並留下 schema 圖。
+- 狀態：**現行業務、資料及契約的接線原則**。具體保存分別由[訪談](interview-storage.md)、[JD](jd-storage.md)及[Memory](memory-storage.md)文件說明；正式 DDL 與生成契約由程式維護。驗證見[結案紀錄](../history.md#source-ee8cbce8eb3c303d1765)。
 - 語意權威：[資料保存與交易](../architecture/persistence.md)、[Memory 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[JD 工具](../specs/2026-09-29-jd-model-tool-contract-review.md)。本頁只說接線方式。
 
 ## 1. 一個 service、一個正式結果，兩種入口
@@ -27,11 +27,11 @@ API 接受的 client command ID 用於辨認瀏覽器重送同一命令；模型
 
 ## 3. Memory：可變工作稿與固定快照不是兩個相反模型
 
-T04 的實作映射、研究與目前未驗邊界維護於 [Memory 保存接線](memory-storage.md)；本節保留跨層規則，不複製資料表或另一份施工狀態。
+實作映射、選型及驗證限制維護於 [Memory 保存接線](memory-storage.md)；本節保留跨層規則，不複製資料表。
 
 候選的關係連 stable object ID；工具 title 先在有權的當前 layer map 精確解析，取得 ID 後才對該物件操作。改名先固定目標再改；同層有效 title 唯一，歷史／不同層不作同名限制。新命令使用重用名稱時選目前物件；**沒有「模型一定知道舊名」的保證，也不追加被否決的強制 read proof**。原操作重入與歷史引用均維持原 identity。
 
-候選每次有效操作有可恢復的位置；position 可由不可變修訂選用或可復原 checkpoint-linked 快照實現，但只有領域是可寫 owner。刪情境同次移除候選理解指向它的 bindings，不刪理解；歷史快照不變。B1 只能改情境；B2 只能改理解，讀目前固定交接的情境；權限在 service 再驗，不只藏 tool。
+候選每次有效操作有可恢復的位置；position 由不可變修訂選用實現，但只有 Memory 領域模組負責寫入。刪情境同次移除候選理解指向它的 bindings，不刪理解；歷史快照不變。B1 只能改情境；B2 只能改理解，讀目前固定交接的情境；權限在 service 再驗，不只藏 tool。
 
 發布演算法用固定候選位置，不讓 LLM 處理版本：
 
@@ -48,7 +48,7 @@ T04 的實作映射、研究與目前未驗邊界維護於 [Memory 保存接線]
 
 JD 業務沿既定 profile／職責／任務／成果／要求／知識／技能／關係建立型別模型；schema 不從 Memory Markdown 或 UI widget 反推。欄位意義依[JD 指南](../guides/2026-09-09-jd-field-and-writing-guide.md)。舊 SQL／測例只供參考，沒有相容表名義務。
 
-T03 已實作上述集合的人工端點／UI、固定修訂、原結果及候選底層；候選位置、分支回退、放棄與交易內採用見 [JD 保存接線 §3.1](jd-storage.md#31-本輪候選與可恢復位置)。來源、Agent 共同完成與候選 UI 仍依 T07–T09 施工，不能將人工正式 API 當作 A 候選寫入，也不因底層可組合而宣稱整輪恢復已驗收。
+人工端點／UI、固定修訂、原結果與候選使用同一 JD 領域模組；候選位置、分支回退、放棄與交易內採用見 [JD 保存接線 §3.1](jd-storage.md#31-本輪候選與可恢復位置)。模型工具寫入候選，A 完成交易才正式採用；人工正式 API 不作為 A 候選寫入入口。
 
 JD `read_ref` 解到本輪 JD identity／型別與合法內容基準；Memory `target_title` 解到本輪固定 snapshot 內 identity。existing `citation_ref` 解到 JD 自己保存的特定來源，不用同名猜舊來源。直接來源可選正式訪談、情境、理解或 current_input；pending current_input 僅在 A 完成交易取得正式來源資格。
 
@@ -64,13 +64,13 @@ JD `read_ref` 解到本輪 JD identity／型別與合法內容基準；Memory `t
 
 ## 5. 唯一契約來源及生成
 
-新目標 `apps/api/contracts/http/` 保存跨語言 DTO，`contracts/tools/` 保存模型可見 schema。Schema 與描述按業務拆，不每參數一檔。鎖定 datamodel-code-generator 產 Python DTO，json-schema-to-typescript 產 TypeScript；OpenAPI 從 API 的生成型別形成，不再手寫 OpenAPI／TS／Pydantic 三份 shape。HTTP／tool 邊界仍做執行時驗證，TS 型別不代替它。[現行策略](../contract-strategy.md)的原則保持，路徑不同不接回退役 package。
+`apps/api/contracts/http/` 保存跨語言 DTO，`contracts/tools/` 保存模型可見 schema。Schema 與描述按業務拆，不每參數一檔。鎖定 datamodel-code-generator 產 Python DTO，json-schema-to-typescript 產 TypeScript；OpenAPI 從 API 的生成型別形成，不再手寫 OpenAPI／TS／Pydantic 三份 shape。HTTP／tool 邊界仍做執行時驗證，TS 型別不代替它。[現行策略](../contract-strategy.md)的原則保持，路徑不同不接回退役 package。
 
 模型 schema 與 HTTP 不強求相同：HTTP 需要保存／預覽狀態，tool 只回推理下一步所需資訊。模型 strict wire 是薄編譯邊界：有限 variants、required／additionalProperties 按 provider 子集，語意上未列 change 仍是保留，不把 null 當清空。生成後以真 SDK payload 驗，而非只測 Python class 建得出來。
 
-T05 的生成器亦將 tools 原 schema 複製為安裝包內唯讀資源，`--check` 驗 byte 一致；provider definitions 使用這份生成副本，不從 DTO 再生另一個 shape。離線 SDK payload 不等於遠端 strict 接受；實測範圍依 [Memory 工具接線](memory-tools.md)。
+生成器亦將 tools 原 schema 複製為安裝包內唯讀資源，`--check` 驗 byte 一致；provider definitions 使用這份生成副本，不從 DTO 再生另一個 shape。離線 SDK payload 不等於遠端 strict 接受；實測範圍依 [Memory 工具接線](memory-tools.md)。
 
-原始 Responses items 不塞進自製 message schema；按官方 SDK output→input 轉換後保留必要 metadata、opaque bytes 與順序，兩種方向各有 round-trip 測例。生成檔不手改；CI 再生成比 diff。新 schema 尚未產生前，本文不宣稱任何 wire 已完成。
+原始 Responses items 不塞進自製 message schema；按官方 SDK output→input 轉換後保留必要 metadata、opaque bytes 與順序，兩種方向各有 round-trip 測例。生成檔不手改；CI 再生成比 diff。實際 wire 以 schema、生成物與對應驗證為準。
 
 ## 6. 資料演進與恢復
 
@@ -78,4 +78,4 @@ T05 的生成器亦將 tools 原 schema 複製為安裝包內唯讀資源，`--c
 
 首版不自動清理候選／checkpoint，也不新增備份產品；保留邊界仍需可測。新 migration 前 fail fast 檢查 DB 版本與配置；schema 不相容不得帶著半套表啟動。框架 saver schema 用官方 setup／upgrade 路徑，不在業務 Alembic 中手抄其結構。
 
-取消與最後提交使用相同持久資格裁決；重啟時舊 runner 的資格不得沿用到新 attempt。租約／fencing 具體 SQL 由 T02／T08 依兩連線反例選擇，不把 Python mutex 當跨程序保存保證。未知 COMMIT 要對帳，不能因查詢超時便把目前表頭回退。
+取消與最後提交使用相同持久資格裁決；重啟時舊 runner 的資格不得沿用到新 attempt。writer fencing 由 executions 執行資格模組 的行鎖與條件更新實現，程序接管依[執行接線 §6](agent-execution.md#6-本機-a-supervisor)，不把 Python mutex 當跨程序保存保證。未知 COMMIT 要對帳，不能因查詢超時便把目前表頭回退。

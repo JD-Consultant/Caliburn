@@ -115,7 +115,7 @@ tests/test_foreground_runtime.py tests/test_manual_runtime.py
 
 最後追加上述兩個 closure 情境及 terminal-result early return 後，僅重跑受影響 `tests/test_ai_runtime.py`，**25 PASS／1.01s**。工作目錄為 `experiments/jd-relational-app`；使用既有 frozen lock、offline／no-sync、`PYTHONUTF8=1` 及 `-p no:cacheprovider`。這是原生 graph／Future、InMemorySaver 與合成 storage 的窄回歸，不含 PostgreSQL／provider。與先前 12／73／4／126 PASS 有重疊，不加總。
 
-另唯讀核對 [test_ai_runtime_postgres.py](../../../../experiments/jd-relational-app/tests/test_ai_runtime_postgres.py) 四案、主代理最後 stdout（`253 passed in 4.04s` 與 `14 passed in 6.43s`）及[切片結果](../../../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md#6-分層驗收紀錄)。本 reviewer 沒有重跑 DB，證據判讀如下：
+另唯讀核對 [test_ai_runtime_postgres.py](../../../../experiments/jd-relational-app/tests/test_ai_runtime_postgres.py) 四案、主代理最後 stdout（`253 passed in 4.04s` 與 `14 passed in 6.43s`）及[切片結果](../../../archive/legacy-specs/2026-09-13-jd-ai-runtime-and-tools-slice.md#6-分層驗收紀錄)。本 reviewer 沒有重跑 DB，證據判讀如下：
 
 | 案例 | 原始碼及紀錄可支持的範圍 |
 |---|---|

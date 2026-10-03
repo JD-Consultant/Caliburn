@@ -1,10 +1,8 @@
 # 相似比對(similarity matching)v1 — 設計 spec
 
-> **類型**:設計 spec(已與維護者逐段確認,2026-07-04)。
-> **研究依據**:[`2026-07-02-multi-ocs-candidate-dedup-research.md`](../research/retrieval/2026-07-02-multi-ocs-candidate-dedup-research.md)
-> (五輪;門檻與灰區體積皆有實驗出處)。**決策**:ADR 0022。
-> **一句話**:現有系統一個都不動;indexer 多一個 endpoint,api 組完知識包後多打一通電話,
-> web 多畫幾個徽章。非破壞性——**不刪任何項目**。
+> 適用範圍：獨立 RAG 的相似比對契約。下文 API／Web 的整合例子保留當時設計脈絡，相關舊產品已退役，不代表現行 JD App 依賴檢索；隔離邊界見 [RAG 設計](../design/rag-pipeline.md)與 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。
+
+相似比對區分可合併的重複項目與需要人工判斷的相近項目。設計依據為[五輪相似度實驗](../research/retrieval/2026-07-02-multi-ocs-candidate-dedup-research.md)；門檻與灰區大小均對應該次語料與模型。比對結果只影響顯示，不刪除原項目。
 
 ## 0. 定位、範圍、非目標
 
@@ -21,10 +19,7 @@
 
 ## 1. 契約(`packages/indexer-contract`;rubric row 3,ADR 0010 機制沿用)
 
-> 命名規範:pair 欄位 = `left_id`/`right_id`(Splink/記錄連結標準;**禁用 a/b**)。
-> 既有 `SimilarPair.a/b`(舊 tasks:findSimilar,零消費者)同步改名統一。
-> **後記(2026-07-04 實作後)**:`tasks:findSimilar` 已**整組退役**(維護者裁示;零消費者、
-> 功能被 items:match 涵蓋)——SimilarPair/SimilarTaskRef/FindSimilar* 模型已自契約刪除。
+配對欄位使用 `left_id`／`right_id`，沿用記錄連結常見命名。原 `tasks:findSimilar` 的功能已由 `items:match` 涵蓋；`SimilarPair`、`SimilarTaskRef` 與 `FindSimilar*` 已移出契約。
 
 ### Request — `POST /items:match`
 
@@ -81,7 +76,7 @@
 | knowledge / skill | 0.85 | 0.65 | 校準用;**v1 不接表面**(skill 灰區 116–186 對,見 §10) |
 | unit | 0.95 | 0.80 | 暫比照 task;**未經實驗**,校準腳本先跑、乾淨才接線 |
 
-改門檻 = 改 settings + 跑校準腳本留紀錄(進 `docs/specs/`),不改碼。
+門檻由 settings 管理，校準腳本記錄各設定下的分數分布與灰區數量。
 **絕對門檻不可移植**(各向異性,EMNLP 2020):數字只對「本池 × bge-m3」有效。
 
 ## 3. api 整合(純搬運,~30 行)
@@ -136,7 +131,7 @@ TaskRowVM.similarTo?: { name: string; score: number }[]  // 灰區對
 | 池 < 2 條 | 直接回空 groups/pairs(不打 embedder) |
 
 - **web 端零新機制**:similarity 是 pack 的一部分,走既有 `request()` → 失敗一律
-  `ApiError(status, message, body)`([api.ts](../../apps/web/src/lib/api.ts));
+  `ApiError(status, message, body)`（舊 Web 的 `apps/web/src/lib/api.ts` 範例，該入口已退役）；
   降級可見性看 `pack.meta.similarity`,不另設錯誤通道。
 - **api⇄indexer**:`KnowledgeClient.match` 失敗 → log warning + 降級(同 `fetch_one` 模式)。
 
@@ -153,8 +148,7 @@ TaskRowVM.similarTo?: { name: string; score: number }[]  // 灰區對
   5. 主基準清空 → 分群照常顯示、自動套不跑;
   6. survivorship:主基準在→必為代表;不在→文字最長。
 - **整合測試**(需 embedder):態度層「團隊合作↔團隊意識 → 同群」characterization。
-- **校準腳本**(Task 0,scratchpad 雛形進 repo):輸出 per-kind 分布 + 斷崖位置 +
-  灰區對數;units 一起跑。輸出存 `docs/specs/` 當校準紀錄。
+- **校準腳本**:輸出各 kind 的分數分布、斷崖位置與灰區對數，包含 unit 類型。
 
 ## 7. 升級槽(一行註記,不預建)
 
@@ -165,10 +159,6 @@ TaskRowVM.similarTo?: { name: string; score: number }[]  // 灰區對
 - 其餘:sparse 混合、mean-centering、Qdrant payload cluster_id 下沉、人工確認對持久化
   (SKOS exactMatch/closeMatch)——均先不做。
 
-## 8. 文檔更新義務(同 commit)
+## 8. 延伸閱讀
 
-- [`docs/design/editor-knowledge-pack.md`](../archive/docs-cleanup-2026-10-02.md):
-  similarity 掛載點、web 顯示變換鐵律、不變量 A/B。
-- `apps/ocs-indexer/README.md`(items:match 端點面)· `apps/web/README.md`(分群顯示)·
-  `apps/api/README.md`(similarity 掛載)。
-- ADR 索引(0022)。
+[知識包設計沿革](../history.md#source-342210e06cceeff43952)說明當時的相似度掛載與顯示方式；[RAG 管線](../design/rag-pipeline.md)說明檢索研究與現行 JD App 的隔離關係。

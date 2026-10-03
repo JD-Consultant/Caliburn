@@ -57,7 +57,7 @@ Anthropic Interviewer 公開採訪談目標／rubric、可適應追問及後續�
 | 工作理解／Memory | 現在能成立的工作範圍、共同模式、責任、條件、例外及有影響未知 | 不是每案永久新增一個 Task；不是無條件的抽象摘要 |
 | JD | 某項工作已有足夠理解即可逐步寫成清楚、適當粒度的職務內容，之後再做全份核對 | 不必等整場訪談結束，也不是所有案例和分析過程的合集 |
 
-這裡沿用已討論分工說明內容用途，**不新增物理儲存層或規定每層各呼叫一次模型**。目前 Memory 流程不因本指南改動。[既有資訊取捨研究](../specs/2026-09-07-work-case-and-understanding-information-selection.md)
+這裡沿用已討論分工說明內容用途，**不新增物理儲存層或規定每層各呼叫一次模型**。目前 Memory 流程不因本指南改動。[既有資訊取捨研究](../research/work-analysis/2026-09-07-work-case-and-understanding-information-selection.md)
 
 ### 具體取捨
 
@@ -148,7 +148,7 @@ OpenAI 建議清楚區分目的、規則、例子、context；Anthropic 同樣�
 
 ## 8. 後續內容審核樣例
 
-下列是審核提示修改是否漏需求的情境，**本輪未執行新 eval 或付費測試**。
+下列情境可用來檢查提示修改是否保留內容需求；它們是驗證設計，不是實驗結果。
 
 | 情境 | 應看見的效果 |
 |---|---|
@@ -162,17 +162,17 @@ OpenAI 建議清楚區分目的、規則、例子、context；Anthropic 同樣�
 | 案例數持續增加 | 有效資訊增加而理解不無限重複，案例仍可回查 |
 | 收尾全面檢查 | 能發現早期少談但有效的工作，不只整理最近主題 |
 
-這些情境涵蓋內容品質，不代表另開架構或增加模型。資料庫、AI 編輯與員工審核的具體接法，在成品語意確認後另議。
+這些情境檢查內容品質，不要求增加模型或另建架構。資料庫、AI 編輯與員工核對方式依[現行規格](../specs/README.md)。
 
 ## 9. 工作理解正文要寫到多清楚（2026-09-25 研究補核對）
 
-**範圍與狀態：**這是職務分析方法的研究結論，供[產品概念第二層](../product-concept.md#第二層概念與資訊關係已確認的部分其餘待討論)表述目標效果；不是現行 B2 已達成的實測、固定提示、資料結構或施工授權。本節只決定資訊取捨，不決定誰在何時建立欄位、版本或發布。
+本節說明工作理解正文的資訊取捨，供[產品概念](../product-concept.md#核心概念與資訊關係)引用。B2 的資料結構、提示、角色權限與發布流程依[現行規格](../specs/README.md)；模型是否達到這些內容目標，另以實測判定。
 
 ### 來源能支持什麼，不能支持什麼
 
 2026-09-25 核對的第一手來源：[OPM Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)把工作分析建立在實際任務、所需能力及兩者關係；[O*NET Content Model](https://www.onetcenter.org/content.html)區分一般、較詳細的工作活動及工作情境；[英國 HSE 的 Understanding the Task](https://www.hse.gov.uk/humanfactors/assets/docs/understanding-the-task.pdf)以工作目的組織步驟與決策，特別提醒低頻但重要的工作不應只因不常發生就忽略；[UCSB Job Description Basics](https://www.hr.ucsb.edu/hr-units/compensation/job-description-basics)要求職務內容能辨識實際工作、責任及結果，而非只剩籠統動詞。這些共同支持**描述不能空泛、抽象層與具體層應互相連得上、條件與責任不能被無據泛化**；但各來源服務的是職業資料、任務分析或 JD 撰寫，**沒有任何一份規定本產品 B2 的 Memory 正文長度、欄位或三層架構**。本節以下是 Caliburn 對個別員工長訪談需求的映射，不冒稱外部標準。
 
-[OpenAI Codex 公開的 consolidation 提示](https://raw.githubusercontent.com/openai/codex/main/codex-rs/memories/write/templates/memories/consolidation.md)將簡短導覽與較具體、可用於後續工作的記憶內容分開，且不主張固定項目數；可借鑑「導覽不是正文、正文不必複製全部原始材料」的資訊分層。該 `main` 文件會變動、服務的是程式開發而非職務分析，不能用它決定哪些員工工作可以刪除。本節沿用已有的[資訊取捨研究 §3–4](../specs/2026-09-07-work-case-and-understanding-information-selection.md)，不重建另一份 Memory 原則。
+[OpenAI Codex 公開的 consolidation 提示](https://raw.githubusercontent.com/openai/codex/main/codex-rs/memories/write/templates/memories/consolidation.md)將簡短導覽與較具體、可用於後續工作的記憶內容分開，且不主張固定項目數；可借鑑「導覽不是正文、正文不必複製全部原始材料」的資訊分層。該 `main` 文件會變動、服務的是程式開發而非職務分析，不能用它決定哪些員工工作可以刪除。本節沿用已有的[資訊取捨研究 §3–4](../research/work-analysis/2026-09-07-work-case-and-understanding-information-selection.md)，不重建另一份 Memory 原則。
 
 ### 三種深度比較與結論
 
@@ -190,4 +190,4 @@ OpenAI 建議清楚區分目的、規則、例子、context；Anthropic 同樣�
 - **例行工作與少見例外：**假設員工說明日常教室收尾及一次特殊活動後的窗戶清理。理解應使顧問知道兩者是否屬本人、是否同一適用範圍；若只知道一次，不能寫成每日清窗，也不能因低頻而讓有責任意義的工作消失。清理順序與現場細節仍在情境。是否構成持續職責要以後續訪談核對。
 - **僅有部分資訊：**假設只知道員工「使用 Excel」，尚不知用來處理什麼工作。下層可保留已知原話及缺口；理解不能造出「負責報表分析」或填滿一套知識技能。若線索影響工作範圍，應標明目前只知道什麼、還缺什麼並保留回查入口，供顧問追問。
 
-**驗收方法不是字數或欄位數。**用不同職位、舊情境後來被更正、低頻高影響工作、本人與團隊責任不清，以及只掌握部分事實的對照，檢查正文能否支持正確的初步理解與向下回查；再看情境與原話是否保留了更細的證據。這仍不能單獨證明整份工作已被完整訪談，也不授權新增 verifier、資料層或 B2 對 B1 的審核權。
+**驗收方法不是字數或欄位數。**用不同職位、舊情境後來被更正、低頻高影響工作、本人與團隊責任不清，以及只掌握部分事實的對照，檢查正文能否支持正確的初步理解與向下回查；再看情境與原話是否保留了更細的證據。這些判準檢查已取得資訊的整理品質，不能單獨證明完整訪談範圍，也不增加驗證器、資料層或 B2 審核 B1 的職責。

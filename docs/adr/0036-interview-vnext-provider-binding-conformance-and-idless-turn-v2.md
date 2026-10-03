@@ -6,12 +6,12 @@
 
 依據：
 
-- [`../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md)
-- [`../plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](../plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md) §23 true-live 診斷
+- [`../specs/2026-07-18-interview-vnext-llm-runtime-architecture-review.md`](../history.md#source-749737a1537ae176f993)
+- [`../plans/2026-07-18-interview-vnext-v3-5-turn-eval-harness-plan.md`](../history.md#source-adde91251a1a00660e92) §23 true-live 診斷
 
 實作 authority：
 
-- [`../plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md)
+- [`../plans/2026-07-18-interview-vnext-v3-5a-runtime-contract-reconstruction-plan.md`](../history.md#source-5a567e31cfc6e7dbfdbc)
 
 Refines：
 

@@ -351,7 +351,7 @@ inventory);等多久=work context;準備什麼材料=inputs+Tools & Technology�
 ### 8.4 實品樣張
 
 骨架+槽位表已填成完整模擬樣張(軟體測試工程師,公版引用取自 repo 真資料 ISD2519-002v2):
-**[`2026-07-05-golden-sample-software-tester.md`](../../specs/2026-07-05-golden-sample-software-tester.md)**
+**[`2026-07-05-golden-sample-software-tester.md`](../work-analysis/2026-07-05-golden-sample-software-tester.md)**
 ——同時示範公版/客製兩層分野、抓漏實績、深問預算、覆蓋率自檢四機制。待維護者審。
 
 ### 8.5 兩個設計紅利(合成時浮現)
@@ -493,10 +493,10 @@ ADR 0023/0024/0025 草案對研究結果逐條覆審(尺=最新/最主流/大廠
 原待決 1/2/3 皆由其涵蓋——tool=workflow 確定性步驟+回合內小呼叫;adaptive=指令+三重保險)
 · **0024**(LLM 接線)· **0025**(共編權限)全數 Accepted。
 
-**實作後記(2026-07-05,v1 完成)**:spec([`interview-engine-v1-spec`](../../specs/2026-07-05-interview-engine-v1-spec.md))
+**實作後記(2026-07-05,v1 完成)**:spec([`interview-engine-v1-spec`](../../history.md#source-85f5df84a38116aa1802))
 → plan 15 task → **全數實作**(契約 details/四表/human_touched/槽位門檻/指令詞彙表/executor/
 select_schema+對抗驗收 PASS/回合服務/4 端點/web 面板+批審+稽核頁/模擬受訪者校準 #1 PASS
-(關鍵字 0.91、quote 驗證 1.0))。端到端設計=[`design/interview-engine.md`](../../archive/docs-cleanup-2026-10-02.md);
+(關鍵字 0.91、quote 驗證 1.0))。端到端設計=[`design/interview-engine.md`](../../history.md#source-342210e06cceeff43952);
 tag `interview-v1`。spike 修正:adapter 用 openai SDK 直傳(非 Pydantic AI,理由=動態 raw
 schema,見驗收紀錄);`:review` 只轉狀態、前端套用(ai-suggestions 不變量 1)。
 

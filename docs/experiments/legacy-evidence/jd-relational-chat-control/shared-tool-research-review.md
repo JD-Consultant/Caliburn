@@ -32,4 +32,4 @@
 - **自然操作評估：**固定 SDK、真 DB 與新程序證據只證明接合與恢復；尚須未指示工具順序的真訪談，驗該寫才寫、責任忠實度、工具誤選、來源支持及對錯誤結果的理解。付費範圍另按原計畫確認。
 - **聊天准入／原 run 查回：**本輪正在實作；歷史分支不可只憑相同文字或 metadata 選取，沿已實測的 native parent 關係。有斷鏈或查找超界時保留未解狀態，不能宣稱原請求不存在並重新執行。
 
-施工與驗收繼續沿 [RS 計畫](../../../plans/2026-09-13-jd-relational-app-implementation.md)，原格式與產品決策不因二手參考自動改寫。已知接點實作見 [transport](../../../../experiments/jd-relational-app/src/jd_relational/transport.py)、[consultant tools](../../../../experiments/jd-relational-app/src/jd_relational/consultant_tools.py)及 [AI runtime](../../../../experiments/jd-relational-app/src/jd_relational/ai_runtime.py)。
+施工與驗收繼續沿 [RS 計畫](../../../archive/implementation-plans/2026-09-13-jd-relational-app-implementation.md)，原格式與產品決策不因二手參考自動改寫。已知接點實作見 [transport](../../../../experiments/jd-relational-app/src/jd_relational/transport.py)、[consultant tools](../../../../experiments/jd-relational-app/src/jd_relational/consultant_tools.py)及 [AI runtime](../../../../experiments/jd-relational-app/src/jd_relational/ai_runtime.py)。

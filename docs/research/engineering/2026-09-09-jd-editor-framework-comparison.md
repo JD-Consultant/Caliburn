@@ -1,8 +1,8 @@
 # JD 編輯框架：原生能力、細節差距與選型證據
 
-**2026-09-09 後續限制：**Owner 已限定免費開源並要求執行研究計畫。下方 F 表中的付費 Tiptap Toolkit／Tracked Changes、CKEditor premium 僅保留為比較沿革，原優先排序不再有效；最新採用候選與原始碼證據依[免費開源能力與缺口研究](../../specs/2026-09-09-jd-oss-editor-capabilities-and-gaps.md)。Owner 另容許重議「人改 pending 仍 pending」，不可再以該條單獨淘汰開源方案。
+**2026-09-09 後續限制：**Owner 已限定免費開源並要求執行研究計畫。下方 F 表中的付費 Tiptap Toolkit／Tracked Changes、CKEditor premium 僅保留為比較沿革，原優先排序不再有效；最新採用候選與原始碼證據依[免費開源能力與缺口研究](2026-09-09-jd-oss-editor-capabilities-and-gaps.md)。Owner 另容許重議「人改 pending 仍 pending」，不可再以該條單獨淘汰開源方案。
 
-JD-R002/C03；查閱日 **2026-09-09**。這是 G2 證據／比較，不是套件採用、購買或施工授權。結論在[整體入口](../../specs/2026-09-09-ai-document-app-composition-research.md)，建議流程在[可執行方案](../../specs/2026-09-09-jd-ai-editing-executable-proposal.md)。既有文件產品證據保留於 [E01–E20](2026-09-09-jd-document-model-official-evidence.md)；agent 往返及錯誤見 [R01–R10](../agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)。不重開職務內容或 Memory。
+JD-R002/C03；查閱日 **2026-09-09**。這是 G2 證據／比較，不是套件採用、購買或施工授權。結論在[整體入口](2026-09-09-ai-document-app-composition-research.md)，建議流程在[可執行方案](../../history.md#source-81ce3748645d8d8bc468)。既有文件產品證據保留於 [E01–E20](2026-09-09-jd-document-model-official-evidence.md)；agent 往返及錯誤見 [R01–R10](../agent-systems/2026-09-09-jd-ai-app-runtime-official-evidence.md)。不重開職務內容或 Memory。
 
 **閱讀方式：**Fact 是來源明文；Mapping 是針對 C01／C02 的選擇；Unknown 不是沒有功能，而是目前證據不足，不能當作已覆蓋。官方範例不等於完整成品；latest 文件也不等於任何舊安裝版本可用。
 

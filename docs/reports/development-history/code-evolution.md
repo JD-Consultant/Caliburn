@@ -90,7 +90,7 @@
 
 **程式可證明的變化。**`480959e7` 的 `build_consultant_messages` 已有事件議程 `agenda_view`，卻同時注入 `ledger_summary` 產生的「下一個缺口」。`1223aa13` 移除 `next_gap`、`ledger_summary`、`gap_label` 的引導路徑，讓議程承接選題，教材則按階段選取。`run_turn` 也不再預存 `last_gap`，改以裁剪是否真正落地更新該部分進度。
 
-**當時說明與回讀判斷。**[ADR0033](../../adr/0033-episode-agenda-consultant-tools.md)及[7/14診斷](../../specs/2026-07-14-interview-agenda-architecture-research.md)指出線性槽位使行為指標難以到達，以及「任何寫入」不代表當前問題已有進展。程式顯示這次不只是新增事件工具，而是清掉新舊兩套控制同時引導模型的接縫；事件工具在此前已接入。
+**當時說明與回讀判斷。**[ADR0033](../../adr/0033-episode-agenda-consultant-tools.md)及[7/14診斷](../../research/work-analysis/2026-07-14-interview-agenda-architecture-research.md)指出線性槽位使行為指標難以到達，以及「任何寫入」不代表當前問題已有進展。程式顯示這次不只是新增事件工具，而是清掉新舊兩套控制同時引導模型的接縫；事件工具在此前已接入。
 
 **固定證據：**
 
@@ -104,7 +104,7 @@
 
 **程式可證明的變化。**`a6a8574e` 的 `scribe_pass` 只把最新員工發言送進書記 prompt；該版本雖已有 `harvest.py`，服務還沒呼叫它。`9b80074d` 才在 `run_turn` 接入事件關閉／自動關閉 → `pending_harvest` → `harvest_pass`。後者選出事件期間多輪員工原文、注入實際起草需要的教材，逐筆定位 quote 所屬回合，再沿既有 `records_to_ops`／`land_ops` 成為待審草稿。
 
-**當時說明與回讀判斷。**原模組檔頭說明跨輪定位與行為指標教材的用途；同題背景見[事件議程研究](../../specs/2026-07-14-interview-agenda-architecture-research.md)。可用來展示的不是「多寫一個 Agent」，而是核對原料、教材、觸發點、寫入者是否真的連成一條路。
+**當時說明與回讀判斷。**原模組檔頭說明跨輪定位與行為指標教材的用途；同題背景見[事件議程研究](../../research/work-analysis/2026-07-14-interview-agenda-architecture-research.md)。可用來展示的不是「多寫一個 Agent」，而是核對原料、教材、觸發點、寫入者是否真的連成一條路。
 
 **固定證據：**
 
@@ -112,7 +112,7 @@
 - 接入前後：`a6a8574e:apps/api/app/interview/service.py` → `9b80074d:apps/api/app/interview/service.py`。
 - 起草及定位：`9b80074d:apps/api/app/interview/harvest.py` 的 `_episode_turns`、`_locate`、`harvest_pass`。
 - 測試：`9b80074d:apps/api/tests/test_interview_service.py` 的 `test_close_episode_triggers_harvest_lands_indicator`；`9b80074d:apps/api/tests/test_interview_harvest.py` 的 `test_harvest_prompt_injects_indicator_material`、`test_locate_finds_turn`。
-- 實驗原文：`b8494e10:docs/specs/2026-07-05-interview-sim-calibration.md`「紀錄 #3 — 2026-07-15」；可讀[原文件](../../specs/2026-07-05-interview-sim-calibration.md)。檔名日期不是這次實驗日期。
+- 實驗原文：`b8494e10:docs/specs/2026-07-05-interview-sim-calibration.md`「紀錄 #3 — 2026-07-15」；可讀[原文件](../../history.md#source-bbe1eedda0bb5779480a)。檔名日期不是這次實驗日期。
 
 **驗證界線。**該次合成人設實驗記錄11條P、harvest落地1/1，但總閘門仍 FAIL：`verify_pass_rate=0.74`，原報告診斷主要為重複起草遭拒收，另有從非回答起草的雜訊。11條P不能全算成 harvest 產出；0.74也不能改稱事實正確率。這是接線後進一步暴露分工與量測問題的材料，不是全系統通過。
 
@@ -127,7 +127,7 @@
 - 前後組裝：`9e9dba16:apps/api/app/interview_vnext/application/context_builder.py` → `7b2cec5a:apps/api/app/interview_vnext/application/context_builder.py` 的 `_eligible_question_frame`。
 - 前後驗證：`9e9dba16:apps/api/app/interview_vnext/application/turn_interpret.py` → `7b2cec5a:apps/api/app/interview_vnext/application/turn_interpret.py`，`verify_turn_interpret_output`／`_materialize_binding`。
 - 反例：`7b2cec5a:apps/api/tests/test_interview_vnext_turn_interpret.py` 的 `test_frequency_slot_accepts_exact_count_and_rejects_hidden_second_count`、`test_frequency_slot_fails_closed_on_unsupported_interval_range_or_irregular_count`。
-- 後續限定驗證見[R5-D紀錄](../../plans/2026-07-22-interview-vnext-v3-5a-r5-d-bounded-correctness-closure-plan.md)，不是後來新架構的驗收。
+- 後續限定驗證見[R5-D紀錄](../../history.md#source-7b42c231502a8e960a77)，不是後來新架構的驗收。
 
 **驗證界線。**測試接受「每月2次」、拒收「每月2次或3次」，但也明確拒收當時不支援的「每兩週一次」。這揭示結構化規則的表達限制，不該只報正例或稱自然語言短答已普遍解決；當時資料庫測試通過也不等於真模型語意通過。
 
@@ -150,7 +150,7 @@
 
 **程式可證明的變化。**舊 `create_case` 自動附上本批 `stage.source_reference`；`split_case` 又把同一組來源複製給所有新案例。`88713a9c` 改為模型用已提供的 `evidence_keys` 選擇支持關係，Runtime 解析正式引用並按來源順序保存；拆分時未分配給新案例的舊證據須明示處置。`cf60e4d4` 進一步把 B2 的 `read_case_source(case_id, source_reference, offset)` 收斂為 `read_case_source(evidence_key)`，來源與分頁位置交給 Runtime。
 
-**當時說明與回讀判斷。**[引用施工計畫 §1–2](../../plans/2026-09-17-interview-evidence-citations.md)區分處理範圍 `window`、證據 `source`、消歧 `context`。程式可證明引用選擇責任有改變：模型判斷「哪些內容支持這個案例」，App 處理地址與順序；不能因某段原話在本批出現，就自動視為支持每個案例。
+**當時說明與回讀判斷。**[引用施工計畫 §1–2](../../history.md#source-68f621f02972c31d1d41)區分處理範圍 `window`、證據 `source`、消歧 `context`。程式可證明引用選擇責任有改變：模型判斷「哪些內容支持這個案例」，App 處理地址與順序；不能因某段原話在本批出現，就自動視為支持每個案例。
 
 **固定證據：**
 
@@ -166,7 +166,7 @@
 
 基礎實作的 `build_request_view` 只改推論用視圖，不改 canonical messages；摘要另帶涵蓋邊界與 prefix digest，主模型未成功時不發布新的摘要狀態。這是**當時自建的接續摘要方案**，不可混同後來採用的 OpenAI 原生 standalone compaction。
 
-**當時說明與回讀判斷。**[9/16設計及兩次小步結果](../../specs/2026-09-16-openrouter-continuation-compaction-design.md)保存當時供應商／框架限制及接線順序。本次補出的重點是：有摘要函式不代表已縮到真正的 request，也不代表重啟能拿回摘要；原始對話、送模投影與接續狀態是不同責任。
+**當時說明與回讀判斷。**[9/16設計及兩次小步結果](../../history.md#source-49fa82b26188aad2b075)保存當時供應商／框架限制及接線順序。本次補出的重點是：有摘要函式不代表已縮到真正的 request，也不代表重啟能拿回摘要；原始對話、送模投影與接續狀態是不同責任。
 
 **固定證據：**
 
@@ -181,7 +181,7 @@
 
 **程式可證明的變化。**舊 `_recover_previous` 在前景恢復期間直接 wake 背景；`0c742248` 移除這個呼叫，由 managed App 在 `finish_startup` 完成後才執行 `BackgroundCoordinator.resume_pending`。另一個接縫是 graph 建立時尚沒有 App 文件資源：`6e322fe5` 把建構 middleware 時綁定的 readers，改成每次 invoke 由 `ConsultantContext.background_availability` 注入，middleware 只讀取並呈現狀態，不啟動工作。
 
-**當時說明與回讀判斷。**[背景接線設計 §2.2](../../specs/2026-09-17-managed-app-background-callback-design.md)明確記錄過早 wake 遇到 `startup_pending`，上層又隔離錯誤；以及 graph 與 App 資源的建立順序問題。這能呈現生命週期診斷：不能只查「函式有沒有寫」，還要查呼叫時誰已 ready、資源屬於哪份文件。
+**當時說明與回讀判斷。**[背景接線設計 §2.2](../../history.md#source-7c86c662c16442ee0356)明確記錄過早 wake 遇到 `startup_pending`，上層又隔離錯誤；以及 graph 與 App 資源的建立順序問題。這能呈現生命週期診斷：不能只查「函式有沒有寫」，還要查呼叫時誰已 ready、資源屬於哪份文件。
 
 **固定證據：**
 
@@ -206,7 +206,7 @@ git show ff4df3a3 -- apps/ocs-indexer/tests/test_matching_core.py
 
 ## 本輪核對範圍與仍缺的材料
 
-2026-10-02：補入11組程式演進材料，主要深化6–9月的資料、訪談與 Memory 接線；3–5月原始起點仍沿[早期原件](../../archive/early-projects/README.md)及[既有時間線](product-and-architecture.md)查，不把本頁最早日期當成專案起點。
+2026-10-02：補入11組程式演進材料，主要深化6–9月的資料、訪談與 Memory 接線；3–5月原始起點仍沿[早期原件](../../history.md#source-662ea57dd88fb5eb0879)及[既有時間線](product-and-architecture.md)查，不把本頁最早日期當成專案起點。
 
 本次核對了本文66個不同的 Git blob 定位均可讀，30個具名測試在對應歷史測試檔中存在；回讀了相關前後程式與原紀錄。新增本文、調整三個入口，四份文件的相對連結／章節定位檢查無失效。**這些是材料與引用檢查，不是執行了30個產品測試**；沒有付費請求、重跑舊實驗、改產品或清除原證據。
 

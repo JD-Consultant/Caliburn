@@ -3,7 +3,7 @@
 - 日期：2026-09-27。
 - 狀態：有限合成案例已執行；不是正式 parser、工具或產品驗收。
 - 範圍：全合成字串、無模型請求、無資料庫與產品資料。RapidFuzz 只安裝於被忽略的 `.research-tmp/` 隔離環境；未改 App 依賴、鎖定檔或 production。
-- 決策入口：[產品概念 009](../../../product-concept.md#工作情境與工作理解的三個內容欄位目標未實作)；判讀與後續 gate：[工具研究 §10.6](../../../specs/2026-09-09-llm-app-tool-use-and-document-editing-common-practices.md#106-帶上下文-hunk-的有限離線驗證2026-09-27)。本頁保存證據，不建立第二份產品規則。
+- 決策入口：[產品概念 009](../../../product-concept.md#分層工作記憶)；判讀與後續 gate：[工具研究 §10.6](../../../research/agent-systems/2026-09-09-llm-app-tool-use-and-document-editing-common-practices.md#106-帶上下文-hunk-的有限離線驗證2026-09-27)。本頁保存證據，不建立第二份產品規則。
 
 ## 問題與驗證順序
 

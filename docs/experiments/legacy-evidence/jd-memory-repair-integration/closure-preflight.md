@@ -8,7 +8,7 @@
 
 結束條件需要三件分開證明的事：原工作確實停止、原 C 發布結果已確認、保存的對話及回合狀態已閉合。Future 結束只滿足第一件；查到 receipt 只滿足第二件；補 ToolMessage 或 `update_state` 不可替代前兩件。
 
-這沿用[已採用核心](../../../specs/2026-09-13-jd-memory-repair-core-slice.md)與[接合前窄審](../jd-memory-repair-core/runtime-preflight.md)，沒有重開 patch、Memory 分層或資料表設計。C 的 artifact／publication、JD 的 SQL operation、原始對話各維持原本權責。
+這沿用[已採用核心](../../../archive/legacy-specs/2026-09-13-jd-memory-repair-core-slice.md)與[接合前窄審](../jd-memory-repair-core/runtime-preflight.md)，沒有重開 patch、Memory 分層或資料表設計。C 的 artifact／publication、JD 的 SQL operation、原始對話各維持原本權責。
 
 ## 2. 最小分類矩陣
 

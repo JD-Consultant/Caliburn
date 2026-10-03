@@ -53,10 +53,10 @@ Revision 4、修改條件後重跑、production、merge 與 push 均未授權；
 
 ## 設計來源與分類
 
-- 大廠／框架共同方向、Caliburn mapping 與實驗變數的逐層分類：[`final audit`](../../../../../archive/worktree-snapshots/20260918-memory-routing-spike/docs/specs/2026-09-03-memory-read-spike-consensus-and-framework-final-audit.md)
-- 已核准 read contract：[`MEM-Q004 research`](../../../../../archive/worktree-snapshots/20260918-memory-routing-spike/docs/specs/2026-09-03-memory-routing-canonical-read-and-isolated-spike-research.md)
-- 實作與停止條件：[`Revision 2 plan`](../../../../../archive/worktree-snapshots/20260918-memory-routing-spike/docs/plans/2026-09-03-memory-routing-canonical-read-isolated-spike.md)
-- 當前決策：[`current-decisions.md`](../../../../../archive/worktree-snapshots/20260918-memory-routing-spike/docs/current-decisions.md)
+- 大廠／框架共同方向、Caliburn mapping 與實驗變數的逐層分類：[`final audit`](../../../../../history.md#source-de1b247c8ace15eeafc3)
+- 已核准 read contract：[`MEM-Q004 research`](../../../../../history.md#source-e15d04730e1b34a0353c)
+- 實作與停止條件：[`Revision 2 plan`](../../../../../history.md#source-7742e637ba57015e57a9)
+- 當前決策：[`current-decisions.md`](../../../../../history.md#source-d6955ac0140fd2b52a42)
 
 凡不屬框架原生能力的常數或政策，只能是凍結的實驗變數，不得冒充 vendor 標準或 production 決策。
 

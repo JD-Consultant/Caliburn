@@ -6,8 +6,8 @@
 - 查閱／最後核對：2026-09-26。
 - 維護責任：Agent 架構研究；產品取捨由 Product Owner 確認。
 - 範圍：職務顧問 A 如何跨 Step／Turn 接續分析；B1／B2 只核對責任界線，不在此重設背景流程。
-- 上位入口：[全產品目標導覽](../../target-architecture-map.md)、[產品概念](../../product-concept.md#reasoning-與-compaction-的接續政策目標未實作)、[討論規範](../../architecture-discussion-standard.md)。
-- 研究沿革：PROD-G1-014 → 015 曾允許極端原生自動壓縮 → **018 取消該例外** → **019 確認 A／B1／B2 的交界門檻／Agent 決定兩種主動觸發、完整視窗接續與 LangGraph＋OpenAI direct Responses SDK**。最新政策見[產品概念](../../product-concept.md#reasoning-與-compaction-的接續政策目標未實作)。下文 §6–8 保留各階段審核，提到自動路徑、固定排列未選或 SDK／框架待選時不是最新目標；早期 [09-25 研究](2026-09-25-agent-capabilities-and-lifecycle-patterns-research.md)也不直接作新接線規格。框架已選，State 及背景工作交界仍待研究，見 §9。
+- 上位入口：[全產品目標導覽](../../target-architecture-map.md)、[產品概念](../../product-concept.md#上下文與分析接續)、[討論規範](../../architecture-discussion-standard.md)。
+- 研究沿革：PROD-G1-014 → 015 曾允許極端原生自動壓縮 → **018 取消該例外** → **019 確認 A／B1／B2 的交界門檻／Agent 決定兩種主動觸發、完整視窗接續與 LangGraph＋OpenAI direct Responses SDK**。最新政策見[產品概念](../../product-concept.md#上下文與分析接續)。下文 §6–8 保留各階段審核，提到自動路徑、固定排列未選或 SDK／框架待選時不是最新目標；早期 [09-25 研究](2026-09-25-agent-capabilities-and-lifecycle-patterns-research.md)也不直接作新接線規格。框架已選，State 及背景工作交界仍待研究，見 §9。
 - 後續裁決 PROD-G1-016／017：Owner 已選擇不使用 `previous_response_id`、明確設定 `store=false`，由 App 自主管理 context 與原生 items 接續，自己的資料庫負責必要持久資料。下文 §6、§8 中「尚未決定不用／仍可比較 chaining／store 未選」是裁決前的審核紀錄，不再作最新選項；最新責任與官方 stateless reasoning／資料保留界線見[顧問設計稿](../../specs/2026-09-26-consultant-context-and-state-design.md)。019 已另定框架，但不預定 State schema、保存／恢復實現或新增筆記機制。
 
 ## 1. 本輪問題與研究結論
@@ -175,7 +175,7 @@
 
 ### 10.4 後續驗證邊界與收斂
 
-候選責任與正常／異常生命週期集中寫在[設計稿 §7](../../specs/2026-09-26-consultant-context-and-state-design.md#7-state-責任與生命週期候選先找使用方再決定表示)，不在研究稿另抄一份流程。
+候選責任與正常／異常生命週期集中寫在[設計稿 §7](../../specs/2026-09-26-consultant-context-and-state-design.md#7-state-責任與生命週期)，不在研究稿另抄一份流程。
 
 採納接線前需要的窄驗證：**原生 items → SDK input → Saver 保存／讀回 → 下一請求**保留內容與順序；一般追加不改舊觀察；compact 全量 output 正確換窗；同 Turn 恢復不刷新 Memory；JD 已提交但 checkpoint 未寫時不重做；provider 回應／compact 已產生卻未保存時不把重送視為零成本。模型品質另驗，不讀 hidden reasoning 判斷是否「真的接著思考」。
 
@@ -203,4 +203,4 @@
 | 框架原生保存 R／必要 task 結果＋原業務結果核對；使用者仍停完整 Step | 可以減少重算，責任仍是框架保存與業務冪等；要補私有候選、完整 Step 採用與取消資格接線。 | **優先候選**；不能承諾完全零額外工時，但無理由新建整套恢復引擎。 |
 | 每個傳送／接收／token／工具階段都建自訂狀態機及 UI 恢復點 | 更多控制及測試組合，仍不能保證找回未保存的遠端回應。 | 首版不建議；需更細控制的實際需求再重開。 |
 
-**附件審核結論：**保留完整迭代形成 Step、原請求先保存、精確候選採用、短業務完成提交及取消終局核對的候選方向。刪除正常人工中途改稿的設計分支；補正 resume／replay 差異，且不能把「已發送」當成「已執行／未執行」證據。**同日 Owner 接續裁決：**原先因 026 而排除第一步半步恢復的限制已被補正；所有 Step 都可承接已保存、可核對的模型／工具結果。只有確無可用同輪恢復位置或整輪放棄，才回完成 Turn、重新提交新輸入。這是產品政策更新，不是框架新能力；具體保存接法仍未選定、未實作或驗收。詳細流程、暫停位置及可證偽情境只在[設計 §7.4](../../specs/2026-09-26-consultant-context-and-state-design.md#74-step-內部恢復與暫停接法候選未採納)維護。研究足以作取捨，停止廣搜；不選資料表、不升級套件、不施工、不送模型。
+**附件審核結論：**保留完整迭代形成 Step、原請求先保存、精確候選採用、短業務完成提交及取消終局核對的候選方向。刪除正常人工中途改稿的設計分支；補正 resume／replay 差異，且不能把「已發送」當成「已執行／未執行」證據。**同日 Owner 接續裁決：**原先因 026 而排除第一步半步恢復的限制已被補正；所有 Step 都可承接已保存、可核對的模型／工具結果。只有確無可用同輪恢復位置或整輪放棄，才回完成 Turn、重新提交新輸入。這是產品政策更新，不是框架新能力；具體保存接法仍未選定、未實作或驗收。詳細流程、暫停位置及可證偽情境只在[設計 §7.4](../../specs/2026-09-26-consultant-context-and-state-design.md#74-step-內部恢復與暫停)維護。研究足以作取捨，停止廣搜；不選資料表、不升級套件、不施工、不送模型。

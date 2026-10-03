@@ -8,11 +8,11 @@
 >
 > 目的：先還原框架官方真正提供的完整流程，再另行判斷如何承接已研究的 OpenAI 記憶流程。本文刻意不做 Caliburn 映射。
 >
-> 後續更精確的能力邊界見[通用流程審核](../../specs/2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)：
+> 後續更精確的能力邊界見[通用流程審核](2026-09-05-generic-memory-flow-framework-crosswalk-audit.md)：
 > LangMem manager 不包含外部按需深讀；Deep Agents 可只固定注入 guide，其他檔案按需讀取；
 > 多筆 Store writes 不是原子交易。以下「原生」只指所列 primitive，不保證整條 pipeline。
 >
-> 原文／摘要的最新固定 source 複核見[小元件資料流](../../specs/2026-09-05-framework-conversation-source-and-summary-primitives-trace.md)：已修正 Deep Agents state replacement 誤讀、DB history 與 model context 混淆，以及漏列 LangMem short-term summary。細節以該子稿為準，不只看「summary／canonical」名稱。
+> 原文／摘要的最新固定 source 複核見[小元件資料流](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md)：已修正 Deep Agents state replacement 誤讀、DB history 與 model context 混淆，以及漏列 LangMem short-term summary。細節以該子稿為準，不只看「summary／canonical」名稱。
 
 ## 0. 研究邊界與證據規則
 
@@ -137,7 +137,7 @@ model call
 
 **[官方契約]** `SummarizationMiddleware` 在 token／message／context fraction 門檻達成後，用另一個模型摘要舊訊息並保留指定數量的近期訊息。若不設 trigger，不會自動觸發。[Prebuilt middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in#summarization)
 
-固定 source 的 `before_model` 回傳 RemoveMessage＋summary＋recent，會更新目前 graph state；但**不等於刪除資料庫全部歷史**。普通 PostgresSaver 保留舊 snapshots；是否能作完整原文 reader 仍需接存取／保留契約。分層、SQL 與來源見[底層追蹤 §1–3](../../specs/2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#1-必須分清三種替換)。
+固定 source 的 `before_model` 回傳 RemoveMessage＋summary＋recent，會更新目前 graph state；但**不等於刪除資料庫全部歷史**。普通 PostgresSaver 保留舊 snapshots；是否能作完整原文 reader 仍需接存取／保留契約。分層、SQL 與來源見[底層追蹤 §1–3](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#1-必須分清三種替換)。
 
 ### 4.3 OpenAI provider 專用能力
 
@@ -198,7 +198,7 @@ Context 接近上限
 
 **[官方契約]** 每個 `create_deep_agent` 都包含 context compression。預設大型 tool payload 超過 20,000 tokens 會 offload；摘要通常在模型 input window 約 85% 觸發、保留約 10% recent tokens。發生標準 `ContextOverflowError` 時會立即摘要後重試。另可選擇加入 `compact_conversation` tool 主動觸發同一引擎。[Deep Agents context compression](https://docs.langchain.com/oss/python/deepagents/context-engineering#context-compression)
 
-**固定 source 更正：**不能把 history rendering 稱為無損 canonical 保證，也不能說 Deep Agents 只剩摘要 state。正常摘要採 request override＋event；overflow 的 ToolMessage eviction 另可能寫回縮短內容，archive 失敗仍可能摘要。完整 trace、固定原始碼與失敗測試見[底層追蹤 §3.2](../../specs/2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#32-deep-agents-summarizationmiddleware修正前輪誤讀)。它仍不是 OpenAI 的 opaque compaction artifact。
+**固定 source 更正：**不能把 history rendering 稱為無損 canonical 保證，也不能說 Deep Agents 只剩摘要 state。正常摘要採 request override＋event；overflow 的 ToolMessage eviction 另可能寫回縮短內容，archive 失敗仍可能摘要。完整 trace、固定原始碼與失敗測試見[底層追蹤 §3.2](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#32-deep-agents-summarizationmiddleware修正前輪誤讀)。它仍不是 OpenAI 的 opaque compaction artifact。
 
 ### 5.4 長期 Memory
 
@@ -280,7 +280,7 @@ filter?: object
 
 它把 BaseStore search results 序列化回模型，也可另外把原始 items 當 artifact 回給 runtime。[LangMem tools API](https://langchain-ai.github.io/langmem/reference/tools/)、[官方 tools 原始碼](https://github.com/langchain-ai/langmem/blob/main/src/langmem/knowledge/tools.py)
 
-**[後續定向複核]** 上述工具可交給 Agent 在執行途中使用；§6.2 manager 不會中途外讀，不代表 LangMem 整包不提供這項工具能力。官方 [hot-path quickstart](https://langchain-ai.github.io/langmem/hot_path_quickstart/) 仍使用舊 `create_react_agent`；新組合應依 [v1 migration](https://docs.langchain.com/oss/python/migrate/langgraph-v1) 核對 `create_agent`，不能只照抄舊範例。元件組合與缺口比較見[審核稿 §8](../../specs/2026-09-05-generic-memory-flow-framework-crosswalk-audit.md#8-owner-同意後先固定能力再比較兩種工具組合)，本輪未做新版本執行相容性測試。
+**[後續定向複核]** 上述工具可交給 Agent 在執行途中使用；§6.2 manager 不會中途外讀，不代表 LangMem 整包不提供這項工具能力。官方 [hot-path quickstart](https://langchain-ai.github.io/langmem/hot_path_quickstart/) 仍使用舊 `create_react_agent`；新組合應依 [v1 migration](https://docs.langchain.com/oss/python/migrate/langgraph-v1) 核對 `create_agent`，不能只照抄舊範例。元件組合與缺口比較見[審核稿 §8](2026-09-05-generic-memory-flow-framework-crosswalk-audit.md#8-owner-同意後先固定能力再比較兩種工具組合)，本輪未做新版本執行相容性測試。
 
 精確 reader 並非 Store 的能力缺口：LangChain 官方工具範例已使用 `ToolRuntime`＋`runtime.store.get`。但將它接成 summary reader 的 locator／missing-result 契約，仍不是 LangMem search／manage 自動生成的功能。[官方工具範例](https://docs.langchain.com/oss/python/langchain/tools#long-term-memory-store)
 
@@ -301,7 +301,7 @@ filter?: object
 
 ### 6.6 Short-term summary：先前漏列的公開小元件
 
-`summarize_messages/asummarize_messages` 接收 messages 與可選 RunningSummary，回傳有界模型輸入及新 summary state；不自行存 Store／刪 checkpoint。`SummarizationNode` 包裝它，預設 input=`messages`、output=`summarized_messages`，將兩者分開；刻意設為同 key 才要求 reducer 移除舊列表。是官方公開 API，不必為了拆開原文與模型視圖就自行發明摘要演算法。來源與版本／相容性邊界見[底層追蹤 §3.3](../../specs/2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#33-langmem-的小型公開元件原事實圖漏列)、[LangMem short-term API](https://langchain-ai.github.io/langmem/reference/short_term/)。
+`summarize_messages/asummarize_messages` 接收 messages 與可選 RunningSummary，回傳有界模型輸入及新 summary state；不自行存 Store／刪 checkpoint。`SummarizationNode` 包裝它，預設 input=`messages`、output=`summarized_messages`，將兩者分開；刻意設為同 key 才要求 reducer 移除舊列表。是官方公開 API，不必為了拆開原文與模型視圖就自行發明摘要演算法。來源與版本／相容性邊界見[底層追蹤 §3.3](2026-09-05-framework-conversation-source-and-summary-primitives-trace.md#33-langmem-的小型公開元件原事實圖漏列)、[LangMem short-term API](https://langchain-ai.github.io/langmem/reference/short_term/)。
 
 ## 7. 對照 OpenAI 已公開責任形狀
 

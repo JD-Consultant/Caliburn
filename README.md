@@ -4,10 +4,15 @@
 
 Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書（JD）應用程式。目標是讓不熟悉 JD 寫作的員工，只需說明工作、回答釐清問題，也能由 AI 逐步產出精簡、完整、符合實際工作的 JD；人仍可編輯同一份工作稿。
 
-- **第一次認識產品：**[產品專題介紹](docs/product-introduction.md)——問題、使用流程、核心設計與待驗證的價值。
-- **準備理解或開發：**[目標架構地圖](docs/target-architecture-map.md)——由全貌逐層深入責任、生命週期、工具與保存。
-- **找檔案或接手工作：**[Repo／文件分類](docs/README.md)、[收尾任務](docs/plans/2026-09-29-target-rebuild/tasks.md#收尾分類與下一步)、[驗收與實驗資料](docs/plans/2026-09-29-target-rebuild/evidence/README.md)。
-- **教授與技術評閱者：**[系統架構報告](docs/reports/system-architecture/README.md)——含流程圖、內部分工與設計取捨；有固定基準，不代替最新開發契約。
+## 閱讀入口
+
+| 想了解什麼 | 文件 |
+|---|---|
+| 產品解決的問題與使用流程 | [產品介紹](docs/product-introduction.md) |
+| 專題的動機、方法、實驗與成果 | [專題報告](docs/reports/project-report/report.md) |
+| 程式內部如何分工、管理資料與延續分析 | [系統架構報告](docs/reports/system-architecture/README.md)，含流程圖與設計取捨 |
+| 維護程式、查找契約與操作方法 | [開發文件導覽](docs/README.md)、[現行架構](docs/target-architecture-map.md) |
+| 查閱研究與開發過程 | [研究與實驗材料](docs/reports/README.md)、[歷史查閱](docs/history.md) |
 
 ## 正式產品
 
@@ -21,9 +26,9 @@ Caliburn 是給員工使用的本機 Web AI 職務分析與職務說明書（JD�
 
 舊的 `experiments/jd-relational-app` 與 `packages/consultant-memory` 程式已退役，只保留研究與沿革文件；精確退役清單與取回方式見 [ADR 0079](docs/adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。不提供舊資料搬移或相容層。
 
-## 已知限制（請先讀）
+## 驗證範圍
 
-品質與容量驗證的**實際結果與未過項目**記在 [T14 品質證據](docs/plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md)、[T16 容量證據](docs/plans/2026-09-29-target-rebuild/evidence/t16-compaction-continuity.md)與 [T17 旅程證據](docs/plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md)。最重要的是：JD 項目的來源引用在跨輪綜合內容時偶爾漏引；每次來源都可回查，但不保證涵蓋完整，使用者應在來源檢視中核對。PDF 畫面正確，部分字型的文字複製／搜尋會出現部首字元。速度與穩定受 OpenAI 帳戶的每分鐘 token 上限（TPM）影響：被限流時系統會自動多等、不算失敗；在 200K TPM 的帳戶上，12 輪訪談約 6–25 分鐘、長訪談要數小時。完整的已知不足與成因見 [T14 證據](docs/plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md#已知不足成因與後續研究方向2026-10-01)。
+品質、容量與使用旅程的實際結果見[驗證範圍](docs/architecture/verification.md)、[實驗發現](docs/reports/experiment-findings.md)與[原始資料](docs/experiments/product-validation/README.md)。跨輪綜合的 JD 項目仍有來源漏引反例；來源可回查不等於依據完整。PDF 部分字型的文字複製／搜尋會出現部首字元。速度受 OpenAI 帳戶的每分鐘 token 上限（TPM）影響：限流時按政策等待；既有 200K TPM 帳戶的合成實驗中，12 輪訪談約 6–25 分鐘，長訪談需數小時，不當成所有環境的效能承諾。
 
 ## 執行環境
 
@@ -74,7 +79,7 @@ pnpm check    # lint、型別、單元／契約測試（不需資料庫）、前
 - 文件地圖與迭代順序：[`docs/README.md`](docs/README.md)
 - 目前有效決策：[`docs/current-decisions.md`](docs/current-decisions.md)
 - 正式架構決策：[ADR 0079](docs/adr/0079-target-rebuild-production-cutover.md)（歷史：[ADR 0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)）
-- 施工計畫、任務與驗證證據：[`docs/plans/2026-09-29-target-rebuild/`](docs/plans/2026-09-29-target-rebuild/README.md)
-- 舊 worktree 與文件沿革：[`docs/archive/worktree-history-index.md`](docs/archive/worktree-history-index.md)
+- 實驗原件與核對命令：[產品驗證資料](docs/experiments/product-validation/README.md)
+- 舊設計與已結案工作：[歷史查閱方式](docs/history.md)；本機封存不隨 Git 發布
 
 `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder` 與 `packages/ocs-contract` 是保留但隔離的 RAG bounded context，不是 JD App runtime 依賴。只有明確執行 `pnpm rag:up`／`pnpm rag:dev` 才會啟動；細節見 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)。

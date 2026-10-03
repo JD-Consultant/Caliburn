@@ -1,11 +1,9 @@
-# Memory CRUD 工具：集中審核範例
 
-- 日期：2026-09-28；最後核對：2026-09-29。
-- 狀態：**已定效果與工程設計的接續範例；未實作、未經 SDK／provider 或保存驗收。**最新目標允許無來源候選；情境移除會同步解除候選理解對它的綁定，但不刪理解或歷史發布。以下非實際 schema／資料表設計。
-- 維護者：工程協作者；決策者：Product Owner。
-- 用途：用同一合成情境核對 Create／Read／Update／Delete，不是 DB CRUD API，也不是正式 JSON Schema。
-- 唯一規則來源：[共同工具規範](2026-09-27-agent-tool-contract-design-research.md)、[Memory 讀取與來源回查](2026-09-27-memory-read-and-source-navigation-contract.md)、[單物件寫入契約](2026-09-27-memory-object-update-tool-contract.md)。本頁只放使用示例，規則變更須先更新責任文件。
-- 入口：[全產品導覽](../target-architecture-map.md)。
+# Memory CRUD 工具範例
+
+以下以同一合成情境展示 Memory 的 Create／Read／Update／Delete，說明模型如何提供參數、App 如何回傳候選操作結果。候選可沒有來源；移除情境會同步解除理解對它的候選綁定，不刪理解或歷史發布。範例不是正式 schema、資料表設計或實測證據。
+
+完整語意見[共同工具規範](2026-09-27-agent-tool-contract-design-research.md)、[Memory 讀取與來源回查](2026-09-27-memory-read-and-source-navigation-contract.md)及[單物件寫入契約](2026-09-27-memory-object-update-tool-contract.md)，全產品關係見[架構導覽](../target-architecture-map.md)。
 
 ## 1. 範例邊界
 
@@ -16,11 +14,11 @@
 | 修改 | `update_work_situation` | `update_work_understanding` |
 | 刪除 | `delete_work_situation` | `delete_work_understanding` |
 
-以上依[共同規範 §2](2026-09-27-agent-tool-contract-design-research.md#2-命名與-description-候選規範)選定動賓短語名稱，與 read／write 責任契約一致；先前資源前綴名稱不再作活動範例，也不註冊同義別名。本例核對操作內容與效果，不代表新增八份實作或已完成工具註冊。B1 不能讀寫理解；B2 不能改情境；A 只能沿授權 read 取得本 Turn 固定的已發布 Memory，不使用上述 Memory 寫入工具。
+以上依[共同規範 §2](2026-09-27-agent-tool-contract-design-research.md#2-命名與-description-規範)選定動賓短語名稱，與 read／write 責任契約一致，不註冊同義別名。B1 不能讀寫理解；B2 不能改情境；A 只能沿授權 read 取得本 Turn 固定的已發布 Memory，不使用上述 Memory 寫入工具。
 
-所有寫入只作用本批候選。App 綁定職務檔案、權限、原工作、操作身分、候選基準及內部 ID；不要求模型填寫。候選範圍由工具說明與執行綁定表達，Create／Read 不重複回 stage；模型不能用參數切換成 published。Title 僅為選擇值，不是 DB 尋址鍵。本文一般 read 示範本批目前工作稿，不冒充已解決同名歷史版本回查。
+所有寫入只作用本批候選。App 綁定職務檔案、權限、原工作、操作身分、候選基準及內部 ID；不要求模型填寫。候選範圍由工具說明與執行綁定表達，Create／Read 不重複回 stage；模型不能用參數切換成 published。Title 僅為選擇值，不是 DB 尋址鍵。本文一般 read 示範本批目前工作稿；歷史回查保持固定引用鏈，不能靠同名推定同一身分。
 
-單一資源的內容參數維持 `title`；讀改刪的既有目標用 `target_title`。Update 的 `changes[]` 承接已定的「同一物件多欄一次修改」；Create 回 created、Delete 回 deleted、無變更回 unchanged，Read 只回內容不附 status／stage，Update 回實際 title／description／applied_changes 且不附 stage。這些是工程設計，不是待 Owner 重選的結果效果；生成 nested strict wire、容量與可靠保存仍待實作驗證。
+單一資源的內容參數維持 `title`；讀改刪的既有目標用 `target_title`。Update 的 `changes[]` 承接已定的「同一物件多欄一次修改」；Create 回 created、Delete 回 deleted、無變更回 unchanged，Read 只回內容不附 status／stage，Update 回實際 title／description／applied_changes 且不附 stage。正式 schema、容量與保存接線見[Memory 實作](../implementation/memory-storage.md)，各層證據不由本頁範例推定。
 
 合成前提：B1 已從合法資料讀到正式訪談序號 12、14，足以整理本人盤點及異常交主管的已知內容。稍後讀到序號 28 的更正，確認頻率為每月而非每週。序號均在本批上界內，不是 Agent Turn、DB ID 或模型自編的引用。12、14 仍有保留價值，所以更新只新增 28，不因更正就抹掉舊原話。
 
@@ -74,7 +72,7 @@ App 回傳完整物件內容，引用與 body 分開：
 
 數字是供模型選取的正式訪談序號，App 仍保留其對應來源身分；不是另定 UUID 或取消來源 ID。若需原話，依共用訪談工具查 12、14 或所需範圍，回傳須有正式序號、說話者及完整訪談原文。本例不把所有來源全文一併塞入 Memory read。
 
-A 使用同類 read 時，App 取本 Turn 固定已發布基準，不讀本例尚未發布候選，也不回 stage。讀取不套用 `applied_changes`，也不回重複的 `status: read`。模型可見導覽仍只提供授權範圍全體集合的 `target_title`／`description`，沿[讀取契約](2026-09-27-memory-read-and-source-navigation-contract.md#1-已確認的讀取內容)按需取得；本頁不另設一份導覽 schema。
+A 使用同類 read 時，App 取本 Turn 固定已發布基準，不讀本例尚未發布候選，也不回 stage。讀取不套用 `applied_changes`，也不回重複的 `status: read`。模型可見導覽仍只提供授權範圍全體集合的 `target_title`／`description`，沿[讀取契約](2026-09-27-memory-read-and-source-navigation-contract.md#1-已確認的讀取內容)按需取得。
 
 ## 4. Update：同次改名、導覽、正文與引用
 
@@ -175,7 +173,6 @@ B2 在本批讀取的結果示例：
 
 讀取來源列以 `target_title` 和描述標出可按需深入的情境，不附全部情境正文。**本例 B2 沿候選引用的穩定身分取得目前候選內容**，包括來源改名或 B1 新修訂；不是讀當初建立理解時的舊情境修訂。A 則在本 Turn 固定已發布 Memory 內逐層讀取；人／App 的舊快照回查才保持當時固定鏈，不以同名最新物件替代。B2 update 沿相同 `changes` 表示，引用 field 為 `work_situation_references`，add／remove 選情境 title；不能把 B1 的 `interview_references` 分支交給 B2 直接寫正式引用。
 
-<a id="7-失敗範例與仍未定事項"></a>
 
 ## 7. 失敗範例與剩餘驗證
 
@@ -195,13 +192,14 @@ B2 在本批讀取的結果示例：
 }
 ```
 
-候選片段只是有界定位資料，不是兩個可直接執行的索引；模型須提出新的明確意圖。`ambiguous_patch_context` 及必要片段沿寫入契約；實際位置不得由 App 猜造，排版及 wire 留實作驗證。保存結果不明不適用 rejected，應先走既有結果核對。若目前標題找不到或原操作綁定後失效，回相應錯誤，不重定向原操作；新呼叫以已重用的標題選到目前物件則合法，不能聲稱知道模型未表達的舊意圖。
+候選片段只是有界定位資料，不是兩個可直接執行的索引；模型須提出新的明確意圖。`ambiguous_patch_context` 及必要片段沿寫入契約；實際位置不得由 App 猜造，排版及 wire 依實際接線驗證。保存結果不明不適用 rejected，應先走既有結果核對。若目前標題找不到或原操作綁定後失效，回相應錯誤，不重定向原操作；新呼叫以已重用的標題選到目前物件則合法，不能聲稱知道模型未表達的舊意圖。
 
 其他必要反例沿責任契約：同層重名建立不覆寫、跨層同名允許、空來源建立與移除最後來源可成立、無效來源拒絕、後段 hunk 失敗全次不改、已知無差異才回 unchanged、刪除不洩露禁止層、被刪情境不留下懸空候選關係、B2 未完成語意分析不得發布。
 
-本頁核對模型可見的 CRUD 使用方式及結果可讀性。分支、改名重用與最小結果已有設計；生成 strict schema、原操作與歷史來源映射、候選保存與結果恢復、容量接線仍待實作驗證；最新[生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md#候選操作快照與三個安全點目標已確認未實作)已確定候選按物件身分維持關係、發布才固定版本，不要求模型用 `add` 同名換版或執行逐條確認。本頁不可直接當完整施工 wire 或驗收證據。
+上述範例展示模型可見的 CRUD 使用方式與結果；strict schema、原操作與歷史來源映射、候選保存／恢復及容量仍各需實測證據。[生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md#候選操作快照與三個安全點)規定候選按物件身分維持關係、發布才固定版本，不要求模型用 `add` 同名換版或執行逐條確認。
 
-## 8. 名稱重用、空來源與 scope 反例（工程設計／未實作驗證）
+
+## 8. 名稱重用、空來源與 scope 反例
 
 - 情境 C 原名「庫存盤點」，改名「月末庫存盤點」後，D 可新建為「庫存盤點」。新呼叫 `read_work_situation({target_title:"庫存盤點"})` 讀 D；原來連 C 的理解來源列顯示 C 的新名，不改連 D。原操作重入仍用已綁定的 C，不重新解析舊名稱，也不新增 read proof。
 - 理解只連 C 時，`work_situation_references` 的 `remove:["庫存盤點"]` 解析 D，因不是該理解成員而整次 `reference_not_found`；`remove:["月末庫存盤點"]` 才移除 C，來源可成為空集合。這不刪 C 或任何歷史資料。

@@ -1,6 +1,6 @@
 # Memory 宿主：資源、重開與回歸結果
 
-2026-09-13；[設計](../../../specs/2026-09-13-jd-memory-host-integration-slice.md)。Python 3.12.13、既有 App lock；PG18.6，零 provider 呼叫。Windows／PG 使用合成資料與隱藏的自有測試程序，未讀真實訪談／日常設定、未改正式產品。
+2026-09-13；[設計](../../../archive/legacy-specs/2026-09-13-jd-memory-host-integration-slice.md)。Python 3.12.13、既有 App lock；PG18.6，零 provider 呼叫。Windows／PG 使用合成資料與隱藏的自有測試程序，未讀真實訪談／日常設定、未改正式產品。
 
 ## 實際接線
 
@@ -43,4 +43,4 @@
 
 ## 未完部分
 
-此單位已接一般 host 的 Memory 資源與儲存初始化。模型的固定 Memory head／導覽投影、按需工具、C 修補、B1/B2 完整窗口與背景整理尚未接；未宣稱它們已受本輪排空測試覆蓋。來源 UI、備份還原、自然品質與日常 AI 啟用仍在[唯一清單](../../../specs/2026-09-13-jd-app-open-issues.md)。只看當輪 JD 改動的需求保持，沒有追加舊對話選輪入口。
+此單位已接一般 host 的 Memory 資源與儲存初始化。模型的固定 Memory head／導覽投影、按需工具、C 修補、B1/B2 完整窗口與背景整理尚未接；未宣稱它們已受本輪排空測試覆蓋。來源 UI、備份還原、自然品質與日常 AI 啟用仍在[唯一清單](../../../archive/legacy-specs/2026-09-13-jd-app-open-issues.md)。只看當輪 JD 改動的需求保持，沒有追加舊對話選輪入口。

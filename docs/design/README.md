@@ -8,7 +8,7 @@
 
 ## 歷史設計
 
-- [`consultant-runtime.md`](consultant-runtime.md) — 原 ADR0060 設計已退役，保留研究與報告脈絡，不作新施工規格。
-- interview engine、editor knowledge pack 的簡短退役通知已移出 checkout；見[Git 恢復對照](../archive/docs-cleanup-2026-10-02.md)。
+- [`consultant-runtime.md`](../history.md#source-ac37cc49c94c6b310f5e) — 原 ADR0060 設計已退役，保留研究與報告脈絡，不作新施工規格。
+- interview engine、editor knowledge pack 的簡短退役通知已移出 checkout；見[Git 恢復對照](../history.md#source-342210e06cceeff43952)。
 
 不要從歷史設計恢復舊 route、hook、store、contract、writer、indexer 或 provider。實際變更維護對應有效責任文件與 App README，不更新退役設計來冒充新權責。

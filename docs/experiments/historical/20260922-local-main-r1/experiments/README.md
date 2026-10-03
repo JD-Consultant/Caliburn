@@ -50,7 +50,7 @@
   六份 constructed cases、rubric 與 assembler 已凍結為 revision 1，**零個 trial 曾被執行**。
   原 Codex-subagent 執行法先被停止（平台不允許把 subagent 當外部 API 受測模型），
   其後 owner 裁定不另付真 provider 成本，改以
-  [外部權威證據審查](../../../../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)
+  [外部權威證據審查](../../../../research/agent-systems/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)
   收斂為「不建 literal-claim layer」。**該結論的依據是 YAGNI 與外部證據，不是本實驗的結果。**
   frozen 案例、rubric 與 assembler 保留為可重用資產，再使用須另升 revision。
 
@@ -62,5 +62,5 @@
   `6c8863863a233830a9216a3ebae46389c91082f097b337c25404400bc93694f7`；
   **八個正式案例尚未執行任何 trial**。
   設計 authority 在
-  [`2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md`](../../../../specs/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)，
-  分段見 [實作計畫](../../../../plans/2026-07-27-r1-task-discovery-implementation-plan.md)。
+  [`2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md`](../../../../research/work-analysis/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)，
+  分段見 [實作計畫](../../../../history.md#source-7661202d166acae889f4)。

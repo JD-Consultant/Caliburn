@@ -8,7 +8,7 @@
 
 ## 1. 本輪基線、版本與效力
 
-已讀：[current register](../../current-decisions.md)、[決策流程](../../decision-process.md)、[完整格式討論稿](../../specs/2026-09-10-jd-format-review.md)、[K／S 新關係討論](../../specs/2026-09-09-jd-document-relationships-working-research.md#2026-09-10任務與知識技能的明確對應討論)、[正式 Plate profile](../../specs/2026-09-10-jd-plate-document-profile.md)、[SSOT](../../specs/contracts/jd-editor-v1.schema.json)、[主設計 §5.4](../../specs/2026-09-09-jd-editor-app-integration-design.md#54-保存資料的具體約束)、[保存 closure](2026-09-10-jd-storage-contract-closure.md)、[先前關係稽核](2026-09-10-jd-storage-relations-audit.md)及[contract strategy](../../contract-strategy.md)。
+已讀：[current register](../../current-decisions.md)、[決策流程](../../decision-process.md)、[完整格式討論稿](../../specs/2026-09-10-jd-format-review.md)、[K／S 新關係討論](../../specs/2026-09-09-jd-document-relationships-working-research.md#2026-09-10任務與知識技能的明確對應討論)、[正式 Plate profile](../../archive/legacy-specs/2026-09-10-jd-plate-document-profile.md)、[SSOT](../../archive/legacy-specs/contracts/jd-editor-v1.schema.json)、[主設計 §5.4](../../archive/legacy-specs/2026-09-09-jd-editor-app-integration-design.md#54-保存資料的具體約束)、[保存 closure](2026-09-10-jd-storage-contract-closure.md)、[先前關係稽核](2026-09-10-jd-storage-relations-audit.md)及[contract strategy](../../contract-strategy.md)。
 
 截至本輪讀取，register 的完整格式／K／S 明確引用仍為 G3 OPEN 推薦，主體格式為 WORKING，Task 1 暫緩。本文提供後續收斂依據，不將提問或研究授權改稱格式及實作已核准。既有 `revision→receipt→head` 原子發布、單向 FK、immutable terminal receipt、no_change／unknown 恢復策略保留。
 

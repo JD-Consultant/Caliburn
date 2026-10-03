@@ -1,6 +1,6 @@
 # Memory 宿主接合：獨立審查
 
-2026-09-13。結論：**PASS；本輪有界審查未發現可重現的 P1／P2**。基準 `8672d93122891a8a1bb47742214374ceb9aeb091`，依[本輪設計](../../../specs/2026-09-13-jd-memory-host-integration-slice.md)。唯讀核產品、初始化、測試前置及新程序 helper；只新增本紀錄，未修改產品／測試、初始化 DB、啟服務或呼叫 provider。
+2026-09-13。結論：**PASS；本輪有界審查未發現可重現的 P1／P2**。基準 `8672d93122891a8a1bb47742214374ceb9aeb091`，依[本輪設計](../../../archive/legacy-specs/2026-09-13-jd-memory-host-integration-slice.md)。唯讀核產品、初始化、測試前置及新程序 helper；只新增本紀錄，未修改產品／測試、初始化 DB、啟服務或呼叫 provider。
 
 ## 正常啟動與保存責任
 

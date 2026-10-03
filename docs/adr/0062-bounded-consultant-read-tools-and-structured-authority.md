@@ -3,7 +3,7 @@
 - **狀態**：Accepted
 - **日期**：2026-08-14
 - **Owner 核准**：在完成官方資料研究與產品北極星複核後，owner 明確同意依最新主流做法直接施工
-- **研究**：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §9.16.3–§9.16.4
+- **研究**：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../history.md#source-20bcac8af4c10acef7f5) §9.16.3–§9.16.4
 - **延續**：ADR 0060 的 LangChain／LangGraph runtime 與 ADR 0061 的 compact structured output；本 ADR 補上 0061 明確延後的 Tool 決策，不改寫兩份 Accepted ADR
 
 ## Context

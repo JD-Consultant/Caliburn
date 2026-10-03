@@ -36,6 +36,10 @@ Thumbs.db
 .worktrees/
 .superpowers/
 
+# Local historical/editorial archives are not part of the published repository.
+# Reusable research, report figures and reproducible experiment data live outside this directory.
+/docs/archive/
+
 # personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
 CLAUDE.local.md
 Codex.local.md

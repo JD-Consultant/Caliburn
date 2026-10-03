@@ -1,7 +1,7 @@
 # 當輪原話來源接合：獨立審查
 
 - 日期：2026-09-13；基準 `c135f18202a888a478ac2d67a72e1e811643e079`；JD-R002／OI-02 局部。
-- 依據：[本輪設計](../../../specs/2026-09-13-jd-consultant-source-integration-slice.md)、[原話接點](source-seams.md)、目前決策與計畫最新路由。審查者未修改產品、作者測試或設定；只寫本報告。
+- 依據：[本輪設計](../../../archive/legacy-specs/2026-09-13-jd-consultant-source-integration-slice.md)、[原話接點](source-seams.md)、目前決策與計畫最新路由。審查者未修改產品、作者測試或設定；只寫本報告。
 - 最終結論：**指定範圍 PASS，CSI-R01／CSI-R02 修正後 CLOSED，未見其他 P1／P2。** 這不包含 Memory／B1／B2、較早來源讀取工具、來源 UI、自然品質或完整 App。
 
 ## 1. CSI-R01／P2：來源服務故障被包成模型參數錯誤

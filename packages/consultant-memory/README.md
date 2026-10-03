@@ -9,7 +9,7 @@ Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新
 - `MemoryArtifacts` 使用 Deep Agents `StoreBackend`／`CompositeBackend` 保存不可變詳記與準備版本；`ReadOnlyFiles` 提供固定版本讀取。正式內容不寫到操作者的檔案系統。
 - `PublicationStore` 以 SQLAlchemy 的版本檢查，將目前版與操作回執寫入同一短交易；重取舊回執不倒退目前版。修補不推進背景整理游標。
 - App 提供 `SourceReader(document_id, validate_reference, read, history_exchanges)`。`validate_reference` 只驗格式／簽章／文件範圍，不讀資料庫；`read` 必須讀原先固定的來源，不能換成最新內容；`history_exchanges` 由來源 owner 依固定上界回傳 canonical `oldest_to_newest` 順序。無效地址用 `caliburn_memory.sources.InvalidSourceReference`；來源服務／儲存故障不可轉成該型別。本套件不擁有原始對話，也不另建來源順序索引。
-- `caliburn_memory.read_tools.readonly_file_tools(backend)` 提供原生 `ls`／`grep`／`read_file`，不掛檔案 middleware 的訊息 hooks。0.7 不支援 backend factory；App 用公開工具替換接點綁固定 reader，見[工具實證](read-tools-results.md)及[新 App 接合](../../docs/specs/2026-09-13-jd-memory-read-integration-slice.md)。
+- `caliburn_memory.read_tools.readonly_file_tools(backend)` 提供原生 `ls`／`grep`／`read_file`，不掛檔案 middleware 的訊息 hooks。0.7 不支援 backend factory；App 用公開工具替換接點綁固定 reader，見[工具實證](read-tools-results.md)及[新 App 接合](../../docs/history.md#source-8ff1477616eafa527f92)。
 - 沿用原 `q019-memory` namespace 及 `q019_document_memory_head`／`q019_memory_publication_receipt` 表，沒有另建平行權威。`setup()` 是明示初始化，禁止在一般開啟或每次回合呼叫。
 
 ### 分層 Memory bundle 基礎
@@ -18,7 +18,7 @@ Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新
 
 `manifest.json` 是 Runtime 自行產生與驗證的結構化 JSON，不套用模型 Markdown 正文的單行長度限制；案例／理解正文與 guide 仍沿原文字規則。這只解除結構資料隨案例與 binding 數量自然成長時的錯誤限制，不改 manifest schema、舊版本解析或 publication digest 的 canonical 計算。
 
-`PublicationStore` 沿用原 head／receipt／CAS，另拒絕候選 bundle 的 `base_publication_revision` 或精確 base `MemoryVersion` 與目前 head 不一致。foundation 當時仍讓舊兩檔 `knowledge.md`／`guide.md` request digest 與讀寫路徑通過歷史相容測試；依 2026-09-17 Owner 決定，這已不是正式新 App 的產品需求，後續 layered C 切片不得繼續暴露雙格式，legacy 程式與測試只作有界清理前的歷史證據。這一段只有資料 authority、保存與驗證，沒有改 B1／B2 Prompt、舊 staging／repair、dispatcher、UI 或 production authority。完整語意與後續切片見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
+`PublicationStore` 沿用原 head／receipt／CAS，另拒絕候選 bundle 的 `base_publication_revision` 或精確 base `MemoryVersion` 與目前 head 不一致。foundation 當時仍讓舊兩檔 `knowledge.md`／`guide.md` request digest 與讀寫路徑通過歷史相容測試；依 2026-09-17 Owner 決定，這已不是正式新 App 的產品需求，後續 layered C 切片不得繼續暴露雙格式，legacy 程式與測試只作有界清理前的歷史證據。這一段只有資料 authority、保存與驗證，沒有改 B1／B2 Prompt、舊 staging／repair、dispatcher、UI 或 production authority。完整語意與後續切片見 [MEM-L001](../../docs/history.md#source-9540bc676045d402f2e8)。
 
 ### B1 案例 staged state／證據 registry／固定 canonical batch Agent graph
 
@@ -32,11 +32,11 @@ create／revise／split／merge 已使用 attempt registry 做精確 evidence �
 
 B1 正常以一個完整 canonical 訪談 batch 工作，不固定呼叫 compaction。若來源交付實際分成多個窗口，目前尚未完整處理的最新窗口必須逐字保留；已完整交付、其模型／工具 wave 安全完成且 Runtime checkpoint 已推進的舊窗口，才可在後續 request view 中像 A 的舊對話一樣被 continuity compaction。原始訪談、signed references 與 evidence registry 仍由來源 owner／checkpoint 完整保存並可按需回查；continuity summary 只作工作延續 Context，不能當案例證據、Memory 或 JD basis。
 
-這仍是 package 內的 B1 候選；目前已由 `BackgroundMemoryWorkflow` 與 B2 staged result 組成同一完整 bundle 後一次發布。後續 App 已從精確注入的 B1 role model 與明示 output reserve 建立 request-only compaction middleware；package 只接受 middleware 並攜帶 state，不選 provider。正式 OpenRouter／Luna role factory、managed callback 與 layered C 已完成各自離線切片；UI、provider／自然模型、完整瀏覽器 App journey 及 production authority 仍未完成。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 前兩施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
+這仍是 package 內的 B1 候選；目前已由 `BackgroundMemoryWorkflow` 與 B2 staged result 組成同一完整 bundle 後一次發布。後續 App 已從精確注入的 B1 role model 與明示 output reserve 建立 request-only compaction middleware；package 只接受 middleware 並攜帶 state，不選 provider。正式 OpenRouter／Luna role factory、managed callback 與 layered C 已完成各自離線切片；UI、provider／自然模型、完整瀏覽器 App journey 及 production authority 仍未完成。完整語意、驗收及下一接點見 [MEM-L001](../../docs/history.md#source-9540bc676045d402f2e8)及[B1 前兩施工切片](../../docs/history.md#source-92bac74644e9011468de)。
 
 ### Ordered evidence source port（App 接點與 B1 stage 已接）
 
-`caliburn_memory.sources` 現提供 immutable typed evidence records：固定 window 內的逐輪 records、以同一 window 為上界的安全歷史分頁，以及 exact `source` 的有界文字頁。records 只含 signed reference 與 message ID／role；App source owner 才擁有 canonical order、lineage 與原文，adapter 不重排、不重簽、不建立第二份索引。B1 與 B2 stage 已消費這些 port 並保存 attempt-scoped key／order proof／Runtime paging cursor；offset 不是模型參數或持久 citation。B1 create／revise／split／merge 的精確引用分配、bundle 保存時的 owner-order 再驗證，以及 B2 case-bound exact-source key 工具均已依[引用施工計畫](../../docs/plans/2026-09-17-interview-evidence-citations.md) Task 5 接入。
+`caliburn_memory.sources` 現提供 immutable typed evidence records：固定 window 內的逐輪 records、以同一 window 為上界的安全歷史分頁，以及 exact `source` 的有界文字頁。records 只含 signed reference 與 message ID／role；App source owner 才擁有 canonical order、lineage 與原文，adapter 不重排、不重簽、不建立第二份索引。B1 與 B2 stage 已消費這些 port 並保存 attempt-scoped key／order proof／Runtime paging cursor；offset 不是模型參數或持久 citation。B1 create／revise／split／merge 的精確引用分配、bundle 保存時的 owner-order 再驗證，以及 B2 case-bound exact-source key 工具均已依[引用施工計畫](../../docs/history.md#source-68f621f02972c31d1d41) Task 5 接入。
 
 ### B2 工作理解 staged state／語意工具／durable Agent graph
 
@@ -50,7 +50,7 @@ Runtime 另可把 publication receipts 推導出的既有 C repair impact 加入
 
 若原話只補足細節，B2 繼續整理；若原話證明 B1 有會影響工作理解的實質錯誤或缺漏，`request_case_rework` 只收已讀 `evidence_key` 與理由，由 Runtime 寫入正式 case／reference 配對並以結構化 `case_rework_required` 結束 attempt。該結果不能交給 `current_understandings()` 或 publication；B2 不改案例，也不自行重跑 B1。所有 B2 工具 schema 都拒絕模型填入 document、signed reference、offset、版本與 outcome；目前已驗的是 Runtime／ToolNode 的 strict 拒絕，OpenRouter wire-level strict 尚未證明。這一片已驗 changed、semantic no-op／完整 binding 重驗、按案例限制的來源讀取、rework terminal、同輸入冪等、新 B1 attempt 清除舊訊息、transport resume、完成修正及 incomplete／refusal／額度防護。
 
-B2 本身仍不越權重跑 B1 或發布；package 外層 `BackgroundMemoryWorkflow` 現已消費這個 terminal，建立新 B1／B2 attempt，並在最多一次返工後發布或 blocked。後續 App 已用精確注入的 B2 role model 組裝 request-only middleware：同一 attempt 固定第一個 task message 並恢復 `continuation_compaction`，新的 stale attempt 從空 state 開始。正式 role factory、managed callback 與 layered C 已完成各自離線切片；provider／自然模型、完整瀏覽器 App journey 及 production authority 仍未完成。完整契約與結果見 [B2 staged maintainer 計畫](../../docs/plans/2026-09-16-b2-understanding-maintainer.md)、[B2 Agent graph 計畫](../../docs/plans/2026-09-16-b2-understanding-agent.md)及[完整背景 workflow 設計](../../docs/specs/2026-09-17-layered-memory-background-workflow-design.md)。
+B2 本身仍不越權重跑 B1 或發布；package 外層 `BackgroundMemoryWorkflow` 現已消費這個 terminal，建立新 B1／B2 attempt，並在最多一次返工後發布或 blocked。後續 App 已用精確注入的 B2 role model 組裝 request-only middleware：同一 attempt 固定第一個 task message 並恢復 `continuation_compaction`，新的 stale attempt 從空 state 開始。正式 role factory、managed callback 與 layered C 已完成各自離線切片；provider／自然模型、完整瀏覽器 App journey 及 production authority 仍未完成。完整契約與結果見 [B2 staged maintainer 計畫](../../docs/history.md#source-78853efa773a5e525161)、[B2 Agent graph 計畫](../../docs/history.md#source-1373d0845ecfb814d5de)及[完整背景 workflow 設計](../../docs/history.md#source-581fea9d87762ea5c453)。
 
 ### 分層完整背景 workflow（package 已完成）
 
@@ -72,17 +72,17 @@ C 第一版只處理 existing stable IDs。案例修訂使用 Runtime 已提供�
 
 `LayeredRepairWorkflow` 沿既有 B1／B2 maintenance session 完成 `seed → edit* → validate → save → prepare → publish`；App 只從本回合已保存的 `read_case`、完整 `read_conversation` 與 `read_work_understanding` 結果建立 read proof，再把模型 evidence key 解析成 canonical source。正式工具不接受 signed reference、revision、version、digest、path、offset 或 operation ID。latest 已變時在解析舊修改前回 stale；成功 publication 的原 START／request／receipt 可恢復，並只把本回合讀取基準推進到該次 applied head。legacy 兩檔程式只留給既有歷史 checkpoint／測試證據，不在正式 schema、分層提示或 model-facing result 暴露。
 
-OpenAI 公開 Sandbox Memory 將 live update 描述為修正 stale Memory 或依使用者要求更新，另在 run 結束後做 extraction／consolidation；本契約沿用這個窄即時修補與背景整理的責任形狀，但 stable IDs、案例→理解引用與完整 bundle publication 是 Caliburn 的產品映射。[OpenAI Sandbox Agents](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)、[MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
+OpenAI 公開 Sandbox Memory 將 live update 描述為修正 stale Memory 或依使用者要求更新，另在 run 結束後做 extraction／consolidation；本契約沿用這個窄即時修補與背景整理的責任形狀，但 stable IDs、案例→理解引用與完整 bundle publication 是 Caliburn 的產品映射。[OpenAI Sandbox Agents](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)、[MEM-L001](../../docs/history.md#source-9540bc676045d402f2e8)。
 
 ## 舊即時修補核心（歷史工程證據；正式產品契約已取代）
 
-**2026-09-13：**新增公開 `build_repair_graph(resolve_workflow)`，供 App 固定 wrapper 在執行時取得同輪資源；`RepairWorkflow.graph` 共用同一六節點，未另寫引擎。建圖與檢視不執行 resolver、不開任何資源。`adoption.json` 已記此版實際 hash，wheel 在乾淨 venv 依 App lock 完成完整依賴安裝並通過隔離檢查，詳見[App 接合結果](../../docs/specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。
+**2026-09-13：**新增公開 `build_repair_graph(resolve_workflow)`，供 App 固定 wrapper 在執行時取得同輪資源；`RepairWorkflow.graph` 共用同一六節點，未另寫引擎。建圖與檢視不執行 resolver、不開任何資源。`adoption.json` 已記此版實際 hash，wheel 在乾淨 venv 依 App lock 完成完整依賴安裝並通過隔離檢查，詳見[App 接合結果](../../docs/history.md#source-97a550604a7802c2d882)。
 
-`caliburn_memory.repair.RepairWorkflow(artifacts, publication, source).graph` 沿原生六節點子圖與呼叫者 Saver；`StateBackend` 暫存兩個 Memory 檔案，官方 `agents.apply_diff` 完整成功後才寫入暫存，整批驗證後才由原 PublicationStore 發布。詳見[修補採用與結果](../../docs/specs/2026-09-13-jd-memory-repair-core-slice.md)。
+`caliburn_memory.repair.RepairWorkflow(artifacts, publication, source).graph` 沿原生六節點子圖與呼叫者 Saver；`StateBackend` 暫存兩個 Memory 檔案，官方 `agents.apply_diff` 完整成功後才寫入暫存，整批驗證後才由原 PublicationStore 發布。詳見[修補採用與結果](../../docs/history.md#source-a62e0ca95c4c2e89e6d4)。
 
 歷史接法由 App 配發 operation／base／source，模型只提供 path／diff；本核心不自動准入、不啟動模型或背景工作。`reconcile(original_request: PublishRequest)` 只核對原生已保存請求的回執與目前版；不收 caller edits、不重播修補，沒有回執仍屬未知。回執證明發布內容，原 patch 文字須由 App 的原工具呼叫證明，兩者不互相代替。依 2026-09-17 Owner 決定，正式新 App 不再使用這個兩檔 path／diff 契約；layered C 改用 stable-ID 受控修訂與完整 bundle publication。此段只記已驗工程沿革，不能作正式工具 schema。
 
-程式採用來源、hash 與實際調整見 [adoption.json](adoption.json)；三核心僅分離來源依賴，沒有重寫 Memory 引擎。[完整接合設計與結果](../../docs/specs/2026-09-13-jd-memory-core-adoption-slice.md)保存官方依據、限制與驗證層級。
+程式採用來源、hash 與實際調整見 [adoption.json](adoption.json)；三核心僅分離來源依賴，沒有重寫 Memory 引擎。[完整接合設計與結果](../../docs/history.md#source-8169253d21b34ca48b9c)保存官方依據、限制與驗證層級。
 
 ## 舊 B1 訪談抽取核心（底層證據，產品語意已取代）
 

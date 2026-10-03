@@ -1,6 +1,6 @@
 # JD 還原與整輪撤回：真瀏覽器驗收結果
 
-日期：2026-09-14；Topic：JD-R002。承接[還原單位結果](2026-09-14-jd-restore-revision-results.md)與[施工計畫](../../plans/2026-09-13-jd-relational-app-implementation.md)。隔離 App，ADR0075 Proposed／production ADR0060 不變。零付費模型呼叫。
+日期：2026-09-14；Topic：JD-R002。承接[還原單位結果](2026-09-14-jd-restore-revision-results.md)與[施工計畫](../../archive/implementation-plans/2026-09-13-jd-relational-app-implementation.md)。隔離 App，ADR0075 Proposed／production ADR0060 不變。零付費模型呼叫。
 
 ## 1. 完成效果
 
@@ -79,9 +79,9 @@ Windows 11 原生 DPAPI 設定檔與 host；PostgreSQL 18.6 專用 55436，每�
 - 撤回後 `jd_source_link` 回到 0 筆，因為那一輪寫的項目連同它們的來源一起被取回；來源標記與按鈕存在的證據是旅程中段的截圖與紀錄，不是結束時的資料庫。
 - 還原確認期間的暫停（設計 §4.2）已實作並在真瀏覽器驗過**還原**這一側；**撤回**那一側的暫停由同一個 `onHold` 接點提供，但沒有在真瀏覽器單獨驗過。保存時的 `stale_view` 拒絕仍是最後一道。
 - 「取消後送出鍵恢復」無法由這條旅程證明：該鍵此時被空輸入這個獨立原因停用。這裡只證明欄位恢復可編輯、暫停說明消失。
-- 這條旅程只有**新增**與**加入引用**兩種改動。修改／刪除／移動的辨認仍未在真瀏覽器驗；依 [OI-04](../../specs/2026-09-13-jd-app-open-issues.md) 的既定做法，那要**配合核心顧問旅程**核對，不以擴充固定離線腳本代替——該腳本的定位是接線驗收，不是訪談模擬。
+- 這條旅程只有**新增**與**加入引用**兩種改動。修改／刪除／移動的辨認仍未在真瀏覽器驗；依 [OI-04](../../archive/legacy-specs/2026-09-13-jd-app-open-issues.md) 的既定做法，那要**配合核心顧問旅程**核對，不以擴充固定離線腳本代替——該腳本的定位是接線驗收，不是訪談模擬。
 - headless Chrome，不是實體視窗操作。旅程結束後[五個 helper 程序都確認退出](jd-relational-ui-restore/process-exit-check.json)，Saver 連線關閉；沒有刪資料庫或清 volume。
 
 ## 7. 下一步
 
-真瀏覽器這一項已閉合。本稿列為後續的兩項也已完成並各自另有結果：[顧問指引與分析 Skills](../../specs/2026-09-14-jd-consultant-guidance-and-skills-slice.md)、[新 Windows 程序續作](jd-b1-adoption/r3-notification-and-background-results.md)、以及收據記錄被撤回回合（tag `jd-undo-provenance-20260914`）。其餘仍照[收尾清單](../../specs/2026-09-13-jd-app-open-issues.md)推進。
+真瀏覽器這一項已閉合。本稿列為後續的兩項也已完成並各自另有結果：[顧問指引與分析 Skills](../../archive/legacy-specs/2026-09-14-jd-consultant-guidance-and-skills-slice.md)、[新 Windows 程序續作](jd-b1-adoption/r3-notification-and-background-results.md)、以及收據記錄被撤回回合（tag `jd-undo-provenance-20260914`）。其餘仍照[收尾清單](../../archive/legacy-specs/2026-09-13-jd-app-open-issues.md)推進。

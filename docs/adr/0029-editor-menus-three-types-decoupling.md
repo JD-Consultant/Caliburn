@@ -38,4 +38,4 @@
 - ⚠️ 三分類控制選單暫吃參考池(官方全表未入源,記縫);長文件導航(sticky/大綱)記縫。
 - ⚠️ AI 元件過渡期維持舊樣(與新選單視覺暫不一致),直到 AI 層重設計。
 
-細節規格:[`../specs/2026-07-11-editor-menus-redesign-research.md`](../specs/2026-07-11-editor-menus-redesign-research.md)。
+細節規格:[`../specs/2026-07-11-editor-menus-redesign-research.md`](../history.md#source-17605e43789d1be5d104)。

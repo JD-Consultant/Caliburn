@@ -30,7 +30,7 @@
 
 **限制。** 只有兩種合成人設、每批六份，並非真人試驗、隨機化大樣本或普遍改善保證。知識技能仍不穩定，Q3 仍有一個經逐筆核對原文確認的輕微漏引；不能寫成「全面解決幻覺」。
 
-證據：[T14 的完整比較與未解問題](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md)、[原始輸出、逐字稿、指標及算法](../plans/2026-09-29-target-rebuild/evidence/data/instruction-experiments-2026-10-01/README.md)。
+證據：[T14 的完整比較與未解問題](../history.md#source-d3293e9b28c75bbb6616)、[原始輸出、逐字稿、指標及算法](../experiments/product-validation/data/instruction-experiments-2026-10-01/README.md)。
 
 可呈現的能力：從領域方法提出可測假說、做有基準的比較、分辨改善與副作用、在效果與複雜度之間做減法。這是材料組織建議，不是學校公布的評分項目。
 
@@ -46,7 +46,7 @@
 
 **限制。** 仍有 10 筆 JD 依據待核對，本例也沒有自然產生 JD → Memory 的引用換版；B1／B2 未自然觸發壓縮。不能以長旅程完成宣稱所有品質／容量 gate 已通過。重建事件、缺少的完整接續原件及不完整耗時均需保留註記。
 
-證據：[T17 事故、原因核對、A2 修正與實測](../plans/2026-09-29-target-rebuild/evidence/t17-course-administrator-journey.md)、[四份長旅程原件及保存限制](../plans/2026-09-29-target-rebuild/evidence/data/instruction-experiments-2026-10-01/README.md#採購長旅程原件)。
+證據：[T17 事故、原因核對、A2 修正與實測](../history.md#source-98d840caa9eed7fb2840)、[四份長旅程原件及保存限制](../experiments/product-validation/data/instruction-experiments-2026-10-01/README.md#採購長旅程原件)。
 
 可呈現的能力：故障定位、資料一致性、分層責任、受限恢復設計、可稽核的實驗紀錄。
 
@@ -60,7 +60,7 @@
 
 **未來研究問題。** 是否由 App 提供有依據的候選來源，能比自由選序號減少漏選？需固定資訊、比較引用支持率與額外成本，不能先聲稱方案已有效。本輪整理不授權實作或加跑模型。
 
-證據：[T14 診斷與「已知不足」](../plans/2026-09-29-target-rebuild/evidence/t14-job-analysis-quality.md)。
+證據：[T14 診斷與「已知不足」](../history.md#source-d3293e9b28c75bbb6616)。
 
 這個案例適合說明「如何知道問題仍未解決」，不應包裝成成功修復案例。保留反例比把所有問題寫成已解決更有可信度。
 
@@ -70,7 +70,7 @@
 
 後續由 Codex 按凍結期望逐案核對，還發現 model grader 漏掉任務過早建立與錯誤拆分；該審查不是人類領域專家驗證。這是「評測器也需要檢查」的材料，不是盲評 plumbing 跑通就已證明品質。
 
-證據：[R1a 結果與未通過項目](../experiments/2026-07-27-r1-task-discovery/r1a-results.md)。部分原始 capture 仍是本機 ignored 資料，不能宣稱僅靠 Git 即可完整重播；歷史模型、成本與 owner 決策也不作新架構規範。
+證據：[R1a 結果與未通過項目](../experiments/2026-07-27-r1-task-discovery/r1a-results.md)。部分原始 capture 仍是本機 ignored 資料，不能宣稱僅靠 Git 即可完整重播；歷史模型、費用與當時決策不作現行架構規範。
 
 ## 更多可選素材
 
@@ -78,13 +78,13 @@
 |---|---|
 | B1 漏記、不確定性與提示／effort 比較 | [CT37](../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct37-prompt-effort-comparison-results.md)；medium 未修復、high 只過單例，後續 CT38／CT42／CT43 在同區，不能跳過失敗 |
 | 舊 JD 編輯整合審查 | [核心 review](../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-core-review/README.md)；初審 FAIL 與 closure 一起呈現，不當成新架構驗收 |
-| PDF 可見成品與文字層不一致 | [T13](../plans/2026-09-29-target-rebuild/evidence/t13-pdf-export.md)與 T17；正常顯示不等於複製／搜尋逐字無損 |
-| 工程代理切片的反例與修正 | [任務報告](../experiments/historical/agent-task-reports/README.md)；保留當時範圍及限制，不冒稱申請者手寫 |
+| PDF 可見成品與文字層不一致 | [T13](../history.md#source-409f20a1c297740aed7d)與 T17；正常顯示不等於複製／搜尋逐字無損 |
+| 工程代理切片的反例與修正 | [任務報告](../history.md#source-61a65eccd9fae93aa608)；保留當時範圍及限制，不冒稱申請者手寫 |
 
 ## 編成報告時的取捨
 
 先完成歷史素材盤點，再依申請者能清楚解釋的問題、真實貢獻與原始證據決定正文。這裡不預先指定案例一、二必須入選，也不把較早的檢索、長訪談或架構轉向一律降為附錄。
 
-產品目的、系統總圖與可執行流程沿[教授版架構報告](system-architecture/README.md)取材；不要在正文堆完整 API 清單、每筆 log、提交數或框架商標。每個數字至少能回查一份具基準與限制的原證據。
+產品目的、系統總圖與可執行流程沿[系統架構報告](system-architecture/README.md)取材；不要在正文堆完整 API 清單、每筆 log、提交數或框架商標。每個數字至少能回查一份具基準與限制的原證據。
 
 本頁未替申請者認領貢獻。成績、專題分工、指導者、研究興趣與 AI 使用揭露需要本人提供可核實資料後，才能改寫為第一人稱備審。

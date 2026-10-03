@@ -49,7 +49,7 @@
 
 LangGraph 1.2.11 `pregel/main.py:get_state` 將 `apply_pending_writes` 設為「config 未提供 checkpoint ID」；本案先定位再固定 ID 重讀，避免只用 latest 的 overlay。這是本案對已安裝原生 API 的使用方式，不是另外保存 checkpoint／run 狀態的權威。
 
-相關責任路由：[host 前置與驗收範圍](host-validation-preflight.md)、[既有 AI 工具結果](../../../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)、[施工計畫](../../../plans/2026-09-13-jd-relational-app-implementation.md)。OS 所有權、SQL 原回執、完整 source／selection／Memory 及聊天 HTTP 各依原切片，不以本次檢查圖通過替代。
+相關責任路由：[host 前置與驗收範圍](host-validation-preflight.md)、[既有 AI 工具結果](../../../archive/legacy-specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)、[施工計畫](../../../archive/implementation-plans/2026-09-13-jd-relational-app-implementation.md)。OS 所有權、SQL 原回執、完整 source／selection／Memory 及聊天 HTTP 各依原切片，不以本次檢查圖通過替代。
 
 ## 4. 實際驗證與關閉條件
 

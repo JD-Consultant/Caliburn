@@ -3,7 +3,7 @@
 - 狀態：**Proposed**；尚未改production。2026-09-16 依 Owner 的 `CTX-C001` 裁決，把未能由 OpenRouter 驗證的 provider-native compaction 前提改為 App-side 非破壞式 continuity compaction；其餘顧問／Memory 採用不變。
 - 日期：2026-09-10。
 - Topic：JD-R002/R5、LLM-Q019。
-- 依據：Owner要求實作[完整成品計畫](../plans/2026-09-10-jd-product-delivery.md)；詳細候選、現行證據、版本及驗收見[正式採用設計](../specs/2026-09-10-jd-production-adoption-design.md)。
+- 依據：Owner要求實作[完整成品計畫](../history.md#source-db2719a8118d84420236)；詳細候選、現行證據、版本及驗收見[正式採用設計](../history.md#source-1dbc5dfea3f41bde78a1)。
 
 ## Context
 
@@ -11,13 +11,13 @@
 
 ## Decision
 
-1. 採核心接線驗收後固定manifest中的既有顧問、Memory／來源實作與Skill；保留受測Python3.12、精確框架／模型binding配置，不重做Memory、不接回舊candidate/approved loop。模型路徑維持單一 OpenRouter／OpenAI-only Luna；A／B2 的長對話改由 [App-side 非破壞式 continuity compaction](../specs/2026-09-16-openrouter-continuation-compaction-design.md)承接，canonical conversation 不裁切，摘要不具來源／Memory／JD authority。OpenAI Responses native compaction 只保留為可選 adapter optimization，不再是正式採用前置條件。
+1. 採核心接線驗收後固定manifest中的既有顧問、Memory／來源實作與Skill；保留受測Python3.12、精確框架／模型binding配置，不重做Memory、不接回舊candidate/approved loop。模型路徑維持單一 OpenRouter／OpenAI-only Luna；A／B2 的長對話改由 [App-side 非破壞式 continuity compaction](../history.md#source-49fa82b26188aad2b075)承接，canonical conversation 不裁切，摘要不具來源／Memory／JD authority。OpenAI Responses native compaction 只保留為可選 adapter optimization，不再是正式採用前置條件。
 2. 原始對話及執行項目由官方PostgresSaver唯一保存；確切原文由既有ConversationReader按document/checkpoint/message範圍讀。Memory內容由官方PostgresStore／StoreBackend保存，既有PublicationStore的head/receipt選擇有效版本。JD唯一authority依0073，checkpoint不另存可寫JD。
 3. 正式runtime納入apps/api單composition，正式contract歸job-analysis-contract，原生editor模組納入正式package。無worktree／research import、雙寫或compatibility wrapper；現有架構邊界測試依此successor改成新實際責任，而非刪測試逃避邊界。
 4. 明示新本機DB及fresh-root initialization；官方Saver/Store.setup與app migration在維護階段執行。日常啟動驗版本不改schema，不搬舊資料、不清現有DB。
 5. 單worker、文件admission、scope與已驗取消／效果對帳保留；前景JD/手改互斥依0073。封存拒絕新前景與人編，保留全部資料及已收到來源的既有背景調度／恢復，不等背景歸零；內部catalog枚舉含封存文件。恢復後續談，不自動剪除來源checkpoint或永久刪除。
 6. 全體資料備份及還原演練是成品交付條件；模型金鑰、資料庫設定、日常啟停、無模型服務時的本機讀写與錯誤出口明列，不因缺模型自動fallback。
-7. 依[原生程序生命週期設計](../specs/2026-09-10-jd-native-process-lifecycle-design.md)採 Windows App 專用 Job Object 與 named mutex：API 在任何 DB／client／native 工作前取得單程序互斥、確認舊 Job 全部退出，再加入新 Job；子程序繼承 membership，不繼承 Job handle、不 breakaway。固定 Windows-only `pywin32==312`，先驗 wheel、授權及實際 bootstrap／crash。新程序以舊 Job 停止證據及 PG head-lock 後的 receipt 查詢恢復，不能從查無結果推定停止。手改 admission 的最多一筆 root-only identity binding 保存 operation／base／digest／request key，不保存候選、不偽造原話／AI run；terminal outcome 仍只由原 JD receipt 決定。依[有限人工恢復接點](../specs/2026-09-10-jd-manual-recovery-transport-design.md)，App以原key唯讀發現及一次明示清理／對帳，server投影完整write gate；無candidate重播或新authority。完整 Task 5 故障證據是採用輸入，不以本條當成已實作。
+7. 依[原生程序生命週期設計](../history.md#source-4542a67b9bab38d55ed8)採 Windows App 專用 Job Object 與 named mutex：API 在任何 DB／client／native 工作前取得單程序互斥、確認舊 Job 全部退出，再加入新 Job；子程序繼承 membership，不繼承 Job handle、不 breakaway。固定 Windows-only `pywin32==312`，先驗 wheel、授權及實際 bootstrap／crash。新程序以舊 Job 停止證據及 PG head-lock 後的 receipt 查詢恢復，不能從查無結果推定停止。手改 admission 的最多一筆 root-only identity binding 保存 operation／base／digest／request key，不保存候選、不偽造原話／AI run；terminal outcome 仍只由原 JD receipt 決定。依[有限人工恢復接點](../history.md#source-dfafcebdfe44e64adc96)，App以原key唯讀發現及一次明示清理／對帳，server投影完整write gate；無candidate重播或新authority。完整 Task 5 故障證據是採用輸入，不以本條當成已實作。
 
 ## Consequences
 

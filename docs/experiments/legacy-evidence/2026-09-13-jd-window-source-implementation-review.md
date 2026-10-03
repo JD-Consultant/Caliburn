@@ -66,7 +66,7 @@
 - [9/12 JD 關聯式保存契約](../../specs/2026-09-12-jd-relational-schema-and-write-contract.md)
 - [9/12 Agent 工具契約](../../specs/2026-09-12-jd-relational-agent-tool-contract.md)
 - [9/13 完成窗口 source contract](../../specs/2026-09-13-jd-interview-window-source-contract.md)
-- [9/13 B1／B2 adoption mapping](../../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)
+- [9/13 B1／B2 adoption mapping](../../archive/legacy-specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)
 - [9/06 Memory 整理節奏研究](../../specs/2026-09-06-memory-generation-cadence-and-continuity-review.md)
 - [OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling)
 - [Anthropic tool use](https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview)

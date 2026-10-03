@@ -1,9 +1,9 @@
 # Q019-MEM-SUMMARY-01：OpenAI 詳記遇到後續更正時如何處理
 
 > 2026-09-06 · G2 定向官方 source review；事實已核對，Caliburn 保存／回查接法仍 OPEN。沒有程式施工、沒有改保留政策、沒有付費模型測試。
-> 入口：[current decisions](../../current-decisions.md)；前題：[摘要路由 §2.4](../../specs/2026-09-05-memory-summary-routing-and-deep-read-source-review.md#24-2026-09-06-補查詳記可否更新不等於原文不可改)；受影響設計：[Q019 Memory](../../specs/2026-09-06-analysis-only-agent-memory-design.md)。只補「訪談詳記」，不重選整套 Memory。
+> 入口：[current decisions](../../current-decisions.md)；前題：[摘要路由 §2.4](2026-09-05-memory-summary-routing-and-deep-read-source-review.md#24-2026-09-06-補查詳記可否更新不等於原文不可改)；受影響設計：[Q019 Memory](../../history.md#source-7c28c9e58ce7f8268b9f)。只補「訪談詳記」，不重選整套 Memory。
 
-> **最新狀態：後續接法的效果邊界已獲 Owner 同意，WORKING。**見[詳記更新與更正回查接法 §6](../../specs/2026-09-06-interview-summary-correction-routing-proposal.md#6-審核界線與下一步)。同段可重抽、跨段靠目前正文與更正引用；本稿 OPEN／待審措辭保留研究當時沿革，不重開已收斂選型。工程設計／計畫與實作尚未因此完成。
+> **最新狀態：後續接法的效果邊界已獲 Owner 同意，WORKING。**見[詳記更新與更正回查接法 §6](../../history.md#source-82629b5487e5377d9f5c)。同段可重抽、跨段靠目前正文與更正引用；本稿 OPEN／待審措辭保留研究當時沿革，不重開已收斂選型。工程設計／計畫與實作尚未因此完成。
 
 ## 0. 直接回答與證據界線
 

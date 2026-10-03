@@ -2,13 +2,13 @@
 
 正式後端（[ADR0079](../../docs/adr/0079-target-rebuild-production-cutover.md)）：FastAPI 單程序、PostgreSQL、LangGraph 官方 saver 與 OpenAI 直連 Responses；A 主顧問、B1／B2 背景整理 Memory、關聯式 JD 人工與 AI 共用編輯、來源與差異、撤回及中文 PDF 都在此。日常操作從 repository 根目錄的 `pnpm` 命令進入（見[根 README](../../README.md#第一次設定)與 [runbook](../../docs/runbook.md)）；本頁保留後端細節。只綁定 loopback，不對外開放；完成度、已知限制與各項驗證證據以[任務表](../../docs/history.md#source-378c7f9480def66d4cde)為準，離線測試通過不等於分析品質已達標。
 
-產品使用 `gpt-6-luna`／`high`（2026-10-01 Owner 因成本確認），不採用 Sol 或自動 fallback。程式化 `ModelSettings` 的 Sol 接縫僅保留既有隔離研究，不再推進切換或追加 Sol 外送；沒有環境／UI 模型切換，不能將既有原生歷史交給另一模型。能力與限制以[選型文件](../../docs/implementation/technology-decisions.md#1-首選工具鏈)為準。
+產品使用 `gpt-6-luna`／`high`（使用者於 2026-10-01 因成本確認），不採用 Sol 或自動 fallback。程式化 `ModelSettings` 的 Sol 接縫僅保留既有隔離研究，不再推進切換或追加 Sol 外送；沒有環境／UI 模型切換，不能將既有原生歷史交給另一模型。能力與限制以[選型文件](../../docs/implementation/technology-decisions.md#1-首選工具鏈)為準。
 
 **2026-09-30 接線狀態：**已完成四次全合成真模型訪談，其中第三輪固定已發布 Memory、暫停／重開／同輪接續後更正 JD；三次 B1／B2 背景批次正式發布。來源與快照選用修訂經 DB 核對；正式中文 PDF 已渲染。JD 八個模型入口、候選預覽、取消、完整公開中間訊息的歷史回看，以及 typed stream→SSE 的暫態公開文字已接線。真 A 已保存 commentary，但尚未截得完成前的真串流畫面，不能宣告整體時序驗收完成。`POST /inputs` 只在模型與 supervisor 就緒時接受新工作；原已接受命令可先查回原結果，不因目前無模型設定而失去辨識。狀態可經 `/consultant-turns/{execution_id}` 或 `/consultant-turns/by-command/{command_id}` 重取。這不是長訪談品質或完整恢復 gate 已通過；分別見 [A 接線證據](../../docs/history.md#source-f5df4f496aad7b909036)、[Memory 編排證據](../../docs/history.md#source-14d692c99a98b4e9954e)與任務表。
 
 ## 安裝與執行
 
-**UI 交接增量：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 已可依職務檔案找回進行中／暫停的 A，不需瀏覽器先保存 execution／command ID；回傳 `{"turn": <既有公開狀態>}` 或明確 `{"turn": null}`，未知檔案 404。不啟動／恢復模型、不返回 Memory 或終態歷史。前端已接上發現與原 execution 控制；分層驗證及未驗邊界見[證據](../../docs/history.md#source-c8ea469844e955e1447b)。
+**找回進行中的訪談：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 可依職務檔案找回進行中／暫停的 A，不需瀏覽器先保存 execution／command ID；回傳 `{"turn": <既有公開狀態>}` 或明確 `{"turn": null}`，未知檔案 404。不啟動／恢復模型、不返回 Memory 或終態歷史。前端使用此入口找回原 execution 與控制；分層驗證及未驗邊界見[證據](../../docs/history.md#source-c8ea469844e955e1447b)。
 
 **離線回看：**只要原 DB 可用，即使未配置模型，也會接上既有 PostgreSQL checkpointer 以讀取已保存的公開中間訊息；不建立模型 client、不啟動執行 supervisor。新輸入仍回 `503 model_not_configured`，不是為了回看而重跑模型。真保存→無模型重啟及 UI／PDF 續驗見 [T17 證據](../../docs/history.md#source-98d840caa9eed7fb2840)。
 
@@ -81,8 +81,8 @@ migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade h
 - `GET /api/job-files/{job_file_id}/jd/profile`：目前正式修訂與四欄基本資料；新檔案為 null，代表尚未提供。
 - `POST /api/job-files/{job_file_id}/jd/profile`：`command_id`、`expected_revision_id`、`changes`；明確 set／clear 指定欄位，未指定保留。成功／原命令重送回 200；舊基底、重用命令改 payload、活躍／暫停 A 的新人工修改回 409；非法欄位或重複 change 回 422。重送可返回舊操作當時的固定修訂，需最新內容另 GET；背景 Memory 不阻止人工編輯。保存／恢復界線見 [JD 保存接線](../../docs/implementation/jd-storage.md)。已接人工基本資料 UI，**不是 A 候選寫入入口**。
 - `GET /api/job-files/{job_file_id}/jd/areas`：目前正式修訂與依序排列的職責集合，無資料時 `areas: []`。`POST` 同路徑：同一命令／基底規則下，以 `change.action` 建立、修訂、刪除或排序一項職責；完整輸入以 schema 為準。刪職責將任務轉未歸屬，不刪內容；profile、其他職責與任務保留。已接人工 UI；不是模型直接修改正式 JD 的路徑。
-- `GET /api/job-files/{job_file_id}/jd/tasks`：目前正式修訂的任務集合，未歸屬在前，再依職責與組內順序；每項含獨立的成果／要求。`POST` 同路徑以 `change.action` 建立、修訂、移動、明細排序或刪除。任務及明細身分保留，兩組不能互換或跨任務移動；同任務多欄與明細調整全成或全拒。沿同一 JD command／base／人工准入規則，原結果可恢復；已接人工 UI，來源尚未交付。完整參數以 `edit-jd-tasks-request.schema.json` 為準，不是模型工具參數。
-- `GET /api/job-files/{job_file_id}/jd/capabilities`：同一固定修訂的共用知識／技能定義與有序 `task_links`；正文不在任務內複製。`POST` 同路徑以 `change.action` 增修刪定義、概覽排序、連結／解除任務或排序任務關係。仍被使用的定義刪除回 409 `capability_in_use`；刪任務保留定義。知識與技能不能跨類排序或改類別，命令／基底／准入沿原規則；原結果按原修訂回讀。完整形狀以 `edit-jd-capabilities-request.schema.json` 為準；已接人工 UI，模型工具仍待 T07，不將本端點直接提供給 Agent。
+- `GET /api/job-files/{job_file_id}/jd/tasks`：目前正式修訂的任務集合，未歸屬在前，再依職責與組內順序；每項含獨立的成果／要求。`POST` 同路徑以 `change.action` 建立、修訂、移動、明細排序或刪除。任務及明細身分保留，兩組不能互換或跨任務移動；同任務多欄與明細調整全成或全拒。沿同一 JD command／base／人工准入規則，原結果可恢復；人工 UI 可編輯，來源另按需回查。完整參數以 `edit-jd-tasks-request.schema.json` 為準，不是模型工具參數。
+- `GET /api/job-files/{job_file_id}/jd/capabilities`：同一固定修訂的共用知識／技能定義與有序 `task_links`；正文不在任務內複製。`POST` 同路徑以 `change.action` 增修刪定義、概覽排序、連結／解除任務或排序任務關係。仍被使用的定義刪除回 409 `capability_in_use`；刪任務保留定義。知識與技能不能跨類排序或改類別，命令／基底／准入沿原規則；原結果按原修訂回讀。完整形狀以 `edit-jd-capabilities-request.schema.json` 為準。模型經 JD 工具編輯候選，不直接使用此人工編輯端點。
 - `GET /api/job-files/{job_file_id}/jd/work`：供人工 UI 組合讀取同一固定修訂的職責、任務及明細、知識／技能與任務關係、協作對象與共通條件；先固定 head，重用既有投影，不另存資料。各集合的獨立 GET 不承諾跨請求相同修訂；需要一個集合編輯畫面基底時使用此入口。
 - `GET/POST /api/job-files/{job_file_id}/jd/collaborators`：主要協作對象的固定集合及新增、局部修訂、排序、刪除。名稱／合作範圍至少一欄有內容；未指定保留、null 清空不能清成空項。`GET/POST .../jd/conditions`：全職務共通條件，五類各自排序；明確修訂分類保留身分並放目的類末尾，不自動套到任務。兩者沿同一 JD 命令／基底／准入與歷史規則，完整 shape 依 `contracts/http/`；已接人工 UI 與同版 `/jd/work`，不是模型候選入口。
 - `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，原命令重送回原接受結果／200；不同內容重用命令或已有其他 A 回 409。提交後 supervisor 執行既有 runner；未配置模型回 503，不接受無法執行的工作。取消後重新提交須用新命令；不提供任意正式化 API。接線／驗證界線見上方更新。
@@ -128,7 +128,6 @@ SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG 
 
 長訪談評測由 `scripts/simulate_interview.py` 明示啟動，不在測試或 App 啟動時自動執行。已診斷的中斷可保留原輸出路徑及旅程參數，以 `--resume-job-file`、`--resume-execution`、原絕對 `--deadline` 接續；先核對並等待指定原執行，只有已確認終止才依原旅程的重送政策處理，不因查詢失敗自行重送。完整參數見 `--help`，批准範圍、費用／時間與實際結果見 [T17 續跑修訂 A2](../../docs/history.md#source-98d840caa9eed7fb2840)。`.progress.jsonl` 與 `.events.jsonl` 是評測證據，不能代替產品的正式訪談／執行保存。
 
-<a id="顧問推理摘要前端待接"></a>
 ### 顧問推理摘要
 
 新 A 模型請求啟用可讀推理摘要；`/api/job-files/{job_file_id}/consultant-turns/{execution_id}/activity-stream` 在一條 SSE 提供 `commentary`、`reasoning_summary`，`/reasoning-summaries` 回讀已保存摘要。Web 已接入即時顯示與歷史回看；查詢失敗不當成沒有摘要，也不為回看而重跑模型。摘要不作正式訪談依據，不公開原始推理。完整契約與驗證範圍見[介面 §2.1](../../docs/implementation/interface-and-delivery.md#21-推理摘要串流與歷史回看)。

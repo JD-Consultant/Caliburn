@@ -1,10 +1,10 @@
 # RAG pipeline — PDF → OCS → indexer → embedder/Qdrant（保留、隔離的 bounded context）
 
-> **狀態**：retained future bounded context。**不是**正式 JD App（`experiments/jd-relational-app`）的一部分，也**不是**已退役的歷史設計。
+> **狀態**：保留的獨立檢索範圍，尚未接入正式 JD App（`apps/api`、`apps/web`）；不是已退役的歷史設計。
 > `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract`、`packages/indexer-contract`
 > 都是可獨立安裝、測試、執行的 monorepo 成員，但**不被**正式 JD App import、呼叫，也不掛在產品的
 > production composition root 上。決策依據：[ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md)
-> Decision 5（Proposed，2026-08-11 修正為保留＋隔離）；設計脈絡與 owner 裁決見
+> Decision 5（Proposed，2026-08-11 修正為保留＋隔離）；設計脈絡與範圍取捨見
 > [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../specs/2026-08-11-rag-bounded-context-retention-design.md)。
 > 若要讓正式 JD App 開始消費檢索結果，必須另開 ADR 定義 query contract、index freshness、embedding
 > identity、failure fallback 與 provenance／evidence linkage；本檔不是那個授權。
@@ -45,8 +45,8 @@ App process。
 | [`packages/indexer-contract/`](../../packages/indexer-contract/) | indexer 查詢 API 的共用 pydantic wire model，為未來 `ocs-indexer ⇄` API consumer 保留的 seam | 否——沒有 `package.json`，Python-only | Python，per-app `uv` |
 
 `ocs-contract`／`indexer-contract` 都以 `tool.uv.sources` path dependency（相對路徑、editable）供
-`pdf-to-json`／`ocs-indexer` 使用，不是發佈到 registry 的套件。正式 `jd-relational-app` 與
-`packages/consultant-memory` 完全不宣告對它們的依賴。
+`pdf-to-json`／`ocs-indexer` 使用，不是發佈到 registry 的套件。正式 App 不依賴這些契約；
+舊 `jd-relational-app` 與 `packages/consultant-memory` 已退役，現行產品邊界見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。
 
 ## 3. 本機指令
 
@@ -90,7 +90,7 @@ PostgreSQL；JD App 的資料庫也不由本 Compose 建立。
 
 ## 5. 邊界不變量
 
-- **正式 JD App 不 import、不呼叫、不部署 RAG 程式碼**：`experiments/jd-relational-app/src` 與 `web/src`
+- **正式 JD App 不 import、不呼叫、不部署 RAG 程式碼**：`apps/api/src/caliburn` 與 `apps/web/src`
   不得出現 `jd_ocs_indexer`、`jd_pdf_to_json`、`ocs_contract`、`indexer_contract` 或 `embedder` 的依賴；
   以 dependency metadata 與靜態掃描驗證。
 - **RAG app 之間可以互相 import 對方的 contract**：`pdf-to-json`／`ocs-indexer` import `ocs-contract`，
@@ -99,7 +99,7 @@ PostgreSQL；JD App 的資料庫也不由本 Compose 建立。
 - **`ocs-indexer` 的查詢 API（:8000）目前沒有任何 consumer**：它的 README 描述「供 apps/api 使用」是歷史／
   未來設計意圖，不是目前已接通的事實；`indexer-contract` 是為了那條未來 seam 保留的 wire model，在 current
   API 真的開始消費它之前，不會有任何 current 程式碼 import 它。
-- **不做資料遷移或雙寫**：`job_analysis` 的 PostgreSQL Current State 與 RAG 的 PDF／OCS JSON／Qdrant 是兩套
+- **不做資料遷移或雙寫**：正式 App 的 PostgreSQL 資料與 RAG 的 PDF／OCS JSON／Qdrant 是兩套
   互不相通的資料世界。
 - 若要讓正式 JD App 開始消費檢索結果，必須另開 ADR，明確定義 query contract、index freshness、
   embedding identity、failure fallback、API transaction 外的 provider 呼叫，以及 current JD
@@ -111,8 +111,8 @@ PostgreSQL；JD App 的資料庫也不由本 Compose 建立。
 - [ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md) — current-only hard cut，Decision 5
   記錄 RAG 保留＋隔離。
 - [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../specs/2026-08-11-rag-bounded-context-retention-design.md)
-  — 恢復範圍、owner 裁決與研究來源。
-- [`docs/plans/2026-08-11-rag-bounded-context-retention-plan.md`](../plans/2026-08-11-rag-bounded-context-retention-plan.md)
+  — 恢復範圍、隔離原則與研究來源。
+- [`docs/plans/2026-08-11-rag-bounded-context-retention-plan.md`](../history.md#source-0f1ee13f53bc33d4050e)
   — 逐 task 執行計畫與驗收條件。
 - [`apps/pdf-to-json/README.md`](../../apps/pdf-to-json/README.md)、
   [`apps/ocs-indexer/README.md`](../../apps/ocs-indexer/README.md)、

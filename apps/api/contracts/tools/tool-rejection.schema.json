@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ToolRejection",
+  "description": "A confirmed refusal, not an unknown save outcome or an empty successful read. No raw exception, scope, credential or stack trace is exposed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "code", "message", "next_action"],
+  "properties": {
+    "status": {"type": "string", "const": "rejected"},
+    "code": {"type": "string", "minLength": 1},
+    "message": {"type": "string", "minLength": 1},
+    "next_action": {"type": "string", "minLength": 1}
+  }
+}

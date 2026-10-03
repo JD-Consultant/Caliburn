@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CommentaryUpdate",
+  "description": "Transient public commentary accumulated text. Not a durable event, formal interview source, or execution completion signal.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["job_file_id", "execution_id", "response_id", "message_id", "text"],
+  "properties": {
+    "job_file_id": {"type": "string", "format": "uuid"},
+    "execution_id": {"type": "string", "format": "uuid"},
+    "response_id": {"type": "string"},
+    "message_id": {"type": "string"},
+    "text": {"type": "string"}
+  }
+}

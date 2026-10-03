@@ -1,0 +1,33 @@
+{
+  "registered_at": "2026-10-03T04:00:22.054031+00:00",
+  "execute": true,
+  "job_file_id": "d2b47271-8f0e-4967-a2f2-73d61883ac68",
+  "execution_id": "814f3e99-5100-4785-b913-6c3fd1380b04",
+  "original_response_id": "resp_0dfb1aa7d876747c016ac077e778dc87d0ba3bed399d7c4ab6",
+  "git_head": "d5b2f34277e5a115bc528321b5243e1bd441dee2",
+  "python": "3.14.7",
+  "openai": "3.20.0",
+  "psycopg": "3.3.6",
+  "order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate"
+  ],
+  "requests_sha256": {
+    "baseline": "8aca86780b34996769bc1db3a4d9f06ed88b47b7d16491bf71b26eb92ce0d813",
+    "candidate": "8e8d6c8d5e06631fa0da59048fa93bdcd195b07788c2c0ffb5b0b292c7633193"
+  },
+  "input_sha256": "fde6b816930e401d08dc38f5f9a25b35ee87727d56a86535f6b24c0f2ab4f204",
+  "tools_sha256": "de62298461bec1e581e9f26cc838dac3b1d1f46c1ecef55223477a68895b97ad",
+  "before_sha256": "69beb2613e3dc0dab08f95abbb3725fd848dd4e7505b950600efcc813f24a328",
+  "artifact_sha256": {
+    "replay.py": "cea15285cca2daadfd3e9c9f0fd166bacc623367b5558d9883f155caba919045",
+    "protocol.md": "7dcf254d0d1c9a6f7aefb37be65fc3ee086e239703251845d34ffa07905a79f3",
+    "candidate-review-rule.txt": "074c042470d1388c275dfe44f0f36ad94ec3e054cfdcf97497e4fc2b3fc96103",
+    "openai_responses.py": "539ba7237afa8137096eae06b38037cd52fe43c528f47fb638606db1b59c2f4d",
+    "response_streaming.py": "3431caf030a6da7d7b93a3dc14eff651b2a2db503e7a68dd51bb7627efe74a9c"
+  }
+}

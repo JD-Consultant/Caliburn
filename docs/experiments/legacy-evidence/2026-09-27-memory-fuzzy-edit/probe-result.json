@@ -1,0 +1,344 @@
+{
+  "scope": "DISPOSABLE SYNTHETIC PROBE; NOT PRODUCTION ACCEPTANCE",
+  "python": "3.12.13",
+  "rapidfuzz": "3.14.6",
+  "scorer": "rapidfuzz.distance.metrics_cpp_avx2",
+  "checks": 18,
+  "guard_checks": 14,
+  "scope_limits": 2,
+  "semantic_counterexamples": 1,
+  "policy_observations": 1,
+  "rows": [
+    {
+      "name": "long_exact",
+      "kind": "guard_check",
+      "status": "applied",
+      "method": "exact",
+      "characters": 130622,
+      "matches": 1,
+      "scores": [
+        1
+      ],
+      "ranges": [
+        [
+          130539,
+          130583
+        ]
+      ],
+      "elapsed_ms": 0.359
+    },
+    {
+      "name": "long_fuzzy_typo",
+      "kind": "guard_check",
+      "status": "applied",
+      "method": "fuzzy_lines",
+      "characters": 130622,
+      "matches": 1,
+      "scores": [
+        0.977273
+      ],
+      "ranges": [
+        [
+          130539,
+          130583
+        ]
+      ],
+      "elapsed_ms": 4.306
+    },
+    {
+      "name": "multiline_format",
+      "kind": "guard_check",
+      "status": "applied",
+      "method": "fuzzy_lines",
+      "characters": 105,
+      "matches": 1,
+      "scores": [
+        1
+      ],
+      "ranges": [
+        [
+          39,
+          66
+        ]
+      ],
+      "elapsed_ms": 0.034
+    },
+    {
+      "name": "duplicate_exact",
+      "kind": "guard_check",
+      "status": "ambiguous",
+      "method": "exact",
+      "characters": 90,
+      "matches": 2,
+      "scores": [
+        1,
+        1
+      ],
+      "ranges": [
+        [
+          0,
+          44
+        ],
+        [
+          46,
+          90
+        ]
+      ],
+      "elapsed_ms": 0.004
+    },
+    {
+      "name": "overlap_exact",
+      "kind": "guard_check",
+      "status": "ambiguous",
+      "method": "exact",
+      "characters": 5,
+      "matches": 3,
+      "scores": [
+        1,
+        1,
+        1
+      ],
+      "ranges": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "elapsed_ms": 0.003
+    },
+    {
+      "name": "two_unequal_fuzzy_scores",
+      "kind": "guard_check",
+      "status": "ambiguous",
+      "method": "fuzzy_lines",
+      "characters": 89,
+      "matches": 2,
+      "scores": [
+        0.977273,
+        0.909091
+      ],
+      "ranges": [
+        [
+          0,
+          44
+        ],
+        [
+          45,
+          89
+        ]
+      ],
+      "elapsed_ms": 0.008
+    },
+    {
+      "name": "overlap_fuzzy",
+      "kind": "guard_check",
+      "status": "ambiguous",
+      "method": "fuzzy_lines",
+      "characters": 80,
+      "matches": 2,
+      "scores": [
+        0.981132,
+        0.981132
+      ],
+      "ranges": [
+        [
+          0,
+          53
+        ],
+        [
+          27,
+          80
+        ]
+      ],
+      "elapsed_ms": 0.007
+    },
+    {
+      "name": "context_disambiguates",
+      "kind": "guard_check",
+      "status": "applied",
+      "method": "exact",
+      "characters": 99,
+      "matches": 1,
+      "scores": [
+        1
+      ],
+      "ranges": [
+        [
+          50,
+          99
+        ]
+      ],
+      "elapsed_ms": 0.002
+    },
+    {
+      "name": "not_found",
+      "kind": "guard_check",
+      "status": "no_match",
+      "method": "fuzzy_lines",
+      "characters": 122,
+      "matches": 0,
+      "scores": [],
+      "ranges": [],
+      "elapsed_ms": 0.012
+    },
+    {
+      "name": "delete_block",
+      "kind": "guard_check",
+      "status": "applied",
+      "method": "exact",
+      "characters": 122,
+      "matches": 1,
+      "scores": [
+        1
+      ],
+      "ranges": [
+        [
+          39,
+          83
+        ]
+      ],
+      "elapsed_ms": 0.003
+    },
+    {
+      "name": "insert_with_anchor",
+      "kind": "guard_check",
+      "status": "applied",
+      "method": "exact",
+      "characters": 122,
+      "matches": 1,
+      "scores": [
+        1
+      ],
+      "ranges": [
+        [
+          39,
+          83
+        ]
+      ],
+      "elapsed_ms": 0.003
+    },
+    {
+      "name": "blank_old_rejected",
+      "kind": "guard_check",
+      "status": "invalid",
+      "method": "none",
+      "characters": 44,
+      "matches": 0,
+      "scores": [],
+      "ranges": [],
+      "elapsed_ms": 0.001
+    },
+    {
+      "name": "short_fuzzy_rejected",
+      "kind": "guard_check",
+      "status": "unsupported_short_fuzzy",
+      "method": "fuzzy_lines",
+      "characters": 4,
+      "matches": 0,
+      "scores": [],
+      "ranges": [],
+      "elapsed_ms": 0.004
+    },
+    {
+      "name": "cost_limit_is_not_no_match",
+      "kind": "guard_check",
+      "status": "scan_limit",
+      "method": "fuzzy_lines",
+      "characters": 40199,
+      "matches": 0,
+      "scores": [],
+      "ranges": [],
+      "elapsed_ms": 0.052
+    },
+    {
+      "name": "wrapped_paragraph_not_supported",
+      "kind": "scope_limit",
+      "status": "no_match",
+      "method": "fuzzy_lines",
+      "characters": 45,
+      "matches": 0,
+      "scores": [],
+      "ranges": [],
+      "elapsed_ms": 0.006
+    },
+    {
+      "name": "inline_fuzzy_not_supported",
+      "kind": "scope_limit",
+      "status": "no_match",
+      "method": "fuzzy_lines",
+      "characters": 44,
+      "matches": 0,
+      "scores": [],
+      "ranges": [],
+      "elapsed_ms": 0.003
+    },
+    {
+      "name": "unique_does_not_mean_faithful",
+      "kind": "semantic_counterexample",
+      "status": "applied",
+      "method": "fuzzy_lines",
+      "characters": 44,
+      "matches": 1,
+      "scores": [
+        0.909091
+      ],
+      "ranges": [
+        [
+          0,
+          44
+        ]
+      ],
+      "elapsed_ms": 0.004
+    },
+    {
+      "name": "exact_precedes_nearby_variant",
+      "kind": "policy_observation",
+      "status": "applied",
+      "method": "exact",
+      "characters": 89,
+      "matches": 1,
+      "scores": [
+        1
+      ],
+      "ranges": [
+        [
+          0,
+          44
+        ]
+      ],
+      "elapsed_ms": 0.002
+    },
+    {
+      "kind": "threshold_observation",
+      "cutoff": 0.9,
+      "status": "applied",
+      "matches": 1
+    },
+    {
+      "kind": "threshold_observation",
+      "cutoff": 0.95,
+      "status": "applied",
+      "matches": 1
+    },
+    {
+      "kind": "threshold_observation",
+      "cutoff": 0.98,
+      "status": "no_match",
+      "matches": 0
+    },
+    {
+      "kind": "threshold_observation",
+      "cutoff": 0.99,
+      "status": "no_match",
+      "matches": 0
+    }
+  ]
+}

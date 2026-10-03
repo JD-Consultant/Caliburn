@@ -19,7 +19,7 @@ Supersedes：
 - 0033 的 episode 作為訪談／分析單位；不保留其 v3 tool/harvest 實作。
 
 完整規格：
-[`../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md)
+[`../specs/2026-07-16-interview-ai-vnext-greenfield-architecture.md`](../history.md#source-2ec5b8af0b6e160e3656)
 
 ## 脈絡
 

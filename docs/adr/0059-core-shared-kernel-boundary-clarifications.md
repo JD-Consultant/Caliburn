@@ -4,7 +4,7 @@
 - **日期**：2026-08-11
 - **核准**：2026-08-11，owner 核准；guard 已同步落地（`_is_public_core_import()`
   於六個 consumer guard 強制底線私有 submodule 例外，非僅文件宣告）
-- **研究**：[`2026-08-11-core-boundary-and-guard-corrections-research.md`](../specs/2026-08-11-core-boundary-and-guard-corrections-research.md)
+- **研究**：[`2026-08-11-core-boundary-and-guard-corrections-research.md`](../history.md#source-202ed993de42d6512898)
 
 ## Context
 

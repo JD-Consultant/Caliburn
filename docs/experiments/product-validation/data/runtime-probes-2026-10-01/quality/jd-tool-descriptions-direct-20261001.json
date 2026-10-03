@@ -1,0 +1,270 @@
+[
+  {
+    "case": "partial",
+    "trial": 1,
+    "input_tokens_counted": 15500,
+    "request_sha256": "53e0e53473e2422f58407e838701732d5b40053738c4cb50095ff21afca29cd8",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 15500,
+      "input_tokens_details": {
+        "cache_write_tokens": 15497,
+        "cached_tokens": 0
+      },
+      "output_tokens": 240,
+      "output_tokens_details": {
+        "reasoning_tokens": 80
+      },
+      "total_tokens": 15740
+    },
+    "calls": [
+      {
+        "name": "revise_jd_item",
+        "arguments": {
+          "read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "scope_text",
+              "value": "支援平日晚間及週末成人進修班的報名、課前名單與教室資料、課程異動通知、每日出席紀錄及每季出席人次彙整。"
+            },
+            {
+              "action": "remove_source",
+              "target": {
+                "kind": "item"
+              },
+              "citation_ref": "citation_fe584e1dccf146b8932f6770015ea540"
+            },
+            {
+              "action": "add_source",
+              "target": {
+                "kind": "item"
+              },
+              "source": {
+                "kind": "current_input"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "text": ""
+  },
+  {
+    "case": "whole_field",
+    "trial": 2,
+    "input_tokens_counted": 8080,
+    "request_sha256": "1151a6ac468ca2e5ac6895c3e22d0967c0f0f4051b062db0bab0e8e4e2e98fcd",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 8080,
+      "input_tokens_details": {
+        "cache_write_tokens": 313,
+        "cached_tokens": 7764
+      },
+      "output_tokens": 169,
+      "output_tokens_details": {
+        "reasoning_tokens": 54
+      },
+      "total_tokens": 8249
+    },
+    "calls": [
+      {
+        "name": "revise_jd_profile",
+        "arguments": {
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "reports_to",
+              "value": "校長"
+            },
+            {
+              "action": "remove_source",
+              "field": "reports_to",
+              "citation_ref": "citation_fixture_supervisor"
+            },
+            {
+              "action": "add_source",
+              "field": "reports_to",
+              "source": {
+                "kind": "current_input"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "text": "我會依你這次的更正更新直接匯報對象，並保留職稱、單位及其他工作的交接對象不變。"
+  },
+  {
+    "case": "partial",
+    "trial": 3,
+    "input_tokens_counted": 15500,
+    "request_sha256": "53e0e53473e2422f58407e838701732d5b40053738c4cb50095ff21afca29cd8",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 15500,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 15497
+      },
+      "output_tokens": 793,
+      "output_tokens_details": {
+        "reasoning_tokens": 215
+      },
+      "total_tokens": 16293
+    },
+    "calls": [
+      {
+        "name": "revise_jd_item",
+        "arguments": {
+          "read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "scope_text",
+              "value": "支援平日晚間及週末成人進修班的報名、課前名單與教室資料、課程異動通知、課後出席紀錄及每季出席人次彙整。"
+            },
+            {
+              "action": "add_source",
+              "target": {
+                "kind": "item"
+              },
+              "source": {
+                "kind": "current_input"
+              }
+            },
+            {
+              "action": "remove_source",
+              "target": {
+                "kind": "item"
+              },
+              "citation_ref": "citation_fe584e1dccf146b8932f6770015ea540"
+            }
+          ]
+        }
+      },
+      {
+        "name": "create_jd_task",
+        "arguments": {
+          "parent_read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "title": "整理每堂課出席紀錄",
+          "description": "每有開課，依老師交付的出席表整理每堂出席人數與缺漏，完成後存入中心指定資料夾。",
+          "outcomes": [
+            {
+              "text": "每堂課的出席人數與缺漏整理於試算表，並存入中心指定資料夾。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "text": "姓名漏填或出席勾選不清楚時，向老師確認，不自行推測。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "required_knowledge": [],
+          "required_skills": [],
+          "supporting_sources": [
+            {
+              "kind": "current_input"
+            }
+          ]
+        }
+      },
+      {
+        "name": "create_jd_task",
+        "arguments": {
+          "parent_read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "title": "彙整季度出席人次",
+          "description": "每季彙整成人進修班出席人次，提供行政組長掌握班級執行情形。",
+          "outcomes": [
+            {
+              "text": "每季出席人次彙整供行政組長掌握班級執行情形。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "text": "按出席人次計算，同一學員每參加一堂課計一人次，不以不重複學員人數計算。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "required_knowledge": [],
+          "required_skills": [],
+          "supporting_sources": [
+            {
+              "kind": "current_input"
+            }
+          ]
+        }
+      },
+      {
+        "name": "request_memory_consolidation",
+        "arguments": {}
+      }
+    ],
+    "text": ""
+  },
+  {
+    "case": "whole_field",
+    "trial": 4,
+    "input_tokens_counted": 8080,
+    "request_sha256": "1151a6ac468ca2e5ac6895c3e22d0967c0f0f4051b062db0bab0e8e4e2e98fcd",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 8080,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 8077
+      },
+      "output_tokens": 247,
+      "output_tokens_details": {
+        "reasoning_tokens": 138
+      },
+      "total_tokens": 8327
+    },
+    "calls": [
+      {
+        "name": "revise_jd_profile",
+        "arguments": {
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "reports_to",
+              "value": "校長"
+            },
+            {
+              "action": "add_source",
+              "field": "reports_to",
+              "source": {
+                "kind": "current_input"
+              }
+            },
+            {
+              "action": "remove_source",
+              "field": "reports_to",
+              "citation_ref": "citation_fixture_supervisor"
+            }
+          ]
+        }
+      }
+    ],
+    "text": "我會只更正直接匯報對象，保留職稱、單位與其他交接對象不變。"
+  }
+]

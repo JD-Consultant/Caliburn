@@ -1,15 +1,14 @@
-# docs/design — 現行跨 app 設計
+# 跨 App 設計與歷史索引
 
-這裡只放能指導現行 code 的跨 app／seam 說明。每個 UI 動作要對到真實 request 或純函式，欄位用真名，不變量與退役禁令要明寫。
+本目錄同時有獨立保留範圍與已退役設計，不因仍有文件就稱為 active。現行架構從[架構地圖](../target-architecture-map.md)進入；正式產品權責依 [ADR0079（Accepted）](../adr/0079-target-rebuild-production-cutover.md)，[ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)只作舊產品沿革。
 
 ## 現行設計
 
-- [`consultant-runtime.md`](consultant-runtime.md) — ADR 0060 的 LangChain／LangGraph durable consultant、context、Skills、文件審核／authority、API、Web 與 export；唯一 active current-product design。
 - [`rag-pipeline.md`](rag-pipeline.md) — 保留但與 current API/Web 完全隔離的 PDF／OCS／indexer／embedder／Qdrant bounded context。
 
 ## 歷史設計
 
-- [`interview-engine.md`](interview-engine.md) — 已刪訪談 engine，只供決策追溯。
-- [`editor-knowledge-pack.md`](editor-knowledge-pack.md) — 已刪 OCS editor／knowledge seam，只供決策追溯。
+- [`consultant-runtime.md`](../history.md#source-ac37cc49c94c6b310f5e) — 原 ADR0060 設計已退役，保留研究與報告脈絡，不作新施工規格。
+- interview engine、editor knowledge pack 的簡短退役通知已移出 checkout；見[Git 恢復對照](../history.md#source-342210e06cceeff43952)。
 
-不要從歷史設計恢復舊 route、hook、store、contract、writer、indexer 或 provider。現行 consultant seam 改變時，同 commit 更新 `consultant-runtime.md` 與對應 app README。
+不要從歷史設計恢復舊 route、hook、store、contract、writer、indexer 或 provider。實際變更維護對應有效責任文件與 App README，不更新退役設計來冒充新權責。

@@ -4,12 +4,12 @@
 - 日期：2026-08-01
 - 部分翻案：[0040](0040-professional-consultant-engine-and-r1-validation-contract.md)
   **決定 29–30**（支持度四級）。**決定 31–34 不變且被本 ADR 強化**。
-- 研究：[OPKS 設計裁決](../specs/2026-08-01-opks-design-decisions-research.md)與五份原料
-  （[效度與法規](../specs/2026-08-01-opks-raw-validity-and-ai-regulation.md)、
-  [工作產出](../specs/2026-08-01-opks-raw-work-outputs.md)、
-  [行為指標](../specs/2026-08-01-opks-raw-performance-indicators.md)、
-  [skills taxonomy](../specs/2026-08-01-opks-raw-skills-taxonomies.md)、
-  [LLM 生成](../specs/2026-08-01-opks-raw-llm-generation-grounding.md)）
+- 研究：[OPKS 設計裁決](../history.md#source-4cbacf4b3375899949e7)與五份原料
+  （[效度與法規](../research/work-analysis/2026-08-01-opks-raw-validity-and-ai-regulation.md)、
+  [工作產出](../research/work-analysis/2026-08-01-opks-raw-work-outputs.md)、
+  [行為指標](../research/work-analysis/2026-08-01-opks-raw-performance-indicators.md)、
+  [skills taxonomy](../research/work-analysis/2026-08-01-opks-raw-skills-taxonomies.md)、
+  [LLM 生成](../research/work-analysis/2026-08-01-opks-raw-llm-generation-grounding.md)）
 - 審查：外部審查者兩輪（2026-08-01）；三項事實更正已於 `a464f42` 落地
 
 ## 脈絡

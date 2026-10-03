@@ -2,7 +2,7 @@
 
 - 狀態：Accepted
 - 日期：2026-08-05
-- 依據：[`docs/specs/2026-08-04-opks-progressive-elicitation-research.md`](../specs/2026-08-04-opks-progressive-elicitation-research.md)
+- 依據：[`docs/specs/2026-08-04-opks-progressive-elicitation-research.md`](../history.md#source-d0604cda1359b341dcb0)
 - 延續：[0047](0047-model-owned-open-issue-closure.md)（模型自關 open issue）、
   [0048](0048-opks-evidence-axes-and-document-level-competencies.md) 決定 6／14／24–25、
   [0049](0049-opks-derived-axes-evidence-whitelist-and-document-authority.md) 決定 13／14、

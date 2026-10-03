@@ -1,9 +1,9 @@
 # ADR 0023 — 訪談引擎骨幹:無狀態回合服務 + 軟階段 + 指令詞彙表
 
 - **狀態**:Accepted(2026-07-05)。
-- **研究依據**:[`../specs/2026-07-05-llm-integration-wiring-research.md`](../specs/2026-07-05-llm-integration-wiring-research.md)
+- **研究依據**:[`../specs/2026-07-05-llm-integration-wiring-research.md`](../research/agent-systems/2026-07-05-llm-integration-wiring-research.md)
   (輪 1–10;判別場景、五路權威收斂、需求訪談、指令詞彙表)+ 上游
-  [`../specs/2026-07-02-llm-interview-authoring-research.md`](../specs/2026-07-02-llm-interview-authoring-research.md)。
+  [`../specs/2026-07-02-llm-interview-authoring-research.md`](../research/work-analysis/2026-07-02-llm-interview-authoring-research.md)。
 - **關聯**:互動模式=ADR 0020(不變);並發地基=ADR 0015;**接受後部分翻案 ADR 0007**
   (LangGraph 留用部分——見決定 6;0007 的 12-factor 原則保留且被本 ADR 強化)。
 
@@ -36,7 +36,7 @@
 4. **停止三重保險**(確定性,LLM 不能繞過):硬上限(每槽追問 ≤2 等)+ 覆蓋率門檻
    (core 任務 12 槽/淺掃 4 槽;`advance` 未達門檻 → 拒絕並回缺口)+ LLM 飽和信號。
 5. **深問預算**:先便宜問完每任務「頻率+比重」,以 O*NET core/supplemental 判準分配
-   全套深問(黃金範本 v0:[`../specs/2026-07-05-golden-sample-software-tester.md`](../specs/2026-07-05-golden-sample-software-tester.md))。
+   全套深問(黃金範本 v0:[`../specs/2026-07-05-golden-sample-software-tester.md`](../research/work-analysis/2026-07-05-golden-sample-software-tester.md))。
 6. **全新實作,不整合舊碼**(維護者 2026-07-05 定調):新引擎按本 ADR 重新設計實作,
    **不承諾搬移既有 graph 任何程式碼**;既有圖(含 STAR/5W2H 槽定義、prompts、指標品質分)
    僅為**參考材料**,設計時可借鑑其領域知識、不受其形狀約束。退役時機照 Strangler Fig:

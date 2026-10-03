@@ -9,9 +9,9 @@
   Segment 5 R1a 使用 owner 開發環境的 `OPENROUTER_API_KEY`，key 未寫入 artifact 或 Git。
 
 > **設計 authority 不在本目錄**，在
-> [R1 Task Discovery 實驗設計](../../specs/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)。
+> [R1 Task Discovery 實驗設計](../../research/work-analysis/2026-07-27-professional-consultant-r1-task-discovery-experiment-design.md)。
 > 本目錄只是那份設計的可執行資產；兩者衝突以設計為準。
-> 實作分段見 [實作計畫](../../plans/2026-07-27-r1-task-discovery-implementation-plan.md)。
+> 實作分段見 [實作計畫](../../history.md#source-7661202d166acae889f4)。
 > Python harness 與 tests 位於
 > [`apps/api/evals/professional_consultant_r1/`](../../../apps/api/evals/professional_consultant_r1/)；
 > 本目錄只保存凍結案例、rubric 與之後的 trial 結果。
@@ -71,7 +71,7 @@ metadata 形狀已由 Segment 4 真實回應核對。真實 wire 顯示 `endpoin
 - 加上前一次由過嚴 route gate 中止、但已成功送出的 US$0.02765，Segment 4 累計
   **US$0.2145455**（owner 上限 US$1）。
 - requested／canonical／endpoint 與三份 catalog snapshot hash 詳見
-  [實作計畫 Segment 4](../../plans/2026-07-27-r1-task-discovery-implementation-plan.md#完成證據)。
+  [實作計畫 Segment 4](../../history.md#source-7661202d166acae889f4)。
 - artifacts 在 gitignored
   `apps/api/output/professional-consultant-r1/preflight-20260727T113646Z/`；
   manifest 完整性與 secret scan 通過。

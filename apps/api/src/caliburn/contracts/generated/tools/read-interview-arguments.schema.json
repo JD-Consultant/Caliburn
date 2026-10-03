@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReadInterviewArguments",
+  "description": "Read selected formal historical interview messages, not current input or instructions. The App binds the job file, source eligibility and read upper bound. An unavailable or out-of-scope sequence rejects the whole query; incomplete reads are not silently truncated.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["query"],
+  "properties": {
+    "query": {
+      "description": "Choose explicit messages or an inclusive range using formal interview sequences; smaller numbers mean earlier speech within the same job file.",
+      "anyOf": [
+        {"$ref": "#/$defs/InterviewMessagesQuery"},
+        {"$ref": "#/$defs/InterviewRangeQuery"}
+      ]
+    }
+  },
+  "$defs": {
+    "InterviewMessagesQuery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sequences"],
+      "properties": {
+        "kind": {"type": "string", "const": "messages"},
+        "sequences": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "integer", "minimum": 1},
+          "description": "Select one or more formal sequences; gaps and duplicates are allowed. The domain deduplicates and returns only selected messages in ascending order, without renumbering or adding context."
+        }
+      }
+    },
+    "InterviewRangeQuery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "start_sequence", "end_sequence"],
+      "properties": {
+        "kind": {"type": "string", "const": "range"},
+        "start_sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "First included formal sequence. Must not exceed end_sequence; the domain validates the ordering."
+        },
+        "end_sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Last included formal sequence. Return every eligible message in the closed interval, subject to the App-bound scope."
+        }
+      }
+    }
+  }
+}

@@ -3,10 +3,10 @@
 - **狀態**：Proposed
 - **日期**：2026-09-02
 - **Owner 對齊**：Qdrant／Voyage 的比較與 compatibility 結果保留；2026-09-02 重驗後降為「只有代表性長訪談證明官方 Store recall 不足才啟用」的 deferred candidate，不屬 Memory foundation。完整 hybrid integration smoke、本機 service lifecycle 與新證據未收斂前維持 Proposed
-- **上位產品契約**：[`2026-09-01-framework-independent-memory-contract.md`](../specs/2026-09-01-framework-independent-memory-contract.md)
-- **框架複核**：[`2026-09-02-memory-framework-selection-revalidation.md`](../specs/2026-09-02-memory-framework-selection-revalidation.md)
-- **版本／一致性研究**：[`2026-09-02-memory-versioning-concurrency-and-replay-research.md`](../specs/2026-09-02-memory-versioning-concurrency-and-replay-research.md)
-- **最小切片重驗**：[`2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md`](../specs/2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md)；本文 Decision 只描述日後若缺口被證實時的候選架構，不得拿來提前施工 Qdrant、outbox、CAS 或 immutable revision platform
+- **上位產品契約**：[`2026-09-01-framework-independent-memory-contract.md`](../history.md#source-8310283b667d245046d5)
+- **框架複核**：[`2026-09-02-memory-framework-selection-revalidation.md`](../research/agent-systems/2026-09-02-memory-framework-selection-revalidation.md)
+- **版本／一致性研究**：[`2026-09-02-memory-versioning-concurrency-and-replay-research.md`](../research/agent-systems/2026-09-02-memory-versioning-concurrency-and-replay-research.md)
+- **最小切片重驗**：[`2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md`](../research/agent-systems/2026-09-02-memory-inventory-versioning-provenance-and-minimal-slice-revalidation.md)；本文 Decision 只描述日後若缺口被證實時的候選架構，不得拿來提前施工 Qdrant、outbox、CAS 或 immutable revision platform
 - **Supersedes when Accepted**：ADR 0057／0060 對 current runtime 不啟動或連接 Qdrant 的部分，以及 ADR 0071「第一版不固定 embedding retrieval／第二 Store index」的部分；**不取代** ADR 0057 對 OCS／PDF／indexer／embedder／Reference RAG bounded context 的隔離，也不取代 ADR 0060 的 PostgreSQL durable authority、員工核准或 provider-neutral runtime
 
 ## Context
@@ -61,7 +61,7 @@ Qdrant 的 top-k 結果只服務 Context selection。全面製作、重整與檢
 
 ### 5. Dense embedding 採可替換的 Voyage 4 Large leaf
 
-2026-09-02 的窄 compatibility smoke 以 24 筆匿名繁中工作 Memory、12 個口語查詢比較 `voyageai/voyage-4-large`（1024 維）與 `google/gemini-embedding-2`（1536 維）；兩者都是 Top-1 12/12、Top-3 12/12、MRR 1.0。這只證明兩者通過當次 compatibility 門檻，不是正式 eval、普遍品質排名或當前採購決策。若代表性 recall 缺口日後真的觸發本 ADR，且重新核對版本、價格與可重跑 fixture 後仍無反證，Voyage 4 Large 才是目前優先候選。完整官方比較、資料形狀、限制與聚合結果見 [框架複核 §7.2.4](../specs/2026-09-02-memory-framework-selection-revalidation.md)。當次 probe 沒有留下可重跑 fixture，因此不得把 12/12 當 regression gate；Accepted 前的 hybrid integration smoke 必須補齊匿名 fixture、runner 與逐案預期結果。
+2026-09-02 的窄 compatibility smoke 以 24 筆匿名繁中工作 Memory、12 個口語查詢比較 `voyageai/voyage-4-large`（1024 維）與 `google/gemini-embedding-2`（1536 維）；兩者都是 Top-1 12/12、Top-3 12/12、MRR 1.0。這只證明兩者通過當次 compatibility 門檻，不是正式 eval、普遍品質排名或當前採購決策。若代表性 recall 缺口日後真的觸發本 ADR，且重新核對版本、價格與可重跑 fixture 後仍無反證，Voyage 4 Large 才是目前優先候選。完整官方比較、資料形狀、限制與聚合結果見 [框架複核 §7.2.4](../research/agent-systems/2026-09-02-memory-framework-selection-revalidation.md)。當次 probe 沒有留下可重跑 fixture，因此不得把 12/12 當 regression gate；Accepted 前的 hybrid integration smoke 必須補齊匿名 fixture、runner 與逐案預期結果。
 
 OpenRouter request 必須固定 canonical slug `voyageai/voyage-4-large-20260727`、`allow_fallbacks=false`、1024 維、float 與 cosine；文件與 query 分別使用 provider `document`／`query` input type。另以 9-token probe 驗證該 canonical slug 可直接呼叫，實際回傳 `voyage-4-large` 與 1024 維向量。[Voyage embeddings](https://docs.voyageai.com/docs/embeddings) · [Voyage pricing](https://docs.voyageai.com/docs/pricing) · [OpenRouter Embeddings API](https://openrouter.ai/docs/api/api-reference/embeddings/create-embeddings) · [OpenRouter model catalog](https://openrouter.ai/api/v1/embeddings/models)
 

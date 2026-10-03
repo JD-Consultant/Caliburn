@@ -1,7 +1,7 @@
 # ADR 0022 — 相似比對(items:match):indexer 確定性能力、三區分帶、非破壞呈現
 
 - **狀態**:Accepted(2026-07-04)。
-- 研究依據:[`../specs/2026-07-02-multi-ocs-candidate-dedup-research.md`](../specs/2026-07-02-multi-ocs-candidate-dedup-research.md)
+- 研究依據:[`../specs/2026-07-02-multi-ocs-candidate-dedup-research.md`](../research/retrieval/2026-07-02-multi-ocs-candidate-dedup-research.md)
   (五輪:權威共識、真實資料實驗 ×3、reranker 實測)。
   設計細節:[`../specs/2026-07-04-similarity-matching-v1-spec.md`](../specs/2026-07-04-similarity-matching-v1-spec.md)。
 

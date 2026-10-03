@@ -2,7 +2,7 @@
 
 - **狀態**：Accepted
 - **日期**：2026-08-13；2026-08-14 依 owner 產品語意審核、最終框架覆蓋審核與明確施工授權修訂
-- **研究**：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §0–§8、§9.7–§9.13
+- **研究**：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../history.md#source-20bcac8af4c10acef7f5) §0–§8、§9.7–§9.13
 - **部分取代**：0043 的四表 Current State 形狀；0045 的舊 Web 契約與自寫 authority seam；0046 的自寫 durable turn；0047 的舊 open-issue closure；0049–0051 的分立 Proposal／Current JD persistence 形狀；0053 決定 4 對「職能基準名稱／工作描述只能由模型讀、不得提案」的限制；0054 的固定 child-operation scheduler；0052／0056 的無確認直接匯出政策；0058–0059 對現行 AI 功能模組／shared kernel 的切割
 - **保留**：本機單一操作者、多文件隔離、員工文件權威、來源與更正、Task／Duty／O／P／K／S 專業方法、0048–0051 的 evidence／linkage／穩定 identity／員工決策不等於證據等語意（只取代舊 persistence／type shape）、0052 的外部正式代碼邊界、deterministic export，以及 0057 的 RAG bounded-context 隔離
 
@@ -185,7 +185,7 @@ Web 維持 `/workspace` 與文件詳情頁。員工可看見現在談什麼、�
 
 ## Acceptance gate
 
-Owner 於 2026-08-14 在要求完成產品方向與成熟框架覆蓋審核後，明確授權審核通過即可開始施工；該審核記錄於 [`2026-08-14-consultant-runtime-north-star-audit-ledger.md`](../specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md)，因此本 ADR 改為 Accepted。依配套 implementation plan 建新的 production worktree，完成前不得 merge／push。
+Owner 於 2026-08-14 在要求完成產品方向與成熟框架覆蓋審核後，明確授權審核通過即可開始施工；該審核記錄於 [`2026-08-14-consultant-runtime-north-star-audit-ledger.md`](../history.md#source-efd8ec7f8d7bb28c57cf)，因此本 ADR 改為 Accepted。依配套 implementation plan 建新的 production worktree，完成前不得 merge／push。
 
 Big-bang 只描述最終切換方式，不表示長時間盲做。每個可獨立驗證的 Task／功能完成後，必須在同一審核帳本記錄：實際員工效果、採用的成熟 primitive、仍留的最薄產品政策、退出的舊機制、驗證證據與北極星偏移判斷。未通過就不得開始下一個 Task；若找到會改善產品效果的新方法，先與 owner 討論並更新研究／successor ADR，不能由實作者暗中改方向。
 

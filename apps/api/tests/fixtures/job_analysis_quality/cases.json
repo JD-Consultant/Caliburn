@@ -1,0 +1,221 @@
+{
+  "version": 3,
+  "data_origin": "fully_synthetic",
+  "cases": [
+    {
+      "id": "correction_keeps_other_case",
+      "split": "development",
+      "risks": ["correction", "scope_preservation"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "目前兩個網站案，你各負責什麼？"},
+          {"sequence": 2, "speaker": "employee", "text": "我做青禾商店與嵐預約的前端，後端由同事負責。我剛才以為兩案都每月檢查；嵐的查詢逾時會保留已選日期，青禾下單結果不明時不能讓使用者重複送出。"},
+          {"sequence": 3, "speaker": "consultant", "text": "兩案的每月檢查都是服務約定嗎？"}
+        ],
+        "current_input": "更正，只有嵐約定每月檢查。青禾是交付後發現前端缺陷才修，沒有固定月檢；剛才說的兩案逾時處理與後端分工都沒變。",
+        "seed_work_situations": [
+          {"title": "青禾商店前端", "description": "訂單逾時及維護", "body": "本人實作前端；下單結果不明時避免重複送出。原先表示每月檢查，後端由同事負責。", "interview_references": [2]},
+          {"title": "嵐預約前端", "description": "查詢逾時及月檢", "body": "本人實作前端；查詢逾時保留已選日期，每月檢查。後端由同事負責。", "interview_references": [2]}
+        ],
+        "jd_draft": [
+          {"label": "前端維護", "authorship": "model", "manual_pending": false, "text": "青禾與嵐兩案均按月檢查前端。", "source_sequences": [2]}
+        ]
+      }
+    },
+    {
+      "id": "missing_subject_is_not_authority",
+      "split": "development",
+      "risks": ["missing_subject", "responsibility_boundary"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "你剛提到採購流程，可以描述參與的人嗎？"},
+          {"sequence": 2, "speaker": "employee", "text": "我們小組三個人會碰這件事，我是採購助理；現在還沒說各自分工。"},
+          {"sequence": 3, "speaker": "consultant", "text": "從拿到請購資料到付款，流程怎麼走？"}
+        ],
+        "current_input": "核對完就送審，通過後付款。",
+        "seed_work_situations": [],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "ten_percent_is_not_whole_job",
+      "split": "development",
+      "risks": ["partial_coverage", "tool_is_not_task"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "你目前的職位，以及想先說的一件工作是什麼？"},
+          {"sequence": 2, "speaker": "employee", "text": "我是行政助理，今天先說活動報名名單整理，其他工作還沒開始談。"},
+          {"sequence": 3, "speaker": "consultant", "text": "整理名單時，你親自處理什麼，交給誰用？"}
+        ],
+        "current_input": "我用 Excel 合併各組名單，依相同電子郵件去重，再交活動承辦聯絡報名者。這個案例目前大概只講了一成，後續怎麼處理還沒說；其他工作也還沒談。",
+        "seed_work_situations": [],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "rare_responsibility_survives_routine_update",
+      "split": "development",
+      "risks": ["low_frequency", "scope_preservation", "responsibility_boundary"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "除了每天的工作，有沒有少見但你仍須負責的事？"},
+          {"sequence": 2, "speaker": "employee", "text": "我是倉務助理，每日核對出貨單。另有颱風停出貨的通知責任：主管決定停出貨後，我按當次出貨名單通知承運商並回收確認，不能由我決定停工或復工。去年沒啟動過，但責任還在。"},
+          {"sequence": 3, "speaker": "consultant", "text": "回到每日核單，遇到數量不同怎麼處理？"}
+        ],
+        "current_input": "我把單據與實際待出貨數量核對，數量不一致就列差異交值班主管確認，不自行改單。",
+        "seed_work_situations": [
+          {"title": "颱風停出貨通知", "description": "主管決定後通知承運商", "body": "主管決定停出貨後，本人依當次出貨名單通知承運商並回收確認；本人無停復工決定權。去年未發生但仍屬本人責任。", "interview_references": [2]}
+        ],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "manual_draft_is_not_employee_fact",
+      "split": "development",
+      "risks": ["manual_draft", "responsibility_boundary", "unsupported_standard"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "採購工作的決定權怎麼分？"},
+          {"sequence": 2, "speaker": "employee", "text": "我是採購助理，只整理報價、比較交期和已提供的規格，提出建議；供應商由經理選定，價格和付款也由經理核准。"},
+          {"sequence": 3, "speaker": "consultant", "text": "目前人工草稿寫了全權核准與年度降成本目標，這符合實際情況嗎？"}
+        ],
+        "current_input": "不符合，那是我先貼的公版。全權核准和每年降成本20%都不是我的責任，也沒有那個目標；剛才說的比價和建議工作才是。請修正。",
+        "seed_work_situations": [],
+        "jd_draft": [
+          {"label": "採購管理", "authorship": "human", "manual_pending": true, "text": "全權核准供應商與付款，每年降低採購成本20%。", "source_sequences": [2]}
+        ]
+      }
+    },
+    {
+      "id": "unknown_scope_stays_unknown",
+      "split": "development",
+      "risks": ["uncertainty", "responsibility_boundary", "temporal_scope"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "你現在負責哪些設備排程？"},
+          {"sequence": 2, "speaker": "employee", "text": "我是維修排程助理，接到已核准的工單後安排可用時段；去年只替主管代班過一次。我希望以後能自己核准，但現在還沒有。"},
+          {"sequence": 3, "speaker": "consultant", "text": "你說到固定保養，是所有設備都有固定周期嗎？"}
+        ],
+        "current_input": "印象中有一類是每月，但我不確定哪一類，也還沒查到約定。我目前只能確認會替已核准工單排時段，周期之後再補。",
+        "seed_work_situations": [],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "daily_vs_month_end_recount_scope",
+      "split": "development",
+      "risks": ["conditional_responsibility", "shared_collaborator_scope", "scope_preservation"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "月底盤點有差異時，你本人先做什麼？"},
+          {"sequence": 2, "speaker": "employee", "text": "月底庫存盤點不一致時，我先複點、查出入庫紀錄，再把仍無法解釋的差異交主管；不由我核准調帳。"},
+          {"sequence": 3, "speaker": "consultant", "text": "那每天出貨的單據數量有差異時呢？"}
+        ],
+        "current_input": "每日出貨差異會請現場複點，我拿回報更新差異清單。現場同事負責搬貨和這段複點，我不負責搬貨。",
+        "seed_work_situations": [
+          {"title": "月底庫存盤點差異", "description": "本人先複點及追查紀錄", "body": "月底盤點有差異時，本人先複點、查出入庫紀錄，再交主管處理未解差異；本人不核准調帳。", "interview_references": [2]}
+        ],
+        "jd_draft": [
+          {"label": "月底盤點差異追查", "authorship": "model", "manual_pending": false, "text": "月底盤點不一致時先複點及追查出入庫紀錄，將未解差異交主管；不含調帳核准。", "source_sequences": [2]}
+        ]
+      }
+    },
+    {
+      "id": "shared_work_background_is_not_per_case_profile",
+      "split": "development",
+      "risks": ["work_background", "scope_preservation", "no_profile_repetition"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "你的角色、服務範圍，以及目前一項工作是什麼？"},
+          {"sequence": 2, "speaker": "employee", "text": "我是文化中心學習推廣組的課程行政專員，工作向組長報告，只支援館內成人課程；兒童課程由另一組負責。我每週彙整講師回覆的可授課時段，把衝突列出交組長決定，不自行承諾開課日期。"},
+          {"sequence": 3, "speaker": "consultant", "text": "同一工作範圍內，還有哪項固定由你處理的事？"}
+        ],
+        "current_input": "另一項是每期開課前核對已確認的教室與課表，把需要調整的場地列給場務同事協調；場地確定後我通知講師。我不負責教學內容或兒童課程，也沒有改變剛才說的角色與匯報關係。",
+        "seed_work_situations": [
+          {"title": "彙整講師時段", "description": "每週彙整時段及提報衝突", "body": "本人每週彙整講師可授課時段，把衝突交組長決定，不自行承諾開課日期。", "interview_references": [2]}
+        ],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "unconfirmed_background_is_not_a_profile_blank",
+      "split": "development",
+      "risks": ["work_background", "uncertainty", "no_profile_repetition"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "可以說明大家如何找你，以及你目前能確認的工作嗎？"},
+          {"sequence": 2, "speaker": "employee", "text": "大家叫我設備支援窗口，但正式職稱與歸屬單位還沒有確認。我目前只受理北館投影設備的報修，記下教室、故障現象與聯絡人，再交維修同事；我不拆機維修。"},
+          {"sequence": 3, "speaker": "consultant", "text": "交給維修同事後，你還負責什麼？"}
+        ],
+        "current_input": "我收到維修同事通知處理完成後，就回覆原報修人。正式職稱、單位與固定匯報對象仍未確認，不能由交給維修同事推成向他報告；目前只確認這段北館的接收與回覆工作。",
+        "seed_work_situations": [],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "historical_fact_keeps_historical_source",
+      "split": "development",
+      "risks": ["cross_turn_source", "work_background"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "請介紹目前的職位及主要工作。"},
+          {"sequence": 2, "speaker": "employee", "text": "我是成人教育中心的課程行政專員，向行政組長報告，處理成人進修班的報名與課前名冊。我不授課，也不決定開課或收費。"},
+          {"sequence": 3, "speaker": "consultant", "text": "核對報名時，遇到重複登記或付款資料不符，您會如何處理？"}
+        ],
+        "current_input": "我每天核對姓名、聯絡方式與課程。重複登記就聯絡本人確認要保留哪筆；付款資料不符就交財務查帳，財務確認後我才更新繳費狀態。我整理課前使用的報名名冊，但不能自己認定款項已入帳。",
+        "seed_work_situations": [],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "current_correction_keeps_other_sources",
+      "split": "development",
+      "risks": ["cross_turn_source", "correction", "scope_preservation"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "請介紹目前的職位及主要工作。"},
+          {"sequence": 2, "speaker": "employee", "text": "我是成人教育中心的課程行政專員，向行政組長報告，處理成人進修班的報名與課前名冊。我不授課，也不決定開課或收費。"},
+          {"sequence": 3, "speaker": "consultant", "text": "目前還有需要補充或更正的資訊嗎？"}
+        ],
+        "current_input": "更正一下，目前直接向教務主任匯報，不是前面說的行政組長。另外，付款資料不符時，我會交財務查帳，財務確認後才更新繳費狀態。",
+        "seed_work_situations": [],
+        "jd_draft": []
+      }
+    },
+    {
+      "id": "known_work_does_not_need_forced_rewrite",
+      "split": "holdout_candidate",
+      "risks": ["sufficient_evidence", "no_forced_write", "confirmed_standard"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "閉館前你本人需要交付什麼？"},
+          {"sequence": 2, "speaker": "employee", "text": "我是圖書館排架助理，每個開館日閉館前核對還書推車與館藏位置。錯架或查不到的書列入待處理清單，交晚班館員接手；已確認要在18點前交清單。我沒有館藏註銷權。"},
+          {"sequence": 3, "speaker": "consultant", "text": "目前這段草稿是否準確，有新變動嗎？"}
+        ],
+        "current_input": "準確，沒有新變動，剛才說的就是目前做法。",
+        "seed_work_situations": [],
+        "jd_draft": [
+          {"label": "閉館前還書核對", "authorship": "model", "manual_pending": false, "text": "每個開館日閉館前核對還書推車與館藏位置，將錯架或待查書籍列清單，18點前交晚班館員接手；不含館藏註銷決定。", "source_sequences": [2]}
+        ]
+      }
+    },
+    {
+      "id": "one_off_event_does_not_change_regular_scope",
+      "split": "holdout_candidate",
+      "risks": ["correction", "low_frequency", "uncertainty", "scope_preservation"],
+      "input": {
+        "formal_interview": [
+          {"sequence": 1, "speaker": "consultant", "text": "教室每天與特殊活動後的整理分別是什麼？"},
+          {"sequence": 2, "speaker": "employee", "text": "我是教室管理助理，每天閉館前收桌面和椅子。上次社區展覽後也幫忙清窗，但只發生一次；是否往後仍由我做還沒約定。"},
+          {"sequence": 3, "speaker": "consultant", "text": "所以清窗也是每天閉館的固定工作嗎？"}
+        ],
+        "current_input": "不是，請更正這個理解。每天固定只有桌椅收尾；清窗是那次展覽後的協助，未來是否負責還沒確認。",
+        "seed_work_situations": [
+          {"title": "每日教室收尾", "description": "閉館前整理桌椅", "body": "本人每天閉館前收桌面與椅子。", "interview_references": [2]},
+          {"title": "社區展覽後清窗", "description": "一次協助，未來責任未定", "body": "本人在一次社區展覽後協助清窗；是否形成持續責任尚未約定。", "interview_references": [2]}
+        ],
+        "jd_draft": []
+      }
+    }
+  ]
+}

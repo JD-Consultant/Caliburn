@@ -1,0 +1,122 @@
+[
+  {
+    "case": "recovery",
+    "trial": 1,
+    "input_tokens_counted": 8516,
+    "request_sha256": "211c63c512b19161486a59c45fc09db87490d16f97f37083e6db2b973c81b3dd",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 8516,
+      "input_tokens_details": {
+        "cache_write_tokens": 8513,
+        "cached_tokens": 0
+      },
+      "output_tokens": 331,
+      "output_tokens_details": {
+        "reasoning_tokens": 155
+      },
+      "total_tokens": 8847
+    },
+    "calls": [
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "responsibility_area",
+            "title": "報名資料核對與繳費狀態處理",
+            "scope_text": "核對報名資料、處理經本人確認的重複登記，並依財務查帳結果更新繳費狀態；不自行認定款項入帳，額滿、加開名額及退款交由行政組長與財務決定。",
+            "supporting_sources": [
+              {
+                "kind": "current_input"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "text": "職務基本資料已依您先前提供的資訊整理。報名核對這部分，我會只把本輪補充的處理流程寫入，並保留財務及主管的決策界線。"
+  },
+  {
+    "case": "recovery",
+    "trial": 2,
+    "input_tokens_counted": 8516,
+    "request_sha256": "211c63c512b19161486a59c45fc09db87490d16f97f37083e6db2b973c81b3dd",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 8516,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 8513
+      },
+      "output_tokens": 187,
+      "output_tokens_details": {
+        "reasoning_tokens": 67
+      },
+      "total_tokens": 8703
+    },
+    "calls": [
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "responsibility_area",
+            "title": "課程報名與資料核對",
+            "scope_text": "處理成人進修班報名資料核對及繳費狀態更新；依報名者確認取消重複登記，款項入帳由財務確認，名額與退款決策交由行政組長及財務。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 2
+              },
+              {
+                "kind": "current_input"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "text": ""
+  },
+  {
+    "case": "source_baseline",
+    "trial": 3,
+    "input_tokens_counted": 31992,
+    "request_sha256": "fe068af135abbd21308a3c2b8b021739ac2fee5a829ca404e66c61a89aee679c",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 31992,
+      "input_tokens_details": {
+        "cache_write_tokens": 25616,
+        "cached_tokens": 6373
+      },
+      "output_tokens": 801,
+      "output_tokens_details": {
+        "reasoning_tokens": 718
+      },
+      "total_tokens": 32793
+    },
+    "calls": [
+      {
+        "name": "read_jd",
+        "arguments": {
+          "view": "profile",
+          "read_ref": null
+        }
+      },
+      {
+        "name": "read_jd",
+        "arguments": {
+          "view": "item",
+          "read_ref": "area_1c928d76353e460a9b6273328f2c75a9"
+        }
+      }
+    ],
+    "text": ""
+  },
+  {
+    "case": "source_candidate",
+    "trial": 4,
+    "input_tokens_counted": 32029,
+    "error_type": "AssertionError"
+  }
+]

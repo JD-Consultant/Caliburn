@@ -1,0 +1,17 @@
+flowchart TB
+    HTTP[HTTP 邊界<br/>請求／回應／串流] --> W[流程編排 workflows<br/>A Turn／Memory 批次／完成與失敗]
+    W --> R[角色 agents<br/>A／B1／B2 的指令、Context、工具集]
+    R --> E[共用執行 agent_execution<br/>模型往返／接續／容量／工具 Step]
+    E --> T[角色工具轉接<br/>語意參數＋App 提供的範圍]
+    T --> D[業務 features<br/>訪談／JD／Memory／執行資格]
+    W -->|跨領域提交協調| D
+    E --> M[OpenAI adapter]
+    E --> C[LangGraph Checkpointer]
+    D --> DB[(PostgreSQL)]
+    C --> DB
+    classDef orchestration fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e;
+    classDef domain fill:#dcfce7,stroke:#15803d,color:#14532d;
+    classDef mechanism fill:#f1f5f9,stroke:#475569,color:#0f172a;
+    class W,R,E orchestration;
+    class D,DB domain;
+    class HTTP,T,M,C mechanism;

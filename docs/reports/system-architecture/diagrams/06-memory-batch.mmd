@@ -1,0 +1,11 @@
+flowchart TB
+    R[A 提出整理要求<br/>本輪完成後才具備啟動資格] --> B[固定已發布基底與訪談上界<br/>建立可恢復的候選批次]
+    B --> S[B1 整理情境<br/>讀寫目前候選情境]
+    S --> H[保存交接位置<br/>提供情境變更 diff]
+    H --> U[B2 整理理解<br/>讀目前情境；讀寫目前理解]
+    U -->|整理完成| P[原子發布<br/>完整 Memory 快照]
+    P --> A[A 下個 Turn 可選用新版]
+    classDef actor fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e;
+    classDef safe fill:#dcfce7,stroke:#15803d,color:#14532d;
+    class S,U actor;
+    class B,H,P safe;

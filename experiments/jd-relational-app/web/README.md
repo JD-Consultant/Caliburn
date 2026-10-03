@@ -4,7 +4,7 @@
 
 ## 執行
 
-使用 Node 24.19.0、pnpm 12.5.1 與根目錄 lock。API 先依[受管理設定](../../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)明示初始化一次；一般開啟只使用原設定，不能重做 init。後端設定的允許來源必須包含 `http://127.0.0.1:3002`，API port 以該設定為準。
+使用 Node 24.19.0、pnpm 12.5.1 與根目錄 lock。API 先依[受管理設定](../../../docs/history.md#source-d48808fa1c7c98eef3ff)明示初始化一次；一般開啟只使用原設定，不能重做 init。後端設定的允許來源必須包含 `http://127.0.0.1:3002`，API port 以該設定為準。
 
 日常直接在 repository 根目錄執行：
 
@@ -34,6 +34,6 @@ pnpm --filter @caliburn/jd-relational-web test
 pnpm --filter @caliburn/jd-relational-web build
 ```
 
-受限環境若 Node test worker 無法建立，可用官方 `--test-isolation=none` 跑純測；不代表已驗證 TSX 畫面。Next build 必須保留型別檢查，不能為略過程序限制而關掉。2026-09-22 最新驗證為 **310 tests passed**、TypeScript 通過、production build 通過；真瀏覽器／API／PostgreSQL／Luna 證據見[元件與完整 App 驗收](../../../docs/specs/evidence/2026-09-22-jd-component-first-acceptance.md)。聊天旅程中曾有 fetch 中斷，明示查回後完成且 DB 一致；限定重現的連線原因仍未定位，不宣稱所有瀏覽器故障通過。
+受限環境若 Node test worker 無法建立，可用官方 `--test-isolation=none` 跑純測；不代表已驗證 TSX 畫面。Next build 必須保留型別檢查，不能為略過程序限制而關掉。2026-09-22 最新驗證為 **310 tests passed**、TypeScript 通過、production build 通過；真瀏覽器／API／PostgreSQL／Luna 證據見[元件與完整 App 驗收](../../../docs/experiments/legacy-evidence/2026-09-22-jd-component-first-acceptance.md)。聊天旅程中曾有 fetch 中斷，明示查回後完成且 DB 一致；限定重現的連線原因仍未定位，不宣稱所有瀏覽器故障通過。
 
-`src/lib/api.ts` 使用生成型別與八份 Schema 驗證回覆；`session.ts` 協調本文件的人工／聊天候選與原請求交接；`drafts.ts` 使用 idb 原生短交易，舊 v1 列只在 claim 時驗證升成 v2。`chat-session.ts` 只負責觀察及明示控制，不建立第二份持久聊天。業務規則和保存只在共用 Python 服務，UI 不解碼 ref、不重算關係約束。套件版本與授權見[UI 前置](../../../docs/specs/evidence/2026-09-13-jd-react-ui-preflight.md)及[聊天前置](../../../docs/specs/evidence/jd-relational-chat-web/ui-preflight.md)。
+`src/lib/api.ts` 使用生成型別與八份 Schema 驗證回覆；`session.ts` 協調本文件的人工／聊天候選與原請求交接；`drafts.ts` 使用 idb 原生短交易，舊 v1 列只在 claim 時驗證升成 v2。`chat-session.ts` 只負責觀察及明示控制，不建立第二份持久聊天。業務規則和保存只在共用 Python 服務，UI 不解碼 ref、不重算關係約束。套件版本與授權見[UI 前置](../../../docs/experiments/legacy-evidence/2026-09-13-jd-react-ui-preflight.md)及[聊天前置](../../../docs/experiments/legacy-evidence/jd-relational-chat-web/ui-preflight.md)。

@@ -1,7 +1,7 @@
 # ADR 0016 — 後端批次 task-catalog 端點(每 ocs_code 撈一次池)
 
 - **狀態**:Accepted（2026-06-30）。
-- 研究依據:[`../specs/2026-06-30-web-data-layer-optimization-research.md`](../specs/2026-06-30-web-data-layer-optimization-research.md)(§1)。
+- 研究依據:[`../specs/2026-06-30-web-data-layer-optimization-research.md`](../research/engineering/2026-06-30-web-data-layer-optimization-research.md)(§1)。
 
 ## 脈絡
 

@@ -1,7 +1,7 @@
 # ADR 0028 — 訪談流程 v2.1:AI 驅動共用編輯 UI(追蹤修訂)+ 議程化彈性流程 + 完整性檢查表 + 態度收尾
 
 - **狀態**:Accepted(2026-07-09)。
-- **研究依據**:[`../specs/2026-07-09-interview-flow-task-curation-and-flexibility-research.md`](../specs/2026-07-09-interview-flow-task-curation-and-flexibility-research.md)
+- **研究依據**:[`../specs/2026-07-09-interview-flow-task-curation-and-flexibility-research.md`](../research/work-analysis/2026-07-09-interview-flow-task-curation-and-flexibility-research.md)
   (D1–D7;真人實測 session `eb2af457` 診斷 + Eightfold/O*NET/DACUM/mixed-initiative/
   automation-bias/LangGraph-HITL/Claude Code/Tiptap/Fluent 2 等 2026 權威錨)。
 - **關聯**:四組件=ADR 0027(**本 ADR 修正其態度通道與 onboarding 實作形**);共編權限=

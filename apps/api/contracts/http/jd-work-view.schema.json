@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdWorkView",
+  "description": "All manual JD editor collections from one fixed formal revision; profile is read separately. Not a model navigation map.",
+  "type": "object", "additionalProperties": false,
+  "required": ["revision_id", "areas", "tasks", "capabilities", "task_links", "collaborators", "conditions"],
+  "properties": {
+    "revision_id": {"type": "string", "format": "uuid"},
+    "areas": {"type": "array", "items": {"$ref": "jd-areas-view.schema.json#/$defs/Area"}},
+    "tasks": {"type": "array", "items": {"$ref": "jd-tasks-view.schema.json#/$defs/WorkTask"}},
+    "capabilities": {"type": "array", "items": {"$ref": "jd-capabilities-view.schema.json#/$defs/Capability"}},
+    "task_links": {"type": "array", "items": {"$ref": "jd-capabilities-view.schema.json#/$defs/TaskLink"}},
+    "collaborators": {"type": "array", "items": {"$ref": "jd-collaborators-view.schema.json#/$defs/Collaborator"}},
+    "conditions": {"type": "array", "items": {"$ref": "jd-conditions-view.schema.json#/$defs/Condition"}}
+  }
+}

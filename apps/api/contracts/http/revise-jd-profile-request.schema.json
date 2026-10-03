@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReviseJdProfileRequest",
+  "description": "Revise only the specified profile fields from the observed formal JD revision. Reuse the original command and payload when its result is uncertain.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command_id", "expected_revision_id", "changes"],
+  "properties": {
+    "command_id": {"type": "string", "format": "uuid"},
+    "expected_revision_id": {"type": "string", "format": "uuid"},
+    "changes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {"oneOf": [{"$ref": "#/$defs/SetField"}, {"$ref": "#/$defs/ClearField"}]}
+    }
+  },
+  "$defs": {
+    "ProfileField": {"type": "string", "enum": ["job_title", "organization_unit", "reports_to", "purpose"]},
+    "SetField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "field", "value"],
+      "properties": {
+        "action": {"const": "set_field"},
+        "field": {"$ref": "#/$defs/ProfileField"},
+        "value": {"type": "string", "minLength": 1, "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"}
+      }
+    },
+    "ClearField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "field"],
+      "properties": {
+        "action": {"const": "clear_field"},
+        "field": {"$ref": "#/$defs/ProfileField"}
+      }
+    }
+  }
+}

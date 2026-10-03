@@ -1,7 +1,7 @@
 # ADR 0021 — 知識包:選職類=唯一 knowledge 同步點;indexer 給資料、api 處理、web 讀寫
 
 - **狀態**:Accepted(2026-07-03)。
-- 研究依據:[`../specs/2026-07-03-editor-provenance-knowledge-pack-decisions.md`](../specs/2026-07-03-editor-provenance-knowledge-pack-decisions.md)
+- 研究依據:[`../specs/2026-07-03-editor-provenance-knowledge-pack-decisions.md`](../history.md#source-d3b2c20f85e8b3ad2114)
   (§1 原則、§5 設計與抓取策略研究:TanStack/Next.js/web.dev 官方 + 實測 27KB/職類)。
 
 ## 脈絡

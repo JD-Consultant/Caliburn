@@ -1,7 +1,6 @@
 # RAG bounded contexts 保留與 current-only 隔離設計
 
-- **狀態**：Owner 已核准設計，待 implementation plan
-- **日期**：2026-08-11
+獨立 RAG 包含 PDF 轉換、文件契約、索引、嵌入與向量資料庫。這份 2026-08-11 的設計記錄說明如何保留這條資料管線，同時讓 JD App 不依賴它啟動。文中的目錄與命令保留當時條件；現行產品邊界見[ADR0079](../adr/0079-target-rebuild-production-cutover.md)，操作方式見[操作手冊](../runbook.md)。
 
 ## 1. 背景與診斷
 
@@ -11,15 +10,16 @@
 PDF → OCS contract → OCS JSON → indexer → embedder → Qdrant
 ```
 
-Owner 已澄清：RAG 尚未接上 current API/Web，但 `pdf-to-json`、`ocs-indexer`、`embedder` 與其 contracts 必須留在 monorepo，供後續建置使用。
+已確認的保留範圍是：RAG 尚未接上 current API/Web，但 `pdf-to-json`、`ocs-indexer`、`embedder` 與其 contracts 留在 monorepo，供後續建置使用。
 
 刪除範圍的直接證據：
 
 - `60db19a` 刪除 `apps/ocs-indexer`、`apps/pdf-to-json`、`apps/embedder`。
 - 同一 hard cut 刪除 `packages/ocs-contract`、`packages/indexer-contract`。
-- ADR 0057 目前仍是 `Proposed`，因此可依 owner 新裁決修正內容，不改寫 Accepted ADR。
+- ADR 0057 是 `Proposed`；當時依這次範圍修正更新提案，不改寫 Accepted ADR。
 
-## 2. Owner 裁決
+
+## 2. 保留與隔離原則
 
 採「選擇性恢復、隔離保留」：
 
@@ -95,23 +95,23 @@ pdf-to-json ──uses──> ocs-contract ──writes──> OCS JSON corpus
 - `embedder` 只提供 BGE-M3 HTTP embedding service，不進 API process。
 - `indexer-contract` 保留作未來 query seam；在 current API 尚未接 RAG 前，不新增 consumer。
 
-## 6. Workspace、測試與完成門檻
+## 6. 隔離設計的驗證方法
 
-恢復後必須逐項驗證：
+隔離設計可從依賴、啟動及測試三方面檢查：
 
 1. root workspace graph 看得到三個 RAG app 與兩個 contracts；current API/Web 仍可正常 install。
 2. `pdf-to-json` 的 parser／transformer tests 與 `ocs-contract` codegen check 通過。
 3. `ocs-indexer` 的 unit／contract tests 通過；不把 live Qdrant 或 GPU 服務列為預設單元測試前提。
 4. `docker compose config` 的預設服務只有 PostgreSQL；啟用 `rag` profile 才包含 Qdrant／embedder。
 5. Turbo 的預設 `dev` 只啟動 current API/Web；RAG 以明確 filter／指令啟動。
-6. `git diff --check`、workspace lockfile consistency、current API/Web 既有 gates 維持通過。
+6. Workspace lockfile 與各專案依賴一致，現行 API／Web 的測試不因 RAG 目錄存在而改變。
 7. 新增或更新 boundary tests，證明 current API/Web 沒有 import `apps/ocs-indexer`、`apps/pdf-to-json`、`embedder` 或舊 runtime。
 
 ## 7. 後果與未來接線
 
-好處是 RAG 所需程式碼與來源資料不會再被 current-only cleanup 誤刪，同時 current Web 成品不會被 Qdrant、GPU 或 PDF pipeline 拖入啟動與部署邊界。代價是 monorepo 會重新包含兩個 Python data app、GPU container 與約 311.6 MiB PDF corpus；這是 owner 為未來 RAG 保留可重建來源所接受的成本。
+好處是 RAG 所需程式碼與來源資料不會再被 current-only cleanup 誤刪，同時 current Web 成品不會被 Qdrant、GPU 或 PDF pipeline 拖入啟動與部署邊界。代價是 monorepo 會重新包含兩個 Python data app、GPU container 與約 311.6 MiB PDF corpus；這是為未來 RAG 保留可重建來源所接受的成本。
 
-未來要讓 Job Analysis 使用檢索結果時，必須另開 ADR，明確決定：query contract、index freshness、embedding identity、failure fallback、API transaction 外的 provider 呼叫，以及 current JD provenance／evidence linkage。這份恢復設計本身不授權任何 current API/Web wiring。
+讓 JD App 使用檢索結果，還需要定義查詢格式、索引更新時效、嵌入模型身分、失敗時的替代行為，以及結果與 JD 依據的關係。這份設計只處理獨立 RAG 的保留與隔離，不代表已接入 JD App。
 
 ## 8. 研究來源
 

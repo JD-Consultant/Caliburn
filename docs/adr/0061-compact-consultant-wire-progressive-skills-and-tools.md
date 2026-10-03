@@ -3,7 +3,7 @@
 - **狀態**：Accepted
 - **日期**：2026-08-14
 - **Owner 核准範圍**：先解決 schema；Tool 種類、按需載入與排程留待下一輪討論
-- **研究**：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../specs/2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §9.15–§9.16
+- **研究**：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](../history.md#source-20bcac8af4c10acef7f5) §9.15–§9.16
 - **修正**：ADR 0060 的 model-facing result contract；不改其產品北極星、LangChain／LangGraph runtime、單一 durable authority、員工審核、動態 Task／Duty／OPKS、自然續談、匯出與延後項目
 
 ## Context
@@ -67,7 +67,7 @@ LangChain 實際轉換後的 provider schema 已凍結以下結構量測：
 - [Google Gemini — Structured output](https://ai.google.dev/gemini-api/docs/structured-output)
 - [LangChain — Structured output](https://docs.langchain.com/oss/python/langchain/structured-output)
 - [Pydantic — JSON Schema](https://docs.pydantic.dev/latest/concepts/json_schema/)
-- [`2026-07-31-anthropic-strict-schema-grammar-limit-research.md`](../specs/2026-07-31-anthropic-strict-schema-grammar-limit-research.md)
-- [`2026-07-31-context-engineering-model-facing-contract-research.md`](../specs/2026-07-31-context-engineering-model-facing-contract-research.md)
-- [`2026-07-31-task-analysis-compact-wire-contract-plan.md`](../plans/2026-07-31-task-analysis-compact-wire-contract-plan.md)
+- [`2026-07-31-anthropic-strict-schema-grammar-limit-research.md`](../research/agent-systems/2026-07-31-anthropic-strict-schema-grammar-limit-research.md)
+- [`2026-07-31-context-engineering-model-facing-contract-research.md`](../research/agent-systems/2026-07-31-context-engineering-model-facing-contract-research.md)
+- [`2026-07-31-task-analysis-compact-wire-contract-plan.md`](../history.md#source-099fca2c1d1904c52d6e)
 - [`2026-07-31-job-analysis-attributed-live-smoke`](../experiments/2026-07-31-job-analysis-attributed-live-smoke/README.md)

@@ -1,0 +1,347 @@
+[
+  {
+    "variant": "baseline",
+    "trial": 1,
+    "input_tokens_counted": 14109,
+    "request_sha256": "546ea66ba89dd8a181b869d65adc8043f47622a89d9d681bb450e0f97dec286e",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 14109,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 14106
+      },
+      "output_tokens": 276,
+      "output_tokens_details": {
+        "reasoning_tokens": 115
+      },
+      "total_tokens": 14385
+    },
+    "calls": [
+      {
+        "name": "revise_jd_item",
+        "arguments": {
+          "read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "scope_text",
+              "value": "支援平日晚間及週末成人進修班的報名、課前名單與教室資料、課程異動通知、課後出席紀錄及每季出席人次彙整。"
+            },
+            {
+              "action": "remove_source",
+              "target": {
+                "kind": "item"
+              },
+              "citation_ref": "citation_fe584e1dccf146b8932f6770015ea540"
+            },
+            {
+              "action": "add_source",
+              "target": {
+                "kind": "item"
+              },
+              "source": {
+                "kind": "current_input"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "text": ""
+  },
+  {
+    "variant": "candidate",
+    "trial": 2,
+    "input_tokens_counted": 14187,
+    "request_sha256": "fe7f57d911d48d95d1956cd51cb86db02c9306165502aa7b364561ef337dac07",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 14187,
+      "input_tokens_details": {
+        "cache_write_tokens": 14184,
+        "cached_tokens": 0
+      },
+      "output_tokens": 517,
+      "output_tokens_details": {
+        "reasoning_tokens": 389
+      },
+      "total_tokens": 14704
+    },
+    "calls": [
+      {
+        "name": "revise_jd_item",
+        "arguments": {
+          "read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "scope_text",
+              "value": "支援平日晚間及週末成人進修班的報名、課前名單與教室資料、課程異動通知、課後出席紀錄及每季出席人次彙整。"
+            },
+            {
+              "action": "add_source",
+              "target": {
+                "kind": "item"
+              },
+              "source": {
+                "kind": "current_input"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "text": ""
+  },
+  {
+    "variant": "baseline",
+    "trial": 3,
+    "input_tokens_counted": 14109,
+    "request_sha256": "546ea66ba89dd8a181b869d65adc8043f47622a89d9d681bb450e0f97dec286e",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 14109,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 14106
+      },
+      "output_tokens": 750,
+      "output_tokens_details": {
+        "reasoning_tokens": 146
+      },
+      "total_tokens": 14859
+    },
+    "calls": [
+      {
+        "name": "revise_jd_item",
+        "arguments": {
+          "read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "scope_text",
+              "value": "支援平日晚間及週末成人進修班的報名、課前名單與教室資料、課程異動通知、課後出席紀錄及每季出席人次彙整。"
+            },
+            {
+              "action": "remove_source",
+              "target": {
+                "kind": "item"
+              },
+              "citation_ref": "citation_fe584e1dccf146b8932f6770015ea540"
+            },
+            {
+              "action": "add_source",
+              "target": {
+                "kind": "item"
+              },
+              "source": {
+                "kind": "current_input"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "create_jd_task",
+        "arguments": {
+          "parent_read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "title": "整理每堂課出席紀錄",
+          "description": "依老師提交的出席表，整理每堂出席人數及缺漏資料至試算表，完成後存放於中心指定資料夾。",
+          "outcomes": [
+            {
+              "text": "各堂課的出席人數與缺漏整理於試算表並存入中心指定資料夾。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "text": "有開課的每一天，依老師交付的出席表整理各堂出席人數與缺漏。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            },
+            {
+              "text": "姓名漏填或出席勾選不清楚時，向老師確認，不自行推測或補填。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "required_knowledge": [],
+          "required_skills": [],
+          "supporting_sources": [
+            {
+              "kind": "current_input"
+            }
+          ]
+        }
+      },
+      {
+        "name": "create_jd_task",
+        "arguments": {
+          "parent_read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "title": "彙整季度出席人次",
+          "description": "每季彙整成人進修班出席人次，提供行政組長掌握班級執行情形。",
+          "outcomes": [
+            {
+              "text": "每季提供出席人次彙整，供行政組長掌握班級執行情形。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "text": "以出席人次計算；同一位學員參加三堂課，計為三人次而非一人。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "required_knowledge": [],
+          "required_skills": [],
+          "supporting_sources": [
+            {
+              "kind": "current_input"
+            }
+          ]
+        }
+      }
+    ],
+    "text": ""
+  },
+  {
+    "variant": "candidate",
+    "trial": 4,
+    "input_tokens_counted": 14187,
+    "request_sha256": "fe7f57d911d48d95d1956cd51cb86db02c9306165502aa7b364561ef337dac07",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 14187,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 14184
+      },
+      "output_tokens": 755,
+      "output_tokens_details": {
+        "reasoning_tokens": 158
+      },
+      "total_tokens": 14942
+    },
+    "calls": [
+      {
+        "name": "revise_jd_item",
+        "arguments": {
+          "read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "scope_text",
+              "value": "支援平日晚間及週末成人進修班的報名、課前名單與教室資料、課程異動通知、每日出席紀錄及每季出席人次彙整。"
+            },
+            {
+              "action": "remove_source",
+              "target": {
+                "kind": "item"
+              },
+              "citation_ref": "citation_fe584e1dccf146b8932f6770015ea540"
+            },
+            {
+              "action": "add_source",
+              "target": {
+                "kind": "item"
+              },
+              "source": {
+                "kind": "current_input"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "create_jd_task",
+        "arguments": {
+          "parent_read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "title": "整理並存檔每日出席紀錄",
+          "description": "每個開課日依老師交付的出席表整理各堂出席人數及缺漏，並將完成的紀錄存入中心指定資料夾。",
+          "outcomes": [
+            {
+              "text": "每堂出席人數及缺漏整理於試算表，完成紀錄存入中心指定資料夾。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "text": "有開課的每一天依老師提供的出席表整理出席人數與缺漏；姓名漏填或勾選不清楚時請老師確認，不自行推測。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "required_knowledge": [],
+          "required_skills": [],
+          "supporting_sources": [
+            {
+              "kind": "current_input"
+            }
+          ]
+        }
+      },
+      {
+        "name": "create_jd_task",
+        "arguments": {
+          "parent_read_ref": "area_79bd80e4c44e490eb36730c5cebda4b2",
+          "title": "按季彙整出席人次",
+          "description": "每季彙整成人進修班出席人次提供行政組長，供掌握班級執行情形。",
+          "outcomes": [
+            {
+              "text": "每季提供出席人次彙整予行政組長，供其掌握班級執行情形。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "text": "以實際出席堂次計算人次；同一學員參加三堂計為三人次，不按不重複學員人數計算。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          ],
+          "required_knowledge": [],
+          "required_skills": [],
+          "supporting_sources": [
+            {
+              "kind": "current_input"
+            }
+          ]
+        }
+      }
+    ],
+    "text": ""
+  }
+]

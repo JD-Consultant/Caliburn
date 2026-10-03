@@ -1,0 +1,392 @@
+[
+  {
+    "case": "source_candidate",
+    "trial": 1,
+    "input_tokens_counted": 32029,
+    "request_sha256": "a2aa17e7389436c4b732f68c6dc9b862f8c9eaa584fb8f2c77f0c0c627880359",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 32029,
+      "input_tokens_details": {
+        "cache_write_tokens": 32026,
+        "cached_tokens": 0
+      },
+      "output_tokens": 1691,
+      "output_tokens_details": {
+        "reasoning_tokens": 902
+      },
+      "total_tokens": 33720
+    },
+    "calls": [
+      {
+        "name": "revise_jd_profile",
+        "arguments": {
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "purpose",
+              "value": "透過成人進修班報名核對、課前資料交付、異動通知及出席紀錄整理，支援課程日常運作，並提供師生與行政管理所需資訊。"
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 2
+              }
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 4
+              }
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 6
+              }
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 8
+              }
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 10
+              }
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 16
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "成人進修班學員",
+            "scope_text": "報名資料核對與重複登記確認；接收課程時間異動或停課通知，未回覆時由本人追蹤聯絡。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 4
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 8
+              },
+              {
+                "kind": "current_input"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "授課老師",
+            "scope_text": "提供出席表並確認出席資料疑義；確認課前名單，接收課程異動通知。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 6
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 8
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 10
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "場地窗口",
+            "scope_text": "接收課前教室資料並處理設備；接收課程異動通知。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 6
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 8
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "財務",
+            "scope_text": "受理付款資料不符案件查帳，確認後由本人更新繳費狀態。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 4
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "行政組長",
+            "scope_text": "確認課程改期時間，並接收每季出席人次彙整。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 8
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 10
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "中心主任",
+            "scope_text": "決定颱風停課；本人依公告通知各班。",
+            "supporting_sources": [
+              {
+                "kind": "current_input"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "text": "整體對照後，四項主要任務已涵蓋目前說明的工作，報名結案步驟的不確定處也未被擴寫。我會補上職務目的，並將您實際往來的關鍵對象及合作範圍列明。"
+  },
+  {
+    "case": "source_candidate",
+    "trial": 2,
+    "input_tokens_counted": 32029,
+    "request_sha256": "a2aa17e7389436c4b732f68c6dc9b862f8c9eaa584fb8f2c77f0c0c627880359",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 32029,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 32026
+      },
+      "output_tokens": 2032,
+      "output_tokens_details": {
+        "reasoning_tokens": 1219
+      },
+      "total_tokens": 34061
+    },
+    "calls": [
+      {
+        "name": "revise_jd_profile",
+        "arguments": {
+          "changes": [
+            {
+              "action": "set_field",
+              "field": "purpose",
+              "value": "支援成人進修班日常課程運作，處理報名與課前資料、異動通知及出席紀錄，供授課老師、場地窗口與行政組長執行課程及掌握班級情形。"
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 2
+              }
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 6
+              }
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 8
+              }
+            },
+            {
+              "action": "add_source",
+              "field": "purpose",
+              "source": {
+                "kind": "interview",
+                "interview_sequence": 10
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "成人進修班學員",
+            "scope_text": "就重複報名確認應保留的登記；接收課程異動或停課通知，並於未回覆時配合聯絡確認。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 4
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 8
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 14
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "授課老師",
+            "scope_text": "確認課前名冊；交回出席表，並就出席資料缺漏或不清楚處協助確認；接收課程異動通知。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 6
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 8
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 10
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "場地窗口",
+            "scope_text": "接收課前教室資料及課程異動通知，並負責場地設備處理。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 6
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 8
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "財務",
+            "scope_text": "查核付款資料不符的報名案件；財務確認後，課程行政專員才更新繳費狀態。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 4
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "行政組長",
+            "scope_text": "確認課程改期時間，並接收每季出席人次彙整以掌握班級執行情形。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 8
+              },
+              {
+                "kind": "interview",
+                "interview_sequence": 10
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "create_jd_item",
+        "arguments": {
+          "item": {
+            "kind": "collaborator",
+            "name": "主任",
+            "scope_text": "決定颱風停課；決定後，課程行政專員依公告通知各班並追蹤聯絡不到的人。",
+            "supporting_sources": [
+              {
+                "kind": "interview",
+                "interview_sequence": 14
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "request_memory_consolidation",
+        "arguments": {}
+      }
+    ],
+    "text": "目前已涵蓋您列出的主要工作，也確認沒有固定專案或額外支援。我會補上職務目的，並只列出實際工作中已確認的協作對象與分工；不會推測額外資格或工具能力。"
+  }
+]

@@ -5,7 +5,7 @@
 - 補充：[0043](0043-job-analysis-local-current-state-persistence-and-authoring-authority.md)、
   [0044](0044-partial-jd-task-reconciliation-and-human-confirmation.md)
 - 研究：
-  [`job_analysis` 本機 Web 編輯切片、跨語言契約與共用寫入研究](../specs/2026-07-30-job-analysis-local-web-contract-and-authority-commit-seam-research.md)
+  [`job_analysis` 本機 Web 編輯切片、跨語言契約與共用寫入研究](../history.md#source-7de4a9cccb8a3ff82b1f)
 
 ## 脈絡
 

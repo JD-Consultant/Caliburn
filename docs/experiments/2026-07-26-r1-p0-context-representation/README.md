@@ -7,9 +7,9 @@
 - 不使用：`OPENROUTER_API_KEY`、`OPENAI_API_KEY`、production route、Web、資料庫
 - 上游 authority：
   - [ADR 0040](../../adr/0040-professional-consultant-engine-and-r1-validation-contract.md)
-  - [R1 Task Discovery 深入研究](../../specs/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
-  - [2026-07-26 紅隊修訂](../../specs/2026-07-26-professional-consultant-r1-red-team-review-and-corrections.md)
-  - [Context 表示外部權威證據審查](../../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)
+  - [R1 Task Discovery 深入研究](../../research/work-analysis/2026-07-25-professional-consultant-r1-task-discovery-deep-research.md)
+  - [2026-07-26 紅隊修訂](../../history.md#source-6e14672dc7f5f32abb3f)
+  - [Context 表示外部權威證據審查](../../research/agent-systems/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)
 
 > **2026-07-26 執行修訂**：原計畫把 Codex subagent 當作原本要由 API 呼叫的受測 LLM；owner 確認平台
 > 不允許這種用法，因此本實驗停止在 cases／rubric／assembler 已凍結、**尚未執行任何 trial**的狀態。
@@ -19,7 +19,7 @@
 >
 > **2026-07-27 結案**（[ADR 0041](../../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)）：
 > owner 裁定不為本實驗支付 trial 成本，改以
-> [Context 表示外部權威證據審查](../../specs/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)
+> [Context 表示外部權威證據審查](../../research/agent-systems/2026-07-26-professional-consultant-context-representation-external-evidence-review.md)
 > 收斂。第一版**不建 literal-claim layer**，理由是 **YAGNI 與外部證據，不是實驗結果**——
 > §1.1 的預期結果**未被驗證，只是未被推翻**，任何文件不得把本結案寫成「實驗顯示持平」。
 > 下文設計與六個 frozen cases、rubric、assembler 保留為可重用資產；要再使用須另升 revision。

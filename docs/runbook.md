@@ -1,90 +1,174 @@
 # Runbook — Caliburn JD App 本機操作
 
-正式 App 位於 [`experiments/jd-relational-app`](../experiments/jd-relational-app/README.md)，但日常操作統一從 repository 根目錄進入。舊 `apps/api`、`apps/web`、npm／Turbo 與 PostgreSQL 16 Compose 已退役；正式邊界見 [ADR 0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
+正式 App 是 `apps/api` 與 `apps/web`，日常操作統一從 repository 根目錄進入；正式邊界見
+[ADR 0079](adr/0079-target-rebuild-production-cutover.md)。舊 `experiments/jd-relational-app`
+（含舊 `app:init`／`app:set-key`、OpenRouter、Windows 認證管理員）已退役，不再有對應命令。
 
 ## 服務與版本
 
-| 項目 | 正式要求 |
+| 項目 | 要求 |
 |---|---|
 | Node.js | `>=24.19.0 <25` |
 | package manager | pnpm `12.5.1`，根目錄單一 lockfile |
-| Python | `>=3.12 <3.13`，由 uv 管理 |
-| PostgreSQL | 本機 **18.6**；由首次初始化記錄 host／port／database／user |
-| API | `127.0.0.1`；port 由首次初始化保存 |
-| Web | `http://127.0.0.1:3002/` |
-| OpenRouter | 外部 LLM gateway；key 只存 Windows 認證管理員 |
+| Python | `3.14`，由 uv `0.12.20` 管理（`apps/api/uv.lock`） |
+| PostgreSQL | 本機 **18.6**，獨立程序；容器或本機安裝皆可 |
+| API | `127.0.0.1:8100`，單程序、無 reload、無 proxy headers |
+| Web | 正式：由 API 同源提供 `http://127.0.0.1:8100/`；開發：Vite `http://127.0.0.1:5173/` |
+| 模型 | OpenAI Responses 直連，`gpt-6-luna`／high；key 只在後端使用 |
+| PDF | 授權的中文字型＋Playwright Chromium（選用；缺少時匯出回 503） |
 | RAG | 隔離且非預設依賴 |
 
-API 固定單程序、loopback、無 reload、無 proxy headers。不要按端口終止身分不明的程序；程式變更後在原前景終端正常停止再重啟。
+不要按端口終止身分不明的程序；程式變更後在原前景終端正常停止再重啟。
 
 ## 安裝依賴
 
-在 repository 根目錄執行：
-
 ```powershell
 pnpm install --frozen-lockfile
-uv sync --project experiments/jd-relational-app --frozen
+uv sync --project apps/api --locked
 ```
 
-Node／TypeScript 只使用 `pnpm-lock.yaml`；Python 只使用 `experiments/jd-relational-app/uv.lock`。不要產生 npm lockfile，也不要用根目錄 Compose 建立 JD App 的資料庫。
+Node／TypeScript 只使用 `pnpm-lock.yaml`；Python 只使用 `apps/api/uv.lock`。不要產生 npm lockfile，也不要用根目錄 Compose 建立 JD App 的資料庫。
 
 ## 第一次初始化
 
-先建立空的 PostgreSQL 18.6 資料庫，再執行：
+1. 建立一個**空的**專用 PostgreSQL database（不要沿用舊產品的資料庫；本版不搬移舊資料）。
+2. 以環境變數明示連線，密碼由本機秘密管理注入，不貼在命令列歷史、文件或 Git：
 
 ```powershell
-pnpm app:status
-pnpm app:init
-pnpm app:set-key
+$env:CALIBURN_DATABASE_URL = 'postgresql://帳號:密碼@127.0.0.1:5432/caliburn'
+$env:CALIBURN_DATABASE_SCHEMA = 'caliburn'      # 預設值；可省略
+pnpm app:migrate                                 # 建立 namespace 並升級到最新 schema，可重跑
+pnpm app:status                                  # 診斷；不印出密碼或 key
+pnpm build                                       # 建置 Web，供 `pnpm start` 同源提供
 ```
 
-`app:init` 會互動詢問 PostgreSQL 連線、API port 及允許的 Web origin；管理畫面 origin 應為 `http://127.0.0.1:3002`。資料庫密碼不顯示，也不從命令參數或環境變數傳入。
-
-初始化會執行固定 JD migration 與官方 LangGraph Saver／Store setup。普通啟動只核對既有結構，不自動 migration、清資料或重建 volume。初始化中斷時使用：
-
-```powershell
-pnpm app:resume-init
-```
-
-不要對已有內容、未知物件或版本不符的資料庫再次執行 `app:init`。本版不搬移舊資料，也不讀取舊 schema。
+`app:migrate` 是**唯一**會改 schema 的命令。啟動只核對 migration head：未初始化或版本不符會啟動失敗，並提示執行 `pnpm app:migrate`；它不自動升級、清資料或重建 volume。LangGraph 的 checkpoint 表由官方 saver 在啟動時安全建立。
 
 ## AI credential
 
-```powershell
-pnpm app:set-key
-pnpm app:status
-pnpm app:remove-key
-```
+二擇一，後端只讀 `OPENAI_API_KEY` 這一項：
 
-OpenRouter key 只存同一 Windows 使用者的 Windows 認證管理員，不放 `.env`、DPAPI App 設定、資料庫、prompt、checkpoint、前端、log 或 Git。`app:status` 只證明 credential 已設定；確認有效性需要真 provider 請求。沒有 key 時人工 JD 仍可使用，AI 明示未啟用，且不會自動 fallback。
+- 環境變數 `OPENAI_API_KEY`；
+- 或 `apps/api/.env`（已被 Git 忽略）內**唯一一行** `OPENAI_API_KEY=...`，`pnpm start`／`pnpm dev` 會自動以 `--key-file` 載入。
+
+key 不進 prompt、模型工具、Web bundle、URL、資料庫、checkpoint、一般 log 或 Git。`pnpm app:status` 只顯示「已設定」，不證明 key 有效；確認有效性需要真 provider 請求。沒有 key 時人工 JD 仍可使用，AI 訪談明示停用，且不會自動 fallback。更換 key 後須重啟後端。
+
+注意：後端啟動時會續跑已接受但未完成的訪談與背景整理，這可能消耗模型額度；只想操作人工 JD 時不要提供 key。
 
 ## 日常啟動與停止
 
-先啟動已初始化的 PostgreSQL，再於 repository 根目錄執行：
+先啟動已初始化的 PostgreSQL，再於根目錄執行：
 
 ```powershell
-pnpm dev
+pnpm start    # 單一後端程序同源提供建置後的 Web：http://127.0.0.1:8100/
+pnpm dev      # 開發：後端 :8100 與 Vite :5173 同時前景啟動：http://127.0.0.1:5173/
 ```
 
-正式 production build／serve：
+`pnpm start` 需要先 `pnpm build`；沒有建置會明確報錯，不自動建置或猜目錄。在原終端按 Ctrl+C 正常停止：後端先停止新准入、保存已取得的結果並停在可恢復邊界，再釋放資源；強制關閉仍依最後可靠位置恢復。重開後，進行中或暫停的訪談可由介面找回並續作；背景整理由系統依持久狀態自動承接。
+
+隔離驗證時若前端使用第二個埠，可在**後端啟動前**設定 `CALIBURN_DEV_ORIGIN=http://127.0.0.1:5174`（只接受一個帶明確埠的 loopback HTTP origin），見[後端 README](../apps/api/README.md)。
+
+## PDF 匯出
+
+匯出正式 JD 的中文 PDF 需要兩項，缺少時 `GET /api/job-files/{id}/jd/export.pdf` 回 503，不下載空檔：
 
 ```powershell
-pnpm build
-pnpm start
+$env:CALIBURN_PDF_FONT_PATH = 'D:\fonts\NotoSansTC-VF.ttf'              # 已授權的中文字型
+uv run --project apps/api --locked python -m playwright install chromium --only-shell   # 鎖定版本的瀏覽器
+# 或指定與已鎖 Playwright 相容的 Chromium：$env:CALIBURN_PDF_CHROMIUM_PATH = '...\chrome.exe'
 ```
 
-開啟 <http://127.0.0.1:3002/>。根啟動器透過 App 的 `api-origin` 讀取已核准的 loopback API 位址；不讀出秘密、不猜 port，也不保存第二份設定。API 與 Web 共用前景程序群組；在原終端按 Ctrl+C 後，App 會先排空已登記工作再關閉資源。
+PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部分字型的文字複製／搜尋會出現部首字元（已知限制，見 [T13](history.md#source-409f20a1c297740aed7d)）。
 
-需要診斷時，才直接在 `experiments/jd-relational-app` 使用 `uv run --frozen python -m jd_relational ...`；這不是另一條日常產品入口。
+## 診斷
+
+| 現象 | 查什麼 |
+|---|---|
+| 想知道這次啟動會用什麼 | `pnpm app:status`：資料庫（可連線、migration 是否在 head）、模型是否設定、PDF 字型／瀏覽器、Web 建置 |
+| 後端啟動失敗並提到 migration | 資料庫尚未初始化或版本不符：`pnpm app:migrate` |
+| `POST /inputs` 回 503 `model_not_configured` | 沒有 OpenAI key（或後端啟動前未設定）；人工 JD 不受影響 |
+| 瀏覽器或 CLI 收到 403 | 精確 Host／Origin 檢查：只接受 `127.0.0.1`／`localhost`／`[::1]` 的 5173／8100（及明示的一個 dev origin） |
+| `GET /api/health` | 只表示程序存活，不表示資料庫或模型可用 |
+| 訪談失敗或結果不明 | 介面顯示安全的失敗原因，原輸入保留；技術診斷在後端 log（只含穩定 ID、階段、錯誤類別，不含原話或 payload） |
+| 一輪訪談很久沒有回應 | 多半是 OpenAI 帳戶的每分鐘 token 上限（TPM）在限流，後端 log 會出現 `Provider request failed: … failure=rate_limited`。系統會照服務建議的時間自動多等（沒有建議時 10 秒起、60 秒封頂），**不算失敗**，單輪最長等到工作期限（預設 30 分鐘）；可隨時取消該輪。TPM 200K 的帳戶上，一場 12 輪訪談約 6–25 分鐘；要更快請改用更高 TPM 的帳戶 |
+| 訪談或背景整理全部立刻失敗，後端 log 為 `failure=access_blocked … provider_code=credit_balance_exhausted` | OpenAI 帳戶儲值額度用完（HTTP 429，但不是限流）。系統不重試、原輸入保留、該次處理標為失敗；補額度後重新送出原輸入 |
+| 資料庫剛重啟（或被外力中止）後，讀訪談狀態的端點回 500，`/api/health` 仍是 ok | **重啟後端**。leader 鎖與 checkpoint 連線各只持一條資料庫連線、不會自動重連，這是刻意的單一 leader 設計；重啟時系統會恢復已保存的進行中工作（能續作則續作，否則安全終止、原輸入保留，之後可重送） |
+
+### 在 DataGrip 查某個職務檔案的 AI 執行紀錄
+
+先連到**正式 App 使用的 PostgreSQL database**，勾選 `caliburn` schema；不是 `public`。5180／8180 的記憶體示範站沒有這份資料。DataGrip 的 schema 選擇、Synchronize 及重新查詢是三件事：看不到 VIEW 先同步 schema，資料更新後再重新執行 SELECT。
+
+這是按需診斷功能：原生 checkpoint 有二進位內容，先解碼成一份可重建的本機副本，再用 VIEW 查閱。只讀原始執行／業務表，寫入的只有 `diagnostic_execution_snapshots`；不執行模型、不續跑 Turn、不修改 JD 或 Memory。
+
+在 repository 根目錄、與正式 App 相同的資料庫環境設定下執行：
+
+```powershell
+pnpm app:migrate
+uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --job-file-id 職務檔案UUID
+# 只更新某一輪，改用：
+uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID
+```
+
+兩個範圍參數擇一；不用 API key。沒有 execution 的既存空檔案回報 0 筆，找不到的 UUID 則報錯。若權限、migration、原生紀錄解碼或並行更新出錯，整次匯入回滾，原診斷副本仍保留。終端只印成功筆數或錯誤類別，避免洩露私人 payload。
+
+DataGrip 展開 `caliburn → views`，可直接雙擊下列 VIEW，再用 `job_file_id` 或 `execution_id` 篩選：
+
+| VIEW | 每列代表什麼 | 主要欄位 |
+|---|---|---|
+| `diagnostic_execution_history` | 一輪 A 或一批 Memory（包含失敗／取消） | 檔案名稱、原輸入、正式答覆、正式序號、狀態、失敗嘗試、JD 候選狀態／修訂、已發布 Memory 快照 |
+| `diagnostic_model_steps` | 一份已保存的原模型回應，不等於業務 Step 已完成 | A／B1／B2 role、response_order、request（含 instructions、input、tools）、response（含輸出與 usage）、thread／checkpoint、snapshot_at |
+| `diagnostic_tool_calls` | 上述回應的一次 function call | 工具名稱、原 arguments、call_id、對應 output、結果是否已保存 |
+
+例如整個檔案的操作：
+
+```sql
+SELECT * FROM caliburn.diagnostic_execution_history
+WHERE job_file_id = '換成職務檔案UUID'::uuid
+ORDER BY created_at, execution_id;
+
+SELECT * FROM caliburn.diagnostic_tool_calls
+WHERE execution_id = '換成執行UUID'::uuid
+ORDER BY response_order, output_index;
+
+SELECT role, response_order, request, response, snapshot_at
+FROM caliburn.diagnostic_model_steps
+WHERE execution_id = '換成執行UUID'::uuid
+ORDER BY response_order;
+```
+
+`request` 就是保存的當時請求（敏感欄位已遮蔽），可在 DataGrip 展開 JSON 看 context、指引與工具說明。`response` 可看公開訊息、可讀推理摘要與原工具要求；舊模型沒有回傳摘要時不會補造。`response_order` 是本次擷取中已保存回應的觀察順序，不是重試次數，也不是跨程序精確時鐘。
+
+要看本輪資料庫實際寫了什麼，再 JOIN 既有操作表；讀工具不一定有業務操作，一次工具也可能產生多筆操作：
+
+```sql
+SELECT h.display_name, h.execution_id, o.kind, o.expected_revision_id,
+       o.result_revision_id, o.request_payload, o.created_at
+FROM caliburn.diagnostic_execution_history h
+JOIN caliburn.jd_operations o
+  ON o.job_file_id = h.job_file_id AND o.candidate_execution_id = h.execution_id
+WHERE h.execution_id = '換成執行UUID'::uuid
+ORDER BY o.created_at, o.command_id;
+```
+
+這個排列用於查閱，不宣稱同時間戳的 command_id 順序就是操作發生順序；修訂因果查 `expected_revision_id → result_revision_id`。`jd_candidate_status = adopted` 才表示本輪候選已採用；工具成功訊息本身不表示整輪已提交。
+
+**判讀界線：**
+
+- 總覽的業務狀態、正式訪談序號與嘗試統計是即時 JOIN；訪談文字、模型／工具正文均經遮蔽，是 `snapshot_at` 那次擷取。`snapshot_at IS NULL` 表示尚未匯入；有時間且回應數 0 表示該次未找到已保存回應。新進展須再次執行匯入命令，DataGrip Refresh 本身不會解碼新增 checkpoint。
+- `recorded` 只表示取得工具回傳，內容仍可能是錯誤；`not_recorded` 表示未找到保存結果，不能推定未執行或失敗。正式效果仍由 JD／Memory 原結果判定。
+- 包含本 execution 各階段留下的原模型回應及 pending writes，可能含後來放棄的工作。不能把診斷項目當成正式訪談來源，或把模型回應 `completed` 當整輪成功。
+- 副本遮蔽 `encrypted_content`、已知憑證欄位及可辨識的 key 字串，**不是完整匿名化**。仍含原訪談與工作內容；不自動匯出、不提交 Git。DataGrip 可將核准的合成結果另存 JSON／CSV 供錄影或報告使用。一般 log 仍不含這些正文。
+- VIEW 沿用查詢者的資料庫權限；建議在 DataGrip 開啟唯讀連線。它不是跨使用者授權或資料隔離 API。
+
+設計取捨、測試及版本見 [T06 診斷查閱證據](history.md#source-6ac54c64f9ded4edcb9e)。
 
 ## 資料庫與備份
 
-`public` schema 保存關聯式 JD 與背景准入；`jd_runtime` 保存 LangGraph checkpoint／store／Memory publication。兩者屬同一 App、同一資料範圍，但責任分層。一份完整備份包含：
+**首版成品驗收不以備份／空庫還原為前置。**目前優先驗證既有 PostgreSQL／checkpoint 在一般中斷與重開後能查回已確認保存的訪談、JD 與進度；未送出的輸入或未保存草稿不保證意外關閉後找回。備份資訊供後續維護參考，不表示已完成完整還原端到端驗收：
 
-1. 整個資料庫的 `pg_dump`，不要用 `-n` 只挑單一 schema；
-2. App 的 `host.v1.dpapi` 設定檔。
-
-OpenRouter key 不在備份內；換電腦或還原後須重新執行 `pnpm app:set-key`。瀏覽器 IndexedDB 不是正式資料庫備份。精確證據與限制見 [`specs/2026-09-14-jd-backup-and-restore-slice.md`](specs/2026-09-14-jd-backup-and-restore-slice.md)。
+- 備份整個資料庫（`pg_dump` 不要用 `-n` 只挑單一 schema）；關聯式資料與 checkpoint 表在同一 namespace，兩者屬同一資料範圍。
+- OpenAI key 不在備份內；在另一台電腦還原後須重新提供 key。瀏覽器 localStorage／sessionStorage 不是正式資料備份。
+- 不自動清資料、刪 volume 或重建資料庫；資料處置需先核對精確目標。
 
 ## 驗證
 
@@ -92,15 +176,14 @@ OpenRouter key 不在備份內；換電腦或還原後須重新執行 `pnpm app:
 pnpm check
 ```
 
-也可使用窄命令：
+也可使用窄命令：`pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build`。`pnpm test` 不需資料庫；真 PostgreSQL 整合測試需明確指定隔離的 loopback `_test` 資料庫並直接執行 pytest：
 
 ```powershell
-pnpm test
-pnpm typecheck
-pnpm build
+$env:CALIBURN_TEST_DATABASE_URL = 'postgresql://測試帳號:密碼@127.0.0.1:5432/caliburn_test'
+uv run --project apps/api --locked pytest apps/api/tests -m postgres -q
 ```
 
-真 PostgreSQL、真瀏覽器與真模型結果分開記錄；離線測試不能代替 provider 或 UI 證據。Windows 受限 token 可能讓真 ACL 模組因暫存目錄權限出現 `WinError 5`，不得為測試變綠而放寬正式 App 的 ACL 或忽略錯誤。
+測試各自建立並回收隨機 schema，不碰既有資料。真 PostgreSQL、真瀏覽器與真模型結果分開記錄；離線測試不能代替 provider 或 UI 證據。付費驗證腳本須依 manifest 明示的有限預算執行（見各任務證據）。Windows 受限 token 可能讓暫存目錄權限出現 `WinError 5`，不得為測試變綠而放寬安全限制。
 
 ## RAG（隔離、非 JD App 依賴）
 

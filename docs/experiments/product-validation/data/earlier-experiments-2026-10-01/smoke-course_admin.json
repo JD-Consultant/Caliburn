@@ -1,0 +1,397 @@
+{
+ "persona": "course_admin",
+ "label": "smoke",
+ "started": "2026-09-30T15:35:43.267941+00:00",
+ "job_file_id": "45e0f30b-47c1-4bd5-ae81-ac25f40fcda1",
+ "turns": [
+  {
+   "turn": 1,
+   "status": "completed",
+   "seconds": 16.3,
+   "employee": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。",
+   "consultant": "已先記下您的職稱、所屬單位及匯報對象。初步看來，工作涵蓋成人進修班的報名與課程行政支援，也包括每月出席人次彙整；開課、收費與授課則不在您的決策或執行範圍內。\n\n就攝影班的重複報名和付款資料不符，您當時實際怎麼核對、如何處理或通知相關人員？不確定的部分可以先說您做了哪一步。"
+  },
+  {
+   "turn": 2,
+   "status": "completed",
+   "seconds": 24.5,
+   "employee": "我每天會核對報名表上的姓名、聯絡方式和課程。發現重複時，我會聯絡本人確認要保留哪筆，再取消重複登記；付款資料不符的話，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自行認定款項已入帳。",
+   "consultant": "已將「課程報名核對與異常處理」整理進職務說明書草稿，包括：核對姓名、聯絡方式和課程；重複報名須先向本人確認保留哪筆；付款資料不符時交由財務查帳，並依財務確認更新繳費狀態。也保留了您不能自行認定款項已入帳的責任界線。\n\n接著想了解課程異動通知：通常您如何得知異動、會通知哪些人，並需要更新哪些名單或課程資料？"
+  }
+ ],
+ "jd": {
+  "profile": {
+   "job_title": "課程行政專員",
+   "organization_unit": "成人教育中心",
+   "reports_to": "行政組長",
+   "purpose": null
+  },
+  "work": {
+   "revision_id": "1dd4e313-6579-4400-859e-c494f248123a",
+   "areas": [
+    {
+     "area_id": "d2114ad2-ecf3-4853-b34e-893bcf934705",
+     "title": "課程報名與課前準備",
+     "scope_text": "辦理成人進修班報名資料核對及課前行政資料準備。"
+    }
+   ],
+   "tasks": [
+    {
+     "task_id": "71f6cf58-cfc5-4c20-b552-6107e18746d1",
+     "area_id": "d2114ad2-ecf3-4853-b34e-893bcf934705",
+     "title": "核對報名資料並處理重複登記與繳費狀態",
+     "description": "每日核對報名表中的姓名、聯絡方式及課程；依確認結果處理重複登記，並將付款資料疑義交由財務查帳。",
+     "outcomes": [
+      {
+       "detail_id": "9082b189-a114-4312-93c0-908a21b9f932",
+       "text": "重複報名經本人確認保留資料後，取消重複登記。"
+      },
+      {
+       "detail_id": "abb8640e-f4e2-4fb0-9072-1ea6919d466b",
+       "text": "財務確認款項後，更新報名者的繳費狀態。"
+      }
+     ],
+     "requirements": [
+      {
+       "detail_id": "5b9ed7d2-a474-48f4-86bf-5e64f2422ccf",
+       "text": "發現重複報名時，先聯絡本人確認要保留的資料，再取消重複登記。"
+      },
+      {
+       "detail_id": "919ded4a-0d35-4b1f-980b-637c55c0c15b",
+       "text": "付款資料不符時，提供報名資料及匯款末五碼給財務查帳，依財務確認結果更新繳費狀態；不得自行認定款項已入帳。"
+      }
+     ]
+    }
+   ],
+   "capabilities": [],
+   "task_links": [],
+   "collaborators": [],
+   "conditions": []
+  }
+ },
+ "references": [
+  {
+   "citation_id": "b85486bf-df8b-4250-82b9-a452cc67db40",
+   "target_label": "職務名稱",
+   "target": {
+    "kind": "profile_field",
+    "field": "job_title",
+    "item_id": null,
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "2744a3af-8d25-4213-b5bd-7f75bd6889d2",
+   "target_label": "所屬單位",
+   "target": {
+    "kind": "profile_field",
+    "field": "organization_unit",
+    "item_id": null,
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "2c971666-4c8d-4d01-b25e-779ccabe9607",
+   "target_label": "直屬主管",
+   "target": {
+    "kind": "profile_field",
+    "field": "reports_to",
+    "item_id": null,
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "7d43e7af-46f3-48bd-a6ee-d1a509384cd6",
+   "target_label": "職責：課程報名與課前準備",
+   "target": {
+    "kind": "area",
+    "field": null,
+    "item_id": "d2114ad2-ecf3-4853-b34e-893bcf934705",
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "6520222a-f6dd-4f05-82ea-3667efacf679",
+   "target_label": "任務：核對報名資料並處理重複登記與繳費狀態",
+   "target": {
+    "kind": "task",
+    "field": null,
+    "item_id": "71f6cf58-cfc5-4c20-b552-6107e18746d1",
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "6471ff0d-9778-4bed-abd9-da9859e91a42",
+   "target_label": "任務：核對報名資料並處理重複登記與繳費狀態",
+   "target": {
+    "kind": "task",
+    "field": null,
+    "item_id": "71f6cf58-cfc5-4c20-b552-6107e18746d1",
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 4 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "b3d0672c-6eb1-458c-b666-a063011b9f7a",
+   "target_label": "任務：核對報名資料並處理重複登記與繳費狀態 · 成果：重複報名經本人確認保留資料後，取消重複登記。",
+   "target": {
+    "kind": "detail",
+    "field": null,
+    "item_id": "9082b189-a114-4312-93c0-908a21b9f932",
+    "task_id": "71f6cf58-cfc5-4c20-b552-6107e18746d1"
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 4 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "cc0cd0e4-a88a-49d3-af41-a4fedbee344f",
+   "target_label": "任務：核對報名資料並處理重複登記與繳費狀態 · 成果：財務確認款項後，更新報名者的繳費狀態。",
+   "target": {
+    "kind": "detail",
+    "field": null,
+    "item_id": "abb8640e-f4e2-4fb0-9072-1ea6919d466b",
+    "task_id": "71f6cf58-cfc5-4c20-b552-6107e18746d1"
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 4 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "4518551b-a47a-4369-ac66-671ce24bd81a",
+   "target_label": "任務：核對報名資料並處理重複登記與繳費狀態 · 要求：發現重複報名時，先聯絡本人確認要保留的資料，再取消重複登記。",
+   "target": {
+    "kind": "detail",
+    "field": null,
+    "item_id": "5b9ed7d2-a474-48f4-86bf-5e64f2422ccf",
+    "task_id": "71f6cf58-cfc5-4c20-b552-6107e18746d1"
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 4 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "cffce6bb-837f-42e8-9d57-ec004fa37f20",
+   "target_label": "任務：核對報名資料並處理重複登記與繳費狀態 · 要求：付款資料不符時，提供報名資料及匯款末五碼給財務查帳，依財務確認結果更新繳費狀態；不得自行認定款項已入帳。",
+   "target": {
+    "kind": "detail",
+    "field": null,
+    "item_id": "919ded4a-0d35-4b1f-980b-637c55c0c15b",
+    "task_id": "71f6cf58-cfc5-4c20-b552-6107e18746d1"
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 4 · 員工",
+   "needs_recheck": false
+  }
+ ],
+ "source_contents": {
+  "b85486bf-df8b-4250-82b9-a452cc67db40": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+  },
+  "2744a3af-8d25-4213-b5bd-7f75bd6889d2": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+  },
+  "2c971666-4c8d-4d01-b25e-779ccabe9607": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+  },
+  "7d43e7af-46f3-48bd-a6ee-d1a509384cd6": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+  },
+  "6520222a-f6dd-4f05-82ea-3667efacf679": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是成人教育中心的課程行政專員，向行政組長報告，服務平日晚上和週末的成人進修班。我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。我不授課，也不決定開課或收費。每個月我也會彙整出席人次給行政組長。最近在核對下週攝影班報名時，發現兩個人重複報名，還有人付款資料對不起來。"
+  },
+  "6471ff0d-9778-4bed-abd9-da9859e91a42": {
+   "kind": "interview",
+   "interview_sequence": 4,
+   "speaker": "employee",
+   "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程。發現重複時，我會聯絡本人確認要保留哪筆，再取消重複登記；付款資料不符的話，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自行認定款項已入帳。"
+  },
+  "b3d0672c-6eb1-458c-b666-a063011b9f7a": {
+   "kind": "interview",
+   "interview_sequence": 4,
+   "speaker": "employee",
+   "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程。發現重複時，我會聯絡本人確認要保留哪筆，再取消重複登記；付款資料不符的話，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自行認定款項已入帳。"
+  },
+  "cc0cd0e4-a88a-49d3-af41-a4fedbee344f": {
+   "kind": "interview",
+   "interview_sequence": 4,
+   "speaker": "employee",
+   "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程。發現重複時，我會聯絡本人確認要保留哪筆，再取消重複登記；付款資料不符的話，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自行認定款項已入帳。"
+  },
+  "4518551b-a47a-4369-ac66-671ce24bd81a": {
+   "kind": "interview",
+   "interview_sequence": 4,
+   "speaker": "employee",
+   "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程。發現重複時，我會聯絡本人確認要保留哪筆，再取消重複登記；付款資料不符的話，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自行認定款項已入帳。"
+  },
+  "cffce6bb-837f-42e8-9d57-ec004fa37f20": {
+   "kind": "interview",
+   "interview_sequence": 4,
+   "speaker": "employee",
+   "interview_text": "我每天會核對報名表上的姓名、聯絡方式和課程。發現重複時，我會聯絡本人確認要保留哪筆，再取消重複登記；付款資料不符的話，我會把報名資料和匯款末五碼交給財務查帳，等財務確認後才更新繳費狀態，我不能自行認定款項已入帳。"
+  }
+ },
+ "checks": {
+  "facts": {
+   "schedule": {
+    "kind": "hidden",
+    "surfaced": true,
+    "in_jd": false
+   },
+   "registration_check": {
+    "kind": "core",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "payment": {
+    "kind": "core",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "authority": {
+    "kind": "core",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "roster_handoff": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "schedule_change": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "typhoon": {
+    "kind": "rare",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "attendance_daily": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "attendance_report": {
+    "kind": "core",
+    "surfaced": true,
+    "in_jd": false
+   },
+   "quality_roster": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "risk_peak": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "tools": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "limits": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   }
+  },
+  "recording_gaps": [
+   "attendance_report",
+   "schedule"
+  ],
+  "elicitation_gaps": [
+   "attendance_daily",
+   "limits",
+   "quality_roster",
+   "risk_peak",
+   "roster_handoff",
+   "schedule_change",
+   "tools",
+   "typhoon"
+  ],
+  "correction": {
+   "new_present": false,
+   "old_left_as_current": 0,
+   "unchanged_kept": [
+    false,
+    false
+   ]
+  },
+  "profile_sources": {
+   "job_title": {
+    "value": "課程行政專員",
+    "cited": 1,
+    "supported": true
+   },
+   "organization_unit": {
+    "value": "成人教育中心",
+    "cited": 1,
+    "supported": true
+   },
+   "reports_to": {
+    "value": "行政組長",
+    "cited": 1,
+    "supported": true
+   }
+  },
+  "collaborators_in_text": [
+   true,
+   true,
+   false,
+   false,
+   false
+  ],
+  "shape": {
+   "areas": 1,
+   "tasks": 1,
+   "outcomes": 2,
+   "requirements": 2,
+   "capabilities": 0,
+   "collaborator_items": 0,
+   "condition_items": 0,
+   "references": 10
+  },
+  "style": {
+   "consultant_turns": 2,
+   "mean_consultant_chars": 144,
+   "questions_per_turn": 1.0,
+   "leading_phrases": 0
+  }
+ }
+}

@@ -1,0 +1,644 @@
+{
+ "persona": "procurement",
+ "label": "rehearsal",
+ "started": "2026-10-01T14:18:30.414453+00:00",
+ "job_file_id": "34ee4c18-47ea-44ac-9e44-b2115f2bbccd",
+ "turns": [
+  {
+   "turn": 1,
+   "status": "completed",
+   "seconds": 34.9,
+   "employee": "我是電子零件組裝廠的採購專員，向採購主管報告，負責原物料和包材採購。每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。最近有一批銅排被供應商延後兩週交貨，我正在想辦法避免生產線停線。",
+   "consultant": "我已先把「採購專員」、向採購主管報告，以及原物料與包材採購、採購後續協調和供應商資料管理納入職務草稿。\n\n想進一步了解您提到的銅排延遲：您目前親自採取了哪些處理方式？例如和供應商協調交期、尋找替代供應，或通知內部相關人員；其中哪些可由您自行決定，哪些需要主管核准？"
+  },
+  {
+   "turn": 2,
+   "status": "completed",
+   "seconds": 32.7,
+   "employee": "我會當天通知生管和採購主管，並跟供應商談急件或分批交貨。替代料我不能自己決定改用還沒認證的供應商，這部分不能由我自行決定。",
+   "consultant": "已把延遲交貨時「當天通知生管與採購主管、協商急件或分批交貨」納入採購跟進工作，也記下您不能自行決定採用尚未認證供應商的替代料。\n\n再想了解平常採購的詢價比價：您通常會比較哪些條件來整理或選擇供應商？最後由誰決定或核准採購？"
+  },
+  {
+   "turn": 3,
+   "status": "completed",
+   "seconds": 45.1,
+   "employee": "新品項或金額比較大的請購，我會至少找三家詢價，整理比價表給主管；常用品項就用既有合約價。比價會看價格、交期、品質紀錄和付款條件，不一定最低價就選，還要寫選擇理由。最後依金額由我或主管核准。",
+   "consultant": "已把新品項或金額較大的請購至少詢價三家、整理比價表並說明選擇理由，以及常用品項依既有合約價辦理，納入採購工作描述。比價因素也記錄為價格、交期、品質紀錄和付款條件；核准依金額由您或主管負責。您沒有提供具體金額門檻，所以草稿不會自行補上。\n\n接著想了解收貨品質問題：發現問題時，您通常會怎麼協調？哪些部分由您處理，之後會交由哪些人或單位接手？"
+  },
+  {
+   "turn": 4,
+   "status": "completed",
+   "seconds": 54.3,
+   "employee": "貨到後由倉庫收貨、品保檢驗；如果有數量差異或品質問題，他們會通知我，我再和供應商談退換貨或扣款。是否接受這些處理方式由主管決定。",
+   "consultant": "已補上收貨品質異常的分工：倉庫負責收貨、品保負責檢驗；若有數量差異或品質問題，您接獲通知後與供應商協商退換貨或扣款，但是否接受處理方式由主管決定。\n\n接著想釐清發票與付款工作：在這個流程中，您實際負責哪些步驟？例如會核對哪些資料、處理後交給誰？"
+  }
+ ],
+ "events": [
+  {
+   "turn": 2,
+   "event": "cancelled_then_resent",
+   "first": "cancelled"
+  },
+  {
+   "turn": 3,
+   "event": "human_edit",
+   "purpose": "（人工撰寫）確保原物料與包材及時、足量且成本合理地供應生產。",
+   "task_title": "（人工補充）彙整供應商年度績效資料"
+  },
+  {
+   "turn": 4,
+   "event": "backend_killed_mid_turn_and_restarted"
+  },
+  {
+   "turn": 4,
+   "event": "turn_ended_then_resent",
+   "first": "failed"
+  },
+  {
+   "event": "pdf_exported",
+   "bytes": 495905,
+   "is_pdf": true
+  }
+ ],
+ "jd": {
+  "profile": {
+   "job_title": "採購專員",
+   "organization_unit": null,
+   "reports_to": "採購主管",
+   "purpose": "（人工撰寫）確保原物料與包材及時、足量且成本合理地供應生產。"
+  },
+  "work": {
+   "revision_id": "d4e3c833-e091-4dfd-a074-47482d795ef8",
+   "areas": [
+    {
+     "area_id": "f8d5849f-5c38-42e0-a606-3b175f08cab2",
+     "title": "原物料與包材採購及供應商協調",
+     "scope_text": "涵蓋請購處理、詢價比價、採購下單與交期跟進，並協調收貨品質、發票付款及供應商資料管理。"
+    }
+   ],
+   "tasks": [
+    {
+     "task_id": "7d23b7c9-700f-4131-a632-70b58d56f990",
+     "area_id": null,
+     "title": "（人工補充）彙整供應商年度績效資料",
+     "description": "由人工補充的任務，用來檢查後續的 AI 訪談不會悄悄覆寫它。",
+     "outcomes": [],
+     "requirements": []
+    },
+    {
+     "task_id": "c349c872-adad-4c0e-be8f-e84ff971ca28",
+     "area_id": "f8d5849f-5c38-42e0-a606-3b175f08cab2",
+     "title": "辦理原物料與包材採購及交期跟進",
+     "description": "處理請購單、詢價比價、下採購單並追蹤交期；新品項或金額較大的請購至少詢價三家並整理比價表、說明選擇理由，常用品項依既有合約價辦理。遇供應商延遲時，通知生管與採購主管，並與供應商協商急件或分批交貨。",
+     "outcomes": [
+      {
+       "detail_id": "44b2c734-a314-4826-bab7-48609501b93c",
+       "text": "完成原物料與包材的採購下單及交期跟進，支援生產用料供應。"
+      }
+     ],
+     "requirements": [
+      {
+       "detail_id": "e8050060-e8b4-4b3f-823b-5eb0820384ca",
+       "text": "不得自行決定改用尚未認證供應商的替代料。"
+      },
+      {
+       "detail_id": "6cf1e3a2-01ca-459e-9bb7-b4fee84d4d57",
+       "text": "比價須考量價格、交期、品質紀錄與付款條件，不以最低價作為唯一選擇依據；採購依金額由本人或主管核准。"
+      }
+     ]
+    },
+    {
+     "task_id": "32308ee5-b06c-4c37-ae59-030613281765",
+     "area_id": "f8d5849f-5c38-42e0-a606-3b175f08cab2",
+     "title": "協調採購後續事項並管理供應商資料",
+     "description": "協調收貨品質問題及發票付款事項，並管理供應商資料。倉庫負責收貨、品保負責檢驗；有數量差異或品質問題時，接獲通知後與供應商協商退換貨或扣款。",
+     "outcomes": [],
+     "requirements": [
+      {
+       "detail_id": "1908d858-32f1-4803-8e56-5e9e97d58d72",
+       "text": "是否接受退換貨或扣款等處理方式由主管決定。"
+      }
+     ]
+    }
+   ],
+   "capabilities": [],
+   "task_links": [],
+   "collaborators": [],
+   "conditions": []
+  }
+ },
+ "references": [
+  {
+   "citation_id": "4bfd8a45-a4e7-4f95-9ff5-5069b4a6aefd",
+   "target_label": "職務名稱",
+   "target": {
+    "kind": "profile_field",
+    "field": "job_title",
+    "item_id": null,
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "a04d795b-01d0-4673-9a66-02bbaed6d495",
+   "target_label": "直屬主管",
+   "target": {
+    "kind": "profile_field",
+    "field": "reports_to",
+    "item_id": null,
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "c7299860-c841-4274-9b41-faa57ad57d28",
+   "target_label": "職務目的",
+   "target": {
+    "kind": "profile_field",
+    "field": "purpose",
+    "item_id": null,
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": true
+  },
+  {
+   "citation_id": "53d321a1-59ea-4913-a076-e02e247d5565",
+   "target_label": "職責：原物料與包材採購及供應商協調",
+   "target": {
+    "kind": "area",
+    "field": null,
+    "item_id": "f8d5849f-5c38-42e0-a606-3b175f08cab2",
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "36f14af6-2198-485f-a21a-79e690f0de3c",
+   "target_label": "任務：辦理原物料與包材採購及交期跟進",
+   "target": {
+    "kind": "task",
+    "field": null,
+    "item_id": "c349c872-adad-4c0e-be8f-e84ff971ca28",
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "795b5652-6f00-48ce-adce-72a22cd695e9",
+   "target_label": "任務：辦理原物料與包材採購及交期跟進 · 成果：完成原物料與包材的採購下單及交期跟進，支援生產用料供應。",
+   "target": {
+    "kind": "detail",
+    "field": null,
+    "item_id": "44b2c734-a314-4826-bab7-48609501b93c",
+    "task_id": "c349c872-adad-4c0e-be8f-e84ff971ca28"
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "23e50dd9-8f75-4ab1-8433-e1f43657f774",
+   "target_label": "任務：協調採購後續事項並管理供應商資料",
+   "target": {
+    "kind": "task",
+    "field": null,
+    "item_id": "32308ee5-b06c-4c37-ae59-030613281765",
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 2 · 員工",
+   "needs_recheck": true
+  },
+  {
+   "citation_id": "6ed83a59-7fb5-4f09-836d-142dfeee5488",
+   "target_label": "任務：辦理原物料與包材採購及交期跟進",
+   "target": {
+    "kind": "task",
+    "field": null,
+    "item_id": "c349c872-adad-4c0e-be8f-e84ff971ca28",
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 4 · 員工",
+   "needs_recheck": true
+  },
+  {
+   "citation_id": "e48fd573-e9da-401a-a51b-1a6741d898c0",
+   "target_label": "任務：辦理原物料與包材採購及交期跟進 · 要求：不得自行決定改用尚未認證供應商的替代料。",
+   "target": {
+    "kind": "detail",
+    "field": null,
+    "item_id": "e8050060-e8b4-4b3f-823b-5eb0820384ca",
+    "task_id": "c349c872-adad-4c0e-be8f-e84ff971ca28"
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 4 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "a218c6a4-df51-4ce9-a07f-1d6aa6c1dba5",
+   "target_label": "任務：辦理原物料與包材採購及交期跟進",
+   "target": {
+    "kind": "task",
+    "field": null,
+    "item_id": "c349c872-adad-4c0e-be8f-e84ff971ca28",
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 6 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "51f7ab3c-b78c-4c67-ab78-a6a28a2d62f0",
+   "target_label": "任務：辦理原物料與包材採購及交期跟進 · 要求：比價須考量價格、交期、品質紀錄與付款條件，不以最低價作為唯一選擇依據；採購依金額由本人或主管核准。",
+   "target": {
+    "kind": "detail",
+    "field": null,
+    "item_id": "6cf1e3a2-01ca-459e-9bb7-b4fee84d4d57",
+    "task_id": "c349c872-adad-4c0e-be8f-e84ff971ca28"
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 6 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "9519f2a8-b211-42d2-8111-dcdd39fded89",
+   "target_label": "任務：協調採購後續事項並管理供應商資料",
+   "target": {
+    "kind": "task",
+    "field": null,
+    "item_id": "32308ee5-b06c-4c37-ae59-030613281765",
+    "task_id": null
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 8 · 員工",
+   "needs_recheck": false
+  },
+  {
+   "citation_id": "82772a14-0ffc-4faa-991e-b69a776bd0e5",
+   "target_label": "任務：協調採購後續事項並管理供應商資料 · 要求：是否接受退換貨或扣款等處理方式由主管決定。",
+   "target": {
+    "kind": "detail",
+    "field": null,
+    "item_id": "1908d858-32f1-4803-8e56-5e9e97d58d72",
+    "task_id": "32308ee5-b06c-4c37-ae59-030613281765"
+   },
+   "source_kind": "interview",
+   "source_label": "訪談序號 8 · 員工",
+   "needs_recheck": false
+  }
+ ],
+ "source_contents": {
+  "4bfd8a45-a4e7-4f95-9ff5-5069b4a6aefd": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是電子零件組裝廠的採購專員，向採購主管報告，負責原物料和包材採購。每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。最近有一批銅排被供應商延後兩週交貨，我正在想辦法避免生產線停線。"
+  },
+  "a04d795b-01d0-4673-9a66-02bbaed6d495": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是電子零件組裝廠的採購專員，向採購主管報告，負責原物料和包材採購。每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。最近有一批銅排被供應商延後兩週交貨，我正在想辦法避免生產線停線。"
+  },
+  "c7299860-c841-4274-9b41-faa57ad57d28": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是電子零件組裝廠的採購專員，向採購主管報告，負責原物料和包材採購。每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。最近有一批銅排被供應商延後兩週交貨，我正在想辦法避免生產線停線。"
+  },
+  "53d321a1-59ea-4913-a076-e02e247d5565": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是電子零件組裝廠的採購專員，向採購主管報告，負責原物料和包材採購。每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。最近有一批銅排被供應商延後兩週交貨，我正在想辦法避免生產線停線。"
+  },
+  "36f14af6-2198-485f-a21a-79e690f0de3c": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是電子零件組裝廠的採購專員，向採購主管報告，負責原物料和包材採購。每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。最近有一批銅排被供應商延後兩週交貨，我正在想辦法避免生產線停線。"
+  },
+  "795b5652-6f00-48ce-adce-72a22cd695e9": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是電子零件組裝廠的採購專員，向採購主管報告，負責原物料和包材採購。每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。最近有一批銅排被供應商延後兩週交貨，我正在想辦法避免生產線停線。"
+  },
+  "23e50dd9-8f75-4ab1-8433-e1f43657f774": {
+   "kind": "interview",
+   "interview_sequence": 2,
+   "speaker": "employee",
+   "interview_text": "我是電子零件組裝廠的採購專員，向採購主管報告，負責原物料和包材採購。每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。最近有一批銅排被供應商延後兩週交貨，我正在想辦法避免生產線停線。"
+  },
+  "6ed83a59-7fb5-4f09-836d-142dfeee5488": {
+   "kind": "interview",
+   "interview_sequence": 4,
+   "speaker": "employee",
+   "interview_text": "我會當天通知生管和採購主管，並跟供應商談急件或分批交貨。替代料我不能自己決定改用還沒認證的供應商，這部分不能由我自行決定。"
+  },
+  "e48fd573-e9da-401a-a51b-1a6741d898c0": {
+   "kind": "interview",
+   "interview_sequence": 4,
+   "speaker": "employee",
+   "interview_text": "我會當天通知生管和採購主管，並跟供應商談急件或分批交貨。替代料我不能自己決定改用還沒認證的供應商，這部分不能由我自行決定。"
+  },
+  "a218c6a4-df51-4ce9-a07f-1d6aa6c1dba5": {
+   "kind": "interview",
+   "interview_sequence": 6,
+   "speaker": "employee",
+   "interview_text": "新品項或金額比較大的請購，我會至少找三家詢價，整理比價表給主管；常用品項就用既有合約價。比價會看價格、交期、品質紀錄和付款條件，不一定最低價就選，還要寫選擇理由。最後依金額由我或主管核准。"
+  },
+  "51f7ab3c-b78c-4c67-ab78-a6a28a2d62f0": {
+   "kind": "interview",
+   "interview_sequence": 6,
+   "speaker": "employee",
+   "interview_text": "新品項或金額比較大的請購，我會至少找三家詢價，整理比價表給主管；常用品項就用既有合約價。比價會看價格、交期、品質紀錄和付款條件，不一定最低價就選，還要寫選擇理由。最後依金額由我或主管核准。"
+  },
+  "9519f2a8-b211-42d2-8111-dcdd39fded89": {
+   "kind": "interview",
+   "interview_sequence": 8,
+   "speaker": "employee",
+   "interview_text": "貨到後由倉庫收貨、品保檢驗；如果有數量差異或品質問題，他們會通知我，我再和供應商談退換貨或扣款。是否接受這些處理方式由主管決定。"
+  },
+  "82772a14-0ffc-4faa-991e-b69a776bd0e5": {
+   "kind": "interview",
+   "interview_sequence": 8,
+   "speaker": "employee",
+   "interview_text": "貨到後由倉庫收貨、品保檢驗；如果有數量差異或品質問題，他們會通知我，我再和供應商談退換貨或扣款。是否接受這些處理方式由主管決定。"
+  }
+ },
+ "checks": {
+  "facts": {
+   "pr_intake": {
+    "kind": "core",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "rfq": {
+    "kind": "core",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "quote_basis": {
+    "kind": "hidden",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "approval_limit": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "po_issue": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "po_change": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "blanket": {
+    "kind": "rare",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "expedite": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "shortage_escalate": {
+    "kind": "hidden",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "delivery_peak": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "receiving_coord": {
+    "kind": "core",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "iqc_reject": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "packaging": {
+    "kind": "rare",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "invoice_match": {
+    "kind": "core",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "payment_inquiry": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "onboarding": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "evaluation": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "audit": {
+    "kind": "rare",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "negotiate": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "cost_saving": {
+    "kind": "hidden",
+    "surfaced": true,
+    "in_jd": true
+   },
+   "price_watch": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "mrp_review": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "obsolete": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "emergency": {
+    "kind": "rare",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "import": {
+    "kind": "rare",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "schedule": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "tools": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "language": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "erp_project": {
+    "kind": "rare",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "new_hire": {
+    "kind": "rare",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "supplier_comm": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "internal_comm": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "limits": {
+    "kind": "core",
+    "surfaced": false,
+    "in_jd": false
+   },
+   "risk_peak": {
+    "kind": "hidden",
+    "surfaced": false,
+    "in_jd": false
+   }
+  },
+  "recording_gaps": [],
+  "elicitation_gaps": [
+   "approval_limit",
+   "audit",
+   "blanket",
+   "delivery_peak",
+   "emergency",
+   "erp_project",
+   "evaluation",
+   "expedite",
+   "import",
+   "internal_comm",
+   "iqc_reject",
+   "language",
+   "limits",
+   "mrp_review",
+   "negotiate",
+   "new_hire",
+   "obsolete",
+   "onboarding",
+   "payment_inquiry",
+   "po_change",
+   "po_issue",
+   "price_watch",
+   "risk_peak",
+   "schedule",
+   "supplier_comm",
+   "tools"
+  ],
+  "correction": {
+   "new_present": false,
+   "old_left_as_current": 0,
+   "unchanged_kept": [
+    false,
+    true
+   ]
+  },
+  "late_correction": {
+   "sent": false,
+   "new_present": false,
+   "old_left_as_current": 0
+  },
+  "profile_sources": {
+   "job_title": {
+    "value": "採購專員",
+    "cited": 1,
+    "supported": true
+   },
+   "organization_unit": {
+    "value": null,
+    "cited": 0,
+    "supported": false
+   },
+   "reports_to": {
+    "value": "採購主管",
+    "cited": 1,
+    "supported": true
+   }
+  },
+  "citations": {
+   "checked": 15,
+   "unsupported": [],
+   "support_rate": 1.0
+  },
+  "collaborators_in_text": [
+   true,
+   true,
+   true,
+   false,
+   true,
+   false,
+   true
+  ],
+  "shape": {
+   "areas": 1,
+   "tasks": 3,
+   "outcomes": 1,
+   "requirements": 3,
+   "capabilities": 0,
+   "collaborator_items": 0,
+   "condition_items": 0,
+   "references": 13
+  },
+  "style": {
+   "consultant_turns": 4,
+   "mean_consultant_chars": 134,
+   "questions_per_turn": 2.0,
+   "leading_phrases": 1
+  }
+ }
+}

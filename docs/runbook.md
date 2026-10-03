@@ -42,7 +42,9 @@ pnpm app:status                                  # 診斷；不印出密碼或 k
 pnpm build                                       # 建置 Web，供 `pnpm start` 同源提供
 ```
 
-`app:migrate` 是**唯一**會改 schema 的命令。啟動只核對 migration head：未初始化或版本不符會啟動失敗，並提示執行 `pnpm app:migrate`；它不自動升級、清資料或重建 volume。LangGraph 的 checkpoint 表由官方 saver 在啟動時安全建立。
+`app:migrate` 負責 App 業務 schema 的建立與升級。啟動只核對 migration head：未初始化或版本不符會啟動失敗，並提示執行 `pnpm app:migrate`；它不自動升級業務 schema、清資料或重建 volume。LangGraph 的 checkpoint 表則由官方 saver 在啟動時建立。
+
+PowerShell 的 `$env:…` 只對目前視窗及其啟動的程序有效。換新視窗後，須重新提供相同的資料庫／schema 與所需 PDF 設定；不會從 `apps/api/.env` 載入這些設定。這裡的空白資料庫要求只適用於首次安裝，更新目前 App 時沿用原資料庫。
 
 ## AI credential
 
@@ -51,7 +53,7 @@ pnpm build                                       # 建置 Web，供 `pnpm start`
 - 環境變數 `OPENAI_API_KEY`；
 - 或 `apps/api/.env`（已被 Git 忽略）內**唯一一行** `OPENAI_API_KEY=...`，`pnpm start`／`pnpm dev` 會自動以 `--key-file` 載入。
 
-key 不進 prompt、模型工具、Web bundle、URL、資料庫、checkpoint、一般 log 或 Git。`pnpm app:status` 只顯示「已設定」，不證明 key 有效；確認有效性需要真 provider 請求。沒有 key 時人工 JD 仍可使用，AI 訪談明示停用，且不會自動 fallback。更換 key 後須重啟後端。
+key 不進 prompt、模型工具、Web bundle、URL、資料庫、checkpoint、一般 log 或 Git。檔案存在時，根啟動器以 `--key-file` 載入的 key 為準；不要同時保留兩份不同金鑰。`pnpm app:status` 不讀取此檔案，判讀方式見[診斷](#診斷)。沒有 key 時人工 JD 仍可使用，AI 訪談明示停用，且不會自動 fallback。更換 key 後須重啟後端。
 
 注意：後端啟動時會續跑已接受但未完成的訪談與背景整理，這可能消耗模型額度；只想操作人工 JD 時不要提供 key。
 
@@ -68,6 +70,22 @@ pnpm dev      # 開發：後端 :8100 與 Vite :5173 同時前景啟動：http:/
 
 隔離驗證時若前端使用第二個埠，可在**後端啟動前**設定 `CALIBURN_DEV_ORIGIN=http://127.0.0.1:5174`（只接受一個帶明確埠的 loopback HTTP origin），見[後端 README](../apps/api/README.md)。
 
+## 更新已有安裝
+
+先讓工作停在安全點，正常停止自己啟動的 App，備份原資料庫。沒有未提交修改且分支沒有分歧時，從專案根目錄執行：
+
+```powershell
+git pull --ff-only
+pnpm install --frozen-lockfile
+uv sync --project apps/api --locked
+# 在此終端提供原 CALIBURN_DATABASE_URL／schema 與所需 PDF 設定。
+pnpm app:migrate
+pnpm build
+pnpm start
+```
+
+不要因為 migration 或分支更新失敗就重建資料庫、刪 volume 或強制覆蓋工作。`git pull` 拒絕快轉時先核對本機差異；歷史修正的提交對照見[歷史查閱](history.md)。更新 Playwright 套件後，還需按下節重新安裝對應瀏覽器。
+
 ## PDF 匯出
 
 匯出正式 JD 的中文 PDF 需要兩項，缺少時 `GET /api/job-files/{id}/jd/export.pdf` 回 503，不下載空檔：
@@ -80,11 +98,13 @@ uv run --project apps/api --locked python -m playwright install chromium --only-
 
 PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部分字型的文字複製／搜尋會出現部首字元（已知限制，見 [T13](history.md#source-409f20a1c297740aed7d)）。
 
+字型必須使用實際可讀的檔案，下載方式見 [Noto CJK 官方指南](https://github.com/notofonts/noto-cjk/blob/main/Sans/README.md)。如果安裝瀏覽器時自訂了 `PLAYWRIGHT_BROWSERS_PATH`，後端啟動時也要提供相同值。新的終端需重新提供字型與自訂瀏覽器路徑；設定完成後重啟後端才生效。
+
 ## 診斷
 
 | 現象 | 查什麼 |
 |---|---|
-| 想知道這次啟動會用什麼 | `pnpm app:status`：資料庫（可連線、migration 是否在 head）、模型是否設定、PDF 字型／瀏覽器、Web 建置 |
+| 檢查目前終端的設定 | `pnpm app:status`：核對環境變數及資料庫連線／migration；不代表正在執行的後端狀態，見下方判讀說明 |
 | 後端啟動失敗並提到 migration | 資料庫尚未初始化或版本不符：`pnpm app:migrate` |
 | `POST /inputs` 回 503 `model_not_configured` | 沒有 OpenAI key（或後端啟動前未設定）；人工 JD 不受影響 |
 | 瀏覽器或 CLI 收到 403 | 精確 Host／Origin 檢查：只接受 `127.0.0.1`／`localhost`／`[::1]` 的 5173／8100（及明示的一個 dev origin） |
@@ -93,6 +113,19 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 | 一輪訪談很久沒有回應 | 多半是 OpenAI 帳戶的每分鐘 token 上限（TPM）在限流，後端 log 會出現 `Provider request failed: … failure=rate_limited`。系統會照服務建議的時間自動多等（沒有建議時 10 秒起、60 秒封頂），**不算失敗**，單輪最長等到工作期限（預設 30 分鐘）；可隨時取消該輪。TPM 200K 的帳戶上，一場 12 輪訪談約 6–25 分鐘；要更快請改用更高 TPM 的帳戶 |
 | 訪談或背景整理全部立刻失敗，後端 log 為 `failure=access_blocked … provider_code=credit_balance_exhausted` | OpenAI 帳戶儲值額度用完（HTTP 429，但不是限流）。系統不重試、原輸入保留、該次處理標為失敗；補額度後重新送出原輸入 |
 | 資料庫剛重啟（或被外力中止）後，讀訪談狀態的端點回 500，`/api/health` 仍是 ok | **重啟後端**。leader 鎖與 checkpoint 連線各只持一條資料庫連線、不會自動重連，這是刻意的單一 leader 設計；重啟時系統會恢復已保存的進行中工作（能續作則續作，否則安全終止、原輸入保留，之後可重送） |
+
+### 判讀 `pnpm app:status`
+
+這個命令直接讀取目前終端的環境變數，不經過 `pnpm start` 的啟動器，也不詢問正在執行的後端。它不啟動模型、不遷移資料、不印出密碼或 key。
+
+| 輸出 | 能確認什麼 |
+|---|---|
+| `database` | 按目前環境設定連線，核對 App migration 是否在 head |
+| `model` | 只辨認環境變數中的 key；使用 `apps/api/.env` 時可能顯示未設定，不代表 `pnpm start` 載入失敗。顯示已設定也不證明 key 有效 |
+| `pdf` | 核對字型及明示瀏覽器執行檔是否存在；使用 Playwright 預設瀏覽器時，不檢查瀏覽器是否已下載，也不驗證渲染結果 |
+| `web` | 只檢查明示的 `CALIBURN_WEB_BUILD_DIRECTORY`；未設定時可能顯示未配置。`pnpm start` 會另外指定 `apps/web/dist` 並核對 `index.html` |
+
+因此，退出碼 0 不是所有產品能力已就緒的證明；AI 與 PDF 的實際功能仍須分別驗證。不要為消除「未設定」提示而把 key 複製到更多地方。
 
 ### 在 DataGrip 查某個職務檔案的 AI 執行紀錄
 
@@ -103,13 +136,12 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 在 repository 根目錄、與正式 App 相同的資料庫環境設定下執行：
 
 ```powershell
-pnpm app:migrate
 uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --job-file-id 職務檔案UUID
 # 只更新某一輪，改用：
 uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID
 ```
 
-兩個範圍參數擇一；不用 API key。沒有 execution 的既存空檔案回報 0 筆，找不到的 UUID 則報錯。若權限、migration、原生紀錄解碼或並行更新出錯，整次匯入回滾，原診斷副本仍保留。終端只印成功筆數或錯誤類別，避免洩露私人 payload。
+兩個範圍參數擇一；不用 API key。資料庫須已升級到目前 migration；若尚未升級，先沿[更新流程](#更新已有安裝)停止 App，再執行 `pnpm app:migrate`，不是每次查詢都遷移。沒有 execution 的既存空檔案回報 0 筆，找不到的 UUID 則報錯。若權限、migration、原生紀錄解碼或並行更新出錯，整次匯入回滾，原診斷副本仍保留。終端只印成功筆數或錯誤類別，避免洩露私人 payload。
 
 DataGrip 展開 `caliburn → views`，可直接雙擊下列 VIEW，再用 `job_file_id` 或 `execution_id` 篩選：
 

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OccupationReferenceTaskView",
+  "description": "公版任務完整已解析細節，與員工 JD 任務可多對多對應。",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "reference_id": {
+      "type": "string"
+    },
+    "source_sha256": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "unit_id": {
+      "type": "string"
+    },
+    "names": {
+      "type": "array",
+      "items": {
+        "$ref": "occupation-reference-search-result.schema.json#/$defs/ReferenceTaskName"
+      }
+    },
+    "competency_blocks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ReferenceCompetencyBlock"
+      }
+    }
+  },
+  "required": [
+    "reference_id",
+    "source_sha256",
+    "task_id",
+    "unit_id",
+    "names",
+    "competency_blocks"
+  ],
+  "$defs": {
+    "NamedContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "name"
+      ]
+    },
+    "Indicator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "text"
+      ]
+    },
+    "ReferenceCompetencyBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "competency_level": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NamedContent"
+          }
+        },
+        "indicators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Indicator"
+          }
+        },
+        "knowledge": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NamedContent"
+          }
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NamedContent"
+          }
+        }
+      },
+      "required": [
+        "competency_level",
+        "outputs",
+        "indicators",
+        "knowledge",
+        "skills"
+      ]
+    }
+  }
+}

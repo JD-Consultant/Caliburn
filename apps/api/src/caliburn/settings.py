@@ -1,11 +1,13 @@
 """Explicit target settings; never load a legacy dotenv or infer its database."""
 
+import math
 import os
 import re
 from dataclasses import dataclass, field
 from decimal import Decimal
 from pathlib import Path
 
+import httpx2
 from openai.types.shared.reasoning_effort import ReasoningEffort
 
 from caliburn.adapters.database_settings import DatabaseSettings
@@ -65,12 +67,42 @@ class PdfSettings:
 
 
 @dataclass(frozen=True, slots=True)
+class OccupationReferenceSettings:
+    """Explicit external service origin and bounded request duration; disabled by omission."""
+
+    base_url: str
+    request_timeout_seconds: float = 30.0
+
+    def __post_init__(self) -> None:
+        message = "Reference service must use an explicit HTTP(S) origin without credentials"
+        if re.fullmatch(r"https?://[A-Za-z0-9._:\[\]-]+/?", self.base_url) is None:
+            raise ValueError(message)
+        try:
+            origin = httpx2.URL(self.base_url)
+        except httpx2.InvalidURL:
+            raise ValueError(message) from None
+        if (
+            not origin.host
+            or self.base_url.removesuffix("/").endswith(":")
+            or (origin.port is not None and not 1 <= origin.port <= 65_535)
+        ):
+            raise ValueError(message)
+        if (
+            type(self.request_timeout_seconds) not in (int, float)
+            or not math.isfinite(self.request_timeout_seconds)
+            or self.request_timeout_seconds <= 0
+        ):
+            raise ValueError("Reference request timeout must be finite and positive")
+
+
+@dataclass(frozen=True, slots=True)
 class Settings:
     database: DatabaseSettings | None = None
     model: ModelSettings | None = None
     pdf: PdfSettings | None = None
     dev_origin: str | None = None
     web_build_directory: Path | None = None
+    occupation_references: OccupationReferenceSettings | None = None
 
     def __post_init__(self) -> None:
         if self.web_build_directory is not None and not self.web_build_directory.is_absolute():
@@ -91,6 +123,7 @@ class Settings:
         pdf_font = os.environ.get("CALIBURN_PDF_FONT_PATH")
         pdf_browser = os.environ.get("CALIBURN_PDF_CHROMIUM_PATH")
         web_build = os.environ.get("CALIBURN_WEB_BUILD_DIRECTORY")
+        reference_url = os.environ.get("CALIBURN_OCCUPATION_REFERENCE_URL")
         return cls(
             dev_origin=os.environ.get("CALIBURN_DEV_ORIGIN"),
             web_build_directory=Path(web_build) if web_build is not None else None,
@@ -106,5 +139,13 @@ class Settings:
                 executable_path=Path(pdf_browser) if pdf_browser else None,
             )
             if pdf_font
+            else None,
+            occupation_references=OccupationReferenceSettings(
+                base_url=reference_url,
+                request_timeout_seconds=float(
+                    os.environ.get("CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS", "30")
+                ),
+            )
+            if reference_url is not None
             else None,
         )

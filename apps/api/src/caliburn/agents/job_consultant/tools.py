@@ -18,6 +18,10 @@ from caliburn.transport.model_tools.memory_consolidation import (
     memory_consolidation_definitions,
 )
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools, memory_read_definitions
+from caliburn.transport.model_tools.occupation_references import (
+    OccupationReferenceTools,
+    occupation_reference_definitions,
+)
 
 CONSULTANT_MEMORY_READ_NAMES = (
     "read_work_situation_map",
@@ -28,7 +32,10 @@ CONSULTANT_MEMORY_READ_NAMES = (
 )
 
 
-def consultant_tool_definitions() -> list[FunctionToolParam]:
+def consultant_tool_definitions(
+    *,
+    occupation_references_enabled: bool = False,
+) -> list[FunctionToolParam]:
     """Build A's tool template before its published Memory scope has been selected."""
     return [
         *memory_read_definitions(names=CONSULTANT_MEMORY_READ_NAMES),
@@ -37,6 +44,7 @@ def consultant_tool_definitions() -> list[FunctionToolParam]:
         *jd_write_definitions(),
         *memory_consolidation_definitions(),
         *context_compaction_definitions(),
+        *(occupation_reference_definitions() if occupation_references_enabled else []),
     ]
 
 
@@ -49,6 +57,8 @@ class ConsultantTools:
         jd_changes: JdChangesTools,
         consolidation: MemoryConsolidationTools,
         compaction: ContextCompactionTools,
+        *,
+        occupation_references: OccupationReferenceTools | None = None,
     ) -> None:
         self.memory_reads = memory_reads
         self.jd_reads = jd_reads
@@ -56,6 +66,7 @@ class ConsultantTools:
         self.jd_changes = jd_changes
         self.consolidation = consolidation
         self.compaction = compaction
+        self.occupation_references = occupation_references
 
     @property
     def names(self) -> tuple[str, ...]:
@@ -66,6 +77,7 @@ class ConsultantTools:
             *self.jd_writes.names,
             *self.consolidation.names,
             *self.compaction.names,
+            *(self.occupation_references.names if self.occupation_references is not None else ()),
         )
 
     def definitions(self) -> list[FunctionToolParam]:
@@ -76,6 +88,11 @@ class ConsultantTools:
             *self.jd_writes.definitions(),
             *self.consolidation.definitions(),
             *self.compaction.definitions(),
+            *(
+                self.occupation_references.definitions()
+                if self.occupation_references is not None
+                else []
+            ),
         ]
 
     async def prepare(
@@ -95,6 +112,15 @@ class ConsultantTools:
             return self.consolidation.prepare(call.arguments, operation_id)
         if call.name in self.compaction.names:
             return self.compaction.prepare(call.arguments)
+        if self.occupation_references is not None:
+            if call.name in self.occupation_references.read_names:
+                return await self.occupation_references.invoke(call.name, call.arguments)
+            if call.name in self.occupation_references.write_names:
+                return await self.occupation_references.prepare(
+                    call.name,
+                    call.arguments,
+                    operation_id,
+                )
         return reject_tool_call(
             "scope_not_allowed", "本角色沒有這項工具。", "使用本角色已提供的具名工具。"
         )
@@ -105,4 +131,11 @@ class ConsultantTools:
             return await self.consolidation.execute(prepared)
         if isinstance(prepared, dict) and prepared.get("kind") == "context_compaction":
             return await self.compaction.execute(prepared)
+        if (
+            isinstance(prepared, dict)
+            and prepared.get("kind") == "occupation_reference_state_change"
+        ):
+            if self.occupation_references is None:
+                raise ValueError("The saved Turn does not permit occupation reference changes")
+            return await self.occupation_references.execute(prepared)
         return await self.jd_writes.execute(restore_jd_write(prepared))

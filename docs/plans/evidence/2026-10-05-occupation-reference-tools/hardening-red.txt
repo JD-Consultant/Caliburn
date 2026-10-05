@@ -1,0 +1,12 @@
+FFFFF.FFF.F                                                              [100%]
+=========================== short test summary info ===========================
+FAILED tests/unit/test_occupation_reference_tool_feedback.py::test_selection_contract_explains_full_replacement_and_retained_references
+FAILED tests/unit/test_occupation_reference_tool_feedback.py::test_invalid_arguments_offer_the_actual_tools_legal_next_step[search_occupation_references-{"query":" "}-query-add/remove]
+FAILED tests/unit/test_occupation_reference_tool_feedback.py::test_invalid_arguments_offer_the_actual_tools_legal_next_step[read_occupation_reference-{"reference_id":"ref_frontend"}-task_id-add/remove]
+FAILED tests/unit/test_occupation_reference_tool_feedback.py::test_invalid_arguments_offer_the_actual_tools_legal_next_step[read_occupation_reference_state-{"unexpected":1}-{}-add/remove]
+FAILED tests/unit/test_occupation_reference_tool_feedback.py::test_invalid_arguments_offer_the_actual_tools_legal_next_step[select_occupation_references-{"reference_ids":null}-reference_ids-add/remove]
+FAILED tests/unit/test_occupation_reference_tool_feedback.py::test_external_failure_feedback_matches_the_failure_class[timeout-App-\u6838\u5c0d\u516c\u7248\u5b9a\u4f4d]
+FAILED tests/unit/test_occupation_reference_tool_feedback.py::test_external_failure_feedback_matches_the_failure_class[reference_service_unavailable-App-\u6838\u5c0d\u516c\u7248\u5b9a\u4f4d]
+FAILED tests/unit/test_occupation_reference_tool_feedback.py::test_external_failure_feedback_matches_the_failure_class[reference_index_incompatible-\u7d22\u5f15-\u6838\u5c0d\u516c\u7248\u5b9a\u4f4d]
+FAILED tests/unit/test_occupation_reference_tool_feedback.py::test_successful_large_write_returns_a_bounded_receipt_without_losing_saved_scope
+9 failed, 2 passed in 1.41s

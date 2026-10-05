@@ -1,0 +1,25 @@
+{
+  "scope": "reference tool documentation maintenance, no production or runtime changes",
+  "checked_documents": 11,
+  "checked_local_links_and_anchors": 272,
+  "missing_targets": [],
+  "fixed_output_contract_marker_preserved": true,
+  "old_requests_and_saved_results_separately_explained": true,
+  "source_sha256": {
+    "docs/target-architecture-map.md": "f194fdf4aa4ba39d6acdcad8de64b5bbd89dacc82112ce47cad63aa3acd9cfa7",
+    "docs/architecture/system-boundaries.md": "091ae25153c7b0586bdc5614110f89e9687cdb86add606691bfb0d25197610ea",
+    "docs/architecture/persistence.md": "ad9b3c08bac52adce7c449259e949dc18281f0fd9f5fe77b4245c107b86e9ad0",
+    "docs/architecture/delivery-and-operations.md": "30bd576767be1ff5e9e6d5abe8176913a22a1391f003db120321bc96973205af",
+    "docs/architecture/verification.md": "c9fc29dda4bafbf338f4b0d53bec5f6b6c4e669056b57c903a9633fa64a5618c",
+    "docs/implementation/agent-execution.md": "758fb21da35be914a8733ec69c9e52c5a7e7d2f681afe57ee67c667f707bed44",
+    "docs/specs/README.md": "e40f7d405d3bc98e9929f97102408fad2779bf1fd1365164b564857939acef9b",
+    "docs/specs/2026-10-04-public-reference-completion-design.md": "7b80185574bf83c45036babb2579f5ef9489128791bf8e641bfee03beef8a63a",
+    "docs/specs/2026-10-05-occupation-reference-api-design.md": "63b333fc2e5d15ea53ca4c3bb1a0a4479dfd0d0a7f80025b1d4b4ba117b5dade",
+    "docs/reports/system-architecture/03-components.md": "32e500785cd979da35264e1464f0e082278ab103cd703fd1fce7a92b9aec01a1",
+    "docs/reports/system-architecture/04-agent-execution.md": "cac962fd5f96c60999eb9368115068883fd14d8a81fa3f48858fb16d77fdfe7d"
+  },
+  "limits": [
+    "Documentation verification only; no new model, retrieval or database test.",
+    "Inline Mermaid source reviewed; no report image regeneration."
+  ]
+}

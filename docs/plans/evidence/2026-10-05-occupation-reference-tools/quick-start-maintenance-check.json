@@ -1,0 +1,706 @@
+{
+  "checked_at": "2026-10-05T11:35:50.640580+00:00",
+  "scope": "Quick Start、首次安裝及日常啟停文件；未啟動或停止服務。",
+  "files": [
+    {
+      "file": "README.md",
+      "before_sha256": "c0d51352a6ec833ef5291162643901146875bad9a7954b8636e4a94e5bb8d4f7",
+      "after_sha256": "da0188771bbb94f32c042b1fc324f18f960c56ee95826871d23df03ab83e4baf",
+      "existing_headings_preserved": true,
+      "changed_original_code_blocks": 1
+    },
+    {
+      "file": "docs/runbook.md",
+      "before_sha256": "197f77c671260569c40785f022ca8b53112909ff90ed064eec2509cb9f44ca8d",
+      "after_sha256": "617d9d77f23d94c6f2bef0d6f26c0d7bacd796b9e42afed8b98e54dd07f1746a",
+      "existing_headings_preserved": true,
+      "changed_original_code_blocks": 1
+    },
+    {
+      "file": "apps/api/README.md",
+      "before_sha256": "8f73ff95667baff527fdfc501c9d2b689d795367998fce86c0429c08e02e3526",
+      "after_sha256": "0cf0578c6172ea2d683196a21a454d334bb75812743f2789fc192d4feadefec7",
+      "existing_headings_preserved": true,
+      "changed_original_code_blocks": 0
+    },
+    {
+      "file": "apps/web/README.md",
+      "before_sha256": "d7f2e001089b0d96702568950fc9dd78e2af9c1d11117052d9464fd1d478be9d",
+      "after_sha256": "784244b365019a918826f75a86393eea36b60d92d63c530325070e04d437da91",
+      "existing_headings_preserved": true,
+      "changed_original_code_blocks": 0
+    }
+  ],
+  "local_links": [
+    {
+      "file": "README.md",
+      "target": "docs/reports/system-architecture/diagrams/01-value-loop.png",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "#docker-啟動",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "#執行環境",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "#第一次設定",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "#日常啟動",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/adr/0079-target-rebuild-production-cutover.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/reports/system-architecture/diagrams/02-system-boundary.png",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/adr/0080-opt-in-public-reference-agent-tools.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/adr/0079-target-rebuild-production-cutover.md#退役範圍與取回",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/runbook.md#pdf-匯出",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/runbook.md#docker-操作",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/runbook.md#pdf-匯出",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/implementation/agent-execution.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/runbook.md#診斷",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/history.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/runbook.md#資料庫與備份",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "apps/api/README.md#測試與檢查",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "README.md",
+      "target": "docs/architecture/verification.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/reports/experiment-findings.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/experiments/product-validation/README.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/product-introduction.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/reports/project-report/report.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/reports/system-architecture/README.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/README.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/target-architecture-map.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/reports/README.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/history.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/current-decisions.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/experiments/product-validation/README.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/history.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "docs/design/rag-pipeline.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "README.md",
+      "target": "apps/api/README.md#公版參考工具的可選啟用",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "adr/0079-target-rebuild-production-cutover.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "../README.md#quick-start快速開始",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "#docker-操作",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "#安裝依賴",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "#第一次初始化",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "#ai-credential",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "#日常啟動與停止",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "#pdf-匯出",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "#在-datagrip-查某個職務檔案的-ai-執行紀錄",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "experiments/product-validation/2026-10-03-docker-delivery.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "#診斷",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "../apps/api/README.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "history.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "history.md#source-409f20a1c297740aed7d",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "#更新已有安裝",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "history.md#source-6ac54c64f9ded4edcb9e",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "adr/0080-opt-in-public-reference-agent-tools.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "../apps/api/README.md#公版參考工具的可選啟用",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "docs/runbook.md",
+      "target": "design/rag-pipeline.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../README.md#第一次設定",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/runbook.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/adr/0079-target-rebuild-production-cutover.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/architecture/verification.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/implementation/technology-decisions.md#1-首選工具鏈",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../README.md#quick-start快速開始",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "#目標資料庫初始化",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/runbook.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/runbook.md#診斷",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../web/README.md#合成資料瀏覽器驗收",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md#4-pdf-與程序",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-25de60a3e4266687fd86",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../README.md#docker-啟動",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/runbook.md#docker-操作",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-25de60a3e4266687fd86",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../README.md#更新已有安裝",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/implementation/jd-storage.md#32-模型導覽與既有物件定位",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-098e24f247a9411844be",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-25de60a3e4266687fd86",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/plans/2026-10-05-occupation-reference-agent-integration.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/specs/2026-10-04-public-reference-completion-design.md#memory-的排除範圍唯讀入口未接模型",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../ocs-indexer/README.md#職位整體參考-api",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-c8ea469844e955e1447b",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-98d840caa9eed7fb2840",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/implementation/jd-storage.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-f5df4f496aad7b909036",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-409f20a1c297740aed7d",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/architecture/verification.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/implementation/agent-execution.md#58-產品與付費驗證的金額界線",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-ee8cbce8eb3c303d1765",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-98d840caa9eed7fb2840",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md#21-推理摘要串流與歷史回看",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/api/README.md",
+      "target": "../../docs/history.md#source-d76bfd79f21fb146c537",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/adr/0079-target-rebuild-production-cutover.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/history.md#source-378c7f9480def66d4cde",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/reports/experiment-findings.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/history.md#source-072687957bc7ca22325b",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/history.md#source-a75c36d876a672e0f607",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../README.md#quick-start快速開始",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/code-organization.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/coding-standard.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/history.md#source-a75c36d876a672e0f607",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/history.md#source-e93341e9711337954840",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md#31-正式-jd-來源的唯讀下鑽",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/history.md#source-e93341e9711337954840",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/history.md#source-9b7ba33984fa2002fb60",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../api/README.md",
+      "exists": true,
+      "anchor_valid": null
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../api/README.md#使用建置後的同源畫面",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md#11-讀寫邊界",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/history.md#source-c8ea469844e955e1447b",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md#12-基本資料編輯的讀取基底與恢復",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md#17-逐欄就地編輯",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md#13-職責與任務的人工編輯",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md#14-共用知識技能及任務關係的人工編輯",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/implementation/interface-and-delivery.md#15-協作對象與共通條件的人工編輯",
+      "exists": true,
+      "anchor_valid": true
+    },
+    {
+      "file": "apps/web/README.md",
+      "target": "../../docs/history.md#source-5c7e31b4b23b7ad82923",
+      "exists": true,
+      "anchor_valid": true
+    }
+  ],
+  "local_link_count": 110,
+  "anchor_count": 71,
+  "errors": [],
+  "git_diff_check_exit_code": 0,
+  "intentional_layout_changes": [
+    "README 新增 Quick Start 標題及導覽；既有標題與錨點保留。",
+    "README 的 Docker 初次設定分開為複製設定檔、人工填設定與建置／遷移／啟動；執行命令保持原樣。",
+    "runbook 的 Docker 日常命令由單一程式區塊改為操作表，避免整段貼上後立即停止。"
+  ],
+  "verification_level": "純文件：比對快照、命令、連結與錨點；依現行 package.json、啟動器及 Compose 核對操作，不重做安裝、不操作資料庫或模型。"
+}

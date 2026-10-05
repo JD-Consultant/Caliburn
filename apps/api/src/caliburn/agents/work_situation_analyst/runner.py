@@ -24,6 +24,7 @@ class WorkSituationAnalystRunner:
     checkpointer: BaseCheckpointSaver[str]
     client: AsyncOpenAI
     settings: ModelSettings
+    excluded_work_enabled: bool = False
 
     async def run(
         self,
@@ -33,7 +34,11 @@ class WorkSituationAnalystRunner:
         recovery: AnalysisRecovery | None = None,
     ) -> MemoryAnalysisResult:
         return await MemoryAnalysisRunner(
-            self.sessions, self.checkpointer, self.client, self.settings
+            self.sessions,
+            self.checkpointer,
+            self.client,
+            self.settings,
+            excluded_work_enabled=self.excluded_work_enabled,
         ).run(
             writer,
             stage,

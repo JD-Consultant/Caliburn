@@ -92,7 +92,7 @@ class MemoryReadWorkflow:
         self, binding: MemoryReadBinding, sequences: tuple[int, ...]
     ) -> tuple[InterviewMessage, ...]:
         async with self.sessions() as session:
-            scope = await _interview_scope(session, binding)
+            scope = await resolve_interview_scope(session, binding)
             return tuple(
                 await interviews.read_interview_messages(session, scope, sequences=sequences)
             )
@@ -101,7 +101,7 @@ class MemoryReadWorkflow:
         self, binding: MemoryReadBinding, *, start_sequence: int, end_sequence: int
     ) -> tuple[InterviewMessage, ...]:
         async with self.sessions() as session:
-            scope = await _interview_scope(session, binding)
+            scope = await resolve_interview_scope(session, binding)
             return tuple(
                 await interviews.read_interview_range(
                     session, scope, start_sequence=start_sequence, end_sequence=end_sequence
@@ -128,7 +128,10 @@ async def _bind_view(
     return view
 
 
-async def _interview_scope(session: AsyncSession, binding: MemoryReadBinding) -> InterviewReadScope:
+async def resolve_interview_scope(
+    session: AsyncSession, binding: MemoryReadBinding
+) -> InterviewReadScope:
+    """Validate the live App binding and retain its original Turn or batch frontier."""
     await _require_active(session, binding.scope)
     if isinstance(binding, CandidateMemoryRead):
         record = await candidate_queries.require_stage(session, binding.stage)

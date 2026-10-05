@@ -1,0 +1,60 @@
+{
+  "scope": "actual_handlers_with_synthetic_in_memory_workflow_no_database_or_http",
+  "source_sha256": {
+    "docs/plans/evidence/2026-10-05-occupation-reference-tools/verify_tool_hardening.py": "557f09cf1e2d6901a0bc2ad2feacd830c03411a8abf0dfbf9109a4c911a61a57",
+    "apps/api/tests/unit/test_occupation_reference_tools.py": "d4e1aa9f14dc191a7218ae0b78e6da026d2ec6a8e5ad6a6ed4a869442f32d7b5",
+    "apps/api/src/caliburn/transport/model_tools/occupation_references.py": "b16cce833576ad0dda2e056913f9211ef6e8b553f9fbadb62cd4ad964a2b9c00",
+    "apps/api/src/caliburn/agents/job_consultant/runner.py": "25f6ac906b1e49a4e2da94eaa58d5e53f3d7961ca8ac8599ff8f99ef7464bf0a",
+    "apps/api/src/caliburn/agents/job_consultant/reference_instructions.py": "e5a0d0eb393fd8d32c8d789523f72cf3c1281ff30888efb01c1b94a57389668f",
+    "apps/api/contracts/tools/occupation-reference-write-result.schema.json": "d7faa92e72cfa88fcf52a290106c68ed7919d037a9f643db6043e40d2b410822",
+    "apps/api/contracts/tools/select-occupation-references-arguments.schema.json": "1d300c6887b2c27a6cc3ccc89b1e5e428ac39a7886e74385c1555fc45ef2ebea",
+    "apps/api/contracts/tools/read-occupation-reference-arguments.schema.json": "80fed574ef17ba28e18d02f236de5920a2d4dfc33e76d02572f44b43a98d747c"
+  },
+  "selection_description": "以已讀公版的精確 reference_ids 取代全部選用集合；要保留的舊 ID 一併填入，不是追加。可多選或 []。這是參考選擇，不是認定員工職稱；未選不代表員工否認。保留已有排除工作範圍，成功僅更新本輪候選，整輪成功完成後才可供後續使用。成功只回 {\"status\":\"updated\"}；需要完整 state 時再按需讀取。",
+  "selection_parameter_description": "本次完整選用集合，取代舊集合；要保留的舊 reference_id 必須一起填入，不是追加。可多選；[] 表示看過但沒有適合的參考。不是認定員工職稱，也不表示未選公版的工作未做。",
+  "invalid_search": {
+    "status": "rejected",
+    "code": "invalid_arguments",
+    "message": "query 或搜尋欄位不合法，本次未執行搜尋。",
+    "next_action": "只填非空 query，最多 12,000 字元；使用本人已確認的主要工作，不填其他參數。"
+  },
+  "configured_read_limit_characters": 64,
+  "write_result_modes": {
+    "state": {
+      "write_result": {
+        "selected_reference_ids": null,
+        "excluded_work": [
+          "正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。"
+        ]
+      },
+      "write_result_characters": 244,
+      "read_result": {
+        "status": "rejected",
+        "code": "read_limit_exceeded",
+        "message": "完整公版資料超過工具輸出容量，未回傳截斷內容。",
+        "next_action": "資料容量由 App 處理，不視為已讀或沒有相關任務。"
+      },
+      "saved_command_unchanged": true,
+      "saved_scope_characters": 192
+    },
+    "status": {
+      "write_result": {
+        "status": "updated"
+      },
+      "write_result_characters": 20,
+      "read_result": {
+        "status": "rejected",
+        "code": "read_limit_exceeded",
+        "message": "完整公版資料超過工具輸出容量，未回傳截斷內容。",
+        "next_action": "資料容量由 App 處理，不視為已讀或沒有相關任務。"
+      },
+      "saved_command_unchanged": true,
+      "saved_scope_characters": 192
+    }
+  },
+  "limits": [
+    "Character count only, not tokens, latency or JD quality.",
+    "Legacy requests intentionally retain their original larger result.",
+    "Synthetic low capacity, not a measured production incident."
+  ]
+}

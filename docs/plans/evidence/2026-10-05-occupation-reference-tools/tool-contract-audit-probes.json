@@ -1,0 +1,59 @@
+{
+  "scope": "offline_contract_audit_using_existing_in_memory_fixtures",
+  "source_sha256": {
+    "apps/api/tests/unit/test_occupation_reference_tools.py": "3a525c6ab944357c8e99861f59ad43a7d56e2e88da3f582b4f7e0245c09f4c8b",
+    "docs/plans/evidence/2026-10-05-occupation-reference-tools/audit_tool_contracts.py": "4ab7c7e398f2766a218f136c98d027ffa78773a709c46f74a5c47be1a7c33ca6",
+    "apps/api/src/caliburn/transport/model_tools/occupation_references.py": "9f65f51670b3b386a9e78ff53aeafab440b9f868a5aefc5efe7d7a33e5d9c811",
+    "apps/api/src/caliburn/agents/job_consultant/reference_instructions.py": "bc979251b1b314b28a519b6ce44af4c925bd29b57b167fdcbc8b58567dc19145",
+    "apps/api/contracts/tools/select-occupation-references-arguments.schema.json": "6142222660b91a164742a31e0e69ab139a5cd564f19501e5d54d76599e0d45ee",
+    "apps/api/contracts/tools/tool-rejection.schema.json": "f66f63f03b9737ecddf7fe567b6e7d18929d5e0bec19f1d0c8d01eb054532da3"
+  },
+  "invalid_query": {
+    "tool": "search_occupation_references",
+    "arguments": {
+      "query": "   "
+    },
+    "result": {
+      "status": "rejected",
+      "code": "invalid_arguments",
+      "message": "參數、公版定位或排除範圍更新不合法，本次未改。",
+      "next_action": "使用工具定義的欄位；移除請用已有排除範圍的精確文字，add/remove 不重疊且至少一項非空。"
+    },
+    "external_calls": []
+  },
+  "selection_replacement": {
+    "before": [
+      "ref_frontend",
+      "ref_backend"
+    ],
+    "requested": [
+      "ref_frontend"
+    ],
+    "after": [
+      "ref_frontend"
+    ],
+    "scope": "actual_domain_function_with_synthetic_reference_ids"
+  },
+  "write_result_capacity": {
+    "configured_max_result_characters": 64,
+    "read_result": {
+      "status": "rejected",
+      "code": "read_limit_exceeded",
+      "message": "完整公版資料超過工具輸出容量，未回傳截斷內容。",
+      "next_action": "資料容量由 App 處理，不視為已讀或沒有相關任務。"
+    },
+    "write_result": {
+      "selected_reference_ids": null,
+      "excluded_work": [
+        "正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。正式環境部署由維運負責。"
+      ]
+    },
+    "write_result_characters": 244,
+    "scope": "actual_tool_handler_with_simulated_successful_workflow_no_database_write"
+  },
+  "limits": [
+    "No production changes, database, HTTP, GPU or model calls.",
+    "The small capacity reproduces a handler boundary; not a measured production incident.",
+    "Successful existing tests establish wire behavior, not model usability or prompt quality."
+  ]
+}

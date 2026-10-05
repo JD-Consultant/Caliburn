@@ -23,6 +23,10 @@ from caliburn.features.job_description.model_reference_persistence import JdMode
 from caliburn.features.job_description.persistence import JdRevisionRecord
 from caliburn.features.job_description.source_persistence import JdSourceReferenceRecord
 from caliburn.features.job_files.persistence import JobFileRecord
+from caliburn.features.occupation_references.persistence import (
+    ReferenceCandidateRecord,
+    ReferenceOperationRecord,
+)
 from caliburn.features.work_memory.batch_persistence import MemoryBatchRecord
 from caliburn.features.work_memory.position_persistence import MemoryPositionRecord
 from caliburn.features.work_memory.revision_persistence import MemoryObjectRevisionRecord
@@ -63,6 +67,14 @@ assert (
     is target_metadata.tables[JdSourceReferenceRecord.__tablename__]
 )
 assert JdCandidateRecord.__table__ is target_metadata.tables[JdCandidateRecord.__tablename__]
+assert (
+    ReferenceCandidateRecord.__table__
+    is target_metadata.tables[ReferenceCandidateRecord.__tablename__]
+)
+assert (
+    ReferenceOperationRecord.__table__
+    is target_metadata.tables[ReferenceOperationRecord.__tablename__]
+)
 assert MemoryObjectRevisionRecord.__table__ is target_metadata.tables["memory_object_revisions"]
 assert MemoryPositionRecord.__table__ is target_metadata.tables["memory_positions"]
 assert MemoryBatchRecord.__table__ is target_metadata.tables["memory_batches"]

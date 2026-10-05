@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SelectOccupationReferencesArguments",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "reference_ids": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"},
+      "description": "本次完整選用集合，取代舊集合；要保留的舊 reference_id 必須一起填入，不是追加。可多選；[] 表示看過但沒有適合的參考。不是認定員工職稱，也不表示未選公版的工作未做。"
+    }
+  },
+  "required": ["reference_ids"]
+}

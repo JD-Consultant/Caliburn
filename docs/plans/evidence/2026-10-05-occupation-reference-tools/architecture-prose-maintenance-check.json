@@ -1,0 +1,321 @@
+{
+  "status": "passed",
+  "checked_at_utc": "2026-10-05T10:50:47.373406+00:00",
+  "scope": "22 份主要文件整體敘述及計畫維護紀錄；純文件檢查，不代表模型、服務或產品品質驗證",
+  "supersedes_previous_result": false,
+  "previous_check": "architecture-maintenance-check.json",
+  "main_document_count": 22,
+  "maintenance_record": {
+    "path": "docs/plans/2026-10-05-occupation-reference-tools.md",
+    "sha256": "d0fa909a532fbb3b751fd1f342092ced43d671c525f68fc21910560e48f73e71"
+  },
+  "local_links_checked": 545,
+  "anchors_checked": 131,
+  "external_links_not_requested": 114,
+  "git_diff_check": {
+    "command": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "docs/README.md",
+      "docs/target-architecture-map.md",
+      "docs/product-concept.md",
+      "docs/specs/README.md",
+      "docs/implementation/README.md",
+      "docs/implementation/data-and-contracts.md",
+      "docs/implementation/agent-execution.md",
+      "docs/implementation/interface-and-delivery.md",
+      "docs/architecture/system-boundaries.md",
+      "docs/architecture/design-decisions.md",
+      "docs/architecture/persistence.md",
+      "docs/architecture/delivery-and-operations.md",
+      "docs/architecture/verification.md",
+      "docs/reports/system-architecture/README.md",
+      "docs/reports/system-architecture/01-purpose.md",
+      "docs/reports/system-architecture/02-system-overview.md",
+      "docs/reports/system-architecture/03-components.md",
+      "docs/reports/system-architecture/04-agent-execution.md",
+      "docs/reports/system-architecture/05-work-memory.md",
+      "docs/reports/system-architecture/06-jd-and-recovery.md",
+      "docs/reports/system-architecture/07-evaluation.md",
+      "docs/reports/system-architecture/references.md",
+      "docs/plans/2026-10-05-occupation-reference-tools.md"
+    ],
+    "exit_code": 0
+  },
+  "documents": [
+    {
+      "path": "docs/README.md",
+      "before_sha256": "167cc635e54aa6c2ea7d8e481eb76ffbc8936a2ab52127ad99fa872749560082",
+      "after_sha256": "b4738322aeea47831d53f41408c3742e84d7f9d4cf98c44a02df1ad544f9bb1b",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/target-architecture-map.md",
+      "before_sha256": "f194fdf4aa4ba39d6acdcad8de64b5bbd89dacc82112ce47cad63aa3acd9cfa7",
+      "after_sha256": "e4276dd71f265e60a03838cc1fa26682fe4bcffa28d6d98bc2ad0367dbb962d5",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/product-concept.md",
+      "before_sha256": "57942ba745ffaabf41208c422714b755f7658fa488636aa3c3308a67beaf0758",
+      "after_sha256": "c2ecb97bcbb1f3be26cebb37173cc1db7502cf5b9bb489e7ecd97d2340f8bfb2",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/specs/README.md",
+      "before_sha256": "e40f7d405d3bc98e9929f97102408fad2779bf1fd1365164b564857939acef9b",
+      "after_sha256": "d678b0ad1c31ac8c8b2a41380d82b7aa063723f7aa2f93a63efe5604c25ff36c",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/implementation/README.md",
+      "before_sha256": "cfff8bc6d0a961ef3a294fdfcd7c3eadacfcfd2102db416224a7c39a79383cf7",
+      "after_sha256": "be550187884a0218e7ce69f92eded76cfbfb186dcf1d32c3f06c835f5fc69913",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/implementation/data-and-contracts.md",
+      "before_sha256": "695f630ca83f52c8bba63b52e8b112b83114a0f0e8bf79c869aa632eddd21eea",
+      "after_sha256": "fe6439c034db197003b335bbbffa574fbfa2c19f0dd63924e445c0cf2b59f023",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/implementation/agent-execution.md",
+      "before_sha256": "758fb21da35be914a8733ec69c9e52c5a7e7d2f681afe57ee67c667f707bed44",
+      "after_sha256": "46acfb1d3f532c0a4a59ed4f0f103c3f2d8ab8f2774ee284d4ce2883b232eebe",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/implementation/interface-and-delivery.md",
+      "before_sha256": "b24dbd58c4d0fc1275aeac7a739b50291fe551bfaf32461d96759812a269d872",
+      "after_sha256": "ae169d4580c52272308d560c17552d4be0b4bf9c20301d4d3e69f8d0dfbf6aa6",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/architecture/system-boundaries.md",
+      "before_sha256": "091ae25153c7b0586bdc5614110f89e9687cdb86add606691bfb0d25197610ea",
+      "after_sha256": "dcbcdac63a5cc38f61ac47579d1d98a53d30189db03e0a08c1ea9d2777ae2bf5",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/architecture/design-decisions.md",
+      "before_sha256": "3df5f50afab24499035d6632a7fc0c256e8bf057e7ad9c745beb28a93ac94cad",
+      "after_sha256": "b088c4889bac39982beabc823473937f24b446172237e73e90d3df8b890bfb47",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/architecture/persistence.md",
+      "before_sha256": "ad9b3c08bac52adce7c449259e949dc18281f0fd9f5fe77b4245c107b86e9ad0",
+      "after_sha256": "fe3a3802c0a4dfdf264ee042b50c5d464af4dcfa4f7d98cc01e4f5d71f8154e1",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/architecture/delivery-and-operations.md",
+      "before_sha256": "30bd576767be1ff5e9e6d5abe8176913a22a1391f003db120321bc96973205af",
+      "after_sha256": "5c3b869dc6ac537182d013f367562bfe28aacb5f20a39a41455d415280b48124",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/architecture/verification.md",
+      "before_sha256": "c9fc29dda4bafbf338f4b0d53bec5f6b6c4e669056b57c903a9633fa64a5618c",
+      "after_sha256": "26ecceec8cda581dcf320dba19f1514d24e0ca709ca227b7ec7d8ac2fb123289",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/reports/system-architecture/README.md",
+      "before_sha256": "af9b09d4c3c961d99a20eb7675c698da8a2b539f7dfbfe95e07b9bdebd8f48c8",
+      "after_sha256": "176289339acae2bfa68ee84256db7b338c80673f509cca22b89fa1e1deb37cb7",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/reports/system-architecture/01-purpose.md",
+      "before_sha256": "537e0102cdd241d5d10e53212ce13a4c55688c31f0e23c1393bc8922f048984c",
+      "after_sha256": "c2d57cc3d369807d03cf6409619d55994eceb5deca29799cb34376fef243d884",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/reports/system-architecture/02-system-overview.md",
+      "before_sha256": "a6c414e7d4e16083fe48819c53cd6069a34f4e7281910ea3cf1a61b05c1187d9",
+      "after_sha256": "2ef8deeb49600bcf89ab1e13245066eb203155accd57d31901421fa6be0c2910",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/reports/system-architecture/03-components.md",
+      "before_sha256": "32e500785cd979da35264e1464f0e082278ab103cd703fd1fce7a92b9aec01a1",
+      "after_sha256": "1512f01914e3faad30662b538a07c7bd396c2f90a2e2dd1ff5c8cf8fb32702f7",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/reports/system-architecture/04-agent-execution.md",
+      "before_sha256": "cac962fd5f96c60999eb9368115068883fd14d8a81fa3f48858fb16d77fdfe7d",
+      "after_sha256": "ced2b2671a01e779795c0815bbc2c2c0f60d6867386b66e4371c340810c63acd",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/reports/system-architecture/05-work-memory.md",
+      "before_sha256": "b1eb6fe15365454665720450ba9ba48fe108e823046671fbf72fdbac1ead08b9",
+      "after_sha256": "0bc5869b1242dfa3b928679c6905e98feeede06d37cdc5851f900e74a1437b35",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/reports/system-architecture/06-jd-and-recovery.md",
+      "before_sha256": "1910eccf1a49d953a26c66f1b29d038b3de0c01b2d4b207f27a39ba886627585",
+      "after_sha256": "4c146443fd41fb54985332c46eba717b2e29e866ccc132d12f9b6e50be45de46",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/reports/system-architecture/07-evaluation.md",
+      "before_sha256": "61a92f671c34ad3b05330e9971563361291965d54236c475817b6584e4c21063",
+      "after_sha256": "f196fd24fcc6746ff1adf9e9681dafc7771a3801d60319365b92221c7d5db342",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    },
+    {
+      "path": "docs/reports/system-architecture/references.md",
+      "before_sha256": "799e6fb9ffda55deb936de6d46c003eaf66ed3d01fc06b49d1b63aa2adb1fef1",
+      "after_sha256": "187a9aa8202a00cb855a4a223cab23c17d4d4b514517cf499799fbf54c499a02",
+      "checks": {
+        "headings_unchanged": true,
+        "code_fences_unchanged": true,
+        "existing_inline_code_preserved": true,
+        "existing_link_targets_preserved": true,
+        "numeric_tokens_preserved": true
+      }
+    }
+  ],
+  "manual_review": [
+    "入口分清產品、架構、設計契約、實作、操作及證據責任；詳細規則沿原責任文件維護。",
+    "現行 compaction 與尚未實作的輪前文字摘要分開標示，未改動 Accepted ADR。",
+    "獨立 RAG 非預設依賴；可選公版查讀沿 ADR0080，公版不是員工事實或自動完成門檻。",
+    "報告圖稿與所有既有程式區塊保留；基本部署圖的可選 RAG 路徑在正文註明。",
+    "檢索研究按變因列出，保留原數字、原件及有限樣本的適用範圍。"
+  ],
+  "failures": []
+}

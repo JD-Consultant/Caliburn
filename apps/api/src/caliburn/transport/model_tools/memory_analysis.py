@@ -18,6 +18,10 @@ from caliburn.features.work_memory.models import (
 )
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.transport.model_tools.contracts import reject_tool_call
+from caliburn.transport.model_tools.excluded_work_reads import (
+    ExcludedWorkReadTools,
+    excluded_work_read_definitions,
+)
 from caliburn.transport.model_tools.memory_reads import (
     MemoryReadTools,
     memory_read_definitions,
@@ -43,10 +47,15 @@ MEMORY_CHECKPOINT_TYPES = (
 )
 
 
-def memory_analysis_tool_definitions(layer: MemoryLayer) -> list[FunctionToolParam]:
+def memory_analysis_tool_definitions(
+    layer: MemoryLayer,
+    *,
+    excluded_work_enabled: bool = False,
+) -> list[FunctionToolParam]:
     """Same contracts as bound tools, without persistence or a fabricated binding."""
     return [
         *memory_read_definitions(names=memory_read_names(layer)),
+        *(excluded_work_read_definitions() if excluded_work_enabled else []),
         *memory_write_definitions(layer),
     ]
 
@@ -55,17 +64,28 @@ def memory_analysis_tool_definitions(layer: MemoryLayer) -> list[FunctionToolPar
 class MemoryAnalysisTools:
     reads: MemoryReadTools
     writes: MemoryWriteTools
+    excluded_work: ExcludedWorkReadTools | None = None
 
     @property
     def names(self) -> tuple[str, ...]:
-        return (*self.reads.names, *self.writes.names)
+        return (
+            *self.reads.names,
+            *(self.excluded_work.names if self.excluded_work is not None else ()),
+            *self.writes.names,
+        )
 
     def definitions(self) -> list[FunctionToolParam]:
-        return [*self.reads.definitions(), *self.writes.definitions()]
+        return [
+            *self.reads.definitions(),
+            *(self.excluded_work.definitions() if self.excluded_work is not None else []),
+            *self.writes.definitions(),
+        ]
 
     async def prepare(self, call: ResponseFunctionToolCall, operation_id: UUID) -> object:
         if call.name in self.reads.names:
             return await self.reads.invoke(call.name, call.arguments)
+        if self.excluded_work is not None and call.name in self.excluded_work.names:
+            return await self.excluded_work.invoke(call.name, call.arguments)
         if call.name in self.writes.names:
             return await self.writes.prepare(call.name, call.arguments, command_id=operation_id)
         return reject_tool_call(

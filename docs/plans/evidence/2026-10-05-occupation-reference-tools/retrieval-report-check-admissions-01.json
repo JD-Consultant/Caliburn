@@ -1,0 +1,35 @@
+{
+  "scope": "Local source transcription and arithmetic only; incomplete qrels and historical model grades preserved",
+  "table_B28": {
+    "rows": 8,
+    "b1_query_pair_multiple": 4.482474226804124,
+    "known_pairs": 12,
+    "known_facets": 8,
+    "unassessed_case": "H01"
+  },
+  "table_B29": {
+    "rows": 4,
+    "candidate_pair_reduction_percent": 31.57894736842105,
+    "all_configurations": 7038,
+    "eligible_configurations": 3325,
+    "eligible_sensitivity_full_coverage": 0,
+    "unrestricted_sensitivity_full_coverage": 20,
+    "zero_weak_max_known_facets": 5
+  },
+  "table_B30": {
+    "rows": 3,
+    "variant_results": 24,
+    "short_negation_probe_in_top5": 2,
+    "interpretation": "Three fixed contrasts, not an estimated employee failure rate"
+  },
+  "local_evidence_links_checked": 17,
+  "not_verified": [
+    "semantic truth",
+    "full-corpus recall",
+    "fresh latency",
+    "consultant or JD quality"
+  ],
+  "revision_purpose": "Admissions-facing prose: results first; methods and scope retained; no experiment data changes",
+  "report_sha256": "ce23aa5108f488407d6b40b5fe970a8a4ddf92534ac27bb1dfbd984302546d7e",
+  "verifier_sha256": "d47f9c102ff2d41c078d8a6af23d948015f4975417ed790cc9ab7e588124ab6f"
+}

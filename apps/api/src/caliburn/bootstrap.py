@@ -4,12 +4,14 @@ from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack, asynccontextmanager
 from functools import partial
 
+import httpx2
 from fastapi import FastAPI
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.adapters.occupation_references import OccupationReferenceClient
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.adapters.pdf_renderer import PdfRenderer
 from caliburn.adapters.process_lock import PostgresProcessLock
@@ -20,7 +22,7 @@ from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
 from caliburn.features.executions.models import ExecutionScope, ExecutionStatus
-from caliburn.settings import ModelSettings, Settings
+from caliburn.settings import ModelSettings, OccupationReferenceSettings, Settings
 from caliburn.transport.http.consultant_activity import router as consultant_activity_router
 from caliburn.transport.http.consultant_turns import router as consultant_turn_router
 from caliburn.transport.http.health import router as health_router
@@ -162,7 +164,14 @@ async def _start_database_runtime(
     await saver.setup()
     app.state.consultant_status_workflow = ConsultantStatusWorkflow(database.sessions, saver)
     if configured.model is not None:
-        await _start_model_runtime(app, configured.model, database, saver, resources)
+        await _start_model_runtime(
+            app,
+            configured.model,
+            database,
+            saver,
+            resources,
+            occupation_references=configured.occupation_references,
+        )
 
 
 async def _start_model_runtime(
@@ -171,12 +180,25 @@ async def _start_model_runtime(
     database: Database,
     saver: AsyncPostgresSaver,
     resources: AsyncExitStack,
+    *,
+    occupation_references: OccupationReferenceSettings | None = None,
 ) -> None:
     """Start the consultant and Memory supervisors that share one local leader fence."""
     sdk = create_responses_client(
         api_key=model.api_key, timeout_seconds=model.request_timeout_seconds
     )
     resources.push_async_callback(sdk.close)
+    reference_client = None
+    if occupation_references is not None:
+        http_client = await resources.enter_async_context(
+            httpx2.AsyncClient(
+                base_url=occupation_references.base_url,
+                timeout=occupation_references.request_timeout_seconds,
+                trust_env=False,
+                follow_redirects=False,
+            )
+        )
+        reference_client = OccupationReferenceClient(http_client)
     hub: ConsultantCommentaryHub = app.state.consultant_commentary_hub
     activity_hub: ConsultantActivityHub = app.state.consultant_activity_hub
 
@@ -210,13 +232,26 @@ async def _start_model_runtime(
         model,
         on_commentary=publish_commentary,
         on_reasoning_summary=publish_reasoning_summary,
+        occupation_references=reference_client,
     )
     leader_lock = PostgresProcessLock(database.settings)
     memory_batch = MemoryBatchWorkflow(
         database.sessions,
         run_role=MemoryRoleDispatch(
-            WorkSituationAnalystRunner(database.sessions, saver, sdk, model),
-            WorkUnderstandingAnalystRunner(database.sessions, saver, sdk, model),
+            WorkSituationAnalystRunner(
+                database.sessions,
+                saver,
+                sdk,
+                model,
+                excluded_work_enabled=reference_client is not None,
+            ),
+            WorkUnderstandingAnalystRunner(
+                database.sessions,
+                saver,
+                sdk,
+                model,
+                excluded_work_enabled=reference_client is not None,
+            ),
         ),
     )
     memory_supervisor = MemorySupervisor(
@@ -250,8 +285,8 @@ async def _start_model_runtime(
     app.state.consultant_control_workflow = ConsultantControlWorkflow(
         database.sessions, saver, supervisor
     )
-    # LIFO cleanup stops Memory before releasing the shared leader fence, then SDK/saver,
-    # then database. No second leader or queue is created.
+    # LIFO cleanup stops Memory before releasing the shared leader fence, then external
+    # clients/saver, then database. No second leader or queue is created.
     resources.push_async_callback(memory_supervisor.close)
     await memory_supervisor.start()
     app.state.memory_supervisor = memory_supervisor

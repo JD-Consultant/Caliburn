@@ -1,5 +1,6 @@
 {
   "name": "@caliburn/ocs-indexer",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "test": "uv run --all-extras pytest -q",

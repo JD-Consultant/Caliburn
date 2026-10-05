@@ -1,6 +1,7 @@
 [project]
 name = "indexer-contract"
 version = "0.1.0"
+license = "MIT"
 description = "Caliburn indexer query-API contract — shared pydantic wire models (ocs-indexer ⇄ api)"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2.9,<3"]

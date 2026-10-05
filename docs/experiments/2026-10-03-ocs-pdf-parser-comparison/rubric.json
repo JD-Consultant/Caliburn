@@ -1,0 +1,42 @@
+{
+  "revision": 2,
+  "revision_reason": "Initial scoring required exactly seven grid columns and confused extra empty grid columns with semantic loss. Revision 2 scores ordered separate cells in the same row; the source expectations are unchanged. Camelot lattice is a separately reported diagnostic arm added after observing line-split rows from auto. No Docling trial had run at revision 2.",
+  "normalization": "Remove whitespace only for anchor matching; raw output is retained unchanged. This does not assess English word spacing.",
+  "row_checks": [
+    {"id":"01", "page":2, "task":"T1.2", "level":"3", "indicator":"P1.2.5", "knowledge":"K17", "skill":"S20"},
+    {"id":"01", "page":2, "task":"T2.1", "level":"3", "indicator":"P2.1.4", "knowledge":"K19", "skill":"S22"},
+    {"id":"02", "page":2, "task":"T2.1", "level":"4", "indicator":"P2.1.2", "knowledge":"K07", "skill":"S05"},
+    {"id":"02", "page":2, "task":"T2.3", "level":"3", "indicator":"P2.3.3", "knowledge":"K09", "skill":"S09"},
+    {"id":"03", "page":4, "task":"T3.2", "level":"6", "indicator":"P3.2.3", "knowledge":"K33", "skill":"S23"},
+    {"id":"04", "page":2, "task":"T1.2", "level":"5", "indicator":"P1.2.2", "knowledge":"K17", "skill":"S08"},
+    {"id":"04", "page":2, "task":"T2.1", "level":"5", "indicator":"P2.1.3", "knowledge":"K19", "skill":"S11"},
+    {"id":"05", "page":2, "task":"T1.1", "level":"3", "indicator":"P1.1.1", "knowledge":"K04", "skill":"S03"},
+    {"id":"05", "page":2, "task":"T1.2", "level":"3", "indicator":"P1.2.1", "knowledge":"K06", "skill":"S06"},
+    {"id":"05", "page":2, "task":"T2.1", "level":"3", "indicator":"P2.1.2", "knowledge":"K11", "skill":"S09"},
+    {"id":"06", "page":2, "task":"T1.2", "level":"3", "indicator":"P1.2.4", "knowledge":"K06", "skill":"S09"},
+    {"id":"06", "page":2, "task":"T2.1", "level":"4", "indicator":"P2.1.1", "knowledge":"K08", "skill":"S11"},
+    {"id":"07", "page":3, "task":"T3.3", "level":"4", "indicator":"P3.3.1", "knowledge":"K15", "skill":"S26"},
+    {"id":"08", "page":2, "task":"T1.3", "level":"4", "indicator":"P1.3.6", "knowledge":"K11", "skill":"S12"},
+    {"id":"08", "page":2, "task":"T1.4", "level":"3", "indicator":"P1.4.2", "knowledge":"K10", "skill":"S14"},
+    {"id":"09", "page":2, "task":"T1.3", "level":"5", "indicator":"P1.3.2", "knowledge":"K13", "skill":"S11"},
+    {"id":"09", "page":2, "task":"T2.1", "level":"5", "indicator":"P2.1.1", "knowledge":"K14", "skill":"S07"},
+    {"id":"10", "page":2, "task":"T1.2", "level":"4", "indicator":"P1.2.3", "knowledge":"K06", "skill":"S06"},
+    {"id":"10", "page":2, "task":"T1.3", "level":"3", "indicator":"P1.3.1", "knowledge":"K06", "skill":"S06"},
+    {"id":"10", "page":2, "task":"T2.1", "level":"4", "indicator":"P2.1.1", "knowledge":"K07", "skill":"S09"}
+  ],
+  "text_checks": [
+    {"id":"01", "page":5, "label":"3D正文數字", "text":"3D列印技術：如FDM"},
+    {"id":"01", "page":5, "label":"補充末尾", "text":"Polyjet（彩色噴墨）等。"},
+    {"id":"02", "page":4, "label":"註2續行", "text":"珠寶設計標準作業流程。"},
+    {"id":"02", "page":4, "label":"註4續行", "text":"製作與材料相關知識、珠寶製作標準作業流程。"},
+    {"id":"03", "page":4, "label":"未編碼態度", "text":"配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"},
+    {"id":"03", "page":4, "label":"DFX補充", "text":"DFX(指設計時考慮製造、組裝、品管、測試、成本等等因素)。"},
+    {"id":"04", "page":5, "label":"未編碼態度", "text":"配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"},
+    {"id":"07", "page":3, "label":"英文原文", "text":"Financial technology, 縮寫: FinTech"}
+  ],
+  "continuation_checks": [
+    {"id":"02", "page":2, "column":3, "code":"P1.1.3", "tail":"見，精進設計構想。"},
+    {"id":"06", "page":2, "column":3, "code":"P1.1.3", "tail":"公差與配合等。"},
+    {"id":"08", "page":2, "column":3, "code":"P1.2.4", "tail":"有效性。"}
+  ]
+}

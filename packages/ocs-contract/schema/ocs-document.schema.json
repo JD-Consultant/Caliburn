@@ -110,7 +110,7 @@
         "ocs_name": { "allOf": [{ "$ref": "#/$defs/OcsName" }], "default": {} },
         "category": { "allOf": [{ "$ref": "#/$defs/Category" }], "default": {} },
         "job_description": { "type": "string" },
-        "ocs_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 },
+        "ocs_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 },
         "_pending": {
           "type": "object",
           "additionalProperties": true,
@@ -127,7 +127,7 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "competency_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 },
+        "competency_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 },
         "_pending": {
           "type": "object",
           "additionalProperties": true,

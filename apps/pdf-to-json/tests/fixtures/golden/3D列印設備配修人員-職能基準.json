@@ -4,7 +4,7 @@
       "高中（職）以上畢業或具備1年以上工作經驗者。"
     ],
     "supplements": [
-      "D列印技術：如FDM（熱融堆疊）、SLA／DLP／LCD（光固化）與SLS（雷射粉末燒結）、MJF（多射流熔融）、Polyjet（彩色噴墨）等。"
+      "3D列印技術：如FDM（熱融堆疊）、SLA／DLP／LCD（光固化）與SLS（雷射粉末燒結）、MJF（多射流熔融）、Polyjet（彩色噴墨）等。"
     ]
   },
   "ocs_attitude": {
@@ -79,7 +79,7 @@
                   {
                     "code": "K01",
                     "field_pending": null,
-                    "name": "3D列印技術原理及設備 結構理論"
+                    "name": "3D列印技術原理及設備結構理論"
                   },
                   {
                     "code": "K02",
@@ -129,7 +129,7 @@
                   {
                     "code": "K12",
                     "field_pending": null,
-                    "name": "系統整合與相容性評估理 論"
+                    "name": "系統整合與相容性評估理論"
                   }
                 ],
                 "outputs": [],
@@ -243,7 +243,7 @@
                   {
                     "code": "K01",
                     "field_pending": null,
-                    "name": "3D列印技術原理及設備 結構理論"
+                    "name": "3D列印技術原理及設備結構理論"
                   },
                   {
                     "code": "K03",
@@ -370,7 +370,7 @@
                   {
                     "code": "K01",
                     "field_pending": null,
-                    "name": "3D列印技術原理及設備 結構理論"
+                    "name": "3D列印技術原理及設備結構理論"
                   },
                   {
                     "code": "K04",
@@ -385,7 +385,7 @@
                   {
                     "code": "K10",
                     "field_pending": null,
-                    "name": "3D列印故障類型及成因 分析"
+                    "name": "3D列印故障類型及成因分析"
                   },
                   {
                     "code": "K18",
@@ -475,7 +475,7 @@
                   {
                     "code": "K01",
                     "field_pending": null,
-                    "name": "3D列印技術原理及設備 結構理論"
+                    "name": "3D列印技術原理及設備結構理論"
                   },
                   {
                     "code": "K05",
@@ -645,7 +645,7 @@
                   {
                     "code": "K01",
                     "field_pending": null,
-                    "name": "3D列印技術原理及設備 結構理論"
+                    "name": "3D列印技術原理及設備結構理論"
                   },
                   {
                     "code": "K05",
@@ -752,7 +752,7 @@
                   {
                     "code": "K01",
                     "field_pending": null,
-                    "name": "3D列印技術原理及設備 結構理論"
+                    "name": "3D列印技術原理及設備結構理論"
                   },
                   {
                     "code": "K05",
@@ -762,7 +762,7 @@
                   {
                     "code": "K10",
                     "field_pending": null,
-                    "name": "3D列印故障類型及成因 分析"
+                    "name": "3D列印故障類型及成因分析"
                   }
                 ],
                 "outputs": [
@@ -837,7 +837,7 @@
                   {
                     "code": "K01",
                     "field_pending": null,
-                    "name": "3D列印技術原理及設備 結構理論"
+                    "name": "3D列印技術原理及設備結構理論"
                   },
                   {
                     "code": "K05",
@@ -847,7 +847,7 @@
                   {
                     "code": "K10",
                     "field_pending": null,
-                    "name": "3D列印故障類型及成因 分析"
+                    "name": "3D列印故障類型及成因分析"
                   },
                   {
                     "code": "K15",

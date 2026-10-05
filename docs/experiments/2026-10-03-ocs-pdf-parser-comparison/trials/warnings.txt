@@ -1,0 +1,2 @@
+Docling on case 09 emitted: MatchingPostProcessor WARNING 2 of 34 pdf cells matched neither a row nor a column band of the 8x5 grid and were dropped from the table. The returned conversion status remained SUCCESS. The warning was not used as an independently verified text-loss score.
+Camelot auto initial run: atexit temporary-directory cleanup raised PermissionError (WinError 5); extraction calls and output succeeded. Later lattice/stacking runs used an explicit writable temporary directory without those cleanup errors.

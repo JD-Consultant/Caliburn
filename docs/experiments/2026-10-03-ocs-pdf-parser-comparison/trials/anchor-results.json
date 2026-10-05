@@ -1,0 +1,2596 @@
+[
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "01",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.5",
+      "knowledge": "K17",
+      "skill": "S20"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.2 校 準\n及調試設\n備",
+        "O1.2.1 驗\n收報告\nO1.2.2 設\n備基本資\n料檔案",
+        "P1.2.1執行設備校準，符合設備基線數據與性能\n標準，確保列印品質達到規格要求。\nP1.2.2進行轉檔、列印測試，驗證設備各項功能\n正常運作，並優化初始列印參數設定。\nP1.2.3撰寫安裝驗收報告，確認設備功能符合規\n格要求。\nP1.2.4協助使用者熟悉原廠操作手冊內容，並提\n供現場操作指導與注意事項說明。\nP1.2.5建立設備基本資料檔案，以利後續設備維\n護管理作業。",
+        "3",
+        null,
+        null,
+        "K01 3D列印技術原理及設備\n結構理論\nK03 3D設備校準程序\nK04 3D加工參數\nK05材料科學及3D材料特性\nK08品質標準及安全規範\nK13測試驗證方法論\nK14技術文件撰寫規範\nK17品質管制統計方法",
+        null,
+        null,
+        "S01 3D列印技術類型辨識能力\nS02 3D列印設備組裝與拆解能力\nS07設備控制介面校準能力\nS08問題解決能力\nS20檔案建立與管理能力",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "01",
+      "page": 2,
+      "task": "T2.1",
+      "level": "3",
+      "indicator": "P2.1.4",
+      "knowledge": "K19",
+      "skill": "S22"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2品質檢\n測及設備\n維護",
+        "T2.1 診 斷\n及排除設\n備異常狀\n況",
+        "O2.2.1 維\n修紀錄文\n件",
+        "P2.1.1運用多元診斷方法，系統性分析設備異常\n現象，判斷故障類型與原因。\nP2.1.2依據判斷結果，檢修設備，更換損壞的零\n件，排除故障、測試並維持正常運作。\nP2.1.3協助使用者更新設備軟體，並解決驅動程\n式或切片軟體相關問題。\nP2.1.4記錄維修過程的資訊，並建立維修作業管\n理文件。",
+        "3",
+        null,
+        null,
+        "K01 3D列印技術原理及設備\n結構理論\nK04 3D加工參數\nK05材料科學及3D材料特性\nK10 3D列印故障類型及成因\n分析\nK18設備維修理論與診斷原理\nK19軟體管理知識",
+        null,
+        null,
+        "S07設備控制介面校準能力\nS08問題解決能力\nS13故障排除能力\nS18軟體更新與驅動程式處理能力\nS21多元診斷方法應用能力\nS22維修與保養紀錄撰寫能力",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.2",
+      "knowledge": "K07",
+      "skill": "S05"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2設計珠\n寶與物件",
+        "T2.1珠寶\n與物件設\n計創意發\n想",
+        "",
+        "P2.1.1確認「設計專案」中的相關物件與工作範\n疇，蒐集、分析珠寶與物件設計、原物料\n與產品趨勢，並判定材料開發過程，對環\n境造成的衝擊及永續影響評估。\nP2.1.2運用創意設計工具與技巧發展設計概念。",
+        "4",
+        null,
+        null,
+        "K01珠寶屬性相關知識\nK02創意、設計相關知識\nK05色彩學\nK06珠寶創作相關知識【註3】\nK07珠寶、飾品製作相關知識【註\n4】",
+        null,
+        null,
+        "S02創意設計能力\nS04資料蒐集與分析\nS05統籌規劃能力",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "task": "T2.3",
+      "level": "3",
+      "indicator": "P2.3.3",
+      "knowledge": "K09",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T2.3完成\n3D設計初\n稿",
+        "O2.3.1 3D\n設計初稿",
+        "P2.3.1應用珠寶相關軟體繪製3D渲染圖，並於\n圖面標示尺寸、珠寶材質、工法。\nP2.3.2交付3D珠寶設計初稿與客戶進行討論並\n修正初稿。\nP2.3.3進行存檔與備份。",
+        "3",
+        null,
+        null,
+        "K01珠寶屬性相關知識\nK02創意、設計相關知識\nK05色彩學\nK08繪圖相關知識\nK09模型概念",
+        null,
+        null,
+        "S01溝通協調能力\nS07 3D繪圖能力\nS08觀察和解析能力\nS09色彩應用與繪圖技巧",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "task": "T3.2",
+      "level": "6",
+      "indicator": "P3.2.3",
+      "knowledge": "K33",
+      "skill": "S23"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T3.2進行\n設計製整\n合及檢測\n與驗證規\n劃",
+        "O3.2.1完\n成機械系\n統設計與\n製造\nO3.2.2完\n成檢測與\n驗證",
+        "P3.2.1掌握新興技術與市場趨勢。\nP3.2.2訂定符合產業需求之產品規格。\nP3.2.3完成機械系統整合設計。",
+        "6",
+        null,
+        null,
+        "K30 機器動力整合分析\nK31 機械結構分析\nK32 智慧化機電整合\nK33 智慧化檢測及驗證",
+        null,
+        null,
+        "S21 整機架構與系統分析能力\nS22 智慧化機電整合能力\nS23 智慧化系統檢測及驗證能力",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "04",
+      "page": 2,
+      "task": "T1.2",
+      "level": "5",
+      "indicator": "P1.2.2",
+      "knowledge": "K17",
+      "skill": "S08"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.2學習\n機械工程\n專業知\n識、術\n語、構\n造、用途\n及設計程\n序",
+        "O1.2.1機\n械名稱\nO1.2.2機\n械構造\nO1.2.3機\n械組成",
+        "P1.2.1具重要的機械工程專業術語、構造、用途\n與組成之基本概念。\nP1.2.2具機械設計程序和各式機械原理。",
+        "5",
+        null,
+        null,
+        "K08機械工程概要與基礎原理\nK09熱流與能源基本原理\nK10力學與設計基本原理\nK11控制與自動化基本原理\nK12製造與材料基本原理\nK13機械元件基本原理\nK14機器手臂基本原理\nK15感測器基本原理\nK16致動器基本原理\nK17智慧型機電整合基本原理",
+        null,
+        null,
+        "S04機械常識\nS05機械構造組成能力\nS06機械設計基礎能力\nS07機械應用能力\nS08智慧機電整合基礎能力",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "04",
+      "page": 2,
+      "task": "T2.1",
+      "level": "5",
+      "indicator": "P2.1.3",
+      "knowledge": "K19",
+      "skill": "S11"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2智慧機\n電整合設\n計",
+        "T2.1邏輯\n分析、程\n式設計與\n人機介面\n機電整合",
+        "O2.1.1機\n電整合之\nPLC數位\n邏輯程式\nO2.1.2電\n腦程式\nO2.1.3機\n電系統之\n人機介面",
+        "P2.1.1熟悉邏輯分析。\nP2.1.2熟悉軟體設計。\nP2.1.3熟悉機電整合之控制器與人機介面。",
+        "5",
+        null,
+        null,
+        "K18數位邏輯與PLC程式設計\nK19計算機程式語言與撰寫",
+        null,
+        null,
+        "S09數位邏輯設計能力\nS10程式撰寫能力\nS11機電整合之人機介面規劃與\n編程能力",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T1.1",
+      "level": "3",
+      "indicator": "P1.1.1",
+      "knowledge": "K04",
+      "skill": "S03"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T1AIoT標\n準與應用\n趨勢研究",
+        "T1.1蒐集\n國際及國\n內AIoT\n相關標準",
+        "O1.1.1AI\noT相關軟\n硬體所具\n備之國際\n標準分析\n報告",
+        "P1.1.1能夠分析比較不同AIoT應用與所採用之\n產品（與其標準）優劣勢。",
+        "3",
+        "K01 AIoT系統基本架構\nK02 AIoT相關國際標準\nK03 基礎通訊原理\nK04 工業通訊標準",
+        "S01 資料搜集與分析能力\nS02 英文閱讀能力\nS03 瞭解判讀產品規格書能力"
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.1",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.2蒐集\n與分析\nAIoT應用\n發展趨勢",
+        "O1.2.1AI\noT現行應\n用與未來\n發展趨勢\n評估報告",
+        "P1.2.1能夠深入了解AIoT的現行應用領域與發\n展中技術，並從物聯網、感知系統、機\n器聯網、機器學習等應用場域整合的角\n度，系統性評估其未來創新潛力與技術\n演進方向。",
+        "3",
+        "K05 AIoT發展趨勢\nK06 AIoT應用案例",
+        "S01 資料搜集與分析能力\nS02 英文閱讀能力\nS03 瞭解判讀產品規格書能力\nS04 論壇與相關發表研讀能力\nS05 AIoT應用趨勢與需求分析\n能力\nS06 AIoT應用發展整合判斷能\n力"
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T2.1",
+      "level": "3",
+      "indicator": "P2.1.2",
+      "knowledge": "K11",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2AIoT系\n統需求分\n析與解決\n方案設計",
+        "T2.1客戶\n作業模式\n與流程分\n析",
+        "O2.1.1系\n統導入前\n後作業流\n程比較表",
+        "P2.1.1系統導入前後之作業模式差異分析。\nP2.1.2辨識既有機/電/感測設備導入現況。",
+        "3",
+        "K07 導入效益分析概念\nK08 作業原理\nK09 設備控制器與機構知識\nK10 機電整合\nK11 機器學習",
+        "S07 作業流程問題分析能力\nS08 流程最佳化\nS09 跨部門溝通與協調能力"
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.4",
+      "knowledge": "K06",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.2利用\nCAD進行\n製圖",
+        "O1.2.1零部件圖\nO1.2.2零部件組裝圖\nO1.2.3零件加工圖\nO1.2.4機構組立圖\n（2D/3D）\nO1.2.5機構組立零件表\nO1.2.6設計圖面輸出\nO1.2.7 PDM系統圖面\n存檔或更新\nO1.2.8設計變更資訊標\n註\nO1.2.9出圖Bom表\nO1.2.10木模圖\nO1.2.11鑄造圖\nO1.2.12刀具圖\nO1.2.13治具圖\nO1.2.14板金圖",
+        "P1.2.1利用3D CAD，製作軸、長方\n體、殼狀物（薄殼構造物）等\n基本機械零部件的外型，在顯\n示裝置上適當的進行表示。\nP1.2.2探討各零部件能否如設計宗旨\n一般進行組裝，正確判斷適當\n與否。\nP1.2.3産品的組裝圖確切的進行三維\n表示。\nP1.2.4在CAD軟體，能正確的標註\n表面粗糙度、尺寸公差、幾何\n公差。",
+        "3",
+        "K01 製圖種類（組裝圖、零部件\n組裝圖、零部件圖、詳細\n圖、工序圖等）\nK02 圖紙規格、圖紙規範、公差\n與配合\nK03 製圖理論（含：用語、規\n格、三視圖的辨識、前視圖、側\n視圖、透視圖等）\nK06電腦圖檔相關管理知識",
+        "S01 製圖用工具（儀器、規尺\n等）的使用方法\nS02 各種投影法、視圖的種類及\n看圖方法\nS03 電氣線路圖的種類及用途\n（系統圖、迴路圖、連接圖、配\n線圖等）\nS04 CAD的活用技術\nS05 CAD的種類、構成\nS06 2D繪圖/識圖能力\nS07 3D繪圖/識圖能力\nS08 數據互換的思路及互換方法\nS09 關於 CAD 的技術動向等"
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.1",
+      "knowledge": "K08",
+      "skill": "S11"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2機構的",
+        "T2.1設計",
+        "O2.1.1機構圖拆圖-細",
+        "P2.1.1總體理解機構設計所需的各種",
+        "4",
+        "K08 材料力學的知識",
+        "S11 機構設計的展開方式"
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "07",
+      "page": 3,
+      "task": "T3.3",
+      "level": "4",
+      "indicator": "P3.3.1",
+      "knowledge": "K15",
+      "skill": "S26"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T3.3 依據資料分\n析結果，從事風險\n控制或法令遵循",
+        "O3.3.1 風險分析報\n告及法令遵循需求\n事項",
+        "P3.3.1提高風險規避之有效性及降低法\n令遵循成本。",
+        "4",
+        "K05法律/法規\nK06金融商品\nK10風險管理\nK14統計\nK15科技發展",
+        "S04有效連結\nS05價值判斷\nS14問題解決\nS19協調能力\nS26資訊科技能力\nS26量化資料分析"
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "task": "T1.3",
+      "level": "4",
+      "indicator": "P1.3.6",
+      "knowledge": "K11",
+      "skill": "S12"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.3供應\n商風險管\n理與監控",
+        "",
+        "P1.3.1根據供應商合約檢驗供應商提供之原物料\n樣品品質，確認品質達標後持續追蹤後續\n原料品質。\nP1.3.2確認供應商交貨時率是否如合約擬定之期\n程進行。\nP1.3.3定期對供應商的績效進行審查和評估，評\n估其是否符合合同條款和公司期望。\nP1.3.4與供應商分享評估結果，提供回饋和改進\n建議，以促進其持續改進。\nP1.3.5及時識別和解決供應商可能出現的問題和\n衝突，掌握供應商當前困境與尚可爭取、\n協調之處。\nP1.3.6迅速與有關部門或人員反應原物料供貨問\n題，並協商、制定應對策略和應急計劃，\n降低可能的損失。",
+        "4",
+        null,
+        null,
+        "K01供應鏈管理基礎知識\nK04成本管控概念\nK07所屬產業相關安全規範\nK08所屬產業產品品質管理和檢\n驗知識\nK09專案管理知識\nK10風險管理知識\nK11國內外進出口流程",
+        null,
+        null,
+        "S03風險評估能力\nS06基礎外語溝通能力\nS07溝通協商技巧\nS08團隊合作能力\nS10問題解決\nS11衝突管理\nS12專案執行能力",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "task": "T1.4",
+      "level": "3",
+      "indicator": "P1.4.2",
+      "knowledge": "K10",
+      "skill": "S14"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.4供應\n商資料維\n護",
+        "",
+        "P1.4.1定期收集潛在供應商之基本資料，包括公\n司背景、產品和服務範圍、經驗和能力\n等。\nP1.4.2根據每次合作經驗與結果，彙整該供應商",
+        "3",
+        null,
+        null,
+        "K01供應鏈管理基礎知識\nK02供應商評估\nK03所屬產業發展現況與趨勢\nK10風險管理知識",
+        null,
+        null,
+        "S01資訊蒐集與整合\nS02資訊分析\nS13資料管理\nS14人脈拓展能力",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "09",
+      "page": 2,
+      "task": "T1.3",
+      "level": "5",
+      "indicator": "P1.3.2",
+      "knowledge": "K13",
+      "skill": "S11"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.3 評估\n應用或發\n展效益",
+        "O1.3.1導\n入評估分\n析報告或\n資料表\nO1.3.2風\n險評估報\n告或文件",
+        "P1.3.1根據目標與需求，運用各類分析\n方法（如 SWOT、五力分析、資\n料統計分析等） ，進行 AI 技術\n應用或發展之優勢、劣勢與限\n制、商業效益及識別風險等評\n估，並向經營管理者說明分析結\n果，從而選擇適合的應用或發展\n項目範疇。\nP1.3.2針對已選擇之AI技術、工具或解\n決方案進行施測，評估其應用效\n果並適時調整AI技術發展方\n案，以提升技術的可行性與執行\n效益。",
+        "5",
+        null,
+        null,
+        "K03 市場研究與分析方法\nK04 資料庫原理\nK05 機器學習概論\nK06 商業智慧概論\nK09 人工智慧概論（含鑑別式與生成\n式AI）\nK10 AI治理概念（含倫理、偏見防範\n等）\nK11 資料處理與分析概念\nK12 風險管理概念（含AI技術、模型\n偏見、法律合規等）\nK13 資訊安全概念",
+        null,
+        null,
+        "S03 技術評估與分析能力\nS05 問題解決能力\nS08 資料整合與分析能力\nS09 資料視覺化能力\nS10 AI技術/工具應用能力\nS11 實驗設計與分析能力",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "09",
+      "page": 2,
+      "task": "T2.1",
+      "level": "5",
+      "indicator": "P2.1.1",
+      "knowledge": "K14",
+      "skill": "S07"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 提出AI\n應用策略\n及建議",
+        "T2.1 制定\nAI技術應\n用發展計\n畫",
+        "O2.1.1 AI\n技術應用\n或發展專\n案建議/計\n畫書",
+        "P2.1.1依評估決定後確定之AI應用發展\n項目範疇及目標，進行跨部門溝\n通與協調，制定詳細的AI技術\n應用或發展專案計畫，涵蓋時程\n表、人力資源規劃、資源分配、",
+        "5",
+        null,
+        null,
+        "K02 AI應用場景知識\nK05 機器學習概論\nK08 專案管理知識\nK14敏捷管理開發方法\nK09 人工智慧概論（含鑑別式與生成",
+        null,
+        null,
+        "S03 技術評估與分析能力\nS05 問題解決能力\nS06 協調溝通能力\nS07 專案管理能力（含時間管理、資\n源分配、風險應對與KPI監控等）",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T1.2",
+      "level": "4",
+      "indicator": "P1.2.3",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.2加工\n程式編輯\n及轉出",
+        "O1.2.1\n加工程\n式",
+        "P1.2.1設定工作物原點座標。\nP1.2.2依工件加工特徵，選擇適當刀具並編寫2D及\n3D加工程式等。\nP1.2.3配合工具機控制器輸出程式。",
+        "4",
+        null,
+        null,
+        "K01工程識圖\nK02工程材料\nK03銑床工作法\nK04計算機概論\nK05螺紋規格\nK06職業安全衛生相關規範",
+        null,
+        null,
+        "S01工作圖判讀\nS02程式編輯能力\nS03依據工件判斷加工條件設定\nS04工程計算能力\nS05 CAD／CAM軟體操作能力\nS06刀具選用及研磨",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T1.3",
+      "level": "3",
+      "indicator": "P1.3.1",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.3估算\n加工工時",
+        "",
+        "P1.3.1依據工作圖、刀具路徑模擬及銑削條件估算加\n工工時。",
+        "3",
+        null,
+        null,
+        "K01工程識圖\nK02工程材料\nK03銑床工作法\nK04計算機概論\nK05螺紋規格\nK06職業安全衛生相關規範",
+        null,
+        null,
+        "S01工作圖判讀\nS02程式編輯能力\nS03依據工件判斷加工條件設定\nS04工程計算能力\nS05 CAD／CAM軟體操作能力\nS06刀具選用及研磨",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.1",
+      "knowledge": "K07",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 CNC\n銑床基\n本操作",
+        "T2.1工件\n夾持固定\n方式與精\n度校正",
+        "",
+        "P2.1.2使用虎鉗或其他夾、治具夾持工件及設定工件\n座標原點。\nP2.1.1使用量錶及其他量測儀校正工件平行度、垂直\n度等。",
+        "4",
+        null,
+        null,
+        "K03銑床工作法\nK04計算機概論\nK06職業安全衛生相關規範\nK07精密量測概論",
+        null,
+        null,
+        "S07夾(治)具使用\nS08使用不同量具進行量測能力\nS09 CNC銑床機具操作",
+        null,
+        null
+      ]
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "text",
+    "check": {
+      "id": "01",
+      "page": 5,
+      "label": "3D正文數字",
+      "text": "3D列印技術：如FDM"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "text",
+    "check": {
+      "id": "01",
+      "page": 5,
+      "label": "補充末尾",
+      "text": "Polyjet（彩色噴墨）等。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "text",
+    "check": {
+      "id": "02",
+      "page": 4,
+      "label": "註2續行",
+      "text": "珠寶設計標準作業流程。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "text",
+    "check": {
+      "id": "02",
+      "page": 4,
+      "label": "註4續行",
+      "text": "製作與材料相關知識、珠寶製作標準作業流程。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "text",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "label": "未編碼態度",
+      "text": "配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "text",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "label": "DFX補充",
+      "text": "DFX(指設計時考慮製造、組裝、品管、測試、成本等等因素)。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "text",
+    "check": {
+      "id": "04",
+      "page": 5,
+      "label": "未編碼態度",
+      "text": "配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "text",
+    "check": {
+      "id": "07",
+      "page": 3,
+      "label": "英文原文",
+      "text": "Financial technology, 縮寫: FinTech"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "column": 3,
+      "code": "P1.1.3",
+      "tail": "見，精進設計構想。"
+    },
+    "passed": true,
+    "matching_cells": [
+      "P1.1.3以專案目標與考量發展設計構想，進行分\n析、討論，並徵詢利益關係人的回饋意\n見，精進設計構想。"
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "column": 3,
+      "code": "P1.1.3",
+      "tail": "公差與配合等。"
+    },
+    "passed": true,
+    "matching_cells": [
+      "方法、輪廓虛線省略等製圖技\n術，按照圖紙正確還原其立體\n構造。\nP1.1.3根據圖紙，正確的理解表面織\n構符號、公差與配合等。\nP1.1.4瞭解圖面與實際相關加工法、\n材料與表面塗裝之關係識別。"
+    ]
+  },
+  {
+    "engine": "pdfplumber",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "column": 3,
+      "code": "P1.2.4",
+      "tail": "有效性。"
+    },
+    "passed": true,
+    "matching_cells": [
+      "標準、交貨期限、價格、付款條件和法律\n責任等。\nP1.2.4確定最終的合約版本並進行簽署，同時與\n法律部門或法律顧問協作確保合同的法律\n有效性。"
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "01",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.5",
+      "knowledge": "K17",
+      "skill": "S20"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "",
+        "T1.2 校 準",
+        "O1.2.1 驗",
+        "P1.2.1執行設備校準，符合設備基線數據與性能",
+        "3",
+        "K01 3D 列印技術原理及設備",
+        "S01 3D 列印技術類型辨識能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "01",
+      "page": 2,
+      "task": "T2.1",
+      "level": "3",
+      "indicator": "P2.1.4",
+      "knowledge": "K19",
+      "skill": "S22"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T2 品 質 檢",
+        "T2.1 診 斷",
+        "O2.2.1 維",
+        "P2.1.1運用多元診斷方法，系統性分析設備異常",
+        "3",
+        "K01 3D 列印技術原理及設備",
+        "S07設備控制介面校準能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.2",
+      "knowledge": "K07",
+      "skill": "S05"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T2 設計珠",
+        "T2.1 珠寶",
+        "",
+        "P2.1.1 確認「設計專案」中的相關物件與工作範",
+        "4",
+        "K01 珠寶屬性相關知識",
+        "S02 創意設計能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "task": "T2.3",
+      "level": "3",
+      "indicator": "P2.3.3",
+      "knowledge": "K09",
+      "skill": "S09"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "",
+        "T2.3 完成",
+        "O2.3.1 3D",
+        "P2.3.1 應用珠寶相關軟體繪製 3D 渲染圖，並於",
+        "3",
+        "K01 珠寶屬性相關知識",
+        "S01 溝通協調能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "task": "T3.2",
+      "level": "6",
+      "indicator": "P3.2.3",
+      "knowledge": "K33",
+      "skill": "S23"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T3.2進行",
+        "O3.2.1完",
+        "P3.2.1掌握新興技術與市場趨勢。",
+        "6",
+        "K30  機器動力整合分析",
+        "S21  整機架構與系統分析能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "04",
+      "page": 2,
+      "task": "T1.2",
+      "level": "5",
+      "indicator": "P1.2.2",
+      "knowledge": "K17",
+      "skill": "S08"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T1.2學習",
+        "O1.2.1機",
+        "P1.2.1具重要的機械工程專業術語、構造、用途",
+        "5",
+        "K08機械工程概要與基礎原理",
+        "S04機械常識"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "04",
+      "page": 2,
+      "task": "T2.1",
+      "level": "5",
+      "indicator": "P2.1.3",
+      "knowledge": "K19",
+      "skill": "S11"
+    },
+    "passed": false,
+    "matching_rows": []
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T1.1",
+      "level": "3",
+      "indicator": "P1.1.1",
+      "knowledge": "K04",
+      "skill": "S03"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T1AIoT 標",
+        "T1.1 蒐集",
+        "O1.1.1AI",
+        "P1.1.1 能夠分析比較不同 AIoT 應用與所採用之",
+        "3",
+        "",
+        ""
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.1",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "",
+        "T1.2 蒐集",
+        "O1.2.1AI",
+        "P1.2.1 能夠深入了解 AIoT 的現行應用領域與發",
+        "3",
+        "",
+        ""
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T2.1",
+      "level": "3",
+      "indicator": "P2.1.2",
+      "knowledge": "K11",
+      "skill": "S09"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T2AIoT 系",
+        "T2.1 客戶",
+        "O2.1.1 系",
+        "P2.1.1 系統導入前後之作業模式差異分析。",
+        "3",
+        "",
+        ""
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.4",
+      "knowledge": "K06",
+      "skill": "S09"
+    },
+    "passed": false,
+    "matching_rows": []
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.1",
+      "knowledge": "K08",
+      "skill": "S11"
+    },
+    "passed": false,
+    "matching_rows": []
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "07",
+      "page": 3,
+      "task": "T3.3",
+      "level": "4",
+      "indicator": "P3.3.1",
+      "knowledge": "K15",
+      "skill": "S26"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T3.3 依 據 資 料 分",
+        "O3.3.1 風險分析報",
+        "P3.3.1 提高風險規避之有效性及降低法",
+        "4",
+        "K05 法律/法規",
+        "S04 有效連結"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "task": "T1.3",
+      "level": "4",
+      "indicator": "P1.3.6",
+      "knowledge": "K11",
+      "skill": "S12"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T1.3供應",
+        "P1.3.1根據供應商合約檢驗供應商提供之原物料",
+        "4",
+        "K01供應鏈管理基礎知識",
+        "S03風險評估能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "task": "T1.4",
+      "level": "3",
+      "indicator": "P1.4.2",
+      "knowledge": "K10",
+      "skill": "S14"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T1.4供應",
+        "P1.4.1定期收集潛在供應商之基本資料，包括公",
+        "3",
+        "K01供應鏈管理基礎知識",
+        "S01資訊蒐集與整合"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "09",
+      "page": 2,
+      "task": "T1.3",
+      "level": "5",
+      "indicator": "P1.3.2",
+      "knowledge": "K13",
+      "skill": "S11"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "",
+        "T1.3 評估",
+        "O1.3.1導",
+        "P1.3.1根據目標與需求，運用各類分析",
+        "5",
+        "K03 市場研究與分析方法",
+        "S03 技術評估與分析能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "09",
+      "page": 2,
+      "task": "T2.1",
+      "level": "5",
+      "indicator": "P2.1.1",
+      "knowledge": "K14",
+      "skill": "S07"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T2 提出 AI",
+        "T2.1 制定",
+        "O2.1.1 AI",
+        "P2.1.1依評估決定後確定之 AI 應用發展",
+        "5",
+        "K02 AI 應用場景知識",
+        "S03 技術評估與分析能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T1.2",
+      "level": "4",
+      "indicator": "P1.2.3",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T1.2加工\nO1.2.1",
+        "P1.2.1設定工作物原點座標。",
+        "4",
+        "K01工程識圖",
+        "S01工作圖判讀"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T1.3",
+      "level": "3",
+      "indicator": "P1.3.1",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        "T1.3估算",
+        "P1.3.1依據工作圖、刀具路徑模擬及銑削條件估算加",
+        "3",
+        "K01工程識圖",
+        "S01工作圖判讀"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.1",
+      "knowledge": "K07",
+      "skill": "S09"
+    },
+    "passed": false,
+    "matching_rows": []
+  },
+  {
+    "engine": "camelot",
+    "kind": "text",
+    "check": {
+      "id": "01",
+      "page": 5,
+      "label": "3D正文數字",
+      "text": "3D列印技術：如FDM"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot",
+    "kind": "text",
+    "check": {
+      "id": "01",
+      "page": 5,
+      "label": "補充末尾",
+      "text": "Polyjet（彩色噴墨）等。"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot",
+    "kind": "text",
+    "check": {
+      "id": "02",
+      "page": 4,
+      "label": "註2續行",
+      "text": "珠寶設計標準作業流程。"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot",
+    "kind": "text",
+    "check": {
+      "id": "02",
+      "page": 4,
+      "label": "註4續行",
+      "text": "製作與材料相關知識、珠寶製作標準作業流程。"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot",
+    "kind": "text",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "label": "未編碼態度",
+      "text": "配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot",
+    "kind": "text",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "label": "DFX補充",
+      "text": "DFX(指設計時考慮製造、組裝、品管、測試、成本等等因素)。"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot",
+    "kind": "text",
+    "check": {
+      "id": "04",
+      "page": 5,
+      "label": "未編碼態度",
+      "text": "配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot",
+    "kind": "text",
+    "check": {
+      "id": "07",
+      "page": 3,
+      "label": "英文原文",
+      "text": "Financial technology, 縮寫: FinTech"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "column": 3,
+      "code": "P1.1.3",
+      "tail": "見，精進設計構想。"
+    },
+    "passed": false,
+    "matching_cells": [
+      "P1.1.3 以專案目標與考量發展設計構想，進行分"
+    ]
+  },
+  {
+    "engine": "camelot",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "column": 3,
+      "code": "P1.1.3",
+      "tail": "公差與配合等。"
+    },
+    "passed": false,
+    "matching_cells": []
+  },
+  {
+    "engine": "camelot",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "column": 3,
+      "code": "P1.2.4",
+      "tail": "有效性。"
+    },
+    "passed": false,
+    "matching_cells": [
+      "P1.2.4確定最終的合約版本並進行簽署，同時與"
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "01",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.5",
+      "knowledge": "K17",
+      "skill": "S20"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.2 校 準\n及 調 試 設\n備",
+        "O1.2.1 驗\n收報告 \nO1.2.2 設\n備 基 本 資\n料檔案",
+        "P1.2.1執行設備校準，符合設備基線數據與性能\n標準，確保列印品質達到規格要求。 \nP1.2.2進行轉檔、列印測試，驗證設備各項功能\n正常運作，並優化初始列印參數設定。 \nP1.2.3撰寫安裝驗收報告，確認設備功能符合規\n格要求。 \nP1.2.4協助使用者熟悉原廠操作手冊內容，並提\n供現場操作指導與注意事項說明。 \nP1.2.5建立設備基本資料檔案，以利後續設備維\n護管理作業。",
+        "3",
+        "K01 3D 列印技術原理及設備\n結構理論 \nK03 3D 設備校準程序 \nK04 3D 加工參數 \nK05材料科學及3D 材料特性 \nK08品質標準及安全規範 \nK13測試驗證方法論 \nK14技術文件撰寫規範 \nK17品質管制統計方法",
+        "S01 3D 列印技術類型辨識能力 \nS02 3D 列印設備組裝與拆解能力 \nS07設備控制介面校準能力 \nS08問題解決能力 \nS20檔案建立與管理能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "01",
+      "page": 2,
+      "task": "T2.1",
+      "level": "3",
+      "indicator": "P2.1.4",
+      "knowledge": "K19",
+      "skill": "S22"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 品 質 檢\n測 及 設 備\n維護",
+        "T2.1 診 斷\n及 排 除 設\n備 異 常 狀\n況",
+        "O2.2.1 維\n修 紀 錄 文\n件",
+        "P2.1.1運用多元診斷方法，系統性分析設備異常\n現象，判斷故障類型與原因。 \nP2.1.2依據判斷結果，檢修設備，更換損壞的零\n件，排除故障、測試並維持正常運作。 \nP2.1.3協助使用者更新設備軟體，並解決驅動程\n式或切片軟體相關問題。 \nP2.1.4記錄維修過程的資訊，並建立維修作業管\n理文件。",
+        "3",
+        "K01 3D 列印技術原理及設備\n結構理論 \nK04 3D 加工參數 \nK05材料科學及3D 材料特性 \nK10 3D 列印故障類型及成因\n分析 \nK18設備維修理論與診斷原理 \nK19軟體管理知識",
+        "S07設備控制介面校準能力 \nS08問題解決能力 \nS13故障排除能力 \nS18軟體更新與驅動程式處理能力 \nS21多元診斷方法應用能力 \nS22維修與保養紀錄撰寫能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.2",
+      "knowledge": "K07",
+      "skill": "S05"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 設計珠\n寶與物件",
+        "T2.1 珠寶\n與物件設\n計創意發\n想",
+        "",
+        "P2.1.1 確認「設計專案」中的相關物件與工作範\n疇，蒐集、分析珠寶與物件設計、原物料\n與產品趨勢，並判定材料開發過程，對環\n境造成的衝擊及永續影響評估。 \nP2.1.2 運用創意設計工具與技巧發展設計概念。",
+        "4",
+        "K01 珠寶屬性相關知識 \nK02 創意、設計相關知識 \nK05 色彩學 \nK06 珠寶創作相關知識【註 3】 \nK07 珠寶、飾品製作相關知識【註\n4】",
+        "S02 創意設計能力 \nS04 資料蒐集與分析 \nS05 統籌規劃能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "task": "T2.3",
+      "level": "3",
+      "indicator": "P2.3.3",
+      "knowledge": "K09",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T2.3 完成\n3D 設計初\n稿",
+        "O2.3.1 3D\n設計初稿",
+        "P2.3.1 應用珠寶相關軟體繪製 3D 渲染圖，並於\n圖面標示尺寸、珠寶材質、工法。 \nP2.3.2 交付 3D 珠寶設計初稿與客戶進行討論並\n修正初稿。 \nP2.3.3 進行存檔與備份。",
+        "3",
+        "K01 珠寶屬性相關知識 \nK02 創意、設計相關知識 \nK05 色彩學 \nK08 繪圖相關知識 \nK09 模型概念",
+        "S01 溝通協調能力 \nS07 3D 繪圖能力 \nS08 觀察和解析能力 \nS09 色彩應用與繪圖技巧"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "task": "T3.2",
+      "level": "6",
+      "indicator": "P3.2.3",
+      "knowledge": "K33",
+      "skill": "S23"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T3.2進行\n設計製整\n合及檢測\n與驗證規\n劃",
+        "O3.2.1完\n成機械系\n統設計與\n製造 \nO3.2.2完\n成檢測與\n驗證",
+        "P3.2.1掌握新興技術與市場趨勢。 \nP3.2.2訂定符合產業需求之產品規格。 \nP3.2.3完成機械系統整合設計。",
+        "6",
+        "K30  機器動力整合分析 \nK31  機械結構分析 \nK32  智慧化機電整合 \nK33  智慧化檢測及驗證",
+        "S21  整機架構與系統分析能力 \nS22  智慧化機電整合能力 \nS23  智慧化系統檢測及驗證能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "04",
+      "page": 2,
+      "task": "T1.2",
+      "level": "5",
+      "indicator": "P1.2.2",
+      "knowledge": "K17",
+      "skill": "S08"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.2學習\n機械工程\n專業知\n識、術\n語、構\n造、用途\n及設計程\n序",
+        "O1.2.1機\n械名稱 \nO1.2.2機\n械構造 \nO1.2.3機\n械組成",
+        "P1.2.1具重要的機械工程專業術語、構造、用途\n與組成之基本概念。 \nP1.2.2具機械設計程序和各式機械原理。",
+        "5",
+        "K08機械工程概要與基礎原理 \nK09熱流與能源基本原理 \nK10力學與設計基本原理 \nK11控制與自動化基本原理 \nK12製造與材料基本原理 \nK13機械元件基本原理 \nK14機器手臂基本原理 \nK15感測器基本原理 \nK16致動器基本原理 \nK17智慧型機電整合基本原理",
+        "S04機械常識 \nS05機械構造組成能力 \nS06機械設計基礎能力 \nS07機械應用能力 \nS08智慧機電整合基礎能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "04",
+      "page": 2,
+      "task": "T2.1",
+      "level": "5",
+      "indicator": "P2.1.3",
+      "knowledge": "K19",
+      "skill": "S11"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2智慧機\n電整合設\n計",
+        "T2.1邏輯\n分析、程\n式設計與\n人機介面 \n機電整合",
+        "O2.1.1機\n電整合之\nPLC 數位\n邏輯程式 \nO2.1.2電\n腦程式 \nO2.1.3機\n電系統之 \n人機介面",
+        "P2.1.1熟悉邏輯分析。 \nP2.1.2熟悉軟體設計。 \nP2.1.3熟悉機電整合之控制器與人機介面。",
+        "5",
+        "K18數位邏輯與 PLC 程式設計 \nK19計算機程式語言與撰寫",
+        "S09數位邏輯設計能力 \nS10程式撰寫能力 \nS11機電整合之人機介面規劃與\n編程能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T1.1",
+      "level": "3",
+      "indicator": "P1.1.1",
+      "knowledge": "K04",
+      "skill": "S03"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T1AIoT 標\n準與應用\n趨勢研究",
+        "T1.1 蒐集\n國際及國\n內 AIoT\n相關標準",
+        "O1.1.1AI\noT 相關軟\n硬體所具\n備之國際\n標準分析\n報告",
+        "P1.1.1 能夠分析比較不同 AIoT 應用與所採用之\n產品（與其標準）優劣勢。",
+        "3",
+        "K01 AIoT 系統基本架構\nK02 AIoT 相關國際標準\nK03 基礎通訊原理\nK04 工業通訊標準",
+        "S01 資料搜集與分析能力\nS02 英文閱讀能力\nS03 瞭解判讀產品規格書能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.1",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.2 蒐集\n與分析\nAIoT 應用\n發展趨勢",
+        "O1.2.1AI\noT 現行應\n用與未來\n發展趨勢\n評估報告",
+        "P1.2.1 能夠深入了解 AIoT 的現行應用領域與發\n展中技術，並從物聯網、感知系統、機\n器聯網、機器學習等應用場域整合的角\n度，系統性評估其未來創新潛力與技術\n演進方向。",
+        "3",
+        "K05 AIoT 發展趨勢\nK06 AIoT 應用案例",
+        "S01 資料搜集與分析能力\nS02 英文閱讀能力\nS03 瞭解判讀產品規格書能力\nS04 論壇與相關發表研讀能力\nS05 AIoT 應用趨勢與需求分析\n能力\nS06 AIoT 應用發展整合判斷能\n力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T2.1",
+      "level": "3",
+      "indicator": "P2.1.2",
+      "knowledge": "K11",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2AIoT 系\n統需求分\n析與解決\n方案設計",
+        "T2.1 客戶\n作業模式\n與流程分\n析",
+        "O2.1.1 系\n統導入前\n後作業流\n程比較表",
+        "P2.1.1 系統導入前後之作業模式差異分析。\nP2.1.2 辨識既有機/電/感測設備導入現況。",
+        "3",
+        "K07 導入效益分析概念\nK08 作業原理\nK09 設備控制器與機構知識\nK10 機電整合\nK11 機器學習",
+        "S07 作業流程問題分析能力\nS08 流程最佳化\nS09 跨部門溝通與協調能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.4",
+      "knowledge": "K06",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.2 利用\nCAD 進行\n製圖",
+        "O1.2.1 零部件圖\nO1.2.2 零部件組裝圖\nO1.2.3 零件加工圖\nO1.2.4 機構組立圖\n（2D/3D）\nO1.2.5 機構組立零件表\nO1.2.6 設計圖面輸出\nO1.2.7 PDM 系統圖面\n存檔或更新\nO1.2.8 設計變更資訊標\n註 O\n1.2.9 出圖 Bom 表\nO1.2.10 木模圖\nO1.2.11 鑄造圖\nO1.2.12 刀具圖\nO1.2.13 治具圖\nO1.2.14 板金圖",
+        "P1.2.1 利用 3D CAD，製作軸、長方\n體、殼狀物（薄殼構造物）等\n基本機械零部件的外型，在顯\n示裝置上適當的進行表示。\nP1.2.2 探討各零部件能否如設計宗旨\n一般進行組裝，正確判斷適當\n與否。\nP1.2.3 産品的組裝圖確切的進行三維\n表示。\nP1.2.4 在 CAD 軟體，能正確的標註\n表面粗糙度、尺寸公差、幾何\n公差。",
+        "3",
+        "K01 製圖種類（組裝圖、零部件\n組裝圖、零部件圖、詳細\n圖、工序圖等）\nK02 圖紙規格、圖紙規範、公差\n與配合\nK03 製圖理論（含：用語、規\n格、三視圖的辨識、前視圖、側\n視圖、透視圖等）\nK06 電腦圖檔相關管理知識",
+        "S01 製圖用工具（儀器、規尺\n等）的使用方法\nS02 各種投影法、視圖的種類及\n看圖方法\nS03 電氣線路圖的種類及用途\n（系統圖、迴路圖、連接圖、配\n線圖等）\nS04 CAD 的活用技術\nS05 CAD 的種類、構成\nS06 2D 繪圖/識圖能力\nS07 3D 繪圖/識圖能力\nS08 數據互換的思路及互換方法\nS09 關於 CAD 的技術動向等"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.1",
+      "knowledge": "K08",
+      "skill": "S11"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 機構的",
+        "T2.1 設計",
+        "O2.1.1 機構圖拆圖-細",
+        "P2.1.1 總體理解機構設計所需的各種",
+        "4",
+        "K08 材料力學的知識",
+        "S11 機構設計的展開方式"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "07",
+      "page": 3,
+      "task": "T3.3",
+      "level": "4",
+      "indicator": "P3.3.1",
+      "knowledge": "K15",
+      "skill": "S26"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T3.3 依 據 資 料 分\n析結果，從事風險\n控制或法令遵循",
+        "O3.3.1 風險分析報\n告及法令遵循需求\n事項",
+        "P3.3.1 提高風險規避之有效性及降低法\n令遵循成本。",
+        "4",
+        "K05 法律/法規\nK06 金融商品\nK10 風險管理\nK14 統計\nK15 科技發展",
+        "S04 有效連結\nS05 價值判斷\nS14 問題解決\nS19 協調能力\nS26 資訊科技能力\nS26 量化資料分析"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "task": "T1.3",
+      "level": "4",
+      "indicator": "P1.3.6",
+      "knowledge": "K11",
+      "skill": "S12"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.3供應\n商風險管\n理與監控",
+        "",
+        "P1.3.1根據供應商合約檢驗供應商提供之原物料\n樣品品質，確認品質達標後持續追蹤後續\n原料品質。 \nP1.3.2確認供應商交貨時率是否如合約擬定之期\n程進行。 \nP1.3.3定期對供應商的績效進行審查和評估，評\n估其是否符合合同條款和公司期望。 \nP1.3.4與供應商分享評估結果，提供回饋和改進\n建議，以促進其持續改進。 \nP1.3.5及時識別和解決供應商可能出現的問題和\n衝突，掌握供應商當前困境與尚可爭取、\n協調之處。 \nP1.3.6迅速與有關部門或人員反應原物料供貨問\n題，並協商、制定應對策略和應急計劃，\n降低可能的損失。",
+        "4",
+        "K01供應鏈管理基礎知識 \nK04成本管控概念 \nK07所屬產業相關安全規範 \nK08所屬產業產品品質管理和檢\n驗知識 \nK09專案管理知識 \nK10風險管理知識 \nK11國內外進出口流程",
+        "S03風險評估能力 \nS06基礎外語溝通能力 \nS07溝通協商技巧 \nS08團隊合作能力 \nS10問題解決 \nS11衝突管理 \nS12專案執行能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "task": "T1.4",
+      "level": "3",
+      "indicator": "P1.4.2",
+      "knowledge": "K10",
+      "skill": "S14"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.4供應\n商資料維\n護",
+        "",
+        "P1.4.1定期收集潛在供應商之基本資料，包括公\n司背景、產品和服務範圍、經驗和能力\n等。 \nP1.4.2根據每次合作經驗與結果，彙整該供應商",
+        "3",
+        "K01供應鏈管理基礎知識 \nK02供應商評估 \nK03所屬產業發展現況與趨勢 \nK10風險管理知識",
+        "S01資訊蒐集與整合 \nS02資訊分析 \nS13資料管理 \nS14人脈拓展能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "09",
+      "page": 2,
+      "task": "T1.3",
+      "level": "5",
+      "indicator": "P1.3.2",
+      "knowledge": "K13",
+      "skill": "S11"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.3 評估\n應用或發\n展效益",
+        "O1.3.1導\n入評估分\n析報告或\n資料表 \nO1.3.2風\n險評估報\n告或文件",
+        "P1.3.1根據目標與需求，運用各類分析\n方法（如 SWOT、五力分析、資\n料統計分析等）  ，進行 AI 技術\n應 用 或 發 展 之 優 勢 、 劣 勢 與 限\n制 、 商 業 效 益 及 識 別 風 險 等 評\n估，並向經營管理者說明分析結\n果，從而選擇適合的應用或發展\n項目範疇。 \nP1.3.2針對已選擇之 AI 技術、工具或解\n決方案進行施測，評估其應用效\n果並適時調整 AI 技術發展方\n案，以提升技術的可行性與執行\n效益。",
+        "5",
+        "K03 市場研究與分析方法 \nK04 資料庫原理 \nK05 機器學習概論 \nK06 商業智慧概論 \nK09  人工智慧概論（含鑑別式與生成\n式 AI） \nK10  AI 治理概念（含倫理、偏見防範\n等） \nK11 資料處理與分析概念 \nK12 風險管理概念（含 AI 技術、模型\n偏見、法律合規等） \nK13 資訊安全概念",
+        "S03 技術評估與分析能力 \nS05 問題解決能力 \nS08 資料整合與分析能力 \nS09 資料視覺化能力 \nS10 AI 技術/工具應用能力 \nS11 實驗設計與分析能力"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "09",
+      "page": 2,
+      "task": "T2.1",
+      "level": "5",
+      "indicator": "P2.1.1",
+      "knowledge": "K14",
+      "skill": "S07"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 提出 AI\n應 用 策 略\n及建議",
+        "T2.1 制定\nAI 技術應\n用發展計\n畫",
+        "O2.1.1 AI\n技術應用\n或發展專\n案建議/計\n畫書",
+        "P2.1.1依評估決定後確定之 AI 應用發展\n項目範疇及目標，進行跨部門溝\n通與協調，制定詳細的 AI 技術\n應用或發展專案計畫，涵蓋時程\n表、人力資源規劃、資源分配、",
+        "5",
+        "K02 AI 應用場景知識 \nK05 機器學習概論 \nK08 專案管理知識 \nK14敏捷管理開發方法 \nK09  人工智慧概論（含鑑別式與生成",
+        "S03 技術評估與分析能力 \nS05 問題解決能力 \nS06 協調溝通能力 \nS07  專案管理能力（含時間管理、資\n源分配、風險應對與 KPI 監控等）"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T1.2",
+      "level": "4",
+      "indicator": "P1.2.3",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.2加工\n程式編輯\n及轉出",
+        "O1.2.1\n加工程\n式",
+        "P1.2.1設定工作物原點座標。 \nP1.2.2依工件加工特徵，選擇適當刀具並編寫2D 及\n3D 加工程式等。 \nP1.2.3配合工具機控制器輸出程式。",
+        "4",
+        "K01工程識圖 \nK02工程材料 \nK03銑床工作法 \nK04計算機概論 \nK05螺紋規格 \nK06職業安全衛生相關規範",
+        "S01工作圖判讀 \nS02程式編輯能力 \nS03依據工件判斷加工條件設定 \nS04工程計算能力 \nS05 CAD／CAM 軟體操作能力 \nS06刀具選用及研磨"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T1.3",
+      "level": "3",
+      "indicator": "P1.3.1",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "",
+        "T1.3估算\n加工工時",
+        "",
+        "P1.3.1依據工作圖、刀具路徑模擬及銑削條件估算加\n工工時。",
+        "3",
+        "K01工程識圖 \nK02工程材料 \nK03銑床工作法 \nK04計算機概論 \nK05螺紋規格 \nK06職業安全衛生相關規範",
+        "S01工作圖判讀 \nS02程式編輯能力 \nS03依據工件判斷加工條件設定 \nS04工程計算能力 \nS05 CAD／CAM 軟體操作能力 \nS06刀具選用及研磨"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.1",
+      "knowledge": "K07",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 CNC\n銑床基\n本操作",
+        "T2.1工件\n夾持固定\n方式與精\n度校正",
+        "",
+        "P2.1.2使用虎鉗或其他夾、治具夾持工件及設定工件\n座標原點。 \nP2.1.1使用量錶及其他量測儀校正工件平行度、垂直\n度等。",
+        "4",
+        "K03銑床工作法 \nK04計算機概論 \nK06職業安全衛生相關規範 \nK07精密量測概論",
+        "S07夾(治)具使用 \nS08使用不同量具進行量測能力 \nS09 CNC 銑床機具操作"
+      ]
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "text",
+    "check": {
+      "id": "01",
+      "page": 5,
+      "label": "3D正文數字",
+      "text": "3D列印技術：如FDM"
+    },
+    "passed": true,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "text",
+    "check": {
+      "id": "01",
+      "page": 5,
+      "label": "補充末尾",
+      "text": "Polyjet（彩色噴墨）等。"
+    },
+    "passed": true,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "text",
+    "check": {
+      "id": "02",
+      "page": 4,
+      "label": "註2續行",
+      "text": "珠寶設計標準作業流程。"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "text",
+    "check": {
+      "id": "02",
+      "page": 4,
+      "label": "註4續行",
+      "text": "製作與材料相關知識、珠寶製作標準作業流程。"
+    },
+    "passed": false,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "text",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "label": "未編碼態度",
+      "text": "配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"
+    },
+    "passed": true,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "text",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "label": "DFX補充",
+      "text": "DFX(指設計時考慮製造、組裝、品管、測試、成本等等因素)。"
+    },
+    "passed": true,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "text",
+    "check": {
+      "id": "04",
+      "page": 5,
+      "label": "未編碼態度",
+      "text": "配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"
+    },
+    "passed": true,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "text",
+    "check": {
+      "id": "07",
+      "page": 3,
+      "label": "英文原文",
+      "text": "Financial technology, 縮寫: FinTech"
+    },
+    "passed": true,
+    "scope": "tables_only"
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "column": 3,
+      "code": "P1.1.3",
+      "tail": "見，精進設計構想。"
+    },
+    "passed": true,
+    "matching_cells": [
+      "P1.1.3 以專案目標與考量發展設計構想，進行分\n析、討論，並徵詢利益關係人的回饋意\n見，精進設計構想。"
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "column": 3,
+      "code": "P1.1.3",
+      "tail": "公差與配合等。"
+    },
+    "passed": true,
+    "matching_cells": [
+      "方法、輪廓虛線省略等製圖技\n術，按照圖紙正確還原其立體\n構造。\nP1.1.3 根據圖紙，正確的理解表面織\n構符號、公差與配合等。\nP1.1.4 瞭解圖面與實際相關加工法、\n材料與表面塗裝之關係識別。"
+    ]
+  },
+  {
+    "engine": "camelot-lattice",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "column": 3,
+      "code": "P1.2.4",
+      "tail": "有效性。"
+    },
+    "passed": true,
+    "matching_cells": [
+      "標準、交貨期限、價格、付款條件和法律\n責任等。 \nP1.2.4確定最終的合約版本並進行簽署，同時與\n法律部門或法律顧問協作確保合同的法律\n有效性。"
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "01",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.5",
+      "knowledge": "K17",
+      "skill": "S20"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.2 校 準 及調試設 備",
+        "O1.2.1 驗 收報告 O1.2.2 設 備基本資 料檔案",
+        "P1.2.1執行設備校準，符合設備基線數據與性能 標準，確保列印品質達到規格要求。 P1.2.2進行轉檔、列印測試，驗證設備各項功能 正常運作，並優化初始列印參數設定。 P1.2.3撰寫安裝驗收報告，確認設備功能符合規 格要求。 P1.2.4協助使用者熟悉原廠操作手冊內容，並提 供現場操作指導與注意事項說明。 P1.2.5建立設備基本資料檔案，以利後續設備維 護管理作業。",
+        "3",
+        "K01 3D列印技術原理及設備 結構理論 K03 3D設備校準程序 K04 3D加工參數 K05材料科學及3D材料特性 K08品質標準及安全規範 K13測試驗證方法論 K14技術文件撰寫規範 K17品質管制統計方法",
+        "S01 3D列印技術類型辨識能力 S02 3D列印設備組裝與拆解能力 S07設備控制介面校準能力 S08問題解決能力 S20檔案建立與管理能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "01",
+      "page": 2,
+      "task": "T2.1",
+      "level": "3",
+      "indicator": "P2.1.4",
+      "knowledge": "K19",
+      "skill": "S22"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 品 質檢 測及設備 維護",
+        "T2.1 診 斷 及排除設 備異常狀 況",
+        "O2.2.1 維 修紀錄文 件",
+        "P2.1.1運用多元診斷方法，系統性分析設備異常 現象，判斷故障類型與原因。 P2.1.2依據判斷結果，檢修設備，更換損壞的零 件，排除故障、測試並維持正常運作。 P2.1.3協助使用者更新設備軟體，並解決驅動程 式或切片軟體相關問題。 P2.1.4記錄維修過程的資訊，並建立維修作業管 理文件。",
+        "3",
+        "K01 3D列印技術原理及設備 結構理論 K04 3D加工參數 K05材料科學及3D材料特性 K10 3D列印故障類型及成因 分析 K18設備維修理論與診斷原理 K19軟體管理知識",
+        "S07設備控制介面校準能力 S08問題解決能力 S13故障排除能力 S18軟體更新與驅動程式處理能力 S21多元診斷方法應用能力 S22維修與保養紀錄撰寫能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.2",
+      "knowledge": "K07",
+      "skill": "S05"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 設計珠 寶與物件",
+        "T2.1 珠寶 與物件設 計創意發 想",
+        null,
+        "P2.1.1 確認「設計專案」中的相關物件與工作範 疇，蒐集、分析珠寶與物件設計、原物料 與產品趨勢，並判定材料開發過程，對環 境造成的衝擊及永續影響評估。 P2.1.2運用創意設計工具與技巧發展設計概念。",
+        "4",
+        "K01珠寶屬性相關知識 K02創意、設計相關知識 K05色彩學 K06珠寶創作相關知識 【註3】 K07 珠寶、飾品製作相關知識 【註 4】",
+        "S02創意設計能力 S04資料蒐集與分析 S05統籌規劃能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "task": "T2.3",
+      "level": "3",
+      "indicator": "P2.3.3",
+      "knowledge": "K09",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T2.3 完成 3D 設計初 稿",
+        "O2.3.1 3D 設計初稿",
+        "P2.3.1 應用珠寶相關軟體繪製 3D 渲染圖，並於 圖面標示尺寸、珠寶材質、工法。 P2.3.2 交付 3D 珠寶設計初稿與客戶進行討論並 修正初稿。 P2.3.3進行存檔與備份。",
+        "3",
+        "K01珠寶屬性相關知識 K02創意、設計相關知識 K05色彩學 K08繪圖相關知識 K09模型概念",
+        "S01溝通協調能力 S07 3D繪圖能力 S08觀察和解析能力 S09色彩應用與繪圖技巧"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "task": "T3.2",
+      "level": "6",
+      "indicator": "P3.2.3",
+      "knowledge": "K33",
+      "skill": "S23"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        null,
+        "T3.2進行",
+        "O3.2.1完",
+        "P3.2.1掌握新興技術與市場趨勢。",
+        "6",
+        "K30 機器動力整合分析",
+        "S21 整機架構與系統分析能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "04",
+      "page": 2,
+      "task": "T1.2",
+      "level": "5",
+      "indicator": "P1.2.2",
+      "knowledge": "K17",
+      "skill": "S08"
+    },
+    "passed": false,
+    "matching_rows": [
+      [
+        null,
+        "T1.2學習 機械工程 專業知 識、術 語、構 造、用途 及設計程 序",
+        "O1.2.1機 械名稱 O1.2.2機 械構造 O1.2.3機 械組成",
+        "P1.2.1具重要的機械工程專業術語、構造、用途 與組成之基本概念。 P1.2.2具機械設計程序和各式機械原理。",
+        "5",
+        "K08機械工程概要與基礎原理 K09熱流與能源基本原理 K10力學與設計基本原理 K11控制與自動化基本原理 K12製造與材料基本原理 K13機械元件基本原理 K14機器手臂基本原理 K15感測器基本原理 K16致動器基本原理",
+        "S04機械常識 S05機械構造組成能力 S06機械設計基礎能力 S07機械應用能力 S08智慧機電整合基礎能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "04",
+      "page": 2,
+      "task": "T2.1",
+      "level": "5",
+      "indicator": "P2.1.3",
+      "knowledge": "K19",
+      "skill": "S11"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2智慧機 電整合設 計",
+        "T2.1邏輯 分析、程 式設計與 人機介面 機電整合",
+        "O2.1.1機 電整合之 PLC 數位 邏輯程式 O2.1.2電 腦程式 O2.1.3機 電系統之",
+        "P2.1.1熟悉邏輯分析。 P2.1.2熟悉軟體設計。 P2.1.3熟悉機電整合之控制器與人機介面。",
+        "5",
+        "K17智慧型機電整合基本原理 K18數位邏輯與PLC程式設計 K19計算機程式語言與撰寫",
+        "S09數位邏輯設計能力 S10程式撰寫能力 S11機電整合之人機介面規劃與 編程能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T1.1",
+      "level": "3",
+      "indicator": "P1.1.1",
+      "knowledge": "K04",
+      "skill": "S03"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T1AIoT 標 準與應用 趨勢研究",
+        "T1.1 蒐集 國際及國 內 AIoT 相關標準",
+        "O1.1.1AI oT 相關軟 硬體所具 備之國際 標準分析 報告",
+        "P1.1.1 能夠分析比較不同 AIoT 應用與所採用之 產品（與其標準）優劣勢。",
+        "3",
+        "K01 AIoT系統基本架構 K02 AIoT相關國際標準 K03 基礎通訊原理 K04 工業通訊標準",
+        "S01 資料搜集與分析能力 S02 英文閱讀能力 S03 瞭解判讀產品規格書能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.1",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.2 蒐集 與分析 AIoT 應用 發展趨勢",
+        "O1.2.1AI oT 現行應 用與未來 發展趨勢 評估報告",
+        "P1.2.1 能夠深入了解 AIoT 的現行應用領域與發 展中技術，並從物聯網、感知系統、機 器聯網、機器學習等應用場域整合的角 度，系統性評估其未來創新潛力與技術 演進方向。",
+        "3",
+        "K05 AIoT發展趨勢 K06 AIoT應用案例",
+        "S01 資料搜集與分析能力 S02 英文閱讀能力 S03 瞭解判讀產品規格書能力 S04 論壇與相關發表研讀能力 S05 AIoT應用趨勢與需求分析 能力 S06 AIoT應用發展整合判斷能 力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "05",
+      "page": 2,
+      "task": "T2.1",
+      "level": "3",
+      "indicator": "P2.1.2",
+      "knowledge": "K11",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2AIoT 系 統需求分 析與解決 方案設計",
+        "T2.1 客戶 作業模式 與流程分 析",
+        "O2.1.1 系 統導入前 後作業流 程比較表",
+        "P2.1.1 系統導入前後之作業模式差異分析。 P2.1.2 辨識既有機/電/感測設備導入現況。",
+        "3",
+        "K07 導入效益分析概念 K08 作業原理 K09 設備控制器與機構知識 K10 機電整合 K11 機器學習",
+        "S07 作業流程問題分析能力 S08 流程最佳化 S09 跨部門溝通與協調能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "task": "T1.2",
+      "level": "3",
+      "indicator": "P1.2.4",
+      "knowledge": "K06",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.2 利用 CAD 進行 製圖",
+        "O1.2.1 零部件圖 O1.2.2 零部件組裝圖 O1.2.3 零件加工圖 O1.2.4 機構組立圖 （2D/3D） O1.2.5 機構組立零件表 O1.2.6 設計圖面輸出 O1.2.7 PDM系統圖面 存檔或更新 O1.2.8 設計變更資訊標 註 O1.2.9 出圖 Bom 表 O1.2.10 木模圖 O1.2.11 鑄造圖 O1.2.12 刀具圖 O1.2.13 治具圖 O1.2.14 板金圖",
+        "P1.2.1利用3D CAD，製作軸、長方 體、殼狀物（薄殼構造物）等 基本機械零部件的外型，在顯 示裝置上適當的進行表示。 P1.2.2 探討各零部件能否如設計宗旨 一般進行組裝，正確判斷適當 與否。 P1.2.3 産品的組裝圖確切的進行三維 表示。 P1.2.4 在 CAD 軟體，能正確的標註 表面粗糙度、尺寸公差、幾何 公差。",
+        "3",
+        "K01 製圖種類（組裝圖、零部件 組裝圖、零部件圖、詳細 圖、工序圖等） K02 圖紙規格、圖紙規範、公差 與配合 K03 製圖理論（含：用語、規 格、三視圖的辨識、前視圖、側 視圖、透視圖等） K06 電腦圖檔相關管理知識",
+        "S01 製圖用工具（儀器、規尺 等）的使用方法 S02 各種投影法、視圖的種類及 看圖方法 S03 電氣線路圖的種類及用途 （系統圖、迴路圖、連接圖、配 線圖等） S04 CAD的活用技術 S05 CAD的種類、構成 S06 2D繪圖/識圖能力 S07 3D繪圖/識圖能力 S08 數據互換的思路及互換方法 S09 關於 CAD 的技術動向等"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.1",
+      "knowledge": "K08",
+      "skill": "S11"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2機構的",
+        "T2.1設計",
+        "O2.1.1機構圖拆圖-細",
+        "P2.1.1總體理解機構設計所需的各種",
+        "4",
+        "K08 材料力學的知識",
+        "S11 機構設計的展開方式"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "07",
+      "page": 3,
+      "task": "T3.3",
+      "level": "4",
+      "indicator": "P3.3.1",
+      "knowledge": "K15",
+      "skill": "S26"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T3.3 依據資料分 析結果，從事風險 控制或法令遵循",
+        "O3.3.1 風險分析報 告及法令遵循需求 事項",
+        "P3.3.1 提高風險規避之有效性及降低法 令遵循成本。",
+        "4",
+        "（K=knowledge K05法律/法規 K06 金融商品 K10 風險管理 K14 統計 K15 科技發展",
+        "S04 有效連結 S05 價值判斷 S14 問題解決 S19 協調能力 S26 資訊科技能力 S26 量化資料分析"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "task": "T1.3",
+      "level": "4",
+      "indicator": "P1.3.6",
+      "knowledge": "K11",
+      "skill": "S12"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.3供應 商風險管 理與監控",
+        null,
+        "P1.3.1根據供應商合約檢驗供應商提供之原物料 樣品品質，確認品質達標後持續追蹤後續 原料品質。 P1.3.2確認供應商交貨時率是否如合約擬定之期 程進行。 P1.3.3定期對供應商的績效進行審查和評估，評 估其是否符合合同條款和公司期望。 P1.3.4與供應商分享評估結果，提供回饋和改進 建議，以促進其持續改進。 P1.3.5及時識別和解決供應商可能出現的問題和 衝突，掌握供應商當前困境與尚可爭取、 協調之處。 P1.3.6迅速與有關部門或人員反應原物料供貨問 題，並協商、制定應對策略和應急計劃， 降低可能的損失。",
+        "4",
+        "K01供應鏈管理基礎知識 K04成本管控概念 K07所屬產業相關安全規範 K08所屬產業產品品質管理和檢 驗知識 K09專案管理知識 K10風險管理知識 K11國內外進出口流程",
+        "S03風險評估能力 S06基礎外語溝通能力 S07溝通協商技巧 S08團隊合作能力 S10問題解決 S11衝突管理 S12專案執行能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "task": "T1.4",
+      "level": "3",
+      "indicator": "P1.4.2",
+      "knowledge": "K10",
+      "skill": "S14"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.4供應 商資料維 護",
+        null,
+        "P1.4.1定期收集潛在供應商之基本資料，包括公 司背景、產品和服務範圍、經驗和能力 等。 P1.4.2根據每次合作經驗與結果，彙整該供應商",
+        "3",
+        "K01供應鏈管理基礎知識 K02供應商評估 K03所屬產業發展現況與趨勢 K10風險管理知識",
+        "S01資訊蒐集與整合 S02資訊分析 S13資料管理 S14人脈拓展能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "09",
+      "page": 2,
+      "task": "T1.3",
+      "level": "5",
+      "indicator": "P1.3.2",
+      "knowledge": "K13",
+      "skill": "S11"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.3 評估 應用或發 展效益",
+        "O1.3.1導 入評估分 析報告或 資料表 O1.3.2風 險評估報 告或文件",
+        "P1.3.1根據目標與需求，運用各類分析 方法（如 SWOT、五力分析、資 料統計分析等） ，進行 AI 技術 應用或發展之優勢、劣勢與限 制、商業效益及識別風險等評 估，並向經營管理者說明分析結 果，從而選擇適合的應用或發展 項目範疇。 P1.3.2針對已選擇之 AI 技術、工具或解 決方案進行施測，評估其應用效 果並適時調整 AI 技術發展方 案，以提升技術的可行性與執行 效益。",
+        "5",
+        "K03 市場研究與分析方法 K04 資料庫原理 K05 機器學習概論 K06 商業智慧概論 K09 人工智慧概論（含鑑別式與生成 式AI） K10 AI 治理概念（含倫理、偏見防範 等） K11 資料處理與分析概念 K12 風險管理概念（含AI技術、模型 偏見、法律合規等） K13 資訊安全概念",
+        "S03 技術評估與分析能力 S05 問題解決能力 S08 資料整合與分析能力 S09 資料視覺化能力 S10 AI 技術/工具應用能力 S11 實驗設計與分析能力"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "09",
+      "page": 2,
+      "task": "T2.1",
+      "level": "5",
+      "indicator": "P2.1.1",
+      "knowledge": "K14",
+      "skill": "S07"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 提出AI 應用策略 及建議",
+        "T2.1 制定 AI 技術應 用發展計 畫",
+        "O2.1.1 AI 技術應用 或發展專 案建議/計 畫書",
+        "P2.1.1依評估決定後確定之 AI 應用發展 項目範疇及目標，進行跨部門溝 通與協調，制定詳細的 AI 技術 應用或發展專案計畫，涵蓋時程 表、人力資源規劃、資源分配、",
+        "5",
+        "K02 AI 應用場景知識 K05 機器學習概論 K08 專案管理知識 K14敏捷管理開發方法 K09 人工智慧概論（含鑑別式與生成",
+        "S03 技術評估與分析能力 S05 問題解決能力 S06 協調溝通能力 S07 專案管理能力（含時間管理、資 源分配、風險應對與KPI 監控等）"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T1.2",
+      "level": "4",
+      "indicator": "P1.2.3",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.2加工 程式編輯 及轉出",
+        "O1.2.1 加工程 式",
+        "P1.2.1設定工作物原點座標。 P1.2.2依工件加工特徵，選擇適當刀具並編寫2D 及 3D加工程式等。 P1.2.3配合工具機控制器輸出程式。",
+        "4",
+        "K01工程識圖 K02工程材料 K03銑床工作法 K04計算機概論 K05螺紋規格 K06職業安全衛生相關規範",
+        "S01工作圖判讀 S02程式編輯能力 S03依據工件判斷加工條件設定 S04工程計算能力 S05 CAD／CAM軟體操作能力 S06刀具選用及研磨"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T1.3",
+      "level": "3",
+      "indicator": "P1.3.1",
+      "knowledge": "K06",
+      "skill": "S06"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        null,
+        "T1.3估算 加工工時",
+        null,
+        "P1.3.1依據工作圖、刀具路徑模擬及銑削條件估算加 工工時。",
+        "3",
+        "K01工程識圖 K02工程材料 K03銑床工作法 K04計算機概論 K05螺紋規格 K06職業安全衛生相關規範",
+        "S01工作圖判讀 S02程式編輯能力 S03依據工件判斷加工條件設定 S04工程計算能力 S05 CAD／CAM軟體操作能力 S06刀具選用及研磨"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "row",
+    "check": {
+      "id": "10",
+      "page": 2,
+      "task": "T2.1",
+      "level": "4",
+      "indicator": "P2.1.1",
+      "knowledge": "K07",
+      "skill": "S09"
+    },
+    "passed": true,
+    "matching_rows": [
+      [
+        "T2 CNC 銑床基 本操作",
+        "T2.1工件 夾持固定 方式與精 度校正",
+        null,
+        "P2.1.2使用虎鉗或其他夾、治具夾持工件及設定工件 座標原點。 P2.1.1使用量錶及其他量測儀校正工件平行度、垂直 度等。",
+        "4",
+        "K03銑床工作法 K04計算機概論 K06職業安全衛生相關規範 K07精密量測概論",
+        "S07夾(治)具使用 S08使用不同量具進行量測能力 S09 CNC銑床機具操作"
+      ]
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "text",
+    "check": {
+      "id": "01",
+      "page": 5,
+      "label": "3D正文數字",
+      "text": "3D列印技術：如FDM"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "docling",
+    "kind": "text",
+    "check": {
+      "id": "01",
+      "page": 5,
+      "label": "補充末尾",
+      "text": "Polyjet（彩色噴墨）等。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "docling",
+    "kind": "text",
+    "check": {
+      "id": "02",
+      "page": 4,
+      "label": "註2續行",
+      "text": "珠寶設計標準作業流程。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "docling",
+    "kind": "text",
+    "check": {
+      "id": "02",
+      "page": 4,
+      "label": "註4續行",
+      "text": "製作與材料相關知識、珠寶製作標準作業流程。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "docling",
+    "kind": "text",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "label": "未編碼態度",
+      "text": "配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "docling",
+    "kind": "text",
+    "check": {
+      "id": "03",
+      "page": 4,
+      "label": "DFX補充",
+      "text": "DFX(指設計時考慮製造、組裝、品管、測試、成本等等因素)。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "docling",
+    "kind": "text",
+    "check": {
+      "id": "04",
+      "page": 5,
+      "label": "未編碼態度",
+      "text": "配合產業特質與需求，積極培育技專院校學生之專業技術與能力，以達適才適所之教育目的。"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "docling",
+    "kind": "text",
+    "check": {
+      "id": "07",
+      "page": 3,
+      "label": "英文原文",
+      "text": "Financial technology, 縮寫: FinTech"
+    },
+    "passed": true,
+    "scope": "page_text_and_tables"
+  },
+  {
+    "engine": "docling",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "02",
+      "page": 2,
+      "column": 3,
+      "code": "P1.1.3",
+      "tail": "見，精進設計構想。"
+    },
+    "passed": true,
+    "matching_cells": [
+      "P1.1.3 以專案目標與考量發展設計構想，進行分 析、討論，並徵詢利益關係人的回饋意 見，精進設計構想。"
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "06",
+      "page": 2,
+      "column": 3,
+      "code": "P1.1.3",
+      "tail": "公差與配合等。"
+    },
+    "passed": true,
+    "matching_cells": [
+      "方法、輪廓虛線省略等製圖技 術，按照圖紙正確還原其立體 構造。 P1.1.3 根據圖紙，正確的理解表面織 構符號、公差與配合等。 P1.1.4 瞭解圖面與實際相關加工法、 材料與表面塗裝之關係識別。"
+    ]
+  },
+  {
+    "engine": "docling",
+    "kind": "continuation_cell",
+    "check": {
+      "id": "08",
+      "page": 2,
+      "column": 3,
+      "code": "P1.2.4",
+      "tail": "有效性。"
+    },
+    "passed": true,
+    "matching_cells": [
+      "標準、交貨期限、價格、付款條件和法律 責任等。 P1.2.4確定最終的合約版本並進行簽署，同時與 法律部門或法律顧問協作確保合同的法律 有效性。"
+    ]
+  }
+]

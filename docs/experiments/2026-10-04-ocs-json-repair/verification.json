@@ -1,0 +1,27 @@
+{
+  "summary": {
+    "converted": 815,
+    "rejected": 53,
+    "excluded": 40
+  },
+  "manifest_and_results_unique": true,
+  "source_hashes_match": true,
+  "normal_output_exactly_matches_converted": true,
+  "tracked_original_pdfs_and_json_unchanged_from_HEAD": true,
+  "original_json_count": 908,
+  "consumer": "generated OCSDocument and pure normalize; no index or embedding",
+  "counts": {
+    "documents_loaded_and_normalized": 815,
+    "documents_with_uncoded_attitudes": 4,
+    "documents_with_profile_level_six": 2,
+    "units": 2890,
+    "task_groups": 7336,
+    "task_codes": 7485,
+    "blocks": 7563,
+    "blocks_with_level_six": 43,
+    "indicators": 20656,
+    "outputs": 8522,
+    "knowledge": 36844,
+    "skills": 34925
+  }
+}

@@ -1,12 +1,11 @@
 """Version-history extractor (moved verbatim from OCSTransformer, Phase 3b)."""
 
-from typing import Dict, Optional
-
 from jd_pdf_to_json.core.models import VersionEntry, VersionInfo
 from jd_pdf_to_json.transformers.support import tables as tbl
+from jd_pdf_to_json.utils.exceptions import TransformationError
 from jd_pdf_to_json.utils.logger import logger
 
-VERSION_HEADER_ALIASES: Dict[str, list] = {
+VERSION_HEADER_ALIASES: dict[str, list] = {
     "version": ["版本", "version"],
     "ocs_code": ["職能基準代碼", "職能代碼", "ocscode"],
     "ocs_name": ["職能基準名稱", "職能名稱", "ocsname"],
@@ -19,15 +18,16 @@ VERSION_HEADER_ALIASES: Dict[str, list] = {
 def extract_version_info(pdf) -> VersionInfo:
     """Extract version history from the first-page table."""
     versions = []
+    recognized = False
     try:
-        tables = pdf.pages[0].extract_tables()
+        tables = [table.rows for table in pdf.pages[0].tables]
         if not tables:
             logger.warning("未找到版本表格，version_info.versions 將為空")
             return VersionInfo(versions=versions)
 
         for table in tables:
-            header_idx: Optional[int] = None
-            header_map: Dict[str, int] = {}
+            header_idx: int | None = None
+            header_map: dict[str, int] = {}
             for row_idx, row in enumerate(table):
                 current_map = tbl.build_column_map(row, VERSION_HEADER_ALIASES)
                 if all(k in current_map for k in ("version", "ocs_code", "ocs_name", "status")):
@@ -37,13 +37,12 @@ def extract_version_info(pdf) -> VersionInfo:
 
             if header_idx is None:
                 continue
+            recognized = True
 
             for row in table[header_idx + 1 :]:
                 version_idx = header_map.get("version")
                 version_val = (
-                    tbl.find_cell_value(row, version_idx) or ""
-                    if version_idx is not None
-                    else ""
+                    tbl.find_cell_value(row, version_idx) or "" if version_idx is not None else ""
                 )
                 if not version_val:
                     continue
@@ -67,6 +66,8 @@ def extract_version_info(pdf) -> VersionInfo:
                 )
 
     except Exception as e:
-        logger.warning(f"版本提取失敗: {str(e)}")
+        raise TransformationError(f"version_extractor.py failed: {e}") from e
 
+    if recognized and not versions:
+        raise TransformationError("Recognized version table has no extracted entries")
     return VersionInfo(versions=versions)

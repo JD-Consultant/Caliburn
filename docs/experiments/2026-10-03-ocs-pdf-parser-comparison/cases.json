@@ -1,0 +1,52 @@
+[
+  {
+    "id": "01",
+    "path": "apps/pdf-to-json/data/pdfs/3D列印設備配修人員-職能基準.pdf",
+    "sha256": "1adc394e15dd7d6d1402ed216e9e9e78b0af0428c3d3bcff3fa92a7370c86639"
+  },
+  {
+    "id": "02",
+    "path": "apps/pdf-to-json/data/pdfs/3D珠寶設計人員-職能基準.pdf",
+    "sha256": "61756c11f6b25410f1d031bd349485482275b732881f4fcc7bbacb6300f5b883"
+  },
+  {
+    "id": "03",
+    "path": "apps/pdf-to-json/data/pdfs/機械設計工程師-職能基準.pdf",
+    "sha256": "b2cac61809cadce6cacba698a00821409c1cdbd160622448068acef09d0d21a6"
+  },
+  {
+    "id": "04",
+    "path": "apps/pdf-to-json/data/pdfs/電控系統工程師-職能基準.pdf",
+    "sha256": "aba4ca825c7d46c4ea2a41bb3a0a7e498cb67f18fffd8f7a41eb230155cf6dd2"
+  },
+  {
+    "id": "05",
+    "path": "apps/pdf-to-json/data/pdfs/AIoT應用工程師-職能基準.pdf",
+    "sha256": "462b2f1d7a60cca993f12f7b857d0c6e29088b7eafa295b7a48c998b6f67ebad"
+  },
+  {
+    "id": "06",
+    "path": "apps/pdf-to-json/data/pdfs/工具機機械設計工程師-職能基準.pdf",
+    "sha256": "de3f44b35e145367f264f032e8635137f9eb83a47f9c325978736ebf079af992"
+  },
+  {
+    "id": "07",
+    "path": "apps/pdf-to-json/data/pdfs/銀行─金融科技人員-職能基準.pdf",
+    "sha256": "1f9dd4c432e724be470b2eb73f92db8088c8381d6e09aca9098b54ed1f4de2e1"
+  },
+  {
+    "id": "08",
+    "path": "apps/pdf-to-json/data/pdfs/供應鏈管理人員-職能基準.pdf",
+    "sha256": "e57fbccb6f32fbdf3cfb54c319d8ad4486be7b7d319aa63d14937dc9391ab9cd"
+  },
+  {
+    "id": "09",
+    "path": "apps/pdf-to-json/data/pdfs/AI應用規劃師-職能基準.pdf",
+    "sha256": "dd4c9eefc2e891dd8a00d162dca96687c2f93b2267fbd988c40460857f21b3fc"
+  },
+  {
+    "id": "10",
+    "path": "apps/pdf-to-json/data/pdfs/CNC銑床技術人員-職能基準.pdf",
+    "sha256": "54ef4f071e053a61934ef5cc8ab496fca0e2095f237f85adce2c0903f34e3bf4"
+  }
+]

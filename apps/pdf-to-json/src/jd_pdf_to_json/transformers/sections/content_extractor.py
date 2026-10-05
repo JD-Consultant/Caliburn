@@ -6,7 +6,7 @@ parse_task_codes splits combined task-code cells.
 """
 
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from jd_pdf_to_json.core.models import (
     CompetencyBlock,
@@ -21,43 +21,21 @@ from jd_pdf_to_json.transformers.support import items as itm
 from jd_pdf_to_json.transformers.support import scanning as scan
 from jd_pdf_to_json.transformers.support import tables as tbl
 from jd_pdf_to_json.transformers.support import text as txt
-from jd_pdf_to_json.utils.logger import logger
+from jd_pdf_to_json.utils.exceptions import TransformationError
 
 
 def extract_content(pdf) -> OCSContent:
     """Extract OCU units: tasks, outputs, behavioral indicators, K/S competencies."""
-    ocu_units: List[OCSUnit] = []
-    known_ocu_names: Dict[str, str] = {}
+    ocu_units: list[OCSUnit] = []
+    known_ocu_names: dict[str, str] = {}
 
     try:
-        content_header: Optional[List[Any]] = None
-        merged_content_rows: List[List[Any]] = []
+        merged_content_rows = []
+        for _table, rows in tbl.mapped_content_tables(pdf):
+            merged_content_rows.extend(rows)
 
-        for page in pdf.pages:
-            for table in page.extract_tables() or []:
-                if not table:
-                    continue
-                cleaned_rows = tbl.clean_table_rows(table)
-                if not cleaned_rows:
-                    continue
-
-                header_idx, _, header_span = tbl.find_ocu_header_row(cleaned_rows)
-                if header_idx is None:
-                    # ocs_attitude / notes_and_appendix tables are not OCU content.
-                    if content_header is not None:
-                        section_type = tbl.detect_table_type(table)
-                        if section_type not in ("ocs_attitude", "notes_and_appendix"):
-                            merged_content_rows.extend(cleaned_rows)
-                    continue
-
-                if content_header is None:
-                    content_header = tbl.merge_rows_for_header(
-                        cleaned_rows[header_idx : header_idx + header_span]
-                    )
-                merged_content_rows.extend(cleaned_rows[header_idx + header_span :])
-
-        if content_header and merged_content_rows:
-            merged_table = [content_header] + merged_content_rows
+        if merged_content_rows:
+            merged_table = [tbl.CANONICAL_HEADER] + merged_content_rows
             parsed_units = (
                 parse_ocu_table_units(merged_table)
                 if tbl.is_ocu_candidate_table(merged_table)
@@ -73,7 +51,7 @@ def extract_content(pdf) -> OCSContent:
                 if not re.fullmatch(r"T\d+", unit.ocu_code) or scan.is_generic_unit_name(
                     unit.ocu_name
                 ):
-                    grouped: Dict[str, List[Task]] = {}
+                    grouped: dict[str, list[Task]] = {}
                     for task in unit.tasks:
                         primary_code = task.task_codes[0].code if task.task_codes else ""
                         match = re.match(r"(T\d+)", primary_code)
@@ -117,29 +95,29 @@ def extract_content(pdf) -> OCSContent:
                             entry.name = text_task_names[entry.code]
 
     except Exception as e:
-        logger.warning(f"OCU 內容提取失敗: {str(e)}")
+        raise TransformationError(f"Content extraction failed: {e}") from e
 
     return OCSContent(ocu_units=ocu_units)
 
+
 def parse_task_codes(
     task_code_raw: str, task_name_raw: str, same_column: bool
-) -> List[TaskCodeEntry]:
+) -> list[TaskCodeEntry]:
     """Extract one or more TaskCodeEntry from raw cell values.
 
     Separate columns with a clean T-code produce a single entry.
     A combined cell or embedded codes produce one entry per T-code found.
     """
+    task_code_raw = txt.normalize_code_spacing(task_code_raw)
     if not same_column and re.fullmatch(r"T\d+(?:\.\d+)?", task_code_raw, re.IGNORECASE):
-        return [
-            TaskCodeEntry(code=task_code_raw, name=txt.compact_wrapped_text(task_name_raw))
-        ]
+        return [TaskCodeEntry(code=task_code_raw, name=txt.compact_wrapped_text(task_name_raw))]
 
-    text = task_name_raw or task_code_raw
+    text = txt.normalize_code_spacing(task_name_raw or task_code_raw)
     if not text:
         return []
 
     matches = list(re.finditer(r"(T\d+(?:\.\d+)?)(?![.\d])", text, re.IGNORECASE))
-    entries: List[TaskCodeEntry] = []
+    entries: list[TaskCodeEntry] = []
     for i, m in enumerate(matches):
         name_end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
         entries.append(
@@ -150,7 +128,8 @@ def parse_task_codes(
         )
     return entries
 
-def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
+
+def parse_ocu_table_units(table: list[list[Any]]) -> list[OCSUnit]:
     """Parse a merged OCU table into one or more OCSUnit objects."""
     if not table or len(table) < 2:
         return []
@@ -182,10 +161,10 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
             ocu_name = str(header[1]).strip()
 
         data_rows = table[header_idx + header_span :]
-        units: List[OCSUnit] = []
-        unit_tasks: Dict[str, List[Task]] = {}
-        unit_names: Dict[str, str] = {}
-        last_task_by_ocu: Dict[str, Task] = {}
+        units: list[OCSUnit] = []
+        unit_tasks: dict[str, list[Task]] = {}
+        unit_names: dict[str, str] = {}
+        last_task_by_ocu: dict[str, Task] = {}
         current_ocu_code = ocu_code
         current_ocu_name = ocu_name
 
@@ -199,28 +178,27 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
             if not row:
                 continue
 
-            if col_map and row:
-                major_duty_raw = txt.compact_wrapped_text(row[0])
+            if "major_duty" in col_map and row:
+                major_duty_raw = txt.compact_wrapped_text(row[col_map["major_duty"]])
                 duty_match = re.match(r"(T\d+)(.+)", major_duty_raw)
                 if duty_match:
                     current_ocu_code = duty_match.group(1)
                     current_ocu_name = duty_match.group(2).strip() or current_ocu_name
                     _ensure_unit(current_ocu_code, current_ocu_name)
+                elif major_duty_raw and current_ocu_code in unit_names:
+                    current_ocu_name = txt.append_text_if_new(current_ocu_name, major_duty_raw)
+                    unit_names[current_ocu_code] = current_ocu_name
 
             task_code_idx = col_map.get("task_code")
             task_name_idx = col_map.get("task_name")
             task_code = (
                 str(row[task_code_idx]).strip()
-                if task_code_idx is not None
-                and task_code_idx < len(row)
-                and row[task_code_idx]
+                if task_code_idx is not None and task_code_idx < len(row) and row[task_code_idx]
                 else ""
             )
             task_name = (
                 str(row[task_name_idx]).strip()
-                if task_name_idx is not None
-                and task_name_idx < len(row)
-                and row[task_name_idx]
+                if task_name_idx is not None and task_name_idx < len(row) and row[task_name_idx]
                 else ""
             )
             if not task_name and task_code_idx is not None and task_code_idx < len(row):
@@ -240,13 +218,13 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
                 else []
             )
 
-            knowledge: List[CompetencyItem] = []
+            knowledge: list[CompetencyItem] = []
             if "knowledge" in col_map and col_map["knowledge"] < len(row):
                 knowledge = itm.extract_competency_items(row[col_map["knowledge"]], "K")
             if not knowledge:
                 knowledge = itm.extract_competency_items_from_row(row, "K")
 
-            skills: List[CompetencyItem] = []
+            skills: list[CompetencyItem] = []
             if "skills" in col_map and col_map["skills"] < len(row):
                 skills = itm.extract_competency_items(row[col_map["skills"]], "S")
             if not skills:
@@ -297,6 +275,12 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
                             )
                         )
                     previous_block = previous_task.competency_blocks[-1]
+                    if (
+                        outputs
+                        and all(item.code is None for item in outputs)
+                        and previous_block.outputs
+                    ):
+                        outputs = []
 
                     output_idx = col_map.get("outputs")
                     behavioral_idx = col_map.get("behavioral")
@@ -328,21 +312,36 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
                         else ""
                     )
 
+                    # A continuation can finish the prior item AND start new
+                    # coded items in the same cell. Keep the leading fragment.
+                    output_tail = txt.normalize_code_spacing(output_tail)
+                    behavioral_tail = txt.normalize_code_spacing(behavioral_tail)
+                    knowledge_tail = txt.normalize_code_spacing(knowledge_tail)
+                    skills_tail = txt.normalize_code_spacing(skills_tail)
+                    output_tail = re.split(
+                        r"O\d+(?:[-.]\d+)*", output_tail, maxsplit=1, flags=re.IGNORECASE
+                    )[0]
+                    behavioral_tail = re.split(
+                        r"[PT]\.?\d+(?:[-.]\d+)*", behavioral_tail, maxsplit=1, flags=re.IGNORECASE
+                    )[0]
+                    knowledge_tail = re.split(
+                        r"K\d+(?:[-.]\d+)*", knowledge_tail, maxsplit=1, flags=re.IGNORECASE
+                    )[0]
+                    skills_tail = re.split(
+                        r"S\d+(?:[-.]\d+)*", skills_tail, maxsplit=1, flags=re.IGNORECASE
+                    )[0]
+
                     if (
-                        not outputs
-                        and output_tail
+                        output_tail
                         and previous_block.outputs
-                        and not re.search(
-                            r"\bO\d+(?:[-.]\d+)*", output_tail, flags=re.IGNORECASE
-                        )
+                        and not re.search(r"\bO\d+(?:[-.]\d+)*", output_tail, flags=re.IGNORECASE)
                     ):
                         previous_block.outputs[-1].name = txt.append_text_if_new(
                             previous_block.outputs[-1].name, output_tail
                         )
 
                     if (
-                        not behavioral_indicators
-                        and behavioral_tail
+                        behavioral_tail
                         and previous_block.indicators
                         and not re.search(
                             r"\b[PT]\d+(?:[-.]\d+)*", behavioral_tail, flags=re.IGNORECASE
@@ -353,8 +352,7 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
                         )
 
                     if (
-                        not knowledge
-                        and knowledge_tail
+                        knowledge_tail
                         and previous_block.knowledge
                         and not re.search(
                             r"\bK\d+(?:[-.]\d+)*", knowledge_tail, flags=re.IGNORECASE
@@ -365,12 +363,9 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
                         )
 
                     if (
-                        not skills
-                        and skills_tail
+                        skills_tail
                         and previous_block.skills
-                        and not re.search(
-                            r"\bS\d+(?:[-.]\d+)*", skills_tail, flags=re.IGNORECASE
-                        )
+                        and not re.search(r"\bS\d+(?:[-.]\d+)*", skills_tail, flags=re.IGNORECASE)
                     ):
                         previous_block.skills[-1].name = txt.append_text_if_new(
                             previous_block.skills[-1].name, skills_tail
@@ -383,6 +378,8 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
                     # New block when both a structural trigger (new O or level change)
                     # and new K/S codes are present.
                     new_level = itm.extract_task_level(row, col_map)
+                    if new_level is None:
+                        new_level = previous_block.competency_level
                     level_changed = new_level != previous_block.competency_level
                     has_new_o = bool(outputs)
                     has_new_ks = bool(knowledge or skills)
@@ -407,7 +404,7 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
                         dd.dedupe_block(previous_block)
                     continue
 
-                continue
+                raise TransformationError(f"Orphan content continuation: {row}")
 
             task_level = itm.extract_task_level(row, col_map)
             if primary_task_code:
@@ -430,7 +427,8 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
         for code, tasks in unit_tasks.items():
             for task in tasks:
                 task.competency_blocks = [
-                    b for b in task.competency_blocks
+                    b
+                    for b in task.competency_blocks
                     if b.indicators or b.outputs or b.knowledge or b.skills
                 ]
             tasks = [t for t in tasks if t.competency_blocks]
@@ -446,6 +444,4 @@ def parse_ocu_table_units(table: List[List[Any]]) -> List[OCSUnit]:
         return units
 
     except Exception as e:
-        logger.warning(f"OCU 表解析失敗: {str(e)}")
-        return []
-
+        raise TransformationError(f"Content table failed: {e}") from e

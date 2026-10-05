@@ -1,0 +1,7633 @@
+{
+  "summary": {
+    "changed": 778,
+    "unchanged": 37
+  },
+  "changed_sections": {
+    "ocs_content": 764,
+    "notes": 327,
+    "ocs_attitude": 59,
+    "ocs_profile": 4
+  },
+  "files": [
+    {
+      "source": "3D列印積層製造工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [],
+          "added": [
+            "04.2.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "3D列印設備配修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "3D珠寶設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O2.3.13",
+            "O3.2.13"
+          ],
+          "added": [
+            "O2.3.1",
+            "O3.2.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "AIoT應用工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "AI應用規劃師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "AI標註人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "AI演算法工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "AI演算法應用工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T4.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "AI詠唱人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "CNC折床技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "CNC折床技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "CNC車床技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "CNC車床技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "CNC銑床、車床程式設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O2.1.12",
+            "O2.2.13"
+          ],
+          "added": [
+            "O2.1.1",
+            "O2.2.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "CNC銑床技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "indicators": {
+          "removed": [
+            "P1.1.23"
+          ],
+          "added": [
+            "P1.1.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "CNC銑床技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "skills": {
+          "removed": [],
+          "added": [
+            "K12"
+          ]
+        }
+      }
+    },
+    {
+      "source": "FAE工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "LED光學設計工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "LED照明工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "PCBA維修技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "PCBA維修技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "PCB佈局工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "PCB佈局工程助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "PCB前製程生產製造操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "PCB品檢員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "PCB後製程生產製造操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "RF研發工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "SEO網站優化工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "VR_AR程式設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "XR互動多媒體數位內容開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "XR穿戴設備韌體設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O2.2.1",
+            "O3.1.1",
+            "O3.2.1",
+            "O3.3.1",
+            "O3.3.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "不動產仲介業務秘書-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "不動產仲介經紀人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "不動產仲介門市店長-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "不織布前紡製造技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "中古汽車查定人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "中古汽車銷售人員-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "中小型企業專業經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "中式烹飪助理廚師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "中式烹飪廚師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "乳牛修護蹄人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "knowledge": {
+          "removed": [],
+          "added": [
+            "K0"
+          ]
+        }
+      }
+    },
+    {
+      "source": "人力資源勞動法令人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "人工智慧訓練主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "介面視覺設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "代銷企劃文案-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "代銷企劃設計-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "代銷專案經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "代銷市調人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "代銷業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "代銷規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "企劃人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "企劃助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "企業內部稽核人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "企業永續環境管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "企業永續發展人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "企業財務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "作業環境監測技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "使用者經驗設計人員(UX)-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "供應鏈管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "供應鏈管理助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "保健食品產業行銷企劃師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "保健食品研發工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "保全人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "保存修護科學檢測專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "信用卡機構-經營管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "信用卡機構─風險管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "倉管主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "倉管助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "倉管專員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "停車場業務開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "停車場營運主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "停車場管理員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復交趾作工匠（四級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復剪黏作工匠（四級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復土水作工匠（三級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復土水作工匠（五級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復塑作工匠（五級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復大木作工匠（四級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復小木作工匠（四級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復彩繪作工匠（四級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復木作工匠（三級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復木作工匠（五級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復油漆作工匠（三級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復泥作工匠（四級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復泥塑作工匠（三級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復瓦作工匠（四級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復畫作工匠（五級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復石雕作工匠（三級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復石雕作工匠（五級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復石雕作工匠（四級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復鑿花作工匠（三級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復鑿花作工匠（五級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "傳統技術修復鑿花作工匠（四級）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "儀校助理工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "儀校工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "儲電系統整合工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "knowledge": {
+          "removed": [],
+          "added": [
+            "S06"
+          ]
+        }
+      }
+    },
+    {
+      "source": "公關企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "公關活動業活動專案經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "公關經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "共享機車整備員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "冷凍水產國際市場經營人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "冷凍空調技術人員-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "冷凍空調系統規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "冷凍空調設備安裝人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "冷凍空調設備維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "skills": {
+          "removed": [
+            "S6"
+          ],
+          "added": []
+        }
+      }
+    },
+    {
+      "source": "冷鏈倉儲物流人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "凸版（柔版）印刷技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "凹版印刷技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "出版品企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "出版品編輯人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "動物疫苗cGMP品保人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "動物疫苗製程開發研究人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "動畫設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O2.2.13"
+          ],
+          "added": [
+            "O2.2.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "勞資爭議仲裁人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "勞資爭議調解人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "匿名稽核員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "半導體產業-製造-品管工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "半導體產業-製造-廠務工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "半導體產業-製造-製程整合工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "半導體產業-製造-設備工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "半導體產業IC佈局工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "半導體產業數位IC設計工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "半導體產業軟體設計工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "半導體產業韌體設計工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "半導體產業類比IC設計工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "博物館技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "博物館策展_研究人員-職能基準.json",
+      "changed_sections": [
+        "ocs_profile",
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "印刷作業廠務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "印刷業務行銷主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "印刷機台技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "印刷生產排程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "印刷裝訂與後加工技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "印刷製程管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "印前技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "印花處理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "咖啡杯測人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "咖啡烘焙人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "咖啡烘焙助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "咖啡調製人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "品牌企劃師-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "員工關係人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "商品展示陳列人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "商業智慧（BI）系統開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "knowledge": {
+          "removed": [
+            "K15"
+          ],
+          "added": []
+        },
+        "skills": {
+          "removed": [],
+          "added": [
+            "K15"
+          ]
+        }
+      }
+    },
+    {
+      "source": "商業營運主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "商業營運行政人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "國際事務行政人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.1.1",
+            "O1.1.2",
+            "O1.2.1",
+            "O1.2.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "國際行銷主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "國際運送承攬主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "國際運送承攬人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "園藝療育師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "培訓專案主管人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "基層主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "場地管理業場館服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "場地管理業工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "場地管理業業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠加工助理技術員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠加工技術員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠加工資深技術員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠射出品質管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠射出成型工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠射出模具設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠整合製造操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠材料應用工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [],
+          "added": [
+            "02.2.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "塑膠模具技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠生產製造操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塑膠製品檢測人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "塗料開發工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "壓鑄模具技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "壓鑄模具設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "壽險-投資人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "壽險─數據分析人員（金融科技）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "壽險業-核保人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "knowledge": {
+          "removed": [
+            "K0"
+          ],
+          "added": []
+        }
+      }
+    },
+    {
+      "source": "壽險業-業務專員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "壽險業-系統設計人員（金融科技）-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "壽險業-資訊安全人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "壽險業─理賠人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "壽險業統計精算師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "壽險業風險管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "壽險業－法令遵循人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "外籍移工仲介從業人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "外籍移工勞資關係人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "外籍移工生活照顧服務人員-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "多媒體設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "多媒體設計企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "天線設計工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_profile",
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "太陽光電模組製程工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "太陽光電產業設備開發工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "太陽光電發電系統專案助理人員-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "太陽光電發電系統專案管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "太陽光電發電系統監控人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "太陽光電發電系統維運人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "太陽光電發電系統設備安裝人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "夾治具安裝技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "夾治具製造技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "夾治具設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "夾治具設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "婚宴活動企劃執行人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "婚紗攝影人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "婚紗攝影助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "婚紗造型專業人員（禮服秘書）-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "媒體企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "媒體企劃助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "客戶服務主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "客戶服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "客戶服務企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "客戶服務助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "客戶服務專案人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "客戶服務部門主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T2.2"
+          ]
+        },
+        "indicators": {
+          "removed": [
+            "P2.2",
+            "P2.3",
+            "P3.1"
+          ],
+          "added": [
+            "P2.3.1"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O2.2.1",
+            "O2.2.2",
+            "O2.2.3"
+          ]
+        }
+      }
+    },
+    {
+      "source": "客運營運經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "客運營運調度人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "室內裝修工程管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "室內設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "室內設計助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "室內設計裝修專業人員-低碳永續-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "家事清潔服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "家具設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "家具設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "寵物照顧人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "寵物生命紀念業服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "寵物美容助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "寵物美容專業人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "寶玉石工藝產業工藝師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "寶石切磨技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "專案管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "導遊人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "小型汽車售後服務接待人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "小型汽車售後服務接待助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "小型汽車新車整備員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "小型汽車維修廠品質技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "小型汽車維修廠技術主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "小型汽車維修廠技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "小型汽車維修廠技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "就業服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "展覽業務經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "展覽行銷企劃專員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "展覽行銷企劃經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "展覽裝潢業展場會場設計業務-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工具機機械設計工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工具機軟體人機介面工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工會理事長-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T1.2",
+            "T1.3",
+            "T2.2",
+            "T3.1"
+          ]
+        },
+        "indicators": {
+          "removed": [
+            "T1.2",
+            "T1.3",
+            "T2.2"
+          ],
+          "added": [
+            "P1.2.1",
+            "P1.3.1",
+            "P1.3.2",
+            "P1.3.3",
+            "P2.1.1",
+            "P2.2.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "工會總幹事／秘書長-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工業工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工業工程助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工藝產業生產管理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工藝產業產品經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工藝產業行銷經紀-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工藝產業陶瓷工藝師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "工藝產業首飾金工工藝師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "市場分析助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "市場調查分析人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "平版印刷技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "平面視覺傳達設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "平面設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "店面智慧化設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "廚房助手-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "廚房領班人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "廣告AE人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "廣告企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "廣告創意總監-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "廣告文案人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "廣告文案助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "廣告業務主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築塗裝技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築塗裝技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築壁畫修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築壁畫修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築彩繪修護主持人-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築彩繪修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築彩繪修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築木質彩繪修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築木質彩繪修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築物漆作技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "建築設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "影視產業剪輯人才-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "影視產業聲音人才-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "影視產業視覺效果人才-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "影音串流工程助理-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "影音串流軟體設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "影音動畫設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O3.4.23",
+            "O3.5.23"
+          ],
+          "added": [
+            "O3.4.2",
+            "O3.5.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "影音文物保存修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "影音文物保存修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "微型企業營運主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "微型電動二輪車機構設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "成衣整燙人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "成衣服裝設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "成衣服裝設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "成衣生產助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "成衣生產技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "成衣裁剪人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "成衣裁剪助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "房務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "批發業務人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "技術文件編譯人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "投信投顧業-基金經理人-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "投信投顧業-基金銷售業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "投信投顧業-證券投資研究人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "拋光加工技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "招募甄選專業人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "振動分析工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "採購主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "採購人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "採購助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "擠型模具技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "擠型模具設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "放電加工技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "散裝船舶運務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "整體造型設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "數位匯流設備技術人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "數位印刷技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "數位印刷生產管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "數位媒體廣告投放人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "數位平臺營運企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "數位行銷企劃主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "文創產業品牌行銷經紀人-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "文化資產解說專案執行人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "文資場域經營管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "施工架施作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "施工架高階技術人員／領班-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "旅行業產品操作人員（旅行業OP人員）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "旅遊業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "旅遊業營運主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "旅遊線控經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "旅遊諮詢人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "旅館客務經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "indicators": {
+          "removed": [
+            "T2.1"
+          ],
+          "added": []
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "03.2.2",
+            "03.3.4"
+          ]
+        }
+      }
+    },
+    {
+      "source": "旅館房務經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "indicators": {
+          "removed": [
+            "T1.3"
+          ],
+          "added": []
+        }
+      }
+    },
+    {
+      "source": "旋臂鑽床操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "日式烹飪助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "日式烹飪廚師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "昇降設備技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "景觀園藝技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "景觀園藝植栽人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "景觀園藝植栽設計規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "智慧感測產品工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "智慧生產工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "智慧綠建築中高階系統整合人才-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "智慧綠建築安全監控人才-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "智慧綠建築建築設計人才-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "智慧綠建築節能規劃人才-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "智慧製造導入顧問-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "會計主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "會計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "會計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "會議專案經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "服裝打版技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "期貨信託基金經理人-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "期貨商-受託買賣業務人員（包括金融科技人才）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "期貨服務事業（顧問、經理、信託）及槓桿交易商研究分析人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "木質文物修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "木質文物修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "林業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "架上繪畫修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "架上繪畫修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "染整前處理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "染整後整理加工人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "染整研發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "染色處理技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "森林療癒人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "模具技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "模板技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "模板技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "機器人機電整合工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "機械組裝人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "機械製圖人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O1.3.13"
+          ],
+          "added": [
+            "O1.3.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "機械設備銲接工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O1.2.13",
+            "O1.2.22"
+          ],
+          "added": [
+            "O1.2.1",
+            "O1.2.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "機械設計工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "機電熱能助理工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "機電熱能工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "櫃台人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "民俗調理業傳統整復推拿技術員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "民俗調理業經絡調理技術員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "民俗調理業腳底按摩調理員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "水下遙控無人載具（ROV）作業主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "水下遙控無人載具（ROV）技術工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "水電工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "水電工程助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "水電繪圖人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車充電椿裝配技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車充電站（椿）建置規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車動力檢查及維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車噴漆塗裝技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車噴漆塗裝技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車塗裝前處理技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車影音多媒體技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車影音多媒體技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車整車電路設計工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車玻璃換修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車租賃業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車維修人員（適用大型商用車）-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車維修廠務主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車維修技術主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車美容助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車美容專業人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車輪胎技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車輪胎技術助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車鈑金技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車鈑金技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車銷售人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "汽車電子控制系統維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "沖壓模具技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "油電混合動力車檢修技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "泥作技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "泥作技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "泥作放樣人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "活動主持人-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "活動主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "活動企劃助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "活動企劃專員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "活動指導員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "活動（專案）行銷企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "流行音樂演唱會執行製作-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "流行音樂演藝執行經紀-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "流行音樂燈光專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "流行音樂行銷企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "流行音樂音響專業人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "海運運務人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "消費性電子產品機構設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "淨零建築能效管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_profile",
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "淨零建築能效評估規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_profile",
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "淨零碳規劃管理師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "清潔領班-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "測量工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "測量工程助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "測量放樣助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "演唱會助理導播-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "演唱會視訊工程師-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "無人機維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "無形資產評價人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "無線通信助理技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "無線通信技術人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "無線通信資深技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "照明設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "照明設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "燃油機車維修技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "燃油機車維修技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "營建工程專案管理主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "營建防水技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "營建防水技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "營運智慧分析師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "物業案場主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "物業案場服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "物流作業人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "物流司機-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "物流營運主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "物流管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "物流運輸規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "物聯網研發助理工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "物聯網研發工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "特定寵物（犬）訓練人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "獎勵旅遊業業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "獎勵旅遊業活動企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "珠寶製作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "珠寶設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "珠寶設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "珠寶金工人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "環境清潔人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "生技產業生物技術研發師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "生技產業配方劑型研究人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "生產設備工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "生產設備工程助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "生鮮處理員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產後居家照顧服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險-投資人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險─數據分析人員（金融科技）-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險業-核保人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險業-業務專員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險業-系統設計人員（金融科技）-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "產險業-資訊安全人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險業─理賠人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險業產品設計人員（金融科技）-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險業統計精算師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險業風險管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "產險業－法令遵循人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "皮件設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "皮件設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "直播後台操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "石材乾式安裝技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "石材乾式安裝技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "石材濕式安裝技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "石材濕式安裝技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "石質文物修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "石質文物修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "磊晶工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "社區健康促進推動人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "社群媒體經營人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "私立就業服務機構主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T1.2"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.2.1",
+            "O4.1.1",
+            "O4.3.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "私立就業服務機構招募人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "私立就業機會開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T1.2"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.2.1",
+            "O1.3.1",
+            "O2.1.1",
+            "O3.1.1",
+            "O3.1.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "穀物採後處理設備技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "節能績效量測與驗證工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "粉末冶金模具技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "粉末冶金模具設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "精密量測助理工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "精密量測工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "精實管理基層主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "indicators": {
+          "removed": [
+            "P1.2.15"
+          ],
+          "added": [
+            "P1.2.1"
+          ]
+        },
+        "outputs": {
+          "removed": [
+            "O1.1.15",
+            "O1.1.25",
+            "O1.1.35",
+            "O1.1.45",
+            "O1.1.55",
+            "O1.2.15",
+            "O3.3.45"
+          ],
+          "added": [
+            "O1.1.1",
+            "O1.1.2",
+            "O1.1.3",
+            "O1.1.4",
+            "O1.1.5",
+            "O1.2.1",
+            "O3.3.4"
+          ]
+        }
+      }
+    },
+    {
+      "source": "系統保全技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "系統保全資通訊工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "系統家具組裝人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "系統家具規劃銷售人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O2.1.13"
+          ],
+          "added": [
+            "O2.1.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "系統機動保全主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "系統機動保全人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "系統管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "系統維護人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "系統電源設計工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "紙絹文物修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "紙絹文物修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "紡紗生產技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "紡織化學工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "紡織品行銷人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "紡織品設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "紡織廠生管人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "紡織設備維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "組織法務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "組織法務助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "綜合零售業區域主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "綜合零售業商品採購人員-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "綜合零售業大數據分析師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "綜合零售業展店主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "綜合零售業數位行銷專員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "綜合零售業物聯網應用企劃師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "綜合零售業門市主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "綠色新材料開發工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "網站前端開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "網站管理維護人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "網站系統設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "網站資訊管理助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "網紅經紀人-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "網路建置維護人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "網路管理助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "網路維修助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "網路行銷企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "網路資訊安全人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "縫製設備操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "織品文物修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "織品文物修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "織布生產技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "纖維生產技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "美甲彩繪人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "職業棒球運動員經紀人-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "職業訓練人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "職涯諮詢人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "職能分析人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T1.1",
+            "T1.2",
+            "T2.1"
+          ]
+        },
+        "indicators": {
+          "removed": [
+            "P1.1",
+            "P1.2",
+            "P2.1"
+          ],
+          "added": [
+            "P1.1.1",
+            "P1.1.2",
+            "P1.1.3",
+            "P1.1.4",
+            "P1.2.1",
+            "P1.2.2",
+            "P1.2.3",
+            "P2.1.1",
+            "P2.1.2",
+            "P2.1.3",
+            "P2.1.4",
+            "P2.2.1",
+            "P3.1.1",
+            "P3.1.2",
+            "P3.2.1"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.1.1",
+            "O1.1.2",
+            "O1.1.3",
+            "O1.2.1",
+            "O1.2.2",
+            "O2.1.1",
+            "O2.1.2",
+            "O2.2.1",
+            "O3.1.1",
+            "O3.1.2",
+            "O3.2.1"
+          ]
+        },
+        "knowledge": {
+          "removed": [],
+          "added": [
+            "K01",
+            "K02",
+            "K03",
+            "K04",
+            "K05",
+            "K06",
+            "K07",
+            "K09"
+          ]
+        },
+        "skills": {
+          "removed": [],
+          "added": [
+            "S01",
+            "S03",
+            "S05",
+            "S06"
+          ]
+        }
+      }
+    },
+    {
+      "source": "自動光學檢測人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自動化控制工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自動化控制工程助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自動化機構設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自動化機構設計助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自行車品保人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自行車整車產品企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自行車材料應用工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自行車維修技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自行車維修技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自行車設計工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "自行車設計工程助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "船務進出口作業人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "船舶運務規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "色彩規劃管理師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "花藝設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "花藝設計助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "葡萄果園經營管理專員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T2.2"
+          ]
+        },
+        "indicators": {
+          "removed": [
+            "P1.1",
+            "P1.2",
+            "P1.3",
+            "P2.1",
+            "P3.1",
+            "P3.2",
+            "P3.3",
+            "P3.4",
+            "P4.1",
+            "P4.2",
+            "P4.3"
+          ],
+          "added": []
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.2.1",
+            "O1.3.1",
+            "O1.4.1",
+            "O2.1.1",
+            "O2.2.1",
+            "O2.3.1",
+            "O2.3.2",
+            "O2.3.3",
+            "O2.3.4",
+            "O2.4.1",
+            "O2.4.2",
+            "O2.4.3",
+            "O3.1.1",
+            "O3.1.2",
+            "O3.1.3",
+            "O3.2.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "蔬菜育苗智慧生產人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "蔬菜育苗智慧經營管理師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "薪酬管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "藥品生產作業人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "蘭花生產管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "蜂蜜品評人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "螺絲螺帽成型技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "螺絲螺帽技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "行動應用企劃師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T4.2"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O2.5.1",
+            "O3.1.1",
+            "O3.2.1",
+            "O4.1.1",
+            "O4.2.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "行動裝置程式設計師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T1.2"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.4.1",
+            "O1.5.1",
+            "O1.6.1",
+            "O1.6.2",
+            "O1.7.1",
+            "O1.7.2",
+            "O2.1.1",
+            "O2.2.1",
+            "O2.3.1",
+            "O2.3.2",
+            "O2.4.1",
+            "O2.4.2",
+            "O2.5.1",
+            "O2.5.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "行動裝置維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "行動遊戲程式設計師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "行政總務主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "行政總務管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "行銷主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "行銷人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "行銷助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "表演藝術產業節目製作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "表演藝術產業舞台技術統籌人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "表演藝術產業舞台監督人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "表演藝術產業音響工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "表演設施舞台機械自動控制人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "裝修木工人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "裝修木工助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "裝卸督導人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "製藥品管檢驗人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "製藥品質保證主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "製藥品質保證人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "製藥製程開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "製造業CAD／CAM工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "製造業品管主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "製造業品管人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "製造業安全助理-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "製造業安全工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O2.1.16",
+            "O2.3.16"
+          ],
+          "added": [
+            "O2.1.1",
+            "O2.3.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "複合材料工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "西式烹飪助理廚師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "西式烹飪廚師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T2.3"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.2.1",
+            "O2.1.1",
+            "O2.1.2",
+            "O2.2.1",
+            "O2.2.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "西點、麵包烘焙助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "西點、麵包烘焙技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "視覺藝術產業修復人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "視覺藝術產業展覽策劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "視覺藝術產業拍賣人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "視覺藝術產業經紀人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "觀光產業業務發展主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "訂製鞋製作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "訓練主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "訓練稽核人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "訓練行政人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "訓練規劃與評量人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "設計服務行銷企劃師-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "課程設計與規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "調酒員／吧檯服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "證券業-受託買賣業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "證券業-承銷業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "證券業-自營業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "證券業-財富管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "貨物_貨櫃裝卸人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "貨運處理_調度人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資安檢測工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資安檢測工程助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資安管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資料工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資料庫分析設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資材主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資材人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資訊安全工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T2.2",
+            "T3.2",
+            "T3.3",
+            "T4.10",
+            "T4.2",
+            "T4.3",
+            "T4.4",
+            "T4.5",
+            "T4.6",
+            "T4.7",
+            "T4.8",
+            "T4.9",
+            "T5.2",
+            "T5.3",
+            "T5.4",
+            "T7.1",
+            "T7.3",
+            "T7.4",
+            "T7.5",
+            "T7.6",
+            "T8.2",
+            "T8.3",
+            "T9.2"
+          ]
+        },
+        "indicators": {
+          "removed": [
+            "P1.1",
+            "P4.1",
+            "P4.2"
+          ],
+          "added": [
+            "P7.1.1"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.1.1",
+            "O2.2.1",
+            "O2.2.2",
+            "O2.3.1",
+            "O2.3.2",
+            "O3.1.1",
+            "O3.1.2",
+            "O3.1.3",
+            "O3.1.4",
+            "O3.2.1",
+            "O3.2.2",
+            "O3.2.3",
+            "O3.2.4",
+            "O3.2.5",
+            "O3.3.1",
+            "O3.3.2",
+            "O3.3.3",
+            "O4.1.1",
+            "O4.1.2",
+            "O4.10.1",
+            "O4.10.2",
+            "O4.2.1",
+            "O4.2.2",
+            "O4.3.1",
+            "O4.3.2",
+            "O4.4.1",
+            "O4.4.2",
+            "O4.5.1",
+            "O4.5.2",
+            "O4.5.3",
+            "O4.5.4",
+            "O4.6.1",
+            "O4.6.2",
+            "O4.7.1",
+            "O4.7.2",
+            "O4.7.3",
+            "O4.7.4",
+            "O4.8.1",
+            "O4.8.2",
+            "O4.8.3",
+            "O4.9.1",
+            "O4.9.2",
+            "O4.9.3",
+            "O5.1.1",
+            "O5.1.2",
+            "O5.2.1",
+            "O5.3.1",
+            "O5.3.2",
+            "O5.4.1",
+            "O5.4.2",
+            "O6.1.1",
+            "O7.1.1",
+            "O7.1.2",
+            "O7.2.1",
+            "O7.2.2",
+            "O7.3.1",
+            "O7.4.1",
+            "O7.4.2",
+            "O7.6.1",
+            "O7.6.2",
+            "O7.7.1",
+            "O7.7.2",
+            "O7.7.3",
+            "O8.1.1",
+            "O8.2.1",
+            "O8.2.2",
+            "O8.2.3",
+            "O8.3.1",
+            "O8.3.2",
+            "O9.1.1",
+            "O9.1.2",
+            "O9.1.3",
+            "O9.2.1",
+            "O9.2.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "資訊設備管制人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資通網路助理技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資通網路技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資通網路規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "資通網路資深技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "跨境電商商品企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "跨境電商營運人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "車用感測系統開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "車用感測裝置設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "車銑數控機技術助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "軟裝設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "軟體測試助理工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "軟體測試工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "輕型汽車底盤維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "輕鋼架工程技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "輕鋼架工程技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "農務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "農業人力資源管理師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "農業勘損人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "農機操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "農漁會信用部主任-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "農漁會農業推廣人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "農產加工暨管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "農產品驗證輔導人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "農藥代噴技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.1.1",
+            "O1.1.2",
+            "O2.1.1",
+            "O2.1.2",
+            "O2.1.3",
+            "O2.1.4",
+            "O2.1.5",
+            "O2.1.6",
+            "O2.2.1",
+            "O2.2.2",
+            "O2.2.3",
+            "O2.2.4",
+            "O2.3.1",
+            "O2.3.2",
+            "O2.3.3",
+            "O2.3.4",
+            "O2.3.5",
+            "O2.5.1",
+            "O2.5.2",
+            "O2.5.3",
+            "O2.5.4",
+            "O2.5.5",
+            "O2.5.6"
+          ]
+        }
+      }
+    },
+    {
+      "source": "農藥管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T3.2"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.1.1",
+            "O1.3.1",
+            "O1.3.2",
+            "O2.1.1",
+            "O2.3.1",
+            "O2.3.2",
+            "O2.3.3",
+            "O2.4.1",
+            "O2.4.2",
+            "O2.4.3",
+            "O3.1.1",
+            "O3.1.2"
+          ]
+        }
+      }
+    },
+    {
+      "source": "通訊產業智慧手持裝置嵌入式系統韌體工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "連鎖加盟區域管理主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "連鎖加盟業務管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "連鎖門市展店人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "連鎖門市服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "連鎖餐飲內場廚務員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "連鎖餐飲區域督導-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "連鎖餐飲門市主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "連鎖餐飲門市服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "進出口客戶服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "遊戲2D美術設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "遊戲3D動作設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "遊戲3D場景設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O1.2.13"
+          ],
+          "added": [
+            "O1.2.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "遊戲企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "遊戲技術美術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "遊戲數值人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "遊戲測試人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "遊戲營運人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "knowledge": {
+          "removed": [],
+          "added": [
+            "K07",
+            "K14"
+          ]
+        }
+      }
+    },
+    {
+      "source": "遊戲特效設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O2.2.12",
+            "O2.3.13"
+          ],
+          "added": [
+            "O2.2.1",
+            "O2.3.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "遊戲自動化測試工程人員-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "遊戲資深技術美術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "運動中心營運經理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "運動彩券經銷商-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "運動彩券門市人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "運動賽會經理人-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "都更危老整合人-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "醫療器材產業品質保證工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "knowledge": {
+          "removed": [],
+          "added": [
+            "S20.20"
+          ]
+        }
+      }
+    },
+    {
+      "source": "醫療器材產業業務主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "醫療器材產業業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "醫療器材產業業務助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "醫療器材產業法規人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T2.3",
+            "T2.4",
+            "T3.2",
+            "T3.4"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O2.1.1",
+            "O2.2.1",
+            "O2.3.1",
+            "O2.4.1",
+            "O3.1.1",
+            "O3.2.1",
+            "O3.3.1",
+            "O3.3.2",
+            "O3.3.3",
+            "O3.3.4",
+            "O3.4.1",
+            "O3.5.1",
+            "O3.6.1",
+            "O4.1.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "醫療器材產業維修助理工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "醫療器材產業醫療電子器材研發工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "醫療設備工程管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "醫藥品業務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "醫藥品業務助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬射出成型（MIM）技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬射出成型（MIM）製程工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬扣件CAE工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬扣件產品開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬文物修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬文物修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬研磨技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬研磨技術助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬表面一般塗裝技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬製造品質管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬製造品質管理助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬製造生產管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金屬製造生產管理助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金融控股公司─直接投資人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "金融控股公司─經營管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "針平織研發工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鈑金繪圖員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [
+            "O1.2.22",
+            "O1.2.33"
+          ],
+          "added": [
+            "O1.2.2",
+            "O1.2.3"
+          ]
+        }
+      }
+    },
+    {
+      "source": "鈑金設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行-防制洗錢_打擊資恐人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─OBU業務_外匯人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─企業永續授信人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─企業永續治理人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─徵信及授信人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─投資分析人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─數位行銷人員(金融科技)-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─數據分析人員(金融科技)-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─理財規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─產品設計人員(金融科技)-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─直接投資人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─系統設計人員(金融科技)-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─經營管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─資訊安全人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─金融商品研發人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─金融科技人員-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─風險控管人員(金融科技)-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─風險管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行─高資產管理人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "銀行－法令遵循人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銀髮族膳食製備人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銑床技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銲接助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銲接技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銷售助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "銷售顧問-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鋁門窗安裝技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鋁門窗安裝技術助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "錄音工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鍛造技術人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "鍛造模具技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鍛造模具設計人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鏟裝機維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鏟裝機維修助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "陶瓷文物修護專業技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "陶瓷文物修護技術助理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "陽極處理技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "陽極處理設備操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "離岸作業塗裝檢查員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "離岸作業塗裝維護人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "離岸作業水上支撐結構檢修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "離岸作業水下支撐結構檢測人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "雲端支援服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "雲端架構工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "雲端系統維運人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "雲端系統開發工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "零售商品採購人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "零售服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "零售業主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "零售業倉儲管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "零售業品保管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "零售業賣場陳列與規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.2.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "零售營運主管-職能基準.json",
+      "changed_sections": [
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "零售系統開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "零售電子商務營運人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "雷射切割操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電信工務管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電信維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電信網路規劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電信網路規劃技術主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電信線路助理技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電信線路技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電信線路資深技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電信設備安裝人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電動機車檢修技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電動車機電整合工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電動車檢修技術人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "電動車檢修技術助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "電動輔助自行車-機電檢測開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電商平台招商企劃人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電商物流中心理貨員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電器設備維修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電器銷售服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電子出版技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電子工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電子工程助理-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "電控系統工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電機儀控工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電機儀控工程助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電磁相容工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T1.2"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O1.1.1",
+            "O2.2.1",
+            "O2.2.2",
+            "O3.1.1",
+            "O3.2.1",
+            "O3.3.1",
+            "O4.1.1",
+            "O4.2.1",
+            "O4.3.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "電聲工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電腦周邊設備硬體研發工程人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電腦設備維修助理-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電腦設備裝修人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電話／網路行銷服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電路板製程工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電鍍技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "電鍍設備操作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鞋品實體通路銷售服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鞋品維修人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "鞋品設計人員-職能基準.json",
+      "changed_sections": [],
+      "status": "unchanged",
+      "code_changes": {}
+    },
+    {
+      "source": "鞋品開版人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鞋品開發人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鞋楦模型製作人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鞋業廠務管理人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "鞋面車縫人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "音樂(唱片)製作人-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "領隊人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "食品品保工程師-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "食品品保技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "食品安全與品保主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "食品技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "食品研發主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "餐廳領班人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "餐飲服務人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "餐飲管理主管-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "體育行政管理人員秘書長-職能基準.json",
+      "changed_sections": [
+        "ocs_content",
+        "ocs_attitude",
+        "notes"
+      ],
+      "status": "changed",
+      "code_changes": {
+        "tasks": {
+          "removed": [],
+          "added": [
+            "T6.8",
+            "T7.1"
+          ]
+        },
+        "indicators": {
+          "removed": [
+            "P1.1",
+            "P7.2",
+            "P7.3",
+            "P8.1"
+          ],
+          "added": [
+            "P6.7.2",
+            "P6.7.3",
+            "P6.8.1",
+            "P6.8.2",
+            "P7.1.1",
+            "P7.1.2",
+            "P7.1.3",
+            "P7.1.4"
+          ]
+        },
+        "outputs": {
+          "removed": [],
+          "added": [
+            "O6.7.2",
+            "O6.7.3",
+            "O6.8.1",
+            "O7.1.1"
+          ]
+        }
+      }
+    },
+    {
+      "source": "體育運動文物調查盤點員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    },
+    {
+      "source": "高速車床技術人員-職能基準.json",
+      "changed_sections": [
+        "ocs_content"
+      ],
+      "status": "changed",
+      "code_changes": {}
+    }
+  ]
+}

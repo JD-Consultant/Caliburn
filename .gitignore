@@ -43,3 +43,17 @@ Thumbs.db
 # personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
 CLAUDE.local.md
 Codex.local.md
+
+# Local engineering scratch and service initialization state.
+.tmp/
+.qdrant-initialized
+
+# Large evidence is published as gzip; restored original files stay local.
+/docs/experiments/2026-10-04-public-chunk-retrieval/run-01/all-rankings.json
+/docs/experiments/2026-10-04-query-chunk-cross-retrieval/run-01/all-rankings.json
+/docs/experiments/2026-10-04-retrieval-input-boundaries/prepared.json
+/docs/experiments/2026-10-04-retrieval-reference-views/sources.jsonl
+/docs/experiments/2026-10-05-b1-dual-route-retrieval/run-01/all-rankings.json
+/docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/all-rankings.json
+/docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-02/trace.jsonl
+/docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/trace.jsonl

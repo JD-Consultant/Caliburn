@@ -6,7 +6,7 @@ Stateless parsers that turn raw cell/row text into typed competency items
 
 import re
 import unicodedata
-from typing import Any, Dict, List
+from typing import Any
 
 from jd_pdf_to_json.core.models import (
     BehavioralIndicator,
@@ -14,39 +14,37 @@ from jd_pdf_to_json.core.models import (
     OutputItem,
 )
 from jd_pdf_to_json.transformers.support import text as txt
+from jd_pdf_to_json.utils.exceptions import TransformationError
 
 
-def extract_output_items(cell_value: Any) -> List[OutputItem]:
+def extract_output_items(cell_value: Any) -> list[OutputItem]:
     """Parse O-code work outputs from a cell."""
     if not cell_value:
         return []
-    text = txt.compact_wrapped_text(cell_value)
+    text = txt.compact_wrapped_text(txt.normalize_code_spacing(str(cell_value)))
     if not text:
         return []
 
-    pattern = re.compile(r"(O\d+(?:[-.]\d+)*)", re.IGNORECASE)
+    pattern = re.compile(r"(O\d+(?:[-.]\d+)*|0\d+(?:[-.]\d+)+)", re.IGNORECASE)
     matches = list(pattern.finditer(text))
     if matches:
-        outputs: List[OutputItem] = []
+        outputs: list[OutputItem] = []
         for i, m in enumerate(matches):
             end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
             outputs.append(
-                OutputItem(code=m.group(1).strip(), name=text[m.end() : end].strip("；;，,"))
+                OutputItem(code=m.group(1).strip(), name=text[m.end() : end].strip("；;，, "))
             )
         return outputs
 
-    return [
-        OutputItem(code=t, name="")
-        for t in (tok.strip() for tok in re.split(r"[\s,，;；\n]+", text))
-        if re.fullmatch(r"O\d+(?:[-.]\d+)*", t, flags=re.IGNORECASE)
-    ]
+    # Source sometimes provides a plain output name (e.g. 會議記錄).
+    return [OutputItem(code=None, name=text)]
 
 
-def extract_behavioral_indicators(cell_value: Any) -> List[BehavioralIndicator]:
+def extract_behavioral_indicators(cell_value: Any) -> list[BehavioralIndicator]:
     """Parse P/T behavioral indicators from a cell."""
     if not cell_value:
         return []
-    text = txt.compact_wrapped_text(cell_value)
+    text = txt.compact_wrapped_text(txt.normalize_code_spacing(str(cell_value)))
     if not text:
         return []
 
@@ -54,7 +52,7 @@ def extract_behavioral_indicators(cell_value: Any) -> List[BehavioralIndicator]:
     pattern = re.compile(r"([PT]\.?\d+(?:[-.]\d+)*)", re.IGNORECASE)
     matches = list(pattern.finditer(text))
     if matches:
-        indicators: List[BehavioralIndicator] = []
+        indicators: list[BehavioralIndicator] = []
         for i, m in enumerate(matches):
             end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
             indicator_text = text[m.end() : end].strip("；;，,") or m.group(1).strip()
@@ -72,16 +70,15 @@ def extract_behavioral_indicators(cell_value: Any) -> List[BehavioralIndicator]:
     return indicators
 
 
-def extract_behavioral_indicators_from_row(row: List[Any]) -> List[BehavioralIndicator]:
+def extract_behavioral_indicators_from_row(row: list[Any]) -> list[BehavioralIndicator]:
     """Fallback P-code extraction scanning all cells in a row."""
-    row_text = "\n".join(
-        str(c).strip() for c in row if c is not None and str(c).strip()
-    )
+    row_text = "\n".join(str(c).strip() for c in row if c is not None and str(c).strip())
+    row_text = txt.normalize_code_spacing(row_text)
     if not row_text:
         return []
     pattern = re.compile(r"(P\.?\d+(?:[-.]\d+)*)", re.IGNORECASE)
     matches = list(pattern.finditer(row_text))
-    indicators: List[BehavioralIndicator] = []
+    indicators: list[BehavioralIndicator] = []
     for i, m in enumerate(matches):
         end = matches[i + 1].start() if i + 1 < len(matches) else len(row_text)
         indicator_text = row_text[m.end() : end].strip("；;，,") or m.group(1).strip()
@@ -89,43 +86,51 @@ def extract_behavioral_indicators_from_row(row: List[Any]) -> List[BehavioralInd
     return indicators
 
 
-def extract_competency_items(cell_value: Any, code_prefix: str) -> List[CompetencyItem]:
+def extract_competency_items(
+    cell_value: Any, code_prefix: str, *, preserve_field_codes: bool = True
+) -> list[CompetencyItem]:
     """Parse K/S competency items from a cell."""
     if not cell_value:
         return []
     raw = unicodedata.normalize("NFKC", str(cell_value)).replace("\r", "\n")
+    raw = txt.normalize_code_spacing(raw)
     text = "\n".join(line.strip() for line in raw.split("\n") if line and line.strip())
     if not text:
         return []
     pattern = re.compile(
-        rf"({code_prefix}\d+(?:[-.]\d+)*)([\s\S]*?)(?=(?:[KS]\d+(?:[-.]\d+)*)|$)",
+        r"([KS]\d+(?:[-.]\d+)*)([\s\S]*?)(?=(?:[KS]\d+(?:[-.]\d+)*)|$)",
         flags=re.IGNORECASE,
     )
     return [
         CompetencyItem(
             code=m.group(1).strip(),
-            name=re.sub(r"\s+", " ", m.group(2)).strip("；;，, ") or m.group(1).strip(),
+            name=txt.compact_wrapped_text(m.group(2)).strip("；;，, ") or m.group(1).strip(),
         )
         for m in pattern.finditer(text)
+        if preserve_field_codes or m.group(1).upper().startswith(code_prefix.upper())
     ]
 
 
-def extract_competency_items_from_row(row: List[Any], code_prefix: str) -> List[CompetencyItem]:
+def extract_competency_items_from_row(row: list[Any], code_prefix: str) -> list[CompetencyItem]:
     """Fallback K/S extraction scanning all cells in a row."""
-    row_text = "\n".join(
-        str(c).strip() for c in row if c is not None and str(c).strip()
+    row_text = "\n".join(str(c).strip() for c in row if c is not None and str(c).strip())
+    return (
+        extract_competency_items(row_text, code_prefix, preserve_field_codes=False)
+        if row_text
+        else []
     )
-    return extract_competency_items(row_text, code_prefix) if row_text else []
 
 
-def extract_task_level(row: List[Any], col_map: Dict[str, int]) -> int:
-    """Extract the task competency level from a mapped row; defaults to 3."""
+def extract_task_level(row: list[Any], col_map: dict[str, int]) -> int | None:
+    """Preserve 1–6 or absence; reject an explicit unrecognized value."""
     level_idx = col_map.get("level")
     if level_idx is None or level_idx >= len(row):
-        return 3
+        return None
     raw = str(row[level_idx]).strip() if row[level_idx] is not None else ""
-    match = re.search(r"\d+", raw)
+    if not raw or raw in {"-", "—", "－"}:
+        return None
+    normalized = unicodedata.normalize("NFKC", raw)
+    match = re.fullmatch(r"(?:第)?([1-6])(?:級)?", normalized)
     if not match:
-        return 3
-    level = int(match.group(0))
-    return level if 1 <= level <= 5 else 3
+        raise TransformationError(f"Invalid competency level: {raw!r}")
+    return int(match.group(1))

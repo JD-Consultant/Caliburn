@@ -5,11 +5,9 @@
     ],
     "supplements": [
       "【註1】珠寶屬性相關知識：珠寶屬性、珠寶相關金屬/合金相關知識、物理與寶石相關知識、材料品質產業標準、珠寶原料相關知識、寶石稀有材料相關知識。",
-      "【註2】創意、設計相關知識：設計原理與概論、創意概論、珠寶設計發展趨勢、珠寶產業設計概論、設計專業術語、設計要素和原則、珠寶設計標準作業",
-      "流程。",
+      "【註2】創意、設計相關知識：設計原理與概論、創意概論、珠寶設計發展趨勢、珠寶產業設計概論、設計專業術語、設計要素和原則、珠寶設計標準作業流程。",
       "【註3】珠寶創作相關知識：文化、藝術相關知識、創作實務概論、創作問題因應相關知識、珠寶產業相關準則、規範和標準、珠寶和3D物件的生產相關。",
-      "【註4】珠寶、飾品製作相關知識：首飾與飾品製作技術相關知識、特定材料(包含綠色循環經濟材料等)、建造、製作與完工相關知識、製作與材料相關知",
-      "識、珠寶製作標準作業流程。"
+      "【註4】珠寶、飾品製作相關知識：首飾與飾品製作技術相關知識、特定材料(包含綠色循環經濟材料等)、建造、製作與完工相關知識、製作與材料相關知識、珠寶製作標準作業流程。"
     ]
   },
   "ocs_attitude": {
@@ -56,7 +54,7 @@
           {
             "competency_blocks": [
               {
-                "competency_level": 3,
+                "competency_level": 4,
                 "field_pending": null,
                 "indicators": [
                   {
@@ -148,7 +146,7 @@
           {
             "competency_blocks": [
               {
-                "competency_level": 3,
+                "competency_level": 4,
                 "field_pending": null,
                 "indicators": [
                   {
@@ -186,7 +184,7 @@
                   {
                     "code": "K07",
                     "field_pending": null,
-                    "name": "珠寶、飾品製作相關知識【註 4】"
+                    "name": "珠寶、飾品製作相關知識【註4】"
                   }
                 ],
                 "outputs": [],
@@ -222,7 +220,7 @@
           {
             "competency_blocks": [
               {
-                "competency_level": 3,
+                "competency_level": 4,
                 "field_pending": null,
                 "indicators": [
                   {
@@ -360,9 +358,9 @@
                 ],
                 "outputs": [
                   {
-                    "code": "O2.3.13",
+                    "code": "O2.3.1",
                     "field_pending": null,
-                    "name": "D設計初稿"
+                    "name": "3D設計初稿"
                   }
                 ],
                 "skills": [
@@ -409,7 +407,7 @@
           {
             "competency_blocks": [
               {
-                "competency_level": 3,
+                "competency_level": 4,
                 "field_pending": null,
                 "indicators": [
                   {
@@ -488,7 +486,7 @@
           {
             "competency_blocks": [
               {
-                "competency_level": 3,
+                "competency_level": 4,
                 "field_pending": null,
                 "indicators": [
                   {
@@ -546,9 +544,9 @@
                 ],
                 "outputs": [
                   {
-                    "code": "O3.2.13",
+                    "code": "O3.2.1",
                     "field_pending": null,
-                    "name": "D列印樣品"
+                    "name": "3D列印樣品"
                   }
                 ],
                 "skills": [

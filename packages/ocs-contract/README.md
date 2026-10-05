@@ -1,10 +1,10 @@
 # ocs-contract
 
-OCS 文件 seam 的 typed contract。`schema/ocs-document.schema.json` 是唯一 source of truth；
-`src/ocs_contract/models.py` 與 `types/ocs-document.ts` 都是生成物，不可手改。
+本套件定義 OCS 文件交換的型別與結構。唯一來源是 `schema/ocs-document.schema.json`；
+`src/ocs_contract/models.py` 與 `types/ocs-document.ts` 都由它生成，不可手改。
 
 目前消費者是 `apps/pdf-to-json` 的輸出驗證與 `apps/ocs-indexer` 的 ingestion。
-它屬於隔離 RAG bounded context，不是正式 JD App contract，也沒有 legacy Web consumer。
+它屬於獨立 RAG bounded context。正式 JD App 使用自己的 contract；已退役的 legacy Web 也不消費本套件。
 
 ```bash
 pnpm --filter @caliburn/ocs-contract run codegen

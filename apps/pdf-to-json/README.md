@@ -1,12 +1,14 @@
 # pdf-to-json — OCS PDF → 結構化 JSON(ETL)
 
-「解析」bounded context:把官方職能基準(OCS/iCAP)**PDF** 轉成結構化 **JSON**(CLI 工具),
-供 [`apps/ocs-indexer`](../ocs-indexer/) 索引。純離線批次、無伺服器、無狀態。
+將官方職能基準（OCS/iCAP）**PDF** 轉成結構化 **JSON**，供 [`apps/ocs-indexer`](../ocs-indexer/) 建立公版參考索引。
+這是「解析」bounded context 的離線 CLI 工具，沒有伺服器或使用者狀態。
 
-> **這份 README 一檔兩用**:上半是 **app 指南**(跑 / 架構 / codemap);
-> **下半 §1–10 是 OCS 來源 JSON 的欄位語意契約**，動 RAG 消費者的 OCS 欄位前先讀[§6](#6-field-contract)(尤其 §6.3)。可機器驗證的結構由 [`ocs-contract` schema](../../packages/ocs-contract/schema/ocs-document.schema.json)管理；不從已退役的轉址文件取規則。
+> **閱讀方式：**上半說明如何執行、轉換流程與程式位置；**下半 §1–10 定義 OCS 來源 JSON 的欄位語意契約**。
+> 修改 RAG 消費者對 OCS 欄位的處理前，先讀[§6](#6-field-contract)，尤其 §6.3。可機器驗證的結構由 [`ocs-contract` schema](../../packages/ocs-contract/schema/ocs-document.schema.json)管理；不從已退役的轉址文件取規則。
 
 ## Quick Start
+
+下列命令從 `apps/pdf-to-json` 執行。轉換失敗的候選與診斷另存，正常輸出只收通過檢核的 JSON。
 
 ### 1) 安裝
 
@@ -26,6 +28,11 @@ uv run python -m jd_pdf_to_json.cli convert path\to\input.pdf -o path\to\output.
 uv run python -m jd_pdf_to_json.cli batch path\to\pdf_folder -o path\to\json_folder
 ```
 
+本輪補齊結果位於 `data/json-checked-2026-10-04/`，診斷與差異位於相鄰的
+`data/json-checked-2026-10-04.diagnostics/`。原有 indexer JSON 保留；通過解析檢核不代表已確認官方最新版本。
+執行結果、驗證範圍及待處理文件見[補齊紀錄](../../docs/experiments/2026-10-04-ocs-json-repair/README.md)。
+本輪 815 份寫出新 JSON、53 份拒絕、40 份歷史檔排除；拒絕文件不在新正常輸出中。
+
 ## CLI 使用方法
 
 ### convert
@@ -40,7 +47,7 @@ uv run python -m jd_pdf_to_json.cli convert <pdf_path> -o <output_path>
 
 - `pdf_path`：輸入 PDF 檔案路徑。
 - `-o, --output`：輸出 JSON 路徑（不指定時，預設與 PDF 同名）。
-- `--validate/--no-validate`：是否啟用 schema 驗證（預設啟用）。
+- `--validate/--no-validate`：保留舊 CLI 相容參數；生成模型、必要內容與來源檢核始終執行，不能略過缺漏而輸出。
 
 ### batch
 
@@ -54,7 +61,12 @@ uv run python -m jd_pdf_to_json.cli batch <input_dir> -o <output_dir>
 
 - `input_dir`：PDF 來源資料夾。
 - `-o, --output`：JSON 輸出資料夾。
-- `--validate/--no-validate`：是否啟用 schema 驗證（預設啟用）。
+- `--validate/--no-validate`：相容參數，必要檢核始終執行。
+- `--exclude-historical`：排除檔名含「歷史資料」的文件；不據此判定其餘文件為官方最新版。
+
+批次先固定檔名與 SHA-256 清單，再逐檔轉換。每份結果恰為 `converted`、`rejected` 或 `excluded`；
+單檔失敗不阻止其餘文件，存在 rejected 時整批 exit 1。報告與 rejected 候選放在 `<output_dir>.diagnostics/`，
+正常資料目錄只接受通過檢核的 JSON。失敗保留既有目標檔，報告明示此次未成功更新。
 
 ### validate
 
@@ -71,25 +83,29 @@ uv run python -m jd_pdf_to_json.cli validate <json_path>
 ## 架構 / 流程(Pipes-and-Filters)
 
 ```
-PDF ─▶ parse ─▶ transform ─▶ [validate] ─▶ write JSON
-      PDFPlumber   section 拆解    schema      JSONWriter
-      (→ pages)    → OCSDocument   (可停用)
+PDF bytes ─▶ parse ─▶ transform ─▶ validate ─▶ write JSON
+             PDFDocument          schema／來源  原子替換
 ```
 
-`convert` 照 **4 階段**跑;`batch` 對整個資料夾逐檔跑(**單檔失敗不中斷**,收尾寫 summary log)。
-`transform` 是**薄編排**:re-open PDF,依序委派五個 section extractor 組成 `OCSDocument`——
+`convert` 與 `batch` 共用單檔轉換流程。parser 從固定 bytes 開啟 PDF 一次，保存頁面文字、words、表格與儲存格位置；
+關閉後由 `transform` 依序委派五個 section extractor 組成 `OCSDocument`：
 
 `version → profile → content → attitude → notes`
 
-其中 **`content_extractor` 最難**(§6.3 的區塊分界 / 跨頁 / 同格多 T code 規則都在它)。
-**驗證不擋輸出**:schema 失敗仍寫 JSON(方便人工檢查)但 `exit 1`。
+其中 `content_extractor` 負責 §6.3 的區塊分界、跨頁接續與同格多 T code 規則。
+內容表格依自身表頭與位置對齊；沒有重複表頭的續表須與前表位置相符。重疊子表只有正文已被外表涵蓋時才排除。
+驗證按來源列核對任務、block、級別及各欄位正文；metadata 由其 section owner 重讀抽取快照核對組裝結果。
+這些檢查不能獨立證明 PDF 抽取沒有漏字，代表原件的人工核對仍必要。
+
+驗證失敗 exit 1，候選只寫診斷目錄。正常 JSON 使用同目錄暫存檔完成後原子替換，不留下截斷檔案。
 
 ## Codemap
 
 ```
 src/jd_pdf_to_json/
-  cli.py                 # typer CLI:convert / batch / validate(4 階段編排 + log)
-  parsers/               # base(port)+ pdf_parser(PDFPlumberParser:PDF → {metadata, pages})
+  cli.py                 # convert / batch / validate，清單及結果報告
+  conversion.py          # 共用單檔流程與 converted/rejected 結果
+  parsers/               # PDFPlumberParser + typed PDFDocument/PDFPage/PDFTable
   transformers/
     ocs_transformer.py   # 薄編排:依序呼叫 sections/*,組 OCSDocument
     sections/            # 五個 section extractor(version / profile / content / attitude / notes)
@@ -102,10 +118,9 @@ src/jd_pdf_to_json/
 
 ## 不變量
 
-- **Pipes-and-Filters,單向**:parse → transform → validate → write;各階段可獨立測。
-- **transformer 只編排、不解析**:每個 PDF section 的邏輯住自己的 extractor(Phase 3b 拆解;
-  **別把規則塞回 orchestrator**)。
-- **契約在下半(§1–10)且權威**:改欄位語意 = 改契約,牽動 indexer / api / `packages/ocs-contract`。
+- **Pipes-and-Filters，單向：**parse → transform → validate → write，各階段可獨立測試。
+- **transformer 只編排、不解析：**每個 PDF section 由自己的 extractor 處理；沿 Phase 3b 拆解結果，解析規則不放回 orchestrator。
+- **欄位語意以 §1–10 為準：**修改語意就是修改契約，須同步檢查 indexer / api / `packages/ocs-contract` 的使用方式。
 
 ## 1. Purpose
 本專案定義可重複、可驗證、可擴充的 JSON 輸出格式，用於將職能基準（OCS）PDF 轉為結構化資料，支援：
@@ -331,11 +346,12 @@ src/jd_pdf_to_json/
 - `task_codes` 為必填陣列，至少一個元素；每個元素包含 `code`（T code 字串）與 `name`（任務名稱字串）。
 - `competency_blocks` 為必填陣列，至少包含一個 block。
 - `indicators` 為必填陣列；一個 block 可包含多個 P-code。
-- `outputs` 為可選陣列；無 O 時為空陣列 `[]`。
+- `outputs` 為可選陣列；來源沒有產出時為 `[]`。有正文但沒有代碼時保留 `code=null`；原文數字代碼（如 `04.2.1`）原樣保留，不改成 O。
 - `knowledge` 與 `skills` 為必填陣列，元素包含 `code` 與 `name`。
 - 若同一 task 中某個 O 在多個 block 出現（例如 T4.1 的 O 跨 level），允許重複宣告。
 - `indicators[*].text` 若跨行或分段，保留完整內容，不壓縮為代碼字串。
-- `competency_level` 為整數或 `null`；無級別資料時填 `null`。
+- `competency_level` 與 profile 的 `ocs_level` 為 1–6 整數或 `null`；無級別資料時填 `null`，明確非法值拒絕，不預設 3。
+- K／S 儲存格的原文代碼與正文依來源欄位保留；若技能欄印成 K-code，也不自行改字母。
 
 建議理解方式：
 
@@ -358,7 +374,7 @@ src/jd_pdf_to_json/
 
 規則：
 
-- `attitudes` 依 A-code 順序排列。
+- `attitudes` 依來源順序排列，原文沒有 A-code 時以 `code=null` 保留正文。
 - 部分 PDF 的 `name` 含描述文字（格式：`名稱：描述`），保留原文，不拆分。
 
 ### 6.5 notes
@@ -381,8 +397,8 @@ PDF 末頁「說明與補充事項」分為兩個子區塊：
 規則：
 
 - `prerequisites`：「建議擔任此職類／職業之學歷／經歷／或能力條件」下的每一條文字，不含標題行本身。
-- `supplements`：「其他補充說明」下的所有條文；無此區塊時為空陣列 `[]`。
-- 兩個欄位均為 `List[str]`，每個元素為一條去除項目符號後的純文字。
+- `supplements`：「其他補充說明」下的條文、沒有子標題的說明正文，以及「相關所屬類別」；來源沒有內容時為 `[]`。
+- 兩個欄位均為 `List[str]`，每個元素為一條去除明確項目符號後的純文字；版面換行接回原條目，保留正文數字與負號。
 
 ## 7. Validation Checklist
 
@@ -391,7 +407,7 @@ PDF 末頁「說明與補充事項」分為兩個子區塊：
 - Top-level 五區塊鍵名完整存在。
 - `ocs_profile.category` 三類別皆為陣列型別。
 - `knowledge`/`skills` 元素都具備 `code` 與 `name`。
-- `ocs_attitude.attitudes[*]` 具備 `code` 與 `name`。
+- `ocs_attitude.attitudes[*]` 具備 `code` 與非空 `name`；來源無代碼時 `code=null`。
 - `version_info.versions` 存在且每筆具 `version`、`ocs_code`、`status`。
 - `ocs_content.ocu_units[*].tasks[*].task_codes` 為非空陣列，每個元素具備 `code` 與 `name`。
 - `notes.prerequisites` 與 `notes.supplements` 均為字串陣列。
@@ -494,7 +510,7 @@ PDF 末頁「說明與補充事項」分為兩個子區塊：
 
 ## 指路
 
-- 架構鳥瞰:根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md)(Code map:pdf-to-json = Pipes-and-Filters)。
+- 系統範圍：根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md)；公版資料流見 [RAG 管線](../../docs/design/rag-pipeline.md)，本工具採 Pipes-and-Filters，程式位置見本頁 Codemap。
 - 來源欄位語意：[§6 Field Contract](#6-field-contract)；結構與生成規則：[ocs-contract](../../packages/ocs-contract/README.md)。
 - transformer 拆解研究:[`docs/specs/2026-06-28-pdf-to-json-transformer-decomposition-research.md`](../../docs/research/retrieval/2026-06-28-pdf-to-json-transformer-decomposition-research.md)。
 - 下游：[ocs-indexer](../ocs-indexer/README.md)(索引消費本輸出)；機器契約見 [OCS JSON Schema](../../packages/ocs-contract/schema/ocs-document.schema.json)，不是 JD 著作契約。

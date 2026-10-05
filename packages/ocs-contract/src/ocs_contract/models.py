@@ -130,7 +130,7 @@ class OcsProfile(BaseModel):
     ocs_name: OcsName | None = Field({}, validate_default=True)
     category: Category | None = Field({}, validate_default=True)
     job_description: str | None = None
-    ocs_level: conint(ge=1, le=5) | None = None
+    ocs_level: conint(ge=1, le=6) | None = None
     field_pending: FieldPending | None = Field(
         None,
         alias='_pending',
@@ -153,7 +153,7 @@ class CompetencyBlock(BaseModel):
     model_config = ConfigDict(
         extra='allow',
     )
-    competency_level: conint(ge=1, le=5) | None = None
+    competency_level: conint(ge=1, le=6) | None = None
     field_pending: FieldPending1 | None = Field(
         None,
         alias='_pending',

@@ -6,7 +6,6 @@ parsed units and recognise placeholder names.
 """
 
 import re
-from typing import List, Optional
 
 from jd_pdf_to_json.core.models import BehavioralIndicator, OCSUnit
 from jd_pdf_to_json.transformers.support import dedupe as dd
@@ -24,10 +23,9 @@ def scan_ocu_names_from_text(pdf) -> dict:
     pure_code_re = re.compile(r"^[KSOP]\d+(?:[.\-]\d+)*$", re.IGNORECASE)
 
     for page in pdf.pages:
-        left_crop = page.crop((0, 0, page.width * 0.12, page.height))
-        words = left_crop.extract_words()
-        current_ocu: Optional[str] = None
-        name_parts: List[str] = []
+        words = [word for word in page.words if word["x1"] <= page.width * 0.12]
+        current_ocu: str | None = None
+        name_parts: list[str] = []
         ocu_x: float = 0.0
 
         for word in words:
@@ -61,12 +59,12 @@ def scan_task_names_from_words(pdf) -> dict:
 
     for page in pdf.pages:
         words = sorted(
-            page.extract_words(),
+            page.words,
             key=lambda w: (round(w["top"] / 5) * 5, w["x0"]),
         )
-        current_task: Optional[str] = None
+        current_task: str | None = None
         task_x: float = 0.0
-        parts: List[str] = []
+        parts: list[str] = []
 
         for word in words:
             text = word["text"].split("\n")[0].strip()
@@ -88,7 +86,7 @@ def scan_task_names_from_words(pdf) -> dict:
     return names
 
 
-def derive_task_code_from_p_codes(indicators: List[BehavioralIndicator]) -> Optional[str]:
+def derive_task_code_from_p_codes(indicators: list[BehavioralIndicator]) -> str | None:
     """Derive task code from P-code when the task-code table cell is None.
 
     P-code format: P{ocu}.{task}.{seq} → T{ocu}.{task}. E.g. P1.1.1 → T1.1.
@@ -105,7 +103,7 @@ def is_generic_unit_name(name: str) -> bool:
     return txt.normalize_text(name) in {"主要職責", "工作任務", "unknown", ""}
 
 
-def merge_ocu_unit(unit: OCSUnit, ocu_units: List[OCSUnit]) -> None:
+def merge_ocu_unit(unit: OCSUnit, ocu_units: list[OCSUnit]) -> None:
     """Merge *unit* into *ocu_units*, combining tasks for matching OCU codes."""
     for existing in ocu_units:
         if existing.ocu_code != unit.ocu_code:
@@ -118,18 +116,14 @@ def merge_ocu_unit(unit: OCSUnit, ocu_units: List[OCSUnit]) -> None:
             if primary in task_map:
                 target = task_map[primary]
                 target.competency_blocks.extend(task.competency_blocks)
-                target.competency_blocks = [
-                    dd.dedupe_block(b) for b in target.competency_blocks
-                ]
+                target.competency_blocks = [dd.dedupe_block(b) for b in target.competency_blocks]
                 existing_codes = {e.code for e in target.task_codes}
                 for entry in task.task_codes:
                     if entry.code not in existing_codes:
                         target.task_codes.append(entry)
             else:
                 existing.tasks.append(task)
-        if is_generic_unit_name(existing.ocu_name) and not is_generic_unit_name(
-            unit.ocu_name
-        ):
+        if is_generic_unit_name(existing.ocu_name) and not is_generic_unit_name(unit.ocu_name):
             existing.ocu_name = unit.ocu_name
         return
     ocu_units.append(unit)

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReadOccupationReferenceArguments",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "reference_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$", "description": "工具結果或已選 state 提供的精確公版定位，原樣帶回；未選公版也可讀，不猜造 ID。"},
+    "task_id": {"type": ["string", "null"], "pattern": "^u[1-9][0-9]*-t[1-9][0-9]*$", "description": "null 讀職位概述和完整已解析任務導覽；指定導覽提供的 task_id 讀該任務全部細節。"}
+  },
+  "required": ["reference_id", "task_id"]
+}

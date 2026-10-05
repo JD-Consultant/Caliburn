@@ -8,6 +8,7 @@ from langgraph.checkpoint.base import BaseCheckpointSaver
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.occupation_references import OccupationReferenceClient
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
 from caliburn.adapters.response_serialization import restore_response
@@ -30,6 +31,7 @@ from caliburn.agent_execution.tool_steps import (
 from caliburn.agents.job_consultant.context_binding import TurnContext, capture_turn_context
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
 from caliburn.agents.job_consultant.recent_preload import fit_recent_interview_preload
+from caliburn.agents.job_consultant.reference_instructions import OCCUPATION_REFERENCE_INSTRUCTIONS
 from caliburn.agents.job_consultant.tools import ConsultantTools, consultant_tool_definitions
 from caliburn.features.executions.history_models import (
     AgentRole,
@@ -38,6 +40,7 @@ from caliburn.features.executions.history_models import (
 )
 from caliburn.features.executions.models import (
     ExecutionScope,
+    ExecutionStateError,
     ExecutionWriter,
 )
 from caliburn.features.interviews.models import FormalInterviewExchange
@@ -48,6 +51,10 @@ from caliburn.transport.model_tools.jd_reads import JdReadTools
 from caliburn.transport.model_tools.jd_writes import JdWriteTools
 from caliburn.transport.model_tools.memory_consolidation import MemoryConsolidationTools
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
+from caliburn.transport.model_tools.occupation_references import (
+    OccupationReferenceTools,
+    occupation_reference_write_result_format,
+)
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.context_history import RoleContextHistory
 from caliburn.workflows.execution_controls import ConsultantExecutionControls
@@ -63,6 +70,7 @@ from caliburn.workflows.jd_task_writes import JdTaskWriteWorkflow
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
 from caliburn.workflows.memory_reads import MemoryReadWorkflow
 from caliburn.workflows.model_runtime import bind_model_runtime, fix_execution_policy
+from caliburn.workflows.occupation_references import OccupationReferenceWorkflow
 
 type ConsultantRecovery = HeldModelResponse | HeldInputCount | HeldCompaction | HeldPreparationCount
 
@@ -75,6 +83,7 @@ class ConsultantRunner:
     settings: ModelSettings
     on_commentary: Callable[[ExecutionScope, PublicCommentaryUpdate], None] | None = None
     on_reasoning_summary: Callable[[ExecutionScope, PublicReasoningSummary], None] | None = None
+    occupation_references: OccupationReferenceClient | None = None
 
     async def run(
         self,
@@ -127,24 +136,38 @@ class ConsultantRunner:
             else None,
         )
         executor = model.executor
+        instructions = CONSULTANT_INSTRUCTIONS
+        if self.occupation_references is not None:
+            instructions += f"\n\n{OCCUPATION_REFERENCE_INSTRUCTIONS}"
         history_template = ResponseRequest(
             model=self.settings.model,
-            instructions=CONSULTANT_INSTRUCTIONS,
+            instructions=instructions,
             input_items=[],
-            tools=consultant_tool_definitions(),
+            tools=consultant_tool_definitions(
+                occupation_references_enabled=self.occupation_references is not None,
+            ),
             reasoning_effort=self.settings.reasoning_effort,
             max_output_tokens=self.settings.max_output_tokens,
             stream=commentary is not None,
         )
+        preparation_recovery = (
+            recovery
+            if isinstance(recovery, (HeldCompaction, HeldPreparationCount))
+            and recovery.thread_id == preparation_thread
+            else None
+        )
+        history_template = await role_history.resolve_template(
+            history_template,
+            recovery=preparation_recovery,
+        )
+        if _references_enabled(history_template) and self.occupation_references is None:
+            raise ExecutionStateError("The saved Turn requires its occupation reference client")
         prepared = await role_history.prepare_history(
             template=history_template,
             threshold_tokens=128_000,
             count_input=executor.count_input,
             runtime=model.compaction,
-            recovery=recovery
-            if isinstance(recovery, (HeldCompaction, HeldPreparationCount))
-            and recovery.thread_id == preparation_thread
-            else None,
+            recovery=preparation_recovery,
         )
         # Summary is a generation option, not a history preparation policy. Keep the
         # pre-work count/compact request stable for older saved preparation boundaries.
@@ -157,7 +180,7 @@ class ConsultantRunner:
             template=ResponseRequest.from_snapshot(turn_payload),
             prepared_history=prepared,
         )
-        tools = self._tools(writer, context, role_history)
+        tools = await self._tools(writer, context, role_history)
 
         compact_window = bind_window_compaction(
             self.checkpointer,
@@ -210,9 +233,24 @@ class ConsultantRunner:
             writer, candidate.position, reply, position
         )
 
-    def _tools(
+    async def _tools(
         self, writer: ExecutionWriter, context: TurnContext, role_history: RoleContextHistory
     ) -> ConsultantTools:
+        references = None
+        if _references_enabled(context.request):
+            if self.occupation_references is None:
+                raise ExecutionStateError("The saved Turn requires its occupation reference client")
+            result_format = occupation_reference_write_result_format(
+                context.request.create_payload()["tools"]
+            )
+            workflow = OccupationReferenceWorkflow(self.sessions, self.occupation_references)
+            await workflow.start(writer)
+            references = OccupationReferenceTools(
+                workflow,
+                self.occupation_references,
+                writer,
+                write_result_format=result_format,
+            )
         return ConsultantTools(
             MemoryReadTools(MemoryReadWorkflow(self.sessions), context.memory_binding),
             JdReadTools(JdReadWorkflow(self.sessions), context.memory_binding),
@@ -233,4 +271,18 @@ class ConsultantRunner:
             ),
             MemoryConsolidationTools(MemoryConsolidationWorkflow(self.sessions), writer),
             ContextCompactionTools(role_history),
+            occupation_references=references,
         )
+
+
+def _references_enabled(request: ResponseRequest) -> bool:
+    """Use the original captured capability bundle, not today's runtime configuration."""
+    required = set(OccupationReferenceTools.names)
+    declared = [
+        tool["name"] for tool in request.create_payload()["tools"] if tool["name"] in required
+    ]
+    if not declared:
+        return False
+    if len(declared) != len(required) or set(declared) != required:
+        raise ExecutionStateError("The saved Turn has an invalid occupation reference toolkit")
+    return True

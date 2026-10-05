@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, Mock
 from uuid import uuid4
 
 import pytest
+from langgraph.checkpoint.memory import InMemorySaver
 
 from caliburn.agents.job_consultant import runner as consultant_runner
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
@@ -26,7 +27,7 @@ from caliburn.workflows.memory_analysis.results import AnalysisComplete, parse_o
 
 
 class CapturedPreparationError(Exception):
-    """Stop at the first history I/O boundary, before any network or checkpoint work."""
+    """Stop before history preparation, database work, or network requests."""
 
     def __init__(self, payload):
         self.payload = payload
@@ -72,7 +73,7 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
         if effort is None
         else ModelSettings(api_key="synthetic-never-sent", reasoning_effort=effort)
     )
-    runner = runner_class(sessions, Mock(), Mock(), settings)
+    runner = runner_class(sessions, InMemorySaver(), Mock(), settings)
     with pytest.raises(CapturedPreparationError) as captured:
         if layer is None:
             await runner.run(writer)

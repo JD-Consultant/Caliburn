@@ -37,7 +37,11 @@ from caliburn.features.work_memory import candidate_queries
 from caliburn.features.work_memory.candidates import MemoryBatchPosition
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import ModelSettings
-from caliburn.transport.model_tools.memory_analysis import MemoryAnalysisTools
+from caliburn.transport.model_tools.excluded_work_reads import ExcludedWorkReadTools
+from caliburn.transport.model_tools.memory_analysis import (
+    MemoryAnalysisTools,
+    memory_analysis_tool_definitions,
+)
 from caliburn.transport.model_tools.memory_reads import MemoryReadTools
 from caliburn.transport.model_tools.memory_writes import MemoryWriteTools
 from caliburn.workflows.context_history import RoleContextHistory
@@ -51,6 +55,7 @@ from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
 from caliburn.workflows.memory_writes import MemoryWritePreparation
 from caliburn.workflows.model_runtime import bind_model_runtime, fix_execution_policy
+from caliburn.workflows.occupation_reference_reads import ExcludedWorkReadWorkflow
 
 HISTORY_THRESHOLD_TOKENS = 128_000  # Owner-approved pre-batch policy, not provider capacity.
 
@@ -69,6 +74,7 @@ class MemoryAnalysisRunner:
     checkpointer: BaseCheckpointSaver[str]
     client: AsyncOpenAI
     settings: ModelSettings
+    excluded_work_enabled: bool = False
 
     async def run(
         self,
@@ -110,15 +116,6 @@ class MemoryAnalysisRunner:
 
         await ensure_active()
         policy = await fix_execution_policy(self.sessions, writer, self.settings)
-        tools = MemoryAnalysisTools(
-            MemoryReadTools(MemoryReadWorkflow(self.sessions), binding),
-            MemoryWriteTools(
-                MemoryWritePreparation(self.sessions),
-                MemoryCandidateWorkflow(self.sessions),
-                binding,
-                writer,
-            ),
-        )
         model = bind_model_runtime(
             self.sessions, writer, self.client, self.settings, ensure_active=ensure_active
         )
@@ -127,13 +124,25 @@ class MemoryAnalysisRunner:
             model=self.settings.model,
             instructions=instructions,
             input_items=[],
-            tools=tools.definitions(),
+            tools=memory_analysis_tool_definitions(
+                stage.phase,
+                excluded_work_enabled=self.excluded_work_enabled,
+            ),
             reasoning_effort=self.settings.reasoning_effort,
             max_output_tokens=self.settings.max_output_tokens,
         )
         preparation_recovery = (
-            recovery if isinstance(recovery, (HeldCompaction, HeldPreparationCount)) else None
+            recovery
+            if isinstance(recovery, (HeldCompaction, HeldPreparationCount))
+            and recovery.thread_id
+            == context_thread_id(
+                writer.scope,
+                role,
+                HistoryWindowKind.PREPARED_HISTORY,
+            )
+            else None
         )
+        template = await history.resolve_template(template, recovery=preparation_recovery)
         items = await history.prepare_history(
             template=template,
             threshold_tokens=HISTORY_THRESHOLD_TOKENS,
@@ -149,6 +158,7 @@ class MemoryAnalysisRunner:
             history_items=items,
             situation_changes=situation_changes,
         )
+        tools = self._tools(writer, binding, request)
         config: RunnableConfig = {"configurable": {"thread_id": thread_id, "checkpoint_ns": ""}}
         saved = await self.checkpointer.aget_tuple(config)
         compact_window = bind_window_compaction(
@@ -203,4 +213,27 @@ class MemoryAnalysisRunner:
             current_stage,
             outcome,
             ContextPosition(thread_id, window.checkpoint_id, HistoryWindowKind.COMPLETED_WORK),
+        )
+
+    def _tools(
+        self,
+        writer: ExecutionWriter,
+        binding: CandidateMemoryRead,
+        request: ResponseRequest,
+    ) -> MemoryAnalysisTools:
+        declared = {tool["name"] for tool in request.create_payload()["tools"]}
+        excluded_work = (
+            ExcludedWorkReadTools(ExcludedWorkReadWorkflow(self.sessions), binding)
+            if "read_excluded_work" in declared
+            else None
+        )
+        return MemoryAnalysisTools(
+            MemoryReadTools(MemoryReadWorkflow(self.sessions), binding),
+            MemoryWriteTools(
+                MemoryWritePreparation(self.sessions),
+                MemoryCandidateWorkflow(self.sessions),
+                binding,
+                writer,
+            ),
+            excluded_work=excluded_work,
         )

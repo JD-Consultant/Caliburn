@@ -4,6 +4,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from uuid import UUID
 
+from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -46,6 +47,55 @@ class RoleContextHistory:
     async def request_compaction(self) -> None:
         async with self.sessions.begin() as session:
             await history.request_context_compaction(session, self.writer, self.role)
+
+    async def resolve_template(
+        self,
+        template: ResponseRequest,
+        recovery: HeldCompaction | HeldPreparationCount | None = None,
+    ) -> ResponseRequest:
+        """Keep this role's original preparation settings across process/code reentry.
+
+        The original request remains in the native saver. Clearing its historical input
+        yields a role template; preparation and context capture still own their inputs.
+        A held result requires the original saved request boundary: only the result may
+        still be unsaved. This lookup neither adopts a window nor authorizes replay.
+        """
+        if template.create_payload()["input"]:
+            raise ValueError("The role template must not include history or new-work input")
+        thread_id = context_thread_id(
+            self.writer.scope, self.role, HistoryWindowKind.PREPARED_HISTORY
+        )
+        if recovery is not None and (
+            not isinstance(recovery, (HeldCompaction, HeldPreparationCount))
+            or recovery.thread_id != thread_id
+        ):
+            raise ValueError("The held preparation belongs to another role or execution")
+        await self.ensure_active()
+        config: RunnableConfig = {"configurable": {"thread_id": thread_id, "checkpoint_ns": ""}}
+        saved = await self.checkpointer.aget_tuple(config)
+        snapshot: object
+        if saved is None:
+            if recovery is not None:
+                raise ValueError("The held result has no saved preparation boundary")
+            return template
+        else:
+            values = saved.checkpoint["channel_values"]
+            # Before the first expanded state, the native input checkpoint owns the
+            # same request. Pending result writes never replace that original input.
+            if "request_snapshot" not in values:
+                values = values.get("__start__", {})
+            if not isinstance(values, dict) or values.get("preparation_policy") is None:
+                raise ValueError("The saved boundary is not a history preparation")
+            snapshot = values.get("request_snapshot")
+            if recovery is not None and (
+                values.get("request_id") != recovery.request_id
+                or snapshot != recovery.request_snapshot
+            ):
+                raise ValueError("The held preparation does not match its saved request")
+        if not isinstance(snapshot, dict):
+            raise ValueError("The saved preparation request is unavailable")
+        original = ResponseRequest.from_snapshot(snapshot).create_payload()
+        return ResponseRequest.from_snapshot({**original, "input": []})
 
     async def prepare_history(
         self,

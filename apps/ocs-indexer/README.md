@@ -1,9 +1,13 @@
 # ocs-indexer — OCS 知識索引與查詢服務
 
-「檢索」bounded context。把 [`apps/pdf-to-json`](../pdf-to-json/) 產出的 OCS(職能基準)JSON
-轉成 **兩種 Qdrant 向量點(profile + task)**,並提供**無狀態查詢 HTTP API**(:8000)。
-本 app 只負責「結構化 + 可語意搜尋的候選池」；不保存對話、LLM 或使用者狀態。
-它目前是隔離、明示啟動的 RAG bounded context，沒有正式 JD App consumer。
+將 [`apps/pdf-to-json`](../pdf-to-json/) 產出的 OCS（職能基準）JSON 建成 Qdrant 索引，
+透過 **無狀態查詢 HTTP API**（:8000）提供公版候選資料。職位整體參考使用獨立的
+document／task 索引；既有 profile／task 索引與介面保留原語意。
+
+本 app 是「檢索」bounded context，負責結構化候選池及語意搜尋，不保存對話、LLM 或使用者狀態。
+RAG 服務須明示啟動；JD App 可依 [ADR0080](../../docs/adr/0080-opt-in-public-reference-agent-tools.md)配置 HTTP consumer，不成為 App 預設啟動依賴。
+
+下圖為既有 profile／task 索引的資料流；新公版參考索引的使用方式見[職位整體參考 API](#職位整體參考-api)。
 
 ```text
 OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HTTP→apps/embedder GPU) ─► Qdrant(ocs_v4)
@@ -11,12 +15,56 @@ OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HT
                                                 查詢 client ◄── 無狀態 API(:8000) ◄──┘
 ```
 
-- **嵌入不在本進程**:BGE-M3(dense 1024d + sparse)由 [`apps/embedder`](../embedder/)
-  GPU 容器提供(`POST /embed`),indexer 只是 HTTP client(ADR 0012;**別把 torch 裝回來**,
-  Windows 上會 segfault)。
-- **Qdrant 屬本 app**:別的服務只經查詢 API 取資料,不直接碰 collection(資料主權)。
+- **模型在獨立 GPU 容器：**BGE-M3（dense 1024d + sparse）由 [`apps/embedder`](../embedder/)
+  提供（`POST /embed`），indexer 只作 HTTP client。依 ADR 0012，不在 indexer 安裝 torch；
+  原 Windows 行程內執行曾有 segfault。
+- **Qdrant 由本 app 管理：**其他服務經查詢 API 取資料，不直接存取 collection。
 
 ## 跑 / 測試
+
+### 職位整體參考 API
+
+2026-10-05 已實作；JD App 可選 consumer 依 [ADR0080](../../docs/adr/0080-opt-in-public-reference-agent-tools.md) 明示啟用，獨立服務權責不變。
+
+輸入員工實際工作文字，取得最多五份去重公版及**完整已解析任務目錄**。
+顧問自行判斷是否適用；本服務不保存員工確認進度，也不判定 JD 完成。
+JSON 目錄完整不等於原 PDF 抽取完整。
+
+| Method | Path | 用途 |
+|---|---|---|
+| POST | `/occupation-references:search` | `{query, limit?}` → 公版概述、任務目錄、搜尋證據及實際檢索設定 |
+| GET | `/occupation-references/{reference_id}` | 固定來源的概述與完整已解析目錄 |
+| GET | `/occupation-references/{reference_id}/tasks/{task_id}` | 任務群組 O/P/K/S，保留無碼項目及多 T 共用區塊 |
+
+查詢預設 `limit=5`，可選 1–5；未知欄位拒絕。模型只提供工作正文，不提供檢索參數。
+BGE-M3 1024 維向量用 exact cosine 搜整份 D／任務與概述 T，兩路各取 20 份不同父公版；
+**完整聯集全部 rerank 後才取最終五份**。`rerank_logit` 是排序值，cosine 是搜尋證據，
+都不是符合率或適用門檻。職位名稱供顯示，不嵌入；K/S 保存在來源，按需讀取。
+
+以下從 repo 根目錄執行，選版目錄每個 OCS code 僅放一份明示選用的 JSON：
+
+```powershell
+docker compose --profile rag up -d --build qdrant embedder
+uv run --project apps/ocs-indexer --extra api jd-ocs-indexer index-references ./data/selected-ocs --collection ocs_references_20261005
+$env:REFERENCE_COLLECTION = 'ocs_references_20261005'
+$env:REFERENCE_CANDIDATE_LIMIT = '20'
+uv run --project apps/ocs-indexer --extra api jd-ocs-indexer serve --port 8000
+```
+
+`index-references` 只建立新 collection，拒絕覆寫及重複 OCS code；全部寫入後才發布 ready
+manifest。原始 UTF-8 JSON 與 hash 綁定 `reference_id`，讀取不代換成新版。失敗的 collection
+保持未 ready；修正後請改用新名稱，不會自動刪資料。
+
+`REFERENCE_COLLECTION` 未設定時新 API 回 503。`RERANKER_URL` 預設沿用 `EMBEDDER_URL`。
+20 是原話控制初值，尚未證明為通用最佳參數；可由服務端設定 40。`GET /healthz` 是既有
+基礎檢查，不代替新索引／模型的實際搜尋驗證。body 格式錯誤 422、來源不存在 404、索引
+未 ready／不相容 409、無效模型回覆 502、連線失敗 503，不將故障當空結果。
+
+契約權威：[`indexer_contract/references.py`](../../packages/indexer-contract/src/indexer_contract/references.py)。
+設計及證據：[`API 設計`](../../docs/specs/2026-10-05-occupation-reference-api-design.md)、
+[`施工及驗證`](../../docs/plans/2026-10-05-occupation-reference-api.md)。
+
+### 既有 profile／task API
 
 ```bash
 uv sync --all-extras                       # api extra = fastapi + uvicorn
@@ -32,7 +80,7 @@ uv run --all-extras pytest -q
 
 ## 為什麼是 profile + task 兩種點
 
-從使用者流程倒推 embedding 單位——整個著作流程只有兩個動作需要語意搜尋:
+既有 profile／task 索引依兩種查詢用途選擇 embedding 單位。這組介面與上面的職位整體參考 API 分開，不能將下表當作新 API 的向量內容：
 
 | 動作 | 點類型 | embed 內容 |
 |---|---|---|
@@ -111,19 +159,21 @@ embed 字串只放 ChunkRecord.text) → HTTP embed(batch) → QdrantWriter.upse
 | GET | `/occupations/{ocs_code}/competencies` | K/S/O/P/A 能力池(多來源 CitableItem) |
 | GET | `/healthz`、`/stats` | 就緒(含 `index_model`)、點數統計 |
 
-歷史消費端設計保留在 Git 與研究文件；未來若要接入正式 JD App，須另經現行決策流程，不能直接復活舊 `apps/api` 接點。
+這組 profile／task API 的歷史消費端設計保留在 Git 與研究文件。若要新增它的正式 JD App 用途，須另經現行決策流程，不能直接復活舊 `apps/api` 接點；ADR0080 已接入的是上方獨立的職位整體參考 API。
 
 ## Codemap
 
 ```text
 src/jd_ocs_indexer/
-  cli.py                  # index / stats / doctor / smoke-query / query / serve(瘦 CLI,ADR 0009)
+  cli.py                  # index-references / index / stats / query / serve(瘦 CLI)
   config.py               # .env → Settings(QDRANT_*, EMBEDDER_URL, OCS_SOURCE_ROOT)
   pipeline.py             # run_index 純編排(CLI/批次/測試共用)
   models/                 # ocs.py(來源 JSON tolerant models)、chunk.py(ChunkRecord/EmbeddedChunk)
   ingestion/              # reader(掃檔) → normalizer(補缺/版本) → builder(v4 兩種點)
                           #   payloads.py = 落庫 payload 的 pydantic 權威(schema_version)
   embeddings/             # base.py(port + 相容驗證)、http_embedder.py(→ apps/embedder)、factory.py
+  references/             # source(固定來源)／service(檢索用例)／store(Qdrant adapter)
+  reranking/              # HTTP adapter：批次配對、模型身分／分數驗證
   store/                  # ids(uuid5)、schema(vectors+payload indexes)、writer(upsert)、
                           #   manifest(嵌入身分)、qdrant_client
   validation/             # stats、smoke_query、search(build_filter + dense/hybrid RRF,CLI+API 共用)
@@ -143,6 +193,7 @@ collapse/score_pairs(校準即生產);輸出留 `docs/specs/` 當校準紀錄。
 | 命令 | 用途 |
 |---|---|
 | `index <SCAN_DIR> [--limit N]` | 建索引(全量;寫 `QDRANT_COLLECTION`) |
+| `index-references <SCAN_DIR> --collection <NEW_NAME>` | 選定來源版本 → 獨立公版參考索引；拒絕覆寫 |
 | `stats [SCAN_DIR] [--collection]` | source 端 / Qdrant 端統計 |
 | `doctor <SCAN_DIR>` | 資料健康檢查(parse 失敗/缺欄;不阻斷索引) |
 | `query "<TEXT>" [-l profile\|task] [--ocs-code] [-H]` | 人類可讀查詢(`-H` = hybrid) |

@@ -33,6 +33,10 @@ class EmbeddingMismatchError(RuntimeError):
     """Index was built with a different embedding model than the live embedder."""
 
 
+class EmbeddingResponseError(RuntimeError):
+    """The embedding provider returned an invalid count, vector, or model identity."""
+
+
 def assert_compatible(manifest: "EmbeddingSignature | None", current: "EmbeddingSignature") -> None:
     """Fail fast when the query embedder does not match the index's.
 

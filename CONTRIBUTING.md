@@ -31,8 +31,7 @@ uv sync --project apps/api --locked
 
 Node／TypeScript 使用根目錄唯一的 `pnpm-lock.yaml`；不要新增 npm lockfile。Python 使用
 `apps/api/uv.lock`。資料庫與 OpenAI key 只經明示的環境變數／`apps/api/.env` 的單一 key 設定，
-不由安裝或啟動偷偷建立、清除或搬移；步驟見[根 README](README.md#第一次設定)與
-[runbook](docs/runbook.md)。
+不由安裝或啟動偷偷建立、清除或搬移；步驟見 [runbook 的首次初始化](docs/runbook.md#第一次初始化)。
 
 ## 日常開發
 

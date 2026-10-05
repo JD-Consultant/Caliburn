@@ -1,10 +1,10 @@
 # 後端文件入口
 
-本目錄沿用曾退役的 `apps/api` 路徑，但目前已包含新目標程式；不要按舊文件的 `app/core` 等模組指引施工。
+本目錄提供現行後端的閱讀入口。`apps/api` 已依 ADR0079 成為正式產品後端；舊 API 曾使用相同目錄名稱，追查歷史時須核對當時版本，不能沿用 `app/core` 等退役模組指引施工。
 
 - 安裝、執行與已知限制：[後端 README](../README.md)。
 - 模組、契約、保存與執行設計：[實作文件入口](../../../docs/implementation/README.md)。
-- 任務及驗收狀態：[重建計畫](../../../docs/history.md#source-ee8cbce8eb3c303d1765)。
-- 正式產品權責仍依 [ADR0077](../../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)，不是因本目錄已有程式就完成正式切換。
+- 後續任務及驗收狀態：[目前決策](../../../docs/current-decisions.md)、[計畫入口](../../../docs/plans/README.md)；原[重建計畫](../../../docs/history.md#source-ee8cbce8eb3c303d1765)已結案，供追溯施工與驗證。
+- 正式產品權責依 [ADR0079](../../../docs/adr/0079-target-rebuild-production-cutover.md)，公版工具的可選接線依 [ADR0080](../../../docs/adr/0080-opt-in-public-reference-agent-tools.md)；[ADR0077](../../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)是舊產品沿革。
 
 此處不複製第二套設計文件。舊 API 的退役脈絡見 [ADR0057](../../../docs/adr/0057-current-only-runtime-and-data-boundary.md)及[歷史入口](../../../docs/history.md#source-e0ba6e4a9e510be1a900)；本頁原文可從 `def9c248:apps/api/docs/README.md` 讀回。

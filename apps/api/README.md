@@ -1,10 +1,14 @@
 # Caliburn backend
 
-正式後端使用 FastAPI 單程序、PostgreSQL、LangGraph 官方 saver 與 OpenAI 直連 Responses，負責訪談、背景 Memory、JD 編輯、來源回查與 PDF 匯出。日常啟動從專案根目錄的 `pnpm` 命令進入（見[根 README](../../README.md#第一次設定)與 [操作手冊](../../docs/runbook.md)）；本頁說明後端配置、API 與測試。服務只綁定 loopback，不對外開放；正式範圍見 [ADR 0079](../../docs/adr/0079-target-rebuild-production-cutover.md)，實際驗證與限制見[驗證範圍](../../docs/architecture/verification.md)。
+正式後端負責訪談、背景 Memory、JD 編輯、來源回查與 PDF 匯出。它以 FastAPI 單程序運行，使用 PostgreSQL 保存資料、LangGraph 官方 saver 保存執行狀態，並直連 OpenAI Responses。服務只綁定 loopback，不對外開放。
+
+本頁說明後端配置、API 與測試。日常啟動從專案根目錄的 `pnpm` 命令進入，步驟見[操作手冊](../../docs/runbook.md#快速開始)。正式範圍由 [ADR 0079](../../docs/adr/0079-target-rebuild-production-cutover.md)定義；哪些行為已驗證、結果支持到哪裡，見[驗證範圍](../../docs/architecture/verification.md)。
 
 產品使用 `gpt-6-luna`／`high`（使用者於 2026-10-01 因成本確認），不採用 Sol 或自動 fallback。程式化 `ModelSettings` 的 Sol 接縫僅保留既有隔離研究，不再推進切換或追加 Sol 外送；沒有環境／UI 模型切換，不能將既有原生歷史交給另一模型。能力與限制以[選型文件](../../docs/implementation/technology-decisions.md#1-首選工具鏈)為準。
 
 ## 安裝與執行
+
+首次使用完整 App，從[操作手冊的快速開始](../../docs/runbook.md#快速開始)選擇 Docker 或原生方式。下方命令供原生後端開發；停止時在啟動的終端按 Ctrl+C，再次啟動沿用原資料庫與設定。
 
 從專案根目錄執行，使用 Python 3.14、uv 0.12.20 與根 `package.json` 指定的 Node／pnpm。先提供[資料庫設定](#目標資料庫初始化)，AI 與 PDF 設定見 [操作手冊](../../docs/runbook.md)。依賴由 `apps/api/uv.lock` 與根 `pnpm-lock.yaml` 固定。
 
@@ -36,6 +40,8 @@ uv run --project apps/api --locked python apps/api/scripts/run_backend.py --key-
 
 ### 使用建置後的同源畫面
 
+Docker 可直接包好同源 Web、後端、PDF 資源與 PostgreSQL；操作見 [runbook 的 Docker 操作](../../docs/runbook.md#docker-操作)。使用同一個後端入口，但容器明確指定 `--host 0.0.0.0`，主機只發布到 loopback；以下保留原生啟動方式。
+
 正式交付形式。先沿上節設定資料庫，使用所定 Node／pnpm 與 Python 環境，從 repo root 執行（`pnpm build`＋`pnpm start` 已包含下列步驟與環境變數）：
 
 ```powershell
@@ -63,7 +69,7 @@ uv run --project apps/api --locked alembic -c apps/api/alembic.ini check
 
 migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade head` 不重建原資料。應用啟動只檢查 migration head，不默默升級。未配置新 DB 時 health 仍可用、檔案 API 回 503；已配置但結構未初始化／不相符則啟動失敗。初始 schema 包含不可變原文，不提供破壞性 downgrade；需要資料處置應另行核對精確範圍。
 
-日常入口 `pnpm start`／`pnpm dev` 會要求資料庫設定；上述「未配置 DB 時 health 可用」只適用於直接啟動的最低層診斷入口。版本更新流程見[根 README](../../README.md#更新已有安裝)。
+日常入口 `pnpm start`／`pnpm dev` 會要求資料庫設定；上述「未配置 DB 時 health 可用」只適用於直接啟動的最低層診斷入口。版本更新流程見[操作手冊](../../docs/runbook.md#更新已有安裝)。
 
 **JD 模型短定位（0023）：**升級前讓執行中的工作停在安全點，停止原後端後，沿上述相同 DB／schema 設定執行 `pnpm app:migrate`，再 `pnpm start`。這只新增模型定位映射，不重建 JD 或改寫原模型歷史；新工具結果提供 `task_12`／`citation_18` 等短定位，舊 UUID 定位仍相容。映射由 App 自動發配，不能手動重排／重設序號／清表；前端 HTTP 仍使用原 UUID，無須為此重建前端。設計與驗證見 [JD 保存 §3.2](../../docs/implementation/jd-storage.md#32-模型導覽與既有物件定位)及 [T14 §8](../../docs/history.md#source-098e24f247a9411844be)。
 
@@ -71,11 +77,30 @@ migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade h
 
 ## API 與執行紀錄
 
+**公版參考工具（可選接線）：**`OccupationReferenceTools` 已可接入顧問 runner；未配置時維持原工具清單，不建立 RAG HTTP client。沒有新增 App HTTP 路由。模型 schema 位於 `contracts/tools/`；綁定、prepare／execute 與生效資格見[工具契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型)，[施工紀錄](../../docs/plans/2026-10-05-occupation-reference-agent-integration.md)記錄驗證。`0024` 新增此 feature 的兩張表，本輪只套用隔離測試 schema，既有安裝仍循上述 `pnpm app:migrate` 流程。
+
+**Memory 排除範圍讀取：**啟用後 B1／B2 只增加 `read_excluded_work({})`，只回 `excluded_work`，沿現有 `MemoryReadBinding` 固定訪談上界與 stage 資格；不需 RAG HTTP client、不複製 Memory、不給選公版或寫入能力。schema、使用方式及時序反例見[唯讀契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#memory-的排除範圍唯讀入口未接模型)。
+
+### 公版參考工具的可選啟用
+
+先沿 [RAG README](../ocs-indexer/README.md#職位整體參考-api)準備正確來源索引並啟動獨立 API，再設定欲啟用工具的 App 程序。App 使用明示的 origin，不接受路徑、憑證、query 或 fragment。
+
+以下命令只指定設定，不會更新已啟動的程序。本輪施工沒有改現行程序；已有測試或訪談執行時，須等其他測試結束後的安全點再啟動欲啟用的 App。
+
+```powershell
+$env:CALIBURN_OCCUPATION_REFERENCE_URL = 'http://127.0.0.1:8000'
+$env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
+```
+
+未設 URL 就關閉；timeout 預設 30 秒，必須有限且大於零。原生啟動沿現有資料庫／金鑰設定與 `pnpm start`；若同時有其他 App 使用相同 DB，先依 runbook 避免同一 leader 的重複程序。Docker 使用現有 App `env_file` 加入這兩項設定，URL 使用容器可達的服務位置；根 Compose 插值 `.env` 不等於容器環境。
+
+顧問新增五工具，B1／B2 新增一個唯讀工具；角色已保存的 preparation／context／Step 繼續原工具清單，新設定只影響新的未綁定請求。關閉前先讓使用公版的 A Turn 完成；原請求需要 RAG 而 client 配置消失時會明確拒絕，不靜默換工具。RAG 下線回工具錯誤，不視為查無結果、不清 state。client 不使用系統代理、不跟隨重導，由 App 關閉。
+
 **找回進行中的訪談：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 可依職務檔案找回進行中／暫停的 A，不需瀏覽器先保存 execution／command ID；回傳 `{"turn": <既有公開狀態>}` 或明確 `{"turn": null}`，未知檔案 404。不啟動／恢復模型、不返回 Memory 或終態歷史。狀態也可經 `/consultant-turns/{execution_id}` 或 `/consultant-turns/by-command/{command_id}` 重取；驗證見[原始紀錄](../../docs/history.md#source-c8ea469844e955e1447b)。
 
 **離線回看：**只要原 DB 可用，即使未配置模型，也可透過既有 PostgreSQL checkpointer 讀取已保存的公開中間訊息；不建立模型 client、不啟動執行 supervisor。`POST /inputs` 只在模型與 supervisor 就緒時接受新工作；沒有模型設定時回 `503 model_not_configured`，既有命令仍可查回原結果，不為回看而重跑模型。驗證見 [T17 紀錄](../../docs/history.md#source-98d840caa9eed7fb2840)。
 
-主要資料入口（具體 DTO 由 `/openapi.json` 與 `contracts/http/` 生成）：
+下列入口涵蓋職務檔案、正式訪談與人工 JD 編輯。讀取入口提供目前資料或固定修訂；修改入口沿命令與讀取基底處理重送及衝突。具體 DTO 由 `/openapi.json` 與 `contracts/http/` 生成：
 
 - `POST /api/job-files`：`command_id`、`display_name`、`employee_name`；新建立回 201，同一命令重送回原結果／200，不同輸入重用命令回 409。
 - `GET /api/job-files`、`GET /api/job-files/{job_file_id}`：清單／目前檔案 metadata。

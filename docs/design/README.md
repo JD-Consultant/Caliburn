@@ -1,10 +1,10 @@
 # 跨 App 設計與歷史索引
 
-本目錄同時有獨立保留範圍與已退役設計，不因仍有文件就稱為 active。現行架構從[架構地圖](../target-architecture-map.md)進入；正式產品權責依 [ADR0079（Accepted）](../adr/0079-target-rebuild-production-cutover.md)，[ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)只作舊產品沿革。
+本目錄保留跨 App 的設計說明，並分開列出現行範圍與歷史設計。現行架構從[架構地圖](../target-architecture-map.md)進入；正式產品權責依 [ADR0079（Accepted）](../adr/0079-target-rebuild-production-cutover.md)，[ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)只作舊產品沿革。
 
 ## 現行設計
 
-- [`rag-pipeline.md`](rag-pipeline.md) — 保留但與 current API/Web 完全隔離的 PDF／OCS／indexer／embedder／Qdrant bounded context。
+- [`rag-pipeline.md`](rag-pipeline.md) — 獨立的 PDF／OCS／indexer／embedder／Qdrant bounded context，說明資料流、資源與操作邊界。依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，JD App 可明示啟用 HTTP consumer；RAG 不成為預設啟動依賴。
 
 ## 歷史設計
 

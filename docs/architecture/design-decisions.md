@@ -2,7 +2,7 @@
 
 Caliburn 採用模組化單體、PostgreSQL 與原生模型接續，讓訪談、JD 編輯及背景 Memory 整理共用明確的資料與恢復規則。本章說明這些選擇的理由、替代方案與代價，也交代哪些效果仍缺實測。
 
-以下以截至 2026-10-03 的產品為範圍。分析品質、真人使用效果與未覆蓋分支的證據見[驗證範圍](verification.md)及[實驗發現的問題](../reports/experiment-findings.md)，架構機制本身不代表效果已達標。
+核心機制以截至 2026-10-03 的產品為基礎，後續目標調整另標示狀態。分析品質、真人使用效果與未覆蓋分支的證據見[驗證範圍](verification.md)及[實驗發現的問題](../reports/experiment-findings.md)；本章說明選擇的理由，不以架構機制推定效果已達標。
 
 ## 1. 文件結構：多視角、單一責任、可逐層深入
 
@@ -10,7 +10,9 @@ Caliburn 採用模組化單體、PostgreSQL 與原生模型接續，讓訪談、
 
 一份涵蓋所有細節的長文不易定位問題，完全依技術工具分類也難以看出產品流程。按職責分開的專題讓讀者選擇所需深度；代價是跨層問題需要配合總覽與互動流程閱讀，而非只看單一章節。
 
-README 簡述產品價值與現況；[產品介紹](../product-introduction.md)透過問題、使用旅程、設計與驗證說明用途。架構導覽則連到詳細專題，圖與正文放在一起，方便對照。這種安排借鑑 [GitHub README 指引](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)的簡短入口及 [Diátaxis explanation](https://diataxis.fr/explanation/)著重理解的寫法，不視為大型專案唯一適用的模板。圖面以 [C4 檢查指引](https://c4model.com/diagrams/checklist)說明範圍、圖例與箭頭意義，並以 arc42 runtime view 呈現代表性的正常與異常時序，避免函式細節掩蓋互動關係。
+README 簡述產品價值與現況；[產品介紹](../product-introduction.md)透過問題、使用旅程、設計與驗證說明用途。架構導覽連到詳細專題，圖與正文放在一起，方便對照。這種安排借鑑 [GitHub README 指引](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)的簡短入口及 [Diátaxis explanation](https://diataxis.fr/explanation/)著重理解的寫法，不視為大型專案唯一適用的模板。
+
+圖面以 [C4 檢查指引](https://c4model.com/diagrams/checklist)說明範圍、圖例與箭頭意義，並以 arc42 runtime view 呈現代表性的正常與異常時序，避免函式細節掩蓋互動關係。
 
 依據：[C4](https://c4model.com/diagrams)按讀者問題逐層放大，且不必畫滿四層；[arc42 building blocks](https://docs.arc42.org/section-5/)描述責任及內部結構，[runtime view](https://docs.arc42.org/section-6/)補代表性互動。這支持多視角，不規定本案目錄名稱。[Microsoft 架構規格](https://learn.microsoft.com/en-us/azure/well-architected/architect-role/architecture-design-specification)支持業務目標、功能／非功能選擇、操作與驗證一併說清；[Google 文件工程](https://abseil.io/resources/swe-book/html/ch10.html)支持面向讀者及持續維護。查閱：2026-09-29。
 
@@ -28,7 +30,9 @@ README 簡述產品價值與現況；[產品介紹](../product-introduction.md)�
 
 候選需要支援單次修改的原子性、來源身分、B1／B2 共用工作稿、預覽與差異比較，以及 Step 恢復時的一致位置。候選與操作結果在同一保存邊界內，checkpoint 則記錄接續位置；恢復時可核對原結果，不讓兩種保存方式各自判定正式資料。
 
-全版全文複製簡單但重複；Git 式差異鏈需要重建與更多格式／清理規則；event sourcing 需要事件版本與 replay 正確性。現行採「物件修訂重用 + 快照選用」保留固定歷史，無需額外版本框架。暫不做正文內容位址去重：未變物件不重存，變動物件保存完整正文。這保留了直接讀取正文的便利，但仍有重複文字的儲存成本；是否需要壓縮或去重，尚缺真實容量量測。
+現行採「物件修訂重用 + 快照選用」保留固定歷史，無需額外版本框架：未變物件不重存，變動物件保存完整正文。這讓正文可直接讀取，但仍有重複文字的儲存成本；目前不做正文內容位址去重，是否需要壓縮或去重，尚缺真實容量量測。
+
+其他做法各有代價：每版複製全部正文較簡單，但重複較多；Git 式差異鏈需要重建正文及更多格式／清理規則；event sourcing 則須維護事件版本與 replay 正確性。
 
 ## 4. 交易：短交易、條件提交、原操作核對
 
@@ -44,9 +48,15 @@ README 簡述產品價值與現況；[產品介紹](../product-introduction.md)�
 
 不新增通用模型供應商抽象層、第二套工作階段引擎、每步必填的工作狀態筆記或獨立的壓縮 AI 角色。只有實測反例顯示原生接續不足，才評估需要補充哪些分析資料；不可讀的推理內容不作為 App 可讀取的工作計畫。
 
-**上下文控制權：**App 決定組裝與接續內容；框架／adapter 不另選要保留的歷史、不暗中摘要或換角色。使用 `store=false`，不使用 `previous_response_id`，由 App 明確提供接續 items。SDK 發送邊界的實際請求才足以說明有無隱含變換，僅看組裝前資料仍有證據缺口；這也不代表所有請求副本都永久保存。
+**上下文控制權：**App 決定組裝與接續內容，框架／adapter 不另選歷史、不暗中摘要或換角色。使用 `store=false`，不使用 `previous_response_id`，由 App 明確提供接續 items。
+
+驗證這項分工時，須核對 SDK 發送邊界的實際請求；僅看組裝前資料不足以排除隱含變換。這項驗證要求也不表示所有請求副本都永久保存。
 
 App 仍可明確呼叫模型的原生能力。[OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)允許送入完整視窗，並採用完整的返回視窗；其中加密的 compaction item 無法由人解讀。App 控制壓縮的觸發時機、範圍與安全採用條件，但不掌握供應商內部如何取捨內容。現行規則不啟用伺服器端自動壓縮，由 App 在完整 Step 交界達 160K 時主動壓縮，包含 Turn 內符合條件的交界。門檻與回退規則以[共用執行 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與中途保險)為準；對話接續仍由 App 管理。
+
+**已確認的目標調整，尚未實作：**輪前使用 App 管理的文字摘要，輪中仍採全部原生 compact output；B1／B2 壓後只追加目前候選導覽。
+
+這項調整回應長訪談實測中觀察到的問題：歷次 App 資料仍留在 compact 的返回視窗，而官方不允許自行裁切該結果。摘要內容及品質仍待設計，不能宣稱文字摘要保留了加密推理。此變更不新增壓縮 AI 角色或恢復框架，完整取捨見[輪前摘要與輪中壓縮](../specs/2026-10-04-context-summary-and-compaction-design.md)。
 
 ## 6. 工具與格式：依內容與操作選擇
 

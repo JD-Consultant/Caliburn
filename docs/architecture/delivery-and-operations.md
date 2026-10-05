@@ -2,7 +2,7 @@
 
 Caliburn 以本機 Web 提供訪談、JD 編輯與 PDF 匯出，後端管理模型執行、資料保存及中斷恢復。本章說明畫面如何反映正式結果、本機程序如何運作，以及工作資料與外部模型之間的信任邊界。
 
-以下描述截至 2026-10-03 的產品機制；分析品質、真人使用效果與未覆蓋分支的證據見[驗證範圍](verification.md)及[實驗發現的問題](../reports/experiment-findings.md)，不能由功能存在推定效果達標。
+核心機制以截至 2026-10-03 的產品為基礎，後續公版可選接線另列於部署說明。具體設定與操作指令由 App README 及操作手冊維護；分析品質、真人使用效果與未覆蓋分支的證據見[驗證範圍](verification.md)及[實驗發現的問題](../reports/experiment-findings.md)，不能由功能存在推定效果達標。
 
 ## 1. 使用者看到的主要流程
 
@@ -35,7 +35,9 @@ Caliburn 以本機 Web 提供訪談、JD 編輯與 PDF 匯出，後端管理模�
 | 正式完成 | 以原完成結果取得完整答覆與正式 JD；可展開已保存公開訊息 | UI 斷線後讀同一結果，不再生成另一則 final；未保存片段不假裝已恢復 |
 | 人工 JD 寫入／PDF | 寫入遵循 JD 業務；PDF 固定當下正式修訂 | 鎖定檢查在後端，版本不符不盲蓋；匯出期間候選／新版發布不改變同一份輸出 |
 
-現行介面採伺服器事件串流（SSE），搭配查詢與命令 API；跨語言格式由同一契約來源生成。[MDN SSE 說明](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)介紹單向事件與重連機制；但重連不保證所有業務事件都已保留，因此仍須查詢正式狀態。每個頁面共用一條進度連線，不為每個 Step 或工具另開串流。中間文字僅顯示 API 公開訊息，不展示不可讀的推理內容，也不要求模型揭露內部推理。若提供工具活動資訊，僅顯示可安全公開的名稱與進度摘要，不展示金鑰或完整敏感參數。HTTP 路徑、事件型別及重連細節見[介面設計](../implementation/interface-and-delivery.md)。
+現行介面採伺服器事件串流（SSE），搭配查詢與命令 API；跨語言格式由同一契約來源生成。每個頁面共用一條進度連線，不為每個 Step 或工具另開串流。[MDN SSE 說明](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)介紹單向事件與重連機制；但重連不保證所有業務事件都已保留，因此仍須查詢正式狀態。
+
+中間文字僅顯示 API 公開訊息，不展示不可讀的推理內容，也不要求模型揭露內部推理。若提供工具活動資訊，僅顯示可安全公開的名稱與進度摘要，不展示金鑰或完整敏感參數。HTTP 路徑、事件型別及重連細節見[介面設計](../implementation/interface-and-delivery.md)。
 
 **完成後撤回的條件：**App 依原輪操作的前後差異產生反向修改，只有受影響內容與關係仍符合安全撤回條件時，才一次採用全部修改。若人或 AI 後來已修改同一部分，則回報衝突，不覆蓋後續內容；不提供自動合併或任意還原歷史版本。撤回功能不作為 AI 工具，也不撤回正式訪談、獨立的 Memory 或上下文壓縮。
 
@@ -47,13 +49,17 @@ Caliburn 以本機 Web 提供訪談、JD 編輯與 PDF 匯出，後端管理模�
 
 ```mermaid
 flowchart LR
-  browser[本機瀏覽器] <-->|本機 API／串流| app[App 後端與背景執行]
-  app <-->|短交易／checkpoint| db[(本機 PostgreSQL)]
+  browser[本機瀏覽器] <-->|127.0.0.1 API／串流| app[App：Web 成品、後端與背景執行]
+  app <-->|短交易／checkpoint| db[(PostgreSQL：業務與 checkpoint)]
   app <-->|HTTPS；經授權工作資料| openai[OpenAI Responses]
   app --> file[本機 PDF 匯出]
 ```
 
 現行部署採 FastAPI 單程序，同源提供建置後的 Web，內部處理 A 與背景 B Graph。PostgreSQL 為獨立資料庫程序。依賴鎖定受支援的穩定版本；OpenAI SDK／LangGraph／checkpointer 的相容版本與原生 API 測試結果界定這組依賴的已知適用範圍。
+
+上圖為未啟用公版參考的最小部署。依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，App 可在明示配置 URL 後透過 HTTP 使用獨立 RAG；RAG 不由 JD App 自動啟動。設定只影響尚未綁定的新請求，執行中的工作仍沿原工具與格式恢復。啟用方式見 [API README](../../apps/api/README.md#公版參考工具的可選啟用)，程序操作見 [runbook](../runbook.md#rag獨立服務非-jd-app-預設依賴)。
+
+可原生啟動，也可用 `compose.jd-app.yaml`：一個 App 容器加一個 PostgreSQL 容器及資料 volume。兩者使用同一份程式、契約與持久資料機制，不是兩套產品。Docker 包含 PDF 瀏覽器與中文字型，主機入口只綁 loopback；既有資料不自動搬入。建置、安全與停止邊界見[交付接線 §4.2](../implementation/interface-and-delivery.md#42-docker-交付)，啟動與 DataGrip 設定見 [runbook](../runbook.md#docker-操作)。
 
 多頁籤操作及同一檔案的重複提交，由後端檢查執行資格。同一操作者可管理多份檔案，各檔案的資料保持隔離；全域資源上限只限制執行量，不將不同職務檔案合併成同一模型對話。未來若需多個後端程序，須再驗證資料庫中的執行資格與重入機制，不能以程序內的鎖定保證跨程序安全。
 
@@ -91,7 +97,9 @@ UI 進度從既有 State 與業務結果讀取。診斷資料保留技術原因�
 
 ## 6. 產品範圍與成效評估
 
-核心使用旅程為：**建檔／開場 → 訪談 → 有據改稿 → 保存與中斷接續 → Memory 發布 → 下一輪使用 → PDF**。取消競爭、來源換版、人工修改及長訪談涉及不同層級的證據，詳見[驗證範圍](verification.md)；全稿審核、搜尋、跨機備份、事件平台及多種部署不在現行範圍。
+核心使用旅程為：**建檔／開場 → 訪談 → 有據改稿 → 保存與中斷接續 → Memory 發布 → 下一輪使用 → PDF**。這是代表性路徑，Memory 不必每輪發布，PDF 也可在需要時匯出目前正式稿。
+
+取消競爭、來源換版、人工修改及長訪談涉及不同層級的證據，詳見[驗證範圍](verification.md)；專用全稿審核、原話搜尋、跨機備份、事件平台及遠端公開部署不在現行範圍。
 
 產品價值驗證看「員工能否只靠訪談得到涵蓋主要工作的精簡、高訊號 JD」及成本／時間，不以模型步數多、Memory 資料多或功能數量多代表成功。商業價格、客群規模及獲客成效仍待獨立驗證。
 

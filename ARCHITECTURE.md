@@ -1,8 +1,8 @@
 # Caliburn 架構
 
-Caliburn 是在本機執行的 Web AI 職務分析與職務說明書（JD）應用程式。員工可直接編輯 JD，也可與顧問持續訪談，
-由 AI 依照與人工編輯相同的業務規則讀寫 JD。單一操作者可管理多份資料彼此隔離的職務檔案；目前不提供登入、
-存取控制清單（ACL）、多租戶、計費、雲端部署或多人協作，服務僅綁定本機回環位址（loopback）。
+Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。員工透過持續訪談說明工作，AI 逐步編修 JD；人也可直接編輯同一份文件，兩種入口遵循相同的業務規則。
+
+單一操作者可管理多份資料隔離的職務檔案。服務僅綁定本機回環位址（loopback），目前不提供登入、存取控制清單（ACL）、多租戶、計費、雲端部署或多人協作。本頁提供程式組成的簡短入口，詳細契約由各主題文件維護。
 
 ## 組成
 
@@ -24,7 +24,7 @@ PostgreSQL               OpenAI Responses API（經授權的工作資料；store
   LangGraph checkpoint（原生接續歷史）
 ```
 
-程式位於 `apps/api`（後端）與 `apps/web`（介面）。後端採模組化單體：訪談、JD 與 Memory 各自管理資料和規則，由工作流程協調；三個 AI 分析角色共用模型與工具執行機制，不各自部署成服務。Web 呈現資料與提交操作，正式結果統一由後端保存。
+程式位於 `apps/api`（後端）與 `apps/web`（介面）。上圖呈現未啟用公版參考的基本組成。後端採模組化單體：訪談、JD 與 Memory 各自管理資料和規則，由工作流程協調；三個 AI 分析角色共用模型與工具執行機制，不各自部署成服務。Web 呈現資料與提交操作，正式結果統一由後端保存。
 
 ## 資料與執行的基本規則
 
@@ -41,6 +41,6 @@ PostgreSQL               OpenAI Responses API（經授權的工作資料；store
 
 ## 獨立的檢索研究
 
-`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract` 與
-`packages/indexer-contract` 構成可獨立執行的 RAG 領域，目前未供正式 JD 應用程式使用。
-僅透過 `pnpm rag:*` 明確啟動；詳見 [RAG 設計](docs/design/rag-pipeline.md)。
+`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract` 與 `packages/indexer-contract` 構成獨立 RAG 領域，分別處理公版轉換、索引、向量與 API 契約。
+
+依 [ADR0080](docs/adr/0080-opt-in-public-reference-agent-tools.md)，JD App 可在明示設定後透過 HTTP 查讀公版；RAG 不由 App 自動部署或啟動，也不保存員工訪談與 JD。選用公版及明確否認範圍由 App 自己保存，工具資格與跨輪規則沿原執行流程。啟停仍使用 `pnpm rag:*`，詳細分工見 [RAG 設計](docs/design/rag-pipeline.md)。

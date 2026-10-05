@@ -1,6 +1,6 @@
 # 實作驗證與需求追溯
 
-- 狀態：**持續維護的驗證與需求追溯表**。本頁定義驗證責任，表內要求不構成通過證明。已驗、部分、離線及未驗範圍依[架構驗證](../architecture/verification.md)與[產品實驗](../experiments/product-validation/README.md)判讀。
+- 狀態：**持續維護的驗證與需求追溯表** 。本頁定義驗證責任，表內要求不構成通過證明。已驗、部分、離線及未驗範圍依[架構驗證](../architecture/verification.md)與[產品實驗](../experiments/product-validation/README.md)判讀。
 - 需求效果唯一來源：[V01–V28](../architecture/verification.md)、[E01–E15](../specs/2026-09-27-shared-agent-execution-and-state-design.md#71-職責異常驗證映射)、[JDT-01–09](../specs/2026-09-29-jd-model-tool-contract-review.md#7-行為邊界與證據層級)。實驗原件與結果由[產品驗證與實驗資料](../experiments/product-validation/README.md)路由。
 
 ## 1. 分層測試，不以 mock 冒充產品
@@ -96,7 +96,7 @@
 
 每項證據包含 commit／版本、配置、資料 scope、命令、期望、觀察、失敗與限制。provider 加實際 usage／成本及 request IDs（不含密鑰），整合加程序／交易交錯記錄。原話及完整 request 不默認永久記錄；只保留當次測試必要且授權的資料。
 
-**變更驗收：**按適用範圍核對確定性、機制及核心旅程測例；真模型重大事實、權限、引用錯誤逐項揭露，不能用平均分掩蓋。非確定品質用既有指南 rubric，結果分布及樣本限制明說，不臨時改評分規則求過關。真實節時 ROI（V25）可列後續試點，不杜撰數字，也不因此新增營收／使用者研究平台。
+**變更驗收：** 按適用範圍核對確定性、機制及核心旅程測例；真模型重大事實、權限、引用錯誤逐項揭露，不能用平均分掩蓋。非確定品質用既有指南 rubric，結果分布及樣本限制明說，不臨時改評分規則求過關。真實節時 ROI（V25）可列後續試點，不杜撰數字，也不因此新增營收／使用者研究平台。
 
 ## 6. 已知限制與未驗範圍
 

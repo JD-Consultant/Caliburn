@@ -1,6 +1,6 @@
 # 公版職位整體參考的搜尋定義
 
-日期：2026-10-04。狀態：**研究候選，品質方案／參數尚未正式採納，未接 JD App**；2026-10-05 已授權的[獨立 API 契約與實作](2026-10-05-occupation-reference-api-design.md)另行記錄。[五案四組第一輪](../experiments/2026-10-04-representative-occupation-top5/run-01/README.md)已執行；整段 dense 暫留控制基線，廣蒐＋rerank 未呈現整體優勢，主要領域粒度及評審判讀仍有未解反例。[三類 A 訪談原文四法](../experiments/2026-10-04-a-interview-occupation-retrieval/run-01/README.md)接續完成：同人初期已找到的倉庫／採購強代表均保留，但更多原文、分段及 rerank 未穩定增加；額外責任降級與孤立動作給2待驗。
+日期：2026-10-04。狀態：**研究候選，品質方案／參數尚未正式採納，未接 JD App** ；2026-10-05 已授權的[獨立 API 契約與實作](2026-10-05-occupation-reference-api-design.md)另行記錄。[五案四組第一輪](../experiments/2026-10-04-representative-occupation-top5/run-01/README.md)已執行；整段 dense 暫留控制基線，廣蒐＋rerank 未呈現整體優勢，主要領域粒度及評審判讀仍有未解反例。[三類 A 訪談原文四法](../experiments/2026-10-04-a-interview-occupation-retrieval/run-01/README.md)接續完成：同人初期已找到的倉庫／採購強代表均保留，但更多原文、分段及 rerank 未穩定增加；額外責任降級與孤立動作給2待驗。
 
 本輪先定義如何找職位整體參考。公版收尾用途保留為[用途參考](2026-10-04-public-reference-completion-design.md)，單項 JD 任務完整度機制暫緩；搜尋不輸出「員工已完成訪談」或「JD 已完整」。[較早的兩層檢索候選](2026-10-04-public-reference-retrieval-design.md)及封存實驗保留原貌，本文件細化職位整體參考的搜尋與交付邊界。
 
@@ -18,11 +18,11 @@
 
 ## 2. 輸入：固定工作資料與多個保留脈絡的查詢
 
-目標 App 的候選輸入仍是一版已發布 **B2 工作理解正文**，必要時沿固定來源讀 B1 補分工、對象或條件。已依使用者要求以[五份固定合成員工需求](../experiments/2026-10-04-representative-occupation-top5/README.md)，在[第一輪](../experiments/2026-10-04-representative-occupation-top5/run-01/README.md)比較同一工作事實的整段／人工保留脈絡分段及有無 rerank；[原話與現行發布B1／B2六組比較](../experiments/2026-10-04-memory-layer-retrieval/run-01/README.md)也已完成八案。當輪B2逐理解列候選；[後續十二法](../experiments/2026-10-05-memory-public-unit-retrieval/run-01/README.md)不支持只採B2，原話整段對照仍需保留。雙輸入候選融合尚未測，未選定正式輸入。職稱、Memory 標題、工具清單不單獨作為工作查詢。
+目標 App 的候選輸入仍是一版已發布 **B2 工作理解正文** ，必要時沿固定來源讀 B1 補分工、對象或條件。已依使用者要求以[五份固定合成員工需求](../experiments/2026-10-04-representative-occupation-top5/README.md)，在[第一輪](../experiments/2026-10-04-representative-occupation-top5/run-01/README.md)比較同一工作事實的整段／人工保留脈絡分段及有無 rerank；[原話與現行發布B1／B2六組比較](../experiments/2026-10-04-memory-layer-retrieval/run-01/README.md)也已完成八案。當輪B2逐理解列候選；[後續十二法](../experiments/2026-10-05-memory-public-unit-retrieval/run-01/README.md)不支持只採B2，原話整段對照仍需保留。雙輸入候選融合尚未測，未選定正式輸入。職稱、Memory 標題、工具清單不單獨作為工作查詢。
 
 查詢須讓檢索模型讀到本人做什麼、對什麼、產出／用途，以及會影響相關性的條件與權責。B2 物件不等於一個 JD 任務；先比較完整物件正文與保留描述／範圍的分段，不先把 Markdown 每段、每句或所有案件各自當工作。第一個輸入元件的具體表示仍由實驗決定，本輪不為改寫查詢另增 LLM。
 
-例如以下為**虛構查詢示意，非本輪實測結果**：
+例如以下為**虛構查詢示意，非本輪實測結果** ：
 
 - 「依已確認需求與設計實作產品網頁、互動及資料顯示，串接後端提供的介面。」
 - 「開發後端 API 與資料處理，維護資料庫存取；需求與對外承諾由產品負責人確認。」
@@ -34,7 +34,7 @@
 
 ## 3. 搜尋對象：公版工作正文
 
-本輪沿已有文件層研究基線：公版概述及 **T／O／P 正文**。職位名稱、原始代碼、來源、版本與任務關係作 metadata；embedding 排除職位名稱、OPKS 代碼及表頭，保留項目正文／名稱。
+本輪沿已有文件層研究基線：公版概述及 **T／O／P 正文** 。職位名稱、原始代碼、來源、版本與任務關係作 metadata；embedding 排除職位名稱、OPKS 代碼及表頭，保留項目正文／名稱。
 
 每份公版的完整已解析任務目錄由來源結構讀取；任務細節及 K／S 可回查，不要求先建立額外向量。[公版切塊比較](../experiments/2026-10-04-public-chunk-retrieval/run-01/README.md)已固定八whole輸入，對比整份、任務及既有工作單元；T/U保留獨立概述chunk，按父公版合併。冷氣前五改善，混合前後端及倉庫卻丟失部分既有代表，整份保留控制基線，未選正式切法。[員工分段×切法交叉](../experiments/2026-10-04-query-chunk-cross-retrieval/run-01/README.md)已完成八案十法：倉庫找回既有代表、冷氣保留改善，全端仍缺後端且掉前端，整份仍作控制。[後續D/T/M及rerank十二法](../experiments/2026-10-05-memory-public-unit-retrieval/run-01/README.md)已比較整份＋task等權融合：原話task-R找回網站系統設計人的前後端共同參考，但先融合截20的M漏掉它；B2單獨也未進候選，R另有退步。混合方式／候選深度仍待驗；群組命中須彙整父公版，不能把任務相似視為職位整體已適用。
 

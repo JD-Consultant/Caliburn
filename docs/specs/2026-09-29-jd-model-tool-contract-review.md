@@ -13,14 +13,14 @@ JD 的結構與寫作方法見[產品概念](../product-concept.md#jd-與成果�
 | `execute_jd(action, payload)` 一個萬用入口 | 名義上工具少，實際格式、權限與錯誤都藏在 payload。 | 不採。 |
 | **按業務效果的少量具名工具；同一項目的相關修訂合在一次呼叫** | 類型與責任較清楚；建立完整任務、局部修訂及結構移動仍各有邊界。 | **現行分工；模型效果與 wire 依證據驗證。** |
 
-JD 工具只提供 A 所需的能力，不把 Memory B1／B2 編輯、資料庫操作、員工撤回、整版發布或內部診斷塞進 JD 工具。App 提供職務檔案、當輪 JD 候選、固定 Memory 基準、原操作與儲存資訊；模型只選**目標、要寫的內容、必要的直接來源**。名稱使用 `動作_業務對象` snake_case；多個同義入口不並存。OpenAI 官方建議清楚描述函式、參數與結果，且程式已知值不要求模型填；具體工具名稱、數量與輸出格式則依 Caliburn 的工作流程選擇。[OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)
+JD 工具只提供 A 所需的能力，不把 Memory B1／B2 編輯、資料庫操作、員工撤回、整版發布或內部診斷塞進 JD 工具。App 提供職務檔案、當輪 JD 候選、固定 Memory 基準、原操作與儲存資訊；模型只選**目標、要寫的內容、必要的直接來源** 。名稱使用 `動作_業務對象` snake_case；多個同義入口不並存。OpenAI 官方建議清楚描述函式、參數與結果，且程式已知值不要求模型填；具體工具名稱、數量與輸出格式則依 Caliburn 的工作流程選擇。[OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)
 
 指南的全稿雙向核對是品質目標；依[最新產品範圍](../product-concept.md#jd-與成果界線)，近期不加全稿審核 Agent、審核狀態或固定評改循環，逐步編修不以全稿完成為必要條件。
 
 
 ## 2. 模型可見入口
 
-**八個具名入口：七個承接 JD 內容讀寫，一個承接差異閱讀。**這不是理論最少或官方要求的數量；Memory／訪談讀取沿各自工具，不計入 JD 八入口。不另設 tool search 或 registry。
+**八個具名入口：七個承接 JD 內容讀寫，一個承接差異閱讀。** 這不是理論最少或官方要求的數量；Memory／訪談讀取沿各自工具，不計入 JD 八入口。不另設 tool search 或 registry。
 
 | 工具名稱 | 何時用／最少的模型選擇 | 不做什麼 |
 |---|---|---|
@@ -37,7 +37,7 @@ JD 工具只提供 A 所需的能力，不把 Memory B1／B2 編輯、資料庫�
 
 ### 2.1 欄位與操作覆蓋
 
-下表審核的是**模型能力覆蓋**，不是新的欄位、UI 或資料表。建立是建立 JD 內容項目；職務檔案及單一 profile 的建立仍由 App 管理。
+下表審核的是**模型能力覆蓋** ，不是新的欄位、UI 或資料表。建立是建立 JD 內容項目；職務檔案及單一 profile 的建立仍由 App 管理。
 
 | 既定內容／效果 | 讀／建立／局部修改 | 刪除、移動與關係 | 來源與核對 |
 |---|---|---|---|
@@ -52,7 +52,7 @@ JD 工具只提供 A 所需的能力，不把 Memory B1／B2 編輯、資料庫�
 
 ## 3. 讀取結果：按需深入，避免重複投影
 
-`read_jd` 的輸入效果與 `view` 範圍見[§3.3](2026-09-26-consultant-context-and-state-design.md#33-jd-導覽後的按需深入讀取)。**map 用精簡 JSON**，便於帶回定位；模型只在按需呼叫時填本次必須選的參數。**其他讀取範圍：**full 採完整可讀的 JD Markdown，不逐項附 refs 或來源 metadata；item／profile／區域採精簡 JSON，保留完整業務內容、關係及 App 提供的必要定位。這是依閱讀與後續操作用途選定的接法，不從 map JSON 或差異 Markdown 推導所有結果都要同格式；實際模型品質與容量仍待驗。OpenAI 的 function result 允許字串形式的 JSON 或文字；Markdown 不是 provider 的必選要求。[OpenAI result formatting](https://developers.openai.com/api/docs/guides/function-calling#formatting-results)
+`read_jd` 的輸入效果與 `view` 範圍見[§3.3](2026-09-26-consultant-context-and-state-design.md#33-jd-導覽後的按需深入讀取)。**map 用精簡 JSON** ，便於帶回定位；模型只在按需呼叫時填本次必須選的參數。**其他讀取範圍：** full 採完整可讀的 JD Markdown，不逐項附 refs 或來源 metadata；item／profile／區域採精簡 JSON，保留完整業務內容、關係及 App 提供的必要定位。這是依閱讀與後續操作用途選定的接法，不從 map JSON 或差異 Markdown 推導所有結果都要同格式；實際模型品質與容量仍待驗。OpenAI 的 function result 允許字串形式的 JSON 或文字；Markdown 不是 provider 的必選要求。[OpenAI result formatting](https://developers.openai.com/api/docs/guides/function-calling#formatting-results)
 
 例如讀 map 中的 `task_12`：
 
@@ -60,7 +60,7 @@ JD 工具只提供 A 所需的能力，不把 Memory B1／B2 編輯、資料庫�
 {"view":"item","read_ref":"task_12"}
 ```
 
-供模型看的局部結果採下列**合成示例**；內容與參照均為示意，不新增 JD 業務欄位：
+供模型看的局部結果採下列**合成示例** ；內容與參照均為示意，不新增 JD 業務欄位：
 
 ```json
 {
@@ -75,7 +75,7 @@ JD 工具只提供 A 所需的能力，不把 Memory B1／B2 編輯、資料庫�
 }
 ```
 
-成果／要求各自可有多筆；上例只有一筆，不暗示固定配對。**JD 模型定位沿既有 `read_ref`／`citation_ref` 欄位，值改為 App 發配的型別＋短序號，例如 `task_12`、`outcome_15`、`citation_18`；不另增 `item_ref` 或版本參數。**模型原樣帶回、不自行編號。相容與保存沿 [JD 保存 §3.2](../implementation/jd-storage.md#32-模型導覽與既有物件定位)；舊 UUID 定位仍可解析，但新輸出使用短定位。在局部讀取沿相同表示提供明細定位，不增加 map 欄位。定位仍不是寫入授權：App 還原正式身分後，在當輪可見 JD／候選中核對完整內容基準、型別、權限與業務規則，才轉成 Domain 命令；不能只憑 map 預覽准寫。已具足夠有效內容不強迫反覆 read；實際過時或缺內容才重讀，不新增已讀游標／refresh token。
+成果／要求各自可有多筆；上例只有一筆，不暗示固定配對。**JD 模型定位沿既有 `read_ref`／`citation_ref` 欄位，值改為 App 發配的型別＋短序號，例如 `task_12`、`outcome_15`、`citation_18`；不另增 `item_ref` 或版本參數。** 模型原樣帶回、不自行編號。相容與保存沿 [JD 保存 §3.2](../implementation/jd-storage.md#32-模型導覽與既有物件定位)；舊 UUID 定位仍可解析，但新輸出使用短定位。在局部讀取沿相同表示提供明細定位，不增加 map 欄位。定位仍不是寫入授權：App 還原正式身分後，在當輪可見 JD／候選中核對完整內容基準、型別、權限與業務規則，才轉成 Domain 命令；不能只憑 map 預覽准寫。已具足夠有效內容不強迫反覆 read；實際過時或缺內容才重讀，不新增已讀游標／refresh token。
 
 局部讀取只列被選項目及直屬明細所需定位，不複製其他項目的 refs。知識／技能先只給名稱與可讀定位，需要完整定義再讀；共用 K／S 的反向任務用途由既有關係投影，才能判斷修改或刪除的影響。直接來源先顯示可辨認名稱及必要的既存引用定位，原話或 Memory 完整鏈不在每次 JD 讀取自動重貼。完整局部內容的來源集合無成員時回 `[]`；例中的空集合不是繼承父任務來源。能力列的 `supporting_sources` 屬任務－能力關係，能力定義自己的來源須另讀該項目。一般來源不印「目前相符」；只有需要核對時才標示。
 
@@ -83,20 +83,20 @@ JD 工具只提供 A 所需的能力，不把 Memory B1／B2 編輯、資料庫�
 
 ## 4. 編輯輸入：只傳模型必須決定的內容
 
-下列是**語意契約**，不是可直接送 provider 的完整 schema。正式生成來源沿[契約策略](../contract-strategy.md)；使用顯式 `strict:true`；所有宣告屬性 required、每個 object `additionalProperties:false`，根必須是 object，有限 variants 放在屬性或陣列元素內；須核對實際序列化是否落在支援子集。`read_jd` 語意上不需定位時用 null 的 wire 細節沿原契約核對，不加新的參數。不為了符合 wire 規則把 Domain 的「未提及＝不修改」改成清空。[OpenAI strict mode](https://developers.openai.com/api/docs/guides/function-calling#strict-mode)、[支援 schema](https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas)
+下列是**語意契約** ，不是可直接送 provider 的完整 schema。正式生成來源沿[契約策略](../contract-strategy.md)；使用顯式 `strict:true`；所有宣告屬性 required、每個 object `additionalProperties:false`，根必須是 object，有限 variants 放在屬性或陣列元素內；須核對實際序列化是否落在支援子集。`read_jd` 語意上不需定位時用 null 的 wire 細節沿原契約核對，不加新的參數。不為了符合 wire 規則把 Domain 的「未提及＝不修改」改成清空。[OpenAI strict mode](https://developers.openai.com/api/docs/guides/function-calling#strict-mode)、[支援 schema](https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas)
 
 | 操作 | 模型欄位 | App 自行提供／驗證 |
 |---|---|---|
 | 基本資料／目的 | `changes[]` 每筆明確選 `field` 與 set／clear／來源動作；欄位限 `job_title`、`organization_unit`、`reports_to`、`purpose`。 | 當輪同一 profile、可空限制及逐欄來源；不由模型建立 profile 或改員工姓名。 |
 | 建立任務 | `parent_read_ref` 選 map 中職責的既有 `read_ref`，null 表未歸屬；任務標題／敘述；已知成果、要求、關聯知識／技能及各自適用的直接來源。沒有的子項用空集合，不創造占位內容。 | 職務檔案、候選、任務及明細 ID、排序預設、原操作；檢查關係資格與整組候選。 |
 | 建立其他項目 | `kind` 與該型別的內容，限職責、共用知識／技能、協作對象及共通條件；來源只附實際支持的項目。 | `kind` 決定的合法欄位及容器、ID、預設末尾排序。 |
-| 修訂 | `read_ref` ＋有限 `changes[]`，詳見 §4.1。每筆只填其動作真正需要的值。 | 固定目標、型別與權限；驗所有 changes，**同一呼叫全成或全拒**。未列的欄位與來源保留。 |
+| 修訂 | `read_ref` ＋有限 `changes[]`，詳見 §4.1。每筆只填其動作真正需要的值。 | 固定目標、型別與權限；驗所有 changes，**同一呼叫全成或全拒** 。未列的欄位與來源保留。 |
 | 移動 | `read_ref`、需要換職責時的 `parent_read_ref`（null 表未歸屬）；排序以 first／last 或指定同組鄰項的 `read_ref` 表意，不填 position。必要的相關 `content_changes` 沿既有結構操作。 | 保留身分、明細、K／S 及來源；只允許任務換容器，其餘同容器同類排序；處理受影響順序。 |
 | 刪除 | `read_ref`，限職責、任務、共用知識／技能、協作對象及共通條件；刪職責可附存活任務所需的有界 `content_changes`。成果／要求由所屬任務移除。 | 刪任務清其明細／關係及所附 current source links，保留共用 K／S；刪職責保留任務及原順序、轉未歸屬。固定歷史快照及當時依據不被刪掉。 |
 
-`parent_read_ref`、`detail_read_ref`、`capability_read_ref` 等名稱只區分**同一 JD `read_ref` 的參數用途**，不是另一種 ID、token 或新儲存。模型不填 revision、operation key、文件 ID 或 source 責任模組。參照不能猜造；App 不能因同名重建便將舊參照改指新物件。基本資料以四個固定欄位選擇，不為它再製造 profile 定位。
+`parent_read_ref`、`detail_read_ref`、`capability_read_ref` 等名稱只區分**同一 JD `read_ref` 的參數用途** ，不是另一種 ID、token 或新儲存。模型不填 revision、operation key、文件 ID 或 source 責任模組。參照不能猜造；App 不能因同名重建便將舊參照改指新物件。基本資料以四個固定欄位選擇，不為它再製造 profile 定位。
 
-同一 A Turn 可做數次定向操作，在共同候選中核對後才正式生效；這不取消**既有單次業務操作的完整性**。現行跨職責移動與刪職責已有必要內容調整、一次全成或全拒的能力，本契約保留：移動只可連帶調整該任務及來源／目的職責摘要，刪職責只可調整其存活任務，詳見[JD 保存與操作](../implementation/jd-storage.md)。不讓結構先變、必要限制遺漏，也不將無關項目塞進 `content_changes`。更廣的跨項目原子需求須先有反例；不先建任意 batch engine。單次 `updated` 只表示候選效果，不能當正式 JD 已提交。
+同一 A Turn 可做數次定向操作，在共同候選中核對後才正式生效；這不取消**既有單次業務操作的完整性** 。現行跨職責移動與刪職責已有必要內容調整、一次全成或全拒的能力，本契約保留：移動只可連帶調整該任務及來源／目的職責摘要，刪職責只可調整其存活任務，詳見[JD 保存與操作](../implementation/jd-storage.md)。不讓結構先變、必要限制遺漏，也不將無關項目塞進 `content_changes`。更廣的跨項目原子需求須先有反例；不先建任意 batch engine。單次 `updated` 只表示候選效果，不能當正式 JD 已提交。
 
 
 ### 4.1 有限修訂動作與精確來源目標
@@ -111,42 +111,42 @@ JD 工具只提供 A 所需的能力，不把 Memory B1／B2 編輯、資料庫�
 | `remove_source` | 該目標已有的 `citation_ref`；只移除此 JD 引用，不刪 Memory／訪談或改其他項目的依據。 |
 | `confirm_reference_alignment` | 該目標已有的 `citation_ref`；A 已重評仍支持目前 JD 才提出，App 綁到本 Turn 固定可見的同身分新修訂。沒有換版但 JD 被改過時，也須針對目前內容重核；不能僅因讀過或文字相似而解除待核對。 |
 
-來源目標沿既有 Domain，不升級成「每個 JSON 葉節點都可掛來源」：profile 是指定 `field`；一般項目是自身；任務明細用其 `detail_read_ref`；任務－能力關係用外層 task `read_ref`＋`capability_read_ref`。**普通任務的 name／description 屬同一 task 來源目標**，不是新建兩份逐欄來源；依[JD 保存](../implementation/jd-storage.md)的來源目標與內容基準核對。來源動作中的 target 使用有限具型別選擇，不接受任意路徑。
+來源目標沿既有 Domain，不升級成「每個 JSON 葉節點都可掛來源」：profile 是指定 `field`；一般項目是自身；任務明細用其 `detail_read_ref`；任務－能力關係用外層 task `read_ref`＋`capability_read_ref`。**普通任務的 name／description 屬同一 task 來源目標** ，不是新建兩份逐欄來源；依[JD 保存](../implementation/jd-storage.md)的來源目標與內容基準核對。來源動作中的 target 使用有限具型別選擇，不接受任意路徑。
 
-同一呼叫不得重複或相反修改同一效果鍵：同欄 set／clear、同明細重複修訂、同關係 link／unlink、同引用 remove／confirm 均拒絕；**同目標的文字修訂＋來源確認則合法**，確認須針對本次最終文字，不以修改前的支持狀態通過。不得一面刪來源或 target、一面確認它；明細必須屬所選任務，關係兩端須同份 JD。App 先組最終候選，再驗全部改動與來源；任一失敗整次拒絕。文字修訂省略來源動作時保留原引用，但由既有規則判斷是否待核對；`add_source` 不暗示取代整份來源集合。空來源表示沒有新增依據，不表示內容已受核實，也不為了讓 schema 通過而補造。
+同一呼叫不得重複或相反修改同一效果鍵：同欄 set／clear、同明細重複修訂、同關係 link／unlink、同引用 remove／confirm 均拒絕；**同目標的文字修訂＋來源確認則合法** ，確認須針對本次最終文字，不以修改前的支持狀態通過。不得一面刪來源或 target、一面確認它；明細必須屬所選任務，關係兩端須同份 JD。App 先組最終候選，再驗全部改動與來源；任一失敗整次拒絕。文字修訂省略來源動作時保留原引用，但由既有規則判斷是否待核對；`add_source` 不暗示取代整份來源集合。空來源表示沒有新增依據，不表示內容已受核實，也不為了讓 schema 通過而補造。
 
-**移除與確認引用的語意：**`remove_source` 移除的是所選 target 的整筆引用，不是只排除原文中被更正的一句。局部更正後，剩餘依據仍應共同支持該 target 保留的事實；失效、重複或已有充分替代的引用可移除，不要求永久保留全部舊引用。`confirm_reference_alignment` 只確認指定 `citation_ref` 的支持關係，其他引用仍可待核對。這些語意及 JD 欄位意義落在 canonical schema 的參數 description，與既有角色指引分工，不另增參數／validator 或自動猜配來源。[實測與限制](../history.md#source-d3293e9b28c75bbb6616)明示：工具形狀可用，不表示已解決局部更正的語意漏引用。
+**移除與確認引用的語意：** `remove_source` 移除的是所選 target 的整筆引用，不是只排除原文中被更正的一句。局部更正後，剩餘依據仍應共同支持該 target 保留的事實；失效、重複或已有充分替代的引用可移除，不要求永久保留全部舊引用。`confirm_reference_alignment` 只確認指定 `citation_ref` 的支持關係，其他引用仍可待核對。這些語意及 JD 欄位意義落在 canonical schema 的參數 description，與既有角色指引分工，不另增參數／validator 或自動猜配來源。[實測與限制](../history.md#source-d3293e9b28c75bbb6616)明示：工具形狀可用，不表示已解決局部更正的語意漏引用。
 
 
 ### 4.2 直接來源的最小選擇
 
-JD 可直接依據已核對的有效訪談、A 當次輸入或本 Turn 固定已發布 Memory 中的工作情境／工作理解；依據貼在**它實際支持的 JD 項目、成果／要求或任務－能力關係**，不把任務所有來源無差別複製到每個子項。模型只填一個有意義的來源選擇值，App 再映射正式身分與版本：
+JD 可直接依據已核對的有效訪談、A 當次輸入或本 Turn 固定已發布 Memory 中的工作情境／工作理解；依據貼在**它實際支持的 JD 項目、成果／要求或任務－能力關係** ，不把任務所有來源無差別複製到每個子項。模型只填一個有意義的來源選擇值，App 再映射正式身分與版本：
 
 ```json
 [{"kind":"interview","interview_sequence":42},{"kind":"work_situation","target_title":"網站頁面交付"},{"kind":"work_understanding","target_title":"網站前端交付"},{"kind":"current_input"}]
 ```
 
-這些是四種**替代選擇型別**，不是一筆來源同時填四欄。正式序號及 `target_title` 來自有權看到的歷史訪談或固定 Memory 導覽／讀取；`current_input` 由 App 綁定本輪尚無正式序號的員工原話，若本輪取消，相關候選引用也不能正式留下。**Memory 定位只用 `target_title`，層別由 kind 區分，不自創 Memory 短 ID、read_ref、版本或 refresh token。**App 依固定已發布版映射真實身分，不以同名替代已刪物件，也不將標題字串當成 DB 身分。完整來源與資格依[來源讀取契約](2026-09-27-memory-read-and-source-navigation-contract.md)；開場／顧問原話保留出處及語境，不冒充員工已確認事實，公開中間訊息／取消輸入不得引用。只見導覽名稱不能宣稱內容已核對支持；需要時讀來源。
+這些是四種**替代選擇型別** ，不是一筆來源同時填四欄。正式序號及 `target_title` 來自有權看到的歷史訪談或固定 Memory 導覽／讀取；`current_input` 由 App 綁定本輪尚無正式序號的員工原話，若本輪取消，相關候選引用也不能正式留下。**Memory 定位只用 `target_title`，層別由 kind 區分，不自創 Memory 短 ID、read_ref、版本或 refresh token。** App 依固定已發布版映射真實身分，不以同名替代已刪物件，也不將標題字串當成 DB 身分。完整來源與資格依[來源讀取契約](2026-09-27-memory-read-and-source-navigation-contract.md)；開場／顧問原話保留出處及語境，不冒充員工已確認事實，公開中間訊息／取消輸入不得引用。只見導覽名稱不能宣稱內容已核對支持；需要時讀來源。
 
-讀 JD 時，**已存在的直接來源**用 `citation_ref` 精確定位，供模型指定移除或明確核對那一筆；這是 **JD 所擁有的引用定位，不是 Memory 物件短 ID**，也不能用它任意讀舊版 Memory 正文。局部結果須附來源 `kind` 及正確讀取線索：訪談提供正式 `interview_sequence`；Memory 若同身分仍存在，提供本 Turn 固定版的 `target_title`，另有舊名時清楚標為歷史名稱；`current_input` 指本輪已提供的原話，不編造正式序號。來源線索跟隨 profile field／item／detail／relation 的實際所屬，不把子項引用全攤成父項的來源。
+讀 JD 時，**已存在的直接來源** 用 `citation_ref` 精確定位，供模型指定移除或明確核對那一筆；這是 **JD 所擁有的引用定位，不是 Memory 物件短 ID** ，也不能用它任意讀舊版 Memory 正文。局部結果須附來源 `kind` 及正確讀取線索：訪談提供正式 `interview_sequence`；Memory 若同身分仍存在，提供本 Turn 固定版的 `target_title`，另有舊名時清楚標為歷史名稱；`current_input` 指本輪已提供的原話，不編造正式序號。來源線索跟隨 profile field／item／detail／relation 的實際所屬，不把子項引用全攤成父項的來源。
 
 `confirm_reference_alignment` 對 JD 的 Memory 引用才有「綁到本 Turn 固定同身分新修訂」的效果；對不可變歷史訪談則保留原來源身分，只重核它是否支持目前 JD 內容，不製造訪談新版或假來源 diff。來源沒變但 JD 改過，仍須針對目前內容重評。`current_input` 僅在本輪候選中核對，A 成功完成後由 App 映射其正式訪談序號；取消／最終失敗不留下該輪候選引用。單純讀到 diff／新版、改寫 JD 或來源同名都不等於核對。來源被移除、無權或無法核對時不可確認；可保留待核對、移除不適用引用或追問，不盲目改綁。Memory source diff 由來源領域模組產生，JD 工具按該引用取回；不覆蓋[跨層核對規則](../product-concept.md#分層工作記憶)。
 
 
 ### 4.3 兩類差異的按需入口
 
-`read_jd_changes` 的根輸入選定為固定 `query` object，內含兩種有限分支；不增加既定 `read_jd` 的 views 或 map 欄位。兩端基準由 App 取得，模型不傳版本、時間戳、已讀游標或 refresh token。`source` **僅限 Memory 來源**，不是通用歷史文字比較入口；不可變訪談原話沿共同 `read_interview` 讀取。
+`read_jd_changes` 的根輸入選定為固定 `query` object，內含兩種有限分支；不增加既定 `read_jd` 的 views 或 map 欄位。兩端基準由 App 取得，模型不傳版本、時間戳、已讀游標或 refresh token。`source` **僅限 Memory 來源** ，不是通用歷史文字比較入口；不可變訪談原話沿共同 `read_interview` 讀取。
 
 | 查詢 | 最少模型選擇 | App 固定的比較範圍及回傳 |
 |---|---|---|
 | `query.kind = manual` | 全部人工改動，或以既有區域名稱／某存活項目的 `read_ref`／profile `field` 縮小範圍 | 上一個成功完成 A Turn 所形成的正式 JD → 本 Turn 起始正式 JD；回人工操作的受影響範圍與淨差異。明說新增、刪除、移動、關聯及文字前後；「有人改過又改回」與「沒有操作」分開。本 Turn 自己的候選不混入人工差異。 |
 | `query.kind = source` | 從局部 JD 讀到、來源 kind 為 work_situation／work_understanding 的 `citation_ref` | 該引用固定舊來源修訂 → A 本 Turn 固定 Memory 中同身分新修訂；回內容／引用鏈的相關變化、可用新版 `target_title` 及來源可用性。原來源確定不在新版時明示，不按同名替代。 |
 
-**參數分支：**source 分支僅含 `kind`／`citation_ref`；manual 分支含 `kind`／`scope`。scope 為四種互斥物件：`{kind:"all"}`、`{kind:"area",view:已定區域名}`、`{kind:"item",read_ref:存活項目定位}`、`{kind:"profile_field",field:四個可編欄之一}`。area 只接受原 `read_jd` 中不需另選目標的區域 view，不接受 map／full／item，也不把需職責定位的 work_tasks 查詢猜成全稿；這類精確範圍用 item 分支。各分支只帶自身必要屬性且全部 required，禁止其他分支屬性、null 佔位與未知值；nested variants 由正式來源生成並驗證。未知／非法形狀為 `invalid_arguments`，不能退回 all。
+**參數分支：** source 分支僅含 `kind`／`citation_ref`；manual 分支含 `kind`／`scope`。scope 為四種互斥物件：`{kind:"all"}`、`{kind:"area",view:已定區域名}`、`{kind:"item",read_ref:存活項目定位}`、`{kind:"profile_field",field:四個可編欄之一}`。area 只接受原 `read_jd` 中不需另選目標的區域 view，不接受 map／full／item，也不把需職責定位的 work_tasks 查詢猜成全稿；這類精確範圍用 item 分支。各分支只帶自身必要屬性且全部 required，禁止其他分支屬性、null 佔位與未知值；nested variants 由正式來源生成並驗證。未知／非法形狀為 `invalid_arguments`，不能退回 all。
 
-**人工差異基底的工程定義：**前文的「A 上次已見」不是推測模型記得哪些字句，也不逐項維護已讀游標。比較使用既有成功 Turn 完成結果中的正式 JD 位置；沒有成功 A 歷史時，用職務檔案建立時的空 JD 基底。因此首輪前人工已寫的內容也會列為新增。兩端在本 Turn 準備時固定，read／暫停／恢復／取消都不推進基底；下一個成功完成 Turn 才提供下一輪的比較起點。這只表示兩次成功工作之間有何人工變動，**不代表其內容已被 A 審核，也不解除既存來源的待核對**。之前提示仍沿原生歷史接續，需要目前內容時按需讀 JD；不增加一套人工問題待辦。若應存在的基底不可取回，明確報比較無法完成，不偷偷改用另一版或空稿。
+**人工差異基底的工程定義：** 前文的「A 上次已見」不是推測模型記得哪些字句，也不逐項維護已讀游標。比較使用既有成功 Turn 完成結果中的正式 JD 位置；沒有成功 A 歷史時，用職務檔案建立時的空 JD 基底。因此首輪前人工已寫的內容也會列為新增。兩端在本 Turn 準備時固定，read／暫停／恢復／取消都不推進基底；下一個成功完成 Turn 才提供下一輪的比較起點。這只表示兩次成功工作之間有何人工變動，**不代表其內容已被 A 審核，也不解除既存來源的待核對** 。之前提示仍沿原生歷史接續，需要目前內容時按需讀 JD；不增加一套人工問題待辦。若應存在的基底不可取回，明確報比較無法完成，不偷偷改用另一版或空稿。
 
-**來源型別、scope 與兩端可用性：**先核對呼叫者及本 Turn scope，再辨認其中引用與來源；沿[共同錯誤契約](2026-09-27-agent-tool-contract-design-research.md#7-錯誤回傳與恢復責任)回可修正錯誤，不建立第二套狀態／回執。
+**來源型別、scope 與兩端可用性：** 先核對呼叫者及本 Turn scope，再辨認其中引用與來源；沿[共同錯誤契約](2026-09-27-agent-tool-contract-design-research.md#7-錯誤回傳與恢復責任)回可修正錯誤，不建立第二套狀態／回執。
 
 | 情況 | 結果與下一步 |
 |---|---|
@@ -160,27 +160,27 @@ JD 可直接依據已核對的有效訪談、A 當次輸入或本 Turn 固定已
 
 例：`{"query":{"kind":"source","citation_ref":"citation_18"}}` 只有在 citation_18 是合法 Memory 引用時才回兩端 Markdown。若它其實引用訪談 42，回 `rejected: source_kind_not_supported` 及「請以 read_interview 選取正式序號 42」；不是 `unchanged`，也不是來源被刪除。只讀舊固定來源的相關差異，仍不新增 Agent 的任意舊版 Memory 全文入口。
 
-人工概覽須在下一輪讓 A 辨認有受影響內容；它是既有改動提示的投影，**不改已確認 JD map，也不恢復起始預載 JD 導覽**。詳細 Markdown 必須交代比較兩端與位置，不只列事件數。已刪項目可從人工比較的全部／區域範圍讀到，不要求先取得已不存在的 current `read_ref`；歷史位置不能送 writer。比較基底依上段正式完成位置，不以本輪 read 建立新進度。任一範圍超出完整交付容量時明示未完整，提供可縮小範圍；不靜默漏掉上限外事件、不新加 cursor。
+人工概覽須在下一輪讓 A 辨認有受影響內容；它是既有改動提示的投影，**不改已確認 JD map，也不恢復起始預載 JD 導覽** 。詳細 Markdown 必須交代比較兩端與位置，不只列事件數。已刪項目可從人工比較的全部／區域範圍讀到，不要求先取得已不存在的 current `read_ref`；歷史位置不能送 writer。比較基底依上段正式完成位置，不以本輪 read 建立新進度。任一範圍超出完整交付容量時明示未完整，提供可縮小範圍；不靜默漏掉上限外事件、不新加 cursor。
 
 同一 JD 同時有人改稿與來源換版時，兩個比較仍各自成立；A 應用目前 JD、新來源及必要原話重評。來源差異不包含人工改稿，人工差異不證明工作事實；讀兩種差異都無寫入效果。確認只透過所屬修訂入口，且只處理被指定的保留引用，不把整個 JD 或同批 Memory 全部刷新。
 
 ## 5. 模型可見結果與失敗
 
-**以下選定模型可見的 tool 回傳，不規定 UI API 或正式回執。**Responses 原生 call／result 已配對，模型在該歷史仍有效時看得到自己提交的 arguments；因此正常成功不重抄輸入內容、職務檔案、Memory 版、操作 key、完整 before／after 或 `stage: candidate`。App 另保留可靠業務結果供中斷對帳；compaction 後若模型需要舊細節，按需讀真實資料，不另建一份永久成功通知。**JD map 用已定精簡 JSON；full 與詳細差異採 Markdown；item／profile／區域沿 §3 精簡 JSON，保留可操作定位及關係；單純寫入結果採下表短文字。**這是模型回傳契約，不為外觀一致把純文字包成 `{"message":"..."}`，也不為欄位外觀統一填 `null`。
+**以下選定模型可見的 tool 回傳，不規定 UI API 或正式回執。** Responses 原生 call／result 已配對，模型在該歷史仍有效時看得到自己提交的 arguments；因此正常成功不重抄輸入內容、職務檔案、Memory 版、操作 key、完整 before／after 或 `stage: candidate`。App 另保留可靠業務結果供中斷對帳；compaction 後若模型需要舊細節，按需讀真實資料，不另建一份永久成功通知。**JD map 用已定精簡 JSON；full 與詳細差異採 Markdown；item／profile／區域沿 §3 精簡 JSON，保留可操作定位及關係；單純寫入結果採下表短文字。** 這是模型回傳契約，不為外觀一致把純文字包成 `{"message":"..."}`，也不為欄位外觀統一填 `null`。
 
-`read_jd` 只回**所請求的那一層**。`map` 回已確認的導覽結構及讀取定位，沒有整份正文；`full` 回目前完整 JD 的可讀成品文字，不逐項重貼定位／來源；`item` 回選定項目的自身完整內容及直屬子項，必要時附下一步可讀／可編輯定位與直接來源（上節範例）；`profile`、`responsibility_areas`、`work_tasks` 等已確認的區域 view 回指定範圍，不越界遞迴展開其他區域或整條引用鏈。例如讀某職責的 `work_tasks`，回 `items[]`，每項附其 JD `read_ref` 與 §3 的完整任務投影；不另外重貼同職責文字。其他集合區域同樣以 `items[]` 承載其型別的完整自身內容，profile 則回四個既定欄位的完整值及逐欄 `supporting_sources`，不虛構項目 ID。
+`read_jd` 只回**所請求的那一層** 。`map` 回已確認的導覽結構及讀取定位，沒有整份正文；`full` 回目前完整 JD 的可讀成品文字，不逐項重貼定位／來源；`item` 回選定項目的自身完整內容及直屬子項，必要時附下一步可讀／可編輯定位與直接來源（上節範例）；`profile`、`responsibility_areas`、`work_tasks` 等已確認的區域 view 回指定範圍，不越界遞迴展開其他區域或整條引用鏈。例如讀某職責的 `work_tasks`，回 `items[]`，每項附其 JD `read_ref` 與 §3 的完整任務投影；不另外重貼同職責文字。其他集合區域同樣以 `items[]` 承載其型別的完整自身內容，profile 則回四個既定欄位的完整值及逐欄 `supporting_sources`，不虛構項目 ID。
 
-若任務有多筆成果／要求，須完整列出並提供相應明細定位；不能以「更多內容略」冒充完整。合法空區域明列 `items: []`，不把空白誤解成讀取失敗。區域內容過大而無法完整交付時，回**未完整讀取**與可縮小的合法範圍，不靜默截斷。
+若任務有多筆成果／要求，須完整列出並提供相應明細定位；不能以「更多內容略」冒充完整。合法空區域明列 `items: []`，不把空白誤解成讀取失敗。區域內容過大而無法完整交付時，回**未完整讀取** 與可縮小的合法範圍，不靜默截斷。
 
 | 本次效果 | 候選的最短模型回傳 | 何時必須增加資訊 |
 |---|---|---|
 | 建立如實成立 | `created · read_ref: task_19`；新 JD 定位是輸入中沒有、後續選取需要的資訊，不重複正文或來源，也不擴用成 Memory 短 ID。 | 實際內容被正規化或部分未成立時不能只回 created；拒絕半套建立。明細後續需要定位時沿局部 read 取得。 |
-| 精確修訂／移動 | `updated`／`moved`。 | App 實際效果與輸入不同、移動解除關係、內容位置需核對時，回**實際**影響的短摘要或差異；不冒充原參數即已套用。 |
+| 精確修訂／移動 | `updated`／`moved`。 | App 實際效果與輸入不同、移動解除關係、內容位置需核對時，回**實際** 影響的短摘要或差異；不冒充原參數即已套用。 |
 | 刪除 | `deleted`。 | 刪職責使任務變未歸屬等模型下一步需要知道的非直觀效果，簡短提示即可；不回整份 JD。 |
 | 來源確認 | `aligned`，只表示指定 JD 引用在本輪候選中已對齊。 | 改綁到哪個可見來源、是否仍有其他待核對依據須可判讀；不表示全項／全稿審核通過或正式提交。 |
 | 已核確定沒有差異 | `unchanged`。 | 不產生假更新或新的已提交事實。 |
 | 確定拒絕且未修改 | `rejected: <code>`＋可理解原因／下一步。 | 歧義、目標失效、來源不可用等，說明合法修正方式；不露 stack trace 或禁止層內容。 |
-| 提交結果不明 | **App 先對帳原操作**，不能回 `unchanged` 叫模型重送。 | 只有確定的原結果才能回模型繼續；不能以目前最新版 JD 冒充原操作結果。 |
+| 提交結果不明 | **App 先對帳原操作** ，不能回 `unchanged` 叫模型重送。 | 只有確定的原結果才能回模型繼續；不能以目前最新版 JD 冒充原操作結果。 |
 
 模型可見範例（短字串足夠時，不再包 JSON）：
 
@@ -254,7 +254,7 @@ rejected: target_stale；本次未修改。
 
 ## 8. 當前第一手依據與研究界線
 
-下列來源的核對日期為 2026-09-29。這是查閱當日的公開契約，**不是鎖定 SDK 版本、實際 provider wire 或自然模型驗收**；不推測 ChatGPT／Codex／Claude 未公開的內部儲存與 JD 工具。
+下列來源的核對日期為 2026-09-29。這是查閱當日的公開契約，**不是鎖定 SDK 版本、實際 provider wire 或自然模型驗收** ；不推測 ChatGPT／Codex／Claude 未公開的內部儲存與 JD 工具。
 
 | 第一手來源 | 官方明文／適用範圍 | Caliburn 的映射或不能外推處 |
 |---|---|---|

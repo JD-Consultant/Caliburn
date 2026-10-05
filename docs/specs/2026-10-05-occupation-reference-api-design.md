@@ -1,6 +1,6 @@
 # 公版職位參考 API
 
-2026-10-05。狀態：**獨立 RAG API 已實作；App 可依 ADR0080 明示接入 HTTP consumer**。本文件維護檢索、固定來源讀取及 RAG HTTP 契約；App 的工具、選用與否認 state 由[公版工具契約](2026-10-04-public-reference-completion-design.md)負責。用途沿[職位整體參考](2026-10-04-occupation-overview-reference-retrieval-design.md)，接線決策見 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，實驗原件不改寫。
+2026-10-05。狀態：**獨立 RAG API 已實作；App 可依 ADR0080 明示接入 HTTP consumer** 。本文件維護檢索、固定來源讀取及 RAG HTTP 契約；App 的工具、選用與否認 state 由[公版工具契約](2026-10-04-public-reference-completion-design.md)負責。用途沿[職位整體參考](2026-10-04-occupation-overview-reference-retrieval-design.md)，接線決策見 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，實驗原件不改寫。
 
 初次 API 授權為「先把 api 搞好，規範的搞，低耦合高內聚，命名方式也是」及「也不用整合，前面要改就好，要優化就優化」。後續「現在接入 tool」授權另行完成可選 App 接線，不把 RAG 變成預設啟動依賴。
 
@@ -22,7 +22,7 @@
 
 每來源以 code＋原始 UTF-8 SHA256 生成 `reference_id`；任務以來源內單元／群組位置生成 `task_id`。原始 JSON 正文存於 document point，讀取校驗 hash 與 ID，不從檔名／同名新版代替。JSON 解析完整不代表 PDF 抽取完全。缺代碼、同代碼多群組、無正文任務仍在目錄；只有非空搜尋正文才向量化。
 
-正文清理沿實驗：排除職位名稱、OPKS/T 代碼與表頭；保留概述、工作單元／任務名稱、O/P 正文。D 為整份去重正文；T 為任務群組正文＋獨立概述點。BGE-M3 1024d；Qdrant exact cosine 兩路各取 20 個**不同父公版**，完整聯集去重後全部以完整 D 正文 rerank，才截最終 5。不先 RRF 截 20。20 是原話控制初值，服務端可改為 40，不宣稱通用最佳參數或全庫 Recall。
+正文清理沿實驗：排除職位名稱、OPKS/T 代碼與表頭；保留概述、工作單元／任務名稱、O/P 正文。D 為整份去重正文；T 為任務群組正文＋獨立概述點。BGE-M3 1024d；Qdrant exact cosine 兩路各取 20 個**不同父公版** ，完整聯集去重後全部以完整 D 正文 rerank，才截最終 5。不先 RRF 截 20。20 是原話控制初值，服務端可改為 40，不宣稱通用最佳參數或全庫 Recall。
 
 rerank 由既有 Linux GPU embedder 增加本機 HTTP 能力，indexer 不載入 torch。BAAI/bge-reranker-v2-m3 固定 revision，長正文以 token windows／overlap 64 全部評分取最大 logit；過長 query 明確拒絕，不靜默截斷。API 不宣稱已做任務適用性判斷。模型與連線在 FastAPI lifespan 建立／清理；依賴由建構注入，內部不得 import FastAPI／transport DTO。
 

@@ -1,11 +1,11 @@
 # RAG pipeline — PDF → OCS → indexer → embedder/Qdrant（保留、隔離的 bounded context）
 
-> **現行狀態**：RAG 是獨立檢索範圍。正式 JD App（`apps/api`、`apps/web`）已依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)完成可選 HTTP consumer 接線，須明示設定才啟用；不是預設啟動依賴。
+> **現行狀態** ：RAG 是獨立檢索範圍。正式 JD App（`apps/api`、`apps/web`）已依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)完成可選 HTTP consumer 接線，須明示設定才啟用；不是預設啟動依賴。
 > `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract`、`packages/indexer-contract`
 > 保持獨立安裝、測試與執行；正式 App 不 import 這些 Python 套件，也不代為啟動 GPU 或 Qdrant。
 > App 的 composition root 只在有設定時建立 HTTP client，公版選用及排除範圍由 App 保存。
 >
-> **沿革**：[ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md) Decision 5（Proposed，2026-08-11 修正為保留＋隔離）與
+> **沿革** ：[ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md) Decision 5（Proposed，2026-08-11 修正為保留＋隔離）與
 > [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../specs/2026-08-11-rag-bounded-context-retention-design.md)。
 > 這些文件保留當時未接消費端的取捨；現行接入權責依 ADR0080，查詢契約依[公版參考 API 設計](../specs/2026-10-05-occupation-reference-api-design.md)。
 
@@ -13,9 +13,9 @@
 
 現行公版參考流程分為三段：
 
-1. **解析來源：**`pdf-to-json` 將 PDF 轉成 OCS JSON，正常輸出與拒絕診斷分開保存。
-2. **建索引與查詢：**操作者明示選定來源版本，以 `index-references` 建立獨立 document／task 索引。查詢經兩路廣蒐、完整聯集重排序及公版去重，回傳最多五份參考；模型計算由獨立 `embedder` 提供。
-3. **按需使用：**設定後的 JD App 經 HTTP 查詢公版，顧問再選主要參考、讀取任務及記錄員工明確否認的工作範圍。公版提供查漏線索，工作事實仍由員工訪談支持。
+1. **解析來源：** `pdf-to-json` 將 PDF 轉成 OCS JSON，正常輸出與拒絕診斷分開保存。
+2. **建索引與查詢：** 操作者明示選定來源版本，以 `index-references` 建立獨立 document／task 索引。查詢經兩路廣蒐、完整聯集重排序及公版去重，回傳最多五份參考；模型計算由獨立 `embedder` 提供。
+3. **按需使用：** 設定後的 JD App 經 HTTP 查詢公版，顧問再選主要參考、讀取任務及記錄員工明確否認的工作範圍。公版提供查漏線索，工作事實仍由員工訪談支持。
 
 <details>
 <summary>歷史：公版消費端接入前的 profile／task 管線</summary>
@@ -113,18 +113,18 @@ PostgreSQL；JD App 的資料庫也不由本 Compose 建立。
 
 ## 5. 邊界不變量
 
-- **正式 JD App 不 import 或部署 RAG 程式碼：**`apps/api/src/caliburn` 與 `apps/web/src`
+- **正式 JD App 不 import 或部署 RAG 程式碼：** `apps/api/src/caliburn` 與 `apps/web/src`
   不直接依賴 `jd_ocs_indexer`、`jd_pdf_to_json`、`ocs_contract`、`indexer_contract` 或 `embedder` 套件。
   以 dependency metadata 與靜態掃描驗證；明示啟用的公版 HTTP client 依 ADR0080 管理。
-- **RAG app 之間可以互相 import 對方的 contract**：`pdf-to-json`／`ocs-indexer` import `ocs-contract`，
+- **RAG app 之間可以互相 import 對方的 contract** ：`pdf-to-json`／`ocs-indexer` import `ocs-contract`，
   `ocs-indexer` 也 import `indexer-contract`，這是預期內的 bounded-context 內部依賴；guard 只掃 current API
   的 composition surfaces，不禁止這個方向，也不阻止 RAG app 之間或 RAG app 對自己 contract 的依賴。
-- **API 與進度各有 owner：**`ocs-indexer` 的職位整體參考 API（:8000）提供來源與搜尋結果，
+- **API 與進度各有 owner：** `ocs-indexer` 的職位整體參考 API（:8000）提供來源與搜尋結果，
   `indexer-contract` 定義 producer 的 wire model；App 保存選用公版與明確否認範圍，不交給 RAG 保存。
   既有 profile／task API 的退役消費端不因新接線而復活。
-- **不做資料遷移或雙寫：**正式 App 的 PostgreSQL 與 RAG 的 PDF／OCS JSON／Qdrant 各自保存資料。
+- **不做資料遷移或雙寫：** 正式 App 的 PostgreSQL 與 RAG 的 PDF／OCS JSON／Qdrant 各自保存資料。
   公版正文不複製成 Memory／JD 工作事實；查詢正文只使用員工確認的實際工作，排除範圍另行保存與讀取。
-- **故障不能當查無資料：**索引未 ready、模型身分不相容或連線失敗皆回明確錯誤，不以空結果代替，
+- **故障不能當查無資料：** 索引未 ready、模型身分不相容或連線失敗皆回明確錯誤，不以空結果代替，
   也不清除 App 的選用 state。
 - 現行 consumer 權責依 ADR0080。新增其他消費用途仍循決策流程；本檔與歷史的 [ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md)
   不提供額外施工授權。

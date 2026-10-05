@@ -1,6 +1,6 @@
 # JD 與公版的按需取用
 
-日期：2026-10-05。狀態：**三層取用方向已確認／可驗證設計稿；搜尋投影未切換**。使用者確認的目的為「只拿目前需要的資訊，不拿不需要的」，並同意 JD 局部讀取、公版候選概覽 → 完整任務目錄 → 必要正文的方向。接續授權的工具說明／錯誤及精簡寫入回傳已完成，現況以[公版工具契約](2026-10-04-public-reference-completion-design.md#工具契約接續改善2026-10-05)為準。
+日期：2026-10-05。狀態：**三層取用方向已確認／可驗證設計稿；搜尋投影未切換** 。使用者確認的目的為「只拿目前需要的資訊，不拿不需要的」，並同意 JD 局部讀取、公版候選概覽 → 完整任務目錄 → 必要正文的方向。接續授權的工具說明／錯誤及精簡寫入回傳已完成，現況以[公版工具契約](2026-10-04-public-reference-completion-design.md#工具契約接續改善2026-10-05)為準。
 
 本文件維護這次取用策略與比較設計；現行 JD 工具、獨立 RAG HTTP 契約及公版 state 分別由下列責任文件維護。它不授權重啟正在測試的服務，也不將字元量測當成模型品質驗收。
 
@@ -53,13 +53,13 @@
 - 每份 `reference_id`、`title`、原始 `overview`。
 - `work_area_names`：全部已解析工作單元名稱，依來源順序保留；缺名稱保留 null，不生成補寫名稱。
 
-這份形狀是**設計稿**，不是目前生效的 JSON Schema。App 可從既有 RAG 完整回傳作確定性投影；RAG 的 D20/T20、完整聯集 rerank、排序、來源及 HTTP DTO 不變。概述不以模型改寫，工作單元名稱不再按員工 query 做第二次相似度過濾。
+這份形狀是**設計稿** ，不是目前生效的 JSON Schema。App 可從既有 RAG 完整回傳作確定性投影；RAG 的 D20/T20、完整聯集 rerank、排序、來源及 HTTP DTO 不變。概述不以模型改寫，工作單元名稱不再按員工 query 做第二次相似度過濾。
 
-模型以概覽決定需要比較哪些候選；概覽不足、名稱抽象或可能漏掉主要面向時，可讀**任何候選**的完整目錄或必要正文，閱讀權限不以已選中為前提。選用集合可多選，仍沿既有 state，不要求固定留一份或五份。
+模型以概覽決定需要比較哪些候選；概覽不足、名稱抽象或可能漏掉主要面向時，可讀**任何候選** 的完整目錄或必要正文，閱讀權限不以已選中為前提。選用集合可多選，仍沿既有 state，不要求固定留一份或五份。
 
 ### 4.2 完整任務目錄
 
-沿 `read_occupation_reference(reference_id, task_id=null)`。需要查漏時讀該來源的概述與**全部已解析任務群組**，包含沒有檢索命中的任務。不用當前已知工作再過濾目錄，才能看見員工尚未提到的工作線索。
+沿 `read_occupation_reference(reference_id, task_id=null)`。需要查漏時讀該來源的概述與**全部已解析任務群組** ，包含沒有檢索命中的任務。不用當前已知工作再過濾目錄，才能看見員工尚未提到的工作線索。
 
 已選公版的有效目錄在當前 context 足以使用時沿用；新焦點涉及另一候選才補讀。新搜尋名次變化不自動清除選擇或員工否認。
 
@@ -79,7 +79,7 @@
 | `search_occupation_references` | `query` 非空、非全空白，最多 12,000 字元；只用本人已確認的主要工作與必要脈絡。 | **候選** `view: candidate_overviews` 加最多五份概覽；`references=[]` 是搜尋正常但無候選。現行回傳仍是五份完整目錄。 |
 | `read_occupation_reference` | `reference_id` 用既有工具結果或 state 的精確定位；`task_id` 必填，null 讀目錄，字串用目錄提供的合法定位。 | null 回完整已解析目錄；指定 task 回該完整群組及能力區塊。來源缺名稱可為 null，不能據此補寫事實。 |
 | `read_occupation_reference_state` | `{}`，不能填 scope、版本或上界。 | `selected_reference_ids + excluded_work`；前者 null 為尚未選擇，[] 為已評估無合適參考；後者 [] 為目前沒有明確排除。 |
-| `select_occupation_references` | `reference_ids` 是**取代全部選用集合**，保留的舊 ID 要一起填；可多選，[] 清空選用，精確去重。 | 新請求只回 `{"status":"updated"}`，保留原 excluded_work；本輪候選已更新，非正式 Turn 完成。 |
+| `select_occupation_references` | `reference_ids` 是**取代全部選用集合** ，保留的舊 ID 要一起填；可多選，[] 清空選用，精確去重。 | 新請求只回 `{"status":"updated"}`，保留原 excluded_work；本輪候選已更新，非正式 Turn 完成。 |
 | `update_excluded_work` | `add`／`remove` 必填陣列，至少一欄非空；每項非空且不可含 NUL；不得交集。remove 須精確命中已有字串，未知移除整批拒絕。 | 新請求只回 `{"status":"updated"}`；不是原話來源、向量輸入或完成判定。 |
 | `read_excluded_work` | B1／B2 的 `{}`，唯讀。 | 只回 `excluded_work` 完整清單；[] 為沒有排除，與讀取失敗不同。 |
 
@@ -113,7 +113,7 @@
 
 ### 4.6 錯誤回傳與合法下一步
 
-沿原 `ToolRejection`：`status: rejected`、`code`、`message`、`next_action` 必填，不回 raw exception、stack、連線或金鑰。message 必須說清這次原因，next_action 依**實際工具及錯誤類別**提供下一步，不套用所有工具共用的 add/remove 教學。
+沿原 `ToolRejection`：`status: rejected`、`code`、`message`、`next_action` 必填，不回 raw exception、stack、連線或金鑰。message 必須說清這次原因，next_action 依**實際工具及錯誤類別** 提供下一步，不套用所有工具共用的 add/remove 教學。
 
 | 情況／既有 code | 模型得知及合法處理 |
 |---|---|
@@ -142,7 +142,7 @@
 
 重用既有 F01 公版 API 原件，不呼叫任何服務或模型。以相同緊湊 JSON 序列化，現行五份搜尋工具輸出為 8,779 字元，候選概覽為 966 字元。額外讀第 1／前 2 份目錄時，累計工具輸出為 3,341／4,465 字元；若五份全讀，累計為 9,724 字元，高於現行一次完整目錄輸出。
 
-這只是單案例的資料量敏感度，不是模型選擇、token、耗時或品質結果。它說明分層取用的收益取決於**實際需要展開多少**，不能只拿第一步概覽大小宣稱整段成本下降。[方法、完整投影與結果](../experiments/2026-10-05-reference-context-projection/README.md)可離線重算。
+這只是單案例的資料量敏感度，不是模型選擇、token、耗時或品質結果。它說明分層取用的收益取決於**實際需要展開多少** ，不能只拿第一步概覽大小宣稱整段成本下降。[方法、完整投影與結果](../experiments/2026-10-05-reference-context-projection/README.md)可離線重算。
 
 ## 7. 接續比較與驗收
 

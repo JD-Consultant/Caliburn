@@ -171,7 +171,7 @@ B2 在本批讀取的結果示例：
 }
 ```
 
-讀取來源列以 `target_title` 和描述標出可按需深入的情境，不附全部情境正文。**本例 B2 沿候選引用的穩定身分取得目前候選內容**，包括來源改名或 B1 新修訂；不是讀當初建立理解時的舊情境修訂。A 則在本 Turn 固定已發布 Memory 內逐層讀取；人／App 的舊快照回查才保持當時固定鏈，不以同名最新物件替代。B2 update 沿相同 `changes` 表示，引用 field 為 `work_situation_references`，add／remove 選情境 title；不能把 B1 的 `interview_references` 分支交給 B2 直接寫正式引用。
+讀取來源列以 `target_title` 和描述標出可按需深入的情境，不附全部情境正文。**本例 B2 沿候選引用的穩定身分取得目前候選內容** ，包括來源改名或 B1 新修訂；不是讀當初建立理解時的舊情境修訂。A 則在本 Turn 固定已發布 Memory 內逐層讀取；人／App 的舊快照回查才保持當時固定鏈，不以同名最新物件替代。B2 update 沿相同 `changes` 表示，引用 field 為 `work_situation_references`，add／remove 選情境 title；不能把 B1 的 `interview_references` 分支交給 B2 直接寫正式引用。
 
 
 ## 7. 失敗範例與剩餘驗證

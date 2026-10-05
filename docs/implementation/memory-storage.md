@@ -1,6 +1,6 @@
 # Memory 保存接線
 
-- 狀態：**現行 Memory 保存責任**。候選、固定修訂、角色交接與背景發布依下列機制運作。最終失敗後，正式訪談再前進三輪才允許一次新批次；此解除政策仍待確認，且未在真長旅程自然觸發，見[執行接線 §7](agent-execution.md#7-memory-背景工作)。驗證見[保存](../history.md#source-8181e62e2e98ac941ed9)與[背景工作](../history.md#source-14d692c99a98b4e9954e)。
+- 狀態：**現行 Memory 保存責任** 。候選、固定修訂、角色交接與背景發布依下列機制運作。最終失敗後，正式訪談再前進三輪才允許一次新批次；此解除政策仍待確認，且未在真長旅程自然觸發，見[執行接線 §7](agent-execution.md#7-memory-背景工作)。驗證見[保存](../history.md#source-8181e62e2e98ac941ed9)與[背景工作](../history.md#source-14d692c99a98b4e9954e)。
 - 上位責任：[資料保存 §2–4](../architecture/persistence.md#2-不可變修訂與發布快照)、[B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[內容與引用修改](../specs/2026-09-27-memory-object-update-tool-contract.md)、[title 解析](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#4-定位與權限界線)。接線總則見 [data-and-contracts §3](data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 
 ## 1. 實作責任與純規則
@@ -13,22 +13,22 @@
 - 引用按穩定內部身分作集合增刪；保留未指定成員。重複新增已有關係是無效果；移除不存在的關係、同次又加又移除或新增不允許來源均拒絕。移除最後一筆合法，與無效來源不同。
 - 標題在 App 的單層 map 內精確映射為 ID，CRUD 與引用進入資料介面後用 ID；歷史與已綁定原操作不重新解析 title。純規則只檢查傳入 map，不自行查其他層。
 
-純值／變更放 `models.py`／`changes.py`，不依賴 ORM、HTTP、LLM 或生成 DTO。這些函式**不證明**來源已正式成立、在本批 F 以內或角色有權；service 由訪談領域模組 和批次綁定取得合法集合。
+純值／變更放 `models.py`／`changes.py`，不依賴 ORM、HTTP、LLM 或生成 DTO。這些函式**不證明** 來源已正式成立、在本批 F 以內或角色有權；service 由訪談領域模組 和批次綁定取得合法集合。
 
 ### 1.1 正式來源範圍接線
 
 `work_memory/sources.py` 透過 `interviews/queries.py`，重用現有正式訊息保存，不直接讀別的領域表，也不複製原話：
 
-- `bind_memory_source_window` 只供新批次準備：接收原整理要求的員工來源身分，精確解出正式序號 F；K 由呼叫方選定的已發布快照提供。F 與非零 K 均須為同檔案的有效員工發話；首次 K=0。查詢最大序號只用於驗證來源資格，**不是拿最大序號當 F**。有效要求 F≤K 返回「已涵蓋」，不另造空批。
+- `bind_memory_source_window` 只供新批次準備：接收原整理要求的員工來源身分，精確解出正式序號 F；K 由呼叫方選定的已發布快照提供。F 與非零 K 均須為同檔案的有效員工發話；首次 K=0。查詢最大序號只用於驗證來源資格，**不是拿最大序號當 F** 。有效要求 F≤K 返回「已涵蓋」，不另造空批。
 - `MemorySourceWindow` 明列固定檔案、來源身分及 `(K,F]`；不是模型可填欄位，也不另負責資料保存。批次保存／恢復沿原值，不在每次讀取、交接或恢復重呼 bind 取得新範圍。
 - `read_required_interviews` 共用既有近期歷史組裝，保留完整 `(K,F]`、真實角色及前置語境規則；不含 F 之後即使已正式保存的答覆。`read_reference_sources` 可回讀 `≤F` 的更早有效來源，空引用合法，不把必處理新區間當成唯一可引用範圍。
-- 訪談領域模組 的 `read_interview_sources` 在 SQL 同時限定檔案、來源 ID 與上界；有一個來源不存在、未正式化、跨檔案或超界就整組拒絕，不返回部分結果。這是新增的內部 ID 查詢，**不是新增模型工具**。
+- 訪談領域模組 的 `read_interview_sources` 在 SQL 同時限定檔案、來源 ID 與上界；有一個來源不存在、未正式化、跨檔案或超界就整組拒絕，不返回部分結果。這是新增的內部 ID 查詢，**不是新增模型工具** 。
 
 來源範圍綁定與後續候選／發布共用 §2.2、§5 的批次資格；來源查詢本身不負責背景調度或 Graph 恢復。
 
 ## 2. 保存表示：固定修訂，而非資料庫舊列
 
-採既定 PostgreSQL＋SQLAlchemy／Alembic，以明確新增不可變修訂、保存選用來表達歷史。**不以 MVCC 舊列、ORM 版本計數器或每次完整正文複製充當 Memory 發布快照。**下圖呈現保存、發布及消費路徑；schema 見 §2.1–2.2。
+採既定 PostgreSQL＋SQLAlchemy／Alembic，以明確新增不可變修訂、保存選用來表達歷史。**不以 MVCC 舊列、ORM 版本計數器或每次完整正文複製充當 Memory 發布快照。** 下圖呈現保存、發布及消費路徑；schema 見 §2.1–2.2。
 
 ```mermaid
 flowchart TD
@@ -58,7 +58,7 @@ flowchart TD
 
 ### 2.1 固定物件修訂
 
-Migration `0011_memory_object_revisions` 與 `revision_persistence.py` 維護下列關係；所有身分／FK 均包含職務檔案範圍。這些是**固定儲存表示，不是 B1／B2 操作中的候選關係表**。
+Migration `0011_memory_object_revisions` 與 `revision_persistence.py` 維護下列關係；所有身分／FK 均包含職務檔案範圍。這些是**固定儲存表示，不是 B1／B2 操作中的候選關係表** 。
 
 ```mermaid
 flowchart LR
@@ -104,7 +104,7 @@ flowchart TD
 
 每次內容修改只新增必要修訂與輕量選用列。位置沿 parent 保存可恢復路徑；回復必須在本批 base 到目前位置的路徑內，且完整階段座標曾由真實原結果提供，不能只拿一個存在的 position ID 偽造 B2 資格。候選讀取使用目前 stage，會看到該 stage 內後續成功操作；新修改則須符合精確目前位置。這兩種檢查不同，不把模型歷史文字改成 latest。
 
-`memory_positions.is_sealed` 只表示選用集合完成、不可再加列；不表示已分析或已發布。候選理解可以保存舊固定來源 pair，但**目前讀取依 source object ID 解析該位置選用**。正式快照不能如此模糊解析：發布先建立需要的新理解修訂，然後存下所有路徑一致的精確 pair。這使動態候選綁定與歷史固定引用各有明確責任。
+`memory_positions.is_sealed` 只表示選用集合完成、不可再加列；不表示已分析或已發布。候選理解可以保存舊固定來源 pair，但**目前讀取依 source object ID 解析該位置選用** 。正式快照不能如此模糊解析：發布先建立需要的新理解修訂，然後存下所有路徑一致的精確 pair。這使動態候選綁定與歷史固定引用各有明確責任。
 
 Memory 領域模組 不保存原生模型 request，也不提供全歷史模型入口。原操作摘要只能核對同一意圖，不能重建遺失的工具參數；完整 native request 的可靠保存、工具配對及 Graph 接續由[共用執行](agent-execution.md)承接。
 
@@ -131,7 +131,7 @@ Memory 領域模組 不保存原生模型 request，也不提供全歷史模型�
 
 保存選型依據：
 
-- [PostgreSQL MVCC](https://www.postgresql.org/docs/18/mvcc-intro.html)保障交易讀取可見性；[VACUUM](https://www.postgresql.org/docs/18/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY)會回收不再需要的舊列。**推論：**不能把它當已發布 Memory／JD 依據的永久歷史服務。保留那些修訂必須是應用資料契約。
+- [PostgreSQL MVCC](https://www.postgresql.org/docs/18/mvcc-intro.html)保障交易讀取可見性；[VACUUM](https://www.postgresql.org/docs/18/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY)會回收不再需要的舊列。**推論：** 不能把它當已發布 Memory／JD 依據的永久歷史服務。保留那些修訂必須是應用資料契約。
 - [SQLAlchemy version counter](https://docs.sqlalchemy.org/en/21/orm/versioning.html)主要在 flush 核對並行修訂，不自動保存本案完整來源圖；其[官方 temporal row 範例](https://docs.sqlalchemy.org/en/21/orm/examples.html#versioning-using-temporal-rows)示範以 INSERT 新列保留原版本。借鑑不可變修訂原則，但不直接引入攔截全 ORM 修改的通用 event hook：本案兩層發布、來源上界與原操作要由明確用例控制。
 - [PostgreSQL constraints](https://www.postgresql.org/docs/18/ddl-constraints.html)提供 FK／UNIQUE／CHECK；跨列存在性使用 FK／UNIQUE，不寫查其他表的 CHECK。名稱比較須核[collation 的 deterministic 與 non-deterministic 區別](https://www.postgresql.org/docs/18/collation.html#COLLATION-NONDETERMINISTIC)，本案以精確 Unicode／空白與唯一限制的 PG 反例核對。
 
@@ -145,7 +145,7 @@ Memory 領域模組 不保存原生模型 request，也不提供全歷史模型�
 
 完整路徑為：有效來源 → B1 候選情境 → B2 候選理解 → 固定快照讀回。沿用 §2.1 的固定正文，不另建第二份正文體系：
 
-- 候選位置只保存各身分的修訂選用。理解候選的來源集合可從所選理解修訂取得情境 ID，再沿**同一候選位置**解析目前情境；不直接把儲存的舊來源修訂當成目前候選來源。固定歷史 read 則完整沿原 `(object_id, revision_id)`，兩條讀取路徑命名／型別須區分。
+- 候選位置只保存各身分的修訂選用。理解候選的來源集合可從所選理解修訂取得情境 ID，再沿**同一候選位置** 解析目前情境；不直接把儲存的舊來源修訂當成目前候選來源。固定歷史 read 則完整沿原 `(object_id, revision_id)`，兩條讀取路徑命名／型別須區分。
 - B1 修改情境只前移其選用，保留理解的身分綁定；刪除情境時，同次為受影響理解產生解除該綁定的新修訂、重用正文，再一起前移位置。原固定列不改。B1 的投影不包含理解資訊，App 的確定性解除不代表 B1 已分析理解。
 - 發布使用確定的候選位置，將理解保留的情境身分解析成該版情境修訂；關係換版時新建理解修訂。先前歷史及未變正文重用，不能把不一致的候選選用直接當正式快照。
 - 准入／writer fencing 重用 `executions`；候選回退用 generation 使被放棄分支失效。Memory 自己保存原意圖摘要值及結果，參考既有 JD 用例的恢復模式，不借用 JD 的操作表、不造通用收據框架。完成交接、發布與終局狀態由 workflow 在同一短交易協調。

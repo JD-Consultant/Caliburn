@@ -1,6 +1,6 @@
 # 公版參考的整體與任務收尾用途
 
-日期：2026-10-05。狀態：**已接入角色 runner，可由明示設定啟用；現行共用服務未重啟**。使用者已接續授權「現在接入 tool」，取代前輪先不接模型的限制；採用權責見 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，接線驗證見[驗證紀錄](../experiments/engineering/README.md#角色接線)。檢索策略仍依[檢索設計](2026-10-04-public-reference-retrieval-design.md)；本文件定義顧問如何使用公版與保存必要的跨輪資訊。
+日期：2026-10-05。狀態：**已接入角色 runner，可由明示設定啟用；現行共用服務未重啟** 。使用者已接續授權「現在接入 tool」，取代前輪先不接模型的限制；採用權責見 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，接線驗證見[驗證紀錄](../experiments/engineering/README.md#角色接線)。檢索策略仍依[檢索設計](2026-10-04-public-reference-retrieval-design.md)；本文件定義顧問如何使用公版與保存必要的跨輪資訊。
 
 ## 最新確認：只保留明確否認的工作範圍
 
@@ -61,9 +61,9 @@
 
 寫入回傳格式由本輪已保存的原請求決定：
 
-- **新請求：**兩個寫入工具的 description 均帶固定後綴，成功回精簡結果。
-- **舊請求：**兩個 description 均沒有該後綴，維持原本完整 state 回傳；恢復後仍使用舊格式。
-- **已保存結果：**原 request、prepared command 與 native output 原樣接續，不重新轉成新格式。
+- **新請求：** 兩個寫入工具的 description 均帶固定後綴，成功回精簡結果。
+- **舊請求：** 兩個 description 均沒有該後綴，維持原本完整 state 回傳；恢復後仍使用舊格式。
+- **已保存結果：** 原 request、prepared command 與 native output 原樣接續，不重新轉成新格式。
 
 固定後綴為 `成功只回 {"status":"updated"}；需要完整 state 時再按需讀取。`。這段文字用來識別持久格式，後續潤飾 description 必須保留；不能依當前設定或自由文字語意猜模式。
 
@@ -75,7 +75,7 @@
 
 feature 仍擁有 `occupation_reference_candidates`（位置）與 `occupation_reference_operations`（不可變結果）兩表。App 綁定檔案、writer、generation、revision 與 operation，模型不提供。prepare 固定變更，execute 以短交易核對檔案／writer／revision；原命令重送回原結果。checkpoint 缺欄位不得補預設值；回復至本 Turn 可達祖先會更換 generation，拒絕舊分支操作。
 
-只有 execution completed **且**有對應正式員工 exchange 的候選，才成為後續 Turn 可見 state；依正式員工序號取最新者。這是本輪正式生效資格，不是回答來源欄位或模型否認判讀的證明。中間未使用工具的輪次不清空 state。
+只有 execution completed **且** 有對應正式員工 exchange 的候選，才成為後續 Turn 可見 state；依正式員工序號取最新者。這是本輪正式生效資格，不是回答來源欄位或模型否認判讀的證明。中間未使用工具的輪次不清空 state。
 
 `0024` 只用於隔離測試 schema，未在本次套用正式資料庫；接線沿用其既有 JSON shape，不新增 migration、不改寫舊實驗原件。正常 runner 接續沿已保存的 prepared command 與 operation result，不倒帶候選或重選公版；完成／取消沿既有資格機制。
 
@@ -94,7 +94,7 @@ Memory 整理需要知道責任界線，以免將員工未負責的工作補回�
 
 參數必須是空物件；模型不能填職務 ID、執行 ID、版本、stage 或上界。入口沒有搜尋、選公版、更新排除清單的權限。完整清單超過容量時明確拒絕，不截斷或假裝為空；此結果不是原話引用或完成判定。
 
-App 建立 `ExcludedWorkReadWorkflow(sessions)` 與 `ExcludedWorkReadTools(workflow, binding)`，`binding` 沿現有 `MemoryReadBinding`。B1／B2 使用 `CandidateMemoryRead`，從持久批次及有效 stage 取得固定 F；可見的正式 Turn 必須 completed 且其正式**員工輸入序號 ≤ F**。觸發批次的顧問回覆可能晚於 F，仍須讀到該 Turn 已正式化的排除範圍。後續 Turn 的新增／解除不回流舊批次；active、取消或沒有正式 exchange 的候選不生效。`PublishedMemoryRead` 則沿既有固定訪談上界。兩者都核對 execution ACTIVE，候選另核對 stage／generation，沿既有 Memory 讀取契約，不新增模型提供的範圍欄位。
+App 建立 `ExcludedWorkReadWorkflow(sessions)` 與 `ExcludedWorkReadTools(workflow, binding)`，`binding` 沿現有 `MemoryReadBinding`。B1／B2 使用 `CandidateMemoryRead`，從持久批次及有效 stage 取得固定 F；可見的正式 Turn 必須 completed 且其正式**員工輸入序號 ≤ F** 。觸發批次的顧問回覆可能晚於 F，仍須讀到該 Turn 已正式化的排除範圍。後續 Turn 的新增／解除不回流舊批次；active、取消或沒有正式 exchange 的候選不生效。`PublishedMemoryRead` 則沿既有固定訪談上界。兩者都核對 execution ACTIVE，候選另核對 stage／generation，沿既有 Memory 讀取契約，不新增模型提供的範圍欄位。
 
 `workflows/occupation_reference_reads.py` 共用正式 state 查詢；顧問 start 在 file lock 中固定當前 frontier 後也使用此查詢。沒有第二份排除資料、Memory 寫入、資料表或新的發布狀態。工具 schema 由既有 generator 生成；B1／B2 只在啟用的原請求上增加唯讀工具。角色內容指引未因本切片重寫，模型按需讀取與否認判讀由後續訪談比較評估。
 
@@ -121,7 +121,7 @@ Memory 唯讀接縫另驗空參數、完整輸出、固定 F、同一批次 B1�
 
 # 公版參考的整體與任務收尾用途
 
-日期：2026-10-04。狀態：**候選／使用者確認的用途方向，效果未驗證，未接正式 JD App**。本文件補充[檢索候選設計](2026-10-04-public-reference-retrieval-design.md)的兩種參考如何被顧問使用；檢索輸入、資料單位及參數仍沿該設計逐元件比較。前輪封存設計及結構實驗不改寫。
+日期：2026-10-04。狀態：**候選／使用者確認的用途方向，效果未驗證，未接正式 JD App** 。本文件補充[檢索候選設計](2026-10-04-public-reference-retrieval-design.md)的兩種參考如何被顧問使用；檢索輸入、資料單位及參數仍沿該設計逐元件比較。前輪封存設計及結構實驗不改寫。
 
 **最新範圍（2026-10-05）：** 使用者同意簡化收尾流程，確認紀錄只保留「確認事項＋員工回答來源」，其他由顧問判斷，詳見下一節。工具及保存切片已授權，保持未接模型；契約及驗證由下方工具節與[驗證紀錄](../experiments/engineering/README.md#公版參考工具)維護。以下較早的選答、處理結果欄位、自動排除及更新方案保留為討論沿革，不是目前第一版要求。
 
@@ -228,7 +228,7 @@ Memory 整理或搜尋名次變動不自動清除紀錄。員工更正相關責�
 
 `answer_refs` 只接受 `{"kind":"current_input"}` 或 `{"kind":"interview","interview_sequence":2}`。前者由 App 綁定本輪已接受的員工輸入；後者必須是同職務檔案、固定可讀上界內的正式員工訊息。顧問訊息、Memory、其他 Turn 未正式化輸入與未知來源均拒絕。資料庫保存穩定來源 UUID，後續輪次讀回時投影成正式序號；不另複製回答正文。
 
-feature 擁有 `occupation_reference_candidates`（候選位置）及 `occupation_reference_operations`（不可變 state 結果）兩表，migration 為 `0024`。workflow 經各資料擁有者查詢，只有 execution 已 completed **且**具對應正式員工 exchange 的候選才可作後續 base；依正式員工序號取最新者。未使用工具的中間輪次不清除前次 state。取消／失敗保留隔離候選以供查核，不生效；不另造第二個完成旗標。
+feature 擁有 `occupation_reference_candidates`（候選位置）及 `occupation_reference_operations`（不可變 state 結果）兩表，migration 為 `0024`。workflow 經各資料擁有者查詢，只有 execution 已 completed **且** 具對應正式員工 exchange 的候選才可作後續 base；依正式員工序號取最新者。未使用工具的中間輪次不清除前次 state。取消／失敗保留隔離候選以供查核，不生效；不另造第二個完成旗標。
 
 App 綁定檔案、writer、generation、revision、operation 身分。prepare 固定完整變更後才保存工具意圖；execute 經短交易的檔案／writer 鎖與 revision 檢查，原 operation 重送回原結果。來源再次核對，外部公版讀取不置於資料庫交易，也不在成功後重播時重查服務。同 Turn 回復到可達祖先建立新 generation，撤銷舊分支操作。來源存在只代表能回查，並不代表事項或 JD 已完成。
 
@@ -241,9 +241,9 @@ App 綁定檔案、writer、generation、revision、operation 身分。prepare �
 
 ## 本輪收斂：以整份 JD 收尾為主
 
-使用者在確認現行分析方法後，決定**先不補單項 JD 任務的完整度分析／收尾機制**。本輪以職位整體參考協助整份 JD 收尾：讓顧問理解員工大致從事哪些工作類型，使用相關公版的完整已解析任務目錄提示可能未提到的工作。客製化職位仍可跨多份公版，不固定成單一職稱；檢索依員工實際工作及 Memory，而非先指定職稱套模板。
+使用者在確認現行分析方法後，決定**先不補單項 JD 任務的完整度分析／收尾機制** 。本輪以職位整體參考協助整份 JD 收尾：讓顧問理解員工大致從事哪些工作類型，使用相關公版的完整已解析任務目錄提示可能未提到的工作。客製化職位仍可跨多份公版，不固定成單一職稱；檢索依員工實際工作及 Memory，而非先指定職稱套模板。
 
-工作任務細節參考保留為後續方向，暫不實作或新增其完整度驗證。現有顧問依情境、案例與工作理解追問及撰寫 JD 的方法繼續使用。下文的兩用途與細節進度保留既有討論，**本輪只細化整體任務目錄的確認進度**，不要求第一版同時建立兩套用途。
+工作任務細節參考保留為後續方向，暫不實作或新增其完整度驗證。現有顧問依情境、案例與工作理解追問及撰寫 JD 的方法繼續使用。下文的兩用途與細節進度保留既有討論，**本輪只細化整體任務目錄的確認進度** ，不要求第一版同時建立兩套用途。
 
 候選整體收尾規則：
 

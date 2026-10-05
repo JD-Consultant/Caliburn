@@ -1,6 +1,6 @@
 # 業務、資料及契約接線
 
-- 狀態：**現行業務、資料及契約的接線原則**。具體保存分別由[訪談](interview-storage.md)、[JD](jd-storage.md)及[Memory](memory-storage.md)文件說明；正式 DDL 與生成契約由程式維護。驗證見[結案紀錄](../history.md#source-ee8cbce8eb3c303d1765)。
+- 狀態：**現行業務、資料及契約的接線原則** 。具體保存分別由[訪談](interview-storage.md)、[JD](jd-storage.md)及[Memory](memory-storage.md)文件說明；正式 DDL 與生成契約由程式維護。驗證見[結案紀錄](../history.md#source-ee8cbce8eb3c303d1765)。
 - 語意權威：[資料保存與交易](../architecture/persistence.md)、[Memory 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[JD 工具](../specs/2026-09-29-jd-model-tool-contract-review.md)。本頁只說接線方式。
 
 本頁從人工與模型工具共用的業務入口開始，說明短交易、原操作結果、Memory 發布及 JD 完成如何接在一起。具體資料表與保存演算法由各保存文件維護，這裡說明它們必須共同遵守的接線規則。
@@ -35,7 +35,7 @@ DB pool connection 與 Graph checkpointer connection 各自管理，不能假設
 
 實作映射、選型及驗證限制維護於 [Memory 保存接線](memory-storage.md)；本節保留跨層規則，不複製資料表。
 
-候選的關係連 stable object ID；工具 title 先在有權的當前 layer map 精確解析，取得 ID 後才對該物件操作。改名先固定目標再改；同層有效 title 唯一，歷史／不同層不作同名限制。新命令使用重用名稱時選目前物件；**沒有「模型一定知道舊名」的保證，也不追加被否決的強制 read proof**。原操作重入與歷史引用均維持原 identity。
+候選的關係連 stable object ID；工具 title 先在有權的當前 layer map 精確解析，取得 ID 後才對該物件操作。改名先固定目標再改；同層有效 title 唯一，歷史／不同層不作同名限制。新命令使用重用名稱時選目前物件；**沒有「模型一定知道舊名」的保證，也不追加被否決的強制 read proof** 。原操作重入與歷史引用均維持原 identity。
 
 候選每次有效操作有可恢復的位置；position 由不可變修訂選用實現，但只有 Memory 領域模組負責寫入。刪情境同次移除候選理解指向它的 bindings，不刪理解；歷史快照不變。B1 只能改情境；B2 只能改理解，讀目前固定交接的情境；權限在 service 再驗，不只藏 tool。
 
@@ -64,7 +64,7 @@ JD `read_ref` 解到本輪 JD identity／型別與合法內容基準；Memory `t
 - source diff 以 citation 固定舊來源到本輪 pinned Memory 同身分新來源，展開相關引用鏈變化；舊正文只作 diff 材料，不給任意歷史閱讀入口。
 - `confirm_reference_alignment` 只對指定 JD 依據與目前內容基底成立；讀 diff、更新文字、重加既存來源不能自動確認。刪除／同名新建不冒充同身分。
 
-完成 A 由 workflow 協調 **JD 候選、有效訪談與序號、完整正式答覆、current_input 來源解析、完成結果、背景要求上界**同次提交。序號使用檔案內受交易保護的分配，不直接依會跳號的全域 sequence 保證取消不佔號。完整已公開中間訊息另按回看政策保留，無正式序號、不作依據。
+完成 A 由 workflow 協調 **JD 候選、有效訪談與序號、完整正式答覆、current_input 來源解析、完成結果、背景要求上界** 同次提交。序號使用檔案內受交易保護的分配，不直接依會跳號的全域 sequence 保證取消不佔號。完整已公開中間訊息另按回看政策保留，無正式序號、不作依據。
 
 取消只使該輪候選／來源／後續寫入失效，回有效基底；不是把已提交的外部修改反向逐筆 undo。A 暫停／活躍時，人工 JD 寫由後端拒絕；正式完成後的 JD 撤回則是獨立條件命令，不撤回訪談／Memory。
 

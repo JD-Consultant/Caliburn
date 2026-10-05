@@ -56,4 +56,4 @@ A1／A2 對照 rerank 的影響；B1／B2 同樣對照。整段與分段則檢�
 
 現在只有需求與實驗草稿，沒有虛構排名、評分或成本。討論後凍結新 revision 再執行；修訂保留舊版，不回寫封存實驗。所有五案都逐案報告，不只挑最好看的案例。
 
-路由：[當前職位整體搜尋設計](../../specs/2026-10-04-occupation-overview-reference-retrieval-design.md)、[方法依據與演進](../../research/retrieval/2026-10-04-retrieval-relevance-judgment-methods.md)、[逐元件計畫](../../plans/2026-10-04-public-reference-retrieval-design.md)。
+路由：[當前職位整體搜尋設計](../../specs/2026-10-04-occupation-overview-reference-retrieval-design.md)、[方法依據與演進](../../research/retrieval/2026-10-04-retrieval-relevance-judgment-methods.md)、[驗證順序](../../specs/2026-10-04-public-reference-retrieval-design.md)。

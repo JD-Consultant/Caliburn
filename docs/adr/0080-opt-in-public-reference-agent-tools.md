@@ -1,6 +1,6 @@
 # ADR 0080：以明示設定接入公版參考工具
 
-- 狀態：Accepted（2026-10-05；使用者要求「現在接入 tool」，同時要求保護正在進行的其他測試）。接線施工與驗證狀態依[計畫](../plans/2026-10-05-occupation-reference-agent-integration.md)，本次不重啟現行服務。
+- 狀態：Accepted（2026-10-05；使用者要求「現在接入 tool」，同時要求保護正在進行的其他測試）。接線施工與驗證狀態依[計畫](../experiments/engineering/README.md#角色接線)，本次不重啟現行服務。
 - 範圍：在 ADR0079 的正式 App 上增加可選 HTTP consumer；RAG 仍是獨立服務，不成為預設啟動依賴，也不移入 App 套件。
 - 接續：將先前「獨立 RAG 不接 JD App」調整為「明示設定時可供模型按需呼叫」。不改寫歷史 ADR，也不變更 JD／Memory／訪談權威。
 

@@ -89,4 +89,4 @@ Qdrant 官方提供 payload 分組、filter／scroll 及來源 lookup 能力，�
 
 研究採納先要求每個有效已標註工作面向保有支持；來源標註不窮盡，不能把未知候選全算錯。除涵蓋外，記錄來源關係保真、未命中目錄可取回、正文量、實際 token、pair 量、DB／embedding／GPU／合併時間。參數、來源及預期判準在執行前固定，失敗與修訂另留原件。
 
-本輪原型與核對見[兩層參考結構實驗](../experiments/2026-10-04-retrieval-reference-views/README.md)，接續驗證見[計畫](../plans/2026-10-04-public-reference-retrieval-design.md)。
+本輪原型與核對見[兩層參考結構實驗](../experiments/2026-10-04-retrieval-reference-views/README.md)。接續實驗由[實驗索引](../experiments/README.md)查閱；後續比較依本節界定，不從已封存的施工清單推定完成。

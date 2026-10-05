@@ -1,6 +1,6 @@
 # 公版參考的整體與任務收尾用途
 
-日期：2026-10-05。狀態：**已接入角色 runner，可由明示設定啟用；現行共用服務未重啟**。使用者已接續授權「現在接入 tool」，取代前輪先不接模型的限制；採用權責見 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，接線驗證見[施工紀錄](../plans/2026-10-05-occupation-reference-agent-integration.md)。檢索策略仍依[檢索設計](2026-10-04-public-reference-retrieval-design.md)；本文件定義顧問如何使用公版與保存必要的跨輪資訊。
+日期：2026-10-05。狀態：**已接入角色 runner，可由明示設定啟用；現行共用服務未重啟**。使用者已接續授權「現在接入 tool」，取代前輪先不接模型的限制；採用權責見 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，接線驗證見[驗證紀錄](../experiments/engineering/README.md#角色接線)。檢索策略仍依[檢索設計](2026-10-04-public-reference-retrieval-design.md)；本文件定義顧問如何使用公版與保存必要的跨輪資訊。
 
 ## 最新確認：只保留明確否認的工作範圍
 
@@ -69,7 +69,7 @@
 
 公版工具組缺工具、名稱重複或兩項寫入格式混用時，App 在建立候選前拒絕。handler 使用原 captured request，不新增模型版本參數、資料表或恢復器。
 
-可選角色指引同步說明替換與小型成功回傳，已有足夠有效內容可沿用；排除維護可以在訪談中進行。只影響新的啟用請求，舊輪次仍使用原指引。搜尋仍回最多五份完整已解析目錄，三層候選概覽仍是另案比較。工程反例、獨立審查與驗證見[接續紀錄](../plans/evidence/2026-10-05-occupation-reference-tools/hardening-verification.md)。
+可選角色指引同步說明替換與小型成功回傳，已有足夠有效內容可沿用；排除維護可以在訪談中進行。只影響新的啟用請求，舊輪次仍使用原指引。搜尋仍回最多五份完整已解析目錄，三層候選概覽仍是另案比較。工程反例、獨立審查與驗證見[接續紀錄](../experiments/engineering/2026-10-05-occupation-reference-tools/hardening-verification.md)。
 
 `add` 以原字串去重、保留原順序；`remove` 用讀回的精確字串。新增與移除有交集、兩者皆空、移除不存在項目、空白或 NUL 均整批拒絕。更換文字可同次移除舊範圍並新增修正版；沒有另建語意去重或判斷模型。搜尋失敗不當成無合適公版，回傳超量不靜默截斷。
 
@@ -112,9 +112,9 @@ App 建立 `ExcludedWorkReadWorkflow(sessions)` 與 `ExcludedWorkReadTools(workf
 
 本次重點：無回答來源也可保存排除範圍、跨輪保留、重新選用不清除、員工更正可移除、未知移除整批拒絕、取消／失敗不生效、職務檔案隔離、原操作重播及回復保護。工具旅程核對搜尋請求仍只包含原正向 query，不帶 `excluded_work`。
 
-[施工紀錄](../plans/2026-10-05-occupation-reference-tools.md)與[接續驗證](../plans/evidence/2026-10-05-occupation-reference-tools/excluded-work-verification.md)記錄本次結果；前版測試留在原紀錄，不冒充新版本驗收。未測顧問是否能正確區分否認／未知、避免重問或完成 JD，亦未驗 token／耗時收益。模型選公版與真正 JD／PDF 收尾比較仍是後續工作。
+[驗證紀錄](../experiments/engineering/README.md#公版參考工具)與[接續驗證](../experiments/engineering/2026-10-05-occupation-reference-tools/excluded-work-verification.md)記錄本次結果；前版測試留在原紀錄，不冒充新版本驗收。未測顧問是否能正確區分否認／未知、避免重問或完成 JD，亦未驗 token／耗時收益。模型選公版與真正 JD／PDF 收尾比較仍是後續工作。
 
-Memory 唯讀接縫另驗空參數、完整輸出、固定 F、同一批次 B1→B2、後輪更正隔離、職務隔離、過時 generation／stage 拒絕及真工具 JSON／PostgreSQL 旅程；見[唯讀入口驗證](../plans/evidence/2026-10-05-occupation-reference-tools/memory-read-verification.md)。接續角色組裝與恢復反例見[可選接線驗證](../plans/evidence/2026-10-05-occupation-reference-tools/agent-integration-verification.md)。專題報告的研究比較與數據限制見[§6.3 與附錄 B.14](../reports/project-report/report.md#b14-主要職位參考的廣蒐與精搜)。
+Memory 唯讀接縫另驗空參數、完整輸出、固定 F、同一批次 B1→B2、後輪更正隔離、職務隔離、過時 generation／stage 拒絕及真工具 JSON／PostgreSQL 旅程；見[唯讀入口驗證](../experiments/engineering/2026-10-05-occupation-reference-tools/memory-read-verification.md)。接續角色組裝與恢復反例見[可選接線驗證](../experiments/engineering/2026-10-05-occupation-reference-tools/agent-integration-verification.md)。專題報告的研究比較與數據限制見[§6.3 與附錄 B.14](../reports/project-report/report.md#b14-主要職位參考的廣蒐與精搜)。
 
 <details>
 <summary>沿革：前版確認事項與員工來源設計（已由上文取代）</summary>
@@ -123,7 +123,7 @@ Memory 唯讀接縫另驗空參數、完整輸出、固定 F、同一批次 B1�
 
 日期：2026-10-04。狀態：**候選／使用者確認的用途方向，效果未驗證，未接正式 JD App**。本文件補充[檢索候選設計](2026-10-04-public-reference-retrieval-design.md)的兩種參考如何被顧問使用；檢索輸入、資料單位及參數仍沿該設計逐元件比較。前輪封存設計及結構實驗不改寫。
 
-**最新範圍（2026-10-05）：** 使用者同意簡化收尾流程，確認紀錄只保留「確認事項＋員工回答來源」，其他由顧問判斷，詳見下一節。工具及保存切片已授權，保持未接模型；契約及驗證由下方工具節與[施工紀錄](../plans/2026-10-05-occupation-reference-tools.md)維護。以下較早的選答、處理結果欄位、自動排除及更新方案保留為討論沿革，不是目前第一版要求。
+**最新範圍（2026-10-05）：** 使用者同意簡化收尾流程，確認紀錄只保留「確認事項＋員工回答來源」，其他由顧問判斷，詳見下一節。工具及保存切片已授權，保持未接模型；契約及驗證由下方工具節與[驗證紀錄](../experiments/engineering/README.md#公版參考工具)維護。以下較早的選答、處理結果欄位、自動排除及更新方案保留為討論沿革，不是目前第一版要求。
 
 **最新確認（2026-10-05）：** 使用者已同意顧問先看五份候選公版的概述與任務目錄、可多選主要工作參考，再按需閱讀正文。[公版參考 state](#公版參考-state先選主要參考再按需核對)保存目前選用的固定公版定位及兩欄確認紀錄；已授權獨立工具與保存，不註冊顧問工具、不切換正式流程。篩選及收尾效果未驗證。
 
@@ -203,7 +203,7 @@ Memory 整理或搜尋名次變動不自動清除紀錄。員工更正相關責�
 
 ### 最小落地與驗證順序
 
-以下保留接續切片與完成條件；第一個工具／保存切片的實際進度見[施工紀錄](../plans/2026-10-05-occupation-reference-tools.md)，後續模型品質與接線仍未執行。不在本節增加產品欄位。
+以下保留接續切片與完成條件；第一個工具／保存切片的實際進度見[驗證紀錄](../experiments/engineering/README.md#公版參考工具)，後續模型品質與接線仍未執行。不在本節增加產品欄位。
 
 1. **state 保存與回讀。** 先用固定資料驗 `null`、空選擇、多選、重選後保留確認紀錄，以及不同職務檔案隔離。只接受有效公版定位與該檔案的員工回答來源；有來源但回答為未知／部分負責時，程式不得自動判定完成。
 2. **獨立公版 consumer 資料流。** 沿現有 API 接概述／目錄及按需正文讀取，驗未選公版仍可讀、空候選與服務失敗分開、固定來源失效不以同名替換。這一步只能證明工具資料流與 state 行為，不證明顧問會挑選正確。

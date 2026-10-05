@@ -69,7 +69,7 @@
 [audit_tool_contracts.py](audit_tool_contracts.py)另執行三項有界反例，[完整輸入、輸出及來源 SHA256](tool-contract-audit-probes.json)已保存。它使用既有記憶體 fixture 及真正 Domain／tool handler；零 DB、HTTP、GPU、模型及付費呼叫。重算：
 
 ```powershell
-& .venv/Scripts/python.exe ../../docs/plans/evidence/2026-10-05-occupation-reference-tools/audit_tool_contracts.py
+& .venv/Scripts/python.exe ../../docs/experiments/engineering/2026-10-05-occupation-reference-tools/audit_tool_contracts.py
 ```
 
 未改正式工具、schema、Prompt、環境檔或共用服務。規範靜態核對、離線 wire、provider 接受及模型正確選讀仍分開回報；不能把本輪合格的 schema 稱為所有規範與品質均通過。

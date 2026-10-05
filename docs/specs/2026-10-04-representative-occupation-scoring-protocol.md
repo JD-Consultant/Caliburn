@@ -69,4 +69,4 @@
 
 需求、rubric 或 Prompt 修訂另存 revision，保留失敗及原件。尚未啟動新模型、服務或費用；單項 JD 任務完整度、未知探索、整份 JD 收尾至 PDF 仍沿既定後續範圍。
 
-關聯：[職位整體搜尋](2026-10-04-occupation-overview-reference-retrieval-design.md)、[方法研究](../research/retrieval/2026-10-04-retrieval-relevance-judgment-methods.md)、[元件計畫](../plans/2026-10-04-public-reference-retrieval-design.md)。
+關聯：[職位整體搜尋](2026-10-04-occupation-overview-reference-retrieval-design.md)、[方法研究](../research/retrieval/2026-10-04-retrieval-relevance-judgment-methods.md)、[驗證設計](../specs/2026-10-04-public-reference-retrieval-design.md)。

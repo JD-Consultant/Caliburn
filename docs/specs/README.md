@@ -26,7 +26,7 @@
 
 ## 獨立 RAG 範圍
 
-- [公版職位參考 API](2026-10-05-occupation-reference-api-design.md)：已實作獨立 API；原話 D20/T20 完整聯集後 rerank、完整已解析任務目錄與固定來源讀取。實作驗證與重播見[施工紀錄](../plans/2026-10-05-occupation-reference-api.md)，可選 App／Agent consumer 依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，未採納通用最佳品質參數。
+- [公版職位參考 API](2026-10-05-occupation-reference-api-design.md)：已實作獨立 API；原話 D20/T20 完整聯集後 rerank、完整已解析任務目錄與固定來源讀取。實作驗證與重播見[驗證紀錄](../experiments/engineering/README.md#公版參考-api)，可選 App／Agent consumer 依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，未採納通用最佳品質參數。
 
 - [相似度匹配 V1](2026-07-04-similarity-matching-v1-spec.md)
 - [RAG bounded context 與 retention](2026-08-11-rag-bounded-context-retention-design.md)

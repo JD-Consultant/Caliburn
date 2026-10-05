@@ -1,6 +1,6 @@
 # 公版工具接入 A／B1／B2：驗證紀錄
 
-日期：2026-10-05。使用者接續要求「現在接入 tool」，並提醒有人正在測試。依 [ADR0080](../../../adr/0080-opt-in-public-reference-agent-tools.md) 完成可選角色接線；[計畫](../../2026-10-05-occupation-reference-agent-integration.md)維護施工範圍，前輪未接模型的工具與保存證據保留原樣。
+日期：2026-10-05。依 [ADR0080](../../../adr/0080-opt-in-public-reference-agent-tools.md) 完成可選角色接線；本頁保留接線範圍、反例與結果，前輪未接模型的工具與保存證據保留原樣。現行契約與其他驗證見[工程驗證索引](../README.md#角色接線)。
 
 ## 交付行為
 
@@ -44,7 +44,7 @@
 
 ```powershell
 apps/api/.venv/Scripts/python.exe -m pytest apps/api/tests/unit apps/api/tests/contracts -q -p no:cacheprovider --tb=short
-apps/api/.venv/Scripts/python.exe docs/plans/evidence/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_runners.py apps/api/tests/integration/test_reference_template_reentry.py apps/api/tests/integration/test_consultant_runner.py apps/api/tests/integration/test_consultant_runner_recovery.py apps/api/tests/integration/test_memory_analysis_runners.py apps/api/tests/integration/test_role_context_history.py apps/api/tests/integration/test_consultant_context_binding.py apps/api/tests/integration/test_excluded_work_reads.py apps/api/tests/integration/test_occupation_reference_workflow.py -m postgres -q --tb=short
+apps/api/.venv/Scripts/python.exe docs/experiments/engineering/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_runners.py apps/api/tests/integration/test_reference_template_reentry.py apps/api/tests/integration/test_consultant_runner.py apps/api/tests/integration/test_consultant_runner_recovery.py apps/api/tests/integration/test_memory_analysis_runners.py apps/api/tests/integration/test_role_context_history.py apps/api/tests/integration/test_consultant_context_binding.py apps/api/tests/integration/test_excluded_work_reads.py apps/api/tests/integration/test_occupation_reference_workflow.py -m postgres -q --tb=short
 ```
 
 從 `apps/api` 執行：

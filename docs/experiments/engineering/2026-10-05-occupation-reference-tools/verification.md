@@ -1,6 +1,6 @@
 # 公版參考工具驗證紀錄
 
-日期：2026-10-05。範圍是已授權、尚未註冊顧問的工具／state 切片；[施工計畫](../../2026-10-05-occupation-reference-tools.md)及[責任契約](../../../specs/2026-10-04-public-reference-completion-design.md#工具與保存契約2026-10-05未接模型)。使用合成訪談與 HTTP fixture，沒有模型請求／付費外送。沿用其他工作仍在使用的 checkout，未 commit／push。
+日期：2026-10-05。範圍是當時尚未註冊顧問的工具／state 切片；本頁保存反例與結果，現行行為依[責任契約](../../../specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型)。使用合成訪談與 HTTP fixture，沒有模型請求／付費外送。後續版本與可選角色接線見[工程驗證索引](../README.md#公版參考工具)。
 
 ## 可重現反例與設計選擇
 
@@ -32,7 +32,7 @@ Ruff／格式及完整後端 Mypy 通過；`pnpm build` 的全量 codegen drift�
 真資料庫使用既有 `caliburn-jd-docker-test-postgres-1`、loopback `127.0.0.1:55441` 的 `caliburn_docker_test`。本目錄 [run_tests.py](run_tests.py) 只私下讀取指定容器的帳密供子程序使用，fixture 建立／清除專屬隨機 schema；沒有讀寫正式 App 資料庫、重建 volume 或停止其他程序。
 
 ```powershell
-apps/api/.venv/Scripts/python.exe docs/plans/evidence/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_state.py apps/api/tests/integration/test_occupation_reference_workflow.py apps/api/tests/integration/test_occupation_reference_tool_journey.py apps/api/tests/integration/test_database_migrations.py apps/api/tests/integration/test_consultant_completion.py -m postgres -q --tb=short
+apps/api/.venv/Scripts/python.exe docs/experiments/engineering/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_state.py apps/api/tests/integration/test_occupation_reference_workflow.py apps/api/tests/integration/test_occupation_reference_tool_journey.py apps/api/tests/integration/test_database_migrations.py apps/api/tests/integration/test_consultant_completion.py -m postgres -q --tb=short
 ```
 
 結果：**36 passed**。包含新切片 19 項、migration 5 項及既有 consultant completion 12 項；驗證 migration/model metadata 相符、保存與既有完成路徑回歸。

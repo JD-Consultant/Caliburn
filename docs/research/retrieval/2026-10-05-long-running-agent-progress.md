@@ -2,7 +2,7 @@
 
 查閱日期：2026-10-05。狀態：研究／候選，未實作、未接 JD App，沒有新增模型實驗或費用。
 
-接續狀態：上句及以下方案保留本研究當輪脈絡；後續已採用獨立 `excluded_work` 並完成[可選工具接線](../../plans/2026-10-05-occupation-reference-agent-integration.md)。使用者再次確認 JD 為總目標、工作任務可動態拆合與修訂；當前 state 提供時機與避免重問的候選比較見[接續研究](../agent-systems/2026-10-05-adaptive-jd-task-state-and-repeated-questions.md)。
+接續狀態：上句及以下方案保留本研究當輪脈絡；後續已採用獨立 `excluded_work` 並完成[可選工具接線](../../experiments/engineering/README.md#角色接線)。使用者再次確認 JD 為總目標、工作任務可動態拆合與修訂；當前 state 提供時機與避免重問的候選比較見[接續研究](../agent-systems/2026-10-05-adaptive-jd-task-state-and-repeated-questions.md)。
 
 後續確認（2026-10-05）：使用者將確認紀錄收斂為「確認事項＋員工回答來源」，其餘由顧問判斷，見[最新設計方向](../../specs/2026-10-04-public-reference-completion-design.md#最新確認只記確認事項與員工回答來源)。下文另存結論、接續事項或公版定位等做法保留為研究沿革，不再是第一版要求；有回答來源不自動代表事項已釐清。
 

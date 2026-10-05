@@ -6,9 +6,8 @@
 
 後續工作先由[目前決策](../current-decisions.md)找相關契約與尚待處理事項，再依[開發規範](../implementation/development-standard.md)界定切片。需要多步驟協作時才在本目錄建立新計畫，不另抄產品規格，也不重新執行已結案的 T01–T18。
 
-2026-10-05：[公版職位參考 API](2026-10-05-occupation-reference-api.md)，使用者授權獨立 RAG API
-及相關重構；該切片不含 JD App／Agent 接線。驗收、重播及模型實測證據由計畫路由。
+公版檢索實驗與 API、工具、角色接線的已結案計畫也已封存。可重現的實驗方法、結果與原始輸出仍保留在[實驗目錄](../experiments/README.md)；API 與工具的反例、重播及保存驗證改由[工程驗證索引](../experiments/engineering/README.md)查閱。
 
-2026-10-05：[公版參考工具與確認資料](2026-10-05-occupation-reference-tools.md)，完成獨立工具與保存切片；保留當輪未接模型的工程證據。[後續比較](../specs/2026-10-04-public-reference-completion-design.md#最小落地與驗證順序)由設計文件維護，不把工具完成當成顧問收尾品質達標。
+本目錄目前沒有進行中的施工計畫。公版參考的按需導覽、收尾品質與後續比較仍由[設計文件](../specs/2026-10-04-public-reference-completion-design.md)維護，不因計畫封存而宣稱已完成。
 
-2026-10-05：[公版參考工具接入顧問與 Memory](2026-10-05-occupation-reference-agent-integration.md)，使用者接續授權角色接線；A 五工具、B1／B2 唯讀排除範圍，明示設定啟用。原請求與恢復保留舊配置，不重啟正在測試的共用服務；實測範圍見計畫與證據。
+少數舊路徑只留簡短的歷史入口，讓已固定雜湊的實驗原件仍可找到資料；不修改原始實驗文件，也不保留第二份計畫正文。

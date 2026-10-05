@@ -36,8 +36,8 @@
 
 ```powershell
 apps/api/.venv/Scripts/python.exe -m pytest -p no:cacheprovider apps/api/tests/unit/test_occupation_reference_tool_feedback.py apps/api/tests/unit/test_occupation_reference_tools.py apps/api/tests/unit/test_reference_tool_registration.py apps/api/tests/unit/test_role_prompt_contracts.py apps/api/tests/unit/test_excluded_work_reads.py apps/api/tests/unit/test_occupation_reference_client.py apps/api/tests/unit/test_occupation_reference_state.py apps/api/tests/unit/test_occupation_reference_configuration.py apps/api/tests/contracts -q --tb=short
-apps/api/.venv/Scripts/python.exe docs/plans/evidence/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_tool_journey.py apps/api/tests/integration/test_occupation_reference_runners.py apps/api/tests/integration/test_reference_template_reentry.py apps/api/tests/integration/test_occupation_reference_workflow.py apps/api/tests/integration/test_occupation_reference_state.py apps/api/tests/integration/test_excluded_work_reads.py -q --tb=short
-apps/api/.venv/Scripts/python.exe docs/plans/evidence/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_runners.py -q --tb=short
+apps/api/.venv/Scripts/python.exe docs/experiments/engineering/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_tool_journey.py apps/api/tests/integration/test_occupation_reference_runners.py apps/api/tests/integration/test_reference_template_reentry.py apps/api/tests/integration/test_occupation_reference_workflow.py apps/api/tests/integration/test_occupation_reference_state.py apps/api/tests/integration/test_excluded_work_reads.py -q --tb=short
+apps/api/.venv/Scripts/python.exe docs/experiments/engineering/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_runners.py -q --tb=short
 pnpm build
 ```
 
@@ -45,7 +45,7 @@ pnpm build
 
 ```powershell
 .venv/Scripts/python.exe -m mypy src/caliburn
-.venv/Scripts/python.exe ../../docs/plans/evidence/2026-10-05-occupation-reference-tools/verify_tool_hardening.py
+.venv/Scripts/python.exe ../../docs/experiments/engineering/2026-10-05-occupation-reference-tools/verify_tool_hardening.py
 ```
 
 Windows sandbox 的 Python 暫存目錄 ACL 與 Docker named pipe 造成初次生成／PG 命令環境失敗；沒有用此失敗當產品反例。經自動核准後以同一有界生成器、隔離資料庫 runner 及本地 build 完成。測試 runner 核對既有 `caliburn-jd-docker-test-postgres-1` 的 loopback 55441，使用獨立 `caliburn_docker_test` 與隨機 schema，不輸出憑證、不清 volume。

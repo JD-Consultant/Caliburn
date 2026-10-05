@@ -7,7 +7,7 @@
 Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。員工透過訪談讓 AI 理解實際工作；人與 AI 可編輯同一份 JD。單一操作者可管理多份資料隔離的職務檔案。具體功能、非目標及目前進度以有效決策與責任文件為準，不從本檔推導新需求。
 
 - **現行正式產品**：[`apps/api`](apps/api/README.md)（後端）與 [`apps/web`](apps/web/README.md)（介面）；正式權責見 [ADR0079](docs/adr/0079-target-rebuild-production-cutover.md)。現況與已知限制見[目前決策](docs/current-decisions.md)、[驗證範圍](docs/architecture/verification.md)與[實驗原件](docs/experiments/product-validation/README.md)；文件或測試通過不等於分析品質已達標。
-- **舊架構與獨立範圍**：`experiments/jd-relational-app` 與 `packages/consultant-memory` 的程式已依 ADR0079 退役，只保留研究與沿革文件（退役前的程式可由 Git 歷史取回），不接回舊接線、不遷移舊資料；ADR0077 是歷史。討論或圖稿須標明「現行」「目標／未實作」「候選」或「歷史」，不能把其中一種冒充另一種。RAG 是獨立範圍，不是 JD App 的依賴。
+- **舊架構與獨立範圍**：`experiments/jd-relational-app` 與 `packages/consultant-memory` 的程式已依 ADR0079 退役；舊關聯式 App 的操作說明已封存，不再提供可執行入口。研究與實驗證據仍由 `docs/` 查閱，退役前程式及沿革文件可由 Git 歷史取回。不接回舊接線、不遷移舊資料；ADR0077 是歷史。討論或圖稿須標明「現行」「目標／未實作」「候選」或「歷史」，不能把其中一種冒充另一種。RAG 是獨立範圍，不是 JD App 的依賴。
 
 ## 自主工作與提問界線
 

@@ -24,7 +24,7 @@
 
 ```powershell
 apps/api/.venv/Scripts/python.exe -m pytest apps/api/tests/unit apps/api/tests/contracts -q -p no:cacheprovider --tb=short
-apps/api/.venv/Scripts/python.exe docs/plans/evidence/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_state.py apps/api/tests/integration/test_occupation_reference_workflow.py apps/api/tests/integration/test_occupation_reference_tool_journey.py apps/api/tests/integration/test_database_migrations.py apps/api/tests/integration/test_consultant_completion.py -m postgres -q --tb=short
+apps/api/.venv/Scripts/python.exe docs/experiments/engineering/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_state.py apps/api/tests/integration/test_occupation_reference_workflow.py apps/api/tests/integration/test_occupation_reference_tool_journey.py apps/api/tests/integration/test_database_migrations.py apps/api/tests/integration/test_consultant_completion.py -m postgres -q --tb=short
 apps/api/.venv/Scripts/python.exe -m ruff check apps/api
 apps/api/.venv/Scripts/python.exe -m ruff format --check apps/api
 apps/api/.venv/Scripts/python.exe -m mypy --config-file apps/api/pyproject.toml apps/api/src/caliburn

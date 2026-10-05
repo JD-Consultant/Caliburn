@@ -26,6 +26,7 @@
 | 顧問在引導示範中讀了什麼、引用了什麼？ | [倉庫訪談原件](data/inventory-demo-guided-20261003/) |
 | 來源核對指引與定位錯誤如何重現？ | [引用核對實驗原件](data/reference-alignment-prompt-20261003/) |
 | Docker 是否可建置、保存 JD、匯出中文 PDF 並保留重建前的資料？ | [Docker 交付驗證](2026-10-03-docker-delivery.md) |
+| 整份檔案刪除是否完整、隔離，並保留未結束工作與原文保護？ | [刪除驗證](2026-10-05-job-file-deletion.md)：真 PostgreSQL 交易、競爭及故障注入；介面與示範站檢查另列 |
 | 現有 Docker 示範站是否已更新，錄影前還需要哪些準備？ | [10／5 更新檢查](2026-10-05-docker-demo-update.md)：新版映像、migration、畫面與 PDF 核對完成；完整訪談案例及公版服務接線仍待準備 |
 | 報告各項成果有什麼證據，還缺哪種比較？ | [主張與證據索引](2026-10-04-report-evidence-audit.md) |
 | 兩角色壓縮後能否接續分析、發布並回查舊稿？ | [Memory 兩組整合對照](data/memory-compaction-publish-2026-10-04/README.md) |

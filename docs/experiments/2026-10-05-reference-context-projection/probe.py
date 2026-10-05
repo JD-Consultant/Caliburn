@@ -19,7 +19,7 @@ def measure(value: object) -> dict[str, int]:
 def main() -> None:
     root = Path(__file__).resolve().parents[3]
     source = root / (
-        "docs/plans/evidence/2026-10-05-occupation-reference-api/"
+        "docs/experiments/engineering/2026-10-05-occupation-reference-api/"
         "live-search-result.json"
     )
     source_bytes = source.read_bytes()

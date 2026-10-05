@@ -154,7 +154,7 @@ Linear 與 Geist 屬另一支（冷色、單一無襯線、13px 密集），工�
 | 元件 | 參照與查到的事實 | Caliburn 現況 |
 |---|---|---|
 | **主版面：左聊天、右文件** | Anthropic Artifacts：「these Artifacts appear in a dedicated window alongside their conversation」，使用者可即時檢視與編輯（[官方公告](https://www.anthropic.com/news/claude-3-5-sonnet)）。OpenAI Canvas 頁面回 403，**未取得** | 左訪談、右 JD，人與 AI 編輯同一份 JD ✓ |
-| **聊天輸入器** | Vercel AI Elements PromptInput：自動長高的 textarea；「Enter to submit, Shift+Enter for new line」；送出鈕是**純圖示**，圖示隨狀態改變；圓角邊框容器（[文件](https://elements.ai-sdk.dev/components/prompt-input)） | 自動長高 ✓；預設送出鈕改成圓形純圖示 ✓（無障礙名稱與 tooltip 仍是「送出訪談」）；「正在確認送出…」「重新確認原請求」兩個需要說明的狀態保留文字；**Enter 不送出**（見下方「刻意不同」） |
+| **聊天輸入器** | Vercel AI Elements PromptInput：自動長高的 textarea；「Enter to submit, Shift+Enter for new line」；送出鈕是**純圖示**，圖示隨狀態改變；圓角邊框容器（[文件](https://elements.ai-sdk.dev/components/prompt-input)） | 自動長高 ✓；預設送出鈕改成圓形純圖示 ✓（無障礙名稱與 tooltip 仍是「送出訪談」）；「正在確認送出…」「重新確認原請求」兩個需要說明的狀態保留文字；**Enter 送出**（原本不送出，2026-10-05 改，見 §16） |
 | **聊天訊息** | AI Elements Message：使用者訊息是 secondary 底色的扁平樣式，助理訊息 full-width、不加氣泡，有複製／重試等動作與 tooltip，文件未提頭像（[文件](https://elements.ai-sdk.dev/components/message)） | 員工靠右淡底氣泡、顧問靠左純文字 ✓；另有小頭像與說話者名稱一行（Cloudscape 對話氣泡也用頭像加名稱）；**不顯示訪談序號**（維護者指示） |
 | **按鈕種類** | Primer：Primary「Never put more than one in a group of buttons」；Default 用於次要動作；Invisible 用於低調；Danger「Used sparingly for destructive actions, typically prompt a confirmation dialog」。Carbon：Secondary 是 set 裡的負面動作（Cancel／Back），Danger「for actions that could have destructive effects on the user's data (delete or remove)」，「Do not use two high-emphasis buttons in a button group」，純圖示鈕一律要 tooltip，Danger 不得做成純圖示。shadcn/ui：default、outline、secondary、ghost、destructive、link（[Primer](https://primer.style/product/components/button/)、[Carbon](https://carbondesignsystem.com/components/button/usage/)、[shadcn](https://ui.shadcn.com/docs/components/button)）。Atlassian、Apple HIG、Polaris 頁面**未取得** | 一組按鈕只有一個實心主按鈕 ✓；次要用外框、低調用文字 ✓；純圖示鈕都有 tooltip ✓。**改了：**原本「取消處理」「撤回」「移除」用琥珀色按鈕——上面三套系統都沒有琥珀色按鈕，破壞性動作用紅色。現在「取消處理」是一般外框鈕（Primer 的 Danger 是留給會跳確認的動作，取消處理沒有確認視窗），紅色只用在刪除與撤回的**確認鈕** |
 | **對話框與刪除確認** | Primer Dialog：Header／Body／Footer，Footer 由左到右 Default（Cancel）→ Primary 或 Danger 在最右，尺寸 small／medium／large。shadcn AlertDialog：Cancel 在前、Action 在後，說明寫出後果（「This action cannot be undone」）。Cloudscape 刪除模式：標題「Delete [resource type]」、本文、後果放在資訊提示、按鈕 Cancel／Delete。NN/g：只在後果嚴重時用確認視窗、按鈕寫具體動作而不是 Yes／No、不要預設選 Yes、盡量提供 Undo（[Primer](https://primer.style/product/components/dialog/)、[shadcn](https://ui.shadcn.com/docs/components/alert-dialog)、[Cloudscape](https://cloudscape.design/patterns/resource-management/delete/delete-with-simple-confirmation/)、[NN/g](https://www.nngroup.com/articles/confirmation-dialog/)） | 標題、後果說明、「返回 JD」加確認鈕 ✓，按鈕寫具體動作（「確認刪除職責」）✓。**改了：**刪除確認鈕原本放在對話框**內容區**，其他對話框的動作都在 Footer；現在移到 Footer 最右並用紅色。沒有 Undo（需要後端支援，不在視覺改版範圍） |
@@ -168,7 +168,7 @@ Linear 與 Geist 屬另一支（冷色、單一無襯線、13px 密集），工�
 | **項目的 hover 動作** | Slack 訊息的浮動工具列、Gmail 列上的 hover 動作 | **Unknown**：依產品觀察，沒有查到官方文件；樣式是「帶邊框的浮動工具列」。只顯示指著的最內層項目的工具列（`:has()` 判斷）是我的取捨，**沒有外部先例**，由 e2e 守住 |
 
 **刻意與參照不同的地方**（每項都有理由，不是疏漏）：
-1. **Enter 不送出。** 參照都是 Enter 送出、Shift＋Enter 換行。這裡的送出是「正式訪談」的起點，且使用者用注音等輸入法時 Enter 用來選字，必須另外處理輸入法組字狀態才不會誤送；這是行為決定，不是視覺，沿 T09 先不做。
+1. **（2026-10-05 已推翻，見 §16：改為 Enter 送出，並以輸入法組字判斷避開注音選字。）Enter 不送出。** 參照都是 Enter 送出、Shift＋Enter 換行。這裡的送出是「正式訪談」的起點，且使用者用注音等輸入法時 Enter 用來選字，必須另外處理輸入法組字狀態才不會誤送；這是行為決定，不是視覺，沿 T09 先不做。
 2. **兩個狀態的送出鈕保留文字。**「重新確認原請求」是重送同一個命令，不是新送一次，圖示說不清楚。
 3. **沒有「捲到最新」浮動鈕**（AI Elements 與 ChatGPT 有）。它需要輸入底欄高度與捲動狀態跨元件傳遞，成本大於價值；維護者也要求不要過度設計。
 4. **沒有 Undo。** NN/g 建議提供 Undo；需要後端支援，不在這次視覺改版。
@@ -371,3 +371,30 @@ ChatGPT 的「Thought for N seconds」介面只找到第三方描述，沒有官
 本案取捨：保留名稱與頭像，員工原話改用細線區隔、顧問保留純文字；淡化頭像、減少完成狀態的大色塊，輸入框改較小圓角。正式回覆載入後，過程入口留在對應的回覆下方；尚未載入時仍可從原位置查回。所有配色沿現有 token，不引入動畫、框架或第二套聊天狀態。
 
 程式沿 [React 的 Effect 使用界線](https://react.dev/learn/you-might-not-need-an-effect)：能從已確認 Turn 推導的表單顯示直接推導；新 command 與草稿清理放在送出事件，不用 Effect 自動開下一輪。產品規則以[介面文件](../../implementation/interface-and-delivery.md#2-串流不是保存權威)為準，測試與畫面檢查另記[證據 §15](../../history.md#source-a75c36d876a672e0f607)。
+
+## 16. 聊天輸入器：Enter 送出與按鈕按下狀態（2026-10-05）
+
+維護者要求聊天室可以按 Enter 送出，並把按鈕做得更好看。這次推翻 §9「刻意不同 1」：當時不做，是因為注音選字的 Enter 會誤送；現在以輸入法組字判斷解決，不必再避開通行慣例。
+
+**Enter（行為）**
+
+- **Fact（一手來源）：**[Vercel AI Elements 原碼](https://github.com/vercel/ai-elements/blob/main/packages/elements/src/prompt-input.tsx)的 `handleKeyDown`：Enter 且不在輸入法組字（`isComposing`）、沒按 Shift、送出鈕未停用時，以 `form.requestSubmit()` 送出，Shift＋Enter 換行；範例的送出鈕是 `disabled={!text && !status}`。[MDN keydown](https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event)：以 `event.isComposing || event.keyCode === 229` 略過輸入法處理的按鍵；`compositionend` 可能早於 `keydown`，此時 `isComposing` 為 false，但 keyCode 仍是 229。
+- **Mapping：**Enter 等同按下送出鈕（`sendDisabled` 單一判斷，鈕不可用就不動作；空白草稿與按鈕一樣提示填寫）。保存、重送、確認規則不動，沒有第二條送出路徑。「這個按鍵是不是送出」集中在 `features/interview/send-key.ts`；`keyCode` 已被 DOM 型別標示過時，是整個前端第一個 `eslint-disable`（`no-deprecated`，附原因），要退就刪那一行加上 Safari 的判斷。
+- **風險與緩解：**送出是正式訪談的起點，誤按 Enter 會把寫到一半的答案送出。緩解是既有的「取消處理」加「取回原文編輯」（草稿不會遺失）；送出鈕的提示標明「送出訪談（Enter）」。**沒有**另加常駐說明文字。
+
+**按鈕（質感）**
+
+- **Measured（公開頁，桌面 1440px，2026-10-05）：**GitHub 登入頁（Primer）主要鈕高 40、半徑 6、14px／500、邊框 `rgba(31,35,40,.15)`，次要鈕淡灰底 `#f6f8fa`＋邊框 `#d1d9e0`；Linear 導覽鈕高 32、膠囊形；Vercel 導覽鈕高 32、半徑 6、14px／500，轉場 150ms；Stripe 高 40、半徑 4、14px／400；Notion 高 36–38、半徑 8、16px／500，次要鈕是淡藍底無邊框。我們的矩形鈕（36px／半徑 8、小鈕 28px／半徑 6、字重 500、轉場 120ms）已在這個範圍內，不重做尺寸。Claude 登入頁沒有抓到按鈕（0 個候選），未取得。
+- **Fact（原碼）：**[Primer `ButtonBase.module.css`](https://github.com/primer/react/blob/main/packages/react/src/Button/ButtonBase.module.css)：default、primary、danger、invisible 都有獨立的 `:hover`、`:active`，停用時 `box-shadow: none`。[shadcn/ui `button.tsx`](https://github.com/shadcn-ui/ui/blob/main/apps/v4/registry/new-york-v4/ui/button.tsx) 現行版：outline 變體有 `shadow-xs`，圖示 16px（`size-4`），尺寸 sm 32／預設 36／lg 40。
+- **採用（`theme.ts` 單一來源；維護者「不要綠色，就白色，Apple 風格」）：**主要鈕原本是品牌綠實心，改成白底、深色字、字重 600，以一圈細邊加兩層柔陰影浮起（`shadow.button`／`buttonHover`；macOS 與 iOS 26 膠囊鈕的做法，是風格參照，不是逐字規格）；次要鈕維持細邊、不浮起，主次靠「浮起與否」區分；文字鈕改深色字、淡灰 hover；所有按鈕改膠囊（`radius.pill`）、圖示鈕改圓形；外框鈕保留 `shadow.xs`；實心、外框、文字、圖示鈕都補 `:active`（原本關了漣漪又沒有按下樣式）。就地編輯的「✓」同樣改白底浮起（`styles.css`）。破壞性確認鈕仍是紅色實心。
+- **刻意沒做：**①送出鈕在空白時停用（AI Elements 如此，ChatGPT、Claude 的畫面也如此，但這不是這次要求，既有 6 個單元測試把「可按」當成「查詢完成」的訊號，e2e 的強制色彩檢查也在空白草稿時量送出鈕，停用後的外觀未評估，要做另案）。②沒改尺寸、半徑、字重、圖示：實測落在主流範圍內。③沒碰「職務檔案清單頁」與刪除對話框：另一項進行中工作（職務檔案刪除）的範圍；該對話框的「取消」是文字樣式，與其他對話框的次要（外框）樣式不同，收尾時應統一。
+- **聊天室的按鈕（只改外觀，行為與測試不動；維護者「改 UI 就好」）：**暫停／繼續／取消處理與取回原文編輯、開始下一次訪談，由 28px 小鈕改為 36px 白色膠囊（拿掉 `size="small"`，形狀與顏色來自主題），與圓形送出鈕同一語言；送出鈕圖示由紙飛機改為向上箭頭（描邊 2.25；ChatGPT、Claude、Perplexity 的畫面都是向上箭頭，只是產品觀察，沒有官方文件），不再使用的 `SendIcon` 已刪。390px 寬量到無橫向溢出，處理控制鈕為 112×36。
+- **效果：**全產品的按鈕不再有品牌綠實心。仍是綠色的只有鍵盤焦點環、連結、頁籤指示線與少數標籤（不是按鈕，這次沒動；若也要去綠需另外決定）。
+
+**驗證**
+
+單元：Enter 7 項（含「弄壞各守衛，對應測試會失敗」的突變驗證：Shift、`isComposing`、keyCode 229 各一次）；完整 Vitest 45 檔／285 項、`tsc`、完整 ESLint、Prettier 全過。真 Chromium（私有示範站）：Shift＋Enter 換行不送；以 CDP 組字（keydown 為 key＝Process、isComposing＝true、keyCode＝229）時 Enter 不送；一般 Enter 只送一次且文字相同。**未驗證：**Safari／macOS 輸入法實機、e2e 全套（未起隔離 PostgreSQL）、Windows 高對比下的外框鈕陰影（陰影本來就會被該模式移除，邊框仍在）。
+
+**2026-10-05 白色改版後的驗證範圍：**維護者要求不跑大測試，所以只做截圖與量測（聊天室各狀態、對話框、就地編輯「✓」量到 28×28、白底、半徑 999px）與 Prettier、殘留引用檢查。完整 Vitest／`tsc`／ESLint 的通過紀錄是白色與全域膠囊改動**之前**跑的，改動後沒有重跑，e2e 也沒跑；JD 區小按鈕的左右內距由 10px 改 12px，沒有逐一重量版面。
+
+**2026-10-06 提交前回歸：**已對目前白色按鈕、全域膠囊、Enter 送出及檔案刪除的合併工作目錄執行 `pnpm check`，exit 0。Vitest 45 檔／285 項、TypeScript、ESLint、生成契約與 production build 均通過；這補上前述白色改版後未重跑的程式檢查，不新增 e2e、Safari／macOS 輸入法或高對比實機結論。刪除及取消／保存競爭的 PostgreSQL 結果另見[刪除驗證](../../experiments/product-validation/2026-10-05-job-file-deletion.md#取消與保存競爭的接續驗證2026-10-06)。

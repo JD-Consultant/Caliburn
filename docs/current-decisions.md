@@ -13,6 +13,7 @@
 
 | 主題 | 已確認的方向 | 責任文件 |
 |---|---|---|
+| 職務檔案管理 | 清單可建立、改名及確認刪除整份檔案；刪除含所屬歷史且不可復原，有執行中或暫停工作時拒絕 | [檔案刪除](implementation/interview-storage.md#11-整份職務檔案刪除)、[清單介面](implementation/interface-and-delivery.md#11-讀寫邊界) |
 | 訪談與 JD | 有效訪談、候選 JD 及正式完成分開；取消未完成工作不產生正式訪談資格 | [核心生命週期](specs/2026-09-29-core-value-loop-lifecycle.md)、[資料交易](architecture/persistence.md) |
 | Memory | B1 整理情境，B2 分析理解，再發布；不回交 B1，顧問讀固定的已發布快照 | [背景生命週期](specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[Memory 保存](implementation/memory-storage.md) |
 | Memory 內容組織 | 2026-10-05 收斂：保留原話 → 情境 → 理解分層；B1 按工作脈絡整理，B2 按工作意義重組。以可定位、可直接使用、可局部修訂決定理解粒度，A 依當前工作範圍選讀。單集合替代暫不推進；方法及教材已更新。正式 B2 提示已局部加入跨案數值副本維護規則，其餘方法未整體替換 B1／B2 提示 | [分析分工](specs/2026-09-25-b1-b2-information-gap-lifecycle.md#分析分工與內容方法)、[方法與範例](guides/2026-09-09-complete-work-analysis-guide.md#107-收斂後的整理與選讀準則)、[研究收斂與採用證據](research/agent-systems/2026-10-05-demand-loaded-memory-and-incremental-updates.md#10-研究收斂與可重算證據)、[既有 B2 比較](experiments/product-validation/data/memory-organization-2026-10-05/capability-aligned-results.md) |
@@ -31,7 +32,7 @@
 
 Memory 一般分析的充分性（2026-10-05，內容方向已確認）：已整理的現行工作應由理解或情境支援；原話保留給原句、歷史追溯及具體疑點查證，不作日常整理漏項的固定補救。[分析指南](guides/2026-09-09-complete-work-analysis-guide.md#104-小範圍足夠深理解應能直接使用)與[閱讀停止條件](specs/2026-09-27-memory-read-and-source-navigation-contract.md#a-顧問的閱讀與停止條件)已同步；[既有路徑核對](experiments/product-validation/data/early-interview-recall-2026-10-05/analysis/organized-work-sufficiency.md)區分一般工作與歷史題，不修改原判準／成績。後續[五對局部指引比較](experiments/product-validation/data/early-interview-recall-2026-10-05/reading-probe-01/README.md)完成：缺導覽時候選少讀一份情境 map，細節回答補回確認者，已有導覽時兩邊都未重讀。只支持局部候選，未改正式 Prompt／工具；本次占用 US$0.016609010，累計 US$1.442270635，外送已停止。
 
-公版工具契約接續（2026-10-05，已授權並實作）：[原審核](plans/evidence/2026-10-05-occupation-reference-tools/tool-contract-audit.md)三項反例已修正：全集合替換說明、各工具錯誤下一步、新寫入只回小型成功結果，完整 state 按需讀。舊 captured request 保留原回傳格式，重複／缺漏／格式混用在候選建立前拒絕；[回歸與獨立審查](plans/evidence/2026-10-05-occupation-reference-tools/hardening-verification.md)維護本輪驗證。搜尋仍回完整目錄，三層概覽仍是比較設計；共用服務未重啟，未將工程驗證當模型品質驗收。
+公版工具契約接續（2026-10-05，已授權並實作）：[原審核](experiments/engineering/2026-10-05-occupation-reference-tools/tool-contract-audit.md)三項反例已修正：全集合替換說明、各工具錯誤下一步、新寫入只回小型成功結果，完整 state 按需讀。舊 captured request 保留原回傳格式，重複／缺漏／格式混用在候選建立前拒絕；[回歸與獨立審查](experiments/engineering/2026-10-05-occupation-reference-tools/hardening-verification.md)維護本輪驗證。搜尋仍回完整目錄，三層概覽仍是比較設計；共用服務未重啟，未將工程驗證當模型品質驗收。
 
 JD／公版按需取用（2026-10-05，WORKING／方向已確認）：使用者確認只拿當前需要的資訊，同意 JD 局部讀取、公版候選概覽 → 選讀完整任務目錄 → 必要正文。[設計稿](specs/2026-10-05-jd-and-reference-demand-loading-design.md)沿既有讀取與 state，候選概覽優先放 App 模型工具投影，保留任何候選的完整目錄可讀，不改 RAG 排名。[單案離線字元量測](experiments/2026-10-05-reference-context-projection/README.md)已完成；全讀五份時輸出反而增加。搜尋 wire 尚未切換；接續工具說明及寫入 hardening 另見上項，不重寫執行中請求。模型選讀、實際 token／耗時及 JD 品質比較後再決定三層取用正式切換。
 
@@ -53,13 +54,13 @@ Memory 比較（2026-10-05，研究證據）：[三批分層與完整原話配�
 
 公版 consumer 最新確認（2026-10-05，再次簡化）：使用者確認只需避免重問，不保存回答來源或一般確認紀錄。改為獨立 `excluded_work`，記員工明確沒做／不負責的具體範圍，與 Memory 分開，不自動加入向量 query；員工更正可解除。未知、拒答與尚未回答不能當作沒做。最新責任以[只保留明確否認範圍](specs/2026-10-04-public-reference-completion-design.md#最新確認只保留明確否認的工作範圍)為準；已授權並完成可選角色接線，避免重問與收尾品質另以模型實驗評估。
 
-主要參考選擇 state（2026-10-05）：目前兩欄為 `selected_reference_ids` 與 `excluded_work`。候選公版先看概述／任務目錄，可多選或不選，需要才讀正文；重選不清除否認範圍。採用、取消、重播及回復沿既有 Turn 資格。[工具契約](specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型)、[實作與驗證](plans/2026-10-05-occupation-reference-tools.md)維護現況，前版回答來源方案留作沿革，不是並存工具。
+主要參考選擇 state（2026-10-05）：目前兩欄為 `selected_reference_ids` 與 `excluded_work`。候選公版先看概述／任務目錄，可多選或不選，需要才讀正文；重選不清除否認範圍。採用、取消、重播及回復沿既有 Turn 資格。[工具契約](specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型)、[實作與驗證](experiments/engineering/README.md#公版參考工具)維護現況，前版回答來源方案留作沿革，不是並存工具。
 
-Memory 排除範圍唯讀（2026-10-05）：`read_excluded_work({})` 沿既有 Memory binding／持久 F 讀取有效正式 state，不把後輪新增或更正帶回舊批次；沒有複製到 Memory 或增加寫入權限。[唯讀契約](specs/2026-10-04-public-reference-completion-design.md#memory-的排除範圍唯讀入口未接模型)與[元件驗證](plans/evidence/2026-10-05-occupation-reference-tools/memory-read-verification.md)維護責任；接續[可選角色接線](plans/2026-10-05-occupation-reference-agent-integration.md)保留原請求工具清單，現有共用服務未重啟。
+Memory 排除範圍唯讀（2026-10-05）：`read_excluded_work({})` 沿既有 Memory binding／持久 F 讀取有效正式 state，不把後輪新增或更正帶回舊批次；沒有複製到 Memory 或增加寫入權限。[唯讀契約](specs/2026-10-04-public-reference-completion-design.md#memory-的排除範圍唯讀入口未接模型)與[元件驗證](experiments/engineering/2026-10-05-occupation-reference-tools/memory-read-verification.md)維護責任；接續[可選角色接線](experiments/engineering/README.md#角色接線)保留原請求工具清單，現有共用服務未重啟。
 
 獨立 RAG API：2026-10-05 使用者已授權[公版職位參考 API](specs/2026-10-05-occupation-reference-api-design.md)
 及必要重構，實作沿原話 D20/T20 完整聯集至 rerank 控制初值，提供最多五份去重公版、完整
-已解析目錄及固定來源任務正文讀取。驗證與重播見[施工紀錄](plans/2026-10-05-occupation-reference-api.md)。
+已解析目錄及固定來源任務正文讀取。驗證與重播見[驗證紀錄](experiments/engineering/README.md#公版參考-api)。
 App／Agent consumer 可由明示設定啟用，操作及恢復依 [ADR0080](adr/0080-opt-in-public-reference-agent-tools.md)；控制初值不升格為通用最佳品質參數，收尾效果另測。
 
 以下不是重開已結案的 T01–T18，而是後續維護的定位入口。

@@ -1494,9 +1494,9 @@ $$
 
 三例的向量與 rerank 分數皆上升，其中兩例進前五。結果支持將否認範圍另存、查詢以確認工作為主；它不表示所有否定句都會失效，也尚未驗證模型自動產生正向查詢的忠實性。[否認查詢原件](../../experiments/2026-10-05-negated-work-retrieval/run-01/summary.json)
 
-工程驗證分開記錄：真 Qdrant 的來源與資料單位核對、八案既有向量／logit 重播均重現前五；另以 F01 完成一次新 query embedding、34 個候選重排序及 64 次任務讀取，前五一致，單次約 3.544 秒。此數字含來源讀取，只是一例，不能稱作平均延遲、p95 或已證明的加速。[API 驗證原件](../../plans/evidence/2026-10-05-occupation-reference-api/live-search-result.json)
+工程驗證分開記錄：真 Qdrant 的來源與資料單位核對、八案既有向量／logit 重播均重現前五；另以 F01 完成一次新 query embedding、34 個候選重排序及 64 次任務讀取，前五一致，單次約 3.544 秒。此數字含來源讀取，只是一例，不能稱作平均延遲、p95 或已證明的加速。[API 驗證原件](../../experiments/engineering/2026-10-05-occupation-reference-api/live-search-result.json)
 
-App 側的搜尋、讀取、選用與排除工作工具另驗契約及 PostgreSQL 保存；Memory 只讀固定批次上界內的排除範圍。它們尚未註冊到正式模型，也沒有自動判定 JD 完成。工具測試與檢索品質、顧問追問品質、整份 JD／PDF 品質分別記錄，不能互相替代。[工具責任與驗證入口](../../specs/2026-10-04-public-reference-completion-design.md)
+App 側的搜尋、讀取、選用與排除工作工具另驗契約及 PostgreSQL 保存；Memory 只讀固定批次上界內的排除範圍。工具已可依明示設定接入顧問，不自動判定 JD 完成。工具測試與檢索品質、顧問追問品質、整份 JD／PDF 品質分別記錄，不能互相替代。[工具責任與驗證入口](../../specs/2026-10-04-public-reference-completion-design.md)、[可選接線驗證](../../experiments/engineering/README.md#角色接線)
 
 #### B.14.5 前期比較與採用結論
 

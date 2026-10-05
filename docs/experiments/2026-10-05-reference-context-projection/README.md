@@ -4,7 +4,7 @@
 
 ## 資料與方法
 
-輸入是既有 [F01 API 原件](../../plans/evidence/2026-10-05-occupation-reference-api/live-search-result.json)。讀既有五份 reference，重建目前 App 搜尋工具投影，再建立候選概覽。概覽只帶固定 ID、名稱、原始概述及全部工作單元名稱；不送 similarity、任務目錄、OPKS 正文或新的模型摘要。
+輸入是既有 [F01 API 原件](../../experiments/engineering/2026-10-05-occupation-reference-api/live-search-result.json)。讀既有五份 reference，重建目前 App 搜尋工具投影，再建立候選概覽。概覽只帶固定 ID、名稱、原始概述及全部工作單元名稱；不送 similarity、任務目錄、OPKS 正文或新的模型摘要。
 
 兩組皆用 `json.dumps(ensure_ascii=False, separators=(",", ":"))` 序列化。額外讀第 1／前 2／全部 5 份完整目錄，僅作大小敏感度情境；不是顧問實際選擇，不判定哪份適合員工。累計字元包含第一份概覽及每次完整目錄結果，未計提示、工具參數、state 或任務正文。
 

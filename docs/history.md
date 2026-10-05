@@ -11,6 +11,10 @@
 
 未引用原件由本機搬移 CSV 與 Git 歷史查閱，不逐項列於本頁。原件留在本機 ignored archive；下列 git show 只讀取固定提交的版本，不保證包含其後的未提交修改，沒有 blob 的項目不提供取回命令。
 
+2026-10-06 整理公版檢索與 API／工具的已結案計畫、文件維護檢查及分支準備清單：原件存於本機 `docs/archive/2026-10-06-completed-plans/`，搬移清單記錄原路徑與 SHA-256，不隨 Git 發布。整理前版本為 `67c8bf0d54bb06a6c44833a20d38bceef966c682`；例如可用 `git show '67c8bf0d54bb06a6c44833a20d38bceef966c682:docs/plans/2026-10-05-occupation-reference-api.md'` 查閱當時計畫。API／工具的有效反例與重播原件另留在[工程驗證](experiments/engineering/README.md)，檢索實驗與專題報告原件仍保留。未完成的品質研究以當前設計文件為準，不以結案清單推定完成。
+
+2026-10-06 另將退役的 `experiments/jd-relational-app/` 整個目錄移至本機 `docs/archive/2026-10-06-retired-app/`。目錄只剩七份舊操作說明、測試支援筆記與沿革文件，原始內容與逐檔雜湊均保留。封存前確認沒有程序或 Docker 掛載使用該目錄，未停止現行 App，也未改資料庫或 volume。七份文件可從上述整理前提交取回；例如 `git show '67c8bf0d54bb06a6c44833a20d38bceef966c682:experiments/jd-relational-app/README.md'`。退役前程式仍依 [ADR0079](adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)查閱。
+
 <a id="source-6d950507a5dd6e11d4ed"></a>
 - 原路徑 `docs/specs/2026-07-13-ai-layer-v3-code-annex.md`：基準有 blob；只讀取回 `git show 'af62218a:docs/specs/2026-07-13-ai-layer-v3-code-annex.md'`。
 

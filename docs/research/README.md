@@ -21,7 +21,7 @@
 
 - 長任務沒有唯一答案時如何收尾：[JD 長任務收斂研究](work-analysis/2026-10-05-jd-long-task-convergence.md)。比較動態分解、反覆修訂、必要條件與提問價值；當輪確認紀錄方案保留沿革，最新公版 state 以[選用公版＋明確否認範圍](../specs/2026-10-04-public-reference-completion-design.md#最新確認只保留明確否認的工作範圍)為準。收尾效果仍需模型比較。
 - 分層 Memory 的內容組織與選讀：[大資料方法與目前收斂](agent-systems/2026-10-05-demand-loaded-memory-and-incremental-updates.md#9-收斂採用既有分層改善內容組織與選讀)。保留原話 → 情境 → 理解，借鑑必要脈絡就近組織、增量修訂及按需載入；正式 B1／B2 提示未替換。[表示方案研究](agent-systems/2026-10-05-interview-memory-representation-alternatives.md)保留早期單集合等候選的比較沿革。
-- 長任務 Agent 是否需要已完成／未完成進度：[進度保存與公版核對研究](retrieval/2026-10-05-long-running-agent-progress.md)。比較官方接續做法及待辦清單消融，保留各輪方案沿革；最新 state 已獨立保存明確否認並完成[可選角色接線](../plans/2026-10-05-occupation-reference-agent-integration.md)，未驗證重問率或收尾品質。
+- 長任務 Agent 是否需要已完成／未完成進度：[進度保存與公版核對研究](retrieval/2026-10-05-long-running-agent-progress.md)。比較官方接續做法及待辦清單消融，保留各輪方案沿革；最新 state 已獨立保存明確否認並完成[可選角色接線](../experiments/engineering/README.md#角色接線)，未驗證重問率或收尾品質。
 
 - 公版檢索如何判斷有效輸出：[相關性標註與評估研究](retrieval/2026-10-04-retrieval-relevance-judgment-methods.md)。研究／候選；比較 TREC／BEIR、官方自動評估與有／無對照方法，提出正文證據、局部／整體價值及已知支持涵蓋的候選判準，尚未建立新評分資料或正式契約。
 - 公版參考處理進度與 Memory 更新：[研究比較](retrieval/2026-10-04-public-reference-progress-and-context-selection.md)。研究／候選；比較保存粒度、員工選答、App 投影與顧問局部重核。當時方案保留研究沿革；後續已完成可選 consumer 接線，現行範圍優先整份 JD 收尾，細節用途後續，權責依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)。

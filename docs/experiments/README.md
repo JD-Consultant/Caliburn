@@ -6,6 +6,7 @@
 大份 JSON 與 trace 以 gzip 無損保存；原始位元組、SHA-256 及重現前的還原步驟見[大檔原件保存](artifact-storage.md)。
 
 現行產品的合成訪談、指引比較、來源差異及長旅程原件，從[產品驗證資料](product-validation/README.md)查閱。
+公版 API、工具與角色接線的反例、回歸及重播資料，從[工程驗證紀錄](engineering/README.md)查閱。
 本目錄不是通用 eval 平台，也不取代 [research/](../research/README.md) 的研究或 `docs/adr/` 的決策。
 
 ## 1. 與其他文檔的邊界

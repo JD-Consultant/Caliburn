@@ -52,7 +52,7 @@ JD 是總目標。底下各項工作類似子任務，數量與粒度沒有預�
 
 ## 5. 現行接線與具體缺口
 
-現行 [state 契約](../../specs/2026-10-04-public-reference-completion-design.md)已有 selected references、可更正的 `excluded_work`、跨輪正式資格與 Memory 固定 F。[接線驗證](../../plans/evidence/2026-10-05-occupation-reference-tools/agent-integration-verification.md)證明保存、工具分派及原生恢復。
+現行 [state 契約](../../specs/2026-10-04-public-reference-completion-design.md)已有 selected references、可更正的 `excluded_work`、跨輪正式資格與 Memory 固定 F。[接線驗證](../../experiments/engineering/2026-10-05-occupation-reference-tools/agent-integration-verification.md)證明保存、工具分派及原生恢復。
 
 顧問[公版指引](../../../apps/api/src/caliburn/agents/job_consultant/reference_instructions.py)要求按需讀 state；[initial context](../../../apps/api/src/caliburn/agents/job_consultant/context_binding.py)目前組 Memory maps、近期訪談及當輪員工輸入，沒有自動加入排除清單。也沒有結構化的員工提問出口來阻擋重問。
 

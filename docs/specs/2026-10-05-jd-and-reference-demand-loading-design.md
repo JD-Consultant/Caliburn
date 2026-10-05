@@ -83,7 +83,7 @@
 | `update_excluded_work` | `add`／`remove` 必填陣列，至少一欄非空；每項非空且不可含 NUL；不得交集。remove 須精確命中已有字串，未知移除整批拒絕。 | 新請求只回 `{"status":"updated"}`；不是原話來源、向量輸入或完成判定。 |
 | `read_excluded_work` | B1／B2 的 `{}`，唯讀。 | 只回 `excluded_work` 完整清單；[] 為沒有排除，與讀取失敗不同。 |
 
-模型工具的 `strict` 約束 function arguments；成功及錯誤回傳仍由 App 型別驗證、序列化及測試，不因 input schema 合法就自動保證輸出正確。[前輪審核](../plans/evidence/2026-10-05-occupation-reference-tools/tool-contract-audit.md)發現的完整 state 重複回傳，已由獨立 hardening 切片改成固定小型成功結果；完整 state 另讀。舊 captured request 依原工具定義保留完整回傳，原生結果不回寫；不隨搜尋投影靜默切換。
+模型工具的 `strict` 約束 function arguments；成功及錯誤回傳仍由 App 型別驗證、序列化及測試，不因 input schema 合法就自動保證輸出正確。[前輪審核](../experiments/engineering/2026-10-05-occupation-reference-tools/tool-contract-audit.md)發現的完整 state 重複回傳，已由獨立 hardening 切片改成固定小型成功結果；完整 state 另讀。舊 captured request 依原工具定義保留完整回傳，原生結果不回寫；不隨搜尋投影靜默切換。
 
 ### 4.5 候選 description 與角色指引
 

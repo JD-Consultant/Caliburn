@@ -570,11 +570,11 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 
 ### 6.3 公版工具的可選角色接線
 
-公版工具的可選接線依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)：bootstrap 只在明示配置時供 A 注入 RAG client，B1／B2 只增加排除範圍唯讀工具。角色先從自己的原 preparation checkpoint 還原模板，工具權限沿已捕捉 request；同工作重入不換提示或增加工具。A 的公版寫入 command 沿既有 prepare／execute／result 節點，重播不倒帶候選；B 的排除讀取沿原 Memory binding／F。實作與反例見[接線紀錄](../plans/2026-10-05-occupation-reference-agent-integration.md)。
+公版工具的可選接線依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)：bootstrap 只在明示配置時供 A 注入 RAG client，B1／B2 只增加排除範圍唯讀工具。角色先從自己的原 preparation checkpoint 還原模板，工具權限沿已捕捉 request；同工作重入不換提示或增加工具。A 的公版寫入 command 沿既有 prepare／execute／result 節點，重播不倒帶候選；B 的排除讀取沿原 Memory binding／F。實作與反例見[接線紀錄](../experiments/engineering/README.md#角色接線)。
 
 `ConsultantRunner._tools` 在建立公版候選前，核對原 captured request 的工具組與寫入結果格式。公版工具缺漏、名稱重複或格式混用時拒絕；合法請求由 `occupation_reference_write_result_format` 決定 handler 的回傳模式。
 
-這個判斷使用原工具定義，不讀當前全域設定。已保存的 native output 直接接續，只有尚未完成的命令才沿原模式 execute。固定描述後綴及兩種結果格式只在[公版工具契約](../specs/2026-10-04-public-reference-completion-design.md#工具契約接續改善2026-10-05)完整定義，[回歸與獨立審查](../plans/evidence/2026-10-05-occupation-reference-tools/hardening-verification.md)保存實際證據。
+這個判斷使用原工具定義，不讀當前全域設定。已保存的 native output 直接接續，只有尚未完成的命令才沿原模式 execute。固定描述後綴及兩種結果格式只在[公版工具契約](../specs/2026-10-04-public-reference-completion-design.md#工具契約接續改善2026-10-05)完整定義，[回歸與獨立審查](../experiments/engineering/2026-10-05-occupation-reference-tools/hardening-verification.md)保存實際證據。
 
 ## 7. Memory 背景工作
 

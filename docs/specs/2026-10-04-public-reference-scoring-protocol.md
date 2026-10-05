@@ -99,4 +99,4 @@
 
 下一個元件是評審校準及有界實驗請求，之後用相同評審比較原話／Memory 表示，再依既定順序比較資料單位、DB／參數及檢索後決策模型。公版／員工工作保持多對多；單項 JD 任務完整度機制、整份 JD 收尾效果及 PDF 交付仍為後續驗證。
 
-關聯：[職位整體參考搜尋](2026-10-04-occupation-overview-reference-retrieval-design.md)、[上位研究](../research/retrieval/2026-10-04-retrieval-relevance-judgment-methods.md)、[元件順序](../plans/2026-10-04-public-reference-retrieval-design.md)、[目前決策](../current-decisions.md)。
+關聯：[職位整體參考搜尋](2026-10-04-occupation-overview-reference-retrieval-design.md)、[上位研究](../research/retrieval/2026-10-04-retrieval-relevance-judgment-methods.md)、[驗證順序](../specs/2026-10-04-public-reference-retrieval-design.md)、[目前決策](../current-decisions.md)。

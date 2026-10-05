@@ -1,8 +1,13 @@
 """Configure the official checkpoint serializer; payload allowlists belong to callers."""
 
 from collections.abc import Iterable
+from uuid import UUID
 
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+from psycopg import AsyncConnection
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 def create_graph_serializer(*, allowed_types: Iterable[type[object]] = ()) -> JsonPlusSerializer:
@@ -24,3 +29,23 @@ def create_graph_serializer(*, allowed_types: Iterable[type[object]] = ()) -> Js
         allowed_json_modules=None,
         allowed_msgpack_modules=tuple(allowed_types),
     )
+
+
+async def delete_job_file_checkpoints(session: AsyncSession, job_file_id: UUID) -> None:
+    """Use the native saver on the caller's transaction, never a second committing pool."""
+    thread_ids = await session.scalars(
+        text(
+            "SELECT thread_id FROM checkpoints WHERE thread_id LIKE :prefix "
+            "UNION SELECT thread_id FROM checkpoint_blobs WHERE thread_id LIKE :prefix "
+            "UNION SELECT thread_id FROM checkpoint_writes WHERE thread_id LIKE :prefix"
+        ),
+        {"prefix": f"{job_file_id}:%"},
+    )
+    connection = await session.connection()
+    raw_connection = await connection.get_raw_connection()
+    driver = raw_connection.driver_connection
+    if not isinstance(driver, AsyncConnection):
+        raise RuntimeError("Checkpoint deletion requires the configured psycopg driver")
+    saver = AsyncPostgresSaver(driver)
+    for thread_id in thread_ids:
+        await saver.adelete_thread(thread_id)

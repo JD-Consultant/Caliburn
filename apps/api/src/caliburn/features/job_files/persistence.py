@@ -3,7 +3,17 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Text, func, select, update
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Text,
+    delete,
+    func,
+    select,
+    update,
+)
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
@@ -51,7 +61,9 @@ class JobFileRenameRecord(Base):
         ),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     command_id: Mapped[UUID] = mapped_column(primary_key=True)
     display_name: Mapped[str] = mapped_column(Text)
     expected_name_revision: Mapped[int] = mapped_column(BigInteger)
@@ -133,3 +145,8 @@ async def list_job_files(session: AsyncSession) -> list[JobFileRecord]:
             select(JobFileRecord).order_by(JobFileRecord.created_at, JobFileRecord.job_file_id)
         )
     )
+
+
+async def delete_job_file(session: AsyncSession, job_file_id: UUID) -> None:
+    """The database cascades this root deletion; the caller owns its transaction."""
+    await session.execute(delete(JobFileRecord).where(JobFileRecord.job_file_id == job_file_id))

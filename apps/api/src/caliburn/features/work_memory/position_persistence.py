@@ -23,10 +23,13 @@ class MemoryPositionRecord(Base):
             ["job_file_id", "parent_position_id"],
             ["memory_positions.job_file_id", "memory_positions.position_id"],
             name="fk_memory_positions_parent",
+            ondelete="CASCADE",
         ),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     position_id: Mapped[UUID] = mapped_column(primary_key=True)
     parent_position_id: Mapped[UUID | None]
     is_sealed: Mapped[bool] = mapped_column(Boolean, server_default=false())
@@ -40,6 +43,7 @@ class MemoryPositionMemberRecord(Base):
             ["job_file_id", "position_id"],
             ["memory_positions.job_file_id", "memory_positions.position_id"],
             name="fk_memory_position_members_position",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "object_id", "revision_id"],
@@ -49,6 +53,7 @@ class MemoryPositionMemberRecord(Base):
                 "memory_object_revisions.revision_id",
             ],
             name="fk_memory_position_members_revision",
+            ondelete="CASCADE",
         ),
     )
 

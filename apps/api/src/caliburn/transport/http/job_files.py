@@ -10,6 +10,7 @@ from caliburn.contracts.generated.create_job_file_request import CreateJobFileRe
 from caliburn.contracts.generated.interview_history import InterviewHistory, InterviewMessage
 from caliburn.contracts.generated.job_file_list import JobFile, JobFileList
 from caliburn.contracts.generated.rename_job_file_request import RenameJobFileRequest
+from caliburn.features.executions.models import ExecutionBusyError
 from caliburn.features.job_files.models import (
     CreateJobFile,
     CreationCommandConflictError,
@@ -31,6 +32,15 @@ def get_job_file_workflow(request: Request) -> JobFileWorkflow:
 
 
 JobFiles = Annotated[JobFileWorkflow, Depends(get_job_file_workflow)]
+
+
+@router.delete("/{job_file_id}", status_code=204)
+async def delete_job_file(job_file_id: UUID, workflow: JobFiles) -> Response:
+    try:
+        await workflow.delete(job_file_id)
+    except ExecutionBusyError as error:
+        raise HTTPException(status_code=409, detail={"code": "job_file_busy"}) from error
+    return Response(status_code=204)
 
 
 @router.post("", status_code=201, response_model=JobFile, responses={200: {"model": JobFile}})

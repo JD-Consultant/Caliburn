@@ -16,6 +16,7 @@ const publicErrorCodes = new Set([
   'model_not_configured',
   'consultant_unavailable',
   'job_file_not_found',
+  'job_file_busy',
   'jd_review_baseline_not_available',
 ]);
 
@@ -55,7 +56,7 @@ export async function requestJson<T>(
       code,
     );
   }
-  const value: unknown = await response.json();
+  const value: unknown = response.status === 204 ? undefined : await response.json();
   if (!validate(value)) throw new ApiError('服務回傳的資料格式不符，尚未採用這份結果。');
   return value;
 }

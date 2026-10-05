@@ -34,7 +34,9 @@ class MemoryObjectRecord(Base):
         CheckConstraint("layer IN ('work_situation', 'work_understanding')", name="layer"),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     object_id: Mapped[UUID] = mapped_column(primary_key=True)
     layer: Mapped[str] = mapped_column(Text)
 
@@ -46,6 +48,7 @@ class MemoryBodyRecord(Base):
             ["job_file_id", "object_id"],
             ["memory_objects.job_file_id", "memory_objects.object_id"],
             name="fk_memory_bodies_object",
+            ondelete="CASCADE",
         ),
         CheckConstraint("length(btrim(body)) > 0", name="body_content"),
     )
@@ -63,11 +66,13 @@ class MemoryObjectRevisionRecord(Base):
             ["job_file_id", "object_id"],
             ["memory_objects.job_file_id", "memory_objects.object_id"],
             name="fk_memory_object_revisions_object",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "object_id", "body_id"],
             ["memory_bodies.job_file_id", "memory_bodies.object_id", "memory_bodies.body_id"],
             name="fk_memory_object_revisions_body",
+            ondelete="CASCADE",
         ),
         CheckConstraint("length(btrim(title)) > 0", name="title_content"),
         CheckConstraint("length(btrim(description)) > 0", name="description_content"),
@@ -94,16 +99,19 @@ class MemoryInterviewReferenceRecord(Base):
                 "memory_object_revisions.revision_id",
             ],
             name="fk_memory_interview_references_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "source_id"],
             ["interview_texts.job_file_id", "interview_texts.source_id"],
             name="fk_memory_interview_references_source_file",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "object_id", "owner_layer"],
             ["memory_objects.job_file_id", "memory_objects.object_id", "memory_objects.layer"],
             name="fk_memory_interview_references_owner_layer",
+            ondelete="CASCADE",
         ),
         CheckConstraint("owner_layer = 'work_situation'", name="owner_layer"),
     )
@@ -112,7 +120,7 @@ class MemoryInterviewReferenceRecord(Base):
     object_id: Mapped[UUID] = mapped_column(primary_key=True)
     revision_id: Mapped[UUID] = mapped_column(primary_key=True)
     source_id: Mapped[UUID] = mapped_column(
-        ForeignKey("formal_interviews.source_id"), primary_key=True
+        ForeignKey("formal_interviews.source_id", ondelete="CASCADE"), primary_key=True
     )
     owner_layer: Mapped[str] = mapped_column(Text, server_default="work_situation")
 
@@ -128,6 +136,7 @@ class MemorySituationReferenceRecord(Base):
                 "memory_object_revisions.revision_id",
             ],
             name="fk_memory_situation_references_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "source_object_id", "source_revision_id"],
@@ -137,16 +146,19 @@ class MemorySituationReferenceRecord(Base):
                 "memory_object_revisions.revision_id",
             ],
             name="fk_memory_situation_references_source_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "object_id", "owner_layer"],
             ["memory_objects.job_file_id", "memory_objects.object_id", "memory_objects.layer"],
             name="fk_memory_situation_references_owner_layer",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "source_object_id", "source_layer"],
             ["memory_objects.job_file_id", "memory_objects.object_id", "memory_objects.layer"],
             name="fk_memory_situation_references_source_layer",
+            ondelete="CASCADE",
         ),
         CheckConstraint("owner_layer = 'work_understanding'", name="owner_layer"),
         CheckConstraint("source_layer = 'work_situation'", name="source_layer"),

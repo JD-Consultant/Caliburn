@@ -60,7 +60,6 @@ export function ConsultantTurnControls({ turn }: { turn: ConsultantTurn }) {
             <Button
               key={control}
               variant="outlined"
-              size="small"
               startIcon={icons[control]}
               disabled={command.isPending}
               onClick={() => {

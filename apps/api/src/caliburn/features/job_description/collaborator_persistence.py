@@ -30,7 +30,9 @@ class CollaboratorRevisionRecord(Base):
         ),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     collaborator_id: Mapped[UUID] = mapped_column(primary_key=True)
     content_revision_id: Mapped[UUID] = mapped_column(primary_key=True)
     name: Mapped[str | None] = mapped_column(Text)
@@ -44,6 +46,7 @@ class CollaboratorSelectionRecord(Base):
             ["job_file_id", "revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_collaborator_selections_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "collaborator_id", "content_revision_id"],
@@ -53,6 +56,7 @@ class CollaboratorSelectionRecord(Base):
                 "jd_collaborator_revisions.content_revision_id",
             ],
             name="fk_jd_collaborator_selections_content",
+            ondelete="CASCADE",
         ),
         UniqueConstraint("job_file_id", "revision_id", "position"),
         CheckConstraint("position >= 0", name="position"),

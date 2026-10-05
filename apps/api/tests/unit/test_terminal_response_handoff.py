@@ -2,12 +2,15 @@
 
 import asyncio
 from dataclasses import replace
+from uuid import uuid4
 
 import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 
 from caliburn.agent_execution.result_save_retries import ResultSaveCancelledError
 from caliburn.agent_execution.tool_steps import ResponseStepSaveError, run_response_step
+from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
+from caliburn.workflows.execution_failures import run_with_failure_boundary
 from caliburn.workflows.model_requests import (
     ReceivedModelResponseCancelledError,
     ReceivedModelResponseError,
@@ -65,7 +68,10 @@ async def test_terminal_carrier_saves_or_holds_original_without_effects(cancelle
     assert accounted == [received.attempt_id]
 
 
-async def test_real_task_cancellation_after_terminal_retains_original_without_effects():
+@pytest.mark.parametrize("supervised_boundary", [False, True])
+async def test_real_task_cancellation_after_terminal_retains_original_without_effects(
+    supervised_boundary,
+):
     saver = InMemorySaver()
     probe = CapacityProbe([100])
     closing = asyncio.Event()
@@ -87,7 +93,21 @@ async def test_real_task_cancellation_after_terminal_retains_original_without_ef
         max_tool_calls=2,
         runtime=replace(probe.runtime(), request_model=model, account_response=account),
     )
-    task = asyncio.create_task(run_response_step(saver, request=request_fixture(), **args))
+
+    async def run(writer):
+        return await run_response_step(saver, request=request_fixture(), **args)
+
+    async def settle(writer, error):
+        raise AssertionError("Cancellation cannot settle as a failed product execution")
+
+    writer = ExecutionWriter(
+        ExecutionScope(uuid4(), uuid4(), ExecutionKind.CONSULTANT_TURN), uuid4()
+    )
+    task = asyncio.create_task(
+        run_with_failure_boundary(writer, run=run, settle_failure=settle)
+        if supervised_boundary
+        else run_response_step(saver, request=request_fixture(), **args)
+    )
     await asyncio.wait_for(closing.wait(), timeout=5)
     task.cancel()
     with pytest.raises(ResultSaveCancelledError) as stopped:
@@ -101,6 +121,8 @@ async def test_real_task_cancellation_after_terminal_retains_original_without_ef
     error = stopped.value
     while error is not None:
         tasks = [arg for arg in error.args if isinstance(arg, asyncio.Task)]
+        if supervised_boundary:
+            assert all(native.done() for native in tasks)
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
         error = error.__cause__

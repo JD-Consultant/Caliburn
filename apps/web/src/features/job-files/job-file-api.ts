@@ -34,3 +34,12 @@ export function renameJobFile(jobFileId: string, command: RenameJobFileRequest):
     body: JSON.stringify(command),
   });
 }
+
+/** 共用 HTTP 邊界將空正文 204 映射為 undefined。 */
+export function deleteJobFile(jobFileId: string): Promise<void> {
+  return requestJson(
+    `/api/job-files/${encodeURIComponent(jobFileId)}`,
+    (value): value is undefined => value === undefined,
+    { method: 'DELETE' },
+  );
+}

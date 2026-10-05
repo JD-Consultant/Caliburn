@@ -41,7 +41,9 @@ class ContextHistoryHeadRecord(Base):
         ),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     role: Mapped[str] = mapped_column(Text, primary_key=True)
     thread_id: Mapped[str | None] = mapped_column(Text)
     checkpoint_id: Mapped[str | None] = mapped_column(Text)
@@ -52,11 +54,14 @@ class ContextHistoryBindingRecord(Base):
     __tablename__ = "context_history_bindings"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["job_file_id", "execution_id"], ["executions.job_file_id", "executions.execution_id"]
+            ["job_file_id", "execution_id"],
+            ["executions.job_file_id", "executions.execution_id"],
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "role"],
             ["context_history_heads.job_file_id", "context_history_heads.role"],
+            ondelete="CASCADE",
         ),
         CheckConstraint(
             "role IN ('job_consultant', 'work_situation_analyst', 'work_understanding_analyst')",

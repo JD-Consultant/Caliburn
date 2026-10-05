@@ -58,10 +58,6 @@ export const LinkIcon = createIcon('LinkIcon', [
   'M15 7h2a5 5 0 1 1 0 10h-2',
   'M8 12h8',
 ]);
-export const SendIcon = createIcon('SendIcon', [
-  'M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z',
-  'M6 12h16',
-]);
 export const PauseIcon = createIcon('PauseIcon', [
   'M15 3h3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z',
   'M6 3h3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z',

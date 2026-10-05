@@ -21,6 +21,7 @@ class ReferenceOperationRecord(Base):
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
             name="fk_reference_operation_execution",
+            ondelete="CASCADE",
         ),
         UniqueConstraint(
             "job_file_id", "execution_id", "revision_id", name="uq_reference_revision"
@@ -33,6 +34,7 @@ class ReferenceOperationRecord(Base):
                 "occupation_reference_operations.revision_id",
             ],
             name="fk_reference_operation_expected",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "execution_id", "parent_revision_id"],
@@ -42,6 +44,7 @@ class ReferenceOperationRecord(Base):
                 "occupation_reference_operations.revision_id",
             ],
             name="fk_reference_operation_parent",
+            ondelete="CASCADE",
         ),
         CheckConstraint("kind IN ('start', 'apply', 'restore')", name="reference_operation_kind"),
         CheckConstraint(
@@ -80,6 +83,7 @@ class ReferenceCandidateRecord(Base):
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
             name="fk_reference_candidate_execution",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "execution_id", "base_revision_id"],
@@ -89,6 +93,7 @@ class ReferenceCandidateRecord(Base):
                 "occupation_reference_operations.revision_id",
             ],
             name="fk_reference_candidate_base",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "execution_id", "current_revision_id"],
@@ -98,6 +103,7 @@ class ReferenceCandidateRecord(Base):
                 "occupation_reference_operations.revision_id",
             ],
             name="fk_reference_candidate_current",
+            ondelete="CASCADE",
         ),
     )
 

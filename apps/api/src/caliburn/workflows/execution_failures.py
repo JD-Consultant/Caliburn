@@ -1,8 +1,10 @@
 """Last-resort settlement after normal workflow recovery is exhausted."""
 
+import asyncio
 import logging
 from collections.abc import Awaitable, Callable
 
+from caliburn.agent_execution.native_cleanup import await_native_cleanup
 from caliburn.features.executions.models import ExecutionWriter
 
 _LOG = logging.getLogger(__name__)
@@ -22,7 +24,11 @@ async def run_with_failure_boundary(
     """
     try:
         return await run(writer)
+    except asyncio.CancelledError as error:
+        await await_native_cleanup(error)
+        raise
     except Exception as error:
+        await await_native_cleanup(error)
         _LOG.warning(
             "Execution stopped; reconciling its terminal outcome",
             extra={

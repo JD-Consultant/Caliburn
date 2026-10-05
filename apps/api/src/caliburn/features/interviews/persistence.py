@@ -31,7 +31,9 @@ class InterviewTextRecord(Base):
     )
 
     source_id: Mapped[UUID] = mapped_column(primary_key=True)
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"))
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE")
+    )
     speaker: Mapped[str] = mapped_column(Text)
     interview_text: Mapped[str] = mapped_column(Text)
 
@@ -42,6 +44,7 @@ class FormalInterviewRecord(Base):
         ForeignKeyConstraint(
             ["job_file_id", "source_id"],
             ["interview_texts.job_file_id", "interview_texts.source_id"],
+            ondelete="CASCADE",
         ),
         UniqueConstraint("source_id"),
         CheckConstraint("interview_sequence > 0", name="positive_sequence"),
@@ -58,10 +61,12 @@ class InterviewInputRecord(Base):
         ForeignKeyConstraint(
             ["job_file_id", "source_id"],
             ["interview_texts.job_file_id", "interview_texts.source_id"],
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
+            ondelete="CASCADE",
         ),
         UniqueConstraint("source_id"),
         UniqueConstraint("execution_id"),
@@ -82,10 +87,12 @@ class InterviewReplyRecord(Base):
         ForeignKeyConstraint(
             ["job_file_id", "execution_id"],
             ["interview_inputs.job_file_id", "interview_inputs.execution_id"],
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "source_id"],
             ["interview_texts.job_file_id", "interview_texts.source_id"],
+            ondelete="CASCADE",
         ),
         UniqueConstraint("source_id"),
     )

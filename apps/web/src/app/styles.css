@@ -83,12 +83,12 @@ h6 {
   font-weight: 600;
 }
 
-/* The file list: quiet rows, one large click target per row, the rename action on hover. */
+/* The file list: quiet rows, one large click target per row, actions on hover or focus. */
 .file-list {
   overflow: hidden;
   background: var(--cb-surface);
 }
-.file-list .MuiTableRow-root:last-child .MuiTableCell-root {
+.file-list .MuiTableBody-root .MuiTableRow-root:last-child .MuiTableCell-root {
   border-block-end: 0;
 }
 .file-row {
@@ -127,13 +127,48 @@ h6 {
   color: var(--cb-text-muted);
   font-size: 0.8125rem;
 }
-.file-identity {
-  display: block;
-  margin-block-start: 2px;
+/* 清單沿用內頁閱讀紙面；不改動工作區或全域元件樣式。 */
+.job-files-page .file-list .MuiTableCell-root {
+  border-block-end-color: var(--cb-border-subtle);
+}
+.job-files-page .file-list .MuiTableCell-head {
+  padding-block: 16px;
+  background: var(--cb-surface);
   color: var(--cb-text-muted);
-  font-size: 0.75rem;
-  line-height: 1rem;
-  font-variant-numeric: tabular-nums;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.job-files-page .file-list .MuiTableCell-body {
+  padding-block: 20px;
+}
+.job-files-page .file-avatar {
+  background: var(--cb-canvas);
+  border: 1px solid var(--cb-border-subtle);
+  color: var(--cb-text-muted);
+}
+.job-files-page .row-link {
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+.job-files-page .row-action + .row-action {
+  margin-inline-start: 4px;
+}
+@media (any-pointer: coarse) {
+  .job-files-page .row-action {
+    width: 44px;
+    height: 44px;
+    opacity: 1;
+  }
+}
+@media (max-width: 599px) {
+  .job-files-page .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .job-files-page .file-avatar {
+    display: none;
+  }
 }
 
 /* ---- workspace: interview | JD, each pane scrolls on its own ---- */
@@ -900,19 +935,21 @@ details > summary:hover {
   justify-content: flex-end;
   gap: 4px;
 }
-/* Save is the one filled control, as PatternFly raises its confirm icon to the brand colour once there is
- * something to save and as the composer's send button is the only filled control there. */
+/* Save is the one raised control: a white face lifted by ring and shadow, like every other primary button. */
 .inline-edit__save.MuiIconButton-root {
-  background: var(--cb-accent);
-  color: var(--cb-on-accent);
+  background: var(--cb-surface);
+  color: var(--cb-text);
+  box-shadow: var(--cb-shadow-button);
 }
 .inline-edit__save.MuiIconButton-root:hover {
-  background: var(--cb-accent-hover);
-  color: var(--cb-on-accent);
+  background: var(--cb-canvas);
+  color: var(--cb-text);
+  box-shadow: var(--cb-shadow-button-hover);
 }
 .inline-edit__save.MuiIconButton-root.Mui-disabled {
   background: var(--cb-pressed);
   color: var(--cb-text-faint);
+  box-shadow: none;
 }
 /* Touch: a 28px icon is under every touch-target guideline. */
 @media (pointer: coarse) {

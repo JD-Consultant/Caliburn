@@ -18,7 +18,9 @@ class JdModelReferenceRecord(Base):
     reference_number: Mapped[int] = mapped_column(
         BigInteger, Identity(always=True), primary_key=True
     )
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"))
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE")
+    )
     canonical_ref: Mapped[str] = mapped_column(Text)
 
     @property

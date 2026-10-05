@@ -4,7 +4,7 @@ import asyncio
 from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
 from contextlib import asynccontextmanager
 from types import MappingProxyType
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -86,6 +86,10 @@ class ConsultantSupervisor:
 
     def has_runner(self, scope: ExecutionScope) -> bool:
         return scope in self._tasks
+
+    def has_file_runner(self, job_file_id: UUID) -> bool:
+        """Includes terminal invocations still saving or cleaning up native results."""
+        return any(scope.job_file_id == job_file_id for scope in self._tasks)
 
     async def start(self) -> None:
         if self._started or self._closing:

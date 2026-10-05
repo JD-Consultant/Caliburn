@@ -1,0 +1,92 @@
+{
+  "verified_at_utc": "2026-10-04T20:54:15.645015+00:00",
+  "scope": "authorized independent RAG API; no JD App integration",
+  "checks": [
+    {
+      "command": "apps/ocs-indexer/.venv/Scripts/python.exe -X utf8 -B -m pytest apps/ocs-indexer/tests apps/embedder/tests -q -p no:cacheprovider --basetemp S:/caliburn/tmp/reference-api-tests-20261005-09",
+      "exit_code": 0,
+      "tests_passed": 86,
+      "output": "pytest-final.txt"
+    },
+    {
+      "command": "apps/api/.venv/Scripts/ruff.exe check --select E,F,I --line-length 100 apps/ocs-indexer/src/jd_ocs_indexer/references apps/ocs-indexer/src/jd_ocs_indexer/reranking apps/ocs-indexer/src/jd_ocs_indexer/api/reference_routes.py apps/ocs-indexer/src/jd_ocs_indexer/api/app.py apps/ocs-indexer/src/jd_ocs_indexer/embeddings/http_embedder.py packages/indexer-contract/src/indexer_contract/references.py apps/embedder/app.py apps/embedder/reranking.py apps/embedder/tests apps/ocs-indexer/tests/test_http_embedder.py apps/ocs-indexer/tests/test_http_reranker.py apps/ocs-indexer/tests/test_reference_api.py apps/ocs-indexer/tests/test_reference_lifecycle.py apps/ocs-indexer/tests/test_reference_retrieval.py apps/ocs-indexer/tests/test_reference_store.py",
+      "exit_code": 0
+    },
+    {
+      "command": "apps/api/.venv/Scripts/ruff.exe format --check --line-length 100 apps/ocs-indexer/src/jd_ocs_indexer/references apps/ocs-indexer/src/jd_ocs_indexer/reranking apps/ocs-indexer/src/jd_ocs_indexer/api/reference_routes.py apps/ocs-indexer/src/jd_ocs_indexer/api/app.py apps/ocs-indexer/src/jd_ocs_indexer/embeddings/http_embedder.py packages/indexer-contract/src/indexer_contract/references.py apps/embedder/app.py apps/embedder/reranking.py apps/embedder/tests apps/ocs-indexer/tests/test_http_embedder.py apps/ocs-indexer/tests/test_http_reranker.py apps/ocs-indexer/tests/test_reference_api.py apps/ocs-indexer/tests/test_reference_lifecycle.py apps/ocs-indexer/tests/test_reference_retrieval.py apps/ocs-indexer/tests/test_reference_store.py",
+      "exit_code": 0,
+      "files": 20
+    },
+    {
+      "command": "apps/api/.venv/Scripts/mypy.exe --python-version 3.11 --python-executable apps/ocs-indexer/.venv/Scripts/python.exe --strict --follow-imports silent apps/ocs-indexer/src/jd_ocs_indexer/references apps/ocs-indexer/src/jd_ocs_indexer/reranking apps/ocs-indexer/src/jd_ocs_indexer/api/reference_routes.py packages/indexer-contract/src/indexer_contract/references.py apps/embedder/reranking.py apps/ocs-indexer/src/jd_ocs_indexer/embeddings/http_embedder.py",
+      "exit_code": 0,
+      "source_files": 11
+    },
+    {
+      "command": "pnpm build",
+      "exit_code": 0,
+      "includes": [
+        "App codegen check",
+        "Web TypeScript",
+        "Web build"
+      ],
+      "environment": "approved local uv cache access after sandbox denial"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "warnings": "CRLF normalization notices; no whitespace errors"
+    },
+    {
+      "command": "pnpm --filter @caliburn/ocs-contract run check-codegen",
+      "exit_code": 1,
+      "result": "Windows Bash E_ACCESSDENIED; generation not executed",
+      "retry_policy": "script uses git checkout against dirty generated files, so do not retry destructively"
+    },
+    {
+      "command": "apps/api/.venv/Scripts/python.exe -m datamodel_code_generator --input packages/ocs-contract/schema/ocs-document.schema.json --input-file-type jsonschema --output tmp/reference-api-ocs-models-20261005.py --output-model-type pydantic_v2.BaseModel --use-standard-collections --use-union-operator --use-schema-description --target-python-version 3.11 --disable-timestamp",
+      "exit_code": 0,
+      "comparison": "generated temporary Python output equals current working model; source files untouched",
+      "scope": "Python only; this task did not modify OCS JSON Schema or TS"
+    }
+  ],
+  "replay": {
+    "command": "apps/ocs-indexer/.venv/Scripts/python.exe -X utf8 -B docs/plans/evidence/2026-10-05-occupation-reference-api/replay.py --qdrant-url http://127.0.0.1:16340 --collection reference_api_replay_02 --output server-replay-02.json",
+    "documents": 805,
+    "task_and_overview_chunks": 8068,
+    "fixed_cases": 8,
+    "all_top5_identical": true,
+    "vectors_and_logits": "frozen cache; no new relevance scoring"
+  },
+  "fresh_provider_checks": {
+    "network_disabled_smoke": "model-smoke-result.json",
+    "real_local_HTTP_search": "live-search-result.json",
+    "total_query_embeddings": 2,
+    "total_rerank_pairs": 39,
+    "paid_external_calls": 0,
+    "cost_usd": 0,
+    "live_database": "Qdrant v1.18.2",
+    "API_incoming_transport": "FastAPI TestClient; downstream models real HTTP, database real server",
+    "full_index_reembedded": false,
+    "latency_benchmark": false
+  },
+  "review": {
+    "reviewer": "independent read-only subagent",
+    "initial_findings": {
+      "critical": 0,
+      "important": 0,
+      "minor": 1
+    },
+    "minor": "GPU startup failure retains loaded global model",
+    "fix": "Red then Green startup cleanup test; initialization in try/finally",
+    "open_findings": 0
+  },
+  "limits": [
+    "synthetic frozen cases; not full-corpus recall",
+    "no new blinded relevance labels",
+    "not a JD completion evaluation",
+    "not JD App or Agent integration",
+    "D/T20 and final5 are a control baseline, not universal quality parameters"
+  ],
+  "ownership": "preexisting dirty files preserved; no commit, push, merge or sealed experiment edits"
+}

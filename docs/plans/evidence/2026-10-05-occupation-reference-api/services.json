@@ -1,0 +1,97 @@
+{
+  "scope": "only_task_owned_containers",
+  "containers": [
+    {
+      "id": "9d65b86ac459a9affab350434a5cb7fcfac42472dccf57c6ec24ce957159a763",
+      "name": "caliburn-reference-api-qdrant-20261005-01",
+      "image_id": "sha256:75eab8c4ba42096724fdcfde8b4de0b5713d529dde32f285a1f86fdcb2c9e50c",
+      "status": "exited",
+      "running": false,
+      "exit_code": 143,
+      "started_at": "2026-10-04T20:23:13.834506859Z",
+      "finished_at": "2026-10-04T20:51:45.514338415Z",
+      "startup_error": "",
+      "label": "reference-api-validation"
+    },
+    {
+      "id": "97930b6433a4bb5df77005a482fe6568c176db43464104555961fa5b3bbca9bf",
+      "name": "caliburn-reference-api-qdrant-20261005-02",
+      "image_id": "sha256:75eab8c4ba42096724fdcfde8b4de0b5713d529dde32f285a1f86fdcb2c9e50c",
+      "status": "exited",
+      "running": false,
+      "exit_code": 143,
+      "started_at": "2026-10-04T20:27:12.709028075Z",
+      "finished_at": "2026-10-04T20:51:46.042325523Z",
+      "startup_error": "",
+      "label": "reference-api-validation"
+    },
+    {
+      "id": "ad376412dc42b9b6158b2f1dded72b2e82e425d148b405d7b52a59e7ea6a3826",
+      "name": "caliburn-reference-api-model-20261005-01",
+      "image_id": "sha256:f5928254a947c1caa209bd9b867839e1ecdbd932018b3a946472023080af435d",
+      "status": "created",
+      "running": false,
+      "exit_code": 127,
+      "started_at": "0001-01-01T00:00:00Z",
+      "finished_at": "0001-01-01T00:00:00Z",
+      "startup_error": "failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: exec: \"python\": executable file not found in $PATH",
+      "label": "reference-api-validation"
+    },
+    {
+      "id": "8fcabba1af2fdc2d42697941c7d16583e5670706b8360ccf3557af0a0a23bd04",
+      "name": "caliburn-reference-api-model-20261005-02",
+      "image_id": "sha256:f5928254a947c1caa209bd9b867839e1ecdbd932018b3a946472023080af435d",
+      "status": "created",
+      "running": false,
+      "exit_code": 127,
+      "started_at": "0001-01-01T00:00:00Z",
+      "finished_at": "0001-01-01T00:00:00Z",
+      "startup_error": "failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: exec: \"/opt/venv/bin/python\": stat /opt/venv/bin/python: no such file or directory",
+      "label": "reference-api-validation"
+    },
+    {
+      "id": "1782f2e4cf1fc8c8aa783a38f419f20e2dfeeeedf0f795ef80565da7747d0a97",
+      "name": "caliburn-reference-api-model-20261005-03",
+      "image_id": "sha256:f5928254a947c1caa209bd9b867839e1ecdbd932018b3a946472023080af435d",
+      "status": "exited",
+      "running": false,
+      "exit_code": 1,
+      "started_at": "2026-10-04T20:28:41.106171154Z",
+      "finished_at": "2026-10-04T20:28:50.279096715Z",
+      "startup_error": "",
+      "label": "reference-api-validation"
+    },
+    {
+      "id": "16980a202c3d3434fba73782a5bfb7cd17375e1bb723099c00b3cdfa621cf87a",
+      "name": "caliburn-reference-api-model-20261005-04",
+      "image_id": "sha256:f5928254a947c1caa209bd9b867839e1ecdbd932018b3a946472023080af435d",
+      "status": "exited",
+      "running": false,
+      "exit_code": 0,
+      "started_at": "2026-10-04T20:42:23.660815221Z",
+      "finished_at": "2026-10-04T20:44:42.845307838Z",
+      "startup_error": "",
+      "label": "reference-api-validation"
+    },
+    {
+      "id": "cad4cb07f179402f792f89afab383c9fdb02943961a08469fcb9b0302fbd3421",
+      "name": "caliburn-reference-api-model-20261005-05",
+      "image_id": "sha256:f5928254a947c1caa209bd9b867839e1ecdbd932018b3a946472023080af435d",
+      "status": "exited",
+      "running": false,
+      "exit_code": 0,
+      "started_at": "2026-10-04T20:47:00.961036803Z",
+      "finished_at": "2026-10-04T20:51:50.860892974Z",
+      "startup_error": "",
+      "label": "reference-api-validation"
+    }
+  ],
+  "setup_failures": {
+    "model-01": "python absent from cached image PATH",
+    "model-02": "/opt/venv/bin/python absent from cached CUDA image",
+    "model-03": "BGE main ref absent from mounted cache; public snapshot was in old stopped container",
+    "qdrant-01": "Docker Desktop internal network port not reachable from host; no index uploaded"
+  },
+  "existing_services": "not_stopped_or_started",
+  "cleanup": "own_running_processes_stopped; containers, network and public cached weights retained"
+}

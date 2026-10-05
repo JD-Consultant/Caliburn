@@ -1,0 +1,38 @@
+{
+  "network": "none",
+  "fresh_embedding_queries": 1,
+  "fresh_rerank_pairs": 5,
+  "embedding_max_absolute_error": 5.1792705398789884e-05,
+  "rerank_max_absolute_error": 0.0,
+  "query_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_ids": [
+    "IIS3513-003v4",
+    "IIS3513-008v3",
+    "KRM1324-001v1",
+    "IIS3513-002v4",
+    "KPS2434-001v2"
+  ],
+  "fresh_logits": [
+    -3.41015625,
+    -3.5,
+    -3.5859375,
+    -4.0234375,
+    -4.29296875
+  ],
+  "health": {
+    "status": "ok",
+    "model": "BAAI/bge-m3",
+    "model_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "dim": 1024,
+    "device": "cuda",
+    "reranker_loaded": true,
+    "reranker_model": "BAAI/bge-reranker-v2-m3",
+    "reranker_revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e"
+  },
+  "packages": {
+    "torch": "2.6.0+cu124",
+    "transformers": "4.57.6",
+    "FlagEmbedding": "1.4.0",
+    "fastapi": "0.115.0"
+  }
+}

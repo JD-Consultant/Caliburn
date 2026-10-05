@@ -288,11 +288,11 @@ def normalize(doc: OCSDocument) -> NormalizedOCS:
 
     # v2: build pairs first, derive parallel arrays from them
     attitude_pairs = [
-        Pair(code=a.code, name=a.name.strip())
+        Pair(code=a.code or "", name=a.name.strip())
         for a in doc.ocs_attitude.attitudes
-        if a.code and a.name and a.name.strip()
+        if a.name and a.name.strip()
     ]
-    attitude_codes = [p.code for p in attitude_pairs]
+    attitude_codes = [p.code for p in attitude_pairs if p.code]
     attitude_terms = [p.name for p in attitude_pairs]
 
     prerequisites = [p.strip() for p in doc.notes.prerequisites if p and p.strip()]

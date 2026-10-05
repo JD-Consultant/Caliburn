@@ -1,0 +1,926 @@
+{
+  "scope": "API_TestClient_with_real_Qdrant_and_GPU_HTTP_dependencies",
+  "fresh_query_embeddings": 1,
+  "fresh_rerank_pairs": 34,
+  "index_vectors": "frozen_805_document_8068_task_vectors",
+  "prior_top5_identical": true,
+  "case_id": "F01",
+  "task_reads": 64,
+  "elapsed_seconds_single_observation_not_benchmark": 3.543923299992457,
+  "query_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "health": {
+    "status": "ok",
+    "model": "BAAI/bge-m3",
+    "model_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "dim": 1024,
+    "device": "cuda",
+    "reranker_loaded": true,
+    "reranker_model": "BAAI/bge-reranker-v2-m3",
+    "reranker_revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e"
+  },
+  "response": {
+    "references": [
+      {
+        "reference": {
+          "reference_id": "c4067e6a-5ea4-58fe-ad15-d679b1857ea8",
+          "source_sha256": "6a6a927621211aa1ea6cac97f745d39ffc54f1673c024eba1761cac7bf1910a2",
+          "source_file": "apps/pdf-to-json/data/json-checked-2026-10-04/網站系統設計人員-職能基準.json",
+          "ocs_code": "IIS3513-003v4",
+          "title": "網站系統設計人員",
+          "overview": "網站系統之設計、開發及測試等相關工作。",
+          "catalog_scope": "all_parsed_task_groups",
+          "units": [
+            {
+              "unit_id": "u1",
+              "code": "T1",
+              "name": "系統需求分析與規劃",
+              "tasks": [
+                {
+                  "task_id": "u1-t1",
+                  "names": [
+                    {
+                      "code": "T1.1",
+                      "name": "蒐集並確認系統架構需求"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t2",
+                  "names": [
+                    {
+                      "code": "T1.2",
+                      "name": "建立軟體設計規格"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t3",
+                  "names": [
+                    {
+                      "code": "T1.3",
+                      "name": "設計分層架構"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t4",
+                  "names": [
+                    {
+                      "code": "T1.4",
+                      "name": "針對全球化與在地化作設計"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u2",
+              "code": "T2",
+              "name": "系統建置規劃",
+              "tasks": [
+                {
+                  "task_id": "u2-t1",
+                  "names": [
+                    {
+                      "code": "T2.1",
+                      "name": "規劃系統與應用程式安全"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t2",
+                  "names": [
+                    {
+                      "code": "T2.2",
+                      "name": "找出最適合專案的開發平台"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t3",
+                  "names": [
+                    {
+                      "code": "T2.3",
+                      "name": "找出最適合專案的開發工具"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t4",
+                  "names": [
+                    {
+                      "code": "T2.4",
+                      "name": "準備開發環境"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u3",
+              "code": "T3",
+              "name": "進行應用程式開發",
+              "tasks": [
+                {
+                  "task_id": "u3-t1",
+                  "names": [
+                    {
+                      "code": "T3.1",
+                      "name": "開發前後端架構應用程\n式"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t2",
+                  "names": [
+                    {
+                      "code": "T3.2",
+                      "name": "第三方服務與系統整合"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t3",
+                  "names": [
+                    {
+                      "code": "T3.3",
+                      "name": "程式碼除錯"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t4",
+                  "names": [
+                    {
+                      "code": "T3.4",
+                      "name": "測試應用程式"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t5",
+                  "names": [
+                    {
+                      "code": "T3.5",
+                      "name": "執行系統與應用程式安全"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t6",
+                  "names": [
+                    {
+                      "code": "T3.6",
+                      "name": "檔案記錄系統"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u4",
+              "code": "T4",
+              "name": "佈署應用程式到正式環境",
+              "tasks": [
+                {
+                  "task_id": "u4-t1",
+                  "names": [
+                    {
+                      "code": "T4.1",
+                      "name": "進行軟體安裝"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t2",
+                  "names": [
+                    {
+                      "code": "T4.2",
+                      "name": "進行資料庫安裝"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t3",
+                  "names": [
+                    {
+                      "code": "T4.3",
+                      "name": "管理應用程式設定"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u5",
+              "code": "T5",
+              "name": "提供客戶IT支援服務",
+              "tasks": [
+                {
+                  "task_id": "u5-t1",
+                  "names": [
+                    {
+                      "code": "T5.1",
+                      "name": "確認支援程序"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u5-t2",
+                  "names": [
+                    {
+                      "code": "T5.2",
+                      "name": "進行支援"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            }
+          ]
+        },
+        "retrieval_evidence": {
+          "document_cosine": null,
+          "task_cosine": 0.7030176,
+          "matched_task_ids": [
+            "u1-t1",
+            "u3-t1",
+            "u1-t2"
+          ],
+          "overview_matched": false,
+          "task_applicability": "not_evaluated"
+        },
+        "rerank_logit": -3.41015625
+      },
+      {
+        "reference": {
+          "reference_id": "2a70bee4-61ef-54fe-ae2a-196ebce4dc39",
+          "source_sha256": "f4d33c426bd7885e0d8393af6a7badbd305dcbbdde907ff9d0db2872dc6f34de",
+          "source_file": "apps/pdf-to-json/data/json-checked-2026-10-04/網路管理助理-職能基準.json",
+          "ocs_code": "IIS3513-008v3",
+          "title": "網路管理助理",
+          "overview": "協助維護及管理組織網路系統。",
+          "catalog_scope": "all_parsed_task_groups",
+          "units": [
+            {
+              "unit_id": "u1",
+              "code": "T1",
+              "name": "作業系統(OS)【註1】的安裝、配置",
+              "tasks": [
+                {
+                  "task_id": "u1-t1",
+                  "names": [
+                    {
+                      "code": "T1.1",
+                      "name": "找出適合的OS"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t2",
+                  "names": [
+                    {
+                      "code": "T1.2",
+                      "name": "安裝、設定與最佳化OS"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t3",
+                  "names": [
+                    {
+                      "code": "T1.3",
+                      "name": "利用工具解決問題"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t4",
+                  "names": [
+                    {
+                      "code": "T1.4",
+                      "name": "提供新版本OS執行說明"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u2",
+              "code": "T2",
+              "name": "解決OS與軟、硬體問題",
+              "tasks": [
+                {
+                  "task_id": "u2-t1",
+                  "names": [
+                    {
+                      "code": "T2.1",
+                      "name": "蒐集及整理應解決的問題"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t2",
+                  "names": [
+                    {
+                      "code": "T2.2",
+                      "name": "協助挑選最適切的問題解決方案或工具"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t3",
+                  "names": [
+                    {
+                      "code": "T2.3",
+                      "name": "測試系統並完成各項文件"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            }
+          ]
+        },
+        "retrieval_evidence": {
+          "document_cosine": 0.69592404,
+          "task_cosine": null,
+          "matched_task_ids": [],
+          "overview_matched": false,
+          "task_applicability": "not_evaluated"
+        },
+        "rerank_logit": -3.5
+      },
+      {
+        "reference": {
+          "reference_id": "0fc53af7-f0b3-5534-b04e-44f1bb7133df",
+          "source_sha256": "63bc42546689c25da33befa315b4952d8ad258bdb38f7ce5c56ce93e381e6503",
+          "source_file": "apps/pdf-to-json/data/json-checked-2026-10-04/供應鏈管理人員-職能基準.json",
+          "ocs_code": "KRM1324-001v1",
+          "title": "供應鏈管理人員",
+          "overview": "開發並管理從供應商到最終客戶的所有流程，包括協調生產計畫、物流運輸、庫存控制和品質管理，以確保達到產品準時交付、成本最適化和客\n戶滿意度最大化。",
+          "catalog_scope": "all_parsed_task_groups",
+          "units": [
+            {
+              "unit_id": "u1",
+              "code": "T1",
+              "name": "管理供應商",
+              "tasks": [
+                {
+                  "task_id": "u1-t1",
+                  "names": [
+                    {
+                      "code": "T1.1",
+                      "name": "供應商的開發與評估"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t2",
+                  "names": [
+                    {
+                      "code": "T1.2",
+                      "name": "供應商的選擇與合約簽訂"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t3",
+                  "names": [
+                    {
+                      "code": "T1.3",
+                      "name": "供應商風險管理與監控"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t4",
+                  "names": [
+                    {
+                      "code": "T1.4",
+                      "name": "供應商資料維護"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t5",
+                  "names": [
+                    {
+                      "code": "T1.5",
+                      "name": "供應商績效評估與改進"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u2",
+              "code": "T2",
+              "name": "管理需求端客戶",
+              "tasks": [
+                {
+                  "task_id": "u2-t1",
+                  "names": [
+                    {
+                      "code": "T2.1",
+                      "name": "客戶需求管理"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t2",
+                  "names": [
+                    {
+                      "code": "T2.2",
+                      "name": "供應鏈執行與協調"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u3",
+              "code": "T3",
+              "name": "管理生產計畫",
+              "tasks": [
+                {
+                  "task_id": "u3-t1",
+                  "names": [
+                    {
+                      "code": "T3.1",
+                      "name": "制訂生產計畫"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t2",
+                  "names": [
+                    {
+                      "code": "T3.2",
+                      "name": "產線品質管理"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t3",
+                  "names": [
+                    {
+                      "code": "T3.3",
+                      "name": "生產績效評估與改進"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u4",
+              "code": "T4",
+              "name": "庫存與出貨管理",
+              "tasks": [
+                {
+                  "task_id": "u4-t1",
+                  "names": [
+                    {
+                      "code": "T4.1",
+                      "name": "庫存管理"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t2",
+                  "names": [
+                    {
+                      "code": "T4.2",
+                      "name": "出貨需求確認"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t3",
+                  "names": [
+                    {
+                      "code": "T4.3",
+                      "name": "出貨安排"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t4",
+                  "names": [
+                    {
+                      "code": "T4.4",
+                      "name": "出貨追蹤"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            }
+          ]
+        },
+        "retrieval_evidence": {
+          "document_cosine": null,
+          "task_cosine": 0.7228066,
+          "matched_task_ids": [
+            "u2-t2",
+            "u2-t1",
+            "u4-t2"
+          ],
+          "overview_matched": false,
+          "task_applicability": "not_evaluated"
+        },
+        "rerank_logit": -3.5859375
+      },
+      {
+        "reference": {
+          "reference_id": "24590524-84a9-5459-ad8a-197eb7017621",
+          "source_sha256": "e1d55475a1807b05c4b087e0f0983812d976b543182ff5ba9af813dc2617ba89",
+          "source_file": "apps/pdf-to-json/data/json-checked-2026-10-04/系統維護人員-職能基準.json",
+          "ocs_code": "IIS3513-002v4",
+          "title": "系統維護人員",
+          "overview": "從事系統軟硬體安裝及維護管理之工作。",
+          "catalog_scope": "all_parsed_task_groups",
+          "units": [
+            {
+              "unit_id": "u1",
+              "code": "T1",
+              "name": "系統硬體設備與元件配置與服務",
+              "tasks": [
+                {
+                  "task_id": "u1-t1",
+                  "names": [
+                    {
+                      "code": "T1.1",
+                      "name": "安裝與配置電腦設備與元件"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t2",
+                  "names": [
+                    {
+                      "code": "T1.2",
+                      "name": "安裝與配置周邊設備"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t3",
+                  "names": [
+                    {
+                      "code": "T1.3",
+                      "name": "支援服務中心"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u2",
+              "code": "T2",
+              "name": "安裝升級與管理作業系統與應用程式",
+              "tasks": [
+                {
+                  "task_id": "u2-t1",
+                  "names": [
+                    {
+                      "code": "T2.1",
+                      "name": "決定組織支援服務程序"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t2",
+                  "names": [
+                    {
+                      "code": "T2.2",
+                      "name": "安裝或升級電腦作業系統"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t3",
+                  "names": [
+                    {
+                      "code": "T2.3",
+                      "name": "安裝用戶端應用程式"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t4",
+                  "names": [
+                    {
+                      "code": "T2.4",
+                      "name": "帳號權限與環境配置設定"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u3",
+              "code": "T3",
+              "name": "安裝、配置與測試路由器、防火牆",
+              "tasks": [
+                {
+                  "task_id": "u3-t1",
+                  "names": [
+                    {
+                      "code": "T3.1",
+                      "name": "準備安裝路由器"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t2",
+                  "names": [
+                    {
+                      "code": "T3.2",
+                      "name": "路由器安裝、配置及測試"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u4",
+              "code": "T4",
+              "name": "協助完成資料庫備份與復原",
+              "tasks": [
+                {
+                  "task_id": "u4-t1",
+                  "names": [
+                    {
+                      "code": "T4.1",
+                      "name": "規劃備份及復原時程"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t2",
+                  "names": [
+                    {
+                      "code": "T4.2",
+                      "name": "執行資料庫備份"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t3",
+                  "names": [
+                    {
+                      "code": "T4.3",
+                      "name": "建立復原點與災害復原程序"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t4",
+                  "names": [
+                    {
+                      "code": "T4.4",
+                      "name": "建立並佈署備援資料庫"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            }
+          ]
+        },
+        "retrieval_evidence": {
+          "document_cosine": 0.7007226,
+          "task_cosine": null,
+          "matched_task_ids": [],
+          "overview_matched": false,
+          "task_applicability": "not_evaluated"
+        },
+        "rerank_logit": -4.0234375
+      },
+      {
+        "reference": {
+          "reference_id": "eb7f0068-3702-5188-925f-d625576ce1e2",
+          "source_sha256": "d77878d590bbdafecbc496a9f1a245f484eab0236db77b8ec6e9758d98262162",
+          "source_file": "apps/pdf-to-json/data/json-checked-2026-10-04/醫藥品業務人員-職能基準.json",
+          "ocs_code": "KPS2434-001v2",
+          "title": "醫藥品業務人員",
+          "overview": "從事各類藥品之推廣銷售。",
+          "catalog_scope": "all_parsed_task_groups",
+          "units": [
+            {
+              "unit_id": "u1",
+              "code": "T1",
+              "name": "蒐集藥品市場資訊",
+              "tasks": [
+                {
+                  "task_id": "u1-t1",
+                  "names": [
+                    {
+                      "code": "T1.1",
+                      "name": "蒐集藥品供需市場資料"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t2",
+                  "names": [
+                    {
+                      "code": "T1.2",
+                      "name": "達成進藥目標"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t3",
+                  "names": [
+                    {
+                      "code": "T1.3",
+                      "name": "擬定並執行銷售策略"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u2",
+              "code": "T2",
+              "name": "經營客戶關係",
+              "tasks": [
+                {
+                  "task_id": "u2-t1",
+                  "names": [
+                    {
+                      "code": "T2.1",
+                      "name": "客戶資料管理"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t2",
+                  "names": [
+                    {
+                      "code": "T2.2",
+                      "name": "客戶聯繫與維護"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u3",
+              "code": "T3",
+              "name": "進行醫藥品推廣",
+              "tasks": [
+                {
+                  "task_id": "u3-t1",
+                  "names": [
+                    {
+                      "code": "T3.1",
+                      "name": "掌握醫療單位處方需求"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t2",
+                  "names": [
+                    {
+                      "code": "T3.2",
+                      "name": "說明醫藥品成分及注意事項"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t3",
+                  "names": [
+                    {
+                      "code": "T3.3",
+                      "name": "活動規劃及執行"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u4",
+              "code": "T4",
+              "name": "協助處理客戶訂單及產品問題",
+              "tasks": [
+                {
+                  "task_id": "u4-t1",
+                  "names": [
+                    {
+                      "code": "T4.1",
+                      "name": "處理訂單與退換貨"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t2",
+                  "names": [
+                    {
+                      "code": "T4.2",
+                      "name": "反應產品不良/怨訴事宜"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u4-t3",
+                  "names": [
+                    {
+                      "code": "T4.3",
+                      "name": "處理客戶諮詢"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            }
+          ]
+        },
+        "retrieval_evidence": {
+          "document_cosine": null,
+          "task_cosine": 0.7141863,
+          "matched_task_ids": [
+            "u4-t3",
+            "u4-t2",
+            "u2-t2"
+          ],
+          "overview_matched": false,
+          "task_applicability": "not_evaluated"
+        },
+        "rerank_logit": -4.29296875
+      }
+    ],
+    "retrieval_policy": {
+      "preprocessing": "ocs_top_body_v1",
+      "candidate_limit_per_route": 20,
+      "candidate_count": 34,
+      "search": "exact_dense_cosine",
+      "fusion": "full_union_before_rerank",
+      "embedding_model": "BAAI/bge-m3",
+      "embedding_dimensions": 1024,
+      "reranker_model": "BAAI/bge-reranker-v2-m3",
+      "reranker_revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e"
+    }
+  }
+}

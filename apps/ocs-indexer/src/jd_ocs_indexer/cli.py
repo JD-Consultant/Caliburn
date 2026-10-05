@@ -22,6 +22,44 @@ app = typer.Typer(
 console = Console()
 
 
+@app.command("index-references")
+def index_reference_sources(
+    scan_dir: Path = typer.Argument(..., exists=True, file_okay=False, dir_okay=True),
+    collection: str = typer.Option(
+        ..., "--collection", help="New reference collection; never overwritten."
+    ),
+) -> None:
+    """Index explicitly selected source versions for full D/T union reference retrieval."""
+    from contextlib import closing
+
+    from jd_ocs_indexer.embeddings.http_embedder import HttpEmbedder
+    from jd_ocs_indexer.references.source import build_reference
+    from jd_ocs_indexer.references.store import index_references
+
+    settings = load_settings()
+    documents = [
+        build_reference(
+            path.read_bytes().decode("utf-8"), source_file=path.relative_to(scan_dir).as_posix()
+        )
+        for path in sorted(scan_dir.rglob("*.json"))
+    ]
+    # Parse everything before creating a collection: malformed or duplicate sources fail closed.
+    with (
+        closing(
+            make_client(
+                url=settings.qdrant_url,
+                api_key=settings.qdrant_api_key,
+                timeout=settings.qdrant_timeout,
+            )
+        ) as client,
+        closing(HttpEmbedder(settings.embedder_url)) as embedder,
+    ):
+        points = index_references(
+            client, collection, documents, embedder, batch_size=settings.index_batch_size
+        )
+    console.print(f"Reference index ready: {collection}; {len(documents)} sources, {points} points")
+
+
 # ---------- index ----------
 
 

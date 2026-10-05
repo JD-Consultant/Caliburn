@@ -54,6 +54,9 @@ class Settings:
     embedder_url: str
 
     extra: dict[str, str] = field(default_factory=dict)
+    reference_collection: str | None = None
+    reference_candidate_limit: int = 20
+    reranker_url: str | None = None
 
 
 def _env_float(name: str, default: float) -> float:
@@ -73,4 +76,7 @@ def load_settings() -> Settings:
         source_root=source_root,
         index_batch_size=_env_int("INDEX_BATCH_SIZE", 32),
         embedder_url=_env("EMBEDDER_URL", "http://localhost:8082") or "http://localhost:8082",
+        reference_collection=_env("REFERENCE_COLLECTION"),
+        reference_candidate_limit=_env_int("REFERENCE_CANDIDATE_LIMIT", 20),
+        reranker_url=_env("RERANKER_URL"),
     )

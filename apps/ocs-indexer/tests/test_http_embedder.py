@@ -1,8 +1,8 @@
 import json
 
 import httpx
-
-from jd_ocs_indexer.embeddings.base import EmbeddingSignature
+import pytest
+from jd_ocs_indexer.embeddings.base import EmbeddingResponseError, EmbeddingSignature
 from jd_ocs_indexer.embeddings.http_embedder import HttpEmbedder
 
 
@@ -12,7 +12,16 @@ def _handler(request: httpx.Request) -> httpx.Response:
         {"dense": [0.1] * 1024, "sparse": {"indices": [1, 2], "values": [0.5, 0.7]}}
         for _ in body["texts"]
     ]
-    return httpx.Response(200, json={"embeddings": embs})
+    return httpx.Response(
+        200,
+        json={
+            "embeddings": embs,
+            "model": "BAAI/bge-m3",
+            "dim": 1024,
+            "revision": 1,
+            "model_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+        },
+    )
 
 
 def _embedder(handler) -> HttpEmbedder:
@@ -38,3 +47,35 @@ def test_maps_dense_and_sparse():
 def test_empty_texts_no_call():
     e = _embedder(lambda r: httpx.Response(500))  # would error if called
     assert e.embed_texts([]) == []
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {"embeddings": []},
+        {"embeddings": [{"dense": [0.0] * 1024}]},
+        {
+            "embeddings": [{"dense": [0.1] * 1024}],
+            "model": "different-model",
+            "dim": 1024,
+            "revision": 1,
+        },
+    ],
+)
+def test_invalid_or_unidentified_embedding_response_is_rejected(body):
+    embedder = _embedder(lambda request: httpx.Response(200, json=body))
+    with pytest.raises(EmbeddingResponseError):
+        embedder.embed_texts(["work"])
+
+
+def test_embedding_with_different_weights_is_rejected():
+    body = {
+        "model": "BAAI/bge-m3",
+        "model_revision": "different-weights",
+        "dim": 1024,
+        "revision": 1,
+        "embeddings": [{"dense": [0.1] * 1024}],
+    }
+    embedder = _embedder(lambda request: httpx.Response(200, json=body))
+    with pytest.raises(EmbeddingResponseError):
+        embedder.embed_texts(["work"])

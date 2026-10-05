@@ -1,8 +1,8 @@
 # 程式撰寫規範：可讀、明確、可測的實作
 
-- 狀態：**現行程式撰寫規範**。適用新程式、測試、腳本與受影響的修改範圍，不要求無關程式全面改寫。
+- 狀態：**現行程式撰寫規範** 。適用新程式、測試、腳本與受影響的修改範圍，不要求無關程式全面改寫。
 - 責任：[程式組織](code-organization.md)管模組、依賴方向及共用命名；本頁管函式／實例／Service 的寫法、資源與錯誤處理、範例及審查。產品規則仍由[架構入口](../target-architecture-map.md)路由，不以風格重訂業務契約。
-- 原則：**讓下一位開發者容易判斷輸入、效果、依賴與失敗；不是讓程式看起來抽象、短或用了最多設計模式。**範例只說明寫法，不能取代正式 API／工具 schema 或視為產品已完成。
+- 原則：**讓下一位開發者容易判斷輸入、效果、依賴與失敗；不是讓程式看起來抽象、短或用了最多設計模式。** 範例只說明寫法，不能取代正式 API／工具 schema 或視為產品已完成。
 
 ## 1. 採用依據與取捨
 
@@ -16,13 +16,13 @@
 | [Python asyncio](https://docs.python.org/3/library/asyncio-task.html#task-cancellation)與 [SQLAlchemy async](https://docs.sqlalchemy.org/en/21/orm/extensions/asyncio.html#using-asyncsession-with-concurrent-tasks) | 清理、取消傳遞與並行 Session 隔離；框架能力不等於產品已具備恢復／交易保證 |
 | [React state 結構](https://react.dev/learn/choosing-the-state-structure)與 [Effect 使用界線](https://react.dev/learn/you-might-not-need-an-effect) | 避免矛盾／重複狀態，能由現有輸入計算就不另存；Effect 用於外部同步，不拿它串起全部產品流程 |
 
-這些是多個成熟實踐的可借鑑部分，**不是所有大廠共同使用同一份 coding standard**。優先現行受支援 API；「最新」不等於重寫穩定程式或引入尚未需要的語言技巧。套件版本仍由[選型](technology-decisions.md)與 lock 管理。
+這些是多個成熟實踐的可借鑑部分，**不是所有大廠共同使用同一份 coding standard** 。優先現行受支援 API；「最新」不等於重寫穩定程式或引入尚未需要的語言技巧。套件版本仍由[選型](technology-decisions.md)與 lock 管理。
 
 ## 2. 名稱、參數與型別
 
 大小寫／目錄／動賓命名沿[程式組織 §3](code-organization.md#3-名稱要能表達身分時間與效果)，本頁不另造詞彙表。
 
-- 名稱說明**這是什麼、哪個範圍、哪個時點**：`published_snapshot`、`candidate_revision`、`input_tokens`、`timeout_seconds`，不用脫離語境的 `data2`、`temp`、`new_obj`。短區域的 `index`／`item` 可以，跨模組結果不可以只叫 `data`。
+- 名稱說明**這是什麼、哪個範圍、哪個時點** ：`published_snapshot`、`candidate_revision`、`input_tokens`、`timeout_seconds`，不用脫離語境的 `data2`、`temp`、`new_obj`。短區域的 `index`／`item` 可以，跨模組結果不可以只叫 `data`。
 - `get`／`read`／`list` 不偷偷寫業務資料；`create`／`publish` 等效果名稱須與實際邊界相符。名稱相近但語意不同的 pending／formal、candidate／published 不合成模糊的 `save`。
 - 避免 `run(data, True, False)` 及 mode 字串控制完全不同流程；不同操作用具名函式，容易混淆的 Python 參數用 keyword-only，TS 用有意義的 options。不要為兩個清楚參數硬包 DTO。
 - 函式參數與回傳標型別；Python 區域變數及 TS 區域推導不重複標註。TS 模組公開非元件函式標明回傳，React 元件／簡單 callback 可交編譯器推導。邊界形狀由唯一 schema 生成，不重寫一套「比較好看」的 wire 型別。
@@ -35,7 +35,7 @@
 
 一個函式維持一個可描述的效果與清楚抽象層次。先處理不合法前置條件，再保留可順讀的正常路徑；不強迫每函式最多若干行／參數，也不為行數把一次交易拆到找不到提交處。簡單 comprehension 可以，多層巢狀、三元式及帶副作用的 comprehension 改成普通迴圈。不要使用可變預設值、隱藏 I/O 的 property、萬用 `**kwargs` 傳整包環境。
 
-例如，以下是**區間型別／前置條件寫法示意**；來源資格與越界判斷仍須訪談領域模組驗證，不靠這個型別保證：
+例如，以下是**區間型別／前置條件寫法示意** ；來源資格與越界判斷仍須訪談領域模組驗證，不靠這個型別保證：
 
 ```python
 from dataclasses import dataclass
@@ -63,7 +63,7 @@ def describe_interview_range(interview_range: InterviewRange) -> str:
 
 ## 4. 實例、Service 與解耦
 
-Service 是**應用用例責任**，不等於必須叫 `SomethingService` 的 class，更不等於獨立部署。
+Service 是**應用用例責任** ，不等於必須叫 `SomethingService` 的 class，更不等於獨立部署。
 
 | 情況 | 優先寫法 | 不採用 |
 |---|---|---|
@@ -92,7 +92,7 @@ async def rename_job_file(
     )
 ```
 
-此形狀讓 persistence 寫 SQL、service 管用例；呼叫方明確掌握交易，內層不 commit。`AsyncSession` 可以出現在 service／workflow，**不能因此洩入純 models**。上例的型別及依賴由真實 feature 定義，正式寫入仍需原契約的作用域、重送及權限機制；不能只抄此片段便宣稱完成。
+此形狀讓 persistence 寫 SQL、service 管用例；呼叫方明確掌握交易，內層不 commit。`AsyncSession` 可以出現在 service／workflow，**不能因此洩入純 models** 。上例的型別及依賴由真實 feature 定義，正式寫入仍需原契約的作用域、重送及權限機制；不能只抄此片段便宣稱完成。
 
 只有實際需要替換的 I/O 才抽介面，例如 renderer 的消費者只需要 `render_html(...) -> bytes`，就不設計未使用的 renderer plugin 平台。組合優先；繼承留給框架契約或真實替代關係，不建立承載 A／B1／B2 全部業務的 `BaseAgent`。共同執行機制與角色分析規則不能因相似迴圈而合併權責。
 
@@ -111,7 +111,7 @@ async def rename_job_file(
 
 函式元件、具名 props、單向資料流；hook 名稱必須真的是 hook，不把普通工具函式加上 `use`。已在 query cache 的 server state 不另外複製到全域 store。局部編輯草稿與正式資料分開，能從 props／state 算出的顯示文字在 render 推導，不用 Effect 同步第二份。
 
-以下是**可執行的局部表單狀態示例**，不是 A Turn／Memory 的正式狀態機：
+以下是**可執行的局部表單狀態示例** ，不是 A Turn／Memory 的正式狀態機：
 
 ```typescript
 type SaveState =
@@ -133,7 +133,7 @@ export function getSaveLabel(state: SaveState): string {
 
 這比多個互斥布林更難表示矛盾狀態。外部新增狀態不能靠 `default: return '成功'` 吞掉；協定未知值在驗證邊界明示處理。前端不得依這種 UI state 推定正式提交成功。
 
-Promise 必須 await、return 或有明確錯誤處理；不要把 async 函式直接塞到要求同步回呼的地方。事件 handler 可用 `void saveDraft().catch(showSaveError)`，但 `void` 本身**不處理錯誤**。取消 fetch／忽略過時結果不代表後端業務取消。缺少值不能靠非空斷言跳過檢查。
+Promise 必須 await、return 或有明確錯誤處理；不要把 async 函式直接塞到要求同步回呼的地方。事件 handler 可用 `void saveDraft().catch(showSaveError)`，但 `void` 本身**不處理錯誤** 。取消 fetch／忽略過時結果不代表後端業務取消。缺少值不能靠非空斷言跳過檢查。
 
 `readonly` 適用讀取 props／投影；不要突變 props、React state 或共用 cache 物件。型別 `type`／`interface` 按用途選，union 用 type；不強制全轉一種。表單、HTTP client、業務規則與畫面不擠在同一大元件，亦不為每個 JSX 區塊新增檔案。
 
@@ -145,7 +145,7 @@ I/O 替身在實際外部邊界；不 mock 受測規則本身，也不把每個 
 
 Docstring／註解解釋非顯然的範圍、單位、效果、失敗與原因；不用重述每行程式。公開邊界或易誤用用例有簡短契約，例外與限制必要時才加 Args／Returns／Raises。命名用英文；規格／註解可繁中，但同一段保持一致。持久格式或恢復不變量宜連到責任文件，不貼整份設計。
 
-提取共用程式前檢查：**是否同一語意、是否一起變動、消費者是否已有、是否真的降低理解成本？**兩段形狀相似但一個是候選、一個是正式發布，不能只為 DRY 合併成 flag 驅動萬用函式。純一行代理若沒有邊界價值可以去除；有契約隔離價值的薄 adapter 不因行數少而刪掉。
+提取共用程式前檢查：**是否同一語意、是否一起變動、消費者是否已有、是否真的降低理解成本？** 兩段形狀相似但一個是候選、一個是正式發布，不能只為 DRY 合併成 flag 驅動萬用函式。純一行代理若沒有邊界價值可以去除；有契約隔離價值的薄 adapter 不因行數少而刪掉。
 
 ## 8. 如何執行，而非只要求「寫得漂亮」
 

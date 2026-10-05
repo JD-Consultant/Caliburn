@@ -1,6 +1,6 @@
 # 程式組織、依賴方向與命名
 
-- 狀態：**現行程式組織與維護規範**。目錄樹說明責任與依賴；實際路徑以程式及同題接線文件為準。
+- 狀態：**現行程式組織與維護規範** 。目錄樹說明責任與依賴；實際路徑以程式及同題接線文件為準。
 - 依據：[系統責任](../architecture/system-boundaries.md)、[工程取捨](../architecture/design-decisions.md)、[開發規範](development-standard.md)。採模組化單體，不將每個業務模組拆成部署或套件。
 - 配套：[程式撰寫規範](coding-standard.md)定義函式／實例／Service、型別、錯誤、非同步與測試寫法；本頁保留目錄、依賴及共用命名責任。
 
@@ -65,7 +65,7 @@ Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位�
 
 ## 2. 依賴方向與可檢查限制
 
-圖為**Python 靜態依賴規則**；箭頭表示 import／呼叫方向，不是執行時序。組裝根可注入所有具體實作。
+圖為**Python 靜態依賴規則** ；箭頭表示 import／呼叫方向，不是執行時序。組裝根可注入所有具體實作。
 
 ```mermaid
 flowchart TD

@@ -1,6 +1,6 @@
 # Memory 模型工具接線
 
-- 狀態：**現行 Memory 模型工具接線**。讀寫、角色與共用執行依下列責任協作；工具測試不取代真模型分析品質評估。驗證見[證據索引](../history.md#source-8e6fa902e6e1928b1f59)。
+- 狀態：**現行 Memory 模型工具接線** 。讀寫、角色與共用執行依下列責任協作；工具測試不取代真模型分析品質評估。驗證見[證據索引](../history.md#source-8e6fa902e6e1928b1f59)。
 - 語意權威：[讀取與來源回查](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[單物件更新](../specs/2026-09-27-memory-object-update-tool-contract.md)、[共同工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md)。本頁只說程式責任與接線，不另抄 JSON shape。
 
 ## 1. 契約與模組邊界
@@ -42,7 +42,7 @@ App 綁定角色、原執行身分、可見基準、訪談上界
 - 正常讀取不回 `stage`、`status: read`、內部 UUID、執行／版本參數；模型只填標題或訪談選取。
 - 拒絕沿共同 `status/code/message/next_action`，區分非法參數、無權、過時階段、找不到目標、來源不可讀及容量不足。基礎設施錯誤交 Runtime，不轉成模型參數錯誤或合法空集合；不洩漏 raw exception。
 
-`MemoryReadTools.max_result_characters` 預設 1,000,000，App 可配置，非模型參數。完整結果超限回 `read_limit_exceeded`，不靜默截斷。這是輸出防護，**不是 token 計數或容量預算保證**；Runtime 在發送前依實際完整 request 計數與檢查容量。訪談可縮小選取；整份 map 或單物件超量則由 App 處理，不能假裝已完整讀過。
+`MemoryReadTools.max_result_characters` 預設 1,000,000，App 可配置，非模型參數。完整結果超限回 `read_limit_exceeded`，不靜默截斷。這是輸出防護，**不是 token 計數或容量預算保證** ；Runtime 在發送前依實際完整 request 計數與檢查容量。訪談可縮小選取；整份 map 或單物件超量則由 App 處理，不能假裝已完整讀過。
 
 ## 4. 寫入準備、採用與原結果接續
 
@@ -59,7 +59,7 @@ App 綁定角色、原執行身分、可見基準、訪談上界
 
 準備過程無業務寫入。所有內容與引用使用同一個候選位置解析；參照由訪談序號／情境標題轉成穩定 ID。正文解析、模糊定位與實際 diff 是純運算，在釋放讀取 session 後以受控同步工作執行，不持有寫入交易等模型或做長文運算。候選在準備後已變動則Memory 候選服務拒絕過時命令，不能偷偷改採最新位置。
 
-`PreparedMemoryToolCall` 是 **App 內部不可變待執行命令**，不是模型參數、正式回執或另一份可編輯候選。包含套用後正文是為了固定原操作；可編輯工作稿仍由Memory 候選服務 保存。其可靠序列化、checkpoint 採用及程序接續由[共用執行](agent-execution.md#42-單一模型工具-step)承接。
+`PreparedMemoryToolCall` 是 **App 內部不可變待執行命令** ，不是模型參數、正式回執或另一份可編輯候選。包含套用後正文是為了固定原操作；可編輯工作稿仍由Memory 候選服務 保存。其可靠序列化、checkpoint 採用及程序接續由[共用執行](agent-execution.md#42-單一模型工具-step)承接。
 
 原操作恢復必須重用已保存的 prepared command，不重新用舊標題呼叫 prepare。例如物件改名後舊名稱被另一物件使用，原命令仍指原身分；真正新操作才解析現在的同名物件。再次進入 execute 可以，但Memory 候選服務核對同一命令及提交結果，不能重複效果。
 

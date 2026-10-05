@@ -48,13 +48,13 @@ README 簡述產品價值與現況；[產品介紹](../product-introduction.md)�
 
 不新增通用模型供應商抽象層、第二套工作階段引擎、每步必填的工作狀態筆記或獨立的壓縮 AI 角色。只有實測反例顯示原生接續不足，才評估需要補充哪些分析資料；不可讀的推理內容不作為 App 可讀取的工作計畫。
 
-**上下文控制權：**App 決定組裝與接續內容，框架／adapter 不另選歷史、不暗中摘要或換角色。使用 `store=false`，不使用 `previous_response_id`，由 App 明確提供接續 items。
+**上下文控制權：** App 決定組裝與接續內容，框架／adapter 不另選歷史、不暗中摘要或換角色。使用 `store=false`，不使用 `previous_response_id`，由 App 明確提供接續 items。
 
 驗證這項分工時，須核對 SDK 發送邊界的實際請求；僅看組裝前資料不足以排除隱含變換。這項驗證要求也不表示所有請求副本都永久保存。
 
 App 仍可明確呼叫模型的原生能力。[OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)允許送入完整視窗，並採用完整的返回視窗；其中加密的 compaction item 無法由人解讀。App 控制壓縮的觸發時機、範圍與安全採用條件，但不掌握供應商內部如何取捨內容。現行規則不啟用伺服器端自動壓縮，由 App 在完整 Step 交界達 160K 時主動壓縮，包含 Turn 內符合條件的交界。門檻與回退規則以[共用執行 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與中途保險)為準；對話接續仍由 App 管理。
 
-**已確認的目標調整，尚未實作：**輪前使用 App 管理的文字摘要，輪中仍採全部原生 compact output；B1／B2 壓後只追加目前候選導覽。
+**已確認的目標調整，尚未實作：** 輪前使用 App 管理的文字摘要，輪中仍採全部原生 compact output；B1／B2 壓後只追加目前候選導覽。
 
 這項調整回應長訪談實測中觀察到的問題：歷次 App 資料仍留在 compact 的返回視窗，而官方不允許自行裁切該結果。摘要內容及品質仍待設計，不能宣稱文字摘要保留了加密推理。此變更不新增壓縮 AI 角色或恢復框架，完整取捨見[輪前摘要與輪中壓縮](../specs/2026-10-04-context-summary-and-compaction-design.md)。
 

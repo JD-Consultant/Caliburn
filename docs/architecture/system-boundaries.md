@@ -2,7 +2,7 @@
 
 Caliburn 把使用者互動、AI 分析、業務資料與執行恢復分開處理。這些功能在同一個後端內協作：AI 提出讀取或修改要求，業務模組判斷是否允許，資料庫保存結果；畫面則呈現正式資料與尚在處理中的候選內容。
 
-本章說明各模組如何分工，以及訪談、JD 和 Memory 如何流轉。整體閱讀入口見[架構導覽](../target-architecture-map.md)，設計理由見[設計取捨](design-decisions.md)。
+本章先界定產品範圍，再說明模組、分析角色與資料流。它回答「誰負責判斷、誰保存結果、彼此交換什麼」；具體工具與生命週期沿各節連結深入。整體閱讀入口見[架構導覽](../target-architecture-map.md)，設計理由見[設計取捨](design-decisions.md)。
 
 ## 1. 核心閉環與範圍
 
@@ -10,11 +10,15 @@ Caliburn 把使用者互動、AI 分析、業務資料與執行恢復分開處�
 
 現行產品範圍包括：多份隔離職務檔案、自然長訪談、A 的 Step 恢復／暫停／取消、候選 JD 即時預覽與完成提交、B1／B2 整理及固定 Memory 快照、可追溯來源、人工改稿可見性、JD 依據待核對、目前稿 PDF。
 
+明示配置後，顧問另可用公版職位參考查漏，保存選用公版與員工明確否認的工作範圍；B1／B2 只讀否認範圍。依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，RAG 是 App 外部的可選服務，公版不是員工事實，也不自動判定 JD 完成。
+
 現行範圍不含專用全稿審核 AI、原話語意搜尋與跨機還原；C 即時修補、固定雙向互審、通用規則引擎、微服務拆分與舊資料遷移不作為現行方案。全稿完整品質仍是長期產品目標，目前不能宣稱已通過全稿審核。
 
 ## 2. App 拆開後有哪些責任
 
-下圖呈現**現行產品的邏輯分工**；方框不代表獨立服務、程序或資料表。現行架構採模組化單體，由一個 App 後端協調使用者操作與背景流程；非同步工作不要求每個 AI 角色各自使用一個程序。箭頭表示呼叫或資料交換方向，圓柱表示儲存；圖中通常省略回傳箭頭，因此單向箭頭不代表資料只能寫入、不能讀取。
+下圖呈現**現行產品的邏輯分工**。現行架構採模組化單體，由一個 App 後端協調使用者操作與背景流程；方框表示責任，不表示各自部署的服務、程序或資料表。非同步工作也不要求每個 AI 角色各自使用一個程序。
+
+箭頭表示呼叫或資料交換方向，圓柱表示儲存。圖中通常省略回傳箭頭，因此單向箭頭不代表資料只能寫入、不能讀取。
 
 ```mermaid
 flowchart TB
@@ -22,13 +26,14 @@ flowchart TB
   web -->|命令、查詢及執行控制| usecase[App 用例協調]
   subgraph backend[App 後端：邏輯模組]
     usecase -->|啟動與恢復| execution[AI 執行：LangGraph]
-    usecase -->|人工操作與完成協調| domain[業務責任：職務檔案與訪談<br/>JD／Memory]
+    usecase -->|人工操作與完成協調| domain[業務責任：職務檔案與訪談<br/>JD／Memory／公版參考 state]
     execution -->|模型往返與授權工具派送| adapter[角色工具與 Responses 接線]
     adapter -->|受限查詢與修改| domain
     domain -->|業務資料與短交易| persistence[PostgreSQL 持久化接線]
     execution -->|存取執行狀態| checkpoint[LangGraph checkpointer]
   end
   adapter <--> provider[OpenAI Responses API]
+  adapter -.->|明示配置後：公版查讀| rag[獨立公版 RAG 服務]
   persistence -->|業務資料與交易| pg[(PostgreSQL)]
   checkpoint -->|執行保存；不等同業務交易| pg
 ```
@@ -40,12 +45,15 @@ flowchart TB
 | 職務檔案與訪談 | 檔案隔離、輸入保存、正式訪談資格與不可變來源 | 保存輸入、完成後授予序號、範圍回讀、讀原結果 | 取消輸入留存不等於有效來源；[來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md) |
 | JD 業務 | 關聯式正文、候選、人工／AI 變動、正式版本、編輯依據與待核對 | 共用讀寫／提交／撤回規則，來源比較及明確確認 | 不把人寫的 JD 當訪談事實；[JD 工具與領域介面](../specs/2026-09-29-jd-model-tool-contract-review.md) |
 | Memory 業務 | 本批候選、物件與關係、固定發布快照、來源處理進度 | 受限 CRUD、導覽／正文／差異、交接快照、共同發布 | 不替模型判斷工作語意；[Memory 子圖](../specs/2026-09-24-caliburn-layered-architecture-map.md) |
+| 公版參考業務與 HTTP 接線 | App 保存選用公版、否認範圍及原操作結果；RAG 提供固定來源的檢索與正文 | A 按需查讀、選用及更新排除範圍；B1／B2 只讀有效排除範圍 | 明示啟用、資料不複製進 Memory／JD；[公版工具契約](../specs/2026-10-04-public-reference-completion-design.md) |
 | AI 執行 | Graph 執行位置、各角色私有的原生接續資料、Step／控制與恢復 | 執行 A 或 B1／B2；保存已取得結果；按正式結果接續 | 不把 checkpoint 當正式 JD／Memory；[共用執行](../specs/2026-09-27-shared-agent-execution-and-state-design.md) |
 | 角色工具／模型接線 | 將模型意圖轉成授權用例、將真結果轉成原生 output | 模型不填檔案、版本、權限、operation identity；App 注入 | 不是另一套業務儲存／通用管理工具；[工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md) |
 | 持久化接線 | 交易、約束、隔離、條件提交、持久結果查回 | 保存由業務定義的一致操作；提供原操作結果 | 不判斷語意正確、不跨 LLM 開長交易；[資料與交易](persistence.md) |
 | PDF 投影 | 對已完成 JD 的唯讀輸出 | 固定一次正式 JD 修訂後產 PDF，目前不含姓名／訪談／Memory | 不把候選或 PDF 反向當正式 JD；[匯出與部署](delivery-and-operations.md) |
 
-圖中模型接線與 OpenAI 的雙向箭頭表示 Responses 請求與原生輸出；機密資訊與資料外送的界線另見[部署視圖](delivery-and-operations.md)。人工與 AI 編輯都經過 JD 業務模組，因此刪除、引用與提交使用同一套規則，不因操作入口不同而改變。
+圖中模型接線與 OpenAI 的雙向箭頭表示 Responses 請求與原生輸出；通往 RAG 的虛線表示明示配置才啟用的查讀路徑。公版內容由 RAG 管理，選用與否認 state 由 App 保存。機密資訊與資料外送的界線另見[部署視圖](delivery-and-operations.md)。
+
+人工與 AI 編輯都經過 JD 業務模組，刪除、引用與提交使用同一套規則；HTTP 與模型工具只負責各自的輸入與呈現方式。
 
 ## 3. AI 分析角色：共用執行機制、分別處理工作
 
@@ -65,7 +73,9 @@ flowchart TB
 | JD 來源比較／JD 業務 | 既存引用身分、A 固定 Memory、目前合法 JD 位置 | 原引用→目前可見來源的差異或明確不可用結果；不按同名偷換來源，不把 read 當成確認。 |
 | 執行恢復／App 與原業務模組 | 原工作綁定、可靠 checkpoint、原操作辨識、控制資格 | 從原結果或可靠位置接續，或明確保留受阻／已放棄狀態。不能以最新資料冒充舊結果或刷新同 Turn 基準。 |
 
-模型輸入輸出的細節見[工具設計](../specs/2026-09-27-agent-tool-contract-design-research.md)，執行控制見[共用執行機制](../specs/2026-09-27-shared-agent-execution-and-state-design.md)，交易見[資料保存](persistence.md)。圖中的「業務責任」合併呈現職務檔案、訪談、JD 與 Memory；它們仍各自管理資料與規則。
+上表說明跨模組的接收與交付，下表則說明模型的分析職責；流程完成與分析品質須分開判讀。圖中的「業務責任」合併呈現職務檔案、訪談、JD 與 Memory，它們仍各自管理資料與規則。
+
+模型輸入輸出的細節見[工具設計](../specs/2026-09-27-agent-tool-contract-design-research.md)，執行控制見[共用執行機制](../specs/2026-09-27-shared-agent-execution-and-state-design.md)，交易見[資料保存](persistence.md)。
 
 | 角色 | 分析目的 | 可讀／可寫 | 完成代表什麼 |
 |---|---|---|---|
@@ -89,6 +99,8 @@ Memory 採單向 B1 → B2 → 發布，不回交 B1。B1 交接後不再修改�
 | A 完成 → Memory 調度 | 已成立整理要求與訪談序號上界 | 不攜帶 A 私人推理；A final 在上界之後，不納入該批 |
 | B1 → B2 | 同一候選的交接位置、情境變更概覽 | B1 不交私人 context；B2 按需讀正文／Markdown diff |
 | Memory → A／JD | 已發布快照的導覽／正文／來源 | A 同 Turn 固定；JD 引用保留採用當時快照，不自動換版 |
+| A → 公版 RAG → A | 已確認主要工作 query、固定公版定位、目錄或任務正文 | 只在啟用時查讀；不自動加入否認範圍，也不以相似度認定員工責任 |
+| 公版參考 state → A／B1／B2 | A 讀本輪選用及排除範圍；B1／B2 只讀其固定上界內有效的排除範圍 | 選用與否認不寫入 Memory；後輪更正不回流舊批次，取消／失敗候選不跨輪生效 |
 | 業務 → 儲存 | 一致操作與前置條件 | 儲存實現原子性；業務判斷不散落在工具、Graph、UI 三處 |
 
 Python 後端與 Web 之間的傳輸格式由單一來源生成，避免兩端各自定義而產生差異；詳細方式見[契約策略](../contract-strategy.md)。

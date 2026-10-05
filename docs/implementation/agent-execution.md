@@ -2,10 +2,15 @@
 
 - 狀態：**現行共用執行接線**。A／B1／B2 共用原生接續、Step 控制與恢復；產品生命週期依[共用執行契約](../specs/2026-09-27-shared-agent-execution-and-state-design.md)。驗證見[架構驗證](../architecture/verification.md)與[產品實驗](../experiments/product-validation/README.md)；機制接通不等於所有恢復分支或模型品質已驗。
 - 驗證分假 provider＋真 saver／PG、有界真模型及產品旅程。新驗證依當次有效授權進行，不把模型自述或推理摘要當驗收證據。
+- 已確認但未實作的調整：[輪前 App 摘要、輪中原生壓縮](../specs/2026-10-04-context-summary-and-compaction-design.md)。本文仍記載現行原生接線；目標須調整輪前結果型別／採用及 B 輪中候選導覽投影，不能只換 Prompt 就宣稱完成。摘要 Prompt 待討論，未改下面的現行節點、工具 wire 或驗證結論。
+
+本頁說明執行機制如何接上角色與業務模組：先看 Graph 與 State 的責任，再看私有歷史、回退位置及實際接線。哪些資料可正式採用由業務模組判定；Graph 負責保存可接續的位置，兩者在恢復時共同核對。
 
 ## 1. 執行圖與業務資格分開
 
-`agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；角色 runner 經 bootstrap 接上相同 SDK、官方 saver 及持久預算。角色只提供 instructions、允許工具、起始資料 projector 及結束結果轉譯，不各寫 loop。Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。本節節點表描述責任切點，不要求程式恰好採同名 node；實際接線與驗證分見 §6–7 及相關 evidence。
+`agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；角色 runner 經 bootstrap 接上相同 SDK、官方 saver 及持久預算。各角色提供 instructions、允許工具、起始資料 projector 及結束結果轉譯，共用模型與工具的執行迴圈。
+
+Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。本節節點表描述責任切點，不要求程式恰好採同名 node；實際接線與驗證分見 §6–7 及相關 evidence。
 
 責任切點如下，節點名稱是工程名稱，不是對模型公開的新工具：
 
@@ -26,11 +31,13 @@ Graph 入口使用 `durability="sync"`。**native super-step 不等於上述完�
 
 ## 2. State 的最小型別分組
 
-Graph State 保存：不可變工作綁定的參照、原生有效窗口／採用位置、原回應與待處理 calls、候選固定位置及操作結果定位、控制／路由所需資料、已計入的執行計量。**不是全部送 LLM**；也不把現在分析的焦點、猜想等強制變成模型每 Step 必填欄位。
+Graph State 保存執行與恢復所需的資料：不可變工作綁定的參照、原生有效窗口／採用位置、原回應與待處理 calls、候選固定位置及操作結果定位、控制／路由所需資料、已計入的執行計量。
+
+**State 不會全部送入 LLM。**模型 input 由 App 依契約組裝；目前分析焦點、猜想等也不強制成為模型每 Step 必填欄位。
 
 原生窗口 channel 使用明確的「追加 items」與「可靠採用完整 compacted output」操作；不能套會按 message ID 合併覆寫的通用 MessagesState／`add_messages`。serializer 保存 JSON-compatible 原生資料；output→input 轉換只按官方契約，不刪 reasoning／phase／call metadata。`status` 等 output-only 欄位按實際 SDK input 規則轉型，**保存原輸出**與**合法重送表示**分開驗，不能機械送所有 response envelope。[OpenAI 原生接續範例](https://developers.openai.com/api/docs/guides/deployment-checklist#use-reasoningencrypted_content)
 
-SDK client、DB session、工具實作與密鑰由依賴注入，不進 State。候選正文由領域保存，State 不存另一份可寫副本。Runtime context、Graph State、模型 input 明確分型別。
+Runtime context、Graph State 與模型 input 使用不同型別，分清執行依賴、保存進度與本次請求內容。SDK client、DB session、工具實作與密鑰經由依賴注入取得，不進 State；候選正文由領域保存，State 不存另一份可寫副本。
 
 [Memory 寫入接縫](memory-tools.md#4-寫入準備採用與原結果接續)提供 immutable prepared command，可能含已計算的新正文及成功回傳。這是待執行原操作，不是另建可編輯候選。Runtime 在業務 execute 前可靠保存它；恢復以同一命令核對原結果，不重新 prepare 或解析已改指別人的 title。純讀工具的結果也保存後沿原 call 接續，不以現在資料冒充當時觀察。
 
@@ -560,6 +567,14 @@ UI 不傳 writer、checkpoint 或 interrupt ID，Memory kind 不得進入。
 - 日誌僅記 execution identity、kind、exception type，不記原錯誤訊息、provider body、原文或 reasoning。收尾自身失敗向上傳遞，不能顯示假 failed；DB 全面故障時仍需恢復服務，不承諾離線提交。
 - 通用 supervisor 只擁有 task／領導資格，不新增 JD／Memory 判斷；bootstrap 明確注入各自既有的業務收尾。實測範圍及限制見 [T12 §6](../history.md#source-d4bb8d17c5639690aeb3)。
 - A／Memory 產品執行只在最外層收尾一次；原件接續與故障注入直接呼叫 `run`。收尾自身拋錯直接回 supervisor，不再次分類或第二次提交，也不把原 Memory failure reason 改成通用原因。
+
+### 6.3 公版工具的可選角色接線
+
+公版工具的可選接線依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)：bootstrap 只在明示配置時供 A 注入 RAG client，B1／B2 只增加排除範圍唯讀工具。角色先從自己的原 preparation checkpoint 還原模板，工具權限沿已捕捉 request；同工作重入不換提示或增加工具。A 的公版寫入 command 沿既有 prepare／execute／result 節點，重播不倒帶候選；B 的排除讀取沿原 Memory binding／F。實作與反例見[接線紀錄](../plans/2026-10-05-occupation-reference-agent-integration.md)。
+
+`ConsultantRunner._tools` 在建立公版候選前，核對原 captured request 的工具組與寫入結果格式。公版工具缺漏、名稱重複或格式混用時拒絕；合法請求由 `occupation_reference_write_result_format` 決定 handler 的回傳模式。
+
+這個判斷使用原工具定義，不讀當前全域設定。已保存的 native output 直接接續，只有尚未完成的命令才沿原模式 execute。固定描述後綴及兩種結果格式只在[公版工具契約](../specs/2026-10-04-public-reference-completion-design.md#工具契約接續改善2026-10-05)完整定義，[回歸與獨立審查](../plans/evidence/2026-10-05-occupation-reference-tools/hardening-verification.md)保存實際證據。
 
 ## 7. Memory 背景工作
 

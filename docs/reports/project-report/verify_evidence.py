@@ -9,6 +9,7 @@ import hashlib
 import json
 from pathlib import Path
 from statistics import mean
+from xml.etree import ElementTree
 
 REPORT_DIR = Path(__file__).resolve().parent
 DATA_DIR = REPORT_DIR.parents[1] / "experiments/product-validation/data"
@@ -30,7 +31,9 @@ def check_archive_hashes() -> int:
 
 
 def check_comparison_tables(report: str) -> dict:
-    with (COMPARISON_DIR / "metrics.csv").open(encoding="utf-8-sig", newline="") as source:
+    with (COMPARISON_DIR / "metrics.csv").open(
+        encoding="utf-8-sig", newline=""
+    ) as source:
         rows = list(csv.DictReader(source))
     assert len(rows) == 24
     for row in rows:
@@ -42,10 +45,14 @@ def check_comparison_tables(report: str) -> dict:
             turn.get("status") == "completed" for turn in run["turns"]
         )
         assert int(row["tasks"]) == len(tasks)
-        assert int(row["max_task_chars"]) == max(len(task["description"]) for task in tasks)
+        assert int(row["max_task_chars"]) == max(
+            len(task["description"]) for task in tasks
+        )
         assert int(row["capabilities"]) == len(run["jd"]["work"]["capabilities"])
         assert int(row["citations_checked"]) == run["checks"]["citations"]["checked"]
-        assert int(row["citations_unsupported"]) == len(run["checks"]["citations"]["unsupported"])
+        assert int(row["citations_unsupported"]) == len(
+            run["checks"]["citations"]["unsupported"]
+        )
         purpose = bool(run["jd"]["profile"].get("purpose"))
         assert purpose == (row["purpose_written"] == "True")
         persona_label = "課程" if persona == "course_admin" else "倉庫"
@@ -76,7 +83,8 @@ def check_comparison_tables(report: str) -> dict:
         summaries[version] = {
             "completed_turns": sum(int(row["turns_completed"]) for row in group),
             "facets_total": sum(
-                len([key for key in row["hidden_aspects_asked"].split(";") if key]) for row in group
+                len([key for key in row["hidden_aspects_asked"].split(";") if key])
+                for row in group
             ),
             "course_tasks_mean": mean(int(row["tasks"]) for row in course),
             "course_max_chars_mean": mean(int(row["max_task_chars"]) for row in course),
@@ -114,7 +122,9 @@ def check_source_recheck(report: str) -> dict:
         ),
     )
     for name, expected in names_and_hashes:
-        assert hashlib.sha256((SOURCE_DIR / name).read_bytes()).hexdigest() == expected, name
+        assert (
+            hashlib.sha256((SOURCE_DIR / name).read_bytes()).hexdigest() == expected
+        ), name
     run = read_json(SOURCE_DIR / "source-only-recheck-luna-20261001.json")
     audit = read_json(SOURCE_DIR / "source-only-recheck-luna-audit-20261001.json")
     assert run["status"]["status"] == "completed"
@@ -160,9 +170,14 @@ def check_source_recheck(report: str) -> dict:
     ]
     for point in ("before", "after"):
         assert run[point]["work"]["tasks"][0]["description"] in report
-        assert audit["source_chains"][point][0]["understanding"]["content"]["body"] in report
+        assert (
+            audit["source_chains"][point][0]["understanding"]["content"]["body"]
+            in report
+        )
     interview = next(
-        item for item in run["before"]["interviews"]["messages"] if item["interview_sequence"] == 8
+        item
+        for item in run["before"]["interviews"]["messages"]
+        if item["interview_sequence"] == 8
     )
     assert run["input"] in report and interview["interview_text"] in report
     old = audit["source_chains"]["before"][0]["reference"]
@@ -193,8 +208,110 @@ def main() -> None:
         "report_table_rows_checked": 48,
         "comparison": check_comparison_tables(report),
         "source_recheck": check_source_recheck(report),
+        "supplemental_evidence": check_supplemental_evidence(report),
     }
     print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+def check_supplemental_evidence(report: str) -> dict:
+    """Check new table transcriptions without sending requests or editing data."""
+    design_dir = DATA_DIR / "design-comparisons-2026-10-04"
+    design = read_json(design_dir / "live-03/summary.json")
+    for name, expected in design["source_files_sha256"].items():
+        path = REPORT_DIR.parents[2] / name
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected, name
+    with (design_dir / "live-03/metrics.csv").open(
+        encoding="utf-8-sig", newline=""
+    ) as source:
+        rows = list(csv.DictReader(source))
+    assert len(rows) == 36
+    for group in design["groups"]:
+        selected = [
+            row
+            for row in rows
+            if row["suite"] == group["suite"] and row["arm"] == group["arm"]
+        ]
+        for field in (
+            "input_tokens",
+            "output_tokens",
+            "cached_input_tokens",
+            "cache_write_tokens",
+            "model_calls",
+            "read_calls",
+        ):
+            assert sum(int(row[field]) for row in selected) == group[field], field
+        assert sum(row["all_passed"] == "True" for row in selected) == group["passed"]
+    for suite, expected_percent in (("context", 93.77), ("locator", 47.86)):
+        pair = design["paired_input"][suite]
+        calculated = round(
+            100
+            * (pair["baseline_input"] - pair["candidate_input"])
+            / pair["baseline_input"],
+            2,
+        )
+        assert calculated == pair["reduction_percent"] == expected_percent
+        assert str(expected_percent) in report
+    for case_id, label in (
+        ("context-1", "前段"),
+        ("context-18", "中段"),
+        ("context-36", "後段"),
+    ):
+        for repeat in (1, 2):
+            pair = {
+                row["arm"]: row
+                for row in rows
+                if row["case_id"] == case_id and int(row["repeat"]) == repeat
+            }
+            cells = [label, str(repeat)]
+            cells.extend(
+                f"{int(pair[arm]['input_tokens']):,}" for arm in ("full", "selective")
+            )
+            assert f"| {' | '.join(cells)} |" in report, cells
+    memory_dir = DATA_DIR / "memory-compaction-publish-2026-10-04/live-02"
+    memory = read_json(memory_dir / "summary.json")
+    for name, expected in memory["source_hashes"].items():
+        assert (
+            hashlib.sha256((memory_dir / name).read_bytes()).hexdigest() == expected
+        ), name
+    assert memory["published_batches"] == 4
+    assert all(
+        memory[key]
+        for key in (
+            "all_reentries_no_outbound",
+            "all_old_snapshots_unchanged",
+            "all_role_heads_adopted",
+        )
+    )
+    assert len(memory["compaction_handoffs"]) == 2
+    assert all(
+        item["full_output_prefix_preserved"] for item in memory["compaction_handoffs"]
+    )
+    for group in memory["groups"]:
+        label = "原門檻" if group["arm"] == "control" else "壓縮探針"
+        cells = [
+            label,
+            str(group["batch"]),
+            f"{group['model_calls']}／{group['compactions']}",
+        ]
+        cells.extend(f"{group[field]:,}" for field in ("input_tokens", "output_tokens"))
+        assert f"| {' | '.join(cells)} | 成功 |" in report, cells
+    cases = (
+        ElementTree.parse(DATA_DIR / "mechanism-checks-2026-10-04/results.xml")
+        .getroot()
+        .findall(".//testcase")
+    )
+    assert len(cases) == 163
+    assert not any(
+        case.find(tag) is not None
+        for case in cases
+        for tag in ("failure", "error", "skipped")
+    )
+    assert "| 合計 | 163 |" in report
+    return {
+        "model_trials": len(rows),
+        "published_batches": 4,
+        "mechanism_tests": len(cases),
+    }
 
 
 if __name__ == "__main__":

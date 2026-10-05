@@ -2,7 +2,9 @@
 
 > 2026-10-02 切換後，本文標示「已退役」的程式路徑是舊 App（`experiments/jd-relational-app`、`packages/consultant-memory`）的檔案，已自工作樹移除；用 `git show 6ad33bcb:<路徑>` 取回，說明見 [ADR0079](../../docs/adr/0079-target-rebuild-production-cutover.md#退役範圍與取回)。
 
-> **歷史文件（2026-09-22 退役）：**本套契約的 schema、生成器與生成碼已隨舊 API／Web 移除；本頁只保留契約演進記錄。現行新 App 契約由 `experiments/jd-relational-app/contracts`（已退役） 產生並驗證，詳見 [ADR 0077](../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
+> **歷史文件（2026-09-22 退役）：**本套契約的 schema、生成器與生成碼已隨舊 API／Web 移除；本頁只保留契約演進記錄。當時接替它的契約位於 `experiments/jd-relational-app/contracts`（現亦已退役），沿革見 [ADR 0077](../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
+
+現行產品依 ADR0079 使用 `apps/api/contracts` 的正式契約，生成及驗證方式見[契約策略](../../docs/contract-strategy.md)。以下內容與命令只描述本套件退役前的狀態。
 
 以下描述退役前 `/api/v1/job-analysis/consultant-documents` 與 `/workspace` 共用的 typed seam。`schema/job-analysis-workspace.schema.json`
 是唯一 source of truth；`src/job_analysis_contract/models.py` 與 `types/job-analysis-workspace.ts`

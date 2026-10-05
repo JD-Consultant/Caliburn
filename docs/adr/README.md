@@ -88,6 +88,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0077](0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) | 採用已驗關聯式 JD App 為唯一 production authority；舊 API／Web／契約硬退役、fresh PostgreSQL 18.6、Node 24＋pnpm 12 單一根入口，完整保留研究與實驗文件 | **Accepted**（2026-09-22；Owner 核准不保留舊程式或舊資料相容性；取代 0060／0066／0067／0069 的舊 production authority，並採用 0074–0076 已驗實作）；**2026-10-02 起 Superseded by 0079** |
 | [0078](0078-current-jd-read-only-locator.md) | 正式 A 顧問在同一 current JD 上唯讀定位、按需讀正文與關聯，完整讀取後才寫；全稿讀取仍可回退 | **Proposed**（2026-09-24；分支內施工、離線與窄真模型定位通過，完整旅程／品質仍待驗收） |
 | [0079](0079-target-rebuild-production-cutover.md) | 新目標通過 T18 gate 後，共同切換正式入口、CI、文件與精確舊碼退役；不搬移或刪除舊資料 | **Accepted**（2026-10-02；Owner 放行；取代 0077 的正式實作與入口，舊程式已退役） |
+| [0080](0080-opt-in-public-reference-agent-tools.md) | 公版工具以明示設定接入 A，B1／B2 只讀排除範圍；沿原請求與重播，RAG 保持獨立及非預設依賴 | **Accepted**（2026-10-05；Owner 授權接線，現有共用服務不重啟；實作驗證依施工紀錄） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../history.md#source-f661c579036f7cefc3f9)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、契約 #1–#4 登記）。

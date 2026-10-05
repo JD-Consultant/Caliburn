@@ -4,6 +4,19 @@
 [ADR 0079](adr/0079-target-rebuild-production-cutover.md)。舊 `experiments/jd-relational-app`
 （含舊 `app:init`／`app:set-key`、OpenRouter、Windows 認證管理員）已退役，不再有對應命令。
 
+本頁負責安裝、設定、啟停、更新與診斷。首次使用從下方[快速開始](#快速開始)選擇 Docker 或原生方式；產品用途與功能見[主 README](../README.md)。
+
+## 快速開始
+
+選一種啟動方式，所有命令都從專案根目錄執行。首次使用先完成對應的安裝、設定與初始化；之後使用日常啟動命令即可。
+
+| 方式 | 首次安裝與啟動 | 日常啟動 | 停止 |
+|---|---|---|---|
+| Docker：依賴與 PDF 資源由映像提供 | [Docker 操作](#docker-操作) | `docker compose -f compose.jd-app.yaml up -d --wait` | `docker compose -f compose.jd-app.yaml stop` |
+| 原生：本機開發或自行管理 PostgreSQL | [服務與版本](#服務與版本) → [安裝依賴](#安裝依賴) → [第一次初始化](#第一次初始化) → [AI credential](#ai-credential) | 啟動 PostgreSQL、提供環境設定後執行 `pnpm start` | 在啟動的終端按 Ctrl+C |
+
+預設畫面是 `http://127.0.0.1:8100/`。原生開發使用 `pnpm dev`，畫面改為 `http://127.0.0.1:5173/`，操作細節見[日常啟動與停止](#日常啟動與停止)。原生 PDF 資源須另行設定，見[PDF 匯出](#pdf-匯出)。
+
 ## 服務與版本
 
 | 項目 | 要求 |
@@ -15,10 +28,92 @@
 | API | `127.0.0.1:8100`，單程序、無 reload、無 proxy headers |
 | Web | 正式：由 API 同源提供 `http://127.0.0.1:8100/`；開發：Vite `http://127.0.0.1:5173/` |
 | 模型 | OpenAI Responses 直連，`gpt-6-luna`／high；key 只在後端使用 |
-| PDF | 授權的中文字型＋Playwright Chromium（選用；缺少時匯出回 503） |
+| PDF | Docker 已包字型與 Playwright Chromium；原生啟動須另行設定，缺少時匯出回 503 |
 | RAG | 隔離且非預設依賴 |
 
 不要按端口終止身分不明的程序；程式變更後在原前景終端正常停止再重啟。
+
+## Docker 操作
+
+使用根目錄的 `compose.jd-app.yaml`，不是 RAG 的 `docker-compose.yml`。Docker Desktop 須切到 Linux containers，Docker Compose 須為 `2.24.0` 以上（`docker compose version`）；首次建置需下載映像、鎖定依賴、Chromium 與 Noto CJK 字型。前端建置和後端非 editable 安裝由多階段映像完成；執行容器不帶 Node、uv、原始 repo、金鑰或本機依賴。
+
+### 首次啟動
+
+1. 根目錄尚無 `.env` 時，複製 `.env.jd-app.example` 為 `.env`；已有檔案時只補上範例中的設定，不覆蓋原內容：
+
+```powershell
+if (!(Test-Path .env)) { Copy-Item .env.jd-app.example .env }
+```
+
+2. 在根 `.env` 設定 `CALIBURN_POSTGRES_PASSWORD`。使用足夠長、只含英文字母、數字、`-`、`_` 的密碼，避免 URL 分隔字元；妥善保管，後續沿用，不每次重產。這是新專用 PostgreSQL 的密碼，不是既有資料庫的密碼。
+3. AI key 仍放 `apps/api/.env` 的唯一一行 `OPENAI_API_KEY=...`，或以 `CALIBURN_OPENAI_ENV_FILE` 指向本機 key 檔。缺檔時只停用 AI，不影響人工 JD／PDF。Compose 在執行時注入後端環境；它不將檔案建進映像。根 `.env` 與 key 檔均不提交 Git；也不要分享展開後的 `docker compose config` 或完整容器環境。
+4. 從 repo 根目錄依序執行：
+
+```powershell
+& {
+    docker compose -f compose.jd-app.yaml build app
+    if ($LASTEXITCODE -ne 0) { throw 'App 建置失敗，停止啟動。' }
+    docker compose -f compose.jd-app.yaml up -d --wait postgres
+    if ($LASTEXITCODE -ne 0) { throw 'PostgreSQL 未就緒，停止啟動。' }
+    docker compose -f compose.jd-app.yaml run --rm app alembic -c /opt/caliburn/alembic.ini upgrade head
+    if ($LASTEXITCODE -ne 0) { throw '資料庫升級失敗，停止啟動。' }
+    docker compose -f compose.jd-app.yaml up -d --wait app
+    if ($LASTEXITCODE -ne 0) { throw 'App 未就緒，請檢查 log。' }
+}
+```
+
+畫面預設在 `http://127.0.0.1:8100/`。App 內部監聽 `0.0.0.0:8100`，但主機只發布至 `127.0.0.1`；仍是本機單操作者產品，沒有放寬 Host／Origin 或加入反向代理。根 `.env` 可改 `CALIBURN_APP_PORT`（App）與 `CALIBURN_POSTGRES_PORT`（DataGrip）；改埠後使用相應 URL。不要同時用兩個 App 程序連同一個資料庫。
+
+新 PostgreSQL 的 `jd_postgres_data` named volume 保存完整資料庫，包含業務與 checkpoint。PostgreSQL 18 使用 `/var/lib/postgresql` 掛載；不要改掛到舊版的 `/var/lib/postgresql/data`。這套配置不讀、不搬、不刪原本的本機資料庫，也不沿用 RAG volume。既有資料遷入容器須另外先備份、驗證還原，不能將「容器可以啟動」當成資料已搬好。
+
+### 日常啟停與更新
+
+首次安裝完成後，依需要執行其中一項；再次啟動沿用原設定及資料，不需重做初始化。
+
+| 操作 | 命令 |
+|---|---|
+| 啟動／再次啟動 | `docker compose -f compose.jd-app.yaml up -d --wait` |
+| 查看容器狀態 | `docker compose -f compose.jd-app.yaml ps` |
+| 查看最近的 App 紀錄 | `docker compose -f compose.jd-app.yaml logs --tail 100 app` |
+| 停止 App 與資料庫 | `docker compose -f compose.jd-app.yaml stop` |
+
+`stop` 保留容器與 volume；`down` 移除容器與網路，仍保留 named volume。**不要用 `down -v` 或 volume prune 清資料。**不要任意改 Compose project name（`-p`），否則會使用另一份 volume。密碼只在空 volume 初始化時生效；修改 `.env` 不會替已存在的 PostgreSQL 帳號改密碼。
+
+更新前先停在安全點、停止自有 App 並備份整個原資料庫，再更新程式：
+
+```powershell
+& {
+    docker compose -f compose.jd-app.yaml stop app
+    if ($LASTEXITCODE -ne 0) { throw 'App 停止失敗，停止更新。' }
+    git pull --ff-only
+    if ($LASTEXITCODE -ne 0) { throw 'Git 更新失敗，請先核對本機差異。' }
+    docker compose -f compose.jd-app.yaml build app
+    if ($LASTEXITCODE -ne 0) { throw 'App 建置失敗，停止更新。' }
+    docker compose -f compose.jd-app.yaml up -d --wait postgres
+    if ($LASTEXITCODE -ne 0) { throw 'PostgreSQL 未就緒，停止更新。' }
+    docker compose -f compose.jd-app.yaml run --rm app alembic -c /opt/caliburn/alembic.ini upgrade head
+    if ($LASTEXITCODE -ne 0) { throw '資料庫升級失敗，停止更新。' }
+    docker compose -f compose.jd-app.yaml up -d --wait app
+    if ($LASTEXITCODE -ne 0) { throw 'App 未就緒，請檢查 log。' }
+}
+```
+
+資料庫升級仍是明確操作；啟動不自動 migration、建示範資料或清空 volume。上述 PowerShell 區塊在任一步驟失敗時停止，不繼續啟動未升級的 App。映像名稱由 Compose project 區分，隔離測試建置不覆蓋正式 project 的映像。App 以非 root、唯讀 root filesystem 執行，暫存 PDF／瀏覽器工作只寫 `/tmp`。Docker 的 `init` 與 90 秒停止期限供正常收尾；逾時強制結束仍依既有可靠位置恢復，不保證保存所有在途結果。重開且帶 key 時會承接已接受工作，可能使用模型額度。
+
+資料庫被外力中止或重啟後，依既有連線限制再執行 `docker compose -f compose.jd-app.yaml restart app`。Compose 的相依重啟只處理明確的 Compose 操作，不保證 Docker 自動重啟 PostgreSQL 時也重啟 App。healthcheck 只確認程序存活，不代表 AI、資料庫或 PDF 全部可用。
+
+### DataGrip 與診斷
+
+| 欄位 | 預設值 |
+|---|---|
+| Host／Port | `127.0.0.1`／`55440`（改埠後依根 `.env`） |
+| Database／User | `caliburn`／`caliburn` |
+| Password | 根 `.env` 的 `CALIBURN_POSTGRES_PASSWORD` |
+| Schema | 勾選 `caliburn`，不是 `public` |
+
+建議另設唯讀連線。既有 AI 執行紀錄的查閱方式不變：在原生開發環境將 `CALIBURN_DATABASE_URL` 設為上述主機連線，沿下方[執行紀錄](#在-datagrip-查某個職務檔案的-ai-執行紀錄)執行 `apps/api/scripts/refresh_execution_diagnostics.py`，再從 DataGrip 查 VIEW。此開發診斷腳本不在執行映像中；不另造一份診斷來源。
+
+配置、PDF、資料保存及已驗範圍見 [Docker 交付驗證](experiments/product-validation/2026-10-03-docker-delivery.md)。
 
 ## 安裝依賴
 
@@ -27,7 +122,7 @@ pnpm install --frozen-lockfile
 uv sync --project apps/api --locked
 ```
 
-Node／TypeScript 只使用 `pnpm-lock.yaml`；Python 只使用 `apps/api/uv.lock`。不要產生 npm lockfile，也不要用根目錄 Compose 建立 JD App 的資料庫。
+以下為原生開發方式。Node／TypeScript 只使用 `pnpm-lock.yaml`；Python 只使用 `apps/api/uv.lock`。不要產生 npm lockfile，也不要用 RAG Compose 建立 JD App 的資料庫。
 
 ## 第一次初始化
 
@@ -217,7 +312,7 @@ uv run --project apps/api --locked pytest apps/api/tests -m postgres -q
 
 測試各自建立並回收隨機 schema，不碰既有資料。真 PostgreSQL、真瀏覽器與真模型結果分開記錄；離線測試不能代替 provider 或 UI 證據。付費驗證腳本須依 manifest 明示的有限預算執行（見各任務證據）。Windows 受限 token 可能讓暫存目錄權限出現 `WinError 5`，不得為測試變綠而放寬安全限制。
 
-## RAG（隔離、非 JD App 依賴）
+## RAG（獨立服務、非 JD App 預設依賴）
 
 `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder` 與 `packages/ocs-contract` 不在 JD App dependency graph。只有明確執行下列命令才啟動：
 
@@ -227,4 +322,4 @@ pnpm rag:dev
 pnpm rag:down
 ```
 
-不要把 RAG 接進 JD App composition root。詳見 [`design/rag-pipeline.md`](design/rag-pipeline.md)。
+依 [ADR0080](adr/0080-opt-in-public-reference-agent-tools.md)，App 可透過明示 URL 使用公版參考 HTTP 工具；未配置時不建立 client，不自動啟動上述服務。啟用及執行中請求的設定邊界見 [API README](../apps/api/README.md#公版參考工具的可選啟用)。獨立管線沿 [`design/rag-pipeline.md`](design/rag-pipeline.md)。有人正在測試時，不為啟用工具重啟共用程序、改既有 `.env`、更新正式 schema 或清索引。

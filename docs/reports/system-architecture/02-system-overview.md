@@ -8,7 +8,9 @@
 
 圖二的箭頭表示資料或請求往來，框線表示執行位置。Web、後端、PostgreSQL 與 PDF 渲染在本機運作；模型推論則由後端將組裝好的上下文（Context）送至 OpenAI。因此，本產品需要連網，訪談資料也可能隨模型請求外送。
 
-UI 負責訪談、預覽、人工編輯、來源檢視及下載。後端才決定資料範圍、工具權限、正式提交與恢復位置。瀏覽器不持有供應商金鑰，也不是業務資料保存是否成功的判定者。
+圖中呈現未啟用公版參考的基本部署。明示設定後，後端另可透過 HTTP 查讀獨立 RAG 的公版資料；RAG 不由 JD App 自動啟動，也不成為預設依賴。這項可選路徑依 [ADR0080](../../adr/0080-opt-in-public-reference-agent-tools.md)，詳細分工見[第四章](04-agent-execution.md)。
+
+UI 提供訪談、預覽、人工編輯、來源檢視及下載；後端檢查資料範圍與工具權限，協調正式提交及恢復。瀏覽器不持有供應商金鑰，畫面也須依後端結果判定資料是否已保存。
 
 目前選型為 React／TypeScript 前端，Python／FastAPI 後端，PostgreSQL 保存產品資料，LangGraph 管理可持久接續的執行。模型以 OpenAI direct Responses SDK 呼叫，產品選擇 Luna／high；這是成本與品質的產品取捨，不是宣稱它對所有任務最佳。PDF 使用受控的 HTML／CSS 與 Chromium 渲染。
 
@@ -26,7 +28,9 @@ A、B1、B2 是不同職責、工具集與 Context 的分析角色，共用執�
 | 執行 Checkpoint | 已保存的模型／工具進度、Context 接續位置 | 用來恢復工作，不直接冒充正式產品資料 |
 | 供應商 Response 狀態 | 遠端接續與保存 API 回應的能力 | 本產品用 `store=false`，不使用 `previous_response_id` 作為歷史來源 |
 
-Context 由 App 組裝與接續，其中的 reasoning／compaction 項目可能包含供應商產生、App 無法解讀的內容。App 控制傳送哪些項目，但不能任意重寫內部推理。`store=false` 表示本產品不以遠端 Response 保存作為恢復依據，不能據此推論供應商完整的隱私或資料留存政策。
+Context 由 App 組裝與接續，其中的 reasoning／compaction 項目可能包含供應商產生、App 無法解讀的內容。App 控制傳送哪些項目，但不能任意重寫內部推理。
+
+`store=false` 表示本產品不以遠端 Response 保存作為恢復依據；供應商的完整隱私與資料留存政策，仍須依其契約判讀。
 
 ## 部署與權限要分開看
 

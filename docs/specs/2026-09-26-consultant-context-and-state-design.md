@@ -1,6 +1,8 @@
 
 # 職務顧問的上下文與分析延續
 
+**Context 調整的狀態：**本文的輪前原生壓縮、時序圖與 C 恢復範例記載現行接法。已確認目標改為輪前按需 App 文字摘要、輪中原生 compaction，依[新 Context 契約](2026-10-04-context-summary-and-compaction-design.md)；尚未實作／驗收，摘要 Prompt 待討論。A 的固定 Memory、起始資料順序、來源資格、Step 恢復及取消保證不變。
+
 職務顧問 A 透過模型與工具往返理解員工工作，並在不同訪談回合與上下文壓縮後接續分析。本文說明模型看見哪些資料、如何延續與恢復，以及 Memory、JD 和保存之間的界線。
 
 各 Agent 的共同機制見[共用執行](2026-09-27-shared-agent-execution-and-state-design.md)，B1／B2 的工作交界見[背景生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md)。全產品關係見[架構導覽](../target-architecture-map.md)，方法依據見[原生接續與 State 研究](../research/agent-systems/2026-09-26-reasoning-tool-results-and-state-boundary-research.md)。正式程式為 `apps/api`／`apps/web`，見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)；驗證層級見[驗收矩陣](../architecture/verification.md)。
@@ -16,7 +18,7 @@
 | 三層受訪者工作記憶；A 不直接維護正式 Memory，不採 C | [資訊責任](../product-concept.md#分層工作記憶)、[記憶子圖](2026-09-24-caliburn-layered-architecture-map.md)。B1 維護工作情境，B2 維護工作理解；不是 B2 審批 B1。 |
 | Memory 跨 Step 固定、跨 Turn 換用最新正式版 | [PROD-G1-013 讀取基準](../product-concept.md#上下文與分析接續)。這是本產品的一致性選擇，不是 OpenAI 的強制規則。 |
 | 新 Turn 的 App user 資料直接附完整近期訪談，本輪原話另行提供 | [PROD-G1-029 訪談可見範圍](../product-concept.md#上下文與分析接續)。按正式訪談序號 K 之後至 H 及必要前問組裝，不改成固定最近幾輪；精確定義見 §4，同 Turn 不在每 Step 重複追加起始資料。 |
-| OpenAI 直連、`all_turns` 與原生 Compaction | [PROD-G1-018／019](../product-concept.md#上下文與分析接續)。Reasoning 跨 Step 及 Turn 接續；A 依門檻或 Agent 決定在 Turn 交界壓縮，B1／B2 依 [007](2026-09-25-b1-b2-information-gap-lifecycle.md#新批次與-compaction-邊界)在新批次首次分析前檢查門檻，達門檻才壓縮已有歷史。另在完整 Step 交界採 160K 中途保險，不啟用 server-side 自動兜底；完整視窗承接不變。 |
+| OpenAI 直連、`all_turns` 與受控 Context 濃縮 | 現行輪前／輪中均用原生 Compaction。已確認目標為[輪前按需文字摘要、輪中原生壓縮](2026-10-04-context-summary-and-compaction-design.md)，尚未實作；跨摘要不宣稱保留全部加密 reasoning。各方輪前 128K、完整 Step 交界 160K 的檢查時點保留，不啟用 server-side 自動兜底。 |
 | App 自主管理 context，不使用 `previous_response_id`，設定 `store=false` | [PROD-G1-016／017](../product-concept.md#上下文與分析接續)。App 提供每次請求的輸入視窗與原生接續 items，並由自己的資料庫管理必要持久資料；保存／恢復依共用執行與[資料交易](../architecture/persistence.md)。 |
 | LangGraph＋OpenAI direct Responses SDK；不採 LangChain 應用封裝 | [PROD-G1-019／020](../product-concept.md#上下文與分析接續)。鎖定版本與接線依[執行接線](../implementation/agent-execution.md)，不使用 LangChain Message 接續層。 |
 | State 支持延續，不強制固定分析表 | [延續能力](../product-concept.md#上下文與分析接續)。不恢復「每 Step 必填分析表／永久追蹤所有疑點」的要求，不增加沒有使用方的分析筆記。 |
@@ -365,6 +367,8 @@ App 綁定職務檔案與本次執行，一致取得最新完整 Memory publicat
 
 ### 輪前主動壓縮與完整 Step 交界保險
 
+**以下表格及返回範例描述現行原生接法。**新目標的輪前摘要、reasoning 界線及回退基底由[輪前摘要契約](2026-10-04-context-summary-and-compaction-design.md#3-輪前以文字摘要準備接續基底)維護。輪中 A 仍完整承接 C，不重加員工輸入或初始 App 資料，也不刷新固定 Memory；B 的候選導覽例外不套用到 A。
+
 **壓縮門檻：**A／B1／B2 輪前檢查 128K，另以 160K 作中途保險。具體時點、完整視窗接續及回退規則統一見[共用執行 §6.3](2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與中途保險)。本節輪前追加資料的步驟不得套在輪中壓縮之後。
 
 | 官方路徑 | 已核對的契約 | 本產品狀態 |
@@ -468,6 +472,8 @@ App 須能在兩種用途之間可靠對應；模型不能生成業務保存結�
 - **工具結果的回補：**已保存的原回傳直接承接；接續缺失時，依原業務結果形成回傳。若不足以提供需要的內容，明示缺口，不猜結果，也不用最新版資料冒充原操作。
 
 #### Compaction 已返回，但切換尚未確認
+
+下列 W → C 是現行原生壓縮的恢復範例。已確認目標的輪前 W → S 同樣要求先保存、確認採用、恢復原後綴；差別是 S 為 App 文字資料而非原生壓縮返回，見[新契約保存表](2026-10-04-context-summary-and-compaction-design.md#5-保存取消與安全點不變)。輪中 W → C 仍依本段原生契約處理。
 
 前 Turn 結束後，以完整舊視窗 W 取得 `/responses/compact` 返回視窗 C。依[官方 standalone 契約](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)，C 指完整 `compacted.output`，不是挑出單一 compaction item。
 

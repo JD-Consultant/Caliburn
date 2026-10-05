@@ -1,8 +1,8 @@
 # Caliburn 架構導覽
 
-Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據的職務說明書（JD）。系統由本機 Web 工作區、後端業務模組、AI 分析流程與資料庫組成；背景工作記憶支援長訪談，來源關係讓每項分析與 JD 改動可以回查。
+Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據的職務說明書（JD）。本機 Web 工作區提供訪談與編輯，後端協調 AI 分析、業務規則及資料保存；背景工作記憶支援長訪談，來源關係支援回查分析與 JD 的依據。
 
-本頁先說明整體運作，再提供各主題的閱讀入口。若想先了解需求與使用情境，可從[產品介紹](product-introduction.md)開始；完整的圖文解說見[系統架構報告](reports/system-architecture/README.md)。
+本頁說明整體運作，並帶讀者進入各主題的責任文件；工具欄位與恢復細節在對應專題維護。若想先了解需求與使用情境，可從[產品介紹](product-introduction.md)開始；完整的圖文解說見[系統架構報告](reports/system-architecture/README.md)。
 
 ## 一眼看懂：產品邊界與主要能力
 
@@ -32,12 +32,14 @@ flowchart LR
 | 各模組如何協作，資料流向哪裡？ | [系統責任與資料流](architecture/system-boundaries.md) |
 | 訪談、JD 修改與背景整理何時正式生效？ | [核心閉環與生命週期](specs/2026-09-29-core-value-loop-lifecycle.md) |
 | 顧問如何組裝 Context、固定 Memory 與按需閱讀？ | [顧問 Context](specs/2026-09-26-consultant-context-and-state-design.md) |
+| 已確認的輪前摘要與輪中壓縮如何分工？ | [目標 Context 契約](specs/2026-10-04-context-summary-and-compaction-design.md)；尚未實作，摘要 Prompt 待討論 |
 | 原始訪談、工作情境與工作理解如何組織？ | [Memory 分層設計](specs/2026-09-24-caliburn-layered-architecture-map.md) |
 | B1、B2 如何整理、交接與發布？ | [背景整理生命週期](specs/2026-09-25-b1-b2-information-gap-lifecycle.md) |
 | 模型與工具如何接續，暫停或中斷後如何恢復？ | [共用執行機制](specs/2026-09-27-shared-agent-execution-and-state-design.md) |
 | 工具如何命名、限制權限與回傳結果？ | [工具設計](specs/2026-09-27-agent-tool-contract-design-research.md) |
 | Memory 如何定位、讀取、編輯與引用？ | [讀取與來源](specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[物件更新](specs/2026-09-27-memory-object-update-tool-contract.md)、[操作範例](specs/2026-09-28-memory-tools-crud-examples.md) |
 | JD 的欄位、來源與差異如何處理？ | [JD 資料與工具](specs/2026-09-29-jd-model-tool-contract-review.md)、[JD 寫作指南](guides/2026-09-09-jd-field-and-writing-guide.md) |
+| 顧問如何用公版查漏，哪些資訊跨輪保留？ | [公版工具與 state](specs/2026-10-04-public-reference-completion-design.md)；可選接線依 [ADR0080](adr/0080-opt-in-public-reference-agent-tools.md)，檢索由[獨立 RAG API](specs/2026-10-05-occupation-reference-api-design.md)負責 |
 | 版本、交易與執行資料如何保存？ | [資料保存與交易](architecture/persistence.md) |
 | 畫面、串流、PDF 與本機服務如何運作？ | [互動與運作](architecture/delivery-and-operations.md) |
 | 為什麼採用這些技術與設計？ | [設計取捨](architecture/design-decisions.md) |
@@ -59,18 +61,20 @@ flowchart LR
 ## 貫穿系統的五個設計概念
 
 - **分層分析與按需閱讀。**原始訪談 → 工作情境 → 工作理解逐層整理；JD 可採用任一層的合格依據。導覽找位置，diff 找變化，正文與原話補足脈絡。
-- **候選與正式快照。**B1／B2 修改目前候選，完成才發布不可變快照。A 每輪固定一版正式 Memory，背景新版不改變執行中的基準；JD 歷史依據也不自動換版。
+- **候選與正式快照。**候選是尚未正式採用的工作稿，保存後仍可預覽與恢復。B1／B2 整理完成才發布不可變 Memory 快照；A 每輪固定一版正式 Memory，背景新版不改變執行中的基準，JD 歷史依據也不自動換版。
 - **執行歷史與正式訪談。**原生模型輸出與工具結果用於接續推論；正式訪談保存有效交流。取消輸入、中間訊息與推理摘要即使可回看，也不因此取得正式來源資格。
-- **Step 接續與整輪取消。**Step 恢復保留同一輪的資料基準；取消則退回新輸入前，保留已採用的輪前 compaction。含有被放棄輸入的輪中壓縮不能跨回退使用。
+- **Step 接續與整輪取消。**Step 恢復保留同一輪的資料基準；取消則退回新輸入前，保留已採用的輪前接續基底。含有被放棄輸入的輪中壓縮不能跨回退使用。現行輪前與輪中皆採原生 compaction；已確認但尚未實作的目標，是輪前改用按需文字摘要、輪中保留原生壓縮。
 - **來源差異與人工改稿。**來源換版與人工修改 JD 有各自的比較基準。看過 diff 不代表已確認依據；只有 JD 需要明確核對對齊，Memory 候選沒有逐筆確認引用的流程。
 
 ### 業務規則與交易機制
 
-業務模組決定哪些結果必須一起成立，工作流程協調操作，PostgreSQL 負責原子提交、約束與持久保存。顧問完成時，正式訪談、JD 候選採用與執行完成狀態在同一交易提交；Memory 發布時則固定快照與處理進度。LangGraph 保存執行位置，恢復時仍以正式業務結果為準。交易內不等待模型回應，詳細機制見[資料與交易](architecture/persistence.md)。
+業務模組決定哪些結果必須一起成立，工作流程協調操作，PostgreSQL 負責原子提交、約束與持久保存。顧問完成時，正式訪談、JD 候選採用與執行完成狀態在同一交易提交；Memory 發布時則固定快照與處理進度。
+
+LangGraph 保存執行位置。恢復時，App 核對原業務結果後接續，不能只從執行位置推定已提交。交易內不等待模型回應，詳細機制見[資料與交易](architecture/persistence.md)。
 
 ## 目前範圍與已知限制
 
-現行產品使用 React／MUI、FastAPI、PostgreSQL、LangGraph 與 OpenAI Responses API，採本機模組化單體。Memory 為單向 B1 → B2 → 發布，不回交 B1。獨立 RAG 研究目前不是 JD App 的執行依賴。
+現行產品使用 React／MUI、FastAPI、PostgreSQL、LangGraph 與 OpenAI Responses API，採本機模組化單體。Memory 為單向 B1 → B2 → 發布，不回交 B1。App 可在明示設定後使用獨立 RAG 的公版查讀服務；未配置時維持原流程，RAG 不成為預設啟動依賴。
 
 既有實驗包含真模型合成旅程、資料庫測試與離線測試；各自證明的範圍不同。真人訪談的省時與學習負擔尚待評估，部分背景壓縮與發布分支尚未驗證。Memory 最終失敗後再前進三輪才允許新批次，是現行程序的行為，產品政策仍待確認。結果與限制集中在[驗證章節](architecture/verification.md)。
 

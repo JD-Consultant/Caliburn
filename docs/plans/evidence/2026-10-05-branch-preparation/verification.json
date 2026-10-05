@@ -1,0 +1,142 @@
+{
+  "date": "2026-10-05",
+  "branch": "reference-and-maintenance",
+  "base_commit": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "scope": "All completed work, explicitly authorized by the user; local commits and preparation only.",
+  "commands": [
+    {
+      "command": "pnpm check",
+      "exit_code": 0,
+      "results": {
+        "launcher_tests": 5,
+        "api_unit_contract_tests": 1402,
+        "web_tests": 270,
+        "web_test_files": 43,
+        "mypy_source_files": 319,
+        "ruff_format_files": 480,
+        "lint": "passed",
+        "codegen_drift_check": "passed",
+        "production_build": "passed"
+      }
+    },
+    {
+      "command": "apps/ocs-indexer/.venv/Scripts/python.exe -m pytest -p no:cacheprovider apps/ocs-indexer/tests apps/embedder/tests -q --tb=short",
+      "exit_code": 0,
+      "tests_passed": 86,
+      "provider": "test doubles; QdrantLocal contract, no live GPU"
+    },
+    {
+      "command": "apps/pdf-to-json/.venv/Scripts/python.exe -m pytest -p no:cacheprovider -o addopts= apps/pdf-to-json/tests -q --tb=short",
+      "exit_code": 0,
+      "tests_passed": 67
+    },
+    {
+      "command": "apps/api/.venv/Scripts/python.exe docs/plans/evidence/2026-10-05-occupation-reference-tools/run_tests.py apps/api/tests/integration/test_occupation_reference_tool_journey.py apps/api/tests/integration/test_occupation_reference_runners.py apps/api/tests/integration/test_reference_template_reentry.py apps/api/tests/integration/test_occupation_reference_workflow.py apps/api/tests/integration/test_occupation_reference_state.py apps/api/tests/integration/test_excluded_work_reads.py -q --tb=short",
+      "exit_code": 0,
+      "tests_passed": 55,
+      "database": "Explicit loopback 55441 *_test database; own random schemas only",
+      "provider": "MockTransport"
+    },
+    {
+      "command": "apps/api/.venv/Scripts/python.exe -m pytest -p no:cacheprovider docs/reports/project-report/test_verify_evidence.py -q --tb=short",
+      "exit_code": 0,
+      "tests_passed": 3
+    },
+    {
+      "command": "apps/api/.venv/Scripts/python.exe docs/reports/project-report/verify_evidence.py",
+      "exit_code": 0,
+      "archive_hashes_checked": 28,
+      "report_table_rows_checked": 48
+    },
+    {
+      "command": "apps/api/.venv/Scripts/python.exe docs/reports/project-report/verify_retrieval_evidence.py",
+      "exit_code": 0,
+      "local_evidence_links_checked": 33,
+      "report_tables": [
+        "B.28",
+        "B.29",
+        "B.30"
+      ]
+    },
+    {
+      "command": "docker compose -f compose.jd-app.yaml config --quiet",
+      "exit_code": 0,
+      "configuration": "Synthetic password and missing optional key file; no container mutation"
+    }
+  ],
+  "document_links": {
+    "files_checked": 329,
+    "local_links_checked": 2800,
+    "errors": [],
+    "captured_source_copies_preserved": 23
+  },
+  "artifact_storage": {
+    "archives": 8,
+    "original_bytes": 470586946,
+    "archive_bytes": 52640587,
+    "roundtrip_sha256": "all 8 passed",
+    "documented_restoration_command": "executed; existing originals validated without overwrite"
+  },
+  "publish_content": {
+    "files_above_50mib": [],
+    "unresolved_credential_patterns": [],
+    "reviewed_existing_test_fixtures": [
+      {
+        "path": "apps/api/tests/integration/test_credential_containment.py",
+        "assignment": "SECRET",
+        "reason": "Existing literal test sentinel; starts with sk-caliburn-, unchanged from HEAD.",
+        "sha256": "3c412dc40aacabd0f27f368cd76325bd6f9b99c3c7f9dbaac3dc8aef0a275efe"
+      }
+    ],
+    "local_scratch_and_filled_env_files": "excluded",
+    "staged_diff_whitespace": "Source and maintained docs checked with CRLF allowed; frozen experiment/evidence files checked by exact staged-blob SHA-256 instead of formatting."
+  },
+  "verification_context": {
+    "initial_uv_cache_failure": "Sandbox filesystem ACL; same pnpm command passed after approval",
+    "initial_pg_runner_failure": "Actual published port initially unavailable; read-only inspect and TCP check succeeded; original runner then passed",
+    "product_services_restarted": false,
+    "volumes_cleared": false,
+    "paid_model_calls": 0,
+    "push_executed": false,
+    "merge_executed": false,
+    "worktrees": 1
+  },
+  "commit_groups": [
+    {
+      "key": "license",
+      "message": "chore(license): adopt MIT license",
+      "paths": 10
+    },
+    {
+      "key": "pdf",
+      "message": "fix(pdf): preserve OCS content across table variants",
+      "paths": 70
+    },
+    {
+      "key": "rag",
+      "message": "feat(rag): add occupation reference retrieval and source reads",
+      "paths": 46
+    },
+    {
+      "key": "agents",
+      "message": "feat(agents): add reference tools and refine memory reading",
+      "paths": 112
+    },
+    {
+      "key": "deploy",
+      "message": "feat(deploy): add local Docker app startup",
+      "paths": 7
+    },
+    {
+      "key": "research",
+      "message": "docs(research): preserve retrieval and memory experiment evidence",
+      "paths": 4457
+    },
+    {
+      "key": "docs",
+      "message": "docs: clarify product architecture and submission report",
+      "paths": 75
+    }
+  ],
+  "completed_docker_demo_record": "docs/experiments/product-validation/2026-10-05-docker-demo-update.md"
+}

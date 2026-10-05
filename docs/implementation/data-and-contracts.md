@@ -3,17 +3,23 @@
 - 狀態：**現行業務、資料及契約的接線原則**。具體保存分別由[訪談](interview-storage.md)、[JD](jd-storage.md)及[Memory](memory-storage.md)文件說明；正式 DDL 與生成契約由程式維護。驗證見[結案紀錄](../history.md#source-ee8cbce8eb3c303d1765)。
 - 語意權威：[資料保存與交易](../architecture/persistence.md)、[Memory 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[JD 工具](../specs/2026-09-29-jd-model-tool-contract-review.md)。本頁只說接線方式。
 
+本頁從人工與模型工具共用的業務入口開始，說明短交易、原操作結果、Memory 發布及 JD 完成如何接在一起。具體資料表與保存演算法由各保存文件維護，這裡說明它們必須共同遵守的接線規則。
+
 ## 1. 一個 service、一個正式結果，兩種入口
 
-人工 HTTP 與 Agent tool 各自轉譯輸入，呼叫同一領域用例。服務輸入包含 App 綁定的檔案／執行資格、解析後的內部目標、型別化修改與原操作辨識；模型不填這些執行值。返回 typed result，再分別投影為 HTTP DTO／精簡工具文字，不以模型可見 `updated` 作資料庫收據。
+人工 HTTP 與 Agent tool 各自轉譯輸入，呼叫同一領域用例，因此同一種修改遵循相同的業務規則。用例輸入包含 App 綁定的檔案／執行資格、解析後的內部目標、型別化修改與原操作辨識；模型不填這些執行值。
 
-API 接受的 client command ID 用於辨認瀏覽器重送同一命令；模型 `call_id` 用於 function output 配對；業務 operation ID 用於重入查回原效果。用途分開，但不強制三張表或三套 registry。operation identity 在派送前可恢復，重入不重新解析改名後的 target_title。
+用例回傳有型別的實際結果，HTTP 將它投影為 DTO，模型工具則投影為精簡文字。模型可見的 `updated` 是成功確認；恢復時仍查原業務結果，不能把這段文字當成資料庫保存的唯一憑據。
+
+三種識別各有用途：client command ID 辨認瀏覽器重送同一命令，模型 `call_id` 配對 function output，業務 operation ID 則用來查回原操作效果。這些用途須分清，但不強制三張表或三套 registry。operation identity 在派送前須可恢復；重新進入時沿用原目標，不重新解析已改名的 target_title。
 
 ## 2. SQL／交易責任
 
 單庫短交易預設從 PostgreSQL Read Committed＋顯式條件／短行鎖開始驗證，不以 Serializable 包住整輪。跨列不變量以唯一鍵、FK、檔案／候選控制列鎖或條件更新保障；Serializable 只有具體反例需要時局部採用，serialization failure 由原操作重試而非重跑 LLM。所有可見資料均檢查 job_file scope。
 
-業務服務定義「一次必須成立什麼」，SQL adapter 實現原子性；工作流開短交易、相關服務參與同一 session，內層不提交。模型、串流、PDF、等待使用者、重試 backoff 期間不得持有該交易。DB pool connection 與 Graph checkpointer connection 各自管理，不能假設 saver 與業務共享 transaction。[PostgreSQL](https://www.postgresql.org/docs/current/transaction-iso.html)、[SQLAlchemy async session](https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#using-asyncsession-with-concurrent-tasks)
+業務服務定義「一次必須成立什麼」，SQL adapter 實現原子性。工作流開短交易，相關服務參與同一 session，內層不提交；模型、串流、PDF、等待使用者及重試 backoff 期間不得持有該交易。
+
+DB pool connection 與 Graph checkpointer connection 各自管理，不能假設 saver 與業務共享 transaction。[PostgreSQL](https://www.postgresql.org/docs/current/transaction-iso.html)、[SQLAlchemy async session](https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#using-asyncsession-with-concurrent-tasks)
 
 **每筆具副作用操作的共同接法：**
 

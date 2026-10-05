@@ -1,0 +1,62 @@
+name: caliburn-jd-app
+
+services:
+  postgres:
+    image: postgres:18.6-bookworm@sha256:1c59e2c3c818eaa0f0628f695b36e7c9e362d6b219b36a54a32df645cbd7e1af
+    environment:
+      POSTGRES_USER: caliburn
+      POSTGRES_DB: caliburn
+      POSTGRES_PASSWORD: ${CALIBURN_POSTGRES_PASSWORD:?Set a URL-safe database password before starting Compose}
+    ports:
+      - "127.0.0.1:${CALIBURN_POSTGRES_PORT:-55440}:5432"
+    volumes:
+      - jd_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-p", "5432", "-U", "caliburn", "-d", "caliburn"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    init: true
+    environment:
+      CALIBURN_DATABASE_URL: postgresql://caliburn:${CALIBURN_POSTGRES_PASSWORD:?Set a URL-safe database password before starting Compose}@postgres:5432/caliburn
+      CALIBURN_DATABASE_SCHEMA: caliburn
+      CALIBURN_DEV_ORIGIN: http://127.0.0.1:${CALIBURN_APP_PORT:-8100}
+    env_file:
+      - path: ${CALIBURN_OPENAI_ENV_FILE:-./apps/api/.env}
+        required: false
+    ports:
+      - "127.0.0.1:${CALIBURN_APP_PORT:-8100}:8100"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+    shm_size: 256mb
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 90s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8100/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  jd_postgres_data:

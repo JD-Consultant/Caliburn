@@ -1,6 +1,6 @@
 # Optional, isolated RAG infrastructure only.
-# The Caliburn JD App uses the separately initialized PostgreSQL 18.6 instance
-# recorded by `pnpm app:init`; Compose is not part of its default runtime.
+# The Caliburn JD App uses its own compose.jd-app.yaml or a native PostgreSQL.
+# This file never initializes the JD App database.
 
 services:
   qdrant:

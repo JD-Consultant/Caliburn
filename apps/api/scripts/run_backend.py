@@ -1,4 +1,4 @@
-"""Run the loopback development backend with optional explicit OpenAI credentials.
+"""Run the local backend with optional explicit OpenAI credentials.
 
 Database and PDF configuration use target environment variables documented in README.
 This does not migrate, erase, seed or start PostgreSQL, and does not switch production.
@@ -18,6 +18,12 @@ from caliburn.settings import ModelSettings, Settings
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--key-file", type=Path)
+    parser.add_argument(
+        "--host",
+        choices=("127.0.0.1", "0.0.0.0"),
+        default="127.0.0.1",
+        help="Use 0.0.0.0 only inside a container published to host loopback.",
+    )
     # The default is the Demo port; isolated evaluation backends choose another one.
     parser.add_argument("--port", type=int, default=8100)
     arguments = parser.parse_args()
@@ -35,9 +41,10 @@ def main() -> None:
         parser.error("Configure CALIBURN_DATABASE_URL for the isolated target database.")
     uvicorn.run(
         create_app(configured),
-        host="127.0.0.1",
+        host=arguments.host,
         port=arguments.port,
         loop="asyncio:SelectorEventLoop",
+        proxy_headers=False,
     )
 
 

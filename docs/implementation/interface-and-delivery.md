@@ -47,6 +47,10 @@ sequenceDiagram
 
 **列表改名已接上：**選擇 stable file ID，只編輯顯示名稱；使用當時讀到的名稱修訂作新鮮度條件。送出前將原命令保留在該檔案的本分頁 sessionStorage；結果不明時重開／reload 沿用原命令與原基準，不能自動換最新基準重送。明確拒絕後要求重讀，使用者再決定。成功或原結果重送成功都 invalidate 清單與該檔 metadata，由 GET 更新畫面；不將原結果覆蓋成目前名稱。保存與交易由[職務檔案領域模組](interview-storage.md#10-列表改名名稱新鮮度與原操作結果)負責；暫存只為有限 transport 恢復，不另存可編輯的正式資料。窄螢幕保留名稱／受訪者／操作，隱藏次要建立時間，避免字字換行。
 
+**刪除整份檔案：**清單每列提供獨立刪除入口，不觸發進入檔案。確認對話框列出檔案名稱，說明訪談、JD、Memory 與執行紀錄一起刪除且無法復原，初始焦點在「取消」。刪除等待期間停用重複提交；收到 204 後才刷新清單並移除該檔案的 Query cache，不先樂觀隱藏。有未結束工作時說明不能刪除；結果不明可用同一檔案 ID 再確認。API 與交易見[刪除規則](interview-storage.md#11-整份職務檔案刪除)。
+
+清單沿用工作畫面的字型、色彩與細線樣式，檔案名稱是主要入口、受訪者是次要資訊，改名及刪除另列為具可讀名稱的圖示按鈕。窄螢幕與鍵盤操作仍保留這些入口；視覺樣式集中在既有 theme／清單 CSS，不另建一套 UI 系統。
+
 框架依據：[React Router 路由](https://reactrouter.com/start/declarative/installation)、[Query key 必須包含查詢變數](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)、[Ajv 型別守衛](https://ajv.js.org/guide/typescript.html)。本案關閉隱含 query／mutation retry，由 UI 明確重讀／確認；不把 cache 當正式資料。MUI 9 已移除 system props 與 `disableEscapeKeyDown`，使用 `sx` 及受控 `onClose`；焦點在 transition `onEntered` 後定位，保留框架焦點陷阱及關閉恢復，不移除 StrictMode。[MUI migration](https://mui.com/material-ui/migration/upgrade-to-v9/)
 
 驗證：[檔案 UI](../history.md#source-2a993efd60b1a85e23d6)。目前 Ajv 在 runtime 編譯 schema；standalone codegen、嚴格 CSP 相容性及整體 bundle 效能未由此證明。安全限制不能因驗證器需求而默默放寬。
@@ -142,6 +146,8 @@ sequenceDiagram
 已保存的未知原命令優先沿 by-command 核對，不能以 current 空結果證明它從未被接受；不為找回畫面重送原輸入或另造 command ID。頁面徽章、候選與 JD 唯讀狀態維持同一 query cache，沒有另一份 state 或第二個輪詢。契約與分層驗證見[發現入口證據](../history.md#source-c8ea469844e955e1447b)。
 
 **完成後接著輸入：**原 Turn 經狀態查詢確認為 `completed` 後，直接顯示空白輸入框，不要求再點「開始下一次訪談」。顯示表單不啟動模型、不重送原話；使用者按送出時才建立新 command。原完成識別保留到送出時再替換，若已被另一頁換成不同的待確認識別，不得覆蓋。送出事件將原文交給待確認請求並清空下一則草稿；結果不明時保留原 command 與文字供核對，明確未受理則還原為可編輯草稿。即使由另一頁查明同一請求已完成，也不得再把原請求當成下一則輸入。狀態重查不清空使用者正在寫的下一則草稿。取消或失敗仍由使用者選「取回原文編輯／開始下一次訪談」後重查 current；暫停、活動中及未知狀態不開放另送。完成提示用低強調文字，錯誤與待確認仍明示。此規則不改後端准入及保存契約，驗證見[視覺改版證據 §15](../history.md#source-a75c36d876a672e0f607)。
+
+**送出鍵：**輸入框內 Enter 送出、Shift＋Enter 換行（Vercel AI Elements PromptInput；[MDN keydown](https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event)）。Enter 等同按下送出鈕：鈕不可用時不動作，空白草稿與按鈕一樣提示填寫，不另開送出路徑，保存、重送與確認規則同上。輸入法組字中的 Enter（`isComposing`，或 Safari 先結束組字後只剩 keyCode 229）不送出；判斷集中在 `send-key.ts`，其 `keyCode` 是 `no-deprecated` 的唯一例外。
 
 完整公開 commentary 從原生 checkpoint／pending writes 投影；status polling 呈現候選與控制，歷史回答透過原 execution 定位按需回看。即時文字沿 direct Responses typed stream → 有界程序內投影 → 同源 SSE → UI；沒有訊息時明示空，不編造進度。驗證：[provider 串流](../history.md#source-caf2f3430699b78cd2b7)、[傳輸](../history.md#source-8c70f5667c1a6cb7f93f)、[UI](../history.md#source-bfa2c9aaeee3741277e2)。
 

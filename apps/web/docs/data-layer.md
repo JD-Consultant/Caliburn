@@ -1,6 +1,6 @@
 # Web 資料層
 
-> **歷史文件（2026-09-22 退役）：**本頁描述已移除的 `apps/web` 資料層，只供追溯；現行 Web 見 [`experiments/jd-relational-app/web`](../../../experiments/jd-relational-app/web/README.md)。
+> **歷史文件（2026-09-22 退役）：**本頁描述已移除的 Web 資料層，只供追溯；現行介面見 [Web README](../README.md)。舊關聯式 App 的說明已封存，取回方式見[歷史索引](../../../docs/history.md)。
 
 退役前 Web 使用 TanStack Query 讀取 Job Analysis projection；Query cache 是讀取快取，不是另一份文件真相。真相在 API 的 PostgreSQL Current State。
 

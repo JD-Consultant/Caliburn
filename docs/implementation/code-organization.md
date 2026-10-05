@@ -37,6 +37,7 @@ apps/
         openai_responses.py     # direct SDK；不另造 provider interface family
         openai_models.py        # 已核對的模型容量／推理等級與費率；無自動選型／fallback
         graph_checkpointer.py  # 官方 saver 初始化、序列化與身分綁定
+        job_file_checkpointer.py # 檔案列鎖與官方 checkpoint 寫入共用交易，防止刪後遲到保存
         pdf_renderer.py         # 正式 JD 的受控列印
       transport/http/           # routers、DTO mapping、公開串流；無業務 SQL
       transport/model_tools/    # 模型工具的薄入口（JD／Memory 讀寫、背景整理、壓縮請求）；與 http 同為邊界

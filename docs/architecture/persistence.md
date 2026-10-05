@@ -47,6 +47,7 @@ Caliburn 使用 PostgreSQL 保存訪談、JD 和 Memory，使用 LangGraph check
 | A 正式完成 | 完整答覆、有效訪談序號、JD 候選及來源正式採用、完成結果、已成立的 Memory 整理意圖 | 已先行保存原文不重複新增；模型與 PDF 不在交易內 |
 | Memory 交接 | 已完成階段、相應候選快照／位置及下一階段資格 | B2 推論；B1 交接後不再修改本批情境，B1／B2 不同時寫入，見[系統責任](system-boundaries.md) |
 | Memory 發布 | 不可變快照、來源涵蓋上界、發布結果及候選完成狀態 | A 正在執行的固定讀取基準不被替換 |
+| 刪除整份職務檔案 | 檔案、所屬業務資料與原生 checkpoint 一起刪除 | 不等待模型；有執行中、暫停或仍在收尾的工作時拒絕 |
 | 取消或終止未完成 A | 取消資格成立、候選不再可提交、接續回退位置 | 保留已採用輪前 compaction，不承接回退點之後的輪中壓縮；不回滾獨立 Memory 發布或先前正式操作 |
 
 每項操作使用短交易，不以一個交易涵蓋完整 Turn 或 Memory 批次，也不在交易內等待模型回應。資料庫負責原子性、約束、並行安全與持久性，不判斷員工工作內容、模型分析是否完成或提示內容。PostgreSQL 的[交易](https://www.postgresql.org/docs/current/tutorial-transactions.html)、[約束](https://www.postgresql.org/docs/current/ddl-constraints.html)與[隔離](https://www.postgresql.org/docs/current/transaction-iso.html)提供保存機制，業務規則仍由業務模組定義。
@@ -89,7 +90,9 @@ A 完成時持久記錄要求處理到的正式員工訊息上界；同檔案新
 
 現行回看依賴保留的原生回應，不能先清除唯一來源；串流中未保存的片段不承諾恢復。變更保存位置時，須能核對資料已完整交接。目前不自動清理候選與舊 checkpoint，後續須先量測容量，再依上述條件評估；這不代表無限保存沒有成本。
 
-目前不承諾備份／跨機還原，不代表資料可只存在 UI。整份職務檔案刪除與正式歷史保留政策的變更，須另行定義確認程序及引用清理規則。Schema migration 維護現行資料結構，**不遷移舊架構資料**。
+上述保留規則適用於仍存在的職務檔案。使用者可在清單確認刪除整份檔案；其訪談原文、JD、Memory、來源關係及執行紀錄一起移除，不提供復原。有執行中、暫停或仍在收尾的顧問工作，或進行中、仍在收尾的 Memory 整理時，不能刪除。這項操作不允許單獨改寫或清除正式原文，也不影響其他檔案；確認與交易細節見[職務檔案刪除](../implementation/interview-storage.md#11-整份職務檔案刪除)。
+
+目前不承諾備份／跨機還原，不代表資料可只存在 UI。Schema migration 維護現行資料結構，**不遷移舊架構資料**。
 
 交易、中斷、重試與競爭情境的測試方法及結果見[驗證與限制](verification.md)。
 
@@ -99,7 +102,7 @@ App 的公版參考業務模組保存目前選用公版與員工明確否認的�
 
 依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md) 以明示設定接入角色；未配置時不建立 candidate 或 HTTP client。
 
-角色恢復沿原 request 的工具與提示，以及 native checkpoint 已保存的 command／result；重入不倒帶 candidate，不新增另一套 restore 或配置保存。已取消／失敗候選不進入下一輪正式 state。接線與故障注入證據見[接線紀錄](../plans/2026-10-05-occupation-reference-agent-integration.md)。
+角色恢復沿原 request 的工具與提示，以及 native checkpoint 已保存的 command／result；重入不倒帶 candidate，不新增另一套 restore 或配置保存。已取消／失敗候選不進入下一輪正式 state。接線與故障注入證據見[接線紀錄](../experiments/engineering/README.md#角色接線)。
 
 業務操作結果仍保存完整 state。模型端的新寫入成功只回小型確認，需要完整內容時另讀；輸出格式由本輪原請求綁定，舊請求及已存 native result 保留原格式。模型回傳與業務保存的內容不同，不增加第二份 state 權威。格式與相容性以[工具契約](../specs/2026-10-04-public-reference-completion-design.md#工具契約接續改善2026-10-05)為準。
 

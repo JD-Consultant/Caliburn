@@ -9,9 +9,11 @@
 
 ## 1. 設計範圍與驗證方法
 
-2026-10-05 接續完成[公版工具的可選角色接線](../plans/2026-10-05-occupation-reference-agent-integration.md)：以合成 Responses／公版 HTTP transport 與真 PostgreSQL 驗證工具資格、跨輪 state、固定 Memory 讀取範圍、寫入後中斷重播及原請求模板恢復。完整指令、結果與獨立審查修正見[驗證原件](../plans/evidence/2026-10-05-occupation-reference-tools/agent-integration-verification.md)；沒有操作共用服務或執行真模型品質比較。
+2026-10-05 接續完成[公版工具的可選角色接線](../experiments/engineering/README.md#角色接線)：以合成 Responses／公版 HTTP transport 與真 PostgreSQL 驗證工具資格、跨輪 state、固定 Memory 讀取範圍、寫入後中斷重播及原請求模板恢復。完整指令、結果與獨立審查修正見[驗證原件](../experiments/engineering/2026-10-05-occupation-reference-tools/agent-integration-verification.md)；沒有操作共用服務或執行真模型品質比較。
 
-工具契約的[接續驗證](../plans/evidence/2026-10-05-occupation-reference-tools/hardening-verification.md)另覆蓋全集合替換說明、各工具錯誤指引、精簡成功回傳，以及新舊請求與已存 native output 的格式保持；完整工具組的重複／缺漏／混用在建立候選前拒絕。離線及 PostgreSQL 結果支持這些工程邊界，顧問選公版、避免重問與 JD 收尾品質仍須模型及訪談驗證。
+工具契約的[接續驗證](../experiments/engineering/2026-10-05-occupation-reference-tools/hardening-verification.md)另覆蓋全集合替換說明、各工具錯誤指引、精簡成功回傳，以及新舊請求與已存 native output 的格式保持；完整工具組的重複／缺漏／混用在建立候選前拒絕。離線及 PostgreSQL 結果支持這些工程邊界，顧問選公版、避免重問與 JD 收尾品質仍須模型及訪談驗證。
+
+2026-10-06 的[檔案刪除驗證](../experiments/product-validation/2026-10-05-job-file-deletion.md#取消與保存競爭的接續驗證2026-10-06)補上取消後原生保存尚未結束的競爭：保存與檔案鎖共用同一交易，刪除後拒絕遲到寫入。相關 PostgreSQL 廣套 227 項與前後端既有檢查通過；工程證據不代替模型分析品質，也不代表該次防護已重建到既有 Docker 映像。
 
 | 設計層次 | 設計依據 | 驗證方法與限制 |
 |---|---|---|

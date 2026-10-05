@@ -62,7 +62,7 @@ manifest。原始 UTF-8 JSON 與 hash 綁定 `reference_id`，讀取不代換成
 
 契約權威：[`indexer_contract/references.py`](../../packages/indexer-contract/src/indexer_contract/references.py)。
 設計及證據：[`API 設計`](../../docs/specs/2026-10-05-occupation-reference-api-design.md)、
-[`施工及驗證`](../../docs/plans/2026-10-05-occupation-reference-api.md)。
+[`施工及驗證`](../../docs/experiments/engineering/README.md#公版參考-api)。
 
 ### 既有 profile／task API
 

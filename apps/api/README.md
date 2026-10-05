@@ -4,6 +4,8 @@
 
 本頁說明後端配置、API 與測試。日常啟動從專案根目錄的 `pnpm` 命令進入，步驟見[操作手冊](../../docs/runbook.md#快速開始)。正式範圍由 [ADR 0079](../../docs/adr/0079-target-rebuild-production-cutover.md)定義；哪些行為已驗證、結果支持到哪裡，見[驗證範圍](../../docs/architecture/verification.md)。
 
+清單支援整份職務檔案刪除：`DELETE /api/job-files/{job_file_id}` 成功回 204，含所屬訪談、JD、Memory 與執行紀錄；有未結束工作時回 409 `job_file_busy`。不可復原，不影響其他檔案。更新既有安裝須先套用 `0025_job_file_deletion`；確認、歷史保護與 checkpoint 交易見[刪除規則](../../docs/implementation/interview-storage.md#11-整份職務檔案刪除)。
+
 產品使用 `gpt-6-luna`／`high`（使用者於 2026-10-01 因成本確認），不採用 Sol 或自動 fallback。程式化 `ModelSettings` 的 Sol 接縫僅保留既有隔離研究，不再推進切換或追加 Sol 外送；沒有環境／UI 模型切換，不能將既有原生歷史交給另一模型。能力與限制以[選型文件](../../docs/implementation/technology-decisions.md#1-首選工具鏈)為準。
 
 ## 安裝與執行
@@ -77,7 +79,7 @@ migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade h
 
 ## API 與執行紀錄
 
-**公版參考工具（可選接線）：**`OccupationReferenceTools` 已可接入顧問 runner；未配置時維持原工具清單，不建立 RAG HTTP client。沒有新增 App HTTP 路由。模型 schema 位於 `contracts/tools/`；綁定、prepare／execute 與生效資格見[工具契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型)，[施工紀錄](../../docs/plans/2026-10-05-occupation-reference-agent-integration.md)記錄驗證。`0024` 新增此 feature 的兩張表，本輪只套用隔離測試 schema，既有安裝仍循上述 `pnpm app:migrate` 流程。
+**公版參考工具（可選接線）：**`OccupationReferenceTools` 已可接入顧問 runner；未配置時維持原工具清單，不建立 RAG HTTP client。沒有新增 App HTTP 路由。模型 schema 位於 `contracts/tools/`；綁定、prepare／execute 與生效資格見[工具契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型)，[驗證紀錄](../../docs/experiments/engineering/README.md#角色接線)記錄驗證。`0024` 新增此 feature 的兩張表，本輪只套用隔離測試 schema，既有安裝仍循上述 `pnpm app:migrate` 流程。
 
 **Memory 排除範圍讀取：**啟用後 B1／B2 只增加 `read_excluded_work({})`，只回 `excluded_work`，沿現有 `MemoryReadBinding` 固定訪談上界與 stage 資格；不需 RAG HTTP client、不複製 Memory、不給選公版或寫入能力。schema、使用方式及時序反例見[唯讀契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#memory-的排除範圍唯讀入口未接模型)。
 

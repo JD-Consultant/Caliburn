@@ -221,3 +221,19 @@ A／B 的角色 workflow 從固定 Memory 取得 K，持久綁定 H／F；同工
 - 只存最小的原命令及結果欄位；現行表頭無法證明某個舊命令是否已提交，因此此資料不能只放 UI。這是職務檔案領域模組保存的結果，不是新通用收據服務、Graph checkpoint 或全文版本平台。首版不清除可重送命令結果。
 
 研究借鑑 [Google AIP-154](https://google.aip.dev/154)的資源新鮮度檢查與 [PostgreSQL row lock](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)；本案採明確 label counter 而非完整資源 ETag，原操作重送保證沿本案既有交易契約。測例涵蓋舊命令重送、同基準競爭、同名隔離、改回同字、原結果不可改、後段失敗一起回滾；不由此宣稱全產品程序故障或交付安全已完成。
+
+## 11. 整份職務檔案刪除
+
+使用者在清單確認後，`DELETE /api/job-files/{job_file_id}` 移除整份職務檔案及其訪談、JD、Memory、引用與執行紀錄。成功回 HTTP 204，沒有 JSON 正文；目標已不存在也回 204，因此回應遺失時可重送同一個檔案 ID。這不是隱藏清單或軟刪除，不提供 Undo。
+
+`JobFileWorkflow.delete` 先鎖住既有顧問與 Memory 執行管理程序的派送入口，再在短交易中取得職務檔案列鎖，檢查是否有 active／paused 的執行，刪除根記錄及該檔案的原生 checkpoint。任一同檔案的執行還在運作或收尾，或資料庫仍有未結束工作時，回 HTTP 409，公開錯誤碼為 `job_file_busy`，不刪任何資料。即使取消或完成狀態已提交，也必須等原執行真正退出後再刪除。
+
+派送鎖持有至刪除交易提交，避免檢查後又啟動新的原生寫入；檔案列鎖與輸入准入共用，避免刪除後仍接受新的工作。刪除不等待模型，也不在持有資料庫列鎖時等待執行收尾；其他閒置檔案仍可正常刪除。未啟用模型時沒有背景執行管理程序，仍保留相同的資料庫忙碌檢查與交易。
+
+- 業務關係使用 PostgreSQL `ON DELETE CASCADE`；既有跨檔案複合外鍵仍保留。Migration `0025_job_file_deletion` 同步 ORM 與資料庫，不清空資料庫或其他 namespace。
+- 原文、固定修訂與原操作結果的保護仍成立；只有所屬檔案根記錄已刪除時，才允許其 cascade 清理。不能用單獨刪除原文或執行記錄繞過歷史保護；資料庫也檢查整份刪除時不能有未結束工作。
+- 原生 checkpoint 沒有業務外鍵。Adapter 按 App 的 `{job_file_id}:` thread 前綴找出該檔案的 threads，使用官方 `AsyncPostgresSaver.adelete_thread` 清除 checkpoint、blob 與 write。Saver 借用當前 SQLAlchemy session 的 psycopg connection，不另開可自行提交的 pool；任一步失敗，業務資料與 checkpoint 一起回滾。
+- 原生寫入另由 `JobFilePostgresSaver` 保護：`aput`／`aput_writes` 在官方寫入連線的同一交易內，先取得所屬檔案的 `FOR KEY SHARE` 鎖。刪除根列的排他鎖與它互斥；已開始的保存先完成，刪除才清理，刪除先成立則後到的保存拒絕。取消或重複取消不能提早釋放保存交易。這不改寫框架表、不另存 checkpoint，也不把模型等待放進交易。
+- 必須透過上述 HTTP／workflow 刪除；手動 SQL 刪根記錄不會代為呼叫原生 Saver。刪除不操作 OpenAI、不刪容器或 volume，也不影響其他檔案及隔離實驗資料庫。
+
+機制依據為 PostgreSQL 的[外鍵 cascade](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)、[trigger 條件](https://www.postgresql.org/docs/current/sql-createtrigger.html)與[列鎖互斥](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)，原生 Saver 的刪除與連線行為亦核對鎖定版本原碼。確認、錯誤及重讀行為見[介面讀寫邊界](interface-and-delivery.md#11-讀寫邊界)；測試方法與結果見[刪除驗證](../experiments/product-validation/2026-10-05-job-file-deletion.md)。

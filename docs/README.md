@@ -21,7 +21,7 @@
 | 修改程式、Prompt、Tool 或 Context | [實作規範](implementation/README.md)：模組、命名、寫法、測試及研究方法 |
 | 查訪談分析與 JD 寫作方法 | [分析指南](guides/README.md)；不是工程規範或實驗結果 |
 | 安裝、啟停、備份及排錯 | [後端](../apps/api/README.md)、[前端](../apps/web/README.md)、[操作手冊](runbook.md) |
-| 查來源與可重現證據 | [產品實驗資料](experiments/product-validation/README.md)、[驗證範圍](architecture/verification.md)、[獨立實驗](experiments/README.md) |
+| 查來源與可重現證據 | [產品實驗資料](experiments/product-validation/README.md)、[工程驗證](experiments/engineering/README.md)、[驗證範圍](architecture/verification.md)、[獨立實驗](experiments/README.md) |
 
 各層文件分別回答不同問題，詳細規則只在負責該主題的文件維護：
 

@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, Mock
 import httpx2
 import pytest
 from fastapi import FastAPI
+from psycopg import AsyncConnection
 
 from caliburn import bootstrap
 from caliburn import settings as configuration
@@ -161,6 +162,9 @@ async def test_disabled_runtime_constructs_no_reference_client_and_leaves_memory
         assert runtime.consultant.call_args.kwargs.get("occupation_references") is None
         assert runtime.situation.call_args.kwargs.get("excluded_work_enabled", False) is False
         assert runtime.understanding.call_args.kwargs.get("excluded_work_enabled", False) is False
+        deletion = runtime.app.state.job_file_workflow
+        assert deletion.consultant_supervisor is runtime.app.state.consultant_supervisor
+        assert deletion.memory_supervisor is runtime.app.state.memory_supervisor
     client_factory.assert_not_called()
     runtime.sdk.close.assert_awaited_once()
 
@@ -230,6 +234,8 @@ async def test_database_startup_forwards_the_explicit_reference_configuration(ru
         yield runtime.saver
 
     runtime.saver.setup = AsyncMock()
+    runtime.saver.conn = Mock(spec=AsyncConnection)
+    runtime.saver.pipe = None
     monkeypatch.setattr(bootstrap.AsyncPostgresSaver, "from_conn_string", saver_context)
     start_model = AsyncMock()
     monkeypatch.setattr(bootstrap, "_start_model_runtime", start_model)

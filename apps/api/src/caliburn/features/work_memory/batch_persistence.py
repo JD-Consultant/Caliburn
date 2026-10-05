@@ -27,27 +27,32 @@ class MemoryBatchRecord(Base):
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
             name="fk_memory_batches_execution",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "base_snapshot_id"],
             ["memory_snapshots.job_file_id", "memory_snapshots.snapshot_id"],
             name="fk_memory_batches_base_snapshot",
             use_alter=True,
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "base_position_id"],
             ["memory_positions.job_file_id", "memory_positions.position_id"],
             name="fk_memory_batches_base_position",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "current_position_id"],
             ["memory_positions.job_file_id", "memory_positions.position_id"],
             name="fk_memory_batches_current_position",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "through_source_id"],
             ["interview_texts.job_file_id", "interview_texts.source_id"],
             name="fk_memory_batches_source_file",
+            ondelete="CASCADE",
         ),
         CheckConstraint("phase IN ('work_situation', 'work_understanding')", name="phase"),
         CheckConstraint("status IN ('open', 'published', 'discarded')", name="status"),
@@ -66,7 +71,9 @@ class MemoryBatchRecord(Base):
     stage_id: Mapped[UUID]
     phase: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(Text)
-    through_source_id: Mapped[UUID] = mapped_column(ForeignKey("formal_interviews.source_id"))
+    through_source_id: Mapped[UUID] = mapped_column(
+        ForeignKey("formal_interviews.source_id", ondelete="CASCADE")
+    )
     covered_through_sequence: Mapped[int]
     through_sequence: Mapped[int]
 
@@ -78,16 +85,19 @@ class MemorySnapshotRecord(Base):
             ["job_file_id", "position_id"],
             ["memory_positions.job_file_id", "memory_positions.position_id"],
             name="fk_memory_snapshots_position",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "execution_id"],
             ["memory_batches.job_file_id", "memory_batches.execution_id"],
             name="fk_memory_snapshots_batch",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "through_source_id"],
             ["interview_texts.job_file_id", "interview_texts.source_id"],
             name="fk_memory_snapshots_source_file",
+            ondelete="CASCADE",
         ),
         UniqueConstraint("job_file_id", "execution_id", name="uq_memory_snapshots_batch"),
         CheckConstraint("covered_through_sequence > 0", name="coverage"),
@@ -97,7 +107,9 @@ class MemorySnapshotRecord(Base):
     snapshot_id: Mapped[UUID] = mapped_column(primary_key=True)
     position_id: Mapped[UUID]
     execution_id: Mapped[UUID]
-    through_source_id: Mapped[UUID] = mapped_column(ForeignKey("formal_interviews.source_id"))
+    through_source_id: Mapped[UUID] = mapped_column(
+        ForeignKey("formal_interviews.source_id", ondelete="CASCADE")
+    )
     covered_through_sequence: Mapped[int]
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
@@ -109,10 +121,13 @@ class MemoryHeadRecord(Base):
             ["job_file_id", "snapshot_id"],
             ["memory_snapshots.job_file_id", "memory_snapshots.snapshot_id"],
             name="fk_memory_heads_snapshot",
+            ondelete="CASCADE",
         ),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     snapshot_id: Mapped[UUID]
 
 
@@ -123,6 +138,7 @@ class MemoryOperationRecord(Base):
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
             name="fk_memory_operations_execution",
+            ondelete="CASCADE",
         ),
     )
 

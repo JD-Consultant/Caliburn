@@ -45,6 +45,10 @@ async def lock_job_file(session: AsyncSession, job_file_id: UUID) -> None:
         raise JobFileNotFoundError("Job file not found")
 
 
+async def delete_job_file(session: AsyncSession, job_file_id: UUID) -> None:
+    await persistence.delete_job_file(session, job_file_id)
+
+
 async def rename_job_file(
     session: AsyncSession, job_file_id: UUID, command: RenameJobFile
 ) -> JobFile:

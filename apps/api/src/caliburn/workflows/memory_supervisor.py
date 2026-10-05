@@ -1,7 +1,8 @@
 """Lifespan-owned Memory tasks; durable discovery, no broker and no nested model retry."""
 
 import asyncio
-from collections.abc import Awaitable, Callable, Mapping
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
+from contextlib import asynccontextmanager
 from types import MappingProxyType
 from uuid import UUID, uuid4
 
@@ -75,6 +76,16 @@ class MemorySupervisor:
         """Optional after-A-commit hint only; periodic discovery is authoritative."""
         if self._started and not self._closing:
             self._wake.set()
+
+    def has_file_runner(self, job_file_id: UUID) -> bool:
+        """Publication can commit before the invocation's native cleanup finishes."""
+        return job_file_id in self._tasks
+
+    @asynccontextmanager
+    async def hold_dispatch(self) -> AsyncIterator[None]:
+        """Exclude discovery/task launch during a short whole-file deletion transaction."""
+        async with self._scan_lock:
+            yield
 
     async def scan(self) -> None:
         """Bounded discovery; no retry authorization and no liveness inference from SQL."""

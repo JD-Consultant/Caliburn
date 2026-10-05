@@ -71,13 +71,15 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test('空清單提供建立入口，但不把未接上的訪談宣稱為可用', async () => {
+test('空清單提供建立入口，頁首只顯示產品資訊', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ job_files: [] })));
   renderApp();
   expect(await screen.findByRole('heading', { name: '職務檔案' })).toBeVisible();
   expect(await screen.findByText('尚無職務檔案')).toBeVisible();
   expect(screen.getByRole('button', { name: '建立職務檔案' })).toBeEnabled();
   expect(screen.queryByRole('button', { name: '傳送' })).not.toBeInTheDocument();
+  expect(screen.getByText('職務訪談與職務說明書')).toBeVisible();
+  expect(screen.queryByText('新架構開發中')).not.toBeInTheDocument();
 });
 
 test('讀取失敗不是空清單，使用者可以重新讀取', async () => {

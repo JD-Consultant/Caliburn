@@ -26,21 +26,25 @@ class JdSourceReferenceRecord(Base):
             ["job_file_id", "revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_source_references_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "reviewed_revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_source_references_reviewed_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "interview_source_id"],
             ["interview_texts.job_file_id", "interview_texts.source_id"],
             name="fk_jd_source_references_interview",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "memory_snapshot_id"],
             ["memory_snapshots.job_file_id", "memory_snapshots.snapshot_id"],
             name="fk_jd_source_references_memory_snapshot",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "memory_object_id", "memory_revision_id"],
@@ -50,6 +54,7 @@ class JdSourceReferenceRecord(Base):
                 "memory_object_revisions.revision_id",
             ],
             name="fk_jd_source_references_memory_revision",
+            ondelete="CASCADE",
         ),
         CheckConstraint(
             "(target_kind = 'profile_field' AND target_field IS NOT NULL "

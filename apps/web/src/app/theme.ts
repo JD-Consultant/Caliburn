@@ -70,7 +70,7 @@ export const color = {
   okIcon: '#218358',
 } as const;
 
-export const radius = { sm: 6, md: 8, lg: 12, xl: 16, xxl: 24 } as const;
+export const radius = { sm: 6, md: 8, lg: 12, xl: 16, xxl: 24, pill: 999 } as const;
 
 /** Geist-style: an edge ring plus several very faint blurs instead of one heavy shadow. */
 export const shadow = {
@@ -85,6 +85,9 @@ export const shadow = {
   composer: `0 0 0 1px ${ink(0.12)}, 0 2px 8px ${ink(0.04)}, 0 4px 40px 4px ${ink(0.03)}`,
   composerHover: `0 0 0 1px ${ink(0.22)}, 0 2px 8px ${ink(0.04)}, 0 4px 40px 4px ${ink(0.03)}`,
   composerFocus: `0 0 0 1.5px ${color.accent}, 0 0 0 5px ${accentTint(0.14)}, 0 2px 8px ${ink(0.04)}`,
+  /** A white, Apple-style button: a hairline ring, then two soft layers that lift it off the page. */
+  button: `0 0 0 1px ${ink(0.1)}, 0 1px 2px ${ink(0.06)}, 0 3px 8px -2px ${ink(0.1)}`,
+  buttonHover: `0 0 0 1px ${ink(0.14)}, 0 1px 2px ${ink(0.08)}, 0 4px 12px -2px ${ink(0.14)}`,
   /** The source sheet's left edge while it overlaps the JD pane. */
   sheet: `-16px 0 32px -8px ${ink(0.08)}`,
 } as const;
@@ -166,6 +169,8 @@ const cssVariables = {
   '--cb-shadow-sm': shadow.sm,
   '--cb-shadow-md': shadow.md,
   '--cb-shadow-lg': shadow.lg,
+  '--cb-shadow-button': shadow.button,
+  '--cb-shadow-button-hover': shadow.buttonHover,
   '--cb-shadow-composer': shadow.composer,
   '--cb-shadow-composer-hover': shadow.composerHover,
   '--cb-shadow-composer-focus': shadow.composerFocus,
@@ -239,22 +244,19 @@ const components: Components<Theme> = {
     styleOverrides: {
       root: {
         minHeight: 36,
-        padding: '6px 14px',
-        borderRadius: radius.md,
+        padding: '6px 16px',
+        borderRadius: radius.pill,
         transition: transition('background-color', 'border-color', 'color', 'box-shadow'),
         '&.Mui-focusVisible': focusOutline,
       },
-      sizeSmall: {
-        minHeight: 28,
-        padding: '2px 10px',
-        fontSize: '0.8125rem',
-        borderRadius: radius.sm,
-      },
+      sizeSmall: { minHeight: 28, padding: '2px 12px', fontSize: '0.8125rem' },
       sizeLarge: { minHeight: 44, padding: '10px 18px' },
       startIcon: { marginRight: 6, marginLeft: -2, '& > *:nth-of-type(1)': { fontSize: 18 } },
+      // A faint resting shadow lifts the white button off the page (shadcn's outline button, Primer's default).
       outlined: {
         backgroundColor: color.surface,
-        '&.Mui-disabled': { borderColor: color.borderSubtle, color: ink(0.38) },
+        boxShadow: shadow.xs,
+        '&.Mui-disabled': { borderColor: color.borderSubtle, color: ink(0.38), boxShadow: 'none' },
       },
       text: { '&.Mui-disabled': { color: ink(0.38) } },
     },
@@ -262,10 +264,14 @@ const components: Components<Theme> = {
       {
         props: { variant: 'contained', color: 'primary' },
         style: {
-          backgroundColor: color.accent,
-          color: color.onAccent,
-          '&:hover': { backgroundColor: color.accentHover },
-          '&.Mui-disabled': { backgroundColor: color.pressed, color: ink(0.38) },
+          // White, Apple style (macOS and iOS 26 capsules): no brand fill, a white face lifted by ring and shadow.
+          backgroundColor: color.surface,
+          color: color.text,
+          fontWeight: 600,
+          boxShadow: shadow.button,
+          '&:hover': { backgroundColor: color.canvas, boxShadow: shadow.buttonHover },
+          '&:active': { backgroundColor: color.pressed, boxShadow: shadow.button },
+          '&.Mui-disabled': { backgroundColor: color.pressed, color: ink(0.38), boxShadow: 'none' },
         },
       },
       {
@@ -274,11 +280,16 @@ const components: Components<Theme> = {
           borderColor: color.borderStrong,
           color: color.text,
           '&:hover': { backgroundColor: color.hover, borderColor: color.borderStrong },
+          '&:active': { backgroundColor: color.pressed },
         },
       },
       {
         props: { variant: 'text', color: 'primary' },
-        style: { color: color.accent, '&:hover': { backgroundColor: color.accentSoft } },
+        style: {
+          color: color.text,
+          '&:hover': { backgroundColor: color.hover },
+          '&:active': { backgroundColor: color.pressed },
+        },
       },
     ],
   },
@@ -286,9 +297,10 @@ const components: Components<Theme> = {
     styleOverrides: {
       root: {
         color: color.textMuted,
-        borderRadius: radius.sm,
+        borderRadius: radius.pill,
         transition: transition('background-color', 'color'),
         '&:hover': { backgroundColor: color.hover, color: color.text },
+        '&:active': { backgroundColor: color.pressed },
         '&.Mui-focusVisible': focusOutline,
       },
       sizeSmall: { width: 28, height: 28, padding: 0, fontSize: '1.125rem' },

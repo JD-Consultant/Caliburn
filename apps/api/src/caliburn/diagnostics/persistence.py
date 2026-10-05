@@ -15,7 +15,9 @@ class DiagnosticExecutionSnapshot(Base):
     __tablename__ = "diagnostic_execution_snapshots"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["job_file_id", "execution_id"], ["executions.job_file_id", "executions.execution_id"]
+            ["job_file_id", "execution_id"],
+            ["executions.job_file_id", "executions.execution_id"],
+            ondelete="CASCADE",
         ),
         CheckConstraint("jsonb_typeof(steps) = 'array'", name="steps_array"),
     )

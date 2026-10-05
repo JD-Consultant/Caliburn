@@ -11,6 +11,7 @@ from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.adapters.job_file_checkpointer import JobFilePostgresSaver
 from caliburn.adapters.occupation_references import OccupationReferenceClient
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.adapters.pdf_renderer import PdfRenderer
@@ -156,12 +157,13 @@ async def _start_database_runtime(
         ),
         options=f"-c search_path={database.settings.schema}",
     )
-    saver = await resources.enter_async_context(
+    native_saver = await resources.enter_async_context(
         AsyncPostgresSaver.from_conn_string(
             dsn, serde=create_graph_serializer(allowed_types=MEMORY_CHECKPOINT_TYPES)
         )
     )
-    await saver.setup()
+    await native_saver.setup()
+    saver = JobFilePostgresSaver(native_saver)
     app.state.consultant_status_workflow = ConsultantStatusWorkflow(database.sessions, saver)
     if configured.model is not None:
         await _start_model_runtime(
@@ -290,3 +292,8 @@ async def _start_model_runtime(
     resources.push_async_callback(memory_supervisor.close)
     await memory_supervisor.start()
     app.state.memory_supervisor = memory_supervisor
+    app.state.job_file_workflow = JobFileWorkflow(
+        database.sessions,
+        consultant_supervisor=supervisor,
+        memory_supervisor=memory_supervisor,
+    )

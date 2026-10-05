@@ -17,16 +17,19 @@ class JdCandidateRecord(Base):
             ["job_file_id", "execution_id"],
             ["executions.job_file_id", "executions.execution_id"],
             name="fk_jd_candidates_execution",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "base_revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_candidates_base_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "current_revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_candidates_current_revision",
+            ondelete="CASCADE",
         ),
         CheckConstraint("status IN ('open', 'adopted', 'discarded')", name="status"),
     )

@@ -6,7 +6,7 @@ import { Alert, Box, Button, InputBase } from '@mui/material';
 import type { SubmitInterviewInput } from '../../shared/api/generated/submit-interview-input';
 import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
 import { ApiError, describeReadError } from '../../shared/api/http';
-import { SendIcon } from '../../shared/ui/icons';
+import { ArrowUpIcon } from '../../shared/ui/icons';
 import {
   clearTurnHint,
   consultantTurnByCommandQuery,
@@ -23,6 +23,7 @@ import {
 } from './interview-turn-api';
 import type { TurnHint } from './interview-turn-api';
 import { ConsultantTurnControls } from './ConsultantTurnControls';
+import { isSendKey } from './send-key';
 import { TurnLog } from './TurnLog';
 
 const statusText: Record<ConsultantTurn['status'], string> = {
@@ -215,6 +216,10 @@ function ComposerForFile({ jobFileId, aboveDock }: ComposerProps) {
   // A plain send is icon-only, as in every chat composer (ChatGPT, Claude, AI Elements' PromptInput);
   // the two states that need words keep their label.
   const iconOnlySend = !submission.isPending && !pending;
+  const sendDisabled =
+    submission.isPending ||
+    restored.error !== null ||
+    (!pending && !readyForNewInput && !canStartNextInput);
   return (
     <>
       <div className="composer-log">
@@ -290,10 +295,10 @@ function ComposerForFile({ jobFileId, aboveDock }: ComposerProps) {
             <ConsultantTurnControls key={verified.execution_id} turn={verified} />
             {isTerminalTurn(verified.status) && verified.status !== 'completed' && (
               <div className="dock-controls">
-                <Button variant="outlined" size="small" onClick={() => startNext(true)}>
+                <Button variant="outlined" onClick={() => startNext(true)}>
                   取回原文編輯
                 </Button>
-                <Button variant="contained" size="small" onClick={() => startNext(false)}>
+                <Button variant="contained" onClick={() => startNext(false)}>
                   開始下一次訪談
                 </Button>
               </div>
@@ -341,19 +346,21 @@ function ComposerForFile({ jobFileId, aboveDock }: ComposerProps) {
                 slotProps={{ input: { 'aria-label': '訪談內容' } }}
                 value={pending?.text ?? draft}
                 onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (!isSendKey(event)) return;
+                  // Enter presses the send button, or does nothing while that is disabled; it never breaks a line.
+                  event.preventDefault();
+                  if (!sendDisabled) event.currentTarget.form?.requestSubmit();
+                }}
                 disabled={(hint !== null && !canStartNextInput) || restored.error !== null}
               />
               <Button
                 type="submit"
                 variant="contained"
-                startIcon={<SendIcon />}
+                startIcon={<ArrowUpIcon strokeWidth={2.25} />}
                 aria-label={iconOnlySend ? sendLabel : undefined}
-                title={iconOnlySend ? sendLabel : undefined}
-                disabled={
-                  submission.isPending ||
-                  restored.error !== null ||
-                  (!pending && !readyForNewInput && !canStartNextInput)
-                }
+                title={iconOnlySend ? `${sendLabel}（Enter）` : undefined}
+                disabled={sendDisabled}
                 className={iconOnlySend ? 'composer-send composer-send--icon' : 'composer-send'}
               >
                 {iconOnlySend ? null : sendLabel}

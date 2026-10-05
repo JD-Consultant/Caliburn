@@ -35,7 +35,7 @@ class ExecutionBudgetRecord(Base):
     )
 
     execution_id: Mapped[UUID] = mapped_column(
-        ForeignKey("executions.execution_id"), primary_key=True
+        ForeignKey("executions.execution_id", ondelete="CASCADE"), primary_key=True
     )
     max_model_steps: Mapped[int] = mapped_column()
     max_compactions: Mapped[int] = mapped_column()
@@ -74,7 +74,7 @@ class OutboundAttemptRecord(Base):
     )
 
     execution_id: Mapped[UUID] = mapped_column(
-        ForeignKey("execution_budgets.execution_id"), primary_key=True
+        ForeignKey("execution_budgets.execution_id", ondelete="CASCADE"), primary_key=True
     )
     attempt_id: Mapped[UUID] = mapped_column(primary_key=True)
     request_id: Mapped[UUID] = mapped_column()

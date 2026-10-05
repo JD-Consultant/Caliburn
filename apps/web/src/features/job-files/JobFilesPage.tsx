@@ -19,11 +19,13 @@ import {
 } from '@mui/material';
 import { describeReadError } from '../../shared/api/http';
 import { IconAction } from '../../shared/ui/IconAction';
-import { AddIcon, EditIcon } from '../../shared/ui/icons';
+import { AddIcon, CloseIcon, EditIcon } from '../../shared/ui/icons';
 import type { JobFile } from '../../shared/api/generated/job-file-list';
 import { CreateJobFileDialog } from './CreateJobFileDialog';
+import { DeleteJobFileDialog } from './DeleteJobFileDialog';
 import { RenameJobFileDialog } from './RenameJobFileDialog';
 import { jobFileQuery, jobFilesQuery } from './job-file-api';
+import { clearPendingRename } from './rename-command';
 
 // "2026/09/29 18:00": 24-hour, no seconds. The default zh-TW form ("2026/9/29 下午6:00:00") wraps.
 const createdFormat = new Intl.DateTimeFormat('zh-TW', {
@@ -41,6 +43,7 @@ export function JobFilesPage() {
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
   const [renaming, setRenaming] = useState<JobFile | null>(null);
+  const [deleting, setDeleting] = useState<JobFile | null>(null);
 
   function created(jobFileId: string): void {
     setIsCreating(false);
@@ -61,8 +64,24 @@ export function JobFilesPage() {
     void cache.invalidateQueries({ queryKey: jobFilesQuery.queryKey });
   }
 
+  async function refreshDeletedFile(jobFileId: string): Promise<void> {
+    // 現行檔案相關 query key 的第二段皆為 jobFileId；避免其他檔案或全域清單遭清除。
+    const scopedQueries = {
+      predicate: (query: { queryKey: readonly unknown[] }) => query.queryKey[1] === jobFileId,
+    };
+    await cache.cancelQueries(scopedQueries);
+    cache.removeQueries(scopedQueries);
+    try {
+      clearPendingRename(jobFileId);
+    } catch {
+      // 本機儲存不可用不改變後端已確認的刪除結果。
+    }
+    await cache.invalidateQueries({ queryKey: jobFilesQuery.queryKey });
+    setDeleting(null);
+  }
+
   return (
-    <Stack spacing={4}>
+    <Stack spacing={4} className="job-files-page">
       <div className="page-heading">
         <div>
           <Typography variant="h4" component="h1">
@@ -142,13 +161,11 @@ export function JobFilesPage() {
                               underline="none"
                               color="text.primary"
                               className="row-link"
+                              title={file.job_file_id}
                               aria-label={`開啟 ${file.display_name}（${identity}）`}
                             >
                               {file.display_name}
                             </Link>
-                            <small className="file-identity" title={file.job_file_id}>
-                              識別 {file.job_file_id.slice(0, 8)}
-                            </small>
                           </div>
                         </Stack>
                       </TableCell>
@@ -170,6 +187,17 @@ export function JobFilesPage() {
                         >
                           <EditIcon />
                         </IconAction>
+                        <IconAction
+                          className="row-action"
+                          color="error"
+                          label={`刪除 ${file.display_name}（${identity}）`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setDeleting(file);
+                          }}
+                        >
+                          <CloseIcon />
+                        </IconAction>
                       </TableCell>
                     </TableRow>
                   );
@@ -187,6 +215,14 @@ export function JobFilesPage() {
           file={renaming}
           onClose={() => setRenaming(null)}
           onRefresh={refreshRenamedFile}
+        />
+      )}
+      {deleting && (
+        <DeleteJobFileDialog
+          key={deleting.job_file_id}
+          file={deleting}
+          onClose={() => setDeleting(null)}
+          onDeleted={refreshDeletedFile}
         />
       )}
     </Stack>

@@ -169,6 +169,11 @@ async def require_manual_edit_allowed(session: AsyncSession, job_file_id: UUID) 
         raise ExecutionBusyError("Manual edits are disabled while a consultant turn is active")
 
 
+async def require_file_deletion_allowed(session: AsyncSession, job_file_id: UUID) -> None:
+    if await persistence.has_live_work(session, job_file_id):
+        raise ExecutionBusyError("Complete or discard live work before deleting this job file")
+
+
 async def _lock_execution(
     session: AsyncSession, scope: ExecutionScope
 ) -> persistence.ExecutionRecord:

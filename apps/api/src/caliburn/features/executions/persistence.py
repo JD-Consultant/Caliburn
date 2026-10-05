@@ -49,7 +49,9 @@ class ExecutionRecord(Base):
     )
 
     execution_id: Mapped[UUID] = mapped_column(primary_key=True)
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"))
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE")
+    )
     kind: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(Text)
     writer_id: Mapped[UUID | None] = mapped_column()
@@ -97,6 +99,20 @@ async def has_active_consultant(session: AsyncSession, job_file_id: UUID) -> boo
             .where(
                 ExecutionRecord.job_file_id == job_file_id,
                 ExecutionRecord.kind == "consultant_turn",
+                ExecutionRecord.status.in_(("active", "paused")),
+            )
+            .limit(1)
+        )
+    ) is not None
+
+
+async def has_live_work(session: AsyncSession, job_file_id: UUID) -> bool:
+    """Whole-file deletion must wait for both consultant and Memory work."""
+    return (
+        await session.scalar(
+            select(ExecutionRecord.execution_id)
+            .where(
+                ExecutionRecord.job_file_id == job_file_id,
                 ExecutionRecord.status.in_(("active", "paused")),
             )
             .limit(1)

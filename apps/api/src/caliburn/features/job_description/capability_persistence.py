@@ -37,7 +37,9 @@ class CapabilityRevisionRecord(Base):
         ),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     capability_id: Mapped[UUID] = mapped_column(primary_key=True)
     content_revision_id: Mapped[UUID] = mapped_column(primary_key=True)
     kind: Mapped[str] = mapped_column(Text)
@@ -52,6 +54,7 @@ class CapabilitySelectionRecord(Base):
             ["job_file_id", "revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_capability_selections_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "capability_id", "content_revision_id"],
@@ -61,6 +64,7 @@ class CapabilitySelectionRecord(Base):
                 "jd_capability_revisions.content_revision_id",
             ],
             name="fk_jd_capability_selections_content",
+            ondelete="CASCADE",
         ),
         UniqueConstraint("job_file_id", "revision_id", "position"),
         CheckConstraint("position >= 0", name="position"),
@@ -84,6 +88,7 @@ class TaskCapabilityRecord(Base):
                 "jd_task_selections.task_id",
             ],
             name="fk_jd_task_capabilities_task",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "revision_id", "capability_id"],
@@ -93,6 +98,7 @@ class TaskCapabilityRecord(Base):
                 "jd_capability_selections.capability_id",
             ],
             name="fk_jd_task_capabilities_capability",
+            ondelete="CASCADE",
         ),
         UniqueConstraint("job_file_id", "revision_id", "task_id", "position"),
         CheckConstraint("position >= 0", name="position"),

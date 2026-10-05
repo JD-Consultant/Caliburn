@@ -3,6 +3,30 @@ import { requestJson } from './http';
 
 afterEach(() => vi.unstubAllGlobals());
 
+test('a bodyless deletion validates undefined without attempting JSON parsing', async () => {
+  vi.stubGlobal('fetch', () => Promise.resolve(new Response(null, { status: 204 })));
+  await expect(
+    requestJson('/api/job-files/example', (value): value is undefined => value === undefined, {
+      method: 'DELETE',
+    }),
+  ).resolves.toBeUndefined();
+});
+
+test('a busy deletion exposes only the allowed public code', async () => {
+  vi.stubGlobal('fetch', () =>
+    Promise.resolve(
+      Response.json(
+        { detail: { code: 'job_file_busy', debug: 'private content' } },
+        { status: 409 },
+      ),
+    ),
+  );
+  await expect(requestJson('/api/example', Array.isArray)).rejects.toMatchObject({
+    status: 409,
+    code: 'job_file_busy',
+  });
+});
+
 test.each([
   { body: { detail: { code: 'not_found' } }, name: 'unknown resource' },
   { body: { detail: { code: 'consultant_turn_not_found' } }, name: 'missing turn' },

@@ -40,6 +40,7 @@ class JdRevisionRecord(Base):
             ["job_file_id", "parent_revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_revisions_parent",
+            ondelete="CASCADE",
         ),
         CheckConstraint(
             "parent_revision_id IS NULL OR parent_revision_id <> revision_id",
@@ -47,7 +48,9 @@ class JdRevisionRecord(Base):
         ),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     revision_id: Mapped[UUID] = mapped_column(primary_key=True)
     parent_revision_id: Mapped[UUID | None]
     job_title: Mapped[str | None] = mapped_column(Text)
@@ -64,15 +67,19 @@ class JobDescriptionRecord(Base):
             ["job_file_id", "initial_revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_job_descriptions_initial_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "current_revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_job_descriptions_current_revision",
+            ondelete="CASCADE",
         ),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     initial_revision_id: Mapped[UUID]
     current_revision_id: Mapped[UUID]
 
@@ -84,11 +91,13 @@ class JdOperationRecord(Base):
             ["job_file_id", "expected_revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_operations_expected_revision",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["job_file_id", "result_revision_id"],
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_operations_result_revision",
+            ondelete="CASCADE",
         ),
         CheckConstraint(
             "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
@@ -100,6 +109,7 @@ class JdOperationRecord(Base):
             ["job_file_id", "candidate_execution_id"],
             ["jd_candidates.job_file_id", "jd_candidates.execution_id"],
             name="fk_jd_operations_candidate",
+            ondelete="CASCADE",
         ),
         CheckConstraint(
             "(candidate_execution_id IS NULL) = (candidate_generation_id IS NULL)",
@@ -107,7 +117,9 @@ class JdOperationRecord(Base):
         ),
     )
 
-    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    job_file_id: Mapped[UUID] = mapped_column(
+        ForeignKey("job_files.job_file_id", ondelete="CASCADE"), primary_key=True
+    )
     command_id: Mapped[UUID] = mapped_column(primary_key=True)
     kind: Mapped[str] = mapped_column(Text)
     expected_revision_id: Mapped[UUID]

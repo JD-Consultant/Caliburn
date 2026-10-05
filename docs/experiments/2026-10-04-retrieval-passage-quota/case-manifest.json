@@ -1,0 +1,25 @@
+{
+  "frozen_utc": "2026-10-04T04:33:24.844351+00:00",
+  "before_new_embeddings_or_rankings": true,
+  "observed_development_employees": 18,
+  "development_topics": 64,
+  "new_holdout_employees": 4,
+  "new_holdout_topics": 22,
+  "sources": {
+    "apps/pdf-to-json/data/json-checked-2026-10-04/咖啡調製人員-職能基準.json": "7d9a539c0c27b0ccc9c61844805bfeaacd9b5e91db1b5d5738875426ec6e5526",
+    "apps/pdf-to-json/data/json-checked-2026-10-04/會計人員-職能基準.json": "a8fdd48cc40a1afb4cc39050b414692e6f02dd79a4a6a7417fdab2921f24e069",
+    "apps/pdf-to-json/data/json-checked-2026-10-04/平面設計助理-職能基準.json": "ebef61653fd714954e6dd7fad38a807ad09f7ebd893ad149ec9f1f1d252ef871",
+    "apps/pdf-to-json/data/json-checked-2026-10-04/資料庫分析設計人員-職能基準.json": "27e2bcf135cd11b4a2644d428c17a480bc42f75cdc63097bd1b23ed121f10799",
+    "apps/pdf-to-json/data/json-checked-2026-10-04/採購人員-職能基準.json": "9218b6491f538956fd48e1d993e580e5bf3afbe2cb46088276468e7c0164c294",
+    "apps/pdf-to-json/data/json-checked-2026-10-04/冷凍空調設備安裝人員-職能基準.json": "90ae2ef07c2b23aa5c696552ffc13f74db5898e1d32d45b48ad0d372baf7153f",
+    "apps/pdf-to-json/data/json-checked-2026-10-04/零售業倉儲管理人員-職能基準.json": "d3b1676b18a4d93d8c75b4e54ae6d0f2085c30213b081611f834639b515ad82a"
+  },
+  "parent_cases_sha256": "b5d8adb7044ba3175bc2f00aaf404ea30813040dbd58c2f7e8083f6f06b3f34d",
+  "files_sha256": {
+    "development-cases.json": "86e3a42214438365972e255f292f478783797e3eedad5365ad71f346c46fbda3",
+    "holdout-cases.json": "cfa2a29247d5e582ce0d477c39248f528f72a1e27458ebf755125b91ac619ffa",
+    "freeze_cases.py": "b0cbb24c71ffe6b5e4c0e5d3435b24ba15a12a35bd530d469519c319cfe525f8",
+    "protocol.md": "4d87b594171922106e1102cec26d5684902e01a3d83f2e2945f2864b4d04ae55"
+  },
+  "limits": "Synthetic source-derived new combinations; source overlap; no real employee/expert completeness gate."
+}

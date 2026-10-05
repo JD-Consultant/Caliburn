@@ -1,0 +1,20 @@
+{
+  "job_id": "new-003",
+  "phase": "formal-01",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心工作是收銀結帳、商品銷售及顧客服務，沒有描述會員網站畫面、互動元件、API 串接或瀏覽器品質的開發維護，無法代表員工的主要工作領域。",
+    "evidence": [],
+    "limitations": [
+      "公版未涵蓋員工主要的網站前端開發與維護工作。",
+      "員工明確不負責的 API 內部邏輯、權限規則、資料庫及伺服器維護，也不能由此公版推定為其職責。"
+    ]
+  },
+  "seconds": 10.632924500037916,
+  "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+  "document_sha256": "ce9fbc83d4d34f841b70880d07f94248c303a9716a5f48ce2e9f7706c70bf738",
+  "case_id": "F02",
+  "document_id": "KPS5220-001v4"
+}

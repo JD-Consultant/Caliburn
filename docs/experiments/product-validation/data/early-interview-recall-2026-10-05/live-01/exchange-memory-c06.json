@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "a7519c0e-e579-4204-a8b2-dd521201c8cc",
+    "interview_sequence": 116,
+    "speaker": "employee",
+    "interview_text": "先跳到單據：前面那個箱和件不同的品號，確認後一箱是多少件，可以套到其他商品嗎？另外單據和核准紀錄的保存年限，我有沒有說過確定幾年，該找誰確認？"
+  },
+  "consultant_reply": {
+    "source_id": "c8e38626-789c-4356-b78b-15d01230c621",
+    "interview_sequence": 117,
+    "speaker": "consultant",
+    "interview_text": "前面確認的那個品號是**一箱 12 件**，但只適用於該品號，不能直接套用到其他商品；其他品號須依各自確認的換算依據處理。\n\n單據及核准紀錄的保存年限**尚未確認具體幾年**。目前是依公司既有規則存於共享資料夾，檔名包含日期及原單號；保存年限應向**財務**確認。"
+  }
+}

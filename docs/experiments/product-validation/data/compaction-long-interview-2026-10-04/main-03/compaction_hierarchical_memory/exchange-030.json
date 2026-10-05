@@ -1,0 +1,16 @@
+{
+  "event_id": "e030",
+  "execution_id": "b0a90a0e-798d-484d-bab0-52ae6f3ff77e",
+  "employee_input": {
+    "source_id": "4d95b01c-bb4c-4e25-9452-ae14d7731fbf",
+    "interview_sequence": 60,
+    "speaker": "employee",
+    "interview_text": "品質窗口確認召回範圍和是否解除，我不能自己宣布可以繼續賣。客服處理對客通知，採購聯繫供應商；我追蹤隔離量、回收量和各店回覆，直到主管確認紀錄齊全，不把自己寫成決定召回的人。"
+  },
+  "consultant_reply": {
+    "source_id": "5b9b8cf7-4cd5-4fda-b901-8b1d205a203a",
+    "interview_sequence": 61,
+    "speaker": "consultant",
+    "interview_text": "已補充召回任務的追蹤成果與責任界線：您追蹤隔離量、回收量及各店回覆，直到主管確認紀錄齊全；召回範圍與解除由品質窗口確認，客服負責對客通知，採購聯繫供應商，您不決定召回或宣布恢復銷售。\n\n除召回外，還有沒有其他不常發生、但需要您核對庫存並跨部門追蹤的情況？可以先說一件。"
+  }
+}

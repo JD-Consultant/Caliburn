@@ -1,0 +1,97 @@
+{
+  "inputs": {
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/all-rankings.json": {
+      "sha256": "ceed5198f620b0df4836e4e18f6a80eda7a28e781e73e357f4f40c2eb61efb0a",
+      "bytes": 41006618
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/graded-results.json": {
+      "sha256": "343965fb1fec7944d6255d698c0fe84de19fd445caa442d351915ffa2a0ff6d4",
+      "bytes": 2413338
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/cases.json": {
+      "sha256": "6089e469ffb78f7e3300fc62f5afd499e8427cd76b3e01e2e29b708aa4b7ae3b",
+      "bytes": 76963
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/queries.json": {
+      "sha256": "36a62c2ad45cddf0497ea72673dd805b0e2801f1614e4ff87660b1104d78869c",
+      "bytes": 87621
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/corpus.json": {
+      "sha256": "ae5ec2b264eba771f84b27a69fef7e80067d6a14ec20e94e9be0482fa9ac868d",
+      "bytes": 2387875
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/results.json": {
+      "sha256": "5b3bdd60ea24127e45e9547e3ea7252f057cd29f272b2edb7342934347994f66",
+      "bytes": 1153228
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/verification-final.json": {
+      "sha256": "efea6692b2b8757ae854e34ffdff8ee99aabd2ab336580cb2fe59f5c8b763c73",
+      "bytes": 678
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/input-manifest.json": {
+      "sha256": "33a96970103142cc05a0dc3fa961bd5641b226b457670bf38ad562552a8b483e",
+      "bytes": 77502
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/artifact-hashes.json": {
+      "sha256": "a57a7df9b57c1acdc48b5f4e7d05d6cbf172c9034801eacc262c1b0133e7c6ec",
+      "bytes": 84001
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/query-unions.json": {
+      "sha256": "3ad29c270422c5993c92eef3113462e2aa977ad698525511c91d5152f659dda0",
+      "bytes": 88299
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/verification.json": {
+      "sha256": "3a4585f1550b5a15cae6733ff9d7860b7989c288235c9516fd6d5ecab6467157",
+      "bytes": 408
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/artifact-hashes.json": {
+      "sha256": "a5ccb352d21d636379be4a8896ceed8f374b12fb4f9324532168659749ff27eb",
+      "bytes": 4307
+    },
+    "docs/experiments/2026-10-04-a-interview-occupation-retrieval/run-01/pipeline.py": {
+      "sha256": "7d89f781ad2dd02cc0aee3e63ca400b0e956756f6d9335303193fe604b01894b",
+      "bytes": 3717
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/protocol.md": {
+      "sha256": "46b867f52ef5ba6b6c65e5fd86e4ac673e8acf5bf2d58b56a6bbe80e166e7fba",
+      "bytes": 2354
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/evaluate.py": {
+      "sha256": "0ddba40e351c2b6097417e08994176c3d4f12b707c886ab6decb49b2de705337",
+      "bytes": 13212
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/verify.py": {
+      "sha256": "d5bae6d69d1f357d20aff2dcb8d76924a0c25231f8cf2f74e3517aaff500224b",
+      "bytes": 11852
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/test_depth.py": {
+      "sha256": "558e06b88d897c1686ca7e9b70501948256779f06a2315693af4de39efbacf9d",
+      "bytes": 2211
+    },
+    "docs/plans/2026-10-05-initial-retrieval-depth.md": {
+      "sha256": "e263b62cb2779a05c508e88c84f6219e3216d0d83c6890e5674282e1640400ce",
+      "bytes": 3636
+    }
+  },
+  "depths": [
+    20,
+    40,
+    80
+  ],
+  "embedding_dimension": 1024,
+  "source": "frozen verified exact cosine rankings",
+  "judgment_pool_pairs": 158,
+  "known_grade3_pairs": 12,
+  "ambiguous_pairs": [
+    [
+      "F05",
+      "AVA2172-001v4"
+    ],
+    [
+      "H03",
+      "MMP1324-001v4"
+    ]
+  ],
+  "new_provider_calls": 0,
+  "scope": "initial candidates only, no new rerank or final K5"
+}

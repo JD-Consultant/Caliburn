@@ -1,0 +1,583 @@
+[
+  {
+    "query_id": "F01-whole-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F01-whole-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F01-B1-W-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F01-B1-S-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F01-B2-S-0",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F01-B2-S-0",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F02-whole-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F02-whole-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F02-B1-W-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F02-B1-S-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F02-B2-S-0",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F02-B2-S-0",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F03-whole-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F03-whole-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F03-B1-W-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F03-B1-S-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F03-B1-S-1",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F03-B2-S-0",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F03-B2-S-0",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F03-B2-S-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F03-B2-S-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F04-whole-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F04-whole-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F04-B1-W-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F04-B1-S-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F04-B1-S-1",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F04-B1-S-2",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F04-B1-S-3",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F04-B2-S-0",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F04-B2-S-0",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F05-whole-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F05-whole-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F05-B1-W-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F05-B1-S-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F05-B1-S-1",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F05-B2-S-0",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "F05-B2-S-0",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H01-whole-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H01-whole-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H01-B1-W-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H01-B1-S-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H01-B1-S-1",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H01-B1-S-2",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H01-B1-S-3",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H01-B2-S-0",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H01-B2-S-0",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-whole-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-whole-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-B1-W-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-B1-S-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-B1-S-1",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-B1-S-2",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-B1-S-3",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-B1-S-4",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-B2-S-0",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H02-B2-S-0",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-whole-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-whole-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-W-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-0",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-1",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-2",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-3",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-4",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-5",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-6",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-7",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-8",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-9",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-10",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-11",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-12",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-13",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-14",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B1-S-15",
+    "representation": "document",
+    "control": "prior_B1_document",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B2-S-0",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B2-S-0",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B2-S-1",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B2-S-1",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B2-S-2",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B2-S-2",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B2-S-3",
+    "representation": "document",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  },
+  {
+    "query_id": "H03-B2-S-3",
+    "representation": "task",
+    "control": "prior_dual_route",
+    "all_805_parent_ids_unchanged": true,
+    "max_score_error": 0.0
+  }
+]

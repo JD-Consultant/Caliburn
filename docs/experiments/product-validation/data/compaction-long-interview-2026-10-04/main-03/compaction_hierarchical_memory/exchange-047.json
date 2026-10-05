@@ -1,0 +1,16 @@
+{
+  "event_id": "e047",
+  "execution_id": "b1515687-c873-4b54-8c32-cfd115b408d8",
+  "employee_input": {
+    "source_id": "b9e9db5f-ae51-4276-9d54-7974dea5a473",
+    "interview_sequence": 94,
+    "speaker": "employee",
+    "interview_text": "更正一下，退貨核對只有週一因週末累積改成08:50開始；週二到週五仍是08:35。退貨差異表仍要在09:10前交客服，不是把交表時間也延後15分鐘。"
+  },
+  "consultant_reply": {
+    "source_id": "ececcca6-4ab7-4ec1-829c-dbe3e5f8f45e",
+    "interview_sequence": 95,
+    "speaker": "consultant",
+    "interview_text": "已修正退貨任務：週一因週末累積，08:50 開始核對；週二至週五仍為 08:35。退貨差異表每天仍須在 09:10 前交客服，週一核對較晚不會延後交表時間。\n\n另確認一下每週三新增的抽盤品項：是先交主管確認後再盤，還是盤完後再提交結果？"
+  }
+}

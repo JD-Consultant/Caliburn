@@ -1,0 +1,14 @@
+test_changed_database_returned_ids_are_detected (test_audit.AuditContract.test_changed_database_returned_ids_are_detected) ... FAIL
+
+======================================================================
+FAIL: test_changed_database_returned_ids_are_detected (test_audit.AuditContract.test_changed_database_returned_ids_are_detected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieve-rerank\test_audit.py", line 23, in test_changed_database_returned_ids_are_detected
+    with self.assertRaises(AssertionError):
+AssertionError: AssertionError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 1.041s
+
+FAILED (failures=1)

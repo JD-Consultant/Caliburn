@@ -1,0 +1,16 @@
+{
+  "event_id": "e042",
+  "execution_id": "18d96dd0-4efa-40bd-b38f-1e4a2954c253",
+  "employee_input": {
+    "source_id": "3fe4c597-057f-4e4f-801c-80363b8e98de",
+    "interview_sequence": 84,
+    "speaker": "employee",
+    "interview_text": "遇到ERP暫時不能用，我記錄原單號、實收及狀態，不能先說已入帳。系統恢復後核對有無重複登錄，再補入并保留實際處理時間；我不負責修伺服器，也不自行修改資料庫。"
+  },
+  "consultant_reply": {
+    "source_id": "cd5fda65-a71a-49d1-ad7a-786ac3ab1f31",
+    "interview_sequence": 85,
+    "speaker": "consultant",
+    "interview_text": "已補入到貨登錄任務：ERP 暫時無法使用時，先記錄原單號、實收數及狀態，不標示為已入帳；系統恢復後先查有無重複登錄，再補登並保留實際處理時間。也記下您不負責修復伺服器或自行修改資料庫。\n\n若系統故障持續，可能影響當日截止事項時，您會通知哪個窗口？"
+  }
+}

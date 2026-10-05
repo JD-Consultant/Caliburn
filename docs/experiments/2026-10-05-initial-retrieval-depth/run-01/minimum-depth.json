@@ -1,0 +1,334 @@
+[
+  {
+    "case_id": "F01",
+    "variant": "O",
+    "minimum_N_all_known_grade3": 15,
+    "minimum_N_clear_grade3": 15,
+    "work_facets": {
+      "facets": {
+        "瀏覽器畫面、互動與操作檢查的開發及維護": 4,
+        "訂單 API、權限、商業規則及資料存取的開發及維護": 15
+      },
+      "minimum_N_for_known_facets": 15,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "瀏覽器畫面、互動與操作檢查的開發及維護": 4,
+        "訂單 API、權限、商業規則及資料存取的開發及維護": 15
+      },
+      "minimum_N_for_known_facets": 15,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "F01",
+    "variant": "B2",
+    "minimum_N_all_known_grade3": 24,
+    "minimum_N_clear_grade3": 24,
+    "work_facets": {
+      "facets": {
+        "瀏覽器畫面、互動與操作檢查的開發及維護": 1,
+        "訂單 API、權限、商業規則及資料存取的開發及維護": 24
+      },
+      "minimum_N_for_known_facets": 24,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "瀏覽器畫面、互動與操作檢查的開發及維護": 1,
+        "訂單 API、權限、商業規則及資料存取的開發及維護": 24
+      },
+      "minimum_N_for_known_facets": 24,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "F02",
+    "variant": "O",
+    "minimum_N_all_known_grade3": 1,
+    "minimum_N_clear_grade3": 1,
+    "work_facets": {
+      "facets": {
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "F02",
+    "variant": "B2",
+    "minimum_N_all_known_grade3": 1,
+    "minimum_N_clear_grade3": 1,
+    "work_facets": {
+      "facets": {
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "F03",
+    "variant": "O",
+    "minimum_N_all_known_grade3": 1,
+    "minimum_N_clear_grade3": 1,
+    "work_facets": {
+      "facets": {
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "F03",
+    "variant": "B2",
+    "minimum_N_all_known_grade3": 1,
+    "minimum_N_clear_grade3": 1,
+    "work_facets": {
+      "facets": {
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "F04",
+    "variant": "O",
+    "minimum_N_all_known_grade3": 1,
+    "minimum_N_clear_grade3": 1,
+    "work_facets": {
+      "facets": {
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "F04",
+    "variant": "B2",
+    "minimum_N_all_known_grade3": 7,
+    "minimum_N_clear_grade3": 7,
+    "work_facets": {
+      "facets": {
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養": 7
+      },
+      "minimum_N_for_known_facets": 7,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養": 7
+      },
+      "minimum_N_for_known_facets": 7,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "F05",
+    "variant": "O",
+    "minimum_N_all_known_grade3": 14,
+    "minimum_N_clear_grade3": 1,
+    "work_facets": {
+      "facets": {
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "F05",
+    "variant": "B2",
+    "minimum_N_all_known_grade3": 1,
+    "minimum_N_clear_grade3": 1,
+    "work_facets": {
+      "facets": {
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "H01",
+    "variant": "O",
+    "minimum_N_all_known_grade3": null,
+    "minimum_N_clear_grade3": null,
+    "work_facets": {
+      "facets": {
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業": null
+      },
+      "minimum_N_for_known_facets": null,
+      "unassessed_facets": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ]
+    },
+    "clear_work_facets": {
+      "facets": {
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業": null
+      },
+      "minimum_N_for_known_facets": null,
+      "unassessed_facets": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ]
+    }
+  },
+  {
+    "case_id": "H01",
+    "variant": "B2",
+    "minimum_N_all_known_grade3": null,
+    "minimum_N_clear_grade3": null,
+    "work_facets": {
+      "facets": {
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業": null
+      },
+      "minimum_N_for_known_facets": null,
+      "unassessed_facets": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ]
+    },
+    "clear_work_facets": {
+      "facets": {
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業": null
+      },
+      "minimum_N_for_known_facets": null,
+      "unassessed_facets": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ]
+    }
+  },
+  {
+    "case_id": "H02",
+    "variant": "O",
+    "minimum_N_all_known_grade3": 5,
+    "minimum_N_clear_grade3": 5,
+    "work_facets": {
+      "facets": {
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業": 2
+      },
+      "minimum_N_for_known_facets": 2,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業": 2
+      },
+      "minimum_N_for_known_facets": 2,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "H02",
+    "variant": "B2",
+    "minimum_N_all_known_grade3": 4,
+    "minimum_N_clear_grade3": 4,
+    "work_facets": {
+      "facets": {
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "H03",
+    "variant": "O",
+    "minimum_N_all_known_grade3": 6,
+    "minimum_N_clear_grade3": 2,
+    "work_facets": {
+      "facets": {
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作": 2
+      },
+      "minimum_N_for_known_facets": 2,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作": 2
+      },
+      "minimum_N_for_known_facets": 2,
+      "unassessed_facets": []
+    }
+  },
+  {
+    "case_id": "H03",
+    "variant": "B2",
+    "minimum_N_all_known_grade3": 2,
+    "minimum_N_clear_grade3": 1,
+    "work_facets": {
+      "facets": {
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    },
+    "clear_work_facets": {
+      "facets": {
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作": 1
+      },
+      "minimum_N_for_known_facets": 1,
+      "unassessed_facets": []
+    }
+  }
+]

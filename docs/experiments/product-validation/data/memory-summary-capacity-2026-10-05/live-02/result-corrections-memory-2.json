@@ -1,0 +1,272 @@
+{
+  "case_id": "corrections",
+  "arm": "memory",
+  "repeat": 2,
+  "cell_id": "corrections-memory-2",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6465
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+      },
+      "result_characters": 1891
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "退貨核對、狀態登錄與差異處理"
+      },
+      "result_characters": 780
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "庫存報表"
+      },
+      "result_characters": 490
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "收貨異常週報"
+      },
+      "result_characters": 417
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "倉庫掃碼器備品核對與故障追蹤"
+      },
+      "result_characters": 453
+    },
+    {
+      "step": 3,
+      "name": "read_interview",
+      "arguments": {
+        "query": {
+          "kind": "messages",
+          "sequences": [
+            2,
+            4,
+            6,
+            8,
+            10,
+            12,
+            14,
+            16,
+            18,
+            20,
+            42,
+            44,
+            46,
+            48,
+            56,
+            86,
+            88,
+            98
+          ]
+        }
+      },
+      "result_characters": 2604
+    },
+    {
+      "step": 4,
+      "name": "read_interview",
+      "arguments": {
+        "query": {
+          "kind": "messages",
+          "sequences": [
+            94,
+            96
+          ]
+        }
+      },
+      "result_characters": 335
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 5340,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 5337
+        },
+        "output_tokens": 125,
+        "output_tokens_details": {
+          "reasoning_tokens": 28
+        },
+        "total_tokens": 5465
+      },
+      "estimated_usd": "0.000116170",
+      "seconds": 2.247442100022454,
+      "counted_input_tokens": 5340
+    },
+    {
+      "usage": {
+        "input_tokens": 10926,
+        "input_tokens_details": {
+          "cache_write_tokens": 5586,
+          "cached_tokens": 5337
+        },
+        "output_tokens": 331,
+        "output_tokens_details": {
+          "reasoning_tokens": 172
+        },
+        "total_tokens": 11257
+      },
+      "estimated_usd": "0.000917420",
+      "seconds": 4.201652999967337,
+      "counted_input_tokens": 10926
+    },
+    {
+      "usage": {
+        "input_tokens": 14579,
+        "input_tokens_details": {
+          "cache_write_tokens": 3653,
+          "cached_tokens": 10923
+        },
+        "output_tokens": 487,
+        "output_tokens_details": {
+          "reasoning_tokens": 329
+        },
+        "total_tokens": 15066
+      },
+      "estimated_usd": "0.000809655",
+      "seconds": 6.4556236999924295,
+      "counted_input_tokens": 14579
+    },
+    {
+      "usage": {
+        "input_tokens": 16697,
+        "input_tokens_details": {
+          "cache_write_tokens": 2118,
+          "cached_tokens": 14576
+        },
+        "output_tokens": 965,
+        "output_tokens_details": {
+          "reasoning_tokens": 934
+        },
+        "total_tokens": 17662
+      },
+      "estimated_usd": "0.000893310",
+      "seconds": 9.47664910001913,
+      "counted_input_tokens": 16697
+    },
+    {
+      "usage": {
+        "input_tokens": 17861,
+        "input_tokens_details": {
+          "cache_write_tokens": 1164,
+          "cached_tokens": 16694
+        },
+        "output_tokens": 2037,
+        "output_tokens_details": {
+          "reasoning_tokens": 758
+        },
+        "total_tokens": 19898
+      },
+      "estimated_usd": "0.001331240",
+      "seconds": 16.45164310000837,
+      "counted_input_tokens": 17861
+    }
+  ],
+  "answer": {
+    "findings": "已核對並區分以下工作事實：\n\n- **進貨驗收與登錄：**通常於到貨當天下班前完成已確認項目的 ERP 登錄；月底最後一天的截止清單由財務提供，超過截止或有疑義的單據由財務決定歸屬月份，本人記錄實際收貨時間及未決原因，不自行回填日期。本人比對採購單、送貨單與實際到貨的品號、批號、數量；倉庫同事清點實物，本人記錄差異、通知採購並追蹤。驗收不良比例的分母是「每批實際驗收件數」：**超過 5%** 提報倉儲主管；剛好 5% 不因這項比例規則提報，但有安全疑慮時無論比例都先隔離並通知主管。比例不跨月，也不是按每日進貨單張數計算。補貨或退貨由採購決定；異常由本人追蹤至補貨／退貨完成且帳物相符，不能自行接受替代品或更改採購單價格。\n\n- **退貨核對：**核對前一工作日收到的退貨；較早的每日 08:35 說法已由後續補充明確修正：週一因週末累積於 **08:50** 開始，週二至週五仍於 **08:35** 開始；每天均須在 **09:10 前**把退貨差異表交客服，週一開始較晚不會延後交表。本人核對客退單、品號、批號及實收數量；常溫商品狀態依倉庫確認登錄，冷藏商品另由品質窗口判定是否可再銷售。本人不自行判定報廢；數量差異交客服確認，主管同意調帳後才依核准資料修改 ERP 並保留核准單號。\n\n- **庫存帳齡表及週報：**早期原話曾記為每月底最後一個工作日交付（序號 42）；後續更正（序號 98）將帳齡表交付時點改為**次月第一個工作日**，仍依月底庫存狀態整理，而非採交表當天狀態。依已確認入庫日期及月末庫存狀態計算，核對批號和調撥資料，分列可售、待檢、報廢待核准；主管決定促銷、報廢等處置。這個時點更正**不改變**收貨異常週報：該週報仍每週五 **16:00 前**交採購與主管，列未結案原因、等待天數及下一步；供應商回覆附更新時間，無回覆標示未確認。帳齡表與週報用途、交付時間分開。\n\n- **兩種 5% 不可混用：**進貨驗收的 5% 是每批實際驗收商品中的不良比例，超過門檻提報主管；掃碼器的 5% 則是每月依「使用中的設備數量」準備的備品比例，備品不足要請主管核准補充。後者不是商品不良比例，也不是按商品件數計算；故障設備由本人登記並交資訊窗口處理、追蹤更換及送修，本人不拆機維修。\n\n若「帳齡表更正」指更改其交付時點，答案明確是**不影響**週五收貨異常週報。若指的是帳齡表數字更正，而該更正又涉及一筆未結案收貨異常，現有資料只確認不同表單分開處理，未明確說明是否須同步更新週報；不宜推定完全無關或必須連動。",
+    "references": [
+      {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 12,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 14,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 16,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 18,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 42,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 44,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 46,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 48,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 86,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 88,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 94,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 98,
+        "target_title": null
+      }
+    ],
+    "questions": [
+      "您所說的「帳齡表更正」是指交付時點改為次月第一個工作日，還是也想確認若帳齡表數值更正涉及未結案收貨異常，是否需要同步更新週報？現有紀錄只確定前者不改變週報時程，後者的連動規則尚未說明。"
+    ]
+  },
+  "seconds": 93.68885709997267
+}

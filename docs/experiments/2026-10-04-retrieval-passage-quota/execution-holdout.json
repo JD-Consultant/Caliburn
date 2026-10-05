@@ -1,0 +1,24 @@
+{
+  "created_utc": 1791089778.9481509,
+  "before_new_rerank": true,
+  "selection_sha256": "ef6a0fb2537680edd9b93d7a38ddd682e76ef115a0afbee2afa0226ffd61a0e6",
+  "sources": {
+    "common.py": "b304cd1859564b3b33b3e9abc5867e304b621a458a601681cd587fdc6c8e7bb8",
+    "selection.py": "d5962c3ea3e2a88ef99d44a664779cdefdb2d552c21b1b80ec0540b5bd64ba36",
+    "gpu_worker.py": "3b8cfc7357c400b834006636b0a97df2f735e2503a6ab0dfa24515c5df4a1191",
+    "analyze.py": "92d884bc3a37b2ad895a10f2dd39e737dfed924d55d25f5f86684a93d799dad5",
+    "run_holdout.py": "c4ad86a3ea2aace4d441177f0817bb46284fc79ad29c085aaa105066653ef8cc",
+    "benchmark.py": "a1f896dc234dce5ae5d3c9e8772bc69f1a9bbd231240d3d4a28b62af0316d806",
+    "benchmark-plan.json": "98c2b84734f95b32d08dc623462a6a26c14986fa278c99e436e59ffe9281f7eb",
+    "selection-frozen.json": "3da6b5f88a6373d033d77e991f51a61cf2ae02c7d49ccc2a3aa33f48e3366e21",
+    "selection-development.json": "ef6a0fb2537680edd9b93d7a38ddd682e76ef115a0afbee2afa0226ffd61a0e6",
+    "case-amendment-01.json": "977ff27a2ab14a39b13a127827a5656baf834e0c2dc4c149d79411cf377efaab",
+    "holdout-cases-2026-10-04-reviewed.json": "ae7e8c712455555a1ff16b2a8d80a8721214ffdac322e9919e63999c2f67d4f4",
+    "prepared-holdout.json": "78603978965a5d01b6496c7fb9fd1dd2c2c93f39170fe64be7e91104a52cefb4",
+    "holdout-passage-cache.jsonl": "ebe784b2be0b0b2f24c1f843f0617c872b4425b8bc5ae7d96cf13b8d1a3eaae4",
+    "holdout-jobs.json": "13733ddda89a399cf7ede34802e40a2df45bef46bd305840d9a8b1ace76122f4",
+    "database-holdout.json": "2f1be0b08acc601ab691b8ebf2d51d60bb1d3fc8e6f93da92e1c81cc465b1e4c",
+    "prepared-development.json": "fd09c809820c1215d9cf96185658e4eeea927ef77c184e3917bcaa14c4646744"
+  },
+  "model_sha256": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286"
+}

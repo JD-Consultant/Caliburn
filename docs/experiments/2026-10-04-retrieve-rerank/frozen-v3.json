@@ -1,0 +1,12 @@
+{
+  "supersedes": "frozen-v2.json",
+  "reason": "Before any reranker score: exclude unconfirmed image-based pest detection and equipment maintenance; retain confirmed but unscored actions. No document ID/query change for remaining topics.",
+  "sources": {
+    "frozen.json": "48cd3a9760480cbf0dd1ab46bedb21854dc9fe893e246882a00fd816614566b9",
+    "frozen-v2.json": "e1010346b409b742621466f579a506f346f1002f58c32794a153a72f4f510f79",
+    "cases-v3.json": "619e2c41aa341a6bf61453c657c7876a439eda2d006312bcf591cecb20943b45",
+    "protocol-amendment-01.md": "fb2bfd1952b9835f2866d8c306b5f371e263979342940a93497cef5214869f0c"
+  },
+  "effective_cases": "cases-v3.json",
+  "topic_count": 64
+}

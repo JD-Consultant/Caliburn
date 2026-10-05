@@ -1,0 +1,2 @@
+/caliburn-ocs-rerank-boundaries {"Status":"exited","Running":false,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":0,"ExitCode":0,"Error":"","StartedAt":"2026-10-04T05:34:12.27526772Z","FinishedAt":"2026-10-04T05:39:48.182448388Z"}
+/caliburn-ocs-eval-embedder-1 {"Status":"exited","Running":false,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":0,"ExitCode":137,"Error":"","StartedAt":"2026-10-04T05:32:00.96057972Z","FinishedAt":"2026-10-04T05:34:11.29606905Z"}

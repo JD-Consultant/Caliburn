@@ -25,3 +25,7 @@ docs/archive/branch-snapshots/20261002-legacy-jd-research/**/docs/** -text
 
 # 公開實驗原件：搬移後仍以相同位元組核對既有 SHA-256。
 docs/experiments/product-validation/data/** -text
+
+# Frozen experiment inputs, outputs and source hashes keep their original bytes.
+docs/experiments/** -text
+docs/plans/evidence/** -text

@@ -1,0 +1,46 @@
+{
+  "final": {
+    "task": {
+      "title": "乙倉退貨核對與異動交接",
+      "work": "每日 17:30 核對乙倉退貨單與實收品，檢查分類並記錄；無法判定的品項列為待判定，不計入可用庫存。涉及庫存異動時，交由倉儲主管核准；核准後由帳務專員執行 ERP 異動。本人負責退貨核對與交接，不負責核准或 ERP 異動；甲倉盤點差異門檻不適用於乙倉退貨。"
+    },
+    "unknowns": [
+      "乙倉差異百分比門檻尚未提供。",
+      "待判定品項後續由誰判定及如何處理，尚未提供。"
+    ],
+    "references": [
+      {
+        "kind": "work_understanding",
+        "target_title": "乙倉退貨核對與異動交接"
+      }
+    ]
+  },
+  "steps": 2,
+  "tool_calls": [
+    {
+      "event": "tool",
+      "step": 1,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "乙倉退貨核對與異動交接"
+      },
+      "result": {
+        "title": "乙倉退貨核對與異動交接",
+        "description": "退貨核對、待判定狀態與核准交接；不套甲倉門檻。",
+        "body": "乙倉每天 17:30 由本人核對退貨單與實收品，檢查分類並記錄；無法判定的列待判定，不計可用庫存。異動由倉儲主管核准；核准後由帳務專員異動 ERP，不由本人異動。乙倉差異百分比門檻尚未提供。",
+        "work_situation_references": [
+          {
+            "target_title": "乙倉退貨核對",
+            "description": "每天定時核對、分類與庫存異動分工。"
+          }
+        ]
+      }
+    }
+  ],
+  "reads": [
+    [
+      "work_understanding",
+      "乙倉退貨核對與異動交接"
+    ]
+  ]
+}

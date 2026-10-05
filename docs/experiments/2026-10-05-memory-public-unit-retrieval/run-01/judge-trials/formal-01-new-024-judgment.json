@@ -1,0 +1,22 @@
+{
+  "job_id": "new-024",
+  "phase": "formal-01",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是機台保養、維修、故障排除及依製程調整設備；員工主要負責會員網站前端畫面、互動、API 串接與瀏覽器品質，工作對象和責任範圍不相符，無法代表其主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "我平常負責會員網站的畫面。",
+        "reference_quote": "維護機台的正常運作，例行性與預防性保養。"
+      }
+    ],
+    "limitations": []
+  },
+  "seconds": 3.999774999974761,
+  "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+  "document_sha256": "28132191f52ace592b43e2ed66df1c300af82b249e18f43afb4e219817a49d7e",
+  "case_id": "F02",
+  "document_id": "MEM3113-001v4"
+}

@@ -1,0 +1,7 @@
+{
+  "queries": 93,
+  "fresh_unique_texts": 55,
+  "reused_original_texts": 30,
+  "new_token_max": 1655,
+  "fresh_embedding_seconds": 2.0930582999717444
+}

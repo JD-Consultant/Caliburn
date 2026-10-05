@@ -1,0 +1,8037 @@
+[
+  {
+    "case_id": "F01",
+    "method": "R01",
+    "query_ids": [
+      "F01-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.7401048412937905
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": 0.7329291447328026
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": 0.7140967406464814
+        },
+        {
+          "id": "INM3514-001v4",
+          "score": 0.7115719353521694
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": 0.708157862157778
+        },
+        {
+          "id": "KRM4224-001v3",
+          "score": 0.7049904254998248
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": 0.7039741130049616
+        },
+        {
+          "id": "AVA2172-002v3",
+          "score": 0.7014533473453693
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": 0.7007226527440235
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": 0.7006657967637997
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": 0.7001450215133675
+        },
+        {
+          "id": "MQM1322-001v4",
+          "score": 0.699639343570897
+        },
+        {
+          "id": "MPM7322-001v4",
+          "score": 0.6976354088279738
+        },
+        {
+          "id": "IIS3513-008v3",
+          "score": 0.6959240951839242
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": 0.6946282574306675
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": 0.6938362780789
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": 0.6928919763682266
+        },
+        {
+          "id": "花藝設計助理",
+          "score": 0.6928650340992624
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": 0.6927899162163866
+        },
+        {
+          "id": "MQM2141-001v4",
+          "score": 0.6926038311376381
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "KPS2434-004v2",
+        "score": 0.7401048412937905
+      },
+      {
+        "id": "KRM1324-002v1",
+        "score": 0.7329291447328026
+      },
+      {
+        "id": "IDC5294-001v3",
+        "score": 0.7140967406464814
+      },
+      {
+        "id": "INM3514-001v4",
+        "score": 0.7115719353521694
+      },
+      {
+        "id": "KPS4999-001v3",
+        "score": 0.708157862157778
+      },
+      {
+        "id": "KRM4224-001v3",
+        "score": 0.7049904254998248
+      },
+      {
+        "id": "AVA2172-004v3",
+        "score": 0.7039741130049616
+      },
+      {
+        "id": "AVA2172-002v3",
+        "score": 0.7014533473453693
+      },
+      {
+        "id": "IIS3513-002v4",
+        "score": 0.7007226527440235
+      },
+      {
+        "id": "BAS3323-003v3",
+        "score": 0.7006657967637997
+      },
+      {
+        "id": "AVA2172-003v3",
+        "score": 0.7001450215133675
+      },
+      {
+        "id": "MQM1322-001v4",
+        "score": 0.699639343570897
+      },
+      {
+        "id": "MPM7322-001v4",
+        "score": 0.6976354088279738
+      },
+      {
+        "id": "IIS3513-008v3",
+        "score": 0.6959240951839242
+      },
+      {
+        "id": "BAS1499-003v4",
+        "score": 0.6946282574306675
+      },
+      {
+        "id": "BGM1349-001v3",
+        "score": 0.6938362780789
+      },
+      {
+        "id": "RTM4323-004v1",
+        "score": 0.6928919763682266
+      },
+      {
+        "id": "花藝設計助理",
+        "score": 0.6928650340992624
+      },
+      {
+        "id": "MIM2141-001v4",
+        "score": 0.6927899162163866
+      },
+      {
+        "id": "MQM2141-001v4",
+        "score": 0.6926038311376381
+      }
+    ],
+    "selected": [
+      {
+        "id": "KPS2434-004v2",
+        "score": 0.7401048412937905
+      },
+      {
+        "id": "KRM1324-002v1",
+        "score": 0.7329291447328026
+      },
+      {
+        "id": "IDC5294-001v3",
+        "score": 0.7140967406464814
+      },
+      {
+        "id": "INM3514-001v4",
+        "score": 0.7115719353521694
+      },
+      {
+        "id": "KPS4999-001v3",
+        "score": 0.708157862157778
+      }
+    ],
+    "characters": 3366
+  },
+  {
+    "case_id": "F01",
+    "method": "R02",
+    "query_ids": [
+      "F01-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "IIS3513-008v3",
+          "score": -3.5
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": -4.0234375
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -4.51171875
+        },
+        {
+          "id": "MQM2141-001v4",
+          "score": -4.6953125
+        },
+        {
+          "id": "MQM1322-001v4",
+          "score": -5.20703125
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": -5.46875
+        },
+        {
+          "id": "INM3514-001v4",
+          "score": -5.484375
+        },
+        {
+          "id": "KRM4224-001v3",
+          "score": -5.59765625
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": -5.79296875
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": -5.890625
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": -5.99609375
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": -6.234375
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": -6.3046875
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": -6.4375
+        },
+        {
+          "id": "MPM7322-001v4",
+          "score": -6.890625
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": -7.09375
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": -7.17578125
+        },
+        {
+          "id": "花藝設計助理",
+          "score": -7.296875
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": -7.87890625
+        },
+        {
+          "id": "AVA2172-002v3",
+          "score": -8.4375
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "IIS3513-008v3",
+        "score": -3.5
+      },
+      {
+        "id": "IIS3513-002v4",
+        "score": -4.0234375
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": -4.51171875
+      },
+      {
+        "id": "MQM2141-001v4",
+        "score": -4.6953125
+      },
+      {
+        "id": "MQM1322-001v4",
+        "score": -5.20703125
+      },
+      {
+        "id": "KRM1324-002v1",
+        "score": -5.46875
+      },
+      {
+        "id": "INM3514-001v4",
+        "score": -5.484375
+      },
+      {
+        "id": "KRM4224-001v3",
+        "score": -5.59765625
+      },
+      {
+        "id": "AVA2172-003v3",
+        "score": -5.79296875
+      },
+      {
+        "id": "KPS4999-001v3",
+        "score": -5.890625
+      },
+      {
+        "id": "BAS1499-003v4",
+        "score": -5.99609375
+      },
+      {
+        "id": "BGM1349-001v3",
+        "score": -6.234375
+      },
+      {
+        "id": "MIM2141-001v4",
+        "score": -6.3046875
+      },
+      {
+        "id": "BAS3323-003v3",
+        "score": -6.4375
+      },
+      {
+        "id": "MPM7322-001v4",
+        "score": -6.890625
+      },
+      {
+        "id": "RTM4323-004v1",
+        "score": -7.09375
+      },
+      {
+        "id": "IDC5294-001v3",
+        "score": -7.17578125
+      },
+      {
+        "id": "花藝設計助理",
+        "score": -7.296875
+      },
+      {
+        "id": "AVA2172-004v3",
+        "score": -7.87890625
+      },
+      {
+        "id": "AVA2172-002v3",
+        "score": -8.4375
+      }
+    ],
+    "selected": [
+      {
+        "id": "IIS3513-008v3",
+        "score": -3.5
+      },
+      {
+        "id": "IIS3513-002v4",
+        "score": -4.0234375
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": -4.51171875
+      },
+      {
+        "id": "MQM2141-001v4",
+        "score": -4.6953125
+      },
+      {
+        "id": "MQM1322-001v4",
+        "score": -5.20703125
+      }
+    ],
+    "characters": 4951
+  },
+  {
+    "case_id": "F01",
+    "method": "R03",
+    "query_ids": [
+      "F01-segments-1",
+      "F01-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.7401500490740349
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": 0.7358784510254615
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": 0.7181533340236228
+        },
+        {
+          "id": "網路維修助理",
+          "score": 0.7104477101169704
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": 0.7095904006739056
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": 0.7055652619374362
+        },
+        {
+          "id": "KRM4224-001v3",
+          "score": 0.7050830851727101
+        },
+        {
+          "id": "IIS3513-008v3",
+          "score": 0.7049044058298009
+        },
+        {
+          "id": "INM3514-001v4",
+          "score": 0.7040358547566555
+        },
+        {
+          "id": "MQM1322-001v4",
+          "score": 0.7019506641926246
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": 0.7017187123927917
+        },
+        {
+          "id": "IIS3513-001v4",
+          "score": 0.6999949588364383
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": 0.6999628412523927
+        },
+        {
+          "id": "MQM2141-001v4",
+          "score": 0.6967471586064671
+        },
+        {
+          "id": "RTM4999-001v3",
+          "score": 0.6957518978257095
+        },
+        {
+          "id": "MEM3511-001v3",
+          "score": 0.6956977565563756
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": 0.6951186088134379
+        },
+        {
+          "id": "KRM3323-001v4",
+          "score": 0.6949842971446288
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": 0.6948910812504329
+        },
+        {
+          "id": "BGM5220-002v3",
+          "score": 0.6945772042531514
+        }
+      ],
+      [
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.7189210667693031
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": 0.7124442073974016
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": 0.6872239401099034
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": 0.6849217188682482
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": 0.6827164232593935
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": 0.6816685670345982
+        },
+        {
+          "id": "INM3514-001v4",
+          "score": 0.6806318739902695
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": 0.6793291655327998
+        },
+        {
+          "id": "MQM1322-001v4",
+          "score": 0.6791385392157077
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": 0.6783100809117779
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": 0.6770132803093908
+        },
+        {
+          "id": "KRM4224-001v3",
+          "score": 0.6716332009230375
+        },
+        {
+          "id": "MQM2141-001v4",
+          "score": 0.6708116686805476
+        },
+        {
+          "id": "RTM4999-001v3",
+          "score": 0.6698632885837585
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": 0.6697473262083113
+        },
+        {
+          "id": "IIS3513-008v3",
+          "score": 0.6694023224232861
+        },
+        {
+          "id": "KPS3322-002v4",
+          "score": 0.6691514461818846
+        },
+        {
+          "id": "BGM1330-001v3",
+          "score": 0.6686509122886377
+        },
+        {
+          "id": "IDC1330-001v1",
+          "score": 0.6676937199190102
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": 0.6663034771795753
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "KRM1324-002v1",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-002v4",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "BGM1349-001v3",
+        "fusion_score": 0.3333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "MIM2141-001v4",
+        "fusion_score": 0.27142857142857146,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "INM3514-001v4",
+        "fusion_score": 0.225,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "KRM4224-001v3",
+        "fusion_score": 0.20192307692307693,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          },
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "網路維修助理",
+        "fusion_score": 0.2,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "KPS4999-001v3",
+        "fusion_score": 0.19285714285714284,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "MQM1322-001v4",
+        "fusion_score": 0.19090909090909092,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "IDC5294-001v3",
+        "fusion_score": 0.17424242424242425,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-008v3",
+        "fusion_score": 0.16993464052287582,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "BAS3323-003v3",
+        "fusion_score": 0.14285714285714285,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "MQM2141-001v4",
+        "fusion_score": 0.1380952380952381,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          },
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "RTM4999-001v3",
+        "fusion_score": 0.12916666666666665,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          },
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "RTM4323-004v1",
+        "fusion_score": 0.11805555555555555,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          },
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "BAS1499-003v4",
+        "fusion_score": 0.1111111111111111,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-004v3",
+        "fusion_score": 0.08333333333333333,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-001v4",
+        "fusion_score": 0.07692307692307693,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "MEM3511-001v3",
+        "fusion_score": 0.058823529411764705,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-002v4",
+        "fusion_score": 0.05555555555555555,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "BGM1330-001v3",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "KRM3323-001v4",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "IDC1330-001v1",
+        "fusion_score": 0.05,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "BGM5220-002v3",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-003v3",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "KRM1324-002v1",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-002v4",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "BGM1349-001v3",
+        "fusion_score": 0.3333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "MIM2141-001v4",
+        "fusion_score": 0.27142857142857146,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      }
+    ],
+    "characters": 4294
+  },
+  {
+    "case_id": "F01",
+    "method": "R04",
+    "query_ids": [
+      "F01-segments-1",
+      "F01-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "MQM2141-001v4",
+          "score": -3.0859375
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": -3.865234375
+        },
+        {
+          "id": "IIS3513-001v4",
+          "score": -4.125
+        },
+        {
+          "id": "INM3514-001v4",
+          "score": -4.31640625
+        },
+        {
+          "id": "KRM4224-001v3",
+          "score": -4.4609375
+        },
+        {
+          "id": "MQM1322-001v4",
+          "score": -4.60546875
+        },
+        {
+          "id": "MEM3511-001v3",
+          "score": -4.62109375
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": -4.6484375
+        },
+        {
+          "id": "IIS3513-008v3",
+          "score": -4.68359375
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -4.7421875
+        },
+        {
+          "id": "KRM3323-001v4",
+          "score": -4.88671875
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": -5.1015625
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": -5.30859375
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": -5.47265625
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": -5.4921875
+        },
+        {
+          "id": "BGM5220-002v3",
+          "score": -5.5625
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": -5.9140625
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": -6.13671875
+        },
+        {
+          "id": "RTM4999-001v3",
+          "score": -6.2109375
+        },
+        {
+          "id": "網路維修助理",
+          "score": -6.6171875
+        }
+      ],
+      [
+        {
+          "id": "KPS2434-004v2",
+          "score": -3.2890625
+        },
+        {
+          "id": "KRM4224-001v3",
+          "score": -3.41015625
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": -3.736328125
+        },
+        {
+          "id": "MQM2141-001v4",
+          "score": -3.775390625
+        },
+        {
+          "id": "INM3514-001v4",
+          "score": -3.955078125
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": -4.16015625
+        },
+        {
+          "id": "KPS3322-002v4",
+          "score": -4.44921875
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": -4.7109375
+        },
+        {
+          "id": "MQM1322-001v4",
+          "score": -4.71875
+        },
+        {
+          "id": "IIS3513-008v3",
+          "score": -4.83203125
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": -4.8984375
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": -5.19140625
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": -5.3203125
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": -5.63671875
+        },
+        {
+          "id": "IDC1330-001v1",
+          "score": -5.75
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": -5.77734375
+        },
+        {
+          "id": "RTM4999-001v3",
+          "score": -5.78515625
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": -5.86328125
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": -5.94140625
+        },
+        {
+          "id": "BGM1330-001v3",
+          "score": -6.16796875
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "MQM2141-001v4",
+        "fusion_score": 0.7,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.5909090909090909,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-002v4",
+        "fusion_score": 0.5833333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "KRM4224-001v3",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "INM3514-001v4",
+        "fusion_score": 0.3666666666666667,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "KPS4999-001v3",
+        "fusion_score": 0.25396825396825395,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-001v4",
+        "fusion_score": 0.25,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "MQM1322-001v4",
+        "fusion_score": 0.24285714285714285,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-008v3",
+        "fusion_score": 0.19090909090909092,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          },
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "KRM1324-002v1",
+        "fusion_score": 0.1736111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          },
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "MIM2141-001v4",
+        "fusion_score": 0.1380952380952381,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          },
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "BGM1349-001v3",
+        "fusion_score": 0.12955465587044535,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          },
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-002v4",
+        "fusion_score": 0.125,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "MEM3511-001v3",
+        "fusion_score": 0.125,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "RTM4323-004v1",
+        "fusion_score": 0.11145510835913312,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          },
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "IDC5294-001v3",
+        "fusion_score": 0.10555555555555556,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          },
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "RTM4999-001v3",
+        "fusion_score": 0.10555555555555556,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          },
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-003v3",
+        "fusion_score": 0.08333333333333333,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "KRM3323-001v4",
+        "fusion_score": 0.08333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "BAS1499-003v4",
+        "fusion_score": 0.07692307692307693,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-004v3",
+        "fusion_score": 0.07142857142857142,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "BAS3323-003v3",
+        "fusion_score": 0.06666666666666667,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "IDC1330-001v1",
+        "fusion_score": 0.0625,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "BGM5220-002v3",
+        "fusion_score": 0.058823529411764705,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "BGM1330-001v3",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      },
+      {
+        "id": "網路維修助理",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "MQM2141-001v4",
+        "fusion_score": 0.7,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.5909090909090909,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-002v4",
+        "fusion_score": 0.5833333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "KRM4224-001v3",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "INM3514-001v4",
+        "fusion_score": 0.3666666666666667,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      }
+    ],
+    "characters": 5148
+  },
+  {
+    "case_id": "F02",
+    "method": "R01",
+    "query_ids": [
+      "F02-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "INM3514-001v4",
+          "score": 0.702312320618274
+        },
+        {
+          "id": "IIS3513-001v4",
+          "score": 0.6841391253182406
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.680067039992749
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": 0.6796374523644567
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": 0.6661706903705916
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": 0.6657707387621963
+        },
+        {
+          "id": "IDC3512-002v2",
+          "score": 0.6657552868643537
+        },
+        {
+          "id": "ISD2152-004v5",
+          "score": 0.6654681107933805
+        },
+        {
+          "id": "BAS3332-003v3",
+          "score": 0.6639168672426522
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": 0.6626729865119421
+        },
+        {
+          "id": "花藝設計助理",
+          "score": 0.6614395553760548
+        },
+        {
+          "id": "BAS1499-002v4",
+          "score": 0.6613600678014279
+        },
+        {
+          "id": "IDC1330-001v1",
+          "score": 0.6597001821612102
+        },
+        {
+          "id": "ISD2513-001v4",
+          "score": 0.656472489074444
+        },
+        {
+          "id": "FBF1223-003v3",
+          "score": 0.6548070511938682
+        },
+        {
+          "id": "FIS2511-002v2",
+          "score": 0.6541465386587606
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": 0.6529430322075098
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": 0.6527268705935332
+        },
+        {
+          "id": "網路維修助理",
+          "score": 0.6520560219333095
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": 0.6518178342672443
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "INM3514-001v4",
+        "score": 0.702312320618274
+      },
+      {
+        "id": "IIS3513-001v4",
+        "score": 0.6841391253182406
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": 0.680067039992749
+      },
+      {
+        "id": "AVA2172-003v3",
+        "score": 0.6796374523644567
+      },
+      {
+        "id": "IIS3513-002v4",
+        "score": 0.6661706903705916
+      },
+      {
+        "id": "BAS1499-003v4",
+        "score": 0.6657707387621963
+      },
+      {
+        "id": "IDC3512-002v2",
+        "score": 0.6657552868643537
+      },
+      {
+        "id": "ISD2152-004v5",
+        "score": 0.6654681107933805
+      },
+      {
+        "id": "BAS3332-003v3",
+        "score": 0.6639168672426522
+      },
+      {
+        "id": "KPS3322-003v3",
+        "score": 0.6626729865119421
+      },
+      {
+        "id": "花藝設計助理",
+        "score": 0.6614395553760548
+      },
+      {
+        "id": "BAS1499-002v4",
+        "score": 0.6613600678014279
+      },
+      {
+        "id": "IDC1330-001v1",
+        "score": 0.6597001821612102
+      },
+      {
+        "id": "ISD2513-001v4",
+        "score": 0.656472489074444
+      },
+      {
+        "id": "FBF1223-003v3",
+        "score": 0.6548070511938682
+      },
+      {
+        "id": "FIS2511-002v2",
+        "score": 0.6541465386587606
+      },
+      {
+        "id": "MIM2141-001v4",
+        "score": 0.6529430322075098
+      },
+      {
+        "id": "FAC3313-001v2",
+        "score": 0.6527268705935332
+      },
+      {
+        "id": "網路維修助理",
+        "score": 0.6520560219333095
+      },
+      {
+        "id": "BGM1349-001v3",
+        "score": 0.6518178342672443
+      }
+    ],
+    "selected": [
+      {
+        "id": "INM3514-001v4",
+        "score": 0.702312320618274
+      },
+      {
+        "id": "IIS3513-001v4",
+        "score": 0.6841391253182406
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": 0.680067039992749
+      },
+      {
+        "id": "AVA2172-003v3",
+        "score": 0.6796374523644567
+      },
+      {
+        "id": "IIS3513-002v4",
+        "score": 0.6661706903705916
+      }
+    ],
+    "characters": 4777
+  },
+  {
+    "case_id": "F02",
+    "method": "R02",
+    "query_ids": [
+      "F02-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "INM3514-001v4",
+          "score": -1.9482421875
+        },
+        {
+          "id": "IIS3513-001v4",
+          "score": -2.103515625
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": -3.41796875
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": -4.875
+        },
+        {
+          "id": "IDC1330-001v1",
+          "score": -5.25
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": -5.33984375
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": -5.37109375
+        },
+        {
+          "id": "BAS3332-003v3",
+          "score": -5.37890625
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": -5.45703125
+        },
+        {
+          "id": "IDC3512-002v2",
+          "score": -5.78515625
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -5.8203125
+        },
+        {
+          "id": "FBF1223-003v3",
+          "score": -5.9140625
+        },
+        {
+          "id": "ISD2513-001v4",
+          "score": -6.0703125
+        },
+        {
+          "id": "BAS1499-002v4",
+          "score": -6.375
+        },
+        {
+          "id": "ISD2152-004v5",
+          "score": -6.7734375
+        },
+        {
+          "id": "網路維修助理",
+          "score": -7.01171875
+        },
+        {
+          "id": "FIS2511-002v2",
+          "score": -7.08984375
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": -7.34375
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": -8.2578125
+        },
+        {
+          "id": "花藝設計助理",
+          "score": -9.171875
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "INM3514-001v4",
+        "score": -1.9482421875
+      },
+      {
+        "id": "IIS3513-001v4",
+        "score": -2.103515625
+      },
+      {
+        "id": "IIS3513-002v4",
+        "score": -3.41796875
+      },
+      {
+        "id": "AVA2172-003v3",
+        "score": -4.875
+      },
+      {
+        "id": "IDC1330-001v1",
+        "score": -5.25
+      },
+      {
+        "id": "BGM1349-001v3",
+        "score": -5.33984375
+      },
+      {
+        "id": "KPS3322-003v3",
+        "score": -5.37109375
+      },
+      {
+        "id": "BAS3332-003v3",
+        "score": -5.37890625
+      },
+      {
+        "id": "BAS1499-003v4",
+        "score": -5.45703125
+      },
+      {
+        "id": "IDC3512-002v2",
+        "score": -5.78515625
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": -5.8203125
+      },
+      {
+        "id": "FBF1223-003v3",
+        "score": -5.9140625
+      },
+      {
+        "id": "ISD2513-001v4",
+        "score": -6.0703125
+      },
+      {
+        "id": "BAS1499-002v4",
+        "score": -6.375
+      },
+      {
+        "id": "ISD2152-004v5",
+        "score": -6.7734375
+      },
+      {
+        "id": "網路維修助理",
+        "score": -7.01171875
+      },
+      {
+        "id": "FIS2511-002v2",
+        "score": -7.08984375
+      },
+      {
+        "id": "MIM2141-001v4",
+        "score": -7.34375
+      },
+      {
+        "id": "FAC3313-001v2",
+        "score": -8.2578125
+      },
+      {
+        "id": "花藝設計助理",
+        "score": -9.171875
+      }
+    ],
+    "selected": [
+      {
+        "id": "INM3514-001v4",
+        "score": -1.9482421875
+      },
+      {
+        "id": "IIS3513-001v4",
+        "score": -2.103515625
+      },
+      {
+        "id": "IIS3513-002v4",
+        "score": -3.41796875
+      },
+      {
+        "id": "AVA2172-003v3",
+        "score": -4.875
+      },
+      {
+        "id": "IDC1330-001v1",
+        "score": -5.25
+      }
+    ],
+    "characters": 5065
+  },
+  {
+    "case_id": "F02",
+    "method": "R03",
+    "query_ids": [
+      "F02-segments-1",
+      "F02-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "INM3514-001v4",
+          "score": 0.6880332046879191
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.6785063353654751
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": 0.671605126154482
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": 0.6645931144575282
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": 0.6623424165693441
+        },
+        {
+          "id": "IIS3513-001v4",
+          "score": 0.6613998249511853
+        },
+        {
+          "id": "BAS1499-002v4",
+          "score": 0.6612760809628303
+        },
+        {
+          "id": "ISD2152-004v5",
+          "score": 0.6612154949056223
+        },
+        {
+          "id": "BAS3332-003v3",
+          "score": 0.6513177092643454
+        },
+        {
+          "id": "FIS2511-002v2",
+          "score": 0.6506225385165887
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": 0.6501298463434492
+        },
+        {
+          "id": "花藝設計助理",
+          "score": 0.6495852473145871
+        },
+        {
+          "id": "ISD2513-001v4",
+          "score": 0.6475287309871176
+        },
+        {
+          "id": "FIS2511-001v2",
+          "score": 0.6475221308572132
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": 0.647386857401441
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": 0.6472954605448686
+        },
+        {
+          "id": "FBF1223-003v3",
+          "score": 0.6464476663386403
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": 0.6446015504500984
+        },
+        {
+          "id": "IDC1330-001v1",
+          "score": 0.6433876751268173
+        },
+        {
+          "id": "ISD2152-001v4",
+          "score": 0.6423417030677927
+        }
+      ],
+      [
+        {
+          "id": "INM3514-001v4",
+          "score": 0.6876444132121694
+        },
+        {
+          "id": "IIS3513-001v4",
+          "score": 0.6750862272740039
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.6655832081885094
+        },
+        {
+          "id": "ISD2152-004v5",
+          "score": 0.6562919002813445
+        },
+        {
+          "id": "ISD2513-001v4",
+          "score": 0.6519976227895032
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": 0.6503725118429389
+        },
+        {
+          "id": "IDC1330-001v1",
+          "score": 0.648466256250311
+        },
+        {
+          "id": "BAS1499-002v4",
+          "score": 0.647499588981603
+        },
+        {
+          "id": "FIS2511-002v2",
+          "score": 0.64678237266437
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": 0.6456701132890503
+        },
+        {
+          "id": "FBF1223-003v3",
+          "score": 0.6448761850530376
+        },
+        {
+          "id": "FIS2511-001v2",
+          "score": 0.6415839559245511
+        },
+        {
+          "id": "IDC3512-002v2",
+          "score": 0.6404811574699303
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": 0.6401162319733951
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": 0.6393988845280227
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": 0.6386833359991649
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": 0.6375817905701637
+        },
+        {
+          "id": "IISD3512-001v3",
+          "score": 0.6375512788936744
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": 0.6365792705438289
+        },
+        {
+          "id": "花藝設計助理",
+          "score": 0.6342033852916487
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "INM3514-001v4",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.5833333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-001v4",
+        "fusion_score": 0.47619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "BAS1499-003v4",
+        "fusion_score": 0.34285714285714286,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-003v3",
+        "fusion_score": 0.31666666666666665,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "ISD2152-004v5",
+        "fusion_score": 0.3111111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-002v4",
+        "fusion_score": 0.25757575757575757,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "ISD2513-001v4",
+        "fusion_score": 0.23809523809523808,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "BAS1499-002v4",
+        "fusion_score": 0.2361111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          },
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "FIS2511-002v2",
+        "fusion_score": 0.19090909090909092,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "IDC1330-001v1",
+        "fusion_score": 0.175,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "FIS2511-001v2",
+        "fusion_score": 0.14358974358974358,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          },
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-003v3",
+        "fusion_score": 0.14215686274509803,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "FBF1223-003v3",
+        "fusion_score": 0.1388888888888889,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          },
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "花藝設計助理",
+        "fusion_score": 0.12454212454212454,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          },
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      },
+      {
+        "id": "BGM1349-001v3",
+        "fusion_score": 0.1213235294117647,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          },
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "BAS3332-003v3",
+        "fusion_score": 0.1,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "IDC3512-002v2",
+        "fusion_score": 0.07142857142857142,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "KRM1324-002v1",
+        "fusion_score": 0.0625,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "IDC5294-001v3",
+        "fusion_score": 0.05555555555555555,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "FAC3313-001v2",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "IISD3512-001v3",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "MIM2141-001v4",
+        "fusion_score": 0.05,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "ISD2152-001v4",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "INM3514-001v4",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.5833333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-001v4",
+        "fusion_score": 0.47619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "BAS1499-003v4",
+        "fusion_score": 0.34285714285714286,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-003v3",
+        "fusion_score": 0.31666666666666665,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      }
+    ],
+    "characters": 4612
+  },
+  {
+    "case_id": "F02",
+    "method": "R04",
+    "query_ids": [
+      "F02-segments-1",
+      "F02-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "IIS3513-001v4",
+          "score": -3.23046875
+        },
+        {
+          "id": "INM3514-001v4",
+          "score": -3.662109375
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": -5.0703125
+        },
+        {
+          "id": "BAS3332-003v3",
+          "score": -5.76953125
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": -5.79296875
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": -5.890625
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": -6.01953125
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -6.16796875
+        },
+        {
+          "id": "IDC1330-001v1",
+          "score": -6.30859375
+        },
+        {
+          "id": "FIS2511-001v2",
+          "score": -6.45703125
+        },
+        {
+          "id": "BAS1499-002v4",
+          "score": -6.55078125
+        },
+        {
+          "id": "FBF1223-003v3",
+          "score": -6.59375
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": -6.65625
+        },
+        {
+          "id": "ISD2152-001v4",
+          "score": -6.7265625
+        },
+        {
+          "id": "FIS2511-002v2",
+          "score": -6.80078125
+        },
+        {
+          "id": "ISD2513-001v4",
+          "score": -6.8203125
+        },
+        {
+          "id": "ISD2152-004v5",
+          "score": -7.265625
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": -8.921875
+        },
+        {
+          "id": "花藝設計助理",
+          "score": -8.9453125
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": -9.125
+        }
+      ],
+      [
+        {
+          "id": "IIS3513-001v4",
+          "score": -1.765625
+        },
+        {
+          "id": "INM3514-001v4",
+          "score": -3.3046875
+        },
+        {
+          "id": "IIS3513-002v4",
+          "score": -4.97265625
+        },
+        {
+          "id": "IISD3512-001v3",
+          "score": -5.9296875
+        },
+        {
+          "id": "BGM1349-001v3",
+          "score": -6.84375
+        },
+        {
+          "id": "IDC1330-001v1",
+          "score": -6.8515625
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": -6.8671875
+        },
+        {
+          "id": "BAS1499-003v4",
+          "score": -6.984375
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -7.0703125
+        },
+        {
+          "id": "ISD2152-004v5",
+          "score": -7.07421875
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": -7.234375
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": -7.33203125
+        },
+        {
+          "id": "BAS1499-002v4",
+          "score": -7.35546875
+        },
+        {
+          "id": "ISD2513-001v4",
+          "score": -7.47265625
+        },
+        {
+          "id": "FIS2511-001v2",
+          "score": -7.68359375
+        },
+        {
+          "id": "IDC3512-002v2",
+          "score": -7.86328125
+        },
+        {
+          "id": "FBF1223-003v3",
+          "score": -7.984375
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": -8.078125
+        },
+        {
+          "id": "FIS2511-002v2",
+          "score": -8.109375
+        },
+        {
+          "id": "花藝設計助理",
+          "score": -10.046875
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "IIS3513-001v4",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "INM3514-001v4",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-002v4",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-003v3",
+        "fusion_score": 0.29166666666666663,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "IDC1330-001v1",
+        "fusion_score": 0.24285714285714285,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "BGM1349-001v3",
+        "fusion_score": 0.23809523809523808,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "BAS1499-003v4",
+        "fusion_score": 0.2361111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          },
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-003v3",
+        "fusion_score": 0.22619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          },
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.2111111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "BAS3332-003v3",
+        "fusion_score": 0.2,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "IISD3512-001v3",
+        "fusion_score": 0.2,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "BAS1499-002v4",
+        "fusion_score": 0.15476190476190477,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "FIS2511-001v2",
+        "fusion_score": 0.1534090909090909,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "ISD2152-004v5",
+        "fusion_score": 0.14646464646464646,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          },
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "FBF1223-003v3",
+        "fusion_score": 0.13247863247863248,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          },
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "ISD2513-001v4",
+        "fusion_score": 0.12549019607843137,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          },
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "FIS2511-002v2",
+        "fusion_score": 0.1125,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          },
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "花藝設計助理",
+        "fusion_score": 0.09761904761904762,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          },
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      },
+      {
+        "id": "IDC5294-001v3",
+        "fusion_score": 0.07692307692307693,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "ISD2152-001v4",
+        "fusion_score": 0.06666666666666667,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "IDC3512-002v2",
+        "fusion_score": 0.058823529411764705,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "FAC3313-001v2",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "MIM2141-001v4",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "KRM1324-002v1",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "IIS3513-001v4",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "INM3514-001v4",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "IIS3513-002v4",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-003v3",
+        "fusion_score": 0.29166666666666663,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "IDC1330-001v1",
+        "fusion_score": 0.24285714285714285,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      }
+    ],
+    "characters": 5784
+  },
+  {
+    "case_id": "F03",
+    "method": "R01",
+    "query_ids": [
+      "F03-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "FAC4311-001v2",
+          "score": 0.7663261266058978
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": 0.75700102450956
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.720300322456659
+        },
+        {
+          "id": "FAC1211-001v2",
+          "score": 0.7071800482172719
+        },
+        {
+          "id": "BAS1219-003v4",
+          "score": 0.6992856344175201
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": 0.6869350689977476
+        },
+        {
+          "id": "KRM3323-001v4",
+          "score": 0.6826592122068853
+        },
+        {
+          "id": "KPS5220-001v4",
+          "score": 0.6805899529488768
+        },
+        {
+          "id": "MPM7322-001v4",
+          "score": 0.6778568600084005
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": 0.6770475731505249
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": 0.6739371861115286
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": 0.6727622750927238
+        },
+        {
+          "id": "BGM5220-002v3",
+          "score": 0.6713997826496415
+        },
+        {
+          "id": "MMP4321-003v4",
+          "score": 0.6704863507814014
+        },
+        {
+          "id": "KRM1420-003v4",
+          "score": 0.6697473983293024
+        },
+        {
+          "id": "花藝設計助理",
+          "score": 0.6686147992892825
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": 0.6674015446915706
+        },
+        {
+          "id": "BAS1219-005v1",
+          "score": 0.6671464872437216
+        },
+        {
+          "id": "KRM1420-001v4",
+          "score": 0.6636992054806001
+        },
+        {
+          "id": "KPS3322-002v4",
+          "score": 0.6634662387657406
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "FAC4311-001v2",
+        "score": 0.7663261266058978
+      },
+      {
+        "id": "FAC3313-001v2",
+        "score": 0.75700102450956
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": 0.720300322456659
+      },
+      {
+        "id": "FAC1211-001v2",
+        "score": 0.7071800482172719
+      },
+      {
+        "id": "BAS1219-003v4",
+        "score": 0.6992856344175201
+      },
+      {
+        "id": "BAS3323-003v3",
+        "score": 0.6869350689977476
+      },
+      {
+        "id": "KRM3323-001v4",
+        "score": 0.6826592122068853
+      },
+      {
+        "id": "KPS5220-001v4",
+        "score": 0.6805899529488768
+      },
+      {
+        "id": "MPM7322-001v4",
+        "score": 0.6778568600084005
+      },
+      {
+        "id": "KPS5292-002v3",
+        "score": 0.6770475731505249
+      },
+      {
+        "id": "RTM4323-004v1",
+        "score": 0.6739371861115286
+      },
+      {
+        "id": "KPS4999-001v3",
+        "score": 0.6727622750927238
+      },
+      {
+        "id": "BGM5220-002v3",
+        "score": 0.6713997826496415
+      },
+      {
+        "id": "MMP4321-003v4",
+        "score": 0.6704863507814014
+      },
+      {
+        "id": "KRM1420-003v4",
+        "score": 0.6697473983293024
+      },
+      {
+        "id": "花藝設計助理",
+        "score": 0.6686147992892825
+      },
+      {
+        "id": "KRM1324-002v1",
+        "score": 0.6674015446915706
+      },
+      {
+        "id": "BAS1219-005v1",
+        "score": 0.6671464872437216
+      },
+      {
+        "id": "KRM1420-001v4",
+        "score": 0.6636992054806001
+      },
+      {
+        "id": "KPS3322-002v4",
+        "score": 0.6634662387657406
+      }
+    ],
+    "selected": [
+      {
+        "id": "FAC4311-001v2",
+        "score": 0.7663261266058978
+      },
+      {
+        "id": "FAC3313-001v2",
+        "score": 0.75700102450956
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": 0.720300322456659
+      },
+      {
+        "id": "FAC1211-001v2",
+        "score": 0.7071800482172719
+      },
+      {
+        "id": "BAS1219-003v4",
+        "score": 0.6992856344175201
+      }
+    ],
+    "characters": 3797
+  },
+  {
+    "case_id": "F03",
+    "method": "R02",
+    "query_ids": [
+      "F03-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "FAC4311-001v2",
+          "score": -0.75341796875
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": -1.064453125
+        },
+        {
+          "id": "FAC1211-001v2",
+          "score": -2.224609375
+        },
+        {
+          "id": "BAS1219-005v1",
+          "score": -2.37890625
+        },
+        {
+          "id": "KRM3323-001v4",
+          "score": -2.7109375
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -3.0
+        },
+        {
+          "id": "BAS1219-003v4",
+          "score": -3.02734375
+        },
+        {
+          "id": "KPS3322-002v4",
+          "score": -3.6640625
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": -3.814453125
+        },
+        {
+          "id": "KRM1420-001v4",
+          "score": -4.06640625
+        },
+        {
+          "id": "BGM5220-002v3",
+          "score": -4.3984375
+        },
+        {
+          "id": "MPM7322-001v4",
+          "score": -4.5625
+        },
+        {
+          "id": "KPS5220-001v4",
+          "score": -5.0078125
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": -5.28515625
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": -5.65234375
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": -5.9609375
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": -5.96484375
+        },
+        {
+          "id": "KRM1420-003v4",
+          "score": -5.98046875
+        },
+        {
+          "id": "花藝設計助理",
+          "score": -6.33984375
+        },
+        {
+          "id": "MMP4321-003v4",
+          "score": -6.55078125
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "FAC4311-001v2",
+        "score": -0.75341796875
+      },
+      {
+        "id": "FAC3313-001v2",
+        "score": -1.064453125
+      },
+      {
+        "id": "FAC1211-001v2",
+        "score": -2.224609375
+      },
+      {
+        "id": "BAS1219-005v1",
+        "score": -2.37890625
+      },
+      {
+        "id": "KRM3323-001v4",
+        "score": -2.7109375
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": -3.0
+      },
+      {
+        "id": "BAS1219-003v4",
+        "score": -3.02734375
+      },
+      {
+        "id": "KPS3322-002v4",
+        "score": -3.6640625
+      },
+      {
+        "id": "KPS5292-002v3",
+        "score": -3.814453125
+      },
+      {
+        "id": "KRM1420-001v4",
+        "score": -4.06640625
+      },
+      {
+        "id": "BGM5220-002v3",
+        "score": -4.3984375
+      },
+      {
+        "id": "MPM7322-001v4",
+        "score": -4.5625
+      },
+      {
+        "id": "KPS5220-001v4",
+        "score": -5.0078125
+      },
+      {
+        "id": "BAS3323-003v3",
+        "score": -5.28515625
+      },
+      {
+        "id": "KPS4999-001v3",
+        "score": -5.65234375
+      },
+      {
+        "id": "KRM1324-002v1",
+        "score": -5.9609375
+      },
+      {
+        "id": "RTM4323-004v1",
+        "score": -5.96484375
+      },
+      {
+        "id": "KRM1420-003v4",
+        "score": -5.98046875
+      },
+      {
+        "id": "花藝設計助理",
+        "score": -6.33984375
+      },
+      {
+        "id": "MMP4321-003v4",
+        "score": -6.55078125
+      }
+    ],
+    "selected": [
+      {
+        "id": "FAC4311-001v2",
+        "score": -0.75341796875
+      },
+      {
+        "id": "FAC3313-001v2",
+        "score": -1.064453125
+      },
+      {
+        "id": "FAC1211-001v2",
+        "score": -2.224609375
+      },
+      {
+        "id": "BAS1219-005v1",
+        "score": -2.37890625
+      },
+      {
+        "id": "KRM3323-001v4",
+        "score": -2.7109375
+      }
+    ],
+    "characters": 3839
+  },
+  {
+    "case_id": "F03",
+    "method": "R03",
+    "query_ids": [
+      "F03-segments-1",
+      "F03-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "FAC4311-001v2",
+          "score": 0.7556339654286305
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": 0.7463838795931905
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.7062795967711095
+        },
+        {
+          "id": "FAC1211-001v2",
+          "score": 0.7005818279047786
+        },
+        {
+          "id": "BAS1219-003v4",
+          "score": 0.692477256057533
+        },
+        {
+          "id": "KRM3323-001v4",
+          "score": 0.6779419514552831
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": 0.6704036135124806
+        },
+        {
+          "id": "KPS5220-001v4",
+          "score": 0.6663006560291596
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": 0.6651999235841438
+        },
+        {
+          "id": "花藝設計助理",
+          "score": 0.6632636129042131
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": 0.6627335291037859
+        },
+        {
+          "id": "MPM7322-001v4",
+          "score": 0.6598080024927208
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": 0.6597918395281639
+        },
+        {
+          "id": "KPS3322-002v4",
+          "score": 0.6577091223391058
+        },
+        {
+          "id": "BAS1219-005v1",
+          "score": 0.6556250127377359
+        },
+        {
+          "id": "BGM5220-002v3",
+          "score": 0.6553691339225844
+        },
+        {
+          "id": "KRM1420-003v4",
+          "score": 0.6547299430785715
+        },
+        {
+          "id": "KRM1420-001v4",
+          "score": 0.6527116354685036
+        },
+        {
+          "id": "MMP4321-003v4",
+          "score": 0.652185020300367
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": 0.6475889633357722
+        }
+      ],
+      [
+        {
+          "id": "FAC4311-001v2",
+          "score": 0.7533918767285
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": 0.7494516711589551
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.7136253223416444
+        },
+        {
+          "id": "FAC1211-001v2",
+          "score": 0.7002061541615471
+        },
+        {
+          "id": "BAS1219-003v4",
+          "score": 0.6896709479317173
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": 0.6811632947267948
+        },
+        {
+          "id": "KRM3323-001v4",
+          "score": 0.6798371508863461
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": 0.6789067471657897
+        },
+        {
+          "id": "KPS5220-001v4",
+          "score": 0.6774042279154681
+        },
+        {
+          "id": "MPM7322-001v4",
+          "score": 0.6702438931172787
+        },
+        {
+          "id": "BAS1219-005v1",
+          "score": 0.6694301412051917
+        },
+        {
+          "id": "KPS3322-002v4",
+          "score": 0.6677084516459953
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": 0.6653572184196488
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": 0.6631013680247091
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": 0.661776501103616
+        },
+        {
+          "id": "KRM1420-003v4",
+          "score": 0.6616235192770329
+        },
+        {
+          "id": "BGM5220-002v3",
+          "score": 0.6607527140933946
+        },
+        {
+          "id": "MMP4321-003v4",
+          "score": 0.6604622172779715
+        },
+        {
+          "id": "花藝設計助理",
+          "score": 0.6602513657246573
+        },
+        {
+          "id": "KRM1420-001v4",
+          "score": 0.6585779898533786
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "FAC4311-001v2",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "FAC3313-001v2",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "FAC1211-001v2",
+        "fusion_score": 0.4,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "BAS1219-003v4",
+        "fusion_score": 0.3333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "KRM3323-001v4",
+        "fusion_score": 0.26785714285714285,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "BAS3323-003v3",
+        "fusion_score": 0.2361111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          },
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "KPS5292-002v3",
+        "fusion_score": 0.21428571428571427,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "KPS5220-001v4",
+        "fusion_score": 0.2111111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "RTM4323-004v1",
+        "fusion_score": 0.17142857142857143,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          },
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "MPM7322-001v4",
+        "fusion_score": 0.16783216783216784,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          },
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "BAS1219-005v1",
+        "fusion_score": 0.14583333333333331,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          },
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "KPS4999-001v3",
+        "fusion_score": 0.14583333333333331,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-002v4",
+        "fusion_score": 0.14358974358974358,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          },
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "花藝設計助理",
+        "fusion_score": 0.14090909090909093,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "BGM5220-002v3",
+        "fusion_score": 0.11437908496732026,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          },
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "KRM1420-003v4",
+        "fusion_score": 0.11437908496732026,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          },
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "KRM1324-002v1",
+        "fusion_score": 0.11428571428571428,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          },
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "MMP4321-003v4",
+        "fusion_score": 0.10263157894736842,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          },
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "KRM1420-001v4",
+        "fusion_score": 0.10025062656641603,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          },
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "FAC4311-001v2",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "FAC3313-001v2",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "FAC1211-001v2",
+        "fusion_score": 0.4,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "BAS1219-003v4",
+        "fusion_score": 0.3333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      }
+    ],
+    "characters": 3797
+  },
+  {
+    "case_id": "F03",
+    "method": "R04",
+    "query_ids": [
+      "F03-segments-1",
+      "F03-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "FAC4311-001v2",
+          "score": -1.06640625
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": -1.4404296875
+        },
+        {
+          "id": "FAC1211-001v2",
+          "score": -2.234375
+        },
+        {
+          "id": "BAS1219-005v1",
+          "score": -2.826171875
+        },
+        {
+          "id": "KRM3323-001v4",
+          "score": -3.09375
+        },
+        {
+          "id": "BAS1219-003v4",
+          "score": -3.34375
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -3.45703125
+        },
+        {
+          "id": "KRM1420-001v4",
+          "score": -3.787109375
+        },
+        {
+          "id": "KPS3322-002v4",
+          "score": -4.08984375
+        },
+        {
+          "id": "BGM5220-002v3",
+          "score": -4.2421875
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": -4.4765625
+        },
+        {
+          "id": "MPM7322-001v4",
+          "score": -4.765625
+        },
+        {
+          "id": "KPS5220-001v4",
+          "score": -5.06640625
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": -5.26171875
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": -5.4296875
+        },
+        {
+          "id": "花藝設計助理",
+          "score": -5.46484375
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": -5.9140625
+        },
+        {
+          "id": "KRM1420-003v4",
+          "score": -5.9453125
+        },
+        {
+          "id": "MMP4321-003v4",
+          "score": -6.0859375
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": -6.83203125
+        }
+      ],
+      [
+        {
+          "id": "FAC4311-001v2",
+          "score": -1.6552734375
+        },
+        {
+          "id": "FAC3313-001v2",
+          "score": -2.19921875
+        },
+        {
+          "id": "FAC1211-001v2",
+          "score": -2.6015625
+        },
+        {
+          "id": "BAS1219-005v1",
+          "score": -3.314453125
+        },
+        {
+          "id": "KRM3323-001v4",
+          "score": -3.470703125
+        },
+        {
+          "id": "BAS1219-003v4",
+          "score": -3.91796875
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -4.0703125
+        },
+        {
+          "id": "KRM1420-001v4",
+          "score": -4.17578125
+        },
+        {
+          "id": "KPS3322-002v4",
+          "score": -4.5703125
+        },
+        {
+          "id": "BGM5220-002v3",
+          "score": -5.109375
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": -5.17578125
+        },
+        {
+          "id": "KPS5220-001v4",
+          "score": -5.33984375
+        },
+        {
+          "id": "BAS3323-003v3",
+          "score": -5.515625
+        },
+        {
+          "id": "MPM7322-001v4",
+          "score": -5.625
+        },
+        {
+          "id": "KPS4999-001v3",
+          "score": -5.8046875
+        },
+        {
+          "id": "RTM4323-004v1",
+          "score": -6.00390625
+        },
+        {
+          "id": "KRM1324-002v1",
+          "score": -6.18359375
+        },
+        {
+          "id": "花藝設計助理",
+          "score": -6.84375
+        },
+        {
+          "id": "MMP4321-003v4",
+          "score": -6.92578125
+        },
+        {
+          "id": "KRM1420-003v4",
+          "score": -7.16015625
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "FAC4311-001v2",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "FAC3313-001v2",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "FAC1211-001v2",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "BAS1219-005v1",
+        "fusion_score": 0.4,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "KRM3323-001v4",
+        "fusion_score": 0.3333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "BAS1219-003v4",
+        "fusion_score": 0.2857142857142857,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.25,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "KRM1420-001v4",
+        "fusion_score": 0.2222222222222222,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-002v4",
+        "fusion_score": 0.2,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "BGM5220-002v3",
+        "fusion_score": 0.18181818181818182,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "KPS5292-002v3",
+        "fusion_score": 0.16666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "KPS5220-001v4",
+        "fusion_score": 0.14835164835164835,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          },
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "MPM7322-001v4",
+        "fusion_score": 0.14358974358974358,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          },
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "BAS3323-003v3",
+        "fusion_score": 0.1380952380952381,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          },
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "KPS4999-001v3",
+        "fusion_score": 0.125,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          },
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "RTM4323-004v1",
+        "fusion_score": 0.11437908496732026,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          },
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "花藝設計助理",
+        "fusion_score": 0.11145510835913312,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          },
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "KRM1324-002v1",
+        "fusion_score": 0.10317460317460317,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          },
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "KRM1420-003v4",
+        "fusion_score": 0.10025062656641603,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          },
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      },
+      {
+        "id": "MMP4321-003v4",
+        "fusion_score": 0.1,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          },
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "FAC4311-001v2",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "FAC3313-001v2",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "FAC1211-001v2",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "BAS1219-005v1",
+        "fusion_score": 0.4,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "KRM3323-001v4",
+        "fusion_score": 0.3333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      }
+    ],
+    "characters": 3839
+  },
+  {
+    "case_id": "F04",
+    "method": "R01",
+    "query_ids": [
+      "F04-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "MEM7412-001v3",
+          "score": 0.7262986395033644
+        },
+        {
+          "id": "SET2141-001v3",
+          "score": 0.7227255434128439
+        },
+        {
+          "id": "MEM7231-010v2",
+          "score": 0.7116927053037732
+        },
+        {
+          "id": "網路維修助理",
+          "score": 0.7099858264071255
+        },
+        {
+          "id": "MEM7231-009v3",
+          "score": 0.7089271089082143
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": 0.7056802874781221
+        },
+        {
+          "id": "KPS5220-002v3",
+          "score": 0.7011921873715726
+        },
+        {
+          "id": "TFB5131-002v3",
+          "score": 0.7009875193537051
+        },
+        {
+          "id": "MEM7234-002v3",
+          "score": 0.6994706684062435
+        },
+        {
+          "id": "MEM8199-001v3",
+          "score": 0.6991233393206753
+        },
+        {
+          "id": "MEM8199-002v3",
+          "score": 0.6950184669911761
+        },
+        {
+          "id": "MEM3511-001v3",
+          "score": 0.6945757979130824
+        },
+        {
+          "id": "IIS7421-002v3",
+          "score": 0.6945158616269522
+        },
+        {
+          "id": "MEM7234-001v3",
+          "score": 0.6944077953255412
+        },
+        {
+          "id": "印刷機台技術助理",
+          "score": 0.692637427029195
+        },
+        {
+          "id": "MEM7231-019v1",
+          "score": 0.6925646424304936
+        },
+        {
+          "id": "SET7127-002v3",
+          "score": 0.6920860134783794
+        },
+        {
+          "id": "MPM7935-004v3",
+          "score": 0.6905569248206909
+        },
+        {
+          "id": "BAS3332-003v3",
+          "score": 0.689925317624968
+        },
+        {
+          "id": "SET7231-001v3",
+          "score": 0.6889392326794759
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "MEM7412-001v3",
+        "score": 0.7262986395033644
+      },
+      {
+        "id": "SET2141-001v3",
+        "score": 0.7227255434128439
+      },
+      {
+        "id": "MEM7231-010v2",
+        "score": 0.7116927053037732
+      },
+      {
+        "id": "網路維修助理",
+        "score": 0.7099858264071255
+      },
+      {
+        "id": "MEM7231-009v3",
+        "score": 0.7089271089082143
+      },
+      {
+        "id": "MIM2141-001v4",
+        "score": 0.7056802874781221
+      },
+      {
+        "id": "KPS5220-002v3",
+        "score": 0.7011921873715726
+      },
+      {
+        "id": "TFB5131-002v3",
+        "score": 0.7009875193537051
+      },
+      {
+        "id": "MEM7234-002v3",
+        "score": 0.6994706684062435
+      },
+      {
+        "id": "MEM8199-001v3",
+        "score": 0.6991233393206753
+      },
+      {
+        "id": "MEM8199-002v3",
+        "score": 0.6950184669911761
+      },
+      {
+        "id": "MEM3511-001v3",
+        "score": 0.6945757979130824
+      },
+      {
+        "id": "IIS7421-002v3",
+        "score": 0.6945158616269522
+      },
+      {
+        "id": "MEM7234-001v3",
+        "score": 0.6944077953255412
+      },
+      {
+        "id": "印刷機台技術助理",
+        "score": 0.692637427029195
+      },
+      {
+        "id": "MEM7231-019v1",
+        "score": 0.6925646424304936
+      },
+      {
+        "id": "SET7127-002v3",
+        "score": 0.6920860134783794
+      },
+      {
+        "id": "MPM7935-004v3",
+        "score": 0.6905569248206909
+      },
+      {
+        "id": "BAS3332-003v3",
+        "score": 0.689925317624968
+      },
+      {
+        "id": "SET7231-001v3",
+        "score": 0.6889392326794759
+      }
+    ],
+    "selected": [
+      {
+        "id": "MEM7412-001v3",
+        "score": 0.7262986395033644
+      },
+      {
+        "id": "SET2141-001v3",
+        "score": 0.7227255434128439
+      },
+      {
+        "id": "MEM7231-010v2",
+        "score": 0.7116927053037732
+      },
+      {
+        "id": "網路維修助理",
+        "score": 0.7099858264071255
+      },
+      {
+        "id": "MEM7231-009v3",
+        "score": 0.7089271089082143
+      }
+    ],
+    "characters": 3210
+  },
+  {
+    "case_id": "F04",
+    "method": "R02",
+    "query_ids": [
+      "F04-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "SET7127-002v3",
+          "score": -0.666015625
+        },
+        {
+          "id": "網路維修助理",
+          "score": -1.66015625
+        },
+        {
+          "id": "MEM7412-001v3",
+          "score": -2.349609375
+        },
+        {
+          "id": "MEM3511-001v3",
+          "score": -2.83984375
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": -3.001953125
+        },
+        {
+          "id": "MEM8199-002v3",
+          "score": -3.033203125
+        },
+        {
+          "id": "SET7231-001v3",
+          "score": -3.138671875
+        },
+        {
+          "id": "SET2141-001v3",
+          "score": -3.259765625
+        },
+        {
+          "id": "MEM7231-010v2",
+          "score": -3.37890625
+        },
+        {
+          "id": "IIS7421-002v3",
+          "score": -3.4140625
+        },
+        {
+          "id": "MEM8199-001v3",
+          "score": -3.52734375
+        },
+        {
+          "id": "KPS5220-002v3",
+          "score": -4.13671875
+        },
+        {
+          "id": "MEM7231-009v3",
+          "score": -4.19140625
+        },
+        {
+          "id": "BAS3332-003v3",
+          "score": -4.640625
+        },
+        {
+          "id": "MPM7935-004v3",
+          "score": -4.80859375
+        },
+        {
+          "id": "印刷機台技術助理",
+          "score": -4.828125
+        },
+        {
+          "id": "MEM7231-019v1",
+          "score": -5.296875
+        },
+        {
+          "id": "TFB5131-002v3",
+          "score": -5.3046875
+        },
+        {
+          "id": "MEM7234-002v3",
+          "score": -5.4453125
+        },
+        {
+          "id": "MEM7234-001v3",
+          "score": -5.8125
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "SET7127-002v3",
+        "score": -0.666015625
+      },
+      {
+        "id": "網路維修助理",
+        "score": -1.66015625
+      },
+      {
+        "id": "MEM7412-001v3",
+        "score": -2.349609375
+      },
+      {
+        "id": "MEM3511-001v3",
+        "score": -2.83984375
+      },
+      {
+        "id": "MIM2141-001v4",
+        "score": -3.001953125
+      },
+      {
+        "id": "MEM8199-002v3",
+        "score": -3.033203125
+      },
+      {
+        "id": "SET7231-001v3",
+        "score": -3.138671875
+      },
+      {
+        "id": "SET2141-001v3",
+        "score": -3.259765625
+      },
+      {
+        "id": "MEM7231-010v2",
+        "score": -3.37890625
+      },
+      {
+        "id": "IIS7421-002v3",
+        "score": -3.4140625
+      },
+      {
+        "id": "MEM8199-001v3",
+        "score": -3.52734375
+      },
+      {
+        "id": "KPS5220-002v3",
+        "score": -4.13671875
+      },
+      {
+        "id": "MEM7231-009v3",
+        "score": -4.19140625
+      },
+      {
+        "id": "BAS3332-003v3",
+        "score": -4.640625
+      },
+      {
+        "id": "MPM7935-004v3",
+        "score": -4.80859375
+      },
+      {
+        "id": "印刷機台技術助理",
+        "score": -4.828125
+      },
+      {
+        "id": "MEM7231-019v1",
+        "score": -5.296875
+      },
+      {
+        "id": "TFB5131-002v3",
+        "score": -5.3046875
+      },
+      {
+        "id": "MEM7234-002v3",
+        "score": -5.4453125
+      },
+      {
+        "id": "MEM7234-001v3",
+        "score": -5.8125
+      }
+    ],
+    "selected": [
+      {
+        "id": "SET7127-002v3",
+        "score": -0.666015625
+      },
+      {
+        "id": "網路維修助理",
+        "score": -1.66015625
+      },
+      {
+        "id": "MEM7412-001v3",
+        "score": -2.349609375
+      },
+      {
+        "id": "MEM3511-001v3",
+        "score": -2.83984375
+      },
+      {
+        "id": "MIM2141-001v4",
+        "score": -3.001953125
+      }
+    ],
+    "characters": 4669
+  },
+  {
+    "case_id": "F04",
+    "method": "R03",
+    "query_ids": [
+      "F04-segments-1",
+      "F04-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "SET2141-001v3",
+          "score": 0.6963922516960931
+        },
+        {
+          "id": "KPS5220-002v3",
+          "score": 0.6930813487169291
+        },
+        {
+          "id": "MEM7412-001v3",
+          "score": 0.6881002824145233
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": 0.6751832811020497
+        },
+        {
+          "id": "TFB5131-002v3",
+          "score": 0.6750141952039297
+        },
+        {
+          "id": "CCM7129-001v3",
+          "score": 0.6743147185277865
+        },
+        {
+          "id": "CCM7922-002v3",
+          "score": 0.6725623975111543
+        },
+        {
+          "id": "MEM8199-001v3",
+          "score": 0.6714972739317144
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": 0.6706943883784036
+        },
+        {
+          "id": "印刷機台技術助理",
+          "score": 0.668046090682167
+        },
+        {
+          "id": "IIS7421-002v3",
+          "score": 0.6675162213048884
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.6669587399451455
+        },
+        {
+          "id": "NFP7911-001v1",
+          "score": 0.6668727806765277
+        },
+        {
+          "id": "MEM8199-002v3",
+          "score": 0.6665177578021951
+        },
+        {
+          "id": "網路維修助理",
+          "score": 0.6653897378072141
+        },
+        {
+          "id": "MEM3511-001v3",
+          "score": 0.6649428038377642
+        },
+        {
+          "id": "CAP2171-003v3",
+          "score": 0.6647801707492499
+        },
+        {
+          "id": "CCM7922-001v3",
+          "score": 0.6617386400305316
+        },
+        {
+          "id": "MEM7234-001v3",
+          "score": 0.6616189059441776
+        },
+        {
+          "id": "CCM7412-001v4",
+          "score": 0.6614685308495949
+        }
+      ],
+      [
+        {
+          "id": "MEM7412-001v3",
+          "score": 0.7288161481645121
+        },
+        {
+          "id": "MEM7231-010v2",
+          "score": 0.7236872348450296
+        },
+        {
+          "id": "MEM7231-009v3",
+          "score": 0.7203617600963754
+        },
+        {
+          "id": "網路維修助理",
+          "score": 0.7167461430505222
+        },
+        {
+          "id": "SET2141-001v3",
+          "score": 0.7161998892505408
+        },
+        {
+          "id": "MEM7234-002v3",
+          "score": 0.7111885850246451
+        },
+        {
+          "id": "MEM7234-001v3",
+          "score": 0.7094822062653713
+        },
+        {
+          "id": "TFB5131-002v3",
+          "score": 0.707371875767459
+        },
+        {
+          "id": "IIS7421-002v3",
+          "score": 0.7064014033077352
+        },
+        {
+          "id": "MEM3511-001v3",
+          "score": 0.7047438443028333
+        },
+        {
+          "id": "MPM7935-004v3",
+          "score": 0.7046318948424739
+        },
+        {
+          "id": "KPS5220-002v3",
+          "score": 0.7043053016149765
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": 0.7041134037279391
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": 0.7025385808496372
+        },
+        {
+          "id": "MEM7231-019v1",
+          "score": 0.6998030133707934
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": 0.6976672905199728
+        },
+        {
+          "id": "MEM8199-001v3",
+          "score": 0.6967437974124322
+        },
+        {
+          "id": "SET7231-002v3",
+          "score": 0.6961326192431434
+        },
+        {
+          "id": "SET7127-002v3",
+          "score": 0.6929572606173806
+        },
+        {
+          "id": "SET7232-001v2",
+          "score": 0.692388640510688
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "MEM7412-001v3",
+        "fusion_score": 0.75,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "SET2141-001v3",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "KPS5220-002v3",
+        "fusion_score": 0.41025641025641024,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "MEM7231-010v2",
+        "fusion_score": 0.3333333333333333,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "TFB5131-002v3",
+        "fusion_score": 0.2777777777777778,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "MIM2141-001v4",
+        "fusion_score": 0.27142857142857146,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "網路維修助理",
+        "fusion_score": 0.2625,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "MEM7231-009v3",
+        "fusion_score": 0.25,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "IIS7421-002v3",
+        "fusion_score": 0.18333333333333335,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "MEM7234-001v3",
+        "fusion_score": 0.175,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "KPS5292-002v3",
+        "fusion_score": 0.16666666666666669,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          },
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "MEM8199-001v3",
+        "fusion_score": 0.16666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "MEM3511-001v3",
+        "fusion_score": 0.1497326203208556,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          },
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "CCM7129-001v3",
+        "fusion_score": 0.14285714285714285,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "MEM7234-002v3",
+        "fusion_score": 0.14285714285714285,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.13574660633484165,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          },
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "CCM7922-002v3",
+        "fusion_score": 0.125,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "印刷機台技術助理",
+        "fusion_score": 0.09090909090909091,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "MPM7935-004v3",
+        "fusion_score": 0.08333333333333333,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "NFP7911-001v1",
+        "fusion_score": 0.07142857142857142,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "MEM8199-002v3",
+        "fusion_score": 0.06666666666666667,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "MEM7231-019v1",
+        "fusion_score": 0.0625,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "CAP2171-003v3",
+        "fusion_score": 0.05555555555555555,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "CCM7922-001v3",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "SET7231-002v3",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "SET7127-002v3",
+        "fusion_score": 0.05,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "CCM7412-001v4",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      },
+      {
+        "id": "SET7232-001v2",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "MEM7412-001v3",
+        "fusion_score": 0.75,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "SET2141-001v3",
+        "fusion_score": 0.6666666666666666,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "KPS5220-002v3",
+        "fusion_score": 0.41025641025641024,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "MEM7231-010v2",
+        "fusion_score": 0.3333333333333333,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "TFB5131-002v3",
+        "fusion_score": 0.2777777777777778,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      }
+    ],
+    "characters": 3199
+  },
+  {
+    "case_id": "F04",
+    "method": "R04",
+    "query_ids": [
+      "F04-segments-1",
+      "F04-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "CCM7129-001v3",
+          "score": -3.583984375
+        },
+        {
+          "id": "SET2141-001v3",
+          "score": -3.8984375
+        },
+        {
+          "id": "KPS5220-002v3",
+          "score": -4.21875
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": -4.22265625
+        },
+        {
+          "id": "IIS7421-002v3",
+          "score": -4.2734375
+        },
+        {
+          "id": "MEM3511-001v3",
+          "score": -4.30078125
+        },
+        {
+          "id": "網路維修助理",
+          "score": -4.30859375
+        },
+        {
+          "id": "MEM7412-001v3",
+          "score": -4.44921875
+        },
+        {
+          "id": "CCM7412-001v4",
+          "score": -4.83203125
+        },
+        {
+          "id": "MEM8199-001v3",
+          "score": -4.953125
+        },
+        {
+          "id": "MEM7234-001v3",
+          "score": -5.23046875
+        },
+        {
+          "id": "MEM8199-002v3",
+          "score": -5.30078125
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -5.3515625
+        },
+        {
+          "id": "CCM7922-001v3",
+          "score": -5.38671875
+        },
+        {
+          "id": "CCM7922-002v3",
+          "score": -6.0546875
+        },
+        {
+          "id": "CAP2171-003v3",
+          "score": -6.12109375
+        },
+        {
+          "id": "NFP7911-001v1",
+          "score": -6.203125
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": -6.60546875
+        },
+        {
+          "id": "TFB5131-002v3",
+          "score": -6.66796875
+        },
+        {
+          "id": "印刷機台技術助理",
+          "score": -7.484375
+        }
+      ],
+      [
+        {
+          "id": "SET7127-002v3",
+          "score": -1.853515625
+        },
+        {
+          "id": "SET7231-002v3",
+          "score": -2.994140625
+        },
+        {
+          "id": "MEM7412-001v3",
+          "score": -3.349609375
+        },
+        {
+          "id": "網路維修助理",
+          "score": -3.576171875
+        },
+        {
+          "id": "KPS5220-002v3",
+          "score": -3.6328125
+        },
+        {
+          "id": "MEM3511-001v3",
+          "score": -3.6328125
+        },
+        {
+          "id": "MEM8199-001v3",
+          "score": -3.689453125
+        },
+        {
+          "id": "IIS7421-002v3",
+          "score": -3.83203125
+        },
+        {
+          "id": "MIM2141-001v4",
+          "score": -4.01171875
+        },
+        {
+          "id": "SET2141-001v3",
+          "score": -4.08203125
+        },
+        {
+          "id": "KPS2434-004v2",
+          "score": -4.7734375
+        },
+        {
+          "id": "MEM7231-010v2",
+          "score": -5.0546875
+        },
+        {
+          "id": "MEM7231-009v3",
+          "score": -5.15234375
+        },
+        {
+          "id": "MEM7234-002v3",
+          "score": -5.7578125
+        },
+        {
+          "id": "SET7232-001v2",
+          "score": -5.8203125
+        },
+        {
+          "id": "TFB5131-002v3",
+          "score": -5.91015625
+        },
+        {
+          "id": "MPM7935-004v3",
+          "score": -5.9609375
+        },
+        {
+          "id": "MEM7234-001v3",
+          "score": -5.96875
+        },
+        {
+          "id": "MEM7231-019v1",
+          "score": -6.3046875
+        },
+        {
+          "id": "KPS5292-002v3",
+          "score": -7.1953125
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "CCM7129-001v3",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "SET7127-002v3",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "SET2141-001v3",
+        "fusion_score": 0.4242424242424242,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "KPS5220-002v3",
+        "fusion_score": 0.41666666666666663,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "MEM7412-001v3",
+        "fusion_score": 0.3611111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "SET7231-002v3",
+        "fusion_score": 0.3333333333333333,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "網路維修助理",
+        "fusion_score": 0.325,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "MIM2141-001v4",
+        "fusion_score": 0.30000000000000004,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "MEM3511-001v3",
+        "fusion_score": 0.2857142857142857,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "IIS7421-002v3",
+        "fusion_score": 0.2777777777777778,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "MEM8199-001v3",
+        "fusion_score": 0.2159090909090909,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "KPS2434-004v2",
+        "fusion_score": 0.15476190476190477,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          },
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "MEM7234-001v3",
+        "fusion_score": 0.13596491228070173,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "TFB5131-002v3",
+        "fusion_score": 0.10882352941176471,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          },
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "KPS5292-002v3",
+        "fusion_score": 0.10025062656641603,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          },
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      },
+      {
+        "id": "CCM7412-001v4",
+        "fusion_score": 0.1,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "MEM7231-010v2",
+        "fusion_score": 0.07692307692307693,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "MEM8199-002v3",
+        "fusion_score": 0.07692307692307693,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "MEM7231-009v3",
+        "fusion_score": 0.07142857142857142,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "CCM7922-001v3",
+        "fusion_score": 0.06666666666666667,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "MEM7234-002v3",
+        "fusion_score": 0.06666666666666667,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "CCM7922-002v3",
+        "fusion_score": 0.0625,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "SET7232-001v2",
+        "fusion_score": 0.0625,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "CAP2171-003v3",
+        "fusion_score": 0.058823529411764705,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "MPM7935-004v3",
+        "fusion_score": 0.05555555555555555,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "NFP7911-001v1",
+        "fusion_score": 0.05555555555555555,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "MEM7231-019v1",
+        "fusion_score": 0.05,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "印刷機台技術助理",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "CCM7129-001v3",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "SET7127-002v3",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "SET2141-001v3",
+        "fusion_score": 0.4242424242424242,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "KPS5220-002v3",
+        "fusion_score": 0.41666666666666663,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "MEM7412-001v3",
+        "fusion_score": 0.3611111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      }
+    ],
+    "characters": 4312
+  },
+  {
+    "case_id": "F05",
+    "method": "R01",
+    "query_ids": [
+      "F05-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "KMC2431-009v2",
+          "score": 0.7354520171464813
+        },
+        {
+          "id": "KMM2431-006v3",
+          "score": 0.7326168453357484
+        },
+        {
+          "id": "AVA2172-002v3",
+          "score": 0.7254615895166545
+        },
+        {
+          "id": "IDC2712-001v1",
+          "score": 0.7253583654822326
+        },
+        {
+          "id": "KMC2431-006v3",
+          "score": 0.7138906003213189
+        },
+        {
+          "id": "KMM2431-002v4",
+          "score": 0.711467227820812
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": 0.7104113413247942
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": 0.7053744484500486
+        },
+        {
+          "id": "MPM7322-006v4",
+          "score": 0.6976986634417403
+        },
+        {
+          "id": "KMC2431-011v1",
+          "score": 0.6969568405258875
+        },
+        {
+          "id": "KMC2431-007v3",
+          "score": 0.6967080804104215
+        },
+        {
+          "id": "MPM7322-007v4",
+          "score": 0.6963667891317061
+        },
+        {
+          "id": "KMC2432-003v3",
+          "score": 0.6953077392713773
+        },
+        {
+          "id": "KMM2431-004v4",
+          "score": 0.6907840163725284
+        },
+        {
+          "id": "PIC3332-002v2",
+          "score": 0.689473689766559
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": 0.6886861502833077
+        },
+        {
+          "id": "TTM4221-004v3",
+          "score": 0.6856483442833785
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": 0.685403744739673
+        },
+        {
+          "id": "APP2431-001v2",
+          "score": 0.6837402668830139
+        },
+        {
+          "id": "KMC2431-001v4",
+          "score": 0.68228355171786
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "KMC2431-009v2",
+        "score": 0.7354520171464813
+      },
+      {
+        "id": "KMM2431-006v3",
+        "score": 0.7326168453357484
+      },
+      {
+        "id": "AVA2172-002v3",
+        "score": 0.7254615895166545
+      },
+      {
+        "id": "IDC2712-001v1",
+        "score": 0.7253583654822326
+      },
+      {
+        "id": "KMC2431-006v3",
+        "score": 0.7138906003213189
+      },
+      {
+        "id": "KMM2431-002v4",
+        "score": 0.711467227820812
+      },
+      {
+        "id": "AVA2172-004v3",
+        "score": 0.7104113413247942
+      },
+      {
+        "id": "IDC5294-001v3",
+        "score": 0.7053744484500486
+      },
+      {
+        "id": "MPM7322-006v4",
+        "score": 0.6976986634417403
+      },
+      {
+        "id": "KMC2431-011v1",
+        "score": 0.6969568405258875
+      },
+      {
+        "id": "KMC2431-007v3",
+        "score": 0.6967080804104215
+      },
+      {
+        "id": "MPM7322-007v4",
+        "score": 0.6963667891317061
+      },
+      {
+        "id": "KMC2432-003v3",
+        "score": 0.6953077392713773
+      },
+      {
+        "id": "KMM2431-004v4",
+        "score": 0.6907840163725284
+      },
+      {
+        "id": "PIC3332-002v2",
+        "score": 0.689473689766559
+      },
+      {
+        "id": "AVA2172-003v3",
+        "score": 0.6886861502833077
+      },
+      {
+        "id": "TTM4221-004v3",
+        "score": 0.6856483442833785
+      },
+      {
+        "id": "KPS3322-003v3",
+        "score": 0.685403744739673
+      },
+      {
+        "id": "APP2431-001v2",
+        "score": 0.6837402668830139
+      },
+      {
+        "id": "KMC2431-001v4",
+        "score": 0.68228355171786
+      }
+    ],
+    "selected": [
+      {
+        "id": "KMC2431-009v2",
+        "score": 0.7354520171464813
+      },
+      {
+        "id": "KMM2431-006v3",
+        "score": 0.7326168453357484
+      },
+      {
+        "id": "AVA2172-002v3",
+        "score": 0.7254615895166545
+      },
+      {
+        "id": "IDC2712-001v1",
+        "score": 0.7253583654822326
+      },
+      {
+        "id": "KMC2431-006v3",
+        "score": 0.7138906003213189
+      }
+    ],
+    "characters": 2507
+  },
+  {
+    "case_id": "F05",
+    "method": "R02",
+    "query_ids": [
+      "F05-whole-1"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "PIC3332-002v2",
+          "score": -3.712890625
+        },
+        {
+          "id": "MPM7322-006v4",
+          "score": -4.453125
+        },
+        {
+          "id": "KMC2432-003v3",
+          "score": -4.4765625
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": -4.92578125
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": -5.20703125
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": -5.22265625
+        },
+        {
+          "id": "KMM2431-006v3",
+          "score": -5.48046875
+        },
+        {
+          "id": "KMC2431-006v3",
+          "score": -5.58203125
+        },
+        {
+          "id": "TTM4221-004v3",
+          "score": -5.70703125
+        },
+        {
+          "id": "KMC2431-009v2",
+          "score": -5.9765625
+        },
+        {
+          "id": "KMM2431-004v4",
+          "score": -6.11328125
+        },
+        {
+          "id": "IDC2712-001v1",
+          "score": -6.31640625
+        },
+        {
+          "id": "KMM2431-002v4",
+          "score": -6.50390625
+        },
+        {
+          "id": "AVA2172-002v3",
+          "score": -6.6640625
+        },
+        {
+          "id": "APP2431-001v2",
+          "score": -6.91015625
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": -7.24609375
+        },
+        {
+          "id": "KMC2431-007v3",
+          "score": -7.48046875
+        },
+        {
+          "id": "KMC2431-001v4",
+          "score": -7.61328125
+        },
+        {
+          "id": "KMC2431-011v1",
+          "score": -7.890625
+        },
+        {
+          "id": "MPM7322-007v4",
+          "score": -9.1328125
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "PIC3332-002v2",
+        "score": -3.712890625
+      },
+      {
+        "id": "MPM7322-006v4",
+        "score": -4.453125
+      },
+      {
+        "id": "KMC2432-003v3",
+        "score": -4.4765625
+      },
+      {
+        "id": "KPS3322-003v3",
+        "score": -4.92578125
+      },
+      {
+        "id": "AVA2172-003v3",
+        "score": -5.20703125
+      },
+      {
+        "id": "AVA2172-004v3",
+        "score": -5.22265625
+      },
+      {
+        "id": "KMM2431-006v3",
+        "score": -5.48046875
+      },
+      {
+        "id": "KMC2431-006v3",
+        "score": -5.58203125
+      },
+      {
+        "id": "TTM4221-004v3",
+        "score": -5.70703125
+      },
+      {
+        "id": "KMC2431-009v2",
+        "score": -5.9765625
+      },
+      {
+        "id": "KMM2431-004v4",
+        "score": -6.11328125
+      },
+      {
+        "id": "IDC2712-001v1",
+        "score": -6.31640625
+      },
+      {
+        "id": "KMM2431-002v4",
+        "score": -6.50390625
+      },
+      {
+        "id": "AVA2172-002v3",
+        "score": -6.6640625
+      },
+      {
+        "id": "APP2431-001v2",
+        "score": -6.91015625
+      },
+      {
+        "id": "IDC5294-001v3",
+        "score": -7.24609375
+      },
+      {
+        "id": "KMC2431-007v3",
+        "score": -7.48046875
+      },
+      {
+        "id": "KMC2431-001v4",
+        "score": -7.61328125
+      },
+      {
+        "id": "KMC2431-011v1",
+        "score": -7.890625
+      },
+      {
+        "id": "MPM7322-007v4",
+        "score": -9.1328125
+      }
+    ],
+    "selected": [
+      {
+        "id": "PIC3332-002v2",
+        "score": -3.712890625
+      },
+      {
+        "id": "MPM7322-006v4",
+        "score": -4.453125
+      },
+      {
+        "id": "KMC2432-003v3",
+        "score": -4.4765625
+      },
+      {
+        "id": "KPS3322-003v3",
+        "score": -4.92578125
+      },
+      {
+        "id": "AVA2172-003v3",
+        "score": -5.20703125
+      }
+    ],
+    "characters": 4486
+  },
+  {
+    "case_id": "F05",
+    "method": "R03",
+    "query_ids": [
+      "F05-segments-1",
+      "F05-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "KMC2431-009v2",
+          "score": 0.7406487199138156
+        },
+        {
+          "id": "KMM2431-006v3",
+          "score": 0.7313682732692147
+        },
+        {
+          "id": "AVA2172-002v3",
+          "score": 0.7190094120712277
+        },
+        {
+          "id": "IDC2712-001v1",
+          "score": 0.7169326181572169
+        },
+        {
+          "id": "KMC2431-006v3",
+          "score": 0.7163472036750156
+        },
+        {
+          "id": "KMM2431-002v4",
+          "score": 0.7134421935535086
+        },
+        {
+          "id": "KMC2431-011v1",
+          "score": 0.7039621809376377
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": 0.7028732598718974
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": 0.7008498420482003
+        },
+        {
+          "id": "KMC2431-007v3",
+          "score": 0.6915527628381826
+        },
+        {
+          "id": "KMC2432-003v3",
+          "score": 0.6876943911188532
+        },
+        {
+          "id": "PIC3332-002v2",
+          "score": 0.6848687034367126
+        },
+        {
+          "id": "KMM2431-004v4",
+          "score": 0.6828571231554346
+        },
+        {
+          "id": "TTM4221-004v3",
+          "score": 0.6816909672828992
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": 0.6813199376620909
+        },
+        {
+          "id": "AVA2431-001v2",
+          "score": 0.6784249338408597
+        },
+        {
+          "id": "KRM2431-001v3",
+          "score": 0.6783498047795791
+        },
+        {
+          "id": "MPM7322-006v4",
+          "score": 0.6773091974553396
+        },
+        {
+          "id": "KMC2432-004v2",
+          "score": 0.6770792347885392
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": 0.675601522068873
+        }
+      ],
+      [
+        {
+          "id": "KMC2431-009v2",
+          "score": 0.7037358969943722
+        },
+        {
+          "id": "AVA2172-002v3",
+          "score": 0.6924528125140753
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": 0.6922108945004456
+        },
+        {
+          "id": "KMM2431-006v3",
+          "score": 0.6886812495762247
+        },
+        {
+          "id": "IDC2712-001v1",
+          "score": 0.6872844180076042
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": 0.6836997820620061
+        },
+        {
+          "id": "KMC2431-006v3",
+          "score": 0.6777007203418239
+        },
+        {
+          "id": "MPM7322-007v4",
+          "score": 0.6738277651469213
+        },
+        {
+          "id": "KMM2431-002v4",
+          "score": 0.6714891015610267
+        },
+        {
+          "id": "IDC2172-005v2",
+          "score": 0.6634871072458894
+        },
+        {
+          "id": "成衣服裝設計助理",
+          "score": 0.6632830301675745
+        },
+        {
+          "id": "MPM7322-006v4",
+          "score": 0.6599797220837091
+        },
+        {
+          "id": "KMC2431-007v3",
+          "score": 0.6594603562237618
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": 0.6593623842688874
+        },
+        {
+          "id": "KMC2431-011v1",
+          "score": 0.6589738880582873
+        },
+        {
+          "id": "ATC3521-003v4",
+          "score": 0.6586436951431747
+        },
+        {
+          "id": "IDC2172-009v2",
+          "score": 0.6586183431620295
+        },
+        {
+          "id": "市場分析助理",
+          "score": 0.6568723125232481
+        },
+        {
+          "id": "視覺藝術產業經紀人員",
+          "score": 0.6553332778121757
+        },
+        {
+          "id": "KMC2432-003v3",
+          "score": 0.6550290838554376
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "KMC2431-009v2",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-002v3",
+        "fusion_score": 0.5833333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "KMM2431-006v3",
+        "fusion_score": 0.5333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "IDC2712-001v1",
+        "fusion_score": 0.3666666666666667,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-004v3",
+        "fusion_score": 0.3611111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "KMC2431-006v3",
+        "fusion_score": 0.29166666666666663,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "IDC5294-001v3",
+        "fusion_score": 0.24285714285714285,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "KMM2431-002v4",
+        "fusion_score": 0.24285714285714285,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "KMC2431-011v1",
+        "fusion_score": 0.1875,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          },
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "KMC2431-007v3",
+        "fusion_score": 0.16233766233766234,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "KMC2432-003v3",
+        "fusion_score": 0.13095238095238093,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      },
+      {
+        "id": "MPM7322-006v4",
+        "fusion_score": 0.12955465587044535,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          },
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-003v3",
+        "fusion_score": 0.12916666666666665,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          },
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "MPM7322-007v4",
+        "fusion_score": 0.1111111111111111,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "IDC2172-005v2",
+        "fusion_score": 0.09090909090909091,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "成衣服裝設計助理",
+        "fusion_score": 0.08333333333333333,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "PIC3332-002v2",
+        "fusion_score": 0.07692307692307693,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "KMM2431-004v4",
+        "fusion_score": 0.07142857142857142,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "TTM4221-004v3",
+        "fusion_score": 0.06666666666666667,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "ATC3521-003v4",
+        "fusion_score": 0.058823529411764705,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "AVA2431-001v2",
+        "fusion_score": 0.058823529411764705,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "IDC2172-009v2",
+        "fusion_score": 0.05555555555555555,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "KRM2431-001v3",
+        "fusion_score": 0.05555555555555555,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "市場分析助理",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "KMC2432-004v2",
+        "fusion_score": 0.05,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "視覺藝術產業經紀人員",
+        "fusion_score": 0.05,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-003v3",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "KMC2431-009v2",
+        "fusion_score": 1.0,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-002v3",
+        "fusion_score": 0.5833333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "KMM2431-006v3",
+        "fusion_score": 0.5333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "IDC2712-001v1",
+        "fusion_score": 0.3666666666666667,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-004v3",
+        "fusion_score": 0.3611111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      }
+    ],
+    "characters": 2576
+  },
+  {
+    "case_id": "F05",
+    "method": "R04",
+    "query_ids": [
+      "F05-segments-1",
+      "F05-segments-2"
+    ],
+    "query_rankings": [
+      [
+        {
+          "id": "MPM7322-006v4",
+          "score": -4.80078125
+        },
+        {
+          "id": "KMC2432-003v3",
+          "score": -4.93359375
+        },
+        {
+          "id": "PIC3332-002v2",
+          "score": -5.21484375
+        },
+        {
+          "id": "IDC2712-001v1",
+          "score": -5.296875
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": -5.3515625
+        },
+        {
+          "id": "AVA2172-002v3",
+          "score": -5.35546875
+        },
+        {
+          "id": "KMC2431-006v3",
+          "score": -5.6015625
+        },
+        {
+          "id": "KPS3322-003v3",
+          "score": -5.6484375
+        },
+        {
+          "id": "AVA2431-001v2",
+          "score": -5.7578125
+        },
+        {
+          "id": "KMM2431-006v3",
+          "score": -5.7734375
+        },
+        {
+          "id": "KRM2431-001v3",
+          "score": -5.87109375
+        },
+        {
+          "id": "KMC2431-009v2",
+          "score": -5.95703125
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": -6.33984375
+        },
+        {
+          "id": "KMM2431-002v4",
+          "score": -6.4921875
+        },
+        {
+          "id": "TTM4221-004v3",
+          "score": -6.61328125
+        },
+        {
+          "id": "KMC2432-004v2",
+          "score": -6.83203125
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": -6.94921875
+        },
+        {
+          "id": "KMM2431-004v4",
+          "score": -7.2109375
+        },
+        {
+          "id": "KMC2431-007v3",
+          "score": -7.62890625
+        },
+        {
+          "id": "KMC2431-011v1",
+          "score": -7.91796875
+        }
+      ],
+      [
+        {
+          "id": "KMC2432-003v3",
+          "score": -4.5625
+        },
+        {
+          "id": "AVA2172-004v3",
+          "score": -5.2578125
+        },
+        {
+          "id": "KMC2431-006v3",
+          "score": -5.27734375
+        },
+        {
+          "id": "IDC2712-001v1",
+          "score": -5.31640625
+        },
+        {
+          "id": "IDC2172-009v2",
+          "score": -5.421875
+        },
+        {
+          "id": "AVA2172-002v3",
+          "score": -5.515625
+        },
+        {
+          "id": "MPM7322-006v4",
+          "score": -5.85546875
+        },
+        {
+          "id": "KMC2431-009v2",
+          "score": -6.046875
+        },
+        {
+          "id": "KMM2431-006v3",
+          "score": -6.08984375
+        },
+        {
+          "id": "IDC2172-005v2",
+          "score": -6.23046875
+        },
+        {
+          "id": "AVA2172-003v3",
+          "score": -6.48828125
+        },
+        {
+          "id": "視覺藝術產業經紀人員",
+          "score": -6.6328125
+        },
+        {
+          "id": "KMC2431-007v3",
+          "score": -6.7265625
+        },
+        {
+          "id": "ATC3521-003v4",
+          "score": -6.81640625
+        },
+        {
+          "id": "IDC5294-001v3",
+          "score": -6.91015625
+        },
+        {
+          "id": "KMM2431-002v4",
+          "score": -7.3203125
+        },
+        {
+          "id": "KMC2431-011v1",
+          "score": -7.44921875
+        },
+        {
+          "id": "MPM7322-007v4",
+          "score": -7.921875
+        },
+        {
+          "id": "成衣服裝設計助理",
+          "score": -7.93359375
+        },
+        {
+          "id": "市場分析助理",
+          "score": -8.390625
+        }
+      ]
+    ],
+    "merged_ranking": [
+      {
+        "id": "KMC2432-003v3",
+        "fusion_score": 0.8333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "MPM7322-006v4",
+        "fusion_score": 0.625,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-004v3",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "IDC2712-001v1",
+        "fusion_score": 0.4,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "KMC2431-006v3",
+        "fusion_score": 0.375,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-002v3",
+        "fusion_score": 0.2857142857142857,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          },
+          {
+            "query": 2,
+            "rank": 5,
+            "contribution": 0.14285714285714285
+          }
+        ]
+      },
+      {
+        "id": "PIC3332-002v2",
+        "fusion_score": 0.25,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      },
+      {
+        "id": "KMM2431-006v3",
+        "fusion_score": 0.19090909090909092,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          },
+          {
+            "query": 2,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "KMC2431-009v2",
+        "fusion_score": 0.18803418803418803,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          },
+          {
+            "query": 2,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "IDC2172-009v2",
+        "fusion_score": 0.16666666666666666,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-003v3",
+        "fusion_score": 0.15476190476190477,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          },
+          {
+            "query": 2,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "KMM2431-002v4",
+        "fusion_score": 0.12549019607843137,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          },
+          {
+            "query": 2,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "KMC2431-007v3",
+        "fusion_score": 0.12142857142857143,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 18,
+            "contribution": 0.05
+          },
+          {
+            "query": 2,
+            "rank": 12,
+            "contribution": 0.07142857142857142
+          }
+        ]
+      },
+      {
+        "id": "IDC5294-001v3",
+        "fusion_score": 0.11805555555555555,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          },
+          {
+            "query": 2,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "KPS3322-003v3",
+        "fusion_score": 0.1111111111111111,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 7,
+            "contribution": 0.1111111111111111
+          }
+        ]
+      },
+      {
+        "id": "KMC2431-011v1",
+        "fusion_score": 0.10317460317460317,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          },
+          {
+            "query": 2,
+            "rank": 16,
+            "contribution": 0.05555555555555555
+          }
+        ]
+      },
+      {
+        "id": "AVA2431-001v2",
+        "fusion_score": 0.1,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 8,
+            "contribution": 0.1
+          }
+        ]
+      },
+      {
+        "id": "IDC2172-005v2",
+        "fusion_score": 0.09090909090909091,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 9,
+            "contribution": 0.09090909090909091
+          }
+        ]
+      },
+      {
+        "id": "KRM2431-001v3",
+        "fusion_score": 0.08333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 10,
+            "contribution": 0.08333333333333333
+          }
+        ]
+      },
+      {
+        "id": "視覺藝術產業經紀人員",
+        "fusion_score": 0.07692307692307693,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 11,
+            "contribution": 0.07692307692307693
+          }
+        ]
+      },
+      {
+        "id": "ATC3521-003v4",
+        "fusion_score": 0.06666666666666667,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 13,
+            "contribution": 0.06666666666666667
+          }
+        ]
+      },
+      {
+        "id": "TTM4221-004v3",
+        "fusion_score": 0.0625,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 14,
+            "contribution": 0.0625
+          }
+        ]
+      },
+      {
+        "id": "KMC2432-004v2",
+        "fusion_score": 0.058823529411764705,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 15,
+            "contribution": 0.058823529411764705
+          }
+        ]
+      },
+      {
+        "id": "KMM2431-004v4",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "MPM7322-007v4",
+        "fusion_score": 0.05263157894736842,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 17,
+            "contribution": 0.05263157894736842
+          }
+        ]
+      },
+      {
+        "id": "成衣服裝設計助理",
+        "fusion_score": 0.05,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 18,
+            "contribution": 0.05
+          }
+        ]
+      },
+      {
+        "id": "市場分析助理",
+        "fusion_score": 0.047619047619047616,
+        "query_contributions": [
+          {
+            "query": 2,
+            "rank": 19,
+            "contribution": 0.047619047619047616
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "id": "KMC2432-003v3",
+        "fusion_score": 0.8333333333333333,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          },
+          {
+            "query": 2,
+            "rank": 0,
+            "contribution": 0.5
+          }
+        ]
+      },
+      {
+        "id": "MPM7322-006v4",
+        "fusion_score": 0.625,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 0,
+            "contribution": 0.5
+          },
+          {
+            "query": 2,
+            "rank": 6,
+            "contribution": 0.125
+          }
+        ]
+      },
+      {
+        "id": "AVA2172-004v3",
+        "fusion_score": 0.5,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 4,
+            "contribution": 0.16666666666666666
+          },
+          {
+            "query": 2,
+            "rank": 1,
+            "contribution": 0.3333333333333333
+          }
+        ]
+      },
+      {
+        "id": "IDC2712-001v1",
+        "fusion_score": 0.4,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 3,
+            "contribution": 0.2
+          },
+          {
+            "query": 2,
+            "rank": 3,
+            "contribution": 0.2
+          }
+        ]
+      },
+      {
+        "id": "KMC2431-006v3",
+        "fusion_score": 0.375,
+        "query_contributions": [
+          {
+            "query": 1,
+            "rank": 6,
+            "contribution": 0.125
+          },
+          {
+            "query": 2,
+            "rank": 2,
+            "contribution": 0.25
+          }
+        ]
+      }
+    ],
+    "characters": 2954
+  }
+]

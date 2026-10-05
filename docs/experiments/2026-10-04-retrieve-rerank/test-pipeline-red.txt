@@ -1,0 +1,30 @@
+test_empty_truth_is_not_one_hundred_percent_coverage (test_evaluate.RetrievalContract.test_empty_truth_is_not_one_hundred_percent_coverage) ... ok
+test_query_cannot_be_silently_truncated (test_evaluate.RetrievalContract.test_query_cannot_be_silently_truncated) ... ok
+test_reranker_cannot_restore_document_removed_by_broad_search (test_evaluate.RetrievalContract.test_reranker_cannot_restore_document_removed_by_broad_search) ... FAIL
+test_secondary_topic_is_not_hidden_by_primary_role_hit (test_evaluate.RetrievalContract.test_secondary_topic_is_not_hidden_by_primary_role_hit) ... ok
+test_threshold_removes_candidates_without_filling_from_below (test_evaluate.RetrievalContract.test_threshold_removes_candidates_without_filling_from_below) ... ok
+test_windows_preserve_tail_and_overlap (test_evaluate.RetrievalContract.test_windows_preserve_tail_and_overlap) ... ok
+
+======================================================================
+FAIL: test_reranker_cannot_restore_document_removed_by_broad_search (test_evaluate.RetrievalContract.test_reranker_cannot_restore_document_removed_by_broad_search)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieve-rerank\test_evaluate.py", line 10, in test_reranker_cannot_restore_document_removed_by_broad_search
+    self.assertEqual([r['id'] for r in pipeline(dense,pairs,2,None,1,0.5)],['B'])
+AssertionError: Lists differ: ['C'] != ['B']
+
+First differing element 0:
+'C'
+'B'
+
+- ['C']
+?   ^
+
++ ['B']
+?   ^
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+FAILED (failures=1)

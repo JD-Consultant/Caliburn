@@ -1,0 +1,78 @@
+{
+  "case_id": "boundaries",
+  "arm": "flat",
+  "repeat": 2,
+  "cell_id": "boundaries-flat-2",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 10606,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 10603
+        },
+        "output_tokens": 1563,
+        "output_tokens_details": {
+          "reasoning_tokens": 639
+        },
+        "total_tokens": 12169
+      },
+      "estimated_usd": "0.000887830",
+      "seconds": 12.392797700013034,
+      "counted_input_tokens": 10606
+    }
+  ],
+  "answer": {
+    "findings": "依已完成訪談核對如下：\n\n- **產品召回（低頻支援工作）：**收到品質窗口提供的品號與批號後，本人查核可售、待檢、在途調撥及各店庫存，通知倉庫先隔離，並把影響範圍提供主管及品質窗口；之後追蹤隔離量、回收量及各店回覆，直到主管確認紀錄齊全。若店方只報總量而沒有批號，會請店方補資料；通知只列部分批號時，會向品質窗口確認範圍，不自行把未列批號全數納入，也不自行判定其安全。召回範圍與是否解除召回、恢復銷售由品質窗口確認；對客通知由客服處理，供應商聯繫由採購處理。店方或品質窗口遲未補齊／確認時的後續升級或交由誰追蹤，尚未說明，不能推定為本人負責至某一未確認的處置決定。\n- **休假交接：**休假前將未結案差異、預計到貨及當日截止事項交代理人，附原單號、現況及下一聯絡窗口；返崗後核對代理人的登錄與已完成事項，以避免重複入帳或狀態不一致。這是交接及返崗核對，不代表本人負責代理人的工作分配或考核；若核對發現登錄與原紀錄不一致，具體修正、回報或升級步驟尚未確認。\n- **單據保存：**已知單據與核准紀錄依公司既有檔案規則存於共享資料夾，檔名含日期及原單號；本人依規則存放並維持可追溯性。訪談未確認保存年限，也沒有足以寫成數字年限的依據；不應自行補訂期限。\n- **冷藏退貨溫度門檻：**冷藏退貨須查看溫度紀錄並交品質窗口判定是否可再銷售；本人不知道合格門檻，也不自行套用外部標準。現有資訊不足以寫入任何數字門檻。\n\n建議追問：1. 冷藏退貨採用的正式溫度合格門檻是多少、適用何種紀錄／判定情況，應由哪個品質窗口或文件確認？2. 單據及核准紀錄的正式保存年限是多少、依據哪項公司規則，是否有不同文件類別的期限？另外，若返崗核對發現代理登錄不一致，您實際會先做什麼、交由誰核准或處理？",
+    "references": [
+      {
+        "kind": "interview",
+        "interview_sequence": 58,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 60,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 62,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 102,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 70,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 71,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 56,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 96,
+        "target_title": null
+      }
+    ],
+    "questions": [
+      "冷藏退貨採用的正式溫度合格門檻是多少、適用何種紀錄或判定情況，應由哪個品質窗口或文件確認？",
+      "單據及核准紀錄的正式保存年限是多少、依據哪項公司規則？不同文件類別是否有不同期限？",
+      "若返崗核對發現代理人的登錄與原紀錄不一致，您實際會先做什麼，並交由誰核准或處理？"
+    ]
+  },
+  "seconds": 23.30162709997967
+}

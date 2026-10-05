@@ -1,0 +1,9 @@
+{
+  "qdrant_stopped": true,
+  "embedding_or_reranker_started_by_this_run": false,
+  "storage_collections_preserved": true,
+  "identity_verified_before_stop": true,
+  "embedder_state": "exited 137 false",
+  "listener_count": 0,
+  "qdrant_pid": 25056
+}

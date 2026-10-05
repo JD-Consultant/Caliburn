@@ -1,0 +1,3842 @@
+[
+  {
+    "case_id": "F01",
+    "method": "W-Dmax",
+    "repeat": 1,
+    "seconds": 0.027978099999018013,
+    "db_seconds": 0.027909399999771267,
+    "queries": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "INM3514-001v4",
+      "KPS4999-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmax",
+    "repeat": 1,
+    "seconds": 0.038842500012833625,
+    "db_seconds": 0.038741600001230836,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmean3",
+    "repeat": 1,
+    "seconds": 0.028961800038814545,
+    "db_seconds": 0.0288676000200212,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KPS2434-004v2",
+      "ISD2152-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umax",
+    "repeat": 1,
+    "seconds": 0.026926400023512542,
+    "db_seconds": 0.026819600025191903,
+    "queries": 1,
+    "selected_ids": [
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KPS2434-004v2",
+      "MQM1322-001v4",
+      "KPS2434-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umean3",
+    "repeat": 1,
+    "seconds": 0.02978189999703318,
+    "db_seconds": 0.02968229999532923,
+    "queries": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "ISD2152-001v4",
+      "MQM1322-001v4",
+      "KRM1324-002v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Dmax",
+    "repeat": 1,
+    "seconds": 0.04552669997792691,
+    "db_seconds": 0.04538839997258037,
+    "queries": 2,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IIS3513-002v4",
+      "BGM1349-001v3",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Tmax",
+    "repeat": 1,
+    "seconds": 0.036779899965040386,
+    "db_seconds": 0.03657910000765696,
+    "queries": 2,
+    "selected_ids": [
+      "KPS2434-002v2",
+      "KPS2434-004v2",
+      "MPM7322-001v4",
+      "BGM1330-001v3",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Tmean3",
+    "repeat": 1,
+    "seconds": 0.0621707999962382,
+    "db_seconds": 0.06195040000602603,
+    "queries": 2,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "ISD2152-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Umax",
+    "repeat": 1,
+    "seconds": 0.05780660000164062,
+    "db_seconds": 0.05760210001608357,
+    "queries": 2,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "MQM1322-001v4",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Umean3",
+    "repeat": 1,
+    "seconds": 0.03840119997039437,
+    "db_seconds": 0.03818849998060614,
+    "queries": 2,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "ISD2152-001v4",
+      "MQM1322-001v4",
+      "KRM1324-001v1",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Dmax",
+    "repeat": 2,
+    "seconds": 0.0207380999927409,
+    "db_seconds": 0.020673300023190677,
+    "queries": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "INM3514-001v4",
+      "KPS4999-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmax",
+    "repeat": 2,
+    "seconds": 0.02314999996451661,
+    "db_seconds": 0.02305389998946339,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmean3",
+    "repeat": 2,
+    "seconds": 0.02936540002701804,
+    "db_seconds": 0.029266800032928586,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KPS2434-004v2",
+      "ISD2152-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umax",
+    "repeat": 2,
+    "seconds": 0.028749900055117905,
+    "db_seconds": 0.028652300010435283,
+    "queries": 1,
+    "selected_ids": [
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KPS2434-004v2",
+      "MQM1322-001v4",
+      "KPS2434-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umean3",
+    "repeat": 2,
+    "seconds": 0.03402530000312254,
+    "db_seconds": 0.03384519997052848,
+    "queries": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "ISD2152-001v4",
+      "MQM1322-001v4",
+      "KRM1324-002v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Dmax",
+    "repeat": 2,
+    "seconds": 0.05625500000314787,
+    "db_seconds": 0.056075200031045824,
+    "queries": 2,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IIS3513-002v4",
+      "BGM1349-001v3",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Tmax",
+    "repeat": 2,
+    "seconds": 0.05630880000535399,
+    "db_seconds": 0.05605070001911372,
+    "queries": 2,
+    "selected_ids": [
+      "KPS2434-002v2",
+      "KPS2434-004v2",
+      "MPM7322-001v4",
+      "BGM1330-001v3",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Tmean3",
+    "repeat": 2,
+    "seconds": 0.04671550000784919,
+    "db_seconds": 0.046356000064406544,
+    "queries": 2,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "ISD2152-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Umax",
+    "repeat": 2,
+    "seconds": 0.024664999975357205,
+    "db_seconds": 0.02433550002751872,
+    "queries": 2,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "MQM1322-001v4",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Umean3",
+    "repeat": 2,
+    "seconds": 0.024719999986700714,
+    "db_seconds": 0.024371800012886524,
+    "queries": 2,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "ISD2152-001v4",
+      "MQM1322-001v4",
+      "KRM1324-001v1",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Dmax",
+    "repeat": 3,
+    "seconds": 0.017602399981115013,
+    "db_seconds": 0.017494600033387542,
+    "queries": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "INM3514-001v4",
+      "KPS4999-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmax",
+    "repeat": 3,
+    "seconds": 0.01865199999883771,
+    "db_seconds": 0.018496899981983006,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmean3",
+    "repeat": 3,
+    "seconds": 0.019591999996919185,
+    "db_seconds": 0.01942649995908141,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KPS2434-004v2",
+      "ISD2152-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umax",
+    "repeat": 3,
+    "seconds": 0.02819639997323975,
+    "db_seconds": 0.028014899988193065,
+    "queries": 1,
+    "selected_ids": [
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KPS2434-004v2",
+      "MQM1322-001v4",
+      "KPS2434-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umean3",
+    "repeat": 3,
+    "seconds": 0.03215430001728237,
+    "db_seconds": 0.03198299999348819,
+    "queries": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "ISD2152-001v4",
+      "MQM1322-001v4",
+      "KRM1324-002v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Dmax",
+    "repeat": 3,
+    "seconds": 0.02500209998106584,
+    "db_seconds": 0.02477369998814538,
+    "queries": 2,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IIS3513-002v4",
+      "BGM1349-001v3",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Tmax",
+    "repeat": 3,
+    "seconds": 0.07026479998603463,
+    "db_seconds": 0.0700634999666363,
+    "queries": 2,
+    "selected_ids": [
+      "KPS2434-002v2",
+      "KPS2434-004v2",
+      "MPM7322-001v4",
+      "BGM1330-001v3",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Tmean3",
+    "repeat": 3,
+    "seconds": 0.04136239999206737,
+    "db_seconds": 0.041146500036120415,
+    "queries": 2,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "ISD2152-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Umax",
+    "repeat": 3,
+    "seconds": 0.0233870999654755,
+    "db_seconds": 0.023029699979815632,
+    "queries": 2,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "MQM1322-001v4",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Umean3",
+    "repeat": 3,
+    "seconds": 0.038758200011216104,
+    "db_seconds": 0.03849370003445074,
+    "queries": 2,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "ISD2152-001v4",
+      "MQM1322-001v4",
+      "KRM1324-001v1",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Dmax",
+    "repeat": 1,
+    "seconds": 0.028859300015028566,
+    "db_seconds": 0.028788800002075732,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "KPS2434-004v2",
+      "AVA2172-003v3",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmax",
+    "repeat": 1,
+    "seconds": 0.010325099981855601,
+    "db_seconds": 0.010222300013992935,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "TTM3422-001v2",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmean3",
+    "repeat": 1,
+    "seconds": 0.02466419996926561,
+    "db_seconds": 0.02456469996832311,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IDC1330-001v1",
+      "ISD2152-001v4",
+      "MIM2141-001v4",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umax",
+    "repeat": 1,
+    "seconds": 0.028557299985550344,
+    "db_seconds": 0.02845699997851625,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IDC1330-001v1",
+      "ISD2152-004v5",
+      "ISD2152-001v4",
+      "IIS3513-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umean3",
+    "repeat": 1,
+    "seconds": 0.029848999984096736,
+    "db_seconds": 0.02974620001623407,
+    "queries": 1,
+    "selected_ids": [
+      "ISD2152-001v4",
+      "INM3514-001v4",
+      "MIM2141-001v4",
+      "IIS3513-001v4",
+      "IDC1330-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Dmax",
+    "repeat": 1,
+    "seconds": 0.03400250000413507,
+    "db_seconds": 0.03385750006418675,
+    "queries": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "KPS2434-004v2",
+      "IIS3513-001v4",
+      "BAS1499-003v4",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Tmax",
+    "repeat": 1,
+    "seconds": 0.06323550001252443,
+    "db_seconds": 0.0630202999454923,
+    "queries": 2,
+    "selected_ids": [
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "INM3514-001v4",
+      "IIS3513-003v4",
+      "FIS2511-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Tmean3",
+    "repeat": 1,
+    "seconds": 0.03983419999713078,
+    "db_seconds": 0.03960730001563206,
+    "queries": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "IIS3513-003v4",
+      "FIS2511-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Umax",
+    "repeat": 1,
+    "seconds": 0.02319430001080036,
+    "db_seconds": 0.022996700019575655,
+    "queries": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-004v5",
+      "IDC1330-001v1",
+      "ISD2152-001v4",
+      "IIS3513-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Umean3",
+    "repeat": 1,
+    "seconds": 0.030910299974493682,
+    "db_seconds": 0.030702499963808805,
+    "queries": 2,
+    "selected_ids": [
+      "ISD2152-001v4",
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "FIS2511-002v2",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Dmax",
+    "repeat": 2,
+    "seconds": 0.022610000043641776,
+    "db_seconds": 0.022549400047864765,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "KPS2434-004v2",
+      "AVA2172-003v3",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmax",
+    "repeat": 2,
+    "seconds": 0.009471500001382083,
+    "db_seconds": 0.00937849999172613,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "TTM3422-001v2",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmean3",
+    "repeat": 2,
+    "seconds": 0.009949800034519285,
+    "db_seconds": 0.009851299982983619,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IDC1330-001v1",
+      "ISD2152-001v4",
+      "MIM2141-001v4",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umax",
+    "repeat": 2,
+    "seconds": 0.028684200020506978,
+    "db_seconds": 0.028581999999005347,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IDC1330-001v1",
+      "ISD2152-004v5",
+      "ISD2152-001v4",
+      "IIS3513-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umean3",
+    "repeat": 2,
+    "seconds": 0.032720499963033944,
+    "db_seconds": 0.03261950000887737,
+    "queries": 1,
+    "selected_ids": [
+      "ISD2152-001v4",
+      "INM3514-001v4",
+      "MIM2141-001v4",
+      "IIS3513-001v4",
+      "IDC1330-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Dmax",
+    "repeat": 2,
+    "seconds": 0.04418009996879846,
+    "db_seconds": 0.04404329997487366,
+    "queries": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "KPS2434-004v2",
+      "IIS3513-001v4",
+      "BAS1499-003v4",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Tmax",
+    "repeat": 2,
+    "seconds": 0.02267009997740388,
+    "db_seconds": 0.02246679994277656,
+    "queries": 2,
+    "selected_ids": [
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "INM3514-001v4",
+      "IIS3513-003v4",
+      "FIS2511-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Tmean3",
+    "repeat": 2,
+    "seconds": 0.06018450000556186,
+    "db_seconds": 0.059959900041576475,
+    "queries": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "IIS3513-003v4",
+      "FIS2511-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Umax",
+    "repeat": 2,
+    "seconds": 0.05939879996003583,
+    "db_seconds": 0.059181699936743826,
+    "queries": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-004v5",
+      "IDC1330-001v1",
+      "ISD2152-001v4",
+      "IIS3513-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Umean3",
+    "repeat": 2,
+    "seconds": 0.061820399947464466,
+    "db_seconds": 0.06161220005014911,
+    "queries": 2,
+    "selected_ids": [
+      "ISD2152-001v4",
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "FIS2511-002v2",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Dmax",
+    "repeat": 3,
+    "seconds": 0.004919500031974167,
+    "db_seconds": 0.004855000006500632,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "KPS2434-004v2",
+      "AVA2172-003v3",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmax",
+    "repeat": 3,
+    "seconds": 0.028727500000968575,
+    "db_seconds": 0.028632599976845086,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "TTM3422-001v2",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmean3",
+    "repeat": 3,
+    "seconds": 0.03126820002216846,
+    "db_seconds": 0.03116389998467639,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IDC1330-001v1",
+      "ISD2152-001v4",
+      "MIM2141-001v4",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umax",
+    "repeat": 3,
+    "seconds": 0.027650600008200854,
+    "db_seconds": 0.027555199980270118,
+    "queries": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IDC1330-001v1",
+      "ISD2152-004v5",
+      "ISD2152-001v4",
+      "IIS3513-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umean3",
+    "repeat": 3,
+    "seconds": 0.029466599982697517,
+    "db_seconds": 0.029364899965003133,
+    "queries": 1,
+    "selected_ids": [
+      "ISD2152-001v4",
+      "INM3514-001v4",
+      "MIM2141-001v4",
+      "IIS3513-001v4",
+      "IDC1330-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Dmax",
+    "repeat": 3,
+    "seconds": 0.020163900044281036,
+    "db_seconds": 0.01998240005923435,
+    "queries": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "KPS2434-004v2",
+      "IIS3513-001v4",
+      "BAS1499-003v4",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Tmax",
+    "repeat": 3,
+    "seconds": 0.04703530005645007,
+    "db_seconds": 0.04682449996471405,
+    "queries": 2,
+    "selected_ids": [
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "INM3514-001v4",
+      "IIS3513-003v4",
+      "FIS2511-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Tmean3",
+    "repeat": 3,
+    "seconds": 0.048588400008156896,
+    "db_seconds": 0.04836260003503412,
+    "queries": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "IIS3513-003v4",
+      "FIS2511-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Umax",
+    "repeat": 3,
+    "seconds": 0.03254889999516308,
+    "db_seconds": 0.03233950003050268,
+    "queries": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-004v5",
+      "IDC1330-001v1",
+      "ISD2152-001v4",
+      "IIS3513-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Umean3",
+    "repeat": 3,
+    "seconds": 0.01623980002477765,
+    "db_seconds": 0.01602490001823753,
+    "queries": 2,
+    "selected_ids": [
+      "ISD2152-001v4",
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "FIS2511-002v2",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Dmax",
+    "repeat": 1,
+    "seconds": 0.022351300052832812,
+    "db_seconds": 0.022285300015937537,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmax",
+    "repeat": 1,
+    "seconds": 0.010696400015149266,
+    "db_seconds": 0.010562700044829398,
+    "queries": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "FAC4311-001v2",
+      "停車場管理員",
+      "FAC1211-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmean3",
+    "repeat": 1,
+    "seconds": 0.013909899978898466,
+    "db_seconds": 0.013805800001136959,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "KRM4212-001v2",
+      "FAC1211-001v2",
+      "KRM1420-001v4",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umax",
+    "repeat": 1,
+    "seconds": 0.00985290005337447,
+    "db_seconds": 0.009748200012836605,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "停車場管理員",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umean3",
+    "repeat": 1,
+    "seconds": 0.029268399986904114,
+    "db_seconds": 0.029157200013287365,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "KPS2434-004v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Dmax",
+    "repeat": 1,
+    "seconds": 0.028279899968765676,
+    "db_seconds": 0.028142299968749285,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Tmax",
+    "repeat": 1,
+    "seconds": 0.052944600000046194,
+    "db_seconds": 0.05273220007074997,
+    "queries": 2,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "FAC4311-001v2",
+      "KRM4212-001v2",
+      "FAC1211-001v2",
+      "停車場管理員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Tmean3",
+    "repeat": 1,
+    "seconds": 0.04089250002289191,
+    "db_seconds": 0.04067190003115684,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC1211-001v2",
+      "KRM4212-001v2",
+      "KRM1420-001v4",
+      "FAC3313-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Umax",
+    "repeat": 1,
+    "seconds": 0.025119600002653897,
+    "db_seconds": 0.024907600018195808,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "KRM4212-001v2",
+      "FAC3313-001v2",
+      "停車場管理員",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Umean3",
+    "repeat": 1,
+    "seconds": 0.032363199978135526,
+    "db_seconds": 0.03214339999249205,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "KRM3323-001v4",
+      "KRM4212-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Dmax",
+    "repeat": 2,
+    "seconds": 0.005547799984924495,
+    "db_seconds": 0.005479399987962097,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmax",
+    "repeat": 2,
+    "seconds": 0.03674630000023171,
+    "db_seconds": 0.03665009996620938,
+    "queries": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "FAC4311-001v2",
+      "停車場管理員",
+      "FAC1211-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmean3",
+    "repeat": 2,
+    "seconds": 0.012518799980171025,
+    "db_seconds": 0.01241719996323809,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "KRM4212-001v2",
+      "FAC1211-001v2",
+      "KRM1420-001v4",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umax",
+    "repeat": 2,
+    "seconds": 0.029701000021304935,
+    "db_seconds": 0.02959489997010678,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "停車場管理員",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umean3",
+    "repeat": 2,
+    "seconds": 0.030670400010421872,
+    "db_seconds": 0.0305666999774985,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "KPS2434-004v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Dmax",
+    "repeat": 2,
+    "seconds": 0.035145599977113307,
+    "db_seconds": 0.03500279999570921,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Tmax",
+    "repeat": 2,
+    "seconds": 0.060321500001009554,
+    "db_seconds": 0.060118600027635694,
+    "queries": 2,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "FAC4311-001v2",
+      "KRM4212-001v2",
+      "FAC1211-001v2",
+      "停車場管理員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Tmean3",
+    "repeat": 2,
+    "seconds": 0.019696099974680692,
+    "db_seconds": 0.019479299953673035,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC1211-001v2",
+      "KRM4212-001v2",
+      "KRM1420-001v4",
+      "FAC3313-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Umax",
+    "repeat": 2,
+    "seconds": 0.05549759999848902,
+    "db_seconds": 0.055283699999563396,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "KRM4212-001v2",
+      "FAC3313-001v2",
+      "停車場管理員",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Umean3",
+    "repeat": 2,
+    "seconds": 0.030459899979177862,
+    "db_seconds": 0.03024250001180917,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "KRM3323-001v4",
+      "KRM4212-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Dmax",
+    "repeat": 3,
+    "seconds": 0.02974899997934699,
+    "db_seconds": 0.029680299980100244,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmax",
+    "repeat": 3,
+    "seconds": 0.02122709999093786,
+    "db_seconds": 0.021126999985426664,
+    "queries": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "FAC4311-001v2",
+      "停車場管理員",
+      "FAC1211-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmean3",
+    "repeat": 3,
+    "seconds": 0.032458400004543364,
+    "db_seconds": 0.03234490001341328,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "KRM4212-001v2",
+      "FAC1211-001v2",
+      "KRM1420-001v4",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umax",
+    "repeat": 3,
+    "seconds": 0.02680980000877753,
+    "db_seconds": 0.02671159995952621,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "停車場管理員",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umean3",
+    "repeat": 3,
+    "seconds": 0.03140679997159168,
+    "db_seconds": 0.0312988999648951,
+    "queries": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "KPS2434-004v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Dmax",
+    "repeat": 3,
+    "seconds": 0.03328159998636693,
+    "db_seconds": 0.03314620000310242,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Tmax",
+    "repeat": 3,
+    "seconds": 0.06334200000856072,
+    "db_seconds": 0.06313680001767352,
+    "queries": 2,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "FAC4311-001v2",
+      "KRM4212-001v2",
+      "FAC1211-001v2",
+      "停車場管理員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Tmean3",
+    "repeat": 3,
+    "seconds": 0.04525599995395169,
+    "db_seconds": 0.04504090000409633,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC1211-001v2",
+      "KRM4212-001v2",
+      "KRM1420-001v4",
+      "FAC3313-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Umax",
+    "repeat": 3,
+    "seconds": 0.05887150001944974,
+    "db_seconds": 0.05862600001273677,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "KRM4212-001v2",
+      "FAC3313-001v2",
+      "停車場管理員",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Umean3",
+    "repeat": 3,
+    "seconds": 0.038448400038760155,
+    "db_seconds": 0.038146100006997585,
+    "queries": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "KRM3323-001v4",
+      "KRM4212-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Dmax",
+    "repeat": 1,
+    "seconds": 0.00504200003342703,
+    "db_seconds": 0.004977600008714944,
+    "queries": 1,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "MEM7231-010v2",
+      "網路維修助理",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmax",
+    "repeat": 1,
+    "seconds": 0.021857699961401522,
+    "db_seconds": 0.021751799969933927,
+    "queries": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "SET3113-004v2",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmean3",
+    "repeat": 1,
+    "seconds": 0.011073899979237467,
+    "db_seconds": 0.01096369995502755,
+    "queries": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "MIM2141-001v4",
+      "SET7127-002v3",
+      "SET2141-001v3",
+      "SET7127-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umax",
+    "repeat": 1,
+    "seconds": 0.03277699998579919,
+    "db_seconds": 0.0326770999818109,
+    "queries": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "MIM2141-001v4",
+      "MEM7231-010v2",
+      "MEM7234-001v3",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umean3",
+    "repeat": 1,
+    "seconds": 0.03156430000672117,
+    "db_seconds": 0.03146069997455925,
+    "queries": 1,
+    "selected_ids": [
+      "MIM2141-001v4",
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "SET7127-001v3",
+      "SET2141-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Dmax",
+    "repeat": 1,
+    "seconds": 0.03421730000991374,
+    "db_seconds": 0.03406979999272153,
+    "queries": 2,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "KPS5220-002v3",
+      "MEM7231-010v2",
+      "TFB5131-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Tmax",
+    "repeat": 1,
+    "seconds": 0.0629039999912493,
+    "db_seconds": 0.06269729998894036,
+    "queries": 2,
+    "selected_ids": [
+      "MEM7231-009v3",
+      "RTM4323-001v4",
+      "SET3113-002v3",
+      "SET7127-001v3",
+      "MEM7131-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Tmean3",
+    "repeat": 1,
+    "seconds": 0.06150840001646429,
+    "db_seconds": 0.061276899999938905,
+    "queries": 2,
+    "selected_ids": [
+      "SET3113-002v3",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "RLM4323-004v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Umax",
+    "repeat": 1,
+    "seconds": 0.0591679000062868,
+    "db_seconds": 0.058955299959052354,
+    "queries": 2,
+    "selected_ids": [
+      "SET3113-002v3",
+      "RLM4323-004v1",
+      "KPS5220-002v3",
+      "MEM7234-001v3",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Umean3",
+    "repeat": 1,
+    "seconds": 0.06327330000931397,
+    "db_seconds": 0.06305380002595484,
+    "queries": 2,
+    "selected_ids": [
+      "MIM2141-001v4",
+      "SET2141-001v3",
+      "SET3113-002v3",
+      "KPS5220-002v3",
+      "IIS7421-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Dmax",
+    "repeat": 2,
+    "seconds": 0.027550800004974008,
+    "db_seconds": 0.027487399987876415,
+    "queries": 1,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "MEM7231-010v2",
+      "網路維修助理",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmax",
+    "repeat": 2,
+    "seconds": 0.009551400027703494,
+    "db_seconds": 0.009454899991396815,
+    "queries": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "SET3113-004v2",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmean3",
+    "repeat": 2,
+    "seconds": 0.02793689997633919,
+    "db_seconds": 0.027835799963213503,
+    "queries": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "MIM2141-001v4",
+      "SET7127-002v3",
+      "SET2141-001v3",
+      "SET7127-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umax",
+    "repeat": 2,
+    "seconds": 0.026082900003530085,
+    "db_seconds": 0.025983500003349036,
+    "queries": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "MIM2141-001v4",
+      "MEM7231-010v2",
+      "MEM7234-001v3",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umean3",
+    "repeat": 2,
+    "seconds": 0.0066556999809108675,
+    "db_seconds": 0.006549099984113127,
+    "queries": 1,
+    "selected_ids": [
+      "MIM2141-001v4",
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "SET7127-001v3",
+      "SET2141-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Dmax",
+    "repeat": 2,
+    "seconds": 0.010348199983127415,
+    "db_seconds": 0.01020959991728887,
+    "queries": 2,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "KPS5220-002v3",
+      "MEM7231-010v2",
+      "TFB5131-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Tmax",
+    "repeat": 2,
+    "seconds": 0.044062000000849366,
+    "db_seconds": 0.04385699995327741,
+    "queries": 2,
+    "selected_ids": [
+      "MEM7231-009v3",
+      "RTM4323-001v4",
+      "SET3113-002v3",
+      "SET7127-001v3",
+      "MEM7131-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Tmean3",
+    "repeat": 2,
+    "seconds": 0.06691409996710718,
+    "db_seconds": 0.0665393999661319,
+    "queries": 2,
+    "selected_ids": [
+      "SET3113-002v3",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "RLM4323-004v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Umax",
+    "repeat": 2,
+    "seconds": 0.05886240000836551,
+    "db_seconds": 0.0586602000403218,
+    "queries": 2,
+    "selected_ids": [
+      "SET3113-002v3",
+      "RLM4323-004v1",
+      "KPS5220-002v3",
+      "MEM7234-001v3",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Umean3",
+    "repeat": 2,
+    "seconds": 0.06141570000909269,
+    "db_seconds": 0.06119439995381981,
+    "queries": 2,
+    "selected_ids": [
+      "MIM2141-001v4",
+      "SET2141-001v3",
+      "SET3113-002v3",
+      "KPS5220-002v3",
+      "IIS7421-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Dmax",
+    "repeat": 3,
+    "seconds": 0.004883599991444498,
+    "db_seconds": 0.00482130004093051,
+    "queries": 1,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "MEM7231-010v2",
+      "網路維修助理",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmax",
+    "repeat": 3,
+    "seconds": 0.028567200002726167,
+    "db_seconds": 0.028473000042140484,
+    "queries": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "SET3113-004v2",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmean3",
+    "repeat": 3,
+    "seconds": 0.033932599995750934,
+    "db_seconds": 0.033822899975348264,
+    "queries": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "MIM2141-001v4",
+      "SET7127-002v3",
+      "SET2141-001v3",
+      "SET7127-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umax",
+    "repeat": 3,
+    "seconds": 0.00745700002880767,
+    "db_seconds": 0.007355100009590387,
+    "queries": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "MIM2141-001v4",
+      "MEM7231-010v2",
+      "MEM7234-001v3",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umean3",
+    "repeat": 3,
+    "seconds": 0.01967430004151538,
+    "db_seconds": 0.019571700016967952,
+    "queries": 1,
+    "selected_ids": [
+      "MIM2141-001v4",
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "SET7127-001v3",
+      "SET2141-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Dmax",
+    "repeat": 3,
+    "seconds": 0.034396200033370405,
+    "db_seconds": 0.0342588999774307,
+    "queries": 2,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "KPS5220-002v3",
+      "MEM7231-010v2",
+      "TFB5131-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Tmax",
+    "repeat": 3,
+    "seconds": 0.020654399995692074,
+    "db_seconds": 0.020451600023079664,
+    "queries": 2,
+    "selected_ids": [
+      "MEM7231-009v3",
+      "RTM4323-001v4",
+      "SET3113-002v3",
+      "SET7127-001v3",
+      "MEM7131-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Tmean3",
+    "repeat": 3,
+    "seconds": 0.05867569998372346,
+    "db_seconds": 0.058449899952393025,
+    "queries": 2,
+    "selected_ids": [
+      "SET3113-002v3",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "RLM4323-004v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Umax",
+    "repeat": 3,
+    "seconds": 0.03517920000012964,
+    "db_seconds": 0.03490069997496903,
+    "queries": 2,
+    "selected_ids": [
+      "SET3113-002v3",
+      "RLM4323-004v1",
+      "KPS5220-002v3",
+      "MEM7234-001v3",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Umean3",
+    "repeat": 3,
+    "seconds": 0.05526370002189651,
+    "db_seconds": 0.05505229998379946,
+    "queries": 2,
+    "selected_ids": [
+      "MIM2141-001v4",
+      "SET2141-001v3",
+      "SET3113-002v3",
+      "KPS5220-002v3",
+      "IIS7421-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Dmax",
+    "repeat": 1,
+    "seconds": 0.02951820002635941,
+    "db_seconds": 0.02944420004496351,
+    "queries": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "AVA2172-002v3",
+      "IDC2712-001v1",
+      "KMC2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmax",
+    "repeat": 1,
+    "seconds": 0.020882699987851083,
+    "db_seconds": 0.020780400023795664,
+    "queries": 1,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KPS3334-009v4",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KMM2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmean3",
+    "repeat": 1,
+    "seconds": 0.030992800020612776,
+    "db_seconds": 0.03088669996941462,
+    "queries": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "KMM2431-006v3",
+      "KMC2431-005v4",
+      "KMC1222-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umax",
+    "repeat": 1,
+    "seconds": 0.027821000025141984,
+    "db_seconds": 0.027714600029867142,
+    "queries": 1,
+    "selected_ids": [
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "BAS2431-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umean3",
+    "repeat": 1,
+    "seconds": 0.032397700008004904,
+    "db_seconds": 0.03229110001120716,
+    "queries": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "BAS2431-001v4",
+      "KPS3334-009v4",
+      "KPS3334-008v4",
+      "AVA2172-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Dmax",
+    "repeat": 1,
+    "seconds": 0.009635700029321015,
+    "db_seconds": 0.009478699997998774,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "AVA2172-002v3",
+      "KMM2431-006v3",
+      "IDC2712-001v1",
+      "AVA2172-004v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Tmax",
+    "repeat": 1,
+    "seconds": 0.032701299991458654,
+    "db_seconds": 0.03249939996749163,
+    "queries": 2,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KPS3334-009v4",
+      "KMM2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Tmean3",
+    "repeat": 1,
+    "seconds": 0.05337719997623935,
+    "db_seconds": 0.053148599981795996,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "KMM2431-006v3",
+      "KMC2431-005v4",
+      "IDC2172-009v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Umax",
+    "repeat": 1,
+    "seconds": 0.03454219998093322,
+    "db_seconds": 0.03432770003564656,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "KMM2431-006v3",
+      "IDC2172-009v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Umean3",
+    "repeat": 1,
+    "seconds": 0.055089799978304654,
+    "db_seconds": 0.054870399995706975,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "BAS2431-001v4",
+      "KPS3334-008v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Dmax",
+    "repeat": 2,
+    "seconds": 0.004912199976388365,
+    "db_seconds": 0.004847099946346134,
+    "queries": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "AVA2172-002v3",
+      "IDC2712-001v1",
+      "KMC2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmax",
+    "repeat": 2,
+    "seconds": 0.030941099976189435,
+    "db_seconds": 0.030840800027363002,
+    "queries": 1,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KPS3334-009v4",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KMM2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmean3",
+    "repeat": 2,
+    "seconds": 0.010334499995224178,
+    "db_seconds": 0.01023329998133704,
+    "queries": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "KMM2431-006v3",
+      "KMC2431-005v4",
+      "KMC1222-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umax",
+    "repeat": 2,
+    "seconds": 0.03235400002449751,
+    "db_seconds": 0.0322557000326924,
+    "queries": 1,
+    "selected_ids": [
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "BAS2431-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umean3",
+    "repeat": 2,
+    "seconds": 0.03126069996505976,
+    "db_seconds": 0.031153999967500567,
+    "queries": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "BAS2431-001v4",
+      "KPS3334-009v4",
+      "KPS3334-008v4",
+      "AVA2172-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Dmax",
+    "repeat": 2,
+    "seconds": 0.059304900001734495,
+    "db_seconds": 0.05915350001305342,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "AVA2172-002v3",
+      "KMM2431-006v3",
+      "IDC2712-001v1",
+      "AVA2172-004v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Tmax",
+    "repeat": 2,
+    "seconds": 0.03714649996254593,
+    "db_seconds": 0.036827299976721406,
+    "queries": 2,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KPS3334-009v4",
+      "KMM2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Tmean3",
+    "repeat": 2,
+    "seconds": 0.04678199999034405,
+    "db_seconds": 0.046546599944122136,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "KMM2431-006v3",
+      "KMC2431-005v4",
+      "IDC2172-009v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Umax",
+    "repeat": 2,
+    "seconds": 0.058008500025607646,
+    "db_seconds": 0.0578096000244841,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "KMM2431-006v3",
+      "IDC2172-009v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Umean3",
+    "repeat": 2,
+    "seconds": 0.03294840001035482,
+    "db_seconds": 0.032721699972171336,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "BAS2431-001v4",
+      "KPS3334-008v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Dmax",
+    "repeat": 3,
+    "seconds": 0.02574150002328679,
+    "db_seconds": 0.025663500011432916,
+    "queries": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "AVA2172-002v3",
+      "IDC2712-001v1",
+      "KMC2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmax",
+    "repeat": 3,
+    "seconds": 0.013439800008200109,
+    "db_seconds": 0.013338699995074421,
+    "queries": 1,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KPS3334-009v4",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KMM2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmean3",
+    "repeat": 3,
+    "seconds": 0.0098289999878034,
+    "db_seconds": 0.009723199997097254,
+    "queries": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "KMM2431-006v3",
+      "KMC2431-005v4",
+      "KMC1222-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umax",
+    "repeat": 3,
+    "seconds": 0.006807199970353395,
+    "db_seconds": 0.006708199973218143,
+    "queries": 1,
+    "selected_ids": [
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "BAS2431-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umean3",
+    "repeat": 3,
+    "seconds": 0.018662000016774982,
+    "db_seconds": 0.018560600001364946,
+    "queries": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "BAS2431-001v4",
+      "KPS3334-009v4",
+      "KPS3334-008v4",
+      "AVA2172-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Dmax",
+    "repeat": 3,
+    "seconds": 0.04556800000136718,
+    "db_seconds": 0.04542769998079166,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "AVA2172-002v3",
+      "KMM2431-006v3",
+      "IDC2712-001v1",
+      "AVA2172-004v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Tmax",
+    "repeat": 3,
+    "seconds": 0.0663856000173837,
+    "db_seconds": 0.06617510004434735,
+    "queries": 2,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KPS3334-009v4",
+      "KMM2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Tmean3",
+    "repeat": 3,
+    "seconds": 0.04601109999930486,
+    "db_seconds": 0.04577809997135773,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "KMM2431-006v3",
+      "KMC2431-005v4",
+      "IDC2172-009v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Umax",
+    "repeat": 3,
+    "seconds": 0.05950099998153746,
+    "db_seconds": 0.05929639999521896,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "KMM2431-006v3",
+      "IDC2172-009v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Umean3",
+    "repeat": 3,
+    "seconds": 0.013499099994078279,
+    "db_seconds": 0.013276199926622212,
+    "queries": 2,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "BAS2431-001v4",
+      "KPS3334-008v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Dmax",
+    "repeat": 1,
+    "seconds": 0.016968200041446835,
+    "db_seconds": 0.01689920003991574,
+    "queries": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "THM4222-001v3",
+      "KPS2434-004v2",
+      "TTM4221-007v1",
+      "FAC3313-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmax",
+    "repeat": 1,
+    "seconds": 0.020339200040325522,
+    "db_seconds": 0.020237000018823892,
+    "queries": 1,
+    "selected_ids": [
+      "TTM3422-001v2",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmean3",
+    "repeat": 1,
+    "seconds": 0.030849400034639984,
+    "db_seconds": 0.030750000034458935,
+    "queries": 1,
+    "selected_ids": [
+      "THM4222-001v3",
+      "BHR2422-011v4",
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umax",
+    "repeat": 1,
+    "seconds": 0.028432500024791807,
+    "db_seconds": 0.02832979999948293,
+    "queries": 1,
+    "selected_ids": [
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員",
+      "BHR2422-011v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umean3",
+    "repeat": 1,
+    "seconds": 0.031258200004231185,
+    "db_seconds": 0.03115540003636852,
+    "queries": 1,
+    "selected_ids": [
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Dmax",
+    "repeat": 1,
+    "seconds": 0.06507249997230247,
+    "db_seconds": 0.06486280000535771,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "KPS2434-004v2",
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "TFB1412-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Tmax",
+    "repeat": 1,
+    "seconds": 0.07826019998174161,
+    "db_seconds": 0.07792009995318949,
+    "queries": 3,
+    "selected_ids": [
+      "TFB1412-002v2",
+      "BHR2422-007v4",
+      "BHR2422-011v4",
+      "TTM3422-001v2",
+      "THM4222-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Tmean3",
+    "repeat": 1,
+    "seconds": 0.09443429997190833,
+    "db_seconds": 0.09410830005072057,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "TTM3422-001v2",
+      "TFB1412-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Umax",
+    "repeat": 1,
+    "seconds": 0.08672109997132793,
+    "db_seconds": 0.08641119999811053,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "連鎖餐飲門市管理人員",
+      "THM4222-001v3",
+      "BHR2422-011v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Umean3",
+    "repeat": 1,
+    "seconds": 0.06795699999202043,
+    "db_seconds": 0.06763290002709255,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "THM4222-001v3",
+      "BHR2422-011v4",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Dmax",
+    "repeat": 2,
+    "seconds": 0.005449499993119389,
+    "db_seconds": 0.005378499976359308,
+    "queries": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "THM4222-001v3",
+      "KPS2434-004v2",
+      "TTM4221-007v1",
+      "FAC3313-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmax",
+    "repeat": 2,
+    "seconds": 0.023130399989895523,
+    "db_seconds": 0.0230287000304088,
+    "queries": 1,
+    "selected_ids": [
+      "TTM3422-001v2",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmean3",
+    "repeat": 2,
+    "seconds": 0.031036300002597272,
+    "db_seconds": 0.030929600005038083,
+    "queries": 1,
+    "selected_ids": [
+      "THM4222-001v3",
+      "BHR2422-011v4",
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umax",
+    "repeat": 2,
+    "seconds": 0.00726719998056069,
+    "db_seconds": 0.007164099952206016,
+    "queries": 1,
+    "selected_ids": [
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員",
+      "BHR2422-011v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umean3",
+    "repeat": 2,
+    "seconds": 0.02095699997153133,
+    "db_seconds": 0.020845499995630234,
+    "queries": 1,
+    "selected_ids": [
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Dmax",
+    "repeat": 2,
+    "seconds": 0.01740429998608306,
+    "db_seconds": 0.017029899987392128,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "KPS2434-004v2",
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "TFB1412-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Tmax",
+    "repeat": 2,
+    "seconds": 0.09544199996162206,
+    "db_seconds": 0.09512949996860698,
+    "queries": 3,
+    "selected_ids": [
+      "TFB1412-002v2",
+      "BHR2422-007v4",
+      "BHR2422-011v4",
+      "TTM3422-001v2",
+      "THM4222-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Tmean3",
+    "repeat": 2,
+    "seconds": 0.0327578000142239,
+    "db_seconds": 0.032419700000900775,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "TTM3422-001v2",
+      "TFB1412-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Umax",
+    "repeat": 2,
+    "seconds": 0.09074259997578338,
+    "db_seconds": 0.090435299964156,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "連鎖餐飲門市管理人員",
+      "THM4222-001v3",
+      "BHR2422-011v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Umean3",
+    "repeat": 2,
+    "seconds": 0.06014730001334101,
+    "db_seconds": 0.059823399991728365,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "THM4222-001v3",
+      "BHR2422-011v4",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Dmax",
+    "repeat": 3,
+    "seconds": 0.0296673999982886,
+    "db_seconds": 0.02959659998305142,
+    "queries": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "THM4222-001v3",
+      "KPS2434-004v2",
+      "TTM4221-007v1",
+      "FAC3313-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmax",
+    "repeat": 3,
+    "seconds": 0.02142379997530952,
+    "db_seconds": 0.021323899971321225,
+    "queries": 1,
+    "selected_ids": [
+      "TTM3422-001v2",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmean3",
+    "repeat": 3,
+    "seconds": 0.010884799994528294,
+    "db_seconds": 0.010776799987070262,
+    "queries": 1,
+    "selected_ids": [
+      "THM4222-001v3",
+      "BHR2422-011v4",
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umax",
+    "repeat": 3,
+    "seconds": 0.03166770003736019,
+    "db_seconds": 0.03157029999420047,
+    "queries": 1,
+    "selected_ids": [
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員",
+      "BHR2422-011v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umean3",
+    "repeat": 3,
+    "seconds": 0.006084200053010136,
+    "db_seconds": 0.005985399999190122,
+    "queries": 1,
+    "selected_ids": [
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Dmax",
+    "repeat": 3,
+    "seconds": 0.05420489999232814,
+    "db_seconds": 0.05385379999643192,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "KPS2434-004v2",
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "TFB1412-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Tmax",
+    "repeat": 3,
+    "seconds": 0.08266259997617453,
+    "db_seconds": 0.0823521000565961,
+    "queries": 3,
+    "selected_ids": [
+      "TFB1412-002v2",
+      "BHR2422-007v4",
+      "BHR2422-011v4",
+      "TTM3422-001v2",
+      "THM4222-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Tmean3",
+    "repeat": 3,
+    "seconds": 0.0570329999900423,
+    "db_seconds": 0.05671010003425181,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "TTM3422-001v2",
+      "TFB1412-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Umax",
+    "repeat": 3,
+    "seconds": 0.09565569995902479,
+    "db_seconds": 0.09535699995467439,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "連鎖餐飲門市管理人員",
+      "THM4222-001v3",
+      "BHR2422-011v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Umean3",
+    "repeat": 3,
+    "seconds": 0.03712200000882149,
+    "db_seconds": 0.03679770004237071,
+    "queries": 3,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "THM4222-001v3",
+      "BHR2422-011v4",
+      "連鎖餐飲門市管理人員"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Dmax",
+    "repeat": 1,
+    "seconds": 0.02180480002425611,
+    "db_seconds": 0.021725900005549192,
+    "queries": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "KRM1324-002v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmax",
+    "repeat": 1,
+    "seconds": 0.02072160004172474,
+    "db_seconds": 0.020623499993234873,
+    "queries": 1,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "TFB5131-001v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KPS5292-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmean3",
+    "repeat": 1,
+    "seconds": 0.009546500048600137,
+    "db_seconds": 0.009439100045710802,
+    "queries": 1,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MPM7322-001v4",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umax",
+    "repeat": 1,
+    "seconds": 0.0317776000010781,
+    "db_seconds": 0.03163819998735562,
+    "queries": 1,
+    "selected_ids": [
+      "KPS5220-003v3",
+      "RLM4323-004v1",
+      "BGM5220-002v3",
+      "RLM9330-001v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umean3",
+    "repeat": 1,
+    "seconds": 0.031091900018509477,
+    "db_seconds": 0.03098749998025596,
+    "queries": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "MMP4321-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Dmax",
+    "repeat": 1,
+    "seconds": 0.07611780002480373,
+    "db_seconds": 0.07585640007164329,
+    "queries": 4,
+    "selected_ids": [
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "MMP4321-003v4",
+      "MMP1324-003v4",
+      "MMP4321-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Tmax",
+    "repeat": 1,
+    "seconds": 0.09862770000472665,
+    "db_seconds": 0.0982176000252366,
+    "queries": 4,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "RLM9330-001v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Tmean3",
+    "repeat": 1,
+    "seconds": 0.12225870002293959,
+    "db_seconds": 0.12181540002347901,
+    "queries": 4,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "RLM4323-004v1",
+      "RLM9330-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Umax",
+    "repeat": 1,
+    "seconds": 0.087780500005465,
+    "db_seconds": 0.08739360002800822,
+    "queries": 4,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "KRM1324-001v1",
+      "KPS5220-003v3",
+      "RLM9330-001v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Umean3",
+    "repeat": 1,
+    "seconds": 0.1006014000158757,
+    "db_seconds": 0.10017469990998507,
+    "queries": 4,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-003v4",
+      "KRM1324-001v1",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Dmax",
+    "repeat": 2,
+    "seconds": 0.023003899957984686,
+    "db_seconds": 0.022938599984627217,
+    "queries": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "KRM1324-002v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmax",
+    "repeat": 2,
+    "seconds": 0.03525620000436902,
+    "db_seconds": 0.03516020003007725,
+    "queries": 1,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "TFB5131-001v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KPS5292-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmean3",
+    "repeat": 2,
+    "seconds": 0.030286599998362362,
+    "db_seconds": 0.030179699999280274,
+    "queries": 1,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MPM7322-001v4",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umax",
+    "repeat": 2,
+    "seconds": 0.006522099953144789,
+    "db_seconds": 0.006383299943991005,
+    "queries": 1,
+    "selected_ids": [
+      "KPS5220-003v3",
+      "RLM4323-004v1",
+      "BGM5220-002v3",
+      "RLM9330-001v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umean3",
+    "repeat": 2,
+    "seconds": 0.020485300046857446,
+    "db_seconds": 0.02037959999870509,
+    "queries": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "MMP4321-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Dmax",
+    "repeat": 2,
+    "seconds": 0.04451820004032925,
+    "db_seconds": 0.044269800069741905,
+    "queries": 4,
+    "selected_ids": [
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "MMP4321-003v4",
+      "MMP1324-003v4",
+      "MMP4321-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Tmax",
+    "repeat": 2,
+    "seconds": 0.07780689996434376,
+    "db_seconds": 0.07741490000626072,
+    "queries": 4,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "RLM9330-001v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Tmean3",
+    "repeat": 2,
+    "seconds": 0.0970145000028424,
+    "db_seconds": 0.09658870002022013,
+    "queries": 4,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "RLM4323-004v1",
+      "RLM9330-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Umax",
+    "repeat": 2,
+    "seconds": 0.09211700002197176,
+    "db_seconds": 0.09171719994628802,
+    "queries": 4,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "KRM1324-001v1",
+      "KPS5220-003v3",
+      "RLM9330-001v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Umean3",
+    "repeat": 2,
+    "seconds": 0.09161579998908564,
+    "db_seconds": 0.09118160005891696,
+    "queries": 4,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-003v4",
+      "KRM1324-001v1",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Dmax",
+    "repeat": 3,
+    "seconds": 0.031555900000967085,
+    "db_seconds": 0.03148559998953715,
+    "queries": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "KRM1324-002v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmax",
+    "repeat": 3,
+    "seconds": 0.034051200025714934,
+    "db_seconds": 0.03395379998255521,
+    "queries": 1,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "TFB5131-001v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KPS5292-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmean3",
+    "repeat": 3,
+    "seconds": 0.031133900047279894,
+    "db_seconds": 0.031033100036438555,
+    "queries": 1,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MPM7322-001v4",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umax",
+    "repeat": 3,
+    "seconds": 0.02791370003251359,
+    "db_seconds": 0.027817599999252707,
+    "queries": 1,
+    "selected_ids": [
+      "KPS5220-003v3",
+      "RLM4323-004v1",
+      "BGM5220-002v3",
+      "RLM9330-001v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umean3",
+    "repeat": 3,
+    "seconds": 0.032977000053506345,
+    "db_seconds": 0.03272100002504885,
+    "queries": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "MMP4321-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Dmax",
+    "repeat": 3,
+    "seconds": 0.10561019997112453,
+    "db_seconds": 0.10533049999503419,
+    "queries": 4,
+    "selected_ids": [
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "MMP4321-003v4",
+      "MMP1324-003v4",
+      "MMP4321-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Tmax",
+    "repeat": 3,
+    "seconds": 0.12857400003122166,
+    "db_seconds": 0.12818360002711415,
+    "queries": 4,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "RLM9330-001v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Tmean3",
+    "repeat": 3,
+    "seconds": 0.10290939995320514,
+    "db_seconds": 0.10247729998081923,
+    "queries": 4,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "RLM4323-004v1",
+      "RLM9330-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Umax",
+    "repeat": 3,
+    "seconds": 0.126373200037051,
+    "db_seconds": 0.12596450001001358,
+    "queries": 4,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "KRM1324-001v1",
+      "KPS5220-003v3",
+      "RLM9330-001v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Umean3",
+    "repeat": 3,
+    "seconds": 0.09152730001369491,
+    "db_seconds": 0.0910944000352174,
+    "queries": 4,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-003v4",
+      "KRM1324-001v1",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Dmax",
+    "repeat": 1,
+    "seconds": 0.02905150002334267,
+    "db_seconds": 0.02898010000353679,
+    "queries": 1,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM1420-001v4",
+      "BAS3323-003v3",
+      "KRM3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmax",
+    "repeat": 1,
+    "seconds": 0.02040620002662763,
+    "db_seconds": 0.020308900042437017,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP4321-002v4",
+      "KPS5220-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmean3",
+    "repeat": 1,
+    "seconds": 0.03112569998484105,
+    "db_seconds": 0.03101719997357577,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "BAS3323-001v4",
+      "MMP4321-002v4",
+      "MMP1324-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umax",
+    "repeat": 1,
+    "seconds": 0.02746610000031069,
+    "db_seconds": 0.027368600014597178,
+    "queries": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "KRM1324-002v1",
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umean3",
+    "repeat": 1,
+    "seconds": 0.031401899992488325,
+    "db_seconds": 0.03129749995423481,
+    "queries": 1,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "BAS3323-003v3",
+      "BAS3323-001v4",
+      "BAS3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Dmax",
+    "repeat": 1,
+    "seconds": 0.0920870000263676,
+    "db_seconds": 0.09176839998690411,
+    "queries": 5,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "BAS3323-003v3",
+      "KRM1324-001v1",
+      "KRM3323-002v4",
+      "MMP1324-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Tmax",
+    "repeat": 1,
+    "seconds": 0.15757369995117188,
+    "db_seconds": 0.1570794999715872,
+    "queries": 5,
+    "selected_ids": [
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP1324-001v4",
+      "MPM7322-001v4",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Tmean3",
+    "repeat": 1,
+    "seconds": 0.09597019996726885,
+    "db_seconds": 0.09543040010612458,
+    "queries": 5,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "MMP1324-001v4",
+      "KRM1324-001v1",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Umax",
+    "repeat": 1,
+    "seconds": 0.05613680003443733,
+    "db_seconds": 0.05560920003335923,
+    "queries": 5,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "BAS3323-003v3",
+      "MMP1324-001v4",
+      "KRM3323-002v4",
+      "KPS5220-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Umean3",
+    "repeat": 1,
+    "seconds": 0.09222469996893778,
+    "db_seconds": 0.0916647999547422,
+    "queries": 5,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "BAS3323-003v3",
+      "BAS3323-001v4",
+      "BAS3323-002v4",
+      "MMP1324-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Dmax",
+    "repeat": 2,
+    "seconds": 0.004864300019107759,
+    "db_seconds": 0.0047907999833114445,
+    "queries": 1,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM1420-001v4",
+      "BAS3323-003v3",
+      "KRM3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmax",
+    "repeat": 2,
+    "seconds": 0.011362999968696386,
+    "db_seconds": 0.011263299966230989,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP4321-002v4",
+      "KPS5220-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmean3",
+    "repeat": 2,
+    "seconds": 0.03405199997359887,
+    "db_seconds": 0.03394499997375533,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "BAS3323-001v4",
+      "MMP4321-002v4",
+      "MMP1324-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umax",
+    "repeat": 2,
+    "seconds": 0.026546900044195354,
+    "db_seconds": 0.026452000020071864,
+    "queries": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "KRM1324-002v1",
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umean3",
+    "repeat": 2,
+    "seconds": 0.0067476999829523265,
+    "db_seconds": 0.006640799983870238,
+    "queries": 1,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "BAS3323-003v3",
+      "BAS3323-001v4",
+      "BAS3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Dmax",
+    "repeat": 2,
+    "seconds": 0.08448669995414093,
+    "db_seconds": 0.08414140000240877,
+    "queries": 5,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "BAS3323-003v3",
+      "KRM1324-001v1",
+      "KRM3323-002v4",
+      "MMP1324-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Tmax",
+    "repeat": 2,
+    "seconds": 0.13823059998685494,
+    "db_seconds": 0.13771089998772368,
+    "queries": 5,
+    "selected_ids": [
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP1324-001v4",
+      "MPM7322-001v4",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Tmean3",
+    "repeat": 2,
+    "seconds": 0.09784770000260323,
+    "db_seconds": 0.09728869999526069,
+    "queries": 5,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "MMP1324-001v4",
+      "KRM1324-001v1",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Umax",
+    "repeat": 2,
+    "seconds": 0.09169989998918027,
+    "db_seconds": 0.0911875999881886,
+    "queries": 5,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "BAS3323-003v3",
+      "MMP1324-001v4",
+      "KRM3323-002v4",
+      "KPS5220-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Umean3",
+    "repeat": 2,
+    "seconds": 0.15412730001844466,
+    "db_seconds": 0.15354889997979626,
+    "queries": 5,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "BAS3323-003v3",
+      "BAS3323-001v4",
+      "BAS3323-002v4",
+      "MMP1324-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Dmax",
+    "repeat": 3,
+    "seconds": 0.03045859996927902,
+    "db_seconds": 0.030379600008018315,
+    "queries": 1,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM1420-001v4",
+      "BAS3323-003v3",
+      "KRM3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmax",
+    "repeat": 3,
+    "seconds": 0.03534659999422729,
+    "db_seconds": 0.03524769999785349,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP4321-002v4",
+      "KPS5220-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmean3",
+    "repeat": 3,
+    "seconds": 0.033108700008597225,
+    "db_seconds": 0.033000499999616295,
+    "queries": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "BAS3323-001v4",
+      "MMP4321-002v4",
+      "MMP1324-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umax",
+    "repeat": 3,
+    "seconds": 0.007448199961800128,
+    "db_seconds": 0.007350499974563718,
+    "queries": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "KRM1324-002v1",
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umean3",
+    "repeat": 3,
+    "seconds": 0.01844590000109747,
+    "db_seconds": 0.018339900008868426,
+    "queries": 1,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "BAS3323-003v3",
+      "BAS3323-001v4",
+      "BAS3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Dmax",
+    "repeat": 3,
+    "seconds": 0.10527090000687167,
+    "db_seconds": 0.10494259995175526,
+    "queries": 5,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "BAS3323-003v3",
+      "KRM1324-001v1",
+      "KRM3323-002v4",
+      "MMP1324-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Tmax",
+    "repeat": 3,
+    "seconds": 0.08899519999977201,
+    "db_seconds": 0.0884899000520818,
+    "queries": 5,
+    "selected_ids": [
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP1324-001v4",
+      "MPM7322-001v4",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Tmean3",
+    "repeat": 3,
+    "seconds": 0.12921149999601766,
+    "db_seconds": 0.1286666999803856,
+    "queries": 5,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "MMP1324-001v4",
+      "KRM1324-001v1",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Umax",
+    "repeat": 3,
+    "seconds": 0.09366210002917796,
+    "db_seconds": 0.09314120007911697,
+    "queries": 5,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "BAS3323-003v3",
+      "MMP1324-001v4",
+      "KRM3323-002v4",
+      "KPS5220-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Umean3",
+    "repeat": 3,
+    "seconds": 0.10866260004695505,
+    "db_seconds": 0.1080978000536561,
+    "queries": 5,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "BAS3323-003v3",
+      "BAS3323-001v4",
+      "BAS3323-002v4",
+      "MMP1324-001v4"
+    ],
+    "cached_query_embeddings": true
+  }
+]

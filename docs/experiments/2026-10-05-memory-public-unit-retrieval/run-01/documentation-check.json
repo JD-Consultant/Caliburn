@@ -1,0 +1,56 @@
+{
+  "documents_checked": 16,
+  "local_links_checked": 193,
+  "missing_links": [],
+  "pending_manifest_links": [
+    {
+      "file": "docs\\experiments\\2026-10-05-memory-public-unit-retrieval\\run-01\\README.md",
+      "target": "artifact-hashes.json"
+    }
+  ],
+  "trailing_whitespace": [],
+  "api_key_pattern_unexpected_matches": [],
+  "api_key_pattern_false_positives_in_provider_encrypted_content": [
+    {
+      "file": "judge-trials\\formal-01-new-013-response.json",
+      "json_fields": [
+        [
+          "output",
+          0,
+          "encrypted_content"
+        ]
+      ]
+    },
+    {
+      "file": "judge-trials\\formal-01-new-020-response.json",
+      "json_fields": [
+        [
+          "output",
+          1,
+          "encrypted_content"
+        ]
+      ]
+    },
+    {
+      "file": "judge-trials\\formal-01-new-027-response.json",
+      "json_fields": [
+        [
+          "output",
+          1,
+          "encrypted_content"
+        ]
+      ]
+    },
+    {
+      "file": "judge-trials\\formal-01-new-031-response.json",
+      "json_fields": [
+        [
+          "output",
+          2,
+          "encrypted_content"
+        ]
+      ]
+    }
+  ],
+  "scope": "local document/link/hash audit; not a general security audit"
+}

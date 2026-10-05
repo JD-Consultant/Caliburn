@@ -1,0 +1,178 @@
+[
+  {
+    "job_id": "C01",
+    "phase": "calibrate",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "會員網站前端頁面與互動功能開發"
+      ],
+      "reason": "員工明確表示主要且持續負責會員網站的頁面版型、互動元件、表單驗證、資料串接及瀏覽器操作測試；公版涵蓋相同工作組合與對象，足以代表其主要的網站前端開發領域，而非僅有單一局部動作相符。",
+      "evidence": [
+        {
+          "employee_quote": "我主要開發會員網站，持續負責頁面版型、互動元件、表單驗證及串接資料，並測試瀏覽器操作。",
+          "reference_quote": "開發網站頁面版型、互動元件及表單驗證，串接服務介面並測試瀏覽器操作，維護畫面功能。"
+        }
+      ],
+      "limitations": [
+        "公版未明確提及會員網站這一特定對象，但其核心工作組合與員工主要責任相符。",
+        "偶爾協助重開電腦不是員工的主要工作，且不影響此公版對主要領域的代表性。"
+      ]
+    },
+    "seconds": 5.511773100006394,
+    "employee_sha256": "17ccab533f1b40f3c6cd182bd7c7b3c56a01e7a9fc2317985d2931f0e260065d",
+    "document_sha256": "5f3f52069b6ca62439b2cadd3ba71deee1ee7458fd4f8722eb6dbe16f42283f3",
+    "expected_grade": 3,
+    "anchor_matched": true
+  },
+  {
+    "job_id": "C02",
+    "phase": "calibrate",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "員工主要持續負責會員網站開發，公版則以員工電腦與設備維護、故障排除為核心，不能代表其主要工作。兩者僅在重開電腦這項局部工作上有關聯，而且員工明確表示只是偶爾協助同事。",
+      "evidence": [
+        {
+          "employee_quote": "我主要開發會員網站，持續負責頁面版型、互動元件、表單驗證及串接資料",
+          "reference_quote": "維護員工電腦與設備，排除故障"
+        },
+        {
+          "employee_quote": "偶爾幫同事重開電腦。",
+          "reference_quote": "重新啟動電腦"
+        }
+      ],
+      "limitations": [
+        "重開電腦僅是偶爾協助，不足以代表員工的主要工作領域。"
+      ]
+    },
+    "seconds": 4.7547492000157945,
+    "employee_sha256": "17ccab533f1b40f3c6cd182bd7c7b3c56a01e7a9fc2317985d2931f0e260065d",
+    "document_sha256": "16fb0638b8b668cf7cddf02183a1c26fa057bd0519b035feda1e422578b83397",
+    "expected_grade": 1,
+    "anchor_matched": true
+  },
+  {
+    "job_id": "C03",
+    "phase": "calibrate",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是設計 API 內部程式、商業邏輯、資料表與資料庫，這些工作明確由同事負責且員工不做，不能代表員工主要製作網站畫面及串接同事提供的 API。",
+      "evidence": [
+        {
+          "employee_quote": "API 內部程式、資料表和資料庫都是同事負責，我不做那些工作。",
+          "reference_quote": "設計 API 的內部程式和商業邏輯，設計資料表、維護資料庫及資料存取規則。"
+        }
+      ],
+      "limitations": [
+        "公版未呈現員工主要製作網站畫面及串接 API 的工作。"
+      ]
+    },
+    "seconds": 4.753781599982176,
+    "employee_sha256": "a47fa98b258376970e559bebd2e2bb2c2fb633a000fd217dad8f1eea48052fd8",
+    "document_sha256": "9d097402a3b97d413405f32e07c4d123cfd7aa1a0507a9fc80f7154b44215645",
+    "expected_grade": 0,
+    "anchor_matched": true
+  },
+  {
+    "job_id": "C04",
+    "phase": "calibrate",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版只對應員工主要工作中的清潔與定期保養局部，未涵蓋其現場安裝、檢修、故障量測、更換零件及試運轉等責任，範圍不足以代表主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "清潔及試運轉都是我做",
+          "reference_quote": "依既定程序清潔冷氣、檢查濾網及耗材，完成定期保養紀錄。"
+        }
+      ],
+      "limitations": [
+        "員工原文未將清潔保養單獨列為可代表整體工作的領域；公版也未呈現安裝與檢修等核心責任。"
+      ]
+    },
+    "seconds": 4.260769199987408,
+    "employee_sha256": "c047efe6f29e215ba6418a1d7b6622d2efe8e58884f358d3ed5b6cb8a936594c",
+    "document_sha256": "1b381276cf3a0089fcdc282ef56fe283da42328cf40953e9447688238412edab",
+    "expected_grade": 2,
+    "anchor_matched": false
+  },
+  {
+    "job_id": "C05",
+    "phase": "calibrate",
+    "judgment": {
+      "grade": null,
+      "uncertain": true,
+      "main_work": [],
+      "reason": "員工只說從事資訊相關工作，並明確表示主要內容與負責範圍尚未說清楚，因此無法判定網站畫面、API、資料表或測試是否屬於其主要工作領域，也不能據此評估公版能否代表主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "我做資訊相關工作，主要內容和負責範圍還沒說清楚。",
+          "reference_quote": "製作網站畫面、開發 API、設計資料表並執行測試。"
+        }
+      ],
+      "limitations": [
+        "員工主要工作領域、持續責任與工作組合均未提供。",
+        "公版列出的工作項目不能單獨證明員工本人負責這些工作。"
+      ]
+    },
+    "seconds": 3.8024330000043847,
+    "employee_sha256": "ef0680f9e69cd3df29cc505b9251d7e3eeca00ed76a3c1936286808bb9ce4ee3",
+    "document_sha256": "685f28716bb0ed5d03e015ffabb7426700984355db3ecdac2d105e2f716dba20",
+    "expected_grade": null,
+    "anchor_matched": true
+  },
+  {
+    "job_id": "C06",
+    "phase": "calibrate",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "伺服器功能與訂單資料處理"
+      ],
+      "reason": "員工明確表示伺服器功能是主要工作，且負責開發訂單 API、權限與商業規則、資料表及查詢，以及測試資料更新。公版核心工作對應這個主要領域的工作組合與責任範圍，足以作為伺服器功能工作的整體參考；不代表員工另一個主要領域的訂單網站畫面開發。",
+      "evidence": [
+        {
+          "employee_quote": "開發訂單 API、權限和商業規則、設計資料表與查詢，再測試資料更新",
+          "reference_quote": "開發訂單 API、權限和商業規則，設計資料表與查詢，測試資料更新並維護服務功能"
+        }
+      ],
+      "limitations": [
+        "公版未涵蓋訂單網站畫面與畫面互動開發。"
+      ]
+    },
+    "seconds": 4.554842900019139,
+    "employee_sha256": "b3b32c54ee82a668d3c166553e99baef8d2f55cead7f02452ad02e1b2e374296",
+    "document_sha256": "65c97c5b8c839061ae3ff1c84e175ca4bf070e9afffe0b1233d1d17ac18f5f62",
+    "expected_grade": 3,
+    "anchor_matched": true
+  },
+  {
+    "job_id": "C07",
+    "phase": "calibrate",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "員工主要負責活動視覺素材的製作與印刷檔案輸出；公版核心工作是庫存核對、揀貨、包裝及安排倉庫出貨，兩者的工作內容與責任範圍沒有有意義的對應。",
+      "evidence": [
+        {
+          "employee_quote": "我主要製作活動視覺素材，做版面、圖片處理及印刷檔案輸出。",
+          "reference_quote": "核對庫存品項，揀貨、包裝及安排倉庫出貨。"
+        }
+      ],
+      "limitations": []
+    },
+    "seconds": 4.148370400012936,
+    "employee_sha256": "8bae9fbe51399ebea7374b6177aa3d7e00f83369f60d89f521027ecb1d72c975",
+    "document_sha256": "bc54a17aac345ce42bddd1ac3d4e9e7c8f51f2060d67ab2435095f81ebb1a2ec",
+    "expected_grade": 0,
+    "anchor_matched": true
+  }
+]

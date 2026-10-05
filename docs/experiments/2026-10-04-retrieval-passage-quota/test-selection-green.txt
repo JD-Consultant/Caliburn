@@ -1,0 +1,9 @@
+test_dense_only_also_preserves_the_secondary_passage (test_selection.PassageRetention.test_dense_only_also_preserves_the_secondary_passage) ... ok
+test_duplicate_reference_retains_both_passage_origins (test_selection.PassageRetention.test_duplicate_reference_retains_both_passage_origins) ... ok
+test_late_secondary_work_has_its_own_retained_slot (test_selection.PassageRetention.test_late_secondary_work_has_its_own_retained_slot) ... ok
+test_missing_required_pair_is_rejected (test_selection.PassageRetention.test_missing_required_pair_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK

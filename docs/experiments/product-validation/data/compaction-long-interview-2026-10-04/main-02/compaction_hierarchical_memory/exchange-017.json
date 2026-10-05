@@ -1,0 +1,16 @@
+{
+  "event_id": "e017",
+  "execution_id": "b9f7f506-fdb1-433b-83eb-f3dffcdc93b6",
+  "employee_input": {
+    "source_id": "d0a57bfe-d047-4e92-a70c-ed8ca3d3827c",
+    "interview_sequence": 34,
+    "speaker": "employee",
+    "interview_text": "回到前面盤點那件事：平常抽盤是每週三，月底全盤的頻率是每個月，遇到異常盤差或主管要求時再加一次。只有月底全盤的彙整表需要主管簽核，平常抽盤是先交查核結果，不要把兩種流程混在一起。"
+  },
+  "consultant_reply": {
+    "source_id": "58967583-a877-4b75-b3d7-f75af78df0ff",
+    "interview_sequence": 35,
+    "speaker": "consultant",
+    "interview_text": "已補上盤點頻率與流程差異：平常抽盤每週三，遇異常盤差或主管要求時加盤；月底全盤每月一次。只有月底全盤彙整表需主管簽核，平常抽盤則先交查核結果。\n\n若盤點差異需要調帳，核准的庫存調整單由誰核准？這和月底全盤彙整表的主管簽核是兩個不同的簽核流程嗎？"
+  }
+}

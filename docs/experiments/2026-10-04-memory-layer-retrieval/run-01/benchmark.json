@@ -1,0 +1,1442 @@
+[
+  {
+    "case_id": "F01",
+    "method": "O-W",
+    "repeat": 1,
+    "seconds": 0.015219299995806068,
+    "db_seconds": 0.014097300008870661,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-S",
+    "repeat": 1,
+    "seconds": 0.030573699972592294,
+    "db_seconds": 0.028841300052590668,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-W",
+    "repeat": 1,
+    "seconds": 0.015668700041715056,
+    "db_seconds": 0.014797399984672666,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-S",
+    "repeat": 1,
+    "seconds": 0.015337800025008619,
+    "db_seconds": 0.014248799998313189,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-W",
+    "repeat": 1,
+    "seconds": 0.015318899997510016,
+    "db_seconds": 0.014415900048334152,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-S",
+    "repeat": 1,
+    "seconds": 0.016661599976941943,
+    "db_seconds": 0.015755899948999286,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-W",
+    "repeat": 1,
+    "seconds": 0.014760799997020513,
+    "db_seconds": 0.013728899997659028,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-S",
+    "repeat": 1,
+    "seconds": 0.031049299985170364,
+    "db_seconds": 0.02913869998883456,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-W",
+    "repeat": 1,
+    "seconds": 0.004406000021845102,
+    "db_seconds": 0.0033159000449813902,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-S",
+    "repeat": 1,
+    "seconds": 0.026281500002369285,
+    "db_seconds": 0.025195199996232986,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-W",
+    "repeat": 1,
+    "seconds": 0.015578199992887676,
+    "db_seconds": 0.01463390002027154,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-S",
+    "repeat": 1,
+    "seconds": 0.014888100035022944,
+    "db_seconds": 0.014019099995493889,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-W",
+    "repeat": 1,
+    "seconds": 0.015837400045711547,
+    "db_seconds": 0.014951199991628528,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-S",
+    "repeat": 1,
+    "seconds": 0.03141719999257475,
+    "db_seconds": 0.02939639997202903,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-W",
+    "repeat": 1,
+    "seconds": 0.0037340999697335064,
+    "db_seconds": 0.002810699981637299,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-S",
+    "repeat": 1,
+    "seconds": 0.04402099997969344,
+    "db_seconds": 0.04222870001103729,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-W",
+    "repeat": 1,
+    "seconds": 0.003683999995701015,
+    "db_seconds": 0.002752400003373623,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-S",
+    "repeat": 1,
+    "seconds": 0.042970400012563914,
+    "db_seconds": 0.04086879995884374,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-W",
+    "repeat": 1,
+    "seconds": 0.015256499988026917,
+    "db_seconds": 0.014244699967093766,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-S",
+    "repeat": 1,
+    "seconds": 0.03155809995951131,
+    "db_seconds": 0.029528999992180616,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-W",
+    "repeat": 1,
+    "seconds": 0.016199500008951873,
+    "db_seconds": 0.015122400014661252,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-S",
+    "repeat": 1,
+    "seconds": 0.062262299994472414,
+    "db_seconds": 0.0584241000469774,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-W",
+    "repeat": 1,
+    "seconds": 0.014671999961137772,
+    "db_seconds": 0.01345149998087436,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-S",
+    "repeat": 1,
+    "seconds": 0.003691399993840605,
+    "db_seconds": 0.002774599997792393,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-W",
+    "repeat": 1,
+    "seconds": 0.02754750003805384,
+    "db_seconds": 0.026773299963679165,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-S",
+    "repeat": 1,
+    "seconds": 0.030690299987327307,
+    "db_seconds": 0.028652400011196733,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-W",
+    "repeat": 1,
+    "seconds": 0.015298099955543876,
+    "db_seconds": 0.014253999979700893,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-S",
+    "repeat": 1,
+    "seconds": 0.031133699987549335,
+    "db_seconds": 0.029144400032237172,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-W",
+    "repeat": 1,
+    "seconds": 0.01611389999743551,
+    "db_seconds": 0.01512709999224171,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-S",
+    "repeat": 1,
+    "seconds": 0.01541330001782626,
+    "db_seconds": 0.014421300031244755,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-W",
+    "repeat": 1,
+    "seconds": 0.015794999955687672,
+    "db_seconds": 0.01486919994931668,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-S",
+    "repeat": 1,
+    "seconds": 0.04504130000714213,
+    "db_seconds": 0.04190830001607537,
+    "queries": 3,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-W",
+    "repeat": 1,
+    "seconds": 0.015506799973081797,
+    "db_seconds": 0.014644599985331297,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-S",
+    "repeat": 1,
+    "seconds": 0.027711100003216416,
+    "db_seconds": 0.02370399999199435,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-W",
+    "repeat": 1,
+    "seconds": 0.01871720002964139,
+    "db_seconds": 0.017730700026731938,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-S",
+    "repeat": 1,
+    "seconds": 0.015001600026153028,
+    "db_seconds": 0.013998699956573546,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-W",
+    "repeat": 1,
+    "seconds": 0.015949999971780926,
+    "db_seconds": 0.015051399997901171,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-S",
+    "repeat": 1,
+    "seconds": 0.06216620001941919,
+    "db_seconds": 0.058535699965432286,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-W",
+    "repeat": 1,
+    "seconds": 0.015457200002856553,
+    "db_seconds": 0.014210599998477846,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-S",
+    "repeat": 1,
+    "seconds": 0.07864269998390228,
+    "db_seconds": 0.07378279999829829,
+    "queries": 5,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-W",
+    "repeat": 1,
+    "seconds": 0.029787999985273927,
+    "db_seconds": 0.028606399951968342,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-S",
+    "repeat": 1,
+    "seconds": 0.003792500006966293,
+    "db_seconds": 0.00284770003054291,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-W",
+    "repeat": 1,
+    "seconds": 0.0036638000165112317,
+    "db_seconds": 0.0028177000349387527,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-S",
+    "repeat": 1,
+    "seconds": 0.044764599995687604,
+    "db_seconds": 0.04032970004482195,
+    "queries": 5,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-W",
+    "repeat": 1,
+    "seconds": 0.022598400013521314,
+    "db_seconds": 0.021702999947592616,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-S",
+    "repeat": 1,
+    "seconds": 0.20736479997867718,
+    "db_seconds": 0.19372020004084334,
+    "queries": 16,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-W",
+    "repeat": 1,
+    "seconds": 0.02661549998447299,
+    "db_seconds": 0.02560669998638332,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-S",
+    "repeat": 1,
+    "seconds": 0.06250399997225031,
+    "db_seconds": 0.05890369997359812,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-S",
+    "repeat": 2,
+    "seconds": 0.031234399997629225,
+    "db_seconds": 0.029184199927840382,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-W",
+    "repeat": 2,
+    "seconds": 0.015745599986985326,
+    "db_seconds": 0.014756300020962954,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-S",
+    "repeat": 2,
+    "seconds": 0.015459900023415685,
+    "db_seconds": 0.01463359995977953,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-W",
+    "repeat": 2,
+    "seconds": 0.016184099949896336,
+    "db_seconds": 0.015358500008005649,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-S",
+    "repeat": 2,
+    "seconds": 0.015384100028313696,
+    "db_seconds": 0.014616600004956126,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-W",
+    "repeat": 2,
+    "seconds": 0.015206699958071113,
+    "db_seconds": 0.01432570000179112,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-S",
+    "repeat": 2,
+    "seconds": 0.030686500016599894,
+    "db_seconds": 0.028930300031788647,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-W",
+    "repeat": 2,
+    "seconds": 0.004114000010304153,
+    "db_seconds": 0.0028845000197179615,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-S",
+    "repeat": 2,
+    "seconds": 0.02717539999866858,
+    "db_seconds": 0.026201900036539882,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-W",
+    "repeat": 2,
+    "seconds": 0.0037524999934248626,
+    "db_seconds": 0.002789099991787225,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-S",
+    "repeat": 2,
+    "seconds": 0.026425600051879883,
+    "db_seconds": 0.02567900001304224,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-W",
+    "repeat": 2,
+    "seconds": 0.015055400028359145,
+    "db_seconds": 0.014036299951840192,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-S",
+    "repeat": 2,
+    "seconds": 0.031206500018015504,
+    "db_seconds": 0.029643399990163743,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-W",
+    "repeat": 2,
+    "seconds": 0.004611100011970848,
+    "db_seconds": 0.0037256000214256346,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-S",
+    "repeat": 2,
+    "seconds": 0.024924500030465424,
+    "db_seconds": 0.023303499910980463,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-W",
+    "repeat": 2,
+    "seconds": 0.01577769999857992,
+    "db_seconds": 0.014909800025634468,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-S",
+    "repeat": 2,
+    "seconds": 0.02037340000970289,
+    "db_seconds": 0.01859429996693507,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-W",
+    "repeat": 2,
+    "seconds": 0.02683769998839125,
+    "db_seconds": 0.025890499993693084,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-S",
+    "repeat": 2,
+    "seconds": 0.0308157000108622,
+    "db_seconds": 0.028785099973902106,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-W",
+    "repeat": 2,
+    "seconds": 0.015534799953456968,
+    "db_seconds": 0.01454940001713112,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-S",
+    "repeat": 2,
+    "seconds": 0.047678800008725375,
+    "db_seconds": 0.04427439998835325,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-W",
+    "repeat": 2,
+    "seconds": 0.015249799995217472,
+    "db_seconds": 0.014335000014398247,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-S",
+    "repeat": 2,
+    "seconds": 0.004136300005484372,
+    "db_seconds": 0.003091000020503998,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-W",
+    "repeat": 2,
+    "seconds": 0.0036239000037312508,
+    "db_seconds": 0.0027876999811269343,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-S",
+    "repeat": 2,
+    "seconds": 0.038482500007376075,
+    "db_seconds": 0.0367131000966765,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-W",
+    "repeat": 2,
+    "seconds": 0.0035917999921366572,
+    "db_seconds": 0.002778500027488917,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-S",
+    "repeat": 2,
+    "seconds": 0.043097499990835786,
+    "db_seconds": 0.04119270003866404,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-W",
+    "repeat": 2,
+    "seconds": 0.004898399987723678,
+    "db_seconds": 0.0036927000037394464,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-S",
+    "repeat": 2,
+    "seconds": 0.02585269999690354,
+    "db_seconds": 0.02492230001371354,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-W",
+    "repeat": 2,
+    "seconds": 0.015320500009693205,
+    "db_seconds": 0.014265999954659492,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-S",
+    "repeat": 2,
+    "seconds": 0.046133600000757724,
+    "db_seconds": 0.04359040001872927,
+    "queries": 3,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-W",
+    "repeat": 2,
+    "seconds": 0.01701779995346442,
+    "db_seconds": 0.016248000029008836,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-S",
+    "repeat": 2,
+    "seconds": 0.061648800037801266,
+    "db_seconds": 0.05765689996769652,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-W",
+    "repeat": 2,
+    "seconds": 0.015588599955663085,
+    "db_seconds": 0.014768799999728799,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-S",
+    "repeat": 2,
+    "seconds": 0.01527700002770871,
+    "db_seconds": 0.014102699991781265,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-W",
+    "repeat": 2,
+    "seconds": 0.003240399993956089,
+    "db_seconds": 0.002478300011716783,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-S",
+    "repeat": 2,
+    "seconds": 0.058113600010983646,
+    "db_seconds": 0.054099999950267375,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-W",
+    "repeat": 2,
+    "seconds": 0.003843999991659075,
+    "db_seconds": 0.0027957999845966697,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-S",
+    "repeat": 2,
+    "seconds": 0.0736453999998048,
+    "db_seconds": 0.06956259999424219,
+    "queries": 5,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-W",
+    "repeat": 2,
+    "seconds": 0.003588200022932142,
+    "db_seconds": 0.0027250999701209366,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-S",
+    "repeat": 2,
+    "seconds": 0.028023699996992946,
+    "db_seconds": 0.02716389996930957,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-W",
+    "repeat": 2,
+    "seconds": 0.014403200009837747,
+    "db_seconds": 0.013478000008035451,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-S",
+    "repeat": 2,
+    "seconds": 0.06348880002042279,
+    "db_seconds": 0.05943419993855059,
+    "queries": 5,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-W",
+    "repeat": 2,
+    "seconds": 0.02760799997486174,
+    "db_seconds": 0.02689259999897331,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-S",
+    "repeat": 2,
+    "seconds": 0.2478298000060022,
+    "db_seconds": 0.23396069993032143,
+    "queries": 16,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-W",
+    "repeat": 2,
+    "seconds": 0.015089799999259412,
+    "db_seconds": 0.014072499994654208,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-S",
+    "repeat": 2,
+    "seconds": 0.06265560002066195,
+    "db_seconds": 0.05910679994849488,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-W",
+    "repeat": 2,
+    "seconds": 0.0033334000036120415,
+    "db_seconds": 0.002506099990569055,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-W",
+    "repeat": 3,
+    "seconds": 0.003184199973475188,
+    "db_seconds": 0.0025041999761015177,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-S",
+    "repeat": 3,
+    "seconds": 0.0029255999834276736,
+    "db_seconds": 0.00229789997683838,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-W",
+    "repeat": 3,
+    "seconds": 0.003069500031415373,
+    "db_seconds": 0.0024695000029169023,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-S",
+    "repeat": 3,
+    "seconds": 0.003008200030308217,
+    "db_seconds": 0.0022922000498510897,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-W",
+    "repeat": 3,
+    "seconds": 0.014675899990834296,
+    "db_seconds": 0.014044599956832826,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-S",
+    "repeat": 3,
+    "seconds": 0.030624000006355345,
+    "db_seconds": 0.02881129994057119,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-W",
+    "repeat": 3,
+    "seconds": 0.01610959996469319,
+    "db_seconds": 0.015246900031343102,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-S",
+    "repeat": 3,
+    "seconds": 0.003180700005032122,
+    "db_seconds": 0.0024258000194095075,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-W",
+    "repeat": 3,
+    "seconds": 0.0031455999705940485,
+    "db_seconds": 0.002490399987436831,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-S",
+    "repeat": 3,
+    "seconds": 0.02370130002964288,
+    "db_seconds": 0.023008699994534254,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-W",
+    "repeat": 3,
+    "seconds": 0.015886399953160435,
+    "db_seconds": 0.015016999968793243,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-S",
+    "repeat": 3,
+    "seconds": 0.018591800006106496,
+    "db_seconds": 0.016936699976213276,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-W",
+    "repeat": 3,
+    "seconds": 0.01273750001564622,
+    "db_seconds": 0.012037900043651462,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-S",
+    "repeat": 3,
+    "seconds": 0.03129630000330508,
+    "db_seconds": 0.029511200031265616,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-W",
+    "repeat": 3,
+    "seconds": 0.015855800011195242,
+    "db_seconds": 0.015057400043588132,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-S",
+    "repeat": 3,
+    "seconds": 0.006808699981775135,
+    "db_seconds": 0.005195300036575645,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-W",
+    "repeat": 3,
+    "seconds": 0.023013100028038025,
+    "db_seconds": 0.02231460000621155,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-S",
+    "repeat": 3,
+    "seconds": 0.03047810000134632,
+    "db_seconds": 0.02875040000071749,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-W",
+    "repeat": 3,
+    "seconds": 0.0036250000121071935,
+    "db_seconds": 0.0027504999889060855,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-S",
+    "repeat": 3,
+    "seconds": 0.04870450001908466,
+    "db_seconds": 0.04546430002665147,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-W",
+    "repeat": 3,
+    "seconds": 0.002972999995108694,
+    "db_seconds": 0.002256099949590862,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-S",
+    "repeat": 3,
+    "seconds": 0.00284319999627769,
+    "db_seconds": 0.002220700029283762,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-W",
+    "repeat": 3,
+    "seconds": 0.018751800002064556,
+    "db_seconds": 0.018003399949520826,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-S",
+    "repeat": 3,
+    "seconds": 0.03163179999683052,
+    "db_seconds": 0.030058200005441904,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-W",
+    "repeat": 3,
+    "seconds": 0.014449700014665723,
+    "db_seconds": 0.013476899999659508,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-S",
+    "repeat": 3,
+    "seconds": 0.031407899979967624,
+    "db_seconds": 0.029748799977824092,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-W",
+    "repeat": 3,
+    "seconds": 0.015820000029634684,
+    "db_seconds": 0.01494490000186488,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-S",
+    "repeat": 3,
+    "seconds": 0.015195099986158311,
+    "db_seconds": 0.014325500000268221,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-W",
+    "repeat": 3,
+    "seconds": 0.01487829996040091,
+    "db_seconds": 0.013888799992855638,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-S",
+    "repeat": 3,
+    "seconds": 0.0301461000344716,
+    "db_seconds": 0.027642000059131533,
+    "queries": 3,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-W",
+    "repeat": 3,
+    "seconds": 0.015230099961627275,
+    "db_seconds": 0.014324699994176626,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-S",
+    "repeat": 3,
+    "seconds": 0.0374796999967657,
+    "db_seconds": 0.03433009987929836,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-W",
+    "repeat": 3,
+    "seconds": 0.0030317999771796167,
+    "db_seconds": 0.0023441000375896692,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-S",
+    "repeat": 3,
+    "seconds": 0.00285799999255687,
+    "db_seconds": 0.002265100018121302,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-W",
+    "repeat": 3,
+    "seconds": 0.003576099989004433,
+    "db_seconds": 0.0029132000054232776,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-S",
+    "repeat": 3,
+    "seconds": 0.0347438000026159,
+    "db_seconds": 0.03179420001106337,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-W",
+    "repeat": 3,
+    "seconds": 0.02765260002342984,
+    "db_seconds": 0.026772100012749434,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-S",
+    "repeat": 3,
+    "seconds": 0.03717079997295514,
+    "db_seconds": 0.03335779998451471,
+    "queries": 5,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-W",
+    "repeat": 3,
+    "seconds": 0.02429839997785166,
+    "db_seconds": 0.023493200016673654,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-S",
+    "repeat": 3,
+    "seconds": 0.003502100007608533,
+    "db_seconds": 0.002607500005979091,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-W",
+    "repeat": 3,
+    "seconds": 0.027710900001693517,
+    "db_seconds": 0.02697580005042255,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-S",
+    "repeat": 3,
+    "seconds": 0.0771489999606274,
+    "db_seconds": 0.07278799987398088,
+    "queries": 5,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-W",
+    "repeat": 3,
+    "seconds": 0.0033745000255294144,
+    "db_seconds": 0.002606599999126047,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-S",
+    "repeat": 3,
+    "seconds": 0.2305845000082627,
+    "db_seconds": 0.21795590012334287,
+    "queries": 16,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-W",
+    "repeat": 3,
+    "seconds": 0.015547599992714822,
+    "db_seconds": 0.014606199983973056,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-S",
+    "repeat": 3,
+    "seconds": 0.06203069997718558,
+    "db_seconds": 0.05874400003813207,
+    "queries": 4,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-W",
+    "repeat": 3,
+    "seconds": 0.015261599968653172,
+    "db_seconds": 0.014359200024046004,
+    "queries": 1,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-S",
+    "repeat": 3,
+    "seconds": 0.019039400038309395,
+    "db_seconds": 0.01724590000230819,
+    "queries": 2,
+    "cached_query_embeddings": true,
+    "includes_exact_cosine_and_canonical_sort": true
+  }
+]

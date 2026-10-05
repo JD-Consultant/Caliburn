@@ -1,0 +1,3132 @@
+[
+  {
+    "case_id": "E01",
+    "split": "regression",
+    "kind": "positive",
+    "domain": "vehicle_repair",
+    "employee_messages": [
+      "我在小客車維修廠處理已派給我的車，不負責接待報價。先看工單和車主描述，做道路試車及掃描故障碼，再量測找原因，不能只按故障碼直接換零件。我檢查煞車、轉向、懸吊和引擎的運作，把檢查結果及需要的材料告訴接待，客戶同意報價後才施工。",
+      "我自己拆裝、更換和調整故障的機件，依維修資料確認鎖緊扭力與裝配位置；完成後重做功能檢查和試車，把量測與更換紀錄寫在工單。需要別的專業或找不到原因時，交技術主管協助，不自行擴大施工。例行換油、濾芯和保養檢查也由我做；工單交接時說明仍需處理的問題。",
+      "我每天收工前把工具歸位，處理廢油與拆下的耗材。主管決定工作的派發與最終放行，我不帶整個團隊也不制定廠內品質制度。偶爾教新人使用扭力扳手，是示範操作，不負責人事考核。進廠的都是一般小客車，沒有大型貨車，也沒有修車身鈑金或噴漆。"
+    ],
+    "grades": {
+      "SET7231-002v3": 3,
+      "MEM7231-003v4": 2,
+      "MEM7231-004v4": 2,
+      "SET7231-001v3": 1
+    },
+    "hard_negatives": [
+      "SET7231-003v3",
+      "MEM7231-006v4",
+      "MEM7213-001v2"
+    ],
+    "rationale": "實際獨立檢修小型汽車、試車、工單；底盤/動力為可接受相關，非大型車或主管。",
+    "boundary": "不負責報價、最終放行、鈑金噴漆、人事考核",
+    "original_split": "development",
+    "topics": [
+      {
+        "topic_id": "E01-T01",
+        "work": "診斷小客車故障",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在小客車維修廠處理已派給我的車，不負責接待報價。先看工單和車主描述，做道路試車及掃描故障碼，再量測找原因，不能只按故障碼直接換零件。我檢查煞車、轉向、懸吊和引擎的運作，把檢查結果及需要的材料告訴接待，客戶同意報價後才施工。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "判別修理維護問題及報價",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "依客戶反映及目視檢查發現問題,與客戶溝通問題及車況,或配合保險理賠作業,確認汽車修理維護【註3】項目。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "使用相關機具、設備及儀器檢驗車體狀況,並依異常狀況判斷故障原因。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.3",
+                "text": "依檢驗結果與所需維修項目,預估工時、維修所需物料及填寫維修報價單。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E01-T02",
+        "work": "拆裝修護機件並復驗",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我自己拆裝、更換和調整故障的機件，依維修資料確認鎖緊扭力與裝配位置；完成後重做功能檢查和試車，把量測與更換紀錄寫在工單。需要別的專業或找不到原因時，交技術主管協助，不自行擴大施工。例行換油、濾芯和保養檢查也由我做；工單交接時說明仍需處理的問題。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "修護引擎設備及零組件",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,檢查、標註及記錄故障或須維修狀況。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.2",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,準備零組件,並選用正確的工具及設備。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.3",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,更換、調整、校正、局部修理或大修引擎設備、零組件與性能。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.4",
+                "text": "進行最終檢查及測試,並完成維修工作紀錄,以確保工作符合品質標準。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E01-T03",
+        "work": "底盤煞車轉向懸吊檢查修護",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在小客車維修廠處理已派給我的車，不負責接待報價。先看工單和車主描述，做道路試車及掃描故障碼，再量測找原因，不能只按故障碼直接換零件。我檢查煞車、轉向、懸吊和引擎的運作，把檢查結果及需要的材料告訴接待，客戶同意報價後才施工。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T2.4",
+            "task_name": [
+              {
+                "code": "T2.4",
+                "name": "修護底盤",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.4.1",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,檢查、標註及記錄故障或須維修狀況。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.4.2",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,準備零組件,並選用正確的工具及設備。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.4.3",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,更換、調整、校正、局部修理或大修底盤構件及性能。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.4.4",
+                "text": "進行最終檢查及測試,並完成維修工作紀錄,以確保工作符合品質標準。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E01-T04",
+        "work": "例行保養",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我自己拆裝、更換和調整故障的機件，依維修資料確認鎖緊扭力與裝配位置；完成後重做功能檢查和試車，把量測與更換紀錄寫在工單。需要別的專業或找不到原因時，交技術主管協助，不自行擴大施工。例行換油、濾芯和保養檢查也由我做；工單交接時說明仍需處理的問題。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "保養汽車",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "依客戶確認後保養項目及汽車修護手冊,再次確認並記錄保養前車況。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.2",
+                "text": "進行及確認五保前置作業(註)。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.3",
+                "text": "依組織工作安全手冊、原廠汽車修護手冊及定期保養紀錄表,指導或執行定期保養項目及完成定期保養紀錄。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E01-T05",
+        "work": "廢油工具與工作區維護",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "我每天收工前把工具歸位，處理廢油與拆下的耗材。主管決定工作的派發與最終放行，我不帶整個團隊也不制定廠內品質制度。偶爾教新人使用扭力扳手，是示範操作，不負責人事考核。進廠的都是一般小客車，沒有大型貨車，也沒有修車身鈑金或噴漆。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T3.2",
+            "task_name": [
+              {
+                "code": "T3.2",
+                "name": "工作場所維護及庫存管理",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.2.1",
+                "text": "指導或執行庫存材料、機具設備、廢料處理及管理等工作。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.2",
+                "text": "指導或執行維修機具與設備之清潔、潤滑、保養及調校等工作。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.3",
+                "text": "指導或執行適當處置有害氣體、有害液體(如廢油處理),並對噪音作適當防護(如戴耳塞等)。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E02",
+    "split": "regression",
+    "kind": "positive",
+    "domain": "cnc_turning",
+    "employee_messages": [
+      "我在金屬加工廠操作數控車床，拿到圖面後確認材料尺寸、加工公差和批量，選擇刀具、夾頭與夾持方式。我會讀既有程式，在機台上模擬確認刀路、工件與刀具不會干涉，再試切第一件；不是只把料放進去按開始。",
+      "第一件用外徑千分尺和內徑量具測量，依結果調刀具補償。合格後才繼續批次生產；中途依檢驗表量測尺寸、看表面與刀具磨耗，偏差就停機調整或換刀，再驗證。尺寸超過我能修正的範圍會通知領班，不把不合格件混入完成品。",
+      "我記录首件與過程檢驗、數量和異常，每天下班清切屑、檢查潤滑與冷卻液。複雜產品的完整程式由另一位工程人員編，我只按核准加工資料調機台參數和局部補償；不制定全廠排程，沒有帶班、採購設備或機台大修責任。"
+    ],
+    "grades": {
+      "MPM7223-002v3": 3,
+      "MPM7223-007v3": 1,
+      "MPD7223-001v3": 1
+    },
+    "hard_negatives": [
+      "MPM7223-001v3",
+      "MPD7223-001v3"
+    ],
+    "rationale": "車床調機、試切、量測與批量加工是主責；非CNC銑床或完整程式設計。",
+    "boundary": "只調參數/補償，不負責完整程式、全廠排程或大修",
+    "original_split": "development",
+    "topics": [
+      {
+        "topic_id": "E02-T01",
+        "work": "圖面公差判讀",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在金屬加工廠操作數控車床，拿到圖面後確認材料尺寸、加工公差和批量，選擇刀具、夾頭與夾持方式。我會讀既有程式，在機台上模擬確認刀路、工件與刀具不會干涉，再試切第一件；不是只把料放進去按開始。",
+        "support": [
+          {
+            "id": "MPM7223-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/CNC車床技術人員-職能基準.json",
+            "source_sha256": "a60ad80acbe4739bda3665c52e395c1d9d2d2ccc88e16d9c7a4eebe9401da2a6",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "工作圖判讀與匯入程式編輯",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "根據工作圖辨別工件徑向、軸向尺寸、表面織構符號與幾何公差。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "依材質及工件形狀,編輯刀具及加工程序。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E02-T02",
+        "work": "夾持工件與校正",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在金屬加工廠操作數控車床，拿到圖面後確認材料尺寸、加工公差和批量，選擇刀具、夾頭與夾持方式。我會讀既有程式，在機台上模擬確認刀路、工件與刀具不會干涉，再試切第一件；不是只把料放進去按開始。",
+        "support": [
+          {
+            "id": "MPM7223-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/CNC車床技術人員-職能基準.json",
+            "source_sha256": "a60ad80acbe4739bda3665c52e395c1d9d2d2ccc88e16d9c7a4eebe9401da2a6",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "工件夾持固定方式與精度校正",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.2",
+                "text": "使用車床夾頭或其他夾、治具夾持工件,設定工件原點,並檢測夾持力。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.1",
+                "text": "使用量錶及其他量具,校正同心度、偏心量及其他部位夾持精度。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E02-T03",
+        "work": "選刀與補償設定",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在金屬加工廠操作數控車床，拿到圖面後確認材料尺寸、加工公差和批量，選擇刀具、夾頭與夾持方式。我會讀既有程式，在機台上模擬確認刀路、工件與刀具不會干涉，再試切第一件；不是只把料放進去按開始。",
+        "support": [
+          {
+            "id": "MPM7223-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/CNC車床技術人員-職能基準.json",
+            "source_sha256": "a60ad80acbe4739bda3665c52e395c1d9d2d2ccc88e16d9c7a4eebe9401da2a6",
+            "task_code": "T3.1",
+            "task_name": [
+              {
+                "code": "T3.1",
+                "name": "刀具選擇與安裝",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.1.1",
+                "text": "刀具選擇並依刀具號碼安裝於刀具庫。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.1.2",
+                "text": "設定刀具座標位置及半徑補正,刀具形狀設定。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E02-T04",
+        "work": "車削加工及異常排除",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "第一件用外徑千分尺和內徑量具測量，依結果調刀具補償。合格後才繼續批次生產；中途依檢驗表量測尺寸、看表面與刀具磨耗，偏差就停機調整或換刀，再驗證。尺寸超過我能修正的範圍會通知領班，不把不合格件混入完成品。",
+        "support": [
+          {
+            "id": "MPM7223-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/CNC車床技術人員-職能基準.json",
+            "source_sha256": "a60ad80acbe4739bda3665c52e395c1d9d2d2ccc88e16d9c7a4eebe9401da2a6",
+            "task_code": "T3.3",
+            "task_name": [
+              {
+                "code": "T3.3",
+                "name": "車削加工",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.3.1",
+                "text": "啟動程式完成加工。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.3.2",
+                "text": "加工過程異常狀況排除。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E02-T05",
+        "work": "首件及過程尺寸量測",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "第一件用外徑千分尺和內徑量具測量，依結果調刀具補償。合格後才繼續批次生產；中途依檢驗表量測尺寸、看表面與刀具磨耗，偏差就停機調整或換刀，再驗證。尺寸超過我能修正的範圍會通知領班，不把不合格件混入完成品。",
+        "support": [
+          {
+            "id": "MPM7223-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/CNC車床技術人員-職能基準.json",
+            "source_sha256": "a60ad80acbe4739bda3665c52e395c1d9d2d2ccc88e16d9c7a4eebe9401da2a6",
+            "task_code": "T4.1",
+            "task_name": [
+              {
+                "code": "T4.1",
+                "name": "內外部尺度量測",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P4.1.1",
+                "text": "使用游標卡尺、內外徑分厘卡等量具,量測工件各種內外部尺寸。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.1.2",
+                "text": "使用圓弧規等量具量測工件內外圓弧尺寸。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.1.3",
+                "text": "以2D投影儀器量測各種內外部尺度。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E02-T06",
+        "work": "機台日常保養",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "我記录首件與過程檢驗、數量和異常，每天下班清切屑、檢查潤滑與冷卻液。複雜產品的完整程式由另一位工程人員編，我只按核准加工資料調機台參數和局部補償；不制定全廠排程，沒有帶班、採購設備或機台大修責任。",
+        "support": [
+          {
+            "id": "MPM7223-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/CNC車床技術人員-職能基準.json",
+            "source_sha256": "a60ad80acbe4739bda3665c52e395c1d9d2d2ccc88e16d9c7a4eebe9401da2a6",
+            "task_code": "T5.1",
+            "task_name": [
+              {
+                "code": "T5.1",
+                "name": "日常基本保養",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P5.1.1",
+                "text": "依使用手冊執行機台與工具日常保養,並完成相關紀錄。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E03",
+    "split": "regression",
+    "kind": "positive",
+    "domain": "bakery",
+    "employee_messages": [
+      "我在烘焙工坊依每天訂單做麵包和少量西點，核對庫存後領取麵粉、奶油與其他材料，依核准配方秤重。我自己操作攪拌機，依麵糰狀態調整攪拌時間，分割、滾圓、整形，管理發酵溫濕度。",
+      "烘烤前確認爐溫與排盤，烤的過程看上色、膨脹和中心狀態，出爐後冷卻再包裝，記錄製作數量和不良原因。收到蛋糕訂單時，我烤蛋糕體、做簡單夾餡裝飾；複雜造型交另一位同事。我會協助試做新配方，但由主管決定是否上架和售價。",
+      "原本我說每天進貨，補充更正：每週兩次進貨，每天只是核對領料。驗收看保存期限和溫度，過期或異常材料隔離回報；工作台、器具及設備按規定清潔。我不負責咖啡豆焙炒、外場點餐或人員排班，也沒有獨立決定採購品牌的權限。"
+    ],
+    "grades": {
+      "TFB7912-002v3": 3,
+      "TFB7912-001v3": 2
+    },
+    "hard_negatives": [
+      "TFB7914-001v3"
+    ],
+    "rationale": "公版助理已包含完整製作流程；技術人員的研發、督導與流程管理未確認，列為可接受相關參考。",
+    "boundary": "進貨每週兩次；不決定定價/上架、咖啡烘焙或排班",
+    "original_split": "development",
+    "topics": [
+      {
+        "topic_id": "E03-T01",
+        "work": "依配方準備秤量原料",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在烘焙工坊依每天訂單做麵包和少量西點，核對庫存後領取麵粉、奶油與其他材料，依核准配方秤重。我自己操作攪拌機，依麵糰狀態調整攪拌時間，分割、滾圓、整形，管理發酵溫濕度。",
+        "support": [
+          {
+            "id": "TFB7912-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/西點、麵包烘焙助理-職能基準.json",
+            "source_sha256": "ce6481df0928f485404fa31cecc072da4e5315d04d73d0f6c6425b39e373a023",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "準備原料",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "依標準配方並遵守安全衛生相關規範,準備所需主、副原料。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.2",
+                "text": "依標準配方,量秤主、副原料。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E03-T02",
+        "work": "攪拌發酵成形與烘烤裝飾",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在烘焙工坊依每天訂單做麵包和少量西點，核對庫存後領取麵粉、奶油與其他材料，依核准配方秤重。我自己操作攪拌機，依麵糰狀態調整攪拌時間，分割、滾圓、整形，管理發酵溫濕度。",
+        "support": [
+          {
+            "id": "TFB7912-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/西點、麵包烘焙助理-職能基準.json",
+            "source_sha256": "ce6481df0928f485404fa31cecc072da4e5315d04d73d0f6c6425b39e373a023",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "製作烘焙食品",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "依標準製作程序,進行原料攪拌作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "控制發酵箱溫度、濕度,檢查發酵程度,並進行烘焙食品成型。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.3",
+                "text": "選用烘烤機具,並確認各類烘焙食品烘烤溫度與時間,以完成產品烘焙。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.4",
+                "text": "視需要裝飾烘焙食品表面。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E03-T03",
+        "work": "外觀與内部品質辨別回報",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "烘烤前確認爐溫與排盤，烤的過程看上色、膨脹和中心狀態，出爐後冷卻再包裝，記錄製作數量和不良原因。收到蛋糕訂單時，我烤蛋糕體、做簡單夾餡裝飾；複雜造型交另一位同事。我會協助試做新配方，但由主管決定是否上架和售價。",
+        "support": [
+          {
+            "id": "TFB7912-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/西點、麵包烘焙助理-職能基準.json",
+            "source_sha256": "ce6481df0928f485404fa31cecc072da4e5315d04d73d0f6c6425b39e373a023",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "協助品質管控",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "依標準配方,採用視覺、嗅覺或味覺等辨識方式,辨別烘焙食品外觀與內部狀況。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.2",
+                "text": "將辨別結果回報給相關人員。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E03-T04",
+        "work": "原料庫存期限及異常隔離回報",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "原本我說每天進貨，補充更正：每週兩次進貨，每天只是核對領料。驗收看保存期限和溫度，過期或異常材料隔離回報；工作台、器具及設備按規定清潔。我不負責咖啡豆焙炒、外場點餐或人員排班，也沒有獨立決定採購品牌的權限。",
+        "support": [
+          {
+            "id": "TFB7912-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/西點、麵包烘焙助理-職能基準.json",
+            "source_sha256": "ce6481df0928f485404fa31cecc072da4e5315d04d73d0f6c6425b39e373a023",
+            "task_code": "T3.1",
+            "task_name": [
+              {
+                "code": "T3.1",
+                "name": "原料貯存",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.1.1",
+                "text": "盤點原料保存期限,並依食品安全衛生相關規範與組織規定,進行食材分類與存放。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.1.2",
+                "text": "依原料、半成品或成品特性,選用適當貯存方式。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.1.3",
+                "text": "盤點原料庫存,並完成相關紀錄。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.1.4",
+                "text": "定期檢查所有貯存空間、設備與原料狀況,並回報異常狀況。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E03-T05",
+        "work": "環境與器具清潔",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "原本我說每天進貨，補充更正：每週兩次進貨，每天只是核對領料。驗收看保存期限和溫度，過期或異常材料隔離回報；工作台、器具及設備按規定清潔。我不負責咖啡豆焙炒、外場點餐或人員排班，也沒有獨立決定採購品牌的權限。",
+        "support": [
+          {
+            "id": "TFB7912-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/西點、麵包烘焙助理-職能基準.json",
+            "source_sha256": "ce6481df0928f485404fa31cecc072da4e5315d04d73d0f6c6425b39e373a023",
+            "task_code": "T3.2",
+            "task_name": [
+              {
+                "code": "T3.2",
+                "name": "維護環境、設備與工具",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.2.1",
+                "text": "依食品安全衛生相關規範,辨識與選用適切的清潔用品進行清潔消毒作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.2",
+                "text": "清洗相關烘焙工具。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.3",
+                "text": "定期清潔環境與相關設備。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E04",
+    "split": "regression",
+    "kind": "positive",
+    "domain": "security_operations",
+    "employee_messages": [
+      "我在公司的資訊單位處理網路防護，根據核准需求設定防火牆規則、網段隔離與遠端連線權限，變更前備份和測試，記錄改了什麼，失敗時回復。每天看防護設備和端點的警示，核對來源位址、時間與帳號，找出需要調查的項目。",
+      "疑似入侵時我收集日誌、比對網路流量和受影響主機，確認範圍，依既定通報流程通知主管。經授權後隔離主機或封鎖連線，整理事件紀錄與後續改善；是否停機由主管和業務單位決定。每月檢查弱點掃描結果，與系統管理同事排修補時間，再確認修補生效。",
+      "我維護設備與帳號權限的操作紀錄，協助同事查防護設定，偶爾示範辨認可疑郵件。我不是對外受委託的滲透測試人員，不制定公司的資安管理政策，也不決定所有人的權限；只執行已核准的調整。這些工作服務公司自己內部的辦公網路與伺服器。"
+    ],
+    "grades": {
+      "INM3513-001v4": 3,
+      "INM2529-001v3": 2,
+      "INM2529-003v2": 1
+    },
+    "hard_negatives": [
+      "INM2529-002v2",
+      "INM2529-003v2"
+    ],
+    "rationale": "網路防護維運、設備設定、監控和事件處理為主；未確認本人規劃及執行資安檢測，非制度管理。資安檢測不限對外委託。",
+    "boundary": "已授權才隔離/改權限；不負責制定政策或對外滲透測試",
+    "original_split": "development",
+    "topics": [
+      {
+        "topic_id": "E04-T01",
+        "work": "防火牆與網路防禦設定",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在公司的資訊單位處理網路防護，根據核准需求設定防火牆規則、網段隔離與遠端連線權限，變更前備份和測試，記錄改了什麼，失敗時回復。每天看防護設備和端點的警示，核對來源位址、時間與帳號，找出需要調查的項目。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "配置網路防禦系統",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "評估路由器及入侵偵測防禦系統特性進階能力,納入網路資源之威脅事件即時處理。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.2",
+                "text": "配置並確認入侵偵測防禦系統特性以找出威脅,並以動態方式阻止其進入網路。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.3",
+                "text": "維持、更新與微調入侵偵測防禦系統佈署。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.4",
+                "text": "配置與驗證以背景為基礎之存取控制(CBAC)以及網路位址轉譯(NAT)以減少網路威脅。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.5",
+                "text": "配置與驗證防火牆來納入新進應用程式檢查並通知統一資源標識符(URI)過濾,以達到網路安全的提升。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.6",
+                "text": "利用路由器功能來取得管理、資料與控制資訊。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E04-T02",
+        "work": "遠端VPN連線設定",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在公司的資訊單位處理網路防護，根據核准需求設定防火牆規則、網段隔離與遠端連線權限，變更前備份和測試，記錄改了什麼，失敗時回復。每天看防護設備和端點的警示，核對來源位址、時間與帳號，找出需要調查的項目。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T2.3",
+            "task_name": [
+              {
+                "code": "T2.3",
+                "name": "配置虛擬私有網路(VPN)",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.3.1",
+                "text": "分析並評估通訊協定安全性與通用路由協議封裝特性與功能性。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.2",
+                "text": "利用憑證授權設定站台對站台VPN之安全連線。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.3",
+                "text": "配置與驗證網站對網站VPN作業之安全連線。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.4",
+                "text": "以安全封包層協定(SSL)VPN提供高度安全網路存取,以達到遠端存取連線特性與效益。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.5",
+                "text": "以動態虛擬通道介面(DVTI)建置VPN伺服器,在虛擬通道介面上建立虛擬存取介面。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.6",
+                "text": "建置與驗證VPN遠端以便能以路由器及VPN軟體用戶端建立站對站連線。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.7",
+                "text": "執行群組加密傳輸(GET)VPN特性來簡化VPN的供應與管理。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.8",
+                "text": "製作VPN建置與管理文件。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E04-T03",
+        "work": "日誌警示監控調查與授權變更",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在公司的資訊單位處理網路防護，根據核准需求設定防火牆規則、網段隔離與遠端連線權限，變更前備份和測試，記錄改了什麼，失敗時回復。每天看防護設備和端點的警示，核對來源位址、時間與帳號，找出需要調查的項目。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T3.4",
+            "task_name": [
+              {
+                "code": "T3.4",
+                "name": "監控與維運系統安全",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.4.1",
+                "text": "運用第三方監控軟體,設定關鍵安全指標並即時監控網路安全。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.4.2",
+                "text": "運用威脅情報與行為分析技術,主動搜尋潛在進階持續性威脅,並透過機器學習演算法分析安全日誌,識別異常行為模式。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.4.3",
+                "text": "針對發現的威脅事件進行根因分析,建立完整的事件時間軸與影響評估報告。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.4.4",
+                "text": "針對相關配置與設定的變更需求,建立變更程序,並取得適當授權。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.4.5",
+                "text": "實施最小權限原則與即時存取控制,並建立身份治理與管理流程,定期執行存取權限審查與認證。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E04-T04",
+        "work": "資安事件範圍確認及核准圍堵",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "疑似入侵時我收集日誌、比對網路流量和受影響主機，確認範圍，依既定通報流程通知主管。經授權後隔離主機或封鎖連線，整理事件紀錄與後續改善；是否停機由主管和業務單位決定。每月檢查弱點掃描結果，與系統管理同事排修補時間，再確認修補生效。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T4.4",
+            "task_name": [
+              {
+                "code": "T4.4",
+                "name": "建立資安事件意外應變措施",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P4.4.1",
+                "text": "建立資安事件分類與分級處理機制,結合組織業務特性與風險承受度,分級調整與及應變流程。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.2",
+                "text": "制定事件初步分析與影響評估之標準程序,設計隔離、阻斷及修復機制。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.3",
+                "text": "依據事件類型與影響程度,執行圍堵措施,進行攻擊路徑分析與影響範圍確認。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.4",
+                "text": "執行威脅根除作業包含惡意程式清除、後門移除、弱點修補及配置強化。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.5",
+                "text": "制定系統復原優先順序與復原時程規劃,及執行資料復原、系統重建及服務恢復作業,並進行復原後的安全驗證與功能測試。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.6",
+                "text": "撰寫資安意外處理執行記錄、復原作業報告及驗證測試文件等安全事故報告。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.7",
+                "text": "建立事件後分析與持續改善機制,制定預防性安全措施與監控強化方案。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E04-T05",
+        "work": "弱點修補與驗證",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "疑似入侵時我收集日誌、比對網路流量和受影響主機，確認範圍，依既定通報流程通知主管。經授權後隔離主機或封鎖連線，整理事件紀錄與後續改善；是否停機由主管和業務單位決定。每月檢查弱點掃描結果，與系統管理同事排修補時間，再確認修補生效。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T3.2",
+            "task_name": [
+              {
+                "code": "T3.2",
+                "name": "修正弱點與威脅",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.2.1",
+                "text": "根據安全風險建議文件,執行所需的網路安全等級。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.2",
+                "text": "執行安全性驗證。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.3",
+                "text": "確保資料完整性與傳輸。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E05",
+    "split": "regression",
+    "kind": "positive",
+    "domain": "hotel_housekeeping",
+    "employee_messages": [
+      "我在旅館依每日房況表整理客房，先確認能不能進房，按程序敲門再進入；住客還在或掛免打擾時回報，不直接進去。我換床單、鋪床，清潔浴室和地面、倒垃圾，補毛巾與盥洗備品，檢查房內用品數量與設備能否正常使用。",
+      "發現設備損壞會記錄房號和問題，交維修處理。清潔完依檢查表自查，再交督導查房，由督導確認可以賣房。我整理布巾與清潔車，清潔劑按規定稀釋並分開存放；遺留物依房號、時間登記送交指定櫃台，不自己帶走。",
+      "偶爾住客要多一條毛巾或枕頭，我送到房門交付並記錄。住客抱怨房間問題我回報督導，賠償與換房由櫃台決定。我只處理被分配的房間，不排整個部門班表、不採購所有物資，也沒有做接待櫃台的入住收款。"
+    ],
+    "grades": {
+      "THM9112-001v3": 3
+    },
+    "hard_negatives": [
+      "TTM1411-001v4"
+    ],
+    "rationale": "客房清潔、鋪床備品、自查與送督導查房；非房務經理。",
+    "boundary": "督導決定房間放行，櫃台決定賠償/換房；不管排班採購",
+    "original_split": "holdout",
+    "topics": [
+      {
+        "topic_id": "E05-T01",
+        "work": "客房清潔鋪床與準備",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在旅館依每日房況表整理客房，先確認能不能進房，按程序敲門再進入；住客還在或掛免打擾時回報，不直接進去。我換床單、鋪床，清潔浴室和地面、倒垃圾，補毛巾與盥洗備品，檢查房內用品數量與設備能否正常使用。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "客房清潔與準備",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "例行性客房清潔與保養所需用品及工具整備,均依相關整備規範進行,並完成紀錄表件與異常狀況簡易處理、報修與記錄(如:病蟲害、設備/設施異常及異味)。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "例行性住宿空間清潔與準備,能在不打擾顧客的前提下確實依顧客需求與客房整備規範進行相關工作,並完成各項清潔與保養紀錄。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E05-T02",
+        "work": "房間設備異常報修",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "發現設備損壞會記錄房號和問題，交維修處理。清潔完依檢查表自查，再交督導查房，由督導確認可以賣房。我整理布巾與清潔車，清潔劑按規定稀釋並分開存放；遺留物依房號、時間登記送交指定櫃台，不自己帶走。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "客房清潔與準備",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "例行性客房清潔與保養所需用品及工具整備,均依相關整備規範進行,並完成紀錄表件與異常狀況簡易處理、報修與記錄(如:病蟲害、設備/設施異常及異味)。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "例行性住宿空間清潔與準備,能在不打擾顧客的前提下確實依顧客需求與客房整備規範進行相關工作,並完成各項清潔與保養紀錄。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E05-T03",
+        "work": "遺留物登記交付",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "發現設備損壞會記錄房號和問題，交維修處理。清潔完依檢查表自查，再交督導查房，由督導確認可以賣房。我整理布巾與清潔車，清潔劑按規定稀釋並分開存放；遺留物依房號、時間登記送交指定櫃台，不自己帶走。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T1.3",
+            "task_name": [
+              {
+                "code": "T1.3",
+                "name": "遺留物處理",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.3.1",
+                "text": "顧客退房離開後,檢查客房是否有遺留物,並依作業規定進行回報與處理。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.2",
+                "text": "進行例行性公共區域清潔與保養時,能檢查是否有顧客遺留物品,並依作業規定進行回報與處理。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E05-T04",
+        "work": "送毛巾枕頭及客訴回報",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "偶爾住客要多一條毛巾或枕頭，我送到房門交付並記錄。住客抱怨房間問題我回報督導，賠償與換房由櫃台決定。我只處理被分配的房間，不排整個部門班表、不採購所有物資，也沒有做接待櫃台的入住收款。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "房務服務作業",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "進行客房服務時,能注意顧客對於房務項目或服務要求的細節,即時回應、處理、回報顧客服務需求,並依作業規定完成相關表件紀錄。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "顧客發生緊急及特殊狀況,能即時通報、尋求幫助並依作業規定提供適當協助以減輕或解決緊急及特殊狀況。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E05-T05",
+        "work": "備品整理補充",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在旅館依每日房況表整理客房，先確認能不能進房，按程序敲門再進入；住客還在或掛免打擾時回報，不直接進去。我換床單、鋪床，清潔浴室和地面、倒垃圾，補毛巾與盥洗備品，檢查房內用品數量與設備能否正常使用。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T3.1",
+            "task_name": [
+              {
+                "code": "T3.1",
+                "name": "客房備品盤點及整理",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.1.1",
+                "text": "進行客房備品盤點工作時,均能依作業規定領用、擺放備品及消耗客用品。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.1.2",
+                "text": "正確記錄其使用、遺失、破損情形,並完成例行性及定期盤點相關紀錄表件。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E06",
+    "split": "regression",
+    "kind": "positive",
+    "domain": "vegetable_nursery",
+    "employee_messages": [
+      "我在蔬菜苗場按生產單安排播種，確認種子批號、數量和穴盤，調配介質後裝盤，播種、覆蓋與澆水，標記品種、日期和批次。每天巡看發芽和苗的狀況，依育苗階段操作溫室的灌溉、通風與遮陰設備。",
+      "我查看感測器的溫度濕度與介質數值，和現場狀況核對；異常時先查是否感測器或管路故障，依核准範圍調整設定並記錄，超過範圍就通知負責人。發現病蟲害或苗長得不齊，分區隔離和記錄，不擅自增加藥量。出貨前篩選苗株、點數裝箱和標示批號，協助裝車。",
+      "我記錄發芽率、處理和出貨數量，清洗穴盤及育苗區域，維護澆水管線的日常操作。病蟲害用藥和大筆設備投資由負責人決定，我只依核准方式執行；不負責整個苗場的經營策略、合約定價或新感測系統研發。"
+    ],
+    "grades": {
+      "NAO6010-003v3": 3,
+      "NAO6010-004v3": 1
+    },
+    "hard_negatives": [
+      "NAO6010-004v3"
+    ],
+    "rationale": "蔬菜苗的生產與感測/環境控制、記錄出貨；非苗場經營管理。",
+    "boundary": "藥量、投資、策略和定價由負責人決定",
+    "original_split": "holdout",
+    "topics": [
+      {
+        "topic_id": "E06-T01",
+        "work": "穴盤種子準備與播種",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在蔬菜苗場按生產單安排播種，確認種子批號、數量和穴盤，調配介質後裝盤，播種、覆蓋與澆水，標記品種、日期和批次。每天巡看發芽和苗的狀況，依育苗階段操作溫室的灌溉、通風與遮陰設備。",
+        "support": [
+          {
+            "id": "NAO6010-003v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/蔬菜育苗智慧生產人員-職能基準.json",
+            "source_sha256": "c198e369babc2d1dfb360c66ebb6bc7e8fd8916848a7965eb13cbaa98393d038",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "種子處理與播種",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "能夠辨識及精選種子。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "操縱自動化播種機,進行穴盤裝填、種子供給。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.3",
+                "text": "瞭解播種機具工作原理,並能夠進行故障排除以及保養。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E06-T02",
+        "work": "育苗階段灌溉與苗況管理",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在蔬菜苗場按生產單安排播種，確認種子批號、數量和穴盤，調配介質後裝盤，播種、覆蓋與澆水，標記品種、日期和批次。每天巡看發芽和苗的狀況，依育苗階段操作溫室的灌溉、通風與遮陰設備。",
+        "support": [
+          {
+            "id": "NAO6010-003v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/蔬菜育苗智慧生產人員-職能基準.json",
+            "source_sha256": "c198e369babc2d1dfb360c66ebb6bc7e8fd8916848a7965eb13cbaa98393d038",
+            "task_code": "T1.3",
+            "task_name": [
+              {
+                "code": "T1.3",
+                "name": "掌握種苗生長狀態",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.3.1",
+                "text": "能夠判定優質種苗及巡檢溫室種苗生長情形,並淘汰異型株,提升產品品質與產量,確保生產良率,達成生產目標。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.2",
+                "text": "針對苗期的不同階段進行不同的水養分管理,並能夠判斷穴盤苗之生長狀況。",
+                "field_pending": null
+              },
+              {
+                "code": "P.1.3.3",
+                "text": "能夠判斷癒合室內作物苗生長需求,並操作癒合室系統,精準調整環境溫濕度。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.4",
+                "text": "將作物苗移出癒合室外後,能夠掌握作物苗馴化與健化階段的溫溼度控制與與水養分管理。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E06-T03",
+        "work": "環控設備操作及簡易異常處理",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我查看感測器的溫度濕度與介質數值，和現場狀況核對；異常時先查是否感測器或管路故障，依核准範圍調整設定並記錄，超過範圍就通知負責人。發現病蟲害或苗長得不齊，分區隔離和記錄，不擅自增加藥量。出貨前篩選苗株、點數裝箱和標示批號，協助裝車。",
+        "support": [
+          {
+            "id": "NAO6010-003v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/蔬菜育苗智慧生產人員-職能基準.json",
+            "source_sha256": "c198e369babc2d1dfb360c66ebb6bc7e8fd8916848a7965eb13cbaa98393d038",
+            "task_code": "T1.4",
+            "task_name": [
+              {
+                "code": "T1.4",
+                "name": "操作溫室設施\n與智慧化\n系統",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.4.1",
+                "text": "能夠操作及熟悉溫室環控設備運作,並能在設備異常時緊急排除簡易問題,或聯繫設備廠商進行檢視維修,安排定期設備保養作業,確保生產環控運作正常。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.4.2",
+                "text": "能夠操作多功能系統,全時監控生長時程,隨時精準調整營養管控與肥培管理。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.4.3",
+                "text": "能夠操作節能分析運算智慧化自動環控系統,以調節最適化之栽培環境條件。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.4.4",
+                "text": "能夠進行設備之智慧節能操作。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E06-T04",
+        "work": "環境數據紀錄",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我查看感測器的溫度濕度與介質數值，和現場狀況核對；異常時先查是否感測器或管路故障，依核准範圍調整設定並記錄，超過範圍就通知負責人。發現病蟲害或苗長得不齊，分區隔離和記錄，不擅自增加藥量。出貨前篩選苗株、點數裝箱和標示批號，協助裝車。",
+        "support": [
+          {
+            "id": "NAO6010-003v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/蔬菜育苗智慧生產人員-職能基準.json",
+            "source_sha256": "c198e369babc2d1dfb360c66ebb6bc7e8fd8916848a7965eb13cbaa98393d038",
+            "task_code": "T1.5",
+            "task_name": [
+              {
+                "code": "T1.5",
+                "name": "處理環境數據",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.5.1",
+                "text": "利用合適的檔案和/或應用程式來儲存與取得數據。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.5.2",
+                "text": "利用清楚的表格、圖表和/或簡單的地圖來呈現數據。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.5.3",
+                "text": "使用合適的單位與數據圖表來表現一系列的數據趨勢。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.5.4",
+                "text": "有邏輯的歸檔全部參考文件,並更新與安全保存。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E06-T05",
+        "work": "病蟲害辨認及通報",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我查看感測器的溫度濕度與介質數值，和現場狀況核對；異常時先查是否感測器或管路故障，依核准範圍調整設定並記錄，超過範圍就通知負責人。發現病蟲害或苗長得不齊，分區隔離和記錄，不擅自增加藥量。出貨前篩選苗株、點數裝箱和標示批號，協助裝車。",
+        "support": [
+          {
+            "id": "NAO6010-003v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/蔬菜育苗智慧生產人員-職能基準.json",
+            "source_sha256": "c198e369babc2d1dfb360c66ebb6bc7e8fd8916848a7965eb13cbaa98393d038",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "發現或分辨病蟲害種類",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "使用病蟲害影像辨識與監測技術提供施藥決策之依據,即早通報防治,以提升產品良率及維持產量。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E06-T06",
+        "work": "出貨包裝",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我查看感測器的溫度濕度與介質數值，和現場狀況核對；異常時先查是否感測器或管路故障，依核准範圍調整設定並記錄，超過範圍就通知負責人。發現病蟲害或苗長得不齊，分區隔離和記錄，不擅自增加藥量。出貨前篩選苗株、點數裝箱和標示批號，協助裝車。",
+        "support": [
+          {
+            "id": "NAO6010-003v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/蔬菜育苗智慧生產人員-職能基準.json",
+            "source_sha256": "c198e369babc2d1dfb360c66ebb6bc7e8fd8916848a7965eb13cbaa98393d038",
+            "task_code": "T3.2",
+            "task_name": [
+              {
+                "code": "T3.2",
+                "name": "規劃並確認產品的包裝作業",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.2.1",
+                "text": "能夠操作出貨系統,依照出貨條件要求,進行產品相關包裝作業。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E07",
+    "split": "regression",
+    "kind": "positive",
+    "domain": "welding",
+    "employee_messages": [
+      "我在金屬製造廠依圖面和作業卡組裝銲接零件，先確認材料、接合位置和尺寸，清理接合面、開槽，放進治具定位，檢查間隙後點固。我會按材料厚度和核准作業條件選銲材、設定電流及保護氣體。",
+      "我操作銲機完成接合，控制順序減少變形，清除熔渣並做外觀和尺寸檢查，發現缺陷就隔離回報；經核准後重工，再送品管確認。要做非破壞檢測的件由品管安排，我不自己簽最終檢測判定。銲接區要確保通風、遮光、防火，開工前檢查設備與防護用具。",
+      "我記录使用材料、機台條件和完成數量，收工檢查設備、整理銲材及工具。特殊材料超出作業卡範圍時請工程人員確認，不自行建立新的銲接程序。我不設計整台機械、安排全廠的檢驗制度或管理整個班組。"
+    ],
+    "grades": {
+      "MPM7212-001v3": 3,
+      "MPM7212-002v3": 1,
+      "MPM2144-001v4": 1
+    },
+    "hard_negatives": [
+      "MPM2144-001v4"
+    ],
+    "rationale": "實作備料定位銲接、作業設定及自檢；機械銲接職位亦含實作，更廣設備製造與設計責任未確認。",
+    "boundary": "品管最終檢測、工程負責新程序；本人只在核准範圍施工",
+    "original_split": "holdout",
+    "topics": [
+      {
+        "topic_id": "E07-T01",
+        "work": "工具材料與安全準備",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在金屬製造廠依圖面和作業卡組裝銲接零件，先確認材料、接合位置和尺寸，清理接合面、開槽，放進治具定位，檢查間隙後點固。我會按材料厚度和核准作業條件選銲材、設定電流及保護氣體。",
+        "support": [
+          {
+            "id": "MPM7212-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/銲接技術人員-職能基準.json",
+            "source_sha256": "ebecc91f3f70fd2725b1687e1a3bf84b420a52ca966fff7552645f894b8fe139",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "準備銲接器(機)具及材料",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "遵照職業安全衛生相關規範、法規要求標準及組織規範,進行前置作業及整理銲接作業所需環境。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "依銲接作業準備所需器(機)具及夾治具。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.3",
+                "text": "依施工(圖)與銲接程序規範準備所需母材及銲材。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E07-T02",
+        "work": "清理接合面與銲前處理",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在金屬製造廠依圖面和作業卡組裝銲接零件，先確認材料、接合位置和尺寸，清理接合面、開槽，放進治具定位，檢查間隙後點固。我會按材料厚度和核准作業條件選銲材、設定電流及保護氣體。",
+        "support": [
+          {
+            "id": "MPM7212-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/銲接技術人員-職能基準.json",
+            "source_sha256": "ebecc91f3f70fd2725b1687e1a3bf84b420a52ca966fff7552645f894b8fe139",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "銲接前處理作業",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "依銲接程序規範,確認板(管)銲接之銲接方法、接頭型式、銲接姿勢或位置、銲接順序及銲接要求。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.2",
+                "text": "清潔銲接處之油污及鐵銹。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.3",
+                "text": "使用銼刀銼削或砂輪機研磨試板(管)銲接處。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E07-T03",
+        "work": "參數銲材定位與銲接",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在金屬製造廠依圖面和作業卡組裝銲接零件，先確認材料、接合位置和尺寸，清理接合面、開槽，放進治具定位，檢查間隙後點固。我會按材料厚度和核准作業條件選銲材、設定電流及保護氣體。",
+        "support": [
+          {
+            "id": "MPM7212-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/銲接技術人員-職能基準.json",
+            "source_sha256": "ebecc91f3f70fd2725b1687e1a3bf84b420a52ca966fff7552645f894b8fe139",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "執行銲接施工",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "遵照職業安全衛生相關規範,選用及穿戴安全衛生護具執行銲接工作。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "依作業需要調整銲接參數。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.3",
+                "text": "配合施工材料選用遮護氣體。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.4",
+                "text": "按施工作業將試板(管)暫銲。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.5",
+                "text": "依平銲、橫銲、立銲、仰銲、管軸銲與角銲等位置完成銲接工作。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.6",
+                "text": "依作業規範防止與改善銲接缺陷。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E07-T04",
+        "work": "清除熔渣外觀及變形自檢",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我操作銲機完成接合，控制順序減少變形，清除熔渣並做外觀和尺寸檢查，發現缺陷就隔離回報；經核准後重工，再送品管確認。要做非破壞檢測的件由品管安排，我不自己簽最終檢測判定。銲接區要確保通風、遮光、防火，開工前檢查設備與防護用具。",
+        "support": [
+          {
+            "id": "MPM7212-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/銲接技術人員-職能基準.json",
+            "source_sha256": "ebecc91f3f70fd2725b1687e1a3bf84b420a52ca966fff7552645f894b8fe139",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "清潔銲道及檢驗",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "以適當工具及方法清除銲道之銲渣。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.2",
+                "text": "進行目視檢查銲道表面、背面與試板(管)變形角度以符合銲接要求。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.3",
+                "text": "能掌握銲接破壞性與非破壞性檢驗之要求標準,以符合銲接品質。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E07-T05",
+        "work": "設備簡易維護及紀錄",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "我記录使用材料、機台條件和完成數量，收工檢查設備、整理銲材及工具。特殊材料超出作業卡範圍時請工程人員確認，不自行建立新的銲接程序。我不設計整台機械、安排全廠的檢驗制度或管理整個班組。",
+        "support": [
+          {
+            "id": "MPM7212-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/銲接技術人員-職能基準.json",
+            "source_sha256": "ebecc91f3f70fd2725b1687e1a3bf84b420a52ca966fff7552645f894b8fe139",
+            "task_code": "T2.3",
+            "task_name": [
+              {
+                "code": "T2.3",
+                "name": "器(機)具簡易維護",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.3.1",
+                "text": "依據維護手冊,進行相關器(機)具維護作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.2",
+                "text": "填寫器(機)具維護紀錄",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E08",
+    "split": "regression",
+    "kind": "positive",
+    "domain": "pet_grooming",
+    "employee_messages": [
+      "我在寵物美容店接手已預約的犬貓，先和飼主確認清潔修剪需求，觀察皮膚、毛況和行為；發現明顯傷口或不適會先告知飼主，建議就醫，不把美容當治療。我依動物體型和毛質選工具、清潔用品，梳理打結處，洗澡沖淨並吹乾。",
+      "我自己修剪指甲、清潔耳部表面，依約定造型剪毛或用電剪，操作時安撫、固定動物，留意緊張反應避免受傷。超出能安全控制的情況會停止、聯絡飼主或負責人，不硬做。完成後檢查毛髮和皮膚、整理前後紀錄，再向飼主說明狀況和居家清潔提醒。",
+      "每天按規定清潔消毒工具、桌面與工作區域，記錄耗材缺口。我偶爾示範洗澡吹乾給新人看，但不負責整間店排班和人事。沒有施打藥物、診斷疾病或進行寵物繁殖；營養處方也不由我決定。"
+    ],
+    "grades": {
+      "PIC5193-001v3": 3,
+      "PIC5193-002v3": 1
+    },
+    "hard_negatives": [
+      "PIC5193-006v1"
+    ],
+    "rationale": "本人獨立犬貓清潔、修剪造型、需求確認與交付；非只做基礎照顧或醫療。",
+    "boundary": "美容不診斷/治療，不打藥；無人事排班責任",
+    "original_split": "holdout",
+    "topics": [
+      {
+        "topic_id": "E08-T01",
+        "work": "需求毛況確認及清潔美容",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在寵物美容店接手已預約的犬貓，先和飼主確認清潔修剪需求，觀察皮膚、毛況和行為；發現明顯傷口或不適會先告知飼主，建議就醫，不把美容當治療。我依動物體型和毛質選工具、清潔用品，梳理打結處，洗澡沖淨並吹乾。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "進行寵物清潔美容工作",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "與飼主確認寵物基本狀況【註1】及美容服務項目【註2】。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "檢視寵物全身狀況,並視需要進行記錄及告知顧客。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.3",
+                "text": "進行寵物美容前,選用與執行適當的保定動作【註3】。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.4",
+                "text": "依飼主需求,進行寵物基本美容【註4】。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.5",
+                "text": "視寵物行為運用適切操作方式,避免對寵物造成傷害及強化美容專業人員自我安全防護措施及職業傷害。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.6",
+                "text": "完成工作紀錄,並視需要記錄寵物異常狀況【註5】及告知飼主。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E08-T02",
+        "work": "安全保定與造型修剪",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我自己修剪指甲、清潔耳部表面，依約定造型剪毛或用電剪，操作時安撫、固定動物，留意緊張反應避免受傷。超出能安全控制的情況會停止、聯絡飼主或負責人，不硬做。完成後檢查毛髮和皮膚、整理前後紀錄，再向飼主說明狀況和居家清潔提醒。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "進行寵物造型",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "進行寵物造型前,執行適當的保定動作。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.2",
+                "text": "依飼主需求,維持原造型或提供新造型設計【註7】。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.3",
+                "text": "視寵物行為運用適切操作方式,以避免造成寵物傷害或操作人員之意外及職業傷害。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.4",
+                "text": "完成工作紀錄,並視需要記錄寵物異常狀況及告知顧客。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E08-T03",
+        "work": "異常辨識停工告知與轉介",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在寵物美容店接手已預約的犬貓，先和飼主確認清潔修剪需求，觀察皮膚、毛況和行為；發現明顯傷口或不適會先告知飼主，建議就醫，不把美容當治療。我依動物體型和毛質選工具、清潔用品，梳理打結處，洗澡沖淨並吹乾。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T1.4",
+            "task_name": [
+              {
+                "code": "T1.4",
+                "name": "處理異常狀況",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.4.1",
+                "text": "觀察寵物行為與狀況,進行問題處理。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.4.2",
+                "text": "辨別寵物異常狀況,並通知顧客,同時視需要轉介醫院。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.4.3",
+                "text": "記錄異常狀況及處理結果。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E08-T04",
+        "work": "工具環境清潔消毒",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "每天按規定清潔消毒工具、桌面與工作區域，記錄耗材缺口。我偶爾示範洗澡吹乾給新人看，但不負責整間店排班和人事。沒有施打藥物、診斷疾病或進行寵物繁殖；營養處方也不由我決定。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T1.3",
+            "task_name": [
+              {
+                "code": "T1.3",
+                "name": "維護工作環境",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.3.1",
+                "text": "辨別與選用適切的清潔用品進行消毒及除臭作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.2",
+                "text": "完成寵物美容工作後,進行相關設備與工具【註8】清潔、消毒及保養作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.3",
+                "text": "定期維護環境與相關設備。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "E08-T05",
+        "work": "居家照顧提醒",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我自己修剪指甲、清潔耳部表面，依約定造型剪毛或用電剪，操作時安撫、固定動物，留意緊張反應避免受傷。超出能安全控制的情況會停止、聯絡飼主或負責人，不硬做。完成後檢查毛髮和皮膚、整理前後紀錄，再向飼主說明狀況和居家清潔提醒。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "門市服務",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "依門市業務,提供接待服務。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.2",
+                "text": "提供寵物居家照顧相關諮詢服務。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.3",
+                "text": "依門市業務項目銷售寵物商品【註9】。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E09",
+    "split": "regression",
+    "kind": "insufficient",
+    "domain": "unknown_a",
+    "employee_messages": [
+      "我每天處理一些公司的事情，會看資料和回覆訊息。",
+      "主管有交代就處理，完成會跟他說。資料內容是什麼我現在不想講，也沒有說明怎麼做。",
+      "不知道成果要叫什麼，使用的系統和決定權先不回答。沒有其他具體工作內容可以補充。"
+    ],
+    "grades": {},
+    "hard_negatives": [],
+    "rationale": "只有泛用處理/資料/回覆，缺工作對象、本人行動及成果，不能確認主要職位。",
+    "boundary": "未知不可補成具體職責",
+    "original_split": "development",
+    "topics": [],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E10",
+    "split": "regression",
+    "kind": "insufficient",
+    "domain": "unknown_b",
+    "employee_messages": [
+      "大家一起處理產品相關工作，有人設計、有人製作、有人服務客戶。",
+      "我會參加會議，聽大家說進度；剛才列的都是團隊事情，哪一項是我自己做的還沒說。",
+      "我目前只肯說自己也在團隊裡，具體負責對象、產出、頻率和決定範圍都還不確定。"
+    ],
+    "grades": {},
+    "hard_negatives": [],
+    "rationale": "團隊業務未分出本人職責；不能把大家的工作全部算本人。",
+    "boundary": "團隊工作不等於本人已確認的工作",
+    "original_split": "development",
+    "topics": [],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E11",
+    "split": "regression",
+    "kind": "out_of_corpus",
+    "domain": "astronomy_research",
+    "employee_messages": [
+      "我在大學研究團隊分析宇宙微波背景觀測資料，校正儀器系統誤差，按觀測頻段建立天空信號與前景污染的分離模型。",
+      "我寫科學計算程式估計角功率譜，用模擬資料檢驗估計偏差及不確定性，比較不同宇宙學參數下的預測；把模型與結果提交研究討論。",
+      "我整理分析方法和圖表投稿學術論文，同行對方法有疑問時重做分析。沒有開發企業業務網站、營運資訊系統或財務投資模型，也不從事商業產品的銷售。"
+    ],
+    "grades": {},
+    "hard_negatives": [],
+    "rationale": "公版805標題與範圍檢查沒有天文/宇宙學研究主要職位；科學程式不等於一般軟體職位已足以代表整體工作。",
+    "boundary": "工作明確但沒有適當主要公版標準",
+    "original_split": "development",
+    "topics": [],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E12",
+    "split": "regression",
+    "kind": "insufficient",
+    "domain": "unknown_c",
+    "employee_messages": [
+      "我負責整理報表、安排事情和追進度，偶爾也要做檢查。",
+      "報表紀錄的對象還沒有說明，安排的是哪類事情也沒说；如何檢查和判斷我先不回答。",
+      "我會把成果交給主管，但成果內容、我能決定到哪裡、具體流程和是否有固定時段都尚未確認。"
+    ],
+    "grades": {},
+    "hard_negatives": [],
+    "rationale": "通用詞彙可匹配多職位，資訊不足，不能確認整體主要工作。",
+    "boundary": "不能由報表/安排/檢查詞彙推定職位",
+    "original_split": "holdout",
+    "topics": [],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E13",
+    "split": "regression",
+    "kind": "insufficient",
+    "domain": "unknown_d",
+    "employee_messages": [
+      "以前做過別的工作，現在換了部門，具體要做什麼還沒確定。",
+      "主管可能讓我接觸系統或客戶，但那是未來可能的分派，目前還沒有開始，也沒確認範圍。",
+      "目前只能說我剛轉調，沒有已實際執行的工作細節可回答，先不要把可能的分派寫成現在的責任。"
+    ],
+    "grades": {},
+    "hard_negatives": [],
+    "rationale": "只有轉調與未確認的未來工作，無現行可用責任證據。",
+    "boundary": "未來可能不等於現在實際工作",
+    "original_split": "holdout",
+    "topics": [],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "E14",
+    "split": "regression",
+    "kind": "out_of_corpus",
+    "domain": "ancient_language_research",
+    "employee_messages": [
+      "我研究古代泥板上的文字，依拓片與高解析照片辨認字形，轉寫並比較不同時期字形變化。",
+      "我對照已出土的文字資料，分析文法和詞义，遇到缺損會標記無法確定的讀法；用語料統計檢查候選解讀，提出不同解釋和證據。",
+      "我寫學術論文、整理校勘表和釋讀說明，不負責博物館展覽策劃、文物修復施工、商業文件翻譯或文字設計。研究對象是古代文獻語言，沒有以上工作分工。"
+    ],
+    "grades": {},
+    "hard_negatives": [],
+    "rationale": "公版805沒有古代語言/文獻釋讀研究主要職位；不把資料分析或文字整理的共同詞當完整職位。",
+    "boundary": "範圍明確；非展覽策劃/文物修復/商業翻譯",
+    "original_split": "holdout",
+    "topics": [],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels."
+  },
+  {
+    "case_id": "M01",
+    "split": "development",
+    "kind": "positive",
+    "domain": "mixed_vehicle_repair",
+    "employee_messages": [
+      "我在小客車維修廠處理已派給我的車，不負責接待報價。先看工單和車主描述，做道路試車及掃描故障碼，再量測找原因，不能只按故障碼直接換零件。我檢查煞車、轉向、懸吊和引擎的運作，把檢查結果及需要的材料告訴接待，客戶同意報價後才施工。",
+      "我自己拆裝、更換和調整故障的機件，依維修資料確認鎖緊扭力與裝配位置；完成後重做功能檢查和試車，把量測與更換紀錄寫在工單。需要別的專業或找不到原因時，交技術主管協助，不自行擴大施工。例行換油、濾芯和保養檢查也由我做；工單交接時說明仍需處理的問題。",
+      "我每天收工前把工具歸位，處理廢油與拆下的耗材。主管決定工作的派發與最終放行，我不帶整個團隊也不制定廠內品質制度。偶爾教新人使用扭力扳手，是示範操作，不負責人事考核。進廠的都是一般小客車，沒有大型貨車，也沒有修車身鈑金或噴漆。",
+      "每週我另外處理車廠零件的請購，先核對規格、數量與需要日期，向供應商要報價，比較價格、交期與過去品質，提出選擇理由。主管核准後我開訂單、追未到貨交期；收到材料的點收由倉庫同事做，我不自行決定替代零件。"
+    ],
+    "grades": {
+      "SET7231-002v3": 3,
+      "MEM7231-003v4": 2,
+      "MEM7231-004v4": 2,
+      "SET7231-001v3": 1,
+      "BAS3323-001v4": 2
+    },
+    "hard_negatives": [
+      "SET7231-003v3",
+      "MEM7231-006v4",
+      "MEM7213-001v2"
+    ],
+    "rationale": "混合合成工作；採購／零售倉儲標準只作局部任務參考，不推定兼任整份職位。",
+    "boundary": "不負責報價、最終放行、鈑金噴漆、人事考核",
+    "original_split": null,
+    "topics": [
+      {
+        "topic_id": "M01-T01",
+        "work": "診斷小客車故障",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在小客車維修廠處理已派給我的車，不負責接待報價。先看工單和車主描述，做道路試車及掃描故障碼，再量測找原因，不能只按故障碼直接換零件。我檢查煞車、轉向、懸吊和引擎的運作，把檢查結果及需要的材料告訴接待，客戶同意報價後才施工。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "判別修理維護問題及報價",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "依客戶反映及目視檢查發現問題,與客戶溝通問題及車況,或配合保險理賠作業,確認汽車修理維護【註3】項目。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "使用相關機具、設備及儀器檢驗車體狀況,並依異常狀況判斷故障原因。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.3",
+                "text": "依檢驗結果與所需維修項目,預估工時、維修所需物料及填寫維修報價單。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M01-T02",
+        "work": "拆裝修護機件並復驗",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我自己拆裝、更換和調整故障的機件，依維修資料確認鎖緊扭力與裝配位置；完成後重做功能檢查和試車，把量測與更換紀錄寫在工單。需要別的專業或找不到原因時，交技術主管協助，不自行擴大施工。例行換油、濾芯和保養檢查也由我做；工單交接時說明仍需處理的問題。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "修護引擎設備及零組件",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,檢查、標註及記錄故障或須維修狀況。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.2",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,準備零組件,並選用正確的工具及設備。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.3",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,更換、調整、校正、局部修理或大修引擎設備、零組件與性能。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.4",
+                "text": "進行最終檢查及測試,並完成維修工作紀錄,以確保工作符合品質標準。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M01-T03",
+        "work": "底盤煞車轉向懸吊檢查修護",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在小客車維修廠處理已派給我的車，不負責接待報價。先看工單和車主描述，做道路試車及掃描故障碼，再量測找原因，不能只按故障碼直接換零件。我檢查煞車、轉向、懸吊和引擎的運作，把檢查結果及需要的材料告訴接待，客戶同意報價後才施工。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T2.4",
+            "task_name": [
+              {
+                "code": "T2.4",
+                "name": "修護底盤",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.4.1",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,檢查、標註及記錄故障或須維修狀況。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.4.2",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,準備零組件,並選用正確的工具及設備。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.4.3",
+                "text": "依客戶確認修護項目、組織工作安全手冊與原廠汽車修護手冊,更換、調整、校正、局部修理或大修底盤構件及性能。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.4.4",
+                "text": "進行最終檢查及測試,並完成維修工作紀錄,以確保工作符合品質標準。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M01-T04",
+        "work": "例行保養",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我自己拆裝、更換和調整故障的機件，依維修資料確認鎖緊扭力與裝配位置；完成後重做功能檢查和試車，把量測與更換紀錄寫在工單。需要別的專業或找不到原因時，交技術主管協助，不自行擴大施工。例行換油、濾芯和保養檢查也由我做；工單交接時說明仍需處理的問題。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "保養汽車",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "依客戶確認後保養項目及汽車修護手冊,再次確認並記錄保養前車況。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.2",
+                "text": "進行及確認五保前置作業(註)。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.3",
+                "text": "依組織工作安全手冊、原廠汽車修護手冊及定期保養紀錄表,指導或執行定期保養項目及完成定期保養紀錄。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M01-T05",
+        "work": "廢油工具與工作區維護",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "我每天收工前把工具歸位，處理廢油與拆下的耗材。主管決定工作的派發與最終放行，我不帶整個團隊也不制定廠內品質制度。偶爾教新人使用扭力扳手，是示範操作，不負責人事考核。進廠的都是一般小客車，沒有大型貨車，也沒有修車身鈑金或噴漆。",
+        "support": [
+          {
+            "id": "SET7231-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/小型汽車維修廠技術人員-職能基準.json",
+            "source_sha256": "fef3668a7309813009ebaac701d8292d840c843e18edb8e14cb9547a1238a1fe",
+            "task_code": "T3.2",
+            "task_name": [
+              {
+                "code": "T3.2",
+                "name": "工作場所維護及庫存管理",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.2.1",
+                "text": "指導或執行庫存材料、機具設備、廢料處理及管理等工作。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.2",
+                "text": "指導或執行維修機具與設備之清潔、潤滑、保養及調校等工作。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.3",
+                "text": "指導或執行適當處置有害氣體、有害液體(如廢油處理),並對噪音作適當防護(如戴耳塞等)。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M01-T06",
+        "work": "每週零件詢比價下單與催貨",
+        "secondary": true,
+        "employee_message": 4,
+        "employee_quote": "每週我另外處理車廠零件的請購，先核對規格、數量與需要日期，向供應商要報價，比較價格、交期與過去品質，提出選擇理由。主管核准後我開訂單、追未到貨交期；收到材料的點收由倉庫同事做，我不自行決定替代零件。",
+        "support": [
+          {
+            "id": "BAS3323-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/採購人員-職能基準.json",
+            "source_sha256": "9218b6491f538956fd48e1d993e580e5bf3afbe2cb46088276468e7c0164c294",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "執行採購案",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.2",
+                "text": "依議價結果,進行下單及協助簽約作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.3",
+                "text": "將詢價結果及供應商資料建檔,以利後續採購參考。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels.",
+    "derived_from": "E01"
+  },
+  {
+    "case_id": "M02",
+    "split": "holdout",
+    "kind": "positive",
+    "domain": "mixed_security_operations",
+    "employee_messages": [
+      "我在公司的資訊單位處理網路防護，根據核准需求設定防火牆規則、網段隔離與遠端連線權限，變更前備份和測試，記錄改了什麼，失敗時回復。每天看防護設備和端點的警示，核對來源位址、時間與帳號，找出需要調查的項目。",
+      "疑似入侵時我收集日誌、比對網路流量和受影響主機，確認範圍，依既定通報流程通知主管。經授權後隔離主機或封鎖連線，整理事件紀錄與後續改善；是否停機由主管和業務單位決定。每月檢查弱點掃描結果，與系統管理同事排修補時間，再確認修補生效。",
+      "我維護設備與帳號權限的操作紀錄，協助同事查防護設定，偶爾示範辨認可疑郵件。我不是對外受委託的滲透測試人員，不制定公司的資安管理政策，也不決定所有人的權限；只執行已核准的調整。這些工作服務公司自己內部的辦公網路與伺服器。",
+      "每個月我還負責資訊設備的採買執行，核對同事核准的規格、數量和預算，蒐集廠商價格與交貨期限並製作比較資料，交主管決定供應商。決定後由我向廠商下單、追交期，驗收由提出需求的人確認；我不決定全公司採購政策。"
+    ],
+    "grades": {
+      "INM3513-001v4": 3,
+      "INM2529-001v3": 2,
+      "INM2529-003v2": 1,
+      "BAS3323-001v4": 2
+    },
+    "hard_negatives": [
+      "INM2529-002v2",
+      "INM2529-003v2"
+    ],
+    "rationale": "混合合成工作；採購／零售倉儲標準只作局部任務參考，不推定兼任整份職位。",
+    "boundary": "已授權才隔離/改權限；不負責制定政策或對外滲透測試",
+    "original_split": null,
+    "topics": [
+      {
+        "topic_id": "M02-T01",
+        "work": "防火牆與網路防禦設定",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在公司的資訊單位處理網路防護，根據核准需求設定防火牆規則、網段隔離與遠端連線權限，變更前備份和測試，記錄改了什麼，失敗時回復。每天看防護設備和端點的警示，核對來源位址、時間與帳號，找出需要調查的項目。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "配置網路防禦系統",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "評估路由器及入侵偵測防禦系統特性進階能力,納入網路資源之威脅事件即時處理。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.2",
+                "text": "配置並確認入侵偵測防禦系統特性以找出威脅,並以動態方式阻止其進入網路。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.3",
+                "text": "維持、更新與微調入侵偵測防禦系統佈署。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.4",
+                "text": "配置與驗證以背景為基礎之存取控制(CBAC)以及網路位址轉譯(NAT)以減少網路威脅。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.5",
+                "text": "配置與驗證防火牆來納入新進應用程式檢查並通知統一資源標識符(URI)過濾,以達到網路安全的提升。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.6",
+                "text": "利用路由器功能來取得管理、資料與控制資訊。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M02-T02",
+        "work": "遠端VPN連線設定",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在公司的資訊單位處理網路防護，根據核准需求設定防火牆規則、網段隔離與遠端連線權限，變更前備份和測試，記錄改了什麼，失敗時回復。每天看防護設備和端點的警示，核對來源位址、時間與帳號，找出需要調查的項目。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T2.3",
+            "task_name": [
+              {
+                "code": "T2.3",
+                "name": "配置虛擬私有網路(VPN)",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.3.1",
+                "text": "分析並評估通訊協定安全性與通用路由協議封裝特性與功能性。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.2",
+                "text": "利用憑證授權設定站台對站台VPN之安全連線。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.3",
+                "text": "配置與驗證網站對網站VPN作業之安全連線。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.4",
+                "text": "以安全封包層協定(SSL)VPN提供高度安全網路存取,以達到遠端存取連線特性與效益。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.5",
+                "text": "以動態虛擬通道介面(DVTI)建置VPN伺服器,在虛擬通道介面上建立虛擬存取介面。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.6",
+                "text": "建置與驗證VPN遠端以便能以路由器及VPN軟體用戶端建立站對站連線。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.7",
+                "text": "執行群組加密傳輸(GET)VPN特性來簡化VPN的供應與管理。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.8",
+                "text": "製作VPN建置與管理文件。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M02-T03",
+        "work": "日誌警示監控調查與授權變更",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在公司的資訊單位處理網路防護，根據核准需求設定防火牆規則、網段隔離與遠端連線權限，變更前備份和測試，記錄改了什麼，失敗時回復。每天看防護設備和端點的警示，核對來源位址、時間與帳號，找出需要調查的項目。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T3.4",
+            "task_name": [
+              {
+                "code": "T3.4",
+                "name": "監控與維運系統安全",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.4.1",
+                "text": "運用第三方監控軟體,設定關鍵安全指標並即時監控網路安全。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.4.2",
+                "text": "運用威脅情報與行為分析技術,主動搜尋潛在進階持續性威脅,並透過機器學習演算法分析安全日誌,識別異常行為模式。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.4.3",
+                "text": "針對發現的威脅事件進行根因分析,建立完整的事件時間軸與影響評估報告。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.4.4",
+                "text": "針對相關配置與設定的變更需求,建立變更程序,並取得適當授權。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.4.5",
+                "text": "實施最小權限原則與即時存取控制,並建立身份治理與管理流程,定期執行存取權限審查與認證。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M02-T04",
+        "work": "資安事件範圍確認及核准圍堵",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "疑似入侵時我收集日誌、比對網路流量和受影響主機，確認範圍，依既定通報流程通知主管。經授權後隔離主機或封鎖連線，整理事件紀錄與後續改善；是否停機由主管和業務單位決定。每月檢查弱點掃描結果，與系統管理同事排修補時間，再確認修補生效。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T4.4",
+            "task_name": [
+              {
+                "code": "T4.4",
+                "name": "建立資安事件意外應變措施",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P4.4.1",
+                "text": "建立資安事件分類與分級處理機制,結合組織業務特性與風險承受度,分級調整與及應變流程。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.2",
+                "text": "制定事件初步分析與影響評估之標準程序,設計隔離、阻斷及修復機制。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.3",
+                "text": "依據事件類型與影響程度,執行圍堵措施,進行攻擊路徑分析與影響範圍確認。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.4",
+                "text": "執行威脅根除作業包含惡意程式清除、後門移除、弱點修補及配置強化。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.5",
+                "text": "制定系統復原優先順序與復原時程規劃,及執行資料復原、系統重建及服務恢復作業,並進行復原後的安全驗證與功能測試。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.6",
+                "text": "撰寫資安意外處理執行記錄、復原作業報告及驗證測試文件等安全事故報告。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.4.7",
+                "text": "建立事件後分析與持續改善機制,制定預防性安全措施與監控強化方案。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M02-T05",
+        "work": "弱點修補與驗證",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "疑似入侵時我收集日誌、比對網路流量和受影響主機，確認範圍，依既定通報流程通知主管。經授權後隔離主機或封鎖連線，整理事件紀錄與後續改善；是否停機由主管和業務單位決定。每月檢查弱點掃描結果，與系統管理同事排修補時間，再確認修補生效。",
+        "support": [
+          {
+            "id": "INM3513-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/網路資訊安全人員-職能基準.json",
+            "source_sha256": "fdcd5f66fcc724c5193f63b18755d3344e7240ff32d157c97f077ef0ca93a772",
+            "task_code": "T3.2",
+            "task_name": [
+              {
+                "code": "T3.2",
+                "name": "修正弱點與威脅",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.2.1",
+                "text": "根據安全風險建議文件,執行所需的網路安全等級。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.2",
+                "text": "執行安全性驗證。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.3",
+                "text": "確保資料完整性與傳輸。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M02-T06",
+        "work": "每月設備詢比價下單與交期追蹤",
+        "secondary": true,
+        "employee_message": 4,
+        "employee_quote": "每個月我還負責資訊設備的採買執行，核對同事核准的規格、數量和預算，蒐集廠商價格與交貨期限並製作比較資料，交主管決定供應商。決定後由我向廠商下單、追交期，驗收由提出需求的人確認；我不決定全公司採購政策。",
+        "support": [
+          {
+            "id": "BAS3323-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/採購人員-職能基準.json",
+            "source_sha256": "9218b6491f538956fd48e1d993e580e5bf3afbe2cb46088276468e7c0164c294",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "執行採購案",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.2",
+                "text": "依議價結果,進行下單及協助簽約作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.3",
+                "text": "將詢價結果及供應商資料建檔,以利後續採購參考。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels.",
+    "derived_from": "E04"
+  },
+  {
+    "case_id": "M03",
+    "split": "development",
+    "kind": "positive",
+    "domain": "mixed_hotel_housekeeping",
+    "employee_messages": [
+      "我在旅館依每日房況表整理客房，先確認能不能進房，按程序敲門再進入；住客還在或掛免打擾時回報，不直接進去。我換床單、鋪床，清潔浴室和地面、倒垃圾，補毛巾與盥洗備品，檢查房內用品數量與設備能否正常使用。",
+      "發現設備損壞會記錄房號和問題，交維修處理。清潔完依檢查表自查，再交督導查房，由督導確認可以賣房。我整理布巾與清潔車，清潔劑按規定稀釋並分開存放；遺留物依房號、時間登記送交指定櫃台，不自己帶走。",
+      "偶爾住客要多一條毛巾或枕頭，我送到房門交付並記錄。住客抱怨房間問題我回報督導，賠償與換房由櫃台決定。我只處理被分配的房間，不排整個部門班表、不採購所有物資，也沒有做接待櫃台的入住收款。",
+      "我每月另外輪值做備品庫房盤點，把儲位的實物和庫存清單逐項核對，記下品名、數量與差異，整理盤點差異表交庫房主管。帳面調整由主管核准，我不直接把差額改掉；這項工作和每天清潔客房分開做。"
+    ],
+    "grades": {
+      "THM9112-001v3": 3,
+      "MMP4321-003v4": 2
+    },
+    "hard_negatives": [
+      "TTM1411-001v4"
+    ],
+    "rationale": "混合合成工作；採購／零售倉儲標準只作局部任務參考，不推定兼任整份職位。",
+    "boundary": "督導決定房間放行，櫃台決定賠償/換房；不管排班採購",
+    "original_split": null,
+    "topics": [
+      {
+        "topic_id": "M03-T01",
+        "work": "客房清潔鋪床與準備",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在旅館依每日房況表整理客房，先確認能不能進房，按程序敲門再進入；住客還在或掛免打擾時回報，不直接進去。我換床單、鋪床，清潔浴室和地面、倒垃圾，補毛巾與盥洗備品，檢查房內用品數量與設備能否正常使用。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "客房清潔與準備",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "例行性客房清潔與保養所需用品及工具整備,均依相關整備規範進行,並完成紀錄表件與異常狀況簡易處理、報修與記錄(如:病蟲害、設備/設施異常及異味)。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "例行性住宿空間清潔與準備,能在不打擾顧客的前提下確實依顧客需求與客房整備規範進行相關工作,並完成各項清潔與保養紀錄。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M03-T02",
+        "work": "房間設備異常報修",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "發現設備損壞會記錄房號和問題，交維修處理。清潔完依檢查表自查，再交督導查房，由督導確認可以賣房。我整理布巾與清潔車，清潔劑按規定稀釋並分開存放；遺留物依房號、時間登記送交指定櫃台，不自己帶走。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "客房清潔與準備",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "例行性客房清潔與保養所需用品及工具整備,均依相關整備規範進行,並完成紀錄表件與異常狀況簡易處理、報修與記錄(如:病蟲害、設備/設施異常及異味)。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "例行性住宿空間清潔與準備,能在不打擾顧客的前提下確實依顧客需求與客房整備規範進行相關工作,並完成各項清潔與保養紀錄。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M03-T03",
+        "work": "遺留物登記交付",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "發現設備損壞會記錄房號和問題，交維修處理。清潔完依檢查表自查，再交督導查房，由督導確認可以賣房。我整理布巾與清潔車，清潔劑按規定稀釋並分開存放；遺留物依房號、時間登記送交指定櫃台，不自己帶走。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T1.3",
+            "task_name": [
+              {
+                "code": "T1.3",
+                "name": "遺留物處理",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.3.1",
+                "text": "顧客退房離開後,檢查客房是否有遺留物,並依作業規定進行回報與處理。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.2",
+                "text": "進行例行性公共區域清潔與保養時,能檢查是否有顧客遺留物品,並依作業規定進行回報與處理。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M03-T04",
+        "work": "送毛巾枕頭及客訴回報",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "偶爾住客要多一條毛巾或枕頭，我送到房門交付並記錄。住客抱怨房間問題我回報督導，賠償與換房由櫃台決定。我只處理被分配的房間，不排整個部門班表、不採購所有物資，也沒有做接待櫃台的入住收款。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "房務服務作業",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "進行客房服務時,能注意顧客對於房務項目或服務要求的細節,即時回應、處理、回報顧客服務需求,並依作業規定完成相關表件紀錄。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "顧客發生緊急及特殊狀況,能即時通報、尋求幫助並依作業規定提供適當協助以減輕或解決緊急及特殊狀況。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M03-T05",
+        "work": "備品整理補充",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在旅館依每日房況表整理客房，先確認能不能進房，按程序敲門再進入；住客還在或掛免打擾時回報，不直接進去。我換床單、鋪床，清潔浴室和地面、倒垃圾，補毛巾與盥洗備品，檢查房內用品數量與設備能否正常使用。",
+        "support": [
+          {
+            "id": "THM9112-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/房務人員-職能基準.json",
+            "source_sha256": "c904353ce8656940e3b2f58dd2bf8e4ed602ecf6c78b170f506bf078958b8b43",
+            "task_code": "T3.1",
+            "task_name": [
+              {
+                "code": "T3.1",
+                "name": "客房備品盤點及整理",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.1.1",
+                "text": "進行客房備品盤點工作時,均能依作業規定領用、擺放備品及消耗客用品。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.1.2",
+                "text": "正確記錄其使用、遺失、破損情形,並完成例行性及定期盤點相關紀錄表件。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M03-T06",
+        "work": "每月備品實物帳面盤點及差異回報",
+        "secondary": true,
+        "employee_message": 4,
+        "employee_quote": "我每月另外輪值做備品庫房盤點，把儲位的實物和庫存清單逐項核對，記下品名、數量與差異，整理盤點差異表交庫房主管。帳面調整由主管核准，我不直接把差額改掉；這項工作和每天清潔客房分開做。",
+        "support": [
+          {
+            "id": "MMP4321-003v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/零售業倉儲管理人員-職能基準.json",
+            "source_sha256": "d3b1676b18a4d93d8c75b4e54ae6d0f2085c30213b081611f834639b515ad82a",
+            "task_code": "T1.3",
+            "task_name": [
+              {
+                "code": "T1.3",
+                "name": "進行定期盤點",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.3.1",
+                "text": "依組織規範進行定期盤點或抽點。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.2",
+                "text": "編制倉儲差異分析報告。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.3",
+                "text": "確認及記錄盤點結果,完成盤點結果(異常)報告。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.4",
+                "text": "依據盤點結果(異常)狀況提出解決方案。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels.",
+    "derived_from": "E05"
+  },
+  {
+    "case_id": "M04",
+    "split": "holdout",
+    "kind": "positive",
+    "domain": "mixed_pet_grooming",
+    "employee_messages": [
+      "我在寵物美容店接手已預約的犬貓，先和飼主確認清潔修剪需求，觀察皮膚、毛況和行為；發現明顯傷口或不適會先告知飼主，建議就醫，不把美容當治療。我依動物體型和毛質選工具、清潔用品，梳理打結處，洗澡沖淨並吹乾。",
+      "我自己修剪指甲、清潔耳部表面，依約定造型剪毛或用電剪，操作時安撫、固定動物，留意緊張反應避免受傷。超出能安全控制的情況會停止、聯絡飼主或負責人，不硬做。完成後檢查毛髮和皮膚、整理前後紀錄，再向飼主說明狀況和居家清潔提醒。",
+      "每天按規定清潔消毒工具、桌面與工作區域，記錄耗材缺口。我偶爾示範洗澡吹乾給新人看，但不負責整間店排班和人事。沒有施打藥物、診斷疾病或進行寵物繁殖；營養處方也不由我決定。",
+      "每季我另外負責店內用品庫房的盤點，逐項清點洗劑、護毛用品和備用工具，核對庫存清單，整理短少與多出的数量並回報負責人。庫存資料的差額要核准才調整，我不自行把差異抹掉；平日美容後記耗材缺口不能代替這次完整盤點。"
+    ],
+    "grades": {
+      "PIC5193-001v3": 3,
+      "PIC5193-002v3": 1,
+      "MMP4321-003v4": 2
+    },
+    "hard_negatives": [
+      "PIC5193-006v1"
+    ],
+    "rationale": "混合合成工作；採購／零售倉儲標準只作局部任務參考，不推定兼任整份職位。",
+    "boundary": "美容不診斷/治療，不打藥；無人事排班責任",
+    "original_split": null,
+    "topics": [
+      {
+        "topic_id": "M04-T01",
+        "work": "需求毛況確認及清潔美容",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在寵物美容店接手已預約的犬貓，先和飼主確認清潔修剪需求，觀察皮膚、毛況和行為；發現明顯傷口或不適會先告知飼主，建議就醫，不把美容當治療。我依動物體型和毛質選工具、清潔用品，梳理打結處，洗澡沖淨並吹乾。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "進行寵物清潔美容工作",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "與飼主確認寵物基本狀況【註1】及美容服務項目【註2】。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "檢視寵物全身狀況,並視需要進行記錄及告知顧客。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.3",
+                "text": "進行寵物美容前,選用與執行適當的保定動作【註3】。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.4",
+                "text": "依飼主需求,進行寵物基本美容【註4】。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.5",
+                "text": "視寵物行為運用適切操作方式,避免對寵物造成傷害及強化美容專業人員自我安全防護措施及職業傷害。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.6",
+                "text": "完成工作紀錄,並視需要記錄寵物異常狀況【註5】及告知飼主。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M04-T02",
+        "work": "安全保定與造型修剪",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我自己修剪指甲、清潔耳部表面，依約定造型剪毛或用電剪，操作時安撫、固定動物，留意緊張反應避免受傷。超出能安全控制的情況會停止、聯絡飼主或負責人，不硬做。完成後檢查毛髮和皮膚、整理前後紀錄，再向飼主說明狀況和居家清潔提醒。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "進行寵物造型",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "進行寵物造型前,執行適當的保定動作。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.2",
+                "text": "依飼主需求,維持原造型或提供新造型設計【註7】。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.3",
+                "text": "視寵物行為運用適切操作方式,以避免造成寵物傷害或操作人員之意外及職業傷害。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.4",
+                "text": "完成工作紀錄,並視需要記錄寵物異常狀況及告知顧客。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M04-T03",
+        "work": "異常辨識停工告知與轉介",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我在寵物美容店接手已預約的犬貓，先和飼主確認清潔修剪需求，觀察皮膚、毛況和行為；發現明顯傷口或不適會先告知飼主，建議就醫，不把美容當治療。我依動物體型和毛質選工具、清潔用品，梳理打結處，洗澡沖淨並吹乾。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T1.4",
+            "task_name": [
+              {
+                "code": "T1.4",
+                "name": "處理異常狀況",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.4.1",
+                "text": "觀察寵物行為與狀況,進行問題處理。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.4.2",
+                "text": "辨別寵物異常狀況,並通知顧客,同時視需要轉介醫院。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.4.3",
+                "text": "記錄異常狀況及處理結果。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M04-T04",
+        "work": "工具環境清潔消毒",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "每天按規定清潔消毒工具、桌面與工作區域，記錄耗材缺口。我偶爾示範洗澡吹乾給新人看，但不負責整間店排班和人事。沒有施打藥物、診斷疾病或進行寵物繁殖；營養處方也不由我決定。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T1.3",
+            "task_name": [
+              {
+                "code": "T1.3",
+                "name": "維護工作環境",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.3.1",
+                "text": "辨別與選用適切的清潔用品進行消毒及除臭作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.2",
+                "text": "完成寵物美容工作後,進行相關設備與工具【註8】清潔、消毒及保養作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.3",
+                "text": "定期維護環境與相關設備。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M04-T05",
+        "work": "居家照顧提醒",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "我自己修剪指甲、清潔耳部表面，依約定造型剪毛或用電剪，操作時安撫、固定動物，留意緊張反應避免受傷。超出能安全控制的情況會停止、聯絡飼主或負責人，不硬做。完成後檢查毛髮和皮膚、整理前後紀錄，再向飼主說明狀況和居家清潔提醒。",
+        "support": [
+          {
+            "id": "PIC5193-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/寵物美容專業人員-職能基準.json",
+            "source_sha256": "7c19cf68d958b2422ad946afffd7239163d0b6ad7ad88f2dcd1bac3caf1f3574",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "門市服務",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "依門市業務,提供接待服務。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.2",
+                "text": "提供寵物居家照顧相關諮詢服務。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.3",
+                "text": "依門市業務項目銷售寵物商品【註9】。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic_id": "M04-T06",
+        "work": "每季用品庫房盤點與差異報告",
+        "secondary": true,
+        "employee_message": 4,
+        "employee_quote": "每季我另外負責店內用品庫房的盤點，逐項清點洗劑、護毛用品和備用工具，核對庫存清單，整理短少與多出的数量並回報負責人。庫存資料的差額要核准才調整，我不自行把差異抹掉；平日美容後記耗材缺口不能代替這次完整盤點。",
+        "support": [
+          {
+            "id": "MMP4321-003v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/零售業倉儲管理人員-職能基準.json",
+            "source_sha256": "d3b1676b18a4d93d8c75b4e54ae6d0f2085c30213b081611f834639b515ad82a",
+            "task_code": "T1.3",
+            "task_name": [
+              {
+                "code": "T1.3",
+                "name": "進行定期盤點",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.3.1",
+                "text": "依組織規範進行定期盤點或抽點。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.2",
+                "text": "編制倉儲差異分析報告。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.3",
+                "text": "確認及記錄盤點結果,完成盤點結果(異常)報告。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.4",
+                "text": "依據盤點結果(異常)狀況提出解決方案。",
+                "field_pending": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unscored": "Topic labels cover listed supported actions, not every sentence, frequency or authority boundary. Negatives have no exhaustive task-level corpus labels.",
+    "derived_from": "E08"
+  }
+]

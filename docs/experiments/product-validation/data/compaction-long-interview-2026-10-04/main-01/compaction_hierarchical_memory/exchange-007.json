@@ -1,0 +1,16 @@
+{
+  "event_id": "e007",
+  "execution_id": "f587ae03-50cb-47a1-a407-4e912fd3d9bb",
+  "employee_input": {
+    "source_id": "47ade5be-e8d2-4fe6-a874-1bdca0cdeda7",
+    "interview_sequence": 14,
+    "speaker": "employee",
+    "interview_text": "退貨另有一份清單。我每個工作日08:35開始核對前一天收到的退貨，在09:10前把退貨差異表交客服窗口。這是退貨的時點，不是進货驗收的時限。"
+  },
+  "consultant_reply": {
+    "source_id": "4a6f1a65-2110-4a43-bad8-d802fe932a6e",
+    "interview_sequence": 15,
+    "speaker": "consultant",
+    "interview_text": "已把退貨整理成獨立工作：每個工作日 08:35 開始核對前一天收到的退貨，並在 09:10 前把退貨差異表交給客服窗口；這個時限不套用到貨驗收。\n\n核對退貨時，您通常會依退貨清單比對哪些資料或實物？"
+  }
+}

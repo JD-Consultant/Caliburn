@@ -1,0 +1,40 @@
+test_changed_retained_document_is_detected (test_audit.AuditContract.test_changed_retained_document_is_detected) ... ok
+test_forged_development_selection_is_detected (test_audit.AuditContract.test_forged_development_selection_is_detected) ... 
+  test_forged_development_selection_is_detected (test_audit.AuditContract.test_forged_development_selection_is_detected) (module='S:\\caliburn\\docs\\experiments\\2026-10-04-retrieve-rerank') ... FAIL
+S:\caliburn\docs\experiments\2026-10-04-retrieve-rerank\passage-pool\verify.py:44: ResourceWarning: unclosed file <_io.TextIOWrapper name='S:\\caliburn\\docs\\experiments\\2026-10-04-occupation-retrieval-generalization\\cache\\20f95996a7ef4d574c29bed8625e84277aee1a73b8d097f5b45b5320ddb27bd8.jsonl' mode='r' encoding='utf-8'>
+  entries = {r['text_sha256']:r['embedding']['dense'] for r in map(json.loads,previous.open(encoding='utf-8'))}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+  test_forged_development_selection_is_detected (test_audit.AuditContract.test_forged_development_selection_is_detected) (module='S:\\caliburn\\docs\\experiments\\2026-10-04-retrieve-rerank\\passage-pool') ... FAIL
+test_missing_selected_comparison_is_detected (test_audit.AuditContract.test_missing_selected_comparison_is_detected) ... S:\caliburn\docs\experiments\2026-10-04-retrieve-rerank\passage-pool\verify.py:44: ResourceWarning: unclosed file <_io.TextIOWrapper name='S:\\caliburn\\docs\\experiments\\2026-10-04-occupation-retrieval-generalization\\cache\\20f95996a7ef4d574c29bed8625e84277aee1a73b8d097f5b45b5320ddb27bd8.jsonl' mode='r' encoding='utf-8'>
+  entries = {r['text_sha256']:r['embedding']['dense'] for r in map(json.loads,previous.open(encoding='utf-8'))}
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+FAIL
+
+======================================================================
+FAIL: test_forged_development_selection_is_detected (test_audit.AuditContract.test_forged_development_selection_is_detected) (module='S:\\caliburn\\docs\\experiments\\2026-10-04-retrieve-rerank')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieve-rerank\test_audit.py", line 35, in test_forged_development_selection_is_detected
+    with self.assertRaises(AssertionError):
+AssertionError: AssertionError not raised
+
+======================================================================
+FAIL: test_forged_development_selection_is_detected (test_audit.AuditContract.test_forged_development_selection_is_detected) (module='S:\\caliburn\\docs\\experiments\\2026-10-04-retrieve-rerank\\passage-pool')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieve-rerank\test_audit.py", line 35, in test_forged_development_selection_is_detected
+    with self.assertRaises(AssertionError):
+AssertionError: AssertionError not raised
+
+======================================================================
+FAIL: test_missing_selected_comparison_is_detected (test_audit.AuditContract.test_missing_selected_comparison_is_detected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieve-rerank\test_audit.py", line 42, in test_missing_selected_comparison_is_detected
+    with self.assertRaises(AssertionError):
+AssertionError: AssertionError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 3.821s
+
+FAILED (failures=3)

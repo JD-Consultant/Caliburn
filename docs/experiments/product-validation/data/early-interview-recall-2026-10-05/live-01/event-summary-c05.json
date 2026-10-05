@@ -1,0 +1,5 @@
+{
+  "event": "case_completed",
+  "arm": "summary",
+  "case_id": "c05"
+}

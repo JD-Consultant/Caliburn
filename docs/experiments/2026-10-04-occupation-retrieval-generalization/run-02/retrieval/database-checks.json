@@ -1,0 +1,1486 @@
+[
+  {
+    "case_id": "E01",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "KPS5220-004v2",
+        "score": 0.7207053
+      },
+      {
+        "id": "SET7231-002v3",
+        "score": 0.7113361
+      },
+      {
+        "id": "MEM7231-004v4",
+        "score": 0.69954777
+      },
+      {
+        "id": "MPD7231-001v4",
+        "score": 0.69644773
+      },
+      {
+        "id": "MEM7231-009v3",
+        "score": 0.69631827
+      },
+      {
+        "id": "MEM7231-006v4",
+        "score": 0.69123954
+      },
+      {
+        "id": "MEM7231-003v4",
+        "score": 0.68853
+      },
+      {
+        "id": "MEM7231-016v2",
+        "score": 0.6879493
+      },
+      {
+        "id": "SET7231-001v3",
+        "score": 0.6846937
+      },
+      {
+        "id": "MEM7231-005v4",
+        "score": 0.68199825
+      }
+    ]
+  },
+  {
+    "case_id": "E01",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "KPS5220-004v2",
+        "score": 0.7361145
+      },
+      {
+        "id": "SET7231-002v3",
+        "score": 0.71268725
+      },
+      {
+        "id": "KPS5220-005v2",
+        "score": 0.6998321
+      },
+      {
+        "id": "MEM7231-009v3",
+        "score": 0.6924416
+      },
+      {
+        "id": "KPS5220-006v2",
+        "score": 0.68979216
+      },
+      {
+        "id": "MEM7231-004v4",
+        "score": 0.68773204
+      },
+      {
+        "id": "MEM7231-003v4",
+        "score": 0.6872579
+      },
+      {
+        "id": "MPD7231-001v4",
+        "score": 0.6769761
+      },
+      {
+        "id": "MEM7234-002v3",
+        "score": 0.6769033
+      },
+      {
+        "id": "MEM7234-001v3",
+        "score": 0.6758595
+      }
+    ]
+  },
+  {
+    "case_id": "E02",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "MPM7223-009v2",
+        "score": 0.770105
+      },
+      {
+        "id": "MPM7223-012v2",
+        "score": 0.76337993
+      },
+      {
+        "id": "MPM7223-010v2",
+        "score": 0.7432383
+      },
+      {
+        "id": "MPM7223-002v3",
+        "score": 0.7312819
+      },
+      {
+        "id": "MPM8142-001v3",
+        "score": 0.7279372
+      },
+      {
+        "id": "MPM2141-001v2",
+        "score": 0.7234347
+      },
+      {
+        "id": "MPM7223-001v3",
+        "score": 0.7175851
+      },
+      {
+        "id": "MPM7223-013v2",
+        "score": 0.7172164
+      },
+      {
+        "id": "MPM8142-003v3",
+        "score": 0.71504843
+      },
+      {
+        "id": "MPM7223-007v3",
+        "score": 0.7132393
+      }
+    ]
+  },
+  {
+    "case_id": "E02",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "MPM7223-012v2",
+        "score": 0.7884754
+      },
+      {
+        "id": "MPM7223-010v2",
+        "score": 0.7730067
+      },
+      {
+        "id": "MPM7223-009v2",
+        "score": 0.76913595
+      },
+      {
+        "id": "MPM7223-001v3",
+        "score": 0.7484899
+      },
+      {
+        "id": "MPM7223-002v3",
+        "score": 0.74627626
+      },
+      {
+        "id": "MPM7222-001v3",
+        "score": 0.7442238
+      },
+      {
+        "id": "MPD3116-002v3",
+        "score": 0.74080896
+      },
+      {
+        "id": "MPD3116-003v3",
+        "score": 0.7336248
+      },
+      {
+        "id": "SET2141-002v2",
+        "score": 0.72798926
+      },
+      {
+        "id": "MPM2141-001v2",
+        "score": 0.7267302
+      }
+    ]
+  },
+  {
+    "case_id": "E03",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "TFB7912-002v3",
+        "score": 0.7849426
+      },
+      {
+        "id": "TFB7912-001v3",
+        "score": 0.7751195
+      },
+      {
+        "id": "TFB7914-002v3",
+        "score": 0.7449511
+      },
+      {
+        "id": "TFB7914-001v3",
+        "score": 0.73730147
+      },
+      {
+        "id": "TFB9901-002v2",
+        "score": 0.70542204
+      },
+      {
+        "id": "MPM8152-001v4",
+        "score": 0.70030844
+      },
+      {
+        "id": "NFP7911-001v1",
+        "score": 0.6995691
+      },
+      {
+        "id": "TFB5131-002v3",
+        "score": 0.69538057
+      },
+      {
+        "id": "MPM8142-001v3",
+        "score": 0.6923367
+      },
+      {
+        "id": "MPM8152-003v4",
+        "score": 0.6922893
+      }
+    ]
+  },
+  {
+    "case_id": "E03",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "TFB7912-002v3",
+        "score": 0.7765884
+      },
+      {
+        "id": "TFB7914-002v3",
+        "score": 0.76412565
+      },
+      {
+        "id": "TFB7914-001v3",
+        "score": 0.73417354
+      },
+      {
+        "id": "TFB7912-001v3",
+        "score": 0.7328626
+      },
+      {
+        "id": "TFB9901-002v2",
+        "score": 0.6758436
+      },
+      {
+        "id": "TFB5131-002v3",
+        "score": 0.6751416
+      },
+      {
+        "id": "NFP7911-001v1",
+        "score": 0.6602793
+      },
+      {
+        "id": "TFB5120-002v3",
+        "score": 0.6549723
+      },
+      {
+        "id": "MPD3114-001v2",
+        "score": 0.65131044
+      },
+      {
+        "id": "MPM8152-001v4",
+        "score": 0.645028
+      }
+    ]
+  },
+  {
+    "case_id": "E04",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "INM3513-002v4",
+        "score": 0.7311462
+      },
+      {
+        "id": "IIS3513-002v4",
+        "score": 0.7295659
+      },
+      {
+        "id": "IIS3511-001v1",
+        "score": 0.7261946
+      },
+      {
+        "id": "INM3513-001v4",
+        "score": 0.72193193
+      },
+      {
+        "id": "網路維修助理",
+        "score": 0.71455455
+      },
+      {
+        "id": "INM2529-003v2",
+        "score": 0.7133628
+      },
+      {
+        "id": "INM2529-004v2",
+        "score": 0.70963705
+      },
+      {
+        "id": "INM7421-011v3",
+        "score": 0.7066353
+      },
+      {
+        "id": "INM2529-001v3",
+        "score": 0.70462334
+      },
+      {
+        "id": "FAC2411-001v2",
+        "score": 0.7014935
+      }
+    ]
+  },
+  {
+    "case_id": "E04",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "INM2529-004v2",
+        "score": 0.75076705
+      },
+      {
+        "id": "INM2529-003v2",
+        "score": 0.74975604
+      },
+      {
+        "id": "INM7421-011v3",
+        "score": 0.7326654
+      },
+      {
+        "id": "IIS3511-001v1",
+        "score": 0.7325674
+      },
+      {
+        "id": "INM3513-001v4",
+        "score": 0.72943723
+      },
+      {
+        "id": "IIS3513-002v4",
+        "score": 0.72861785
+      },
+      {
+        "id": "IIS3513-001v4",
+        "score": 0.7206577
+      },
+      {
+        "id": "網路維修助理",
+        "score": 0.71488845
+      },
+      {
+        "id": "INM3513-002v4",
+        "score": 0.71285576
+      },
+      {
+        "id": "INM3513-003v4",
+        "score": 0.7127787
+      }
+    ]
+  },
+  {
+    "case_id": "E05",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "THM9112-001v3",
+        "score": 0.76754534
+      },
+      {
+        "id": "TTM1411-001v4",
+        "score": 0.7065611
+      },
+      {
+        "id": "TTM3422-001v2",
+        "score": 0.69338655
+      },
+      {
+        "id": "PIC9111-001v3",
+        "score": 0.6854203
+      },
+      {
+        "id": "TFB5131-001v3",
+        "score": 0.67784035
+      },
+      {
+        "id": "BGM5220-002v3",
+        "score": 0.675483
+      },
+      {
+        "id": "TFB1412-002v2",
+        "score": 0.67497003
+      },
+      {
+        "id": "BGM1219-003v3",
+        "score": 0.6728612
+      },
+      {
+        "id": "THM4222-001v3",
+        "score": 0.66936874
+      },
+      {
+        "id": "連鎖餐飲門市管理人員",
+        "score": 0.6651107
+      }
+    ]
+  },
+  {
+    "case_id": "E05",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "THM9112-001v3",
+        "score": 0.7569689
+      },
+      {
+        "id": "THM4222-001v3",
+        "score": 0.7340734
+      },
+      {
+        "id": "TTM3422-001v2",
+        "score": 0.6969997
+      },
+      {
+        "id": "TFB5131-001v3",
+        "score": 0.67843294
+      },
+      {
+        "id": "TTM1411-001v4",
+        "score": 0.6751083
+      },
+      {
+        "id": "TFB1412-002v2",
+        "score": 0.6695885
+      },
+      {
+        "id": "BGM1219-003v3",
+        "score": 0.6572105
+      },
+      {
+        "id": "BGM5220-002v3",
+        "score": 0.65718496
+      },
+      {
+        "id": "TTM5113-003v1",
+        "score": 0.6552429
+      },
+      {
+        "id": "TTM4221-004v3",
+        "score": 0.65284127
+      }
+    ]
+  },
+  {
+    "case_id": "E06",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "NAO6010-003v3",
+        "score": 0.77481604
+      },
+      {
+        "id": "NAO6010-006v1",
+        "score": 0.72690314
+      },
+      {
+        "id": "MPM8152-003v4",
+        "score": 0.7042181
+      },
+      {
+        "id": "NAO6010-004v3",
+        "score": 0.7009771
+      },
+      {
+        "id": "MPM8154-001v4",
+        "score": 0.69583803
+      },
+      {
+        "id": "MIM4322-001v4",
+        "score": 0.69268775
+      },
+      {
+        "id": "NAO2132-002v3",
+        "score": 0.6915588
+      },
+      {
+        "id": "NAO6010-001v4",
+        "score": 0.6884063
+      },
+      {
+        "id": "NAO6010-002v3",
+        "score": 0.6853641
+      },
+      {
+        "id": "MEM7233-001v4",
+        "score": 0.68103755
+      }
+    ]
+  },
+  {
+    "case_id": "E06",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "NAO6010-003v3",
+        "score": 0.7720334
+      },
+      {
+        "id": "NAO6010-004v3",
+        "score": 0.70331156
+      },
+      {
+        "id": "NAO6010-006v1",
+        "score": 0.6984997
+      },
+      {
+        "id": "農藥管理人員",
+        "score": 0.68596375
+      },
+      {
+        "id": "NAO2132-002v3",
+        "score": 0.6746317
+      },
+      {
+        "id": "MPM8152-003v4",
+        "score": 0.67178094
+      },
+      {
+        "id": "NAO6010-001v4",
+        "score": 0.66998684
+      },
+      {
+        "id": "MPM8152-001v4",
+        "score": 0.66633624
+      },
+      {
+        "id": "NAO6010-002v3",
+        "score": 0.6631271
+      },
+      {
+        "id": "MEM7233-001v4",
+        "score": 0.65438753
+      }
+    ]
+  },
+  {
+    "case_id": "E07",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "MPM2144-001v4",
+        "score": 0.78885627
+      },
+      {
+        "id": "MPM7212-001v3",
+        "score": 0.7827025
+      },
+      {
+        "id": "MPM7212-002v3",
+        "score": 0.78265625
+      },
+      {
+        "id": "MPM2141-002v2",
+        "score": 0.7500441
+      },
+      {
+        "id": "MPM7223-005v3",
+        "score": 0.73209417
+      },
+      {
+        "id": "MPM8122-001v3",
+        "score": 0.7284634
+      },
+      {
+        "id": "MPM7223-010v2",
+        "score": 0.723757
+      },
+      {
+        "id": "CCM7129-001v3",
+        "score": 0.7225361
+      },
+      {
+        "id": "MPM8153-001v3",
+        "score": 0.72139406
+      },
+      {
+        "id": "MPD3116-003v3",
+        "score": 0.71945107
+      }
+    ]
+  },
+  {
+    "case_id": "E07",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "MPM7212-001v3",
+        "score": 0.8131162
+      },
+      {
+        "id": "MPM7212-002v3",
+        "score": 0.79895747
+      },
+      {
+        "id": "MPM2144-001v4",
+        "score": 0.7939744
+      },
+      {
+        "id": "MPM7223-005v3",
+        "score": 0.7496534
+      },
+      {
+        "id": "MPM2141-002v2",
+        "score": 0.7489701
+      },
+      {
+        "id": "MPM7223-010v2",
+        "score": 0.74145687
+      },
+      {
+        "id": "MPM7223-008v2",
+        "score": 0.7361012
+      },
+      {
+        "id": "CCM7129-001v3",
+        "score": 0.73536384
+      },
+      {
+        "id": "MPD3116-003v3",
+        "score": 0.7318058
+      },
+      {
+        "id": "MPM7221-001v3",
+        "score": 0.729331
+      }
+    ]
+  },
+  {
+    "case_id": "E08",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "PIC5193-001v3",
+        "score": 0.7988723
+      },
+      {
+        "id": "PIC5193-002v3",
+        "score": 0.78027475
+      },
+      {
+        "id": "MEM9120-001v3",
+        "score": 0.69813085
+      },
+      {
+        "id": "PIC5193-006v1",
+        "score": 0.69516957
+      },
+      {
+        "id": "MEM9191-001v2",
+        "score": 0.6828792
+      },
+      {
+        "id": "PIC5140-001v3",
+        "score": 0.6815216
+      },
+      {
+        "id": "PIC9111-001v3",
+        "score": 0.6729041
+      },
+      {
+        "id": "TFB5139-001v3",
+        "score": 0.6718531
+      },
+      {
+        "id": "PIC5193-005v2",
+        "score": 0.66238457
+      },
+      {
+        "id": "NEP9199-001v4",
+        "score": 0.6601027
+      }
+    ]
+  },
+  {
+    "case_id": "E08",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "PIC5193-001v3",
+        "score": 0.803813
+      },
+      {
+        "id": "PIC5193-002v3",
+        "score": 0.7863459
+      },
+      {
+        "id": "PIC5193-006v1",
+        "score": 0.71440256
+      },
+      {
+        "id": "MEM9120-001v3",
+        "score": 0.6924263
+      },
+      {
+        "id": "PIC5140-001v3",
+        "score": 0.6865555
+      },
+      {
+        "id": "PIC9111-001v3",
+        "score": 0.68074846
+      },
+      {
+        "id": "MEM9191-001v2",
+        "score": 0.6758566
+      },
+      {
+        "id": "PIC5193-004v2",
+        "score": 0.67125237
+      },
+      {
+        "id": "PIC5193-005v2",
+        "score": 0.67065316
+      },
+      {
+        "id": "PIC3230-002v4",
+        "score": 0.65564334
+      }
+    ]
+  },
+  {
+    "case_id": "E09",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "KRM3323-001v4",
+        "score": 0.65681845
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": 0.6542648
+      },
+      {
+        "id": "BHR2422-005v4",
+        "score": 0.63920695
+      },
+      {
+        "id": "MPM8142-003v3",
+        "score": 0.63582295
+      },
+      {
+        "id": "綜合零售業大數據分析師",
+        "score": 0.6354904
+      },
+      {
+        "id": "BGM1349-002v3",
+        "score": 0.6346165
+      },
+      {
+        "id": "市場分析助理",
+        "score": 0.6337144
+      },
+      {
+        "id": "FAC1211-001v2",
+        "score": 0.6332694
+      },
+      {
+        "id": "SET7231-001v3",
+        "score": 0.63210124
+      },
+      {
+        "id": "KRM1420-005v4",
+        "score": 0.63188565
+      }
+    ]
+  },
+  {
+    "case_id": "E09",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "KPS2434-004v2",
+        "score": 0.6541699
+      },
+      {
+        "id": "市場分析助理",
+        "score": 0.6446347
+      },
+      {
+        "id": "KRM3323-001v4",
+        "score": 0.629473
+      },
+      {
+        "id": "BGM2421-002v4",
+        "score": 0.6281406
+      },
+      {
+        "id": "KPS4999-001v3",
+        "score": 0.62669504
+      },
+      {
+        "id": "SET4130-001v2",
+        "score": 0.62409306
+      },
+      {
+        "id": "BAS4222-002v3",
+        "score": 0.62392974
+      },
+      {
+        "id": "BAS3323-003v3",
+        "score": 0.62258494
+      },
+      {
+        "id": "BGM1219-002v4",
+        "score": 0.6207553
+      },
+      {
+        "id": "BAS1499-002v4",
+        "score": 0.62035483
+      }
+    ]
+  },
+  {
+    "case_id": "E10",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "AVA1219-001v4",
+        "score": 0.6527442
+      },
+      {
+        "id": "BAS2421-001v4",
+        "score": 0.6481475
+      },
+      {
+        "id": "MIM4322-001v4",
+        "score": 0.64590436
+      },
+      {
+        "id": "KRM1420-005v4",
+        "score": 0.64436686
+      },
+      {
+        "id": "APA3439-007v3",
+        "score": 0.64292896
+      },
+      {
+        "id": "BGM1330-001v3",
+        "score": 0.6418642
+      },
+      {
+        "id": "KMA2632-001v3",
+        "score": 0.63871074
+      },
+      {
+        "id": "MQM1322-001v4",
+        "score": 0.63748294
+      },
+      {
+        "id": "KRM3323-001v4",
+        "score": 0.6361821
+      },
+      {
+        "id": "ISD2513-001v4",
+        "score": 0.63569415
+      }
+    ]
+  },
+  {
+    "case_id": "E10",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "MIM4322-001v4",
+        "score": 0.6741796
+      },
+      {
+        "id": "MPM7322-001v4",
+        "score": 0.6718192
+      },
+      {
+        "id": "AVA1219-001v4",
+        "score": 0.6697427
+      },
+      {
+        "id": "KPS2434-003v2",
+        "score": 0.66859853
+      },
+      {
+        "id": "MQM1322-001v4",
+        "score": 0.6651406
+      },
+      {
+        "id": "MPD2173-001v4",
+        "score": 0.6641393
+      },
+      {
+        "id": "AVA2173-008v3",
+        "score": 0.6633356
+      },
+      {
+        "id": "KRM3323-001v4",
+        "score": 0.6614263
+      },
+      {
+        "id": "AVA2173-006v4",
+        "score": 0.6594599
+      },
+      {
+        "id": "BGM1330-001v3",
+        "score": 0.65575147
+      }
+    ]
+  },
+  {
+    "case_id": "E11",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "SET2163-001v3",
+        "score": 0.6316192
+      },
+      {
+        "id": "SET2163-002v3",
+        "score": 0.62875473
+      },
+      {
+        "id": "NEP2143-001v4",
+        "score": 0.62795776
+      },
+      {
+        "id": "MPM8142-003v3",
+        "score": 0.62641495
+      },
+      {
+        "id": "KMA2632-001v3",
+        "score": 0.62235767
+      },
+      {
+        "id": "BAS2421-004v1",
+        "score": 0.62164646
+      },
+      {
+        "id": "SET2144-007v2",
+        "score": 0.6149719
+      },
+      {
+        "id": "SET3112-001v3",
+        "score": 0.61320686
+      },
+      {
+        "id": "BHR2422-001v4",
+        "score": 0.61303204
+      },
+      {
+        "id": "FSI2412-010v2",
+        "score": 0.61117935
+      }
+    ]
+  },
+  {
+    "case_id": "E11",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "KMA2632-001v3",
+        "score": 0.6404971
+      },
+      {
+        "id": "MPM7222-012v3",
+        "score": 0.63856184
+      },
+      {
+        "id": "ISD2519-004v1",
+        "score": 0.6353383
+      },
+      {
+        "id": "FSI2412-008v3",
+        "score": 0.6278659
+      },
+      {
+        "id": "INM2521-001v2",
+        "score": 0.62563896
+      },
+      {
+        "id": "SET2149-002v4",
+        "score": 0.6253913
+      },
+      {
+        "id": "BLM2421-007v4",
+        "score": 0.62330824
+      },
+      {
+        "id": "BLM2421-008v3",
+        "score": 0.6209628
+      },
+      {
+        "id": "SET2144-007v2",
+        "score": 0.6208314
+      },
+      {
+        "id": "FSI2412-007v3",
+        "score": 0.62048244
+      }
+    ]
+  },
+  {
+    "case_id": "E12",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "APA3439-007v3",
+        "score": 0.64757705
+      },
+      {
+        "id": "BGM1349-002v3",
+        "score": 0.6415822
+      },
+      {
+        "id": "市場分析助理",
+        "score": 0.63514984
+      },
+      {
+        "id": "KRM3323-001v4",
+        "score": 0.6337298
+      },
+      {
+        "id": "FAC1211-001v2",
+        "score": 0.63142526
+      },
+      {
+        "id": "FAC3313-001v2",
+        "score": 0.6297394
+      },
+      {
+        "id": "BHR2422-011v4",
+        "score": 0.62848186
+      },
+      {
+        "id": "AVA1219-001v4",
+        "score": 0.62654483
+      },
+      {
+        "id": "BHR2422-001v4",
+        "score": 0.6250307
+      },
+      {
+        "id": "KMA2632-001v3",
+        "score": 0.624786
+      }
+    ]
+  },
+  {
+    "case_id": "E12",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "FAC3313-001v2",
+        "score": 0.67107105
+      },
+      {
+        "id": "FAC4311-001v2",
+        "score": 0.65027475
+      },
+      {
+        "id": "FAC1211-001v2",
+        "score": 0.6456763
+      },
+      {
+        "id": "BGM2421-002v4",
+        "score": 0.63947594
+      },
+      {
+        "id": "BGM1349-002v3",
+        "score": 0.63760805
+      },
+      {
+        "id": "BGM1219-003v3",
+        "score": 0.6370747
+      },
+      {
+        "id": "KRM3323-001v4",
+        "score": 0.6365843
+      },
+      {
+        "id": "MQM7993-001v4",
+        "score": 0.6351595
+      },
+      {
+        "id": "MQM1322-001v4",
+        "score": 0.6351105
+      },
+      {
+        "id": "TFB1412-002v2",
+        "score": 0.633931
+      }
+    ]
+  },
+  {
+    "case_id": "E13",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "KRM3323-001v4",
+        "score": 0.61068237
+      },
+      {
+        "id": "BHR2422-001v4",
+        "score": 0.60714376
+      },
+      {
+        "id": "ATC3339-001v4",
+        "score": 0.59197587
+      },
+      {
+        "id": "SET2144-005v3",
+        "score": 0.59063053
+      },
+      {
+        "id": "BGM1330-001v3",
+        "score": 0.5867928
+      },
+      {
+        "id": "AVA1219-001v4",
+        "score": 0.5866405
+      },
+      {
+        "id": "BAS3332-003v3",
+        "score": 0.58541656
+      },
+      {
+        "id": "APA3439-007v3",
+        "score": 0.58450973
+      },
+      {
+        "id": "MIM2141-001v4",
+        "score": 0.58387023
+      },
+      {
+        "id": "KPS5220-006v2",
+        "score": 0.5814582
+      }
+    ]
+  },
+  {
+    "case_id": "E13",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "BGM1330-001v3",
+        "score": 0.6142175
+      },
+      {
+        "id": "KPS2434-004v2",
+        "score": 0.60457575
+      },
+      {
+        "id": "KPS2434-003v2",
+        "score": 0.58636
+      },
+      {
+        "id": "FAC1211-001v2",
+        "score": 0.58611727
+      },
+      {
+        "id": "BGM1349-001v3",
+        "score": 0.5855669
+      },
+      {
+        "id": "BAS3332-003v3",
+        "score": 0.5827185
+      },
+      {
+        "id": "ATC3339-001v4",
+        "score": 0.5820858
+      },
+      {
+        "id": "KRM3323-001v4",
+        "score": 0.5810162
+      },
+      {
+        "id": "KPS3322-001v4",
+        "score": 0.5807699
+      },
+      {
+        "id": "MIM2141-001v4",
+        "score": 0.5803138
+      }
+    ]
+  },
+  {
+    "case_id": "E14",
+    "arm": "B2",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "AVA3439-020v1",
+        "score": 0.6414535
+      },
+      {
+        "id": "CCM7123-002v3",
+        "score": 0.6407649
+      },
+      {
+        "id": "AVA3439-010v1",
+        "score": 0.6351118
+      },
+      {
+        "id": "CCM7319-001v3",
+        "score": 0.6350104
+      },
+      {
+        "id": "APP2641-002v2",
+        "score": 0.6342907
+      },
+      {
+        "id": "AVA3439-019v1",
+        "score": 0.6333857
+      },
+      {
+        "id": "AVA3439-007v1",
+        "score": 0.63197887
+      },
+      {
+        "id": "AVA3439-002v3",
+        "score": 0.63043904
+      },
+      {
+        "id": "AVA3439-017v1",
+        "score": 0.6277114
+      },
+      {
+        "id": "TRM1499-001v4",
+        "score": 0.6252434
+      }
+    ]
+  },
+  {
+    "case_id": "E14",
+    "arm": "raw_employee",
+    "exact": true,
+    "correct": true,
+    "sufficient": true,
+    "unique": true,
+    "ordered": true,
+    "score_valid": true,
+    "tie_aware_rank_valid": true,
+    "returned": [
+      {
+        "id": "CCM7319-001v3",
+        "score": 0.6239946
+      },
+      {
+        "id": "CCM7123-002v3",
+        "score": 0.6205528
+      },
+      {
+        "id": "AVA3439-020v1",
+        "score": 0.6104145
+      },
+      {
+        "id": "AVA3439-002v3",
+        "score": 0.6088078
+      },
+      {
+        "id": "APA3339-002v4",
+        "score": 0.6077209
+      },
+      {
+        "id": "APP2641-002v2",
+        "score": 0.6058395
+      },
+      {
+        "id": "CCM7123-003v3",
+        "score": 0.60481656
+      },
+      {
+        "id": "AVA3439-010v1",
+        "score": 0.6046438
+      },
+      {
+        "id": "AVA3439-019v1",
+        "score": 0.60371673
+      },
+      {
+        "id": "CCM7123-004v3",
+        "score": 0.6014283
+      }
+    ]
+  }
+]

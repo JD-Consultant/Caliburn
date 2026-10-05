@@ -1,0 +1,8 @@
+storage:
+  storage_path: S:/caliburn/tmp/qeval/storage
+  snapshots_path: S:/caliburn/tmp/qeval/snapshots
+service:
+  host: 127.0.0.1
+  http_port: 6335
+  grpc_port: 6336
+telemetry_disabled: true

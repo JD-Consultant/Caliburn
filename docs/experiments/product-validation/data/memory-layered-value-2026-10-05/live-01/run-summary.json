@@ -1,0 +1,132 @@
+{
+  "status": "completed",
+  "outcomes": [
+    {
+      "cell": "initial-b1",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 45.69509920000564
+    },
+    {
+      "cell": "initial-b2",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 45.92290779994801
+    },
+    {
+      "cell": "corrections-b1",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 50.617542700027116
+    },
+    {
+      "cell": "corrections-b2",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 43.38037770008668
+    },
+    {
+      "cell": "extension-b1",
+      "status": "completed",
+      "steps": 6,
+      "seconds": 89.89109630009625
+    },
+    {
+      "cell": "extension-b2",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 48.598640999989584
+    },
+    {
+      "cell": "read-post_delivery-layered",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 30.812099599977955
+    },
+    {
+      "cell": "read-post_delivery-full_history",
+      "status": "completed",
+      "steps": 1,
+      "seconds": 18.73968439991586
+    },
+    {
+      "cell": "read-maintenance-full_history",
+      "status": "completed",
+      "steps": 1,
+      "seconds": 18.28421700000763
+    },
+    {
+      "cell": "read-maintenance-layered",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 30.808053400018252
+    },
+    {
+      "cell": "read-infrequent_work-layered",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 29.146776200039312
+    },
+    {
+      "cell": "read-infrequent_work-full_history",
+      "status": "completed",
+      "steps": 1,
+      "seconds": 17.3125013000099
+    },
+    {
+      "cell": "read-resolved_approval-full_history",
+      "status": "completed",
+      "steps": 1,
+      "seconds": 20.22589010000229
+    },
+    {
+      "cell": "read-resolved_approval-layered",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 28.67024590005167
+    }
+  ],
+  "failure": null,
+  "budget": {
+    "occupied_usd": "0.016463505",
+    "prior_occupied_usd": "1.295271975",
+    "cumulative_occupied_usd": "1.311735480",
+    "pending": {
+      "initial-b1-1": "0.0001",
+      "initial-b1-3": "0.0001",
+      "initial-b1-5": "0.0001",
+      "initial-b2-7": "0.0001",
+      "initial-b2-9": "0.0001",
+      "initial-b2-11": "0.0001",
+      "corrections-b1-13": "0.0001",
+      "corrections-b1-15": "0.0001",
+      "corrections-b1-17": "0.0001",
+      "corrections-b2-19": "0.0001",
+      "corrections-b2-21": "0.0001",
+      "corrections-b2-23": "0.0001",
+      "extension-b1-25": "0.0001",
+      "extension-b1-27": "0.0001",
+      "extension-b1-29": "0.0001",
+      "extension-b1-31": "0.0001",
+      "extension-b1-33": "0.0001",
+      "extension-b1-35": "0.0001",
+      "extension-b2-37": "0.0001",
+      "extension-b2-39": "0.0001",
+      "extension-b2-41": "0.0001",
+      "read-post_delivery-layered-43": "0.0001",
+      "read-post_delivery-layered-45": "0.0001",
+      "read-post_delivery-full_history-47": "0.0001",
+      "read-maintenance-full_history-49": "0.0001",
+      "read-maintenance-layered-51": "0.0001",
+      "read-maintenance-layered-53": "0.0001",
+      "read-infrequent_work-layered-55": "0.0001",
+      "read-infrequent_work-layered-57": "0.0001",
+      "read-infrequent_work-full_history-59": "0.0001",
+      "read-resolved_approval-full_history-61": "0.0001",
+      "read-resolved_approval-layered-63": "0.0001",
+      "read-resolved_approval-layered-65": "0.0001"
+    },
+    "outbound_calls": 66,
+    "elapsed_seconds": 518.0365866000066
+  }
+}

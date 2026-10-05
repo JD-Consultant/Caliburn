@@ -1,0 +1,16 @@
+{
+  "event_id": "e031",
+  "execution_id": "9162ce5d-3f64-4744-92b0-28ec55c18bc6",
+  "employee_input": {
+    "source_id": "abd0617c-c706-4d90-8442-bba8e577990e",
+    "interview_sequence": 62,
+    "speaker": "employee",
+    "interview_text": "上次召回需要我把三個店的批號逐一對上調撥單；一個店只回總量沒有批號，我請它補資料，沒有把總量當成所有召回批號已找齊。完整批號和狀態比快交一張表重要。"
+  },
+  "consultant_reply": {
+    "source_id": "0c89d36e-fa4c-4918-8707-d8a64be16fd1",
+    "interview_sequence": 63,
+    "speaker": "consultant",
+    "interview_text": "已將召回盤查的要求補入任務：逐一核對各店批號與調撥單；若店方只回總量而缺少批號，須請對方補資料，不能當作召回批次已全部查明。完整核對批號與狀態優先於快速交表。\n\n若店方遲遲未補齊批號資料，您通常會如何跟進或向誰回報？"
+  }
+}

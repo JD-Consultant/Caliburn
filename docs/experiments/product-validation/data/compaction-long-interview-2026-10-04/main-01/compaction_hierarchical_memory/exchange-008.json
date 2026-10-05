@@ -1,0 +1,16 @@
+{
+  "event_id": "e008",
+  "execution_id": "d27dff92-1c2b-4e1b-b431-a3a3b5c9d9ad",
+  "employee_input": {
+    "source_id": "fac5860f-e76e-478b-8999-0b284811992e",
+    "interview_sequence": 16,
+    "speaker": "employee",
+    "interview_text": "退貨要核對客退單、品號、批號和实收数量。仓庫同事判定商品是否可再銷售；我依確認結果登錄可售、待檢或報廢待核准狀態。我不自行判定報廢，也不能把待檢庫存當可用量。"
+  },
+  "consultant_reply": {
+    "source_id": "f700320a-8d46-405b-b94b-6ada438c57ab",
+    "interview_sequence": 17,
+    "speaker": "consultant",
+    "interview_text": "已補充退貨核對內容：您核對客退單、品號、批號及實收數量，依倉庫同事的判定登錄可售、待檢或報廢待核准狀態；不自行判定報廢，也不把待檢庫存當作可用量。\n\n退貨差異表交給客服窗口後，後續狀態通常由客服接手，還是您也需要繼續追蹤？"
+  }
+}

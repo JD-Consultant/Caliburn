@@ -1,0 +1,9 @@
+test_duplicate_chunk_rejected (test_probe.RouteTests.test_duplicate_chunk_rejected) ... ok
+test_nonfinite_vector_rejected (test_probe.RouteTests.test_nonfinite_vector_rejected) ... ok
+test_normalization_and_parent_max_avoid_chunk_count_votes (test_probe.RouteTests.test_normalization_and_parent_max_avoid_chunk_count_votes) ... ok
+test_zero_query_rejected_instead_of_arbitrary_candidates (test_probe.RouteTests.test_zero_query_rejected_instead_of_arbitrary_candidates) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.002s
+
+OK

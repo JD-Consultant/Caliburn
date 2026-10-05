@@ -1,0 +1,22 @@
+{
+  "job_id": "C07",
+  "phase": "calibrate",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "員工主要負責活動視覺素材的製作與印刷檔案輸出；公版核心工作是庫存核對、揀貨、包裝及安排倉庫出貨，兩者的工作內容與責任範圍沒有有意義的對應。",
+    "evidence": [
+      {
+        "employee_quote": "我主要製作活動視覺素材，做版面、圖片處理及印刷檔案輸出。",
+        "reference_quote": "核對庫存品項，揀貨、包裝及安排倉庫出貨。"
+      }
+    ],
+    "limitations": []
+  },
+  "seconds": 4.148370400012936,
+  "employee_sha256": "8bae9fbe51399ebea7374b6177aa3d7e00f83369f60d89f521027ecb1d72c975",
+  "document_sha256": "bc54a17aac345ce42bddd1ac3d4e9e7c8f51f2060d67ab2435095f81ebb1a2ec",
+  "expected_grade": 0,
+  "anchor_matched": true
+}

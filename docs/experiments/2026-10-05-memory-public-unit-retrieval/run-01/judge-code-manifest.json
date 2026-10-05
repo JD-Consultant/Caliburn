@@ -1,0 +1,22 @@
+{
+  "inputs": {
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge.py": {
+      "sha256": "b07521e5f868de0f30e819d501e13bac081751c81d9c769077398850811f6574"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/new-judge-jobs.json": {
+      "sha256": "629da6a521d5bee690d255e7a0ce85756332882d507a1b5c1e83bb0631b94929"
+    },
+    "apps/api/src/caliburn/adapters/openai_responses.py": {
+      "sha256": "539ba7237afa8137096eae06b38037cd52fe43c528f47fb638606db1b59c2f4d"
+    },
+    "apps/api/src/caliburn/adapters/openai_pricing.py": {
+      "sha256": "10a20dc74f341ea865f7847e8a91105f2bdc46be0fe0a406ab829a2e38356dd8"
+    },
+    "apps/api/src/caliburn/adapters/openai_models.py": {
+      "sha256": "b672fe9b13ed5ae4d4a8792fc8c054e79903f9843a9e251dfde522c76ad71aab"
+    },
+    "apps/api/src/caliburn/adapters/openai_credentials.py": {
+      "sha256": "b525b0733ff1264cfbcc35c9542e3152dbb8b318c9996d1229d124f57f46a6ce"
+    }
+  }
+}

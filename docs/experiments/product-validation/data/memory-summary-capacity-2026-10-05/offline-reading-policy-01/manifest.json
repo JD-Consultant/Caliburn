@@ -1,0 +1,87 @@
+{
+  "prepared_at": "2026-10-04T18:22:22.838140+00:00",
+  "kind": "paired-a-and-memory-tool-description-reading-policy",
+  "authorization": "US$0.10 / 20 minutes, within cumulative US$2; user confirmed 2026-10-05.",
+  "model": "gpt-6-luna",
+  "effort": "high",
+  "max_output_tokens": 8192,
+  "max_estimated_usd": "0.10",
+  "max_seconds": 1200,
+  "prior_occupied_usd": "1.175334675",
+  "cumulative_limit_usd": "2.00",
+  "grading_items": 19,
+  "schedule": [
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 1
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 1
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "control",
+      "repeat": 1
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "candidate",
+      "repeat": 1
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 2
+    },
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "candidate",
+      "repeat": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "control",
+      "repeat": 2
+    }
+  ],
+  "max_reader_steps": 6,
+  "max_generations": 32,
+  "max_outbound_calls": 64,
+  "sdk_version": "3.20.0",
+  "head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "pricing_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+  "source_sha256": {
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\reading_policy.py": "577f417b47f0acd9dd2a670ec4719bd419ef03c865613d381a6b50edef9a7d54",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\test_reading_policy.py": "fe7e62973295d78ec57fb915279689bba7532d426903075e96bf27126643a80a",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\reading-policy-update.md": "939f48d351eb4d79f9269f13f6ed265c5d072fbc0dc6b4a526c42ad70d1c9cc7",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\study.py": "bc390450ee9f1449198194be74ad30ca2e2fca934182976a97fabb90a8153541",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\fixtures.py": "6a552a0a8554d78e150e082a4c41c8df8a1e0915a73fa3331a486765bd4538d0",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\experiment.py": "b5cda90cbf3419281637b23e0fb4a202f971eedbff341321d344bdf558e3b1a9",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\support.py": "19a2816265c682093737c45d784a0e847e1868bb22f3c3c038127310b684627b",
+    "docs\\experiments\\product-validation\\data\\design-comparisons-2026-10-04\\provider_observations.py": "bfe9ef1189a4a0bae9d3825c0e041656be9483c1bc506f1ea2022c4e13bdd24e",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\live-02\\materials.json": "1eac8c3f107fb1e535baf85b546e8bf063a94af42861e210620e563711c172f7",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\live-02\\cases.json": "7ad653c5f3ed7cf35bb823a430083c454a9490272d2b6e88eb4133385506270a",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\live-02\\instructions.json": "5bb79327e046931faf9c61ed8323370f2ddd5dc713d5b076178fd033db43068d",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\live-02\\tools-memory.json": "f65c2d5c2a277419427db5ef3bdb94d6808b24201bf4a6460f5c59affec3aa41",
+    "apps\\api\\src\\caliburn\\agents\\job_consultant\\instructions.py": "52bbf45613d2c601de0d04aa8bed423d991aeaec21ee8790d270a1b8d6cfdaf0",
+    "apps\\api\\src\\caliburn\\agents\\work_understanding_analyst\\instructions.py": "8b1e0449fb2bf21beadc10063ae16883e8bb79aaf0f797f910128c8d7d02da10",
+    "apps\\api\\src\\caliburn\\transport\\model_tools\\memory_reads.py": "40a6c8e522112744876d8a069452615dd5381e5070adc9ede4cf45eddf48ce1d",
+    "apps\\api\\contracts\\tools\\memory-map-arguments.schema.json": "404c6389d6abfbd71eaed524a2273dda9164c597f41953771b13fff65b55d2d0",
+    "apps\\api\\contracts\\tools\\read-memory-object-arguments.schema.json": "4eedf3909ddea0298fb72cb67474393c4c764f1d6796bad05b71df276aa4762a",
+    "apps\\api\\contracts\\tools\\read-interview-arguments.schema.json": "5500f82ee22ec86ffcb092010d4e073c4da6179d7006f14603f4b68886677a6f"
+  },
+  "input_sha256": {
+    "materials": "796b977a08c9474fac17ecc55627b1565b184d2a70df88add7c73569a2113372",
+    "cases": "50317ef80bb6bb61024eb7d126758a4fa3c072a95811e78bda8d43379082db88",
+    "instructions": "f13734b1ae640dc2e8760cb12c4305811cfeb20dc4619503fde1e342a00f8360",
+    "tools": "7dd35e23fe2d9bd778e8fad9f60a5224398d8cc15f0e1015013aacec3027a1dc"
+  }
+}

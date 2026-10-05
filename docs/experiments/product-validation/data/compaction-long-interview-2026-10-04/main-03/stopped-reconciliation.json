@@ -1,0 +1,95 @@
+{
+  "status": "stopped_reconciliation",
+  "stop_at_utc": "2026-10-04T08:28:58.055476+00:00",
+  "stop_reason": "compaction_limit",
+  "completed_events": 60,
+  "published_memory_batches": 4,
+  "uncompleted_event": "e061",
+  "other_arms_started": false,
+  "source_issues": [],
+  "new_phase": {
+    "all_outbound_sends": 109,
+    "generation_sends": 43,
+    "generation_responses": 43,
+    "count_sends": 56,
+    "compaction_sends": 10,
+    "all_outbound_responses": 109,
+    "missing_generation_usage": 0,
+    "generation_input_tokens": 5420449,
+    "generation_output_tokens": 30849,
+    "generation_cached_input_tokens": 3713053,
+    "generation_reasoning_tokens": 19649,
+    "peak_generation_input_tokens": 157151,
+    "estimated_generation_and_compaction_usd": "0.411182930",
+    "count_admin_reserve_usd": "0.0056"
+  },
+  "cumulative_result": {
+    "generation_calls": 251,
+    "compaction_calls": 16,
+    "outbound_calls": 587,
+    "admitted_input_tokens": 23982097,
+    "estimated_occupation_usd": "1.000591120",
+    "new_phase_elapsed_seconds": 3398.1478373999707
+  },
+  "new_native_audit": {
+    "chain_count": 3,
+    "continuations_checked": 50,
+    "tool_results_checked": 72,
+    "compaction_adoptions_checked": 10,
+    "compactions_not_yet_used_by_generation": 0,
+    "pending_tool_results": 16,
+    "issues": []
+  },
+  "prefix_native_audit": {
+    "chain_count": 3,
+    "continuations_checked": 194,
+    "tool_results_checked": 242,
+    "compaction_adoptions_checked": 4,
+    "compactions_not_yet_used_by_generation": 1,
+    "pending_tool_results": 0,
+    "issues": []
+  },
+  "first_new_request_reuses_exact_safe_items": true,
+  "completed_method_only": {
+    "scope": "main-02 successful e001-e051 and adopted e052 preparation; main-03 successful e052-e060 and fourth Memory batch. Failed main-02 e052 generation/Step compaction and incomplete main-03 e061 are excluded, not erased from cumulative occupation.",
+    "all_outbound_sends": 540,
+    "generation_sends": 231,
+    "count_sends": 296,
+    "compaction_sends": 13,
+    "generation_input_tokens": 18945661,
+    "generation_output_tokens": 174893,
+    "estimated_generation_and_compaction_usd": "0.718993005",
+    "completed_tool_results": 295,
+    "repeat_identical_read_results": 49
+  },
+  "incomplete_e061": {
+    "all_outbound_sends": 13,
+    "generation_sends": 4,
+    "count_sends": 7,
+    "compaction_sends": 2,
+    "read_jd_calls": 35,
+    "generation_input_tokens": 621817,
+    "generation_output_tokens": 1388,
+    "estimated_generation_and_compaction_usd": "0.074490850",
+    "blocked_compaction_sent": false
+  },
+  "context_observation": {
+    "e061_first_request_app_user_messages": 61,
+    "e061_first_request_raw_user_messages": 61,
+    "app_message_characters_not_tokens": 215616,
+    "raw_user_characters_not_tokens": 4589,
+    "historical_interview_message_copies_inside_app_messages": 801,
+    "e053_standalone_prior_employee_events": "e001-e052",
+    "opaque_state_present": true,
+    "e061_count_sequence": [150394, 153650, 155907, 171410, 155109, 157151, 172606]
+  },
+  "analysis_method": "Read-only local JSON projection using prefix_rows, summarize_trace, audit_chains and retrievals. Only request/response rows are passed to retrievals because admission_stopped has no payload. No raw trace was filtered on disk.",
+  "analysis_tool_failure": "continuation_analysis.py stopped with KeyError: payload in analyze_main.retrievals; no stopped-analysis.json was created. Original executed scripts are unchanged.",
+  "cost_scope": "Local usage estimate plus count administration reserves and main-01 US$0.10 reserve, not a verified provider invoice. Counts are cumulative main-02 plus main-03; the time clock is main-03 only.",
+  "artifacts_sha256": {
+    "trace.jsonl": "2b7af98eb408a5f854dd1e61d03b8d095dae75a1498403cba290b605b03b3ec6",
+    "manifest.json": "d2fbe6693ec5a1e2d144fcc4c1db56534efaaa71ecb16fffdc6389e069e2fc65",
+    "result.json": "2e839e0b42b9790dbba3da69ab00f43c09cd8a4ea5ea389ed493fdf7cd2a095f",
+    "failure.json": "87547ec5f7d80a23175779457b90c7dfc1fd753feb564695b385f4b10433e72f"
+  }
+}

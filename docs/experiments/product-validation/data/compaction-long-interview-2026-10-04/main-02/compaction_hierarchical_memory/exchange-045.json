@@ -1,0 +1,16 @@
+{
+  "event_id": "e045",
+  "execution_id": "e56fca4c-1bda-474f-9ed4-15ab84101c8c",
+  "employee_input": {
+    "source_id": "8cfcdb94-cb99-42bd-9224-03da6d8f7469",
+    "interview_sequence": 90,
+    "speaker": "employee",
+    "interview_text": "補充平常抽盤：主管指定的品項必須檢查，另外每週三選近期收退貨頻繁的項目交主管確認，不是我自行更改整個倉庫的盤點制度。抽盤結果是差異清單，不是直接的調帳授權。"
+  },
+  "consultant_reply": {
+    "source_id": "da95aa1f-43d6-4e9e-8cd6-036023f9c821",
+    "interview_sequence": 91,
+    "speaker": "consultant",
+    "interview_text": "已修訂盤點任務：主管指定的品項必須檢查；每週三另選近期收退貨頻繁的項目交主管確認。也明確記錄抽盤結果是差異清單，不代表調帳授權，且不由您自行更改全倉盤點制度。\n\n您選出的近期收退貨頻繁項目，是先交主管確認後再盤，還是盤完後再提交結果？"
+  }
+}

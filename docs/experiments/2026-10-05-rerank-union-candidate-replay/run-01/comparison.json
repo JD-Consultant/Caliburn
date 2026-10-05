@@ -1,0 +1,426 @@
+[
+  {
+    "case_id": "F01",
+    "method": "O-U-R",
+    "baseline": "O-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "KRM1324-001v1",
+      "IIS3513-002v4",
+      "KPS2434-001v2",
+      "KPS2434-002v2",
+      "KPS2434-004v2"
+    ],
+    "new_ids": [
+      "IIS3513-003v4",
+      "IIS3513-008v3",
+      "KRM1324-001v1",
+      "IIS3513-002v4",
+      "KPS2434-001v2"
+    ],
+    "added_ids": [
+      "IIS3513-003v4",
+      "IIS3513-008v3"
+    ],
+    "removed_ids": [
+      "KPS2434-002v2",
+      "KPS2434-004v2"
+    ]
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-U-R",
+    "baseline": "B2-M-R",
+    "same_top5_sequence": true,
+    "old_ids": [
+      "INM3514-001v4",
+      "ISD2152-002v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "ISD2152-001v4",
+      "MEM3113-001v4"
+    ],
+    "new_ids": [
+      "INM3514-001v4",
+      "ISD2152-002v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "ISD2152-001v4",
+      "MEM3113-001v4"
+    ],
+    "added_ids": [],
+    "removed_ids": []
+  },
+  {
+    "case_id": "F02",
+    "method": "O-U-R",
+    "baseline": "O-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "IIS2522-001v3",
+      "INM7421-010v3",
+      "IIS3513-002v4"
+    ],
+    "new_ids": [
+      "IIS3513-003v4",
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "INM2529-001v3",
+      "IIS2522-001v3"
+    ],
+    "added_ids": [
+      "IIS3513-003v4",
+      "INM2529-001v3"
+    ],
+    "removed_ids": [
+      "INM7421-010v3",
+      "IIS3513-002v4"
+    ]
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-U-R",
+    "baseline": "B2-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "INM3514-002v3",
+      "AVA2172-003v3",
+      "ISD2513-001v4",
+      "BAS3332-003v3",
+      "IIS3513-003v4"
+    ],
+    "new_ids": [
+      "INM3514-002v3",
+      "AVA2172-003v3",
+      "MEM3113-001v4",
+      "INM7421-001v3",
+      "ISD2513-001v4"
+    ],
+    "added_ids": [
+      "MEM3113-001v4",
+      "INM7421-001v3"
+    ],
+    "removed_ids": [
+      "BAS3332-003v3",
+      "IIS3513-003v4"
+    ]
+  },
+  {
+    "case_id": "F03",
+    "method": "O-U-R",
+    "baseline": "O-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "KRM3323-001v4",
+      "停車場管理員"
+    ],
+    "new_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "BAS1219-005v1",
+      "KRM3323-001v4"
+    ],
+    "added_ids": [
+      "BAS1219-005v1"
+    ],
+    "removed_ids": [
+      "停車場管理員"
+    ]
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-U-R",
+    "baseline": "B2-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "KRM3323-001v4",
+      "FAC3313-001v2",
+      "BAS1219-003v4",
+      "KPS2434-004v2",
+      "FAC4311-001v2"
+    ],
+    "new_ids": [
+      "KPS2434-004v2",
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "BAS1219-003v4",
+      "FAC4311-001v2"
+    ],
+    "added_ids": [],
+    "removed_ids": []
+  },
+  {
+    "case_id": "F04",
+    "method": "O-U-R",
+    "baseline": "O-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "MEM7231-011v2",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "SET3113-002v3",
+      "網路維修助理"
+    ],
+    "new_ids": [
+      "MEM7231-011v2",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "SET3113-002v3",
+      "SET7231-002v3"
+    ],
+    "added_ids": [
+      "SET7231-002v3"
+    ],
+    "removed_ids": [
+      "網路維修助理"
+    ]
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-U-R",
+    "baseline": "B2-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "MPM8142-001v3",
+      "MIM2141-001v4",
+      "MQM1322-001v4",
+      "MEM7231-005v4",
+      "SET7231-001v3"
+    ],
+    "new_ids": [
+      "MEM7231-003v4",
+      "MPM8142-001v3",
+      "CCM7412-003v3",
+      "MEM8199-002v3",
+      "MIM2141-001v4"
+    ],
+    "added_ids": [
+      "MEM7231-003v4",
+      "CCM7412-003v3",
+      "MEM8199-002v3"
+    ],
+    "removed_ids": [
+      "MQM1322-001v4",
+      "MEM7231-005v4",
+      "SET7231-001v3"
+    ]
+  },
+  {
+    "case_id": "F05",
+    "method": "O-U-R",
+    "baseline": "O-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "KPS3334-009v4",
+      "KMC1222-002v3",
+      "PIC3332-002v2",
+      "ATC3439-001v3",
+      "MPM7322-006v4"
+    ],
+    "new_ids": [
+      "KPS3334-009v4",
+      "KMC1222-002v3",
+      "TTM3422-001v2",
+      "KMC3332-001v3",
+      "AVA2172-001v4"
+    ],
+    "added_ids": [
+      "TTM3422-001v2",
+      "KMC3332-001v3",
+      "AVA2172-001v4"
+    ],
+    "removed_ids": [
+      "PIC3332-002v2",
+      "ATC3439-001v3",
+      "MPM7322-006v4"
+    ]
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-U-R",
+    "baseline": "B2-M-R",
+    "same_top5_sequence": true,
+    "old_ids": [
+      "MPM7322-006v4",
+      "AVA2172-001v4",
+      "ATC3339-001v4",
+      "珠寶金工人員",
+      "AVA2172-004v3"
+    ],
+    "new_ids": [
+      "MPM7322-006v4",
+      "AVA2172-001v4",
+      "ATC3339-001v4",
+      "珠寶金工人員",
+      "AVA2172-004v3"
+    ],
+    "added_ids": [],
+    "removed_ids": []
+  },
+  {
+    "case_id": "H01",
+    "method": "O-U-R",
+    "baseline": "O-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "BGM5220-002v3",
+      "KPS2434-004v2",
+      "KMC2432-001v4"
+    ],
+    "new_ids": [
+      "TTM4221-004v3",
+      "KMC2432-003v3",
+      "BHR2422-011v4",
+      "BGM5220-002v3",
+      "KPS2434-004v2"
+    ],
+    "added_ids": [
+      "KMC2432-003v3"
+    ],
+    "removed_ids": [
+      "KMC2432-001v4"
+    ]
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-U-R",
+    "baseline": "B2-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "BAS1219-005v1",
+      "TFB5139-001v3",
+      "KMC1222-002v3",
+      "BAS1219-003v4",
+      "FAC4311-001v2"
+    ],
+    "new_ids": [
+      "BAS1219-005v1",
+      "BGM5220-002v3",
+      "TFB5139-001v3",
+      "KMC2432-003v3",
+      "KMC1222-002v3"
+    ],
+    "added_ids": [
+      "BGM5220-002v3",
+      "KMC2432-003v3"
+    ],
+    "removed_ids": [
+      "BAS1219-003v4",
+      "FAC4311-001v2"
+    ]
+  },
+  {
+    "case_id": "H02",
+    "method": "O-U-R",
+    "baseline": "O-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "KRM1324-001v1"
+    ],
+    "new_ids": [
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "RLM4323-002v4"
+    ],
+    "added_ids": [
+      "RLM4323-002v4"
+    ],
+    "removed_ids": [
+      "KRM1324-001v1"
+    ]
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-U-R",
+    "baseline": "B2-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "RLM9330-001v1",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "new_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "NFP7911-001v1",
+      "RLM9330-001v1",
+      "BGM5220-002v3"
+    ],
+    "added_ids": [
+      "NFP7911-001v1"
+    ],
+    "removed_ids": [
+      "RLM4323-002v4"
+    ]
+  },
+  {
+    "case_id": "H03",
+    "method": "O-U-R",
+    "baseline": "O-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "MMP4321-002v4",
+      "MQM1322-001v4",
+      "KRM1324-002v1"
+    ],
+    "new_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "MPM8142-003v3",
+      "KPS2434-004v2",
+      "AVA2173-012v3"
+    ],
+    "added_ids": [
+      "MPM8142-003v3",
+      "KPS2434-004v2",
+      "AVA2173-012v3"
+    ],
+    "removed_ids": [
+      "MMP4321-002v4",
+      "MQM1322-001v4",
+      "KRM1324-002v1"
+    ]
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-U-R",
+    "baseline": "B2-M-R",
+    "same_top5_sequence": false,
+    "old_ids": [
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "KRM3323-001v4",
+      "MMP4321-002v4",
+      "MQM2141-005v2"
+    ],
+    "new_ids": [
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "MQM2141-005v2",
+      "MMP4321-002v4",
+      "MQM7919-001v4"
+    ],
+    "added_ids": [
+      "MQM7919-001v4"
+    ],
+    "removed_ids": [
+      "KRM3323-001v4"
+    ]
+  }
+]

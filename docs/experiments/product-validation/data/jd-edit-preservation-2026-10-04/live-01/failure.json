@@ -1,0 +1,12 @@
+{
+  "type": "APIConnectionError",
+  "reason": "provider_or_transport_failure",
+  "current": {
+    "arm": "raw_memory",
+    "prompt_variant": "baseline",
+    "repeat": 1,
+    "case_id": "responsibility_correction",
+    "cell_id": "responsibility_correction-baseline-1",
+    "step": 1
+  }
+}

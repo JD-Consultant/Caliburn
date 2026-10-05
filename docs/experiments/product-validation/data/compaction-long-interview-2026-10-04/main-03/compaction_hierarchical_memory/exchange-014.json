@@ -1,0 +1,16 @@
+{
+  "event_id": "e014",
+  "execution_id": "cb29ec14-78ae-4c87-ab9b-eaf7409a9a1d",
+  "employee_input": {
+    "source_id": "2f2fc262-521f-4c81-a3be-4cf4a50af87c",
+    "interview_sequence": 28,
+    "speaker": "employee",
+    "interview_text": "缺貨追蹤是每天看低於安全庫存的清單，另處理客服或倉庫通報。我先核對可用量、已保留量、待出貨訂單，以及尚未登錄的到貨或退貨，避免把帳面缺貨直接當成真的沒貨。"
+  },
+  "consultant_reply": {
+    "source_id": "0a295b1d-c149-4481-ba09-32bc22c72695",
+    "interview_sequence": 29,
+    "speaker": "consultant",
+    "interview_text": "已將缺貨追蹤加入草稿：您每天查看低於安全庫存清單，也處理客服或倉庫通報；先核對可用量、保留量、待出貨訂單，以及尚未登錄的到貨或退貨，避免把帳面缺貨直接當成實際無貨。\n\n如果核對後確認確實缺貨，您接著會做哪些追蹤或通知？追到什麼結果才會標記完成？"
+  }
+}

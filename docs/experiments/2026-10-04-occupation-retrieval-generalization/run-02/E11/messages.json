@@ -1,0 +1,32 @@
+[
+  {
+    "interview_sequence": 1,
+    "speaker": "app",
+    "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+  },
+  {
+    "interview_sequence": 2,
+    "speaker": "employee",
+    "text": "我在大學研究團隊分析宇宙微波背景觀測資料，校正儀器系統誤差，按觀測頻段建立天空信號與前景污染的分離模型。"
+  },
+  {
+    "interview_sequence": 3,
+    "speaker": "consultant",
+    "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+  },
+  {
+    "interview_sequence": 4,
+    "speaker": "employee",
+    "text": "我寫科學計算程式估計角功率譜，用模擬資料檢驗估計偏差及不確定性，比較不同宇宙學參數下的預測；把模型與結果提交研究討論。"
+  },
+  {
+    "interview_sequence": 5,
+    "speaker": "consultant",
+    "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+  },
+  {
+    "interview_sequence": 6,
+    "speaker": "employee",
+    "text": "我整理分析方法和圖表投稿學術論文，同行對方法有疑問時重做分析。沒有開發企業業務網站、營運資訊系統或財務投資模型，也不從事商業產品的銷售。"
+  }
+]

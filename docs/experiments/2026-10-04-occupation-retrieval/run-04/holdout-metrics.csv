@@ -1,0 +1,17 @@
+﻿stage,case_id,arm,employee_group,split,tokens,top1_id,top1_title,top1_score,hit_1,hit_5,hit_10,mrr,ndcg_10,recall_5,primary_rank,query_seconds,returned_candidates,corpus_count,hard_negative_best_rank
+holdout,hold-accounting,rrf,accounting,holdout,58,FAC4311-001v2,會計人員,0.09523809523809523,1,1,1,1.0,1.0,1.0,1,0,89,805,5
+holdout,hold-recruiting,rrf,recruiting,holdout,58,BHR2422-014v2,招募甄選專業人員,0.1,1,1,1,1.0,1.0,1.0,1,0,87,805,84
+holdout,hold-web,rrf,web,holdout,51,INM3514-001v4,網站前端開發人員,0.09307359307359307,0,0,0,0.0196078431372549,0.0,0.0,51,0,87,805,
+holdout,hold-ux,rrf,ux,holdout,55,AVA2172-003v3,介面視覺設計人員,0.0803030303030303,1,1,1,1.0,0.7309292742059024,1.0,3,0,88,805,16
+holdout,hold-testing,rrf,testing,holdout,54,IISD3512-001v3,雲端系統開發工程人員,0.09545454545454546,0,1,1,0.3333333333333333,0.4731889542498568,1.0,5,0,88,805,19
+holdout,hold-coffee,rrf,coffee,holdout,55,TFB5131-002v3,咖啡調製人員,0.1,1,1,1,1.0,1.0,1.0,1,0,82,805,5
+holdout,hold-roasting,rrf,roasting,holdout,54,TFB7914-001v3,咖啡烘焙人員,0.1,1,1,1,1.0,1.0,1.0,1,0,82,805,26
+holdout,hold-food-service,rrf,food-service,holdout,54,連鎖餐飲門市服務人員,連鎖餐飲門市服務人員,0.1,0,1,1,0.5,0.6309297535714575,1.0,2,0,80,805,
+holdout,hold-electrical,rrf,electrical,holdout,57,CCM7412-001v4,水電工程人員,0.09761904761904762,1,1,1,1.0,1.0,1.0,1,0,82,805,7
+holdout,hold-interior,rrf,interior,holdout,53,CAP2171-003v3,室內設計助理,0.09761904761904762,1,1,1,1.0,0.7309292742059024,1.0,3,0,83,805,9
+holdout,hold-purchasing-manager,rrf,purchasing-manager,holdout,46,MMP1324-002v4,資材主管,0.1,0,0,1,0.1111111111111111,0.3010299956639812,0.0,9,0,83,805,37
+holdout,hold-marketing,rrf,marketing,holdout,47,KMC2431-009v2,社群媒體經營人員,0.08712121212121213,0,1,1,0.5,0.5188972012643011,0.6666666666666666,3,0,84,805,46
+holdout,hold-mixed,rrf,mixed,holdout,59,KRM3323-001v4,綜合零售業商品採購人員,0.09347826086956522,0,1,1,0.5,0.1332149210199512,0.25,14,0,92,805,12
+holdout,hold-no-match-paleontology,rrf,no-match,holdout,35,NAO6030-001v2,農業勘損人員,0.08928571428571427,,,,,,,,0,86,805,
+holdout,hold-no-match-cryptography,rrf,no-match,holdout,46,INM7421-011v3,資通網路資深技術人員,0.07777777777777778,,,,,,,,0,91,805,
+holdout,hold-insufficient,rrf,insufficient,holdout,30,LLS3411-002v2,組織法務助理,0.09166666666666667,,,,,,,,0,91,805,

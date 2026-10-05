@@ -1,0 +1,935 @@
+{
+  "T_absolute_floor_0.7_floor3::absolute_-3.5_cap5": [
+    {
+      "case_id": "F01",
+      "selected_ids": [
+        "IIS3513-003v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F02",
+      "selected_ids": [
+        "INM3514-001v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F03",
+      "selected_ids": [
+        "FAC4311-001v2",
+        "FAC3313-001v2",
+        "FAC1211-001v2",
+        "停車場管理員",
+        "KPS2434-004v2"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F04",
+      "selected_ids": [
+        "SET7127-002v3",
+        "SET3113-002v3",
+        "MIM2141-001v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 2,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F05",
+      "selected_ids": [
+        "KPS3334-009v4",
+        "KMC1222-002v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 1,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H01",
+      "selected_ids": [
+        "BHR2422-011v4",
+        "TTM3422-001v2"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 2,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ]
+    },
+    {
+      "case_id": "H02",
+      "selected_ids": [
+        "MMP4321-002v4",
+        "RLM9330-001v1",
+        "RLM4323-004v1",
+        "BGM5220-002v3",
+        "KRM1324-002v1"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 4,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H03",
+      "selected_ids": [
+        "BAS3323-003v3",
+        "KRM1324-002v1",
+        "MPM7322-001v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 2,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    }
+  ],
+  "T_absolute_floor_0.7_floor3::gap_0.1_cap5": [
+    {
+      "case_id": "F01",
+      "selected_ids": [
+        "IIS3513-003v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F02",
+      "selected_ids": [
+        "INM3514-001v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F03",
+      "selected_ids": [
+        "FAC4311-001v2"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F04",
+      "selected_ids": [
+        "SET7127-002v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F05",
+      "selected_ids": [
+        "KPS3334-009v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H01",
+      "selected_ids": [
+        "BHR2422-011v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ]
+    },
+    {
+      "case_id": "H02",
+      "selected_ids": [
+        "MMP4321-002v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H03",
+      "selected_ids": [
+        "BAS3323-003v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    }
+  ],
+  "T_absolute_floor_0.7_floor3::relative_0.1_cap5": [
+    {
+      "case_id": "F01",
+      "selected_ids": [
+        "IIS3513-003v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F02",
+      "selected_ids": [
+        "INM3514-001v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F03",
+      "selected_ids": [
+        "FAC4311-001v2"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F04",
+      "selected_ids": [
+        "SET7127-002v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F05",
+      "selected_ids": [
+        "KPS3334-009v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H01",
+      "selected_ids": [
+        "BHR2422-011v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ]
+    },
+    {
+      "case_id": "H02",
+      "selected_ids": [
+        "MMP4321-002v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H03",
+      "selected_ids": [
+        "BAS3323-003v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    }
+  ],
+  "T_absolute_floor_0.7_floor3::top1": [
+    {
+      "case_id": "F01",
+      "selected_ids": [
+        "IIS3513-003v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F02",
+      "selected_ids": [
+        "INM3514-001v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F03",
+      "selected_ids": [
+        "FAC4311-001v2"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F04",
+      "selected_ids": [
+        "SET7127-002v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F05",
+      "selected_ids": [
+        "KPS3334-009v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H01",
+      "selected_ids": [
+        "BHR2422-011v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ]
+    },
+    {
+      "case_id": "H02",
+      "selected_ids": [
+        "MMP4321-002v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H03",
+      "selected_ids": [
+        "BAS3323-003v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    }
+  ],
+  "T_fixed_20::absolute_-4_cap5": [
+    {
+      "case_id": "F01",
+      "selected_ids": [
+        "IIS3513-003v4",
+        "KRM1324-001v1"
+      ],
+      "grades": {
+        "0": 1,
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護",
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F02",
+      "selected_ids": [
+        "IIS3513-003v4",
+        "INM3514-001v4",
+        "IIS3513-001v4",
+        "INM2529-001v3",
+        "IIS2522-001v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F03",
+      "selected_ids": [
+        "FAC4311-001v2",
+        "FAC3313-001v2",
+        "FAC1211-001v2",
+        "停車場管理員",
+        "KPS2434-004v2"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F04",
+      "selected_ids": [
+        "MEM7231-011v2",
+        "SET7127-001v3",
+        "SET7127-002v3",
+        "SET3113-002v3",
+        "SET7231-002v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 0,
+        "2": 4,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "F05",
+      "selected_ids": [
+        "KPS3334-009v4",
+        "KMC1222-002v3",
+        "TTM3422-001v2",
+        "KMC3332-001v3",
+        "AVA2172-001v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 3,
+        "2": 1,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H01",
+      "selected_ids": [
+        "KMC2432-003v3",
+        "BHR2422-011v4",
+        "KMC2432-001v4",
+        "KPS5220-001v4",
+        "KPS3322-003v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 2,
+        "2": 3,
+        "3": 0,
+        "ungraded": 0
+      },
+      "known_facets_supported": [],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ]
+    },
+    {
+      "case_id": "H02",
+      "selected_ids": [
+        "MMP4321-002v4",
+        "RLM9330-001v1",
+        "RLM4323-004v1",
+        "KRM1324-001v1",
+        "BGM5220-002v3"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 1,
+        "2": 3,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    },
+    {
+      "case_id": "H03",
+      "selected_ids": [
+        "KRM3323-002v4",
+        "BAS3323-003v3",
+        "KPS2434-004v2",
+        "AVA2173-012v3",
+        "MMP4321-002v4"
+      ],
+      "grades": {
+        "0": 0,
+        "1": 1,
+        "2": 3,
+        "3": 1,
+        "ungraded": 0
+      },
+      "known_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "known_facets_missing": [],
+      "sensitivity_facets_supported": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "sensitivity_facets_missing": [],
+      "unassessed_facets": []
+    }
+  ]
+}

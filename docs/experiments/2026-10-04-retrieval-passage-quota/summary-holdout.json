@@ -1,0 +1,53 @@
+[
+  {
+    "method": "global_rerank",
+    "n": 200,
+    "k": 20,
+    "metrics": {
+      "cases": 4,
+      "positive_cases": 4,
+      "complete_cases": 3,
+      "covered": 21,
+      "total": 22,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 22102.5,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 800
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 20,
+    "k": 10,
+    "metrics": {
+      "cases": 4,
+      "positive_cases": 4,
+      "complete_cases": 4,
+      "covered": 22,
+      "total": 22,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 22822,
+      "mean_documents": 29,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 20,
+    "k": 5,
+    "metrics": {
+      "cases": 4,
+      "positive_cases": 4,
+      "complete_cases": 4,
+      "covered": 22,
+      "total": 22,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 15010,
+      "mean_documents": 14.75,
+      "mean_pair_comparisons": 80
+    }
+  }
+]

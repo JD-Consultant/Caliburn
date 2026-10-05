@@ -1,0 +1,5 @@
+{
+  "event": "case_completed",
+  "arm": "raw",
+  "case_id": "c04"
+}

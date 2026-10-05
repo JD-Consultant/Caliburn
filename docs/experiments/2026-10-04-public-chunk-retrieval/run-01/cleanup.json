@@ -1,0 +1,9 @@
+{
+  "embedder_state": "exited 137",
+  "listeners": 0,
+  "storage_preserved": true,
+  "collections_preserved": true,
+  "qdrant_absent": true,
+  "qdrant_pid": 21244,
+  "other_services_unchanged": true
+}

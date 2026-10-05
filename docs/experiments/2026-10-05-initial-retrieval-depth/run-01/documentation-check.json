@@ -1,0 +1,17 @@
+{
+  "documents_checked": 11,
+  "local_links_checked": 191,
+  "missing_links": [],
+  "pending_manifest_links": [
+    {
+      "file": "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/README.md",
+      "target": "artifact-hashes.json"
+    }
+  ],
+  "trailing_whitespace": [],
+  "frozen_inputs_code_checked": 26,
+  "old_N20_stage_groups_verified": 16,
+  "old_N20_stage_targets_verified": 24,
+  "strong_api_key_pattern_file_count": 0,
+  "scope": "provenance/report/link checks only; no general security or new performance validation"
+}

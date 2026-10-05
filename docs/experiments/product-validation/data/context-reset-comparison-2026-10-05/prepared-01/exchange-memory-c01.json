@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "ad945066-490a-47f9-b038-fa4eb12d4d32",
+    "interview_sequence": 106,
+    "speaker": "employee",
+    "interview_text": "先回到前面退貨那件事，我週一和其他工作日各幾點開始核對？差異表最晚幾點、交給誰？請依我之前說的確認。"
+  },
+  "consultant_reply": {
+    "source_id": "92a5f9cd-59d0-4116-b351-c76bff7c686b",
+    "interview_sequence": 107,
+    "speaker": "consultant",
+    "interview_text": "依您之前說明，退貨核對時間是：週一 08:50 開始，週二至週五 08:35 開始。退貨差異表每天最晚須於 09:10 前交給客服窗口。"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "data_deleted": false,
+  "qdrant_pid": 43224,
+  "only_owned_process_stopped": true,
+  "qdrant_identity_verified": true,
+  "gpu_container": "/caliburn-ocs-memory-public-unit-r1",
+  "gpu_status": "exited",
+  "gpu_exit_code": 0,
+  "gpu_network": "none",
+  "remaining_qdrant_listeners": 0,
+  "original_jd_postgres_containers_still_running": [
+    "caliburn-jd-docker-test-postgres-1",
+    "caliburn-jd-postgres-18-6"
+  ],
+  "container_or_volume_removed": false
+}

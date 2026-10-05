@@ -1,0 +1,111 @@
+{
+  "selection_sha256": "ef6a0fb2537680edd9b93d7a38ddd682e76ef115a0afbee2afa0226ffd61a0e6",
+  "requests": [
+    {
+      "request_id": "E01-global_rerank-1",
+      "case_id": "E01",
+      "repeat": 1,
+      "config": {
+        "method": "global_rerank",
+        "n": 200,
+        "k": 20
+      }
+    },
+    {
+      "request_id": "E01-global_rerank-2",
+      "case_id": "E01",
+      "repeat": 2,
+      "config": {
+        "method": "global_rerank",
+        "n": 200,
+        "k": 20
+      }
+    },
+    {
+      "request_id": "E01-quota_rerank-1",
+      "case_id": "E01",
+      "repeat": 1,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "E01-quota_rerank-2",
+      "case_id": "E01",
+      "repeat": 2,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "M04-global_rerank-1",
+      "case_id": "M04",
+      "repeat": 1,
+      "config": {
+        "method": "global_rerank",
+        "n": 200,
+        "k": 20
+      }
+    },
+    {
+      "request_id": "M04-global_rerank-2",
+      "case_id": "M04",
+      "repeat": 2,
+      "config": {
+        "method": "global_rerank",
+        "n": 200,
+        "k": 20
+      }
+    },
+    {
+      "request_id": "M04-quota_rerank-1",
+      "case_id": "M04",
+      "repeat": 1,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "M04-quota_rerank-2",
+      "case_id": "M04",
+      "repeat": 2,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "E01-full-1",
+      "case_id": "E01",
+      "repeat": 1,
+      "config": {
+        "method": "full_rerank",
+        "n": 805,
+        "k": 805
+      }
+    },
+    {
+      "request_id": "E01-full-2",
+      "case_id": "E01",
+      "repeat": 2,
+      "config": {
+        "method": "full_rerank",
+        "n": 805,
+        "k": 805
+      }
+    }
+  ],
+  "selected_case_ids": [
+    "E01",
+    "M04"
+  ],
+  "repeats": 2,
+  "quality_cases_not_used_for_tuning": true
+}

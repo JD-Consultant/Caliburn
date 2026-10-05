@@ -1,0 +1,24 @@
+{
+  "scope": "post-scoring verifier corrections only; model scores, parameter rows and selected settings unchanged",
+  "reason": [
+    "review reproduced trusting forged development summaries/selection and omitting selected comparisons",
+    "root verifier trusted database-complete marker without checking actual saved returned IDs"
+  ],
+  "fix": [
+    "recompute every development summary from verified per-query rows and frozen metadata; reselect; require comparisons to equal all nonnull choices",
+    "recompute 32 full805 cosine rankings from saved embeddings; verify640 database parameter rows and returned IDs/count; separately verify58 passage-native score lists"
+  ],
+  "tests": {
+    "before": "three assertion failures for selection/comparison plus one database returned-ID assertion failure reproduced the gaps",
+    "after": "10 tests pass including all three new guard cases"
+  },
+  "sources_sha256": {
+    "audit_selection.py": "0a88d6ec2f2179b904ab6304b052bb4bc5bc85655188ad40905d1c35620a628e",
+    "verify.py": "ea61ea6d34cdeac1e35a0e1ba59046a56b482f277fb7fd6cc8c99f88531fd550",
+    "passage-pool/verify.py": "23c469509db88f42fc3379b3933055b71a77baec59ee3edb6735b397b8019443",
+    "test_audit.py": "38496cb5146f4bbbb50f558d3f72d75dcc6bc76a299c0ed89c93894945e76098",
+    "test-selection-audit-red.txt": "61018aa509f41ed1cd67d5c2433701894379b3c62b216d59cadf032f1a8055af",
+    "test-database-audit-red.txt": "6d363fd1b96d7bf38a8b02dc066d3b9c018d6ddcd53a79bd713924a603bf65d2",
+    "test-final-green.txt": "64be95ba49208a8a674011771674cb4424bb2f81b1b9cd4dccfbe093525462ae"
+  }
+}

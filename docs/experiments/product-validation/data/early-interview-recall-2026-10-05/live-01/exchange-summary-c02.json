@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "022279b4-9a27-4e11-9463-727622ae3ab1",
+    "interview_sequence": 108,
+    "speaker": "employee",
+    "interview_text": "再確認前面驗收的比例規則：如果某批剛好是5%，需要因為這項比例規則提報嗎？分母要用什麼？如果有安全疑慮又怎麼處理？這次沒有更改規則。"
+  },
+  "consultant_reply": {
+    "source_id": "1fca9ce7-de4e-4cbb-8fe7-27f9312b0ffd",
+    "interview_sequence": 109,
+    "speaker": "consultant",
+    "interview_text": "剛好 **5%** 不會因為這項比例規則提報；只有比例**超過 5%**才提報倉儲主管。\n\n分母是**每批實際驗收件數**，不跨月彙算，也不是每日進貨單張數。若有安全疑慮，則不論比例高低，都要先隔離並通知主管。"
+  }
+}

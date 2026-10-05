@@ -1,0 +1,29 @@
+{
+  "job_id": "J032",
+  "phase": "grade",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是活動企劃與執行支援，並非視覺素材設計與製作。雖有製作提案簡報、蒐集素材等局部相鄰工作，但不足以代表員工持續負責的主要工作領域。",
+    "evidence": [
+      {
+        "employee_quote": "做版面、字體、色彩和圖片處理",
+        "reference_quote": "協助製作提案簡報。"
+      },
+      {
+        "employee_quote": "整理素材和版本讓後續能修改",
+        "reference_quote": "協助整理活動資料並歸檔。"
+      }
+    ],
+    "limitations": [
+      "公版未描述活動與商品視覺素材的版面設計、跨尺寸製作、依回饋修訂，以及印刷設定檢核與輸出交付。",
+      "公版所述簡報製作及資料歸檔僅與部分工作有關聯，沒有涵蓋員工主要的設計工作組合。"
+    ]
+  },
+  "seconds": 5.452414700004738,
+  "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+  "document_sha256": "5a5501839bd1212daf69db00985d49d5b96fc326623fa24be0962f4a133399ca",
+  "case_id": "F05",
+  "document_id": "KMC2432-003v3"
+}

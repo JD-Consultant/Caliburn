@@ -1,0 +1,18 @@
+{
+  "command": [
+    "apps/ocs-indexer/.venv/Scripts/python.exe",
+    "-X",
+    "utf8",
+    "-m",
+    "pytest",
+    "docs\\experiments\\2026-10-04-occupation-retrieval-generalization\\test_support.py",
+    "docs\\experiments\\2026-10-04-occupation-retrieval-generalization\\test_audit.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "exit_code": 0,
+  "stdout": "...........                                                              [100%]\n11 passed in 5.86s\n",
+  "stderr": "",
+  "scope": "7 preparation/scoring + 4 audit corruption counterexamples; offline, no model or product quality claim"
+}

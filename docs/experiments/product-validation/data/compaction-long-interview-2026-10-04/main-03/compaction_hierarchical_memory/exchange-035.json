@@ -1,0 +1,16 @@
+{
+  "event_id": "e035",
+  "execution_id": "93cea349-55f2-4043-aa91-716287810e60",
+  "employee_input": {
+    "source_id": "52930fb1-d425-4c00-b431-30bb6ce7810e",
+    "interview_sequence": 70,
+    "speaker": "employee",
+    "interview_text": "我休假前把未結案差異、預計到貨和當日截止事項交代理人，附原單號、目前狀態和下一個要聯絡的窗口。回來再核對代理人的登錄與已完成事項，避免兩個人重複入帳或各用不同狀態。"
+  },
+  "consultant_reply": {
+    "source_id": "1e3883bf-c717-493a-9e42-6be0e37c8936",
+    "interview_sequence": 71,
+    "speaker": "consultant",
+    "interview_text": "已新增「交接並核對代理期間的庫存物流事項」任務：休假前交接未結案差異、預計到貨與當日截止事項，附原單號、狀態及下一個聯絡窗口；返崗後核對代理人的登錄與已完成事項，以避免重複入帳或狀態不一致。\n\n若回來核對時發現代理人的登錄與原紀錄不一致，您通常會先怎麼處理？"
+  }
+}

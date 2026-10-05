@@ -1,0 +1,16 @@
+{
+  "event_id": "e011",
+  "execution_id": "ecad3e0e-6842-427a-b0d4-eaf9169ef172",
+  "employee_input": {
+    "source_id": "82cc258e-64f2-4070-8b71-1efd96205c5d",
+    "interview_sequence": 22,
+    "speaker": "employee",
+    "interview_text": "庫存盤點分成平常抽盤與月底全盤。平常由主管指定高周轉或容易出錯的品項，我核對ERP與現場清點結果；月底由倉庫同事分區清點，我整合各區盤點表。"
+  },
+  "consultant_reply": {
+    "source_id": "510a8961-c859-4c81-945b-1c479b46ee6d",
+    "interview_sequence": 23,
+    "speaker": "consultant",
+    "interview_text": "已將盤點獨立整理為一項工作：平常依主管指定的高周轉或易出錯品項核對 ERP 與現場清點結果；月底由倉庫同事分區清點，您整合盤點表。\n\n如果盤點數量與 ERP 不一致，您會怎麼記錄或查核？差異最後由誰決定是否調整庫存？"
+  }
+}

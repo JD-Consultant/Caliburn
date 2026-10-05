@@ -1,0 +1,101 @@
+           _                 _    
+  __ _  __| |_ __ __ _ _ __ | |_  
+ / _` |/ _` | '__/ _` | '_ \| __| 
+| (_| | (_| | | | (_| | | | | |_  
+ \__, |\__,_|_|  \__,_|_| |_|\__| 
+    |_|                           
+
+Version: 1.18.2, build: 44ad62f8
+Access web UI at http://localhost:6335/dashboard
+Agentic Skills: https://skills.qdrant.tech/
+
+2026-10-04T04:52:10.310646Z  WARN qdrant::settings: Config file not found: config/config
+2026-10-04T04:52:10.311068Z  WARN qdrant::settings: Config file not found: config/development
+2026-10-04T04:52:10.318926Z  WARN qdrant: There is a potential issue with the filesystem for storage path S:/caliburn/tmp/qeval/storage. Details: Filesystem type check is not supported on this platform
+2026-10-04T04:52:10.319569Z  INFO storage::content_manager::consensus::persistent: Loading raft state from S:/caliburn/tmp/qeval/storage\raft_state.json
+2026-10-04T04:52:10.327759Z  INFO storage::content_manager::toc: Loading collection: ocs_eval_9401166158b64229ad96f9286d4f1b09
+2026-10-04T04:52:10.425241Z  INFO collection::shards::local_shard: Recovering shard S:/caliburn/tmp/qeval/storage\collections\ocs_eval_9401166158b64229ad96f9286d4f1b09\0: 0/1 (0%)
+2026-10-04T04:52:10.445304Z  INFO collection::shards::local_shard: Recovered collection ocs_eval_9401166158b64229ad96f9286d4f1b09: 1/1 (100%)
+2026-10-04T04:52:10.448643Z  INFO storage::content_manager::toc: Loading collection: ocs_eval_c5ceadde632f418bb40f721308eb4c76
+2026-10-04T04:52:10.528224Z  INFO collection::shards::local_shard: Recovering shard S:/caliburn/tmp/qeval/storage\collections\ocs_eval_c5ceadde632f418bb40f721308eb4c76\0: 0/1 (0%)
+2026-10-04T04:52:10.539903Z  INFO collection::shards::local_shard: Recovered collection ocs_eval_c5ceadde632f418bb40f721308eb4c76: 1/1 (100%)
+2026-10-04T04:52:10.540418Z  INFO storage::content_manager::toc: Loading collection: ocs_eval_contract_cc933669c0364556aefabbd7119bbaf2
+2026-10-04T04:52:10.593029Z  INFO collection::shards::local_shard: Recovering shard S:/caliburn/tmp/qeval/storage\collections\ocs_eval_contract_cc933669c0364556aefabbd7119bbaf2\0: 0/1 (0%)
+2026-10-04T04:52:10.602421Z  INFO collection::shards::local_shard: Recovered collection ocs_eval_contract_cc933669c0364556aefabbd7119bbaf2: 1/1 (100%)
+2026-10-04T04:52:10.602673Z  INFO storage::content_manager::toc: Loading collection: ocs_eval_contract_d4dea48f489540d19588a1b94ad9315b
+2026-10-04T04:52:10.670698Z  INFO collection::shards::local_shard: Recovering shard S:/caliburn/tmp/qeval/storage\collections\ocs_eval_contract_d4dea48f489540d19588a1b94ad9315b\0: 0/1 (0%)
+2026-10-04T04:52:10.680241Z  INFO collection::shards::local_shard: Recovered collection ocs_eval_contract_d4dea48f489540d19588a1b94ad9315b: 1/1 (100%)
+2026-10-04T04:52:10.680571Z  INFO storage::content_manager::toc: Loading collection: ocs_eval_contract_ede9ed25c02346b892eccfbfd95a23c8
+2026-10-04T04:52:10.747429Z  INFO collection::shards::local_shard: Recovering shard S:/caliburn/tmp/qeval/storage\collections\ocs_eval_contract_ede9ed25c02346b892eccfbfd95a23c8\0: 0/1 (0%)
+2026-10-04T04:52:10.756309Z  INFO collection::shards::local_shard: Recovered collection ocs_eval_contract_ede9ed25c02346b892eccfbfd95a23c8: 1/1 (100%)
+2026-10-04T04:52:10.757266Z  INFO qdrant: Distributed mode disabled
+2026-10-04T04:52:10.757407Z  INFO qdrant: Telemetry reporting disabled
+2026-10-04T04:52:10.758872Z  WARN qdrant::actix::web_ui: Static content folder for Web UI './static' does not exist
+2026-10-04T04:52:10.758996Z  INFO qdrant::actix: REST transport settings: keep_alive=5s, client_request_timeout=5s, client_disconnect_timeout=5s
+2026-10-04T04:52:10.759064Z  INFO qdrant::actix: TLS disabled for REST API
+2026-10-04T04:52:10.760635Z  INFO qdrant::actix: Qdrant HTTP listening on 6335
+2026-10-04T04:52:10.760757Z  INFO actix_server::builder: starting 19 workers
+2026-10-04T04:52:10.760844Z  INFO actix_server::server: Actix runtime found; starting in Actix runtime
+2026-10-04T04:52:10.760921Z  INFO actix_server::server: starting service: "actix-web-service-127.0.0.1:6335", workers: 19, listening on: 127.0.0.1:6335
+2026-10-04T04:52:10.763917Z  INFO qdrant::tonic: Qdrant gRPC listening on 6336
+2026-10-04T04:52:10.764087Z  INFO qdrant::tonic: TLS disabled for gRPC API
+2026-10-04T04:56:10.626509Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09 HTTP/1.1" 200 486 "-" "python-httpx/0.28.1" 0.016053
+2026-10-04T04:56:18.451314Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09 HTTP/1.1" 200 485 "-" "python-client/1.18.0 python/3.11.15" 0.000643
+2026-10-04T04:56:18.507700Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6957 "-" "python-client/1.18.0 python/3.11.15" 0.024757
+2026-10-04T04:56:18.515163Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7173 "-" "python-client/1.18.0 python/3.11.15" 0.002785
+2026-10-04T04:56:18.546164Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7070 "-" "python-client/1.18.0 python/3.11.15" 0.002232
+2026-10-04T04:56:18.551364Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7031 "-" "python-client/1.18.0 python/3.11.15" 0.002084
+2026-10-04T04:56:18.560196Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6812 "-" "python-client/1.18.0 python/3.11.15" 0.002252
+2026-10-04T04:56:18.576536Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6763 "-" "python-client/1.18.0 python/3.11.15" 0.002024
+2026-10-04T04:56:18.592681Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7032 "-" "python-client/1.18.0 python/3.11.15" 0.002264
+2026-10-04T04:56:18.623699Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7149 "-" "python-client/1.18.0 python/3.11.15" 0.002214
+2026-10-04T04:56:18.632716Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7055 "-" "python-client/1.18.0 python/3.11.15" 0.002211
+2026-10-04T04:56:18.653402Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7212 "-" "python-client/1.18.0 python/3.11.15" 0.001863
+2026-10-04T04:56:18.670069Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7112 "-" "python-client/1.18.0 python/3.11.15" 0.002539
+2026-10-04T04:56:18.685210Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6950 "-" "python-client/1.18.0 python/3.11.15" 0.002179
+2026-10-04T04:56:18.694151Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6765 "-" "python-client/1.18.0 python/3.11.15" 0.001897
+2026-10-04T04:56:18.700172Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6651 "-" "python-client/1.18.0 python/3.11.15" 0.002290
+2026-10-04T04:56:18.716836Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6894 "-" "python-client/1.18.0 python/3.11.15" 0.001915
+2026-10-04T04:56:18.732139Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6922 "-" "python-client/1.18.0 python/3.11.15" 0.002150
+2026-10-04T04:59:30.796460Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6733 "-" "python-client/1.18.0 python/3.11.15" 0.002557
+2026-10-04T04:59:30.804107Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6651 "-" "python-client/1.18.0 python/3.11.15" 0.001934
+2026-10-04T04:59:30.808431Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6866 "-" "python-client/1.18.0 python/3.11.15" 0.001318
+2026-10-04T04:59:45.523262Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6732 "-" "python-client/1.18.0 python/3.11.15" 0.001607
+2026-10-04T04:59:45.548341Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6650 "-" "python-client/1.18.0 python/3.11.15" 0.001408
+2026-10-04T04:59:45.564226Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6866 "-" "python-client/1.18.0 python/3.11.15" 0.001578
+2026-10-04T05:00:00.054144Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 826 "-" "python-client/1.18.0 python/3.11.15" 0.001337
+2026-10-04T05:00:00.082903Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 857 "-" "python-client/1.18.0 python/3.11.15" 0.001265
+2026-10-04T05:00:00.098244Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 886 "-" "python-client/1.18.0 python/3.11.15" 0.001172
+2026-10-04T05:00:01.769484Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 825 "-" "python-client/1.18.0 python/3.11.15" 0.000994
+2026-10-04T05:00:01.772470Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 857 "-" "python-client/1.18.0 python/3.11.15" 0.000829
+2026-10-04T05:00:01.794350Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 886 "-" "python-client/1.18.0 python/3.11.15" 0.000907
+2026-10-04T05:00:03.460118Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6671 "-" "python-client/1.18.0 python/3.11.15" 0.001997
+2026-10-04T05:00:03.473950Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6786 "-" "python-client/1.18.0 python/3.11.15" 0.001399
+2026-10-04T05:00:03.490529Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7080 "-" "python-client/1.18.0 python/3.11.15" 0.001989
+2026-10-04T05:00:03.505622Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7085 "-" "python-client/1.18.0 python/3.11.15" 0.001711
+2026-10-04T05:00:22.151550Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6672 "-" "python-client/1.18.0 python/3.11.15" 0.001742
+2026-10-04T05:00:22.172599Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 6786 "-" "python-client/1.18.0 python/3.11.15" 0.001337
+2026-10-04T05:00:22.188341Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7080 "-" "python-client/1.18.0 python/3.11.15" 0.001507
+2026-10-04T05:00:22.204114Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 7085 "-" "python-client/1.18.0 python/3.11.15" 0.001563
+2026-10-04T05:00:41.182659Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 889 "-" "python-client/1.18.0 python/3.11.15" 0.001274
+2026-10-04T05:00:41.200617Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 874 "-" "python-client/1.18.0 python/3.11.15" 0.001910
+2026-10-04T05:00:41.203674Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 894 "-" "python-client/1.18.0 python/3.11.15" 0.001034
+2026-10-04T05:00:41.206729Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 899 "-" "python-client/1.18.0 python/3.11.15" 0.001021
+2026-10-04T05:00:43.047856Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 888 "-" "python-client/1.18.0 python/3.11.15" 0.001017
+2026-10-04T05:00:43.060791Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 874 "-" "python-client/1.18.0 python/3.11.15" 0.001062
+2026-10-04T05:00:43.063713Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 894 "-" "python-client/1.18.0 python/3.11.15" 0.000968
+2026-10-04T05:00:43.066306Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 899 "-" "python-client/1.18.0 python/3.11.15" 0.000907
+2026-10-04T05:02:59.713797Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 825 "-" "python-client/1.18.0 python/3.11.15" 0.001831
+2026-10-04T05:02:59.730260Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 857 "-" "python-client/1.18.0 python/3.11.15" 0.001065
+2026-10-04T05:02:59.733036Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 886 "-" "python-client/1.18.0 python/3.11.15" 0.000984
+2026-10-04T05:02:59.760413Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 825 "-" "python-client/1.18.0 python/3.11.15" 0.000905
+2026-10-04T05:02:59.775992Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 857 "-" "python-client/1.18.0 python/3.11.15" 0.001258
+2026-10-04T05:02:59.791532Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 886 "-" "python-client/1.18.0 python/3.11.15" 0.001035
+2026-10-04T05:02:59.806803Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 889 "-" "python-client/1.18.0 python/3.11.15" 0.000951
+2026-10-04T05:02:59.822232Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 874 "-" "python-client/1.18.0 python/3.11.15" 0.000931
+2026-10-04T05:02:59.838468Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 895 "-" "python-client/1.18.0 python/3.11.15" 0.000955
+2026-10-04T05:02:59.854272Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 899 "-" "python-client/1.18.0 python/3.11.15" 0.001077
+2026-10-04T05:02:59.869124Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 889 "-" "python-client/1.18.0 python/3.11.15" 0.000946
+2026-10-04T05:02:59.871765Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 874 "-" "python-client/1.18.0 python/3.11.15" 0.000829
+2026-10-04T05:02:59.884945Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 895 "-" "python-client/1.18.0 python/3.11.15" 0.001034
+2026-10-04T05:02:59.887748Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/ocs_eval_9401166158b64229ad96f9286d4f1b09/points/query HTTP/1.1" 200 899 "-" "python-client/1.18.0 python/3.11.15" 0.000785

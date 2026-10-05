@@ -1,0 +1,4034 @@
+[
+  {
+    "case_id": "F01",
+    "method": "O-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.7535348000237718,
+    "db_seconds": 0.014478600001893938,
+    "cosine_and_sort_seconds": 0.0033848999883048236,
+    "gpu_seconds": 0.6906563000084134,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "IIS3513-008v3",
+      "IIS3513-002v4",
+      "KPS2434-004v2",
+      "MQM2141-001v4",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "O-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.6358434000285342,
+    "db_seconds": 0.030385099991690367,
+    "cosine_and_sort_seconds": 0.00612779997754842,
+    "gpu_seconds": 0.5543713930092053,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "IIS3513-003v4",
+      "KRM1324-001v1",
+      "KPS2434-001v2",
+      "KPS2434-002v2",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "O-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.5842362999683246,
+    "db_seconds": 0.040100700047332793,
+    "cosine_and_sort_seconds": 0.0076988000655546784,
+    "gpu_seconds": 0.4978357329964638,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "IIS3513-002v4",
+      "KPS2434-001v2",
+      "KPS2434-002v2",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.8446610000100918,
+    "db_seconds": 0.024504899978637695,
+    "cosine_and_sort_seconds": 0.00181940000038594,
+    "gpu_seconds": 0.7794598030013731,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "KPS2434-004v2",
+      "MQM2141-001v4",
+      "KRM4224-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.8456659999792464,
+    "db_seconds": 0.021811299957334995,
+    "cosine_and_sort_seconds": 0.005738499981816858,
+    "gpu_seconds": 0.7753405639959965,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "ISD2152-002v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "ISD2152-001v4",
+      "MEM3113-001v4",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.7995218000141904,
+    "db_seconds": 0.03405870002461597,
+    "cosine_and_sort_seconds": 0.007922500022687018,
+    "gpu_seconds": 0.7044675060024019,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-002v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "ISD2152-001v4",
+      "MEM3113-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "O-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.5429700000095181,
+    "db_seconds": 0.018870300031267107,
+    "cosine_and_sort_seconds": 0.0319385000038892,
+    "gpu_seconds": 0.4460773570026504,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "IIS3513-002v4",
+      "AVA2172-003v3",
+      "IDC1330-001v1"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "O-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.7450241000042297,
+    "db_seconds": 0.021876399987377226,
+    "cosine_and_sort_seconds": 0.00606709998100996,
+    "gpu_seconds": 0.6711293629923603,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "IIS3513-003v4",
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "INM2529-001v3",
+      "IIS2522-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "O-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.6394384999875911,
+    "db_seconds": 0.03768559999298304,
+    "cosine_and_sort_seconds": 0.008143800019752234,
+    "gpu_seconds": 0.5404950049996842,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "IIS2522-001v3",
+      "INM7421-010v3",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.7163664000108838,
+    "db_seconds": 0.018397599982563406,
+    "cosine_and_sort_seconds": 0.001764099986758083,
+    "gpu_seconds": 0.6559250989957945,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-003v3",
+      "INM7421-001v3",
+      "ISD2513-001v4",
+      "BAS3332-003v3",
+      "IIS3513-003v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.8771118000149727,
+    "db_seconds": 0.01133730000583455,
+    "cosine_and_sort_seconds": 0.006623599969316274,
+    "gpu_seconds": 0.808922921991325,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-002v3",
+      "AVA2172-003v3",
+      "MEM3113-001v4",
+      "IIS3513-003v4",
+      "BHR2422-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.8028073000023142,
+    "db_seconds": 0.015611200011335313,
+    "cosine_and_sort_seconds": 0.008291000034660101,
+    "gpu_seconds": 0.7360131930036005,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-002v3",
+      "AVA2172-003v3",
+      "ISD2513-001v4",
+      "BAS3332-003v3",
+      "IIS3513-003v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "O-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.5509615000337362,
+    "db_seconds": 0.017089099972508848,
+    "cosine_and_sort_seconds": 0.0020362999639473855,
+    "gpu_seconds": 0.49333589800517075,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "BAS1219-005v1",
+      "KRM3323-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "O-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.6717355000437237,
+    "db_seconds": 0.010855000000447035,
+    "cosine_and_sort_seconds": 0.006257199973333627,
+    "gpu_seconds": 0.6041596460127039,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "停車場管理員",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "O-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.6875703999539837,
+    "db_seconds": 0.017568100010976195,
+    "cosine_and_sort_seconds": 0.007777800026815385,
+    "gpu_seconds": 0.606889091010089,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "KRM3323-001v4",
+      "停車場管理員"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.1052451000432484,
+    "db_seconds": 0.0289649999467656,
+    "cosine_and_sort_seconds": 0.003241600003093481,
+    "gpu_seconds": 1.0394238409935497,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "FAC3313-001v2",
+      "BAS1219-003v4",
+      "KRM3323-001v4",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 40
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.4790815999731421,
+    "db_seconds": 0.05739129998255521,
+    "cosine_and_sort_seconds": 0.011691800085827708,
+    "gpu_seconds": 1.3699830650002696,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "BAS1219-003v4",
+      "KPS2434-004v2",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 40
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.3374957999913022,
+    "db_seconds": 0.07134720002068207,
+    "cosine_and_sort_seconds": 0.015458099951501936,
+    "gpu_seconds": 1.198119880995364,
+    "queries": 2,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM3323-001v4",
+      "FAC3313-001v2",
+      "BAS1219-003v4",
+      "KPS2434-004v2",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 40
+  },
+  {
+    "case_id": "F04",
+    "method": "O-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.529718000034336,
+    "db_seconds": 0.01677599997492507,
+    "cosine_and_sort_seconds": 0.0017294000135734677,
+    "gpu_seconds": 0.46769652400689665,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "SET7127-002v3",
+      "網路維修助理",
+      "MEM7412-001v3",
+      "MEM3511-001v3",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "O-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.7183913000044413,
+    "db_seconds": 0.03143499995348975,
+    "cosine_and_sort_seconds": 0.006019499967806041,
+    "gpu_seconds": 0.6261448860022938,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MEM7231-011v2",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "SET3113-002v3",
+      "SET7231-002v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "O-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.6417008999851532,
+    "db_seconds": 0.039409899967722595,
+    "cosine_and_sort_seconds": 0.007642499927897006,
+    "gpu_seconds": 0.5551087560015731,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MEM7231-011v2",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "SET3113-002v3",
+      "網路維修助理"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.7810951000428759,
+    "db_seconds": 0.005333599983714521,
+    "cosine_and_sort_seconds": 0.030679300019983202,
+    "gpu_seconds": 0.709482495993143,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM8142-001v3",
+      "MEM8199-002v3",
+      "MIM2141-001v4",
+      "MEM2434-001v2",
+      "印刷機台技術助理"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.026726999960374,
+    "db_seconds": 0.011430999962612987,
+    "cosine_and_sort_seconds": 0.005881099961698055,
+    "gpu_seconds": 0.9621973339963006,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MEM7231-003v4",
+      "CCM7412-003v3",
+      "MIM2141-001v4",
+      "MQM1322-001v4",
+      "SET7127-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.9440775000257418,
+    "db_seconds": 0.0367309000575915,
+    "cosine_and_sort_seconds": 0.008061200031079352,
+    "gpu_seconds": 0.8555379659956088,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MPM8142-001v3",
+      "MIM2141-001v4",
+      "MQM1322-001v4",
+      "MEM7231-005v4",
+      "SET7231-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "O-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.4868678000057116,
+    "db_seconds": 0.02901440003188327,
+    "cosine_and_sort_seconds": 0.0022316999966278672,
+    "gpu_seconds": 0.4076417269970989,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "PIC3332-002v2",
+      "MPM7322-006v4",
+      "KMC2432-003v3",
+      "KPS3322-003v3",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "O-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.7181913999957033,
+    "db_seconds": 0.036814199993386865,
+    "cosine_and_sort_seconds": 0.006369399954564869,
+    "gpu_seconds": 0.6344815509946784,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KPS3334-009v4",
+      "KMC1222-002v3",
+      "TTM3422-001v2",
+      "KMC3332-001v3",
+      "AVA2172-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "O-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.6228592999977991,
+    "db_seconds": 0.030220000015106052,
+    "cosine_and_sort_seconds": 0.0084703000029549,
+    "gpu_seconds": 0.5383543329953682,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KPS3334-009v4",
+      "KMC1222-002v3",
+      "PIC3332-002v2",
+      "ATC3439-001v3",
+      "MPM7322-006v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.6229305999586359,
+    "db_seconds": 0.006073499971535057,
+    "cosine_and_sort_seconds": 0.0018731000018306077,
+    "gpu_seconds": 0.5798243190074572,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM7322-006v4",
+      "AVA2172-001v4",
+      "ATC3339-001v4",
+      "AVA2172-004v3",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.794181400036905,
+    "db_seconds": 0.032086400024127215,
+    "cosine_and_sort_seconds": 0.005918400012888014,
+    "gpu_seconds": 0.7189431769947987,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-001v4",
+      "珠寶金工人員",
+      "AVA2172-004v3",
+      "KPS3334-009v4",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 0.786022900021635,
+    "db_seconds": 0.0602988000609912,
+    "cosine_and_sort_seconds": 0.007882999954745173,
+    "gpu_seconds": 0.6771656189957866,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MPM7322-006v4",
+      "AVA2172-001v4",
+      "ATC3339-001v4",
+      "珠寶金工人員",
+      "AVA2172-004v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "O-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.0909073000075296,
+    "db_seconds": 0.022112000035122037,
+    "cosine_and_sort_seconds": 0.0022909000399522483,
+    "gpu_seconds": 1.030214790996979,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "BGM5220-002v3",
+      "KPS2434-004v2",
+      "TFB5139-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "O-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.2432741999509744,
+    "db_seconds": 0.02375300001585856,
+    "cosine_and_sort_seconds": 0.006143700040411204,
+    "gpu_seconds": 1.1635397319914773,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KMC2432-003v3",
+      "BHR2422-011v4",
+      "KMC2432-001v4",
+      "KPS5220-001v4",
+      "KPS3322-003v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "O-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.179326600045897,
+    "db_seconds": 0.041169899923261255,
+    "cosine_and_sort_seconds": 0.008675599994603544,
+    "gpu_seconds": 1.0915197330032242,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "BGM5220-002v3",
+      "KPS2434-004v2",
+      "KMC2432-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.008859499997925,
+    "db_seconds": 0.0239844000316225,
+    "cosine_and_sort_seconds": 0.0019039000035263598,
+    "gpu_seconds": 0.9441836530022556,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS1219-005v1",
+      "BGM5220-002v3",
+      "TFB5139-001v3",
+      "KMC2432-003v3",
+      "TTM4221-004v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.1435373999993317,
+    "db_seconds": 0.011484300019219518,
+    "cosine_and_sort_seconds": 0.006068499991670251,
+    "gpu_seconds": 1.0707154590054415,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS1219-005v1",
+      "KMC1222-002v3",
+      "BHR2422-007v4",
+      "KPS2434-004v2",
+      "BHR2422-011v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.1674822999630123,
+    "db_seconds": 0.04730290005682036,
+    "cosine_and_sort_seconds": 0.009064000041689724,
+    "gpu_seconds": 1.0708384660101729,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BAS1219-005v1",
+      "TFB5139-001v3",
+      "KMC1222-002v3",
+      "BAS1219-003v4",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "O-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.1117941999691539,
+    "db_seconds": 0.005162600020412356,
+    "cosine_and_sort_seconds": 0.002132800000254065,
+    "gpu_seconds": 1.0542518570000539,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "O-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.089144200028386,
+    "db_seconds": 0.0368107000249438,
+    "cosine_and_sort_seconds": 0.0071220999816432595,
+    "gpu_seconds": 0.99871328700101,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MMP4321-002v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "KRM1324-001v1",
+      "BGM5220-002v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "O-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.113945999997668,
+    "db_seconds": 0.04336619999958202,
+    "cosine_and_sort_seconds": 0.007773099932819605,
+    "gpu_seconds": 0.9992302099999506,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.0953194999601692,
+    "db_seconds": 0.018520999990869313,
+    "cosine_and_sort_seconds": 0.03509030002169311,
+    "gpu_seconds": 0.9891474739997648,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "NFP7911-001v1",
+      "RLM9330-001v1",
+      "BGM5220-002v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.1412074000108987,
+    "db_seconds": 0.03056819998892024,
+    "cosine_and_sort_seconds": 0.006449999986216426,
+    "gpu_seconds": 1.0574773310072487,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "RLM9330-001v1",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 1.0902255999972112,
+    "db_seconds": 0.04169129999354482,
+    "cosine_and_sort_seconds": 0.007900499971583486,
+    "gpu_seconds": 1.0049519010062795,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "RLM9330-001v1",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "O-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 3.074652799987234,
+    "db_seconds": 0.030380600015632808,
+    "cosine_and_sort_seconds": 0.0021004999871365726,
+    "gpu_seconds": 2.9893010340019828,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "MPM8142-003v3",
+      "MMP4321-002v4",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "O-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 2.8633080000290647,
+    "db_seconds": 0.011858500016387552,
+    "cosine_and_sort_seconds": 0.007031799992546439,
+    "gpu_seconds": 2.795239469007356,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "KPS2434-004v2",
+      "AVA2173-012v3",
+      "MMP4321-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "O-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 2.96171449997928,
+    "db_seconds": 0.017591900017578155,
+    "cosine_and_sort_seconds": 0.008354199992027134,
+    "gpu_seconds": 2.887543529010145,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "MMP4321-002v4",
+      "MQM1322-001v4",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-D-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 3.1392937999917194,
+    "db_seconds": 0.11274060007417575,
+    "cosine_and_sort_seconds": 0.007521599996834993,
+    "gpu_seconds": 2.9614094930002466,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "MQM2141-005v2",
+      "MQM7919-001v4",
+      "KRM3323-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 80
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-T-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 3.345256000000518,
+    "db_seconds": 0.08136410004226491,
+    "cosine_and_sort_seconds": 0.02859329991042614,
+    "gpu_seconds": 3.1963719420018606,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "MMP4321-002v4",
+      "BAS3323-002v4",
+      "BAS3323-001v4",
+      "INM3513-004v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 80
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-M-R",
+    "repeat": 1,
+    "method_order": [
+      "O-D-R",
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R"
+    ],
+    "seconds": 3.3354245999944396,
+    "db_seconds": 0.1711675000260584,
+    "cosine_and_sort_seconds": 0.03217539994511753,
+    "gpu_seconds": 3.0732696329941973,
+    "queries": 4,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "KRM3323-001v4",
+      "MMP4321-002v4",
+      "MQM2141-005v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 80
+  },
+  {
+    "case_id": "F01",
+    "method": "O-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.652141299971845,
+    "db_seconds": 0.011898600030690432,
+    "cosine_and_sort_seconds": 0.03956230002222583,
+    "gpu_seconds": 0.5551326099957805,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "IIS3513-003v4",
+      "KRM1324-001v1",
+      "KPS2434-001v2",
+      "KPS2434-002v2",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "O-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.5963294999673963,
+    "db_seconds": 0.034314600052312016,
+    "cosine_and_sort_seconds": 0.008601500012446195,
+    "gpu_seconds": 0.5073667490069056,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "IIS3513-002v4",
+      "KPS2434-001v2",
+      "KPS2434-002v2",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.8500785999931395,
+    "db_seconds": 0.030196300009265542,
+    "cosine_and_sort_seconds": 0.0020809000125154853,
+    "gpu_seconds": 0.7655393690074561,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "KPS2434-004v2",
+      "MQM2141-001v4",
+      "KRM4224-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.8692178999772295,
+    "db_seconds": 0.02211879997048527,
+    "cosine_and_sort_seconds": 0.006420799996703863,
+    "gpu_seconds": 0.7837096709990874,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "ISD2152-002v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "ISD2152-001v4",
+      "MEM3113-001v4",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.8220453999820165,
+    "db_seconds": 0.036328200018033385,
+    "cosine_and_sort_seconds": 0.00821239996002987,
+    "gpu_seconds": 0.7261434109968832,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-002v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "ISD2152-001v4",
+      "MEM3113-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "O-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.5509687000303529,
+    "db_seconds": 0.026327100000344217,
+    "cosine_and_sort_seconds": 0.0017595000099390745,
+    "gpu_seconds": 0.47839089400076773,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "IIS3513-008v3",
+      "IIS3513-002v4",
+      "KPS2434-004v2",
+      "MQM2141-001v4",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "O-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.7471378999762237,
+    "db_seconds": 0.01395819999743253,
+    "cosine_and_sort_seconds": 0.008090400020591915,
+    "gpu_seconds": 0.6811359050043393,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "IIS3513-003v4",
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "INM2529-001v3",
+      "IIS2522-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "O-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.6542811000254005,
+    "db_seconds": 0.04753140005050227,
+    "cosine_and_sort_seconds": 0.00854310003342107,
+    "gpu_seconds": 0.5511001220002072,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "IIS2522-001v3",
+      "INM7421-010v3",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.7187857999815606,
+    "db_seconds": 0.019302800006698817,
+    "cosine_and_sort_seconds": 0.002647200017236173,
+    "gpu_seconds": 0.6473315690091113,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-003v3",
+      "INM7421-001v3",
+      "ISD2513-001v4",
+      "BAS3332-003v3",
+      "IIS3513-003v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.9031754999887198,
+    "db_seconds": 0.035572700027842075,
+    "cosine_and_sort_seconds": 0.0062729999772273,
+    "gpu_seconds": 0.8275046569906408,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-002v3",
+      "AVA2172-003v3",
+      "MEM3113-001v4",
+      "IIS3513-003v4",
+      "BHR2422-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.842775100027211,
+    "db_seconds": 0.03199769993079826,
+    "cosine_and_sort_seconds": 0.01031339995097369,
+    "gpu_seconds": 0.7523086500004865,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-002v3",
+      "AVA2172-003v3",
+      "ISD2513-001v4",
+      "BAS3332-003v3",
+      "IIS3513-003v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "O-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.5091565999900922,
+    "db_seconds": 0.016356300038751215,
+    "cosine_and_sort_seconds": 0.001774700009264052,
+    "gpu_seconds": 0.4549460109992651,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "IIS3513-002v4",
+      "AVA2172-003v3",
+      "IDC1330-001v1"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "O-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.6805552000296302,
+    "db_seconds": 0.03466170001775026,
+    "cosine_and_sort_seconds": 0.006359799997881055,
+    "gpu_seconds": 0.6011353169888025,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "停車場管理員",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "O-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.6603816999704577,
+    "db_seconds": 0.01676870003575459,
+    "cosine_and_sort_seconds": 0.00805870007025078,
+    "gpu_seconds": 0.5900915629899828,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "KRM3323-001v4",
+      "停車場管理員"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.1290812999941409,
+    "db_seconds": 0.022514000011142343,
+    "cosine_and_sort_seconds": 0.0034450000384822488,
+    "gpu_seconds": 1.0641132780001499,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "FAC3313-001v2",
+      "BAS1219-003v4",
+      "KRM3323-001v4",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 40
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.5120731999631971,
+    "db_seconds": 0.04420930001651868,
+    "cosine_and_sort_seconds": 0.013221700035501271,
+    "gpu_seconds": 1.4061044830013998,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "BAS1219-003v4",
+      "KPS2434-004v2",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 40
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.393858800001908,
+    "db_seconds": 0.09085299988510087,
+    "cosine_and_sort_seconds": 0.04809829994337633,
+    "gpu_seconds": 1.2063312170066638,
+    "queries": 2,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM3323-001v4",
+      "FAC3313-001v2",
+      "BAS1219-003v4",
+      "KPS2434-004v2",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 40
+  },
+  {
+    "case_id": "F03",
+    "method": "O-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.5790807000012137,
+    "db_seconds": 0.024486100010108203,
+    "cosine_and_sort_seconds": 0.001965699950233102,
+    "gpu_seconds": 0.5126986889954424,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "BAS1219-005v1",
+      "KRM3323-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "O-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.7218485999619588,
+    "db_seconds": 0.03513789997668937,
+    "cosine_and_sort_seconds": 0.006460800010245293,
+    "gpu_seconds": 0.638272866999614,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MEM7231-011v2",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "SET3113-002v3",
+      "SET7231-002v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "O-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.6659672999521717,
+    "db_seconds": 0.040528499986976385,
+    "cosine_and_sort_seconds": 0.009395600005518645,
+    "gpu_seconds": 0.566650706998189,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MEM7231-011v2",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "SET3113-002v3",
+      "網路維修助理"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.7843856000108644,
+    "db_seconds": 0.015745499986223876,
+    "cosine_and_sort_seconds": 0.0018860000418499112,
+    "gpu_seconds": 0.722275513006025,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM8142-001v3",
+      "MEM8199-002v3",
+      "MIM2141-001v4",
+      "MEM2434-001v2",
+      "印刷機台技術助理"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.0410394999780692,
+    "db_seconds": 0.030449700017925352,
+    "cosine_and_sort_seconds": 0.005709099990781397,
+    "gpu_seconds": 0.9506405910069589,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MEM7231-003v4",
+      "CCM7412-003v3",
+      "MIM2141-001v4",
+      "MQM1322-001v4",
+      "SET7127-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.9662325999815948,
+    "db_seconds": 0.05536599998595193,
+    "cosine_and_sort_seconds": 0.007819400052540004,
+    "gpu_seconds": 0.856245367001975,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MPM8142-001v3",
+      "MIM2141-001v4",
+      "MQM1322-001v4",
+      "MEM7231-005v4",
+      "SET7231-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "O-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.5576430999790318,
+    "db_seconds": 0.02278880000812933,
+    "cosine_and_sort_seconds": 0.0017281000036746264,
+    "gpu_seconds": 0.47948912500578444,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "SET7127-002v3",
+      "網路維修助理",
+      "MEM7412-001v3",
+      "MEM3511-001v3",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "O-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.7529567000456154,
+    "db_seconds": 0.026161400019191206,
+    "cosine_and_sort_seconds": 0.007141800015233457,
+    "gpu_seconds": 0.6540353629970923,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KPS3334-009v4",
+      "KMC1222-002v3",
+      "TTM3422-001v2",
+      "KMC3332-001v3",
+      "AVA2172-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "O-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.667839199944865,
+    "db_seconds": 0.061419200035743415,
+    "cosine_and_sort_seconds": 0.009240200044587255,
+    "gpu_seconds": 0.5543129659927217,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KPS3334-009v4",
+      "KMC1222-002v3",
+      "PIC3332-002v2",
+      "ATC3439-001v3",
+      "MPM7322-006v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.6461766000138596,
+    "db_seconds": 0.006475700007285923,
+    "cosine_and_sort_seconds": 0.0017940999823622406,
+    "gpu_seconds": 0.5834896730084438,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM7322-006v4",
+      "AVA2172-001v4",
+      "ATC3339-001v4",
+      "AVA2172-004v3",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.7806289999862202,
+    "db_seconds": 0.013645400002133101,
+    "cosine_and_sort_seconds": 0.0071629000012762845,
+    "gpu_seconds": 0.7166333110071719,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-001v4",
+      "珠寶金工人員",
+      "AVA2172-004v3",
+      "KPS3334-009v4",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.7857464999542572,
+    "db_seconds": 0.05789420002838597,
+    "cosine_and_sort_seconds": 0.008332199999131262,
+    "gpu_seconds": 0.678038348996779,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MPM7322-006v4",
+      "AVA2172-001v4",
+      "ATC3339-001v4",
+      "珠寶金工人員",
+      "AVA2172-004v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "O-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 0.4954911000095308,
+    "db_seconds": 0.01663699996424839,
+    "cosine_and_sort_seconds": 0.0020424999529495835,
+    "gpu_seconds": 0.4223706840130035,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "PIC3332-002v2",
+      "MPM7322-006v4",
+      "KMC2432-003v3",
+      "KPS3322-003v3",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "O-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.258369799994398,
+    "db_seconds": 0.01548269996419549,
+    "cosine_and_sort_seconds": 0.007194200006779283,
+    "gpu_seconds": 1.1911538780113915,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KMC2432-003v3",
+      "BHR2422-011v4",
+      "KMC2432-001v4",
+      "KPS5220-001v4",
+      "KPS3322-003v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "O-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.2332138000056148,
+    "db_seconds": 0.035650999983772635,
+    "cosine_and_sort_seconds": 0.00956100004259497,
+    "gpu_seconds": 1.1392342930048471,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "BGM5220-002v3",
+      "KPS2434-004v2",
+      "KMC2432-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.068671999964863,
+    "db_seconds": 0.022971600003074855,
+    "cosine_and_sort_seconds": 0.0020436999620869756,
+    "gpu_seconds": 0.9794657040038146,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS1219-005v1",
+      "BGM5220-002v3",
+      "TFB5139-001v3",
+      "KMC2432-003v3",
+      "TTM4221-004v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.1879411000409164,
+    "db_seconds": 0.03206789999967441,
+    "cosine_and_sort_seconds": 0.007496099977288395,
+    "gpu_seconds": 1.1063215830072295,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS1219-005v1",
+      "KMC1222-002v3",
+      "BHR2422-007v4",
+      "KPS2434-004v2",
+      "BHR2422-011v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.195373099995777,
+    "db_seconds": 0.035680699977092445,
+    "cosine_and_sort_seconds": 0.009436799969989806,
+    "gpu_seconds": 1.1080806770041818,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BAS1219-005v1",
+      "TFB5139-001v3",
+      "KMC1222-002v3",
+      "BAS1219-003v4",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "O-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.1620742999948561,
+    "db_seconds": 0.006294800026807934,
+    "cosine_and_sort_seconds": 0.0020079000387340784,
+    "gpu_seconds": 1.100173540005926,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "BGM5220-002v3",
+      "KPS2434-004v2",
+      "TFB5139-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "O-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.139190299960319,
+    "db_seconds": 0.025419199955649674,
+    "cosine_and_sort_seconds": 0.044499400013592094,
+    "gpu_seconds": 1.0308678150031483,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MMP4321-002v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "KRM1324-001v1",
+      "BGM5220-002v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "O-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.1169180000433698,
+    "db_seconds": 0.03485479997470975,
+    "cosine_and_sort_seconds": 0.008186799997929484,
+    "gpu_seconds": 1.0370241110067582,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.0543114999891259,
+    "db_seconds": 0.005752300028689206,
+    "cosine_and_sort_seconds": 0.0017716000438667834,
+    "gpu_seconds": 1.0103701000043657,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "NFP7911-001v1",
+      "RLM9330-001v1",
+      "BGM5220-002v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.2075265999883413,
+    "db_seconds": 0.0378086999990046,
+    "cosine_and_sort_seconds": 0.006443299993406981,
+    "gpu_seconds": 1.1092005609971238,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "RLM9330-001v1",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.1584213000023738,
+    "db_seconds": 0.03906069998629391,
+    "cosine_and_sort_seconds": 0.011131800012663007,
+    "gpu_seconds": 1.0607888649974484,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "RLM9330-001v1",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "O-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 1.1317390999756753,
+    "db_seconds": 0.006143999984487891,
+    "cosine_and_sort_seconds": 0.0021715000038966537,
+    "gpu_seconds": 1.0846591620065738,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "O-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 2.967948500008788,
+    "db_seconds": 0.014623199997004122,
+    "cosine_and_sort_seconds": 0.007298699987586588,
+    "gpu_seconds": 2.8974582590017235,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "KPS2434-004v2",
+      "AVA2173-012v3",
+      "MMP4321-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "O-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 3.097390600014478,
+    "db_seconds": 0.016295900044497102,
+    "cosine_and_sort_seconds": 0.0073309000581502914,
+    "gpu_seconds": 3.015532493998762,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "MMP4321-002v4",
+      "MQM1322-001v4",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 3.202426599978935,
+    "db_seconds": 0.07220549997873604,
+    "cosine_and_sort_seconds": 0.007524500018917024,
+    "gpu_seconds": 3.0726127330126474,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "MQM2141-005v2",
+      "MQM7919-001v4",
+      "KRM3323-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 80
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-T-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 3.5543966999975964,
+    "db_seconds": 0.11559840000700206,
+    "cosine_and_sort_seconds": 0.029711199924349785,
+    "gpu_seconds": 3.3630331680033123,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "MMP4321-002v4",
+      "BAS3323-002v4",
+      "BAS3323-001v4",
+      "INM3513-004v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 80
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-M-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 3.487494900007732,
+    "db_seconds": 0.17591330007417127,
+    "cosine_and_sort_seconds": 0.07589529996039346,
+    "gpu_seconds": 3.1660336990025826,
+    "queries": 4,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "KRM3323-001v4",
+      "MMP4321-002v4",
+      "MQM2141-005v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 80
+  },
+  {
+    "case_id": "H03",
+    "method": "O-D-R",
+    "repeat": 2,
+    "method_order": [
+      "O-T-R",
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R"
+    ],
+    "seconds": 3.3532054999959655,
+    "db_seconds": 0.029165999963879585,
+    "cosine_and_sort_seconds": 0.0020764999790117145,
+    "gpu_seconds": 3.276122341005248,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "MPM8142-003v3",
+      "MMP4321-002v4",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "O-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.5872025000280701,
+    "db_seconds": 0.03602860000682995,
+    "cosine_and_sort_seconds": 0.008343400026205927,
+    "gpu_seconds": 0.505259641999146,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "IIS3513-002v4",
+      "KPS2434-001v2",
+      "KPS2434-002v2",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.8672951000044122,
+    "db_seconds": 0.02437830000417307,
+    "cosine_and_sort_seconds": 0.0018084999755956233,
+    "gpu_seconds": 0.8038864150003064,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "KPS2434-004v2",
+      "MQM2141-001v4",
+      "KRM4224-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.8665587999857962,
+    "db_seconds": 0.01502200000686571,
+    "cosine_and_sort_seconds": 0.006987000000663102,
+    "gpu_seconds": 0.8037677940010326,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "ISD2152-002v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "ISD2152-001v4",
+      "MEM3113-001v4",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.8430078999954276,
+    "db_seconds": 0.03239720000419766,
+    "cosine_and_sort_seconds": 0.008925899979658425,
+    "gpu_seconds": 0.7529626309988089,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-002v4",
+      "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+      "ISD2152-001v4",
+      "MEM3113-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "O-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.5364406000007875,
+    "db_seconds": 0.01913650002097711,
+    "cosine_and_sort_seconds": 0.002043199958279729,
+    "gpu_seconds": 0.47905154299223796,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "IIS3513-008v3",
+      "IIS3513-002v4",
+      "KPS2434-004v2",
+      "MQM2141-001v4",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F01",
+    "method": "O-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.6525026999879628,
+    "db_seconds": 0.012359799991827458,
+    "cosine_and_sort_seconds": 0.006514400010928512,
+    "gpu_seconds": 0.5760416479897685,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "IIS3513-003v4",
+      "KRM1324-001v1",
+      "KPS2434-001v2",
+      "KPS2434-002v2",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "O-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.6513910999638028,
+    "db_seconds": 0.03009889996610582,
+    "cosine_and_sort_seconds": 0.008168900036253035,
+    "gpu_seconds": 0.5668912999972235,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "IIS2522-001v3",
+      "INM7421-010v3",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.7428278000443242,
+    "db_seconds": 0.005816299992147833,
+    "cosine_and_sort_seconds": 0.001933799998369068,
+    "gpu_seconds": 0.6849575520027429,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-003v3",
+      "INM7421-001v3",
+      "ISD2513-001v4",
+      "BAS3332-003v3",
+      "IIS3513-003v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.9432929999893531,
+    "db_seconds": 0.03519429999869317,
+    "cosine_and_sort_seconds": 0.007308300002478063,
+    "gpu_seconds": 0.8597927579976385,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-002v3",
+      "AVA2172-003v3",
+      "MEM3113-001v4",
+      "IIS3513-003v4",
+      "BHR2422-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.8667070999508724,
+    "db_seconds": 0.03739180002594367,
+    "cosine_and_sort_seconds": 0.008489100029692054,
+    "gpu_seconds": 0.7809039510029834,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-002v3",
+      "AVA2172-003v3",
+      "ISD2513-001v4",
+      "BAS3332-003v3",
+      "IIS3513-003v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "O-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.5412298000301234,
+    "db_seconds": 0.027049999975133687,
+    "cosine_and_sort_seconds": 0.002085299987811595,
+    "gpu_seconds": 0.47124982900277246,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "IIS3513-002v4",
+      "AVA2172-003v3",
+      "IDC1330-001v1"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F02",
+    "method": "O-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.7980097999679856,
+    "db_seconds": 0.03486539999721572,
+    "cosine_and_sort_seconds": 0.006408499961253256,
+    "gpu_seconds": 0.7059245200071018,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "IIS3513-003v4",
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "INM2529-001v3",
+      "IIS2522-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "O-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.7124000000185333,
+    "db_seconds": 0.022049599967431277,
+    "cosine_and_sort_seconds": 0.00954470003489405,
+    "gpu_seconds": 0.6257550850132247,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "KRM3323-001v4",
+      "停車場管理員"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.1930668000131845,
+    "db_seconds": 0.05857409996679053,
+    "cosine_and_sort_seconds": 0.003396200016140938,
+    "gpu_seconds": 1.080225044002873,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "FAC3313-001v2",
+      "BAS1219-003v4",
+      "KRM3323-001v4",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 40
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.6027029000106268,
+    "db_seconds": 0.06364740000572056,
+    "cosine_and_sort_seconds": 0.047200099972542375,
+    "gpu_seconds": 1.4429738439939683,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "BAS1219-003v4",
+      "KPS2434-004v2",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 40
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.398892999975942,
+    "db_seconds": 0.07368460000725463,
+    "cosine_and_sort_seconds": 0.016775300027802587,
+    "gpu_seconds": 1.2594472769997083,
+    "queries": 2,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM3323-001v4",
+      "FAC3313-001v2",
+      "BAS1219-003v4",
+      "KPS2434-004v2",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 40
+  },
+  {
+    "case_id": "F03",
+    "method": "O-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.5806798000121489,
+    "db_seconds": 0.005750899959821254,
+    "cosine_and_sort_seconds": 0.0017771999700926244,
+    "gpu_seconds": 0.5165146329964045,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "BAS1219-005v1",
+      "KRM3323-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F03",
+    "method": "O-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.7368470000219531,
+    "db_seconds": 0.03170049999607727,
+    "cosine_and_sort_seconds": 0.0064273999887518585,
+    "gpu_seconds": 0.65220757300267,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "FAC1211-001v2",
+      "停車場管理員",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "O-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.6443507000221871,
+    "db_seconds": 0.020715299993753433,
+    "cosine_and_sort_seconds": 0.009823699947446585,
+    "gpu_seconds": 0.578959523991216,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MEM7231-011v2",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "SET3113-002v3",
+      "網路維修助理"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.7972120000049472,
+    "db_seconds": 0.005044599995017052,
+    "cosine_and_sort_seconds": 0.0017786999815143645,
+    "gpu_seconds": 0.7501197380042868,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM8142-001v3",
+      "MEM8199-002v3",
+      "MIM2141-001v4",
+      "MEM2434-001v2",
+      "印刷機台技術助理"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.1216499999864027,
+    "db_seconds": 0.03159680002136156,
+    "cosine_and_sort_seconds": 0.0070389999891631305,
+    "gpu_seconds": 1.029591675993288,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MEM7231-003v4",
+      "CCM7412-003v3",
+      "MIM2141-001v4",
+      "MQM1322-001v4",
+      "SET7127-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.991110100003425,
+    "db_seconds": 0.0384419999900274,
+    "cosine_and_sort_seconds": 0.009202100045513362,
+    "gpu_seconds": 0.9056801429978805,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MPM8142-001v3",
+      "MIM2141-001v4",
+      "MQM1322-001v4",
+      "MEM7231-005v4",
+      "SET7231-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "O-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.5844388999976218,
+    "db_seconds": 0.030711299972608685,
+    "cosine_and_sort_seconds": 0.00193500000750646,
+    "gpu_seconds": 0.4899699889938347,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "SET7127-002v3",
+      "網路維修助理",
+      "MEM7412-001v3",
+      "MEM3511-001v3",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F04",
+    "method": "O-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.7129414000082761,
+    "db_seconds": 0.012053500046022236,
+    "cosine_and_sort_seconds": 0.006838000030256808,
+    "gpu_seconds": 0.6535053020052146,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MEM7231-011v2",
+      "SET7127-001v3",
+      "SET7127-002v3",
+      "SET3113-002v3",
+      "SET7231-002v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "O-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.6800822999794036,
+    "db_seconds": 0.04732370004057884,
+    "cosine_and_sort_seconds": 0.009530099981930107,
+    "gpu_seconds": 0.5755156340019312,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KPS3334-009v4",
+      "KMC1222-002v3",
+      "PIC3332-002v2",
+      "ATC3439-001v3",
+      "MPM7322-006v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.6624940999899991,
+    "db_seconds": 0.006320599990431219,
+    "cosine_and_sort_seconds": 0.0018923000316135585,
+    "gpu_seconds": 0.609219979000045,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM7322-006v4",
+      "AVA2172-001v4",
+      "ATC3339-001v4",
+      "AVA2172-004v3",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.8360053999931552,
+    "db_seconds": 0.031152599956840277,
+    "cosine_and_sort_seconds": 0.006227699981536716,
+    "gpu_seconds": 0.7380063869932201,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-001v4",
+      "珠寶金工人員",
+      "AVA2172-004v3",
+      "KPS3334-009v4",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.7992633000249043,
+    "db_seconds": 0.03288819995941594,
+    "cosine_and_sort_seconds": 0.008617199957370758,
+    "gpu_seconds": 0.7091482959949644,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MPM7322-006v4",
+      "AVA2172-001v4",
+      "ATC3339-001v4",
+      "珠寶金工人員",
+      "AVA2172-004v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "O-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.48560159996850416,
+    "db_seconds": 0.028643300000112504,
+    "cosine_and_sort_seconds": 0.0019937000470235944,
+    "gpu_seconds": 0.41907388299296144,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "PIC3332-002v2",
+      "MPM7322-006v4",
+      "KMC2432-003v3",
+      "KPS3322-003v3",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "F05",
+    "method": "O-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 0.7411214000312611,
+    "db_seconds": 0.011508699972182512,
+    "cosine_and_sort_seconds": 0.006386999972164631,
+    "gpu_seconds": 0.6777978939935565,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KPS3334-009v4",
+      "KMC1222-002v3",
+      "TTM3422-001v2",
+      "KMC3332-001v3",
+      "AVA2172-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "O-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.2778162000468,
+    "db_seconds": 0.0383113999851048,
+    "cosine_and_sort_seconds": 0.04728679999243468,
+    "gpu_seconds": 1.143283325000084,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "BGM5220-002v3",
+      "KPS2434-004v2",
+      "KMC2432-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.0766286000143737,
+    "db_seconds": 0.028153699997346848,
+    "cosine_and_sort_seconds": 0.0019221999682486057,
+    "gpu_seconds": 1.009515959987766,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS1219-005v1",
+      "BGM5220-002v3",
+      "TFB5139-001v3",
+      "KMC2432-003v3",
+      "TTM4221-004v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.249491999973543,
+    "db_seconds": 0.029878799978177994,
+    "cosine_and_sort_seconds": 0.006851299956906587,
+    "gpu_seconds": 1.1657677369948942,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS1219-005v1",
+      "KMC1222-002v3",
+      "BHR2422-007v4",
+      "KPS2434-004v2",
+      "BHR2422-011v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.236206499976106,
+    "db_seconds": 0.04975510004442185,
+    "cosine_and_sort_seconds": 0.008447400003205985,
+    "gpu_seconds": 1.1273963550047483,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BAS1219-005v1",
+      "TFB5139-001v3",
+      "KMC1222-002v3",
+      "BAS1219-003v4",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "O-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.180532700032927,
+    "db_seconds": 0.02810160000808537,
+    "cosine_and_sort_seconds": 0.0022157999919727445,
+    "gpu_seconds": 1.1125401539902668,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "TTM4221-004v3",
+      "BHR2422-011v4",
+      "BGM5220-002v3",
+      "KPS2434-004v2",
+      "TFB5139-001v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H01",
+    "method": "O-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.3565634000115097,
+    "db_seconds": 0.03891580004710704,
+    "cosine_and_sort_seconds": 0.006119199970271438,
+    "gpu_seconds": 1.2662400119879749,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KMC2432-003v3",
+      "BHR2422-011v4",
+      "KMC2432-001v4",
+      "KPS5220-001v4",
+      "KPS3322-003v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "O-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.1592031000182033,
+    "db_seconds": 0.0333538000122644,
+    "cosine_and_sort_seconds": 0.009238699974957854,
+    "gpu_seconds": 1.0732591790001607,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.1458001999999397,
+    "db_seconds": 0.01574790000449866,
+    "cosine_and_sort_seconds": 0.0019002000335603952,
+    "gpu_seconds": 1.0748504170041997,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "NFP7911-001v1",
+      "RLM9330-001v1",
+      "BGM5220-002v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.1881488999933936,
+    "db_seconds": 0.01204850000794977,
+    "cosine_and_sort_seconds": 0.006251199985854328,
+    "gpu_seconds": 1.132675831002416,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "RLM9330-001v1",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.1807134000118822,
+    "db_seconds": 0.04330320004373789,
+    "cosine_and_sort_seconds": 0.00867329997709021,
+    "gpu_seconds": 1.071318030997645,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-001v4",
+      "RLM9330-001v1",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "O-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.1841999999596737,
+    "db_seconds": 0.017116300005000085,
+    "cosine_and_sort_seconds": 0.002943200001027435,
+    "gpu_seconds": 1.1262576199951582,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H02",
+    "method": "O-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 1.1547120999894105,
+    "db_seconds": 0.026085699966643006,
+    "cosine_and_sort_seconds": 0.005979999958071858,
+    "gpu_seconds": 1.0622165189997759,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MMP4321-002v4",
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "KRM1324-001v1",
+      "BGM5220-002v3"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "O-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 3.147577599971555,
+    "db_seconds": 0.016221300000324845,
+    "cosine_and_sort_seconds": 0.007737100007943809,
+    "gpu_seconds": 3.084066379000433,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "MMP4321-002v4",
+      "MQM1322-001v4",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 3.138670100015588,
+    "db_seconds": 0.03159520000917837,
+    "cosine_and_sort_seconds": 0.006198100047186017,
+    "gpu_seconds": 3.054416791012045,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "MQM2141-005v2",
+      "MQM7919-001v4",
+      "KRM3323-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 80
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 3.4823431000113487,
+    "db_seconds": 0.07442320004338399,
+    "cosine_and_sort_seconds": 0.024026700062677264,
+    "gpu_seconds": 3.340551446992322,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "MMP4321-002v4",
+      "BAS3323-002v4",
+      "BAS3323-001v4",
+      "INM3513-004v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 80
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-M-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 3.4594858000054955,
+    "db_seconds": 0.13345369999296963,
+    "cosine_and_sort_seconds": 0.06650719989556819,
+    "gpu_seconds": 3.2018172280077124,
+    "queries": 4,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "KRM3323-001v4",
+      "MMP4321-002v4",
+      "MQM2141-005v2"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 80
+  },
+  {
+    "case_id": "H03",
+    "method": "O-D-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 3.2906977999955416,
+    "db_seconds": 0.016438100021332502,
+    "cosine_and_sort_seconds": 0.0017044999985955656,
+    "gpu_seconds": 3.2409540340013336,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "MPM8142-003v3",
+      "MMP4321-002v4",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  },
+  {
+    "case_id": "H03",
+    "method": "O-T-R",
+    "repeat": 3,
+    "method_order": [
+      "O-M-R",
+      "B2-D-R",
+      "B2-T-R",
+      "B2-M-R",
+      "O-D-R",
+      "O-T-R"
+    ],
+    "seconds": 3.0242510000243783,
+    "db_seconds": 0.03474769997410476,
+    "cosine_and_sort_seconds": 0.0059420999605208635,
+    "gpu_seconds": 2.9461655799968867,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-002v4",
+      "BAS3323-003v3",
+      "KPS2434-004v2",
+      "AVA2173-012v3",
+      "MMP4321-002v4"
+    ],
+    "cached_query_embeddings": true,
+    "fresh_gpu_pairs": 20
+  }
+]

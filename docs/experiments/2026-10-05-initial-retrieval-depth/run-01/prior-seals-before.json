@@ -1,0 +1,14 @@
+[
+  {
+    "path": "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01",
+    "files": 551,
+    "manifest_sha256": "a57a7df9b57c1acdc48b5f4e7d05d6cbf172c9034801eacc262c1b0133e7c6ec",
+    "mismatches": 0
+  },
+  {
+    "path": "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01",
+    "files": 30,
+    "manifest_sha256": "a5ccb352d21d636379be4a8896ceed8f374b12fb4f9324532168659749ff27eb",
+    "mismatches": 0
+  }
+]

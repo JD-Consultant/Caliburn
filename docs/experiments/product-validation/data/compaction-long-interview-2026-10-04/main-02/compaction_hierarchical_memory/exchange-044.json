@@ -1,0 +1,16 @@
+{
+  "event_id": "e044",
+  "execution_id": "76d9d2e7-28a8-43f0-a2f7-fcb389361274",
+  "employee_input": {
+    "source_id": "a83e1ad6-be12-4b6b-970e-d5670b61e8e8",
+    "interview_sequence": 88,
+    "speaker": "employee",
+    "interview_text": "掃碼器故障時我登记設備編號、使用位置和問題，交資訊窗口處理；我追蹤備品更換與送修狀態，不拆機維修。我也不負責決定公司要買哪個品牌的設備。"
+  },
+  "consultant_reply": {
+    "source_id": "781fb1b5-8618-4b9d-889d-06053e383584",
+    "interview_sequence": 89,
+    "speaker": "consultant",
+    "interview_text": "已在 JD 草稿將掃碼器故障處理獨立列項：記錄設備編號、使用位置和問題，交資訊窗口處理，追蹤備品更換及送修狀態；也保留不拆機維修、不決定採購品牌的界線。\n\n通常到什麼狀態，您會把一筆掃碼器故障追蹤標記為完成？"
+  }
+}

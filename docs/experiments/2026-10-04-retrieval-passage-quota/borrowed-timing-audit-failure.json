@@ -1,0 +1,57 @@
+{
+  "duplicate_origins_with_different_forward_time": 2115,
+  "examples": [
+    {
+      "first_origin": {
+        "file": "../2026-10-04-retrieve-rerank/passage-pool/rerank-pairs.jsonl",
+        "case_id": "E01",
+        "passage": 1,
+        "document_id": "MEM7213-004v2"
+      },
+      "other_origin": {
+        "file": "../2026-10-04-retrieve-rerank/passage-pool/rerank-pairs.jsonl",
+        "case_id": "M01",
+        "passage": 1,
+        "document_id": "MEM7213-004v2"
+      },
+      "same_logit": true,
+      "saved_forward_seconds": 0.04191373799403664,
+      "other_forward_seconds": 0.03973424000287196
+    },
+    {
+      "first_origin": {
+        "file": "../2026-10-04-retrieve-rerank/passage-pool/rerank-pairs.jsonl",
+        "case_id": "E01",
+        "passage": 2,
+        "document_id": "MEM7213-004v2"
+      },
+      "other_origin": {
+        "file": "../2026-10-04-retrieve-rerank/passage-pool/rerank-pairs.jsonl",
+        "case_id": "M01",
+        "passage": 2,
+        "document_id": "MEM7213-004v2"
+      },
+      "same_logit": true,
+      "saved_forward_seconds": 0.044638036997639574,
+      "other_forward_seconds": 0.041757049002626445
+    },
+    {
+      "first_origin": {
+        "file": "../2026-10-04-retrieve-rerank/passage-pool/rerank-pairs.jsonl",
+        "case_id": "E01",
+        "passage": 3,
+        "document_id": "MEM7213-004v2"
+      },
+      "other_origin": {
+        "file": "../2026-10-04-retrieve-rerank/passage-pool/rerank-pairs.jsonl",
+        "case_id": "M01",
+        "passage": 3,
+        "document_id": "MEM7213-004v2"
+      },
+      "same_logit": true,
+      "saved_forward_seconds": 0.04309545599971898,
+      "other_forward_seconds": 0.04097838099551154
+    }
+  ],
+  "scope": "Equal text/body/logit reused first score trace; repeated origins have independent elapsed time."
+}

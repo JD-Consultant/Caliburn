@@ -1,0 +1,9 @@
+{
+  "status": "stopped",
+  "generation_calls": 208,
+  "compaction_calls": 6,
+  "outbound_calls": 478,
+  "admitted_input_tokens": 17112156,
+  "estimated_occupation_usd": "0.483808190",
+  "elapsed_seconds": 9224.754614500038
+}

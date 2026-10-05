@@ -1,0 +1,163 @@
+{
+  "dataset_id": "memory-structure-incremental-2026-10-05",
+  "synthetic": true,
+  "provenance": {
+    "initial_and_corrections": "docs/guides/2026-09-09-complete-work-analysis-guide.md section 11; employee statements retained, consultant questions added for this study",
+    "extension": "New synthetic continuation written for this study; not an actual employee record"
+  },
+  "messages": [
+    {
+      "interview_sequence": 1,
+      "role": "assistant",
+      "text": "請從最近做過的網站工作開始，說明是哪個專案、遇到什麼情況，以及您親自處理的部分。"
+    },
+    {
+      "interview_sequence": 2,
+      "role": "user",
+      "text": "甲是電商。送出訂單逾時，我要處理前端，避免使用者一直重按造成重複送單。"
+    },
+    {
+      "interview_sequence": 3,
+      "role": "assistant",
+      "text": "另一個網站專案是否也有逾時處理？具體要保留或避免什麼？"
+    },
+    {
+      "interview_sequence": 4,
+      "role": "user",
+      "text": "乙是預約網站。查詢逾時要保留已選的日期，這個也是我處理。"
+    },
+    {
+      "interview_sequence": 5,
+      "role": "assistant",
+      "text": "這兩個專案由誰確認需求？您與同事的工作範圍如何區分？"
+    },
+    {
+      "interview_sequence": 6,
+      "role": "user",
+      "text": "剛才兩個案都一樣：後端業務規則和服務端部署由同事負責；客戶確認需求，我負責約定的前端範圍。"
+    },
+    {
+      "interview_sequence": 7,
+      "role": "assistant",
+      "text": "網站交付後，您還會處理哪些事情？有約定回覆時間或固定維護嗎？"
+    },
+    {
+      "interview_sequence": 8,
+      "role": "user",
+      "text": "回到甲，交付後的前端缺陷也是我修，接到回報後 24 小時內回覆初步判斷，不是 24 小時內一定修好。甲沒有固定月維護。"
+    },
+    {
+      "interview_sequence": 9,
+      "role": "assistant",
+      "text": "乙案交付後的安排與甲案相同嗎？超出範圍的需求由誰決定？"
+    },
+    {
+      "interview_sequence": 10,
+      "role": "user",
+      "text": "乙合約有每月一次前端維護，檢查頁面操作並修正前端問題。超出約定範圍的變更要先核准，但最後由客戶哪一位核准，我還沒確認。"
+    },
+    {
+      "interview_sequence": 11,
+      "role": "assistant",
+      "text": "前面的說法若有需要更正的地方，可以直接指出是哪個專案和哪項安排。"
+    },
+    {
+      "interview_sequence": 12,
+      "role": "user",
+      "text": "甲剛才說 24 小時是我講錯，應該是 48 小時內回覆初步判斷；其他不變。"
+    },
+    {
+      "interview_sequence": 13,
+      "role": "assistant",
+      "text": "還有其他需要更新的安排嗎？若是後來才改變，也請說明從什麼時候開始。"
+    },
+    {
+      "interview_sequence": 14,
+      "role": "user",
+      "text": "乙從 10 月起改為每季第一個工作日做一次維護，之前才是每月一次。檢查和修正的範圍不變，核准人還沒確認。"
+    },
+    {
+      "interview_sequence": 15,
+      "role": "assistant",
+      "text": "之前還沒確認的資訊，後來有補充嗎？"
+    },
+    {
+      "interview_sequence": 16,
+      "role": "user",
+      "text": "乙的變更核准人後來確認了，是客戶的產品負責人。我整理變更影響和提出需求，不自行核准。這是超出約定範圍的需求，不是每次修前端問題都要重新核准。"
+    },
+    {
+      "interview_sequence": 17,
+      "role": "assistant",
+      "text": "除了目前談到的工作，還有不常發生，但確實由您負責的事情嗎？"
+    },
+    {
+      "interview_sequence": 18,
+      "role": "user",
+      "text": "甲每年約一次更換促銷素材，我負責檢查圖片和連結，客戶提供文案與素材，客戶確認後才上線。不是我規劃活動，也不是我寫文案。"
+    }
+  ],
+  "batches": [
+    {
+      "batch_id": "initial",
+      "previous_batch_id": null,
+      "new_sequences": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "read_through_sequence": 10
+    },
+    {
+      "batch_id": "corrections",
+      "previous_batch_id": "initial",
+      "new_sequences": [
+        11,
+        12,
+        13,
+        14
+      ],
+      "read_through_sequence": 14
+    },
+    {
+      "batch_id": "extension",
+      "previous_batch_id": "corrections",
+      "new_sequences": [
+        15,
+        16,
+        17,
+        18
+      ],
+      "read_through_sequence": 18
+    }
+  ],
+  "probes": [
+    {
+      "probe_id": "post_delivery",
+      "snapshot_batch_id": "corrections",
+      "question": "請將電商甲交付後的前端缺陷處理整理成一項 JD 任務，交代員工做什麼、應在多久內做到哪個程度，以及工作範圍。附上本次採用的來源定位。"
+    },
+    {
+      "probe_id": "maintenance",
+      "snapshot_batch_id": "corrections",
+      "question": "請將預約乙的例行維護整理成一項 JD 任務，保留適用時期、頻率、工作範圍與變更核准責任；若仍有必要確認的資訊，另外指出。附上本次採用的來源定位。"
+    },
+    {
+      "probe_id": "infrequent_work",
+      "snapshot_batch_id": "extension",
+      "question": "除了逾時、缺陷修正與例行維護，員工還有什麼低頻工作？請整理成一項 JD 任務，說明本人與客戶的分工。附上本次採用的來源定位。"
+    },
+    {
+      "probe_id": "resolved_approval",
+      "snapshot_batch_id": "extension",
+      "question": "請依目前資訊重新整理預約乙的維護與變更處理工作，交代週期、員工行動、核准範圍與誰決定；仍未確認的部分才另列。附上本次採用的來源定位。"
+    }
+  ]
+}

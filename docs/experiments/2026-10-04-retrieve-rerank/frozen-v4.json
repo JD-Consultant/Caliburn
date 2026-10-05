@@ -1,0 +1,12 @@
+{
+  "supersedes": "frozen-v3.json",
+  "reason": "Before reranker scores: clamp selection does not imply calibration; coordinated patching does not imply self-executed patching; cross-paragraph quotes complete. IDs, queries, topic count unchanged.",
+  "sources": {
+    "frozen.json": "48cd3a9760480cbf0dd1ab46bedb21854dc9fe893e246882a00fd816614566b9",
+    "frozen-v3.json": "0da418e90be6d60bf2463a858cd146035a68dd0ce6b0a7c3d43e7005c67aefff",
+    "cases-v4.json": "b5d8adb7044ba3175bc2f00aaf404ea30813040dbd58c2f7e8083f6f06b3f34d",
+    "protocol-amendment-01.md": "fb2bfd1952b9835f2866d8c306b5f371e263979342940a93497cef5214869f0c"
+  },
+  "effective_cases": "cases-v4.json",
+  "topic_count": 64
+}

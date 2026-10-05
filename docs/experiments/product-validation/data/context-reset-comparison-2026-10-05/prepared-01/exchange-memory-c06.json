@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "c5423f99-8d94-4683-a1c3-5a974e8fcb67",
+    "interview_sequence": 116,
+    "speaker": "employee",
+    "interview_text": "我指的是庫存帳齡表。不過剛才說每週只是我的想法，主管還沒決定，先不要當成新規定；目前仍照原本的交付時程與取數基準，其他兩張表也不改。"
+  },
+  "consultant_reply": {
+    "source_id": "92f7b620-ca0f-4c4f-8caa-e193e9c2c1f4",
+    "interview_sequence": 117,
+    "speaker": "consultant",
+    "interview_text": "了解，**庫存帳齡表仍維持原規則**：依月底庫存狀態整理，於次月第一個工作日交給主管；每週交付目前只是構想，未列為新規定。退貨差異表與收貨異常週報也不變。掃碼器維修仍由資訊窗口處理。"
+  }
+}

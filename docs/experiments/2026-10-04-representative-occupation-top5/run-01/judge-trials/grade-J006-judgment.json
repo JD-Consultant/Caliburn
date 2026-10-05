@@ -1,0 +1,38 @@
+{
+  "job_id": "J006",
+  "phase": "grade",
+  "judgment": {
+    "grade": 3,
+    "uncertain": false,
+    "main_work": [
+      "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+    ],
+    "reason": "公版涵蓋日常應付款、原始憑證與科目核對、總帳及明細帳的定期記錄核對，以及依週期整理帳目，能實質代表員工持續負責的日常帳務與月結領域，不只是相同名詞或單一局部動作。",
+    "evidence": [
+      {
+        "employee_quote": "每天整理發票、收付款單據和費用憑證，核對訂單、金額及科目後登錄帳務",
+        "reference_quote": "確認原始記帳憑證及會計科目正確無誤。"
+      },
+      {
+        "employee_quote": "我會追蹤應收應付款",
+        "reference_quote": "辦理日常應付款項作業"
+      },
+      {
+        "employee_quote": "月底做對帳、調整分錄及帳表",
+        "reference_quote": "定期記錄並核對組織總分類帳"
+      },
+      {
+        "employee_quote": "月底做對帳、調整分錄及帳表",
+        "reference_quote": "依組織規範之日/月/季/年等不同周期規定記錄總帳及明細分類帳,並依據各項報表分類妥善存放。"
+      }
+    ],
+    "limitations": [
+      "公版另包含財務報表編製及扣繳申報等工作；員工明確表示報稅申報由主管或外部事務所負責，因此不應將這些額外職責推定為員工工作。"
+    ]
+  },
+  "seconds": 8.83521789999213,
+  "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+  "document_sha256": "3e0fb759f17124e4dcc75b8fefea05a59c5744b6b865b4ea8849353dbc51c506",
+  "case_id": "F03",
+  "document_id": "FAC4311-001v2"
+}

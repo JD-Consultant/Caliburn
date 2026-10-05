@@ -1,0 +1,20 @@
+{
+  "count_requests": 52,
+  "generation_responses": 46,
+  "input_tokens": 2370081,
+  "output_tokens": 74774,
+  "cached_tokens": 1907905,
+  "cache_write_tokens": 462038,
+  "generation_estimated_usd": "0.114234600",
+  "batches": {
+    "main-02/e012": 7,
+    "main-02/e028": 14,
+    "main-02/e044": 13,
+    "main-03/e052": 12
+  },
+  "trace_sha256": {
+    "main-02": "c75bac4023d309247d0f0f4c370184b7e691d4dd88179b450b25483800001619",
+    "main-03": "2b7af98eb408a5f854dd1e61d03b8d095dae75a1498403cba290b605b03b3ec6"
+  },
+  "scope": "Four naturally produced Memory batches through e052; already paid in prior runs, not charged again. Consultant generation, administrative count reserves and unrelated failed consultant candidates are excluded."
+}

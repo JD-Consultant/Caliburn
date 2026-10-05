@@ -1,0 +1,31 @@
+{
+  "scope": "offline_structure_only",
+  "passed": true,
+  "statistics": {
+    "sources": 805,
+    "task_groups": 7265,
+    "competency_blocks": 7490,
+    "multi_name_shared_groups": 20,
+    "uncoded_task_groups": 0,
+    "cases": 22,
+    "queries": 74,
+    "query_document_edges": 370,
+    "occupation_entries_across_cases": 276,
+    "multi_query_occupation_entries": 73,
+    "readable_catalog_groups_across_returned_sources": 2809,
+    "mean_documents": 12.545454545454545,
+    "mean_top_characters": 14934.772727272728
+  },
+  "negative_checks_rejected": [
+    "wrong_hash",
+    "missing_pointer",
+    "negative_array_index",
+    "missing_document",
+    "missing_catalog_group",
+    "lost_query_edge",
+    "false_task_alignment",
+    "changed_source_body"
+  ],
+  "new_retrieval_calls": 0,
+  "model_calls": 0
+}

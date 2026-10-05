@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "fcf4abab-90a4-4935-8c4c-abbcfbeb9dbd",
+    "interview_sequence": 112,
+    "speaker": "employee",
+    "interview_text": "回頭確認一下庫存帳齡表，我最早說哪一天交給誰，後來改成哪一天？這張表是按月底狀態，還是交表當天的狀態整理？只是回顧前後說法，不是要改回舊規則。"
+  },
+  "consultant_reply": {
+    "source_id": "7e7c5e17-adf5-45d7-9ab6-4cd9295dec28",
+    "interview_sequence": 113,
+    "speaker": "consultant",
+    "interview_text": "最早的說法是：每月底整理帳齡表，於**當月最後一個工作日交給主管**。後來交付時間改為**次月第一個工作日交給主管**。\n\n表格仍按**月底庫存狀態**整理，不是按交表當天的狀態；帳齡則依已確認的入庫日期及月末庫存狀態計算。這裡只是回顧前後說法，沒有改回舊交付時間。"
+  }
+}

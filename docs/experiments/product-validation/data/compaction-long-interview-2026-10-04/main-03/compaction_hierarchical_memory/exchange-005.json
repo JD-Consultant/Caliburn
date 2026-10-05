@@ -1,0 +1,16 @@
+{
+  "event_id": "e005",
+  "execution_id": "467a5894-9d3a-4734-80ee-8f9af2ce0dda",
+  "employee_input": {
+    "source_id": "50e4a847-771e-458c-b861-55e6fdaa01c5",
+    "interview_sequence": 10,
+    "speaker": "employee",
+    "interview_text": "我通常在到貨當天下班前完成已確認項目的ERP登錄。月底最後一天，財務會提供截止清單；超過截止或有疑義的單據由財務決定歸屬月份，我只保留實際收貨時間和未決原因，不自己回填日期。"
+  },
+  "consultant_reply": {
+    "source_id": "8734d04e-3f9f-45ce-ad87-d522c671d431",
+    "interview_sequence": 11,
+    "speaker": "consultant",
+    "interview_text": "已補上到貨登錄的時效與月底分工：已確認項目通常於到貨當天下班前登錄；月底逾截止或有疑義的單據，由財務判定歸屬月份，您保留實際收貨時間與未決原因，不自行回填日期。\n\n接著想了解缺貨追蹤：缺貨訊息通常從哪裡來？您會記錄或追蹤哪些狀態，又以什麼情況判定可以結案？"
+  }
+}

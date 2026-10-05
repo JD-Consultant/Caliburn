@@ -1,0 +1,8 @@
+{
+  "development_rows": 1008,
+  "held_rows": 12,
+  "borrowed_pairs": 9485,
+  "supplemented_pairs": 3722,
+  "benchmark_samples": 14,
+  "passed": true
+}

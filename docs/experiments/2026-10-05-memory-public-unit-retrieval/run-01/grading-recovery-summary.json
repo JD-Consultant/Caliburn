@@ -1,0 +1,10 @@
+{
+  "responses": 45,
+  "initial_literal_valid": 39,
+  "initial_literal_failures": 6,
+  "explicit_source_transcription_repairs": 6,
+  "grades_changed": 0,
+  "new_model_calls_for_repair": 0,
+  "final_literal_valid": 45,
+  "semantic_relevance_truth_verified": false
+}

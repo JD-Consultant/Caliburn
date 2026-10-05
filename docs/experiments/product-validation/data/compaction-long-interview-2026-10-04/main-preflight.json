@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "schema": "eval_main_preflight_4a4755b806134d73b56e1243f2dc0b1e",
+  "provider_calls": 0,
+  "scope": "real PostgreSQL initial Context projection, persistence and reentry",
+  "results": [
+    {
+      "arm": "compaction_hierarchical_memory",
+      "checks": 5,
+      "job_file_id": "5f67338b-b3af-4f29-9005-d1f06dffde39"
+    },
+    {
+      "arm": "compaction_flat_summary",
+      "checks": 5,
+      "job_file_id": "bbdcb713-3949-4a02-a1ea-bc1a3c344899"
+    },
+    {
+      "arm": "compaction_raw_history",
+      "checks": 5,
+      "job_file_id": "51adebc1-f48a-4e39-9884-69b9b7f52e9f"
+    },
+    {
+      "arm": "compaction_recent_history",
+      "checks": 5,
+      "job_file_id": "f074885c-cede-4716-8e83-456d161292f6"
+    }
+  ]
+}

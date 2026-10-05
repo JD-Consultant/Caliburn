@@ -1,0 +1,45 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "candidate",
+  "repeat": 1,
+  "case_id": "superseded_deadline",
+  "cell_id": "superseded_deadline-candidate-1",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 10916,
+        "input_tokens_details": {
+          "cache_write_tokens": 7055,
+          "cached_tokens": 3858
+        },
+        "output_tokens": 805,
+        "output_tokens_details": {
+          "reasoning_tokens": 480
+        },
+        "total_tokens": 11721
+      },
+      "estimated_usd": "0.001323255",
+      "seconds": 10.323580199969001
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_6.description",
+        "value": "每月底依月底庫存狀態及已確認的入庫日期整理庫存帳齡表，核對批號與調撥資料，分列可售、待檢、報廢待核准庫存；於次月第一個工作日交給主管，以查看滯留與庫存狀態。此表不同於早上交客服的退貨差異表及週五交採購與主管的收貨異常週報，各自維持原有交付時程。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "依已整理的庫存報表資料，將帳齡表描述中的交付時點改為次月第一個工作日。成果欄未寫交付時點、要求欄已正確記載該時點並限定於帳齡表，因此不需修改；退貨差異表與收貨異常週報的時程維持不變。"
+  },
+  "seconds": 21.260673600016162
+}

@@ -1,0 +1,22 @@
+{
+  "container_id": "9d953ea00b09b968f73bd04d20e69d99309dd5b50c9a4e270c59c467464b16e6",
+  "container_name": "caliburn-negated-work-probe-20261005",
+  "image": "sha256:f5928254a947c1caa209bd9b867839e1ecdbd932018b3a946472023080af435d",
+  "docker_inspect_network_mode": "none",
+  "docker_inspect_readonly_rootfs": true,
+  "entrypoint": "python3",
+  "command": ["-B", "/experiments/2026-10-05-negated-work-retrieval/run-01/worker.py"],
+  "readonly_mounts": ["/embedder", "/embedding", "/reranker", "/experiments"],
+  "writable_mounts": ["/experiments/2026-10-05-negated-work-retrieval/run-01"],
+  "tmpfs": "/tmp",
+  "imported_source": {
+    "apps/embedder/reranking.py": "5d942d2cfa85138e16cf124ecd595ee85bff6bdb11b3618c79ef6fe2ccb33925"
+  },
+  "imported_source_hash_timing": "Captured during inference; checked again after completion. Not part of pre-run input manifest.",
+  "preflight_failures": [
+    {"action": "health probe 127.0.0.1:8082", "result": "connection refused; existing service not running"},
+    {"action": "sandboxed docker ps/image ls", "result": "docker pipe permission denied; read-only retry with escalation succeeded"},
+    {"action": "docker run with entrypoint python", "result": "python executable absent; no worker or model execution. Image command and Dockerfile inspected; corrected entrypoint to python3."}
+  ],
+  "isolation_evidence": "Named-container docker inspect selected fields, observed during execution. No environment secrets inspected. Existing PostgreSQL containers untouched."
+}

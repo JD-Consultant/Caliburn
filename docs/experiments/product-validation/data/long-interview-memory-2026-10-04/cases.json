@@ -1,0 +1,10 @@
+[
+  {"case_id":"early_quality","range":"前段","question":"來料不合格時，本人要求供應商多久內提出改善報告？連續幾次不合格要提報？退換貨或扣款是否接受由誰決定？","facts":["七天內提出改善報告","連續兩次不合格提報主管","退換貨或扣款是否接受由主管決定"],"support_sequences":[10]},
+  {"case_id":"early_payment","range":"前段","question":"付款前要核對哪些文件及條件？誰安排付款日期？本人能否承諾付款時間？","facts":["發票、採購單、驗收單品項數量金額一致才送財務","付款日期由財務安排","本人不能承諾付款時間"],"support_sequences":[12]},
+  {"case_id":"early_peak_and_negotiation","range":"前段","question":"哪些季節需求增加、要提早多久下單？年度價格談判在何時、本人準備什麼、誰主談？","facts":["農曆年前與第四季需求增加","提早兩個月下單","十一月年度談判","本人整理去年用量及市場行情","主管主談"],"support_sequences":[26,28]},
+  {"case_id":"middle_emergency","range":"中段","question":"緊急採購能否先下單？何時補哪些資料、何時由谁簽核？後續是否必須在 ERP 補開採購單？","facts":["可先口頭下單","當天補請購單並寫原因","主管事後簽核而非先照一般金額核准","是否必須在ERP補開採購單仍未知"],"support_sequences":[44,50,56]},
+  {"case_id":"cross_period_correction","range":"跨段更正","question":"採購主管與副總的核准金額界線目前怎麼分？正好一百萬元、正好五萬元的核准者是否已確認？請區分更正與仍未釐清處。","facts":["主管界線改到一百萬元而不是五十萬元","正好一百萬元由副總核准","五萬元以下本人直接下單","正好五萬元仍有重疊待釐清，不沿用早期確定說法"],"support_sequences":[52,54]},
+  {"case_id":"late_customs","range":"後段","question":"少數進口品的報關分工是什麼？本人交什麼文件、誰報關、其他協助是否已確認？","facts":["本人提供採購單及發票給報關行","報關由報關行處理","其他報關資料或詢問協助仍未知"],"support_sequences":[80,86]},
+  {"case_id":"late_onboarding","range":"後段","question":"本人如何協助新進採購助理？頻率、教的範圍、考核責任及具體示範是否已確認？","facts":["偶爾協助新進採購助理","教請購流程與ERP操作","不負責考核","具體示範哪些操作未知"],"support_sequences":[80,88]},
+  {"case_id":"unknown_source","range":"未知","question":"每週未交貨清單從哪個系統或單位取得？是否已確認？","facts":["取得清單的來源未知，不能從使用ERP推定"],"support_sequences":[22]}
+]

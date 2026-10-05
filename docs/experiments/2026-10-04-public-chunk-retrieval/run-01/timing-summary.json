@@ -1,0 +1,202 @@
+[
+  {
+    "case_id": "F01",
+    "method": "D-max",
+    "median_seconds": 0.021921399980783463
+  },
+  {
+    "case_id": "F01",
+    "method": "T-max",
+    "median_seconds": 0.020141699991654605
+  },
+  {
+    "case_id": "F01",
+    "method": "T-mean3",
+    "median_seconds": 0.031436200020834804
+  },
+  {
+    "case_id": "F01",
+    "method": "U-max",
+    "median_seconds": 0.026764700014609843
+  },
+  {
+    "case_id": "F01",
+    "method": "U-mean3",
+    "median_seconds": 0.030714199994690716
+  },
+  {
+    "case_id": "F02",
+    "method": "D-max",
+    "median_seconds": 0.028278600017074496
+  },
+  {
+    "case_id": "F02",
+    "method": "T-max",
+    "median_seconds": 0.02186239999718964
+  },
+  {
+    "case_id": "F02",
+    "method": "T-mean3",
+    "median_seconds": 0.02792219998082146
+  },
+  {
+    "case_id": "F02",
+    "method": "U-max",
+    "median_seconds": 0.02713249996304512
+  },
+  {
+    "case_id": "F02",
+    "method": "U-mean3",
+    "median_seconds": 0.006340100022498518
+  },
+  {
+    "case_id": "F03",
+    "method": "D-max",
+    "median_seconds": 0.004995499970391393
+  },
+  {
+    "case_id": "F03",
+    "method": "T-max",
+    "median_seconds": 0.023935000004712492
+  },
+  {
+    "case_id": "F03",
+    "method": "T-mean3",
+    "median_seconds": 0.01074749999679625
+  },
+  {
+    "case_id": "F03",
+    "method": "U-max",
+    "median_seconds": 0.006680399994365871
+  },
+  {
+    "case_id": "F03",
+    "method": "U-mean3",
+    "median_seconds": 0.025662200001534075
+  },
+  {
+    "case_id": "F04",
+    "method": "D-max",
+    "median_seconds": 0.02013190003344789
+  },
+  {
+    "case_id": "F04",
+    "method": "T-max",
+    "median_seconds": 0.020860099990386516
+  },
+  {
+    "case_id": "F04",
+    "method": "T-mean3",
+    "median_seconds": 0.031475800031330436
+  },
+  {
+    "case_id": "F04",
+    "method": "U-max",
+    "median_seconds": 0.02706739999121055
+  },
+  {
+    "case_id": "F04",
+    "method": "U-mean3",
+    "median_seconds": 0.008163899998180568
+  },
+  {
+    "case_id": "F05",
+    "method": "D-max",
+    "median_seconds": 0.02151610003784299
+  },
+  {
+    "case_id": "F05",
+    "method": "T-max",
+    "median_seconds": 0.02205650001997128
+  },
+  {
+    "case_id": "F05",
+    "method": "T-mean3",
+    "median_seconds": 0.029652199998963624
+  },
+  {
+    "case_id": "F05",
+    "method": "U-max",
+    "median_seconds": 0.027456699986942112
+  },
+  {
+    "case_id": "F05",
+    "method": "U-mean3",
+    "median_seconds": 0.030675399990286678
+  },
+  {
+    "case_id": "H01",
+    "method": "D-max",
+    "median_seconds": 0.005445499962661415
+  },
+  {
+    "case_id": "H01",
+    "method": "T-max",
+    "median_seconds": 0.011794199992436916
+  },
+  {
+    "case_id": "H01",
+    "method": "T-mean3",
+    "median_seconds": 0.02553540002554655
+  },
+  {
+    "case_id": "H01",
+    "method": "U-max",
+    "median_seconds": 0.027431600028648973
+  },
+  {
+    "case_id": "H01",
+    "method": "U-mean3",
+    "median_seconds": 0.030463900009635836
+  },
+  {
+    "case_id": "H02",
+    "method": "D-max",
+    "median_seconds": 0.029346499999519438
+  },
+  {
+    "case_id": "H02",
+    "method": "T-max",
+    "median_seconds": 0.02196630003163591
+  },
+  {
+    "case_id": "H02",
+    "method": "T-mean3",
+    "median_seconds": 0.03005870000924915
+  },
+  {
+    "case_id": "H02",
+    "method": "U-max",
+    "median_seconds": 0.008564100018702447
+  },
+  {
+    "case_id": "H02",
+    "method": "U-mean3",
+    "median_seconds": 0.007489899988286197
+  },
+  {
+    "case_id": "H03",
+    "method": "D-max",
+    "median_seconds": 0.005369200021959841
+  },
+  {
+    "case_id": "H03",
+    "method": "T-max",
+    "median_seconds": 0.026307999971322715
+  },
+  {
+    "case_id": "H03",
+    "method": "T-mean3",
+    "median_seconds": 0.029831300023943186
+  },
+  {
+    "case_id": "H03",
+    "method": "U-max",
+    "median_seconds": 0.02792359999148175
+  },
+  {
+    "case_id": "H03",
+    "method": "U-mean3",
+    "median_seconds": 0.02998609998030588
+  }
+]

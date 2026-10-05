@@ -1,0 +1,84 @@
+{
+  "final": {
+    "task": {
+      "title": "乙預約網站前端例行維護",
+      "work": "乙案交付後，依合約執行前端例行維護：10月前每月一次，自10月起改為每季第一個工作日一次。維護範圍為檢查頁面操作並修正前端問題；超出約定範圍的變更須先取得核准再處理。客戶確認需求，員工負責約定的前端範圍；後端業務規則及服務端部署由同事負責。"
+    },
+    "unknowns": [
+      "10月起改為每季維護的年份未提供。",
+      "超出約定範圍的變更，客戶端實際核准人尚未確認。"
+    ],
+    "references": [
+      {
+        "kind": "interview",
+        "sequences": [
+          6,
+          10,
+          14
+        ]
+      }
+    ]
+  },
+  "steps": 1,
+  "tool_calls": [],
+  "reads": [
+    [
+      "interview",
+      1
+    ],
+    [
+      "interview",
+      10
+    ],
+    [
+      "interview",
+      11
+    ],
+    [
+      "interview",
+      12
+    ],
+    [
+      "interview",
+      13
+    ],
+    [
+      "interview",
+      14
+    ],
+    [
+      "interview",
+      2
+    ],
+    [
+      "interview",
+      3
+    ],
+    [
+      "interview",
+      4
+    ],
+    [
+      "interview",
+      5
+    ],
+    [
+      "interview",
+      6
+    ],
+    [
+      "interview",
+      7
+    ],
+    [
+      "interview",
+      8
+    ],
+    [
+      "interview",
+      9
+    ]
+  ],
+  "cell": "read-maintenance-full_history",
+  "seconds": 18.28421700000763
+}

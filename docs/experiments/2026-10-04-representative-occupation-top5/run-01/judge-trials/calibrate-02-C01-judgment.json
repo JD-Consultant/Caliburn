@@ -1,0 +1,26 @@
+{
+  "job_id": "C01",
+  "phase": "calibrate-02",
+  "judgment": {
+    "grade": 3,
+    "uncertain": false,
+    "main_work": [
+      "會員網站頁面與互動功能開發"
+    ],
+    "reason": "公版實質涵蓋員工持續負責的頁面版型、互動元件、表單驗證、資料串接及瀏覽器操作測試，能代表其網站前端功能開發這一主要工作領域；偶爾協助重開電腦不構成主要職責。",
+    "evidence": [
+      {
+        "employee_quote": "持續負責頁面版型、互動元件、表單驗證及串接資料，並測試瀏覽器操作。",
+        "reference_quote": "開發網站頁面版型、互動元件及表單驗證，串接服務介面並測試瀏覽器操作，維護畫面功能。"
+      }
+    ],
+    "limitations": [
+      "此公版代表的是網站頁面與互動功能開發，不據此推定員工另負責未提及的工作領域。"
+    ]
+  },
+  "seconds": 4.5242638000054285,
+  "employee_sha256": "17ccab533f1b40f3c6cd182bd7c7b3c56a01e7a9fc2317985d2931f0e260065d",
+  "document_sha256": "5f3f52069b6ca62439b2cadd3ba71deee1ee7458fd4f8722eb6dbe16f42283f3",
+  "expected_grade": 3,
+  "anchor_matched": true
+}

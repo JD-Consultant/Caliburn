@@ -1,0 +1,31 @@
+{
+  "question": "請將乙倉退貨處理整理成一項完整 JD 任務，說明本人的工作與相關分工，保留必要條件；未知另列。",
+  "work_understanding_map": {
+    "items": [
+      {
+        "target_title": "甲倉盤點差異回報",
+        "description": "本人複盤、填單並依百分比門檻回報。"
+      },
+      {
+        "target_title": "乙倉退貨核對與異動交接",
+        "description": "退貨核對、待判定狀態與核准交接；不套甲倉門檻。"
+      },
+      {
+        "target_title": "甲倉盤點資料歸檔",
+        "description": "每月歸檔差異單及主管回覆。"
+      }
+    ]
+  },
+  "work_situation_map": {
+    "items": [
+      {
+        "target_title": "甲倉盤點與歸檔",
+        "description": "盤點差異回報及月末歸檔。"
+      },
+      {
+        "target_title": "乙倉退貨核對",
+        "description": "每天定時核對、分類與庫存異動分工。"
+      }
+    ]
+  }
+}

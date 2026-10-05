@@ -1,0 +1,16 @@
+{
+  "event_id": "e039",
+  "execution_id": "3827e7c6-9a34-4257-87f6-7383b3987418",
+  "employee_input": {
+    "source_id": "d993f1c8-0e47-4e85-81c5-87d2bd594297",
+    "interview_sequence": 78,
+    "speaker": "employee",
+    "interview_text": "需要的技能是差異查核、整理可追溯的紀錄，以及跨採購、客服、倉庫追蹤事項。不能只寫熟悉Excel；工具是手段，目的是找出差異、保持狀態正確和讓下一個窗口能處理。"
+  },
+  "consultant_reply": {
+    "source_id": "d05daed1-8cd5-4525-9c2e-c7f24dfbae33",
+    "interview_sequence": 79,
+    "speaker": "consultant",
+    "interview_text": "已將 Excel 從技能名稱改為輔助工具，核心技能整理為「多清單差異查核與識別比對」、「可追溯紀錄整理」及「跨窗口事項追蹤與交接」，並連結到實際會用到它們的任務。\n\n若依原單號或品號加批號仍無法核對，您會先把該筆列為待確認，再請哪個窗口協助查明？"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "prepared_at": "2026-10-04T14:16:38.513795+00:00",
+  "kind": "frozen-memory-context-original-vs-reading-stop-policy",
+  "model": "gpt-6-luna",
+  "effort": "high",
+  "sdk_version": "3.20.0",
+  "max_output_tokens": 8192,
+  "max_estimated_usd": "0.10",
+  "max_seconds": 1200,
+  "prior_occupied_usd": "1.056535185",
+  "cumulative_limit_usd": "2.00",
+  "schedule": [
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "corrections",
+      "prompt_variant": "original",
+      "cell_id": "corrections-original-1"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "corrections",
+      "prompt_variant": "candidate",
+      "cell_id": "corrections-candidate-1"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "boundaries",
+      "prompt_variant": "original",
+      "cell_id": "boundaries-original-1"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "boundaries",
+      "prompt_variant": "candidate",
+      "cell_id": "boundaries-candidate-1"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "corrections",
+      "prompt_variant": "candidate",
+      "cell_id": "corrections-candidate-2"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "corrections",
+      "prompt_variant": "original",
+      "cell_id": "corrections-original-2"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "boundaries",
+      "prompt_variant": "candidate",
+      "cell_id": "boundaries-candidate-2"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "boundaries",
+      "prompt_variant": "original",
+      "cell_id": "boundaries-original-2"
+    }
+  ],
+  "head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "instructions_sha256": {
+    "original": "1cbfcc49f1e1de70d1d1e1972e21a1b7543efc06dc83ae19571d8fa017ec0c16",
+    "candidate": "0b97bc5aae6e5f2482862dbcddc41190c770fd7b7b69c70b94715a8745b9152a"
+  },
+  "tools_sha256": {
+    "raw_memory": "825849d5d389b13ed619cc4639486f70d156b266601edb0ee066284cf2315309"
+  },
+  "initial_sha256": {
+    "corrections": "7be03ca09be2e6798e8b34940fba87e3f25f53dc4884c5a89186615886ecb36d",
+    "boundaries": "8f0e715d3a2cb726dbb04e1f14bbe62a19857793beaddf7d27a1623b1c9291a5"
+  },
+  "source_sha256": {
+    "docs\\experiments\\product-validation\\data\\memory-reading-policy-2026-10-04\\policy_study.py": "2ddbca1a84b607863fe54ea8a8dd0c9b5c7b831f52def089dd00f3f35414ec6a",
+    "docs\\experiments\\product-validation\\data\\memory-reading-policy-2026-10-04\\README.md": "abd8f974094a6024b9337bf68ca6f4e5c3a5d220f0981cb22bdefe959b58a767",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\experiment.py": "b5cda90cbf3419281637b23e0fb4a202f971eedbff341321d344bdf558e3b1a9",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\support.py": "19a2816265c682093737c45d784a0e847e1868bb22f3c3c038127310b684627b",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\analyze.py": "073b2e2b5f1846180089ab742c7aa45dcb2d471fb384bf784685a20d02b407ce",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\test_runner.py": "ce5ea65fc97b34888439dd4a8134d1272dc5e7fc2d16e215c890a3423c8745ec",
+    "docs\\experiments\\product-validation\\data\\design-comparisons-2026-10-04\\provider_observations.py": "bfe9ef1189a4a0bae9d3825c0e041656be9483c1bc506f1ea2022c4e13bdd24e",
+    "apps\\api\\src\\caliburn\\agents\\job_consultant\\instructions.py": "a4865cc5ca115a6d4dd42f95e188a8758e80f3ccb856d5fde385fe4aa001de8b",
+    "docs\\experiments\\product-validation\\data\\memory-replacement-value-2026-10-04\\live-01\\instructions.json": "9d8ae818106aa4c20b31bb9da18fb1e6e89f41df41b0c37e3182252469779560",
+    "docs\\experiments\\product-validation\\data\\memory-replacement-value-2026-10-04\\live-01\\materials.json": "79ee15ab0510286e9cdcfc507a6a6632384a8b7cca8fdabb6c82dff20ae5eba7",
+    "docs\\experiments\\product-validation\\data\\memory-replacement-value-2026-10-04\\live-01\\source-files\\cases.json": "8cdcf70d09b6c208599bf59e2d0a4f85d087d81229d66e5e8acc45677661923f"
+  },
+  "pricing_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2"
+}

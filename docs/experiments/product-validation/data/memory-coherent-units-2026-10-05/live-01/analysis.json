@@ -1,0 +1,569 @@
+{
+  "method": "response usage once per HTTP response; tools once per actual invoke, not repeated native history; characters are not tokens",
+  "cells": {
+    "initial-baseline": {
+      "rate_wait_seconds": 19.991625700029545,
+      "model_responses": 2,
+      "input_tokens": 7647,
+      "cached_input_tokens": 3327,
+      "output_tokens": 966,
+      "reasoning_tokens": 364,
+      "max_input_tokens": 4317,
+      "tool_calls": 2,
+      "tool:create_work_understanding": 2,
+      "tool_errors": 0,
+      "estimated_generation_usd": "0.001056120"
+    },
+    "initial-coherent": {
+      "rate_wait_seconds": 19.989773100009188,
+      "model_responses": 2,
+      "input_tokens": 8435,
+      "cached_input_tokens": 3748,
+      "output_tokens": 912,
+      "reasoning_tokens": 266,
+      "max_input_tokens": 4684,
+      "tool_calls": 2,
+      "tool:create_work_understanding": 2,
+      "tool_errors": 0,
+      "estimated_generation_usd": "0.001079205"
+    },
+    "corrections-coherent": {
+      "rate_wait_seconds": 29.982505200023297,
+      "model_responses": 3,
+      "input_tokens": 13213,
+      "cached_input_tokens": 11185,
+      "output_tokens": 901,
+      "reasoning_tokens": 256,
+      "max_input_tokens": 5189,
+      "tool_calls": 4,
+      "tool:read_work_understanding": 2,
+      "tool_errors": 0,
+      "read_characters": 758,
+      "tool:update_work_understanding": 2,
+      "estimated_generation_usd": "0.000815625"
+    },
+    "corrections-baseline": {
+      "rate_wait_seconds": 29.98562849999871,
+      "model_responses": 3,
+      "input_tokens": 11787,
+      "cached_input_tokens": 9760,
+      "output_tokens": 1030,
+      "reasoning_tokens": 467,
+      "max_input_tokens": 4767,
+      "tool_calls": 3,
+      "tool:read_work_understanding": 2,
+      "tool_errors": 0,
+      "read_characters": 720,
+      "tool:update_work_understanding": 1,
+      "estimated_generation_usd": "0.000865750"
+    },
+    "extension-baseline": {
+      "rate_wait_seconds": 59.96601689996896,
+      "model_responses": 6,
+      "input_tokens": 29486,
+      "cached_input_tokens": 25109,
+      "output_tokens": 3086,
+      "reasoning_tokens": 2114,
+      "max_input_tokens": 7108,
+      "tool_calls": 6,
+      "tool:read_work_understanding": 2,
+      "tool_errors": 2,
+      "read_characters": 816,
+      "tool:update_work_understanding": 3,
+      "tool:create_work_understanding": 1,
+      "estimated_generation_usd": "0.002340765"
+    },
+    "extension-coherent": {
+      "rate_wait_seconds": 29.985351099981926,
+      "model_responses": 3,
+      "input_tokens": 13499,
+      "cached_input_tokens": 11278,
+      "output_tokens": 1047,
+      "reasoning_tokens": 352,
+      "max_input_tokens": 5382,
+      "tool_calls": 4,
+      "tool:read_work_understanding": 2,
+      "tool_errors": 0,
+      "read_characters": 807,
+      "tool:update_work_understanding": 1,
+      "tool:create_work_understanding": 1,
+      "estimated_generation_usd": "0.000913680"
+    },
+    "read-post_delivery-baseline": {
+      "rate_wait_seconds": 39.98609459993895,
+      "model_responses": 4,
+      "input_tokens": 7788,
+      "cached_input_tokens": 5109,
+      "output_tokens": 850,
+      "reasoning_tokens": 548,
+      "max_input_tokens": 2670,
+      "tool_calls": 3,
+      "tool:read_work_understanding_map": 1,
+      "tool_errors": 0,
+      "read_characters": 1033,
+      "tool:read_work_understanding": 2,
+      "estimated_generation_usd": "0.000810665"
+    },
+    "read-post_delivery-coherent": {
+      "rate_wait_seconds": 19.992815000005066,
+      "model_responses": 2,
+      "input_tokens": 3347,
+      "cached_input_tokens": 2680,
+      "output_tokens": 889,
+      "reasoning_tokens": 624,
+      "max_input_tokens": 1857,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 395,
+      "estimated_generation_usd": "0.000554525"
+    },
+    "read-maintenance-coherent": {
+      "rate_wait_seconds": 29.990925300051458,
+      "model_responses": 3,
+      "input_tokens": 5376,
+      "cached_input_tokens": 4432,
+      "output_tokens": 618,
+      "reasoning_tokens": 370,
+      "max_input_tokens": 2131,
+      "tool_calls": 2,
+      "tool:read_work_understanding_map": 1,
+      "tool_errors": 0,
+      "read_characters": 712,
+      "tool:read_work_understanding": 1,
+      "estimated_generation_usd": "0.000471095"
+    },
+    "read-maintenance-baseline": {
+      "rate_wait_seconds": 29.98844109993661,
+      "model_responses": 3,
+      "input_tokens": 5136,
+      "cached_input_tokens": 4300,
+      "output_tokens": 568,
+      "reasoning_tokens": 359,
+      "max_input_tokens": 2023,
+      "tool_calls": 2,
+      "tool:read_work_understanding_map": 1,
+      "tool_errors": 0,
+      "read_characters": 669,
+      "tool:read_work_understanding": 1,
+      "estimated_generation_usd": "0.000431275"
+    },
+    "read-infrequent_work-baseline": {
+      "rate_wait_seconds": 29.99044690001756,
+      "model_responses": 3,
+      "input_tokens": 6019,
+      "cached_input_tokens": 4500,
+      "output_tokens": 400,
+      "reasoning_tokens": 138,
+      "max_input_tokens": 2706,
+      "tool_calls": 4,
+      "tool:read_work_understanding_map": 1,
+      "tool_errors": 0,
+      "read_characters": 1375,
+      "tool:read_work_understanding": 3,
+      "estimated_generation_usd": "0.000434650"
+    },
+    "read-infrequent_work-coherent": {
+      "rate_wait_seconds": 19.994970400060993,
+      "model_responses": 2,
+      "input_tokens": 3412,
+      "cached_input_tokens": 2778,
+      "output_tokens": 299,
+      "reasoning_tokens": 131,
+      "max_input_tokens": 1824,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 263,
+      "estimated_generation_usd": "0.000256380"
+    },
+    "read-resolved_approval-coherent": {
+      "rate_wait_seconds": 19.993020899943076,
+      "model_responses": 2,
+      "input_tokens": 3642,
+      "cached_input_tokens": 2783,
+      "output_tokens": 559,
+      "reasoning_tokens": 301,
+      "max_input_tokens": 2049,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 485,
+      "estimated_generation_usd": "0.000414555"
+    },
+    "read-resolved_approval-baseline": {
+      "rate_wait_seconds": 29.990818899997976,
+      "model_responses": 3,
+      "input_tokens": 5508,
+      "cached_input_tokens": 4510,
+      "output_tokens": 603,
+      "reasoning_tokens": 342,
+      "max_input_tokens": 2185,
+      "tool_calls": 2,
+      "tool:read_work_understanding_map": 1,
+      "tool_errors": 0,
+      "read_characters": 805,
+      "tool:read_work_understanding": 1,
+      "estimated_generation_usd": "0.000471125"
+    }
+  },
+  "totals": {
+    "baseline/maintenance": {
+      "rate_wait_seconds": 109.94327109999722,
+      "model_responses": 11,
+      "input_tokens": 48920,
+      "cached_input_tokens": 38196,
+      "output_tokens": 5082,
+      "reasoning_tokens": 2945,
+      "max_input_tokens": 7108,
+      "tool_calls": 11,
+      "tool:create_work_understanding": 3,
+      "tool_errors": 2,
+      "tool:read_work_understanding": 4,
+      "read_characters": 1536,
+      "tool:update_work_understanding": 4,
+      "estimated_generation_usd": "0.004262635"
+    },
+    "baseline/reading": {
+      "rate_wait_seconds": 129.9558014998911,
+      "model_responses": 13,
+      "input_tokens": 24451,
+      "cached_input_tokens": 18419,
+      "output_tokens": 2421,
+      "reasoning_tokens": 1387,
+      "max_input_tokens": 2706,
+      "tool_calls": 11,
+      "tool:read_work_understanding_map": 4,
+      "tool_errors": 0,
+      "read_characters": 3882,
+      "tool:read_work_understanding": 7,
+      "estimated_generation_usd": "0.002147715"
+    },
+    "coherent/maintenance": {
+      "rate_wait_seconds": 79.95762940001441,
+      "model_responses": 8,
+      "input_tokens": 35147,
+      "cached_input_tokens": 26211,
+      "output_tokens": 2860,
+      "reasoning_tokens": 874,
+      "max_input_tokens": 5382,
+      "tool_calls": 10,
+      "tool:create_work_understanding": 3,
+      "tool_errors": 0,
+      "tool:read_work_understanding": 4,
+      "read_characters": 1565,
+      "tool:update_work_understanding": 3,
+      "estimated_generation_usd": "0.002808510"
+    },
+    "coherent/reading": {
+      "rate_wait_seconds": 89.9717316000606,
+      "model_responses": 9,
+      "input_tokens": 15777,
+      "cached_input_tokens": 12673,
+      "output_tokens": 2365,
+      "reasoning_tokens": 1426,
+      "max_input_tokens": 2131,
+      "tool_calls": 5,
+      "tool:read_work_understanding": 4,
+      "tool_errors": 0,
+      "read_characters": 1855,
+      "tool:read_work_understanding_map": 1,
+      "estimated_generation_usd": "0.001696555"
+    }
+  },
+  "snapshots": {
+    "workspace-corrections-baseline.json": {
+      "work_situation": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 423,
+        "reference_edges": 8,
+        "map_characters": 250
+      }
+    },
+    "workspace-corrections-coherent.json": {
+      "work_situation": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 419,
+        "reference_edges": 8,
+        "map_characters": 289
+      }
+    },
+    "workspace-extension-baseline.json": {
+      "work_situation": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      },
+      "work_understanding": {
+        "objects": 3,
+        "body_characters": 517,
+        "reference_edges": 10,
+        "map_characters": 355
+      }
+    },
+    "workspace-extension-coherent.json": {
+      "work_situation": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      },
+      "work_understanding": {
+        "objects": 3,
+        "body_characters": 574,
+        "reference_edges": 10,
+        "map_characters": 429
+      }
+    },
+    "workspace-initial-baseline.json": {
+      "work_situation": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 403,
+        "reference_edges": 6,
+        "map_characters": 226
+      }
+    },
+    "workspace-initial-coherent.json": {
+      "work_situation": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 392,
+        "reference_edges": 6,
+        "map_characters": 275
+      }
+    }
+  },
+  "reader_selection": {
+    "read-post_delivery-baseline": {
+      "available_understandings": 2,
+      "read_understandings": 2,
+      "read_titles": [
+        "客戶網站前端功能與逾時行為處理",
+        "網站交付後的前端缺陷與維護"
+      ],
+      "raw_sequences": []
+    },
+    "read-post_delivery-coherent": {
+      "available_understandings": 2,
+      "read_understandings": 1,
+      "read_titles": [
+        "甲電商網站：訂單逾時前端處理與交付後缺陷修復"
+      ],
+      "raw_sequences": []
+    },
+    "read-maintenance-baseline": {
+      "available_understandings": 2,
+      "read_understandings": 1,
+      "read_titles": [
+        "網站交付後的前端缺陷與維護"
+      ],
+      "raw_sequences": []
+    },
+    "read-maintenance-coherent": {
+      "available_understandings": 2,
+      "read_understandings": 1,
+      "read_titles": [
+        "乙預約網站：查詢逾時狀態保留與定期前端維護"
+      ],
+      "raw_sequences": []
+    },
+    "read-infrequent_work-baseline": {
+      "available_understandings": 3,
+      "read_understandings": 3,
+      "read_titles": [
+        "客戶網站前端功能與逾時行為處理",
+        "網站交付後的前端缺陷與維護",
+        "電商甲年度促銷素材上線檢查"
+      ],
+      "raw_sequences": []
+    },
+    "read-infrequent_work-coherent": {
+      "available_understandings": 3,
+      "read_understandings": 1,
+      "read_titles": [
+        "甲電商網站：年度促銷素材更換"
+      ],
+      "raw_sequences": []
+    },
+    "read-resolved_approval-baseline": {
+      "available_understandings": 3,
+      "read_understandings": 1,
+      "read_titles": [
+        "網站交付後的前端缺陷與維護"
+      ],
+      "raw_sequences": []
+    },
+    "read-resolved_approval-coherent": {
+      "available_understandings": 3,
+      "read_understandings": 1,
+      "read_titles": [
+        "乙預約網站：查詢逾時狀態保留與定期前端維護"
+      ],
+      "raw_sequences": []
+    }
+  },
+  "run_summary": {
+    "status": "completed",
+    "outcomes": [
+      {
+        "cell": "initial-baseline",
+        "status": "completed",
+        "steps": 2,
+        "seconds": 32.80714580003405
+      },
+      {
+        "cell": "initial-coherent",
+        "status": "completed",
+        "steps": 2,
+        "seconds": 32.69995879998896
+      },
+      {
+        "cell": "corrections-coherent",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 43.8775777000119
+      },
+      {
+        "cell": "corrections-baseline",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 41.73741379997227
+      },
+      {
+        "cell": "extension-baseline",
+        "status": "completed",
+        "steps": 6,
+        "seconds": 94.26624399999855
+      },
+      {
+        "cell": "extension-coherent",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 42.94291149999481
+      },
+      {
+        "cell": "read-post_delivery-baseline",
+        "status": "completed",
+        "steps": 4,
+        "seconds": 55.80781849997584
+      },
+      {
+        "cell": "read-post_delivery-coherent",
+        "status": "completed",
+        "steps": 2,
+        "seconds": 31.496331100002863
+      },
+      {
+        "cell": "read-maintenance-coherent",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 41.38188070000615
+      },
+      {
+        "cell": "read-maintenance-baseline",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 39.35149650002131
+      },
+      {
+        "cell": "read-infrequent_work-baseline",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 38.21712849999312
+      },
+      {
+        "cell": "read-infrequent_work-coherent",
+        "status": "completed",
+        "steps": 2,
+        "seconds": 25.835576399986167
+      },
+      {
+        "cell": "read-resolved_approval-coherent",
+        "status": "completed",
+        "steps": 2,
+        "seconds": 28.101759899989702
+      },
+      {
+        "cell": "read-resolved_approval-baseline",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 41.41654849995393
+      }
+    ],
+    "failure": null,
+    "budget": {
+      "occupied_usd": "0.015015415",
+      "prior_occupied_usd": "1.270089235",
+      "cumulative_occupied_usd": "1.285104650",
+      "pending": {
+        "initial-baseline-1": "0.0001",
+        "initial-baseline-3": "0.0001",
+        "initial-coherent-5": "0.0001",
+        "initial-coherent-7": "0.0001",
+        "corrections-coherent-9": "0.0001",
+        "corrections-coherent-11": "0.0001",
+        "corrections-coherent-13": "0.0001",
+        "corrections-baseline-15": "0.0001",
+        "corrections-baseline-17": "0.0001",
+        "corrections-baseline-19": "0.0001",
+        "extension-baseline-21": "0.0001",
+        "extension-baseline-23": "0.0001",
+        "extension-baseline-25": "0.0001",
+        "extension-baseline-27": "0.0001",
+        "extension-baseline-29": "0.0001",
+        "extension-baseline-31": "0.0001",
+        "extension-coherent-33": "0.0001",
+        "extension-coherent-35": "0.0001",
+        "extension-coherent-37": "0.0001",
+        "read-post_delivery-baseline-39": "0.0001",
+        "read-post_delivery-baseline-41": "0.0001",
+        "read-post_delivery-baseline-43": "0.0001",
+        "read-post_delivery-baseline-45": "0.0001",
+        "read-post_delivery-coherent-47": "0.0001",
+        "read-post_delivery-coherent-49": "0.0001",
+        "read-maintenance-coherent-51": "0.0001",
+        "read-maintenance-coherent-53": "0.0001",
+        "read-maintenance-coherent-55": "0.0001",
+        "read-maintenance-baseline-57": "0.0001",
+        "read-maintenance-baseline-59": "0.0001",
+        "read-maintenance-baseline-61": "0.0001",
+        "read-infrequent_work-baseline-63": "0.0001",
+        "read-infrequent_work-baseline-65": "0.0001",
+        "read-infrequent_work-baseline-67": "0.0001",
+        "read-infrequent_work-coherent-69": "0.0001",
+        "read-infrequent_work-coherent-71": "0.0001",
+        "read-resolved_approval-coherent-73": "0.0001",
+        "read-resolved_approval-coherent-75": "0.0001",
+        "read-resolved_approval-baseline-77": "0.0001",
+        "read-resolved_approval-baseline-79": "0.0001",
+        "read-resolved_approval-baseline-81": "0.0001"
+      },
+      "outbound_calls": 82,
+      "elapsed_seconds": 589.8657910000184
+    }
+  }
+}

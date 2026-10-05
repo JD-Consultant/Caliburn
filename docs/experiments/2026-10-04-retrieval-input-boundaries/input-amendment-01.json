@@ -1,0 +1,9 @@
+{
+  "created_utc": 1791091953.4317372,
+  "before_new_embeddings_or_rankings": true,
+  "initial_cases_sha256": "1513968e29519ac60152225134a5df037c03ba7671a1fbcc9791fcd6902dd43e",
+  "effective_cases": "cases-observed.json",
+  "effective_cases_sha256": "026b1759ee909e25ec28581a05667b028ed6e94a9b280e12137b5e8236bd960b",
+  "script_sha256": "1f03f0973d6d711d99f23f7e652b6da40070b5d5b868bebd23a95fb094602808",
+  "scope": "All22 now observed_regression; historical source_split preserved. Employee messages/topics/grades untouched; original retained."
+}

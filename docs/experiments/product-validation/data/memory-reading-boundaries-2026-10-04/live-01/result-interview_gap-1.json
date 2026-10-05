@@ -1,0 +1,177 @@
+{
+  "arm": "raw_memory",
+  "repeat": 1,
+  "case_id": "interview_gap",
+  "cell_id": "interview_gap-1",
+  "status": "step_limit",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding_map",
+      "arguments": {},
+      "result_characters": 185
+    },
+    {
+      "step": 2,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6378
+    },
+    {
+      "step": 3,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+      },
+      "result_characters": 1812
+    },
+    {
+      "step": 4,
+      "name": "read_interview",
+      "arguments": {
+        "query": {
+          "kind": "messages",
+          "sequences": [
+            92,
+            104
+          ]
+        }
+      },
+      "result_characters": 339
+    },
+    {
+      "step": 5,
+      "name": "read_interview",
+      "arguments": {
+        "query": {
+          "kind": "messages",
+          "sequences": [
+            74,
+            76,
+            80,
+            82,
+            84
+          ]
+        }
+      },
+      "result_characters": 760
+    },
+    {
+      "step": 6,
+      "name": "read_interview",
+      "arguments": {
+        "query": {
+          "kind": "messages",
+          "sequences": [
+            50,
+            52,
+            54
+          ]
+        }
+      },
+      "result_characters": 467
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 6902,
+        "input_tokens_details": {
+          "cache_write_tokens": 3202,
+          "cached_tokens": 3697
+        },
+        "output_tokens": 108,
+        "output_tokens_details": {
+          "reasoning_tokens": 44
+        },
+        "total_tokens": 7010
+      },
+      "estimated_usd": "0.000491520",
+      "seconds": 2.174801999994088
+    },
+    {
+      "usage": {
+        "input_tokens": 7162,
+        "input_tokens_details": {
+          "cache_write_tokens": 260,
+          "cached_tokens": 6899
+        },
+        "output_tokens": 37,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 7199
+      },
+      "estimated_usd": "0.000120290",
+      "seconds": 2.099041700013913
+    },
+    {
+      "usage": {
+        "input_tokens": 12586,
+        "input_tokens_details": {
+          "cache_write_tokens": 5424,
+          "cached_tokens": 7159
+        },
+        "output_tokens": 206,
+        "output_tokens_details": {
+          "reasoning_tokens": 168
+        },
+        "total_tokens": 12792
+      },
+      "estimated_usd": "0.000852890",
+      "seconds": 3.8868164000450633
+    },
+    {
+      "usage": {
+        "input_tokens": 14294,
+        "input_tokens_details": {
+          "cache_write_tokens": 1708,
+          "cached_tokens": 12583
+        },
+        "output_tokens": 80,
+        "output_tokens_details": {
+          "reasoning_tokens": 49
+        },
+        "total_tokens": 14374
+      },
+      "estimated_usd": "0.000379630",
+      "seconds": 2.077516800025478
+    },
+    {
+      "usage": {
+        "input_tokens": 14578,
+        "input_tokens_details": {
+          "cache_write_tokens": 284,
+          "cached_tokens": 14291
+        },
+        "output_tokens": 75,
+        "output_tokens_details": {
+          "reasoning_tokens": 38
+        },
+        "total_tokens": 14653
+      },
+      "estimated_usd": "0.000216210",
+      "seconds": 2.2292197000351734
+    },
+    {
+      "usage": {
+        "input_tokens": 15124,
+        "input_tokens_details": {
+          "cache_write_tokens": 546,
+          "cached_tokens": 14575
+        },
+        "output_tokens": 51,
+        "output_tokens_details": {
+          "reasoning_tokens": 18
+        },
+        "total_tokens": 15175
+      },
+      "estimated_usd": "0.000239800",
+      "seconds": 3.4613617000286467
+    }
+  ],
+  "proposal": null,
+  "seconds": 81.55725720000919
+}

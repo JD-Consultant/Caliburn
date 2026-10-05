@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "previous_unchanged_files": 1125,
+  "protected_inputs_unchanged": 8,
+  "vector_batches_hashed": 346,
+  "baseline_checks": 8,
+  "judge_responses": 35,
+  "usage_known": 35,
+  "estimated_usd": "0.037831530",
+  "links_checked": 163,
+  "services_stopped": true,
+  "cleanup_actual_embedder_exit": "exited 137",
+  "no_production_change": true,
+  "no_commit_push_merge": true
+}

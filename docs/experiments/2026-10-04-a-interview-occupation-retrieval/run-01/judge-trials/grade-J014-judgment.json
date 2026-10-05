@@ -1,0 +1,26 @@
+{
+  "job_id": "J014",
+  "phase": "grade",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是依程序執行塑膠加工、設備操作及樣品／成品測試；員工主要負責原物料與包材採購、供應商協調及訂單管理，兩者沒有足以代表主要工作的實質對應。原料與品質相關字眼僅是表面重合，實際責任不同。",
+    "evidence": [
+      {
+        "employee_quote": "負責原物料和包材採購。",
+        "reference_quote": "確認加工模式完備塑膠加工原料、及消耗品處理。"
+      },
+      {
+        "employee_quote": "有數量或品質問題，他們會通知我，我再跟供應商協調退換貨或扣款",
+        "reference_quote": "依主管指示或標準作業程序,進行塑膠成品檢測是否符合規格。"
+      }
+    ],
+    "limitations": []
+  },
+  "seconds": 8.137256500020158,
+  "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+  "document_sha256": "9bb5cc7b6d41d1ac8fbe4f3b3833ad96ee1f0246a537de65a458a3fd06fb7c6e",
+  "case_id": "H03",
+  "document_id": "MPM8142-003v3"
+}

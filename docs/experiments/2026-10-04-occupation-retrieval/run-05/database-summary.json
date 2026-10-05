@@ -1,0 +1,27 @@
+{
+  "development_ef_grid": [
+    {
+      "hnsw_ef": 16,
+      "mean_top10_recall": 0.98125,
+      "mean_tie_eligible": 0.98125,
+      "median_ms": 4.001249995781109
+    },
+    {
+      "hnsw_ef": 64,
+      "mean_top10_recall": 1.0,
+      "mean_tie_eligible": 1.0,
+      "median_ms": 4.028299998026341
+    },
+    {
+      "hnsw_ef": 128,
+      "mean_top10_recall": 1.0,
+      "mean_tie_eligible": 1.0,
+      "median_ms": 4.1603000136092305
+    }
+  ],
+  "selected_hnsw_ef": 64,
+  "exact_queries": 32,
+  "rrf_correct_queries": 32,
+  "all_queries": 32,
+  "scope": "805 profiles, localhost, no load-test or multi-tenant assurance"
+}

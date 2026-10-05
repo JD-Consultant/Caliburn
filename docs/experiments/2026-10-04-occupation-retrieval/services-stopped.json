@@ -1,0 +1,16 @@
+{
+  "completed_utc": "2026-10-03T22:57:28.696015+00:00",
+  "embedder": {
+    "container": "caliburn-ocs-eval-embedder-1",
+    "status": "exited",
+    "model_layer_retained": true
+  },
+  "qdrant": {
+    "pid": 36884,
+    "path": "S:/caliburn/tmp/ocs-eval-qdrant/qdrant.exe",
+    "identity_checked": true,
+    "stopped": true,
+    "storage_and_collections_retained": true
+  },
+  "production_services_touched": false
+}

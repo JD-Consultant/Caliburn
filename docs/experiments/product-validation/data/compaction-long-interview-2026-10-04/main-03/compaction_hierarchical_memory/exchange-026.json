@@ -1,0 +1,16 @@
+{
+  "event_id": "e026",
+  "execution_id": "e3d12078-20c9-4130-b516-7ded5b4e1d4b",
+  "employee_input": {
+    "source_id": "88c8bad5-1f02-4ddd-82a8-5eccb64b7d46",
+    "interview_sequence": 52,
+    "speaker": "employee",
+    "interview_text": "ERP品號重複或單位不一致時，我先記下受影響單號並暫停該筆登錄，交資料維護窗口確認。窗口修正後我再核對；不能把一箱當一件，或自己新增另一個看起來差不多的品號避開錯誤。"
+  },
+  "consultant_reply": {
+    "source_id": "d2e1a38d-477a-4761-8dca-495a60515933",
+    "interview_sequence": 53,
+    "speaker": "consultant",
+    "interview_text": "已補上 ERP 品號或單位有誤時的處理：記下受影響單號、暫停該筆登錄，交資料維護窗口修正後再核對；不把一箱當一件，也不自行新增相似品號。\n\n目前已整理到貨、退貨、盤點、缺貨追蹤、店間調撥、庫存帳齡表與收貨異常週報。除此之外，您是否還有季度、年度或偶爾才處理，但仍需負責的維護、稽核、專案支援或收尾工作？"
+  }
+}

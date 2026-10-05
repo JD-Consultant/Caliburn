@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "0bbda636-1df1-4935-81b0-c7765300bc67",
+    "interview_sequence": 114,
+    "speaker": "employee",
+    "interview_text": "先岔開一下，掃碼器維修仍由資訊窗口處理。回到之前那張表，改成每週交好了。"
+  },
+  "consultant_reply": {
+    "source_id": "08147190-a246-43cc-b41c-6fc56c20d1f5",
+    "interview_sequence": 115,
+    "speaker": "consultant",
+    "interview_text": "掃碼器故障仍由資訊窗口處理，這點與目前 JD 一致。\n\n你說要改成每週交的是哪一張表：**退貨差異表、庫存帳齡表，還是收貨異常週報**？目前收貨異常週報已是每週五 16:00 前提交；另兩張分別是每日交付及次月第一個工作日交付。確認是哪一張後，我再只調整該表的時程。"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "final": {
+    "task": {
+      "title": "電商甲交付後前端缺陷處理",
+      "work": "依客戶確認的需求及約定前端範圍，處理電商甲交付後回報的前端缺陷。收到回報後 48 小時內回覆初步判斷；此為初步回覆期限，不代表須於 48 小時內修復完成。後端業務規則及服務端部署由同事負責；本案沒有固定月維護安排。"
+    },
+    "unknowns": [],
+    "references": [
+      {
+        "kind": "interview",
+        "sequences": [
+          6,
+          8,
+          12
+        ]
+      }
+    ]
+  },
+  "steps": 1,
+  "tool_calls": [],
+  "reads": [
+    [
+      "interview",
+      1
+    ],
+    [
+      "interview",
+      10
+    ],
+    [
+      "interview",
+      11
+    ],
+    [
+      "interview",
+      12
+    ],
+    [
+      "interview",
+      13
+    ],
+    [
+      "interview",
+      14
+    ],
+    [
+      "interview",
+      2
+    ],
+    [
+      "interview",
+      3
+    ],
+    [
+      "interview",
+      4
+    ],
+    [
+      "interview",
+      5
+    ],
+    [
+      "interview",
+      6
+    ],
+    [
+      "interview",
+      7
+    ],
+    [
+      "interview",
+      8
+    ],
+    [
+      "interview",
+      9
+    ]
+  ],
+  "cell": "read-post_delivery-full_history",
+  "seconds": 18.73968439991586
+}

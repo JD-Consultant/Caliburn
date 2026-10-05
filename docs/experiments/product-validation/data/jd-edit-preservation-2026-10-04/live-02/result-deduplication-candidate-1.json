@@ -1,0 +1,166 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "candidate",
+  "repeat": 1,
+  "case_id": "deduplication",
+  "cell_id": "deduplication-candidate-1",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11306,
+        "input_tokens_details": {
+          "cache_write_tokens": 7445,
+          "cached_tokens": 3858
+        },
+        "output_tokens": 4380,
+        "output_tokens_details": {
+          "reasoning_tokens": 3239
+        },
+        "total_tokens": 15686
+      },
+      "estimated_usd": "0.003159505",
+      "seconds": 43.26982230000431
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_2.description",
+        "value": "核對前一工作日收到的退貨單、品號、批號及實收數量，登錄退貨狀態並整理差異；數量不符時聯繫客服確認，並依核准資料更新 ERP。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.outcome_1",
+        "value": "完成退貨差異表並交付客服窗口，供差異確認與後續處理。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.outcome_2",
+        "value": "各筆退貨的商品狀態及待確認事項清楚記錄，供後續庫存判讀與處置。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.outcome_3",
+        "value": "退貨數量差異及核准調帳有可追溯依據，供客服確認與後續查核。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.outcome_4",
+        "value": "未完成確認的異常退貨維持可追蹤的待處理狀態，待倉庫複檢及主管決定，不以立即恢復可售為前提。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.requirement_1",
+        "value": "週一 08:50、週二至週五 08:35 開始核對；每個工作日 09:10 前交退貨差異表給客服。此時限僅適用退貨，不套用進貨驗收。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.requirement_2",
+        "value": "本人不自行判定報廢；待檢庫存不得列為可用量。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.requirement_3",
+        "value": "僅在主管同意調帳後，依核准資料更新 ERP，並保留核准單號。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.requirement_4",
+        "value": "退款由客服與財務處理，不屬於本人工作。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.requirement_5",
+        "value": "外箱完整但內件不齊時仍維持待檢，不直接轉為可售；由倉庫複檢後交主管決定處理方式。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.requirement_6",
+        "value": "報表欄位缺漏時，註明缺漏原因及待確認項，不自行補填數字。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.requirement_7",
+        "value": "常溫退貨依倉庫確認的狀態登錄；冷藏退貨核對溫度紀錄，交品質窗口判定是否可再銷售。溫度合格門檻尚未確認，不自行套用外部標準或填入數值。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "已核對退貨任務並精簡描述、成果與要求，合併重複表述，同時保留作業時點、商品狀態、異常處理及客服、品質、倉庫與主管的責任界線；未延伸修改其他任務。"
+  },
+  "seconds": 54.191614000010304
+}

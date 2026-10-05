@@ -1,0 +1,4190 @@
+[
+  {
+    "case_id": "F01",
+    "document_id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": 4,
+        "merged_rank": 4,
+        "query_evidence": [
+          {
+            "query_id": "F01-whole-1",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:document",
+                "score": 0.7115719349492176
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F01-whole-1",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F01-whole-1",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F01-whole-1",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F01-whole-1",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": null,
+        "merged_rank": 6,
+        "query_evidence": [
+          {
+            "query_id": "F01-segments-1",
+            "rank": 9,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:document",
+                "score": 0.7040358543515858
+              }
+            ]
+          },
+          {
+            "query_id": "F01-segments-2",
+            "rank": 7,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:document",
+                "score": 0.6806318733432586
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F01-segments-1",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "F01-segments-2",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F01-segments-1",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "F01-segments-2",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F01-segments-1",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "F01-segments-2",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F01-segments-1",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "F01-segments-2",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "F02",
+    "document_id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F02-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:document",
+                "score": 0.7023123205882796
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F02-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:1",
+                "score": 0.686409174869924
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:3",
+                "score": 0.6736863887631754
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:1:2",
+                "score": 0.6579179188922449
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F02-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:1",
+                "score": 0.686409174869924
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:3",
+                "score": 0.6736863887631754
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:1:2",
+                "score": 0.6579179188922449
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F02-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:3:None",
+                "score": 0.6932889735652679
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:2:None",
+                "score": 0.6510842507394847
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:overview:None:None",
+                "score": 0.6402142811696359
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F02-whole-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:3:None",
+                "score": 0.6932889735652679
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:2:None",
+                "score": 0.6510842507394847
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:overview:None:None",
+                "score": 0.6402142811696359
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F02-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:document",
+                "score": 0.6880332047649542
+              }
+            ]
+          },
+          {
+            "query_id": "F02-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:document",
+                "score": 0.6876444133155907
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "F02-segments-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:1",
+                "score": 0.6731453837125678
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:1:2",
+                "score": 0.6635313387277344
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:3",
+                "score": 0.6598082374615817
+              }
+            ]
+          },
+          {
+            "query_id": "F02-segments-2",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:1",
+                "score": 0.6687134409611033
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:3",
+                "score": 0.658069799185337
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:2",
+                "score": 0.6544164782290962
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F02-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:1",
+                "score": 0.6731453837125678
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:1:2",
+                "score": 0.6635313387277344
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:3",
+                "score": 0.6598082374615817
+              }
+            ]
+          },
+          {
+            "query_id": "F02-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:1",
+                "score": 0.6687134409611033
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:3",
+                "score": 0.658069799185337
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:task:3:2",
+                "score": 0.6544164782290962
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F02-segments-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:3:None",
+                "score": 0.6756410965141473
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:1:None",
+                "score": 0.6413728414313319
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:overview:None:None",
+                "score": 0.6357617175798285
+              }
+            ]
+          },
+          {
+            "query_id": "F02-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:3:None",
+                "score": 0.6738153969583833
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:overview:None:None",
+                "score": 0.6429934785613469
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:2:None",
+                "score": 0.631930545573471
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F02-segments-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:3:None",
+                "score": 0.6756410965141473
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:1:None",
+                "score": 0.6413728414313319
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:overview:None:None",
+                "score": 0.6357617175798285
+              }
+            ]
+          },
+          {
+            "query_id": "F02-segments-2",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:3:None",
+                "score": 0.6738153969583833
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:overview:None:None",
+                "score": 0.6429934785613469
+              },
+              {
+                "parent_id": "INM3514-001v4",
+                "chunk_id": "INM3514-001v4:unit:2:None",
+                "score": 0.631930545573471
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "F03",
+    "document_id": "FAC3313-001v2",
+    "title": "會計助理",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:document",
+                "score": 0.7570010239892274
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:3:1",
+                "score": 0.7521030875086854
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:4:1",
+                "score": 0.6644436631542487
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:1:1",
+                "score": 0.664406936278646
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": null,
+        "merged_rank": 7,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 7,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:3:1",
+                "score": 0.7521030875086854
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:4:1",
+                "score": 0.6644436631542487
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:1:1",
+                "score": 0.664406936278646
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:3:None",
+                "score": 0.7521030875086854
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:4:None",
+                "score": 0.6644436631542487
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:1:None",
+                "score": 0.664406936278646
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:3:None",
+                "score": 0.7521030875086854
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:4:None",
+                "score": 0.6644436631542487
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:1:None",
+                "score": 0.664406936278646
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:document",
+                "score": 0.7463838791785214
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:document",
+                "score": 0.74945167062262
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:3:1",
+                "score": 0.7374220660345576
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:4:1",
+                "score": 0.6682206820962762
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:1:1",
+                "score": 0.6618335216532812
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:3:1",
+                "score": 0.7366033231919504
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:4:1",
+                "score": 0.6673263184452881
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:1:1",
+                "score": 0.6583800589069548
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": 5,
+        "merged_rank": 5,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:3:1",
+                "score": 0.7374220660345576
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:4:1",
+                "score": 0.6682206820962762
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:1:1",
+                "score": 0.6618335216532812
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:3:1",
+                "score": 0.7366033231919504
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:4:1",
+                "score": 0.6673263184452881
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:task:1:1",
+                "score": 0.6583800589069548
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:3:None",
+                "score": 0.7374220660345576
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:4:None",
+                "score": 0.6682206820962762
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:1:None",
+                "score": 0.6618335216532812
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:3:None",
+                "score": 0.7366033231919504
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:4:None",
+                "score": 0.6673263184452881
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:1:None",
+                "score": 0.6583800589069548
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:3:None",
+                "score": 0.7374220660345576
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:4:None",
+                "score": 0.6682206820962762
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:1:None",
+                "score": 0.6618335216532812
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:3:None",
+                "score": 0.7366033231919504
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:4:None",
+                "score": 0.6673263184452881
+              },
+              {
+                "parent_id": "FAC3313-001v2",
+                "chunk_id": "FAC3313-001v2:unit:1:None",
+                "score": 0.6583800589069548
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "F03",
+    "document_id": "FAC4311-001v2",
+    "title": "會計人員",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:document",
+                "score": 0.7663261264744528
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:2",
+                "score": 0.7297775751638125
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:1:1",
+                "score": 0.7256391596746761
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:3",
+                "score": 0.7050524027547007
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:2",
+                "score": 0.7297775751638125
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:1:1",
+                "score": 0.7256391596746761
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:3",
+                "score": 0.7050524027547007
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:4:None",
+                "score": 0.7588923780990101
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:1:None",
+                "score": 0.7382444508235783
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:2:None",
+                "score": 0.6915447753289921
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:4:None",
+                "score": 0.7588923780990101
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:1:None",
+                "score": 0.7382444508235783
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:2:None",
+                "score": 0.6915447753289921
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:document",
+                "score": 0.7556339652100679
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:document",
+                "score": 0.7533918767178135
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:1:1",
+                "score": 0.7255235089529241
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:2",
+                "score": 0.7250946461400075
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:3",
+                "score": 0.7119171582487164
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:2",
+                "score": 0.7293877040972622
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:1:1",
+                "score": 0.7110464163681327
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:4",
+                "score": 0.7053059369056021
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:1:1",
+                "score": 0.7255235089529241
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:2",
+                "score": 0.7250946461400075
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:3",
+                "score": 0.7119171582487164
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:2",
+                "score": 0.7293877040972622
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:1:1",
+                "score": 0.7110464163681327
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:task:4:4",
+                "score": 0.7053059369056021
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:4:None",
+                "score": 0.7535682892888296
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:1:None",
+                "score": 0.7333961523209488
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:overview:None:None",
+                "score": 0.6843895705524443
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:4:None",
+                "score": 0.7479609488557708
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:1:None",
+                "score": 0.7214416038730305
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:2:None",
+                "score": 0.6778402147902971
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F03-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:4:None",
+                "score": 0.7535682892888296
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:1:None",
+                "score": 0.7333961523209488
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:overview:None:None",
+                "score": 0.6843895705524443
+              }
+            ]
+          },
+          {
+            "query_id": "F03-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:4:None",
+                "score": 0.7479609488557708
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:1:None",
+                "score": 0.7214416038730305
+              },
+              {
+                "parent_id": "FAC4311-001v2",
+                "chunk_id": "FAC4311-001v2:unit:2:None",
+                "score": 0.6778402147902971
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "F04",
+    "document_id": "SET3113-002v3",
+    "title": "冷凍空調技術人員",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F04-whole-1",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F04-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.717951040756995
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:2",
+                "score": 0.7114727335655959
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:1",
+                "score": 0.7054970270166976
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F04-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.717951040756995
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:2",
+                "score": 0.7114727335655959
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:1",
+                "score": 0.7054970270166976
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F04-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:5:None",
+                "score": 0.7254897780052716
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.717951040756995
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:4:None",
+                "score": 0.6541197220654764
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F04-whole-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:5:None",
+                "score": 0.7254897780052716
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.717951040756995
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:4:None",
+                "score": 0.6541197220654764
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "F04-segments-1",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "F04-segments-2",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "F04-segments-1",
+            "rank": 14,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.685016416275503
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:2",
+                "score": 0.6824976289980185
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:1",
+                "score": 0.672053981719396
+              }
+            ]
+          },
+          {
+            "query_id": "F04-segments-2",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.7209987920267418
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:1",
+                "score": 0.7153622104102337
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:2",
+                "score": 0.7148573664845775
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F04-segments-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.685016416275503
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:2",
+                "score": 0.6824976289980185
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:1",
+                "score": 0.672053981719396
+              }
+            ]
+          },
+          {
+            "query_id": "F04-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.7209987920267418
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:1",
+                "score": 0.7153622104102337
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:task:5:2",
+                "score": 0.7148573664845775
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F04-segments-1",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.685016416275503
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:5:None",
+                "score": 0.6846440136923191
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:4:None",
+                "score": 0.6457554973711386
+              }
+            ]
+          },
+          {
+            "query_id": "F04-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:5:None",
+                "score": 0.728162525700085
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.7209987920267418
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:4:None",
+                "score": 0.6440159826292031
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "F04-segments-1",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.685016416275503
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:5:None",
+                "score": 0.6846440136923191
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:4:None",
+                "score": 0.6457554973711386
+              }
+            ]
+          },
+          {
+            "query_id": "F04-segments-2",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:5:None",
+                "score": 0.728162525700085
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:overview:None:None",
+                "score": 0.7209987920267418
+              },
+              {
+                "parent_id": "SET3113-002v3",
+                "chunk_id": "SET3113-002v3:unit:4:None",
+                "score": 0.6440159826292031
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "F05",
+    "document_id": "AVA2172-002v3",
+    "title": "平面視覺傳達設計人員",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "F05-whole-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:document",
+                "score": 0.725461590191744
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F05-whole-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7466794986880528
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:2",
+                "score": 0.6573628091876833
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:1",
+                "score": 0.6546601026630803
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": null,
+        "merged_rank": 9,
+        "query_evidence": [
+          {
+            "query_id": "F05-whole-1",
+            "rank": 9,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7466794986880528
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:2",
+                "score": 0.6573628091876833
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:1",
+                "score": 0.6546601026630803
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F05-whole-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7466794986880528
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:1:None",
+                "score": 0.6744358208781093
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:2:None",
+                "score": 0.6661130436359617
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": 5,
+        "merged_rank": 5,
+        "query_evidence": [
+          {
+            "query_id": "F05-whole-1",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7466794986880528
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:1:None",
+                "score": 0.6744358208781093
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:2:None",
+                "score": 0.6661130436359617
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "F05-segments-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:document",
+                "score": 0.719009412655611
+              }
+            ]
+          },
+          {
+            "query_id": "F05-segments-2",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:document",
+                "score": 0.6924528129927332
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "F05-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7466780028578319
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:2",
+                "score": 0.6611959947976547
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:1",
+                "score": 0.6517240439692783
+              }
+            ]
+          },
+          {
+            "query_id": "F05-segments-2",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7165452845557223
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:1",
+                "score": 0.6489679632988096
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:2:2",
+                "score": 0.6364445278045691
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": null,
+        "merged_rank": 8,
+        "query_evidence": [
+          {
+            "query_id": "F05-segments-1",
+            "rank": 9,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7466780028578319
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:2",
+                "score": 0.6611959947976547
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:1",
+                "score": 0.6517240439692783
+              }
+            ]
+          },
+          {
+            "query_id": "F05-segments-2",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7165452845557223
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:1:1",
+                "score": 0.6489679632988096
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:task:2:2",
+                "score": 0.6364445278045691
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "F05-segments-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7466780028578319
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:1:None",
+                "score": 0.6717355877002307
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:2:None",
+                "score": 0.6688568682542507
+              }
+            ]
+          },
+          {
+            "query_id": "F05-segments-2",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7165452845557223
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:1:None",
+                "score": 0.6562839888473874
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:2:None",
+                "score": 0.6419112373841797
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "F05-segments-1",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7466780028578319
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:1:None",
+                "score": 0.6717355877002307
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:2:None",
+                "score": 0.6688568682542507
+              }
+            ]
+          },
+          {
+            "query_id": "F05-segments-2",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:overview:None:None",
+                "score": 0.7165452845557223
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:1:None",
+                "score": 0.6562839888473874
+              },
+              {
+                "parent_id": "AVA2172-002v3",
+                "chunk_id": "AVA2172-002v3:unit:2:None",
+                "score": 0.6419112373841797
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "H02",
+    "document_id": "MMP4321-003v4",
+    "title": "零售業倉儲管理人員",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": 5,
+        "merged_rank": 5,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:document",
+                "score": 0.7045879199420888
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": null,
+        "merged_rank": null,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": null,
+            "top_chunks": []
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": null,
+        "merged_rank": 6,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.7197391969180273
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6327892035827056
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.589947821149615
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": null,
+        "merged_rank": 7,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": 7,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.7197391969180273
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6327892035827056
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.589947821149615
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:document",
+                "score": 0.7020174013519558
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:document",
+                "score": 0.6681263056322382
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:document",
+                "score": 0.6597125803048953
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:document",
+                "score": 0.6801724872539876
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": 5,
+        "merged_rank": 5,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 18,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:1",
+                "score": 0.6753038829517503
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:2",
+                "score": 0.6597577395368723
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:3",
+                "score": 0.6388312384793404
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:3",
+                "score": 0.7033305341125855
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:2",
+                "score": 0.6093482537121413
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:2:2",
+                "score": 0.6045646861460858
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 17,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:2",
+                "score": 0.6702020349671856
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:2:2",
+                "score": 0.6377456040878804
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:1",
+                "score": 0.6347341952676435
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": null,
+        "merged_rank": 6,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 11,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:1",
+                "score": 0.6753038829517503
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:2",
+                "score": 0.6597577395368723
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:3",
+                "score": 0.6388312384793404
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:3",
+                "score": 0.7033305341125855
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:2",
+                "score": 0.6093482537121413
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:2:2",
+                "score": 0.6045646861460858
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 12,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:2",
+                "score": 0.6702020349671856
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:2:2",
+                "score": 0.6377456040878804
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:task:1:1",
+                "score": 0.6347341952676435
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": 5,
+        "merged_rank": 5,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 7,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.7091721693034689
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6489218329546986
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.6211422705932935
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": 11,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.6700525819089365
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6341182385191927
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.594716365582941
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.6728632305965232
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6056340586011355
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.565963506625687
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 12,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.6782474454616334
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6431016913206327
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.5906740466268574
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.7091721693034689
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6489218329546986
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.6211422705932935
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": 8,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.6700525819089365
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6341182385191927
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.594716365582941
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.6728632305965232
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6056340586011355
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.565963506625687
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 7,
+            "top_chunks": [
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:1:None",
+                "score": 0.6782474454616334
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:unit:2:None",
+                "score": 0.6431016913206327
+              },
+              {
+                "parent_id": "MMP4321-003v4",
+                "chunk_id": "MMP4321-003v4:overview:None:None",
+                "score": 0.5906740466268574
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "H02",
+    "document_id": "RLM9330-001v1",
+    "title": "電商物流中心理貨員",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:document",
+                "score": 0.7600323452930058
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": null,
+        "merged_rank": 8,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": 8,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:1:2",
+                "score": 0.7063246382993377
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:3:1",
+                "score": 0.704055310485292
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:1",
+                "score": 0.6992263158517716
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:1:2",
+                "score": 0.7063246382993377
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:3:1",
+                "score": 0.704055310485292
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:1",
+                "score": 0.6992263158517716
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": 4,
+        "merged_rank": 4,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.7328903199040844
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.704055310485292
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:1:None",
+                "score": 0.6951490767829844
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "H02-whole-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.7328903199040844
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.704055310485292
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:1:None",
+                "score": 0.6951490767829844
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:document",
+                "score": 0.7215689039066415
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:document",
+                "score": 0.720885947396992
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:document",
+                "score": 0.6993318732074479
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": 4,
+        "merged_rank": 4,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:2",
+                "score": 0.7055826974691947
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:3:1",
+                "score": 0.6848249943816055
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:1",
+                "score": 0.6799902490512133
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:3:1",
+                "score": 0.6832467023472915
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:1",
+                "score": 0.6814764895460103
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:2",
+                "score": 0.680266398766503
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:2",
+                "score": 0.6659755946472532
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:1:2",
+                "score": 0.6013186071997362
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:1:1",
+                "score": 0.5915593719511253
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 15,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:2",
+                "score": 0.6723379703219906
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:1:2",
+                "score": 0.6659648074706559
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:1",
+                "score": 0.651136311267197
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": 5,
+        "merged_rank": 5,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:2",
+                "score": 0.7055826974691947
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:3:1",
+                "score": 0.6848249943816055
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:1",
+                "score": 0.6799902490512133
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:3:1",
+                "score": 0.6832467023472915
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:1",
+                "score": 0.6814764895460103
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:2",
+                "score": 0.680266398766503
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:2",
+                "score": 0.6659755946472532
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:1:2",
+                "score": 0.6013186071997362
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:1:1",
+                "score": 0.5915593719511253
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 8,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:2",
+                "score": 0.6723379703219906
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:1:2",
+                "score": 0.6659648074706559
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:task:2:1",
+                "score": 0.651136311267197
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": 4,
+        "merged_rank": 4,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.7196041899886287
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.6848249943816055
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:overview:None:None",
+                "score": 0.6766816255460972
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.7022258721910666
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.6832467023472915
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:overview:None:None",
+                "score": 0.6779685720937315
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.6406310504718533
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:1:None",
+                "score": 0.5998870366824804
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.5819230868258328
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 10,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.6805844573917068
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.6497743894779158
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:overview:None:None",
+                "score": 0.6469827663185972
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "H02-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.7196041899886287
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.6848249943816055
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:overview:None:None",
+                "score": 0.6766816255460972
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-2",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.7022258721910666
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.6832467023472915
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:overview:None:None",
+                "score": 0.6779685720937315
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-3",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.6406310504718533
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:1:None",
+                "score": 0.5998870366824804
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.5819230868258328
+              }
+            ]
+          },
+          {
+            "query_id": "H02-segments-4",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:2:None",
+                "score": 0.6805844573917068
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:unit:3:None",
+                "score": 0.6497743894779158
+              },
+              {
+                "parent_id": "RLM9330-001v1",
+                "chunk_id": "RLM9330-001v1:overview:None:None",
+                "score": 0.6469827663185972
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "H03",
+    "document_id": "BAS3323-003v3",
+    "title": "採購助理",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": 4,
+        "merged_rank": 4,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:document",
+                "score": 0.6930276347676374
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6911275491339846
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.6375269606889553
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.617446374813118
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": null,
+        "merged_rank": 9,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 9,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6911275491339846
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.6375269606889553
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.617446374813118
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": 4,
+        "merged_rank": 4,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.6904940430792765
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.6424794331091115
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.617446374813118
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.6904940430792765
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.6424794331091115
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.617446374813118
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:document",
+                "score": 0.6714702483604704
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": 13,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:document",
+                "score": 0.6441948717409438
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:document",
+                "score": 0.7154834510167846
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:document",
+                "score": 0.7189512873274388
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:document",
+                "score": 0.6788894598159848
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": 1,
+        "merged_rank": 1,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6846037600774726
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.6422335503704334
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:2",
+                "score": 0.616797580924292
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": 10,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6769871198942707
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:3",
+                "score": 0.6079356429726576
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.5873104479059365
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:3",
+                "score": 0.7174915870953433
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6683880766868241
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:1",
+                "score": 0.6641197127748286
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.7441936470001783
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:3",
+                "score": 0.7058569439995934
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.6915917048089213
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 14,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6604435938290865
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.6577721100613497
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:1",
+                "score": 0.6227837997550462
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": null,
+        "merged_rank": 6,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6846037600774726
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.6422335503704334
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:2",
+                "score": 0.616797580924292
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": 14,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6769871198942707
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:3",
+                "score": 0.6079356429726576
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.5873104479059365
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:3",
+                "score": 0.7174915870953433
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6683880766868241
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:1",
+                "score": 0.6641197127748286
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.7441936470001783
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:3",
+                "score": 0.7058569439995934
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.6915917048089213
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:3",
+                "score": 0.6604435938290865
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:1:1",
+                "score": 0.6577721100613497
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:task:2:1",
+                "score": 0.6227837997550462
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.6912928397808131
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.6237079275130245
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.6158274692120991
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.713340243489508
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.6776296212410424
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.620098267266046
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.7292952063622296
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.7071017089054994
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.6593129535205798
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.6822044683807997
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.6499834718188376
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.6165256921018734
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": 2,
+        "merged_rank": 2,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.6912928397808131
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.6237079275130245
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.6158274692120991
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.713340243489508
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.6776296212410424
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.620098267266046
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.7292952063622296
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.7071017089054994
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.6593129535205798
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:1:None",
+                "score": 0.6822044683807997
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:unit:2:None",
+                "score": 0.6499834718188376
+              },
+              {
+                "parent_id": "BAS3323-003v3",
+                "chunk_id": "BAS3323-003v3:overview:None:None",
+                "score": 0.6165256921018734
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "case_id": "H03",
+    "document_id": "MMP1324-001v4",
+    "title": "資材人員",
+    "methods": [
+      {
+        "method": "W-Dmax",
+        "top5_rank": null,
+        "merged_rank": 10,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 10,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:document",
+                "score": 0.6765578342178395
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmax",
+        "top5_rank": null,
+        "merged_rank": 6,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.675111453576509
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:1",
+                "score": 0.6547673043150078
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:2",
+                "score": 0.6329521204064072
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Tmean3",
+        "top5_rank": 5,
+        "merged_rank": 5,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 5,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.675111453576509
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:1",
+                "score": 0.6547673043150078
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:2",
+                "score": 0.6329521204064072
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umax",
+        "top5_rank": null,
+        "merged_rank": 6,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6821546074070367
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:3:None",
+                "score": 0.6013691111088726
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:4:None",
+                "score": 0.5981131944580871
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "W-Umean3",
+        "top5_rank": null,
+        "merged_rank": 10,
+        "query_evidence": [
+          {
+            "query_id": "H03-whole-1",
+            "rank": 10,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6821546074070367
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:3:None",
+                "score": 0.6013691111088726
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:4:None",
+                "score": 0.5981131944580871
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Dmax",
+        "top5_rank": null,
+        "merged_rank": 8,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 9,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:document",
+                "score": 0.6489643023509885
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": 11,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:document",
+                "score": 0.646313267911585
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 2,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:document",
+                "score": 0.7234165966000441
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 8,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:document",
+                "score": 0.6721302134441316
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmax",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 7,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:1",
+                "score": 0.6584477125322719
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.6575563584891966
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:2",
+                "score": 0.6345255614890122
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 9,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.6940532241667184
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:4:2",
+                "score": 0.6831625297870423
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:4:1",
+                "score": 0.6807689495462824
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.7187699287974288
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:2",
+                "score": 0.6908689252853708
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:1",
+                "score": 0.6660246903647087
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:1",
+                "score": 0.6806627012939026
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.6718168417257339
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:overview:None:None",
+                "score": 0.6175927108342304
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Tmean3",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:1",
+                "score": 0.6584477125322719
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.6575563584891966
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:2",
+                "score": 0.6345255614890122
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.6940532241667184
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:4:2",
+                "score": 0.6831625297870423
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:4:1",
+                "score": 0.6807689495462824
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.7187699287974288
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:2",
+                "score": 0.6908689252853708
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:1",
+                "score": 0.6660246903647087
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:1",
+                "score": 0.6806627012939026
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:task:2:3",
+                "score": 0.6718168417257339
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:overview:None:None",
+                "score": 0.6175927108342304
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umax",
+        "top5_rank": 3,
+        "merged_rank": 3,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 4,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6773657161388327
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:3:None",
+                "score": 0.5811114751671544
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:1:None",
+                "score": 0.570586387978696
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:4:None",
+                "score": 0.7139058805253484
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6783234393722499
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:overview:None:None",
+                "score": 0.6315925443288628
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": 13,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6940299449024396
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:4:None",
+                "score": 0.6371648990279318
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:3:None",
+                "score": 0.6113922343708239
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 1,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6923795312162553
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:overview:None:None",
+                "score": 0.6175927108342304
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:3:None",
+                "score": 0.6108495832366768
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "method": "S-Umean3",
+        "top5_rank": 5,
+        "merged_rank": 5,
+        "query_evidence": [
+          {
+            "query_id": "H03-segments-1",
+            "rank": 7,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6773657161388327
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:3:None",
+                "score": 0.5811114751671544
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:1:None",
+                "score": 0.570586387978696
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-2",
+            "rank": null,
+            "top_chunks": []
+          },
+          {
+            "query_id": "H03-segments-3",
+            "rank": 3,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:4:None",
+                "score": 0.7139058805253484
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6783234393722499
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:overview:None:None",
+                "score": 0.6315925443288628
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-4",
+            "rank": 16,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6940299449024396
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:4:None",
+                "score": 0.6371648990279318
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:3:None",
+                "score": 0.6113922343708239
+              }
+            ]
+          },
+          {
+            "query_id": "H03-segments-5",
+            "rank": 6,
+            "top_chunks": [
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:2:None",
+                "score": 0.6923795312162553
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:overview:None:None",
+                "score": 0.6175927108342304
+              },
+              {
+                "parent_id": "MMP1324-001v4",
+                "chunk_id": "MMP1324-001v4:unit:3:None",
+                "score": 0.6108495832366768
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

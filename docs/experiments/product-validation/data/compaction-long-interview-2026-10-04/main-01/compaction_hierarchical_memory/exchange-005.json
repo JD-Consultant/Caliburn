@@ -1,0 +1,16 @@
+{
+  "event_id": "e005",
+  "execution_id": "1a26c864-838b-4187-8328-7d6ed8e2acbb",
+  "employee_input": {
+    "source_id": "da68e370-0e6b-4990-a5ad-ad9dafbbfbc6",
+    "interview_sequence": 10,
+    "speaker": "employee",
+    "interview_text": "我通常在到貨當天下班前完成已確認項目的ERP登錄。月底最後一天，財務會提供截止清單；超過截止或有疑義的單據由財務決定歸屬月份，我只保留實際收貨時間和未決原因，不自己回填日期。"
+  },
+  "consultant_reply": {
+    "source_id": "44a63b90-9a0d-4842-a554-fbf618d8a2dd",
+    "interview_sequence": 11,
+    "speaker": "consultant",
+    "interview_text": "已把到貨登錄的時效與月底界線補進草稿：已確認項目通常在到貨當天下班前登錄 ERP；超過財務截止或有疑義的單據，由財務決定歸屬月份，您保留實際收貨時間與未決原因，不自行回填日期。\n\n接著回到庫存差異：您通常是在什麼情況下發現帳面庫存和實際庫存不一致？"
+  }
+}

@@ -1,0 +1,8 @@
+test_empty_messages_do_not_create_empty_queries (test_inputs.InputIntegrity.test_empty_messages_do_not_create_empty_queries) ... ok
+test_repeated_punctuation_is_not_lost_or_an_extra_query (test_inputs.InputIntegrity.test_repeated_punctuation_is_not_lost_or_an_extra_query) ... ok
+test_sentence_boundaries_preserve_whole_text_and_origins (test_inputs.InputIntegrity.test_sentence_boundaries_preserve_whole_text_and_origins) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK

@@ -1,0 +1,6 @@
+{
+  "schema": "eval_b2_organization_c9f5367f3acd4543",
+  "database": "caliburn_docker_test",
+  "port": 55441,
+  "seed_only": true
+}

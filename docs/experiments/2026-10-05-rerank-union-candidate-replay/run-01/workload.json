@@ -1,0 +1,12 @@
+{
+  "queries": 20,
+  "new_union_pairs": 628,
+  "old_M_R_pairs": 400,
+  "pair_count_multiplier": 1.57,
+  "new_gpu_inferences": 0,
+  "new_db_queries": 0,
+  "new_provider_calls": 0,
+  "new_external_cost_usd": 0,
+  "fresh_latency_measured": false,
+  "scope": "candidate-pair workload only; cached replay has no measured fresh GPU/DB/end-to-end latency"
+}

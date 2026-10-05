@@ -1,0 +1,16 @@
+{
+  "event_id": "e018",
+  "execution_id": "97a80d01-7479-4655-b598-47b2f1ea98b2",
+  "employee_input": {
+    "source_id": "2cd1ff89-0112-4b15-a563-3a2704637ea0",
+    "interview_sequence": 36,
+    "speaker": "employee",
+    "interview_text": "店間調撥每週一、四集中處理。我收到各店需求後確認可用庫存與主管核准，安排倉庫出貨並建立ERP調撥單；物流窗口安排車趟，我不能承諾未核准的需求一定會出貨。"
+  },
+  "consultant_reply": {
+    "source_id": "f0ff8be6-8acb-42cf-abea-8fcf55636981",
+    "interview_sequence": 37,
+    "speaker": "consultant",
+    "interview_text": "已將店間調撥整理為獨立任務：每週一、四集中處理各店需求，確認可用庫存與主管核准後建立 ERP 調撥單、安排倉庫出貨；物流窗口安排車趟，未核准的需求不承諾出貨。\n\n建立調撥單並安排出貨後，您還會追蹤實際出貨、收貨或 ERP 後續更新嗎？通常到什麼狀態算完成？"
+  }
+}

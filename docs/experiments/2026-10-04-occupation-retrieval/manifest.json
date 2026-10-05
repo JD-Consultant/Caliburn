@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "corpus_count": 805,
+  "independent_employee_groups": 2,
+  "input_case_count": 5,
+  "corpus_sha256": "3892cd37e209976a32d0c9fccf2a35c127091179a0b62eda1604647eddd64c65",
+  "cases_sha256": "a6a5a970018e3572b8f66301156cd97971c3c5c184491e395f08f05e9e1b18a9",
+  "protocol_sha256": "628c2516518eff8ef20abe65af29787094fb7586a16678c5002ccff1d9f3f93c",
+  "probes_sha256": "7654e01410f9f8f541bcfdca757d69b77a1321b6bfc97f698fa27d73ce674d8b",
+  "truth_source": "engineering semantic review before retrieval; synthetic only, not expert ground truth",
+  "transformations": [
+    "exact self-title replacement",
+    "markdown markers and generic OPKS headings removed",
+    "TOPKS codes removed",
+    "stable dedup corpus text, names retained"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "event_id": "e001",
+  "execution_id": "a032719a-82c5-49ab-a867-ee67f56552be",
+  "employee_input": {
+    "source_id": "223039f8-bc03-4272-b8a0-b90af6154b70",
+    "interview_sequence": 2,
+    "speaker": "employee",
+    "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+  },
+  "consultant_reply": {
+    "source_id": "0bac4ff7-285d-4871-b717-527075cf7ce4",
+    "interview_sequence": 3,
+    "speaker": "consultant",
+    "interview_text": "已先整理職務名稱、所屬部門、匯報對象與主要工作範圍，並保留您說明的責任界線：您不負責採購議價，也不向客人承諾交期。\n\n先從到貨登錄了解：貨品到倉後，您通常會核對哪些資料、如何登錄？如果實際到貨與資料不符，您會怎麼處理或交接？"
+  }
+}

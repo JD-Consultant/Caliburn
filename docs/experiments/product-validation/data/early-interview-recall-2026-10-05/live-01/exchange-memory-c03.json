@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "1a85be36-dc3a-4ee0-825a-8b9329e45451",
+    "interview_sequence": 110,
+    "speaker": "employee",
+    "interview_text": "收貨異常通知採購後，我原本說多久没回覆要提醒、多久沒進展要回報誰？追到什麼情況才算結案，退換貨或補貨由誰決定？供應商補來的日期算不算我保證的？"
+  },
+  "consultant_reply": {
+    "source_id": "6bb48f59-0dcc-4efd-b641-d8f85141dee8",
+    "interview_sequence": 111,
+    "speaker": "consultant",
+    "interview_text": "依先前確認的收貨異常流程：\n\n- 通知採購後，**兩個工作日未獲回覆**，提醒採購；到**第四個工作日仍無進展**，回報倉儲主管。\n- 追蹤到**補貨或退貨完成，且帳物相符**，才算結案。\n- **退換貨或補貨由採購決定**，您負責記錄差異並追蹤，不自行決定。\n- 供應商實際補貨時間**不由您保證**。"
+  }
+}

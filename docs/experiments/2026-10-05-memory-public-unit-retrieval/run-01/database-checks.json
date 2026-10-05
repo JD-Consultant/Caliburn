@@ -1,0 +1,1442 @@
+[
+  {
+    "query_id": "F01-whole-1",
+    "representation": "document",
+    "max_native_error": 6.193233326179381e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "KPS2434-004v2",
+          "KRM1324-002v1",
+          "IDC5294-001v3",
+          "INM3514-001v4",
+          "KPS4999-001v3",
+          "KRM4224-001v3",
+          "AVA2172-004v3",
+          "AVA2172-002v3",
+          "IIS3513-002v4",
+          "BAS3323-003v3",
+          "AVA2172-003v3",
+          "MQM1322-001v4",
+          "MPM7322-001v4",
+          "IIS3513-008v3",
+          "BAS1499-003v4",
+          "BGM1349-001v3",
+          "RTM4323-004v1",
+          "花藝設計助理",
+          "MIM2141-001v4",
+          "MQM2141-001v4",
+          "KRM3323-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.0354321000049822,
+    "cosine_and_sort_seconds": 0.0021495999535545707
+  },
+  {
+    "query_id": "F01-whole-1",
+    "representation": "task",
+    "max_native_error": 5.058796459511683e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "MPM7322-001v4",
+          "KPS2434-004v2",
+          "KPS2434-002v2",
+          "KRM1324-002v1",
+          "KRM1324-001v1",
+          "ISD2152-001v4",
+          "BGM1330-001v3",
+          "MQM1322-001v4",
+          "KPS2434-001v2",
+          "KPS5220-001v4",
+          "KPS4999-001v3",
+          "BAS2421-001v4",
+          "KMM2431-005v4",
+          "IIS3512-001v3",
+          "IIS3513-003v4",
+          "AVA2173-007v3",
+          "IIS3513-005v4",
+          "SMS2529-001v3",
+          "KPS2434-003v2",
+          "IDC5294-001v3",
+          "LLS2619-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.036344700027257204,
+    "cosine_and_sort_seconds": 0.005528400011826307
+  },
+  {
+    "query_id": "F01-B2-S-0",
+    "representation": "document",
+    "max_native_error": 6.430057508666209e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "INM3514-001v4",
+          "KRM1324-002v1",
+          "網路維修助理",
+          "KPS2434-004v2",
+          "IIS3513-002v4",
+          "MQM2141-001v4",
+          "MIM2141-001v4",
+          "KRM4224-001v3",
+          "SET2152-009v2",
+          "MQM1322-001v4",
+          "BGM1330-001v3",
+          "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+          "IDC5294-001v3",
+          "INM3513-002v4",
+          "IIS3513-001v4",
+          "MEM3511-001v3",
+          "KRM1420-001v4",
+          "MPM7322-001v4",
+          "NFP7911-001v1",
+          "APA3439-002v4",
+          "ISD2513-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.03024390002246946,
+    "cosine_and_sort_seconds": 0.0016503000515513122
+  },
+  {
+    "query_id": "F01-B2-S-0",
+    "representation": "task",
+    "max_native_error": 6.586805234576332e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "MQM1322-001v4",
+          "BGM1330-001v3",
+          "MIM2141-001v4",
+          "MPM7322-001v4",
+          "KPS2434-004v2",
+          "KRM1324-001v1",
+          "KPS2434-002v2",
+          "MEM3113-001v4",
+          "ISD2152-001v4",
+          "網路維修助理",
+          "ISD2152-002v4",
+          "通訊產業智慧手持裝置嵌入式系統韌體工程師",
+          "KRM1324-002v1",
+          "INM2153-001v3",
+          "INM3513-002v4",
+          "KPS2434-003v2",
+          "IIS3511-001v1",
+          "SET3113-004v2",
+          "INM7421-010v3",
+          "IDC1330-001v1",
+          "INM7421-009v3"
+        ]
+      }
+    ],
+    "db_seconds": 0.031011100043542683,
+    "cosine_and_sort_seconds": 0.005571999994572252
+  },
+  {
+    "query_id": "F02-whole-1",
+    "representation": "document",
+    "max_native_error": 6.635789606690423e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "INM3514-001v4",
+          "IIS3513-001v4",
+          "KPS2434-004v2",
+          "AVA2172-003v3",
+          "IIS3513-002v4",
+          "BAS1499-003v4",
+          "IDC3512-002v2",
+          "ISD2152-004v5",
+          "BAS3332-003v3",
+          "KPS3322-003v3",
+          "花藝設計助理",
+          "BAS1499-002v4",
+          "IDC1330-001v1",
+          "ISD2513-001v4",
+          "FBF1223-003v3",
+          "FIS2511-002v2",
+          "MIM2141-001v4",
+          "FAC3313-001v2",
+          "網路維修助理",
+          "BGM1349-001v3",
+          "MQM1322-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.024380099959671497,
+    "cosine_and_sort_seconds": 0.001531900023110211
+  },
+  {
+    "query_id": "F02-whole-1",
+    "representation": "task",
+    "max_native_error": 6.793605966670668e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "INM3514-001v4",
+          "ISD2152-001v4",
+          "IDC1330-001v1",
+          "TTM3422-001v2",
+          "MIM2141-001v4",
+          "INM7421-010v3",
+          "BGM1330-001v3",
+          "MQM1322-001v4",
+          "IIS2522-001v3",
+          "FIS2511-001v2",
+          "FIS2511-002v2",
+          "IIS3513-003v4",
+          "IIS3513-001v4",
+          "連鎖餐飲門市管理人員",
+          "KPS5220-001v4",
+          "KRM1420-001v4",
+          "INM2529-001v3",
+          "INM3514-002v3",
+          "INM7421-009v3",
+          "SET2152-005v2",
+          "MPM7322-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.03013580001424998,
+    "cosine_and_sort_seconds": 0.005696100008208305
+  },
+  {
+    "query_id": "F02-B2-S-0",
+    "representation": "document",
+    "max_native_error": 6.213530767684716e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "INM3514-001v4",
+          "BAS3332-003v3",
+          "IIS3513-001v4",
+          "AVA2172-003v3",
+          "KRM3323-001v4",
+          "ISD2513-001v4",
+          "IDC2172-001v4",
+          "KPS2434-004v2",
+          "BAS1499-002v4",
+          "ISD2152-004v5",
+          "IIS3513-003v4",
+          "BAS1499-003v4",
+          "IIS3513-002v4",
+          "IIS3512-001v3",
+          "網路維修助理",
+          "ATC3339-001v4",
+          "IDC5294-001v3",
+          "SET2152-005v2",
+          "INM7421-001v3",
+          "MQM1322-001v4",
+          "BAS2421-003v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.024143900023773313,
+    "cosine_and_sort_seconds": 0.001563300029374659
+  },
+  {
+    "query_id": "F02-B2-S-0",
+    "representation": "task",
+    "max_native_error": 7.61330474219335e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "BGM1330-001v3",
+          "MQM1322-001v4",
+          "MIM2141-001v4",
+          "KPS5220-001v4",
+          "INM3514-002v3",
+          "MEM7231-005v4",
+          "INM3514-001v4",
+          "IDC1330-001v1",
+          "KPS5294-001v4",
+          "INM2153-001v3",
+          "ISD2152-001v4",
+          "KMC1222-002v3",
+          "BHR2422-001v4",
+          "KPS2434-003v2",
+          "IIS3513-003v4",
+          "MEM7231-019v1",
+          "AVA2172-003v3",
+          "MEM3113-001v4",
+          "連鎖餐飲門市服務人員",
+          "SET2152-005v2",
+          "BLM2421-008v3"
+        ]
+      }
+    ],
+    "db_seconds": 0.029609099961817265,
+    "cosine_and_sort_seconds": 0.006391000002622604
+  },
+  {
+    "query_id": "F03-whole-1",
+    "representation": "document",
+    "max_native_error": 6.065887137030046e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "FAC4311-001v2",
+          "FAC3313-001v2",
+          "KPS2434-004v2",
+          "FAC1211-001v2",
+          "BAS1219-003v4",
+          "BAS3323-003v3",
+          "KRM3323-001v4",
+          "KPS5220-001v4",
+          "MPM7322-001v4",
+          "KPS5292-002v3",
+          "RTM4323-004v1",
+          "KPS4999-001v3",
+          "BGM5220-002v3",
+          "MMP4321-003v4",
+          "KRM1420-003v4",
+          "花藝設計助理",
+          "KRM1324-002v1",
+          "BAS1219-005v1",
+          "KRM1420-001v4",
+          "KPS3322-002v4",
+          "市場分析助理"
+        ]
+      }
+    ],
+    "db_seconds": 0.02463589998660609,
+    "cosine_and_sort_seconds": 0.001573599991388619
+  },
+  {
+    "query_id": "F03-whole-1",
+    "representation": "task",
+    "max_native_error": 8.033953224906298e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "FAC3313-001v2",
+          "KRM4212-001v2",
+          "FAC4311-001v2",
+          "停車場管理員",
+          "FAC1211-001v2",
+          "KPS5292-002v3",
+          "KPS2434-004v2",
+          "BAS1219-003v4",
+          "KPS3334-002v4",
+          "MPM7322-001v4",
+          "KRM1420-001v4",
+          "FFN2412-003v2",
+          "KRM4212-002v2",
+          "KPS2434-002v2",
+          "TTM4221-007v1",
+          "RLM9330-001v1",
+          "BAS3323-003v3",
+          "MMP1324-001v4",
+          "BGM5220-002v3",
+          "KRM1324-002v1",
+          "TFB5131-001v3"
+        ]
+      }
+    ],
+    "db_seconds": 0.029486100014764816,
+    "cosine_and_sort_seconds": 0.03781690000323579
+  },
+  {
+    "query_id": "F03-B2-S-0",
+    "representation": "document",
+    "max_native_error": 9.885368457140942e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "KRM3323-001v4",
+          "BAS3323-003v3",
+          "KRM3323-002v4",
+          "BAS1219-003v4",
+          "FAC3313-001v2",
+          "BAS3323-001v4",
+          "KPS5220-001v4",
+          "KPS3334-007v4",
+          "KPS4999-001v3",
+          "MMP4321-002v4",
+          "MMP4321-003v4",
+          "KPS5220-002v3",
+          "MMP1324-003v4",
+          "KRM1420-003v4",
+          "KRM1324-002v1",
+          "BGM5220-002v3",
+          "MQM7993-001v4",
+          "家具設計助理",
+          "KPS3322-002v4",
+          "KPS2434-004v2",
+          "MPM7322-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.0060603999882005155,
+    "cosine_and_sort_seconds": 0.0016139000072143972
+  },
+  {
+    "query_id": "F03-B2-S-0",
+    "representation": "task",
+    "max_native_error": 7.89843840331983e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "KRM1324-001v1",
+          "MMP4321-002v4",
+          "BAS3323-003v3",
+          "MQM2141-007v2",
+          "BAS3323-002v4",
+          "RTM4323-001v4",
+          "MEM7231-010v2",
+          "KRM3323-001v4",
+          "RLM4323-001v4",
+          "BAS1219-003v4",
+          "KRM1324-002v1",
+          "KRM1420-006v4",
+          "MMP1324-001v4",
+          "BAS3323-001v4",
+          "KPS3334-007v4",
+          "SET7127-001v3",
+          "KRM1420-002v4",
+          "MEM7131-002v2",
+          "MMP1324-003v4",
+          "KRM3323-002v4",
+          "KRM4212-002v2"
+        ]
+      }
+    ],
+    "db_seconds": 0.03244470001664013,
+    "cosine_and_sort_seconds": 0.006618399987928569
+  },
+  {
+    "query_id": "F03-B2-S-1",
+    "representation": "document",
+    "max_native_error": 6.291791088131049e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "FAC4311-001v2",
+          "FAC3313-001v2",
+          "FAC1211-001v2",
+          "KPS5220-001v4",
+          "KPS2434-004v2",
+          "KRM1420-001v4",
+          "BGM5220-002v3",
+          "BAS1219-005v1",
+          "KRM3323-001v4",
+          "MMP4321-003v4",
+          "KRM1420-003v4",
+          "連鎖餐飲門市管理人員",
+          "RTM4323-004v1",
+          "BAS1219-003v4",
+          "停車場管理員",
+          "FBF1345-001v4",
+          "FAC2411-001v2",
+          "KRM1420-002v4",
+          "RTM4323-005v1",
+          "MIM2141-001v4",
+          "TTM1411-002v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.02399740001419559,
+    "cosine_and_sort_seconds": 0.0015648000407963991
+  },
+  {
+    "query_id": "F03-B2-S-1",
+    "representation": "task",
+    "max_native_error": 5.796865099050308e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "FAC3313-001v2",
+          "停車場管理員",
+          "FAC1211-001v2",
+          "KRM4212-001v2",
+          "TFB5131-001v3",
+          "THM4222-001v3",
+          "KRM1420-001v4",
+          "KPS2434-004v2",
+          "FAC4311-001v2",
+          "TTM4221-007v1",
+          "KPS3334-002v4",
+          "TTM3422-001v2",
+          "KRM4212-002v2",
+          "KPS5220-001v4",
+          "FFN2412-003v2",
+          "KMC1222-002v3",
+          "TTM4221-001v4",
+          "KPS3322-003v3",
+          "KRM1420-003v4",
+          "KPS2434-003v2",
+          "KMC3332-001v3"
+        ]
+      }
+    ],
+    "db_seconds": 0.029481699981261045,
+    "cosine_and_sort_seconds": 0.005820700025651604
+  },
+  {
+    "query_id": "F04-whole-1",
+    "representation": "document",
+    "max_native_error": 7.536546020592283e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "MEM7412-001v3",
+          "SET2141-001v3",
+          "MEM7231-010v2",
+          "網路維修助理",
+          "MEM7231-009v3",
+          "MIM2141-001v4",
+          "KPS5220-002v3",
+          "TFB5131-002v3",
+          "MEM7234-002v3",
+          "MEM8199-001v3",
+          "MEM8199-002v3",
+          "MEM3511-001v3",
+          "IIS7421-002v3",
+          "MEM7234-001v3",
+          "印刷機台技術助理",
+          "MEM7231-019v1",
+          "SET7127-002v3",
+          "MPM7935-004v3",
+          "BAS3332-003v3",
+          "SET7231-001v3",
+          "SET7231-002v3"
+        ]
+      }
+    ],
+    "db_seconds": 0.024440100009087473,
+    "cosine_and_sort_seconds": 0.0015022999723441899
+  },
+  {
+    "query_id": "F04-whole-1",
+    "representation": "task",
+    "max_native_error": 6.602715041381657e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "SET3113-002v3",
+          "SET7127-002v3",
+          "MIM2141-001v4",
+          "SET3113-004v2",
+          "MEM7231-009v3",
+          "SET7127-001v3",
+          "網路維修助理",
+          "MEM7231-011v2",
+          "SET7231-001v3",
+          "SET2141-001v3",
+          "KPS5220-004v2",
+          "MEM3113-001v4",
+          "MEM3511-001v3",
+          "RTM4323-001v4",
+          "BAS1219-003v4",
+          "MEM7412-001v3",
+          "MEM7234-002v3",
+          "KPS5220-002v3",
+          "MPM7322-001v4",
+          "SET7231-002v3",
+          "BGM5220-001v3"
+        ]
+      }
+    ],
+    "db_seconds": 0.03350959997624159,
+    "cosine_and_sort_seconds": 0.005640099989250302
+  },
+  {
+    "query_id": "F04-B2-S-0",
+    "representation": "document",
+    "max_native_error": 6.424476828303938e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "SET7127-002v3",
+          "MEM7412-001v3",
+          "MEM3511-001v3",
+          "SET7231-002v3",
+          "網路維修助理",
+          "SET2141-001v3",
+          "IIS7421-002v3",
+          "MEM7231-010v2",
+          "MIM2141-001v4",
+          "MEM8199-001v3",
+          "MPM8142-001v3",
+          "SET7231-001v3",
+          "MEM7213-003v2",
+          "BAS3332-002v3",
+          "BGM5220-002v3",
+          "MPD7231-001v4",
+          "PIC9111-001v3",
+          "印刷機台技術助理",
+          "MEM8199-002v3",
+          "MEM2434-001v2",
+          "MEM7213-004v2"
+        ]
+      }
+    ],
+    "db_seconds": 0.006272599974181503,
+    "cosine_and_sort_seconds": 0.0015795999788679183
+  },
+  {
+    "query_id": "F04-B2-S-0",
+    "representation": "task",
+    "max_native_error": 6.797841289873929e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "MQM1322-001v4",
+          "SET7127-002v3",
+          "MIM2141-001v4",
+          "MEM7231-011v2",
+          "SET7231-001v3",
+          "INM7421-007v3",
+          "SET3113-002v3",
+          "MEM7231-005v4",
+          "MEM7233-001v4",
+          "MPM7322-001v4",
+          "INM3513-002v4",
+          "IIS7421-002v3",
+          "MEM7231-013v2",
+          "MEM7231-014v2",
+          "MEM7231-003v4",
+          "RTM4323-001v4",
+          "SET3113-004v2",
+          "SET7127-001v3",
+          "CCM7412-003v3",
+          "MEM7412-001v3",
+          "MEM2434-001v2"
+        ]
+      }
+    ],
+    "db_seconds": 0.01297450001584366,
+    "cosine_and_sort_seconds": 0.006064799963496625
+  },
+  {
+    "query_id": "F05-whole-1",
+    "representation": "document",
+    "max_native_error": 5.978944328521862e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "KMC2431-009v2",
+          "KMM2431-006v3",
+          "AVA2172-002v3",
+          "IDC2712-001v1",
+          "KMC2431-006v3",
+          "KMM2431-002v4",
+          "AVA2172-004v3",
+          "IDC5294-001v3",
+          "MPM7322-006v4",
+          "KMC2431-011v1",
+          "KMC2431-007v3",
+          "MPM7322-007v4",
+          "KMC2432-003v3",
+          "KMM2431-004v4",
+          "PIC3332-002v2",
+          "AVA2172-003v3",
+          "TTM4221-004v3",
+          "KPS3322-003v3",
+          "APP2431-001v2",
+          "KMC2431-001v4",
+          "IDC2172-009v2"
+        ]
+      }
+    ],
+    "db_seconds": 0.006695999996736646,
+    "cosine_and_sort_seconds": 0.0018455999670550227
+  },
+  {
+    "query_id": "F05-whole-1",
+    "representation": "task",
+    "max_native_error": 6.882267222785288e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "AVA2172-002v3",
+          "KPS3334-009v4",
+          "KMC2431-009v2",
+          "IDC2172-009v2",
+          "KMM2431-006v3",
+          "KMC2431-006v3",
+          "KMC2431-005v4",
+          "KMC1222-002v3",
+          "KPS3334-008v4",
+          "BAS2431-001v4",
+          "ATC3439-001v3",
+          "TTM3422-001v2",
+          "KMC3332-001v3",
+          "AVA2172-001v4",
+          "AVA3431-001v2",
+          "KMM2431-004v4",
+          "PIC3332-002v2",
+          "KMC2431-011v1",
+          "KPS5220-005v2",
+          "IDC2712-001v1",
+          "MPM7322-006v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.03527849999954924,
+    "cosine_and_sort_seconds": 0.0059772999957203865
+  },
+  {
+    "query_id": "F05-B2-S-0",
+    "representation": "document",
+    "max_native_error": 7.08678102867566e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "AVA2172-002v3",
+          "MPM7322-001v4",
+          "AVA2172-004v3",
+          "AVA2172-001v4",
+          "IDC2712-001v1",
+          "花藝設計助理",
+          "MPM7322-006v4",
+          "ATC3339-001v4",
+          "MPM7322-010v3",
+          "AVA2172-003v3",
+          "成衣服裝設計助理",
+          "KMC2431-009v2",
+          "IDC2172-005v2",
+          "KMM2431-006v3",
+          "MPM8142-003v3",
+          "TTM4221-004v3",
+          "IDC2172-009v2",
+          "CAP2163-001v3",
+          "KPS2434-004v2",
+          "AVA2173-008v3",
+          "ISD2152-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.007224800006952137,
+    "cosine_and_sort_seconds": 0.0018308000289835036
+  },
+  {
+    "query_id": "F05-B2-S-0",
+    "representation": "task",
+    "max_native_error": 4.9192150797239265e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "AVA2172-001v4",
+          "MQM1322-001v4",
+          "AVA2172-002v3",
+          "珠寶金工人員",
+          "MPM7322-001v4",
+          "BGM1330-001v3",
+          "MPM7322-007v4",
+          "KMC2431-009v2",
+          "AVA2172-004v3",
+          "KPS3334-009v4",
+          "MIM2141-001v4",
+          "BGM1349-002v3",
+          "展覽行銷企劃經理",
+          "MPD2151-003v2",
+          "AVA3439-001v4",
+          "IDC2172-009v2",
+          "展覽業務經理",
+          "MPM7322-010v3",
+          "ISD2152-001v4",
+          "SET3113-004v2",
+          "PIC5140-002v2"
+        ]
+      }
+    ],
+    "db_seconds": 0.016370499972254038,
+    "cosine_and_sort_seconds": 0.006853399972897023
+  },
+  {
+    "query_id": "H01-whole-1",
+    "representation": "document",
+    "max_native_error": 5.491434929005834e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "BHR2422-007v4",
+          "THM4222-001v3",
+          "KPS2434-004v2",
+          "TTM4221-007v1",
+          "FAC3313-001v2",
+          "KPS5220-001v4",
+          "KRM1420-001v4",
+          "FAC4311-001v2",
+          "KPS3322-003v3",
+          "BAS1219-003v4",
+          "TTM3422-001v2",
+          "TTM4221-004v3",
+          "BGM5220-002v3",
+          "APA3439-002v4",
+          "BAS3332-002v3",
+          "連鎖餐飲門市管理人員",
+          "TFB1412-002v2",
+          "BHR2422-011v4",
+          "FAC1211-001v2",
+          "TFB5139-001v3",
+          "TTM1411-002v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.018503000028431416,
+    "cosine_and_sort_seconds": 0.0020602000295184553
+  },
+  {
+    "query_id": "H01-whole-1",
+    "representation": "task",
+    "max_native_error": 7.596856710367916e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "TTM3422-001v2",
+          "BHR2422-011v4",
+          "THM4222-001v3",
+          "BHR2422-007v4",
+          "TTM4221-007v1",
+          "KPS3322-003v3",
+          "連鎖餐飲門市管理人員",
+          "KRM4212-001v2",
+          "TFB1412-002v2",
+          "KPS5220-001v4",
+          "KPS5220-004v2",
+          "KRM1420-001v4",
+          "KMC2432-001v4",
+          "KPS5220-005v2",
+          "ATC2654-001v4",
+          "KRM4212-002v2",
+          "KMC2432-003v3",
+          "KRM1324-002v1",
+          "SMS2529-001v3",
+          "連鎖餐飲區域督導",
+          "MMP4321-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.030403500015381724,
+    "cosine_and_sort_seconds": 0.00595610000891611
+  },
+  {
+    "query_id": "H01-B2-S-0",
+    "representation": "document",
+    "max_native_error": 7.285990410998977e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "BHR2422-007v4",
+          "KPS2434-004v2",
+          "BHR2422-011v4",
+          "BAS1219-003v4",
+          "FAC4311-001v2",
+          "TFB1412-002v2",
+          "KRM1420-001v4",
+          "APA3439-002v4",
+          "FAC3313-001v2",
+          "TTM3422-001v2",
+          "THM4222-001v3",
+          "TFB5139-001v3",
+          "TTM4221-007v1",
+          "TTM4221-004v3",
+          "KPS3322-003v3",
+          "BGM5220-002v3",
+          "KPS4999-001v3",
+          "FAC1211-001v2",
+          "BAS1219-005v1",
+          "KMC2432-003v3",
+          "連鎖餐飲門市服務人員"
+        ]
+      }
+    ],
+    "db_seconds": 0.02269080001860857,
+    "cosine_and_sort_seconds": 0.0016089999699033797
+  },
+  {
+    "query_id": "H01-B2-S-0",
+    "representation": "task",
+    "max_native_error": 5.4023981621575956e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "BHR2422-007v4",
+          "TFB1412-002v2",
+          "KMC2432-001v4",
+          "TTM3422-001v2",
+          "KRM4212-001v2",
+          "BHR2422-011v4",
+          "KPS3322-003v3",
+          "THM4222-001v3",
+          "KMC1222-002v3",
+          "KMC2431-009v2",
+          "TFB1412-003v2",
+          "SMS2529-001v3",
+          "HMS3299-001v2",
+          "KPS2434-004v2",
+          "連鎖餐飲區域督導",
+          "KRM1420-001v4",
+          "KPS5220-004v2",
+          "BAS1219-005v1",
+          "KRM1420-003v4",
+          "連鎖餐飲門市管理人員",
+          "LLS3411-002v2"
+        ]
+      }
+    ],
+    "db_seconds": 0.03080090001458302,
+    "cosine_and_sort_seconds": 0.005807499983347952
+  },
+  {
+    "query_id": "H02-whole-1",
+    "representation": "document",
+    "max_native_error": 6.642376892962432e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "RLM4323-004v1",
+          "RLM9330-001v1",
+          "MMP4321-002v4",
+          "KRM1324-002v1",
+          "MMP4321-003v4",
+          "MQM7993-001v4",
+          "KRM1324-001v1",
+          "MMP1324-003v4",
+          "BGM5220-002v3",
+          "KRM3323-002v4",
+          "RTO4323-001v4",
+          "MPM7322-001v4",
+          "BAS3323-003v3",
+          "KRM3323-001v4",
+          "RLM4323-002v4",
+          "MQM2141-005v2",
+          "KRM1420-001v4",
+          "KPS5220-001v4",
+          "KPS2434-004v2",
+          "RTM4323-005v1",
+          "MQM2141-008v1"
+        ]
+      }
+    ],
+    "db_seconds": 0.005269100016448647,
+    "cosine_and_sort_seconds": 0.0015758000081405044
+  },
+  {
+    "query_id": "H02-whole-1",
+    "representation": "task",
+    "max_native_error": 6.165215882258934e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "BGM5220-002v3",
+          "TFB5131-001v3",
+          "MMP4321-002v4",
+          "KPS5220-003v3",
+          "KPS5292-002v3",
+          "KRM1324-002v1",
+          "RLM4323-004v1",
+          "RLM9330-001v1",
+          "TFB3433-002v3",
+          "TFB3433-001v3",
+          "MPM7322-001v4",
+          "KRM1420-001v4",
+          "KRM1324-001v1",
+          "KPS2434-004v2",
+          "BAS3323-003v3",
+          "KRM3323-002v4",
+          "KPS2434-005v1",
+          "KRM3323-001v4",
+          "MQM7993-001v4",
+          "RTO4323-001v4",
+          "NFP7911-001v1"
+        ]
+      }
+    ],
+    "db_seconds": 0.03403099998831749,
+    "cosine_and_sort_seconds": 0.0054496999946422875
+  },
+  {
+    "query_id": "H02-B2-S-0",
+    "representation": "document",
+    "max_native_error": 8.094284031923138e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "RLM9330-001v1",
+          "RLM4323-004v1",
+          "MMP4321-002v4",
+          "MMP4321-003v4",
+          "RTO4323-001v4",
+          "KRM3323-001v4",
+          "MMP1324-003v4",
+          "MPM7322-001v4",
+          "RLM4323-002v4",
+          "BGM5220-002v3",
+          "KRM1324-001v1",
+          "KRM1324-002v1",
+          "RTM4323-001v4",
+          "KRM3323-002v4",
+          "RLM4323-001v4",
+          "NFP7911-001v1",
+          "RLM1324-001v4",
+          "RTM4323-004v1",
+          "KPS2434-004v2",
+          "MMP4321-001v4",
+          "RLM4323-003v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.0243932000012137,
+    "cosine_and_sort_seconds": 0.001491100003477186
+  },
+  {
+    "query_id": "H02-B2-S-0",
+    "representation": "task",
+    "max_native_error": 5.505867561872435e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "RLM4323-004v1",
+          "MMP4321-002v4",
+          "BGM5220-002v3",
+          "RLM9330-001v1",
+          "RLM4323-002v4",
+          "MQM1322-001v4",
+          "MPM7322-001v4",
+          "KRM3323-001v4",
+          "TFB5131-001v3",
+          "RTM4323-001v4",
+          "KPS5220-003v3",
+          "MMP4321-001v4",
+          "TFB3433-002v3",
+          "KRM1420-001v4",
+          "RTO4323-001v4",
+          "RLM4323-003v4",
+          "MMP4321-003v4",
+          "RTM1324-002v4",
+          "TFB3433-001v3",
+          "RTO1324-001v4",
+          "KPS5292-002v3"
+        ]
+      }
+    ],
+    "db_seconds": 0.010371399985160679,
+    "cosine_and_sort_seconds": 0.005556299991440028
+  },
+  {
+    "query_id": "H03-whole-1",
+    "representation": "document",
+    "max_native_error": 8.559067576907609e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "KRM1324-001v1",
+          "KRM1324-002v1",
+          "KRM1420-001v4",
+          "BAS3323-003v3",
+          "KRM3323-002v4",
+          "RLM4323-004v1",
+          "KRM3323-001v4",
+          "MMP1324-002v4",
+          "RLM9330-001v1",
+          "MMP1324-001v4",
+          "MQM2141-005v2",
+          "BAS1219-003v4",
+          "BAS3323-002v4",
+          "MQM2141-001v4",
+          "MMP4321-002v4",
+          "BGM1349-002v3",
+          "BAS3323-001v4",
+          "MPM8142-003v3",
+          "MPM8141-001v6",
+          "MQM1322-001v4",
+          "AVA4322-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.02760540001327172,
+    "cosine_and_sort_seconds": 0.0015677999472245574
+  },
+  {
+    "query_id": "H03-whole-1",
+    "representation": "task",
+    "max_native_error": 6.20113347338247e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "MPM7322-001v4",
+          "BAS3323-003v3",
+          "KRM1324-002v1",
+          "MMP4321-002v4",
+          "KPS5220-003v3",
+          "MMP1324-001v4",
+          "MQM1322-001v4",
+          "BAS3323-001v4",
+          "KRM3323-002v4",
+          "BGM5220-002v3",
+          "AVA4322-001v4",
+          "BAS3323-002v4",
+          "KRM4212-001v2",
+          "KRM1324-001v1",
+          "SET7127-001v3",
+          "AVA2173-012v3",
+          "TFB3433-002v3",
+          "KPS2434-004v2",
+          "NFP7911-001v1",
+          "TFB3433-001v3",
+          "MPM3122-001v1"
+        ]
+      }
+    ],
+    "db_seconds": 0.010045600007288158,
+    "cosine_and_sort_seconds": 0.04240189999109134
+  },
+  {
+    "query_id": "H03-B2-S-0",
+    "representation": "document",
+    "max_native_error": 6.577525701878528e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "KRM1324-002v1",
+          "KRM1324-001v1",
+          "KRM3323-002v4",
+          "RTM4323-005v1",
+          "MMP1324-003v4",
+          "RLM4323-004v1",
+          "MQM7993-001v4",
+          "BAS3323-003v3",
+          "MMP4321-002v4",
+          "RLM9330-001v1",
+          "BAS3323-002v4",
+          "MMP1324-001v4",
+          "MQM2141-008v1",
+          "MQM2141-005v2",
+          "MPM8142-003v3",
+          "RTM4323-001v4",
+          "MQM7919-001v4",
+          "MMP1324-002v4",
+          "MQM2141-004v3",
+          "MMP4321-003v4",
+          "RTM4323-002v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.02376920002279803,
+    "cosine_and_sort_seconds": 0.0014062999980524182
+  },
+  {
+    "query_id": "H03-B2-S-0",
+    "representation": "task",
+    "max_native_error": 7.9128160024311e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "AVA4322-001v4",
+          "KRM1324-002v1",
+          "MMP4321-002v4",
+          "MPM7322-001v4",
+          "KRM1324-001v1",
+          "MQM2141-004v3",
+          "TFB5120-005v2",
+          "TFB9901-002v2",
+          "BAS3323-003v3",
+          "MMP1324-003v4",
+          "NFP7911-001v1",
+          "KRM1420-001v4",
+          "KRM3323-002v4",
+          "RLM4323-004v1",
+          "MQM7919-001v4",
+          "AVA2173-012v3",
+          "NAO6010-003v3",
+          "TFB3433-002v3",
+          "TFB5120-004v2",
+          "BGM5220-002v3",
+          "RLM9330-001v1"
+        ]
+      }
+    ],
+    "db_seconds": 0.028688599995803088,
+    "cosine_and_sort_seconds": 0.006770799984224141
+  },
+  {
+    "query_id": "H03-B2-S-1",
+    "representation": "document",
+    "max_native_error": 6.27192133784149e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "KRM1324-001v1",
+          "MQM7993-001v4",
+          "KRM1324-002v1",
+          "MMP1324-001v4",
+          "BAS3323-002v4",
+          "KRM3323-002v4",
+          "BAS3323-001v4",
+          "MQM2141-005v2",
+          "BAS3323-003v3",
+          "KPS4999-001v3",
+          "MQM2141-008v1",
+          "KRM3323-001v4",
+          "MQM2141-001v4",
+          "MQM1322-002v2",
+          "MQM7919-001v4",
+          "MMP1324-002v4",
+          "MQM1322-003v1",
+          "INM3513-004v4",
+          "MQM1322-001v4",
+          "MQM2141-004v3",
+          "FAC2411-001v2"
+        ]
+      }
+    ],
+    "db_seconds": 0.004940099956002086,
+    "cosine_and_sort_seconds": 0.0015160000184550881
+  },
+  {
+    "query_id": "H03-B2-S-1",
+    "representation": "task",
+    "max_native_error": 5.760506205376714e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "MQM2141-005v2",
+          "MQM2141-007v2",
+          "KRM1324-001v1",
+          "BAS3323-002v4",
+          "MQM7993-001v4",
+          "MQM2141-001v4",
+          "MQM2141-008v1",
+          "KRM1324-002v1",
+          "BAS3323-003v3",
+          "MMP1324-001v4",
+          "KRM3323-002v4",
+          "MQM1322-003v1",
+          "MQM7919-001v4",
+          "AVA4322-001v4",
+          "MPM7322-001v4",
+          "NFP7919-003v4",
+          "MQM1322-002v2",
+          "MQM2141-004v3",
+          "SET2131-002v4",
+          "CAP2161-005v3",
+          "KMC3332-001v3"
+        ]
+      }
+    ],
+    "db_seconds": 0.019146099977660924,
+    "cosine_and_sort_seconds": 0.0061348999734036624
+  },
+  {
+    "query_id": "H03-B2-S-2",
+    "representation": "document",
+    "max_native_error": 6.300423027738589e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "BAS3323-003v3",
+          "MQM2141-001v4",
+          "BAS3323-001v4",
+          "MQM2141-006v2",
+          "MEM3511-001v3",
+          "BAS3323-002v4",
+          "ISD3512-002v2",
+          "KPS4999-001v3",
+          "市場分析助理",
+          "KRM3323-001v4",
+          "BGM1219-003v3",
+          "IIS3513-002v4",
+          "FFN2162-001v3",
+          "FAC2411-001v2",
+          "KPS2434-004v2",
+          "INM2529-004v2",
+          "KRM3323-002v4",
+          "KRM1324-002v1",
+          "MQM7919-001v4",
+          "BGM1349-002v3",
+          "SET7311-004v2"
+        ]
+      }
+    ],
+    "db_seconds": 0.024117199995089322,
+    "cosine_and_sort_seconds": 0.0014990000054240227
+  },
+  {
+    "query_id": "H03-B2-S-2",
+    "representation": "task",
+    "max_native_error": 3.9894669900952806e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "KRM1324-001v1",
+          "MMP1324-001v4",
+          "MQM2141-007v2",
+          "MEM7231-005v4",
+          "MEM7231-012v2",
+          "MQM2141-006v2",
+          "ACC2153-001v5",
+          "KRM1420-001v4",
+          "KPS3334-007v4",
+          "IIS3513-002v4",
+          "BAS3323-002v4",
+          "連鎖餐飲門市管理人員",
+          "MMP4321-002v4",
+          "IDC2519-001v2",
+          "MEM7231-011v2",
+          "BAS3323-003v3",
+          "MQM7993-001v4",
+          "KRM3323-002v4",
+          "INM3513-004v4",
+          "LLS2619-001v4",
+          "MQM2141-001v4"
+        ]
+      }
+    ],
+    "db_seconds": 0.029108699993230402,
+    "cosine_and_sort_seconds": 0.005601000040769577
+  },
+  {
+    "query_id": "H03-B2-S-3",
+    "representation": "document",
+    "max_native_error": 6.501141958104029e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "BAS3323-003v3",
+          "MEM3511-001v3",
+          "KRM3323-002v4",
+          "MPD3116-003v3",
+          "KRM3323-001v4",
+          "BAS3323-001v4",
+          "MPM8142-003v3",
+          "MEM7412-001v3",
+          "IIS7421-002v3",
+          "MPM7322-001v4",
+          "BAS1219-003v4",
+          "MMP1324-002v4",
+          "MPM8201-001v3",
+          "MPM7993-001v2",
+          "KPS5220-002v3",
+          "MQM2141-001v4",
+          "MQM1322-001v4",
+          "MEM7231-005v4",
+          "MPM7223-008v2",
+          "SET1223-001v4",
+          "KRM1324-002v1"
+        ]
+      }
+    ],
+    "db_seconds": 0.024051800020970404,
+    "cosine_and_sort_seconds": 0.0016384999617002904
+  },
+  {
+    "query_id": "H03-B2-S-3",
+    "representation": "task",
+    "max_native_error": 7.604066265542997e-08,
+    "native_attempts": [
+      {
+        "limit": 21,
+        "returned_parents": 21,
+        "native_parent_order": [
+          "SET7127-001v3",
+          "MMP1324-001v4",
+          "BAS3323-003v3",
+          "BAS1219-003v4",
+          "MPM7322-001v4",
+          "KRM1324-002v1",
+          "BAS3323-001v4",
+          "MPD3116-003v3",
+          "BAS3323-002v4",
+          "FAC4311-001v2",
+          "KRM3323-002v4",
+          "MEM2151-002v1",
+          "TFB5120-004v2",
+          "MEM7412-001v3",
+          "KRM1324-001v1",
+          "MPM8142-003v3",
+          "MMP4321-002v4",
+          "MPM8122-002v2",
+          "RLM4323-004v1",
+          "CAP2171-004v1",
+          "MPM3122-001v1"
+        ]
+      }
+    ],
+    "db_seconds": 0.03033589996630326,
+    "cosine_and_sort_seconds": 0.005580900004133582
+  }
+]

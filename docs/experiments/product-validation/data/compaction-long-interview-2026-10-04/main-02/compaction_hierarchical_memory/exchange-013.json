@@ -1,0 +1,16 @@
+{
+  "event_id": "e013",
+  "execution_id": "2ba85da2-bcae-446e-84c1-7dd5b42c9e15",
+  "employee_input": {
+    "source_id": "905c161a-214e-426e-bbf5-3c5a278d8923",
+    "interview_sequence": 26,
+    "speaker": "employee",
+    "interview_text": "先留一個盤點頻率的問題，等等再補；目前先說盤點成果。我整理帳實差異表，保留品號、批號、帳面量、實盤量、差額、查核原因與核准單號，讓主管能判斷是否調帳。"
+  },
+  "consultant_reply": {
+    "source_id": "d77368b1-3ed5-4d0e-9496-83e862e15693",
+    "interview_sequence": 27,
+    "speaker": "consultant",
+    "interview_text": "已補上盤點成果：帳實差異表保留品號、批號、帳面量、實盤量、差額、查核原因與核准單號，供主管判斷是否調帳。盤點頻率先留待稍後確認。\n\n這張帳實差異表是每次盤點都會整理，還是只有發現差異時才整理？"
+  }
+}

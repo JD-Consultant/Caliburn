@@ -1,0 +1,26 @@
+{
+  "verified_utc": "2026-10-04T03:09:43.441868+00:00",
+  "status": "passed",
+  "synthetic_cases": 14,
+  "exact_B1_revisions_and_employee_sources": true,
+  "archived_source_hashes": 309,
+  "frozen_labels": true,
+  "ranking_rows": 28,
+  "database_exact_checks": 28,
+  "cache_original_prefix_unchanged": true,
+  "first_round_sealed_files_unchanged": 132,
+  "usage": {
+    "generation_calls": 116,
+    "resolved_models": [
+      "gpt-6-luna"
+    ],
+    "admitted_input": 482982,
+    "input_tokens": 482982,
+    "cached_input_tokens": 404922,
+    "output_tokens": 33918,
+    "estimated_standard_usd": 0.028814219999999998,
+    "conservative_upper_usd": 0.07733175,
+    "official_billing_confirmed": false
+  },
+  "artifact_seal": "passed"
+}

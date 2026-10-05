@@ -1,0 +1,28 @@
+{
+  "job_id": "C02",
+  "phase": "calibrate",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "員工主要持續負責會員網站開發，公版則以員工電腦與設備維護、故障排除為核心，不能代表其主要工作。兩者僅在重開電腦這項局部工作上有關聯，而且員工明確表示只是偶爾協助同事。",
+    "evidence": [
+      {
+        "employee_quote": "我主要開發會員網站，持續負責頁面版型、互動元件、表單驗證及串接資料",
+        "reference_quote": "維護員工電腦與設備，排除故障"
+      },
+      {
+        "employee_quote": "偶爾幫同事重開電腦。",
+        "reference_quote": "重新啟動電腦"
+      }
+    ],
+    "limitations": [
+      "重開電腦僅是偶爾協助，不足以代表員工的主要工作領域。"
+    ]
+  },
+  "seconds": 4.7547492000157945,
+  "employee_sha256": "17ccab533f1b40f3c6cd182bd7c7b3c56a01e7a9fc2317985d2931f0e260065d",
+  "document_sha256": "16fb0638b8b668cf7cddf02183a1c26fa057bd0519b035feda1e422578b83397",
+  "expected_grade": 1,
+  "anchor_matched": true
+}

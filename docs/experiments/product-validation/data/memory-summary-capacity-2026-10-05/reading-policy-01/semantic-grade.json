@@ -1,0 +1,74 @@
+{
+  "kind": "offline_semantic_assessment_not_keyword_grading",
+  "scope": "Frozen 19 criteria; full findings and questions assessed together. Two questions, two repetitions per arm. Submission success and citation syntax are not semantic scores.",
+  "status_definitions": {
+    "pass": "All substantive parts are explicit or clearly equivalent.",
+    "partial": "Core statement is correct, but a required condition or known confirmation window is not delivered.",
+    "fail": "Contradiction, invented fact or wrong value within the frozen criterion."
+  },
+  "corrections_pass_ids": ["monday", "other_days", "deadline", "receiving_scope", "denominator", "strict_threshold", "safety", "scanner", "ageing_state", "ageing_delivery", "weekly"],
+  "cells": [
+    {
+      "cell_id": "corrections-control-1", "pass": 11, "partial": [], "fail": [],
+      "evidence": "Delivers 08:50/08:35/09:10, per-batch denominator, >5% versus =5%, independent safety, equipment denominator, month-end state, next-first-workday and Friday16:00 to purchasing/supervisor. Extra numeric-synchronisation question is distinct from the confirmed unchanged weekly deadline.",
+      "source_note": "Understanding, five situations and13 messages read. All cited situation titles and raw IDs were actually available/read."
+    },
+    {
+      "cell_id": "corrections-candidate-1", "pass": 11, "partial": [], "fail": [],
+      "evidence": "All11 frozen facts delivered. Distinguishes the confirmed weekly deadline from an unconfirmed hypothetical cross-report numeric update.",
+      "source_note": "Reads an already provided understanding map, understanding, four situations and6 messages. Cited equipment facts are supported by the read understanding although the equipment situation was not read/cited."
+    },
+    {
+      "cell_id": "boundaries-control-1", "pass": 7,
+      "partial": [{"id": "temperature", "evidence": "已整理資料明確記載本人不清楚合格門檻", "missing": "No ordinary-temperature warehouse-state distinction. Quality-window confirmation is addressed in questions."}],
+      "fail": [], "source_note": "Reads and cites the understanding; the fixed chain supports the answer. Partial-batch verification and non-inclusion are stated; finance is the named confirmation window."
+    },
+    {
+      "cell_id": "boundaries-candidate-1", "pass": 5,
+      "partial": [
+        {"id": "partial_batch", "evidence": "本人不決定召回範圍、不自行把未列批號判為安全", "missing": "No explicit partial-batch verification with quality window or non-automatic inclusion in recall."},
+        {"id": "retention", "evidence": "文件保存年限不確定", "missing": "Asks which window instead of retaining the already known finance confirmation window."},
+        {"id": "temperature", "evidence": "本人核對溫度紀錄並交品質窗口判定是否可再銷售", "missing": "No ordinary-temperature warehouse-state distinction."}
+      ],
+      "fail": [], "source_note": "Reads an already provided map then understanding; cites that understanding. All missing parts existed in its body, so these are delivery omissions, not capture loss."
+    },
+    {
+      "cell_id": "corrections-candidate-2", "pass": 11, "partial": [], "fail": [],
+      "evidence": "All11 frozen facts delivered; the preserved Friday16:00 weekly deadline is not replaced by the ageing deadline. A hypothetical same-incident numeric-update question is separately retained as unknown.",
+      "source_note": "Reads understanding plus five situations, no raw messages; cites all five read situations. This cell does not demonstrate stopping at understanding."
+    },
+    {
+      "cell_id": "corrections-control-2", "pass": 11, "partial": [], "fail": [],
+      "evidence": "All11 frozen facts delivered, including explicit unchanged weekly deadline after the ageing correction.",
+      "source_note": "Reads understanding, five situations and6 messages; all cited objects/raw IDs were read."
+    },
+    {
+      "cell_id": "boundaries-candidate-2", "pass": 6,
+      "partial": [
+        {"id": "partial_batch", "evidence": "召回範圍及是否解除由品質窗口決定", "missing": "No explicit partial-batch verification and non-automatic inclusion; no claim of automatic inclusion either."},
+        {"id": "temperature", "evidence": "冷藏退貨要核對溫度紀錄並交品質窗口判定是否可再銷售", "missing": "No ordinary-temperature warehouse-state distinction."}
+      ],
+      "fail": [], "source_note": "Reads and cites understanding directly. Finance confirmation appears in questions; do not classify retention as missing."
+    },
+    {
+      "cell_id": "boundaries-control-2", "pass": 7,
+      "partial": [{"id": "temperature", "evidence": "本人不清楚合格溫度門檻", "missing": "No ordinary-temperature warehouse-state distinction. Quality-window regulation is included in the follow-up."}],
+      "fail": [], "source_note": "Reads and cites understanding; partial-batch verification and non-inclusion are explicit. Finance/company document rules are named in the full follow-up, counted consistently with the prior pilot."
+    }
+  ],
+  "totals_per_arm": {
+    "control": {"pass": 36, "partial": 2, "fail": 0, "opportunities": 38},
+    "candidate": {"pass": 33, "partial": 5, "fail": 0, "opportunities": 38}
+  },
+  "outside_frozen_score": [
+    {"kind": "inherited_artifact_error", "source": 14, "original": "前一天", "artifact": "前一工作日", "affected_cells": ["corrections-control-1", "corrections-candidate-1", "corrections-candidate-2", "corrections-control-2"], "note": "All repeat the artifact wording. This was known before the batch; it is not a new grading item, not caused or fixed by this candidate."}
+  ],
+  "fairness_notes": [
+    "Temperature criterion includes an ordinary-return distinction not explicit in the question. Keep the frozen strict grading and show this qualification; all four boundary answers omit it.",
+    "Common recent message105 already restates several facts, so do not attribute all success exclusively to Memory.",
+    "Corrections question asks about earlier claims and later additions. Reading message42 to recover the earlier ageing deadline can be justified; not every raw read is waste.",
+    "A prompt and tool descriptions changed together. The batch cannot isolate their individual causal effects or prove the B2 body hints cause extra reads.",
+    "Small fixed-material repetitions, not statistical superiority or a cross-occupation/capacity benchmark."
+  ],
+  "decision": "Do not adopt this candidate. Restore only this turn's candidate deltas; preserve the already adopted baseline, B2 and immutable evidence."
+}

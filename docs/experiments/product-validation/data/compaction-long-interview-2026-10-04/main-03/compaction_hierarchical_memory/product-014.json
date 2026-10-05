@@ -1,0 +1,1471 @@
+{
+  "profile": {
+    "revision_id": "dfea5ded-c122-4c8e-aae1-b41bf5cd3d1a",
+    "profile": {
+      "job_title": "庫存與物流行政專員",
+      "organization_unit": "營運部",
+      "reports_to": "倉儲主管",
+      "purpose": "處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥及庫存報表，支援營運掌握庫存與物流行政作業；不負責採購訂貨決策與議價、客服處理或對外承諾交期。"
+    }
+  },
+  "work": {
+    "revision_id": "dfea5ded-c122-4c8e-aae1-b41bf5cd3d1a",
+    "areas": [
+      {
+        "area_id": "33bfd298-698c-4679-9b2b-73e03e87a9a9",
+        "content_revision_id": "361742a8-13ad-43cd-bab7-ddcdf5d52927",
+        "title": "庫存與物流行政作業",
+        "scope_text": "涵蓋到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥及庫存報表等工作。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf",
+        "content_revision_id": "a6fe718b-bba4-4f0c-be72-6df8a405be21",
+        "area_id": "33bfd298-698c-4679-9b2b-73e03e87a9a9",
+        "title": "核對並登錄到貨資料",
+        "description": "每日約處理15–20張進貨單。由倉庫同事清點實物，本人比對採購單、送貨單與實際到貨的品號、批號及數量並記錄差異；資料符合後登錄 ERP。已確認項目通常於到貨當天下班前完成 ERP 登錄。商品外箱破損或短少時，拍照、記下實收件數及原單號、通知採購，並將未確認部分列入待處理清單；持續更新差異清單與處理進度。月底最後一天依財務提供的截止清單處理。",
+        "details": [
+          {
+            "detail_id": "23259605-618e-4d64-8584-459243114d11",
+            "kind": "outcome",
+            "text": "核對符合的到貨資料登錄於 ERP。"
+          },
+          {
+            "detail_id": "e2f3cbfc-145a-4884-8333-ff20e29af784",
+            "kind": "outcome",
+            "text": "到貨資料差異有紀錄。"
+          },
+          {
+            "detail_id": "13a751fc-be6c-4997-ae2e-777a86102568",
+            "kind": "outcome",
+            "text": "破損或短少情形有照片、實收件數及原單號紀錄；未確認部分列入待處理清單並通知採購。"
+          },
+          {
+            "detail_id": "76587005-84b3-4be0-9300-db5dcfc83592",
+            "kind": "outcome",
+            "text": "逾截止或有疑義的單據保留實際收貨時間與未決原因，作為後續月份歸屬判定的依據。"
+          },
+          {
+            "detail_id": "63380bbf-957d-4d91-8971-da54cdf5252e",
+            "kind": "outcome",
+            "text": "收貨異常的差異清單與處理進度持續更新，直至補貨或退貨完成且帳物相符後結案。"
+          },
+          {
+            "detail_id": "d60ccfaa-bf31-438c-9583-c29983c5f22f",
+            "kind": "requirement",
+            "text": "不得直接將供應商送貨單所列數量視為實際收貨數；資料符合後才登錄 ERP。"
+          },
+          {
+            "detail_id": "e51ad82f-015a-46cc-9be3-db3870a56e90",
+            "kind": "requirement",
+            "text": "退換貨或補貨由採購決定；本人不得自行同意接受替代品或更改採購單價格。"
+          },
+          {
+            "detail_id": "6d4b1866-bf06-46d7-9d74-08c50ee0141f",
+            "kind": "requirement",
+            "text": "驗收時，不良件數占本批實際驗收件數超過5%時提報倉儲主管；剛好5%不因這條比例規則提報。"
+          },
+          {
+            "detail_id": "956abbc0-520c-41d9-bf64-4f3849babf19",
+            "kind": "requirement",
+            "text": "有安全疑慮時，不受比例門檻限制，先隔離並通知倉儲主管。"
+          },
+          {
+            "detail_id": "8193f514-cacc-4731-b237-907f5e97b13c",
+            "kind": "requirement",
+            "text": "月底逾截止或有疑義的單據，由財務決定歸屬月份；本人不自行回填日期。"
+          },
+          {
+            "detail_id": "3b0b970d-7daf-4e0e-bd70-44a571c47288",
+            "kind": "requirement",
+            "text": "收貨異常兩個工作日未獲回覆時提醒採購；至第四個工作日仍無進展時回報主管。"
+          },
+          {
+            "detail_id": "3f87bc7c-af28-4557-9394-14dcff3ec51d",
+            "kind": "requirement",
+            "text": "收貨異常須待補貨或退貨完成且帳物相符後才結案；不保證供應商實際補貨時間。"
+          }
+        ]
+      },
+      {
+        "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851",
+        "content_revision_id": "99c17dc5-df40-4767-901a-5446ad7514c3",
+        "area_id": "33bfd298-698c-4679-9b2b-73e03e87a9a9",
+        "title": "核對退貨並提交差異表",
+        "description": "每個工作日 08:35 開始核對前一天收到的退貨，使用獨立的退貨清單，比對客退單、品號、批號及實收數量。商品是否可再銷售由倉庫同事判定；本人依確認結果登錄可售、待檢或報廢待核准狀態，並於 09:10 前將退貨差異表交給客服窗口。退貨數量不符時，提供照片及差異紀錄請客服確認；主管同意調帳後，才依核准資料更新 ERP 並保留核准單號。這個時限適用於退貨核對，不是進貨驗收的時限。",
+        "details": [
+          {
+            "detail_id": "b1d88326-98cd-4118-8646-8324a3d66bcb",
+            "kind": "outcome",
+            "text": "退貨差異表於 09:10 前交給客服窗口。"
+          },
+          {
+            "detail_id": "a6875f42-dbd0-4ba3-9fc6-62cd597ed25e",
+            "kind": "outcome",
+            "text": "退貨狀態依倉庫同事確認結果登錄為可售、待檢或報廢待核准。"
+          },
+          {
+            "detail_id": "c6fa5368-5856-4c31-a779-65c47bed5678",
+            "kind": "outcome",
+            "text": "退貨數量差異有照片和差異紀錄供客服確認；經主管核准的調帳依核准資料更新 ERP，並保留核准單號。"
+          },
+          {
+            "detail_id": "6f96fa7e-641c-4e69-9da6-5363cdea1d9f",
+            "kind": "outcome",
+            "text": "退貨異常保留可追溯的狀態與紀錄；必要時可維持待檢，待倉庫複檢及主管決定後續處理，不以立即恢復可售為前提。"
+          },
+          {
+            "detail_id": "c3ae0ced-dbb3-4e3b-a411-3531ef37bf5c",
+            "kind": "requirement",
+            "text": "每個工作日 08:35 開始核對前一天收到的退貨；此時限不套用於進貨驗收。"
+          },
+          {
+            "detail_id": "3a677fc9-0b51-4f59-a8ae-38dcd0cb1b72",
+            "kind": "requirement",
+            "text": "本人不自行判定商品報廢；待檢庫存不得列為可用量。"
+          },
+          {
+            "detail_id": "cf705eb8-ec68-43f5-9fa2-db0203e77b94",
+            "kind": "requirement",
+            "text": "僅在主管同意調帳後，依核准資料更新 ERP 並保留核准單號。"
+          },
+          {
+            "detail_id": "b4557ae5-3ea7-4959-8477-ffd2e01c0504",
+            "kind": "requirement",
+            "text": "退款由客服與財務處理，不屬於本人工作。"
+          },
+          {
+            "detail_id": "4817a3c2-e816-47ac-a65c-42371fcaa947",
+            "kind": "requirement",
+            "text": "外箱完整但內件不齊時仍維持待檢、不直接入可售庫存；由倉庫複檢後再由主管決定處理方式。"
+          }
+        ]
+      },
+      {
+        "task_id": "b9e15eae-cd06-47a1-9f2c-a456ade15baf",
+        "content_revision_id": "95217f64-f97e-48bf-9dbb-d92d10e81e87",
+        "area_id": "33bfd298-698c-4679-9b2b-73e03e87a9a9",
+        "title": "支援庫存盤點與帳實核對",
+        "description": "平常依主管指定的高周轉或容易出錯品項，核對 ERP 資料與現場清點結果；月底全盤由倉庫同事分區清點，本人整合各區盤點表。盤點有差異時，先查近期收貨、退貨、移位及待出貨紀錄，必要時請倉庫同事複盤，並整理帳實差異表供主管判斷是否調帳。",
+        "details": [
+          {
+            "detail_id": "3354e427-bbd6-4526-83e8-63fa6ecd50c6",
+            "kind": "outcome",
+            "text": "主管指定品項的 ERP 資料與現場清點結果完成核對。"
+          },
+          {
+            "detail_id": "64a8ee49-d8cf-41df-bb8d-5832f6dff51d",
+            "kind": "outcome",
+            "text": "月底各區盤點表完成整合。"
+          },
+          {
+            "detail_id": "30d923f2-d990-4342-8295-2c0b0a9d311b",
+            "kind": "outcome",
+            "text": "帳實差異表保留品號、批號、帳面量、實盤量、差額、查核原因及核准單號，供主管判斷是否調帳。"
+          },
+          {
+            "detail_id": "d721d19a-9ff5-4ad6-8f40-74513e97e2c5",
+            "kind": "requirement",
+            "text": "不論盤點差異大小，均不得自行將 ERP 改成現場數；庫存調整須有核准的庫存調整單。"
+          }
+        ]
+      },
+      {
+        "task_id": "c646c415-5471-4576-946a-c3504b61fe25",
+        "content_revision_id": "9ba3dd82-c002-44f1-9041-e9994b4c79f0",
+        "area_id": "33bfd298-698c-4679-9b2b-73e03e87a9a9",
+        "title": "核對並追蹤缺貨情況",
+        "description": "每日查看低於安全庫存的清單，並處理客服或倉庫通報。先核對可用量、已保留量、待出貨訂單，以及尚未登錄的到貨或退貨，避免將帳面缺貨直接判定為實際無貨。",
+        "details": [
+          {
+            "detail_id": "9a88f119-cf4c-4edd-bcf5-1cadf712c299",
+            "kind": "outcome",
+            "text": "缺貨情況經可用量、保留量、待出貨訂單及未登錄到貨／退貨資料核對，以辨別帳面缺貨與實際無貨。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "evidence": [
+    {
+      "entry": {
+        "citation_id": "9e0893f6-d6c0-4c9f-8be1-fd81a7037931",
+        "target_label": "職務名稱",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "job_title",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "4b3af938-5eeb-4d62-9eac-5755caad2931",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "97dde5dc-ef28-444a-a2a6-a502887df89d",
+        "target_label": "所屬單位",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "organization_unit",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "4b3af938-5eeb-4d62-9eac-5755caad2931",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "4d5ecdda-3fab-499b-911d-05b7ea81e30a",
+        "target_label": "直屬主管",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "reports_to",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "4b3af938-5eeb-4d62-9eac-5755caad2931",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "0c7751bd-9b13-4ece-adbf-0c432b283c8c",
+        "target_label": "職務目的",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "purpose",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "4b3af938-5eeb-4d62-9eac-5755caad2931",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "5cc6c271-7c47-4e6a-b4f4-bb5ddfc5af7f",
+        "target_label": "職責：庫存與物流行政作業",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "area",
+          "item_id": "33bfd298-698c-4679-9b2b-73e03e87a9a9",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "4b3af938-5eeb-4d62-9eac-5755caad2931",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "17df872e-aaa9-4abb-950a-d38bf5d8c21a",
+        "target_label": "任務：核對並登錄到貨資料",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "4b3af938-5eeb-4d62-9eac-5755caad2931",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "6d974f05-5689-4209-ad89-1512be05c553",
+        "target_label": "任務：核對並登錄到貨資料",
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "210adb5c-8445-45c9-b024-64129d285909",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "5fd0ac96-50ca-44e9-90d6-9eda00226460",
+        "target_label": "任務：核對並登錄到貨資料 · 成果：核對符合的到貨資料登錄於 ERP。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "23259605-618e-4d64-8584-459243114d11",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "210adb5c-8445-45c9-b024-64129d285909",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "4b136d9d-d6f1-4c5a-a6d4-9f728ffb263f",
+        "target_label": "任務：核對並登錄到貨資料 · 成果：到貨資料差異有紀錄。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "e2f3cbfc-145a-4884-8333-ff20e29af784",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "210adb5c-8445-45c9-b024-64129d285909",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "fa92acd7-3a42-4eb8-aca1-2e3da50011c1",
+        "target_label": "任務：核對並登錄到貨資料 · 要求：不得直接將供應商送貨單所列數量視為實際收貨數；資料符合後才登錄 ERP。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "d60ccfaa-bf31-438c-9583-c29983c5f22f",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "210adb5c-8445-45c9-b024-64129d285909",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "fe2c4dbb-21cd-4f6e-a10c-c1813d928cbc",
+        "target_label": "任務：核對並登錄到貨資料",
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "4fe73d48-7d32-4f22-a8f9-402381e426f7",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "商品外箱破損或短少時，我拍照、記下實收件數及原單號，通知採購，再把未確認的部分留在待處理清單。採購決定是否退換貨或補貨；我不能自行同意接受替代品，也不能改採購單上的價格。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "3017aa8d-ba56-43f6-b3ca-53da30fc50c4",
+        "target_label": "任務：核對並登錄到貨資料 · 成果：破損或短少情形有照片、實收件數及原單號紀錄；未確認部分列入待處理清單並通知採購。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "13a751fc-be6c-4997-ae2e-777a86102568",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "4fe73d48-7d32-4f22-a8f9-402381e426f7",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "商品外箱破損或短少時，我拍照、記下實收件數及原單號，通知採購，再把未確認的部分留在待處理清單。採購決定是否退換貨或補貨；我不能自行同意接受替代品，也不能改採購單上的價格。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "6e4d633d-a18e-4fac-8c67-1bd920a26bb5",
+        "target_label": "任務：核對並登錄到貨資料 · 要求：退換貨或補貨由採購決定；本人不得自行同意接受替代品或更改採購單價格。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "e51ad82f-015a-46cc-9be3-db3870a56e90",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "4fe73d48-7d32-4f22-a8f9-402381e426f7",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "商品外箱破損或短少時，我拍照、記下實收件數及原單號，通知採購，再把未確認的部分留在待處理清單。採購決定是否退換貨或補貨；我不能自行同意接受替代品，也不能改採購單上的價格。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "184f31db-a47d-4a33-8d66-615a3893ad1d",
+        "target_label": "任務：核對並登錄到貨資料 · 要求：驗收時，不良件數占本批實際驗收件數超過5%時提報倉儲主管；剛好5%不因這條比例規則提報。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "6d4b1866-bf06-46d7-9d74-08c50ee0141f",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "025d7357-18c3-4211-8fcc-d0b1829ec4d4",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "驗收時如果不良件數占本批實際驗收件數超過5%，我會提報倉儲主管。剛好5%不因這條比例規則提報，但有安全疑慮時仍先隔離並通知主管；比例門檻不是把安全問題略過的理由。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "b88580d6-60b7-4c89-9573-dfc41c240cad",
+        "target_label": "任務：核對並登錄到貨資料 · 要求：有安全疑慮時，不受比例門檻限制，先隔離並通知倉儲主管。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "956abbc0-520c-41d9-bf64-4f3849babf19",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "025d7357-18c3-4211-8fcc-d0b1829ec4d4",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "驗收時如果不良件數占本批實際驗收件數超過5%，我會提報倉儲主管。剛好5%不因這條比例規則提報，但有安全疑慮時仍先隔離並通知主管；比例門檻不是把安全問題略過的理由。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "9aa58ad3-3ad7-4336-9ae4-c4731f9b81dc",
+        "target_label": "任務：核對並登錄到貨資料",
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": true,
+        "target": {
+          "kind": "task",
+          "item_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": true,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "50e4a847-771e-458c-b861-55e6fdaa01c5",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "我通常在到貨當天下班前完成已確認項目的ERP登錄。月底最後一天，財務會提供截止清單；超過截止或有疑義的單據由財務決定歸屬月份，我只保留實際收貨時間和未決原因，不自己回填日期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "1720ce8b-50ed-41dc-808b-d9185ac0888c",
+        "target_label": "任務：核對並登錄到貨資料 · 成果：逾截止或有疑義的單據保留實際收貨時間與未決原因，作為後續月份歸屬判定的依據。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "76587005-84b3-4be0-9300-db5dcfc83592",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "50e4a847-771e-458c-b861-55e6fdaa01c5",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "我通常在到貨當天下班前完成已確認項目的ERP登錄。月底最後一天，財務會提供截止清單；超過截止或有疑義的單據由財務決定歸屬月份，我只保留實際收貨時間和未決原因，不自己回填日期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "dd61ae30-e39a-4299-8de4-e41126f46fef",
+        "target_label": "任務：核對並登錄到貨資料 · 要求：月底逾截止或有疑義的單據，由財務決定歸屬月份；本人不自行回填日期。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "8193f514-cacc-4731-b237-907f5e97b13c",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "50e4a847-771e-458c-b861-55e6fdaa01c5",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "我通常在到貨當天下班前完成已確認項目的ERP登錄。月底最後一天，財務會提供截止清單；超過截止或有疑義的單據由財務決定歸屬月份，我只保留實際收貨時間和未決原因，不自己回填日期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "67e5a4d0-8537-44fb-9823-6531ceaa6c7f",
+        "target_label": "任務：核對並登錄到貨資料",
+        "source_kind": "interview",
+        "source_label": "訪談序號 12 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "bacb6047-f5d1-418b-bd72-056820d89d68",
+        "interview_sequence": 12,
+        "speaker": "employee",
+        "interview_text": "收貨異常不是通知完就結束。我更新差異清單和處理進度；兩個工作日沒回覆就提醒採購，第四個工作日仍沒進展再回報主管。要到補貨或退貨完成、帳物相符才結案；供應商幾時真的補來不是我能保證的。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "fe887958-4e35-43dc-9ab1-edd139345777",
+        "target_label": "任務：核對並登錄到貨資料 · 成果：收貨異常的差異清單與處理進度持續更新，直至補貨或退貨完成且帳物相符後結案。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 12 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "63380bbf-957d-4d91-8971-da54cdf5252e",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "bacb6047-f5d1-418b-bd72-056820d89d68",
+        "interview_sequence": 12,
+        "speaker": "employee",
+        "interview_text": "收貨異常不是通知完就結束。我更新差異清單和處理進度；兩個工作日沒回覆就提醒採購，第四個工作日仍沒進展再回報主管。要到補貨或退貨完成、帳物相符才結案；供應商幾時真的補來不是我能保證的。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "55ede620-fdc1-430d-a78d-d6f8c97890f9",
+        "target_label": "任務：核對並登錄到貨資料 · 要求：收貨異常兩個工作日未獲回覆時提醒採購；至第四個工作日仍無進展時回報主管。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 12 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "3b0b970d-7daf-4e0e-bd70-44a571c47288",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "bacb6047-f5d1-418b-bd72-056820d89d68",
+        "interview_sequence": 12,
+        "speaker": "employee",
+        "interview_text": "收貨異常不是通知完就結束。我更新差異清單和處理進度；兩個工作日沒回覆就提醒採購，第四個工作日仍沒進展再回報主管。要到補貨或退貨完成、帳物相符才結案；供應商幾時真的補來不是我能保證的。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "40b6ff76-750a-4ef0-a752-d023ef782827",
+        "target_label": "任務：核對並登錄到貨資料 · 要求：收貨異常須待補貨或退貨完成且帳物相符後才結案；不保證供應商實際補貨時間。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 12 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "3f87bc7c-af28-4557-9394-14dcff3ec51d",
+          "field": null,
+          "task_id": "8c23e298-1239-4ff3-b15b-9bbb401c4bbf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "bacb6047-f5d1-418b-bd72-056820d89d68",
+        "interview_sequence": 12,
+        "speaker": "employee",
+        "interview_text": "收貨異常不是通知完就結束。我更新差異清單和處理進度；兩個工作日沒回覆就提醒採購，第四個工作日仍沒進展再回報主管。要到補貨或退貨完成、帳物相符才結案；供應商幾時真的補來不是我能保證的。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "26f3f37c-f1a3-48eb-80b7-c1f8f36affd7",
+        "target_label": "任務：核對退貨並提交差異表",
+        "source_kind": "interview",
+        "source_label": "訪談序號 14 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "f17728ec-0b1b-44f0-b1ad-2db804083851",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "0739892c-e458-41ad-a68d-f94d2c9417e8",
+        "interview_sequence": 14,
+        "speaker": "employee",
+        "interview_text": "退貨另有一份清單。我每個工作日08:35開始核對前一天收到的退貨，在09:10前把退貨差異表交客服窗口。這是退貨的時點，不是進货驗收的時限。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "fb2325d6-7072-4496-ac1b-b509d33726c1",
+        "target_label": "任務：核對退貨並提交差異表 · 成果：退貨差異表於 09:10 前交給客服窗口。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 14 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "b1d88326-98cd-4118-8646-8324a3d66bcb",
+          "field": null,
+          "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "0739892c-e458-41ad-a68d-f94d2c9417e8",
+        "interview_sequence": 14,
+        "speaker": "employee",
+        "interview_text": "退貨另有一份清單。我每個工作日08:35開始核對前一天收到的退貨，在09:10前把退貨差異表交客服窗口。這是退貨的時點，不是進货驗收的時限。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "3a201af3-98b3-493e-a2f1-9a20f5cd71eb",
+        "target_label": "任務：核對退貨並提交差異表 · 要求：每個工作日 08:35 開始核對前一天收到的退貨；此時限不套用於進貨驗收。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 14 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "c3ae0ced-dbb3-4e3b-a411-3531ef37bf5c",
+          "field": null,
+          "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "0739892c-e458-41ad-a68d-f94d2c9417e8",
+        "interview_sequence": 14,
+        "speaker": "employee",
+        "interview_text": "退貨另有一份清單。我每個工作日08:35開始核對前一天收到的退貨，在09:10前把退貨差異表交客服窗口。這是退貨的時點，不是進货驗收的時限。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "00a84965-a978-4e1d-83ed-7ac3c4397709",
+        "target_label": "任務：核對退貨並提交差異表",
+        "source_kind": "interview",
+        "source_label": "訪談序號 16 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "f17728ec-0b1b-44f0-b1ad-2db804083851",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "532abcde-6040-44de-8117-bce8ac474515",
+        "interview_sequence": 16,
+        "speaker": "employee",
+        "interview_text": "退貨要核對客退單、品號、批號和实收数量。仓庫同事判定商品是否可再銷售；我依確認結果登錄可售、待檢或報廢待核准狀態。我不自行判定報廢，也不能把待檢庫存當可用量。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "9a49fd36-9118-4528-9477-0607a74fe941",
+        "target_label": "任務：核對退貨並提交差異表 · 成果：退貨狀態依倉庫同事確認結果登錄為可售、待檢或報廢待核准。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 16 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "a6875f42-dbd0-4ba3-9fc6-62cd597ed25e",
+          "field": null,
+          "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "532abcde-6040-44de-8117-bce8ac474515",
+        "interview_sequence": 16,
+        "speaker": "employee",
+        "interview_text": "退貨要核對客退單、品號、批號和实收数量。仓庫同事判定商品是否可再銷售；我依確認結果登錄可售、待檢或報廢待核准狀態。我不自行判定報廢，也不能把待檢庫存當可用量。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "29adc04c-f913-472a-a8b0-a0530b03896f",
+        "target_label": "任務：核對退貨並提交差異表 · 要求：本人不自行判定商品報廢；待檢庫存不得列為可用量。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 16 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "3a677fc9-0b51-4f59-a8ae-38dcd0cb1b72",
+          "field": null,
+          "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "532abcde-6040-44de-8117-bce8ac474515",
+        "interview_sequence": 16,
+        "speaker": "employee",
+        "interview_text": "退貨要核對客退單、品號、批號和实收数量。仓庫同事判定商品是否可再銷售；我依確認結果登錄可售、待檢或報廢待核准狀態。我不自行判定報廢，也不能把待檢庫存當可用量。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "9fad043d-c14d-4c74-a6e9-33e6803e4256",
+        "target_label": "任務：核對退貨並提交差異表",
+        "source_kind": "interview",
+        "source_label": "訪談序號 18 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "f17728ec-0b1b-44f0-b1ad-2db804083851",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "bffaa30d-616a-4b2d-b6c5-255e2de9ec1f",
+        "interview_sequence": 18,
+        "speaker": "employee",
+        "interview_text": "退貨數量不符時，我提供照片和差異紀錄請客服確認；主管同意調帳後，我才依核准資料改ERP並保留核准單號。退款由客服和財務處理，不是我的工作。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "7bbd2126-35f1-4862-b74f-cbd122cdb310",
+        "target_label": "任務：核對退貨並提交差異表 · 成果：退貨數量差異有照片和差異紀錄供客服確認；經主管核准的調帳依核准資料更新 ERP，並保留核准單號。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 18 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "c6fa5368-5856-4c31-a779-65c47bed5678",
+          "field": null,
+          "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "bffaa30d-616a-4b2d-b6c5-255e2de9ec1f",
+        "interview_sequence": 18,
+        "speaker": "employee",
+        "interview_text": "退貨數量不符時，我提供照片和差異紀錄請客服確認；主管同意調帳後，我才依核准資料改ERP並保留核准單號。退款由客服和財務處理，不是我的工作。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "e5820576-f3bf-4c34-ad10-da507b5e61c2",
+        "target_label": "任務：核對退貨並提交差異表 · 要求：僅在主管同意調帳後，依核准資料更新 ERP 並保留核准單號。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 18 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "cf705eb8-ec68-43f5-9fa2-db0203e77b94",
+          "field": null,
+          "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "bffaa30d-616a-4b2d-b6c5-255e2de9ec1f",
+        "interview_sequence": 18,
+        "speaker": "employee",
+        "interview_text": "退貨數量不符時，我提供照片和差異紀錄請客服確認；主管同意調帳後，我才依核准資料改ERP並保留核准單號。退款由客服和財務處理，不是我的工作。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "e585ba0f-5ca8-470d-addf-8ae8b4b664ee",
+        "target_label": "任務：核對退貨並提交差異表 · 要求：退款由客服與財務處理，不屬於本人工作。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 18 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "b4557ae5-3ea7-4959-8477-ffd2e01c0504",
+          "field": null,
+          "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "bffaa30d-616a-4b2d-b6c5-255e2de9ec1f",
+        "interview_sequence": 18,
+        "speaker": "employee",
+        "interview_text": "退貨數量不符時，我提供照片和差異紀錄請客服確認；主管同意調帳後，我才依核准資料改ERP並保留核准單號。退款由客服和財務處理，不是我的工作。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "b373fea1-ca7c-402a-b69d-2a4d41cd6df0",
+        "target_label": "任務：核對退貨並提交差異表",
+        "source_kind": "interview",
+        "source_label": "訪談序號 20 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "f17728ec-0b1b-44f0-b1ad-2db804083851",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "0d25b3ea-ceda-4228-8655-536d5b53e6b9",
+        "interview_sequence": 20,
+        "speaker": "employee",
+        "interview_text": "有一筆退貨外箱完整但內件不齊，我保留在待檢狀態，沒有直接入可售庫存。主管請仓庫复检後才决定处理方式；我的成果是可追溯的狀態與紀錄，不是每筆都能立即恢復可售。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "938e90c6-afc9-4e9c-b638-f011c0119140",
+        "target_label": "任務：核對退貨並提交差異表 · 成果：退貨異常保留可追溯的狀態與紀錄；必要時可維持待檢，待倉庫複檢及主管決定後續處理，不以立即恢復可售為前提。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 20 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "6f96fa7e-641c-4e69-9da6-5363cdea1d9f",
+          "field": null,
+          "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "0d25b3ea-ceda-4228-8655-536d5b53e6b9",
+        "interview_sequence": 20,
+        "speaker": "employee",
+        "interview_text": "有一筆退貨外箱完整但內件不齊，我保留在待檢狀態，沒有直接入可售庫存。主管請仓庫复检後才决定处理方式；我的成果是可追溯的狀態與紀錄，不是每筆都能立即恢復可售。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "bd97954b-e686-46b7-89e3-bfc8b511467c",
+        "target_label": "任務：核對退貨並提交差異表 · 要求：外箱完整但內件不齊時仍維持待檢、不直接入可售庫存；由倉庫複檢後再由主管決定處理方式。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 20 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "4817a3c2-e816-47ac-a65c-42371fcaa947",
+          "field": null,
+          "task_id": "f17728ec-0b1b-44f0-b1ad-2db804083851"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "0d25b3ea-ceda-4228-8655-536d5b53e6b9",
+        "interview_sequence": 20,
+        "speaker": "employee",
+        "interview_text": "有一筆退貨外箱完整但內件不齊，我保留在待檢狀態，沒有直接入可售庫存。主管請仓庫复检後才决定处理方式；我的成果是可追溯的狀態與紀錄，不是每筆都能立即恢復可售。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "cf4c2193-f325-4b41-8b34-0a6b4bc7db32",
+        "target_label": "任務：支援庫存盤點與帳實核對",
+        "source_kind": "interview",
+        "source_label": "訪談序號 22 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "b9e15eae-cd06-47a1-9f2c-a456ade15baf",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "82cc258e-64f2-4070-8b71-1efd96205c5d",
+        "interview_sequence": 22,
+        "speaker": "employee",
+        "interview_text": "庫存盤點分成平常抽盤與月底全盤。平常由主管指定高周轉或容易出錯的品項，我核對ERP與現場清點結果；月底由倉庫同事分區清點，我整合各區盤點表。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "60da3a9b-646d-4570-bcfc-62579fbf3153",
+        "target_label": "任務：支援庫存盤點與帳實核對 · 成果：主管指定品項的 ERP 資料與現場清點結果完成核對。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 22 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "3354e427-bbd6-4526-83e8-63fa6ecd50c6",
+          "field": null,
+          "task_id": "b9e15eae-cd06-47a1-9f2c-a456ade15baf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "82cc258e-64f2-4070-8b71-1efd96205c5d",
+        "interview_sequence": 22,
+        "speaker": "employee",
+        "interview_text": "庫存盤點分成平常抽盤與月底全盤。平常由主管指定高周轉或容易出錯的品項，我核對ERP與現場清點結果；月底由倉庫同事分區清點，我整合各區盤點表。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "4f94d6f1-648c-48bb-81de-1b7a9c70383a",
+        "target_label": "任務：支援庫存盤點與帳實核對 · 成果：月底各區盤點表完成整合。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 22 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "64a8ee49-d8cf-41df-bb8d-5832f6dff51d",
+          "field": null,
+          "task_id": "b9e15eae-cd06-47a1-9f2c-a456ade15baf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "82cc258e-64f2-4070-8b71-1efd96205c5d",
+        "interview_sequence": 22,
+        "speaker": "employee",
+        "interview_text": "庫存盤點分成平常抽盤與月底全盤。平常由主管指定高周轉或容易出錯的品項，我核對ERP與現場清點結果；月底由倉庫同事分區清點，我整合各區盤點表。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "cc14c4c5-3b3d-445d-bdee-5ad1a253504a",
+        "target_label": "任務：支援庫存盤點與帳實核對",
+        "source_kind": "interview",
+        "source_label": "訪談序號 24 · 員工",
+        "needs_recheck": true,
+        "target": {
+          "kind": "task",
+          "item_id": "b9e15eae-cd06-47a1-9f2c-a456ade15baf",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": true,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "54025e32-5fda-45e2-a5e7-d844fa7155ea",
+        "interview_sequence": 24,
+        "speaker": "employee",
+        "interview_text": "盤點有差異時，我先查近期收貨、退貨、移位和待出貨紀錄，必要時請倉庫同事複盤。不論差異大或小，我都不能自己把ERP改成現場數，必須有核准的庫存調整單。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "0042085d-ecd4-4a37-9b77-47005ca05111",
+        "target_label": "任務：支援庫存盤點與帳實核對 · 要求：不論盤點差異大小，均不得自行將 ERP 改成現場數；庫存調整須有核准的庫存調整單。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 24 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "d721d19a-9ff5-4ad6-8f40-74513e97e2c5",
+          "field": null,
+          "task_id": "b9e15eae-cd06-47a1-9f2c-a456ade15baf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "54025e32-5fda-45e2-a5e7-d844fa7155ea",
+        "interview_sequence": 24,
+        "speaker": "employee",
+        "interview_text": "盤點有差異時，我先查近期收貨、退貨、移位和待出貨紀錄，必要時請倉庫同事複盤。不論差異大或小，我都不能自己把ERP改成現場數，必須有核准的庫存調整單。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "98a3cb72-93da-4075-9672-d954735aed60",
+        "target_label": "任務：支援庫存盤點與帳實核對",
+        "source_kind": "interview",
+        "source_label": "訪談序號 26 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "b9e15eae-cd06-47a1-9f2c-a456ade15baf",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "905c161a-214e-426e-bbf5-3c5a278d8923",
+        "interview_sequence": 26,
+        "speaker": "employee",
+        "interview_text": "先留一個盤點頻率的問題，等等再補；目前先說盤點成果。我整理帳實差異表，保留品號、批號、帳面量、實盤量、差額、查核原因與核准單號，讓主管能判斷是否調帳。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "f32ec675-0f2e-4fd5-93e1-68b6d15d1e8a",
+        "target_label": "任務：支援庫存盤點與帳實核對 · 成果：帳實差異表保留品號、批號、帳面量、實盤量、差額、查核原因及核准單號，供主管判斷是否調帳。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 26 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "30d923f2-d990-4342-8295-2c0b0a9d311b",
+          "field": null,
+          "task_id": "b9e15eae-cd06-47a1-9f2c-a456ade15baf"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "905c161a-214e-426e-bbf5-3c5a278d8923",
+        "interview_sequence": 26,
+        "speaker": "employee",
+        "interview_text": "先留一個盤點頻率的問題，等等再補；目前先說盤點成果。我整理帳實差異表，保留品號、批號、帳面量、實盤量、差額、查核原因與核准單號，讓主管能判斷是否調帳。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "e7c63a11-9377-4621-b396-c9fb730ad8b0",
+        "target_label": "任務：核對並追蹤缺貨情況",
+        "source_kind": "interview",
+        "source_label": "訪談序號 28 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "c646c415-5471-4576-946a-c3504b61fe25",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "2f2fc262-521f-4c81-a3be-4cf4a50af87c",
+        "interview_sequence": 28,
+        "speaker": "employee",
+        "interview_text": "缺貨追蹤是每天看低於安全庫存的清單，另處理客服或倉庫通報。我先核對可用量、已保留量、待出貨訂單，以及尚未登錄的到貨或退貨，避免把帳面缺貨直接當成真的沒貨。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "01ace393-983a-4d41-850e-76354d3b57a2",
+        "target_label": "任務：核對並追蹤缺貨情況 · 成果：缺貨情況經可用量、保留量、待出貨訂單及未登錄到貨／退貨資料核對，以辨別帳面缺貨與實際無貨。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 28 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "9a88f119-cf4c-4edd-bcf5-1cadf712c299",
+          "field": null,
+          "task_id": "c646c415-5471-4576-946a-c3504b61fe25"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "2f2fc262-521f-4c81-a3be-4cf4a50af87c",
+        "interview_sequence": 28,
+        "speaker": "employee",
+        "interview_text": "缺貨追蹤是每天看低於安全庫存的清單，另處理客服或倉庫通報。我先核對可用量、已保留量、待出貨訂單，以及尚未登錄的到貨或退貨，避免把帳面缺貨直接當成真的沒貨。"
+      }
+    }
+  ],
+  "interviews": [
+    {
+      "message": {
+        "source_id": "beab0e1b-38a1-4da5-8725-49068f0a4c6e",
+        "interview_sequence": 1,
+        "speaker": "app",
+        "interview_text": "這裡會透過訪談，逐步理解您的實際工作並整理職務說明書。您不需要先學會撰寫，也不必一次說完；不確定的地方可以直接說明。\n\n請先說說您目前主要負責哪些工作？可以用自己的說法，從平常大家會找您處理的事情開始。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "4b3af938-5eeb-4d62-9eac-5755caad2931",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "edd67e9d-7379-41a4-9488-6dc952a7af20",
+        "interview_sequence": 3,
+        "speaker": "consultant",
+        "interview_text": "已先依您提供的資訊整理職務基本資料與工作目的，也記下工作界線：訂貨決策與議價由採購負責，客服及對外承諾交期不屬於您的工作。\n\n我們先從「到貨登錄」了解日常流程：貨到後，您會核對哪些資訊、登錄在哪裡？如果品項或數量不符，通常由您怎麼處理、再交給誰？"
+      },
+      "execution_id": "ef8be73a-7888-43fe-82f4-0e64bd5dfcce"
+    },
+    {
+      "message": {
+        "source_id": "210adb5c-8445-45c9-b024-64129d285909",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "db35e079-589e-4ed4-82d9-14be204a104a",
+        "interview_sequence": 5,
+        "speaker": "consultant",
+        "interview_text": "已把「核對並登錄到貨資料」整理進草稿，並保留您提到的工作分工、每日約 15–20 張進貨單，以及不得直接把送貨單數量當作實收數的要求。\n\n發現品號、批號或數量不符時，您通常會怎麼記錄並通知誰？後續由誰判斷如何處理，例如補送、退貨或更正資料？"
+      },
+      "execution_id": "ccaf4969-519f-4cb3-ad76-63fba900a96b"
+    },
+    {
+      "message": {
+        "source_id": "4fe73d48-7d32-4f22-a8f9-402381e426f7",
+        "interview_sequence": 6,
+        "speaker": "employee",
+        "interview_text": "商品外箱破損或短少時，我拍照、記下實收件數及原單號，通知採購，再把未確認的部分留在待處理清單。採購決定是否退換貨或補貨；我不能自行同意接受替代品，也不能改採購單上的價格。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "f6f7298f-b8d4-4515-891f-61d15d41d2d1",
+        "interview_sequence": 7,
+        "speaker": "consultant",
+        "interview_text": "已補上到貨異常處理：您會留下破損或短少的佐證與單號、通知採購，並追列未確認事項；退換貨、補貨及價格決定不屬於您的權限。\n\n除了到貨時發現的差異，平常的庫存差異通常怎麼被發現？您會如何核對與記錄，若需要調整庫存，最後由誰決定或核准？"
+      },
+      "execution_id": "3ef43f36-2a60-40a9-b3b7-2fe7efd108c9"
+    },
+    {
+      "message": {
+        "source_id": "025d7357-18c3-4211-8fcc-d0b1829ec4d4",
+        "interview_sequence": 8,
+        "speaker": "employee",
+        "interview_text": "驗收時如果不良件數占本批實際驗收件數超過5%，我會提報倉儲主管。剛好5%不因這條比例規則提報，但有安全疑慮時仍先隔離並通知主管；比例門檻不是把安全問題略過的理由。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "643bfd9b-42ed-4137-a75d-6cb11bfbef74",
+        "interview_sequence": 9,
+        "speaker": "consultant",
+        "interview_text": "已把驗收門檻補進草稿：不良件數比例「超過 5%」才依此規則提報；安全疑慮則不看比例，需先隔離並通知倉儲主管。\n\n未超過 5% 且沒有安全疑慮的不良品，您會怎麼記錄或處理？計算比例所需的件數，是倉庫同事提供給您，還是您也負責核算？"
+      },
+      "execution_id": "9bf607b5-2285-4407-bb72-ce7f6ce9636d"
+    },
+    {
+      "message": {
+        "source_id": "50e4a847-771e-458c-b861-55e6fdaa01c5",
+        "interview_sequence": 10,
+        "speaker": "employee",
+        "interview_text": "我通常在到貨當天下班前完成已確認項目的ERP登錄。月底最後一天，財務會提供截止清單；超過截止或有疑義的單據由財務決定歸屬月份，我只保留實際收貨時間和未決原因，不自己回填日期。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "8734d04e-3f9f-45ce-ad87-d522c671d431",
+        "interview_sequence": 11,
+        "speaker": "consultant",
+        "interview_text": "已補上到貨登錄的時效與月底分工：已確認項目通常於到貨當天下班前登錄；月底逾截止或有疑義的單據，由財務判定歸屬月份，您保留實際收貨時間與未決原因，不自行回填日期。\n\n接著想了解缺貨追蹤：缺貨訊息通常從哪裡來？您會記錄或追蹤哪些狀態，又以什麼情況判定可以結案？"
+      },
+      "execution_id": "467a5894-9d3a-4734-80ee-8f9af2ce0dda"
+    },
+    {
+      "message": {
+        "source_id": "bacb6047-f5d1-418b-bd72-056820d89d68",
+        "interview_sequence": 12,
+        "speaker": "employee",
+        "interview_text": "收貨異常不是通知完就結束。我更新差異清單和處理進度；兩個工作日沒回覆就提醒採購，第四個工作日仍沒進展再回報主管。要到補貨或退貨完成、帳物相符才結案；供應商幾時真的補來不是我能保證的。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "aa012ab9-64ea-430c-aad7-07c0790a2578",
+        "interview_sequence": 13,
+        "speaker": "consultant",
+        "interview_text": "已補上收貨異常的追蹤與結案方式：您更新差異清單與進度，兩個工作日未獲回覆提醒採購，第四個工作日仍無進展則回報主管；補貨或退貨完成且帳物相符後才結案，且不保證供應商實際補貨時間。\n\n前一題補充的是收貨異常；另外，您提到的「缺貨追蹤」通常由什麼訊息或情況啟動？您會追蹤到什麼狀態才算完成？"
+      },
+      "execution_id": "5516a565-47f7-4020-b75f-915f5105a2ab"
+    },
+    {
+      "message": {
+        "source_id": "0739892c-e458-41ad-a68d-f94d2c9417e8",
+        "interview_sequence": 14,
+        "speaker": "employee",
+        "interview_text": "退貨另有一份清單。我每個工作日08:35開始核對前一天收到的退貨，在09:10前把退貨差異表交客服窗口。這是退貨的時點，不是進货驗收的時限。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "31e86eca-0e60-4a49-95ee-61b343882879",
+        "interview_sequence": 15,
+        "speaker": "consultant",
+        "interview_text": "已將退貨整理為獨立任務，記下使用另一份退貨清單、工作日 08:35 開始核對前一日收到的退貨，並於 09:10 前交退貨差異表給客服窗口；這個時限不套用於進貨驗收。\n\n核對退貨時，您會比對哪些資料或實物？若發現差異，表上會記錄什麼，後續由誰處理？"
+      },
+      "execution_id": "8d27bf4f-2999-4bfd-ba5d-d0bf83334d61"
+    },
+    {
+      "message": {
+        "source_id": "532abcde-6040-44de-8117-bce8ac474515",
+        "interview_sequence": 16,
+        "speaker": "employee",
+        "interview_text": "退貨要核對客退單、品號、批號和实收数量。仓庫同事判定商品是否可再銷售；我依確認結果登錄可售、待檢或報廢待核准狀態。我不自行判定報廢，也不能把待檢庫存當可用量。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "3f196570-a73c-48cc-a23a-1f795af9015b",
+        "interview_sequence": 17,
+        "speaker": "consultant",
+        "interview_text": "已補上退貨核對內容與權限界線：您比對客退單、品號、批號及實收數量，依倉庫同事的判定登錄商品狀態；報廢由您以「待核准」狀態記錄，待檢庫存不列為可用量。\n\n如果客退單、品號、批號或實收數量不符，您會在差異表記錄哪些內容、通知誰？客服窗口收到後會接續處理哪一部分？"
+      },
+      "execution_id": "afa79e36-1bfa-47f3-8d9d-a4746deaf0ee"
+    },
+    {
+      "message": {
+        "source_id": "bffaa30d-616a-4b2d-b6c5-255e2de9ec1f",
+        "interview_sequence": 18,
+        "speaker": "employee",
+        "interview_text": "退貨數量不符時，我提供照片和差異紀錄請客服確認；主管同意調帳後，我才依核准資料改ERP並保留核准單號。退款由客服和財務處理，不是我的工作。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "ac6f6caf-4360-4ef9-86a5-8124155d52f3",
+        "interview_sequence": 19,
+        "speaker": "consultant",
+        "interview_text": "已補上退貨數量差異的處理界線：您提供照片與差異紀錄供客服確認，主管同意調帳後才依核准資料更新 ERP、保留核准單號；退款由客服與財務處理。\n\n接著想把「缺貨追蹤」和退貨作業分開了解：通常是什麼訊息或情況讓您開始追蹤缺貨？您會追到哪個狀態才算完成？"
+      },
+      "execution_id": "e0deb11d-16a6-4653-a8da-6cd73c3fcfe8"
+    },
+    {
+      "message": {
+        "source_id": "0d25b3ea-ceda-4228-8655-536d5b53e6b9",
+        "interview_sequence": 20,
+        "speaker": "employee",
+        "interview_text": "有一筆退貨外箱完整但內件不齊，我保留在待檢狀態，沒有直接入可售庫存。主管請仓庫复检後才决定处理方式；我的成果是可追溯的狀態與紀錄，不是每筆都能立即恢復可售。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "22060de0-a526-4c5b-8695-6e47a798736b",
+        "interview_sequence": 21,
+        "speaker": "consultant",
+        "interview_text": "已補上退貨例外：外箱完整但內件不齊時仍維持待檢，不直接入可售庫存；保留可追溯的狀態與紀錄，待倉庫複檢後由主管決定後續處理，不要求每筆都立即恢復可售。\n\n接著了解您提到的庫存報表：通常多久整理一次、主要包含哪些內容，提供給誰作何用途？"
+      },
+      "execution_id": "726d438a-43fa-44c1-998c-f9cf8125cf3f"
+    },
+    {
+      "message": {
+        "source_id": "82cc258e-64f2-4070-8b71-1efd96205c5d",
+        "interview_sequence": 22,
+        "speaker": "employee",
+        "interview_text": "庫存盤點分成平常抽盤與月底全盤。平常由主管指定高周轉或容易出錯的品項，我核對ERP與現場清點結果；月底由倉庫同事分區清點，我整合各區盤點表。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "510a8961-c859-4c81-945b-1c479b46ee6d",
+        "interview_sequence": 23,
+        "speaker": "consultant",
+        "interview_text": "已將盤點獨立整理為一項工作：平常依主管指定的高周轉或易出錯品項核對 ERP 與現場清點結果；月底由倉庫同事分區清點，您整合盤點表。\n\n如果盤點數量與 ERP 不一致，您會怎麼記錄或查核？差異最後由誰決定是否調整庫存？"
+      },
+      "execution_id": "ecad3e0e-6842-427a-b0d4-eaf9169ef172"
+    },
+    {
+      "message": {
+        "source_id": "54025e32-5fda-45e2-a5e7-d844fa7155ea",
+        "interview_sequence": 24,
+        "speaker": "employee",
+        "interview_text": "盤點有差異時，我先查近期收貨、退貨、移位和待出貨紀錄，必要時請倉庫同事複盤。不論差異大或小，我都不能自己把ERP改成現場數，必須有核准的庫存調整單。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "da300879-991e-44ae-a109-bef3e4daddf6",
+        "interview_sequence": 25,
+        "speaker": "consultant",
+        "interview_text": "已補上盤點差異處理：您先查近期收貨、退貨、移位與待出貨紀錄，必要時請倉庫同事複盤；無論差異大小，ERP 都不能由您自行改成現場數，須有核准的庫存調整單。\n\n您提到的「庫存報表」和盤點是另一項工作。這類報表通常多久整理一次、主要提供哪些庫存資訊，供誰使用？"
+      },
+      "execution_id": "4557bd2c-6832-4287-9ec0-d3e6200ce90d"
+    },
+    {
+      "message": {
+        "source_id": "905c161a-214e-426e-bbf5-3c5a278d8923",
+        "interview_sequence": 26,
+        "speaker": "employee",
+        "interview_text": "先留一個盤點頻率的問題，等等再補；目前先說盤點成果。我整理帳實差異表，保留品號、批號、帳面量、實盤量、差額、查核原因與核准單號，讓主管能判斷是否調帳。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "d77368b1-3ed5-4d0e-9496-83e862e15693",
+        "interview_sequence": 27,
+        "speaker": "consultant",
+        "interview_text": "已補上盤點成果：帳實差異表保留品號、批號、帳面量、實盤量、差額、查核原因與核准單號，供主管判斷是否調帳。盤點頻率先留待稍後確認。\n\n這張帳實差異表是每次盤點都會整理，還是只有發現差異時才整理？"
+      },
+      "execution_id": "2ba85da2-bcae-446e-84c1-7dd5b42c9e15"
+    },
+    {
+      "message": {
+        "source_id": "2f2fc262-521f-4c81-a3be-4cf4a50af87c",
+        "interview_sequence": 28,
+        "speaker": "employee",
+        "interview_text": "缺貨追蹤是每天看低於安全庫存的清單，另處理客服或倉庫通報。我先核對可用量、已保留量、待出貨訂單，以及尚未登錄的到貨或退貨，避免把帳面缺貨直接當成真的沒貨。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "0a295b1d-c149-4481-ba09-32bc22c72695",
+        "interview_sequence": 29,
+        "speaker": "consultant",
+        "interview_text": "已將缺貨追蹤加入草稿：您每天查看低於安全庫存清單，也處理客服或倉庫通報；先核對可用量、保留量、待出貨訂單，以及尚未登錄的到貨或退貨，避免把帳面缺貨直接當成實際無貨。\n\n如果核對後確認確實缺貨，您接著會做哪些追蹤或通知？追到什麼結果才會標記完成？"
+      },
+      "execution_id": "cb29ec14-78ae-4c87-ab9b-eaf7409a9a1d"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "event_id": "e048",
+  "execution_id": "dbffa3e1-939e-4874-b3db-0bfc64ac0786",
+  "employee_input": {
+    "source_id": "f3369bf3-58fb-4799-9f12-62759e1db648",
+    "interview_sequence": 96,
+    "speaker": "employee",
+    "interview_text": "再補充退貨：只有冷藏商品退貨要另看溫度紀錄，交品質窗口判定是否可以再銷售；一般常溫退貨沿用倉庫确认的状态。温度合格門檻我不知道，不能用你知道的行業標準替公司填一個數字。"
+  },
+  "consultant_reply": {
+    "source_id": "68f0dd8a-25cf-4f96-87d7-0a9cef468b50",
+    "interview_sequence": 97,
+    "speaker": "consultant",
+    "interview_text": "已補入退貨作業：冷藏退貨須核對溫度紀錄並交品質窗口判定是否可再銷售；常溫退貨仍依倉庫確認的狀態登錄。溫度合格門檻先保留為未確認，不會自行套用外部標準。\n\n接續確認週三抽盤：您選出近期收退貨頻繁的品項後，是先請主管確認再盤，還是盤完再交差異清單？"
+  }
+}

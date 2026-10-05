@@ -1,0 +1,8 @@
+{
+  "scope": "post-review reconstruction with exact historical SHA256 match; original current prepared and database manifest unchanged",
+  "database_prepared_sha256": "65be64816c31efa0c2db299d62d0fdd7a6625bdb16bc765040c114660bf9ac19",
+  "reranker_prepared_sha256": "1c6f94c7ccd944f0bb25eeb28863f57bacac910f1d515c92cb05ae2b36ee2fce",
+  "reconstruction": "Remove per-query embedding_origin; reset M01-M04 embedding_new_seconds to 0; original indent2 ensure_asciiFalse and CRLF serialization. SHA256 exactly matches live DB manifest. This file was reconstructed after review, not preserved at DB execution time.",
+  "differences": "Only embedding cache-origin/new-time reporting metadata differ. Corpus, query text, ranking/scores, vector hashes and dense timing equal; verified explicitly.",
+  "score_limit": "Original 640-query native scores were not saved individually. Their score-error checks are live assertions and saved statistics, not offline recomputable native scores. Returned IDs/counts and full805 cosine rankings are recomputed offline. Passage-pool does retain 58 native score lists."
+}

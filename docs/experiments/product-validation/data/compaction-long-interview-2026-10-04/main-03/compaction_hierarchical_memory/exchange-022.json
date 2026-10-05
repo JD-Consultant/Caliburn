@@ -1,0 +1,16 @@
+{
+  "event_id": "e022",
+  "execution_id": "5b5b0735-c86d-4cd6-a73b-d2eab2587a75",
+  "employee_input": {
+    "source_id": "018f2bad-9723-4355-93a5-f5836ca6513f",
+    "interview_sequence": 44,
+    "speaker": "employee",
+    "interview_text": "帳齡是依已確認的入庫日期和目前庫存狀態算，我會先核對批號與調撥資料，避免移倉就讓庫存變成新貨。主管決定促銷、報廢或其他處置，我不直接設定折扣或把滯銷品刪掉。"
+  },
+  "consultant_reply": {
+    "source_id": "e06dce60-f9b1-4f37-b1bd-6b2b2ff6d31a",
+    "interview_sequence": 45,
+    "speaker": "consultant",
+    "interview_text": "已補上帳齡表的依據與處置界線：依已確認的入庫日期和目前庫存狀態，核對批號及調撥資料，移倉不重設庫齡；促銷、報廢等由主管決定，您不直接設定折扣或刪除滯銷品。\n\n回到盤點差異：需要調帳時，核准的庫存調整單由誰簽核？這和月底全盤彙整表的主管簽核是分開的流程嗎？"
+  }
+}

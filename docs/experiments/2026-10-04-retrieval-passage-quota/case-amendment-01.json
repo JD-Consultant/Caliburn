@@ -1,0 +1,15 @@
+{
+  "frozen_utc": "2026-10-04T04:41:00.832775+00:00",
+  "before_new_embeddings_or_rankings": true,
+  "scope": "Source annotation correction only; employee_messages and support document IDs unchanged; initial files retained.",
+  "effective_holdout_cases": "holdout-cases-2026-10-04-reviewed.json",
+  "effective_sha256": "ae7e8c712455555a1ff16b2a8d80a8721214ffdac322e9919e63999c2f67d4f4",
+  "initial_manifest_sha256": "7590ae815a4a2676087ccfb8b3442854c74be6fd6655d4d50dcb1cd389e3f66d",
+  "script_sha256": "eb76a146e5c117d964488b7959e35846d6b11e8c983628a15d819f0b78835827",
+  "amendments": [
+    "H01 service quote joins passages1/2; remove unconfirmed recommendation P1.1.1",
+    "H01 cleanup excludes unconfirmed periodic equipment checking/maintenance P3.2.3",
+    "H03 procurement adds exact T1.1/T1.2 support, excludes unmentioned negotiation/contracting",
+    "H02 database P3.1.5 only backup/recovery, excludes tuning; H04 excludes unstated environmental P3.2.3"
+  ]
+}

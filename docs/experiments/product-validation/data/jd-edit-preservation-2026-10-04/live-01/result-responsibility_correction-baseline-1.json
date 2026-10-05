@@ -1,0 +1,11 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "baseline",
+  "repeat": 1,
+  "case_id": "responsibility_correction",
+  "cell_id": "responsibility_correction-baseline-1",
+  "status": "stopped",
+  "reads": [],
+  "usage": [],
+  "proposal": null
+}

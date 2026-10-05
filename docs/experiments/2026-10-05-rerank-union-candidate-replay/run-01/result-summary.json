@@ -1,0 +1,12 @@
+{
+  "cases": 8,
+  "methods": 2,
+  "positions": 80,
+  "unique_selected_pairs": 71,
+  "reused_grades": 71,
+  "missing_grades": 0,
+  "prior_controls_unchanged": 48,
+  "query_union_min": 26,
+  "query_union_max": 35,
+  "scope": "observed synthetic cases; cached scores and reused judgments; not holdout or JD completeness"
+}

@@ -1,0 +1,16 @@
+{
+  "event_id": "e041",
+  "execution_id": "2d4c7f58-e33f-4d14-84cb-195d46a74923",
+  "employee_input": {
+    "source_id": "6e922cd3-0244-4b7e-b59f-7623502d5524",
+    "interview_sequence": 82,
+    "speaker": "employee",
+    "interview_text": "上班是工作日08:30到17:30，月底全盤偶爾延後下班，但我不輪夜班。11到12月到貨多，會先按主管指示安排截止單與異常追蹤；旺季不代表可以省掉核准再改ERP。"
+  },
+  "consultant_reply": {
+    "source_id": "7e43ee89-91e8-4ecf-9506-140411ab07fa",
+    "interview_sequence": 83,
+    "speaker": "consultant",
+    "interview_text": "已在 JD 草稿分開記錄排班與權限界線：工作日 08:30–17:30、不輪夜班；月底全盤偶爾延後下班，11–12 月到貨較多時依主管指示安排截止單及異常追蹤。旺季也不能略過 ERP 修改所需的核准。\n\n若旺季遇到截止時間將到、但 ERP 修改尚未取得核准，您通常會怎麼標示並向誰回報？"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "final": {
+    "task": {
+      "title": "預約乙前端維護與變更處理",
+      "work": "本人依約執行預約乙的前端維護：10月起改為每季第一個工作日維護一次；在此之前為每月一次。維護時檢查頁面操作並修正前端問題。客戶確認需求；本人負責約定的前端範圍，同事負責後端業務規則與服務端部署。若需求超出約定範圍，本人整理變更影響並提出需求，不自行核准；由客戶的產品負責人決定是否核准。約定範圍內的前端問題修正，不需每次另行核准。"
+    },
+    "unknowns": [
+      "維護頻率自10月起變更的年份未提供。"
+    ],
+    "references": [
+      {
+        "kind": "interview",
+        "sequences": [
+          6,
+          10,
+          14,
+          16
+        ]
+      }
+    ]
+  },
+  "steps": 1,
+  "tool_calls": [],
+  "reads": [
+    [
+      "interview",
+      1
+    ],
+    [
+      "interview",
+      10
+    ],
+    [
+      "interview",
+      11
+    ],
+    [
+      "interview",
+      12
+    ],
+    [
+      "interview",
+      13
+    ],
+    [
+      "interview",
+      14
+    ],
+    [
+      "interview",
+      15
+    ],
+    [
+      "interview",
+      16
+    ],
+    [
+      "interview",
+      17
+    ],
+    [
+      "interview",
+      18
+    ],
+    [
+      "interview",
+      2
+    ],
+    [
+      "interview",
+      3
+    ],
+    [
+      "interview",
+      4
+    ],
+    [
+      "interview",
+      5
+    ],
+    [
+      "interview",
+      6
+    ],
+    [
+      "interview",
+      7
+    ],
+    [
+      "interview",
+      8
+    ],
+    [
+      "interview",
+      9
+    ]
+  ],
+  "cell": "read-resolved_approval-full_history",
+  "seconds": 20.22589010000229
+}

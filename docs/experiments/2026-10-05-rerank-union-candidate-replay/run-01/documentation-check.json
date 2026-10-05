@@ -1,0 +1,18 @@
+{
+  "documents_checked": 11,
+  "local_links_checked": 190,
+  "missing_links": [],
+  "pending_manifest_links": [
+    {
+      "file": "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/README.md",
+      "target": "artifact-hashes.json"
+    }
+  ],
+  "trailing_whitespace": [],
+  "frozen_input_code_checks": 22,
+  "prior_sealed_files_unchanged": 551,
+  "strong_api_key_pattern_file_count": 0,
+  "new_provider_calls": 0,
+  "new_services_started": false,
+  "scope": "final documentation/provenance audit; not general security or fresh performance evaluation"
+}

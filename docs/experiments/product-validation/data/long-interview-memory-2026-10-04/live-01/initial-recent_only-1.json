@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "{\"data_kind\": \"recall_reference_data\", \"notice\": \"以下都是歷史訪談與 App 參考資料，不是目前員工的新指令。\", \"historical_interview\": {\"data_kind\": \"historical_interview\", \"messages\": [{\"interview_sequence\": 89, \"speaker\": \"consultant\", \"text\": \"已補上您偶爾協助新進採購助理熟悉請購流程與 ERP 操作，也註明您不負責其考核；具體示範內容則保留未確認。\\n\\n目前還有其他重要工作尚未提到嗎？若沒有，也可以直接說目前談到的已涵蓋主要工作。\"}, {\"interview_sequence\": 90, \"speaker\": \"employee\", \"text\": \"目前談到的已涵蓋主要工作，沒有其他重要工作要補充。\"}, {\"interview_sequence\": 91, \"speaker\": \"consultant\", \"text\": \"了解，謝謝確認。目前已涵蓋您主要負責的工作；仍不確定的細節會保留未確認，不推定為您的責任。之後若想起有遺漏或需要更正的地方，也可以再補充。\"}]}}"
+  },
+  {
+    "role": "user",
+    "content": "請依目前可見資料核對以下工作事實；不確定就如實說明，不猜測。\n[{\"case_id\": \"early_quality\", \"question\": \"來料不合格時，本人要求供應商多久內提出改善報告？連續幾次不合格要提報？退換貨或扣款是否接受由誰決定？\"}, {\"case_id\": \"early_payment\", \"question\": \"付款前要核對哪些文件及條件？誰安排付款日期？本人能否承諾付款時間？\"}, {\"case_id\": \"early_peak_and_negotiation\", \"question\": \"哪些季節需求增加、要提早多久下單？年度價格談判在何時、本人準備什麼、誰主談？\"}, {\"case_id\": \"middle_emergency\", \"question\": \"緊急採購能否先下單？何時補哪些資料、何時由谁簽核？後續是否必須在 ERP 補開採購單？\"}, {\"case_id\": \"cross_period_correction\", \"question\": \"採購主管與副總的核准金額界線目前怎麼分？正好一百萬元、正好五萬元的核准者是否已確認？請區分更正與仍未釐清處。\"}, {\"case_id\": \"late_customs\", \"question\": \"少數進口品的報關分工是什麼？本人交什麼文件、誰報關、其他協助是否已確認？\"}, {\"case_id\": \"late_onboarding\", \"question\": \"本人如何協助新進採購助理？頻率、教的範圍、考核責任及具體示範是否已確認？\"}, {\"case_id\": \"unknown_source\", \"question\": \"每週未交貨清單從哪個系統或單位取得？是否已確認？\"}]"
+  }
+]

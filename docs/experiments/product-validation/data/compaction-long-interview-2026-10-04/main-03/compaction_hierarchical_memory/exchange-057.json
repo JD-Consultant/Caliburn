@@ -1,0 +1,16 @@
+{
+  "event_id": "e057",
+  "execution_id": "4a2d8ae3-bc94-4b88-9edb-8bfdeb36aead",
+  "employee_input": {
+    "source_id": "e2abc676-6cf4-4e69-9c9c-d7670cae3947",
+    "interview_sequence": 114,
+    "speaker": "employee",
+    "interview_text": "之前那張表改成每週一次好了，幫我更新。"
+  },
+  "consultant_reply": {
+    "source_id": "117c8c50-eba8-4209-a696-88d8036deada",
+    "interview_sequence": 115,
+    "speaker": "consultant",
+    "interview_text": "剛才提到三張表：退貨差異表目前每日交、庫存帳齡表按月底狀態整理、收貨異常週報每週交。您說要改成每週一次，是指**庫存帳齡表**嗎？若是，想維持交主管，還是也要指定每週哪一天交？"
+  }
+}

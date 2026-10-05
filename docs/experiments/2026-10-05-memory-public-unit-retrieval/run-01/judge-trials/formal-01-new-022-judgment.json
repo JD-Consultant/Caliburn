@@ -1,0 +1,29 @@
+{
+  "job_id": "new-022",
+  "phase": "formal-01",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是無線通信設備的安裝、測試、維護及故障處理；員工主要負責會員網站前端畫面、互動、API 串接與瀏覽器品質。兩者僅有「測試」這項通用動作相似，但對象與工作責任不同，不足以代表員工的主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題",
+        "reference_quote": "協助測試無線通信設備"
+      },
+      {
+        "employee_quote": "我平常負責會員網站的畫面。",
+        "reference_quote": "協助無線通信系統安裝測試、維運、故障排除等客戶服務工作。"
+      }
+    ],
+    "limitations": [
+      "公版未描述網站頁面與互動開發、API 串接或瀏覽器品質工作。",
+      "設備測試、維護及故障處理不能視為員工的網站開發維護責任。"
+    ]
+  },
+  "seconds": 10.477743999974336,
+  "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+  "document_sha256": "d041207b8ac8c24c65dffa15493622b47f255e908108230d3fd4ca3c73f3b1ee",
+  "case_id": "F02",
+  "document_id": "INM7421-001v3"
+}

@@ -1,0 +1,320 @@
+{
+  "cases": [
+    {
+      "case_id": "F01",
+      "minimum_prefix_for_baseline_grade3": 1,
+      "minimum_prefix_for_all_known_grade3": 12,
+      "oracle_metric": {
+        "case_id": "F01",
+        "selected_count": 1,
+        "grades": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 1,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "IIS3513-003v4"
+        ],
+        "known_grade3_missing": [
+          "INM3514-001v4"
+        ],
+        "known_facets_supported": [
+          "瀏覽器畫面、互動與操作檢查的開發及維護",
+          "訂單 API、權限、商業規則及資料存取的開發及維護"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": []
+      },
+      "known_grade3_positions": [
+        {
+          "id": "IIS3513-003v4",
+          "rank": 1,
+          "score": -3.41015625,
+          "distance_from_best": 0.0
+        },
+        {
+          "id": "INM3514-001v4",
+          "rank": 12,
+          "score": -5.484375,
+          "distance_from_best": 2.07421875
+        }
+      ]
+    },
+    {
+      "case_id": "F02",
+      "minimum_prefix_for_baseline_grade3": 2,
+      "minimum_prefix_for_all_known_grade3": 2,
+      "oracle_metric": {
+        "case_id": "F02",
+        "selected_count": 2,
+        "grades": {
+          "0": 0,
+          "1": 0,
+          "2": 1,
+          "3": 1,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "INM3514-001v4"
+        ],
+        "known_grade3_missing": [],
+        "known_facets_supported": [
+          "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": []
+      },
+      "known_grade3_positions": [
+        {
+          "id": "INM3514-001v4",
+          "rank": 2,
+          "score": -1.9482421875,
+          "distance_from_best": 0.0927734375
+        }
+      ]
+    },
+    {
+      "case_id": "F03",
+      "minimum_prefix_for_baseline_grade3": 2,
+      "minimum_prefix_for_all_known_grade3": 2,
+      "oracle_metric": {
+        "case_id": "F03",
+        "selected_count": 2,
+        "grades": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 2,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "FAC3313-001v2",
+          "FAC4311-001v2"
+        ],
+        "known_grade3_missing": [],
+        "known_facets_supported": [
+          "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": []
+      },
+      "known_grade3_positions": [
+        {
+          "id": "FAC4311-001v2",
+          "rank": 1,
+          "score": -0.75341796875,
+          "distance_from_best": 0.0
+        },
+        {
+          "id": "FAC3313-001v2",
+          "rank": 2,
+          "score": -1.064453125,
+          "distance_from_best": 0.31103515625
+        }
+      ]
+    },
+    {
+      "case_id": "F04",
+      "minimum_prefix_for_baseline_grade3": 4,
+      "minimum_prefix_for_all_known_grade3": 4,
+      "oracle_metric": {
+        "case_id": "F04",
+        "selected_count": 4,
+        "grades": {
+          "0": 0,
+          "1": 0,
+          "2": 3,
+          "3": 1,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "SET3113-002v3"
+        ],
+        "known_grade3_missing": [],
+        "known_facets_supported": [
+          "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": []
+      },
+      "known_grade3_positions": [
+        {
+          "id": "SET3113-002v3",
+          "rank": 4,
+          "score": -1.060546875,
+          "distance_from_best": 0.53173828125
+        }
+      ]
+    },
+    {
+      "case_id": "F05",
+      "minimum_prefix_for_baseline_grade3": 5,
+      "minimum_prefix_for_all_known_grade3": 25,
+      "oracle_metric": {
+        "case_id": "F05",
+        "selected_count": 5,
+        "grades": {
+          "0": 0,
+          "1": 3,
+          "2": 1,
+          "3": 1,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "AVA2172-001v4"
+        ],
+        "known_grade3_missing": [
+          "AVA2172-002v3"
+        ],
+        "known_facets_supported": [
+          "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": []
+      },
+      "known_grade3_positions": [
+        {
+          "id": "AVA2172-001v4",
+          "rank": 5,
+          "score": -3.6015625,
+          "distance_from_best": 1.33203125
+        },
+        {
+          "id": "AVA2172-002v3",
+          "rank": 25,
+          "score": -6.6640625,
+          "distance_from_best": 4.39453125
+        }
+      ]
+    },
+    {
+      "case_id": "H01",
+      "minimum_prefix_for_baseline_grade3": 0,
+      "minimum_prefix_for_all_known_grade3": null,
+      "oracle_metric": {
+        "case_id": "H01",
+        "selected_count": 0,
+        "grades": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [],
+        "known_grade3_missing": [],
+        "known_facets_supported": [],
+        "known_facets_missing": [],
+        "unassessed_facets": [
+          "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+        ]
+      },
+      "known_grade3_positions": []
+    },
+    {
+      "case_id": "H02",
+      "minimum_prefix_for_baseline_grade3": 3,
+      "minimum_prefix_for_all_known_grade3": 3,
+      "oracle_metric": {
+        "case_id": "H02",
+        "selected_count": 3,
+        "grades": {
+          "0": 0,
+          "1": 0,
+          "2": 1,
+          "3": 2,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "MMP4321-003v4",
+          "RLM9330-001v1"
+        ],
+        "known_grade3_missing": [],
+        "known_facets_supported": [
+          "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": []
+      },
+      "known_grade3_positions": [
+        {
+          "id": "MMP4321-003v4",
+          "rank": 2,
+          "score": 0.9169921875,
+          "distance_from_best": 0.95703125
+        },
+        {
+          "id": "RLM9330-001v1",
+          "rank": 3,
+          "score": 0.90576171875,
+          "distance_from_best": 0.96826171875
+        }
+      ]
+    },
+    {
+      "case_id": "H03",
+      "minimum_prefix_for_baseline_grade3": 2,
+      "minimum_prefix_for_all_known_grade3": 11,
+      "oracle_metric": {
+        "case_id": "H03",
+        "selected_count": 2,
+        "grades": {
+          "0": 0,
+          "1": 0,
+          "2": 1,
+          "3": 1,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "BAS3323-003v3"
+        ],
+        "known_grade3_missing": [
+          "MMP1324-001v4"
+        ],
+        "known_facets_supported": [
+          "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": []
+      },
+      "known_grade3_positions": [
+        {
+          "id": "BAS3323-003v3",
+          "rank": 2,
+          "score": 2.580078125,
+          "distance_from_best": 0.0625
+        },
+        {
+          "id": "MMP1324-001v4",
+          "rank": 11,
+          "score": 2.193359375,
+          "distance_from_best": 0.44921875
+        }
+      ]
+    }
+  ],
+  "oracle_aggregate": {
+    "selected_count": 19,
+    "average_per_case": 2.375,
+    "range": [
+      0,
+      5
+    ],
+    "empty_cases": [
+      "H01"
+    ],
+    "grades": {
+      "0": 0,
+      "1": 3,
+      "2": 7,
+      "3": 9,
+      "ungraded": 0
+    },
+    "known_grade3_retained": 9,
+    "known_grade3_total": 12,
+    "known_facets_supported": 8,
+    "known_facets_total": 8
+  }
+}

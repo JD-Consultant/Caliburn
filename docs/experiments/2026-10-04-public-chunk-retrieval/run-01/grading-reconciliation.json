@@ -1,0 +1,78 @@
+{
+  "reconciled": 3,
+  "changes": [
+    {
+      "job_id": "J018",
+      "case_id": "H02",
+      "document_id": "KRM1324-001v1",
+      "grade_unchanged": true,
+      "edits": [
+        {
+          "index": 0,
+          "field": "reference_quote",
+          "before": "記錄和更新內部系統庫存數據，維護庫存相關文件。",
+          "after": "記錄和更新內部系統庫存數據,維護庫存相關文件。"
+        }
+      ],
+      "rule": "unique exact source substring after whitespace removal / comma equivalence"
+    },
+    {
+      "job_id": "J019",
+      "case_id": "H03",
+      "document_id": "MMP1324-001v4",
+      "grade_unchanged": true,
+      "edits": [
+        {
+          "index": 0,
+          "field": "reference_quote",
+          "before": "依據供應需求與相關人員確認採購規格。依據程序、授權及準則,執行採購工作並評估相關風險。",
+          "after": "依據供應需求與相關人員確認採購規格。\n依據程序、授權及準則,執行採購工作並評估相關風險。"
+        },
+        {
+          "index": 1,
+          "field": "reference_quote",
+          "before": "取得商品或服務採購核准。依據組織的財務管理系統及組織規範要求,進行採購流程。",
+          "after": "取得商品或服務採購核准。\n依據組織的財務管理系統及組織規範要求,進行採購流程。"
+        }
+      ],
+      "rule": "unique exact source substring after whitespace removal / comma equivalence"
+    },
+    {
+      "job_id": "J026",
+      "case_id": "F05",
+      "document_id": "KPS3334-009v4",
+      "grade_unchanged": true,
+      "edits": [
+        {
+          "index": 0,
+          "field": "reference_quote",
+          "before": "探索各種文字編排設計及視覺設計要素，以創造元素。",
+          "after": "探索各種文字編排設計及視覺設計要素,以創造元素。"
+        },
+        {
+          "index": 1,
+          "field": "reference_quote",
+          "before": "選擇設計技巧，並與相關人員討論，確保設計格式符合輸出平臺的要求。",
+          "after": "選擇設計技巧,並與相關人員討論,確保設計格式符合輸出平臺的要求。"
+        }
+      ],
+      "rule": "unique exact source substring after whitespace removal / comma equivalence"
+    }
+  ],
+  "unresolved": [
+    {
+      "job_id": "J014",
+      "reason": "employee evidence cannot be located"
+    },
+    {
+      "job_id": "J016",
+      "reason": "reference evidence cannot be located"
+    },
+    {
+      "job_id": "J034",
+      "reason": "employee evidence cannot be located"
+    }
+  ],
+  "no_model_rerun": true,
+  "raw_judgments_and_failures_unchanged": true
+}

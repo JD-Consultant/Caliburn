@@ -1,0 +1,184 @@
+[
+  {
+    "case_id": "E01",
+    "method": "global_rerank",
+    "config": {
+      "method": "global_rerank",
+      "n": 200,
+      "k": 20
+    },
+    "samples_seconds": [
+      14.735839399974793,
+      14.53066469996702
+    ],
+    "median_total_seconds": 14.633252049970906,
+    "median_database_seconds": 0.035582250042352825,
+    "median_tokenize_seconds": 0.3170944865014462,
+    "median_worker_seconds": 14.558178360501188,
+    "median_file_transport_overhead_seconds": 0.037966439515003,
+    "pair_counts": [
+      600,
+      600
+    ],
+    "returned_counts": [
+      20,
+      20
+    ]
+  },
+  {
+    "case_id": "E01",
+    "method": "quota_rerank",
+    "config": {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      1.7150165000348352,
+      1.6692535000038333
+    ],
+    "median_total_seconds": 1.6921350000193343,
+    "median_database_seconds": 0.03787524998188019,
+    "median_tokenize_seconds": 0.03684855350002181,
+    "median_worker_seconds": 1.6216706929990323,
+    "median_file_transport_overhead_seconds": 0.03232145697984379,
+    "pair_counts": [
+      60,
+      60
+    ],
+    "returned_counts": [
+      9,
+      9
+    ]
+  },
+  {
+    "case_id": "M04",
+    "method": "global_rerank",
+    "config": {
+      "method": "global_rerank",
+      "n": 200,
+      "k": 20
+    },
+    "samples_seconds": [
+      18.711561800038908,
+      19.01725760003319
+    ],
+    "median_total_seconds": 18.86440970003605,
+    "median_database_seconds": 0.0635144499829039,
+    "median_tokenize_seconds": 0.37068757049928536,
+    "median_worker_seconds": 18.759815554501984,
+    "median_file_transport_overhead_seconds": 0.039165445497928886,
+    "pair_counts": [
+      800,
+      800
+    ],
+    "returned_counts": [
+      20,
+      20
+    ]
+  },
+  {
+    "case_id": "M04",
+    "method": "quota_rerank",
+    "config": {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      1.8785245000035502,
+      1.951286399969831
+    ],
+    "median_total_seconds": 1.9149054499866907,
+    "median_database_seconds": 0.031019450048916042,
+    "median_tokenize_seconds": 0.03911278400119045,
+    "median_worker_seconds": 1.8586321554976166,
+    "median_file_transport_overhead_seconds": 0.02489939453516854,
+    "pair_counts": [
+      80,
+      80
+    ],
+    "returned_counts": [
+      14,
+      14
+    ]
+  },
+  {
+    "case_id": "E01",
+    "method": "full_rerank",
+    "config": {
+      "method": "full_rerank",
+      "n": 805,
+      "k": 805
+    },
+    "samples_seconds": [
+      66.07774420001078,
+      68.63519519998226
+    ],
+    "median_total_seconds": 67.35646969999652,
+    "median_database_seconds": 0.0,
+    "median_tokenize_seconds": 1.5473836775017844,
+    "median_worker_seconds": 67.2899903519974,
+    "median_file_transport_overhead_seconds": 0.06125509800403961,
+    "pair_counts": [
+      2415,
+      2415
+    ],
+    "returned_counts": [
+      805,
+      805
+    ]
+  },
+  {
+    "case_id": "E01",
+    "method": "quota_dense",
+    "config": {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 10
+    },
+    "samples_seconds": [
+      0.023862300033215433,
+      0.0578772000153549
+    ],
+    "median_total_seconds": 0.04086975002428517,
+    "median_database_seconds": 0.04051474999869242,
+    "median_tokenize_seconds": 0.0,
+    "median_worker_seconds": 0.0,
+    "median_file_transport_overhead_seconds": 0.0,
+    "pair_counts": [
+      0,
+      0
+    ],
+    "returned_counts": [
+      24,
+      24
+    ]
+  },
+  {
+    "case_id": "M04",
+    "method": "quota_dense",
+    "config": {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 10
+    },
+    "samples_seconds": [
+      0.06268229999113828,
+      0.03307100001256913
+    ],
+    "median_total_seconds": 0.047876650001853704,
+    "median_database_seconds": 0.0477223000198137,
+    "median_tokenize_seconds": 0.0,
+    "median_worker_seconds": 0.0,
+    "median_file_transport_overhead_seconds": 0.0,
+    "pair_counts": [
+      0,
+      0
+    ],
+    "returned_counts": [
+      20,
+      20
+    ]
+  }
+]

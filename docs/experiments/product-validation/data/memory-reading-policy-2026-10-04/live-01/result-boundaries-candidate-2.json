@@ -1,0 +1,118 @@
+{
+  "arm": "raw_memory",
+  "repeat": 2,
+  "case_id": "boundaries",
+  "prompt_variant": "candidate",
+  "cell_id": "boundaries-candidate-2",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding_map",
+      "arguments": {},
+      "result_characters": 185
+    },
+    {
+      "step": 2,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6465
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11767,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 11764
+        },
+        "output_tokens": 153,
+        "output_tokens_details": {
+          "reasoning_tokens": 76
+        },
+        "total_tokens": 11920
+      },
+      "estimated_usd": "0.000194440",
+      "seconds": 2.4521403000107966
+    },
+    {
+      "usage": {
+        "input_tokens": 12072,
+        "input_tokens_details": {
+          "cache_write_tokens": 305,
+          "cached_tokens": 11764
+        },
+        "output_tokens": 37,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12109
+      },
+      "estimated_usd": "0.000174565",
+      "seconds": 1.6129850000143051
+    },
+    {
+      "usage": {
+        "input_tokens": 17570,
+        "input_tokens_details": {
+          "cache_write_tokens": 5498,
+          "cached_tokens": 12069
+        },
+        "output_tokens": 4266,
+        "output_tokens_details": {
+          "reasoning_tokens": 3403
+        },
+        "total_tokens": 21836
+      },
+      "estimated_usd": "0.002941240",
+      "seconds": 35.1459840000025
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_8.description",
+        "value": "產品召回時，依品質窗口提供的品號、批號核對各店庫存狀態（可售、待檢及在途調撥等），通知倉庫隔離，向主管及品質窗口提供影響範圍，並追蹤隔離量、回收量及各店回覆，直到主管確認紀錄齊全。本人不決定召回範圍或解除；召回範圍及是否解除由品質窗口確認，本人不宣布恢復銷售。客服負責對客通知，採購負責聯繫供應商。批號資料不足時請各店補充，召回範圍不明時向品質窗口確認，保留待確認狀態，不自行擴大召回或判定未列批號安全。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.description",
+        "value": "每週一 08:50 開始核對週末累積收到的退貨；週二至週五 08:35 開始核對前一日收到的退貨。使用獨立的退貨清單，比對客退單、品號、批號及實收數量。商品是否可再銷售由倉庫同事判定；本人依確認結果登錄可售、待檢或報廢待核准狀態，並於每個工作日 09:10 前將退貨差異表交給客服窗口。退貨數量不符時，提供照片及差異紀錄請客服確認；主管同意調帳後，才依核准資料更新 ERP 並保留核准單號。此核對時點與交表時限僅適用於退貨，不是進貨驗收時限。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.requirement_1",
+        "value": "週一 08:50 開始核對週末累積退貨；週二至週五 08:35 開始核對前一日退貨。每個工作日 09:10 前將退貨差異表交客服窗口；此時限僅適用退貨，不套用進貨驗收。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [
+      "冷藏商品退貨目前是否有品質窗口或公司正式確認的溫度合格門檻？若有，請提供確認的數值及適用條件；若尚未確認，我會保留未知，不填入數字。",
+      "單據及核准紀錄是否已有財務確認的保存年限？若有，請提供年限及適用的文件類型；若尚未確認，會維持不填數字。",
+      "休假返崗核對發現代理期間的登錄或狀態不一致時，您會在既有核准範圍內自行更正，還是記錄後交主管或相關窗口處理？"
+    ],
+    "note": "已更正召回描述中的決策權錯置，並修正退貨核對的週一開始時間及交表時限。休假交接描述與目前理解一致，未改寫；文件保存年限及冷藏退貨溫度門檻均未有已確認數字，保留未知並提出釐清問題。"
+  },
+  "seconds": 72.11869279999519
+}

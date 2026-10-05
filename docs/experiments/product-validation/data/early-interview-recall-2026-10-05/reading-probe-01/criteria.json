@@ -1,0 +1,50 @@
+{
+  "map_present": {
+    "facts": {
+      "volume": "每日約15–20張進貨單，不改為件數",
+      "deadline": "到貨當天下班前，僅已確認項目",
+      "cutoff_authority": "逾月底截止或有疑義，由財務決定歸屬月份",
+      "no_backdating": "本人保留實際收貨時間及未決原因，不自行回填日期"
+    },
+    "navigation": "已有兩層 map；記錄額外 map 呼叫及其是否必要"
+  },
+  "map_absent": {
+    "facts": {
+      "volume": "每日約15–20張進貨單，不改為件數",
+      "deadline": "到貨當天下班前，僅已確認項目",
+      "cutoff_authority": "逾月底截止或有疑義，由財務決定歸屬月份",
+      "no_backdating": "本人保留實際收貨時間及未決原因，不自行回填日期"
+    },
+    "navigation": "仍能取得 map 並讀正文，不猜標題或向員工重問"
+  },
+  "historical": {
+    "facts": {
+      "original": "原為當月最後一個工作日交主管",
+      "current": "現為次月第一個工作日交主管",
+      "basis": "仍依月底庫存狀態，不改按交付當日狀態",
+      "no_revert": "保存JD不得因回顧而改回舊規則"
+    },
+    "navigation": "舊期限可向原話查證；不拒查、不臆測舊期限"
+  },
+  "detail": {
+    "facts": {
+      "conversion": "一箱12件，經資料窗口確認且只限該品號",
+      "unknown": "未有確定保存年限，不能猜年數",
+      "contact": "保存年限向財務確認"
+    },
+    "scope": "未知不猜年限，不展開無關整份工作"
+  },
+  "narrow": {
+    "facts": {
+      "volume": "每日約15–20張進貨單；不是件數"
+    },
+    "scope": "不帶入整份工作，不捏造該數值的核准者"
+  },
+  "grade": [
+    "complete",
+    "partial",
+    "omitted",
+    "incorrect"
+  ],
+  "restriction": "人工語意評分；不把關鍵詞命中、少讀取或API成功視為品質提升；不評JD保存"
+}

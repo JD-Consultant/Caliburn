@@ -1,0 +1,1043 @@
+{
+  "failed_query": "H01-segments-1",
+  "representation": "task",
+  "native": [
+    {
+      "id": "BHR2422-007v4",
+      "max_score": 0.6650115,
+      "top_chunks": [
+        {
+          "parent_id": "BHR2422-007v4",
+          "chunk_id": "BHR2422-007v4:task:2:1",
+          "score": 0.6650115
+        },
+        {
+          "parent_id": "BHR2422-007v4",
+          "chunk_id": "BHR2422-007v4:task:2:2",
+          "score": 0.6385356
+        },
+        {
+          "parent_id": "BHR2422-007v4",
+          "chunk_id": "BHR2422-007v4:task:1:2",
+          "score": 0.6211767
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.6650115
+    },
+    {
+      "id": "BHR2422-011v4",
+      "max_score": 0.6569475,
+      "top_chunks": [
+        {
+          "parent_id": "BHR2422-011v4",
+          "chunk_id": "BHR2422-011v4:task:3:1",
+          "score": 0.6569475
+        },
+        {
+          "parent_id": "BHR2422-011v4",
+          "chunk_id": "BHR2422-011v4:task:3:2",
+          "score": 0.6304977
+        },
+        {
+          "parent_id": "BHR2422-011v4",
+          "chunk_id": "BHR2422-011v4:task:3:4",
+          "score": 0.615857
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.6569475
+    },
+    {
+      "id": "TTM3422-001v2",
+      "max_score": 0.65012527,
+      "top_chunks": [
+        {
+          "parent_id": "TTM3422-001v2",
+          "chunk_id": "TTM3422-001v2:task:2:1",
+          "score": 0.65012527
+        },
+        {
+          "parent_id": "TTM3422-001v2",
+          "chunk_id": "TTM3422-001v2:task:2:2",
+          "score": 0.6080539
+        },
+        {
+          "parent_id": "TTM3422-001v2",
+          "chunk_id": "TTM3422-001v2:task:2:3",
+          "score": 0.5667657
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.65012527
+    },
+    {
+      "id": "THM4222-001v3",
+      "max_score": 0.64466494,
+      "top_chunks": [
+        {
+          "parent_id": "THM4222-001v3",
+          "chunk_id": "THM4222-001v3:task:1:2",
+          "score": 0.64466494
+        },
+        {
+          "parent_id": "THM4222-001v3",
+          "chunk_id": "THM4222-001v3:task:1:1",
+          "score": 0.64292085
+        },
+        {
+          "parent_id": "THM4222-001v3",
+          "chunk_id": "THM4222-001v3:task:2:1",
+          "score": 0.62648124
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.64466494
+    },
+    {
+      "id": "TFB1412-002v2",
+      "max_score": 0.63976765,
+      "top_chunks": [
+        {
+          "parent_id": "TFB1412-002v2",
+          "chunk_id": "TFB1412-002v2:task:6:1",
+          "score": 0.63976765
+        },
+        {
+          "parent_id": "TFB1412-002v2",
+          "chunk_id": "TFB1412-002v2:task:5:2",
+          "score": 0.5863829
+        },
+        {
+          "parent_id": "TFB1412-002v2",
+          "chunk_id": "TFB1412-002v2:task:4:1",
+          "score": 0.58296573
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.63976765
+    },
+    {
+      "id": "KPS3322-003v3",
+      "max_score": 0.63084036,
+      "top_chunks": [
+        {
+          "parent_id": "KPS3322-003v3",
+          "chunk_id": "KPS3322-003v3:task:5:2",
+          "score": 0.63084036
+        },
+        {
+          "parent_id": "KPS3322-003v3",
+          "chunk_id": "KPS3322-003v3:task:1:3",
+          "score": 0.57068217
+        },
+        {
+          "parent_id": "KPS3322-003v3",
+          "chunk_id": "KPS3322-003v3:overview:None:None",
+          "score": 0.56352854
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.63084036
+    },
+    {
+      "id": "TTM1499-001v1",
+      "max_score": 0.6259542,
+      "top_chunks": [
+        {
+          "parent_id": "TTM1499-001v1",
+          "chunk_id": "TTM1499-001v1:task:4:3",
+          "score": 0.6259542
+        },
+        {
+          "parent_id": "TTM1499-001v1",
+          "chunk_id": "TTM1499-001v1:task:3:2",
+          "score": 0.56795466
+        },
+        {
+          "parent_id": "TTM1499-001v1",
+          "chunk_id": "TTM1499-001v1:task:4:2",
+          "score": 0.54857284
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.6259542
+    },
+    {
+      "id": "SET2529-001v2",
+      "max_score": 0.6237678,
+      "top_chunks": [
+        {
+          "parent_id": "SET2529-001v2",
+          "chunk_id": "SET2529-001v2:task:2:3",
+          "score": 0.6237678
+        },
+        {
+          "parent_id": "SET2529-001v2",
+          "chunk_id": "SET2529-001v2:overview:None:None",
+          "score": 0.5678131
+        },
+        {
+          "parent_id": "SET2529-001v2",
+          "chunk_id": "SET2529-001v2:task:2:2",
+          "score": 0.5671606
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.6237678
+    },
+    {
+      "id": "TTM4221-007v1",
+      "max_score": 0.6202652,
+      "top_chunks": [
+        {
+          "parent_id": "TTM4221-007v1",
+          "chunk_id": "TTM4221-007v1:task:1:1",
+          "score": 0.6202652
+        },
+        {
+          "parent_id": "TTM4221-007v1",
+          "chunk_id": "TTM4221-007v1:task:2:3",
+          "score": 0.601116
+        },
+        {
+          "parent_id": "TTM4221-007v1",
+          "chunk_id": "TTM4221-007v1:task:2:4",
+          "score": 0.590889
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.6202652
+    },
+    {
+      "id": "連鎖餐飲門市管理人員",
+      "max_score": 0.61955076,
+      "top_chunks": [
+        {
+          "parent_id": "連鎖餐飲門市管理人員",
+          "chunk_id": "連鎖餐飲門市管理人員:task:4:1",
+          "score": 0.61955076
+        },
+        {
+          "parent_id": "連鎖餐飲門市管理人員",
+          "chunk_id": "連鎖餐飲門市管理人員:task:2:3",
+          "score": 0.6072857
+        },
+        {
+          "parent_id": "連鎖餐飲門市管理人員",
+          "chunk_id": "連鎖餐飲門市管理人員:task:4:2",
+          "score": 0.6060671
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.61955076
+    },
+    {
+      "id": "RTO8322-001v4",
+      "max_score": 0.6186495,
+      "top_chunks": [
+        {
+          "parent_id": "RTO8322-001v4",
+          "chunk_id": "RTO8322-001v4:task:6:2",
+          "score": 0.6186495
+        },
+        {
+          "parent_id": "RTO8322-001v4",
+          "chunk_id": "RTO8322-001v4:task:6:1",
+          "score": 0.54545814
+        },
+        {
+          "parent_id": "RTO8322-001v4",
+          "chunk_id": "RTO8322-001v4:task:2:1",
+          "score": 0.5244291
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.6186495
+    },
+    {
+      "id": "連鎖餐飲區域督導",
+      "max_score": 0.61861324,
+      "top_chunks": [
+        {
+          "parent_id": "連鎖餐飲區域督導",
+          "chunk_id": "連鎖餐飲區域督導:task:2:2",
+          "score": 0.61861324
+        },
+        {
+          "parent_id": "連鎖餐飲區域督導",
+          "chunk_id": "連鎖餐飲區域督導:task:4:2",
+          "score": 0.61333716
+        },
+        {
+          "parent_id": "連鎖餐飲區域督導",
+          "chunk_id": "連鎖餐飲區域督導:task:4:1",
+          "score": 0.60115886
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.61861324
+    },
+    {
+      "id": "BHR2422-014v2",
+      "max_score": 0.6181017,
+      "top_chunks": [
+        {
+          "parent_id": "BHR2422-014v2",
+          "chunk_id": "BHR2422-014v2:task:4:1",
+          "score": 0.6181017
+        },
+        {
+          "parent_id": "BHR2422-014v2",
+          "chunk_id": "BHR2422-014v2:task:4:2",
+          "score": 0.5849403
+        },
+        {
+          "parent_id": "BHR2422-014v2",
+          "chunk_id": "BHR2422-014v2:task:1:1",
+          "score": 0.57769704
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.6181017
+    },
+    {
+      "id": "KRM4212-001v2",
+      "max_score": 0.61545706,
+      "top_chunks": [
+        {
+          "parent_id": "KRM4212-001v2",
+          "chunk_id": "KRM4212-001v2:task:2:1",
+          "score": 0.61545706
+        },
+        {
+          "parent_id": "KRM4212-001v2",
+          "chunk_id": "KRM4212-001v2:task:4:2",
+          "score": 0.5722602
+        },
+        {
+          "parent_id": "KRM4212-001v2",
+          "chunk_id": "KRM4212-001v2:task:3:3",
+          "score": 0.57182294
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.61545706
+    },
+    {
+      "id": "TTM4221-005v4",
+      "max_score": 0.6130868,
+      "top_chunks": [
+        {
+          "parent_id": "TTM4221-005v4",
+          "chunk_id": "TTM4221-005v4:task:3:3",
+          "score": 0.6130868
+        },
+        {
+          "parent_id": "TTM4221-005v4",
+          "chunk_id": "TTM4221-005v4:task:3:4",
+          "score": 0.6096251
+        },
+        {
+          "parent_id": "TTM4221-005v4",
+          "chunk_id": "TTM4221-005v4:task:2:2",
+          "score": 0.5571062
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.6130868
+    },
+    {
+      "id": "KRM1324-002v1",
+      "max_score": 0.61218053,
+      "top_chunks": [
+        {
+          "parent_id": "KRM1324-002v1",
+          "chunk_id": "KRM1324-002v1:task:3:1",
+          "score": 0.61218053
+        },
+        {
+          "parent_id": "KRM1324-002v1",
+          "chunk_id": "KRM1324-002v1:task:1:2",
+          "score": 0.5718527
+        },
+        {
+          "parent_id": "KRM1324-002v1",
+          "chunk_id": "KRM1324-002v1:task:2:1",
+          "score": 0.5639706
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.61218053
+    },
+    {
+      "id": "KPS2434-004v2",
+      "max_score": 0.61101365,
+      "top_chunks": [
+        {
+          "parent_id": "KPS2434-004v2",
+          "chunk_id": "KPS2434-004v2:task:3:1",
+          "score": 0.61101365
+        },
+        {
+          "parent_id": "KPS2434-004v2",
+          "chunk_id": "KPS2434-004v2:task:4:1",
+          "score": 0.59175324
+        },
+        {
+          "parent_id": "KPS2434-004v2",
+          "chunk_id": "KPS2434-004v2:task:3:2",
+          "score": 0.5892333
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.61101365
+    },
+    {
+      "id": "SMS2529-001v3",
+      "max_score": 0.60985196,
+      "top_chunks": [
+        {
+          "parent_id": "SMS2529-001v3",
+          "chunk_id": "SMS2529-001v3:task:3:3",
+          "score": 0.60985196
+        },
+        {
+          "parent_id": "SMS2529-001v3",
+          "chunk_id": "SMS2529-001v3:overview:None:None",
+          "score": 0.5729706
+        },
+        {
+          "parent_id": "SMS2529-001v3",
+          "chunk_id": "SMS2529-001v3:task:1:1",
+          "score": 0.5571633
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.60985196
+    },
+    {
+      "id": "TFB1412-003v2",
+      "max_score": 0.60934746,
+      "top_chunks": [
+        {
+          "parent_id": "TFB1412-003v2",
+          "chunk_id": "TFB1412-003v2:task:4:2",
+          "score": 0.60934746
+        },
+        {
+          "parent_id": "TFB1412-003v2",
+          "chunk_id": "TFB1412-003v2:task:4:1",
+          "score": 0.5821932
+        },
+        {
+          "parent_id": "TFB1412-003v2",
+          "chunk_id": "TFB1412-003v2:task:1:2",
+          "score": 0.56309015
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.60934746
+    },
+    {
+      "id": "FIS3321-002v2",
+      "max_score": 0.60898983,
+      "top_chunks": [
+        {
+          "parent_id": "FIS3321-002v2",
+          "chunk_id": "FIS3321-002v2:task:4:1",
+          "score": 0.60898983
+        },
+        {
+          "parent_id": "FIS3321-002v2",
+          "chunk_id": "FIS3321-002v2:task:2:1",
+          "score": 0.5315808
+        },
+        {
+          "parent_id": "FIS3321-002v2",
+          "chunk_id": "FIS3321-002v2:task:3:1",
+          "score": 0.51071525
+        }
+      ],
+      "available_chunks": 3,
+      "score": 0.60898983
+    }
+  ],
+  "offline_top25": [
+    {
+      "id": "BHR2422-007v4",
+      "max_score": 0.665011498480843,
+      "top_chunks": [
+        {
+          "parent_id": "BHR2422-007v4",
+          "chunk_id": "BHR2422-007v4:task:2:1",
+          "score": 0.665011498480843
+        },
+        {
+          "parent_id": "BHR2422-007v4",
+          "chunk_id": "BHR2422-007v4:task:2:2",
+          "score": 0.6385356315899406
+        },
+        {
+          "parent_id": "BHR2422-007v4",
+          "chunk_id": "BHR2422-007v4:task:1:2",
+          "score": 0.6211767008452078
+        }
+      ],
+      "available_chunks": 7,
+      "score": 0.665011498480843
+    },
+    {
+      "id": "BHR2422-011v4",
+      "max_score": 0.6569474345040659,
+      "top_chunks": [
+        {
+          "parent_id": "BHR2422-011v4",
+          "chunk_id": "BHR2422-011v4:task:3:1",
+          "score": 0.6569474345040659
+        },
+        {
+          "parent_id": "BHR2422-011v4",
+          "chunk_id": "BHR2422-011v4:task:3:2",
+          "score": 0.6304976937945987
+        },
+        {
+          "parent_id": "BHR2422-011v4",
+          "chunk_id": "BHR2422-011v4:task:3:4",
+          "score": 0.6158569403702492
+        }
+      ],
+      "available_chunks": 11,
+      "score": 0.6569474345040659
+    },
+    {
+      "id": "TTM3422-001v2",
+      "max_score": 0.6501252402615381,
+      "top_chunks": [
+        {
+          "parent_id": "TTM3422-001v2",
+          "chunk_id": "TTM3422-001v2:task:2:1",
+          "score": 0.6501252402615381
+        },
+        {
+          "parent_id": "TTM3422-001v2",
+          "chunk_id": "TTM3422-001v2:task:2:2",
+          "score": 0.60805395869584
+        },
+        {
+          "parent_id": "TTM3422-001v2",
+          "chunk_id": "TTM3422-001v2:task:2:3",
+          "score": 0.5667657350468247
+        }
+      ],
+      "available_chunks": 16,
+      "score": 0.6501252402615381
+    },
+    {
+      "id": "THM4222-001v3",
+      "max_score": 0.6446649346471978,
+      "top_chunks": [
+        {
+          "parent_id": "THM4222-001v3",
+          "chunk_id": "THM4222-001v3:task:1:2",
+          "score": 0.6446649346471978
+        },
+        {
+          "parent_id": "THM4222-001v3",
+          "chunk_id": "THM4222-001v3:task:1:1",
+          "score": 0.6429208150432308
+        },
+        {
+          "parent_id": "THM4222-001v3",
+          "chunk_id": "THM4222-001v3:task:2:1",
+          "score": 0.626481248078781
+        }
+      ],
+      "available_chunks": 11,
+      "score": 0.6446649346471978
+    },
+    {
+      "id": "TFB1412-002v2",
+      "max_score": 0.6397676343254524,
+      "top_chunks": [
+        {
+          "parent_id": "TFB1412-002v2",
+          "chunk_id": "TFB1412-002v2:task:6:1",
+          "score": 0.6397676343254524
+        },
+        {
+          "parent_id": "TFB1412-002v2",
+          "chunk_id": "TFB1412-002v2:task:5:2",
+          "score": 0.586382938395605
+        },
+        {
+          "parent_id": "TFB1412-002v2",
+          "chunk_id": "TFB1412-002v2:task:4:1",
+          "score": 0.582965753106032
+        }
+      ],
+      "available_chunks": 10,
+      "score": 0.6397676343254524
+    },
+    {
+      "id": "KPS3322-003v3",
+      "max_score": 0.6308403525876027,
+      "top_chunks": [
+        {
+          "parent_id": "KPS3322-003v3",
+          "chunk_id": "KPS3322-003v3:task:5:2",
+          "score": 0.6308403525876027
+        },
+        {
+          "parent_id": "KPS3322-003v3",
+          "chunk_id": "KPS3322-003v3:task:1:3",
+          "score": 0.5706821327206424
+        },
+        {
+          "parent_id": "KPS3322-003v3",
+          "chunk_id": "KPS3322-003v3:overview:None:None",
+          "score": 0.5635284989725705
+        }
+      ],
+      "available_chunks": 19,
+      "score": 0.6308403525876027
+    },
+    {
+      "id": "TTM1499-001v1",
+      "max_score": 0.6259542049855424,
+      "top_chunks": [
+        {
+          "parent_id": "TTM1499-001v1",
+          "chunk_id": "TTM1499-001v1:task:4:3",
+          "score": 0.6259542049855424
+        },
+        {
+          "parent_id": "TTM1499-001v1",
+          "chunk_id": "TTM1499-001v1:task:3:2",
+          "score": 0.5679546643968774
+        },
+        {
+          "parent_id": "TTM1499-001v1",
+          "chunk_id": "TTM1499-001v1:task:4:2",
+          "score": 0.5485728218139216
+        }
+      ],
+      "available_chunks": 11,
+      "score": 0.6259542049855424
+    },
+    {
+      "id": "SET2529-001v2",
+      "max_score": 0.6237677983957216,
+      "top_chunks": [
+        {
+          "parent_id": "SET2529-001v2",
+          "chunk_id": "SET2529-001v2:task:2:3",
+          "score": 0.6237677983957216
+        },
+        {
+          "parent_id": "SET2529-001v2",
+          "chunk_id": "SET2529-001v2:overview:None:None",
+          "score": 0.5678130964407084
+        },
+        {
+          "parent_id": "SET2529-001v2",
+          "chunk_id": "SET2529-001v2:task:2:2",
+          "score": 0.5671606220614631
+        }
+      ],
+      "available_chunks": 6,
+      "score": 0.6237677983957216
+    },
+    {
+      "id": "TTM4221-007v1",
+      "max_score": 0.6202651693822179,
+      "top_chunks": [
+        {
+          "parent_id": "TTM4221-007v1",
+          "chunk_id": "TTM4221-007v1:task:1:1",
+          "score": 0.6202651693822179
+        },
+        {
+          "parent_id": "TTM4221-007v1",
+          "chunk_id": "TTM4221-007v1:task:2:3",
+          "score": 0.6011159812070508
+        },
+        {
+          "parent_id": "TTM4221-007v1",
+          "chunk_id": "TTM4221-007v1:task:2:4",
+          "score": 0.5908889537689956
+        }
+      ],
+      "available_chunks": 10,
+      "score": 0.6202651693822179
+    },
+    {
+      "id": "連鎖餐飲門市管理人員",
+      "max_score": 0.619550759324903,
+      "top_chunks": [
+        {
+          "parent_id": "連鎖餐飲門市管理人員",
+          "chunk_id": "連鎖餐飲門市管理人員:task:4:1",
+          "score": 0.619550759324903
+        },
+        {
+          "parent_id": "連鎖餐飲門市管理人員",
+          "chunk_id": "連鎖餐飲門市管理人員:task:2:3",
+          "score": 0.6072856919957068
+        },
+        {
+          "parent_id": "連鎖餐飲門市管理人員",
+          "chunk_id": "連鎖餐飲門市管理人員:task:4:2",
+          "score": 0.6060670662262135
+        }
+      ],
+      "available_chunks": 11,
+      "score": 0.619550759324903
+    },
+    {
+      "id": "RTO8322-001v4",
+      "max_score": 0.6186494687730235,
+      "top_chunks": [
+        {
+          "parent_id": "RTO8322-001v4",
+          "chunk_id": "RTO8322-001v4:task:6:2",
+          "score": 0.6186494687730235
+        },
+        {
+          "parent_id": "RTO8322-001v4",
+          "chunk_id": "RTO8322-001v4:task:6:1",
+          "score": 0.545458139753893
+        },
+        {
+          "parent_id": "RTO8322-001v4",
+          "chunk_id": "RTO8322-001v4:task:2:1",
+          "score": 0.5244291412297192
+        }
+      ],
+      "available_chunks": 20,
+      "score": 0.6186494687730235
+    },
+    {
+      "id": "連鎖餐飲區域督導",
+      "max_score": 0.6186132752547657,
+      "top_chunks": [
+        {
+          "parent_id": "連鎖餐飲區域督導",
+          "chunk_id": "連鎖餐飲區域督導:task:2:2",
+          "score": 0.6186132752547657
+        },
+        {
+          "parent_id": "連鎖餐飲區域督導",
+          "chunk_id": "連鎖餐飲區域督導:task:4:2",
+          "score": 0.6133371390386152
+        },
+        {
+          "parent_id": "連鎖餐飲區域督導",
+          "chunk_id": "連鎖餐飲區域督導:task:4:1",
+          "score": 0.6011588500718854
+        }
+      ],
+      "available_chunks": 10,
+      "score": 0.6186132752547657
+    },
+    {
+      "id": "BHR2422-014v2",
+      "max_score": 0.6181017515262905,
+      "top_chunks": [
+        {
+          "parent_id": "BHR2422-014v2",
+          "chunk_id": "BHR2422-014v2:task:4:1",
+          "score": 0.6181017515262905
+        },
+        {
+          "parent_id": "BHR2422-014v2",
+          "chunk_id": "BHR2422-014v2:task:4:2",
+          "score": 0.5849402950830114
+        },
+        {
+          "parent_id": "BHR2422-014v2",
+          "chunk_id": "BHR2422-014v2:task:1:1",
+          "score": 0.5776970324547874
+        }
+      ],
+      "available_chunks": 10,
+      "score": 0.6181017515262905
+    },
+    {
+      "id": "KRM4212-001v2",
+      "max_score": 0.615457096972033,
+      "top_chunks": [
+        {
+          "parent_id": "KRM4212-001v2",
+          "chunk_id": "KRM4212-001v2:task:2:1",
+          "score": 0.615457096972033
+        },
+        {
+          "parent_id": "KRM4212-001v2",
+          "chunk_id": "KRM4212-001v2:task:4:2",
+          "score": 0.5722601843227181
+        },
+        {
+          "parent_id": "KRM4212-001v2",
+          "chunk_id": "KRM4212-001v2:task:3:3",
+          "score": 0.5718229496678928
+        }
+      ],
+      "available_chunks": 14,
+      "score": 0.615457096972033
+    },
+    {
+      "id": "TTM4221-005v4",
+      "max_score": 0.6130868171426532,
+      "top_chunks": [
+        {
+          "parent_id": "TTM4221-005v4",
+          "chunk_id": "TTM4221-005v4:task:3:3",
+          "score": 0.6130868171426532
+        },
+        {
+          "parent_id": "TTM4221-005v4",
+          "chunk_id": "TTM4221-005v4:task:3:4",
+          "score": 0.6096251107452995
+        },
+        {
+          "parent_id": "TTM4221-005v4",
+          "chunk_id": "TTM4221-005v4:task:2:2",
+          "score": 0.5571061782867806
+        }
+      ],
+      "available_chunks": 11,
+      "score": 0.6130868171426532
+    },
+    {
+      "id": "KRM1324-002v1",
+      "max_score": 0.6121805391879034,
+      "top_chunks": [
+        {
+          "parent_id": "KRM1324-002v1",
+          "chunk_id": "KRM1324-002v1:task:3:1",
+          "score": 0.6121805391879034
+        },
+        {
+          "parent_id": "KRM1324-002v1",
+          "chunk_id": "KRM1324-002v1:task:1:2",
+          "score": 0.5718526464808518
+        },
+        {
+          "parent_id": "KRM1324-002v1",
+          "chunk_id": "KRM1324-002v1:task:2:1",
+          "score": 0.5639706077260614
+        }
+      ],
+      "available_chunks": 7,
+      "score": 0.6121805391879034
+    },
+    {
+      "id": "KPS2434-004v2",
+      "max_score": 0.6110136242398532,
+      "top_chunks": [
+        {
+          "parent_id": "KPS2434-004v2",
+          "chunk_id": "KPS2434-004v2:task:3:1",
+          "score": 0.6110136242398532
+        },
+        {
+          "parent_id": "KPS2434-004v2",
+          "chunk_id": "KPS2434-004v2:task:4:1",
+          "score": 0.5917532245846935
+        },
+        {
+          "parent_id": "KPS2434-004v2",
+          "chunk_id": "KPS2434-004v2:task:3:2",
+          "score": 0.5892332905918334
+        }
+      ],
+      "available_chunks": 6,
+      "score": 0.6110136242398532
+    },
+    {
+      "id": "SMS2529-001v3",
+      "max_score": 0.6098519763278732,
+      "top_chunks": [
+        {
+          "parent_id": "SMS2529-001v3",
+          "chunk_id": "SMS2529-001v3:task:3:3",
+          "score": 0.6098519763278732
+        },
+        {
+          "parent_id": "SMS2529-001v3",
+          "chunk_id": "SMS2529-001v3:overview:None:None",
+          "score": 0.5729706395148391
+        },
+        {
+          "parent_id": "SMS2529-001v3",
+          "chunk_id": "SMS2529-001v3:task:1:1",
+          "score": 0.5571632813356546
+        }
+      ],
+      "available_chunks": 15,
+      "score": 0.6098519763278732
+    },
+    {
+      "id": "TFB1412-003v2",
+      "max_score": 0.6093474811264608,
+      "top_chunks": [
+        {
+          "parent_id": "TFB1412-003v2",
+          "chunk_id": "TFB1412-003v2:task:4:2",
+          "score": 0.6093474811264608
+        },
+        {
+          "parent_id": "TFB1412-003v2",
+          "chunk_id": "TFB1412-003v2:task:4:1",
+          "score": 0.5821932064396658
+        },
+        {
+          "parent_id": "TFB1412-003v2",
+          "chunk_id": "TFB1412-003v2:task:1:2",
+          "score": 0.5630901363260594
+        }
+      ],
+      "available_chunks": 8,
+      "score": 0.6093474811264608
+    },
+    {
+      "id": "FIS3321-001v2",
+      "max_score": 0.6089898118496508,
+      "top_chunks": [
+        {
+          "parent_id": "FIS3321-001v2",
+          "chunk_id": "FIS3321-001v2:task:4:1",
+          "score": 0.6089898118496508
+        },
+        {
+          "parent_id": "FIS3321-001v2",
+          "chunk_id": "FIS3321-001v2:task:2:1",
+          "score": 0.5367906221789618
+        },
+        {
+          "parent_id": "FIS3321-001v2",
+          "chunk_id": "FIS3321-001v2:task:1:1",
+          "score": 0.5009103470383814
+        }
+      ],
+      "available_chunks": 5,
+      "score": 0.6089898118496508
+    },
+    {
+      "id": "FIS3321-002v2",
+      "max_score": 0.6089898118496508,
+      "top_chunks": [
+        {
+          "parent_id": "FIS3321-002v2",
+          "chunk_id": "FIS3321-002v2:task:4:1",
+          "score": 0.6089898118496508
+        },
+        {
+          "parent_id": "FIS3321-002v2",
+          "chunk_id": "FIS3321-002v2:task:2:1",
+          "score": 0.531580835472258
+        },
+        {
+          "parent_id": "FIS3321-002v2",
+          "chunk_id": "FIS3321-002v2:task:3:1",
+          "score": 0.5107152769327452
+        }
+      ],
+      "available_chunks": 5,
+      "score": 0.6089898118496508
+    },
+    {
+      "id": "KPS5220-001v4",
+      "max_score": 0.6084243857621479,
+      "top_chunks": [
+        {
+          "parent_id": "KPS5220-001v4",
+          "chunk_id": "KPS5220-001v4:task:1:2",
+          "score": 0.6084243857621479
+        },
+        {
+          "parent_id": "KPS5220-001v4",
+          "chunk_id": "KPS5220-001v4:task:3:3",
+          "score": 0.5756867498629852
+        },
+        {
+          "parent_id": "KPS5220-001v4",
+          "chunk_id": "KPS5220-001v4:task:2:2",
+          "score": 0.5651542522410707
+        }
+      ],
+      "available_chunks": 9,
+      "score": 0.6084243857621479
+    },
+    {
+      "id": "MMP4321-001v4",
+      "max_score": 0.6079028405689824,
+      "top_chunks": [
+        {
+          "parent_id": "MMP4321-001v4",
+          "chunk_id": "MMP4321-001v4:task:3:1",
+          "score": 0.6079028405689824
+        },
+        {
+          "parent_id": "MMP4321-001v4",
+          "chunk_id": "MMP4321-001v4:task:3:2",
+          "score": 0.5881267906241798
+        },
+        {
+          "parent_id": "MMP4321-001v4",
+          "chunk_id": "MMP4321-001v4:task:2:2",
+          "score": 0.5601825649549028
+        }
+      ],
+      "available_chunks": 12,
+      "score": 0.6079028405689824
+    },
+    {
+      "id": "KMC2432-001v4",
+      "max_score": 0.607660534709637,
+      "top_chunks": [
+        {
+          "parent_id": "KMC2432-001v4",
+          "chunk_id": "KMC2432-001v4:task:2:1",
+          "score": 0.607660534709637
+        },
+        {
+          "parent_id": "KMC2432-001v4",
+          "chunk_id": "KMC2432-001v4:task:2:2",
+          "score": 0.5826837243457769
+        },
+        {
+          "parent_id": "KMC2432-001v4",
+          "chunk_id": "KMC2432-001v4:overview:None:None",
+          "score": 0.5363509379059039
+        }
+      ],
+      "available_chunks": 7,
+      "score": 0.607660534709637
+    },
+    {
+      "id": "IIS3511-001v1",
+      "max_score": 0.6067741764962665,
+      "top_chunks": [
+        {
+          "parent_id": "IIS3511-001v1",
+          "chunk_id": "IIS3511-001v1:task:3:2",
+          "score": 0.6067741764962665
+        },
+        {
+          "parent_id": "IIS3511-001v1",
+          "chunk_id": "IIS3511-001v1:task:2:2",
+          "score": 0.5846118713315521
+        },
+        {
+          "parent_id": "IIS3511-001v1",
+          "chunk_id": "IIS3511-001v1:task:3:1",
+          "score": 0.5661057399537798
+        }
+      ],
+      "available_chunks": 8,
+      "score": 0.6067741764962665
+    }
+  ]
+}

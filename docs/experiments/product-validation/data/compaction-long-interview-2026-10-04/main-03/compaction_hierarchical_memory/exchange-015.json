@@ -1,0 +1,16 @@
+{
+  "event_id": "e015",
+  "execution_id": "9284a008-4b65-4c49-b0c2-aabf5ca8bdb5",
+  "employee_input": {
+    "source_id": "f5afa3cb-fd67-4c14-a4ed-97a3d7b748f3",
+    "interview_sequence": 30,
+    "speaker": "employee",
+    "interview_text": "我把確認後的缺貨風險及採購回覆的預計到貨日提供客服和倉庫，追蹤到補貨入庫、ERP更新且受影響訂單已有安排。客人通知、拆單或延後出貨由客服決定；採購決定補貨數量。"
+  },
+  "consultant_reply": {
+    "source_id": "89a09864-df5d-4673-8bd5-ba471a20af3e",
+    "interview_sequence": 31,
+    "speaker": "consultant",
+    "interview_text": "已補上缺貨確認後的追蹤與交接：您提供缺貨風險和採購回覆的預計到貨日給客服與倉庫，追蹤至補貨入庫、ERP 更新且受影響訂單已有安排；補貨數量由採購決定，客人通知及出貨安排由客服決定。\n\n接著了解您提到的店間調撥：通常什麼情況會啟動調撥？您會負責哪些步驟，申請或核准由誰處理？"
+  }
+}

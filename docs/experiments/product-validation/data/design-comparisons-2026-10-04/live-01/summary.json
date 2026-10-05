@@ -1,0 +1,98 @@
+{
+  "observed_trials": 2,
+  "planned_trials": 36,
+  "source_files_sha256": {
+    "docs\\experiments\\product-validation\\data\\design-comparisons-2026-10-04\\live-01\\results.jsonl": "1a9687f8ac7e333878e3df8788e63e8cdd668010c9ac7a8344ad2fe5c1bb8669"
+  },
+  "groups": [
+    {
+      "suite": "context",
+      "arm": "full",
+      "trials": 1,
+      "completed": 1,
+      "passed": 1,
+      "checks_passed": 7,
+      "checks_expected": 7,
+      "input_tokens": 159812,
+      "output_tokens": 333,
+      "cached_input_tokens": 78809,
+      "model_calls": 2,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "elapsed_seconds": 8.167
+    },
+    {
+      "suite": "context",
+      "arm": "selective",
+      "trials": 1,
+      "completed": 1,
+      "passed": 0,
+      "checks_passed": 6,
+      "checks_expected": 7,
+      "input_tokens": 10758,
+      "output_tokens": 372,
+      "cached_input_tokens": 6102,
+      "model_calls": 3,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "elapsed_seconds": 8.286
+    }
+  ],
+  "paired_input": {
+    "context": {
+      "paired_trials": 1,
+      "baseline_input": 159812,
+      "candidate_input": 10758,
+      "reduction_percent": 93.27
+    },
+    "locator": {
+      "paired_trials": 0,
+      "baseline_input": 0,
+      "candidate_input": 0,
+      "reduction_percent": null
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-10-03T16:28:45.340745+00:00",
+      "trial_id": "context-1-1-selective",
+      "suite": "context",
+      "case_id": "context-1",
+      "arm": "selective",
+      "repeat": 1,
+      "status": "completed",
+      "input_tokens": 10758,
+      "output_tokens": 372,
+      "cached_input_tokens": 6102,
+      "model_calls": 3,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "checks": {
+        "frequency": true,
+        "actor": true,
+        "approver": true,
+        "deadline": true,
+        "scope": true,
+        "authority": false,
+        "sources": true
+      },
+      "all_passed": false,
+      "answer": {
+        "facts": {
+          "frequency": "每月1次",
+          "actor": "本人",
+          "approver": "採購主管",
+          "deadline": "下月第2個工作日",
+          "scope": "國內一般採購",
+          "authority": "本人沒有核准權；實際更動採購條件須由採購主管決定。"
+        },
+        "interview_sequences": [
+          2,
+          4
+        ]
+      },
+      "elapsed_seconds": 8.286
+    }
+  ],
+  "standard_price_estimate_usd": 0.009768
+}

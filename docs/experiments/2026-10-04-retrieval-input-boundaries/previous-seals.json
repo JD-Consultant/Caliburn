@@ -1,0 +1,26 @@
+[
+  {
+    "experiment": "2026-10-04-occupation-retrieval",
+    "sealed_files": 132,
+    "all_sealed_hashes_unchanged": true,
+    "manifest_sha256": "f7f0f825085ab03770f145f0fa378abe66bca3192070d333943c4bf49463a1c8"
+  },
+  {
+    "experiment": "2026-10-04-occupation-retrieval-generalization",
+    "sealed_files": 69,
+    "all_sealed_hashes_unchanged": true,
+    "manifest_sha256": "9bba04edd87a1549f9f03b5e65b27213530c570b7839f752084ded940c7ba27c"
+  },
+  {
+    "experiment": "2026-10-04-retrieve-rerank",
+    "sealed_files": 86,
+    "all_sealed_hashes_unchanged": true,
+    "manifest_sha256": "4cf07280f3c1c6a0d6d6bc8f73c23c3406d571395fbbf21e9ed615e668d81221"
+  },
+  {
+    "experiment": "2026-10-04-retrieval-passage-quota",
+    "sealed_files": 96,
+    "all_sealed_hashes_unchanged": true,
+    "manifest_sha256": "f15d5d0829471ae565cca3314225f0a1a1032f8d691978d8f4f511cea044adb3"
+  }
+]

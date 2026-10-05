@@ -1,0 +1,7 @@
+# 暖機交接讀取競爭
+
+首個controller只等待rerank-results.json存在，GPU worker以exclusive create寫入大型JSON，controller可能在寫入未完成時開始讀取；JSONDecodeError並非模型失敗或資料語意錯誤。原console及controller保留、已固定hash不改。
+
+核對：GPU品質628個pair及rerank-results後來完整可解析；失敗controller尚未建立benchmark-requests，所以沒有暖機任務或GPU暖機需要重跑。worker仍在等第一筆交接。
+
+最小修訂benchmark_rerank_02.py改等worker在結果檔完全寫完後才建立的rerank-benchmark-pairs.jsonl，再讀結果。後續144次交接request／response原已採temp→rename；新controller另凍結hash。沒有重新品質推論、改排序或付費呼叫。

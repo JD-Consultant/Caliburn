@@ -1,0 +1,322 @@
+[
+  {
+    "case_id": "F01",
+    "document_id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": 4,
+        "in_top20": true
+      },
+      {
+        "method": "T-max",
+        "rank": null,
+        "in_top20": false
+      },
+      {
+        "method": "T-mean3",
+        "rank": null,
+        "in_top20": false
+      },
+      {
+        "method": "U-max",
+        "rank": null,
+        "in_top20": false
+      },
+      {
+        "method": "U-mean3",
+        "rank": null,
+        "in_top20": false
+      }
+    ]
+  },
+  {
+    "case_id": "F02",
+    "document_id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "T-max",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "T-mean3",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "U-max",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "U-mean3",
+        "rank": 2,
+        "in_top20": true
+      }
+    ]
+  },
+  {
+    "case_id": "F03",
+    "document_id": "FAC3313-001v2",
+    "title": "會計助理",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": 2,
+        "in_top20": true
+      },
+      {
+        "method": "T-max",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "T-mean3",
+        "rank": null,
+        "in_top20": true
+      },
+      {
+        "method": "U-max",
+        "rank": 2,
+        "in_top20": true
+      },
+      {
+        "method": "U-mean3",
+        "rank": 2,
+        "in_top20": true
+      }
+    ]
+  },
+  {
+    "case_id": "F03",
+    "document_id": "FAC4311-001v2",
+    "title": "會計人員",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "T-max",
+        "rank": 3,
+        "in_top20": true
+      },
+      {
+        "method": "T-mean3",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "U-max",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "U-mean3",
+        "rank": 1,
+        "in_top20": true
+      }
+    ]
+  },
+  {
+    "case_id": "F04",
+    "document_id": "SET3113-002v3",
+    "title": "冷凍空調技術人員",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": null,
+        "in_top20": false
+      },
+      {
+        "method": "T-max",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "T-mean3",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "U-max",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "U-mean3",
+        "rank": 2,
+        "in_top20": true
+      }
+    ]
+  },
+  {
+    "case_id": "F05",
+    "document_id": "AVA2172-002v3",
+    "title": "平面視覺傳達設計人員",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": 3,
+        "in_top20": true
+      },
+      {
+        "method": "T-max",
+        "rank": 1,
+        "in_top20": true
+      },
+      {
+        "method": "T-mean3",
+        "rank": null,
+        "in_top20": true
+      },
+      {
+        "method": "U-max",
+        "rank": 2,
+        "in_top20": true
+      },
+      {
+        "method": "U-mean3",
+        "rank": 5,
+        "in_top20": true
+      }
+    ]
+  },
+  {
+    "case_id": "H02",
+    "document_id": "MMP4321-003v4",
+    "title": "零售業倉儲管理人員",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": 5,
+        "in_top20": true
+      },
+      {
+        "method": "T-max",
+        "rank": null,
+        "in_top20": false
+      },
+      {
+        "method": "T-mean3",
+        "rank": null,
+        "in_top20": false
+      },
+      {
+        "method": "U-max",
+        "rank": null,
+        "in_top20": true
+      },
+      {
+        "method": "U-mean3",
+        "rank": null,
+        "in_top20": true
+      }
+    ]
+  },
+  {
+    "case_id": "H02",
+    "document_id": "RLM9330-001v1",
+    "title": "電商物流中心理貨員",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": 2,
+        "in_top20": true
+      },
+      {
+        "method": "T-max",
+        "rank": null,
+        "in_top20": true
+      },
+      {
+        "method": "T-mean3",
+        "rank": 3,
+        "in_top20": true
+      },
+      {
+        "method": "U-max",
+        "rank": 4,
+        "in_top20": true
+      },
+      {
+        "method": "U-mean3",
+        "rank": 2,
+        "in_top20": true
+      }
+    ]
+  },
+  {
+    "case_id": "H03",
+    "document_id": "BAS3323-003v3",
+    "title": "採購助理",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": 4,
+        "in_top20": true
+      },
+      {
+        "method": "T-max",
+        "rank": 2,
+        "in_top20": true
+      },
+      {
+        "method": "T-mean3",
+        "rank": null,
+        "in_top20": true
+      },
+      {
+        "method": "U-max",
+        "rank": 4,
+        "in_top20": true
+      },
+      {
+        "method": "U-mean3",
+        "rank": 3,
+        "in_top20": true
+      }
+    ]
+  },
+  {
+    "case_id": "H03",
+    "document_id": "MMP1324-001v4",
+    "title": "資材人員",
+    "methods": [
+      {
+        "method": "D-max",
+        "rank": null,
+        "in_top20": true
+      },
+      {
+        "method": "T-max",
+        "rank": null,
+        "in_top20": true
+      },
+      {
+        "method": "T-mean3",
+        "rank": 5,
+        "in_top20": true
+      },
+      {
+        "method": "U-max",
+        "rank": null,
+        "in_top20": true
+      },
+      {
+        "method": "U-mean3",
+        "rank": null,
+        "in_top20": true
+      }
+    ]
+  }
+]

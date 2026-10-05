@@ -1,0 +1,29 @@
+{
+  "job_id": "J031",
+  "phase": "grade",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版提到依指示製作廣告資料或文宣品，與員工製作視覺素材有局部關聯；但這是概括性的單項工作，公版核心還包括文案企劃、素材蒐集、行政建檔及推廣支援，未能代表員工主要的視覺設計工作組合。",
+    "evidence": [
+      {
+        "employee_quote": "我主要替公司的活動和商品製作視覺素材。",
+        "reference_quote": "依指示協助製作相關廣告資料或文宣品。"
+      },
+      {
+        "employee_quote": "做版面、字體、色彩和圖片處理",
+        "reference_quote": "依指示協助製作相關廣告資料或文宣品。"
+      }
+    ],
+    "limitations": [
+      "公版未明確涵蓋版面、字體、色彩與圖片處理，也未提及跨尺寸製作、依回饋修訂及輸出交付。",
+      "公版主要工作組合偏向廣告文案企劃、素材蒐集、行政支援與推廣作業，和員工主要職責不相符。"
+    ]
+  },
+  "seconds": 8.840280299948063,
+  "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+  "document_sha256": "1cf018a7ec33eac437ab6a68c7443f6a1e7e3dbe7aea3fbfc709dd8fd4cbb7b5",
+  "case_id": "F05",
+  "document_id": "KMC2431-006v3"
+}

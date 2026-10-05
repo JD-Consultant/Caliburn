@@ -1,0 +1,29 @@
+Skipping import of cpp extensions due to incompatible torch version 2.10.0+cu128 for torchao version 0.14.0         Please see GitHub issue #2919 for more info
+passage scores E01: 200 docs, 13.79s
+passage scores E02: 200 docs, 13.85s
+passage scores E03: 200 docs, 11.84s
+passage scores E04: 200 docs, 13.92s
+passage scores E05: 200 docs, 13.89s
+passage scores E06: 200 docs, 14.98s
+passage scores E07: 200 docs, 14.11s
+passage scores E08: 200 docs, 14.41s
+passage scores E09: 200 docs, 12.80s
+passage scores E10: 200 docs, 11.80s
+passage scores E11: 200 docs, 13.03s
+passage scores E12: 200 docs, 12.93s
+passage scores E13: 200 docs, 13.33s
+passage scores E14: 200 docs, 14.28s
+passage scores M01: 200 docs, 18.87s
+passage scores M02: 200 docs, 19.87s
+passage scores M03: 200 docs, 18.93s
+passage scores M04: 200 docs, 18.71s
+passage timing 1 N=20: 1.43s
+passage timing 1 N=50: 3.66s
+passage timing 1 N=100: 7.31s
+passage timing 1 N=200: 14.96s
+passage timing 1 N=805: 66.60s
+passage timing 2 N=20: 1.45s
+passage timing 2 N=50: 3.74s
+passage timing 2 N=100: 7.19s
+passage timing 2 N=200: 14.83s
+passage timing 2 N=805: 64.81s

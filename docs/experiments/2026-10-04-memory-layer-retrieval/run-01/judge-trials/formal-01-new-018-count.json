@@ -1,0 +1,7 @@
+{
+  "response": {
+    "input_tokens": 5421,
+    "object": "response.input_tokens"
+  },
+  "seconds": 0.36531570000806823
+}

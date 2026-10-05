@@ -1,0 +1,9 @@
+{
+  "host": "127.0.0.1",
+  "port": 55442,
+  "database": "caliburn_rag_memory_test",
+  "schema": "eval_rag_memory_ec2a005be9074b3992cbe0a60cefea81",
+  "new_database": false,
+  "container": "caliburn-rag-memory-pg-20261004",
+  "production_schema_touched": false
+}

@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-memory-public-unit-retrieval\run-01\judge.py", line 8, in <module>
+    from common import *
+  File "S:\caliburn\docs\experiments\2026-10-05-memory-public-unit-retrieval\run-01\common.py", line 26, in <module>
+    aggregate=load('unit_chunks',PUBLIC/'chunks.py').aggregate
+              ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-memory-public-unit-retrieval\run-01\common.py", line 21, in load
+    spec=importlib.util.spec_from_file_location(name,p);m=importlib.util.module_from_spec(spec);sys.modules[name]=m;spec.loader.exec_module(m);return m
+                                                                                                                    ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "S:\caliburn\docs\experiments\2026-10-04-public-chunk-retrieval\run-01\chunks.py", line 8, in <module>
+    from evaluation import clean_text
+  File "S:\caliburn\docs\experiments\2026-10-04-occupation-retrieval\evaluation.py", line 7, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'

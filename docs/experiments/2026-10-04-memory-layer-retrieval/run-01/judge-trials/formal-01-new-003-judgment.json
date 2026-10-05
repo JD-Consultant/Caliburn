@@ -1,0 +1,28 @@
+{
+  "job_id": "new-003",
+  "phase": "formal-01",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心工作是零售商品採買、供應商協商、物流及庫存管理，與員工持續負責的會員網站前端畫面、互動、API 串接及瀏覽器品質開發維護沒有有意義的工作對應，不能代表其主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "我平常負責會員網站的畫面。",
+        "reference_quote": "負責執行零售業貨品採買管理作業以規劃、接洽供應商及議價。"
+      },
+      {
+        "employee_quote": "API 的內部邏輯、權限規則和資料庫由另一位同事開發",
+        "reference_quote": "賣場存貨以及成本管理。"
+      }
+    ],
+    "limitations": [
+      "員工明確表示 API 內部邏輯、權限規則及資料庫由同事負責；公版也未呈現其主要的前端畫面、互動元件、API 串接或瀏覽器品質工作。"
+    ]
+  },
+  "seconds": 6.386456900043413,
+  "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+  "document_sha256": "fc08429ca9c360ee7912334c01c068fc5913b0c30b0e60c0d6d9e59c70abcd48",
+  "case_id": "F02",
+  "document_id": "KRM3323-001v4"
+}

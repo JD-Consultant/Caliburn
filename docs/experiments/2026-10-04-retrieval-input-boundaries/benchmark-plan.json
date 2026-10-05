@@ -1,0 +1,138 @@
+{
+  "input_manifest_sha256": "2cf607741319518ed04a79be69e4ad6f12fc7549b90bcf27ae509fcc52c870be",
+  "requests": [
+    {
+      "request_id": "E01-original_messages-1",
+      "case_id": "E01",
+      "variant": "original_messages",
+      "repeat": 1,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "E01-original_messages-2",
+      "case_id": "E01",
+      "variant": "original_messages",
+      "repeat": 2,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "E01-joined_employee-1",
+      "case_id": "E01",
+      "variant": "joined_employee",
+      "repeat": 1,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "E01-joined_employee-2",
+      "case_id": "E01",
+      "variant": "joined_employee",
+      "repeat": 2,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "E01-sentence_pieces-1",
+      "case_id": "E01",
+      "variant": "sentence_pieces",
+      "repeat": 1,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "E01-sentence_pieces-2",
+      "case_id": "E01",
+      "variant": "sentence_pieces",
+      "repeat": 2,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "M04-original_messages-1",
+      "case_id": "M04",
+      "variant": "original_messages",
+      "repeat": 1,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "M04-original_messages-2",
+      "case_id": "M04",
+      "variant": "original_messages",
+      "repeat": 2,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "M04-joined_employee-1",
+      "case_id": "M04",
+      "variant": "joined_employee",
+      "repeat": 1,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "M04-joined_employee-2",
+      "case_id": "M04",
+      "variant": "joined_employee",
+      "repeat": 2,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "M04-sentence_pieces-1",
+      "case_id": "M04",
+      "variant": "sentence_pieces",
+      "repeat": 1,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    },
+    {
+      "request_id": "M04-sentence_pieces-2",
+      "case_id": "M04",
+      "variant": "sentence_pieces",
+      "repeat": 2,
+      "config": {
+        "method": "quota_rerank",
+        "n": 20,
+        "k": 5
+      }
+    }
+  ],
+  "scope": "Warm cached embeddings, actual DB/tokenization/GPU/file handoff/merge; no parameter selection"
+}

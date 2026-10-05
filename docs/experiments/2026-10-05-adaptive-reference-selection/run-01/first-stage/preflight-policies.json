@@ -1,0 +1,3950 @@
+[
+  {
+    "policy_id": "D_fixed_5",
+    "mode": "D",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_fixed_5",
+    "mode": "T",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "fixed",
+        "value": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_5",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 5
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_fixed_10",
+    "mode": "D",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 10
+      }
+    }
+  },
+  {
+    "policy_id": "T_fixed_10",
+    "mode": "T",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "fixed",
+        "value": 10
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_10",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 10
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 10
+      }
+    }
+  },
+  {
+    "policy_id": "D_fixed_20",
+    "mode": "D",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 20
+      }
+    }
+  },
+  {
+    "policy_id": "T_fixed_20",
+    "mode": "T",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "fixed",
+        "value": 20
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_20",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 20
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 20
+      }
+    }
+  },
+  {
+    "policy_id": "D_fixed_40",
+    "mode": "D",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 40
+      }
+    }
+  },
+  {
+    "policy_id": "T_fixed_40",
+    "mode": "T",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "fixed",
+        "value": 40
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_40",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 40
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 40
+      }
+    }
+  },
+  {
+    "policy_id": "D_fixed_80",
+    "mode": "D",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 80
+      }
+    }
+  },
+  {
+    "policy_id": "T_fixed_80",
+    "mode": "T",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "fixed",
+        "value": 80
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_80",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 80
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 80
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.5",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.5",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.5",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.5
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.525",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.525
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.525",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.525
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.525",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.525
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.525
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.55",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.55
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.55",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.55
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.55",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.55
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.55
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.575",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.575
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.575",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.575
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.575",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.575
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.575
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.6",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.6
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.6",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.6
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.6",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.6
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.6
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.625",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.625
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.625",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.625
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.625",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.625
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.625
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.65",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.65
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.65",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.65
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.65",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.65
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.65
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.675",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.675
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.675",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.675
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.675",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.675
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.675
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.7",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.7
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.7",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.7
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.7",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.7
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.7
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.725",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.725
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.725",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.725
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.725",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.725
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.725
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.75",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.75",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.75",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.75
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.775",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.775
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.775",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.775
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.775",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.775
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.775
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.8",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.8",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.8",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.8
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.825",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.825
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.825",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.825
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.825",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.825
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.825
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.85",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.85
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.85",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.85
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.85",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.85
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.85
+      }
+    }
+  },
+  {
+    "policy_id": "D_relative_0.01",
+    "mode": "D",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "T_relative_0.01",
+    "mode": "T",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_0.01",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.01
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "D_relative_0.02",
+    "mode": "D",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "T_relative_0.02",
+    "mode": "T",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "relative",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_0.02",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.02
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "D_relative_0.03",
+    "mode": "D",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "T_relative_0.03",
+    "mode": "T",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "relative",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_0.03",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.03
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "D_relative_0.05",
+    "mode": "D",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "T_relative_0.05",
+    "mode": "T",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "relative",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_0.05",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.05
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "D_relative_0.08",
+    "mode": "D",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.08
+      }
+    }
+  },
+  {
+    "policy_id": "T_relative_0.08",
+    "mode": "T",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "relative",
+        "value": 0.08
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_0.08",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.08
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.08
+      }
+    }
+  },
+  {
+    "policy_id": "D_relative_0.1",
+    "mode": "D",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.1
+      }
+    }
+  },
+  {
+    "policy_id": "T_relative_0.1",
+    "mode": "T",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "relative",
+        "value": 0.1
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_0.1",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.1
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.1
+      }
+    }
+  },
+  {
+    "policy_id": "D_relative_0.15",
+    "mode": "D",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.15
+      }
+    }
+  },
+  {
+    "policy_id": "T_relative_0.15",
+    "mode": "T",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "relative",
+        "value": 0.15
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_0.15",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.15
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.15
+      }
+    }
+  },
+  {
+    "policy_id": "D_gap_0.005",
+    "mode": "D",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.005
+      }
+    }
+  },
+  {
+    "policy_id": "T_gap_0.005",
+    "mode": "T",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "gap",
+        "value": 0.005
+      }
+    }
+  },
+  {
+    "policy_id": "DT_gap_0.005",
+    "mode": "DT",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.005
+      },
+      "T": {
+        "kind": "gap",
+        "value": 0.005
+      }
+    }
+  },
+  {
+    "policy_id": "D_gap_0.01",
+    "mode": "D",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "T_gap_0.01",
+    "mode": "T",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "gap",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "DT_gap_0.01",
+    "mode": "DT",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.01
+      },
+      "T": {
+        "kind": "gap",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "D_gap_0.02",
+    "mode": "D",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "T_gap_0.02",
+    "mode": "T",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "gap",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "DT_gap_0.02",
+    "mode": "DT",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.02
+      },
+      "T": {
+        "kind": "gap",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "D_gap_0.03",
+    "mode": "D",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "T_gap_0.03",
+    "mode": "T",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "gap",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "DT_gap_0.03",
+    "mode": "DT",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.03
+      },
+      "T": {
+        "kind": "gap",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "D_gap_0.05",
+    "mode": "D",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "T_gap_0.05",
+    "mode": "T",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "gap",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "DT_gap_0.05",
+    "mode": "DT",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.05
+      },
+      "T": {
+        "kind": "gap",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.5_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.5,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.5_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.5,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.5_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.5,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.5,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.5_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.5,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.5_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.5,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.5_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.5,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.5,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.525_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.525,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.525_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.525,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.525_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.525,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.525,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.525_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.525,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.525_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.525,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.525_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.525,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.525,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.55_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.55,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.55_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.55,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.55_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.55,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.55,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.55_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.55,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.55_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.55,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.55_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.55,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.55,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.575_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.575,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.575_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.575,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.575_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.575,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.575,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.575_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.575,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.575_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.575,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.575_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.575,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.575,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.6_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.6,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.6_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.6,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.6_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.6,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.6,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.6_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.6,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.6_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.6,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.6_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.6,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.6,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.625_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.625,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.625_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.625,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.625_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.625,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.625,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.625_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.625,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.625_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.625,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.625_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.625,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.625,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.65_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.65,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.65_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.65,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.65_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.65,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.65,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.65_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.65,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.65_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.65,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.65_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.65,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.65,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.675_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.675,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.675_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.675,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.675_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.675,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.675,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.675_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.675,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.675_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.675,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.675_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.675,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.675,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.7_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.7_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.7_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.7_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.7_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.7_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.725_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.725_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.725_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.725_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.725_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.725_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.75_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.75_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.75_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.75_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.75_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.75_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.775_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.775_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.775_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.775_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.775_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.775_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.8_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.8_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.8_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.8_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.8_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.8_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.825_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.825_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.825_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.825_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.825_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.825_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.85_floor3",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.85_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.85_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 3
+      }
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.85_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.85_floor5",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.85_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 5
+      }
+    }
+  },
+  {
+    "policy_id": "D_full",
+    "mode": "D",
+    "family": "full",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "full"
+      }
+    }
+  },
+  {
+    "policy_id": "T_full",
+    "mode": "T",
+    "family": "full",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "full"
+      }
+    }
+  },
+  {
+    "policy_id": "DT_full",
+    "mode": "DT",
+    "family": "full",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "full"
+      },
+      "T": {
+        "kind": "full"
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D5_T10",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 5
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 10
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D5_T20",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 5
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 20
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D5_T40",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 5
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 40
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D5_T80",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 5
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 80
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D10_T5",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 10
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D10_T20",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 10
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 20
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D10_T40",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 10
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 40
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D10_T80",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 10
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 80
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D20_T5",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 20
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D20_T10",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 20
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 10
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D20_T40",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 20
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 40
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D20_T80",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 20
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 80
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D40_T5",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 40
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D40_T10",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 40
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 10
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D40_T20",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 40
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 20
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D40_T80",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 40
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 80
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D80_T5",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 80
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 5
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D80_T10",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 80
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 10
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D80_T20",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 80
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 20
+      }
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D80_T40",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 80
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 40
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.6_T0.65",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.6
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.65
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.6_T0.7",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.6
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.7
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.6_T0.75",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.6
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.6_T0.8",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.6
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.65_T0.6",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.65
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.6
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.65_T0.7",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.65
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.7
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.65_T0.75",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.65
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.65_T0.8",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.65
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.7_T0.6",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.7
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.6
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.7_T0.65",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.7
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.65
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.7_T0.75",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.7
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.7_T0.8",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.7
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.75_T0.6",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.75
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.6
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.75_T0.65",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.75
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.65
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.75_T0.7",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.75
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.7
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.75_T0.8",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.75
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.8_T0.6",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.8
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.6
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.8_T0.65",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.8
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.65
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.8_T0.7",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.8
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.7
+      }
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.8_T0.75",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.8
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.01_T0.02",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.01
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.01_T0.03",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.01
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.01_T0.05",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.01
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.01_T0.08",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.01
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.08
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.01_T0.1",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.01
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.1
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.01_T0.15",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.01
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.15
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.02_T0.01",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.02
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.02_T0.03",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.02
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.02_T0.05",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.02
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.02_T0.08",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.02
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.08
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.02_T0.1",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.02
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.1
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.02_T0.15",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.02
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.15
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.03_T0.01",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.03
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.03_T0.02",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.03
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.03_T0.05",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.03
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.03_T0.08",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.03
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.08
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.03_T0.1",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.03
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.1
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.03_T0.15",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.03
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.15
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.05_T0.01",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.05
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.05_T0.02",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.05
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.05_T0.03",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.05
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.05_T0.08",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.05
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.08
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.05_T0.1",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.05
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.1
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.05_T0.15",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.05
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.15
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.08_T0.01",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.08
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.08_T0.02",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.08
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.08_T0.03",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.08
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.08_T0.05",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.08
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.08_T0.1",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.08
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.1
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.08_T0.15",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.08
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.15
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.1_T0.01",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.1
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.1_T0.02",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.1
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.1_T0.03",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.1
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.1_T0.05",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.1
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.1_T0.08",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.1
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.08
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.1_T0.15",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.1
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.15
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.15_T0.01",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.15
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.15_T0.02",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.15
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.02
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.15_T0.03",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.15
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.03
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.15_T0.05",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.15
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.05
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.15_T0.08",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.15
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.08
+      }
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.15_T0.1",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.15
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.1
+      }
+    }
+  }
+]

@@ -1,0 +1,38 @@
+{
+  "status": "completed",
+  "results": [
+    {
+      "cell": "control-1",
+      "status": "completed",
+      "understandings": 4,
+      "seconds": 163.9177812000271
+    },
+    {
+      "cell": "candidate-1",
+      "status": "completed",
+      "understandings": 13,
+      "seconds": 144.53956409997772
+    }
+  ],
+  "failure": null,
+  "occupied_usd": "0.017453670",
+  "cumulative_occupied_usd": "1.253991040",
+  "pending": {
+    "control-1-1": "0.0001",
+    "control-1-3": "0.0001",
+    "control-1-5": "0.0001",
+    "control-1-7": "0.0001",
+    "control-1-9": "0.0001",
+    "control-1-11": "0.0001",
+    "control-1-13": "0.0001",
+    "control-1-15": "0.0001",
+    "control-1-17": "0.0001",
+    "candidate-1-19": "0.0001",
+    "candidate-1-21": "0.0001",
+    "candidate-1-23": "0.0001",
+    "candidate-1-25": "0.0001",
+    "candidate-1-27": "0.0001",
+    "candidate-1-29": "0.0001"
+  },
+  "seconds": 308.58060109999496
+}

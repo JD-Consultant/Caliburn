@@ -1,0 +1,173 @@
+{
+  "profile": {
+    "revision_id": "b9dbcfcf-7ad8-4415-97d3-f43234eaa219",
+    "profile": {
+      "job_title": "庫存與物流行政專員",
+      "organization_unit": "營運部",
+      "reports_to": "倉儲主管",
+      "purpose": "透過到貨登錄、庫存差異與缺貨追蹤、退貨、店間調撥及庫存報表等行政作業，維持營運所需庫存資訊與物流作業的可追蹤性，並支援相關單位掌握庫存狀況。採購訂貨決策及客服對客人處理、對外承諾交期不在此職務責任範圍。"
+    }
+  },
+  "work": {
+    "revision_id": "b9dbcfcf-7ad8-4415-97d3-f43234eaa219",
+    "areas": [
+      {
+        "area_id": "dd676f46-f3f4-4bf0-b81b-da95f4c2db9a",
+        "content_revision_id": "180ed18a-900a-4f6e-9b0f-bbbd03e72301",
+        "title": "庫存與物流行政作業",
+        "scope_text": "處理到貨登錄、庫存差異與缺貨追蹤、退貨、店間調撥及庫存報表等工作；採購訂貨決策與客服對客處理及對外承諾交期不屬此職責範圍。"
+      }
+    ],
+    "tasks": [],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "evidence": [
+    {
+      "entry": {
+        "citation_id": "7fd1a5d7-be0b-458a-8304-73d78ba9f38e",
+        "target_label": "職務名稱",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "job_title",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "29b963bb-3899-4da2-9835-abcb748c32c9",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "2a713dcb-5572-4feb-b817-6382d156b541",
+        "target_label": "所屬單位",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "organization_unit",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "29b963bb-3899-4da2-9835-abcb748c32c9",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "64f49bf4-3fc5-436e-b5e9-759477f18e4c",
+        "target_label": "直屬主管",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "reports_to",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "29b963bb-3899-4da2-9835-abcb748c32c9",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "c6b2b68f-e2e6-44b8-a2f9-8d6a0d442f4b",
+        "target_label": "職務目的",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "purpose",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "29b963bb-3899-4da2-9835-abcb748c32c9",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "b7fc94b6-0b67-45cf-9c77-e50d13597a7e",
+        "target_label": "職責：庫存與物流行政作業",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "area",
+          "item_id": "dd676f46-f3f4-4bf0-b81b-da95f4c2db9a",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "29b963bb-3899-4da2-9835-abcb748c32c9",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    }
+  ],
+  "interviews": [
+    {
+      "message": {
+        "source_id": "56d7883b-2e48-4c25-ba77-9e02a9f7487b",
+        "interview_sequence": 1,
+        "speaker": "app",
+        "interview_text": "這裡會透過訪談，逐步理解您的實際工作並整理職務說明書。您不需要先學會撰寫，也不必一次說完；不確定的地方可以直接說明。\n\n請先說說您目前主要負責哪些工作？可以用自己的說法，從平常大家會找您處理的事情開始。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "29b963bb-3899-4da2-9835-abcb748c32c9",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "d6564c5c-23f7-4ded-a95d-f2976e8786f0",
+        "interview_sequence": 3,
+        "speaker": "consultant",
+        "interview_text": "已先整理職務名稱、所屬單位、匯報對象與職務目的，也把您列出的庫存與物流行政工作歸為一個職責範圍。採購訂貨決策、客服對客處理及對外承諾交期，已標明不屬於您的責任。\n\n我們先從「到貨登錄」開始：貨到時，您通常依據哪些資料登錄、會核對哪些內容？若資料或實際到貨有差異，您會怎麼處理、交給誰？"
+      },
+      "execution_id": "b9ff317b-33a1-47d1-9ba8-6f9fec24c750"
+    }
+  ]
+}

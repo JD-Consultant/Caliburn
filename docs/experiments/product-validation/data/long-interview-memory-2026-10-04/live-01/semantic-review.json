@@ -1,0 +1,94 @@
+{
+  "results_sha256": "a21468f51ae43567a8b930570b70c2ce6751010c8d0b0058e8930f1769d36c79",
+  "method": "Explicit semantic assessment by the primary engineering reviewer, cross-checked by a read-only AI reviewer against frozen cases, raw employee messages and actual read outputs. Not an independent human-expert or blinded JD evaluation.",
+  "fact_indices": "1-based within each frozen case. Unknown agreement in the recent-only control is abstention, not successful historical recall.",
+  "citation_support": "complete means selected employee sources collectively support all frozen facts; partial means only some; none means no supporting source. invalid_sequences records unrelated selections or non-employee messages. fully_supported_cases additionally requires no invalid_sequences.",
+  "disputed_fact": {
+    "case_id": "early_quality",
+    "index": 3,
+    "strict_interpretation": "Gold asks who accepts the return/exchange/deduction proposal; hierarchical body and answer instead identify acceptance of defective incoming goods. Strict primary score does not award this fact.",
+    "alternative_interpretation": "Employee sequence 10 says '是否接受由主管決定' without explicitly identifying the acceptance object. Treating both statements as the same acceptance authority yields 27/27 instead of 26/27 for each hierarchical trial; other citation defects remain. Original gold and outputs are unchanged."
+  },
+  "trials": [
+    {"arm":"full_history","repeat":1,"cases":[
+      {"case_id":"early_quality","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_payment","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_peak_and_negotiation","facts_pass":[1,2,3,4,5],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"middle_emergency","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[],"note":"50,52,56 suffice; 44 is not mandatory when its facts recur."},
+      {"case_id":"cross_period_correction","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[],"note":"6,8 support historical statements; 52,54 support correction and current uncertainty."},
+      {"case_id":"late_customs","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"late_onboarding","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"unknown_source","facts_pass":[1],"citation_support":"complete","invalid_sequences":[]}
+    ]},
+    {"arm":"flat_summary","repeat":1,"cases":[
+      {"case_id":"early_quality","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_payment","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_peak_and_negotiation","facts_pass":[1,2,3,4,5],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"middle_emergency","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"cross_period_correction","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[55],"note":"55 is consultant paraphrase; 52,54 cover current employee evidence."},
+      {"case_id":"late_customs","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"late_onboarding","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"unknown_source","facts_pass":[1],"citation_support":"complete","invalid_sequences":[21],"note":"22 supports the unknown; 21 is a consultant question. Extra Monday detail comes from employee 20, not cited."}
+    ]},
+    {"arm":"hierarchical_memory","repeat":1,"cases":[
+      {"case_id":"early_quality","facts_pass":[1,2],"citation_support":"partial","invalid_sequences":[],"disputed_facts":[3]},
+      {"case_id":"early_payment","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_peak_and_negotiation","facts_pass":[1,2,3,4,5],"citation_support":"complete","invalid_sequences":[24,30],"note":"26,28 support the five facts; 34 supports extra Excel detail. 24 is requisition validation, 30 concerns different daily negotiation."},
+      {"case_id":"middle_emergency","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[46,48,54],"note":"44,50,56 cover all facts; added demand-review and normal-limit sources do not support this answer."},
+      {"case_id":"cross_period_correction","facts_pass":[1,2,3,4],"citation_support":"none","invalid_sequences":[74,76],"note":"74 concerns demand planning; 76 concerns order changes, neither contains approval limits."},
+      {"case_id":"late_customs","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"late_onboarding","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"unknown_source","facts_pass":[1],"citation_support":"none","invalid_sequences":[58],"note":"58 concerns a copper delivery incident; actual list-source uncertainty is 22."}
+    ]},
+    {"arm":"recent_only","repeat":1,"cases":[
+      {"case_id":"early_quality","facts_pass":[],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"early_payment","facts_pass":[],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"early_peak_and_negotiation","facts_pass":[],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"middle_emergency","facts_pass":[4],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"cross_period_correction","facts_pass":[4],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"late_customs","facts_pass":[3],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"late_onboarding","facts_pass":[4],"citation_support":"none","invalid_sequences":[],"note":"Recounts consultant 89 but ultimately labels known teaching/frequency/appraisal facts unconfirmed; no credit for facts 1-3."},
+      {"case_id":"unknown_source","facts_pass":[1],"citation_support":"none","invalid_sequences":[]}
+    ]},
+    {"arm":"recent_only","repeat":2,"cases":[
+      {"case_id":"early_quality","facts_pass":[],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"early_payment","facts_pass":[],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"early_peak_and_negotiation","facts_pass":[],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"middle_emergency","facts_pass":[4],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"cross_period_correction","facts_pass":[4],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"late_customs","facts_pass":[3],"citation_support":"none","invalid_sequences":[]},
+      {"case_id":"late_onboarding","facts_pass":[4],"citation_support":"none","invalid_sequences":[90],"note":"90 only states that main work was covered, not which onboarding facts were confirmed."},
+      {"case_id":"unknown_source","facts_pass":[1],"citation_support":"none","invalid_sequences":[]}
+    ]},
+    {"arm":"hierarchical_memory","repeat":2,"cases":[
+      {"case_id":"early_quality","facts_pass":[1,2],"citation_support":"partial","invalid_sequences":[],"disputed_facts":[3]},
+      {"case_id":"early_payment","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_peak_and_negotiation","facts_pass":[1,2,3,4,5],"citation_support":"complete","invalid_sequences":[24,30]},
+      {"case_id":"middle_emergency","facts_pass":[1,2,3,4],"citation_support":"partial","invalid_sequences":[46,48],"note":"44,50 support facts 1-3; selected sources omit employee 56 for ERP uncertainty."},
+      {"case_id":"cross_period_correction","facts_pass":[1,2,3,4],"citation_support":"none","invalid_sequences":[65,66,67,68,74,76],"note":"65,67 are consultant messages; others address work scope/emergency frequency/planning/order changes, not limits."},
+      {"case_id":"late_customs","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"late_onboarding","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"unknown_source","facts_pass":[1],"citation_support":"none","invalid_sequences":[58]}
+    ]},
+    {"arm":"flat_summary","repeat":2,"cases":[
+      {"case_id":"early_quality","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_payment","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_peak_and_negotiation","facts_pass":[1,2,3,4,5],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"middle_emergency","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"cross_period_correction","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[55]},
+      {"case_id":"late_customs","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"late_onboarding","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"unknown_source","facts_pass":[1],"citation_support":"complete","invalid_sequences":[21]}
+    ]},
+    {"arm":"full_history","repeat":2,"cases":[
+      {"case_id":"early_quality","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_payment","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"early_peak_and_negotiation","facts_pass":[1,2,3,4,5],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"middle_emergency","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"cross_period_correction","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"late_customs","facts_pass":[1,2,3],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"late_onboarding","facts_pass":[1,2,3,4],"citation_support":"complete","invalid_sequences":[]},
+      {"case_id":"unknown_source","facts_pass":[1],"citation_support":"complete","invalid_sequences":[]}
+    ]}
+  ]
+}

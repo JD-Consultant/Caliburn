@@ -1,0 +1,9 @@
+{
+  "phase": "calibrate-02",
+  "jobs": 7,
+  "completed": 7,
+  "failures": [],
+  "elapsed_seconds": 12.750921999977436,
+  "estimated_or_reserved_total_usd": "0.003849105",
+  "all_anchors_matched": true
+}

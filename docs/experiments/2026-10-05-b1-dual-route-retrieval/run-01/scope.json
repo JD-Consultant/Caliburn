@@ -1,0 +1,11 @@
+{
+  "new_embedding_calls": 0,
+  "new_memory_calls": 0,
+  "new_rerank_calls": 0,
+  "new_provider_calls": 0,
+  "external_cost_usd": 0,
+  "fresh_db_calls": 0,
+  "fresh_service_latency_measured": false,
+  "new_holdout": false,
+  "full_corpus_recall": false
+}

@@ -1,0 +1,20 @@
+{
+  "job_id": "J040",
+  "phase": "grade",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心工作是廠務系統、廠房設施與設備的維護、工程規劃及工安；員工的兩個主要領域則是訂單系統的瀏覽器畫面開發，以及 API、商業規則與資料存取開發。工作對象與責任範圍不相符，沒有可代表主要工作的實質對應。",
+    "evidence": [],
+    "limitations": [
+      "公版提及異常處理、維護等通用動作，但其上下文均指廠務系統或廠房設施，不足以支持員工的訂單系統工作。",
+      "員工偶爾協助同事處理網路問題，不是主要工作；公司設備維護亦由其他人負責。"
+    ]
+  },
+  "seconds": 4.40610469999956,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "540883d8be7efa2c5ad96ea1d5b84f76eaf464f61cf7a097ab0aff397d569a52",
+  "case_id": "F01",
+  "document_id": "MIM2141-001v4"
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "job_id": "new-011",
+    "field": "reference_quote",
+    "before": "依活動計畫書,進行活動前置確認,並說明活動參與者報到、接待流程、活動進行流程與安全須知。",
+    "after": "依活動計劃書,進行活動前置確認,並說明活動參與者報到、接待流程、活動進行流程與安全須知。",
+    "source_offset": 471,
+    "source_unique_literal_match": true,
+    "grade_unchanged": 2,
+    "all_non_evidence_fields_unchanged": true,
+    "type": "manual exact source transcription; punctuation or small wording; no new model call"
+  },
+  {
+    "job_id": "new-012",
+    "field": "reference_quote",
+    "before": "統計銷售日報表、月報表或會計報表，以作為商品資料庫分析與預測。",
+    "after": "統計銷售日報表、月報表或會計報表,以作為商品資料庫分析與預測。",
+    "source_offset": 1038,
+    "source_unique_literal_match": true,
+    "grade_unchanged": 1,
+    "all_non_evidence_fields_unchanged": true,
+    "type": "manual exact source transcription; punctuation or small wording; no new model call"
+  },
+  {
+    "job_id": "new-017",
+    "field": "employee_quote",
+    "before": "我會寫處理訂單的 API、權限檢查和商業規則",
+    "after": "我也會寫處理訂單的 API、權限檢查和商業規則",
+    "source_offset": 77,
+    "source_unique_literal_match": true,
+    "grade_unchanged": 1,
+    "all_non_evidence_fields_unchanged": true,
+    "type": "manual exact source transcription; punctuation or small wording; no new model call"
+  },
+  {
+    "job_id": "new-031",
+    "field": "reference_quote",
+    "before": "依據昇降設備安裝工序,選用適切安裝設備進行安裝作業。",
+    "after": "依照昇降設備安裝工序,選用適切安裝設備進行安裝作業。",
+    "source_offset": 426,
+    "source_unique_literal_match": true,
+    "grade_unchanged": 1,
+    "all_non_evidence_fields_unchanged": true,
+    "type": "manual exact source transcription; punctuation or small wording; no new model call"
+  },
+  {
+    "job_id": "new-043",
+    "field": "reference_quote",
+    "before": "針對供應商品質異常狀況,開立報告要求供應商提出改善對策，必要時協助供應商完成改善對策。",
+    "after": "針對供應商品質異常狀況,開立報告要求供應商提出改善對策,必要時協助供應商完成改善對策。",
+    "source_offset": 1194,
+    "source_unique_literal_match": true,
+    "grade_unchanged": 2,
+    "all_non_evidence_fields_unchanged": true,
+    "type": "manual exact source transcription; punctuation or small wording; no new model call"
+  },
+  {
+    "job_id": "new-044",
+    "field": "reference_quote",
+    "before": "定期評鑑及監控關鍵原物料供應商製程能力及產品品質，確保供應商具有產出符合採購合約要求之能力。",
+    "after": "定期評鑑及監控關鍵原物料供應商製程能力及產品品質,確保供應商具有產出符合採購合約要求之能力。",
+    "source_offset": 1881,
+    "source_unique_literal_match": true,
+    "grade_unchanged": 2,
+    "all_non_evidence_fields_unchanged": true,
+    "type": "manual exact source transcription; punctuation or small wording; no new model call"
+  }
+]

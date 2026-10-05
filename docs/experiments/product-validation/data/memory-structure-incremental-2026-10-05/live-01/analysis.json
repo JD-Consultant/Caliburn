@@ -1,0 +1,374 @@
+{
+  "method": "response usage once per HTTP response; tools once per actual invoke, not repeated native history; characters are not tokens",
+  "cells": {
+    "initial-two_layer-b1": {
+      "rate_wait_seconds": 19.990505499998108,
+      "model_responses": 2,
+      "input_tokens": 7340,
+      "cached_input_tokens": 3263,
+      "output_tokens": 781,
+      "reasoning_tokens": 221,
+      "max_input_tokens": 4074,
+      "tool_calls": 2,
+      "tool:create_work_situation": 2,
+      "tool_errors": 0,
+      "estimated_generation_usd": "0.000932605"
+    },
+    "initial-two_layer-b2": {
+      "rate_wait_seconds": 29.984946299984585,
+      "model_responses": 3,
+      "input_tokens": 14682,
+      "cached_input_tokens": 8619,
+      "output_tokens": 1513,
+      "reasoning_tokens": 750,
+      "max_input_tokens": 6057,
+      "tool_calls": 4,
+      "tool:read_work_situation": 2,
+      "tool_errors": 0,
+      "read_characters": 674,
+      "tool:create_work_understanding": 2,
+      "estimated_generation_usd": "0.001600340"
+    },
+    "initial-one_collection-single": {
+      "rate_wait_seconds": 19.99084679997759,
+      "model_responses": 2,
+      "input_tokens": 7376,
+      "cached_input_tokens": 3298,
+      "output_tokens": 747,
+      "reasoning_tokens": 281,
+      "max_input_tokens": 4075,
+      "tool_calls": 2,
+      "tool:create_work_understanding": 2,
+      "tool_errors": 0,
+      "estimated_generation_usd": "0.000916080"
+    },
+    "corrections-one_collection-single": {
+      "rate_wait_seconds": 39.98103079997236,
+      "model_responses": 4,
+      "input_tokens": 16362,
+      "cached_input_tokens": 13932,
+      "output_tokens": 1574,
+      "reasoning_tokens": 722,
+      "max_input_tokens": 5138,
+      "tool_calls": 4,
+      "tool:read_work_understanding": 2,
+      "tool_errors": 1,
+      "read_characters": 578,
+      "tool:update_work_understanding": 2,
+      "estimated_generation_usd": "0.001229770"
+    },
+    "corrections-two_layer-b1": {
+      "rate_wait_seconds": 29.984428099996876,
+      "model_responses": 3,
+      "input_tokens": 11732,
+      "cached_input_tokens": 9586,
+      "output_tokens": 1148,
+      "reasoning_tokens": 552,
+      "max_input_tokens": 4822,
+      "tool_calls": 4,
+      "tool:read_work_situation": 2,
+      "tool_errors": 0,
+      "read_characters": 674,
+      "tool:update_work_situation": 2,
+      "estimated_generation_usd": "0.000937885"
+    },
+    "corrections-two_layer-b2": {
+      "rate_wait_seconds": 29.982179300044663,
+      "model_responses": 3,
+      "input_tokens": 16866,
+      "cached_input_tokens": 13420,
+      "output_tokens": 883,
+      "reasoning_tokens": 381,
+      "max_input_tokens": 6482,
+      "tool_calls": 3,
+      "tool:read_work_understanding": 2,
+      "tool_errors": 0,
+      "read_characters": 1234,
+      "tool:update_work_understanding": 1,
+      "estimated_generation_usd": "0.001006225"
+    },
+    "extension-two_layer-b1": {
+      "rate_wait_seconds": 29.98600490001263,
+      "model_responses": 3,
+      "input_tokens": 12477,
+      "cached_input_tokens": 9707,
+      "output_tokens": 1701,
+      "reasoning_tokens": 966,
+      "max_input_tokens": 5446,
+      "tool_calls": 4,
+      "tool:read_work_situation": 2,
+      "tool_errors": 0,
+      "read_characters": 729,
+      "tool:update_work_situation": 2,
+      "estimated_generation_usd": "0.001293595"
+    },
+    "extension-two_layer-b2": {
+      "rate_wait_seconds": 29.981391400040593,
+      "model_responses": 3,
+      "input_tokens": 19749,
+      "cached_input_tokens": 14706,
+      "output_tokens": 1646,
+      "reasoning_tokens": 957,
+      "max_input_tokens": 8079,
+      "tool_calls": 5,
+      "tool:read_work_understanding": 2,
+      "tool_errors": 0,
+      "read_characters": 1861,
+      "tool:read_work_situation": 1,
+      "tool:update_work_understanding": 1,
+      "tool:create_work_understanding": 1,
+      "estimated_generation_usd": "0.001600210"
+    },
+    "extension-one_collection-single": {
+      "rate_wait_seconds": 59.95534719986608,
+      "model_responses": 6,
+      "input_tokens": 29346,
+      "cached_input_tokens": 25688,
+      "output_tokens": 1950,
+      "reasoning_tokens": 930,
+      "max_input_tokens": 6360,
+      "tool_calls": 7,
+      "tool:read_work_understanding": 4,
+      "tool_errors": 0,
+      "read_characters": 1535,
+      "tool:update_work_understanding": 2,
+      "tool:create_work_understanding": 1,
+      "estimated_generation_usd": "0.001688680"
+    },
+    "read-post_delivery-two_layer": {
+      "rate_wait_seconds": 19.991735599993262,
+      "model_responses": 2,
+      "input_tokens": 4131,
+      "cached_input_tokens": 1774,
+      "output_tokens": 553,
+      "reasoning_tokens": 311,
+      "max_input_tokens": 2354,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 703,
+      "estimated_generation_usd": "0.000588715"
+    },
+    "read-post_delivery-one_collection": {
+      "rate_wait_seconds": 19.99334279994946,
+      "model_responses": 2,
+      "input_tokens": 2911,
+      "cached_input_tokens": 1298,
+      "output_tokens": 630,
+      "reasoning_tokens": 429,
+      "max_input_tokens": 1610,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 347,
+      "estimated_generation_usd": "0.000529455"
+    },
+    "read-maintenance-one_collection": {
+      "rate_wait_seconds": 19.989306999952532,
+      "model_responses": 2,
+      "input_tokens": 2923,
+      "cached_input_tokens": 2366,
+      "output_tokens": 363,
+      "reasoning_tokens": 163,
+      "max_input_tokens": 1616,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 347,
+      "estimated_generation_usd": "0.000274635"
+    }
+  },
+  "totals": {
+    "two_layer/maintenance": {
+      "rate_wait_seconds": 169.90945550007746,
+      "model_responses": 17,
+      "input_tokens": 82846,
+      "cached_input_tokens": 59301,
+      "output_tokens": 7672,
+      "reasoning_tokens": 3827,
+      "max_input_tokens": 8079,
+      "tool_calls": 22,
+      "tool:create_work_situation": 2,
+      "tool_errors": 0,
+      "tool:read_work_situation": 7,
+      "read_characters": 5172,
+      "tool:create_work_understanding": 3,
+      "tool:update_work_situation": 4,
+      "tool:read_work_understanding": 4,
+      "tool:update_work_understanding": 2,
+      "estimated_generation_usd": "0.007370860"
+    },
+    "two_layer/reading": {
+      "rate_wait_seconds": 19.991735599993262,
+      "model_responses": 2,
+      "input_tokens": 4131,
+      "cached_input_tokens": 1774,
+      "output_tokens": 553,
+      "reasoning_tokens": 311,
+      "max_input_tokens": 2354,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 703,
+      "estimated_generation_usd": "0.000588715"
+    },
+    "one_collection/maintenance": {
+      "rate_wait_seconds": 119.92722479981603,
+      "model_responses": 12,
+      "input_tokens": 53084,
+      "cached_input_tokens": 42918,
+      "output_tokens": 4271,
+      "reasoning_tokens": 1933,
+      "max_input_tokens": 6360,
+      "tool_calls": 13,
+      "tool:create_work_understanding": 3,
+      "tool_errors": 1,
+      "tool:read_work_understanding": 6,
+      "read_characters": 2113,
+      "tool:update_work_understanding": 4,
+      "estimated_generation_usd": "0.003834530"
+    },
+    "one_collection/reading": {
+      "rate_wait_seconds": 39.98264979990199,
+      "model_responses": 4,
+      "input_tokens": 5834,
+      "cached_input_tokens": 3664,
+      "output_tokens": 993,
+      "reasoning_tokens": 592,
+      "max_input_tokens": 1616,
+      "tool_calls": 2,
+      "tool:read_work_understanding": 2,
+      "tool_errors": 0,
+      "read_characters": 694,
+      "estimated_generation_usd": "0.000804090"
+    }
+  },
+  "snapshots": {
+    "workspace-corrections-one_collection-single.json": {
+      "work_situation": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 304,
+        "reference_edges": 7,
+        "map_characters": 235
+      }
+    },
+    "workspace-corrections-two_layer-b1.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 372,
+        "reference_edges": 8,
+        "map_characters": 258
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 424,
+        "reference_edges": 4,
+        "map_characters": 214
+      }
+    },
+    "workspace-corrections-two_layer-b2.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 372,
+        "reference_edges": 8,
+        "map_characters": 258
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 448,
+        "reference_edges": 4,
+        "map_characters": 250
+      }
+    },
+    "workspace-extension-one_collection-single.json": {
+      "work_situation": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      },
+      "work_understanding": {
+        "objects": 3,
+        "body_characters": 435,
+        "reference_edges": 9,
+        "map_characters": 342
+      }
+    },
+    "workspace-extension-two_layer-b1.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 476,
+        "reference_edges": 10,
+        "map_characters": 313
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 448,
+        "reference_edges": 4,
+        "map_characters": 250
+      }
+    },
+    "workspace-extension-two_layer-b2.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 476,
+        "reference_edges": 10,
+        "map_characters": 313
+      },
+      "work_understanding": {
+        "objects": 3,
+        "body_characters": 650,
+        "reference_edges": 5,
+        "map_characters": 385
+      }
+    },
+    "workspace-initial-one_collection-single.json": {
+      "work_situation": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 276,
+        "reference_edges": 5,
+        "map_characters": 218
+      }
+    },
+    "workspace-initial-two_layer-b1.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 347,
+        "reference_edges": 6,
+        "map_characters": 236
+      },
+      "work_understanding": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      }
+    },
+    "workspace-initial-two_layer-b2.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 347,
+        "reference_edges": 6,
+        "map_characters": 236
+      },
+      "work_understanding": {
+        "objects": 2,
+        "body_characters": 424,
+        "reference_edges": 4,
+        "map_characters": 214
+      }
+    }
+  }
+}

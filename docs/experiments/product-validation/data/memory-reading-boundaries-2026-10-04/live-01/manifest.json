@@ -1,0 +1,77 @@
+{
+  "prepared_at": "2026-10-04T15:01:22.418302+00:00",
+  "kind": "controlled-information-gaps-and-task-field-consistency",
+  "model": "gpt-6-luna",
+  "effort": "high",
+  "sdk_version": "3.20.0",
+  "max_output_tokens": 8192,
+  "max_estimated_usd": "0.05",
+  "max_seconds": 900,
+  "prior_occupied_usd": "1.089763360",
+  "cumulative_limit_usd": "2.00",
+  "schedule": [
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "complete",
+      "cell_id": "complete-1"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "situation_gap",
+      "cell_id": "situation_gap-1"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "interview_gap",
+      "cell_id": "interview_gap-1"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "interview_gap",
+      "cell_id": "interview_gap-2"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "situation_gap",
+      "cell_id": "situation_gap-2"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "complete",
+      "cell_id": "complete-2"
+    }
+  ],
+  "head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "instructions_sha256": "0b97bc5aae6e5f2482862dbcddc41190c770fd7b7b69c70b94715a8745b9152a",
+  "tools_sha256": {
+    "raw_memory": "825849d5d389b13ed619cc4639486f70d156b266601edb0ee066284cf2315309"
+  },
+  "initial_sha256": {
+    "complete": "b38b75ce7470fa94eb8b2bc0e2a70738fb70647d57fbb746bff9796702012e7a",
+    "situation_gap": "1a00924ea442d439bcc83c810dda64c0519c4fe9a37a7353a525d0eb2fd1afa9",
+    "interview_gap": "b024dc1b977027585446bc470921db502754d83c39b31ce80b0c9f48c117b0e6"
+  },
+  "source_sha256": {
+    "docs\\experiments\\product-validation\\data\\memory-reading-boundaries-2026-10-04\\study.py": "e3bce631f0f387f8d406faf83b5999f4846f89165af953a1a0c54f3bd27e06c6",
+    "docs\\experiments\\product-validation\\data\\memory-reading-boundaries-2026-10-04\\fixtures.py": "26c07b97fe01bf17835923c8018552671ee80a41cd9313b5f43a9ae99e93cf28",
+    "docs\\experiments\\product-validation\\data\\memory-reading-boundaries-2026-10-04\\test_fixtures.py": "7b31378bf8c0affb196a143c63b024512eb9dd8fac09119f617374571b662df6",
+    "docs\\experiments\\product-validation\\data\\memory-reading-boundaries-2026-10-04\\cases.json": "65f12f987339ea1f0754bbad81d38442bdbd8e172bf7b1e2528c14fef05f2375",
+    "docs\\experiments\\product-validation\\data\\memory-reading-boundaries-2026-10-04\\README.md": "ff763018aa7481b09654e9aac9cdb81be5c8e87500e620e25a225752af881af1",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\experiment.py": "b5cda90cbf3419281637b23e0fb4a202f971eedbff341321d344bdf558e3b1a9",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\support.py": "19a2816265c682093737c45d784a0e847e1868bb22f3c3c038127310b684627b",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\analyze.py": "073b2e2b5f1846180089ab742c7aa45dcb2d471fb384bf784685a20d02b407ce",
+    "docs\\experiments\\product-validation\\data\\design-comparisons-2026-10-04\\provider_observations.py": "bfe9ef1189a4a0bae9d3825c0e041656be9483c1bc506f1ea2022c4e13bdd24e",
+    "docs\\experiments\\product-validation\\data\\memory-reading-policy-2026-10-04\\live-01\\manifest.json": "006cc8742bdf4be7578e72950dc947c7beecabf0b6a1ab2b4a76fce477888708",
+    "docs\\experiments\\product-validation\\data\\memory-reading-policy-2026-10-04\\live-01\\instructions.json": "f82482c089a7fd29475ca1a0396e733fb0b9a7b5036223ed300e1f109dd668fe",
+    "docs\\experiments\\product-validation\\data\\memory-reading-policy-2026-10-04\\live-01\\materials.json": "79ee15ab0510286e9cdcfc507a6a6632384a8b7cca8fdabb6c82dff20ae5eba7",
+    "docs\\experiments\\product-validation\\data\\memory-reading-policy-2026-10-04\\live-01\\initial-corrections.json": "fd482a846d3e8a0b8d2445503b4d554c4fb162116e5ebfff63b123f60b84dd54",
+    "docs\\experiments\\product-validation\\data\\memory-reading-policy-2026-10-04\\live-01\\result.json": "fe9cb68616ba85b9e79a5133448d369e67a725bd2680038aac606336c8705fea"
+  },
+  "pricing_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2"
+}

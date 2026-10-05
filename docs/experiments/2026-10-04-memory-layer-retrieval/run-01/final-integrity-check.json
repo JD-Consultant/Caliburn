@@ -1,0 +1,14 @@
+{
+  "checked_manifests": {
+    "analysis-code-manifest.json": 2,
+    "input-manifest.json": 30,
+    "query-input-manifest.json": 11,
+    "retrieval-code-manifest.json": 6
+  },
+  "current_owner_source_hashes_match": 39,
+  "source_recording_phase": "after first five captures; role instruction hashes fixed before first provider call",
+  "analysis_or_production_code_modified_for_review": false,
+  "additional_inputs_verified_by_verify.py": {
+    "capture-amendment-inputs.json": 2
+  }
+}

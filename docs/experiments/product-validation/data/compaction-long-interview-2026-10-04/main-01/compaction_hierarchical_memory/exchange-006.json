@@ -1,0 +1,16 @@
+{
+  "event_id": "e006",
+  "execution_id": "e9eff89c-3e15-485a-9227-39d023c65135",
+  "employee_input": {
+    "source_id": "ba2fe23d-3c41-40d9-ba59-8ca458401c6f",
+    "interview_sequence": 12,
+    "speaker": "employee",
+    "interview_text": "收貨異常不是通知完就結束。我更新差異清單和處理進度；兩個工作日沒回覆就提醒採購，第四個工作日仍沒進展再回報主管。要到補貨或退貨完成、帳物相符才結案；供應商幾時真的補來不是我能保證的。"
+  },
+  "consultant_reply": {
+    "source_id": "a7c6802e-016a-46e8-bf44-e143b611e6bf",
+    "interview_sequence": 13,
+    "speaker": "consultant",
+    "interview_text": "已另外整理一項「追蹤收貨異常至結案」：您會更新差異清單與處理進度，兩個工作日未獲回覆時提醒採購，第四個工作日仍無進展時回報主管；要等補貨或退貨完成且帳物相符才結案，供應商實際補貨時間不由您保證。\n\n結案前的「帳物相符」，通常是由您核對確認，還是由倉庫同事確認？"
+  }
+}

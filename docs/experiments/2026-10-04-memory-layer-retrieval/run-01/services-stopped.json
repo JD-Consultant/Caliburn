@@ -1,0 +1,29 @@
+{
+  "qdrant_pid": 31332,
+  "data_deleted": false,
+  "qdrant_identity_verified": true,
+  "postgres": {
+    "name": "caliburn-rag-memory-pg-20261004",
+    "status": "exited",
+    "running": false,
+    "finished_at": "2026-10-04T16:16:46.585208528Z"
+  },
+  "embedder": {
+    "name": "caliburn-ocs-eval-embedder-1",
+    "status": "exited",
+    "running": false,
+    "finished_at": "2026-10-04T16:16:50.526204701Z"
+  },
+  "original_postgres_containers_still_running": [
+    "caliburn-jd-docker-test-postgres-1",
+    "caliburn-jd-postgres-18-6"
+  ],
+  "listen_ports_after_stop": {
+    "6335": false,
+    "6336": false,
+    "55442": false
+  },
+  "post_stop_identity_check": "docker inspect state only; Get-NetTCPConnection Listen only",
+  "credentials_inspected": false,
+  "container_or_volume_removed": false
+}

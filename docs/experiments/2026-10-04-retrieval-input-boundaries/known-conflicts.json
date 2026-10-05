@@ -1,0 +1,230 @@
+[
+  {
+    "case_id": "E01",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "MEM7231-006v4"
+    ]
+  },
+  {
+    "case_id": "E01",
+    "variant": "joined_employee",
+    "known_conflicting_retained": [
+      "MEM7231-006v4"
+    ]
+  },
+  {
+    "case_id": "E01",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "MEM7231-006v4",
+      "MEM7213-001v2"
+    ]
+  },
+  {
+    "case_id": "E02",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "MPM7223-001v3",
+      "MPD7223-001v3"
+    ]
+  },
+  {
+    "case_id": "E02",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "MPM7223-001v3",
+      "MPD7223-001v3"
+    ]
+  },
+  {
+    "case_id": "E03",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "TFB7914-001v3"
+    ]
+  },
+  {
+    "case_id": "E03",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "TFB7914-001v3"
+    ]
+  },
+  {
+    "case_id": "E04",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "INM2529-003v2"
+    ]
+  },
+  {
+    "case_id": "E04",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "INM2529-003v2"
+    ]
+  },
+  {
+    "case_id": "E05",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "TTM1411-001v4"
+    ]
+  },
+  {
+    "case_id": "E05",
+    "variant": "joined_employee",
+    "known_conflicting_retained": [
+      "TTM1411-001v4"
+    ]
+  },
+  {
+    "case_id": "E05",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "TTM1411-001v4"
+    ]
+  },
+  {
+    "case_id": "E06",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "NAO6010-004v3"
+    ]
+  },
+  {
+    "case_id": "E06",
+    "variant": "joined_employee",
+    "known_conflicting_retained": [
+      "NAO6010-004v3"
+    ]
+  },
+  {
+    "case_id": "E06",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "NAO6010-004v3"
+    ]
+  },
+  {
+    "case_id": "E07",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "MPM2144-001v4"
+    ]
+  },
+  {
+    "case_id": "E07",
+    "variant": "joined_employee",
+    "known_conflicting_retained": [
+      "MPM2144-001v4"
+    ]
+  },
+  {
+    "case_id": "E07",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "MPM2144-001v4"
+    ]
+  },
+  {
+    "case_id": "E08",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "PIC5193-006v1"
+    ]
+  },
+  {
+    "case_id": "E08",
+    "variant": "joined_employee",
+    "known_conflicting_retained": [
+      "PIC5193-006v1"
+    ]
+  },
+  {
+    "case_id": "E08",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "PIC5193-006v1"
+    ]
+  },
+  {
+    "case_id": "M01",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "MEM7231-006v4"
+    ]
+  },
+  {
+    "case_id": "M01",
+    "variant": "joined_employee",
+    "known_conflicting_retained": [
+      "MEM7231-006v4"
+    ]
+  },
+  {
+    "case_id": "M01",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "MEM7231-006v4",
+      "MEM7213-001v2"
+    ]
+  },
+  {
+    "case_id": "M02",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "INM2529-003v2"
+    ]
+  },
+  {
+    "case_id": "M02",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "INM2529-003v2"
+    ]
+  },
+  {
+    "case_id": "M03",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "TTM1411-001v4"
+    ]
+  },
+  {
+    "case_id": "M03",
+    "variant": "joined_employee",
+    "known_conflicting_retained": [
+      "TTM1411-001v4"
+    ]
+  },
+  {
+    "case_id": "M03",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "TTM1411-001v4"
+    ]
+  },
+  {
+    "case_id": "M04",
+    "variant": "original_messages",
+    "known_conflicting_retained": [
+      "PIC5193-006v1"
+    ]
+  },
+  {
+    "case_id": "M04",
+    "variant": "joined_employee",
+    "known_conflicting_retained": [
+      "PIC5193-006v1"
+    ]
+  },
+  {
+    "case_id": "M04",
+    "variant": "sentence_pieces",
+    "known_conflicting_retained": [
+      "PIC5193-006v1"
+    ]
+  }
+]

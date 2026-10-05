@@ -1,0 +1,34 @@
+{
+  "docs\\experiments\\2026-10-05-adaptive-reference-selection\\run-01\\first-stage\\results.json": {
+    "sha256": "a5ce1d2e1c492445e86629d35a02f5cdb68662fb69bd11bbd8af062f19365dad",
+    "bytes": 17771844
+  },
+  "docs\\experiments\\2026-10-05-adaptive-reference-selection\\run-01\\first-stage\\policies.json": {
+    "sha256": "46aca8777c1918d02d7af4af6a69bdb9eeb4470496c7b9e43cb4ea196c905a1e",
+    "bytes": 72187
+  },
+  "docs\\experiments\\2026-10-05-adaptive-reference-selection\\run-01\\policies.json": {
+    "sha256": "b1862f1e3e2b0e31b6f2ca390bdda7b7c965fa1c0d73ba2e3c05fd9bfe8f6e34",
+    "bytes": 6652
+  },
+  "docs\\experiments\\2026-10-05-adaptive-reference-selection\\run-01\\candidate-pools.json": {
+    "sha256": "8e9361a850ce0fd3ce962bd779ea06ea64b4ffba39b9d148671bde4af7a5ab76",
+    "bytes": 258642
+  },
+  "docs\\experiments\\2026-10-05-adaptive-reference-selection\\run-01\\scope-update.md": {
+    "sha256": "93a9d31888064471e43bbf48b1a13ed2473578cedd748f570488184b7a21d3d6",
+    "bytes": 1716
+  },
+  "docs\\experiments\\2026-10-05-adaptive-reference-selection\\run-01\\compose.py": {
+    "sha256": "b45f35f4783d7ce0c78724817ee540bb14f0db24bba401ca4a7c7a23f06dfe99",
+    "bytes": 8073
+  },
+  "docs\\experiments\\2026-10-05-memory-public-unit-retrieval\\run-01\\cases.json": {
+    "sha256": "6089e469ffb78f7e3300fc62f5afd499e8427cd76b3e01e2e29b708aa4b7ae3b",
+    "bytes": 76963
+  },
+  "docs\\experiments\\2026-10-05-initial-retrieval-depth\\run-01\\targets.json": {
+    "sha256": "2fca43dcbdc18dd484053608d067480477b73bbb9fba315fbd1698a2b5dd2fe1",
+    "bytes": 32623
+  }
+}

@@ -1,0 +1,347 @@
+[
+  {
+    "case_id": "F01",
+    "method": "R01",
+    "samples_seconds": [
+      0.007036700029857457,
+      0.0219543999992311,
+      0.027141799975652248
+    ],
+    "all_trial_samples_seconds": [
+      0.007036700029857457,
+      0.0219543999992311,
+      0.027141799975652248
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.0219543999992311,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F01",
+    "method": "R02",
+    "samples_seconds": [
+      0.5456109000369906,
+      0.4956446000142023
+    ],
+    "all_trial_samples_seconds": [
+      59.19428599998355,
+      0.5456109000369906,
+      0.4956446000142023
+    ],
+    "warm_sample_count": 2,
+    "median_seconds": 0.5206277500255965,
+    "startup_included_trials": [
+      {
+        "task_id": "F01-R02-1",
+        "total_seconds": 59.19428599998355,
+        "gpu_worker_seconds": 0.6781991780007957
+      }
+    ]
+  },
+  {
+    "case_id": "F01",
+    "method": "R03",
+    "samples_seconds": [
+      0.03329409996513277,
+      0.03069449996110052,
+      0.032224199967458844
+    ],
+    "all_trial_samples_seconds": [
+      0.03329409996513277,
+      0.03069449996110052,
+      0.032224199967458844
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.032224199967458844,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F01",
+    "method": "R04",
+    "samples_seconds": [
+      1.0152078000246547,
+      0.9980649000499398,
+      1.0000391999492422
+    ],
+    "all_trial_samples_seconds": [
+      1.0152078000246547,
+      0.9980649000499398,
+      1.0000391999492422
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 1.0000391999492422,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F02",
+    "method": "R01",
+    "samples_seconds": [
+      0.022851100016850978,
+      0.0032645000028423965,
+      0.026198200008366257
+    ],
+    "all_trial_samples_seconds": [
+      0.022851100016850978,
+      0.0032645000028423965,
+      0.026198200008366257
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.022851100016850978,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F02",
+    "method": "R02",
+    "samples_seconds": [
+      0.5715027999831364,
+      0.4721710000303574,
+      0.5063850000151433
+    ],
+    "all_trial_samples_seconds": [
+      0.5715027999831364,
+      0.4721710000303574,
+      0.5063850000151433
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.5063850000151433,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F02",
+    "method": "R03",
+    "samples_seconds": [
+      0.03434239997295663,
+      0.036460099974647164,
+      0.005717699998058379
+    ],
+    "all_trial_samples_seconds": [
+      0.03434239997295663,
+      0.036460099974647164,
+      0.005717699998058379
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.03434239997295663,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F02",
+    "method": "R04",
+    "samples_seconds": [
+      0.9515135000110604,
+      0.9082244000164792,
+      0.9029965999652632
+    ],
+    "all_trial_samples_seconds": [
+      0.9515135000110604,
+      0.9082244000164792,
+      0.9029965999652632
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.9082244000164792,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F03",
+    "method": "R01",
+    "samples_seconds": [
+      0.018191799987107515,
+      0.014929800003301352,
+      0.02604219998465851
+    ],
+    "all_trial_samples_seconds": [
+      0.018191799987107515,
+      0.014929800003301352,
+      0.02604219998465851
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.018191799987107515,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F03",
+    "method": "R02",
+    "samples_seconds": [
+      0.5579406000324525,
+      0.551165199954994,
+      0.5501957000233233
+    ],
+    "all_trial_samples_seconds": [
+      0.5579406000324525,
+      0.551165199954994,
+      0.5501957000233233
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.551165199954994,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F03",
+    "method": "R03",
+    "samples_seconds": [
+      0.005849200009834021,
+      0.039107699994929135,
+      0.037961099995300174
+    ],
+    "all_trial_samples_seconds": [
+      0.005849200009834021,
+      0.039107699994929135,
+      0.037961099995300174
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.037961099995300174,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F03",
+    "method": "R04",
+    "samples_seconds": [
+      1.0080487999948673,
+      0.9886012999922968,
+      0.9989017999614589
+    ],
+    "all_trial_samples_seconds": [
+      1.0080487999948673,
+      0.9886012999922968,
+      0.9989017999614589
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.9989017999614589,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F04",
+    "method": "R01",
+    "samples_seconds": [
+      0.020736300037242472,
+      0.016410599986556917,
+      0.023124200000893325
+    ],
+    "all_trial_samples_seconds": [
+      0.020736300037242472,
+      0.016410599986556917,
+      0.023124200000893325
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.020736300037242472,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F04",
+    "method": "R02",
+    "samples_seconds": [
+      0.5346095000277273,
+      0.5301753000239842,
+      0.5164904000121169
+    ],
+    "all_trial_samples_seconds": [
+      0.5346095000277273,
+      0.5301753000239842,
+      0.5164904000121169
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.5301753000239842,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F04",
+    "method": "R03",
+    "samples_seconds": [
+      0.03825219999998808,
+      0.026232600037474185,
+      0.04020920000039041
+    ],
+    "all_trial_samples_seconds": [
+      0.03825219999998808,
+      0.026232600037474185,
+      0.04020920000039041
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.03825219999998808,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F04",
+    "method": "R04",
+    "samples_seconds": [
+      0.884405099961441,
+      0.9114502999582328,
+      0.8724779000040144
+    ],
+    "all_trial_samples_seconds": [
+      0.884405099961441,
+      0.9114502999582328,
+      0.8724779000040144
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.884405099961441,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F05",
+    "method": "R01",
+    "samples_seconds": [
+      0.014565900026354939,
+      0.0033113000099547207,
+      0.020767899986822158
+    ],
+    "all_trial_samples_seconds": [
+      0.014565900026354939,
+      0.0033113000099547207,
+      0.020767899986822158
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.014565900026354939,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F05",
+    "method": "R02",
+    "samples_seconds": [
+      0.4442648999975063,
+      0.4347678999765776,
+      0.46372979995794594
+    ],
+    "all_trial_samples_seconds": [
+      0.4442648999975063,
+      0.4347678999765776,
+      0.46372979995794594
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.4442648999975063,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F05",
+    "method": "R03",
+    "samples_seconds": [
+      0.026544900028966367,
+      0.03539209999144077,
+      0.018183999985922128
+    ],
+    "all_trial_samples_seconds": [
+      0.026544900028966367,
+      0.03539209999144077,
+      0.018183999985922128
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.026544900028966367,
+    "startup_included_trials": []
+  },
+  {
+    "case_id": "F05",
+    "method": "R04",
+    "samples_seconds": [
+      0.784397599985823,
+      0.7685718999709934,
+      0.7786230000201613
+    ],
+    "all_trial_samples_seconds": [
+      0.784397599985823,
+      0.7685718999709934,
+      0.7786230000201613
+    ],
+    "warm_sample_count": 3,
+    "median_seconds": 0.7786230000201613,
+    "startup_included_trials": []
+  }
+]

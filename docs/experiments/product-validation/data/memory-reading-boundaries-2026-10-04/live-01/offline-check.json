@@ -1,0 +1,11 @@
+{
+  "provider_calls": 0,
+  "schedule_cells": 6,
+  "unchanged_original_messages": true,
+  "same_candidate_prompt": true,
+  "same_tools": true,
+  "preloaded_sequences": [
+    105
+  ],
+  "grading_not_preloaded": true
+}

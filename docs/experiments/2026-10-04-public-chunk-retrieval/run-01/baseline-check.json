@@ -1,0 +1,34 @@
+[
+  {
+    "case_id": "F01",
+    "same_top5_ids": true
+  },
+  {
+    "case_id": "F02",
+    "same_top5_ids": true
+  },
+  {
+    "case_id": "F03",
+    "same_top5_ids": true
+  },
+  {
+    "case_id": "F04",
+    "same_top5_ids": true
+  },
+  {
+    "case_id": "F05",
+    "same_top5_ids": true
+  },
+  {
+    "case_id": "H01",
+    "same_top5_ids": true
+  },
+  {
+    "case_id": "H02",
+    "same_top5_ids": true
+  },
+  {
+    "case_id": "H03",
+    "same_top5_ids": true
+  }
+]

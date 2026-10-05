@@ -1,0 +1,3 @@
+﻿trial_id,suite,case_id,arm,repeat,status,all_passed,input_tokens,output_tokens,cached_input_tokens,model_calls,read_calls,rejected_calls,elapsed_seconds
+context-1-1-full,context,context-1,full,1,completed,True,159812,333,78809,2,2,0,8.167
+context-1-1-selective,context,context-1,selective,1,completed,False,10758,372,6102,3,2,0,8.286

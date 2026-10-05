@@ -1,0 +1,26 @@
+{
+  "type": "ModelStepLimitError",
+  "cell": "control-1",
+  "location": [
+    {
+      "file": "_retry.py",
+      "line": 744,
+      "function": "arun_with_retry"
+    },
+    {
+      "file": "_runnable.py",
+      "line": 756,
+      "function": "ainvoke"
+    },
+    {
+      "file": "_runnable.py",
+      "line": 522,
+      "function": "ainvoke"
+    },
+    {
+      "file": "tool_steps.py",
+      "line": 894,
+      "function": "prepare_next_request"
+    }
+  ]
+}

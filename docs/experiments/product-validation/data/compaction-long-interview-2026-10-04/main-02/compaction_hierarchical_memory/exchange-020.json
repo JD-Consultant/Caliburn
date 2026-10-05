@@ -1,0 +1,16 @@
+{
+  "event_id": "e020",
+  "execution_id": "c52001bc-a9d6-4729-b466-6cbc526a9bfc",
+  "employee_input": {
+    "source_id": "a5c03a53-3df7-4c50-a219-fcc192e6eef9",
+    "interview_sequence": 40,
+    "speaker": "employee",
+    "interview_text": "調撥完成後我整理調撥紀錄，保留原單號、發收兩店與批號。拆單或退回得重新取得核准；我可以提醒與追蹤，但不決定各店分配比例。"
+  },
+  "consultant_reply": {
+    "source_id": "5052a094-90b8-4f2c-aeaa-c5aa7a293ecc",
+    "interview_sequence": 41,
+    "speaker": "consultant",
+    "interview_text": "已把調撥收尾補進草稿：完成後保留原單號、發出店、收貨店與批號；拆單或退回須重新取得核准，您可提醒與追蹤，但不決定各店分配比例。\n\n您提到的庫存報表和這份調撥紀錄是不同資料嗎？若另有庫存報表，最常整理的那份包含哪些內容、提供給誰？"
+  }
+}

@@ -1,0 +1,1 @@
+{"at": "2026-10-03T16:39:38.691036+00:00", "event": "stopped", "error_type": "BudgetExceededError", "model_calls": 8, "input_tokens": 27371, "output_tokens": 1044, "compactions": 0, "cached_tokens": 19301, "outbound_calls": 17}

@@ -1,0 +1,23 @@
+{
+  "results": [
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 1,
+      "case_id": "responsibility_correction",
+      "cell_id": "responsibility_correction-baseline-1",
+      "status": "stopped",
+      "reads": [],
+      "usage": [],
+      "proposal": null
+    }
+  ],
+  "generation_calls": 0,
+  "outbound_calls": 1,
+  "occupied_usd": "0.0001",
+  "cumulative_occupied_usd": "1.105018450",
+  "pending": {
+    "count-responsibility_correction-baseline-1-1": "0.0001"
+  },
+  "seconds": 12.13405299995793
+}

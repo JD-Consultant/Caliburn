@@ -1,0 +1,121 @@
+{
+  "status": "incomplete",
+  "failure": {
+    "type": "ValueError",
+    "reason": "response_incomplete",
+    "current": {
+      "phase": "flat_capture",
+      "batch": 4
+    }
+  },
+  "not_run": [
+    {
+      "case_id": "corrections",
+      "arm": "memory",
+      "repeat": 1
+    },
+    {
+      "case_id": "corrections",
+      "arm": "flat",
+      "repeat": 1
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "memory",
+      "repeat": 1
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "flat",
+      "repeat": 1
+    },
+    {
+      "case_id": "corrections",
+      "arm": "flat",
+      "repeat": 2
+    },
+    {
+      "case_id": "corrections",
+      "arm": "memory",
+      "repeat": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "flat",
+      "repeat": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "memory",
+      "repeat": 2
+    }
+  ],
+  "results": [],
+  "capture_usage": [
+    {
+      "batch": 1,
+      "usage": {
+        "input_tokens": 2842,
+        "input_tokens_details": {
+          "cache_write_tokens": 2839,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3512,
+        "output_tokens_details": {
+          "reasoning_tokens": 1810
+        },
+        "total_tokens": 6354
+      },
+      "estimated_usd": "0.002111175",
+      "seconds": 33.47703609999735,
+      "counted_input_tokens": 2842
+    },
+    {
+      "batch": 2,
+      "usage": {
+        "input_tokens": 5488,
+        "input_tokens_details": {
+          "cache_write_tokens": 5485,
+          "cached_tokens": 0
+        },
+        "output_tokens": 6218,
+        "output_tokens_details": {
+          "reasoning_tokens": 2836
+        },
+        "total_tokens": 11706
+      },
+      "estimated_usd": "0.003794925",
+      "seconds": 56.026668299979065,
+      "counted_input_tokens": 5488
+    },
+    {
+      "batch": 3,
+      "usage": {
+        "input_tokens": 7237,
+        "input_tokens_details": {
+          "cache_write_tokens": 7234,
+          "cached_tokens": 0
+        },
+        "output_tokens": 7300,
+        "output_tokens_details": {
+          "reasoning_tokens": 1552
+        },
+        "total_tokens": 14537
+      },
+      "estimated_usd": "0.004554550",
+      "seconds": 51.866897200001404,
+      "counted_input_tokens": 7237
+    }
+  ],
+  "generation_calls": 4,
+  "outbound_calls": 8,
+  "occupied_usd": "0.015932825",
+  "cumulative_occupied_usd": "1.151989930",
+  "pending": {
+    "count-capture-1": "0.0001",
+    "count-capture-2": "0.0001",
+    "count-capture-3": "0.0001",
+    "count-capture-4": "0.0001"
+  },
+  "seconds": 242.0931209999835
+}

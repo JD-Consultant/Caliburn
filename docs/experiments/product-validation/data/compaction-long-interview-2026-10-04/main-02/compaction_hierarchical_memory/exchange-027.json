@@ -1,0 +1,16 @@
+{
+  "event_id": "e027",
+  "execution_id": "1c85109c-0fd8-4c96-8afc-7df80120935f",
+  "employee_input": {
+    "source_id": "45b0a9c3-ace8-4eac-bfc1-f3a5aeaa51b0",
+    "interview_sequence": 54,
+    "speaker": "employee",
+    "interview_text": "最近某批商品採購單寫箱、送貨單寫件，資料窗口確認一箱12件，我保留換算依據再登錄。12件只適用這個品號的包裝，不代表所有商品一箱都是12件。"
+  },
+  "consultant_reply": {
+    "source_id": "fe333b2f-923c-451e-8b93-ca214ded1931",
+    "interview_sequence": 55,
+    "speaker": "consultant",
+    "interview_text": "已補充到貨登錄任務：只有資料窗口確認該品號的包裝換算後，才依確認結果登錄並保留換算依據；「一箱 12 件」不會套用到其他商品。\n\n這次確認的換算依據會留在品號資料中供後續收貨使用，還是每次遇到都需要重新確認？"
+  }
+}

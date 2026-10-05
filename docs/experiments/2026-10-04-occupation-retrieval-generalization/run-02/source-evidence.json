@@ -1,0 +1,632 @@
+{
+  "E01": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "1b91400e-9888-4fb0-9b59-fd6a7a0b0d30",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "9116480a-d886-4650-a195-90d25712e735",
+        "speaker": "employee",
+        "text": "我在小客車維修廠處理已派給我的車，不負責接待報價。先看工單和車主描述，做道路試車及掃描故障碼，再量測找原因，不能只按故障碼直接換零件。我檢查煞車、轉向、懸吊和引擎的運作，把檢查結果及需要的材料告訴接待，客戶同意報價後才施工。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "5a417c7b-0273-4825-bbc6-2527f537c4b1",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "7a171334-69e3-4608-ac3b-e64b25a4d801",
+        "speaker": "employee",
+        "text": "我自己拆裝、更換和調整故障的機件，依維修資料確認鎖緊扭力與裝配位置；完成後重做功能檢查和試車，把量測與更換紀錄寫在工單。需要別的專業或找不到原因時，交技術主管協助，不自行擴大施工。例行換油、濾芯和保養檢查也由我做；工單交接時說明仍需處理的問題。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "646454d7-af00-45b6-b683-e559df490eff",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "36325d80-6985-4bdd-8b64-17a3ecde4e7d",
+        "speaker": "employee",
+        "text": "我每天收工前把工具歸位，處理廢油與拆下的耗材。主管決定工作的派發與最終放行，我不帶整個團隊也不制定廠內品質制度。偶爾教新人使用扭力扳手，是示範操作，不負責人事考核。進廠的都是一般小客車，沒有大型貨車，也沒有修車身鈑金或噴漆。"
+      }
+    ],
+    "published_snapshot_id": "2a2f1ebf-bd31-42ba-9e97-e2a1ef78d0ea",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E02": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "6618aaa1-6ea2-4371-a500-6f4c5fde8708",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "2e4414a7-cdba-4486-9777-7102a0b224aa",
+        "speaker": "employee",
+        "text": "我在金屬加工廠操作數控車床，拿到圖面後確認材料尺寸、加工公差和批量，選擇刀具、夾頭與夾持方式。我會讀既有程式，在機台上模擬確認刀路、工件與刀具不會干涉，再試切第一件；不是只把料放進去按開始。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "e2c87746-33fe-4224-b84c-9aa3d1893502",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "8e664559-2f24-4046-a662-1ca339eefcf4",
+        "speaker": "employee",
+        "text": "第一件用外徑千分尺和內徑量具測量，依結果調刀具補償。合格後才繼續批次生產；中途依檢驗表量測尺寸、看表面與刀具磨耗，偏差就停機調整或換刀，再驗證。尺寸超過我能修正的範圍會通知領班，不把不合格件混入完成品。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "2cd8a8b6-b718-4552-8704-bd3cf4b14ab5",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "96cbcc1b-e179-4e88-977c-5df93cab6bf9",
+        "speaker": "employee",
+        "text": "我記录首件與過程檢驗、數量和異常，每天下班清切屑、檢查潤滑與冷卻液。複雜產品的完整程式由另一位工程人員編，我只按核准加工資料調機台參數和局部補償；不制定全廠排程，沒有帶班、採購設備或機台大修責任。"
+      }
+    ],
+    "published_snapshot_id": "8f48d1ec-4b92-48c5-833c-97306cf2f19a",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E03": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "f6da07ba-8d29-4d3e-816f-3b2410694017",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "7987722d-4fc8-49fe-b7b0-530f418182ee",
+        "speaker": "employee",
+        "text": "我在烘焙工坊依每天訂單做麵包和少量西點，核對庫存後領取麵粉、奶油與其他材料，依核准配方秤重。我自己操作攪拌機，依麵糰狀態調整攪拌時間，分割、滾圓、整形，管理發酵溫濕度。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "0fe239ac-d6dd-4a27-9a79-49003431d3fa",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "a9004813-ae2b-4582-9a47-47ea4196f25f",
+        "speaker": "employee",
+        "text": "烘烤前確認爐溫與排盤，烤的過程看上色、膨脹和中心狀態，出爐後冷卻再包裝，記錄製作數量和不良原因。收到蛋糕訂單時，我烤蛋糕體、做簡單夾餡裝飾；複雜造型交另一位同事。我會協助試做新配方，但由主管決定是否上架和售價。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "411aaa44-4899-4edf-93fe-548ea3645b63",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "6dd0b89e-2c2d-409a-8b14-47ce98c6eeba",
+        "speaker": "employee",
+        "text": "原本我說每天進貨，補充更正：每週兩次進貨，每天只是核對領料。驗收看保存期限和溫度，過期或異常材料隔離回報；工作台、器具及設備按規定清潔。我不負責咖啡豆焙炒、外場點餐或人員排班，也沒有獨立決定採購品牌的權限。"
+      }
+    ],
+    "published_snapshot_id": "800048ae-c5fd-4486-92e7-1d9dad596ad4",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E04": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "7414d591-9d1a-40b9-a46f-3488f1866140",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "95803120-5d22-4ac1-a834-5bc91593cbc1",
+        "speaker": "employee",
+        "text": "我在公司的資訊單位處理網路防護，根據核准需求設定防火牆規則、網段隔離與遠端連線權限，變更前備份和測試，記錄改了什麼，失敗時回復。每天看防護設備和端點的警示，核對來源位址、時間與帳號，找出需要調查的項目。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "ee44d893-5cfe-4c31-a510-0b5a1e2c53e8",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "54e886a2-e880-4af7-aa23-afb1e2185ef9",
+        "speaker": "employee",
+        "text": "疑似入侵時我收集日誌、比對網路流量和受影響主機，確認範圍，依既定通報流程通知主管。經授權後隔離主機或封鎖連線，整理事件紀錄與後續改善；是否停機由主管和業務單位決定。每月檢查弱點掃描結果，與系統管理同事排修補時間，再確認修補生效。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "a54fa384-b391-480b-b75b-7de6cfec6c29",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "b54e2386-63d8-44ab-b80a-75ffdc6856ac",
+        "speaker": "employee",
+        "text": "我維護設備與帳號權限的操作紀錄，協助同事查防護設定，偶爾示範辨認可疑郵件。我不是對外受委託的滲透測試人員，不制定公司的資安管理政策，也不決定所有人的權限；只執行已核准的調整。這些工作服務公司自己內部的辦公網路與伺服器。"
+      }
+    ],
+    "published_snapshot_id": "660b5321-a7c3-41f3-8af2-d1165124a5d0",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E09": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "132b2c81-9fa4-495c-b6f9-aa6c3051b28a",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "2d895dd6-ff54-47ac-90e8-506f324667cb",
+        "speaker": "employee",
+        "text": "我每天處理一些公司的事情，會看資料和回覆訊息。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "eec5a0ee-a06f-4ac7-ba0e-e31998dfd0c9",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "c4f1791b-0051-4c36-9d77-4601a8632402",
+        "speaker": "employee",
+        "text": "主管有交代就處理，完成會跟他說。資料內容是什麼我現在不想講，也沒有說明怎麼做。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "625cd046-9541-4cd9-98b5-41422d2b18c0",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "81883ba5-0577-4f90-bfcf-80a2cfcdda82",
+        "speaker": "employee",
+        "text": "不知道成果要叫什麼，使用的系統和決定權先不回答。沒有其他具體工作內容可以補充。"
+      }
+    ],
+    "published_snapshot_id": "eb5ea08a-731e-4d6a-a6b0-9b6f2b4469cd",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E10": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "32bc8e6a-0b98-4ba7-9f69-ec710e81b072",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "986acee0-4139-4097-ba54-74c3539f9aa8",
+        "speaker": "employee",
+        "text": "大家一起處理產品相關工作，有人設計、有人製作、有人服務客戶。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "33739522-d34c-4c55-b5e1-c216879dd724",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "25bfd2f0-3c2e-4b87-8dcb-ccdca38baa00",
+        "speaker": "employee",
+        "text": "我會參加會議，聽大家說進度；剛才列的都是團隊事情，哪一項是我自己做的還沒說。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "92f14a4f-7933-4b7e-bc7f-9ea6a7591fe2",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "bad463f0-fbaa-43b0-bb40-c2118644e00e",
+        "speaker": "employee",
+        "text": "我目前只肯說自己也在團隊裡，具體負責對象、產出、頻率和決定範圍都還不確定。"
+      }
+    ],
+    "published_snapshot_id": "a809c874-6283-4e6c-8fe8-6e9934eb4854",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E11": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "e979fb48-f0e6-4726-b172-95eea6941ab2",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "65efd4c2-3b86-49ed-b16f-ae3c89d89cfa",
+        "speaker": "employee",
+        "text": "我在大學研究團隊分析宇宙微波背景觀測資料，校正儀器系統誤差，按觀測頻段建立天空信號與前景污染的分離模型。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "5a22aa3a-7b02-4ab1-885f-192d84a96815",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "b9c33cb6-5f16-435f-949b-b379c38d7431",
+        "speaker": "employee",
+        "text": "我寫科學計算程式估計角功率譜，用模擬資料檢驗估計偏差及不確定性，比較不同宇宙學參數下的預測；把模型與結果提交研究討論。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "4377d817-8386-433e-8f6e-d6eaa5389034",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "7dec9ff8-d995-42bb-9e26-d1dbc31763ba",
+        "speaker": "employee",
+        "text": "我整理分析方法和圖表投稿學術論文，同行對方法有疑問時重做分析。沒有開發企業業務網站、營運資訊系統或財務投資模型，也不從事商業產品的銷售。"
+      }
+    ],
+    "published_snapshot_id": "093ac84c-7a30-4869-9263-cf6655a48985",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E05": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "0ea557ed-ad36-467a-8f3e-5bc814ac70ab",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "3dfe7553-7259-43f1-a7db-49614ed58188",
+        "speaker": "employee",
+        "text": "我在旅館依每日房況表整理客房，先確認能不能進房，按程序敲門再進入；住客還在或掛免打擾時回報，不直接進去。我換床單、鋪床，清潔浴室和地面、倒垃圾，補毛巾與盥洗備品，檢查房內用品數量與設備能否正常使用。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "15151256-3e6d-4d8f-86d7-bb481c7513b6",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "b491506b-7f5d-468f-a631-77203e585324",
+        "speaker": "employee",
+        "text": "發現設備損壞會記錄房號和問題，交維修處理。清潔完依檢查表自查，再交督導查房，由督導確認可以賣房。我整理布巾與清潔車，清潔劑按規定稀釋並分開存放；遺留物依房號、時間登記送交指定櫃台，不自己帶走。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "cc2a19c4-ec26-43a8-b472-09bd2180887b",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "d4ff3b81-3f36-4b83-9cdb-d66d1dcc21bb",
+        "speaker": "employee",
+        "text": "偶爾住客要多一條毛巾或枕頭，我送到房門交付並記錄。住客抱怨房間問題我回報督導，賠償與換房由櫃台決定。我只處理被分配的房間，不排整個部門班表、不採購所有物資，也沒有做接待櫃台的入住收款。"
+      }
+    ],
+    "published_snapshot_id": "e1a7488c-bafa-4592-9397-18044633d1b4",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E06": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "2806febe-27df-4ac6-99f3-fa1198fc0363",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "6b379925-addf-4402-a9d8-eabdbe951510",
+        "speaker": "employee",
+        "text": "我在蔬菜苗場按生產單安排播種，確認種子批號、數量和穴盤，調配介質後裝盤，播種、覆蓋與澆水，標記品種、日期和批次。每天巡看發芽和苗的狀況，依育苗階段操作溫室的灌溉、通風與遮陰設備。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "2a909045-f9be-4ad3-94f4-fbf269fea11b",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "9b443076-bd90-4658-9d5a-ebc276e96e28",
+        "speaker": "employee",
+        "text": "我查看感測器的溫度濕度與介質數值，和現場狀況核對；異常時先查是否感測器或管路故障，依核准範圍調整設定並記錄，超過範圍就通知負責人。發現病蟲害或苗長得不齊，分區隔離和記錄，不擅自增加藥量。出貨前篩選苗株、點數裝箱和標示批號，協助裝車。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "4778b232-38f0-4a43-b218-4f0fa819d97b",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "de1ed671-b346-446e-8243-e6d2af231ada",
+        "speaker": "employee",
+        "text": "我記錄發芽率、處理和出貨數量，清洗穴盤及育苗區域，維護澆水管線的日常操作。病蟲害用藥和大筆設備投資由負責人決定，我只依核准方式執行；不負責整個苗場的經營策略、合約定價或新感測系統研發。"
+      }
+    ],
+    "published_snapshot_id": "918b05af-a7bd-4f45-80b8-95b89157fdb7",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E07": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "a6a0d075-dc11-4e15-959f-914ff23e000b",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "0bc2d873-d460-4411-a549-df1f94c8ab75",
+        "speaker": "employee",
+        "text": "我在金屬製造廠依圖面和作業卡組裝銲接零件，先確認材料、接合位置和尺寸，清理接合面、開槽，放進治具定位，檢查間隙後點固。我會按材料厚度和核准作業條件選銲材、設定電流及保護氣體。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "34785308-e164-4df1-a772-ec18caff0295",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "d8850c77-f185-4644-9344-40e1fc4c912c",
+        "speaker": "employee",
+        "text": "我操作銲機完成接合，控制順序減少變形，清除熔渣並做外觀和尺寸檢查，發現缺陷就隔離回報；經核准後重工，再送品管確認。要做非破壞檢測的件由品管安排，我不自己簽最終檢測判定。銲接區要確保通風、遮光、防火，開工前檢查設備與防護用具。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "acd19e89-370b-4c04-8866-a123d55b0303",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "f50f526d-f366-4e76-81ae-87abf8dc508b",
+        "speaker": "employee",
+        "text": "我記录使用材料、機台條件和完成數量，收工檢查設備、整理銲材及工具。特殊材料超出作業卡範圍時請工程人員確認，不自行建立新的銲接程序。我不設計整台機械、安排全廠的檢驗制度或管理整個班組。"
+      }
+    ],
+    "published_snapshot_id": "9b68026e-b0b3-4c14-85db-bca101dd3432",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E08": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "8a5839b5-03ba-46fb-a6ac-89d4cdc1dd18",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "79706b34-c413-4d3c-ae79-1e1ae09ab75a",
+        "speaker": "employee",
+        "text": "我在寵物美容店接手已預約的犬貓，先和飼主確認清潔修剪需求，觀察皮膚、毛況和行為；發現明顯傷口或不適會先告知飼主，建議就醫，不把美容當治療。我依動物體型和毛質選工具、清潔用品，梳理打結處，洗澡沖淨並吹乾。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "61115bc2-befe-4950-b1db-3e9160283443",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "7b188a19-0f94-470e-8bab-f54d8d6d4d26",
+        "speaker": "employee",
+        "text": "我自己修剪指甲、清潔耳部表面，依約定造型剪毛或用電剪，操作時安撫、固定動物，留意緊張反應避免受傷。超出能安全控制的情況會停止、聯絡飼主或負責人，不硬做。完成後檢查毛髮和皮膚、整理前後紀錄，再向飼主說明狀況和居家清潔提醒。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "7575ea13-1580-4b97-ba99-a0887e0e2ec6",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "5a1ac579-a653-42e6-b19f-0c830297b970",
+        "speaker": "employee",
+        "text": "每天按規定清潔消毒工具、桌面與工作區域，記錄耗材缺口。我偶爾示範洗澡吹乾給新人看，但不負責整間店排班和人事。沒有施打藥物、診斷疾病或進行寵物繁殖；營養處方也不由我決定。"
+      }
+    ],
+    "published_snapshot_id": "c34340f7-4bb9-4ab2-bce4-251e0e02f9a4",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E12": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "a5f05c45-f801-41de-b394-05aa733584e4",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "8c5e2bb1-aea6-452e-bc9e-56eebe746293",
+        "speaker": "employee",
+        "text": "我負責整理報表、安排事情和追進度，偶爾也要做檢查。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "ff439b3d-f1eb-4343-ba5c-aa940132915c",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "3c0ecdb6-e9f0-4eb3-9901-13d378c76075",
+        "speaker": "employee",
+        "text": "報表紀錄的對象還沒有說明，安排的是哪類事情也沒说；如何檢查和判斷我先不回答。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "0e2a01e2-0f6e-4492-84a9-0470f61f6679",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "608050e3-69b7-40dd-8ecd-e97bd1900d4a",
+        "speaker": "employee",
+        "text": "我會把成果交給主管，但成果內容、我能決定到哪裡、具體流程和是否有固定時段都尚未確認。"
+      }
+    ],
+    "published_snapshot_id": "94c186cc-b8a2-4870-b5e0-da5e6f64c4d6",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E13": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "c1fca692-6192-402c-9af4-38ba124a0c19",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "3275448c-0da4-4893-9f0b-6711ffcb9400",
+        "speaker": "employee",
+        "text": "以前做過別的工作，現在換了部門，具體要做什麼還沒確定。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "fb736add-e096-4418-8a89-8e80bb6a2b26",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "aa7e033a-838a-4834-b704-be2d32c52da1",
+        "speaker": "employee",
+        "text": "主管可能讓我接觸系統或客戶，但那是未來可能的分派，目前還沒有開始，也沒確認範圍。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "eacecc28-294e-4ce2-8666-3ce982e92e6a",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "24310f9c-4412-45d7-a9d3-b4251cd142d3",
+        "speaker": "employee",
+        "text": "目前只能說我剛轉調，沒有已實際執行的工作細節可回答，先不要把可能的分派寫成現在的責任。"
+      }
+    ],
+    "published_snapshot_id": "ce41fe07-771b-42f5-9251-3774d94a6560",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  },
+  "E14": {
+    "messages": [
+      {
+        "interview_sequence": 1,
+        "source_id": "40503d60-f180-4dbc-8c6b-0b0f8eb45631",
+        "speaker": "app",
+        "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+      },
+      {
+        "interview_sequence": 2,
+        "source_id": "96ae43c7-8deb-46ed-b3d3-d4a311f2842c",
+        "speaker": "employee",
+        "text": "我研究古代泥板上的文字，依拓片與高解析照片辨認字形，轉寫並比較不同時期字形變化。"
+      },
+      {
+        "interview_sequence": 3,
+        "source_id": "ef0651a9-25c9-42a8-9f3e-270820a46683",
+        "speaker": "consultant",
+        "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+      },
+      {
+        "interview_sequence": 4,
+        "source_id": "9ef2f538-4f8f-40dc-83c7-f8adf6847c91",
+        "speaker": "employee",
+        "text": "我對照已出土的文字資料，分析文法和詞义，遇到缺損會標記無法確定的讀法；用語料統計檢查候選解讀，提出不同解釋和證據。"
+      },
+      {
+        "interview_sequence": 5,
+        "source_id": "441e07f7-8c7a-4179-9353-40843e7ef515",
+        "speaker": "consultant",
+        "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+      },
+      {
+        "interview_sequence": 6,
+        "source_id": "6681186b-cec7-4230-b873-8136105507bb",
+        "speaker": "employee",
+        "text": "我寫學術論文、整理校勘表和釋讀說明，不負責博物館展覽策劃、文物修復施工、商業文件翻譯或文字設計。研究對象是古代文獻語言，沒有以上工作分工。"
+      }
+    ],
+    "published_snapshot_id": "90fb7278-bebc-402e-84cb-4ff46c5c36dd",
+    "batch": {
+      "status": "published",
+      "through_sequence": 6
+    }
+  }
+}

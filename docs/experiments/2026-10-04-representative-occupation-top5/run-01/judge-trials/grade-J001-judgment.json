@@ -1,0 +1,29 @@
+{
+  "job_id": "J001",
+  "phase": "grade",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版的品質故障排除與員工追查訂單異常，都涉及找出問題原因並處理，但這只是通用的局部動作；公版核心責任是產品、製程與品管管理，不能代表員工持續負責的瀏覽器畫面或訂單 API、權限、商業規則及資料存取工作。",
+    "evidence": [
+      {
+        "employee_quote": "上線後若訂單異常，也由我追查程式和資料原因。",
+        "reference_quote": "品質故障排除，針對錯誤找出問題點，並提供解決方案。"
+      },
+      {
+        "employee_quote": "我主要負責公司的線上訂單系統。",
+        "reference_quote": "負責品質管制，使新產品能符合品質標準及穩定生產。"
+      }
+    ],
+    "limitations": [
+      "員工的瀏覽器畫面、互動與操作檢查開發維護，公版未有實質代表。",
+      "員工的訂單 API、權限、商業規則及資料存取開發維護，公版未有實質代表；公版所述品質管制與製程、物料及品管設備管理，工作對象和責任範圍不同。"
+    ]
+  },
+  "seconds": 6.430072800023481,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "5ce3c826528a6addac5d96fa269e577a21e9ad4b5d253f9a3efc5ab6a0b1da39",
+  "case_id": "F01",
+  "document_id": "MQM1322-001v4"
+}

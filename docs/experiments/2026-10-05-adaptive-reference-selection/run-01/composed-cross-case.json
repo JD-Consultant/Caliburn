@@ -1,0 +1,251 @@
+{
+  "folds": [
+    {
+      "test_case": "F01",
+      "chosen_policy": "DT_fixed_D5_T20::gap_1_cap5",
+      "test_result": {
+        "case_id": "F01",
+        "selected_count": 5,
+        "grades": {
+          "0": 3,
+          "1": 1,
+          "2": 0,
+          "3": 1,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "IIS3513-003v4"
+        ],
+        "known_grade3_missing": [
+          "INM3514-001v4"
+        ],
+        "known_facets_supported": [
+          "瀏覽器畫面、互動與操作檢查的開發及維護",
+          "訂單 API、權限、商業規則及資料存取的開發及維護"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": [],
+        "initial_selected_count": 21,
+        "initial_missing_grade3": [],
+        "lost_baseline_grade3": []
+      }
+    },
+    {
+      "test_case": "F02",
+      "chosen_policy": "DT_fixed_D5_T20::absolute_-4_cap5",
+      "test_result": {
+        "case_id": "F02",
+        "selected_count": 5,
+        "grades": {
+          "0": 0,
+          "1": 2,
+          "2": 2,
+          "3": 1,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "INM3514-001v4"
+        ],
+        "known_grade3_missing": [],
+        "known_facets_supported": [
+          "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": [],
+        "initial_selected_count": 23,
+        "initial_missing_grade3": [],
+        "lost_baseline_grade3": []
+      }
+    },
+    {
+      "test_case": "F03",
+      "chosen_policy": "DT_fixed_D5_T20::absolute_-4_cap5",
+      "test_result": {
+        "case_id": "F03",
+        "selected_count": 5,
+        "grades": {
+          "0": 0,
+          "1": 1,
+          "2": 2,
+          "3": 2,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "FAC3313-001v2",
+          "FAC4311-001v2"
+        ],
+        "known_grade3_missing": [],
+        "known_facets_supported": [
+          "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": [],
+        "initial_selected_count": 20,
+        "initial_missing_grade3": [],
+        "lost_baseline_grade3": []
+      }
+    },
+    {
+      "test_case": "F04",
+      "chosen_policy": "DT_fixed_D5_T20::absolute_-4_cap5",
+      "test_result": {
+        "case_id": "F04",
+        "selected_count": 5,
+        "grades": {
+          "0": 0,
+          "1": 0,
+          "2": 4,
+          "3": 1,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "SET3113-002v3"
+        ],
+        "known_grade3_missing": [],
+        "known_facets_supported": [
+          "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": [],
+        "initial_selected_count": 21,
+        "initial_missing_grade3": [],
+        "lost_baseline_grade3": []
+      }
+    },
+    {
+      "test_case": "F05",
+      "chosen_policy": "DT_fixed_D5_T20::relative_1_cap5",
+      "test_result": {
+        "case_id": "F05",
+        "selected_count": 4,
+        "grades": {
+          "0": 0,
+          "1": 3,
+          "2": 1,
+          "3": 0,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [],
+        "known_grade3_missing": [
+          "AVA2172-001v4",
+          "AVA2172-002v3"
+        ],
+        "known_facets_supported": [],
+        "known_facets_missing": [
+          "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+        ],
+        "unassessed_facets": [],
+        "initial_selected_count": 20,
+        "initial_missing_grade3": [],
+        "lost_baseline_grade3": [
+          "AVA2172-001v4"
+        ]
+      }
+    },
+    {
+      "test_case": "H01",
+      "chosen_policy": "DT_fixed_D5_T20::absolute_-4_cap5",
+      "test_result": {
+        "case_id": "H01",
+        "selected_count": 5,
+        "grades": {
+          "0": 0,
+          "1": 2,
+          "2": 3,
+          "3": 0,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [],
+        "known_grade3_missing": [],
+        "known_facets_supported": [],
+        "known_facets_missing": [],
+        "unassessed_facets": [
+          "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+        ],
+        "initial_selected_count": 22,
+        "initial_missing_grade3": [],
+        "lost_baseline_grade3": []
+      }
+    },
+    {
+      "test_case": "H02",
+      "chosen_policy": "DT_fixed_D5_T20::absolute_-4_cap5",
+      "test_result": {
+        "case_id": "H02",
+        "selected_count": 5,
+        "grades": {
+          "0": 0,
+          "1": 1,
+          "2": 2,
+          "3": 2,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "MMP4321-003v4",
+          "RLM9330-001v1"
+        ],
+        "known_grade3_missing": [],
+        "known_facets_supported": [
+          "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": [],
+        "initial_selected_count": 21,
+        "initial_missing_grade3": [],
+        "lost_baseline_grade3": []
+      }
+    },
+    {
+      "test_case": "H03",
+      "chosen_policy": "DT_fixed_D5_T20::absolute_-4_cap5",
+      "test_result": {
+        "case_id": "H03",
+        "selected_count": 5,
+        "grades": {
+          "0": 0,
+          "1": 1,
+          "2": 3,
+          "3": 1,
+          "ungraded": 0
+        },
+        "known_grade3_retained": [
+          "BAS3323-003v3"
+        ],
+        "known_grade3_missing": [
+          "MMP1324-001v4"
+        ],
+        "known_facets_supported": [
+          "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+        ],
+        "known_facets_missing": [],
+        "unassessed_facets": [],
+        "initial_selected_count": 21,
+        "initial_missing_grade3": [],
+        "lost_baseline_grade3": []
+      }
+    }
+  ],
+  "summary": {
+    "selected_count": 39,
+    "average_per_case": 4.875,
+    "range": [
+      4,
+      5
+    ],
+    "empty_cases": [],
+    "grades": {
+      "0": 3,
+      "1": 11,
+      "2": 17,
+      "3": 8,
+      "ungraded": 0
+    },
+    "known_grade3_retained": 8,
+    "known_grade3_total": 12,
+    "known_facets_supported": 7,
+    "known_facets_total": 8
+  },
+  "candidate_pairs": 169,
+  "initial_missing_grade3": 0,
+  "additional_lost_baseline_grade3": 1
+}

@@ -1,0 +1,418 @@
+{
+  "scope": "post-hoc trace only for already judged grade-3 pairs in the union of final results",
+  "not_full_recall": true,
+  "new_model_calls": 0,
+  "new_grades": 0,
+  "inputs": {
+    "results.json": "f680f2a893b3a8b34d1c359b4af43af0bb9ab3fcc427c1dc075ad030e07b60f6",
+    "graded-results.json": "d29676894a00c90e3c28cb3336af2c00358770396b55160f7fbaa7f7cdca91b9",
+    "dense-rankings.json": "4aa5a0c2b795cd8a85276a9f5576b93020915fa7c3546821d777fa900f9fe736"
+  },
+  "references": [
+    {
+      "case_id": "F01",
+      "document_id": "INM3514-001v4",
+      "title": "網站前端開發人員",
+      "existing_grade": 3,
+      "main_work": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護"
+      ],
+      "methods": [
+        {
+          "method": "R01",
+          "queries": [
+            {
+              "query_id": "F01-whole-1",
+              "full_dense_rank_1_based": 4,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 4,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 4,
+          "final_k5_rank_1_based": 4
+        },
+        {
+          "method": "R02",
+          "queries": [
+            {
+              "query_id": "F01-whole-1",
+              "full_dense_rank_1_based": 4,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 7,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 7,
+          "final_k5_rank_1_based": null
+        },
+        {
+          "method": "R03",
+          "queries": [
+            {
+              "query_id": "F01-segments-1",
+              "full_dense_rank_1_based": 9,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 9,
+              "order": "dense"
+            },
+            {
+              "query_id": "F01-segments-2",
+              "full_dense_rank_1_based": 7,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 7,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 6,
+          "final_k5_rank_1_based": null
+        },
+        {
+          "method": "R04",
+          "queries": [
+            {
+              "query_id": "F01-segments-1",
+              "full_dense_rank_1_based": 9,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 4,
+              "order": "rerank"
+            },
+            {
+              "query_id": "F01-segments-2",
+              "full_dense_rank_1_based": 7,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 5,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 5,
+          "final_k5_rank_1_based": 5
+        }
+      ]
+    },
+    {
+      "case_id": "F02",
+      "document_id": "INM3514-001v4",
+      "title": "網站前端開發人員",
+      "existing_grade": 3,
+      "main_work": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "methods": [
+        {
+          "method": "R01",
+          "queries": [
+            {
+              "query_id": "F02-whole-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        },
+        {
+          "method": "R02",
+          "queries": [
+            {
+              "query_id": "F02-whole-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        },
+        {
+          "method": "R03",
+          "queries": [
+            {
+              "query_id": "F02-segments-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            },
+            {
+              "query_id": "F02-segments-2",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        },
+        {
+          "method": "R04",
+          "queries": [
+            {
+              "query_id": "F02-segments-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            },
+            {
+              "query_id": "F02-segments-2",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        }
+      ]
+    },
+    {
+      "case_id": "F03",
+      "document_id": "FAC3313-001v2",
+      "title": "會計助理",
+      "existing_grade": 3,
+      "main_work": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "methods": [
+        {
+          "method": "R01",
+          "queries": [
+            {
+              "query_id": "F03-whole-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "R02",
+          "queries": [
+            {
+              "query_id": "F03-whole-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "R03",
+          "queries": [
+            {
+              "query_id": "F03-segments-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "dense"
+            },
+            {
+              "query_id": "F03-segments-2",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "R04",
+          "queries": [
+            {
+              "query_id": "F03-segments-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            },
+            {
+              "query_id": "F03-segments-2",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        }
+      ]
+    },
+    {
+      "case_id": "F03",
+      "document_id": "FAC4311-001v2",
+      "title": "會計人員",
+      "existing_grade": 3,
+      "main_work": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "methods": [
+        {
+          "method": "R01",
+          "queries": [
+            {
+              "query_id": "F03-whole-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        },
+        {
+          "method": "R02",
+          "queries": [
+            {
+              "query_id": "F03-whole-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        },
+        {
+          "method": "R03",
+          "queries": [
+            {
+              "query_id": "F03-segments-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            },
+            {
+              "query_id": "F03-segments-2",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        },
+        {
+          "method": "R04",
+          "queries": [
+            {
+              "query_id": "F03-segments-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "rerank"
+            },
+            {
+              "query_id": "F03-segments-2",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        }
+      ]
+    },
+    {
+      "case_id": "F05",
+      "document_id": "AVA2172-002v3",
+      "title": "平面視覺傳達設計人員",
+      "existing_grade": 3,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "methods": [
+        {
+          "method": "R01",
+          "queries": [
+            {
+              "query_id": "F05-whole-1",
+              "full_dense_rank_1_based": 3,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 3,
+          "final_k5_rank_1_based": 3
+        },
+        {
+          "method": "R02",
+          "queries": [
+            {
+              "query_id": "F05-whole-1",
+              "full_dense_rank_1_based": 3,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 14,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 14,
+          "final_k5_rank_1_based": null
+        },
+        {
+          "method": "R03",
+          "queries": [
+            {
+              "query_id": "F05-segments-1",
+              "full_dense_rank_1_based": 3,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "dense"
+            },
+            {
+              "query_id": "F05-segments-2",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "R04",
+          "queries": [
+            {
+              "query_id": "F05-segments-1",
+              "full_dense_rank_1_based": 3,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 6,
+              "order": "rerank"
+            },
+            {
+              "query_id": "F05-segments-2",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 6,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 6,
+          "final_k5_rank_1_based": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "checked_utc": "2026-10-04T12:51:23.3273759Z",
+  "qdrant_pid": 51672,
+  "verified_executable": "S:\\caliburn\\tmp\\ocs-eval-qdrant\\qdrant.exe",
+  "stopped_own_qdrant": true,
+  "remaining_listeners": 2,
+  "public_weights_and_storage_preserved": true,
+  "product_services_not_modified": true
+}

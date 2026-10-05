@@ -1,0 +1,13 @@
+{
+  "jobs": 45,
+  "endpoint": "https://api.openai.com/v1",
+  "store": false,
+  "synthetic_employee_inputs": true,
+  "employee_source": "same frozen F01–F05 needs and H01–H03 true A plus synthetic employee, as prior Memory experiment",
+  "public_document_inputs": true,
+  "all_jobs_employee_and_document_exact_hash_bound": true,
+  "memory_text_or_methods_or_ranks_sent": false,
+  "max_usd": "1.00",
+  "jobs_sha256": "629da6a521d5bee690d255e7a0ce85756332882d507a1b5c1e83bb0631b94929",
+  "authorization_scope": "user agreed to continue D/T/M plus rerank retrieval experiment; earlier explicit 18-pair approval is not relabeled as this 45-pair approval"
+}

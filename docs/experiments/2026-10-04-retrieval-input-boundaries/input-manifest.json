@@ -1,0 +1,35 @@
+{
+  "created_utc": 1791091621.4218514,
+  "before_new_embeddings_or_rankings": true,
+  "scope": "All observed synthetic cases; lossless boundary probe; no new holdout or JD semantic alignment labels",
+  "source_hashes": {
+    "development-cases.json": "86e3a42214438365972e255f292f478783797e3eedad5365ad71f346c46fbda3",
+    "holdout-cases-2026-10-04-reviewed.json": "ae7e8c712455555a1ff16b2a8d80a8721214ffdac322e9919e63999c2f67d4f4",
+    "artifact-hashes.json": "f15d5d0829471ae565cca3314225f0a1a1032f8d691978d8f4f511cea044adb3"
+  },
+  "files": {
+    "protocol.md": "b80e71ede15edd9979ec7fcda0a158ec2a7cf0a7a4be272d71cfbb335b7f78fb",
+    "cases.json": "1513968e29519ac60152225134a5df037c03ba7671a1fbcc9791fcd6902dd43e",
+    "inputs.json": "5427335a6f1fadf96bfbc8b9813b6d9b27940079c227c7d13d2e5e3b3b70dd3c",
+    "inputs.py": "2ba7253992cc88bcffdea0b37ec1de65238afd4d55d97dd4da1af6579c903792",
+    "support.py": "a512c8de93e0c49e4070085d0dce36fb9efcdb0d3965117ad841c637cb839241",
+    "freeze.py": "b4e43e3ab0bef770780aaf1f65f5969cf32f52f9d7d8c37a4dc908fd617c58d6"
+  },
+  "queries_by_variant": {
+    "original_messages": 74,
+    "joined_employee": 22,
+    "sentence_pieces": 160
+  },
+  "configs": [
+    {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 5
+    },
+    {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5
+    }
+  ]
+}

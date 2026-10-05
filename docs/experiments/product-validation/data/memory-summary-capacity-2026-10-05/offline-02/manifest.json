@@ -1,0 +1,88 @@
+{
+  "prepared_at": "2026-10-04T16:58:08.429579+00:00",
+  "kind": "artifact-use-pilot-not-capacity-test",
+  "authorization": "User approved added US$0.10/20 minutes, including capture/count/read/failures; cumulative US$2.",
+  "model": "gpt-6-luna",
+  "effort": "high",
+  "max_output_tokens": 8192,
+  "max_estimated_usd": "0.10",
+  "max_seconds": 1200,
+  "prior_occupied_usd": "1.136057105",
+  "cumulative_limit_usd": "2.00",
+  "schedule": [
+    {
+      "case_id": "corrections",
+      "arm": "memory",
+      "repeat": 1
+    },
+    {
+      "case_id": "corrections",
+      "arm": "flat",
+      "repeat": 1
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "memory",
+      "repeat": 1
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "flat",
+      "repeat": 1
+    },
+    {
+      "case_id": "corrections",
+      "arm": "flat",
+      "repeat": 2
+    },
+    {
+      "case_id": "corrections",
+      "arm": "memory",
+      "repeat": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "flat",
+      "repeat": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "memory",
+      "repeat": 2
+    }
+  ],
+  "capture_boundaries": [
+    24,
+    56,
+    88,
+    104
+  ],
+  "grading_items": 19,
+  "max_generations": 32,
+  "max_outbound_calls": 64,
+  "max_reader_steps": 6,
+  "sdk_version": "3.20.0",
+  "head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "pricing_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+  "source_sha256": {
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\README.md": "c271972e56bc965db1e5e429b5d26b7a91a2747438f41c8ffc24901b0a96bd3d",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\material-inspection.json": "789af53d35f6d5aabfd2846b8f5a87976f6bf6d49919e9a9e2c228042e9ec025",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\study.py": "ac4110293e5c81c2146a2a93c7b0491a31775bb913b5807cf838c66772cd60f8",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\fixtures.py": "5975f353c2918a17f3630c37cfaefde418b8453eb921911fd408d0526f69a702",
+    "docs\\experiments\\product-validation\\data\\memory-summary-capacity-2026-10-05\\test_fixtures.py": "22cd59a30da78440fbedc1b8894f1c123b504f8c4addd873e087b174ae0f6d2e",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\experiment.py": "b5cda90cbf3419281637b23e0fb4a202f971eedbff341321d344bdf558e3b1a9",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\support.py": "19a2816265c682093737c45d784a0e847e1868bb22f3c3c038127310b684627b",
+    "docs\\experiments\\product-validation\\data\\memory-reading-policy-2026-10-04\\live-01\\instructions.json": "f82482c089a7fd29475ca1a0396e733fb0b9a7b5036223ed300e1f109dd668fe",
+    "docs\\experiments\\product-validation\\data\\memory-reading-policy-2026-10-04\\live-01\\cases.json": "af98907d013bccc2301b9b4aea80fe12eb352536b3250505a405a9f30482cdb4",
+    "docs\\experiments\\product-validation\\data\\long-interview-memory-2026-10-04\\experiment.py": "c0f8dbfc9464e21e315054d457ed1a4ef7e1cc2de7cfa3297d536610c5cfa42f",
+    "docs\\experiments\\product-validation\\data\\design-comparisons-2026-10-04\\provider_observations.py": "bfe9ef1189a4a0bae9d3825c0e041656be9483c1bc506f1ea2022c4e13bdd24e",
+    "apps\\api\\src\\caliburn\\adapters\\openai_responses.py": "539ba7237afa8137096eae06b38037cd52fe43c528f47fb638606db1b59c2f4d",
+    "apps\\api\\src\\caliburn\\adapters\\response_serialization.py": "c5eadad7235f7d6979bbf29e5c84e1a91b3aa56330e276c4f53244b3e0847230"
+  },
+  "reader_prompt_sha256": "265249bf2a39fb1da35af5982dfbad7daf28c0cef29396655be9bcc9dc2db2f6",
+  "flat_prompt_sha256": "d90a1beb27ef02c068ca3c6900127cda3885a0ca4518af2f0adbe3d344798139",
+  "tools_sha256": {
+    "memory": "c5166622fa170f9b3d2e439c5b9d5c25fbd8606378ddb57d934fcfc12d74b55d",
+    "flat": "7a71baf7eb88453fdbec5ee8b1c2cf760257e47379941f70142521c6ee6f3cae"
+  }
+}

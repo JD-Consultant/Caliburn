@@ -1,0 +1,50 @@
+{
+  "phase": "formal",
+  "jobs": 8,
+  "completed": 0,
+  "failures": [
+    {
+      "job_id": "J001",
+      "type": "APIConnectionError",
+      "message": "Connection error."
+    },
+    {
+      "job_id": "J002",
+      "type": "APIConnectionError",
+      "message": "Connection error."
+    },
+    {
+      "job_id": "J003",
+      "type": "APIConnectionError",
+      "message": "Connection error."
+    },
+    {
+      "job_id": "J004",
+      "type": "APIConnectionError",
+      "message": "Connection error."
+    },
+    {
+      "job_id": "J005",
+      "type": "APIConnectionError",
+      "message": "Connection error."
+    },
+    {
+      "job_id": "J006",
+      "type": "APIConnectionError",
+      "message": "Connection error."
+    },
+    {
+      "job_id": "J007",
+      "type": "APIConnectionError",
+      "message": "Connection error."
+    },
+    {
+      "job_id": "J008",
+      "type": "APIConnectionError",
+      "message": "Connection error."
+    }
+  ],
+  "elapsed_seconds": 6.228609399986453,
+  "estimated_or_reserved_total_usd": "0",
+  "all_jobs_validated": false
+}

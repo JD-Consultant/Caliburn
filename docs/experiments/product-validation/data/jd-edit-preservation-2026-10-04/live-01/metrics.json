@@ -1,0 +1,31 @@
+{
+  "cells": [
+    {
+      "cell_id": "responsibility_correction-baseline-1",
+      "arm": "raw_memory",
+      "case_id": "responsibility_correction",
+      "repeat": 1,
+      "status": "stopped",
+      "model_calls": 0,
+      "initial_input_tokens": null,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "reasoning_tokens": 0,
+      "reads": 0,
+      "repeat_reads": 0,
+      "read_characters": 0,
+      "generation_estimated_usd": "0",
+      "seconds": null,
+      "changes": 0,
+      "prompt_variant": "baseline",
+      "out_of_scope_targets": []
+    }
+  ],
+  "occupied_usd": "0.0001",
+  "cumulative_occupied_usd": "1.105018450",
+  "outbound_calls": 1,
+  "elapsed_seconds": 12.13405299995793,
+  "note": "Metrics are derived; correctness and citation support require separate semantic grading."
+}

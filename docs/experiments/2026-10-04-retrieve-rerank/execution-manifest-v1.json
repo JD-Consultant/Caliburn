@@ -1,0 +1,24 @@
+{
+  "frozen_utc": "2026-10-04T03:12:30.212340+00:00",
+  "before_any_reranker_scores": true,
+  "model_revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+  "model_lfs_sha256": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286",
+  "sources": {
+    "protocol.md": "b4e746100ee2db053c404e9b92fa92c05504cf7a7a2644a5a4a42b3a4ca8cd9c",
+    "protocol-amendment-01.md": "fb2bfd1952b9835f2866d8c306b5f371e263979342940a93497cef5214869f0c",
+    "frozen.json": "48cd3a9760480cbf0dd1ab46bedb21854dc9fe893e246882a00fd816614566b9",
+    "frozen-v2.json": "e1010346b409b742621466f579a506f346f1002f58c32794a153a72f4f510f79",
+    "frozen-v3.json": "0da418e90be6d60bf2463a858cd146035a68dd0ce6b0a7c3d43e7005c67aefff",
+    "cases-v3.json": "619e2c41aa341a6bf61453c657c7876a439eda2d006312bcf591cecb20943b45",
+    "queries.json": "5ccc82d1a6729a5c1b3b00515eac8aa330cbfb009c8fb3e59f67a11a502fa71f",
+    "prepared.json": "1c6f94c7ccd944f0bb25eeb28863f57bacac910f1d515c92cb05ae2b36ee2fce",
+    "new-query-cache.jsonl": "2ffb647ea1e6ec036ada9755a8e2cc2f9a72a8eac43173dc434bacca2a58e9ee",
+    "evaluate.py": "ea11a202e5497f08e67ab4029d15d990e5d453c45989fcb695bcd934d5fcaf90",
+    "test_evaluate.py": "0acfa46c2318bec4f4f27be8f07f4ad5c9457080a460b5863697ffc2a9a7ad59",
+    "run.py": "0e35dc636c0ac0c61ecd9aaf4936886645e3f46ab618cfb969af9d4928036601",
+    "gpu_worker.py": "4347c03b22807b20cc9d8ee812e334ffb1d6d46b370c7d550677af09060db07c",
+    "analyze.py": "d4052abb0aebf6d0ed8ad55f592d13885eb43563d94fed6255f462c50747e503",
+    "download_model.py": "9625fb4131a5e8d5af5987c9ae137ab90ac18b7505f31d20033a0c6410dbaedb"
+  },
+  "scope": "local isolated research; no paid model or downstream LLM"
+}

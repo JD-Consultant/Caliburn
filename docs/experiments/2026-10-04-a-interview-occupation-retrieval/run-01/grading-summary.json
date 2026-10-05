@@ -1,0 +1,20 @@
+{
+  "phase": "grade",
+  "jobs": 33,
+  "completed": 31,
+  "failures": [
+    {
+      "job_id": "J019",
+      "type": "ValueError",
+      "message": "reference evidence cannot be located"
+    },
+    {
+      "job_id": "J025",
+      "type": "ValueError",
+      "message": "reference evidence cannot be located"
+    }
+  ],
+  "elapsed_seconds": 177.42244829999981,
+  "estimated_or_reserved_total_usd": "0.047436980",
+  "all_jobs_validated": false
+}

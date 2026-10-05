@@ -1,0 +1,122 @@
+[
+  {
+    "case_id": "F01",
+    "method": "O-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-T",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-T",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-T",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-T",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-T",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-T",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-T",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-D",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-T",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-D",
+    "same_prior_top5": true
+  }
+]

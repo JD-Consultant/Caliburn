@@ -1,0 +1,16 @@
+{
+  "event_id": "e021",
+  "execution_id": "1fca6064-0e4d-4e89-8396-dfc34c7398c7",
+  "employee_input": {
+    "source_id": "58b12909-1bb6-4285-bd96-4cb3f6bc6639",
+    "interview_sequence": 42,
+    "speaker": "employee",
+    "interview_text": "每月底我整理庫存帳齡表，把可售、待檢、報廢待核准分開列，當月最後一個工作日交主管。這張表是看滯留與庫存狀態，不是早上交客服的退貨差異表。"
+  },
+  "consultant_reply": {
+    "source_id": "4e209d21-dfed-4db3-9664-445e46452cff",
+    "interview_sequence": 43,
+    "speaker": "consultant",
+    "interview_text": "已將「編製月末庫存帳齡表」獨立加入草稿，記下每月底按可售、待檢、報廢待核准分列，於當月最後一個工作日交主管，供查看滯留與庫存狀態；也保留它和早上交客服的退貨差異表不同。\n\n這張表的「帳齡」是依什麼日期或規則計算的？"
+  }
+}

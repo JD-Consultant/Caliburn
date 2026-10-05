@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "a551b458-cba6-4b74-b260-d43cc5237d95",
+    "interview_sequence": 114,
+    "speaker": "employee",
+    "interview_text": "先岔開一下，掃碼器維修仍由資訊窗口處理。回到之前那張表，改成每週交好了。"
+  },
+  "consultant_reply": {
+    "source_id": "bbba9723-69d0-4f59-934b-5e6289a2b624",
+    "interview_sequence": 115,
+    "speaker": "consultant",
+    "interview_text": "掃碼器維修由資訊窗口處理，我會保留這項分工。你說要改成每週交的是哪張表：**退貨差異表、庫存帳齡表，還是收貨異常週報**？"
+  }
+}

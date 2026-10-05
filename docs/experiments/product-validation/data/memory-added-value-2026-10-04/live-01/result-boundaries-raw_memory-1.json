@@ -1,0 +1,62 @@
+{
+  "arm": "raw_memory",
+  "repeat": 1,
+  "case_id": "boundaries",
+  "cell_id": "boundaries-raw_memory-1",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 22748,
+        "input_tokens_details": {
+          "cache_write_tokens": 19391,
+          "cached_tokens": 3354
+        },
+        "output_tokens": 1643,
+        "output_tokens_details": {
+          "reasoning_tokens": 1129
+        },
+        "total_tokens": 24391
+      },
+      "estimated_usd": "0.003279215",
+      "seconds": 18.244881899969187
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_8.description",
+        "value": "產品召回時，依品質窗口提供的品號與批號查核可售、待檢、在途調撥及各店庫存，逐一核對各店批號與調撥單；通知倉庫先隔離，整理影響範圍清單提供主管及品質窗口，並追蹤隔離量、回收量及各店回覆，直到主管確認紀錄齊全。召回通知僅列部分批號時，向品質窗口確認範圍；店方回覆缺少批號時請其補充，未確認的批號保留待確認。本人不決定召回範圍或是否解除、不判定未列批號安全，也不宣布恢復銷售。",
+        "references": [
+          {
+            "kind": "interview",
+            "interview_sequence": 58,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 60,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 62,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 102,
+            "target_title": null
+          }
+        ]
+      }
+    ],
+    "questions": [
+      "冷藏退貨溫度紀錄的公司合格門檻目前尚未確認；應向哪個窗口或查閱哪份公司規範，才能確認正式數值？",
+      "文件及核准紀錄的保存年限目前尚未確認；能否向財務確認公司適用的保存年限或檔案規則？"
+    ],
+    "note": "已核對產品召回描述與責任界線，修正為本人負責庫存盤查、隔離通知、影響清單及後續追蹤，召回範圍與解除由品質窗口確認。休假前後交接描述與訪談相符，未更動。冷藏退貨溫度門檻與文件保存年限都沒有足夠依據寫成數字；保留未知並列出確認問題。"
+  },
+  "seconds": 29.424323500017636
+}

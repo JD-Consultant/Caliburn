@@ -1,0 +1,15 @@
+{
+  "phase": "grade",
+  "jobs": 49,
+  "completed": 48,
+  "failures": [
+    {
+      "job_id": "J014",
+      "type": "ValueError",
+      "message": "employee evidence cannot be located"
+    }
+  ],
+  "elapsed_seconds": 154.0170696999994,
+  "estimated_or_reserved_total_usd": "0.035030905",
+  "all_anchors_matched": false
+}

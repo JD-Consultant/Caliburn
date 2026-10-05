@@ -1,0 +1,25 @@
+{
+  "job_id": "C02",
+  "phase": "calibrate-02",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版描述的是員工電腦與設備維護，僅與員工偶爾協助重開電腦的動作局部相符；不代表其主要的會員網站開發工作。",
+    "evidence": [
+      {
+        "employee_quote": "偶爾幫同事重開電腦",
+        "reference_quote": "重新啟動電腦"
+      }
+    ],
+    "limitations": [
+      "員工主要負責頁面版型、互動元件、表單驗證、資料串接及瀏覽器操作測試，公版未涵蓋這些工作。",
+      "重開電腦屬偶爾協助，不足以代表主要工作。"
+    ]
+  },
+  "seconds": 4.296107700036373,
+  "employee_sha256": "17ccab533f1b40f3c6cd182bd7c7b3c56a01e7a9fc2317985d2931f0e260065d",
+  "document_sha256": "16fb0638b8b668cf7cddf02183a1c26fa057bd0519b035feda1e422578b83397",
+  "expected_grade": 1,
+  "anchor_matched": true
+}

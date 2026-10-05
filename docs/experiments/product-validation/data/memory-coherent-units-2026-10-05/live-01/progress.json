@@ -1,0 +1,86 @@
+[
+  {
+    "cell": "initial-baseline",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 32.80714580003405
+  },
+  {
+    "cell": "initial-coherent",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 32.69995879998896
+  },
+  {
+    "cell": "corrections-coherent",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 43.8775777000119
+  },
+  {
+    "cell": "corrections-baseline",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 41.73741379997227
+  },
+  {
+    "cell": "extension-baseline",
+    "status": "completed",
+    "steps": 6,
+    "seconds": 94.26624399999855
+  },
+  {
+    "cell": "extension-coherent",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 42.94291149999481
+  },
+  {
+    "cell": "read-post_delivery-baseline",
+    "status": "completed",
+    "steps": 4,
+    "seconds": 55.80781849997584
+  },
+  {
+    "cell": "read-post_delivery-coherent",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 31.496331100002863
+  },
+  {
+    "cell": "read-maintenance-coherent",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 41.38188070000615
+  },
+  {
+    "cell": "read-maintenance-baseline",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 39.35149650002131
+  },
+  {
+    "cell": "read-infrequent_work-baseline",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 38.21712849999312
+  },
+  {
+    "cell": "read-infrequent_work-coherent",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 25.835576399986167
+  },
+  {
+    "cell": "read-resolved_approval-coherent",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 28.101759899989702
+  },
+  {
+    "cell": "read-resolved_approval-baseline",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 41.41654849995393
+  }
+]

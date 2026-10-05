@@ -1,0 +1,149 @@
+{
+  "status": "completed",
+  "outcomes": [
+    {
+      "cell": "read-post_delivery-r1-baseline",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 31.24706999998307
+    },
+    {
+      "cell": "read-post_delivery-r1-scoped",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 30.63419700000668
+    },
+    {
+      "cell": "read-maintenance-r1-scoped",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 28.560152799997013
+    },
+    {
+      "cell": "read-maintenance-r1-baseline",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 52.46389690000797
+    },
+    {
+      "cell": "read-infrequent_work-r1-baseline",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 50.456394999986514
+    },
+    {
+      "cell": "read-infrequent_work-r1-scoped",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 27.72811779996846
+    },
+    {
+      "cell": "read-resolved_approval-r1-scoped",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 30.758323100046255
+    },
+    {
+      "cell": "read-resolved_approval-r1-baseline",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 46.167310899996664
+    },
+    {
+      "cell": "read-deadline_only-r1-baseline",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 40.26561290002428
+    },
+    {
+      "cell": "read-deadline_only-r1-scoped",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 25.941916699986905
+    },
+    {
+      "cell": "read-approver_only-r1-scoped",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 36.60424160002731
+    },
+    {
+      "cell": "read-approver_only-r1-baseline",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 26.379052600008436
+    },
+    {
+      "cell": "read-post_delivery-r2-baseline",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 30.03967939998256
+    },
+    {
+      "cell": "read-post_delivery-r2-scoped",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 28.01887930004159
+    },
+    {
+      "cell": "read-maintenance-r2-scoped",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 29.115210900024977
+    },
+    {
+      "cell": "read-maintenance-r2-baseline",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 42.613935000030324
+    }
+  ],
+  "failure": null,
+  "budget": {
+    "occupied_usd": "0.010167325",
+    "prior_occupied_usd": "1.285104650",
+    "cumulative_occupied_usd": "1.295271975",
+    "pending": {
+      "read-post_delivery-r1-baseline-1": "0.0001",
+      "read-post_delivery-r1-baseline-3": "0.0001",
+      "read-post_delivery-r1-scoped-5": "0.0001",
+      "read-post_delivery-r1-scoped-7": "0.0001",
+      "read-maintenance-r1-scoped-9": "0.0001",
+      "read-maintenance-r1-scoped-11": "0.0001",
+      "read-maintenance-r1-baseline-13": "0.0001",
+      "read-maintenance-r1-baseline-15": "0.0001",
+      "read-maintenance-r1-baseline-17": "0.0001",
+      "read-infrequent_work-r1-baseline-19": "0.0001",
+      "read-infrequent_work-r1-baseline-21": "0.0001",
+      "read-infrequent_work-r1-baseline-23": "0.0001",
+      "read-infrequent_work-r1-scoped-25": "0.0001",
+      "read-infrequent_work-r1-scoped-27": "0.0001",
+      "read-resolved_approval-r1-scoped-29": "0.0001",
+      "read-resolved_approval-r1-scoped-31": "0.0001",
+      "read-resolved_approval-r1-baseline-33": "0.0001",
+      "read-resolved_approval-r1-baseline-35": "0.0001",
+      "read-resolved_approval-r1-baseline-37": "0.0001",
+      "read-deadline_only-r1-baseline-39": "0.0001",
+      "read-deadline_only-r1-baseline-41": "0.0001",
+      "read-deadline_only-r1-baseline-43": "0.0001",
+      "read-deadline_only-r1-scoped-45": "0.0001",
+      "read-deadline_only-r1-scoped-47": "0.0001",
+      "read-approver_only-r1-scoped-49": "0.0001",
+      "read-approver_only-r1-scoped-51": "0.0001",
+      "read-approver_only-r1-scoped-53": "0.0001",
+      "read-approver_only-r1-baseline-55": "0.0001",
+      "read-approver_only-r1-baseline-57": "0.0001",
+      "read-post_delivery-r2-baseline-59": "0.0001",
+      "read-post_delivery-r2-baseline-61": "0.0001",
+      "read-post_delivery-r2-scoped-63": "0.0001",
+      "read-post_delivery-r2-scoped-65": "0.0001",
+      "read-maintenance-r2-scoped-67": "0.0001",
+      "read-maintenance-r2-scoped-69": "0.0001",
+      "read-maintenance-r2-baseline-71": "0.0001",
+      "read-maintenance-r2-baseline-73": "0.0001",
+      "read-maintenance-r2-baseline-75": "0.0001"
+    },
+    "outbound_calls": 76,
+    "elapsed_seconds": 556.9298487000051
+  }
+}

@@ -1,0 +1,84 @@
+[
+  {
+    "family": "absolute",
+    "policies": 65,
+    "full_known_retention_policies": 36,
+    "smallest_full_retention_candidate_total": 292,
+    "smallest_full_retention_policy_ids": [
+      "DT_absolute_0.675"
+    ],
+    "candidate_total_range": [
+      0,
+      6174
+    ]
+  },
+  {
+    "family": "absolute_floor",
+    "policies": 90,
+    "full_known_retention_policies": 44,
+    "smallest_full_retention_candidate_total": 297,
+    "smallest_full_retention_policy_ids": [
+      "DT_absolute_floor_0.675_floor3"
+    ],
+    "candidate_total_range": [
+      24,
+      6174
+    ]
+  },
+  {
+    "family": "fixed",
+    "policies": 35,
+    "full_known_retention_policies": 21,
+    "smallest_full_retention_candidate_total": 169,
+    "smallest_full_retention_policy_ids": [
+      "DT_fixed_D5_T20"
+    ],
+    "candidate_total_range": [
+      40,
+      926
+    ]
+  },
+  {
+    "family": "full",
+    "policies": 3,
+    "full_known_retention_policies": 3,
+    "smallest_full_retention_candidate_total": 6440,
+    "smallest_full_retention_policy_ids": [
+      "D_full",
+      "T_full",
+      "DT_full"
+    ],
+    "candidate_total_range": [
+      6440,
+      6440
+    ]
+  },
+  {
+    "family": "gap",
+    "policies": 15,
+    "full_known_retention_policies": 6,
+    "smallest_full_retention_candidate_total": 6439,
+    "smallest_full_retention_policy_ids": [
+      "T_gap_0.02",
+      "DT_gap_0.02"
+    ],
+    "candidate_total_range": [
+      12,
+      6440
+    ]
+  },
+  {
+    "family": "relative",
+    "policies": 63,
+    "full_known_retention_policies": 34,
+    "smallest_full_retention_candidate_total": 588,
+    "smallest_full_retention_policy_ids": [
+      "D_relative_0.08",
+      "DT_relative_D0.08_T0.01"
+    ],
+    "candidate_total_range": [
+      17,
+      4334
+    ]
+  }
+]

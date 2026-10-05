@@ -1,0 +1,379 @@
+{
+  "development_grid": [
+    {
+      "threshold": 0.35,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.375,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.4,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.425,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.45,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.475,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.5,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.525,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.55,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.575,
+      "positive_accepts": 13,
+      "negative_accepts": 3
+    },
+    {
+      "threshold": 0.6,
+      "positive_accepts": 13,
+      "negative_accepts": 2
+    },
+    {
+      "threshold": 0.625,
+      "positive_accepts": 13,
+      "negative_accepts": 2
+    },
+    {
+      "threshold": 0.65,
+      "positive_accepts": 13,
+      "negative_accepts": 1
+    },
+    {
+      "threshold": 0.675,
+      "positive_accepts": 13,
+      "negative_accepts": 0
+    },
+    {
+      "threshold": 0.7,
+      "positive_accepts": 13,
+      "negative_accepts": 0
+    },
+    {
+      "threshold": 0.725,
+      "positive_accepts": 13,
+      "negative_accepts": 0
+    },
+    {
+      "threshold": 0.75,
+      "positive_accepts": 11,
+      "negative_accepts": 0
+    },
+    {
+      "threshold": 0.775,
+      "positive_accepts": 9,
+      "negative_accepts": 0
+    },
+    {
+      "threshold": 0.8,
+      "positive_accepts": 2,
+      "negative_accepts": 0
+    },
+    {
+      "threshold": 0.825,
+      "positive_accepts": 0,
+      "negative_accepts": 0
+    },
+    {
+      "threshold": 0.85,
+      "positive_accepts": 0,
+      "negative_accepts": 0
+    },
+    {
+      "threshold": 0.875,
+      "positive_accepts": 0,
+      "negative_accepts": 0
+    },
+    {
+      "threshold": 0.9,
+      "positive_accepts": 0,
+      "negative_accepts": 0
+    }
+  ],
+  "provisional_threshold": 0.675,
+  "decisions": [
+    {
+      "case_id": "dev-accounting",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7817650727569475,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-recruiting",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7874698789661355,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-web",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7458723266362836,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-ux",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.729412216499322,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-testing",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.8019519538981377,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-coffee",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7979063788134392,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-roasting",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.8233007462131552,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-food-service",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7547844194556965,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-electrical",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7764036570342471,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-interior",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7881756882653016,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-purchasing-manager",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7820907464173152,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-marketing",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7798420551168738,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-mixed",
+      "split": "development",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7543870037746054,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "dev-no-match-astronomy",
+      "split": "development",
+      "expected_abstain": true,
+      "reason": "OCS 職位清單未含天體物理研究職位",
+      "dense_top1_score": 0.6328827494099268,
+      "selected_threshold_accepts": false
+    },
+    {
+      "case_id": "dev-no-match-quantum",
+      "split": "development",
+      "expected_abstain": true,
+      "reason": "OCS 職位清單未含此量子研究職位",
+      "dense_top1_score": 0.5978411867770166,
+      "selected_threshold_accepts": false
+    },
+    {
+      "case_id": "dev-insufficient",
+      "split": "development",
+      "expected_abstain": true,
+      "reason": "沒有明確工作的對象、行動與產出，不能判職位",
+      "dense_top1_score": 0.6529580619053337,
+      "selected_threshold_accepts": false
+    },
+    {
+      "case_id": "hold-accounting",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7884931584184076,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-recruiting",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7394775482845224,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-web",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7157324219889979,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-ux",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7126425804209613,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-testing",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7495339592127325,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-coffee",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.8128276773775531,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-roasting",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.8084573184192929,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-food-service",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7759380716670903,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-electrical",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7934618009086721,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-interior",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.786281324765006,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-purchasing-manager",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7366399521135233,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-marketing",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.7335655780520927,
+      "selected_threshold_accepts": true
+    },
+    {
+      "case_id": "hold-mixed",
+      "split": "holdout",
+      "expected_abstain": false,
+      "reason": null,
+      "dense_top1_score": 0.6733797660161054,
+      "selected_threshold_accepts": false
+    },
+    {
+      "case_id": "hold-no-match-paleontology",
+      "split": "holdout",
+      "expected_abstain": true,
+      "reason": "OCS 職位清單未含古生物研究職位",
+      "dense_top1_score": 0.6183920188763543,
+      "selected_threshold_accepts": false
+    },
+    {
+      "case_id": "hold-no-match-cryptography",
+      "split": "holdout",
+      "expected_abstain": true,
+      "reason": "只有理論研究，不能當成企業資訊安全工作",
+      "dense_top1_score": 0.6315912541667674,
+      "selected_threshold_accepts": false
+    },
+    {
+      "case_id": "hold-insufficient",
+      "split": "holdout",
+      "expected_abstain": true,
+      "reason": "工作對象與實際流程皆缺少",
+      "dense_top1_score": 0.6984330952235895,
+      "selected_threshold_accepts": true
+    }
+  ],
+  "limitation": "Only 3 dev and 3 holdout negatives; no production confidence or fit probability"
+}

@@ -1,0 +1,16 @@
+{
+  "event_id": "e025",
+  "execution_id": "0dfa7ab1-209c-4759-bbca-e846e9ea1a36",
+  "employee_input": {
+    "source_id": "bcacbcf9-f59e-4fa7-baf2-9cd1a9d64fe8",
+    "interview_sequence": 50,
+    "speaker": "employee",
+    "interview_text": "供應商送貨資料有誤時，我回報採購請對方更正，再核對新版單據和實收紀錄。供應商基本資料、付款條件和稅額由採購或財務維護，我只確認與收貨登錄相關的欄位。"
+  },
+  "consultant_reply": {
+    "source_id": "249e6ac5-578e-408a-8860-74fa904fedbf",
+    "interview_sequence": 51,
+    "speaker": "consultant",
+    "interview_text": "已把供應商送貨資料更正流程補到到貨任務：資料有誤時通知採購請供應商更正，再核對新版單據與實收紀錄；您只核對收貨登錄相關欄位，供應商基本資料、付款條件及稅額由採購或財務維護。\n\n如果新版單據仍與實收紀錄不一致，您通常會怎麼記錄或往下處理？"
+  }
+}

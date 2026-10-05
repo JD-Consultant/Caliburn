@@ -1,0 +1,27 @@
+{
+  "sources": {
+    "docs/experiments/2026-10-04-occupation-retrieval/corpus.json": "3892cd37e209976a32d0c9fccf2a35c127091179a0b62eda1604647eddd64c65",
+    "docs/experiments/2026-10-04-occupation-retrieval-generalization/cases.json": "d8b6310dc38d30226ce77dc73f954e4f9f97785320cd61589a225b9ea48478f5",
+    "docs/experiments/2026-10-04-occupation-retrieval-generalization/run-02/retrieval/queries.json": "c1dd20069c3b7f80f659f3acab3da7a39596172f886c887ee8e5ea3929936bb4",
+    "docs/experiments/2026-10-04-occupation-retrieval-generalization/run-02/retrieval/fixed-rankings.jsonl": "86272438fcf4808511218fe2c3a877bcfd103942994d33fdb9a9f00a3531f91f",
+    "docs/experiments/2026-10-04-retrieve-rerank/protocol.md": "b4e746100ee2db053c404e9b92fa92c05504cf7a7a2644a5a4a42b3a4ca8cd9c",
+    "docs/experiments/2026-10-04-retrieve-rerank/cases.json": "49acfed8b621cf06de2bdcd33e33cebfcf54b2a8da5865daf9b6962d0dd97615",
+    "docs/experiments/2026-10-04-retrieve-rerank/queries.json": "5ccc82d1a6729a5c1b3b00515eac8aa330cbfb009c8fb3e59f67a11a502fa71f",
+    "docs/experiments/2026-10-04-retrieve-rerank/prepare.py": "34f637388686e55110cf613928a860a1bedbfe142cccd8b84828dd7cdc7dda39"
+  },
+  "topic_count": 66,
+  "cases": 18,
+  "new_holdout": [
+    "M02",
+    "M04"
+  ],
+  "labels": "engineering non-exhaustive source-supported task mapping",
+  "unscored_examples": [
+    "E01 偶爾示範新人扭力工具",
+    "E03 進貨驗收溫度、每週兩次頻率與協助新配方",
+    "E05 督導放行、清潔劑稀釋",
+    "E06 隔離苗株、出貨點數及管線清洗",
+    "E08 新人示範、耗材缺口"
+  ],
+  "full_employee_coverage_verified": false
+}

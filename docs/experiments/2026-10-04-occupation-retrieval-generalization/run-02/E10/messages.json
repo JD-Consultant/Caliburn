@@ -1,0 +1,32 @@
+[
+  {
+    "interview_sequence": 1,
+    "speaker": "app",
+    "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+  },
+  {
+    "interview_sequence": 2,
+    "speaker": "employee",
+    "text": "大家一起處理產品相關工作，有人設計、有人製作、有人服務客戶。"
+  },
+  {
+    "interview_sequence": 3,
+    "speaker": "consultant",
+    "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+  },
+  {
+    "interview_sequence": 4,
+    "speaker": "employee",
+    "text": "我會參加會議，聽大家說進度；剛才列的都是團隊事情，哪一項是我自己做的還沒說。"
+  },
+  {
+    "interview_sequence": 5,
+    "speaker": "consultant",
+    "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+  },
+  {
+    "interview_sequence": 6,
+    "speaker": "employee",
+    "text": "我目前只肯說自己也在團隊裡，具體負責對象、產出、頻率和決定範圍都還不確定。"
+  }
+]

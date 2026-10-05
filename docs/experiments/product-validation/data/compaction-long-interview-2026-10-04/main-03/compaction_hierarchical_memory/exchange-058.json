@@ -1,0 +1,16 @@
+{
+  "event_id": "e058",
+  "execution_id": "cc18cefa-5f52-4d9c-b58d-a1e40f3b6d66",
+  "employee_input": {
+    "source_id": "aa93fb3b-ee02-484d-94e2-fc965047a822",
+    "interview_sequence": 116,
+    "speaker": "employee",
+    "interview_text": "我指的是庫存帳齡表，不是退貨差異表或收貨異常週報。剛剛先不用改成每週，先維持次月第一個工作日，等主管確認是否真的要改週報。"
+  },
+  "consultant_reply": {
+    "source_id": "4a585229-a17c-4766-be81-f4680b84debf",
+    "interview_sequence": 117,
+    "speaker": "consultant",
+    "interview_text": "了解，是指**庫存帳齡表**。目前先維持依月底庫存狀態整理，於**次月第一個工作日交主管**；暫不改為每週一次，等主管確認後再調整。退貨差異表與收貨異常週報的用途及時程都不變。"
+  }
+}

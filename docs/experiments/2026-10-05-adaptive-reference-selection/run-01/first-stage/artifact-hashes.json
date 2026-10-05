@@ -1,0 +1,70 @@
+{
+  "created_at": "2026-10-05T03:42:24.753789+00:00",
+  "scope": "CPU first-stage exploration artifacts, including failed preflight provenance; excludes this manifest",
+  "files": {
+    "evaluate.py": {
+      "sha256": "6eb5264416f800486174a445264dca75afde4dac2800fe35f74df1af5cdb43a1",
+      "bytes": 13586
+    },
+    "family-diagnostics.json": {
+      "sha256": "4f59ee11e5c31045b344cd5b82d0540a9318d410afb6e61b450b307a17db222c",
+      "bytes": 1772
+    },
+    "frontier.json": {
+      "sha256": "eea0c095395f30cdba0dc27c25e242decc6bd52070e9623812ad34f6b744912f",
+      "bytes": 40428
+    },
+    "full-route-rankings.json": {
+      "sha256": "0cbd0569ecce6c34d46ad4954a6743d36b7ee935d93e501ebfa2add0ac76c40c",
+      "bytes": 1357681
+    },
+    "input-manifest.json": {
+      "sha256": "5047c7037038fc1b5f7e8983546f2c967e976fecc6ff3e58a630e35fc741feeb",
+      "bytes": 2691
+    },
+    "policies.json": {
+      "sha256": "46aca8777c1918d02d7af4af6a69bdb9eeb4470496c7b9e43cb4ea196c905a1e",
+      "bytes": 72187
+    },
+    "preflight-failed-input-manifest.json": {
+      "sha256": "e3c73d8acb0cdfe40d2aa312eb6960dbf4208e357b6a1da0aacef26f01e78014",
+      "bytes": 2691
+    },
+    "preflight-policies.json": {
+      "sha256": "46aca8777c1918d02d7af4af6a69bdb9eeb4470496c7b9e43cb4ea196c905a1e",
+      "bytes": 72187
+    },
+    "protocol.md": {
+      "sha256": "c753f07feae28eb3b1909afdc1f4e636395df15f7c0b39f51a6241fcefd46fe2",
+      "bytes": 3681
+    },
+    "report.md": {
+      "sha256": "864a64d0f478f4bdb35c0b412ef19bf4962451204ba29c3f3db93f7d837ef746",
+      "bytes": 4155
+    },
+    "results.json": {
+      "sha256": "a5ce1d2e1c492445e86629d35a02f5cdb68662fb69bd11bbd8af062f19365dad",
+      "bytes": 17771844
+    },
+    "summary.json": {
+      "sha256": "2069a14fa1c2d3ce6dadd30330b9b8a6bf13192a41bc297101ad3125e2ff376d",
+      "bytes": 292385
+    },
+    "test_mechanism.py": {
+      "sha256": "d96454766c4c4fa58f7073971788de0c7030956a3e2b9ad3ed428c731d9f0149",
+      "bytes": 1685
+    },
+    "verification-final.json": {
+      "sha256": "130710a2e935a72283ad19153bbaebbbaf33797614041e425e91863ecd4fb7c9",
+      "bytes": 1717
+    },
+    "verification.json": {
+      "sha256": "75ddf23a6fa65e01981e6a3a28dc8e6b7043e5ec1d3eddb1c10d3ce1f76019ad",
+      "bytes": 1978
+    },
+    "verify.py": {
+      "sha256": "721d526de19c36df40a95e6be7cb8529ca2451b2c0c0d84efe6c983f77be54a7",
+      "bytes": 5149
+    }
+  }
+}

@@ -1,0 +1,1076 @@
+{
+  "control-1": {
+    "model_responses": 6,
+    "input_tokens": 94755,
+    "cached_tokens": 70174,
+    "cache_write_tokens": 24563,
+    "output_tokens": 7154,
+    "reasoning_tokens": 2669,
+    "rate_wait_seconds": 59.69730680005159,
+    "tool_calls": [
+      {
+        "call_id": "call_V3S9PezbBVbqxo1gfIdSF24z",
+        "name": "read_work_situation_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_LqOyPBtxfOmELMErrbOGc3Fe",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_j5YaLVRNS2fMgYuXDyz9NMWI",
+        "name": "read_work_understanding",
+        "arguments": {
+          "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+        }
+      },
+      {
+        "call_id": "call_xiOToHl2iW8SWeFxMwBZT6qD",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "退貨核對、狀態登錄與差異處理"
+        }
+      },
+      {
+        "call_id": "call_ES2yLLupmugSB58Ola5ZibG8",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "倉庫掃碼器備品核對與故障追蹤"
+        }
+      },
+      {
+        "call_id": "call_7nrPldZsuFyZigOqTHSyCF5G",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "新同事庫存作業示範與交接說明"
+        }
+      },
+      {
+        "call_id": "call_CmNFexPLNVQf85SbA8zvDpEs",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存報表"
+        }
+      },
+      {
+        "call_id": "call_WwJoOFwskfsXvy74Logi0p25",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "休假前後庫存物流事項交接"
+        }
+      },
+      {
+        "call_id": "call_Wo0buxNEOAxeH8NE5Y4WCF5h",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "年度庫存查核與稽核取證"
+        }
+      },
+      {
+        "call_id": "call_aV9RQywrT0yulD7pyUwPsLWd",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "店間調撥"
+        }
+      },
+      {
+        "call_id": "call_5ohKbzH5Iu2OfXyj1Tbmwtu8",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "缺貨追蹤"
+        }
+      },
+      {
+        "call_id": "call_JCVm7utDhE2iVbRg5VBkiOmx",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "產品召回庫存盤查與隔離追蹤"
+        }
+      },
+      {
+        "call_id": "call_NAPEtpYzWJlEJV6n52wqPsBW",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+        }
+      },
+      {
+        "call_id": "call_rvelutlCJnqx3ChVwZz6N0rd",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存盤點與差異查核"
+        }
+      },
+      {
+        "call_id": "call_orCTrHylBzR5zUNpSQp1XxS4",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "收貨異常週報"
+        }
+      },
+      {
+        "call_id": "call_8sEBW78DhLX1oqakelVMdb6b",
+        "name": "delete_work_understanding",
+        "arguments": {
+          "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+        }
+      },
+      {
+        "call_id": "call_EC3cZj87yyIwnXi6UshCe8eH",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "日常庫存異動登錄與跨窗口異常追蹤",
+          "description": "整合收貨、退貨、店間調撥、缺貨及收貨異常週報等日常異動處理；依不同流程保留核對依據、時點、追蹤終點與採購、客服、倉庫、財務及主管的權限界線。各時限與門檻不可互套，未明確的例外仍須回查相應情境。",
+          "body": "## 工作模式與責任界線\n本人處理多種庫存進出與狀態變更：核對來源單據和實際／系統庫存、記錄差異、更新 ERP 或追蹤清單，並將待決事項交給有權窗口。本人不代替採購決定訂貨、補貨量、退換貨或交期；客服決定客人通知、拆單或延後出貨，財務決定截止歸屬月份，主管或品質窗口依各流程作成核准／判定。各流程有不同時限、結案條件及表單，不能以一項流程的規則推及其他流程。\n\n## 收貨登錄及收貨異常\n- 每日約處理 15–20 張進貨單；倉庫同事清點實物，本人比對採購單、送貨單與實收品號、批號、數量，不能把供應商單據數量直接當實收。確認相符的項目通常於到貨當天下班前登錄 ERP。\n- 月底最後一天財務提供截止清單；超過截止或有疑義的單據由財務決定歸屬月份，本人記錄實際收貨時間與未決原因，不自行回填日期。\n- 外箱破損或短少時拍照、記錄實收數及原單號、通知採購並列入待處理清單；本人更新差異與進度。兩個工作日未回覆提醒採購，第四個工作日仍無進展回報主管。採購決定補貨或退換貨；本人不接受替代品、不改採購單價格。補貨或退貨完成且帳物相符才結案，並不保證供應商到貨時間。\n- 驗收不良率以每批實際驗收件數為分母，超過 5% 提報倉儲主管；剛好 5% 不因該門檻提報，但有安全疑慮時不論比例先隔離並通知主管。此驗收門檻不是掃碼器備品的 5%。未超過門檻且無安全疑慮時的處理方式及比例核算者尚未明確。\n- 送貨資料錯誤由本人回報採購，待供應商更正後再核對。ERP 品號重複或單位不一致時暫停該筆登錄並交資料維護窗口確認；窗口修正後再核對，不自行新增相似品號。曾確認某一特定品號一箱為 12 件，換算依據只適用該品號；是否保存於品號資料或每次重驗未知。\n- ERP 暫停時記錄原單號、實收數及狀態，不標成已入帳；系統恢復後先查有無重複登錄，再補登並保留實際處理時間。本人不修伺服器、不改資料庫。持續故障或截止迫近而修改尚未核准時的通知／標記方式，以及單號、品號或批號仍無法匹配時的確認窗口未知。\n\n## 收貨異常週報\n每週五 16:00 前交週報給採購及主管，列未結案原因、等待天數及下一跟進事項。供應商回覆附更新時間；未回覆標示「未確認」，不代填預計完成日。這是收貨異常週報期限，不是其他登錄或報表期限。\n\n## 退貨核對與狀態登錄\n- 每工作日核對前一工作日收到的退貨，使用獨立清單；週一 08:50 開始（含週末累積），週二至週五 08:35 開始，但每日仍在 09:10 前交退貨差異表給客服。開始時間變化不改交表期限。\n- 核對客退單、品號、批號及實收量。常溫品依倉庫確認的狀態登錄可售、待檢或報廢待核准；冷藏品另核對溫度紀錄並交品質窗口判斷可否再售，溫度門檻本人不清楚。本人不自行判定報廢，待檢品不列可用量；外箱完整但內件不齊仍先維持待檢。\n- 數量差異提供照片和紀錄請客服確認；主管同意調帳後才依核准資料改 ERP，並保留核准單號。退款由客服與財務處理。客退單、品號或批號不符及客服確認後細節尚未說明。09:10 是退貨時限，不適用於收貨。\n\n## 店間調撥\n每週一、四集中處理各店需求；本人核對可用量及主管核准後建立 ERP 調撥單並安排倉庫出貨，物流窗口安排車趟。不承諾未核准需求，也不決定分配比例。收發數不一致時比對調撥單、裝箱清單和簽收紀錄並請兩店確認；在途量不能列作收貨店可售庫存，雙方收發相符後結案。拆單或退回須重新核准。目的店臨時拒收時記錄原因並請主管決定改店或退回，核准後才更新 ERP、通知雙方並連結原單與新核准。核准方式、未核准／無可用量時的後續及差異確認後處置未知。\n\n## 缺貨追蹤\n每天檢視低於安全庫存清單及客服／倉庫通報；先核對可用量、已保留量、待出貨訂單，以及未登錄到貨或退貨，避免把帳面低量直接當成實際缺貨。確認後提供客服與倉庫缺貨風險和採購回覆的預計到貨日，記錄更新時間及供應商確認狀態；日期變動即更新清單並通知相關窗口。追蹤至補貨入庫、ERP 更新且受影響訂單已有安排。本人不保證到貨；採購決定補貨量，客服決定客人通知、拆單或延後出貨。安全庫存門檻及訂單安排判定細節未知；收貨異常的兩／四工作日提醒規則不套用於缺貨。\n\n## 回查與尚待確認\n進貨、ERP例外及異常回查「到貨驗收、ERP 登錄與收貨異常追蹤」；週報回查「收貨異常週報」；退貨、調撥及缺貨分別回查同名情境。不得將各流程時限、核准方式、庫存狀態或結案規則互套。上述各節列明的門檻、後續窗口或處置未知，應依原情境回查，不自行補成通則。",
+          "work_situation_references": [
+            "到貨驗收、ERP 登錄與收貨異常追蹤",
+            "收貨異常週報",
+            "退貨核對、狀態登錄與差異處理",
+            "店間調撥",
+            "缺貨追蹤"
+          ]
+        }
+      },
+      {
+        "call_id": "call_e8UJ6A4Mm705BqSJWnNE0wCY",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "庫存盤點、帳齡報表與年度稽核支援",
+          "description": "呈現本人對帳實盤點、庫存帳齡狀態報表及年度抽樣查核的不同責任；保留每週、月末與年底的適用時點、調帳核准界線，以及年終實物全盤不等於年度稽核。",
+          "body": "## 盤點及差異查核\n- 平常抽盤每週三；主管指定的高周轉或易錯品項必查，本人另選近期收貨／退貨頻繁品項交主管確認。本人比對 ERP 與現場清點結果，異常盤差或主管要求時加盤；平常現場由誰清點、本人所選品項何時確認尚不明。\n- 月底每月一次全盤由倉庫同事分區清點，本人彙整盤點表；只有月底全盤彙整表需要主管簽核，平常抽盤交查核結果，兩者流程不同。\n- 有差異時先查近期收貨、退貨、移位及待出貨紀錄，必要時請倉庫複盤。本人整理帳實差異（品號、批號、帳面量、實盤量、差額、查核原因及核准單號），供主管判斷；抽盤結果本身不是調帳授權。不論差異大小，未有核准庫存調整單不得自行將 ERP 改成實盤數。誰核准調整單、其與月底彙整表簽核的關係、差異表是否每次盤點都做以及其他結案時點未知。\n\n## 庫存帳齡表\n按月底庫存狀態整理帳齡表，列可售、待檢及報廢待核准，次月第一個工作日交主管查看滯留和庫存狀態；採月底狀態而非交表日狀態。帳齡依已確認入庫日期及月末狀態計算，先核對批號和調撥資料，避免移倉被視為新入庫。促銷、報廢或其他處置由主管決定，本人不自行設定折扣或刪除庫存。具體帳齡分段／公式、其他欄位及主管決定後的執行流程尚未知。此表不等同退貨差異表、盤點差異表或週五收貨異常週報。\n\n## 年度稽核證據支援\n每年年底配合財務及外部稽核，依財務／稽核提供的抽樣清單提供收貨、調撥、退貨及核准調帳證據，說明差異和追查狀態。抽樣項目由財務或稽核選，不由本人決定。追問時依原單號找紀錄與核准文件；缺件則列明並請相關窗口補充，不重製文件冒充原有核准。稽核是否通過及會計處理由財務、稽核判斷；缺件後是否由本人追到補齊或取得回覆尚未知。\n\n## 時期與責任區分\n年終實物全盤和年度稽核可能同時發生，但不是同一責任：全盤核對實物與帳差，稽核提供證據與可追溯性。本人表示若其中一項改由他人負責，另一項仍是本人的責任；年終全盤是否採不同於每月全盤的程序尚未說明。各項流程與未知細節回查「庫存盤點與差異查核」、「庫存報表」及「年度庫存查核與稽核取證」。",
+          "work_situation_references": [
+            "庫存盤點與差異查核",
+            "庫存報表",
+            "年度庫存查核與稽核取證"
+          ]
+        }
+      },
+      {
+        "call_id": "call_K6b0VmcwwKJNHW06x6flDH19",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "產品召回期間的庫存盤查與隔離追蹤",
+          "description": "收錄低頻但確實存在的品質事件支援：依品質窗口提供的品號／批號核查門市及庫存狀態、促成隔離並追蹤紀錄；清楚標示召回範圍與解除決定不屬本人。",
+          "body": "## 適用情境與執行內容\n這是低頻但明確屬於本人工作的召回支援，不是日常庫存流程的通則。收到品質窗口提供的品號及批號後，查各店可售、待檢、在途調撥及其他庫存狀態；通知倉庫先隔離，向主管及品質窗口提供影響範圍，追蹤隔離量、回收量及各店回覆，直到主管確認紀錄齊全。\n\n## 資訊完整性與責任邊界\n品質窗口決定召回範圍及是否解除；本人不決定召回，也不宣布恢復銷售。客服負責對客通知，採購聯繫供應商。曾遇門市只報總量而未提供批號，會請補資料，不把總量當成已查清所有批次；完整批號及狀態優先於快速交表。若通知只列部分批號，先向品質窗口查證範圍，不自行把未列批號加入召回，也不自行認定安全；資料不足時保留待確認。\n\n## 尚未明確\n門市延遲補批號的跟進時限與升級對象、品質窗口暫不能確認範圍時由誰跟進／回報、回收量如何核實，以及主管確認紀錄齊全後的後續工作，現有資料未說明。具體案例與限制回查「產品召回庫存盤查與隔離追蹤」。",
+          "work_situation_references": [
+            "產品召回庫存盤查與隔離追蹤"
+          ]
+        }
+      },
+      {
+        "call_id": "call_KGe7c1UiLQXdi5QiYo5Lmiee",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "庫存作業交接與流程示範",
+          "description": "整合休假代理期間的作業連續性，以及新同事上任時對本人流程的示範和交接說明維護；不推定為正式管理或公司層級訓練職責，並標出交接差異處理等未知。",
+          "body": "## 休假前後的作業連續性\n休假前交接未結案差異、預計到貨及當日截止事項，附原單號、目前狀態和下一聯絡窗口；返崗後核對代理期間登錄及完成事項，以免重複入帳或庫存狀態不一致。若發現代理登錄與原紀錄不一致，如何更正、通知或升級尚未說明。\n\n## 新同事流程示範\n新同事上任時示範本人負責的 ERP 登錄、查找原單據及差異查核，並維護本人流程的交接說明。主管負責工作分配及考核；本人沒有帶人職務，也不制定公司全體訓練制度。說明文件何時因流程變更更新或定期檢視尚未明確。\n\n此理解只涵蓋已說明的個人工作交接及範圍內流程分享，不延伸為人事管理或正式訓練職責。詳細條件分別回查「休假前後庫存物流事項交接」及「新同事庫存作業示範與交接說明」。",
+          "work_situation_references": [
+            "休假前後庫存物流事項交接",
+            "新同事庫存作業示範與交接說明"
+          ]
+        }
+      },
+      {
+        "call_id": "call_SbZt5BFba6E5jTKXNXv50Tkl",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "倉庫掃碼器備品核對與故障追蹤",
+          "description": "獨立記錄倉庫掃碼器設備備品比例核對、核准補充及故障後交資訊窗口追蹤；此設備備品 5% 與商品驗收不良率門檻完全不同。",
+          "body": "## 備品核對及故障追蹤\n每月按使用中掃碼器設備數量核對備品，依 5% 準備；不足時請主管核准補充。這是設備數量的備品比例，不是商品驗收不良率，也不是按商品件數計算。故障時記錄設備編號、位置與問題，交資訊窗口，追蹤備品更換及送修狀態。\n\n本人不拆機維修，也不決定採購品牌。按 5% 計算非整數時如何取整、補充採購細節及更換／送修到何種狀態才結案尚未說明。具體條件回查「倉庫掃碼器備品核對與故障追蹤」。",
+          "work_situation_references": [
+            "倉庫掃碼器備品核對與故障追蹤"
+          ]
+        }
+      },
+      {
+        "call_id": "call_Cw7gvmlGCCXWplJDIc5HJXbH",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      }
+    ],
+    "incomplete_responses": [],
+    "tools_by_name": {
+      "read_work_situation_map": 1,
+      "read_work_understanding_map": 2,
+      "read_work_understanding": 1,
+      "read_work_situation": 12,
+      "delete_work_understanding": 1,
+      "create_work_understanding": 5
+    },
+    "read_path": [
+      {
+        "call_id": "call_V3S9PezbBVbqxo1gfIdSF24z",
+        "name": "read_work_situation_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_LqOyPBtxfOmELMErrbOGc3Fe",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_j5YaLVRNS2fMgYuXDyz9NMWI",
+        "name": "read_work_understanding",
+        "arguments": {
+          "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+        }
+      },
+      {
+        "call_id": "call_xiOToHl2iW8SWeFxMwBZT6qD",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "退貨核對、狀態登錄與差異處理"
+        }
+      },
+      {
+        "call_id": "call_ES2yLLupmugSB58Ola5ZibG8",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "倉庫掃碼器備品核對與故障追蹤"
+        }
+      },
+      {
+        "call_id": "call_7nrPldZsuFyZigOqTHSyCF5G",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "新同事庫存作業示範與交接說明"
+        }
+      },
+      {
+        "call_id": "call_CmNFexPLNVQf85SbA8zvDpEs",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存報表"
+        }
+      },
+      {
+        "call_id": "call_WwJoOFwskfsXvy74Logi0p25",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "休假前後庫存物流事項交接"
+        }
+      },
+      {
+        "call_id": "call_Wo0buxNEOAxeH8NE5Y4WCF5h",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "年度庫存查核與稽核取證"
+        }
+      },
+      {
+        "call_id": "call_aV9RQywrT0yulD7pyUwPsLWd",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "店間調撥"
+        }
+      },
+      {
+        "call_id": "call_5ohKbzH5Iu2OfXyj1Tbmwtu8",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "缺貨追蹤"
+        }
+      },
+      {
+        "call_id": "call_JCVm7utDhE2iVbRg5VBkiOmx",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "產品召回庫存盤查與隔離追蹤"
+        }
+      },
+      {
+        "call_id": "call_NAPEtpYzWJlEJV6n52wqPsBW",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+        }
+      },
+      {
+        "call_id": "call_rvelutlCJnqx3ChVwZz6N0rd",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存盤點與差異查核"
+        }
+      },
+      {
+        "call_id": "call_orCTrHylBzR5zUNpSQp1XxS4",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "收貨異常週報"
+        }
+      },
+      {
+        "call_id": "call_Cw7gvmlGCCXWplJDIc5HJXbH",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      }
+    ],
+    "tool_errors": [],
+    "read_output_characters": 16406,
+    "understandings": [
+      {
+        "title": "日常庫存異動登錄與跨窗口異常追蹤",
+        "body_characters": 1863,
+        "sources": [
+          "退貨核對、狀態登錄與差異處理",
+          "店間調撥",
+          "缺貨追蹤",
+          "到貨驗收、ERP 登錄與收貨異常追蹤",
+          "收貨異常週報"
+        ]
+      },
+      {
+        "title": "庫存盤點、帳齡報表與年度稽核支援",
+        "body_characters": 860,
+        "sources": [
+          "庫存報表",
+          "年度庫存查核與稽核取證",
+          "庫存盤點與差異查核"
+        ]
+      },
+      {
+        "title": "倉庫掃碼器備品核對與故障追蹤",
+        "body_characters": 200,
+        "sources": [
+          "倉庫掃碼器備品核對與故障追蹤"
+        ]
+      },
+      {
+        "title": "產品召回期間的庫存盤查與隔離追蹤",
+        "body_characters": 406,
+        "sources": [
+          "產品召回庫存盤查與隔離追蹤"
+        ]
+      },
+      {
+        "title": "庫存作業交接與流程示範",
+        "body_characters": 314,
+        "sources": [
+          "新同事庫存作業示範與交接說明",
+          "休假前後庫存物流事項交接"
+        ]
+      }
+    ],
+    "understanding_body_characters": 3643,
+    "map_characters": 651
+  },
+  "candidate-1": {
+    "model_responses": 8,
+    "input_tokens": 133094,
+    "cached_tokens": 106677,
+    "cache_write_tokens": 26393,
+    "output_tokens": 8025,
+    "reasoning_tokens": 1749,
+    "rate_wait_seconds": 79.54580300004454,
+    "tool_calls": [
+      {
+        "call_id": "call_rxjgEOu46NZGSszFn3x7J8lW",
+        "name": "read_work_situation_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_7RYdBiM50dwkao8ws0b2M9pY",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_Y7CAuwSBZQv5BzC4mqxWGoPw",
+        "name": "read_work_understanding",
+        "arguments": {
+          "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+        }
+      },
+      {
+        "call_id": "call_Tqbhx24ezbshZnLx3fJWJbxl",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "退貨核對、狀態登錄與差異處理"
+        }
+      },
+      {
+        "call_id": "call_osRC5Ks73ojGeWhUinV84QTU",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "倉庫掃碼器備品核對與故障追蹤"
+        }
+      },
+      {
+        "call_id": "call_DaXZgRPtc9bZVfHfHuVSuDCT",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "新同事庫存作業示範與交接說明"
+        }
+      },
+      {
+        "call_id": "call_dcqUVkdAkNo5AYJnxa2PY3ot",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存報表"
+        }
+      },
+      {
+        "call_id": "call_SlNa271mnVUtrB5rMLH2PLeD",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "休假前後庫存物流事項交接"
+        }
+      },
+      {
+        "call_id": "call_bIPTNxzw2zMCnd0lgQHiBS2f",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "年度庫存查核與稽核取證"
+        }
+      },
+      {
+        "call_id": "call_4IAOXTvGci7INKzPEcQX8IFu",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "店間調撥"
+        }
+      },
+      {
+        "call_id": "call_9BWCxogXKU9eZTQd7eAN3Tq3",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "缺貨追蹤"
+        }
+      },
+      {
+        "call_id": "call_LnhSICD77Ctkzwg38OJlnuKz",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "產品召回庫存盤查與隔離追蹤"
+        }
+      },
+      {
+        "call_id": "call_Cootnbb0S3HrimjafeAEWN8h",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+        }
+      },
+      {
+        "call_id": "call_o26DXAnodD3kIFZfXsMy0BKW",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存盤點與差異查核"
+        }
+      },
+      {
+        "call_id": "call_969WCUSFbVMnNtCGPZo75vIb",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "收貨異常週報"
+        }
+      },
+      {
+        "call_id": "call_DWvGH4XixSgEkTXiN0MujDZz",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "到貨驗收、ERP 登錄與收貨異常追蹤",
+          "description": "適用於供應商到貨核對、ERP 入帳及收貨差異的處理；涵蓋月結截止、品號／單位例外與系統暫停，不套用退貨或週報時限。",
+          "body": "## 工作範圍與角色\n本人自述為營運部庫存與物流行政專員，向倉儲主管報告。到貨工作包括單據與實收核對、ERP 登錄及收貨異常追蹤；採購決定訂貨，亦負責供應商更正及退換貨／補貨決定。本人不負責採購議價或對外承諾交期，不自行修改採購價格或接受替代品。\n\n## 到貨核對與登錄\n- 每天約處理 15–20 張進貨單。倉庫同事清點實物，本人比對採購單、送貨單及實際到貨的品號、批號、數量並記錄差異；不能直接以送貨單數量當實收數。\n- 資料相符後登錄 ERP，已確認項目通常於到貨當天下班前完成。\n- 月底最後一天由財務提供截止清單；超過截止或有疑義的單據由財務決定歸屬月份。本人保留實際收貨時間及未決原因，不自行回填日期。\n\n## 收貨異常追蹤及提報\n- 外箱破損或短少時拍照，記錄實收件數及原單號，通知採購，未確認部分列入待處理清單並更新差異及進度。\n- 兩個工作日未獲回覆提醒採購；第四個工作日仍無進展則回報主管。收貨異常待補貨或退貨完成且帳物相符才結案；供應商補貨時間不由本人保證。\n- 驗收不良比例按每批實際驗收件數計算；超過 5% 提報倉儲主管，不跨月、不以每日進貨單張數作分母。剛好 5% 不因比例規則提報；若有安全疑慮，無論比例均先隔離並通知主管。這個 5% 與掃碼器備品 5% 是不同計算。\n- 未超過門檻且無安全疑慮時的處理方式，以及比例所需件數由誰核算，尚未說明。\n\n## 資料與系統例外\n- 供應商送貨資料錯誤時回報採購請供應商更正，收到新版後核對單據與實收。供應商基本資料、付款條件及稅額由採購或財務維護；本人只確認收貨登錄欄位。\n- ERP 品號重複或單位不一致時，記下受影響單號並暫停該筆登錄，交資料維護窗口確認，修正後再核對；不可把一箱當一件，也不自行新增相似品號避錯。曾有某品號經窗口確認一箱為 12 件，保留換算依據後登錄；此換算只適用該品號。換算依據是否留存於品號資料或每次重新確認，尚不明。\n- ERP 暫停時記錄原單號、實收數及狀態，不標示為已入帳。系統恢復後先查是否重複登錄，再補登並保留實際處理時間。本人不修復伺服器或自行修改資料庫。\n- 旺季 11–12 月到貨較多時依主管指示安排截止單及異常追蹤，不因此略過 ERP 修改核准。截止迫近而 ERP 修改未核准時如何標示及回報，以及故障可能影響截止時通知誰，尚未說明。\n- 其他類型單據差異、其他登錄時效例外，以及原單號或品號搭配批號仍無法匹配時的標記與確認窗口，尚未說明。\n\n## 工作方法與條件\n核對需分辨可用、保留、待檢及在途庫存，並核對原單號、品號、批號、單位及核准資料。Excel 主要使用篩選、樞紐分析及查找比對清單；不只依相似品名合併，因同名商品可能規格不同。工作日 08:30–17:30，不輪夜班；月底全盤偶爾延後下班。平常在辦公區，收貨或盤點時進倉並遵守動線及隔離區標示；公司不要求操作堆高機或搬整箱重物。其他防護用品要求尚未說明。\n\n## 邊界\n每週五 16:00 收貨異常週報是獨立交付工作；退貨另有自己的核對時段及 09:10 交表期限，不可把時限互套。本人目前不負責社群行銷或人員考核。",
+          "work_situation_references": [
+            "到貨驗收、ERP 登錄與收貨異常追蹤"
+          ]
+        }
+      },
+      {
+        "call_id": "call_0Z4N6BzScQ4D1pp3Wp8nGr7T",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "收貨異常週報",
+          "description": "選讀每週五向採購與主管彙整收貨異常的工作；聚焦未結案狀態、等待時間、下一步與供應商回覆時間戳，不替代異常案件本身的追蹤規則。",
+          "body": "## 交付與內容\n- 每週五 16:00 前將收貨異常週報交給採購與主管。\n- 列出未結案原因、等待天數及下一個跟進事項。供應商回覆需附更新時間；尚無回覆時標示「未確認」，不代供應商填預計完成日。\n- 週報供相關人員處置與追蹤，不為讓數字看起來一致而自行補齊資訊。\n- 系統欄位缺漏時列明缺漏原因與待確認項，不自行補數。\n\n## 留存與時限界線\n單據及核准紀錄依公司既有規則存於共享資料夾，檔名含日期及原單號；保存年限本人不確定，需向財務確認。週報的週五 16:00 是此報表的交付期限，不套用到進貨登錄、退貨核對、帳齡表或其他收貨作業。案件的兩／四工作日提醒與結案條件屬收貨異常追蹤本身，不由週報時點取代。",
+          "work_situation_references": [
+            "收貨異常週報"
+          ]
+        }
+      },
+      {
+        "call_id": "call_MDUzPWvQIdpyNIUmtPevADow",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "退貨核對、狀態登錄與差異處理",
+          "description": "選讀前一工作日客退的核對與狀態登錄；保留週一／平日不同開始時間、每日 09:10 交表、常溫／冷藏判定分工及調帳核准界線。",
+          "body": "## 核對時點與資料\n- 每個工作日用獨立退貨清單核對前一工作日收到的退貨。週一因週末累積於 08:50 開始；週二至週五於 08:35 開始。每天仍須在 09:10 前將退貨差異表交客服窗口，週一較晚開始不延後交表。\n- 核對客退單、品號、批號及實收數量。這些期限只屬退貨，不套用進貨驗收或週五收貨異常週報。\n\n## 商品狀態與判定分工\n- 常溫退貨依倉庫同事確認的商品狀態登錄為可售、待檢或報廢待核准。\n- 冷藏退貨另核對溫度紀錄，交品質窗口判定是否可再銷售。本人不清楚溫度合格門檻，不套用外部或行業標準。\n- 本人不自行判定報廢；待檢庫存不可列為可用量。外箱完整但內件不齊時維持待檢，不直接登錄可售；主管請倉庫複檢後決定處理方式。本人保留可追溯狀態，不保證每筆立即恢復可售。\n\n## 數量差異與 ERP 調帳\n數量不符時提供照片及差異紀錄請客服確認；主管同意調帳後，才依核准資料修改 ERP，並保留核准單號。退款由客服與財務處理，不是本人工作。退貨調帳需有主管同意，與盤點使用核准庫存調整單的程序不可混為一談。\n\n## 尚未確認\n客退單、品號或批號不符時的具體後續、客服確認後的處理細節，以及其他狀態判定條件尚未說明。",
+          "work_situation_references": [
+            "退貨核對、狀態登錄與差異處理"
+          ]
+        }
+      },
+      {
+        "call_id": "call_1FISKN62Z0O1LpOcvnGwbffI",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "庫存盤點與差異查核",
+          "description": "涵蓋每週三平常抽盤、每月月底全盤及必要加盤的不同安排、差異調查與調帳權限；不與年度稽核取證合併。",
+          "body": "## 盤點安排與成果\n- 平常抽盤每週三進行；主管指定的高周轉或易錯品項必須檢查。本人另選近期收貨、退貨頻繁的品項交主管確認。主管確認是在盤點前還是提交差異清單時，現有資料未說明。\n- 本人核對 ERP 與現場清點結果；異常盤差或主管要求時加盤。平常現場由誰清點尚未明確。\n- 月底全盤每月一次，由倉庫同事分區清點，本人整合各區盤點表。只有月底全盤彙整表需要主管簽核；平常抽盤先交查核結果，兩者不是同一簽核流程。\n- 年終實物全盤與年度稽核可能同時期，但工作目的不同：全盤看實物與帳差，稽核看證據與可追溯性。本人表示一項改由他人負責時，另一項仍是本人的責任；年終全盤與一般月底全盤是否採不同程序尚不明。\n\n## 差異查核與調整界線\n- 盤點數量與 ERP 不一致時，先查近期收貨、退貨、移位及待出貨紀錄；必要時請倉庫同事複盤。\n- 不論差異大小，本人不能自行把 ERP 改成現場數，必須有核准的庫存調整單。抽盤差異清單不是調帳授權。\n- 本人整理帳實差異表，記錄品號、批號、帳面量、實盤量、差額、查核原因及核准單號，供主管判斷是否調帳。是否每次盤點都整理，或只有有差異時整理，尚未釐清。\n- 欄位缺漏時列明原因及待確認項，不為求表格完整自行補數。\n\n## 尚未明確\n核准庫存調整單由誰簽核、與月底全盤彙整表主管簽核的關係，以及核准調整以外的差異結案或回報時點，現有資料未說明。",
+          "work_situation_references": [
+            "庫存盤點與差異查核"
+          ]
+        }
+      },
+      {
+        "call_id": "call_aS0H7hnROdZ3d3gFmabRlC38",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "年度庫存稽核取證與差異說明",
+          "description": "涵蓋年底依財務／外部稽核抽樣要求提供庫存交易證據、追查與補件；年終實物全盤是另一項責任，不可合併。",
+          "body": "## 年度稽核支援\n- 每年年底配合財務及外部稽核進行庫存查核。依財務或稽核提供的抽樣清單，提供收貨、調撥、退貨及核准調帳證據，說明差異與追查狀態。\n- 抽樣項目由財務或稽核選定，本人不決定查核哪一筆。\n\n## 原始紀錄與判斷權限\n稽核追問時，依原單號找往來紀錄與核准文件；缺件就列出缺件並請相關窗口補充，不重製文件冒充原有核准。稽核是否通過及會計處理由財務與稽核判斷。補件後是否由本人追蹤至資料齊全或收到稽核回覆，尚未說明。\n\n## 與年終實物全盤區分\n年終實物全盤看實物及帳差，年度稽核看證據及可追溯性；時程可以重疊，工作不可合併。本人表示若其中一項改由他人負責，另一項仍為本人責任。年終全盤是否採不同於每月月底全盤的程序尚未說明。",
+          "work_situation_references": [
+            "年度庫存查核與稽核取證"
+          ]
+        }
+      },
+      {
+        "call_id": "call_O7Lt1rI7wLaTPlUCOfQkUC3T",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "店間調撥需求、出貨與收發差異",
+          "description": "適用於每週一、四集中處理店間庫存需求；涵蓋可用量與核准確認、ERP 調撥單、物流分工、在途界線及差異結案。",
+          "body": "## 需求與出貨\n- 每週一、四集中處理各店調撥需求。本人核對可用庫存及主管核准後建立 ERP 調撥單並安排倉庫出貨；物流窗口安排車趟。\n- 未核准需求不能承諾一定出貨；本人不決定各店分配比例。\n\n## 收發核對與結案\n- 出貨店與收貨店數量不一致時，對照調撥單、裝箱清單及簽收紀錄追查，請兩店確認。\n- 貨物在途不可列作收貨店可售庫存；雙方收發紀錄相符後才結案。完成後保留原單號、發出店、收貨店及批號。\n- 拆單或退回須重新取得核准。主管核准後若收貨店臨時不收，本人登記原因並請主管確認改目的店或退回；不自行改店別。取得新核准後才更新 ERP、通知雙方，並連結原調撥單及新核准資料。\n\n## 尚未明確\n主管核准的具體方式、未核准或無可用庫存時的後續處理，以及兩店確認差異後的其他處置細節，尚未說明。",
+          "work_situation_references": [
+            "店間調撥"
+          ]
+        }
+      },
+      {
+        "call_id": "call_FgW55duIWi26ODXjH8pHwsfw",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "缺貨確認與補貨資訊追蹤",
+          "description": "選讀每日依低於安全庫存清單及客服／倉庫通報確認缺貨，更新相關窗口並追蹤補貨與受影響訂單；不代替採購或客服作決策。",
+          "body": "## 啟動與核對\n- 每天查看低於安全庫存清單，也處理客服或倉庫通報。\n- 先核對可用量、已保留量、待出貨訂單，以及尚未登錄的到貨或退貨；不能把帳面缺貨直接當成實際無貨。\n\n## 確認缺貨後的資訊與追蹤\n- 確認缺貨後，將缺貨風險及採購回覆的預計到貨日提供客服和倉庫，追蹤到補貨入庫、ERP 更新，且受影響訂單已有安排。\n- 預計到貨日是採購提供的資訊。本人記錄更新時間及是否仍待供應商確認；日期變更時更新清單並通知受影響窗口。不保證到貨準時，也不將舊日期當成已確認承諾。\n\n## 決策界線與未知\n採購決定補貨數量；客人通知、拆單或延後出貨由客服決定。本人提供資訊並追蹤，不代替決策。安全庫存具體門檻、受影響訂單安排的判定細節及其他例外尚未說明。收貨異常的兩／四工作日提醒升級規則不套用於缺貨追蹤。",
+          "work_situation_references": [
+            "缺貨追蹤"
+          ]
+        }
+      },
+      {
+        "call_id": "call_hMUlsyZ2VVFmO8OfR11H3SDN",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "月末庫存帳齡表與滯留狀態彙整",
+          "description": "選讀依月底庫存狀態製作、次月第一個工作日交主管的帳齡表；保留帳齡依據、庫存狀態與主管處置權限，與其他差異表分開。",
+          "body": "## 編製與交付\n- 依月底庫存狀態整理帳齡表，分列可售、待檢、報廢待核准，於次月第一個工作日交主管查看滯留及庫存狀態；採月末狀態，不改用交表當天狀態。\n- 帳齡依已確認的入庫日期及月末庫存狀態計算。本人先核對批號與調撥資料，避免移倉使庫存看似新入庫。\n- 欄位缺漏時列出原因與待確認項，不為求表格完整自行補數字。\n\n## 處置權限及表單界線\n促銷、報廢或其他處置由主管決定；本人不直接設定折扣或刪除滯銷品。此帳齡表不同於退貨差異表、週五收貨異常週報、盤點差異表及調撥紀錄，各自用途及時點不可互套。\n\n## 尚未明確\n帳齡分段或具體公式、其他欄位，以及主管決定處置後由誰執行及如何追蹤，尚未說明。",
+          "work_situation_references": [
+            "庫存報表"
+          ]
+        }
+      },
+      {
+        "call_id": "call_YCeiDHusfOaDME16mwG7Hx0u",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "產品召回批號盤查、隔離與回覆追蹤",
+          "description": "低頻但確實存在的召回支援工作：按品質窗口所給品號／批號盤查各店與庫存狀態、促成隔離並追蹤紀錄；本人不決定召回範圍或解除。",
+          "body": "## 盤查與隔離\n- 產品召回時，依品質窗口提供的品號與批號查核各店可售、待檢、在途調撥及其他庫存，向主管及品質窗口提供影響範圍，通知倉庫先隔離。\n- 這是低頻但確實屬於本人工作的事項，不因案例少而忽略。\n\n## 回覆追蹤與責任界線\n- 追蹤隔離量、回收量及各店回覆，直到主管確認紀錄齊全。\n- 品質窗口決定召回範圍及是否解除；本人不決定召回，也不宣布恢復銷售。客服負責對客通知，採購聯繫供應商。\n- 曾遇三家店需逐一對照調撥單，其中一家只報總量而未提供批號；本人請補資料，不將總量當成所有批次已查清。完整批號及狀態核對優先於快速交表。\n- 通知只列部分批號時，先向品質窗口查證範圍；不直接把未列出的同品項批號列入召回，也不自行認定其安全。資訊不足時保留待確認。\n\n## 尚未明確\n店方延遲補批號的跟進時限與升級對象、品質窗口暫不能確認範圍時由誰跟進或回報、回收量如何核實，以及主管確認紀錄齊全後的後續工作，尚未說明。",
+          "work_situation_references": [
+            "產品召回庫存盤查與隔離追蹤"
+          ]
+        }
+      },
+      {
+        "call_id": "call_gzBUcDDpLVljjTjVEBn4S4Pv",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "倉庫掃碼器備品與故障設備追蹤",
+          "description": "選讀每月按使用中掃碼器數核備品及故障設備交資訊窗口處理；保留主管核准補充與不負責維修的邊界，5% 不同於驗收門檻。",
+          "body": "## 每月備品核對\n- 每月按使用中的倉庫掃碼器數量核對備品，依 5% 準備；不足時請主管核准補充。\n- 這是設備備品比例，不是按商品件數，也不是收貨驗收不良的 5% 提報門檻。兩個比例不能互換。\n- 5% 算得非整數時如何取整或確認數量，尚未說明。\n\n## 故障追蹤\n掃碼器故障時登記設備編號、使用位置及問題，交資訊窗口處理，追蹤備品更換及送修狀態。本人不拆機維修，也不決定採購品牌。\n\n## 尚未明確\n備品不足後的補充採購細節，以及故障追蹤何時視為完成（含更換或送修如何結案），尚未說明。",
+          "work_situation_references": [
+            "倉庫掃碼器備品核對與故障追蹤"
+          ]
+        }
+      },
+      {
+        "call_id": "call_YAnsBJdEYtnUoKSv224ZXpXl",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "新同事庫存流程示範與作業說明維護",
+          "description": "涵蓋新同事上任時示範本人負責的 ERP 登錄、原單據查找與差異查核，以及維護自身流程交接說明；不是正式帶人或公司訓練職責。",
+          "body": "## 示範與維護\n新同事上任時，本人示範 ERP 登錄、查找原單據及差異查核流程，並維護本人負責流程的交接說明。這是本人工作範圍內的實際示範與說明維護，不代表正式帶人職務或制定公司訓練制度。\n\n## 權限與未知\n主管負責工作分配及考核。交接說明在流程變更時如何更新，或是否定期檢視，尚未說明。",
+          "work_situation_references": [
+            "新同事庫存作業示範與交接說明"
+          ]
+        }
+      },
+      {
+        "call_id": "call_C6TJO96VZiOxdNSuxo0PBxf4",
+        "name": "create_work_understanding",
+        "arguments": {
+          "title": "休假前後庫存物流工作交接與核對",
+          "description": "選讀本人休假前交接未結案差異、預計到貨與截止事項，以及返崗後核對代理期間登錄；聚焦狀態延續及避免重複入帳。",
+          "body": "## 休假前交接\n將未結案差異、預計到貨及當日截止事項交給代理人，附原單號、目前狀態及下一個聯絡窗口，讓代理人可接續處理。\n\n## 返崗核對\n返崗後核對代理期間的登錄與已完成事項，避免重複入帳或狀態不一致。跨清單核對時以原單號，或品號搭配批號查找；不只依相似品名合併，因同名商品可能規格不同。本人使用 Excel 的篩選、樞紐分析及查找功能協助核對。\n\n## 尚未明確\n若返崗後發現代理登錄與原紀錄不一致，如何更正、通知或升級，尚未說明。",
+          "work_situation_references": [
+            "休假前後庫存物流事項交接"
+          ]
+        }
+      },
+      {
+        "call_id": "call_llalq6NKcftJ7xAueltqTOMb",
+        "name": "delete_work_understanding",
+        "arguments": {
+          "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+        }
+      },
+      {
+        "call_id": "call_sF1m1k0kqqwtUHwv9YRjAZqo",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      }
+    ],
+    "incomplete_responses": [],
+    "tools_by_name": {
+      "read_work_situation_map": 1,
+      "read_work_understanding_map": 2,
+      "read_work_understanding": 1,
+      "read_work_situation": 12,
+      "create_work_understanding": 12,
+      "delete_work_understanding": 1
+    },
+    "read_path": [
+      {
+        "call_id": "call_rxjgEOu46NZGSszFn3x7J8lW",
+        "name": "read_work_situation_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_7RYdBiM50dwkao8ws0b2M9pY",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_Y7CAuwSBZQv5BzC4mqxWGoPw",
+        "name": "read_work_understanding",
+        "arguments": {
+          "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+        }
+      },
+      {
+        "call_id": "call_Tqbhx24ezbshZnLx3fJWJbxl",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "退貨核對、狀態登錄與差異處理"
+        }
+      },
+      {
+        "call_id": "call_osRC5Ks73ojGeWhUinV84QTU",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "倉庫掃碼器備品核對與故障追蹤"
+        }
+      },
+      {
+        "call_id": "call_DaXZgRPtc9bZVfHfHuVSuDCT",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "新同事庫存作業示範與交接說明"
+        }
+      },
+      {
+        "call_id": "call_dcqUVkdAkNo5AYJnxa2PY3ot",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存報表"
+        }
+      },
+      {
+        "call_id": "call_SlNa271mnVUtrB5rMLH2PLeD",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "休假前後庫存物流事項交接"
+        }
+      },
+      {
+        "call_id": "call_bIPTNxzw2zMCnd0lgQHiBS2f",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "年度庫存查核與稽核取證"
+        }
+      },
+      {
+        "call_id": "call_4IAOXTvGci7INKzPEcQX8IFu",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "店間調撥"
+        }
+      },
+      {
+        "call_id": "call_9BWCxogXKU9eZTQd7eAN3Tq3",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "缺貨追蹤"
+        }
+      },
+      {
+        "call_id": "call_LnhSICD77Ctkzwg38OJlnuKz",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "產品召回庫存盤查與隔離追蹤"
+        }
+      },
+      {
+        "call_id": "call_Cootnbb0S3HrimjafeAEWN8h",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+        }
+      },
+      {
+        "call_id": "call_o26DXAnodD3kIFZfXsMy0BKW",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存盤點與差異查核"
+        }
+      },
+      {
+        "call_id": "call_969WCUSFbVMnNtCGPZo75vIb",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "收貨異常週報"
+        }
+      },
+      {
+        "call_id": "call_sF1m1k0kqqwtUHwv9YRjAZqo",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      }
+    ],
+    "tool_errors": [],
+    "read_output_characters": 17063,
+    "understandings": [
+      {
+        "title": "收貨異常週報",
+        "body_characters": 304,
+        "sources": [
+          "收貨異常週報"
+        ]
+      },
+      {
+        "title": "新同事庫存流程示範與作業說明維護",
+        "body_characters": 146,
+        "sources": [
+          "新同事庫存作業示範與交接說明"
+        ]
+      },
+      {
+        "title": "月末庫存帳齡表與滯留狀態彙整",
+        "body_characters": 298,
+        "sources": [
+          "庫存報表"
+        ]
+      },
+      {
+        "title": "退貨核對、狀態登錄與差異處理",
+        "body_characters": 512,
+        "sources": [
+          "退貨核對、狀態登錄與差異處理"
+        ]
+      },
+      {
+        "title": "倉庫掃碼器備品與故障設備追蹤",
+        "body_characters": 246,
+        "sources": [
+          "倉庫掃碼器備品核對與故障追蹤"
+        ]
+      },
+      {
+        "title": "店間調撥需求、出貨與收發差異",
+        "body_characters": 350,
+        "sources": [
+          "店間調撥"
+        ]
+      },
+      {
+        "title": "休假前後庫存物流工作交接與核對",
+        "body_characters": 219,
+        "sources": [
+          "休假前後庫存物流事項交接"
+        ]
+      },
+      {
+        "title": "年度庫存稽核取證與差異說明",
+        "body_characters": 318,
+        "sources": [
+          "年度庫存查核與稽核取證"
+        ]
+      },
+      {
+        "title": "庫存盤點與差異查核",
+        "body_characters": 588,
+        "sources": [
+          "庫存盤點與差異查核"
+        ]
+      },
+      {
+        "title": "到貨驗收、ERP 登錄與收貨異常追蹤",
+        "body_characters": 1301,
+        "sources": [
+          "到貨驗收、ERP 登錄與收貨異常追蹤"
+        ]
+      },
+      {
+        "title": "缺貨確認與補貨資訊追蹤",
+        "body_characters": 349,
+        "sources": [
+          "缺貨追蹤"
+        ]
+      },
+      {
+        "title": "產品召回批號盤查、隔離與回覆追蹤",
+        "body_characters": 409,
+        "sources": [
+          "產品召回庫存盤查與隔離追蹤"
+        ]
+      }
+    ],
+    "understanding_body_characters": 5040,
+    "map_characters": 1336
+  },
+  "candidate-2": {
+    "model_responses": 3,
+    "input_tokens": 27892,
+    "cached_tokens": 14477,
+    "cache_write_tokens": 13406,
+    "output_tokens": 8670,
+    "reasoning_tokens": 2465,
+    "rate_wait_seconds": 29.87783789995592,
+    "tool_calls": [
+      {
+        "call_id": "call_q4dzRBKQld4J6h0g1uc3WGUs",
+        "name": "read_work_situation_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_3eCfvurqey69NLSK9JVXSDtb",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_35JhCeH8qq7BkZjr8LVT0Afc",
+        "name": "read_work_understanding",
+        "arguments": {
+          "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+        }
+      },
+      {
+        "call_id": "call_UH1cp0UOZN1KnWe08SGVqC3N",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "退貨核對、狀態登錄與差異處理"
+        }
+      },
+      {
+        "call_id": "call_TxLNcbqiwRiMOHBl1S1qaHml",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "倉庫掃碼器備品核對與故障追蹤"
+        }
+      },
+      {
+        "call_id": "call_Y8jXiH6cCop1kZfjtrvseKrh",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "新同事庫存作業示範與交接說明"
+        }
+      },
+      {
+        "call_id": "call_561XnSbEs6tXpbytSiT5Kdej",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存報表"
+        }
+      },
+      {
+        "call_id": "call_vNBzdT8v99pc9F5VVQjK1JpH",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "休假前後庫存物流事項交接"
+        }
+      },
+      {
+        "call_id": "call_nGoRizhMbkd7n2wSwhVAB4PS",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "年度庫存查核與稽核取證"
+        }
+      },
+      {
+        "call_id": "call_qtR00nDunUpD2HQKMvmNIiME",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "店間調撥"
+        }
+      },
+      {
+        "call_id": "call_C1YfsSbRR3X444QuZgScvp4k",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "缺貨追蹤"
+        }
+      },
+      {
+        "call_id": "call_BMFKplGTlrimUYQJ253G6FGS",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "產品召回庫存盤查與隔離追蹤"
+        }
+      },
+      {
+        "call_id": "call_BunLO4bkdlNn17E3uDbEjQqX",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+        }
+      },
+      {
+        "call_id": "call_VwCPJJI3ekpjXUai0QPG0nE1",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存盤點與差異查核"
+        }
+      },
+      {
+        "call_id": "call_2yLHUvbidEcjiD6hGE67S8TZ",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "收貨異常週報"
+        }
+      }
+    ],
+    "incomplete_responses": [
+      {
+        "reason": "max_output_tokens",
+        "unexecuted_call_names": [
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding",
+          "create_work_understanding"
+        ]
+      }
+    ],
+    "tools_by_name": {
+      "read_work_situation_map": 1,
+      "read_work_understanding_map": 1,
+      "read_work_understanding": 1,
+      "read_work_situation": 12
+    },
+    "read_path": [
+      {
+        "call_id": "call_q4dzRBKQld4J6h0g1uc3WGUs",
+        "name": "read_work_situation_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_3eCfvurqey69NLSK9JVXSDtb",
+        "name": "read_work_understanding_map",
+        "arguments": {}
+      },
+      {
+        "call_id": "call_35JhCeH8qq7BkZjr8LVT0Afc",
+        "name": "read_work_understanding",
+        "arguments": {
+          "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+        }
+      },
+      {
+        "call_id": "call_UH1cp0UOZN1KnWe08SGVqC3N",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "退貨核對、狀態登錄與差異處理"
+        }
+      },
+      {
+        "call_id": "call_TxLNcbqiwRiMOHBl1S1qaHml",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "倉庫掃碼器備品核對與故障追蹤"
+        }
+      },
+      {
+        "call_id": "call_Y8jXiH6cCop1kZfjtrvseKrh",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "新同事庫存作業示範與交接說明"
+        }
+      },
+      {
+        "call_id": "call_561XnSbEs6tXpbytSiT5Kdej",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存報表"
+        }
+      },
+      {
+        "call_id": "call_vNBzdT8v99pc9F5VVQjK1JpH",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "休假前後庫存物流事項交接"
+        }
+      },
+      {
+        "call_id": "call_nGoRizhMbkd7n2wSwhVAB4PS",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "年度庫存查核與稽核取證"
+        }
+      },
+      {
+        "call_id": "call_qtR00nDunUpD2HQKMvmNIiME",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "店間調撥"
+        }
+      },
+      {
+        "call_id": "call_C1YfsSbRR3X444QuZgScvp4k",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "缺貨追蹤"
+        }
+      },
+      {
+        "call_id": "call_BMFKplGTlrimUYQJ253G6FGS",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "產品召回庫存盤查與隔離追蹤"
+        }
+      },
+      {
+        "call_id": "call_BunLO4bkdlNn17E3uDbEjQqX",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+        }
+      },
+      {
+        "call_id": "call_VwCPJJI3ekpjXUai0QPG0nE1",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "庫存盤點與差異查核"
+        }
+      },
+      {
+        "call_id": "call_2yLHUvbidEcjiD6hGE67S8TZ",
+        "name": "read_work_situation",
+        "arguments": {
+          "target_title": "收貨異常週報"
+        }
+      }
+    ],
+    "tool_errors": [],
+    "read_output_characters": 15775
+  }
+}

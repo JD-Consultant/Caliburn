@@ -1,0 +1,32 @@
+[
+  {
+    "directory": "docs/experiments/2026-10-04-memory-layer-retrieval/run-01",
+    "manifest_sha256": "f4a3fbdc7411ef8ad0a32e35fc2220a143950f35889f07bc52ad08acaf3fdd98",
+    "files": 158,
+    "mismatches": 0
+  },
+  {
+    "directory": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01",
+    "manifest_sha256": "18842f4898b0796226cb37dbaa33474009f8e69302eb87aec0b9c1c9ba360234",
+    "files": 547,
+    "mismatches": 0
+  },
+  {
+    "directory": "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01",
+    "manifest_sha256": "a57a7df9b57c1acdc48b5f4e7d05d6cbf172c9034801eacc262c1b0133e7c6ec",
+    "files": 551,
+    "mismatches": 0
+  },
+  {
+    "directory": "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01",
+    "manifest_sha256": "a5ccb352d21d636379be4a8896ceed8f374b12fb4f9324532168659749ff27eb",
+    "files": 30,
+    "mismatches": 0
+  },
+  {
+    "directory": "docs/experiments/2026-10-05-initial-retrieval-depth/run-01",
+    "manifest_sha256": "d58898f4471b91dc2d30baa3270b94343165860a9c41e22695980e32fbc7e388",
+    "files": 32,
+    "mismatches": 0
+  }
+]

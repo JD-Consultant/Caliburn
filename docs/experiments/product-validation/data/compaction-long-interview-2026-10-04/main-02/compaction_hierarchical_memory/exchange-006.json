@@ -1,0 +1,16 @@
+{
+  "event_id": "e006",
+  "execution_id": "5516a565-47f7-4020-b75f-915f5105a2ab",
+  "employee_input": {
+    "source_id": "bacb6047-f5d1-418b-bd72-056820d89d68",
+    "interview_sequence": 12,
+    "speaker": "employee",
+    "interview_text": "收貨異常不是通知完就結束。我更新差異清單和處理進度；兩個工作日沒回覆就提醒採購，第四個工作日仍沒進展再回報主管。要到補貨或退貨完成、帳物相符才結案；供應商幾時真的補來不是我能保證的。"
+  },
+  "consultant_reply": {
+    "source_id": "aa012ab9-64ea-430c-aad7-07c0790a2578",
+    "interview_sequence": 13,
+    "speaker": "consultant",
+    "interview_text": "已補上收貨異常的追蹤與結案方式：您更新差異清單與進度，兩個工作日未獲回覆提醒採購，第四個工作日仍無進展則回報主管；補貨或退貨完成且帳物相符後才結案，且不保證供應商實際補貨時間。\n\n前一題補充的是收貨異常；另外，您提到的「缺貨追蹤」通常由什麼訊息或情況啟動？您會追蹤到什麼狀態才算完成？"
+  }
+}

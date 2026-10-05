@@ -1,0 +1,458 @@
+{
+  "observed_trials": 36,
+  "planned_trials": 36,
+  "source_files_sha256": {
+    "docs\\experiments\\product-validation\\data\\design-comparisons-2026-10-04\\live-01\\results.jsonl": "1a9687f8ac7e333878e3df8788e63e8cdd668010c9ac7a8344ad2fe5c1bb8669",
+    "docs\\experiments\\product-validation\\data\\design-comparisons-2026-10-04\\live-02\\results.jsonl": "27ca2d0aeb63b0e78352689efb0f5e7b4b15af83c20d9b78701f4dc8bd7fe71a",
+    "docs\\experiments\\product-validation\\data\\design-comparisons-2026-10-04\\live-03\\results.jsonl": "56d9579ca26fe3d057cd5782103a6a783276203f75a06ca9cce673f30cd28b36"
+  },
+  "groups": [
+    {
+      "suite": "context",
+      "arm": "full",
+      "trials": 6,
+      "completed": 6,
+      "passed": 4,
+      "checks_passed": 38,
+      "checks_expected": 42,
+      "input_tokens": 1038036,
+      "output_tokens": 2299,
+      "cached_input_tokens": 869280,
+      "cache_write_tokens": 168717,
+      "model_calls": 13,
+      "read_calls": 10,
+      "rejected_calls": 0,
+      "elapsed_seconds": 388.051
+    },
+    {
+      "suite": "context",
+      "arm": "selective",
+      "trials": 6,
+      "completed": 6,
+      "passed": 0,
+      "checks_passed": 36,
+      "checks_expected": 42,
+      "input_tokens": 64688,
+      "output_tokens": 3790,
+      "cached_input_tokens": 47428,
+      "cache_write_tokens": 17206,
+      "model_calls": 18,
+      "read_calls": 12,
+      "rejected_calls": 0,
+      "elapsed_seconds": 133.786
+    },
+    {
+      "suite": "locator",
+      "arm": "short",
+      "trials": 12,
+      "completed": 12,
+      "passed": 12,
+      "checks_passed": 12,
+      "checks_expected": 12,
+      "input_tokens": 21556,
+      "output_tokens": 453,
+      "cached_input_tokens": 10760,
+      "cache_write_tokens": 10760,
+      "model_calls": 12,
+      "read_calls": 0,
+      "rejected_calls": 0,
+      "elapsed_seconds": 80.124
+    },
+    {
+      "suite": "locator",
+      "arm": "uuid",
+      "trials": 12,
+      "completed": 12,
+      "passed": 12,
+      "checks_passed": 12,
+      "checks_expected": 12,
+      "input_tokens": 41346,
+      "output_tokens": 1027,
+      "cached_input_tokens": 20655,
+      "cache_write_tokens": 20655,
+      "model_calls": 12,
+      "read_calls": 0,
+      "rejected_calls": 0,
+      "elapsed_seconds": 83.186
+    }
+  ],
+  "paired_input": {
+    "context": {
+      "paired_trials": 6,
+      "baseline_input": 1038036,
+      "candidate_input": 64688,
+      "reduction_percent": 93.77
+    },
+    "locator": {
+      "paired_trials": 12,
+      "baseline_input": 41346,
+      "candidate_input": 21556,
+      "reduction_percent": 47.86
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-10-03T16:28:45.340745+00:00",
+      "trial_id": "context-1-1-selective",
+      "suite": "context",
+      "case_id": "context-1",
+      "arm": "selective",
+      "repeat": 1,
+      "status": "completed",
+      "input_tokens": 10758,
+      "output_tokens": 372,
+      "cached_input_tokens": 6102,
+      "model_calls": 3,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "checks": {
+        "frequency": true,
+        "actor": true,
+        "approver": true,
+        "deadline": true,
+        "scope": true,
+        "authority": false,
+        "sources": true
+      },
+      "all_passed": false,
+      "answer": {
+        "facts": {
+          "frequency": "每月1次",
+          "actor": "本人",
+          "approver": "採購主管",
+          "deadline": "下月第2個工作日",
+          "scope": "國內一般採購",
+          "authority": "本人沒有核准權；實際更動採購條件須由採購主管決定。"
+        },
+        "interview_sequences": [
+          2,
+          4
+        ]
+      },
+      "elapsed_seconds": 8.286,
+      "cache_write_tokens": 4647
+    },
+    {
+      "at": "2026-10-03T16:50:51.783488+00:00",
+      "trial_id": "context-18-1-full",
+      "suite": "context",
+      "case_id": "context-18",
+      "arm": "full",
+      "repeat": 1,
+      "status": "completed",
+      "input_tokens": 240102,
+      "output_tokens": 575,
+      "cached_input_tokens": 158917,
+      "model_calls": 3,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "checks": {
+        "frequency": true,
+        "actor": false,
+        "approver": false,
+        "deadline": true,
+        "scope": true,
+        "authority": false,
+        "sources": true
+      },
+      "all_passed": false,
+      "answer": {
+        "facts": {
+          "frequency": "每月2次",
+          "actor": "由我處理",
+          "approver": "部門主管核准",
+          "deadline": "下月第10個工作日",
+          "scope": "國外一般採購",
+          "authority": "我本人沒有核准權"
+        },
+        "interview_sequences": [
+          70,
+          72
+        ]
+      },
+      "elapsed_seconds": 80.785,
+      "cache_write_tokens": 81176
+    },
+    {
+      "at": "2026-10-03T16:51:15.689506+00:00",
+      "trial_id": "context-18-1-selective",
+      "suite": "context",
+      "case_id": "context-18",
+      "arm": "selective",
+      "repeat": 1,
+      "status": "completed",
+      "input_tokens": 10839,
+      "output_tokens": 710,
+      "cached_input_tokens": 6132,
+      "model_calls": 3,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "checks": {
+        "frequency": true,
+        "actor": true,
+        "approver": true,
+        "deadline": true,
+        "scope": true,
+        "authority": false,
+        "sources": true
+      },
+      "all_passed": false,
+      "answer": {
+        "facts": {
+          "frequency": "每月2次",
+          "actor": "本人",
+          "approver": "部門主管",
+          "deadline": "下月第10個工作日",
+          "scope": "國外一般採購",
+          "authority": "我本人沒有核准權；金額超過各類紀錄相應門檻只列出差異，不能自行核准；實際更動採購條件須由部門主管決定。"
+        },
+        "interview_sequences": [
+          70,
+          72
+        ]
+      },
+      "elapsed_seconds": 23.904,
+      "cache_write_tokens": 4698
+    },
+    {
+      "at": "2026-10-03T16:55:02.657046+00:00",
+      "trial_id": "context-36-1-selective",
+      "suite": "context",
+      "case_id": "context-36",
+      "arm": "selective",
+      "repeat": 1,
+      "status": "completed",
+      "input_tokens": 10752,
+      "output_tokens": 539,
+      "cached_input_tokens": 6102,
+      "model_calls": 3,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "checks": {
+        "frequency": true,
+        "actor": true,
+        "approver": true,
+        "deadline": true,
+        "scope": true,
+        "authority": false,
+        "sources": true
+      },
+      "all_passed": false,
+      "answer": {
+        "facts": {
+          "frequency": "每月4次",
+          "actor": "本人",
+          "approver": "部門主管",
+          "deadline": "下月第10個工作日",
+          "scope": "國外一般採購",
+          "authority": "本人沒有核准權；金額超過36100元（第1類）、36200元（第2類）、36300元（第3類）、36400元（第4類）、36500元（第5類）、36600元（第6類）、36700元（第7類）、36800元（第8類）只列出差異，不能自行核准；實際更動採購條件須由部門主管決定。"
+        },
+        "interview_sequences": [
+          142,
+          144
+        ]
+      },
+      "elapsed_seconds": 23.236,
+      "cache_write_tokens": 4641
+    },
+    {
+      "at": "2026-10-03T16:56:50.068372+00:00",
+      "trial_id": "context-1-2-selective",
+      "suite": "context",
+      "case_id": "context-1",
+      "arm": "selective",
+      "repeat": 2,
+      "status": "completed",
+      "input_tokens": 10758,
+      "output_tokens": 835,
+      "cached_input_tokens": 9678,
+      "model_calls": 3,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "checks": {
+        "frequency": true,
+        "actor": true,
+        "approver": true,
+        "deadline": true,
+        "scope": true,
+        "authority": false,
+        "sources": true
+      },
+      "all_passed": false,
+      "answer": {
+        "facts": {
+          "frequency": "每月1次",
+          "actor": "本人",
+          "approver": "採購主管",
+          "deadline": "下月第2個工作日",
+          "scope": "國內一般採購",
+          "authority": "本人沒有核准權；金額超過1100元只列出差異，不能自行核准；實際更動採購條件須由採購主管決定。"
+        },
+        "interview_sequences": [
+          2,
+          4
+        ]
+      },
+      "elapsed_seconds": 26.039,
+      "cache_write_tokens": 1071
+    },
+    {
+      "at": "2026-10-03T16:57:48.479055+00:00",
+      "trial_id": "context-18-2-selective",
+      "suite": "context",
+      "case_id": "context-18",
+      "arm": "selective",
+      "repeat": 2,
+      "status": "completed",
+      "input_tokens": 10829,
+      "output_tokens": 425,
+      "cached_input_tokens": 9736,
+      "model_calls": 3,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "checks": {
+        "frequency": true,
+        "actor": true,
+        "approver": true,
+        "deadline": true,
+        "scope": true,
+        "authority": false,
+        "sources": true
+      },
+      "all_passed": false,
+      "answer": {
+        "facts": {
+          "frequency": "每月2次",
+          "actor": "本人",
+          "approver": "部門主管",
+          "deadline": "下月第10個工作日",
+          "scope": "國外一般採購",
+          "authority": "本人沒有核准權；金額超過各類紀錄所列門檻只列出差異，不能自行核准；實際更動採購條件須由部門主管決定。"
+        },
+        "interview_sequences": [
+          70,
+          72
+        ]
+      },
+      "elapsed_seconds": 24.369,
+      "cache_write_tokens": 1084
+    },
+    {
+      "at": "2026-10-03T16:59:54.997030+00:00",
+      "trial_id": "context-36-2-selective",
+      "suite": "context",
+      "case_id": "context-36",
+      "arm": "selective",
+      "repeat": 2,
+      "status": "completed",
+      "input_tokens": 10752,
+      "output_tokens": 909,
+      "cached_input_tokens": 9678,
+      "model_calls": 3,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "checks": {
+        "frequency": true,
+        "actor": true,
+        "approver": true,
+        "deadline": true,
+        "scope": true,
+        "authority": false,
+        "sources": true
+      },
+      "all_passed": false,
+      "answer": {
+        "facts": {
+          "frequency": "每月4次",
+          "actor": "本人",
+          "approver": "部門主管",
+          "deadline": "下月第10個工作日",
+          "scope": "國外一般採購",
+          "authority": "本人沒有核准權；作業條件1至8分別為金額超過36100元、36200元、36300元、36400元、36500元、36600元、36700元、36800元只列出差異，不能自行核准；實際更動採購條件須由部門主管決定。"
+        },
+        "interview_sequences": [
+          142,
+          144
+        ]
+      },
+      "elapsed_seconds": 27.952,
+      "cache_write_tokens": 1065
+    },
+    {
+      "at": "2026-10-03T17:01:05.390845+00:00",
+      "trial_id": "context-36-2-full",
+      "suite": "context",
+      "case_id": "context-36",
+      "arm": "full",
+      "repeat": 2,
+      "status": "completed",
+      "input_tokens": 159806,
+      "output_tokens": 522,
+      "cached_input_tokens": 157618,
+      "model_calls": 2,
+      "read_calls": 2,
+      "rejected_calls": 0,
+      "checks": {
+        "frequency": true,
+        "actor": true,
+        "approver": true,
+        "deadline": true,
+        "scope": true,
+        "authority": false,
+        "sources": true
+      },
+      "all_passed": false,
+      "answer": {
+        "facts": {
+          "frequency": "每月4次",
+          "actor": "本人",
+          "approver": "部門主管",
+          "deadline": "下月第10個工作日",
+          "scope": "國外一般採購",
+          "authority": "我本人沒有核准權；實際更動採購條件須由部門主管決定。"
+        },
+        "interview_sequences": [
+          142,
+          144
+        ]
+      },
+      "elapsed_seconds": 70.392,
+      "cache_write_tokens": 2182
+    }
+  ],
+  "standard_price_estimate_usd": 0.040449,
+  "all_reported_usage_including_interrupted_trials": {
+    "responses": 56,
+    "input_tokens": 1244438,
+    "output_tokens": 7686,
+    "cached_tokens": 948123,
+    "cache_write_tokens": 296147,
+    "standard_price_estimate_usd": 0.050359
+  },
+  "provider_stops": [
+    {
+      "run": "live-01",
+      "at": "2026-10-03T16:28:46.706652+00:00",
+      "event": "stopped",
+      "error_type": "RateLimitError",
+      "model_calls": 6,
+      "count_calls": 6,
+      "input_tokens": 249384
+    },
+    {
+      "run": "live-02",
+      "at": "2026-10-03T16:51:29.128435+00:00",
+      "event": "stopped",
+      "error_type": "RateLimitError",
+      "failure": {
+        "kind": "rate_limited",
+        "status": 429,
+        "code": "rate_limit_exceeded"
+      },
+      "model_calls": 14,
+      "count_calls": 14,
+      "input_tokens": 660110
+    }
+  ],
+  "analysis_script_sha256": "42db45a28ecc6b650d6f8aacc88dc7cc2df8930722aec2f6f14f9173772c8fc9"
+}

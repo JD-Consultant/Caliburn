@@ -1,0 +1,29 @@
+{
+  "job_id": "J048",
+  "phase": "grade",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是組織網路與作業系統的安裝、配置及疑難排除，無法代表員工持續負責的瀏覽器畫面開發或訂單 API、權限、商業規則及資料存取工作。員工偶爾協助處理同事的網路連線問題，只有局部關聯，不足以代表主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "偶爾同事電腦連不上網路會請我幫忙",
+        "reference_quote": "協助維護及管理組織網路系統。"
+      },
+      {
+        "employee_quote": "公司設備維護和固定資料備份由其他人負責",
+        "reference_quote": "作業系統(OS)【註1】的安裝、配置"
+      }
+    ],
+    "limitations": [
+      "公版內容聚焦網路與作業系統維護，未描述員工主要負責的訂單畫面、API、權限、商業規則或資料存取開發。",
+      "員工僅提及偶爾協助網路連線問題；不能據此推定其負責公版所列的作業系統安裝、配置或管理。"
+    ]
+  },
+  "seconds": 6.559499400027562,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "708a043dba983f844e74b98a990e601b8273d93862500d82c7aae2d7258209fb",
+  "case_id": "F01",
+  "document_id": "IIS3513-008v3"
+}

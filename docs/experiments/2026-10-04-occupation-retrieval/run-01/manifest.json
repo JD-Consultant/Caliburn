@@ -1,0 +1,22 @@
+{
+  "started_utc": "2026-10-03T22:15:55.411846+00:00",
+  "base_manifest_sha256": "755e97e97c30763f68645a01258ebb3cb3c2e0c2c5c66cd617a189bb3563d4a5",
+  "probes_sha256": "7654e01410f9f8f541bcfdca757d69b77a1321b6bfc97f698fa27d73ce674d8b",
+  "runtime": {
+    "model": "BAAI/bge-m3",
+    "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "device": "cuda",
+    "fp16": true,
+    "max_length": 8192,
+    "batch_size": 1,
+    "packages": {
+      "torch": "2.10.0+cu128",
+      "transformers": "4.57.6",
+      "FlagEmbedding": "1.4.0",
+      "huggingface-hub": "0.36.2"
+    }
+  },
+  "model_fingerprint": "20f95996a7ef4d574c29bed8625e84277aee1a73b8d097f5b45b5320ddb27bd8",
+  "script_sha256": "4cbd077696e24d535b690d5213d5c35d12485598414badd7d3e70c42e1aa409e",
+  "evaluator_sha256": "c554ce7212d0dff04e3d610c863eb65ed5d6d1b5fa985a3d42ec29d960dcd9e0"
+}

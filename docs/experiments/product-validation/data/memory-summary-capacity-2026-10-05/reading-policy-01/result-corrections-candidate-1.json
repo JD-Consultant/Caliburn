@@ -1,0 +1,219 @@
+{
+  "case_id": "corrections",
+  "arm": "candidate",
+  "repeat": 1,
+  "cell_id": "corrections-candidate-1",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding_map",
+      "arguments": {},
+      "result_characters": 185
+    },
+    {
+      "step": 2,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6465
+    },
+    {
+      "step": 3,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "庫存報表"
+      },
+      "result_characters": 490
+    },
+    {
+      "step": 3,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "收貨異常週報"
+      },
+      "result_characters": 417
+    },
+    {
+      "step": 3,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+      },
+      "result_characters": 1891
+    },
+    {
+      "step": 3,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "退貨核對、狀態登錄與差異處理"
+      },
+      "result_characters": 780
+    },
+    {
+      "step": 4,
+      "name": "read_interview",
+      "arguments": {
+        "query": {
+          "kind": "messages",
+          "sequences": [
+            42,
+            44,
+            46,
+            48,
+            56,
+            98
+          ]
+        }
+      },
+      "result_characters": 885
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 5714,
+        "input_tokens_details": {
+          "cache_write_tokens": 5711,
+          "cached_tokens": 0
+        },
+        "output_tokens": 109,
+        "output_tokens_details": {
+          "reasoning_tokens": 27
+        },
+        "total_tokens": 5823
+      },
+      "estimated_usd": "0.000768675",
+      "seconds": 2.1885579000227153,
+      "counted_input_tokens": 5714
+    },
+    {
+      "usage": {
+        "input_tokens": 5975,
+        "input_tokens_details": {
+          "cache_write_tokens": 261,
+          "cached_tokens": 5711
+        },
+        "output_tokens": 37,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 6012
+      },
+      "estimated_usd": "0.000108535",
+      "seconds": 1.8097469999920577,
+      "counted_input_tokens": 5975
+    },
+    {
+      "usage": {
+        "input_tokens": 11473,
+        "input_tokens_details": {
+          "cache_write_tokens": 5498,
+          "cached_tokens": 5972
+        },
+        "output_tokens": 668,
+        "output_tokens_details": {
+          "reasoning_tokens": 464
+        },
+        "total_tokens": 12141
+      },
+      "estimated_usd": "0.001081270",
+      "seconds": 5.913850699958857,
+      "counted_input_tokens": 11473
+    },
+    {
+      "usage": {
+        "input_tokens": 15105,
+        "input_tokens_details": {
+          "cache_write_tokens": 3632,
+          "cached_tokens": 11470
+        },
+        "output_tokens": 321,
+        "output_tokens_details": {
+          "reasoning_tokens": 282
+        },
+        "total_tokens": 15426
+      },
+      "estimated_usd": "0.000729500",
+      "seconds": 5.427127000002656,
+      "counted_input_tokens": 15105
+    },
+    {
+      "usage": {
+        "input_tokens": 15980,
+        "input_tokens_details": {
+          "cache_write_tokens": 875,
+          "cached_tokens": 15102
+        },
+        "output_tokens": 2774,
+        "output_tokens_details": {
+          "reasoning_tokens": 1628
+        },
+        "total_tokens": 18754
+      },
+      "estimated_usd": "0.001647695",
+      "seconds": 24.469316700007766,
+      "counted_input_tokens": 15980
+    }
+  ],
+  "answer": {
+    "findings": "核對結果（以下將「進貨驗收不良率」與「掃碼器備品比例」分開，並以後續補充修正早期帳齡表交付日）：\n\n- **進貨驗收：**到貨時本人比對採購單、送貨單與實際到貨的品號、批號及數量；倉庫同事清點實物，本人核對單據、記錄差異，資料相符後登錄 ERP，已確認項目通常於到貨當天下班前完成。驗收不良率以「每批實際驗收件數」為分母；超過 5% 提報倉儲主管，不跨月累計，也不以每日進貨單張數計算。剛好 5% 不觸發此比例提報規則；但有安全疑慮時，不論比例均先隔離並通知主管。月底截止歸屬由財務決定，本人記錄實際收貨時間及未決原因，不自行回填日期。\n- **退貨核對：**每日核對前一工作日收到的退貨；週一 08:50 開始、週二至週五 08:35 開始，但每天都須在 09:10 前把退貨差異表交客服窗口。本人核對客退單、品號、批號及實收數量；常溫品依倉庫確認的狀態登錄，冷藏品的溫度紀錄交品質窗口判定。數量差異由本人提供照片與紀錄請客服確認；須主管同意後才能依核准資料調整 ERP，並保留核准單號。09:10 是退貨交表時限，不是進貨登錄或週報時限。\n- **庫存帳齡表：**早期說法曾為月底最後一個工作日交主管；後續補充已將交付日改為**次月第一個工作日**。更正的是交付時點，不是資料基準：仍按月底庫存狀態整理，不以交表當天狀態替代，並依已確認入庫日期及月末庫存狀態計算，核對批號與調撥資料。本人整理並交主管查看滯留與狀態；促銷、報廢等處置由主管決定，本人不自行設定折扣或刪除庫存。\n- **設備比例對照：**掃碼器備品的 5% 是每月依「使用中的設備數量」核對／準備備品的比例；不足時請主管核准補充。它是設備數量基準，與每批實際驗收商品件數的不良率 5% 完全不同，不能互套。\n- **帳齡表更正與收貨異常週報：**週報仍是每週五 16:00 前交採購與主管，記錄未結案原因、等待天數及下一步；後續帳齡表交付日補充明確指出週報時點不變。已核對的資料支持兩張表用途與交期分開，但沒有說明帳齡表某次更正是否必須或絕不需要同步更正週報內容，因此不能概括判定「一定影響」或「完全不影響」。若更正涉及收貨異常週報所追蹤的未結案事項，是否需同步更新週報，仍待確認。\n\n待釐清：帳齡表更正若源自收貨單據／入庫日期差異，且該收貨異常仍未結案，是否要在當週收貨異常週報同步更新？",
+    "references": [
+      {
+        "kind": "work_situation",
+        "interview_sequence": null,
+        "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+      },
+      {
+        "kind": "work_situation",
+        "interview_sequence": null,
+        "target_title": "退貨核對、狀態登錄與差異處理"
+      },
+      {
+        "kind": "work_situation",
+        "interview_sequence": null,
+        "target_title": "庫存報表"
+      },
+      {
+        "kind": "work_situation",
+        "interview_sequence": null,
+        "target_title": "收貨異常週報"
+      },
+      {
+        "kind": "work_understanding",
+        "interview_sequence": null,
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 42,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 44,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 46,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 48,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 98,
+        "target_title": null
+      }
+    ],
+    "questions": [
+      "帳齡表更正若源自收貨單據或入庫日期差異，且相關收貨異常仍未結案，是否要在當週收貨異常週報同步更新？"
+    ]
+  },
+  "seconds": 94.63712810003199
+}

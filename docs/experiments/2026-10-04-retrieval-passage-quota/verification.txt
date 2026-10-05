@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-passage-quota\verify.py", line 192, in <module>
+    result = check(); print(json.dumps(result,indent=2))
+             ^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-passage-quota\verify.py", line 48, in check
+    assert p['logit']==r['logit'] and p['windows']==r['windows'] and p['query_tokens']==r['query_tokens']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

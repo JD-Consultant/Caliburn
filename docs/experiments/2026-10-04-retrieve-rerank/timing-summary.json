@@ -1,0 +1,112 @@
+[
+  {
+    "case_id": "E01",
+    "arm": "raw_employee",
+    "n": 20,
+    "samples": [
+      0.6944893489999231,
+      0.7102586330001941
+    ],
+    "rerank_median_seconds": 0.7023739910000586,
+    "dense_exact_median_seconds": 0.00030230003176257014
+  },
+  {
+    "case_id": "E01",
+    "arm": "raw_employee",
+    "n": 50,
+    "samples": [
+      1.725210151002102,
+      1.6873296789999586
+    ],
+    "rerank_median_seconds": 1.7062699150010303,
+    "dense_exact_median_seconds": 0.00030230003176257014
+  },
+  {
+    "case_id": "E01",
+    "arm": "raw_employee",
+    "n": 100,
+    "samples": [
+      3.1247181569997338,
+      3.0523631979958736
+    ],
+    "rerank_median_seconds": 3.0885406774978037,
+    "dense_exact_median_seconds": 0.00030230003176257014
+  },
+  {
+    "case_id": "E01",
+    "arm": "raw_employee",
+    "n": 200,
+    "samples": [
+      6.341752672997245,
+      6.147733140001947
+    ],
+    "rerank_median_seconds": 6.244742906499596,
+    "dense_exact_median_seconds": 0.00030230003176257014
+  },
+  {
+    "case_id": "E01",
+    "arm": "raw_employee",
+    "n": 805,
+    "samples": [
+      26.209865789001924,
+      26.371826506001526
+    ],
+    "rerank_median_seconds": 26.290846147501725,
+    "dense_exact_median_seconds": 0.00030230003176257014
+  },
+  {
+    "case_id": "E04",
+    "arm": "B2",
+    "n": 20,
+    "samples": [
+      1.0033496039977763,
+      1.025859199995466
+    ],
+    "rerank_median_seconds": 1.0146044019966212,
+    "dense_exact_median_seconds": 0.0002734999870881438
+  },
+  {
+    "case_id": "E04",
+    "arm": "B2",
+    "n": 50,
+    "samples": [
+      2.518413067999063,
+      2.4083632550027687
+    ],
+    "rerank_median_seconds": 2.463388161500916,
+    "dense_exact_median_seconds": 0.0002734999870881438
+  },
+  {
+    "case_id": "E04",
+    "arm": "B2",
+    "n": 100,
+    "samples": [
+      4.431090926002071,
+      4.405890879002982
+    ],
+    "rerank_median_seconds": 4.418490902502526,
+    "dense_exact_median_seconds": 0.0002734999870881438
+  },
+  {
+    "case_id": "E04",
+    "arm": "B2",
+    "n": 200,
+    "samples": [
+      8.631833237996034,
+      8.881293287995504
+    ],
+    "rerank_median_seconds": 8.756563262995769,
+    "dense_exact_median_seconds": 0.0002734999870881438
+  },
+  {
+    "case_id": "E04",
+    "arm": "B2",
+    "n": 805,
+    "samples": [
+      33.25460837999708,
+      33.70555794600659
+    ],
+    "rerank_median_seconds": 33.48008316300184,
+    "dense_exact_median_seconds": 0.0002734999870881438
+  }
+]

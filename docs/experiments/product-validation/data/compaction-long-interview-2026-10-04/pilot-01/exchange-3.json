@@ -1,0 +1,16 @@
+{
+  "event_id": "e004",
+  "execution_id": "57e78eee-3410-4152-8598-941c0ceb92f6",
+  "employee_input": {
+    "source_id": "fdcd6918-41cd-490a-8bb2-1cde46029924",
+    "interview_sequence": 6,
+    "speaker": "employee",
+    "interview_text": "驗收時如果不良件數占本批實際驗收件數超過5%，我會提報倉儲主管。剛好5%不因這條比例規則提報，但有安全疑慮時仍先隔離並通知主管；比例門檻不是把安全問題略過的理由。"
+  },
+  "consultant_reply": {
+    "source_id": "7a46486c-3453-4993-bea9-e5990b7c068a",
+    "interview_sequence": 7,
+    "speaker": "consultant",
+    "interview_text": "已另增「提報進貨驗收不良並處理安全疑慮」任務，記下超過 5% 才依比例門檻提報、剛好 5% 不因該門檻提報；若有安全疑慮，則先隔離並通知主管，不受比例限制。\n\n接著想了解「庫存差異」：通常是在什麼情況下發現差異？您會怎麼追查，最後由誰確認是否調整庫存記錄？"
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "status": "completed",
+  "outcomes": [
+    {
+      "cell": "initial-baseline",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 32.80714580003405
+    },
+    {
+      "cell": "initial-coherent",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 32.69995879998896
+    },
+    {
+      "cell": "corrections-coherent",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 43.8775777000119
+    },
+    {
+      "cell": "corrections-baseline",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 41.73741379997227
+    },
+    {
+      "cell": "extension-baseline",
+      "status": "completed",
+      "steps": 6,
+      "seconds": 94.26624399999855
+    },
+    {
+      "cell": "extension-coherent",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 42.94291149999481
+    },
+    {
+      "cell": "read-post_delivery-baseline",
+      "status": "completed",
+      "steps": 4,
+      "seconds": 55.80781849997584
+    },
+    {
+      "cell": "read-post_delivery-coherent",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 31.496331100002863
+    },
+    {
+      "cell": "read-maintenance-coherent",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 41.38188070000615
+    },
+    {
+      "cell": "read-maintenance-baseline",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 39.35149650002131
+    },
+    {
+      "cell": "read-infrequent_work-baseline",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 38.21712849999312
+    },
+    {
+      "cell": "read-infrequent_work-coherent",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 25.835576399986167
+    },
+    {
+      "cell": "read-resolved_approval-coherent",
+      "status": "completed",
+      "steps": 2,
+      "seconds": 28.101759899989702
+    },
+    {
+      "cell": "read-resolved_approval-baseline",
+      "status": "completed",
+      "steps": 3,
+      "seconds": 41.41654849995393
+    }
+  ],
+  "failure": null,
+  "budget": {
+    "occupied_usd": "0.015015415",
+    "prior_occupied_usd": "1.270089235",
+    "cumulative_occupied_usd": "1.285104650",
+    "pending": {
+      "initial-baseline-1": "0.0001",
+      "initial-baseline-3": "0.0001",
+      "initial-coherent-5": "0.0001",
+      "initial-coherent-7": "0.0001",
+      "corrections-coherent-9": "0.0001",
+      "corrections-coherent-11": "0.0001",
+      "corrections-coherent-13": "0.0001",
+      "corrections-baseline-15": "0.0001",
+      "corrections-baseline-17": "0.0001",
+      "corrections-baseline-19": "0.0001",
+      "extension-baseline-21": "0.0001",
+      "extension-baseline-23": "0.0001",
+      "extension-baseline-25": "0.0001",
+      "extension-baseline-27": "0.0001",
+      "extension-baseline-29": "0.0001",
+      "extension-baseline-31": "0.0001",
+      "extension-coherent-33": "0.0001",
+      "extension-coherent-35": "0.0001",
+      "extension-coherent-37": "0.0001",
+      "read-post_delivery-baseline-39": "0.0001",
+      "read-post_delivery-baseline-41": "0.0001",
+      "read-post_delivery-baseline-43": "0.0001",
+      "read-post_delivery-baseline-45": "0.0001",
+      "read-post_delivery-coherent-47": "0.0001",
+      "read-post_delivery-coherent-49": "0.0001",
+      "read-maintenance-coherent-51": "0.0001",
+      "read-maintenance-coherent-53": "0.0001",
+      "read-maintenance-coherent-55": "0.0001",
+      "read-maintenance-baseline-57": "0.0001",
+      "read-maintenance-baseline-59": "0.0001",
+      "read-maintenance-baseline-61": "0.0001",
+      "read-infrequent_work-baseline-63": "0.0001",
+      "read-infrequent_work-baseline-65": "0.0001",
+      "read-infrequent_work-baseline-67": "0.0001",
+      "read-infrequent_work-coherent-69": "0.0001",
+      "read-infrequent_work-coherent-71": "0.0001",
+      "read-resolved_approval-coherent-73": "0.0001",
+      "read-resolved_approval-coherent-75": "0.0001",
+      "read-resolved_approval-baseline-77": "0.0001",
+      "read-resolved_approval-baseline-79": "0.0001",
+      "read-resolved_approval-baseline-81": "0.0001"
+    },
+    "outbound_calls": 82,
+    "elapsed_seconds": 589.8657910000184
+  }
+}

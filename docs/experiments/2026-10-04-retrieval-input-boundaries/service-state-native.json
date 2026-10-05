@@ -1,0 +1,8 @@
+{
+  "scope": "Only this round owned research Qdrant stopped; persisted corpus/public weights retained",
+  "verified_utc": "2026-10-04T05:42:03.5171270Z",
+  "owned_pid": 51168,
+  "process_stopped": true,
+  "listening_ports": [],
+  "expected_executable": "S:\\caliburn\\tmp\\ocs-eval-qdrant\\qdrant.exe"
+}

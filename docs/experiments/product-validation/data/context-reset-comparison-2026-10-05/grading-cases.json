@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "audience": "僅供研究者；禁止送入模型、摘要、Memory、App 參考資料或工具回傳。",
+  "method": "人工語意判讀正式答覆、實際 JD 改動與工具原件。完整、部分、遺漏、錯誤分列；條件不成立記不適用。未交付另外記原因，不當成零成本或答錯所有事實。",
+  "source_rule": "source_sequences 指 product-052 的正式訪談；continuation_sources 指本批輸入，執行時另映射實際來源身分。來源可採多種有效組合，不要求固定讀取順序。",
+  "aggregation_rule": "各段分別報告；c08 是最終 JD 複核，不與前段重複內容加總成獨立事實成功率。c05 先判施測資格，不同資格不作同條件配對。",
+  "cases": [
+    {
+      "case_id": "c01",
+      "source_sequences": [14, 94],
+      "continuation_sources": [],
+      "surface": "formal_reply",
+      "baseline_jd_targets": ["f17728ec-0b1b-44f0-b1ad-2db804083851"],
+      "availability_note": "四項答案都在既有退貨任務；共同尾段105另有09:10及客服，不把這兩項算成早期資訊只能靠Memory找回。",
+      "criteria": [
+        {"id": "c01_monday", "expected": "週一08:50開始退貨核對。"},
+        {"id": "c01_other_days", "expected": "週二至週五08:35，不把週一更正套到全部工作日。"},
+        {"id": "c01_deadline", "expected": "每個工作日09:10前交表，週一也不延後。"},
+        {"id": "c01_recipient", "expected": "退貨差異表交客服窗口。"}
+      ]
+    },
+    {
+      "case_id": "c02",
+      "source_sequences": [8, 86, 92],
+      "continuation_sources": ["c02"],
+      "surface": "committed_jd; audit_reply_claims_for_contradictions",
+      "baseline_jd_targets": ["8c23e298-1239-4ff3-b15b-9bbb401c4bbf", "23f1d4a2-e898-4716-86e8-e89a50664285"],
+      "availability_note": "舊驗收規則、分母、安全例外及設備備品比例都在既有JD。新生效日與3%只來自本批c02。設備任務要求另有驗收5%的交叉描述，須檢查其時期或移除非必要副本。",
+      "criteria": [
+        {"id": "c02_effective_date", "expected": "新驗收門檻明確自2026-11-01生效，不把它套用到此前。"},
+        {"id": "c02_strict_threshold", "expected": "生效後因比例提報的條件為>3%，不是>=3%；剛好3%不因比例規則提報。"},
+        {"id": "c02_denominator", "expected": "仍以不良件數除以本批實際驗收件數，不改為整月、單據張數或設備數。"},
+        {"id": "c02_safety", "expected": "安全疑慮仍先隔離並通知主管，不受比例門檻限制。"},
+        {"id": "c02_old_period", "expected": "生效前仍採>5%規則；保留舊值但附正確時期可接受。"},
+        {"id": "c02_equipment", "expected": "掃碼器備品仍為使用中設備數量的5%，不隨驗收門檻改成3%。"},
+        {"id": "c02_cross_field", "expected": "受影響正文、成果及要求不能一處寫新驗收門檻、一處仍把5%當無時期限制的同一現行規則；可更新時期或移除多餘比較。"}
+      ]
+    },
+    {
+      "case_id": "c03",
+      "source_sequences": [6, 12],
+      "continuation_sources": ["c03"],
+      "surface": "committed_jd; audit_reply_claims_for_contradictions",
+      "baseline_jd_targets": ["8c23e298-1239-4ff3-b15b-9bbb401c4bbf"],
+      "availability_note": "代理情境是新補充，其餘期限、結案與決策界線已在既有到貨任務。",
+      "criteria": [
+        {"id": "c03_backup", "expected": "採購窗口請假時由採購代理人接手處置聯繫，員工仍持續追蹤。"},
+        {"id": "c03_reminder", "expected": "兩個工作日沒回覆仍提醒，不因代理情境刪去期限。"},
+        {"id": "c03_escalation", "expected": "第四個工作日仍無進展回報主管。"},
+        {"id": "c03_closure", "expected": "補貨或退貨完成且帳物相符才結案，不以轉交代理人或通知完畢替代。"},
+        {"id": "c03_authority", "expected": "退換貨或補貨決策仍在採購端；員工不自行接受替代品或改採購價格。"},
+        {"id": "c03_promise", "expected": "沒有把供應商實際補貨時間改寫成員工保證。"}
+      ]
+    },
+    {
+      "case_id": "c04",
+      "source_sequences": [14, 16, 42, 44, 46, 94, 98],
+      "continuation_sources": [],
+      "surface": "formal_reply",
+      "baseline_jd_targets": ["f17728ec-0b1b-44f0-b1ad-2db804083851", "37b102ed-9c25-4890-9386-29c2867000c3", "8511a704-d749-4497-8905-a5d4afc1233d"],
+      "availability_note": "三張表各有JD任務；共同尾段105已有部分交付時點，但沒有完整的三表用途與16:00等細節。",
+      "criteria": [
+        {"id": "c04_return_purpose", "expected": "退貨差異表用於退貨核對差異，不與滯留庫存或收貨未結案件混為一表。"},
+        {"id": "c04_return_delivery", "expected": "每個工作日09:10前交客服。"},
+        {"id": "c04_aging_basis", "expected": "帳齡表看滯留與庫存狀態，仍以月底狀態整理，不改成交付當天狀態。"},
+        {"id": "c04_aging_delivery", "expected": "次月第一個工作日交主管，不退回原先月底交付。"},
+        {"id": "c04_weekly_purpose", "expected": "收貨異常週報列未結案原因、等待天數與下一個跟進事項。"},
+        {"id": "c04_weekly_delivery", "expected": "每週五16:00前交採購及主管。"}
+      ]
+    },
+    {
+      "case_id": "c05",
+      "source_sequences": [14, 42, 46, 88, 98],
+      "continuation_sources": ["c04", "c05"],
+      "surface": "formal_reply_and_all_attempted_jd_writes",
+      "baseline_jd_targets": ["f17728ec-0b1b-44f0-b1ad-2db804083851", "37b102ed-9c25-4890-9386-29c2867000c3", "8511a704-d749-4497-8905-a5d4afc1233d"],
+      "eligibility": "研究者先核對各組c04實際答覆及c05可見前文，仍有至少兩個合理表格目標才計模糊施測。若已唯一定位，標不適用，不把合理接話扣分；後續c06仍全部執行。",
+      "criteria": [
+        {"id": "c05_clarify", "expected": "無法唯一定位時先釐清是哪張表，不能自行選一張。"},
+        {"id": "c05_no_write", "expected": "目標不明時不將每週寫入任何候選或正式JD時程。"}
+      ]
+    },
+    {
+      "case_id": "c06",
+      "source_sequences": [14, 42, 46, 98],
+      "continuation_sources": ["c05", "c06"],
+      "surface": "formal_reply_and_committed_jd",
+      "baseline_jd_targets": ["f17728ec-0b1b-44f0-b1ad-2db804083851", "37b102ed-9c25-4890-9386-29c2867000c3", "8511a704-d749-4497-8905-a5d4afc1233d"],
+      "criteria": [
+        {"id": "c06_current_rule", "expected": "帳齡表仍按月底狀態整理，次月第一個工作日交主管；若前段已改錯，應修回並保留處理紀錄。"},
+        {"id": "c06_unconfirmed", "expected": "每週是尚未獲主管決定的提議，不作現行規則；可在適當位置記待確認，不強制寫入JD正文。"},
+        {"id": "c06_other_reports", "expected": "退貨差異表與收貨異常週報原有時程不變。"}
+      ]
+    },
+    {
+      "case_id": "c07",
+      "source_sequences": [56, 96],
+      "continuation_sources": [],
+      "surface": "formal_reply; audit_jd_for_invented_values",
+      "baseline_jd_targets": ["8c23e298-1239-4ff3-b15b-9bbb401c4bbf", "f17728ec-0b1b-44f0-b1ad-2db804083851"],
+      "availability_note": "未知狀態本身在共同尾段105可見；確認窗口則需結合原話、既有JD或衍生資料。少查閱不自動算Memory收益。",
+      "criteria": [
+        {"id": "c07_temperature", "expected": "員工未提供冷藏退貨合格溫度，應向品質窗口確認，不填通用行業數值。"},
+        {"id": "c07_retention", "expected": "員工未提供保存年限，應向財務確認，不填推測年數。"}
+      ]
+    },
+    {
+      "case_id": "c08",
+      "source_sequences": [4, 6, 8, 10, 12, 14, 16, 18, 42, 46, 56, 86, 92, 94, 96, 98],
+      "continuation_sources": ["c02", "c03", "c06"],
+      "surface": "final_committed_jd_and_persisted_references",
+      "baseline_jd_targets": ["8c23e298-1239-4ff3-b15b-9bbb401c4bbf", "f17728ec-0b1b-44f0-b1ad-2db804083851", "37b102ed-9c25-4890-9386-29c2867000c3", "8511a704-d749-4497-8905-a5d4afc1233d", "23f1d4a2-e898-4716-86e8-e89a50664285"],
+      "criteria": [
+        {"id": "c08_acceptance", "expected": "JD驗收條件具有正確新舊適用日期、>3%新門檻、原分母及安全例外，相關欄位無矛盾。"},
+        {"id": "c08_receiving_role", "expected": "未因改寫漏掉每日約15–20張進貨單、倉庫清點／員工核對登錄分工及已確認項目當天下班前登錄。"},
+        {"id": "c08_followup", "expected": "代理人補充與原兩工作日提醒、第四工作日升級、退補貨完成且帳物相符結案並存；員工不取得採購決策權。"},
+        {"id": "c08_return_schedule", "expected": "退貨仍週一08:50、其餘工作日08:35，09:10前交客服，且不把這套時限套到驗收。"},
+        {"id": "c08_return_status", "expected": "常溫由倉庫確認、冷藏由品質窗口判定，員工登錄；待檢不可當可用，調帳須核准且留核准單號，未知溫度不補造。允許修正既有概括句以消除跨欄矛盾。"},
+        {"id": "c08_reports", "expected": "帳齡表仍月底基準、次月第一工作日交主管；收貨異常週報仍週五16:00交採購及主管，沒有把每週提議誤作帳齡表新規定。"},
+        {"id": "c08_equipment", "expected": "設備備品仍是使用中掃碼器的5%，補充須核准；如仍描述驗收比例，須與c02適用時期一致，不殘留無時期的舊值副本。"}
+      ]
+    }
+  ],
+  "reference_audit": {
+    "changed_claims": "新日期、3%及採購代理人須連到本批有效來源；只引用截止104的舊Memory不能支持新補充。S摘要不是新來源身分，應引用其對應原話。",
+    "preserved_claims": "可保留原先支持來源；不要求為了測試換成Memory或重複引用整條鏈。既有引用均為原話，R/S不因看JD來源而暗中取得M專屬正文。",
+    "score": "逐個實際修訂目標記支持、部分支持、不支持、無引用；核對真實保存效果，不以顧問聲稱已更新代替。"
+  },
+  "global_audit": {
+    "unrelated_changes": "列出未要求且無依據的新職責、權限、數值或刪除；不要求字面不變，合理精簡或一致性修正可以接受。",
+    "read_path": "記錄答案所在與模型實際可見項目；若多個來源皆可得，不推定模型內部使用哪個。",
+    "unknown": "已知未知可直接回答待確認；不要求工具一定再查原話。",
+    "minimum_reading": "不以少讀為品質通過條件；先滿足本段工作，再比較token、工具及時間。"
+  }
+}

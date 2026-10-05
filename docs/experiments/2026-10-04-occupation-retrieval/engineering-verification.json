@@ -1,0 +1,34 @@
+{
+  "completed_utc": "2026-10-03T22:56:22.771336+00:00",
+  "scope": "isolated research tooling; no production app tests claimed",
+  "checks": [
+    {
+      "command": "apps/ocs-indexer/.venv/Scripts/python.exe -m pytest docs/experiments/2026-10-04-occupation-retrieval/test_evaluation.py docs/experiments/2026-10-04-occupation-retrieval/test_database.py docs/experiments/2026-10-04-occupation-retrieval/test_preparation.py docs/experiments/2026-10-04-occupation-retrieval/test_audit.py -q -p no:cacheprovider --basetemp S:/caliburn/tmp/occupation-verification-final-20261004",
+      "exit_code": 0,
+      "stdout": "19 passed in 1.08s",
+      "live_database": true
+    },
+    {
+      "command": "apps/pdf-to-json/.venv/Scripts/ruff.exe check docs/experiments/2026-10-04-occupation-retrieval",
+      "exit_code": 0,
+      "stdout": "All checks passed!"
+    },
+    {
+      "command": "apps/ocs-indexer/.venv/Scripts/python.exe -m compileall -q docs/experiments/2026-10-04-occupation-retrieval",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "notes": "Existing repository LF/CRLF warnings only"
+    }
+  ],
+  "final_audit_tool_checks": {
+    "completed_utc": "2026-10-03T23:02:20.325027+00:00",
+    "audit_tests": "4 passed in 0.18s",
+    "ruff": "All checks passed!",
+    "compileall_exit_code": 0,
+    "missing_local_links": [],
+    "notes": "After report review and expected-stage completeness checks; live DB suite ran before services were stopped"
+  }
+}

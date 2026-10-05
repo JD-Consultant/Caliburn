@@ -1,0 +1,218 @@
+[
+  {
+    "variant": "O",
+    "depth_each_route": 20,
+    "query_count": 8,
+    "query_parent_pair_workload": 247,
+    "employee_unique_parents_total": 247,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 12,
+    "known_facets_total": 8,
+    "known_facets_retained": 8,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 10,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 8
+  },
+  {
+    "variant": "O",
+    "depth_each_route": 40,
+    "query_count": 8,
+    "query_parent_pair_workload": 480,
+    "employee_unique_parents_total": 480,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 12,
+    "known_facets_total": 8,
+    "known_facets_retained": 8,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 10,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 8
+  },
+  {
+    "variant": "O",
+    "depth_each_route": 80,
+    "query_count": 8,
+    "query_parent_pair_workload": 926,
+    "employee_unique_parents_total": 926,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 12,
+    "known_facets_total": 8,
+    "known_facets_retained": 8,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 10,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 8
+  },
+  {
+    "variant": "B1-W",
+    "depth_each_route": 20,
+    "query_count": 8,
+    "query_parent_pair_workload": 249,
+    "employee_unique_parents_total": 249,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 11,
+    "known_facets_total": 8,
+    "known_facets_retained": 7,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 9,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 7
+  },
+  {
+    "variant": "B1-W",
+    "depth_each_route": 40,
+    "query_count": 8,
+    "query_parent_pair_workload": 485,
+    "employee_unique_parents_total": 485,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 12,
+    "known_facets_total": 8,
+    "known_facets_retained": 8,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 10,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 8
+  },
+  {
+    "variant": "B1-W",
+    "depth_each_route": 80,
+    "query_count": 8,
+    "query_parent_pair_workload": 949,
+    "employee_unique_parents_total": 949,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 12,
+    "known_facets_total": 8,
+    "known_facets_retained": 8,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 10,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 8
+  },
+  {
+    "variant": "B1-S",
+    "depth_each_route": 20,
+    "query_count": 35,
+    "query_parent_pair_workload": 1101,
+    "employee_unique_parents_total": 620,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 11,
+    "known_facets_total": 8,
+    "known_facets_retained": 7,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 9,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 7
+  },
+  {
+    "variant": "B1-S",
+    "depth_each_route": 40,
+    "query_count": 35,
+    "query_parent_pair_workload": 2174,
+    "employee_unique_parents_total": 1108,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 12,
+    "known_facets_total": 8,
+    "known_facets_retained": 8,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 10,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 8
+  },
+  {
+    "variant": "B1-S",
+    "depth_each_route": 80,
+    "query_count": 35,
+    "query_parent_pair_workload": 4189,
+    "employee_unique_parents_total": 1842,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 12,
+    "known_facets_total": 8,
+    "known_facets_retained": 8,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 10,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 8
+  },
+  {
+    "variant": "B2-S",
+    "depth_each_route": 20,
+    "query_count": 12,
+    "query_parent_pair_workload": 381,
+    "employee_unique_parents_total": 324,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 11,
+    "known_facets_total": 8,
+    "known_facets_retained": 7,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 9,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 7
+  },
+  {
+    "variant": "B2-S",
+    "depth_each_route": 40,
+    "query_count": 12,
+    "query_parent_pair_workload": 748,
+    "employee_unique_parents_total": 628,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 12,
+    "known_facets_total": 8,
+    "known_facets_retained": 8,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 10,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 8
+  },
+  {
+    "variant": "B2-S",
+    "depth_each_route": 80,
+    "query_count": 12,
+    "query_parent_pair_workload": 1438,
+    "employee_unique_parents_total": 1166,
+    "unassessed_cases": [
+      "H01"
+    ],
+    "known_targets_total": 12,
+    "known_targets_retained": 12,
+    "known_facets_total": 8,
+    "known_facets_retained": 8,
+    "clear_targets_total": 10,
+    "clear_targets_retained": 10,
+    "clear_facets_total": 8,
+    "clear_facets_retained": 8
+  }
+]

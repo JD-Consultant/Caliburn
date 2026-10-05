@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "166cc2ec-ba00-4cfd-ac8e-6a8450411844",
+    "interview_sequence": 106,
+    "speaker": "employee",
+    "interview_text": "先回到最早說的到貨登錄：我一天大約處理幾張進貨單，已確認的項目通常何時入ERP？如果碰到月底截止後或還有疑義的單據，是誰決定算哪個月，我能不能自己回填日期？請依我已經說過的確認。"
+  },
+  "consultant_reply": {
+    "source_id": "66ffc73c-4824-4c78-8b07-fc9964fedc7e",
+    "interview_sequence": 107,
+    "speaker": "consultant",
+    "interview_text": "您之前確認的做法是：每天約處理 **15–20 張進貨單**；已確認的項目通常在**到貨當天下班前**登錄 ERP。\n\n月底最後一天，財務會提供截止清單；超過截止或仍有疑義的單據，由**財務決定歸屬月份**。您會保留實際收貨時間及未決原因，**不自行回填日期**。"
+  }
+}

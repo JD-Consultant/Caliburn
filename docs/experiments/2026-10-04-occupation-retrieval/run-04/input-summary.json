@@ -1,0 +1,31 @@
+{
+  "A_facts": {
+    "hit_1": 0.25,
+    "hit_5": 1.0,
+    "hit_10": 1.0,
+    "mrr": 0.5,
+    "ndcg_10": 0.508993343417598,
+    "recall_5": 0.5,
+    "mean_tokens": 132.2
+  },
+  "B_b2": {
+    "hit_1": 0.5,
+    "hit_5": 1.0,
+    "hit_10": 1.0,
+    "mrr": 0.6666666666666666,
+    "ndcg_10": 0.6913205536548932,
+    "recall_5": 0.75,
+    "mean_tokens": 528.4
+  },
+  "C_b2_b1": {
+    "hit_1": 0.375,
+    "hit_5": 1.0,
+    "hit_10": 1.0,
+    "mrr": 0.6041666666666666,
+    "ndcg_10": 0.5670408743050841,
+    "recall_5": 0.5,
+    "mean_tokens": 969.0
+  },
+  "selected_automatic_input": "B_b2",
+  "decision_scope": "two synthetic employee groups; provisional, A is fact baseline"
+}

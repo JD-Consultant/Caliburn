@@ -1,0 +1,14 @@
+{
+  "before_reranker_scores": true,
+  "sources": {
+    "protocol.md": "91cb440251dba9df126f2621b118c5a8a36cd203b5f143604d6c3314dcb21851",
+    "prepare.py": "d71982b92518e85f557f5d925fc3728cef847bdc8a322886c0745d22cf0fcfd0",
+    "gpu_worker.py": "d526ee5072ea83f66a14137736d87d73a7a912682691e6dc957dfa89780532d1",
+    "analyze.py": "34467b5e981a336b428c4d2d6410188a71123135bde39d7f4bf5d015738dc616",
+    "prepared.json": "fca9877eaf7516b9205f5d596c25ee002ac0891dad638b9331464c431b70b2cd",
+    "passage-cache.jsonl": "7976d8f3274786d5c122c1fda3eaab8973472369dd8d19f95795e6335a4c17e6",
+    "database-checks.json": "5d631e2a1dae61d65c76e94b430c5a2e509817dabf14050e1481d4b3ee2e5a9b"
+  },
+  "cases_sha256": "b5d8adb7044ba3175bc2f00aaf404ea30813040dbd58c2f7e8083f6f06b3f34d",
+  "model_sha256": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286"
+}

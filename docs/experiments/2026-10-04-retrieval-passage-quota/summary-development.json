@@ -1,0 +1,954 @@
+[
+  {
+    "method": "global_dense",
+    "n": 20,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 7,
+      "covered": 45,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 4306.722222222223,
+      "mean_documents": 5,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 20,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 10,
+      "covered": 62,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 8566.222222222223,
+      "mean_documents": 10,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 20,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 17098.38888888889,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 20,
+    "k": 50,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 17098.38888888889,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 50,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 7,
+      "covered": 45,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 4306.722222222223,
+      "mean_documents": 5,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 50,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 10,
+      "covered": 62,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 8566.222222222223,
+      "mean_documents": 10,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 50,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 17098.38888888889,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 50,
+    "k": 50,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 42307.833333333336,
+      "mean_documents": 50,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 100,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 7,
+      "covered": 45,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 4306.722222222223,
+      "mean_documents": 5,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 100,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 10,
+      "covered": 62,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 8566.222222222223,
+      "mean_documents": 10,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 100,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 17098.38888888889,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 100,
+    "k": 50,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 42307.833333333336,
+      "mean_documents": 50,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 200,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 7,
+      "covered": 45,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 4306.722222222223,
+      "mean_documents": 5,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 200,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 10,
+      "covered": 62,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 8566.222222222223,
+      "mean_documents": 10,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 200,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 17098.38888888889,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_dense",
+    "n": 200,
+    "k": 50,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 42307.833333333336,
+      "mean_documents": 50,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 20,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 9,
+      "covered": 61,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 5974.888888888889,
+      "mean_documents": 5,
+      "mean_pair_comparisons": 64.44444444444444
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 20,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 10195.666666666666,
+      "mean_documents": 10,
+      "mean_pair_comparisons": 64.44444444444444
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 20,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 17098.38888888889,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 64.44444444444444
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 20,
+    "k": 50,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 17098.38888888889,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 64.44444444444444
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 50,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 8,
+      "covered": 60,
+      "total": 64,
+      "secondary_covered": 0,
+      "secondary_total": 4,
+      "mean_characters": 6505,
+      "mean_documents": 5,
+      "mean_pair_comparisons": 161.11111111111111
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 50,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 10,
+      "covered": 62,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 12344.388888888889,
+      "mean_documents": 10,
+      "mean_pair_comparisons": 161.11111111111111
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 50,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 21029.722222222223,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 161.11111111111111
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 50,
+    "k": 50,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 42307.833333333336,
+      "mean_documents": 50,
+      "mean_pair_comparisons": 161.11111111111111
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 100,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 8,
+      "covered": 60,
+      "total": 64,
+      "secondary_covered": 0,
+      "secondary_total": 4,
+      "mean_characters": 6697.333333333333,
+      "mean_documents": 5,
+      "mean_pair_comparisons": 322.22222222222223
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 100,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 9,
+      "covered": 61,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 13146.833333333334,
+      "mean_documents": 10,
+      "mean_pair_comparisons": 322.22222222222223
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 100,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 24211.38888888889,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 322.22222222222223
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 100,
+    "k": 50,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 11,
+      "covered": 63,
+      "total": 64,
+      "secondary_covered": 3,
+      "secondary_total": 4,
+      "mean_characters": 50837.944444444445,
+      "mean_documents": 50,
+      "mean_pair_comparisons": 322.22222222222223
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 200,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 8,
+      "covered": 60,
+      "total": 64,
+      "secondary_covered": 0,
+      "secondary_total": 4,
+      "mean_characters": 7018,
+      "mean_documents": 5,
+      "mean_pair_comparisons": 644.4444444444445
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 200,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 8,
+      "covered": 60,
+      "total": 64,
+      "secondary_covered": 0,
+      "secondary_total": 4,
+      "mean_characters": 14287.111111111111,
+      "mean_documents": 10,
+      "mean_pair_comparisons": 644.4444444444445
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 200,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 26900.055555555555,
+      "mean_documents": 20,
+      "mean_pair_comparisons": 644.4444444444445
+    }
+  },
+  {
+    "method": "global_rerank",
+    "n": 200,
+    "k": 50,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 58843.11111111111,
+      "mean_documents": 50,
+      "mean_pair_comparisons": 644.4444444444445
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 20,
+    "k": 3,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 8,
+      "covered": 55,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 6706.777777777777,
+      "mean_documents": 7.555555555555555,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 20,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 9,
+      "covered": 56,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 10804.111111111111,
+      "mean_documents": 12.38888888888889,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 20,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 20268.666666666668,
+      "mean_documents": 23.77777777777778,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 20,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 39804.055555555555,
+      "mean_documents": 46.44444444444444,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 50,
+    "k": 3,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 8,
+      "covered": 55,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 6706.777777777777,
+      "mean_documents": 7.555555555555555,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 50,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 9,
+      "covered": 56,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 10804.111111111111,
+      "mean_documents": 12.38888888888889,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 50,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 20268.666666666668,
+      "mean_documents": 23.77777777777778,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 50,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 39804.055555555555,
+      "mean_documents": 46.44444444444444,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 100,
+    "k": 3,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 8,
+      "covered": 55,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 6706.777777777777,
+      "mean_documents": 7.555555555555555,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 100,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 9,
+      "covered": 56,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 10804.111111111111,
+      "mean_documents": 12.38888888888889,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 100,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 20268.666666666668,
+      "mean_documents": 23.77777777777778,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_dense",
+    "n": 100,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 39804.055555555555,
+      "mean_documents": 46.44444444444444,
+      "mean_pair_comparisons": 0
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 20,
+    "k": 3,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 10,
+      "covered": 62,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 9520.611111111111,
+      "mean_documents": 7.277777777777778,
+      "mean_pair_comparisons": 64.44444444444444
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 20,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 14918.055555555555,
+      "mean_documents": 12.055555555555555,
+      "mean_pair_comparisons": 64.44444444444444
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 20,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 24448.11111111111,
+      "mean_documents": 23.27777777777778,
+      "mean_pair_comparisons": 64.44444444444444
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 20,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 39804.055555555555,
+      "mean_documents": 46.44444444444444,
+      "mean_pair_comparisons": 64.44444444444444
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 50,
+    "k": 3,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 9,
+      "covered": 61,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 9466,
+      "mean_documents": 7,
+      "mean_pair_comparisons": 161.11111111111111
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 50,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 10,
+      "covered": 62,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 16215.111111111111,
+      "mean_documents": 11.88888888888889,
+      "mean_pair_comparisons": 161.11111111111111
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 50,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 29069.444444444445,
+      "mean_documents": 23.88888888888889,
+      "mean_pair_comparisons": 161.11111111111111
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 50,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 49061.11111111111,
+      "mean_documents": 45.611111111111114,
+      "mean_pair_comparisons": 161.11111111111111
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 100,
+    "k": 3,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 9,
+      "covered": 61,
+      "total": 64,
+      "secondary_covered": 1,
+      "secondary_total": 4,
+      "mean_characters": 10809.166666666666,
+      "mean_documents": 7.222222222222222,
+      "mean_pair_comparisons": 322.22222222222223
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 100,
+    "k": 5,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 10,
+      "covered": 62,
+      "total": 64,
+      "secondary_covered": 2,
+      "secondary_total": 4,
+      "mean_characters": 17103.944444444445,
+      "mean_documents": 11.88888888888889,
+      "mean_pair_comparisons": 322.22222222222223
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 100,
+    "k": 10,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 32593.444444444445,
+      "mean_documents": 23.666666666666668,
+      "mean_pair_comparisons": 322.22222222222223
+    }
+  },
+  {
+    "method": "quota_rerank",
+    "n": 100,
+    "k": 20,
+    "metrics": {
+      "cases": 18,
+      "positive_cases": 12,
+      "complete_cases": 12,
+      "covered": 64,
+      "total": 64,
+      "secondary_covered": 4,
+      "secondary_total": 4,
+      "mean_characters": 56492.444444444445,
+      "mean_documents": 45.833333333333336,
+      "mean_pair_comparisons": 322.22222222222223
+    }
+  }
+]

@@ -1,0 +1,2241 @@
+[
+  {
+    "policy_id": "DT_absolute_0.775",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.775
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.775
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 0,
+      "T": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.8",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.8
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 0,
+      "T": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.825",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.825
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.825
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 0,
+      "T": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.85",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.85
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.85
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 0,
+      "T": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.775",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.775
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.8",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.825",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.825
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.85",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.85
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.775",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.775
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "T": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.8",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "T": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.825",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.825
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "T": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.85",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.85
+      }
+    },
+    "candidate_total": 0,
+    "candidate_min": 0,
+    "candidate_max": 0,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 0,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "T": 0
+    },
+    "known_grade3": {
+      "retained": 0,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 0,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 0,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.8_T0.75",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.8
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    },
+    "candidate_total": 1,
+    "candidate_min": 0,
+    "candidate_max": 1,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 1,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 0,
+      "T": 1
+    },
+    "known_grade3": {
+      "retained": 1,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 1,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 1,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 1,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "T_absolute_0.75",
+    "mode": "T",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    },
+    "candidate_total": 1,
+    "candidate_min": 0,
+    "candidate_max": 1,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 1,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 0,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "T": 1
+    },
+    "known_grade3": {
+      "retained": 1,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 1,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 1,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 1,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_0.75",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.75
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    },
+    "candidate_total": 4,
+    "candidate_min": 0,
+    "candidate_max": 2,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 2,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 2,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 4,
+      "T": 1
+    },
+    "known_grade3": {
+      "retained": 3,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 2,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 3,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 2,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_D0.75_T0.8",
+    "mode": "DT",
+    "family": "absolute",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.75
+      },
+      "T": {
+        "kind": "absolute",
+        "value": 0.8
+      }
+    },
+    "candidate_total": 4,
+    "candidate_min": 0,
+    "candidate_max": 2,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 2,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 2,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 4,
+      "T": 0
+    },
+    "known_grade3": {
+      "retained": 3,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 2,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 3,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 2,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.75",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.75
+      }
+    },
+    "candidate_total": 4,
+    "candidate_min": 0,
+    "candidate_max": 2,
+    "per_case_counts": {
+      "F01": 0,
+      "F02": 0,
+      "F03": 2,
+      "F04": 0,
+      "F05": 0,
+      "H01": 0,
+      "H02": 2,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 4
+    },
+    "known_grade3": {
+      "retained": 3,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 2,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 3,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 2,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_0.725",
+    "mode": "D",
+    "family": "absolute",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute",
+        "value": 0.725
+      }
+    },
+    "candidate_total": 11,
+    "candidate_min": 0,
+    "candidate_max": 4,
+    "per_case_counts": {
+      "F01": 2,
+      "F02": 0,
+      "F03": 2,
+      "F04": 1,
+      "F05": 4,
+      "H01": 0,
+      "H02": 2,
+      "H03": 0
+    },
+    "route_count_totals": {
+      "D": 11
+    },
+    "known_grade3": {
+      "retained": 4,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 3,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 4,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 3,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "T_gap_0.005",
+    "mode": "T",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "gap",
+        "value": 0.005
+      }
+    },
+    "candidate_total": 12,
+    "candidate_min": 1,
+    "candidate_max": 3,
+    "per_case_counts": {
+      "F01": 3,
+      "F02": 1,
+      "F03": 1,
+      "F04": 1,
+      "F05": 1,
+      "H01": 1,
+      "H02": 1,
+      "H03": 3
+    },
+    "route_count_totals": {
+      "T": 12
+    },
+    "known_grade3": {
+      "retained": 5,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 5,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 5,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 5,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_gap_0.005",
+    "mode": "DT",
+    "family": "gap",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "gap",
+        "value": 0.005
+      },
+      "T": {
+        "kind": "gap",
+        "value": 0.005
+      }
+    },
+    "candidate_total": 22,
+    "candidate_min": 1,
+    "candidate_max": 4,
+    "per_case_counts": {
+      "F01": 3,
+      "F02": 1,
+      "F03": 2,
+      "F04": 3,
+      "F05": 3,
+      "H01": 3,
+      "H02": 3,
+      "H03": 4
+    },
+    "route_count_totals": {
+      "D": 13,
+      "T": 12
+    },
+    "known_grade3": {
+      "retained": 7,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 7,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.725_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 5
+      }
+    },
+    "candidate_total": 40,
+    "candidate_min": 5,
+    "candidate_max": 5,
+    "per_case_counts": {
+      "F01": 5,
+      "F02": 5,
+      "F03": 5,
+      "F04": 5,
+      "F05": 5,
+      "H01": 5,
+      "H02": 5,
+      "H03": 5
+    },
+    "route_count_totals": {
+      "D": 40
+    },
+    "known_grade3": {
+      "retained": 8,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 8,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.75_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 5
+      }
+    },
+    "candidate_total": 40,
+    "candidate_min": 5,
+    "candidate_max": 5,
+    "per_case_counts": {
+      "F01": 5,
+      "F02": 5,
+      "F03": 5,
+      "F04": 5,
+      "F05": 5,
+      "H01": 5,
+      "H02": 5,
+      "H03": 5
+    },
+    "route_count_totals": {
+      "D": 40
+    },
+    "known_grade3": {
+      "retained": 8,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 8,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.775_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 5
+      }
+    },
+    "candidate_total": 40,
+    "candidate_min": 5,
+    "candidate_max": 5,
+    "per_case_counts": {
+      "F01": 5,
+      "F02": 5,
+      "F03": 5,
+      "F04": 5,
+      "F05": 5,
+      "H01": 5,
+      "H02": 5,
+      "H03": 5
+    },
+    "route_count_totals": {
+      "D": 40
+    },
+    "known_grade3": {
+      "retained": 8,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 8,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.825_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 5
+      }
+    },
+    "candidate_total": 40,
+    "candidate_min": 5,
+    "candidate_max": 5,
+    "per_case_counts": {
+      "F01": 5,
+      "F02": 5,
+      "F03": 5,
+      "F04": 5,
+      "F05": 5,
+      "H01": 5,
+      "H02": 5,
+      "H03": 5
+    },
+    "route_count_totals": {
+      "D": 40
+    },
+    "known_grade3": {
+      "retained": 8,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 8,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.85_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 5
+      }
+    },
+    "candidate_total": 40,
+    "candidate_min": 5,
+    "candidate_max": 5,
+    "per_case_counts": {
+      "F01": 5,
+      "F02": 5,
+      "F03": 5,
+      "F04": 5,
+      "F05": 5,
+      "H01": 5,
+      "H02": 5,
+      "H03": 5
+    },
+    "route_count_totals": {
+      "D": 40
+    },
+    "known_grade3": {
+      "retained": 8,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 8,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_absolute_floor_0.8_floor5",
+    "mode": "D",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 5
+      }
+    },
+    "candidate_total": 40,
+    "candidate_min": 5,
+    "candidate_max": 5,
+    "per_case_counts": {
+      "F01": 5,
+      "F02": 5,
+      "F03": 5,
+      "F04": 5,
+      "F05": 5,
+      "H01": 5,
+      "H02": 5,
+      "H03": 5
+    },
+    "route_count_totals": {
+      "D": 40
+    },
+    "known_grade3": {
+      "retained": 8,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 8,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "D_fixed_5",
+    "mode": "D",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 5
+      }
+    },
+    "candidate_total": 40,
+    "candidate_min": 5,
+    "candidate_max": 5,
+    "per_case_counts": {
+      "F01": 5,
+      "F02": 5,
+      "F03": 5,
+      "F04": 5,
+      "F05": 5,
+      "H01": 5,
+      "H02": 5,
+      "H03": 5
+    },
+    "route_count_totals": {
+      "D": 40
+    },
+    "known_grade3": {
+      "retained": 8,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 8,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 6,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_relative_D0.03_T0.01",
+    "mode": "DT",
+    "family": "relative",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "relative",
+        "value": 0.03
+      },
+      "T": {
+        "kind": "relative",
+        "value": 0.01
+      }
+    },
+    "candidate_total": 58,
+    "candidate_min": 2,
+    "candidate_max": 12,
+    "per_case_counts": {
+      "F01": 6,
+      "F02": 5,
+      "F03": 2,
+      "F04": 12,
+      "F05": 7,
+      "H01": 12,
+      "H02": 3,
+      "H03": 11
+    },
+    "route_count_totals": {
+      "D": 49,
+      "T": 17
+    },
+    "known_grade3": {
+      "retained": 9,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 8,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "T_absolute_floor_0.7_floor3",
+    "mode": "T",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 3
+      }
+    },
+    "candidate_total": 63,
+    "candidate_min": 3,
+    "candidate_max": 19,
+    "per_case_counts": {
+      "F01": 19,
+      "F02": 3,
+      "F03": 13,
+      "F04": 3,
+      "F05": 10,
+      "H01": 3,
+      "H02": 9,
+      "H03": 3
+    },
+    "route_count_totals": {
+      "T": 63
+    },
+    "known_grade3": {
+      "retained": 8,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 8,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.725_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.725,
+        "floor": 5
+      }
+    },
+    "candidate_total": 64,
+    "candidate_min": 7,
+    "candidate_max": 9,
+    "per_case_counts": {
+      "F01": 8,
+      "F02": 9,
+      "F03": 7,
+      "F04": 9,
+      "F05": 7,
+      "H01": 7,
+      "H02": 9,
+      "H03": 8
+    },
+    "route_count_totals": {
+      "D": 40,
+      "T": 40
+    },
+    "known_grade3": {
+      "retained": 9,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 9,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.75_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.75,
+        "floor": 5
+      }
+    },
+    "candidate_total": 64,
+    "candidate_min": 7,
+    "candidate_max": 9,
+    "per_case_counts": {
+      "F01": 8,
+      "F02": 9,
+      "F03": 7,
+      "F04": 9,
+      "F05": 7,
+      "H01": 7,
+      "H02": 9,
+      "H03": 8
+    },
+    "route_count_totals": {
+      "D": 40,
+      "T": 40
+    },
+    "known_grade3": {
+      "retained": 9,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 9,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.775_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.775,
+        "floor": 5
+      }
+    },
+    "candidate_total": 64,
+    "candidate_min": 7,
+    "candidate_max": 9,
+    "per_case_counts": {
+      "F01": 8,
+      "F02": 9,
+      "F03": 7,
+      "F04": 9,
+      "F05": 7,
+      "H01": 7,
+      "H02": 9,
+      "H03": 8
+    },
+    "route_count_totals": {
+      "D": 40,
+      "T": 40
+    },
+    "known_grade3": {
+      "retained": 9,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 9,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.825_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.825,
+        "floor": 5
+      }
+    },
+    "candidate_total": 64,
+    "candidate_min": 7,
+    "candidate_max": 9,
+    "per_case_counts": {
+      "F01": 8,
+      "F02": 9,
+      "F03": 7,
+      "F04": 9,
+      "F05": 7,
+      "H01": 7,
+      "H02": 9,
+      "H03": 8
+    },
+    "route_count_totals": {
+      "D": 40,
+      "T": 40
+    },
+    "known_grade3": {
+      "retained": 9,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 9,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.85_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.85,
+        "floor": 5
+      }
+    },
+    "candidate_total": 64,
+    "candidate_min": 7,
+    "candidate_max": 9,
+    "per_case_counts": {
+      "F01": 8,
+      "F02": 9,
+      "F03": 7,
+      "F04": 9,
+      "F05": 7,
+      "H01": 7,
+      "H02": 9,
+      "H03": 8
+    },
+    "route_count_totals": {
+      "D": 40,
+      "T": 40
+    },
+    "known_grade3": {
+      "retained": 9,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 9,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.8_floor5",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 5
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.8,
+        "floor": 5
+      }
+    },
+    "candidate_total": 64,
+    "candidate_min": 7,
+    "candidate_max": 9,
+    "per_case_counts": {
+      "F01": 8,
+      "F02": 9,
+      "F03": 7,
+      "F04": 9,
+      "F05": 7,
+      "H01": 7,
+      "H02": 9,
+      "H03": 8
+    },
+    "route_count_totals": {
+      "D": 40,
+      "T": 40
+    },
+    "known_grade3": {
+      "retained": 9,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 9,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_fixed_5",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 5
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 5
+      }
+    },
+    "candidate_total": 64,
+    "candidate_min": 7,
+    "candidate_max": 9,
+    "per_case_counts": {
+      "F01": 8,
+      "F02": 9,
+      "F03": 7,
+      "F04": 9,
+      "F05": 7,
+      "H01": 7,
+      "H02": 9,
+      "H03": 8
+    },
+    "route_count_totals": {
+      "D": 40,
+      "T": 40
+    },
+    "known_grade3": {
+      "retained": 9,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 9,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_absolute_floor_0.7_floor3",
+    "mode": "DT",
+    "family": "absolute_floor",
+    "asymmetric": false,
+    "route_rules": {
+      "D": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 3
+      },
+      "T": {
+        "kind": "absolute_floor",
+        "value": 0.7,
+        "floor": 3
+      }
+    },
+    "candidate_total": 89,
+    "candidate_min": 5,
+    "candidate_max": 27,
+    "per_case_counts": {
+      "F01": 27,
+      "F02": 5,
+      "F03": 13,
+      "F04": 10,
+      "F05": 14,
+      "H01": 5,
+      "H02": 10,
+      "H03": 5
+    },
+    "route_count_totals": {
+      "D": 45,
+      "T": 63
+    },
+    "known_grade3": {
+      "retained": 10,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 10,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  },
+  {
+    "policy_id": "DT_fixed_D5_T20",
+    "mode": "DT",
+    "family": "fixed",
+    "asymmetric": true,
+    "route_rules": {
+      "D": {
+        "kind": "fixed",
+        "value": 5
+      },
+      "T": {
+        "kind": "fixed",
+        "value": 20
+      }
+    },
+    "candidate_total": 169,
+    "candidate_min": 20,
+    "candidate_max": 23,
+    "per_case_counts": {
+      "F01": 21,
+      "F02": 23,
+      "F03": 20,
+      "F04": 21,
+      "F05": 20,
+      "H01": 22,
+      "H02": 21,
+      "H03": 21
+    },
+    "route_count_totals": {
+      "D": 40,
+      "T": 160
+    },
+    "known_grade3": {
+      "retained": 12,
+      "known": 12,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "known_work_facets": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 10,
+      "known": 10,
+      "unassessed_cases": [
+        "H01"
+      ]
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_cases": [
+        "H01"
+      ]
+    }
+  }
+]

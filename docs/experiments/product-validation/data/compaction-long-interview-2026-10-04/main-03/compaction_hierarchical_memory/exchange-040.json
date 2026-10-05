@@ -1,0 +1,16 @@
+{
+  "event_id": "e040",
+  "execution_id": "70d41f18-389f-4349-b788-4a3b5b090b44",
+  "employee_input": {
+    "source_id": "84cb48c6-a3b1-49e0-8708-96d984852123",
+    "interview_sequence": 80,
+    "speaker": "employee",
+    "interview_text": "平常在辦公區工作，收貨或盤點時到倉庫核對。公司沒有要求我開堆高機，也没有要求我搬整箱重物；我需遵守現場動線和隔離區標示，不能因為職稱帶物流就假設要有堆高機證照。"
+  },
+  "consultant_reply": {
+    "source_id": "439609d1-514e-4dd2-a2ea-0ee49bfa8da8",
+    "interview_sequence": 81,
+    "speaker": "consultant",
+    "interview_text": "了解。已在 JD 草稿補上：主要在辦公區工作，收貨或盤點時進入倉庫核對並遵守現場動線及隔離區標示；工作不要求操作堆高機或搬運整箱重物，也不會因職稱推定需要堆高機證照。\n\n進入倉庫核對時，公司是否要求穿著安全鞋、反光背心等防護用品？若沒有固定要求，也可以直接說沒有。"
+  }
+}

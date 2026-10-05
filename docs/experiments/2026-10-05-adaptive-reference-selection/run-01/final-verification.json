@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-10-05T03:47:43.799277+00:00",
+  "manifest_files_checked": 33,
+  "relative_links_checked": 34,
+  "failures": 0,
+  "new_model_calls": 0,
+  "external_cost_usd": 0,
+  "production_code_changes": false,
+  "independent_review": "review.md"
+}

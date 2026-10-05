@@ -1,0 +1,9 @@
+{
+  "phase": "formal-02",
+  "jobs": 8,
+  "completed": 8,
+  "failures": [],
+  "elapsed_seconds": 31.782807699986733,
+  "estimated_or_reserved_total_usd": "0.005628700",
+  "all_jobs_validated": true
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "case_id": "F01",
+    "method": "O-W",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-S",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-W",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-S",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-W",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-S",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-W",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-S",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-W",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-S",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-W",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-S",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-W",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-S",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-W",
+    "prior_top5_unchanged": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-S",
+    "prior_top5_unchanged": true
+  }
+]

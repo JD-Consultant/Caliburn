@@ -1,0 +1,102 @@
+[
+  {
+    "query_id": "F01-whole-1",
+    "candidate_ids_unchanged": true,
+    "parents": 34
+  },
+  {
+    "query_id": "F01-B2-S-0",
+    "candidate_ids_unchanged": true,
+    "parents": 31
+  },
+  {
+    "query_id": "F02-whole-1",
+    "candidate_ids_unchanged": true,
+    "parents": 35
+  },
+  {
+    "query_id": "F02-B2-S-0",
+    "candidate_ids_unchanged": true,
+    "parents": 35
+  },
+  {
+    "query_id": "F03-whole-1",
+    "candidate_ids_unchanged": true,
+    "parents": 29
+  },
+  {
+    "query_id": "F03-B2-S-0",
+    "candidate_ids_unchanged": true,
+    "parents": 31
+  },
+  {
+    "query_id": "F03-B2-S-1",
+    "candidate_ids_unchanged": true,
+    "parents": 32
+  },
+  {
+    "query_id": "F04-whole-1",
+    "candidate_ids_unchanged": true,
+    "parents": 30
+  },
+  {
+    "query_id": "F04-B2-S-0",
+    "candidate_ids_unchanged": true,
+    "parents": 35
+  },
+  {
+    "query_id": "F05-whole-1",
+    "candidate_ids_unchanged": true,
+    "parents": 32
+  },
+  {
+    "query_id": "F05-B2-S-0",
+    "candidate_ids_unchanged": true,
+    "parents": 33
+  },
+  {
+    "query_id": "H01-whole-1",
+    "candidate_ids_unchanged": true,
+    "parents": 30
+  },
+  {
+    "query_id": "H01-B2-S-0",
+    "candidate_ids_unchanged": true,
+    "parents": 31
+  },
+  {
+    "query_id": "H02-whole-1",
+    "candidate_ids_unchanged": true,
+    "parents": 26
+  },
+  {
+    "query_id": "H02-B2-S-0",
+    "candidate_ids_unchanged": true,
+    "parents": 29
+  },
+  {
+    "query_id": "H03-whole-1",
+    "candidate_ids_unchanged": true,
+    "parents": 31
+  },
+  {
+    "query_id": "H03-B2-S-0",
+    "candidate_ids_unchanged": true,
+    "parents": 31
+  },
+  {
+    "query_id": "H03-B2-S-1",
+    "candidate_ids_unchanged": true,
+    "parents": 26
+  },
+  {
+    "query_id": "H03-B2-S-2",
+    "candidate_ids_unchanged": true,
+    "parents": 35
+  },
+  {
+    "query_id": "H03-B2-S-3",
+    "candidate_ids_unchanged": true,
+    "parents": 32
+  }
+]

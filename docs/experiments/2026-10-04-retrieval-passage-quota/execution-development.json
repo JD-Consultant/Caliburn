@@ -1,0 +1,24 @@
+{
+  "created_utc": 1791089297.5739923,
+  "before_new_scores": true,
+  "sources": {
+    "protocol.md": "4d87b594171922106e1102cec26d5684902e01a3d83f2e2945f2864b4d04ae55",
+    "protocol-amendment-01.md": "31e56c90db0f39d0ee9135dcb4f6804fb87850be80b66a852405fcbcb0d7a9cb",
+    "common.py": "3c5d8337c8bb4fb9ac5abf48cfcaa81ef482a93a12d074483544764707d2748c",
+    "selection.py": "d5962c3ea3e2a88ef99d44a664779cdefdb2d552c21b1b80ec0540b5bd64ba36",
+    "prepare.py": "69a4e57c036c8a1aafd219a711982fe297158693a61a3ddc50ca1f54a4793c34",
+    "gpu_worker.py": "21bafe130c232ff04e0671eb72318858c50b51cce4422f6935af885479976e85",
+    "analyze.py": "92d884bc3a37b2ad895a10f2dd39e737dfed924d55d25f5f86684a93d799dad5",
+    "development-cases.json": "86e3a42214438365972e255f292f478783797e3eedad5365ad71f346c46fbda3",
+    "prepared-development.json": "fd09c809820c1215d9cf96185658e4eeea927ef77c184e3917bcaa14c4646744",
+    "borrowed-pairs.jsonl": "77704d78f99455ccb093288e67b30910cef21bcef661ba702726e164ba09a1e4",
+    "development-jobs.json": "4d7977524712b6d4cebefe372690ff62adcdede8ba1c884712cd458572545722",
+    "case-manifest.json": "7590ae815a4a2676087ccfb8b3442854c74be6fd6655d4d50dcb1cd389e3f66d",
+    "case-amendment-01.json": "977ff27a2ab14a39b13a127827a5656baf834e0c2dc4c149d79411cf377efaab",
+    "holdout-cases-2026-10-04-reviewed.json": "ae7e8c712455555a1ff16b2a8d80a8721214ffdac322e9919e63999c2f67d4f4"
+  },
+  "model_sha256": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286",
+  "borrowed_source_sha256": "56946410aecc4ca9a1aedbad11b4a7db8a628a867cd9e79854a4162c5f957995",
+  "passage_cache_sha256": "7976d8f3274786d5c122c1fda3eaab8973472369dd8d19f95795e6335a4c17e6",
+  "document_cache_sha256": "7bebef816eb7688b613031609b2470999e7a60e2783fb2d22371730cb78c47ed"
+}

@@ -1,0 +1,39 @@
+{
+  "model_responses": 49,
+  "automatic_evidence_validation_passed": 48,
+  "source_quote_only_corrections": [
+    {
+      "job_id": "J014",
+      "phase": "grade",
+      "case_id": "F01",
+      "document_id": "KPS2434-004v2",
+      "judgment": {
+        "grade": 1,
+        "uncertain": false,
+        "main_work": [],
+        "reason": "公版核心是銷售與業務行政支援，包括聯絡客戶確認訂單、出貨及帳款等；員工主要負責訂單系統的畫面與伺服器功能開發維護。兩者僅共享「訂單」這個對象，工作動作與責任不同，不能代表員工的任一主要工作面向。",
+        "evidence": [
+          {
+            "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+            "reference_quote": "依合約及訂單處理標準作業流程,與客戶保持聯繫,以確認訂單、交貨期、出貨、借出及配貨進度。"
+          }
+        ],
+        "limitations": [
+          "公版描述的是訂單業務流程中的客戶聯繫與出貨進度確認，並未描述訂單 API、權限、商業規則或資料存取的開發及維護。",
+          "公版也未代表員工持續負責的瀏覽器畫面、互動與操作檢查開發及維護。"
+        ]
+      },
+      "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+      "document_sha256": "b615d417afa5718246272de95579a2e795551caac52bdc12613f1a9937902eb6",
+      "evidence_correction": {
+        "kind": "source_quote_only",
+        "original_quote": "我會寫處理訂單的 API、權限檢查和商業規則",
+        "corrected_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+        "reason": "模型逐字引句漏掉「也」；按唯一原文補回，分級、理由、主要領域及公版證據不改，未重跑模型。"
+      }
+    }
+  ],
+  "numeric_grade_changes": 0,
+  "additional_model_calls": 0,
+  "original_summary_and_responses_preserved": true
+}

@@ -1,0 +1,104 @@
+{
+  "case_id": "corrections",
+  "arm": "flat",
+  "repeat": 1,
+  "cell_id": "corrections-flat-1",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 10621,
+        "input_tokens_details": {
+          "cache_write_tokens": 10618,
+          "cached_tokens": 0
+        },
+        "output_tokens": 2102,
+        "output_tokens_details": {
+          "reasoning_tokens": 1052
+        },
+        "total_tokens": 12723
+      },
+      "estimated_usd": "0.002378550",
+      "seconds": 18.132093199994415,
+      "counted_input_tokens": 10621
+    }
+  ],
+  "answer": {
+    "findings": "核對結果如下，以下時點與比例各自適用於不同流程：\n\n- **進貨驗收與 ERP 登錄：**每天約處理 15–20 張進貨單；倉庫同事清點實物，員工比對採購單、送貨單及實收品號、批號、數量，確認相符後才登錄 ERP，通常於到貨當天下班前完成已確認項目的登錄。驗收不良率的分母是**每批實際驗收件數**，不跨月累計，也不是以每日進貨單張數計算；比例**超過 5%**才依該門檻提報倉儲主管，剛好 5%不觸發這項比例提報規則。若有安全疑慮，則不論比例都先隔離並通知主管。未超過門檻且無安全疑慮時的後續處理細節仍未確認，不宜補寫假定流程。\n- **退貨核對：**每天核對前一天收到的退貨；週一因週末累積，08:50 開始，週二至週五 08:35 開始，但**每天都須於 09:10 前把退貨差異表交客服**，週一較晚開始不會延後交件期限。員工核對客退單、品號、批號及數量並依判定結果登錄狀態；常溫商品可否再銷售由倉庫同事判定，冷藏商品須由品質窗口查看溫度紀錄並判定，員工不知道也不自行設定冷藏溫度門檻。數量差異的調帳須經主管同意後才更新 ERP；退款由客服與財務處理。\n- **庫存帳齡表：**月底依月底庫存狀態整理，將可售、待檢、報廢待核准分開列，於**次月第一個工作日交主管**；用途是查看滯留及庫存狀態。員工依已確認的入庫日期及目前狀態核算並核對批號、調撥資料；促銷、報廢或其他處置由主管決定。先前所述月底整理與後續補充的交付時間適用於同一張帳齡表：交件時間明確為次月第一個工作日。\n- **設備比例的範圍不同：**掃碼器的 5%是每月以**使用中的設備數量**為基準維持的備品比例，不是進貨驗收不良率，也不是掃碼器故障率。備品不足時員工提請主管核准補充；故障時記錄設備編號、位置及問題，交資訊窗口處理並追蹤送修或備品更換，不拆機維修。兩個 5%不得互相套用。\n- **週報時程不受帳齡表更正影響：**收貨異常週報仍是每週五 16:00 前交採購及主管，列未結案原因、等待天數與下一跟進事項；供應商回覆附更新時間，未回覆標示未確認。帳齡表交付日的補充只調整帳齡表本身，不改變週報期限；也不改變每天 09:10 前交客服的退貨差異表期限。",
+    "references": [
+      {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 92,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 14,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 94,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 16,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 18,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 42,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 44,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 98,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 46,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 86,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 88,
+        "target_title": null
+      }
+    ],
+    "questions": []
+  },
+  "seconds": 29.00068719999399
+}

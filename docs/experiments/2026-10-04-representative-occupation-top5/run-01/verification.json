@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "cases": 5,
+  "queries": 15,
+  "full_rankings": 15,
+  "native_initial_checks": 15,
+  "quality_pairs": 300,
+  "final_groups": 20,
+  "final_positions": 100,
+  "unique_judgments": 49,
+  "complete_trials": 60,
+  "warm_trials": 59,
+  "startup_included_trials": 1,
+  "prior_protected_inputs_unchanged": 8,
+  "prior_sealed_artifacts_unchanged": 474,
+  "limit": "mechanism/source binding only; semantic judgments remain model assessments"
+}

@@ -1,0 +1,36 @@
+test_dense_only_also_preserves_the_secondary_passage (test_selection.PassageRetention.test_dense_only_also_preserves_the_secondary_passage) ... FAIL
+test_duplicate_reference_retains_both_passage_origins (test_selection.PassageRetention.test_duplicate_reference_retains_both_passage_origins) ... FAIL
+test_late_secondary_work_has_its_own_retained_slot (test_selection.PassageRetention.test_late_secondary_work_has_its_own_retained_slot) ... FAIL
+test_missing_required_pair_is_rejected (test_selection.PassageRetention.test_missing_required_pair_is_rejected) ... ok
+
+======================================================================
+FAIL: test_dense_only_also_preserves_the_secondary_passage (test_selection.PassageRetention.test_dense_only_also_preserves_the_secondary_passage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-passage-quota\test_selection.py", line 37, in test_dense_only_also_preserves_the_secondary_passage
+    self.assertEqual({r['id'] for r in result},{'a','rare'})
+AssertionError: Items in the second set but not the first:
+'rare'
+
+======================================================================
+FAIL: test_duplicate_reference_retains_both_passage_origins (test_selection.PassageRetention.test_duplicate_reference_retains_both_passage_origins)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-passage-quota\test_selection.py", line 23, in test_duplicate_reference_retains_both_passage_origins
+    self.assertEqual({r['id'] for r in result},{'common','a','b'})
+AssertionError: Items in the second set but not the first:
+'b'
+
+======================================================================
+FAIL: test_late_secondary_work_has_its_own_retained_slot (test_selection.PassageRetention.test_late_secondary_work_has_its_own_retained_slot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-passage-quota\test_selection.py", line 13, in test_late_secondary_work_has_its_own_retained_slot
+    self.assertEqual({r['id'] for r in result},{'main-a','rare'})
+AssertionError: Items in the second set but not the first:
+'rare'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+FAILED (failures=3)

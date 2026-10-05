@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "395a2732-40a2-49d3-b76b-924145a517bc",
+    "interview_sequence": 106,
+    "speaker": "employee",
+    "interview_text": "先回到前面退貨那件事，我週一和其他工作日各幾點開始核對？差異表最晚幾點、交給誰？請依我之前說的確認。"
+  },
+  "consultant_reply": {
+    "source_id": "0eb1d5ab-a863-4c36-8c2e-239823ce25d9",
+    "interview_sequence": 107,
+    "speaker": "consultant",
+    "interview_text": "依您之前的補充（第 94 則）：\n\n- **週一**：08:50 開始核對。\n- **週二至週五**：08:35 開始核對。\n- **退貨差異表**：每天最晚 **09:10 前**交給**客服窗口**；週一開始較晚，交表時間不變。"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "job_id": "J007",
+  "phase": "formal-02",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是電信工程團隊與場域管理、施工安排及協調，不能代表員工持續負責的瀏覽器畫面或訂單 API、權限、商業規則及資料存取開發。員工偶爾協助同事處理電腦網路問題，僅與公版的電信網路故障工作有表面關聯，不足以代表主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "畫面與伺服器功能都是我持續負責的主要工作。",
+        "reference_quote": "負責及監督管理電信工程業務。"
+      },
+      {
+        "employee_quote": "偶爾同事電腦連不上網路會請我幫忙",
+        "reference_quote": "依據工作任務評估網路中斷及故障,對客戶的影響程度,擬定作業程序。"
+      }
+    ],
+    "limitations": [
+      "員工主要領域是軟體功能開發與維護；公版的施工、團隊管理及電信故障處理責任與其工作內容不符。"
+    ]
+  },
+  "seconds": 6.5735207999823615,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "9126cc13b5ddc2b071c1843916ec727e7bb3dc6b0c6a5b2635784242b84ce555",
+  "case_id": "F01",
+  "document_id": "BGM1330-001v3"
+}

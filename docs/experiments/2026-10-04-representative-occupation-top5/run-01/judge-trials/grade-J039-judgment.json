@@ -1,0 +1,25 @@
+{
+  "job_id": "J039",
+  "phase": "grade",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版主要描述行銷活動的資料蒐集、規劃協助、前置準備及執行協調，未代表員工持續負責的視覺版面設計、跨尺寸製作、修訂與輸出交付。員工整理素材與版本和公版的活動資料歸檔僅有局部關聯，不足以代表其主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "也整理素材和版本讓後續能修改",
+        "reference_quote": "協助整理歷史活動資料並歸檔。"
+      }
+    ],
+    "limitations": [
+      "公版未描述視覺版面、字體色彩與圖片處理、跨尺寸製作、依回饋修訂或印刷輸出設定等主要工作。",
+      "公版的活動規劃、資源準備、廠商聯繫及報告撰寫等工作，不能據此視為員工主要負責的工作。"
+    ]
+  },
+  "seconds": 7.62112209998304,
+  "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+  "document_sha256": "f237c23d7c791a41fc1860d10aea86d043fe943cbcfcf8d03f76e47e48bdef1c",
+  "case_id": "F05",
+  "document_id": "KMM2431-006v3"
+}

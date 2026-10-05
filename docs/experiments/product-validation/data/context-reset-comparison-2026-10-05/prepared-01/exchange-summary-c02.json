@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "2edd815c-70e0-491d-bf7a-92efe6b9832e",
+    "interview_sequence": 108,
+    "speaker": "employee",
+    "interview_text": "主管剛確認一項新規定：自2026年11月1日起，驗收不良比例改成超過3%才因比例規則提報；剛好3%不算超過。在這個日期之前仍照原規則。只改這個門檻及生效日，其他條件不變，請更新JD適用的位置。"
+  },
+  "consultant_reply": {
+    "source_id": "68d46fd2-c591-4d27-b56c-64eb0eec4464",
+    "interview_sequence": 109,
+    "speaker": "consultant",
+    "interview_text": "已更新 JD 的到貨驗收提報規則：**2026 年 10 月 31 日（含）以前，超過 5% 才依比例規則提報；自 2026 年 11 月 1 日起，改為超過 3% 才提報。**兩個門檻剛好達標時，都不因比例規則提報。\n\n每批實際驗收件數的分母及安全疑慮時先隔離並通知主管的例外均保留不變。更新已套用至目前的 JD 候選。"
+  }
+}

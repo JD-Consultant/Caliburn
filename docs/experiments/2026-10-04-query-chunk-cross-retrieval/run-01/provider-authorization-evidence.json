@@ -1,0 +1,26 @@
+{
+  "destination": "https://api.openai.com/v1",
+  "fixed_in_existing_adapter": true,
+  "adapter_sha256": "539ba7237afa8137096eae06b38037cd52fe43c528f47fb638606db1b59c2f4d",
+  "job_count": 8,
+  "all_new_jobs_are_agent_authored_synthetic_F_cases": true,
+  "actual_employee_interview_data": false,
+  "no_H_historical_interview_job_in_new_batch": true,
+  "synthetic_source": "docs/experiments/2026-10-04-representative-occupation-top5/cases-v1.json",
+  "source_sha256": "ac7a871de75bb1c49ae36d2445bc4fa87c0ac386b78e8cb6f74f663e089573fb",
+  "data_kind": "agent_authored_synthetic_employee_work",
+  "provenance": "依一般工作情境編寫；本輪沒有先查待搜尋公版、既有支持標註或預期來源 ID 來改寫案例。不是真人訪談，也不保證沒有預訓練知識重疊。",
+  "case_ids": [
+    "F01",
+    "F02",
+    "F04"
+  ],
+  "public_reference_bodies_only": true,
+  "new_jobs_sha256": "33a1f3cce92b3499b7026360a166640eb47d573fc45c16ded17714eb4408123f",
+  "store": false,
+  "background": false,
+  "retries": 0,
+  "max_cost_usd": "1.00",
+  "count_or_response_calls_completed": 0,
+  "approval_review_initial_rejection": "employee interview data/destination not established; evidence above verifies synthetic-only data and fixed official endpoint"
+}

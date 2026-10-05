@@ -1,0 +1,27 @@
+holdout: 200 supplemented pairs
+Skipping import of cpp extensions due to incompatible torch version 2.10.0+cu128 for torchao version 0.14.0         Please see GitHub issue #2919 for more info
+holdout: 400 supplemented pairs
+holdout: 600 supplemented pairs
+holdout: 800 supplemented pairs
+holdout: 1000 supplemented pairs
+holdout: 1200 supplemented pairs
+holdout: 1403 supplemented pairs
+holdout: 1603 supplemented pairs
+holdout: 1803 supplemented pairs
+holdout: 2003 supplemented pairs
+holdout: 2207 supplemented pairs
+holdout: 2407 supplemented pairs
+holdout: 2607 supplemented pairs
+holdout: 2807 supplemented pairs
+holdout: 3010 supplemented pairs
+holdout: 3210 supplemented pairs
+benchmark E01-global_rerank-1: 14.68s
+benchmark E01-global_rerank-2: 14.43s
+benchmark E01-quota_rerank-1: 1.63s
+benchmark E01-quota_rerank-2: 1.61s
+benchmark M04-global_rerank-1: 18.59s
+benchmark M04-global_rerank-2: 18.93s
+benchmark M04-quota_rerank-1: 1.81s
+benchmark M04-quota_rerank-2: 1.91s
+benchmark E01-full-1: 66.03s
+benchmark E01-full-2: 68.55s

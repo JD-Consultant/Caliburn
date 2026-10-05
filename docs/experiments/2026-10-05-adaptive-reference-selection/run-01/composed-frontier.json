@@ -1,0 +1,56 @@
+{
+  "criteria": "Preserve all initial known grade3 and every baseline-final known grade3; no ungraded final; cap<=5. Minimize pairs, grade0/1, and selected; maximize grade3 and grade2. Not a deployable best proof.",
+  "rows": [
+    {
+      "id": "DT_fixed_D5_T20::absolute_-4_cap5",
+      "first_policy": "DT_fixed_D5_T20",
+      "final_policy": {
+        "id": "absolute_-4_cap5",
+        "kind": "absolute",
+        "parameter": -4.0,
+        "limit": 5
+      },
+      "candidate_pairs": 169,
+      "initial_known_grade3": 12,
+      "lost_baseline_grade3_count": 0,
+      "selected_count": 37,
+      "average_per_case": 4.625,
+      "range": [
+        2,
+        5
+      ],
+      "empty_cases": [],
+      "grades": {
+        "0": 1,
+        "1": 10,
+        "2": 17,
+        "3": 9,
+        "ungraded": 0
+      },
+      "known_grade3_retained": 9,
+      "known_grade3_total": 12,
+      "known_facets_supported": 8,
+      "known_facets_total": 8,
+      "sensitivity": {
+        "selected_count": 37,
+        "average_per_case": 4.625,
+        "range": [
+          2,
+          5
+        ],
+        "empty_cases": [],
+        "grades": {
+          "0": 1,
+          "1": 10,
+          "2": 17,
+          "3": 9,
+          "ungraded": 0
+        },
+        "known_grade3_retained": 8,
+        "known_grade3_total": 10,
+        "known_facets_supported": 7,
+        "known_facets_total": 8
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+﻿stage,case_id,arm,employee_group,split,tokens,top1_id,top1_title,top1_score,hit_1,hit_5,hit_10,mrr,ndcg_10,recall_5,primary_rank,query_seconds,returned_candidates,corpus_count,hard_negative_best_rank
+holdout,hold-accounting,dense,accounting,holdout,58,FAC3313-001v2,會計助理,0.7884931584184076,1,1,1,1.0,0.8339912323981488,1.0,2,0,805,805,3
+holdout,hold-recruiting,dense,recruiting,holdout,58,BHR2422-014v2,招募甄選專業人員,0.7394775482845224,1,1,1,1.0,1.0,1.0,1,0,805,805,66
+holdout,hold-web,dense,web,holdout,51,網路維修助理,網路維修助理,0.7157324219889979,0,0,0,0.029411764705882353,0.0,0.0,34,0,805,805,143
+holdout,hold-ux,dense,ux,holdout,55,SET2152-005v2,FAE工程人員【註1】,0.7126425804209613,0,1,1,0.5,0.606422698504514,1.0,3,0,805,805,120
+holdout,hold-testing,dense,testing,holdout,54,ISD2152-004v5,行動裝置程式設計師,0.7495339592127325,0,1,1,0.25,0.469514592756915,1.0,4,0,805,805,118
+holdout,hold-coffee,dense,coffee,holdout,55,TFB5131-002v3,咖啡調製人員,0.8128276773775531,1,1,1,1.0,1.0,1.0,1,0,805,805,3
+holdout,hold-roasting,dense,roasting,holdout,54,TFB7914-001v3,咖啡烘焙人員,0.8084573184192929,1,1,1,1.0,1.0,1.0,1,0,805,805,20
+holdout,hold-food-service,dense,food-service,holdout,54,連鎖餐飲門市服務人員,連鎖餐飲門市服務人員,0.7759380716670903,0,1,1,0.5,0.6309297535714575,1.0,2,0,805,805,
+holdout,hold-electrical,dense,electrical,holdout,57,CCM7412-002v4,水電工程助理,0.7934618009086721,1,1,1,1.0,0.8339912323981488,1.0,2,0,805,805,7
+holdout,hold-interior,dense,interior,holdout,53,CAP2171-003v3,室內設計助理,0.786281324765006,1,1,1,1.0,0.8339912323981488,1.0,2,0,805,805,50
+holdout,hold-purchasing-manager,dense,purchasing-manager,holdout,46,BAS3323-001v4,採購人員,0.7366399521135233,0,0,0,0.07142857142857142,0.0,0.0,14,0,805,805,6
+holdout,hold-marketing,dense,marketing,holdout,47,FFN2412-002v3,銀行─數位行銷人員（屬金融科技*人才）,0.7335655780520927,0,1,1,0.5,0.5389081574594713,0.6666666666666666,5,0,805,805,129
+holdout,hold-mixed,dense,mixed,holdout,59,KPS2434-004v2,醫療器材產業業務助理,0.6733797660161054,0,1,1,0.3333333333333333,0.47164739851123466,0.5,5,0,805,805,8
+holdout,hold-no-match-paleontology,dense,no-match,holdout,35,KPS5292-001v2,中古汽車銷售人員,0.6183920188763543,,,,,,,,0,805,805,
+holdout,hold-no-match-cryptography,dense,no-match,holdout,46,INM7421-011v3,資通網路資深技術人員,0.6315912541667674,,,,,,,,0,805,805,
+holdout,hold-insufficient,dense,insufficient,holdout,30,BAS1219-003v4,行政總務管理人員,0.6984330952235895,,,,,,,,0,805,805,

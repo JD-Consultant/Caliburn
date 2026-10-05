@@ -1,0 +1,28 @@
+{
+  "job_id": "J011",
+  "phase": "grade",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版與員工主要工作有視覺稿設計的局部交集，但公版核心是裝置互動介面，包含介面流程與線框、原型、使用者體驗測試及交付開發；不足以代表員工製作活動與商品視覺素材的主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "做版面、字體、色彩和圖片處理",
+        "reference_quote": "依線框稿架構,選用適切繪圖軟體設計視覺稿(mockup)。"
+      },
+      {
+        "employee_quote": "再依回饋修改",
+        "reference_quote": "視組織相關人員要求或客戶需求,調整介面。"
+      }
+    ],
+    "limitations": [
+      "視覺稿及修改是局部相似；公版描述的是裝置介面，而非員工所述活動與商品素材的跨尺寸製作、印刷檔案檢核及輸出交付。"
+    ]
+  },
+  "seconds": 7.0640946999774314,
+  "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+  "document_sha256": "05eb1325d3ca7978420f67a72261a1556a9299b344581936e8e1ebf4ff625ec5",
+  "case_id": "F05",
+  "document_id": "AVA2172-003v3"
+}

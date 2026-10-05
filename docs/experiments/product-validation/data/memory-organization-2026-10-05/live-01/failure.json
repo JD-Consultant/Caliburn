@@ -1,0 +1,26 @@
+{
+  "type": "IncompleteModelResponseError",
+  "cell": "candidate-2",
+  "location": [
+    {
+      "file": "_runnable.py",
+      "line": 756,
+      "function": "ainvoke"
+    },
+    {
+      "file": "_runnable.py",
+      "line": 522,
+      "function": "ainvoke"
+    },
+    {
+      "file": "tool_steps.py",
+      "line": 820,
+      "function": "prepare_tool"
+    },
+    {
+      "file": "response_steps.py",
+      "line": 38,
+      "function": "inspect_response_step"
+    }
+  ]
+}

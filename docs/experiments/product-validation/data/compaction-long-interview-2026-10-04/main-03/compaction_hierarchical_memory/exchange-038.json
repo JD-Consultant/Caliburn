@@ -1,0 +1,16 @@
+{
+  "event_id": "e038",
+  "execution_id": "56579f1e-a552-4a76-b99d-1a04727e66e7",
+  "employee_input": {
+    "source_id": "b669f06e-8282-49cd-9ce4-1b1d30d780ae",
+    "interview_sequence": 76,
+    "speaker": "employee",
+    "interview_text": "Excel主要用篩選、樞紐分析和查找核對不同清單；我會以原單號或品號搭配批號比對，不能只靠商品名稱相似就合併。有些清單同名不同規格，所以要保留這個判斷方式。"
+  },
+  "consultant_reply": {
+    "source_id": "aecf6082-2d4e-4349-942c-e6b2cfa76e6c",
+    "interview_sequence": 77,
+    "speaker": "consultant",
+    "interview_text": "已新增「Excel 多清單篩選與識別核對」技能，記錄您運用篩選、樞紐分析及查找核對清單，並以原單號或品號加批號比對；同名不同規格不會只憑相似品名合併。也已連結到涉及多清單或批號核對的相關工作。\n\n如果依單號或品號加批號仍無法匹配，您通常會怎麼標記並交由誰確認？"
+  }
+}

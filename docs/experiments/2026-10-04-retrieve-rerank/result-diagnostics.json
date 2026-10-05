@@ -1,0 +1,1652 @@
+{
+  "scope": "post-selection descriptive failure diagnosis; no held-out retuning or adopted threshold",
+  "sources_sha256": {
+    "cases-v4.json": "b5d8adb7044ba3175bc2f00aaf404ea30813040dbd58c2f7e8083f6f06b3f34d",
+    "final-metrics.jsonl": "f68dd1679c834f56fbda05c8bc58a88ce90807ecf6934a8ed30f8cdbbe322af0",
+    "passage-pool\\prepared.json": "fca9877eaf7516b9205f5d596c25ee002ac0891dad638b9331464c431b70b2cd",
+    "passage-pool\\rerank-pairs.jsonl": "56946410aecc4ca9a1aedbad11b4a7db8a628a867cd9e79854a4162c5f957995",
+    "passage-pool\\comparison.json": "4cd523a2099474c88b80773a08bb63d40a6105d3d46454bc0a883860a5508723",
+    "passage-pool\\final-metrics.jsonl": "492f2c0517480e454a05c1c6efe2c781310b55b3866be7b0b2d0dceacfbec98c",
+    "passage-pool\\timing-summary.json": "5b345fcd609383215980ae4d14329dabaaa6f04236f5222d73d9d601d42e3569",
+    "diagnose-results.py": "80b456f1bac68b0a11dab2e23c9c3803190eaaa22db4eea4a8e4cc00186c777b"
+  },
+  "chosen_development_setting": {
+    "method": "rerank",
+    "n": 200,
+    "cosine": 0.65,
+    "k": 20,
+    "cross": null
+  },
+  "controlled_development_comparison": [
+    {
+      "representation": "raw_employee",
+      "method": "dense_only",
+      "n": 200,
+      "cosine": null,
+      "k": 50,
+      "cross": null,
+      "development_cases": 16,
+      "positive_cases": 10,
+      "complete_cases": 8,
+      "missing": {
+        "M01": [
+          "M01-T06"
+        ],
+        "M03": [
+          "M03-T06"
+        ]
+      },
+      "mean_characters_all_development": 43302.1875
+    },
+    {
+      "representation": "raw_employee",
+      "method": "rerank",
+      "n": 200,
+      "cosine": null,
+      "k": 50,
+      "cross": null,
+      "development_cases": 16,
+      "positive_cases": 10,
+      "complete_cases": 8,
+      "missing": {
+        "M01": [
+          "M01-T06"
+        ],
+        "M03": [
+          "M03-T06"
+        ]
+      },
+      "mean_characters_all_development": 56396.5
+    },
+    {
+      "representation": "raw_segments",
+      "method": "dense_only",
+      "n": 200,
+      "cosine": null,
+      "k": 50,
+      "cross": null,
+      "development_cases": 16,
+      "positive_cases": 10,
+      "complete_cases": 9,
+      "missing": {
+        "M01": [
+          "M01-T06"
+        ]
+      },
+      "mean_characters_all_development": 41576.625
+    },
+    {
+      "representation": "raw_segments",
+      "method": "rerank",
+      "n": 200,
+      "cosine": null,
+      "k": 50,
+      "cross": null,
+      "development_cases": 16,
+      "positive_cases": 10,
+      "complete_cases": 10,
+      "missing": {},
+      "mean_characters_all_development": 58350.9375
+    }
+  ],
+  "broad_topic_counts": {
+    "covered": 63,
+    "total": 64
+  },
+  "final_topic_counts": {
+    "covered": 63,
+    "total": 64
+  },
+  "broad_documents": {
+    "E01": 118,
+    "E02": 65,
+    "E03": 9,
+    "E04": 55,
+    "E05": 5,
+    "E06": 16,
+    "E07": 125,
+    "E08": 5,
+    "E09": 7,
+    "E10": 2,
+    "E11": 0,
+    "E12": 1,
+    "E13": 0,
+    "E14": 0,
+    "M01": 127,
+    "M02": 61,
+    "M03": 8,
+    "M04": 8
+  },
+  "failure_trace": [
+    {
+      "case_id": "M04",
+      "split": "holdout",
+      "topic_id": "M04-T06",
+      "work": "每季用品庫房盤點與差異報告",
+      "secondary": true,
+      "support": [
+        {
+          "id": "MMP4321-003v4",
+          "max_cosine_rank": 12,
+          "max_cosine": 0.6357555763298794,
+          "passes_candidate_depth": true,
+          "passes_cosine": false,
+          "broad_retained": false,
+          "rerank_logit": -3.388671875,
+          "rerank_sigmoid": 0.032651378460344445,
+          "rerank_rank_in_saved_top200_without_cosine": 14,
+          "rerank_rank_after_cosine": null,
+          "final_retained": false
+        }
+      ],
+      "covered": false
+    }
+  ],
+  "all_topic_traces": [
+    {
+      "case_id": "E01",
+      "split": "regression",
+      "topic_id": "E01-T01",
+      "work": "診斷小客車故障",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E01",
+      "split": "regression",
+      "topic_id": "E01-T02",
+      "work": "拆裝修護機件並復驗",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E01",
+      "split": "regression",
+      "topic_id": "E01-T03",
+      "work": "底盤煞車轉向懸吊檢查修護",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E01",
+      "split": "regression",
+      "topic_id": "E01-T04",
+      "work": "例行保養",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E01",
+      "split": "regression",
+      "topic_id": "E01-T05",
+      "work": "廢油工具與工作區維護",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E02",
+      "split": "regression",
+      "topic_id": "E02-T01",
+      "work": "圖面公差判讀",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7223-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.6970895793852256,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.01004791259765625,
+          "rerank_sigmoid": 0.5025119570154033,
+          "rerank_rank_in_saved_top200_without_cosine": 3,
+          "rerank_rank_after_cosine": 3,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E02",
+      "split": "regression",
+      "topic_id": "E02-T02",
+      "work": "選擇夾頭與工件夾持方式",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7223-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.6970895793852256,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.01004791259765625,
+          "rerank_sigmoid": 0.5025119570154033,
+          "rerank_rank_in_saved_top200_without_cosine": 3,
+          "rerank_rank_after_cosine": 3,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E02",
+      "split": "regression",
+      "topic_id": "E02-T03",
+      "work": "選刀與補償設定",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7223-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.6970895793852256,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.01004791259765625,
+          "rerank_sigmoid": 0.5025119570154033,
+          "rerank_rank_in_saved_top200_without_cosine": 3,
+          "rerank_rank_after_cosine": 3,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E02",
+      "split": "regression",
+      "topic_id": "E02-T04",
+      "work": "車削加工及異常排除",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7223-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.6970895793852256,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.01004791259765625,
+          "rerank_sigmoid": 0.5025119570154033,
+          "rerank_rank_in_saved_top200_without_cosine": 3,
+          "rerank_rank_after_cosine": 3,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E02",
+      "split": "regression",
+      "topic_id": "E02-T05",
+      "work": "首件及過程尺寸量測",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7223-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.6970895793852256,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.01004791259765625,
+          "rerank_sigmoid": 0.5025119570154033,
+          "rerank_rank_in_saved_top200_without_cosine": 3,
+          "rerank_rank_after_cosine": 3,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E02",
+      "split": "regression",
+      "topic_id": "E02-T06",
+      "work": "機台日常保養",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7223-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.6970895793852256,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.01004791259765625,
+          "rerank_sigmoid": 0.5025119570154033,
+          "rerank_rank_in_saved_top200_without_cosine": 3,
+          "rerank_rank_after_cosine": 3,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E03",
+      "split": "regression",
+      "topic_id": "E03-T01",
+      "work": "依配方準備秤量原料",
+      "secondary": false,
+      "support": [
+        {
+          "id": "TFB7912-002v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7452093920081067,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.391357421875,
+          "rerank_sigmoid": 0.4033905717738624,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E03",
+      "split": "regression",
+      "topic_id": "E03-T02",
+      "work": "攪拌發酵成形與烘烤裝飾",
+      "secondary": false,
+      "support": [
+        {
+          "id": "TFB7912-002v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7452093920081067,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.391357421875,
+          "rerank_sigmoid": 0.4033905717738624,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E03",
+      "split": "regression",
+      "topic_id": "E03-T03",
+      "work": "外觀與内部品質辨別回報",
+      "secondary": false,
+      "support": [
+        {
+          "id": "TFB7912-002v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7452093920081067,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.391357421875,
+          "rerank_sigmoid": 0.4033905717738624,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E03",
+      "split": "regression",
+      "topic_id": "E03-T04",
+      "work": "原料庫存期限及異常隔離回報",
+      "secondary": false,
+      "support": [
+        {
+          "id": "TFB7912-002v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7452093920081067,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.391357421875,
+          "rerank_sigmoid": 0.4033905717738624,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E03",
+      "split": "regression",
+      "topic_id": "E03-T05",
+      "work": "環境與器具清潔",
+      "secondary": false,
+      "support": [
+        {
+          "id": "TFB7912-002v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7452093920081067,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.391357421875,
+          "rerank_sigmoid": 0.4033905717738624,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E04",
+      "split": "regression",
+      "topic_id": "E04-T01",
+      "work": "防火牆與網路防禦設定",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 3,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E04",
+      "split": "regression",
+      "topic_id": "E04-T02",
+      "work": "核准遠端連線的存取權限設定",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 3,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E04",
+      "split": "regression",
+      "topic_id": "E04-T03",
+      "work": "日誌警示監控調查與授權變更",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 3,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E04",
+      "split": "regression",
+      "topic_id": "E04-T04",
+      "work": "資安事件範圍確認及核准圍堵",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 3,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E04",
+      "split": "regression",
+      "topic_id": "E04-T05",
+      "work": "協調弱點修補時程及確認修補生效（非本人施作修補）",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 3,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E05",
+      "split": "regression",
+      "topic_id": "E05-T01",
+      "work": "客房清潔鋪床與準備",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E05",
+      "split": "regression",
+      "topic_id": "E05-T02",
+      "work": "房間設備異常報修",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E05",
+      "split": "regression",
+      "topic_id": "E05-T03",
+      "work": "遺留物登記交付",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E05",
+      "split": "regression",
+      "topic_id": "E05-T04",
+      "work": "送毛巾枕頭及客訴回報",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E05",
+      "split": "regression",
+      "topic_id": "E05-T05",
+      "work": "備品整理補充",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E06",
+      "split": "regression",
+      "topic_id": "E06-T01",
+      "work": "穴盤種子準備與播種",
+      "secondary": false,
+      "support": [
+        {
+          "id": "NAO6010-003v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7167092158582816,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.6650390625,
+          "rerank_sigmoid": 0.6603914338601954,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E06",
+      "split": "regression",
+      "topic_id": "E06-T02",
+      "work": "育苗階段灌溉與苗況管理",
+      "secondary": false,
+      "support": [
+        {
+          "id": "NAO6010-003v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7167092158582816,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.6650390625,
+          "rerank_sigmoid": 0.6603914338601954,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E06",
+      "split": "regression",
+      "topic_id": "E06-T03",
+      "work": "環控設備操作及簡易異常處理",
+      "secondary": false,
+      "support": [
+        {
+          "id": "NAO6010-003v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7167092158582816,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.6650390625,
+          "rerank_sigmoid": 0.6603914338601954,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E06",
+      "split": "regression",
+      "topic_id": "E06-T04",
+      "work": "環境數據紀錄",
+      "secondary": false,
+      "support": [
+        {
+          "id": "NAO6010-003v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7167092158582816,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.6650390625,
+          "rerank_sigmoid": 0.6603914338601954,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E06",
+      "split": "regression",
+      "topic_id": "E06-T06",
+      "work": "出貨包裝",
+      "secondary": false,
+      "support": [
+        {
+          "id": "NAO6010-003v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7167092158582816,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.6650390625,
+          "rerank_sigmoid": 0.6603914338601954,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E07",
+      "split": "regression",
+      "topic_id": "E07-T01",
+      "work": "工具材料與安全準備",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7212-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.8054213483348835,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.472412109375,
+          "rerank_sigmoid": 0.38404548879733924,
+          "rerank_rank_in_saved_top200_without_cosine": 2,
+          "rerank_rank_after_cosine": 2,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E07",
+      "split": "regression",
+      "topic_id": "E07-T02",
+      "work": "清理接合面與銲前處理",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7212-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.8054213483348835,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.472412109375,
+          "rerank_sigmoid": 0.38404548879733924,
+          "rerank_rank_in_saved_top200_without_cosine": 2,
+          "rerank_rank_after_cosine": 2,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E07",
+      "split": "regression",
+      "topic_id": "E07-T03",
+      "work": "參數銲材定位與銲接",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7212-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.8054213483348835,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.472412109375,
+          "rerank_sigmoid": 0.38404548879733924,
+          "rerank_rank_in_saved_top200_without_cosine": 2,
+          "rerank_rank_after_cosine": 2,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E07",
+      "split": "regression",
+      "topic_id": "E07-T04",
+      "work": "清除熔渣外觀及變形自檢",
+      "secondary": false,
+      "support": [
+        {
+          "id": "MPM7212-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.8054213483348835,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.472412109375,
+          "rerank_sigmoid": 0.38404548879733924,
+          "rerank_rank_in_saved_top200_without_cosine": 2,
+          "rerank_rank_after_cosine": 2,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E08",
+      "split": "regression",
+      "topic_id": "E08-T01",
+      "work": "需求毛況確認及清潔美容",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E08",
+      "split": "regression",
+      "topic_id": "E08-T02",
+      "work": "安全保定與造型修剪",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E08",
+      "split": "regression",
+      "topic_id": "E08-T03",
+      "work": "異常辨識停工告知與轉介",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E08",
+      "split": "regression",
+      "topic_id": "E08-T04",
+      "work": "工具環境清潔消毒",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "E08",
+      "split": "regression",
+      "topic_id": "E08-T05",
+      "work": "居家照顧提醒",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M01",
+      "split": "development",
+      "topic_id": "M01-T01",
+      "work": "診斷小客車故障",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M01",
+      "split": "development",
+      "topic_id": "M01-T02",
+      "work": "拆裝修護機件並復驗",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M01",
+      "split": "development",
+      "topic_id": "M01-T03",
+      "work": "底盤煞車轉向懸吊檢查修護",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M01",
+      "split": "development",
+      "topic_id": "M01-T04",
+      "work": "例行保養",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M01",
+      "split": "development",
+      "topic_id": "M01-T05",
+      "work": "廢油工具與工作區維護",
+      "secondary": false,
+      "support": [
+        {
+          "id": "SET7231-002v3",
+          "max_cosine_rank": 9,
+          "max_cosine": 0.7210502260391783,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.7734375,
+          "rerank_sigmoid": 0.14511536292037017,
+          "rerank_rank_in_saved_top200_without_cosine": 4,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M01",
+      "split": "development",
+      "topic_id": "M01-T06",
+      "work": "每週零件詢比價下單與催貨",
+      "secondary": true,
+      "support": [
+        {
+          "id": "BAS3323-001v4",
+          "max_cosine_rank": 108,
+          "max_cosine": 0.6559452392988534,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -2.662109375,
+          "rerank_sigmoid": 0.06524656576181369,
+          "rerank_rank_in_saved_top200_without_cosine": 14,
+          "rerank_rank_after_cosine": 12,
+          "final_retained": true
+        },
+        {
+          "id": "BAS3323-001v4",
+          "max_cosine_rank": 108,
+          "max_cosine": 0.6559452392988534,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -2.662109375,
+          "rerank_sigmoid": 0.06524656576181369,
+          "rerank_rank_in_saved_top200_without_cosine": 14,
+          "rerank_rank_after_cosine": 12,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M02",
+      "split": "holdout",
+      "topic_id": "M02-T01",
+      "work": "防火牆與網路防禦設定",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 4,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M02",
+      "split": "holdout",
+      "topic_id": "M02-T02",
+      "work": "核准遠端連線的存取權限設定",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 4,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M02",
+      "split": "holdout",
+      "topic_id": "M02-T03",
+      "work": "日誌警示監控調查與授權變更",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 4,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M02",
+      "split": "holdout",
+      "topic_id": "M02-T04",
+      "work": "資安事件範圍確認及核准圍堵",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 4,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M02",
+      "split": "holdout",
+      "topic_id": "M02-T05",
+      "work": "協調弱點修補時程及確認修補生效（非本人施作修補）",
+      "secondary": false,
+      "support": [
+        {
+          "id": "INM3513-001v4",
+          "max_cosine_rank": 4,
+          "max_cosine": 0.715986351552327,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.0772705078125,
+          "rerank_sigmoid": 0.5193080209917633,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M02",
+      "split": "holdout",
+      "topic_id": "M02-T06",
+      "work": "每月設備詢比價下單與交期追蹤",
+      "secondary": true,
+      "support": [
+        {
+          "id": "BAS3323-001v4",
+          "max_cosine_rank": 2,
+          "max_cosine": 0.7209598335765831,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.8349609375,
+          "rerank_sigmoid": 0.13764834430452294,
+          "rerank_rank_in_saved_top200_without_cosine": 14,
+          "rerank_rank_after_cosine": 13,
+          "final_retained": true
+        },
+        {
+          "id": "BAS3323-001v4",
+          "max_cosine_rank": 2,
+          "max_cosine": 0.7209598335765831,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -1.8349609375,
+          "rerank_sigmoid": 0.13764834430452294,
+          "rerank_rank_in_saved_top200_without_cosine": 14,
+          "rerank_rank_after_cosine": 13,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M03",
+      "split": "development",
+      "topic_id": "M03-T01",
+      "work": "客房清潔鋪床與準備",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M03",
+      "split": "development",
+      "topic_id": "M03-T02",
+      "work": "房間設備異常報修",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M03",
+      "split": "development",
+      "topic_id": "M03-T03",
+      "work": "遺留物登記交付",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M03",
+      "split": "development",
+      "topic_id": "M03-T04",
+      "work": "送毛巾枕頭及客訴回報",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M03",
+      "split": "development",
+      "topic_id": "M03-T05",
+      "work": "備品整理補充",
+      "secondary": false,
+      "support": [
+        {
+          "id": "THM9112-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7226353472696323,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -0.14453125,
+          "rerank_sigmoid": 0.4639299554287248,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M03",
+      "split": "development",
+      "topic_id": "M03-T06",
+      "work": "每月備品實物帳面盤點及差異回報",
+      "secondary": true,
+      "support": [
+        {
+          "id": "MMP4321-003v4",
+          "max_cosine_rank": 6,
+          "max_cosine": 0.6555092831519261,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": -3.767578125,
+          "rerank_sigmoid": 0.022586042786347345,
+          "rerank_rank_in_saved_top200_without_cosine": 13,
+          "rerank_rank_after_cosine": 4,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M04",
+      "split": "holdout",
+      "topic_id": "M04-T01",
+      "work": "需求毛況確認及清潔美容",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M04",
+      "split": "holdout",
+      "topic_id": "M04-T02",
+      "work": "安全保定與造型修剪",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M04",
+      "split": "holdout",
+      "topic_id": "M04-T03",
+      "work": "異常辨識停工告知與轉介",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M04",
+      "split": "holdout",
+      "topic_id": "M04-T04",
+      "work": "工具環境清潔消毒",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M04",
+      "split": "holdout",
+      "topic_id": "M04-T05",
+      "work": "居家照顧提醒",
+      "secondary": false,
+      "support": [
+        {
+          "id": "PIC5193-001v3",
+          "max_cosine_rank": 1,
+          "max_cosine": 0.7527585602260131,
+          "passes_candidate_depth": true,
+          "passes_cosine": true,
+          "broad_retained": true,
+          "rerank_logit": 0.2296142578125,
+          "rerank_sigmoid": 0.557152681150527,
+          "rerank_rank_in_saved_top200_without_cosine": 1,
+          "rerank_rank_after_cosine": 1,
+          "final_retained": true
+        }
+      ],
+      "covered": true
+    },
+    {
+      "case_id": "M04",
+      "split": "holdout",
+      "topic_id": "M04-T06",
+      "work": "每季用品庫房盤點與差異報告",
+      "secondary": true,
+      "support": [
+        {
+          "id": "MMP4321-003v4",
+          "max_cosine_rank": 12,
+          "max_cosine": 0.6357555763298794,
+          "passes_candidate_depth": true,
+          "passes_cosine": false,
+          "broad_retained": false,
+          "rerank_logit": -3.388671875,
+          "rerank_sigmoid": 0.032651378460344445,
+          "rerank_rank_in_saved_top200_without_cosine": 14,
+          "rerank_rank_after_cosine": null,
+          "final_retained": false
+        }
+      ],
+      "covered": false
+    }
+  ],
+  "warm_no_cutoff_benchmark": {
+    "candidate200_seconds": 14.895933635500114,
+    "all805_seconds": 65.7029658374995,
+    "model_loop_reduction": 0.7732836951022634,
+    "ratio": 4.410798775372874,
+    "scope": "E01, 3 passages/document, 2 repeats, pretokenized, no cosine cutoff; not chosen-setting or end-to-end latency"
+  }
+}

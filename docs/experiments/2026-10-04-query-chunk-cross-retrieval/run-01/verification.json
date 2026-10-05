@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "queries": 30,
+  "parents": 805,
+  "cosines_recomputed": 376020,
+  "native_checks": 90,
+  "unchanged_controls": 48,
+  "result_groups": 80,
+  "positions": 400,
+  "warm_trials": 240,
+  "valid_unique_pairs": 103,
+  "previous_manifests": [
+    {
+      "manifest": "docs/experiments/2026-10-04-occupation-retrieval/artifact-hashes.json",
+      "files": 132
+    },
+    {
+      "manifest": "docs/experiments/2026-10-04-occupation-retrieval-generalization/artifact-hashes.json",
+      "files": 69
+    },
+    {
+      "manifest": "docs/experiments/2026-10-04-retrieve-rerank/artifact-hashes.json",
+      "files": 86
+    },
+    {
+      "manifest": "docs/experiments/2026-10-04-retrieval-passage-quota/artifact-hashes.json",
+      "files": 96
+    },
+    {
+      "manifest": "docs/experiments/2026-10-04-retrieval-input-boundaries/artifact-hashes.json",
+      "files": 78
+    },
+    {
+      "manifest": "docs/experiments/2026-10-04-retrieval-reference-views/artifact-hashes.json",
+      "files": 13
+    },
+    {
+      "manifest": "docs/experiments/2026-10-04-representative-occupation-top5/run-01/artifact-hashes.json",
+      "files": 410
+    },
+    {
+      "manifest": "docs/experiments/2026-10-04-a-interview-occupation-retrieval/run-01/artifact-hashes.json",
+      "files": 241
+    },
+    {
+      "manifest": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/artifact-hashes.json",
+      "files": 547
+    }
+  ],
+  "previous_unchanged_files": 1672,
+  "protected_inputs": 8,
+  "meaning": "mechanisms and literal evidence only; semantic grading and global recall not certified"
+}

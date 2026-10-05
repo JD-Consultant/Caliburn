@@ -1,0 +1,188 @@
+{
+  "attempt": "final_audit.py before final-audit.json saved",
+  "error": "original vector all-field comparison includes cache_reused false vs intentionally true",
+  "differences": [
+    {
+      "query_id": "F01-whole-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F01-segments-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F01-segments-2",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F02-whole-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F02-segments-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F02-segments-2",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F03-whole-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F03-segments-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F03-segments-2",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F04-whole-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F04-segments-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F04-segments-2",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F05-whole-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F05-segments-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "F05-segments-2",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H01-whole-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H01-segments-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H01-segments-2",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H01-segments-3",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H02-whole-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H02-segments-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H02-segments-2",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H02-segments-3",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H02-segments-4",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H03-whole-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H03-segments-1",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H03-segments-2",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H03-segments-3",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H03-segments-4",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    },
+    {
+      "query_id": "H03-segments-5",
+      "field": "cache_reused",
+      "before": false,
+      "after": true
+    }
+  ],
+  "dense_values_changed": false,
+  "fix": "compare original vector content excluding cache_reused and immediate provenance only"
+}

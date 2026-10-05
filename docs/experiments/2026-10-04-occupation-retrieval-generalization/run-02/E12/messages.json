@@ -1,0 +1,32 @@
+[
+  {
+    "interview_sequence": 1,
+    "speaker": "app",
+    "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+  },
+  {
+    "interview_sequence": 2,
+    "speaker": "employee",
+    "text": "我負責整理報表、安排事情和追進度，偶爾也要做檢查。"
+  },
+  {
+    "interview_sequence": 3,
+    "speaker": "consultant",
+    "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+  },
+  {
+    "interview_sequence": 4,
+    "speaker": "employee",
+    "text": "報表紀錄的對象還沒有說明，安排的是哪類事情也沒说；如何檢查和判斷我先不回答。"
+  },
+  {
+    "interview_sequence": 5,
+    "speaker": "consultant",
+    "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+  },
+  {
+    "interview_sequence": 6,
+    "speaker": "employee",
+    "text": "我會把成果交給主管，但成果內容、我能決定到哪裡、具體流程和是否有固定時段都尚未確認。"
+  }
+]

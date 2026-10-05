@@ -1,0 +1,102 @@
+{
+  "arm": "raw_memory",
+  "repeat": 1,
+  "case_id": "complete",
+  "cell_id": "complete-1",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding_map",
+      "arguments": {},
+      "result_characters": 185
+    },
+    {
+      "step": 2,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6378
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 6269,
+        "input_tokens_details": {
+          "cache_write_tokens": 6266,
+          "cached_tokens": 0
+        },
+        "output_tokens": 89,
+        "output_tokens_details": {
+          "reasoning_tokens": 27
+        },
+        "total_tokens": 6358
+      },
+      "estimated_usd": "0.000828050",
+      "seconds": 2.817880699993111
+    },
+    {
+      "usage": {
+        "input_tokens": 6510,
+        "input_tokens_details": {
+          "cache_write_tokens": 241,
+          "cached_tokens": 6266
+        },
+        "output_tokens": 37,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 6547
+      },
+      "estimated_usd": "0.000111585",
+      "seconds": 1.774693200015463
+    },
+    {
+      "usage": {
+        "input_tokens": 11934,
+        "input_tokens_details": {
+          "cache_write_tokens": 5424,
+          "cached_tokens": 6507
+        },
+        "output_tokens": 1501,
+        "output_tokens_details": {
+          "reasoning_tokens": 1034
+        },
+        "total_tokens": 13435
+      },
+      "estimated_usd": "0.001493870",
+      "seconds": 13.781138499965891
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_2.description",
+        "value": "每週一 08:50 開始核對週末累積收到的退貨；週二至週五 08:35 開始核對前一日收到的退貨。使用獨立的退貨清單，比對客退單、品號、批號及實收數量。常溫退貨依倉庫同事確認的商品狀態登錄為可售、待檢或報廢待核准；冷藏退貨另核對溫度紀錄，交品質窗口判定是否可再銷售。退貨數量不符時，提供照片及差異紀錄請客服確認；主管同意調帳後，才依核准資料更新 ERP 並保留核准單號。此核對時點與交表時限僅適用於退貨，不是進貨驗收時限。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.outcome_2",
+        "value": "常溫退貨狀態依倉庫同事確認結果登錄為可售、待檢或報廢待核准；冷藏退貨核對溫度紀錄後交品質窗口判定是否可再銷售。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "僅修正退貨任務描述及成果中將商品狀態判定一概歸給倉庫的表述；明確區分常溫退貨由倉庫確認、冷藏退貨由品質窗口判定是否可再銷售。核對時點、交表期限、客服確認、ERP 調帳核准及其他工作均未改動。"
+  },
+  "seconds": 51.42924440000206
+}

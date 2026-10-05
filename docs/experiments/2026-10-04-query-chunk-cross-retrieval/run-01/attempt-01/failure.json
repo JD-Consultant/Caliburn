@@ -1,0 +1,6 @@
+{
+  "script": "retrieve.py",
+  "error": "AssertionError: H01-segments-1 task parent20 native/offline differs",
+  "new_final_results_saved": false,
+  "diagnosis": "identical text/vector boundary tie"
+}

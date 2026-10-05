@@ -1,0 +1,10 @@
+{
+  "checked_utc": "2026-10-04T12:05:04.6788506Z",
+  "qdrant_pid": 9196,
+  "verified_executable": "S:\\caliburn\\tmp\\ocs-eval-qdrant\\qdrant.exe",
+  "verified_command_line": "\"S:\\caliburn\\tmp\\ocs-eval-qdrant\\qdrant.exe\" --config-path S:\\caliburn\\tmp\\ocs-eval-qdrant\\config.yaml",
+  "stopped_own_qdrant": true,
+  "remaining_listeners": 0,
+  "public_weights_and_storage_preserved": true,
+  "product_services_not_modified": true
+}

@@ -1,0 +1,252 @@
+{
+  "status": "provisional_isolated_pilot",
+  "production_adoption": false,
+  "fresh_holdout": false,
+  "choice": {
+    "input": "published_B2_body",
+    "corpus": "description_and_TOP_body",
+    "embedding": "BGE-M3",
+    "retrieval": "Qdrant_exact_dense_cosine",
+    "candidate_top_k": 10,
+    "production_acceptance_threshold": null
+  },
+  "input": {
+    "A_facts": {
+      "hit_1": 0.25,
+      "hit_5": 1.0,
+      "hit_10": 1.0,
+      "mrr": 0.5,
+      "ndcg_10": 0.508993343417598,
+      "recall_5": 0.5,
+      "mean_tokens": 132.2
+    },
+    "B_b2": {
+      "hit_1": 0.5,
+      "hit_5": 1.0,
+      "hit_10": 1.0,
+      "mrr": 0.6666666666666666,
+      "ndcg_10": 0.6913205536548932,
+      "recall_5": 0.75,
+      "mean_tokens": 528.4
+    },
+    "C_b2_b1": {
+      "hit_1": 0.375,
+      "hit_5": 1.0,
+      "hit_10": 1.0,
+      "mrr": 0.6041666666666666,
+      "ndcg_10": 0.5670408743050841,
+      "recall_5": 0.5,
+      "mean_tokens": 969.0
+    },
+    "selected_automatic_input": "B_b2",
+    "decision_scope": "two synthetic employee groups; provisional, A is fact baseline"
+  },
+  "whole_memory_methods": {
+    "top-dense": {
+      "hit_1": 0.5,
+      "hit_5": 1.0,
+      "hit_10": 1.0,
+      "mrr": 0.6666666666666666,
+      "ndcg_10": 0.6913205536548932,
+      "recall_5": 0.75,
+      "mean_tokens": 528.4
+    },
+    "top-rrf": {
+      "hit_1": 0.0,
+      "hit_5": 0.5,
+      "hit_10": 0.75,
+      "mrr": 0.18068910256410256,
+      "ndcg_10": 0.2653274671052281,
+      "recall_5": 0.25,
+      "mean_tokens": 528.4
+    },
+    "top-sparse": {
+      "hit_1": 0.0,
+      "hit_5": 0.0,
+      "hit_10": 0.0,
+      "mrr": 0.057808328009566395,
+      "ndcg_10": 0.019903597582386644,
+      "recall_5": 0.0,
+      "mean_tokens": 528.4
+    },
+    "topks-dense": {
+      "hit_1": 0.25,
+      "hit_5": 1.0,
+      "hit_10": 1.0,
+      "mrr": 0.4791666666666667,
+      "ndcg_10": 0.5814426008620015,
+      "recall_5": 0.5,
+      "mean_tokens": 528.4
+    },
+    "topks-rrf": {
+      "hit_1": 0.625,
+      "hit_5": 0.75,
+      "hit_10": 0.75,
+      "mrr": 0.6656862745098039,
+      "ndcg_10": 0.5467970248354499,
+      "recall_5": 0.375,
+      "mean_tokens": 528.4
+    },
+    "topks-sparse": {
+      "hit_1": 0.0,
+      "hit_5": 0.5,
+      "hit_10": 0.5,
+      "mrr": 0.14887820512820513,
+      "ndcg_10": 0.15745176684042772,
+      "recall_5": 0.25,
+      "mean_tokens": 528.4
+    },
+    "provisional_choice": "top-dense"
+  },
+  "original_short_probe_holdout": {
+    "metrics": {
+      "hit_1": 0.5384615384615384,
+      "hit_5": 0.8461538461538461,
+      "hit_10": 0.9230769230769231,
+      "mrr": 0.6895424836601306,
+      "ndcg_10": 0.655316874937027,
+      "recall_5": 0.7628205128205128,
+      "mean_tokens": 50.75
+    },
+    "representation": "topks",
+    "method": "rrf",
+    "top_k_grid": [
+      {
+        "k": 1,
+        "any_acceptable_cases": 9,
+        "all_primary_roles_cases": 7,
+        "positive_cases": 13
+      },
+      {
+        "k": 3,
+        "any_acceptable_cases": 13,
+        "all_primary_roles_cases": 11,
+        "positive_cases": 13
+      },
+      {
+        "k": 5,
+        "any_acceptable_cases": 13,
+        "all_primary_roles_cases": 11,
+        "positive_cases": 13
+      },
+      {
+        "k": 10,
+        "any_acceptable_cases": 13,
+        "all_primary_roles_cases": 13,
+        "positive_cases": 13
+      }
+    ],
+    "selected_k": 10,
+    "holdout_any_acceptable_at_selected_k": 12,
+    "holdout_all_primary_at_selected_k": 11
+  },
+  "final_candidate_regression": {
+    "metrics": {
+      "hit_1": 0.46153846153846156,
+      "hit_5": 0.8461538461538461,
+      "hit_10": 0.8461538461538461,
+      "mrr": 0.6295518207282913,
+      "ndcg_10": 0.6322612536921569,
+      "recall_5": 0.782051282051282,
+      "mean_tokens": 50.75
+    },
+    "representation": "top",
+    "method": "dense",
+    "top_k_grid": [
+      {
+        "k": 1,
+        "any_acceptable_cases": 9,
+        "all_primary_roles_cases": 8,
+        "positive_cases": 13
+      },
+      {
+        "k": 3,
+        "any_acceptable_cases": 11,
+        "all_primary_roles_cases": 10,
+        "positive_cases": 13
+      },
+      {
+        "k": 5,
+        "any_acceptable_cases": 12,
+        "all_primary_roles_cases": 10,
+        "positive_cases": 13
+      },
+      {
+        "k": 10,
+        "any_acceptable_cases": 13,
+        "all_primary_roles_cases": 11,
+        "positive_cases": 13
+      }
+    ],
+    "selected_k": 10,
+    "holdout_any_acceptable_at_selected_k": 11,
+    "holdout_all_primary_at_selected_k": 11
+  },
+  "final_candidate_whole_memory": {
+    "metrics": {
+      "hit_1": 0.5,
+      "hit_5": 1.0,
+      "hit_10": 1.0,
+      "mrr": 0.6666666666666666,
+      "ndcg_10": 0.6913205536548932,
+      "recall_5": 0.75,
+      "mean_tokens": 528.4
+    },
+    "database_checks": [
+      {
+        "case_id": "procurement-cut44",
+        "correct": true,
+        "sufficient": true,
+        "unique": true,
+        "ordered": true,
+        "score_valid": true,
+        "tie_aware_rank_valid": true
+      },
+      {
+        "case_id": "inventory-control-cut2",
+        "correct": true,
+        "sufficient": true,
+        "unique": true,
+        "ordered": true,
+        "score_valid": true,
+        "tie_aware_rank_valid": true
+      },
+      {
+        "case_id": "inventory-control-cut4",
+        "correct": true,
+        "sufficient": true,
+        "unique": true,
+        "ordered": true,
+        "score_valid": true,
+        "tie_aware_rank_valid": true
+      },
+      {
+        "case_id": "inventory-compacted-cut2",
+        "correct": true,
+        "sufficient": true,
+        "unique": true,
+        "ordered": true,
+        "score_valid": true,
+        "tie_aware_rank_valid": true
+      },
+      {
+        "case_id": "inventory-compacted-cut4",
+        "correct": true,
+        "sufficient": true,
+        "unique": true,
+        "ordered": true,
+        "score_valid": true,
+        "tie_aware_rank_valid": true
+      }
+    ],
+    "scope": "Same pilot employee snapshots under selected method; not unseen-employee validation"
+  },
+  "limitations": [
+    "2 synthetic employee contexts; 5 correlated snapshots",
+    "32 hand-written work probes, holdout has overlapping occupation domains",
+    "manual incomplete relevance labels, not expert ground truth",
+    "method reconsidered after original holdout; final holdout is regression only",
+    "exact=false / hnsw_ef measurements began at yellow; stable dense ANN indexing not verified",
+    "no real-employee, JD completion, task-coverage, or database-product comparison"
+  ]
+}

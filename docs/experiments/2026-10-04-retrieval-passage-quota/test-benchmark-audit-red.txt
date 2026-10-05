@@ -1,0 +1,28 @@
+test_benchmark_id_does_not_authorize_a_different_config (test_audit.EvidenceIntegrity.test_benchmark_id_does_not_authorize_a_different_config) ... FAIL
+test_claimed_db_http_timing_requires_every_passage_search (test_audit.EvidenceIntegrity.test_claimed_db_http_timing_requires_every_passage_search) ... FAIL
+test_missing_parameter_comparison_is_rejected (test_audit.EvidenceIntegrity.test_missing_parameter_comparison_is_rejected) ... ok
+test_new_multisegment_quote_cannot_use_legacy_exception (test_audit.EvidenceIntegrity.test_new_multisegment_quote_cannot_use_legacy_exception) ... ok
+test_saved_legacy_anchor_is_valid_but_returns_full_context (test_audit.EvidenceIntegrity.test_saved_legacy_anchor_is_valid_but_returns_full_context) ... ok
+test_summary_pass_marker_cannot_replace_coverage (test_audit.EvidenceIntegrity.test_summary_pass_marker_cannot_replace_coverage) ... ok
+test_wrong_native_score_is_rejected_even_with_matching_ids (test_audit.EvidenceIntegrity.test_wrong_native_score_is_rejected_even_with_matching_ids) ... ok
+
+======================================================================
+FAIL: test_benchmark_id_does_not_authorize_a_different_config (test_audit.EvidenceIntegrity.test_benchmark_id_does_not_authorize_a_different_config)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-passage-quota\test_audit.py", line 10, in test_benchmark_id_does_not_authorize_a_different_config
+    with self.assertRaises(AssertionError):
+AssertionError: AssertionError not raised
+
+======================================================================
+FAIL: test_claimed_db_http_timing_requires_every_passage_search (test_audit.EvidenceIntegrity.test_claimed_db_http_timing_requires_every_passage_search)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-passage-quota\test_audit.py", line 16, in test_claimed_db_http_timing_requires_every_passage_search
+    with self.assertRaises(AssertionError):
+AssertionError: AssertionError not raised
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+FAILED (failures=2)

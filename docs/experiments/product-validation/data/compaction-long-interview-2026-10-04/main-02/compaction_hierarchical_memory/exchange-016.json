@@ -1,0 +1,16 @@
+{
+  "event_id": "e016",
+  "execution_id": "3f3de34a-daeb-4da2-bd12-54e60cad5946",
+  "employee_input": {
+    "source_id": "339f3895-7c3c-4b5e-bd73-6defaf23625e",
+    "interview_sequence": 32,
+    "speaker": "employee",
+    "interview_text": "預計到貨日只是採購提供的資訊，我會註記更新時間和是否仍待供應商確認。我不保證準時到貨；日期更改時更新清單並通知受影響窗口，不能把舊日期留著當成已確認承諾。"
+  },
+  "consultant_reply": {
+    "source_id": "d0f5f97c-fd67-443c-85b1-c68524cb030e",
+    "interview_sequence": 33,
+    "speaker": "consultant",
+    "interview_text": "已修正缺貨任務中的預計到貨日界線：您會記錄更新時間及是否仍待供應商確認；日期變更時更新清單並通知受影響窗口。您不保證準時到貨，也不把舊日期當成已確認承諾。\n\n回到店間調撥：通常什麼情況會啟動調撥？您負責哪些步驟，申請或核准由誰處理？"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "cases": 8,
+  "methods": 6,
+  "groups": 48,
+  "top5_positions": 240,
+  "unique_selected_pairs": 78,
+  "reused_graded_pairs": 60,
+  "pending_new_grades": 18,
+  "queries": 93,
+  "cosines_recomputed": 74865,
+  "max_score_error": 0,
+  "prior_sealed_files_unchanged": 1775,
+  "original_controls_unchanged": 16,
+  "warm_trials": 144,
+  "published_source_scopes_verified": 8,
+  "scope": "finite synthetic retrieval comparison; not full-library relevance recall or JD completeness"
+}

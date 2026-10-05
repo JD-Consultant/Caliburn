@@ -1,0 +1,52 @@
+[
+  {
+    "cell": "website-correction-control",
+    "steps": 3,
+    "status": "completed"
+  },
+  {
+    "cell": "website-correction-candidate",
+    "steps": 3,
+    "status": "completed"
+  },
+  {
+    "cell": "website-task-candidate",
+    "steps": 2,
+    "status": "completed"
+  },
+  {
+    "cell": "website-task-control",
+    "steps": 2,
+    "status": "completed"
+  },
+  {
+    "cell": "warehouse-correction-control",
+    "steps": 5,
+    "status": "completed"
+  },
+  {
+    "cell": "warehouse-correction-candidate",
+    "steps": 3,
+    "status": "completed"
+  },
+  {
+    "cell": "warehouse-task-candidate",
+    "steps": 2,
+    "status": "completed"
+  },
+  {
+    "cell": "warehouse-task-control",
+    "steps": 2,
+    "status": "completed"
+  },
+  {
+    "cell": "warehouse-detail-control",
+    "steps": 2,
+    "status": "completed"
+  },
+  {
+    "cell": "warehouse-detail-candidate",
+    "steps": 3,
+    "status": "completed"
+  }
+]

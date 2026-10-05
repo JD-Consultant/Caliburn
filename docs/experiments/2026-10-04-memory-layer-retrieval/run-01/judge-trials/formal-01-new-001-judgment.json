@@ -1,0 +1,25 @@
+{
+  "job_id": "new-001",
+  "phase": "formal-01",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是網路系統與設備的故障診斷、維修及工具保養，不能代表員工持續負責的瀏覽器畫面開發，或訂單 API、商業規則及資料存取開發。員工偶爾協助處理同事無法連網，與公版網路故障診斷僅有局部關聯，不足以代表主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "偶爾同事電腦連不上網路會請我幫忙",
+        "reference_quote": "以軟體測量網路狀況,找出網路故障原因。"
+      }
+    ],
+    "limitations": [
+      "公版主要描述網路系統及設備維修，並包含工具準備與保養；員工沒有持續負責這些工作。",
+      "員工主要工作的兩個已知面向均未獲公版實質支持。"
+    ]
+  },
+  "seconds": 6.513028600020334,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "fa91b60496070e123fa24ad87a61337af44aabe7891d517ca0bbc70920bf7216",
+  "case_id": "F01",
+  "document_id": "網路維修助理"
+}

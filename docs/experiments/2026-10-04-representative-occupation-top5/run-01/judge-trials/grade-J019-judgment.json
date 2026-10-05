@@ -1,0 +1,28 @@
+{
+  "job_id": "J019",
+  "phase": "grade",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "員工的主要工作是持續開發及維護訂單系統的瀏覽器畫面與後端功能；公版核心工作則是數位影音／社群平臺的營運、行銷、內容製作與數據分析。兩者僅有「平臺」等詞語上的表面關聯，公版未實質代表員工任一主要工作領域。",
+    "evidence": [
+      {
+        "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則，設計及修改資料表、查詢與資料更新",
+        "reference_quote": "操作與管理數位平臺(含社群媒體)。"
+      },
+      {
+        "employee_quote": "我主要負責公司的線上訂單系統。",
+        "reference_quote": "運用多元方式如直播、拍影片等,聚集網路流量與粉絲留言互動,建立粉絲對品牌的信任與忠誠度。"
+      }
+    ],
+    "limitations": [
+      "公版提及的平臺管理與數據分析屬於影音／社群經營脈絡，不能據此推定其代表訂單系統的軟體開發工作。"
+    ]
+  },
+  "seconds": 5.699643499974627,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "dfc97e0350f1d6012abf6b9df2210488977a5453e34be11e6665cafa8cba86e6",
+  "case_id": "F01",
+  "document_id": "IDC5294-001v3"
+}

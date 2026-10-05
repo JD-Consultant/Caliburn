@@ -1,0 +1,42 @@
+{
+  "metrics": {
+    "hit_1": 0.5384615384615384,
+    "hit_5": 0.8461538461538461,
+    "hit_10": 0.9230769230769231,
+    "mrr": 0.6895424836601306,
+    "ndcg_10": 0.655316874937027,
+    "recall_5": 0.7628205128205128,
+    "mean_tokens": 50.75
+  },
+  "representation": "topks",
+  "method": "rrf",
+  "top_k_grid": [
+    {
+      "k": 1,
+      "any_acceptable_cases": 9,
+      "all_primary_roles_cases": 7,
+      "positive_cases": 13
+    },
+    {
+      "k": 3,
+      "any_acceptable_cases": 13,
+      "all_primary_roles_cases": 11,
+      "positive_cases": 13
+    },
+    {
+      "k": 5,
+      "any_acceptable_cases": 13,
+      "all_primary_roles_cases": 11,
+      "positive_cases": 13
+    },
+    {
+      "k": 10,
+      "any_acceptable_cases": 13,
+      "all_primary_roles_cases": 13,
+      "positive_cases": 13
+    }
+  ],
+  "selected_k": 10,
+  "holdout_any_acceptable_at_selected_k": 12,
+  "holdout_all_primary_at_selected_k": 11
+}

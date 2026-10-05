@@ -1,0 +1,111 @@
+{
+  "case_id": "corrections",
+  "arm": "flat",
+  "repeat": 2,
+  "cell_id": "corrections-flat-2",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 10621,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 10618
+        },
+        "output_tokens": 2045,
+        "output_tokens_details": {
+          "reasoning_tokens": 987
+        },
+        "total_tokens": 12666
+      },
+      "estimated_usd": "0.001128980",
+      "seconds": 16.89251360000344,
+      "counted_input_tokens": 10621
+    }
+  ],
+  "answer": {
+    "findings": "核對結果（將不同流程的時間與比例分開適用）：\n\n- **進貨驗收與登錄：**員工每天約處理 15–20 張進貨單，核對採購單、送貨單及實際到貨的品號、批號與數量；實物由倉庫同事清點，員工核對單據並記錄差異。只有已確認的收貨資料才登錄 ERP，通常於到貨當天下班前完成；未確認差異不當作已入帳。驗收不良率按「每批實際驗收件數」計算，不跨月彙算，也不是按每日進貨單張數計算。比例**超過 5%**時提報倉儲主管；剛好 5%不因該比例門檻提報，但如有安全疑慮，不論比例均先隔離並通知主管。現有核對資料未確認由誰核算不良比例，故不將計算責任推定為員工。\n\n- **退貨核對：**員工每日核對前一天收到的退貨；週一因週末累積，08:50 開始，週二至週五 08:35 開始，但每天都須在 **09:10 前**把退貨差異表交客服，週一較晚開始不會延後交表期限。員工核對退貨單、品號、批號及實收數量；常溫商品可否再銷售由倉庫同事判定，冷藏退貨則由品質窗口判定，員工依判定登錄狀態。數量差異需請客服確認；調帳須經主管同意後才更新 ERP。此 09:10 是退貨差異表時限，不是進貨 ERP 登錄時限。\n\n- **庫存帳齡表：**每月底整理，按月底庫存狀態分列可售、待檢及報廢待核准庫存，依已確認入庫日期及目前庫存狀態計算，並核對批號與調撥資料，避免移倉後被當成新貨；於**次月第一個工作日**交主管。促銷、報廢等後續處置由主管決定，員工不自行決定。\n\n- **設備異常比例的範圍不同：**掃碼器備品的 **5%** 是每月核對的設備備品比例，以使用中的設備數量為基礎；不足時提請主管核准補充。它不是進貨驗收不良率的分母或提報門檻，兩個 5%不可互換。\n\n- **更正與週報時程：**帳齡表更正後的交付時點不改變收貨異常週報時程。該週報仍由員工每週五 16:00 前交採購及主管，列未結案原因、等待天數與下一個跟進事項；供應商回覆須附更新時間，未回覆則標示未確認。這與退貨每日 09:10 交客服的差異表亦是不同交付物。\n\n尚未確認的具體事項：驗收不良比例由誰核算。",
+    "references": [
+      {
+        "kind": "interview",
+        "interview_sequence": 4,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 6,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 8,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 10,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 14,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 16,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 18,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 42,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 44,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 46,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 86,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 92,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 94,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 96,
+        "target_title": null
+      },
+      {
+        "kind": "interview",
+        "interview_sequence": 98,
+        "target_title": null
+      }
+    ],
+    "questions": [
+      "驗收不良率的核算實際由誰負責：您本人、倉庫同事，或其他窗口？"
+    ]
+  },
+  "seconds": 27.94108730001608
+}

@@ -1,0 +1,16 @@
+{
+  "event_id": "e006",
+  "execution_id": "c31c809b-27f4-45f5-8ed2-4ece8ca9049b",
+  "employee_input": {
+    "source_id": "783c5b33-078d-477a-872f-1454c2b94762",
+    "interview_sequence": 8,
+    "speaker": "employee",
+    "interview_text": "收貨異常不是通知完就結束。我更新差異清單和處理進度；兩個工作日沒回覆就提醒採購，第四個工作日仍沒進展再回報主管。要到補貨或退貨完成、帳物相符才結案；供應商幾時真的補來不是我能保證的。"
+  },
+  "consultant_reply": {
+    "source_id": "df08d0ce-d30b-461a-a9a3-0af0754b12d4",
+    "interview_sequence": 9,
+    "speaker": "consultant",
+    "interview_text": "已新增「追蹤收貨異常至完成結案」，包括更新差異清單與進度、兩個工作日未回覆時提醒採購、第四個工作日仍無進展時回報主管，以及補貨或退貨完成且帳物相符後才結案。也記下供應商實際補貨時間不由您保證。\n\n您先前提到的「庫存差異」，通常是透過哪些情況發現的，例如盤點、系統資料或門市回報？"
+  }
+}

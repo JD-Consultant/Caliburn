@@ -1,0 +1,226 @@
+{
+  "dataset_id": "memory-structure-incremental-2026-10-05",
+  "model_visible": false,
+  "grades": [
+    "complete",
+    "partial",
+    "missing",
+    "incorrect"
+  ],
+  "rules": [
+    "Grade meaning and scope, not fixed titles, object counts or exact wording.",
+    "minimum_support lists necessary employee messages reachable through the cited provenance chain; extra valid supporting messages are allowed.",
+    "Consultant questions provide context but do not independently establish employee facts.",
+    "Grade body fidelity and provenance independently; a source list alone is not proof of correct support.",
+    "Report findings outside these checks separately; do not change denominators after observing model output."
+  ],
+  "checks": [
+    {
+      "check_id": "order_timeout",
+      "batches": [
+        "initial",
+        "corrections",
+        "extension"
+      ],
+      "expected": "甲的訂單逾時處理防止使用者反覆操作造成重複送單。",
+      "minimum_support": [
+        2
+      ]
+    },
+    {
+      "check_id": "reservation_timeout",
+      "batches": [
+        "initial",
+        "corrections",
+        "extension"
+      ],
+      "expected": "乙的查詢逾時須保留使用者已選日期，不與甲的訂單要求混淆。",
+      "minimum_support": [
+        4
+      ]
+    },
+    {
+      "check_id": "shared_authority",
+      "batches": [
+        "initial",
+        "corrections",
+        "extension"
+      ],
+      "expected": "需求由客戶確認，員工負責約定前端；兩案後端業務規則與服務端部署由同事負責。",
+      "minimum_support": [
+        6
+      ]
+    },
+    {
+      "check_id": "initial_deadline",
+      "batches": [
+        "initial"
+      ],
+      "expected": "甲接到回報後24小時內回覆初步判斷。",
+      "minimum_support": [
+        8
+      ]
+    },
+    {
+      "check_id": "corrected_deadline",
+      "batches": [
+        "corrections",
+        "extension"
+      ],
+      "expected": "甲的現行初判回覆期限更正為收到回報後48小時，不再把24小時列為同時有效期限。",
+      "minimum_support": [
+        8,
+        12
+      ]
+    },
+    {
+      "check_id": "not_resolution_guarantee",
+      "batches": [
+        "initial",
+        "corrections",
+        "extension"
+      ],
+      "expected": "初判回覆不是保證同期限完成修復；甲交付後前端缺陷仍由員工處理。",
+      "minimum_support": [
+        8
+      ]
+    },
+    {
+      "check_id": "no_monthly_a",
+      "batches": [
+        "initial",
+        "corrections",
+        "extension"
+      ],
+      "expected": "甲沒有固定月維護，不將乙的周期套到甲。",
+      "minimum_support": [
+        8
+      ]
+    },
+    {
+      "check_id": "initial_monthly_b",
+      "batches": [
+        "initial"
+      ],
+      "expected": "乙每月一次前端維護。",
+      "minimum_support": [
+        10
+      ]
+    },
+    {
+      "check_id": "maintenance_periods",
+      "batches": [
+        "corrections",
+        "extension"
+      ],
+      "expected": "乙10月起每季第一個工作日維護，之前每月一次；新舊時期分開，不能只保留每季。",
+      "minimum_support": [
+        10,
+        14
+      ]
+    },
+    {
+      "check_id": "maintenance_scope",
+      "batches": [
+        "initial",
+        "corrections",
+        "extension"
+      ],
+      "expected": "乙維護包含檢查頁面操作與修正前端問題；周期更改不刪除工作範圍。",
+      "minimum_support": [
+        10
+      ]
+    },
+    {
+      "check_id": "approval_required",
+      "batches": [
+        "initial",
+        "corrections",
+        "extension"
+      ],
+      "expected": "乙超出約定範圍的變更須先核准，不當作員工可自行決定。",
+      "minimum_support": [
+        10
+      ]
+    },
+    {
+      "check_id": "approver_unknown",
+      "batches": [
+        "initial",
+        "corrections"
+      ],
+      "expected": "乙的客戶端最終核准人尚未確認；不得使用第三批才提供的資訊。",
+      "minimum_support": [
+        10
+      ]
+    },
+    {
+      "check_id": "approver_resolved",
+      "batches": [
+        "extension"
+      ],
+      "expected": "乙超範圍需求由客戶產品負責人核准，員工整理變更影響及提出需求但不自行核准；不再維持核准人未知。",
+      "minimum_support": [
+        16
+      ]
+    },
+    {
+      "check_id": "approval_scope",
+      "batches": [
+        "extension"
+      ],
+      "expected": "核准要求針對超出約定範圍的需求，不能擴張為每次修前端問題都要重新核准。",
+      "minimum_support": [
+        16
+      ]
+    },
+    {
+      "check_id": "infrequent_materials",
+      "batches": [
+        "extension"
+      ],
+      "expected": "甲每年約一次更換促銷素材，員工檢查圖片與連結；低頻不因此遺漏。",
+      "minimum_support": [
+        18
+      ]
+    },
+    {
+      "check_id": "materials_authority",
+      "batches": [
+        "extension"
+      ],
+      "expected": "客戶提供文案與素材，確認後才上線；員工不規劃活動、不寫文案，不自行增加活動成效責任。",
+      "minimum_support": [
+        18
+      ]
+    }
+  ],
+  "probe_checks": [
+    {
+      "probe_id": "post_delivery",
+      "checks": [
+        "corrected_deadline",
+        "not_resolution_guarantee",
+        "no_monthly_a",
+        "shared_authority"
+      ]
+    },
+    {
+      "probe_id": "maintenance",
+      "checks": [
+        "maintenance_periods",
+        "maintenance_scope",
+        "approval_required",
+        "approver_unknown",
+        "shared_authority"
+      ]
+    },
+    {
+      "probe_id": "infrequent_work",
+      "checks": [
+        "infrequent_materials",
+        "materials_authority"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "case_id": "boundaries",
+  "arm": "candidate",
+  "repeat": 2,
+  "cell_id": "boundaries-candidate-2",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6465
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 5699,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 5696
+        },
+        "output_tokens": 108,
+        "output_tokens_details": {
+          "reasoning_tokens": 24
+        },
+        "total_tokens": 5807
+      },
+      "estimated_usd": "0.000111260",
+      "seconds": 2.2316192000289448,
+      "counted_input_tokens": 5699
+    },
+    {
+      "usage": {
+        "input_tokens": 11268,
+        "input_tokens_details": {
+          "cache_write_tokens": 5569,
+          "cached_tokens": 5696
+        },
+        "output_tokens": 798,
+        "output_tokens_details": {
+          "reasoning_tokens": 166
+        },
+        "total_tokens": 12066
+      },
+      "estimated_usd": "0.001152385",
+      "seconds": 7.684138999960851,
+      "counted_input_tokens": 11268
+    }
+  ],
+  "answer": {
+    "findings": "依已完成訪談整理，產品召回是低頻但明確存在的支援工作：本人依品質窗口提供的品號、批號查核各店及可售、待檢、在途等庫存狀態，促成倉庫隔離，提供影響範圍並追蹤隔離量、回收量與各店回覆，直到主管確認紀錄齊全。召回範圍及是否解除由品質窗口決定；本人不決定召回、不自行把未列批號認定為安全，也不宣布恢復銷售。客服負責對客通知，採購聯繫供應商。這屬既有低頻職責，不應按每次事件另造永久任務。\n\n休假交接方面，本人休假前交接未結案差異、預計到貨及當日截止事項，附原單號、目前狀態與下一聯絡窗口；返崗後核對代理期間的登錄與完成事項，以避免重複入帳或狀態不一致。現有資料沒有說明發現代理登錄不一致時由誰核准更正或如何升級，因此不能推定本人有權自行改帳或承擔代理人全部決策。\n\n單據與核准紀錄依公司既有規則存放共享資料夾，檔名帶日期及原單號；稽核缺件時列明缺件並請相關窗口補充，不重製文件冒充原有核准。保存年限尚不確定，不能寫成具體年數。冷藏退貨要核對溫度紀錄並交品質窗口判定是否可再銷售，但溫度合格門檻也尚不清楚，不能自行填入數字要求。",
+    "references": [
+      {
+        "kind": "work_understanding",
+        "interview_sequence": null,
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      }
+    ],
+    "questions": [
+      "冷藏退貨的溫度合格門檻由哪個窗口或文件規定？請提供適用的數值與單位（以及若有的測量時點／條件），或確認目前沒有可用的固定門檻。",
+      "單據及核准紀錄的保存年限由哪個部門或公司規範決定？若已知，請提供適用文件類型及年限；若尚未確認，可否向財務確認後再定數字要求？",
+      "休假返崗後若發現代理期間登錄不一致，您本人通常是先通知代理人或主管、提出更正，還是可依既有核准自行更正？"
+    ]
+  },
+  "seconds": 31.960166700009722
+}

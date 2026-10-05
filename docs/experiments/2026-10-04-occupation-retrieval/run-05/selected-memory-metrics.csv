@@ -1,0 +1,6 @@
+﻿stage,case_id,arm,employee_group,split,tokens,top1_id,top1_title,top1_score,hit_1,hit_5,hit_10,mrr,ndcg_10,recall_5,primary_rank,query_seconds,returned_candidates,corpus_count,hard_negative_best_rank
+selected-memory,procurement-cut44,B2+TOPKS+RRF-exact,procurement,input-pilot,1196,BAS3323-001v4,採購人員,0.08695652,1,1,1,1.0,0.8107386164741188,0.5,1,0,10,805,6
+selected-memory,inventory-control-cut2,B2+TOPKS+RRF-exact,inventory,input-pilot,198,MMP4321-003v4,零售業倉儲管理人員,0.07941177,1,1,1,1.0,0.7452525342261976,0.5,1,0,10,805,
+selected-memory,inventory-control-cut4,B2+TOPKS+RRF-exact,inventory,input-pilot,340,RLM4323-004v1,冷鏈倉儲物流人員,0.09347826,0,1,1,0.25,0.3741951202093122,0.5,4,0,10,805,
+selected-memory,inventory-compacted-cut2,B2+TOPKS+RRF-exact,inventory,input-pilot,355,FAC4311-001v2,會計人員,0.07702703,0,0,0,0,0.03204905244952618,0.0,,0,10,805,
+selected-memory,inventory-compacted-cut4,B2+TOPKS+RRF-exact,inventory,input-pilot,553,RLM4323-004v1,冷鏈倉儲物流人員,0.07941177,0,0,0,0,0.03204905244952618,0.0,,0,10,805,

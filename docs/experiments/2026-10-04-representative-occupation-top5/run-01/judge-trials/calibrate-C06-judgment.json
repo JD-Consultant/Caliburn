@@ -1,0 +1,26 @@
+{
+  "job_id": "C06",
+  "phase": "calibrate",
+  "judgment": {
+    "grade": 3,
+    "uncertain": false,
+    "main_work": [
+      "伺服器功能與訂單資料處理"
+    ],
+    "reason": "員工明確表示伺服器功能是主要工作，且負責開發訂單 API、權限與商業規則、資料表及查詢，以及測試資料更新。公版核心工作對應這個主要領域的工作組合與責任範圍，足以作為伺服器功能工作的整體參考；不代表員工另一個主要領域的訂單網站畫面開發。",
+    "evidence": [
+      {
+        "employee_quote": "開發訂單 API、權限和商業規則、設計資料表與查詢，再測試資料更新",
+        "reference_quote": "開發訂單 API、權限和商業規則，設計資料表與查詢，測試資料更新並維護服務功能"
+      }
+    ],
+    "limitations": [
+      "公版未涵蓋訂單網站畫面與畫面互動開發。"
+    ]
+  },
+  "seconds": 4.554842900019139,
+  "employee_sha256": "b3b32c54ee82a668d3c166553e99baef8d2f55cead7f02452ad02e1b2e374296",
+  "document_sha256": "65c97c5b8c839061ae3ff1c84e175ca4bf070e9afffe0b1233d1d17ac18f5f62",
+  "expected_grade": 3,
+  "anchor_matched": true
+}

@@ -1,0 +1,16 @@
+{
+  "event_id": "e010",
+  "execution_id": "726d438a-43fa-44c1-998c-f9cf8125cf3f",
+  "employee_input": {
+    "source_id": "0d25b3ea-ceda-4228-8655-536d5b53e6b9",
+    "interview_sequence": 20,
+    "speaker": "employee",
+    "interview_text": "有一筆退貨外箱完整但內件不齊，我保留在待檢狀態，沒有直接入可售庫存。主管請仓庫复检後才决定处理方式；我的成果是可追溯的狀態與紀錄，不是每筆都能立即恢復可售。"
+  },
+  "consultant_reply": {
+    "source_id": "22060de0-a526-4c5b-8695-6e47a798736b",
+    "interview_sequence": 21,
+    "speaker": "consultant",
+    "interview_text": "已補上退貨例外：外箱完整但內件不齊時仍維持待檢，不直接入可售庫存；保留可追溯的狀態與紀錄，待倉庫複檢後由主管決定後續處理，不要求每筆都立即恢復可售。\n\n接著了解您提到的庫存報表：通常多久整理一次、主要包含哪些內容，提供給誰作何用途？"
+  }
+}

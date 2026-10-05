@@ -1,0 +1,9 @@
+{
+  "status": "completed",
+  "schema": "eval_compaction_pilot_98547e890534497b88fdfcdaabbe3856",
+  "generation_calls": 23,
+  "outbound_calls": 50,
+  "admitted_input_tokens": 241846,
+  "reserved_estimate_usd": "0.221346750",
+  "elapsed_seconds": 393.66730030003237
+}

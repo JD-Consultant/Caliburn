@@ -1,0 +1,26 @@
+{
+  "job_id": "J009",
+  "phase": "grade",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心工作是保全系統的規劃、安裝配置與營運管理，包含安排及管理機動保全人員；員工的兩項主要工作則是線上訂單系統的瀏覽器畫面開發，以及訂單 API、商業規則與資料存取開發。兩者只有「系統」等泛稱上的重合，工作對象、用途及責任均不相符，不能代表員工的主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "我主要負責公司的線上訂單系統。",
+        "reference_quote": "負責系統保全之人員、設備、技術管理等相關工作。"
+      },
+      {
+        "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則，設計及修改資料表、查詢與資料更新",
+        "reference_quote": "定期維護、保養保全系統,並判別系統問題與報修。"
+      }
+    ],
+    "limitations": []
+  },
+  "seconds": 5.943061599973589,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "a3d87b411ff4f186b0acdb33e243ee0d0447f5807381f9f6d586b8f39ca78523",
+  "case_id": "F01",
+  "document_id": "BGM1349-001v3"
+}

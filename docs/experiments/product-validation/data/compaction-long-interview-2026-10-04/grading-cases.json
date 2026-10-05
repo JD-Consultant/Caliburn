@@ -1,0 +1,429 @@
+{
+  "schema_version": 1,
+  "audience": "研究者專用；不送入模型、Memory、App資料訊息或read工具。",
+  "grading_method": "按事實單位逐項人工語意核對，引用另行評分；不以關鍵詞命中或模型自報當成通過。",
+  "timing_rule": "每案使用實際得到的員工事件對照正式來源序號。eNNN只是來源事件代號。observe_after_event_id表示以該輸入處理完成後為觀察點，並不代表固定資料庫序號。",
+  "observation_rule": {
+    "explicit_probe_case_ids": ["return_schedule", "return_conditions", "threshold_scope", "receiving_boundaries", "report_distinctions", "ambiguous_report", "clarification_resolution", "counting_and_audit", "uncertainty"],
+    "explicit_probe_surface": "32 個單位由指定回提/更正輸入後的正式顧問答覆判讀；涉及改稿另看該輪提交後JD及工具證據。回答遺漏明確被詢問的已知細節不能當成正確。模糊案例先核施測資格。",
+    "final_claim_audit_case_ids": ["availability", "transfers", "traceability", "recall", "handoff_and_tools"],
+    "final_claim_audit_surface": "19 個單位核對e061完成後的正式JD及正式答覆實際採用的主張。未主張該細節記未採用，不計入精確事實正確率分母，也不當記憶失敗。沒有表達的主要工作另依12領域涵蓋判準計分，不以51當成同等回憶測試總分。",
+    "memory_and_summary_capture": "整理產物的事實保留另行判讀，不能與顧問取用或JD主張合併分數；原話組無整理產物，該指標不適用。",
+    "source_surface": "引用評分使用實際正式JD依據、Memory下層來源與本次工具讀取證據；顧問聲稱已引用不等於資料庫已有支持來源。"
+  },
+  "cases": [
+    {
+      "case_id": "return_schedule",
+      "observe_after_event_id": "e053",
+      "source_event_ids": [
+        "e007",
+        "e047"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "monday_start",
+          "criterion": "週一退貨核對08:50開始。"
+        },
+        {
+          "unit_id": "other_days_start",
+          "criterion": "週二到週五仍08:35開始，不把更正套到所有工作日。"
+        },
+        {
+          "unit_id": "deadline_recipient",
+          "criterion": "退貨差異表09:10前交客服窗口，截止時間未延後。"
+        }
+      ]
+    },
+    {
+      "case_id": "return_conditions",
+      "observe_after_event_id": "e053",
+      "source_event_ids": [
+        "e008",
+        "e048"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "ambient_owner",
+          "criterion": "一般常溫退貨由倉庫確認狀態，員工登錄。"
+        },
+        {
+          "unit_id": "cold_owner",
+          "criterion": "只有冷藏退貨另看溫度紀錄，由品質窗口判定可再銷售。"
+        },
+        {
+          "unit_id": "cold_unknown",
+          "criterion": "溫度合格門檻未提供，不創造數字。"
+        }
+      ]
+    },
+    {
+      "case_id": "threshold_scope",
+      "observe_after_event_id": "e054",
+      "source_event_ids": [
+        "e004",
+        "e046",
+        "e043"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "fraction_denominator",
+          "criterion": "不良件數／本批實際驗收件數，不是整月、單據張數或設備數。"
+        },
+        {
+          "unit_id": "strict_comparison",
+          "criterion": "比例必須>5%；剛好5%不因比例規則提報。"
+        },
+        {
+          "unit_id": "independent_safety",
+          "criterion": "安全疑慮仍先隔離並通知主管，不受比例免報解讀。"
+        },
+        {
+          "unit_id": "reserve_distinction",
+          "criterion": "設備備品是使用中掃碼器數量的5%，不與驗收提報混用。"
+        }
+      ]
+    },
+    {
+      "case_id": "receiving_boundaries",
+      "observe_after_event_id": "e055",
+      "source_event_ids": [
+        "e002",
+        "e003",
+        "e005",
+        "e006"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "daily_range",
+          "criterion": "每天約15–20張進貨單；不推算固定18張，不改成週。"
+        },
+        {
+          "unit_id": "matching",
+          "criterion": "倉庫清點實物，員工核對單據與實收、差異及ERP登錄。"
+        },
+        {
+          "unit_id": "reminder",
+          "criterion": "兩工作日未回覆提醒採購，第四工作日無進展回報主管。"
+        },
+        {
+          "unit_id": "closure",
+          "criterion": "退補貨完成且帳物相符才結案，不只通知便結案。"
+        },
+        {
+          "unit_id": "authority",
+          "criterion": "退換貨、補貨決策在採購，員工不承諾供應商交期。"
+        },
+        {
+          "unit_id": "cutoff",
+          "criterion": "一般當日下班前登錄已確認項；月底歸属由財務決定，不自行回填。"
+        }
+      ]
+    },
+    {
+      "case_id": "report_distinctions",
+      "observe_after_event_id": "e056",
+      "source_event_ids": [
+        "e007",
+        "e021",
+        "e022",
+        "e023",
+        "e049"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "return_report",
+          "criterion": "退貨差異表是退貨核對差異，09:10前交客服。"
+        },
+        {
+          "unit_id": "aging_report",
+          "criterion": "庫存帳齡表仍反映月底狀態，改次月第一工作日交主管。"
+        },
+        {
+          "unit_id": "weekly_report",
+          "criterion": "收貨異常週報列未結原因與跟進事項，週五16:00前交採購和主管。"
+        },
+        {
+          "unit_id": "no_cross_change",
+          "criterion": "帳齡表更正不改其他兩張表的截止時間或用途。"
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous_report",
+      "observe_after_event_id": "e057",
+      "eligibility": "依該組實際可見前文確認仍有至少兩個合理表單目標。若顧問上一句已唯一指向某張表，e057不算模糊施測，不因合理接話扣分；不同施測資格的組別不併入同條件配對分數。",
+      "source_event_ids": [
+        "e007",
+        "e021",
+        "e023"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "clarify_before_write",
+          "criterion": "『之前那張表』無唯一目標，應詢問是哪張表，不選一張立即改。"
+        },
+        {
+          "unit_id": "no_unsupported_edit",
+          "criterion": "正式或候選稿都不寫入尚未確認的『每週』。"
+        }
+      ]
+    },
+    {
+      "case_id": "clarification_resolution",
+      "observe_after_event_id": "e058",
+      "source_event_ids": [
+        "e049",
+        "e057",
+        "e058"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "retain_date",
+          "criterion": "明確澄清是帳齡表但暫不改週報；仍次月第一工作日，標示尚待主管決定。"
+        },
+        {
+          "unit_id": "no_other_change",
+          "criterion": "退貨差異表及收貨異常週報不受此澄清影響。"
+        }
+      ]
+    },
+    {
+      "case_id": "counting_and_audit",
+      "observe_after_event_id": "e059",
+      "source_event_ids": [
+        "e011",
+        "e012",
+        "e017",
+        "e032",
+        "e033",
+        "e034",
+        "e045"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "cycles",
+          "criterion": "平常抽盤每週三；月底全盤每月，異常盤差或主管要求時加做。"
+        },
+        {
+          "unit_id": "signoff",
+          "criterion": "月底全盤彙整表主管簽核；平常抽盤交查核結果，不能全套月底簽核。"
+        },
+        {
+          "unit_id": "adjustment",
+          "criterion": "不論差額大小，ERP調帳須核准庫存調整單，不能自動按實盤改帳。"
+        },
+        {
+          "unit_id": "separate_results",
+          "criterion": "全盤的帳實核對與稽核的原單、核准證據可追溯性要可分辨。"
+        },
+        {
+          "unit_id": "audit_authority",
+          "criterion": "財務或稽核決定抽樣與判定，員工提供證據、不補造歷史核准文件。"
+        }
+      ]
+    },
+    {
+      "case_id": "uncertainty",
+      "observe_after_event_id": "e060",
+      "source_event_ids": [
+        "e028",
+        "e040",
+        "e048"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "retention_unknown",
+          "criterion": "單據保存年限未知、需問財務，不填固定年數。"
+        },
+        {
+          "unit_id": "temperature_unknown",
+          "criterion": "冷藏溫度門檻未知、由品質判斷，不填常識溫度。"
+        },
+        {
+          "unit_id": "qualification",
+          "criterion": "公司未要求堆高機操作或證照，不能把它寫成此職位資格。"
+        }
+      ]
+    },
+    {
+      "case_id": "availability",
+      "observe_after_event_id": "e061",
+      "source_event_ids": [
+        "e014",
+        "e015",
+        "e016"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "usable_stock",
+          "criterion": "核對可用、保留、待出貨及未登錄收退貨，不只看帳面量。"
+        },
+        {
+          "unit_id": "completion",
+          "criterion": "跟進到補貨入庫、ERP更新、受影響訂單已有安排。"
+        },
+        {
+          "unit_id": "delegation",
+          "criterion": "客服決定拆單／延後與對客通知；採購決定補貨，員工提供資訊和追蹤。"
+        },
+        {
+          "unit_id": "uncertain_dates",
+          "criterion": "預計到貨含更新時間與確認狀態，不能當員工保證。"
+        }
+      ]
+    },
+    {
+      "case_id": "transfers",
+      "observe_after_event_id": "e061",
+      "source_event_ids": [
+        "e018",
+        "e019",
+        "e020",
+        "e050"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "transfer_scope",
+          "criterion": "每週一、四集中處理需求及核准，建立ERP調撥、協調出貨。"
+        },
+        {
+          "unit_id": "in_transit",
+          "criterion": "在途貨不能算收貨店可售；雙方收發紀錄相符才結案。完成後的調撥紀錄保留批號，不另推定批號查核是額外結案門檻。"
+        },
+        {
+          "unit_id": "changed_destination",
+          "criterion": "不收貨時先記原因請主管核准改店或退回，不能員工自行改店別。"
+        }
+      ]
+    },
+    {
+      "case_id": "traceability",
+      "observe_after_event_id": "e061",
+      "source_event_ids": [
+        "e025",
+        "e026",
+        "e027",
+        "e028",
+        "e038",
+        "e039"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "units",
+          "criterion": "一箱12件僅該品號，不泛化到所有商品；品號/單位有問題先確認。"
+        },
+        {
+          "unit_id": "identifiers",
+          "criterion": "以原單號、品號、批號比對，不能只靠相似名稱合併。"
+        },
+        {
+          "unit_id": "record_scope",
+          "criterion": "財務/採購維護付款及稅額；員工只確認收貨相關欄位。"
+        }
+      ]
+    },
+    {
+      "case_id": "recall",
+      "observe_after_event_id": "e061",
+      "source_event_ids": [
+        "e029",
+        "e030",
+        "e031",
+        "e051"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "rare_duty",
+          "criterion": "召回屬低頻但有效責任，含多店、批號、在途與隔離追蹤。"
+        },
+        {
+          "unit_id": "quality_authority",
+          "criterion": "品質定召回範圍/解除，員工不得決定繼續銷售。"
+        },
+        {
+          "unit_id": "incomplete_scope",
+          "criterion": "通知批號不全須查證，不能逕自套全批或宣布未列批安全。"
+        }
+      ]
+    },
+    {
+      "case_id": "handoff_and_tools",
+      "observe_after_event_id": "e061",
+      "source_event_ids": [
+        "e035",
+        "e036",
+        "e037",
+        "e038",
+        "e039",
+        "e040",
+        "e041",
+        "e042",
+        "e043",
+        "e044"
+      ],
+      "fact_units": [
+        {
+          "unit_id": "handoff",
+          "criterion": "休假交未結事項、窗口與截止；回任核對避免重複入帳。"
+        },
+        {
+          "unit_id": "training_boundaries",
+          "criterion": "可示範ERP和交接說明，不是人員考核或全公司訓練管理。"
+        },
+        {
+          "unit_id": "knowledge_and_skill",
+          "criterion": "库存狀態、單位、批號概念；差異查核、Excel核對和協調可追溯工作，不只工具名。"
+        },
+        {
+          "unit_id": "conditions",
+          "criterion": "工作日08:30–17:30、偶月底延時但不輪夜班；倉庫現場安全，不推定搬重物。"
+        },
+        {
+          "unit_id": "outage",
+          "criterion": "ERP停用時留原單和狀態；恢復查重再補登，不聲稱已入帳或負責修伺服器。"
+        },
+        {
+          "unit_id": "equipment",
+          "criterion": "核對掃碼器備品、登記設備故障追蹤資訊窗口，不升成維修或設備選型決策。"
+        }
+      ]
+    }
+  ],
+  "source_rubric": {
+    "supported": "所選來源確實支持指定主張、範圍與更正；允许多個有效組合。",
+    "unsupported": "有來源但不支持該主張、誤用顧問猜測、錯誤序號或遺漏重要的更正。",
+    "not_cited": "正文正確但沒有引用支持，內容可得分，來源不得分。",
+    "memory_vs_raw": "分别標記來自原生歷史、Memory正文、摘要或原話查回，不把按需補救都算Memory產物保留。"
+  },
+  "jd_rubric": {
+    "coverage_domains": [
+      "收貨核對與ERP登錄",
+      "收貨異常追蹤",
+      "退貨核對與狀態登錄",
+      "抽盤與全盤差異處理",
+      "缺貨資訊確認與跟進",
+      "店間調撥",
+      "庫存帳齡與異常報表",
+      "單據品號/計量單位查核",
+      "產品召回支援",
+      "年度稽核證據提供",
+      "休假交接與流程示範",
+      "掃碼器備品/送修追蹤"
+    ],
+    "score": "每個領域0=漏失或錯誤；1=只有概括提及；2=本人行動、用途與重要權責可辨識。允許合理合併，不要求十二個職責或十二個任務。",
+    "high_signal": "不要求所有原文數字出現在JD；已採用的數字、責任與條件不得錯，重要邊界不能只為縮短刪掉。",
+    "unsupported_claims": "逐項列出無依據的新職責、KPI、證照或決策權，不從覆蓋分扣除後隱藏。",
+    "changes": "比較編輯前後正式JD，核對目標改動、不受影響項目保留、取消/待確認未生效。"
+  },
+  "conditional_ellipsis": {
+    "probe_id": "ellipsis_frequency",
+    "expected": "前問確為月底全盤時：每月，加做限異常盤差/主管要求，不能把抽盤也改每月。",
+    "eligibility": "需實際顧問前問及實際員工回覆；沒有前問或各組供給不同，另列未施測或自然互動，不併入同輸入的配對分數。"
+  },
+  "metrics": {
+    "quality": "各案正確事實單位/實際施測單位、完整正確案例、JD覆蓋、來源支持；列出每個錯誤而非只平均。",
+    "efficiency": "全部模型輸入/輸出/快取/推理、count/create/compact及背景呼叫，讀取次數、工具結果token、重複讀取；整理前置用量另列並納入總量。",
+    "capacity": "每次實際完整請求計數、壓縮前後窗口、壓縮次數與已保存採用位置；自然未達門檻不能當作壓縮通過。",
+    "missing": "失敗或未施測不填0token、不當未知就是答對；保留缺失原因與分母。"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "arm": "raw_memory",
+  "repeat": 2,
+  "case_id": "boundaries",
+  "cell_id": "boundaries-raw_memory-2",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_interview",
+      "arguments": {
+        "query": {
+          "kind": "messages",
+          "sequences": [
+            56,
+            58,
+            60,
+            62,
+            70,
+            96,
+            102
+          ]
+        }
+      },
+      "result_characters": 1044
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 22748,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 22745
+        },
+        "output_tokens": 574,
+        "output_tokens_details": {
+          "reasoning_tokens": 472
+        },
+        "total_tokens": 23322
+      },
+      "estimated_usd": "0.000514750",
+      "seconds": 9.37141589995008
+    },
+    {
+      "usage": {
+        "input_tokens": 23968,
+        "input_tokens_details": {
+          "cache_write_tokens": 1220,
+          "cached_tokens": 22745
+        },
+        "output_tokens": 1325,
+        "output_tokens_details": {
+          "reasoning_tokens": 833
+        },
+        "total_tokens": 25293
+      },
+      "estimated_usd": "0.001042750",
+      "seconds": 14.971136200008914
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_8.description",
+        "value": "產品召回時，依品質窗口提供的品號與批號查核可售、待檢、在途調撥及各店庫存，逐一核對批號與調撥單；若資料不足或通知僅列部分批號，向相關店別補查並請品質窗口確認範圍，未確認前保留待確認。通知倉庫隔離，提供影響範圍清單給主管及品質窗口，並追蹤隔離量、回收量與各店回覆，直到主管確認紀錄齊全。召回範圍及是否解除由品質窗口確認；本人不決定召回或宣布恢復銷售。客服負責對客通知，採購負責聯繫供應商。",
+        "references": [
+          {
+            "kind": "interview",
+            "interview_sequence": 58,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 60,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 62,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 102,
+            "target_title": null
+          }
+        ]
+      }
+    ],
+    "questions": [
+      "冷藏商品退貨的溫度合格門檻（含數值、單位及適用判定方式）目前由哪份公司規範或品質窗口確認？若你目前不知道，先保留未確認即可。",
+      "單據與核准紀錄依財務確認的規則需保存幾年？若不同類型紀錄年限不同，也請說明適用分類；若目前尚未確認，先不填數字。"
+    ],
+    "note": "已核對產品召回、休假交接、文件保存與冷藏退貨相關文字。僅提議更正產品召回描述中與本人決策權限相反的內容；休假前後交接及共享資料夾／文件保存要求已符合訪談，不需改寫。冷藏退貨溫度門檻與文件保存年限均未獲確認，不能寫成數字要求；保留待釐清問題。"
+  },
+  "seconds": 49.394931000017095
+}

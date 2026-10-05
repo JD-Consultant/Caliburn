@@ -1,0 +1,82 @@
+{
+  "type": "object",
+  "properties": {
+    "task": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "work": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "work"
+      ],
+      "additionalProperties": false
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "work_understanding",
+                  "work_situation"
+                ]
+              },
+              "target_title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "target_title"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "interview"
+                ]
+              },
+              "sequences": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            },
+            "required": [
+              "kind",
+              "sequences"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "task",
+    "unknowns",
+    "references"
+  ],
+  "additionalProperties": false
+}

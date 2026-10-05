@@ -1,0 +1,12 @@
+[
+  {
+    "query_id": "H01-segments-1",
+    "representation": "task",
+    "needed_groups": 21,
+    "cutoff_score": 0.6089898118496508,
+    "tied_parents": [
+      "FIS3321-001v2",
+      "FIS3321-002v2"
+    ]
+  }
+]

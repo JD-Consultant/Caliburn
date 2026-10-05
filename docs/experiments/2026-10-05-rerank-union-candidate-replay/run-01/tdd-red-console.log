@@ -1,0 +1,68 @@
+EEEEEE
+======================================================================
+ERROR: test_changed_query_or_document_hash_is_rejected (__main__.UnionReplayTests.test_changed_query_or_document_hash_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\test_replay.py", line 36, in test_changed_query_or_document_hash_is_rejected
+    self.assertEqual(replay.checked_logit(good, "q", "d"), 1.0)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\replay.py", line 10, in checked_logit
+    raise NotImplementedError("source-bound cache implementation pending")
+NotImplementedError: source-bound cache implementation pending
+
+======================================================================
+ERROR: test_duplicate_route_parent_is_rejected (__main__.UnionReplayTests.test_duplicate_route_parent_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\test_replay.py", line 43, in test_duplicate_route_parent_is_rejected
+    replay.union_candidates(self.rows(["a", "a"]), self.rows(["b"]))
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\replay.py", line 4, in union_candidates
+    raise NotImplementedError("union selection integrity implementation pending")
+NotImplementedError: union selection integrity implementation pending
+
+======================================================================
+ERROR: test_missing_logit_does_not_borrow_another_query_score (__main__.UnionReplayTests.test_missing_logit_does_not_borrow_another_query_score)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\test_replay.py", line 32, in test_missing_logit_does_not_borrow_another_query_score
+    replay.order_by_logit(self.rows(["missing"]), {})
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\replay.py", line 7, in order_by_logit
+    raise NotImplementedError("union selection integrity implementation pending")
+NotImplementedError: union selection integrity implementation pending
+
+======================================================================
+ERROR: test_nonfinite_logit_is_rejected (__main__.UnionReplayTests.test_nonfinite_logit_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\test_replay.py", line 47, in test_nonfinite_logit_is_rejected
+    replay.order_by_logit(self.rows(["a"]), {"a": float("nan")})
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\replay.py", line 7, in order_by_logit
+    raise NotImplementedError("union selection integrity implementation pending")
+NotImplementedError: union selection integrity implementation pending
+
+======================================================================
+ERROR: test_parent_in_both_routes_is_scored_once_with_both_origins (__main__.UnionReplayTests.test_parent_in_both_routes_is_scored_once_with_both_origins)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\test_replay.py", line 26, in test_parent_in_both_routes_is_scored_once_with_both_origins
+    union = replay.union_candidates(self.rows(["a", "b"]), self.rows(["b", "c"]))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\replay.py", line 4, in union_candidates
+    raise NotImplementedError("union selection integrity implementation pending")
+NotImplementedError: union selection integrity implementation pending
+
+======================================================================
+ERROR: test_task_only_candidate_beyond_fused_twenty_is_kept (__main__.UnionReplayTests.test_task_only_candidate_beyond_fused_twenty_is_kept)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\test_replay.py", line 19, in test_task_only_candidate_beyond_fused_twenty_is_kept
+    union = replay.union_candidates(dense, task)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-rerank-union-candidate-replay\run-01\replay.py", line 4, in union_candidates
+    raise NotImplementedError("union selection integrity implementation pending")
+NotImplementedError: union selection integrity implementation pending
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+FAILED (errors=6)

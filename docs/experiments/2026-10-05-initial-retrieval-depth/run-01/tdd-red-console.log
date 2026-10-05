@@ -1,0 +1,80 @@
+EEEEEEE
+======================================================================
+ERROR: test_duplicate_parent_in_a_route_is_rejected (__main__.DepthTests.test_duplicate_parent_in_a_route_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\test_depth.py", line 24, in test_duplicate_parent_in_a_route_is_rejected
+    depth.candidate_union(["a", "a"], ["b", "c"], 2)
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\evaluate.py", line 4, in candidate_union
+    raise NotImplementedError("parent-prefix implementation pending")
+NotImplementedError: parent-prefix implementation pending
+
+======================================================================
+ERROR: test_known_missing_and_unassessed_are_separate (__main__.DepthTests.test_known_missing_and_unassessed_are_separate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\test_depth.py", line 38, in test_known_missing_and_unassessed_are_separate
+    result = depth.facet_state(["front", "back", "course"], [{"id": "a", "main_work": ["front", "back"]}], set())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\evaluate.py", line 7, in facet_state
+    raise NotImplementedError("known/unknown facet support implementation pending")
+NotImplementedError: known/unknown facet support implementation pending
+
+======================================================================
+ERROR: test_multiple_references_support_same_facet_once (__main__.DepthTests.test_multiple_references_support_same_facet_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\test_depth.py", line 28, in test_multiple_references_support_same_facet_once
+    result = depth.facet_state(["front", "back"], targets, {"a", "b"})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\evaluate.py", line 7, in facet_state
+    raise NotImplementedError("known/unknown facet support implementation pending")
+NotImplementedError: known/unknown facet support implementation pending
+
+======================================================================
+ERROR: test_no_judged_support_is_unknown_not_perfect_coverage (__main__.DepthTests.test_no_judged_support_is_unknown_not_perfect_coverage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\test_depth.py", line 33, in test_no_judged_support_is_unknown_not_perfect_coverage
+    result = depth.facet_state(["course"], [], {"a"})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\evaluate.py", line 7, in facet_state
+    raise NotImplementedError("known/unknown facet support implementation pending")
+NotImplementedError: known/unknown facet support implementation pending
+
+======================================================================
+ERROR: test_rank_forty_is_not_in_twenty_but_is_in_forty (__main__.DepthTests.test_rank_forty_is_not_in_twenty_but_is_in_forty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\test_depth.py", line 16, in test_rank_forty_is_not_in_twenty_but_is_in_forty
+    self.assertNotIn("target", depth.candidate_union(dense, task, 20))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\evaluate.py", line 4, in candidate_union
+    raise NotImplementedError("parent-prefix implementation pending")
+NotImplementedError: parent-prefix implementation pending
+
+======================================================================
+ERROR: test_two_routes_deduplicate_parent_but_query_pools_stay_separate (__main__.DepthTests.test_two_routes_deduplicate_parent_but_query_pools_stay_separate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\test_depth.py", line 20, in test_two_routes_deduplicate_parent_but_query_pools_stay_separate
+    self.assertEqual(depth.candidate_union(["a", "b"], ["b", "c"], 2), ["a", "b", "c"])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\evaluate.py", line 4, in candidate_union
+    raise NotImplementedError("parent-prefix implementation pending")
+NotImplementedError: parent-prefix implementation pending
+
+======================================================================
+ERROR: test_unrecognized_facet_cannot_invent_work_support (__main__.DepthTests.test_unrecognized_facet_cannot_invent_work_support)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\test_depth.py", line 44, in test_unrecognized_facet_cannot_invent_work_support
+    depth.facet_state(["front"], [{"id": "a", "main_work": ["invented"]}], {"a"})
+  File "S:\caliburn\docs\experiments\2026-10-05-initial-retrieval-depth\run-01\evaluate.py", line 7, in facet_state
+    raise NotImplementedError("known/unknown facet support implementation pending")
+NotImplementedError: known/unknown facet support implementation pending
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.002s
+
+FAILED (errors=7)

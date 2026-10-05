@@ -1,0 +1,29 @@
+{
+  "job_id": "J035",
+  "phase": "grade",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心工作是協助銷售、建立客戶合約或訂單文件、處理銷售資料及售後服務；員工主要負責訂單系統的畫面與伺服器功能開發維護。雖然兩者都提到訂單或資料，但工作對象與責任不同，不能代表員工任一主要工作面向。",
+    "evidence": [
+      {
+        "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+        "reference_quote": "依組織規定,處理訂單並協助安排銷售相關事宜。"
+      },
+      {
+        "employee_quote": "設計及修改資料表、查詢與資料更新",
+        "reference_quote": "依組織規範,維護銷售資料庫。"
+      }
+    ],
+    "limitations": [
+      "公版的訂單處理是銷售業務及相關文件作業，並未描述訂單系統、API、畫面互動或商業規則的開發與維護。",
+      "公版的銷售資料建檔及資料庫維護，不能僅因共享「資料」或「資料庫」概念便視為員工的系統開發工作。"
+    ]
+  },
+  "seconds": 6.4836310999817215,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "1319ce0078cf0a29ac89253f4af187b0d5f7a02efd57b33e2d4bea37de6358af",
+  "case_id": "F01",
+  "document_id": "KPS4999-001v3"
+}

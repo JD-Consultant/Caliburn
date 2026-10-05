@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "eb98fe20-61be-4155-a3a8-1142f9ac24fb",
+    "interview_sequence": 116,
+    "speaker": "employee",
+    "interview_text": "先跳到單據：前面那個箱和件不同的品號，確認後一箱是多少件，可以套到其他商品嗎？另外單據和核准紀錄的保存年限，我有沒有說過確定幾年，該找誰確認？"
+  },
+  "consultant_reply": {
+    "source_id": "380fd0bd-51b9-4f5a-9adc-598ab6db8af2",
+    "interview_sequence": 117,
+    "speaker": "consultant",
+    "interview_text": "那個品號經資料維護窗口確認後，**一箱是 12 件**；這個換算只適用於該品號，不能套用到其他商品。\n\n你沒有確認單據和核准紀錄要保存幾年；保存年限需向**財務確認**。"
+  }
+}

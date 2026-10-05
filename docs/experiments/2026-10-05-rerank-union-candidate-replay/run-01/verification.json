@@ -1,0 +1,14 @@
+{
+  "groups": 16,
+  "positions": 80,
+  "query_pools": 20,
+  "cached_source_bound_pairs": 628,
+  "unique_selected_pairs": 71,
+  "known_grades": 71,
+  "missing_grades": 0,
+  "old_rerank_controls_unchanged": 48,
+  "prior_sealed_files_unchanged": 551,
+  "fresh_gpu_or_db_time_measured": false,
+  "provider_calls": 0,
+  "scope": "cached finite-case candidate retention ablation; not holdout or JD completeness"
+}

@@ -1,0 +1,45 @@
+{
+  "automatic_spacing_comma_restorations": 3,
+  "manual_omission_restorations": 3,
+  "manual_changes": [
+    {
+      "job_id": "J014",
+      "case_id": "F01",
+      "document_id": "KPS2434-002v2",
+      "field": "employee_quote",
+      "index": 0,
+      "before": "我會寫處理訂單的 API、權限檢查和商業規則",
+      "after": "我也會寫處理訂單的 API、權限檢查和商業規則",
+      "restored_omission": "也",
+      "grade_unchanged": true,
+      "source_occurrences": 1
+    },
+    {
+      "job_id": "J034",
+      "case_id": "F01",
+      "document_id": "KRM1324-001v1",
+      "field": "employee_quote",
+      "index": 0,
+      "before": "我會寫處理訂單的 API、權限檢查和商業規則",
+      "after": "我也會寫處理訂單的 API、權限檢查和商業規則",
+      "restored_omission": "也",
+      "grade_unchanged": true,
+      "source_occurrences": 1
+    },
+    {
+      "job_id": "J016",
+      "case_id": "H03",
+      "document_id": "KPS5220-003v3",
+      "field": "reference_quote",
+      "index": 0,
+      "before": "判別熱銷/滯銷電器商品,並視庫存量進(退)貨。",
+      "after": "判別熱銷/滯銷電器商品,並視庫存量進行進(退)貨。",
+      "restored_omission": "進行",
+      "grade_unchanged": true,
+      "source_occurrences": 1
+    }
+  ],
+  "unresolved": [],
+  "new_model_calls": 0,
+  "raw_responses_failures_and29_judgments_preserved": true
+}

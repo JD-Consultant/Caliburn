@@ -1,0 +1,257 @@
+[
+  {
+    "case_id": "F01",
+    "variant": "O",
+    "query_ids": [
+      "F01-whole-1"
+    ]
+  },
+  {
+    "case_id": "F01",
+    "variant": "B1-W",
+    "query_ids": [
+      "F01-B1-W-0"
+    ]
+  },
+  {
+    "case_id": "F01",
+    "variant": "B1-S",
+    "query_ids": [
+      "F01-B1-S-0"
+    ]
+  },
+  {
+    "case_id": "F01",
+    "variant": "B2-S",
+    "query_ids": [
+      "F01-B2-S-0"
+    ]
+  },
+  {
+    "case_id": "F02",
+    "variant": "O",
+    "query_ids": [
+      "F02-whole-1"
+    ]
+  },
+  {
+    "case_id": "F02",
+    "variant": "B1-W",
+    "query_ids": [
+      "F02-B1-W-0"
+    ]
+  },
+  {
+    "case_id": "F02",
+    "variant": "B1-S",
+    "query_ids": [
+      "F02-B1-S-0"
+    ]
+  },
+  {
+    "case_id": "F02",
+    "variant": "B2-S",
+    "query_ids": [
+      "F02-B2-S-0"
+    ]
+  },
+  {
+    "case_id": "F03",
+    "variant": "O",
+    "query_ids": [
+      "F03-whole-1"
+    ]
+  },
+  {
+    "case_id": "F03",
+    "variant": "B1-W",
+    "query_ids": [
+      "F03-B1-W-0"
+    ]
+  },
+  {
+    "case_id": "F03",
+    "variant": "B1-S",
+    "query_ids": [
+      "F03-B1-S-0",
+      "F03-B1-S-1"
+    ]
+  },
+  {
+    "case_id": "F03",
+    "variant": "B2-S",
+    "query_ids": [
+      "F03-B2-S-0",
+      "F03-B2-S-1"
+    ]
+  },
+  {
+    "case_id": "F04",
+    "variant": "O",
+    "query_ids": [
+      "F04-whole-1"
+    ]
+  },
+  {
+    "case_id": "F04",
+    "variant": "B1-W",
+    "query_ids": [
+      "F04-B1-W-0"
+    ]
+  },
+  {
+    "case_id": "F04",
+    "variant": "B1-S",
+    "query_ids": [
+      "F04-B1-S-0",
+      "F04-B1-S-1",
+      "F04-B1-S-2",
+      "F04-B1-S-3"
+    ]
+  },
+  {
+    "case_id": "F04",
+    "variant": "B2-S",
+    "query_ids": [
+      "F04-B2-S-0"
+    ]
+  },
+  {
+    "case_id": "F05",
+    "variant": "O",
+    "query_ids": [
+      "F05-whole-1"
+    ]
+  },
+  {
+    "case_id": "F05",
+    "variant": "B1-W",
+    "query_ids": [
+      "F05-B1-W-0"
+    ]
+  },
+  {
+    "case_id": "F05",
+    "variant": "B1-S",
+    "query_ids": [
+      "F05-B1-S-0",
+      "F05-B1-S-1"
+    ]
+  },
+  {
+    "case_id": "F05",
+    "variant": "B2-S",
+    "query_ids": [
+      "F05-B2-S-0"
+    ]
+  },
+  {
+    "case_id": "H01",
+    "variant": "O",
+    "query_ids": [
+      "H01-whole-1"
+    ]
+  },
+  {
+    "case_id": "H01",
+    "variant": "B1-W",
+    "query_ids": [
+      "H01-B1-W-0"
+    ]
+  },
+  {
+    "case_id": "H01",
+    "variant": "B1-S",
+    "query_ids": [
+      "H01-B1-S-0",
+      "H01-B1-S-1",
+      "H01-B1-S-2",
+      "H01-B1-S-3"
+    ]
+  },
+  {
+    "case_id": "H01",
+    "variant": "B2-S",
+    "query_ids": [
+      "H01-B2-S-0"
+    ]
+  },
+  {
+    "case_id": "H02",
+    "variant": "O",
+    "query_ids": [
+      "H02-whole-1"
+    ]
+  },
+  {
+    "case_id": "H02",
+    "variant": "B1-W",
+    "query_ids": [
+      "H02-B1-W-0"
+    ]
+  },
+  {
+    "case_id": "H02",
+    "variant": "B1-S",
+    "query_ids": [
+      "H02-B1-S-0",
+      "H02-B1-S-1",
+      "H02-B1-S-2",
+      "H02-B1-S-3",
+      "H02-B1-S-4"
+    ]
+  },
+  {
+    "case_id": "H02",
+    "variant": "B2-S",
+    "query_ids": [
+      "H02-B2-S-0"
+    ]
+  },
+  {
+    "case_id": "H03",
+    "variant": "O",
+    "query_ids": [
+      "H03-whole-1"
+    ]
+  },
+  {
+    "case_id": "H03",
+    "variant": "B1-W",
+    "query_ids": [
+      "H03-B1-W-0"
+    ]
+  },
+  {
+    "case_id": "H03",
+    "variant": "B1-S",
+    "query_ids": [
+      "H03-B1-S-0",
+      "H03-B1-S-1",
+      "H03-B1-S-2",
+      "H03-B1-S-3",
+      "H03-B1-S-4",
+      "H03-B1-S-5",
+      "H03-B1-S-6",
+      "H03-B1-S-7",
+      "H03-B1-S-8",
+      "H03-B1-S-9",
+      "H03-B1-S-10",
+      "H03-B1-S-11",
+      "H03-B1-S-12",
+      "H03-B1-S-13",
+      "H03-B1-S-14",
+      "H03-B1-S-15"
+    ]
+  },
+  {
+    "case_id": "H03",
+    "variant": "B2-S",
+    "query_ids": [
+      "H03-B2-S-0",
+      "H03-B2-S-1",
+      "H03-B2-S-2",
+      "H03-B2-S-3"
+    ]
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "arm": "raw",
+  "repeat": 2,
+  "case_id": "boundaries",
+  "cell_id": "boundaries-raw-2",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 21162,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 21159
+        },
+        "output_tokens": 1380,
+        "output_tokens_details": {
+          "reasoning_tokens": 937
+        },
+        "total_tokens": 22542
+      },
+      "estimated_usd": "0.000901890",
+      "seconds": 16.164654199965298
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_8.description",
+        "value": "產品召回時，依品質窗口提供的品號與批號，查核可售、待檢、在途調撥及各店庫存，通知倉庫先隔離，並提供主管及品質窗口影響範圍清單；追蹤隔離量、回收量及各店回覆，直到主管確認紀錄齊全。召回範圍及是否解除由品質窗口確認；本人不決定召回，也不核准或宣布恢復銷售。",
+        "references": [
+          {
+            "kind": "interview",
+            "interview_sequence": 58,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 60,
+            "target_title": null
+          }
+        ]
+      }
+    ],
+    "questions": [
+      "冷藏退貨的溫度合格門檻目前未確認。請問品質窗口或公司規範確認的門檻數值及單位是什麼？若尚未確認，是否先維持未定、不寫數字？",
+      "單據與核准紀錄的保存年限目前不確定。請問財務確認的保存年限為何？若尚未確認，是否先維持不填年限？"
+    ],
+    "note": "已更正產品召回任務中將召回決定及恢復銷售核准錯列為本人責任的描述；休假交接及依公司檔案規則保存、由財務確認年限的文字符合訪談。冷藏退貨溫度門檻與文件保存年限均未有已確認數字，不宜自行補入。"
+  },
+  "seconds": 27.077152499987278
+}

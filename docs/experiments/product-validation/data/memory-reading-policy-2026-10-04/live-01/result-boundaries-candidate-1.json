@@ -1,0 +1,73 @@
+{
+  "arm": "raw_memory",
+  "repeat": 1,
+  "case_id": "boundaries",
+  "prompt_variant": "candidate",
+  "cell_id": "boundaries-candidate-1",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6465
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11767,
+        "input_tokens_details": {
+          "cache_write_tokens": 8067,
+          "cached_tokens": 3697
+        },
+        "output_tokens": 167,
+        "output_tokens_details": {
+          "reasoning_tokens": 81
+        },
+        "total_tokens": 11934
+      },
+      "estimated_usd": "0.001129145",
+      "seconds": 3.452960000024177
+    },
+    {
+      "usage": {
+        "input_tokens": 17395,
+        "input_tokens_details": {
+          "cache_write_tokens": 5628,
+          "cached_tokens": 11764
+        },
+        "output_tokens": 1765,
+        "output_tokens_details": {
+          "reasoning_tokens": 1346
+        },
+        "total_tokens": 19160
+      },
+      "estimated_usd": "0.001703940",
+      "seconds": 17.38952829997288
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_8.description",
+        "value": "產品召回時，依品質窗口提供的品號與批號查核各店可售、待檢、在途調撥等庫存狀態，通知倉庫先隔離，向主管與品質窗口提供影響範圍；追蹤隔離量、回收量及各店回覆，直到主管確認紀錄齊全。召回範圍及是否解除由品質窗口確認；本人不決定召回或宣布恢復銷售。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [
+      "冷藏退貨的溫度合格門檻是否有公司規範或品質窗口確認的數值（含單位及適用的測量時點）？若目前不清楚，請確認是否仍由品質窗口逐案判定。",
+      "公司既有單據檔案規則的保存年限是幾年？若依單據類別不同，請提供各類別年限或財務確認的正式依據；若尚未確認，JD 暫不寫數字。"
+    ],
+    "note": "已核對召回、休假交接及單據保存要求。修正召回任務描述中錯置為本人決定召回範圍及核准恢復銷售的內容；現有召回權限界線、休假前後交接責任與單據存放規則均與已整理資訊一致，未另行改寫。冷藏退貨溫度門檻及保存年限仍未知，不寫成數字要求，列出待釐清問題。"
+  },
+  "seconds": 42.961848100007046
+}

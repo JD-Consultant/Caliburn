@@ -1,0 +1,98 @@
+[
+  {
+    "cell": "read-post_delivery-r1-baseline",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 31.24706999998307
+  },
+  {
+    "cell": "read-post_delivery-r1-scoped",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 30.63419700000668
+  },
+  {
+    "cell": "read-maintenance-r1-scoped",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 28.560152799997013
+  },
+  {
+    "cell": "read-maintenance-r1-baseline",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 52.46389690000797
+  },
+  {
+    "cell": "read-infrequent_work-r1-baseline",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 50.456394999986514
+  },
+  {
+    "cell": "read-infrequent_work-r1-scoped",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 27.72811779996846
+  },
+  {
+    "cell": "read-resolved_approval-r1-scoped",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 30.758323100046255
+  },
+  {
+    "cell": "read-resolved_approval-r1-baseline",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 46.167310899996664
+  },
+  {
+    "cell": "read-deadline_only-r1-baseline",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 40.26561290002428
+  },
+  {
+    "cell": "read-deadline_only-r1-scoped",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 25.941916699986905
+  },
+  {
+    "cell": "read-approver_only-r1-scoped",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 36.60424160002731
+  },
+  {
+    "cell": "read-approver_only-r1-baseline",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 26.379052600008436
+  },
+  {
+    "cell": "read-post_delivery-r2-baseline",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 30.03967939998256
+  },
+  {
+    "cell": "read-post_delivery-r2-scoped",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 28.01887930004159
+  },
+  {
+    "cell": "read-maintenance-r2-scoped",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 29.115210900024977
+  },
+  {
+    "cell": "read-maintenance-r2-baseline",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 42.613935000030324
+  }
+]

@@ -1,0 +1,4 @@
+{"Status":"exited","Running":false,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":0,"ExitCode":1,"Error":"","StartedAt":"2026-10-04T04:48:53.35301886Z","FinishedAt":"2026-10-04T04:49:11.454654593Z"}
+{"Status":"exited","Running":false,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":0,"ExitCode":0,"Error":"","StartedAt":"2026-10-04T04:51:33.938589329Z","FinishedAt":"2026-10-04T04:52:58.9119393Z"}
+{"Status":"exited","Running":false,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":0,"ExitCode":0,"Error":"","StartedAt":"2026-10-04T04:56:43.709998864Z","FinishedAt":"2026-10-04T05:03:01.387338403Z"}
+{"Status":"exited","Running":false,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":0,"ExitCode":137,"Error":"","StartedAt":"2026-10-04T04:55:44.967406397Z","FinishedAt":"2026-10-04T04:56:42.514322848Z"}

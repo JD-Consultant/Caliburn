@@ -1,0 +1,22 @@
+{
+  "job_id": "J031",
+  "phase": "formal",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "員工的主要工作是開發與維護會員網站的畫面、互動、API 串接及瀏覽器品質；公版核心則是休閒活動營運、顧客服務、設施清潔與設備維護，兩者沒有有意義的工作對應。",
+    "evidence": [
+      {
+        "employee_quote": "我平常負責會員網站的畫面。",
+        "reference_quote": "協助企劃與執行休閒活動營運相關單位的各項活動、日常例行性運作及設施維護"
+      }
+    ],
+    "limitations": []
+  },
+  "seconds": 5.32636750000529,
+  "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+  "document_sha256": "1e0adf95e5da8d3132810ade0a71f2138e33a4bc79d0219d1394db9756768cd2",
+  "case_id": "F02",
+  "document_id": "TTM3422-001v2"
+}

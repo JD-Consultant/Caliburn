@@ -1,0 +1,16 @@
+{
+  "event_id": "e002",
+  "execution_id": "e198a073-82a9-46cc-91a0-46d3035a1999",
+  "employee_input": {
+    "source_id": "addc3d53-12ea-49ed-a4cb-f45a96eb920d",
+    "interview_sequence": 4,
+    "speaker": "employee",
+    "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+  },
+  "consultant_reply": {
+    "source_id": "f4618413-b9e7-4af5-9764-c6083746aefd",
+    "interview_sequence": 5,
+    "speaker": "consultant",
+    "interview_text": "已在草稿中新增「核對進貨單據並登錄到貨資料」，記錄了每日約 15–20 張、由倉庫同事清點實物、您核對單據與記錄差異，以及資料符合後才登錄 ERP。也特別註明實收數以清點結果為準，不能直接採用供應商送貨單數量。\n\n若發現差異，您通常會先通知或交由誰確認？差異尚未釐清前，您會暫緩登錄，直到資料確認符合嗎？"
+  }
+}

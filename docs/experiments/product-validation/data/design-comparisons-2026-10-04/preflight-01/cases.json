@@ -1,0 +1,111 @@
+{
+  "context": [
+    {
+      "case_id": "context-1",
+      "target_title": "一般採購月結",
+      "question": "請核對「一般採購月結」目前的頻率、執行者、核准者、期限、適用範圍與權限界線；用精確原文值回覆，列出共同支持全部六項結論的必要員工訪談序號，不列無關訊息。",
+      "expected": {
+        "frequency": "每月1次",
+        "actor": "本人",
+        "approver": "採購主管",
+        "deadline": "下月第2個工作日",
+        "scope": "國內一般採購",
+        "authority": "沒有核准權"
+      },
+      "sources": [
+        2,
+        4
+      ]
+    },
+    {
+      "case_id": "context-18",
+      "target_title": "進貨單歸檔",
+      "question": "請核對「進貨單歸檔」目前的頻率、執行者、核准者、期限、適用範圍與權限界線；用精確原文值回覆，列出共同支持全部六項結論的必要員工訪談序號，不列無關訊息。",
+      "expected": {
+        "frequency": "每月2次",
+        "actor": "本人",
+        "approver": "部門主管",
+        "deadline": "下月第10個工作日",
+        "scope": "國外一般採購",
+        "authority": "沒有核准權"
+      },
+      "sources": [
+        70,
+        72
+      ]
+    },
+    {
+      "case_id": "context-36",
+      "target_title": "一般採購季結",
+      "question": "請核對「一般採購季結」目前的頻率、執行者、核准者、期限、適用範圍與權限界線；用精確原文值回覆，列出共同支持全部六項結論的必要員工訪談序號，不列無關訊息。",
+      "expected": {
+        "frequency": "每月4次",
+        "actor": "本人",
+        "approver": "部門主管",
+        "deadline": "下月第10個工作日",
+        "scope": "國外一般採購",
+        "authority": "沒有核准權"
+      },
+      "sources": [
+        142,
+        144
+      ]
+    }
+  ],
+  "locator": [
+    {
+      "case_id": "locator-single",
+      "indices": [
+        19
+      ],
+      "kind": "task",
+      "question": "選取目前任務『跨部門交接（平日）』。"
+    },
+    {
+      "case_id": "locator-order",
+      "indices": [
+        36,
+        2,
+        29
+      ],
+      "kind": "task",
+      "question": "依序選取：一般採購季結（平日）、採購申請核對（平日）、採購資料權限（平日）。"
+    },
+    {
+      "case_id": "locator-similar",
+      "indices": [
+        37,
+        1
+      ],
+      "kind": "task",
+      "question": "依序選取：一般採購月結（月末）、一般採購月結（平日）；不得混同。"
+    },
+    {
+      "case_id": "locator-history",
+      "indices": [
+        24
+      ],
+      "kind": "task",
+      "question": "沿用先前已選取的那一個替代品資料蒐集任務，不要改選其他任務。",
+      "history": true
+    },
+    {
+      "case_id": "locator-citation",
+      "indices": [
+        45,
+        9
+      ],
+      "kind": "citation",
+      "question": "依序選取樣品收件核對（月末）、樣品收件核對（平日）各自目前的既存引用，不是任務定位。"
+    },
+    {
+      "case_id": "locator-recovery",
+      "indices": [
+        11
+      ],
+      "kind": "task",
+      "question": "先前定位已失效；請從目前導覽重新選取採購退貨核對（平日）。",
+      "recovery": true
+    }
+  ]
+}

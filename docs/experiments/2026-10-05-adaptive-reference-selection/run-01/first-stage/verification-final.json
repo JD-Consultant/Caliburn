@@ -1,0 +1,32 @@
+{
+  "rows_independently_checked": 2168,
+  "policies": 271,
+  "selection_IDs_and_counts": "pass",
+  "known_positive_and_facet_retention": "pass",
+  "summary_counts": "pass",
+  "mechanism_tests": 6,
+  "test_exit_code": 0,
+  "test_output": "test_absolute_inclusive_and_zero (test_mechanism.SelectionTests.test_absolute_inclusive_and_zero) ... ok\ntest_fixed_and_empty (test_mechanism.SelectionTests.test_fixed_and_empty) ... ok\ntest_floor_and_full (test_mechanism.SelectionTests.test_floor_and_full) ... ok\ntest_gap_keeps_upper_prefix_and_no_gap_keeps_all (test_mechanism.SelectionTests.test_gap_keeps_upper_prefix_and_no_gap_keeps_all) ... ok\ntest_grid_unique (test_mechanism.SelectionTests.test_grid_unique) ... ok\ntest_relative_own_top (test_mechanism.SelectionTests.test_relative_own_top) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.001s\n\nOK\n",
+  "input_hashes_unchanged": true,
+  "prior_seals": [
+    {
+      "directory": "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01",
+      "files": 551,
+      "mismatches": 0,
+      "manifest_sha256": "a57a7df9b57c1acdc48b5f4e7d05d6cbf172c9034801eacc262c1b0133e7c6ec"
+    },
+    {
+      "directory": "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01",
+      "files": 30,
+      "mismatches": 0,
+      "manifest_sha256": "a5ccb352d21d636379be4a8896ceed8f374b12fb4f9324532168659749ff27eb"
+    },
+    {
+      "directory": "docs/experiments/2026-10-05-initial-retrieval-depth/run-01",
+      "files": 32,
+      "mismatches": 0,
+      "manifest_sha256": "d58898f4471b91dc2d30baa3270b94343165860a9c41e22695980e32fbc7e388"
+    }
+  ],
+  "new_provider_embedding_reranker_database_calls": 0
+}

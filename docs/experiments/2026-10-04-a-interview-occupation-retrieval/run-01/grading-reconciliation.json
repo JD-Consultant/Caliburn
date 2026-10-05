@@ -1,0 +1,39 @@
+{
+  "model_responses": 33,
+  "automatic_evidence_validation_passed": 31,
+  "source_format_only_corrections": [
+    {
+      "job_id": "J019",
+      "original_grade_unchanged": 1,
+      "changes": [
+        {
+          "evidence_index": 1,
+          "original_quote": "監督團隊進行供應商資訊蒐集, 並發展最佳選項, 以進行合約的談判計畫。",
+          "corrected_quote": "監督團隊進行供應商資訊蒐集,並發展最佳選項,以進行合約的談判計畫。",
+          "kind": "comma/space literal source correction"
+        },
+        {
+          "evidence_index": 2,
+          "original_quote": "依據組織經營目標及相關政策資訊, 規劃並訂定供應商管理辦法。",
+          "corrected_quote": "依據組織經營目標及相關政策資訊,規劃並訂定供應商管理辦法。",
+          "kind": "comma/space literal source correction"
+        }
+      ]
+    },
+    {
+      "job_id": "J025",
+      "original_grade_unchanged": 2,
+      "changes": [
+        {
+          "evidence_index": 2,
+          "original_quote": "及時識別和解決供應商可能出現的問題和衝突，掌握供應商當前困境與尚可爭取、協調之處。",
+          "corrected_quote": "及時識別和解決供應商可能出現的問題和衝突,掌握供應商當前困境與尚可爭取、協調之處。",
+          "kind": "comma/space literal source correction"
+        }
+      ]
+    }
+  ],
+  "numeric_grade_changes": 0,
+  "additional_model_calls": 0,
+  "original_summary_and_responses_preserved": true
+}

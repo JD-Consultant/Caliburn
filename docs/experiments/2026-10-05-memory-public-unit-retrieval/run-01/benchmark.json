@@ -1,0 +1,3746 @@
+[
+  {
+    "case_id": "F01",
+    "method": "O-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.008039599983021617,
+    "db_seconds": 0.00594569998793304,
+    "cosine_and_sort_seconds": 0.0020098999957554042,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "INM3514-001v4",
+      "KPS4999-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.03667610004777089,
+    "db_seconds": 0.03042329999152571,
+    "cosine_and_sort_seconds": 0.005618399998638779,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.041869200009386986,
+    "db_seconds": 0.03324959997553378,
+    "cosine_and_sort_seconds": 0.007346600003074855,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "KPS2434-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.030065099999774247,
+    "db_seconds": 0.02778619999298826,
+    "cosine_and_sort_seconds": 0.0017115999944508076,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "KRM1324-002v1",
+      "網路維修助理",
+      "KPS2434-004v2",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.03949270001612604,
+    "db_seconds": 0.0326830999692902,
+    "cosine_and_sort_seconds": 0.00612800003727898,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MQM1322-001v4",
+      "BGM1330-001v3",
+      "MIM2141-001v4",
+      "MPM7322-001v4",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.044751100009307265,
+    "db_seconds": 0.036034800054039806,
+    "cosine_and_sort_seconds": 0.007281100028194487,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MQM1322-001v4",
+      "INM3514-001v4",
+      "BGM1330-001v3",
+      "KRM1324-002v1",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.025008900032844394,
+    "db_seconds": 0.022700699977576733,
+    "cosine_and_sort_seconds": 0.0016917000175453722,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "KPS2434-004v2",
+      "AVA2172-003v3",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.08298649999778718,
+    "db_seconds": 0.03362389997346327,
+    "cosine_and_sort_seconds": 0.04868010000791401,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "TTM3422-001v2",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.06357860000571236,
+    "db_seconds": 0.05486220004968345,
+    "cosine_and_sort_seconds": 0.0071699999389238656,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.008074399956967682,
+    "db_seconds": 0.0057280000182799995,
+    "cosine_and_sort_seconds": 0.0016889999969862401,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "BAS3332-003v3",
+      "IIS3513-001v4",
+      "AVA2172-003v3",
+      "KRM3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.01911140000447631,
+    "db_seconds": 0.011791300028562546,
+    "cosine_and_sort_seconds": 0.006594300037249923,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "MIM2141-001v4",
+      "KPS5220-001v4",
+      "INM3514-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.050862499978393316,
+    "db_seconds": 0.042070900031831115,
+    "cosine_and_sort_seconds": 0.00742450007237494,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "BAS3332-003v3",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.025240899994969368,
+    "db_seconds": 0.022885999991558492,
+    "cosine_and_sort_seconds": 0.0016220000106841326,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.03992790001211688,
+    "db_seconds": 0.03247959999134764,
+    "cosine_and_sort_seconds": 0.006443599995691329,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "FAC4311-001v2",
+      "停車場管理員",
+      "FAC1211-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.03920749999815598,
+    "db_seconds": 0.030124900047667325,
+    "cosine_and_sort_seconds": 0.007132300001103431,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "FAC4311-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "KRM4212-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.035500000056345016,
+    "db_seconds": 0.03157310001552105,
+    "cosine_and_sort_seconds": 0.0029802999924868345,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-001v4",
+      "FAC3313-001v2",
+      "FAC4311-001v2",
+      "BAS3323-003v3",
+      "KPS5220-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.03396100003737956,
+    "db_seconds": 0.020750600029714406,
+    "cosine_and_sort_seconds": 0.011534799996297807,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM1324-001v1",
+      "MMP4321-002v4",
+      "停車場管理員",
+      "BAS3323-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.10085139999864623,
+    "db_seconds": 0.08429629995953292,
+    "cosine_and_sort_seconds": 0.013643899990711361,
+    "queries": 2,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "BAS3323-003v3",
+      "FAC4311-001v2",
+      "FAC1211-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.028019200020935386,
+    "db_seconds": 0.025395400007255375,
+    "cosine_and_sort_seconds": 0.001995099999476224,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "MEM7231-010v2",
+      "網路維修助理",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.03645920002600178,
+    "db_seconds": 0.030355399998370558,
+    "cosine_and_sort_seconds": 0.00524490000680089,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "SET3113-004v2",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.06217950000427663,
+    "db_seconds": 0.05426400003489107,
+    "cosine_and_sort_seconds": 0.006559500005096197,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET3113-002v3",
+      "SET2141-001v3",
+      "MIM2141-001v4",
+      "SET7127-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.026571399997919798,
+    "db_seconds": 0.024454600003082305,
+    "cosine_and_sort_seconds": 0.0014973999932408333,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "SET7127-002v3",
+      "MEM7412-001v3",
+      "MEM3511-001v3",
+      "SET7231-002v3",
+      "網路維修助理"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.0353334000101313,
+    "db_seconds": 0.029255100002046674,
+    "cosine_and_sort_seconds": 0.005267000000458211,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MQM1322-001v4",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "MEM7231-011v2",
+      "SET7231-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.06275139999343082,
+    "db_seconds": 0.05433080001967028,
+    "cosine_and_sort_seconds": 0.007056099944747984,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "SET7127-002v3",
+      "MQM1322-001v4",
+      "MEM7412-001v3",
+      "MIM2141-001v4",
+      "MEM3511-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.027111099974717945,
+    "db_seconds": 0.024863200029358268,
+    "cosine_and_sort_seconds": 0.0015021000290289521,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "AVA2172-002v3",
+      "IDC2712-001v1",
+      "KMC2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.03668439999455586,
+    "db_seconds": 0.02977419999660924,
+    "cosine_and_sort_seconds": 0.0061858000117354095,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KPS3334-009v4",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KMM2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.04183890001149848,
+    "db_seconds": 0.033339800022076815,
+    "cosine_and_sort_seconds": 0.007018000062089413,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "KPS3334-009v4",
+      "KMC2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.026759599975775927,
+    "db_seconds": 0.02432799997041002,
+    "cosine_and_sort_seconds": 0.0018002999713644385,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "MPM7322-001v4",
+      "AVA2172-004v3",
+      "AVA2172-001v4",
+      "IDC2712-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.038532599981408566,
+    "db_seconds": 0.032505500013940036,
+    "cosine_and_sort_seconds": 0.005091500002890825,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-001v4",
+      "MQM1322-001v4",
+      "AVA2172-002v3",
+      "珠寶金工人員",
+      "MPM7322-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.06164829997578636,
+    "db_seconds": 0.05297880002763122,
+    "cosine_and_sort_seconds": 0.0068168999860063195,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "AVA2172-001v4",
+      "MPM7322-001v4",
+      "AVA2172-004v3",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.07008729997323826,
+    "db_seconds": 0.024839499965310097,
+    "cosine_and_sort_seconds": 0.044622199959121644,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "THM4222-001v3",
+      "KPS2434-004v2",
+      "TTM4221-007v1",
+      "FAC3313-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.017511399986688048,
+    "db_seconds": 0.011195799976121634,
+    "cosine_and_sort_seconds": 0.005532399984076619,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "TTM3422-001v2",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.028142800030764192,
+    "db_seconds": 0.019236399966757745,
+    "cosine_and_sort_seconds": 0.007479900028556585,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "THM4222-001v3",
+      "BHR2422-011v4",
+      "TTM4221-007v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.0315985000343062,
+    "db_seconds": 0.029171900008805096,
+    "cosine_and_sort_seconds": 0.0017802000511437654,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "KPS2434-004v2",
+      "BHR2422-011v4",
+      "BAS1219-003v4",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.017772999999579042,
+    "db_seconds": 0.011502499983180314,
+    "cosine_and_sort_seconds": 0.0054991000215522945,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "KMC2432-001v4",
+      "TTM3422-001v2",
+      "KRM4212-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.06528949999483302,
+    "db_seconds": 0.05687849997775629,
+    "cosine_and_sort_seconds": 0.006921800028067082,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "KPS2434-004v2",
+      "BHR2422-011v4",
+      "TTM3422-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.025906700000632554,
+    "db_seconds": 0.023765799996908754,
+    "cosine_and_sort_seconds": 0.0015199999907054007,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "KRM1324-002v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.01663420000113547,
+    "db_seconds": 0.010574600019026548,
+    "cosine_and_sort_seconds": 0.005359700007829815,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "TFB5131-001v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KPS5292-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.06574769999133423,
+    "db_seconds": 0.05679449992021546,
+    "cosine_and_sort_seconds": 0.007505499990656972,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "BGM5220-002v3",
+      "MMP4321-002v4",
+      "RLM9330-001v1",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.007936699956189841,
+    "db_seconds": 0.005516000033821911,
+    "cosine_and_sort_seconds": 0.0017496999935247004,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RTO4323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.04172819998348132,
+    "db_seconds": 0.034839199972338974,
+    "cosine_and_sort_seconds": 0.006161600002087653,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-002v4",
+      "BGM5220-002v3",
+      "RLM9330-001v1",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.04793679999420419,
+    "db_seconds": 0.039472100033890456,
+    "cosine_and_sort_seconds": 0.0069759999751113355,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.007478899962734431,
+    "db_seconds": 0.005156300030648708,
+    "cosine_and_sort_seconds": 0.0016441000043414533,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM1420-001v4",
+      "BAS3323-003v3",
+      "KRM3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.0366554000065662,
+    "db_seconds": 0.030154099978972226,
+    "cosine_and_sort_seconds": 0.00543889997061342,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP4321-002v4",
+      "KPS5220-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.046444599982351065,
+    "db_seconds": 0.03778940002666786,
+    "cosine_and_sort_seconds": 0.007281200028955936,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "BAS3323-003v3",
+      "MPM7322-001v4",
+      "KRM3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-D",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.0395097000291571,
+    "db_seconds": 0.03187949996208772,
+    "cosine_and_sort_seconds": 0.006068899994716048,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS3323-003v3",
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM3323-002v4",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-T",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.12016599997878075,
+    "db_seconds": 0.09079689998179674,
+    "cosine_and_sort_seconds": 0.024912199936807156,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "MMP1324-001v4",
+      "KRM1324-002v1",
+      "MQM2141-007v2",
+      "AVA4322-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-M",
+    "repeat": 1,
+    "method_order": [
+      "O-D",
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M"
+    ],
+    "seconds": 0.21191589999943972,
+    "db_seconds": 0.17607699992367998,
+    "cosine_and_sort_seconds": 0.030009099864400923,
+    "queries": 4,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BAS3323-003v3",
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM3323-002v4",
+      "MMP1324-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.021245300013106316,
+    "db_seconds": 0.014172600000165403,
+    "cosine_and_sort_seconds": 0.005854699993506074,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.08782519999658689,
+    "db_seconds": 0.03508340002736077,
+    "cosine_and_sort_seconds": 0.05126839998411015,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "KPS2434-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.024732000019866973,
+    "db_seconds": 0.02264360000845045,
+    "cosine_and_sort_seconds": 0.0014442999963648617,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "KRM1324-002v1",
+      "網路維修助理",
+      "KPS2434-004v2",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.03691299998899922,
+    "db_seconds": 0.030576599994674325,
+    "cosine_and_sort_seconds": 0.005563499988056719,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MQM1322-001v4",
+      "BGM1330-001v3",
+      "MIM2141-001v4",
+      "MPM7322-001v4",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.0429837999981828,
+    "db_seconds": 0.0338070000289008,
+    "cosine_and_sort_seconds": 0.007719999994151294,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MQM1322-001v4",
+      "INM3514-001v4",
+      "BGM1330-001v3",
+      "KRM1324-002v1",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.02648669999325648,
+    "db_seconds": 0.024382299976423383,
+    "cosine_and_sort_seconds": 0.001457699981983751,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "INM3514-001v4",
+      "KPS4999-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.036430299980565906,
+    "db_seconds": 0.030402000003959984,
+    "cosine_and_sort_seconds": 0.005228299996815622,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "TTM3422-001v2",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.025881700043100864,
+    "db_seconds": 0.01690510002663359,
+    "cosine_and_sort_seconds": 0.00732789997709915,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.030680499970912933,
+    "db_seconds": 0.0285699000232853,
+    "cosine_and_sort_seconds": 0.001449999981559813,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "BAS3332-003v3",
+      "IIS3513-001v4",
+      "AVA2172-003v3",
+      "KRM3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.03682839998509735,
+    "db_seconds": 0.030446699995081872,
+    "cosine_and_sort_seconds": 0.005612600012682378,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "MIM2141-001v4",
+      "KPS5220-001v4",
+      "INM3514-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.062137799977790564,
+    "db_seconds": 0.053474900021683425,
+    "cosine_and_sort_seconds": 0.007239400001708418,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "BAS3332-003v3",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.024604300037026405,
+    "db_seconds": 0.022510899987537414,
+    "cosine_and_sort_seconds": 0.0014625000185333192,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "KPS2434-004v2",
+      "AVA2172-003v3",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.017214399995282292,
+    "db_seconds": 0.011055500013753772,
+    "cosine_and_sort_seconds": 0.005452899960801005,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "FAC4311-001v2",
+      "停車場管理員",
+      "FAC1211-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.06558029999723658,
+    "db_seconds": 0.057198099966626614,
+    "cosine_and_sort_seconds": 0.007028200023341924,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "FAC4311-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "KRM4212-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.056746100017335266,
+    "db_seconds": 0.05266650003613904,
+    "cosine_and_sort_seconds": 0.0030240999767556787,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-001v4",
+      "FAC3313-001v2",
+      "FAC4311-001v2",
+      "BAS3323-003v3",
+      "KPS5220-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.0675197999808006,
+    "db_seconds": 0.05439399997703731,
+    "cosine_and_sort_seconds": 0.011207400006242096,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM1324-001v1",
+      "MMP4321-002v4",
+      "停車場管理員",
+      "BAS3323-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.10573230002773926,
+    "db_seconds": 0.0892002999316901,
+    "cosine_and_sort_seconds": 0.013595999975223094,
+    "queries": 2,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "BAS3323-003v3",
+      "FAC4311-001v2",
+      "FAC1211-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.029737900011241436,
+    "db_seconds": 0.027728700020816177,
+    "cosine_and_sort_seconds": 0.0013580999802798033,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.03586830000858754,
+    "db_seconds": 0.029881399997975677,
+    "cosine_and_sort_seconds": 0.005037299997638911,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "SET3113-004v2",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.04511609999462962,
+    "db_seconds": 0.03694640001049265,
+    "cosine_and_sort_seconds": 0.006950200069695711,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET3113-002v3",
+      "SET2141-001v3",
+      "MIM2141-001v4",
+      "SET7127-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.00654129998292774,
+    "db_seconds": 0.00459299999056384,
+    "cosine_and_sort_seconds": 0.001422500004991889,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "SET7127-002v3",
+      "MEM7412-001v3",
+      "MEM3511-001v3",
+      "SET7231-002v3",
+      "網路維修助理"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.040633599972352386,
+    "db_seconds": 0.0345952000352554,
+    "cosine_and_sort_seconds": 0.005273199989460409,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MQM1322-001v4",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "MEM7231-011v2",
+      "SET7231-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.043460600019898266,
+    "db_seconds": 0.0352769999881275,
+    "cosine_and_sort_seconds": 0.006815799977630377,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "SET7127-002v3",
+      "MQM1322-001v4",
+      "MEM7412-001v3",
+      "MIM2141-001v4",
+      "MEM3511-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.03078759997151792,
+    "db_seconds": 0.028060599986929446,
+    "cosine_and_sort_seconds": 0.0020599000272341073,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "MEM7231-010v2",
+      "網路維修助理",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.035879300034139305,
+    "db_seconds": 0.02966190001461655,
+    "cosine_and_sort_seconds": 0.0055000000284053385,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KPS3334-009v4",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KMM2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.042476699978578836,
+    "db_seconds": 0.034588900045491755,
+    "cosine_and_sort_seconds": 0.006563099974300712,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "KPS3334-009v4",
+      "KMC2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.029281600029207766,
+    "db_seconds": 0.027220799995120615,
+    "cosine_and_sort_seconds": 0.001421299995854497,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "MPM7322-001v4",
+      "AVA2172-004v3",
+      "AVA2172-001v4",
+      "IDC2712-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.03665329999057576,
+    "db_seconds": 0.03062919998774305,
+    "cosine_and_sort_seconds": 0.005055400019045919,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-001v4",
+      "MQM1322-001v4",
+      "AVA2172-002v3",
+      "珠寶金工人員",
+      "MPM7322-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.08191069995518774,
+    "db_seconds": 0.03336300002411008,
+    "cosine_and_sort_seconds": 0.04710129997693002,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "AVA2172-001v4",
+      "MPM7322-001v4",
+      "AVA2172-004v3",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.0072678999858908355,
+    "db_seconds": 0.005172499979380518,
+    "cosine_and_sort_seconds": 0.001500000013038516,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "AVA2172-002v3",
+      "IDC2712-001v1",
+      "KMC2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.03468000004068017,
+    "db_seconds": 0.028554299962706864,
+    "cosine_and_sort_seconds": 0.005411099991761148,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "TTM3422-001v2",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.06219279998913407,
+    "db_seconds": 0.05353010003454983,
+    "cosine_and_sort_seconds": 0.007183500041719526,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "THM4222-001v3",
+      "BHR2422-011v4",
+      "TTM4221-007v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.023053199984133244,
+    "db_seconds": 0.021039499959442765,
+    "cosine_and_sort_seconds": 0.0014291999978013337,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "KPS2434-004v2",
+      "BHR2422-011v4",
+      "BAS1219-003v4",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.03667860000859946,
+    "db_seconds": 0.030604599975049496,
+    "cosine_and_sort_seconds": 0.005353199958335608,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "KMC2432-001v4",
+      "TTM3422-001v2",
+      "KRM4212-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.0431941999704577,
+    "db_seconds": 0.03508160001365468,
+    "cosine_and_sort_seconds": 0.006784600089304149,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "KPS2434-004v2",
+      "BHR2422-011v4",
+      "TTM3422-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.030003699997905642,
+    "db_seconds": 0.028007099987007678,
+    "cosine_and_sort_seconds": 0.0013744999887421727,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "THM4222-001v3",
+      "KPS2434-004v2",
+      "TTM4221-007v1",
+      "FAC3313-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.03576589998556301,
+    "db_seconds": 0.02987229998689145,
+    "cosine_and_sort_seconds": 0.005148099968209863,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "TFB5131-001v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KPS5292-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.04671219998272136,
+    "db_seconds": 0.03900580003391951,
+    "cosine_and_sort_seconds": 0.006482299999333918,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "BGM5220-002v3",
+      "MMP4321-002v4",
+      "RLM9330-001v1",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.024518000020179898,
+    "db_seconds": 0.022484000015538186,
+    "cosine_and_sort_seconds": 0.001402100024279207,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RTO4323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.03683250001631677,
+    "db_seconds": 0.03077740001026541,
+    "cosine_and_sort_seconds": 0.005348099977709353,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-002v4",
+      "BGM5220-002v3",
+      "RLM9330-001v1",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.042014600010588765,
+    "db_seconds": 0.033908800047356635,
+    "cosine_and_sort_seconds": 0.006765800004359335,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.030314599978737533,
+    "db_seconds": 0.028301100013777614,
+    "cosine_and_sort_seconds": 0.001402699970640242,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "KRM1324-002v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.034441999974660575,
+    "db_seconds": 0.028659200004767627,
+    "cosine_and_sort_seconds": 0.005075699998997152,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP4321-002v4",
+      "KPS5220-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.06350330001441762,
+    "db_seconds": 0.05527860001893714,
+    "cosine_and_sort_seconds": 0.006680699938442558,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "BAS3323-003v3",
+      "MPM7322-001v4",
+      "KRM3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.08795189997181296,
+    "db_seconds": 0.080708300054539,
+    "cosine_and_sort_seconds": 0.005700699926819652,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS3323-003v3",
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM3323-002v4",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-T",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.10618619999149814,
+    "db_seconds": 0.0790176999871619,
+    "cosine_and_sort_seconds": 0.02309700002660975,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "MMP1324-001v4",
+      "KRM1324-002v1",
+      "MQM2141-007v2",
+      "AVA4322-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-M",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.2271896000020206,
+    "db_seconds": 0.19311589992139488,
+    "cosine_and_sort_seconds": 0.028190799988806248,
+    "queries": 4,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BAS3323-003v3",
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM3323-002v4",
+      "MMP1324-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-D",
+    "repeat": 2,
+    "method_order": [
+      "O-T",
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D"
+    ],
+    "seconds": 0.006746700033545494,
+    "db_seconds": 0.004754599998705089,
+    "cosine_and_sort_seconds": 0.0014424000401049852,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM1420-001v4",
+      "BAS3323-003v3",
+      "KRM3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.053908699948806316,
+    "db_seconds": 0.04595379997044802,
+    "cosine_and_sort_seconds": 0.006884500035084784,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "MPM7322-001v4",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "KPS2434-002v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.006926100002601743,
+    "db_seconds": 0.004824400006327778,
+    "cosine_and_sort_seconds": 0.0014774000155739486,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "KRM1324-002v1",
+      "網路維修助理",
+      "KPS2434-004v2",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.040350899973418564,
+    "db_seconds": 0.033937000029254705,
+    "cosine_and_sort_seconds": 0.0056434000143781304,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MQM1322-001v4",
+      "BGM1330-001v3",
+      "MIM2141-001v4",
+      "MPM7322-001v4",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.06823189998976886,
+    "db_seconds": 0.015817300009075552,
+    "cosine_and_sort_seconds": 0.05109029996674508,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MQM1322-001v4",
+      "INM3514-001v4",
+      "BGM1330-001v3",
+      "KRM1324-002v1",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.03233120002551004,
+    "db_seconds": 0.029963299981318414,
+    "cosine_and_sort_seconds": 0.0015687000122852623,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "INM3514-001v4",
+      "KPS4999-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.037184600019827485,
+    "db_seconds": 0.03045900003053248,
+    "cosine_and_sort_seconds": 0.006006599985994399,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.06449160003103316,
+    "db_seconds": 0.055391999951098114,
+    "cosine_and_sort_seconds": 0.007712799939326942,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "KPS2434-004v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.007578000018838793,
+    "db_seconds": 0.005437400017399341,
+    "cosine_and_sort_seconds": 0.0015573999844491482,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "BAS3332-003v3",
+      "IIS3513-001v4",
+      "AVA2172-003v3",
+      "KRM3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.017749299993738532,
+    "db_seconds": 0.011637900024652481,
+    "cosine_and_sort_seconds": 0.0053743000025860965,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "MIM2141-001v4",
+      "KPS5220-001v4",
+      "INM3514-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.047000400023534894,
+    "db_seconds": 0.03846430004341528,
+    "cosine_and_sort_seconds": 0.00704070006031543,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "INM3514-001v4",
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "BAS3332-003v3",
+      "AVA2172-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.007124700001440942,
+    "db_seconds": 0.00499610003316775,
+    "cosine_and_sort_seconds": 0.0015289000002667308,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "KPS2434-004v2",
+      "AVA2172-003v3",
+      "IIS3513-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.01635089999763295,
+    "db_seconds": 0.0099534000037238,
+    "cosine_and_sort_seconds": 0.005689000012353063,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "TTM3422-001v2",
+      "MIM2141-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.04512819997034967,
+    "db_seconds": 0.035898700065445155,
+    "cosine_and_sort_seconds": 0.007776400016155094,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "FAC4311-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "KRM4212-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.031025500036776066,
+    "db_seconds": 0.027181199984624982,
+    "cosine_and_sort_seconds": 0.0029552000341936946,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM3323-001v4",
+      "FAC3313-001v2",
+      "FAC4311-001v2",
+      "BAS3323-003v3",
+      "KPS5220-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.06174459995236248,
+    "db_seconds": 0.04756829998223111,
+    "cosine_and_sort_seconds": 0.012316900014411658,
+    "queries": 2,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM1324-001v1",
+      "MMP4321-002v4",
+      "停車場管理員",
+      "BAS3323-003v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.12540369998896495,
+    "db_seconds": 0.10861330002080649,
+    "cosine_and_sort_seconds": 0.013903499988373369,
+    "queries": 2,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM3323-001v4",
+      "BAS3323-003v3",
+      "FAC4311-001v2",
+      "FAC1211-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.00712199998088181,
+    "db_seconds": 0.004931600007694215,
+    "cosine_and_sort_seconds": 0.0015239999629557133,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.04051720001734793,
+    "db_seconds": 0.033772599999792874,
+    "cosine_and_sort_seconds": 0.005847699998412281,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "FAC4311-001v2",
+      "停車場管理員",
+      "FAC1211-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.06066979997558519,
+    "db_seconds": 0.051698299997951835,
+    "cosine_and_sort_seconds": 0.007488700037356466,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET3113-002v3",
+      "SET2141-001v3",
+      "MIM2141-001v4",
+      "SET7127-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.023346300004050136,
+    "db_seconds": 0.020932600018568337,
+    "cosine_and_sort_seconds": 0.0015308000147342682,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "SET7127-002v3",
+      "MEM7412-001v3",
+      "MEM3511-001v3",
+      "SET7231-002v3",
+      "網路維修助理"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.017831499979365617,
+    "db_seconds": 0.011711900006048381,
+    "cosine_and_sort_seconds": 0.005378500034566969,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MQM1322-001v4",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "MEM7231-011v2",
+      "SET7231-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.039215900003910065,
+    "db_seconds": 0.029021200025454164,
+    "cosine_and_sort_seconds": 0.008767399995122105,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "SET7127-002v3",
+      "MQM1322-001v4",
+      "MEM7412-001v3",
+      "MIM2141-001v4",
+      "MEM3511-001v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.02264459995785728,
+    "db_seconds": 0.02052469999762252,
+    "cosine_and_sort_seconds": 0.001484300009906292,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "MEM7231-010v2",
+      "網路維修助理",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.039417400024831295,
+    "db_seconds": 0.032859800034202635,
+    "cosine_and_sort_seconds": 0.005737300030887127,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "SET3113-004v2",
+      "MEM7231-009v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.05996660003438592,
+    "db_seconds": 0.05079660005867481,
+    "cosine_and_sort_seconds": 0.007776200014632195,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "KPS3334-009v4",
+      "KMC2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.02606120001291856,
+    "db_seconds": 0.024071299994830042,
+    "cosine_and_sort_seconds": 0.0013461000053212047,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "MPM7322-001v4",
+      "AVA2172-004v3",
+      "AVA2172-001v4",
+      "IDC2712-001v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.03664119995664805,
+    "db_seconds": 0.030116300040390342,
+    "cosine_and_sort_seconds": 0.005614800029434264,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-001v4",
+      "MQM1322-001v4",
+      "AVA2172-002v3",
+      "珠寶金工人員",
+      "MPM7322-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.0660238999989815,
+    "db_seconds": 0.05754199996590614,
+    "cosine_and_sort_seconds": 0.007048400002531707,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "AVA2172-001v4",
+      "MPM7322-001v4",
+      "AVA2172-004v3",
+      "MQM1322-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.020471700001507998,
+    "db_seconds": 0.01811399997677654,
+    "cosine_and_sort_seconds": 0.00168009998742491,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "AVA2172-002v3",
+      "IDC2712-001v1",
+      "KMC2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.08622019999893382,
+    "db_seconds": 0.0351465999847278,
+    "cosine_and_sort_seconds": 0.05026939994422719,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "AVA2172-002v3",
+      "KPS3334-009v4",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KMM2431-006v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.04621460003545508,
+    "db_seconds": 0.03692640003282577,
+    "cosine_and_sort_seconds": 0.007682299998123199,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "THM4222-001v3",
+      "BHR2422-011v4",
+      "TTM4221-007v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.023700300022028387,
+    "db_seconds": 0.021478299982845783,
+    "cosine_and_sort_seconds": 0.001540199969895184,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "KPS2434-004v2",
+      "BHR2422-011v4",
+      "BAS1219-003v4",
+      "FAC4311-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.03688709996640682,
+    "db_seconds": 0.030294800002593547,
+    "cosine_and_sort_seconds": 0.005869700049515814,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "KMC2432-001v4",
+      "TTM3422-001v2",
+      "KRM4212-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.06568810000317171,
+    "db_seconds": 0.05695549998199567,
+    "cosine_and_sort_seconds": 0.007122299983166158,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "TFB1412-002v2",
+      "KPS2434-004v2",
+      "BHR2422-011v4",
+      "TTM3422-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.02494139998452738,
+    "db_seconds": 0.022834900009911507,
+    "cosine_and_sort_seconds": 0.0014928000164218247,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BHR2422-007v4",
+      "THM4222-001v3",
+      "KPS2434-004v2",
+      "TTM4221-007v1",
+      "FAC3313-001v2"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.03842100000474602,
+    "db_seconds": 0.0322910999529995,
+    "cosine_and_sort_seconds": 0.005352200008928776,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "TTM3422-001v2",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.04141260002506897,
+    "db_seconds": 0.03249210002832115,
+    "cosine_and_sort_seconds": 0.007417400018312037,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "BGM5220-002v3",
+      "MMP4321-002v4",
+      "RLM9330-001v1",
+      "KRM1324-002v1"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.007253600051626563,
+    "db_seconds": 0.005092400009743869,
+    "cosine_and_sort_seconds": 0.0015929999644868076,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM9330-001v1",
+      "RLM4323-004v1",
+      "MMP4321-002v4",
+      "MMP4321-003v4",
+      "RTO4323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.04150970000773668,
+    "db_seconds": 0.03512170002795756,
+    "cosine_and_sort_seconds": 0.005632599990349263,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "MMP4321-002v4",
+      "BGM5220-002v3",
+      "RLM9330-001v1",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.06520290003390983,
+    "db_seconds": 0.05607319995760918,
+    "cosine_and_sort_seconds": 0.007747099967673421,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "BGM5220-002v3",
+      "RLM4323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.023143699974752963,
+    "db_seconds": 0.020863300014752895,
+    "cosine_and_sort_seconds": 0.001416900020558387,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "KRM1324-002v1",
+      "MMP4321-003v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.03676039999118075,
+    "db_seconds": 0.02938790002372116,
+    "cosine_and_sort_seconds": 0.006536599947139621,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BGM5220-002v3",
+      "TFB5131-001v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KPS5292-002v3"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.0481283999979496,
+    "db_seconds": 0.03955900005530566,
+    "cosine_and_sort_seconds": 0.0070748000289313495,
+    "queries": 1,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "BAS3323-003v3",
+      "MPM7322-001v4",
+      "KRM3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.1162002999917604,
+    "db_seconds": 0.10859120002714917,
+    "cosine_and_sort_seconds": 0.005996700027026236,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "BAS3323-003v3",
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM3323-002v4",
+      "BAS3323-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.1180132000008598,
+    "db_seconds": 0.09027520002564415,
+    "cosine_and_sort_seconds": 0.02332629996817559,
+    "queries": 4,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "MMP1324-001v4",
+      "KRM1324-002v1",
+      "MQM2141-007v2",
+      "AVA4322-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-M",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.17692900000838563,
+    "db_seconds": 0.14376710006035864,
+    "cosine_and_sort_seconds": 0.027597999898716807,
+    "queries": 4,
+    "routes_per_query": 2,
+    "selected_ids": [
+      "BAS3323-003v3",
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM3323-002v4",
+      "MMP1324-001v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-D",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.03007950005121529,
+    "db_seconds": 0.028037199983373284,
+    "cosine_and_sort_seconds": 0.0013642999692820013,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM1420-001v4",
+      "BAS3323-003v3",
+      "KRM3323-002v4"
+    ],
+    "cached_query_embeddings": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-T",
+    "repeat": 3,
+    "method_order": [
+      "O-M",
+      "B2-D",
+      "B2-T",
+      "B2-M",
+      "O-D",
+      "O-T"
+    ],
+    "seconds": 0.01842789998045191,
+    "db_seconds": 0.011460900015663356,
+    "cosine_and_sort_seconds": 0.006032200006302446,
+    "queries": 1,
+    "routes_per_query": 1,
+    "selected_ids": [
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP4321-002v4",
+      "KPS5220-003v3"
+    ],
+    "cached_query_embeddings": true
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "a5c5f85e-bbfa-4a52-8ac5-648aef5e4c79",
+    "interview_sequence": 118,
+    "speaker": "employee",
+    "interview_text": "再確認一下，我之前有說冷藏退貨的合格溫度，以及單據要保存幾年嗎？如果沒有，分別應向哪個窗口確認？"
+  },
+  "consultant_reply": {
+    "source_id": "a46db70c-3ed6-4f3b-af44-785a923c11c1",
+    "interview_sequence": 119,
+    "speaker": "consultant",
+    "interview_text": "你之前**沒有提供**這兩項的具體數字：\n\n- **冷藏退貨合格溫度**：你說需查溫度紀錄，並交由**品質窗口**判定是否可再銷售；合格門檻未知，應向品質窗口確認。\n- **單據保存年限**：你說不確定，應向**財務窗口**確認；沒有自行提供保存幾年的年限。"
+  }
+}

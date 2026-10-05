@@ -1,0 +1,37 @@
+{
+  "created_utc": "2026-10-04T11:21:45.690296+00:00",
+  "revision": "employee-needs-v1-draft",
+  "scope": "synthetic_needs_and_rubric_preparation_only",
+  "status": "discussion_draft_not_executed",
+  "final_k_for_future_comparison": 5,
+  "new_retrievals": 0,
+  "new_model_calls": 0,
+  "inputs": {
+    "docs/experiments/2026-10-04-representative-occupation-top5/cases-v1.json": {
+      "sha256": "ac7a871de75bb1c49ae36d2445bc4fa87c0ac386b78e8cb6f74f663e089573fb",
+      "bytes": 7353
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/cases-v1.md": {
+      "sha256": "6fc624bd1ede12c1e54b7a53f17ecd6f16c5327fcc7731b9b46342ddad575acd",
+      "bytes": 6824
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/README.md": {
+      "sha256": "bbbfc08ee31185e333b433e4f97c58de9ea158e0b8b113896d0fdcfe36ea71f8",
+      "bytes": 6101
+    },
+    "docs/specs/2026-10-04-representative-occupation-scoring-protocol.md": {
+      "sha256": "d76d6a13dbf12f11ae9323e2e64521709b48996b3efc77c2e9fd3006d2184b87",
+      "bytes": 6838
+    }
+  },
+  "preparation_verification": {
+    "cases": 5,
+    "reading_view_exact_match": true,
+    "checked_documents": 10,
+    "local_links_valid": 154,
+    "protected_inputs_unchanged": 8,
+    "sealed_artifacts_unchanged": 474
+  },
+  "verification_note": "首輪核對器把封存清單的相對路徑誤解為 repo 根目錄，誤查根目錄 .gitignore；修正為各實驗目錄後核對通過，沒有修改封存原件。",
+  "next_revision_policy": "討論後若修改員工需求或判準，保留此草稿快照並另存版本；本檔不是模型或檢索執行紀錄。"
+}

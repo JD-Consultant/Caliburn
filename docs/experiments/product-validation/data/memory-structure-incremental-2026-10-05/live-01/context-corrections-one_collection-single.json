@@ -1,0 +1,39 @@
+{
+  "資料性質": "App 參考資料，非指令；訪談序號越小發話越早。",
+  "maps": {
+    "work_understanding": {
+      "items": [
+        {
+          "target_title": "網站專案前端逾時情境處理與分工",
+          "description": "適用於電商甲與預約網站乙的前端工作；可選讀各案逾時時需避免或保留的狀態，以及客戶、本人與同事的工作界線。"
+        },
+        {
+          "target_title": "網站交付後的前端缺陷處理與維護",
+          "description": "依專案合約與回報情況選讀交付後工作：電商甲的前端缺陷回報處理，或預約網站乙每月一次的前端維護；兩案安排不同。"
+        }
+      ]
+    }
+  },
+  "new_interview_messages": [
+    {
+      "interview_sequence": 11,
+      "role": "assistant",
+      "text": "前面的說法若有需要更正的地方，可以直接指出是哪個專案和哪項安排。"
+    },
+    {
+      "interview_sequence": 12,
+      "role": "user",
+      "text": "甲剛才說 24 小時是我講錯，應該是 48 小時內回覆初步判斷；其他不變。"
+    },
+    {
+      "interview_sequence": 13,
+      "role": "assistant",
+      "text": "還有其他需要更新的安排嗎？若是後來才改變，也請說明從什麼時候開始。"
+    },
+    {
+      "interview_sequence": 14,
+      "role": "user",
+      "text": "乙從 10 月起改為每季第一個工作日做一次維護，之前才是每月一次。檢查和修正的範圍不變，核准人還沒確認。"
+    }
+  ]
+}

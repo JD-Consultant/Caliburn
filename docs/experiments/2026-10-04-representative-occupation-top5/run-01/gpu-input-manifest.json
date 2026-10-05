@@ -1,0 +1,14 @@
+{
+  "inputs": {
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/execution-manifest-02.json": {
+      "sha256": "78eb59203a2e507039340f9618a56e1721287b675bd5294ba44c80f1e1c1bc9e"
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/query-vectors.json": {
+      "sha256": "ceff38938e5b997e70ec13693bd337c2cd6a5efd1d7d30380434b27c58d4c663"
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/dense-rankings.json": {
+      "sha256": "4aa5a0c2b795cd8a85276a9f5576b93020915fa7c3546821d777fa900f9fe736"
+    }
+  },
+  "model_sha256": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286"
+}

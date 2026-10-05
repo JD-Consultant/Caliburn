@@ -1,0 +1,16 @@
+{
+  "event_id": "e023",
+  "execution_id": "8d26f15c-38ab-4f91-a292-c08a79cc2063",
+  "employee_input": {
+    "source_id": "10fdb4db-3ab5-422e-bb5b-699d005d4a83",
+    "interview_sequence": 46,
+    "speaker": "employee",
+    "interview_text": "另外每週五16:00前，我交收貨異常週報給採購和主管；它是未結案原因、等待天數和下一個跟進事項。週報中的供應商回覆要附更新時間，沒有回覆就標未確認，不替供應商填一個預計完成日。"
+  },
+  "consultant_reply": {
+    "source_id": "2f6aa05b-1d7d-4573-93ee-daa373d270fa",
+    "interview_sequence": 47,
+    "speaker": "consultant",
+    "interview_text": "已將「收貨異常週報」獨立加入草稿：每週五 16:00 前交採購與主管，列出未結案原因、等待天數及下一跟進事項；供應商回覆附更新時間，未回覆標為未確認，不代填預計完成日。\n\n回到盤點調帳：核准的庫存調整單通常由誰簽核？這是否和月底全盤彙整表的主管簽核分開？"
+  }
+}

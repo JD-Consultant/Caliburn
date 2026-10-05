@@ -1,0 +1,36 @@
+{
+  "review_method": "逐項語意核對答覆、實際已讀正文與凍結來源；由工程助理判讀，非獨立盲評，不使用關鍵詞自動算通過。",
+  "rubric": "criteria.json 保持不變；historical.no_revert 的 JD 保存部分不在本批唯讀範圍，兩邊均不列事實分母。另觀察答覆沒有改回舊規則。",
+  "pairs": {
+    "map_present": {
+      "control": {"volume": "complete", "deadline": "complete", "cutoff_authority": "complete", "no_backdating": "complete"},
+      "navigation": {"volume": "complete", "deadline": "complete", "cutoff_authority": "complete", "no_backdating": "complete"},
+      "observation": "兩邊均讀一項理解，未重讀 map，未讀情境或原话；原反例在本次冷啟動控制組未重現。"
+    },
+    "map_absent": {
+      "control": {"volume": "complete", "deadline": "complete", "cutoff_authority": "complete", "no_backdating": "complete"},
+      "navigation": {"volume": "complete", "deadline": "complete", "cutoff_authority": "complete", "no_backdating": "complete"},
+      "observation": "控制組讀兩層 map，候選只讀理解 map；隨後兩邊均讀同一項理解，未猜標題，四項事實完整。"
+    },
+    "historical": {
+      "control": {"original": "complete", "current": "complete", "basis": "complete", "no_revert": "not_applicable_persistence"},
+      "navigation": {"original": "complete", "current": "complete", "basis": "complete", "no_revert": "not_applicable_persistence"},
+      "observation": "兩邊均讀理解、庫存報表情境與 #2/#42/#44/#48/#98 原話，保留當月末→次月首工作日及月底狀態。答覆未要求改回舊期限；沒有 JD 保存可評。"
+    },
+    "detail": {
+      "control": {"conversion": "partial", "unknown": "complete", "contact": "complete"},
+      "precision": {"conversion": "complete", "unknown": "complete", "contact": "complete"},
+      "observation": "控制答覆有一箱12件及僅限該品號，也說其他商品應交資料維護窗口確認，但沒有交代該品號此換算已由該窗口確認；非全錯。候選明說『經資料維護窗口確認的品號』。兩邊均不猜保存年數，指向財務，且無新增讀取。候選多補共享資料夾與檔名規則，來源確有提供，但不是本題必要內容。"
+    },
+    "narrow": {
+      "control": {"volume": "complete"},
+      "precision": {"volume": "complete"},
+      "observation": "兩邊只回答每日約15–20張進貨單，無新增讀取，沒有捏造核准者或展開其他工作。"
+    }
+  },
+  "totals": {
+    "control": {"complete": 14, "partial": 1, "omitted": 0, "incorrect": 0, "applicable_checks": 15},
+    "candidate_by_case": {"complete": 15, "partial": 0, "omitted": 0, "incorrect": 0, "applicable_checks": 15}
+  },
+  "interpretation": "每個情境只做一對，兩項候選並未合併測試。這是開發題的局部支持，不是統計顯著性、未見題泛化或完整JD/長訪談品質驗收。"
+}

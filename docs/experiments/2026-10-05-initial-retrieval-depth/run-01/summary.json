@@ -1,0 +1,182 @@
+[
+  {
+    "variant": "O",
+    "depth_each_route": 20,
+    "cases": 8,
+    "query_count": 8,
+    "employee_parent_count_sum": 247,
+    "rerank_pair_workload": 247,
+    "known_grade3": {
+      "retained": 12,
+      "known": 12,
+      "unassessed_case_count": 1
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 10,
+      "known": 10,
+      "unassessed_case_count": 1
+    },
+    "known_work_facets": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    }
+  },
+  {
+    "variant": "O",
+    "depth_each_route": 40,
+    "cases": 8,
+    "query_count": 8,
+    "employee_parent_count_sum": 480,
+    "rerank_pair_workload": 480,
+    "known_grade3": {
+      "retained": 12,
+      "known": 12,
+      "unassessed_case_count": 1
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 10,
+      "known": 10,
+      "unassessed_case_count": 1
+    },
+    "known_work_facets": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    }
+  },
+  {
+    "variant": "O",
+    "depth_each_route": 80,
+    "cases": 8,
+    "query_count": 8,
+    "employee_parent_count_sum": 926,
+    "rerank_pair_workload": 926,
+    "known_grade3": {
+      "retained": 12,
+      "known": 12,
+      "unassessed_case_count": 1
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 10,
+      "known": 10,
+      "unassessed_case_count": 1
+    },
+    "known_work_facets": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    }
+  },
+  {
+    "variant": "B2",
+    "depth_each_route": 20,
+    "cases": 8,
+    "query_count": 12,
+    "employee_parent_count_sum": 324,
+    "rerank_pair_workload": 381,
+    "known_grade3": {
+      "retained": 11,
+      "known": 12,
+      "unassessed_case_count": 1
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 9,
+      "known": 10,
+      "unassessed_case_count": 1
+    },
+    "known_work_facets": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 7,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    }
+  },
+  {
+    "variant": "B2",
+    "depth_each_route": 40,
+    "cases": 8,
+    "query_count": 12,
+    "employee_parent_count_sum": 628,
+    "rerank_pair_workload": 748,
+    "known_grade3": {
+      "retained": 12,
+      "known": 12,
+      "unassessed_case_count": 1
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 10,
+      "known": 10,
+      "unassessed_case_count": 1
+    },
+    "known_work_facets": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    }
+  },
+  {
+    "variant": "B2",
+    "depth_each_route": 80,
+    "cases": 8,
+    "query_count": 12,
+    "employee_parent_count_sum": 1166,
+    "rerank_pair_workload": 1438,
+    "known_grade3": {
+      "retained": 12,
+      "known": 12,
+      "unassessed_case_count": 1
+    },
+    "clear_grade3_sensitivity": {
+      "retained": 10,
+      "known": 10,
+      "unassessed_case_count": 1
+    },
+    "known_work_facets": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    },
+    "clear_work_facets_sensitivity": {
+      "retained": 8,
+      "known": 8,
+      "unassessed_case_count": 1,
+      "unassessed_facet_count": 1
+    }
+  }
+]

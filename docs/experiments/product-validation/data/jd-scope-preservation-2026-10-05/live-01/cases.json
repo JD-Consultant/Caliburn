@@ -1,0 +1,32 @@
+[
+  {
+    "probe_id": "post_delivery",
+    "snapshot_batch_id": "corrections",
+    "question": "請將電商甲交付後的前端缺陷處理整理成一項 JD 任務，交代員工做什麼、應在多久內做到哪個程度，以及工作範圍。附上本次採用的來源定位。"
+  },
+  {
+    "probe_id": "maintenance",
+    "snapshot_batch_id": "corrections",
+    "question": "請將預約乙的例行維護整理成一項 JD 任務，保留適用時期、頻率、工作範圍與變更核准責任；若仍有必要確認的資訊，另外指出。附上本次採用的來源定位。"
+  },
+  {
+    "probe_id": "infrequent_work",
+    "snapshot_batch_id": "extension",
+    "question": "除了逾時、缺陷修正與例行維護，員工還有什麼低頻工作？請整理成一項 JD 任務，說明本人與客戶的分工。附上本次採用的來源定位。"
+  },
+  {
+    "probe_id": "resolved_approval",
+    "snapshot_batch_id": "extension",
+    "question": "請依目前資訊重新整理預約乙的維護與變更處理工作，交代週期、員工行動、核准範圍與誰決定；仍未確認的部分才另列。附上本次採用的來源定位。"
+  },
+  {
+    "probe_id": "deadline_only",
+    "snapshot_batch_id": "corrections",
+    "question": "這次只補電商甲 JD 的『初判回覆期限』一句，不重寫整項工作。請交代期限從何時起算、回覆到哪個程度；附上採用的來源。沿用 task.title 與 task.work 放這個片段即可。"
+  },
+  {
+    "probe_id": "approver_only",
+    "snapshot_batch_id": "extension",
+    "question": "這次只補預約乙 JD 的『超約需求核准』片段，不重寫維護任務。請交代哪種需求要核准、員工做哪一段、最後由誰決定；附上採用的來源。沿用 task.title 與 task.work 放這個片段即可。"
+  }
+]

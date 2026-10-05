@@ -1,0 +1,156 @@
+{
+  "arm": "raw_memory",
+  "repeat": 1,
+  "case_id": "corrections",
+  "cell_id": "corrections-raw_memory-1",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+      },
+      "result_characters": 1891
+    },
+    {
+      "step": 1,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "退貨核對、狀態登錄與差異處理"
+      },
+      "result_characters": 780
+    },
+    {
+      "step": 1,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "庫存報表"
+      },
+      "result_characters": 490
+    },
+    {
+      "step": 1,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6465
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 22728,
+        "input_tokens_details": {
+          "cache_write_tokens": 22725,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1461,
+        "output_tokens_details": {
+          "reasoning_tokens": 1277
+        },
+        "total_tokens": 24189
+      },
+      "estimated_usd": "0.003571425",
+      "seconds": 19.222063399967737
+    },
+    {
+      "usage": {
+        "input_tokens": 32279,
+        "input_tokens_details": {
+          "cache_write_tokens": 9551,
+          "cached_tokens": 22725
+        },
+        "output_tokens": 2486,
+        "output_tokens_details": {
+          "reasoning_tokens": 1651
+        },
+        "total_tokens": 34765
+      },
+      "estimated_usd": "0.002664425",
+      "seconds": 23.505895300011616
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_1.requirement_3",
+        "value": "驗收不良件數占每批實際驗收件數超過 5% 時，提報倉儲主管；剛好 5% 不依此比例規則提報。",
+        "references": [
+          {
+            "kind": "interview",
+            "interview_sequence": 8,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 92,
+            "target_title": null
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.description",
+        "value": "每週一因週末累積，08:50 開始核對週末累積收到的退貨；週二至週五 08:35 開始核對前一日收到的退貨。使用獨立的退貨清單，比對客退單、品號、批號及實收數量。常溫商品是否可再銷售由倉庫同事判定；冷藏商品另核對溫度紀錄，交品質窗口判定是否可再銷售。本人依確認結果登錄可售、待檢或報廢待核准狀態，並於每個工作日 09:10 前將退貨差異表交給客服窗口。退貨數量不符時，提供照片及差異紀錄請客服確認；主管同意調帳後，才依核准資料更新 ERP 並保留核准單號。此核對時點與交表時限僅適用於退貨，不是進貨驗收時限。",
+        "references": [
+          {
+            "kind": "interview",
+            "interview_sequence": 14,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 16,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 94,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 96,
+            "target_title": null
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.requirement_1",
+        "value": "週一 08:50 開始核對週末累積的退貨；週二至週五 08:35 開始核對前一日退貨。每個工作日仍須於 09:10 前將退貨差異表交給客服窗口；此時限不套用於進貨驗收。",
+        "references": [
+          {
+            "kind": "interview",
+            "interview_sequence": 94,
+            "target_title": null
+          }
+        ]
+      },
+      {
+        "target_ref": "task_6.description",
+        "value": "每月底整理庫存帳齡表，以月底庫存狀態及已確認的入庫日期為依據，核對批號與調撥資料，分列可售、待檢、報廢待核准庫存；於次月第一個工作日交給主管，以查看滯留與庫存狀態。此表不同於早上交客服的退貨差異表及週五交採購與主管的收貨異常週報。",
+        "references": [
+          {
+            "kind": "interview",
+            "interview_sequence": 42,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 44,
+            "target_title": null
+          },
+          {
+            "kind": "interview",
+            "interview_sequence": 98,
+            "target_title": null
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "已核對進貨驗收、退貨核對及庫存帳齡表：修正驗收不良門檻為每批實際驗收件數的比例超過 5% 才提報；更正退貨週一／週二至週五核對時間及 09:10 交表期限，並區分常溫與冷藏退貨的判定責任；將帳齡表交付時間改為次月第一個工作日。其餘已正確欄位未重寫，無待釐清問題。"
+  },
+  "seconds": 65.09490190003999
+}

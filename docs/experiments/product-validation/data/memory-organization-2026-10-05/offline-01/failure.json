@@ -1,0 +1,11 @@
+{
+  "type": "ValueError",
+  "cell": null,
+  "location": [
+    {
+      "file": "study.py",
+      "line": 431,
+      "function": "run"
+    }
+  ]
+}

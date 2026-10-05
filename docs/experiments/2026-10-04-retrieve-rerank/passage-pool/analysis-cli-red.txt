@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieve-rerank\passage-pool\analyze.py", line 7, in <module>
+    from evaluate import coverage, pipeline, select
+ModuleNotFoundError: No module named 'evaluate'

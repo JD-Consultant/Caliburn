@@ -1,0 +1,43 @@
+{
+  "prior_seals_before": [
+    {
+      "path": "docs\\experiments\\2026-10-05-memory-public-unit-retrieval\\run-01",
+      "files_checked": 551,
+      "mismatches": 0
+    },
+    {
+      "path": "docs\\experiments\\2026-10-05-rerank-union-candidate-replay\\run-01",
+      "files_checked": 30,
+      "mismatches": 0
+    },
+    {
+      "path": "docs\\experiments\\2026-10-05-initial-retrieval-depth\\run-01",
+      "files_checked": 32,
+      "mismatches": 0
+    }
+  ],
+  "prior_seals_after": [
+    {
+      "path": "docs\\experiments\\2026-10-05-memory-public-unit-retrieval\\run-01",
+      "files_checked": 551,
+      "mismatches": 0
+    },
+    {
+      "path": "docs\\experiments\\2026-10-05-rerank-union-candidate-replay\\run-01",
+      "files_checked": 30,
+      "mismatches": 0
+    },
+    {
+      "path": "docs\\experiments\\2026-10-05-initial-retrieval-depth\\run-01",
+      "files_checked": 32,
+      "mismatches": 0
+    }
+  ],
+  "source_bound_target_count": 12,
+  "unique_reused_judgments": 158,
+  "baseline_groups_reproduced": 8,
+  "policies": 69,
+  "new_provider_calls": 0,
+  "new_embedding_or_rerank_calls": 0,
+  "external_cost_usd": 0
+}

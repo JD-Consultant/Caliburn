@@ -1,0 +1,7 @@
+{
+  "authorization_note": "2026-10-05 user explicitly approved US$0.25 /45 minutes; counted within original cumulative US$2; prior occupied US$1.322929315; stop at bounds without rerun.",
+  "batch_usd": "0.25",
+  "seconds": 2700,
+  "prior_cumulative_occupied_usd": "1.322929315",
+  "started_at": "2026-10-05T10:51:39.625715+00:00"
+}

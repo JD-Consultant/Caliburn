@@ -1,0 +1,30 @@
+{
+  "job_id": "C04",
+  "phase": "calibrate-02",
+  "judgment": {
+    "grade": 2,
+    "uncertain": false,
+    "main_work": [
+      "冷氣保養"
+    ],
+    "reason": "公版具體涵蓋冷氣定期保養中的清潔、檢查濾網及耗材與保養紀錄，對員工持續負責的保養工作有一組實質支持，屬部分代表；但未涵蓋其安裝、故障檢修、更換零件及試運轉等工作。",
+    "evidence": [
+      {
+        "employee_quote": "我主要到現場安裝、檢修和保養冷氣",
+        "reference_quote": "依既定程序清潔冷氣、檢查濾網及耗材，完成定期保養紀錄。"
+      },
+      {
+        "employee_quote": "清潔及試運轉都是我做。",
+        "reference_quote": "依既定程序清潔冷氣"
+      }
+    ],
+    "limitations": [
+      "公版只呈現定期保養的部分工作，未描述冷氣安裝、定位接線配管、故障量測、零件更換或試運轉。"
+    ]
+  },
+  "seconds": 7.397277600015514,
+  "employee_sha256": "c047efe6f29e215ba6418a1d7b6622d2efe8e58884f358d3ed5b6cb8a936594c",
+  "document_sha256": "1b381276cf3a0089fcdc282ef56fe283da42328cf40953e9447688238412edab",
+  "expected_grade": 2,
+  "anchor_matched": true
+}

@@ -1,0 +1,25 @@
+{
+  "job_id": "J036",
+  "phase": "grade",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版主要涵蓋咖啡店顧客服務、飲品製作及吧檯管理。設備維護僅有檢查、維護基本營業器具的局部相似，未能代表員工主要負責的冷氣設備現場安裝、故障檢修、試運轉及定期保養。",
+    "evidence": [
+      {
+        "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+        "reference_quote": "定期檢查與維護基本營業器具,並填寫設備保養紀錄表。"
+      }
+    ],
+    "limitations": [
+      "公版未描述冷氣設備安裝、配管接線、抽真空、測漏或試運轉。",
+      "公版設備維護指向基本營業器具，沒有支持冷氣故障判斷、零件修復或更換等主要責任。"
+    ]
+  },
+  "seconds": 6.1442040000110865,
+  "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+  "document_sha256": "aefebaa64ad9dde113b78514e8c7727d5e50d5d11eeb8263618a1a63f5bf44be",
+  "case_id": "F04",
+  "document_id": "TFB5131-002v3"
+}

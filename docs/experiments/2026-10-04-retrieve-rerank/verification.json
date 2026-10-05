@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "ranking_queries": 32,
+  "pair_scores": 6400,
+  "parameter_rows": 15360,
+  "topic_labels": 64,
+  "database_exact_queries": 640,
+  "warm_timing_samples": 20,
+  "full805_cosine_rankings_recomputed": 32,
+  "database_saved_ids_recomputed": 640,
+  "database_native_score_error_scope": "live assertion and saved statistics only; individual native scores were not saved",
+  "scope": "offline recomputation of saved local GPU and Qdrant results; not employee expert validation",
+  "artifact_seal": "passed",
+  "verified_utc": "2026-10-04T05:10:19.449745+00:00"
+}

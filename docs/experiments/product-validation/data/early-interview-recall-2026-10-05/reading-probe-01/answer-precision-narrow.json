@@ -1,0 +1,15 @@
+{
+  "arm": "precision",
+  "case_id": "narrow",
+  "answer": "每日約處理 **15–20 張進貨單**。",
+  "reads": [],
+  "steps": 1,
+  "usage": {
+    "input_tokens": 11094,
+    "output_tokens": 83,
+    "reasoning_tokens": 63,
+    "cached_input_tokens": 3558,
+    "generation_calls": 1
+  },
+  "estimated_usd": "0.001119005"
+}

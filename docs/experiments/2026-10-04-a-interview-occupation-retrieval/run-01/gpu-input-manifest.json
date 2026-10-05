@@ -1,0 +1,14 @@
+{
+  "inputs": {
+    "docs/experiments/2026-10-04-a-interview-occupation-retrieval/run-01/execution-manifest.json": {
+      "sha256": "27a14dcf92be256fbbf4a3df6acd603f4dc1e040c91d691ca75d5a9a7b6fc056"
+    },
+    "docs/experiments/2026-10-04-a-interview-occupation-retrieval/run-01/query-vectors.json": {
+      "sha256": "2746e52862c56fcdc25b0defa4d58a14579f3996df2d13a0ea967ef1423a4ac4"
+    },
+    "docs/experiments/2026-10-04-a-interview-occupation-retrieval/run-01/dense-rankings.json": {
+      "sha256": "d2d044e8b8a4fa74e500960bc52f2066e211a99c8544ba3774b7ec386ef0aad5"
+    }
+  },
+  "model_sha256": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286"
+}

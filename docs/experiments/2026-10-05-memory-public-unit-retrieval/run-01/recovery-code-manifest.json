@@ -1,0 +1,148 @@
+{
+  "inputs": {
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/recover_quotes.py": {
+      "sha256": "229407453a7108924f35e0c81210974ba44ea0939a18cc1b45b052583a7386f0"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/grading-summary.json": {
+      "sha256": "b1c3a51263b5efeb7f0065d3a4595826f658f9e6993dfe7f18dc6cf35a07617d"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judgments.json": {
+      "sha256": "d6cf5e48fd83440c0e1a958e49ed12dfd9888aee8ad779ffc001471b3d9b2210"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-001-response.json": {
+      "sha256": "2b54ead9c936832dbf206848ab887d230a0c122b242f44d3fa683141ec8efc4d"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-002-response.json": {
+      "sha256": "f1f764861175a9ffe06464cab8edea0686627edb7b91a2d42e3fff3178fed9b2"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-003-response.json": {
+      "sha256": "5e1c8685aa7abfea34ebedc04884974683d6b50eb64444bb1eefae3b47284b71"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-004-response.json": {
+      "sha256": "8c791108454e381b23cc409c9b573bf24067d033fb214cd78ae1f4b636983c21"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-005-response.json": {
+      "sha256": "396b51ad79d48d98c84bc87de5cc10ebe893ae909dc2e3398d6d5ceebcdf20bd"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-006-response.json": {
+      "sha256": "7d1b415f2bfb6d6f055c173ce90ff3a5c6f3024e7dc700da00f220ae53c46cf6"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-007-response.json": {
+      "sha256": "fccc1303d1bbfd306865c2d219f222c32ddf98a6d283a5fa801aa2443d7ba357"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-008-response.json": {
+      "sha256": "85091ba41e3f6a21bc29f93f796bd0d15252fafdc3c430ceac8a472f462b1ca3"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-009-response.json": {
+      "sha256": "1ebf0edd41bc4faceb1a5b0a733eae6b0791ba3845990350db01aac1baeb4f00"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-010-response.json": {
+      "sha256": "27b9edc9cd0a0a32a56c6e013e3073ae591e645bb6099e0be8d6b80dd9b68515"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-011-response.json": {
+      "sha256": "3e5e376273ebd779494c62aa9a4d47b76fd559cd68d73619ba72819acf3fd692"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-012-response.json": {
+      "sha256": "ba8642d813174ead105041d931ea7066a6df1cb3b53d9a95e04f60e091324c5b"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-013-response.json": {
+      "sha256": "6fc21e55dfb056b5bfdb700406b1aaf0c1ae1c4a413265ced787bf3bb57f62ba"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-014-response.json": {
+      "sha256": "63f184e90e64f89123403419913010e7dd5cb3df5da53b29acdd63a08bec2bc7"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-015-response.json": {
+      "sha256": "afcdab1c6e7275f9927295764434cecd390a04f0724fd64e5b02ef50a74a8548"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-016-response.json": {
+      "sha256": "a23a0a8d197e3b9c73919d5f2eeafe6d4b532dc6ff183a1ef95f5c64424a4309"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-017-response.json": {
+      "sha256": "ea3201d42c38d0d75c757964254a0f285ff46b29369a7c646eb7cd46d7934634"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-018-response.json": {
+      "sha256": "cadd3939f605b94edb71f92e448391e8146a7d2c2cdee6b249627cfa59515906"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-019-response.json": {
+      "sha256": "e1223a46dcd88f8727a2a3ea22c193fe114e7f308f61fab5863a990d3ba231d7"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-020-response.json": {
+      "sha256": "175ccd135d07f4c0485e6481a4297d9cf0e2127a5b8b7cec9a486d20f1ead407"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-021-response.json": {
+      "sha256": "2f93245402a0ed3f5531125abf6711a51692aa71ce283a744b92e44494b00036"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-022-response.json": {
+      "sha256": "96f3b911bf61ee5b34a6f3116e9f8bb186f09105a2cd875b1e6380df505c34b9"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-023-response.json": {
+      "sha256": "b5c1bc95078eff500653b27040d2e503fcf98cc59597b6c8d98338f5bc970513"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-024-response.json": {
+      "sha256": "85e9f35cba1bed02d58e45fef80d6e189c7b9d93352e2c1affa967d8adccc97c"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-025-response.json": {
+      "sha256": "5731b7b983e12e34412358273cd566eef1237792bb0819c304d478956b847c96"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-026-response.json": {
+      "sha256": "11d3d50170d0e0d40e201ce66587a4850735581d15348069ebfcc2c252306146"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-027-response.json": {
+      "sha256": "8ffcf7d3607680c1d137e951c9e401fa3f05098b9ef09c485f511b3e7989d424"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-028-response.json": {
+      "sha256": "eb65a61aaedcb51f02adeee85174ebe2e11cfcf8b380cd7b59bd5de949c9ff35"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-029-response.json": {
+      "sha256": "92589dea99980b9a3280308c707d095eb68ef75fab419613d0f72a74e43b56b3"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-030-response.json": {
+      "sha256": "a583503a58a7ae4f250e1cf58d883a9fe962c572c4c621926e724d51dcf8d801"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-031-response.json": {
+      "sha256": "f4a9350a0c13dfcff8604f0f76701d1031608c69c9c3e3071b7ba02d4fe04f51"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-032-response.json": {
+      "sha256": "ad20a719e93efa341e97aabab2c0733400eefb35d4b00b14239d9ccca8ad80ea"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-033-response.json": {
+      "sha256": "42080142e6fa54e5dafb6d1d4f1be89c4981da5bbbe8d2139a787f3f38eaa17a"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-034-response.json": {
+      "sha256": "7196fbe2811cb33082f1095cb215369630879d6a8d987e549a7b5981df98bece"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-035-response.json": {
+      "sha256": "5e4b9ac8ae638df9192d3d6f79943678012094ce2cd603a7c001aea347ac055f"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-036-response.json": {
+      "sha256": "0ac08461c21f5c6277c7c4e3496776cf9fe21bacac1bfcbef13a71a3b7ad8d0c"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-037-response.json": {
+      "sha256": "36c1d12e2382d6ab63f32d34c3d60339c9ca40026d09d3994700f436745f08d2"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-038-response.json": {
+      "sha256": "b71f8fc785ab42f8c1556541d6daed892a7b9b167a4da563e783a05f1a4fa553"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-039-response.json": {
+      "sha256": "92d9439a47e030ff3d566a64cd8a9cac6ddc1add27754d79e15f90a825fefec4"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-040-response.json": {
+      "sha256": "6d80ca742e02e9660f58a2d014e09285e44af7c02441c21bad0b480359e16806"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-041-response.json": {
+      "sha256": "918bc889a4f9c54a465fad3a2dd4174cbb5ca828250f7ff8b7881b30871d5bd3"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-042-response.json": {
+      "sha256": "ed1562216e16a026773ee285939622aeb4e78f3cb68406a51b514f42bb0d4e82"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-043-response.json": {
+      "sha256": "1f06c6dbefad7e145eec868a19f12981b65007f4cfad0b022d68b5304c4e4b82"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-044-response.json": {
+      "sha256": "6c7de536c8ed3a79dda08e17d43dbeb0d4f9caed9338b73df8b272130f79bb5e"
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/judge-trials/formal-01-new-045-response.json": {
+      "sha256": "357c266c84aa039499ea70ec2337b35b7e82d79e56abb020e8f443d8516a195c"
+    }
+  }
+}

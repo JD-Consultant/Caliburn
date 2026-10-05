@@ -1,0 +1,42 @@
+{
+  "started_utc": "2026-10-04T07:03:36.758446+00:00",
+  "scope": "offline_structure_only_no_new_rankings",
+  "variant": "original_messages",
+  "method": "quota_rerank",
+  "n": 20,
+  "k": 5,
+  "inputs": {
+    "docs/experiments/2026-10-04-occupation-retrieval/corpus.json": {
+      "sha256": "3892cd37e209976a32d0c9fccf2a35c127091179a0b62eda1604647eddd64c65",
+      "bytes": 5746841
+    },
+    "docs/experiments/2026-10-04-retrieval-input-boundaries/cases-observed.json": {
+      "sha256": "026b1759ee909e25ec28581a05667b028ed6e94a9b280e12137b5e8236bd960b",
+      "bytes": 195785
+    },
+    "docs/experiments/2026-10-04-retrieval-input-boundaries/inputs.json": {
+      "sha256": "5427335a6f1fadf96bfbc8b9813b6d9b27940079c227c7d13d2e5e3b3b70dd3c",
+      "bytes": 149175
+    },
+    "docs/experiments/2026-10-04-retrieval-input-boundaries/metrics.jsonl": {
+      "sha256": "671cfa3425468d4763d59dd00f5fc29b4d63dd6da3ea875da5c3f147e5aeba00",
+      "bytes": 382600
+    },
+    "docs/experiments/2026-10-04-retrieval-reference-views/prepare.py": {
+      "sha256": "1427d0ba860fbdd05ebc7f50d9d1c47af7032964782d6921cb9a640d9a47be9d",
+      "bytes": 6070
+    },
+    "docs/experiments/2026-10-04-retrieval-reference-views/verify.py": {
+      "sha256": "6f69b475a26b338cfb4d0110613149887d75b008aeddebddb1ea17618153b8be",
+      "bytes": 13187
+    },
+    "docs/experiments/2026-10-04-retrieval-reference-views/protocol.md": {
+      "sha256": "f730d1516680907fdac5805c08dbc27328b72d0120ac49276d364634bbca76cf",
+      "bytes": 2157
+    },
+    "docs/specs/2026-10-04-public-reference-retrieval-design.md": {
+      "sha256": "ac71dc5ff54cb9193de9cabdef0899fd072de6b26c7907ca934af161ebc3935f",
+      "bytes": 10877
+    }
+  }
+}

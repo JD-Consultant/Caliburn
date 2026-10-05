@@ -1,0 +1,16 @@
+{
+  "event_id": "e051",
+  "execution_id": "05d634d2-fd4c-4a39-b406-67df969ff09b",
+  "employee_input": {
+    "source_id": "91e7c347-3e9e-49bb-abde-51c1c9922d49",
+    "interview_sequence": 102,
+    "speaker": "employee",
+    "interview_text": "召回通知有時只寫一部分批號，若另一批同商品沒有被列，我先查證並向品質窗口確認范围，不直接把全部批號列召回，也不自行认定未列的那批安全。資訊不夠時先保留待確認。"
+  },
+  "consultant_reply": {
+    "source_id": "fb8b4265-843f-4290-ba18-5a1823c4d9cf",
+    "interview_sequence": 103,
+    "speaker": "consultant",
+    "interview_text": "已補入產品召回任務：若通知只列部分批號，您會先向品質窗口核實範圍；未確認前保留待確認，不自行把其他批號列入召回，也不判定它們安全。\n\n若品質窗口暫時未能確認範圍，您會把待確認批號交由誰跟進或回報？"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "file": "README.md",
+  "before": "新U的前五與既有O-T-R相同，不能說比任務單路更好。",
+  "after": "新U與既有O-T-R同樣把網站系統設計人員排第1，但完整前五順序不同，沒有證明比任務單路更好。",
+  "source_old_T_R_ids": [
+    "IIS3513-003v4",
+    "KRM1324-001v1",
+    "KPS2434-001v2",
+    "KPS2434-002v2",
+    "KPS2434-004v2"
+  ],
+  "source_new_U_R_ids": [
+    "IIS3513-003v4",
+    "IIS3513-008v3",
+    "KRM1324-001v1",
+    "IIS3513-002v4",
+    "KPS2434-001v2"
+  ],
+  "cause": "report claim exceeded independently checked result; top representative shared, entire top5 not equal",
+  "scores_judgments_protocol_changed": false,
+  "original_report_code_preserved": true,
+  "readme_before_sha256": "69558bb04958564f1ec1fc011d39c3720bb22ab9753918e83ff3a6ca9e1edaaf"
+}

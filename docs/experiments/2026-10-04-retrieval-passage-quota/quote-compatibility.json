@@ -1,0 +1,39 @@
+{
+  "frozen_cases_sha256": "86e3a42214438365972e255f292f478783797e3eedad5365ad71f346c46fbda3",
+  "legacy_cases": [
+    {
+      "case_id": "E02",
+      "topic_id": "E02-T03",
+      "original_anchor_quote": "我在金屬加工廠操作數控車床，拿到圖面後確認材料尺寸、加工公差和批量，選擇刀具、夾頭與夾持方式。我會讀既有程式，在機台上模擬確認刀路、工件與刀具不會干涉，再試切第一件；不是只把料放進去按開始。",
+      "employee_message_indices": [
+        1,
+        2
+      ],
+      "full_context_quote": "我在金屬加工廠操作數控車床，拿到圖面後確認材料尺寸、加工公差和批量，選擇刀具、夾頭與夾持方式。我會讀既有程式，在機台上模擬確認刀路、工件與刀具不會干涉，再試切第一件；不是只把料放進去按開始。\n第一件用外徑千分尺和內徑量具測量，依結果調刀具補償。合格後才繼續批次生產；中途依檢驗表量測尺寸、看表面與刀具磨耗，偏差就停機調整或換刀，再驗證。尺寸超過我能修正的範圍會通知領班，不把不合格件混入完成品。",
+      "note": "Legacy v4 uses one anchor quote plus context indices; scoring labels/source original untouched."
+    },
+    {
+      "case_id": "E03",
+      "topic_id": "E03-T02",
+      "original_anchor_quote": "我在烘焙工坊依每天訂單做麵包和少量西點，核對庫存後領取麵粉、奶油與其他材料，依核准配方秤重。我自己操作攪拌機，依麵糰狀態調整攪拌時間，分割、滾圓、整形，管理發酵溫濕度。",
+      "employee_message_indices": [
+        1,
+        2
+      ],
+      "full_context_quote": "我在烘焙工坊依每天訂單做麵包和少量西點，核對庫存後領取麵粉、奶油與其他材料，依核准配方秤重。我自己操作攪拌機，依麵糰狀態調整攪拌時間，分割、滾圓、整形，管理發酵溫濕度。\n烘烤前確認爐溫與排盤，烤的過程看上色、膨脹和中心狀態，出爐後冷卻再包裝，記錄製作數量和不良原因。收到蛋糕訂單時，我烤蛋糕體、做簡單夾餡裝飾；複雜造型交另一位同事。我會協助試做新配方，但由主管決定是否上架和售價。",
+      "note": "Legacy v4 uses one anchor quote plus context indices; scoring labels/source original untouched."
+    },
+    {
+      "case_id": "E08",
+      "topic_id": "E08-T03",
+      "original_anchor_quote": "我在寵物美容店接手已預約的犬貓，先和飼主確認清潔修剪需求，觀察皮膚、毛況和行為；發現明顯傷口或不適會先告知飼主，建議就醫，不把美容當治療。我依動物體型和毛質選工具、清潔用品，梳理打結處，洗澡沖淨並吹乾。",
+      "employee_message_indices": [
+        1,
+        2
+      ],
+      "full_context_quote": "我在寵物美容店接手已預約的犬貓，先和飼主確認清潔修剪需求，觀察皮膚、毛況和行為；發現明顯傷口或不適會先告知飼主，建議就醫，不把美容當治療。我依動物體型和毛質選工具、清潔用品，梳理打結處，洗澡沖淨並吹乾。\n我自己修剪指甲、清潔耳部表面，依約定造型剪毛或用電剪，操作時安撫、固定動物，留意緊張反應避免受傷。超出能安全控制的情況會停止、聯絡飼主或負責人，不硬做。完成後檢查毛髮和皮膚、整理前後紀錄，再向飼主說明狀況和居家清潔提醒。",
+      "note": "Legacy v4 uses one anchor quote plus context indices; scoring labels/source original untouched."
+    }
+  ],
+  "scope": "Only known old development format; new H01 joined quote remains required."
+}

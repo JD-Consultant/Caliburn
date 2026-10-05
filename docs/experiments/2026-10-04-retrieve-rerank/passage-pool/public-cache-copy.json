@@ -1,0 +1,26 @@
+[
+  {
+    "name": "config.json",
+    "blob": "9f62673cb00ec41dcec8947b9ed16f6f2eb23ba2"
+  },
+  {
+    "name": "model.safetensors",
+    "blob": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286"
+  },
+  {
+    "name": "sentencepiece.bpe.model",
+    "blob": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+  },
+  {
+    "name": "special_tokens_map.json",
+    "blob": "b1879d702821e753ffe4245048eee415d54a9385"
+  },
+  {
+    "name": "tokenizer.json",
+    "blob": "69564b696052886ed0ac63fa393e928384e0f8caada38c1f4864a9bfbf379c15"
+  },
+  {
+    "name": "tokenizer_config.json",
+    "blob": "328a00a9a560aadcf2a3064f917517359eb3cc26"
+  }
+]

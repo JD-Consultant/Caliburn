@@ -1,0 +1,4296 @@
+[
+  {
+    "job_id": "J001",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版的品質故障排除與員工追查訂單異常，都涉及找出問題原因並處理，但這只是通用的局部動作；公版核心責任是產品、製程與品管管理，不能代表員工持續負責的瀏覽器畫面或訂單 API、權限、商業規則及資料存取工作。",
+      "evidence": [
+        {
+          "employee_quote": "上線後若訂單異常，也由我追查程式和資料原因。",
+          "reference_quote": "品質故障排除，針對錯誤找出問題點，並提供解決方案。"
+        },
+        {
+          "employee_quote": "我主要負責公司的線上訂單系統。",
+          "reference_quote": "負責品質管制，使新產品能符合品質標準及穩定生產。"
+        }
+      ],
+      "limitations": [
+        "員工的瀏覽器畫面、互動與操作檢查開發維護，公版未有實質代表。",
+        "員工的訂單 API、權限、商業規則及資料存取開發維護，公版未有實質代表；公版所述品質管制與製程、物料及品管設備管理，工作對象和責任範圍不同。"
+      ]
+    },
+    "seconds": 6.430072800023481,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "5ce3c826528a6addac5d96fa269e577a21e9ad4b5d253f9a3efc5ab6a0b1da39",
+    "case_id": "F01",
+    "document_id": "MQM1322-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J002",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "reason": "公版對排版設計、圖文處理、印前檢查與印刷輸出有實質且持續的工作對應，可代表員工主要工作中偏向印刷品製作與交付的一部分；但其核心更集中於印前及製版流程，未涵蓋員工跨社群、網站與印刷媒體的整體視覺設計工作，因此屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我會整理要呈現的資訊，做版面、字體、色彩和圖片處理，提供初稿，再依回饋修改",
+          "reference_quote": "運用視覺設計相關知識,並應用繪圖軟體進行排版設計與印前規劃。"
+        },
+        {
+          "employee_quote": "我會確認不同尺寸的內容沒有被裁掉，核對印刷的解析度、出血和色彩設定，交付可使用的檔案",
+          "reference_quote": "依印前檢查作業流程,進行各步驟檢查作業,確認顏色、尺寸、圖文樣式、版面等均符合排版設計與印前設計。"
+        }
+      ],
+      "limitations": [
+        "公版偏重印前排版、打樣、製版及印刷輸出，不能充分代表社群圖片與網站橫幅等跨媒體視覺素材的製作。",
+        "公版包含相機拍攝、設備準備及製版等工作，員工明確表示不負責拍攝；這些內容不應視為其工作責任。"
+      ]
+    },
+    "seconds": 10.17531359998975,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "19e23ed4367604118549db83e6da88af070147de156175c0a86515f311235ee6",
+    "case_id": "F05",
+    "document_id": "MPM7322-006v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J003",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版對定期保養、檢查與更換零組件及維修後測試有具體工作描述，可部分支持員工主要工作中的定期保養與部分檢修工作。但公版對象是機車，且故障檢修定位為協助技術人員；未涵蓋冷氣現場安裝及員工自行判斷、修復與試運轉的完整責任，因此只能部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "依定期保養紀錄或手冊規範,執行定期保養工作,並完成紀錄表。"
+        },
+        {
+          "employee_quote": "更換或修復有問題的零件，完成後再測試",
+          "reference_quote": "更換各系統相關構件/零組件。"
+        },
+        {
+          "employee_quote": "完成後再測試並把處理情形寫在工單上。",
+          "reference_quote": "協助完成維修後測試作業。"
+        }
+      ],
+      "limitations": [
+        "公版的工作對象為機車，並非冷氣設備。",
+        "公版未描述冷氣設備的現場安裝、配管、接線、抽真空、測漏及試運轉。",
+        "公版將故障維修和維修後測試描述為協助技術人員；員工則依派工自行處理現場檢修工作。"
+      ]
+    },
+    "seconds": 11.997740899969358,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "53e579030008b4e4e05addda299996f19fa5ea31d42434a74dc7f139ef05dae0",
+    "case_id": "F04",
+    "document_id": "MEM7231-010v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J004",
+    "phase": "grade",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是銷售與業務支援的行政後勤，包括客戶資料管理、客戶問題與訂單處理、帳款追蹤及部門行政；員工的主要工作則是會員網站前端畫面、互動、API 串接及瀏覽器品質的開發維護。兩者的工作對象、用途與責任範圍沒有有意義的對應，因此不適合代表員工的主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "我平常負責會員網站的畫面。",
+          "reference_quote": "從事協助部門主管及業務人員完成銷售或業務支援之行政後勤等工作。"
+        },
+        {
+          "employee_quote": "我會做頁面版型、互動元件、表單驗證、不同裝置的顯示調整，並串接同事提供的 API",
+          "reference_quote": "協助處理客戶問題"
+        }
+      ],
+      "limitations": [
+        "公版未描述網站畫面、互動元件、API 串接或瀏覽器品質的開發維護。",
+        "員工明確指出 API 內部邏輯、權限規則和資料庫由同事負責；伺服器維護、資料備份及排值班也不屬於其工作，不能據此建立與公版的對應。"
+      ]
+    },
+    "seconds": 4.852004199987277,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "b615d417afa5718246272de95579a2e795551caac52bdc12613f1a9937902eb6",
+    "case_id": "F02",
+    "document_id": "KPS2434-004v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J005",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是系統家具的案源開發、空間規劃與報價、簽約，以及施工監工、驗收和客戶管理；員工主要負責冷氣設備的現場安裝、故障檢修、試運轉及定期保養。兩者只有現場服務、完工驗收或保養說明等局部情境相近，公版並未描述員工主要負責的冷氣安裝與維修工作，不能代表該主要領域。",
+      "evidence": [
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "交付或解說使用與保養產品之方法。"
+        },
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件",
+          "reference_quote": "依客戶反映之問題,進行協調處理。"
+        }
+      ],
+      "limitations": [
+        "公版的保養內容是交付或解說家具產品的使用與保養方法，不是執行冷氣設備清潔、檢查或定期保養。",
+        "公版售後服務聚焦客訴協調處理，未描述冷氣故障診斷、零件修復或更換。",
+        "公版提及現場監工與驗收，但其工作重點是依規劃圖面管理家具施工與工期，不能據此視為冷氣設備現場安裝工作的代表。"
+      ]
+    },
+    "seconds": 9.03784970002016,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "d48d949dbf936db4019ad123a6976ada220d8fdd31c2f7d54ed71e1f72ed87b1",
+    "case_id": "F04",
+    "document_id": "KPS5220-002v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J006",
+    "phase": "grade",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "reason": "公版涵蓋日常應付款、原始憑證與科目核對、總帳及明細帳的定期記錄核對，以及依週期整理帳目，能實質代表員工持續負責的日常帳務與月結領域，不只是相同名詞或單一局部動作。",
+      "evidence": [
+        {
+          "employee_quote": "每天整理發票、收付款單據和費用憑證，核對訂單、金額及科目後登錄帳務",
+          "reference_quote": "確認原始記帳憑證及會計科目正確無誤。"
+        },
+        {
+          "employee_quote": "我會追蹤應收應付款",
+          "reference_quote": "辦理日常應付款項作業"
+        },
+        {
+          "employee_quote": "月底做對帳、調整分錄及帳表",
+          "reference_quote": "定期記錄並核對組織總分類帳"
+        },
+        {
+          "employee_quote": "月底做對帳、調整分錄及帳表",
+          "reference_quote": "依組織規範之日/月/季/年等不同周期規定記錄總帳及明細分類帳,並依據各項報表分類妥善存放。"
+        }
+      ],
+      "limitations": [
+        "公版另包含財務報表編製及扣繳申報等工作；員工明確表示報稅申報由主管或外部事務所負責，因此不應將這些額外職責推定為員工工作。"
+      ]
+    },
+    "seconds": 8.83521789999213,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "3e0fb759f17124e4dcc75b8fefea05a59c5744b6b865b4ea8849353dbc51c506",
+    "case_id": "F03",
+    "document_id": "FAC4311-001v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J007",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是遊戲營運、玩家回饋、產品評估與營收分析，無法代表員工主要負責的會員網站畫面、互動、API 串接及瀏覽器品質開發維護。員工測試操作並找出畫面問題，與公版提到的「解決遊戲缺陷」只有局部、概括性的關聯，未形成足以代表主要工作的責任組合。",
+      "evidence": [
+        {
+          "employee_quote": "測試瀏覽器上的操作、找出畫面問題",
+          "reference_quote": "解決遊戲缺陷"
+        },
+        {
+          "employee_quote": "我平常負責會員網站的畫面。",
+          "reference_quote": "負責遊戲的營運及維護，包含管理遊戲平台、處理玩家回饋、解決遊戲缺陷、關注遊戲玩家社群、提供遊戲營運報告等。"
+        },
+        {
+          "employee_quote": "API 的內部邏輯、權限規則和資料庫由另一位同事開發，我不會去修改那些部分。",
+          "reference_quote": "與技術單位確認遊戲伺服器穩定狀況及版本更新流程。"
+        }
+      ],
+      "limitations": [
+        "「解決遊戲缺陷」未說明具體工作內容，僅能視為局部概括關聯；公版沒有呈現員工的畫面開發、互動元件或 API 串接責任。"
+      ]
+    },
+    "seconds": 11.252549100026954,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "29646021313963ad67c2f6e06621f1c7d377a206ff5ff18d6517bec5acf5ceb9",
+    "case_id": "F02",
+    "document_id": "IDC1330-001v1",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J008",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是系統設備、作業系統、網路及資料庫等安裝維護，不能代表員工主要負責的會員網站畫面、互動、API 串接及瀏覽器品質開發維護。僅「測試、找出問題、調整效能」有局部動作上的關聯，工作對象與責任範圍不同。",
+      "evidence": [
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題、調整載入速度及可操作性",
+          "reference_quote": "使用測試工具檢測設備與元件功能,識別故障問題並執行修復作業。"
+        },
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題、調整載入速度及可操作性",
+          "reference_quote": "運用系統知識,測試並優化系統效能,以達成組織目標。"
+        }
+      ],
+      "limitations": [
+        "上述相似處僅是測試、問題排查及效能調整等通用動作；公版描述的是設備與系統維護，未涵蓋員工的頁面版型、互動元件、表單驗證、API 串接及瀏覽器品質工作。",
+        "員工明確表示 API 內部邏輯、權限規則、資料庫及伺服器維護由他人或不屬於本人工作；公版這些職責不能作為代表其主要工作的依據。"
+      ]
+    },
+    "seconds": 6.325125899980776,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "c28c8c8c78a2bfb32feefbff19dd09f8487e7f261209e1ccff220742666d7948",
+    "case_id": "F02",
+    "document_id": "IIS3513-002v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J009",
+    "phase": "grade",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是保全系統的規劃、安裝配置與營運管理，包含安排及管理機動保全人員；員工的兩項主要工作則是線上訂單系統的瀏覽器畫面開發，以及訂單 API、商業規則與資料存取開發。兩者只有「系統」等泛稱上的重合，工作對象、用途及責任均不相符，不能代表員工的主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "我主要負責公司的線上訂單系統。",
+          "reference_quote": "負責系統保全之人員、設備、技術管理等相關工作。"
+        },
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則，設計及修改資料表、查詢與資料更新",
+          "reference_quote": "定期維護、保養保全系統,並判別系統問題與報修。"
+        }
+      ],
+      "limitations": []
+    },
+    "seconds": 5.943061599973589,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "a3d87b411ff4f186b0acdb33e243ee0d0447f5807381f9f6d586b8f39ca78523",
+    "case_id": "F01",
+    "document_id": "BGM1349-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J010",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是行政總務的規劃與管理，沒有代表員工主要的帳務登錄、應收應付款追蹤、對帳及月結工作。僅有偶爾代訂用品及留收據與公版採辦工作局部相關，屬於局部關聯，不足以代表主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "辦公室用品不足時，我偶爾依已核准清單代訂並留收據",
+          "reference_quote": "督導並執行公務用品【註5】採辦事宜"
+        },
+        {
+          "employee_quote": "我的主要工作是處理公司的日常帳務及月結。",
+          "reference_quote": "於組織或企業內部從事行政總務相關工作之規劃、協調、指導、管制及考核等管理工作。"
+        }
+      ],
+      "limitations": [
+        "員工明確表示不負責找供應商、議價或採購策略；公版包含供應商管理、議價及採辦督導等職責。",
+        "公版未提供員工主要帳務工作所需的帳務登錄、應收應付款追蹤、對帳或月結帳表整理等責任支持。"
+      ]
+    },
+    "seconds": 8.025211700005457,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "2a12be18bebbd3e11080d30ecd6670d7f61ff137247a9e5d0720fe76aa347925",
+    "case_id": "F03",
+    "document_id": "BAS1219-005v1",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J011",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版與員工主要工作有視覺稿設計的局部交集，但公版核心是裝置互動介面，包含介面流程與線框、原型、使用者體驗測試及交付開發；不足以代表員工製作活動與商品視覺素材的主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "做版面、字體、色彩和圖片處理",
+          "reference_quote": "依線框稿架構,選用適切繪圖軟體設計視覺稿(mockup)。"
+        },
+        {
+          "employee_quote": "再依回饋修改",
+          "reference_quote": "視組織相關人員要求或客戶需求,調整介面。"
+        }
+      ],
+      "limitations": [
+        "視覺稿及修改是局部相似；公版描述的是裝置介面，而非員工所述活動與商品素材的跨尺寸製作、印刷檔案檢核及輸出交付。"
+      ]
+    },
+    "seconds": 7.0640946999774314,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "05eb1325d3ca7978420f67a72261a1556a9299b344581936e8e1ebf4ff625ec5",
+    "case_id": "F05",
+    "document_id": "AVA2172-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J012",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "reason": "公版明確包含協助產出社群所需圖片素材，與員工持續負責視覺素材製作中的一部分有實際對應，因此屬部分代表。但公版核心工作還包含社群策略、互動及成效分析，且沒有具體涵蓋員工的版面設計、跨尺寸調整、印刷設定與檔案交付責任，不能代表其主要工作整體。",
+      "evidence": [
+        {
+          "employee_quote": "我主要替公司的活動和商品製作視覺素材。",
+          "reference_quote": "協助企劃及產出社群網站需要之文字、圖片及影片等素材及社群平台經營之工作。"
+        },
+        {
+          "employee_quote": "做版面、字體、色彩和圖片處理，提供初稿，再依回饋修改",
+          "reference_quote": "並協助產出需要之文字、圖片及影片等素材。"
+        }
+      ],
+      "limitations": [
+        "公版以社群媒體經營為核心，涵蓋經營策略、網友互動、數據分析及策略調整；員工說明這些工作由行銷同事負責。",
+        "公版的圖片素材產出僅支持員工主要工作中的素材製作部分，未具體描述版面設計、跨尺寸製作、修訂、印刷規格檢核或輸出交付。",
+        "員工偶爾依排程張貼已核准圖片，不足以代表其主要工作是社群平台經營。"
+      ]
+    },
+    "seconds": 9.615405999997165,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "10b582fee425bd093267d1e30630f34cac6e72ee7630e439c165d80fdc98671b",
+    "case_id": "F05",
+    "document_id": "KMC2431-009v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J013",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版對故障診斷、維修處理、完工確認及維修紀錄有一組具體描述，能部分對應員工持續負責的冷氣故障檢修工作；但公版對象是網路系統與設備，且核心內容不涵蓋冷氣安裝、配管接線、抽真空、測漏及定期保養，因此只能部分代表該主要工作領域。",
+      "evidence": [
+        {
+          "employee_quote": "量測並判斷故障原因，更換或修復有問題的零件",
+          "reference_quote": "以軟體測量網路狀況,找出網路故障原因。"
+        },
+        {
+          "employee_quote": "完成後再測試並把處理情形寫在工單上。",
+          "reference_quote": "依據實際維修情形完成維修紀錄及報告"
+        },
+        {
+          "employee_quote": "維修時，我會問使用情況",
+          "reference_quote": "告知客戶維修完成,請客戶確認網路連線狀況,完成驗收並取得簽收。"
+        }
+      ],
+      "limitations": [
+        "公版的診斷對象是網路架構及網路設備，沒有描述冷氣設備的安裝與現場施工工作。",
+        "公版未涵蓋員工提及的配管、接線、抽真空、測漏、溫度與排水確認，以及定期清潔保養。",
+        "員工每季協助清點工具與材料是兼任工作，不足以使公版的工具管理內容代表其主要工作。"
+      ]
+    },
+    "seconds": 13.732647299999371,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "fa91b60496070e123fa24ad87a61337af44aabe7891d517ca0bbc70920bf7216",
+    "case_id": "F04",
+    "document_id": "網路維修助理",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J014",
+    "phase": "grade",
+    "case_id": "F01",
+    "document_id": "KPS2434-004v2",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是銷售與業務行政支援，包括聯絡客戶確認訂單、出貨及帳款等；員工主要負責訂單系統的畫面與伺服器功能開發維護。兩者僅共享「訂單」這個對象，工作動作與責任不同，不能代表員工的任一主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+          "reference_quote": "依合約及訂單處理標準作業流程,與客戶保持聯繫,以確認訂單、交貨期、出貨、借出及配貨進度。"
+        }
+      ],
+      "limitations": [
+        "公版描述的是訂單業務流程中的客戶聯繫與出貨進度確認，並未描述訂單 API、權限、商業規則或資料存取的開發及維護。",
+        "公版也未代表員工持續負責的瀏覽器畫面、互動與操作檢查開發及維護。"
+      ]
+    },
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "b615d417afa5718246272de95579a2e795551caac52bdc12613f1a9937902eb6",
+    "evidence_correction": {
+      "kind": "source_quote_only",
+      "original_quote": "我會寫處理訂單的 API、權限檢查和商業規則",
+      "corrected_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+      "reason": "模型逐字引句漏掉「也」；按唯一原文補回，分級、理由、主要領域及公版證據不改，未重跑模型。"
+    },
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J015",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是場館業務拓展、客戶關係與場館行銷／活動服務，沒有描述員工主要負責的視覺版面設計、跨尺寸製作、修訂及輸出交付。兩者僅在社群宣傳上有局部關聯；員工明確表示只是偶爾張貼已核准圖片，不足以代表其主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "偶爾行銷同事忙不過來，我會照排程把已核准圖片貼到社群平台",
+          "reference_quote": "社群網路媒體宣傳文案"
+        }
+      ],
+      "limitations": [
+        "員工的主要工作是活動與商品視覺素材製作；公版未涵蓋其版面設計、圖片處理、跨尺寸調整、印刷設定與檔案交付。",
+        "員工明確指出活動策略、預算、廣告投放和成效分析由行銷同事負責；公版中的場館客戶開發、業務及活動現場執行也不構成其主要工作代表。"
+      ]
+    },
+    "seconds": 7.795349399966653,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "66e663bc797dbb15bd3bc8478b89d706083db3d66d0993bc5f429f26347e7966",
+    "case_id": "F05",
+    "document_id": "KPS3322-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J016",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "reason": "公版涵蓋蒐集視覺素材、協助完成設計初稿、協調版面排版及輸出設計圖等工作，與員工主要視覺製作領域中的部分持續工作有實質對應。但公版核心定位是依設計人員指示提供協助，未能代表員工負責版面設計、跨尺寸製作、依回饋修訂並核對輸出規格的整體責任，因此屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "做版面、字體、色彩和圖片處理",
+          "reference_quote": "陪同設計人員與相關人員,協調版面設定及排版,並完成相關紀錄。"
+        },
+        {
+          "employee_quote": "提供初稿，再依回饋修改",
+          "reference_quote": "蒐集客戶提供之素材,並依設計人員指示,使用輔助軟體,協助完成設計圖初稿。"
+        },
+        {
+          "employee_quote": "交付可使用的檔案",
+          "reference_quote": "協助設計人員輸出設計圖或成型打樣。"
+        }
+      ],
+      "limitations": [
+        "公版多次將工作限定為依設計人員指示或協助設計人員，未呈現員工對視覺素材製作的主要執行責任。",
+        "公版未具體涵蓋同一活動製作社群、網站及印刷等不同尺寸版本、依回饋修訂，以及檢查解析度、出血和色彩設定。",
+        "員工偶爾代貼已核准圖片及行銷策略、投放和成效分析等工作，不構成此主要領域的代表依據。"
+      ]
+    },
+    "seconds": 8.157497800013516,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "471213ae398af76d89029abae680f51e1fb5c7418ea15abf2aea2ac2fd6ae0fd",
+    "case_id": "F05",
+    "document_id": "AVA2172-004v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J017",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作對象是電腦及周邊設備，員工主要負責冷氣設備現場安裝、故障檢修、試運轉及保養。故障判斷、零件更換、測試與定期保養等動作有局部對應，但公版沒有代表冷氣安裝所需的配管、接線、抽真空、測漏及運轉檢查等主要工作，僅屬通用工作動作重合，不足以代表該主要領域。",
+      "evidence": [
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件，完成後再測試",
+          "reference_quote": "依使用者所反映故障問題與需求,進行故障判斷,並視需要填寫維修請料單。"
+        },
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "執行電腦及周邊設備維護與保養,並填寫保養記錄表。"
+        },
+        {
+          "employee_quote": "依施工要求定位設備、配管、接線，檢查接合處，再做抽真空、測漏及試運轉",
+          "reference_quote": "於符合職業安全衛生規範的環境與作業程序下,依據手冊連接主機板、中央處理器、記憶體、硬碟、光碟機、電源供應器、及其他介面卡(顯示卡、有線或無線網卡)等零組件。"
+        }
+      ],
+      "limitations": [
+        "公版描述的維修、保養對象為電腦及周邊設備；上述對應只支持一般故障處理、測試與保養動作，不能據此推定具備冷氣設備工作的代表性。"
+      ]
+    },
+    "seconds": 10.342153100005817,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "3bcd19244dc01ce4089aa319172eb3d7ba6b4130b9528d608f72015da0a43e87",
+    "case_id": "F04",
+    "document_id": "MEM3511-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J018",
+    "phase": "grade",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是零售商品採買、供應商接洽與議價、庫存及物流管理，沒有代表員工主要的日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理。公版提到財務報表，是用於採購成本分析，並非員工負責的帳務核對與月結工作。",
+      "evidence": [
+        {
+          "employee_quote": "月底做對帳、調整分錄及帳表",
+          "reference_quote": "從業人員藉由製作簡易的財務報表,進行採購成本分析與控管"
+        },
+        {
+          "employee_quote": "不負責找供應商、議價或採購策略，也沒有管理倉庫和商品庫存。",
+          "reference_quote": "負責執行零售業貨品採買管理作業以規劃、接洽供應商及議價。"
+        }
+      ],
+      "limitations": [
+        "公版的財務報表內容服務於採購成本分析，不能據此視為代表日常帳務處理或月結。",
+        "員工偶爾依核准清單代訂用品，但不負責採購策略或庫存管理；這不足以代表公版的主要採買與商品管理工作。"
+      ]
+    },
+    "seconds": 8.937693400017451,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "fc08429ca9c360ee7912334c01c068fc5913b0c30b0e60c0d6d9e59c70abcd48",
+    "case_id": "F03",
+    "document_id": "KRM3323-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J019",
+    "phase": "grade",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "員工的主要工作是持續開發及維護訂單系統的瀏覽器畫面與後端功能；公版核心工作則是數位影音／社群平臺的營運、行銷、內容製作與數據分析。兩者僅有「平臺」等詞語上的表面關聯，公版未實質代表員工任一主要工作領域。",
+      "evidence": [
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則，設計及修改資料表、查詢與資料更新",
+          "reference_quote": "操作與管理數位平臺(含社群媒體)。"
+        },
+        {
+          "employee_quote": "我主要負責公司的線上訂單系統。",
+          "reference_quote": "運用多元方式如直播、拍影片等,聚集網路流量與粉絲留言互動,建立粉絲對品牌的信任與忠誠度。"
+        }
+      ],
+      "limitations": [
+        "公版提及的平臺管理與數據分析屬於影音／社群經營脈絡，不能據此推定其代表訂單系統的軟體開發工作。"
+      ]
+    },
+    "seconds": 5.699643499974627,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "dfc97e0350f1d6012abf6b9df2210488977a5453e34be11e6665cafa8cba86e6",
+    "case_id": "F01",
+    "document_id": "IDC5294-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J020",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版涵蓋設備故障檢查、維修、保養清潔及功能測試，與員工持續負責的故障檢修和定期保養有實質對應，並部分涉及組裝定位與測試，因此可代表該主要領域的一部分。惟公版以一般電器設備維修為主，未涵蓋員工冷氣現場安裝的重要施工流程，故屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件，完成後再測試",
+          "reference_quote": "依手冊說明,正確使用適合檢測工具,進行電器設備測試,針對故障範圍進行檢查判斷,確認具體故障項目。"
+        },
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "在維修完成後,進行電器設備的保養與清潔。"
+        },
+        {
+          "employee_quote": "依施工要求定位設備、配管、接線，檢查接合處，再做抽真空、測漏及試運轉",
+          "reference_quote": "完成電器設備組裝與定位作業,並進行設備之功能測試。"
+        }
+      ],
+      "limitations": [
+        "公版未描述冷氣設備安裝所需的配管、接線、抽真空與測漏等現場施工內容。",
+        "員工不負責的報價、設備選型、工程排程與人員分配，也不是公版可代表的員工主要工作。"
+      ]
+    },
+    "seconds": 8.677396500017494,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "def3727bddc14afd8c5bfcb38e2939b05a4b47de9dbbb71179f91f160dbd1d3e",
+    "case_id": "F04",
+    "document_id": "MEM7412-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J021",
+    "phase": "grade",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "reason": "公版核心工作涵蓋將需求轉為視覺元素、影像處理、排版、依回饋調整設計，以及完稿輸出；這與員工持續負責的活動與商品視覺素材製作，在工作動作、對象及交付用途上實質吻合，足以作為該主要工作面向的整體參考。",
+      "evidence": [
+        {
+          "employee_quote": "收到行銷同事的需求、文案和尺寸後，我會整理要呈現的資訊，做版面、字體、色彩和圖片處理，提供初稿，再依回饋修改",
+          "reference_quote": "依組織 / 顧客需求及預算，將所欲傳達主題及訊息轉換為視覺元素，並進行影像處理、排版與完稿後製等作業。"
+        },
+        {
+          "employee_quote": "同一活動通常要做成社群圖片、網站橫幅和印刷用檔案。",
+          "reference_quote": "與相關人員協調版面設定與排版。"
+        },
+        {
+          "employee_quote": "我會確認不同尺寸的內容沒有被裁掉，核對印刷的解析度、出血和色彩設定，交付可使用的檔案，也整理素材和版本讓後續能修改。",
+          "reference_quote": "輸出設計圖或成型打樣,並確認設計符合需求。"
+        }
+      ],
+      "limitations": [
+        "公版還包含設計趨勢蒐集、預算彙整、設計提案、廠商追蹤及結案等內容；員工敘述未確認其負責這些工作，因此不將其視為員工職責。",
+        "員工偶爾依排程發布已核准圖片，不代表負責活動策略、廣告投放或成效分析；這些也不是本次評為強代表的依據。"
+      ]
+    },
+    "seconds": 10.399860000004992,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "29858789b1cac13c0cff2ec9efc41a32cb429045069b9d4b5b7849e0db34aaaa",
+    "case_id": "F05",
+    "document_id": "AVA2172-002v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J022",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是領導、規劃及督導會計部門，並負責覆核與管理；員工主要是親自處理日常帳務登錄、對帳及月結。雖有應收應付及帳表等局部工作關聯，但公版沒有代表員工主要的實務作業責任，屬局部關聯。",
+      "evidence": [
+        {
+          "employee_quote": "核對訂單、金額及科目後登錄帳務",
+          "reference_quote": "督導及審核收入、成本及費用,核對應收應付款項及往來帳。"
+        },
+        {
+          "employee_quote": "月底做對帳、調整分錄及帳表",
+          "reference_quote": "定期覆核企業內部之財務報表,並針對異常項目執行差異分析。"
+        }
+      ],
+      "limitations": [
+        "公版要求領導、分配工作及督導會計部門作業，員工敘述未顯示承擔此類管理責任。",
+        "員工說明付款核准、資金安排和報稅申報由主管或外部事務所負責；不能把這些公版職責視為員工本人負責。",
+        "公版提及的覆核、督導與員工親自登錄、對帳及月結並非同一責任層級。"
+      ]
+    },
+    "seconds": 8.955766599974595,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "aafe4e1e1e8acdab615f591bce9b30469cf66fa8d2262157404140d183bfd2bc",
+    "case_id": "F03",
+    "document_id": "FAC1211-001v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J023",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版對故障檢修與修復、設備試車有具體且持續的工作描述，能部分代表員工的主要工作；但員工主要工作面向還包括現場安裝及定期保養，公版未描述定位設備、配管、接線等安裝作業，對清潔、耗材檢查等定期保養也缺乏具體內容，因此不足以整體代表該面向。",
+      "evidence": [
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件，完成後再測試並把處理情形寫在工單上。",
+          "reference_quote": "觀察、測量、計算及比較標準系統與組件參數/數值,找出故障,以不傷害設備、電路、周遭環境或服務方式,尋找與識別故障。"
+        },
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件，完成後再測試並把處理情形寫在工單上。",
+          "reference_quote": "重新組裝器械,測試修復成效,進行最後測試,並確保機組正常運轉。"
+        },
+        {
+          "employee_quote": "接到派工後會確認現場狀況，依施工要求定位設備、配管、接線，檢查接合處，再做抽真空、測漏及試運轉，確認溫度和排水是否正常。",
+          "reference_quote": "遵循法規及程序,依據特定系統規格,連接設定測試/測量裝置,測量調整設備零件與控制系統,提供最佳性能。"
+        },
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況，必要時向客戶說明使用注意事項。",
+          "reference_quote": "負責冷凍空調設備維護保養及檢修。"
+        }
+      ],
+      "limitations": [
+        "未涵蓋員工的現場安裝工作，例如定位設備、配管及接線。",
+        "公版雖提及維護保養，但未具體描述員工所述的定期清潔、耗材檢查及向客戶說明使用注意事項。"
+      ]
+    },
+    "seconds": 14.097819899965543,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "3f989791aeffc7202995f6feac8dfba902f47ee0073e76b73668587f625a7b90",
+    "case_id": "F04",
+    "document_id": "SET7127-002v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J024",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是依系統家具圖面規劃並組裝櫃體，不能代表員工主要的冷氣設備安裝、故障檢修、試運轉及定期保養。只有現場安裝等通用動作相似；工具與材料清點也僅是員工偶爾協助，屬局部關聯。",
+      "evidence": [
+        {
+          "employee_quote": "我主要到客戶現場安裝和維修冷氣。",
+          "reference_quote": "依據系統家具配置圖面，進行施工規劃及現場組裝施工等工作。"
+        },
+        {
+          "employee_quote": "每季會跟著同事清點一次工具和剩餘材料",
+          "reference_quote": "依據系統家具配置圖面及施工細節,進行施工所需材料整備,並盤點五金配件及器具。"
+        },
+        {
+          "employee_quote": "接案報價、設備選型、工程排程及人員分配由主管處理，我依派工完成現場工作。",
+          "reference_quote": "配合現況規劃工序及施作人員安排。"
+        }
+      ],
+      "limitations": [
+        "公版的施工及驗收對象是系統家具，未涵蓋冷氣設備安裝、配管接線、抽真空、測漏、故障診斷與維修。",
+        "員工的工具及材料清點是每季跟同事協助一次，且不負責採購或庫存管理，不能據此視為主要工作代表。",
+        "公版包含施工規劃及人員安排，員工明確表示這些由主管處理。"
+      ]
+    },
+    "seconds": 10.531051600002684,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "18172878417c270f3459dea684f449aed07a5dbe4a32bfa8dea99ad8c744f02e",
+    "case_id": "F04",
+    "document_id": "CCM7129-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J025",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是電腦設備、作業系統、網路及使用者環境的安裝維護，另涵蓋資料庫備份復原；不代表員工持續負責的瀏覽器互動畫面開發或訂單 API、商業規則及資料存取開發。員工偶爾協助同事處理網路問題，與公版排除電腦環境問題僅有局部關聯，未形成可代表其主要工作的領域。",
+      "evidence": [
+        {
+          "employee_quote": "偶爾同事電腦連不上網路會請我幫忙",
+          "reference_quote": "設定電腦與使用者環境,並排除問題。"
+        },
+        {
+          "employee_quote": "設計及修改資料表、查詢與資料更新",
+          "reference_quote": "執行資料庫備份"
+        }
+      ],
+      "limitations": [
+        "資料表、查詢及資料更新是員工的應用程式資料工作；公版此處描述的是資料庫備份，不能據此視為代表其資料存取開發。",
+        "員工明確表示公司設備維護和固定資料備份由其他人負責；這些公版工作不能歸為員工主要職責。"
+      ]
+    },
+    "seconds": 11.176223699992988,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "c28c8c8c78a2bfb32feefbff19dd09f8487e7f261209e1ccff220742666d7948",
+    "case_id": "F01",
+    "document_id": "IIS3513-002v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J026",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是供應鏈及客戶訂單的作業追蹤、資料登錄與出貨安排；員工主要負責開發及維護訂單系統的瀏覽器畫面與伺服器功能。兩者雖涉及訂單系統及資料更新，但責任內容不同，僅有局部關聯，不足以代表員工任一主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "我主要負責公司的線上訂單系統。",
+          "reference_quote": "將確認的訂單輸入到ERP或訂單管理系統中"
+        },
+        {
+          "employee_quote": "設計及修改資料表、查詢與資料更新",
+          "reference_quote": "將訂單完成情況及相關數據更新到系統中"
+        }
+      ],
+      "limitations": [
+        "員工負責製作瀏覽器上的訂單操作畫面、API、權限、商業規則及資料存取；公版未描述這些軟體開發與維護責任。",
+        "公版提及的系統更新是供應鏈或客戶訂單作業，不能據此推定為系統功能開發。"
+      ]
+    },
+    "seconds": 6.612699399993289,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "4abb3abeb74afe2f631fb5eebbb865464846975ba39917b2906bafd2227b5304",
+    "case_id": "F01",
+    "document_id": "KRM1324-002v1",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J027",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是行政庶務、日常物品採購及其他行政管理工作，未涵蓋員工主要的日常帳務登錄、應收應付款追蹤、對帳與月結帳表整理。只有員工偶爾代訂辦公室用品，與公版日常物品採購存在局部對應，不足以代表其主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "辦公室用品不足時，我偶爾依已核准清單代訂並留收據",
+          "reference_quote": "依標準作業流程規定辦理採購,並點交與申請領用人簽署確認。"
+        },
+        {
+          "employee_quote": "我主要準備與核對資料。",
+          "reference_quote": "依採購明細填寫物品清冊、領用記錄及支出申請單。"
+        }
+      ],
+      "limitations": [
+        "員工所述帳務登錄、應收應付款追蹤、銀行往來核對、月結對帳及帳表整理，公版均未描述。",
+        "公版的日常物品採購包含標準流程、點交及領用紀錄；員工僅偶爾依已核准清單代訂，不負責供應商遴選、議價或採購策略。"
+      ]
+    },
+    "seconds": 6.9257599000120535,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "0ef2ee3f90aa3047d3f2de4449d8090b92e6794c7c10d5e6a9d07da830151630",
+    "case_id": "F03",
+    "document_id": "BAS1219-003v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J028",
+    "phase": "grade",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "瀏覽器畫面、互動與操作檢查的開發及維護"
+      ],
+      "reason": "公版核心明確涵蓋網站前端程式開發與維護、依需求撰寫前端程式、跨裝置與瀏覽器驗證，以及功能測試；這組持續責任與員工負責訂單畫面、操作流程及檢查的主要工作實質相符，足以代表其瀏覽器前端領域。此分數只代表該主要領域，不表示涵蓋員工全部工作。",
+      "evidence": [
+        {
+          "employee_quote": "製作瀏覽器上的訂單列表、查詢、編輯畫面和表單檢查，讓畫面在不同裝置上都能操作。",
+          "reference_quote": "依據使用者要求,撰寫前端程式。"
+        },
+        {
+          "employee_quote": "讓畫面在不同裝置上都能操作。",
+          "reference_quote": "在不同裝置與瀏覽器中驗證網站,並修正其差異以確保相容性。"
+        },
+        {
+          "employee_quote": "每次新增功能，我會測試畫面操作、API 與資料是否一致，修正問題",
+          "reference_quote": "自行依照規格進行單元測試,並確認功能有效性。"
+        }
+      ],
+      "limitations": [
+        "公版不足以代表員工另一項主要工作「訂單 API、權限、商業規則及資料存取的開發及維護」；其中的資料交換格式、資料模型及前後端串接描述，不能代表該領域的完整責任。"
+      ]
+    },
+    "seconds": 7.13227940001525,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "5febce12fc452a427d886f8490cb24dab31146396775c26a100fbd86bd90aaea",
+    "case_id": "F01",
+    "document_id": "INM3514-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J029",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版對空調設備的操作與保養維護，能代表員工主要工作中的定期保養及部分運轉檢查，屬於一組持續且具體的工作支持。但公版核心是場館多類設施的整體操作維護與管理，未能充分代表員工親自進行冷氣現場安裝、故障判斷及零件修復的工作組合，因此為部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "負責相關機電(照明、中央監控、空調、水電)及動力工程設備的操作與保養維護。"
+        },
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件",
+          "reference_quote": "活動進行期間發生任何設備問題,立即排除。"
+        }
+      ],
+      "limitations": [
+        "公版涵蓋場館建築、機電及其他設施，並涉及跨部門協調、採購與協力廠商管理；員工主要是依派工親自完成冷氣現場工作。",
+        "公版的設備故障排除是活動進行期間的場館設備應變，未明確對應員工冷氣故障診斷及零件修復；公版也未充分描述員工的冷氣安裝流程。"
+      ]
+    },
+    "seconds": 10.11229880002793,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "199caf97e5345db7155c8171b2d1da62d248bd5d6e8d2a55ae1ce8d5f4621786",
+    "case_id": "F04",
+    "document_id": "SET2141-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J030",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "reason": "公版對需求釐清、平面設計規劃、提案修改及多媒體素材製作的描述，能實質支持員工主要工作中的視覺設計與修訂部分，因此屬部分代表。但公版涵蓋的工作範圍較廣，且未明確對應員工的跨尺寸延展、印刷檔案檢查與交付流程，尚不足以強代表整個主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "我會整理要呈現的資訊，做版面、字體、色彩和圖片處理，提供初稿，再依回饋修改",
+          "reference_quote": "依組織/顧客需求,規劃平面設計草圖及使用者導向設計等。"
+        },
+        {
+          "employee_quote": "收到行銷同事的需求、文案和尺寸後",
+          "reference_quote": "蒐集、釐清與確認需求資訊"
+        },
+        {
+          "employee_quote": "再依回饋修改",
+          "reference_quote": "與組織/顧客溝通討論需求,調整與修改提案內容、規劃製作進度,並產出設計提案企劃書。"
+        }
+      ],
+      "limitations": [
+        "公版也涵蓋影音、互動內容及攝影相關素材製作，這些不是員工所述的主要工作。",
+        "公版未明確涵蓋員工所述的跨尺寸製作、印刷解析度／出血／色彩設定檢查，以及素材版本整理與可修改檔案交付。"
+      ]
+    },
+    "seconds": 8.38025899999775,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "bc0e398aefed4132c664369b0d3b979e7510d8d8247125f5cd6559c7ba8318a9",
+    "case_id": "F05",
+    "document_id": "IDC2712-001v1",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J031",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版提到依指示製作廣告資料或文宣品，與員工製作視覺素材有局部關聯；但這是概括性的單項工作，公版核心還包括文案企劃、素材蒐集、行政建檔及推廣支援，未能代表員工主要的視覺設計工作組合。",
+      "evidence": [
+        {
+          "employee_quote": "我主要替公司的活動和商品製作視覺素材。",
+          "reference_quote": "依指示協助製作相關廣告資料或文宣品。"
+        },
+        {
+          "employee_quote": "做版面、字體、色彩和圖片處理",
+          "reference_quote": "依指示協助製作相關廣告資料或文宣品。"
+        }
+      ],
+      "limitations": [
+        "公版未明確涵蓋版面、字體、色彩與圖片處理，也未提及跨尺寸製作、依回饋修訂及輸出交付。",
+        "公版主要工作組合偏向廣告文案企劃、素材蒐集、行政支援與推廣作業，和員工主要職責不相符。"
+      ]
+    },
+    "seconds": 8.840280299948063,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "1cf018a7ec33eac437ab6a68c7443f6a1e7e3dbe7aea3fbfc709dd8fd4cbb7b5",
+    "case_id": "F05",
+    "document_id": "KMC2431-006v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J032",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是活動企劃與執行支援，並非視覺素材設計與製作。雖有製作提案簡報、蒐集素材等局部相鄰工作，但不足以代表員工持續負責的主要工作領域。",
+      "evidence": [
+        {
+          "employee_quote": "做版面、字體、色彩和圖片處理",
+          "reference_quote": "協助製作提案簡報。"
+        },
+        {
+          "employee_quote": "整理素材和版本讓後續能修改",
+          "reference_quote": "協助整理活動資料並歸檔。"
+        }
+      ],
+      "limitations": [
+        "公版未描述活動與商品視覺素材的版面設計、跨尺寸製作、依回饋修訂，以及印刷設定檢核與輸出交付。",
+        "公版所述簡報製作及資料歸檔僅與部分工作有關聯，沒有涵蓋員工主要的設計工作組合。"
+      ]
+    },
+    "seconds": 5.452414700004738,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "5a5501839bd1212daf69db00985d49d5b96fc326623fa24be0962f4a133399ca",
+    "case_id": "F05",
+    "document_id": "KMC2432-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J033",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是現場活動主持、掌握氣氛及與觀眾互動，不能代表員工主要的視覺素材版面設計、跨尺寸製作、修訂與輸出交付。員工偶爾依排程張貼已核准圖片，與公版發布活動宣傳訊息只有局部關聯，不足以代表主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "偶爾行銷同事忙不過來，我會照排程把已核准圖片貼到社群平台",
+          "reference_quote": "依客戶需求,於個人自媒體發佈相關訊息,達到活動宣傳目的。"
+        },
+        {
+          "employee_quote": "我主要替公司的活動和商品製作視覺素材。",
+          "reference_quote": "依客戶需求，以活動宣傳或產品銷售為目的，主持現場活動、掌握氣氛及與觀眾互動，以達活動流程順利進行之目的。"
+        }
+      ],
+      "limitations": [
+        "公版的主持、現場互動與流程掌控，不是員工所述的主要責任。",
+        "社群張貼是偶爾協助；員工表示活動策略、預算、廣告投放和成效分析由行銷同事負責。"
+      ]
+    },
+    "seconds": 8.533285899960902,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "9bbc88061b3e6b89625a3193f736f68c0a9614a30f95f8d022516e86e4768966",
+    "case_id": "F05",
+    "document_id": "PIC3332-002v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J034",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "reason": "公版的網站異常處理、修正後測試及效能改善，部分對應員工持續負責的瀏覽器操作測試、畫面問題排查、載入速度調整與回歸確認，因此不只是偶爾共用工具或孤立動作。但公版核心涵蓋伺服器、作業系統及網站維運，沒有代表員工的頁面版型、互動元件、表單驗證與 API 串接等主要工作組合，故屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題",
+          "reference_quote": "依據使用者所提出之異常現象,找出並隔離異常。"
+        },
+        {
+          "employee_quote": "功能修改後也要確認沒有影響其他頁面。",
+          "reference_quote": "於測試環境進行測試修正結果,確認修正原本錯誤且不會造成其他問題。"
+        },
+        {
+          "employee_quote": "調整載入速度及可操作性",
+          "reference_quote": "分析報告,以找出伺服器與網站效能改進方案。"
+        }
+      ],
+      "limitations": [
+        "公版主要描述網站伺服器及作業系統維護、設定、安全與效能管理；員工明確表示維護伺服器、資料備份和排值班不是其工作。",
+        "員工不負責 API 內部邏輯、權限規則及資料庫；公版也未能代表其頁面版型、互動元件、表單驗證與 API 串接工作。"
+      ]
+    },
+    "seconds": 13.593627900001593,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "dfc23afae9c8aafc12177a164c9e79c73bbdde8e4e5dfef84a6489b0ba8d58d1",
+    "case_id": "F02",
+    "document_id": "IIS3513-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J035",
+    "phase": "grade",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是協助銷售、建立客戶合約或訂單文件、處理銷售資料及售後服務；員工主要負責訂單系統的畫面與伺服器功能開發維護。雖然兩者都提到訂單或資料，但工作對象與責任不同，不能代表員工任一主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+          "reference_quote": "依組織規定,處理訂單並協助安排銷售相關事宜。"
+        },
+        {
+          "employee_quote": "設計及修改資料表、查詢與資料更新",
+          "reference_quote": "依組織規範,維護銷售資料庫。"
+        }
+      ],
+      "limitations": [
+        "公版的訂單處理是銷售業務及相關文件作業，並未描述訂單系統、API、畫面互動或商業規則的開發與維護。",
+        "公版的銷售資料建檔及資料庫維護，不能僅因共享「資料」或「資料庫」概念便視為員工的系統開發工作。"
+      ]
+    },
+    "seconds": 6.4836310999817215,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "1319ce0078cf0a29ac89253f4af187b0d5f7a02efd57b33e2d4bea37de6358af",
+    "case_id": "F01",
+    "document_id": "KPS4999-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J036",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版主要涵蓋咖啡店顧客服務、飲品製作及吧檯管理。設備維護僅有檢查、維護基本營業器具的局部相似，未能代表員工主要負責的冷氣設備現場安裝、故障檢修、試運轉及定期保養。",
+      "evidence": [
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "定期檢查與維護基本營業器具,並填寫設備保養紀錄表。"
+        }
+      ],
+      "limitations": [
+        "公版未描述冷氣設備安裝、配管接線、抽真空、測漏或試運轉。",
+        "公版設備維護指向基本營業器具，沒有支持冷氣故障判斷、零件修復或更換等主要責任。"
+      ]
+    },
+    "seconds": 6.1442040000110865,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "aefebaa64ad9dde113b78514e8c7727d5e50d5d11eeb8263618a1a63f5bf44be",
+    "case_id": "F04",
+    "document_id": "TFB5131-002v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J037",
+    "phase": "grade",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是客服中心的營運管理、客服團隊領導、預算管控與服務品質管理；員工主要負責會員網站畫面、互動、API 串接及瀏覽器品質的開發維護。兩者雖都涉及客戶，但工作對象、實際任務與責任範圍不同，沒有足以代表員工主要工作的對應。",
+      "evidence": [],
+      "limitations": [
+        "公版提及客戶服務與品質改善，但未描述網站介面開發、互動元件、API 串接或瀏覽器測試。",
+        "員工明確不負責決定產品需求；公版著重客服營運與管理，不能據此視為網站開發工作的代表。"
+      ]
+    },
+    "seconds": 4.516939699999057,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "a0b661ce682eccaa50500109b58f63af54004d0adf2c93853758ddb2fcbe9412",
+    "case_id": "F02",
+    "document_id": "BAS1499-003v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J038",
+    "phase": "grade",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "reason": "公版不只是提到會計或單一核對動作，而是涵蓋交易紀錄整理與登錄、憑證核對、帳務計算及定期報表製作，整體上能代表員工主要的日常記帳與月結帳務領域。員工的應收應付款追蹤、銀行對帳及調整分錄有些未在公版明列，因此不表示每項工作都完全對應。",
+      "evidence": [
+        {
+          "employee_quote": "每天整理發票、收付款單據和費用憑證，核對訂單、金額及科目後登錄帳務；遇到資料不一致，我會找經手同事確認。",
+          "reference_quote": "依據一般記帳與會計準則整理各項支出、收入與交易明細,並登錄於會計系統"
+        },
+        {
+          "employee_quote": "每天整理發票、收付款單據和費用憑證，核對訂單、金額及科目後登錄帳務；遇到資料不一致，我會找經手同事確認。",
+          "reference_quote": "詳細核對收支明細表所列之款項,確認其與交易憑證正確無誤,若有錯誤應與相關單位及人員確認後修正。"
+        },
+        {
+          "employee_quote": "月底做對帳、調整分錄及帳表，整理主管和外部事務所需要的資料，讓帳務能按時結清。",
+          "reference_quote": "依組織規範之日/月/季/年等不同周期及目的協助製作相關報表"
+        }
+      ],
+      "limitations": [
+        "公版未明列應收應付款追蹤、銀行往來核對或調整分錄，這些員工工作沒有逐項對應。",
+        "公版提及協助付款作業及製作稅務申報書；員工說明付款核准與報稅申報由主管或外部事務所負責，員工主要準備與核對資料。"
+      ]
+    },
+    "seconds": 13.184575000021141,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "edf18bbf6b5184804940ef66bdb576272842a628ed1ba3c80b7ddcaeee646245",
+    "case_id": "F03",
+    "document_id": "FAC3313-001v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J039",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版主要描述行銷活動的資料蒐集、規劃協助、前置準備及執行協調，未代表員工持續負責的視覺版面設計、跨尺寸製作、修訂與輸出交付。員工整理素材與版本和公版的活動資料歸檔僅有局部關聯，不足以代表其主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "也整理素材和版本讓後續能修改",
+          "reference_quote": "協助整理歷史活動資料並歸檔。"
+        }
+      ],
+      "limitations": [
+        "公版未描述視覺版面、字體色彩與圖片處理、跨尺寸製作、依回饋修訂或印刷輸出設定等主要工作。",
+        "公版的活動規劃、資源準備、廠商聯繫及報告撰寫等工作，不能據此視為員工主要負責的工作。"
+      ]
+    },
+    "seconds": 7.62112209998304,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "f237c23d7c791a41fc1860d10aea86d043fe943cbcfcf8d03f76e47e48bdef1c",
+    "case_id": "F05",
+    "document_id": "KMM2431-006v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J040",
+    "phase": "grade",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是廠務系統、廠房設施與設備的維護、工程規劃及工安；員工的兩個主要領域則是訂單系統的瀏覽器畫面開發，以及 API、商業規則與資料存取開發。工作對象與責任範圍不相符，沒有可代表主要工作的實質對應。",
+      "evidence": [],
+      "limitations": [
+        "公版提及異常處理、維護等通用動作，但其上下文均指廠務系統或廠房設施，不足以支持員工的訂單系統工作。",
+        "員工偶爾協助同事處理網路問題，不是主要工作；公司設備維護亦由其他人負責。"
+      ]
+    },
+    "seconds": 4.40610469999956,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "540883d8be7efa2c5ad96ea1d5b84f76eaf464f61cf7a097ab0aff397d569a52",
+    "case_id": "F01",
+    "document_id": "MIM2141-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J041",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版具體涵蓋故障判斷、零件檢修與更換、定期保養、測試及紀錄，能部分代表員工持續負責的檢修與保養工作；但公版對象是燃油機車，且未涵蓋冷氣設備的現場安裝、配管、接線、抽真空與測漏，因此不能完整代表該主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件，完成後再測試並把處理情形寫在工單上。",
+          "reference_quote": "使用相關機具、設備及儀器檢驗各系統,並依異常狀況判斷故障原因。"
+        },
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況，必要時向客戶說明使用注意事項。",
+          "reference_quote": "依定期保養紀錄或手冊規範,執行檢查各系統及定期保養項目。"
+        },
+        {
+          "employee_quote": "我主要到客戶現場安裝和維修冷氣。接到派工後會確認現場狀況，依施工要求定位設備、配管、接線，檢查接合處，再做抽真空、測漏及試運轉，確認溫度和排水是否正常。",
+          "reference_quote": "負責燃油機車各系統（引擎、傳動、電裝、車架與懸吊等系統）、廢氣檢測、附加零件與機件等故障排除及保養工作。"
+        }
+      ],
+      "limitations": [
+        "公版核心對象為燃油機車，與員工負責的冷氣設備不同。",
+        "公版未描述冷氣現場安裝、配管接線、抽真空及測漏等工作。"
+      ]
+    },
+    "seconds": 12.445106700004544,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "e493a4305eb5c43de85d016d1d2653311d7d6d54f3446acdd3604254b8428603",
+    "case_id": "F04",
+    "document_id": "MEM7231-009v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J042",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是跨境電商平台的營運、訂單處理及客服，與員工工作同在訂單平台領域，也有「訂單」名詞重疊；但員工負責開發及維護畫面與伺服器功能，公版描述的是平台操作與營運流程，責任性質不同，因此不足以代表任一主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則，設計及修改資料表、查詢與資料更新",
+          "reference_quote": "依組織策略程序要求,定時登入跨境電商平台,下載未出庫訂單明細。"
+        },
+        {
+          "employee_quote": "我會先整理使用者操作流程，製作瀏覽器上的訂單列表、查詢、編輯畫面和表單檢查",
+          "reference_quote": "從事跨境電子商務購物平台之營運。"
+        }
+      ],
+      "limitations": [
+        "公版未描述瀏覽器畫面、API、權限與商業規則、資料存取或軟體測試與除錯等開發責任。"
+      ]
+    },
+    "seconds": 8.674485999974422,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "37a11f0692920986b12e1080a02a89ba90f3d92a446f311b52bac933ed427f4f",
+    "case_id": "F01",
+    "document_id": "KRM4224-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J043",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "reason": "公版中的介面調整與使用者體驗測試，能對應員工持續進行的畫面品質檢查及介面維護，是主要工作中的具體子工作，因此屬部分代表。但公版核心偏向介面視覺設計、設計提案與交付開發人員，不能代表員工以實作頁面與互動功能為主的工作組合。",
+      "evidence": [
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題、調整載入速度及可操作性",
+          "reference_quote": "協助進行使用者體驗測試,並將測試結果提供給相關人員進行調整。"
+        },
+        {
+          "employee_quote": "功能修改後也要確認沒有影響其他頁面。",
+          "reference_quote": "視組織相關人員要求或客戶需求,調整介面。"
+        },
+        {
+          "employee_quote": "收到已確認的功能需求和設計稿後，我會做頁面版型、互動元件、表單驗證、不同裝置的顯示調整",
+          "reference_quote": "依設計企劃書,進行裝置介面設計,並確認符合原規劃設計風格。"
+        }
+      ],
+      "limitations": [
+        "公版主要描述分析設計需求、產出視覺稿與線框稿、協助完成 prototype，並將設計交給相關人員進行裝置開發；員工則依已確認的需求和設計稿實作頁面。",
+        "公版未涵蓋員工的互動元件、表單驗證、API 串接、不同裝置顯示實作、載入速度調整及修改後的頁面回歸確認。",
+        "員工明確不負責 API 內部邏輯、權限規則與資料庫；公版也不足以代表這些工作。"
+      ]
+    },
+    "seconds": 18.3283783000079,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "05eb1325d3ca7978420f67a72261a1556a9299b344581936e8e1ebf4ff625ec5",
+    "case_id": "F02",
+    "document_id": "AVA2172-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J044",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版對廠務設施設備的定期保養、修理及異常故障排除有實質描述，並將空調列為廠務系統之一，因此能部分代表員工持續負責的設備維護與檢修工作。但公版核心是整廠廠務系統的運轉管理、工程規劃改善及相關管控，未具體涵蓋員工在客戶現場進行冷氣安裝、配管接線、抽真空、測漏與試運轉的整組工作，故屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "對不同的設施設備,實行定期保養、修理或更新工作,以確保各項設施設備的效率、可用性及安全性。(基礎/進階)"
+        },
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件",
+          "reference_quote": "廠務系統異常問題處理、故障排除與緊急應變之處理。（基礎/進階）"
+        },
+        {
+          "employee_quote": "我主要到客戶現場安裝和維修冷氣。",
+          "reference_quote": "水電特殊氣體、空調集塵、廢純軟水處理、消防勞安"
+        }
+      ],
+      "limitations": [
+        "公版偏重整廠廠務系統，不是以客戶現場的冷氣設備安裝與維修為核心。",
+        "公版未具體描述冷氣定位、配管接線、抽真空、測漏及試運轉等工作。",
+        "員工的接案報價、設備選型、工程排程及人員分配由主管處理，不應以公版的工程規劃或督導工作視為員工職責。"
+      ]
+    },
+    "seconds": 8.835405799967702,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "540883d8be7efa2c5ad96ea1d5b84f76eaf464f61cf7a097ab0aff397d569a52",
+    "case_id": "F04",
+    "document_id": "MIM2141-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J045",
+    "phase": "grade",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "reason": "公版核心是網站前端開發與維護，涵蓋前端程式撰寫、後端串接、跨裝置與瀏覽器驗證及測試，對應員工持續負責的畫面、互動、API 串接與瀏覽器品質工作組合，不只是單一局部動作，因此可作為該主要領域的整體參考。公版亦包含員工未負責的需求分析、規格規劃等工作，不能據此推定員工承擔這些責任。",
+      "evidence": [
+        {
+          "employee_quote": "收到已確認的功能需求和設計稿後，我會做頁面版型、互動元件、表單驗證、不同裝置的顯示調整，並串接同事提供的 API",
+          "reference_quote": "依據使用者要求,撰寫前端程式。"
+        },
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題",
+          "reference_quote": "在不同裝置與瀏覽器中驗證網站,並修正其差異以確保相容性。"
+        },
+        {
+          "employee_quote": "功能修改後也要確認沒有影響其他頁面。",
+          "reference_quote": "開發已變更的需求,並同時考慮變更後,對系統其他部分的影響。"
+        }
+      ],
+      "limitations": [
+        "公版包含需求分析、規格與文件規劃等工作；員工是在收到已確認需求和設計稿後開發，且不負責決定產品需求。",
+        "公版涵蓋較廣的網站維護與變更管理內容；員工明確不負責 API 內部邏輯、權限規則及資料庫，也不負責伺服器維護、備份或排值班。"
+      ]
+    },
+    "seconds": 7.708541900035925,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "5febce12fc452a427d886f8490cb24dab31146396775c26a100fbd86bd90aaea",
+    "case_id": "F02",
+    "document_id": "INM3514-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J046",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "reason": "公版對客戶應收帳款追蹤及帳款文件整理有實際支持，與員工持續負責的應收款追蹤有部分對應，因此屬部分代表。但公版定位於銷售／業務行政支援，未涵蓋員工的日常帳務登錄、應付款追蹤、銀行對帳、調整分錄及月結帳表整理，不能代表其主要帳務工作整體。",
+      "evidence": [
+        {
+          "employee_quote": "我會追蹤應收應付款",
+          "reference_quote": "協助確認客戶支付貨款的方式與支付期限,以完成帳款收付。"
+        },
+        {
+          "employee_quote": "整理主管和外部事務所需要的資料",
+          "reference_quote": "整理帳款之相關文件。"
+        }
+      ],
+      "limitations": [
+        "公版僅明列客戶貨款收付與帳款文件整理，沒有支持應付款追蹤、帳務登錄、銀行往來核對、調整分錄或月結帳表整理。",
+        "員工明確表示付款核准、資金安排及報稅申報由主管或外部事務所負責；公版也不能作為這些責任由員工承擔的證據。"
+      ]
+    },
+    "seconds": 11.344903099990916,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "b615d417afa5718246272de95579a2e795551caac52bdc12613f1a9937902eb6",
+    "case_id": "F03",
+    "document_id": "KPS2434-004v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J047",
+    "phase": "grade",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是場館業務拓展、客戶維繫、場地安排與活動執行，與員工持續負責的會員網站前端開發及維護沒有有意義的責任或工作組合對應。公版雖提到更新網路消息，但屬場館行銷資訊更新，不代表頁面互動、API 串接或瀏覽器品質工作。",
+      "evidence": [
+        {
+          "employee_quote": "收到已確認的功能需求和設計稿後，我會做頁面版型、互動元件、表單驗證、不同裝置的顯示調整，並串接同事提供的 API",
+          "reference_quote": "更新網路最新消息。"
+        },
+        {
+          "employee_quote": "我平常負責會員網站的畫面。",
+          "reference_quote": "負責業務拓展，維繫舊客戶與開發新客戶，專案控管、專案執行、進度控管，及服務品質管理等"
+        }
+      ],
+      "limitations": [
+        "公版提及網站資訊更新，僅有表面上的網站相關性，沒有描述員工主要負責的網站前端開發維護工作。"
+      ]
+    },
+    "seconds": 9.330179399985354,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "66e663bc797dbb15bd3bc8478b89d706083db3d66d0993bc5f429f26347e7966",
+    "case_id": "F02",
+    "document_id": "KPS3322-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J048",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是組織網路與作業系統的安裝、配置及疑難排除，無法代表員工持續負責的瀏覽器畫面開發或訂單 API、權限、商業規則及資料存取工作。員工偶爾協助處理同事的網路連線問題，只有局部關聯，不足以代表主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "偶爾同事電腦連不上網路會請我幫忙",
+          "reference_quote": "協助維護及管理組織網路系統。"
+        },
+        {
+          "employee_quote": "公司設備維護和固定資料備份由其他人負責",
+          "reference_quote": "作業系統(OS)【註1】的安裝、配置"
+        }
+      ],
+      "limitations": [
+        "公版內容聚焦網路與作業系統維護，未描述員工主要負責的訂單畫面、API、權限、商業規則或資料存取開發。",
+        "員工僅提及偶爾協助網路連線問題；不能據此推定其負責公版所列的作業系統安裝、配置或管理。"
+      ]
+    },
+    "seconds": 6.559499400027562,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "708a043dba983f844e74b98a990e601b8273d93862500d82c7aae2d7258209fb",
+    "case_id": "F01",
+    "document_id": "IIS3513-008v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J049",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是品質管理系統、產品檢驗與驗證及矯正預防措施，不代表員工持續負責的瀏覽器畫面開發維護或訂單 API、商業規則及資料存取開發維護。員工確實會測試新增功能，公版也涉及測試，但測試對象與目的不同，僅構成局部關聯。",
+      "evidence": [
+        {
+          "employee_quote": "每次新增功能，我會測試畫面操作、API 與資料是否一致",
+          "reference_quote": "妥善規劃並確實執行公司產品安全性及有效性驗證測試"
+        },
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則，設計及修改資料表、查詢與資料更新",
+          "reference_quote": "定期檢視及審核生產、品管和其他操作紀錄"
+        }
+      ],
+      "limitations": [
+        "公版的檢驗、測試與驗證主要指向公司產品的品質及安全有效性，並非員工對訂單系統畫面、API 與資料一致性的功能測試。",
+        "公版未實質涵蓋員工列明的兩個主要工作面向，故不列為代表主要工作的公版。"
+      ]
+    },
+    "seconds": 6.73109320004005,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "06c43542acf376c0c4e6a0c7783f041b735c6d9fdcb33b34429cc8b297c193a9",
+    "case_id": "F01",
+    "document_id": "MQM2141-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J001",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版對庫存補貨有局部實質支持；員工每週核對物料需求缺口與安全庫存，並負責下單，是其採購工作中持續的補貨子工作。但公版主要涵蓋倉儲盤點、分類、存放及紀錄等作業，補貨部分僅提到通知重新採購，未涵蓋員工主要的請購、下單、交期異常協調及供應商管理，因此僅屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我還會每週和生管一起看物料需求計畫，確認缺口和安全庫存，需要補貨就由我下單",
+          "reference_quote": "透過產品來源知識、產品選擇目的地頻率(或週期性)及潛在供應問題,通知存貨的重新採購。"
+        },
+        {
+          "employee_quote": "我會先和生管一起確認缺口和安全庫存，確定需要補貨後才下單。",
+          "reference_quote": "透過產品來源知識、產品選擇目的地頻率(或週期性)及潛在供應問題,通知存貨的重新採購。"
+        }
+      ],
+      "limitations": [
+        "公版著重倉儲管理，未涵蓋詢價比價、採購單核准與建立、供應商交期及品質異常協調等工作。",
+        "公版提到通知重新採購，員工則負責確認補貨需求並下單；兩者責任範圍並不相同。"
+      ]
+    },
+    "seconds": 17.985865099995863,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "895b66f5b2b459920a980556040019567e3c2aa1440964a1b3577160dfbc2d6f",
+    "case_id": "H03",
+    "document_id": "MMP4321-002v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J002",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是場館業務拓展、客戶關係、場地預訂與活動現場執行；員工主要負責成人課程的報名、課前安排、異動通知及出席紀錄。兩者只有檔期通知、資料保存及財務聯繫等局部行政動作相近，不足以代表員工的主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "老師臨時改上課時間時，我會先拿行政組長確認的時間，再照名冊用簡訊通知學員，也通知老師和場地窗口。",
+          "reference_quote": "協助客戶安排適當的檔期。"
+        },
+        {
+          "employee_quote": "除了出席表整理成試算表，沒有特別的課後資料；完成後我會存到中心指定的資料夾。",
+          "reference_quote": "將客戶往來之文件進行歸檔、數位化保存。"
+        },
+        {
+          "employee_quote": "付款資料對不上時，我會把報名資料和匯款末五碼整理給財務查帳，等財務確認後才更新繳費狀態；我不能自行認定款項已入帳。",
+          "reference_quote": "完成簽約手續後,知會財務部門預收場地訂金、開立收據或發票。"
+        }
+      ],
+      "limitations": [
+        "檔期安排、文件保存及財務聯繫的相似處僅限局部行政動作；公版描述的是客戶場地安排、活動紀錄及場館交易流程，員工描述的是成人課程作業。",
+        "員工只通知已由行政組長確認的課程異動，並不決定改期；不能據此視為公版中的場地業務或活動執行責任。"
+      ]
+    },
+    "seconds": 13.542302999994718,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "66e663bc797dbb15bd3bc8478b89d706083db3d66d0993bc5f429f26347e7966",
+    "case_id": "H01",
+    "document_id": "KPS3322-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J003",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版涵蓋需求與庫存檢視、詢價議價、驗收及供應商異常處理，能代表員工採購工作中的一組持續且具體的職責。但公版以零售商品採購為核心，員工則負責電子零件組裝所需的原物料與包材；公版另有市場需求分析、商品定位及供應商開發等工作，與員工已確認的責任組合不完全相符，故屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我還會每週和生管一起看物料需求計畫，確認缺口和安全庫存，需要補貨就由我下單；少數大宗原料有年度框架合約，我依合約逐次下單，續約資料由我整理、主管負責談。",
+          "reference_quote": "定期檢視庫存情況並依採購需求進行採購規劃。"
+        },
+        {
+          "employee_quote": "新品項或金額比較大的請購，我會至少找三家詢價，整理比價表給主管看；常用品項則用既有合約價。比價會看價格、交期、品質紀錄和付款條件，不一定最低價就選，還要寫理由。",
+          "reference_quote": "進行詢價作業,並依組織預算與需求議價。"
+        },
+        {
+          "employee_quote": "貨到後由倉庫收貨、品保檢驗；有數量或品質問題，他們會通知我，我再跟供應商協調退換貨或扣款，是否接受由主管決定。",
+          "reference_quote": "依據組織相關人員反映商品問題,與供應商進行退貨賠償溝通。"
+        },
+        {
+          "employee_quote": "我會依交期達成率、品質合格率和配合度整理績效表交給主管，由主管決定是否調整合作。",
+          "reference_quote": "定期檢視供應商合作情形,並依供應商評估指標,作為繼續或終止合作之依據。"
+        }
+      ],
+      "limitations": [
+        "公版的零售商品市場需求分析、商品市場範疇與商品採購計畫，不是員工已確認的主要責任；員工的採購對象是原物料和包材，並與生管確認缺口及安全庫存。",
+        "公版包含供應商開發新商品及簽訂採購合約等責任；員工年度價格談判由主管主談，供應商績效表亦交主管決定是否調整合作。",
+        "公版描述辦理供應商款項支付；員工是核對發票、採購單與驗收單後送財務，付款日期由財務安排。"
+      ]
+    },
+    "seconds": 16.2358473999775,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "1be2a57c49dd736680c64e5277f3e028e167af36905b70a1957bdb7416fa3cfb",
+    "case_id": "H03",
+    "document_id": "KRM3323-002v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J004",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ],
+      "reason": "公版的預約登記及修改／取消作業，與員工持續處理課程報名、核對資料及取消重複登記有一組具體工作對應，因此可部分代表主要工作中的報名作業。但公版核心是旅宿顧客預約與櫃台服務，未涵蓋員工主要工作中的課前資料安排、課程異動通知及出席紀錄，不能代表整個主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "我每天會用中心的報名系統核對報名資料，確認姓名、聯絡方式和課程。",
+          "reference_quote": "依據相關作業程序與顧客確認個人資訊和預約細節,並正確紀錄於訂房系統。"
+        },
+        {
+          "employee_quote": "發現重複報名，我會聯絡本人確認要保留哪一筆，再取消重複登記。",
+          "reference_quote": "依照作業規定與訂房系統操作程序處理修改或取消。"
+        },
+        {
+          "employee_quote": "課前兩個工作天，我會整理報名名冊和教室資料，交給老師和場地窗口使用。",
+          "reference_quote": "依照作業規定將預約和需求之細節彙集並交給適當部門(如:房務部、餐飲部或VIP及商務中心)。"
+        }
+      ],
+      "limitations": [
+        "預約／登記的對象與用途不同：員工處理成人進修課程報名，公版處理旅宿住宿預約。",
+        "公版未充分涵蓋課前名冊與教室資料、課程時間異動通知及出席紀錄整理等主要工作。",
+        "員工明確表示改期不是由其決定；付款資料不符時由財務查帳，員工確認後才更新繳費狀態，公版的旅宿訂金及櫃台帳務工作不能據此視為相同責任。"
+      ]
+    },
+    "seconds": 12.999842799967155,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "c10138044fa538f9dcf22cced46c4b892decb1c5e760b4d85dbe4d3e37b6813b",
+    "case_id": "H01",
+    "document_id": "THM4222-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J005",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "僅有聯絡報名者處理重複登記，與公版的顧客問題溝通處理有局部關聯；但這是孤立的局部工作，公版核心是門市商品管理、銷售服務與環境維護，不能代表員工主要的成人進修課程行政工作。",
+      "evidence": [
+        {
+          "employee_quote": "發現重複報名，我會聯絡本人確認要保留哪一筆，再取消重複登記。",
+          "reference_quote": "依組織規範,以適切的溝通方式,處理並記錄顧客問題。"
+        }
+      ],
+      "limitations": [
+        "公版未涵蓋員工主要工作組合中的課程報名、課前資料安排、異動通知及出席紀錄整理。",
+        "公版的庫存、進退貨、商品陳列補貨、銷售收款與門市環境維護，均非員工所述的主要職責。"
+      ]
+    },
+    "seconds": 7.633468499989249,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "abeb6678d89fd1f95a1d304dead87d4f20c0076963cf484458bbdb01641319e8",
+    "case_id": "H01",
+    "document_id": "BGM5220-002v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J006",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版的庫存管理工作與員工定期複點、回報差異及通知採購補貨有實質對應，足以部分代表其倉儲工作中的庫存準確與異常處理面向。但公版偏向供應鏈協調、追蹤與提出建議，沒有涵蓋員工主要工作中的多項現場作業。",
+      "evidence": [
+        {
+          "employee_quote": "平常每天下班前，我會複點當天異動比較多的品項，不是全倉盤點。月底會先複點自己負責的區域，再交主管抽查；如果差異超過主管規定的範圍，就要寫差異報告。",
+          "reference_quote": "確認庫存管理系統資料更新,並與倉庫管理團隊追蹤與溝通,了解庫存進出狀況,以落實系統庫存量與實際庫存維持一致。"
+        },
+        {
+          "employee_quote": "庫存低於安全庫存時，我會通知採購補貨。",
+          "reference_quote": "根據安全庫存量比對實際庫存後,對存量異常(過多或過少)商品提供庫存調整建議。"
+        },
+        {
+          "employee_quote": "有差異就拍照通知採購",
+          "reference_quote": "發現異常狀況,立即回報供應鏈管理人員,必要時配合與相關部門進行溝通,了解原因並尋求解決方案。"
+        }
+      ],
+      "limitations": [
+        "公版描述的是確認庫存資料、與倉庫團隊追蹤溝通及提出庫存調整建議；員工則親自複點並依主管規定撰寫差異報告，責任方式與層級不完全相同。",
+        "公版沒有實質涵蓋員工的收貨驗收、上架、揀貨及客戶退貨現場處理。",
+        "公版另有供應商管理、客戶訂單與配送等工作，不能據此推定為員工負責。"
+      ]
+    },
+    "seconds": 15.038098100048956,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "4abb3abeb74afe2f631fb5eebbb865464846975ba39917b2906bafd2227b5304",
+    "case_id": "H02",
+    "document_id": "KRM1324-002v1",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J007",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ],
+      "reason": "公版對活動參與者名冊、簽到表及資料歸檔有實際描述，能部分代表員工持續進行的課前名冊準備與出席紀錄整理。但公版核心偏向活動企劃及現場執行，未能代表員工主要工作中的課程報名處理、異動通知及繳費資料協調等工作組合。",
+      "evidence": [
+        {
+          "employee_quote": "課前兩個工作天，我會整理報名名冊和教室資料，交給老師和場地窗口使用。",
+          "reference_quote": "依活動計劃書,製作活動物品清冊【註2】、活動流程表,彙整參與人員名冊,並視需要製作簽到表。"
+        },
+        {
+          "employee_quote": "每堂課由老師把出席表交給我，我再把出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚時，我會請老師確認，不會自己猜。",
+          "reference_quote": "依活動計劃書,設置報到處,檢查參加者的報到資料,並提供活動手冊/資料袋或入場許可證。"
+        },
+        {
+          "employee_quote": "除了出席表整理成試算表，沒有特別的課後資料；完成後我會存到中心指定的資料夾。",
+          "reference_quote": "協助整理活動資料並歸檔。"
+        },
+        {
+          "employee_quote": "付款資料對不上時，我會把報名資料和匯款末五碼整理給財務查帳，等財務確認後才更新繳費狀態；我不能自行認定款項已入帳。",
+          "reference_quote": "依組織規範,執行款項收付作業。"
+        }
+      ],
+      "limitations": [
+        "公版著重活動企劃、場地與設備準備、現場執行及結案；員工沒有表示自己負責這些活動管理工作。",
+        "公版的款項收付責任不同於員工整理資料交財務查帳、待財務確認後更新狀態的作法。",
+        "公版未涵蓋員工日常核對課程報名、處理重複登記及依核定時間通知課程異動等工作。"
+      ]
+    },
+    "seconds": 18.255951899976935,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "5a5501839bd1212daf69db00985d49d5b96fc326623fa24be0962f4a133399ca",
+    "case_id": "H01",
+    "document_id": "KMC2432-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J008",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版以貨運、載具／貨物移動紀錄、運輸配送及相關文件為核心；員工主要工作是倉庫現場的收貨上架、揀貨、盤點與退貨處理。兩者有貨物紀錄方面的局部交集，但不足以代表員工的主要倉儲工作組合。",
+      "evidence": [
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。",
+          "reference_quote": "依工作場所程序及法規規範詳細紀錄載具/貨物的移動及相關文件。"
+        }
+      ],
+      "limitations": [
+        "員工原話呈現的是依儲位上架並登記入庫；公版所述是載具／貨物移動及文件紀錄，並未涵蓋員工的上架、揀貨、盤點及退貨處理等主要工作。",
+        "揀貨後的交接或存放安排、部分退貨紀錄方式等屬員工明示不確定的內容，不據此推定其職責。"
+      ]
+    },
+    "seconds": 18.943385499995202,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "9378257d4fe8fc787233ff3d4e2731c1a0e27e36cfcc8e629016b171155f081a",
+    "case_id": "H02",
+    "document_id": "RLM4323-002v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J009",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心在國際生行政、居留簽證與生活輔導，以及境外學習與交流活動；員工主要負責成人進修課程的報名、課前安排、異動通知及出席紀錄。兩者只有「課程學習相關作業」的泛稱重疊，沒有足以代表員工主要工作的一組具體責任。",
+      "evidence": [
+        {
+          "employee_quote": "我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。",
+          "reference_quote": "協助課程學習相關作業。"
+        }
+      ],
+      "limitations": [
+        "公版所述國際生簽證、居留、生活輔導及境外學習活動，不能視為員工的工作責任。",
+        "僅有泛稱的課程相關協助，無法支持員工的報名、課前資料整理、異動聯絡或出席紀錄等具體工作組合。"
+      ]
+    },
+    "seconds": 7.607095199986361,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "bc22bc8ba1f8ff425003d791cd06efa0f395eafc9a6747c7546256008d4021ca",
+    "case_id": "H01",
+    "document_id": "國際事務行政人員",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J010",
+    "phase": "grade",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版涵蓋收貨驗收、儲存、庫存管控、盤點、補貨與發貨等一組倉儲作業，對應員工持續負責的收貨、上架、揀貨、盤點及退貨處理，足以代表其主要的倉儲現場作業領域，不只是單一動作相似。公版另含員工未確認或不負責的較廣管理及判斷工作，不能據此推定那些也是員工職責。",
+      "evidence": [
+        {
+          "employee_quote": "我主要負責收貨驗收、上架、揀貨補貨、庫存盤點和客戶退貨入庫。",
+          "reference_quote": "執行商品驗收、調度和安全儲存的作業程序。"
+        },
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。上架前我也會用手持掃描器再掃一次條碼確認品項。",
+          "reference_quote": "依組織程序及商品特性,將商品儲存於適合的環境中。"
+        },
+        {
+          "employee_quote": "我依出貨單揀貨，會先進先出。",
+          "reference_quote": "依組織規範程序,進行發貨點交作業。"
+        },
+        {
+          "employee_quote": "平常每天下班前，我會複點當天異動比較多的品項，不是全倉盤點。月底會先複點自己負責的區域，再交主管抽查；如果差異超過主管規定的範圍，就要寫差異報告。",
+          "reference_quote": "依組織規範進行定期盤點或抽點。"
+        },
+        {
+          "employee_quote": "我會檢查退貨的外觀和數量，再依情況入庫或送到待處理區；如果是瑕疵品，判定由品保負責。",
+          "reference_quote": "控管倉儲產品的品質及數量,並根據需要,維護、監控和調整倉儲周轉率。"
+        }
+      ],
+      "limitations": [
+        "員工對供應商退貨只負責備貨及登記出貨，退不退由採購決定；瑕疵品判定由品保負責，不能把公版中的品質管控解讀為員工擁有這些決策權。",
+        "員工低於安全庫存時通知採購補貨，但補貨移動方式不確定；公版的補貨、商品調度及倉儲量能管理範圍較廣。",
+        "員工僅在盤點差異超過主管設定範圍時寫差異報告，未確認會比對其他資料、提出解決方案或負責調整庫存周轉率。",
+        "揀貨後的交接方式、揀貨時是否掃描或登記，以及退貨入庫或送往待處理區的相關紀錄均未確認。"
+      ]
+    },
+    "seconds": 19.671044899965636,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "780d82154184284005ca68258f18400255ca42a447adf6a578852c57dfdd2dd7",
+    "case_id": "H02",
+    "document_id": "MMP4321-003v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J011",
+    "phase": "grade",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版核心涵蓋進貨點收、上架、庫存盤點及撿集出貨，與員工持續負責的倉儲現場工作組合及作業對象相符，足以作為該主要領域的整體參考。這不表示補貨或客戶退貨各環節均已涵蓋，也不代表公版中的包裝、出貨等工作都適用於員工。",
+      "evidence": [
+        {
+          "employee_quote": "我主要負責收貨驗收、上架、揀貨補貨、庫存盤點和客戶退貨入庫。",
+          "reference_quote": "貨品進倉\n貨品進倉點收前置作業"
+        },
+        {
+          "employee_quote": "我會對照採購單和送貨單核對品項、數量，有差異就拍照通知採購；退不退貨或收不收不是我決定。",
+          "reference_quote": "依點貨單資訊,清點進貨商品內容/數量/型號等資訊。\n已確認之貨品資訊於系統註記,並修正錯誤之商品資訊。"
+        },
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。",
+          "reference_quote": "依倉庫存放規則,選擇適當的存放貨架/儲位/區域進行上架,並確保堆疊穩定且符合安全要求。\n更新倉儲管理系統中的相關貨物資訊。"
+        },
+        {
+          "employee_quote": "我依出貨單揀貨，會先進先出。",
+          "reference_quote": "整理由行政人員彙整的撿貨單,將撿貨內容依集貨區分類標示,並前往各集貨區進行撿貨。"
+        },
+        {
+          "employee_quote": "平常每天下班前，我會複點當天異動比較多的品項，不是全倉盤點。月底會先複點自己負責的區域，再交主管抽查；如果差異超過主管規定的範圍，就要寫差異報告。",
+          "reference_quote": "依組織盤點計畫,執行盤點工作。\n於倉儲系統彙整盤點物品資訊,並依照儲位或物品類別,進行盤點,核對數量。\n將盤點結果回報權責人員。"
+        },
+        {
+          "employee_quote": "我會檢查退貨的外觀和數量，再依情況入庫或送到待處理區；如果是瑕疵品，判定由品保負責。",
+          "reference_quote": "依組織規定處理瑕疵商品退貨。"
+        }
+      ],
+      "limitations": [
+        "員工補貨工作明確包括低於安全庫存時通知採購，但公版未具體描述這項補貨責任；補貨貨品移動方式亦未確認。",
+        "員工負責檢查客戶退貨外觀與數量，並依情況入庫或送至待處理區；公版只概述瑕疵商品退貨，未描述相同的客戶退貨檢查、分流及紀錄流程。",
+        "員工供應商退貨僅負責備貨及登記出貨，是否退貨由採購決定；不能把退貨決策責任歸給員工。",
+        "公版詳述訂單包裝、分貨及出貨流程，員工對揀貨後交接或存放方式表示不確定，不能據此認定其負責這些完整流程。"
+      ]
+    },
+    "seconds": 20.364228999998886,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "f9e36644a867d09eb115db29a76b609bfe8a25decb9dae9f8eb61e0fae9a15ba",
+    "case_id": "H02",
+    "document_id": "RLM9330-001v1",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J012",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版涵蓋收貨驗收、存貨管理、揀貨與退貨驗收，和員工持續負責的倉儲現場作業有多項實質對應，可代表其中一組主要工作。但公版以冷鏈及溫度檢測、記錄與管控為重要工作，員工未提及這些責任；公版也包含較完整的包裝、出貨交接與退貨系統處理，員工並未確認負責這些工作，因此屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我會把到貨的品項和數量拿來對照採購單、送貨單核對；有差異就拍照通知採購。",
+          "reference_quote": "依入庫(驗收)單資訊,清點進貨商品內容/數量/型號/溫層等資訊。"
+        },
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。",
+          "reference_quote": "將貨物移入適當的冷藏或冷凍設施或環境,並依據貨物的類型和規定放置在適當區域以利存貨管理。"
+        },
+        {
+          "employee_quote": "我依出貨單揀貨，會先進先出。",
+          "reference_quote": "根據訂單資訊與庫存位置指示,進行貨物種類與數量的揀選。"
+        },
+        {
+          "employee_quote": "平常每天下班前，我會複點當天異動比較多的品項，不是全倉盤點。月底會先複點自己負責的區域，再交主管抽查；如果差異超過主管規定的範圍，就要寫差異報告。",
+          "reference_quote": "依照先進先出原則,進行商品、數量、效期、批號與外箱完整性(良品/壞品)庫存盤點,並依效期調整存放位置,確認實際庫存與系統記錄的一致性。"
+        },
+        {
+          "employee_quote": "我會檢查退貨的外觀和數量，再依情況入庫或送到待處理區；如果是瑕疵品，判定由品保負責。",
+          "reference_quote": "檢查退回的貨物外包裝是否完整,確保貨物未被損壞或污染,並特別注意是否符合冷鏈運輸的溫度要求。"
+        }
+      ],
+      "limitations": [
+        "員工未提及冷藏、冷凍、貨物溫度檢測或冷鏈紀錄；這些是公版明確涵蓋的工作。",
+        "員工對揀貨後交接去向及揀貨時是否掃描或登記不確定，不能據此認定負責公版所述的完整包裝、出貨交接與出貨系統更新。",
+        "客戶退貨的系統登記及待處理區紀錄未確認；瑕疵品判定明確由品保負責。"
+      ]
+    },
+    "seconds": 13.67379329999676,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "84fbe44f08229f05ef908fbfce0302626f5c83067f4a8682cd2d3926c0c3b7cf",
+    "case_id": "H02",
+    "document_id": "RLM4323-004v1",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J013",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ],
+      "reason": "公版對學員報到及名冊登錄彙整有實際涵蓋，與員工持續處理報名資料、名冊的工作相符，因此對其主要課程行政領域有部分代表性。但公版核心還包括課程方案與教學內容規劃、師資安排、授課、評量及訓練檢討；員工主要負責行政執行，並不決定開課或改期，也不授課，故不足以代表該領域整體工作。",
+      "evidence": [
+        {
+          "employee_quote": "我每天會用中心的報名系統核對報名資料，確認姓名、聯絡方式和課程。",
+          "reference_quote": "登錄及彙整學員名冊。"
+        },
+        {
+          "employee_quote": "發現重複報名，我會聯絡本人確認要保留哪一筆，再取消重複登記。",
+          "reference_quote": "辦理學員報到及相關事項。"
+        },
+        {
+          "employee_quote": "我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。",
+          "reference_quote": "依招生簡章,確認學員資格及進行甄選作業。"
+        }
+      ],
+      "limitations": [
+        "公版描述的學員資格確認及甄選，並非員工已確認負責的工作；員工說明其會核對報名資料及處理重複登記。",
+        "公版未充分涵蓋員工的課前教室資料整理、依核准時間通知異動，以及出席表整理和出席人次彙整。",
+        "公版的課程規劃、教學執行、學員輔導與評量等責任，不應推定為員工工作；員工明確表示不授課，且改期由行政組長確認。"
+      ]
+    },
+    "seconds": 16.129076900018845,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "d445ce25e3236d84f2288aa9dd01804b6b471d01b7b8adba12cdf11a8a3190cf",
+    "case_id": "H01",
+    "document_id": "BHR2422-011v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J014",
+    "phase": "grade",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是依程序執行塑膠加工、設備操作及樣品／成品測試；員工主要負責原物料與包材採購、供應商協調及訂單管理，兩者沒有足以代表主要工作的實質對應。原料與品質相關字眼僅是表面重合，實際責任不同。",
+      "evidence": [
+        {
+          "employee_quote": "負責原物料和包材採購。",
+          "reference_quote": "確認加工模式完備塑膠加工原料、及消耗品處理。"
+        },
+        {
+          "employee_quote": "有數量或品質問題，他們會通知我，我再跟供應商協調退換貨或扣款",
+          "reference_quote": "依主管指示或標準作業程序,進行塑膠成品檢測是否符合規格。"
+        }
+      ],
+      "limitations": []
+    },
+    "seconds": 8.137256500020158,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "9bb5cc7b6d41d1ac8fbe4f3b3833ad96ee1f0246a537de65a458a3fd06fb7c6e",
+    "case_id": "H03",
+    "document_id": "MPM8142-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J015",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ],
+      "reason": "公版實質涵蓋課程報名、課前名單準備、出席資料登錄及訓後紀錄與報表，對員工持續負責的成人進修課程行政作業有一組具體且相符的支持。但公版另涵蓋教學活動支援、評量、結訓及訓後追蹤等工作，且未明確呈現員工的課程異動通知及付款資料核對流程，因此屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。",
+          "reference_quote": "於訓練機構或企業訓練單位，準備訓前相關前置作業、行政支援，以及負責訓後訓練發展紀錄維護、相關報表產出等工作。"
+        },
+        {
+          "employee_quote": "我每天會用中心的報名系統核對報名資料，確認姓名、聯絡方式和課程。",
+          "reference_quote": "按訓練計畫與招生對象,運用現有資源進行招生報名作業。"
+        },
+        {
+          "employee_quote": "課前兩個工作天，我會整理報名名冊和教室資料，交給老師和場地窗口使用。",
+          "reference_quote": "通知並確認學員名單,準備受訓學員報到資料。"
+        },
+        {
+          "employee_quote": "每堂課由老師把出席表交給我，我再把出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚時，我會請老師確認，不會自己猜。",
+          "reference_quote": "辦理受訓學員簽到與簽退、請假、資料登錄及餐點確認等事宜。"
+        },
+        {
+          "employee_quote": "出席人次每季彙整給行政組長，用來掌握班級執行情形。",
+          "reference_quote": "彙整相關訓練紀錄及評量成果,並完成統計報表。"
+        },
+        {
+          "employee_quote": "我不授課，也不決定開課或收費。",
+          "reference_quote": "配合講師進行訓練課程,支援學習活動,擔任教學助理。"
+        }
+      ],
+      "limitations": [
+        "員工的課程異動通知有明確流程：依行政組長確認的時間通知學員、老師及場地窗口；公版未明確描述此類改期通知。",
+        "員工處理付款資料不符時須交由財務查帳，並待確認後更新繳費狀態；公版未涵蓋這項流程。",
+        "公版還包括教學活動支援及評量、結訓、訓後追蹤等工作，員工陳述未顯示這些是其職責。"
+      ]
+    },
+    "seconds": 24.47125269996468,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "8546d4abaf864037013eb827e8e9f9d8d88f714f5695a6d42ddec94f4aaed793",
+    "case_id": "H01",
+    "document_id": "BHR2422-007v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J016",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版對供應商接洽與議價、詢價下單、物流進度追蹤及供應商資料等工作有實質涵蓋，支持員工主要採購領域中的一組持續工作，因此屬部分代表。但公版核心情境是零售商品採買，並延伸至消費市場、商品選擇、銷售及庫存管理；員工則主要負責電子零件組裝所需的原物料與包材採購，且包含請購資料核對、物料需求與安全庫存確認、來料品質異常協調等工作，範圍與工作對象並不完全相符。",
+      "evidence": [
+        {
+          "employee_quote": "新品項或金額比較大的請購，我會至少找三家詢價，整理比價表給主管看；常用品項則用既有合約價。",
+          "reference_quote": "透過商品詢價、議價、下單、以及物流進度追蹤等工作項目"
+        },
+        {
+          "employee_quote": "每週一我會整理未交貨清單，交期落後的就打電話或寄信催貨，並回報生管預估的新交期。",
+          "reference_quote": "監管貨品運輸與配送是否符合時程"
+        },
+        {
+          "employee_quote": "新供應商要建檔時，我會收集公司登記、稅籍、銀行帳戶和品質認證文件，交給品保審核，通過後才能建檔下單。",
+          "reference_quote": "彙整過去連繫過的廠商並將資料文件化"
+        },
+        {
+          "employee_quote": "我會依交期達成率、品質合格率和配合度整理績效表交給主管，由主管決定是否調整合作。",
+          "reference_quote": "並評核該商品之供應商是否能成為長期合作對象"
+        }
+      ],
+      "limitations": [
+        "公版著重零售商品、消費市場與商品採購策略，不能代表員工的製造業原物料與包材需求管理全貌。",
+        "公版未充分呈現員工的請購資料核對、與生管確認物料缺口及安全庫存、來料品質異常處理等責任。"
+      ]
+    },
+    "seconds": 15.006881300010718,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "fc08429ca9c360ee7912334c01c068fc5913b0c30b0e60c0d6d9e59c70abcd48",
+    "case_id": "H03",
+    "document_id": "KRM3323-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J017",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版的商品訂貨與進銷存管理，能部分代表員工持續依物料缺口、安全庫存決定補貨並下單的工作；但公版描述的是門市商品訂貨與庫存管理，未涵蓋員工採購工作的主要組合，例如詢比價、供應商管理、交期追蹤及品質與收貨異常協調，因此屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我還會每週和生管一起看物料需求計畫，確認缺口和安全庫存，需要補貨就由我下單",
+          "reference_quote": "能依據銷售狀況、庫存數量及總部政策,進行訂貨及能理解進銷存貨表單。"
+        },
+        {
+          "employee_quote": "我會先和生管一起確認缺口和安全庫存，確定需要補貨後才下單。",
+          "reference_quote": "能針對進銷廢存表單之分析及總部政策,據此進行庫存管理,降低商品迴轉天數,並提出改善方案或目標達成對策。"
+        }
+      ],
+      "limitations": [
+        "公版的訂貨對象是門市商品，員工負責的則是原物料與包材；訂貨及庫存管理的部分工作相近，但工作對象與責任範圍不同。",
+        "公版未提供詢價比價、供應商管理、交期追蹤、品質異常協調或採購單與發票核對等員工核心採購工作。"
+      ]
+    },
+    "seconds": 12.279520499985665,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "4345ccc187ad0de2b2617e76ad1198f651ac1eb67c62a09d88fb42a9c59d5035",
+    "case_id": "H03",
+    "document_id": "KRM1420-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J018",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版對進料供應商評鑑及稽核有部分對應，能支持員工定期整理供應商績效資料、聯絡安排供應商稽核等持續性子工作，因此屬部分代表。但公版核心是品質管制與品質工程；員工主要的詢價比價、請購下單、交期協調及採購流程未獲涵蓋，且員工不負責判定稽核結果。",
+      "evidence": [
+        {
+          "employee_quote": "我會依交期達成率、品質合格率和配合度整理績效表交給主管，由主管決定是否調整合作。",
+          "reference_quote": "稽核品質、管理、工安、採購工程，評鑑進物料供應商"
+        },
+        {
+          "employee_quote": "我主要負責和主要供應商聯絡、約稽核時間，並配合品保安排到廠。",
+          "reference_quote": "稽核品質、管理、工安、採購工程，評鑑進物料供應商"
+        }
+      ],
+      "limitations": [
+        "供應商稽核結果由誰判定或跟進，員工表示不確定；不能視為員工負責品質稽核或供應商評鑑決策。",
+        "公版其餘主要工作，如檢驗方法與流程、製程品保、品質異常分析及品質系統管理，不能代表員工的採購核心工作。"
+      ]
+    },
+    "seconds": 17.611867200001143,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "5ce3c826528a6addac5d96fa269e577a21e9ad4b5d253f9a3efc5ab6a0b1da39",
+    "case_id": "H03",
+    "document_id": "MQM1322-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J019",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版與員工都涉及資材採購及供應商管理，但公版核心是督導部門、規劃策略性採購與制定管理辦法；員工主要負責原物料與包材的日常請購下單、交期及異常協調。員工的年度談判以準備資料為主、由主管主談，供應商績效表也交主管決定後續合作，因此僅有局部工作關聯，不能代表其主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。",
+          "reference_quote": "督導與協調資材部門運作，負責資材的採購與管理事宜。"
+        },
+        {
+          "employee_quote": "十一月年度談判時，我會整理去年用量和市場行情給主管，主要是準備資料，由主管主談。",
+          "reference_quote": "監督團隊進行供應商資訊蒐集,並發展最佳選項,以進行合約的談判計畫。"
+        },
+        {
+          "employee_quote": "我會依交期達成率、品質合格率和配合度整理績效表交給主管，由主管決定是否調整合作。",
+          "reference_quote": "依據組織經營目標及相關政策資訊,規劃並訂定供應商管理辦法。"
+        }
+      ],
+      "limitations": [
+        "公版描述的是資材部門督導、策略與制度層級的工作，未能代表員工日常採購執行及交期、品質異常協調。",
+        "員工的供應商績效整理及年度談判準備有局部關聯，但決策或主談責任由主管承擔。"
+      ]
+    },
+    "seconds": 15.50373060000129,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "05b253b9edef1be5440a4a70242919f1837c22b0b3226cfdde5c12ac393c6568",
+    "case_id": "H03",
+    "document_id": "MMP1324-002v4",
+    "evidence_corrections": [
+      {
+        "evidence_index": 1,
+        "original_quote": "監督團隊進行供應商資訊蒐集, 並發展最佳選項, 以進行合約的談判計畫。",
+        "corrected_quote": "監督團隊進行供應商資訊蒐集,並發展最佳選項,以進行合約的談判計畫。",
+        "kind": "comma/space literal source correction"
+      },
+      {
+        "evidence_index": 2,
+        "original_quote": "依據組織經營目標及相關政策資訊, 規劃並訂定供應商管理辦法。",
+        "corrected_quote": "依據組織經營目標及相關政策資訊,規劃並訂定供應商管理辦法。",
+        "kind": "comma/space literal source correction"
+      }
+    ],
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J020",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版提到確認生產所需原物料、庫存及採購明細，並採購原物料滿足產線；這實質支持員工主要採購工作中每週確認物料缺口、安全庫存並補貨下單的部分，屬部分代表。公版核心仍是印刷生產安排、流程控管及庫存作業，未涵蓋員工主要的詢價比價、供應商管理、交期與品質異常協調等責任，故不足以強代表整個採購領域。",
+      "evidence": [
+        {
+          "employee_quote": "我還會每週和生管一起看物料需求計畫，確認缺口和安全庫存，需要補貨就由我下單",
+          "reference_quote": "採購原物料以滿足產線需求。"
+        },
+        {
+          "employee_quote": "我會先和生管一起確認缺口和安全庫存，確定需要補貨後才下單。",
+          "reference_quote": "確認庫存數量及訂單需求之採購明細。"
+        }
+      ],
+      "limitations": [
+        "公版僅提及生產所需原物料的採購與庫存確認，未描述包材採購、詢價比價、開立採購單或供應商管理。",
+        "公版主要責任是印刷生產流程及庫存管理，不能代表員工整體採購職責。"
+      ]
+    },
+    "seconds": 14.323349499958567,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "c3c52db602187448f31b02e7b61c18e596aa63982091c6bc2c8a6935f9a8e346",
+    "case_id": "H03",
+    "document_id": "MPM7322-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J021",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版對存貨盤點及差異回報有實際對應，可部分代表員工持續負責的盤點工作；但公版核心偏向制定倉管政策、管理存量及督導盤點，員工主要是執行日常與月底複點並依規定回報，責任層級不完全相符。",
+      "evidence": [
+        {
+          "employee_quote": "平常每天下班前，我會複點當天異動比較多的品項，不是全倉盤點。月底會先複點自己負責的區域，再交主管抽查；如果差異超過主管規定的範圍，就要寫差異報告。",
+          "reference_quote": "督導存貨盤點及存貨週轉程序。"
+        },
+        {
+          "employee_quote": "月底會先複點自己負責的區域，再交主管抽查；如果差異超過主管規定的範圍，就要寫差異報告。",
+          "reference_quote": "製作存貨盤點報告,將差異及解決方案回報給管理階層。"
+        }
+      ],
+      "limitations": [
+        "公版沒有充分代表員工的收貨驗收、上架、揀貨、補貨及客戶退貨檢查與處理等現場作業。",
+        "員工表示盤點範圍與差異門檻由主管規定，且盤點後交主管抽查；沒有證據顯示員工負責制定庫存政策、決定最適存量或督導他人盤點。",
+        "員工複點的是當天異動較多品項及自己負責的區域，不是全倉盤點。"
+      ]
+    },
+    "seconds": 14.649795400036965,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "7864a5bb8ff116b2c5e8cef771f8a2c8419a67941293d503591b46a64fbd87b7",
+    "case_id": "H02",
+    "document_id": "MMP1324-003v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J022",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是會計與簿記、財務憑證審查、帳簿核對及財稅作業，無法代表員工主要的成人進修課程行政工作。員工處理付款資料不符時，僅整理資料交財務查帳，待財務確認後更新繳費狀態；這是局部的付款資料協調，並非本人負責會計審查或帳務核對，因此只屬局部關聯。",
+      "evidence": [
+        {
+          "employee_quote": "付款資料對不上時，我會把報名資料和匯款末五碼整理給財務查帳，等財務確認後才更新繳費狀態；我不能自行認定款項已入帳。",
+          "reference_quote": "審查財務收款文件及憑證"
+        },
+        {
+          "employee_quote": "我再把出席人數和缺漏整理到試算表；姓名漏填或勾選不清楚時，我會請老師確認，不會自己猜。",
+          "reference_quote": "核對總帳與明細分類帳目上所列之款項,確認交易憑證資料與金額正確無誤,若有錯誤應與相關單位及人員確認後修正。"
+        }
+      ],
+      "limitations": [
+        "員工明確將查帳交由財務處理，並表示不能自行認定款項已入帳；沒有證據顯示其負責審查財務憑證、核對帳簿或作帳。",
+        "員工的出席人次彙整是課程執行情形紀錄，不是公版所述的財務帳簿或財務報表工作。"
+      ]
+    },
+    "seconds": 11.72065609996207,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "3e0fb759f17124e4dcc75b8fefea05a59c5744b6b865b4ea8849353dbc51c506",
+    "case_id": "H01",
+    "document_id": "FAC4311-001v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J023",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版對詢比價、下單、交期跟催、異常退換貨及請款等採購流程有持續且實質的對應，能部分代表員工的主要採購工作，不只是局部工具或名詞相似。不過公版也涵蓋採購計畫、招標邀標、議約及合約終止等較廣的責任；員工描述的工作較偏原物料與包材的日常執行，年度談判由主管主談，因此責任範圍僅部分相符，評為 2。",
+      "evidence": [
+        {
+          "employee_quote": "新品項或金額比較大的請購，我會至少找三家詢價，整理比價表給主管看；常用品項則用既有合約價。比價會看價格、交期、品質紀錄和付款條件，不一定最低價就選，還要寫理由。",
+          "reference_quote": "依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。"
+        },
+        {
+          "employee_quote": "我還會每週和生管一起看物料需求計畫，確認缺口和安全庫存，需要補貨就由我下單；少數大宗原料有年度框架合約，我依合約逐次下單，續約資料由我整理、主管負責談。",
+          "reference_quote": "依議價結果,進行下單及協助簽約作業。"
+        },
+        {
+          "employee_quote": "每週一我會整理未交貨清單，交期落後的就打電話或寄信催貨，並回報生管預估的新交期。",
+          "reference_quote": "依組織採購規範、訂購單/採購合約,處理採購項目遺失或延遲、貨品交期跟催等問題。"
+        },
+        {
+          "employee_quote": "貨到後由倉庫收貨、品保檢驗；有數量或品質問題，他們會通知我，我再跟供應商協調退換貨或扣款，是否接受由主管決定。",
+          "reference_quote": "依組織採購規範,處理不符合訂購單/採購合約之退貨/換貨、求償與取消或終止合約等相關事務。"
+        },
+        {
+          "employee_quote": "十一月年度談判時，我會整理去年用量和市場行情給主管，主要是準備資料，由主管主談。",
+          "reference_quote": "依核定後採購計畫,研擬招標/邀標規範內容,並經主管同意。"
+        }
+      ],
+      "limitations": [
+        "公版包括採購計畫、招標邀標、議約及合約終止等工作；員工原話未確認由本人承擔這些責任。",
+        "員工主要描述原物料與包材的日常採購執行，並明確表示年度談判由主管主談；公版的較廣採購責任與員工責任層級並非完全相符。"
+      ]
+    },
+    "seconds": 29.07254980003927,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "3940f07ff994da45ae36f544b3d7a154cce938bb410130a672e68dde60d1642e",
+    "case_id": "H03",
+    "document_id": "BAS3323-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J024",
+    "phase": "grade",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版涵蓋採購前置與文件、下單、交期跟催、收貨異常處理、請款及供應商資料管理，與員工持續負責的原物料及包材採購流程形成廣泛對應，可作為該採購領域的整體參考；不是只靠單一共通動作判定。",
+      "evidence": [
+        {
+          "employee_quote": "每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。",
+          "reference_quote": "依組織採購規範及流程，協助執行採購作業及採購資料管理。"
+        },
+        {
+          "employee_quote": "每週一我會整理未交貨清單，交期落後的就打電話或寄信催貨，並回報生管預估的新交期。",
+          "reference_quote": "依組織採購規範、訂購單/採購合約,協助處理貨品短缺或延遲、貨品交期跟催等問題。"
+        },
+        {
+          "employee_quote": "有數量或品質問題，他們會通知我，我再跟供應商協調退換貨或扣款，是否接受由主管決定。",
+          "reference_quote": "依組織採購規範、訂購單/採購合約,並依主管指示,處理退貨/換貨、求償與取消或終止合約等相關事務。"
+        },
+        {
+          "employee_quote": "新供應商要建檔時，我會收集公司登記、稅籍、銀行帳戶和品質認證文件，交給品保審核，通過後才能建檔下單。",
+          "reference_quote": "依法令規定及組織採購規範,建立供應商資料及合約歸檔。"
+        },
+        {
+          "employee_quote": "我會依交期達成率、品質合格率和配合度整理績效表交給主管，由主管決定是否調整合作。",
+          "reference_quote": "依法令規定、組織採購規範與主管指示,記錄供應商合作狀況。"
+        }
+      ],
+      "limitations": [
+        "公版著重依規範及主管指示協助執行，未明列員工的物料需求計畫與安全庫存檢視、詢價比價及供應商績效評鑑等工作細節。",
+        "公版可代表採購執行及資料管理領域，但不表示員工所有工作內容、核准權限或供應商決策責任均與公版相同。"
+      ]
+    },
+    "seconds": 23.482656200008933,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "ae8e68e8198f164b9e46a3cd359164548db52fc5510af86f333257d4b1cd793d",
+    "case_id": "H03",
+    "document_id": "BAS3323-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J025",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版對供應商交期監控、績效評估、問題協調及資料收集有實質描述，能代表員工採購工作中持續的供應商管理子工作，因此屬部分代表。但員工主要還負責請購資料核對、詢價比價、ERP 下單及日常採購執行，公版沒有充分涵蓋這些工作；公版另包含員工未負責的客戶需求、生產計畫與出貨等廣泛供應鏈職責，且供應商選擇、合約簽署及合作調整的決策權也高於員工所述範圍。",
+      "evidence": [
+        {
+          "employee_quote": "我會依交期達成率、品質合格率和配合度整理績效表交給主管，由主管決定是否調整合作。",
+          "reference_quote": "定期對供應商的績效進行審查和評估,評估其是否符合合同條款和公司期望。"
+        },
+        {
+          "employee_quote": "每週一我會整理未交貨清單，交期落後的就打電話或寄信催貨，並回報生管預估的新交期。",
+          "reference_quote": "確認供應商交貨時率是否如合約擬定之期程進行。"
+        },
+        {
+          "employee_quote": "有數量或品質問題，他們會通知我，我再跟供應商協調退換貨或扣款，是否接受由主管決定。",
+          "reference_quote": "及時識別和解決供應商可能出現的問題和衝突,掌握供應商當前困境與尚可爭取、協調之處。"
+        },
+        {
+          "employee_quote": "新供應商要建檔時，我會收集公司登記、稅籍、銀行帳戶和品質認證文件，交給品保審核，通過後才能建檔下單。",
+          "reference_quote": "定期收集潛在供應商之基本資料,包括公司背景、產品和服務範圍、經驗和能力等。"
+        },
+        {
+          "employee_quote": "新品項或金額比較大的請購，我會至少找三家詢價，整理比價表給主管看；常用品項則用既有合約價。",
+          "reference_quote": "分析和比較不同供應商的優劣勢,根據評估結果篩選出符合目前需求的最終供應商。"
+        }
+      ],
+      "limitations": [
+        "公版未充分涵蓋員工日常請購資料核對、採購單 ERP 建立及採購執行流程；比價與供應商篩選雖有局部對應，員工仍將資料交主管審閱。",
+        "公版描述供應商開發、選擇、合約條款協商與簽署等較完整或較高決策層級的責任；員工年度談判主要準備資料，主管主談，供應商合作調整也由主管決定。",
+        "公版另涵蓋客戶需求、生產計畫、庫存及出貨管理，超出員工確認的主要採購工作範圍。"
+      ]
+    },
+    "seconds": 18.782634900009725,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "50ab0c7531cc675062074676243084ed69421cca29d92c2809cf05c5a0e9035e",
+    "case_id": "H03",
+    "document_id": "KRM1324-001v1",
+    "evidence_corrections": [
+      {
+        "evidence_index": 2,
+        "original_quote": "及時識別和解決供應商可能出現的問題和衝突，掌握供應商當前困境與尚可爭取、協調之處。",
+        "corrected_quote": "及時識別和解決供應商可能出現的問題和衝突,掌握供應商當前困境與尚可爭取、協調之處。",
+        "kind": "comma/space literal source correction"
+      }
+    ],
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J026",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版主要描述銷售業務支援，包括客戶與產品資料、訂單及貨款處理；與員工的成人課程行政核心工作不同。員工的報名資料核對、付款異常轉交及出席人次彙整，和公版資料管理、帳款及報表工作有局部關聯，但不足以代表其主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "我每天會用中心的報名系統核對報名資料，確認姓名、聯絡方式和課程。",
+          "reference_quote": "整理客戶需求與基本資料,並將客戶資料分類、建檔及備份。"
+        },
+        {
+          "employee_quote": "付款資料對不上時，我會把報名資料和匯款末五碼整理給財務查帳，等財務確認後才更新繳費狀態；我不能自行認定款項已入帳。",
+          "reference_quote": "協助確認客戶支付貨款的方式與支付期限,以完成帳款收付。"
+        },
+        {
+          "employee_quote": "出席人次每季彙整給行政組長，用來掌握班級執行情形。",
+          "reference_quote": "定期提供產品銷售報表,供業務人員與部門主管參考。"
+        }
+      ],
+      "limitations": [
+        "公版所述資料、帳款及報表工作服務於銷售業務；員工則負責課程報名、課前安排、異動通知及出席紀錄，兩者的工作對象與用途不同。",
+        "員工只明確說明付款資料對不上時轉交財務查帳，不能據此推定其負責一般貨款追蹤或帳款收付。",
+        "出席人次彙整與銷售報表僅有報表整理及提供主管參考的局部相似，內容和用途並不相同。"
+      ]
+    },
+    "seconds": 14.674609300040174,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "b615d417afa5718246272de95579a2e795551caac52bdc12613f1a9937902eb6",
+    "case_id": "H01",
+    "document_id": "KPS2434-004v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J027",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版對商品盤點、補貨、產品放置與庫存相關作業有實質支持，能代表員工倉儲現場工作的部分持續責任；但員工主要工作還包括收貨驗收、揀貨及客戶退貨處理，公版未充分描述這些核心作業的流程與責任範圍，因此屬部分代表，而非該主要工作面向的整體參考。",
+      "evidence": [
+        {
+          "employee_quote": "我主要負責收貨驗收、上架、揀貨補貨、庫存盤點和客戶退貨入庫。",
+          "reference_quote": "執行商品盤點、補貨、寄貨、出貨等倉儲管理作業。"
+        },
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。",
+          "reference_quote": "使用標籤、庫存系統及其它資訊來源,協助產品識別、處理方式及其儲存要求。"
+        },
+        {
+          "employee_quote": "庫存低於安全庫存時，我會通知採購補貨。",
+          "reference_quote": "透過產品來源知識、產品選擇目的地頻率(或週期性)及潛在供應問題,通知存貨的重新採購。"
+        }
+      ],
+      "limitations": [
+        "公版未具體描述員工的收貨驗收、依出貨單揀貨及客戶退貨檢查與分流流程，因而不足以涵蓋其主要倉儲現場工作的整體組合。",
+        "員工明確表示揀貨後的交接或放置方式不確定；公版中較廣泛的出貨作業描述，不能據此推定員工負責特定交接流程。"
+      ]
+    },
+    "seconds": 28.855186100001447,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "895b66f5b2b459920a980556040019567e3c2aa1440964a1b3577160dfbc2d6f",
+    "case_id": "H02",
+    "document_id": "MMP4321-002v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J028",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版主要描述餐飲服務人員的督導管理、餐廳營運與員工教育訓練，不能代表員工主要負責的成人進修課程行政作業。公版提到課程通知及確認參加人員，與員工通知課程異動有局部動作相似，但員工不規劃或決定課程異動；該相似不足以代表其主要工作領域。",
+      "evidence": [
+        {
+          "employee_quote": "老師臨時改上課時間時，我會先拿行政組長確認的時間，再照名冊用簡訊通知學員，也通知老師和場地窗口。",
+          "reference_quote": "規劃例行教育訓練之時間、主題、參加人員,並依照預定行程事前發出上課通知與準備教材。"
+        },
+        {
+          "employee_quote": "課前兩個工作天，我會整理報名名冊和教室資料，交給老師和場地窗口使用。",
+          "reference_quote": "依照預定時間開辦課程,確認參加人員,課後抽問或檢閱員工之學後心得報告,並給予回饋意見。"
+        }
+      ],
+      "limitations": [
+        "員工通知的是成人進修課程異動，且依行政組長確認的時間執行；公版的教育訓練則由其職務規劃並開辦，對象為餐飲服務員。",
+        "公版核心工作還包括餐飲服務人員督導、餐廳環境與服務管理、訂席及顧客抱怨處理，與員工主要工作組合不同。"
+      ]
+    },
+    "seconds": 7.788001500011887,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "db17ff9708b936887f1d85cfd1a2394b0c700929232d9a0969e8522b7bac9613",
+    "case_id": "H01",
+    "document_id": "TFB1412-002v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J029",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ],
+      "reason": "公版有一組具體的報名行政工作，包括受理報名、建立名冊、維護資料及統計人數，與員工主要工作中的報名處理有實質對應，因此可作為該領域的部分參考。但公版整體以旅行團出團與結團為核心，未能代表員工的課前安排、出席紀錄等工作組合，故不屬強代表。",
+      "evidence": [
+        {
+          "employee_quote": "我主要處理報名、課前名單和教室資料、課程異動通知及課後紀錄。",
+          "reference_quote": "依據旅遊產品製作出團宣傳文件,開放接受報名,將報名旅客建立名冊,基本資料建檔、維護與更新,並統計人數。"
+        },
+        {
+          "employee_quote": "我每天會用中心的報名系統核對報名資料，確認姓名、聯絡方式和課程。",
+          "reference_quote": "將報名旅客建立名冊,基本資料建檔、維護與更新,並統計人數。"
+        },
+        {
+          "employee_quote": "發現重複報名，我會聯絡本人確認要保留哪一筆，再取消重複登記。",
+          "reference_quote": "協助處理出團和報名作業"
+        }
+      ],
+      "limitations": [
+        "公版主要涵蓋旅行團報名、旅遊文件、交通食宿安排、帶團交接、客訴及團帳等工作，這些不是員工陳述的主要責任。",
+        "員工的課前名單與教室資料整理、出席表及每季出席人次彙整，在公版中沒有相應的具體工作支持。",
+        "公版的行程異動及旅客通知涉及旅遊行程與退費；不能據此推定員工具有決定課程異動或處理退費的責任。"
+      ]
+    },
+    "seconds": 13.649214699980803,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "1394d6d0e177033fc277db13b677bc2581f7e098425a5b775b04625ff1ce6141",
+    "case_id": "H01",
+    "document_id": "TTM4221-007v1",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J030",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "僅有報名資料核對與餐飲訂位作業的局部類比，工作對象及用途不同；公版核心是餐飲現場接待、點餐送餐與環境維護，不能代表成人進修課程的報名、課前安排、異動通知或出席紀錄等主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "我每天會用中心的報名系統核對報名資料，確認姓名、聯絡方式和課程。",
+          "reference_quote": "依組織規範與服務流程,處理訂位作業及現場座位安排。"
+        }
+      ],
+      "limitations": [
+        "報名資料核對與餐飲訂位僅有局部作業相似，並非相同工作責任。",
+        "公版未涵蓋課前名冊與教室資料、課程異動通知、出席紀錄及每季彙整等主要工作。"
+      ]
+    },
+    "seconds": 7.4131084000109695,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "7ca9703a0e275ed524efa2fc9f46d0cc563fd254800364e328307e309df3c46c",
+    "case_id": "H01",
+    "document_id": "TFB5139-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J031",
+    "phase": "grade",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版對員工主要採購領域中的供應商供貨追蹤、延誤或品質異常協調、供應商績效記錄及資料管理，有持續且具體的工作對應，足以部分代表這些子工作。但公版主要描述供應鏈管理人員指示下的協助與追蹤，並未涵蓋員工的詢價比價、供應商選擇、請購下單及核准責任，也包含員工不負責的客戶訂單與出貨作業，因此不是整體採購工作的強代表。",
+      "evidence": [
+        {
+          "employee_quote": "每週一我會整理未交貨清單，交期落後的就打電話或寄信催貨，並回報生管預估的新交期。",
+          "reference_quote": "主動追蹤供貨狀態,當發生供貨延誤或品質問題時,與供應商協商解決方案。"
+        },
+        {
+          "employee_quote": "我會依交期達成率、品質合格率和配合度整理績效表交給主管，由主管決定是否調整合作。",
+          "reference_quote": "定期收集供應商的績效數據,並記錄結果。"
+        },
+        {
+          "employee_quote": "也管供應商資料。",
+          "reference_quote": "定期與供應商進行日常聯繫,了解供應商產品相關資訊,定期更新供應商資料庫,並提供潛在新增供應商資訊。"
+        }
+      ],
+      "limitations": [
+        "公版未涵蓋員工主要負責的原物料與包材請購、詢價比價、採購訂單開立及核准分工。",
+        "公版所述採購訂單成立或增減是根據供應鏈管理人員指示追蹤，與員工負責實際採購作業的範圍及責任層級不完全相同。",
+        "公版另包含客戶需求、客戶訂單、出貨安排及請款等工作，員工陳述未確認由本人負責。"
+      ]
+    },
+    "seconds": 12.342045099998359,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "4abb3abeb74afe2f631fb5eebbb865464846975ba39917b2906bafd2227b5304",
+    "case_id": "H03",
+    "document_id": "KRM1324-002v1",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J032",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是會計交易紀錄、憑證核對、帳務計算及財務報表；員工的主要工作是成人進修課程行政。付款資料不符時，員工僅整理資料交由財務查帳，待財務確認後更新繳費狀態，這是局部的帳務協調，不足以代表其主要工作，也不等同承擔會計帳務責任。",
+      "evidence": [
+        {
+          "employee_quote": "付款資料對不上時，我會把報名資料和匯款末五碼整理給財務查帳，等財務確認後才更新繳費狀態；我不能自行認定款項已入帳。",
+          "reference_quote": "核對收支明細表所列之款項,確認其與交易憑證正確無誤,若有錯誤應與相關單位及人員確認後修正。"
+        },
+        {
+          "employee_quote": "出席人次每季彙整給行政組長，用來掌握班級執行情形。",
+          "reference_quote": "各類財務報表/申報書"
+        }
+      ],
+      "limitations": [
+        "員工的出席人次彙整是掌握班級執行情形，不能據此視為公版所述的財務報表或帳務工作。",
+        "員工對其他付款資料尚未到時的跟進或交接方式表示不確定，不推定其負責完整的付款核對或帳務處理。"
+      ]
+    },
+    "seconds": 10.729465899989009,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "edf18bbf6b5184804940ef66bdb576272842a628ed1ba3c80b7ddcaeee646245",
+    "case_id": "H01",
+    "document_id": "FAC3313-001v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J033",
+    "phase": "grade",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是獎勵旅遊的業務拓展、客戶需求與提案，以及旅遊活動執行和結案，不能代表員工主要的成人進修課程行政工作。公版有少量活動聯繫、資料整理與場地協調方面的局部關聯，但工作對象和責任組合不同，不足以代表主要領域。",
+      "evidence": [
+        {
+          "employee_quote": "每堂課由老師把出席表交給我，我再把出席人數和缺漏整理到試算表",
+          "reference_quote": "整理活動內容,若有發生相關問題,須提出流程記錄。"
+        },
+        {
+          "employee_quote": "課前兩個工作天，我會整理報名名冊和教室資料，交給老師和場地窗口使用。",
+          "reference_quote": "確認訂房、車、餐的狀況是否正確。"
+        },
+        {
+          "employee_quote": "老師臨時改上課時間時，我會先拿行政組長確認的時間，再照名冊用簡訊通知學員，也通知老師和場地窗口。",
+          "reference_quote": "按照主管指示,進行活動修正。"
+        }
+      ],
+      "limitations": [
+        "上述對應僅為紀錄整理、場地相關協調或依主管確認事項進行聯繫等局部相似；公版涉及客戶開發、旅遊活動企劃與現場執行，員工則負責課程報名、課前行政、異動通知及出席紀錄。"
+      ]
+    },
+    "seconds": 9.298727899964433,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "a3080334b642778e20f7e74db635b08d1be5712d3cac4e0fe952d4221a03b37e",
+    "case_id": "H01",
+    "document_id": "TTM4221-004v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json"
+  },
+  {
+    "job_id": "J001",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版的進貨檢查、存貨運送與盤點等工作，實質支持員工倉儲現場作業中的收貨、上架及庫存盤點這組持續工作，因此屬部分代表。公版整體仍以吧檯、飲品服務與顧客作業為主，且未涵蓋員工的揀貨、補貨及客戶退貨等核心工作，不足以強代表整個倉儲作業領域。",
+      "evidence": [
+        {
+          "employee_quote": "我會對照採購單和送貨單核對品項、數量，有差異就拍照通知採購；退不退貨或收不收不是我決定。",
+          "reference_quote": "根據組織政策與程序,依訂單與送貨單檢查進貨品項並記錄。"
+        },
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。",
+          "reference_quote": "運送進存貨至適當的保管區域時,須使用安全的搬運技術以避免破損。"
+        },
+        {
+          "employee_quote": "平常每天下班前，我會複點當天異動比較多的品項，不是全倉盤點。月底會先複點自己負責的區域，再交主管抽查；如果差異超過主管規定的範圍，就要寫差異報告。",
+          "reference_quote": "定期檢查及盤點庫存量,以確認後續品質。"
+        }
+      ],
+      "limitations": [
+        "公版庫存工作置於吧檯與存貨管理脈絡，核心整體工作還包括飲品調製、結帳及顧客服務，並非倉儲職位的整體工作組合。",
+        "公版未實質涵蓋員工的揀貨、補貨及客戶退貨處理。員工亦明確表示供應商退貨是否退貨由採購決定，不能據此認定員工負責退貨決策。"
+      ]
+    },
+    "seconds": 15.22943690000102,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "76529ac55e8877e4ad0f67219df14246110464ae4f1bbcc01d54a3f8981e2c38",
+    "case_id": "H02",
+    "document_id": "TFB5131-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J002",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "reason": "公版持續涵蓋軟體程式開發、測試除錯及維護，對員工的畫面開發與瀏覽器品質工作有實質但概括的支持，足以部分代表其主要工作。公版未明確涵蓋會員網站頁面、互動元件、API 串接或瀏覽器品質等核心工作組合，且另含多項不同責任，因此不足以強代表該面向。",
+      "evidence": [
+        {
+          "employee_quote": "收到已確認的功能需求和設計稿後，我會做頁面版型、互動元件、表單驗證、不同裝置的顯示調整，並串接同事提供的 API，把登入狀態、會員資料及錯誤訊息顯示正確。",
+          "reference_quote": "撰寫軟體程式,測試與調校除錯改善軟體問題。"
+        },
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題、調整載入速度及可操作性，功能修改後也要確認沒有影響其他頁面。",
+          "reference_quote": "能迅速完成軟體程式,測試與改善軟體問題,探究原因。"
+        },
+        {
+          "employee_quote": "功能修改後也要確認沒有影響其他頁面。",
+          "reference_quote": "維護軟體程式與版本控制管理。"
+        }
+      ],
+      "limitations": [
+        "公版主要以一般軟體設計及產品開發維護描述，未指出員工持續負責的會員網站畫面、互動、API 串接及瀏覽器品質工作。",
+        "員工明確表示 API 內部邏輯、權限規則及資料庫由同事負責；不能將公版中的資料庫設計等責任推定為員工工作。"
+      ]
+    },
+    "seconds": 13.187468499992974,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "48d43acc47c06889d126275ebacca9410698ff930dd4e3262b0edc4ff0d41ffc",
+    "case_id": "F02",
+    "document_id": "ISD2152-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J003",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "reason": "公版的門市帳務管理與員工主要帳務領域有實質但有限的重疊：都涉及日常帳務確認及核對。公版著重營業日報表、現金及銷售帳吻合，僅能代表員工帳務工作的部分子項；不足以代表其整體帳務登錄、應收應付款追蹤及月結工作組合。",
+      "evidence": [
+        {
+          "employee_quote": "每天整理發票、收付款單據和費用憑證，核對訂單、金額及科目後登錄帳務；遇到資料不一致，我會找經手同事確認。",
+          "reference_quote": "能製作或確認營業日報表,確保現金、有價證券與銷售帳之吻合,落實門市帳務管理工作。"
+        }
+      ],
+      "limitations": [
+        "公版描述的是門市營業日報表與現金、有價證券及銷售帳核對，未涵蓋員工所述的應收應付款追蹤、銀行往來核對、調整分錄及月結帳表整理。",
+        "公版核心工作還包括門市人員、商品、營運及顧客管理，整體工作範圍與員工的帳務工作組合不相符。"
+      ]
+    },
+    "seconds": 10.661604599968996,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "4345ccc187ad0de2b2617e76ad1198f651ac1eb67c62a09d88fb42a9c59d5035",
+    "case_id": "F03",
+    "document_id": "KRM1420-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J004",
+    "phase": "formal",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是廠務系統及廠房設施的運轉、巡檢、維護與工程改善，與員工主要負責的會員網站畫面開發、API 串接及瀏覽器品質工作沒有實質對應。",
+      "evidence": [
+        {
+          "employee_quote": "我平常負責會員網站的畫面。",
+          "reference_quote": "負責廠務各項系統運轉維護管理及工程改善"
+        },
+        {
+          "employee_quote": "維護伺服器、資料備份和排值班都不是我的工作",
+          "reference_quote": "執行廠務系統巡檢、維護與保養。"
+        }
+      ],
+      "limitations": []
+    },
+    "seconds": 4.686401400016621,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "540883d8be7efa2c5ad96ea1d5b84f76eaf464f61cf7a097ab0aff397d569a52",
+    "case_id": "F02",
+    "document_id": "MIM2141-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J005",
+    "phase": "formal",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是藥品推廣銷售、客戶經營與醫藥品說明，與員工持續負責的瀏覽器訂單畫面及訂單系統伺服器功能開發維護沒有有意義的工作對應。雖然兩者都出現「訂單」，公版描述的是依組織政策辦理訂單與退換貨，不是開發訂單系統。",
+      "evidence": [
+        {
+          "employee_quote": "製作瀏覽器上的訂單列表、查詢、編輯畫面和表單檢查",
+          "reference_quote": "從事各類藥品之推廣銷售。"
+        },
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+          "reference_quote": "依照組織政策及規定,處理訂單與退換貨事宜。"
+        }
+      ],
+      "limitations": [
+        "公版的訂單工作是客戶訂單與退換貨處理，僅有詞語重疊，不支持員工的訂單 API、權限、商業規則或資料存取開發。"
+      ]
+    },
+    "seconds": 7.51993670000229,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "f3b11d73c47d111514f7d273aa5a91ab3e7fcfe512db90de961ed88028459cb9",
+    "case_id": "F01",
+    "document_id": "KPS2434-001v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J006",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "訂單 API、權限、商業規則及資料存取的開發及維護"
+      ],
+      "reason": "公版描述軟體程式開發、測試除錯及資料庫設計，能部分對應員工持續負責的訂單伺服器與資料工作，故屬部分代表；但未明確涵蓋 API、權限檢查或商業規則，也未具體描述訂單情境，不能視為強代表。",
+      "evidence": [
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則，設計及修改資料表、查詢與資料更新",
+          "reference_quote": "撰寫軟體程式,測試與調校除錯改善軟體問題。"
+        },
+        {
+          "employee_quote": "設計及修改資料表、查詢與資料更新",
+          "reference_quote": "設計軟體元件與實體資料庫。"
+        },
+        {
+          "employee_quote": "每次新增功能，我會測試畫面操作、API 與資料是否一致，修正問題",
+          "reference_quote": "製作雛形開發程序與測試分析評估。"
+        }
+      ],
+      "limitations": [
+        "未具體描述瀏覽器畫面、互動操作或表單檢查，不能代表「瀏覽器畫面、互動與操作檢查的開發及維護」。",
+        "公版亦包含硬體文件、產品手冊、作業程序、進度成本管控及教育訓練等工作，並非員工所述訂單伺服器工作的完整職責組合。"
+      ]
+    },
+    "seconds": 8.46981290000258,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "48d43acc47c06889d126275ebacca9410698ff930dd4e3262b0edc4ff0d41ffc",
+    "case_id": "F01",
+    "document_id": "ISD2152-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J007",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "reason": "公版對遊戲宣傳廣告及營運活動素材的繪製與製作，能部分支持員工持續負責的活動與商品視覺素材工作，因此不只是共同工具或孤立動作。但公版核心範圍是遊戲美術設定及遊戲內角色、物件、場景素材，未涵蓋員工主要的版面編排、跨尺寸調整、印刷檔規格檢核與交付流程，故屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我主要替公司的活動和商品製作視覺素材。",
+          "reference_quote": "依據單機或線上遊戲專案需求繪製特定目的之物件,如遊戲改版、營運活動、追加資料片內容等。"
+        },
+        {
+          "employee_quote": "收到行銷同事的需求、文案和尺寸後，我會整理要呈現的資訊，做版面、字體、色彩和圖片處理，提供初稿，再依回饋修改",
+          "reference_quote": "根據項目需求內容,繪製草圖並進行高品質之完稿,以應用至宣傳廣告。"
+        }
+      ],
+      "limitations": [
+        "公版以遊戲專案美術為核心，不能代表員工一般活動與商品視覺設計的完整工作範圍。",
+        "公版未具體支持跨社群、網站及印刷尺寸製作、印刷解析度與出血檢核、版本整理及交付等工作。",
+        "員工偶爾代為發布社群圖片，不足以視為主要工作；公版也未支持行銷策略、預算、廣告投放或成效分析。"
+      ]
+    },
+    "seconds": 14.610012100019958,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "9ecd187fe25cf8f6a4934b768c22ba8bb78a9015932cd35017710a71764ccee0",
+    "case_id": "F05",
+    "document_id": "IDC2172-009v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J008",
+    "phase": "formal",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是連鎖餐飲門市營運管理，涵蓋門市計畫、品質、人員、物料及顧客關係，沒有實質代表員工主要負責的會員網站畫面、互動、API 串接及瀏覽器品質開發維護。公版提到的資通安全與顧客資料也屬門市管理責任，不能據此視為網站開發工作的代表。",
+      "evidence": [
+        {
+          "employee_quote": "我平常負責會員網站的畫面。",
+          "reference_quote": "從事連鎖餐飲門市人員、設備、物料、顧客關係等營運管理相關工作。"
+        },
+        {
+          "employee_quote": "API 的內部邏輯、權限規則和資料庫由另一位同事開發，我不會去修改那些部分。",
+          "reference_quote": "確保門市資通安全,各項金鑰、密碼等依規定妥善保管。"
+        }
+      ],
+      "limitations": [
+        "公版提及資通安全及客戶資料，但其脈絡是門市例行管理，不支持代表員工的網站前端開發工作。"
+      ]
+    },
+    "seconds": 7.371053899987601,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "b0914700c0e5365649216544cb6f029e166cccc2998d18b0f0ee338bd59a7060",
+    "case_id": "F02",
+    "document_id": "連鎖餐飲門市管理人員",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J009",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版對故障檢查與判因、維修或更換零件、保養後測試及紀錄等持續子工作有實質對應，可部分代表員工的故障檢修與保養工作。但公版核心對象是自行車，且未涵蓋冷氣設備的現場安裝、配管接線、抽真空、測漏及試運轉等特有工作，因此不足以強代表員工的整個主要領域。",
+      "evidence": [
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件",
+          "reference_quote": "依顧客反映之自行車問題或執行保養時發現之狀況,目視或使用相關工具檢驗各系統,並依異常狀況判斷故障原因。"
+        },
+        {
+          "employee_quote": "更換或修復有問題的零件，完成後再測試並把處理情形寫在工單上。",
+          "reference_quote": "進行各系統之故障排除及調整、更換零件及組裝。"
+        },
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "依保養手冊/保養紀錄,執行自行車拆解/組裝,並選用適切保養方式,指導或執行保養作業。"
+        },
+        {
+          "employee_quote": "完成後再測試並把處理情形寫在工單上。",
+          "reference_quote": "保養後,進行測試並完成紀錄表。"
+        }
+      ],
+      "limitations": [
+        "公版工作對象是自行車，與員工負責的冷氣設備不同。",
+        "公版未描述冷氣現場安裝、配管接線、抽真空、測漏及溫度與排水確認等工作。",
+        "公版的顧客估價、交車及店務庫存管理等工作，不能據此視為員工的主要責任。"
+      ]
+    },
+    "seconds": 12.659153200045694,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "8b061eee37e39fb470ac8773ca134dc6f88b71a1cbf34aa4bd67876681c45a37",
+    "case_id": "F04",
+    "document_id": "MEM7234-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J010",
+    "phase": "formal",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版的核心工作涵蓋空調冷凍設備的檢查、保養、維修與故障排除，並具體描述空調系統的裝配、試車及檢修。這與員工持續負責的冷氣現場安裝、故障處理及測試工作，在設備對象、主要動作與現場責任上實質相符，足以作為該主要工作領域的整體參考。公版未細述員工提到的抽真空、測漏、零件更換及清潔耗材等保養細節，且包含較廣的中央空調、冷凍與熱泵系統工作；這些是細節與範圍差異，不影響其對主要領域的強代表性。",
+      "evidence": [
+        {
+          "employee_quote": "我主要到客戶現場安裝和維修冷氣。",
+          "reference_quote": "一般空調冷凍設備檢查、保養、維修、故障排除等工作。"
+        },
+        {
+          "employee_quote": "接到派工後會確認現場狀況，依施工要求定位設備、配管、接線，檢查接合處，再做抽真空、測漏及試運轉，確認溫度和排水是否正常。",
+          "reference_quote": "持續檢查安裝與啟動品質,通知相關人員備妥系統,進行水電連接。"
+        },
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件，完成後再測試並把處理情形寫在工單上。",
+          "reference_quote": "調整系統參數藉由觀察、測量,蒐集系統構件運作中數據,分析數據找出空調系統問題並解決。"
+        },
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況，必要時向客戶說明使用注意事項。",
+          "reference_quote": "一般空調冷凍設備檢查、保養、維修、故障排除等工作。"
+        }
+      ],
+      "limitations": [
+        "公版未具體描述員工提及的抽真空、測漏、零件更換，以及清潔與耗材檢查等步驟。",
+        "公版包含中央空調、冷凍及熱泵系統等較廣工作範圍，未明確限定為員工所述的冷氣設備現場工作。"
+      ]
+    },
+    "seconds": 16.934294200036675,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "d29937bcd26c74aa334c8e54a766acf912e786431e3bbbf2b49ff79c88b4b124",
+    "case_id": "F04",
+    "document_id": "SET3113-002v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J011",
+    "phase": "formal",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "員工的主要工作是活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付；公版核心則是網路行銷活動的規劃、預算與執行，以及成效監控和數據分析。公版提到文案、體驗設計及廣告要素位置，僅有局部關聯，未形成足以代表員工主要視覺設計工作的責任組合。偶爾代貼已核准圖片也不構成主要職責代表。",
+      "evidence": [
+        {
+          "employee_quote": "做版面、字體、色彩和圖片處理",
+          "reference_quote": "發展文案與體驗設計,以清楚傳達產品的形象、特色及優勢。"
+        },
+        {
+          "employee_quote": "我會確認不同尺寸的內容沒有被裁掉，核對印刷的解析度、出血和色彩設定，交付可使用的檔案，也整理素材和版本讓後續能修改。",
+          "reference_quote": "確認網路廣告各項要素與相對位置能達到體驗設計聚焦。"
+        },
+        {
+          "employee_quote": "偶爾行銷同事忙不過來，我會照排程把已核准圖片貼到社群平台，但活動策略、預算、廣告投放和成效分析都由他們負責。",
+          "reference_quote": "依據活動預算執行表,執行行銷活動。"
+        }
+      ],
+      "limitations": [
+        "公版未呈現員工主要負責的跨尺寸視覺製作、印刷輸出檢核及素材版本管理等工作組合。",
+        "公版偏重行銷活動規劃、預算、投放與成效分析；這些責任由員工明確表示是行銷同事負責。"
+      ]
+    },
+    "seconds": 9.036591899988707,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "070489f81ac65910dd95b8e1430ed89cfc0f3f92c14563b03e0dd28cc45c604f",
+    "case_id": "F05",
+    "document_id": "KMC2431-005v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J012",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版的庫存管理工作對員工的盤點、庫存安全量與入庫紀錄等具體持續工作有實質支持，因此可部分代表其倉儲工作；但正文整體以印刷生產安排與流程控管為核心，庫存作業也偏向印刷原物料及領料流程，未涵蓋員工主要倉儲現場工作的完整組合。",
+      "evidence": [
+        {
+          "employee_quote": "平常每天下班前，我會複點當天異動比較多的品項，不是全倉盤點。",
+          "reference_quote": "依庫存管理標準作業程序定期清點庫存並記錄存檔。"
+        },
+        {
+          "employee_quote": "庫存低於安全庫存時，我會通知採購補貨。",
+          "reference_quote": "掌握庫存安全量並執行庫存周轉管理。"
+        },
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。",
+          "reference_quote": "依庫存管理標準作業程序填寫領料單、出貨單,確實清點數量,保存入庫或出庫紀錄,建檔於庫存管理電腦系統,並完成歸檔作業。"
+        },
+        {
+          "employee_quote": "我會對照採購單和送貨單核對品項、數量，有差異就拍照通知採購",
+          "reference_quote": "核對採購品項符合待採購明細。"
+        }
+      ],
+      "limitations": [
+        "公版沒有具體描述員工依儲位規則上架、按出貨單依先進先出揀貨，以及客戶退貨的外觀與數量檢查及分流處理。",
+        "公版提及的領料與原物料作業處於印刷生產脈絡，不能直接等同員工完整的物流中心倉儲責任。",
+        "員工對揀貨是否掃描或登記、補貨貨品的移動路徑，以及客戶退貨後續登記或通知流程表示不確定，不能據此補足公版未涵蓋的工作。"
+      ]
+    },
+    "seconds": 18.351929900003597,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "c3c52db602187448f31b02e7b61c18e596aa63982091c6bc2c8a6935f9a8e346",
+    "case_id": "H02",
+    "document_id": "MPM7322-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J013",
+    "phase": "formal",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是連鎖餐飲門市營運管理，不能代表成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業。僅有整理出席資料、彙整數據的局部相似，但公版的數據工作用於門市業務檢討，對象與用途不同，屬局部關聯。",
+      "evidence": [
+        {
+          "employee_quote": "每堂課由老師把出席表交給我，我再把出席人數和缺漏整理到試算表",
+          "reference_quote": "依據組織規範,執行門市數據統計分析,定期進行業務檢討"
+        }
+      ],
+      "limitations": [
+        "員工主要工作中的報名核對、課前資料整理、異動通知及出席紀錄，未被公版作為課程行政責任描述。",
+        "公版的業績目標、商品與服務品質、現金物料、人員及顧客關係管理，均非員工所述主要責任；員工也明確表示不授課、不決定開課或收費。"
+      ]
+    },
+    "seconds": 9.785577100003138,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "b0914700c0e5365649216544cb6f029e166cccc2998d18b0f0ee338bd59a7060",
+    "case_id": "H01",
+    "document_id": "連鎖餐飲門市管理人員",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J015",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版包含日常物品及辦公設備的比價、採購等具體工作，可部分參照員工持續負責的詢價比價與採購下單；但公版核心偏行政庶務物品、設備及相關管理，未涵蓋員工原物料與包材的生產需求採購，也不足以代表其完整主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "新品項或金額比較大的請購，我會至少找三家詢價，整理比價表給主管看；常用品項則用既有合約價。",
+          "reference_quote": "對組織決議採購之辦公設備進行比價或議價、簽核、簽約採購、安裝及驗收。"
+        },
+        {
+          "employee_quote": "每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。",
+          "reference_quote": "依標準作業流程規定辦理採購,並點交與申請領用人簽署確認。"
+        },
+        {
+          "employee_quote": "我還會每週和生管一起看物料需求計畫，確認缺口和安全庫存，需要補貨就由我下單",
+          "reference_quote": "訂立採購標準作業流程,並向員工說明日常物品申請作業。"
+        }
+      ],
+      "limitations": [
+        "公版描述的是辦公設備、日常物品及其他行政庶務相關採購，沒有具體涵蓋原物料與包材的採購對象及生產用途。",
+        "員工的物料需求計畫、安全庫存確認、交期落後時催貨或協調急件、收貨品質異常協調及供應商績效管理，公版未形成相應的工作組合。"
+      ]
+    },
+    "seconds": 21.934414799965452,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "0ef2ee3f90aa3047d3f2de4449d8090b92e6794c7c10d5e6a9d07da830151630",
+    "case_id": "H03",
+    "document_id": "BAS1219-003v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J017",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "reason": "公版提到展覽主視覺、文宣產品及協助設計徵展文宣品，對員工的視覺素材設計有具體但有限的工作對應，因此可部分代表該主要工作面向。公版核心工作主要是展覽市場調查、行銷規劃、活動執行與展後分析；且設計內容偏向提出方向或協助文宣，未涵蓋員工持續負責的版面製作、跨尺寸調整、依回饋修訂及印刷檔案輸出流程，故不足以強代表。",
+      "evidence": [
+        {
+          "employee_quote": "我會整理要呈現的資訊，做版面、字體、色彩和圖片處理，提供初稿，再依回饋修改",
+          "reference_quote": "協助設計給參展廠商的徵展文宣品。"
+        },
+        {
+          "employee_quote": "同一活動通常要做成社群圖片、網站橫幅和印刷用檔案。",
+          "reference_quote": "與設計部門溝通協調,提出展覽主視覺設計方向,以及展覽的各式文宣產品。"
+        }
+      ],
+      "limitations": [
+        "公版的文宣設計內容限於展覽行銷脈絡，並以協助設計或提出設計方向為主，未明確涵蓋員工負責的完整素材製作與交付責任。",
+        "公版主要涵蓋展覽行銷策略、活動控管及成效分析；員工明確表示這些由行銷同事負責。"
+      ]
+    },
+    "seconds": 23.21513349999441,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "625266fe802a9cd6cfe03858e35acbc07bb403960f3af40b428661e8174ad01d",
+    "case_id": "F05",
+    "document_id": "BAS2431-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J020",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版涵蓋採購需求、下單、跟催、交期追蹤及供應商評鑑管理，與員工持續負責的原物料及包材採購、交期協調和供應商績效整理有實質對應，足以部分代表其主要採購工作。但公版核心還包括制定組織採購政策、策略與供應商管理制度，以及督導評估改善；員工描述的主要是日常採購執行，且年度談判由主管主談、供應商合作調整由主管決定，因此不構成對該主要工作領域的強整體代表。",
+      "evidence": [
+        {
+          "employee_quote": "每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。",
+          "reference_quote": "依協商後結果,規劃採購策略(含供應商資訊、人力資源、預算、成本管控、議價、訂定採購合約、下單、跟催、進出貨掌控、交期追蹤、逆物流及安全庫存管理、核銷與風險等)。"
+        },
+        {
+          "employee_quote": "我會依交期達成率、品質合格率和配合度整理績效表交給主管，由主管決定是否調整合作。",
+          "reference_quote": "依組織供應商開發、評鑑程序與管理制度,進行供應商開發及評鑑作業(包含價格、付款條件、品質保證、交貨時間與歷年信用評價等事項)。"
+        },
+        {
+          "employee_quote": "十一月年度談判時，我會整理去年用量和市場行情給主管，主要是準備資料，由主管主談。",
+          "reference_quote": "依組織內部討論結果,與供應商進行協商談判及議價,以取得合作共識。"
+        }
+      ],
+      "limitations": [
+        "公版著重組織層級的採購政策與程序、採購策略及供應商管理制度之規劃與推動；員工原話主要呈現日常請購、下單、追交期及供應商協調，未顯示其負責制定這些制度或策略。",
+        "供應商績效表由員工整理並交主管，合作調整由主管決定；年度價格談判也由主管主談，責任層級與公版的策略規劃、督導及協商責任並不完全相符。"
+      ]
+    },
+    "seconds": 18.372571300016716,
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "6f8a0ffe831d64ab4bf4c4220d4ea776cb6d0b9fffed03eec7c865521c8693fc",
+    "case_id": "H03",
+    "document_id": "BAS3323-002v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J021",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "reason": "公版有一段具體的日常帳務系統報表登載、修改及更正工作，實質對應員工持續負責的帳務登錄；但其餘核心內容主要是停車場管理，且未涵蓋應收應付款追蹤、銀行對帳、月結調整及帳表整理，故屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "每天整理發票、收付款單據和費用憑證，核對訂單、金額及科目後登錄帳務",
+          "reference_quote": "依組織帳務處理規範,進行日常帳務系統報表的登載、修改及更正等相關作業。"
+        }
+      ],
+      "limitations": [
+        "公版未呈現員工對應收應付款、銀行往來的追蹤與核對，也未涵蓋月底調整分錄及帳表整理。",
+        "付款核准、資金安排及報稅申報由主管或外部事務所負責，不應視為員工或公版所代表的本人責任。"
+      ]
+    },
+    "seconds": 12.717829699977301,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "6ab297d050aac0964828343157735015c1da860b0002a7e3a965814945e74424",
+    "case_id": "F03",
+    "document_id": "停車場管理員",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J022",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版的進貨點收、庫存盤點與補貨區整理，能代表員工倉儲現場工作中一組持續的收貨核對與庫存管理子工作，因此屬部分代表；但公版的核心情境是鞋品門市，不能代表完整的倉儲作業組合。",
+      "evidence": [
+        {
+          "employee_quote": "我會對照採購單和送貨單核對品項、數量，有差異就拍照通知採購",
+          "reference_quote": "依進貨配送單,點收品項、數量與品質"
+        },
+        {
+          "employee_quote": "平常每天下班前，我會複點當天異動比較多的品項，不是全倉盤點。",
+          "reference_quote": "每日統計銷售數據、盤點鞋品庫存量,並製作相關報表。"
+        },
+        {
+          "employee_quote": "月底會先複點自己負責的區域，再交主管抽查；如果差異超過主管規定的範圍，就要寫差異報告。",
+          "reference_quote": "盤點與記錄鞋品庫存量。"
+        },
+        {
+          "employee_quote": "我會檢查退貨的外觀和數量，再依情況入庫或送到待處理區；如果是瑕疵品，判定由品保負責。",
+          "reference_quote": "依進貨配送單,點收品項、數量與品質,針對外包裝損毀或品質不符鞋品進行退、換貨作業。"
+        }
+      ],
+      "limitations": [
+        "公版以實體通路鞋品銷售、售後服務及門市庫存管理為主；能支持收貨點收、盤點等子工作，但未涵蓋員工完整的倉儲工作組合。",
+        "員工依儲位規則上架、在庫存系統登記入庫、依出貨單揀貨及按先進先出作業，公版沒有相應的完整倉庫上架與出貨揀貨流程。",
+        "員工不決定供應商退貨，且僅負責備貨及登記出貨；公版的門市退換貨作業不能據此代表該責任。員工操作堆高機的工作也未見於公版。"
+      ]
+    },
+    "seconds": 19.01620210002875,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "823351ab06cce64c561a5df3aaf3962a5947c0780f69a0c6e66412ef4d5f5db9",
+    "case_id": "H02",
+    "document_id": "KPS5292-002v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J023",
+    "phase": "formal",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版主要描述協助太陽光電專案蒐集規格、檢視設計與配線、整理文件及支援專案人員，與員工主要負責的冷氣現場安裝、故障檢修及保養不相符，不能代表該主要工作。僅有接線與配線檢視的局部工作關聯，屬局部支持。",
+      "evidence": [
+        {
+          "employee_quote": "依施工要求定位設備、配管、接線",
+          "reference_quote": "協助檢視配線連接作業"
+        }
+      ],
+      "limitations": [
+        "配線相關內容只是局部動作相近，公版並未描述冷氣設備的安裝、故障診斷與修復、試運轉或定期保養。",
+        "公版中的材料清點屬太陽光電專案作業；員工僅每季跟同事清點工具和剩餘材料，且不負責採購或管理庫存，不能據此認定其代表員工主要工作。"
+      ]
+    },
+    "seconds": 8.008098600024823,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "af2186582073f8a079d0b1894f1359774ae9dc464f40cf807774b878745dcc29",
+    "case_id": "F04",
+    "document_id": "SET3113-004v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J024",
+    "phase": "formal",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是印刷生產排程、流程控管、產線監督及庫存作業，並未代表員工持續負責的瀏覽器介面開發或訂單 API、商業規則與資料存取開發。兩者提到訂單或電腦系統，屬於不同工作目的與責任，不能據此視為主要工作對應。",
+      "evidence": [
+        {
+          "employee_quote": "我主要負責公司的線上訂單系統。",
+          "reference_quote": "從事印刷生產作業安排與流程控管等工作。"
+        },
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則，設計及修改資料表、查詢與資料更新",
+          "reference_quote": "建檔於庫存管理電腦系統"
+        },
+        {
+          "employee_quote": "畫面與伺服器功能都是我持續負責的主要工作。",
+          "reference_quote": "規劃生產排程,考量人力、設備及產能,進行工作分配,以降低成本並提高效率。"
+        }
+      ],
+      "limitations": [
+        "公版提及客戶訂單規格及庫存管理電腦系統，但內容是印刷生產安排、庫存記錄等作業，沒有支持軟體介面或伺服器功能的開發及維護。",
+        "員工偶爾協助同事處理網路問題，不足以使此公版代表其主要工作。"
+      ]
+    },
+    "seconds": 7.6885545999975875,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "c3c52db602187448f31b02e7b61c18e596aa63982091c6bc2c8a6935f9a8e346",
+    "case_id": "F01",
+    "document_id": "MPM7322-001v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J025",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "reason": "公版描述依需求準備、創作並確認行銷素材，與員工持續製作活動及商品素材有實質但概括的工作對應，因此部分支持其主要領域。但公版核心偏向不動產行銷策略、文案、活動及媒體規劃，沒有具體涵蓋員工的版面與圖像設計、跨尺寸製作及印刷輸出流程，不能強代表這些工作。",
+      "evidence": [
+        {
+          "employee_quote": "我主要替公司的活動和商品製作視覺素材。收到行銷同事的需求、文案和尺寸後，我會整理要呈現的資訊，做版面、字體、色彩和圖片處理，提供初稿，再依回饋修改；同一活動通常要做成社群圖片、網站橫幅和印刷用檔案。",
+          "reference_quote": "協助相關不動產銷售人員依據業主及客戶需求和代銷經驗,準備行銷素材。"
+        },
+        {
+          "employee_quote": "我會確認不同尺寸的內容沒有被裁掉，核對印刷的解析度、出血和色彩設定，交付可使用的檔案，也整理素材和版本讓後續能修改。",
+          "reference_quote": "行銷素材應能反映議定的不動產行銷計畫及目的。\n確認行銷素材的精確性,且應符合法律的規定。"
+        },
+        {
+          "employee_quote": "但活動策略、預算、廣告投放和成效分析都由他們負責。",
+          "reference_quote": "協助讓業主同意行銷計畫,包含行銷活動和預算。"
+        }
+      ],
+      "limitations": [
+        "公版的行銷素材工作以不動產行銷計畫為脈絡，並未明確描述視覺版面設計、跨尺寸調整、印刷規格檢核或檔案交付。",
+        "員工明確表示活動策略、預算、廣告投放和成效分析由行銷同事負責，不能以公版對這些工作的描述推定為員工責任。"
+      ]
+    },
+    "seconds": 14.776389300008304,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "8dc49a21d71fd967a321b22667b60a1c3ee100f53c8695a8fbfc74742565ac29",
+    "case_id": "F05",
+    "document_id": "KPS3334-008v4",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J027",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "成人進修課程的報名、課前安排與異動通知、出席紀錄等行政作業"
+      ],
+      "reason": "公版中確認活動參加名單、提醒預約時間等工作，與員工持續整理課程名冊及通知學員有具體的局部對應，因此可部分代表其主要課程行政工作。但公版以休閒活動營運與現場執行為核心，未涵蓋員工的報名資料核對與重複登記處理、課前資料協調、課程異動通知流程及課後出席紀錄彙整等整體責任，故不足以強代表該主要領域。",
+      "evidence": [
+        {
+          "employee_quote": "課前兩個工作天，我會整理報名名冊和教室資料，交給老師和場地窗口使用。",
+          "reference_quote": "依據預約系統確認參加活動人員名單與房號。"
+        },
+        {
+          "employee_quote": "老師臨時改上課時間時，我會先拿行政組長確認的時間，再照名冊用簡訊通知學員，也通知老師和場地窗口。",
+          "reference_quote": "提醒顧客預約時間。"
+        }
+      ],
+      "limitations": [
+        "公版所述為休閒活動營運及執行，與成人進修課程行政的工作對象及責任範圍不完全相同。",
+        "公版未實質涵蓋員工的報名資料核對、重複登記處理、課前資料交付協調及課後出席紀錄整理與每季彙整。",
+        "員工明確表示改期由行政組長確認，員工負責通知；不應將公版中的活動規劃或執行責任視為員工職責。"
+      ]
+    },
+    "seconds": 19.64161349995993,
+    "employee_sha256": "23818e0c08b464d328ed4921571b26ee92d0213a7f836b58856befeacf8668ec",
+    "document_sha256": "1e0adf95e5da8d3132810ade0a71f2138e33a4bc79d0219d1394db9756768cd2",
+    "case_id": "H01",
+    "document_id": "TTM3422-001v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J028",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版的商品收貨點收、庫存盤點、補貨及退貨作業，對員工持續負責的倉儲工作有實質支持，屬於主要領域中的一組具體子工作。但公版核心還包含門市電器商品銷售、顧客諮詢與陳列管理，且未涵蓋員工的出貨單揀貨等倉庫作業組合，因此是部分代表，而非整體強代表。",
+      "evidence": [
+        {
+          "employee_quote": "我主要負責收貨驗收、上架、揀貨補貨、庫存盤點和客戶退貨入庫。",
+          "reference_quote": "依進貨配送單,點收電器商品項目、數量與品質,針對外包裝毀損或品質不符商品進行退貨作業。"
+        },
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。",
+          "reference_quote": "依組織規範程序,盤點與記錄電器商品庫存量。"
+        },
+        {
+          "employee_quote": "我依出貨單揀貨，會先進先出。",
+          "reference_quote": "運用輔助工具與正確搬運姿勢,進行補貨作業,並記錄缺貨商品。"
+        }
+      ],
+      "limitations": [
+        "公版以賣場／門市電器商品銷售與顧客服務為核心，與員工的物流中心倉儲情境不同。",
+        "公版未呈現員工依出貨單揀貨及先進先出的工作；員工也不確定揀貨交接方式。",
+        "不可據此推定員工負責決定供應商退貨、瑕疵品判定或客戶退貨的完整登記流程。"
+      ]
+    },
+    "seconds": 16.504099699959625,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "cd519fb60920efbd2f8d2d3cca091ed23b52ce22758e0af5706d5b57cb0d93ed",
+    "case_id": "H02",
+    "document_id": "KPS5220-003v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J029",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "reason": "公版涵蓋撰寫程式、功能測試、除錯驗證與功能維護，能部分代表員工持續負責的網站功能開發及瀏覽器品質工作。但公版核心對象是行動裝置應用軟體，未明確涵蓋會員網站的畫面、互動元件與 API 串接，因此屬部分代表，而非該主要領域的完整整體參考。",
+      "evidence": [
+        {
+          "employee_quote": "我平常負責會員網站的畫面。",
+          "reference_quote": "開發及維護行動裝置應用軟體功能或產品"
+        },
+        {
+          "employee_quote": "我會做頁面版型、互動元件、表單驗證、不同裝置的顯示調整，並串接同事提供的 API",
+          "reference_quote": "撰寫程式碼"
+        },
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題",
+          "reference_quote": "功能測試"
+        },
+        {
+          "employee_quote": "找出畫面問題",
+          "reference_quote": "除錯與驗證"
+        },
+        {
+          "employee_quote": "功能修改後也要確認沒有影響其他頁面。",
+          "reference_quote": "能夠依需求進行功能維護。"
+        }
+      ],
+      "limitations": [
+        "公版明確以行動裝置應用軟體為對象，員工主要負責的是會員網站畫面與瀏覽器操作。",
+        "公版未具體描述頁面版型、互動元件、API 串接或瀏覽器品質工作。",
+        "公版另含先期可行性評估、時程規劃與佈署等工作，不能據此推定員工負責；員工並明確表示不負責 API 內部邏輯、權限規則及資料庫。"
+      ]
+    },
+    "seconds": 8.987260800029617,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "84c561d88b8a748080b4cd3c693cf916575ed4b8dd94a284dcd28240d38becbb",
+    "case_id": "F02",
+    "document_id": "ISD2152-004v5",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J030",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+      ],
+      "reason": "公版對冷氣設備現場安裝及冷媒系統測試有具體、持續的工作描述，實質支持員工主要工作中的安裝與試運轉部分，足以作為該主要領域的部分參考。但員工的主要工作還包括故障判斷與修復、定期保養；公版對這些工作的涵蓋較有限，且包含員工明確由主管負責的採購事項，因此不足以強代表整個主要工作面向。",
+      "evidence": [
+        {
+          "employee_quote": "依施工要求定位設備、配管、接線，檢查接合處，再做抽真空、測漏及試運轉",
+          "reference_quote": "測試定位、確認並修復洩漏處,再次依設備規範站壓,確認無漏後,將污物卸除並洩壓後,將分離式系統抽至真空,清除所有不凝結氣體,使用真空計進行規範之「站空測試」,證明真空效力。"
+        },
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "依據製造商要求檢查維護構件,以適當冷媒填充分離式系統,並處理工作期間發生之問題。"
+        },
+        {
+          "employee_quote": "接案報價、設備選型、工程排程及人員分配由主管處理，我依派工完成現場工作。",
+          "reference_quote": "依據應備材料目錄確認零件材料之產品需求及型號,並製作採購單。"
+        }
+      ],
+      "limitations": [
+        "公版主要描述安裝、配管及冷媒系統測試，對員工依使用情況判斷故障、修復或更換零件的完整工作流程支持不足。",
+        "公版對定期清潔及檢查的描述有限，未充分呈現員工所述的定期保養工作組合。",
+        "公版包含製作採購單等工作，而員工表示相關事項由主管處理。"
+      ]
+    },
+    "seconds": 12.817181399965193,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "b799c0c25e85500b3fec228c2b160406fd44ebedbb0f726a5f0d05e22af03fb0",
+    "case_id": "F04",
+    "document_id": "SET7127-001v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J031",
+    "phase": "formal",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "員工的主要工作是開發與維護會員網站的畫面、互動、API 串接及瀏覽器品質；公版核心則是休閒活動營運、顧客服務、設施清潔與設備維護，兩者沒有有意義的工作對應。",
+      "evidence": [
+        {
+          "employee_quote": "我平常負責會員網站的畫面。",
+          "reference_quote": "協助企劃與執行休閒活動營運相關單位的各項活動、日常例行性運作及設施維護"
+        }
+      ],
+      "limitations": []
+    },
+    "seconds": 5.32636750000529,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "1e0adf95e5da8d3132810ade0a71f2138e33a4bc79d0219d1394db9756768cd2",
+    "case_id": "F02",
+    "document_id": "TTM3422-001v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J032",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "reason": "公版對收貨點驗、庫存盤點、補貨及退貨處理等持續工作有實質支持，能代表員工倉儲工作的部分具體作業；但公版核心是門市商品管理及門市服務、環境維護，未涵蓋員工的揀貨與物流中心倉儲作業組合，故屬部分代表而非強代表。",
+      "evidence": [
+        {
+          "employee_quote": "我主要負責收貨驗收、上架、揀貨補貨、庫存盤點和客戶退貨入庫。",
+          "reference_quote": "點算進貨商品數量與檢查品質。"
+        },
+        {
+          "employee_quote": "平常每天下班前，我會複點當天異動比較多的品項，不是全倉盤點。",
+          "reference_quote": "依組織規範,盤點與記錄商品庫存量,並及時回報門市管理人員。"
+        },
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。",
+          "reference_quote": "整理庫存區域,整理紙箱與雜物,並將剩餘商品存放正確倉庫位置。"
+        },
+        {
+          "employee_quote": "我會檢查退貨的外觀和數量，再依情況入庫或送到待處理區；如果是瑕疵品，判定由品保負責。",
+          "reference_quote": "記錄外包裝損毀或品質不符商品,並協助進行退貨及報廢作業。"
+        }
+      ],
+      "limitations": [
+        "公版正文的整體工作範圍包含門市服務與門市環境維護，與員工物流中心倉儲職責不相符。",
+        "公版未描述員工依出貨單揀貨、按先進先出作業及揀貨後交接等工作；收貨、上架、退貨等相似作業不足以代表其完整倉儲工作組合。",
+        "員工明確表示供應商退貨是否辦理由採購決定；其本人僅備貨及登記出貨，不應解讀為負責退貨決策。"
+      ]
+    },
+    "seconds": 18.944178799982183,
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "abeb6678d89fd1f95a1d304dead87d4f20c0076963cf484458bbdb01641319e8",
+    "case_id": "H02",
+    "document_id": "BGM5220-002v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J033",
+    "phase": "formal",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心涵蓋活動專案規劃與管理、行銷及公關策略、預算和團隊領導，無法代表員工主要的視覺素材版面設計、跨尺寸製作、修訂及輸出交付。員工偶爾依排程張貼已核准圖片，與公版執行線上行銷活動有有限的局部關聯，但不足以代表其主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "偶爾行銷同事忙不過來，我會照排程把已核准圖片貼到社群平台",
+          "reference_quote": "依時程與應變計畫,實施並監督計畫中的線上、實體、線上/實體活動"
+        }
+      ],
+      "limitations": [
+        "公版未描述版面、字體、色彩與圖片處理、跨尺寸調整、印刷規格檢查或可編輯素材與版本交付。",
+        "員工明確表示活動策略、預算、廣告投放與成效分析由行銷同事負責；公版以這些及活動管理工作為核心，不能據此推定為員工責任。"
+      ]
+    },
+    "seconds": 8.10726339998655,
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "4d168fb9f763e990f83fbba321517ea3bd8e59ddf68dd6fcf30b8cff98021870",
+    "case_id": "F05",
+    "document_id": "KMC1222-002v3",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J035",
+    "phase": "formal",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+      ],
+      "reason": "公版有持續的報表統計、彙整與歸檔工作，能部分對應員工整理帳表及結帳資料的工作；但公版的帳務內容主要是門市銷售與營運報表，未呈現員工的憑證核對與帳務登錄、應收應付款追蹤、銀行往來核對及調整分錄，因此只部分代表該主要工作領域。",
+      "evidence": [
+        {
+          "employee_quote": "每天整理發票、收付款單據和費用憑證，核對訂單、金額及科目後登錄帳務",
+          "reference_quote": "統計銷售日報表、月報表或會計報表,以作為商品資料庫分析與預測。"
+        },
+        {
+          "employee_quote": "月底做對帳、調整分錄及帳表，整理主管和外部事務所需要的資料，讓帳務能按時結清。",
+          "reference_quote": "將門市營運過程相關文件紀錄統整歸檔或提交予經營者營運日誌。"
+        }
+      ],
+      "limitations": [
+        "公版報表著重門市銷售及營運成效，不等同於員工所述的日常帳務登錄與月結。",
+        "公版未呈現應收應付款追蹤、銀行往來核對或調整分錄。",
+        "員工表示付款核准、資金安排及報稅申報由主管或外部事務所負責，不能據公版推定為員工責任。"
+      ]
+    },
+    "seconds": 9.117485299997497,
+    "employee_sha256": "b8d6134e40488ccb7f51aae0f79875f9757a025c3708937d62e9299bf30b3b13",
+    "document_sha256": "78ecc8fb92e4900c52f35c7f20772568fdb78fe0e9f265c4f63d5fd262621548",
+    "case_id": "F03",
+    "document_id": "KRM4212-001v2",
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json"
+  },
+  {
+    "job_id": "J018",
+    "phase": "formal",
+    "case_id": "H02",
+    "document_id": "KRM1324-001v1",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版涵蓋供應鏈層級的庫存管理與出貨協調，與員工倉儲現場作業有局部關聯，例如庫存資料維護及出貨理貨流程。但公版描述的是庫存規劃、系統管理和協調倉庫作業，未實質代表員工持續負責的收貨上架、實際揀貨、盤點及退貨處理等工作組合，因此不足以代表其主要工作領域。",
+      "evidence": [
+        {
+          "employee_quote": "驗收完會依儲位規則把貨上架、貼標籤，並在庫存系統登記入庫。",
+          "reference_quote": "記錄和更新內部系統庫存數據,維護庫存相關文件。"
+        },
+        {
+          "employee_quote": "我依出貨單揀貨，會先進先出。",
+          "reference_quote": "更新內部系統,以利倉庫人員進行理貨。"
+        }
+      ],
+      "limitations": [
+        "公版提及庫存資料維護及支援倉庫理貨，但沒有描述員工所做的實際收貨、上架、盤點與退貨處理流程。",
+        "不據員工未確認的揀貨掃描或登記方式，以及退貨紀錄流程，推定其工作內容。"
+      ]
+    },
+    "employee_sha256": "423a9cb57fd472751a17f0b67f613e8cf54b0fbbb346e3738c86e96cd72a7b88",
+    "document_sha256": "50ab0c7531cc675062074676243084ed69421cca29d92c2809cf05c5a0e9035e",
+    "seconds": 29.999754499993287,
+    "quote_reconciled": true,
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments-reconciled-02.json"
+  },
+  {
+    "job_id": "J019",
+    "phase": "formal",
+    "case_id": "H03",
+    "document_id": "MMP1324-001v4",
+    "judgment": {
+      "grade": 3,
+      "uncertain": false,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "reason": "公版涵蓋採購規劃與授權、執行採購流程、驗收及不符合事項處理、帳款與供應商績效評核，能作為員工主要採購工作的整體參考。員工的具體比價方式、催交與緊急供貨協調未逐項呈現，但並未使公版僅剩孤立或局部動作；公版中的庫存管理及專案規劃則不宜視為員工已負責的工作。",
+      "evidence": [
+        {
+          "employee_quote": "負責原物料和包材採購。每天處理請購單、詢價比價、下採購單、追交期、協調收貨品質問題和發票付款，也管供應商資料。",
+          "reference_quote": "依據供應需求與相關人員確認採購規格。\n依據程序、授權及準則,執行採購工作並評估相關風險。"
+        },
+        {
+          "employee_quote": "核准後我才在 ERP 開採購單",
+          "reference_quote": "取得商品或服務採購核准。\n依據組織的財務管理系統及組織規範要求,進行採購流程。"
+        },
+        {
+          "employee_quote": "貨到後由倉庫收貨、品保檢驗；有數量或品質問題，他們會通知我，我再跟供應商協調退換貨或扣款，是否接受由主管決定。",
+          "reference_quote": "於職權範圍內,處理不符合規範要求的行動,或依據採購政策及程序提報。"
+        },
+        {
+          "employee_quote": "我會依交期達成率、品質合格率和配合度整理績效表交給主管，由主管決定是否調整合作。",
+          "reference_quote": "依據供應商績效評核表,進行供應商評核並記錄。"
+        }
+      ],
+      "limitations": [
+        "公版列有盤點、庫存紀錄維護及呆滯廢品價值確認；員工已確認的工作是與生管核對缺口及安全庫存後下單，呆滯料處置也由主管決定，不宜將公版這些庫存責任直接歸給員工。",
+        "到貨收貨與品保檢驗由倉庫及品保執行，員工負責接獲問題後與供應商協調；公版的驗收工作不能解讀為員工本人執行檢驗。",
+        "員工每半年整理供應商績效表並交主管決定合作調整；公版寫的是年度績效評核，且評核責任的表述較直接，頻率與決策責任範圍並不完全相同。"
+      ]
+    },
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "3d1c6c7d9904cd4e423c8d59e93c52dee01b50659d4cc1d532fab2e7b768d30e",
+    "seconds": 23.253903799981344,
+    "quote_reconciled": true,
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments-reconciled-02.json"
+  },
+  {
+    "job_id": "J026",
+    "phase": "formal",
+    "case_id": "F05",
+    "document_id": "KPS3334-009v4",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+      ],
+      "reason": "公版對視覺設計元素的規劃與製作、文字編排、輸出格式考量及依回饋修正，能實質代表員工主要工作的設計與修訂部分。但未明確涵蓋員工持續負責的跨尺寸轉製、印刷規格檢核及素材版本管理，且公版另含房地產廣告企劃與製作管理，因此屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我會整理要呈現的資訊，做版面、字體、色彩和圖片處理，提供初稿，再依回饋修改",
+          "reference_quote": "探索各種文字編排設計及視覺設計要素,以創造元素。"
+        },
+        {
+          "employee_quote": "同一活動通常要做成社群圖片、網站橫幅和印刷用檔案。",
+          "reference_quote": "選擇設計技巧,並與相關人員討論,確保設計格式符合輸出平臺的要求。"
+        },
+        {
+          "employee_quote": "我會確認不同尺寸的內容沒有被裁掉，核對印刷的解析度、出血和色彩設定，交付可使用的檔案",
+          "reference_quote": "與相關人員討論並確認額外的要求或修改,並完成所有必要的修正。"
+        }
+      ],
+      "limitations": [
+        "公版以不動產代銷建案為對象，並涵蓋行銷目標與預算、創意提案、廣告製作管理及行銷活動等員工不負責的工作。",
+        "公版未明確描述跨尺寸內容適配、印刷解析度／出血／色彩設定檢核，或素材與版本整理。"
+      ]
+    },
+    "employee_sha256": "682591e487ee01349eb1d1a6692750bdce715be1b9509869d2df06ab7d818db0",
+    "document_sha256": "e404279f60282db893f98326e7fa15b81a449dcd4863debc800e8f696a1954df",
+    "seconds": 22.791960400005337,
+    "quote_reconciled": true,
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments-reconciled-02.json"
+  },
+  {
+    "job_id": "J014",
+    "phase": "formal",
+    "case_id": "F01",
+    "document_id": "KPS2434-002v2",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心工作是醫療器材推廣銷售、客戶服務及合約與貨款處理，沒有代表員工持續負責的瀏覽器畫面開發，或訂單 API、權限、商業規則及資料存取開發。雖然雙方都提到訂單，公版所述是出貨、退換貨及帳款等業務處理，並非訂單系統的軟體開發；員工偶爾協助網路問題也不足以構成主要工作對應。",
+      "evidence": [
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+          "reference_quote": "依合約及公司訂單處理標準作業流程,正確處理訂單之出貨與退換貨事宜。"
+        },
+        {
+          "employee_quote": "偶爾同事電腦連不上網路會請我幫忙",
+          "reference_quote": "善用現代科技工具或親自拜訪客戶,定期維繫客戶關係,並記錄客戶需求。"
+        }
+      ],
+      "limitations": []
+    },
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "2fc6b5b4f6fce2963b81573551e49f05b2b30d1097ec6f466380d8439e8a65ab",
+    "seconds": 7.548153100011405,
+    "quote_reconciled": true,
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments-reconciled-02.json"
+  },
+  {
+    "job_id": "J034",
+    "phase": "formal",
+    "case_id": "F01",
+    "document_id": "KRM1324-001v1",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "員工的兩個主要工作面向都是訂單系統的軟體開發及維護；公版核心則是供應鏈管理，涵蓋供應商管理、需求與生產協調、庫存及出貨。公版提及訂單與內部系統，但描述的是供應鏈作業中更新資料、安排出貨，並非開發或維護軟體，不能代表員工的主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+          "reference_quote": "針對出貨的品項與客戶,於內部系統更新,提供相關部門或人員進行出貨安排。"
+        },
+        {
+          "employee_quote": "畫面與伺服器功能都是我持續負責的主要工作。",
+          "reference_quote": "更新內部系統,以利倉庫人員進行理貨。"
+        }
+      ],
+      "limitations": [
+        "公版雖提及訂單及內部系統，但未描述瀏覽器畫面、API、權限、商業規則或資料存取的開發及維護。"
+      ]
+    },
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "50ab0c7531cc675062074676243084ed69421cca29d92c2809cf05c5a0e9035e",
+    "seconds": 6.775511900021229,
+    "quote_reconciled": true,
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments-reconciled-02.json"
+  },
+  {
+    "job_id": "J016",
+    "phase": "formal",
+    "case_id": "H03",
+    "document_id": "KPS5220-003v3",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是門市電器商品銷售服務及零售庫存管理，不能代表員工主要的原物料與包材採購工作。員工補貨下單、到貨點收與退換貨協調，和公版庫存補貨及進貨退貨有局部工作對應；但這些是孤立的共通作業，公版未涵蓋員工主要的詢價比價、採購下單、供應商交期與異常協調等責任，故僅屬局部關聯。",
+      "evidence": [
+        {
+          "employee_quote": "每週和生管一起看物料需求計畫，確認缺口和安全庫存，需要補貨就由我下單",
+          "reference_quote": "判別熱銷/滯銷電器商品,並視庫存量進行進(退)貨。"
+        },
+        {
+          "employee_quote": "貨到後由倉庫收貨、品保檢驗；有數量或品質問題，他們會通知我，我再跟供應商協調退換貨或扣款，是否接受由主管決定。",
+          "reference_quote": "依進貨配送單,點收電器商品項目、數量與品質,針對外包裝毀損或品質不符商品進行退貨作業。"
+        }
+      ],
+      "limitations": [
+        "公版著重顧客諮詢與銷售、促銷、門市商品陳列及零售庫存；員工主要工作是供應商端的原物料與包材採購。",
+        "公版的進貨、退貨和庫存作業僅提供局部支持，不能據此視為代表採購工作整體。"
+      ]
+    },
+    "employee_sha256": "0f245f3963446e724618588e0e1f9780bba0b5053594dd56c9c2d2189c803c31",
+    "document_sha256": "cd519fb60920efbd2f8d2d3cca091ed23b52ce22758e0af5706d5b57cb0d93ed",
+    "seconds": 9.355007200036198,
+    "quote_reconciled": true,
+    "reused": true,
+    "prior_judgment_file": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments-reconciled-02.json"
+  },
+  {
+    "job_id": "J001",
+    "phase": "formal-02",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "reason": "公版對網路平台建置、運行管理、優化及使用者體驗有所描述，能部分對應員工持續負責的會員網站畫面開發與品質維護，屬於主要工作中的一組具體子工作。但公版範圍偏向數位保險平台的規劃與整體管理，未明確涵蓋前端頁面、互動元件及瀏覽器測試等具體責任，因此只能部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "我會做頁面版型、互動元件、表單驗證、不同裝置的顯示調整，並串接同事提供的 API，把登入狀態、會員資料及錯誤訊息顯示正確。",
+          "reference_quote": "從事網路平台規劃、建置、運行管理及優化"
+        },
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題、調整載入速度及可操作性，功能修改後也要確認沒有影響其他頁面。",
+          "reference_quote": "管理數位保險平台,進行後續優化改良,確保平台運行的穩定性與可靠性"
+        },
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題、調整載入速度及可操作性，功能修改後也要確認沒有影響其他頁面。",
+          "reference_quote": "重視使用者體驗,應用新金融科技優化保險商品。"
+        }
+      ],
+      "limitations": [
+        "公版著重數位保險平台的規劃、建置與整體運行管理，未明確說明會員網站前端頁面的實作、API 串接或瀏覽器品質測試。",
+        "公版另涵蓋資料庫、資訊安全及平台整體管理等工作；這些內容不能據此視為員工負責的工作。"
+      ]
+    },
+    "seconds": 10.507124099996872,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "88a18ebc9fdf774dbc02ea2cecb1c7188a2bae311a11d3fbb99c99129893d485",
+    "case_id": "F02",
+    "document_id": "FIS2511-001v2"
+  },
+  {
+    "job_id": "J002",
+    "phase": "formal-02",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是冷鏈倉庫的貨物進出、存貨管理、揀貨與出貨，不能代表員工主要負責的冷氣設備現場安裝、故障檢修、試運轉及定期保養。只有盤點這項局部動作相似；員工僅偶爾協助清點工具和材料，因此不足以代表主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "每季會跟著同事清點一次工具和剩餘材料",
+          "reference_quote": "依照先進先出原則,進行商品、數量、效期、批號與外箱完整性(良品/壞品)庫存盤點"
+        }
+      ],
+      "limitations": [
+        "公版提及冷藏或冷凍區域的溫度監控及設備故障通報，但內容屬倉儲環境與貨物管理，並非冷氣設備的安裝或維修。",
+        "員工明確表示不負責採購或管理庫存；公版的存貨管理與出入庫作業不屬其主要責任。"
+      ]
+    },
+    "seconds": 6.611242699960712,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "84fbe44f08229f05ef908fbfce0302626f5c83067f4a8682cd2d3926c0c3b7cf",
+    "case_id": "F04",
+    "document_id": "RLM4323-004v1"
+  },
+  {
+    "job_id": "J003",
+    "phase": "formal-02",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版與員工工作都涉及設備維護、故障判斷、維修及測試，但公版核心對象是電腦及周邊設備，且多為依手冊及維修人員指示執行的協助工作；員工主要負責冷氣設備的現場安裝、檢修、試運轉及保養。這些相似處屬通用維修流程的局部關聯，不足以代表員工的主要工作領域。",
+      "evidence": [
+        {
+          "employee_quote": "維修時，我會問使用情況、量測並判斷故障原因，更換或修復有問題的零件",
+          "reference_quote": "依使用者所反映故障問題與需求,及手冊指引或電腦設備維修人員指示進行故障判斷"
+        },
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "於符合職業安全衛生規範的環境與作業程序下,依手冊指引及電腦設備維修人員指示,執行電腦及周邊設備維護與保養,並填寫保養記錄表。"
+        }
+      ],
+      "limitations": [
+        "公版內容以電腦及周邊設備的軟硬體組裝、維修為對象，未描述冷氣設備的現場安裝與試運轉流程。",
+        "公版多處限定依手冊或電腦設備維修人員指示執行，與員工依派工完成冷氣現場工作的責任範圍不同。"
+      ]
+    },
+    "seconds": 12.403183499991428,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "635d1c1ce3abd2cde19826fc060ee0f96125cb8ef73e206e7af418a5a6eac74b",
+    "case_id": "F04",
+    "document_id": "IIS7421-002v3"
+  },
+  {
+    "job_id": "J004",
+    "phase": "formal-02",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是汽車噴漆塗裝前處理，與員工主要負責的冷氣現場安裝及故障檢修不同。公版提及機具設備清潔與定期保養，和員工保養工作只有一般動作上的局部相似，對象與責任範圍不相符，不足以代表其主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "定期保養也由我做，包括清潔、檢查耗材和運轉狀況",
+          "reference_quote": "依使用手冊執行機具設備日常清潔與定期保養,並完成相關紀錄。"
+        }
+      ],
+      "limitations": [
+        "公版的保養對象是作業機具設備，未涵蓋冷氣設備安裝、故障判斷與修復、試運轉或客戶設備定期保養。",
+        "公版另有庫存盤點等工作，但員工僅每季協助清點工具和剩餘材料，且不負責庫存管理，不能作為代表其主要工作的依據。"
+      ]
+    },
+    "seconds": 8.178877700003795,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "ff579b261ddb59a5167c3d8edf1b9d891e61628d15d7aeb69dd1d2f47d475c54",
+    "case_id": "F04",
+    "document_id": "MEM7131-002v2"
+  },
+  {
+    "job_id": "J005",
+    "phase": "formal-02",
+    "judgment": {
+      "grade": 2,
+      "uncertain": false,
+      "main_work": [
+        "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+      ],
+      "reason": "公版涵蓋前端功能與介面設計、API 介接、除錯及測試，對員工持續負責的會員網站前端工作有實質支持；但其工作範圍也包含員工不負責的需求規劃、後端業務邏輯與資料庫等工作，且未具體涵蓋員工所述的瀏覽器操作品質、不同裝置調整等內容，屬部分代表。",
+      "evidence": [
+        {
+          "employee_quote": "收到已確認的功能需求和設計稿後，我會做頁面版型、互動元件、表單驗證、不同裝置的顯示調整，並串接同事提供的 API，把登入狀態、會員資料及錯誤訊息顯示正確。",
+          "reference_quote": "進行前端功能規劃設計。\n進行前端使用者介面(UI)設計。"
+        },
+        {
+          "employee_quote": "功能修改後也要確認沒有影響其他頁面。",
+          "reference_quote": "設計測試案例與流程,並以文件記錄測試結果。\n針對產出的程式碼進行需求規格測試,以確保符合需求。"
+        },
+        {
+          "employee_quote": "API 的內部邏輯、權限規則和資料庫由另一位同事開發，我不會去修改那些部分。",
+          "reference_quote": "進行後端資料庫介接。\n進行後端業務邏輯設計與API介面設計。"
+        }
+      ],
+      "limitations": [
+        "公版涵蓋系統需求分析、架構規劃及後端業務邏輯等較廣責任；員工表示不負責產品需求，也不修改 API 內部邏輯、權限規則及資料庫。",
+        "公版描述一般應用程式測試與部署，未具體對應員工所述的瀏覽器操作、不同裝置顯示、表單驗證及載入速度調整；員工亦只偶爾協助部署設定。"
+      ]
+    },
+    "seconds": 11.561306299990974,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "a17e2106c34c9c1f71be426cdb5c65a37be27c6d763a30cf477ffb2defff6bb0",
+    "case_id": "F02",
+    "document_id": "IIS3513-003v4"
+  },
+  {
+    "job_id": "J006",
+    "phase": "formal-02",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是貨運裝載、運送與調度，不能代表員工主要負責的冷氣設備現場安裝、故障檢修、試運轉及定期保養。僅有到現場確認、檢查及撰寫紀錄等一般工作動作上的局部相似，對象與責任內容不同。",
+      "evidence": [
+        {
+          "employee_quote": "接到派工後會確認現場狀況，依施工要求定位設備、配管、接線",
+          "reference_quote": "到達現場後,選擇適當的搬運設備與材料"
+        },
+        {
+          "employee_quote": "完成後再測試並把處理情形寫在工單上",
+          "reference_quote": "根據工作場域政策,完成所有必要裝卸文件的撰寫"
+        }
+      ],
+      "limitations": [
+        "公版主要描述託運物品搬運、裝載、運送、危險貨物處理及貨運調度，並未描述冷氣設備安裝、故障診斷與零件修復、試運轉或定期保養。",
+        "上述相似處僅是一般現場作業及紀錄動作，不能據此視為相同工作責任。"
+      ]
+    },
+    "seconds": 7.247455500008073,
+    "employee_sha256": "3d9ab04edfe34cbf125e69da0efe405443eefcd6180482f869f2a43fa26e82a9",
+    "document_sha256": "867e5ba53771ed760bf31a5bfd2f3783637bfb11fa8b79e60745472ac0bd6f80",
+    "case_id": "F04",
+    "document_id": "RTM4323-001v4"
+  },
+  {
+    "job_id": "J007",
+    "phase": "formal-02",
+    "judgment": {
+      "grade": 0,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版核心是電信工程團隊與場域管理、施工安排及協調，不能代表員工持續負責的瀏覽器畫面或訂單 API、權限、商業規則及資料存取開發。員工偶爾協助同事處理電腦網路問題，僅與公版的電信網路故障工作有表面關聯，不足以代表主要工作。",
+      "evidence": [
+        {
+          "employee_quote": "畫面與伺服器功能都是我持續負責的主要工作。",
+          "reference_quote": "負責及監督管理電信工程業務。"
+        },
+        {
+          "employee_quote": "偶爾同事電腦連不上網路會請我幫忙",
+          "reference_quote": "依據工作任務評估網路中斷及故障,對客戶的影響程度,擬定作業程序。"
+        }
+      ],
+      "limitations": [
+        "員工主要領域是軟體功能開發與維護；公版的施工、團隊管理及電信故障處理責任與其工作內容不符。"
+      ]
+    },
+    "seconds": 6.5735207999823615,
+    "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+    "document_sha256": "9126cc13b5ddc2b071c1843916ec727e7bb3dc6b0c6a5b2635784242b84ce555",
+    "case_id": "F01",
+    "document_id": "BGM1330-001v3"
+  },
+  {
+    "job_id": "J008",
+    "phase": "formal-02",
+    "judgment": {
+      "grade": 1,
+      "uncertain": false,
+      "main_work": [],
+      "reason": "公版提到網路平台建置、優化及使用者體驗，與員工的網站畫面工作有局部關聯；但描述停留在平台整體規劃、建置與管理，沒有實質涵蓋頁面版型、互動元件、API 串接或瀏覽器品質等持續工作組合，因此不足以代表員工的主要工作領域。",
+      "evidence": [
+        {
+          "employee_quote": "我平常負責會員網站的畫面。",
+          "reference_quote": "從事網路平台規劃、建置、運行管理及優化"
+        },
+        {
+          "employee_quote": "我會測試瀏覽器上的操作、找出畫面問題、調整載入速度及可操作性",
+          "reference_quote": "重視使用者體驗,應用新金融科技優化保險商品。"
+        }
+      ],
+      "limitations": [
+        "公版未具體說明前端頁面、互動元件、表單驗證、API 串接或瀏覽器測試等工作。",
+        "公版包含平台規劃與運行管理、資料庫及資訊安全等工作；員工明確表示 API 內部邏輯、權限規則和資料庫由同事負責，伺服器維護及產品需求決策也不屬其工作。"
+      ]
+    },
+    "seconds": 10.56895839999197,
+    "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+    "document_sha256": "c1b5d83273e70eb95ddd64f36ff666d8d1637c155a1965435988f16a4d80a9fa",
+    "case_id": "F02",
+    "document_id": "FIS2511-002v2"
+  }
+]

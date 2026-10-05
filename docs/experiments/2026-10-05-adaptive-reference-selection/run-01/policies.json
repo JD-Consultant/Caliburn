@@ -1,0 +1,409 @@
+[
+  {
+    "id": "top1",
+    "kind": "fixed",
+    "limit": 1
+  },
+  {
+    "id": "top2",
+    "kind": "fixed",
+    "limit": 2
+  },
+  {
+    "id": "top3",
+    "kind": "fixed",
+    "limit": 3
+  },
+  {
+    "id": "top4",
+    "kind": "fixed",
+    "limit": 4
+  },
+  {
+    "id": "top5",
+    "kind": "fixed",
+    "limit": 5
+  },
+  {
+    "id": "top10",
+    "kind": "fixed",
+    "limit": 10
+  },
+  {
+    "id": "top40",
+    "kind": "fixed",
+    "limit": 40
+  },
+  {
+    "id": "absolute_-8_cap5",
+    "kind": "absolute",
+    "parameter": -8.0,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-7.5_cap5",
+    "kind": "absolute",
+    "parameter": -7.5,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-7_cap5",
+    "kind": "absolute",
+    "parameter": -7.0,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-6.5_cap5",
+    "kind": "absolute",
+    "parameter": -6.5,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-6_cap5",
+    "kind": "absolute",
+    "parameter": -6.0,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-5.5_cap5",
+    "kind": "absolute",
+    "parameter": -5.5,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-5_cap5",
+    "kind": "absolute",
+    "parameter": -5.0,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-4.5_cap5",
+    "kind": "absolute",
+    "parameter": -4.5,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-4_cap5",
+    "kind": "absolute",
+    "parameter": -4.0,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-3.5_cap5",
+    "kind": "absolute",
+    "parameter": -3.5,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-3_cap5",
+    "kind": "absolute",
+    "parameter": -3.0,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-2.5_cap5",
+    "kind": "absolute",
+    "parameter": -2.5,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-2_cap5",
+    "kind": "absolute",
+    "parameter": -2.0,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-1.5_cap5",
+    "kind": "absolute",
+    "parameter": -1.5,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-1_cap5",
+    "kind": "absolute",
+    "parameter": -1.0,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-0.5_cap5",
+    "kind": "absolute",
+    "parameter": -0.5,
+    "limit": 5
+  },
+  {
+    "id": "absolute_0_cap5",
+    "kind": "absolute",
+    "parameter": 0.0,
+    "limit": 5
+  },
+  {
+    "id": "absolute_-8_cap10",
+    "kind": "absolute",
+    "parameter": -8.0,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-7.5_cap10",
+    "kind": "absolute",
+    "parameter": -7.5,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-7_cap10",
+    "kind": "absolute",
+    "parameter": -7.0,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-6.5_cap10",
+    "kind": "absolute",
+    "parameter": -6.5,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-6_cap10",
+    "kind": "absolute",
+    "parameter": -6.0,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-5.5_cap10",
+    "kind": "absolute",
+    "parameter": -5.5,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-5_cap10",
+    "kind": "absolute",
+    "parameter": -5.0,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-4.5_cap10",
+    "kind": "absolute",
+    "parameter": -4.5,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-4_cap10",
+    "kind": "absolute",
+    "parameter": -4.0,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-3.5_cap10",
+    "kind": "absolute",
+    "parameter": -3.5,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-3_cap10",
+    "kind": "absolute",
+    "parameter": -3.0,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-2.5_cap10",
+    "kind": "absolute",
+    "parameter": -2.5,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-2_cap10",
+    "kind": "absolute",
+    "parameter": -2.0,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-1.5_cap10",
+    "kind": "absolute",
+    "parameter": -1.5,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-1_cap10",
+    "kind": "absolute",
+    "parameter": -1.0,
+    "limit": 10
+  },
+  {
+    "id": "absolute_-0.5_cap10",
+    "kind": "absolute",
+    "parameter": -0.5,
+    "limit": 10
+  },
+  {
+    "id": "absolute_0_cap10",
+    "kind": "absolute",
+    "parameter": 0.0,
+    "limit": 10
+  },
+  {
+    "id": "relative_0.1_cap5",
+    "kind": "relative",
+    "parameter": 0.1,
+    "limit": 5
+  },
+  {
+    "id": "relative_0.25_cap5",
+    "kind": "relative",
+    "parameter": 0.25,
+    "limit": 5
+  },
+  {
+    "id": "relative_0.5_cap5",
+    "kind": "relative",
+    "parameter": 0.5,
+    "limit": 5
+  },
+  {
+    "id": "relative_1_cap5",
+    "kind": "relative",
+    "parameter": 1,
+    "limit": 5
+  },
+  {
+    "id": "relative_1.5_cap5",
+    "kind": "relative",
+    "parameter": 1.5,
+    "limit": 5
+  },
+  {
+    "id": "relative_2_cap5",
+    "kind": "relative",
+    "parameter": 2,
+    "limit": 5
+  },
+  {
+    "id": "relative_3_cap5",
+    "kind": "relative",
+    "parameter": 3,
+    "limit": 5
+  },
+  {
+    "id": "relative_4_cap5",
+    "kind": "relative",
+    "parameter": 4,
+    "limit": 5
+  },
+  {
+    "id": "relative_6_cap5",
+    "kind": "relative",
+    "parameter": 6,
+    "limit": 5
+  },
+  {
+    "id": "relative_0.1_cap10",
+    "kind": "relative",
+    "parameter": 0.1,
+    "limit": 10
+  },
+  {
+    "id": "relative_0.25_cap10",
+    "kind": "relative",
+    "parameter": 0.25,
+    "limit": 10
+  },
+  {
+    "id": "relative_0.5_cap10",
+    "kind": "relative",
+    "parameter": 0.5,
+    "limit": 10
+  },
+  {
+    "id": "relative_1_cap10",
+    "kind": "relative",
+    "parameter": 1,
+    "limit": 10
+  },
+  {
+    "id": "relative_1.5_cap10",
+    "kind": "relative",
+    "parameter": 1.5,
+    "limit": 10
+  },
+  {
+    "id": "relative_2_cap10",
+    "kind": "relative",
+    "parameter": 2,
+    "limit": 10
+  },
+  {
+    "id": "relative_3_cap10",
+    "kind": "relative",
+    "parameter": 3,
+    "limit": 10
+  },
+  {
+    "id": "relative_4_cap10",
+    "kind": "relative",
+    "parameter": 4,
+    "limit": 10
+  },
+  {
+    "id": "relative_6_cap10",
+    "kind": "relative",
+    "parameter": 6,
+    "limit": 10
+  },
+  {
+    "id": "gap_0.1_cap5",
+    "kind": "gap",
+    "parameter": 0.1,
+    "limit": 5
+  },
+  {
+    "id": "gap_0.25_cap5",
+    "kind": "gap",
+    "parameter": 0.25,
+    "limit": 5
+  },
+  {
+    "id": "gap_0.5_cap5",
+    "kind": "gap",
+    "parameter": 0.5,
+    "limit": 5
+  },
+  {
+    "id": "gap_1_cap5",
+    "kind": "gap",
+    "parameter": 1,
+    "limit": 5
+  },
+  {
+    "id": "gap_2_cap5",
+    "kind": "gap",
+    "parameter": 2,
+    "limit": 5
+  },
+  {
+    "id": "gap_0.1_cap10",
+    "kind": "gap",
+    "parameter": 0.1,
+    "limit": 10
+  },
+  {
+    "id": "gap_0.25_cap10",
+    "kind": "gap",
+    "parameter": 0.25,
+    "limit": 10
+  },
+  {
+    "id": "gap_0.5_cap10",
+    "kind": "gap",
+    "parameter": 0.5,
+    "limit": 10
+  },
+  {
+    "id": "gap_1_cap10",
+    "kind": "gap",
+    "parameter": 1,
+    "limit": 10
+  },
+  {
+    "id": "gap_2_cap10",
+    "kind": "gap",
+    "parameter": 2,
+    "limit": 10
+  }
+]

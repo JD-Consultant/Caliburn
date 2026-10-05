@@ -1,0 +1,16 @@
+test_matching_request_id_cannot_relabel_an_input_variant (test_audit_boundaries.BoundaryEvidence.test_matching_request_id_cannot_relabel_an_input_variant) ... FAIL
+test_one_reference_may_support_multiple_work_topics (test_audit_boundaries.BoundaryEvidence.test_one_reference_may_support_multiple_work_topics) ... ok
+test_several_reference_sources_may_support_one_work_topic (test_audit_boundaries.BoundaryEvidence.test_several_reference_sources_may_support_one_work_topic) ... ok
+
+======================================================================
+FAIL: test_matching_request_id_cannot_relabel_an_input_variant (test_audit_boundaries.BoundaryEvidence.test_matching_request_id_cannot_relabel_an_input_variant)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-input-boundaries\test_audit_boundaries.py", line 10, in test_matching_request_id_cannot_relabel_an_input_variant
+    with self.assertRaises(AssertionError):
+AssertionError: AssertionError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+FAILED (failures=1)

@@ -1,0 +1,6 @@
+{
+  "exe": "S:/caliburn/tmp/ocs-eval-qdrant/qdrant.exe",
+  "container": "caliburn-ocs-eval-embedder-1",
+  "config": "S:/caliburn/tmp/ocs-eval-qdrant/config.yaml",
+  "pid": 21244
+}

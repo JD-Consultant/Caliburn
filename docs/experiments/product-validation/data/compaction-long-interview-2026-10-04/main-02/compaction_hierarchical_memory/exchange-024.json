@@ -1,0 +1,16 @@
+{
+  "event_id": "e024",
+  "execution_id": "56ec441d-e5a2-45c7-8454-b33b67386e33",
+  "employee_input": {
+    "source_id": "8b510bfc-ba81-4687-92c7-192b98c0fe3b",
+    "interview_sequence": 48,
+    "speaker": "employee",
+    "interview_text": "我的報表是讓其他人能做處置和追蹤，不是追求所有數字看起來一致。發現系統欄位缺漏，我會列缺漏原因和待確認項，不會為了報表完整自行補數字；各張表的用途和交付時間要分開。"
+  },
+  "consultant_reply": {
+    "source_id": "8f3bdc6e-cab1-4e8b-bd66-3c688f69bdad",
+    "interview_sequence": 49,
+    "speaker": "consultant",
+    "interview_text": "已將欄位缺漏的處理原則分別補入四張表單任務：退貨差異表、盤點差異表、庫存帳齡表和收貨異常週報。各表仍各自保留用途與已知交付時間；資料缺漏時列明原因與待確認項，不自行補數字。\n\n另想釐清盤點調帳的權限：改 ERP 所需的核准庫存調整單通常由誰核准？這和月底全盤彙整表的主管簽核是分開的流程嗎？"
+  }
+}

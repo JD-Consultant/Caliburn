@@ -1,0 +1,9 @@
+{
+  "queries": 24,
+  "fresh_embedding_texts": 22,
+  "fresh_rerank_pairs": 1218,
+  "paid_llm_calls": 0,
+  "external_provider_calls": 0,
+  "elapsed_seconds": 170.03462397499243,
+  "inputs_unchanged": true
+}

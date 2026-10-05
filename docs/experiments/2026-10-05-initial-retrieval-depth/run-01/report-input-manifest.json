@@ -1,0 +1,37 @@
+{
+  "inputs": {
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/report.py": {
+      "sha256": "5369bfcc9cb4bfb051b3af52805573ee26da744cab538a2f749943456fbe3fd0",
+      "bytes": 9225
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/results.json": {
+      "sha256": "db0c08c2baf778f022770291411f00dd11e52d225ad56154cb7a9fbd397afadb",
+      "bytes": 978135
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/targets.json": {
+      "sha256": "2fca43dcbdc18dd484053608d067480477b73bbb9fba315fbd1698a2b5dd2fe1",
+      "bytes": 32623
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/summary.json": {
+      "sha256": "842a35a46e6c8c0db29fd0a88763359d4d246df1a64579f74d7af7942fbc14b8",
+      "bytes": 4072
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/minimum-depth.json": {
+      "sha256": "963d455e9717ef2d17ea3ec926c272567c54a39ace06adc2ce794afaf6b12378",
+      "bytes": 9656
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/verification.json": {
+      "sha256": "bd8f86bfae35fd5963d8edcb41659035ba0fae6dc9f57b2ae5e61b0054af27f9",
+      "bytes": 463
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/cases.json": {
+      "sha256": "6089e469ffb78f7e3300fc62f5afd499e8427cd76b3e01e2e29b708aa4b7ae3b",
+      "bytes": 76963
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/results.json": {
+      "sha256": "f05c8931f69d10a6c3055681fd4bb255620e49ded8e8c8d8b16c0b33be5dadda",
+      "bytes": 377142
+    }
+  },
+  "stage_diagnosis": "exploratory readback of old N20 U-R only; no new deeper rerank"
+}

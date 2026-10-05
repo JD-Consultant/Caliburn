@@ -1,0 +1,7 @@
+{
+  "authorization_note": "2026-10-05 使用者明確同意本批新增最多 US$0.25／45 分鐘，計入累計 US$2；起點 US$1.391700015；固定 Luna/high，達界線停止，不補跑。",
+  "batch_usd": "0.25",
+  "seconds": 2700,
+  "prior_cumulative_occupied_usd": "1.391700015",
+  "started_at": "2026-10-05T11:53:37.739303+00:00"
+}

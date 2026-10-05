@@ -1,0 +1,16 @@
+{
+  "event_id": "e053",
+  "execution_id": "cae821ae-5aac-47a1-961b-53e770538280",
+  "employee_input": {
+    "source_id": "ac4f8bad-efbd-429d-b877-2199b3d21c92",
+    "interview_sequence": 106,
+    "speaker": "employee",
+    "interview_text": "請核對退貨核對現在星期一及其他工作日各幾點開始，差異表幾點前交誰？再把常溫和冷藏退貨的判定責任分開說明，若JD不符請修正。"
+  },
+  "consultant_reply": {
+    "source_id": "f22876d6-323a-4871-bdee-f5127d2b5e62",
+    "interview_sequence": 107,
+    "speaker": "consultant",
+    "interview_text": "已核對，JD 目前的退貨任務與您說明一致，無需修正：\n\n- **核對時間：**週一 08:50 開始核對週末累積的退貨；週二至週五 08:35 開始核對前一日收到的退貨。\n- **交表時間與對象：**每個工作日都須在 09:10 前將退貨差異表交給客服窗口；週一較晚開始核對不會延後交表時間。\n- **常溫退貨：**依倉庫確認的商品狀態登錄。\n- **冷藏退貨：**另核對溫度紀錄，交由品質窗口判定是否可再銷售。合格溫度門檻仍標示為未確認，不填入自行推定的數值。"
+  }
+}

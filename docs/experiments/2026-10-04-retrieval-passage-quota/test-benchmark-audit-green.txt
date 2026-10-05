@@ -1,0 +1,16 @@
+test_benchmark_id_does_not_authorize_a_different_config (test_audit.EvidenceIntegrity.test_benchmark_id_does_not_authorize_a_different_config) ... ok
+test_claimed_db_http_timing_requires_every_passage_search (test_audit.EvidenceIntegrity.test_claimed_db_http_timing_requires_every_passage_search) ... ok
+test_missing_parameter_comparison_is_rejected (test_audit.EvidenceIntegrity.test_missing_parameter_comparison_is_rejected) ... ok
+test_new_multisegment_quote_cannot_use_legacy_exception (test_audit.EvidenceIntegrity.test_new_multisegment_quote_cannot_use_legacy_exception) ... ok
+test_saved_legacy_anchor_is_valid_but_returns_full_context (test_audit.EvidenceIntegrity.test_saved_legacy_anchor_is_valid_but_returns_full_context) ... ok
+test_summary_pass_marker_cannot_replace_coverage (test_audit.EvidenceIntegrity.test_summary_pass_marker_cannot_replace_coverage) ... ok
+test_wrong_native_score_is_rejected_even_with_matching_ids (test_audit.EvidenceIntegrity.test_wrong_native_score_is_rejected_even_with_matching_ids) ... ok
+test_dense_only_also_preserves_the_secondary_passage (test_selection.PassageRetention.test_dense_only_also_preserves_the_secondary_passage) ... ok
+test_duplicate_reference_retains_both_passage_origins (test_selection.PassageRetention.test_duplicate_reference_retains_both_passage_origins) ... ok
+test_late_secondary_work_has_its_own_retained_slot (test_selection.PassageRetention.test_late_secondary_work_has_its_own_retained_slot) ... ok
+test_missing_required_pair_is_rejected (test_selection.PassageRetention.test_missing_required_pair_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.001s
+
+OK

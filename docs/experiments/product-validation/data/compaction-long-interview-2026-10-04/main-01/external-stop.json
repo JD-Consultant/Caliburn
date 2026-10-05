@@ -1,0 +1,13 @@
+{
+  "status": "intentionally_stopped",
+  "reason": "Research hook erased generation rate headers after a token-count response lacking those headers, causing unnecessary 60-second fallback pacing.",
+  "scope": "stopped own verified Python process during a recorded pre-send wait; not a provider failure or product-quality result",
+  "stopped_process_id": 53316,
+  "launcher_process_id": 34632,
+  "last_phase": "consultant",
+  "active_turn": 9,
+  "completed_events": 8,
+  "artifacts_and_schema_retained": true,
+  "automatic_result_json": false,
+  "next_run_rule": "separate new run after tested pacing correction; never combine pre/post versions as one paired comparison"
+}

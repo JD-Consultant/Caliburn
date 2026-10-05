@@ -1,0 +1,107 @@
+{
+  "started_utc": "2026-10-04T02:00:44.276904+00:00",
+  "generation_manifest_sha256": "7260c1fba6e2b98affebb267877a89eda16422acca5e6175023b267bebe91bf5",
+  "corpus_sha256": "3892cd37e209976a32d0c9fccf2a35c127091179a0b62eda1604647eddd64c65",
+  "runtime": {
+    "model": "BAAI/bge-m3",
+    "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "device": "cuda",
+    "fp16": true,
+    "max_length": 8192,
+    "batch_size": 1,
+    "packages": {
+      "torch": "2.10.0+cu128",
+      "transformers": "4.57.6",
+      "FlagEmbedding": "1.4.0",
+      "huggingface-hub": "0.36.2"
+    }
+  },
+  "model_key": "20f95996a7ef4d574c29bed8625e84277aee1a73b8d097f5b45b5320ddb27bd8",
+  "cache_original_bytes": 59553476,
+  "cache_original_sha256": "d260298b7beba5177eee4d49198b746d637d8c76667e1716372b02e1194c11d9",
+  "collection": "ocs_eval_9401166158b64229ad96f9286d4f1b09",
+  "collection_configuration": {
+    "status": "green",
+    "optimizer_status": "ok",
+    "warnings": null,
+    "indexed_vectors_count": 1610,
+    "points_count": 805,
+    "segments_count": 2,
+    "config": {
+      "params": {
+        "vectors": {
+          "dense": {
+            "size": 1024,
+            "distance": "Cosine",
+            "hnsw_config": null,
+            "quantization_config": null,
+            "on_disk": null,
+            "datatype": null,
+            "multivector_config": null
+          }
+        },
+        "shard_number": 1,
+        "sharding_method": null,
+        "replication_factor": 1,
+        "write_consistency_factor": 1,
+        "read_fan_out_factor": null,
+        "read_fan_out_delay_ms": null,
+        "on_disk_payload": true,
+        "sparse_vectors": {
+          "sparse": {
+            "index": null,
+            "modifier": null
+          }
+        }
+      },
+      "hnsw_config": {
+        "m": 16,
+        "ef_construct": 100,
+        "full_scan_threshold": 10,
+        "max_indexing_threads": 0,
+        "on_disk": false,
+        "payload_m": null,
+        "inline_storage": null
+      },
+      "optimizer_config": {
+        "deleted_threshold": 0.2,
+        "vacuum_min_vector_number": 1000,
+        "default_segment_number": 1,
+        "max_segment_size": null,
+        "memmap_threshold": null,
+        "indexing_threshold": 1,
+        "flush_interval_sec": 5,
+        "max_optimization_threads": null,
+        "prevent_unoptimized": null
+      },
+      "wal_config": {
+        "wal_capacity_mb": 32,
+        "wal_segments_ahead": 0,
+        "wal_retain_closed": 1
+      },
+      "quantization_config": null,
+      "strict_mode_config": null,
+      "metadata": null
+    },
+    "payload_schema": {},
+    "update_queue": {
+      "length": 0,
+      "deferred_points": null
+    }
+  },
+  "database_corpus_points": 805,
+  "database_vectors_max_error": 2.295421985820667e-08,
+  "fixed": {
+    "input": "published_B2",
+    "representation": "TOP",
+    "method": "dense_exact",
+    "k": 10
+  },
+  "legacy_threshold": 0.675,
+  "threshold_status": "previously rejected, diagnostic only",
+  "source_contents": {
+    "retrieve.py": "\"\"\"Fixed candidate evaluation. No choices or calibration from this holdout.\"\"\"\nimport argparse\nimport csv\nimport hashlib\nimport json\nimport shutil\nimport sys\nfrom datetime import UTC, datetime\n\nimport numpy as np\nfrom qdrant_client import QdrantClient, models\n\nfrom support import FIRST, HERE, decision, load_module, published_b2\n\nsys.path.insert(0, str(FIRST))\nbaseline = load_module(\"occ2_fixed_retrieval\", FIRST / \"experiment.py\")\nfrom evaluation import ranking_check, validate_dense\nsys.path.pop(0)\nbaseline.HERE = HERE\n\n\ndef dump(path, value):\n    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str), encoding=\"utf-8\")\n\n\ndef sha(path):\n    return hashlib.sha256(path.read_bytes()).hexdigest()\n\n\ndef summaries(rows):\n    result = {}\n    for arm in (\"B2\", \"raw_employee\"):\n        result[arm] = {}\n        for split in (\"development\", \"holdout\", \"all\"):\n            group = [r for r in rows if r[\"arm\"] == arm and (split == \"all\" or r[\"split\"] == split)]\n            positive = [r for r in group if r[\"kind\"] == \"positive\"]\n            negative = [r for r in group if r[\"kind\"] != \"positive\"]\n            result[arm][split] = {\"positive_cases\": len(positive),\n                **{key: float(np.mean([r[key] for r in positive])) for key in (\"hit_1\", \"hit_5\", \"hit_10\", \"mrr\", \"ndcg_10\")},\n                \"primary_in_top10\": sum(r[\"primary_in_top10\"] for r in positive),\n                \"empty_positive_queries\": sum(r[\"query_empty\"] for r in positive),\n                \"negative_cases\": len(negative), \"empty_negative_queries\": sum(r[\"query_empty\"] for r in negative),\n                \"legacy_threshold_positive_accepts\": sum(r[\"legacy_threshold_accepts\"] for r in positive),\n                \"legacy_threshold_false_accepts\": sum(r[\"legacy_threshold_accepts\"] for r in negative),\n                \"negative_by_kind\": {kind: {\"cases\": sum(r[\"kind\"] == kind for r in negative),\n                    \"false_accepts\": sum(r[\"legacy_threshold_accepts\"] for r in negative if r[\"kind\"] == kind)}\n                    for kind in (\"insufficient\", \"out_of_corpus\")}}\n    return result\n\n\ndef main(run_dir):\n    manifest = json.loads((run_dir / \"manifest.json\").read_text(encoding=\"utf-8\"))\n    for path, expected in [(HERE / \"cases.json\", manifest[\"cases_sha256\"]),\n                            (HERE / \"protocol.md\", manifest[\"protocol_sha256\"]),\n                            (FIRST / \"corpus.json\", manifest[\"corpus_sha256\"])]:\n        if sha(path) != expected:\n            raise ValueError(\"Frozen protocol or labels changed\")\n    assert json.loads((run_dir / \"complete.json\").read_text())[\"cases\"] == 14\n    out = run_dir / \"retrieval\"\n    out.mkdir(exist_ok=False)\n    (HERE / \"cache\").mkdir(exist_ok=True)\n    old_cache = FIRST / \"cache/20f95996a7ef4d574c29bed8625e84277aee1a73b8d097f5b45b5320ddb27bd8.jsonl\"\n    new_cache = HERE / \"cache\" / old_cache.name\n    if new_cache.exists():\n        raise ValueError(\"This run requires a fresh copied cache\")\n    shutil.copyfile(old_cache, new_cache)\n    model = baseline.Embeddings()\n    client = QdrantClient(url=\"http://127.0.0.1:6335\", timeout=60, trust_env=False)\n    corpus = json.loads((FIRST / \"corpus.json\").read_text(encoding=\"utf-8\"))\n    cases = json.loads((HERE / \"cases.json\").read_text(encoding=\"utf-8\"))\n    name = json.loads((FIRST / \"candidate-01/collection.json\").read_text())[\"name\"]\n    try:\n        assert model.path == new_cache\n        docs, _, _ = model.get([r[\"texts\"][\"top\"] for r in corpus], \"fixed805TOP\")\n        info = client.get_collection(name)\n        assert info.points_count == 805\n        actual = []\n        offset = None\n        while True:\n            points, offset = client.scroll(name, limit=256, offset=offset, with_vectors=[\"dense\"], with_payload=True)\n            actual.extend(points)\n            if offset is None:\n                break\n        assert len(actual) == 805 and len({p.id for p in actual}) == 805\n        errors = []\n        for p in actual:\n            assert p.payload == {\"ocs_code\": corpus[int(p.id)][\"id\"], \"title\": corpus[int(p.id)][\"title\"]}\n            vector = validate_dense([p.vector[\"dense\"]], 1)[0]\n            errors.append(float(np.max(np.abs(vector - docs[int(p.id)]))))\n        assert max(errors) < 1e-6\n        dump(out / \"manifest.json\", {\"started_utc\": datetime.now(UTC).isoformat(), \"generation_manifest_sha256\": sha(run_dir / \"manifest.json\"),\n            \"corpus_sha256\": sha(FIRST / \"corpus.json\"), \"runtime\": model.runtime, \"model_key\": model.model_key,\n            \"cache_original_bytes\": old_cache.stat().st_size, \"cache_original_sha256\": sha(old_cache),\n            \"collection\": name, \"collection_configuration\": info.model_dump(mode=\"json\"),\n            \"database_corpus_points\": len(actual), \"database_vectors_max_error\": max(errors),\n            \"fixed\": {\"input\": \"published_B2\", \"representation\": \"TOP\", \"method\": \"dense_exact\", \"k\": 10},\n            \"legacy_threshold\": 0.675, \"threshold_status\": \"previously rejected, diagnostic only\",\n            \"source_contents\": {p.name: p.read_text(encoding=\"utf-8\") for p in (HERE / \"retrieve.py\", HERE / \"support.py\", HERE / \"test_support.py\")}})\n        prepared = []\n        for case in cases:\n            snapshot = json.loads((run_dir / case[\"case_id\"] / \"snapshot.json\").read_text(encoding=\"utf-8\"))\n            prepared.append({\"case_id\": case[\"case_id\"], \"B2\": published_b2(snapshot),\n                \"raw_employee\": \"\\n\\n\".join(case[\"employee_messages\"]), \"snapshot_sha256\": sha(run_dir / case[\"case_id\"] / \"snapshot.json\")})\n        dump(out / \"queries.json\", prepared)\n        rows, db_checks = [], []\n        for case, query in zip(cases, prepared, strict=True):\n            for arm in (\"B2\", \"raw_employee\"):\n                text = query[arm]\n                if text is None:\n                    ranking, tokens = [], 0\n                else:\n                    dense, _, sizes = model.get([text], f\"{case['case_id']}-{arm}\")\n                    tokens = sizes[0]\n                    ranking = baseline.sorted_ranking(docs @ dense[0], corpus)\n                    response = client.query_points(name, query=dense[0].tolist(), using=\"dense\", limit=10,\n                        with_payload=True, search_params=models.SearchParams(exact=True)).points\n                    returned = [(p.payload[\"ocs_code\"], p.score) for p in response]\n                    check = ranking_check(returned, ranking)\n                    assert check[\"correct\"]\n                    db_checks.append({\"case_id\": case[\"case_id\"], \"arm\": arm, \"exact\": True,\n                        **check, \"returned\": [{\"id\": k, \"score\": v} for k, v in returned]})\n                row = baseline.record(out, \"fixed\", case, arm, ranking, tokens, corpus)\n                row.update({\"kind\": case[\"kind\"], \"query_empty\": text is None, **decision(case, ranking)})\n                rows.append(row)\n                print(json.dumps({k: row[k] for k in (\"case_id\", \"arm\", \"hit_10\", \"primary_rank\", \"top1_score\", \"legacy_threshold_accepts\")}), flush=True)\n        dump(out / \"metrics.json\", rows)\n        dump(out / \"summary.json\", summaries(rows))\n        dump(out / \"database-checks.json\", db_checks)\n        with (out / \"metrics.csv\").open(\"w\", newline=\"\", encoding=\"utf-8-sig\") as stream:\n            writer = csv.DictWriter(stream, fieldnames=list(rows[0]))\n            writer.writeheader()\n            writer.writerows(rows)\n        dump(out / \"complete.json\", {\"finished_utc\": datetime.now(UTC).isoformat(),\n            \"rows\": len(rows), \"database_queries\": len(db_checks), \"cache_path\": model.path.relative_to(HERE).as_posix(),\n            \"cache_sha256\": sha(model.path), \"cache_bytes\": model.path.stat().st_size,\n            \"used_cache_keys\": sorted(model.used_keys)})\n    finally:\n        model.client.close()\n        client.close()\n\n\nif __name__ == \"__main__\":\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"run\", default=\"run-02\", nargs=\"?\")\n    args = parser.parse_args()\n    main(HERE / args.run)\n",
+    "support.py": "\"\"\"Pure preparation guards for this fixed-candidate experiment.\"\"\"\n\nimport importlib.util\nimport sys\nfrom pathlib import Path\n\nHERE = Path(__file__).resolve().parent\nROOT = HERE.parents[2]\nFIRST = HERE.parent / \"2026-10-04-occupation-retrieval\"\n\n\ndef load_module(name, path):\n    spec = importlib.util.spec_from_file_location(name, path)\n    module = importlib.util.module_from_spec(spec)\n    sys.modules[name] = module\n    spec.loader.exec_module(module)\n    return module\n\n\ndef generation_messages(case):\n    questions = [\"請描述目前實際負責的工作、對象與做到的範圍。\",\n                 \"請補充本人如何處理、判斷與交付，以及決定權和例外。\",\n                 \"還有哪些工作、頻率、更正或尚未確認的責任界線？\"]\n    if len(case[\"employee_messages\"]) != 3 or any(not text.strip() for text in case[\"employee_messages\"]):\n        raise ValueError(\"Three nonempty employee messages required\")\n    messages = []\n    for index, (question, text) in enumerate(zip(questions, case[\"employee_messages\"], strict=True)):\n        messages.extend([\n            {\"interview_sequence\": index * 2 + 1, \"speaker\": \"app\" if index == 0 else \"consultant\", \"text\": question},\n            {\"interview_sequence\": index * 2 + 2, \"speaker\": \"employee\", \"text\": text}])\n    return messages\n\n\ndef published_b2(snapshot):\n    if not any(item[\"layer\"] == \"work_understanding\" for item in snapshot[\"objects\"]):\n        return None\n    # Generation runs in the API environment; retrieval's NumPy dependency is lazy.\n    sys.path.insert(0, str(FIRST))\n    try:\n        from prepare import memory_case\n    finally:\n        sys.path.pop(0)\n    prepared = memory_case(\"extraction\", \"extraction\", snapshot, \"diagnostic baseline\", [], {}, \"\", [])\n    text = prepared[\"inputs\"][\"B_b2\"]\n    if not text.strip():\n        raise ValueError(\"Published B2 has an empty body\")\n    return text\n\n\ndef decision(case, ranking):\n    sys.path.insert(0, str(FIRST))\n    try:\n        from evaluation import ranking_metrics\n    finally:\n        sys.path.pop(0)\n    metrics = ranking_metrics([key for key, _ in ranking], case[\"grades\"])\n    primary = {key for key, grade in case[\"grades\"].items() if grade == 3}\n    return {**metrics, \"expected_abstain\": case[\"kind\"] != \"positive\",\n            \"primary_in_top10\": bool(primary & {key for key, _ in ranking[:10]}) if primary else None,\n            \"legacy_threshold\": 0.675,\n            \"legacy_threshold_accepts\": bool(ranking and ranking[0][1] >= 0.675)}\n",
+    "test_support.py": "\"\"\"Behavioral counterexamples for unbiased input and published snapshot extraction.\"\"\"\n\nimport json\n\nimport pytest\n\nfrom support import generation_messages, published_b2\n\n\ndef test_generation_excludes_answer_annotations():\n    case = {\"case_id\": \"E01\", \"employee_messages\": [\"原話A\", \"原話B\", \"原話C\"],\n            \"grades\": {\"SECRET_TARGET_CODE\": 3}, \"rationale\": \"SECRET_EXPECTED_TITLE\"}\n    messages = generation_messages(case)\n    assert len(messages) == 6\n    assert [row[\"interview_sequence\"] for row in messages] == list(range(1, 7))\n    assert [row[\"text\"] for row in messages if row[\"speaker\"] == \"employee\"] == case[\"employee_messages\"]\n    assert \"SECRET\" not in json.dumps(messages)\n\n\ndef test_empty_published_memory_is_explicit_abstention():\n    assert published_b2({\"snapshot\": {}, \"objects\": []}) is None\n\n\n@pytest.mark.parametrize(\"revision\", [\"right\", \"wrong\"])\ndef test_missing_reference_and_wrong_revision_cannot_be_silently_skipped(revision):\n    snapshot = {\"snapshot\": {}, \"objects\": [\n        {\"object_id\": \"b2\", \"layer\": \"work_understanding\", \"content\": {\"body\": \"理解\"},\n         \"work_situation_references\": [{\"object_id\": \"a\", \"revision_id\": \"right\"},\n                                       {\"object_id\": \"absent\", \"revision_id\": \"r\"}]},\n        {\"object_id\": \"a\", \"revision_id\": revision, \"layer\": \"work_situation\", \"content\": {\"body\": \"原文\"}}]}\n    with pytest.raises(ValueError):\n        published_b2(snapshot)\n\n\ndef test_valid_understanding_retains_unknown_and_negation():\n    snapshot = {\"snapshot\": {}, \"objects\": [\n        {\"object_id\": \"b2\", \"layer\": \"work_understanding\", \"content\": {\"body\": \"本人沒有核准權，頻率未知。\"},\n         \"work_situation_references\": [{\"object_id\": \"a\", \"revision_id\": \"r\"}]},\n        {\"object_id\": \"a\", \"revision_id\": \"r\", \"layer\": \"work_situation\", \"content\": {\"body\": \"情境\"}}]}\n    assert published_b2(snapshot) == \"本人沒有核准權，頻率未知。\"\ndef test_empty_positive_is_a_miss_instead_of_dropped_case():\n    from support import decision\n    result = decision({\"kind\": \"positive\", \"grades\": {\"expected\": 3}}, [])\n    assert result[\"hit_10\"] == 0 and result[\"mrr\"] == 0\n    assert result[\"ndcg_10\"] == 0 and result[\"primary_in_top10\"] is False\n    assert result[\"legacy_threshold_accepts\"] is False\n\n\ndef test_negative_does_not_become_a_retrieval_hit_when_no_memory():\n    from support import decision\n    result = decision({\"kind\": \"insufficient\", \"grades\": {}}, [])\n    assert result[\"hit_10\"] is None\n    assert result[\"expected_abstain\"] and not result[\"legacy_threshold_accepts\"]\n"
+  }
+}

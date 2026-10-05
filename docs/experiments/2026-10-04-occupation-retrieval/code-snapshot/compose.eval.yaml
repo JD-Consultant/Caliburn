@@ -1,0 +1,25 @@
+services:
+  embedder:
+    image: unsloth/unsloth:latest
+    entrypoint: ["bash", "-c"]
+    command: ["python -m pip install --no-deps FlagEmbedding==1.4.0 && python /experiment/bootstrap.py"]
+    gpus: all
+    ports: ["127.0.0.1:8082:80"]
+    environment:
+      MODEL_ID: BAAI/bge-m3
+      DEVICE: cuda
+      USE_FP16: "true"
+      BATCH_SIZE: "1"
+      MAX_LENGTH: "8192"
+      EVAL_MODEL_REVISION: "5617a9f61b028005a4858fdac845db406aefb181"
+    volumes:
+      - "hf_cache:/root/.cache/huggingface"
+      - "../../../apps/embedder:/app:ro"
+      - ".:/experiment:ro"
+  qdrant:
+    image: qdrant/qdrant:v1.18.2
+    ports: ["127.0.0.1:6333:6333"]
+    volumes: ["qdrant_data:/qdrant/storage"]
+volumes:
+  hf_cache:
+  qdrant_data:

@@ -1,0 +1,123 @@
+{
+  "arm": "raw_memory",
+  "repeat": 1,
+  "case_id": "situation_gap",
+  "cell_id": "situation_gap-1",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding_map",
+      "arguments": {},
+      "result_characters": 185
+    },
+    {
+      "step": 2,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6378
+    },
+    {
+      "step": 3,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "收貨異常週報"
+      },
+      "result_characters": 417
+    },
+    {
+      "step": 3,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+      },
+      "result_characters": 1812
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 6902,
+        "input_tokens_details": {
+          "cache_write_tokens": 3202,
+          "cached_tokens": 3697
+        },
+        "output_tokens": 99,
+        "output_tokens_details": {
+          "reasoning_tokens": 25
+        },
+        "total_tokens": 7001
+      },
+      "estimated_usd": "0.000487020",
+      "seconds": 3.3859681999892928
+    },
+    {
+      "usage": {
+        "input_tokens": 7153,
+        "input_tokens_details": {
+          "cache_write_tokens": 251,
+          "cached_tokens": 6899
+        },
+        "output_tokens": 37,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 7190
+      },
+      "estimated_usd": "0.000119165",
+      "seconds": 1.310889300017152
+    },
+    {
+      "usage": {
+        "input_tokens": 12577,
+        "input_tokens_details": {
+          "cache_write_tokens": 5424,
+          "cached_tokens": 7150
+        },
+        "output_tokens": 154,
+        "output_tokens_details": {
+          "reasoning_tokens": 78
+        },
+        "total_tokens": 12731
+      },
+      "estimated_usd": "0.000826800",
+      "seconds": 3.1424293000018224
+    },
+    {
+      "usage": {
+        "input_tokens": 14566,
+        "input_tokens_details": {
+          "cache_write_tokens": 1989,
+          "cached_tokens": 12574
+        },
+        "output_tokens": 763,
+        "output_tokens_details": {
+          "reasoning_tokens": 475
+        },
+        "total_tokens": 15329
+      },
+      "estimated_usd": "0.000756165",
+      "seconds": 8.370224400016014
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_1.requirement_6",
+        "value": "通知採購後，由本人持續更新差異清單及處理進度；兩個工作日未獲回覆時提醒採購，第四個工作日仍無進展則回報主管。退換貨或補貨由採購決定；本人不保證供應商實際補貨時間。",
+        "references": [
+          {
+            "kind": "work_situation",
+            "interview_sequence": null,
+            "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "僅修正收貨異常提醒與升級要求，保留兩個工作日提醒、第四個工作日回報主管，以及採購決定退換貨或補貨、本人不承諾供應商補貨時間的界線；未改動其他事項。"
+  },
+  "seconds": 60.195608099980745
+}

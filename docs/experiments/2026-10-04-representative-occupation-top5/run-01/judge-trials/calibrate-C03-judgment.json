@@ -1,0 +1,24 @@
+{
+  "job_id": "C03",
+  "phase": "calibrate",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是設計 API 內部程式、商業邏輯、資料表與資料庫，這些工作明確由同事負責且員工不做，不能代表員工主要製作網站畫面及串接同事提供的 API。",
+    "evidence": [
+      {
+        "employee_quote": "API 內部程式、資料表和資料庫都是同事負責，我不做那些工作。",
+        "reference_quote": "設計 API 的內部程式和商業邏輯，設計資料表、維護資料庫及資料存取規則。"
+      }
+    ],
+    "limitations": [
+      "公版未呈現員工主要製作網站畫面及串接 API 的工作。"
+    ]
+  },
+  "seconds": 4.753781599982176,
+  "employee_sha256": "a47fa98b258376970e559bebd2e2bb2c2fb633a000fd217dad8f1eea48052fd8",
+  "document_sha256": "9d097402a3b97d413405f32e07c4d123cfd7aa1a0507a9fc80f7154b44215645",
+  "expected_grade": 0,
+  "anchor_matched": true
+}

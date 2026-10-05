@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "status": "offline_material_selection; not_an_execution_manifest",
+  "source_root": "repository_root",
+  "prefix": {
+    "last_completed_event": "e052",
+    "formal_sequence_range": [1, 105],
+    "memory_and_summary_covered_through": 104,
+    "common_recent_sequences": [101, 102, 103, 104, 105],
+    "excluded_later_events": "e053 onwards, including incomplete e061",
+    "common_jd_copy": true,
+    "reuse_opaque_state": false
+  },
+  "source_files": [
+    {
+      "role": "jd_and_formal_interviews",
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/compaction_hierarchical_memory/product-052.json",
+      "sha256": "13f9ae667fb3c2b51f03f48f1e6be9c1774e7e2efba38e559ec0d0203770c00c"
+    },
+    {
+      "role": "jd_review_baselines",
+      "path": "docs/experiments/product-validation/data/context-reset-comparison-2026-10-05/reference-review-anchors.json.gz",
+      "sha256": "4b04a6cceeaa15d8494d6d0d4e8307706d58d3a9152ea7b34282118bb97ad666"
+    },
+    {
+      "role": "memory",
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/compaction_hierarchical_memory/memory-e052.json",
+      "sha256": "304bffc05fd75b1bccec424d3ba37a563a3994be7056e2425848aab46dc747a1"
+    },
+    {
+      "role": "flat_summary",
+      "path": "docs/experiments/product-validation/data/memory-summary-capacity-2026-10-05/live-02/flat-summary-4.md",
+      "sha256": "1d958ed2669fee423764f18433fd3f2ab0c3e0cb476bd5f3fe66d8ee3ca4d6c8"
+    },
+    {
+      "role": "summary_source_batches",
+      "path": "docs/experiments/product-validation/data/memory-summary-capacity-2026-10-05/live-02/capture-source-batches.json",
+      "sha256": "831a13a1e8d5eef1238da1201e78f31cd058587ad6f46ceabd916f247308a81f"
+    },
+    {
+      "role": "historical_context_observation_only",
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/trace.jsonl",
+      "sha256": "2b7af98eb408a5f854dd1e61d03b8d095dae75a1498403cba290b605b03b3ec6"
+    }
+  ],
+  "verified_counts": {
+    "formal_messages": 105,
+    "employee_messages": 52,
+    "responsibility_areas": 1,
+    "tasks": 13,
+    "outcomes": 33,
+    "requirements": 47,
+    "knowledge": 2,
+    "skills": 4,
+    "conditions": 3,
+    "persisted_references": 207,
+    "initial_references_needing_review": 39,
+    "distinct_review_baseline_revisions": 156,
+    "persisted_reference_kinds": {"interview": 207},
+    "situations": 12,
+    "understandings": 1
+  },
+  "historical_pressure_observation": {
+    "filter": {"event_id": "e052", "phase": "consultant"},
+    "selection": "last /v1/responses/input_tokens response in the filtered trace; not a new provider request",
+    "reported_complete_request_input_tokens": 144455,
+    "last_generation_input_items": 136,
+    "app_reference_messages": 52,
+    "app_reference_text_characters": 177909,
+    "other_user_messages": 52,
+    "other_user_text_characters": 4068,
+    "function_calls": 6,
+    "function_outputs": 6,
+    "compaction_items": 1,
+    "note": "This request contains retained old App references and opaque items. It is not a token count for cleaned history, new input, or employee text alone."
+  },
+  "preparation_status": {
+    "source_hashes_checked": true,
+    "summary_source_sequences_checked": true,
+    "continuation_cases": 8,
+    "jd_write_adapter_verified": true,
+    "jd_write_adapter_verification_scope": "real PostgreSQL fixtures and production read/write/reference transactions; see README sections 6 and 7 for native continuation tests",
+    "native_history_runner_verified": true,
+    "native_history_runner_verification_scope": "real PostgreSQL checkpoints and JD transactions, scripted HTTP responses only; not a live model comparison or complete paid batch runner",
+    "full_prompt_and_tools_frozen": true,
+    "batch_runner_verified": true,
+    "batch_runner_verification_scope": "93 offline tests, including 18 real PostgreSQL cases and a complete 3 x 8 scripted-provider batch; no live-model quality result",
+    "prepared_manifest": "prepared-01/manifest.json",
+    "new_request_provider_counted": false,
+    "paid_execution_authorized": true,
+    "authorization": "2026-10-05：本批最多 US$0.25／45分鐘，計入原累計 US$2；達上限停止，不補跑。實際啟動另記 started.json。",
+    "new_provider_calls": 0,
+    "prior_cumulative_estimated_occupied_usd": "1.322929315",
+    "cumulative_limit_usd": "2.00"
+  }
+}

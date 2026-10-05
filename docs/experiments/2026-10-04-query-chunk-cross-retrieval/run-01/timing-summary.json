@@ -1,0 +1,402 @@
+[
+  {
+    "case_id": "F01",
+    "method": "W-Dmax",
+    "median_seconds": 0.0207380999927409
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmax",
+    "median_seconds": 0.02314999996451661
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmean3",
+    "median_seconds": 0.028961800038814545
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umax",
+    "median_seconds": 0.02819639997323975
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umean3",
+    "median_seconds": 0.03215430001728237
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Dmax",
+    "median_seconds": 0.04552669997792691
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Tmax",
+    "median_seconds": 0.05630880000535399
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Tmean3",
+    "median_seconds": 0.04671550000784919
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Umax",
+    "median_seconds": 0.024664999975357205
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Umean3",
+    "median_seconds": 0.03840119997039437
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Dmax",
+    "median_seconds": 0.022610000043641776
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmax",
+    "median_seconds": 0.010325099981855601
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmean3",
+    "median_seconds": 0.02466419996926561
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umax",
+    "median_seconds": 0.028557299985550344
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umean3",
+    "median_seconds": 0.029848999984096736
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Dmax",
+    "median_seconds": 0.03400250000413507
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Tmax",
+    "median_seconds": 0.04703530005645007
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Tmean3",
+    "median_seconds": 0.048588400008156896
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Umax",
+    "median_seconds": 0.03254889999516308
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Umean3",
+    "median_seconds": 0.030910299974493682
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Dmax",
+    "median_seconds": 0.022351300052832812
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmax",
+    "median_seconds": 0.02122709999093786
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmean3",
+    "median_seconds": 0.013909899978898466
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umax",
+    "median_seconds": 0.02680980000877753
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umean3",
+    "median_seconds": 0.030670400010421872
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Dmax",
+    "median_seconds": 0.03328159998636693
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Tmax",
+    "median_seconds": 0.060321500001009554
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Tmean3",
+    "median_seconds": 0.04089250002289191
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Umax",
+    "median_seconds": 0.05549759999848902
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Umean3",
+    "median_seconds": 0.032363199978135526
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Dmax",
+    "median_seconds": 0.00504200003342703
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmax",
+    "median_seconds": 0.021857699961401522
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmean3",
+    "median_seconds": 0.02793689997633919
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umax",
+    "median_seconds": 0.026082900003530085
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umean3",
+    "median_seconds": 0.01967430004151538
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Dmax",
+    "median_seconds": 0.03421730000991374
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Tmax",
+    "median_seconds": 0.044062000000849366
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Tmean3",
+    "median_seconds": 0.06150840001646429
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Umax",
+    "median_seconds": 0.05886240000836551
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Umean3",
+    "median_seconds": 0.06141570000909269
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Dmax",
+    "median_seconds": 0.02574150002328679
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmax",
+    "median_seconds": 0.020882699987851083
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmean3",
+    "median_seconds": 0.010334499995224178
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umax",
+    "median_seconds": 0.027821000025141984
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umean3",
+    "median_seconds": 0.03126069996505976
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Dmax",
+    "median_seconds": 0.04556800000136718
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Tmax",
+    "median_seconds": 0.03714649996254593
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Tmean3",
+    "median_seconds": 0.04678199999034405
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Umax",
+    "median_seconds": 0.058008500025607646
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Umean3",
+    "median_seconds": 0.03294840001035482
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Dmax",
+    "median_seconds": 0.016968200041446835
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmax",
+    "median_seconds": 0.02142379997530952
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmean3",
+    "median_seconds": 0.030849400034639984
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umax",
+    "median_seconds": 0.028432500024791807
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umean3",
+    "median_seconds": 0.02095699997153133
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Dmax",
+    "median_seconds": 0.05420489999232814
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Tmax",
+    "median_seconds": 0.08266259997617453
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Tmean3",
+    "median_seconds": 0.0570329999900423
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Umax",
+    "median_seconds": 0.09074259997578338
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Umean3",
+    "median_seconds": 0.06014730001334101
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Dmax",
+    "median_seconds": 0.023003899957984686
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmax",
+    "median_seconds": 0.034051200025714934
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmean3",
+    "median_seconds": 0.030286599998362362
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umax",
+    "median_seconds": 0.02791370003251359
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umean3",
+    "median_seconds": 0.031091900018509477
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Dmax",
+    "median_seconds": 0.07611780002480373
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Tmax",
+    "median_seconds": 0.09862770000472665
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Tmean3",
+    "median_seconds": 0.10290939995320514
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Umax",
+    "median_seconds": 0.09211700002197176
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Umean3",
+    "median_seconds": 0.09161579998908564
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Dmax",
+    "median_seconds": 0.02905150002334267
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmax",
+    "median_seconds": 0.02040620002662763
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmean3",
+    "median_seconds": 0.033108700008597225
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umax",
+    "median_seconds": 0.026546900044195354
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umean3",
+    "median_seconds": 0.01844590000109747
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Dmax",
+    "median_seconds": 0.0920870000263676
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Tmax",
+    "median_seconds": 0.13823059998685494
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Tmean3",
+    "median_seconds": 0.09784770000260323
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Umax",
+    "median_seconds": 0.09169989998918027
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Umean3",
+    "median_seconds": 0.10866260004695505
+  }
+]

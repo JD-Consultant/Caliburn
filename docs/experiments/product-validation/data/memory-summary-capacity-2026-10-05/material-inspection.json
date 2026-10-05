@@ -1,0 +1,163 @@
+{
+  "kind": "offline_read_only_material_inspection",
+  "inspected_at": "2026-10-04T16:34:40.4087464Z",
+  "branch": "jd-app-docker",
+  "head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "new_provider_calls": 0,
+  "new_database_writes": 0,
+  "source_files": [
+    {
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/employee-scenario.json",
+      "bytes": 20036,
+      "sha256": "cb0d1dd3ecf32f8e887a44c514f42e5e1b3f3c1410145672fdbcb1621ae09333"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/grading-cases.json",
+      "bytes": 15941,
+      "sha256": "568f5246ad649f1b1f2ef934a83287e572109ee06d09ee6a5661a69f7359a6ce"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/preflight-02/result.json",
+      "bytes": 5540,
+      "sha256": "2334eb1635dc9d9ad59f24fdbc76814b2b8481f6b7bd55620e9e5feaee6914fc"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/stopped-reconciliation.json",
+      "bytes": 4095,
+      "sha256": "c68a5a350c370b390678e38e41e6ab589091fc07397abf6e2c845e78a5f8947a"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/compaction_hierarchical_memory/product-052.json",
+      "bytes": 316874,
+      "sha256": "13f9ae667fb3c2b51f03f48f1e6be9c1774e7e2efba38e559ec0d0203770c00c"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/compaction_hierarchical_memory/product-060.json",
+      "bytes": 327490,
+      "sha256": "db6f330b0be5a834a994bd2bf5e655bbc6e20ff8cf6cbd0fe89b4e001839e49c"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/compaction_hierarchical_memory/memory-e052.json",
+      "bytes": 43575,
+      "sha256": "304bffc05fd75b1bccec424d3ba37a563a3994be7056e2425848aab46dc747a1"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/jd-edit-preservation-2026-10-04/live-02/result.json",
+      "bytes": 63651,
+      "sha256": "88773041748be8476e76e3fd26caec2242033cfe5f4c97128fa28c8161975d21"
+    }
+  ],
+  "formal_source_52": {
+    "messages": 105,
+    "employee_messages": 52,
+    "total_text_characters": 10834.0,
+    "employee_text_characters": 4068.0,
+    "sequence_min": 1.0,
+    "sequence_max": 105.0
+  },
+  "latest_successful_60": {
+    "messages": 121,
+    "employee_messages": 60,
+    "total_text_characters": 13245.0
+  },
+  "fixed_memory": {
+    "snapshot": {
+      "job_file_id": "8a207649-05df-4c06-a86c-83111c432e28",
+      "snapshot_id": "b4ab78eb-d8f2-44d9-a8fe-f08770da37fe",
+      "position_id": "82127924-2619-402f-be98-b4d622f9d1ac",
+      "through_source_id": "5a4ee916-d48b-492f-b177-ca07d115b3b3",
+      "covered_through_sequence": 104
+    },
+    "work_situations": 12,
+    "work_understandings": 1
+  },
+  "previous_provider_measurements": {
+    "employee_scenario_characters": 4589,
+    "counts": [
+      {
+        "name": "compaction_hierarchical_memory",
+        "input_tokens": 8326,
+        "capacity": {
+          "allowed_input_tokens": 922000,
+          "output_reserve_tokens": 16384,
+          "fits_model": true,
+          "pre_turn_threshold_reached": false,
+          "complete_step_threshold_reached": false
+        }
+      },
+      {
+        "name": "compaction_flat_summary",
+        "input_tokens": 7862,
+        "capacity": {
+          "allowed_input_tokens": 922000,
+          "output_reserve_tokens": 16384,
+          "fits_model": true,
+          "pre_turn_threshold_reached": false,
+          "complete_step_threshold_reached": false
+        }
+      },
+      {
+        "name": "compaction_raw_history",
+        "input_tokens": 7851,
+        "capacity": {
+          "allowed_input_tokens": 922000,
+          "output_reserve_tokens": 16384,
+          "fits_model": true,
+          "pre_turn_threshold_reached": false,
+          "complete_step_threshold_reached": false
+        }
+      },
+      {
+        "name": "compaction_recent_history",
+        "input_tokens": 7530,
+        "capacity": {
+          "allowed_input_tokens": 922000,
+          "output_reserve_tokens": 16384,
+          "fits_model": true,
+          "pre_turn_threshold_reached": false,
+          "complete_step_threshold_reached": false
+        }
+      },
+      {
+        "name": "raw_preload_counterfactual",
+        "input_tokens": 11919,
+        "capacity": {
+          "allowed_input_tokens": 922000,
+          "output_reserve_tokens": 16384,
+          "fits_model": true,
+          "pre_turn_threshold_reached": false,
+          "complete_step_threshold_reached": false
+        }
+      }
+    ],
+    "stopped_context": {
+      "e061_first_request_app_user_messages": 61,
+      "e061_first_request_raw_user_messages": 61,
+      "app_message_characters_not_tokens": 215616,
+      "raw_user_characters_not_tokens": 4589,
+      "historical_interview_message_copies_inside_app_messages": 801,
+      "e053_standalone_prior_employee_events": "e001-e052",
+      "opaque_state_present": true,
+      "e061_count_sequence": [
+        150394,
+        153650,
+        155907,
+        171410,
+        155109,
+        157151,
+        172606
+      ]
+    }
+  },
+  "accounting": {
+    "prior_cumulative_estimated_occupied_usd": "1.136057105",
+    "cumulative_limit_usd": "2.00",
+    "new_paid_authorization": "none; prior JD batch closed"
+  },
+  "limitations": [
+    "Character counts are not provider token counts.",
+    "The 61-event preflight and incomplete e061 are not a completed 61-event interview.",
+    "No opaque state is decoded or replayed from sanitized trace.",
+    "No new memory-versus-summary output was generated."
+  ]
+}

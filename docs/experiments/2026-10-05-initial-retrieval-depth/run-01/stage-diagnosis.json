@@ -1,0 +1,468 @@
+[
+  {
+    "case_id": "F01",
+    "variant": "O",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "IIS3513-003v4",
+        "title": "網站系統設計人員",
+        "main_work": [
+          "瀏覽器畫面、互動與操作檢查的開發及維護",
+          "訂單 API、權限、商業規則及資料存取的開發及維護"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 1,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      },
+      {
+        "id": "INM3514-001v4",
+        "title": "網站前端開發人員",
+        "main_work": [
+          "瀏覽器畫面、互動與操作檢查的開發及維護"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 12,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "瀏覽器畫面、互動與操作檢查的開發及維護",
+      "訂單 API、權限、商業規則及資料存取的開發及維護"
+    ],
+    "prior_U_R_clear_facets_retained": [
+      "瀏覽器畫面、互動與操作檢查的開發及維護",
+      "訂單 API、權限、商業規則及資料存取的開發及維護"
+    ],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "F01",
+    "variant": "B2",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "IIS3513-003v4",
+        "title": "網站系統設計人員",
+        "main_work": [
+          "瀏覽器畫面、互動與操作檢查的開發及維護",
+          "訂單 API、權限、商業規則及資料存取的開發及維護"
+        ],
+        "initial_N20_recalled": false,
+        "prior_U_R_rank": null,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": false
+      },
+      {
+        "id": "INM3514-001v4",
+        "title": "網站前端開發人員",
+        "main_work": [
+          "瀏覽器畫面、互動與操作檢查的開發及維護"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 1,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "瀏覽器畫面、互動與操作檢查的開發及維護"
+    ],
+    "prior_U_R_clear_facets_retained": [
+      "瀏覽器畫面、互動與操作檢查的開發及維護"
+    ],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "F02",
+    "variant": "O",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "INM3514-001v4",
+        "title": "網站前端開發人員",
+        "main_work": [
+          "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 2,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+    ],
+    "prior_U_R_clear_facets_retained": [
+      "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+    ],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "F02",
+    "variant": "B2",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "INM3514-001v4",
+        "title": "網站前端開發人員",
+        "main_work": [
+          "會員網站畫面、互動、API 串接及瀏覽器品質的開發維護"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 13,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [],
+    "prior_U_R_clear_facets_retained": [],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "F03",
+    "variant": "O",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "FAC3313-001v2",
+        "title": "會計助理",
+        "main_work": [
+          "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 2,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      },
+      {
+        "id": "FAC4311-001v2",
+        "title": "會計人員",
+        "main_work": [
+          "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 1,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+    ],
+    "prior_U_R_clear_facets_retained": [
+      "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+    ],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "F03",
+    "variant": "B2",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "FAC3313-001v2",
+        "title": "會計助理",
+        "main_work": [
+          "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 2,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      },
+      {
+        "id": "FAC4311-001v2",
+        "title": "會計人員",
+        "main_work": [
+          "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 5,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+    ],
+    "prior_U_R_clear_facets_retained": [
+      "日常帳務登錄、應收應付款追蹤、對帳及月結帳表整理"
+    ],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "F04",
+    "variant": "O",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "SET3113-002v3",
+        "title": "冷凍空調技術人員",
+        "main_work": [
+          "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 4,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+    ],
+    "prior_U_R_clear_facets_retained": [
+      "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+    ],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "F04",
+    "variant": "B2",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "SET3113-002v3",
+        "title": "冷凍空調技術人員",
+        "main_work": [
+          "冷氣設備的現場安裝、故障檢修、試運轉及定期保養"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 17,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [],
+    "prior_U_R_clear_facets_retained": [],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "F05",
+    "variant": "O",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "AVA2172-001v4",
+        "title": "多媒體設計人員",
+        "main_work": [
+          "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 5,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": true
+      },
+      {
+        "id": "AVA2172-002v3",
+        "title": "平面視覺傳達設計人員",
+        "main_work": [
+          "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 25,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+    ],
+    "prior_U_R_clear_facets_retained": [],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "F05",
+    "variant": "B2",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "AVA2172-001v4",
+        "title": "多媒體設計人員",
+        "main_work": [
+          "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 2,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": true
+      },
+      {
+        "id": "AVA2172-002v3",
+        "title": "平面視覺傳達設計人員",
+        "main_work": [
+          "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 20,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "活動與商品視覺素材的版面設計、跨尺寸製作、修訂及輸出交付"
+    ],
+    "prior_U_R_clear_facets_retained": [],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "H01",
+    "variant": "O",
+    "depth": 20,
+    "targets": [],
+    "prior_U_R_known_facets_retained": [],
+    "prior_U_R_clear_facets_retained": [],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "H01",
+    "variant": "B2",
+    "depth": 20,
+    "targets": [],
+    "prior_U_R_known_facets_retained": [],
+    "prior_U_R_clear_facets_retained": [],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "H02",
+    "variant": "O",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "MMP4321-003v4",
+        "title": "零售業倉儲管理人員",
+        "main_work": [
+          "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 2,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      },
+      {
+        "id": "RLM9330-001v1",
+        "title": "電商物流中心理貨員",
+        "main_work": [
+          "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 3,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+    ],
+    "prior_U_R_clear_facets_retained": [
+      "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+    ],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "H02",
+    "variant": "B2",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "MMP4321-003v4",
+        "title": "零售業倉儲管理人員",
+        "main_work": [
+          "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 23,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": false
+      },
+      {
+        "id": "RLM9330-001v1",
+        "title": "電商物流中心理貨員",
+        "main_work": [
+          "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 4,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+    ],
+    "prior_U_R_clear_facets_retained": [
+      "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+    ],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "H03",
+    "variant": "O",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "BAS3323-003v3",
+        "title": "採購助理",
+        "main_work": [
+          "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 2,
+        "prior_U_R_final_K5_retained": true,
+        "sensitivity_excluded": false
+      },
+      {
+        "id": "MMP1324-001v4",
+        "title": "資材人員",
+        "main_work": [
+          "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 11,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": true
+      }
+    ],
+    "prior_U_R_known_facets_retained": [
+      "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+    ],
+    "prior_U_R_clear_facets_retained": [
+      "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+    ],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  },
+  {
+    "case_id": "H03",
+    "variant": "B2",
+    "depth": 20,
+    "targets": [
+      {
+        "id": "BAS3323-003v3",
+        "title": "採購助理",
+        "main_work": [
+          "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 7,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": false
+      },
+      {
+        "id": "MMP1324-001v4",
+        "title": "資材人員",
+        "main_work": [
+          "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+        ],
+        "initial_N20_recalled": true,
+        "prior_U_R_rank": 22,
+        "prior_U_R_final_K5_retained": false,
+        "sensitivity_excluded": true
+      }
+    ],
+    "prior_U_R_known_facets_retained": [],
+    "prior_U_R_clear_facets_retained": [],
+    "scope": "existing N20 rerank diagnostics only; no N40/N80 rerank result"
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "job_id": "new-018",
+  "phase": "formal-01",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是產線機台的保養、故障排除、調整與升級；員工主要持續負責的是訂單系統的瀏覽器畫面及伺服器功能，工作對象與責任範圍不同，無法代表其任一主要工作領域。",
+    "evidence": [
+      {
+        "employee_quote": "畫面與伺服器功能都是我持續負責的主要工作。",
+        "reference_quote": "維護機台的正常運作，例行性與預防性保養。"
+      },
+      {
+        "employee_quote": "偶爾同事電腦連不上網路會請我幫忙",
+        "reference_quote": "量產設備維護與故障排除,發掘機台是否有潛在問題。(基礎/進階)"
+      }
+    ],
+    "limitations": [
+      "公版提及機台「功能增修」或「功能升級」，但其上下文指機台設備，不能據此視為訂單系統功能開發的支持。",
+      "員工偶爾協助處理電腦網路問題，不足以代表主要工作；公版內容也未描述該類工作。"
+    ]
+  },
+  "seconds": 5.780508800002281,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "28132191f52ace592b43e2ed66df1c300af82b249e18f43afb4e219817a49d7e",
+  "case_id": "F01",
+  "document_id": "MEM3113-001v4"
+}

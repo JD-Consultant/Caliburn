@@ -1,0 +1,678 @@
+"""B2-only paired runs using real candidate tools, role runtime and isolated PostgreSQL."""
+
+import argparse
+import asyncio
+import hashlib
+import importlib.util
+import json
+import subprocess
+import time
+import traceback
+from dataclasses import asdict, replace
+from datetime import UTC, datetime
+from decimal import Decimal
+from pathlib import Path
+from unittest.mock import patch
+from urllib.parse import quote
+from uuid import NAMESPACE_URL, uuid4, uuid5
+
+import httpx2
+import psycopg
+from caliburn.adapters.database import Database
+from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.adapters.openai_credentials import read_openai_api_key
+from caliburn.adapters.openai_models import model_profile
+from caliburn.adapters.openai_responses import create_responses_client
+from caliburn.adapters.response_serialization import restore_response
+from caliburn.agents.memory_analysis.runner import MemoryAnalysisRunner
+from caliburn.agents.work_understanding_analyst.instructions import (
+    UNDERSTANDING_INSTRUCTIONS,
+)
+from caliburn.features.executions import service as executions
+from caliburn.features.executions.history_models import AgentRole
+from caliburn.features.executions.models import ExecutionKind, ExecutionScope
+from caliburn.features.work_memory.candidates import CreateMemoryObject
+from caliburn.features.work_memory.models import MemoryContent
+from caliburn.features.work_memory.revisions import MemoryLayer
+from caliburn.settings import DatabaseSettings, ModelSettings
+from caliburn.transport.model_tools.memory_analysis import (
+    MEMORY_CHECKPOINT_TYPES,
+    memory_analysis_tool_definitions,
+)
+from caliburn.transport.model_tools.memory_reads import MemoryReadTools
+from caliburn.workflows.memory_analysis.results import MemoryAnalysisResult
+from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from psycopg.conninfo import make_conninfo
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[4]
+SOURCE = HERE.parent / "memory-summary-capacity-2026-10-05/live-02"
+MODEL = "gpt-6-luna"
+MAX_SECONDS = 1200
+MAX_USD = Decimal("0.10")
+PRIOR = Decimal("1.236537370")
+SUPPLEMENT = """
+
+本次為固定資料的隔離重組評測，不是新增訪談或新增情境的整理批次。
+App 載入既有情境及理解，請重新分析目前全部工作內容與組織；有必要才修改、拆合或新增理解，正確部分可保留。
+本次沒有新增情境 diff，空差異不表示免除這項全範圍重組任務。不要求特定標題、項數或工具順序。
+訪談原話最多可讀到原快照的最後員工輸入；完成分析即可，不宣稱已正式發布。
+"""
+
+
+def load_module(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+fixtures = load_module("organization_fixtures", HERE / "fixtures.py")
+probe = load_module(
+    "organization_pg",
+    HERE.parent / "memory-compaction-publish-2026-10-04/experiment.py",
+)
+provider = load_module(
+    "organization_rate",
+    HERE.parent / "design-comparisons-2026-10-04/provider_observations.py",
+)
+
+
+def study_model_settings():
+    """Use production capabilities; only the authorized stop policy is stricter."""
+    defaults = ModelSettings(api_key="configured-by-client", model=MODEL)
+    return replace(
+        defaults,
+        max_attempts_per_request=1,
+        turn_timeout_seconds=min(defaults.turn_timeout_seconds, MAX_SECONDS),
+    )
+
+
+def public_model_settings(model):
+    return {key: value for key, value in asdict(model).items() if key != "api_key"}
+
+
+class StudyBudget:
+    """Local reservation accounting, without the legacy helper's fixed 64-call cap.
+
+    Retains the previous Budget arithmetic. Kept here so historical experiments and
+    their frozen helper remain unchanged; this is not a product accounting layer.
+    """
+
+    def __init__(self, max_outbound_calls):
+        self.max_usd = MAX_USD
+        self.max_seconds = MAX_SECONDS
+        self.max_outbound_calls = max_outbound_calls
+        self.occupied = Decimal(0)
+        self.started = time.monotonic()
+        self.pending = {}
+        self.outbound_calls = 0
+
+    def reserve(self, key, amount):
+        if time.monotonic() - self.started >= self.max_seconds:
+            raise ValueError("time_limit")
+        if self.outbound_calls >= self.max_outbound_calls:
+            raise ValueError("outbound_limit")
+        if (
+            not amount.is_finite()
+            or amount < 0
+            or self.occupied + amount > self.max_usd
+        ):
+            raise ValueError("estimated_budget_limit")
+        if key in self.pending:
+            raise ValueError("unsettled_request")
+        self.pending[key] = amount
+        self.occupied += amount
+        self.outbound_calls += 1
+
+    def settle(self, key, amount):
+        if not amount.is_finite() or amount < 0:
+            raise ValueError("unknown_usage")
+        self.occupied += amount - self.pending.pop(key)
+        if self.occupied > self.max_usd:
+            raise ValueError("estimated_budget_limit_after_settlement")
+
+
+def dump(path, value):
+    path.write_text(
+        json.dumps(value, ensure_ascii=False, indent=2, default=str) + "\n",
+        encoding="utf-8",
+    )
+
+
+def prepare(run_dir):
+    model = study_model_settings()
+    run_dir.mkdir(parents=True, exist_ok=False)
+    material = fixtures.bounded_material(
+        json.loads((SOURCE / "materials.json").read_text(encoding="utf-8"))
+    )
+    prompts = {
+        "control": UNDERSTANDING_INSTRUCTIONS + SUPPLEMENT,
+        "candidate": (HERE / "b2-source-navigation-instructions.md")
+        .read_text(encoding="utf-8")
+        .strip()
+        + SUPPLEMENT,
+    }
+    dump(run_dir / "materials.json", material)
+    dump(run_dir / "instructions.json", prompts)
+    dump(
+        run_dir / "tools.json",
+        memory_analysis_tool_definitions(MemoryLayer.WORK_UNDERSTANDING),
+    )
+    dump(
+        run_dir / "cases.json",
+        json.loads((SOURCE / "cases.json").read_text(encoding="utf-8")),
+    )
+    sources = [
+        HERE / name
+        for name in (
+            "study.py",
+            "fixtures.py",
+            "b2-source-navigation-instructions.md",
+            "README.md",
+            "cases.md",
+        )
+    ]
+    sources += [SOURCE / "materials.json", SOURCE / "cases.json"]
+    sources += [
+        HERE.parent / "memory-compaction-publish-2026-10-04/experiment.py",
+        HERE.parent / "design-comparisons-2026-10-04/provider_observations.py",
+        *sorted((ROOT / "apps/api/src/caliburn").rglob("*.py")),
+        *sorted((ROOT / "apps/api/contracts/tools").glob("*.json")),
+        *sorted(
+            (ROOT / "apps/api/src/caliburn/contracts/generated/tools").glob(
+                "*.schema.json"
+            )
+        ),
+        ROOT / "apps/api/uv.lock",
+    ]
+    manifest = {
+        "prepared_at": datetime.now(UTC).isoformat(),
+        "kind": "b2-only-full-scope-reorganization-not-incremental-diff",
+        "authorization": "User approved added US$0.10/20 minutes within cumulative US$2, 2026-10-05.",
+        "model": MODEL,
+        "effort": model.reasoning_effort,
+        "model_settings": public_model_settings(model),
+        "max_output_tokens": model.max_output_tokens,
+        "max_estimated_usd": str(MAX_USD),
+        "max_seconds": MAX_SECONDS,
+        "prior_occupied_usd": str(PRIOR),
+        "cumulative_limit_usd": "2.00",
+        "schedule": ["control-1", "candidate-1"],
+        "through_sequence": material["snapshot"]["covered_through_sequence"],
+        "max_steps_per_cell": model.max_model_steps,
+        "max_outbound_calls": model.max_outbound_attempts,
+        "study_overrides": {
+            "max_attempts_per_request": "1; stop first failure, no automatic retry",
+            "turn_timeout_seconds": "bounded by the batch's authorized 1200 seconds",
+            "batch_outbound_limit": "same numeric cap as one production execution; shared across both cells",
+            "compaction": "not studied; reject input >=128000 or any compaction endpoint",
+        },
+        "official_pricing_checked": "https://developers.openai.com/api/docs/pricing (2026-10-05)",
+        "git_head": subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        ).strip(),
+        "source_sha256": {
+            str(path.relative_to(ROOT)).replace("\\", "/"): hashlib.sha256(
+                path.read_bytes()
+            ).hexdigest()
+            for path in sources
+        },
+        "artifact_sha256": {
+            path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in run_dir.glob("*.json")
+        },
+    }
+    dump(run_dir / "manifest.json", manifest)
+    print(
+        json.dumps(
+            {
+                "prepared": str(run_dir),
+                "messages": len(material["messages"]),
+                "objects": len(material["objects"]),
+            }
+        ),
+        flush=True,
+    )
+
+
+def load_prepared(run_dir):
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    if manifest.get("model_settings") != public_model_settings(study_model_settings()):
+        raise ValueError("Frozen model settings differ from runtime")
+    for paths, base in (
+        (manifest["source_sha256"], ROOT),
+        (manifest["artifact_sha256"], run_dir),
+    ):
+        for name, digest in paths.items():
+            if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
+                raise ValueError(f"Frozen source changed: {name}")
+    return (
+        manifest,
+        json.loads((run_dir / "materials.json").read_text(encoding="utf-8")),
+        json.loads((run_dir / "instructions.json").read_text(encoding="utf-8")),
+    )
+
+
+def test_database():
+    # Read credentials privately from the identified test container, never log Env or DSN.
+    info = json.loads(
+        subprocess.check_output(
+            ["docker", "inspect", "caliburn-jd-docker-test-postgres-1"], text=True
+        )
+    )[0]
+    ports = info["NetworkSettings"]["Ports"]["5432/tcp"]
+    if ports != [{"HostIp": "127.0.0.1", "HostPort": "55441"}]:
+        raise ValueError("Unexpected test PostgreSQL binding")
+    env = dict(item.split("=", 1) for item in info["Config"]["Env"] if "=" in item)
+    # URL-escape both credential parts; never include this URL in result artifacts.
+    url = f"postgresql://{quote(env['POSTGRES_USER'], safe='')}:{quote(env['POSTGRES_PASSWORD'], safe='')}@127.0.0.1:55441/caliburn_docker_test"
+    return DatabaseSettings(url=url, schema="eval_b2_organization_" + uuid4().hex[:16])
+
+
+async def seed_cell(database, settings, material):
+    file_id = uuid4()
+    source_ids = {}
+    with psycopg.connect(
+        settings.url, options=f"-c search_path={settings.schema}"
+    ) as connection:
+        connection.execute(
+            "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,display_name,employee_name) VALUES (%s,%s,'B2 comparison','B2 comparison','合成')",
+            (file_id, uuid4()),
+        )
+        for message in material["messages"]:
+            source_id = uuid4()
+            source_ids[message["interview_sequence"]] = source_id
+            connection.execute(
+                "INSERT INTO interview_texts (job_file_id,source_id,speaker,interview_text) VALUES (%s,%s,%s,%s)",
+                (file_id, source_id, message["speaker"], message["text"]),
+            )
+            connection.execute(
+                "INSERT INTO formal_interviews (job_file_id,interview_sequence,source_id) VALUES (%s,%s,%s)",
+                (file_id, message["interview_sequence"], source_id),
+            )
+    scope = ExecutionScope(file_id, uuid4(), ExecutionKind.MEMORY_BATCH)
+    async with database.sessions.begin() as session:
+        await executions.admit_execution(session, scope)
+        writer = await executions.claim_writer(session, scope, writer_id=uuid4())
+    candidates = MemoryCandidateWorkflow(database.sessions)
+    stage = await candidates.start(writer, source_ids[max(source_ids)])
+    identities = {}
+    for layer in MemoryLayer:
+        for key, value in material["objects"].items():
+            if not key.startswith(layer.value + ":"):
+                continue
+            references = (
+                [source_ids[n] for n in value["interview_references"]]
+                if layer == MemoryLayer.WORK_SITUATION
+                else [
+                    identities[item["target_title"]]
+                    for item in value["work_situation_references"]
+                ]
+            )
+            # Seed-only identity control: production maps sort by object UUID.
+            # Namespaced IDs repeat across isolated job files, making initial order equal.
+            # No patch remains active when the real model or its tools run.
+            seed_ids = [
+                uuid5(NAMESPACE_URL, f"caliburn-b2-seed:{key}:{part}")
+                for part in ("object", "revision", "body")
+            ]
+            with patch(
+                "caliburn.features.work_memory.revision_service.uuid4",
+                side_effect=seed_ids,
+            ):
+                result = await candidates.edit(
+                    writer,
+                    CreateMemoryObject(
+                        uuid4(),
+                        stage,
+                        layer,
+                        MemoryContent(
+                            value["title"], value["description"], value["body"]
+                        ),
+                        frozenset(references),
+                    ),
+                )
+            stage = result.position
+            identities[value["title"]] = result.object_id
+        if layer == MemoryLayer.WORK_SITUATION:
+            stage = await candidates.handoff(writer, stage, uuid4())
+    return writer, stage
+
+
+async def read_material(database, writer, stage):
+    reads = MemoryReadTools(
+        MemoryReadWorkflow(database.sessions), CandidateMemoryRead(writer.scope, stage)
+    )
+    result = {"maps": {}, "objects": {}}
+    for layer in MemoryLayer:
+        view = json.loads(await reads.invoke(f"read_{layer.value}_map", "{}"))
+        result["maps"][layer.value] = view
+        for item in view["items"]:
+            value = json.loads(
+                await reads.invoke(
+                    f"read_{layer.value}",
+                    json.dumps(
+                        {"target_title": item["target_title"]}, ensure_ascii=False
+                    ),
+                )
+            )
+            result["objects"][f"{layer.value}:{item['target_title']}"] = value
+    return result
+
+
+class Recorder:
+    def __init__(self, run_dir):
+        self.run_dir = run_dir
+        self.tools = json.loads((run_dir / "tools.json").read_text(encoding="utf-8"))
+        self.model = study_model_settings()
+        self.budget = StudyBudget(self.model.max_outbound_attempts)
+        self.cell = ""
+        self.headers = {}
+        self.last_finished = time.monotonic()
+        self.counted = 0
+        self.count_payload = None
+        self.key = None
+
+    def event(self, value):
+        probe.append(self.run_dir / "trace.jsonl", {"cell": self.cell, **value})
+
+    async def request(self, request):
+        payload = json.loads(request.content)
+        path = request.url.path
+        if payload.get("tools") != self.tools:
+            raise asyncio.CancelledError("tool_contract_changed")
+        if request.url.host != "api.openai.com" or payload.get("model") != MODEL:
+            raise asyncio.CancelledError("unexpected_provider_or_model")
+        self.key = f"{self.cell}-{self.budget.outbound_calls + 1}"
+        if path.endswith("/input_tokens"):
+            self.count_payload = payload
+            amount = Decimal("0.0001")
+        elif path.endswith("/responses"):
+            if payload.get("max_output_tokens") != self.model.max_output_tokens:
+                raise asyncio.CancelledError("output_cap_mismatch")
+            if (
+                not 0 < self.counted < 128000
+                or self.count_payload is None
+                or any(payload.get(k) != v for k, v in self.count_payload.items())
+            ):
+                raise asyncio.CancelledError("count_and_request_mismatch_or_capacity")
+            delay = provider.admission_delay(
+                self.headers,
+                time.monotonic() - self.last_finished,
+                self.counted + self.model.max_output_tokens - 4096,
+            )
+            if (
+                time.monotonic() - self.budget.started + delay
+                >= self.budget.max_seconds
+            ):
+                raise asyncio.CancelledError("time_limit_before_wait")
+            if delay:
+                self.event({"event": "rate_wait", "seconds": delay})
+                await asyncio.sleep(delay)
+            amount = model_profile(MODEL).pricing.reserve_response_cost(
+                input_tokens=self.counted,
+                max_output_tokens=self.model.max_output_tokens,
+            )
+        else:
+            raise asyncio.CancelledError(
+                "unexpected_endpoint_no_compaction_in_this_study"
+            )
+        try:
+            self.budget.reserve(self.key, amount)
+        except ValueError as error:
+            raise asyncio.CancelledError(str(error)) from None
+        self.event(
+            {
+                "event": "request",
+                "key": self.key,
+                "path": path,
+                "payload": probe.public_document(payload),
+            }
+        )
+
+    async def response(self, response):
+        await response.aread()
+        self.last_finished = time.monotonic()
+        self.headers = provider.rate_headers(response.headers)
+        if response.status_code != 200:
+            code = None
+            try:
+                error_body = response.json()
+                if isinstance(error_body, dict) and isinstance(
+                    error_body.get("error"), dict
+                ):
+                    code = error_body["error"].get("code")
+            except ValueError:
+                pass
+            self.event(
+                {
+                    "event": "provider_error",
+                    "status": response.status_code,
+                    "key": self.key,
+                    "path": response.request.url.path,
+                    "code": code,
+                }
+            )
+            raise asyncio.CancelledError("provider_error_no_automatic_rerun")
+        payload = response.json()
+        self.event(
+            {
+                "event": "response",
+                "key": self.key,
+                "path": response.request.url.path,
+                "payload": probe.public_document(payload),
+            }
+        )
+        if response.request.url.path.endswith("/input_tokens"):
+            self.counted = payload["input_tokens"]
+        else:
+            estimate = model_profile(MODEL).pricing.estimate_response_cost(
+                restore_response(payload)
+            )
+            if estimate is None:
+                raise asyncio.CancelledError("unknown_usage")
+            self.budget.settle(self.key, estimate)
+            self.count_payload = None
+            self.event(
+                {
+                    "event": "settled",
+                    "key": self.key,
+                    "estimated_usd": str(estimate),
+                    "occupied_usd": str(self.budget.occupied),
+                }
+            )
+
+
+async def run(run_dir, *, seed_only):
+    manifest, material, prompts = load_prepared(run_dir)
+    if PRIOR + MAX_USD > Decimal("2.00"):
+        raise ValueError("Cumulative authorization would be exceeded")
+    if (run_dir / "setup.json").exists():
+        raise ValueError("This run already started; inspect it rather than rerun")
+    settings = test_database()
+    await asyncio.to_thread(probe.initialize_schema, settings)
+    dump(
+        run_dir / "setup.json",
+        {
+            "schema": settings.schema,
+            "database": "caliburn_docker_test",
+            "port": 55441,
+            "seed_only": seed_only,
+        },
+    )
+    database = Database(settings)
+    cells = []
+    recorder = None
+    outcomes = []
+    failure = None
+    first_initial = None
+    try:
+        for name in manifest["schedule"]:
+            writer, stage = await seed_cell(database, settings, material)
+            initial = await read_material(database, writer, stage)
+            if initial["objects"] != material["objects"]:
+                # Source set order is not semantic; compare canonical relation lists.
+                def canonical(value):
+                    copy = json.loads(json.dumps(value))
+                    for item in copy.values():
+                        if "work_situation_references" in item:
+                            item["work_situation_references"].sort(
+                                key=lambda ref: ref["target_title"]
+                            )
+                    return copy
+
+                if canonical(initial["objects"]) != canonical(material["objects"]):
+                    raise ValueError(
+                        "Seed does not reproduce the frozen source content"
+                    )
+            dump(run_dir / f"initial-{name}.json", initial)
+            if first_initial is None:
+                first_initial = initial
+            elif initial != first_initial:
+                raise ValueError("Paired initial tool views differ")
+            cells.append((name, writer, stage))
+        dump(
+            run_dir / "cells.json",
+            [
+                {
+                    "cell": name,
+                    "job_file_id": str(writer.scope.job_file_id),
+                    "execution_id": str(writer.scope.execution_id),
+                }
+                for name, writer, _ in cells
+            ],
+        )
+        if seed_only:
+            print(
+                f"{len(cells)} isolated initial states verified; no provider calls",
+                flush=True,
+            )
+            return
+        recorder = Recorder(run_dir)
+        recorder.event(
+            {
+                "event": "paid_phase_started",
+                "max_seconds": MAX_SECONDS,
+                "max_usd": str(MAX_USD),
+            }
+        )
+        model = study_model_settings()
+        async with (
+            asyncio.timeout(MAX_SECONDS),
+            httpx2.AsyncClient(
+                follow_redirects=False,
+                event_hooks={
+                    "request": [recorder.request],
+                    "response": [recorder.response],
+                },
+            ) as transport,
+            create_responses_client(
+                api_key=read_openai_api_key(ROOT / "apps/api/.env"),
+                timeout_seconds=model.request_timeout_seconds,
+                http_client=transport,
+            ) as client,
+            AsyncPostgresSaver.from_conn_string(
+                make_conninfo(
+                    settings.url, options=f"-c search_path={settings.schema}"
+                ),
+                serde=create_graph_serializer(allowed_types=MEMORY_CHECKPOINT_TYPES),
+            ) as saver,
+        ):
+            await saver.setup()
+            for name, writer, stage in cells:
+                recorder.cell = name
+                started = time.monotonic()
+                result = await MemoryAnalysisRunner(
+                    database.sessions, saver, client, model
+                ).run(
+                    writer,
+                    stage,
+                    role=AgentRole.WORK_UNDERSTANDING_ANALYST,
+                    instructions=prompts[name.split("-")[0]],
+                    situation_changes=[],
+                )
+                if not isinstance(result, MemoryAnalysisResult):
+                    raise TypeError("Role did not complete")
+                final = await read_material(database, writer, stage)
+                dump(run_dir / f"output-{name}.json", final)
+                original_situations = {
+                    k: v
+                    for k, v in material["objects"].items()
+                    if k.startswith("work_situation:")
+                }
+                final_situations = {
+                    k: v
+                    for k, v in final["objects"].items()
+                    if k.startswith("work_situation:")
+                }
+                if original_situations != final_situations:
+                    raise ValueError("B2 changed fixed situations")
+                outcomes.append(
+                    {
+                        "cell": name,
+                        "status": "completed",
+                        "understandings": len(
+                            final["maps"]["work_understanding"]["items"]
+                        ),
+                        "seconds": time.monotonic() - started,
+                    }
+                )
+                dump(run_dir / "progress.json", outcomes)
+                print(
+                    json.dumps(
+                        {**outcomes[-1], "occupied_usd": str(recorder.budget.occupied)}
+                    ),
+                    flush=True,
+                )
+    except (Exception, asyncio.CancelledError) as error:  # noqa: BLE001 -- top-level experiment records failure and exits nonzero
+        # Do not print exception messages from database/provider clients: they may carry data.
+        failure = {
+            "type": type(error).__name__,
+            "cell": recorder.cell if recorder else None,
+        }
+        failure["location"] = [
+            {
+                "file": Path(frame.filename).name,
+                "line": frame.lineno,
+                "function": frame.name,
+            }
+            for frame in traceback.extract_tb(error.__traceback__)[-4:]
+        ]
+        if isinstance(error, asyncio.CancelledError):
+            failure["reason"] = str(error)
+        dump(run_dir / "failure.json", failure)
+        print(json.dumps({"stopped": failure}), flush=True)
+    finally:
+        if recorder is not None:
+            dump(
+                run_dir / "result.json",
+                {
+                    "status": "completed"
+                    if len(outcomes) == len(manifest["schedule"]) and failure is None
+                    else "stopped",
+                    "results": outcomes,
+                    "failure": failure,
+                    "occupied_usd": str(recorder.budget.occupied),
+                    "cumulative_occupied_usd": str(PRIOR + recorder.budget.occupied),
+                    "pending": recorder.budget.pending,
+                    "seconds": time.monotonic() - recorder.budget.started,
+                },
+            )
+        await database.close()
+    if failure is not None:
+        raise SystemExit(1)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("mode", choices=("prepare", "seed-check", "live"))
+    parser.add_argument("run_dir", type=Path)
+    args = parser.parse_args()
+    if args.mode == "prepare":
+        prepare(args.run_dir)
+    else:
+        with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as loop:
+            loop.run(run(args.run_dir, seed_only=args.mode == "seed-check"))

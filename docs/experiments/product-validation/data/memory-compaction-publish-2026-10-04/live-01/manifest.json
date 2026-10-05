@@ -1,0 +1,25 @@
+{
+  "git_head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "schema": "eval_memory_275dd6c4c6d741b49f82c96eb7d49de4",
+  "model": "gpt-6-luna",
+  "effort": "high",
+  "messages": [
+    "請說明庫存盤點與年度查核的工作、頻率與決定權。",
+    "我每月盤點庫存，核對帳面與實物，記錄差異交倉庫主管；主管核准才能調整ERP，我沒有核准權。每年一次協助年度查核，準備盤點表和單據，不負責查核結論。",
+    "盤點有沒有變更？是否還有其他工作？",
+    "更正：盤點目前改成每季一次，不是每月；其他核准責任不變，年度查核也不變。新增工作是每週核對客戶退貨的品項與數量，記錄差異交品保；能不能再次銷售由品保決定，我只依品保結論登錄，不判定商品可售。"
+  ],
+  "openai": "3.20.0",
+  "thresholds": {
+    "control": 128000,
+    "compacted": 1
+  },
+  "protocol_sha256": "fea01a355415170de43fb3e4d33b7e0d65f94df384b7a7baf7011b2048181273",
+  "script_sha256": "1d08bcf2dbed3715f2ef987eb2b8053d69b1274c5b4879ee677d3a2b7d6572f1",
+  "instructions_sha256": {
+    "B1": "0f3abd516e55664ebff06ed4a03dbeb95426e16d204d49286fcb444f6c5a9447",
+    "B2": "4deac4a7f3b6715b2bab2af32fdbd03d6e01828a36ce5f56310b49a04260855c"
+  },
+  "maximum_generation_calls": 32,
+  "maximum_input_tokens": 2000000
+}

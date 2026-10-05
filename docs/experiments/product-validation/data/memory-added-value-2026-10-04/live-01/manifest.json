@@ -1,0 +1,69 @@
+{
+  "prepared_at": "2026-10-04T12:04:47.576715+00:00",
+  "model": "gpt-6-luna",
+  "effort": "high",
+  "max_output_tokens": 8192,
+  "max_estimated_usd": "0.20",
+  "max_seconds": 1800,
+  "prior_occupied_usd": "1.000591120",
+  "cumulative_limit_usd": "2.00",
+  "kind": "fresh-context-review-proposals-not-product-writes",
+  "schedule": [
+    {
+      "arm": "raw",
+      "repeat": 1,
+      "case_id": "corrections"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "corrections"
+    },
+    {
+      "arm": "raw",
+      "repeat": 1,
+      "case_id": "boundaries"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "boundaries"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "corrections"
+    },
+    {
+      "arm": "raw",
+      "repeat": 2,
+      "case_id": "corrections"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "boundaries"
+    },
+    {
+      "arm": "raw",
+      "repeat": 2,
+      "case_id": "boundaries"
+    }
+  ],
+  "head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "source_sha256": {
+    "docs\\experiments\\product-validation\\data\\compaction-long-interview-2026-10-04\\main-03\\compaction_hierarchical_memory\\product-052.json": "13f9ae667fb3c2b51f03f48f1e6be9c1774e7e2efba38e559ec0d0203770c00c",
+    "docs\\experiments\\product-validation\\data\\compaction-long-interview-2026-10-04\\main-03\\compaction_hierarchical_memory\\memory-e052.json": "304bffc05fd75b1bccec424d3ba37a563a3994be7056e2425848aab46dc747a1",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\cases.json": "8cdcf70d09b6c208599bf59e2d0a4f85d087d81229d66e5e8acc45677661923f",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\support.py": "8387874887d6bfb171982dab7304c0b9350d4fca7b97080f27204276d1d049e1",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\experiment.py": "2a0e140c59e423c7a374b22b346e054be27136f2a12b2b60ef12df9e6dc699e9",
+    "apps\\api\\src\\caliburn\\agents\\job_consultant\\instructions.py": "318e0332a38262bcd7ad6a1513e613c0c311ec0bf1ba12bebd2aa250ab86f25c"
+  },
+  "instructions_sha256": "246df0b983eb51e6588428d7692c650b52aaba1160eda550e70300f9725d5ba2",
+  "tools_sha256": {
+    "raw": "fe516f8ee4e25804e3131f7749860ed2eb9d76a9386b92b4d058dbb2fdbf6fcd",
+    "raw_memory": "825849d5d389b13ed619cc4639486f70d156b266601edb0ee066284cf2315309"
+  },
+  "sdk_version": "3.20.0",
+  "pricing_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2"
+}

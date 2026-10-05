@@ -1,0 +1,32 @@
+[
+  {
+    "interview_sequence": 1,
+    "speaker": "app",
+    "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+  },
+  {
+    "interview_sequence": 2,
+    "speaker": "employee",
+    "text": "我研究古代泥板上的文字，依拓片與高解析照片辨認字形，轉寫並比較不同時期字形變化。"
+  },
+  {
+    "interview_sequence": 3,
+    "speaker": "consultant",
+    "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+  },
+  {
+    "interview_sequence": 4,
+    "speaker": "employee",
+    "text": "我對照已出土的文字資料，分析文法和詞义，遇到缺損會標記無法確定的讀法；用語料統計檢查候選解讀，提出不同解釋和證據。"
+  },
+  {
+    "interview_sequence": 5,
+    "speaker": "consultant",
+    "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+  },
+  {
+    "interview_sequence": 6,
+    "speaker": "employee",
+    "text": "我寫學術論文、整理校勘表和釋讀說明，不負責博物館展覽策劃、文物修復施工、商業文件翻譯或文字設計。研究對象是古代文獻語言，沒有以上工作分工。"
+  }
+]

@@ -1,0 +1,1035 @@
+{
+  "rows": [
+    {
+      "case_id": "N01",
+      "variant": "base",
+      "query_id": "N01-base",
+      "probe_id": "IDC3512-001v2",
+      "primary_id": "INM3514-001v4",
+      "rerank_logit": -6.7734375,
+      "common_rerank_rank": 14,
+      "common_pool_count": 70,
+      "own_pool_count": 34,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": true,
+      "document_cosine": 0.5867489645587296,
+      "document_parent_rank": 179,
+      "task_cosine": 0.6283544944579411,
+      "task_parent_rank": 115,
+      "probe_chunk": {
+        "chunk_id": "IDC3512-001v2:task:1:1",
+        "text": "規劃網站專案優化策略\n需求分析\n優化建議書\n分析客戶需求,包含:關鍵字/詞數量、網頁結構、連結布局、數據查詢、環境趨勢、競爭者分析等相關網站狀況檢查,提出改善建議。\n制定搜尋引擎優化(SEO)策略,產出優化建議書。",
+        "score": 0.5939844904721826,
+        "rank": 973,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N01",
+      "variant": "question_only",
+      "query_id": "N01-question_only",
+      "probe_id": "IDC3512-001v2",
+      "primary_id": "INM3514-001v4",
+      "rerank_logit": 0.7705078125,
+      "common_rerank_rank": 1,
+      "common_pool_count": 70,
+      "own_pool_count": 32,
+      "own_rerank_rank": 1,
+      "probe_in_top5": true,
+      "primary_in_top5": true,
+      "document_cosine": 0.7206040861737274,
+      "document_parent_rank": 1,
+      "task_cosine": 0.7256545528952866,
+      "task_parent_rank": 1,
+      "probe_chunk": {
+        "chunk_id": "IDC3512-001v2:task:1:1",
+        "text": "規劃網站專案優化策略\n需求分析\n優化建議書\n分析客戶需求,包含:關鍵字/詞數量、網頁結構、連結布局、數據查詢、環境趨勢、競爭者分析等相關網站狀況檢查,提出改善建議。\n制定搜尋引擎優化(SEO)策略,產出優化建議書。",
+        "score": 0.7256545528952866,
+        "rank": 1,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N01",
+      "variant": "no_short",
+      "query_id": "N01-no_short",
+      "probe_id": "IDC3512-001v2",
+      "primary_id": "INM3514-001v4",
+      "rerank_logit": -2.65625,
+      "common_rerank_rank": 1,
+      "common_pool_count": 70,
+      "own_pool_count": 33,
+      "own_rerank_rank": 1,
+      "probe_in_top5": true,
+      "primary_in_top5": true,
+      "document_cosine": 0.7193309488955794,
+      "document_parent_rank": 1,
+      "task_cosine": 0.7201306894698767,
+      "task_parent_rank": 1,
+      "probe_chunk": {
+        "chunk_id": "IDC3512-001v2:task:1:1",
+        "text": "規劃網站專案優化策略\n需求分析\n優化建議書\n分析客戶需求,包含:關鍵字/詞數量、網頁結構、連結布局、數據查詢、環境趨勢、競爭者分析等相關網站狀況檢查,提出改善建議。\n制定搜尋引擎優化(SEO)策略,產出優化建議書。",
+        "score": 0.7201306894698767,
+        "rank": 1,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N01",
+      "variant": "no_explicit",
+      "query_id": "N01-no_explicit",
+      "probe_id": "IDC3512-001v2",
+      "primary_id": "INM3514-001v4",
+      "rerank_logit": -2.21484375,
+      "common_rerank_rank": 1,
+      "common_pool_count": 70,
+      "own_pool_count": 32,
+      "own_rerank_rank": 1,
+      "probe_in_top5": true,
+      "primary_in_top5": false,
+      "document_cosine": 0.75116393856791,
+      "document_parent_rank": 1,
+      "task_cosine": 0.7363744724706496,
+      "task_parent_rank": 1,
+      "probe_chunk": {
+        "chunk_id": "IDC3512-001v2:task:1:1",
+        "text": "規劃網站專案優化策略\n需求分析\n優化建議書\n分析客戶需求,包含:關鍵字/詞數量、網頁結構、連結布局、數據查詢、環境趨勢、競爭者分析等相關網站狀況檢查,提出改善建議。\n制定搜尋引擎優化(SEO)策略,產出優化建議書。",
+        "score": 0.7363744724706496,
+        "rank": 1,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N01",
+      "variant": "yes_short",
+      "query_id": "N01-yes_short",
+      "probe_id": "IDC3512-001v2",
+      "primary_id": "INM3514-001v4",
+      "rerank_logit": -2.2109375,
+      "common_rerank_rank": 1,
+      "common_pool_count": 70,
+      "own_pool_count": 33,
+      "own_rerank_rank": 1,
+      "probe_in_top5": true,
+      "primary_in_top5": true,
+      "document_cosine": 0.7382032794685867,
+      "document_parent_rank": 1,
+      "task_cosine": 0.7391574727777848,
+      "task_parent_rank": 1,
+      "probe_chunk": {
+        "chunk_id": "IDC3512-001v2:task:1:1",
+        "text": "規劃網站專案優化策略\n需求分析\n優化建議書\n分析客戶需求,包含:關鍵字/詞數量、網頁結構、連結布局、數據查詢、環境趨勢、競爭者分析等相關網站狀況檢查,提出改善建議。\n制定搜尋引擎優化(SEO)策略,產出優化建議書。",
+        "score": 0.7391574727777848,
+        "rank": 1,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N01",
+      "variant": "uncertain",
+      "query_id": "N01-uncertain",
+      "probe_id": "IDC3512-001v2",
+      "primary_id": "INM3514-001v4",
+      "rerank_logit": -3.03515625,
+      "common_rerank_rank": 3,
+      "common_pool_count": 70,
+      "own_pool_count": 34,
+      "own_rerank_rank": 3,
+      "probe_in_top5": true,
+      "primary_in_top5": true,
+      "document_cosine": 0.7228078203668459,
+      "document_parent_rank": 1,
+      "task_cosine": 0.722840975279406,
+      "task_parent_rank": 1,
+      "probe_chunk": {
+        "chunk_id": "IDC3512-001v2:task:1:1",
+        "text": "規劃網站專案優化策略\n需求分析\n優化建議書\n分析客戶需求,包含:關鍵字/詞數量、網頁結構、連結布局、數據查詢、環境趨勢、競爭者分析等相關網站狀況檢查,提出改善建議。\n制定搜尋引擎優化(SEO)策略,產出優化建議書。",
+        "score": 0.7216658153028698,
+        "rank": 2,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N01",
+      "variant": "no_repeated3",
+      "query_id": "N01-no_repeated3",
+      "probe_id": "IDC3512-001v2",
+      "primary_id": "INM3514-001v4",
+      "rerank_logit": -3.9296875,
+      "common_rerank_rank": 6,
+      "common_pool_count": 70,
+      "own_pool_count": 30,
+      "own_rerank_rank": 3,
+      "probe_in_top5": true,
+      "primary_in_top5": false,
+      "document_cosine": 0.7530626619004335,
+      "document_parent_rank": 1,
+      "task_cosine": 0.7392991795664812,
+      "task_parent_rank": 1,
+      "probe_chunk": {
+        "chunk_id": "IDC3512-001v2:task:1:1",
+        "text": "規劃網站專案優化策略\n需求分析\n優化建議書\n分析客戶需求,包含:關鍵字/詞數量、網頁結構、連結布局、數據查詢、環境趨勢、競爭者分析等相關網站狀況檢查,提出改善建議。\n制定搜尋引擎優化(SEO)策略,產出優化建議書。",
+        "score": 0.7392991795664812,
+        "rank": 1,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N01",
+      "variant": "confirmed_projection",
+      "query_id": "N01-confirmed_projection",
+      "probe_id": "IDC3512-001v2",
+      "primary_id": "INM3514-001v4",
+      "rerank_logit": -6.7734375,
+      "common_rerank_rank": 14,
+      "common_pool_count": 70,
+      "own_pool_count": 34,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": true,
+      "document_cosine": 0.5867489645587296,
+      "document_parent_rank": 179,
+      "task_cosine": 0.6283544944579411,
+      "task_parent_rank": 115,
+      "probe_chunk": {
+        "chunk_id": "IDC3512-001v2:task:1:1",
+        "text": "規劃網站專案優化策略\n需求分析\n優化建議書\n分析客戶需求,包含:關鍵字/詞數量、網頁結構、連結布局、數據查詢、環境趨勢、競爭者分析等相關網站狀況檢查,提出改善建議。\n制定搜尋引擎優化(SEO)策略,產出優化建議書。",
+        "score": 0.5939844904721826,
+        "rank": 973,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N02",
+      "variant": "base",
+      "query_id": "N02-base",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "FAC4311-001v2",
+      "rerank_logit": -7.171875,
+      "common_rerank_rank": 54,
+      "common_pool_count": 58,
+      "own_pool_count": 32,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": true,
+      "document_cosine": 0.5766054609652004,
+      "document_parent_rank": 174,
+      "task_cosine": 0.635786256644712,
+      "task_parent_rank": 143,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.5651055487640952,
+        "rank": 2368,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N02",
+      "variant": "question_only",
+      "query_id": "N02-question_only",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "FAC4311-001v2",
+      "rerank_logit": -0.9482421875,
+      "common_rerank_rank": 1,
+      "common_pool_count": 58,
+      "own_pool_count": 33,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": true,
+      "document_cosine": 0.6367196765844575,
+      "document_parent_rank": 31,
+      "task_cosine": 0.6593480840284724,
+      "task_parent_rank": 64,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6214027322888966,
+        "rank": 527,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N02",
+      "variant": "no_short",
+      "query_id": "N02-no_short",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "FAC4311-001v2",
+      "rerank_logit": -2.7265625,
+      "common_rerank_rank": 3,
+      "common_pool_count": 58,
+      "own_pool_count": 33,
+      "own_rerank_rank": 3,
+      "probe_in_top5": true,
+      "primary_in_top5": true,
+      "document_cosine": 0.6268752177090837,
+      "document_parent_rank": 17,
+      "task_cosine": 0.6382670186140049,
+      "task_parent_rank": 50,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6114635632420482,
+        "rank": 273,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N02",
+      "variant": "no_explicit",
+      "query_id": "N02-no_explicit",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "FAC4311-001v2",
+      "rerank_logit": -2.560546875,
+      "common_rerank_rank": 1,
+      "common_pool_count": 58,
+      "own_pool_count": 30,
+      "own_rerank_rank": 1,
+      "probe_in_top5": true,
+      "primary_in_top5": true,
+      "document_cosine": 0.7084353592782568,
+      "document_parent_rank": 3,
+      "task_cosine": 0.7108404981902854,
+      "task_parent_rank": 4,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.7108404981902854,
+        "rank": 4,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N02",
+      "variant": "yes_short",
+      "query_id": "N02-yes_short",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "FAC4311-001v2",
+      "rerank_logit": -2.65234375,
+      "common_rerank_rank": 3,
+      "common_pool_count": 58,
+      "own_pool_count": 33,
+      "own_rerank_rank": 3,
+      "probe_in_top5": true,
+      "primary_in_top5": true,
+      "document_cosine": 0.6423304612292096,
+      "document_parent_rank": 20,
+      "task_cosine": 0.6560955008910352,
+      "task_parent_rank": 62,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6269486313236874,
+        "rank": 386,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N02",
+      "variant": "uncertain",
+      "query_id": "N02-uncertain",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "FAC4311-001v2",
+      "rerank_logit": -2.3046875,
+      "common_rerank_rank": 4,
+      "common_pool_count": 58,
+      "own_pool_count": 32,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": true,
+      "document_cosine": 0.6274769697877858,
+      "document_parent_rank": 22,
+      "task_cosine": 0.6376831262643312,
+      "task_parent_rank": 83,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6081104563409424,
+        "rank": 506,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N02",
+      "variant": "no_repeated3",
+      "query_id": "N02-no_repeated3",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "FAC4311-001v2",
+      "rerank_logit": -4.609375,
+      "common_rerank_rank": 32,
+      "common_pool_count": 58,
+      "own_pool_count": 31,
+      "own_rerank_rank": 16,
+      "probe_in_top5": false,
+      "primary_in_top5": true,
+      "document_cosine": 0.654838489225228,
+      "document_parent_rank": 7,
+      "task_cosine": 0.6619680055875484,
+      "task_parent_rank": 5,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6619680055875484,
+        "rank": 7,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N02",
+      "variant": "confirmed_projection",
+      "query_id": "N02-confirmed_projection",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "FAC4311-001v2",
+      "rerank_logit": -7.171875,
+      "common_rerank_rank": 54,
+      "common_pool_count": 58,
+      "own_pool_count": 32,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": true,
+      "document_cosine": 0.5766054609652004,
+      "document_parent_rank": 174,
+      "task_cosine": 0.635786256644712,
+      "task_parent_rank": 143,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.5651055487640952,
+        "rank": 2368,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N03",
+      "variant": "base",
+      "query_id": "N03-base",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "MMP4321-003v4",
+      "rerank_logit": -6.015625,
+      "common_rerank_rank": 40,
+      "common_pool_count": 46,
+      "own_pool_count": 28,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": false,
+      "document_cosine": 0.6271627037768321,
+      "document_parent_rank": 80,
+      "task_cosine": 0.6633811440423938,
+      "task_parent_rank": 74,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6021216744983978,
+        "rank": 1159,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N03",
+      "variant": "question_only",
+      "query_id": "N03-question_only",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "MMP4321-003v4",
+      "rerank_logit": -1.9775390625,
+      "common_rerank_rank": 6,
+      "common_pool_count": 46,
+      "own_pool_count": 30,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": false,
+      "document_cosine": 0.6632393188050121,
+      "document_parent_rank": 23,
+      "task_cosine": 0.6754118503451456,
+      "task_parent_rank": 34,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6404800376328912,
+        "rank": 226,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N03",
+      "variant": "no_short",
+      "query_id": "N03-no_short",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "MMP4321-003v4",
+      "rerank_logit": -2.1640625,
+      "common_rerank_rank": 6,
+      "common_pool_count": 46,
+      "own_pool_count": 28,
+      "own_rerank_rank": 6,
+      "probe_in_top5": false,
+      "primary_in_top5": false,
+      "document_cosine": 0.6625779104047478,
+      "document_parent_rank": 18,
+      "task_cosine": 0.661771383412473,
+      "task_parent_rank": 30,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6363101558311619,
+        "rank": 160,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N03",
+      "variant": "no_explicit",
+      "query_id": "N03-no_explicit",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "MMP4321-003v4",
+      "rerank_logit": -2.3203125,
+      "common_rerank_rank": 10,
+      "common_pool_count": 46,
+      "own_pool_count": 28,
+      "own_rerank_rank": 9,
+      "probe_in_top5": false,
+      "primary_in_top5": false,
+      "document_cosine": 0.7117527538482397,
+      "document_parent_rank": 4,
+      "task_cosine": 0.7032818448220751,
+      "task_parent_rank": 8,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.7032818448220751,
+        "rank": 10,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N03",
+      "variant": "yes_short",
+      "query_id": "N03-yes_short",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "MMP4321-003v4",
+      "rerank_logit": -1.998046875,
+      "common_rerank_rank": 7,
+      "common_pool_count": 46,
+      "own_pool_count": 29,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": false,
+      "document_cosine": 0.6744536990271417,
+      "document_parent_rank": 23,
+      "task_cosine": 0.6756852631364759,
+      "task_parent_rank": 33,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6499167976977541,
+        "rank": 190,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N03",
+      "variant": "uncertain",
+      "query_id": "N03-uncertain",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "MMP4321-003v4",
+      "rerank_logit": -1.775390625,
+      "common_rerank_rank": 8,
+      "common_pool_count": 46,
+      "own_pool_count": 29,
+      "own_rerank_rank": 8,
+      "probe_in_top5": false,
+      "primary_in_top5": false,
+      "document_cosine": 0.658727474556931,
+      "document_parent_rank": 20,
+      "task_cosine": 0.6601156817468875,
+      "task_parent_rank": 41,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6294032785623664,
+        "rank": 266,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N03",
+      "variant": "no_repeated3",
+      "query_id": "N03-no_repeated3",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "MMP4321-003v4",
+      "rerank_logit": -3.3984375,
+      "common_rerank_rank": 22,
+      "common_pool_count": 46,
+      "own_pool_count": 30,
+      "own_rerank_rank": 15,
+      "probe_in_top5": false,
+      "primary_in_top5": false,
+      "document_cosine": 0.6828062113114504,
+      "document_parent_rank": 4,
+      "task_cosine": 0.6860374284671144,
+      "task_parent_rank": 6,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6860374284671144,
+        "rank": 7,
+        "population": 8068
+      }
+    },
+    {
+      "case_id": "N03",
+      "variant": "confirmed_projection",
+      "query_id": "N03-confirmed_projection",
+      "probe_id": "BAS3323-001v4",
+      "primary_id": "MMP4321-003v4",
+      "rerank_logit": -6.015625,
+      "common_rerank_rank": 40,
+      "common_pool_count": 46,
+      "own_pool_count": 28,
+      "own_rerank_rank": null,
+      "probe_in_top5": false,
+      "primary_in_top5": false,
+      "document_cosine": 0.6271627037768321,
+      "document_parent_rank": 80,
+      "task_cosine": 0.6633811440423938,
+      "task_parent_rank": 74,
+      "probe_chunk": {
+        "chunk_id": "BAS3323-001v4:task:1:2",
+        "text": "採購規劃與執行\n執行採購案\n詢比價相關報告\n依核定後採購計畫,進行詢價、比價、議價與供應商評選,選擇品質符合要求、成本最低且風險值最低之供應商。\n依議價結果,進行下單及協助簽約作業。\n將詢價結果及供應商資料建檔,以利後續採購參考。",
+        "score": 0.6021216744983978,
+        "rank": 1159,
+        "population": 8068
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "case_id": "N01",
+      "variant": "question_only",
+      "delta_vs_base": {
+        "document_cosine": 0.1338551216149978,
+        "task_cosine": 0.09730005843734546,
+        "rerank_logit": 7.5439453125
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.0,
+        "task_cosine": 0.0,
+        "rerank_logit": 0.0
+      },
+      "delta_vs_yes": {
+        "document_cosine": -0.01759919329485926,
+        "task_cosine": -0.013502919882498188,
+        "rerank_logit": 2.9814453125
+      },
+      "probe_chunk_delta_vs_base": 0.13167006242310397
+    },
+    {
+      "case_id": "N01",
+      "variant": "no_short",
+      "delta_vs_base": {
+        "document_cosine": 0.13258198433684976,
+        "task_cosine": 0.09177619501193557,
+        "rerank_logit": 4.1171875
+      },
+      "delta_vs_question": {
+        "document_cosine": -0.00127313727814804,
+        "task_cosine": -0.005523863425409892,
+        "rerank_logit": -3.4267578125
+      },
+      "delta_vs_yes": {
+        "document_cosine": -0.0188723305730073,
+        "task_cosine": -0.01902678330790808,
+        "rerank_logit": -0.4453125
+      },
+      "probe_chunk_delta_vs_base": 0.12614619899769408
+    },
+    {
+      "case_id": "N01",
+      "variant": "no_explicit",
+      "delta_vs_base": {
+        "document_cosine": 0.16441497400918037,
+        "task_cosine": 0.10801997801270846,
+        "rerank_logit": 4.55859375
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.030559852394182574,
+        "task_cosine": 0.010719919575363002,
+        "rerank_logit": -2.9853515625
+      },
+      "delta_vs_yes": {
+        "document_cosine": 0.012960659099323313,
+        "task_cosine": -0.002783000307135186,
+        "rerank_logit": -0.00390625
+      },
+      "probe_chunk_delta_vs_base": 0.14238998199846697
+    },
+    {
+      "case_id": "N01",
+      "variant": "yes_short",
+      "delta_vs_base": {
+        "document_cosine": 0.15145431490985706,
+        "task_cosine": 0.11080297831984365,
+        "rerank_logit": 4.5625
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.01759919329485926,
+        "task_cosine": 0.013502919882498188,
+        "rerank_logit": -2.9814453125
+      },
+      "delta_vs_yes": {
+        "document_cosine": 0.0,
+        "task_cosine": 0.0,
+        "rerank_logit": 0.0
+      },
+      "probe_chunk_delta_vs_base": 0.14517298230560216
+    },
+    {
+      "case_id": "N01",
+      "variant": "uncertain",
+      "delta_vs_base": {
+        "document_cosine": 0.13605885580811627,
+        "task_cosine": 0.09448648082146494,
+        "rerank_logit": 3.73828125
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.0022037341931184784,
+        "task_cosine": -0.002813577615880525,
+        "rerank_logit": -3.8056640625
+      },
+      "delta_vs_yes": {
+        "document_cosine": -0.015395459101740783,
+        "task_cosine": -0.016316497498378713,
+        "rerank_logit": -0.82421875
+      },
+      "probe_chunk_delta_vs_base": 0.12768132483068717
+    },
+    {
+      "case_id": "N01",
+      "variant": "no_repeated3",
+      "delta_vs_base": {
+        "document_cosine": 0.16631369734170387,
+        "task_cosine": 0.11094468510854005,
+        "rerank_logit": 2.84375
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.032458575726706074,
+        "task_cosine": 0.013644626671194593,
+        "rerank_logit": -4.7001953125
+      },
+      "delta_vs_yes": {
+        "document_cosine": 0.014859382431846813,
+        "task_cosine": 0.00014170678869640518,
+        "rerank_logit": -1.71875
+      },
+      "probe_chunk_delta_vs_base": 0.14531468909429857
+    },
+    {
+      "case_id": "N02",
+      "variant": "question_only",
+      "delta_vs_base": {
+        "document_cosine": 0.060114215619257116,
+        "task_cosine": 0.023561827383760447,
+        "rerank_logit": 6.2236328125
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.0,
+        "task_cosine": 0.0,
+        "rerank_logit": 0.0
+      },
+      "delta_vs_yes": {
+        "document_cosine": -0.005610784644752065,
+        "task_cosine": 0.0032525831374372594,
+        "rerank_logit": 1.7041015625
+      },
+      "probe_chunk_delta_vs_base": 0.0562971835248014
+    },
+    {
+      "case_id": "N02",
+      "variant": "no_short",
+      "delta_vs_base": {
+        "document_cosine": 0.05026975674388334,
+        "task_cosine": 0.0024807619692929217,
+        "rerank_logit": 4.4453125
+      },
+      "delta_vs_question": {
+        "document_cosine": -0.009844458875373774,
+        "task_cosine": -0.021081065414467526,
+        "rerank_logit": -1.7783203125
+      },
+      "delta_vs_yes": {
+        "document_cosine": -0.015455243520125839,
+        "task_cosine": -0.017828482277030266,
+        "rerank_logit": -0.07421875
+      },
+      "probe_chunk_delta_vs_base": 0.04635801447795296
+    },
+    {
+      "case_id": "N02",
+      "variant": "no_explicit",
+      "delta_vs_base": {
+        "document_cosine": 0.13182989831305647,
+        "task_cosine": 0.07505424154557339,
+        "rerank_logit": 4.611328125
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.07171568269379935,
+        "task_cosine": 0.05149241416181294,
+        "rerank_logit": -1.6123046875
+      },
+      "delta_vs_yes": {
+        "document_cosine": 0.06610489804904729,
+        "task_cosine": 0.0547449972992502,
+        "rerank_logit": 0.091796875
+      },
+      "probe_chunk_delta_vs_base": 0.14573494942619014
+    },
+    {
+      "case_id": "N02",
+      "variant": "yes_short",
+      "delta_vs_base": {
+        "document_cosine": 0.06572500026400918,
+        "task_cosine": 0.020309244246323188,
+        "rerank_logit": 4.51953125
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.005610784644752065,
+        "task_cosine": -0.0032525831374372594,
+        "rerank_logit": -1.7041015625
+      },
+      "delta_vs_yes": {
+        "document_cosine": 0.0,
+        "task_cosine": 0.0,
+        "rerank_logit": 0.0
+      },
+      "probe_chunk_delta_vs_base": 0.061843082559592144
+    },
+    {
+      "case_id": "N02",
+      "variant": "uncertain",
+      "delta_vs_base": {
+        "document_cosine": 0.0508715088225854,
+        "task_cosine": 0.0018968696196192125,
+        "rerank_logit": 4.8671875
+      },
+      "delta_vs_question": {
+        "document_cosine": -0.009242706796671718,
+        "task_cosine": -0.021664957764141235,
+        "rerank_logit": -1.3564453125
+      },
+      "delta_vs_yes": {
+        "document_cosine": -0.014853491441423783,
+        "task_cosine": -0.018412374626703976,
+        "rerank_logit": 0.34765625
+      },
+      "probe_chunk_delta_vs_base": 0.04300490757684716
+    },
+    {
+      "case_id": "N02",
+      "variant": "no_repeated3",
+      "delta_vs_base": {
+        "document_cosine": 0.07823302826002765,
+        "task_cosine": 0.026181748942836425,
+        "rerank_logit": 2.5625
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.018118812640770532,
+        "task_cosine": 0.0026199215590759772,
+        "rerank_logit": -3.6611328125
+      },
+      "delta_vs_yes": {
+        "document_cosine": 0.012508027996018467,
+        "task_cosine": 0.005872504696513237,
+        "rerank_logit": -1.95703125
+      },
+      "probe_chunk_delta_vs_base": 0.09686245682345318
+    },
+    {
+      "case_id": "N03",
+      "variant": "question_only",
+      "delta_vs_base": {
+        "document_cosine": 0.03607661502817994,
+        "task_cosine": 0.012030706302751826,
+        "rerank_logit": 4.0380859375
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.0,
+        "task_cosine": 0.0,
+        "rerank_logit": 0.0
+      },
+      "delta_vs_yes": {
+        "document_cosine": -0.011214380222129616,
+        "task_cosine": -0.0002734127913303075,
+        "rerank_logit": 0.0205078125
+      },
+      "probe_chunk_delta_vs_base": 0.03835836313449337
+    },
+    {
+      "case_id": "N03",
+      "variant": "no_short",
+      "delta_vs_base": {
+        "document_cosine": 0.03541520662791564,
+        "task_cosine": -0.0016097606299207978,
+        "rerank_logit": 3.8515625
+      },
+      "delta_vs_question": {
+        "document_cosine": -0.0006614084002642961,
+        "task_cosine": -0.013640466932672624,
+        "rerank_logit": -0.1865234375
+      },
+      "delta_vs_yes": {
+        "document_cosine": -0.011875788622393912,
+        "task_cosine": -0.013913879724002931,
+        "rerank_logit": -0.166015625
+      },
+      "probe_chunk_delta_vs_base": 0.03418848133276409
+    },
+    {
+      "case_id": "N03",
+      "variant": "no_explicit",
+      "delta_vs_base": {
+        "document_cosine": 0.08459005007140752,
+        "task_cosine": 0.03990070077968133,
+        "rerank_logit": 3.6953125
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.04851343504322758,
+        "task_cosine": 0.027869994476929505,
+        "rerank_logit": -0.3427734375
+      },
+      "delta_vs_yes": {
+        "document_cosine": 0.037299054821097966,
+        "task_cosine": 0.027596581685599197,
+        "rerank_logit": -0.322265625
+      },
+      "probe_chunk_delta_vs_base": 0.1011601703236773
+    },
+    {
+      "case_id": "N03",
+      "variant": "yes_short",
+      "delta_vs_base": {
+        "document_cosine": 0.04729099525030955,
+        "task_cosine": 0.012304119094082133,
+        "rerank_logit": 4.017578125
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.011214380222129616,
+        "task_cosine": 0.0002734127913303075,
+        "rerank_logit": -0.0205078125
+      },
+      "delta_vs_yes": {
+        "document_cosine": 0.0,
+        "task_cosine": 0.0,
+        "rerank_logit": 0.0
+      },
+      "probe_chunk_delta_vs_base": 0.047795123199356304
+    },
+    {
+      "case_id": "N03",
+      "variant": "uncertain",
+      "delta_vs_base": {
+        "document_cosine": 0.031564770780098894,
+        "task_cosine": -0.003265462295506283,
+        "rerank_logit": 4.240234375
+      },
+      "delta_vs_question": {
+        "document_cosine": -0.004511844248081043,
+        "task_cosine": -0.015296168598258109,
+        "rerank_logit": 0.2021484375
+      },
+      "delta_vs_yes": {
+        "document_cosine": -0.01572622447021066,
+        "task_cosine": -0.015569581389588416,
+        "rerank_logit": 0.22265625
+      },
+      "probe_chunk_delta_vs_base": 0.027281604063968623
+    },
+    {
+      "case_id": "N03",
+      "variant": "no_repeated3",
+      "delta_vs_base": {
+        "document_cosine": 0.05564350753461822,
+        "task_cosine": 0.022656284424720563,
+        "rerank_logit": 2.6171875
+      },
+      "delta_vs_question": {
+        "document_cosine": 0.019566892506438283,
+        "task_cosine": 0.010625578121968737,
+        "rerank_logit": -1.4208984375
+      },
+      "delta_vs_yes": {
+        "document_cosine": 0.008352512284308666,
+        "task_cosine": 0.01035216533063843,
+        "rerank_logit": -1.400390625
+      },
+      "probe_chunk_delta_vs_base": 0.08391575396871653
+    }
+  ],
+  "counts": {
+    "question_only": {
+      "cases": 3,
+      "higher_vs_base": {
+        "document_cosine": 3,
+        "task_cosine": 3,
+        "rerank_logit": 3
+      },
+      "probe_chunk_higher_vs_base": 3,
+      "probe_in_top5": 1,
+      "primary_in_top5": 2
+    },
+    "no_short": {
+      "cases": 3,
+      "higher_vs_base": {
+        "document_cosine": 3,
+        "task_cosine": 2,
+        "rerank_logit": 3
+      },
+      "probe_chunk_higher_vs_base": 3,
+      "probe_in_top5": 2,
+      "primary_in_top5": 2
+    },
+    "no_explicit": {
+      "cases": 3,
+      "higher_vs_base": {
+        "document_cosine": 3,
+        "task_cosine": 3,
+        "rerank_logit": 3
+      },
+      "probe_chunk_higher_vs_base": 3,
+      "probe_in_top5": 2,
+      "primary_in_top5": 1
+    },
+    "yes_short": {
+      "cases": 3,
+      "higher_vs_base": {
+        "document_cosine": 3,
+        "task_cosine": 3,
+        "rerank_logit": 3
+      },
+      "probe_chunk_higher_vs_base": 3,
+      "probe_in_top5": 2,
+      "primary_in_top5": 2
+    },
+    "uncertain": {
+      "cases": 3,
+      "higher_vs_base": {
+        "document_cosine": 3,
+        "task_cosine": 2,
+        "rerank_logit": 3
+      },
+      "probe_chunk_higher_vs_base": 3,
+      "probe_in_top5": 1,
+      "primary_in_top5": 2
+    },
+    "no_repeated3": {
+      "cases": 3,
+      "higher_vs_base": {
+        "document_cosine": 3,
+        "task_cosine": 3,
+        "rerank_logit": 3
+      },
+      "probe_chunk_higher_vs_base": 3,
+      "probe_in_top5": 1,
+      "primary_in_top5": 1
+    }
+  },
+  "warning": "Three synthetic contrasts, no human corpus relevance grading or consultant repeat-question test."
+}

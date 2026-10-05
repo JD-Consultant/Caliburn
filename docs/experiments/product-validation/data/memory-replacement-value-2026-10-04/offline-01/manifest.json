@@ -1,0 +1,81 @@
+{
+  "prepared_at": "2026-10-04T12:46:51.758887+00:00",
+  "model": "gpt-6-luna",
+  "effort": "high",
+  "max_output_tokens": 8192,
+  "max_estimated_usd": "0.10",
+  "max_seconds": 1200,
+  "prior_occupied_usd": "1.024756355",
+  "cumulative_limit_usd": "2.00",
+  "kind": "full-originals-vs-recent-originals-memory-review-proposals",
+  "schedule": [
+    {
+      "arm": "raw",
+      "repeat": 1,
+      "case_id": "corrections"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "corrections"
+    },
+    {
+      "arm": "raw",
+      "repeat": 1,
+      "case_id": "boundaries"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "boundaries"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "corrections"
+    },
+    {
+      "arm": "raw",
+      "repeat": 2,
+      "case_id": "corrections"
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "boundaries"
+    },
+    {
+      "arm": "raw",
+      "repeat": 2,
+      "case_id": "boundaries"
+    }
+  ],
+  "head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "source_sha256": {
+    "docs\\experiments\\product-validation\\data\\compaction-long-interview-2026-10-04\\main-03\\compaction_hierarchical_memory\\product-052.json": "13f9ae667fb3c2b51f03f48f1e6be9c1774e7e2efba38e559ec0d0203770c00c",
+    "docs\\experiments\\product-validation\\data\\compaction-long-interview-2026-10-04\\main-03\\compaction_hierarchical_memory\\memory-e052.json": "304bffc05fd75b1bccec424d3ba37a563a3994be7056e2425848aab46dc747a1",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\cases.json": "8cdcf70d09b6c208599bf59e2d0a4f85d087d81229d66e5e8acc45677661923f",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\support.py": "19a2816265c682093737c45d784a0e847e1868bb22f3c3c038127310b684627b",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\experiment.py": "58ce60a7fc858b7a783c937c530d82faed023bde09a5c810ccfe4d36d3c4c093",
+    "apps\\api\\src\\caliburn\\agents\\job_consultant\\instructions.py": "318e0332a38262bcd7ad6a1513e613c0c311ec0bf1ba12bebd2aa250ab86f25c",
+    "docs\\experiments\\product-validation\\data\\memory-replacement-value-2026-10-04\\study.py": "67ddbf97dc458e6c7f24b627fa6e3e44ab20edaad770d0e8d55caf41808aeca0",
+    "docs\\experiments\\product-validation\\data\\memory-replacement-value-2026-10-04\\contexts.py": "c67bcd6b04fcb076fba945be48d1b81159fec5d539f4bcfe405bd7d4b21ca4c7",
+    "docs\\experiments\\product-validation\\data\\memory-replacement-value-2026-10-04\\README.md": "af61641722dc31428f4efac0314d2a6a0ba0f4e7b359d91a11d8f9bbe0789329",
+    "apps\\api\\src\\caliburn\\features\\interviews\\queries.py": "c4f926c1204377e158d1aa163d9dfecf206a33a8912c26835a03e78c44409fc4"
+  },
+  "instructions_sha256": "1cbfcc49f1e1de70d1d1e1972e21a1b7543efc06dc83ae19571d8fa017ec0c16",
+  "tools_sha256": {
+    "raw": "fe516f8ee4e25804e3131f7749860ed2eb9d76a9386b92b4d058dbb2fdbf6fcd",
+    "raw_memory": "825849d5d389b13ed619cc4639486f70d156b266601edb0ee066284cf2315309"
+  },
+  "sdk_version": "3.20.0",
+  "pricing_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+  "arm_labels": {
+    "raw": "full_originals",
+    "raw_memory": "recent_originals_memory"
+  },
+  "recent_boundary": {
+    "covered_through_sequence": 104,
+    "through_sequence": 105
+  }
+}

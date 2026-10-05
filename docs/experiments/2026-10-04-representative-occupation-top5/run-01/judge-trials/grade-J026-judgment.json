@@ -1,0 +1,29 @@
+{
+  "job_id": "J026",
+  "phase": "grade",
+  "judgment": {
+    "grade": 1,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是供應鏈及客戶訂單的作業追蹤、資料登錄與出貨安排；員工主要負責開發及維護訂單系統的瀏覽器畫面與伺服器功能。兩者雖涉及訂單系統及資料更新，但責任內容不同，僅有局部關聯，不足以代表員工任一主要工作面向。",
+    "evidence": [
+      {
+        "employee_quote": "我主要負責公司的線上訂單系統。",
+        "reference_quote": "將確認的訂單輸入到ERP或訂單管理系統中"
+      },
+      {
+        "employee_quote": "設計及修改資料表、查詢與資料更新",
+        "reference_quote": "將訂單完成情況及相關數據更新到系統中"
+      }
+    ],
+    "limitations": [
+      "員工負責製作瀏覽器上的訂單操作畫面、API、權限、商業規則及資料存取；公版未描述這些軟體開發與維護責任。",
+      "公版提及的系統更新是供應鏈或客戶訂單作業，不能據此推定為系統功能開發。"
+    ]
+  },
+  "seconds": 6.612699399993289,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "4abb3abeb74afe2f631fb5eebbb865464846975ba39917b2906bafd2227b5304",
+  "case_id": "F01",
+  "document_id": "KRM1324-002v1"
+}

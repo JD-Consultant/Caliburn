@@ -1,0 +1,8 @@
+{
+  "pid": 43224,
+  "config": "S:\\caliburn\\tmp\\ocs-eval-qdrant\\config.yaml",
+  "exe_sha256": "b029d8b1c54ee14b164c93cc60f722ff87dae9f6379f779cd378f5e33b17474e",
+  "config_sha256": "2a83d2e2dadf3db53ec39e6ad319202a8de1cd34852d8b91b667d9ecc74b2214",
+  "owned_start": true,
+  "exe": "S:\\caliburn\\tmp\\ocs-eval-qdrant\\qdrant.exe"
+}

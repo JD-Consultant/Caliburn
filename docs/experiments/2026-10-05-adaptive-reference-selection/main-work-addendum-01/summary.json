@@ -1,0 +1,2083 @@
+{
+  "scope": "Post-hoc objective reassessment, same eight historical cases; no new model inference.",
+  "all_combinations": 7038,
+  "eligible_universe": 3325,
+  "universe_filter": "Final cap <= 5; no ungraded final outputs. No requirement to preserve each known grade3 document.",
+  "objective_order": [
+    "Meet specified known-main-facet coverage",
+    "Minimize grade0+grade1 count",
+    "Minimize final document count",
+    "Minimize initial candidate pairs"
+  ],
+  "zero_weak_objective": "First maximize known main facets, then apply count/workload tie breaks.",
+  "groups": {
+    "original_facets_8_of_8": {
+      "eligible_count": 68,
+      "optimal_tie_ids": [
+        "T_fixed_20::absolute_-4_cap5"
+      ],
+      "top_rows": [
+        {
+          "id": "T_fixed_20::absolute_-4_cap5",
+          "first_policy": "T_fixed_20",
+          "final_policy": {
+            "id": "absolute_-4_cap5",
+            "kind": "absolute",
+            "parameter": -4.0,
+            "limit": 5
+          },
+          "candidate_pairs": 160,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 1,
+          "selected_count": 37,
+          "average_per_case": 4.625,
+          "range": [
+            2,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 10,
+            "2": 18,
+            "3": 8,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 8,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 37,
+            "average_per_case": 4.625,
+            "range": [
+              2,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 10,
+              "2": 18,
+              "3": 8,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_fixed_D5_T20::absolute_-4_cap5",
+          "first_policy": "DT_fixed_D5_T20",
+          "final_policy": {
+            "id": "absolute_-4_cap5",
+            "kind": "absolute",
+            "parameter": -4.0,
+            "limit": 5
+          },
+          "candidate_pairs": 169,
+          "initial_known_grade3": 12,
+          "lost_baseline_grade3_count": 0,
+          "selected_count": 37,
+          "average_per_case": 4.625,
+          "range": [
+            2,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 10,
+            "2": 17,
+            "3": 9,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 9,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 37,
+            "average_per_case": 4.625,
+            "range": [
+              2,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 10,
+              "2": 17,
+              "3": 9,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 8,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_fixed_20::relative_1.5_cap5",
+          "first_policy": "T_fixed_20",
+          "final_policy": {
+            "id": "relative_1.5_cap5",
+            "kind": "relative",
+            "parameter": 1.5,
+            "limit": 5
+          },
+          "candidate_pairs": 160,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 1,
+          "selected_count": 35,
+          "average_per_case": 4.375,
+          "range": [
+            3,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 3,
+            "1": 9,
+            "2": 15,
+            "3": 8,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 8,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 35,
+            "average_per_case": 4.375,
+            "range": [
+              3,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 3,
+              "1": 9,
+              "2": 15,
+              "3": 8,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_fixed_D10_T20::absolute_-4_cap5",
+          "first_policy": "DT_fixed_D10_T20",
+          "final_policy": {
+            "id": "absolute_-4_cap5",
+            "kind": "absolute",
+            "parameter": -4.0,
+            "limit": 5
+          },
+          "candidate_pairs": 194,
+          "initial_known_grade3": 12,
+          "lost_baseline_grade3_count": 0,
+          "selected_count": 37,
+          "average_per_case": 4.625,
+          "range": [
+            2,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 2,
+            "1": 10,
+            "2": 16,
+            "3": 9,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 9,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 37,
+            "average_per_case": 4.625,
+            "range": [
+              2,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 2,
+              "1": 10,
+              "2": 16,
+              "3": 9,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 8,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_fixed_20::gap_1_cap5",
+          "first_policy": "T_fixed_20",
+          "final_policy": {
+            "id": "gap_1_cap5",
+            "kind": "gap",
+            "parameter": 1,
+            "limit": 5
+          },
+          "candidate_pairs": 160,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 1,
+          "selected_count": 37,
+          "average_per_case": 4.625,
+          "range": [
+            2,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 3,
+            "1": 10,
+            "2": 16,
+            "3": 8,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 8,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 37,
+            "average_per_case": 4.625,
+            "range": [
+              2,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 3,
+              "1": 10,
+              "2": 16,
+              "3": 8,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_fixed_D5_T20::gap_1_cap5",
+          "first_policy": "DT_fixed_D5_T20",
+          "final_policy": {
+            "id": "gap_1_cap5",
+            "kind": "gap",
+            "parameter": 1,
+            "limit": 5
+          },
+          "candidate_pairs": 169,
+          "initial_known_grade3": 12,
+          "lost_baseline_grade3_count": 0,
+          "selected_count": 37,
+          "average_per_case": 4.625,
+          "range": [
+            2,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 3,
+            "1": 10,
+            "2": 15,
+            "3": 9,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 9,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 37,
+            "average_per_case": 4.625,
+            "range": [
+              2,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 3,
+              "1": 10,
+              "2": 15,
+              "3": 9,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 8,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_fixed_D5_T20::relative_1.5_cap5",
+          "first_policy": "DT_fixed_D5_T20",
+          "final_policy": {
+            "id": "relative_1.5_cap5",
+            "kind": "relative",
+            "parameter": 1.5,
+            "limit": 5
+          },
+          "candidate_pairs": 169,
+          "initial_known_grade3": 12,
+          "lost_baseline_grade3_count": 0,
+          "selected_count": 37,
+          "average_per_case": 4.625,
+          "range": [
+            3,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 3,
+            "1": 10,
+            "2": 15,
+            "3": 9,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 9,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 37,
+            "average_per_case": 4.625,
+            "range": [
+              3,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 3,
+              "1": 10,
+              "2": 15,
+              "3": 9,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 8,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_fixed_D10_T20::gap_1_cap5",
+          "first_policy": "DT_fixed_D10_T20",
+          "final_policy": {
+            "id": "gap_1_cap5",
+            "kind": "gap",
+            "parameter": 1,
+            "limit": 5
+          },
+          "candidate_pairs": 194,
+          "initial_known_grade3": 12,
+          "lost_baseline_grade3_count": 0,
+          "selected_count": 37,
+          "average_per_case": 4.625,
+          "range": [
+            2,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 3,
+            "1": 10,
+            "2": 15,
+            "3": 9,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 9,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 37,
+            "average_per_case": 4.625,
+            "range": [
+              2,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 3,
+              "1": 10,
+              "2": 15,
+              "3": 9,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 8,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_fixed_D10_T20::relative_1.5_cap5",
+          "first_policy": "DT_fixed_D10_T20",
+          "final_policy": {
+            "id": "relative_1.5_cap5",
+            "kind": "relative",
+            "parameter": 1.5,
+            "limit": 5
+          },
+          "candidate_pairs": 194,
+          "initial_known_grade3": 12,
+          "lost_baseline_grade3_count": 0,
+          "selected_count": 37,
+          "average_per_case": 4.625,
+          "range": [
+            3,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 3,
+            "1": 10,
+            "2": 15,
+            "3": 9,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 9,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 37,
+            "average_per_case": 4.625,
+            "range": [
+              3,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 3,
+              "1": 10,
+              "2": 15,
+              "3": 9,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 8,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_fixed_20::absolute_-4.5_cap5",
+          "first_policy": "T_fixed_20",
+          "final_policy": {
+            "id": "absolute_-4.5_cap5",
+            "kind": "absolute",
+            "parameter": -4.5,
+            "limit": 5
+          },
+          "candidate_pairs": 160,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 1,
+          "selected_count": 39,
+          "average_per_case": 4.875,
+          "range": [
+            4,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 3,
+            "1": 10,
+            "2": 18,
+            "3": 8,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 8,
+          "known_grade3_total": 12,
+          "known_facets_supported": 8,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 39,
+            "average_per_case": 4.875,
+            "range": [
+              4,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 3,
+              "1": 10,
+              "2": 18,
+              "3": 8,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        }
+      ]
+    },
+    "original_facets_at_least_7_of_8": {
+      "eligible_count": 108,
+      "optimal_tie_ids": [
+        "T_absolute_floor_0.7_floor3::absolute_-3.5_cap5"
+      ],
+      "top_rows": [
+        {
+          "id": "T_absolute_floor_0.7_floor3::absolute_-3.5_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "absolute_-3.5_cap5",
+            "kind": "absolute",
+            "parameter": -3.5,
+            "limit": 5
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 22,
+          "average_per_case": 2.75,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 2,
+            "2": 13,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 22,
+            "average_per_case": 2.75,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 2,
+              "2": 13,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor3::top2",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "top2",
+            "kind": "fixed",
+            "limit": 2
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 16,
+          "average_per_case": 2.0,
+          "range": [
+            2,
+            2
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 16,
+            "average_per_case": 2.0,
+            "range": [
+              2,
+              2
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor5::top2",
+          "first_policy": "T_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "top2",
+            "kind": "fixed",
+            "limit": 2
+          },
+          "candidate_pairs": 71,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 16,
+          "average_per_case": 2.0,
+          "range": [
+            2,
+            2
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 16,
+            "average_per_case": 2.0,
+            "range": [
+              2,
+              2
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor3::top2",
+          "first_policy": "DT_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "top2",
+            "kind": "fixed",
+            "limit": 2
+          },
+          "candidate_pairs": 89,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 16,
+          "average_per_case": 2.0,
+          "range": [
+            2,
+            2
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 16,
+            "average_per_case": 2.0,
+            "range": [
+              2,
+              2
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor5::top2",
+          "first_policy": "DT_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "top2",
+            "kind": "fixed",
+            "limit": 2
+          },
+          "candidate_pairs": 99,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 16,
+          "average_per_case": 2.0,
+          "range": [
+            2,
+            2
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 16,
+            "average_per_case": 2.0,
+            "range": [
+              2,
+              2
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor3::absolute_-4_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "absolute_-4_cap5",
+            "kind": "absolute",
+            "parameter": -4.0,
+            "limit": 5
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 24,
+          "average_per_case": 3.0,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 14,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 24,
+            "average_per_case": 3.0,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 14,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor5::absolute_-3.5_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "absolute_-3.5_cap5",
+            "kind": "absolute",
+            "parameter": -3.5,
+            "limit": 5
+          },
+          "candidate_pairs": 71,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 26,
+          "average_per_case": 3.25,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 3,
+            "2": 16,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 26,
+            "average_per_case": 3.25,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 3,
+              "2": 16,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor3::absolute_-3.5_cap5",
+          "first_policy": "DT_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "absolute_-3.5_cap5",
+            "kind": "absolute",
+            "parameter": -3.5,
+            "limit": 5
+          },
+          "candidate_pairs": 89,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 1,
+          "selected_count": 29,
+          "average_per_case": 3.625,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 3,
+            "2": 18,
+            "3": 8,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 8,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 29,
+            "average_per_case": 3.625,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 3,
+              "2": 18,
+              "3": 8,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 8,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor3::relative_1_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "relative_1_cap5",
+            "kind": "relative",
+            "parameter": 1,
+            "limit": 5
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 17,
+          "average_per_case": 2.125,
+          "range": [
+            1,
+            4
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 3,
+            "1": 1,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 17,
+            "average_per_case": 2.125,
+            "range": [
+              1,
+              4
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 3,
+              "1": 1,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor5::absolute_-4_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "absolute_-4_cap5",
+            "kind": "absolute",
+            "parameter": -4.0,
+            "limit": 5
+          },
+          "candidate_pairs": 71,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 28,
+          "average_per_case": 3.5,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 3,
+            "2": 17,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 28,
+            "average_per_case": 3.5,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 3,
+              "2": 17,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        }
+      ]
+    },
+    "sensitivity_facets_8_of_8": {
+      "eligible_count": 0,
+      "optimal_tie_ids": [],
+      "top_rows": []
+    },
+    "sensitivity_facets_at_least_7_of_8": {
+      "eligible_count": 108,
+      "optimal_tie_ids": [
+        "T_absolute_floor_0.7_floor3::absolute_-3.5_cap5"
+      ],
+      "top_rows": [
+        {
+          "id": "T_absolute_floor_0.7_floor3::absolute_-3.5_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "absolute_-3.5_cap5",
+            "kind": "absolute",
+            "parameter": -3.5,
+            "limit": 5
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 22,
+          "average_per_case": 2.75,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 2,
+            "2": 13,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 22,
+            "average_per_case": 2.75,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 2,
+              "2": 13,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor3::top2",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "top2",
+            "kind": "fixed",
+            "limit": 2
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 16,
+          "average_per_case": 2.0,
+          "range": [
+            2,
+            2
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 16,
+            "average_per_case": 2.0,
+            "range": [
+              2,
+              2
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor5::top2",
+          "first_policy": "T_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "top2",
+            "kind": "fixed",
+            "limit": 2
+          },
+          "candidate_pairs": 71,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 16,
+          "average_per_case": 2.0,
+          "range": [
+            2,
+            2
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 16,
+            "average_per_case": 2.0,
+            "range": [
+              2,
+              2
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor3::top2",
+          "first_policy": "DT_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "top2",
+            "kind": "fixed",
+            "limit": 2
+          },
+          "candidate_pairs": 89,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 16,
+          "average_per_case": 2.0,
+          "range": [
+            2,
+            2
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 16,
+            "average_per_case": 2.0,
+            "range": [
+              2,
+              2
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor5::top2",
+          "first_policy": "DT_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "top2",
+            "kind": "fixed",
+            "limit": 2
+          },
+          "candidate_pairs": 99,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 16,
+          "average_per_case": 2.0,
+          "range": [
+            2,
+            2
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 16,
+            "average_per_case": 2.0,
+            "range": [
+              2,
+              2
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor3::absolute_-4_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "absolute_-4_cap5",
+            "kind": "absolute",
+            "parameter": -4.0,
+            "limit": 5
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 24,
+          "average_per_case": 3.0,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 2,
+            "2": 14,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 24,
+            "average_per_case": 3.0,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 2,
+              "2": 14,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor5::absolute_-3.5_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "absolute_-3.5_cap5",
+            "kind": "absolute",
+            "parameter": -3.5,
+            "limit": 5
+          },
+          "candidate_pairs": 71,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 26,
+          "average_per_case": 3.25,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 3,
+            "2": 16,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 26,
+            "average_per_case": 3.25,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 3,
+              "2": 16,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor3::absolute_-3.5_cap5",
+          "first_policy": "DT_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "absolute_-3.5_cap5",
+            "kind": "absolute",
+            "parameter": -3.5,
+            "limit": 5
+          },
+          "candidate_pairs": 89,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 1,
+          "selected_count": 29,
+          "average_per_case": 3.625,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 3,
+            "2": 18,
+            "3": 8,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 8,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 29,
+            "average_per_case": 3.625,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 3,
+              "2": 18,
+              "3": 8,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 8,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor3::relative_1_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "relative_1_cap5",
+            "kind": "relative",
+            "parameter": 1,
+            "limit": 5
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 17,
+          "average_per_case": 2.125,
+          "range": [
+            1,
+            4
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 3,
+            "1": 1,
+            "2": 6,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 17,
+            "average_per_case": 2.125,
+            "range": [
+              1,
+              4
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 3,
+              "1": 1,
+              "2": 6,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor5::absolute_-4_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "absolute_-4_cap5",
+            "kind": "absolute",
+            "parameter": -4.0,
+            "limit": 5
+          },
+          "candidate_pairs": 71,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 2,
+          "selected_count": 28,
+          "average_per_case": 3.5,
+          "range": [
+            1,
+            5
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 1,
+            "1": 3,
+            "2": 17,
+            "3": 7,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 7,
+          "known_grade3_total": 12,
+          "known_facets_supported": 7,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 28,
+            "average_per_case": 3.5,
+            "range": [
+              1,
+              5
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 1,
+              "1": 3,
+              "2": 17,
+              "3": 7,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 7,
+            "known_grade3_total": 10,
+            "known_facets_supported": 7,
+            "known_facets_total": 8
+          }
+        }
+      ]
+    },
+    "zero_grade0_grade1": {
+      "eligible_count": 817,
+      "optimal_tie_ids": [
+        "T_absolute_floor_0.7_floor3::gap_0.1_cap5",
+        "T_absolute_floor_0.7_floor3::relative_0.1_cap5",
+        "T_absolute_floor_0.7_floor3::top1"
+      ],
+      "top_rows": [
+        {
+          "id": "T_absolute_floor_0.7_floor3::gap_0.1_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "gap_0.1_cap5",
+            "kind": "gap",
+            "parameter": 0.1,
+            "limit": 5
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 8,
+          "average_per_case": 1.0,
+          "range": [
+            1,
+            1
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 8,
+            "average_per_case": 1.0,
+            "range": [
+              1,
+              1
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 4,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor3::relative_0.1_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "relative_0.1_cap5",
+            "kind": "relative",
+            "parameter": 0.1,
+            "limit": 5
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 8,
+          "average_per_case": 1.0,
+          "range": [
+            1,
+            1
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 8,
+            "average_per_case": 1.0,
+            "range": [
+              1,
+              1
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 4,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor3::top1",
+          "first_policy": "T_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "top1",
+            "kind": "fixed",
+            "limit": 1
+          },
+          "candidate_pairs": 63,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 8,
+          "average_per_case": 1.0,
+          "range": [
+            1,
+            1
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 8,
+            "average_per_case": 1.0,
+            "range": [
+              1,
+              1
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 4,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor5::gap_0.1_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "gap_0.1_cap5",
+            "kind": "gap",
+            "parameter": 0.1,
+            "limit": 5
+          },
+          "candidate_pairs": 71,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 8,
+          "average_per_case": 1.0,
+          "range": [
+            1,
+            1
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 8,
+            "average_per_case": 1.0,
+            "range": [
+              1,
+              1
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 4,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor5::relative_0.1_cap5",
+          "first_policy": "T_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "relative_0.1_cap5",
+            "kind": "relative",
+            "parameter": 0.1,
+            "limit": 5
+          },
+          "candidate_pairs": 71,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 8,
+          "average_per_case": 1.0,
+          "range": [
+            1,
+            1
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 8,
+            "average_per_case": 1.0,
+            "range": [
+              1,
+              1
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 4,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "T_absolute_floor_0.7_floor5::top1",
+          "first_policy": "T_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "top1",
+            "kind": "fixed",
+            "limit": 1
+          },
+          "candidate_pairs": 71,
+          "initial_known_grade3": 8,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 8,
+          "average_per_case": 1.0,
+          "range": [
+            1,
+            1
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 8,
+            "average_per_case": 1.0,
+            "range": [
+              1,
+              1
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 4,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor3::gap_0.1_cap5",
+          "first_policy": "DT_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "gap_0.1_cap5",
+            "kind": "gap",
+            "parameter": 0.1,
+            "limit": 5
+          },
+          "candidate_pairs": 89,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 8,
+          "average_per_case": 1.0,
+          "range": [
+            1,
+            1
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 8,
+            "average_per_case": 1.0,
+            "range": [
+              1,
+              1
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 4,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor3::relative_0.1_cap5",
+          "first_policy": "DT_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "relative_0.1_cap5",
+            "kind": "relative",
+            "parameter": 0.1,
+            "limit": 5
+          },
+          "candidate_pairs": 89,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 8,
+          "average_per_case": 1.0,
+          "range": [
+            1,
+            1
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 8,
+            "average_per_case": 1.0,
+            "range": [
+              1,
+              1
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 4,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor3::top1",
+          "first_policy": "DT_absolute_floor_0.7_floor3",
+          "final_policy": {
+            "id": "top1",
+            "kind": "fixed",
+            "limit": 1
+          },
+          "candidate_pairs": 89,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 8,
+          "average_per_case": 1.0,
+          "range": [
+            1,
+            1
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 4,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 8,
+            "average_per_case": 1.0,
+            "range": [
+              1,
+              1
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 4,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        },
+        {
+          "id": "DT_absolute_floor_0.7_floor5::gap_0.1_cap5",
+          "first_policy": "DT_absolute_floor_0.7_floor5",
+          "final_policy": {
+            "id": "gap_0.1_cap5",
+            "kind": "gap",
+            "parameter": 0.1,
+            "limit": 5
+          },
+          "candidate_pairs": 99,
+          "initial_known_grade3": 10,
+          "lost_baseline_grade3_count": 5,
+          "selected_count": 9,
+          "average_per_case": 1.125,
+          "range": [
+            1,
+            2
+          ],
+          "empty_cases": [],
+          "grades": {
+            "0": 0,
+            "1": 0,
+            "2": 5,
+            "3": 4,
+            "ungraded": 0
+          },
+          "known_grade3_retained": 4,
+          "known_grade3_total": 12,
+          "known_facets_supported": 5,
+          "known_facets_total": 8,
+          "sensitivity": {
+            "selected_count": 9,
+            "average_per_case": 1.125,
+            "range": [
+              1,
+              2
+            ],
+            "empty_cases": [],
+            "grades": {
+              "0": 0,
+              "1": 0,
+              "2": 5,
+              "3": 4,
+              "ungraded": 0
+            },
+            "known_grade3_retained": 4,
+            "known_grade3_total": 10,
+            "known_facets_supported": 5,
+            "known_facets_total": 8
+          }
+        }
+      ]
+    }
+  }
+}

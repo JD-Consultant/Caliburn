@@ -1,0 +1,91 @@
+{
+  "case_id": "boundaries",
+  "arm": "memory",
+  "repeat": 2,
+  "cell_id": "boundaries-memory-2",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding_map",
+      "arguments": {},
+      "result_characters": 185
+    },
+    {
+      "step": 2,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6465
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 5325,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 5322
+        },
+        "output_tokens": 128,
+        "output_tokens_details": {
+          "reasoning_tokens": 56
+        },
+        "total_tokens": 5453
+      },
+      "estimated_usd": "0.000117520",
+      "seconds": 2.462491200014483,
+      "counted_input_tokens": 5325
+    },
+    {
+      "usage": {
+        "input_tokens": 5605,
+        "input_tokens_details": {
+          "cache_write_tokens": 280,
+          "cached_tokens": 5322
+        },
+        "output_tokens": 37,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 5642
+      },
+      "estimated_usd": "0.000107020",
+      "seconds": 1.4989324999623932,
+      "counted_input_tokens": 5605
+    },
+    {
+      "usage": {
+        "input_tokens": 11103,
+        "input_tokens_details": {
+          "cache_write_tokens": 5498,
+          "cached_tokens": 5602
+        },
+        "output_tokens": 1090,
+        "output_tokens_details": {
+          "reasoning_tokens": 421
+        },
+        "total_tokens": 12193
+      },
+      "estimated_usd": "0.001288570",
+      "seconds": 11.216437500028405,
+      "counted_input_tokens": 11103
+    }
+  ],
+  "answer": {
+    "findings": "核對結果：\n- **產品召回（低頻但確有此項工作）**：本人依品質窗口提供的品號、批號，查核各店及不同庫存狀態（包括可售、待檢、在途調撥等），協調倉庫隔離，向主管及品質窗口提供影響範圍，並追蹤隔離量、回收量及各店回覆，直到主管確認紀錄齊全。本人不決定是否召回、召回範圍或解除隔離／恢復銷售；對客通知由客服負責，供應商聯繫由採購負責。批號或範圍資料不足時應請窗口補充或確認，不自行把未列批號判為召回品，也不自行認定安全。這應作為一項低頻召回盤查與追蹤工作，不按每次事件另立永久職責。\n- **休假前後交接**：休假前交接未結案差異、預計到貨及當日截止事項，附原單號、當前狀態及下一聯絡窗口；返崗後核對代理期間的登錄與完成事項，以避免重複入帳或狀態不一致。這是既有庫存物流工作的交接安排，不表示本人負責代理人的所有工作或擁有其核准權。代理登錄與原紀錄不一致時，後續更正、通知或升級程序尚未釐清。\n- **單據保存**：本人依公司既有規則將單據及核准紀錄存於共享資料夾，檔名帶日期及原單號；保存年限未知，不能寫成數字要求，也不應由本人自行設定。稽核缺件時列明缺件並請相關窗口補充，不重造原有核准文件。\n- **數字要求是否已知**：冷藏退貨溫度合格門檻未知；文件保存年限也未知。兩者目前都不足以寫成數字標準，應保留未知，不以外部或行業慣例補值。",
+    "references": [
+      {
+        "kind": "work_understanding",
+        "interview_sequence": null,
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      }
+    ],
+    "questions": [
+      "冷藏退貨的溫度判定，您手邊或品質窗口是否有正式標準？若有，請提供門檻數值、單位，以及標準文件或確認窗口；若沒有或不清楚，可先保留未知。",
+      "單據及核准紀錄的保存年限，財務是否有依文件類型區分的正式規定？可否確認各類紀錄的年限與規定來源；若目前查不到，先不寫數字。"
+    ]
+  },
+  "seconds": 47.87258699996164
+}

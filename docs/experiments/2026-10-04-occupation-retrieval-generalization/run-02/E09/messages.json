@@ -1,0 +1,32 @@
+[
+  {
+    "interview_sequence": 1,
+    "speaker": "app",
+    "text": "請描述目前實際負責的工作、對象與做到的範圍。"
+  },
+  {
+    "interview_sequence": 2,
+    "speaker": "employee",
+    "text": "我每天處理一些公司的事情，會看資料和回覆訊息。"
+  },
+  {
+    "interview_sequence": 3,
+    "speaker": "consultant",
+    "text": "請補充本人如何處理、判斷與交付，以及決定權和例外。"
+  },
+  {
+    "interview_sequence": 4,
+    "speaker": "employee",
+    "text": "主管有交代就處理，完成會跟他說。資料內容是什麼我現在不想講，也沒有說明怎麼做。"
+  },
+  {
+    "interview_sequence": 5,
+    "speaker": "consultant",
+    "text": "還有哪些工作、頻率、更正或尚未確認的責任界線？"
+  },
+  {
+    "interview_sequence": 6,
+    "speaker": "employee",
+    "text": "不知道成果要叫什麼，使用的系統和決定權先不回答。沒有其他具體工作內容可以補充。"
+  }
+]

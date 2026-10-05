@@ -1,0 +1,28 @@
+{
+  "job_id": "J005",
+  "phase": "formal",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心是藥品推廣銷售、客戶經營與醫藥品說明，與員工持續負責的瀏覽器訂單畫面及訂單系統伺服器功能開發維護沒有有意義的工作對應。雖然兩者都出現「訂單」，公版描述的是依組織政策辦理訂單與退換貨，不是開發訂單系統。",
+    "evidence": [
+      {
+        "employee_quote": "製作瀏覽器上的訂單列表、查詢、編輯畫面和表單檢查",
+        "reference_quote": "從事各類藥品之推廣銷售。"
+      },
+      {
+        "employee_quote": "我也會寫處理訂單的 API、權限檢查和商業規則",
+        "reference_quote": "依照組織政策及規定,處理訂單與退換貨事宜。"
+      }
+    ],
+    "limitations": [
+      "公版的訂單工作是客戶訂單與退換貨處理，僅有詞語重疊，不支持員工的訂單 API、權限、商業規則或資料存取開發。"
+    ]
+  },
+  "seconds": 7.51993670000229,
+  "employee_sha256": "b126e1f5afa608f167e0ff05d36eea8878cb20a2affc3c67e66fa283f5257207",
+  "document_sha256": "f3b11d73c47d111514f7d273aa5a91ab3e7fcfe512db90de961ed88028459cb9",
+  "case_id": "F01",
+  "document_id": "KPS2434-001v2"
+}

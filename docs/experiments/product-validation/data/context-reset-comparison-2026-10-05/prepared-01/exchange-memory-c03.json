@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "440ea61d-1afb-427b-bed9-edb31e5cbce4",
+    "interview_sequence": 110,
+    "speaker": "employee",
+    "interview_text": "再補充收貨異常：採購窗口請假時，由採購代理人接手處置聯繫，我仍要持續追蹤。提醒、往上回報與結案的原有條件都不變，也沒有增加我的決策權。請把這個分工補進既有工作。"
+  },
+  "consultant_reply": {
+    "source_id": "083b5743-e7f3-4624-b067-ea80d29ce9a1",
+    "interview_sequence": 111,
+    "speaker": "consultant",
+    "interview_text": "已將分工補入「核對並登錄到貨資料」任務：採購窗口請假時，由採購代理人接手收貨異常的處置聯繫；您仍持續追蹤進度，且不因此取得處置決策權。原有提醒、往上回報與結案條件維持不變。"
+  }
+}

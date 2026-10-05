@@ -1,0 +1,54 @@
+{
+  "verified_utc": "2026-10-04T03:55:07.4468024Z",
+  "qdrant_owned_pid": 38468,
+  "qdrant_expected_path": "S:\\caliburn\\tmp\\ocs-eval-qdrant\\qdrant.exe",
+  "qdrant_process_stopped": true,
+  "research_listening_ports": [],
+  "owned_containers": [
+    "caliburn-ocs-eval-embedder-1",
+    "caliburn-ocs-rerank-eval",
+    "caliburn-ocs-rerank-passages"
+  ],
+  "container_states": [
+    {
+      "Status": "exited",
+      "Running": false,
+      "Paused": false,
+      "Restarting": false,
+      "OOMKilled": false,
+      "Dead": false,
+      "Pid": 0,
+      "ExitCode": 0,
+      "Error": "",
+      "StartedAt": "2026-10-04T03:24:59.863114925Z",
+      "FinishedAt": "2026-10-04T03:31:51.798580856Z"
+    },
+    {
+      "Status": "exited",
+      "Running": false,
+      "Paused": false,
+      "Restarting": false,
+      "OOMKilled": false,
+      "Dead": false,
+      "Pid": 0,
+      "ExitCode": 0,
+      "Error": "",
+      "StartedAt": "2026-10-04T03:14:19.123249971Z",
+      "FinishedAt": "2026-10-04T03:20:57.926514532Z"
+    },
+    {
+      "Status": "exited",
+      "Running": false,
+      "Paused": false,
+      "Restarting": false,
+      "OOMKilled": false,
+      "Dead": false,
+      "Pid": 0,
+      "ExitCode": 0,
+      "Error": "",
+      "StartedAt": "2026-10-04T03:31:53.069437934Z",
+      "FinishedAt": "2026-10-04T03:40:44.916640839Z"
+    }
+  ],
+  "scope": "Only owned research Qdrant stopped; GPU workers exited themselves; public caches and experiment data retained"
+}

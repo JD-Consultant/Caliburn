@@ -1,0 +1,26 @@
+{
+  "job_id": "new-025",
+  "phase": "formal-01",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心工作是蒐集與分析職業職能資料、設計分析方法並驗證職能模型；員工主要負責會員網站前端畫面、互動、API 串接及瀏覽器品質，兩者的工作對象與責任範圍不同，沒有可代表其主要工作的實質對應。",
+    "evidence": [
+      {
+        "employee_quote": "我平常負責會員網站的畫面。",
+        "reference_quote": "蒐集完整關鍵職業/職務文獻資料,確認該職業/職務之從業人員的工作範疇。"
+      },
+      {
+        "employee_quote": "API 的內部邏輯、權限規則和資料庫由另一位同事開發，我不會去修改那些部分。",
+        "reference_quote": "分析工作任務所需具備之知識、技能與態度,以符合實務工作及發展趨勢。"
+      }
+    ],
+    "limitations": []
+  },
+  "seconds": 6.074536699976306,
+  "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+  "document_sha256": "ede70f733176d6e9c4f1d4f328f2e6d847fb8ecd23e13405d9bfda1e707bfe2e",
+  "case_id": "F02",
+  "document_id": "BHR2422-001v4"
+}

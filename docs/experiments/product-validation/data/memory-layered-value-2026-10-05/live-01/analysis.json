@@ -1,0 +1,791 @@
+{
+  "method": "response usage once per HTTP response; tools once per actual invoke, not repeated native history; characters are not tokens",
+  "cells": {
+    "initial-b1": {
+      "rate_wait_seconds": 29.98529940005392,
+      "model_responses": 3,
+      "input_tokens": 10327,
+      "cached_input_tokens": 6268,
+      "output_tokens": 928,
+      "reasoning_tokens": 259,
+      "max_input_tokens": 4053,
+      "tool_calls": 3,
+      "tool:read_work_situation_map": 1,
+      "tool_errors": 0,
+      "read_characters": 13,
+      "tool:create_work_situation": 2,
+      "estimated_generation_usd": "0.001033830"
+    },
+    "initial-b2": {
+      "rate_wait_seconds": 29.984591800021008,
+      "model_responses": 3,
+      "input_tokens": 14670,
+      "cached_input_tokens": 8548,
+      "output_tokens": 1545,
+      "reasoning_tokens": 441,
+      "max_input_tokens": 6116,
+      "tool_calls": 6,
+      "tool:read_work_situation": 2,
+      "tool_errors": 0,
+      "read_characters": 744,
+      "tool:create_work_understanding": 4,
+      "estimated_generation_usd": "0.001623005"
+    },
+    "corrections-b1": {
+      "rate_wait_seconds": 29.982389300013892,
+      "model_responses": 3,
+      "input_tokens": 11391,
+      "cached_input_tokens": 9202,
+      "output_tokens": 1099,
+      "reasoning_tokens": 429,
+      "max_input_tokens": 4697,
+      "tool_calls": 4,
+      "tool:read_work_situation": 2,
+      "tool_errors": 0,
+      "read_characters": 744,
+      "tool:update_work_situation": 2,
+      "estimated_generation_usd": "0.000914920"
+    },
+    "corrections-b2": {
+      "rate_wait_seconds": 29.981518399901688,
+      "model_responses": 3,
+      "input_tokens": 20142,
+      "cached_input_tokens": 14885,
+      "output_tokens": 1185,
+      "reasoning_tokens": 361,
+      "max_input_tokens": 8106,
+      "tool_calls": 8,
+      "tool:read_work_situation": 2,
+      "tool_errors": 0,
+      "read_characters": 2552,
+      "tool:read_work_understanding": 4,
+      "tool:update_work_understanding": 2,
+      "estimated_generation_usd": "0.001398250"
+    },
+    "extension-b1": {
+      "rate_wait_seconds": 59.960151799954474,
+      "model_responses": 6,
+      "input_tokens": 29948,
+      "cached_input_tokens": 25910,
+      "output_tokens": 1886,
+      "reasoning_tokens": 717,
+      "max_input_tokens": 6537,
+      "tool_calls": 7,
+      "tool:read_work_situation": 4,
+      "tool_errors": 0,
+      "read_characters": 1920,
+      "tool:update_work_situation": 2,
+      "tool:create_work_situation": 1,
+      "estimated_generation_usd": "0.001706400"
+    },
+    "extension-b2": {
+      "rate_wait_seconds": 29.979281299980357,
+      "model_responses": 3,
+      "input_tokens": 20925,
+      "cached_input_tokens": 15011,
+      "output_tokens": 1918,
+      "reasoning_tokens": 1117,
+      "max_input_tokens": 8763,
+      "tool_calls": 8,
+      "tool:read_work_understanding": 3,
+      "tool_errors": 0,
+      "read_characters": 2584,
+      "tool:read_work_situation": 3,
+      "tool:update_work_understanding": 1,
+      "tool:create_work_understanding": 1,
+      "estimated_generation_usd": "0.001848135"
+    },
+    "read-post_delivery-layered": {
+      "rate_wait_seconds": 19.993719800026156,
+      "model_responses": 2,
+      "input_tokens": 4923,
+      "cached_input_tokens": 2278,
+      "output_tokens": 808,
+      "reasoning_tokens": 594,
+      "max_input_tokens": 2642,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 405,
+      "estimated_generation_usd": "0.000757255"
+    },
+    "read-post_delivery-full_history": {
+      "rate_wait_seconds": 9.998600699938834,
+      "model_responses": 1,
+      "input_tokens": 1534,
+      "cached_input_tokens": 0,
+      "output_tokens": 702,
+      "reasoning_tokens": 552,
+      "max_input_tokens": 1534,
+      "estimated_generation_usd": "0.000542675"
+    },
+    "read-maintenance-full_history": {
+      "rate_wait_seconds": 9.996913700015284,
+      "model_responses": 1,
+      "input_tokens": 1540,
+      "cached_input_tokens": 0,
+      "output_tokens": 724,
+      "reasoning_tokens": 516,
+      "max_input_tokens": 1540,
+      "estimated_generation_usd": "0.000554425"
+    },
+    "read-maintenance-layered": {
+      "rate_wait_seconds": 19.994503800058737,
+      "model_responses": 2,
+      "input_tokens": 5088,
+      "cached_input_tokens": 3917,
+      "output_tokens": 795,
+      "reasoning_tokens": 534,
+      "max_input_tokens": 2801,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 556,
+      "estimated_generation_usd": "0.000582895"
+    },
+    "read-infrequent_work-layered": {
+      "rate_wait_seconds": 19.994104799930938,
+      "model_responses": 2,
+      "input_tokens": 5350,
+      "cached_input_tokens": 4112,
+      "output_tokens": 472,
+      "reasoning_tokens": 295,
+      "max_input_tokens": 2868,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 417,
+      "estimated_generation_usd": "0.000431720"
+    },
+    "read-infrequent_work-full_history": {
+      "rate_wait_seconds": 9.998030900023878,
+      "model_responses": 1,
+      "input_tokens": 1756,
+      "cached_input_tokens": 0,
+      "output_tokens": 605,
+      "reasoning_tokens": 480,
+      "max_input_tokens": 1756,
+      "estimated_generation_usd": "0.000521925"
+    },
+    "read-resolved_approval-full_history": {
+      "rate_wait_seconds": 9.998610000009649,
+      "model_responses": 1,
+      "input_tokens": 1761,
+      "cached_input_tokens": 0,
+      "output_tokens": 947,
+      "reasoning_tokens": 726,
+      "max_input_tokens": 1761,
+      "estimated_generation_usd": "0.000693550"
+    },
+    "read-resolved_approval-layered": {
+      "rate_wait_seconds": 19.994045999948867,
+      "model_responses": 2,
+      "input_tokens": 5561,
+      "cached_input_tokens": 4117,
+      "output_tokens": 666,
+      "reasoning_tokens": 383,
+      "max_input_tokens": 3074,
+      "tool_calls": 1,
+      "tool:read_work_understanding": 1,
+      "tool_errors": 0,
+      "read_characters": 641,
+      "estimated_generation_usd": "0.000554520"
+    }
+  },
+  "totals": {
+    "layered/maintenance": {
+      "rate_wait_seconds": 209.87323199992534,
+      "model_responses": 21,
+      "input_tokens": 107403,
+      "cached_input_tokens": 79824,
+      "output_tokens": 8561,
+      "reasoning_tokens": 3324,
+      "max_input_tokens": 8763,
+      "tool_calls": 36,
+      "tool:read_work_situation_map": 1,
+      "tool_errors": 0,
+      "read_characters": 8557,
+      "tool:create_work_situation": 3,
+      "tool:read_work_situation": 13,
+      "tool:create_work_understanding": 5,
+      "tool:update_work_situation": 4,
+      "tool:read_work_understanding": 7,
+      "tool:update_work_understanding": 3,
+      "estimated_generation_usd": "0.008524540"
+    },
+    "layered/reading": {
+      "rate_wait_seconds": 79.9763743999647,
+      "model_responses": 8,
+      "input_tokens": 20922,
+      "cached_input_tokens": 14424,
+      "output_tokens": 2741,
+      "reasoning_tokens": 1806,
+      "max_input_tokens": 3074,
+      "tool_calls": 4,
+      "tool:read_work_understanding": 4,
+      "tool_errors": 0,
+      "read_characters": 2019,
+      "estimated_generation_usd": "0.002326390"
+    },
+    "full_history/reading": {
+      "rate_wait_seconds": 39.992155299987644,
+      "model_responses": 4,
+      "input_tokens": 6591,
+      "cached_input_tokens": 0,
+      "output_tokens": 2978,
+      "reasoning_tokens": 2274,
+      "max_input_tokens": 1761,
+      "estimated_generation_usd": "0.002312575"
+    }
+  },
+  "snapshots": {
+    "workspace-corrections-b1.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 433,
+        "reference_edges": 8,
+        "map_characters": 287
+      },
+      "work_understanding": {
+        "objects": 4,
+        "body_characters": 567,
+        "reference_edges": 4,
+        "map_characters": 440
+      }
+    },
+    "workspace-corrections-b2.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 433,
+        "reference_edges": 8,
+        "map_characters": 287
+      },
+      "work_understanding": {
+        "objects": 4,
+        "body_characters": 604,
+        "reference_edges": 4,
+        "map_characters": 469
+      }
+    },
+    "workspace-extension-b1.json": {
+      "work_situation": {
+        "objects": 3,
+        "body_characters": 581,
+        "reference_edges": 10,
+        "map_characters": 450
+      },
+      "work_understanding": {
+        "objects": 4,
+        "body_characters": 604,
+        "reference_edges": 4,
+        "map_characters": 469
+      }
+    },
+    "workspace-extension-b2.json": {
+      "work_situation": {
+        "objects": 3,
+        "body_characters": 581,
+        "reference_edges": 10,
+        "map_characters": 450
+      },
+      "work_understanding": {
+        "objects": 5,
+        "body_characters": 780,
+        "reference_edges": 5,
+        "map_characters": 594
+      }
+    },
+    "workspace-initial-b1.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 398,
+        "reference_edges": 6,
+        "map_characters": 255
+      },
+      "work_understanding": {
+        "objects": 0,
+        "body_characters": 0,
+        "reference_edges": 0,
+        "map_characters": 2
+      }
+    },
+    "workspace-initial-b2.json": {
+      "work_situation": {
+        "objects": 2,
+        "body_characters": 398,
+        "reference_edges": 6,
+        "map_characters": 255
+      },
+      "work_understanding": {
+        "objects": 4,
+        "body_characters": 567,
+        "reference_edges": 4,
+        "map_characters": 440
+      }
+    }
+  },
+  "reader_selection": {
+    "read-post_delivery-layered": {
+      "body_characters": 137,
+      "raw_text_characters": 0,
+      "initial_context_json_characters": 912,
+      "initial_map_json_characters": 778,
+      "seconds": 30.812099599977955,
+      "available_understandings": 4,
+      "available_situations": 2,
+      "read_bodies": [
+        [
+          "work_understanding",
+          "甲電商交付後前端缺陷回覆與修復"
+        ]
+      ],
+      "raw_sequences": [],
+      "preloaded_raw_messages": 0,
+      "references": [
+        {
+          "kind": "work_understanding",
+          "target_title": "甲電商交付後前端缺陷回覆與修復"
+        }
+      ],
+      "reachable_interview_sequences": [
+        2,
+        6,
+        8,
+        12
+      ]
+    },
+    "read-post_delivery-full_history": {
+      "raw_text_characters": 530,
+      "initial_context_json_characters": 1448,
+      "initial_map_json_characters": 0,
+      "seconds": 18.73968439991586,
+      "available_understandings": 0,
+      "available_situations": 0,
+      "read_bodies": [],
+      "raw_sequences": [
+        1,
+        10,
+        11,
+        12,
+        13,
+        14,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "preloaded_raw_messages": 14,
+      "references": [
+        {
+          "kind": "interview",
+          "sequences": [
+            6,
+            8,
+            12
+          ]
+        }
+      ],
+      "reachable_interview_sequences": [
+        6,
+        8,
+        12
+      ]
+    },
+    "read-maintenance-layered": {
+      "body_characters": 206,
+      "raw_text_characters": 0,
+      "initial_context_json_characters": 918,
+      "initial_map_json_characters": 778,
+      "seconds": 30.808053400018252,
+      "available_understandings": 4,
+      "available_situations": 2,
+      "read_bodies": [
+        [
+          "work_understanding",
+          "乙預約網站交付後前端維護與範圍外變更核准"
+        ]
+      ],
+      "raw_sequences": [],
+      "preloaded_raw_messages": 0,
+      "references": [
+        {
+          "kind": "work_understanding",
+          "target_title": "乙預約網站交付後前端維護與範圍外變更核准"
+        }
+      ],
+      "reachable_interview_sequences": [
+        4,
+        6,
+        10,
+        14
+      ]
+    },
+    "read-maintenance-full_history": {
+      "raw_text_characters": 530,
+      "initial_context_json_characters": 1454,
+      "initial_map_json_characters": 0,
+      "seconds": 18.28421700000763,
+      "available_understandings": 0,
+      "available_situations": 0,
+      "read_bodies": [],
+      "raw_sequences": [
+        1,
+        10,
+        11,
+        12,
+        13,
+        14,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "preloaded_raw_messages": 14,
+      "references": [
+        {
+          "kind": "interview",
+          "sequences": [
+            6,
+            10,
+            14
+          ]
+        }
+      ],
+      "reachable_interview_sequences": [
+        6,
+        10,
+        14
+      ]
+    },
+    "read-infrequent_work-layered": {
+      "body_characters": 127,
+      "raw_text_characters": 0,
+      "initial_context_json_characters": 1196,
+      "initial_map_json_characters": 1066,
+      "seconds": 29.146776200039312,
+      "available_understandings": 5,
+      "available_situations": 3,
+      "read_bodies": [
+        [
+          "work_understanding",
+          "甲電商年度促銷素材更換與上線確認"
+        ]
+      ],
+      "raw_sequences": [],
+      "preloaded_raw_messages": 0,
+      "references": [
+        {
+          "kind": "work_understanding",
+          "target_title": "甲電商年度促銷素材更換與上線確認"
+        }
+      ],
+      "reachable_interview_sequences": [
+        18
+      ]
+    },
+    "read-infrequent_work-full_history": {
+      "raw_text_characters": 705,
+      "initial_context_json_characters": 1853,
+      "initial_map_json_characters": 0,
+      "seconds": 17.3125013000099,
+      "available_understandings": 0,
+      "available_situations": 0,
+      "read_bodies": [],
+      "raw_sequences": [
+        1,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "preloaded_raw_messages": 18,
+      "references": [
+        {
+          "kind": "interview",
+          "sequences": [
+            18
+          ]
+        }
+      ],
+      "reachable_interview_sequences": [
+        18
+      ]
+    },
+    "read-resolved_approval-layered": {
+      "body_characters": 255,
+      "raw_text_characters": 0,
+      "initial_context_json_characters": 1200,
+      "initial_map_json_characters": 1066,
+      "seconds": 28.67024590005167,
+      "available_understandings": 5,
+      "available_situations": 3,
+      "read_bodies": [
+        [
+          "work_understanding",
+          "乙預約網站交付後前端維護與範圍外變更核准"
+        ]
+      ],
+      "raw_sequences": [],
+      "preloaded_raw_messages": 0,
+      "references": [
+        {
+          "kind": "work_understanding",
+          "target_title": "乙預約網站交付後前端維護與範圍外變更核准"
+        }
+      ],
+      "reachable_interview_sequences": [
+        4,
+        6,
+        10,
+        14,
+        16
+      ]
+    },
+    "read-resolved_approval-full_history": {
+      "raw_text_characters": 705,
+      "initial_context_json_characters": 1857,
+      "initial_map_json_characters": 0,
+      "seconds": 20.22589010000229,
+      "available_understandings": 0,
+      "available_situations": 0,
+      "read_bodies": [],
+      "raw_sequences": [
+        1,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "preloaded_raw_messages": 18,
+      "references": [
+        {
+          "kind": "interview",
+          "sequences": [
+            6,
+            10,
+            14,
+            16
+          ]
+        }
+      ],
+      "reachable_interview_sequences": [
+        6,
+        10,
+        14,
+        16
+      ]
+    }
+  },
+  "transitions": {
+    "initial": {
+      "added": [
+        "object_1",
+        "object_2",
+        "object_3",
+        "object_4",
+        "object_5",
+        "object_6"
+      ],
+      "removed": [],
+      "changed": [],
+      "unchanged": []
+    },
+    "corrections": {
+      "added": [],
+      "removed": [],
+      "changed": [
+        "object_1",
+        "object_2",
+        "object_4",
+        "object_6"
+      ],
+      "unchanged": [
+        "object_3",
+        "object_5"
+      ]
+    },
+    "extension": {
+      "added": [
+        "object_7",
+        "object_8"
+      ],
+      "removed": [],
+      "changed": [
+        "object_2",
+        "object_6"
+      ],
+      "unchanged": [
+        "object_1",
+        "object_3",
+        "object_4",
+        "object_5"
+      ]
+    }
+  },
+  "run_summary": {
+    "status": "completed",
+    "outcomes": [
+      {
+        "cell": "initial-b1",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 45.69509920000564
+      },
+      {
+        "cell": "initial-b2",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 45.92290779994801
+      },
+      {
+        "cell": "corrections-b1",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 50.617542700027116
+      },
+      {
+        "cell": "corrections-b2",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 43.38037770008668
+      },
+      {
+        "cell": "extension-b1",
+        "status": "completed",
+        "steps": 6,
+        "seconds": 89.89109630009625
+      },
+      {
+        "cell": "extension-b2",
+        "status": "completed",
+        "steps": 3,
+        "seconds": 48.598640999989584
+      },
+      {
+        "cell": "read-post_delivery-layered",
+        "status": "completed",
+        "steps": 2,
+        "seconds": 30.812099599977955
+      },
+      {
+        "cell": "read-post_delivery-full_history",
+        "status": "completed",
+        "steps": 1,
+        "seconds": 18.73968439991586
+      },
+      {
+        "cell": "read-maintenance-full_history",
+        "status": "completed",
+        "steps": 1,
+        "seconds": 18.28421700000763
+      },
+      {
+        "cell": "read-maintenance-layered",
+        "status": "completed",
+        "steps": 2,
+        "seconds": 30.808053400018252
+      },
+      {
+        "cell": "read-infrequent_work-layered",
+        "status": "completed",
+        "steps": 2,
+        "seconds": 29.146776200039312
+      },
+      {
+        "cell": "read-infrequent_work-full_history",
+        "status": "completed",
+        "steps": 1,
+        "seconds": 17.3125013000099
+      },
+      {
+        "cell": "read-resolved_approval-full_history",
+        "status": "completed",
+        "steps": 1,
+        "seconds": 20.22589010000229
+      },
+      {
+        "cell": "read-resolved_approval-layered",
+        "status": "completed",
+        "steps": 2,
+        "seconds": 28.67024590005167
+      }
+    ],
+    "failure": null,
+    "budget": {
+      "occupied_usd": "0.016463505",
+      "prior_occupied_usd": "1.295271975",
+      "cumulative_occupied_usd": "1.311735480",
+      "pending": {
+        "initial-b1-1": "0.0001",
+        "initial-b1-3": "0.0001",
+        "initial-b1-5": "0.0001",
+        "initial-b2-7": "0.0001",
+        "initial-b2-9": "0.0001",
+        "initial-b2-11": "0.0001",
+        "corrections-b1-13": "0.0001",
+        "corrections-b1-15": "0.0001",
+        "corrections-b1-17": "0.0001",
+        "corrections-b2-19": "0.0001",
+        "corrections-b2-21": "0.0001",
+        "corrections-b2-23": "0.0001",
+        "extension-b1-25": "0.0001",
+        "extension-b1-27": "0.0001",
+        "extension-b1-29": "0.0001",
+        "extension-b1-31": "0.0001",
+        "extension-b1-33": "0.0001",
+        "extension-b1-35": "0.0001",
+        "extension-b2-37": "0.0001",
+        "extension-b2-39": "0.0001",
+        "extension-b2-41": "0.0001",
+        "read-post_delivery-layered-43": "0.0001",
+        "read-post_delivery-layered-45": "0.0001",
+        "read-post_delivery-full_history-47": "0.0001",
+        "read-maintenance-full_history-49": "0.0001",
+        "read-maintenance-layered-51": "0.0001",
+        "read-maintenance-layered-53": "0.0001",
+        "read-infrequent_work-layered-55": "0.0001",
+        "read-infrequent_work-layered-57": "0.0001",
+        "read-infrequent_work-full_history-59": "0.0001",
+        "read-resolved_approval-full_history-61": "0.0001",
+        "read-resolved_approval-layered-63": "0.0001",
+        "read-resolved_approval-layered-65": "0.0001"
+      },
+      "outbound_calls": 66,
+      "elapsed_seconds": 518.0365866000066
+    }
+  }
+}

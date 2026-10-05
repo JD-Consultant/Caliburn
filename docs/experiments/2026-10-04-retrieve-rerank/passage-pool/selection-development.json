@@ -1,0 +1,33 @@
+{
+  "status": "experimental only; no production threshold",
+  "criteria": "complete coverage of engineering-labeled source-supported topics in development; then fewer mean characters, smaller N",
+  "chosen": {
+    "dense_only": null,
+    "rerank": {
+      "method": "rerank",
+      "n": 200,
+      "cosine": 0.65,
+      "k": 20,
+      "cross": null,
+      "development": {
+        "queries": 16,
+        "positive_queries": 10,
+        "complete_queries": 10,
+        "topic_coverage_macro": 1.0,
+        "secondary_covered": 2,
+        "secondary_total": 2,
+        "mean_documents": 9.5625,
+        "mean_characters": 10540.0625,
+        "mean_character_retention_ratio": 0.013228986243944071,
+        "labeled_relevant_recall_macro": 0.975
+      }
+    }
+  },
+  "inputs_sha256": {
+    "frozen-v4.json": "9810a9c27f8f41c7e766f979c6f51fba504ec5cf9e1585fc676854c3eac167d9",
+    "execution-manifest.json": "c5d07cadfcd691abcb7eca418b285214ae690d46de36e63f1d3f422cc1edb938",
+    "prepared.json": "fca9877eaf7516b9205f5d596c25ee002ac0891dad638b9331464c431b70b2cd",
+    "rerank-pairs.jsonl": "56946410aecc4ca9a1aedbad11b4a7db8a628a867cd9e79854a4162c5f957995",
+    "analyze-v2.py": "4a58d265572f06b5df5e0ed6bc18b08fd7e633c4c03377dba1c5bc897f4d9832"
+  }
+}

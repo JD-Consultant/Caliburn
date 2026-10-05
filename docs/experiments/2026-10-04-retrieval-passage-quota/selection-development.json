@@ -1,0 +1,58 @@
+{
+  "criteria": "12/12 known positives and 64/64 supported topics, then mean characters, pair comparisons, N, K",
+  "chosen": {
+    "global_dense": null,
+    "global_rerank": {
+      "method": "global_rerank",
+      "n": 200,
+      "k": 20,
+      "metrics": {
+        "cases": 18,
+        "positive_cases": 12,
+        "complete_cases": 12,
+        "covered": 64,
+        "total": 64,
+        "secondary_covered": 4,
+        "secondary_total": 4,
+        "mean_characters": 26900.055555555555,
+        "mean_documents": 20,
+        "mean_pair_comparisons": 644.4444444444445
+      }
+    },
+    "quota_dense": {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 10,
+      "metrics": {
+        "cases": 18,
+        "positive_cases": 12,
+        "complete_cases": 12,
+        "covered": 64,
+        "total": 64,
+        "secondary_covered": 4,
+        "secondary_total": 4,
+        "mean_characters": 20268.666666666668,
+        "mean_documents": 23.77777777777778,
+        "mean_pair_comparisons": 0
+      }
+    },
+    "quota_rerank": {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5,
+      "metrics": {
+        "cases": 18,
+        "positive_cases": 12,
+        "complete_cases": 12,
+        "covered": 64,
+        "total": 64,
+        "secondary_covered": 4,
+        "secondary_total": 4,
+        "mean_characters": 14918.055555555555,
+        "mean_documents": 12.055555555555555,
+        "mean_pair_comparisons": 64.44444444444444
+      }
+    }
+  },
+  "holdout_not_used": true
+}

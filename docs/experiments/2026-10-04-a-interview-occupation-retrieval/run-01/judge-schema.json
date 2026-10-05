@@ -1,0 +1,64 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "grade": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        null
+      ]
+    },
+    "uncertain": {
+      "type": "boolean"
+    },
+    "main_work": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reason": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "employee_quote": {
+            "type": "string"
+          },
+          "reference_quote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "employee_quote",
+          "reference_quote"
+        ]
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "grade",
+    "uncertain",
+    "main_work",
+    "reason",
+    "evidence",
+    "limitations"
+  ]
+}

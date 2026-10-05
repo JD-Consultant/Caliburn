@@ -1,0 +1,20 @@
+{
+  "created_utc": "2026-10-04T12:11:49.015213+00:00",
+  "passed": true,
+  "frozen_draft_inputs_unchanged": 4,
+  "protected_inputs_unchanged": 8,
+  "prior_sealed_artifacts_unchanged": 474,
+  "model_responses": 63,
+  "estimated_usage_usd": "0.035030905",
+  "known_strong_pairs_traced": 5,
+  "checked_documents": 11,
+  "local_links_exist": 158,
+  "own_services_stopped": true,
+  "independent_review": "review.md",
+  "semantic_limitations": [
+    "same-anchor regression is not independent calibration",
+    "F04 facet granularity",
+    "F04 cross-object 1/2 boundary"
+  ],
+  "scope": "source integrity, usage, trace, documentation and cleanup only; not semantic correctness"
+}

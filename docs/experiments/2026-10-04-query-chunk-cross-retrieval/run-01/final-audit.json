@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "query_originals_unchanged": 30,
+  "public_vector_batches_hashed": 346,
+  "old_pair_grades_unchanged": 117,
+  "new_valid_responses": 8,
+  "quote_repairs": 0,
+  "max_native_cosine_error": 1.1751134398885199e-07,
+  "previous_unchanged_files": 1672,
+  "protected_inputs": 8,
+  "estimated_usd": "0.005628700",
+  "links_checked": 167,
+  "owned_services_stopped": true,
+  "no_production_change_by_this_experiment": true,
+  "no_commit_push_merge": true,
+  "independent_review_recorded": true
+}

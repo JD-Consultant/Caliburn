@@ -1,0 +1,16 @@
+{
+  "event_id": "e060",
+  "execution_id": "8ac314bd-7e6e-4c8b-9838-060106e37039",
+  "employee_input": {
+    "source_id": "8f3540f5-9a5c-4a98-9d20-c851dc939e7b",
+    "interview_sequence": 120,
+    "speaker": "employee",
+    "interview_text": "請確認冷藏退貨的温度門檻、單據要保存幾年、我是否需要堆高機證照。已知的就說，尚未確認不要自行補進JD。"
+  },
+  "consultant_reply": {
+    "source_id": "aa7a48e8-5d3c-4704-be78-f104769c03c6",
+    "interview_sequence": 121,
+    "speaker": "consultant",
+    "interview_text": "已核對目前可確認的內容：\n\n- **冷藏退貨溫度門檻：尚未確認。**您會核對溫度紀錄，並交由品質窗口判定是否可再銷售；JD 不填入自行推定的溫度數字。\n- **單據保存年限：尚未確認。**單據與核准紀錄依公司規則存於共享資料夾，檔名含日期與原單號；保存年限需向財務確認，不自行填寫年數。\n- **堆高機證照：不需要。**公司沒有要求您操作堆高機，也不會因職稱推定需持有相關證照。\n\n這些已知界線可保留在 JD；兩項尚未確認的標準不會自行補入。"
+  }
+}

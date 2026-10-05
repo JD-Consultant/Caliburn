@@ -1,0 +1,50 @@
+test_duplicate_chunk_rejected (test_probe.RouteTests.test_duplicate_chunk_rejected) ... ERROR
+test_nonfinite_vector_rejected (test_probe.RouteTests.test_nonfinite_vector_rejected) ... ERROR
+test_normalization_and_parent_max_avoid_chunk_count_votes (test_probe.RouteTests.test_normalization_and_parent_max_avoid_chunk_count_votes) ... ERROR
+test_zero_query_rejected_instead_of_arbitrary_candidates (test_probe.RouteTests.test_zero_query_rejected_instead_of_arbitrary_candidates) ... ERROR
+
+======================================================================
+ERROR: test_duplicate_chunk_rejected (test_probe.RouteTests.test_duplicate_chunk_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-b1-dual-route-retrieval\run-01\test_probe.py", line 29, in test_duplicate_chunk_rejected
+    score_route([{'parent_id': 'a', 'chunk_id': 'same'}] * 2, np.array([[1., 0.], [0., 1.]]), [1., 0.])
+  File "S:\caliburn\docs\experiments\2026-10-05-b1-dual-route-retrieval\run-01\probe.py", line 5, in score_route
+    raise NotImplementedError('offline route scoring not implemented')
+NotImplementedError: offline route scoring not implemented
+
+======================================================================
+ERROR: test_nonfinite_vector_rejected (test_probe.RouteTests.test_nonfinite_vector_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-b1-dual-route-retrieval\run-01\test_probe.py", line 25, in test_nonfinite_vector_rejected
+    score_route([{'parent_id': 'a', 'chunk_id': 'a1'}], np.array([[float('nan'), 0.]]), [1., 0.])
+  File "S:\caliburn\docs\experiments\2026-10-05-b1-dual-route-retrieval\run-01\probe.py", line 5, in score_route
+    raise NotImplementedError('offline route scoring not implemented')
+NotImplementedError: offline route scoring not implemented
+
+======================================================================
+ERROR: test_normalization_and_parent_max_avoid_chunk_count_votes (test_probe.RouteTests.test_normalization_and_parent_max_avoid_chunk_count_votes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-b1-dual-route-retrieval\run-01\test_probe.py", line 12, in test_normalization_and_parent_max_avoid_chunk_count_votes
+    scores, parents = score_route(rows, np.array([[2., 0.], [2., 1.], [1., 0.]]), [10., 0.])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-05-b1-dual-route-retrieval\run-01\probe.py", line 5, in score_route
+    raise NotImplementedError('offline route scoring not implemented')
+NotImplementedError: offline route scoring not implemented
+
+======================================================================
+ERROR: test_zero_query_rejected_instead_of_arbitrary_candidates (test_probe.RouteTests.test_zero_query_rejected_instead_of_arbitrary_candidates)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-05-b1-dual-route-retrieval\run-01\test_probe.py", line 21, in test_zero_query_rejected_instead_of_arbitrary_candidates
+    score_route([{'parent_id': 'a', 'chunk_id': 'a1'}], np.array([[1., 0.]]), [0., 0.])
+  File "S:\caliburn\docs\experiments\2026-10-05-b1-dual-route-retrieval\run-01\probe.py", line 5, in score_route
+    raise NotImplementedError('offline route scoring not implemented')
+NotImplementedError: offline route scoring not implemented
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+FAILED (errors=4)

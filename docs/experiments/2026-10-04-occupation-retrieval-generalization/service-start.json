@@ -1,0 +1,9 @@
+{
+  "container": "/caliburn-ocs-eval-embedder-1",
+  "image": "sha256:f21629b9ae4ed11231768edfaed0f40d41d85d6ea9a71e8096a3d96ea0311772",
+  "running": true,
+  "started_at": "2026-10-04T01:24:43.758926176Z",
+  "loopback_port": "127.0.0.1:8082",
+  "qdrant_pid": 58280,
+  "qdrant_executable": "S:\\caliburn\\tmp\\ocs-eval-qdrant\\qdrant.exe"
+}

@@ -1,0 +1,6 @@
+{
+  "reason": "The original CLI imported unavailable python-dotenv before admission. No started.json, trace or paid requests existed. This launcher uses the existing product credential reader and calls the same frozen execute().",
+  "launcher_sha256": "9fdabb419ad85dda38387036086d079ea1ae865425ed1acbe8b9530d71655ca5",
+  "credential_reader_sha256": "b525b0733ff1264cfbcc35c9542e3152dbb8b318c9996d1229d124f57f46a6ce",
+  "changes_to_frozen_materials": false
+}

@@ -1,0 +1,16 @@
+{
+  "event_id": "e049",
+  "execution_id": "3f554a79-c8ba-4c68-ab62-d8522c668710",
+  "employee_input": {
+    "source_id": "1a369141-20b6-4361-a317-d656d8661705",
+    "interview_sequence": 98,
+    "speaker": "employee",
+    "interview_text": "之前月底那張用來看滯留庫存的表，交付時間改成次月第一個工作日。它仍是按月底狀態整理，不改成當天狀態；早上交客服的退貨差異表和週五的收貨異常週報都不變。"
+  },
+  "consultant_reply": {
+    "source_id": "27916a97-6598-47f2-ab6d-baa7bede3583",
+    "interview_sequence": 99,
+    "speaker": "consultant",
+    "interview_text": "已將庫存帳齡表改為依月底狀態整理，於**次月第一個工作日**交主管；退貨差異表與週五收貨異常週報的時程維持不變。\n\n回到週三抽盤：您挑出近期收退貨頻繁的品項後，是先交主管確認再盤，還是盤完再提交差異清單？"
+  }
+}

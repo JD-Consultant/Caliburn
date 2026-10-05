@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "employees": 18,
+  "topics": 64,
+  "full805_max_cosine_rankings": 18,
+  "qdrant_passage_queries": 58,
+  "candidate_document_scores": 3600,
+  "parameter_rows": 8640,
+  "warm_timing_samples": 10,
+  "database_native_scores_recomputed": 58,
+  "database_max_score_error": 1.1947672273748822e-07
+}

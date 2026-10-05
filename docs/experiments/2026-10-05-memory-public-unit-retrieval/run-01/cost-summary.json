@@ -1,0 +1,9 @@
+{
+  "response_calls": 45,
+  "estimated_or_reserved_usd": "0.044907465",
+  "all_usage_known": true,
+  "is_provider_invoice": false,
+  "new_embeddings": 0,
+  "new_memory_calls": 0,
+  "local_rerank_provider_calls": 0
+}

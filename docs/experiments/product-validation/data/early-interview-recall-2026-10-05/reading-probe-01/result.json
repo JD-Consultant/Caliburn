@@ -1,0 +1,46 @@
+{
+  "status": "completed",
+  "last_phase": {
+    "arm": "precision",
+    "case_id": "narrow"
+  },
+  "completed": [
+    "control-map_present",
+    "navigation-map_present",
+    "navigation-map_absent",
+    "control-map_absent",
+    "control-historical",
+    "navigation-historical",
+    "precision-detail",
+    "control-detail",
+    "control-narrow",
+    "precision-narrow"
+  ],
+  "usage": {
+    "input_tokens": 201557,
+    "output_tokens": 4420,
+    "reasoning_tokens": 2501,
+    "cached_input_tokens": 112991,
+    "cache_write_input_tokens": 88500,
+    "total_tokens": 205977,
+    "outbound_calls": 44,
+    "count_calls": 22,
+    "generation_calls": 22,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 201557,
+    "prior_usd": "1.425661625",
+    "batch_limit_usd": "0.05",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0022",
+    "actual_estimated_usd": "0.014409010",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.016609010",
+    "cumulative_occupied_usd": "1.442270635",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 101.34612560004462,
+    "seconds_limit": 900,
+    "stop_reason": null
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "case_id": "boundaries",
+  "arm": "candidate",
+  "repeat": 1,
+  "cell_id": "boundaries-candidate-1",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding_map",
+      "arguments": {},
+      "result_characters": 185
+    },
+    {
+      "step": 2,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6465
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 5699,
+        "input_tokens_details": {
+          "cache_write_tokens": 1704,
+          "cached_tokens": 3992
+        },
+        "output_tokens": 63,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 5762
+      },
+      "estimated_usd": "0.000284720",
+      "seconds": 1.9058678000001237,
+      "counted_input_tokens": 5699
+    },
+    {
+      "usage": {
+        "input_tokens": 5914,
+        "input_tokens_details": {
+          "cache_write_tokens": 215,
+          "cached_tokens": 5696
+        },
+        "output_tokens": 37,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 5951
+      },
+      "estimated_usd": "0.000102635",
+      "seconds": 1.6100358000257984,
+      "counted_input_tokens": 5914
+    },
+    {
+      "usage": {
+        "input_tokens": 11412,
+        "input_tokens_details": {
+          "cache_write_tokens": 5498,
+          "cached_tokens": 5911
+        },
+        "output_tokens": 935,
+        "output_tokens_details": {
+          "reasoning_tokens": 228
+        },
+        "total_tokens": 12347
+      },
+      "estimated_usd": "0.001214160",
+      "seconds": 8.662015799956862,
+      "counted_input_tokens": 11412
+    }
+  ],
+  "answer": {
+    "findings": "產品召回是低頻但明確存在的工作：本人依品質窗口提供的品號、批號，查核各店可售、待檢、在途調撥及其他庫存，促成倉庫隔離，向主管與品質窗口提供影響範圍，並追蹤隔離量、回收量及店方回覆，直到主管確認紀錄齊全。本人不決定召回範圍、不自行把未列批號判為安全，也不決定解除隔離或宣布恢復銷售；品質窗口決定召回範圍與是否解除，客服負責對客通知，採購聯繫供應商。這應保留為一項低頻召回盤查與隔離追蹤工作，不按每次事件另造永久職責。\n\n休假交接屬延續性的工作支援：休假前交接未結案差異、預計到貨及當日截止事項，附原單號、狀態與下一聯絡窗口；返崗後核對代理期間的登錄和完成事項，以避免重複入帳或狀態不一致。現有資料支持本人負責資訊交接及返崗核對，未支持本人負責代理人的整體工作或作出其職權內的核准決定。若發現代理登錄與原紀錄不一致，具體更正、通知或升級程序尚未說明。\n\n單據及核准紀錄依公司既有規則存於共享資料夾，檔名含日期及原單號；稽核缺件時列明缺件並請相關窗口補充，不重製文件冒充原核准。本人有保存與追溯紀錄的作業責任，但文件保存年限不確定，不能據此寫出數字年限。\n\n冷藏退貨由本人核對溫度紀錄並交品質窗口判定是否可再銷售；本人不自行決定溫度是否合格。合格門檻本人不清楚，因此目前不足以寫成數字要求。建議追問：冷藏退貨適用的溫度合格範圍（及若有的測量／超限判定條件）是什麼，依據由哪個窗口確認？文件保存方面，建議追問：公司對相關單據及核准紀錄規定的保存年限是多少，是否依文件類型而異、由哪個窗口確認？",
+    "references": [
+      {
+        "kind": "work_understanding",
+        "interview_sequence": null,
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      }
+    ],
+    "questions": [
+      "冷藏退貨的溫度合格範圍，以及適用的測量或超限判定條件是什麼？應由哪個窗口確認其依據？",
+      "相關單據與核准紀錄的保存年限是多少？是否依文件類型而異，並由哪個窗口確認？"
+    ]
+  },
+  "seconds": 44.95769240002846
+}

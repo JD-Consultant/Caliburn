@@ -1,0 +1,23 @@
+# SDD ledger — plan: docs/plans/2026-10-04-occupation-retrieval-experiment.md
+
+- 授權：使用者要求自主比較、選型、調參並保留詳細原件；隔離研究，不提交或接 production。
+- Task 1 Red：8 個計分／清理反例全部因預期行為缺失而失敗；Green：8 passed（2026-10-04）。
+- Ruling：大型 CUDA build 下載過慢，停止核對身分後的自有 compose CLI，重用本機 `unsloth/unsloth` Linux GPU image（torch 2.10.0+cu128、transformers 4.57.6），安裝 FlagEmbedding 1.4.0；保留實際 image digest 與模型 commit，不宣稱與原 Dockerfile 的 torch 2.6 完全等價。
+- Ruling：索引前發現 4 組 OCS code 碰撞（8 文件），含 Unknown，先全組 quarantine，避免任選檔案或資料覆寫。再排除 2 份缺職位名稱；正式比較凍結 corpus 805。此為尚待人工 PDF/source 身分複核的限制，沒有擅修原始 JSON。
+- Pre-flight：Task 2 consumes Task 1 的 frozen corpus/cases；Task 3 只讀同一結果，不修改 labels 或 holdout。重複庫存快照按 employee_group 聚合，不偽造獨立樣本數。
+- Task 1 complete：15 項離線／實際 Qdrant 測試通過；額外 Red→Green 防具語意標題被刪、sparse 零分拿假票、缺／錯 B1 revision，以及 exact 回傳少項／倒序／重複仍被錯認正確。
+- Review：獨立代理提出三個 Important，全部在正式方法比較前修正：所有階段共用排除 sparse 零分的 RRF；run 保存 cache byte-prefix 長度及 hash、所用 keys（未來 append 不使舊 hash 失效）；exact 檢查包含唯一性、足額、score 順序及 tie-aware rank。另補 validation.py hash、全部 B1 引用 exact revision 檢查。
+- 環境失敗保留：run-01／02 因 S: 滿而停止。替代下載部分移 C:（13 檔、308,584,528 bytes）；自有 Qdrant 預檢 mmap 儲存移 C: 全部保留，釋出 2.4 GB。沒有 quality outcome 被改分。run-01 的 6、run-02 的 570 條完整向量快取接續使用，兩份原始 cache prefix 都保存，沒有把重算當成新自然生成樣本。
+- Ruling：Qdrant 1.18.2 Windows 長絕對路徑造成 Gridstore os error 3；以 S:/caliburn/tmp/qeval junction 指向允許的 C: 專用 runtime 路徑，避免長路徑且不占 S: 容量。舊測試資料保留。
+- Ruling：run-03 input15 結果完成，B2 在兩個 synthetic employee_group 下排序較佳；representation 尚無結果即因2份 description 空而停止。revision2/run-04 明示 description fallback 到 TOP，維持同805集合，沒有替換有效 input outcomes 或事後改 labels。輸入選擇只屬試點；stage2人工正文不冒充自然B2跨職務評估。
+- Failure：run-04 於 threshold 保存因 NumPy int64 不能 JSON 序列化停止；轉 Python int/float 後 run-05 以同模型快取重現。run-04 已有結果保留，不算新自然生成樣本。
+- Method mismatch：run-05 的短 probes development 選 TOPKS＋RRF（k20/depth50），原 holdout 有效保留。完整已選 B2 補查顯示 compacted 庫存2/4的主要職位掉出前10；短工作正文不能代表整份 B2，不能採用短案例勝出作實際 Memory 預設。
+- Ruling：memory-01 探索性比較完整 B2 的 TOP/TOPKS × dense/sparse/RRF（固定 k60/depth50）；TOP+dense 分組 nDCG 0.691 最佳，暫選此候選。其後持久腳本在 memory-02 重現全部指標。原 holdout 已見過，candidate-01 明示 regression only/fresh_holdout=false；沒有把重選後分數冒稱獨立驗證，未修改標註。
+- Parameters：候選前10，當前805職位用 exact dense；ANN ef64 為網格候選未採用。development provisional cosine0.675，資訊不足負例0.698433仍接受，因此正式接受門檻未定，亦未驗 JD 結束。
+- Audit Red→Green：資料保存稽核4個反例先全部失敗，實作後通過；會攔截cache prefix缺失/改動、score及grade更動、排名截短。pytest Temp 受 Windows sandbox 阻擋，改以已核准的全新工作區暫存目錄執行；這是環境問題，不改計分。
+- Task 2 complete：本機FP16 BGE-M3、805 corpus，完整比較與參數／真Qdrant檢查完成；只下載公開模型，沒有新增外部付費模型呼叫。8192上限，cache最大4310 tokens，未截斷。
+- Verification：19項研究測試、ruff、compileall及diff whitespace檢查通過。離線稽核重算725排名記錄（含網格/快取重現）、320份DB回傳、2454個向量並核818來源hash。不是725個員工，亦不增加獨立品質樣本。
+- Preservation limitation：成功主流程／最終候選目前程式與已記hash相符，另存code-snapshot。早期失敗版及run-05補查的舊腳本只存hash未逐版封存；原排名與cache可由現有等價計算重現。cache/logs保留本機、不提交Git，尚無第二份備份。
+- Final review：獨立代理重算及另用公式核統計，沒有 Critical；補 ANN 證據限制後沒有阻擋結案的 Important。collection起測yellow、named vector count近似，不能僅count≥805證明dense HNSW完整；README 改診斷表、ef64未完成穩定校準。Minor seal命令／必要stage檢查已補，完整紀錄見review.md。
+- Cleanup：最後真Qdrant測試後保存logs、停止僅自有embedder容器與核路徑身分的Qdrant PID36884；所有模型layer、collections、storage保留。正式服務未操作，見services-stopped.json。
+- Task 3 complete：報告、逐例彙整、離線重算、獨立核查及本機數據封存完成。試點候選B2→TOP→dense exact→top10；正式接受門檻、穩定ANN、真人職位品質及JD完成條件均未驗收，不編造完成率。

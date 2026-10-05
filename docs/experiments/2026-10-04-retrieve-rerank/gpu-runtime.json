@@ -1,0 +1,178 @@
+{
+  "load_seconds": 4.633510526000464,
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "gpu_bytes": 8585216000,
+  "dtype": "torch.float16",
+  "attention": "sdpa",
+  "batch_size": 1,
+  "max_pair_tokens": 8192,
+  "prepared_sha256": "1c6f94c7ccd944f0bb25eeb28863f57bacac910f1d515c92cb05ae2b36ee2fce",
+  "worker_sha256": "4347c03b22807b20cc9d8ee812e334ffb1d6d46b370c7d550677af09060db07c",
+  "model_revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+  "torch_version": "2.10.0+cu128",
+  "execution_manifest_sha256": "cd853d3fe99ed6c30d2bcd7c66c3deb21266eb879b3296f7f018e3dba2d2970a",
+  "document_tokenize_seconds": 0.572590386000229,
+  "query_tokenize": [
+    {
+      "case_id": "E01",
+      "arm": "B2",
+      "seconds": 0.00043927400110987946
+    },
+    {
+      "case_id": "E01",
+      "arm": "raw_employee",
+      "seconds": 0.00025837699649855494
+    },
+    {
+      "case_id": "E02",
+      "arm": "B2",
+      "seconds": 0.0006165080048958771
+    },
+    {
+      "case_id": "E02",
+      "arm": "raw_employee",
+      "seconds": 0.00024876499810488895
+    },
+    {
+      "case_id": "E03",
+      "arm": "B2",
+      "seconds": 0.0004718409982160665
+    },
+    {
+      "case_id": "E03",
+      "arm": "raw_employee",
+      "seconds": 0.00023308900563279167
+    },
+    {
+      "case_id": "E04",
+      "arm": "B2",
+      "seconds": 0.0004915469980915077
+    },
+    {
+      "case_id": "E04",
+      "arm": "raw_employee",
+      "seconds": 0.0002806630000122823
+    },
+    {
+      "case_id": "E05",
+      "arm": "B2",
+      "seconds": 0.0004280520006432198
+    },
+    {
+      "case_id": "E05",
+      "arm": "raw_employee",
+      "seconds": 0.00020007300190627575
+    },
+    {
+      "case_id": "E06",
+      "arm": "B2",
+      "seconds": 0.0003956299988203682
+    },
+    {
+      "case_id": "E06",
+      "arm": "raw_employee",
+      "seconds": 0.0002197659996454604
+    },
+    {
+      "case_id": "E07",
+      "arm": "B2",
+      "seconds": 0.00036112400266574696
+    },
+    {
+      "case_id": "E07",
+      "arm": "raw_employee",
+      "seconds": 0.00022208700102055445
+    },
+    {
+      "case_id": "E08",
+      "arm": "B2",
+      "seconds": 0.00046269399899756536
+    },
+    {
+      "case_id": "E08",
+      "arm": "raw_employee",
+      "seconds": 0.00021559299784712493
+    },
+    {
+      "case_id": "E09",
+      "arm": "B2",
+      "seconds": 0.0002772209991235286
+    },
+    {
+      "case_id": "E09",
+      "arm": "raw_employee",
+      "seconds": 0.00011541700223460793
+    },
+    {
+      "case_id": "E10",
+      "arm": "B2",
+      "seconds": 0.00025173700123559684
+    },
+    {
+      "case_id": "E10",
+      "arm": "raw_employee",
+      "seconds": 0.00010397000005468726
+    },
+    {
+      "case_id": "E11",
+      "arm": "B2",
+      "seconds": 0.0004758159993798472
+    },
+    {
+      "case_id": "E11",
+      "arm": "raw_employee",
+      "seconds": 0.0002079740006593056
+    },
+    {
+      "case_id": "E12",
+      "arm": "B2",
+      "seconds": 0.0002863850022549741
+    },
+    {
+      "case_id": "E12",
+      "arm": "raw_employee",
+      "seconds": 0.00010307200136594474
+    },
+    {
+      "case_id": "E13",
+      "arm": "B2",
+      "seconds": 0.0001876050009741448
+    },
+    {
+      "case_id": "E13",
+      "arm": "raw_employee",
+      "seconds": 9.789700561668724e-05
+    },
+    {
+      "case_id": "E14",
+      "arm": "B2",
+      "seconds": 0.0003258439974160865
+    },
+    {
+      "case_id": "E14",
+      "arm": "raw_employee",
+      "seconds": 0.00014656100393040106
+    },
+    {
+      "case_id": "M01",
+      "arm": "raw_employee",
+      "seconds": 0.000286816997686401
+    },
+    {
+      "case_id": "M02",
+      "arm": "raw_employee",
+      "seconds": 0.000282920002064202
+    },
+    {
+      "case_id": "M03",
+      "arm": "raw_employee",
+      "seconds": 0.00035316900175530463
+    },
+    {
+      "case_id": "M04",
+      "arm": "raw_employee",
+      "seconds": 0.00033590500243008137
+    }
+  ],
+  "protocol_amendment_sha256": "fb2bfd1952b9835f2866d8c306b5f371e263979342940a93497cef5214869f0c"
+}

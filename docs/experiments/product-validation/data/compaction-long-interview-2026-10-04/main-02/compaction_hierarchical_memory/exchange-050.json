@@ -1,0 +1,16 @@
+{
+  "event_id": "e050",
+  "execution_id": "0169d57c-c4f2-4309-bae5-70670253ce78",
+  "employee_input": {
+    "source_id": "2906a16c-e6ff-4ca1-9d43-a24af20430e0",
+    "interview_sequence": 100,
+    "speaker": "employee",
+    "interview_text": "補充店間調撥，主管核准後若收貨店臨時不收，我登記原因並請主管確認是改目的店還是退回，不會自行改店別。核准後再更新ERP和雙方通知，原調撥單與新核准資料都要能連起來。"
+  },
+  "consultant_reply": {
+    "source_id": "24a3fe44-e8ec-4191-8509-254fd7e21072",
+    "interview_sequence": 101,
+    "speaker": "consultant",
+    "interview_text": "已補入店間調撥的拒收例外：收貨店臨時不收時，您記錄原因並請主管確認改目的店或退回；核准後才更新 ERP、通知雙方，並保留原調撥單與新核准資料的連結。您不會自行更改店別。\n\n另接續確認週三抽盤：近期收退貨頻繁的品項，是先交主管確認後再盤，還是盤完後再提交差異清單？"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "baseline",
+  "repeat": 1,
+  "case_id": "already_correct",
+  "cell_id": "already_correct-baseline-1",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11006,
+        "input_tokens_details": {
+          "cache_write_tokens": 7278,
+          "cached_tokens": 3725
+        },
+        "output_tokens": 957,
+        "output_tokens_details": {
+          "reasoning_tokens": 692
+        },
+        "total_tokens": 11963
+      },
+      "estimated_usd": "0.001425800",
+      "seconds": 12.135241499985568
+    }
+  ],
+  "proposal": {
+    "changes": [],
+    "questions": [
+      "平常抽盤時，現場實物由誰清點？目前任務只寫本人核對 ERP 與現場清點結果，未明確指定清點責任。",
+      "本人另選近期收貨或退貨頻繁品項交主管確認，是在盤點前確認品項，還是提交查核結果時確認？",
+      "帳實差異表是每次盤點都整理，還是僅在發現差異時整理？若要保留目前表述，此項可待有實例時再確認。"
+    ],
+    "note": "已核對盤點任務的週三抽盤、月底全盤、差異查核、成果表及調帳界線；目前文字與已整理的實際工作相符，無須修改。年終實物全盤與年度稽核分開列示，亦符合已知責任界線。"
+  },
+  "seconds": 23.102996799978428
+}

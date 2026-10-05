@@ -1,0 +1,16 @@
+{
+  "event_id": "e043",
+  "execution_id": "c6c01c53-00e2-49c7-91ec-e52d3720ce27",
+  "employee_input": {
+    "source_id": "2a4db0a8-98d4-4b05-94ef-1e30199806bd",
+    "interview_sequence": 86,
+    "speaker": "employee",
+    "interview_text": "另外我每月核對倉庫掃碼器的備品數，依使用中的設備數量準備5%備品，不足就請主管核准補充。這個5%是設備備品比例，不是前面驗收不良的提報門檻，也不是用商品件數算。"
+  },
+  "consultant_reply": {
+    "source_id": "33b17153-938b-4d15-bf32-28475e18c55a",
+    "interview_sequence": 87,
+    "speaker": "consultant",
+    "interview_text": "已將掃碼器備品核對獨立列為每月任務：依使用中的設備數量維持 5% 備品比例，不足時提請主管核准補充；也註明此比例不同於驗收不良的 5% 門檻。\n\n若依 5% 計算出的備品數不是整數，實務上如何取整或確認數量？"
+  }
+}

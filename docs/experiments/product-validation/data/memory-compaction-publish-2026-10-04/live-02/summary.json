@@ -1,0 +1,93 @@
+{
+  "published_batches": 4,
+  "all_reentries_no_outbound": true,
+  "all_old_snapshots_unchanged": true,
+  "all_role_heads_adopted": true,
+  "readback_checks": [
+    {
+      "arm": "control",
+      "batch": 1,
+      "content_and_revision_unchanged": true,
+      "fixed_chain_coherent": true,
+      "sources_within_frontier": true
+    },
+    {
+      "arm": "control",
+      "batch": 2,
+      "content_and_revision_unchanged": true,
+      "fixed_chain_coherent": true,
+      "sources_within_frontier": true
+    },
+    {
+      "arm": "compacted",
+      "batch": 1,
+      "content_and_revision_unchanged": true,
+      "fixed_chain_coherent": true,
+      "sources_within_frontier": true
+    },
+    {
+      "arm": "compacted",
+      "batch": 2,
+      "content_and_revision_unchanged": true,
+      "fixed_chain_coherent": true,
+      "sources_within_frontier": true
+    }
+  ],
+  "compaction_handoffs": [
+    {
+      "arm": "compacted",
+      "batch": 2,
+      "full_output_prefix_preserved": true
+    },
+    {
+      "arm": "compacted",
+      "batch": 2,
+      "full_output_prefix_preserved": true
+    }
+  ],
+  "groups": [
+    {
+      "arm": "compacted",
+      "batch": 1,
+      "model_calls": 11,
+      "compactions": 0,
+      "input_tokens": 42570,
+      "output_tokens": 2769,
+      "cached_tokens": 37671
+    },
+    {
+      "arm": "compacted",
+      "batch": 2,
+      "model_calls": 10,
+      "compactions": 2,
+      "input_tokens": 62323,
+      "output_tokens": 5035,
+      "cached_tokens": 46738
+    },
+    {
+      "arm": "control",
+      "batch": 1,
+      "model_calls": 8,
+      "compactions": 0,
+      "input_tokens": 27605,
+      "output_tokens": 1345,
+      "cached_tokens": 25136
+    },
+    {
+      "arm": "control",
+      "batch": 2,
+      "model_calls": 11,
+      "compactions": 0,
+      "input_tokens": 65892,
+      "output_tokens": 4872,
+      "cached_tokens": 56011
+    }
+  ],
+  "source_hashes": {
+    "manifest.json": "881ca43e1288f6466db3fb71e84f777ca68a24b4a489ec4d9511bb0e401a8955",
+    "results.jsonl": "04d9b624f3a0b03fdb8dfbf099ab6bcc399a187e40c6b872df00e658e4d7e736",
+    "trace.jsonl": "34626f1b681a73f51438a09a703ce6c4125d4ce49edaeb5b578df17dc4525282",
+    "run.jsonl": "523b3b790ace062b61c81f30f9f35c17ea42b0e257d8719fee87f91f38c54448"
+  },
+  "analysis_script_sha256": "a92fef088e5e5d34f5252a1e5e52a18a866fe75ba6b09f73996186f2e13d63ff"
+}

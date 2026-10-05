@@ -1,0 +1,8 @@
+{
+  "expected_executable": "S:\\caliburn\\tmp\\ocs-eval-qdrant\\qdrant.exe",
+  "listening_ports": [],
+  "scope": "Only this round owned research Qdrant stopped; persisted vectors/public weights retained",
+  "owned_pid": 45044,
+  "verified_utc": "2026-10-04T05:05:24.5340989Z",
+  "process_stopped": true
+}

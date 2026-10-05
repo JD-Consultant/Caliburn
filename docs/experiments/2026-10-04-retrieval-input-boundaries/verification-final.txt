@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "scope": "Observed synthetic query-boundary sensitivity only; not semantic JD task equivalence/completeness",
+  "case_variants": 66,
+  "quality_native_queries": 256,
+  "metric_rows": 132,
+  "topic_variant_traces": 258,
+  "new_embeddings": 133,
+  "supplemented_pairs": 2660,
+  "benchmark_samples": 24,
+  "benchmark_native_queries": 116
+}

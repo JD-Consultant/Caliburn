@@ -1,0 +1,45 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "candidate",
+  "repeat": 2,
+  "case_id": "numeric_boundaries",
+  "cell_id": "numeric_boundaries-candidate-2",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11136,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 11133
+        },
+        "output_tokens": 574,
+        "output_tokens_details": {
+          "reasoning_tokens": 308
+        },
+        "total_tokens": 11710
+      },
+      "estimated_usd": "0.000398630",
+      "seconds": 7.977566500019748
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_1.outcome_2",
+        "value": "到貨差異有可追溯的記錄：短少或外箱破損時記下實收件數及原單號、留存照片並通知採購；未確認部分列入待處理清單，以供後續處理追蹤。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "已核對到貨任務的成果與分工：實物由倉庫同事清點；本人核對採購單、送貨單與實際到貨資料、記錄差異及追蹤未確認項。只修正錯置實物清點責任的成果欄位，未改其他內容。"
+  },
+  "seconds": 18.877859300002456
+}

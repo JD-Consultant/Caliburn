@@ -1,0 +1,9 @@
+{
+  "provider_calls": 0,
+  "schedule_cells": 20,
+  "same_paired_initial_context": true,
+  "same_tools": true,
+  "original_messages_and_memory_unchanged": true,
+  "grading_not_preloaded": true,
+  "candidate_added_characters": 161
+}

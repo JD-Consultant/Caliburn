@@ -1,0 +1,11 @@
+{
+  "load_seconds": 39.690746701002354,
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "torch": "2.10.0+cu128",
+  "model_sha256": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286",
+  "revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+  "attention": "sdpa",
+  "max_pair_tokens": 8192,
+  "overlap": 64,
+  "batch_size": 1
+}

@@ -1,0 +1,10 @@
+{
+  "checked_utc": "2026-10-04T12:52:02.1653537Z",
+  "qdrant_pid": 51672,
+  "stopped_own_qdrant": true,
+  "remaining_listeners": 0,
+  "public_weights_and_storage_preserved": true,
+  "product_services_not_modified": true,
+  "prior_record": "cleanup.json",
+  "note": "Immediate exit snapshot counted all connection states; this follow-up checks actual listening sockets and process exit."
+}

@@ -1,0 +1,254 @@
+{
+  "kind": "offline_accounting_and_context_audit_not_quality_grade",
+  "arms": {
+    "control": {
+      "completed_cells": 4,
+      "input_tokens": 126197,
+      "cached_tokens": 86772,
+      "output_tokens": 10440,
+      "reasoning_tokens": 5451,
+      "model_calls": 12,
+      "read_calls": 16,
+      "raw_read_calls": 2,
+      "map_read_calls": 0,
+      "initial_input_tokens": [
+        5340,
+        5325,
+        5340,
+        5325
+      ],
+      "estimated_generation_usd": "0.011014945"
+    },
+    "candidate": {
+      "completed_cells": 4,
+      "input_tokens": 126578,
+      "cached_tokens": 87979,
+      "output_tokens": 8805,
+      "reasoning_tokens": 4252,
+      "model_calls": 13,
+      "read_calls": 16,
+      "raw_read_calls": 1,
+      "map_read_calls": 2,
+      "initial_input_tokens": [
+        5714,
+        5699,
+        5714,
+        5699
+      ],
+      "estimated_generation_usd": "0.010106190"
+    }
+  },
+  "paired_initial_contexts": [
+    {
+      "case_id": "corrections",
+      "repeat": 1,
+      "equal": true
+    },
+    {
+      "case_id": "corrections",
+      "repeat": 2,
+      "equal": true
+    },
+    {
+      "case_id": "boundaries",
+      "repeat": 1,
+      "equal": true
+    },
+    {
+      "case_id": "boundaries",
+      "repeat": 2,
+      "equal": true
+    }
+  ],
+  "generation_requests": [
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 1,
+      "step": 1,
+      "input_items": 2
+    },
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 1,
+      "step": 2,
+      "input_items": 6
+    },
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 1,
+      "step": 3,
+      "input_items": 17
+    },
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 1,
+      "step": 4,
+      "input_items": 21
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 1,
+      "step": 1,
+      "input_items": 2
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 1,
+      "step": 2,
+      "input_items": 6
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 1,
+      "step": 3,
+      "input_items": 8
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 1,
+      "step": 4,
+      "input_items": 18
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 1,
+      "step": 5,
+      "input_items": 21
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "control",
+      "repeat": 1,
+      "step": 1,
+      "input_items": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "control",
+      "repeat": 1,
+      "step": 2,
+      "input_items": 6
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "candidate",
+      "repeat": 1,
+      "step": 1,
+      "input_items": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "candidate",
+      "repeat": 1,
+      "step": 2,
+      "input_items": 5
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "candidate",
+      "repeat": 1,
+      "step": 3,
+      "input_items": 7
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 2,
+      "step": 1,
+      "input_items": 2
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 2,
+      "step": 2,
+      "input_items": 6
+    },
+    {
+      "case_id": "corrections",
+      "arm": "candidate",
+      "repeat": 2,
+      "step": 3,
+      "input_items": 18
+    },
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 2,
+      "step": 1,
+      "input_items": 2
+    },
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 2,
+      "step": 2,
+      "input_items": 6
+    },
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 2,
+      "step": 3,
+      "input_items": 17
+    },
+    {
+      "case_id": "corrections",
+      "arm": "control",
+      "repeat": 2,
+      "step": 4,
+      "input_items": 20
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "candidate",
+      "repeat": 2,
+      "step": 1,
+      "input_items": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "candidate",
+      "repeat": 2,
+      "step": 2,
+      "input_items": 6
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "control",
+      "repeat": 2,
+      "step": 1,
+      "input_items": 2
+    },
+    {
+      "case_id": "boundaries",
+      "arm": "control",
+      "repeat": 2,
+      "step": 2,
+      "input_items": 6
+    }
+  ],
+  "counted_input_range": [
+    5325,
+    16275
+  ],
+  "occupied_usd": "0.023621135",
+  "cumulative_occupied_usd": "1.198955810",
+  "pending_administrative_or_unknown_usd": "0.0025",
+  "seconds": 468.53279399999883,
+  "sha256": {
+    "manifest.json": "718984edc2a584b4b175f4f2270352b1c24b4adf1229bae8d0b3d6bef9bb11d3",
+    "result.json": "ea0fb753a31c3898894b9ae9ec7713e01023f490e34a1c0d6e2da38dffe4fbf0",
+    "trace.jsonl": "978f774f55aebf57645771c19d0599e1eb0a72f6646542cf6bb5ba9af430f5f9"
+  },
+  "note": "Semantic quality and source support must be assessed separately; no keyword grading."
+}

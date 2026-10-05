@@ -1,0 +1,57 @@
+[
+  {
+    "case_id": "E01",
+    "arm": "raw_segments",
+    "n": 20,
+    "samples": [
+      1.4269958750010119,
+      1.4497587799996836
+    ],
+    "rerank_median_seconds": 1.4383773275003477,
+    "qdrant_passages_top200_seconds_one_sample": 0.22826820006594062
+  },
+  {
+    "case_id": "E01",
+    "arm": "raw_segments",
+    "n": 50,
+    "samples": [
+      3.6646677979952074,
+      3.7439901329998975
+    ],
+    "rerank_median_seconds": 3.7043289654975524,
+    "qdrant_passages_top200_seconds_one_sample": 0.22826820006594062
+  },
+  {
+    "case_id": "E01",
+    "arm": "raw_segments",
+    "n": 100,
+    "samples": [
+      7.310502198000904,
+      7.188950661999115
+    ],
+    "rerank_median_seconds": 7.24972643000001,
+    "qdrant_passages_top200_seconds_one_sample": 0.22826820006594062
+  },
+  {
+    "case_id": "E01",
+    "arm": "raw_segments",
+    "n": 200,
+    "samples": [
+      14.96340984699782,
+      14.828457424002409
+    ],
+    "rerank_median_seconds": 14.895933635500114,
+    "qdrant_passages_top200_seconds_one_sample": 0.22826820006594062
+  },
+  {
+    "case_id": "E01",
+    "arm": "raw_segments",
+    "n": 805,
+    "samples": [
+      66.59699197400187,
+      64.80893970099714
+    ],
+    "rerank_median_seconds": 65.7029658374995,
+    "qdrant_passages_top200_seconds_one_sample": 0.22826820006594062
+  }
+]

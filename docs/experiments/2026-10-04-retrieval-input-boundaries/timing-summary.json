@@ -1,0 +1,362 @@
+[
+  {
+    "case_id": "E01",
+    "variant": "original_messages",
+    "config": {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      0.02035859995521605,
+      0.039291499997489154
+    ],
+    "median_total_seconds": 0.029825049976352602,
+    "median_database_seconds": 0.029715249984292313,
+    "median_worker_seconds": 0.0,
+    "median_tokenize_seconds": 0.0,
+    "median_file_transport_overhead_seconds": 0.0,
+    "query_counts": [
+      3,
+      3
+    ],
+    "pair_counts": [
+      0,
+      0
+    ],
+    "returned_counts": [
+      14,
+      14
+    ]
+  },
+  {
+    "case_id": "E01",
+    "variant": "original_messages",
+    "config": {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      1.9082545000128448,
+      1.6617313999449834
+    ],
+    "median_total_seconds": 1.7849929499789141,
+    "median_database_seconds": 0.047274400072637945,
+    "median_worker_seconds": 1.707105085501098,
+    "median_tokenize_seconds": 0.030725371500011533,
+    "median_file_transport_overhead_seconds": 0.030475214487523772,
+    "query_counts": [
+      3,
+      3
+    ],
+    "pair_counts": [
+      60,
+      60
+    ],
+    "returned_counts": [
+      9,
+      9
+    ]
+  },
+  {
+    "case_id": "E01",
+    "variant": "joined_employee",
+    "config": {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      0.01454189996002242,
+      0.01553759997477755
+    ],
+    "median_total_seconds": 0.015039749967399985,
+    "median_database_seconds": 0.015004100016085431,
+    "median_worker_seconds": 0.0,
+    "median_tokenize_seconds": 0.0,
+    "median_file_transport_overhead_seconds": 0.0,
+    "query_counts": [
+      1,
+      1
+    ],
+    "pair_counts": [
+      0,
+      0
+    ],
+    "returned_counts": [
+      5,
+      5
+    ]
+  },
+  {
+    "case_id": "E01",
+    "variant": "joined_employee",
+    "config": {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      0.7221661999938078,
+      0.7595538999885321
+    ],
+    "median_total_seconds": 0.7408600499911699,
+    "median_database_seconds": 0.014810799999395385,
+    "median_worker_seconds": 0.6824676950018329,
+    "median_tokenize_seconds": 0.011472451995359734,
+    "median_file_transport_overhead_seconds": 0.04351195501294569,
+    "query_counts": [
+      1,
+      1
+    ],
+    "pair_counts": [
+      20,
+      20
+    ],
+    "returned_counts": [
+      5,
+      5
+    ]
+  },
+  {
+    "case_id": "E01",
+    "variant": "sentence_pieces",
+    "config": {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      0.11184010002762079,
+      0.07109889999264851
+    ],
+    "median_total_seconds": 0.09146950001013465,
+    "median_database_seconds": 0.09120450005866587,
+    "median_worker_seconds": 0.0,
+    "median_tokenize_seconds": 0.0,
+    "median_file_transport_overhead_seconds": 0.0,
+    "query_counts": [
+      10,
+      10
+    ],
+    "pair_counts": [
+      0,
+      0
+    ],
+    "returned_counts": [
+      37,
+      37
+    ]
+  },
+  {
+    "case_id": "E01",
+    "variant": "sentence_pieces",
+    "config": {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      5.23928400001023,
+      5.173360700020567
+    ],
+    "median_total_seconds": 5.206322350015398,
+    "median_database_seconds": 0.12903989996993914,
+    "median_worker_seconds": 5.046049285501795,
+    "median_tokenize_seconds": 0.09518758649937809,
+    "median_file_transport_overhead_seconds": 0.03073606448378996,
+    "query_counts": [
+      10,
+      10
+    ],
+    "pair_counts": [
+      200,
+      200
+    ],
+    "returned_counts": [
+      32,
+      32
+    ]
+  },
+  {
+    "case_id": "M04",
+    "variant": "original_messages",
+    "config": {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      0.045462400012183934,
+      0.030212600016966462
+    ],
+    "median_total_seconds": 0.0378375000145752,
+    "median_database_seconds": 0.037724549998529255,
+    "median_worker_seconds": 0.0,
+    "median_tokenize_seconds": 0.0,
+    "median_file_transport_overhead_seconds": 0.0,
+    "query_counts": [
+      4,
+      4
+    ],
+    "pair_counts": [
+      0,
+      0
+    ],
+    "returned_counts": [
+      11,
+      11
+    ]
+  },
+  {
+    "case_id": "M04",
+    "variant": "original_messages",
+    "config": {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      1.759616499999538,
+      1.7772180000320077
+    ],
+    "median_total_seconds": 1.7684172500157729,
+    "median_database_seconds": 0.05079110004589893,
+    "median_worker_seconds": 1.6863062045013066,
+    "median_tokenize_seconds": 0.037712848501541885,
+    "median_file_transport_overhead_seconds": 0.031116345489863306,
+    "query_counts": [
+      4,
+      4
+    ],
+    "pair_counts": [
+      80,
+      80
+    ],
+    "returned_counts": [
+      14,
+      14
+    ]
+  },
+  {
+    "case_id": "M04",
+    "variant": "joined_employee",
+    "config": {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      0.015082400001119822,
+      0.002531800011638552
+    ],
+    "median_total_seconds": 0.008807100006379187,
+    "median_database_seconds": 0.008773750014370307,
+    "median_worker_seconds": 0.0,
+    "median_tokenize_seconds": 0.0,
+    "median_file_transport_overhead_seconds": 0.0,
+    "query_counts": [
+      1,
+      1
+    ],
+    "pair_counts": [
+      0,
+      0
+    ],
+    "returned_counts": [
+      5,
+      5
+    ]
+  },
+  {
+    "case_id": "M04",
+    "variant": "joined_employee",
+    "config": {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      0.637383499997668,
+      0.6366472999798134
+    ],
+    "median_total_seconds": 0.6370153999887407,
+    "median_database_seconds": 0.0032152000057976693,
+    "median_worker_seconds": 0.6047665275000327,
+    "median_tokenize_seconds": 0.011043063499528216,
+    "median_file_transport_overhead_seconds": 0.028956572477909504,
+    "query_counts": [
+      1,
+      1
+    ],
+    "pair_counts": [
+      20,
+      20
+    ],
+    "returned_counts": [
+      5,
+      5
+    ]
+  },
+  {
+    "case_id": "M04",
+    "variant": "sentence_pieces",
+    "config": {
+      "method": "quota_dense",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      0.13504829996963963,
+      0.10959899995941669
+    ],
+    "median_total_seconds": 0.12232364996452816,
+    "median_database_seconds": 0.12206665001576766,
+    "median_worker_seconds": 0.0,
+    "median_tokenize_seconds": 0.0,
+    "median_file_transport_overhead_seconds": 0.0,
+    "query_counts": [
+      10,
+      10
+    ],
+    "pair_counts": [
+      0,
+      0
+    ],
+    "returned_counts": [
+      18,
+      18
+    ]
+  },
+  {
+    "case_id": "M04",
+    "variant": "sentence_pieces",
+    "config": {
+      "method": "quota_rerank",
+      "n": 20,
+      "k": 5
+    },
+    "samples_seconds": [
+      4.380236400000285,
+      4.389730399998371
+    ],
+    "median_total_seconds": 4.384983399999328,
+    "median_database_seconds": 0.12047920003533363,
+    "median_worker_seconds": 4.233702365498175,
+    "median_tokenize_seconds": 0.09594967149678268,
+    "median_file_transport_overhead_seconds": 0.03041148452030029,
+    "query_counts": [
+      10,
+      10
+    ],
+    "pair_counts": [
+      200,
+      200
+    ],
+    "returned_counts": [
+      28,
+      28
+    ]
+  }
+]

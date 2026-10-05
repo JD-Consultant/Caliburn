@@ -1,0 +1,1 @@
+{"at": "2026-10-03T16:49:05.229940+00:00", "event": "completed", "model_calls": 40, "input_tokens": 198390, "output_tokens": 14021, "compactions": 2, "cached_tokens": 165556, "outbound_calls": 86}

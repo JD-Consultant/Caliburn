@@ -1,0 +1,56 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "baseline",
+  "repeat": 1,
+  "case_id": "responsibility_correction",
+  "cell_id": "responsibility_correction-baseline-1",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11178,
+        "input_tokens_details": {
+          "cache_write_tokens": 11175,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1742,
+        "output_tokens_details": {
+          "reasoning_tokens": 1203
+        },
+        "total_tokens": 12920
+      },
+      "estimated_usd": "0.002268175",
+      "seconds": 16.15547559998231
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_2.description",
+        "value": "每週一 08:50 開始核對週末累積收到的退貨；週二至週五 08:35 開始核對前一日收到的退貨。使用獨立的退貨清單，比對客退單、品號、批號及實收數量。常溫商品由本人依倉庫同事確認結果登錄可售、待檢或報廢待核准；冷藏商品另核對溫度紀錄，交品質窗口判定是否可再銷售，不自行套用未確認的溫度門檻。退貨數量不符時，提供照片及差異紀錄請客服確認；主管同意調帳後，才依核准資料更新 ERP 並保留核准單號。每個工作日 09:10 前將退貨差異表交給客服窗口。退貨核對時點與交表時限僅適用於退貨，不是進貨驗收時限。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_2.outcome_2",
+        "value": "常溫退貨狀態依倉庫同事確認結果登錄為可售、待檢或報廢待核准；冷藏退貨核對溫度紀錄後交品質窗口判定是否可再銷售。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "僅修正退貨任務描述與成果中將常溫倉庫判定泛化至冷藏商品的責任分工；既有冷藏品質判定、待檢／報廢界線、調帳核准與退貨交表時限要求已與整理後的工作理解一致，未改動其他工作。"
+  },
+  "seconds": 26.663707499974407
+}

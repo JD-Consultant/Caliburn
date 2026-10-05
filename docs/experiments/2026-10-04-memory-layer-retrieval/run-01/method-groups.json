@@ -1,0 +1,431 @@
+[
+  {
+    "case_id": "F01",
+    "method": "O-W",
+    "query_ids": [
+      "F01-whole-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F01",
+    "method": "O-S",
+    "query_ids": [
+      "F01-segments-1",
+      "F01-segments-2"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-W",
+    "query_ids": [
+      "F01-B1-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-S",
+    "query_ids": [
+      "F01-B1-S-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-W",
+    "query_ids": [
+      "F01-B2-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-S",
+    "query_ids": [
+      "F01-B2-S-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-W",
+    "query_ids": [
+      "F02-whole-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F02",
+    "method": "O-S",
+    "query_ids": [
+      "F02-segments-1",
+      "F02-segments-2"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-W",
+    "query_ids": [
+      "F02-B1-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-S",
+    "query_ids": [
+      "F02-B1-S-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-W",
+    "query_ids": [
+      "F02-B2-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-S",
+    "query_ids": [
+      "F02-B2-S-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-W",
+    "query_ids": [
+      "F03-whole-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F03",
+    "method": "O-S",
+    "query_ids": [
+      "F03-segments-1",
+      "F03-segments-2"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-W",
+    "query_ids": [
+      "F03-B1-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-S",
+    "query_ids": [
+      "F03-B1-S-0",
+      "F03-B1-S-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-W",
+    "query_ids": [
+      "F03-B2-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-S",
+    "query_ids": [
+      "F03-B2-S-0",
+      "F03-B2-S-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-W",
+    "query_ids": [
+      "F04-whole-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F04",
+    "method": "O-S",
+    "query_ids": [
+      "F04-segments-1",
+      "F04-segments-2"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-W",
+    "query_ids": [
+      "F04-B1-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-S",
+    "query_ids": [
+      "F04-B1-S-0",
+      "F04-B1-S-1",
+      "F04-B1-S-2",
+      "F04-B1-S-3"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-W",
+    "query_ids": [
+      "F04-B2-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-S",
+    "query_ids": [
+      "F04-B2-S-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-W",
+    "query_ids": [
+      "F05-whole-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F05",
+    "method": "O-S",
+    "query_ids": [
+      "F05-segments-1",
+      "F05-segments-2"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-W",
+    "query_ids": [
+      "F05-B1-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-S",
+    "query_ids": [
+      "F05-B1-S-0",
+      "F05-B1-S-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-W",
+    "query_ids": [
+      "F05-B2-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-S",
+    "query_ids": [
+      "F05-B2-S-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-W",
+    "query_ids": [
+      "H01-whole-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H01",
+    "method": "O-S",
+    "query_ids": [
+      "H01-segments-1",
+      "H01-segments-2",
+      "H01-segments-3"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-W",
+    "query_ids": [
+      "H01-B1-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-S",
+    "query_ids": [
+      "H01-B1-S-0",
+      "H01-B1-S-1",
+      "H01-B1-S-2",
+      "H01-B1-S-3"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-W",
+    "query_ids": [
+      "H01-B2-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-S",
+    "query_ids": [
+      "H01-B2-S-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-W",
+    "query_ids": [
+      "H02-whole-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H02",
+    "method": "O-S",
+    "query_ids": [
+      "H02-segments-1",
+      "H02-segments-2",
+      "H02-segments-3",
+      "H02-segments-4"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-W",
+    "query_ids": [
+      "H02-B1-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-S",
+    "query_ids": [
+      "H02-B1-S-0",
+      "H02-B1-S-1",
+      "H02-B1-S-2",
+      "H02-B1-S-3",
+      "H02-B1-S-4"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-W",
+    "query_ids": [
+      "H02-B2-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-S",
+    "query_ids": [
+      "H02-B2-S-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-W",
+    "query_ids": [
+      "H03-whole-1"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H03",
+    "method": "O-S",
+    "query_ids": [
+      "H03-segments-1",
+      "H03-segments-2",
+      "H03-segments-3",
+      "H03-segments-4",
+      "H03-segments-5"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-W",
+    "query_ids": [
+      "H03-B1-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-S",
+    "query_ids": [
+      "H03-B1-S-0",
+      "H03-B1-S-1",
+      "H03-B1-S-2",
+      "H03-B1-S-3",
+      "H03-B1-S-4",
+      "H03-B1-S-5",
+      "H03-B1-S-6",
+      "H03-B1-S-7",
+      "H03-B1-S-8",
+      "H03-B1-S-9",
+      "H03-B1-S-10",
+      "H03-B1-S-11",
+      "H03-B1-S-12",
+      "H03-B1-S-13",
+      "H03-B1-S-14",
+      "H03-B1-S-15"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-W",
+    "query_ids": [
+      "H03-B2-W-0"
+    ],
+    "has_input": true
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-S",
+    "query_ids": [
+      "H03-B2-S-0",
+      "H03-B2-S-1",
+      "H03-B2-S-2",
+      "H03-B2-S-3"
+    ],
+    "has_input": true
+  }
+]

@@ -1,0 +1,202 @@
+{
+  "native_chain_audit": {
+    "chain_count": 3,
+    "continuations_checked": 20,
+    "tool_results_checked": 24,
+    "pending_tool_results": 0,
+    "issues": []
+  },
+  "store_false_on_all_generations": true,
+  "truncation_disabled_on_all_generations": true,
+  "encrypted_state_requested_on_all_generations": true,
+  "turn_start_inputs": [
+    {
+      "turn": 1,
+      "event_id": "e001",
+      "current_input_unmodified_user_message": true,
+      "app_reference_role": "user",
+      "reference_fields": [
+        "data_kind",
+        "work_situation_map",
+        "work_understanding_map",
+        "historical_interview",
+        "interview_read_boundary"
+      ],
+      "memory_map_titles": {
+        "work_situation_map": [],
+        "work_understanding_map": []
+      },
+      "recent_interview_sequences": [
+        1
+      ],
+      "interview_read_boundary": {
+        "covered_through_sequence": 0,
+        "through_sequence": 1,
+        "context_sequences": []
+      }
+    },
+    {
+      "turn": 2,
+      "event_id": "e002",
+      "current_input_unmodified_user_message": true,
+      "app_reference_role": "user",
+      "reference_fields": [
+        "data_kind",
+        "work_situation_map",
+        "work_understanding_map",
+        "historical_interview",
+        "interview_read_boundary"
+      ],
+      "memory_map_titles": {
+        "work_situation_map": [],
+        "work_understanding_map": []
+      },
+      "recent_interview_sequences": [
+        1,
+        2,
+        3
+      ],
+      "interview_read_boundary": {
+        "covered_through_sequence": 0,
+        "through_sequence": 3,
+        "context_sequences": []
+      }
+    },
+    {
+      "turn": 3,
+      "event_id": "e004",
+      "current_input_unmodified_user_message": true,
+      "app_reference_role": "user",
+      "reference_fields": [
+        "data_kind",
+        "work_situation_map",
+        "work_understanding_map",
+        "historical_interview",
+        "interview_read_boundary"
+      ],
+      "memory_map_titles": {
+        "work_situation_map": [],
+        "work_understanding_map": []
+      },
+      "recent_interview_sequences": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "interview_read_boundary": {
+        "covered_through_sequence": 0,
+        "through_sequence": 5,
+        "context_sequences": []
+      }
+    },
+    {
+      "turn": 4,
+      "event_id": "e006",
+      "current_input_unmodified_user_message": true,
+      "app_reference_role": "user",
+      "reference_fields": [
+        "data_kind",
+        "work_situation_map",
+        "work_understanding_map",
+        "historical_interview",
+        "interview_read_boundary"
+      ],
+      "memory_map_titles": {
+        "work_situation_map": [],
+        "work_understanding_map": []
+      },
+      "recent_interview_sequences": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "interview_read_boundary": {
+        "covered_through_sequence": 0,
+        "through_sequence": 7,
+        "context_sequences": []
+      }
+    },
+    {
+      "turn": 5,
+      "event_id": "e055",
+      "current_input_unmodified_user_message": true,
+      "app_reference_role": "user",
+      "reference_fields": [
+        "data_kind",
+        "work_situation_map",
+        "work_understanding_map",
+        "historical_interview",
+        "interview_read_boundary"
+      ],
+      "memory_map_titles": {
+        "work_situation_map": [
+          "進貨驗收、到貨登錄與收貨異常追蹤"
+        ],
+        "work_understanding_map": [
+          "進貨核對、到貨登錄與收貨異常追蹤（限定範圍）"
+        ]
+      },
+      "recent_interview_sequences": [
+        9
+      ],
+      "interview_read_boundary": {
+        "covered_through_sequence": 8,
+        "through_sequence": 9,
+        "context_sequences": []
+      }
+    }
+  ],
+  "memory_role_inputs": [
+    {
+      "instructions_sha256": "0f3abd516e55664ebff06ed4a03dbeb95426e16d204d49286fcb444f6c5a9447",
+      "app_reference_role": "user",
+      "reference_fields": [
+        "data_kind",
+        "notice",
+        "work_situation_map",
+        "required_interview_range",
+        "historical_interview"
+      ],
+      "required_interview_range": {
+        "start_sequence": 1,
+        "end_sequence": 8
+      },
+      "historical_interview_sequences": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "situation_changes": []
+    },
+    {
+      "instructions_sha256": "4deac4a7f3b6715b2bab2af32fdbd03d6e01828a36ce5f56310b49a04260855c",
+      "app_reference_role": "user",
+      "reference_fields": [
+        "data_kind",
+        "notice",
+        "work_situation_map",
+        "work_understanding_map",
+        "work_situation_changes"
+      ],
+      "required_interview_range": null,
+      "historical_interview_sequences": [],
+      "situation_changes": [
+        {
+          "change": "added",
+          "target_title": "進貨驗收、到貨登錄與收貨異常追蹤"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "event_id": "e034",
+  "execution_id": "a9bced7a-340e-4145-8a93-48ce985d83f5",
+  "employee_input": {
+    "source_id": "bf1ed6df-d75e-456c-86e9-1a95fa511db8",
+    "interview_sequence": 68,
+    "speaker": "employee",
+    "interview_text": "年底全盤和稽核可能重疊，但不是同一件工作：全盤看實物和帳差，稽核要證據與可追溯性。若只有其中一項換別人負責，另一項仍是我的責任；JD不要全部合成一句盤點。"
+  },
+  "consultant_reply": {
+    "source_id": "7581354e-e095-4907-9105-26a4ee824ba9",
+    "interview_sequence": 69,
+    "speaker": "consultant",
+    "interview_text": "已將年底全盤與年度稽核明確保留為兩項獨立任務：全盤聚焦現場實物與帳差核對；稽核聚焦證據提供與可追溯性。即使時程重疊，也不互相取代。\n\n年度稽核、盤點及日常庫存紀錄主要透過 ERP 和共享資料夾處理嗎？還會使用其他系統或固定表單工具嗎？"
+  }
+}

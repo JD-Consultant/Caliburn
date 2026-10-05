@@ -1,0 +1,5 @@
+{
+  "type": "ValueError",
+  "message": "Empty input cannot be vectorized",
+  "utc": "2026-10-03T22:24:26.748042+00:00"
+}

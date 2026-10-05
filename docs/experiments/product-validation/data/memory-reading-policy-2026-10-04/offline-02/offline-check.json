@@ -1,0 +1,9 @@
+{
+  "provider_calls": 0,
+  "schedule_cells": 8,
+  "unique_cell_ids": 8,
+  "core_criteria": 21,
+  "same_tools_as_baseline": true,
+  "same_inputs_for_both_prompts": true,
+  "research_supplement_unchanged": true
+}

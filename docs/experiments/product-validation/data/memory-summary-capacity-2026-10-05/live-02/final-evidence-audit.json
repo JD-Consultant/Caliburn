@@ -1,0 +1,31 @@
+{
+  "kind": "offline_final_evidence_audit",
+  "audited_at": "2026-10-04T17:36:12.670781+00:00",
+  "new_provider_calls": 0,
+  "new_database_writes": 0,
+  "checks": {
+    "historical_sources_unchanged": 8,
+    "manifest_dependencies_verified": true,
+    "protocol_CRLF_only": [
+      "live-01/executed-protocol.md",
+      "live-02/executed-protocol.md"
+    ],
+    "completed_scheduled_cells": 8,
+    "reader_protocol_frozen": true,
+    "fresh_initial_contexts_verified": 8,
+    "saved_flat_summary_terminal_LF_not_sent": true,
+    "grade_totals": {
+      "memory": {"pass": 35, "partial": 3, "fail": 0, "opportunities": 38},
+      "flat": {"pass": 35, "partial": 3, "fail": 0, "opportunities": 38}
+    },
+    "trace_accounting": {
+      "generations": 23,
+      "outbounds": 46,
+      "last_response_seconds_from_original_start": 924.835515,
+      "peak_input_tokens": 17861,
+      "result_trace_hashes_verified": true,
+      "budget_limits_met": true
+    },
+    "local_links": {"checked": 24, "missing": 0}
+  }
+}

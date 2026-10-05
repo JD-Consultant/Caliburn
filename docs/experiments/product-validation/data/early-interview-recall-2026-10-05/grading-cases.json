@@ -1,0 +1,59 @@
+{
+  "status": "pre_run_research_only_do_not_send_to_model",
+  "early_employee_ordinal_max": 17,
+  "baseline_formal_through": 105,
+  "recent_sequences": [101,102,103,104,105],
+  "new_change_case": "c05",
+  "scoring": ["complete","partial","omitted","incorrect"],
+  "cases": {
+    "c01": {"sources": [4,10], "checks": {
+      "volume": "每日約15–20張進貨單，不改為件數",
+      "deadline": "到貨當天下班前，僅已確認項目",
+      "cutoff_authority": "逾月底截止或有疑義，由財務決定歸屬月份",
+      "no_backdating": "本人保留實際收貨時間及未決原因，不自行回填日期"
+    }},
+    "c02": {"sources": [8,92], "checks": {
+      "strict_threshold": "超過5%才因比例規則提報，剛好5%不因此提報",
+      "denominator": "每批實際驗收件數，不以進貨單張數或整月為分母",
+      "safety": "安全疑慮不受比例限制，先隔離並通知主管"
+    }},
+    "c03": {"sources": [6,12], "checks": {
+      "remind": "兩個工作日未回覆提醒採購",
+      "escalate": "第四個工作日仍無進展回報主管",
+      "closure": "補貨或退貨完成，且帳物相符",
+      "decision": "退換貨或補貨由採購決定",
+      "promise": "本人不保證供應商實際補貨日期"
+    }},
+    "c04": {"sources": [42,98], "checks": {
+      "original": "原為當月最後一個工作日交主管",
+      "current": "現為次月第一個工作日交主管",
+      "basis": "仍依月底庫存狀態，不改按交付當日狀態",
+      "no_revert": "保存JD不得因回顧而改回舊規則"
+    }},
+    "c05": {"sources": [6,12], "additional_source": "c05_current_input", "checks": {
+      "new_limits": "保存JD為下一筆收貨異常起三工作日未回覆提醒採購、第五工作日仍無進展回報主管",
+      "closure": "仍需退補貨完成且帳物相符",
+      "authority": "採購決策且本人不保證交期仍保留",
+      "scope": "不把新期限套到缺貨追蹤及其他工作，不保留矛盾的現行2/4副本",
+      "sources": "新期限有本次有效來源；既有正確原來源可保留"
+    }},
+    "c06": {"sources": [54,56], "checks": {
+      "conversion": "一箱12件，經資料窗口確認且只限該品號",
+      "unknown": "未有確定保存年限，不能猜年數",
+      "contact": "保存年限向財務確認"
+    }},
+    "c07": {"sources": [14,94], "checks": {
+      "monday": "週一08:50",
+      "other_days": "週二至週五08:35",
+      "delivery": "每個工作日09:10前交客服窗口",
+      "scope": "不把退貨時點套到進貨驗收"
+    }},
+    "c08": {"sources": [6,12,28,30,32], "additional_source": "c05_formal_source", "checks": {
+      "current_limits": "JD仍為下一筆起3/5工作日，無矛盾現行2/4副本",
+      "closure": "JD保留補貨或退貨完成且帳物相符",
+      "authority": "JD保留採購決策及本人不保證實際補貨時間",
+      "scope": "缺貨仍依補貨入庫、ERP更新及訂單安排追蹤，不新增收貨3/5期限",
+      "sources": "變更依據指向c05有效來源，不用舊Memory或最後核對指令冒充新期限證據"
+    }}
+  }
+}

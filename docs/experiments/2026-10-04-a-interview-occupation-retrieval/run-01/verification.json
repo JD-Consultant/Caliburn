@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "cases": 3,
+  "source_turns": 69,
+  "queries": 18,
+  "native_exact_queries": 18,
+  "quality_pairs": 360,
+  "groups": 18,
+  "final_positions": 90,
+  "unique_judgments": 33,
+  "warm_trials": 54,
+  "fresh_benchmark_pairs": 1080,
+  "previous_run_files_unchanged": 410,
+  "limit": "source, ranking and timing only; not model semantic correctness"
+}

@@ -1,0 +1,51 @@
+{
+  "reason": "Final reviewer identified three wording ambiguities; define existing object order, tested depths vs minimum29, and case-public pairs vs globally distinct public documents. No ranking, grade, input, protocol, or probe code changes. Frozen report.py preserves initial generated wording.",
+  "changes": [
+    {
+      "file": "README.md",
+      "before_sha256": "f013d3d6d04549e9b21082b199c68ea28e939123582d014ba52c1f80cf392e46",
+      "after_sha256": "41901c978edd74ea806bd8f66335d5fe6f75d14391c4c3875f4cf7862179aa58",
+      "replacements": [
+        {
+          "before": "B1整合與逐情境都需每路Top40才保留12/12已知主要公版、8/8已知面向",
+          "after": "在所測20／40／80中，B1整合與逐情境首次於每路Top40保留12/12已知案例×公版配對、8/8已知面向"
+        },
+        {
+          "before": "已知公版 |",
+          "after": "已知來源配對 |"
+        },
+        {
+          "before": "12份公版沿前輪模型grade3判讀",
+          "after": "12個案例×公版配對（共11份不同公版）沿前輪模型grade3判讀"
+        },
+        {
+          "before": "排除敏感度得相同深度結論。",
+          "after": "排除後10配對涉及9份不同公版，敏感度得相同深度結論。"
+        },
+        {
+          "before": "B1整合按原文字順序、逐情境沿原物件",
+          "after": "B1整合沿封存查詢的既有物件排序（正文SHA、object_id）串接，逐情境沿原物件"
+        }
+      ]
+    },
+    {
+      "file": "report.md",
+      "before_sha256": "09f1808fe640371c7fe5d497e163aa65e3aa15632379d9486b28c5e74b3ab434",
+      "after_sha256": "0279f4903c5ab4641ca15116bee7a9445fa3921aeebe50e4b1f387b67b833728",
+      "replacements": [
+        {
+          "before": "已知來源 |",
+          "after": "已知來源配對 |"
+        }
+      ]
+    }
+  ],
+  "evidence": {
+    "original_B1_sort_source": "docs/experiments/2026-10-04-memory-layer-retrieval/run-01/queries.py:13",
+    "known_case_public_pairs": 12,
+    "known_distinct_public_documents": 11,
+    "clear_case_public_pairs": 10,
+    "clear_distinct_public_documents": 9,
+    "F01_B1_minimum_N": 29
+  }
+}

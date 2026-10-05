@@ -1,0 +1,16 @@
+{
+  "event_id": "e019",
+  "execution_id": "129cb4b8-99bb-4384-bab9-d7d12f27a21e",
+  "employee_input": {
+    "source_id": "de382445-2e9d-47d4-a2e8-d2775d68e1e3",
+    "interview_sequence": 38,
+    "speaker": "employee",
+    "interview_text": "出貨店和收貨店回報數量不一致時，我對照調撥單、裝箱清單與簽收紀錄，追查差異並請雙方確認。貨還在路上不能直接列作收貨店可售庫存；結案條件是雙方收發紀錄相符。"
+  },
+  "consultant_reply": {
+    "source_id": "a11170ee-b88c-4078-9616-53eb3cb8168a",
+    "interview_sequence": 39,
+    "speaker": "consultant",
+    "interview_text": "已補上調撥後的差異處理：數量不符時對照調撥單、裝箱清單與簽收紀錄，請出貨店和收貨店確認；在途貨不列為收貨店可售庫存，雙方收發紀錄相符後結案。\n\n另外想了解您提到的庫存報表：通常提供哪些內容、給誰使用，主要協助哪些工作或判斷？"
+  }
+}

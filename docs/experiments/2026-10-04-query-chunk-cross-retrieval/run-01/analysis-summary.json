@@ -1,0 +1,11 @@
+{
+  "groups": 80,
+  "positions": 400,
+  "unique_pairs": 103,
+  "missing_positions": 0,
+  "new_response_count": 8,
+  "new_accounted_usd": "0.005628700",
+  "new_embedding_calls": 0,
+  "strong_pairs": 10,
+  "grading": "single model; no expert truth or exhaustive recall"
+}

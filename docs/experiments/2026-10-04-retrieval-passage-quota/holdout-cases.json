@@ -1,0 +1,893 @@
+[
+  {
+    "case_id": "H01",
+    "split": "new_holdout",
+    "kind": "positive",
+    "employee_messages": [
+      "每天我在吧檯詢問客人要的口味與飲品，協助點單。我會依當天咖啡豆狀態調整磨豆刻度，試喝後調整萃取時間與粉量，按店裡配方做濃縮、拿鐵和手沖，奶泡也由我打好。",
+      "飲品送出時我會解釋風味；我自己操作收銀系統、核對實收金額和當班結帳表。客人反映太苦或等太久時，我先溝通處理並記錄回饋，超過授權的退費要請店長確認。",
+      "收班後我清潔消毒咖啡機相關器具、杯皿及吧檯，放回指定位置並填保養清潔紀錄。咖啡豆烘焙與門市人事排班由別人負責，我沒有決定整店菜單或招募員工。",
+      "另外每週我負責店內的帳務核對：按既定會計科目把各項收入支出登到總帳和明細帳，逐筆對收付款憑證，確認分類及金額相符。發現差額就找經辦人查明，整理更正資料交主管確認，不能自行抹平差異；這項工作不是只印收銀機日結表。"
+    ],
+    "topics": [
+      {
+        "topic_id": "H01-T01",
+        "work": "飲品介紹與點單",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "每天我在吧檯詢問客人要的口味與飲品，協助點單。我會依當天咖啡豆狀態調整磨豆刻度，試喝後調整萃取時間與粉量，按店裡配方做濃縮、拿鐵和手沖，奶泡也由我打好。",
+        "support": [
+          {
+            "id": "TFB5131-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/咖啡調製人員-職能基準.json",
+            "source_sha256": "7d9a539c0c27b0ccc9c61844805bfeaacd9b5e91db1b5d5738875426ec6e5526",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "飲品服務",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "介紹咖啡、餐點或相關周邊商品,並視顧客需求與偏好推薦。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "依據顧客偏好與需求,完成點餐服務。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.3",
+                "text": "送餐並清楚解說咖啡飲品風味與特性。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H01-T02",
+        "work": "磨豆萃取與咖啡奶泡製作",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "每天我在吧檯詢問客人要的口味與飲品，協助點單。我會依當天咖啡豆狀態調整磨豆刻度，試喝後調整萃取時間與粉量，按店裡配方做濃縮、拿鐵和手沖，奶泡也由我打好。",
+        "support": [
+          {
+            "id": "TFB5131-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/咖啡調製人員-職能基準.json",
+            "source_sha256": "7d9a539c0c27b0ccc9c61844805bfeaacd9b5e91db1b5d5738875426ec6e5526",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "調製咖啡",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "選用並正確操作咖啡器具。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "依不同產地、風味的咖啡豆調整適合的萃取參數,並測試咖啡風味。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.3",
+                "text": "依組織標準作業流程,選用正確器具與原料萃取咖啡。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.4",
+                "text": "依組織標準作業流程,選用正確器具與原料製作蒸氣奶泡。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.5",
+                "text": "依組織標準作業流程,選用正確咖啡器具製作義式咖啡/花式咖啡。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H01-T03",
+        "work": "收款與當班結帳",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "飲品送出時我會解釋風味；我自己操作收銀系統、核對實收金額和當班結帳表。客人反映太苦或等太久時，我先溝通處理並記錄回饋，超過授權的退費要請店長確認。",
+        "support": [
+          {
+            "id": "TFB5131-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/咖啡調製人員-職能基準.json",
+            "source_sha256": "7d9a539c0c27b0ccc9c61844805bfeaacd9b5e91db1b5d5738875426ec6e5526",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "結帳與收桌",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "依組織規範/標準服務流程,收取正確金額,並操作營運管理系統。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H01-T04",
+        "work": "顧客問題與回饋記錄",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "飲品送出時我會解釋風味；我自己操作收銀系統、核對實收金額和當班結帳表。客人反映太苦或等太久時，我先溝通處理並記錄回饋，超過授權的退費要請店長確認。",
+        "support": [
+          {
+            "id": "TFB5131-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/咖啡調製人員-職能基準.json",
+            "source_sha256": "7d9a539c0c27b0ccc9c61844805bfeaacd9b5e91db1b5d5738875426ec6e5526",
+            "task_code": "T1.3",
+            "task_name": [
+              {
+                "code": "T1.3",
+                "name": "顧客關係管理",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.3.2",
+                "text": "運用適切溝通方式,回應顧客問題,並蒐集顧客回饋,作為後續服務改善參考。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.3",
+                "text": "記錄顧客問題處理結果。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H01-T05",
+        "work": "吧檯器具清消與維護紀錄",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "收班後我清潔消毒咖啡機相關器具、杯皿及吧檯，放回指定位置並填保養清潔紀錄。咖啡豆烘焙與門市人事排班由別人負責，我沒有決定整店菜單或招募員工。",
+        "support": [
+          {
+            "id": "TFB5131-002v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/咖啡調製人員-職能基準.json",
+            "source_sha256": "7d9a539c0c27b0ccc9c61844805bfeaacd9b5e91db1b5d5738875426ec6e5526",
+            "task_code": "T3.2",
+            "task_name": [
+              {
+                "code": "T3.2",
+                "name": "環境與設備維護",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.2.1",
+                "text": "依職業安全衛生與食品安全衛生相關規範,辨別與選用正確的清潔用品,進行環境消毒與清潔作業。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.2",
+                "text": "依職業安全衛生與食品安全衛生相關規範,辨別與選用正確的清潔用品,消毒與清潔吧檯設備器材、用具、杯皿並復位。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.3",
+                "text": "定期檢查與維護基本營業器具,並填寫設備保養紀錄表。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H01-T06",
+        "work": "每週總帳明細帳與憑證核對",
+        "secondary": true,
+        "employee_message": 4,
+        "employee_quote": "另外每週我負責店內的帳務核對：按既定會計科目把各項收入支出登到總帳和明細帳，逐筆對收付款憑證，確認分類及金額相符。發現差額就找經辦人查明，整理更正資料交主管確認，不能自行抹平差異；這項工作不是只印收銀機日結表。",
+        "support": [
+          {
+            "id": "FAC4311-001v2",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/會計人員-職能基準.json",
+            "source_sha256": "a8fdd48cc40a1afb4cc39050b414692e6f02dd79a4a6a7417fdab2921f24e069",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "定期記錄並核對組織總分類帳",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "將各類收支依組織規範製作總帳及明細分類帳。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "依組織規範之日/月/季/年等不同周期規定記錄總帳及明細分類帳,並依據各項報表分類妥善存放。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.3",
+                "text": "核對總帳與明細分類帳目上所列之款項,確認交易憑證資料與金額正確無誤,若有錯誤應與相關單位及人員確認後修正。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      }
+    ],
+    "grades": {
+      "TFB5131-002v3": 3,
+      "FAC4311-001v2": 2
+    },
+    "hard_negatives": [],
+    "unscored": "Engineering source labels cover listed actions only; quotes retain frequency, authority and denials. Not exhaustive corpus relevance or employee responsibility truth."
+  },
+  {
+    "case_id": "H02",
+    "split": "new_holdout",
+    "kind": "positive",
+    "employee_messages": [
+      "我跟主設計一起聽客戶說海報和型錄需求，把尺寸、文字、圖片風格及視覺元素記下來，找參考照片與素材。素材到齊後，我依主設計指示用繪圖軟體整理出設計初稿和提案資料，由他決定方向。",
+      "方案確認後，我按照指示繪製版面與圖像、標明設計細節，配合印刷端討論版面設定及排版，把修改內容記錄下來，協助輸出設計圖及打樣。最後定稿仍要交主設計與客戶確認。",
+      "我也把客戶資料、設計作品和各版檔案整理歸檔，更新檔案清單。報價與簽約不是我的權限，我不負責整個品牌策略，也不寫應用程式。",
+      "每週另有一項固定責任：依資訊負責人給的程序備份公司訂單資料庫，核對備份是否完成，並在隔離的測試資料庫演練還原，保存備份和復原紀錄。出錯就通報他，沒有擅自修改正式資料表、索引或效能參數的權限。這是資料庫的備份，不是把設計圖複製到隨身碟。"
+    ],
+    "topics": [
+      {
+        "topic_id": "H02-T01",
+        "work": "客戶視覺需求與素材蒐集",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我跟主設計一起聽客戶說海報和型錄需求，把尺寸、文字、圖片風格及視覺元素記下來，找參考照片與素材。素材到齊後，我依主設計指示用繪圖軟體整理出設計初稿和提案資料，由他決定方向。",
+        "support": [
+          {
+            "id": "AVA2172-004v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/平面設計助理-職能基準.json",
+            "source_sha256": "ebef61653fd714954e6dd7fad38a807ad09f7ebd893ad149ec9f1f1d252ef871",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "蒐集設計資訊",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.2",
+                "text": "陪同設計人員、組織相關單位或客戶洽談,並記錄所需視覺元素及相關需求。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.3",
+                "text": "依設計需求,蒐集相關文字、照片或圖案等視覺元素。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H02-T02",
+        "work": "依指示整理設計初稿及提案",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我跟主設計一起聽客戶說海報和型錄需求，把尺寸、文字、圖片風格及視覺元素記下來，找參考照片與素材。素材到齊後，我依主設計指示用繪圖軟體整理出設計初稿和提案資料，由他決定方向。",
+        "support": [
+          {
+            "id": "AVA2172-004v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/平面設計助理-職能基準.json",
+            "source_sha256": "ebef61653fd714954e6dd7fad38a807ad09f7ebd893ad149ec9f1f1d252ef871",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "協助設計提案",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "蒐集客戶提供之素材,並依設計人員指示,使用輔助軟體,協助完成設計圖初稿。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "依設計人員指示,彙整設計提案資訊。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H02-T03",
+        "work": "版面繪製排版紀錄與打樣",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "方案確認後，我按照指示繪製版面與圖像、標明設計細節，配合印刷端討論版面設定及排版，把修改內容記錄下來，協助輸出設計圖及打樣。最後定稿仍要交主設計與客戶確認。",
+        "support": [
+          {
+            "id": "AVA2172-004v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/平面設計助理-職能基準.json",
+            "source_sha256": "ebef61653fd714954e6dd7fad38a807ad09f7ebd893ad149ec9f1f1d252ef871",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "協助繪製設計圖",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "依確認後之提案內容與設計人員指示,選用適切軟體繪製設計圖,並標明詳細設計資訊。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.2",
+                "text": "陪同設計人員與相關人員,協調版面設定及排版,並完成相關紀錄。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.2.3",
+                "text": "協助設計人員輸出設計圖或成型打樣。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H02-T04",
+        "work": "客戶與作品資料歸檔",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "我也把客戶資料、設計作品和各版檔案整理歸檔，更新檔案清單。報價與簽約不是我的權限，我不負責整個品牌策略，也不寫應用程式。",
+        "support": [
+          {
+            "id": "AVA2172-004v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/平面設計助理-職能基準.json",
+            "source_sha256": "ebef61653fd714954e6dd7fad38a807ad09f7ebd893ad149ec9f1f1d252ef871",
+            "task_code": "T1.2",
+            "task_name": [
+              {
+                "code": "T1.2",
+                "name": "處理行政工作",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.2.1",
+                "text": "協助整理及歸檔相關案例(設計作品與資料)。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.2.2",
+                "text": "協助建立客戶及設計資料檔案。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H02-T05",
+        "work": "每週資料庫備份與測試還原紀錄",
+        "secondary": true,
+        "employee_message": 4,
+        "employee_quote": "每週另有一項固定責任：依資訊負責人給的程序備份公司訂單資料庫，核對備份是否完成，並在隔離的測試資料庫演練還原，保存備份和復原紀錄。出錯就通報他，沒有擅自修改正式資料表、索引或效能參數的權限。這是資料庫的備份，不是把設計圖複製到隨身碟。",
+        "support": [
+          {
+            "id": "INM3513-004v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/資料庫分析設計人員-職能基準.json",
+            "source_sha256": "27e2bcf135cd11b4a2644d428c17a480bc42f75cdc63097bd1b23ed121f10799",
+            "task_code": "T3.1",
+            "task_name": [
+              {
+                "code": "T3.1",
+                "name": "建置資料庫",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.1.5",
+                "text": "建立與管理資料庫備份、回復與進行資料庫復原、微調與進行資料庫最佳化,產出資料庫備份紀錄。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      }
+    ],
+    "grades": {
+      "AVA2172-004v3": 3,
+      "INM3513-004v4": 2
+    },
+    "hard_negatives": [],
+    "unscored": "Engineering source labels cover listed actions only; quotes retain frequency, authority and denials. Not exhaustive corpus relevance or employee responsibility truth."
+  },
+  {
+    "case_id": "H03",
+    "split": "new_holdout",
+    "kind": "positive",
+    "employee_messages": [
+      "日常我接收部門和廠商的支出請款，核對原始單據、經辦簽核、會計科目與金額，資料不齊就退回補件。依公司的記帳規則整理應付款項，但付款核准與銀行轉帳由主管處理。",
+      "每月我記錄並核對總分類帳與明細帳，逐項對回原始交易，跟經辦單位查明錯誤後更正。我還編製資產負債表、綜合損益表、現金流量表與權益變動表，確認餘額和總帳相符，依報表類別存檔。",
+      "人事提供薪資彙整表後，我核對薪資及人事費用文件，製作薪資發放傳票，送主管簽核。薪資制度與人員聘用不是由我決定；我也不負責公司的投資決策或稅務策略。",
+      "另外每月由我處理辦公用品採購：收齊各部門品項規格和需求量，找供應商確認條件並比較報價，整理資料送主管核准後下單，追蹤供應商是否按約定時間交貨。有延誤就聯絡供應商及使用部門，不自行超支或改需求。"
+    ],
+    "topics": [
+      {
+        "topic_id": "H03-T01",
+        "work": "請款原始憑證科目與權責核對",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "日常我接收部門和廠商的支出請款，核對原始單據、經辦簽核、會計科目與金額，資料不齊就退回補件。依公司的記帳規則整理應付款項，但付款核准與銀行轉帳由主管處理。",
+        "support": [
+          {
+            "id": "FAC4311-001v2",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/會計人員-職能基準.json",
+            "source_sha256": "a8fdd48cc40a1afb4cc39050b414692e6f02dd79a4a6a7417fdab2921f24e069",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "辦理日常應付款項作業",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "依據一般記帳與會計準則,辦理組織內部或協力廠商之支出請款事宜。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "確認經辦人員依權責辦理各類原始憑證。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.3",
+                "text": "確認原始記帳憑證及會計科目正確無誤。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H03-T02",
+        "work": "每月總帳明細帳與原始交易核對",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "每月我記錄並核對總分類帳與明細帳，逐項對回原始交易，跟經辦單位查明錯誤後更正。我還編製資產負債表、綜合損益表、現金流量表與權益變動表，確認餘額和總帳相符，依報表類別存檔。",
+        "support": [
+          {
+            "id": "FAC4311-001v2",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/會計人員-職能基準.json",
+            "source_sha256": "a8fdd48cc40a1afb4cc39050b414692e6f02dd79a4a6a7417fdab2921f24e069",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "定期記錄並核對組織總分類帳",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "將各類收支依組織規範製作總帳及明細分類帳。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "依組織規範之日/月/季/年等不同周期規定記錄總帳及明細分類帳,並依據各項報表分類妥善存放。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.3",
+                "text": "核對總帳與明細分類帳目上所列之款項,確認交易憑證資料與金額正確無誤,若有錯誤應與相關單位及人員確認後修正。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H03-T03",
+        "work": "編製四大財務報表與餘額核對",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "每月我記錄並核對總分類帳與明細帳，逐項對回原始交易，跟經辦單位查明錯誤後更正。我還編製資產負債表、綜合損益表、現金流量表與權益變動表，確認餘額和總帳相符，依報表類別存檔。",
+        "support": [
+          {
+            "id": "FAC4311-001v2",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/會計人員-職能基準.json",
+            "source_sha256": "a8fdd48cc40a1afb4cc39050b414692e6f02dd79a4a6a7417fdab2921f24e069",
+            "task_code": "T3.1",
+            "task_name": [
+              {
+                "code": "T3.1",
+                "name": "編製組織財務報表",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.1.1",
+                "text": "編製資產負債表、綜合損益表、現金流量表及權益變動表等四大報表。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.1.2",
+                "text": "確認報表餘額與總分類帳相符,相關金額與原始交易紀錄相符。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H03-T04",
+        "work": "薪資文件核對及發放傳票",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "人事提供薪資彙整表後，我核對薪資及人事費用文件，製作薪資發放傳票，送主管簽核。薪資制度與人員聘用不是由我決定；我也不負責公司的投資決策或稅務策略。",
+        "support": [
+          {
+            "id": "FAC4311-001v2",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/會計人員-職能基準.json",
+            "source_sha256": "a8fdd48cc40a1afb4cc39050b414692e6f02dd79a4a6a7417fdab2921f24e069",
+            "task_code": "T4.1",
+            "task_name": [
+              {
+                "code": "T4.1",
+                "name": "辦理薪資發放立帳作業",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P4.1.1",
+                "text": "取得人事單位提供之薪資彙整表與組織之人事費用相關表單,據以製作薪資發放傳票。",
+                "field_pending": null
+              },
+              {
+                "code": "P4.1.2",
+                "text": "確認薪資及人事費用相關文件正確,並由主管簽核確認。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H03-T05",
+        "work": "每月用品採購條件報價與交期追蹤",
+        "secondary": true,
+        "employee_message": 4,
+        "employee_quote": "另外每月由我處理辦公用品採購：收齊各部門品項規格和需求量，找供應商確認條件並比較報價，整理資料送主管核准後下單，追蹤供應商是否按約定時間交貨。有延誤就聯絡供應商及使用部門，不自行超支或改需求。",
+        "support": [
+          {
+            "id": "BAS3323-001v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/採購人員-職能基準.json",
+            "source_sha256": "9218b6491f538956fd48e1d993e580e5bf3afbe2cb46088276468e7c0164c294",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "驗收採購項目及請款",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "依組織採購規範、訂購單/採購合約,處理採購項目遺失或延遲、貨品交期跟催等問題。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      }
+    ],
+    "grades": {
+      "FAC4311-001v2": 3,
+      "BAS3323-001v4": 2
+    },
+    "hard_negatives": [],
+    "unscored": "Engineering source labels cover listed actions only; quotes retain frequency, authority and denials. Not exhaustive corpus relevance or employee responsibility truth."
+  },
+  {
+    "case_id": "H04",
+    "split": "new_holdout",
+    "kind": "positive",
+    "employee_messages": [
+      "我按家用冷氣的設計圖和現場指示，先核對施工範圍、動線與所需零件，檢查防護措施、消防設備和工具測試裝置是否正常，與施工主管確認支架位置及承重要求，才準備進場。",
+      "安裝時我先依檢查表確認絕緣與安全防護完成，再依說明固定支架、設備與配件。我會量尺寸、裁切彎曲管線、焊接冷媒配管，注意焊接汙染，做規定的尺寸和壓力檢查並填紀錄；超出作業指示的異常先問主管。",
+      "完工後我清潔工具並歸位，整理現場，填完工紀錄向主管回報。系統設計、工程報價與整家公司的人員排程不是我負責的；目前也沒有承接大型中央空調系統規劃。",
+      "每季我還負責公司材料庫房的完整盤點：照庫存清單逐項清點備料和備用工具，核對帳上數量，記錄短少或多出的差異、整理盤點異常報告交主管確認。帳面數字要經核准才調整，不是只替當天施工拿幾個零件。"
+    ],
+    "topics": [
+      {
+        "topic_id": "H04-T01",
+        "work": "施工現場安全及防護檢核",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我按家用冷氣的設計圖和現場指示，先核對施工範圍、動線與所需零件，檢查防護措施、消防設備和工具測試裝置是否正常，與施工主管確認支架位置及承重要求，才準備進場。",
+        "support": [
+          {
+            "id": "SET7127-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/冷凍空調設備安裝人員-職能基準.json",
+            "source_sha256": "90ae2ef07c2b23aa5c696552ffc13f74db5898e1d32d45b48ad0d372baf7153f",
+            "task_code": "T1.1",
+            "task_name": [
+              {
+                "code": "T1.1",
+                "name": "確認施工安全",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "遵循法規及程序【註1】,準備及進行,確認施工現場、消防設備與個人防護措施符合規範。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.1.2",
+                "text": "確認相關配合事項均已完備,各項安全裝置運作正常。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H04-T02",
+        "work": "圖面施工範圍工具與支撐準備",
+        "secondary": false,
+        "employee_message": 1,
+        "employee_quote": "我按家用冷氣的設計圖和現場指示，先核對施工範圍、動線與所需零件，檢查防護措施、消防設備和工具測試裝置是否正常，與施工主管確認支架位置及承重要求，才準備進場。",
+        "support": [
+          {
+            "id": "SET7127-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/冷凍空調設備安裝人員-職能基準.json",
+            "source_sha256": "90ae2ef07c2b23aa5c696552ffc13f74db5898e1d32d45b48ad0d372baf7153f",
+            "task_code": "T2.1",
+            "task_name": [
+              {
+                "code": "T2.1",
+                "name": "準備前置作業",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.1.1",
+                "text": "遵循法規及程序,由設計圖並與冷凍空調系統施工主管確認零件材料、施工範圍、動線及其他要求。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.2",
+                "text": "備妥工具、設備與測試裝置並確認運作/操作正常且安全無虞。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.1.3",
+                "text": "檢視環境,依所需的載重與安裝要求,選用支撐、保護功能的支撐設備與配件。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H04-T03",
+        "work": "按說明完成安裝固定與防護確認",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "安裝時我先依檢查表確認絕緣與安全防護完成，再依說明固定支架、設備與配件。我會量尺寸、裁切彎曲管線、焊接冷媒配管，注意焊接汙染，做規定的尺寸和壓力檢查並填紀錄；超出作業指示的異常先問主管。",
+        "support": [
+          {
+            "id": "SET7127-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/冷凍空調設備安裝人員-職能基準.json",
+            "source_sha256": "90ae2ef07c2b23aa5c696552ffc13f74db5898e1d32d45b48ad0d372baf7153f",
+            "task_code": "T2.2",
+            "task_name": [
+              {
+                "code": "T2.2",
+                "name": "進行安裝與固定裝置",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.2.1",
+                "text": "遵循法規及程序,依據安裝說明,於外露導電體和施工機器上,確認完成電機絕緣保護措施,精確安裝及固定裝置(支撐設備和配件)。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H04-T04",
+        "work": "冷媒配管裁焊與尺寸壓力檢查",
+        "secondary": false,
+        "employee_message": 2,
+        "employee_quote": "安裝時我先依檢查表確認絕緣與安全防護完成，再依說明固定支架、設備與配件。我會量尺寸、裁切彎曲管線、焊接冷媒配管，注意焊接汙染，做規定的尺寸和壓力檢查並填紀錄；超出作業指示的異常先問主管。",
+        "support": [
+          {
+            "id": "SET7127-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/冷凍空調設備安裝人員-職能基準.json",
+            "source_sha256": "90ae2ef07c2b23aa5c696552ffc13f74db5898e1d32d45b48ad0d372baf7153f",
+            "task_code": "T3.2",
+            "task_name": [
+              {
+                "code": "T3.2",
+                "name": "安裝冷凍空調系統之配管與配件",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P3.2.1",
+                "text": "遵循法規及程序,以切割、焊接專業技法進行裁切、燒焊、彎曲及鉗工管線與配件,以利裝配冷凍空調設備。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.2",
+                "text": "以銀、銅、鋁、氣焊工法處理冷媒配管與配件,並使用適當焊接方式,預防管路焊接氧化物汙染。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.3",
+                "text": "依據永續性能源準則,進行配管作業與配件安裝,善用材料與機器設備,不可損壞環境與其他設施。",
+                "field_pending": null
+              },
+              {
+                "code": "P3.2.4",
+                "text": "依據施工指示或說明書,執行尺寸和壓力檢驗及其他各項品質檢查。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H04-T05",
+        "work": "完工清理歸位及紀錄回報",
+        "secondary": false,
+        "employee_message": 3,
+        "employee_quote": "完工後我清潔工具並歸位，整理現場，填完工紀錄向主管回報。系統設計、工程報價與整家公司的人員排程不是我負責的；目前也沒有承接大型中央空調系統規劃。",
+        "support": [
+          {
+            "id": "SET7127-001v3",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/冷凍空調設備安裝人員-職能基準.json",
+            "source_sha256": "90ae2ef07c2b23aa5c696552ffc13f74db5898e1d32d45b48ad0d372baf7153f",
+            "task_code": "T2.3",
+            "task_name": [
+              {
+                "code": "T2.3",
+                "name": "完工復原與記錄",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P2.3.1",
+                "text": "遵循法規及程序,依6S原則完成作業,將工具和設備清潔後歸位,整理現場保持整潔。",
+                "field_pending": null
+              },
+              {
+                "code": "P2.3.2",
+                "text": "確認完工且整理環境後,呈報相關人員並記錄。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      },
+      {
+        "topic_id": "H04-T06",
+        "work": "每季材料庫房盤點與異常報告",
+        "secondary": true,
+        "employee_message": 4,
+        "employee_quote": "每季我還負責公司材料庫房的完整盤點：照庫存清單逐項清點備料和備用工具，核對帳上數量，記錄短少或多出的差異、整理盤點異常報告交主管確認。帳面數字要經核准才調整，不是只替當天施工拿幾個零件。",
+        "support": [
+          {
+            "id": "MMP4321-003v4",
+            "source": "apps/pdf-to-json/data/json-checked-2026-10-04/零售業倉儲管理人員-職能基準.json",
+            "source_sha256": "d3b1676b18a4d93d8c75b4e54ae6d0f2085c30213b081611f834639b515ad82a",
+            "task_code": "T1.3",
+            "task_name": [
+              {
+                "code": "T1.3",
+                "name": "進行定期盤點",
+                "field_pending": null
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.3.1",
+                "text": "依組織規範進行定期盤點或抽點。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.2",
+                "text": "編制倉儲差異分析報告。",
+                "field_pending": null
+              },
+              {
+                "code": "P1.3.3",
+                "text": "確認及記錄盤點結果,完成盤點結果(異常)報告。",
+                "field_pending": null
+              }
+            ],
+            "scope": "Only the described supported action; not all duties of this source position."
+          }
+        ]
+      }
+    ],
+    "grades": {
+      "SET7127-001v3": 3,
+      "MMP4321-003v4": 2
+    },
+    "hard_negatives": [],
+    "unscored": "Engineering source labels cover listed actions only; quotes retain frequency, authority and denials. Not exhaustive corpus relevance or employee responsibility truth."
+  }
+]

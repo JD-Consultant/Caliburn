@@ -1,0 +1,12 @@
+{
+  "count_requests": 33,
+  "model_requests": 33,
+  "fresh_episodes": 14,
+  "model_responses": 33,
+  "continuation_requests": 19,
+  "preserved_reasoning": 20,
+  "preserved_function_call": 40,
+  "estimated_generation_usd": "0.013163505",
+  "pending_allowance_usd": "0.0033",
+  "status": "completed"
+}

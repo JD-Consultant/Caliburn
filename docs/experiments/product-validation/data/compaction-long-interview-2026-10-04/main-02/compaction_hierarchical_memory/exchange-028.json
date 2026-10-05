@@ -1,0 +1,16 @@
+{
+  "event_id": "e028",
+  "execution_id": "617edba6-1218-4e3a-a22b-f9d903e8198e",
+  "employee_input": {
+    "source_id": "db9b3fc2-54b2-480e-b237-531fd793d13b",
+    "interview_sequence": 56,
+    "speaker": "employee",
+    "interview_text": "單據和核准紀錄依公司既有檔案規則放在共享資料夾，檔名帶日期與原單號。保存幾年我不確定，這要問財務；我不能給你一個自己猜的保存年限。"
+  },
+  "consultant_reply": {
+    "source_id": "79d69f10-3085-42a2-a8f5-8628c0f023e0",
+    "interview_sequence": 57,
+    "speaker": "consultant",
+    "interview_text": "已補入到貨任務草稿：單據與核准紀錄依公司既有規則存放在共享資料夾，檔名包含日期與原單號；保存年限由財務確認，不自行設定或猜測。\n\n那一箱 12 件的換算依據，會放在共享資料夾供查核，還是也會維護在品號資料中供後續收貨參照？"
+  }
+}

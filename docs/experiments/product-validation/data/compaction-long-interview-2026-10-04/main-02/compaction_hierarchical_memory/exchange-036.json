@@ -1,0 +1,16 @@
+{
+  "event_id": "e036",
+  "execution_id": "0d8715e2-9d8e-4165-8a80-4a3c0c58230a",
+  "employee_input": {
+    "source_id": "2789d917-4254-4d98-8e6d-de8d8af0a546",
+    "interview_sequence": 72,
+    "speaker": "employee",
+    "interview_text": "新同事上任時，我會示範ERP登錄、如何找原單據及查差異，主管决定分工和考核。我沒有帶人職務，不負責訂全公司的訓練制度；示範實際流程和維護自己的交接說明是我會做的。"
+  },
+  "consultant_reply": {
+    "source_id": "7ef196fa-8629-479f-934d-5a381b783e57",
+    "interview_sequence": 73,
+    "speaker": "consultant",
+    "interview_text": "已新增「示範庫存作業並維護交接說明」任務，記錄您在新同事上任時示範 ERP 登錄、查找原單據及查核差異，並維護自己負責流程的說明；工作分配與考核由主管決定，您不負責帶人或制定全公司訓練制度。\n\n交接說明通常在流程變更時更新，還是也有固定檢視週期？"
+  }
+}

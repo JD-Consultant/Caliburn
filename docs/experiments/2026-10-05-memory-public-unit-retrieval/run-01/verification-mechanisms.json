@@ -1,0 +1,24 @@
+{
+  "cases": 8,
+  "methods": 12,
+  "groups": 96,
+  "positions": 480,
+  "queries": 20,
+  "cosines_recomputed": 177460,
+  "max_cosine_error": 0,
+  "quality_rerank_pairs": 628,
+  "warm_dense_trials": 144,
+  "warm_rerank_trials": 144,
+  "fresh_warm_rerank_pairs": 3600,
+  "controls_unchanged": 24,
+  "prior_sealed_files_unchanged": 1933,
+  "negative_probes": [
+    "changed query text rejected",
+    "duplicate parent in local pool rejected",
+    "changed source hash rejected"
+  ],
+  "unique_selected_pairs": 158,
+  "validated_grades": 113,
+  "grading_complete": false,
+  "scope": "finite observed synthetic retrieval comparison; not full-corpus relevance recall/JD completeness"
+}

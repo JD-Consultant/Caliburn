@@ -1,0 +1,160 @@
+{
+  "final": {
+    "status": "complete"
+  },
+  "steps": 3,
+  "tool_calls": [
+    {
+      "event": "tool",
+      "step": 1,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "甲倉盤點差異回報"
+      },
+      "result": {
+        "title": "甲倉盤點差異回報",
+        "description": "本人複盤、填單並依百分比門檻回報。",
+        "body": "甲倉每天盤點，本人複盤填差異單；帳實數量差異超過 5% 才回報主管，不自行異動 ERP。",
+        "work_situation_references": [
+          {
+            "target_title": "甲倉盤點與歸檔",
+            "description": "盤點差異回報及月末歸檔。"
+          }
+        ]
+      }
+    },
+    {
+      "event": "tool",
+      "step": 1,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "乙倉退貨核對與異動交接"
+      },
+      "result": {
+        "title": "乙倉退貨核對與異動交接",
+        "description": "退貨核對、待判定狀態與核准交接；不套甲倉門檻。",
+        "body": "乙倉每天 17:30 由本人核對退貨單與實收品，檢查分類並記錄；無法判定的列待判定，不計可用庫存。異動核准人尚未確認；核准後由帳務專員異動 ERP，不由本人異動。乙倉差異百分比門檻尚未提供。甲倉超過 5% 的回報門檻不適用乙倉。",
+        "work_situation_references": [
+          {
+            "target_title": "乙倉退貨核對",
+            "description": "每天定時核對、分類與庫存異動分工。"
+          }
+        ]
+      }
+    },
+    {
+      "event": "tool",
+      "step": 1,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "甲倉盤點資料歸檔"
+      },
+      "result": {
+        "title": "甲倉盤點資料歸檔",
+        "description": "每月歸檔差異單及主管回覆。",
+        "body": "本人在每個月末將甲倉差異單與主管回覆歸檔一次。",
+        "work_situation_references": [
+          {
+            "target_title": "甲倉盤點與歸檔",
+            "description": "盤點差異回報及月末歸檔。"
+          }
+        ]
+      }
+    },
+    {
+      "event": "tool",
+      "step": 1,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "甲倉盤點與歸檔"
+      },
+      "result": {
+        "title": "甲倉盤點與歸檔",
+        "description": "盤點差異回報及月末歸檔。",
+        "body": "甲倉每天盤點；本人複盤並填差異單，帳實數量差異超過 8% 才回報主管，不自行異動 ERP。每個月末將差異單與主管回覆歸檔一次。",
+        "interview_references": [
+          1,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "event": "tool",
+      "step": 1,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "乙倉退貨核對"
+      },
+      "result": {
+        "title": "乙倉退貨核對",
+        "description": "每天定時核對、分類與庫存異動分工。",
+        "body": "乙倉每天 17:30 由本人核對退貨單與實收品，檢查分類並記錄；無法判定的列待判定，不計可用庫存。異動由倉儲主管核准；核准後由帳務專員異動 ERP，不由本人異動。乙倉差異百分比門檻尚未提供。",
+        "interview_references": [
+          2,
+          4
+        ]
+      }
+    },
+    {
+      "event": "tool",
+      "step": 2,
+      "name": "update_work_understanding",
+      "arguments": {
+        "target_title": "甲倉盤點差異回報",
+        "changes": [
+          {
+            "field": "body",
+            "diff": "@@\n-甲倉每天盤點，本人複盤填差異單；帳實數量差異超過 5% 才回報主管，不自行異動 ERP。\n+甲倉每天盤點，本人複盤填差異單；帳實數量差異超過 8% 才回報主管，不自行異動 ERP。"
+          }
+        ]
+      },
+      "result": {
+        "status": "updated"
+      }
+    },
+    {
+      "event": "tool",
+      "step": 2,
+      "name": "update_work_understanding",
+      "arguments": {
+        "target_title": "乙倉退貨核對與異動交接",
+        "changes": [
+          {
+            "field": "description",
+            "value": "乙倉每日退貨核對、分類與記錄；倉儲主管核准庫存異動，再由帳務專員交接執行 ERP 異動。"
+          },
+          {
+            "field": "body",
+            "diff": "@@\n-乙倉每天 17:30 由本人核對退貨單與實收品，檢查分類並記錄；無法判定的列待判定，不計可用庫存。異動核准人尚未確認；核准後由帳務專員異動 ERP，不由本人異動。乙倉差異百分比門檻尚未提供。甲倉超過 5% 的回報門檻不適用乙倉。\n+乙倉每天 17:30 由本人核對退貨單與實收品，檢查分類並記錄；無法判定的列待判定，不計可用庫存。異動由倉儲主管核准；核准後由帳務專員異動 ERP，不由本人異動。乙倉差異百分比門檻尚未提供。"
+          }
+        ]
+      },
+      "result": {
+        "status": "updated"
+      }
+    }
+  ],
+  "reads": [
+    [
+      "work_situation",
+      "乙倉退貨核對"
+    ],
+    [
+      "work_situation",
+      "甲倉盤點與歸檔"
+    ],
+    [
+      "work_understanding",
+      "乙倉退貨核對與異動交接"
+    ],
+    [
+      "work_understanding",
+      "甲倉盤點差異回報"
+    ],
+    [
+      "work_understanding",
+      "甲倉盤點資料歸檔"
+    ]
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "baseline",
+  "repeat": 1,
+  "case_id": "numeric_boundaries",
+  "cell_id": "numeric_boundaries-baseline-1",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11003,
+        "input_tokens_details": {
+          "cache_write_tokens": 7275,
+          "cached_tokens": 3725
+        },
+        "output_tokens": 521,
+        "output_tokens_details": {
+          "reasoning_tokens": 323
+        },
+        "total_tokens": 11524
+      },
+      "estimated_usd": "0.001207425",
+      "seconds": 6.980679900036193
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_1.outcome_2",
+        "value": "到貨差異及未確認項目留有實收紀錄與追蹤資訊，供採購及相關窗口處理。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "僅核對本次提供的到貨任務內容；成果一與分工描述符合已知工作，修正成果二，避免將倉庫同事清點實物寫成本人職責。"
+  },
+  "seconds": 17.996173700026702
+}

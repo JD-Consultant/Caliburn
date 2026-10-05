@@ -1,0 +1,10 @@
+{
+  "checked_utc": "2026-10-04T02:05:36.6392255Z",
+  "embedding_container": "caliburn-ocs-eval-embedder-1",
+  "embedding_running": false,
+  "qdrant_owned_pid": 58280,
+  "qdrant_owned_running": false,
+  "research_ports_listening": [],
+  "existing_research_postgresql": "retained; not owned or stopped by this experiment",
+  "data": "schemas, published snapshots, vectors and Qdrant storage retained"
+}

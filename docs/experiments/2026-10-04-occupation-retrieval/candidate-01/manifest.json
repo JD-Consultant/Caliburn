@@ -1,0 +1,24 @@
+{
+  "purpose": "Validate whole-B2 pilot choice TOP+dense, old holdout is regression only",
+  "base_manifest_sha256": "7dda4d4667bf3393fa531b02ff51665101f86079f4c912e67a61bb23bf3e0e16",
+  "runtime": {
+    "model": "BAAI/bge-m3",
+    "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "device": "cuda",
+    "fp16": true,
+    "max_length": 8192,
+    "batch_size": 1,
+    "packages": {
+      "torch": "2.10.0+cu128",
+      "transformers": "4.57.6",
+      "FlagEmbedding": "1.4.0",
+      "huggingface-hub": "0.36.2"
+    }
+  },
+  "script_sha256": "a5182458ee111699794c6a573aa53c523bfc23f5770fe3d92b088a672cde4ea2",
+  "validation_sha256": "c069259e405b042f72c3cf10d7704234b5b616228c7b663c25b95fefb26ea1ad",
+  "environment_sha256": "d8d0cfc4a8138bc68cf4ba152f9c7b0c664e87556967f214874afbe7b0845a7b",
+  "input_choice_source": "run-03/input-summary.json",
+  "method_choice_source": "memory-01/memory-method-summary.json",
+  "fresh_holdout": false
+}

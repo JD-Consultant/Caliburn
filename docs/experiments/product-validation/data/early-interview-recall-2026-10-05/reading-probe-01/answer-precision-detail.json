@@ -1,0 +1,15 @@
+{
+  "arm": "precision",
+  "case_id": "detail",
+  "answer": "那個經資料維護窗口確認的品號是 **一箱 12 件**；這個換算只適用該品號，不能套用到其他商品，其他品號需依各自資料確認。\n\n你沒有說過單據及核准紀錄確定要保存幾年。已知是依公司既有規則存放在共享資料夾，檔名帶日期及原單號；保存年限應向**財務**確認。",
+  "reads": [],
+  "steps": 1,
+  "usage": {
+    "input_tokens": 11128,
+    "output_tokens": 329,
+    "reasoning_tokens": 217,
+    "cached_input_tokens": 0,
+    "generation_calls": 1
+  },
+  "estimated_usd": "0.001655425"
+}

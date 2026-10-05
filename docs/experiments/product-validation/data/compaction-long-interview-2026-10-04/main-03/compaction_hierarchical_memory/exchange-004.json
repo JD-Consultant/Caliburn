@@ -1,0 +1,16 @@
+{
+  "event_id": "e004",
+  "execution_id": "9bf607b5-2285-4407-bb72-ce7f6ce9636d",
+  "employee_input": {
+    "source_id": "025d7357-18c3-4211-8fcc-d0b1829ec4d4",
+    "interview_sequence": 8,
+    "speaker": "employee",
+    "interview_text": "驗收時如果不良件數占本批實際驗收件數超過5%，我會提報倉儲主管。剛好5%不因這條比例規則提報，但有安全疑慮時仍先隔離並通知主管；比例門檻不是把安全問題略過的理由。"
+  },
+  "consultant_reply": {
+    "source_id": "643bfd9b-42ed-4137-a75d-6cb11bfbef74",
+    "interview_sequence": 9,
+    "speaker": "consultant",
+    "interview_text": "已把驗收門檻補進草稿：不良件數比例「超過 5%」才依此規則提報；安全疑慮則不看比例，需先隔離並通知倉儲主管。\n\n未超過 5% 且沒有安全疑慮的不良品，您會怎麼記錄或處理？計算比例所需的件數，是倉庫同事提供給您，還是您也負責核算？"
+  }
+}

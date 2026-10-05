@@ -1,0 +1,22 @@
+[
+  {
+    "cell": "control-1",
+    "job_file_id": "292b2432-6679-4480-adae-a48a0728a401",
+    "execution_id": "c421bd06-2175-4415-a5b7-60af13edc31e"
+  },
+  {
+    "cell": "candidate-1",
+    "job_file_id": "414dadbc-aee6-455d-b56b-9e5691832f0d",
+    "execution_id": "aac28fa0-81f5-4ebb-b24d-2df63f481a04"
+  },
+  {
+    "cell": "candidate-2",
+    "job_file_id": "db4edbc3-2b06-4c68-b5bd-a6d57080e133",
+    "execution_id": "198d09b3-f7ff-47f3-9f75-14b4943bf4eb"
+  },
+  {
+    "cell": "control-2",
+    "job_file_id": "4b1175ce-be6e-43fe-9260-42cd135048c4",
+    "execution_id": "ab16e35a-6c0e-466d-bc88-d3caf0db6538"
+  }
+]

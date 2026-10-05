@@ -1,0 +1,35 @@
+{
+  "groups": 40,
+  "positions": 200,
+  "unique_pairs": 84,
+  "missing_positions": 0,
+  "new_response_count": 35,
+  "new_estimated_usd": "0.037831530",
+  "counts": {
+    "parents": 805,
+    "counts": {
+      "document": 805,
+      "task": 8068,
+      "unit": 3661
+    },
+    "kinds": {
+      "document:document": 805,
+      "task:overview": 803,
+      "task:task": 7265,
+      "unit:overview": 803,
+      "unit:unit": 2858
+    },
+    "unique_texts": 11064,
+    "all_document_lines_preserved": true,
+    "source_files_verified": 805
+  },
+  "embedding": {
+    "unique_texts": 11064,
+    "fresh": 9460,
+    "cached": 1604,
+    "batches": 346,
+    "embed_seconds": 114.39639690017793,
+    "elapsed_seconds": 122.99550549994456,
+    "fresh_token_max": 1315
+  }
+}

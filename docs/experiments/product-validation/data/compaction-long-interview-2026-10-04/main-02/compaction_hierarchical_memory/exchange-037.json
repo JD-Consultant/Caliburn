@@ -1,0 +1,16 @@
+{
+  "event_id": "e037",
+  "execution_id": "0803a344-41ef-4132-ab7d-6dfed0fabc18",
+  "employee_input": {
+    "source_id": "ab0df328-a7df-47c1-b837-03dfa8b7fc48",
+    "interview_sequence": 74,
+    "speaker": "employee",
+    "interview_text": "我需要理解可用、保留、待檢和在途庫存的差別，也要知道品號、批號和不同計量單位的關係。ERP不只是輸入數字，還要檢查原單號、庫存狀態和核准資料是否對得起來。"
+  },
+  "consultant_reply": {
+    "source_id": "daf753e2-7b17-42a7-aff7-22f56d71398a",
+    "interview_sequence": 75,
+    "speaker": "consultant",
+    "interview_text": "已新增「庫存狀態與可用量概念」、「品號、批號與計量單位關係」兩項知識，以及「ERP資料與來源依據核對」技能，並連結到實際使用它們的收貨、退貨、盤點、缺貨、調撥、帳齡表、召回及流程示範任務。其他未能確認的能力沒有推定加入。\n\n除 ERP 和共享資料夾外，您會用試算表或其他工具維護差異清單、追蹤進度或編製報表嗎？"
+  }
+}

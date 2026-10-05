@@ -1,0 +1,63 @@
+{
+  "status": "completed",
+  "completed": {
+    "raw": [
+      "c01",
+      "c02",
+      "c03",
+      "c04",
+      "c05",
+      "c06",
+      "c07",
+      "c08"
+    ],
+    "summary": [
+      "c01",
+      "c02",
+      "c03",
+      "c04",
+      "c05",
+      "c06",
+      "c07",
+      "c08"
+    ],
+    "memory": [
+      "c01",
+      "c02",
+      "c03",
+      "c04",
+      "c05",
+      "c06",
+      "c07",
+      "c08"
+    ]
+  },
+  "capacity_stops": {},
+  "usage": {
+    "input_tokens": 952392,
+    "output_tokens": 14073,
+    "reasoning_tokens": 9479,
+    "cached_input_tokens": 857571,
+    "cache_write_input_tokens": 94692,
+    "total_tokens": 966465,
+    "outbound_calls": 108,
+    "count_calls": 65,
+    "generation_calls": 43,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 952392,
+    "prior_usd": "1.391700015",
+    "batch_limit_usd": "0.25",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0065",
+    "actual_estimated_usd": "0.027461610",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.033961610",
+    "cumulative_occupied_usd": "1.425661625",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 318.3905489000026,
+    "seconds_limit": 2700,
+    "stop_reason": null
+  }
+}

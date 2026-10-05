@@ -1,0 +1,58 @@
+{
+  "created_at": "2026-10-05T03:37:53.960953+00:00",
+  "inputs": {
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/all-rankings.json": {
+      "sha256": "ceed5198f620b0df4836e4e18f6a80eda7a28e781e73e357f4f40c2eb61efb0a",
+      "bytes": 41006618
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/cases.json": {
+      "sha256": "6089e469ffb78f7e3300fc62f5afd499e8427cd76b3e01e2e29b708aa4b7ae3b",
+      "bytes": 76963
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/queries.json": {
+      "sha256": "36a62c2ad45cddf0497ea72673dd805b0e2801f1614e4ff87660b1104d78869c",
+      "bytes": 87621
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/corpus.json": {
+      "sha256": "ae5ec2b264eba771f84b27a69fef7e80067d6a14ec20e94e9be0482fa9ac868d",
+      "bytes": 2387875
+    },
+    "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/artifact-hashes.json": {
+      "sha256": "a57a7df9b57c1acdc48b5f4e7d05d6cbf172c9034801eacc262c1b0133e7c6ec",
+      "bytes": 84001
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/query-unions.json": {
+      "sha256": "3ad29c270422c5993c92eef3113462e2aa977ad698525511c91d5152f659dda0",
+      "bytes": 88299
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/artifact-hashes.json": {
+      "sha256": "a5ccb352d21d636379be4a8896ceed8f374b12fb4f9324532168659749ff27eb",
+      "bytes": 4307
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/targets.json": {
+      "sha256": "2fca43dcbdc18dd484053608d067480477b73bbb9fba315fbd1698a2b5dd2fe1",
+      "bytes": 32623
+    },
+    "docs/experiments/2026-10-05-initial-retrieval-depth/run-01/artifact-hashes.json": {
+      "sha256": "d58898f4471b91dc2d30baa3270b94343165860a9c41e22695980e32fbc7e388",
+      "bytes": 4620
+    },
+    "docs/experiments/2026-10-05-adaptive-reference-selection/run-01/first-stage/protocol.md": {
+      "sha256": "28ab64c7d160746caf2baa251f54a34a5d4287a75087cdf3d901655646a08c52",
+      "bytes": 3190
+    },
+    "docs/experiments/2026-10-05-adaptive-reference-selection/run-01/first-stage/evaluate.py": {
+      "sha256": "a05175f28d3c63e2d9a56f3bf81c9aef0dd693ecb495c5a23d143c6fa4a70f8d",
+      "bytes": 13299
+    },
+    "docs/experiments/2026-10-05-adaptive-reference-selection/run-01/first-stage/test_mechanism.py": {
+      "sha256": "d96454766c4c4fa58f7073971788de0c7030956a3e2b9ad3ed428c731d9f0149",
+      "bytes": 1685
+    }
+  },
+  "new_provider_calls": 0,
+  "new_embedding_calls": 0,
+  "new_reranker_calls": 0,
+  "new_database_calls": 0,
+  "score_source": "frozen exact CPU cosine, no recomputed embedding"
+}

@@ -1,0 +1,168 @@
+{
+  "status": "counted",
+  "scope": "Initial templates only; later Agent history and outputs are not generated",
+  "head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "file_hashes": {
+    "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/employee-scenario.json": "cb0d1dd3ecf32f8e887a44c514f42e5e1b3f3c1410145672fdbcb1621ae09333",
+    "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/grading-cases.json": "84e8d0264f505632e6f27f5178db352c530007dbdd39b9340a0b0aaecda9ef7b",
+    "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/preparation.py": "d07e6bcb10ec1732f054f11737c64d0c015451772e1a5085a8cf5fd59a9edbd7",
+    "apps/api/src/caliburn/agents/job_consultant/instructions.py": "318e0332a38262bcd7ad6a1513e613c0c311ec0bf1ba12bebd2aa250ab86f25c",
+    "apps/api/src/caliburn/adapters/openai_responses.py": "539ba7237afa8137096eae06b38037cd52fe43c528f47fb638606db1b59c2f4d",
+    "apps/api/src/caliburn/adapters/openai_models.py": "b672fe9b13ed5ae4d4a8792fc8c054e79903f9843a9e251dfde522c76ad71aab"
+  },
+  "openai_sdk_version": "3.20.0",
+  "employee_events": 61,
+  "employee_characters": 4589,
+  "case_count": 14,
+  "fact_units": 51,
+  "generation_calls": 0,
+  "compaction_calls": 0,
+  "count_attempts": 5,
+  "requests": [
+    {
+      "name": "compaction_hierarchical_memory",
+      "payload_sha256": "791dc8b6dff17f04b5d00f80c79ea809460515455790f6e4f63f1be62ddd3496",
+      "tool_names": [
+        "read_work_situation_map",
+        "read_work_situation",
+        "read_work_understanding_map",
+        "read_work_understanding",
+        "read_interview",
+        "read_jd",
+        "read_jd_changes",
+        "revise_jd_profile",
+        "create_jd_task",
+        "create_jd_item",
+        "revise_jd_item",
+        "delete_jd_item",
+        "move_jd_item",
+        "request_context_compaction"
+      ]
+    },
+    {
+      "name": "compaction_flat_summary",
+      "payload_sha256": "eedd59bfd356f676a749cf11a16e95e0d769485927e315f9d8bbcc5d6b5eecb2",
+      "tool_names": [
+        "read_interview",
+        "read_jd",
+        "read_jd_changes",
+        "revise_jd_profile",
+        "create_jd_task",
+        "create_jd_item",
+        "revise_jd_item",
+        "delete_jd_item",
+        "move_jd_item",
+        "request_context_compaction"
+      ]
+    },
+    {
+      "name": "compaction_raw_history",
+      "payload_sha256": "cb4dc319b570d02604453b37c1c5ed8718b88bfe43cc9fc4976d3448726b51fb",
+      "tool_names": [
+        "read_interview",
+        "read_jd",
+        "read_jd_changes",
+        "revise_jd_profile",
+        "create_jd_task",
+        "create_jd_item",
+        "revise_jd_item",
+        "delete_jd_item",
+        "move_jd_item",
+        "request_context_compaction"
+      ]
+    },
+    {
+      "name": "compaction_recent_history",
+      "payload_sha256": "51f60cd9eed3464677d1dbfd9b26ed7294fc6ab5bbed36b0bb8043f02c4f0103",
+      "tool_names": [
+        "read_jd",
+        "read_jd_changes",
+        "revise_jd_profile",
+        "create_jd_task",
+        "create_jd_item",
+        "revise_jd_item",
+        "delete_jd_item",
+        "move_jd_item",
+        "request_context_compaction"
+      ]
+    },
+    {
+      "name": "raw_preload_counterfactual",
+      "payload_sha256": "98f4fa18599b3e054999a75933e410c5aaf13387244e7bb9f9c16d83198a1e12",
+      "tool_names": [
+        "read_interview",
+        "read_jd",
+        "read_jd_changes",
+        "revise_jd_profile",
+        "create_jd_task",
+        "create_jd_item",
+        "revise_jd_item",
+        "delete_jd_item",
+        "move_jd_item",
+        "request_context_compaction"
+      ]
+    }
+  ],
+  "counts": [
+    {
+      "name": "compaction_hierarchical_memory",
+      "status": "counted",
+      "input_tokens": 8326,
+      "capacity": {
+        "allowed_input_tokens": 922000,
+        "output_reserve_tokens": 16384,
+        "fits_model": true,
+        "pre_turn_threshold_reached": false,
+        "complete_step_threshold_reached": false
+      }
+    },
+    {
+      "name": "compaction_flat_summary",
+      "status": "counted",
+      "input_tokens": 7862,
+      "capacity": {
+        "allowed_input_tokens": 922000,
+        "output_reserve_tokens": 16384,
+        "fits_model": true,
+        "pre_turn_threshold_reached": false,
+        "complete_step_threshold_reached": false
+      }
+    },
+    {
+      "name": "compaction_raw_history",
+      "status": "counted",
+      "input_tokens": 7851,
+      "capacity": {
+        "allowed_input_tokens": 922000,
+        "output_reserve_tokens": 16384,
+        "fits_model": true,
+        "pre_turn_threshold_reached": false,
+        "complete_step_threshold_reached": false
+      }
+    },
+    {
+      "name": "compaction_recent_history",
+      "status": "counted",
+      "input_tokens": 7530,
+      "capacity": {
+        "allowed_input_tokens": 922000,
+        "output_reserve_tokens": 16384,
+        "fits_model": true,
+        "pre_turn_threshold_reached": false,
+        "complete_step_threshold_reached": false
+      }
+    },
+    {
+      "name": "raw_preload_counterfactual",
+      "status": "counted",
+      "input_tokens": 11919,
+      "capacity": {
+        "allowed_input_tokens": 922000,
+        "output_reserve_tokens": 16384,
+        "fits_model": true,
+        "pre_turn_threshold_reached": false,
+        "complete_step_threshold_reached": false
+      }
+    }
+  ]
+}

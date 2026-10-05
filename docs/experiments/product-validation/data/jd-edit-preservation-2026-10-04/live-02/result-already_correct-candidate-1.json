@@ -1,0 +1,58 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "candidate",
+  "repeat": 1,
+  "case_id": "already_correct",
+  "cell_id": "already_correct-candidate-1",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11139,
+        "input_tokens_details": {
+          "cache_write_tokens": 7278,
+          "cached_tokens": 3858
+        },
+        "output_tokens": 1732,
+        "output_tokens_details": {
+          "reasoning_tokens": 1182
+        },
+        "total_tokens": 12871
+      },
+      "estimated_usd": "0.001814630",
+      "seconds": 19.335427800018806
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_3.description",
+        "value": "平常抽盤每週三進行：主管指定的高周轉或容易出錯品項必須檢查；本人另選近期收貨或退貨頻繁的項目交主管確認。本人核對 ERP 資料與現場清點結果；遇異常盤差或主管要求時另加盤。月底全盤每月一次，由倉庫同事分區清點，本人整合各區盤點表。平常抽盤先交差異清單或查核結果；月底全盤整理彙整表供主管簽核。盤點有差異時，先查近期收貨、退貨、移位及待出貨紀錄，必要時請倉庫同事複盤，並整理帳實差異表供主管判斷是否調帳。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      },
+      {
+        "target_ref": "task_3.requirement_5",
+        "value": "主管指定的高周轉或容易出錯品項必須檢查；本人另選近期收貨或退貨頻繁的項目交主管確認，不自行更改整個倉庫的盤點制度。抽盤差異清單僅呈現查核結果，不構成調帳授權。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [
+      "每週三平常抽盤的現場清點通常由誰執行？本人另選近期收貨或退貨頻繁的項目，是在盤點前交主管確認，還是在提交結果時確認？"
+    ],
+    "note": "盤點任務的頻率、月底全盤分工、差異查核與調帳界線均與已整理工作相符；補明主管指定品項為高周轉或容易出錯品項，並保留一般抽盤現場清點分工及主管確認時點尚未釐清。"
+  },
+  "seconds": 30.21551189996535
+}

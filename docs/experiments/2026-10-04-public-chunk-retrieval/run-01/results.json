@@ -1,0 +1,5327 @@
+[
+  {
+    "case_id": "F01",
+    "method": "D-max",
+    "representation": "document",
+    "aggregation": "max",
+    "candidate_parents": [
+      "KPS2434-004v2",
+      "KRM1324-002v1",
+      "IDC5294-001v3",
+      "INM3514-001v4",
+      "KPS4999-001v3",
+      "KRM4224-001v3",
+      "AVA2172-004v3",
+      "AVA2172-002v3",
+      "IIS3513-002v4",
+      "BAS3323-003v3",
+      "AVA2172-003v3",
+      "MQM1322-001v4",
+      "MPM7322-001v4",
+      "IIS3513-008v3",
+      "BAS1499-003v4",
+      "BGM1349-001v3",
+      "RTM4323-004v1",
+      "花藝設計助理",
+      "MIM2141-001v4",
+      "MQM2141-001v4"
+    ],
+    "selected": [
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.7401048412902171,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:document",
+            "score": 0.7401048412902171
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7401048412902171
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7329291448950097,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:document",
+            "score": 0.7329291448950097
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7329291448950097
+      },
+      {
+        "id": "IDC5294-001v3",
+        "max_score": 0.7140967404846715,
+        "top_chunks": [
+          {
+            "parent_id": "IDC5294-001v3",
+            "chunk_id": "IDC5294-001v3:document",
+            "score": 0.7140967404846715
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7140967404846715
+      },
+      {
+        "id": "INM3514-001v4",
+        "max_score": 0.7115719349492176,
+        "top_chunks": [
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:document",
+            "score": 0.7115719349492176
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7115719349492176
+      },
+      {
+        "id": "KPS4999-001v3",
+        "max_score": 0.7081578619323332,
+        "top_chunks": [
+          {
+            "parent_id": "KPS4999-001v3",
+            "chunk_id": "KPS4999-001v3:document",
+            "score": 0.7081578619323332
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7081578619323332
+      }
+    ]
+  },
+  {
+    "case_id": "F01",
+    "method": "T-max",
+    "representation": "task",
+    "aggregation": "max",
+    "candidate_parents": [
+      "MPM7322-001v4",
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "ISD2152-001v4",
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "KPS2434-001v2",
+      "KPS5220-001v4",
+      "KPS4999-001v3",
+      "BAS2421-001v4",
+      "KMM2431-005v4",
+      "IIS3512-001v3",
+      "IIS3513-003v4",
+      "AVA2173-007v3",
+      "IIS3513-005v4",
+      "SMS2529-001v3",
+      "KPS2434-003v2",
+      "IDC5294-001v3"
+    ],
+    "selected": [
+      {
+        "id": "MPM7322-001v4",
+        "max_score": 0.7407187248607856,
+        "top_chunks": [
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:2",
+            "score": 0.7407187248607856
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:7",
+            "score": 0.729372616331549
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:3",
+            "score": 0.7151696705242641
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.7407187248607856
+      },
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.7395313944262893,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:task:3:1",
+            "score": 0.7395313944262893
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:task:2:1",
+            "score": 0.6927948188303854
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:task:4:1",
+            "score": 0.6733070937377179
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.7395313944262893
+      },
+      {
+        "id": "KPS2434-002v2",
+        "max_score": 0.7371745983037876,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-002v2",
+            "chunk_id": "KPS2434-002v2:task:5:2",
+            "score": 0.7371745983037876
+          },
+          {
+            "parent_id": "KPS2434-002v2",
+            "chunk_id": "KPS2434-002v2:task:5:1",
+            "score": 0.7363261880658877
+          },
+          {
+            "parent_id": "KPS2434-002v2",
+            "chunk_id": "KPS2434-002v2:task:4:2",
+            "score": 0.6660781891391575
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.7371745983037876
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7310994130367989,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:3:1",
+            "score": 0.7310994130367989
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:3:2",
+            "score": 0.697054860426447
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:2:2",
+            "score": 0.6897809598301456
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.7310994130367989
+      },
+      {
+        "id": "KRM1324-001v1",
+        "max_score": 0.7228065915023915,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:task:2:2",
+            "score": 0.7228065915023915
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:task:2:1",
+            "score": 0.6926065121431386
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:task:4:2",
+            "score": 0.6878610512607214
+          }
+        ],
+        "available_chunks": 15,
+        "score": 0.7228065915023915
+      }
+    ]
+  },
+  {
+    "case_id": "F01",
+    "method": "T-mean3",
+    "representation": "task",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "MPM7322-001v4",
+      "KPS2434-004v2",
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "ISD2152-001v4",
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "KPS2434-001v2",
+      "KPS5220-001v4",
+      "KPS4999-001v3",
+      "BAS2421-001v4",
+      "KMM2431-005v4",
+      "IIS3512-001v3",
+      "IIS3513-003v4",
+      "AVA2173-007v3",
+      "IIS3513-005v4",
+      "SMS2529-001v3",
+      "KPS2434-003v2",
+      "IDC5294-001v3"
+    ],
+    "selected": [
+      {
+        "id": "MPM7322-001v4",
+        "max_score": 0.7407187248607856,
+        "top_chunks": [
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:2",
+            "score": 0.7407187248607856
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:7",
+            "score": 0.729372616331549
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:3",
+            "score": 0.7151696705242641
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.7284203372388663
+      },
+      {
+        "id": "KPS2434-002v2",
+        "max_score": 0.7371745983037876,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-002v2",
+            "chunk_id": "KPS2434-002v2:task:5:2",
+            "score": 0.7371745983037876
+          },
+          {
+            "parent_id": "KPS2434-002v2",
+            "chunk_id": "KPS2434-002v2:task:5:1",
+            "score": 0.7363261880658877
+          },
+          {
+            "parent_id": "KPS2434-002v2",
+            "chunk_id": "KPS2434-002v2:task:4:2",
+            "score": 0.6660781891391575
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.7131929918362775
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7310994130367989,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:3:1",
+            "score": 0.7310994130367989
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:3:2",
+            "score": 0.697054860426447
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:2:2",
+            "score": 0.6897809598301456
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.7059784110977972
+      },
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.7395313944262893,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:task:3:1",
+            "score": 0.7395313944262893
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:task:2:1",
+            "score": 0.6927948188303854
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:task:4:1",
+            "score": 0.6733070937377179
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.7018777689981309
+      },
+      {
+        "id": "ISD2152-001v4",
+        "max_score": 0.7199302422154226,
+        "top_chunks": [
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:overview:None:None",
+            "score": 0.7199302422154226
+          },
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:task:1:1",
+            "score": 0.6834462203100413
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.7016882312627319
+      }
+    ]
+  },
+  {
+    "case_id": "F01",
+    "method": "U-max",
+    "representation": "unit",
+    "aggregation": "max",
+    "candidate_parents": [
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KPS2434-004v2",
+      "MQM1322-001v4",
+      "KPS2434-001v2",
+      "ISD2152-001v4",
+      "KRM1324-001v1",
+      "IIS3513-005v4",
+      "MPM7322-001v4",
+      "AVA2172-003v3",
+      "IDC1330-001v1",
+      "KPS4999-001v3",
+      "BAS2421-001v4",
+      "AVA2173-007v3",
+      "KPS5294-001v4",
+      "KPS5220-001v4",
+      "KMM2431-005v4",
+      "SMS2529-001v3",
+      "SET2151-001v5",
+      "連鎖餐飲門市服務人員"
+    ],
+    "selected": [
+      {
+        "id": "KPS2434-002v2",
+        "max_score": 0.7411276918327876,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-002v2",
+            "chunk_id": "KPS2434-002v2:unit:5:None",
+            "score": 0.7411276918327876
+          },
+          {
+            "parent_id": "KPS2434-002v2",
+            "chunk_id": "KPS2434-002v2:unit:2:None",
+            "score": 0.66536665021139
+          },
+          {
+            "parent_id": "KPS2434-002v2",
+            "chunk_id": "KPS2434-002v2:unit:3:None",
+            "score": 0.6376338361303358
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.7411276918327876
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7396140282793242,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:3:None",
+            "score": 0.7396140282793242
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:2:None",
+            "score": 0.6855246105362982
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:overview:None:None",
+            "score": 0.6648096745217335
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.7396140282793242
+      },
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.739037587862395,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:3:None",
+            "score": 0.739037587862395
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:2:None",
+            "score": 0.6927948188303854
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:4:None",
+            "score": 0.6733070937377179
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.739037587862395
+      },
+      {
+        "id": "MQM1322-001v4",
+        "max_score": 0.7214080969022245,
+        "top_chunks": [
+          {
+            "parent_id": "MQM1322-001v4",
+            "chunk_id": "MQM1322-001v4:unit:1:None",
+            "score": 0.7214080969022245
+          },
+          {
+            "parent_id": "MQM1322-001v4",
+            "chunk_id": "MQM1322-001v4:overview:None:None",
+            "score": 0.6760100742757138
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.7214080969022245
+      },
+      {
+        "id": "KPS2434-001v2",
+        "max_score": 0.720825462080825,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-001v2",
+            "chunk_id": "KPS2434-001v2:unit:4:None",
+            "score": 0.720825462080825
+          },
+          {
+            "parent_id": "KPS2434-001v2",
+            "chunk_id": "KPS2434-001v2:unit:2:None",
+            "score": 0.6867925090077782
+          },
+          {
+            "parent_id": "KPS2434-001v2",
+            "chunk_id": "KPS2434-001v2:unit:3:None",
+            "score": 0.6437630574556399
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.720825462080825
+      }
+    ]
+  },
+  {
+    "case_id": "F01",
+    "method": "U-mean3",
+    "representation": "unit",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "KPS2434-002v2",
+      "KRM1324-002v1",
+      "KPS2434-004v2",
+      "MQM1322-001v4",
+      "KPS2434-001v2",
+      "ISD2152-001v4",
+      "KRM1324-001v1",
+      "IIS3513-005v4",
+      "MPM7322-001v4",
+      "AVA2172-003v3",
+      "IDC1330-001v1",
+      "KPS4999-001v3",
+      "BAS2421-001v4",
+      "AVA2173-007v3",
+      "KPS5294-001v4",
+      "KPS5220-001v4",
+      "KMM2431-005v4",
+      "SMS2529-001v3",
+      "SET2151-001v5",
+      "連鎖餐飲門市服務人員"
+    ],
+    "selected": [
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.739037587862395,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:3:None",
+            "score": 0.739037587862395
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:2:None",
+            "score": 0.6927948188303854
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:4:None",
+            "score": 0.6733070937377179
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.701713166810166
+      },
+      {
+        "id": "ISD2152-001v4",
+        "max_score": 0.7199302422154226,
+        "top_chunks": [
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:overview:None:None",
+            "score": 0.7199302422154226
+          },
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:unit:1:None",
+            "score": 0.6834462203100413
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.7016882312627319
+      },
+      {
+        "id": "MQM1322-001v4",
+        "max_score": 0.7214080969022245,
+        "top_chunks": [
+          {
+            "parent_id": "MQM1322-001v4",
+            "chunk_id": "MQM1322-001v4:unit:1:None",
+            "score": 0.7214080969022245
+          },
+          {
+            "parent_id": "MQM1322-001v4",
+            "chunk_id": "MQM1322-001v4:overview:None:None",
+            "score": 0.6760100742757138
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.6987090855889692
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7396140282793242,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:3:None",
+            "score": 0.7396140282793242
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:2:None",
+            "score": 0.6855246105362982
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:overview:None:None",
+            "score": 0.6648096745217335
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6966494377791186
+      },
+      {
+        "id": "KRM1324-001v1",
+        "max_score": 0.7199210789605663,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:2:None",
+            "score": 0.7199210789605663
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:4:None",
+            "score": 0.7059776079643837
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:3:None",
+            "score": 0.6632476730589014
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6963821199946171
+      }
+    ]
+  },
+  {
+    "case_id": "F02",
+    "method": "D-max",
+    "representation": "document",
+    "aggregation": "max",
+    "candidate_parents": [
+      "INM3514-001v4",
+      "IIS3513-001v4",
+      "KPS2434-004v2",
+      "AVA2172-003v3",
+      "IIS3513-002v4",
+      "BAS1499-003v4",
+      "IDC3512-002v2",
+      "ISD2152-004v5",
+      "BAS3332-003v3",
+      "KPS3322-003v3",
+      "花藝設計助理",
+      "BAS1499-002v4",
+      "IDC1330-001v1",
+      "ISD2513-001v4",
+      "FBF1223-003v3",
+      "FIS2511-002v2",
+      "MIM2141-001v4",
+      "FAC3313-001v2",
+      "網路維修助理",
+      "BGM1349-001v3"
+    ],
+    "selected": [
+      {
+        "id": "INM3514-001v4",
+        "max_score": 0.7023123205882796,
+        "top_chunks": [
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:document",
+            "score": 0.7023123205882796
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7023123205882796
+      },
+      {
+        "id": "IIS3513-001v4",
+        "max_score": 0.6841391268446668,
+        "top_chunks": [
+          {
+            "parent_id": "IIS3513-001v4",
+            "chunk_id": "IIS3513-001v4:document",
+            "score": 0.6841391268446668
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6841391268446668
+      },
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.6800670407156102,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:document",
+            "score": 0.6800670407156102
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6800670407156102
+      },
+      {
+        "id": "AVA2172-003v3",
+        "max_score": 0.679637452700778,
+        "top_chunks": [
+          {
+            "parent_id": "AVA2172-003v3",
+            "chunk_id": "AVA2172-003v3:document",
+            "score": 0.679637452700778
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.679637452700778
+      },
+      {
+        "id": "IIS3513-002v4",
+        "max_score": 0.6661706905275302,
+        "top_chunks": [
+          {
+            "parent_id": "IIS3513-002v4",
+            "chunk_id": "IIS3513-002v4:document",
+            "score": 0.6661706905275302
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6661706905275302
+      }
+    ]
+  },
+  {
+    "case_id": "F02",
+    "method": "T-max",
+    "representation": "task",
+    "aggregation": "max",
+    "candidate_parents": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "TTM3422-001v2",
+      "MIM2141-001v4",
+      "INM7421-010v3",
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "IIS2522-001v3",
+      "FIS2511-001v2",
+      "FIS2511-002v2",
+      "IIS3513-003v4",
+      "IIS3513-001v4",
+      "連鎖餐飲門市管理人員",
+      "KPS5220-001v4",
+      "KRM1420-001v4",
+      "INM2529-001v3",
+      "INM3514-002v3",
+      "INM7421-009v3",
+      "SET2152-005v2"
+    ],
+    "selected": [
+      {
+        "id": "INM3514-001v4",
+        "max_score": 0.686409174869924,
+        "top_chunks": [
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:task:3:1",
+            "score": 0.686409174869924
+          },
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:task:3:3",
+            "score": 0.6736863887631754
+          },
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:task:1:2",
+            "score": 0.6579179188922449
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.686409174869924
+      },
+      {
+        "id": "ISD2152-001v4",
+        "max_score": 0.6774621612290683,
+        "top_chunks": [
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:overview:None:None",
+            "score": 0.6774621612290683
+          },
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:task:1:1",
+            "score": 0.646079640292078
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.6774621612290683
+      },
+      {
+        "id": "IDC1330-001v1",
+        "max_score": 0.6752432711115803,
+        "top_chunks": [
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:overview:None:None",
+            "score": 0.6752432711115803
+          },
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:task:2:1",
+            "score": 0.665553922581716
+          },
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:task:2:2",
+            "score": 0.6586220876820079
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.6752432711115803
+      },
+      {
+        "id": "TTM3422-001v2",
+        "max_score": 0.672810753231803,
+        "top_chunks": [
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:overview:None:None",
+            "score": 0.672810753231803
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:task:2:2",
+            "score": 0.6250318924966625
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:task:1:2",
+            "score": 0.6210624917763028
+          }
+        ],
+        "available_chunks": 16,
+        "score": 0.672810753231803
+      },
+      {
+        "id": "MIM2141-001v4",
+        "max_score": 0.668886012330953,
+        "top_chunks": [
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:task:1:1",
+            "score": 0.668886012330953
+          },
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:overview:None:None",
+            "score": 0.6352239472544012
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.668886012330953
+      }
+    ]
+  },
+  {
+    "case_id": "F02",
+    "method": "T-mean3",
+    "representation": "task",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "INM3514-001v4",
+      "ISD2152-001v4",
+      "IDC1330-001v1",
+      "TTM3422-001v2",
+      "MIM2141-001v4",
+      "INM7421-010v3",
+      "BGM1330-001v3",
+      "MQM1322-001v4",
+      "IIS2522-001v3",
+      "FIS2511-001v2",
+      "FIS2511-002v2",
+      "IIS3513-003v4",
+      "IIS3513-001v4",
+      "連鎖餐飲門市管理人員",
+      "KPS5220-001v4",
+      "KRM1420-001v4",
+      "INM2529-001v3",
+      "INM3514-002v3",
+      "INM7421-009v3",
+      "SET2152-005v2"
+    ],
+    "selected": [
+      {
+        "id": "INM3514-001v4",
+        "max_score": 0.686409174869924,
+        "top_chunks": [
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:task:3:1",
+            "score": 0.686409174869924
+          },
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:task:3:3",
+            "score": 0.6736863887631754
+          },
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:task:1:2",
+            "score": 0.6579179188922449
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.6726711608417815
+      },
+      {
+        "id": "IDC1330-001v1",
+        "max_score": 0.6752432711115803,
+        "top_chunks": [
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:overview:None:None",
+            "score": 0.6752432711115803
+          },
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:task:2:1",
+            "score": 0.665553922581716
+          },
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:task:2:2",
+            "score": 0.6586220876820079
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.6664730937917681
+      },
+      {
+        "id": "ISD2152-001v4",
+        "max_score": 0.6774621612290683,
+        "top_chunks": [
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:overview:None:None",
+            "score": 0.6774621612290683
+          },
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:task:1:1",
+            "score": 0.646079640292078
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.6617709007605732
+      },
+      {
+        "id": "MIM2141-001v4",
+        "max_score": 0.668886012330953,
+        "top_chunks": [
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:task:1:1",
+            "score": 0.668886012330953
+          },
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:overview:None:None",
+            "score": 0.6352239472544012
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.6520549797926771
+      },
+      {
+        "id": "連鎖餐飲門市管理人員",
+        "max_score": 0.6596562245020174,
+        "top_chunks": [
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:task:4:2",
+            "score": 0.6596562245020174
+          },
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:task:4:1",
+            "score": 0.6510104850407963
+          },
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:task:2:3",
+            "score": 0.6448766293119705
+          }
+        ],
+        "available_chunks": 11,
+        "score": 0.6518477796182615
+      }
+    ]
+  },
+  {
+    "case_id": "F02",
+    "method": "U-max",
+    "representation": "unit",
+    "aggregation": "max",
+    "candidate_parents": [
+      "INM3514-001v4",
+      "IDC1330-001v1",
+      "ISD2152-004v5",
+      "ISD2152-001v4",
+      "IIS3513-001v4",
+      "AVA2172-003v3",
+      "TTM3422-001v2",
+      "MIM2141-001v4",
+      "IIS3513-003v4",
+      "連鎖餐飲門市管理人員",
+      "BAS1499-003v4",
+      "連鎖餐飲門市服務人員",
+      "INM7421-010v3",
+      "MQM1322-001v4",
+      "SET2152-005v2",
+      "FBF1223-003v3",
+      "FIS2511-001v2",
+      "FIS2511-002v2",
+      "MEM7231-010v2",
+      "TTM1411-002v4"
+    ],
+    "selected": [
+      {
+        "id": "INM3514-001v4",
+        "max_score": 0.6932889735652679,
+        "top_chunks": [
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:unit:3:None",
+            "score": 0.6932889735652679
+          },
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:unit:2:None",
+            "score": 0.6510842507394847
+          },
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:overview:None:None",
+            "score": 0.6402142811696359
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6932889735652679
+      },
+      {
+        "id": "IDC1330-001v1",
+        "max_score": 0.6825427084903332,
+        "top_chunks": [
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:unit:2:None",
+            "score": 0.6825427084903332
+          },
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:overview:None:None",
+            "score": 0.6752432711115803
+          },
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:unit:3:None",
+            "score": 0.5835430770582528
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6825427084903332
+      },
+      {
+        "id": "ISD2152-004v5",
+        "max_score": 0.6806531466045048,
+        "top_chunks": [
+          {
+            "parent_id": "ISD2152-004v5",
+            "chunk_id": "ISD2152-004v5:unit:2:None",
+            "score": 0.6806531466045048
+          },
+          {
+            "parent_id": "ISD2152-004v5",
+            "chunk_id": "ISD2152-004v5:unit:1:None",
+            "score": 0.620709631524309
+          },
+          {
+            "parent_id": "ISD2152-004v5",
+            "chunk_id": "ISD2152-004v5:overview:None:None",
+            "score": 0.6060234585222924
+          }
+        ],
+        "available_chunks": 3,
+        "score": 0.6806531466045048
+      },
+      {
+        "id": "ISD2152-001v4",
+        "max_score": 0.6774621612290683,
+        "top_chunks": [
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:overview:None:None",
+            "score": 0.6774621612290683
+          },
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:unit:1:None",
+            "score": 0.646079640292078
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.6774621612290683
+      },
+      {
+        "id": "IIS3513-001v4",
+        "max_score": 0.6755980701513948,
+        "top_chunks": [
+          {
+            "parent_id": "IIS3513-001v4",
+            "chunk_id": "IIS3513-001v4:unit:5:None",
+            "score": 0.6755980701513948
+          },
+          {
+            "parent_id": "IIS3513-001v4",
+            "chunk_id": "IIS3513-001v4:overview:None:None",
+            "score": 0.6415390842486064
+          },
+          {
+            "parent_id": "IIS3513-001v4",
+            "chunk_id": "IIS3513-001v4:unit:3:None",
+            "score": 0.6351339167676321
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.6755980701513948
+      }
+    ]
+  },
+  {
+    "case_id": "F02",
+    "method": "U-mean3",
+    "representation": "unit",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "INM3514-001v4",
+      "IDC1330-001v1",
+      "ISD2152-004v5",
+      "ISD2152-001v4",
+      "IIS3513-001v4",
+      "AVA2172-003v3",
+      "TTM3422-001v2",
+      "MIM2141-001v4",
+      "IIS3513-003v4",
+      "連鎖餐飲門市管理人員",
+      "BAS1499-003v4",
+      "連鎖餐飲門市服務人員",
+      "INM7421-010v3",
+      "MQM1322-001v4",
+      "SET2152-005v2",
+      "FBF1223-003v3",
+      "FIS2511-001v2",
+      "FIS2511-002v2",
+      "MEM7231-010v2",
+      "TTM1411-002v4"
+    ],
+    "selected": [
+      {
+        "id": "ISD2152-001v4",
+        "max_score": 0.6774621612290683,
+        "top_chunks": [
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:overview:None:None",
+            "score": 0.6774621612290683
+          },
+          {
+            "parent_id": "ISD2152-001v4",
+            "chunk_id": "ISD2152-001v4:unit:1:None",
+            "score": 0.646079640292078
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.6617709007605732
+      },
+      {
+        "id": "INM3514-001v4",
+        "max_score": 0.6932889735652679,
+        "top_chunks": [
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:unit:3:None",
+            "score": 0.6932889735652679
+          },
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:unit:2:None",
+            "score": 0.6510842507394847
+          },
+          {
+            "parent_id": "INM3514-001v4",
+            "chunk_id": "INM3514-001v4:overview:None:None",
+            "score": 0.6402142811696359
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6615291684914628
+      },
+      {
+        "id": "MIM2141-001v4",
+        "max_score": 0.668886012330953,
+        "top_chunks": [
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:unit:1:None",
+            "score": 0.668886012330953
+          },
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:overview:None:None",
+            "score": 0.6352239472544012
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.6520549797926771
+      },
+      {
+        "id": "IIS3513-001v4",
+        "max_score": 0.6755980701513948,
+        "top_chunks": [
+          {
+            "parent_id": "IIS3513-001v4",
+            "chunk_id": "IIS3513-001v4:unit:5:None",
+            "score": 0.6755980701513948
+          },
+          {
+            "parent_id": "IIS3513-001v4",
+            "chunk_id": "IIS3513-001v4:overview:None:None",
+            "score": 0.6415390842486064
+          },
+          {
+            "parent_id": "IIS3513-001v4",
+            "chunk_id": "IIS3513-001v4:unit:3:None",
+            "score": 0.6351339167676321
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.6507570237225444
+      },
+      {
+        "id": "IDC1330-001v1",
+        "max_score": 0.6825427084903332,
+        "top_chunks": [
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:unit:2:None",
+            "score": 0.6825427084903332
+          },
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:overview:None:None",
+            "score": 0.6752432711115803
+          },
+          {
+            "parent_id": "IDC1330-001v1",
+            "chunk_id": "IDC1330-001v1:unit:3:None",
+            "score": 0.5835430770582528
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6471096855533888
+      }
+    ]
+  },
+  {
+    "case_id": "F03",
+    "method": "D-max",
+    "representation": "document",
+    "aggregation": "max",
+    "candidate_parents": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KPS2434-004v2",
+      "FAC1211-001v2",
+      "BAS1219-003v4",
+      "BAS3323-003v3",
+      "KRM3323-001v4",
+      "KPS5220-001v4",
+      "MPM7322-001v4",
+      "KPS5292-002v3",
+      "RTM4323-004v1",
+      "KPS4999-001v3",
+      "BGM5220-002v3",
+      "MMP4321-003v4",
+      "KRM1420-003v4",
+      "花藝設計助理",
+      "KRM1324-002v1",
+      "BAS1219-005v1",
+      "KRM1420-001v4",
+      "KPS3322-002v4"
+    ],
+    "selected": [
+      {
+        "id": "FAC4311-001v2",
+        "max_score": 0.7663261264744528,
+        "top_chunks": [
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:document",
+            "score": 0.7663261264744528
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7663261264744528
+      },
+      {
+        "id": "FAC3313-001v2",
+        "max_score": 0.7570010239892274,
+        "top_chunks": [
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:document",
+            "score": 0.7570010239892274
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7570010239892274
+      },
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.7203003224025473,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:document",
+            "score": 0.7203003224025473
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7203003224025473
+      },
+      {
+        "id": "FAC1211-001v2",
+        "max_score": 0.7071800490348338,
+        "top_chunks": [
+          {
+            "parent_id": "FAC1211-001v2",
+            "chunk_id": "FAC1211-001v2:document",
+            "score": 0.7071800490348338
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7071800490348338
+      },
+      {
+        "id": "BAS1219-003v4",
+        "max_score": 0.699285634443535,
+        "top_chunks": [
+          {
+            "parent_id": "BAS1219-003v4",
+            "chunk_id": "BAS1219-003v4:document",
+            "score": 0.699285634443535
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.699285634443535
+      }
+    ]
+  },
+  {
+    "case_id": "F03",
+    "method": "T-max",
+    "representation": "task",
+    "aggregation": "max",
+    "candidate_parents": [
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "FAC4311-001v2",
+      "停車場管理員",
+      "FAC1211-001v2",
+      "KPS5292-002v3",
+      "KPS2434-004v2",
+      "BAS1219-003v4",
+      "KPS3334-002v4",
+      "MPM7322-001v4",
+      "KRM1420-001v4",
+      "FFN2412-003v2",
+      "KRM4212-002v2",
+      "KPS2434-002v2",
+      "TTM4221-007v1",
+      "RLM9330-001v1",
+      "BAS3323-003v3",
+      "MMP1324-001v4",
+      "BGM5220-002v3",
+      "KRM1324-002v1"
+    ],
+    "selected": [
+      {
+        "id": "FAC3313-001v2",
+        "max_score": 0.7521030875086854,
+        "top_chunks": [
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:task:3:1",
+            "score": 0.7521030875086854
+          },
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:task:4:1",
+            "score": 0.6644436631542487
+          },
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:task:1:1",
+            "score": 0.664406936278646
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7521030875086854
+      },
+      {
+        "id": "KRM4212-001v2",
+        "max_score": 0.733130793053163,
+        "top_chunks": [
+          {
+            "parent_id": "KRM4212-001v2",
+            "chunk_id": "KRM4212-001v2:task:4:1",
+            "score": 0.733130793053163
+          },
+          {
+            "parent_id": "KRM4212-001v2",
+            "chunk_id": "KRM4212-001v2:task:2:1",
+            "score": 0.7115950262085893
+          },
+          {
+            "parent_id": "KRM4212-001v2",
+            "chunk_id": "KRM4212-001v2:task:4:2",
+            "score": 0.7065735790673264
+          }
+        ],
+        "available_chunks": 14,
+        "score": 0.733130793053163
+      },
+      {
+        "id": "FAC4311-001v2",
+        "max_score": 0.7297775751638125,
+        "top_chunks": [
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:task:4:2",
+            "score": 0.7297775751638125
+          },
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:task:1:1",
+            "score": 0.7256391596746761
+          },
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:task:4:3",
+            "score": 0.7050524027547007
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.7297775751638125
+      },
+      {
+        "id": "停車場管理員",
+        "max_score": 0.7233446403395323,
+        "top_chunks": [
+          {
+            "parent_id": "停車場管理員",
+            "chunk_id": "停車場管理員:task:3:1",
+            "score": 0.7233446403395323
+          },
+          {
+            "parent_id": "停車場管理員",
+            "chunk_id": "停車場管理員:task:1:2",
+            "score": 0.5658371589171559
+          },
+          {
+            "parent_id": "停車場管理員",
+            "chunk_id": "停車場管理員:task:2:1",
+            "score": 0.5602537372379943
+          }
+        ],
+        "available_chunks": 8,
+        "score": 0.7233446403395323
+      },
+      {
+        "id": "FAC1211-001v2",
+        "max_score": 0.7211105867089358,
+        "top_chunks": [
+          {
+            "parent_id": "FAC1211-001v2",
+            "chunk_id": "FAC1211-001v2:task:2:3",
+            "score": 0.7211105867089358
+          },
+          {
+            "parent_id": "FAC1211-001v2",
+            "chunk_id": "FAC1211-001v2:task:1:2",
+            "score": 0.7123260624748636
+          },
+          {
+            "parent_id": "FAC1211-001v2",
+            "chunk_id": "FAC1211-001v2:task:2:1",
+            "score": 0.6988091289673799
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.7211105867089358
+      }
+    ]
+  },
+  {
+    "case_id": "F03",
+    "method": "T-mean3",
+    "representation": "task",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "FAC4311-001v2",
+      "停車場管理員",
+      "FAC1211-001v2",
+      "KPS5292-002v3",
+      "KPS2434-004v2",
+      "BAS1219-003v4",
+      "KPS3334-002v4",
+      "MPM7322-001v4",
+      "KRM1420-001v4",
+      "FFN2412-003v2",
+      "KRM4212-002v2",
+      "KPS2434-002v2",
+      "TTM4221-007v1",
+      "RLM9330-001v1",
+      "BAS3323-003v3",
+      "MMP1324-001v4",
+      "BGM5220-002v3",
+      "KRM1324-002v1"
+    ],
+    "selected": [
+      {
+        "id": "FAC4311-001v2",
+        "max_score": 0.7297775751638125,
+        "top_chunks": [
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:task:4:2",
+            "score": 0.7297775751638125
+          },
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:task:1:1",
+            "score": 0.7256391596746761
+          },
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:task:4:3",
+            "score": 0.7050524027547007
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.7201563791977298
+      },
+      {
+        "id": "KRM4212-001v2",
+        "max_score": 0.733130793053163,
+        "top_chunks": [
+          {
+            "parent_id": "KRM4212-001v2",
+            "chunk_id": "KRM4212-001v2:task:4:1",
+            "score": 0.733130793053163
+          },
+          {
+            "parent_id": "KRM4212-001v2",
+            "chunk_id": "KRM4212-001v2:task:2:1",
+            "score": 0.7115950262085893
+          },
+          {
+            "parent_id": "KRM4212-001v2",
+            "chunk_id": "KRM4212-001v2:task:4:2",
+            "score": 0.7065735790673264
+          }
+        ],
+        "available_chunks": 14,
+        "score": 0.7170997994430263
+      },
+      {
+        "id": "FAC1211-001v2",
+        "max_score": 0.7211105867089358,
+        "top_chunks": [
+          {
+            "parent_id": "FAC1211-001v2",
+            "chunk_id": "FAC1211-001v2:task:2:3",
+            "score": 0.7211105867089358
+          },
+          {
+            "parent_id": "FAC1211-001v2",
+            "chunk_id": "FAC1211-001v2:task:1:2",
+            "score": 0.7123260624748636
+          },
+          {
+            "parent_id": "FAC1211-001v2",
+            "chunk_id": "FAC1211-001v2:task:2:1",
+            "score": 0.6988091289673799
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.7107485927170597
+      },
+      {
+        "id": "KRM1420-001v4",
+        "max_score": 0.707954751256009,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1420-001v4",
+            "chunk_id": "KRM1420-001v4:task:4:4",
+            "score": 0.707954751256009
+          },
+          {
+            "parent_id": "KRM1420-001v4",
+            "chunk_id": "KRM1420-001v4:task:2:3",
+            "score": 0.7037156945160105
+          },
+          {
+            "parent_id": "KRM1420-001v4",
+            "chunk_id": "KRM1420-001v4:overview:None:None",
+            "score": 0.6852767772610076
+          }
+        ],
+        "available_chunks": 19,
+        "score": 0.6989824076776756
+      },
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.7187659629298497,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:task:3:2",
+            "score": 0.7187659629298497
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:task:3:1",
+            "score": 0.6875944675632037
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:task:4:1",
+            "score": 0.6831449965747834
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.6965018090226124
+      }
+    ]
+  },
+  {
+    "case_id": "F03",
+    "method": "U-max",
+    "representation": "unit",
+    "aggregation": "max",
+    "candidate_parents": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "停車場管理員",
+      "KPS2434-004v2",
+      "MPM7322-001v4",
+      "FFN2412-003v2",
+      "KPS5292-002v3",
+      "MMP4321-003v4",
+      "BAS1219-003v4",
+      "KPS3334-002v4",
+      "TTM3422-001v2",
+      "KRM3323-001v4",
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "BAS2421-001v4",
+      "FAC1211-001v2",
+      "BAS3323-003v3",
+      "TTM4221-003v3",
+      "MMP1324-001v4"
+    ],
+    "selected": [
+      {
+        "id": "FAC4311-001v2",
+        "max_score": 0.7588923780990101,
+        "top_chunks": [
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:unit:4:None",
+            "score": 0.7588923780990101
+          },
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:unit:1:None",
+            "score": 0.7382444508235783
+          },
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:unit:2:None",
+            "score": 0.6915447753289921
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7588923780990101
+      },
+      {
+        "id": "FAC3313-001v2",
+        "max_score": 0.7521030875086854,
+        "top_chunks": [
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:unit:3:None",
+            "score": 0.7521030875086854
+          },
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:unit:4:None",
+            "score": 0.6644436631542487
+          },
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:unit:1:None",
+            "score": 0.664406936278646
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7521030875086854
+      },
+      {
+        "id": "KRM4212-001v2",
+        "max_score": 0.7477597204558365,
+        "top_chunks": [
+          {
+            "parent_id": "KRM4212-001v2",
+            "chunk_id": "KRM4212-001v2:unit:4:None",
+            "score": 0.7477597204558365
+          },
+          {
+            "parent_id": "KRM4212-001v2",
+            "chunk_id": "KRM4212-001v2:unit:2:None",
+            "score": 0.6724901545077169
+          },
+          {
+            "parent_id": "KRM4212-001v2",
+            "chunk_id": "KRM4212-001v2:overview:None:None",
+            "score": 0.6093599663923881
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.7477597204558365
+      },
+      {
+        "id": "停車場管理員",
+        "max_score": 0.7233446403395323,
+        "top_chunks": [
+          {
+            "parent_id": "停車場管理員",
+            "chunk_id": "停車場管理員:unit:3:None",
+            "score": 0.7233446403395323
+          },
+          {
+            "parent_id": "停車場管理員",
+            "chunk_id": "停車場管理員:unit:1:None",
+            "score": 0.571567544774991
+          },
+          {
+            "parent_id": "停車場管理員",
+            "chunk_id": "停車場管理員:unit:2:None",
+            "score": 0.5695503127566972
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7233446403395323
+      },
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.7227813413352147,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:3:None",
+            "score": 0.7227813413352147
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:4:None",
+            "score": 0.6831449965747834
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:1:None",
+            "score": 0.638518387576221
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7227813413352147
+      }
+    ]
+  },
+  {
+    "case_id": "F03",
+    "method": "U-mean3",
+    "representation": "unit",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "FAC4311-001v2",
+      "FAC3313-001v2",
+      "KRM4212-001v2",
+      "停車場管理員",
+      "KPS2434-004v2",
+      "MPM7322-001v4",
+      "FFN2412-003v2",
+      "KPS5292-002v3",
+      "MMP4321-003v4",
+      "BAS1219-003v4",
+      "KPS3334-002v4",
+      "TTM3422-001v2",
+      "KRM3323-001v4",
+      "KRM1324-002v1",
+      "KRM1324-001v1",
+      "BAS2421-001v4",
+      "FAC1211-001v2",
+      "BAS3323-003v3",
+      "TTM4221-003v3",
+      "MMP1324-001v4"
+    ],
+    "selected": [
+      {
+        "id": "FAC4311-001v2",
+        "max_score": 0.7588923780990101,
+        "top_chunks": [
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:unit:4:None",
+            "score": 0.7588923780990101
+          },
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:unit:1:None",
+            "score": 0.7382444508235783
+          },
+          {
+            "parent_id": "FAC4311-001v2",
+            "chunk_id": "FAC4311-001v2:unit:2:None",
+            "score": 0.6915447753289921
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7295605347505267
+      },
+      {
+        "id": "FAC3313-001v2",
+        "max_score": 0.7521030875086854,
+        "top_chunks": [
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:unit:3:None",
+            "score": 0.7521030875086854
+          },
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:unit:4:None",
+            "score": 0.6644436631542487
+          },
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:unit:1:None",
+            "score": 0.664406936278646
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6936512289805267
+      },
+      {
+        "id": "KRM3323-001v4",
+        "max_score": 0.6929771644860041,
+        "top_chunks": [
+          {
+            "parent_id": "KRM3323-001v4",
+            "chunk_id": "KRM3323-001v4:unit:4:None",
+            "score": 0.6929771644860041
+          },
+          {
+            "parent_id": "KRM3323-001v4",
+            "chunk_id": "KRM3323-001v4:unit:6:None",
+            "score": 0.6806311801412137
+          },
+          {
+            "parent_id": "KRM3323-001v4",
+            "chunk_id": "KRM3323-001v4:overview:None:None",
+            "score": 0.6804376965911255
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.6846820137394478
+      },
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.7227813413352147,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:3:None",
+            "score": 0.7227813413352147
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:4:None",
+            "score": 0.6831449965747834
+          },
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:unit:1:None",
+            "score": 0.638518387576221
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.681481575162073
+      },
+      {
+        "id": "BAS1219-003v4",
+        "max_score": 0.6976891916174973,
+        "top_chunks": [
+          {
+            "parent_id": "BAS1219-003v4",
+            "chunk_id": "BAS1219-003v4:unit:2:None",
+            "score": 0.6976891916174973
+          },
+          {
+            "parent_id": "BAS1219-003v4",
+            "chunk_id": "BAS1219-003v4:unit:3:None",
+            "score": 0.6731175212196052
+          },
+          {
+            "parent_id": "BAS1219-003v4",
+            "chunk_id": "BAS1219-003v4:unit:1:None",
+            "score": 0.6618799153936121
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6775622094102381
+      }
+    ]
+  },
+  {
+    "case_id": "F04",
+    "method": "D-max",
+    "representation": "document",
+    "aggregation": "max",
+    "candidate_parents": [
+      "MEM7412-001v3",
+      "SET2141-001v3",
+      "MEM7231-010v2",
+      "網路維修助理",
+      "MEM7231-009v3",
+      "MIM2141-001v4",
+      "KPS5220-002v3",
+      "TFB5131-002v3",
+      "MEM7234-002v3",
+      "MEM8199-001v3",
+      "MEM8199-002v3",
+      "MEM3511-001v3",
+      "IIS7421-002v3",
+      "MEM7234-001v3",
+      "印刷機台技術助理",
+      "MEM7231-019v1",
+      "SET7127-002v3",
+      "MPM7935-004v3",
+      "BAS3332-003v3",
+      "SET7231-001v3"
+    ],
+    "selected": [
+      {
+        "id": "MEM7412-001v3",
+        "max_score": 0.7262986394387085,
+        "top_chunks": [
+          {
+            "parent_id": "MEM7412-001v3",
+            "chunk_id": "MEM7412-001v3:document",
+            "score": 0.7262986394387085
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7262986394387085
+      },
+      {
+        "id": "SET2141-001v3",
+        "max_score": 0.7227255431207047,
+        "top_chunks": [
+          {
+            "parent_id": "SET2141-001v3",
+            "chunk_id": "SET2141-001v3:document",
+            "score": 0.7227255431207047
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7227255431207047
+      },
+      {
+        "id": "MEM7231-010v2",
+        "max_score": 0.7116927053654603,
+        "top_chunks": [
+          {
+            "parent_id": "MEM7231-010v2",
+            "chunk_id": "MEM7231-010v2:document",
+            "score": 0.7116927053654603
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7116927053654603
+      },
+      {
+        "id": "網路維修助理",
+        "max_score": 0.7099858256520213,
+        "top_chunks": [
+          {
+            "parent_id": "網路維修助理",
+            "chunk_id": "網路維修助理:document",
+            "score": 0.7099858256520213
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7099858256520213
+      },
+      {
+        "id": "MEM7231-009v3",
+        "max_score": 0.7089271090119067,
+        "top_chunks": [
+          {
+            "parent_id": "MEM7231-009v3",
+            "chunk_id": "MEM7231-009v3:document",
+            "score": 0.7089271090119067
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7089271090119067
+      }
+    ]
+  },
+  {
+    "case_id": "F04",
+    "method": "T-max",
+    "representation": "task",
+    "aggregation": "max",
+    "candidate_parents": [
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "SET3113-004v2",
+      "MEM7231-009v3",
+      "SET7127-001v3",
+      "網路維修助理",
+      "MEM7231-011v2",
+      "SET7231-001v3",
+      "SET2141-001v3",
+      "KPS5220-004v2",
+      "MEM3113-001v4",
+      "MEM3511-001v3",
+      "RTM4323-001v4",
+      "BAS1219-003v4",
+      "MEM7412-001v3",
+      "MEM7234-002v3",
+      "KPS5220-002v3",
+      "MPM7322-001v4",
+      "SET7231-002v3"
+    ],
+    "selected": [
+      {
+        "id": "SET3113-002v3",
+        "max_score": 0.717951040756995,
+        "top_chunks": [
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:overview:None:None",
+            "score": 0.717951040756995
+          },
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:task:5:2",
+            "score": 0.7114727335655959
+          },
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:task:5:1",
+            "score": 0.7054970270166976
+          }
+        ],
+        "available_chunks": 17,
+        "score": 0.717951040756995
+      },
+      {
+        "id": "SET7127-002v3",
+        "max_score": 0.7108239448092049,
+        "top_chunks": [
+          {
+            "parent_id": "SET7127-002v3",
+            "chunk_id": "SET7127-002v3:task:3:1",
+            "score": 0.7108239448092049
+          },
+          {
+            "parent_id": "SET7127-002v3",
+            "chunk_id": "SET7127-002v3:task:3:2",
+            "score": 0.707653089466495
+          },
+          {
+            "parent_id": "SET7127-002v3",
+            "chunk_id": "SET7127-002v3:task:3:3",
+            "score": 0.6956449018687092
+          }
+        ],
+        "available_chunks": 12,
+        "score": 0.7108239448092049
+      },
+      {
+        "id": "MIM2141-001v4",
+        "max_score": 0.7101810034624059,
+        "top_chunks": [
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:overview:None:None",
+            "score": 0.7101810034624059
+          },
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:task:1:1",
+            "score": 0.7025167096832128
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.7101810034624059
+      },
+      {
+        "id": "SET3113-004v2",
+        "max_score": 0.698734758652626,
+        "top_chunks": [
+          {
+            "parent_id": "SET3113-004v2",
+            "chunk_id": "SET3113-004v2:task:2:1",
+            "score": 0.698734758652626
+          },
+          {
+            "parent_id": "SET3113-004v2",
+            "chunk_id": "SET3113-004v2:task:1:2",
+            "score": 0.6408433431957683
+          },
+          {
+            "parent_id": "SET3113-004v2",
+            "chunk_id": "SET3113-004v2:task:1:1",
+            "score": 0.6384555168964761
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.698734758652626
+      },
+      {
+        "id": "MEM7231-009v3",
+        "max_score": 0.6977894984213874,
+        "top_chunks": [
+          {
+            "parent_id": "MEM7231-009v3",
+            "chunk_id": "MEM7231-009v3:task:2:1",
+            "score": 0.6977894984213874
+          },
+          {
+            "parent_id": "MEM7231-009v3",
+            "chunk_id": "MEM7231-009v3:task:1:3",
+            "score": 0.6749623266872077
+          },
+          {
+            "parent_id": "MEM7231-009v3",
+            "chunk_id": "MEM7231-009v3:task:1:1",
+            "score": 0.666510661753013
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.6977894984213874
+      }
+    ]
+  },
+  {
+    "case_id": "F04",
+    "method": "T-mean3",
+    "representation": "task",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "SET3113-002v3",
+      "SET7127-002v3",
+      "MIM2141-001v4",
+      "SET3113-004v2",
+      "MEM7231-009v3",
+      "SET7127-001v3",
+      "網路維修助理",
+      "MEM7231-011v2",
+      "SET7231-001v3",
+      "SET2141-001v3",
+      "KPS5220-004v2",
+      "MEM3113-001v4",
+      "MEM3511-001v3",
+      "RTM4323-001v4",
+      "BAS1219-003v4",
+      "MEM7412-001v3",
+      "MEM7234-002v3",
+      "KPS5220-002v3",
+      "MPM7322-001v4",
+      "SET7231-002v3"
+    ],
+    "selected": [
+      {
+        "id": "SET3113-002v3",
+        "max_score": 0.717951040756995,
+        "top_chunks": [
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:overview:None:None",
+            "score": 0.717951040756995
+          },
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:task:5:2",
+            "score": 0.7114727335655959
+          },
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:task:5:1",
+            "score": 0.7054970270166976
+          }
+        ],
+        "available_chunks": 17,
+        "score": 0.7116402671130961
+      },
+      {
+        "id": "MIM2141-001v4",
+        "max_score": 0.7101810034624059,
+        "top_chunks": [
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:overview:None:None",
+            "score": 0.7101810034624059
+          },
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:task:1:1",
+            "score": 0.7025167096832128
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.7063488565728093
+      },
+      {
+        "id": "SET7127-002v3",
+        "max_score": 0.7108239448092049,
+        "top_chunks": [
+          {
+            "parent_id": "SET7127-002v3",
+            "chunk_id": "SET7127-002v3:task:3:1",
+            "score": 0.7108239448092049
+          },
+          {
+            "parent_id": "SET7127-002v3",
+            "chunk_id": "SET7127-002v3:task:3:2",
+            "score": 0.707653089466495
+          },
+          {
+            "parent_id": "SET7127-002v3",
+            "chunk_id": "SET7127-002v3:task:3:3",
+            "score": 0.6956449018687092
+          }
+        ],
+        "available_chunks": 12,
+        "score": 0.7047073120481363
+      },
+      {
+        "id": "SET2141-001v3",
+        "max_score": 0.6936927364762033,
+        "top_chunks": [
+          {
+            "parent_id": "SET2141-001v3",
+            "chunk_id": "SET2141-001v3:task:3:2",
+            "score": 0.6936927364762033
+          },
+          {
+            "parent_id": "SET2141-001v3",
+            "chunk_id": "SET2141-001v3:overview:None:None",
+            "score": 0.6904663431606741
+          },
+          {
+            "parent_id": "SET2141-001v3",
+            "chunk_id": "SET2141-001v3:task:2:1",
+            "score": 0.672980411698303
+          }
+        ],
+        "available_chunks": 12,
+        "score": 0.6857131637783934
+      },
+      {
+        "id": "SET7127-001v3",
+        "max_score": 0.6964704056369225,
+        "top_chunks": [
+          {
+            "parent_id": "SET7127-001v3",
+            "chunk_id": "SET7127-001v3:task:3:1",
+            "score": 0.6964704056369225
+          },
+          {
+            "parent_id": "SET7127-001v3",
+            "chunk_id": "SET7127-001v3:task:2:1",
+            "score": 0.6936698979014058
+          },
+          {
+            "parent_id": "SET7127-001v3",
+            "chunk_id": "SET7127-001v3:task:5:1",
+            "score": 0.665573360711126
+          }
+        ],
+        "available_chunks": 14,
+        "score": 0.6852378880831514
+      }
+    ]
+  },
+  {
+    "case_id": "F04",
+    "method": "U-max",
+    "representation": "unit",
+    "aggregation": "max",
+    "candidate_parents": [
+      "SET3113-002v3",
+      "MIM2141-001v4",
+      "MEM7231-010v2",
+      "MEM7234-001v3",
+      "MEM7231-009v3",
+      "SET7127-001v3",
+      "MEM3511-001v3",
+      "MEM7234-002v3",
+      "SET7231-002v3",
+      "CCM7412-003v3",
+      "BAS1219-003v4",
+      "SET7127-002v3",
+      "KPS5220-002v3",
+      "IIS7421-002v3",
+      "KPS5220-005v2",
+      "CCM7119-006v3",
+      "SET2141-001v3",
+      "CCM7412-001v4",
+      "MEM7412-001v3",
+      "KPS5292-002v3"
+    ],
+    "selected": [
+      {
+        "id": "SET3113-002v3",
+        "max_score": 0.7254897780052716,
+        "top_chunks": [
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:unit:5:None",
+            "score": 0.7254897780052716
+          },
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:overview:None:None",
+            "score": 0.717951040756995
+          },
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:unit:4:None",
+            "score": 0.6541197220654764
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.7254897780052716
+      },
+      {
+        "id": "MIM2141-001v4",
+        "max_score": 0.7101810034624059,
+        "top_chunks": [
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:overview:None:None",
+            "score": 0.7101810034624059
+          },
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:unit:1:None",
+            "score": 0.7025167096832128
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.7101810034624059
+      },
+      {
+        "id": "MEM7231-010v2",
+        "max_score": 0.7085904233780214,
+        "top_chunks": [
+          {
+            "parent_id": "MEM7231-010v2",
+            "chunk_id": "MEM7231-010v2:unit:1:None",
+            "score": 0.7085904233780214
+          },
+          {
+            "parent_id": "MEM7231-010v2",
+            "chunk_id": "MEM7231-010v2:unit:2:None",
+            "score": 0.6743126114717749
+          },
+          {
+            "parent_id": "MEM7231-010v2",
+            "chunk_id": "MEM7231-010v2:overview:None:None",
+            "score": 0.6337193268343875
+          }
+        ],
+        "available_chunks": 3,
+        "score": 0.7085904233780214
+      },
+      {
+        "id": "MEM7234-001v3",
+        "max_score": 0.7055264499044691,
+        "top_chunks": [
+          {
+            "parent_id": "MEM7234-001v3",
+            "chunk_id": "MEM7234-001v3:unit:2:None",
+            "score": 0.7055264499044691
+          },
+          {
+            "parent_id": "MEM7234-001v3",
+            "chunk_id": "MEM7234-001v3:unit:1:None",
+            "score": 0.6481084944325647
+          },
+          {
+            "parent_id": "MEM7234-001v3",
+            "chunk_id": "MEM7234-001v3:overview:None:None",
+            "score": 0.5697169357426983
+          }
+        ],
+        "available_chunks": 3,
+        "score": 0.7055264499044691
+      },
+      {
+        "id": "MEM7231-009v3",
+        "max_score": 0.7043335181898364,
+        "top_chunks": [
+          {
+            "parent_id": "MEM7231-009v3",
+            "chunk_id": "MEM7231-009v3:unit:1:None",
+            "score": 0.7043335181898364
+          },
+          {
+            "parent_id": "MEM7231-009v3",
+            "chunk_id": "MEM7231-009v3:unit:2:None",
+            "score": 0.6977894984213874
+          },
+          {
+            "parent_id": "MEM7231-009v3",
+            "chunk_id": "MEM7231-009v3:overview:None:None",
+            "score": 0.6066600009082901
+          }
+        ],
+        "available_chunks": 3,
+        "score": 0.7043335181898364
+      }
+    ]
+  },
+  {
+    "case_id": "F04",
+    "method": "U-mean3",
+    "representation": "unit",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "SET3113-002v3",
+      "MIM2141-001v4",
+      "MEM7231-010v2",
+      "MEM7234-001v3",
+      "MEM7231-009v3",
+      "SET7127-001v3",
+      "MEM3511-001v3",
+      "MEM7234-002v3",
+      "SET7231-002v3",
+      "CCM7412-003v3",
+      "BAS1219-003v4",
+      "SET7127-002v3",
+      "KPS5220-002v3",
+      "IIS7421-002v3",
+      "KPS5220-005v2",
+      "CCM7119-006v3",
+      "SET2141-001v3",
+      "CCM7412-001v4",
+      "MEM7412-001v3",
+      "KPS5292-002v3"
+    ],
+    "selected": [
+      {
+        "id": "MIM2141-001v4",
+        "max_score": 0.7101810034624059,
+        "top_chunks": [
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:overview:None:None",
+            "score": 0.7101810034624059
+          },
+          {
+            "parent_id": "MIM2141-001v4",
+            "chunk_id": "MIM2141-001v4:unit:1:None",
+            "score": 0.7025167096832128
+          }
+        ],
+        "available_chunks": 2,
+        "score": 0.7063488565728093
+      },
+      {
+        "id": "SET3113-002v3",
+        "max_score": 0.7254897780052716,
+        "top_chunks": [
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:unit:5:None",
+            "score": 0.7254897780052716
+          },
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:overview:None:None",
+            "score": 0.717951040756995
+          },
+          {
+            "parent_id": "SET3113-002v3",
+            "chunk_id": "SET3113-002v3:unit:4:None",
+            "score": 0.6541197220654764
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.699186846942581
+      },
+      {
+        "id": "SET7127-002v3",
+        "max_score": 0.6947967969789264,
+        "top_chunks": [
+          {
+            "parent_id": "SET7127-002v3",
+            "chunk_id": "SET7127-002v3:unit:3:None",
+            "score": 0.6947967969789264
+          },
+          {
+            "parent_id": "SET7127-002v3",
+            "chunk_id": "SET7127-002v3:unit:2:None",
+            "score": 0.6921160408257874
+          },
+          {
+            "parent_id": "SET7127-002v3",
+            "chunk_id": "SET7127-002v3:overview:None:None",
+            "score": 0.681500802029222
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6894712132779786
+      },
+      {
+        "id": "SET7127-001v3",
+        "max_score": 0.7006532318807456,
+        "top_chunks": [
+          {
+            "parent_id": "SET7127-001v3",
+            "chunk_id": "SET7127-001v3:unit:3:None",
+            "score": 0.7006532318807456
+          },
+          {
+            "parent_id": "SET7127-001v3",
+            "chunk_id": "SET7127-001v3:unit:2:None",
+            "score": 0.6935892025774801
+          },
+          {
+            "parent_id": "SET7127-001v3",
+            "chunk_id": "SET7127-001v3:unit:5:None",
+            "score": 0.6717917644952567
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.6886780663178275
+      },
+      {
+        "id": "SET2141-001v3",
+        "max_score": 0.6904663431606741,
+        "top_chunks": [
+          {
+            "parent_id": "SET2141-001v3",
+            "chunk_id": "SET2141-001v3:overview:None:None",
+            "score": 0.6904663431606741
+          },
+          {
+            "parent_id": "SET2141-001v3",
+            "chunk_id": "SET2141-001v3:unit:3:None",
+            "score": 0.682450514270109
+          },
+          {
+            "parent_id": "SET2141-001v3",
+            "chunk_id": "SET2141-001v3:unit:5:None",
+            "score": 0.6789943903548762
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.6839704159285532
+      }
+    ]
+  },
+  {
+    "case_id": "F05",
+    "method": "D-max",
+    "representation": "document",
+    "aggregation": "max",
+    "candidate_parents": [
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "AVA2172-002v3",
+      "IDC2712-001v1",
+      "KMC2431-006v3",
+      "KMM2431-002v4",
+      "AVA2172-004v3",
+      "IDC5294-001v3",
+      "MPM7322-006v4",
+      "KMC2431-011v1",
+      "KMC2431-007v3",
+      "MPM7322-007v4",
+      "KMC2432-003v3",
+      "KMM2431-004v4",
+      "PIC3332-002v2",
+      "AVA2172-003v3",
+      "TTM4221-004v3",
+      "KPS3322-003v3",
+      "APP2431-001v2",
+      "KMC2431-001v4"
+    ],
+    "selected": [
+      {
+        "id": "KMC2431-009v2",
+        "max_score": 0.73545201688195,
+        "top_chunks": [
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:document",
+            "score": 0.73545201688195
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.73545201688195
+      },
+      {
+        "id": "KMM2431-006v3",
+        "max_score": 0.7326168456809217,
+        "top_chunks": [
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:document",
+            "score": 0.7326168456809217
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7326168456809217
+      },
+      {
+        "id": "AVA2172-002v3",
+        "max_score": 0.725461590191744,
+        "top_chunks": [
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:document",
+            "score": 0.725461590191744
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.725461590191744
+      },
+      {
+        "id": "IDC2712-001v1",
+        "max_score": 0.7253583651461546,
+        "top_chunks": [
+          {
+            "parent_id": "IDC2712-001v1",
+            "chunk_id": "IDC2712-001v1:document",
+            "score": 0.7253583651461546
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7253583651461546
+      },
+      {
+        "id": "KMC2431-006v3",
+        "max_score": 0.7138906001934656,
+        "top_chunks": [
+          {
+            "parent_id": "KMC2431-006v3",
+            "chunk_id": "KMC2431-006v3:document",
+            "score": 0.7138906001934656
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7138906001934656
+      }
+    ]
+  },
+  {
+    "case_id": "F05",
+    "method": "T-max",
+    "representation": "task",
+    "aggregation": "max",
+    "candidate_parents": [
+      "AVA2172-002v3",
+      "KPS3334-009v4",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KMM2431-006v3",
+      "KMC2431-006v3",
+      "KMC2431-005v4",
+      "KMC1222-002v3",
+      "KPS3334-008v4",
+      "BAS2431-001v4",
+      "ATC3439-001v3",
+      "TTM3422-001v2",
+      "KMC3332-001v3",
+      "AVA2172-001v4",
+      "AVA3431-001v2",
+      "KMM2431-004v4",
+      "PIC3332-002v2",
+      "KMC2431-011v1",
+      "KPS5220-005v2",
+      "IDC2712-001v1"
+    ],
+    "selected": [
+      {
+        "id": "AVA2172-002v3",
+        "max_score": 0.7466794986880528,
+        "top_chunks": [
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:overview:None:None",
+            "score": 0.7466794986880528
+          },
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:task:1:2",
+            "score": 0.6573628091876833
+          },
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:task:1:1",
+            "score": 0.6546601026630803
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.7466794986880528
+      },
+      {
+        "id": "KPS3334-009v4",
+        "max_score": 0.734633112930613,
+        "top_chunks": [
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:task:4:1",
+            "score": 0.734633112930613
+          },
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:task:4:2",
+            "score": 0.7096492028571237
+          },
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:task:2:4",
+            "score": 0.6762764457057848
+          }
+        ],
+        "available_chunks": 12,
+        "score": 0.734633112930613
+      },
+      {
+        "id": "KMC2431-009v2",
+        "max_score": 0.7340701709222104,
+        "top_chunks": [
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:overview:None:None",
+            "score": 0.7340701709222104
+          },
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:task:1:2",
+            "score": 0.7178047624382007
+          },
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:task:1:1",
+            "score": 0.6827739727806498
+          }
+        ],
+        "available_chunks": 8,
+        "score": 0.7340701709222104
+      },
+      {
+        "id": "IDC2172-009v2",
+        "max_score": 0.729482640156371,
+        "top_chunks": [
+          {
+            "parent_id": "IDC2172-009v2",
+            "chunk_id": "IDC2172-009v2:task:3:1",
+            "score": 0.729482640156371
+          },
+          {
+            "parent_id": "IDC2172-009v2",
+            "chunk_id": "IDC2172-009v2:task:3:2",
+            "score": 0.6678684957630355
+          },
+          {
+            "parent_id": "IDC2172-009v2",
+            "chunk_id": "IDC2172-009v2:task:1:1",
+            "score": 0.6598875050248028
+          }
+        ],
+        "available_chunks": 8,
+        "score": 0.729482640156371
+      },
+      {
+        "id": "KMM2431-006v3",
+        "max_score": 0.7126339600665087,
+        "top_chunks": [
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:task:1:2",
+            "score": 0.7126339600665087
+          },
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:task:2:2",
+            "score": 0.7045750739129955
+          },
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:task:1:1",
+            "score": 0.7002976464189605
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.7126339600665087
+      }
+    ]
+  },
+  {
+    "case_id": "F05",
+    "method": "T-mean3",
+    "representation": "task",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "AVA2172-002v3",
+      "KPS3334-009v4",
+      "KMC2431-009v2",
+      "IDC2172-009v2",
+      "KMM2431-006v3",
+      "KMC2431-006v3",
+      "KMC2431-005v4",
+      "KMC1222-002v3",
+      "KPS3334-008v4",
+      "BAS2431-001v4",
+      "ATC3439-001v3",
+      "TTM3422-001v2",
+      "KMC3332-001v3",
+      "AVA2172-001v4",
+      "AVA3431-001v2",
+      "KMM2431-004v4",
+      "PIC3332-002v2",
+      "KMC2431-011v1",
+      "KPS5220-005v2",
+      "IDC2712-001v1"
+    ],
+    "selected": [
+      {
+        "id": "KMC2431-009v2",
+        "max_score": 0.7340701709222104,
+        "top_chunks": [
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:overview:None:None",
+            "score": 0.7340701709222104
+          },
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:task:1:2",
+            "score": 0.7178047624382007
+          },
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:task:1:1",
+            "score": 0.6827739727806498
+          }
+        ],
+        "available_chunks": 8,
+        "score": 0.7115496353803535
+      },
+      {
+        "id": "KPS3334-009v4",
+        "max_score": 0.734633112930613,
+        "top_chunks": [
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:task:4:1",
+            "score": 0.734633112930613
+          },
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:task:4:2",
+            "score": 0.7096492028571237
+          },
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:task:2:4",
+            "score": 0.6762764457057848
+          }
+        ],
+        "available_chunks": 12,
+        "score": 0.7068529204978405
+      },
+      {
+        "id": "KMM2431-006v3",
+        "max_score": 0.7126339600665087,
+        "top_chunks": [
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:task:1:2",
+            "score": 0.7126339600665087
+          },
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:task:2:2",
+            "score": 0.7045750739129955
+          },
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:task:1:1",
+            "score": 0.7002976464189605
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.7058355601328216
+      },
+      {
+        "id": "KMC2431-005v4",
+        "max_score": 0.7022850419459472,
+        "top_chunks": [
+          {
+            "parent_id": "KMC2431-005v4",
+            "chunk_id": "KMC2431-005v4:task:1:2",
+            "score": 0.7022850419459472
+          },
+          {
+            "parent_id": "KMC2431-005v4",
+            "chunk_id": "KMC2431-005v4:task:1:5",
+            "score": 0.6942475605025321
+          },
+          {
+            "parent_id": "KMC2431-005v4",
+            "chunk_id": "KMC2431-005v4:task:1:1",
+            "score": 0.6891518910021164
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.6952281644835319
+      },
+      {
+        "id": "KMC1222-002v3",
+        "max_score": 0.7012013059674003,
+        "top_chunks": [
+          {
+            "parent_id": "KMC1222-002v3",
+            "chunk_id": "KMC1222-002v3:task:4:4",
+            "score": 0.7012013059674003
+          },
+          {
+            "parent_id": "KMC1222-002v3",
+            "chunk_id": "KMC1222-002v3:task:4:5",
+            "score": 0.6950414475310006
+          },
+          {
+            "parent_id": "KMC1222-002v3",
+            "chunk_id": "KMC1222-002v3:overview:None:None",
+            "score": 0.6835509001118973
+          }
+        ],
+        "available_chunks": 35,
+        "score": 0.6932645512034328
+      }
+    ]
+  },
+  {
+    "case_id": "F05",
+    "method": "U-max",
+    "representation": "unit",
+    "aggregation": "max",
+    "candidate_parents": [
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "BAS2431-001v4",
+      "KPS3334-008v4",
+      "IDC2172-009v2",
+      "KMC2431-006v3",
+      "AVA2172-004v3",
+      "KMC2431-005v4",
+      "KMM2431-004v4",
+      "PIC3332-002v2",
+      "AVA2431-001v2",
+      "KMM2431-002v4",
+      "TTM3422-001v2",
+      "TTM4221-002v4",
+      "AVA3439-001v4",
+      "AVA3431-001v2",
+      "KRM2431-001v3",
+      "ATC3439-001v3"
+    ],
+    "selected": [
+      {
+        "id": "KPS3334-009v4",
+        "max_score": 0.7492129137117811,
+        "top_chunks": [
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:unit:4:None",
+            "score": 0.7492129137117811
+          },
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:unit:3:None",
+            "score": 0.6785570216412811
+          },
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:unit:2:None",
+            "score": 0.6639510821316337
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7492129137117811
+      },
+      {
+        "id": "AVA2172-002v3",
+        "max_score": 0.7466794986880528,
+        "top_chunks": [
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:overview:None:None",
+            "score": 0.7466794986880528
+          },
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:unit:1:None",
+            "score": 0.6744358208781093
+          },
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:unit:2:None",
+            "score": 0.6661130436359617
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.7466794986880528
+      },
+      {
+        "id": "KMC2431-009v2",
+        "max_score": 0.7340701709222104,
+        "top_chunks": [
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:overview:None:None",
+            "score": 0.7340701709222104
+          },
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:unit:1:None",
+            "score": 0.7001184511913656
+          },
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:unit:2:None",
+            "score": 0.6910602435539904
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.7340701709222104
+      },
+      {
+        "id": "KMM2431-006v3",
+        "max_score": 0.7236486257835044,
+        "top_chunks": [
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:unit:2:None",
+            "score": 0.7236486257835044
+          },
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:unit:1:None",
+            "score": 0.7224267064931752
+          },
+          {
+            "parent_id": "KMM2431-006v3",
+            "chunk_id": "KMM2431-006v3:overview:None:None",
+            "score": 0.6175375136905239
+          }
+        ],
+        "available_chunks": 3,
+        "score": 0.7236486257835044
+      },
+      {
+        "id": "BAS2431-001v4",
+        "max_score": 0.7224114815872361,
+        "top_chunks": [
+          {
+            "parent_id": "BAS2431-001v4",
+            "chunk_id": "BAS2431-001v4:unit:2:None",
+            "score": 0.7224114815872361
+          },
+          {
+            "parent_id": "BAS2431-001v4",
+            "chunk_id": "BAS2431-001v4:overview:None:None",
+            "score": 0.6927288595916263
+          },
+          {
+            "parent_id": "BAS2431-001v4",
+            "chunk_id": "BAS2431-001v4:unit:3:None",
+            "score": 0.6785005672964091
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.7224114815872361
+      }
+    ]
+  },
+  {
+    "case_id": "F05",
+    "method": "U-mean3",
+    "representation": "unit",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "KPS3334-009v4",
+      "AVA2172-002v3",
+      "KMC2431-009v2",
+      "KMM2431-006v3",
+      "BAS2431-001v4",
+      "KPS3334-008v4",
+      "IDC2172-009v2",
+      "KMC2431-006v3",
+      "AVA2172-004v3",
+      "KMC2431-005v4",
+      "KMM2431-004v4",
+      "PIC3332-002v2",
+      "AVA2431-001v2",
+      "KMM2431-002v4",
+      "TTM3422-001v2",
+      "TTM4221-002v4",
+      "AVA3439-001v4",
+      "AVA3431-001v2",
+      "KRM2431-001v3",
+      "ATC3439-001v3"
+    ],
+    "selected": [
+      {
+        "id": "KMC2431-009v2",
+        "max_score": 0.7340701709222104,
+        "top_chunks": [
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:overview:None:None",
+            "score": 0.7340701709222104
+          },
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:unit:1:None",
+            "score": 0.7001184511913656
+          },
+          {
+            "parent_id": "KMC2431-009v2",
+            "chunk_id": "KMC2431-009v2:unit:2:None",
+            "score": 0.6910602435539904
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.7084162885558555
+      },
+      {
+        "id": "BAS2431-001v4",
+        "max_score": 0.7224114815872361,
+        "top_chunks": [
+          {
+            "parent_id": "BAS2431-001v4",
+            "chunk_id": "BAS2431-001v4:unit:2:None",
+            "score": 0.7224114815872361
+          },
+          {
+            "parent_id": "BAS2431-001v4",
+            "chunk_id": "BAS2431-001v4:overview:None:None",
+            "score": 0.6927288595916263
+          },
+          {
+            "parent_id": "BAS2431-001v4",
+            "chunk_id": "BAS2431-001v4:unit:3:None",
+            "score": 0.6785005672964091
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.6978803028250905
+      },
+      {
+        "id": "KPS3334-009v4",
+        "max_score": 0.7492129137117811,
+        "top_chunks": [
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:unit:4:None",
+            "score": 0.7492129137117811
+          },
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:unit:3:None",
+            "score": 0.6785570216412811
+          },
+          {
+            "parent_id": "KPS3334-009v4",
+            "chunk_id": "KPS3334-009v4:unit:2:None",
+            "score": 0.6639510821316337
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6972403391615654
+      },
+      {
+        "id": "KPS3334-008v4",
+        "max_score": 0.7216285366968168,
+        "top_chunks": [
+          {
+            "parent_id": "KPS3334-008v4",
+            "chunk_id": "KPS3334-008v4:unit:3:None",
+            "score": 0.7216285366968168
+          },
+          {
+            "parent_id": "KPS3334-008v4",
+            "chunk_id": "KPS3334-008v4:unit:2:None",
+            "score": 0.6849861687154171
+          },
+          {
+            "parent_id": "KPS3334-008v4",
+            "chunk_id": "KPS3334-008v4:unit:4:None",
+            "score": 0.6826213498098656
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6964120184073664
+      },
+      {
+        "id": "AVA2172-002v3",
+        "max_score": 0.7466794986880528,
+        "top_chunks": [
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:overview:None:None",
+            "score": 0.7466794986880528
+          },
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:unit:1:None",
+            "score": 0.6744358208781093
+          },
+          {
+            "parent_id": "AVA2172-002v3",
+            "chunk_id": "AVA2172-002v3:unit:2:None",
+            "score": 0.6661130436359617
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6957427877340413
+      }
+    ]
+  },
+  {
+    "case_id": "H01",
+    "method": "D-max",
+    "representation": "document",
+    "aggregation": "max",
+    "candidate_parents": [
+      "BHR2422-007v4",
+      "THM4222-001v3",
+      "KPS2434-004v2",
+      "TTM4221-007v1",
+      "FAC3313-001v2",
+      "KPS5220-001v4",
+      "KRM1420-001v4",
+      "FAC4311-001v2",
+      "KPS3322-003v3",
+      "BAS1219-003v4",
+      "TTM3422-001v2",
+      "TTM4221-004v3",
+      "BGM5220-002v3",
+      "APA3439-002v4",
+      "BAS3332-002v3",
+      "連鎖餐飲門市管理人員",
+      "TFB1412-002v2",
+      "BHR2422-011v4",
+      "FAC1211-001v2",
+      "TFB5139-001v3"
+    ],
+    "selected": [
+      {
+        "id": "BHR2422-007v4",
+        "max_score": 0.6451285611527924,
+        "top_chunks": [
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:document",
+            "score": 0.6451285611527924
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6451285611527924
+      },
+      {
+        "id": "THM4222-001v3",
+        "max_score": 0.6412383411062139,
+        "top_chunks": [
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:document",
+            "score": 0.6412383411062139
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6412383411062139
+      },
+      {
+        "id": "KPS2434-004v2",
+        "max_score": 0.6358392419743988,
+        "top_chunks": [
+          {
+            "parent_id": "KPS2434-004v2",
+            "chunk_id": "KPS2434-004v2:document",
+            "score": 0.6358392419743988
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6358392419743988
+      },
+      {
+        "id": "TTM4221-007v1",
+        "max_score": 0.6324038806973739,
+        "top_chunks": [
+          {
+            "parent_id": "TTM4221-007v1",
+            "chunk_id": "TTM4221-007v1:document",
+            "score": 0.6324038806973739
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6324038806973739
+      },
+      {
+        "id": "FAC3313-001v2",
+        "max_score": 0.6293837857108782,
+        "top_chunks": [
+          {
+            "parent_id": "FAC3313-001v2",
+            "chunk_id": "FAC3313-001v2:document",
+            "score": 0.6293837857108782
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6293837857108782
+      }
+    ]
+  },
+  {
+    "case_id": "H01",
+    "method": "T-max",
+    "representation": "task",
+    "aggregation": "max",
+    "candidate_parents": [
+      "TTM3422-001v2",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1",
+      "KPS3322-003v3",
+      "連鎖餐飲門市管理人員",
+      "KRM4212-001v2",
+      "TFB1412-002v2",
+      "KPS5220-001v4",
+      "KPS5220-004v2",
+      "KRM1420-001v4",
+      "KMC2432-001v4",
+      "KPS5220-005v2",
+      "ATC2654-001v4",
+      "KRM4212-002v2",
+      "KMC2432-003v3",
+      "KRM1324-002v1",
+      "SMS2529-001v3",
+      "連鎖餐飲區域督導"
+    ],
+    "selected": [
+      {
+        "id": "TTM3422-001v2",
+        "max_score": 0.6680221100321824,
+        "top_chunks": [
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:task:2:1",
+            "score": 0.6680221100321824
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:task:2:2",
+            "score": 0.6274032327790373
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:task:2:3",
+            "score": 0.578921473010687
+          }
+        ],
+        "available_chunks": 16,
+        "score": 0.6680221100321824
+      },
+      {
+        "id": "BHR2422-011v4",
+        "max_score": 0.6605029997042438,
+        "top_chunks": [
+          {
+            "parent_id": "BHR2422-011v4",
+            "chunk_id": "BHR2422-011v4:task:3:1",
+            "score": 0.6605029997042438
+          },
+          {
+            "parent_id": "BHR2422-011v4",
+            "chunk_id": "BHR2422-011v4:task:3:2",
+            "score": 0.6272203445496085
+          },
+          {
+            "parent_id": "BHR2422-011v4",
+            "chunk_id": "BHR2422-011v4:task:3:4",
+            "score": 0.605304427325942
+          }
+        ],
+        "available_chunks": 11,
+        "score": 0.6605029997042438
+      },
+      {
+        "id": "THM4222-001v3",
+        "max_score": 0.6572905141081935,
+        "top_chunks": [
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:task:1:1",
+            "score": 0.6572905141081935
+          },
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:task:1:2",
+            "score": 0.6526602846577583
+          },
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:task:2:1",
+            "score": 0.6445990699657511
+          }
+        ],
+        "available_chunks": 11,
+        "score": 0.6572905141081935
+      },
+      {
+        "id": "BHR2422-007v4",
+        "max_score": 0.645696343799012,
+        "top_chunks": [
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:task:2:1",
+            "score": 0.645696343799012
+          },
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:task:2:2",
+            "score": 0.6218674353283093
+          },
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:task:1:2",
+            "score": 0.6215674123556514
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.645696343799012
+      },
+      {
+        "id": "TTM4221-007v1",
+        "max_score": 0.6344878140374159,
+        "top_chunks": [
+          {
+            "parent_id": "TTM4221-007v1",
+            "chunk_id": "TTM4221-007v1:task:1:1",
+            "score": 0.6344878140374159
+          },
+          {
+            "parent_id": "TTM4221-007v1",
+            "chunk_id": "TTM4221-007v1:task:1:3",
+            "score": 0.5978426299298426
+          },
+          {
+            "parent_id": "TTM4221-007v1",
+            "chunk_id": "TTM4221-007v1:task:3:1",
+            "score": 0.5905902367804042
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.6344878140374159
+      }
+    ]
+  },
+  {
+    "case_id": "H01",
+    "method": "T-mean3",
+    "representation": "task",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "TTM3422-001v2",
+      "BHR2422-011v4",
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM4221-007v1",
+      "KPS3322-003v3",
+      "連鎖餐飲門市管理人員",
+      "KRM4212-001v2",
+      "TFB1412-002v2",
+      "KPS5220-001v4",
+      "KPS5220-004v2",
+      "KRM1420-001v4",
+      "KMC2432-001v4",
+      "KPS5220-005v2",
+      "ATC2654-001v4",
+      "KRM4212-002v2",
+      "KMC2432-003v3",
+      "KRM1324-002v1",
+      "SMS2529-001v3",
+      "連鎖餐飲區域督導"
+    ],
+    "selected": [
+      {
+        "id": "THM4222-001v3",
+        "max_score": 0.6572905141081935,
+        "top_chunks": [
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:task:1:1",
+            "score": 0.6572905141081935
+          },
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:task:1:2",
+            "score": 0.6526602846577583
+          },
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:task:2:1",
+            "score": 0.6445990699657511
+          }
+        ],
+        "available_chunks": 11,
+        "score": 0.6515166229105677
+      },
+      {
+        "id": "BHR2422-011v4",
+        "max_score": 0.6605029997042438,
+        "top_chunks": [
+          {
+            "parent_id": "BHR2422-011v4",
+            "chunk_id": "BHR2422-011v4:task:3:1",
+            "score": 0.6605029997042438
+          },
+          {
+            "parent_id": "BHR2422-011v4",
+            "chunk_id": "BHR2422-011v4:task:3:2",
+            "score": 0.6272203445496085
+          },
+          {
+            "parent_id": "BHR2422-011v4",
+            "chunk_id": "BHR2422-011v4:task:3:4",
+            "score": 0.605304427325942
+          }
+        ],
+        "available_chunks": 11,
+        "score": 0.6310092571932647
+      },
+      {
+        "id": "BHR2422-007v4",
+        "max_score": 0.645696343799012,
+        "top_chunks": [
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:task:2:1",
+            "score": 0.645696343799012
+          },
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:task:2:2",
+            "score": 0.6218674353283093
+          },
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:task:1:2",
+            "score": 0.6215674123556514
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.6297103971609909
+      },
+      {
+        "id": "TTM3422-001v2",
+        "max_score": 0.6680221100321824,
+        "top_chunks": [
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:task:2:1",
+            "score": 0.6680221100321824
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:task:2:2",
+            "score": 0.6274032327790373
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:task:2:3",
+            "score": 0.578921473010687
+          }
+        ],
+        "available_chunks": 16,
+        "score": 0.6247822719406355
+      },
+      {
+        "id": "連鎖餐飲門市管理人員",
+        "max_score": 0.6302711572963365,
+        "top_chunks": [
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:task:4:1",
+            "score": 0.6302711572963365
+          },
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:task:4:2",
+            "score": 0.608792767297242
+          },
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:task:2:3",
+            "score": 0.6028299945746995
+          }
+        ],
+        "available_chunks": 11,
+        "score": 0.6139646397227593
+      }
+    ]
+  },
+  {
+    "case_id": "H01",
+    "method": "U-max",
+    "representation": "unit",
+    "aggregation": "max",
+    "candidate_parents": [
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員",
+      "BHR2422-011v4",
+      "TTM4221-007v1",
+      "KMC2432-003v3",
+      "KRM1420-001v4",
+      "FAC4311-001v2",
+      "TFB1412-002v2",
+      "KPS5220-001v4",
+      "KMC2432-001v4",
+      "KPS5220-005v2",
+      "KPS3322-003v3",
+      "TFB1412-003v2",
+      "KMC2431-012v1",
+      "KMC3332-001v3",
+      "KPS5220-004v2",
+      "KRM1420-002v4",
+      "ATC3339-001v4"
+    ],
+    "selected": [
+      {
+        "id": "THM4222-001v3",
+        "max_score": 0.6751259598540128,
+        "top_chunks": [
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:unit:1:None",
+            "score": 0.6751259598540128
+          },
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:unit:2:None",
+            "score": 0.6543054345341677
+          },
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:unit:3:None",
+            "score": 0.6070109828712205
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6751259598540128
+      },
+      {
+        "id": "BHR2422-007v4",
+        "max_score": 0.665996099565742,
+        "top_chunks": [
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:unit:2:None",
+            "score": 0.665996099565742
+          },
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:unit:1:None",
+            "score": 0.6478892881472145
+          },
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:unit:3:None",
+            "score": 0.5798923207671713
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.665996099565742
+      },
+      {
+        "id": "TTM3422-001v2",
+        "max_score": 0.6612124362542402,
+        "top_chunks": [
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:unit:2:None",
+            "score": 0.6612124362542402
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:unit:4:None",
+            "score": 0.5789920930341804
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:unit:3:None",
+            "score": 0.5774744200711606
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6612124362542402
+      },
+      {
+        "id": "連鎖餐飲門市管理人員",
+        "max_score": 0.6510261738785557,
+        "top_chunks": [
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:unit:4:None",
+            "score": 0.6510261738785557
+          },
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:unit:3:None",
+            "score": 0.6008975899133824
+          },
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:unit:1:None",
+            "score": 0.5631073024380624
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6510261738785557
+      },
+      {
+        "id": "BHR2422-011v4",
+        "max_score": 0.6424613514562432,
+        "top_chunks": [
+          {
+            "parent_id": "BHR2422-011v4",
+            "chunk_id": "BHR2422-011v4:unit:3:None",
+            "score": 0.6424613514562432
+          },
+          {
+            "parent_id": "BHR2422-011v4",
+            "chunk_id": "BHR2422-011v4:unit:1:None",
+            "score": 0.5621547250445051
+          },
+          {
+            "parent_id": "BHR2422-011v4",
+            "chunk_id": "BHR2422-011v4:overview:None:None",
+            "score": 0.5504252921459261
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6424613514562432
+      }
+    ]
+  },
+  {
+    "case_id": "H01",
+    "method": "U-mean3",
+    "representation": "unit",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "THM4222-001v3",
+      "BHR2422-007v4",
+      "TTM3422-001v2",
+      "連鎖餐飲門市管理人員",
+      "BHR2422-011v4",
+      "TTM4221-007v1",
+      "KMC2432-003v3",
+      "KRM1420-001v4",
+      "FAC4311-001v2",
+      "TFB1412-002v2",
+      "KPS5220-001v4",
+      "KMC2432-001v4",
+      "KPS5220-005v2",
+      "KPS3322-003v3",
+      "TFB1412-003v2",
+      "KMC2431-012v1",
+      "KMC3332-001v3",
+      "KPS5220-004v2",
+      "KRM1420-002v4",
+      "ATC3339-001v4"
+    ],
+    "selected": [
+      {
+        "id": "THM4222-001v3",
+        "max_score": 0.6751259598540128,
+        "top_chunks": [
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:unit:1:None",
+            "score": 0.6751259598540128
+          },
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:unit:2:None",
+            "score": 0.6543054345341677
+          },
+          {
+            "parent_id": "THM4222-001v3",
+            "chunk_id": "THM4222-001v3:unit:3:None",
+            "score": 0.6070109828712205
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6454807924198003
+      },
+      {
+        "id": "BHR2422-007v4",
+        "max_score": 0.665996099565742,
+        "top_chunks": [
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:unit:2:None",
+            "score": 0.665996099565742
+          },
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:unit:1:None",
+            "score": 0.6478892881472145
+          },
+          {
+            "parent_id": "BHR2422-007v4",
+            "chunk_id": "BHR2422-007v4:unit:3:None",
+            "score": 0.5798923207671713
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6312592361600425
+      },
+      {
+        "id": "TTM4221-007v1",
+        "max_score": 0.6301698150172055,
+        "top_chunks": [
+          {
+            "parent_id": "TTM4221-007v1",
+            "chunk_id": "TTM4221-007v1:unit:1:None",
+            "score": 0.6301698150172055
+          },
+          {
+            "parent_id": "TTM4221-007v1",
+            "chunk_id": "TTM4221-007v1:unit:3:None",
+            "score": 0.6162661760340321
+          },
+          {
+            "parent_id": "TTM4221-007v1",
+            "chunk_id": "TTM4221-007v1:unit:2:None",
+            "score": 0.5910237899615783
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6124865936709386
+      },
+      {
+        "id": "TTM3422-001v2",
+        "max_score": 0.6612124362542402,
+        "top_chunks": [
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:unit:2:None",
+            "score": 0.6612124362542402
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:unit:4:None",
+            "score": 0.5789920930341804
+          },
+          {
+            "parent_id": "TTM3422-001v2",
+            "chunk_id": "TTM3422-001v2:unit:3:None",
+            "score": 0.5774744200711606
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6058929831198604
+      },
+      {
+        "id": "連鎖餐飲門市管理人員",
+        "max_score": 0.6510261738785557,
+        "top_chunks": [
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:unit:4:None",
+            "score": 0.6510261738785557
+          },
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:unit:3:None",
+            "score": 0.6008975899133824
+          },
+          {
+            "parent_id": "連鎖餐飲門市管理人員",
+            "chunk_id": "連鎖餐飲門市管理人員:unit:1:None",
+            "score": 0.5631073024380624
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6050103554100001
+      }
+    ]
+  },
+  {
+    "case_id": "H02",
+    "method": "D-max",
+    "representation": "document",
+    "aggregation": "max",
+    "candidate_parents": [
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "MMP4321-002v4",
+      "KRM1324-002v1",
+      "MMP4321-003v4",
+      "MQM7993-001v4",
+      "KRM1324-001v1",
+      "MMP1324-003v4",
+      "BGM5220-002v3",
+      "KRM3323-002v4",
+      "RTO4323-001v4",
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "KRM3323-001v4",
+      "RLM4323-002v4",
+      "MQM2141-005v2",
+      "KRM1420-001v4",
+      "KPS5220-001v4",
+      "KPS2434-004v2",
+      "RTM4323-005v1"
+    ],
+    "selected": [
+      {
+        "id": "RLM4323-004v1",
+        "max_score": 0.7633340132393822,
+        "top_chunks": [
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:document",
+            "score": 0.7633340132393822
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7633340132393822
+      },
+      {
+        "id": "RLM9330-001v1",
+        "max_score": 0.7600323452930058,
+        "top_chunks": [
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:document",
+            "score": 0.7600323452930058
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7600323452930058
+      },
+      {
+        "id": "MMP4321-002v4",
+        "max_score": 0.7071964001216833,
+        "top_chunks": [
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:document",
+            "score": 0.7071964001216833
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7071964001216833
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7046755756515557,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:document",
+            "score": 0.7046755756515557
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7046755756515557
+      },
+      {
+        "id": "MMP4321-003v4",
+        "max_score": 0.7045879199420888,
+        "top_chunks": [
+          {
+            "parent_id": "MMP4321-003v4",
+            "chunk_id": "MMP4321-003v4:document",
+            "score": 0.7045879199420888
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7045879199420888
+      }
+    ]
+  },
+  {
+    "case_id": "H02",
+    "method": "T-max",
+    "representation": "task",
+    "aggregation": "max",
+    "candidate_parents": [
+      "BGM5220-002v3",
+      "TFB5131-001v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KPS5292-002v3",
+      "KRM1324-002v1",
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "TFB3433-002v3",
+      "TFB3433-001v3",
+      "MPM7322-001v4",
+      "KRM1420-001v4",
+      "KRM1324-001v1",
+      "KPS2434-004v2",
+      "BAS3323-003v3",
+      "KRM3323-002v4",
+      "KPS2434-005v1",
+      "KRM3323-001v4",
+      "MQM7993-001v4",
+      "RTO4323-001v4"
+    ],
+    "selected": [
+      {
+        "id": "BGM5220-002v3",
+        "max_score": 0.74339299329676,
+        "top_chunks": [
+          {
+            "parent_id": "BGM5220-002v3",
+            "chunk_id": "BGM5220-002v3:task:1:2",
+            "score": 0.74339299329676
+          },
+          {
+            "parent_id": "BGM5220-002v3",
+            "chunk_id": "BGM5220-002v3:task:1:3",
+            "score": 0.7241414317105224
+          },
+          {
+            "parent_id": "BGM5220-002v3",
+            "chunk_id": "BGM5220-002v3:task:1:1",
+            "score": 0.6961364011317247
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.74339299329676
+      },
+      {
+        "id": "TFB5131-001v3",
+        "max_score": 0.731980633837441,
+        "top_chunks": [
+          {
+            "parent_id": "TFB5131-001v3",
+            "chunk_id": "TFB5131-001v3:task:1:2",
+            "score": 0.731980633837441
+          },
+          {
+            "parent_id": "TFB5131-001v3",
+            "chunk_id": "TFB5131-001v3:task:1:3",
+            "score": 0.5681656999477148
+          },
+          {
+            "parent_id": "TFB5131-001v3",
+            "chunk_id": "TFB5131-001v3:task:1:1",
+            "score": 0.5601524163616289
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.731980633837441
+      },
+      {
+        "id": "MMP4321-002v4",
+        "max_score": 0.7222414088514755,
+        "top_chunks": [
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:task:1:4",
+            "score": 0.7222414088514755
+          },
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:task:1:3",
+            "score": 0.6716230538660604
+          },
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:task:1:1",
+            "score": 0.6489411511133883
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.7222414088514755
+      },
+      {
+        "id": "KPS5220-003v3",
+        "max_score": 0.7205875288897239,
+        "top_chunks": [
+          {
+            "parent_id": "KPS5220-003v3",
+            "chunk_id": "KPS5220-003v3:task:2:1",
+            "score": 0.7205875288897239
+          },
+          {
+            "parent_id": "KPS5220-003v3",
+            "chunk_id": "KPS5220-003v3:task:2:2",
+            "score": 0.7028427065350635
+          },
+          {
+            "parent_id": "KPS5220-003v3",
+            "chunk_id": "KPS5220-003v3:task:1:2",
+            "score": 0.59730708710106
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.7205875288897239
+      },
+      {
+        "id": "KPS5292-002v3",
+        "max_score": 0.7109035074050862,
+        "top_chunks": [
+          {
+            "parent_id": "KPS5292-002v3",
+            "chunk_id": "KPS5292-002v3:task:2:1",
+            "score": 0.7109035074050862
+          },
+          {
+            "parent_id": "KPS5292-002v3",
+            "chunk_id": "KPS5292-002v3:task:2:2",
+            "score": 0.6386185990409035
+          },
+          {
+            "parent_id": "KPS5292-002v3",
+            "chunk_id": "KPS5292-002v3:task:1:3",
+            "score": 0.6045598670960787
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.7109035074050862
+      }
+    ]
+  },
+  {
+    "case_id": "H02",
+    "method": "T-mean3",
+    "representation": "task",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "BGM5220-002v3",
+      "TFB5131-001v3",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KPS5292-002v3",
+      "KRM1324-002v1",
+      "RLM4323-004v1",
+      "RLM9330-001v1",
+      "TFB3433-002v3",
+      "TFB3433-001v3",
+      "MPM7322-001v4",
+      "KRM1420-001v4",
+      "KRM1324-001v1",
+      "KPS2434-004v2",
+      "BAS3323-003v3",
+      "KRM3323-002v4",
+      "KPS2434-005v1",
+      "KRM3323-001v4",
+      "MQM7993-001v4",
+      "RTO4323-001v4"
+    ],
+    "selected": [
+      {
+        "id": "BGM5220-002v3",
+        "max_score": 0.74339299329676,
+        "top_chunks": [
+          {
+            "parent_id": "BGM5220-002v3",
+            "chunk_id": "BGM5220-002v3:task:1:2",
+            "score": 0.74339299329676
+          },
+          {
+            "parent_id": "BGM5220-002v3",
+            "chunk_id": "BGM5220-002v3:task:1:3",
+            "score": 0.7241414317105224
+          },
+          {
+            "parent_id": "BGM5220-002v3",
+            "chunk_id": "BGM5220-002v3:task:1:1",
+            "score": 0.6961364011317247
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.7212236087130024
+      },
+      {
+        "id": "RLM4323-004v1",
+        "max_score": 0.7075092884531088,
+        "top_chunks": [
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:task:2:2",
+            "score": 0.7075092884531088
+          },
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:task:3:1",
+            "score": 0.7059304773334478
+          },
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:task:1:2",
+            "score": 0.7002240979450908
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.7045546212438825
+      },
+      {
+        "id": "RLM9330-001v1",
+        "max_score": 0.7063246382993377,
+        "top_chunks": [
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:task:1:2",
+            "score": 0.7063246382993377
+          },
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:task:3:1",
+            "score": 0.704055310485292
+          },
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:task:2:1",
+            "score": 0.6992263158517716
+          }
+        ],
+        "available_chunks": 8,
+        "score": 0.7032020882121338
+      },
+      {
+        "id": "MPM7322-001v4",
+        "max_score": 0.6906485671936727,
+        "top_chunks": [
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:2:2",
+            "score": 0.6906485671936727
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:2:1",
+            "score": 0.6883719782532465
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:7",
+            "score": 0.6812909537821847
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.6867704997430346
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7090705349229558,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:2:2",
+            "score": 0.7090705349229558
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:1:1",
+            "score": 0.6739456543572893
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:3:2",
+            "score": 0.6712010247338035
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.6847390713380163
+      }
+    ]
+  },
+  {
+    "case_id": "H02",
+    "method": "U-max",
+    "representation": "unit",
+    "aggregation": "max",
+    "candidate_parents": [
+      "KPS5220-003v3",
+      "RLM4323-004v1",
+      "BGM5220-002v3",
+      "RLM9330-001v1",
+      "KRM1324-001v1",
+      "MMP4321-003v4",
+      "MMP4321-002v4",
+      "KPS5292-002v3",
+      "MPM7322-001v4",
+      "KRM3323-001v4",
+      "KRM1324-002v1",
+      "KRM1420-001v4",
+      "MMP1324-003v4",
+      "KPS2434-001v2",
+      "RTO4323-001v4",
+      "MQM7993-001v4",
+      "BAS3323-002v4",
+      "KPS2434-004v2",
+      "BGM1322-001v4",
+      "RTM4323-001v4"
+    ],
+    "selected": [
+      {
+        "id": "KPS5220-003v3",
+        "max_score": 0.7405139281325945,
+        "top_chunks": [
+          {
+            "parent_id": "KPS5220-003v3",
+            "chunk_id": "KPS5220-003v3:unit:2:None",
+            "score": 0.7405139281325945
+          },
+          {
+            "parent_id": "KPS5220-003v3",
+            "chunk_id": "KPS5220-003v3:unit:1:None",
+            "score": 0.582929179090529
+          },
+          {
+            "parent_id": "KPS5220-003v3",
+            "chunk_id": "KPS5220-003v3:overview:None:None",
+            "score": 0.5228238729466672
+          }
+        ],
+        "available_chunks": 3,
+        "score": 0.7405139281325945
+      },
+      {
+        "id": "RLM4323-004v1",
+        "max_score": 0.7385939257107631,
+        "top_chunks": [
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:unit:2:None",
+            "score": 0.7385939257107631
+          },
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:unit:1:None",
+            "score": 0.7238389311800402
+          },
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:unit:3:None",
+            "score": 0.7233119542045371
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7385939257107631
+      },
+      {
+        "id": "BGM5220-002v3",
+        "max_score": 0.7374160051618036,
+        "top_chunks": [
+          {
+            "parent_id": "BGM5220-002v3",
+            "chunk_id": "BGM5220-002v3:unit:1:None",
+            "score": 0.7374160051618036
+          },
+          {
+            "parent_id": "BGM5220-002v3",
+            "chunk_id": "BGM5220-002v3:unit:2:None",
+            "score": 0.5824334732835639
+          },
+          {
+            "parent_id": "BGM5220-002v3",
+            "chunk_id": "BGM5220-002v3:overview:None:None",
+            "score": 0.5701317546669356
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.7374160051618036
+      },
+      {
+        "id": "RLM9330-001v1",
+        "max_score": 0.7328903199040844,
+        "top_chunks": [
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:unit:2:None",
+            "score": 0.7328903199040844
+          },
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:unit:3:None",
+            "score": 0.704055310485292
+          },
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:unit:1:None",
+            "score": 0.6951490767829844
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7328903199040844
+      },
+      {
+        "id": "KRM1324-001v1",
+        "max_score": 0.7317985952080837,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:4:None",
+            "score": 0.7317985952080837
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:1:None",
+            "score": 0.6797670513391387
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:2:None",
+            "score": 0.6528885814592762
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7317985952080837
+      }
+    ]
+  },
+  {
+    "case_id": "H02",
+    "method": "U-mean3",
+    "representation": "unit",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "KPS5220-003v3",
+      "RLM4323-004v1",
+      "BGM5220-002v3",
+      "RLM9330-001v1",
+      "KRM1324-001v1",
+      "MMP4321-003v4",
+      "MMP4321-002v4",
+      "KPS5292-002v3",
+      "MPM7322-001v4",
+      "KRM3323-001v4",
+      "KRM1324-002v1",
+      "KRM1420-001v4",
+      "MMP1324-003v4",
+      "KPS2434-001v2",
+      "RTO4323-001v4",
+      "MQM7993-001v4",
+      "BAS3323-002v4",
+      "KPS2434-004v2",
+      "BGM1322-001v4",
+      "RTM4323-001v4"
+    ],
+    "selected": [
+      {
+        "id": "RLM4323-004v1",
+        "max_score": 0.7385939257107631,
+        "top_chunks": [
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:unit:2:None",
+            "score": 0.7385939257107631
+          },
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:unit:1:None",
+            "score": 0.7238389311800402
+          },
+          {
+            "parent_id": "RLM4323-004v1",
+            "chunk_id": "RLM4323-004v1:unit:3:None",
+            "score": 0.7233119542045371
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7285816036984468
+      },
+      {
+        "id": "RLM9330-001v1",
+        "max_score": 0.7328903199040844,
+        "top_chunks": [
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:unit:2:None",
+            "score": 0.7328903199040844
+          },
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:unit:3:None",
+            "score": 0.704055310485292
+          },
+          {
+            "parent_id": "RLM9330-001v1",
+            "chunk_id": "RLM9330-001v1:unit:1:None",
+            "score": 0.6951490767829844
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.7106982357241204
+      },
+      {
+        "id": "KRM1324-001v1",
+        "max_score": 0.7317985952080837,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:4:None",
+            "score": 0.7317985952080837
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:1:None",
+            "score": 0.6797670513391387
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:2:None",
+            "score": 0.6528885814592762
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6881514093354996
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.690445985522637,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:1:None",
+            "score": 0.690445985522637
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:3:None",
+            "score": 0.6854094335977345
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:2:None",
+            "score": 0.6575805116925265
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6778119769376327
+      },
+      {
+        "id": "MMP4321-002v4",
+        "max_score": 0.71799944566586,
+        "top_chunks": [
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:unit:1:None",
+            "score": 0.71799944566586
+          },
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:overview:None:None",
+            "score": 0.6288386099716163
+          },
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:unit:3:None",
+            "score": 0.6168212289493508
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6545530948622758
+      }
+    ]
+  },
+  {
+    "case_id": "H03",
+    "method": "D-max",
+    "representation": "document",
+    "aggregation": "max",
+    "candidate_parents": [
+      "KRM1324-001v1",
+      "KRM1324-002v1",
+      "KRM1420-001v4",
+      "BAS3323-003v3",
+      "KRM3323-002v4",
+      "RLM4323-004v1",
+      "KRM3323-001v4",
+      "MMP1324-002v4",
+      "RLM9330-001v1",
+      "MMP1324-001v4",
+      "MQM2141-005v2",
+      "BAS1219-003v4",
+      "BAS3323-002v4",
+      "MQM2141-001v4",
+      "MMP4321-002v4",
+      "BGM1349-002v3",
+      "BAS3323-001v4",
+      "MPM8142-003v3",
+      "MPM8141-001v6",
+      "MQM1322-001v4"
+    ],
+    "selected": [
+      {
+        "id": "KRM1324-001v1",
+        "max_score": 0.7058456357884633,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:document",
+            "score": 0.7058456357884633
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7058456357884633
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7023518119454328,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:document",
+            "score": 0.7023518119454328
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.7023518119454328
+      },
+      {
+        "id": "KRM1420-001v4",
+        "max_score": 0.6954379735560341,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1420-001v4",
+            "chunk_id": "KRM1420-001v4:document",
+            "score": 0.6954379735560341
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6954379735560341
+      },
+      {
+        "id": "BAS3323-003v3",
+        "max_score": 0.6930276347676374,
+        "top_chunks": [
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:document",
+            "score": 0.6930276347676374
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6930276347676374
+      },
+      {
+        "id": "KRM3323-002v4",
+        "max_score": 0.6913179881009892,
+        "top_chunks": [
+          {
+            "parent_id": "KRM3323-002v4",
+            "chunk_id": "KRM3323-002v4:document",
+            "score": 0.6913179881009892
+          }
+        ],
+        "available_chunks": 1,
+        "score": 0.6913179881009892
+      }
+    ]
+  },
+  {
+    "case_id": "H03",
+    "method": "T-max",
+    "representation": "task",
+    "aggregation": "max",
+    "candidate_parents": [
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "MMP1324-001v4",
+      "MQM1322-001v4",
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "BGM5220-002v3",
+      "AVA4322-001v4",
+      "BAS3323-002v4",
+      "KRM4212-001v2",
+      "KRM1324-001v1",
+      "SET7127-001v3",
+      "AVA2173-012v3",
+      "TFB3433-002v3",
+      "KPS2434-004v2",
+      "NFP7911-001v1",
+      "TFB3433-001v3"
+    ],
+    "selected": [
+      {
+        "id": "MPM7322-001v4",
+        "max_score": 0.6912343584521738,
+        "top_chunks": [
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:7",
+            "score": 0.6912343584521738
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:2",
+            "score": 0.67371594724675
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:3",
+            "score": 0.6730728523053251
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.6912343584521738
+      },
+      {
+        "id": "BAS3323-003v3",
+        "max_score": 0.6911275491339846,
+        "top_chunks": [
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:task:1:3",
+            "score": 0.6911275491339846
+          },
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:task:1:1",
+            "score": 0.6375269606889553
+          },
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:overview:None:None",
+            "score": 0.617446374813118
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.6911275491339846
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.6889838577804734,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:3:1",
+            "score": 0.6889838577804734
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:2:2",
+            "score": 0.6665679173201673
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:1:2",
+            "score": 0.6574971831491103
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.6889838577804734
+      },
+      {
+        "id": "MMP4321-002v4",
+        "max_score": 0.67849863371063,
+        "top_chunks": [
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:task:1:4",
+            "score": 0.67849863371063
+          },
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:task:1:3",
+            "score": 0.6706886949371251
+          },
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:task:1:1",
+            "score": 0.6215134874078883
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.67849863371063
+      },
+      {
+        "id": "KPS5220-003v3",
+        "max_score": 0.6761082489660962,
+        "top_chunks": [
+          {
+            "parent_id": "KPS5220-003v3",
+            "chunk_id": "KPS5220-003v3:task:2:2",
+            "score": 0.6761082489660962
+          },
+          {
+            "parent_id": "KPS5220-003v3",
+            "chunk_id": "KPS5220-003v3:task:2:1",
+            "score": 0.6352164171352599
+          },
+          {
+            "parent_id": "KPS5220-003v3",
+            "chunk_id": "KPS5220-003v3:task:1:2",
+            "score": 0.594929676769494
+          }
+        ],
+        "available_chunks": 6,
+        "score": 0.6761082489660962
+      }
+    ]
+  },
+  {
+    "case_id": "H03",
+    "method": "T-mean3",
+    "representation": "task",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "KRM1324-002v1",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "MMP1324-001v4",
+      "MQM1322-001v4",
+      "BAS3323-001v4",
+      "KRM3323-002v4",
+      "BGM5220-002v3",
+      "AVA4322-001v4",
+      "BAS3323-002v4",
+      "KRM4212-001v2",
+      "KRM1324-001v1",
+      "SET7127-001v3",
+      "AVA2173-012v3",
+      "TFB3433-002v3",
+      "KPS2434-004v2",
+      "NFP7911-001v1",
+      "TFB3433-001v3"
+    ],
+    "selected": [
+      {
+        "id": "MPM7322-001v4",
+        "max_score": 0.6912343584521738,
+        "top_chunks": [
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:7",
+            "score": 0.6912343584521738
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:2",
+            "score": 0.67371594724675
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:task:1:3",
+            "score": 0.6730728523053251
+          }
+        ],
+        "available_chunks": 10,
+        "score": 0.6793410526680829
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.6889838577804734,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:3:1",
+            "score": 0.6889838577804734
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:2:2",
+            "score": 0.6665679173201673
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:task:1:2",
+            "score": 0.6574971831491103
+          }
+        ],
+        "available_chunks": 7,
+        "score": 0.6710163194165837
+      },
+      {
+        "id": "BAS3323-001v4",
+        "max_score": 0.6705987858685593,
+        "top_chunks": [
+          {
+            "parent_id": "BAS3323-001v4",
+            "chunk_id": "BAS3323-001v4:task:2:1",
+            "score": 0.6705987858685593
+          },
+          {
+            "parent_id": "BAS3323-001v4",
+            "chunk_id": "BAS3323-001v4:task:2:2",
+            "score": 0.6591036688108265
+          },
+          {
+            "parent_id": "BAS3323-001v4",
+            "chunk_id": "BAS3323-001v4:task:1:2",
+            "score": 0.6521659178211414
+          }
+        ],
+        "available_chunks": 8,
+        "score": 0.660622790833509
+      },
+      {
+        "id": "MMP4321-002v4",
+        "max_score": 0.67849863371063,
+        "top_chunks": [
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:task:1:4",
+            "score": 0.67849863371063
+          },
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:task:1:3",
+            "score": 0.6706886949371251
+          },
+          {
+            "parent_id": "MMP4321-002v4",
+            "chunk_id": "MMP4321-002v4:task:1:1",
+            "score": 0.6215134874078883
+          }
+        ],
+        "available_chunks": 9,
+        "score": 0.6569002720185478
+      },
+      {
+        "id": "MMP1324-001v4",
+        "max_score": 0.675111453576509,
+        "top_chunks": [
+          {
+            "parent_id": "MMP1324-001v4",
+            "chunk_id": "MMP1324-001v4:task:2:3",
+            "score": 0.675111453576509
+          },
+          {
+            "parent_id": "MMP1324-001v4",
+            "chunk_id": "MMP1324-001v4:task:2:1",
+            "score": 0.6547673043150078
+          },
+          {
+            "parent_id": "MMP1324-001v4",
+            "chunk_id": "MMP1324-001v4:task:2:2",
+            "score": 0.6329521204064072
+          }
+        ],
+        "available_chunks": 11,
+        "score": 0.6542769594326414
+      }
+    ]
+  },
+  {
+    "case_id": "H03",
+    "method": "U-max",
+    "representation": "unit",
+    "aggregation": "max",
+    "candidate_parents": [
+      "KRM3323-002v4",
+      "KRM1324-002v1",
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "BAS1219-003v4",
+      "MMP1324-001v4",
+      "MMP4321-003v4",
+      "BGM5220-002v3",
+      "BAS3323-001v4",
+      "MQM1322-001v4",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KRM1324-001v1",
+      "KRM1420-001v4",
+      "KPS2434-004v2",
+      "NFP7911-001v1",
+      "AVA2173-012v3",
+      "SET7127-001v3",
+      "BAS3323-002v4",
+      "AVA4322-001v4"
+    ],
+    "selected": [
+      {
+        "id": "KRM3323-002v4",
+        "max_score": 0.7082853549735639,
+        "top_chunks": [
+          {
+            "parent_id": "KRM3323-002v4",
+            "chunk_id": "KRM3323-002v4:unit:3:None",
+            "score": 0.7082853549735639
+          },
+          {
+            "parent_id": "KRM3323-002v4",
+            "chunk_id": "KRM3323-002v4:overview:None:None",
+            "score": 0.6083449324274675
+          },
+          {
+            "parent_id": "KRM3323-002v4",
+            "chunk_id": "KRM3323-002v4:unit:2:None",
+            "score": 0.5950727945873181
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.7082853549735639
+      },
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7053148520889707,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:3:None",
+            "score": 0.7053148520889707
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:1:None",
+            "score": 0.6533930774895779
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:2:None",
+            "score": 0.6393746472023083
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.7053148520889707
+      },
+      {
+        "id": "MPM7322-001v4",
+        "max_score": 0.6967370275596825,
+        "top_chunks": [
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:unit:1:None",
+            "score": 0.6967370275596825
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:unit:2:None",
+            "score": 0.6545886606153222
+          },
+          {
+            "parent_id": "MPM7322-001v4",
+            "chunk_id": "MPM7322-001v4:overview:None:None",
+            "score": 0.49726887513383417
+          }
+        ],
+        "available_chunks": 3,
+        "score": 0.6967370275596825
+      },
+      {
+        "id": "BAS3323-003v3",
+        "max_score": 0.6904940430792765,
+        "top_chunks": [
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:unit:1:None",
+            "score": 0.6904940430792765
+          },
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:unit:2:None",
+            "score": 0.6424794331091115
+          },
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:overview:None:None",
+            "score": 0.617446374813118
+          }
+        ],
+        "available_chunks": 3,
+        "score": 0.6904940430792765
+      },
+      {
+        "id": "BAS1219-003v4",
+        "max_score": 0.6845960791208415,
+        "top_chunks": [
+          {
+            "parent_id": "BAS1219-003v4",
+            "chunk_id": "BAS1219-003v4:unit:2:None",
+            "score": 0.6845960791208415
+          },
+          {
+            "parent_id": "BAS1219-003v4",
+            "chunk_id": "BAS1219-003v4:unit:3:None",
+            "score": 0.6045329106429751
+          },
+          {
+            "parent_id": "BAS1219-003v4",
+            "chunk_id": "BAS1219-003v4:unit:4:None",
+            "score": 0.5808878517271151
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6845960791208415
+      }
+    ]
+  },
+  {
+    "case_id": "H03",
+    "method": "U-mean3",
+    "representation": "unit",
+    "aggregation": "mean3",
+    "candidate_parents": [
+      "KRM3323-002v4",
+      "KRM1324-002v1",
+      "MPM7322-001v4",
+      "BAS3323-003v3",
+      "BAS1219-003v4",
+      "MMP1324-001v4",
+      "MMP4321-003v4",
+      "BGM5220-002v3",
+      "BAS3323-001v4",
+      "MQM1322-001v4",
+      "MMP4321-002v4",
+      "KPS5220-003v3",
+      "KRM1324-001v1",
+      "KRM1420-001v4",
+      "KPS2434-004v2",
+      "NFP7911-001v1",
+      "AVA2173-012v3",
+      "SET7127-001v3",
+      "BAS3323-002v4",
+      "AVA4322-001v4"
+    ],
+    "selected": [
+      {
+        "id": "KRM1324-002v1",
+        "max_score": 0.7053148520889707,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:3:None",
+            "score": 0.7053148520889707
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:1:None",
+            "score": 0.6533930774895779
+          },
+          {
+            "parent_id": "KRM1324-002v1",
+            "chunk_id": "KRM1324-002v1:unit:2:None",
+            "score": 0.6393746472023083
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.666027525593619
+      },
+      {
+        "id": "KRM1324-001v1",
+        "max_score": 0.6728953862077087,
+        "top_chunks": [
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:4:None",
+            "score": 0.6728953862077087
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:3:None",
+            "score": 0.6444232380447137
+          },
+          {
+            "parent_id": "KRM1324-001v1",
+            "chunk_id": "KRM1324-001v1:unit:1:None",
+            "score": 0.6443902558149307
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.653902960022451
+      },
+      {
+        "id": "BAS3323-003v3",
+        "max_score": 0.6904940430792765,
+        "top_chunks": [
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:unit:1:None",
+            "score": 0.6904940430792765
+          },
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:unit:2:None",
+            "score": 0.6424794331091115
+          },
+          {
+            "parent_id": "BAS3323-003v3",
+            "chunk_id": "BAS3323-003v3:overview:None:None",
+            "score": 0.617446374813118
+          }
+        ],
+        "available_chunks": 3,
+        "score": 0.6501399503338353
+      },
+      {
+        "id": "BAS3323-001v4",
+        "max_score": 0.6795230684842872,
+        "top_chunks": [
+          {
+            "parent_id": "BAS3323-001v4",
+            "chunk_id": "BAS3323-001v4:unit:2:None",
+            "score": 0.6795230684842872
+          },
+          {
+            "parent_id": "BAS3323-001v4",
+            "chunk_id": "BAS3323-001v4:unit:1:None",
+            "score": 0.6571784427531489
+          },
+          {
+            "parent_id": "BAS3323-001v4",
+            "chunk_id": "BAS3323-001v4:unit:3:None",
+            "score": 0.6037953728285802
+          }
+        ],
+        "available_chunks": 4,
+        "score": 0.6468322946886721
+      },
+      {
+        "id": "BAS3323-002v4",
+        "max_score": 0.6554454849304496,
+        "top_chunks": [
+          {
+            "parent_id": "BAS3323-002v4",
+            "chunk_id": "BAS3323-002v4:unit:4:None",
+            "score": 0.6554454849304496
+          },
+          {
+            "parent_id": "BAS3323-002v4",
+            "chunk_id": "BAS3323-002v4:unit:2:None",
+            "score": 0.6489682269549965
+          },
+          {
+            "parent_id": "BAS3323-002v4",
+            "chunk_id": "BAS3323-002v4:unit:1:None",
+            "score": 0.6293789158493053
+          }
+        ],
+        "available_chunks": 5,
+        "score": 0.6445975425782504
+      }
+    ]
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "candidate",
+  "repeat": 2,
+  "case_id": "already_correct",
+  "cell_id": "already_correct-candidate-2",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11139,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 11136
+        },
+        "output_tokens": 3119,
+        "output_tokens_details": {
+          "reasoning_tokens": 2624
+        },
+        "total_tokens": 14258
+      },
+      "estimated_usd": "0.001671160",
+      "seconds": 34.71892710000975
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_3.description",
+        "value": "平常抽盤每週三進行：主管指定的高周轉或容易出錯品項必須檢查；本人另選近期收貨或退貨頻繁的項目交主管確認。本人核對 ERP 資料與現場清點結果；遇異常盤差或主管要求時另加盤。月底全盤每月一次，由倉庫同事分區清點，本人整合各區盤點表。平常抽盤先交差異清單或查核結果；月底全盤整理彙整表供主管簽核。差異查核時先查近期收貨、退貨、移位及待出貨紀錄，必要時請倉庫同事複盤；本人整理帳實差異表供主管判斷是否調帳。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [
+      "平常週三抽盤的現場清點通常由誰執行？你另選的近期收貨／退貨頻繁品項，是盤點前先請主管確認，還是查核後再交主管確認？帳實差異表是每次盤點都整理，還是有差異時才整理？"
+    ],
+    "note": "已核對盤點任務：保留每週三抽盤、每月月底全盤、必要加盤、兩類成果交付與不同簽核要求；補明主管指定品項的高周轉／易出錯特徵，並保留庫存調整須核准、不得自行改帳及年終實物全盤與年度稽核分開的界線。現場清點分工、主管確認時點及差異表製作條件仍待確認。"
+  },
+  "seconds": 45.59658930002479
+}

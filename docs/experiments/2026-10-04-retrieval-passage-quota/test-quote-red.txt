@@ -1,0 +1,22 @@
+test_missing_parameter_comparison_is_rejected (test_audit.EvidenceIntegrity.test_missing_parameter_comparison_is_rejected) ... ok
+test_new_multisegment_quote_cannot_use_legacy_exception (test_audit.EvidenceIntegrity.test_new_multisegment_quote_cannot_use_legacy_exception) ... ok
+test_saved_legacy_anchor_is_valid_but_returns_full_context (test_audit.EvidenceIntegrity.test_saved_legacy_anchor_is_valid_but_returns_full_context) ... FAIL
+test_summary_pass_marker_cannot_replace_coverage (test_audit.EvidenceIntegrity.test_summary_pass_marker_cannot_replace_coverage) ... ok
+test_wrong_native_score_is_rejected_even_with_matching_ids (test_audit.EvidenceIntegrity.test_wrong_native_score_is_rejected_even_with_matching_ids) ... ok
+
+======================================================================
+FAIL: test_saved_legacy_anchor_is_valid_but_returns_full_context (test_audit.EvidenceIntegrity.test_saved_legacy_anchor_is_valid_but_returns_full_context)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-passage-quota\test_audit.py", line 10, in test_saved_legacy_anchor_is_valid_but_returns_full_context
+    self.assertEqual(check_quote(case,topic,'development'),'��Ĥ@�q\n��ĤG�q')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\2026-10-04-retrieval-passage-quota\audit.py", line 9, in check_quote
+    assert topic['employee_quote']==joined,'incomplete quote'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: incomplete quote
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.003s
+
+FAILED (failures=1)

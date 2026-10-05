@@ -1,0 +1,25 @@
+{
+  "image_id": "sha256:f21629b9ae4ed11231768edfaed0f40d41d85d6ea9a71e8096a3d96ea0311772",
+  "image_label": "unsloth/unsloth:latest",
+  "model_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+  "qdrant": {
+    "title": "qdrant - vector search engine",
+    "version": "1.18.2",
+    "commit": "44ad62f8cd69642be5afa6441612525e24a0d063"
+  },
+  "qdrant_release_zip_sha256": "b2b262cba6f78cf4fa794ae78d73a8f70a221c93c76c75ac8fd6fe95d809b142",
+  "model_precision": "fp16",
+  "requested_max_length": 8192,
+  "requested_batch_size": 1,
+  "production_modified": false,
+  "weights": {
+    "actual_sha256": "b5e0ce3470abf5ef3831aa1bd5553b486803e83251590ab7ff35a117cf6aad38",
+    "upstream_lfs_sha256": "b5e0ce3470abf5ef3831aa1bd5553b486803e83251590ab7ff35a117cf6aad38",
+    "size": 2271145830
+  },
+  "qdrant_storage": "C:/Users/chenb/.codex/visualizations/2026/10/03/01a10248-0918-7fe1-8ae8-47185d6d9e82/ocs-eval-qdrant-runtime-20261004/storage",
+  "preflight_storage_archive": "C:/Users/chenb/.codex/visualizations/2026/10/03/01a10248-0918-7fe1-8ae8-47185d6d9e82/ocs-eval-qdrant-preflight-storage-20261004",
+  "qdrant_storage_actual": "C:/Users/chenb/.codex/visualizations/2026/10/03/01a10248-0918-7fe1-8ae8-47185d6d9e82/ocs-eval-qdrant-runtime-short-20261004/storage",
+  "qdrant_storage_path": "S:/caliburn/tmp/qeval/storage",
+  "qdrant_windows_short_path_junction": true
+}

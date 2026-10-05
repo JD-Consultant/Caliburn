@@ -1,0 +1,16 @@
+{
+  "event_id": "e012",
+  "execution_id": "4557bd2c-6832-4287-9ec0-d3e6200ce90d",
+  "employee_input": {
+    "source_id": "54025e32-5fda-45e2-a5e7-d844fa7155ea",
+    "interview_sequence": 24,
+    "speaker": "employee",
+    "interview_text": "盤點有差異時，我先查近期收貨、退貨、移位和待出貨紀錄，必要時請倉庫同事複盤。不論差異大或小，我都不能自己把ERP改成現場數，必須有核准的庫存調整單。"
+  },
+  "consultant_reply": {
+    "source_id": "da300879-991e-44ae-a109-bef3e4daddf6",
+    "interview_sequence": 25,
+    "speaker": "consultant",
+    "interview_text": "已補上盤點差異處理：您先查近期收貨、退貨、移位與待出貨紀錄，必要時請倉庫同事複盤；無論差異大小，ERP 都不能由您自行改成現場數，須有核准的庫存調整單。\n\n您提到的「庫存報表」和盤點是另一項工作。這類報表通常多久整理一次、主要提供哪些庫存資訊，供誰使用？"
+  }
+}

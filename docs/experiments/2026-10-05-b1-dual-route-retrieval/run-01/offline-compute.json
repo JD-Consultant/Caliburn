@@ -1,0 +1,758 @@
+[
+  {
+    "query_id": "F01-whole-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.006004200025927275,
+    "service_latency": false
+  },
+  {
+    "query_id": "F01-whole-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04363769997144118,
+    "service_latency": false
+  },
+  {
+    "query_id": "F01-B1-W-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005473299999721348,
+    "service_latency": false
+  },
+  {
+    "query_id": "F01-B1-W-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04928079998353496,
+    "service_latency": false
+  },
+  {
+    "query_id": "F01-B1-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005331100022885948,
+    "service_latency": false
+  },
+  {
+    "query_id": "F01-B1-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04342870000982657,
+    "service_latency": false
+  },
+  {
+    "query_id": "F01-B2-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005618399998638779,
+    "service_latency": false
+  },
+  {
+    "query_id": "F01-B2-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.06701389997033402,
+    "service_latency": false
+  },
+  {
+    "query_id": "F02-whole-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005483200016897172,
+    "service_latency": false
+  },
+  {
+    "query_id": "F02-whole-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04469809995498508,
+    "service_latency": false
+  },
+  {
+    "query_id": "F02-B1-W-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005175700003746897,
+    "service_latency": false
+  },
+  {
+    "query_id": "F02-B1-W-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.049008000001776963,
+    "service_latency": false
+  },
+  {
+    "query_id": "F02-B1-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005749100004322827,
+    "service_latency": false
+  },
+  {
+    "query_id": "F02-B1-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04474919999483973,
+    "service_latency": false
+  },
+  {
+    "query_id": "F02-B2-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.0055618000333197415,
+    "service_latency": false
+  },
+  {
+    "query_id": "F02-B2-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04701109998859465,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-whole-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005167199997231364,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-whole-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04535069997655228,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B1-W-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005628800019621849,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B1-W-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04568050004309043,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B1-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005553000024519861,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B1-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04563680000137538,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B1-S-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005967999983113259,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B1-S-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.07261350000044331,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B2-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005205800000112504,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B2-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.044865100004244596,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B2-S-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005201200023293495,
+    "service_latency": false
+  },
+  {
+    "query_id": "F03-B2-S-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04463660001056269,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-whole-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005565800005570054,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-whole-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04539610003121197,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-W-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.0053610000177286565,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-W-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04692189994966611,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005223699961788952,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.0448838000302203,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-S-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005816499993670732,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-S-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04476819996489212,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-S-2",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005698700028005987,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-S-2",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04391210002359003,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-S-3",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005891899985726923,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B1-S-3",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04895189998205751,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B2-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.006355500023346394,
+    "service_latency": false
+  },
+  {
+    "query_id": "F04-B2-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.046262499992735684,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-whole-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.0052803999860771,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-whole-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.0447594000142999,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-B1-W-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.0393173000193201,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-B1-W-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04988080001203343,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-B1-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005637700029183179,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-B1-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04680200002621859,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-B1-S-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.006228900048881769,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-B1-S-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.045960199960973114,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-B2-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.006651100004091859,
+    "service_latency": false
+  },
+  {
+    "query_id": "F05-B2-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04735920001985505,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-whole-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005448999989312142,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-whole-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.044472899986431,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-W-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005730199976824224,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-W-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04610619996674359,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.0058750000316649675,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04536829999415204,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-S-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.0051229000091552734,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-S-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04668249998940155,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-S-2",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005861799989361316,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-S-2",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04815949994372204,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-S-3",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.006851600017398596,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B1-S-3",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.05000570003176108,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B2-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.006303999980445951,
+    "service_latency": false
+  },
+  {
+    "query_id": "H01-B2-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.046589899982791394,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-whole-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005552600021474063,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-whole-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.047077299968805164,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-W-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.006306600000243634,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-W-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.045090499974321574,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005667299963533878,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.08766180003294721,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.00577240000711754,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04491950001101941,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-2",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.0051457000081427395,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-2",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04635190003318712,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-3",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005264100036583841,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-3",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.044857600005343556,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-4",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.00563020003028214,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B1-S-4",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04647400003159419,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B2-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005258299992419779,
+    "service_latency": false
+  },
+  {
+    "query_id": "H02-B2-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04560630000196397,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-whole-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005842700018547475,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-whole-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04731069999979809,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-W-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.006292300007771701,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-W-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.049689300009049475,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005482999957166612,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04634310002438724,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.0056733000092208385,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04752800002461299,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-2",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005232600029557943,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-2",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04510709998430684,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-3",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005631199979688972,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-3",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04683309997199103,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-4",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005452200013678521,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-4",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04696579999290407,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-5",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005799599981401116,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-5",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04610430001048371,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-6",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005095299973618239,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-6",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04893019999144599,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-7",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005340799980331212,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-7",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04756099998485297,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-8",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005481100000906736,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-8",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.09350279998034239,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-9",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005719500011764467,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-9",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04726939997635782,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-10",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.006023199995979667,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-10",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.048585299984551966,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-11",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005970400001388043,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-11",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04729030001908541,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-12",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.004978999961167574,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-12",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04655850003473461,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-13",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005015600007027388,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-13",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04535729996860027,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-14",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.004998799995519221,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-14",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.047423899988643825,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-15",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005935500026680529,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B1-S-15",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04599979997146875,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B2-S-0",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005166900053154677,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B2-S-0",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.04708250000840053,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B2-S-1",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.007155500003136694,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B2-S-1",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.052394600003026426,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B2-S-2",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005354299966711551,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B2-S-2",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.0457829000079073,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B2-S-3",
+    "representation": "document",
+    "offline_score_and_aggregate_seconds": 0.005387999990489334,
+    "service_latency": false
+  },
+  {
+    "query_id": "H03-B2-S-3",
+    "representation": "task",
+    "offline_score_and_aggregate_seconds": 0.047010499984025955,
+    "service_latency": false
+  }
+]

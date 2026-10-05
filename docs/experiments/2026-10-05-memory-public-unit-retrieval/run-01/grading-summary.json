@@ -1,0 +1,40 @@
+{
+  "phase": "formal-01",
+  "jobs": 45,
+  "completed": 39,
+  "failures": [
+    {
+      "job_id": "new-011",
+      "type": "ValueError",
+      "message": "reference evidence cannot be located"
+    },
+    {
+      "job_id": "new-012",
+      "type": "ValueError",
+      "message": "reference evidence cannot be located"
+    },
+    {
+      "job_id": "new-017",
+      "type": "ValueError",
+      "message": "employee evidence cannot be located"
+    },
+    {
+      "job_id": "new-031",
+      "type": "ValueError",
+      "message": "reference evidence cannot be located"
+    },
+    {
+      "job_id": "new-043",
+      "type": "ValueError",
+      "message": "reference evidence cannot be located"
+    },
+    {
+      "job_id": "new-044",
+      "type": "ValueError",
+      "message": "reference evidence cannot be located"
+    }
+  ],
+  "elapsed_seconds": 206.65129339997657,
+  "estimated_or_reserved_total_usd": "0.044907465",
+  "all_jobs_validated": false
+}

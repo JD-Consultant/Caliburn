@@ -1,0 +1,16 @@
+{
+  "event_id": "e046",
+  "execution_id": "b638e8ad-3534-4503-877a-cc24ab7665ef",
+  "employee_input": {
+    "source_id": "8e8e43b5-721d-447b-9ac5-55c5979c2449",
+    "interview_sequence": 92,
+    "speaker": "employee",
+    "interview_text": "剛剛說的驗收5%，分母是每批實際驗收件數，不是把整個月混在一起算，也不是每日進貨單張數。原本超過才提報的規則不變；設備備品的5%也不受這個說明影響。"
+  },
+  "consultant_reply": {
+    "source_id": "eef8c1c1-f506-4737-a9c9-887678a13a0f",
+    "interview_sequence": 93,
+    "speaker": "consultant",
+    "interview_text": "已補明：驗收不良比例以**每批實際驗收件數**為分母，不跨月彙算，也不以每日進貨單張數計算。原本「超過 5% 才提報」及安全疑慮須另行處理的規則不變；掃碼器備品的 5% 也維持獨立計算。\n\n掃碼器備品比例算出非整數時，實務上如何決定備品數量？若目前不確定，也可以先留待確認。"
+  }
+}

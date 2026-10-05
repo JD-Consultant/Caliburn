@@ -1,0 +1,92 @@
+{
+  "status": "completed",
+  "outcomes": [
+    {
+      "cell": "website-correction-control",
+      "steps": 3,
+      "status": "completed"
+    },
+    {
+      "cell": "website-correction-candidate",
+      "steps": 3,
+      "status": "completed"
+    },
+    {
+      "cell": "website-task-candidate",
+      "steps": 2,
+      "status": "completed"
+    },
+    {
+      "cell": "website-task-control",
+      "steps": 2,
+      "status": "completed"
+    },
+    {
+      "cell": "warehouse-correction-control",
+      "steps": 5,
+      "status": "completed"
+    },
+    {
+      "cell": "warehouse-correction-candidate",
+      "steps": 3,
+      "status": "completed"
+    },
+    {
+      "cell": "warehouse-task-candidate",
+      "steps": 2,
+      "status": "completed"
+    },
+    {
+      "cell": "warehouse-task-control",
+      "steps": 2,
+      "status": "completed"
+    },
+    {
+      "cell": "warehouse-detail-control",
+      "steps": 2,
+      "status": "completed"
+    },
+    {
+      "cell": "warehouse-detail-candidate",
+      "steps": 3,
+      "status": "completed"
+    }
+  ],
+  "failure": null,
+  "budget": {
+    "occupied_usd": "0.011193835",
+    "prior_occupied_usd": "1.311735480",
+    "cumulative_occupied_usd": "1.322929315",
+    "pending": {
+      "website-correction-control-1": "0.0001",
+      "website-correction-control-3": "0.0001",
+      "website-correction-control-5": "0.0001",
+      "website-correction-candidate-7": "0.0001",
+      "website-correction-candidate-9": "0.0001",
+      "website-correction-candidate-11": "0.0001",
+      "website-task-candidate-13": "0.0001",
+      "website-task-candidate-15": "0.0001",
+      "website-task-control-17": "0.0001",
+      "website-task-control-19": "0.0001",
+      "warehouse-correction-control-21": "0.0001",
+      "warehouse-correction-control-23": "0.0001",
+      "warehouse-correction-control-25": "0.0001",
+      "warehouse-correction-control-27": "0.0001",
+      "warehouse-correction-control-29": "0.0001",
+      "warehouse-correction-candidate-31": "0.0001",
+      "warehouse-correction-candidate-33": "0.0001",
+      "warehouse-correction-candidate-35": "0.0001",
+      "warehouse-task-candidate-37": "0.0001",
+      "warehouse-task-candidate-39": "0.0001",
+      "warehouse-task-control-41": "0.0001",
+      "warehouse-task-control-43": "0.0001",
+      "warehouse-detail-control-45": "0.0001",
+      "warehouse-detail-control-47": "0.0001",
+      "warehouse-detail-candidate-49": "0.0001",
+      "warehouse-detail-candidate-51": "0.0001",
+      "warehouse-detail-candidate-53": "0.0001"
+    },
+    "outbound_calls": 54,
+    "elapsed_seconds": 392.9539724000497
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "parents": 805,
+  "counts": {
+    "document": 805,
+    "task": 8068,
+    "unit": 3661
+  },
+  "kinds": {
+    "document:document": 805,
+    "task:overview": 803,
+    "task:task": 7265,
+    "unit:overview": 803,
+    "unit:unit": 2858
+  },
+  "unique_texts": 11064,
+  "all_document_lines_preserved": true,
+  "source_files_verified": 805
+}

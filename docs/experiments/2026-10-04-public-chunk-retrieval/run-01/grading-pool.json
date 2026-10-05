@@ -1,0 +1,427 @@
+{
+  "unique_pairs": 84,
+  "reused_pairs": 49,
+  "new_pairs": 35,
+  "pairs": [
+    {
+      "case_id": "F01",
+      "document_id": "IDC5294-001v3",
+      "reused": true
+    },
+    {
+      "case_id": "F01",
+      "document_id": "INM3514-001v4",
+      "reused": true
+    },
+    {
+      "case_id": "F01",
+      "document_id": "ISD2152-001v4",
+      "reused": false
+    },
+    {
+      "case_id": "F01",
+      "document_id": "KPS2434-001v2",
+      "reused": false
+    },
+    {
+      "case_id": "F01",
+      "document_id": "KPS2434-002v2",
+      "reused": false
+    },
+    {
+      "case_id": "F01",
+      "document_id": "KPS2434-004v2",
+      "reused": true
+    },
+    {
+      "case_id": "F01",
+      "document_id": "KPS4999-001v3",
+      "reused": true
+    },
+    {
+      "case_id": "F01",
+      "document_id": "KRM1324-001v1",
+      "reused": false
+    },
+    {
+      "case_id": "F01",
+      "document_id": "KRM1324-002v1",
+      "reused": true
+    },
+    {
+      "case_id": "F01",
+      "document_id": "MPM7322-001v4",
+      "reused": false
+    },
+    {
+      "case_id": "F01",
+      "document_id": "MQM1322-001v4",
+      "reused": true
+    },
+    {
+      "case_id": "F02",
+      "document_id": "AVA2172-003v3",
+      "reused": true
+    },
+    {
+      "case_id": "F02",
+      "document_id": "IDC1330-001v1",
+      "reused": true
+    },
+    {
+      "case_id": "F02",
+      "document_id": "IIS3513-001v4",
+      "reused": true
+    },
+    {
+      "case_id": "F02",
+      "document_id": "IIS3513-002v4",
+      "reused": true
+    },
+    {
+      "case_id": "F02",
+      "document_id": "INM3514-001v4",
+      "reused": true
+    },
+    {
+      "case_id": "F02",
+      "document_id": "ISD2152-001v4",
+      "reused": false
+    },
+    {
+      "case_id": "F02",
+      "document_id": "ISD2152-004v5",
+      "reused": false
+    },
+    {
+      "case_id": "F02",
+      "document_id": "KPS2434-004v2",
+      "reused": true
+    },
+    {
+      "case_id": "F02",
+      "document_id": "MIM2141-001v4",
+      "reused": false
+    },
+    {
+      "case_id": "F02",
+      "document_id": "TTM3422-001v2",
+      "reused": false
+    },
+    {
+      "case_id": "F02",
+      "document_id": "連鎖餐飲門市管理人員",
+      "reused": false
+    },
+    {
+      "case_id": "F03",
+      "document_id": "BAS1219-003v4",
+      "reused": true
+    },
+    {
+      "case_id": "F03",
+      "document_id": "FAC1211-001v2",
+      "reused": true
+    },
+    {
+      "case_id": "F03",
+      "document_id": "FAC3313-001v2",
+      "reused": true
+    },
+    {
+      "case_id": "F03",
+      "document_id": "FAC4311-001v2",
+      "reused": true
+    },
+    {
+      "case_id": "F03",
+      "document_id": "KPS2434-004v2",
+      "reused": true
+    },
+    {
+      "case_id": "F03",
+      "document_id": "KRM1420-001v4",
+      "reused": false
+    },
+    {
+      "case_id": "F03",
+      "document_id": "KRM3323-001v4",
+      "reused": true
+    },
+    {
+      "case_id": "F03",
+      "document_id": "KRM4212-001v2",
+      "reused": false
+    },
+    {
+      "case_id": "F03",
+      "document_id": "停車場管理員",
+      "reused": false
+    },
+    {
+      "case_id": "F04",
+      "document_id": "MEM7231-009v3",
+      "reused": true
+    },
+    {
+      "case_id": "F04",
+      "document_id": "MEM7231-010v2",
+      "reused": true
+    },
+    {
+      "case_id": "F04",
+      "document_id": "MEM7234-001v3",
+      "reused": false
+    },
+    {
+      "case_id": "F04",
+      "document_id": "MEM7412-001v3",
+      "reused": true
+    },
+    {
+      "case_id": "F04",
+      "document_id": "MIM2141-001v4",
+      "reused": true
+    },
+    {
+      "case_id": "F04",
+      "document_id": "SET2141-001v3",
+      "reused": true
+    },
+    {
+      "case_id": "F04",
+      "document_id": "SET3113-002v3",
+      "reused": false
+    },
+    {
+      "case_id": "F04",
+      "document_id": "SET3113-004v2",
+      "reused": false
+    },
+    {
+      "case_id": "F04",
+      "document_id": "SET7127-001v3",
+      "reused": false
+    },
+    {
+      "case_id": "F04",
+      "document_id": "SET7127-002v3",
+      "reused": true
+    },
+    {
+      "case_id": "F04",
+      "document_id": "網路維修助理",
+      "reused": true
+    },
+    {
+      "case_id": "F05",
+      "document_id": "AVA2172-002v3",
+      "reused": true
+    },
+    {
+      "case_id": "F05",
+      "document_id": "BAS2431-001v4",
+      "reused": false
+    },
+    {
+      "case_id": "F05",
+      "document_id": "IDC2172-009v2",
+      "reused": false
+    },
+    {
+      "case_id": "F05",
+      "document_id": "IDC2712-001v1",
+      "reused": true
+    },
+    {
+      "case_id": "F05",
+      "document_id": "KMC1222-002v3",
+      "reused": false
+    },
+    {
+      "case_id": "F05",
+      "document_id": "KMC2431-005v4",
+      "reused": false
+    },
+    {
+      "case_id": "F05",
+      "document_id": "KMC2431-006v3",
+      "reused": true
+    },
+    {
+      "case_id": "F05",
+      "document_id": "KMC2431-009v2",
+      "reused": true
+    },
+    {
+      "case_id": "F05",
+      "document_id": "KMM2431-006v3",
+      "reused": true
+    },
+    {
+      "case_id": "F05",
+      "document_id": "KPS3334-008v4",
+      "reused": false
+    },
+    {
+      "case_id": "F05",
+      "document_id": "KPS3334-009v4",
+      "reused": false
+    },
+    {
+      "case_id": "H01",
+      "document_id": "BHR2422-007v4",
+      "reused": true
+    },
+    {
+      "case_id": "H01",
+      "document_id": "BHR2422-011v4",
+      "reused": true
+    },
+    {
+      "case_id": "H01",
+      "document_id": "FAC3313-001v2",
+      "reused": true
+    },
+    {
+      "case_id": "H01",
+      "document_id": "KPS2434-004v2",
+      "reused": true
+    },
+    {
+      "case_id": "H01",
+      "document_id": "THM4222-001v3",
+      "reused": true
+    },
+    {
+      "case_id": "H01",
+      "document_id": "TTM3422-001v2",
+      "reused": false
+    },
+    {
+      "case_id": "H01",
+      "document_id": "TTM4221-007v1",
+      "reused": true
+    },
+    {
+      "case_id": "H01",
+      "document_id": "連鎖餐飲門市管理人員",
+      "reused": false
+    },
+    {
+      "case_id": "H02",
+      "document_id": "BGM5220-002v3",
+      "reused": false
+    },
+    {
+      "case_id": "H02",
+      "document_id": "KPS5220-003v3",
+      "reused": false
+    },
+    {
+      "case_id": "H02",
+      "document_id": "KPS5292-002v3",
+      "reused": false
+    },
+    {
+      "case_id": "H02",
+      "document_id": "KRM1324-001v1",
+      "reused": false
+    },
+    {
+      "case_id": "H02",
+      "document_id": "KRM1324-002v1",
+      "reused": true
+    },
+    {
+      "case_id": "H02",
+      "document_id": "MMP4321-002v4",
+      "reused": true
+    },
+    {
+      "case_id": "H02",
+      "document_id": "MMP4321-003v4",
+      "reused": true
+    },
+    {
+      "case_id": "H02",
+      "document_id": "MPM7322-001v4",
+      "reused": false
+    },
+    {
+      "case_id": "H02",
+      "document_id": "RLM4323-004v1",
+      "reused": true
+    },
+    {
+      "case_id": "H02",
+      "document_id": "RLM9330-001v1",
+      "reused": true
+    },
+    {
+      "case_id": "H02",
+      "document_id": "TFB5131-001v3",
+      "reused": false
+    },
+    {
+      "case_id": "H03",
+      "document_id": "BAS1219-003v4",
+      "reused": false
+    },
+    {
+      "case_id": "H03",
+      "document_id": "BAS3323-001v4",
+      "reused": true
+    },
+    {
+      "case_id": "H03",
+      "document_id": "BAS3323-002v4",
+      "reused": false
+    },
+    {
+      "case_id": "H03",
+      "document_id": "BAS3323-003v3",
+      "reused": true
+    },
+    {
+      "case_id": "H03",
+      "document_id": "KPS5220-003v3",
+      "reused": false
+    },
+    {
+      "case_id": "H03",
+      "document_id": "KRM1324-001v1",
+      "reused": true
+    },
+    {
+      "case_id": "H03",
+      "document_id": "KRM1324-002v1",
+      "reused": true
+    },
+    {
+      "case_id": "H03",
+      "document_id": "KRM1420-001v4",
+      "reused": true
+    },
+    {
+      "case_id": "H03",
+      "document_id": "KRM3323-002v4",
+      "reused": true
+    },
+    {
+      "case_id": "H03",
+      "document_id": "MMP1324-001v4",
+      "reused": false
+    },
+    {
+      "case_id": "H03",
+      "document_id": "MMP4321-002v4",
+      "reused": true
+    },
+    {
+      "case_id": "H03",
+      "document_id": "MPM7322-001v4",
+      "reused": true
+    }
+  ]
+}

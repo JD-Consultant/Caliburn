@@ -1,0 +1,28 @@
+{
+  "inputs": {
+    "report.py": {
+      "sha256": "7d6e087c5faeb39eccbf028602e19c2a13fd3e12cd650129481a125f7f99450b",
+      "bytes": 6855
+    },
+    "summary.json": {
+      "sha256": "b9c8d9ac27b8cc5d67f77185f34680ff98e508dccba88d920325109b1e545379",
+      "bytes": 5512
+    },
+    "results.json": {
+      "sha256": "0c7d3e0ccbb045ef7373a82de492018ce7f7a7ff662ccaf17cd0b598952c5a70",
+      "bytes": 1224618
+    },
+    "target-ranks.json": {
+      "sha256": "96b4b7b7cfbc909ca2eababf120abb5048db2037a5b302c1b29c67cf0f3e6379",
+      "bytes": 31585
+    },
+    "verification.json": {
+      "sha256": "60c50ac5af0acfda2f0360054be013e2cc723bcb47931104dd97b817a3677cf7",
+      "bytes": 384
+    },
+    "scope.json": {
+      "sha256": "8b4484036301539a3c48840b27335233b4633a28af3044418fce9f34b807f074",
+      "bytes": 255
+    }
+  }
+}

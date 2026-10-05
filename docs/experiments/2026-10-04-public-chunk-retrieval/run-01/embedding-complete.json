@@ -1,0 +1,9 @@
+{
+  "unique_texts": 11064,
+  "fresh": 9460,
+  "cached": 1604,
+  "batches": 346,
+  "embed_seconds": 114.39639690017793,
+  "elapsed_seconds": 122.99550549994456,
+  "fresh_token_max": 1315
+}

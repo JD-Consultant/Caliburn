@@ -1,0 +1,18 @@
+{
+  "checked_documents": [
+    "docs\\experiments\\2026-10-04-memory-layer-retrieval\\run-01\\README.md",
+    "docs\\experiments\\2026-10-04-memory-layer-retrieval\\run-01\\review.md",
+    "docs\\experiments\\2026-10-04-memory-layer-retrieval\\run-01\\progress.md",
+    "docs\\experiments\\2026-10-04-memory-layer-retrieval\\run-01\\report.md",
+    "docs\\current-decisions.md",
+    "docs\\experiments\\README.md",
+    "docs\\specs\\README.md",
+    "docs\\specs\\2026-10-04-occupation-overview-reference-retrieval-design.md",
+    "docs\\plans\\2026-10-04-public-reference-retrieval-design.md"
+  ],
+  "existing_local_links": 182,
+  "missing_local_links": [],
+  "pending_self_manifest_link": "artifact-hashes.json written after this check",
+  "credential_token_pattern_matches": 0,
+  "scope": "file existence and strong API-key token pattern; not semantic security certification"
+}

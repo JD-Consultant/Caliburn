@@ -1,0 +1,26 @@
+{
+  "job_id": "J004",
+  "phase": "formal",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版核心工作是廠務系統及廠房設施的運轉、巡檢、維護與工程改善，與員工主要負責的會員網站畫面開發、API 串接及瀏覽器品質工作沒有實質對應。",
+    "evidence": [
+      {
+        "employee_quote": "我平常負責會員網站的畫面。",
+        "reference_quote": "負責廠務各項系統運轉維護管理及工程改善"
+      },
+      {
+        "employee_quote": "維護伺服器、資料備份和排值班都不是我的工作",
+        "reference_quote": "執行廠務系統巡檢、維護與保養。"
+      }
+    ],
+    "limitations": []
+  },
+  "seconds": 4.686401400016621,
+  "employee_sha256": "568b2e4478ef26ab2c05313cc945080ec81932220c40c63e28b2767a2208243d",
+  "document_sha256": "540883d8be7efa2c5ad96ea1d5b84f76eaf464f61cf7a097ab0aff397d569a52",
+  "case_id": "F02",
+  "document_id": "MIM2141-001v4"
+}

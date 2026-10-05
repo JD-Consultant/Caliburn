@@ -1,0 +1,85 @@
+{
+  "completed_utc": "2026-10-04T03:09:53.148100+00:00",
+  "passed": true,
+  "source_files_sha256_verified": 818,
+  "corpus_count": 805,
+  "cache_entries": 2454,
+  "used_texts_in_recomputation": 2454,
+  "maximum_tokens": 4310,
+  "silent_truncation": false,
+  "ranking_rows_recomputed": 725,
+  "stages": {
+    "run-05/holdout": 16,
+    "run-05/input": 15,
+    "run-05/method": 48,
+    "run-05/representation": 48,
+    "run-05/rrf-grid": 256,
+    "run-05/selected-memory": 5,
+    "memory-01/memory-method": 30,
+    "memory-02/memory-method": 30,
+    "candidate-01/holdout": 16,
+    "candidate-01/rrf-grid": 256,
+    "candidate-01/selected-memory": 5
+  },
+  "database_rows_recomputed": 320,
+  "database_exact_or_rrf_rows_correct": 128,
+  "checks": [
+    {
+      "path": "run-05/holdout-rankings.jsonl",
+      "rows": 16,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "run-05/input-rankings.jsonl",
+      "rows": 15,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "run-05/method-rankings.jsonl",
+      "rows": 48,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "run-05/representation-rankings.jsonl",
+      "rows": 48,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "run-05/rrf-grid-rankings.jsonl",
+      "rows": 256,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "run-05/selected-memory-rankings.jsonl",
+      "rows": 5,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "memory-01/memory-method-rankings.jsonl",
+      "rows": 30,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "memory-02/memory-method-rankings.jsonl",
+      "rows": 30,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "candidate-01/holdout-rankings.jsonl",
+      "rows": 16,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "candidate-01/rrf-grid-rankings.jsonl",
+      "rows": 256,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    },
+    {
+      "path": "candidate-01/selected-memory-rankings.jsonl",
+      "rows": 5,
+      "cached_scores_and_frozen_grades_and_metrics": true
+    }
+  ],
+  "scope": "Offline recomputation of saved live results; not a new trial",
+  "script_sha256": "18e6dce68d61205d629243950fd120fcea3f5d8d7b7aa9c45975bcf9a54ff798"
+}

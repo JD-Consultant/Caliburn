@@ -1,0 +1,292 @@
+{
+  "phase": {
+    "arm": "compaction_hierarchical_memory",
+    "phase": "consultant",
+    "event_id": "e061",
+    "turn": 61
+  },
+  "error_type": "StudyStop",
+  "reason": "compaction_limit",
+  "frames": [
+    {
+      "file": "S:\\caliburn\\docs\\experiments\\product-validation\\data\\compaction-long-interview-2026-10-04\\continuation.py",
+      "line": 640,
+      "function": "run"
+    },
+    {
+      "file": "S:\\caliburn\\docs\\experiments\\product-validation\\data\\compaction-long-interview-2026-10-04\\continuation.py",
+      "line": 428,
+      "function": "run_arm"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agents\\job_consultant\\runner.py",
+      "line": 187,
+      "function": "run"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\tool_steps.py",
+      "line": 285,
+      "function": "run_response_loop"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\tool_steps.py",
+      "line": 364,
+      "function": "_run_response_flow"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\result_save_retries.py",
+      "line": 91,
+      "function": "retry_result_save"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\asyncio\\__init__.py",
+      "line": 112,
+      "function": "__call__"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\asyncio\\__init__.py",
+      "line": 157,
+      "function": "iter"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\_utils.py",
+      "line": 111,
+      "function": "inner"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\__init__.py",
+      "line": 393,
+      "function": "<lambda>"
+    },
+    {
+      "file": "S:\\caliburn\\.research-tmp\\python\\cpython-3.14.7-windows-x86_64-none\\Lib\\concurrent\\futures\\_base.py",
+      "line": 447,
+      "function": "result"
+    },
+    {
+      "file": "S:\\caliburn\\.research-tmp\\python\\cpython-3.14.7-windows-x86_64-none\\Lib\\concurrent\\futures\\_base.py",
+      "line": 396,
+      "function": "__get_result"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\asyncio\\__init__.py",
+      "line": 116,
+      "function": "__call__"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\tool_steps.py",
+      "line": 345,
+      "function": "run_or_reconcile"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\tool_steps.py",
+      "line": 587,
+      "function": "_run_response_flow_once"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\pregel\\main.py",
+      "line": 4068,
+      "function": "ainvoke"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\pregel\\main.py",
+      "line": 3440,
+      "function": "astream"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\pregel\\_runner.py",
+      "line": 396,
+      "function": "atick"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\pregel\\_retry.py",
+      "line": 744,
+      "function": "arun_with_retry"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\_internal\\_runnable.py",
+      "line": 756,
+      "function": "ainvoke"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\_internal\\_runnable.py",
+      "line": 522,
+      "function": "ainvoke"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\tool_steps.py",
+      "line": 787,
+      "function": "compact_window"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\context_compaction.py",
+      "line": 209,
+      "function": "compact_window"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\context_compaction.py",
+      "line": 179,
+      "function": "run_context_compaction"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\context_compaction.py",
+      "line": 252,
+      "function": "_run_context_boundary"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\result_save_retries.py",
+      "line": 91,
+      "function": "retry_result_save"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\asyncio\\__init__.py",
+      "line": 112,
+      "function": "__call__"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\asyncio\\__init__.py",
+      "line": 157,
+      "function": "iter"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\_utils.py",
+      "line": 111,
+      "function": "inner"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\__init__.py",
+      "line": 393,
+      "function": "<lambda>"
+    },
+    {
+      "file": "S:\\caliburn\\.research-tmp\\python\\cpython-3.14.7-windows-x86_64-none\\Lib\\concurrent\\futures\\_base.py",
+      "line": 447,
+      "function": "result"
+    },
+    {
+      "file": "S:\\caliburn\\.research-tmp\\python\\cpython-3.14.7-windows-x86_64-none\\Lib\\concurrent\\futures\\_base.py",
+      "line": 396,
+      "function": "__get_result"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\tenacity\\asyncio\\__init__.py",
+      "line": 116,
+      "function": "__call__"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\context_compaction.py",
+      "line": 238,
+      "function": "run_or_reconcile"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\context_compaction.py",
+      "line": 482,
+      "function": "_run_context_boundary_once"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\pregel\\main.py",
+      "line": 4068,
+      "function": "ainvoke"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\pregel\\main.py",
+      "line": 3440,
+      "function": "astream"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\pregel\\_runner.py",
+      "line": 396,
+      "function": "atick"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\pregel\\_retry.py",
+      "line": 744,
+      "function": "arun_with_retry"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\_internal\\_runnable.py",
+      "line": 756,
+      "function": "ainvoke"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\langgraph\\_internal\\_runnable.py",
+      "line": 522,
+      "function": "ainvoke"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\agent_execution\\context_compaction.py",
+      "line": 325,
+      "function": "request_compaction"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\workflows\\model_requests.py",
+      "line": 225,
+      "function": "request_compaction"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\workflows\\model_requests.py",
+      "line": 285,
+      "function": "_send"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\src\\caliburn\\adapters\\openai_responses.py",
+      "line": 145,
+      "function": "compact_context"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\openai\\resources\\responses\\responses.py",
+      "line": 3867,
+      "function": "compact"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\openai\\_base_client.py",
+      "line": 2053,
+      "function": "post"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\openai\\_base_client.py",
+      "line": 1773,
+      "function": "request"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\openai\\_client.py",
+      "line": 1361,
+      "function": "_send_request"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\openai\\_client.py",
+      "line": 1340,
+      "function": "_send_with_auth_retry"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\openai\\_base_client.py",
+      "line": 1690,
+      "function": "_send_request"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\httpx2\\_client.py",
+      "line": 1818,
+      "function": "send"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\httpx2\\_client.py",
+      "line": 1846,
+      "function": "_send_handling_auth"
+    },
+    {
+      "file": "S:\\caliburn\\apps\\api\\.venv\\Lib\\site-packages\\httpx2\\_client.py",
+      "line": 1879,
+      "function": "_send_handling_redirects"
+    },
+    {
+      "file": "S:\\caliburn\\docs\\experiments\\product-validation\\data\\compaction-long-interview-2026-10-04\\continuation.py",
+      "line": 150,
+      "function": "request"
+    },
+    {
+      "file": "S:\\caliburn\\docs\\experiments\\product-validation\\data\\compaction-long-interview-2026-10-04\\main_support.py",
+      "line": 123,
+      "function": "admit"
+    }
+  ]
+}

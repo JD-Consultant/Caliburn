@@ -1,0 +1,16 @@
+{
+  "event_id": "e033",
+  "execution_id": "a34eaeac-0953-4fce-8a71-d0ea2f19ab32",
+  "employee_input": {
+    "source_id": "bfe502a6-3548-43b4-a326-e33038398571",
+    "interview_sequence": 66,
+    "speaker": "employee",
+    "interview_text": "稽核追問時，我找回原單號的往來紀錄和核准文件，沒有就列缺件請窗口補，不重製一份假裝當時就有的核准單。稽核是否通過或會計如何處理，由財務及稽核判斷。"
+  },
+  "consultant_reply": {
+    "source_id": "e60f80af-3340-4371-a0ed-5a3c7713cc91",
+    "interview_sequence": 67,
+    "speaker": "consultant",
+    "interview_text": "已補入年度庫存查核任務：稽核追問時依原單號查找往來紀錄與核准文件；缺件則列明並請窗口補充，不重製文件冒充原始核准紀錄。稽核是否通過及會計處理由財務與稽核判斷。\n\n請窗口補件後，您會追蹤到資料補齊或稽核回覆，還是只需列出缺件並交回？"
+  }
+}

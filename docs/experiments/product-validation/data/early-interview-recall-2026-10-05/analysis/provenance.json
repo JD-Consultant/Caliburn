@@ -1,0 +1,14 @@
+{
+  "status": "completed",
+  "trace_records": 325,
+  "trace_bytes": 11778197,
+  "trace_sha256": "1ee84b42d289c9f15ce14f6c1f61eb4dec3950e0389a9b720447bfbac783ce6f",
+  "result_sha256": "6b40856eb1c7c0f243e81f9937867fb8556755349a64a249612b2e1c06022370",
+  "analysis_sha256": "0274b263f8949f8fe53b00f31a455cb07863d7de7dfdd13bbc2156ba282fae74",
+  "accounting_reconciled": true,
+  "native_prefix_transitions_verified": {
+    "raw": 12,
+    "summary": 12,
+    "memory": 16
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "inputs": {
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/report.py": {
+      "sha256": "1346d86ad70d83a34df365f6c3bd45fa4b28d44c0fc5ac6c99839eca37da7b06",
+      "bytes": 7431
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/results.json": {
+      "sha256": "f05c8931f69d10a6c3055681fd4bb255620e49ded8e8c8d8b16c0b33be5dadda",
+      "bytes": 377142
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/comparison.json": {
+      "sha256": "900d9275caac07baae4c9e5cc815d1b7ab120983bcabd5d9b71cac8186ac07ce",
+      "bytes": 8199
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/workload.json": {
+      "sha256": "690fbbf6882432510e6360638fa79541b51771cc9edc19e8d89ba5bbcb0ba275",
+      "bytes": 351
+    },
+    "docs/experiments/2026-10-05-rerank-union-candidate-replay/run-01/verification.json": {
+      "sha256": "3a4585f1550b5a15cae6733ff9d7860b7989c288235c9516fd6d5ecab6467157",
+      "bytes": 408
+    }
+  }
+}

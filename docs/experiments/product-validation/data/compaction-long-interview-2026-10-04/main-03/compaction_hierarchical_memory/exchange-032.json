@@ -1,0 +1,16 @@
+{
+  "event_id": "e032",
+  "execution_id": "c36c11f1-a315-407c-b948-7bfd23ea66a8",
+  "employee_input": {
+    "source_id": "4fd91da8-d06a-4428-8525-040378e6cf23",
+    "interview_sequence": 64,
+    "speaker": "employee",
+    "interview_text": "每年年底配合財務及外部稽核做庫存查核。我按抽樣清單提供收貨、調撥、退貨和核准調帳的證據，說明差異及追查狀態。抽樣項目由財務或稽核選，我不替他們决定查哪一筆。"
+  },
+  "consultant_reply": {
+    "source_id": "1f92c409-4a92-4a67-a4de-a4ee473afb01",
+    "interview_sequence": 65,
+    "speaker": "consultant",
+    "interview_text": "已新增獨立的「支援年度庫存查核與稽核取證」任務，記錄您年底配合財務及外部稽核，依抽樣清單提供收貨、調撥、退貨和核准調帳證據，並說明差異與追查狀態；抽查項目由財務或稽核選定。\n\n若財務或稽核提交後追問缺件或差異，您會負責補查到資料完整，還是提供手上資料後交回他們處理？"
+  }
+}

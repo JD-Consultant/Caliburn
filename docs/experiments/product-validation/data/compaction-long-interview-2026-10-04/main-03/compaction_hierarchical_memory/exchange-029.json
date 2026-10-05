@@ -1,0 +1,16 @@
+{
+  "event_id": "e029",
+  "execution_id": "c1191e91-5ee5-4341-8ddf-fc42a16b0560",
+  "employee_input": {
+    "source_id": "c093665d-8a39-4a39-b051-e3aaa58f3194",
+    "interview_sequence": 58,
+    "speaker": "employee",
+    "interview_text": "遇到產品召回時，我依品質窗口提供的品號和批號，查可售、待檢、在途調撥以及各店庫存，通知倉庫先隔離，提供影響範圍清單給主管及品質窗口。召回是低頻但确实属于我的工作。"
+  },
+  "consultant_reply": {
+    "source_id": "61ee08b7-2018-47ee-93ca-66c3c65f893e",
+    "interview_sequence": 59,
+    "speaker": "consultant",
+    "interview_text": "已先將「支援產品召回庫存盤查」列為獨立任務，記錄依品質窗口提供的品號、批號查核各類庫存、通知倉庫先隔離，並提供影響範圍清單給主管及品質窗口。\n\n通知倉庫後，您還會追蹤隔離是否完成或更新影響清單嗎？還是交出清單後就完成您的部分？"
+  }
+}

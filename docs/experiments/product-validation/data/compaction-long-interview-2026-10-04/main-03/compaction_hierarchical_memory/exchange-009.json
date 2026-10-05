@@ -1,0 +1,16 @@
+{
+  "event_id": "e009",
+  "execution_id": "e0deb11d-16a6-4653-a8da-6cd73c3fcfe8",
+  "employee_input": {
+    "source_id": "bffaa30d-616a-4b2d-b6c5-255e2de9ec1f",
+    "interview_sequence": 18,
+    "speaker": "employee",
+    "interview_text": "退貨數量不符時，我提供照片和差異紀錄請客服確認；主管同意調帳後，我才依核准資料改ERP並保留核准單號。退款由客服和財務處理，不是我的工作。"
+  },
+  "consultant_reply": {
+    "source_id": "ac6f6caf-4360-4ef9-86a5-8124155d52f3",
+    "interview_sequence": 19,
+    "speaker": "consultant",
+    "interview_text": "已補上退貨數量差異的處理界線：您提供照片與差異紀錄供客服確認，主管同意調帳後才依核准資料更新 ERP、保留核准單號；退款由客服與財務處理。\n\n接著想把「缺貨追蹤」和退貨作業分開了解：通常是什麼訊息或情況讓您開始追蹤缺貨？您會追到哪個狀態才算完成？"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "candidate",
+  "repeat": 1,
+  "case_id": "numeric_boundaries",
+  "cell_id": "numeric_boundaries-candidate-1",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11136,
+        "input_tokens_details": {
+          "cache_write_tokens": 7275,
+          "cached_tokens": 3858
+        },
+        "output_tokens": 419,
+        "output_tokens_details": {
+          "reasoning_tokens": 204
+        },
+        "total_tokens": 11555
+      },
+      "estimated_usd": "0.001157755",
+      "seconds": 5.935172199970111
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_1.outcome_2",
+        "value": "收貨差異及未確認項目記錄實收件數、原單號與處理狀態，供採購及相關窗口核對與追蹤。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "核對到貨成果與分工後，僅修正 outcome_2：由倉庫同事清點實物，本人核對單據、記錄差異並追蹤未確認事項。"
+  },
+  "seconds": 16.86992890003603
+}

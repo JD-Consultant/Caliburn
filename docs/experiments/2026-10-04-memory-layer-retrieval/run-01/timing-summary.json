@@ -1,0 +1,338 @@
+[
+  {
+    "case_id": "F01",
+    "method": "O-W",
+    "query_count": 1,
+    "median_seconds": 0.015219299995806068,
+    "median_db_seconds": 0.014097300008870661
+  },
+  {
+    "case_id": "F01",
+    "method": "O-S",
+    "query_count": 2,
+    "median_seconds": 0.030573699972592294,
+    "median_db_seconds": 0.028841300052590668
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-W",
+    "query_count": 1,
+    "median_seconds": 0.015668700041715056,
+    "median_db_seconds": 0.014756300020962954
+  },
+  {
+    "case_id": "F01",
+    "method": "B1-S",
+    "query_count": 1,
+    "median_seconds": 0.015337800025008619,
+    "median_db_seconds": 0.014248799998313189
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-W",
+    "query_count": 1,
+    "median_seconds": 0.015318899997510016,
+    "median_db_seconds": 0.014415900048334152
+  },
+  {
+    "case_id": "F01",
+    "method": "B2-S",
+    "query_count": 1,
+    "median_seconds": 0.015384100028313696,
+    "median_db_seconds": 0.014616600004956126
+  },
+  {
+    "case_id": "F02",
+    "method": "O-W",
+    "query_count": 1,
+    "median_seconds": 0.014760799997020513,
+    "median_db_seconds": 0.014044599956832826
+  },
+  {
+    "case_id": "F02",
+    "method": "O-S",
+    "query_count": 2,
+    "median_seconds": 0.030686500016599894,
+    "median_db_seconds": 0.028930300031788647
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-W",
+    "query_count": 1,
+    "median_seconds": 0.004406000021845102,
+    "median_db_seconds": 0.0033159000449813902
+  },
+  {
+    "case_id": "F02",
+    "method": "B1-S",
+    "query_count": 1,
+    "median_seconds": 0.026281500002369285,
+    "median_db_seconds": 0.025195199996232986
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-W",
+    "query_count": 1,
+    "median_seconds": 0.0037524999934248626,
+    "median_db_seconds": 0.002789099991787225
+  },
+  {
+    "case_id": "F02",
+    "method": "B2-S",
+    "query_count": 1,
+    "median_seconds": 0.02370130002964288,
+    "median_db_seconds": 0.023008699994534254
+  },
+  {
+    "case_id": "F03",
+    "method": "O-W",
+    "query_count": 1,
+    "median_seconds": 0.015837400045711547,
+    "median_db_seconds": 0.014951199991628528
+  },
+  {
+    "case_id": "F03",
+    "method": "O-S",
+    "query_count": 2,
+    "median_seconds": 0.031206500018015504,
+    "median_db_seconds": 0.02939639997202903
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-W",
+    "query_count": 1,
+    "median_seconds": 0.004611100011970848,
+    "median_db_seconds": 0.0037256000214256346
+  },
+  {
+    "case_id": "F03",
+    "method": "B1-S",
+    "query_count": 2,
+    "median_seconds": 0.03129630000330508,
+    "median_db_seconds": 0.029511200031265616
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-W",
+    "query_count": 1,
+    "median_seconds": 0.01577769999857992,
+    "median_db_seconds": 0.014909800025634468
+  },
+  {
+    "case_id": "F03",
+    "method": "B2-S",
+    "query_count": 2,
+    "median_seconds": 0.02037340000970289,
+    "median_db_seconds": 0.01859429996693507
+  },
+  {
+    "case_id": "F04",
+    "method": "O-W",
+    "query_count": 1,
+    "median_seconds": 0.023013100028038025,
+    "median_db_seconds": 0.02231460000621155
+  },
+  {
+    "case_id": "F04",
+    "method": "O-S",
+    "query_count": 2,
+    "median_seconds": 0.0308157000108622,
+    "median_db_seconds": 0.028785099973902106
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-W",
+    "query_count": 1,
+    "median_seconds": 0.015534799953456968,
+    "median_db_seconds": 0.01454940001713112
+  },
+  {
+    "case_id": "F04",
+    "method": "B1-S",
+    "query_count": 4,
+    "median_seconds": 0.04870450001908466,
+    "median_db_seconds": 0.04546430002665147
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-W",
+    "query_count": 1,
+    "median_seconds": 0.014671999961137772,
+    "median_db_seconds": 0.01345149998087436
+  },
+  {
+    "case_id": "F04",
+    "method": "B2-S",
+    "query_count": 1,
+    "median_seconds": 0.003691399993840605,
+    "median_db_seconds": 0.002774599997792393
+  },
+  {
+    "case_id": "F05",
+    "method": "O-W",
+    "query_count": 1,
+    "median_seconds": 0.018751800002064556,
+    "median_db_seconds": 0.018003399949520826
+  },
+  {
+    "case_id": "F05",
+    "method": "O-S",
+    "query_count": 2,
+    "median_seconds": 0.03163179999683052,
+    "median_db_seconds": 0.030058200005441904
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-W",
+    "query_count": 1,
+    "median_seconds": 0.014449700014665723,
+    "median_db_seconds": 0.013476899999659508
+  },
+  {
+    "case_id": "F05",
+    "method": "B1-S",
+    "query_count": 2,
+    "median_seconds": 0.031407899979967624,
+    "median_db_seconds": 0.029748799977824092
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-W",
+    "query_count": 1,
+    "median_seconds": 0.015820000029634684,
+    "median_db_seconds": 0.01494490000186488
+  },
+  {
+    "case_id": "F05",
+    "method": "B2-S",
+    "query_count": 1,
+    "median_seconds": 0.01541330001782626,
+    "median_db_seconds": 0.014421300031244755
+  },
+  {
+    "case_id": "H01",
+    "method": "O-W",
+    "query_count": 1,
+    "median_seconds": 0.015320500009693205,
+    "median_db_seconds": 0.014265999954659492
+  },
+  {
+    "case_id": "H01",
+    "method": "O-S",
+    "query_count": 3,
+    "median_seconds": 0.04504130000714213,
+    "median_db_seconds": 0.04190830001607537
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-W",
+    "query_count": 1,
+    "median_seconds": 0.015506799973081797,
+    "median_db_seconds": 0.014644599985331297
+  },
+  {
+    "case_id": "H01",
+    "method": "B1-S",
+    "query_count": 4,
+    "median_seconds": 0.0374796999967657,
+    "median_db_seconds": 0.03433009987929836
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-W",
+    "query_count": 1,
+    "median_seconds": 0.015588599955663085,
+    "median_db_seconds": 0.014768799999728799
+  },
+  {
+    "case_id": "H01",
+    "method": "B2-S",
+    "query_count": 1,
+    "median_seconds": 0.015001600026153028,
+    "median_db_seconds": 0.013998699956573546
+  },
+  {
+    "case_id": "H02",
+    "method": "O-W",
+    "query_count": 1,
+    "median_seconds": 0.003576099989004433,
+    "median_db_seconds": 0.0029132000054232776
+  },
+  {
+    "case_id": "H02",
+    "method": "O-S",
+    "query_count": 4,
+    "median_seconds": 0.058113600010983646,
+    "median_db_seconds": 0.054099999950267375
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-W",
+    "query_count": 1,
+    "median_seconds": 0.015457200002856553,
+    "median_db_seconds": 0.014210599998477846
+  },
+  {
+    "case_id": "H02",
+    "method": "B1-S",
+    "query_count": 5,
+    "median_seconds": 0.0736453999998048,
+    "median_db_seconds": 0.06956259999424219
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-W",
+    "query_count": 1,
+    "median_seconds": 0.02429839997785166,
+    "median_db_seconds": 0.023493200016673654
+  },
+  {
+    "case_id": "H02",
+    "method": "B2-S",
+    "query_count": 1,
+    "median_seconds": 0.003792500006966293,
+    "median_db_seconds": 0.00284770003054291
+  },
+  {
+    "case_id": "H03",
+    "method": "O-W",
+    "query_count": 1,
+    "median_seconds": 0.014403200009837747,
+    "median_db_seconds": 0.013478000008035451
+  },
+  {
+    "case_id": "H03",
+    "method": "O-S",
+    "query_count": 5,
+    "median_seconds": 0.06348880002042279,
+    "median_db_seconds": 0.05943419993855059
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-W",
+    "query_count": 1,
+    "median_seconds": 0.022598400013521314,
+    "median_db_seconds": 0.021702999947592616
+  },
+  {
+    "case_id": "H03",
+    "method": "B1-S",
+    "query_count": 16,
+    "median_seconds": 0.2305845000082627,
+    "median_db_seconds": 0.21795590012334287
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-W",
+    "query_count": 1,
+    "median_seconds": 0.015547599992714822,
+    "median_db_seconds": 0.014606199983973056
+  },
+  {
+    "case_id": "H03",
+    "method": "B2-S",
+    "query_count": 4,
+    "median_seconds": 0.06250399997225031,
+    "median_db_seconds": 0.05890369997359812
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "methods": [
+    "O-D",
+    "O-T",
+    "O-M",
+    "B2-D",
+    "B2-T",
+    "B2-M"
+  ],
+  "rerank_methods": [
+    "O-D-R",
+    "O-T-R",
+    "O-M-R",
+    "B2-D-R",
+    "B2-T-R",
+    "B2-M-R"
+  ],
+  "queries": 20,
+  "cases": 8,
+  "max_cost_usd": "1.00",
+  "max_calls": 100,
+  "query_embedding_reused": true,
+  "reranker_image": "sha256:f21629b9ae4ed11231768edfaed0f40d41d85d6ea9a71e8096a3d96ea0311772"
+}

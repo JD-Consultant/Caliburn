@@ -1,0 +1,812 @@
+{
+  "results": [
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "complete",
+      "cell_id": "complete-1",
+      "status": "completed",
+      "reads": [
+        {
+          "step": 1,
+          "name": "read_work_understanding_map",
+          "arguments": {},
+          "result_characters": 185
+        },
+        {
+          "step": 2,
+          "name": "read_work_understanding",
+          "arguments": {
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          },
+          "result_characters": 6378
+        }
+      ],
+      "usage": [
+        {
+          "usage": {
+            "input_tokens": 6269,
+            "input_tokens_details": {
+              "cache_write_tokens": 6266,
+              "cached_tokens": 0
+            },
+            "output_tokens": 89,
+            "output_tokens_details": {
+              "reasoning_tokens": 27
+            },
+            "total_tokens": 6358
+          },
+          "estimated_usd": "0.000828050",
+          "seconds": 2.817880699993111
+        },
+        {
+          "usage": {
+            "input_tokens": 6510,
+            "input_tokens_details": {
+              "cache_write_tokens": 241,
+              "cached_tokens": 6266
+            },
+            "output_tokens": 37,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 6547
+          },
+          "estimated_usd": "0.000111585",
+          "seconds": 1.774693200015463
+        },
+        {
+          "usage": {
+            "input_tokens": 11934,
+            "input_tokens_details": {
+              "cache_write_tokens": 5424,
+              "cached_tokens": 6507
+            },
+            "output_tokens": 1501,
+            "output_tokens_details": {
+              "reasoning_tokens": 1034
+            },
+            "total_tokens": 13435
+          },
+          "estimated_usd": "0.001493870",
+          "seconds": 13.781138499965891
+        }
+      ],
+      "proposal": {
+        "changes": [
+          {
+            "target_ref": "task_2.description",
+            "value": "每週一 08:50 開始核對週末累積收到的退貨；週二至週五 08:35 開始核對前一日收到的退貨。使用獨立的退貨清單，比對客退單、品號、批號及實收數量。常溫退貨依倉庫同事確認的商品狀態登錄為可售、待檢或報廢待核准；冷藏退貨另核對溫度紀錄，交品質窗口判定是否可再銷售。退貨數量不符時，提供照片及差異紀錄請客服確認；主管同意調帳後，才依核准資料更新 ERP 並保留核准單號。此核對時點與交表時限僅適用於退貨，不是進貨驗收時限。",
+            "references": [
+              {
+                "kind": "work_understanding",
+                "interview_sequence": null,
+                "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+              }
+            ]
+          },
+          {
+            "target_ref": "task_2.outcome_2",
+            "value": "常溫退貨狀態依倉庫同事確認結果登錄為可售、待檢或報廢待核准；冷藏退貨核對溫度紀錄後交品質窗口判定是否可再銷售。",
+            "references": [
+              {
+                "kind": "work_understanding",
+                "interview_sequence": null,
+                "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+              }
+            ]
+          }
+        ],
+        "questions": [],
+        "note": "僅修正退貨任務描述及成果中將商品狀態判定一概歸給倉庫的表述；明確區分常溫退貨由倉庫確認、冷藏退貨由品質窗口判定是否可再銷售。核對時點、交表期限、客服確認、ERP 調帳核准及其他工作均未改動。"
+      },
+      "seconds": 51.42924440000206
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "situation_gap",
+      "cell_id": "situation_gap-1",
+      "status": "completed",
+      "reads": [
+        {
+          "step": 1,
+          "name": "read_work_understanding_map",
+          "arguments": {},
+          "result_characters": 185
+        },
+        {
+          "step": 2,
+          "name": "read_work_understanding",
+          "arguments": {
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          },
+          "result_characters": 6378
+        },
+        {
+          "step": 3,
+          "name": "read_work_situation",
+          "arguments": {
+            "target_title": "收貨異常週報"
+          },
+          "result_characters": 417
+        },
+        {
+          "step": 3,
+          "name": "read_work_situation",
+          "arguments": {
+            "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+          },
+          "result_characters": 1812
+        }
+      ],
+      "usage": [
+        {
+          "usage": {
+            "input_tokens": 6902,
+            "input_tokens_details": {
+              "cache_write_tokens": 3202,
+              "cached_tokens": 3697
+            },
+            "output_tokens": 99,
+            "output_tokens_details": {
+              "reasoning_tokens": 25
+            },
+            "total_tokens": 7001
+          },
+          "estimated_usd": "0.000487020",
+          "seconds": 3.3859681999892928
+        },
+        {
+          "usage": {
+            "input_tokens": 7153,
+            "input_tokens_details": {
+              "cache_write_tokens": 251,
+              "cached_tokens": 6899
+            },
+            "output_tokens": 37,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 7190
+          },
+          "estimated_usd": "0.000119165",
+          "seconds": 1.310889300017152
+        },
+        {
+          "usage": {
+            "input_tokens": 12577,
+            "input_tokens_details": {
+              "cache_write_tokens": 5424,
+              "cached_tokens": 7150
+            },
+            "output_tokens": 154,
+            "output_tokens_details": {
+              "reasoning_tokens": 78
+            },
+            "total_tokens": 12731
+          },
+          "estimated_usd": "0.000826800",
+          "seconds": 3.1424293000018224
+        },
+        {
+          "usage": {
+            "input_tokens": 14566,
+            "input_tokens_details": {
+              "cache_write_tokens": 1989,
+              "cached_tokens": 12574
+            },
+            "output_tokens": 763,
+            "output_tokens_details": {
+              "reasoning_tokens": 475
+            },
+            "total_tokens": 15329
+          },
+          "estimated_usd": "0.000756165",
+          "seconds": 8.370224400016014
+        }
+      ],
+      "proposal": {
+        "changes": [
+          {
+            "target_ref": "task_1.requirement_6",
+            "value": "通知採購後，由本人持續更新差異清單及處理進度；兩個工作日未獲回覆時提醒採購，第四個工作日仍無進展則回報主管。退換貨或補貨由採購決定；本人不保證供應商實際補貨時間。",
+            "references": [
+              {
+                "kind": "work_situation",
+                "interview_sequence": null,
+                "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+              }
+            ]
+          }
+        ],
+        "questions": [],
+        "note": "僅修正收貨異常提醒與升級要求，保留兩個工作日提醒、第四個工作日回報主管，以及採購決定退換貨或補貨、本人不承諾供應商補貨時間的界線；未改動其他事項。"
+      },
+      "seconds": 60.195608099980745
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 1,
+      "case_id": "interview_gap",
+      "cell_id": "interview_gap-1",
+      "status": "step_limit",
+      "reads": [
+        {
+          "step": 1,
+          "name": "read_work_understanding_map",
+          "arguments": {},
+          "result_characters": 185
+        },
+        {
+          "step": 2,
+          "name": "read_work_understanding",
+          "arguments": {
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          },
+          "result_characters": 6378
+        },
+        {
+          "step": 3,
+          "name": "read_work_situation",
+          "arguments": {
+            "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+          },
+          "result_characters": 1812
+        },
+        {
+          "step": 4,
+          "name": "read_interview",
+          "arguments": {
+            "query": {
+              "kind": "messages",
+              "sequences": [
+                92,
+                104
+              ]
+            }
+          },
+          "result_characters": 339
+        },
+        {
+          "step": 5,
+          "name": "read_interview",
+          "arguments": {
+            "query": {
+              "kind": "messages",
+              "sequences": [
+                74,
+                76,
+                80,
+                82,
+                84
+              ]
+            }
+          },
+          "result_characters": 760
+        },
+        {
+          "step": 6,
+          "name": "read_interview",
+          "arguments": {
+            "query": {
+              "kind": "messages",
+              "sequences": [
+                50,
+                52,
+                54
+              ]
+            }
+          },
+          "result_characters": 467
+        }
+      ],
+      "usage": [
+        {
+          "usage": {
+            "input_tokens": 6902,
+            "input_tokens_details": {
+              "cache_write_tokens": 3202,
+              "cached_tokens": 3697
+            },
+            "output_tokens": 108,
+            "output_tokens_details": {
+              "reasoning_tokens": 44
+            },
+            "total_tokens": 7010
+          },
+          "estimated_usd": "0.000491520",
+          "seconds": 2.174801999994088
+        },
+        {
+          "usage": {
+            "input_tokens": 7162,
+            "input_tokens_details": {
+              "cache_write_tokens": 260,
+              "cached_tokens": 6899
+            },
+            "output_tokens": 37,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 7199
+          },
+          "estimated_usd": "0.000120290",
+          "seconds": 2.099041700013913
+        },
+        {
+          "usage": {
+            "input_tokens": 12586,
+            "input_tokens_details": {
+              "cache_write_tokens": 5424,
+              "cached_tokens": 7159
+            },
+            "output_tokens": 206,
+            "output_tokens_details": {
+              "reasoning_tokens": 168
+            },
+            "total_tokens": 12792
+          },
+          "estimated_usd": "0.000852890",
+          "seconds": 3.8868164000450633
+        },
+        {
+          "usage": {
+            "input_tokens": 14294,
+            "input_tokens_details": {
+              "cache_write_tokens": 1708,
+              "cached_tokens": 12583
+            },
+            "output_tokens": 80,
+            "output_tokens_details": {
+              "reasoning_tokens": 49
+            },
+            "total_tokens": 14374
+          },
+          "estimated_usd": "0.000379630",
+          "seconds": 2.077516800025478
+        },
+        {
+          "usage": {
+            "input_tokens": 14578,
+            "input_tokens_details": {
+              "cache_write_tokens": 284,
+              "cached_tokens": 14291
+            },
+            "output_tokens": 75,
+            "output_tokens_details": {
+              "reasoning_tokens": 38
+            },
+            "total_tokens": 14653
+          },
+          "estimated_usd": "0.000216210",
+          "seconds": 2.2292197000351734
+        },
+        {
+          "usage": {
+            "input_tokens": 15124,
+            "input_tokens_details": {
+              "cache_write_tokens": 546,
+              "cached_tokens": 14575
+            },
+            "output_tokens": 51,
+            "output_tokens_details": {
+              "reasoning_tokens": 18
+            },
+            "total_tokens": 15175
+          },
+          "estimated_usd": "0.000239800",
+          "seconds": 3.4613617000286467
+        }
+      ],
+      "proposal": null,
+      "seconds": 81.55725720000919
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "interview_gap",
+      "cell_id": "interview_gap-2",
+      "status": "step_limit",
+      "reads": [
+        {
+          "step": 1,
+          "name": "read_work_understanding_map",
+          "arguments": {},
+          "result_characters": 185
+        },
+        {
+          "step": 2,
+          "name": "read_work_understanding",
+          "arguments": {
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          },
+          "result_characters": 6378
+        },
+        {
+          "step": 3,
+          "name": "read_work_situation_map",
+          "arguments": {},
+          "result_characters": 1411
+        },
+        {
+          "step": 4,
+          "name": "read_work_situation",
+          "arguments": {
+            "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+          },
+          "result_characters": 1812
+        },
+        {
+          "step": 5,
+          "name": "read_interview",
+          "arguments": {
+            "query": {
+              "kind": "messages",
+              "sequences": [
+                80,
+                82,
+                84,
+                92,
+                104
+              ]
+            }
+          },
+          "result_characters": 767
+        },
+        {
+          "step": 6,
+          "name": "read_interview",
+          "arguments": {
+            "query": {
+              "kind": "messages",
+              "sequences": [
+                50,
+                52,
+                54,
+                74,
+                76
+              ]
+            }
+          },
+          "result_characters": 748
+        }
+      ],
+      "usage": [
+        {
+          "usage": {
+            "input_tokens": 6902,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 6899
+            },
+            "output_tokens": 140,
+            "output_tokens_details": {
+              "reasoning_tokens": 71
+            },
+            "total_tokens": 7042
+          },
+          "estimated_usd": "0.000139290",
+          "seconds": 2.6213955000275746
+        },
+        {
+          "usage": {
+            "input_tokens": 7194,
+            "input_tokens_details": {
+              "cache_write_tokens": 292,
+              "cached_tokens": 6899
+            },
+            "output_tokens": 37,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 7231
+          },
+          "estimated_usd": "0.000124290",
+          "seconds": 1.4915111000300385
+        },
+        {
+          "usage": {
+            "input_tokens": 12618,
+            "input_tokens_details": {
+              "cache_write_tokens": 5424,
+              "cached_tokens": 7191
+            },
+            "output_tokens": 41,
+            "output_tokens_details": {
+              "reasoning_tokens": 22
+            },
+            "total_tokens": 12659
+          },
+          "estimated_usd": "0.000770710",
+          "seconds": 1.5178867999929935
+        },
+        {
+          "usage": {
+            "input_tokens": 13655,
+            "input_tokens_details": {
+              "cache_write_tokens": 1037,
+              "cached_tokens": 12615
+            },
+            "output_tokens": 45,
+            "output_tokens_details": {
+              "reasoning_tokens": 7
+            },
+            "total_tokens": 13700
+          },
+          "estimated_usd": "0.000278575",
+          "seconds": 1.6424948999774642
+        },
+        {
+          "usage": {
+            "input_tokens": 15202,
+            "input_tokens_details": {
+              "cache_write_tokens": 1547,
+              "cached_tokens": 13652
+            },
+            "output_tokens": 249,
+            "output_tokens_details": {
+              "reasoning_tokens": 130
+            },
+            "total_tokens": 15451
+          },
+          "estimated_usd": "0.000454695",
+          "seconds": 3.751377400010824
+        },
+        {
+          "usage": {
+            "input_tokens": 15907,
+            "input_tokens_details": {
+              "cache_write_tokens": 705,
+              "cached_tokens": 15199
+            },
+            "output_tokens": 134,
+            "output_tokens_details": {
+              "reasoning_tokens": 97
+            },
+            "total_tokens": 16041
+          },
+          "estimated_usd": "0.000307415",
+          "seconds": 2.823251700028777
+        }
+      ],
+      "proposal": null,
+      "seconds": 79.40091369999573
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "situation_gap",
+      "cell_id": "situation_gap-2",
+      "status": "completed",
+      "reads": [
+        {
+          "step": 1,
+          "name": "read_work_understanding",
+          "arguments": {
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          },
+          "result_characters": 6378
+        },
+        {
+          "step": 2,
+          "name": "read_work_situation",
+          "arguments": {
+            "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+          },
+          "result_characters": 1812
+        },
+        {
+          "step": 2,
+          "name": "read_work_situation",
+          "arguments": {
+            "target_title": "收貨異常週報"
+          },
+          "result_characters": 417
+        }
+      ],
+      "usage": [
+        {
+          "usage": {
+            "input_tokens": 6902,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 6899
+            },
+            "output_tokens": 120,
+            "output_tokens_details": {
+              "reasoning_tokens": 24
+            },
+            "total_tokens": 7022
+          },
+          "estimated_usd": "0.000129290",
+          "seconds": 3.3648229999816976
+        },
+        {
+          "usage": {
+            "input_tokens": 12409,
+            "input_tokens_details": {
+              "cache_write_tokens": 5507,
+              "cached_tokens": 6899
+            },
+            "output_tokens": 244,
+            "output_tokens_details": {
+              "reasoning_tokens": 168
+            },
+            "total_tokens": 12653
+          },
+          "estimated_usd": "0.000879665",
+          "seconds": 3.08097579999594
+        },
+        {
+          "usage": {
+            "input_tokens": 14488,
+            "input_tokens_details": {
+              "cache_write_tokens": 2079,
+              "cached_tokens": 12406
+            },
+            "output_tokens": 1142,
+            "output_tokens_details": {
+              "reasoning_tokens": 885
+            },
+            "total_tokens": 15630
+          },
+          "estimated_usd": "0.000955235",
+          "seconds": 11.117396000016015
+        }
+      ],
+      "proposal": {
+        "changes": [
+          {
+            "target_ref": "task_1.requirement_6",
+            "value": "通知採購後，本人更新差異清單與處理進度；兩個工作日未獲回覆時提醒採購，第四個工作日仍無進展時回報主管。退換貨或補貨決策仍由採購負責。",
+            "references": [
+              {
+                "kind": "work_situation",
+                "interview_sequence": null,
+                "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+              }
+            ]
+          }
+        ],
+        "questions": [],
+        "note": "僅修正收貨異常通知採購後的提醒與升級時點，並保留採購負責退換貨或補貨決策的界線；其他JD內容未提案修改。"
+      },
+      "seconds": 50.753841800033115
+    },
+    {
+      "arm": "raw_memory",
+      "repeat": 2,
+      "case_id": "complete",
+      "cell_id": "complete-2",
+      "status": "completed",
+      "reads": [
+        {
+          "step": 1,
+          "name": "read_work_understanding_map",
+          "arguments": {},
+          "result_characters": 185
+        },
+        {
+          "step": 2,
+          "name": "read_work_understanding",
+          "arguments": {
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          },
+          "result_characters": 6378
+        }
+      ],
+      "usage": [
+        {
+          "usage": {
+            "input_tokens": 6269,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 6266
+            },
+            "output_tokens": 78,
+            "output_tokens_details": {
+              "reasoning_tokens": 16
+            },
+            "total_tokens": 6347
+          },
+          "estimated_usd": "0.000101960",
+          "seconds": 2.7355811999877915
+        },
+        {
+          "usage": {
+            "input_tokens": 6499,
+            "input_tokens_details": {
+              "cache_write_tokens": 230,
+              "cached_tokens": 6266
+            },
+            "output_tokens": 37,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 6536
+          },
+          "estimated_usd": "0.000110210",
+          "seconds": 1.3051160000031814
+        },
+        {
+          "usage": {
+            "input_tokens": 11923,
+            "input_tokens_details": {
+              "cache_write_tokens": 5424,
+              "cached_tokens": 6496
+            },
+            "output_tokens": 1475,
+            "output_tokens_details": {
+              "reasoning_tokens": 1004
+            },
+            "total_tokens": 13398
+          },
+          "estimated_usd": "0.001480760",
+          "seconds": 14.053111500048544
+        }
+      ],
+      "proposal": {
+        "changes": [
+          {
+            "target_ref": "task_2.description",
+            "value": "每週一 08:50 開始核對週末累積收到的退貨；週二至週五 08:35 開始核對前一日收到的退貨。使用獨立的退貨清單，比對客退單、品號、批號及實收數量。常溫退貨的商品狀態依倉庫同事確認；冷藏退貨另核對溫度紀錄，交品質窗口判定是否可再銷售。本人依相應窗口確認結果登錄退貨狀態，不自行判定商品是否可再銷售或報廢，並於每個工作日 09:10 前將退貨差異表交給客服窗口。退貨數量不符時，提供照片及差異紀錄請客服確認；主管同意調帳後，才依核准資料更新 ERP 並保留核准單號。此核對時點與交表時限僅適用於退貨，不是進貨驗收時限。",
+            "references": [
+              {
+                "kind": "work_understanding",
+                "interview_sequence": null,
+                "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+              }
+            ]
+          },
+          {
+            "target_ref": "task_2.outcome_2",
+            "value": "常溫退貨狀態依倉庫同事確認結果登錄；冷藏退貨另核對溫度紀錄並交品質窗口判定是否可再銷售，溫度合格門檻未確認，不自行套用外部或行業標準。",
+            "references": [
+              {
+                "kind": "work_understanding",
+                "interview_sequence": null,
+                "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+              }
+            ]
+          }
+        ],
+        "questions": [],
+        "note": "僅修正退貨任務描述與成果中容易把冷藏品判定責任歸給倉庫或本人之處；其他成果及要求與已整理理解一致，未作更動。"
+      },
+      "seconds": 50.75458340003388
+    }
+  ],
+  "generation_calls": 25,
+  "outbound_calls": 50,
+  "occupied_usd": "0.015155090",
+  "cumulative_occupied_usd": "1.104918450",
+  "pending": {
+    "count-complete-1-1": "0.0001",
+    "count-complete-1-2": "0.0001",
+    "count-complete-1-3": "0.0001",
+    "count-situation_gap-1-1": "0.0001",
+    "count-situation_gap-1-2": "0.0001",
+    "count-situation_gap-1-3": "0.0001",
+    "count-situation_gap-1-4": "0.0001",
+    "count-interview_gap-1-1": "0.0001",
+    "count-interview_gap-1-2": "0.0001",
+    "count-interview_gap-1-3": "0.0001",
+    "count-interview_gap-1-4": "0.0001",
+    "count-interview_gap-1-5": "0.0001",
+    "count-interview_gap-1-6": "0.0001",
+    "count-interview_gap-2-1": "0.0001",
+    "count-interview_gap-2-2": "0.0001",
+    "count-interview_gap-2-3": "0.0001",
+    "count-interview_gap-2-4": "0.0001",
+    "count-interview_gap-2-5": "0.0001",
+    "count-interview_gap-2-6": "0.0001",
+    "count-situation_gap-2-1": "0.0001",
+    "count-situation_gap-2-2": "0.0001",
+    "count-situation_gap-2-3": "0.0001",
+    "count-complete-2-1": "0.0001",
+    "count-complete-2-2": "0.0001",
+    "count-complete-2-3": "0.0001"
+  },
+  "seconds": 374.1610321000335
+}

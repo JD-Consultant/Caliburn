@@ -1,0 +1,97 @@
+{
+  "created_utc": "2026-10-04T11:41:40.320564+00:00",
+  "before_new_rankings": true,
+  "authorization": "user agreed five fixed synthetic needs and four methods; prior delegation to test and retain data",
+  "n": 20,
+  "final_k": 5,
+  "rrf_k": 2,
+  "database_exact": true,
+  "model": "gpt-6-luna",
+  "reasoning_effort": "high",
+  "max_cost_usd": "1.00",
+  "max_responses": 107,
+  "max_output_tokens": 4096,
+  "max_seconds": 1800,
+  "inputs": {
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/protocol.md": {
+      "sha256": "1e9cb865e37ab324089a8ee6374a610e25064755ac82f073956badbbe9c32557",
+      "bytes": 5167
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/pipeline.py": {
+      "sha256": "7d89f781ad2dd02cc0aee3e63ca400b0e956756f6d9335303193fe604b01894b",
+      "bytes": 3717
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/test_pipeline.py": {
+      "sha256": "7e1818f7116b2d49ccc64f23cafcf00364f69ae806949e237fdf1a7ed8300b30",
+      "bytes": 2488
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/prepare.py": {
+      "sha256": "6d1055e15510e64ae3adabbcffeac1b199096cf0030fbe6a7a77d5a5fda233e2",
+      "bytes": 7606
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/retrieve.py": {
+      "sha256": "b22a15d3a9396376f553e4616cf0780a00c96f9b6a11ea5178fc5a2d5f242570",
+      "bytes": 10810
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/gpu_worker.py": {
+      "sha256": "32eeb7a0ed292c316d62cd9f266ce7ef236ced4b827d597d349afe6da3b35311",
+      "bytes": 4650
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/judge.py": {
+      "sha256": "9686f5978d167a570af7c43267b8f3bb8ff37fbdfd616883074db8f9d959d05d",
+      "bytes": 8293
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/report.py": {
+      "sha256": "c35c54c6c82651e9c27aa4d02548076a626e43ac2b609a10b98f2ae334dc2982",
+      "bytes": 5285
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/verify.py": {
+      "sha256": "64d7f6acd56c5d191cac4fd1e3a6eb02367f62b5568be8a8b9f43d6ec2a48a4c",
+      "bytes": 4828
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/queries.json": {
+      "sha256": "a857aedd8b64399ddfa9bcb7b9998200876df3b0eff66e020874921fea335efb",
+      "bytes": 25060
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/corpus.json": {
+      "sha256": "ae5ec2b264eba771f84b27a69fef7e80067d6a14ec20e94e9be0482fa9ac868d",
+      "bytes": 2387875
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/calibration-cases.json": {
+      "sha256": "f7630681cef9852253c3444965151718eeee2702bbe23b2b4a3803d63048fb96",
+      "bytes": 2243
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/judge-prompt.txt": {
+      "sha256": "7574097bc521a1dda8259a521fb196e9cac214cacf7bffc066a73f0b7a06faac",
+      "bytes": 7382
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/run-01/judge-schema.json": {
+      "sha256": "805aead5d2b5ec4a8a86c88ea7de51cab56cb157059eb4043975c131618fa8ba",
+      "bytes": 1057
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/cases-v1.json": {
+      "sha256": "ac7a871de75bb1c49ae36d2445bc4fa87c0ac386b78e8cb6f74f663e089573fb",
+      "bytes": 7353
+    },
+    "docs/experiments/2026-10-04-representative-occupation-top5/draft-input-manifest-v1.json": {
+      "sha256": "e3dd152fc21171ecd513a49f91d37b00548c1561895046bcea76af4ce65970de",
+      "bytes": 1639
+    },
+    "docs/experiments/2026-10-04-retrieve-rerank/prepared.json": {
+      "sha256": "1c6f94c7ccd944f0bb25eeb28863f57bacac910f1d515c92cb05ae2b36ee2fce",
+      "bytes": 4944141
+    },
+    "docs/experiments/2026-10-04-occupation-retrieval-generalization/cache/20f95996a7ef4d574c29bed8625e84277aee1a73b8d097f5b45b5320ddb27bd8.jsonl": {
+      "sha256": "7bebef816eb7688b613031609b2470999e7a60e2783fb2d22371730cb78c47ed",
+      "bytes": 60208450
+    },
+    "docs/specs/2026-10-04-representative-occupation-scoring-protocol.md": {
+      "sha256": "d76d6a13dbf12f11ae9323e2e64521709b48996b3efc77c2e9fd3006d2184b87",
+      "bytes": 6838
+    },
+    "docs/experiments/2026-10-04-retrieve-rerank/evaluate.py": {
+      "sha256": "ea11a202e5497f08e67ab4029d15d990e5d453c45989fcb695bcd934d5fcaf90",
+      "bytes": 1559
+    }
+  }
+}

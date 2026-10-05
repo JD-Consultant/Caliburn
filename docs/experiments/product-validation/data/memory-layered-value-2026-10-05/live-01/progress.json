@@ -1,0 +1,86 @@
+[
+  {
+    "cell": "initial-b1",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 45.69509920000564
+  },
+  {
+    "cell": "initial-b2",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 45.92290779994801
+  },
+  {
+    "cell": "corrections-b1",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 50.617542700027116
+  },
+  {
+    "cell": "corrections-b2",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 43.38037770008668
+  },
+  {
+    "cell": "extension-b1",
+    "status": "completed",
+    "steps": 6,
+    "seconds": 89.89109630009625
+  },
+  {
+    "cell": "extension-b2",
+    "status": "completed",
+    "steps": 3,
+    "seconds": 48.598640999989584
+  },
+  {
+    "cell": "read-post_delivery-layered",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 30.812099599977955
+  },
+  {
+    "cell": "read-post_delivery-full_history",
+    "status": "completed",
+    "steps": 1,
+    "seconds": 18.73968439991586
+  },
+  {
+    "cell": "read-maintenance-full_history",
+    "status": "completed",
+    "steps": 1,
+    "seconds": 18.28421700000763
+  },
+  {
+    "cell": "read-maintenance-layered",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 30.808053400018252
+  },
+  {
+    "cell": "read-infrequent_work-layered",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 29.146776200039312
+  },
+  {
+    "cell": "read-infrequent_work-full_history",
+    "status": "completed",
+    "steps": 1,
+    "seconds": 17.3125013000099
+  },
+  {
+    "cell": "read-resolved_approval-full_history",
+    "status": "completed",
+    "steps": 1,
+    "seconds": 20.22589010000229
+  },
+  {
+    "cell": "read-resolved_approval-layered",
+    "status": "completed",
+    "steps": 2,
+    "seconds": 28.67024590005167
+  }
+]

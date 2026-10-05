@@ -1,0 +1,306 @@
+[
+  {
+    "arm": "control",
+    "batch": 1,
+    "snapshot": {
+      "job_file_id": "c6e90b59-b671-4d38-9a18-422c52c1c659",
+      "snapshot_id": "5302fcd4-3ec2-4360-9c80-f4665b66a858",
+      "position_id": "6d5e0118-a676-48b3-b48e-5c1f0d832bea",
+      "through_source_id": "5ae95262-49f4-4d33-9a70-80df81271c88",
+      "covered_through_sequence": 2
+    },
+    "content_and_revision_unchanged": true,
+    "fixed_chain_coherent": true,
+    "sources_within_frontier": true,
+    "objects": [
+      {
+        "object_id": "c7a475a2-cacf-48fb-b17e-16cb549f9fe4",
+        "revision_id": "eadbef9c-0054-4cf0-b0fd-e015c17a3a15",
+        "body_id": "6168d00b-f650-48d1-8c2b-fa4a1d3efb81",
+        "layer": "work_situation",
+        "content": {
+          "title": "庫存盤點與年度查核支援",
+          "description": "整理本人每月庫存盤點及每年協助年度查核的工作；閱讀時區分日常差異記錄與年度查核準備，並注意本人不具 ERP 調整核准權，也不負責年度查核結論。",
+          "body": "## 工作情境\n本人每月盤點庫存，核對帳面與實物，並記錄差異後交給倉庫主管。差異交主管後，只有主管核准才能調整 ERP；本人沒有核准權，也未表示自己執行 ERP 調整。\n\n每年一次協助年度查核，工作包括準備盤點表和單據。本人不負責查核結論。\n\n## 頻率與責任界線\n- 庫存盤點：每月一次；核對帳面與實物、記錄差異並交倉庫主管。\n- 年度查核支援：每年一次；準備盤點表和單據。\n- ERP 調整須經倉庫主管核准；本人無核准權。\n- 年度查核結論不由本人負責。\n\n## 未知\n未說明差異的後續處理方式、本人是否參與 ERP 調整操作、年度查核的其他參與者或具體流程。"
+        },
+        "interview_references": [
+          "5ae95262-49f4-4d33-9a70-80df81271c88"
+        ],
+        "work_situation_references": [],
+        "interview_sequences": [
+          2
+        ]
+      },
+      {
+        "object_id": "18de5a2c-bd29-490a-a853-47e9219c3fed",
+        "revision_id": "d00e0b76-6716-4b8c-94b1-f94c3d725c46",
+        "body_id": "52cab921-306a-4036-9d9b-204ed39be58d",
+        "layer": "work_understanding",
+        "content": {
+          "title": "庫存盤點差異記錄與年度查核準備",
+          "description": "整理每月庫存盤點及每年年度查核支援兩類工作；閱讀時區分日常盤點與查核準備，並留意 ERP 調整核准及查核結論的責任界線。",
+          "body": "## 工作內容與適用情境\n- **每月庫存盤點：**核對帳面庫存與實物，記錄差異並交給倉庫主管。這描述的是盤點核對、差異記錄與交接，不代表本人負責決定差異原因或後續處理。\n- **每年年度查核支援：**準備盤點表和單據，屬於查核準備工作；目前資料未說明其他查核流程或本人是否承擔其他工作。\n\n## 責任界線\n- ERP 調整須經倉庫主管核准；本人沒有核准權。現有資料未確認本人是否會在核准後操作 ERP，因此不應推定由本人執行調整。\n- 本人不負責年度查核結論。\n\n## 尚待確認\n差異交給主管後的處理方式、本人是否參與 ERP 調整操作，以及年度查核的其他參與者和具體流程均未說明。需要判斷這些事項時，回查「庫存盤點與年度查核支援」。"
+        },
+        "interview_references": [],
+        "work_situation_references": [
+          {
+            "object_id": "c7a475a2-cacf-48fb-b17e-16cb549f9fe4",
+            "revision_id": "eadbef9c-0054-4cf0-b0fd-e015c17a3a15"
+          }
+        ],
+        "interview_sequences": []
+      }
+    ]
+  },
+  {
+    "arm": "control",
+    "batch": 2,
+    "snapshot": {
+      "job_file_id": "c6e90b59-b671-4d38-9a18-422c52c1c659",
+      "snapshot_id": "8d2987e9-3d82-4112-9db0-1a28d5908bbb",
+      "position_id": "61093b22-b24d-4b2e-bfca-ad678765d71a",
+      "through_source_id": "e140da95-ce16-4366-ba69-f0692e4d17a5",
+      "covered_through_sequence": 4
+    },
+    "content_and_revision_unchanged": true,
+    "fixed_chain_coherent": true,
+    "sources_within_frontier": true,
+    "objects": [
+      {
+        "object_id": "7caf173d-1b82-42d5-85ee-967fbf2385a9",
+        "revision_id": "5c0df6b7-ff76-477b-8a0d-a28687ce6264",
+        "body_id": "59f2e5b9-f222-4fa3-b8ae-9129bba1d979",
+        "layer": "work_situation",
+        "content": {
+          "title": "客戶退貨核對與登錄",
+          "description": "整理本人每週核對客戶退貨品項與數量、記錄差異並交品保，以及依品保結論登錄的工作；品項是否可再次銷售由品保決定，本人不判定商品可售。",
+          "body": "## 工作情境\n本人每週核對客戶退貨的品項與數量，記錄差異並交給品保。商品能否再次銷售由品保決定；本人只依品保結論登錄，不判定商品是否可售。\n\n## 頻率與責任界線\n- 頻率：每週。\n- 本人核對退貨品項與數量、記錄差異並交品保，再依品保結論登錄。\n- 是否可再次銷售由品保決定；本人不作可售判定。\n\n## 未知\n未說明差異以外退貨的處理方式、登錄系統或具體登錄內容。"
+        },
+        "interview_references": [
+          "e140da95-ce16-4366-ba69-f0692e4d17a5"
+        ],
+        "work_situation_references": [],
+        "interview_sequences": [
+          4
+        ]
+      },
+      {
+        "object_id": "c7a475a2-cacf-48fb-b17e-16cb549f9fe4",
+        "revision_id": "ee9874e1-41f7-4c46-ae6d-72180790b755",
+        "body_id": "879f2173-bd1d-40c9-91e2-849904827597",
+        "layer": "work_situation",
+        "content": {
+          "title": "庫存盤點與年度查核支援",
+          "description": "整理本人每季庫存盤點及每年協助年度查核的工作；閱讀時區分日常差異記錄與年度查核準備，並注意本人不具 ERP 調整核准權，也不負責年度查核結論。",
+          "body": "## 工作情境\n本人目前每季盤點庫存，核對帳面與實物，並記錄差異後交給倉庫主管。差異交主管後，只有主管核准才能調整 ERP；本人沒有核准權，也未表示自己執行 ERP 調整。\n\n每年一次協助年度查核，工作包括準備盤點表和單據。本人不負責查核結論。\n\n## 頻率與責任界線\n- 庫存盤點：目前每季一次；核對帳面與實物、記錄差異並交倉庫主管。\n- 年度查核支援：每年一次；準備盤點表和單據。\n- ERP 調整須經倉庫主管核准；本人無核准權。\n- 年度查核結論不由本人負責。\n\n## 未知\n未說明差異的後續處理方式、本人是否參與 ERP 調整操作、年度查核的其他參與者或具體流程。"
+        },
+        "interview_references": [
+          "5ae95262-49f4-4d33-9a70-80df81271c88",
+          "e140da95-ce16-4366-ba69-f0692e4d17a5"
+        ],
+        "work_situation_references": [],
+        "interview_sequences": [
+          2,
+          4
+        ]
+      },
+      {
+        "object_id": "18de5a2c-bd29-490a-a853-47e9219c3fed",
+        "revision_id": "65a75c4a-aa0b-4a9b-be9d-a95416e79024",
+        "body_id": "56c1eb00-62ba-47d7-8b3a-89133e1181d4",
+        "layer": "work_understanding",
+        "content": {
+          "title": "庫存盤點、退貨核對登錄與年度查核準備",
+          "description": "整理本人每季庫存盤點、每週退貨核對及依品保結論登錄、每年年度查核準備；保留不同工作頻率及倉庫主管／品保的決策界線，不把核對、交接或登錄延伸成核准、可售判定或查核結論責任。",
+          "body": "## 工作內容與適用情境\n- **每季庫存盤點：**本人目前每季核對帳面庫存與實物、記錄差異並交給倉庫主管。訪談中先前提到每月一次，之後明確更正為目前每季一次、不是每月；未提供變更日期。\n- **每週客戶退貨核對與登錄：**核對退貨品項與數量，記錄差異並交給品保；本人只依品保結論登錄，不判定商品是否可再次銷售。\n- **每年年度查核支援：**準備盤點表和單據；這是查核準備工作，本人不負責查核結論。\n\n## 責任界線\n- 庫存差異交倉庫主管後，ERP 調整須經主管核准；本人沒有核准權。資料未確認本人是否會在核准後操作 ERP，不應推定本人執行調整。\n- 退貨品項能否再次銷售由品保決定；本人的登錄依據是品保結論，不是本人作可售判定。\n- 盤點與退貨工作都包括核對、差異記錄及交接，但決策對象和後續工作各有其情境；這些工作不表示本人負責差異判定、ERP 核准或可售決策。\n\n## 尚待確認與回查\n- 庫存差異交主管後的處理方式、本人是否參與 ERP 調整操作，以及年度查核的其他參與者和具體流程未說明；回查「庫存盤點與年度查核支援」。\n- 退貨中差異以外的處理方式、登錄系統及具體登錄內容未說明；回查「客戶退貨核對與登錄」。"
+        },
+        "interview_references": [],
+        "work_situation_references": [
+          {
+            "object_id": "7caf173d-1b82-42d5-85ee-967fbf2385a9",
+            "revision_id": "5c0df6b7-ff76-477b-8a0d-a28687ce6264"
+          },
+          {
+            "object_id": "c7a475a2-cacf-48fb-b17e-16cb549f9fe4",
+            "revision_id": "ee9874e1-41f7-4c46-ae6d-72180790b755"
+          }
+        ],
+        "interview_sequences": []
+      }
+    ]
+  },
+  {
+    "arm": "compacted",
+    "batch": 1,
+    "snapshot": {
+      "job_file_id": "d2ede038-b7c2-477c-9a19-9370882f0a70",
+      "snapshot_id": "93a94653-281d-48a9-91e4-947fea500a69",
+      "position_id": "48255189-64a5-415c-854e-9edf14835163",
+      "through_source_id": "18901693-8acf-45cb-bd44-7e96861cdf33",
+      "covered_through_sequence": 2
+    },
+    "content_and_revision_unchanged": true,
+    "fixed_chain_coherent": true,
+    "sources_within_frontier": true,
+    "objects": [
+      {
+        "object_id": "89558d26-4cd7-4746-8f46-8ed4bfa7a3f6",
+        "revision_id": "8875d898-83b7-4652-b324-408e4f219df5",
+        "body_id": "f7de2a8e-697e-4b8d-ab0f-401afcacb8b9",
+        "layer": "work_situation",
+        "content": {
+          "title": "每月庫存盤點與差異處理",
+          "description": "記錄本人每月盤點庫存、核對帳面與實物並將差異交由倉庫主管處理的工作；亦標明 ERP 調整的核准界線。",
+          "body": "## 情境與頻率\n本人每月盤點庫存，核對帳面與實物。\n\n## 本人行動與交接\n發現差異時，記錄差異並交給倉庫主管。主管核准後才能調整 ERP；本人沒有核准權。\n\n## 責任界線\n本人負責盤點、核對及記錄並將差異交給倉庫主管，不負責核准 ERP 調整。原話未說明差異的具體處理流程、由誰執行 ERP 調整，或盤點涵蓋範圍。"
+        },
+        "interview_references": [
+          "18901693-8acf-45cb-bd44-7e96861cdf33"
+        ],
+        "work_situation_references": [],
+        "interview_sequences": [
+          2
+        ]
+      },
+      {
+        "object_id": "97498ae8-bd66-4a04-b1f0-935055a4e268",
+        "revision_id": "6d72a8b6-5f34-4ed7-bacb-b5e47cd22257",
+        "body_id": "37b916aa-d2a6-4d7a-9c14-0236b2690be7",
+        "layer": "work_situation",
+        "content": {
+          "title": "年度查核盤點資料準備",
+          "description": "記錄本人每年一次協助年度查核時準備盤點表和單據的工作，以及不負責查核結論的責任界線。",
+          "body": "## 情境與頻率\n本人每年一次協助年度查核。\n\n## 本人行動與責任界線\n本人準備盤點表和單據；不負責查核結論。\n\n## 未知\n原話未說明查核的具體範圍、其他參與者、本人是否另有查核工作，或查核結論由誰作成。"
+        },
+        "interview_references": [
+          "18901693-8acf-45cb-bd44-7e96861cdf33"
+        ],
+        "work_situation_references": [],
+        "interview_sequences": [
+          2
+        ]
+      },
+      {
+        "object_id": "58a77870-6ba7-43f5-8da2-04dc520e11f1",
+        "revision_id": "b6584905-ea4c-40ac-afc3-e4b16a3ff1fc",
+        "body_id": "1ede103c-8360-499b-986f-54471d81470e",
+        "layer": "work_understanding",
+        "content": {
+          "title": "庫存盤點、差異回報與年度查核資料準備",
+          "description": "整合本人每月盤點與差異回報，以及每年協助查核準備盤點資料的工作。閱讀時請區分例行盤點的核對、記錄與交接責任，和年度查核中的資料準備角色；不將本人寫成 ERP 核准者或查核結論負責人。",
+          "body": "## 工作範圍\n本人有兩種有明確週期的庫存相關工作：每月盤點庫存並處理盤點差異的記錄與交接；每年一次協助年度查核，準備相關盤點資料。兩者都涉及盤點資訊，但目前資料未確認年度查核準備與每月盤點的資料或流程如何銜接。\n\n## 每月盤點與差異交接\n本人每月盤點庫存，核對帳面與實物。發現差異時，記錄差異並交給倉庫主管。ERP 調整須經主管核准，本人沒有核准權；因此本人目前可確認的責任是盤點、核對、記錄及交接，不包括核准 ERP 調整。現有資料未說明差異的後續處理流程、由誰實際執行 ERP 調整，或盤點涵蓋範圍。\n\n## 年度查核資料準備\n本人每年一次協助年度查核，準備盤點表和單據；本人不負責查核結論。這項描述只確認其資料準備及責任界線，未確認本人是否另有查核工作、查核的具體範圍、其他參與者，或由誰作成查核結論。\n\n## 理解界線\n上述工作可支持將本人理解為承擔庫存實物與帳面核對、差異記錄及向主管交接，並在年度查核時準備盤點文件的人；不能據此推定本人有 ERP 調整核准權、負責差異最終處理或查核判斷。若需釐清盤點範圍、差異後續處理及年度查核中的其他職責，應回查「每月庫存盤點與差異處理」及「年度查核盤點資料準備」。"
+        },
+        "interview_references": [],
+        "work_situation_references": [
+          {
+            "object_id": "89558d26-4cd7-4746-8f46-8ed4bfa7a3f6",
+            "revision_id": "8875d898-83b7-4652-b324-408e4f219df5"
+          },
+          {
+            "object_id": "97498ae8-bd66-4a04-b1f0-935055a4e268",
+            "revision_id": "6d72a8b6-5f34-4ed7-bacb-b5e47cd22257"
+          }
+        ],
+        "interview_sequences": []
+      }
+    ]
+  },
+  {
+    "arm": "compacted",
+    "batch": 2,
+    "snapshot": {
+      "job_file_id": "d2ede038-b7c2-477c-9a19-9370882f0a70",
+      "snapshot_id": "8294b1b0-e2a4-4f85-9cde-98f8a88009a0",
+      "position_id": "700079b9-7f89-4851-b6b9-e1d05b608e63",
+      "through_source_id": "91890ced-b8f1-438b-b94c-e60ae52e83fa",
+      "covered_through_sequence": 4
+    },
+    "content_and_revision_unchanged": true,
+    "fixed_chain_coherent": true,
+    "sources_within_frontier": true,
+    "objects": [
+      {
+        "object_id": "89558d26-4cd7-4746-8f46-8ed4bfa7a3f6",
+        "revision_id": "58ad8ca5-f81d-4360-81b7-9447b991894e",
+        "body_id": "04cda25d-e5e4-448f-b12d-01f2059f02ce",
+        "layer": "work_situation",
+        "content": {
+          "title": "每季庫存盤點與差異處理",
+          "description": "記錄本人目前每季盤點庫存、核對帳面與實物並將差異交由倉庫主管處理的工作；亦標明 ERP 調整的核准界線及頻率更正。",
+          "body": "## 情境與頻率\n本人目前每季盤點庫存，核對帳面與實物。員工更正先前所述每月頻率：目前改為每季一次；更改生效日期未說明。\n\n## 本人行動與交接\n發現差異時，記錄差異並交給倉庫主管。主管核准後才能調整 ERP；本人沒有核准權。\n\n## 責任界線\n本人負責盤點、核對及記錄並將差異交給倉庫主管，不負責核准 ERP 調整。原話未說明差異的具體處理流程、由誰執行 ERP 調整，或盤點涵蓋範圍。"
+        },
+        "interview_references": [
+          "18901693-8acf-45cb-bd44-7e96861cdf33",
+          "91890ced-b8f1-438b-b94c-e60ae52e83fa"
+        ],
+        "work_situation_references": [],
+        "interview_sequences": [
+          2,
+          4
+        ]
+      },
+      {
+        "object_id": "97498ae8-bd66-4a04-b1f0-935055a4e268",
+        "revision_id": "6d72a8b6-5f34-4ed7-bacb-b5e47cd22257",
+        "body_id": "37b916aa-d2a6-4d7a-9c14-0236b2690be7",
+        "layer": "work_situation",
+        "content": {
+          "title": "年度查核盤點資料準備",
+          "description": "記錄本人每年一次協助年度查核時準備盤點表和單據的工作，以及不負責查核結論的責任界線。",
+          "body": "## 情境與頻率\n本人每年一次協助年度查核。\n\n## 本人行動與責任界線\n本人準備盤點表和單據；不負責查核結論。\n\n## 未知\n原話未說明查核的具體範圍、其他參與者、本人是否另有查核工作，或查核結論由誰作成。"
+        },
+        "interview_references": [
+          "18901693-8acf-45cb-bd44-7e96861cdf33"
+        ],
+        "work_situation_references": [],
+        "interview_sequences": [
+          2
+        ]
+      },
+      {
+        "object_id": "ce32503e-ade0-4923-993b-75e10e30c69c",
+        "revision_id": "ad806c40-2e74-4e5e-b678-e52020eb604d",
+        "body_id": "230fb3d6-3047-41ca-ac10-9fae6e9e18f7",
+        "layer": "work_situation",
+        "content": {
+          "title": "每週客戶退貨核對與品保交接",
+          "description": "記錄本人每週核對客戶退貨品項與數量、記錄差異交品保，並依品保結論登錄；商品是否可再次銷售由品保決定，本人不作可售判定。",
+          "body": "## 情境與頻率\n本人每週核對客戶退貨的品項與數量。\n\n## 本人行動與交接\n核對有差異時，記錄差異並交給品保。商品能否再次銷售由品保決定；本人只依品保結論登錄，不判定商品可售。\n\n## 責任界線與未知\n本人負責核對、記錄差異及依品保結論登錄，不負責判定商品可售。原話未說明登錄系統、交接後流程或沒有差異時的處理方式。"
+        },
+        "interview_references": [
+          "91890ced-b8f1-438b-b94c-e60ae52e83fa"
+        ],
+        "work_situation_references": [],
+        "interview_sequences": [
+          4
+        ]
+      },
+      {
+        "object_id": "58a77870-6ba7-43f5-8da2-04dc520e11f1",
+        "revision_id": "72892980-926a-4f9a-84d8-c76245a7302e",
+        "body_id": "94304593-591f-4645-92b9-38cb689650af",
+        "layer": "work_understanding",
+        "content": {
+          "title": "庫存盤點、退貨核對與年度查核資料準備",
+          "description": "整合本人目前每季庫存盤點與差異交接、每週退貨核對及依品保結論登錄，以及每年協助查核準備盤點資料。區分本人核對、記錄、交接與登錄的工作，及主管核准 ERP、品保判定可售和查核結論的責任界線；盤點頻率更正的生效時間未知。",
+          "body": "## 工作範圍\n目前資料確認三項有週期的工作：每季盤點庫存並核對帳面與實物；每週核對客戶退貨品項與數量；每年一次協助年度查核並準備盤點表和單據。這些工作都涉及核對或資料，但對象、交接對象及決策責任不同，不能視為同一流程。資料未說明年度查核準備與例行庫存盤點如何銜接。\n\n## 目前每季庫存盤點與差異交接\n本人目前每季盤點庫存，核對帳面與實物；發現差異時記錄並交給倉庫主管。員工已更正早先所述的每月頻率，說目前改為每季一次；更改的生效日期未說明，因此可確認的是目前每季，不應將每月仍寫成現行頻率。ERP 調整須由主管核准，本人沒有核准權。本人可確認負責盤點、核對、差異記錄及交接；差異的後續處理、實際由誰執行 ERP 調整及盤點涵蓋範圍仍未知。\n\n## 每週客戶退貨核對與品保交接\n本人每週核對客戶退貨的品項與數量；有差異時記錄並交給品保。商品能否再次銷售由品保決定，本人依品保結論登錄，不作可售判定。現有資料未說明登錄系統、品保交接後流程、登錄內容細節或沒有差異時如何處理。\n\n## 年度查核資料準備\n本人每年一次協助年度查核，準備盤點表和單據，不負責查核結論。這確認的是協助及資料準備角色，不足以判定本人沒有其他查核工作；查核具體範圍、其他參與者及由誰作成結論均未說明。訪談表示年度查核工作不變。\n\n## 理解界線與回查\n目前可成立的工作認識是：本人依不同週期核對庫存或退貨資料、記錄並按情況交接，另負責年度查核所需盤點表與單據準備；本人不是 ERP 調整核准者，也不是商品可售判定者或查核結論負責人。不可據此推定本人負責差異最終處理、執行 ERP 調整或查核判斷。若要釐清庫存盤點範圍及差異後續、退貨登錄與品保交接流程，或年度查核中的其他職責，分別回查「每季庫存盤點與差異處理」、「每週客戶退貨核對與品保交接」及「年度查核盤點資料準備」。"
+        },
+        "interview_references": [],
+        "work_situation_references": [
+          {
+            "object_id": "89558d26-4cd7-4746-8f46-8ed4bfa7a3f6",
+            "revision_id": "58ad8ca5-f81d-4360-81b7-9447b991894e"
+          },
+          {
+            "object_id": "97498ae8-bd66-4a04-b1f0-935055a4e268",
+            "revision_id": "6d72a8b6-5f34-4ed7-bacb-b5e47cd22257"
+          },
+          {
+            "object_id": "ce32503e-ade0-4923-993b-75e10e30c69c",
+            "revision_id": "ad806c40-2e74-4e5e-b678-e52020eb604d"
+          }
+        ],
+        "interview_sequences": []
+      }
+    ]
+  }
+]

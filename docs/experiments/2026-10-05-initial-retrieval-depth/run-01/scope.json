@@ -1,0 +1,20 @@
+{
+  "cases": 8,
+  "input_variants": 2,
+  "depths": [
+    20,
+    40,
+    80
+  ],
+  "groups": 48,
+  "judgment_pool_pairs": 158,
+  "known_primary_pairs": 12,
+  "new_provider_calls": 0,
+  "new_embedding_inferences": 0,
+  "new_db_queries": 0,
+  "new_rerank_inferences": 0,
+  "new_external_cost_usd": 0,
+  "fresh_latency_measured": false,
+  "full_corpus_qrels_available": false,
+  "scope": "known assessed-pool and facet retention in cached exact initial rankings"
+}

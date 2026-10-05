@@ -1,0 +1,13 @@
+{
+  "queries": 63,
+  "complete_parent_rankings": 126,
+  "point_cosines_independently_checked": 558999,
+  "max_cosine_error": 1.3322676295501878e-15,
+  "control_rankings_unchanged": 83,
+  "prior_depth_groups_unchanged": 48,
+  "candidate_groups": 96,
+  "target_path_rows": 48,
+  "old_sealed_files_unchanged": 1318,
+  "new_provider_calls": 0,
+  "fresh_service_latency_measured": false
+}

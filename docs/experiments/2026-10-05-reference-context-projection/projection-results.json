@@ -1,0 +1,175 @@
+{
+  "scope": "offline_tool_payload_character_measurement",
+  "source": "docs/plans/evidence/2026-10-05-occupation-reference-api/live-search-result.json",
+  "source_sha256": "bc3b8be15f6e0325413c0c1459a574ea28eaedbc7de8b7f9bb2adf44a0224ea3",
+  "probe_sha256": "e7af6e503067c11e9837dc21e45b7db5fab287c65968cad938282a0515a58475",
+  "case_id": "F01",
+  "serialization": "json.ensure_ascii_false.compact_separators",
+  "baseline_search_result": {
+    "characters": 8779,
+    "utf8_bytes": 10669
+  },
+  "candidate_projection": {
+    "view": "candidate_overviews",
+    "references": [
+      {
+        "reference_id": "c4067e6a-5ea4-58fe-ad15-d679b1857ea8",
+        "title": "網站系統設計人員",
+        "overview": "網站系統之設計、開發及測試等相關工作。",
+        "work_area_names": [
+          "系統需求分析與規劃",
+          "系統建置規劃",
+          "進行應用程式開發",
+          "佈署應用程式到正式環境",
+          "提供客戶IT支援服務"
+        ]
+      },
+      {
+        "reference_id": "2a70bee4-61ef-54fe-ae2a-196ebce4dc39",
+        "title": "網路管理助理",
+        "overview": "協助維護及管理組織網路系統。",
+        "work_area_names": [
+          "作業系統(OS)【註1】的安裝、配置",
+          "解決OS與軟、硬體問題"
+        ]
+      },
+      {
+        "reference_id": "0fc53af7-f0b3-5534-b04e-44f1bb7133df",
+        "title": "供應鏈管理人員",
+        "overview": "開發並管理從供應商到最終客戶的所有流程，包括協調生產計畫、物流運輸、庫存控制和品質管理，以確保達到產品準時交付、成本最適化和客\n戶滿意度最大化。",
+        "work_area_names": [
+          "管理供應商",
+          "管理需求端客戶",
+          "管理生產計畫",
+          "庫存與出貨管理"
+        ]
+      },
+      {
+        "reference_id": "24590524-84a9-5459-ad8a-197eb7017621",
+        "title": "系統維護人員",
+        "overview": "從事系統軟硬體安裝及維護管理之工作。",
+        "work_area_names": [
+          "系統硬體設備與元件配置與服務",
+          "安裝升級與管理作業系統與應用程式",
+          "安裝、配置與測試路由器、防火牆",
+          "協助完成資料庫備份與復原"
+        ]
+      },
+      {
+        "reference_id": "eb7f0068-3702-5188-925f-d625576ce1e2",
+        "title": "醫藥品業務人員",
+        "overview": "從事各類藥品之推廣銷售。",
+        "work_area_names": [
+          "蒐集藥品市場資訊",
+          "經營客戶關係",
+          "進行醫藥品推廣",
+          "協助處理客戶訂單及產品問題"
+        ]
+      }
+    ]
+  },
+  "candidate_projection_size": {
+    "characters": 966,
+    "utf8_bytes": 1662
+  },
+  "catalog_sizes": [
+    {
+      "reference_id": "c4067e6a-5ea4-58fe-ad15-d679b1857ea8",
+      "title": "網站系統設計人員",
+      "source_sha256": "6a6a927621211aa1ea6cac97f745d39ffc54f1673c024eba1761cac7bf1910a2",
+      "unit_count": 5,
+      "task_group_count": 19,
+      "characters": 2375,
+      "utf8_bytes": 2853
+    },
+    {
+      "reference_id": "2a70bee4-61ef-54fe-ae2a-196ebce4dc39",
+      "title": "網路管理助理",
+      "source_sha256": "f4d33c426bd7885e0d8393af6a7badbd305dcbbdde907ff9d0db2872dc6f34de",
+      "unit_count": 2,
+      "task_group_count": 7,
+      "characters": 1124,
+      "utf8_bytes": 1368
+    },
+    {
+      "reference_id": "0fc53af7-f0b3-5534-b04e-44f1bb7133df",
+      "title": "供應鏈管理人員",
+      "source_sha256": "63bc42546689c25da33befa315b4952d8ad258bdb38f7ce5c56ce93e381e6503",
+      "unit_count": 4,
+      "task_group_count": 14,
+      "characters": 1884,
+      "utf8_bytes": 2312
+    },
+    {
+      "reference_id": "24590524-84a9-5459-ad8a-197eb7017621",
+      "title": "系統維護人員",
+      "source_sha256": "e1d55475a1807b05c4b087e0f0983812d976b543182ff5ba9af813dc2617ba89",
+      "unit_count": 4,
+      "task_group_count": 13,
+      "characters": 1800,
+      "utf8_bytes": 2230
+    },
+    {
+      "reference_id": "eb7f0068-3702-5188-925f-d625576ce1e2",
+      "title": "醫藥品業務人員",
+      "source_sha256": "d77878d590bbdafecbc496a9f1a245f484eab0236db77b8ec6e9758d98262162",
+      "unit_count": 4,
+      "task_group_count": 11,
+      "characters": 1575,
+      "utf8_bytes": 1885
+    }
+  ],
+  "scenarios": [
+    {
+      "catalog_selection": "ranked_prefix_for_size_sensitivity_only",
+      "catalog_count": 1,
+      "reference_ids": [
+        "c4067e6a-5ea4-58fe-ad15-d679b1857ea8"
+      ],
+      "tool_result_count": 2,
+      "aggregate_size": {
+        "characters": 3341,
+        "utf8_bytes": 4515
+      },
+      "character_reduction_percent": 61.94
+    },
+    {
+      "catalog_selection": "ranked_prefix_for_size_sensitivity_only",
+      "catalog_count": 2,
+      "reference_ids": [
+        "c4067e6a-5ea4-58fe-ad15-d679b1857ea8",
+        "2a70bee4-61ef-54fe-ae2a-196ebce4dc39"
+      ],
+      "tool_result_count": 3,
+      "aggregate_size": {
+        "characters": 4465,
+        "utf8_bytes": 5883
+      },
+      "character_reduction_percent": 49.14
+    },
+    {
+      "catalog_selection": "ranked_prefix_for_size_sensitivity_only",
+      "catalog_count": 5,
+      "reference_ids": [
+        "c4067e6a-5ea4-58fe-ad15-d679b1857ea8",
+        "2a70bee4-61ef-54fe-ae2a-196ebce4dc39",
+        "0fc53af7-f0b3-5534-b04e-44f1bb7133df",
+        "24590524-84a9-5459-ad8a-197eb7017621",
+        "eb7f0068-3702-5188-925f-d625576ce1e2"
+      ],
+      "tool_result_count": 6,
+      "aggregate_size": {
+        "characters": 9724,
+        "utf8_bytes": 12310
+      },
+      "character_reduction_percent": -10.76
+    }
+  ],
+  "limits": [
+    "One previously observed F01 result; no new retrieval or holdout.",
+    "Ranked prefixes are size sensitivity scenarios, not model selections.",
+    "No token counts, time, cost, selection quality or JD quality measured.",
+    "Aggregate size excludes prompts, call arguments, state and task details.",
+    "Candidate projection is a proposal, not the current tool contract."
+  ]
+}

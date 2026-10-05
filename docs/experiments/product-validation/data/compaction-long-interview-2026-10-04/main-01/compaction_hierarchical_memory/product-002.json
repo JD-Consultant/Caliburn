@@ -1,0 +1,354 @@
+{
+  "profile": {
+    "revision_id": "bcfbb73b-a25b-4f50-99e3-77ad7281ef44",
+    "profile": {
+      "job_title": "庫存與物流行政專員",
+      "organization_unit": "營運部",
+      "reports_to": "倉儲主管",
+      "purpose": "處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥及庫存報表，支援營運中的庫存資訊維護與物流行政作業；採購決策與客戶交涉不屬本職務責任。"
+    }
+  },
+  "work": {
+    "revision_id": "bcfbb73b-a25b-4f50-99e3-77ad7281ef44",
+    "areas": [
+      {
+        "area_id": "86f5e544-788a-464c-8136-8411148d12b9",
+        "content_revision_id": "a40649cb-cf53-44ce-9048-d326c0295b85",
+        "title": "到貨與庫存資料管理",
+        "scope_text": "負責進貨單據與實際到貨資料核對、差異記錄及符合資料後的 ERP 登錄。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "98eb2f87-bbbd-4f29-83be-d58f30da0f60",
+        "content_revision_id": "fe70b953-c953-4e58-8957-0e34caaba2c6",
+        "area_id": "86f5e544-788a-464c-8136-8411148d12b9",
+        "title": "核對並登錄到貨資料",
+        "description": "每日處理約 15–20 張進貨單；比對採購單、送貨單與實際到貨的品號、批號及數量。由倉庫同事清點實物，本人核對單據並記錄差異；資料符合後登錄 ERP。",
+        "details": [
+          {
+            "detail_id": "5450522d-d6c5-4bd4-a775-a975e103dd4b",
+            "kind": "outcome",
+            "text": "符合實際到貨並完成核對的進貨資料登錄於 ERP。"
+          },
+          {
+            "detail_id": "0ebdb1c1-1c74-4007-8c52-ec7867d7a275",
+            "kind": "outcome",
+            "text": "到貨資料差異有記錄，供後續處理或查核。"
+          },
+          {
+            "detail_id": "fb62b481-2db8-4ecc-a4f4-ce48419373f0",
+            "kind": "requirement",
+            "text": "不得直接以供應商送貨單上的數量作為實際收貨數；須以實際到貨清點資料進行核對，資料符合後才登錄 ERP。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "evidence": [
+    {
+      "entry": {
+        "citation_id": "3e0dd516-8715-4850-b4c5-7bfa0ee8d05b",
+        "target_label": "職務名稱",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "job_title",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "223039f8-bc03-4272-b8a0-b90af6154b70",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "f720f16e-c9d8-4fd1-a63b-83ca22b2b613",
+        "target_label": "所屬單位",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "organization_unit",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "223039f8-bc03-4272-b8a0-b90af6154b70",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "4f6b281e-b28d-4e55-8e7f-3aff38dea5f9",
+        "target_label": "直屬主管",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "reports_to",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "223039f8-bc03-4272-b8a0-b90af6154b70",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "c588d0a0-e815-49b1-8a35-d31256b8bb27",
+        "target_label": "職務目的",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "profile_field",
+          "item_id": null,
+          "field": "purpose",
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "223039f8-bc03-4272-b8a0-b90af6154b70",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "7bd807fe-c3e5-41f8-9334-57c787d9b976",
+        "target_label": "職責：到貨與庫存資料管理",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "area",
+          "item_id": "86f5e544-788a-464c-8136-8411148d12b9",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "223039f8-bc03-4272-b8a0-b90af6154b70",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "8164a7c0-8db2-4fce-8e6f-58c044b175a0",
+        "target_label": "職責：到貨與庫存資料管理",
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "area",
+          "item_id": "86f5e544-788a-464c-8136-8411148d12b9",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "7426fdca-628f-4aa4-9c1e-7555b3b44193",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "05c37e0b-c388-4eb7-935f-aee8c5f881f4",
+        "target_label": "任務：核對並登錄到貨資料",
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "98eb2f87-bbbd-4f29-83be-d58f30da0f60",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "223039f8-bc03-4272-b8a0-b90af6154b70",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "a930a1c8-34e4-4a7c-8044-29e0b9a0dda1",
+        "target_label": "任務：核對並登錄到貨資料",
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "task",
+          "item_id": "98eb2f87-bbbd-4f29-83be-d58f30da0f60",
+          "field": null,
+          "task_id": null
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "7426fdca-628f-4aa4-9c1e-7555b3b44193",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "bb82a6fd-2baf-4eb6-892b-8524ac122fc8",
+        "target_label": "任務：核對並登錄到貨資料 · 成果：符合實際到貨並完成核對的進貨資料登錄於 ERP。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "5450522d-d6c5-4bd4-a775-a975e103dd4b",
+          "field": null,
+          "task_id": "98eb2f87-bbbd-4f29-83be-d58f30da0f60"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "7426fdca-628f-4aa4-9c1e-7555b3b44193",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "be46f54c-51d4-4646-8319-81217addaada",
+        "target_label": "任務：核對並登錄到貨資料 · 成果：到貨資料差異有記錄，供後續處理或查核。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "0ebdb1c1-1c74-4007-8c52-ec7867d7a275",
+          "field": null,
+          "task_id": "98eb2f87-bbbd-4f29-83be-d58f30da0f60"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "7426fdca-628f-4aa4-9c1e-7555b3b44193",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      }
+    },
+    {
+      "entry": {
+        "citation_id": "f484bb61-9817-4898-9dc2-aa9207535c43",
+        "target_label": "任務：核對並登錄到貨資料 · 要求：不得直接以供應商送貨單上的數量作為實際收貨數；須以實際到貨清點資料進行核對，資料符合後才登錄 ERP。",
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "target": {
+          "kind": "detail",
+          "item_id": "fb62b481-2db8-4ecc-a4f4-ce48419373f0",
+          "field": null,
+          "task_id": "98eb2f87-bbbd-4f29-83be-d58f30da0f60"
+        },
+        "jd_changed": false,
+        "source_changed": false
+      },
+      "content": {
+        "source_id": "7426fdca-628f-4aa4-9c1e-7555b3b44193",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      }
+    }
+  ],
+  "interviews": [
+    {
+      "message": {
+        "source_id": "65a7aca0-06ff-4a49-a26e-eb50d33df2ee",
+        "interview_sequence": 1,
+        "speaker": "app",
+        "interview_text": "這裡會透過訪談，逐步理解您的實際工作並整理職務說明書。您不需要先學會撰寫，也不必一次說完；不確定的地方可以直接說明。\n\n請先說說您目前主要負責哪些工作？可以用自己的說法，從平常大家會找您處理的事情開始。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "223039f8-bc03-4272-b8a0-b90af6154b70",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是庫存與物流行政專員，隸屬營運部，向倉儲主管報告。主要處理到貨登錄、庫存差異、退貨、缺貨追蹤、店間調撥和庫存報表。採購決定訂貨，客服處理客人，我不負責採購議價或對外承諾交期。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "0bac4ff7-285d-4871-b717-527075cf7ce4",
+        "interview_sequence": 3,
+        "speaker": "consultant",
+        "interview_text": "已先整理職務名稱、所屬部門、匯報對象與主要工作範圍，並保留您說明的責任界線：您不負責採購議價，也不向客人承諾交期。\n\n先從到貨登錄了解：貨品到倉後，您通常會核對哪些資料、如何登錄？如果實際到貨與資料不符，您會怎麼處理或交接？"
+      },
+      "execution_id": "a032719a-82c5-49ab-a867-ee67f56552be"
+    },
+    {
+      "message": {
+        "source_id": "7426fdca-628f-4aa4-9c1e-7555b3b44193",
+        "interview_sequence": 4,
+        "speaker": "employee",
+        "interview_text": "每天大約有15–20張進貨單。我先比對採購單、送貨單與實際到貨的品號、批號和數量，倉庫同事清點實物，我核對單據、記錄差異，資料符合後登錄ERP；不能把供應商送貨單的數量直接當實收數。"
+      },
+      "execution_id": null
+    },
+    {
+      "message": {
+        "source_id": "8589501f-5dc2-49bb-a542-1e587693283a",
+        "interview_sequence": 5,
+        "speaker": "consultant",
+        "interview_text": "已把到貨登錄整理為一項工作：每天約處理 15–20 張進貨單，由倉庫同事清點實物，您負責核對採購單、送貨單與實際到貨的品號、批號及數量、記錄差異，並在資料符合後登錄 ERP；也特別保留「不可直接把送貨單數量當作實收數」這項要求。\n\n若核對時發現數量或品項不符，您通常會把差異記在哪裡、通知誰？在差異釐清前，您會先暫停登錄，還是有其他處理方式？"
+      },
+      "execution_id": "e4512c12-6f87-46c1-bc77-c94cf855cc99"
+    }
+  ]
+}

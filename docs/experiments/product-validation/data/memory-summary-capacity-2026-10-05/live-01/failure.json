@@ -1,0 +1,8 @@
+{
+  "type": "ValueError",
+  "reason": "response_incomplete",
+  "current": {
+    "phase": "flat_capture",
+    "batch": 4
+  }
+}

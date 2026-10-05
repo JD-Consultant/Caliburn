@@ -1,0 +1,36 @@
+{
+  "created_utc": 1791091965.6260622,
+  "before_new_scores": true,
+  "sources": {
+    "protocol.md": "b80e71ede15edd9979ec7fcda0a158ec2a7cf0a7a4be272d71cfbb335b7f78fb",
+    "input-manifest.json": "2cf607741319518ed04a79be69e4ad6f12fc7549b90bcf27ae509fcc52c870be",
+    "input-amendment-01.json": "32eb6628a03b9d0f582408a123ddb9dae2c7bc2adf8088fb82ac5fa8433a1467",
+    "cases.json": "1513968e29519ac60152225134a5df037c03ba7671a1fbcc9791fcd6902dd43e",
+    "cases-observed.json": "026b1759ee909e25ec28581a05667b028ed6e94a9b280e12137b5e8236bd960b",
+    "inputs.json": "5427335a6f1fadf96bfbc8b9813b6d9b27940079c227c7d13d2e5e3b3b70dd3c",
+    "inputs.py": "2ba7253992cc88bcffdea0b37ec1de65238afd4d55d97dd4da1af6579c903792",
+    "support.py": "a512c8de93e0c49e4070085d0dce36fb9efcdb0d3965117ad841c637cb839241",
+    "prepare.py": "4057f3b1676209d5c30fd32ac8ec04d590b0863f22a2b7a537d27b31df18b0d5",
+    "gpu_worker.py": "be1f732ed77dc77266fd7c24524a7a37f98a6f21b909f1ad5b8dc83974e630c8",
+    "analyze.py": "7d97eeecef22aaee9c1fd62d4be84d0048426618189ae06a24fbec40ba6bdcff",
+    "benchmark.py": "e03308e7782322556720f9e957f9fa8aabe997af8fc2fe441d2dd3707b98cd9b",
+    "prepared.json": "f43fb5e45d8db4ddef8b88e52fdb7b08dded429118a28a143acaaa8d2ac85a53",
+    "jobs.json": "23a30ef002517ca8703f5e9ddf63f24c399197f6ddde25ec8d1afc36acf5ca87",
+    "benchmark-plan.json": "8db21076e0e489628f7bf4bc47e44d55883ec392556df8877d5f472a64e51c75",
+    "all-passage-cache.jsonl": "170a181120f443837f091caed713b201cdeb62486b4b25c227ed2748bdfa8470",
+    "new-passage-cache.jsonl": "9af97c69a55993a2d3c0d6d0ba88c6c8f3e280b2bc7d885446e0500c9b18a32f",
+    "database-checks.json": "07db1e84cd8ec6e5260d315dbfdafc4254d700a9e4ed6d8107306fdb7f8c8333",
+    "embedding-runtime.json": "655b387b1a96e34731c8a9b78d9d30affaa5b1e17809a1db26c1cbc3b5c1807a"
+  },
+  "model_sha256": "d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286",
+  "prior_sources": {
+    "common.py": "b304cd1859564b3b33b3e9abc5867e304b621a458a601681cd587fdc6c8e7bb8",
+    "selection.py": "d5962c3ea3e2a88ef99d44a664779cdefdb2d552c21b1b80ec0540b5bd64ba36",
+    "audit.py": "b8ec2ae95bc58a05f4d55d23af2632552dc30234129145f74487c338c38346d3",
+    "artifact-hashes.json": "f15d5d0829471ae565cca3314225f0a1a1032f8d691978d8f4f511cea044adb3",
+    "borrowed-pairs.jsonl": "77704d78f99455ccb093288e67b30910cef21bcef661ba702726e164ba09a1e4",
+    "supplemental-development-pairs.jsonl": "0bd91b4a2b4fa4d7124730a540b6437a8759d5225802b11f6ce44800d4ae77e0",
+    "supplemental-holdout-pairs.jsonl": "731170d3572ed075757ab18cfe717b80b9cab3970690ad8342ba080a3cd47cf4"
+  },
+  "document_cache_sha256": "7bebef816eb7688b613031609b2470999e7a60e2783fb2d22371730cb78c47ed"
+}

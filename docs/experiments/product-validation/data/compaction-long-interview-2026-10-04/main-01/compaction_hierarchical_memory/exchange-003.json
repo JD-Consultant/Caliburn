@@ -1,0 +1,16 @@
+{
+  "event_id": "e003",
+  "execution_id": "bd6c9e03-63c2-4d17-81af-905fd7458c5f",
+  "employee_input": {
+    "source_id": "1b0966b8-c7d4-4749-81ad-8cbd9b4c4fd9",
+    "interview_sequence": 6,
+    "speaker": "employee",
+    "interview_text": "商品外箱破損或短少時，我拍照、記下實收件數及原單號，通知採購，再把未確認的部分留在待處理清單。採購決定是否退換貨或補貨；我不能自行同意接受替代品，也不能改採購單上的價格。"
+  },
+  "consultant_reply": {
+    "source_id": "5af31087-08c3-4ff9-84d2-a48f6bbcf7b9",
+    "interview_sequence": 7,
+    "speaker": "consultant",
+    "interview_text": "已補充到貨異常的處理方式：商品外箱破損或短少時，您會拍照、記錄實收件數與原單號、通知採購，並將未確認部分列入待處理清單。也寫明退換貨或補貨由採購決定，您不自行接受替代品或修改採購單價格。\n\n接著想了解您提到的庫存差異：通常是怎麼發現差異的？發現後您會如何查核或處理？"
+  }
+}

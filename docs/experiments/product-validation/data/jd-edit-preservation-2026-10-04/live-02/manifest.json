@@ -1,0 +1,196 @@
+{
+  "prepared_at": "2026-10-04T16:00:16.479230+00:00",
+  "kind": "paired-jd-edit-preservation-not-product-writes",
+  "model": "gpt-6-luna",
+  "effort": "high",
+  "sdk_version": "3.20.0",
+  "max_output_tokens": 8192,
+  "max_estimated_usd": "0.0499",
+  "max_seconds": 661,
+  "authorization": "User approved US$0.05/15 minutes for this batch, within cumulative US$2",
+  "prior_occupied_usd": "1.105018450",
+  "cumulative_limit_usd": "2.00",
+  "schedule": [
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 1,
+      "case_id": "responsibility_correction",
+      "cell_id": "responsibility_correction-baseline-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 1,
+      "case_id": "responsibility_correction",
+      "cell_id": "responsibility_correction-candidate-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 1,
+      "case_id": "deduplication",
+      "cell_id": "deduplication-baseline-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 1,
+      "case_id": "deduplication",
+      "cell_id": "deduplication-candidate-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 1,
+      "case_id": "superseded_deadline",
+      "cell_id": "superseded_deadline-baseline-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 1,
+      "case_id": "superseded_deadline",
+      "cell_id": "superseded_deadline-candidate-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 1,
+      "case_id": "numeric_boundaries",
+      "cell_id": "numeric_boundaries-baseline-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 1,
+      "case_id": "numeric_boundaries",
+      "cell_id": "numeric_boundaries-candidate-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 1,
+      "case_id": "already_correct",
+      "cell_id": "already_correct-baseline-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 1,
+      "case_id": "already_correct",
+      "cell_id": "already_correct-candidate-1"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 2,
+      "case_id": "already_correct",
+      "cell_id": "already_correct-candidate-2"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 2,
+      "case_id": "already_correct",
+      "cell_id": "already_correct-baseline-2"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 2,
+      "case_id": "numeric_boundaries",
+      "cell_id": "numeric_boundaries-candidate-2"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 2,
+      "case_id": "numeric_boundaries",
+      "cell_id": "numeric_boundaries-baseline-2"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 2,
+      "case_id": "superseded_deadline",
+      "cell_id": "superseded_deadline-candidate-2"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 2,
+      "case_id": "superseded_deadline",
+      "cell_id": "superseded_deadline-baseline-2"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 2,
+      "case_id": "deduplication",
+      "cell_id": "deduplication-candidate-2"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 2,
+      "case_id": "deduplication",
+      "cell_id": "deduplication-baseline-2"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "candidate",
+      "repeat": 2,
+      "case_id": "responsibility_correction",
+      "cell_id": "responsibility_correction-candidate-2"
+    },
+    {
+      "arm": "raw_memory",
+      "prompt_variant": "baseline",
+      "repeat": 2,
+      "case_id": "responsibility_correction",
+      "cell_id": "responsibility_correction-baseline-2"
+    }
+  ],
+  "head": "13c0663a7d42e2e73b5c2ef45d20faa9e1b1fa11",
+  "instructions_sha256": {
+    "baseline": "47fb30d8504bb672788d6b054d0e25253c564a5bb1ee519f75d54f2d07334160",
+    "candidate": "81470380824af1a4b53c57d5abd91b32cf4e6927ca085b39425f91b7d8073375"
+  },
+  "tools_sha256": {
+    "raw_memory": "825849d5d389b13ed619cc4639486f70d156b266601edb0ee066284cf2315309"
+  },
+  "initial_sha256": {
+    "responsibility_correction": "0798bb4ecee30119d675ab3c3c9f2f6af4fb9aa761a9aeed2c18eb6a03baaf56",
+    "deduplication": "c3f7e929cd81f6a122fbf280dcdfc84a4c6079800b0db931cc1c9408ce495233",
+    "superseded_deadline": "e16b6564640c4e7d9c213937f1274588b232864befd224c324170e1f25cd15c5",
+    "numeric_boundaries": "a6f81ff6f81f5dbb34cec42d2000d6479ba3b6f2b1f39588b1def08c5fbb6f44",
+    "already_correct": "8b147b7b230a4ff02bbab1d3b361603acae2f2caf42e1694a80374edeffb1b14"
+  },
+  "source_sha256": {
+    "docs\\experiments\\product-validation\\data\\jd-edit-preservation-2026-10-04\\README.md": "88ebb6433dd5dc1694c0c4f03944f7a8b66fbec4e1f5c3cee6d3b2d23a0a4d3e",
+    "docs\\experiments\\product-validation\\data\\jd-edit-preservation-2026-10-04\\study.py": "6133645ddf16cd5d1c6b55f9d9465b95527e7d8728465dcd77de08a10a87a40b",
+    "docs\\experiments\\product-validation\\data\\jd-edit-preservation-2026-10-04\\fixtures.py": "0645b7e352eea774ae33323545d02421a8938cf9417ce38a6888f3f8a0ad108c",
+    "docs\\experiments\\product-validation\\data\\jd-edit-preservation-2026-10-04\\test_fixtures.py": "dd775a4360363c34a0f78b2016da0669ae13b8823df3ed0db485217b04066ff9",
+    "docs\\experiments\\product-validation\\data\\jd-edit-preservation-2026-10-04\\cases.json": "1920f3755952d2328f027718471e3805c2bcf6b104f3dfe7bae3653e683374da",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\experiment.py": "b5cda90cbf3419281637b23e0fb4a202f971eedbff341321d344bdf558e3b1a9",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\support.py": "19a2816265c682093737c45d784a0e847e1868bb22f3c3c038127310b684627b",
+    "docs\\experiments\\product-validation\\data\\memory-added-value-2026-10-04\\analyze.py": "073b2e2b5f1846180089ab742c7aa45dcb2d471fb384bf784685a20d02b407ce",
+    "docs\\experiments\\product-validation\\data\\design-comparisons-2026-10-04\\provider_observations.py": "bfe9ef1189a4a0bae9d3825c0e041656be9483c1bc506f1ea2022c4e13bdd24e",
+    "docs\\experiments\\product-validation\\data\\memory-reading-boundaries-2026-10-04\\live-01\\manifest.json": "0634a21eda6d44dd6df19915be986e9deb8a13651a46e0b4f6a32136b7db5c90",
+    "docs\\experiments\\product-validation\\data\\memory-reading-boundaries-2026-10-04\\live-01\\instructions.json": "1fb4fa0d719d6781e6c0e174bccc2de372a1ee399eb25158b63f233181645a1c",
+    "docs\\experiments\\product-validation\\data\\memory-reading-boundaries-2026-10-04\\live-01\\materials.json": "ca0d60dab5d6957b50d03d10a58f819bf365edac06d6a0e72b96dab5ada32419",
+    "docs\\experiments\\product-validation\\data\\memory-reading-boundaries-2026-10-04\\live-01\\result.json": "deffd2a61d23025713d3e46c0814c3830686e933c9a0d415282bd5ca93282906",
+    "apps\\api\\src\\caliburn\\adapters\\openai_models.py": "b672fe9b13ed5ae4d4a8792fc8c054e79903f9843a9e251dfde522c76ad71aab",
+    "apps\\api\\src\\caliburn\\adapters\\openai_responses.py": "539ba7237afa8137096eae06b38037cd52fe43c528f47fb638606db1b59c2f4d"
+  },
+  "pricing_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+  "transport_recovery": {
+    "original_run": "docs\\experiments\\product-validation\\data\\jd-edit-preservation-2026-10-04\\live-01",
+    "original_paid_start": "2026-10-04T15:56:17.733844+00:00",
+    "original_outbound_attempts": 1,
+    "original_occupied_usd": "0.0001",
+    "original_result_sha256": "497890a4a426397e32dea26900ecae3a20e0ee8763acf278835b4c937302d378",
+    "reason": "Sandbox redirected network to refused localhost:9; recovery uses approved external network without resetting original time or spending boundary."
+  }
+}

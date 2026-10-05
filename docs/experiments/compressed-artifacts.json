@@ -1,0 +1,69 @@
+{
+  "format": "gzip",
+  "artifacts": [
+    {
+      "path": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/all-rankings.json",
+      "archive": "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/all-rankings.json.gz",
+      "bytes": 24926106,
+      "sha256": "6749d40276d0811419057b2bb0d8517248eedb767360fe2e9e7fc8c993098949",
+      "archive_bytes": 2668597,
+      "archive_sha256": "e94c658cf5f96613b13be07cee0fbe03ab1ee576c6bdc0c0bb2836e92742d116"
+    },
+    {
+      "path": "docs/experiments/2026-10-04-query-chunk-cross-retrieval/run-01/all-rankings.json",
+      "archive": "docs/experiments/2026-10-04-query-chunk-cross-retrieval/run-01/all-rankings.json.gz",
+      "bytes": 93481367,
+      "sha256": "cd4a0ee020a935092d7a9ffd7463ea8ee696623ad21d1eec9cb26189d228b2e3",
+      "archive_bytes": 10008327,
+      "archive_sha256": "5503e8d6b204d72fa7fafda86c0598848162e9e32ebab1eba61f28deaf489881"
+    },
+    {
+      "path": "docs/experiments/2026-10-04-retrieval-input-boundaries/prepared.json",
+      "archive": "docs/experiments/2026-10-04-retrieval-input-boundaries/prepared.json.gz",
+      "bytes": 29254169,
+      "sha256": "f43fb5e45d8db4ddef8b88e52fdb7b08dded429118a28a143acaaa8d2ac85a53",
+      "archive_bytes": 4816189,
+      "archive_sha256": "8aea674e2c4f3adaeb257cffeaba4c8a0a2fe9760d67c0ac3748b17b63e8be3e"
+    },
+    {
+      "path": "docs/experiments/2026-10-04-retrieval-reference-views/sources.jsonl",
+      "archive": "docs/experiments/2026-10-04-retrieval-reference-views/sources.jsonl.gz",
+      "bytes": 30917191,
+      "sha256": "990301848d77ae2fbb4541c4ba57c5c8e199719e36f7bb41a7d55bd3e2b50fee",
+      "archive_bytes": 2532249,
+      "archive_sha256": "a6abea0d24f25379a5a9a33bf41f49e740e68ec4e395313698d2f65c97880555"
+    },
+    {
+      "path": "docs/experiments/2026-10-05-b1-dual-route-retrieval/run-01/all-rankings.json",
+      "archive": "docs/experiments/2026-10-05-b1-dual-route-retrieval/run-01/all-rankings.json.gz",
+      "bytes": 51413308,
+      "sha256": "a8e27e01348fa75bfc7090e62aed93d41886c216bd26b6787d996c2f5ab0761b",
+      "archive_bytes": 5262597,
+      "archive_sha256": "7f5a5508d0fc6e773c63f443fe542e2cc0c7153d0c96c8a2cde00d02d5ea3e97"
+    },
+    {
+      "path": "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/all-rankings.json",
+      "archive": "docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/all-rankings.json.gz",
+      "bytes": 41006618,
+      "sha256": "ceed5198f620b0df4836e4e18f6a80eda7a28e781e73e357f4f40c2eb61efb0a",
+      "archive_bytes": 4400536,
+      "archive_sha256": "c9b99f1f389eb052e48ce650020849a3ffba5e2be0dc3e481410d076e5e1b128"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-02/trace.jsonl",
+      "archive": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-02/trace.jsonl.gz",
+      "bytes": 145216037,
+      "sha256": "c75bac4023d309247d0f0f4c370184b7e691d4dd88179b450b25483800001619",
+      "archive_bytes": 18242220,
+      "archive_sha256": "c173264dc438642bc471ea140a8bbb6da0fd455c132f0bdf107d8281e386dbd1"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/trace.jsonl",
+      "archive": "docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/trace.jsonl.gz",
+      "bytes": 54372150,
+      "sha256": "2b7af98eb408a5f854dd1e61d03b8d095dae75a1498403cba290b605b03b3ec6",
+      "archive_bytes": 4709872,
+      "archive_sha256": "594cbe89a6e22dc311b483b8f6273d4d2ad0f68f34c7f85e3256d39c885b3fe1"
+    }
+  ]
+}

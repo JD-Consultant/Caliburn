@@ -1,0 +1,97 @@
+{
+  "final": {
+    "task": {
+      "title": "甲案年度促銷素材檢查",
+      "work": "甲案約每年一次更換促銷素材。員工檢查圖片與連結；客戶提供文案及素材，並須在上線前確認。員工不負責規劃促銷活動或撰寫文案。"
+    },
+    "unknowns": [
+      "客戶確認後，由誰執行上線尚未說明。"
+    ],
+    "references": [
+      {
+        "kind": "interview",
+        "sequences": [
+          18
+        ]
+      }
+    ]
+  },
+  "steps": 1,
+  "tool_calls": [],
+  "reads": [
+    [
+      "interview",
+      1
+    ],
+    [
+      "interview",
+      10
+    ],
+    [
+      "interview",
+      11
+    ],
+    [
+      "interview",
+      12
+    ],
+    [
+      "interview",
+      13
+    ],
+    [
+      "interview",
+      14
+    ],
+    [
+      "interview",
+      15
+    ],
+    [
+      "interview",
+      16
+    ],
+    [
+      "interview",
+      17
+    ],
+    [
+      "interview",
+      18
+    ],
+    [
+      "interview",
+      2
+    ],
+    [
+      "interview",
+      3
+    ],
+    [
+      "interview",
+      4
+    ],
+    [
+      "interview",
+      5
+    ],
+    [
+      "interview",
+      6
+    ],
+    [
+      "interview",
+      7
+    ],
+    [
+      "interview",
+      8
+    ],
+    [
+      "interview",
+      9
+    ]
+  ],
+  "cell": "read-infrequent_work-full_history",
+  "seconds": 17.3125013000099
+}

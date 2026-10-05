@@ -1,0 +1,242 @@
+[
+  {
+    "case_id": "F01",
+    "method": "W-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Tmean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F01",
+    "method": "W-Umean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F01",
+    "method": "S-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Tmean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F02",
+    "method": "W-Umean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F02",
+    "method": "S-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Tmean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F03",
+    "method": "W-Umean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F03",
+    "method": "S-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Tmean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F04",
+    "method": "W-Umean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F04",
+    "method": "S-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Tmean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F05",
+    "method": "W-Umean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "F05",
+    "method": "S-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Tmean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H01",
+    "method": "W-Umean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H01",
+    "method": "S-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Tmean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H02",
+    "method": "W-Umean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H02",
+    "method": "S-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Dmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Tmean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umax",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H03",
+    "method": "W-Umean3",
+    "same_prior_top5": true
+  },
+  {
+    "case_id": "H03",
+    "method": "S-Dmax",
+    "same_prior_top5": true
+  }
+]

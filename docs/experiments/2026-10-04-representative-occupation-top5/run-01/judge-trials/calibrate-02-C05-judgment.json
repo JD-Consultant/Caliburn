@@ -1,0 +1,24 @@
+{
+  "job_id": "C05",
+  "phase": "calibrate-02",
+  "judgment": {
+    "grade": null,
+    "uncertain": true,
+    "main_work": [],
+    "reason": "員工表示主要內容和負責範圍尚未說清楚，無法判定公版所列工作是否對應其主要領域。",
+    "evidence": [
+      {
+        "employee_quote": "主要內容和負責範圍還沒說清楚。",
+        "reference_quote": "製作網站畫面、開發 API、設計資料表並執行測試。"
+      }
+    ],
+    "limitations": [
+      "缺少員工具體、持續負責的工作內容與工作組合，無法評估代表性。"
+    ]
+  },
+  "seconds": 3.156862700008787,
+  "employee_sha256": "ef0680f9e69cd3df29cc505b9251d7e3eeca00ed76a3c1936286808bb9ce4ee3",
+  "document_sha256": "685f28716bb0ed5d03e015ffabb7426700984355db3ecdac2d105e2f716dba20",
+  "expected_grade": null,
+  "anchor_matched": true
+}

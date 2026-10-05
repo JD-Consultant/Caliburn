@@ -1,0 +1,16 @@
+{
+  "groups": 48,
+  "queries": 20,
+  "parent_rankings_recomputed": 40,
+  "chunk_scores_regrouped": 177460,
+  "parents_each_ranking": 805,
+  "judgment_pool_pairs": 158,
+  "known_grade3_pairs": 12,
+  "target_paths": 24,
+  "N20_union_controls_unchanged": 20,
+  "old_sealed_files_unchanged": 581,
+  "known_work_facets": 8,
+  "new_provider_calls": 0,
+  "fresh_time_measured": false,
+  "scope": "known assessed-pool retention; not full-corpus recall/JD completeness"
+}

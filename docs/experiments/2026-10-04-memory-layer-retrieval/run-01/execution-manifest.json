@@ -1,0 +1,7 @@
+{
+  "max_cost_usd": "1.00",
+  "max_calls": 160,
+  "input_manifest_sha256": "91cd8adc8c269d9d070af87672f6aa3c10f2f63cee545fd32e59ba84420839b4",
+  "model": "gpt-6-luna",
+  "effort": "high"
+}

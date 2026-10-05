@@ -1,0 +1,14 @@
+{
+  "employee_input": {
+    "source_id": "6ed1c12e-10fc-4928-acaf-03c853e96d7b",
+    "interview_sequence": 114,
+    "speaker": "employee",
+    "interview_text": "補一個正式變更：從下一筆收貨異常開始，沒回覆的提醒改為三個工作日；仍沒進展的主管回報改在第五個工作日。這兩個期限只改收貨異常追蹤，結案條件、採購決策和我不保證供應商交期都不變，其他工作的規則也不變。請更新相關JD。"
+  },
+  "consultant_reply": {
+    "source_id": "77b46d96-e908-4c1d-a555-5dc1bc0be090",
+    "interview_sequence": 115,
+    "speaker": "consultant",
+    "interview_text": "已更新到貨登錄任務中的收貨異常追蹤要求：**從下一筆收貨異常起，三個工作日未獲回覆時提醒採購；第五個工作日仍無進展時回報主管。**\n\n結案條件仍是補貨或退貨完成且帳物相符；退換貨或補貨仍由採購決定，您仍不保證供應商交期。未將新期限套用到其他工作。"
+  }
+}

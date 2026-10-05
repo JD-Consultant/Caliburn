@@ -1,0 +1,45 @@
+{
+  "arm": "raw_memory",
+  "prompt_variant": "baseline",
+  "repeat": 2,
+  "case_id": "numeric_boundaries",
+  "cell_id": "numeric_boundaries-baseline-2",
+  "status": "completed",
+  "reads": [],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 11003,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 11000
+        },
+        "output_tokens": 773,
+        "output_tokens_details": {
+          "reasoning_tokens": 514
+        },
+        "total_tokens": 11776
+      },
+      "estimated_usd": "0.000496800",
+      "seconds": 9.610042500018608
+    }
+  ],
+  "proposal": {
+    "changes": [
+      {
+        "target_ref": "task_1.outcome_2",
+        "value": "到貨差異及未確認項目留有可追溯紀錄，供採購確認後續處理；實收數量依倉庫同事清點結果記錄，不將供應商送貨單數量直接視為實收數。",
+        "references": [
+          {
+            "kind": "work_understanding",
+            "interview_sequence": null,
+            "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+          }
+        ]
+      }
+    ],
+    "questions": [],
+    "note": "僅核對到貨任務的成果與清點分工；原成果把本人寫成實物清點者並直接認定供應商數量，已改為反映倉庫清點、本人依據清點結果核對與記錄差異的分工。其餘提供欄位未作修改。"
+  },
+  "seconds": 20.508163000049535
+}

@@ -1,0 +1,29 @@
+{
+  "created_at": "2026-10-05T04:03:24.632725+00:00",
+  "files": {
+    "analyze.py": {
+      "bytes": 10164,
+      "sha256": "baba0d6a44efb4c4afb5c91da7a476c4cb9aa3f9fb603ce8053a71ae7cebf752"
+    },
+    "input-manifest.json": {
+      "bytes": 1824,
+      "sha256": "ad514992b6118b677df2355f02279b06628c1ff596d8b70f9b2dc60f64637b24"
+    },
+    "README.md": {
+      "bytes": 4566,
+      "sha256": "81dbdabee061b8a2e219d2c7ce79d60ac78e432681c01f0a2a55b6e14ff69f09"
+    },
+    "selected-case-outcomes.json": {
+      "bytes": 24648,
+      "sha256": "17f1b8ab635ec8233c5bdd8bf4f63fe85e3af26dbff1b4c0eb2ae0d7d347411c"
+    },
+    "summary.json": {
+      "bytes": 56349,
+      "sha256": "fcf014788f3ae0bbc5abf4b5b1ee24a691930aec7b41d45a520b7332fd029477"
+    },
+    "verification.json": {
+      "bytes": 644,
+      "sha256": "8114b883a7127e401f7d0caf582af6ac696d0de17ae1c27a366e99a123a53aa2"
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "inputs": {
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/input-manifest.json": {
+      "sha256": "c32dbdde22444a49531a0cbcb1a4c840b2279b7b36e12b48536a9657f3992ba0"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/execution-manifest.json": {
+      "sha256": "cee6749fc722ddf737fd50f498d6bc8aedf0235201631148483fc1162c32b360"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/results.json": {
+      "sha256": "d5fad907167165f21b49a264585823cf193f032b60a222eca2948412971df7ce"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/database-checks.json": {
+      "sha256": "af333e25d51e01ab3804173f4315bcb4084a92915a89fde94b06892ae20a8725"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/benchmark.json": {
+      "sha256": "6b494ce86b172376375050e980bc9d08025101815cf6799035e6892b52cc2ad4"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/baseline-check.json": {
+      "sha256": "ebddf330a2d36a054ce2cdadb101f0b2ac1e35f55d9834b444e0a521e62bfef5"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/grading-pool.json": {
+      "sha256": "5ea8861d0b05695a369a0bb7ad57dbf56d1fbab9300d12bb4d1e79cefcc06e1f"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/new-judge-jobs.json": {
+      "sha256": "05e5cac2065925056e764bcadd0768416572740990c05110fc1fbcf6d65f8d92"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reused-judgments.json": {
+      "sha256": "fdd44e5c9d8404055af74aea25147d4dce6cddc7f83f0b5ab889cc1a78cbe7b5"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments.json": {
+      "sha256": "ba6df5d137acb6e6b4c632f16cc2210c914c1b4a21e53a340634be206fbe9e48"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments-reconciled.json": {
+      "sha256": "da3c9e03047cfb1eb40a01dcfbcb274bbefd7778b72cf999156021982dc619fc"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judgments-reconciled-02.json": {
+      "sha256": "90a26f24090cb1b8c4335d0a62e14d585267d6707692d3dab67367381a14794f"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/grading-summary.json": {
+      "sha256": "5f3d94ddc51434177eaa556b0196b2fdabc671b5ae7aab06a254f956b4e91d24"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/grading-reconciliation.json": {
+      "sha256": "4ac9fadb7f408dc5ead3e60d6355dcd2bb92057b3b3960bb658fd87d0c4b57dc"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/grading-reconciliation-02.json": {
+      "sha256": "795ab07481f8f8e6a86e54330fef5c8164097ab20d316d7acc9df1ed1a020f9f"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/judge-usage.jsonl": {
+      "sha256": "65e53b325ad94d129644f2006c87cd645d1f12f12d4fb93a6f28cb2469a2618f"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reconcile.py": {
+      "sha256": "2376f26a8599321ceff1f75f5000477aea981994e2be6e38d63728224aa6f2d5"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/reconcile_manual.py": {
+      "sha256": "f441aa2506383935fa18fb974d162832d4759b930830091fcc8a411aea219beb"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/report-02.py": {
+      "sha256": "9f5896c2359083243c33ac913fcacb1ee0afe2eb0ce0ba9b269f6c7769571829"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/verify.py": {
+      "sha256": "bc4e638b5b1b59edf460b9365af047eea40029fa11b21fe8ab2484b472fdb3c9"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/final_audit.py": {
+      "sha256": "c4302b21d6fde64f9e49a16e2f17a739479d595f413f8c71903c34f626a521b6"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/analysis-amendment-01.md": {
+      "sha256": "a2b8829439fc91c5085d5be75d2d9c484caf9ec4f84513934e34c3336bbe3946"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/vector-map.json": {
+      "sha256": "52ec4030ce9553bb54190cb0ef4c498b7c663f7720392824dfc1672622b58b4f"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/embedding-complete.json": {
+      "sha256": "3773bd713ab084b53abae39a16d19c4d6cc04df552647fdf9ab2f69b45d25731"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/embedding-batches.jsonl": {
+      "sha256": "104f3de5bc3abdedb144157818d887ecc31894ec8a823ef33f0b970f076e042d"
+    },
+    "docs/experiments/2026-10-04-public-chunk-retrieval/run-01/index-build.json": {
+      "sha256": "45c541be6b3976e9b33e86c743ad83319bf6b3bd4fe401afa982c163feb06fe3"
+    }
+  }
+}

@@ -1,0 +1,438 @@
+{
+  "scope": "post-hoc trace only for already judged grade-3 pairs in the union of final results",
+  "not_full_recall": true,
+  "new_model_calls": 0,
+  "new_grades": 0,
+  "inputs": {
+    "results.json": "5b88843f48ec6a9055f7218b0027ed3345a84b2c37ab9bc1024a177885e9bcdd",
+    "graded-results.json": "1dc79883b553d9e2418a398e93e8b1e2e864b6646a461b5636cb137d0730fead",
+    "dense-rankings.json": "d2d044e8b8a4fa74e500960bc52f2066e211a99c8544ba3774b7ec386ef0aad5"
+  },
+  "references": [
+    {
+      "case_id": "H02",
+      "document_id": "MMP4321-003v4",
+      "title": "零售業倉儲管理人員",
+      "existing_grade": 3,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "methods": [
+        {
+          "method": "I01",
+          "queries": [
+            {
+              "query_id": "H02-initial-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "I02",
+          "queries": [
+            {
+              "query_id": "H02-initial-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 3,
+          "final_k5_rank_1_based": 3
+        },
+        {
+          "method": "R01",
+          "queries": [
+            {
+              "query_id": "H02-whole-1",
+              "full_dense_rank_1_based": 5,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 5,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 5,
+          "final_k5_rank_1_based": 5
+        },
+        {
+          "method": "R02",
+          "queries": [
+            {
+              "query_id": "H02-whole-1",
+              "full_dense_rank_1_based": 5,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "R03",
+          "queries": [
+            {
+              "query_id": "H02-segments-1",
+              "full_dense_rank_1_based": 3,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "dense"
+            },
+            {
+              "query_id": "H02-segments-2",
+              "full_dense_rank_1_based": 6,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 6,
+              "order": "dense"
+            },
+            {
+              "query_id": "H02-segments-3",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            },
+            {
+              "query_id": "H02-segments-4",
+              "full_dense_rank_1_based": 4,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 4,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 3,
+          "final_k5_rank_1_based": 3
+        },
+        {
+          "method": "R04",
+          "queries": [
+            {
+              "query_id": "H02-segments-1",
+              "full_dense_rank_1_based": 3,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 5,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H02-segments-2",
+              "full_dense_rank_1_based": 6,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 4,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H02-segments-3",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H02-segments-4",
+              "full_dense_rank_1_based": 4,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 5,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 4,
+          "final_k5_rank_1_based": 4
+        }
+      ]
+    },
+    {
+      "case_id": "H02",
+      "document_id": "RLM9330-001v1",
+      "title": "電商物流中心理貨員",
+      "existing_grade": 3,
+      "main_work": [
+        "貨品收貨上架、揀貨、盤點與退貨處理等倉儲現場作業"
+      ],
+      "methods": [
+        {
+          "method": "I01",
+          "queries": [
+            {
+              "query_id": "H02-initial-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        },
+        {
+          "method": "I02",
+          "queries": [
+            {
+              "query_id": "H02-initial-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "R01",
+          "queries": [
+            {
+              "query_id": "H02-whole-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "R02",
+          "queries": [
+            {
+              "query_id": "H02-whole-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 3,
+          "final_k5_rank_1_based": 3
+        },
+        {
+          "method": "R03",
+          "queries": [
+            {
+              "query_id": "H02-segments-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            },
+            {
+              "query_id": "H02-segments-2",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            },
+            {
+              "query_id": "H02-segments-3",
+              "full_dense_rank_1_based": 21,
+              "initial_n20_included": false,
+              "pool_rank_after_method_order_1_based": null,
+              "order": "dense"
+            },
+            {
+              "query_id": "H02-segments-4",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        },
+        {
+          "method": "R04",
+          "queries": [
+            {
+              "query_id": "H02-segments-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H02-segments-2",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H02-segments-3",
+              "full_dense_rank_1_based": 21,
+              "initial_n20_included": false,
+              "pool_rank_after_method_order_1_based": null,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H02-segments-4",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 3,
+          "final_k5_rank_1_based": 3
+        }
+      ]
+    },
+    {
+      "case_id": "H03",
+      "document_id": "BAS3323-003v3",
+      "title": "採購助理",
+      "existing_grade": 3,
+      "main_work": [
+        "原物料與包材的請購下單、交期與異常協調、供應商管理等採購工作"
+      ],
+      "methods": [
+        {
+          "method": "I01",
+          "queries": [
+            {
+              "query_id": "H03-initial-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 1,
+          "final_k5_rank_1_based": 1
+        },
+        {
+          "method": "I02",
+          "queries": [
+            {
+              "query_id": "H03-initial-1",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 5,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 5,
+          "final_k5_rank_1_based": 5
+        },
+        {
+          "method": "R01",
+          "queries": [
+            {
+              "query_id": "H03-whole-1",
+              "full_dense_rank_1_based": 4,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 4,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 4,
+          "final_k5_rank_1_based": 4
+        },
+        {
+          "method": "R02",
+          "queries": [
+            {
+              "query_id": "H03-whole-1",
+              "full_dense_rank_1_based": 4,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "R03",
+          "queries": [
+            {
+              "query_id": "H03-segments-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "dense"
+            },
+            {
+              "query_id": "H03-segments-2",
+              "full_dense_rank_1_based": 13,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 13,
+              "order": "dense"
+            },
+            {
+              "query_id": "H03-segments-3",
+              "full_dense_rank_1_based": 5,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 5,
+              "order": "dense"
+            },
+            {
+              "query_id": "H03-segments-4",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "dense"
+            },
+            {
+              "query_id": "H03-segments-5",
+              "full_dense_rank_1_based": 5,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 5,
+              "order": "dense"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        },
+        {
+          "method": "R04",
+          "queries": [
+            {
+              "query_id": "H03-segments-1",
+              "full_dense_rank_1_based": 2,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H03-segments-2",
+              "full_dense_rank_1_based": 13,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 1,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H03-segments-3",
+              "full_dense_rank_1_based": 5,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 3,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H03-segments-4",
+              "full_dense_rank_1_based": 1,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            },
+            {
+              "query_id": "H03-segments-5",
+              "full_dense_rank_1_based": 5,
+              "initial_n20_included": true,
+              "pool_rank_after_method_order_1_based": 2,
+              "order": "rerank"
+            }
+          ],
+          "merged_rank_1_based": 2,
+          "final_k5_rank_1_based": 2
+        }
+      ]
+    }
+  ]
+}

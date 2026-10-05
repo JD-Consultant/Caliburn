@@ -1,0 +1,28 @@
+{
+  "job_id": "C03",
+  "phase": "calibrate-02",
+  "judgment": {
+    "grade": 0,
+    "uncertain": false,
+    "main_work": [],
+    "reason": "公版只描述 API 內部程式、商業邏輯、資料表及資料庫工作；員工明確表示這些由同事負責且自己不做。員工主要製作網站畫面並串接同事提供的 API，公版沒有描述這些工作，故不適合代表其主要工作。",
+    "evidence": [
+      {
+        "employee_quote": "我主要製作網站畫面，串接同事提供的 API。",
+        "reference_quote": "設計 API 的內部程式和商業邏輯，設計資料表、維護資料庫及資料存取規則。"
+      },
+      {
+        "employee_quote": "API 內部程式、資料表和資料庫都是同事負責，我不做那些工作。",
+        "reference_quote": "設計 API 的內部程式和商業邏輯，設計資料表、維護資料庫及資料存取規則。"
+      }
+    ],
+    "limitations": [
+      "公版未描述網站畫面製作或串接 API。"
+    ]
+  },
+  "seconds": 4.272150200034957,
+  "employee_sha256": "a47fa98b258376970e559bebd2e2bb2c2fb633a000fd217dad8f1eea48052fd8",
+  "document_sha256": "9d097402a3b97d413405f32e07c4d123cfd7aa1a0507a9fc80f7154b44215645",
+  "expected_grade": 0,
+  "anchor_matched": true
+}

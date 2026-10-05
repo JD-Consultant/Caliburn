@@ -1,0 +1,59 @@
+{
+  "method": "Post-run semantic review against frozen grading-cases.json; not an automatic keyword score or independent human-expert rating",
+  "arm_order": ["raw", "summary", "memory"],
+  "grade_order": ["complete", "partial", "omitted", "incorrect"],
+  "rows": [
+    {"case": "c01", "criterion": "volume", "grades": ["complete", "complete", "complete"]},
+    {"case": "c01", "criterion": "deadline", "grades": ["complete", "complete", "complete"]},
+    {"case": "c01", "criterion": "cutoff_authority", "grades": ["complete", "partial", "complete"]},
+    {"case": "c01", "criterion": "no_backdating", "grades": ["complete", "complete", "complete"]},
+    {"case": "c02", "criterion": "strict_threshold", "grades": ["complete", "complete", "complete"]},
+    {"case": "c02", "criterion": "denominator", "grades": ["complete", "complete", "complete"]},
+    {"case": "c02", "criterion": "safety", "grades": ["complete", "complete", "complete"]},
+    {"case": "c03", "criterion": "remind", "grades": ["complete", "complete", "complete"]},
+    {"case": "c03", "criterion": "escalate", "grades": ["complete", "complete", "complete"]},
+    {"case": "c03", "criterion": "closure", "grades": ["complete", "complete", "complete"]},
+    {"case": "c03", "criterion": "decision", "grades": ["complete", "incorrect", "complete"]},
+    {"case": "c03", "criterion": "promise", "grades": ["complete", "complete", "complete"]},
+    {"case": "c04", "criterion": "original", "grades": ["complete", "complete", "complete"]},
+    {"case": "c04", "criterion": "current", "grades": ["complete", "complete", "complete"]},
+    {"case": "c04", "criterion": "basis", "grades": ["complete", "complete", "complete"]},
+    {"case": "c04", "criterion": "no_revert", "grades": ["complete", "complete", "complete"]},
+    {"case": "c05", "criterion": "new_limits", "grades": ["complete", "complete", "complete"]},
+    {"case": "c05", "criterion": "closure", "grades": ["complete", "complete", "complete"]},
+    {"case": "c05", "criterion": "authority", "grades": ["complete", "complete", "complete"]},
+    {"case": "c05", "criterion": "scope", "grades": ["complete", "complete", "complete"]},
+    {"case": "c05", "criterion": "sources", "grades": ["complete", "complete", "complete"]},
+    {"case": "c06", "criterion": "conversion", "grades": ["complete", "complete", "partial"]},
+    {"case": "c06", "criterion": "unknown", "grades": ["complete", "complete", "complete"]},
+    {"case": "c06", "criterion": "contact", "grades": ["complete", "complete", "complete"]},
+    {"case": "c07", "criterion": "monday", "grades": ["complete", "complete", "complete"]},
+    {"case": "c07", "criterion": "other_days", "grades": ["complete", "complete", "complete"]},
+    {"case": "c07", "criterion": "delivery", "grades": ["complete", "complete", "complete"]},
+    {"case": "c07", "criterion": "scope", "grades": ["complete", "complete", "complete"]},
+    {"case": "c08", "criterion": "current_limits", "grades": ["complete", "complete", "complete"]},
+    {"case": "c08", "criterion": "closure", "grades": ["complete", "complete", "complete"]},
+    {"case": "c08", "criterion": "authority", "grades": ["complete", "complete", "complete"]},
+    {"case": "c08", "criterion": "scope", "grades": ["complete", "complete", "complete"]},
+    {"case": "c08", "criterion": "sources", "grades": ["complete", "complete", "complete"]}
+  ],
+  "exceptions": {
+    "summary.c01.cutoff_authority": {
+      "grade": "partial",
+      "evidence": "../live-01/exchange-summary-c01.json",
+      "reason": "Correct finance authority, but narrowed any over-cutoff or doubtful document to post-cutoff arrivals or month-attribution doubts. Independent semantic review identified this scope narrowing against the frozen criterion."
+    },
+    "summary.c03.decision": {
+      "grade": "incorrect",
+      "evidence": "../live-01/exchange-summary-c03.json",
+      "reason": "Summary omitted the explicit procurement decision; the model did not read interviews or JD and asserted that the responsibility had not been stated, although original message 6 and the stored JD retained it."
+    },
+    "memory.c06.conversion": {
+      "grade": "partial",
+      "evidence": "../live-01/exchange-memory-c06.json",
+      "reason": "Correctly answered 12 units per box and SKU-only scope, but did not name the data contact that confirmed the conversion, as required by the frozen compound criterion."
+    }
+  },
+  "evidence_convention": "Read-only cases use live-01/exchange-{arm}-{case}.json and actual trace inputs. c05 and c08 require product-{arm}-{case}.json JD text plus source identity mapped to formal sequence 114. c04.no_revert compares the saved work/profile to c03.",
+  "scope": "c01-c07: 28 criteria per arm. c08: five final JD checks, reported separately. Cases continue within each arm and are not independent samples."
+}

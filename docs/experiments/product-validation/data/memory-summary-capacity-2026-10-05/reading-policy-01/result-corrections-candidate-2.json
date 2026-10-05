@@ -1,0 +1,145 @@
+{
+  "case_id": "corrections",
+  "arm": "candidate",
+  "repeat": 2,
+  "cell_id": "corrections-candidate-2",
+  "status": "completed",
+  "reads": [
+    {
+      "step": 1,
+      "name": "read_work_understanding",
+      "arguments": {
+        "target_title": "庫存與物流行政的作業核對、追蹤與支援"
+      },
+      "result_characters": 6465
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+      },
+      "result_characters": 1891
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "退貨核對、狀態登錄與差異處理"
+      },
+      "result_characters": 780
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "庫存報表"
+      },
+      "result_characters": 490
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "收貨異常週報"
+      },
+      "result_characters": 417
+    },
+    {
+      "step": 2,
+      "name": "read_work_situation",
+      "arguments": {
+        "target_title": "倉庫掃碼器備品核對與故障追蹤"
+      },
+      "result_characters": 453
+    }
+  ],
+  "usage": [
+    {
+      "usage": {
+        "input_tokens": 5714,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 5711
+        },
+        "output_tokens": 139,
+        "output_tokens_details": {
+          "reasoning_tokens": 58
+        },
+        "total_tokens": 5853
+      },
+      "estimated_usd": "0.000126910",
+      "seconds": 2.5846058999886736,
+      "counted_input_tokens": 5714
+    },
+    {
+      "usage": {
+        "input_tokens": 11314,
+        "input_tokens_details": {
+          "cache_write_tokens": 5600,
+          "cached_tokens": 5711
+        },
+        "output_tokens": 675,
+        "output_tokens_details": {
+          "reasoning_tokens": 445
+        },
+        "total_tokens": 11989
+      },
+      "estimated_usd": "0.001094910",
+      "seconds": 6.39572870003758,
+      "counted_input_tokens": 11314
+    },
+    {
+      "usage": {
+        "input_tokens": 15311,
+        "input_tokens_details": {
+          "cache_write_tokens": 3997,
+          "cached_tokens": 11311
+        },
+        "output_tokens": 2141,
+        "output_tokens_details": {
+          "reasoning_tokens": 930
+        },
+        "total_tokens": 17452
+      },
+      "estimated_usd": "0.001683535",
+      "seconds": 17.698719899985008,
+      "counted_input_tokens": 15311
+    }
+  ],
+  "answer": {
+    "findings": "依已完成核對，應把各流程的時點與比例分開適用：\n\n- **進貨驗收與登錄：**本人核對採購單、送貨單及實際到貨的品號、批號、數量；實物由倉庫同事清點，資料確認後本人登錄 ERP，已確認項目通常在到貨當天下班前完成。月底最後一天的截止清單由財務提供；逾截止或歸屬有疑義時由財務決定月份，本人保留實際收貨時間及未決原因，不自行回填日期。此時限不是退貨交表或週報時限。\n- **驗收不良 5%：**分母是「每批實際驗收件數」，不是每日進貨單張數，也不是跨月累計；超過 5% 才提報倉儲主管，剛好 5% 不因比例規則提報。但如有安全疑慮，不論比例均先隔離並通知主管。本人記錄差異、通知及追蹤；退換貨或補貨由採購決定。低於門檻且無安全疑慮時的其他處理細節未明確。\n- **退貨核對：**每個工作日核對前一工作日收到的退貨；週一 08:50 開始，週二至週五 08:35 開始，但每天仍須於 09:10 前把退貨差異表交客服。本人核對客退單、品號、批號及實收數量；常溫品依倉庫確認的狀態登錄，冷藏品的可再銷售判定交品質窗口。數量差異由本人提供照片及紀錄請客服確認；只有主管同意調帳後，本人才依核准資料修改 ERP 並留存核准單號。本人不自行判定報廢或退款。\n- **庫存帳齡表：**依月底庫存狀態整理，於次月第一個工作日交主管；分類列出可售、待檢、報廢待核准，帳齡依已確認入庫日期及月末庫存狀態計算，並核對批號及調撥資料，避免移倉被當成新入庫。本人提供滯留與庫存狀態資訊；促銷、報廢或其他處置由主管決定。帳齡分段及具體公式未明確。\n- **設備比例的適用範圍：**已核對的 5% 是每月掃碼器「備品數」相對於「使用中設備數量」的準備比例，不是設備異常率，也不是商品驗收不良率；備品不足時需請主管核准補充。故障時本人登記設備編號、位置與問題，交資訊窗口並追蹤更換及送修。若 5% 計算結果不是整數，取整方式未說明。\n- **帳齡表更正與收貨異常週報：**兩者是用途與時點不同的獨立報表，現有工作事實沒有說明帳齡表更正會自動或必然改動週報。週報每週五 16:00 前交採購及主管，記錄未結案原因、等待天數、下一步及供應商回覆狀態；因此不能把帳齡表更正直接視為週報更正。若兩者涉及同一筆收貨異常，是否須在週報同步更新，現有資料尚未明確，應依該異常在週報中的追蹤狀態另行確認，而非推定有或沒有連動。\n\n因此，早期概括說法須以後續已釐清的適用範圍為準：驗收 5% 是逐批實收驗收件數門檻；設備 5% 是按使用中設備數量準備備品；兩者不可互換。退貨 09:10、帳齡表次月首個工作日及週報週五 16:00 也各自適用於不同交付物。",
+    "references": [
+      {
+        "kind": "work_situation",
+        "interview_sequence": null,
+        "target_title": "到貨驗收、ERP 登錄與收貨異常追蹤"
+      },
+      {
+        "kind": "work_situation",
+        "interview_sequence": null,
+        "target_title": "退貨核對、狀態登錄與差異處理"
+      },
+      {
+        "kind": "work_situation",
+        "interview_sequence": null,
+        "target_title": "庫存報表"
+      },
+      {
+        "kind": "work_situation",
+        "interview_sequence": null,
+        "target_title": "收貨異常週報"
+      },
+      {
+        "kind": "work_situation",
+        "interview_sequence": null,
+        "target_title": "倉庫掃碼器備品核對與故障追蹤"
+      }
+    ],
+    "questions": [
+      "若帳齡表更正是因同一筆收貨異常資料有更新，是否需要同步修正或補充當週收貨異常週報？",
+      "掃碼器備品按使用中設備數量計算為非整數時，實際採用何種取整或核准方式？"
+    ]
+  },
+  "seconds": 60.08057039999403
+}

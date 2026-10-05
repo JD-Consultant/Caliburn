@@ -1,0 +1,9 @@
+{
+  "queries": 24,
+  "parent_rankings": 48,
+  "parents_per_route": 805,
+  "fixed_common_pool_per_case": true,
+  "projection_equal_to_base": true,
+  "own_pool_top5_checked": true,
+  "full_source_hashes_checked_before_after": true
+}

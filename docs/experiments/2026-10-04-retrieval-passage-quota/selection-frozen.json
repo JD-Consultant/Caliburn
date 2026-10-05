@@ -1,0 +1,11 @@
+{
+  "selection_sha256": "ef6a0fb2537680edd9b93d7a38ddd682e76ef115a0afbee2afa0226ffd61a0e6",
+  "sources": {
+    "execution-development.json": "814dfbe5e0c131db60875c3d5ae866deab749b4fd7854b2d1db5ff59e1c3fa7b",
+    "metrics-development.jsonl": "6dfcb03a471a846dbbc3f56d5836b80aab1efd85df344296904dd29a5359bc51",
+    "summary-development.json": "31e33ccb7e1693148f960f94591a7692a566ee227a79e9f6bb659a6e57721a48",
+    "supplemental-development-pairs.jsonl": "0bd91b4a2b4fa4d7124730a540b6437a8759d5225802b11f6ce44800d4ae77e0",
+    "analyze.py": "92d884bc3a37b2ad895a10f2dd39e737dfed924d55d25f5f86684a93d799dad5"
+  },
+  "before_holdout_embeddings": true
+}

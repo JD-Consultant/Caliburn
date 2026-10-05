@@ -1,0 +1,38 @@
+{
+  "docs\\experiments\\2026-10-05-rerank-union-candidate-replay\\run-01\\query-unions.json": {
+    "sha256": "3ad29c270422c5993c92eef3113462e2aa977ad698525511c91d5152f659dda0",
+    "bytes": 88299
+  },
+  "docs\\experiments\\2026-10-05-rerank-union-candidate-replay\\run-01\\results.json": {
+    "sha256": "f05c8931f69d10a6c3055681fd4bb255620e49ded8e8c8d8b16c0b33be5dadda",
+    "bytes": 377142
+  },
+  "docs\\experiments\\2026-10-05-memory-public-unit-retrieval\\run-01\\graded-results.json": {
+    "sha256": "343965fb1fec7944d6255d698c0fe84de19fd445caa442d351915ffa2a0ff6d4",
+    "bytes": 2413338
+  },
+  "docs\\experiments\\2026-10-05-memory-public-unit-retrieval\\run-01\\corpus.json": {
+    "sha256": "ae5ec2b264eba771f84b27a69fef7e80067d6a14ec20e94e9be0482fa9ac868d",
+    "bytes": 2387875
+  },
+  "docs\\experiments\\2026-10-05-memory-public-unit-retrieval\\run-01\\cases.json": {
+    "sha256": "6089e469ffb78f7e3300fc62f5afd499e8427cd76b3e01e2e29b708aa4b7ae3b",
+    "bytes": 76963
+  },
+  "docs\\experiments\\2026-10-05-initial-retrieval-depth\\run-01\\targets.json": {
+    "sha256": "2fca43dcbdc18dd484053608d067480477b73bbb9fba315fbd1698a2b5dd2fe1",
+    "bytes": 32623
+  },
+  "docs\\experiments\\2026-10-05-rerank-union-candidate-replay\\run-01\\input-manifest.json": {
+    "sha256": "17c7c09c79f9af75eb750b8292a374fdf56934e9c818c19620de3aba2f1b050f",
+    "bytes": 3772
+  },
+  "docs\\experiments\\2026-10-05-adaptive-reference-selection\\run-01\\protocol.md": {
+    "sha256": "ae77fd7fb57bf45bd73d259493f8e63bc9f8567d3e34f2d1b99a51fec460b0fd",
+    "bytes": 3023
+  },
+  "docs\\experiments\\2026-10-05-adaptive-reference-selection\\run-01\\analyze.py": {
+    "sha256": "d882053823ff386b9efd897013d6ca098eafa0ea2488745ae5cc9bd7ef6c96a7",
+    "bytes": 10933
+  }
+}

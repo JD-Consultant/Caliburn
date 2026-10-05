@@ -1,0 +1,41 @@
+{
+  "kind": "offline_semantic_reader_assessment_not_keyword_grading",
+  "scope": "Frozen 19 criteria, two repetitions per arm. Complete answer findings and questions are assessed together; sources are checked separately.",
+  "statuses": {
+    "pass": "All substantive parts of the frozen criterion are stated or clearly equivalent.",
+    "partial": "Core answer is correct but a required condition or responsible window is not explicitly delivered.",
+    "fail": "Contradiction, invented fact, or wrong value. None observed within these 19 criteria."
+  },
+  "corrections_pass_ids": ["monday", "other_days", "deadline", "receiving_scope", "denominator", "strict_threshold", "safety", "scanner", "ageing_state", "ageing_delivery", "weekly"],
+  "cells": [
+    {"cell_id": "corrections-memory-1", "pass": 11, "partial": [], "fail": [], "source_note": "Understanding and all five cited situations actually read. Correct weekly deadline remains; the extra question interprets correction as numeric synchronisation, not a changed Friday deadline."},
+    {"cell_id": "corrections-flat-1", "pass": 11, "partial": [], "fail": [], "source_note": "Core source IDs match summary and employee messages. Extra cold-return discussion does not include source96 in its reference list; note this outside the correction-case core source coverage."},
+    {"cell_id": "boundaries-memory-1", "pass": 6, "partial": [
+      {"id": "partial_batch", "evidence": "批號或範圍資料不足時應請補充或向品質窗口查證", "missing": "Does not explicitly state that unlisted batches must not automatically be included in recall."},
+      {"id": "temperature", "evidence": "是否可再銷售交品質窗口判定；本人不清楚溫度合格門檻", "missing": "Does not include the criterion's ordinary-temperature warehouse-state distinction."}
+    ], "fail": [], "source_note": "Cited understanding actually read; its fixed situation/interview chain supports all relevant facts."},
+    {"cell_id": "boundaries-flat-1", "pass": 7, "partial": [
+      {"id": "temperature", "evidence": "冷藏退貨的溫度合格門檻尚未確認", "missing": "Does not include ordinary-temperature warehouse-state distinction; quality-window enquiry appears in questions."}
+    ], "fail": [], "source_note": "Includes the relevant employee sources.63/71/103 are consultant recaps or questions, not new employee facts;64 supports the extra audit discussion, not recall decisions."},
+    {"cell_id": "corrections-flat-2", "pass": 11, "partial": [], "fail": [], "source_note": "Core and extra cold-return source96 are selected; references copied from summary do not imply a raw-read tool call."},
+    {"cell_id": "corrections-memory-2", "pass": 11, "partial": [], "fail": [], "source_note": "Reads understanding, five situations and20 original messages, then cites interview IDs. Cannot call this a no-raw-read Memory-only result."},
+    {"cell_id": "boundaries-flat-2", "pass": 6, "partial": [
+      {"id": "retention", "evidence": "訪談未確認保存年限，也沒有足以寫成數字年限的依據", "missing": "Preserves unknown but does not name finance as the required confirmation window in either findings or questions."},
+      {"id": "temperature", "evidence": "冷藏退貨須查看溫度紀錄並交品質窗口判定是否可再銷售", "missing": "Does not include ordinary-temperature warehouse-state distinction."}
+    ], "fail": [], "source_note": "Source IDs valid and support delivered core facts; no raw tool read."},
+    {"cell_id": "boundaries-memory-2", "pass": 7, "partial": [
+      {"id": "temperature", "evidence": "冷藏退貨溫度合格門檻未知", "missing": "Quality-window confirmation is in questions but ordinary-temperature warehouse-state distinction is absent."}
+    ], "fail": [], "source_note": "Cited understanding actually read; finance appears in follow-up and therefore retention is complete."}
+  ],
+  "totals_per_arm": {
+    "memory": {"pass": 35, "partial": 3, "fail": 0, "opportunities": 38},
+    "flat": {"pass": 35, "partial": 3, "fail": 0, "opportunities": 38}
+  },
+  "fairness_notes": [
+    "Temperature criterion includes an ordinary-return distinction not explicitly named in the standalone question. Retain the frozen strict grading but display that limitation rather than claim universal recall errors.",
+    "Common recent105 already restates several tested facts. Those cannot be attributed solely to either artifact.",
+    "The two capture artifacts each retain19/19 tested criteria, independently assessed. Reader omissions do not mean capture loss.",
+    "Outside the frozen criteria, Memory understanding substitutes previous workday for employee's previous day; correction Memory readers repeat this wording. Flat readers retain previous day.",
+    "Flat ageing wording includes current inventory state next to explicit month-end state. Complete reading preserves month-end, but isolated extraction is ambiguous."
+  ]
+}

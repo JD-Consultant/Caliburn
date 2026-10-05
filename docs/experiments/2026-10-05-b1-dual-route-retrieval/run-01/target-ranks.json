@@ -1,0 +1,1593 @@
+[
+  {
+    "case_id": "F01",
+    "variant": "O",
+    "id": "IIS3513-003v4",
+    "title": "網站系統設計人員",
+    "paths": [
+      {
+        "query_id": "F01-whole-1",
+        "D": {
+          "rank": 40,
+          "score": 0.6823444750449444
+        },
+        "T": {
+          "rank": 15,
+          "score": 0.7030176589215698
+        }
+      }
+    ],
+    "minimum_N": 15,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F01",
+    "variant": "O",
+    "id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "paths": [
+      {
+        "query_id": "F01-whole-1",
+        "D": {
+          "rank": 4,
+          "score": 0.7115719349492176
+        },
+        "T": {
+          "rank": 85,
+          "score": 0.6727450599670184
+        }
+      }
+    ],
+    "minimum_N": 4,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F01",
+    "variant": "B1-W",
+    "id": "IIS3513-003v4",
+    "title": "網站系統設計人員",
+    "paths": [
+      {
+        "query_id": "F01-B1-W-0",
+        "D": {
+          "rank": 29,
+          "score": 0.6788372615327869
+        },
+        "T": {
+          "rank": 48,
+          "score": 0.6686411223024507
+        }
+      }
+    ],
+    "minimum_N": 29,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F01",
+    "variant": "B1-W",
+    "id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "paths": [
+      {
+        "query_id": "F01-B1-W-0",
+        "D": {
+          "rank": 4,
+          "score": 0.7035910611212184
+        },
+        "T": {
+          "rank": 37,
+          "score": 0.6725362629842131
+        }
+      }
+    ],
+    "minimum_N": 4,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F01",
+    "variant": "B1-S",
+    "id": "IIS3513-003v4",
+    "title": "網站系統設計人員",
+    "paths": [
+      {
+        "query_id": "F01-B1-S-0",
+        "D": {
+          "rank": 29,
+          "score": 0.6788372615327869
+        },
+        "T": {
+          "rank": 48,
+          "score": 0.6686411223024507
+        }
+      }
+    ],
+    "minimum_N": 29,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F01",
+    "variant": "B1-S",
+    "id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "paths": [
+      {
+        "query_id": "F01-B1-S-0",
+        "D": {
+          "rank": 4,
+          "score": 0.7035910611212184
+        },
+        "T": {
+          "rank": 37,
+          "score": 0.6725362629842131
+        }
+      }
+    ],
+    "minimum_N": 4,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F01",
+    "variant": "B2-S",
+    "id": "IIS3513-003v4",
+    "title": "網站系統設計人員",
+    "paths": [
+      {
+        "query_id": "F01-B2-S-0",
+        "D": {
+          "rank": 24,
+          "score": 0.6926030901543334
+        },
+        "T": {
+          "rank": 41,
+          "score": 0.6715989832214295
+        }
+      }
+    ],
+    "minimum_N": 24,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F01",
+    "variant": "B2-S",
+    "id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "paths": [
+      {
+        "query_id": "F01-B2-S-0",
+        "D": {
+          "rank": 1,
+          "score": 0.7297914119895996
+        },
+        "T": {
+          "rank": 55,
+          "score": 0.666970266195333
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F02",
+    "variant": "O",
+    "id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "paths": [
+      {
+        "query_id": "F02-whole-1",
+        "D": {
+          "rank": 1,
+          "score": 0.7023123205882796
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.686409174869924
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F02",
+    "variant": "B1-W",
+    "id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "paths": [
+      {
+        "query_id": "F02-B1-W-0",
+        "D": {
+          "rank": 1,
+          "score": 0.6682136925865209
+        },
+        "T": {
+          "rank": 8,
+          "score": 0.6403535433518308
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F02",
+    "variant": "B1-S",
+    "id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "paths": [
+      {
+        "query_id": "F02-B1-S-0",
+        "D": {
+          "rank": 1,
+          "score": 0.6682136925865209
+        },
+        "T": {
+          "rank": 8,
+          "score": 0.6403535433518308
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F02",
+    "variant": "B2-S",
+    "id": "INM3514-001v4",
+    "title": "網站前端開發人員",
+    "paths": [
+      {
+        "query_id": "F02-B2-S-0",
+        "D": {
+          "rank": 1,
+          "score": 0.6886501408804206
+        },
+        "T": {
+          "rank": 7,
+          "score": 0.6556090295899744
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F03",
+    "variant": "O",
+    "id": "FAC3313-001v2",
+    "title": "會計助理",
+    "paths": [
+      {
+        "query_id": "F03-whole-1",
+        "D": {
+          "rank": 2,
+          "score": 0.7570010239892274
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.7521030875086854
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F03",
+    "variant": "O",
+    "id": "FAC4311-001v2",
+    "title": "會計人員",
+    "paths": [
+      {
+        "query_id": "F03-whole-1",
+        "D": {
+          "rank": 1,
+          "score": 0.7663261264744528
+        },
+        "T": {
+          "rank": 3,
+          "score": 0.7297775751638125
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F03",
+    "variant": "B1-W",
+    "id": "FAC3313-001v2",
+    "title": "會計助理",
+    "paths": [
+      {
+        "query_id": "F03-B1-W-0",
+        "D": {
+          "rank": 2,
+          "score": 0.6830214173829856
+        },
+        "T": {
+          "rank": 13,
+          "score": 0.6556535621926716
+        }
+      }
+    ],
+    "minimum_N": 2,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F03",
+    "variant": "B1-W",
+    "id": "FAC4311-001v2",
+    "title": "會計人員",
+    "paths": [
+      {
+        "query_id": "F03-B1-W-0",
+        "D": {
+          "rank": 5,
+          "score": 0.6634457792970898
+        },
+        "T": {
+          "rank": 17,
+          "score": 0.652774169721495
+        }
+      }
+    ],
+    "minimum_N": 5,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F03",
+    "variant": "B1-S",
+    "id": "FAC3313-001v2",
+    "title": "會計助理",
+    "paths": [
+      {
+        "query_id": "F03-B1-S-0",
+        "D": {
+          "rank": 12,
+          "score": 0.6179615993440235
+        },
+        "T": {
+          "rank": 273,
+          "score": 0.5888408777170894
+        }
+      },
+      {
+        "query_id": "F03-B1-S-1",
+        "D": {
+          "rank": 2,
+          "score": 0.7203723379175231
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.7486667109235229
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F03",
+    "variant": "B1-S",
+    "id": "FAC4311-001v2",
+    "title": "會計人員",
+    "paths": [
+      {
+        "query_id": "F03-B1-S-0",
+        "D": {
+          "rank": 111,
+          "score": 0.5719135785232679
+        },
+        "T": {
+          "rank": 107,
+          "score": 0.6126986161867678
+        }
+      },
+      {
+        "query_id": "F03-B1-S-1",
+        "D": {
+          "rank": 1,
+          "score": 0.7399393801686973
+        },
+        "T": {
+          "rank": 7,
+          "score": 0.6987716286032282
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F03",
+    "variant": "B2-S",
+    "id": "FAC3313-001v2",
+    "title": "會計助理",
+    "paths": [
+      {
+        "query_id": "F03-B2-S-0",
+        "D": {
+          "rank": 5,
+          "score": 0.6358038911264112
+        },
+        "T": {
+          "rank": 136,
+          "score": 0.6112318239202943
+        }
+      },
+      {
+        "query_id": "F03-B2-S-1",
+        "D": {
+          "rank": 2,
+          "score": 0.7207080672272118
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.7549239122124479
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F03",
+    "variant": "B2-S",
+    "id": "FAC4311-001v2",
+    "title": "會計人員",
+    "paths": [
+      {
+        "query_id": "F03-B2-S-0",
+        "D": {
+          "rank": 66,
+          "score": 0.584717083764197
+        },
+        "T": {
+          "rank": 52,
+          "score": 0.6286270719427459
+        }
+      },
+      {
+        "query_id": "F03-B2-S-1",
+        "D": {
+          "rank": 1,
+          "score": 0.7408381650091613
+        },
+        "T": {
+          "rank": 9,
+          "score": 0.7004530054903755
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F04",
+    "variant": "O",
+    "id": "SET3113-002v3",
+    "title": "冷凍空調技術人員",
+    "paths": [
+      {
+        "query_id": "F04-whole-1",
+        "D": {
+          "rank": 24,
+          "score": 0.6854147001067313
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.717951040756995
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F04",
+    "variant": "B1-W",
+    "id": "SET3113-002v3",
+    "title": "冷凍空調技術人員",
+    "paths": [
+      {
+        "query_id": "F04-B1-W-0",
+        "D": {
+          "rank": 28,
+          "score": 0.6557753644915914
+        },
+        "T": {
+          "rank": 2,
+          "score": 0.6782177038295588
+        }
+      }
+    ],
+    "minimum_N": 2,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F04",
+    "variant": "B1-S",
+    "id": "SET3113-002v3",
+    "title": "冷凍空調技術人員",
+    "paths": [
+      {
+        "query_id": "F04-B1-S-0",
+        "D": {
+          "rank": 49,
+          "score": 0.6253501255103411
+        },
+        "T": {
+          "rank": 2,
+          "score": 0.6818753606932941
+        }
+      },
+      {
+        "query_id": "F04-B1-S-1",
+        "D": {
+          "rank": 492,
+          "score": 0.5023232221675122
+        },
+        "T": {
+          "rank": 182,
+          "score": 0.58814344446318
+        }
+      },
+      {
+        "query_id": "F04-B1-S-2",
+        "D": {
+          "rank": 19,
+          "score": 0.6452331648152325
+        },
+        "T": {
+          "rank": 4,
+          "score": 0.686484585988479
+        }
+      },
+      {
+        "query_id": "F04-B1-S-3",
+        "D": {
+          "rank": 43,
+          "score": 0.6462569463376471
+        },
+        "T": {
+          "rank": 27,
+          "score": 0.6851648074998252
+        }
+      }
+    ],
+    "minimum_N": 2,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F04",
+    "variant": "B2-S",
+    "id": "SET3113-002v3",
+    "title": "冷凍空調技術人員",
+    "paths": [
+      {
+        "query_id": "F04-B2-S-0",
+        "D": {
+          "rank": 28,
+          "score": 0.6804179816264571
+        },
+        "T": {
+          "rank": 7,
+          "score": 0.699974767593406
+        }
+      }
+    ],
+    "minimum_N": 7,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F05",
+    "variant": "O",
+    "id": "AVA2172-001v4",
+    "title": "多媒體設計人員",
+    "paths": [
+      {
+        "query_id": "F05-whole-1",
+        "D": {
+          "rank": 38,
+          "score": 0.6697653868025577
+        },
+        "T": {
+          "rank": 14,
+          "score": 0.6946449971253964
+        }
+      }
+    ],
+    "minimum_N": 14,
+    "sensitivity_excluded": true
+  },
+  {
+    "case_id": "F05",
+    "variant": "O",
+    "id": "AVA2172-002v3",
+    "title": "平面視覺傳達設計人員",
+    "paths": [
+      {
+        "query_id": "F05-whole-1",
+        "D": {
+          "rank": 3,
+          "score": 0.725461590191744
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.7466794986880528
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F05",
+    "variant": "B1-W",
+    "id": "AVA2172-001v4",
+    "title": "多媒體設計人員",
+    "paths": [
+      {
+        "query_id": "F05-B1-W-0",
+        "D": {
+          "rank": 3,
+          "score": 0.705299290280322
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.6992456719315386
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": true
+  },
+  {
+    "case_id": "F05",
+    "variant": "B1-W",
+    "id": "AVA2172-002v3",
+    "title": "平面視覺傳達設計人員",
+    "paths": [
+      {
+        "query_id": "F05-B1-W-0",
+        "D": {
+          "rank": 1,
+          "score": 0.7094093954573908
+        },
+        "T": {
+          "rank": 3,
+          "score": 0.6948417222776528
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F05",
+    "variant": "B1-S",
+    "id": "AVA2172-001v4",
+    "title": "多媒體設計人員",
+    "paths": [
+      {
+        "query_id": "F05-B1-S-0",
+        "D": {
+          "rank": 3,
+          "score": 0.7173493626115489
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.7181538911517453
+        }
+      },
+      {
+        "query_id": "F05-B1-S-1",
+        "D": {
+          "rank": 136,
+          "score": 0.5518185338544167
+        },
+        "T": {
+          "rank": 51,
+          "score": 0.5977215927281467
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": true
+  },
+  {
+    "case_id": "F05",
+    "variant": "B1-S",
+    "id": "AVA2172-002v3",
+    "title": "平面視覺傳達設計人員",
+    "paths": [
+      {
+        "query_id": "F05-B1-S-0",
+        "D": {
+          "rank": 2,
+          "score": 0.7249408326626066
+        },
+        "T": {
+          "rank": 3,
+          "score": 0.7136493242430476
+        }
+      },
+      {
+        "query_id": "F05-B1-S-1",
+        "D": {
+          "rank": 27,
+          "score": 0.5810040040016817
+        },
+        "T": {
+          "rank": 44,
+          "score": 0.6016150726379559
+        }
+      }
+    ],
+    "minimum_N": 2,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "F05",
+    "variant": "B2-S",
+    "id": "AVA2172-001v4",
+    "title": "多媒體設計人員",
+    "paths": [
+      {
+        "query_id": "F05-B2-S-0",
+        "D": {
+          "rank": 4,
+          "score": 0.704175876199599
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.7179548491921508
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": true
+  },
+  {
+    "case_id": "F05",
+    "variant": "B2-S",
+    "id": "AVA2172-002v3",
+    "title": "平面視覺傳達設計人員",
+    "paths": [
+      {
+        "query_id": "F05-B2-S-0",
+        "D": {
+          "rank": 1,
+          "score": 0.7260155354015767
+        },
+        "T": {
+          "rank": 3,
+          "score": 0.7030466818960578
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H02",
+    "variant": "O",
+    "id": "MMP4321-003v4",
+    "title": "零售業倉儲管理人員",
+    "paths": [
+      {
+        "query_id": "H02-whole-1",
+        "D": {
+          "rank": 5,
+          "score": 0.7045879199420888
+        },
+        "T": {
+          "rank": 27,
+          "score": 0.6582342036043167
+        }
+      }
+    ],
+    "minimum_N": 5,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H02",
+    "variant": "O",
+    "id": "RLM9330-001v1",
+    "title": "電商物流中心理貨員",
+    "paths": [
+      {
+        "query_id": "H02-whole-1",
+        "D": {
+          "rank": 2,
+          "score": 0.7600323452930058
+        },
+        "T": {
+          "rank": 8,
+          "score": 0.7063246382993377
+        }
+      }
+    ],
+    "minimum_N": 2,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H02",
+    "variant": "B1-W",
+    "id": "MMP4321-003v4",
+    "title": "零售業倉儲管理人員",
+    "paths": [
+      {
+        "query_id": "H02-B1-W-0",
+        "D": {
+          "rank": 5,
+          "score": 0.7266644168697937
+        },
+        "T": {
+          "rank": 15,
+          "score": 0.6809769018677185
+        }
+      }
+    ],
+    "minimum_N": 5,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H02",
+    "variant": "B1-W",
+    "id": "RLM9330-001v1",
+    "title": "電商物流中心理貨員",
+    "paths": [
+      {
+        "query_id": "H02-B1-W-0",
+        "D": {
+          "rank": 2,
+          "score": 0.7715662595000435
+        },
+        "T": {
+          "rank": 6,
+          "score": 0.7112247392946036
+        }
+      }
+    ],
+    "minimum_N": 2,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H02",
+    "variant": "B1-S",
+    "id": "MMP4321-003v4",
+    "title": "零售業倉儲管理人員",
+    "paths": [
+      {
+        "query_id": "H02-B1-S-0",
+        "D": {
+          "rank": 5,
+          "score": 0.6976936959646453
+        },
+        "T": {
+          "rank": 12,
+          "score": 0.6886678446119532
+        }
+      },
+      {
+        "query_id": "H02-B1-S-1",
+        "D": {
+          "rank": 2,
+          "score": 0.6525431914935418
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.7157822707688959
+        }
+      },
+      {
+        "query_id": "H02-B1-S-2",
+        "D": {
+          "rank": 5,
+          "score": 0.6506976409562619
+        },
+        "T": {
+          "rank": 55,
+          "score": 0.644008873018073
+        }
+      },
+      {
+        "query_id": "H02-B1-S-3",
+        "D": {
+          "rank": 5,
+          "score": 0.7111007550859613
+        },
+        "T": {
+          "rank": 14,
+          "score": 0.7060155508748679
+        }
+      },
+      {
+        "query_id": "H02-B1-S-4",
+        "D": {
+          "rank": 6,
+          "score": 0.7073388265953744
+        },
+        "T": {
+          "rank": 39,
+          "score": 0.7059498763785278
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H02",
+    "variant": "B1-S",
+    "id": "RLM9330-001v1",
+    "title": "電商物流中心理貨員",
+    "paths": [
+      {
+        "query_id": "H02-B1-S-0",
+        "D": {
+          "rank": 2,
+          "score": 0.7332032739545575
+        },
+        "T": {
+          "rank": 4,
+          "score": 0.7210828624424053
+        }
+      },
+      {
+        "query_id": "H02-B1-S-1",
+        "D": {
+          "rank": 20,
+          "score": 0.6032788914870003
+        },
+        "T": {
+          "rank": 3,
+          "score": 0.6891639854638917
+        }
+      },
+      {
+        "query_id": "H02-B1-S-2",
+        "D": {
+          "rank": 9,
+          "score": 0.6449163986336983
+        },
+        "T": {
+          "rank": 23,
+          "score": 0.6677181867840191
+        }
+      },
+      {
+        "query_id": "H02-B1-S-3",
+        "D": {
+          "rank": 1,
+          "score": 0.7492251645983901
+        },
+        "T": {
+          "rank": 4,
+          "score": 0.7538868783122755
+        }
+      },
+      {
+        "query_id": "H02-B1-S-4",
+        "D": {
+          "rank": 2,
+          "score": 0.7303755181853775
+        },
+        "T": {
+          "rank": 3,
+          "score": 0.7736095546871194
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H02",
+    "variant": "B2-S",
+    "id": "MMP4321-003v4",
+    "title": "零售業倉儲管理人員",
+    "paths": [
+      {
+        "query_id": "H02-B2-S-0",
+        "D": {
+          "rank": 4,
+          "score": 0.7386853901862492
+        },
+        "T": {
+          "rank": 17,
+          "score": 0.6828049007850766
+        }
+      }
+    ],
+    "minimum_N": 4,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H02",
+    "variant": "B2-S",
+    "id": "RLM9330-001v1",
+    "title": "電商物流中心理貨員",
+    "paths": [
+      {
+        "query_id": "H02-B2-S-0",
+        "D": {
+          "rank": 1,
+          "score": 0.7761021924291318
+        },
+        "T": {
+          "rank": 4,
+          "score": 0.7211131140953134
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H03",
+    "variant": "O",
+    "id": "BAS3323-003v3",
+    "title": "採購助理",
+    "paths": [
+      {
+        "query_id": "H03-whole-1",
+        "D": {
+          "rank": 4,
+          "score": 0.6930276347676374
+        },
+        "T": {
+          "rank": 2,
+          "score": 0.6911275491339846
+        }
+      }
+    ],
+    "minimum_N": 2,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H03",
+    "variant": "O",
+    "id": "MMP1324-001v4",
+    "title": "資材人員",
+    "paths": [
+      {
+        "query_id": "H03-whole-1",
+        "D": {
+          "rank": 10,
+          "score": 0.6765578342178395
+        },
+        "T": {
+          "rank": 6,
+          "score": 0.675111453576509
+        }
+      }
+    ],
+    "minimum_N": 6,
+    "sensitivity_excluded": true
+  },
+  {
+    "case_id": "H03",
+    "variant": "B1-W",
+    "id": "BAS3323-003v3",
+    "title": "採購助理",
+    "paths": [
+      {
+        "query_id": "H03-B1-W-0",
+        "D": {
+          "rank": 15,
+          "score": 0.6633191740835234
+        },
+        "T": {
+          "rank": 18,
+          "score": 0.647455160889616
+        }
+      }
+    ],
+    "minimum_N": 15,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H03",
+    "variant": "B1-W",
+    "id": "MMP1324-001v4",
+    "title": "資材人員",
+    "paths": [
+      {
+        "query_id": "H03-B1-W-0",
+        "D": {
+          "rank": 4,
+          "score": 0.6920992619192451
+        },
+        "T": {
+          "rank": 14,
+          "score": 0.6559709803407363
+        }
+      }
+    ],
+    "minimum_N": 4,
+    "sensitivity_excluded": true
+  },
+  {
+    "case_id": "H03",
+    "variant": "B1-S",
+    "id": "BAS3323-003v3",
+    "title": "採購助理",
+    "paths": [
+      {
+        "query_id": "H03-B1-S-0",
+        "D": {
+          "rank": 11,
+          "score": 0.5975789207459812
+        },
+        "T": {
+          "rank": 21,
+          "score": 0.6341445811739155
+        }
+      },
+      {
+        "query_id": "H03-B1-S-1",
+        "D": {
+          "rank": 9,
+          "score": 0.6181480862916627
+        },
+        "T": {
+          "rank": 23,
+          "score": 0.6754771110658826
+        }
+      },
+      {
+        "query_id": "H03-B1-S-2",
+        "D": {
+          "rank": 10,
+          "score": 0.5920540837779117
+        },
+        "T": {
+          "rank": 42,
+          "score": 0.6257469104985431
+        }
+      },
+      {
+        "query_id": "H03-B1-S-3",
+        "D": {
+          "rank": 21,
+          "score": 0.6015295212575504
+        },
+        "T": {
+          "rank": 25,
+          "score": 0.6694668113753741
+        }
+      },
+      {
+        "query_id": "H03-B1-S-4",
+        "D": {
+          "rank": 7,
+          "score": 0.6604059895600257
+        },
+        "T": {
+          "rank": 14,
+          "score": 0.690559284131699
+        }
+      },
+      {
+        "query_id": "H03-B1-S-5",
+        "D": {
+          "rank": 2,
+          "score": 0.5897913357671316
+        },
+        "T": {
+          "rank": 16,
+          "score": 0.6117991184735058
+        }
+      },
+      {
+        "query_id": "H03-B1-S-6",
+        "D": {
+          "rank": 19,
+          "score": 0.6348776382352479
+        },
+        "T": {
+          "rank": 19,
+          "score": 0.6999202324563875
+        }
+      },
+      {
+        "query_id": "H03-B1-S-7",
+        "D": {
+          "rank": 1,
+          "score": 0.6918962658702966
+        },
+        "T": {
+          "rank": 3,
+          "score": 0.7073565389589626
+        }
+      },
+      {
+        "query_id": "H03-B1-S-8",
+        "D": {
+          "rank": 1,
+          "score": 0.6149236363922661
+        },
+        "T": {
+          "rank": 2,
+          "score": 0.6466484483931705
+        }
+      },
+      {
+        "query_id": "H03-B1-S-9",
+        "D": {
+          "rank": 2,
+          "score": 0.6605421221721062
+        },
+        "T": {
+          "rank": 8,
+          "score": 0.7012205782064911
+        }
+      },
+      {
+        "query_id": "H03-B1-S-10",
+        "D": {
+          "rank": 1,
+          "score": 0.6336062688878598
+        },
+        "T": {
+          "rank": 4,
+          "score": 0.683519191576192
+        }
+      },
+      {
+        "query_id": "H03-B1-S-11",
+        "D": {
+          "rank": 2,
+          "score": 0.692728622989765
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.7445714681446203
+        }
+      },
+      {
+        "query_id": "H03-B1-S-12",
+        "D": {
+          "rank": 4,
+          "score": 0.6277082106938328
+        },
+        "T": {
+          "rank": 9,
+          "score": 0.666204836945129
+        }
+      },
+      {
+        "query_id": "H03-B1-S-13",
+        "D": {
+          "rank": 5,
+          "score": 0.6473738553296777
+        },
+        "T": {
+          "rank": 9,
+          "score": 0.6798156283746707
+        }
+      },
+      {
+        "query_id": "H03-B1-S-14",
+        "D": {
+          "rank": 9,
+          "score": 0.6319657936285034
+        },
+        "T": {
+          "rank": 24,
+          "score": 0.6368216589667169
+        }
+      },
+      {
+        "query_id": "H03-B1-S-15",
+        "D": {
+          "rank": 3,
+          "score": 0.6396150710569375
+        },
+        "T": {
+          "rank": 6,
+          "score": 0.6938108023447405
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H03",
+    "variant": "B1-S",
+    "id": "MMP1324-001v4",
+    "title": "資材人員",
+    "paths": [
+      {
+        "query_id": "H03-B1-S-0",
+        "D": {
+          "rank": 9,
+          "score": 0.6005670699265477
+        },
+        "T": {
+          "rank": 10,
+          "score": 0.6670757144111583
+        }
+      },
+      {
+        "query_id": "H03-B1-S-1",
+        "D": {
+          "rank": 1,
+          "score": 0.6872232468113211
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.7825249931649304
+        }
+      },
+      {
+        "query_id": "H03-B1-S-2",
+        "D": {
+          "rank": 7,
+          "score": 0.5958973655338881
+        },
+        "T": {
+          "rank": 24,
+          "score": 0.6379119564279865
+        }
+      },
+      {
+        "query_id": "H03-B1-S-3",
+        "D": {
+          "rank": 14,
+          "score": 0.6161427207239087
+        },
+        "T": {
+          "rank": 37,
+          "score": 0.6588772893003134
+        }
+      },
+      {
+        "query_id": "H03-B1-S-4",
+        "D": {
+          "rank": 486,
+          "score": 0.5228313523838088
+        },
+        "T": {
+          "rank": 17,
+          "score": 0.6863739759857059
+        }
+      },
+      {
+        "query_id": "H03-B1-S-5",
+        "D": {
+          "rank": 42,
+          "score": 0.5355557144443399
+        },
+        "T": {
+          "rank": 1,
+          "score": 0.6480869373560588
+        }
+      },
+      {
+        "query_id": "H03-B1-S-6",
+        "D": {
+          "rank": 41,
+          "score": 0.6112036594918487
+        },
+        "T": {
+          "rank": 12,
+          "score": 0.7179265312664608
+        }
+      },
+      {
+        "query_id": "H03-B1-S-7",
+        "D": {
+          "rank": 21,
+          "score": 0.6242641993449174
+        },
+        "T": {
+          "rank": 2,
+          "score": 0.7283139512446334
+        }
+      },
+      {
+        "query_id": "H03-B1-S-8",
+        "D": {
+          "rank": 109,
+          "score": 0.5438881537209539
+        },
+        "T": {
+          "rank": 3,
+          "score": 0.6446429195338836
+        }
+      },
+      {
+        "query_id": "H03-B1-S-9",
+        "D": {
+          "rank": 13,
+          "score": 0.6050369453304614
+        },
+        "T": {
+          "rank": 11,
+          "score": 0.6921302878731015
+        }
+      },
+      {
+        "query_id": "H03-B1-S-10",
+        "D": {
+          "rank": 15,
+          "score": 0.5594253452223286
+        },
+        "T": {
+          "rank": 2,
+          "score": 0.6851270496567898
+        }
+      },
+      {
+        "query_id": "H03-B1-S-11",
+        "D": {
+          "rank": 15,
+          "score": 0.6274738916487113
+        },
+        "T": {
+          "rank": 17,
+          "score": 0.6672401360943132
+        }
+      },
+      {
+        "query_id": "H03-B1-S-12",
+        "D": {
+          "rank": 45,
+          "score": 0.5923548116049251
+        },
+        "T": {
+          "rank": 46,
+          "score": 0.6330261025259716
+        }
+      },
+      {
+        "query_id": "H03-B1-S-13",
+        "D": {
+          "rank": 13,
+          "score": 0.6195718963709413
+        },
+        "T": {
+          "rank": 18,
+          "score": 0.6584800915092314
+        }
+      },
+      {
+        "query_id": "H03-B1-S-14",
+        "D": {
+          "rank": 15,
+          "score": 0.6098994010778231
+        },
+        "T": {
+          "rank": 36,
+          "score": 0.6318608719945482
+        }
+      },
+      {
+        "query_id": "H03-B1-S-15",
+        "D": {
+          "rank": 56,
+          "score": 0.5769798978426475
+        },
+        "T": {
+          "rank": 28,
+          "score": 0.6593198835389268
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": true
+  },
+  {
+    "case_id": "H03",
+    "variant": "B2-S",
+    "id": "BAS3323-003v3",
+    "title": "採購助理",
+    "paths": [
+      {
+        "query_id": "H03-B2-S-0",
+        "D": {
+          "rank": 8,
+          "score": 0.681230626787825
+        },
+        "T": {
+          "rank": 9,
+          "score": 0.699956322258308
+        }
+      },
+      {
+        "query_id": "H03-B2-S-1",
+        "D": {
+          "rank": 9,
+          "score": 0.677675775260768
+        },
+        "T": {
+          "rank": 9,
+          "score": 0.7248981161543756
+        }
+      },
+      {
+        "query_id": "H03-B2-S-2",
+        "D": {
+          "rank": 1,
+          "score": 0.6229213547192063
+        },
+        "T": {
+          "rank": 16,
+          "score": 0.6136434261444267
+        }
+      },
+      {
+        "query_id": "H03-B2-S-3",
+        "D": {
+          "rank": 1,
+          "score": 0.6804092910348716
+        },
+        "T": {
+          "rank": 3,
+          "score": 0.6909169861776868
+        }
+      }
+    ],
+    "minimum_N": 1,
+    "sensitivity_excluded": false
+  },
+  {
+    "case_id": "H03",
+    "variant": "B2-S",
+    "id": "MMP1324-001v4",
+    "title": "資材人員",
+    "paths": [
+      {
+        "query_id": "H03-B2-S-0",
+        "D": {
+          "rank": 12,
+          "score": 0.6647765079149142
+        },
+        "T": {
+          "rank": 37,
+          "score": 0.6684628704600852
+        }
+      },
+      {
+        "query_id": "H03-B2-S-1",
+        "D": {
+          "rank": 4,
+          "score": 0.701733237817871
+        },
+        "T": {
+          "rank": 10,
+          "score": 0.7217926130605552
+        }
+      },
+      {
+        "query_id": "H03-B2-S-2",
+        "D": {
+          "rank": 69,
+          "score": 0.5624476112392731
+        },
+        "T": {
+          "rank": 2,
+          "score": 0.639604716504123
+        }
+      },
+      {
+        "query_id": "H03-B2-S-3",
+        "D": {
+          "rank": 24,
+          "score": 0.6210166791035203
+        },
+        "T": {
+          "rank": 2,
+          "score": 0.7179378381395151
+        }
+      }
+    ],
+    "minimum_N": 2,
+    "sensitivity_excluded": true
+  }
+]

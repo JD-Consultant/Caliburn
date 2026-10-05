@@ -1,6 +1,7 @@
 [project]
 name = "jd-ocs-indexer"
 version = "0.1.0"
+license = "MIT"
 description = "OCS JSON -> Qdrant indexer for JD Authoring RAG"
 readme = "README.md"
 authors = [

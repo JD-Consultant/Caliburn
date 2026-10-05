@@ -1,5 +1,6 @@
 {
   "name": "@caliburn/ocs-contract",
+  "license": "MIT",
   "private": true,
   "types": "./types/ocs-document.ts",
   "exports": {

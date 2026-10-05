@@ -1,5 +1,6 @@
 {
   "name": "caliburn",
+  "license": "MIT",
   "private": true,
   "packageManager": "pnpm@12.5.1",
   "engines": {

@@ -16,6 +16,11 @@
     "check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build",
     "app:migrate": "uv run --project apps/api --locked alembic -c apps/api/alembic.ini upgrade head",
     "app:status": "uv run --project apps/api --locked python -m caliburn.status",
+    "docker:up": "docker compose -f compose.jd-app.yaml up -d --wait",
+    "docker:stop": "docker compose -f compose.jd-app.yaml stop",
+    "docker:rag:up": "docker compose -f compose.jd-app.yaml -f compose.jd-app.rag.yaml --profile rag up -d --wait --wait-timeout 900",
+    "docker:rag:stop": "docker compose -f compose.jd-app.yaml -f compose.jd-app.rag.yaml --profile rag stop",
+    "test:docker": "node --test scripts/docker-compose.test.mjs",
     "rag:up": "docker compose --profile rag up -d",
     "rag:down": "docker compose stop qdrant embedder",
     "rag:dev": "pnpm --filter @caliburn/ocs-indexer run dev"

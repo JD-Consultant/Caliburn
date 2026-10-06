@@ -23,6 +23,10 @@
 
 [接線驗證](2026-10-05-occupation-reference-tools/agent-integration-verification.md)使用合成 Responses／公版 HTTP transport 與真 PostgreSQL，核對可選設定、A 讀寫、B1／B2 唯讀、跨輪 state、固定 Memory 範圍，以及中斷後沿原請求與原生 checkpoint 恢復。它不代表已驗證公版查漏或 JD 收尾品質。
 
+## Docker 公版參考模式
+
+[配置與套件驗證](2026-10-06-docker-rag-startup.md)記錄基本／公版參考模式、查詢 API 容器化、六項實際 Compose 解析測試、鎖定安裝及 API 回歸。當輪 Docker 引擎未開，Linux 映像、GPU 與完整模式的真容器旅程尚未驗證，操作與後續檢查分別由該頁及[runbook](../../runbook.md#含公版參考的-docker-模式)維護。
+
 ## 原件與歷史路徑
 
 這些資料原放在 `docs/plans/evidence/`，現在依用途歸入工程驗證。JSON、測試輸出與原始結果未改寫；Markdown 只更新檔案連結與重現命令。原 metadata 內的舊路徑仍代表當時位置，查閱時將 `docs/plans/evidence/` 替換為 `docs/experiments/engineering/` 即可。歷史提交的原樣文件依[歷史索引](../../history.md)取回。

@@ -94,7 +94,7 @@ $env:CALIBURN_OCCUPATION_REFERENCE_URL = 'http://127.0.0.1:8000'
 $env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
 ```
 
-未設 URL 就關閉；timeout 預設 30 秒，必須有限且大於零。原生啟動沿現有資料庫／金鑰設定與 `pnpm start`；若同時有其他 App 使用相同 DB，先依 runbook 避免同一 leader 的重複程序。Docker 使用現有 App `env_file` 加入這兩項設定，URL 使用容器可達的服務位置；根 Compose 插值 `.env` 不等於容器環境。
+未設 URL 就關閉；timeout 預設 30 秒，必須有限且大於零。原生啟動沿現有資料庫／金鑰設定與 `pnpm start`；若同時有其他 App 使用相同 DB，先依 runbook 避免同一 leader 的重複程序。Docker 可使用[公版參考模式](../../docs/runbook.md#含公版參考的-docker-模式)一併啟動獨立 RAG，延伸配置會設定 `http://ocs-indexer:8000`。若使用自有外部 RAG，則在 App `env_file` 加入上述設定，URL 必須容器可達；根 Compose 插值 `.env` 不等於容器環境。
 
 顧問新增五工具，B1／B2 新增一個唯讀工具；角色已保存的 preparation／context／Step 繼續原工具清單，新設定只影響新的未綁定請求。關閉前先讓使用公版的 A Turn 完成；原請求需要 RAG 而 client 配置消失時會明確拒絕，不靜默換工具。RAG 下線回工具錯誤，不視為查無結果、不清 state。client 不使用系統代理、不跟隨重導，由 App 關閉。
 

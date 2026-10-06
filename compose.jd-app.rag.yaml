@@ -1,0 +1,59 @@
+# Explicit opt-in extension; always pair with compose.jd-app.yaml --profile rag.
+# Reuse the independent RAG infrastructure without exposing its ports to the host.
+services:
+  app:
+    environment:
+      CALIBURN_OCCUPATION_REFERENCE_URL: http://ocs-indexer:8000
+
+  qdrant:
+    extends:
+      file: docker-compose.yml
+      service: qdrant
+    ports: !reset []
+
+  embedder:
+    extends:
+      file: docker-compose.yml
+      service: embedder
+    image: !reset null
+    ports: !reset []
+
+  ocs-indexer:
+    profiles: [rag]
+    build:
+      context: .
+      dockerfile: apps/ocs-indexer/Dockerfile
+    init: true
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      EMBEDDER_URL: http://embedder:80
+      RERANKER_URL: http://embedder:80
+      REFERENCE_COLLECTION: ${CALIBURN_REFERENCE_COLLECTION:?Select a public-reference collection for this mode}
+      REFERENCE_CANDIDATE_LIMIT: ${CALIBURN_REFERENCE_CANDIDATE_LIMIT:-20}
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      embedder:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# These belong to caliburn-jd-app, not the older standalone RAG project.
+volumes:
+  qdrant_storage:
+  hf_cache:

@@ -22,6 +22,14 @@ OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HT
 
 ## 跑 / 測試
 
+### 與 JD App 一起用 Docker 啟動
+
+使用根目錄的 `compose.jd-app.yaml` 加 `compose.jd-app.rag.yaml`，首次選版與建索引後可用 `pnpm docker:rag:up` 一起啟動 App、PostgreSQL、查詢 API、Qdrant 與 GPU 模型。停止用 `pnpm docker:rag:stop`。完整設定、來源唯讀掛載與搜尋檢查見[操作手冊](../../docs/runbook.md#含公版參考的-docker-模式)。
+
+RAG 仍是獨立服務，不移入 App。查詢 API 映像依本目錄的 lockfile 安裝 API extra 與兩個契約套件，不安裝 torch，也不包含 `.env`、測試或來源 JSON。容器只走內網，不接收 App 的金鑰。`Dockerfile.dockerignore` 限制可進入建置的檔案；服務以非 root 使用者執行，套件採非 editable 安裝，不依賴開發原始碼路徑。
+
+完整模式使用 `caliburn-jd-app` project 的專用索引與模型快取 volume，不自動載入獨立開發 Compose 的資料。下方原生／獨立開發方式仍可用，兩種方式不要同時掛同一份 Qdrant 儲存。
+
 ### 職位整體參考 API
 
 2026-10-05 已實作；JD App 可選 consumer 依 [ADR0080](../../docs/adr/0080-opt-in-public-reference-agent-tools.md) 明示啟用，獨立服務權責不變。
@@ -157,7 +165,7 @@ embed 字串只放 ChunkRecord.text) → HTTP embed(batch) → QdrantWriter.upse
 | GET | `/occupations/{ocs_code}` | 職類官方 metadata(表頭池原料) |
 | GET | `/occupations/{ocs_code}/tasks` | unit→task 結構(任務候選原料) |
 | GET | `/occupations/{ocs_code}/competencies` | K/S/O/P/A 能力池(多來源 CitableItem) |
-| GET | `/healthz`、`/stats` | 就緒(含 `index_model`)、點數統計 |
+| GET | `/healthz`、`/stats` | 基礎連線檢查（含可取得的 `index_model`）、點數統計；不代表公版索引 ready |
 
 這組 profile／task API 的歷史消費端設計保留在 Git 與研究文件。若要新增它的正式 JD App 用途，須另經現行決策流程，不能直接復活舊 `apps/api` 接點；ADR0080 已接入的是上方獨立的職位整體參考 API。
 

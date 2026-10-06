@@ -293,7 +293,13 @@ Python Playwright 的 Chromium revision 跟套件鎖定，瀏覽器測試用 Pla
 
 PostgreSQL 的 named volume 掛於 18 版要求的 `/var/lib/postgresql`。業務與 checkpoint 保存在同一資料庫；App 容器沒有第二份持久資料。初始化和升級由明確的一次性 Alembic 命令處理，不藏在啟動器裡。OpenAI key 在執行時注入後端環境，不作 build argument 或映像檔案。此配置不搬移既有資料，也不提供遠端公開部署。
 
-依據：[uv Docker](https://docs.astral.sh/uv/guides/integration/docker/)、[Playwright Docker](https://playwright.dev/python/docs/docker)、[Compose 啟動相依](https://docs.docker.com/compose/how-tos/startup-order/)、[PostgreSQL 官方映像](https://hub.docker.com/_/postgres)。版本沿用專案 lockfile，映像基底及字型來源固定 digest／checksum。操作由 [runbook](../runbook.md#docker-操作)維護，實測與限制見 [Docker 交付驗證](../experiments/product-validation/2026-10-03-docker-delivery.md)。
+公版參考使用可選延伸檔 `compose.jd-app.rag.yaml`。它透過 Compose `extends` 重用獨立 RAG 的 Qdrant／GPU 配置，取消主機埠，加入非 root、唯讀的查詢 API 容器。GPU 的固定映像 tag 也在延伸檔中清除；App／API／GPU 映像由 Compose 按 project 命名，避免隔離建置覆蓋其他 project 使用的映像。
+
+API 依 `apps/ocs-indexer/uv.lock` 安裝自身與兩個本地契約套件，採非 editable 安裝，不帶 torch、來源目錄或 OpenAI key。App 透過 `http://ocs-indexer:8000` 查詢，不使用主機 localhost。原 App、PostgreSQL、project name 及 PG volume 都不變。
+
+查詢 API 等待 Qdrant 與模型通過健康檢查；App 的啟動相依仍只有 PostgreSQL。`--wait` 與 `/healthz` 不檢查公版索引是否就緒，首次使用仍須選版、建索引並實際搜尋。索引與模型身分由既有查詢流程核對，不另加啟動驗證器。RAG 服務持續運行，工具按需使用；不掛 Docker socket，也不在第一次查詢時才啟動容器。配置不自動選版或遷移資料。操作見 [公版 Docker 模式](../runbook.md#含公版參考的-docker-模式)，本次驗證見[工程紀錄](../experiments/engineering/2026-10-06-docker-rag-startup.md)。
+
+依據：[uv Docker](https://docs.astral.sh/uv/guides/integration/docker/)、[Playwright Docker](https://playwright.dev/python/docs/docker)、[Compose 啟動相依](https://docs.docker.com/compose/how-tos/startup-order/)、[服務配置重用](https://docs.docker.com/compose/how-tos/multiple-compose-files/extends/)、[Compose 覆寫規則](https://docs.docker.com/reference/compose-file/merge/)、[PostgreSQL 官方映像](https://hub.docker.com/_/postgres)。版本沿用專案 lockfile，App 與查詢 API 映像基底及字型來源固定 digest／checksum；GPU 配置沿既有 RAG Dockerfile。操作由 [runbook](../runbook.md#docker-操作)維護，實測與限制見 [Docker 交付驗證](../experiments/product-validation/2026-10-03-docker-delivery.md)。
 
 ## 5. 安全與操作邊界
 

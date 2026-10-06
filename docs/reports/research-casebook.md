@@ -1,8 +1,19 @@
 # Caliburn 問題分析與實驗案例集
 
-本頁是跨校備審、專題報告與口頭報告共用的材料入口，不是個人自傳或第二份驗收紀錄。重點是說清楚「遇到什麼問題，如何查證，為什麼選這個解法，測試支持到什麼程度」。原始數據與最新結論仍由各任務證據持有；本頁整理截至 2026-10-02 可核對的案例。
+本頁供團隊專題與口頭報告選取、核對案例，說明遇到什麼問題、如何查證、為何採用或放棄方案，以及證據支持到什麼程度。下方四個案例保留截至 2026-10-02 的材料；近期研究另列閱讀入口。原始數據與正式狀態仍由各實驗及責任文件維護。
 
-**本頁只收錄四個較完整摘要，不是全專案沿革或已決定的備審選材。**先讀[開發演進素材索引](development-history/README.md)，追查早期解析、檢索、訪談、Memory 與架構多次更替；再從原文選材，不因這頁篇幅較長就忽略較早失敗與研究。
+完整沿革見[開發演進素材索引](development-history/README.md)；這裡挑出問題與證據較完整的案例，包含失敗及未採用方案。
+
+## 近期案例的閱讀入口
+
+| 想說明的取捨 | 發現與原件 | 報告位置 |
+|---|---|---|
+| 已讀理解何時足夠、何時仍須查歷史 | [同 Memory 閱讀策略](../experiments/product-validation/data/memory-reading-policy-2026-10-04/results.md)支持充分性停止；[早期找回](../experiments/product-validation/data/early-interview-recall-2026-10-05/results.md)區分現行工作與歷史值 | [團隊主稿](project-report/report.md) §5.9–5.10、B.15 |
+| 維護較省或少讀，是否足以換架構 | [單集合先導](../experiments/product-validation/data/memory-structure-incremental-2026-10-05/results.md)維護用量較少，卻漏讀另一理解的分工；[研究收斂](../research/agent-systems/2026-10-05-demand-loaded-memory-and-incremental-updates.md#9-收斂採用既有分層改善內容組織與選讀)改為優化既有分層 | 主稿 §6.1 |
+| 找到候選後，為何主要參考仍會漏掉 | [完整聯集重播](../experiments/2026-10-05-rerank-union-candidate-replay/run-01/README.md)定位提前截斷；[階段診斷](../experiments/2026-10-05-initial-retrieval-depth/run-01/README.md)分開未召回與排序掉落 | 主稿 §4.10、§5.11、B.14 |
+| 候選變少，是否就會少問無關問題 | [候選數量比較](../experiments/2026-10-05-adaptive-reference-selection/run-01/README.md)與[主要面向補充](../experiments/2026-10-05-adaptive-reference-selection/main-work-addendum-01/README.md)仍有涵蓋與弱主要參考的取捨；門檻未採用 | [檢索沿革](development-history/retrieval.md)的 10 月材料 |
+| 明確沒做的工作如何與參考分開 | [否認查詢反例](../experiments/2026-10-05-negated-work-retrieval/run-01/README.md)顯示分數不能當責任確認；[可選角色接線](../experiments/engineering/README.md#角色接線)已驗獨立 state，但未驗重問或收尾品質 | 主稿 §6.3、B.14 |
+| 刪除檔案時，如何防止已取消的保存遲到寫回 | [檔案刪除驗證](../experiments/product-validation/2026-10-05-job-file-deletion.md)以 10／6 框架 exit／executor 及真 PostgreSQL 反例核對保存與刪除競爭 | [工程沿革](development-history/engineering-and-verification.md)的後續材料 |
 
 ## 共用敘事與證據結構
 
@@ -16,9 +27,9 @@
 | 修正 | 改了哪一層？哪些條件保持不變？ | 用大量重構代替解釋 |
 | 驗證 | 與哪個基準比較？樣本、環境、判準與結果？ | API 200、測試全綠等於產品品質 |
 | 限制與接續 | 哪裡沒解決？沒有測到什麼？下一個可驗證問題是什麼？ | 把單次合成結果寫成普遍成功率 |
-| 個人貢獻 | 本人實際決策、實作、判讀什麼？他人及 AI 協助什麼？ | 用 repo 提交數推算個人貢獻或自稱全部手寫 |
+| 團隊工作與協作 | 團隊完成哪些決策、設計、實作及判讀？成員與 AI 工具如何參與？ | 用 repo 提交數推定實際分工，或將 AI 協助寫成全部手寫 |
 
-最後一欄須由申請者確認。現有 repo 能證明系統及實驗經過，不能單獨證明每個步驟是誰獨立完成。缺少實驗結果時明記未驗證，不補造成功敘事。
+涉及成員署名或具體分工時，另依團隊可核實資料確認。現有 repo 能支持系統與實驗經過，不能單獨證明每個步驟由誰完成；缺少結果的部分保留未驗證，不補造成功敘事。
 
 ## 案例一 訪談能進行但 JD 的資訊密度不足
 
@@ -32,7 +43,7 @@
 
 證據：[T14 的完整比較與未解問題](../history.md#source-d3293e9b28c75bbb6616)、[原始輸出、逐字稿、指標及算法](../experiments/product-validation/data/instruction-experiments-2026-10-01/README.md)。
 
-可呈現的能力：從領域方法提出可測假說、做有基準的比較、分辨改善與副作用、在效果與複雜度之間做減法。這是材料組織建議，不是學校公布的評分項目。
+本例可用來說明如何把領域方法轉為可測假說，並連同改善與副作用決定採用範圍。
 
 ## 案例二 長訪談中斷後如何避免重複與假成功
 
@@ -48,7 +59,7 @@
 
 證據：[T17 事故、原因核對、A2 修正與實測](../history.md#source-98d840caa9eed7fb2840)、[四份長旅程原件及保存限制](../experiments/product-validation/data/instruction-experiments-2026-10-01/README.md#採購長旅程原件)。
 
-可呈現的能力：故障定位、資料一致性、分層責任、受限恢復設計、可稽核的實驗紀錄。
+本例可用來說明如何核對原結果、界定恢復責任，並保存事故與續跑的證據。
 
 ## 案例三 來源已提供但模型仍漏選引用
 
@@ -58,11 +69,11 @@
 
 **試驗與狀態。** 曾調整來源選項說明、參數順序、推理設定、壓縮與提示候選，尚未可靠解決。Q3 的 169 個檢查項目有一個輕微真漏引，另有一個自動標記經原文核對是誤報。
 
-**未來研究問題。** 是否由 App 提供有依據的候選來源，能比自由選序號減少漏選？需固定資訊、比較引用支持率與額外成本，不能先聲稱方案已有效。本輪整理不授權實作或加跑模型。
+**未來研究問題。** 是否由 App 提供有依據的候選來源，能比自由選序號減少漏選？需固定資訊，比較引用支持率與額外成本；目前沒有這項方案的效果結論。
 
 證據：[T14 診斷與「已知不足」](../history.md#source-d3293e9b28c75bbb6616)。
 
-這個案例適合說明「如何知道問題仍未解決」，不應包裝成成功修復案例。保留反例比把所有問題寫成已解決更有可信度。
+本例支持來源選擇仍有缺口的判斷，尚沒有可靠修復結果。
 
 ## 案例四 額外分析階段是否真的值得
 
@@ -79,12 +90,12 @@
 | B1 漏記、不確定性與提示／effort 比較 | [CT37](../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct37-prompt-effort-comparison-results.md)；medium 未修復、high 只過單例，後續 CT38／CT42／CT43 在同區，不能跳過失敗 |
 | 舊 JD 編輯整合審查 | [核心 review](../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-core-review/README.md)；初審 FAIL 與 closure 一起呈現，不當成新架構驗收 |
 | PDF 可見成品與文字層不一致 | [T13](../history.md#source-409f20a1c297740aed7d)與 T17；正常顯示不等於複製／搜尋逐字無損 |
-| 工程代理切片的反例與修正 | [任務報告](../history.md#source-61a65eccd9fae93aa608)；保留當時範圍及限制，不冒稱申請者手寫 |
+| 工程代理切片的反例與修正 | [任務報告](../history.md#source-61a65eccd9fae93aa608)；保留當時範圍、協作方式與限制 |
 
 ## 編成報告時的取捨
 
-先完成歷史素材盤點，再依申請者能清楚解釋的問題、真實貢獻與原始證據決定正文。這裡不預先指定案例一、二必須入選，也不把較早的檢索、長訪談或架構轉向一律降為附錄。
+依報告要說明的問題與設計取捨選材；正文保留必要的反例、方法、結果及限制，逐次輸出與完整數據連回原件。
 
-產品目的、系統總圖與可執行流程沿[系統架構報告](system-architecture/README.md)取材；不要在正文堆完整 API 清單、每筆 log、提交數或框架商標。每個數字至少能回查一份具基準與限制的原證據。
+產品與資料責任沿[系統架構報告](system-architecture/README.md)取材。每個數字須能回查具基準與限制的原證據；完整 API 清單與 log 留在其責任文件。
 
-本頁未替申請者認領貢獻。成績、專題分工、指導者、研究興趣與 AI 使用揭露需要本人提供可核實資料後，才能改寫為第一人稱備審。
+團隊報告以共同成果為主；成員姓名、指導者、具體分工及 AI 協作方式，另依可核實資料與送件要求填寫。

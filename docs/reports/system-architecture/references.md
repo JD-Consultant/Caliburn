@@ -9,6 +9,8 @@
 | 名稱 | 本報告中的意思 |
 | --- | --- |
 | JD | 職務說明書；可管理的結構化產品成果，不是整份 Markdown |
+| JD 內容／選用／使用關係 | 固定正文、某版 JD 採用的項目與順序，以及任務使用哪些共用能力；三者分開保存 |
+| JD 短定位 | App 配發給模型的可讀定位，如 `task_12`；不取代資料庫 UUID、版本或權限檢查 |
 | AI 分析角色（Agent） | 依特定分析職責設定提示詞、上下文與工具權限的執行角色，如 A、B1、B2 |
 | 共用執行機制（Runtime） | 處理模型與工具的執行、接續、保存及控制，是後端的一部分 |
 | Turn | A 處理一次員工輸入的完整工作，可能包含多個 Step |
@@ -22,10 +24,11 @@
 | Memory 快照 | 發布時選定的一組物件修訂及固定關係，不要求所有物件版本號相同 |
 | 差異（Diff） | 指定舊、新基準間的內容或關係變化；讀取差異不代表已核對完成 |
 | 執行檢查點（Checkpoint） | Graph 已保存的執行狀態，用於接續工作，不取代正式 JD／Memory 的保存 |
-| 上下文壓縮（Compaction） | 由供應商產生壓縮後的接續視窗，不決定原始訪談是否保留 |
+| 上下文壓縮（Compaction） | 由供應商產生壓縮後的接續視窗；現行輪前、輪中均使用，不決定原始訪談是否保留 |
+| 輪前 App 文字摘要 | 已確認、尚未實作的接續目標；輪中仍用原生 compaction，不是正式來源或可解讀的內部推理 |
 | 原子提交 | 一組資料修改一起成立或一起不成立；不代表跨網路所有動作永不失敗 |
 | 公版參考 | 外部職能標準的職位與任務資料，供顧問查漏；不代表員工已負責該工作 |
-| 排除範圍 | 員工明確表示沒做或不負責的具體工作，由 App 獨立保存；不寫入 Memory，也不自動加入向量查詢 |
+| 排除範圍 | 員工明確表示沒做或不負責的具體工作，由 App 獨立保存 state；不把該 state 複製進 Memory，App 也不自動拼入向量查詢 |
 
 ## 採用的外部文件方法
 
@@ -56,6 +59,8 @@
 | 產品需求與架構關係 | [產品概念](../../product-concept.md)、[架構 Map](../../target-architecture-map.md) |
 | 職務分析的專業方法 | [完整工作分析](../../guides/2026-09-09-complete-work-analysis-guide.md)、[JD 撰寫](../../guides/2026-09-09-jd-field-and-writing-guide.md) |
 | 工具與模型參數設計 | [共用工具設計](../../specs/2026-09-27-agent-tool-contract-design-research.md)、[Memory 工具](../../specs/2026-09-27-memory-object-update-tool-contract.md)、[JD 工具](../../specs/2026-09-29-jd-model-tool-contract-review.md) |
-| Context、執行與恢復 | [共用執行機制](../../specs/2026-09-27-shared-agent-execution-and-state-design.md)、[資料保存](../../architecture/persistence.md) |
+| Context、執行與恢復 | [共用執行機制](../../specs/2026-09-27-shared-agent-execution-and-state-design.md)、[資料保存](../../architecture/persistence.md)、[輪前摘要目標](../../specs/2026-10-04-context-summary-and-compaction-design.md) |
+| JD 資料關係與定位 | [JD 保存](../../implementation/jd-storage.md)、[圖稿](diagrams/README.md)、[專題報告附錄 C](../project-report/report.md#附錄-c-jd-資料關聯與保存約束) |
+| 公版工具與本機交付 | [ADR0080](../../adr/0080-opt-in-public-reference-agent-tools.md)、[操作手冊](../../runbook.md)、[介面與交付](../../implementation/interface-and-delivery.md) |
 | 程式模組的劃分 | [系統責任與資料流](../../architecture/system-boundaries.md) |
 | 實驗範圍與驗證限制 | [驗證對照](../../history.md#source-d58692bbe6b4baa7267f)、[實驗發現彙整](../experiment-findings.md) |

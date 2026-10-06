@@ -1,0 +1,28 @@
+erDiagram
+  direction LR
+  jd_revisions ||--o{ jd_capability_selections : selects
+  jd_capability_revisions ||--o{ jd_capability_selections : fixed_content
+  jd_capability_selections ||--o{ jd_task_capabilities : used_by
+  jd_task_selections ||--o{ jd_task_capabilities : uses
+  jd_capability_revisions {
+    uuid job_file_id PK,FK
+    uuid capability_id PK
+    uuid content_revision_id PK
+    text kind
+    text name
+    text description
+  }
+  jd_capability_selections {
+    uuid job_file_id PK,FK
+    uuid revision_id PK,FK
+    uuid capability_id PK,FK
+    uuid content_revision_id FK
+    int position
+  }
+  jd_task_capabilities {
+    uuid job_file_id PK,FK
+    uuid revision_id PK,FK
+    uuid task_id PK,FK
+    uuid capability_id PK,FK
+    int position
+  }

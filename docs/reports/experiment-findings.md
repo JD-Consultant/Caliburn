@@ -1,11 +1,29 @@
-# 實驗發現的問題彙整（收斂版，2026-10-02）
+# Caliburn 實驗發現與後續證據
 
-- 範圍：2026-09-30 至 2026-10-02 對新目標（`apps/api`＋`apps/web`）所做的真模型、容量、恢復與交付實驗，**只整理「發現了什麼問題」**。
-- **刻意不做：**不討論解法與設計。各項在[已知不足表](../history.md#source-d3293e9b28c75bbb6616)的「後續研究方向」欄只是備忘，尚未討論、尚未決定。
-- 唯一來源：數字、判定與限制以各任務 `evidence/` 與其 `data/` 為準，本頁不新增結果、不另存可各自修改的數字；任務狀態以[任務表](../history.md#source-378c7f9480def66d4cde)為準。
-- 讀法：實驗全部用**合成資料與模擬員工**，是工程驗證，不是真人試點；單一人設、單次結果不能推成普遍品質。
+本頁保留 2026-10-02 的問題快照，供團隊追查實驗如何影響後續設計。下方「歷史問題紀錄」的數字、事故及測試結果均屬當時版本；目前產品狀態見[目前決策](../current-decisions.md)，方法與成果見[團隊專題報告](project-report/report.md)。
 
-**目前結論：**核心旅程（員工只接受訪談 → 逐步產出有據 JD → PDF）已在真模型上完整跑通 45 輪；沒有已知未處理的資料或保存錯誤。下列問題是**已知缺口**，不是未發現的 bug；全套後端測試（含真 PostgreSQL）1,974 項 exit 0、前端 162 項通過、lint／型別檢查乾淨（2 項需字型環境變數的真 Chromium 渲染測例被跳過）。
+## 後續證據的閱讀入口（整理至 2026-10-06）
+
+| 原問題或研究方向 | 後續已完成的工作 | 仍須分開判讀的範圍 |
+|---|---|---|
+| B1／B2 壓縮後是否能完成發布 | [兩組整合對照](../experiments/product-validation/data/memory-compaction-publish-2026-10-04/README.md)四批皆發布，核對更正、新工作及固定來源回讀 | 調低門檻的小型探針，不代替正式容量邊界 |
+| 工作記憶是否能直接沿用及局部修訂 | [閱讀策略](../experiments/product-validation/data/memory-reading-policy-2026-10-04/results.md)、[增量整理](../experiments/product-validation/data/memory-layered-value-2026-10-05/results.md)及[兩批接續訪談](../experiments/product-validation/README.md)分別觀察停止深入、局部更新與早期找回 | 起始輸入較少不保證累計較省；兩批原話均放得下，未證明超容量或真人效益 |
+| 整理或閱讀較省，是否就能採用 | [單集合先導](../experiments/product-validation/data/memory-structure-incremental-2026-10-05/results.md)、[自足單元](../experiments/product-validation/data/memory-coherent-units-2026-10-05/results.md)及[取用指引](../experiments/product-validation/data/memory-summary-capacity-2026-10-05/reading-policy-update.md)保留漏項、格式失敗與未採用結果 | 保存完整、選讀足夠及答案完整是不同判準；單集合替代暫不推進 |
+| 跨案舊數值如何避免殘留 | [局部修訂配對](../experiments/product-validation/data/memory-local-preservation-2026-10-05/results.md)後，只採用 B2 兩句副本維護規則，見[採用紀錄](../experiments/product-validation/data/memory-local-preservation-2026-10-05/execution-notes.md#後續採用2026-10-05) | A 候選未採用，完整正式提示組合尚未新增真模型驗證 |
+| 公版能否提供主要工作參考 | [檢索方法及結果](project-report/report.md#511-主要職位參考的廣蒐與排序)、[可選角色接線](../experiments/engineering/2026-10-05-occupation-reference-tools/agent-integration-verification.md)已完成 | 已知標註只涵蓋部分相關來源；工程接線不等於補問／收尾品質通過 |
+| 減少候選能否排除附帶參考 | [動態數量比較](../experiments/2026-10-05-adaptive-reference-selection/run-01/README.md)與[主要面向補充](../experiments/2026-10-05-adaptive-reference-selection/main-work-addendum-01/README.md)沿同八案快取比較初搜及末端選法 | 仍未找到保全已知主要面向且沒有弱主要參考的組合；API 控制參數未切換，未測新案例或實際加速 |
+| 「沒有做」能否靠搜尋分數辨認 | [三案否認反例](../experiments/2026-10-05-negated-work-retrieval/run-01/README.md)中，加入問題與簡短否認後三案分數皆升、兩案入前五；明確否認另存 `excluded_work` | 分數不代表責任確認；正向查詢組成、避免重問與收尾效果仍待模型驗證 |
+| 開發環境外的本機交付 | [隔離 Docker 驗證](../experiments/product-validation/2026-10-03-docker-delivery.md)涵蓋建置、人工保存、中文 PDF 與重建後回讀 | 未重跑真模型完整旅程，不能代替另機或真人測試 |
+| 管理檔案與控制未完成工作 | [檔案刪除與取消收尾驗證](../experiments/product-validation/2026-10-05-job-file-deletion.md)補入交易及遲到保存防護；訪談控制已整合於底部區域 | 最終防護未重建至先前示範映像，未新增完整瀏覽器或真模型驗證 |
+
+## 歷史問題紀錄（截至 2026-10-02）
+
+- 範圍：2026-09-30 至 2026-10-02 對當時重建產品（`apps/api`＋`apps/web`）所做的真模型、容量、恢復與交付實驗，整理發現、當時修正及未解問題。
+- 方向與狀態：當時[已知不足表](../history.md#source-d3293e9b28c75bbb6616)的「後續研究方向」欄是待討論備忘；後續採用與補測沿本頁上方入口查閱。
+- 結果依各任務原件與資料包；歷史任務狀態見[任務表](../history.md#source-378c7f9480def66d4cde)。本頁摘要不取代原判準、數據或限制。
+- 資料為合成人設與模擬員工；真模型旅程、工程測試及容量探針各有範圍，不能推成真人成效或普遍品質。
+
+當時核心旅程（員工只接受訪談 → 逐步產出有據 JD → PDF）已在真模型上跑通 45 輪，該輪紀錄沒有已知未處理的資料或保存錯誤。以下保留當時的品質與驗證缺口；當時後端測試（含真 PostgreSQL）1,974 項 exit 0、前端 162 項通過，lint／型別檢查通過，另有兩項需字型環境變數的真 Chromium 渲染測例被跳過。這些是歷史結果，不是目前版本的重新驗收。
 
 ## 1. 做過哪些實驗
 
@@ -19,7 +37,7 @@
 | 交付：乾淨安裝、同源 UI、PDF、切換候選 | 乾淨 worktree、非 editable 安裝、重基與重驗 | [T18](../history.md#source-25de60a3e4266687fd86)、[T13 PDF](../history.md#source-409f20a1c297740aed7d) |
 | 自動化測試 | 後端 1,974 項（含真 PostgreSQL）、前端 162 項 | [驗證對照](../implementation/verification-plan.md)、[T17 V01–V28 對照](../history.md#source-d58692bbe6b4baa7267f) |
 
-## 2. 目前仍存在的問題（已知缺口）
+## 2. 當時記錄的問題與缺口
 
 分兩種：**實驗直接量到的限制**（A–C）與**驗證層級的缺口**（D）。每項只寫發現、數字、已知原因與影響；「已證實」與「推測」分開。
 
@@ -79,12 +97,12 @@
 
 | 事件 | 影響 |
 |---|---|
-| 2026-10-01 22:57 本機測試 PostgreSQL 與 Demo（8100／5173）被外力中止，Docker Desktop 也停止；時間與桌面代理程式的程序重啟吻合，**因果未證實** | 長旅程停在第 25 輪；資料庫以原參數重啟後資料完整（crash recovery 正常）；續跑完成，細節見[事故紀錄](../history.md#source-98d840caa9eed7fb2840)。Demo 仍關著，未由本次工作重啟 |
-| 2026-10-02 05:16 OpenAI 帳戶額度用完 | B1／B2 探針只完成到第 4 輪就停止；補額度前所有真模型驗證暫停 |
+| 2026-10-01 22:57 本機測試 PostgreSQL 與 Demo（8100／5173）被外力中止，Docker Desktop 也停止；時間與桌面代理程式的程序重啟吻合，**因果未證實** | 長旅程停在第 25 輪；資料庫以原參數重啟後資料完整（crash recovery 正常）；續跑完成，細節見[事故紀錄](../history.md#source-98d840caa9eed7fb2840)。該次工作結束時 Demo 未重啟 |
+| 2026-10-02 05:16 OpenAI 帳戶額度用完 | 當時 B1／B2 探針完成到第 4 輪後停止，真模型驗證暫停；後續執行依各批新紀錄查閱 |
 | 預先登記的停止條件（harness 崩潰、額度用完）觸發 | 依登記規則停下診斷、不自動重跑；續跑與停止的修訂都在證據頁寫明 |
 
 ## 5. 這份報告沒有回答的
 
-- **怎麼解決**：上表各項的解法與設計取捨尚未討論。
+- **完整改善方案**：本快照保留當時修正與待討論方向，後續設計及採用狀態由責任文件維護。
 - **真人效果**：顧問時間、員工學習負擔、真實員工是否覺得被問得合理（V25），需要另設的真人試點。
 - **更廣的資料**：只有合成人設；沒有真實員工資料，也沒有跨職類的樣本量。

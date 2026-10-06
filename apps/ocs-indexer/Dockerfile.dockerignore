@@ -1,0 +1,22 @@
+# Only the query service and its two local contracts enter this build context.
+**
+!apps/
+!apps/ocs-indexer/
+!apps/ocs-indexer/pyproject.toml
+!apps/ocs-indexer/uv.lock
+!apps/ocs-indexer/README.md
+!apps/ocs-indexer/src/
+!apps/ocs-indexer/src/**
+!packages/
+!packages/ocs-contract/
+!packages/ocs-contract/pyproject.toml
+!packages/ocs-contract/src/
+!packages/ocs-contract/src/**
+!packages/indexer-contract/
+!packages/indexer-contract/pyproject.toml
+!packages/indexer-contract/src/
+!packages/indexer-contract/src/**
+**/__pycache__/
+**/*.pyc
+**/.env
+**/.env.*

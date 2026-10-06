@@ -12,7 +12,8 @@
 
 | 方式 | 首次安裝與啟動 | 日常啟動 | 停止 |
 |---|---|---|---|
-| Docker：依賴與 PDF 資源由映像提供 | [Docker 操作](#docker-操作) | `docker compose -f compose.jd-app.yaml up -d --wait` | `docker compose -f compose.jd-app.yaml stop` |
+| Docker 基本模式：App、資料庫與 PDF | [Docker 操作](#docker-操作) | `pnpm docker:up` | `pnpm docker:stop` |
+| Docker 公版參考模式：基本模式加 RAG | [公版參考設定](#含公版參考的-docker-模式) | `pnpm docker:rag:up` | `pnpm docker:rag:stop` |
 | 原生：本機開發或自行管理 PostgreSQL | [服務與版本](#服務與版本) → [安裝依賴](#安裝依賴) → [第一次初始化](#第一次初始化) → [AI credential](#ai-credential) | 啟動 PostgreSQL、提供環境設定後執行 `pnpm start` | 在啟動的終端按 Ctrl+C |
 
 預設畫面是 `http://127.0.0.1:8100/`。原生開發使用 `pnpm dev`，畫面改為 `http://127.0.0.1:5173/`，操作細節見[日常啟動與停止](#日常啟動與停止)。原生 PDF 資源須另行設定，見[PDF 匯出](#pdf-匯出)。
@@ -36,6 +37,8 @@
 ## Docker 操作
 
 使用根目錄的 `compose.jd-app.yaml`，不是 RAG 的 `docker-compose.yml`。Docker Desktop 須切到 Linux containers，Docker Compose 須為 `2.24.0` 以上（`docker compose version`）；首次建置需下載映像、鎖定依賴、Chromium 與 Noto CJK 字型。前端建置和後端非 editable 安裝由多階段映像完成；執行容器不帶 Node、uv、原始 repo、金鑰或本機依賴。
+
+`pnpm docker:*` 只是下方 Compose 命令的捷徑，不建立另一套啟動器。未安裝 pnpm 時可直接執行對應的 `docker compose` 命令。
 
 ### 首次啟動
 
@@ -101,6 +104,65 @@ if (!(Test-Path .env)) { Copy-Item .env.jd-app.example .env }
 資料庫升級仍是明確操作；啟動不自動 migration、建示範資料或清空 volume。上述 PowerShell 區塊在任一步驟失敗時停止，不繼續啟動未升級的 App。映像名稱由 Compose project 區分，隔離測試建置不覆蓋正式 project 的映像。App 以非 root、唯讀 root filesystem 執行，暫存 PDF／瀏覽器工作只寫 `/tmp`。Docker 的 `init` 與 90 秒停止期限供正常收尾；逾時強制結束仍依既有可靠位置恢復，不保證保存所有在途結果。重開且帶 key 時會承接已接受工作，可能使用模型額度。
 
 資料庫被外力中止或重啟後，依既有連線限制再執行 `docker compose -f compose.jd-app.yaml restart app`。Compose 的相依重啟只處理明確的 Compose 操作，不保證 Docker 自動重啟 PostgreSQL 時也重啟 App。healthcheck 只確認程序存活，不代表 AI、資料庫或 PDF 全部可用。
+
+### 含公版參考的 Docker 模式
+
+需要顧問查找公版時，在基本配置上加上 `compose.jd-app.rag.yaml`。兩種模式共用 `caliburn-jd-app` project、App 與 PostgreSQL，不另外開第二套產品。公版模式多了查詢 API `ocs-indexer`、Qdrant 與 GPU 模型服務 `embedder`；它們啟動後持續運行，顧問需要資料時才查詢，不必等到第一次提問才啟動容器。
+
+此模式沿用現有 NVIDIA CUDA 模型服務，需要 Docker Compose `2.30.0` 以上（支援 `gpus` 設定），以及 Docker Desktop／WSL2 可使用的 NVIDIA GPU，詳見 [Compose GPU 設定](https://docs.docker.com/reference/compose-file/services/#gpus)與 [Windows GPU 支援](https://docs.docker.com/desktop/features/gpu/)。首次下載、載入模型可能較久；啟動最多等待 900 秒，失敗時先檢查紀錄，不反覆重送。這份配置不保證 CPU 模式或各 GPU 型號都能使用。
+
+**首次準備：** 先完成上方基本模式的資料庫初始化，再依序準備 RAG。整個過程不需要 OpenAI 請求。
+
+1. 在根 `.env` 設定 `CALIBURN_REFERENCE_COLLECTION`，例如 `ocs_references_20261006`，指定本次使用的公版索引。`CALIBURN_REFERENCE_CANDIDATE_LIMIT` 預設 20，是檢索服務的候選數量上限，不是模型參數。
+2. 準備 `./data/selected-ocs`，只放本次選用的 OCS JSON，每個 OCS code 一份。這個目錄由操作者準備，啟動不自動選版、解析 PDF 或建立示範資料。
+3. 建置查詢 API／模型映像，啟動 Qdrant 與模型，再一次性建新索引。下例的 collection 名稱須與根 `.env` 一致：
+
+```powershell
+& {
+    $sourceDirectory = (Resolve-Path './data/selected-ocs' -ErrorAction Stop).Path
+    if (!(Test-Path -LiteralPath $sourceDirectory -PathType Container)) { throw '來源必須是已存在的目錄。' }
+    docker compose -f compose.jd-app.yaml -f compose.jd-app.rag.yaml --profile rag build ocs-indexer embedder
+    if ($LASTEXITCODE -ne 0) { throw 'RAG 建置失敗。' }
+    docker compose -f compose.jd-app.yaml -f compose.jd-app.rag.yaml --profile rag up -d --wait --wait-timeout 900 qdrant embedder
+    if ($LASTEXITCODE -ne 0) { throw 'RAG 基礎服務未就緒，請檢查紀錄。' }
+    docker compose -f compose.jd-app.yaml -f compose.jd-app.rag.yaml --profile rag run --rm --volume "${sourceDirectory}:/sources:ro" ocs-indexer jd-ocs-indexer index-references /sources --collection ocs_references_20261006
+    if ($LASTEXITCODE -ne 0) { throw '索引未完成，請勿將此 collection 視為可用。' }
+}
+```
+
+來源目錄只在建索引時唯讀掛載，之後 API 從 Qdrant 讀取已固定的來源，不需掛載原 JSON。`index-references` 不覆寫既有 collection，完整寫入後才發布就緒標記（ready manifest）。已有相容、完整的 collection 時，可略過建索引，不必每次啟動重建。失敗索引保留原狀；修正後另選新名稱，不自動刪除。
+
+**日常啟動與查詢檢查：**
+
+```powershell
+pnpm docker:rag:up
+# 等同下列命令；沒有 pnpm 也可直接使用：
+# docker compose -f compose.jd-app.yaml -f compose.jd-app.rag.yaml --profile rag up -d --wait --wait-timeout 900
+```
+
+`--wait` 等待服務通過健康檢查，但 `/healthz` 不檢查公版 collection 是否已建好。使用前再執行一次實際公版搜尋，確認索引與嵌入、重排序模型相容。下例只使用本機 GPU，不呼叫 OpenAI：
+
+```powershell
+docker compose -f compose.jd-app.yaml -f compose.jd-app.rag.yaml --profile rag exec -T ocs-indexer python -c "import json, urllib.request; request = urllib.request.Request('http://127.0.0.1:8000/occupation-references:search', data=json.dumps({'query':'負責收貨、庫存盤點及帳實差異追蹤','limit':1}).encode('utf-8'), headers={'Content-Type':'application/json'}); result=json.load(urllib.request.urlopen(request, timeout=120)); print('公版搜尋成功，候選數：', len(result['references']))"
+```
+
+這只確認搜尋可用，不能以一次成功判定相關性或 JD 品質。索引未 ready／不相容回 409，連線故障回 503，不當成查無資料。查詢 API 的設定與來源契約見 [RAG README](../apps/ocs-indexer/README.md#職位整體參考-api)。
+
+| 操作 | 命令 |
+|---|---|
+| 看完整模式的容器狀態 | `docker compose -f compose.jd-app.yaml -f compose.jd-app.rag.yaml --profile rag ps` |
+| 看 RAG 服務紀錄 | `docker compose -f compose.jd-app.yaml -f compose.jd-app.rag.yaml --profile rag logs --tail 100 ocs-indexer embedder qdrant` |
+| 停止完整模式 | `pnpm docker:rag:stop` |
+
+App 經 `http://ocs-indexer:8000` 查詢；RAG 三個服務不發布主機連接埠，也不接收 OpenAI key。App 的啟動相依仍只有 PostgreSQL；RAG 故障不終止基本訪談／人工 JD 功能，相關工具會回報錯誤。切換模式仍須讓已綁定公版工具的 A／Memory 工作結束，再在安全點停止原 App；不要在暫停或執行中的工作換掉工具設定。
+
+由完整模式改回基本模式時，先執行 `pnpm docker:rag:stop`，再執行 `pnpm docker:up`。Compose 會依基本配置重建同一個 App，保留原資料。若 App 的外部 key 檔另有 `CALIBURN_OCCUPATION_REFERENCE_URL`，還須移除該設定才能關閉工具。反向切換時也先在安全點停下原 App，再使用完整模式，不同時運行兩個 App。
+
+兩種模式共用 `caliburn-jd-app_jd_postgres_data`。完整模式另有 `caliburn-jd-app_qdrant_storage` 與 `caliburn-jd-app_hf_cache`；不自動沿用獨立 RAG project 的舊 volume，也不移除它們。舊索引若需遷移，另行備份與驗證還原；不可讓兩個 Qdrant 同時掛同一份儲存。基本模式的 `docker:stop` 不會停止額外的 RAG 容器，請使用對應模式的停止命令。兩種模式都不使用 `down -v`。
+
+更新完整模式時，在安全點停止 App／RAG，備份 PostgreSQL 與 Qdrant，再明示建置 `app ocs-indexer embedder`；如需 migration，沿基本模式的一次性命令完成，最後啟動完整模式。更新程式不覆寫索引；來源或模型身分變動時，另建新 collection 並重新做搜尋檢查。
+
+設定解析、鎖定安裝與 API 回歸結果見 [公版 Docker 驗證](experiments/engineering/2026-10-06-docker-rag-startup.md)。真容器與 GPU 的已驗／未驗範圍在該頁分開記錄。
 
 ### DataGrip 與診斷
 
@@ -322,4 +384,4 @@ pnpm rag:dev
 pnpm rag:down
 ```
 
-依 [ADR0080](adr/0080-opt-in-public-reference-agent-tools.md)，App 可透過明示 URL 使用公版參考 HTTP 工具；未配置時不建立 client，不自動啟動上述服務。啟用及執行中請求的設定邊界見 [API README](../apps/api/README.md#公版參考工具的可選啟用)。獨立管線沿 [`design/rag-pipeline.md`](design/rag-pipeline.md)。有人正在測試時，不為啟用工具重啟共用程序、改既有 `.env`、更新正式 schema 或清索引。
+依 [ADR0080](adr/0080-opt-in-public-reference-agent-tools.md)，App 可透過明示 URL 使用公版參考 HTTP 工具；未配置時不建立 client，不自動啟動上述服務。上列命令供獨立開發；若要 App 與 RAG 一起啟動，使用[公版 Docker 模式](#含公版參考的-docker-模式)，不用另執行 `rag:dev`。啟用及執行中請求的設定邊界見 [API README](../apps/api/README.md#公版參考工具的可選啟用)。獨立管線沿 [`design/rag-pipeline.md`](design/rag-pipeline.md)。有人正在測試時，不為啟用工具重啟共用程序、改既有 `.env`、更新正式 schema 或清索引。

@@ -1,6 +1,6 @@
 # 檢索與參考資料演進材料
 
-回到[演進總覽](README.md)。這條線從 JobIntel 的 iCAP 檢索與獨立 indexer 開始，不從近期 Memory 當作起點。以下是既有原件的索引與簡述，不是重新選型；相似度、排序、事實依據是三種不同問題。
+回到[演進總覽](README.md)。本頁追查檢索的資料粒度、執行環境、排序及事實權責，從 JobIntel 與獨立 indexer 接到 10 月的主要職位參考研究。各節保留當時條件；現行設定與候選方案分開標示。
 
 ## 2026-05：最初的檢索與知識服務
 
@@ -79,6 +79,30 @@ OPKS 證據規則逐步區分「員工實際說過／寫過」與「系統建議
 一次 hard cut 曾刪除 RAG 管線；Owner 隨後要求保留 PDF／JSON、parser、indexer、embedding 與契約，作為獨立領域，避免 JD App 重設計把有用研究一起刪掉。後續正式產品不依賴它，但研究與資料仍有獨立用途。
 
 **引用：**[8/11 事件及保留範圍](../../specs/2026-08-11-rag-bounded-context-retention-design.md)、[ADR0057 草案](../../adr/0057-current-only-runtime-and-data-boundary.md)、[ADR0077 正式權責](../../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)、[RAG 領域入口](../../design/rag-pipeline.md)。不能把「範圍隔離」改寫成「某次搜尋失敗，所以完全放棄向量資料庫」。
+
+## 2026-10-04 至 10-05：找主要職位參考，分開診斷各階段
+
+本階段的目標改為找出能代表員工主要工作的多份公版，供顧問查漏；與 7 月判斷任務是否可合併的研究不同。後期比較固定八個合成案例與 805 份公版，依原員工文字逐份判讀代表性。已知主要來源與面向只作回歸清單，沒有建立全庫相關性答案。
+
+### 從輸入、資料單位與候選去留定位漏失
+
+先比較原話、B1 情境及 B2 理解，再交叉整份正文、任務群組及重排序。全端案例的一份共同參考已在任務路被找到，卻被兩路融合後的提前截斷移除；保留完整聯集後，既有 reranker 將它排到第一。這把「沒找到」拆為初搜未召回、合併時丟失與排序掉落，避免只靠加深搜尋處理所有問題。
+
+原件：[輸入與公版單位交叉](../../experiments/2026-10-05-memory-public-unit-retrieval/run-01/README.md)、[完整聯集重播](../../experiments/2026-10-05-rerank-union-candidate-replay/run-01/README.md)、[初搜深度與階段診斷](../../experiments/2026-10-05-initial-retrieval-depth/run-01/README.md)、[B1 雙路補測](../../experiments/2026-10-05-b1-dual-route-retrieval/run-01/README.md)。B1 補測重用向量作初搜比較，未重跑其最終 rerank 或實際耗時。
+
+### 候選數量降低，仍須保住主要工作
+
+[動態數量比較](../../experiments/2026-10-05-adaptive-reference-selection/run-01/README.md)重播 271 組初搜規則、69 組末端選法；有完整 rerank 快取的 102 組初搜與末端交叉成 7,038 組配置。初搜保留原 12 個已知 case×source 配對的條件下，D5／T20 將候選配對由 247 降至 169，少 31.6%。排除兩個原有疑義標註後，cosine 下限加保底的另一候選可降至 89 配對；這是不同標註條件下的取捨，不能靜默取代保守結果。
+
+[主要工作面向補充](../../experiments/2026-10-05-adaptive-reference-selection/main-work-addendum-01/README.md)再改以面向優先，不要求保住同面向每份公版。在每案末端最多五份、八個原已知面向全保留的條件下，仍至少留下 11 份弱主要參考；降至兩份則漏掉視覺面向。這批尚未找到兼顧涵蓋與排除附帶參考的門檻。所有配置來自同八案的保存分數，沒有新模型推論或新 holdout；配對減少也不是已量得時間、費用或追問減少。
+
+動態門檻及縮減方案仍是候選。現行 API 沿原話 D20／T20、完整聯集重排序、最多五份作實作控制初值，未因這批重播切換，也不稱為通用最佳。
+
+### 相似度不能確認員工責任，工具接線也不能代替品質
+
+[否認輸入反例](../../experiments/2026-10-05-negated-work-retrieval/run-01/README.md)固定三案、八種變體；加入顧問問題與簡短否認後，觀察公版的向量及 rerank 分數三案皆升，其中兩案進前五。結果支持把已確認工作查詢與否認範圍分開處理，未證明所有否定句都失效。
+
+依 [ADR0080](../../adr/0080-opt-in-public-reference-agent-tools.md)，公版已可明示接入顧問；B1／B2 只讀固定批次範圍的排除紀錄。`excluded_work` 只記錄明確未做或不負責的工作，未知、未確認或不願回答不歸為排除；它獨立保存，不自動拼入向量 query。從完整 Memory 組成忠實的工作查詢、避免重問及 JD 收尾效果仍待模型驗證。[工程驗證](../../experiments/engineering/README.md)另記 API 重播、真 Qdrant、PostgreSQL 保存與角色接線，不能與檢索評分合成一次品質驗收。
 
 ## 後續取材注意
 

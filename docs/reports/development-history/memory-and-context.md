@@ -1,6 +1,6 @@
 # 長訪談、記憶與 Context 演進材料
 
-回到[演進總覽](README.md)。這條線關心：對話變長後，資訊是否真的送達、能否保留限定條件與更正、能否找回來源，以及模型是否真的完成寫入。下列 B1／B2／C、詳記、case、turn 的意思依各時期原文，不等同現在的工具契約。
+回到[演進總覽](README.md)。本頁追查長訪談中的入料、限定條件、更正、來源回讀與實際寫入。B1／B2／C、詳記、case、turn 依各時期原文解釋；10 月接續另列於後段。
 
 ## 從對話歷史，到持久工作理解
 
@@ -52,7 +52,7 @@
 
 同樣的「每月 10 日改為 5 日」，短 context 對照會讀取並修補；帶舊延續的情境卻可能零工具、口頭說 5 日，實際 Memory 仍是 10 日。再拆 visible／opaque 因素，追到舊 compaction 的生成請求及當時 optional 修補規則。
 
-重要的是，追查確認**目前要求修補的規則與導覽真的已送到模型**，不能再猜是漏注入；但加密內容不可讀，有限對照也不足以證明 compaction 的唯一因果或普遍失敗率。
+追查確認，**目前要求修補的規則與導覽已送到模型**，不能再猜是漏注入；但加密內容不可讀，有限對照也不足以證明 compaction 的唯一因果或普遍失敗率。
 
 **引用：**[CT28 原對照](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct28-live-repair-context-contrast.md)、[CT32 因素拆分](../../history.md#source-e27b12969cabd656ac6a)、[CT33 來源追查與未解界線](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-08-ct33-compaction-provenance-and-recovery-review.md)。不能據此寫成「刪掉歷史就解決」。
 
@@ -172,6 +172,25 @@ OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有�
 
 **引用／界線：**[原話讀取、來源資格與固定上界](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md) §2–3。序號38／39／40是設計示意，不是真實長旅程結果；尚未完成與正式原話的保存也不能混為一談。後來的容量、來源工具與長訪談實驗接[T16](../../history.md#source-6d2d7ab4abfedbf8416e)及[T17](../../history.md#source-98d840caa9eed7fb2840)，結果層級各自看原件。
 
+## 2026-10-04 至 10-05：從保存得到，進一步比較選讀與使用
+
+正式重建後，測試分開觀察壓縮後發布、資訊找回、增量維護與顧問取用。它們使用不同材料及接線，不合併成一個 Memory 成功率。
+
+| 問題與轉折 | 結果及界線 | 原件 |
+|---|---|---|
+| 10／2 未完成的 B 壓後發布如何補證 | 調低門檻的兩組真模型整合對照完成四批發布與固定來源回讀；不代替正式容量邊界或自然長旅程 | [壓縮發布](../../experiments/product-validation/data/memory-compaction-publish-2026-10-04/README.md) |
+| 理解已足夠，是否仍要讀到底 | 固定同一 Memory 的共同完成三對保留 33／33 指定核心事實，讀取 23→3、累計 input 少 56.23%；全稿欄位一致性仍有反例 | [充分性停止](../../experiments/product-validation/data/memory-reading-policy-2026-10-04/results.md) |
+| 少一層或換摘要，是否就更好 | 單集合先導維護較省，卻漏讀另一理解的分工且下一題格式失敗；三層／單層摘要先導品質未顯示三層較優，三層累計 input 為 3.31 倍 | [單集合](../../experiments/product-validation/data/memory-structure-incremental-2026-10-05/results.md)、[單層摘要](../../experiments/product-validation/data/memory-summary-capacity-2026-10-05/results.md) |
+| 自足單元與回答限定是否足以解決漏項 | 自足單元少讀卻未保持品質等價；固定 Memory 的範圍指引仍有讀後漏分工及責任推論；另一次取用指引未減總讀取且細節退步，均未據此切換產品 | [自足單元](../../experiments/product-validation/data/memory-coherent-units-2026-10-05/results.md)、[回答範圍](../../experiments/product-validation/data/jd-scope-preservation-2026-10-05/results.md)、[未採用指引](../../experiments/product-validation/data/memory-summary-capacity-2026-10-05/reading-policy-update.md) |
+| 分層成果能否承接更正並局部更新 | 三批整理及四對顧問作答觀察到選讀一項理解、保留未變物件與局部修訂；跨案舊期限副本及已讀分工省略仍需修正 | [分層增量](../../experiments/product-validation/data/memory-layered-value-2026-10-05/results.md)、[局部修訂配對](../../experiments/product-validation/data/memory-local-preservation-2026-10-05/results.md) |
+| 換窗後能否接續現行工作及歷史查證 | 兩批三組各八段完成，Memory 的累計 input 相對完整原話分別少 21.0% 與多 7.32%；原話均放得下，沒有超容量勝出結論 | [中後期修訂](../../experiments/product-validation/data/context-reset-comparison-2026-10-05/results.md)、[早期找回](../../experiments/product-validation/data/early-interview-recall-2026-10-05/results.md) |
+
+後續[五對唯讀取用比較](../../experiments/product-validation/data/early-interview-recall-2026-10-05/reading-probe-01/README.md)分開測導覽說明與回答細節：缺導覽時少讀一份情境 map，細節候選補回確認者；已有導覽時兩邊都未重讀。每題只有一對，沒有把兩種候選合併，也未改正式 Prompt／工具或驗 JD 保存。
+
+[研究收斂](../../research/agent-systems/2026-10-05-demand-loaded-memory-and-incremental-updates.md#9-收斂採用既有分層改善內容組織與選讀)保留原話→情境→理解，單集合替代暫不推進。改進重心是各層的內容用途、局部自足性、撤換舊說法及足夠時停止。其後只將兩句跨案數值副本維護規則加入正式 B2，A 候選未採用；角色／工具／完成契約檢查不能代替正式提示組合的真模型效果。採用範圍見[執行紀錄](../../experiments/product-validation/data/memory-local-preservation-2026-10-05/execution-notes.md#後續採用2026-10-05)。
+
+現行輪前與輪中仍使用原生 compaction；輪前 App 文字摘要的目標尚未實作，依[摘要契約](../../specs/2026-10-04-context-summary-and-compaction-design.md)查閱。上述換窗比較不能冒充新摘要政策或容量驗收。
+
 ## 可以連著讀的問題鏈
 
 - **短答與過度概括：**7/20 的前問關係 → CT37 實際入料核對 → CT38 prompt／effort 對照 → CT42／49 長訪談。
@@ -180,4 +199,4 @@ OpenRouter inline compaction smoke 的 input 超過指定 threshold，卻沒有�
 - **分層本身也在迭代：**固定窗口詳記 → 跨批案例 → 理解與來源影響 → 新目標 Snapshot／工作面；每次都要區分設計決定與已有的實測。
 - **操作有效不等於分析完整：**C與背景的取材反例 → 多案例返工漏案 → 分責與候選接續 → B2看變更、JD按需核對；不靠多加審核者解決所有問題。
 
-這些只是方便回讀的素材路線，不先判定哪條一定要放推甄正文。所有原失敗、未驗項目與外送資料限制仍以各原件為準。
+這些只是方便回讀的素材路線，不先判定哪條一定要放團隊專題正文。所有原失敗、未驗項目與外送資料限制仍以各原件為準。

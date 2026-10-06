@@ -1,6 +1,6 @@
 # 產品與架構演進材料
 
-回到[演進總覽](README.md)。以下按當時問題整理，保留設計、實測與後來改向的差別；不是用現在的架構替過去補寫理由。
+回到[演進總覽](README.md)。以下保留各階段的問題、設計、實測與改向，沿原件追查當時的理由。
 
 ## 前身專案與最初資料流
 
@@ -134,10 +134,18 @@ Plate 候選以完整文件樹、JSONB revisions 與原生編輯承接 JD，曾�
 
 新目標重新定義訪談、工作情境、工作理解與 JD 的分工，補上發布快照、引用差異、工具、Context、候選提交與恢復等契約，再拆成 T01–T18 施工。這不是把舊 A／B1／B2／C 接線原樣搬家。
 
-後續留下 Prompt 候選比較、漏引、限流與長旅程中斷等新問題，詳既有近期案例與原始證據。架構文件、程式可跑、有限驗證、正式切換是不同狀態；本次基準下 ADR0079 仍是 Proposed。
+後續留下 Prompt 候選比較、漏引、限流與長旅程中斷等新問題。重建初期 ADR0079 為 Proposed；2026-10-02 正式切換時已 Accepted，由 `apps/api`／`apps/web` 承擔產品權責，舊關聯式 App 與 consultant-memory 程式退役。分析品質仍依各實驗判讀。
 
-**引用：**[分層架構討論](../../specs/2026-09-24-caliburn-layered-architecture-map.md)、[新目標地圖](../../target-architecture-map.md)、[計畫與驗收路由](../../history.md#source-ee8cbce8eb3c303d1765)、[近期案例](../research-casebook.md)、[切換草案](../../adr/0079-target-rebuild-production-cutover.md)。
+**引用：**[分層架構討論](../../specs/2026-09-24-caliburn-layered-architecture-map.md)、[新目標地圖](../../target-architecture-map.md)、[計畫與驗收路由](../../history.md#source-ee8cbce8eb3c303d1765)、[近期案例](../research-casebook.md)、[ADR0079 正式切換](../../adr/0079-target-rebuild-production-cutover.md)。
+
+### 2026-10-03 至 10-06：正式 App 接續交付，研究候選各自驗證
+
+正式 App 補上 Docker 交付、同一 volume 的映像更新、清單管理及整份職務檔案刪除。刪除研究進一步遇到「取消已提交，Saver 仍在收尾」的競態，保存與刪除須在同一交易鎖邊界協調；10/06 的新防護尚未建入前一天示範映像。
+
+Memory 研究繼續比較內容單位、選讀與後續對話；只有兩條跨案數字／期限副本規則接入正式 B2 Prompt。公版參考工具依 ADR0080 完成 opt-in 接線，RAG 仍是獨立範圍；候選召回、主要工作涵蓋與不重問品質尚未因此驗收。研究、工程接線及實際部署各有自己的完成條件。
+
+**引用：**[工程與交付接續](engineering-and-verification.md#8-docker-交付補上容器與資料保留的實機證據)、[Memory 近期研究](memory-and-context.md#2026-10-04-至-10-05從保存得到進一步比較選讀與使用)、[公版角色工具決策](../../adr/0080-opt-in-public-reference-agent-tools.md)、[現況與路由](../../current-decisions.md)。
 
 ## 素材怎麼接著使用
 
-目前不替這些歷史節點選「最佳故事」。例如「固定訪談 → 顧問重設計」可以沿 5 月、7/6、7/9、7/14 四份反例往下讀；「JSONB → relational」則要先說各時期的使用需求不同，不寫成技術排名。待原件與個人貢獻確認後，再決定正文與附錄。
+「固定訪談 → 顧問重設計」可沿 5 月、7/6、7/9、7/14 四份反例閱讀；「JSONB → relational」則要先交代各時期的使用需求。團隊正文採用哪段材料，再由原件核對成果、分工與限制。

@@ -12,6 +12,8 @@
 
 UI 提供訪談、預覽、人工編輯、來源檢視及下載；後端檢查資料範圍與工具權限，協調正式提交及恢復。瀏覽器不持有供應商金鑰，畫面也須依後端結果判定資料是否已保存。
 
+單一操作者可在清單管理多份資料隔離的職務檔案，包括建立、改名及確認刪除。每份檔案的訪談、JD、Memory 與執行歷史共用所屬範圍；整份刪除的確認及保存邊界見[第六章](06-jd-and-recovery.md#整份職務檔案的刪除邊界)。
+
 目前選型為 React／TypeScript 前端，Python／FastAPI 後端，PostgreSQL 保存產品資料，LangGraph 管理可持久接續的執行。模型以 OpenAI direct Responses SDK 呼叫，產品選擇 Luna／high；這是成本與品質的產品取捨，不是宣稱它對所有任務最佳。PDF 使用受控的 HTML／CSS 與 Chromium 渲染。
 
 ## 多個分析角色，不等於多個微服務
@@ -33,6 +35,10 @@ Context 由 App 組裝與接續，其中的 reasoning／compaction 項目可能�
 `store=false` 表示本產品不以遠端 Response 保存作為恢復依據；供應商的完整隱私與資料留存政策，仍須依其契約判讀。
 
 ## 部署與權限要分開看
+
+產品提供原生啟動與 JD App 專用 Docker Compose。Docker 以一個 App 容器提供同源 Web、API、背景工作及 PDF，PostgreSQL 容器使用獨立資料 volume；初始化與 schema 升級仍須明確執行，不自動搬移既有資料。[本機交付契約](../../implementation/interface-and-delivery.md#42-docker-交付)、[操作手冊](../../runbook.md#docker-操作)
+
+產品程式、部署設定與已運行的映像須分開核對。2026-10-05 的 Docker 示範已更新刪除入口與介面，但尚未包含其後完成的 checkpoint 收尾防護，也未設定啟用公版工具；不能以該示範代表所有現行功能已部署。版本與限制見[示範更新](../../experiments/product-validation/2026-10-05-docker-demo-update.md)及[刪除驗證](../../experiments/product-validation/2026-10-05-job-file-deletion.md)。
 
 產品以 loopback 本機存取為前提，並檢查請求來源；職務檔案的隔離、A 活躍時的人工寫入限制與 B1／B2 工具權限，仍必須由後端落實。單靠 UI 隱藏按鈕或 Prompt 說「不要越權」不足以建立隔離。
 

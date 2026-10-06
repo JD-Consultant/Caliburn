@@ -57,9 +57,21 @@ flowchart LR
 
 現行部署採 FastAPI 單程序，同源提供建置後的 Web，內部處理 A 與背景 B Graph。PostgreSQL 為獨立資料庫程序。依賴鎖定受支援的穩定版本；OpenAI SDK／LangGraph／checkpointer 的相容版本與原生 API 測試結果界定這組依賴的已知適用範圍。
 
-上圖為未啟用公版參考的最小部署。依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，App 可在明示配置 URL 後透過 HTTP 使用獨立 RAG；RAG 不由 JD App 自動啟動。設定只影響尚未綁定的新請求，執行中的工作仍沿原工具與格式恢復。啟用方式見 [API README](../../apps/api/README.md#公版參考工具的可選啟用)，程序操作見 [runbook](../runbook.md#rag獨立服務非-jd-app-預設依賴)。
+上圖為未啟用公版參考的最小部署。依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，App 可在明示配置 URL 後透過 HTTP 使用獨立 RAG；基本模式不啟動 RAG，App 程序也不管理容器。設定只影響尚未綁定的新請求，執行中的工作仍沿原工具與格式恢復。啟用方式見 [API README](../../apps/api/README.md#公版參考工具的可選啟用)，程序操作見 [runbook](../runbook.md#rag獨立服務非-jd-app-預設依賴)。
 
 可原生啟動，也可用 `compose.jd-app.yaml`：一個 App 容器加一個 PostgreSQL 容器及資料 volume。兩者使用同一份程式、契約與持久資料機制，不是兩套產品。Docker 包含 PDF 瀏覽器與中文字型，主機入口只綁 loopback；既有資料不自動搬入。建置、安全與停止邊界見[交付接線 §4.2](../implementation/interface-and-delivery.md#42-docker-交付)，啟動與 DataGrip 設定見 [runbook](../runbook.md#docker-操作)。
+
+需要公版參考時，在基本配置上加上 `compose.jd-app.rag.yaml`，於同一 project 啟動查詢 API、Qdrant 與 GPU 模型服務。各服務保持獨立；App 只在需要時透過 HTTP 查詢，不直接載入檢索套件或模型權重。
+
+```mermaid
+flowchart LR
+  app[原 App：訪談／JD] -->|內網 HTTP；按需| rag[公版查詢 API]
+  rag -->|向量及固定來源| qdrant[(Qdrant)]
+  rag -->|嵌入／重排序| gpu[GPU 模型服務]
+  app --> db[(原 PostgreSQL)]
+```
+
+兩種模式共用原 App 與資料庫，不建立副本。OpenAI key 只注入 App，RAG 不發布主機埠。索引由操作者一次性建立，啟動服務不會解析來源、建索引或清資料。App 的基本功能不必等待 RAG；公版查詢故障會回報錯誤，不當成沒有候選。切回基本模式須先讓已使用公版工具的工作完成，再於安全點改配置，避免執行中的工作失去依賴。操作與驗證範圍見[公版 Docker 模式](../runbook.md#含公版參考的-docker-模式)。
 
 多頁籤操作及同一檔案的重複提交，由後端檢查執行資格。同一操作者可管理多份檔案，各檔案的資料保持隔離；全域資源上限只限制執行量，不將不同職務檔案合併成同一模型對話。未來若需多個後端程序，須再驗證資料庫中的執行資格與重入機制，不能以程序內的鎖定保證跨程序安全。
 

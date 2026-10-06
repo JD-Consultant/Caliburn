@@ -93,6 +93,8 @@ cd apps/ocs-indexer && uv run jd-ocs-indexer serve --port 8000
 
 啟動 RAG 不會自動替 JD App 開啟工具。App 端須另設定 URL 與 timeout，步驟見[後端可選啟用](../../apps/api/README.md#公版參考工具的可選啟用)；使用前須讓欲啟用的 App 程序載入設定。
 
+Docker 公版模式使用 `compose.jd-app.rag.yaml`，以 `pnpm docker:rag:up` 一併啟動既有 App／PostgreSQL 與三個獨立 RAG 服務。延伸配置會設定 App 的內網 URL，但 App 程序不管理 RAG 容器；預設基本模式也不啟動 RAG。模型與 Qdrant 設定重用根 `docker-compose.yml`，查詢 API 依自己的 lockfile 獨立建置。來源選版、建索引、停止、volume 與驗證範圍見[公版 Docker 操作](../runbook.md#含公版參考的-docker-模式)。
+
 ## 4. 資料落地位置
 
 下表保留原 corpus 與既有 profile／task 索引的位置及數量，不能當作本次已選版或已通過解析的統計。

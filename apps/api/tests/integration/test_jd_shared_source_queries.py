@@ -6,12 +6,13 @@ from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import text
+from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.job_description.models import ProfileField
+from caliburn.features.job_description.source_changes import AddJdSource, ReviseJdSources
 from caliburn.features.job_description.sources import (
     JdSourceReference,
     JdSourceTarget,
@@ -27,6 +28,8 @@ from caliburn.features.work_memory.candidates import (
 )
 from caliburn.features.work_memory.models import MemoryContent, MemoryContentChanges
 from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionNotFoundError
+from caliburn.workflows.jd_candidates import JdCandidateWorkflow
+from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
 from caliburn.workflows.jd_source_queries import (
     read_fixed_memory_source,
     read_memory_source_changes,
@@ -262,3 +265,104 @@ def test_comparison_endpoint_cannot_exceed_interview_boundary(
             )
 
     transact(client, read)
+
+
+@pytest.mark.parametrize("titles_only", [False, True])
+def test_fixed_source_queries_only_load_selected_members_and_requested_content(
+    client: TestClient, comparison: SourceComparison, titles_only: bool
+) -> None:
+    statements: list[str] = []
+
+    def capture(_connection, _cursor, statement, _parameters, _context, _many):
+        statements.append(statement)
+
+    engine = client.app.state.database.engine.sync_engine
+    event.listen(engine, "before_cursor_execute", capture)
+    try:
+        if titles_only:
+            result = transact(
+                client,
+                lambda session: read_memory_source_titles(
+                    session,
+                    job_file_id=comparison.job_file_id,
+                    source=comparison.source,
+                    snapshot_id=comparison.snapshot_id,
+                    interview_through_sequence=comparison.interview_through_sequence,
+                ),
+            )
+            assert result == ("季度盤點", "每月盤點", True)
+        else:
+            result = transact(
+                client,
+                lambda session: read_fixed_memory_source(
+                    session,
+                    job_file_id=comparison.job_file_id,
+                    source=comparison.source,
+                    interview_through_sequence=comparison.interview_through_sequence,
+                ),
+            )
+            assert result.content.body == "每月核對庫存。"
+    finally:
+        event.remove(engine, "before_cursor_execute", capture)
+    member_reads = [statement for statement in statements if "memory_position_members" in statement]
+    assert member_reads
+    # 每次只查來源指定的物件，不能把整個 position 帶回 Python 再篩選。
+    assert all("memory_position_members.object_id IN (" in statement for statement in member_reads)
+    if titles_only:
+        assert all("memory_bodies" not in statement for statement in statements)
+
+
+def test_overview_groups_fixed_source_headers_by_snapshot(
+    client: TestClient, comparison: SourceComparison
+) -> None:
+    current = transact(
+        client,
+        lambda session: candidate_queries.read_snapshot_object(
+            session, comparison.job_file_id, comparison.snapshot_id, comparison.source.object_id
+        ),
+    )
+    turn = start_turn(client, file_id=comparison.job_file_id)
+    writer = JdCandidateWorkflow(client.app.state.database.sessions)
+    position = turn.candidate
+    for field, source in (
+        (ProfileField.JOB_TITLE, comparison.source),
+        (
+            ProfileField.PURPOSE,
+            replace(
+                comparison.source,
+                snapshot_id=comparison.snapshot_id,
+                revision_id=current.revision_id,
+            ),
+        ),
+    ):
+        position = client.portal.call(
+            writer.edit,
+            turn.writer,
+            position.scope,
+            ReviseJdSources(
+                uuid4(),
+                position.revision_id,
+                JdSourceTarget(SourceTargetKind.PROFILE_FIELD, field=field),
+                (AddJdSource(source),),
+            ),
+        )
+    complete(client, replace(turn, candidate=position))
+    statements: list[str] = []
+
+    def capture(_connection, _cursor, statement, _parameters, _context, _many):
+        statements.append(statement)
+
+    engine = client.app.state.database.engine.sync_engine
+    event.listen(engine, "before_cursor_execute", capture)
+    try:
+        overview = client.portal.call(
+            JdEvidenceWorkflow(client.app.state.database.sessions).read_overview,
+            comparison.job_file_id,
+        )
+    finally:
+        event.remove(engine, "before_cursor_execute", capture)
+    assert {reference.source_label for reference in overview.references} == {"每月盤點", "季度盤點"}
+    assert len(overview.references) == 2
+    assert not any("memory_bodies" in statement for statement in statements)
+    # 兩份歷史快照加上一次比較位置，不能為每條引用重讀目前位置。
+    assert sum("memory_position_members" in statement for statement in statements) <= 3

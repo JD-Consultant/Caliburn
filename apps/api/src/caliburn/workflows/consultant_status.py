@@ -24,6 +24,8 @@ from caliburn.features.executions.models import (
     ExecutionScope,
     ExecutionStatus,
 )
+from caliburn.features.interview_plans import service as interview_plans
+from caliburn.features.interview_plans.models import PlanSnapshot, PlanStateError
 from caliburn.features.interviews import queries as interviews
 from caliburn.features.interviews import service as interview_service
 from caliburn.features.interviews.models import InterviewInputNotFoundError
@@ -42,6 +44,7 @@ class ConsultantTurnStatus:
     candidate: JdCandidatePreview | None = None
     commentary: tuple[PublicCommentary, ...] | None = None
     pause_requested: bool = False
+    plan_preview: PlanSnapshot | None = None
 
 
 class ConsultantTurnUnavailableError(RuntimeError):
@@ -131,6 +134,7 @@ async def _read_status(session: AsyncSession, execution: ExecutionInfo) -> Consu
         if exchange is None:
             raise ConsultantTurnUnavailableError("Formal completion is unavailable")
     candidate = None
+    plan_preview = None
     if execution.status in (ExecutionStatus.ACTIVE, ExecutionStatus.PAUSED):
         try:
             candidate = await candidate_service.read_preview(session, job_file_id, execution_id)
@@ -138,6 +142,10 @@ async def _read_status(session: AsyncSession, execution: ExecutionInfo) -> Consu
             # Admission precedes initialization; cancellation may also close the draft
             # after the status read. Neither grants a preview or invents empty JD content.
             pass
+        try:
+            plan_preview = await interview_plans.read_current(session, job_file_id, execution_id)
+        except PlanStateError as error:
+            raise ConsultantTurnUnavailableError("Saved plan preview is unavailable") from error
     return ConsultantTurnStatus(
         job_file_id,
         execution_id,
@@ -145,4 +153,5 @@ async def _read_status(session: AsyncSession, execution: ExecutionInfo) -> Consu
         original.interview_text,
         candidate,
         pause_requested=execution.pause_requested,
+        plan_preview=plan_preview,
     )

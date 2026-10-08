@@ -1,0 +1,30 @@
+erDiagram
+    executions ||--o| execution_budgets : "固定工作限制"
+    execution_budgets ||--o{ execution_outbound_attempts : "每次外送先預留"
+    executions {
+        uuid execution_id PK
+        uuid job_file_id FK
+        string status
+        uuid writer_id
+    }
+    execution_budgets {
+        uuid execution_id PK,FK
+        int max_model_steps
+        int max_compactions
+        int max_outbound_attempts
+        int max_attempts_per_request
+        datetime deadline_at
+        decimal max_cost_usd "未設金額閘門時 NULL"
+        string cost_basis
+    }
+    execution_outbound_attempts {
+        uuid execution_id PK,FK
+        uuid attempt_id PK
+        uuid request_id
+        string kind
+        string fingerprint
+        uuid writer_id
+        decimal reserved_cost_usd
+        decimal reported_cost_usd "未知時 NULL"
+        datetime admitted_at
+    }

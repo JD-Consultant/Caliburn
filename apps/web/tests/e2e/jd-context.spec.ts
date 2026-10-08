@@ -95,6 +95,12 @@ test('協作與共通條件增修刪、分類內排序、更正分類、重開�
   await expect(secondCondition.getByText('依約配合上線，由產品同事確認排程。')).toBeVisible();
   await secondCondition.getByRole('button', { name: '移到其他分類' }).click();
   await page.getByRole('menuitemradio', { name: '共通協作界線', exact: true }).click();
+  // 正常 CRUD 旅程先等命令確認；立即 reload 會刻意留下待確認操作。
+  await expect(
+    page
+      .getByRole('article', { name: '共通協作界線 1' })
+      .getByRole('button', { name: '修改條件內容' }),
+  ).toBeEnabled();
   await page.reload();
   const updated = await readWork(page.request, fileId);
   expect(
@@ -130,6 +136,8 @@ test('協作與共通條件增修刪、分類內排序、更正分類、重開�
   const shared = page.getByRole('article', { name: '共通協作界線 1' });
   await shared.getByRole('button', { name: '刪除條件' }).click();
   await page.getByRole('button', { name: '確認刪除條件' }).click();
+  // 對話框會先隱藏背景角色；須等刪除完成關閉，才能用元素消失判定成功。
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(shared).toHaveCount(0);
   const final = await readWork(page.request, fileId);
   expect(final.collaborators.map((item) => item.name)).toEqual(['產品同事']);

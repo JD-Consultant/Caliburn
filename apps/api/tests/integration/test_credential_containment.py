@@ -19,6 +19,7 @@ from fastapi.testclient import TestClient
 from openai import AsyncOpenAI
 from psycopg import sql
 
+from caliburn.app_composition import AppComposition
 from caliburn.bootstrap import create_app
 from caliburn.settings import DatabaseSettings, ModelSettings, Settings
 from tests.fixtures.response_transport import response_http_reply
@@ -79,22 +80,23 @@ def test_a_clean_schema_has_nothing_to_find(
 
 def run_turn(
     database_settings: DatabaseSettings,
-    monkeypatch: pytest.MonkeyPatch,
     respond: Callable[[httpx2.Request], httpx2.Response],
 ) -> tuple[dict[str, Any], list[str]]:
     from caliburn.adapters.openai_responses import create_responses_client
 
-    def synthetic_client(*, api_key: str, timeout_seconds: float) -> AsyncOpenAI:
+    def synthetic_client(model: ModelSettings) -> AsyncOpenAI:
         return create_responses_client(
-            api_key=api_key,
-            timeout_seconds=timeout_seconds,
+            api_key=model.api_key,
+            timeout_seconds=model.request_timeout_seconds,
             http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond)),
         )
 
-    monkeypatch.setattr("caliburn.bootstrap.create_responses_client", synthetic_client)
     seen: list[str] = []
     with TestClient(
-        create_app(Settings(database=database_settings, model=ModelSettings(api_key=SECRET))),
+        create_app(
+            Settings(database=database_settings, model=ModelSettings(api_key=SECRET)),
+            composition=AppComposition(create_responses_client=synthetic_client),
+        ),
         base_url="http://127.0.0.1:8100",
         headers={"Origin": "http://127.0.0.1:8100"},
         backend_options={"loop_factory": asyncio.SelectorEventLoop},
@@ -132,7 +134,6 @@ def run_turn(
 def test_a_completed_turn_keeps_the_key_out_of_the_body_the_database_and_public_reads(
     database_settings: DatabaseSettings,
     database_connection: psycopg.Connection,
-    monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     bearers: list[str] = []
@@ -150,7 +151,7 @@ def test_a_completed_turn_keeps_the_key_out_of_the_body_the_database_and_public_
         response["output"][1]["content"][0]["text"] = "盤點時您負責哪一段？"
         return response_http_reply(request, response)
 
-    status, public = run_turn(database_settings, monkeypatch, respond)
+    status, public = run_turn(database_settings, respond)
 
     assert status["status"] == "completed", status
     assert bearers and all(bearer == f"Bearer {SECRET}" for bearer in bearers)
@@ -163,7 +164,6 @@ def test_a_completed_turn_keeps_the_key_out_of_the_body_the_database_and_public_
 def test_a_provider_error_that_echoes_the_key_is_not_stored_or_shown(
     database_settings: DatabaseSettings,
     database_connection: psycopg.Connection,
-    monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     def respond(request: httpx2.Request) -> httpx2.Response:
@@ -178,7 +178,7 @@ def test_a_provider_error_that_echoes_the_key_is_not_stored_or_shown(
             },
         )
 
-    status, public = run_turn(database_settings, monkeypatch, respond)
+    status, public = run_turn(database_settings, respond)
 
     assert status["status"] == "failed", status
     assert not any(part in json.dumps(status, ensure_ascii=False) for part in FRAGMENTS)

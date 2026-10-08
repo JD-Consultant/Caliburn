@@ -1,0 +1,10 @@
+flowchart TD
+  start([開始本輪]) --> prepare[依本輪固定訪談範圍<br/>取得可採用 Plan，建立候選]
+  prepare --> work[依需要局部修改本輪 Plan]
+  work --> boundary{到達哪個工作邊界？}
+  boundary -->|暫停| pause[保留本輪基準與候選]
+  pause -->|同輪繼續| work
+  boundary -->|準備正式完成| commit[[共同完成交易<br/>核對 Plan 最終位置並確立正式資格]]
+  commit --> adopted([後輪可在其合法範圍內採用])
+  boundary -->|取消或最終失敗| discard[本輪候選不取得後輪採用資格]
+  discard --> stopped([本輪結束])

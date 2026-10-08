@@ -1,0 +1,14 @@
+%%{init: {"flowchart": {"rankSpacing": 24, "nodeSpacing": 32, "wrappingWidth": 180}}}%%
+flowchart TB
+  subgraph caliburn[Caliburn・軟體系統邊界]
+    web[Web 工作區<br/>容器・React／TypeScript<br/>訪談與 JD 編輯]
+    backend[App 後端<br/>容器・Python／FastAPI<br/>協調業務、AI 執行與 PDF]
+    pg[(Caliburn 資料庫<br/>容器・PostgreSQL<br/>業務資料與執行 checkpoint)]
+    web -->|HTTP：Web 成品、JSON 命令／查詢<br/>SSE：訂閱公開進度| backend
+    backend -->|PostgreSQL protocol<br/>業務資料與執行快照讀寫| pg
+  end
+  provider[OpenAI<br/>外部軟體系統<br/>Responses API 模型推論]
+  rag[公版 RAG<br/>外部軟體系統・選用<br/>提供公版查讀]
+  backend -->|HTTPS：原生模型請求| provider
+  backend -.->|HTTP：按需公版查讀| rag
+  style caliburn fill:none,stroke:#64748b,stroke-dasharray:5 5

@@ -15,7 +15,14 @@ from pydantic import JsonValue, TypeAdapter, ValidationError
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.diagnostics.projection import role_for_thread
 
-CHANNELS = ("request_snapshot", "response_snapshot", "tool_results")
+CHANNELS = (
+    "request_id",
+    "request_snapshot",
+    "response_snapshot",
+    "tool_results",
+    "binding",
+    "jd_read_max_result_characters",
+)
 JSON_VALUE: TypeAdapter[JsonValue] = TypeAdapter(JsonValue)
 
 
@@ -29,6 +36,8 @@ def read_checkpoint_records(
     )
     for (thread_id,) in threads.fetchall():
         role = role_for_thread(thread_id, prefix)
+        if thread_id == f"{prefix}job_consultant:initial_context":
+            role = "job_consultant"
         if role is not None:
             yield from _read_thread(connection, thread_id, role)
 
@@ -53,7 +62,7 @@ def _read_thread(
         "ORDER BY checkpoint_id,task_id,idx",
         (thread_id, list(CHANNELS)),
     ):
-        pending[checkpoint_id][task_id][channel] = _decode(serializer, kind, bytes(blob))
+        pending[checkpoint_id][task_id][channel] = _decode(serializer, kind, bytes(blob), channel)
     for checkpoint_id, checkpoint in connection.execute(
         "SELECT checkpoint_id,checkpoint FROM checkpoints "
         "WHERE thread_id=%s AND checkpoint_ns='' ORDER BY checkpoint_id",
@@ -73,7 +82,7 @@ def _read_thread(
             if kind == "empty":
                 continue
             if key not in decoded:
-                decoded[key] = _decode(serializer, kind, blob)
+                decoded[key] = _decode(serializer, kind, blob, channel)
             values[channel] = decoded[key]
         base = {
             "thread_id": thread_id,
@@ -90,11 +99,14 @@ def _read_thread(
             yield {**base, "source": "pending_write", "values": {**values, **update}}
 
 
-def _decode(serializer: Any, kind: str, blob: bytes) -> JsonValue:
+def _decode(serializer: Any, kind: str, blob: bytes, channel: str) -> JsonValue:
     if kind not in {"json", "msgpack"}:
         raise ValueError("Unsupported checkpoint encoding for diagnostic JSON")
     try:
         value = serializer.loads_typed((kind, blob))
+        # logical request 使用原生 UUID channel；只在已知欄位轉成 JSON 字串。
+        if channel == "request_id" and isinstance(value, UUID):
+            return str(value)
         if value is None:
             raise ValueError("Saved diagnostic channel is unavailable")
         return JSON_VALUE.validate_python(value)

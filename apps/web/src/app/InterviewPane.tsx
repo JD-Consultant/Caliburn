@@ -2,6 +2,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { InterviewComposer } from '../features/interview/InterviewComposer';
 import { InterviewHistory } from '../features/interview/InterviewHistory';
+import { InterviewPlan } from '../features/interview/InterviewPlan';
 import { consultantTurnQuery } from '../features/interview/interview-turn-api';
 import { SpeakerAvatar } from '../features/interview/SpeakerAvatar';
 import { UndoTurnJd } from '../features/jd-editor/UndoTurnJd';
@@ -21,6 +22,7 @@ export function InterviewPane({ jobFileId }: { jobFileId: string }) {
       </div>
       <div className="pane-scroll" ref={scroller}>
         <div className="interview-content">
+          <InterviewPlan key={jobFileId} jobFileId={jobFileId} />
           <InterviewHistory
             jobFileId={jobFileId}
             renderTurnActions={(executionId) => (

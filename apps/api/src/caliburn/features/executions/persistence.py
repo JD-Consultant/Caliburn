@@ -9,6 +9,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    Select,
     Text,
     UniqueConstraint,
     func,
@@ -20,7 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
-from caliburn.features.executions.models import ExecutionScope, ExecutionStatus
+from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 
 
 class ExecutionRecord(Base):
@@ -144,3 +145,25 @@ async def list_active_consultants(session: AsyncSession) -> tuple[ExecutionRecor
         .order_by(ExecutionRecord.created_at, ExecutionRecord.execution_id)
     )
     return tuple(records)
+
+
+async def read_completed_consultant_execution_ids(
+    session: AsyncSession, job_file_id: UUID, execution_ids: tuple[UUID, ...]
+) -> frozenset[UUID]:
+    if not execution_ids:
+        return frozenset()
+    found = await session.scalars(
+        completed_consultant_executions_projection(job_file_id).where(
+            ExecutionRecord.execution_id.in_(execution_ids),
+        )
+    )
+    return frozenset(found)
+
+
+def completed_consultant_executions_projection(job_file_id: UUID) -> Select[UUID]:
+    """completed 與顧問種類資格仍由 Execution owner 定義，不授予新執行權限。"""
+    return select(ExecutionRecord.execution_id).where(
+        ExecutionRecord.job_file_id == job_file_id,
+        ExecutionRecord.kind == ExecutionKind.CONSULTANT_TURN.value,
+        ExecutionRecord.status == ExecutionStatus.COMPLETED.value,
+    )

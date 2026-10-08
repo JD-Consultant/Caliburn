@@ -1,6 +1,7 @@
 /** Compile the shared Turn definition through the real guard and cross-file discovery ref. */
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import interviewPlanSchema from '../../../../api/contracts/tools/interview-plan.schema.json' with { type: 'json' };
 import { describe, expect, it } from 'vitest';
 import consultantTurnSchema from '../../../../api/contracts/http/consultant-turn.schema.json' with { type: 'json' };
 import currentTurnSchema from '../../../../api/contracts/http/current-consultant-turn.schema.json' with { type: 'json' };
@@ -17,6 +18,7 @@ import { isConsultantTurn } from './validation';
 
 const validator = new Ajv2020();
 addFormats(validator);
+validator.addSchema(interviewPlanSchema, 'tools/interview-plan.schema.json');
 for (const [name, schema] of Object.entries({
   'consultant-turn.schema.json': consultantTurnSchema,
   'jd-areas-view.schema.json': jdAreasSchema,
@@ -39,6 +41,7 @@ const turn: ConsultantTurn = {
   input_text: '合成訪談',
   allowed_controls: ['pause', 'cancel'],
   commentary: [{ response_id: 'response', message_id: 'message', text: '公開進度' }],
+  plan_preview: null,
   candidate: {
     profile: { job_title: '工程師', organization_unit: null, reports_to: null, purpose: null },
     work: {

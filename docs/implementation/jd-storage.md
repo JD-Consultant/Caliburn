@@ -3,9 +3,21 @@
 - 狀態：**現行 JD 保存、交易與讀寫接線** 。人工及模型編輯共用 JD 領域模組，候選在 A 完成交易才正式採用；來源回查、差異與條件撤回依下列契約運作。分析品質及未驗情境見[驗證對照](verification-plan.md)，不由機制測試推定品質達標。
 - 上位契約：[JD 欄位指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。驗證見 [JD 保存](../history.md#source-75f1da860cdd0bef826e)。
 
+| 維護問題 | 閱讀位置 |
+|---|---|
+| 哪個模組負責某一種 JD 內容？ | [程式責任](#1-保存範圍與程式責任) |
+| 固定正文、排序、任務歸屬及能力關係如何保存？ | [固定修訂](#2-固定修訂與目前正式頭)、[職責](#21-職責集合身分固定正文與排序分開)、[任務](#22-任務內容獨立明細及歸屬)、[同版查詢](#23-組合畫面使用同一修訂)、[能力](#24-共用知識技能與任務使用關係)、[協作／條件](#25-協作對象與全職務共通條件) |
+| 人工操作與 A 候選如何提交、恢復？ | [人工原結果](#3-人工編輯與原結果接續)、[本輪候選](#31-本輪候選與可恢復位置)、[條件撤回](#36-完成後的-jd-條件撤回) |
+| 模型如何定位、讀寫與引用？ | [導覽／定位](#32-模型導覽與既有物件定位)、[來源與寫入](#33-直接來源按需讀取與候選模型寫入)、[項目編輯](#34-建立局部修訂與刪除模型項目) |
+| 人工改稿與依據差異如何回查？ | [Changes](#35-來源及人工改稿差異)、[正式來源](#37-人的正式來源回查)、[Turn 變更](#38-完成-turn-的-jd-變更檢視) |
+
+初始化、資料演進與驗證限制見[§4](#4-初始化演進與保證界線)；保存機制的來源與取捨見[§5](#5-研究依據與本案取捨)。
+
 ## 1. 保存範圍與程式責任
 
 目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責／任務集合、獨立成果／要求、共用知識／技能與任務使用關係、協作對象／共通條件的人工讀寫與排序。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[基本資料](interface-and-delivery.md#12-基本資料編輯的讀取基底與恢復)、[職責／任務](interface-and-delivery.md#13-職責與任務的人工編輯)、[知識／技能](interface-and-delivery.md#14-共用知識技能及任務關係的人工編輯)及[協作／條件](interface-and-delivery.md#15-協作對象與共通條件的人工編輯)。候選見 §3.1，模型定位、依據／核對與來源回查見 §3.2–3.8；人工正式端點不作 A 候選寫入捷徑。
+
+**核心保存與修訂**
 
 | 責任 | 已實作位置 |
 |---|---|
@@ -13,78 +25,46 @@
 | 原結果核對、修訂與欄位用例 | [service.py](../../apps/api/src/caliburn/features/job_description/service.py)；參與呼叫方交易，不 commit |
 | 正式頭、固定修訂、原操作 SQL | [persistence.py](../../apps/api/src/caliburn/features/job_description/persistence.py) |
 | 固定正式內容查詢 | [queries.py](../../apps/api/src/caliburn/features/job_description/queries.py)；GET 不偷偷建立資料 |
-| 同版 JD 集合組合讀取 | [work_queries.py](../../apps/api/src/caliburn/features/job_description/work_queries.py)、[jd_work.py](../../apps/api/src/caliburn/transport/http/jd_work.py)；職責／任務／能力及關係／協作／條件先固定 head 一次，再沿既有查詢投影，不另建資料保存模組 |
-| 檔案隔離、人工准入及一次提交 | [jd_editing.py](../../apps/api/src/caliburn/workflows/jd_editing.py)；沿既有檔案鎖與 executions，不重建鎖定系統 |
-| HTTP 驗證／錯誤投影 | [jd_profile.py](../../apps/api/src/caliburn/transport/http/jd_profile.py)；無業務 SQL |
+| 共用修改範圍與原結果 | [revision_editing.py](../../apps/api/src/caliburn/features/job_description/revision_editing.py)；六種編輯共用欄位規則與固定修訂，只選擇正式或候選指標 |
+| 候選位置、回退及採用參與者 | [candidates.py](../../apps/api/src/caliburn/features/job_description/candidates.py)、[candidate_service.py](../../apps/api/src/caliburn/features/job_description/candidate_service.py)、[candidate_persistence.py](../../apps/api/src/caliburn/features/job_description/candidate_persistence.py)；服務不自行 commit |
+
+**JD 內容集合**
+
+| 責任 | 已實作位置 |
+|---|---|
 | 職責值、用例、固定內容／排序 | [areas.py](../../apps/api/src/caliburn/features/job_description/areas.py)、[area_service.py](../../apps/api/src/caliburn/features/job_description/area_service.py)、[area_persistence.py](../../apps/api/src/caliburn/features/job_description/area_persistence.py)；仍屬同一 JD feature，非另套保存服務 |
-| 職責 HTTP 與共用 workflow 注入 | [jd_areas.py](../../apps/api/src/caliburn/transport/http/jd_areas.py)、[jd_dependencies.py](../../apps/api/src/caliburn/transport/http/jd_dependencies.py)；與 profile 共用准入／交易責任 |
 | 任務與獨立明細的值、變更計算 | [tasks.py](../../apps/api/src/caliburn/features/job_description/tasks.py)、[task_changes.py](../../apps/api/src/caliburn/features/job_description/task_changes.py)；先計算完整合法結果，無 DB／HTTP 相依 |
 | 任務用例、保存與 HTTP | [task_service.py](../../apps/api/src/caliburn/features/job_description/task_service.py)、[task_persistence.py](../../apps/api/src/caliburn/features/job_description/task_persistence.py)、[jd_tasks.py](../../apps/api/src/caliburn/transport/http/jd_tasks.py)；沿同一 JD workflow、head 與 operation，不另造服務／交易平台 |
 | 共用知識／技能的值與變更 | [capabilities.py](../../apps/api/src/caliburn/features/job_description/capabilities.py)、[capability_changes.py](../../apps/api/src/caliburn/features/job_description/capability_changes.py)；名稱中的 capability 僅統稱這兩種 JD 能力定義，不代表 Agent 工具能力 |
 | 共用定義／任務關係的用例、SQL、HTTP | [capability_service.py](../../apps/api/src/caliburn/features/job_description/capability_service.py)、[capability_persistence.py](../../apps/api/src/caliburn/features/job_description/capability_persistence.py)、[jd_capabilities.py](../../apps/api/src/caliburn/transport/http/jd_capabilities.py)；沿同一 JD 固定修訂及原操作，反向用途由同一關係投影 |
 | 協作對象值、用例與 SQL | [collaborators.py](../../apps/api/src/caliburn/features/job_description/collaborators.py)、[collaborator_service.py](../../apps/api/src/caliburn/features/job_description/collaborator_service.py)、[collaborator_persistence.py](../../apps/api/src/caliburn/features/job_description/collaborator_persistence.py)；獨立文字與選用，不混成 task 關係 |
 | 共通條件值、變更、用例與 SQL | [conditions.py](../../apps/api/src/caliburn/features/job_description/conditions.py)、[condition_changes.py](../../apps/api/src/caliburn/features/job_description/condition_changes.py)、[condition_service.py](../../apps/api/src/caliburn/features/job_description/condition_service.py)、[condition_persistence.py](../../apps/api/src/caliburn/features/job_description/condition_persistence.py)；分類不表示自動繼承 |
+
+**查詢與跨層接線**
+
+| 責任 | 已實作位置 |
+|---|---|
+| 同版 JD 集合組合讀取 | [work_queries.py](../../apps/api/src/caliburn/features/job_description/work_queries.py)、[jd_work.py](../../apps/api/src/caliburn/transport/http/jd_work.py)；職責／任務／能力及關係／協作／條件先固定 head 一次，再沿既有查詢投影，不另建資料保存模組 |
+| 檔案隔離、人工准入及一次提交 | [jd_editing.py](../../apps/api/src/caliburn/workflows/jd_editing.py)；沿既有檔案鎖與 executions，不重建鎖定系統 |
+| HTTP 驗證／錯誤投影 | [jd_profile.py](../../apps/api/src/caliburn/transport/http/jd_profile.py)；無業務 SQL |
+| 職責 HTTP 與共用 workflow 注入 | [jd_areas.py](../../apps/api/src/caliburn/transport/http/jd_areas.py)、[jd_dependencies.py](../../apps/api/src/caliburn/transport/http/jd_dependencies.py)；與 profile 共用准入／交易責任 |
 | 新建檔案連同空 JD／開場保存 | [job_files.py](../../apps/api/src/caliburn/workflows/job_files.py)；重送建立不重設 JD |
-| 共用修改範圍與原結果 | [revision_editing.py](../../apps/api/src/caliburn/features/job_description/revision_editing.py)；六種編輯共用欄位規則與固定修訂，只選擇正式或候選指標 |
-| 候選位置、回退及採用參與者 | [candidates.py](../../apps/api/src/caliburn/features/job_description/candidates.py)、[candidate_service.py](../../apps/api/src/caliburn/features/job_description/candidate_service.py)、[candidate_persistence.py](../../apps/api/src/caliburn/features/job_description/candidate_persistence.py)；服務不自行 commit |
 | A 候選准入／短交易 | [jd_candidates.py](../../apps/api/src/caliburn/workflows/jd_candidates.py)；沿既有 execution writer 與檔案鎖，不提供獨立正式完成 HTTP |
 
 ## 2. 固定修訂與目前正式頭
 
-以下呈現固定修訂與職責的資料關係，其他集合在各節補充。`job_files` 是職務檔案領域模組；圖的複合識別均含 `job_file_id`。簡化屬性只列識別／關係及已實作欄位，完整 DDL 以 [0005](../../apps/api/src/caliburn/migrations/versions/0005_jd_profile_revisions.py)及 [0006 migration](../../apps/api/src/caliburn/migrations/versions/0006_jd_area_selections.py)為準。
+以下呈現固定修訂與職責的資料關係，其他集合在各節補充。`job_files` 是職務檔案表；圖的複合識別均含 `job_file_id`。簡化屬性保留具體鍵與已實作欄位，型別採簡寫，省略預設值、CHECK 及排序用的複合唯一約束；完整 DDL 以 [0005](../../apps/api/src/caliburn/migrations/versions/0005_jd_profile_revisions.py)及 [0006 migration](../../apps/api/src/caliburn/migrations/versions/0006_jd_area_selections.py)為準。
 
-```mermaid
-erDiagram
-  direction LR
-  job_files ||--|| job_descriptions : owns
-  job_descriptions }o--|| jd_revisions : selects_initial_and_current
-  jd_revisions ||--o{ jd_operations : expected_and_result
-  jd_revisions ||--o{ jd_area_selections : selects_ordered_areas
-  jd_area_revisions ||--o{ jd_area_selections : reuses_fixed_content
-  job_files {
-    uuid job_file_id PK
-  }
-  job_descriptions {
-    uuid job_file_id PK,FK
-    uuid initial_revision_id FK
-    uuid current_revision_id FK
-  }
-  jd_revisions {
-    uuid job_file_id PK,FK
-    uuid revision_id PK
-    uuid parent_revision_id FK
-    text job_title
-    text organization_unit
-    text reports_to
-    text purpose
-  }
-  jd_operations {
-    uuid job_file_id PK,FK
-    uuid command_id PK
-    uuid expected_revision_id FK
-    uuid result_revision_id FK
-    jsonb request_payload
-  }
-  jd_area_revisions {
-    uuid job_file_id PK,FK
-    uuid area_id PK
-    uuid content_revision_id PK
-    text title
-    text scope_text
-  }
-  jd_area_selections {
-    uuid job_file_id PK,FK
-    uuid revision_id PK,FK
-    uuid area_id PK,FK
-    uuid content_revision_id FK
-    int position
-  }
-```
+圖為現行固定修訂與職責的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。省略各表重複的檔案 FK、修訂 parent 及後續章節的關係。檔案建立工作流會同時建立 JD；圖中 `0..1` 表示 FK／唯一約束本身的範圍。
+
+![現行：2. 固定修訂與目前正式頭](../diagrams/implementation/jd-storage/fixed-revisions-areas.png)
+
+[圖源](../diagrams/implementation/jd-storage/fixed-revisions-areas.mmd) · [SVG](../diagrams/implementation/jd-storage/fixed-revisions-areas.svg)
 
 - `job_descriptions` 選初始與目前正式修訂；初始身分不改。固定修訂的父修訂、head、操作結果均以**同檔案的複合 FK** 約束，不能指到另一檔案。
 - `jd_revisions` 保存四個獨立文字欄位，不把整份 JD 存 JSON／Markdown。修訂與原操作不允許 UPDATE／DELETE；空 JD 的四欄為 null，表示尚未提供，不是已確認沒有。
 - 有內容改變才建立新修訂並移動 head。改回相同舊文字仍建立新的修訂身分；只設為目前相同值則沿用修訂，但原命令仍有可重送結果。
-- `jd_operations` 保存原命令的預期基底、型別化修改與結果修訂。JSONB 是原操作意圖，不是第二份可編輯 JD；結果透過固定修訂取回，不複製一份完整結果正文。
+- `jd_operations` 保存原命令的預期基底、型別化修改與結果修訂。`request_payload` 是原操作意圖；`0028` 增加的 nullable `result_payload` 僅保存複合操作的效果與新物件身分，舊操作維持 null。完整結果透過固定修訂取回，不複製一份可編輯 JD 或完整結果正文。
 - 每次改動只複製四個小欄位及職責／任務／能力選用鍵、關係與排序；內容未變就重用固定內容修訂，不引入內容定址、delta 或事件重播。任務內容修訂包含自身成果／要求，詳見 §2.2；共用知識／技能見 §2.4。其他集合同樣維持此不變量，不可讓舊修訂讀可變最新子項，也不可無條件複製整份 JD。
 
 UUID 是身分，不表示時間大小；先後由父修訂與原操作表達。這不是把 ORM 的版本計數器當作永久歷史，亦不是要求 LLM 填修訂號。
@@ -107,38 +87,13 @@ UUID 是身分，不表示時間大小；先後由父修訂與原操作表達。
 
 以下為任務與明細的資料關係，與上圖共用同一份 `jd_revisions`、職責選用及原操作；不是第二套版本服務。完整 DDL 見 [0007 migration](../../apps/api/src/caliburn/migrations/versions/0007_jd_task_selections.py)。
 
-```mermaid
-erDiagram
-  direction LR
-  jd_revisions ||--o{ jd_task_selections : selects_tasks
-  jd_area_selections |o--o{ jd_task_selections : optional_group_same_revision
-  jd_task_revisions ||--o{ jd_task_selections : reuses_fixed_content
-  jd_task_revisions ||--o{ jd_task_details : contains_ordered_details
-  jd_task_selections {
-    uuid job_file_id PK,FK
-    uuid revision_id PK,FK
-    uuid task_id PK,FK
-    uuid content_revision_id FK
-    uuid area_id FK
-    int position
-  }
-  jd_task_revisions {
-    uuid job_file_id PK,FK
-    uuid task_id PK
-    uuid content_revision_id PK
-    text title
-    text description
-  }
-  jd_task_details {
-    uuid job_file_id PK,FK
-    uuid task_id PK,FK
-    uuid content_revision_id PK,FK
-    uuid detail_id PK
-    text kind
-    text text
-    int position
-  }
-```
+<!-- diagram: jd-task-storage -->
+
+![現行：2.2 任務內容、獨立明細及歸屬](../diagrams/implementation/jd-storage/jd-task-storage.png)
+
+[圖源](../diagrams/implementation/jd-storage/jd-task-storage.mmd) · [SVG](../diagrams/implementation/jd-storage/jd-task-storage.svg)
+
+圖為現行任務與明細的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。欄位型別與約束同 §2 簡化；任務可不歸屬職責，故職責端是 `0..1`，不是任務端。固定內容的 `content_revision_id` 未納入選用表主鍵，重用關係為虛線；明細則以完整內容鍵作為自身主鍵的一部分。
 
 - `task_id` 是穩定身分，`content_revision_id` 固定標題、敘述及其兩組明細。`title`／`description` 至少一個有內容；成果／要求均可空集合，不要求湊成一對、不以空白占位。`detail_id` 在同任務中保持身分，供逐筆來源與操作精確定位。
 - 明細以關聯列保存，不塞 JSON 正文；`kind` 分 `outcome`／`requirement`，各自排序，不能跨組或跨任務移動。修文字或自身明細／明細順序才建立新任務內容修訂，複製的是**該任務的固定小型內容集合** ，不是所有任務／整份 JD。此為有界 aggregate 選擇；沒有提前建立每種明細各自的通用版本平台。
@@ -153,25 +108,11 @@ erDiagram
 
 `GET /jd/work` 給人工編輯畫面一組固定 `revision_id`、`areas`、`tasks`、`capabilities`、`task_links`、`collaborators`、`conditions`。不能由前端分別讀取各集合的 latest 再拼接，否則另一請求可能在兩次讀取之間改歸屬、刪職責、改共用定義／關係或更正條件分類。組合讀取只捕捉 head 一次，之後都讀不可變修訂；不需要為此另存投影表、鎖住人工編輯或提高整個 App 的 isolation level。profile 仍為獨立表單及讀取，不宣稱跨 HTTP 請求同版。
 
-```mermaid
-sequenceDiagram
-  participant UI as 人工編輯畫面
-  participant API as JD 查詢
-  participant DB as 既有 JD 保存
-  UI->>API: GET 全部 JD 集合
-  API->>DB: 讀一次目前 head
-  DB-->>API: 固定修訂 R
-  API->>DB: 讀 R 的職責
-  DB-->>API: 職責集合
-  Note over DB: 即使另一請求此時發布 R2<br/>R 的選用與內容不變
-  API->>DB: 讀 R 的任務及明細
-  DB-->>API: 任務集合
-  API->>DB: 讀 R 的知識／技能與任務關係
-  DB-->>API: 共用定義及有序關係
-  API->>DB: 讀 R 的協作對象與共通條件
-  DB-->>API: 協作與條件集合
-  API-->>UI: R + 全部集合與關係
-```
+![現行：2.3 組合畫面使用同一修訂](../diagrams/implementation/jd-storage/revision-consistent-read.png)
+
+[圖源](../diagrams/implementation/jd-storage/revision-consistent-read.mmd) · [SVG](../diagrams/implementation/jd-storage/revision-consistent-read.svg)
+
+圖為現行人工查詢的 UML 時序圖；同步呼叫使用實線實心箭頭，回覆使用虛線箭頭，圖例沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。HTTP 與各次資料查詢都等待結果；固定 R 後的查詢不再重讀 head。
 
 HTTP Schema 透過 [JSON Schema `$ref`](https://json-schema.org/understanding-json-schema/structuring)重用既有 Area／WorkTask／Capability／TaskLink／Collaborator／Condition 定義；官方 Python／TS 生成器及 Ajv 實測跨檔引用，不手抄第二份欄位規格。組合 transport 使用既有 projection 的 JSON 相容值（`model_dump(mode="json")`），不傳遞另一生成模組的 Enum 實例；非空集合的真 PG 測例覆蓋此邊界。此為人工 transport，並非模型的完整 JD／map 工具。
 
@@ -181,36 +122,13 @@ HTTP Schema 透過 [JSON Schema `$ref`](https://json-schema.org/understanding-js
 
 以下為 **0008 已實作** 的增量關係；複合 FK 均包含檔案及正式 JD 修訂，不是只驗 ID 存在。
 
-```mermaid
-erDiagram
-  direction LR
-  jd_revisions ||--o{ jd_capability_selections : selects
-  jd_capability_revisions ||--o{ jd_capability_selections : fixed_content
-  jd_capability_selections ||--o{ jd_task_capabilities : used_by
-  jd_task_selections ||--o{ jd_task_capabilities : uses
-  jd_capability_revisions {
-    uuid job_file_id PK,FK
-    uuid capability_id PK
-    uuid content_revision_id PK
-    text kind
-    text name
-    text description
-  }
-  jd_capability_selections {
-    uuid job_file_id PK,FK
-    uuid revision_id PK,FK
-    uuid capability_id PK,FK
-    uuid content_revision_id FK
-    int position
-  }
-  jd_task_capabilities {
-    uuid job_file_id PK,FK
-    uuid revision_id PK,FK
-    uuid task_id PK,FK
-    uuid capability_id PK,FK
-    int position
-  }
-```
+<!-- diagram: jd-capability-storage -->
+
+![現行：2.4 共用知識／技能與任務使用關係](../diagrams/implementation/jd-storage/jd-capability-storage.png)
+
+[圖源](../diagrams/implementation/jd-storage/jd-capability-storage.mmd) · [SVG](../diagrams/implementation/jd-storage/jd-capability-storage.svg)
+
+圖為現行共用能力與任務使用關係的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)，欄位型別與約束同 §2 簡化。關係表主鍵同時包含任務選用鍵與能力選用鍵，因此兩條使用關係都是識別關係；固定內容的重用仍是非識別關係。
 
 - 一筆定義可由多任務使用，也可暫無用途；`task_links` 是同一組關係的投影，可得任務使用的能力及能力的反向用途，不新增反向保存表。重複連結不增加第二條邊；解除不存在的連結為無效果命令，仍保存原操作結果。
 - 知識與技能各自呈現概覽順序；任務的知識與技能亦各自排序，**不是沿用概覽順序** 。目前儲存一個概覽 position 及每任務的關係 position，按 kind 篩選後得到各組順序；排序只重排同 kind 的位置，不改另一組相對順序。`before_capability_id` 必須在同組；null 表該組末尾。
@@ -227,17 +145,11 @@ erDiagram
 
 這兩個集合仍在同一 JD feature、同一正式修訂、原操作及 workflow 內。沒有另建 CRUD service／泛型 repository、進度表或全文 JSON 副本。Migration [0009](../../apps/api/src/caliburn/migrations/versions/0009_jd_collaborators_conditions.py) 加入內容及選用；既有檔案的這兩類集合初始為空，不搬舊產品資料。
 
-```mermaid
-flowchart LR
-  R[固定 JD 修訂 R] --> CS[協作對象選用與順序]
-  R --> JS[共通條件選用與順序]
-  CS --> C[協作對象固定內容修訂]
-  JS --> J[條件固定內容修訂]
-  N[下一個 JD 修訂 R2] --> CS2[新的協作選用]
-  N --> JS2[新的條件選用]
-  CS2 -->|未改內容重用| C
-  JS2 -->|未改內容重用| J
-```
+![現行：2.5 協作對象與全職務共通條件](../diagrams/implementation/jd-storage/collaborators-conditions.png)
+
+[圖源](../diagrams/implementation/jd-storage/collaborators-conditions.mmd) · [SVG](../diagrams/implementation/jd-storage/collaborators-conditions.svg)
+
+圖為現行協作／條件的局部 ER，省略欄位與檔案 FK；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。不同 JD 修訂各有自己的選用與順序，可以指向同一份未改的固定內容；這些線不表示執行先後。
 
 - 協作對象有穩定 `collaborator_id`；`name`／`scope_text` 至少一欄有意義，未知可 null。允許只記已知合作範圍，未填欄位不猜人名。修訂欄位未指定保留、明確 null 清空但不能清成無內容；順序屬選用，不是正文。
 - 共通條件有穩定 `condition_id`，以既定五種 `kind` 與非空 `text` 表達，沒有虛構 title。只涵蓋整個職務，不自動產生任務、成果或要求，也不把資格條件當成技能。
@@ -259,23 +171,11 @@ HTTP 的 `expected_revision_id` 是使用者畫面讀到的正式基底，`comma
 
 任務 HTTP 沿相同命令與基底規則，唯一形狀見 [task request](../../apps/api/contracts/http/edit-jd-tasks-request.schema.json)及 [task view](../../apps/api/contracts/http/jd-tasks-view.schema.json)。建立、局部修訂、移動／排序、刪除及自身明細增刪改均由型別化動作承接；同次重複指定同一欄或既有明細拒絕。兩組明細回傳各自的穩定 ID／文字，不洩露內容修訂；原命令恢復透過其原 JD 修訂重建，不能用目前集合冒充。這是人工 transport，不新增模型入口。
 
-```mermaid
-sequenceDiagram
-  participant H as HTTP
-  participant W as JD 編輯工作流
-  participant D as 領域與 PostgreSQL
-  H->>W: 原命令、預期正式修訂、changes
-  W->>D: 開短交易，鎖本檔案，查原結果
-  alt 已提交且原內容一致
-    D-->>W: 原結果的固定修訂
-  else 新命令
-    W->>D: 核對無活躍／暫停 A、基底未過期
-    W->>D: 整批修改，保存新修訂／head／原結果
-  end
-  W->>D: COMMIT
-  W-->>H: 該命令結果
-  Note over H,D: 結果遺失以同命令核對<br/>需要目前內容另行 GET
-```
+![現行：3. 人工編輯與原結果接續](../diagrams/implementation/jd-storage/manual-edit.png)
+
+[圖源](../diagrams/implementation/jd-storage/manual-edit.mmd) · [SVG](../diagrams/implementation/jd-storage/manual-edit.svg)
+
+圖為現行人工編輯的 UML 時序圖；同步呼叫使用實線實心箭頭，回覆使用虛線箭頭，圖例沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。省略無內容的同步回覆與拒絕分支；圖中的後續操作均須等待前一呼叫完成，且 HTTP 成功回覆須等待 COMMIT 確認。
 
 工作流先鎖檔案再查原結果。已有結果且 payload 一致就回原修訂，**不因目前已有 A 或更新稿而重新寫入** ；命令身分被拿來送不同內容則拒絕。新命令才核人工准入及 head。與 A 輸入准入共用檔案鎖順序，檢查和寫入在同一交易內；活躍／暫停 A 阻止新的人工 JD 修改，背景 Memory 不阻止。
 
@@ -287,17 +187,11 @@ sequenceDiagram
 
 候選保存 `base_revision_id`、`current_revision_id`、`generation_id` 及 `open/adopted/discarded` 狀態。base 為開始時正式修訂；current 選用同一套不可變 JD 修訂。建立候選只讓兩指標指向正式基底，重入取得目前候選，不重設工作。execution／修訂 FK 限同檔案，已關閉候選不能以同 execution 重開。
 
-```mermaid
-flowchart TD
-  F[正式 head：R0] --> S[開始候選：base R0、current R0]
-  S --> E[短交易修改：current R1 → R2]
-  E --> P[預覽固定 current 一次<br/>profile 與全部集合沿同一修訂讀取]
-  E --> R[恢復到本候選祖先 R1<br/>更換 generation，拒絕舊分支遲到寫入]
-  R --> E
-  E --> D[放棄：標記 discarded<br/>正式 head 仍 R0]
-  E --> A[採用參與者：current 成為正式 head<br/>與訪談及 Turn 完成共用呼叫方交易]
-  P -. 不移動正式 head .-> F
-```
+![現行：3.1 本輪候選與可恢復位置](../diagrams/implementation/jd-storage/candidate-lifecycle.png)
+
+[圖源](../diagrams/implementation/jd-storage/candidate-lifecycle.mmd) · [SVG](../diagrams/implementation/jd-storage/candidate-lifecycle.svg)
+
+圖為現行候選操作成功路徑的基本流程圖；形狀及控制箭頭沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。每次操作另核 writer、狀態與原結果，拒絕分支省略。回到菱形表示依下一個操作選擇分支，不是自動重試或每輪必跑全部操作；預覽、修改與恢復均不移動正式 head。
 
 - **修改** ：檔案列鎖 → 活躍 execution writer → open／generation／正式基底檢查 → 查原操作 → 同一套欄位修改 → 候選 current 與原操作一起提交。每次只持有短交易，不跨模型請求或暫停持鎖。人工正式修改沿既有准入；活躍／暫停 A 仍阻止人工寫入。
 - **讀取** ：正式查詢只沿正式 head。候選預覽只接受 active／paused 的 A execution，捕捉一次 current，再讀該固定修訂的 profile 及全部集合；不以多次 latest 拼接。候選 HTTP／UI 沿[介面接線](interface-and-delivery.md)，預覽不採用正式稿。
@@ -333,20 +227,17 @@ map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍
 - 原始訪談用不可變 `source_id`；Memory 用已發布快照與確切物件修訂，不以標題存引用。模型只選正式序號、`current_input` 或 `target_title`，由 [source resolver](../../apps/api/src/caliburn/workflows/jd_sources.py)在 A 固定範圍內解析。當次輸入暫無正式序號，仍可作本輪候選依據；成功時原身分取得正式資格，取消不留下正式 JD 引用。
 - 新 JD 修訂沿 [source inheritance](../../apps/api/src/caliburn/features/job_description/source_inheritance.py)保留仍存在目標的原引用；刪目標只從新修訂移除其引用，歷史不變。排序／移動不等於文字改寫。共用能力正文變化會使其任務使用關係的內容基底不再相符。
 - [read_jd](../../apps/api/src/caliburn/transport/model_tools/jd_reads.py)沿固定候選位置完成十一種 view：map 精簡 JSON、full 成品 Markdown、局部／區域完整 JSON。正式／候選不混版，來源改名列歷史名稱，移除不改指同名新物件；只在必要時回 `needs_recheck`。大結果明確拒絕，不偷偷截斷。
-- [profile write](../../apps/api/src/caliburn/workflows/jd_profile_writes.py)與 [task write](../../apps/api/src/caliburn/workflows/jd_task_writes.py)先解析固定意圖，再在一個短交易內共同修改候選內容與各直接來源。子操作沿既有 JD operation 的穩定衍生身分重入；後段失敗全退，不另建整包回執。`created`／`updated` 只是候選效果。
+- [profile write](../../apps/api/src/caliburn/workflows/jd_profile_writes.py)與 [task write](../../apps/api/src/caliburn/workflows/jd_task_writes.py)先解析固定意圖及來源，再交 JD 的 [compound service](../../apps/api/src/caliburn/features/job_description/compound_service.py)共同計算內容、關係與直接來源。一次操作至多建立一份最終修訂及一筆 `compound_edit` 原結果；未變內容重用固定修訂，不再為每個來源或明細中間步驟複製整份選用。後段失敗整體回滾；`created`／`updated` 只是候選效果。
+- 複合操作的重入先核對同一命令、完整意圖與候選範圍，再回原 `revision_id`、效果與新項目，不把目前候選倒退。升級前已保存的 prepared command 維持原 wire；[legacy 讀取](../../apps/api/src/caliburn/features/job_description/compound_legacy.py)依舊生成規則有界核對完整衍生操作集合、順序及終點，不能只核對此次傳入的前綴。省略來源／關係尾段（含 no-op）、改換首操作或缺少必要舊結果均明示拒絕；合法原命令仍回原結果及原核對基底。新操作不再寫舊子操作，沒有雙寫或新回執表。
 - Graph 保存 prepared command 使用 [JSON checkpoint adapter](../../apps/api/src/caliburn/transport/model_tools/jd_write_checkpoint.py)：Pydantic TypeAdapter 序列化／嚴格還原具型別意圖，官方 saver 只保存 JSON 值，不靠允許任意 Python constructor／pickle 恢復工具命令。完整 tool request 與配對仍由共用執行機制管理。
 
 來源與修訂的最小關係如下；完整欄位仍以 migration 為準，不手抄第二份 schema：
 
-```mermaid
-flowchart LR
-  JD[固定 JD 修訂] --> Ref[直接引用與已核對內容基底]
-  Ref --> Interview[不可變訪談來源]
-  Ref --> Memory[固定 Memory 快照與物件修訂]
-  Candidate[A 本輪候選] --> JD
-  Complete[完整答覆與正式訪談共同提交] --> Official[正式 JD 頭]
-  Candidate --> Complete
-```
+![現行：3.3 直接來源、按需讀取與候選模型寫入](../diagrams/implementation/jd-storage/direct-sources.png)
+
+[圖源](../diagrams/implementation/jd-storage/direct-sources.mmd) · [SVG](../diagrams/implementation/jd-storage/direct-sources.svg)
+
+圖為現行直接來源的局部 ER，省略欄位、候選基底及其他 FK；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。一筆引用依 `source_kind` 擇一使用訪談，或同時使用 Memory 快照與物件修訂；三條可空 FK 不表示可任意混用。候選與正式頭都指向固定 JD 修訂，正式採用的共同交易見 §3.1，不以 ER 線表示提交動作。
 
 移動入口、差異、來源回查及條件撤回見 §3.4–3.8；候選 UI 見[介面接線](interface-and-delivery.md)。A 共同完成由 [consultant completion](../../apps/api/src/caliburn/workflows/consultant_completion.py)協調，不讓工具提交整輪；背景意圖等 A 正式完成才取得整理資格。
 
@@ -354,7 +245,9 @@ flowchart LR
 
 `create_jd_item` 由 [建立 workflow](../../apps/api/src/caliburn/workflows/jd_item_creation.py) 接回JD 領域模組的職責／能力／協作／條件用例；`revise_jd_item` 由 [修訂 workflow](../../apps/api/src/caliburn/workflows/jd_item_revision.py) 協調同項目文字、直屬明細、能力關係與直接依據；`delete_jd_item` 由 [刪除 workflow](../../apps/api/src/caliburn/workflows/jd_item_deletion.py) 沿既有刪除規則處理。不另存模型版 JD，也不把正式人工端點借給 A。
 
-各入口先將模型選擇解析為含原操作身分、候選位置與固定來源的 prepared value；Graph 保存型別化 JSON 後才執行。單工具內所有子操作共用一個短交易，重入用原 operation 的結果，不用目前最新稿替代原結果。成功只回精簡狀態／新定位，模型已有的全文不重複回送。可修正的語意參數錯誤回工具拒絕；DB／提交結果不明及失效 writer 不吞成一般參數錯誤。
+各入口先將模型選擇解析為含原操作身分、候選位置與固定來源的 prepared value；Graph 保存型別化 JSON 後才執行。profile、任務、一般項目建立／修訂由 [compound edits](../../apps/api/src/caliburn/features/job_description/compound_edits.py)的四類意圖及 `JdCompoundEditResult` 表達；JD owner 重用既有純編輯與來源規則，一次保存最終結果。workflow 負責跨域來源解析、檔案／writer 准入及外層交易，內層不 commit；新項目身分直接由領域結果提供，不由 workflow 比較前後集合猜測。刪除等既有單一操作仍沿其具體用例。
+
+重入用原 operation 的結果，不用目前最新稿替代原結果。成功只回精簡狀態／新定位，模型已有的全文不重複回送。可修正的語意參數錯誤回工具拒絕；DB／提交結果不明及失效 writer 不吞成一般參數錯誤。`0028` 的資料與回復相容驗證見[本輪重構證據](../plans/evidence/full-system-review-2026-10-08.md)。
 
 刪職責保留任務並转未歸屬；刪任務保留共用 K/S。仍被任務使用的 K/S 先拒絕並指引處理關係。修訂與刪除都保留其他項目及正式稿；只有整輪成功保存才採用候選。schema 仍為 `contracts/tools/` 唯一 wire 權威，不在此手抄參數。
 

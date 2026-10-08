@@ -225,6 +225,8 @@ pnpm dev      # 開發：後端 :8100 與 Vite :5173 同時前景啟動：http:/
 
 `pnpm start` 需要先 `pnpm build`；沒有建置會明確報錯，不自動建置或猜目錄。在原終端按 Ctrl+C 正常停止：後端先停止新准入、保存已取得的結果並停在可恢復邊界，再釋放資源；強制關閉仍依最後可靠位置恢復。重開後，進行中或暫停的訪談可由介面找回並續作；背景整理由系統依持久狀態自動承接。
 
+啟動器先用短命的 `uv run --locked` 同步既有專案環境並取得 Python 路徑，再直接啟動後端；自訂 `UV_PROJECT_ENVIRONMENT` 仍由 uv 處理。任一服務啟動失敗或退出時，啟動器會收尾自己持有的其他服務；不依程序名稱或埠號清理。Windows 訊號收尾有有限等待，逾時才強制停止自有程序樹，不能把強制停止當成在途工作已全部保存。
+
 隔離驗證時若前端使用第二個埠，可在**後端啟動前**設定 `CALIBURN_DEV_ORIGIN=http://127.0.0.1:5174`（只接受一個帶明確埠的 loopback HTTP origin），見[後端 README](../apps/api/README.md)。
 
 ## 更新已有安裝
@@ -267,8 +269,8 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 | 瀏覽器或 CLI 收到 403 | 精確 Host／Origin 檢查：只接受 `127.0.0.1`／`localhost`／`[::1]` 的 5173／8100（及明示的一個 dev origin） |
 | `GET /api/health` | 只表示程序存活，不表示資料庫或模型可用 |
 | 訪談失敗或結果不明 | 介面顯示安全的失敗原因，原輸入保留；技術診斷在後端 log（只含穩定 ID、階段、錯誤類別，不含原話或 payload） |
-| 一輪訪談很久沒有回應 | 多半是 OpenAI 帳戶的每分鐘 token 上限（TPM）在限流，後端 log 會出現 `Provider request failed: … failure=rate_limited`。系統會照服務建議的時間自動多等（沒有建議時 10 秒起、60 秒封頂），**不算失敗**，單輪最長等到工作期限（預設 30 分鐘）；可隨時取消該輪。TPM 200K 的帳戶上，一場 12 輪訪談約 6–25 分鐘；要更快請改用更高 TPM 的帳戶 |
-| 訪談或背景整理全部立刻失敗，後端 log 為 `failure=access_blocked … provider_code=credit_balance_exhausted` | OpenAI 帳戶儲值額度用完（HTTP 429，但不是限流）。系統不重試、原輸入保留、該次處理標為失敗；補額度後重新送出原輸入 |
+| 一輪訪談很久沒有回應 | 多半是 OpenAI 帳戶的每分鐘 token 上限（TPM）在限流，後端 log 會出現 `event=model.request_failed`、`failure_kind=rate_limited`。系統會照服務建議的時間自動多等（沒有建議時 10 秒起、60 秒封頂），**不算失敗**，單輪最長等到工作期限（預設 30 分鐘）；可隨時取消該輪。TPM 200K 的帳戶上，一場 12 輪訪談約 6–25 分鐘；要更快請改用更高 TPM 的帳戶 |
+| 訪談或背景整理全部立刻失敗，後端 log 為 `event=model.request_failed`、`failure_kind=access_blocked`、`provider_code=credit_balance_exhausted` | OpenAI 帳戶儲值額度用完（HTTP 429，但不是限流）。系統不重試、原輸入保留、該次處理標為失敗；補額度後重新送出原輸入 |
 | 資料庫剛重啟（或被外力中止）後，讀訪談狀態的端點回 500，`/api/health` 仍是 ok | **重啟後端**。leader 鎖與 checkpoint 連線各只持一條資料庫連線、不會自動重連，這是刻意的單一 leader 設計；重啟時系統會恢復已保存的進行中工作（能續作則續作，否則安全終止、原輸入保留，之後可重送） |
 
 ### 判讀 `pnpm app:status`
@@ -296,6 +298,8 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --job-file-id 職務檔案UUID
 # 只更新某一輪，改用：
 uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID
+# 不重新擷取，直接在終端查看該輪已有的診斷副本：
+uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID --show
 ```
 
 兩個範圍參數擇一；不用 API key。資料庫須已升級到目前 migration；若尚未升級，先沿[更新流程](#更新已有安裝)停止 App，再執行 `pnpm app:migrate`，不是每次查詢都遷移。沒有 execution 的既存空檔案回報 0 筆，找不到的 UUID 則報錯。若權限、migration、原生紀錄解碼或並行更新出錯，整次匯入回滾，原診斷副本仍保留。終端只印成功筆數或錯誤類別，避免洩露私人 payload。
@@ -304,8 +308,8 @@ DataGrip 展開 `caliburn → views`，可直接雙擊下列 VIEW，再用 `job_
 
 | VIEW | 每列代表什麼 | 主要欄位 |
 |---|---|---|
-| `diagnostic_execution_history` | 一輪 A 或一批 Memory（包含失敗／取消） | 檔案名稱、原輸入、正式答覆、正式序號、狀態、失敗嘗試、JD 候選狀態／修訂、已發布 Memory 快照 |
-| `diagnostic_model_steps` | 一份已保存的原模型回應，不等於業務 Step 已完成 | A／B1／B2 role、response_order、request（含 instructions、input、tools）、response（含輸出與 usage）、thread／checkpoint、snapshot_at |
+| `diagnostic_execution_history` | 一輪 A 或一批 Memory（包含失敗／取消） | 檔案名稱、原輸入、正式答覆、正式序號、狀態、失敗嘗試、JD 候選、`captured_initial_context`、目前 Memory head 及本批發布的快照 |
+| `diagnostic_model_steps` | 一份已保存的邏輯請求；可能尚無回應，不等於已外送或業務 Step 已完成 | role、request_id、response_state、response_order、request（instructions、input、tools）、response（輸出與 usage）、原請求及回應的 checkpoint／source、snapshot_at |
 | `diagnostic_tool_calls` | 上述回應的一次 function call | 工具名稱、原 arguments、call_id、對應 output、結果是否已保存 |
 
 例如整個檔案的操作：
@@ -325,7 +329,9 @@ WHERE execution_id = '換成執行UUID'::uuid
 ORDER BY response_order;
 ```
 
-`request` 就是保存的當時請求（敏感欄位已遮蔽），可在 DataGrip 展開 JSON 看 context、指引與工具說明。`response` 可看公開訊息、可讀推理摘要與原工具要求；舊模型沒有回傳摘要時不會補造。`response_order` 是本次擷取中已保存回應的觀察順序，不是重試次數，也不是跨程序精確時鐘。
+`request` 是保存的當時請求（敏感欄位已遮蔽），可展開 JSON 看 Context、指引與工具說明。`response_state=request_only` 表示尚未找到已保存回應，不能推定未外送；`recorded` 才有原回應。`response_order` 為相容保留的欄位名，表示邏輯請求的觀察順序，不是重試次數或跨程序精確時鐘。原請求與後續回應的 checkpoint／source 分列，避免用後來的回應時間冒充請求捕捉時間。
+
+`captured_initial_context` 保存原始 binding、request 及來源，可核當輪固定的 Memory／Plan 版本；`current_published_snapshot_id` 是查詢當下的 Memory head，`published_snapshot_ids` 是這次 execution 發布的快照，三者不能互換。Context 中有導覽或工具可用，不表示模型已讀過正文；實際讀取依工具呼叫及回傳查證。CLI `--show` 輸出同一份受控副本，包含工作正文，不能導入一般 Log 或提交 Git。
 
 要看本輪資料庫實際寫了什麼，再 JOIN 既有操作表；讀工具不一定有業務操作，一次工具也可能產生多筆操作：
 
@@ -343,7 +349,7 @@ ORDER BY o.created_at, o.command_id;
 
 **判讀界線：**
 
-- 總覽的業務狀態、正式訪談序號與嘗試統計是即時 JOIN；訪談文字、模型／工具正文均經遮蔽，是 `snapshot_at` 那次擷取。`snapshot_at IS NULL` 表示尚未匯入；有時間且回應數 0 表示該次未找到已保存回應。新進展須再次執行匯入命令，DataGrip Refresh 本身不會解碼新增 checkpoint。
+- 總覽的業務狀態、正式訪談序號與嘗試統計是即時 JOIN；模型／工具正文是 `snapshot_at` 那次擷取。`snapshot_at IS NULL` 表示尚未匯入，兩種計數也為 null；`saved_response_count` 只計已有回應，`request_only_count` 另計只有請求。新進展須再次執行匯入命令，DataGrip Refresh 本身不會解碼新增 checkpoint。
 - `recorded` 只表示取得工具回傳，內容仍可能是錯誤；`not_recorded` 表示未找到保存結果，不能推定未執行或失敗。正式效果仍由 JD／Memory 原結果判定。
 - 包含本 execution 各階段留下的原模型回應及 pending writes，可能含後來放棄的工作。不能把診斷項目當成正式訪談來源，或把模型回應 `completed` 當整輪成功。
 - 副本遮蔽 `encrypted_content`、已知憑證欄位及可辨識的 key 字串，**不是完整匿名化**。仍含原訪談與工作內容；不自動匯出、不提交 Git。DataGrip 可將核准的合成結果另存 JSON／CSV 供錄影或報告使用。一般 log 仍不含這些正文。
@@ -351,13 +357,48 @@ ORDER BY o.created_at, o.command_id;
 
 設計取捨、測試及版本見 [T06 診斷查閱證據](history.md#source-6ac54c64f9ded4edcb9e)。
 
+### 一般 Log 與 HTTP 關聯
+
+正式 `pnpm dev`／`pnpm start` 的後端入口輸出一行一個 JSON 事件。`CALIBURN_LOG_LEVEL` 預設 `INFO`，可選 `DEBUG`、`INFO`、`WARNING`、`ERROR`、`CRITICAL`；提高等級細節也不輸出訪談正文、完整 URL、秘密或 exception 文字。直接呼叫低階 Uvicorn 工廠不會套用這份輸出配置。
+
+先用 `event`、`module`、`failure_kind` 判斷負責環節，再以 `job_file_id`、`execution_id`、`request_id`、`attempt_id` 查原業務／診斷紀錄。HTTP 回應的 `X-Request-ID` 對應 `http_request_id`，由伺服器產生；不採信傳入值，也不把它當業務命令身分。`execution.runner_returned` 只表示 runner 返回，正式完成仍查業務結果。
+
+`supervisor.monitor_failed` 表示背景監督迴圈中止，`supervisor.release_failed` 表示收尾釋放失敗；用 `execution_kind`、`operation`、`failure_kind` 定位。這些事件可能發生在尚未選定工作時，因此不捏造 execution ID，也不輸出原始例外正文。正常取消不記成監督失敗。
+
+輸出使用容量 1024 的非阻塞佇列，滿時捨棄新紀錄；後續可用事件會附累計 `logging_dropped_records`／`logging_output_failures`，不能把沒看到 Log 當作沒發生。正常關閉最多等待 1 秒排出；程序意外終止可能遺失尾端 Log，可靠結果沿 PostgreSQL／checkpoint 核對。原生終端不自動保存檔案；Docker 沿 Compose 的 local driver 輪替，每檔 10 MB、最多 3 檔。格式規範見[工程文件](implementation/coding-standard.md#72-log-的格式責任與查閱)，本輪驗證見[重構證據](plans/evidence/full-system-review-2026-10-08.md)。
+
 ## 資料庫與備份
 
-**首版成品驗收不以備份／空庫還原為前置。**目前優先驗證既有 PostgreSQL／checkpoint 在一般中斷與重開後能查回已確認保存的訪談、JD 與進度；未送出的輸入或未保存草稿不保證意外關閉後找回。備份資訊供後續維護參考，不表示已完成完整還原端到端驗收：
+一個 PostgreSQL cluster 可包含多個 database，每個 database 再包含 schema；Caliburn 的同一 schema 可保存多份職務檔案。不要為每份訪談建立一套 PostgreSQL，也不要只憑容器名稱中的 `test`／`production` 判定資料用途。日常資料與測試資料使用明確分開的 database／連線；驗證用 schema 必須在測試資料庫中。
 
-- 備份整個資料庫（`pg_dump` 不要用 `-n` 只挑單一 schema）；關聯式資料與 checkpoint 表在同一 namespace，兩者屬同一資料範圍。
-- OpenAI key 不在備份內；在另一台電腦還原後須重新提供 key。瀏覽器 localStorage／sessionStorage 不是正式資料備份。
-- 不自動清資料、刪 volume 或重建資料庫；資料處置需先核對精確目標。
+| 資料用途 | 保存與收尾 |
+|---|---|
+| 日常訪談、JD 與工作進度 | 保留既有資料來源；操作前核對 App 實際連線、schema 及 volume。更新 App 不另建一份空庫當作遷移完成 |
+| 可重建的整合測試 | 保存 fixture、命令與必要結果，完成後只回收本次建立的 schema／容器／volume；中斷留下的資源另核對，不全域 prune |
+| 已結案研究實驗 | 保留足以支持結論的設定、輸入、結果、評分及必要 trace；已有 Git／遠端原件的不重複封存。只有還需重播保存狀態時才保留 database／checkpoint |
+
+需要保留資料庫時，使用 `pg_dump -Fc` 保存整個 database，不以 `-n` 只挑部分 schema；業務資料與 checkpoint 必須一起保存。多個 database 分別匯出，角色等 cluster 級資訊另用 `pg_dumpall --globals-only --no-role-passwords` 保存。OpenAI key 另行提供，角色密碼與本機設定不放入封存附件；瀏覽器 localStorage／sessionStorage 不作正式資料備份。相關工具契約見 [PostgreSQL 備份文件](https://www.postgresql.org/docs/18/backup.html)與 [pg_dumpall](https://www.postgresql.org/docs/18/app-pg-dumpall.html)。
+
+備份與來源資料比較使用同一快照，避免使用中的資料持續更新造成錯判。先在自有隔離環境還原，核對 schema／table、資料筆數與必要內容摘要，保存命令結果；`pg_restore --list` 只能檢查目錄，不能代替實際還原。移除舊資料前，再確認 App 沒有使用該目標、備份後未新增需保留資料、遠端下載雜湊相同。不能手動刪 WAL，或直接壓縮運作中的資料目錄代替一致性備份。
+
+資料庫備份及未公開材料放[私人封存庫](https://github.com/JD-Consultant/Caliburn-archives)，不放公開 repository 或其 Releases。取得備份後先核對清單中的 SHA-256，再在隔離 PostgreSQL 還原；不直接覆蓋日常資料庫。封存格式與取回方式見[原件保存規範](experiments/artifact-storage.md#私人歷史材料與資料庫封存)。
+
+已確認僅含合成測試資料、且所需研究原件已有保存的舊環境，可以依清理授權直接回收，不必為了清理再建立永久完整備份。清理記錄須指出保留證據的位置，以及不再保留舊 DB 重播能力的取捨。資料用途未明或仍供日常使用時不套用這項規則。
+
+首版驗收曾以中斷後重開查回資料為主；不把該歷史範圍解讀成已完成所有版本的備份還原驗收。未送出的輸入與未保存草稿不保證可恢復；每次維護只回報實際驗證的資料與版本。
+
+## 磁碟空間維護
+
+先盤點目錄容量及目前程序，再區分可重建快取、可還原副本、執行環境與正式資料。被 Git 忽略只代表不提交，不能據此刪除。
+
+- **實驗解壓副本**：沿[原件保存規範](experiments/artifact-storage.md#分析完成後釋放空間)核對後清理；gzip 與雜湊清單保留，分析前按需還原。
+- **工具快取**：確認沒有相關工具運作後，可清除有 `CACHEDIR.TAG` 的 mypy 快取。套件快取使用工具本身的維護命令，例如 [uv 的 cache prune](https://docs.astral.sh/uv/concepts/cache/#clearing-the-cache)；先核對快取位置與環境連結方式，避免誤刪執行環境依賴。
+- **本機歷史與執行環境**：`.research-tmp` 曾混放 Python、PostgreSQL、Chromium、資料庫與未提交封存材料，不能整包視為可刪快取。清理前查虛擬環境的 `pyvenv.cfg`、設定及程序路徑；即使資料庫已停止，也須沿上節備份與資料處置規則處理。
+- **Git 資料**：先用 `git count-objects -vH` 盤點並檢查完整性。保留正式 objects、packs 與復原資料；異常暫存檔須個別確認來源、使用狀態及可恢復性，不以整批刪除 `.git` 或改寫歷史作日常清理。
+
+新工作的暫存沿 `.tmp/` 放置；結束前將必要證據保存至責任文件指定位置，再核對清理範圍。長期執行環境與資料庫應有明確的保存位置，遷移時同步更新設定並驗證啟動，不直接移除目前使用的路徑。
+
+每批暫存使用能辨認用途的目錄，記錄來源、是否仍使用及收尾條件。已結案的研究保存結果與必要原件，依賴保留 lockfile／重建方式；除錯暫留的資料須有明確理由與下次清理條件。維護清單只記尚需處理的本機資源，完成後移除，不再累積第二份永久待辦。
 
 ## 驗證
 

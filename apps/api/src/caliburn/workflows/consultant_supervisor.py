@@ -1,6 +1,7 @@
 """Bounded local supervision, not a second model retry or product lifecycle engine."""
 
 import asyncio
+import logging
 from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
 from contextlib import asynccontextmanager
 from types import MappingProxyType
@@ -11,10 +12,13 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from caliburn.adapters.process_lock import PostgresProcessLock
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import (
+    ExecutionKind,
     ExecutionScope,
     ExecutionStateError,
     ExecutionWriter,
 )
+
+_LOG = logging.getLogger(__name__)
 
 
 class ConsultantSupervisor:
@@ -178,6 +182,14 @@ class ConsultantSupervisor:
             # One failed supervision I/O attempt is the bounded policy. No reconnect
             # followed by writer takeover, no provider retry, no product status change.
             self._failure = error
+            _LOG.error(
+                "supervisor.monitor_failed",
+                extra={
+                    "execution_kind": ExecutionKind.CONSULTANT_TURN.value,
+                    "operation": "scan",
+                    "failure_kind": type(error).__name__,
+                },
+            )
         finally:
             self._closing = True
             try:
@@ -187,6 +199,14 @@ class ConsultantSupervisor:
                 # scan failure, if any, without letting a monitor exception go unread.
                 if self._failure is None:
                     self._failure = error
+                _LOG.error(
+                    "supervisor.release_failed",
+                    extra={
+                        "execution_kind": ExecutionKind.CONSULTANT_TURN.value,
+                        "operation": "release_leadership",
+                        "failure_kind": type(error).__name__,
+                    },
+                )
 
     async def _release_leadership(self) -> None:
         if self._leader_release is None:

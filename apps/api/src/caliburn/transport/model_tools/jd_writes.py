@@ -122,6 +122,8 @@ def jd_write_definitions() -> list[FunctionToolParam]:
         function_definition(
             "create_jd_item",
             "建立一個職責、共用知識／技能、協作對象或全職務條件。先按需 read_jd 避免重複。"
+            "新職責用於有意義的工作分組；已有任務改歸屬用 move_jd_item，不重建任務。"
+            "共用知識／技能由已確認工作提煉，建立後用返回的 read_ref 連接適用任務。"
             "只寫已釐清事實並附直接支持它的 supporting_sources；未知不猜。"
             "建立任務另用 create_jd_task。成功僅更新候選，回傳新 read_ref。",
             "create-jd-item-arguments",
@@ -145,7 +147,8 @@ def jd_write_definitions() -> list[FunctionToolParam]:
         function_definition(
             "move_jd_item",
             "移動或排序既有候選項目；read_ref 只選 read_jd 提供的定位。"
-            "任務可移到既有職責或未歸屬；其他項目只在原集合排序。"
+            "重新組織職責時用本工具調整既有任務歸屬，不刪除重建。"
+            "任務可移到既有職責或未歸屬；需新職責先 create_jd_item，其他項目只在原集合排序。"
             "first/last 不需鄰居；before/after 選同目的集合鄰居。"
             "content_changes 只含此次移動必要的相關文字修訂，與結構一次全成或全拒。"
             "保留物件身分與來源，不提交整輪。",

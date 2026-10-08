@@ -1,6 +1,7 @@
 """Lifespan-owned Memory tasks; durable discovery, no broker and no nested model retry."""
 
 import asyncio
+import logging
 from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
 from contextlib import asynccontextmanager
 from types import MappingProxyType
@@ -8,8 +9,10 @@ from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from caliburn.features.executions.models import ExecutionScope, ExecutionWriter
+from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
+
+_LOG = logging.getLogger(__name__)
 
 
 class MemorySupervisor:
@@ -140,6 +143,14 @@ class MemorySupervisor:
                 await self.scan()
         except Exception as error:
             self._failure = error
+            _LOG.error(
+                "supervisor.monitor_failed",
+                extra={
+                    "execution_kind": ExecutionKind.MEMORY_BATCH.value,
+                    "operation": "scan",
+                    "failure_kind": type(error).__name__,
+                },
+            )
         finally:
             self._closing = True
             await self._stop_tasks()

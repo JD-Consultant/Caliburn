@@ -1,60 +1,38 @@
 # Caliburn 文件導覽
 
-想先了解產品可以做什麼，讀[主 README](../README.md)；需要了解需求與使用情境，再讀產品介紹。架構導覽與各主題文件說明詳細設計。開發、操作、研究及實驗文件各有用途，下面依讀者要處理的問題提供入口。
+依手上的問題選入口。現行產品為 `apps/api`、`apps/web`；各頁會標明現行、目標／未實作、候選或歷史。詳細規則由對應責任文件維護，索引只負責指路。
 
-## 產品介紹與報告
+## 依讀者任務查閱
 
-以下三份文件依序說明產品、專題成果與系統內部設計。
-
-1. [產品介紹](product-introduction.md)：顧問作業的需求、使用流程與產品價值。
-2. [專題報告](reports/project-report/report.md)：動機、相關方法、系統設計、實驗、結果及後續研究；正文與附錄可獨立閱讀。
-3. [系統架構報告](reports/system-architecture/README.md)：程式內部分工、Context、Memory、引用與恢復，附[架構圖](reports/system-architecture/diagrams/README.md)。
-
-實驗材料與演進脈絡可從[報告材料索引](reports/README.md)深入。
-
-## 開發與維護
-
-| 需要處理的事情 | 閱讀入口 |
+| 你現在要做什麼 | 直接入口與閱讀順序 |
 |---|---|
-| 確認現行狀態與有效決策 | [目前決策](current-decisions.md)、[ADR](adr/README.md) |
-| 理解整體架構與各元件契約 | [現行架構地圖](target-architecture-map.md) → [設計與工具契約](specs/README.md) |
-| 修改程式、Prompt、Tool 或 Context | [實作規範](implementation/README.md)：模組、命名、寫法、測試及研究方法 |
-| 查訪談分析與 JD 寫作方法 | [分析指南](guides/README.md)；不是工程規範或實驗結果 |
-| 安裝、啟停、備份及排錯 | [後端](../apps/api/README.md)、[前端](../apps/web/README.md)、[操作手冊](runbook.md) |
-| 查來源與可重現證據 | [產品實驗資料](experiments/product-validation/README.md)、[工程驗證](experiments/engineering/README.md)、[驗證範圍](architecture/verification.md)、[獨立實驗](experiments/README.md) |
+| 第一次了解產品與系統 | [產品介紹](product-introduction.md) → [架構導覽](architecture/README.md)。需要完整敘事再讀[專題報告](reports/project-report/report.md)或[系統架構報告](reports/system-architecture/README.md) |
+| 啟動、操作或排查問題 | [操作手冊](runbook.md)；元件設定、開發及測試另查[後端 README](../apps/api/README.md)與[前端 README](../apps/web/README.md) |
+| 修改程式、Prompt、Tool 或 Context | [實作規範](implementation/README.md) → 受影響的[詳細契約](specs/README.md)；多步驟施工由[計畫入口](plans/README.md)查閱 |
+| 查當前規則與未決問題 | [目前決策](current-decisions.md) → 責任正文；正式取捨與接續關係查 [ADR](adr/README.md) |
+| 改善訪談與 JD 分析方法 | [工作分析與 JD 指南](guides/README.md) → 對應研究與效果證據 |
+| 查測試結果、研究或歷史 | [驗證範圍](architecture/verification.md)、[實驗原件](experiments/README.md)、[研究分類](research/README.md)；演進解說見[開發沿革](reports/development-history/README.md)，舊檔取回見[歷史查閱方式](history.md) |
 
-各層文件分別回答不同問題，詳細規則只在負責該主題的文件維護：
+## 文件由誰維護
 
-| 文件層次 | 負責說明 | 深入哪一層 |
-|---|---|---|
-| 產品與報告 | 使用者的問題、產品目標及成果 | 架構導覽說明系統如何支援這些目標 |
-| 架構 | 模組責任、資料流、生命週期、保存與運作邊界 | 設計與工具契約定義具體行為 |
-| 設計與契約 | 角色權限、資料資格、工具操作及正式生效條件 | 實作文件說明程式如何落實契約 |
-| 實作 | 模組、接線、命名及工程機制 | 程式與測試提供實際實現及驗證 |
-| 操作 | 安裝、啟停、設定及問題排查 | 依 App README 與操作手冊執行 |
-| 研究與實驗 | 比較方案、記錄條件、結果與限制 | 沿原始證據判讀，不直接替代產品決策 |
-
-維護時先在「目前決策」定位本題的有效狀態，再沿入口讀責任文件。正式取捨與變更流程依 ADR 及[決策規範](decision-process.md)；報告、計畫或實驗紀錄不另定義一套產品契約。
-
-## 研究與歷史
-
-| 材料 | 位置與用途 |
+| 文件層次 | 責任 |
 |---|---|
-| 官方文件、論文及方案比較 | [research/](research/README.md)，依 Agent／Memory、工作分析、工程及檢索分類 |
-| 工作分析與職務說明書方法 | [guides/](guides/README.md)，保留分析指南及樣稿，不因日期較早而封存 |
-| 從早期原型到現行架構的演進 | [開發沿革](reports/development-history/README.md)，按問題連回當時設計、程式與實驗 |
-| 實驗發現、解法與結果 | [實驗材料](experiments/README.md)、[產品實驗資料](experiments/product-validation/README.md)；原始輸出不改寫成成功紀錄 |
-| 已結案施工與舊設計 | [歷史查閱方式](history.md)；本機 `docs/archive/` 不隨 Git 發布 |
+| [產品概念](product-concept.md) | 產品目標、資訊關係與非目標 |
+| [架構](architecture/README.md) | 模組責任、資料流、生命週期、保存與運作邊界 |
+| [規格](specs/README.md) | 角色權限、資料資格、工具操作及正式生效條件 |
+| [實作](implementation/README.md) | 模組接線、命名、寫法、工程機制與測試方法 |
+| [操作](runbook.md) | 安裝、啟停、備份與排錯；App README 補元件設定與測試 |
+| [研究](research/README.md)、[實驗](experiments/README.md) | 方案依據、受測條件、結果與限制；不直接替代產品決策 |
+| [報告](reports/README.md) | 面向指定讀者與日期範圍解釋設計及成果，引用契約與原件 |
 
-歷史材料記錄當時的設計與條件；現行系統見架構文件，方案變更的理由見 ADR。
+維護方式依[文件與圖面規範](implementation/documentation-standard.md)，正式取捨依[決策流程](decision-process.md)。報告、計畫及索引不另抄完整契約。
 
 ## Repo 的其他目錄
 
-- `apps/api/`、`apps/web/`：現行產品、測試及啟動說明。
-- 獨立 RAG 程式：見 [RAG 說明](design/rag-pipeline.md)，不是 JD App 的預設啟動依賴；公版查讀可依明示設定接入。
-- `scripts/`、`.github/`、workspace 與 lock：開發、建置與依賴設定。
-- `.research-tmp/`、`tmp/`、`output/`：不隨 Git 發布的本機實驗與輸出。
-- `.worktrees/`：本機獨立工作樹。
+- `apps/api/`、`apps/web/`：現行產品、測試及元件說明。
+- 獨立 RAG 程式：見 [RAG 說明](design/rag-pipeline.md)；JD App 可明示設定公版查讀，不以 RAG 為預設啟動依賴。
+- `scripts/`、`.github/`、workspace 與 lock：開發、建置及依賴設定。
+- `.tmp/`、`.research-tmp/`、`tmp/`、`output/`、`.worktrees/`：本機工作、實驗、輸出及獨立工作樹，不作正式文件入口。
 - `node_modules/`、`.venv*`：本機依賴；`.env`、IDE 與代理設定屬本機配置，不收進報告或證據。
 
-舊程式退役範圍與取回方式見 [ADR0079](adr/0079-target-rebuild-production-cutover.md)。封存不是刪除 Git 歷史；追查舊設計時，依[歷史查閱方式](history.md)找到原路徑與提交。
+舊程式退役依 [ADR0079](adr/0079-target-rebuild-production-cutover.md)。本機 `docs/archive/` 不隨 Git 發布；已提交與僅本機保存的材料，分別沿[歷史查閱方式](history.md)定位。

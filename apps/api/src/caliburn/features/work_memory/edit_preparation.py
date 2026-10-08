@@ -1,13 +1,12 @@
 """Pure controlled content preparation before the candidate owner's short transaction."""
 
-import difflib
 from dataclasses import dataclass
 from typing import Literal
 
+from caliburn.adapters.body_edits import describe_body_change as describe_body_change
 from caliburn.features.work_memory.body_edits import (
     DEFAULT_BODY_MATCH_POLICY,
     apply_body_diff,
-    split_body_lines,
 )
 from caliburn.features.work_memory.body_matching import BodyMatchPolicy
 from caliburn.features.work_memory.candidates import MemoryEdit
@@ -87,17 +86,3 @@ def validate_changes(changes: tuple[MemoryFieldChange, ...]) -> None:
                 raise InvalidMemoryChangeError("A reference change cannot be empty")
     if len(fields) != len(set(fields)):
         raise InvalidMemoryChangeError("Each field may be changed only once")
-
-
-def describe_body_change(before: str, after: str) -> str:
-    """Standard contextual diff of actual text; not executable V4A or echoed model input."""
-    lines = difflib.unified_diff(
-        split_body_lines(before),
-        split_body_lines(after),
-        fromfile="body_before",
-        tofile="body_after",
-        n=3,
-    )
-    return "".join(
-        line if line.endswith("\n") else line + "\n\\ No newline at end of file\n" for line in lines
-    )

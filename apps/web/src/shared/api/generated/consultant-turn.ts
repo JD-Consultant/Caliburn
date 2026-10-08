@@ -29,6 +29,10 @@ export interface ConsultantTurn1 {
    */
   candidate: CandidateJdPreview | null;
   /**
+   * The complete current saved plan only while active or paused. Outer null means no preview capability or unavailable preview; an object preserves nullable or deliberately empty plan text. Terminal reads use the job file's adopted plan.
+   */
+  plan_preview: InterviewPlan | null;
+  /**
    * Currently available App controls; each request rechecks the scoped execution. Pause records intent until a safe Step acknowledges it. Empty when terminal or controls are not configured.
    *
    * @maxItems 3
@@ -103,4 +107,7 @@ export interface Condition {
     | 'shared_collaboration'
     | 'qualification';
   text: string;
+}
+export interface InterviewPlan {
+  plan: string | null;
 }

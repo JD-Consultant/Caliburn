@@ -7,13 +7,10 @@ from functools import partial
 import httpx2
 from fastapi import FastAPI
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
-from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.job_file_checkpointer import JobFilePostgresSaver
 from caliburn.adapters.occupation_references import OccupationReferenceClient
-from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.adapters.pdf_renderer import PdfRenderer
 from caliburn.adapters.process_lock import PostgresProcessLock
 from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
@@ -22,12 +19,14 @@ from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.memory_analysis.dispatch import MemoryRoleDispatch
 from caliburn.agents.work_situation_analyst.runner import WorkSituationAnalystRunner
 from caliburn.agents.work_understanding_analyst.runner import WorkUnderstandingAnalystRunner
+from caliburn.app_composition import AppComposition
 from caliburn.features.executions.models import ExecutionScope, ExecutionStatus
 from caliburn.settings import ModelSettings, OccupationReferenceSettings, Settings
 from caliburn.transport.http.consultant_activity import router as consultant_activity_router
 from caliburn.transport.http.consultant_turns import router as consultant_turn_router
 from caliburn.transport.http.health import router as health_router
 from caliburn.transport.http.interview_inputs import router as interview_input_router
+from caliburn.transport.http.interview_plans import router as interview_plans_router
 from caliburn.transport.http.jd_areas import router as jd_areas_router
 from caliburn.transport.http.jd_capabilities import router as jd_capabilities_router
 from caliburn.transport.http.jd_collaborators import router as jd_collaborators_router
@@ -39,9 +38,9 @@ from caliburn.transport.http.jd_tasks import router as jd_tasks_router
 from caliburn.transport.http.jd_undo import router as jd_undo_router
 from caliburn.transport.http.jd_work import router as jd_work_router
 from caliburn.transport.http.job_files import router as job_file_router
+from caliburn.transport.http.logging import HttpLoggingMiddleware, unhandled_error_response
 from caliburn.transport.http.security import LocalHttpSecurityMiddleware
 from caliburn.transport.http.turn_jd_changes import router as turn_jd_changes_router
-from caliburn.transport.model_tools.memory_analysis import MEMORY_CHECKPOINT_TYPES
 from caliburn.workflows.consultant_activity import ConsultantActivityHub
 from caliburn.workflows.consultant_commentary import ConsultantCommentaryHub
 from caliburn.workflows.consultant_commentary import (
@@ -56,6 +55,7 @@ from caliburn.workflows.consultant_status import ConsultantStatusWorkflow
 from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
 from caliburn.workflows.execution_failures import run_with_failure_boundary
 from caliburn.workflows.interview_inputs import InterviewInputWorkflow
+from caliburn.workflows.interview_plans import InterviewPlanReadWorkflow
 from caliburn.workflows.jd_editing import JdEditingWorkflow
 from caliburn.workflows.jd_evidence import JdEvidenceWorkflow
 from caliburn.workflows.jd_export import JdExportWorkflow
@@ -70,6 +70,7 @@ ROUTERS = (
     health_router,
     job_file_router,
     interview_input_router,
+    interview_plans_router,
     consultant_turn_router,
     consultant_activity_router,
     jd_profile_router,
@@ -86,9 +87,12 @@ ROUTERS = (
 )
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None, *, composition: AppComposition | None = None
+) -> FastAPI:
     """Create the app without reading legacy configuration or requiring model credentials."""
     configured = settings if settings is not None else Settings.from_environment()
+    components = composition if composition is not None else AppComposition()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -98,7 +102,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             async with AsyncExitStack() as resources:
                 if database is not None:
                     await database.verify_schema()
-                    await _start_database_runtime(app, configured, database, resources)
+                    await _start_database_runtime(
+                        app, configured, database, resources, composition=components
+                    )
                 yield
         finally:
             app.state.consultant_supervisor = None
@@ -106,8 +112,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             if database is not None:
                 await database.close()
 
-    app = FastAPI(title="Caliburn", version="0.1.0", lifespan=lifespan)
+    app = FastAPI(
+        title="Caliburn",
+        version="0.1.0",
+        lifespan=lifespan,
+        exception_handlers={Exception: unhandled_error_response},
+    )
     app.add_middleware(LocalHttpSecurityMiddleware, dev_origin=configured.dev_origin)
+    app.add_middleware(HttpLoggingMiddleware)
     for router in ROUTERS:
         app.include_router(router)
     if configured.web_build_directory is not None:
@@ -132,6 +144,9 @@ def _reset_runtime_state(app: FastAPI, database: Database | None) -> None:
     app.state.jd_undo_workflow = JdUndoWorkflow(sessions) if sessions else None
     app.state.turn_jd_changes_workflow = TurnJdChangesWorkflow(sessions) if sessions else None
     app.state.interview_input_workflow = InterviewInputWorkflow(sessions) if sessions else None
+    app.state.interview_plan_read_workflow = (
+        InterviewPlanReadWorkflow(sessions) if sessions else None
+    )
     app.state.consultant_status_workflow = None
     app.state.consultant_supervisor = None
     app.state.consultant_commentary_hub = ConsultantCommentaryHub()
@@ -142,7 +157,12 @@ def _reset_runtime_state(app: FastAPI, database: Database | None) -> None:
 
 
 async def _start_database_runtime(
-    app: FastAPI, configured: Settings, database: Database, resources: AsyncExitStack
+    app: FastAPI,
+    configured: Settings,
+    database: Database,
+    resources: AsyncExitStack,
+    *,
+    composition: AppComposition,
 ) -> None:
     if configured.pdf is not None:
         renderer = PdfRenderer(
@@ -151,18 +171,9 @@ async def _start_database_runtime(
         resources.push_async_callback(renderer.aclose)
         app.state.jd_export_workflow = JdExportWorkflow(database.sessions, renderer)
     # Saved public history remains readable without model credentials.
-    dsn = make_conninfo(
-        database.settings.sqlalchemy_url.set(drivername="postgresql").render_as_string(
-            hide_password=False
-        ),
-        options=f"-c search_path={database.settings.schema}",
-    )
     native_saver = await resources.enter_async_context(
-        AsyncPostgresSaver.from_conn_string(
-            dsn, serde=create_graph_serializer(allowed_types=MEMORY_CHECKPOINT_TYPES)
-        )
+        composition.open_checkpointer(database.settings)
     )
-    await native_saver.setup()
     saver = JobFilePostgresSaver(native_saver)
     app.state.consultant_status_workflow = ConsultantStatusWorkflow(database.sessions, saver)
     if configured.model is not None:
@@ -172,6 +183,7 @@ async def _start_database_runtime(
             database,
             saver,
             resources,
+            composition=composition,
             occupation_references=configured.occupation_references,
         )
 
@@ -183,12 +195,11 @@ async def _start_model_runtime(
     saver: AsyncPostgresSaver,
     resources: AsyncExitStack,
     *,
+    composition: AppComposition,
     occupation_references: OccupationReferenceSettings | None = None,
 ) -> None:
     """Start the consultant and Memory supervisors that share one local leader fence."""
-    sdk = create_responses_client(
-        api_key=model.api_key, timeout_seconds=model.request_timeout_seconds
-    )
+    sdk = composition.create_responses_client(model)
     resources.push_async_callback(sdk.close)
     reference_client = None
     if occupation_references is not None:
@@ -235,6 +246,8 @@ async def _start_model_runtime(
         on_commentary=publish_commentary,
         on_reasoning_summary=publish_reasoning_summary,
         occupation_references=reference_client,
+        interview_plans_enabled=composition.interview_plans_enabled,
+        configuration=composition.consultant_configuration,
     )
     leader_lock = PostgresProcessLock(database.settings)
     memory_batch = MemoryBatchWorkflow(

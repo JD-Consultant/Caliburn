@@ -1,0 +1,12 @@
+erDiagram
+  direction TB
+  executions ||--o| memory_batches : batch_execution
+  executions ||..o{ memory_operations : original_operations
+  memory_positions ||..o{ memory_batches : base_position
+  memory_positions ||..o{ memory_batches : current_position
+  memory_positions ||--o{ memory_position_members : selects_objects
+  memory_object_revisions ||..o{ memory_position_members : selects_fixed_revision
+  memory_batches ||..o| memory_snapshots : publishes_once
+  memory_positions ||..o{ memory_snapshots : published_position
+  memory_snapshots |o..o{ memory_batches : optional_base_snapshot
+  memory_snapshots ||..o| memory_heads : current_snapshot

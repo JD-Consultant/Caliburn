@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EditInterviewPlanArguments",
+  "description": "Edit the App-bound consultant plan with one V4A body diff. The App binds scope, position, operation and writer; supply only the requested text change.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["diff"],
+  "properties": {
+    "diff": {"type": "string", "minLength": 1, "maxLength": 16000}
+  }
+}

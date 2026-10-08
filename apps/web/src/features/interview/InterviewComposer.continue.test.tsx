@@ -21,6 +21,7 @@ const completed: ConsultantTurn = {
   input_text: '上一輪的原話',
   allowed_controls: [],
   commentary: [],
+  plan_preview: null,
   candidate: null,
 };
 const clients: QueryClient[] = [];

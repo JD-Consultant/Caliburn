@@ -30,15 +30,9 @@ JD 應以精簡文字涵蓋大部分實際工作與重要差異：做什麼、�
 
 下圖是**核心使用流程**；箭頭表示互動推進，回線表示持續釐清，不代表每則回答都要改稿。
 
-```mermaid
-flowchart LR
-  file[建立職務檔案] -->|開始訪談| guide[顧問引導員工說明工作]
-  guide -->|回答、補充或更正| facts[釐清工作與責任]
-  facts -->|資料足夠時| draft[逐步編修 JD]
-  facts -->|仍有疑點| guide
-  draft -->|回看並補充| guide
-  draft -->|按需要匯出目前正式稿| pdf[PDF 職務說明書]
-```
+![現行基本流程：從員工描述到 JD 交付](diagrams/product-introduction/core-user-flow.png)
+
+[圖源](diagrams/product-introduction/core-user-flow.mmd) · [SVG](diagrams/product-introduction/core-user-flow.svg)
 
 1. 顧問以具體問題引導訪談，員工也可以主動補充資訊，不必先學會 JD 的寫法。
 2. 某個主題已說清楚時，就能逐步寫入 JD；不必等全部訪談結束，也不強制每輪改稿。

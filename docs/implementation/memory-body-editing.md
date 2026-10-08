@@ -1,7 +1,11 @@
 # Memory 正文編輯接線
 
-- 狀態：**現行 Memory 正文編輯機制** 。純運算、模型工具與候選交易分責；共用執行與角色接線見 [Agent 執行](agent-execution.md)。驗證見[正文與工具驗證](../history.md#source-99a88a33a07b25e8aa86)。
+- 狀態：**現行 Memory 正文編輯機制**。2026-10-07 依 [ADR0081](../adr/0081-consultant-interview-focus-and-unresolved-plan.md)將純核心移至 `adapters/body_edits.py`／`body_matching.py`，Memory 原入口保留薄相容包裝；焦點筆記重用同一解析／唯一定位／套用機制，只有 App 筆記用途允許空正文，Memory 仍拒空。純運算、模型工具與候選交易分責；共用執行與角色接線見 [Agent 執行](agent-execution.md)。驗證見[本次切片證據](../plans/evidence/interview-plan-2026-10-07/t1-tools.md)及[正文與工具驗證](../history.md#source-99a88a33a07b25e8aa86)。
 - 產品契約：[單物件更新](../specs/2026-09-27-memory-object-update-tool-contract.md)、[共同工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md)。本頁只決定既有 V4A 能力的解析、定位與套用機制，不重定產品效果或資料保存責任。
+
+閱讀路徑：[採用來源](#1-重用來源與有限補強) → [語法與定位](#2-語法與唯一定位) → [套用與容量](#3-套用錯誤與容量) → [接縫驗證](#4-接縫及驗證層級)。純編輯核心處理一份正文；角色權限、工具回傳與候選交易由各自的接線文件維護。
+
+這裡的 **V4A** 是以文字上下文定位修改位置的 patch 格式。每個 **hunk** 是一段局部修改：以原文上下文或明確的檔尾（EOF）條件定位，再用 `-`／`+` 指定刪除與新增行；一份 diff 可以包含多段 hunk。先看[把「每月」改為「每週」的工具輸入例](../specs/2026-09-27-memory-object-update-tool-contract.md#3-模型輸入一個目標與有限-changes)，再讀下方解析與歧義處理規則。
 
 ## 1. 重用來源與有限補強
 
@@ -25,7 +29,7 @@ App 已綁定的一份候選正文 + body diff
 
 `adapters/v4a_parser.py` 抽取舊側 context 與相對 edit chunks，返回不可變型別。允許 `@@`、原文 anchor／stacked anchors、多 hunk、可選終端 `*** End Patch`／`*** End of File`；第一段亦可直接以增刪／context 開始。以換行分隔完整來源行，不接受數字 unified header、Markdown fence、檔案路徑或 create/delete/move envelope。所有輸入必須被消耗，不能修改前段後忽略非法後段。
 
-`features/work_memory/body_matching.py` 的唯一規則：
+`adapters/body_matching.py` 的唯一規則（Memory 原路徑轉出同一型別）：
 
 - 在完整原文、目前順序游標以後枚舉同列數的整行窗口；context 包含未改行與刪除行，新增行不參與定位。
 - 比對視圖只去每行首尾空白。相同文字合格；非相同的行，雙方至少 10 字元且 Levenshtein normalized similarity ≥0.90 才合格。**每行** 都須合格，不讓大量相同背景掩蓋短標題／短事實不符。
@@ -37,7 +41,13 @@ App 已綁定的一份候選正文 + body diff
 
 ## 3. 套用、錯誤與容量
 
-`body_edits.py` 的 `apply_body_diff` 對全部 hunk 使用原文座標；前段新增／刪除不推移後段基準。只有全部解析與定位成功才形成新正文。保留行使用原文，不將模型的模糊 context 寫回；未改字元、LF／CRLF 混用、尾端換行與 Unicode 保持。某 chunk 的替換文字與實際來源相同時，整段原樣保留，避免 no-op 偷改混合換行符。新增行使用編輯位置的換行樣式；原文無尾端換行時，EOF 新增也不強加最終換行（必要行分隔除外）。來源與結果均不可為空白 body；建立／刪物件走各自能力。
+### 正文保留與全成全拒
+
+`body_edits.py` 的 `apply_body_diff` 對全部 hunk 使用原文座標；前段新增／刪除不推移後段基準。只有全部解析與定位成功才形成新正文。保留行使用原文，不將模型的模糊 context 寫回；未改字元、LF／CRLF 混用、尾端換行與 Unicode 保持。
+
+某 chunk 的替換文字與實際來源相同時，整段原樣保留，避免 no-op 偷改混合換行符。新增行使用編輯位置的換行樣式；原文無尾端換行時，EOF 新增也不強加最終換行（必要行分隔除外）。Memory 的來源與結果均不可為空白 body；建立／刪物件走各自能力。共用核心供 Plan 使用時的空正文政策，依頁首所列契約處理。
+
+### 錯誤與容量政策
 
 錯誤為 `BodyEditError`，承接契約既有 `invalid_patch`、`patch_context_not_found`、`ambiguous_patch_context`；容量另用 `patch_limit_exceeded`，不能冒充無匹配或掃完後唯一。帶必要 hunk 編號／候選片段，工具邊界轉譯合法下一步；不將 raw exception／scope 交模型。
 
@@ -47,6 +57,6 @@ App 已綁定的一份候選正文 + body diff
 
 讀寫 schema／generated DTO、B1／B2 權限、map／read、title → ID、原操作命令、正文與 metadata／來源共同採用已接真 PostgreSQL；Update 回真實前後差異與定位，不 echo 模糊輸入。單物件寫入接線及容量在 [工具接線](memory-tools.md)維護。
 
-原命令保存、`call_id` 配對與 Step 恢復由[共用執行](agent-execution.md)負責；B1 → B2 → 發布沿[背景工作](agent-execution.md#7-memory-背景工作)。純編輯器及交易測試不證明模型會選對內容或正確修正 patch；B1／B2 壓縮後完成發布等情境仍有未驗範圍，見[驗證對照](verification-plan.md)。
+原命令保存、`call_id` 配對與 Step 恢復由[共用執行](agent-execution.md)負責；B1 → B2 → 發布沿[背景工作](agent-execution.md#7-memory-背景工作)。純編輯器及交易測試不證明模型會選對內容或正確修正 patch。測試責任見[驗證對照](verification-plan.md)，B1／B2 的既有模型證據及未驗範圍由[架構驗證](../architecture/verification.md#memory-整理與發布)維護。
 
 既有規格的欄位與例子維持單一權威；本頁不另複製所有工具 JSON。

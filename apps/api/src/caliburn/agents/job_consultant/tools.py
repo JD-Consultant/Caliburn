@@ -9,6 +9,10 @@ from caliburn.transport.model_tools.context_compaction import (
     context_compaction_definitions,
 )
 from caliburn.transport.model_tools.contracts import reject_tool_call
+from caliburn.transport.model_tools.interview_plans import (
+    InterviewPlanTools,
+    interview_plan_definitions,
+)
 from caliburn.transport.model_tools.jd_changes import JdChangesTools, jd_changes_definitions
 from caliburn.transport.model_tools.jd_reads import JdReadTools, jd_read_definitions
 from caliburn.transport.model_tools.jd_write_checkpoint import restore_jd_write, snapshot_jd_write
@@ -35,6 +39,7 @@ CONSULTANT_MEMORY_READ_NAMES = (
 def consultant_tool_definitions(
     *,
     occupation_references_enabled: bool = False,
+    interview_plans_enabled: bool = True,
 ) -> list[FunctionToolParam]:
     """Build A's tool template before its published Memory scope has been selected."""
     return [
@@ -44,6 +49,7 @@ def consultant_tool_definitions(
         *jd_write_definitions(),
         *memory_consolidation_definitions(),
         *context_compaction_definitions(),
+        *(interview_plan_definitions() if interview_plans_enabled else []),
         *(occupation_reference_definitions() if occupation_references_enabled else []),
     ]
 
@@ -59,6 +65,7 @@ class ConsultantTools:
         compaction: ContextCompactionTools,
         *,
         occupation_references: OccupationReferenceTools | None = None,
+        interview_plans: InterviewPlanTools | None = None,
     ) -> None:
         self.memory_reads = memory_reads
         self.jd_reads = jd_reads
@@ -67,6 +74,7 @@ class ConsultantTools:
         self.consolidation = consolidation
         self.compaction = compaction
         self.occupation_references = occupation_references
+        self.interview_plans = interview_plans
 
     @property
     def names(self) -> tuple[str, ...]:
@@ -77,6 +85,7 @@ class ConsultantTools:
             *self.jd_writes.names,
             *self.consolidation.names,
             *self.compaction.names,
+            *(self.interview_plans.names if self.interview_plans is not None else ()),
             *(self.occupation_references.names if self.occupation_references is not None else ()),
         )
 
@@ -88,6 +97,7 @@ class ConsultantTools:
             *self.jd_writes.definitions(),
             *self.consolidation.definitions(),
             *self.compaction.definitions(),
+            *(self.interview_plans.definitions() if self.interview_plans is not None else []),
             *(
                 self.occupation_references.definitions()
                 if self.occupation_references is not None
@@ -112,6 +122,11 @@ class ConsultantTools:
             return self.consolidation.prepare(call.arguments, operation_id)
         if call.name in self.compaction.names:
             return self.compaction.prepare(call.arguments)
+        if self.interview_plans is not None:
+            if call.name in self.interview_plans.read_names:
+                return await self.interview_plans.invoke(call.name, call.arguments)
+            if call.name in self.interview_plans.write_names:
+                return await self.interview_plans.prepare(call.name, call.arguments, operation_id)
         if self.occupation_references is not None:
             if call.name in self.occupation_references.read_names:
                 return await self.occupation_references.invoke(call.name, call.arguments)
@@ -131,6 +146,10 @@ class ConsultantTools:
             return await self.consolidation.execute(prepared)
         if isinstance(prepared, dict) and prepared.get("kind") == "context_compaction":
             return await self.compaction.execute(prepared)
+        if isinstance(prepared, dict) and prepared.get("kind") == "interview_plan_edit":
+            if self.interview_plans is None:
+                raise ValueError("The saved Turn does not permit interview plan edits")
+            return await self.interview_plans.execute(prepared)
         if (
             isinstance(prepared, dict)
             and prepared.get("kind") == "occupation_reference_state_change"

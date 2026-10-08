@@ -178,7 +178,7 @@ def test_item_and_own_source_are_private_and_replay_original_after_later_create(
 def test_source_write_exception_rolls_back_content_sources_and_original_operations(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from caliburn.features.job_description import source_service
+    from caliburn.features.job_description import source_persistence
 
     writer, binding = start_turn(client)
     sessions = client.app.state.database.sessions
@@ -194,14 +194,14 @@ def test_source_write_exception_rolls_back_content_sources_and_original_operatio
         )
 
     prepared = client.portal.call(prepare)
-    real_revise = source_service.revise_sources
+    real_revise = source_persistence.insert_source_references
 
     async def fail_after_real_source_write(*args, **kwargs):
         await real_revise(*args, **kwargs)
         raise RuntimeError("synthetic failure after source insert")
 
     with monkeypatch.context() as patch:
-        patch.setattr(source_service, "revise_sources", fail_after_real_source_write)
+        patch.setattr(source_persistence, "insert_source_references", fail_after_real_source_write)
         with pytest.raises(RuntimeError, match="synthetic failure"):
             client.portal.call(workflow.execute, writer, prepared)
     assert client.portal.call(candidates.read, writer.scope) == before

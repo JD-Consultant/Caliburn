@@ -59,6 +59,35 @@ async def read_prepared_history(
     return SavedContextWindow(saved.checkpoint["id"], deepcopy(items))
 
 
+async def read_compacted_window(
+    checkpointer: BaseCheckpointSaver[str],
+    *,
+    thread_id: str,
+    request: ResponseRequest,
+    input_count: ReceivedInputCount,
+    checkpoint_id: str | None = None,
+) -> SavedContextWindow:
+    """Read a complete mid-work C at the caller's original request/count boundary."""
+    saved = await read_context_checkpoint(
+        checkpointer, thread_id=thread_id, checkpoint_id=checkpoint_id
+    )
+    values = saved.checkpoint["channel_values"]
+    if (
+        values.get("adopted") is not True
+        or values.get("preparation_policy", "missing") is not None
+        or values.get("compaction_snapshot") is None
+    ):
+        raise ValueError("The mid-work compaction has no complete adopted window")
+    if (
+        values.get("request_snapshot") != request.create_payload()
+        or values.get("input_count") != input_count
+    ):
+        raise ValueError("The compacted window belongs to another original request/count")
+    return SavedContextWindow(
+        saved.checkpoint["id"], deepcopy(compaction_input_items(values["compaction_snapshot"]))
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class ReceivedCompaction:
     response: CompactedResponse = field(repr=False)

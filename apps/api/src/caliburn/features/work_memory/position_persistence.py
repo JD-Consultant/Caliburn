@@ -9,11 +9,16 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
 from caliburn.features.work_memory.models import MemoryMapEntry
+from caliburn.features.work_memory.read_models import MemoryObjectMetadata
 from caliburn.features.work_memory.revision_persistence import (
     MemoryObjectRecord,
     MemoryObjectRevisionRecord,
 )
-from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionReference
+from caliburn.features.work_memory.revisions import (
+    MemoryLayer,
+    MemoryRevisionNotFoundError,
+    MemoryRevisionReference,
+)
 
 
 class MemoryPositionRecord(Base):
@@ -146,6 +151,66 @@ async def read_position_map(
     return tuple(
         MemoryMapEntry(object_id, title, description) for object_id, title, description in rows
     )
+
+
+async def read_position_selection(
+    session: AsyncSession,
+    job_file_id: UUID,
+    position_id: UUID,
+    object_ids: tuple[UUID, ...],
+) -> tuple[MemoryObjectMetadata, ...] | None:
+    """只投影指定物件；None 表示位置不可讀，空 tuple 表示該位置沒有選中物件。"""
+    rows = (
+        await session.execute(
+            select(
+                MemoryPositionMemberRecord.object_id,
+                MemoryPositionMemberRecord.revision_id,
+                MemoryObjectRecord.layer,
+                MemoryObjectRevisionRecord.title,
+                MemoryObjectRevisionRecord.description,
+                MemoryObjectRevisionRecord.is_sealed,
+            )
+            .select_from(MemoryPositionRecord)
+            .outerjoin(
+                MemoryPositionMemberRecord,
+                (MemoryPositionMemberRecord.job_file_id == MemoryPositionRecord.job_file_id)
+                & (MemoryPositionMemberRecord.position_id == MemoryPositionRecord.position_id)
+                & MemoryPositionMemberRecord.object_id.in_(object_ids),
+            )
+            .outerjoin(
+                MemoryObjectRevisionRecord,
+                (MemoryObjectRevisionRecord.job_file_id == MemoryPositionMemberRecord.job_file_id)
+                & (MemoryObjectRevisionRecord.object_id == MemoryPositionMemberRecord.object_id)
+                & (
+                    MemoryObjectRevisionRecord.revision_id == MemoryPositionMemberRecord.revision_id
+                ),
+            )
+            .outerjoin(
+                MemoryObjectRecord,
+                (MemoryObjectRecord.job_file_id == MemoryPositionMemberRecord.job_file_id)
+                & (MemoryObjectRecord.object_id == MemoryPositionMemberRecord.object_id),
+            )
+            .where(
+                MemoryPositionRecord.job_file_id == job_file_id,
+                MemoryPositionRecord.position_id == position_id,
+                MemoryPositionRecord.is_sealed.is_(True),
+            )
+            .order_by(MemoryPositionMemberRecord.object_id)
+        )
+    ).all()
+    if not rows:
+        return None
+    selected = []
+    for object_id, revision_id, layer, title, description, is_sealed in rows:
+        if object_id is None:
+            continue
+        # 外連接保留成員存在的證據，不能把不完整版本誤當成物件已刪除。
+        if not is_sealed or layer is None or title is None or description is None:
+            raise MemoryRevisionNotFoundError("The selected Memory revision is unavailable")
+        selected.append(
+            MemoryObjectMetadata(object_id, revision_id, MemoryLayer(layer), title, description)
+        )
+    return tuple(selected)
 
 
 async def is_position_ancestor(

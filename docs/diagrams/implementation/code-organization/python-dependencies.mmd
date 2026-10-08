@@ -1,0 +1,24 @@
+%%{init: {"flowchart": {"wrappingWidth": 250, "nodeSpacing": 32, "rankSpacing": 36}}}%%
+flowchart TD
+  %% diagram: python-dependencies
+  bootstrap[bootstrap<br/>Python 模組群組<br/>組合設定與具體實作]
+  http[HTTP 邊界<br/>Python 模組群組<br/>轉換輸入與呼叫用例]
+  roles[角色組裝與工具<br/>Python 模組群組<br/>組合角色政策與授權工具]
+  workflows[跨領域 workflows<br/>Python 模組群組<br/>協調用例與共同交易]
+  services[feature service／queries<br/>Python 模組群組<br/>提供領域用例與讀取投影]
+  execution[共用 agent_execution<br/>Python 模組群組<br/>執行、接續與恢復]
+  models[純 models<br/>Python 模組群組<br/>定義型別與領域不變量]
+  storage[feature persistence<br/>Python 模組群組<br/>保存與查詢領域資料]
+  database[共用 DB 接線<br/>Python 模組群組<br/>提供 session 與短交易]
+  provider[Responses／checkpointer<br/>Python 模組群組<br/>銜接模型與執行狀態保存]
+  bootstrap -->|匯入並組裝| http
+  bootstrap -->|匯入並組裝| roles
+  http -->|匯入用例| workflows
+  roles -->|匯入用例| workflows
+  roles -->|匯入領域介面| services
+  roles -->|匯入執行機制| execution
+  workflows -->|匯入領域介面| services
+  services -->|匯入規則| models
+  services -->|匯入保存與投影| storage
+  storage -->|匯入交易接線| database
+  execution -->|匯入外部接線| provider

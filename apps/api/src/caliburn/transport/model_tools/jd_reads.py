@@ -33,6 +33,8 @@ from caliburn.workflows.jd_model_references import JdModelReferences
 from caliburn.workflows.jd_reads import JdReadWorkflow
 from caliburn.workflows.memory_reads import PublishedMemoryRead
 
+DEFAULT_JD_READ_MAX_RESULT_CHARACTERS = 1_000_000
+
 _DESCRIPTION = (
     "按需讀取目前可見 JD：map 是定位導覽，full 是完整成品 Markdown，"
     "item 讀指定項目及其直屬明細；職責自身不展開任務，work_tasks 才讀該職責全部任務。"
@@ -57,7 +59,7 @@ class JdReadTools:
         reader: JdReadWorkflow,
         binding: PublishedMemoryRead,
         *,
-        max_result_characters: int = 1_000_000,
+        max_result_characters: int = DEFAULT_JD_READ_MAX_RESULT_CHARACTERS,
     ) -> None:
         if max_result_characters < 1:
             raise ValueError("Tool result character limit must be positive")

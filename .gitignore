@@ -57,3 +57,11 @@ Codex.local.md
 /docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/all-rankings.json
 /docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-02/trace.jsonl
 /docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/trace.jsonl
+/docs/experiments/product-validation/data/full-interview-rag-2026-10-06/provider-trace.jsonl
+/docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P1/checkpoint-witness.jsonl
+/docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P1/provider-trace.jsonl
+/docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P2/checkpoint-witness.jsonl
+/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P1/checkpoint-witness.jsonl
+/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P1/provider-trace.jsonl
+/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P2/checkpoint-witness.jsonl
+/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P2/provider-trace.jsonl

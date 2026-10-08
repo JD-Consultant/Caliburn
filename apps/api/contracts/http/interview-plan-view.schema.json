@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InterviewPlanView",
+  "description": "The job file's legally adopted consultant plan, read only. Null and deliberate empty text remain distinct; neither indicates interview completion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["job_file_id", "plan"],
+  "properties": {
+    "job_file_id": {"type": "string", "format": "uuid"},
+    "plan": {"$ref": "../tools/interview-plan.schema.json#/$defs/InterviewPlan/properties/plan"}
+  }
+}

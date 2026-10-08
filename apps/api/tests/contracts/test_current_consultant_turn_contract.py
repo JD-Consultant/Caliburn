@@ -21,6 +21,12 @@ def validator() -> Draft202012Validator:
         (path.name, Resource.from_contents(json.loads(path.read_text("utf-8"))))
         for path in directory.glob("*.schema.json")
     )
+    registry = registry.with_resource(
+        "tools/interview-plan.schema.json",
+        Resource.from_contents(
+            json.loads((directory.parent / "tools/interview-plan.schema.json").read_text("utf-8"))
+        ),
+    )
     return Draft202012Validator(schema, format_checker=FormatChecker(), registry=registry)
 
 
@@ -33,6 +39,7 @@ def public_turn() -> dict:
         "input_text": "原始輸入尚無正式序號",
         "allowed_controls": [],
         "commentary": [],
+        "plan_preview": None,
         "candidate": None,
     }
 

@@ -16,6 +16,17 @@ class MemoryReadView:
 
 
 @dataclass(frozen=True, slots=True)
+class MemoryObjectMetadata:
+    """固定位置選中的封存版本標頭，不包含正文或來源鏈。"""
+
+    object_id: UUID
+    revision_id: UUID
+    layer: MemoryLayer
+    title: str
+    description: str
+
+
+@dataclass(frozen=True, slots=True)
 class MemoryObjectReading:
     content: MemoryContent
     interview_source_ids: frozenset[UUID]

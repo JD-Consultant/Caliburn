@@ -294,15 +294,17 @@ class ModelRequestExecutor:
             except APIError as error:
                 failure = classify_response_failure(error)
                 _LOG.warning(
-                    "Provider request failed: operation=%s failure=%s http_status=%s "
-                    "provider_code=%s execution_id=%s request_id=%s attempt_id=%s",
-                    kind.value,
-                    failure.kind.value,
-                    failure.status_code,
-                    failure.provider_code,
-                    self.writer.scope.execution_id,
-                    request_id,
-                    attempt_id,
+                    "model.request_failed",
+                    extra={
+                        "operation": kind.value,
+                        "failure_kind": failure.kind.value,
+                        "http_status": failure.status_code,
+                        "provider_code": failure.provider_code,
+                        "job_file_id": self.writer.scope.job_file_id,
+                        "execution_id": self.writer.scope.execution_id,
+                        "request_id": request_id,
+                        "attempt_id": attempt_id,
+                    },
                 )
                 try:
                     retryable = await self._record_failure(attempt_id, error)

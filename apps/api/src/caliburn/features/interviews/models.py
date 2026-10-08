@@ -93,6 +93,14 @@ class FormalInterviewExchange:
 
 
 @dataclass(frozen=True, slots=True)
+class FormalExchangePosition:
+    """Metadata for an original execution's matching formal employee input and reply."""
+
+    execution_id: UUID
+    employee_input_sequence: int
+
+
+@dataclass(frozen=True, slots=True)
 class InterviewReadScope:
     job_file_id: UUID
     through_sequence: int

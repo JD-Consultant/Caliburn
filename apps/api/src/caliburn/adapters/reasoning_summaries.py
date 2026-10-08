@@ -91,4 +91,4 @@ class ReasoningSummaryProjection:
             )
         except Exception:
             self.callback = None
-            _LOG.warning("Public reasoning summary observer disabled after failure")
+            _LOG.warning("reasoning_summary.observer_disabled")

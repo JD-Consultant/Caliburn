@@ -14,6 +14,7 @@ const saved = {
   pause_requested: false,
   input_text: '不應在歷史公開訊息重複顯示的原輸入',
   allowed_controls: [],
+  plan_preview: null,
   candidate: null,
   commentary: [
     { response_id: 'response-1', message_id: 'message-1', text: '先核對既有職責。' },

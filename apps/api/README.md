@@ -115,6 +115,7 @@ $env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
 - `GET /api/job-files/{job_file_id}/jd/capabilities`：同一固定修訂的共用知識／技能定義與有序 `task_links`；正文不在任務內複製。`POST` 同路徑以 `change.action` 增修刪定義、概覽排序、連結／解除任務或排序任務關係。仍被使用的定義刪除回 409 `capability_in_use`；刪任務保留定義。知識與技能不能跨類排序或改類別，命令／基底／准入沿原規則；原結果按原修訂回讀。完整形狀以 `edit-jd-capabilities-request.schema.json` 為準。模型經 JD 工具編輯候選，不直接使用此人工編輯端點。
 - `GET /api/job-files/{job_file_id}/jd/work`：供人工 UI 組合讀取同一固定修訂的職責、任務及明細、知識／技能與任務關係、協作對象與共通條件；先固定 head，重用既有投影，不另存資料。各集合的獨立 GET 不承諾跨請求相同修訂；需要一個集合編輯畫面基底時使用此入口。
 - `GET/POST /api/job-files/{job_file_id}/jd/collaborators`：主要協作對象的固定集合及新增、局部修訂、排序、刪除。名稱／合作範圍至少一欄有內容；未指定保留、null 清空不能清成空項。`GET/POST .../jd/conditions`：全職務共通條件，五類各自排序；明確修訂分類保留身分並放目的類末尾，不自動套到任務。兩者沿同一 JD 命令／基底／准入與歷史規則，完整 shape 依 `contracts/http/`；已接人工 UI 與同版 `/jd/work`，不是模型候選入口。
+- `GET /api/job-files/{job_file_id}/interview-plan`：只讀正式 frontier 採用的顧問工作計畫，回 `{job_file_id, plan}`；未建立為 null，刻意清空保留空字串，讀取不可用不冒充空值。active／paused 的同 Turn 候選沿原 status `plan_preview` 投影，終局不供候選。資料權責、原能力及恢復契約見 [INTPLAN](../../docs/specs/2026-10-06-consultant-interview-planning-and-focus-design.md)；現行內容用途見 [Plan §10](../../docs/specs/2026-10-06-consultant-interview-planning-and-focus-design.md#10-jd-工作計畫內容與用法)；[本次工程證據](../../docs/plans/evidence/jd-work-plan-2026-10-08.md)與已完成的有限真模型比較分開；該比較未呈現可辨整體增益，原 wire／保存／恢復保持。
 - `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，原命令重送回原接受結果／200；不同內容重用命令或已有其他 A 回 409。提交後 supervisor 執行既有 runner；未配置模型回 503，不接受無法執行的工作。取消後重新提交須用新命令；不提供任意正式化 API。驗證見 [A 執行紀錄](../../docs/history.md#source-f5df4f496aad7b909036)。
 
 ### PDF 執行依賴
@@ -166,10 +167,14 @@ SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG 
 
 新 A 模型請求啟用可讀推理摘要；`/api/job-files/{job_file_id}/consultant-turns/{execution_id}/activity-stream` 在一條 SSE 提供 `commentary`、`reasoning_summary`，`/reasoning-summaries` 回讀已保存摘要。Web 已接入即時顯示與歷史回看；查詢失敗不當成沒有摘要，也不為回看而重跑模型。摘要不作正式訪談依據，不公開原始推理。完整契約與驗證範圍見[介面 §2.1](../../docs/implementation/interface-and-delivery.md#21-推理摘要串流與歷史回看)。
 
+### Prompt／Tool 對照
+
+新比較使用 [evaluations](evaluations/README.md) 的固定案例及明示候選配置，沿正式 App／HTTP 執行，保存 manifest、受測來源與原始診斷。CLI 提供無外送的 dry-run／scripted；真 provider 使用已授權 guard factory 的程式化入口。歷史實驗保留原件，新比較不再 import 舊 runner 或改 module-global。
+
 ### 模型失敗診斷
 
 要在 DataGrip 直接 JOIN 查看某份檔案的 AI 輸入、工具與結果，使用按需 `scripts/refresh_execution_diagnostics.py`，再開啟 `diagnostic_execution_history`、`diagnostic_model_steps`、`diagnostic_tool_calls`。它不啟動模型，也不改原 checkpoint；完整命令、擷取新鮮度與敏感資料界線見 [runbook](../../docs/runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
 
-後端 logger `caliburn.workflows.model_requests` 以 `Provider request failed` 記錄實際外送失敗：操作、安全分類、HTTP status、白名單 provider code，以及 **App 本地** execution／request／attempt ID。可依這些 ID 核對既有執行紀錄；它們不是可向 OpenAI 取回遺失回應的遠端 ID。`None` 表示未取得 HTTP status 或 code 不在白名單，不能據此推定沒有錯誤。
+後端 logger `caliburn.workflows.model_requests` 以 JSONL 事件 `model.request_failed` 記錄實際外送失敗：操作、安全分類、HTTP status、白名單 provider code，以及 App 本地 execution／request／attempt ID。可依這些 ID 核對既有執行紀錄；它們不是可向 OpenAI 取回遺失回應的遠端 ID。`null` 表示未取得 HTTP status 或 code 不在白名單，不能據此推定沒有錯誤。正式啟動入口的輸出、等級及 HTTP 關聯見 [Log 操作](../../docs/runbook.md#一般-log-與-http-關聯)。
 
-此警告不代表故障已保存、重試／回滾已完成。不要為診斷開啟原始 HTTP body、訪談、opaque reasoning 或秘密輸出；既有日誌即可，不需新監控服務。接線與驗證範圍見 [T06 §23](../../docs/history.md#source-d76bfd79f21fb146c537)。
+此警告不代表故障已保存、重試／回滾已完成。正文沿受控診斷查閱，不開啟原始 HTTP body、opaque reasoning 或秘密日誌。既有接線沿革見 [T06 §23](../../docs/history.md#source-d76bfd79f21fb146c537)，本輪結構化輸出與查閱修正見[重構證據](../../docs/plans/evidence/full-system-review-2026-10-08.md)。

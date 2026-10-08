@@ -19,6 +19,11 @@ def test_consultant_status_schema_rejects_private_or_invented_state() -> None:
         (path.name, Resource.from_contents(json.loads(path.read_text(encoding="utf-8"))))
         for path in (Path(__file__).parents[2] / "contracts/http").glob("*.schema.json")
     )
+    plan_path = Path(__file__).parents[2] / "contracts/tools/interview-plan.schema.json"
+    registry = registry.with_resource(
+        "../tools/interview-plan.schema.json",
+        Resource.from_contents(json.loads(plan_path.read_text(encoding="utf-8"))),
+    )
     validator = Draft202012Validator(schema, format_checker=FormatChecker(), registry=registry)
     original = {
         "job_file_id": str(uuid4()),
@@ -28,6 +33,7 @@ def test_consultant_status_schema_rejects_private_or_invented_state() -> None:
         "input_text": "合成原話",
         "allowed_controls": [],
         "commentary": [],
+        "plan_preview": None,
         "candidate": None,
     }
     for status in ("active", "paused", "completed", "cancelled", "failed"):

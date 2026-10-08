@@ -10,6 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from caliburn.adapters.openai_responses import create_responses_client
+from caliburn.app_composition import AppComposition
 from caliburn.bootstrap import create_app
 from caliburn.settings import ModelSettings, Settings
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
@@ -19,9 +20,7 @@ from tests.unit.test_response_loop import response_at
 pytestmark = pytest.mark.postgres
 
 
-def test_completed_notification_publishes_two_layers_and_next_turn_sees_maps(
-    database_settings, monkeypatch
-):
+def test_completed_notification_publishes_two_layers_and_next_turn_sees_maps(database_settings):
     requests = []
 
     def respond(request):
@@ -73,13 +72,17 @@ def test_completed_notification_publishes_two_layers_and_next_turn_sees_maps(
             )
         return response_http_reply(request, raw)
 
-    def synthetic_client(**kwargs):
+    def synthetic_client(model):
         return create_responses_client(
-            **kwargs, http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond))
+            api_key=model.api_key,
+            timeout_seconds=model.request_timeout_seconds,
+            http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond)),
         )
 
-    monkeypatch.setattr("caliburn.bootstrap.create_responses_client", synthetic_client)
-    app = create_app(Settings(database=database_settings, model=ModelSettings(api_key="synthetic")))
+    app = create_app(
+        Settings(database=database_settings, model=ModelSettings(api_key="synthetic")),
+        composition=AppComposition(create_responses_client=synthetic_client),
+    )
     with TestClient(
         app,
         base_url="http://127.0.0.1:8100",

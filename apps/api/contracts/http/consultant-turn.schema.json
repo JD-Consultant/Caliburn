@@ -7,7 +7,7 @@
     "ConsultantTurn": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["job_file_id", "execution_id", "status", "pause_requested", "input_text", "allowed_controls", "commentary", "candidate"],
+      "required": ["job_file_id", "execution_id", "status", "pause_requested", "input_text", "allowed_controls", "commentary", "candidate", "plan_preview"],
       "properties": {
         "job_file_id": {"type": "string", "format": "uuid"},
         "execution_id": {"type": "string", "format": "uuid"},
@@ -25,6 +25,10 @@
         "candidate": {
           "description": "A read-only candidate from one fixed revision, only while active or paused. Null also covers the interval before candidate initialization. Never the formal JD or PDF source.",
           "anyOf": [{"$ref": "#/$defs/CandidateJdPreview"}, {"type": "null"}]
+        },
+        "plan_preview": {
+          "description": "The complete current saved plan only while active or paused. Outer null means no preview capability or unavailable preview; an object preserves nullable or deliberately empty plan text. Terminal reads use the job file's adopted plan.",
+          "anyOf": [{"$ref": "../tools/interview-plan.schema.json#/$defs/InterviewPlan"}, {"type": "null"}]
         },
         "allowed_controls": {
           "description": "Currently available App controls; each request rechecks the scoped execution. Pause records intent until a safe Step acknowledges it. Empty when terminal or controls are not configured.",

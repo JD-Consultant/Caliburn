@@ -1,0 +1,24 @@
+sequenceDiagram
+  participant UI as 正式 JD 來源區
+  participant Query as 來源讀取 workflow
+  participant JD as JD 正式修訂／直接引用
+  participant Memory as Memory 固定快照／原始訪談
+  UI->>Query: 展開來源列表
+  Query->>JD: 捕捉正式 head，讀該版引用與目標標籤
+  Query->>Memory: 比較原引用與本次最新已發布基準
+  Query-->>UI: 正式修訂、引用定位、名稱、待核對
+  UI->>Query: 帶回正式修訂及引用，按需讀子來源
+  Query->>JD: 確認仍是目前正式修訂及其直接引用
+  alt 正式修訂已改變
+    Query-->>UI: 409，要求重新讀來源列表
+  else 引用仍可用
+    Query->>Memory: 沿原快照的固定引用鏈讀正文／原話
+    Query-->>UI: 正文與可下鑽定位
+  end
+  opt 查看差異（重新確認正式修訂及引用資格）
+    UI->>Query: 帶回正式修訂及引用，讀取兩種比較
+    Query->>JD: 取該引用上次核對修訂及目前同一目標
+    Query->>Memory: Memory 來源才比較原鏈與最新已發布基準
+    Query-->>UI: JD 差異＋來源差異（訪談為空值）
+  end
+  Note over UI,Memory: 全程只讀；查看不解除待核對、不採用候選、不改寫引用

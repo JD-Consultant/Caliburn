@@ -21,10 +21,10 @@ function focusAtEnd(element: HTMLInputElement | HTMLTextAreaElement | null): voi
 }
 
 export function InlineEditor({ edit, field }: { edit: InlineEdit; field: InlineField }) {
-  const initial = field.value ?? '';
+  // 開啟時固定比較基準與修訂，背景更新不能改變草稿是否已修改的判定。
+  const [initial] = useState(field.value ?? '');
   const [draft, setDraft] = useState(initial);
   const [problem, setProblem] = useState<string | null>(null);
-  // Frozen when the editor opens: a background refresh must not rebase an unsent draft.
   const [revisionId] = useState(edit.revisionId);
   const { canEdit, status, setEditorOpen } = edit;
   useEffect(() => {

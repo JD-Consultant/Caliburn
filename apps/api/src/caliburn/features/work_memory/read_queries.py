@@ -46,21 +46,26 @@ async def read_object(
 ) -> MemoryObjectReading:
     if view.position_id is None:
         raise MemoryRevisionNotFoundError("No Memory snapshot was selected for this Turn")
-    members = await candidate_queries.read_members(session, view.job_file_id, view.position_id)
-    revision = await candidate_queries.read_selected(session, view.job_file_id, members, object_id)
+    revision = await candidate_queries.read_position_object(
+        session, view.job_file_id, view.position_id, object_id
+    )
     if revision.layer != view.layer:
         raise MemoryRevisionNotFoundError("The object is not in the selected layer")
     situation_references: tuple[MemoryMapEntry, ...] = ()
     if revision.work_situation_references:
-        # Candidate bindings follow identity; publication members already fix the chain.
-        # Navigation needs source titles/descriptions, not every source's full body.
-        situation_map = await position_persistence.read_position_map(
-            session, view.job_file_id, view.position_id, MemoryLayer.WORK_SITUATION
-        )
+        # 候選沿物件身分，已發布位置固定版本；導覽只讀來源標頭。
         source_ids = {reference.object_id for reference in revision.work_situation_references}
-        situation_references = tuple(item for item in situation_map if item.object_id in source_ids)
-        if len(situation_references) != len(source_ids):
+        sources = await candidate_queries.read_position_selection(
+            session, view.job_file_id, view.position_id, tuple(source_ids)
+        )
+        if len(sources) != len(source_ids) or any(
+            item.layer != MemoryLayer.WORK_SITUATION for item in sources.values()
+        ):
             raise MemoryRevisionNotFoundError("A source binding is unavailable in the read view")
+        situation_references = tuple(
+            MemoryMapEntry(item.object_id, item.title, item.description)
+            for item in sources.values()
+        )
     return MemoryObjectReading(
         revision.content, revision.interview_references, situation_references
     )

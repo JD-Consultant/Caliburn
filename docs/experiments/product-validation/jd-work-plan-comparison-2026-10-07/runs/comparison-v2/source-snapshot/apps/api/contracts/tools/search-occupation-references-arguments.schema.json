@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SearchOccupationReferencesArguments",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "query": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 12000,
+      "pattern": "\\S",
+      "description": "只描述員工已確認實際負責的主要工作，保留必要脈絡；排除顧問問題、未做或尚未確認的工作。"
+    }
+  },
+  "required": ["query"]
+}

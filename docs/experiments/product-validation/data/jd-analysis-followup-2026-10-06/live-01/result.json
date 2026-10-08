@@ -1,0 +1,87 @@
+{
+  "completed": [
+    {
+      "arm": "old",
+      "case_id": "regroup_distinct_work"
+    },
+    {
+      "arm": "new",
+      "case_id": "regroup_distinct_work"
+    },
+    {
+      "arm": "new",
+      "case_id": "correct_across_affected_fields"
+    },
+    {
+      "arm": "old",
+      "case_id": "correct_across_affected_fields"
+    },
+    {
+      "arm": "old",
+      "case_id": "derive_and_link_capabilities"
+    },
+    {
+      "arm": "new",
+      "case_id": "derive_and_link_capabilities"
+    },
+    {
+      "arm": "new",
+      "case_id": "probe_before_closure"
+    },
+    {
+      "arm": "old",
+      "case_id": "probe_before_closure"
+    },
+    {
+      "arm": "old",
+      "case_id": "keep_coherent_single_area"
+    },
+    {
+      "arm": "new",
+      "case_id": "keep_coherent_single_area"
+    },
+    {
+      "arm": "new",
+      "case_id": "insufficient_without_forced_edit"
+    },
+    {
+      "arm": "old",
+      "case_id": "insufficient_without_forced_edit"
+    },
+    {
+      "arm": "old",
+      "case_id": "group_nonwarehouse_work"
+    },
+    {
+      "arm": "new",
+      "case_id": "group_nonwarehouse_work"
+    }
+  ],
+  "accounting": {
+    "input_tokens": 614884,
+    "output_tokens": 26401,
+    "reasoning_tokens": 20314,
+    "cached_input_tokens": 560176,
+    "cache_write_input_tokens": 54558,
+    "total_tokens": 641285,
+    "outbound_calls": 100,
+    "count_calls": 50,
+    "generation_calls": 50,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 614884,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0050",
+    "actual_estimated_usd": "0.025637010",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.030637010",
+    "cumulative_occupied_usd": "0.030637010",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 554.7737072999953,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

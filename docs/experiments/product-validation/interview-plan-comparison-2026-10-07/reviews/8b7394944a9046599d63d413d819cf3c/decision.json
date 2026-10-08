@@ -1,0 +1,8 @@
+{
+  "question_id": "8b7394944a9046599d63d413d819cf3c",
+  "fact_ids": ["training-boundary"],
+  "mode": "answer",
+  "reason": "training 已實際披露，本題同題再確認員工能否直接批准獨立作業，符合 training-boundary 的責任追問條件，可提供觀察回報與主管核准的原更正事實。未問盤點差異，不帶 inventory-authority。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

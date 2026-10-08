@@ -1,0 +1,66 @@
+{
+  "case": "warehouse-r1-P1",
+  "closure_submitted": true,
+  "completed_turns": 20,
+  "memory_settlement": {
+    "completed": 31
+  },
+  "driver_reminders": 1,
+  "new_consumption": {
+    "generations": 234,
+    "compacts": 1,
+    "outbound": 508,
+    "counted_input": 13340408
+  },
+  "known_cost_usd": "0.245032485",
+  "role_known_cost_usd": {
+    "A": "0.152022425",
+    "Memory": "0.093010060"
+  },
+  "generation_roles": {
+    "A": 119,
+    "Memory": 115
+  },
+  "unique_admitted": 235,
+  "unique_received": 235,
+  "input_tokens": 11732949,
+  "output_tokens": 161630,
+  "provider_window_seconds": 1891.999306,
+  "turn_elapsed_seconds": 1459.8647607000166,
+  "case_result_wall_from_batch_freeze_seconds": 1899.1118185520172,
+  "eight_same_case_total_estimate": {
+    "generations": 1908,
+    "compacts": 8,
+    "outbound": 4141,
+    "counted_input": 107488739,
+    "known_cost_usd": "1.982688980"
+  },
+  "compact_witness": [
+    {
+      "response_id": "resp_0c837a473ce7e65a016ac5765f311887d0ae216d8f007d8d93",
+      "all_C_items": 31,
+      "boundary": "pre-work",
+      "checkpoint_adopted": false,
+      "any_boundary_checkpoint_adopted": true,
+      "subsequent_A_exact_C_prefix": true,
+      "exact_bound_plan_projection_checkpoint": false,
+      "next_A_exact_saved_plan_item": false,
+      "checkpoint_ids": [],
+      "next_attempts": [
+        "d897499d-9049-4993-a483-48a85b173607",
+        "f368ade3-303f-4764-8454-8f92caeb2cd2",
+        "87594d31-73e4-4af0-9eb4-8f8bc255966c",
+        "b7bcc4a2-6fd7-41b5-a99c-2822ef4f19cd",
+        "cfc5468c-4fb9-46d8-892d-b81b96155be2",
+        "8b937348-0839-4546-a314-6a199e632320",
+        "55571247-eefb-4a06-8d3f-5650ab59789a",
+        "725c582f-8f9b-4d27-8744-040691e85a98",
+        "813eee48-a038-4d6f-98c8-8bb77d73c315",
+        "59967c6d-9fc6-4511-8462-a8c694bc4125",
+        "5bd7e1b0-c161-4ebd-9822-dd9b54ed8049",
+        "67c07767-e29e-40cb-bfc5-9b63b701fa60",
+        "a72f0044-a88f-4f79-bf00-23bb940a6e62"
+      ]
+    }
+  ]
+}

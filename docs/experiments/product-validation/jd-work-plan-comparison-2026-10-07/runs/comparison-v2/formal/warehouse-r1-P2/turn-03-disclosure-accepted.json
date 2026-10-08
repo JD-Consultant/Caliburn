@@ -1,0 +1,31 @@
+{
+  "actual_question": "貨物暫放位置我會保留為未知，不作推測。我已把逐箱驗收、差異登記與通報、依採購回覆登記入庫，以及您不負責議價、選供應商或決定拒收，整理進目前 JD 底稿。\n\n您核對外包裝時，如果發現破損，通常會怎麼處理、通知誰？若沒有遇過，也可以直接說。",
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "fact_ids": [],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [],
+  "review_mode": "unknown",
+  "review_reason": "本題限定外包裝破損的處理及通報對象，凍結事實未提供此特定情境；不能把一般收貨差異通報流程或客戶退貨隔離流程當成答案，也不推定是否曾遇過。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": false,
+  "subquestions": [
+    {
+      "quote": "您核對外包裝時，如果發現破損，通常會怎麼處理",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "未提供包裝破損的具體處理或一般流程在此情境的適用細節。"
+    },
+    {
+      "quote": "通知誰？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "沿用外包裝破損的限定情境，其通報對象未明示。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "b9dfb2c1-60a7-4388-9ab3-575691a0d522",
+  "accepted_source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c"
+}

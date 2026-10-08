@@ -1,0 +1,26 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "我已把上架整理為獨立職責與任務，納入依規劃儲位放貨、貼品項與批號標籤、掃碼登記、核對實物與 WMS 儲位，以及空間不足時找組長調整的做法；也記下常溫貨用棧板車、超重貨由有證照同事操作堆高機。\n\n如果核對時發現實物儲位和 WMS 記錄不一致，您會怎麼處理？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "凍結上架流程要求確認實物與系統儲位一致，但未提供發現不一致時的處理；揀貨儲位空缺、放不下調位置與盤點數量差異是不同情境，不能代答。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "如果核對時發現實物儲位和 WMS 記錄不一致，您會怎麼處理？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "所問為上架儲位記錄不一致的特定異常處理，現有事實未明示。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

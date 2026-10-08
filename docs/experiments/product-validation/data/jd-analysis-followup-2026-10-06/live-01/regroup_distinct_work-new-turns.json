@@ -1,0 +1,203 @@
+{
+  "arm": "new",
+  "case_id": "regroup_distinct_work",
+  "job_file_id": "dc3343f6-6c7e-4e27-b55d-fd298114eef0",
+  "before": {
+    "profile": {
+      "revision_id": "85c5da04-38a0-4cf7-9e3d-bc994cda731f",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "透過收貨、揀貨、盤點及退貨作業，維持倉庫貨物流轉和庫存紀錄。"
+      }
+    },
+    "work": {
+      "revision_id": "85c5da04-38a0-4cf7-9e3d-bc994cda731f",
+      "areas": [
+        {
+          "area_id": "9918e50d-2c3d-4e9f-9b52-da803f341879",
+          "title": "物流中心倉儲作業",
+          "scope_text": "負責收貨上架、出貨揀貨、庫存盤點與退貨交接。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "a7dc86e3-1cfe-49bb-b8dd-8305292c7e4c",
+          "area_id": "9918e50d-2c3d-4e9f-9b52-da803f341879",
+          "title": "驗收進貨與上架",
+          "description": "核對單據與實貨，記錄差異並通知採購，將已確認商品上架。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "f1797a26-f0bb-4106-911e-0dcec279dee7",
+          "area_id": "9918e50d-2c3d-4e9f-9b52-da803f341879",
+          "title": "依單據揀貨",
+          "description": "依出貨單揀貨並掃碼核對品項，不符時停止並查原因。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "645477a4-b8aa-48b5-851a-7b9ba6dc3754",
+          "area_id": "9918e50d-2c3d-4e9f-9b52-da803f341879",
+          "title": "盤點庫存",
+          "description": "每日下班前複點高異動商品，月底盤本人區域；主管確認後才調整帳面。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "19601ebf-3912-4004-bc06-2d3d95912824",
+          "area_id": "9918e50d-2c3d-4e9f-9b52-da803f341879",
+          "title": "處理退貨與交接",
+          "description": "檢查客戶退貨，正常品入庫，疑似瑕疵轉品保；依採購通知備妥供應商退貨並登記出貨，不決定退貨。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "85c5da04-38a0-4cf7-9e3d-bc994cda731f",
+      "references": [
+        {
+          "citation_id": "30cba5a7-7fcc-4539-af37-72aa7828de64",
+          "target_label": "任務：驗收進貨與上架",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "a7dc86e3-1cfe-49bb-b8dd-8305292c7e4c",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "496eaf3e-248c-4c40-9817-259c3f58b029",
+          "target_label": "任務：依單據揀貨",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "f1797a26-f0bb-4106-911e-0dcec279dee7",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "2828bb96-b11b-469b-8d46-029523f7360e",
+          "target_label": "任務：盤點庫存",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "645477a4-b8aa-48b5-851a-7b9ba6dc3754",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "09fc912b-0cd6-4133-b6e6-9a4a8498dde8",
+          "target_label": "任務：處理退貨與交接",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "19601ebf-3912-4004-bc06-2d3d95912824",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 8 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "25ab3b32-b58b-4d5f-ae1d-d9b4f3f23676",
+      "exchange": {
+        "employee_input": {
+          "source_id": "c27905dc-b0f7-4c22-95e5-65e533ccffa2",
+          "interview_sequence": 10,
+          "speaker": "employee",
+          "interview_text": "這些都是我現在會做的工作。忙的時候比較多，平常也是這幾項，目前想不到新的補充。"
+        },
+        "consultant_reply": {
+          "source_id": "b1f2ac16-a233-4fb3-b7e7-bad3529df512",
+          "interview_sequence": 11,
+          "speaker": "consultant",
+          "interview_text": "了解，這四項都是您目前持續負責的工作，忙碌時工作量會增加，但平常負責的項目相同。底稿已按收貨上架、出貨揀貨、庫存盤點、退貨交接整理；這輪沒有新工作需要另外加入。\n\n想再釐清出貨異常時的責任範圍：最近一次掃碼發現品項不符，您查到原因後通常怎麼處理？如果無法自行排除，會交給誰接手？"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 47376,
+    "output_tokens": 2282,
+    "reasoning_tokens": 1440,
+    "cached_input_tokens": 33938,
+    "cache_write_input_tokens": 13426,
+    "total_tokens": 49658,
+    "outbound_calls": 8,
+    "count_calls": 4,
+    "generation_calls": 4,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 47376,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0004",
+    "actual_estimated_usd": "0.003159830",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.003559830",
+    "cumulative_occupied_usd": "0.003559830",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 48.43212510000012,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 101446,
+    "output_tokens": 6039,
+    "reasoning_tokens": 4792,
+    "cached_input_tokens": 71768,
+    "cache_write_input_tokens": 29654,
+    "total_tokens": 107485,
+    "outbound_calls": 16,
+    "count_calls": 8,
+    "generation_calls": 8,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 101446,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0008",
+    "actual_estimated_usd": "0.007446330",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.008246330",
+    "cumulative_occupied_usd": "0.008246330",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 116.98932179999974,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

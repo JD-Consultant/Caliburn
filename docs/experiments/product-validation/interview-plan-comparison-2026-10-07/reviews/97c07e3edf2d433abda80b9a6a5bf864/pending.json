@@ -1,0 +1,62 @@
+{
+  "question_id": "97c07e3edf2d433abda80b9a6a5bf864",
+  "profile": "warehouse",
+  "actual_question": "我已把冷藏區每日早晚查看溫度表、超標批次隔離與通報，以及品保決定是否放行的界線整理進底稿；旺季約兩倍出貨量時的急單調序、瓶頸回報和晚班交接也已補入。十二月配合全倉年度盤點與事前整理已記錄；分區責任和財務表單細節仍保留未知。\n\n溫度正常、在 2–8°C 範圍內時，早晚讀數也需要登記嗎？還是只有超標時才記錄時間和溫度？",
+  "disclosed": [
+    "annual-count",
+    "cold-storage",
+    "customer-returns",
+    "inventory-authority",
+    "inventory-partial",
+    "peak-season",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training",
+    "training-boundary"
+  ],
+  "open_gaps": [],
+  "seen_topics": [
+    "annual",
+    "conditions",
+    "customer-returns",
+    "inventory",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "receiving",
+    "customer-returns",
+    "supplier-returns",
+    "picking",
+    "inventory-partial",
+    "training",
+    "training-boundary",
+    "training-boundary",
+    "shelving",
+    "inventory-authority",
+    "cold-storage",
+    "peak-season",
+    "annual-count"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 5
+  },
+  "recent_employee_originals": [
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。\n\n關於你問的「盤點哪些品項或儲位通常由誰安排？」，我目前沒有確定資料，請保留未知，不補猜。",
+    "約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。\n\n每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。"
+  ],
+  "candidate": {
+    "actual_question": "溫度正常、在 2–8°C 範圍內時，早晚讀數也需要登記嗎？還是只有超標時才記錄時間和溫度？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分；若要釐清，可以具體問我實際做的步驟或責任。",
+    "fact_id": null,
+    "unmapped_or_already_answered": true
+  }
+}

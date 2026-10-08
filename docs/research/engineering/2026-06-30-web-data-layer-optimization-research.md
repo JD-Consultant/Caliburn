@@ -1,5 +1,7 @@
 # Web 資料層優化研究紀錄 — 快取/預抓/持久化、存檔並發、項目穩定身分
 
+> 時點說明：本文保留 2026-06-30 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 > **類型**:研究紀錄(findings + 已拍板決策)。決策另寫 ADR。
 > **日期**:2026-06-30
 > **動機**:盤點 `apps/web` 的資料抓取與存檔邏輯,找優化空間。使用者起點兩個直覺:
@@ -16,12 +18,12 @@
 
 | 現行件 | 位置 | 觀察 |
 |---|---|---|
-| 文件查詢/樂觀 PATCH | [useDocument.ts](../../../apps/web/src/hooks/useDocument.ts) | `usePatchDocument` 有 `onMutate`/rollback;但 PATCH **整份 OcsDocument** |
-| 自動儲存 | [useDocument.ts:105](../../../apps/web/src/hooks/useDocument.ts) | debounce 500ms + 卸載前 flush;狀態由 mutation `isPending` 推導 |
-| 任務級別/目錄 | [useTaskCatalog.ts](../../../apps/web/src/hooks/useTaskCatalog.ts) | `useTaskLevel` 與 `useTaskCatalog` **各打一次 `recommendKS`**(同任務同資料、不同 queryKey) |
-| 選單勾選判定 | [FieldCombobox.tsx:41](../../../apps/web/src/components/interview/fields/FieldCombobox.tsx) | `isOfficialSelected` **只比 `name`**(忽略 code,註解自承 code 為位置序碼) |
-| QueryClient | [Providers.tsx:11](../../../apps/web/src/components/layout/Providers.tsx) | 純記憶體、**無全域預設**;各 hook 各自重抄 `staleTime`/`refetchOnWindowFocus` |
-| 後端 PATCH | [documents.py:63](../../../apps/api/app/api/routes/documents.py) | `upsert_draft(profile_id, body)`:收整份、**無 version 檢查**、last-write-wins |
+| 文件查詢/樂觀 PATCH | [useDocument.ts](../../history.md#source-344a39231cec3ce616e7) | `usePatchDocument` 有 `onMutate`/rollback;但 PATCH **整份 OcsDocument** |
+| 自動儲存 | [useDocument.ts:105](../../history.md#source-344a39231cec3ce616e7) | debounce 500ms + 卸載前 flush;狀態由 mutation `isPending` 推導 |
+| 任務級別/目錄 | [useTaskCatalog.ts](../../history.md#source-20995fc7473b5604ab40) | `useTaskLevel` 與 `useTaskCatalog` **各打一次 `recommendKS`**(同任務同資料、不同 queryKey) |
+| 選單勾選判定 | [FieldCombobox.tsx:41](../../history.md#source-272e42cc016bd7a3d626) | `isOfficialSelected` **只比 `name`**(忽略 code,註解自承 code 為位置序碼) |
+| QueryClient | [Providers.tsx:11](../../history.md#source-482a4f976eb0743300c5) | 純記憶體、**無全域預設**;各 hook 各自重抄 `staleTime`/`refetchOnWindowFocus` |
+| 後端 PATCH | [documents.py:63](../../history.md#source-ba942110b8bc0294b0b0) | `upsert_draft(profile_id, body)`:收整份、**無 version 檢查**、last-write-wins |
 | 死代碼 | `AiTaskPanel.tsx`、`fields/FieldBoundSelect.tsx` | 全 repo 無 import |
 
 ---
@@ -32,8 +34,8 @@
 1. **已會記**:`useTaskLevel` 有 `staleTime: 5min`,同任務 5 分鐘內再開不重抓。
 2. **重複請求**:`useTaskLevel` + `useTaskCatalog` 各打一次 `recommendKS`;級別 `competency_level` 本就在 catalog 回應裡。
 3. **重載失憶**:QueryClient 純記憶體,重新整理 → catalog/level/header-meta 全重抓(走 indexer/LLM,慢)。
-4. **整池重撈(最大浪費)**:per-task catalog 來自 [ai.py `_catalog_ks`/`_catalog_op`](../../../apps/api/app/api/routes/ai.py) → `knowledge.competencies(ocs_code)`,**一次撈整個 ocs_code 的能力池**再在記憶體切某 task([task_detail.py](../../../apps/api/app/services/knowledge/task_detail.py))。前端每任務各打 recommend-ks + draft-op → **同一個 ocs_code 的整池被重撈 N×2 次**。
-5. `task-candidates` 回應**不帶 K/S/O/P**([documents.py:153](../../../apps/api/app/api/routes/documents.py)、type [CandidateTask](../../../apps/web/src/types/index.ts)),故無法在「選任務當下」直接 push catalog。
+4. **整池重撈(最大浪費)**:per-task catalog 來自 [ai.py `_catalog_ks`/`_catalog_op`](../../history.md#source-5a24af6ee35207cfa028) → `knowledge.competencies(ocs_code)`,**一次撈整個 ocs_code 的能力池**再在記憶體切某 task([task_detail.py](../../history.md#source-b3dfe36e79e724504001))。前端每任務各打 recommend-ks + draft-op → **同一個 ocs_code 的整池被重撈 N×2 次**。
+5. `task-candidates` 回應**不帶 K/S/O/P**([documents.py:153](../../history.md#source-ba942110b8bc0294b0b0)、type [CandidateTask](../../history.md#source-8d4d2ca4e1a53b4793d5)),故無法在「選任務當下」直接 push catalog。
 
 ### 權威發現
 - **TkDodo(TanStack Query 維護者)— Seeding the Query Cache**:三種灌快取法 —
@@ -59,7 +61,7 @@
 
 ### 診斷
 - 真正的地雷是**整份文件 PATCH = last-write-wins**:即使沒有 LLM,使用者**開兩個分頁**就會互蓋;LLM 共編更嚴重。
-- `version` 全鏈路都有但**從未當並發守衛**([documents.py:70](../../../apps/api/app/api/routes/documents.py) 不檢查 version)。
+- `version` 全鏈路都有但**從未當並發守衛**([documents.py:70](../../history.md#source-ba942110b8bc0294b0b0) 不檢查 version)。
 - autosave 對**每次** commit 都送 PATCH,改了又改回(內容相同)也送 no-op。
 
 ### 權威發現(人 + LLM 共編一份文件的三層做法)
@@ -70,7 +72,7 @@
 | **CRDT(Yjs/Automerge)** | Figma、Notion | 離線優先、**即時逐字**、P2P | 高(每字 16–32B metadata) |
 
 - **AI 速度問題**(Taskade OT-vs-CRDT):agent 產出比人快 **25–100×**;不論演算法都需 **agent 層批次化 + 限速到人類節奏 + 人類操作優先**。
-- 本專案文件是**高度結構化 JSON**(職責→任務→能力區塊→K/S/O/P 陣列),編輯本就是 [ocsDoc.ts](../../../apps/web/src/lib/ocsDoc.ts) 的離散操作 → 強烈傾向「細粒度操作 + 樂觀並發」,**CRDT/OT 對回合制屬過度設計**。
+- 本專案文件是**高度結構化 JSON**(職責→任務→能力區塊→K/S/O/P 陣列),編輯本就是 [ocsDoc.ts](../../history.md#source-56794f7c4b2e7da3192d) 的離散操作 → 強烈傾向「細粒度操作 + 樂觀並發」,**CRDT/OT 對回合制屬過度設計**。
 
 ### 決策(已與使用者拍板:回合制 → 樂觀並發,不上 CRDT/OT)
 保留現有樂觀更新 + 自動儲存 + `version` 欄位。分兩層,**先 minimal**:
@@ -88,11 +90,11 @@
 ## 3. 叢集二-b:官方項目的「穩定身分」(選單打勾 + 操作/LLM 指名地基)
 
 ### 診斷
-- 項目顯示 `code`(K01/O1.1.1…)是 [ocsDoc.ts:34 `renumberCoded`](../../../apps/web/src/lib/ocsDoc.ts) 依**位置**重寫的序碼,**非穩定身分**。
+- 項目顯示 `code`(K01/O1.1.1…)是 [ocsDoc.ts:34 `renumberCoded`](../../history.md#source-56794f7c4b2e7da3192d) 依**位置**重寫的序碼,**非穩定身分**。
 - 選單「已勾選」判定用 **name** → 同任務內**同名不同項**會一起誤打勾;項目被編輯成自訂後也脫鉤。
 - 穩定身分應為**來源 provenance**:`_ref.ocs_code + _ref.code`(官方原始碼)。
   - **K/S**:來源 catalog 有 `code` ✓。
-  - **O/P**:**indexer 契約 DTO 本就有 code**([indexer-contract `CitableItem.code`](../../../packages/indexer-contract/src/indexer_contract/models.py)、池切片 [task_detail.py:33](../../../apps/api/app/services/knowledge/task_detail.py) 回 `{code,name}`/`{code,text}`),但被丟掉於 ① [ai.py `_catalog_op`](../../../apps/api/app/api/routes/ai.py) 只取 name/text、② draft_op service 變純字串、③ 前端 [useTaskCatalog.ts:32](../../../apps/web/src/hooks/useTaskCatalog.ts) 清成 `code:""`。**→ 不需改 indexer。**
+  - **O/P**:**indexer 契約 DTO 本就有 code**([indexer-contract `CitableItem.code`](../../../packages/indexer-contract/src/indexer_contract/models.py)、池切片 [task_detail.py:33](../../history.md#source-b3dfe36e79e724504001) 回 `{code,name}`/`{code,text}`),但被丟掉於 ① [ai.py `_catalog_op`](../../history.md#source-5a24af6ee35207cfa028) 只取 name/text、② draft_op service 變純字串、③ 前端 [useTaskCatalog.ts:32](../../history.md#source-20995fc7473b5604ab40) 清成 `code:""`。**→ 不需改 indexer。**
 
 ### 決策(設計方向,細節待 plan)
 - **D-2b-1 改 provenance 鍵比對**:`isOfficialSelected` 與相關比對改用 `_ref.ocs_code + _ref.code`,不用 name、不用位置序碼。顯示的位置碼不變。

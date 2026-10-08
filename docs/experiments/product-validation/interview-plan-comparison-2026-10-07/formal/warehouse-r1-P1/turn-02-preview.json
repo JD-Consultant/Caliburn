@@ -1,0 +1,57 @@
+{
+  "job_file_id": "1b57cf46-f5ee-449a-b4c3-fbeeb72540e7",
+  "execution_id": "f26ba9c5-f4b6-4485-8537-b83fd6a9c858",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「這批貨通常會先怎麼處理？例如暫放等通知，或照常上架？」，我目前沒有確定資料，請保留未知，不補猜。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "執行物流中心的收貨驗收、上架、揀貨補貨、庫存盤點與退貨作業，維持倉儲與貨物流轉所需的庫存管理，並帶領新人熟悉工作。"
+    },
+    "work": {
+      "revision_id": "4c83878b-a082-4c43-99d1-88e53b3e6811",
+      "areas": [
+        {
+          "area_id": "462b4119-4c62-414b-8a29-d824e14d2b3d",
+          "title": "收貨與倉儲作業",
+          "scope_text": "負責進貨驗收及貨品上架，並依單據與實收情況處理進貨差異的查核與通知；拒收或退換貨由有權責者決定。"
+        },
+        {
+          "area_id": "1c2db323-4f0a-4fe6-aac0-f56ecc9fb86e",
+          "title": "揀貨補貨與庫存管理",
+          "scope_text": "負責訂單揀貨、補貨及庫存盤點。"
+        },
+        {
+          "area_id": "e967d153-ffda-4656-bd2a-97c415cb7e89",
+          "title": "退貨作業",
+          "scope_text": "處理客戶退貨及供應商退貨。"
+        },
+        {
+          "area_id": "7100fb87-db5b-44f2-8526-adcce546df61",
+          "title": "新人帶教",
+          "scope_text": "帶領新人熟悉倉庫工作。"
+        }
+      ],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": [
+        {
+          "condition_id": "373523b8-26c9-4321-a40e-d1fda970547b",
+          "kind": "schedule_travel",
+          "text": "早上 7 點上班；週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "plan_preview": null,
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

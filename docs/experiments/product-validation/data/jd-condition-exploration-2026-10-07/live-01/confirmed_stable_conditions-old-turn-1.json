@@ -1,0 +1,17 @@
+{
+  "execution_id": "b529a4a3-1dcf-412e-8895-dc78eb7efba4",
+  "exchange": {
+    "employee_input": {
+      "source_id": "ccdbdc33-afd6-4b87-9921-dc1a61398400",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "工作條件、常見問題和忙不忙前面都說過了，確定沒有其他補充。"
+    },
+    "consultant_reply": {
+      "source_id": "133853c9-da4b-4d7a-b220-f283702d93ec",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "了解，我不會再追問工作條件、常見問題或工作量／忙季。\n\n我已把訂單資料登錄與金額核對整理進草稿，補上缺件及錯誤時的處理方式、交主管的結果，以及「本人不核准訂單」的責任界線；也整理了與同事、主管的協作關係。主管交接只寫到你明確說的「交主管」，沒有預設後續用途。\n\n為了確認工作範圍：除了訂單登錄與核對，你是否還固定負責其他工作？如果沒有，直接說「沒有」即可。"
+    }
+  }
+}

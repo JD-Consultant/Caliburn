@@ -1,0 +1,14 @@
+{
+  "employee_text": "這個問題我還沒理解，請用實際工作步驟或責任再具體問一次。",
+  "audit": {
+    "actual_question": "收到，這次先不往下追問。您確認的收貨流程與職責界線維持不變；外包裝破損或受潮時的處理方式，以及其他尚未說明的工作細節，我會保留為待釐清，之後再具體詢問。",
+    "employee_text": "這個問題我還沒理解，請用實際工作步驟或責任再具體問一次。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "clarify",
+    "review_reason": "這段只有確認既有收貨內容與保留待釐清事項，並明說這次先不追問；沒有新的實際問題可供員工回答。依凍結政策，無問題的結論及其他工作摘要不得披露隱藏事實，使用固定澄清回覆且不新增任何 fact。",
+    "omitted_subtopics": []
+  },
+  "actually_submitted": false
+}

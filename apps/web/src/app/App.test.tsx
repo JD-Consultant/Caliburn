@@ -422,6 +422,7 @@ test('cancelling a candidate removes only the preview and keeps the formal JD', 
             input_text: '尚非正式的輸入',
             allowed_controls: cancelled ? [] : ['cancel'],
             commentary: [],
+            plan_preview: null,
             candidate: !cancelled
               ? { profile: { ...emptyProfile.profile, job_title: '候選工程師' }, work: emptyWork }
               : null,
@@ -479,6 +480,7 @@ test('狀態查詢失敗不沿用候選或控制；查回 failed 仍保留正式
               input_text: '尚非正式的輸入',
               allowed_controls: state === 'active' ? ['pause', 'cancel'] : [],
               commentary: [],
+              plan_preview: null,
               candidate:
                 state === 'active'
                   ? {
@@ -580,6 +582,7 @@ test('歷史回答按需確認撤回只送原 Turn，成功重讀正式稿而不
             allowed_controls: [],
             input_text: '不重複顯示',
             commentary: [],
+            plan_preview: null,
             candidate: null,
           }),
         );

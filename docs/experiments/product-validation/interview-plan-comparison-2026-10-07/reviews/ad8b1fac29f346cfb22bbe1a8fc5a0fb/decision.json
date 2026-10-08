@@ -1,0 +1,8 @@
+{
+  "question_id": "ad8b1fac29f346cfb22bbe1a8fc5a0fb",
+  "fact_ids": ["inventory-partial"],
+  "mode": "answer",
+  "reason": "實際初問庫存盤點核對與差異處理，inventory-partial 提供查紀錄與複點並開啟未明權限缺口。尚未披露 training，不能提前提供 inventory-authority。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

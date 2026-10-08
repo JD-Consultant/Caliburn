@@ -1,7 +1,9 @@
-import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { runAppProcesses } from "./app-processes.mjs";
+
+export { runAppProcesses } from "./app-processes.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const allowedModes = new Set(["dev", "start"]);
@@ -14,19 +16,13 @@ export function parseMode(value) {
 }
 
 /**
- * The single backend entry: the loopback server, configured only through explicit environment.
- * Extra arguments (for example `--port 8104`) go to the backend unchanged.
+ * 後端只有此啟動入口；額外參數原樣轉交，設定由明示環境提供。
  */
-export function backendInvocation(root, { keyFileExists, extraArgs = [] }) {
+export function backendInvocation(root, { pythonExecutable, keyFileExists, extraArgs = [] }) {
   const keyFile = path.join(root, "apps", "api", ".env");
   return {
-    command: "uv",
+    command: pythonExecutable,
     args: [
-      "run",
-      "--project",
-      "apps/api",
-      "--locked",
-      "python",
       "apps/api/scripts/run_backend.py",
       ...(keyFileExists ? ["--key-file", keyFile] : []),
       ...extraArgs,
@@ -34,7 +30,29 @@ export function backendInvocation(root, { keyFileExists, extraArgs = [] }) {
   };
 }
 
-/** `start` serves the built UI from the API process; it never builds or guesses a directory. */
+/** 保留 uv run 的鎖定同步與自訂環境；服務啟動後不再依賴 uv wrapper 存活。 */
+export async function prepareBackendPython(root, { env, run = runAppProcesses } = {}) {
+  const result = await run([{
+    command: "uv",
+    args: ["run", "--project", "apps/api", "--locked", "python", "-c",
+      "import json, sys; print(json.dumps(sys.executable))"],
+  }], { cwd: root, env, captureStdout: true });
+  if (result.code !== 0 || result.signal) {
+    throw new Error("Backend environment preparation failed; no App services were started.");
+  }
+  let executable;
+  try {
+    executable = JSON.parse(result.stdout);
+  } catch {
+    // 不從 .venv 或 PATH 猜路徑，避免繞過 uv 選定的專案環境。
+  }
+  if (typeof executable !== "string" || !path.isAbsolute(executable)) {
+    throw new Error("uv did not report an absolute Python executable.");
+  }
+  return executable;
+}
+
+/** start 由 API 提供已建置介面；不在啟動時隱含建置。 */
 export function webBuildDirectory(root, exists = existsSync) {
   const directory = path.join(root, "apps", "web", "dist");
   if (!exists(path.join(directory, "index.html"))) {
@@ -52,46 +70,29 @@ export function frontendDevInvocation(pnpmExecutable) {
   return { command: pnpmExecutable, args };
 }
 
-function run(invocation, env) {
-  return spawn(invocation.command, invocation.args, {
-    cwd: repoRoot,
-    env,
-    stdio: "inherit",
-    windowsHide: true,
-  });
-}
-
 async function main() {
   const mode = parseMode(process.argv[2]);
-  const backend = backendInvocation(repoRoot, {
-    keyFileExists: existsSync(path.join(repoRoot, "apps", "api", ".env")),
-    extraArgs: process.argv.slice(3),
-  });
   const env = { ...process.env };
-  const children = [];
+  let frontend;
 
   if (mode === "start") {
     env.CALIBURN_WEB_BUILD_DIRECTORY = webBuildDirectory(repoRoot);
-    children.push(run(backend, env));
   } else {
     const pnpmExecutable = process.env.npm_execpath;
     if (!pnpmExecutable) {
       throw new Error("Run this launcher through the repository pnpm script.");
     }
-    children.push(run(backend, env), run(frontendDevInvocation(pnpmExecutable), env));
+    frontend = frontendDevInvocation(pnpmExecutable);
   }
 
-  // Ctrl+C reaches every process attached to the terminal, so each child shuts itself down
-  // normally. The launcher only waits, and stops the others once any child has ended.
-  const result = await new Promise((resolve, reject) => {
-    for (const child of children) {
-      child.once("error", reject);
-      child.once("close", (code, signal) => resolve({ code, signal }));
-    }
+  const pythonExecutable = await prepareBackendPython(repoRoot, { env });
+  const backend = backendInvocation(repoRoot, {
+    pythonExecutable,
+    keyFileExists: existsSync(path.join(repoRoot, "apps", "api", ".env")),
+    extraArgs: process.argv.slice(3),
   });
-  for (const child of children) {
-    if (child.exitCode === null && child.signalCode === null) child.kill();
-  }
+  const invocations = frontend ? [backend, frontend] : [backend];
+  const result = await runAppProcesses(invocations, { cwd: repoRoot, env });
   process.exitCode = result.signal ? 1 : (result.code ?? 1);
 }
 

@@ -1,5 +1,7 @@
 # JD 跨輪修改通知與引用：官方依據及本案接法
 
+> 時點說明：本文保留 2026-09-10 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 2026-09-10 查閱；JD-R002/C03；定點研究及接線推薦。效力依 [current register](../../current-decisions.md)。本輪釐清前次新增需求的依據，不把原核心 schema／固定模型測試當成這項能力已通過。
 
 ## 1. 結論與證據界線
@@ -41,7 +43,7 @@
 5. **「通知過」不等於「讀完、理解或同意」。** 版本／區間只表示曾向模型提供哪些文件狀態及資料。純訪談可能未完整讀 JD，`jd_edit` 的結果可能包含新版本，分頁也可能只讀一部分；不能只記最後一個 `jd_read` 版本，便稱整份文件都已讀。前版資訊缺失時明示未知並重新提供 current，不能自動報無改動。
 6. **重新開啟與失敗。** 重試可以重新提供同一份唯讀通知；不得因此重做 JD 寫入。通知組裝或讀保存狀態失敗時回報實際失敗，不讓它悄悄變成「沒有修改」。恢复的歷史通知標其固定版本；本輪仍需取得現況。context 縮減後必要現況也由同一入口提供，不能僅仰賴模型記住壓縮前的片段。
 
-這條路需要有限的 App 接線，框架不會自行認識本案的 JD 資料庫及 revision。現有 [runtime.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/runtime.py) 已以 `request.override(messages=server_compaction_view(...))` 建立當次請求投影；[memory_tools.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/memory_tools.py) 已用同類 middleware 提供版本固定的 Memory guide。**沿用的是正式接點與責任邊界，不是把新通知寫進 Memory guide 或改 Memory 流程。** 新 JD context 必須在 compaction view 之後保持可見；串接順序與 checkpoint 的有限版本狀態要由 Task 3／5 驗證。
+這條路需要有限的 App 接線，框架不會自行認識本案的 JD 資料庫及 revision。現有 [runtime.py](../../history.md#source-6abca657a0ba0b1b8c2f) 已以 `request.override(messages=server_compaction_view(...))` 建立當次請求投影；[memory_tools.py](../../history.md#source-e211e715f832e5077ce5) 已用同類 middleware 提供版本固定的 Memory guide。**沿用的是正式接點與責任邊界，不是把新通知寫進 Memory guide 或改 Memory 流程。** 新 JD context 必須在 compaction view 之後保持可見；串接順序與 checkpoint 的有限版本狀態要由 Task 3／5 驗證。
 
 當前已核對官方機制與 installed source，尚未證明新 JD context 的实际 request、保存、重開與自然模型效果。這些屬施工驗收；不再為同一問題重做廣泛框架比較。Task 3 接線前仍须把比較基準、通知資料覆蓋範圍、呈現預算與恢復分支定成可驗證契約，必要公開 wire 變更沿唯一 SSOT。
 
@@ -56,9 +58,9 @@
 | 追查「誰把這句改掉」 | JD immutable revisions／actual changes／origin | 是修改歷史，不偽裝成訪談證據 |
 | 檢查更正及矛盾 | 既有 Memory 的較新更正與原始問答 | 舊引用不會因仍可開啟就自動取得較新事實的效力 |
 
-現有 [Memory](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/memory.py) 的讀取 view 帶 document／version；同一 `/memory/knowledge.md` 邏輯路徑內容可隨版改變。**目前沒有把裸 Memory path 定成 JD 永久來源引用。** 若往後有需要記錄「AI 當時參考哪一版 Memory」，須帶確切版及範圍並沿原 owner 解析；這是另外的過程依據，不能用來取代原話，也不能宣稱本次已建立該 locator。
+現有 [Memory](../../history.md#source-4de5738ad10690282e8a) 的讀取 view 帶 document／version；同一 `/memory/knowledge.md` 邏輯路徑內容可隨版改變。**目前沒有把裸 Memory path 定成 JD 永久來源引用。** 若往後有需要記錄「AI 當時參考哪一版 Memory」，須帶確切版及範圍並沿原 owner 解析；這是另外的過程依據，不能用來取代原話，也不能宣稱本次已建立該 locator。
 
-[sources.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/sources.py) 的 `conversation:` handle 已綁同文件、checkpoint、起訖 message，驗實際 Saver snapshot；Memory 詳記可導回保存的 source／context windows。沿[工具契約 §8](../../history.md#source-7c936733a27235b5d951)重用這條來源路徑；模型用 App 真正發出的引用，不算行號、不造 source ID、不複製一份原話到 JD 表。
+[sources.py](../../history.md#source-6cce82ed2a02688f99de) 的 `conversation:` handle 已綁同文件、checkpoint、起訖 message，驗實際 Saver snapshot；Memory 詳記可導回保存的 source／context windows。沿[工具契約 §8](../../history.md#source-7c936733a27235b5d951)重用這條來源路徑；模型用 App 真正發出的引用，不算行號、不造 source ID、不複製一份原話到 JD 表。
 
 人工新增的 JD 內容本身有人工變更歷史，但若尚未在訪談說過，不能偽造訪談引用。修改後仍保留的舊 reference 只能作回查線索，不自動替新句背書；未有依據的內容可以明示未知／待釐清，不為了看起來引用完整而硬掛最近一輪聊天。這也是本案已定「保存不等於核准」的延伸。
 

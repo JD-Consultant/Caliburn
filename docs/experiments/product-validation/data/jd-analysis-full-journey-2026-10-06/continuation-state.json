@@ -1,0 +1,25 @@
+{
+  "authorization": "使用者同意總上限 US$0.40／原截止不變；不重跑成功訪談，未知用量預留保留。",
+  "approved_total_limit_usd": "0.40",
+  "started_at": "2026-10-06T14:51:05.227478+00:00",
+  "approved_deadline_at": "2026-10-06T15:51:05.227478+00:00",
+  "start_basis": "earliest product outbound admission; conservatively before first recorded provider count",
+  "journal_sha256": "754d77c04c33144af8b9d816a009fca9e7aefd418a22375d228737682ff7f393",
+  "spent_usd": "0.110215030",
+  "retained_reservations": {
+    "6095f61c-c2bf-4b6a-ae69-4319c09ec7bc": "0.011600000",
+    "fe3feb98-34d0-43dc-852f-68d6666f03bb": "0.015088625",
+    "c82a9b31-ca2a-44f2-9c5a-77119ec05e12": "0.015088625",
+    "0cd5b094-d92d-42eb-969f-cb7b45d3675d": "0.015770000",
+    "31af6330-c207-4acf-9bfe-0e5ab8c96eeb": "0.016154625",
+    "7e48d920-7f10-4780-a060-625c8c837331": "0.012973875",
+    "419c19cc-a3d5-4e2e-9aed-7dbaa10f757d": "0.016341000",
+    "d676278c-9890-4e12-9775-4cb1ac62195a": "0.013277500",
+    "22702e1c-1c00-4edf-8074-9da14ec14da4": "0.016341000",
+    "fa1682bb-1f28-41fa-a363-c0b022acb1e3": "0.016341000",
+    "65266ba0-608e-4345-b6f6-6d5dd0b7267a": "0.017822000"
+  },
+  "occupied_usd": "0.277013280",
+  "failed_execution_id": "d87ed8cb-d8e9-40d8-84ff-2369048d3347",
+  "continued_input": "turn-14-input.json"
+}

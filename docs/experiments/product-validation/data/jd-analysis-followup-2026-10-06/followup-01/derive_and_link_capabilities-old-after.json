@@ -1,0 +1,55 @@
+{
+  "profile": {
+    "revision_id": "f49ae5fa-afac-43d0-9201-6af09a84e645",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依訂單完成正確揀貨，維持庫存作業可追查。"
+    }
+  },
+  "work": {
+    "revision_id": "f49ae5fa-afac-43d0-9201-6af09a84e645",
+    "areas": [
+      {
+        "area_id": "eca1b692-8bc3-41ca-91cf-e9971bb92245",
+        "title": "揀貨與核對",
+        "scope_text": "揀貨、核對品項及回報庫存差異。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "decf0bc8-3c16-4eea-bf8b-e3a1fcbc6410",
+        "area_id": "eca1b692-8bc3-41ca-91cf-e9971bb92245",
+        "title": "揀貨並核對庫存",
+        "description": "依出貨單核對品項及數量，先進先出；異常先比對進出貨與儲位，記錄交主管確認，不自行改帳。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "f49ae5fa-afac-43d0-9201-6af09a84e645",
+    "references": [
+      {
+        "citation_id": "2bad446a-0178-4806-879a-9bda0d8b03d1",
+        "target_label": "任務：揀貨並核對庫存",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "decf0bc8-3c16-4eea-bf8b-e3a1fcbc6410",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

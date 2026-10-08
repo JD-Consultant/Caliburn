@@ -1,0 +1,134 @@
+{
+  "arm": "old",
+  "case_id": "warehouse_environment",
+  "job_file_id": "fadab065-8263-4861-94ca-571593834fc7",
+  "before": {
+    "profile": {
+      "revision_id": "7df0e973-cd88-4552-9c4d-179178807344",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "依已確認的到貨及儲位安排，完成收貨與上架並留下入庫紀錄。"
+      }
+    },
+    "work": {
+      "revision_id": "7df0e973-cd88-4552-9c4d-179178807344",
+      "areas": [
+        {
+          "area_id": "bd3e9f29-08ed-44f4-b3e4-6e45db058016",
+          "title": "收貨與上架",
+          "scope_text": "核對到貨、異常交接及依安排上架。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd",
+          "area_id": "bd3e9f29-08ed-44f4-b3e4-6e45db058016",
+          "title": "搬運並上架貨品",
+          "description": "核對到貨後依安排搬運與上架，掃碼確認品項、貼標籤及登記入庫；自行搬箱最重約十五公斤，堆高機操作須有證照。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "7df0e973-cd88-4552-9c4d-179178807344",
+      "references": [
+        {
+          "citation_id": "ed941f77-9b4f-4d63-8cf8-66d8c2623d26",
+          "target_label": "任務：搬運並上架貨品",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "6aacf1a7-52e3-4f29-a60a-baad074cc46c",
+      "exchange": {
+        "employee_input": {
+          "source_id": "ec7a5c0b-0590-4808-a5e2-019933adeab8",
+          "interview_sequence": 8,
+          "speaker": "employee",
+          "interview_text": "正常做法、交接與目前工作範圍都說過了，我現在想不到其他要補的。你還需要了解什麼嗎？"
+        },
+        "consultant_reply": {
+          "source_id": "34d2fe61-09c7-4f63-b9a4-4f4ca757765b",
+          "interview_sequence": 9,
+          "speaker": "consultant",
+          "interview_text": "目前不用再補其他工作類別；你已說明目前主要就是收貨、核對、搬運與上架，也交代了異常時的處理方式和責任界線。我已先把這些內容整理進底稿，並補上入庫成果、相關協作與所需能力。正式職稱沒有明確確認，所以暫時留白。\n\n只有一個細節想確認，避免把資格狀況寫錯：**你目前已取得堆高機操作證照了嗎？**"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "total_tokens": 0,
+    "outbound_calls": 0,
+    "count_calls": 0,
+    "generation_calls": 0,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 0,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0",
+    "actual_estimated_usd": "0",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0",
+    "cumulative_occupied_usd": "0",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 0.15752839999913704,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 109208,
+    "output_tokens": 6011,
+    "reasoning_tokens": 4098,
+    "cached_input_tokens": 89575,
+    "cache_write_input_tokens": 19612,
+    "total_tokens": 115219,
+    "outbound_calls": 14,
+    "count_calls": 7,
+    "generation_calls": 7,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 109208,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0007",
+    "actual_estimated_usd": "0.006354850",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.007054850",
+    "cumulative_occupied_usd": "0.007054850",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 81.5127266999989,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

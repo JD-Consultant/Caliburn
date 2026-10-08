@@ -1,0 +1,106 @@
+{"case": "warehouse-r1-P1", "turn": 1, "status": "completed", "seconds": 82.0, "spent_usd": "0.026861315"}
+{"review_pending": "2fc1377160744aac90cbf822b04a1f1c", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\2fc1377160744aac90cbf822b04a1f1c\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 2, "status": "completed", "seconds": 55.6, "spent_usd": "0.032165975"}
+{"review_pending": "0223b20855a246deae9108d76e7b1dfb", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\0223b20855a246deae9108d76e7b1dfb\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 3, "status": "completed", "seconds": 26.6, "spent_usd": "0.034074955"}
+{"review_pending": "7aeba37b51f049d382877e431ca34d1a", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\7aeba37b51f049d382877e431ca34d1a\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 4, "status": "completed", "seconds": 43.8, "spent_usd": "0.037355655"}
+{"review_pending": "b44c377c25dd432491f4f90b12d32331", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\b44c377c25dd432491f4f90b12d32331\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 5, "status": "completed", "seconds": 41.9, "spent_usd": "0.044750755"}
+{"review_pending": "7a0801a2f298478c909199ed9894efb3", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\7a0801a2f298478c909199ed9894efb3\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 6, "status": "completed", "seconds": 66.6, "spent_usd": "0.058618925"}
+{"review_pending": "2cd01cdc620446bfb89f1ca0de0cf74c", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\2cd01cdc620446bfb89f1ca0de0cf74c\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 7, "status": "completed", "seconds": 30.9, "spent_usd": "0.064507680"}
+{"review_pending": "34413d9c63e24834b0a98f9ef0461d15", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\34413d9c63e24834b0a98f9ef0461d15\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 8, "status": "completed", "seconds": 48.7, "spent_usd": "0.071402110"}
+{"review_pending": "8b7394944a9046599d63d413d819cf3c", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\8b7394944a9046599d63d413d819cf3c\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 9, "status": "completed", "seconds": 233.0, "spent_usd": "0.100188770"}
+{"review_pending": "dc62499518384893be5670b6253ae7db", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\dc62499518384893be5670b6253ae7db\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 10, "status": "completed", "seconds": 42.0, "spent_usd": "0.110528325"}
+{"review_pending": "0dce9b05be934c72ab0f500aa500e63a", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\0dce9b05be934c72ab0f500aa500e63a\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 11, "status": "completed", "seconds": 129.2, "spent_usd": "0.130520960"}
+{"review_pending": "dedb6b6d367d47d083a1985a5facdd71", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\dedb6b6d367d47d083a1985a5facdd71\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 12, "status": "completed", "seconds": 31.6, "spent_usd": "0.139358370"}
+{"review_pending": "207ada7293cc495e83371bcceaf4c885", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\207ada7293cc495e83371bcceaf4c885\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 13, "status": "completed", "seconds": 29.2, "spent_usd": "0.151623330"}
+{"review_pending": "d0062d530bf44b8a8f68538c1db6ebfe", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\d0062d530bf44b8a8f68538c1db6ebfe\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 14, "status": "completed", "seconds": 147.4, "spent_usd": "0.171231185"}
+{"review_pending": "7d51d1485eb64bc68377a68f974b315c", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\7d51d1485eb64bc68377a68f974b315c\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 15, "status": "completed", "seconds": 273.2, "spent_usd": "0.214945675"}
+{"review_pending": "97c07e3edf2d433abda80b9a6a5bf864", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\97c07e3edf2d433abda80b9a6a5bf864\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 16, "status": "completed", "seconds": 32.4, "spent_usd": "0.237334660"}
+{"review_pending": "20691cf2bc4443ceb8b998f19845162a", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\20691cf2bc4443ceb8b998f19845162a\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 17, "status": "completed", "seconds": 8.3, "spent_usd": "0.245527640"}
+{"review_pending": "e645788710b247faa24c80672f740205", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\e645788710b247faa24c80672f740205\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 18, "status": "completed", "seconds": 77.8, "spent_usd": "0.261864730"}
+{"review_pending": "8e658e3c1b594bf7b4de026236be0c5e", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\8e658e3c1b594bf7b4de026236be0c5e\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 19, "status": "completed", "seconds": 10.2, "spent_usd": "0.262816960"}
+{"case": "warehouse-r1-P1", "turn": 20, "status": "completed", "seconds": 49.3, "spent_usd": "0.267461585"}
+{"case": "warehouse-r1-P2", "turn": 1, "status": "completed", "seconds": 41.1, "spent_usd": "0.272045240"}
+{"review_pending": "198dffd4677241eb8e97da4b4d1512e7", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\198dffd4677241eb8e97da4b4d1512e7\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 2, "status": "completed", "seconds": 79.7, "spent_usd": "0.281580505"}
+{"review_pending": "d37c6533db6c4eb59e9cf5f2e4a001c6", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\d37c6533db6c4eb59e9cf5f2e4a001c6\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 3, "status": "completed", "seconds": 37.2, "spent_usd": "0.285357625"}
+{"review_pending": "6c2b6ac5b8db4f68a5b2eb21629d3ee5", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\6c2b6ac5b8db4f68a5b2eb21629d3ee5\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 4, "status": "completed", "seconds": 10.2, "spent_usd": "0.286293305"}
+{"review_pending": "3026c49f64c24c3ebe9bece2e4ef21c2", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\3026c49f64c24c3ebe9bece2e4ef21c2\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 5, "status": "completed", "seconds": 45.6, "spent_usd": "0.290761085"}
+{"review_pending": "776e38ab592e4515ad89115485456e26", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\776e38ab592e4515ad89115485456e26\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 6, "status": "completed", "seconds": 27.1, "spent_usd": "0.293941700"}
+{"review_pending": "cd7c8d2440164d7ab8f46fedfe7c3123", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\cd7c8d2440164d7ab8f46fedfe7c3123\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 7, "status": "completed", "seconds": 39.3, "spent_usd": "0.298252775"}
+{"review_pending": "fedc87622fc24378ac03affcfac0a534", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\fedc87622fc24378ac03affcfac0a534\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 8, "status": "completed", "seconds": 100.2, "spent_usd": "0.309483730"}
+{"review_pending": "74e8808e48c54a1e8aabd1e60a408f78", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\74e8808e48c54a1e8aabd1e60a408f78\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 9, "status": "completed", "seconds": 10.2, "spent_usd": "0.311462370"}
+{"review_pending": "5c272d4bc0624a579d59e8f04e622462", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\5c272d4bc0624a579d59e8f04e622462\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 10, "status": "completed", "seconds": 52.3, "spent_usd": "0.325565370"}
+{"review_pending": "cbd5b314d8aa46ebbf319e161f98f091", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\cbd5b314d8aa46ebbf319e161f98f091\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 11, "status": "completed", "seconds": 33.7, "spent_usd": "0.335827330"}
+{"review_pending": "aec6ae37014547b59a19867dd3dacc6e", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\aec6ae37014547b59a19867dd3dacc6e\\pending.json"}
+Execution stopped; reconciling its terminal outcome
+Execution stopped; reconciling its terminal outcome
+OSError: [Errno 28] No space left on device
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\append_batch.py", line 118, in <module>
+    asyncio.run(main(), loop_factory=asyncio.SelectorEventLoop)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py", line 205, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py", line 128, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\base_events.py", line 720, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\append_batch.py", line 114, in main
+    await run_batch.main()
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\run_batch.py", line 633, in main
+    await run_case(
+    ...<8 lines>...
+    )
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\run_batch.py", line 498, in run_case
+    result = await journey(
+             ^^^^^^^^^^^^^^
+        client, directory, Employee(profile), turns, guard, app
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\run_batch.py", line 263, in journey
+    save(directory / (stem + "-result.json"), result)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\run_batch.py", line 49, in save
+    path.write_text(
+    ~~~~~~~~~~~~~~~^
+        json.dumps(value, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 28] No space left on device

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReadInterviewPlanArguments",
+  "description": "Read the complete current consultant plan. The App binds the job file and execution; supply no arguments.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [],
+  "properties": {}
+}

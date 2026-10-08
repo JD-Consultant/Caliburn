@@ -1,0 +1,32 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "我已把帶教權責修正為：您觀察新人操作並向組長回報；首次漏掃時讓新人重做並解釋原因，反覆出錯則由組長安排再訓練。新人能否獨立上線由主管核准，您不負責批准。\n\n接著想補清楚補貨流程：揀貨區不足時，您從備貨區補貨後，還需要掃碼或登記移庫嗎？如果需要，您負責到哪一步？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "本題專問補貨後是否掃碼／登記移庫及該處理終點；凍結 picking 僅說備貨區補貨，shelving 的入庫掃碼不能代答補貨移庫細節。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "揀貨區不足時，您從備貨區補貨後，還需要掃碼或登記移庫嗎？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "未提供補貨後的掃碼或移庫登記要求，不由一般上架入庫流程推定。"
+      },
+      {
+        "quote": "如果需要，您負責到哪一步？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "條件承接未提供的補貨移庫記錄工作，沒有本人責任終點的確定資料。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

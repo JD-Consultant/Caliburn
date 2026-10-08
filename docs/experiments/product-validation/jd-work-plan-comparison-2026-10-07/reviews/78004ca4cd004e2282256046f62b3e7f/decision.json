@@ -1,0 +1,26 @@
+{
+  "question_id": "78004ca4cd004e2282256046f62b3e7f",
+  "mode": "answer",
+  "fact_ids": [
+    "receiving"
+  ],
+  "reason": "直接追問收貨數量差異的後續記錄、採購回覆與處理權責，receiving 凍結事實可回答。",
+  "subquestions": [
+    {
+      "quote": "這次您核對單據與實收數量、拍照通知採購後，通常還會追蹤採購的回覆或記錄差異嗎？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "收貨異常表與採購回覆後按結果登記入庫直接相關。"
+    },
+    {
+      "quote": "後續由誰決定如何處理？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "採購回覆補送或接受，本人不決定拒收，提供現有權責界線。"
+    }
+  ]
+}

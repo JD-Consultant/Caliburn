@@ -1,0 +1,26 @@
+{
+  "question_id": "951b6a854001491eaee05684bc0cf505",
+  "mode": "answer",
+  "fact_ids": [
+    "picking"
+  ],
+  "reason": "轉問揀貨啟動單據與完成後交接位置，picking 的出貨波次單及包裝區複核直接回應。",
+  "subquestions": [
+    {
+      "quote": "平常您收到什麼通知或單據後開始揀貨？",
+      "mode": "answer",
+      "fact_ids": [
+        "picking"
+      ],
+      "reason": "按出貨波次單揀貨為已凍結的工作依據。"
+    },
+    {
+      "quote": "揀好後通常交給誰，或放到哪裡？",
+      "mode": "answer",
+      "fact_ids": [
+        "picking"
+      ],
+      "reason": "凍結事實明載交包裝區複核，回答交接對象／位置。"
+    }
+  ]
+}

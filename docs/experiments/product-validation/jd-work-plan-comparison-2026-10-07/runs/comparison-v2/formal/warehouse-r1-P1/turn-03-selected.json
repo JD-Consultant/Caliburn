@@ -1,0 +1,41 @@
+{
+  "question_id": "951b6a854001491eaee05684bc0cf505",
+  "employee_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+  "audit": {
+    "actual_question": "好，我先把外包裝破損或異常時的處理方式保留為未確認，不替您推測，也不再追問這一題。\n\n我們改談揀貨：平常您收到什麼通知或單據後開始揀貨？揀好後通常交給誰，或放到哪裡？",
+    "employee_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+    "fact_ids": [
+      "picking"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "picking"
+    ],
+    "review_mode": "answer",
+    "review_reason": "轉問揀貨啟動單據與完成後交接位置，picking 的出貨波次單及包裝區複核直接回應。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "平常您收到什麼通知或單據後開始揀貨？",
+        "mode": "answer",
+        "fact_ids": [
+          "picking"
+        ],
+        "reason": "按出貨波次單揀貨為已凍結的工作依據。"
+      },
+      {
+        "quote": "揀好後通常交給誰，或放到哪裡？",
+        "mode": "answer",
+        "fact_ids": [
+          "picking"
+        ],
+        "reason": "凍結事實明載交包裝區複核，回答交接對象／位置。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

@@ -50,18 +50,9 @@
 
 ## 5. 搜尋及按需讀取流程
 
-```mermaid
-flowchart TD
-  M[固定版本的員工工作資料] --> Q[多個保留脈絡的查詢]
-  Q --> B[各自廣蒐]
-  B --> R[各自 rerank 並保留候選]
-  R --> U[合併去重 保留所有查詢來源]
-  U --> W[工作內容參考導覽]
-  U --> O[來源職位整體導覽]
-  W --> C[按需讀相關內容及必要上下文]
-  O --> T[按來源讀完整已解析任務目錄]
-  T --> L[其他公版內容 作為待確認線索]
-```
+![歷史候選：公版參考查詢與兩種查閱視角](../diagrams/specs/2026-10-04-public-reference-retrieval-design/public-reference-views.png)
+
+[圖源](../diagrams/specs/2026-10-04-public-reference-retrieval-design/public-reference-views.mmd) · [SVG](../diagrams/specs/2026-10-04-public-reference-retrieval-design/public-reference-views.svg)
 
 整張圖是候選，沒有接入正式顧問。N20／K5 是文件層對照初值，切換成任務群組後不能照搬其品質结論；參數須重新比較。初期不加絕對 cosine／sigmoid 門檻；分數不是責任符合率或完成率。
 

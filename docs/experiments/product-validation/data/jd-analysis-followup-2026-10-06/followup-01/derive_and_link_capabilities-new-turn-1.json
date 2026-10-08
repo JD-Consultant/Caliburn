@@ -1,0 +1,17 @@
+{
+  "execution_id": "4cf363d7-29bd-4bec-987d-f9a118b911e8",
+  "exchange": {
+    "employee_input": {
+      "source_id": "98b00dee-414a-48a1-b07b-118362faac45",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "對，平常就是照這樣做。我不太會講什麼專業能力，就是對單、對貨，有問題先查再記下來給主管。"
+    },
+    "consultant_reply": {
+      "source_id": "2cfa8cce-1fa0-431f-a44a-8679d6ee23b0",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "了解，您做的就是依出貨單核對品名與數量，按先進先出揀貨；遇到實貨和系統不一致時，先查進出貨紀錄與儲位、記下差異，再交主管確認，不自行改數量。我已依這些做法補充工作成果與要求，也把相關知識和技能整理進底稿；您不需要另外替它們命名。\n\n除了揀貨和查核差異，您平常或固定週期還會負責哪些工作？例如收貨、上架、盤點、包裝或出貨交接。"
+    }
+  }
+}

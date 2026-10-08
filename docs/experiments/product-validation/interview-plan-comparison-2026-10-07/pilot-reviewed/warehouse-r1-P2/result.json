@@ -1,0 +1,66 @@
+{
+  "file_id": "7f37bf62-7bd1-43f8-962f-7bcd42c0b8a3",
+  "turns": [
+    {
+      "turn": 1,
+      "status": "completed",
+      "elapsed_seconds": 66.60498380000354
+    },
+    {
+      "turn": 2,
+      "status": "completed",
+      "elapsed_seconds": 77.11295269998664
+    },
+    {
+      "turn": 3,
+      "status": "completed",
+      "elapsed_seconds": 22.55045509999036
+    },
+    {
+      "turn": 4,
+      "status": "completed",
+      "elapsed_seconds": 62.70316050000838
+    },
+    {
+      "turn": 5,
+      "status": "completed",
+      "elapsed_seconds": 16.463390799995977
+    }
+  ],
+  "stop": "batch_resource_stop",
+  "closure_submitted": false,
+  "natural_completion_verified": false,
+  "guard": {
+    "spent_usd": "0.057428625",
+    "occupied_usd": "0.057428625",
+    "retained_reservations": {},
+    "generations": 80,
+    "compacts": 0,
+    "outbound": 175,
+    "counted_input": 1690141,
+    "stop_reason": "batch generation attempt limit reached"
+  },
+  "memory_settlement": {
+    "completed": 7,
+    "failed": 1
+  },
+  "measurements": {
+    "input_tokens": 945853,
+    "output_tokens": 42451,
+    "counts": 67,
+    "max_counted_input": 42423,
+    "generation_attempts": 58,
+    "compact_attempts": 0,
+    "roles": {
+      "A": {
+        "input_tokens": 549664,
+        "output_tokens": 22412
+      },
+      "Memory": {
+        "input_tokens": 396189,
+        "output_tokens": 20039
+      }
+    },
+    "A_compact_adoptions": []
+  }
+}

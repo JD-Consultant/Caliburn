@@ -1,0 +1,1274 @@
+[
+  {
+    "at": 1791279076.5302248,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.5302272,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明\"}"
+  },
+  {
+    "at": 1791279076.543827,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.5438282,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白\"}"
+  },
+  {
+    "at": 1791279076.5518646,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.551866,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：\"}"
+  },
+  {
+    "at": 1791279076.555578,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.555579,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你\"}"
+  },
+  {
+    "at": 1791279076.5681436,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.5681448,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會\"}"
+  },
+  {
+    "at": 1791279076.5858738,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.585875,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核\"}"
+  },
+  {
+    "at": 1791279076.635758,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.6357596,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對\"}"
+  },
+  {
+    "at": 1791279076.6358294,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.63583,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採\"}"
+  },
+  {
+    "at": 1791279076.6705463,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.6705477,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購\"}"
+  },
+  {
+    "at": 1791279076.6740758,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.6740775,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單\"}"
+  },
+  {
+    "at": 1791279076.674959,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.67496,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、\"}"
+  },
+  {
+    "at": 1791279076.68128,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.6812813,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送\"}"
+  },
+  {
+    "at": 1791279076.7427762,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.7427773,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨\"}"
+  },
+  {
+    "at": 1791279076.7548919,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.7548928,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單\"}"
+  },
+  {
+    "at": 1791279076.807892,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.8078933,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與\"}"
+  },
+  {
+    "at": 1791279076.8306663,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.8306675,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實\"}"
+  },
+  {
+    "at": 1791279076.847804,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.8478057,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收\"}"
+  },
+  {
+    "at": 1791279076.8525913,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.8525927,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數\"}"
+  },
+  {
+    "at": 1791279076.856779,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.85678,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量\"}"
+  },
+  {
+    "at": 1791279076.8578286,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.8578293,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，\"}"
+  },
+  {
+    "at": 1791279076.8610477,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.861049,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍\"}"
+  },
+  {
+    "at": 1791279076.86501,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.8650112,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照\"}"
+  },
+  {
+    "at": 1791279076.8675382,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.867539,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並\"}"
+  },
+  {
+    "at": 1791279076.878837,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.8788378,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知\"}"
+  },
+  {
+    "at": 1791279076.888934,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.8889349,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採\"}"
+  },
+  {
+    "at": 1791279076.8913372,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.8913386,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購\"}"
+  },
+  {
+    "at": 1791279076.897413,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.897415,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；\"}"
+  },
+  {
+    "at": 1791279076.9038484,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9038498,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒\"}"
+  },
+  {
+    "at": 1791279076.916739,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9167407,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收\"}"
+  },
+  {
+    "at": 1791279076.916801,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9168015,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或\"}"
+  },
+  {
+    "at": 1791279076.9223785,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9223797,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退\"}"
+  },
+  {
+    "at": 1791279076.9281573,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9281588,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換\"}"
+  },
+  {
+    "at": 1791279076.9385772,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.938579,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨\"}"
+  },
+  {
+    "at": 1791279076.9477148,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.947716,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由\"}"
+  },
+  {
+    "at": 1791279076.9516585,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9516594,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採\"}"
+  },
+  {
+    "at": 1791279076.9555697,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9555707,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購\"}"
+  },
+  {
+    "at": 1791279076.9586556,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9586565,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決\"}"
+  },
+  {
+    "at": 1791279076.9638069,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9638083,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定\"}"
+  },
+  {
+    "at": 1791279076.971237,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9712386,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我\"}"
+  },
+  {
+    "at": 1791279076.9732869,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9732878,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先\"}"
+  },
+  {
+    "at": 1791279076.9763424,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9763436,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對\"}"
+  },
+  {
+    "at": 1791279076.9833815,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9833825,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照\"}"
+  },
+  {
+    "at": 1791279076.998948,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279076.9989493,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前\"}"
+  },
+  {
+    "at": 1791279077.003871,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.0038722,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已\"}"
+  },
+  {
+    "at": 1791279077.0100825,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.0100837,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理\"}"
+  },
+  {
+    "at": 1791279077.0223029,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.022304,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的\"}"
+  },
+  {
+    "at": 1791279077.0223553,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.022356,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉\"}"
+  },
+  {
+    "at": 1791279077.0276716,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.0276725,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲\"}"
+  },
+  {
+    "at": 1791279077.0315807,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.0315819,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作\"}"
+  },
+  {
+    "at": 1791279077.033498,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.0334992,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項\"}"
+  },
+  {
+    "at": 1791279077.0417564,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.0417576,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目\"}"
+  },
+  {
+    "at": 1791279077.0467691,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.0467699,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再\"}"
+  },
+  {
+    "at": 1791279077.049201,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.049202,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把\"}"
+  },
+  {
+    "at": 1791279077.051739,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.05174,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的\"}"
+  },
+  {
+    "at": 1791279077.0596511,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.059653,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查\"}"
+  },
+  {
+    "at": 1791279077.1231859,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.1231873,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核\"}"
+  },
+  {
+    "at": 1791279077.134899,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.1349003,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核與\"}"
+  },
+  {
+    "at": 1791279077.5879712,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.5879726,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核與責\"}"
+  },
+  {
+    "at": 1791279077.5942843,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.594286,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核與責任\"}"
+  },
+  {
+    "at": 1791279077.5955646,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.5955653,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核與責任界\"}"
+  },
+  {
+    "at": 1791279077.5956237,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.5956242,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核與責任界線\"}"
+  },
+  {
+    "at": 1791279077.5956705,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.5956707,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核與責任界線記\"}"
+  },
+  {
+    "at": 1791279077.5971727,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.5971737,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核與責任界線記清\"}"
+  },
+  {
+    "at": 1791279077.5974166,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.597417,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核與責任界線記清楚\"}"
+  },
+  {
+    "at": 1791279077.597585,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279077.5975866,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"7984b8a3-3857-429e-ad46-471e9f162f12\",\"response_id\":\"resp_00933d1a394bb439016ac4bfe2cb0c87d0b584ba4a65b3894f\",\"message_id\":\"msg_00933d1a394bb439016ac4bfe6469087d089a7eaa93b1e7495\",\"text\":\"明白：你會核對採購單、送貨單與實收數量，拍照並通知採購；拒收或退換貨由採購決定。我先對照目前已整理的倉儲工作項目，再把你的查核與責任界線記清楚。\"}"
+  },
+  {
+    "at": 1791279091.2241905,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.2241921,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI\"}"
+  },
+  {
+    "at": 1791279091.2269945,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.226996,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need\"}"
+  },
+  {
+    "at": 1791279091.258087,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.258088,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to\"}"
+  },
+  {
+    "at": 1791279091.266591,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.266592,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm\"}"
+  },
+  {
+    "at": 1791279091.287217,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.2872179,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the\"}"
+  },
+  {
+    "at": 1791279091.306983,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.306984,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final\"}"
+  },
+  {
+    "at": 1791279091.3270864,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.3270876,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer\"}"
+  },
+  {
+    "at": 1791279091.347431,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.3474321,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and\"}"
+  },
+  {
+    "at": 1791279091.3553264,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.3553276,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask\"}"
+  },
+  {
+    "at": 1791279091.3660254,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.3660288,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another\"}"
+  },
+  {
+    "at": 1791279091.372733,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.3727345,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question\"}"
+  },
+  {
+    "at": 1791279091.3871107,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.3871117,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to\"}"
+  },
+  {
+    "at": 1791279091.3962739,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.396275,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand\"}"
+  },
+  {
+    "at": 1791279091.4141934,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.4141946,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on\"}"
+  },
+  {
+    "at": 1791279091.4286528,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.4286542,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the\"}"
+  },
+  {
+    "at": 1791279091.4361103,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.4361112,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job\"}"
+  },
+  {
+    "at": 1791279091.4506094,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.4506106,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's\"}"
+  },
+  {
+    "at": 1791279091.4656472,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.4656484,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth\"}"
+  },
+  {
+    "at": 1791279091.4742546,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.4742553,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth.\"}"
+  },
+  {
+    "at": 1791279091.4974794,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.4974809,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The\"}"
+  },
+  {
+    "at": 1791279091.507814,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.507815,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis\"}"
+  },
+  {
+    "at": 1791279091.5172958,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.5172992,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates\"}"
+  },
+  {
+    "at": 1791279091.5486495,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.5486505,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple\"}"
+  },
+  {
+    "at": 1791279091.575247,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.5752485,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles\"}"
+  },
+  {
+    "at": 1791279091.5936992,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.593701,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are\"}"
+  },
+  {
+    "at": 1791279091.6031766,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.603178,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed\"}"
+  },
+  {
+    "at": 1791279091.6328704,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.6328719,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed.\"}"
+  },
+  {
+    "at": 1791279091.637623,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.6376243,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I\"}"
+  },
+  {
+    "at": 1791279091.6463444,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.6463463,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve\"}"
+  },
+  {
+    "at": 1791279091.6556437,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.655645,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already\"}"
+  },
+  {
+    "at": 1791279091.6708345,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.670836,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed\"}"
+  },
+  {
+    "at": 1791279091.678357,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.6783583,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one\"}"
+  },
+  {
+    "at": 1791279091.6898031,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.6898043,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect\"}"
+  },
+  {
+    "at": 1791279091.707059,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.7070599,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect,\"}"
+  },
+  {
+    "at": 1791279091.7133167,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.7133176,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but\"}"
+  },
+  {
+    "at": 1791279091.7230253,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.7230272,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I\"}"
+  },
+  {
+    "at": 1791279091.7393332,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.739334,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should\"}"
+  },
+  {
+    "at": 1791279091.7597618,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.7597632,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire\"}"
+  },
+  {
+    "at": 1791279091.7797434,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.779745,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about\"}"
+  },
+  {
+    "at": 1791279091.8033805,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.8033817,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the\"}"
+  },
+  {
+    "at": 1791279091.809672,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.8096733,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual\"}"
+  },
+  {
+    "at": 1791279091.8224723,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.8224738,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine\"}"
+  },
+  {
+    "at": 1791279091.8360612,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.8360622,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities\"}"
+  },
+  {
+    "at": 1791279091.844346,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.8443475,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities.\"}"
+  },
+  {
+    "at": 1791279091.8528235,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.8528292,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically\"}"
+  },
+  {
+    "at": 1791279091.861248,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.861249,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically,\"}"
+  },
+  {
+    "at": 1791279091.86809,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.8680906,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I\"}"
+  },
+  {
+    "at": 1791279091.8836462,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.8836474,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder\"}"
+  },
+  {
+    "at": 1791279091.9010947,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.9010959,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if\"}"
+  },
+  {
+    "at": 1791279091.9101918,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.910193,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they\"}"
+  },
+  {
+    "at": 1791279091.9220865,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.9220877,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle\"}"
+  },
+  {
+    "at": 1791279091.9414327,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.9414356,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system\"}"
+  },
+  {
+    "at": 1791279091.9480128,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.948014,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry\"}"
+  },
+  {
+    "at": 1791279091.9566154,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.9566162,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and\"}"
+  },
+  {
+    "at": 1791279091.9651375,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.9651384,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and put\"}"
+  },
+  {
+    "at": 1791279091.98932,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.9893212,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway\"}"
+  },
+  {
+    "at": 1791279091.9991903,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279091.9991915,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks\"}"
+  },
+  {
+    "at": 1791279092.0293362,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.0293376,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks.\"}"
+  },
+  {
+    "at": 1791279092.092065,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.0920665,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It\"}"
+  },
+  {
+    "at": 1791279092.1210742,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.1210756,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s\"}"
+  },
+  {
+    "at": 1791279092.1370597,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.1370614,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial\"}"
+  },
+  {
+    "at": 1791279092.1534975,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.153499,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to\"}"
+  },
+  {
+    "at": 1791279092.1624918,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.1624935,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask\"}"
+  },
+  {
+    "at": 1791279092.171994,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.1719956,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how\"}"
+  },
+  {
+    "at": 1791279092.179133,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.1791344,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they\"}"
+  },
+  {
+    "at": 1791279092.1964731,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.1964743,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage\"}"
+  },
+  {
+    "at": 1791279092.2041044,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.2041056,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the\"}"
+  },
+  {
+    "at": 1791279092.2171404,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.2171414,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods\"}"
+  },
+  {
+    "at": 1791279092.2416246,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.2416258,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after\"}"
+  },
+  {
+    "at": 1791279092.2489138,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.2489164,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving\"}"
+  },
+  {
+    "at": 1791279092.2627294,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.2627308,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them\"}"
+  },
+  {
+    "at": 1791279092.2705255,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.2705266,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them,\"}"
+  },
+  {
+    "at": 1791279092.2784457,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.278447,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so\"}"
+  },
+  {
+    "at": 1791279092.2860303,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.2860312,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I\"}"
+  },
+  {
+    "at": 1791279092.2936735,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.293675,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll\"}"
+  },
+  {
+    "at": 1791279092.3031886,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.3031898,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame\"}"
+  },
+  {
+    "at": 1791279092.3179944,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.317995,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the\"}"
+  },
+  {
+    "at": 1791279092.3368895,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.336891,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions\"}"
+  },
+  {
+    "at": 1791279092.3431919,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.343193,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around\"}"
+  },
+  {
+    "at": 1791279092.376994,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.3769953,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their\"}"
+  },
+  {
+    "at": 1791279092.3983257,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.398327,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps\"}"
+  },
+  {
+    "at": 1791279092.4228146,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.422816,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and\"}"
+  },
+  {
+    "at": 1791279092.43323,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.433231,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any\"}"
+  },
+  {
+    "at": 1791279092.44865,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.4486513,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated\"}"
+  },
+  {
+    "at": 1791279092.4580672,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.4580681,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems\"}"
+  },
+  {
+    "at": 1791279092.4677887,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.4677901,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems.\"}"
+  },
+  {
+    "at": 1791279092.4719157,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.471917,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems. I'll\"}"
+  },
+  {
+    "at": 1791279092.4821463,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.482147,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems. I'll make\"}"
+  },
+  {
+    "at": 1791279092.4943125,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.494314,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems. I'll make sure\"}"
+  },
+  {
+    "at": 1791279092.5219274,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.5219305,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems. I'll make sure to\"}"
+  },
+  {
+    "at": 1791279092.531697,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.5316985,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems. I'll make sure to capture\"}"
+  },
+  {
+    "at": 1791279092.5640926,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.5640936,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems. I'll make sure to capture everything\"}"
+  },
+  {
+    "at": 1791279092.5723808,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.5723817,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems. I'll make sure to capture everything effectively\"}"
+  },
+  {
+    "at": 1791279092.5813696,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279092.5813706,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4bff0a88887d0b803a37b6f54ca33\",\"item_id\":\"rs_00933d1a394bb439016ac4bff1f1e487d0956466c36b78fcdd\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying job responsibilities**\\n\\nI need to confirm the final answer and ask another question to expand on the job's breadth. The analysis indicates multiple roles are needed. I’ve already detailed one aspect, but I should inquire about the actual routine responsibilities. Specifically, I wonder if they handle system entry and putaway tasks. It’s crucial to ask how they manage the goods after receiving them, so I’ll frame the questions around their steps and any associated systems. I'll make sure to capture everything effectively.\"}"
+  }
+]

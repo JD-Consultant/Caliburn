@@ -1,0 +1,31 @@
+{
+  "actual_question": "收到，已記下依規劃儲位上架、貼標、以 WMS 登記並核對儲位，以及位置不足時找組長調整；超重貨由持證同事操作堆高機。您是否親自推棧板車這點仍未確認，我先不推測。\n\n一年中有沒有特別忙的時段，會明顯增加您的工作量或改變完成時限？",
+  "employee_text": "雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。",
+  "fact_ids": [
+    "peak-season"
+  ],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [
+    "peak-season"
+  ],
+  "review_mode": "answer",
+  "review_reason": "問題聚焦一年中特別繁忙時段及工作量／時序影響，peak-season 的雙十一與春節前出貨增量和波次順序直接相關；不是一般年度工作廣度提問。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": false,
+  "subquestions": [
+    {
+      "quote": "一年中有沒有特別忙的時段，會明顯增加您的工作量或改變完成時限？",
+      "mode": "answer",
+      "fact_ids": [
+        "peak-season"
+      ],
+      "reason": "雙十一和春節前出貨約兩倍、依組長急單與波次調整順序並交班，能回答所問尖峰負荷與工作安排。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "577f44fa-542f-431b-8428-5e510212ea18",
+  "accepted_source_id": "df3ca181-cfa0-49c6-b3c9-db17a66af9de"
+}

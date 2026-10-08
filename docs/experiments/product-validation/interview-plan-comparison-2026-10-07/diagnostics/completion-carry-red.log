@@ -1,0 +1,113 @@
+......................FF.FFFFF                                           [100%]
+================================== FAILURES ===================================
+___ test_supplement_preloads_all_consumption_and_keeps_unknown_reservation ____
+
+    def test_supplement_preloads_all_consumption_and_keeps_unknown_reservation():
+        from datetime import timedelta
+        from decimal import Decimal
+    
+        prior = accounting()
+        guard = carried_guard(prior, now=DEADLINE - timedelta(seconds=90), clock=lambda: 100)
+>       assert guard.spent == Decimal(prior["spent_usd"])
+E       AssertionError: assert Decimal('0') == Decimal('0.25')
+E        +  where Decimal('0') = <guard.BatchGuard object at 0x00000131E6E157F0>.spent
+E        +  and   Decimal('0.25') = <class 'decimal.Decimal'>('0.25')
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:122: AssertionError
+_____ test_supplement_constructor_delay_does_not_extend_absolute_deadline _____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000131E6D27820>
+
+    def test_supplement_constructor_delay_does_not_extend_absolute_deadline(monkeypatch):
+        import sys
+        from datetime import timedelta
+        from pathlib import Path
+    
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        import guard as experiment_guard
+    
+        current = [100]
+        original = experiment_guard.BatchGuard
+    
+        def delayed(**kwargs):
+            current[0] += 120
+            return original(**kwargs)
+    
+        monkeypatch.setattr(experiment_guard, "BatchGuard", delayed)
+        guard = carried_guard(accounting(), now=DEADLINE - timedelta(seconds=90), clock=lambda: current[0])
+>       with pytest.raises(RuntimeError, match="deadline reached"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:148: Failed
+_ test_supplement_exhausted_total_counter_is_rejected_before_dispatch[generations-max_generations] _
+
+counter = 'generations', limit = 'max_generations'
+
+    @pytest.mark.parametrize("counter,limit", [("generations", "max_generations"), ("compacts", "max_compacts"), ("outbound", "max_outbound"), ("counted_input", "max_counted_input")])
+    def test_supplement_exhausted_total_counter_is_rejected_before_dispatch(counter, limit):
+        from datetime import timedelta
+    
+>       with pytest.raises(ValueError, match="Supplement .* exhausted"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:161: Failed
+_ test_supplement_exhausted_total_counter_is_rejected_before_dispatch[compacts-max_compacts] _
+
+counter = 'compacts', limit = 'max_compacts'
+
+    @pytest.mark.parametrize("counter,limit", [("generations", "max_generations"), ("compacts", "max_compacts"), ("outbound", "max_outbound"), ("counted_input", "max_counted_input")])
+    def test_supplement_exhausted_total_counter_is_rejected_before_dispatch(counter, limit):
+        from datetime import timedelta
+    
+>       with pytest.raises(ValueError, match="Supplement .* exhausted"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:161: Failed
+_ test_supplement_exhausted_total_counter_is_rejected_before_dispatch[outbound-max_outbound] _
+
+counter = 'outbound', limit = 'max_outbound'
+
+    @pytest.mark.parametrize("counter,limit", [("generations", "max_generations"), ("compacts", "max_compacts"), ("outbound", "max_outbound"), ("counted_input", "max_counted_input")])
+    def test_supplement_exhausted_total_counter_is_rejected_before_dispatch(counter, limit):
+        from datetime import timedelta
+    
+>       with pytest.raises(ValueError, match="Supplement .* exhausted"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:161: Failed
+_ test_supplement_exhausted_total_counter_is_rejected_before_dispatch[counted_input-max_counted_input] _
+
+counter = 'counted_input', limit = 'max_counted_input'
+
+    @pytest.mark.parametrize("counter,limit", [("generations", "max_generations"), ("compacts", "max_compacts"), ("outbound", "max_outbound"), ("counted_input", "max_counted_input")])
+    def test_supplement_exhausted_total_counter_is_rejected_before_dispatch(counter, limit):
+        from datetime import timedelta
+    
+>       with pytest.raises(ValueError, match="Supplement .* exhausted"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:161: Failed
+________________ test_supplement_usd_limit_cannot_be_extended _________________
+
+    def test_supplement_usd_limit_cannot_be_extended():
+        from datetime import timedelta
+    
+>       with pytest.raises(ValueError, match="USD budget"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:168: Failed
+=========================== short test summary info ===========================
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_supplement_preloads_all_consumption_and_keeps_unknown_reservation
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_supplement_constructor_delay_does_not_extend_absolute_deadline
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_supplement_exhausted_total_counter_is_rejected_before_dispatch[generations-max_generations]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_supplement_exhausted_total_counter_is_rejected_before_dispatch[compacts-max_compacts]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_supplement_exhausted_total_counter_is_rejected_before_dispatch[outbound-max_outbound]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_supplement_exhausted_total_counter_is_rejected_before_dispatch[counted_input-max_counted_input]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_supplement_usd_limit_cannot_be_extended
+7 failed, 23 passed in 0.50s

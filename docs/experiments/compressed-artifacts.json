@@ -64,6 +64,70 @@
       "sha256": "2b7af98eb408a5f854dd1e61d03b8d095dae75a1498403cba290b605b03b3ec6",
       "archive_bytes": 4709872,
       "archive_sha256": "594cbe89a6e22dc311b483b8f6273d4d2ad0f68f34c7f85e3256d39c885b3fe1"
+    },
+    {
+      "path": "docs/experiments/product-validation/data/full-interview-rag-2026-10-06/provider-trace.jsonl",
+      "archive": "docs/experiments/product-validation/data/full-interview-rag-2026-10-06/provider-trace.jsonl.gz",
+      "bytes": 21483957,
+      "sha256": "856e693bd1c94a22ec08681e2cbe795caddc4bdb69693125efd8411975144b84",
+      "archive_bytes": 3019892,
+      "archive_sha256": "2ba67dea7bcf15d93a7d6a0b0ab1b7f0444be0e5e2776d83c5105f051a7d38ce"
+    },
+    {
+      "path": "docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P1/checkpoint-witness.jsonl",
+      "archive": "docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P1/checkpoint-witness.jsonl.gz",
+      "bytes": 159552855,
+      "sha256": "5d80fc4688994462f6b943e318f7aed6fbad2a573b6eba1b2c040bb98645a3dc",
+      "archive_bytes": 38898140,
+      "archive_sha256": "d24871cea4817877cb202c6880000cc98dae7fb7ce412f5f6d38abe340d43c34"
+    },
+    {
+      "path": "docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P1/provider-trace.jsonl",
+      "archive": "docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P1/provider-trace.jsonl.gz",
+      "bytes": 63926926,
+      "sha256": "5d06f33e5fedaf926606a4d98726bda6c234fb66690b3c13f6b3e501504952e6",
+      "archive_bytes": 11381145,
+      "archive_sha256": "dc02990a73fe3425378d876badc467a9a02cec102599243d0d191b01a183f98f"
+    },
+    {
+      "path": "docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P2/checkpoint-witness.jsonl",
+      "archive": "docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P2/checkpoint-witness.jsonl.gz",
+      "bytes": 45764105,
+      "sha256": "4b4af6e36b5f89836fa74118a96c40df7ad6de83ecc8434949140b9ccaf9d4a8",
+      "archive_bytes": 9365506,
+      "archive_sha256": "d48df86e04ea1dea5510f1b28a948ccd57217c134773293644712e0816fb12e9"
+    },
+    {
+      "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P1/checkpoint-witness.jsonl",
+      "archive": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P1/checkpoint-witness.jsonl.gz",
+      "bytes": 159656491,
+      "sha256": "1dfe5478858fe6a1bad93a323a7f7f4a9ad6bf1e685705a98fccb4c5afe95039",
+      "archive_bytes": 34455395,
+      "archive_sha256": "a7ca99c1aac6cee9960ad43bbe456cab189a2c051537a83a91c3915c8d106ef2"
+    },
+    {
+      "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P1/provider-trace.jsonl",
+      "archive": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P1/provider-trace.jsonl.gz",
+      "bytes": 69109228,
+      "sha256": "54987e017bf75890179eb8b8e17b8af431ae7d6739d4a2d5925c3ab2afe56e24",
+      "archive_bytes": 11117486,
+      "archive_sha256": "4756ccb8650b2ded368fa5a68a36b98d4b0cc81f1db2329d12d592c7f8b1831b"
+    },
+    {
+      "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P2/checkpoint-witness.jsonl",
+      "archive": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P2/checkpoint-witness.jsonl.gz",
+      "bytes": 244898057,
+      "sha256": "2676eb20092fe9f048a102666e831e0d85831b1db4d019000088c818e059b185",
+      "archive_bytes": 40879025,
+      "archive_sha256": "ad3a8bfa741caeaab0b6c0488d41c89e5faf22a21f3ac940521f449f5bff8d46"
+    },
+    {
+      "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P2/provider-trace.jsonl",
+      "archive": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P2/provider-trace.jsonl.gz",
+      "bytes": 80826589,
+      "sha256": "c457902a1c270b8b50a1300563f5dcd7ab7988f30a6cd923ba92bf07fe74f293",
+      "archive_bytes": 12195582,
+      "archive_sha256": "ffbdc18b4775dcddee140f50feae09620225fd09483bf60fed911805bafefc6c"
     }
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "execution_id": "79c49151-6a5d-45d3-82e2-08bf66a56a5c",
+  "exchange": {
+    "employee_input": {
+      "source_id": "e7d58a50-6e6b-4477-8c03-3f10c7ce1339",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "堆高機用在哪些作業我還是想不起來，不要再問這個了。其他事情我可以試著說。"
+    },
+    "consultant_reply": {
+      "source_id": "6cc5beda-b1f0-4a9d-9113-e6adaf2a5d1a",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "了解，堆高機用在哪些作業先保留為未確認，我不會再問這個細節。先談入庫登記：你通常依據什麼資料登記，並把哪些內容記到哪裡？"
+    }
+  }
+}

@@ -57,6 +57,7 @@ test('點基本資料的欄位就地逐欄修改、局部清空、重開、鍵�
 
   // Keyboard: the hidden edit button opens the editor with focus in it; Esc puts focus back on the button.
   const editTitle = editor.getByRole('button', { name: '修改職務名稱' });
+  await expect(editTitle).toHaveAttribute('aria-disabled', 'false');
   await editTitle.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('textbox', { name: '職務名稱' })).toBeFocused();

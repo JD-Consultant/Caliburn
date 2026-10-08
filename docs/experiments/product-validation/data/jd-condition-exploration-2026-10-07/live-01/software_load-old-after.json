@@ -1,0 +1,144 @@
+{
+  "profile": {
+    "revision_id": "65a5557c-a41f-4ceb-b572-7b86a970523c",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "處理已回報的網站前端問題，供測試驗證及客服追蹤。"
+    }
+  },
+  "work": {
+    "revision_id": "65a5557c-a41f-4ceb-b572-7b86a970523c",
+    "areas": [
+      {
+        "area_id": "c084482f-d9dc-45ed-b94d-a3259098d585",
+        "title": "網站前端維護",
+        "scope_text": "重現、修正及回報前端問題，後端由同事負責。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "541a5c3e-6ac3-477d-a56e-4eb04ce79aae",
+        "area_id": "c084482f-d9dc-45ed-b94d-a3259098d585",
+        "title": "處理前端問題單",
+        "description": "在辦公室使用問題單系統及版本控制，依客服提供的畫面與操作步驟重現並修正本人負責的前端問題；後端問題交同事處理。收到回報後十二小時內回覆初步判斷；修正後交由測試同事驗證，測試通過並回報結果給客服後結束處理；產品主管決定是否發布。",
+        "outcomes": [
+          {
+            "detail_id": "5c62b970-f27e-41d7-8c2d-249b081a1432",
+            "text": "修正本人負責的前端問題，交由測試同事驗證，並將處理結果回報客服。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "76528a77-6631-474a-89f7-18e2b8b2399b",
+            "text": "收到問題回報後十二小時內回覆初步判斷；此時限不代表須於十二小時內修復。"
+          },
+          {
+            "detail_id": "2bf8aded-d282-47b9-9129-69bc6021a17f",
+            "text": "測試通過並將結果回報客服後，才結束該問題的處理。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "65a5557c-a41f-4ceb-b572-7b86a970523c",
+    "references": [
+      {
+        "citation_id": "c3f3ed8a-3576-4a9e-95a2-32e9d2598245",
+        "target_label": "任務：處理前端問題單",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "541a5c3e-6ac3-477d-a56e-4eb04ce79aae",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "5bfe4f4a-f696-45ff-86ee-fbd0631f7539",
+        "target_label": "任務：處理前端問題單",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "541a5c3e-6ac3-477d-a56e-4eb04ce79aae",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "abb5fe5c-4ee5-4a1d-9078-38c9362c3992",
+        "target_label": "任務：處理前端問題單 · 成果：修正本人負責的前端問題，交由測試同事驗證，並將處理結果回報客服。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "5c62b970-f27e-41d7-8c2d-249b081a1432",
+          "task_id": "541a5c3e-6ac3-477d-a56e-4eb04ce79aae"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "66459374-ca08-4d81-ac03-a084d9ac6ca6",
+        "target_label": "任務：處理前端問題單 · 成果：修正本人負責的前端問題，交由測試同事驗證，並將處理結果回報客服。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "5c62b970-f27e-41d7-8c2d-249b081a1432",
+          "task_id": "541a5c3e-6ac3-477d-a56e-4eb04ce79aae"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "e89a984d-25e3-4353-93e1-417d4fa53b68",
+        "target_label": "任務：處理前端問題單 · 要求：收到問題回報後十二小時內回覆初步判斷；此時限不代表須於十二小時內修復。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "76528a77-6631-474a-89f7-18e2b8b2399b",
+          "task_id": "541a5c3e-6ac3-477d-a56e-4eb04ce79aae"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "2c1aa6bb-4d0a-4571-a71a-6d3f1737ea69",
+        "target_label": "任務：處理前端問題單 · 要求：測試通過並將結果回報客服後，才結束該問題的處理。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "2bf8aded-d282-47b9-9129-69bc6021a17f",
+          "task_id": "541a5c3e-6ac3-477d-a56e-4eb04ce79aae"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

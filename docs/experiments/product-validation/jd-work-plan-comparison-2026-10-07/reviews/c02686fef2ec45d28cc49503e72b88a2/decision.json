@@ -1,0 +1,26 @@
+{
+  "question_id": "c02686fef2ec45d28cc49503e72b88a2",
+  "mode": "answer",
+  "fact_ids": [
+    "training"
+  ],
+  "reason": "依員工換題意願詢問最近帶新人的項目與帶法，training 直接相關且可首次披露。",
+  "subquestions": [
+    {
+      "quote": "最近一次帶新人時，教的是哪項工作？",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "凍結帶教內容列出掃碼、揀貨與安全動線。"
+    },
+    {
+      "quote": "您當時怎麼帶他上手？",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "先示範、再跟做、觀察錯誤與檢核表記錄直接回答帶教方法。"
+    }
+  ]
+}

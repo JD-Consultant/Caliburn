@@ -1,0 +1,320 @@
+ERROR:    Traceback (most recent call last):
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 149, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3284, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 445, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 1287, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 709, in checkout
+    rec = pool._do_get()
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 176, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 174, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 386, in _create_connection
+    return _ConnectionRecord(self)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 671, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 895, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 891, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\create.py", line 645, in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 857, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\dialects\postgresql\psycopg.py", line 760, in connect
+    return await_(
+        AsyncAdapt_psycopg_connection.create(self, creator_fn(*arg, **kw))
+    )
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\util\concurrency.py", line 167, in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\util\concurrency.py", line 205, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\connectors\asyncio.py", line 378, in create
+    cls._handle_exception_no_connection(dbapi, error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\connectors\asyncio.py", line 409, in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\connectors\asyncio.py", line 376, in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\psycopg\connection_async.py", line 107, in connect
+    raise e.InterfaceError(
+    ...<3 lines>...
+    )
+psycopg.InterfaceError: Psycopg cannot use the 'ProactorEventLoop' to run in async mode. Please use a compatible event loop, for instance by running 'asyncio.run(..., loop_factory=asyncio.SelectorEventLoop(selectors.SelectSelector()))'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\starlette\routing.py", line 654, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\fastapi\routing.py", line 240, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\src\caliburn\bootstrap.py", line 103, in lifespan
+    await database.verify_schema()
+  File "S:\caliburn\apps\api\src\caliburn\adapters\database.py", line 48, in verify_schema
+    async with self.engine.connect() as connection:
+               ~~~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\ext\asyncio\base.py", line 121, in __aenter__
+    return await self.start(is_ctxmanager=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\ext\asyncio\engine.py", line 283, in start
+    await greenlet_spawn(self.sync_engine.connect)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\util\concurrency.py", line 210, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3260, in connect
+    return self._connection_cls(self)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 151, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        err, dialect, engine
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2417, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 149, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3284, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 445, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 1287, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 709, in checkout
+    rec = pool._do_get()
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 176, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 174, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 386, in _create_connection
+    return _ConnectionRecord(self)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 671, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 895, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 891, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\create.py", line 645, in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 857, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\dialects\postgresql\psycopg.py", line 760, in connect
+    return await_(
+        AsyncAdapt_psycopg_connection.create(self, creator_fn(*arg, **kw))
+    )
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\util\concurrency.py", line 167, in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\util\concurrency.py", line 205, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\connectors\asyncio.py", line 378, in create
+    cls._handle_exception_no_connection(dbapi, error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\connectors\asyncio.py", line 409, in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\sqlalchemy\connectors\asyncio.py", line 376, in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\psycopg\connection_async.py", line 107, in connect
+    raise e.InterfaceError(
+    ...<3 lines>...
+    )
+sqlalchemy.exc.InterfaceError: (psycopg.InterfaceError) Psycopg cannot use the 'ProactorEventLoop' to run in async mode. Please use a compatible event loop, for instance by running 'asyncio.run(..., loop_factory=asyncio.SelectorEventLoop(selectors.SelectSelector()))'
+(Background on this error at: https://sqlalche.me/e/21/rvf5)
+
+ERROR:    Application startup failed. Exiting.
+Task exception was never retrieved
+future: <Task finished name='Task-1' coro=<main() done, defined at S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\run_batch.py:394> exception=SystemExit(3)>
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\run_batch.py", line 369, in run_case
+    await asyncio.sleep(0.2)
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\tasks.py", line 705, in sleep
+    return await future
+           ^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\run_batch.py", line 472, in <module>
+    asyncio.run(main())
+    ~~~~~~~~~~~^^^^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py", line 204, in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py", line 64, in __exit__
+    self.close()
+    ~~~~~~~~~~^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py", line 72, in close
+    _cancel_all_tasks(loop)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py", line 216, in _cancel_all_tasks
+    loop.run_until_complete(tasks.gather(*to_cancel, return_exceptions=True))
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\base_events.py", line 707, in run_until_complete
+    self.run_forever()
+    ~~~~~~~~~~~~~~~~^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\base_events.py", line 678, in run_forever
+    self._run_once()
+    ~~~~~~~~~~~~~~^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\base_events.py", line 2057, in _run_once
+    handle._run()
+    ~~~~~~~~~~~^^
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\run_batch.py", line 445, in main
+    await run_case(
+    ...<8 lines>...
+    )
+  File "S:\caliburn\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\run_batch.py", line 388, in run_case
+    await task
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\uvicorn\server.py", line 90, in serve
+    await self._serve(sockets)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\uvicorn\server.py", line 105, in _serve
+    await self.startup(sockets=sockets)
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\uvicorn\server.py", line 118, in startup
+    sys.exit(STARTUP_FAILURE)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^
+SystemExit: 3

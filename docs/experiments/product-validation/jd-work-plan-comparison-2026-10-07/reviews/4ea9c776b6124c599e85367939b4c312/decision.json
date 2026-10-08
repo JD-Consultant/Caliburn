@@ -1,0 +1,26 @@
+{
+  "question_id": "4ea9c776b6124c599e85367939b4c312",
+  "mode": "answer",
+  "fact_ids": [
+    "preparation"
+  ],
+  "reason": "實際轉問一般開課前準備與本人／他人的分工，preparation 的名單教材設備檢查、通知及異常轉交直接相關。",
+  "subquestions": [
+    {
+      "quote": "一門課確認要開班後，到正式上課前，你親自處理哪些事情？",
+      "mode": "answer",
+      "fact_ids": [
+        "preparation"
+      ],
+      "reason": "開課前兩天核名單教材鑰匙設備、印點名表寄通知與當天提早到場，直接回答本人準備工作。"
+    },
+    {
+      "quote": "哪些部分會交由老師、主任或其他同事負責？",
+      "mode": "answer",
+      "fact_ids": [
+        "preparation"
+      ],
+      "reason": "講師教材為核對對象，設備故障找總務、換教室須主任同意，提供凍結的準備分工界線。"
+    }
+  ]
+}

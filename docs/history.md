@@ -674,3 +674,130 @@
 
 <a id="source-c29ccba15695e81e5a56"></a>
 - 原路徑 `docs/specs/2026-07-29-job-analysis-partial-jd-task-reconciliation-research.md`：基準有 blob；只讀取回 `git show 'af62218a:docs/specs/2026-07-29-job-analysis-partial-jd-task-reconciliation-research.md'`。
+
+## 2026-10-08 研究引用補充
+
+以下為舊研究連到退役程式、計畫及設計時可取回的固定 Git 版本，已逐項用 `git cat-file -e` 核對。它們供沿革查讀，不保證含研究當日未提交的修改；頁內對當時行為的判斷仍依原研究與實驗原件。每項命令只讀取該版本，不恢復或啟用退役程式。
+
+<a id="source-5e85fa2cc7a2d74cc2dd"></a>
+- 原路徑 `apps/api/docs/authoring.md`：可取回版本 `af24fd000969119d7f259c093a6ec4de2cff3291`；只讀取回 `git show 'af24fd000969119d7f259c093a6ec4de2cff3291:apps/api/docs/authoring.md'`。
+
+<a id="source-82de2b98bea7c27ce949"></a>
+- 原路徑 `apps/api/app/core/ports.py`：可取回版本 `6b20853e8c6a8baf0d4c69c68be7d083e88d124b`；只讀取回 `git show '6b20853e8c6a8baf0d4c69c68be7d083e88d124b:apps/api/app/core/ports.py'`。
+
+<a id="source-dba0b3d6f269ee357916"></a>
+- 原路徑 `apps/api/app/adapters/llm_openrouter.py`：可取回版本 `5ddc111941b4b9f48e34d82adc349fad9fddb576`；只讀取回 `git show '5ddc111941b4b9f48e34d82adc349fad9fddb576:apps/api/app/adapters/llm_openrouter.py'`。
+
+<a id="source-4d4770b578b058b13ed9"></a>
+- 原路徑 `apps/api/app/services/ai/extract_tasks.py`：可取回版本 `565b6fedbc9260a7db3f7bfbfd2df549d49ac99e`；只讀取回 `git show '565b6fedbc9260a7db3f7bfbfd2df549d49ac99e:apps/api/app/services/ai/extract_tasks.py'`。
+
+<a id="source-eeb144c85ec5802a98ac"></a>
+- 原路徑 `apps/api/app/adapters/openrouter/openrouter.py`：可取回版本 `61b35ec5678fdb0444847c4cc33f08a5b6f0bf92`；只讀取回 `git show '61b35ec5678fdb0444847c4cc33f08a5b6f0bf92:apps/api/app/adapters/openrouter/openrouter.py'`。
+
+<a id="source-fd1b5b60fcab83e8eebc"></a>
+- 原路徑 `apps/api/app/api/deps.py`：可取回版本 `c173c6029928a3d22f8eb7397e8ea7948d73d23c`；只讀取回 `git show 'c173c6029928a3d22f8eb7397e8ea7948d73d23c:apps/api/app/api/deps.py'`。
+
+<a id="source-eb2ce3b4c0a13fbe7bb6"></a>
+- 原路徑 `apps/api/app/consultant/run_service.py`：可取回版本 `c173c6029928a3d22f8eb7397e8ea7948d73d23c`；只讀取回 `git show 'c173c6029928a3d22f8eb7397e8ea7948d73d23c:apps/api/app/consultant/run_service.py'`。
+
+<a id="source-3184e79cd26115a88f06"></a>
+- 原路徑 `apps/api/app/consultant/interview.py`：可取回版本 `c173c6029928a3d22f8eb7397e8ea7948d73d23c`；只讀取回 `git show 'c173c6029928a3d22f8eb7397e8ea7948d73d23c:apps/api/app/consultant/interview.py'`。
+
+<a id="source-7372f2896b10d161f8bd"></a>
+- 原路徑 `docs/plans/2026-09-07-native-context-normal-interview.md`：可取回版本 `e0dab6e004130428784e1fcefe80fc63e0c8566d`；只讀取回 `git show 'e0dab6e004130428784e1fcefe80fc63e0c8566d:docs/plans/2026-09-07-native-context-normal-interview.md'`。
+
+<a id="source-fc58414839bdada7f1fc"></a>
+- 原路徑 `experiments/analysis-agent/src/analysis_agent/budget.py`：可取回版本 `e3b93aa719dfd462b2763e7d554788c5198d0b6c`；只讀取回 `git show 'e3b93aa719dfd462b2763e7d554788c5198d0b6c:experiments/analysis-agent/src/analysis_agent/budget.py'`。
+
+<a id="source-a3bd5c14a291b48b615e"></a>
+- 原路徑 `experiments/analysis-agent/src/analysis_agent/context.py`：可取回版本 `90fcc97059bed342250998e0656cb410885d601f`；只讀取回 `git show '90fcc97059bed342250998e0656cb410885d601f:experiments/analysis-agent/src/analysis_agent/context.py'`。
+
+<a id="source-6abca657a0ba0b1b8c2f"></a>
+- 原路徑 `experiments/analysis-agent/src/analysis_agent/runtime.py`：可取回版本 `3118e8a1e5caf9ddc09977a4c264a91ce965a3d7`；只讀取回 `git show '3118e8a1e5caf9ddc09977a4c264a91ce965a3d7:experiments/analysis-agent/src/analysis_agent/runtime.py'`。
+
+<a id="source-6cce82ed2a02688f99de"></a>
+- 原路徑 `experiments/analysis-agent/src/analysis_agent/sources.py`：可取回版本 `80e29b4a98363f10cffeaf332802adb6f6e29329`；只讀取回 `git show '80e29b4a98363f10cffeaf332802adb6f6e29329:experiments/analysis-agent/src/analysis_agent/sources.py'`。
+
+<a id="source-f72d424630e3d1dd2ecf"></a>
+- 原路徑 `experiments/analysis-agent/src/analysis_agent/extraction.py`：可取回版本 `8cad23ea530eb5f69432adedb2dde67b7582f3aa`；只讀取回 `git show '8cad23ea530eb5f69432adedb2dde67b7582f3aa:experiments/analysis-agent/src/analysis_agent/extraction.py'`。
+
+<a id="source-e211e715f832e5077ce5"></a>
+- 原路徑 `experiments/analysis-agent/src/analysis_agent/memory_tools.py`：可取回版本 `ddc7a5f126ba16729f2db4ccff1191d8c8118eac`；只讀取回 `git show 'ddc7a5f126ba16729f2db4ccff1191d8c8118eac:experiments/analysis-agent/src/analysis_agent/memory_tools.py'`。
+
+<a id="source-4de5738ad10690282e8a"></a>
+- 原路徑 `experiments/analysis-agent/src/analysis_agent/memory.py`：可取回版本 `e3ffddb959117b37fc1d61c93fbadf3dc2b2b6e4`；只讀取回 `git show 'e3ffddb959117b37fc1d61c93fbadf3dc2b2b6e4:experiments/analysis-agent/src/analysis_agent/memory.py'`。
+
+<a id="source-bd5a9230979d84b001d3"></a>
+- 原路徑 `experiments/analysis-agent/src/analysis_agent/consolidation_tools.py`：可取回版本 `a58ca31f28e8d7e0d33d3073b9eb48c5c25ed7c5`；只讀取回 `git show 'a58ca31f28e8d7e0d33d3073b9eb48c5c25ed7c5:experiments/analysis-agent/src/analysis_agent/consolidation_tools.py'`。
+
+<a id="source-344a39231cec3ce616e7"></a>
+- 原路徑 `apps/web/src/hooks/useDocument.ts`：可取回版本 `34fd61a14853748544ed9425501bf3fa0f7c8375`；只讀取回 `git show '34fd61a14853748544ed9425501bf3fa0f7c8375:apps/web/src/hooks/useDocument.ts'`。
+
+<a id="source-20995fc7473b5604ab40"></a>
+- 原路徑 `apps/web/src/hooks/useTaskCatalog.ts`：可取回版本 `4ac3d96e0c38bda31d36cc0561b368ca772bf0da`；只讀取回 `git show '4ac3d96e0c38bda31d36cc0561b368ca772bf0da:apps/web/src/hooks/useTaskCatalog.ts'`。
+
+<a id="source-272e42cc016bd7a3d626"></a>
+- 原路徑 `apps/web/src/components/interview/fields/FieldCombobox.tsx`：可取回版本 `1070416b611ea993d7665b25f510a1bb3653d2b2`；只讀取回 `git show '1070416b611ea993d7665b25f510a1bb3653d2b2:apps/web/src/components/interview/fields/FieldCombobox.tsx'`。
+
+<a id="source-482a4f976eb0743300c5"></a>
+- 原路徑 `apps/web/src/components/layout/Providers.tsx`：可取回版本 `60db19a08431adca94a3b9d64166178ec065dc52`；只讀取回 `git show '60db19a08431adca94a3b9d64166178ec065dc52:apps/web/src/components/layout/Providers.tsx'`。
+
+<a id="source-ba942110b8bc0294b0b0"></a>
+- 原路徑 `apps/api/app/api/routes/documents.py`：可取回版本 `61b35ec5678fdb0444847c4cc33f08a5b6f0bf92`；只讀取回 `git show '61b35ec5678fdb0444847c4cc33f08a5b6f0bf92:apps/api/app/api/routes/documents.py'`。
+
+<a id="source-5a24af6ee35207cfa028"></a>
+- 原路徑 `apps/api/app/api/routes/ai.py`：可取回版本 `ca852f2f06d4405ba94fd2f19aeafc8a28df4715`；只讀取回 `git show 'ca852f2f06d4405ba94fd2f19aeafc8a28df4715:apps/api/app/api/routes/ai.py'`。
+
+<a id="source-b3dfe36e79e724504001"></a>
+- 原路徑 `apps/api/app/services/knowledge/task_detail.py`：可取回版本 `565b6fedbc9260a7db3f7bfbfd2df549d49ac99e`；只讀取回 `git show '565b6fedbc9260a7db3f7bfbfd2df549d49ac99e:apps/api/app/services/knowledge/task_detail.py'`。
+
+<a id="source-8d4d2ca4e1a53b4793d5"></a>
+- 原路徑 `apps/web/src/types/index.ts`：可取回版本 `eafdc387487f1e504e0af909448e59210dae4364`；只讀取回 `git show 'eafdc387487f1e504e0af909448e59210dae4364:apps/web/src/types/index.ts'`。
+
+<a id="source-56794f7c4b2e7da3192d"></a>
+- 原路徑 `apps/web/src/lib/ocsDoc.ts`：可取回版本 `c461461acd59cc582b8e429475703cc2198c647d`；只讀取回 `git show 'c461461acd59cc582b8e429475703cc2198c647d:apps/web/src/lib/ocsDoc.ts'`。
+
+<a id="source-9659220033ae62204c36"></a>
+- 原路徑 `apps/api/app/adapters/knowledge_http.py`：可取回版本 `dedca2b642558844344f3250a39cc4ba25e64c28`；只讀取回 `git show 'dedca2b642558844344f3250a39cc4ba25e64c28:apps/api/app/adapters/knowledge_http.py'`。
+
+<a id="source-05408cd603593fad7785"></a>
+- 原路徑 `apps/web/src/lib/api.ts`：可取回版本 `2a1a155ceda19df1d89b7e138cb7161710a808d6`；只讀取回 `git show '2a1a155ceda19df1d89b7e138cb7161710a808d6:apps/web/src/lib/api.ts'`。
+
+<a id="source-eed51bc603c33d829c3e"></a>
+- 原路徑 `docs/design/task-analysis-engine.md`：可取回版本 `ef090a52a26acfce1fe4495448bd7a7451fcd8a7`；只讀取回 `git show 'ef090a52a26acfce1fe4495448bd7a7451fcd8a7:docs/design/task-analysis-engine.md'`。
+
+<a id="source-4f9069ebaed2cc5fd1ff"></a>
+- 原路徑 `experiments/jd-editor/web/license-inventory.json`：可取回版本 `8eec072d51e97735b22c5f0df598b67101fe570b`；只讀取回 `git show '8eec072d51e97735b22c5f0df598b67101fe570b:experiments/jd-editor/web/license-inventory.json'`。
+
+<a id="source-ed1d512fe6a25c184ffa"></a>
+- 原路徑 `experiments/analysis-agent/pyproject.toml`：可取回版本 `444416722190fd48c14f4423d101f36b25831de1`；只讀取回 `git show '444416722190fd48c14f4423d101f36b25831de1:experiments/analysis-agent/pyproject.toml'`。
+
+<a id="source-09a380153a0b03d544e1"></a>
+- 原路徑 `experiments/analysis-agent/uv.lock`：可取回版本 `444416722190fd48c14f4423d101f36b25831de1`；只讀取回 `git show '444416722190fd48c14f4423d101f36b25831de1:experiments/analysis-agent/uv.lock'`。
+
+<a id="source-1cdc9dfc1ff324ee6844"></a>
+- 原路徑 `apps/api/app/core/domain/knowledge_pack.py`：可取回版本 `fe7fa90fce317095da23fefd02df5e81b6f49e2e`；只讀取回 `git show 'fe7fa90fce317095da23fefd02df5e81b6f49e2e:apps/api/app/core/domain/knowledge_pack.py'`。
+
+<a id="source-3cfcd0e3fa406af5c282"></a>
+- 原路徑 `apps/web/src/lib/pack.ts`：可取回版本 `4ef86c2a6f3fa0e3562ae53bc17b2896f59b6bc9`；只讀取回 `git show '4ef86c2a6f3fa0e3562ae53bc17b2896f59b6bc9:apps/web/src/lib/pack.ts'`。
+
+<a id="source-51677e4473c9a995d591"></a>
+- 原路徑 `apps/api/app/authoring/nodes.py`：可取回版本 `32e69a7007bbe518e2c5f046d3db90d0a2c3343c`；只讀取回 `git show '32e69a7007bbe518e2c5f046d3db90d0a2c3343c:apps/api/app/authoring/nodes.py'`。
+
+<a id="source-44def228ee82f16a68f6"></a>
+- 原路徑 `apps/api/app/authoring/deep_nodes.py`：可取回版本 `32e69a7007bbe518e2c5f046d3db90d0a2c3343c`；只讀取回 `git show '32e69a7007bbe518e2c5f046d3db90d0a2c3343c:apps/api/app/authoring/deep_nodes.py'`。
+
+<a id="source-1ba5ee3639e73ec94c16"></a>
+- 原路徑 `apps/api/app/authoring/graph.py`：可取回版本 `32e69a7007bbe518e2c5f046d3db90d0a2c3343c`；只讀取回 `git show '32e69a7007bbe518e2c5f046d3db90d0a2c3343c:apps/api/app/authoring/graph.py'`。
+
+<a id="source-6b3178818acd5fae1fdf"></a>
+- 原路徑 `apps/api/app/authoring/curate_nodes.py`：可取回版本 `32e69a7007bbe518e2c5f046d3db90d0a2c3343c`；只讀取回 `git show '32e69a7007bbe518e2c5f046d3db90d0a2c3343c:apps/api/app/authoring/curate_nodes.py'`。
+
+<a id="source-8deeacb80e1581cd8d76"></a>
+- 原路徑 `apps/api/evals/interview_v4/reports/real-candidate-audit-2026-07-15.md`：可取回版本 `5ddc111941b4b9f48e34d82adc349fad9fddb576`；只讀取回 `git show '5ddc111941b4b9f48e34d82adc349fad9fddb576:apps/api/evals/interview_v4/reports/real-candidate-audit-2026-07-15.md'`。
+
+<a id="source-3148d8780437cdf6fd24"></a>
+- 原路徑 `docs/plans/2026-09-07-relevant-work-memory-calibration.md`：可取回版本 `2cdb9cb25c438aa03af1f5676152fec5cdf302d7`；只讀取回 `git show '2cdb9cb25c438aa03af1f5676152fec5cdf302d7:docs/plans/2026-09-07-relevant-work-memory-calibration.md'`。
+
+<a id="source-235b14e318cef84e7355"></a>
+- 原路徑 `docs/specs/2026-09-07-incremental-memory-quality-calibration.md`：可取回版本 `2b16d11d812b9ea75ecd2d95e56c64b69c9c9fdb`；只讀取回 `git show '2b16d11d812b9ea75ecd2d95e56c64b69c9c9fdb:docs/specs/2026-09-07-incremental-memory-quality-calibration.md'`。

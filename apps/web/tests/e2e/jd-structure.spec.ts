@@ -97,6 +97,7 @@ test('沒有整項編輯鈕：搬移、新增、刪除各是一個直接的動�
   await expect(added).toBeFocused();
   await added.fill('交接說明');
   await added.press('Control+Enter');
+  await expect(added).toHaveCount(0);
   await expect(task.getByText('交接說明', { exact: true })).toBeVisible();
   expect(writes).toHaveLength(2);
   expect(
@@ -108,6 +109,7 @@ test('沒有整項編輯鈕：搬移、新增、刪除各是一個直接的動�
   await expect(page.getByRole('dialog')).toContainText('核對主要流程');
   expect(writes).toHaveLength(2);
   await page.getByRole('button', { name: '確認刪除工作要求' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(task.getByText('核對主要流程')).toHaveCount(0);
   expect(writes).toHaveLength(3);
   expect((await readWork(page.request, fileId)).tasks[0]?.requirements).toEqual([]);

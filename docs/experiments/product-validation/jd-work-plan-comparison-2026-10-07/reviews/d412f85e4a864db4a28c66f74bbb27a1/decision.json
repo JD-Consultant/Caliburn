@@ -1,0 +1,26 @@
+{
+  "question_id": "d412f85e4a864db4a28c66f74bbb27a1",
+  "mode": "answer",
+  "fact_ids": [
+    "training"
+  ],
+  "reason": "順著員工提出的換題意願，詢問帶新人時的學習內容與本人示範指導，training 直接相關且可首次披露。",
+  "subquestions": [
+    {
+      "quote": "新人當時要學什麼",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "凍結事實提供掃碼、揀貨與安全動線的學習內容。"
+    },
+    {
+      "quote": "您做了哪些示範或指導？",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "先示範再跟做、現場觀察並記檢核表，直接回應所問帶教方式。"
+    }
+  ]
+}

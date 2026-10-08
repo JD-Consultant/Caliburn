@@ -1,0 +1,23 @@
+{
+  "authorization": "使用者同意 US$0.50 總上限／接續30分鐘；既有占用與未知用量保留。",
+  "authorized_window_started_at": "2026-10-06T11:12:16.000Z",
+  "approved_deadline_at": "2026-10-06T11:42:16.000Z",
+  "approved_total_limit_usd": "0.50",
+  "journal_sha256": "dcac1d786b78b8fe399f348e9671369272d346c2444c10de2c043721db42f460",
+  "started_at": "2026-10-06T09:30:26.085423+00:00",
+  "spent_usd": "0.114602145",
+  "retained_reservations": {
+    "f02d943d-77c7-473e-af85-e43f96e609f4": "0.015437625",
+    "830791b0-844c-4d1b-bbf6-1cc805095cee": "0.017251625",
+    "9877c2f8-fbef-4bc1-bb5c-f6157921528b": "0.019138875",
+    "cb1e1248-4c79-4943-9e13-e55fd2770905": "0.019383500",
+    "6e787150-5656-4d37-aa9e-a6838f284b62": "0.020481000",
+    "f71083f5-ab5d-4f4d-bd36-f8a647d241fc": "0.020481000",
+    "bda0a783-68bd-4025-bd6e-af7b09c30d87": "0.012494250",
+    "d7a92f40-c479-4e18-ad7c-7d3e540fef58": "0.021683125",
+    "b2c34a2b-24c7-4897-b2a0-bd4f98a6e8db": "0.021683125"
+  },
+  "occupied_usd": "0.282636270",
+  "previous_checkpoint": "paused-budget-analysis.json",
+  "failed_execution_id": "0a818fc5-9337-426c-826e-31a9998562df"
+}

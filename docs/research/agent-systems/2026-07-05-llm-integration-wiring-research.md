@@ -1,5 +1,7 @@
 # LLM 怎麼接進系統 — 接線層研究(進行中)
 
+> 時點說明：本文保留 2026-07-05 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 > **類型**:研究紀錄(滾動式,邊研究邊討論邊補輪次)。**只研究、未改碼**;落實前開 ADR / plan。
 > **日期**:2026-07-05 起。**分支**:`research/llm-interview-integration`。
 > **上游研究**:[`2026-07-02-llm-interview-authoring-research.md`](../work-analysis/2026-07-02-llm-interview-authoring-research.md)
@@ -14,16 +16,16 @@
 
 ### 已有的
 
-- **LangGraph 訪談圖**(原 graph_v3,[authoring 深文檔](../../../apps/api/docs/authoring.md)):
+- **LangGraph 訪談圖**(原 graph_v3,[authoring 深文檔](../../history.md#source-5e85fa2cc7a2d74cc2dd)):
   pick_profile → 逐任務 STAR/5W2H/indicator loop → curate K/S/A → build_doc;
   interrupt 逐槽問人、checkpointer 可續。**但**:`build_doc` 產舊 doc shape(非 ocs-contract)、
   沒有前端面板驅動、與編輯器是兩條寫入路。→ 定位:**參考材料,不是前提**。
-- **`LlmPort`**([ports.py](../../../apps/api/app/core/ports.py)):只有 `complete_text` / `complete_json`
+- **`LlmPort`**([ports.py](../../history.md#source-82de2b98bea7c27ce949)):只有 `complete_text` / `complete_json`
   兩方法——**全在「提示層」**(`complete_json` = prompt 要 JSON + `safe_parse_json` + 重試)。
-- **`OpenRouterLlm`**([llm_openrouter.py](../../../apps/api/app/adapters/llm_openrouter.py)):
+- **`OpenRouterLlm`**([llm_openrouter.py](../../history.md#source-dba0b3d6f269ee357916)):
   `langchain_openai.ChatOpenAI` 指 OpenRouter OpenAI-相容端點;per-role 分模型
   (deep/indicator/cheap = 成本控制);**沒用到** `response_format` / structured output / tool schema。
-- **`extract_tasks`**([extract_tasks.py](../../../apps/api/app/services/ai/extract_tasks.py)):
+- **`extract_tasks`**([extract_tasks.py](../../history.md#source-4d4770b578b058b13ed9)):
   grounded-id 模式 = LLM 挑 id → **事後 `i in known` 丟棄自創 id**(事後防禦)。
 - **相似比對 `items:match`**(ADR 0022):已為未來訪談引擎預留的確定性 tool(灰區對 → 鑑別提問)。
 

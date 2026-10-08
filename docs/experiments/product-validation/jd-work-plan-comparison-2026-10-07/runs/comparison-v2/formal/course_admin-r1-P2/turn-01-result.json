@@ -1,0 +1,148 @@
+{
+  "status": {
+    "job_file_id": "b63bdf48-ac75-4f06-af36-94326ca5e724",
+    "execution_id": "8d044d19-3328-4143-9e38-8e4c8086c604",
+    "status": "completed",
+    "pause_requested": false,
+    "input_text": "我在成人教育中心做課務行政，向教務主任報告。主要負責課程排程、學員報名與收費資料、開課準備、出缺勤和結業資料，也處理老師臨時缺課及學員退費申請。最近一位老師前一天說不能到，我先通知主任和學員；換誰來上課不是我自己決定。",
+    "commentary": [
+      {
+        "response_id": "resp_011705c9be5ba2d7016ac6a258f0b887d0974c159841ef990f",
+        "message_id": "msg_011705c9be5ba2d7016ac6a25d9a9c87d09790bf33989bd895",
+        "text": "我先把目前提到的工作輪廓和已知的決策界線整理起來，再從一項日常工作深入了解實際流程。"
+      }
+    ],
+    "candidate": null,
+    "plan_preview": null,
+    "allowed_controls": []
+  },
+  "elapsed_seconds": 30.650694600015413,
+  "interviews": {
+    "messages": [
+      {
+        "source_id": "ea92bcb7-11d5-48e5-8e6a-bd46a73eddbb",
+        "interview_sequence": 1,
+        "speaker": "app",
+        "interview_text": "這裡會透過訪談，逐步理解您的實際工作並整理職務說明書。您不需要先學會撰寫，也不必一次說完；不確定的地方可以直接說明。\n\n請先說說您目前主要負責哪些工作？可以用自己的說法，從平常大家會找您處理的事情開始。",
+        "execution_id": null
+      },
+      {
+        "source_id": "b8055733-1e97-496e-b6df-326092861613",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我在成人教育中心做課務行政，向教務主任報告。主要負責課程排程、學員報名與收費資料、開課準備、出缺勤和結業資料，也處理老師臨時缺課及學員退費申請。最近一位老師前一天說不能到，我先通知主任和學員；換誰來上課不是我自己決定。",
+        "execution_id": null
+      },
+      {
+        "source_id": "5952fbe9-1635-4d14-b0e7-e53cc7e8623d",
+        "interview_sequence": 3,
+        "speaker": "consultant",
+        "interview_text": "我先將「課務行政」、所屬成人教育中心、向教務主任報告，以及依目前工作歸納的職務目的寫入 JD 底稿。臨時缺課部分也會保留你已說明的界線：你通知主任和學員，但不決定代課人選。\n\n想先從課程排程了解你的實際分工：以最近一次排課為例，你通常會收到哪些資訊？若時段或需求有衝突，最後由誰決定？",
+        "execution_id": "8d044d19-3328-4143-9e38-8e4c8086c604"
+      }
+    ]
+  },
+  "formal_jd": {
+    "profile": {
+      "revision_id": "b0ae6be6-6482-41c8-b36d-3dadca061a51",
+      "profile": {
+        "job_title": "課務行政",
+        "organization_unit": "成人教育中心",
+        "reports_to": "教務主任",
+        "purpose": "透過課程排程、學員報名與收費資料、開課準備及課程紀錄管理，並處理相關課務申請與異動，支援成人教育課程順利辦理及學員課務服務。"
+      }
+    },
+    "work": {
+      "revision_id": "b0ae6be6-6482-41c8-b36d-3dadca061a51",
+      "areas": [],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "b0ae6be6-6482-41c8-b36d-3dadca061a51",
+      "references": [
+        {
+          "citation_id": "fea5e58f-c85e-4f14-a1eb-47a5b2bc02ad",
+          "target_label": "職務名稱",
+          "target": {
+            "kind": "profile_field",
+            "field": "job_title",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "d6482ba3-090c-4e06-94b1-95ead5acffd7",
+          "target_label": "所屬單位",
+          "target": {
+            "kind": "profile_field",
+            "field": "organization_unit",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "c2e482b4-e726-49a6-b6cc-027b5e7c730d",
+          "target_label": "直屬主管",
+          "target": {
+            "kind": "profile_field",
+            "field": "reports_to",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "ff8780df-f0d8-401b-9e6b-dfa180df02d6",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "plan": {
+    "job_file_id": "b63bdf48-ac75-4f06-af36-94326ca5e724",
+    "plan": "## 目前焦點\n釐清課程排程的本人分工、判斷與交接。\n\n## 工作方向\n- 課程排程、報名與收費資料、開課準備、出缺勤及結業資料：已知主要工作，待分辨各自範圍與成果。\n- 臨時缺課通知與代課安排：已知會通知主任及學員；代課人選由主任決定，待了解通知與後續交接。\n- 退費申請：已知會處理，待釐清本人核對、辦理及核准界線。\n- JD：待依訪談逐步整理職責分組、任務及必要要求；後續核對重要條件與涵蓋面向。"
+  },
+  "guard": {
+    "spent_usd": "0.690989450",
+    "occupied_usd": "0.699523450",
+    "retained_reservations": {
+      "5eb2f9d8-3571-465b-ada1-592350cd97d2": "0.008534000"
+    },
+    "generations": 571,
+    "compacts": 3,
+    "outbound": 1237,
+    "counted_input": 31948361,
+    "stop_reason": null,
+    "batch_deadline": null,
+    "limit_usd": "4.00"
+  }
+}

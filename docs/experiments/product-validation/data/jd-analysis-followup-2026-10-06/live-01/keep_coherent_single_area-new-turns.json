@@ -1,0 +1,134 @@
+{
+  "arm": "new",
+  "case_id": "keep_coherent_single_area",
+  "job_file_id": "7e16274b-75b5-483a-a558-d87a5f3deeb4",
+  "before": {
+    "profile": {
+      "revision_id": "c3f4619d-4587-4666-94ea-970623bad2d0",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "確認待出貨品項與單據一致，回報未排除差異。"
+      }
+    },
+    "work": {
+      "revision_id": "c3f4619d-4587-4666-94ea-970623bad2d0",
+      "areas": [
+        {
+          "area_id": "cd018bf2-47b7-443e-9537-8558c4ba6ca0",
+          "title": "出貨前核對",
+          "scope_text": "條碼與單貨核對及同一工作中的差異回報。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "308d6625-1d0e-4e2f-a53b-bc3d1cd90af9",
+          "area_id": "cd018bf2-47b7-443e-9537-8558c4ba6ca0",
+          "title": "核對待出貨商品",
+          "description": "每日下午三點核對品項與數量；掃碼不符先重掃、核對標籤，仍不符記錄交主管。不負責揀貨、裝箱或換貨決策。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "c3f4619d-4587-4666-94ea-970623bad2d0",
+      "references": [
+        {
+          "citation_id": "e96fdff5-3984-4240-b841-b4d701971eae",
+          "target_label": "任務：核對待出貨商品",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "308d6625-1d0e-4e2f-a53b-bc3d1cd90af9",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "ba1ea8e1-7943-4bc7-a934-66e6a278790f",
+      "exchange": {
+        "employee_input": {
+          "source_id": "f1a1301e-d378-4e05-8b74-7c5ad223ec3e",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "對，都屬於同一次核對，沒有另外負責的工作。這份內容沒錯，今天先到這裡。"
+        },
+        "consultant_reply": {
+          "source_id": "24dda367-4a9c-45bd-9abc-a7b9b70296e4",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "好，今天先到這裡。依你的確認，這些步驟都屬於同一項出貨前條碼核對工作，目前沒有其他負責的工作；揀貨、裝箱及決定換貨不在你的職責範圍內。之後若要繼續，我們再接著核對。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 475779,
+    "output_tokens": 21689,
+    "reasoning_tokens": 16877,
+    "cached_input_tokens": 426665,
+    "cache_write_input_tokens": 49000,
+    "total_tokens": 497468,
+    "outbound_calls": 76,
+    "count_calls": 38,
+    "generation_calls": 38,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 475779,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0038",
+    "actual_estimated_usd": "0.021247550",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.025047550",
+    "cumulative_occupied_usd": "0.025047550",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 451.51050539999414,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 487430,
+    "output_tokens": 22006,
+    "reasoning_tokens": 17110,
+    "cached_input_tokens": 437977,
+    "cache_write_input_tokens": 49336,
+    "total_tokens": 509436,
+    "outbound_calls": 78,
+    "count_calls": 39,
+    "generation_calls": 39,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 487430,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0039",
+    "actual_estimated_usd": "0.021561470",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.025461470",
+    "cumulative_occupied_usd": "0.025461470",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 459.95599349999975,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

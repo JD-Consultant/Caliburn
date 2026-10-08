@@ -1,0 +1,110 @@
+{
+  "status": "全部匿名品質判讀已鎖定，未解盲",
+  "completed_case_count": 2,
+  "completed_pair_count": 1,
+  "source_inputs": [
+    {
+      "case_id": "8b1991cd9ea84de28b92ab1342b99e15",
+      "case_json_sha256": "1ae034ce089e5d3b437f269569a4183e9c197cc75c10b83fe3498cc7151cb1b0",
+      "case_markdown_sha256": "f6137f0ef1543ce93d6f8debaf0c30f14a4f860148eca0f7aed04777cdebd0e6",
+      "bundle_path": "S:/caliburn/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/blind-input/8b1991cd9ea84de28b92ab1342b99e15.json",
+      "bundle_sha256": "9a0e00494a34e5f50da44b6b1289cd9213429d14d81abf384a38f2b96ca38326",
+      "formal_revision_id": "357aa1cd-36ee-4395-855b-729e8a7745df",
+      "criterion_and_guide_files": [
+        {
+          "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/blind-jd-rubric.md",
+          "sha256": "0a80b5fda821802d0de0f46384ae40ca9f16a5b875ceabac53abf43b9c456742"
+        },
+        {
+          "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/private_facts.json",
+          "sha256": "7455f4ac308e87ab4371a7f8c281890d44628ccf7c8aa0c3162e7be3ce8ac636"
+        },
+        {
+          "path": "docs/plans/evidence/interview-plan-2026-10-07/blind-jd-rubric.md",
+          "sha256": "13c14a856ba68b2ae9d2f325e1fe1266db987d2c64ea9cefb83d49a18423cec2"
+        },
+        {
+          "path": "docs/guides/2026-09-09-complete-work-analysis-guide.md",
+          "sha256": "a1f5bdac2d11ce1a11a045e47f96587299a64fdc99338e5d09eb550d5cbf7fe6"
+        },
+        {
+          "path": "docs/guides/2026-09-09-customized-jd-depth-and-interview-calibration.md",
+          "sha256": "46ed3a9944ba4502f7ce0c9fe2d02022a9c9468464069d3f095a91a3e74d8efc"
+        },
+        {
+          "path": "docs/guides/2026-09-09-jd-field-and-writing-guide.md",
+          "sha256": "78dc1527310d40040e0fd1c012b52be1bdefae369d7320cd679e35b94d5206cd"
+        }
+      ]
+    },
+    {
+      "case_id": "4d54caac92074ce18f5351b23b7caaf8",
+      "case_json_sha256": "f243d87cae3fb90b4d2429e0adb0ccbce363f6492a4f1abff6301221efbc6693",
+      "case_markdown_sha256": "c0f87531b0379b928753aaea8f5141f641f029695022ff8365bb993167f99d58",
+      "bundle_path": "S:\\caliburn\\docs\\experiments\\product-validation\\jd-work-plan-comparison-2026-10-07\\runs\\comparison-v2\\blind-input\\4d54caac92074ce18f5351b23b7caaf8.json",
+      "bundle_sha256": "5e228613aeeef717148675f1a304840516f730d3464d12670bf65fac27ecb56d",
+      "formal_revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+      "criterion_and_guide_files": [
+        {
+          "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/blind-jd-rubric.md",
+          "sha256": "0a80b5fda821802d0de0f46384ae40ca9f16a5b875ceabac53abf43b9c456742"
+        },
+        {
+          "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/private_facts.json",
+          "sha256": "7455f4ac308e87ab4371a7f8c281890d44628ccf7c8aa0c3162e7be3ce8ac636"
+        },
+        {
+          "path": "docs/plans/evidence/interview-plan-2026-10-07/blind-jd-rubric.md",
+          "sha256": "13c14a856ba68b2ae9d2f325e1fe1266db987d2c64ea9cefb83d49a18423cec2"
+        },
+        {
+          "path": "docs/guides/2026-09-09-complete-work-analysis-guide.md",
+          "sha256": "a1f5bdac2d11ce1a11a045e47f96587299a64fdc99338e5d09eb550d5cbf7fe6"
+        },
+        {
+          "path": "docs/guides/2026-09-09-customized-jd-depth-and-interview-calibration.md",
+          "sha256": "46ed3a9944ba4502f7ce0c9fe2d02022a9c9468464069d3f095a91a3e74d8efc"
+        },
+        {
+          "path": "docs/guides/2026-09-09-jd-field-and-writing-guide.md",
+          "sha256": "78dc1527310d40040e0fd1c012b52be1bdefae369d7320cd679e35b94d5206cd"
+        }
+      ]
+    }
+  ],
+  "output_hashes": [
+    {
+      "path": "warehouse.json",
+      "sha256": "4b2b20fd0209fcaf6d3867b4791d4ce57a5eeac8a02049cf61e2374eb08c69b4"
+    },
+    {
+      "path": "warehouse.md",
+      "sha256": "abe847eb92dfed2bcd00bf710128f9ef8502e5422e5a476a9e2dc06d2cfe03ec"
+    },
+    {
+      "path": "warehouse-pair-W-A.json",
+      "sha256": "f438d480308f8896cc8854bf941eb9cc7221b78ab842a7b8b3b7f9f8f34251ef"
+    },
+    {
+      "path": "warehouse-pair-W-A.md",
+      "sha256": "fe1449ee16d9e612db78c6ab17ceac84ac919d0fa00cc14e9263375ca1068210"
+    },
+    {
+      "path": "warehouse-8b1991cd9ea84de28b92ab1342b99e15.json",
+      "sha256": "1ae034ce089e5d3b437f269569a4183e9c197cc75c10b83fe3498cc7151cb1b0"
+    },
+    {
+      "path": "warehouse-8b1991cd9ea84de28b92ab1342b99e15.md",
+      "sha256": "f6137f0ef1543ce93d6f8debaf0c30f14a4f860148eca0f7aed04777cdebd0e6"
+    },
+    {
+      "path": "warehouse-4d54caac92074ce18f5351b23b7caaf8.json",
+      "sha256": "f243d87cae3fb90b4d2429e0adb0ccbce363f6492a4f1abff6301221efbc6693"
+    },
+    {
+      "path": "warehouse-4d54caac92074ce18f5351b23b7caaf8.md",
+      "sha256": "c0f87531b0379b928753aaea8f5141f641f029695022ff8365bb993167f99d58"
+    }
+  ],
+  "checksum_scope": "Raw file SHA-256 for every assessment, pair and index output; this checksum container itself is excluded to avoid self-reference."
+}

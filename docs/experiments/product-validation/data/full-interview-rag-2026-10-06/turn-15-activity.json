@@ -1,0 +1,1810 @@
+[
+  {
+    "at": 1791280516.6221597,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.6221619,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明\"}"
+  },
+  {
+    "at": 1791280516.6242707,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.6242719,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白\"}"
+  },
+  {
+    "at": 1791280516.6251178,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.6251187,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：\"}"
+  },
+  {
+    "at": 1791280516.6267853,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.6267862,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙\"}"
+  },
+  {
+    "at": 1791280516.6283455,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.628347,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起\"}"
+  },
+  {
+    "at": 1791280516.634436,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.6344368,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來\"}"
+  },
+  {
+    "at": 1791280516.7529635,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7529655,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、\"}"
+  },
+  {
+    "at": 1791280516.753059,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7530594,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼\"}"
+  },
+  {
+    "at": 1791280516.753272,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.753273,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順\"}"
+  },
+  {
+    "at": 1791280516.7535925,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.753594,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序\"}"
+  },
+  {
+    "at": 1791280516.753646,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7536461,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或\"}"
+  },
+  {
+    "at": 1791280516.7537065,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7537067,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新\"}"
+  },
+  {
+    "at": 1791280516.7537496,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.75375,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排\"}"
+  },
+  {
+    "at": 1791280516.7556188,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7556198,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式\"}"
+  },
+  {
+    "at": 1791280516.7556822,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7556827,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你\"}"
+  },
+  {
+    "at": 1791280516.7557404,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.755741,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認\"}"
+  },
+  {
+    "at": 1791280516.7559583,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7559595,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的\"}"
+  },
+  {
+    "at": 1791280516.7560294,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7560298,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程\"}"
+  },
+  {
+    "at": 1791280516.756223,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.756224,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我\"}"
+  },
+  {
+    "at": 1791280516.7562747,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7562752,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會\"}"
+  },
+  {
+    "at": 1791280516.7564187,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.75642,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只\"}"
+  },
+  {
+    "at": 1791280516.7564893,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7564898,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補\"}"
+  },
+  {
+    "at": 1791280516.7565393,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7565396,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上\"}"
+  },
+  {
+    "at": 1791280516.758942,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7589433,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你\"}"
+  },
+  {
+    "at": 1791280516.759041,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7590413,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確\"}"
+  },
+  {
+    "at": 1791280516.7590811,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7590814,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定\"}"
+  },
+  {
+    "at": 1791280516.7590947,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7590952,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會\"}"
+  },
+  {
+    "at": 1791280516.7642636,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.764265,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做\"}"
+  },
+  {
+    "at": 1791280516.7643268,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7643275,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的\"}"
+  },
+  {
+    "at": 1791280516.772413,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.772414,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分\"}"
+  },
+  {
+    "at": 1791280516.7844267,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7844281,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不\"}"
+  },
+  {
+    "at": 1791280516.7937675,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.7937686,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替\"}"
+  },
+  {
+    "at": 1791280516.8047333,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.804735,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你\"}"
+  },
+  {
+    "at": 1791280516.8150718,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.8150728,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫\"}"
+  },
+  {
+    "at": 1791280516.8296356,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.829637,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出\"}"
+  },
+  {
+    "at": 1791280516.8310237,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.8310244,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未\"}"
+  },
+  {
+    "at": 1791280516.833501,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.8335023,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認\"}"
+  },
+  {
+    "at": 1791280516.8335867,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.8335872,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的\"}"
+  },
+  {
+    "at": 1791280516.8868718,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.8868735,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調\"}"
+  },
+  {
+    "at": 1791280516.886946,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.8869467,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度\"}"
+  },
+  {
+    "at": 1791280516.8870106,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.887011,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規\"}"
+  },
+  {
+    "at": 1791280516.8870459,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.887046,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則\"}"
+  },
+  {
+    "at": 1791280516.8870938,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.887094,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則。\"}"
+  },
+  {
+    "at": 1791280516.8872843,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.8872852,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則。先\"}"
+  },
+  {
+    "at": 1791280516.8873706,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.887371,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則。先核\"}"
+  },
+  {
+    "at": 1791280516.887408,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.8874087,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則。先核對\"}"
+  },
+  {
+    "at": 1791280516.9068778,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.9068792,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則。先核對進\"}"
+  },
+  {
+    "at": 1791280516.9180598,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.918061,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則。先核對進貨\"}"
+  },
+  {
+    "at": 1791280516.9305768,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.9305782,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則。先核對進貨項\"}"
+  },
+  {
+    "at": 1791280516.9319627,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.9319637,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則。先核對進貨項目\"}"
+  },
+  {
+    "at": 1791280516.9320474,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791280516.9320478,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"c690a23f-15fe-47a6-a433-b14ee216af26\",\"response_id\":\"resp_00933d1a394bb439016ac4c57ef37087d0889761915301fe3f\",\"message_id\":\"msg_00933d1a394bb439016ac4c586692087d0a7ab4f35ca22ca84\",\"text\":\"明白：忙起來時你仍依已安排的儲位上架、貼標籤和登記；優先順序或重新安排方式你目前沒有可確認的流程。我會只補上你確定會做的部分，不替你寫出未確認的調度規則。先核對進貨項目。\"}"
+  },
+  {
+    "at": 1791280528.8569694,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.8569705,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe\"}"
+  },
+  {
+    "at": 1791280528.8833818,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.883383,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current\"}"
+  },
+  {
+    "at": 1791280528.899751,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.8997521,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description\"}"
+  },
+  {
+    "at": 1791280528.9063356,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.9063382,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions\"}"
+  },
+  {
+    "at": 1791280528.9300764,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.9300783,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that\"}"
+  },
+  {
+    "at": 1791280528.9376144,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.9376156,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something\"}"
+  },
+  {
+    "at": 1791280528.9467287,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.9467301,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"\"}"
+  },
+  {
+    "at": 1791280528.951924,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.9519253,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot\"}"
+  },
+  {
+    "at": 1791280528.959506,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.959507,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf\"}"
+  },
+  {
+    "at": 1791280528.9974856,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.9974868,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in\"}"
+  },
+  {
+    "at": 1791280528.9975746,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.9975755,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time\"}"
+  },
+  {
+    "at": 1791280528.9975958,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280528.9975965,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\"\"}"
+  },
+  {
+    "at": 1791280529.004476,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.0044773,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but\"}"
+  },
+  {
+    "at": 1791280529.0120344,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.0120375,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it\"}"
+  },
+  {
+    "at": 1791280529.02124,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.0212412,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't\"}"
+  },
+  {
+    "at": 1791280529.028645,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.0286462,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include\"}"
+  },
+  {
+    "at": 1791280529.0369868,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.036988,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details\"}"
+  },
+  {
+    "at": 1791280529.0444858,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.044487,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about\"}"
+  },
+  {
+    "at": 1791280529.0519133,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.0519142,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following\"}"
+  },
+  {
+    "at": 1791280529.060535,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.0605361,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned\"}"
+  },
+  {
+    "at": 1791280529.0693345,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.0693352,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage\"}"
+  },
+  {
+    "at": 1791280529.0772846,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.0772855,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage,\"}"
+  },
+  {
+    "at": 1791280529.0875995,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.0876012,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers\"}"
+  },
+  {
+    "at": 1791280529.100432,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.1004357,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers,\"}"
+  },
+  {
+    "at": 1791280529.108383,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.108384,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or\"}"
+  },
+  {
+    "at": 1791280529.1198933,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.1198943,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration\"}"
+  },
+  {
+    "at": 1791280529.1249883,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.12499,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration.\"}"
+  },
+  {
+    "at": 1791280529.1348498,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.134851,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The\"}"
+  },
+  {
+    "at": 1791280529.1428964,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.1428974,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous\"}"
+  },
+  {
+    "at": 1791280529.1555126,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.155514,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process\"}"
+  },
+  {
+    "at": 1791280529.176529,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.1765301,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might\"}"
+  },
+  {
+    "at": 1791280529.1810527,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.1810534,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have\"}"
+  },
+  {
+    "at": 1791280529.1945806,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.1945815,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been\"}"
+  },
+  {
+    "at": 1791280529.2050762,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.205077,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more\"}"
+  },
+  {
+    "at": 1791280529.2159371,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.215938,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward\"}"
+  },
+  {
+    "at": 1791280529.222121,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.2221239,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward.\"}"
+  },
+  {
+    "at": 1791280529.2314017,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.2314026,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The\"}"
+  },
+  {
+    "at": 1791280529.2450092,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.2450101,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest\"}"
+  },
+  {
+    "at": 1791280529.262697,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.262698,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes\"}"
+  },
+  {
+    "at": 1791280529.269061,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.269062,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the\"}"
+  },
+  {
+    "at": 1791280529.2893188,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.2893202,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure\"}"
+  },
+  {
+    "at": 1791280529.3052588,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.30526,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure,\"}"
+  },
+  {
+    "at": 1791280529.3157337,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.3157349,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but\"}"
+  },
+  {
+    "at": 1791280529.3263478,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.3263488,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the\"}"
+  },
+  {
+    "at": 1791280529.3358436,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.3358452,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions\"}"
+  },
+  {
+    "at": 1791280529.3450475,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.3450487,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are\"}"
+  },
+  {
+    "at": 1791280529.3518925,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.3518934,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the\"}"
+  },
+  {
+    "at": 1791280529.3642142,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.3642154,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same\"}"
+  },
+  {
+    "at": 1791280529.373287,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.373288,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same.\"}"
+  },
+  {
+    "at": 1791280529.3803966,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.3803995,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since\"}"
+  },
+  {
+    "at": 1791280529.3906076,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.3906088,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the\"}"
+  },
+  {
+    "at": 1791280529.4133208,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.4133217,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps\"}"
+  },
+  {
+    "at": 1791280529.4264884,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.4264894,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are\"}"
+  },
+  {
+    "at": 1791280529.4551322,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.4551332,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described\"}"
+  },
+  {
+    "at": 1791280529.4821603,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.4821615,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across\"}"
+  },
+  {
+    "at": 1791280529.5001783,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.5001798,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts\"}"
+  },
+  {
+    "at": 1791280529.5105624,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.5105634,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts,\"}"
+  },
+  {
+    "at": 1791280529.5372756,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.5372767,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I\"}"
+  },
+  {
+    "at": 1791280529.5571833,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.5571845,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might\"}"
+  },
+  {
+    "at": 1791280529.5673187,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.5673199,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not\"}"
+  },
+  {
+    "at": 1791280529.5761468,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.5761478,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need\"}"
+  },
+  {
+    "at": 1791280529.5842438,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.5842445,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an\"}"
+  },
+  {
+    "at": 1791280529.592502,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.5925028,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit\"}"
+  },
+  {
+    "at": 1791280529.5991938,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.5991948,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because\"}"
+  },
+  {
+    "at": 1791280529.6057801,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.6057813,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the\"}"
+  },
+  {
+    "at": 1791280529.6124,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.6124027,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing\"}"
+  },
+  {
+    "at": 1791280529.626907,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.6269083,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description\"}"
+  },
+  {
+    "at": 1791280529.6390045,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.6390052,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already\"}"
+  },
+  {
+    "at": 1791280529.6584733,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.6584744,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers\"}"
+  },
+  {
+    "at": 1791280529.665141,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.665142,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the\"}"
+  },
+  {
+    "at": 1791280529.6761055,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.6761065,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials\"}"
+  },
+  {
+    "at": 1791280529.6839213,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.6839228,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials.\"}"
+  },
+  {
+    "at": 1791280529.6949785,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.6949794,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An\"}"
+  },
+  {
+    "at": 1791280529.7181087,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.7181098,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee\"}"
+  },
+  {
+    "at": 1791280529.7235916,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.723593,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned\"}"
+  },
+  {
+    "at": 1791280529.7300575,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.7300584,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that\"}"
+  },
+  {
+    "at": 1791280529.7390196,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.7390208,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy\"}"
+  },
+  {
+    "at": 1791280529.7476137,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.7476149,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations\"}"
+  },
+  {
+    "at": 1791280529.7552335,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.7552347,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations are\"}"
+  },
+  {
+    "at": 1791280529.762639,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.7626405,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations are similar\"}"
+  },
+  {
+    "at": 1791280529.773791,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.773792,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations are similar,\"}"
+  },
+  {
+    "at": 1791280529.7805383,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.7805393,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations are similar, so\"}"
+  },
+  {
+    "at": 1791280529.8129475,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.812949,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations are similar, so that\"}"
+  },
+  {
+    "at": 1791280529.826822,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.826825,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations are similar, so that’s\"}"
+  },
+  {
+    "at": 1791280529.8538742,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.8538752,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations are similar, so that’s already\"}"
+  },
+  {
+    "at": 1791280529.88206,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.8820612,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations are similar, so that’s already included\"}"
+  },
+  {
+    "at": 1791280529.911291,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280529.911292,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c58d628487d0acf98a7c9ba55665\",\"item_id\":\"rs_00933d1a394bb439016ac4c58f047087d099d2ec177748c131\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Reviewing task description**\\n\\nThe current description mentions that something \\\"cannot shelf in time,\\\" but it doesn't include details about following planned storage, stickers, or registration. The previous process might have been more straightforward. The latest emphasizes the pressure, but the actions are the same. Since the steps are described across contexts, I might not need an edit because the existing description already covers the essentials. An employee mentioned that busy situations are similar, so that’s already included.\"}"
+  },
+  {
+    "at": 1791280543.0617604,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.0617619,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI\"}"
+  },
+  {
+    "at": 1791280543.0618298,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.0618303,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m\"}"
+  },
+  {
+    "at": 1791280543.0699246,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.0699255,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering\"}"
+  },
+  {
+    "at": 1791280543.0764604,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.0764616,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking\"}"
+  },
+  {
+    "at": 1791280543.081854,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.0818553,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about\"}"
+  },
+  {
+    "at": 1791280543.091702,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.0917034,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift\"}"
+  },
+  {
+    "at": 1791280543.0972934,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.0972943,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use\"}"
+  },
+  {
+    "at": 1791280543.1048138,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.1048148,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in\"}"
+  },
+  {
+    "at": 1791280543.1132014,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.1132026,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job\"}"
+  },
+  {
+    "at": 1791280543.119714,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.1197152,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks\"}"
+  },
+  {
+    "at": 1791280543.1316473,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.1316485,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as\"}"
+  },
+  {
+    "at": 1791280543.137973,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.137974,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it\"}"
+  },
+  {
+    "at": 1791280543.146653,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.146654,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s\"}"
+  },
+  {
+    "at": 1791280543.1536121,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.1536133,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial\"}"
+  },
+  {
+    "at": 1791280543.1610677,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.161069,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for\"}"
+  },
+  {
+    "at": 1791280543.1685247,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.168526,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding\"}"
+  },
+  {
+    "at": 1791280543.1774402,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.1774464,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the\"}"
+  },
+  {
+    "at": 1791280543.1845431,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.1845443,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment\"}"
+  },
+  {
+    "at": 1791280543.2008028,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.200804,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role\"}"
+  },
+  {
+    "at": 1791280543.2061617,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.206163,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in\"}"
+  },
+  {
+    "at": 1791280543.213745,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.213746,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work\"}"
+  },
+  {
+    "at": 1791280543.2216263,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.2216275,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work.\"}"
+  },
+  {
+    "at": 1791280543.2300365,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.2300375,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There\"}"
+  },
+  {
+    "at": 1791280543.2363148,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.236316,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s\"}"
+  },
+  {
+    "at": 1791280543.2444618,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.244463,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a\"}"
+  },
+  {
+    "at": 1791280543.2510839,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.2510848,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection\"}"
+  },
+  {
+    "at": 1791280543.2609897,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.2609906,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing\"}"
+  },
+  {
+    "at": 1791280543.273766,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.2737675,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between\"}"
+  },
+  {
+    "at": 1791280543.2789974,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.2789986,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications\"}"
+  },
+  {
+    "at": 1791280543.311929,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.3119304,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and\"}"
+  },
+  {
+    "at": 1791280543.3226666,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.3226678,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual\"}"
+  },
+  {
+    "at": 1791280543.328142,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.3281426,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks\"}"
+  },
+  {
+    "at": 1791280543.337174,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.3371751,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks.\"}"
+  },
+  {
+    "at": 1791280543.3470109,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.3470118,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer\"}"
+  },
+  {
+    "at": 1791280543.3519094,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.3519104,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned\"}"
+  },
+  {
+    "at": 1791280543.3579772,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.3579783,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that\"}"
+  },
+  {
+    "at": 1791280543.3855238,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.385525,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications\"}"
+  },
+  {
+    "at": 1791280543.3962579,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.396259,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need\"}"
+  },
+  {
+    "at": 1791280543.4117403,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.4117422,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to\"}"
+  },
+  {
+    "at": 1791280543.422773,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.4227743,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie\"}"
+  },
+  {
+    "at": 1791280543.4253569,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.4253578,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly\"}"
+  },
+  {
+    "at": 1791280543.4365973,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.4365983,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to\"}"
+  },
+  {
+    "at": 1791280543.4392722,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.439273,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work\"}"
+  },
+  {
+    "at": 1791280543.4482722,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.4482734,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work.\"}"
+  },
+  {
+    "at": 1791280543.4543805,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.4543815,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While\"}"
+  },
+  {
+    "at": 1791280543.4614446,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.4614458,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we\"}"
+  },
+  {
+    "at": 1791280543.4809468,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.480948,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know\"}"
+  },
+  {
+    "at": 1791280543.484751,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.484752,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification\"}"
+  },
+  {
+    "at": 1791280543.4915392,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.4915402,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is\"}"
+  },
+  {
+    "at": 1791280543.5026908,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.5026917,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary\"}"
+  },
+  {
+    "at": 1791280543.5127776,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.5127785,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary,\"}"
+  },
+  {
+    "at": 1791280543.5190806,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.5190818,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding\"}"
+  },
+  {
+    "at": 1791280543.5308256,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.530827,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific\"}"
+  },
+  {
+    "at": 1791280543.5393813,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.5393822,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks\"}"
+  },
+  {
+    "at": 1791280543.5479403,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.5479414,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like\"}"
+  },
+  {
+    "at": 1791280543.5586395,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.5586407,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking\"}"
+  },
+  {
+    "at": 1791280543.5660226,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.5660236,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or\"}"
+  },
+  {
+    "at": 1791280543.5740356,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.574037,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving\"}"
+  },
+  {
+    "at": 1791280543.5822136,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.5822153,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items\"}"
+  },
+  {
+    "at": 1791280543.5895915,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.589593,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is\"}"
+  },
+  {
+    "at": 1791280543.5949826,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.5949843,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential\"}"
+  },
+  {
+    "at": 1791280543.6049192,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6049206,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential.\"}"
+  },
+  {
+    "at": 1791280543.6130564,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6130598,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I\"}"
+  },
+  {
+    "at": 1791280543.62161,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6216116,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think\"}"
+  },
+  {
+    "at": 1791280543.6484363,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6484375,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I\"}"
+  },
+  {
+    "at": 1791280543.6554153,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6554165,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should\"}"
+  },
+  {
+    "at": 1791280543.6655605,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6655622,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow\"}"
+  },
+  {
+    "at": 1791280543.6720686,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6720698,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up\"}"
+  },
+  {
+    "at": 1791280543.6835067,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6835082,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with\"}"
+  },
+  {
+    "at": 1791280543.6853297,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6853306,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples\"}"
+  },
+  {
+    "at": 1791280543.6946611,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.6946628,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to\"}"
+  },
+  {
+    "at": 1791280543.7025006,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.7025018,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify\"}"
+  },
+  {
+    "at": 1791280543.716098,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.7160995,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how\"}"
+  },
+  {
+    "at": 1791280543.722114,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.7221155,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forkl\"}"
+  },
+  {
+    "at": 1791280543.7348928,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.734894,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts\"}"
+  },
+  {
+    "at": 1791280543.7419808,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.7419817,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit\"}"
+  },
+  {
+    "at": 1791280543.7517347,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.751736,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into\"}"
+  },
+  {
+    "at": 1791280543.7673295,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.7673314,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily\"}"
+  },
+  {
+    "at": 1791280543.7730973,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.7730982,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations\"}"
+  },
+  {
+    "at": 1791280543.7753642,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.775365,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations.\"}"
+  },
+  {
+    "at": 1791280543.7839794,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.7839804,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations. It\"}"
+  },
+  {
+    "at": 1791280543.791867,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.7918687,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations. It’s\"}"
+  },
+  {
+    "at": 1791280543.807301,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.8073025,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations. It’s a\"}"
+  },
+  {
+    "at": 1791280543.8134992,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.813501,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations. It’s a useful\"}"
+  },
+  {
+    "at": 1791280543.8285396,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.8285415,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations. It’s a useful direction\"}"
+  },
+  {
+    "at": 1791280543.8384597,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.8384612,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations. It’s a useful direction to\"}"
+  },
+  {
+    "at": 1791280543.8493133,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.8493145,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations. It’s a useful direction to explore\"}"
+  },
+  {
+    "at": 1791280543.8616314,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280543.8616333,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c59aa77487d08ce79d0ded9d1866\",\"item_id\":\"rs_00933d1a394bb439016ac4c59cbf7087d09f9b621d6ee040e8\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Exploring forklift use in jobs**\\n\\nI’m considering asking about forklift use in job tasks as it’s crucial for understanding the equipment role in work. There’s a connection missing between qualifications and actual tasks. Developer mentioned that qualifications need to tie directly to work. While we know certification is necessary, understanding specific tasks like stacking or moving items is essential. I think I should follow up with examples to clarify how forklifts fit into daily operations. It’s a useful direction to explore!\"}"
+  }
+]

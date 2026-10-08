@@ -1,0 +1,95 @@
+{
+  "completed": [
+    {
+      "arm": "old",
+      "case_id": "warehouse_environment"
+    },
+    {
+      "arm": "new",
+      "case_id": "warehouse_environment"
+    },
+    {
+      "arm": "new",
+      "case_id": "warehouse_errors"
+    },
+    {
+      "arm": "old",
+      "case_id": "warehouse_errors"
+    },
+    {
+      "arm": "old",
+      "case_id": "warehouse_load"
+    },
+    {
+      "arm": "new",
+      "case_id": "warehouse_load"
+    },
+    {
+      "arm": "new",
+      "case_id": "accounting_errors"
+    },
+    {
+      "arm": "old",
+      "case_id": "accounting_errors"
+    },
+    {
+      "arm": "old",
+      "case_id": "software_load"
+    },
+    {
+      "arm": "new",
+      "case_id": "software_load"
+    },
+    {
+      "arm": "new",
+      "case_id": "confirmed_stable_conditions"
+    },
+    {
+      "arm": "old",
+      "case_id": "confirmed_stable_conditions"
+    },
+    {
+      "arm": "old",
+      "case_id": "unknown_is_not_unexplored"
+    },
+    {
+      "arm": "new",
+      "case_id": "unknown_is_not_unexplored"
+    },
+    {
+      "arm": "new",
+      "case_id": "employee_requests_stop"
+    },
+    {
+      "arm": "old",
+      "case_id": "employee_requests_stop"
+    }
+  ],
+  "accounting": {
+    "input_tokens": 735420,
+    "output_tokens": 29597,
+    "reasoning_tokens": 22217,
+    "cached_input_tokens": 678293,
+    "cache_write_input_tokens": 56968,
+    "total_tokens": 765017,
+    "outbound_calls": 106,
+    "count_calls": 53,
+    "generation_calls": 53,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 735420,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0053",
+    "actual_estimated_usd": "0.028718330",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.034018330",
+    "cumulative_occupied_usd": "0.034018330",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 528.9742393999986,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

@@ -1,0 +1,2458 @@
+[
+  {
+    "at": 1791281576.3404696,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.3404717,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI\"}"
+  },
+  {
+    "at": 1791281576.3500364,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.350038,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m\"}"
+  },
+  {
+    "at": 1791281576.4373279,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4373293,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying\"}"
+  },
+  {
+    "at": 1791281576.444141,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4441419,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to\"}"
+  },
+  {
+    "at": 1791281576.4573781,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4573796,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand\"}"
+  },
+  {
+    "at": 1791281576.4667358,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4667373,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that\"}"
+  },
+  {
+    "at": 1791281576.4715962,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4715977,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the\"}"
+  },
+  {
+    "at": 1791281576.4764774,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4764786,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior\"}"
+  },
+  {
+    "at": 1791281576.4793048,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4793057,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is\"}"
+  },
+  {
+    "at": 1791281576.4843514,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.484353,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating\"}"
+  },
+  {
+    "at": 1791281576.4847603,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4847612,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that\"}"
+  },
+  {
+    "at": 1791281576.4848173,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4848175,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting\"}"
+  },
+  {
+    "at": 1791281576.484871,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4848714,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public\"}"
+  },
+  {
+    "at": 1791281576.4882393,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4882405,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references\"}"
+  },
+  {
+    "at": 1791281576.4886138,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.4886148,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is\"}"
+  },
+  {
+    "at": 1791281576.573784,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.5737858,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to\"}"
+  },
+  {
+    "at": 1791281576.5738053,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.573806,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find\"}"
+  },
+  {
+    "at": 1791281576.5738654,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.5738657,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible\"}"
+  },
+  {
+    "at": 1791281576.573878,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.5738783,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage\"}"
+  },
+  {
+    "at": 1791281576.573888,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.5738883,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage.\"}"
+  },
+  {
+    "at": 1791281576.574059,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.5740597,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When\"}"
+  },
+  {
+    "at": 1791281576.574073,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.5740733,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm\"}"
+  },
+  {
+    "at": 1791281576.5740855,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.5740857,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure\"}"
+  },
+  {
+    "at": 1791281576.5791268,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.579128,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure,\"}"
+  },
+  {
+    "at": 1791281576.5964773,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.5964785,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I\"}"
+  },
+  {
+    "at": 1791281576.5974689,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.59747,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should\"}"
+  },
+  {
+    "at": 1791281576.6011868,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6011882,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish\"}"
+  },
+  {
+    "at": 1791281576.602176,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6021771,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my\"}"
+  },
+  {
+    "at": 1791281576.6022272,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6022277,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks\"}"
+  },
+  {
+    "at": 1791281576.6022441,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6022444,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks.\"}"
+  },
+  {
+    "at": 1791281576.6068943,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6068957,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We\"}"
+  },
+  {
+    "at": 1791281576.6143842,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6143856,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read\"}"
+  },
+  {
+    "at": 1791281576.625414,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6254168,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the\"}"
+  },
+  {
+    "at": 1791281576.6322072,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6322083,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references\"}"
+  },
+  {
+    "at": 1791281576.6394205,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6394217,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references,\"}"
+  },
+  {
+    "at": 1791281576.6504357,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6504369,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and\"}"
+  },
+  {
+    "at": 1791281576.6588647,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6588666,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the\"}"
+  },
+  {
+    "at": 1791281576.6655617,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6655629,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee\"}"
+  },
+  {
+    "at": 1791281576.6761851,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.676187,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is\"}"
+  },
+  {
+    "at": 1791281576.683118,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6831195,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clar\"}"
+  },
+  {
+    "at": 1791281576.6914337,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.691435,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying\"}"
+  },
+  {
+    "at": 1791281576.698943,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.6989443,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily\"}"
+  },
+  {
+    "at": 1791281576.7063751,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.706376,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties\"}"
+  },
+  {
+    "at": 1791281576.7274783,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7274797,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties,\"}"
+  },
+  {
+    "at": 1791281576.731064,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7310653,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting\"}"
+  },
+  {
+    "at": 1791281576.7311273,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7311277,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there\"}"
+  },
+  {
+    "at": 1791281576.7405636,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7405655,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are\"}"
+  },
+  {
+    "at": 1791281576.7487824,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7487836,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown\"}"
+  },
+  {
+    "at": 1791281576.7552996,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7553008,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional\"}"
+  },
+  {
+    "at": 1791281576.7640471,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.764048,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks\"}"
+  },
+  {
+    "at": 1791281576.7712884,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7712896,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks.\"}"
+  },
+  {
+    "at": 1791281576.7806156,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7806175,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting\"}"
+  },
+  {
+    "at": 1791281576.787516,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7875175,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one\"}"
+  },
+  {
+    "at": 1791281576.7976668,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.7976677,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or\"}"
+  },
+  {
+    "at": 1791281576.806993,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.8069954,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two\"}"
+  },
+  {
+    "at": 1791281576.8110912,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.8110921,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant\"}"
+  },
+  {
+    "at": 1791281576.819065,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.819066,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references\"}"
+  },
+  {
+    "at": 1791281576.8272855,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.8272872,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could\"}"
+  },
+  {
+    "at": 1791281576.8365717,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.8365731,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help\"}"
+  },
+  {
+    "at": 1791281576.8439264,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.8439279,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide\"}"
+  },
+  {
+    "at": 1791281576.8519473,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.8519485,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future\"}"
+  },
+  {
+    "at": 1791281576.866106,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.8661075,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage\"}"
+  },
+  {
+    "at": 1791281576.9068458,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.9068468,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage.\"}"
+  },
+  {
+    "at": 1791281576.9497027,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.9497042,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I\"}"
+  },
+  {
+    "at": 1791281576.975091,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.9750926,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice\"}"
+  },
+  {
+    "at": 1791281576.9807246,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.9807255,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we\"}"
+  },
+  {
+    "at": 1791281576.9961607,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281576.996162,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might\"}"
+  },
+  {
+    "at": 1791281577.0051668,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.0051682,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want\"}"
+  },
+  {
+    "at": 1791281577.0145519,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.014553,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to\"}"
+  },
+  {
+    "at": 1791281577.021605,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.0216064,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read\"}"
+  },
+  {
+    "at": 1791281577.0293067,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.0293076,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current\"}"
+  },
+  {
+    "at": 1791281577.0384898,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.0384915,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference\"}"
+  },
+  {
+    "at": 1791281577.0461679,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.046169,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states\"}"
+  },
+  {
+    "at": 1791281577.053554,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.0535555,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states.\"}"
+  },
+  {
+    "at": 1791281577.0656557,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.065658,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The\"}"
+  },
+  {
+    "at": 1791281577.0721676,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.072169,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate\"}"
+  },
+  {
+    "at": 1791281577.0815597,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.081561,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for\"}"
+  },
+  {
+    "at": 1791281577.087566,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.087567,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “\"}"
+  },
+  {
+    "at": 1791281577.1017137,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.101715,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold\"}"
+  },
+  {
+    "at": 1791281577.1086495,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.1086504,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold chain\"}"
+  },
+  {
+    "at": 1791281577.117585,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.1175861,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold chain warehouse\"}"
+  },
+  {
+    "at": 1791281577.1299722,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.1299734,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold chain warehouse logistics\"}"
+  },
+  {
+    "at": 1791281577.133328,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.133329,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold chain warehouse logistics”\"}"
+  },
+  {
+    "at": 1791281577.1435728,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.143574,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold chain warehouse logistics” seems\"}"
+  },
+  {
+    "at": 1791281577.1515355,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.151537,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold chain warehouse logistics” seems broad\"}"
+  },
+  {
+    "at": 1791281577.1591713,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.1591725,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold chain warehouse logistics” seems broad but\"}"
+  },
+  {
+    "at": 1791281577.1741889,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.1741917,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold chain warehouse logistics” seems broad but relevant\"}"
+  },
+  {
+    "at": 1791281577.182502,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.1825035,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying reference selection**\\n\\nI’m trying to understand that the senior is indicating that selecting public references is meant to find possible coverage. When I'm unsure, I should finish my tasks. We read the references, and the employee is clarifying daily duties, noting there are unknown additional tasks. Selecting one or two relevant references could help guide future coverage. I notice we might want to read current reference states. The candidate for “cold chain warehouse logistics” seems broad but relevant.\"}"
+  },
+  {
+    "at": 1791281577.8482554,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.848257,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI\"}"
+  },
+  {
+    "at": 1791281577.8498745,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.8498755,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m\"}"
+  },
+  {
+    "at": 1791281577.8499596,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.8499599,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking\"}"
+  },
+  {
+    "at": 1791281577.8499968,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.8499973,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that\"}"
+  },
+  {
+    "at": 1791281577.8500102,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.8500104,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the\"}"
+  },
+  {
+    "at": 1791281577.8841002,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.8841019,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model\"}"
+  },
+  {
+    "at": 1791281577.9081604,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9081624,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references\"}"
+  },
+  {
+    "at": 1791281577.9102623,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9102638,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for\"}"
+  },
+  {
+    "at": 1791281577.912426,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9124272,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks\"}"
+  },
+  {
+    "at": 1791281577.9152887,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9152896,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could\"}"
+  },
+  {
+    "at": 1791281577.9188366,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9188373,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be\"}"
+  },
+  {
+    "at": 1791281577.9229715,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9229722,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more\"}"
+  },
+  {
+    "at": 1791281577.9239616,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9239633,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive\"}"
+  },
+  {
+    "at": 1791281577.9240243,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9240248,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive,\"}"
+  },
+  {
+    "at": 1791281577.9263098,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9263105,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet\"}"
+  },
+  {
+    "at": 1791281577.9263582,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9263587,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they\"}"
+  },
+  {
+    "at": 1791281577.9810286,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9810302,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as\"}"
+  },
+  {
+    "at": 1791281577.9811103,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9811108,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help\"}"
+  },
+  {
+    "at": 1791281577.9811869,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9811873,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help.\"}"
+  },
+  {
+    "at": 1791281577.9813354,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9813366,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The\"}"
+  },
+  {
+    "at": 1791281577.9814436,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9814441,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role\"}"
+  },
+  {
+    "at": 1791281577.9816074,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9816086,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of\"}"
+  },
+  {
+    "at": 1791281577.9817293,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.98173,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"\"}"
+  },
+  {
+    "at": 1791281577.9817917,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9817924,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse\"}"
+  },
+  {
+    "at": 1791281577.9818594,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281577.9818602,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\"}"
+  },
+  {
+    "at": 1791281578.0133958,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0133982,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\"\"}"
+  },
+  {
+    "at": 1791281578.016545,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0165462,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves\"}"
+  },
+  {
+    "at": 1791281578.0180905,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0180914,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning\"}"
+  },
+  {
+    "at": 1791281578.0216687,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.02167,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning,\"}"
+  },
+  {
+    "at": 1791281578.0264854,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0264866,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing\"}"
+  },
+  {
+    "at": 1791281578.0265508,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0265512,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment\"}"
+  },
+  {
+    "at": 1791281578.026611,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0266118,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment,\"}"
+  },
+  {
+    "at": 1791281578.0288267,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.02883,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and\"}"
+  },
+  {
+    "at": 1791281578.0289114,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0289118,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining\"}"
+  },
+  {
+    "at": 1791281578.0289516,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.028952,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records\"}"
+  },
+  {
+    "at": 1791281578.0562985,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0563,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records,\"}"
+  },
+  {
+    "at": 1791281578.058951,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0589519,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but\"}"
+  },
+  {
+    "at": 1791281578.0621188,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0621207,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that\"}"
+  },
+  {
+    "at": 1791281578.0670311,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0670323,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title\"}"
+  },
+  {
+    "at": 1791281578.0721872,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0721884,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn\"}"
+  },
+  {
+    "at": 1791281578.0853727,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0853739,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t\"}"
+  },
+  {
+    "at": 1791281578.0854363,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0854368,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact\"}"
+  },
+  {
+    "at": 1791281578.090134,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.090135,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact.\"}"
+  },
+  {
+    "at": 1791281578.0908854,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.090886,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I\"}"
+  },
+  {
+    "at": 1791281578.0909595,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0909598,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m\"}"
+  },
+  {
+    "at": 1791281578.0910084,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0910087,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering\"}"
+  },
+  {
+    "at": 1791281578.0911243,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0911262,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting\"}"
+  },
+  {
+    "at": 1791281578.0939455,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.0939467,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both\"}"
+  },
+  {
+    "at": 1791281578.1029265,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1029277,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"\"}"
+  },
+  {
+    "at": 1791281578.1089487,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1089497,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold\"}"
+  },
+  {
+    "at": 1791281578.1165106,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.116512,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain\"}"
+  },
+  {
+    "at": 1791281578.1224883,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1224906,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse\"}"
+  },
+  {
+    "at": 1791281578.1273837,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.127385,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\"}"
+  },
+  {
+    "at": 1791281578.1349769,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.134978,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\"\"}"
+  },
+  {
+    "at": 1791281578.140543,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1405442,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and\"}"
+  },
+  {
+    "at": 1791281578.1453958,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1453965,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"\"}"
+  },
+  {
+    "at": 1791281578.1543632,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.154364,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse\"}"
+  },
+  {
+    "at": 1791281578.159512,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1595128,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant\"}"
+  },
+  {
+    "at": 1791281578.1658697,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1658711,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\"\"}"
+  },
+  {
+    "at": 1791281578.1713705,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1713717,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The\"}"
+  },
+  {
+    "at": 1791281578.1781828,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1781838,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions\"}"
+  },
+  {
+    "at": 1791281578.1828387,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1828396,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow\"}"
+  },
+  {
+    "at": 1791281578.1896234,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.1896243,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple\"}"
+  },
+  {
+    "at": 1791281578.2014842,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2014856,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public\"}"
+  },
+  {
+    "at": 1791281578.2046163,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2046173,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references\"}"
+  },
+  {
+    "at": 1791281578.21148,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2114809,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to\"}"
+  },
+  {
+    "at": 1791281578.2199621,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2199657,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent\"}"
+  },
+  {
+    "at": 1791281578.224343,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.224344,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major\"}"
+  },
+  {
+    "at": 1791281578.2299762,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2299771,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work\"}"
+  },
+  {
+    "at": 1791281578.2379968,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2379978,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work,\"}"
+  },
+  {
+    "at": 1791281578.2536778,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2536795,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which\"}"
+  },
+  {
+    "at": 1791281578.25574,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2557411,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes\"}"
+  },
+  {
+    "at": 1791281578.2558086,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2558093,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense\"}"
+  },
+  {
+    "at": 1791281578.2605608,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.260562,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense,\"}"
+  },
+  {
+    "at": 1791281578.2666547,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2666557,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but\"}"
+  },
+  {
+    "at": 1791281578.2714868,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2714875,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we\"}"
+  },
+  {
+    "at": 1791281578.2801204,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.280121,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should\"}"
+  },
+  {
+    "at": 1791281578.2840233,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.2840242,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait\"}"
+  },
+  {
+    "at": 1791281578.2902088,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.29021,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until\"}"
+  },
+  {
+    "at": 1791281578.301169,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.3011699,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the\"}"
+  },
+  {
+    "at": 1791281578.3049285,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.3049295,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job\"}"
+  },
+  {
+    "at": 1791281578.3134224,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.3134236,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description\"}"
+  },
+  {
+    "at": 1791281578.3178513,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.3178525,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is\"}"
+  },
+  {
+    "at": 1791281578.3229976,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.3229983,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly\"}"
+  },
+  {
+    "at": 1791281578.332075,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.3320763,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete\"}"
+  },
+  {
+    "at": 1791281578.3351476,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.3351483,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete.\"}"
+  },
+  {
+    "at": 1791281578.3632824,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.363284,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So\"}"
+  },
+  {
+    "at": 1791281578.3837838,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.3837855,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many\"}"
+  },
+  {
+    "at": 1791281578.3955863,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.3955886,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknown\"}"
+  },
+  {
+    "at": 1791281578.397283,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.397284,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns\"}"
+  },
+  {
+    "at": 1791281578.401084,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4010847,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here\"}"
+  },
+  {
+    "at": 1791281578.4083781,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4083788,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here!\"}"
+  },
+  {
+    "at": 1791281578.41585,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.415851,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The\"}"
+  },
+  {
+    "at": 1791281578.4185126,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4185138,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references\"}"
+  },
+  {
+    "at": 1791281578.4314392,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4314399,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are\"}"
+  },
+  {
+    "at": 1791281578.4366162,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4366171,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely\"}"
+  },
+  {
+    "at": 1791281578.4434457,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4434469,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant\"}"
+  },
+  {
+    "at": 1791281578.447874,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.447875,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant but\"}"
+  },
+  {
+    "at": 1791281578.4566941,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4566953,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant but not\"}"
+  },
+  {
+    "at": 1791281578.4619684,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4619696,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant but not the\"}"
+  },
+  {
+    "at": 1791281578.4705882,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4705892,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant but not the exact\"}"
+  },
+  {
+    "at": 1791281578.4816837,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.481685,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant but not the exact position\"}"
+  },
+  {
+    "at": 1791281578.4843466,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.4843478,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant but not the exact position of\"}"
+  },
+  {
+    "at": 1791281578.4946501,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.494651,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant but not the exact position of the\"}"
+  },
+  {
+    "at": 1791281578.5004513,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.5004523,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant but not the exact position of the employee\"}"
+  },
+  {
+    "at": 1791281578.5064094,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281578.5064106,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9a6f92487d089b612499f6abaa5\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring reference options**\\n\\nI’m thinking that the model references for tasks could be more extensive, yet they serve as help. The role of \\\"warehouse assistant\\\" involves cleaning, managing equipment, and maintaining records, but that title isn’t exact. I’m considering selecting both \\\"cold chain warehouse logistics\\\" and \\\"warehouse assistant.\\\" The instructions allow multiple public references to represent major work, which makes sense, but we should wait until the job description is mostly complete. So many unknowns here! The references are likely relevant but not the exact position of the employee.\"}"
+  },
+  {
+    "at": 1791281581.552724,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.552725,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI\"}"
+  },
+  {
+    "at": 1791281581.557939,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.55794,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see\"}"
+  },
+  {
+    "at": 1791281581.5781455,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.578147,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that\"}"
+  },
+  {
+    "at": 1791281581.5896876,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.5896888,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing\"}"
+  },
+  {
+    "at": 1791281581.598363,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.5983644,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility\"}"
+  },
+  {
+    "at": 1791281581.6095903,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.6095915,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for\"}"
+  },
+  {
+    "at": 1791281581.6595428,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.659547,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature\"}"
+  },
+  {
+    "at": 1791281581.6596122,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.6596124,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs\"}"
+  },
+  {
+    "at": 1791281581.6709998,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.6710007,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is\"}"
+  },
+  {
+    "at": 1791281581.7137368,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.713738,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new\"}"
+  },
+  {
+    "at": 1791281581.7289104,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.7289116,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and\"}"
+  },
+  {
+    "at": 1791281581.7664127,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.7664142,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't\"}"
+  },
+  {
+    "at": 1791281581.7761245,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.7761257,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been\"}"
+  },
+  {
+    "at": 1791281581.7861803,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.7861814,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked\"}"
+  },
+  {
+    "at": 1791281581.7958953,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.7958965,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before\"}"
+  },
+  {
+    "at": 1791281581.8050978,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.805099,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before,\"}"
+  },
+  {
+    "at": 1791281581.835247,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.8352485,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which\"}"
+  },
+  {
+    "at": 1791281581.8487763,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.8487778,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is\"}"
+  },
+  {
+    "at": 1791281581.8531382,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.8531392,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting\"}"
+  },
+  {
+    "at": 1791281581.9161565,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.9161577,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting!\"}"
+  },
+  {
+    "at": 1791281581.9476266,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.9476278,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I\"}"
+  },
+  {
+    "at": 1791281581.955187,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.9551883,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could\"}"
+  },
+  {
+    "at": 1791281581.9745152,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.9745162,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention\"}"
+  },
+  {
+    "at": 1791281581.983404,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.983405,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention,\"}"
+  },
+  {
+    "at": 1791281581.990112,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.9901133,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"\"}"
+  },
+  {
+    "at": 1791281581.9995937,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281581.999595,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是\"}"
+  },
+  {
+    "at": 1791281582.0279233,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.0279245,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假\"}"
+  },
+  {
+    "at": 1791281582.034115,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.0341163,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設\"}"
+  },
+  {
+    "at": 1791281582.0656376,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.065639,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你\"}"
+  },
+  {
+    "at": 1791281582.0889254,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.0889268,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要\"}"
+  },
+  {
+    "at": 1791281582.0982122,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.0982137,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負\"}"
+  },
+  {
+    "at": 1791281582.1646526,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.1646538,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責\"}"
+  },
+  {
+    "at": 1791281582.1727395,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.1727407,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\"\"}"
+  },
+  {
+    "at": 1791281582.1873999,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.1874013,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We\"}"
+  },
+  {
+    "at": 1791281582.20628,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.206282,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might\"}"
+  },
+  {
+    "at": 1791281582.213323,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.2133243,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want\"}"
+  },
+  {
+    "at": 1791281582.2211432,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.2211447,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to\"}"
+  },
+  {
+    "at": 1791281582.2499225,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.249924,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to re\"}"
+  },
+  {
+    "at": 1791281582.2825851,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.2825863,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase\"}"
+  },
+  {
+    "at": 1791281582.2879703,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.2879713,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it\"}"
+  },
+  {
+    "at": 1791281582.354383,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.354384,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as\"}"
+  },
+  {
+    "at": 1791281582.362209,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.3622103,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an\"}"
+  },
+  {
+    "at": 1791281582.4174893,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.4174907,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative\"}"
+  },
+  {
+    "at": 1791281582.4269905,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.426992,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative:\"}"
+  },
+  {
+    "at": 1791281582.4843898,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.484391,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"\"}"
+  },
+  {
+    "at": 1791281582.493533,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.4935346,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷\"}"
+  },
+  {
+    "at": 1791281582.5177245,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.5177257,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏\"}"
+  },
+  {
+    "at": 1791281582.5261018,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.5261028,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區\"}"
+  },
+  {
+    "at": 1791281582.5377007,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.5377018,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面\"}"
+  },
+  {
+    "at": 1791281582.545262,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.5452633,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我\"}"
+  },
+  {
+    "at": 1791281582.5840478,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.5840492,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只\"}"
+  },
+  {
+    "at": 1791281582.6001859,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.6001868,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道\"}"
+  },
+  {
+    "at": 1791281582.6259599,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.6259613,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你\"}"
+  },
+  {
+    "at": 1791281582.6379054,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.6379063,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶\"}"
+  },
+  {
+    "at": 1791281582.674219,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.67422,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾\"}"
+  },
+  {
+    "at": 1791281582.6984162,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.6984174,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進\"}"
+  },
+  {
+    "at": 1791281582.7186768,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.718678,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出\"}"
+  },
+  {
+    "at": 1791281582.7407982,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.7407994,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。\"}"
+  },
+  {
+    "at": 1791281582.7510674,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.7510684,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你\"}"
+  },
+  {
+    "at": 1791281582.7632186,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.7632203,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進\"}"
+  },
+  {
+    "at": 1791281582.788339,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.7883403,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去\"}"
+  },
+  {
+    "at": 1791281582.7968135,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.7968147,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時\"}"
+  },
+  {
+    "at": 1791281582.8061357,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.8061366,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會\"}"
+  },
+  {
+    "at": 1791281582.835612,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.8356135,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不\"}"
+  },
+  {
+    "at": 1791281582.847508,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.8475096,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會\"}"
+  },
+  {
+    "at": 1791281582.8709352,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.8709366,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢\"}"
+  },
+  {
+    "at": 1791281582.880647,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.8806493,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查\"}"
+  },
+  {
+    "at": 1791281582.889749,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.889751,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或\"}"
+  },
+  {
+    "at": 1791281582.8992152,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.8992167,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登\"}"
+  },
+  {
+    "at": 1791281582.9127462,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.9127474,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記\"}"
+  },
+  {
+    "at": 1791281582.9273748,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.9273758,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫\"}"
+  },
+  {
+    "at": 1791281582.9526277,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.9526293,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫\"}"
+  },
+  {
+    "at": 1791281582.9604113,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.9604127,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、\"}"
+  },
+  {
+    "at": 1791281582.9803262,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.9803271,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認\"}"
+  },
+  {
+    "at": 1791281582.9987361,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281582.9987373,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨\"}"
+  },
+  {
+    "at": 1791281583.0179174,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.0179188,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品\"}"
+  },
+  {
+    "at": 1791281583.0690145,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.0690157,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀\"}"
+  },
+  {
+    "at": 1791281583.0732582,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.0732596,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態\"}"
+  },
+  {
+    "at": 1791281583.0889611,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.0889618,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？\"}"
+  },
+  {
+    "at": 1791281583.1192033,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.1192045,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還\"}"
+  },
+  {
+    "at": 1791281583.1433837,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.1433852,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是\"}"
+  },
+  {
+    "at": 1791281583.1531177,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.1531193,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是\"}"
+  },
+  {
+    "at": 1791281583.1663141,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.1663153,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到\"}"
+  },
+  {
+    "at": 1791281583.1827564,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.1827576,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡\"}"
+  },
+  {
+    "at": 1791281583.1910756,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.1910772,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面\"}"
+  },
+  {
+    "at": 1791281583.2214885,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.22149,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取\"}"
+  },
+  {
+    "at": 1791281583.2353513,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.2353525,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放\"}"
+  },
+  {
+    "at": 1791281583.2459304,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.2459316,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨\"}"
+  },
+  {
+    "at": 1791281583.281709,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.2817109,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品\"}"
+  },
+  {
+    "at": 1791281583.2914186,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.29142,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？\"}"
+  },
+  {
+    "at": 1791281583.298709,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.2987103,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不\"}"
+  },
+  {
+    "at": 1791281583.3085752,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.3085766,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清\"}"
+  },
+  {
+    "at": 1791281583.318582,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.3185835,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚\"}"
+  },
+  {
+    "at": 1791281583.3263261,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.3263273,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也\"}"
+  },
+  {
+    "at": 1791281583.3591413,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.3591425,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可\"}"
+  },
+  {
+    "at": 1791281583.3755305,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.3755322,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說\"}"
+  },
+  {
+    "at": 1791281583.4056194,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.4056208,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不\"}"
+  },
+  {
+    "at": 1791281583.411045,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.4110465,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清\"}"
+  },
+  {
+    "at": 1791281583.4583871,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.4583886,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚\"}"
+  },
+  {
+    "at": 1791281583.4696245,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.4696257,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\"\"}"
+  },
+  {
+    "at": 1791281583.5046322,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.5046337,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This\"}"
+  },
+  {
+    "at": 1791281583.513529,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.5135303,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way\"}"
+  },
+  {
+    "at": 1791281583.538778,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.5387812,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way,\"}"
+  },
+  {
+    "at": 1791281583.5550897,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.5550907,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I\"}"
+  },
+  {
+    "at": 1791281583.565311,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.5653121,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I can\"}"
+  },
+  {
+    "at": 1791281583.5841477,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.5841494,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I can provide\"}"
+  },
+  {
+    "at": 1791281583.6067562,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.6067574,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I can provide some\"}"
+  },
+  {
+    "at": 1791281583.6086268,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.6086285,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I can provide some options\"}"
+  },
+  {
+    "at": 1791281583.633592,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.6335936,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I can provide some options to\"}"
+  },
+  {
+    "at": 1791281583.6466491,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.6466506,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I can provide some options to clarify\"}"
+  },
+  {
+    "at": 1791281583.6535027,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.653504,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I can provide some options to clarify the\"}"
+  },
+  {
+    "at": 1791281583.6605217,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.660525,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I can provide some options to clarify the situation\"}"
+  },
+  {
+    "at": 1791281583.7050774,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281583.7050798,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c9a5a5bc87d088d314c70b9d0522\",\"item_id\":\"rs_00933d1a394bb439016ac4c9ac573487d0a8ad13e7639180a2\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Considering temperature monitoring responsibility**\\n\\nI see that discussing responsibility for temperature logs is new and hasn't been asked before, which is interesting! I could mention, \\\"不是假設你要負責。\\\" We might want to rephrase it as an alternative: \\\"冷藏區方面我只知道你偶爾進出。你進去時會不會檢查或登記庫溫、確認貨品狀態？還是只是到裡面取放貨品？不清楚也可說不清楚。\\\" This way, I can provide some options to clarify the situation.\"}"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://caliburn.local/contracts/reasoning-summary.schema.json",
+  "title": "ReasoningSummary",
+  "description": "Readable provider summary, not raw reasoning or formal interview evidence. Text is accumulated per response/item/summary part; replace, never append updates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["response_id", "item_id", "output_index", "summary_index", "text"],
+  "properties": {
+    "response_id": {"type": "string", "minLength": 1},
+    "item_id": {"type": "string", "minLength": 1},
+    "output_index": {"type": "integer", "minimum": 0},
+    "summary_index": {"type": "integer", "minimum": 0},
+    "text": {"type": "string", "minLength": 1}
+  }
+}

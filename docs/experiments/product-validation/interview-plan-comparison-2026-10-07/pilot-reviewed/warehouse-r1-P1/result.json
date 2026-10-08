@@ -1,0 +1,66 @@
+{
+  "file_id": "0aadff5f-320e-4e89-a466-e54109a32954",
+  "turns": [
+    {
+      "turn": 1,
+      "status": "completed",
+      "elapsed_seconds": 53.63234189999639
+    },
+    {
+      "turn": 2,
+      "status": "completed",
+      "elapsed_seconds": 67.37494529999094
+    },
+    {
+      "turn": 3,
+      "status": "completed",
+      "elapsed_seconds": 8.172875900010695
+    },
+    {
+      "turn": 4,
+      "status": "completed",
+      "elapsed_seconds": 8.191111599997384
+    },
+    {
+      "turn": 5,
+      "status": "completed",
+      "elapsed_seconds": 10.181932000006782
+    },
+    {
+      "turn": 6,
+      "status": "completed",
+      "elapsed_seconds": 75.78378090000479
+    }
+  ],
+  "stop": "common_bounded_closure",
+  "closure_submitted": true,
+  "natural_completion_verified": false,
+  "guard": {
+    "spent_usd": "0.017023165",
+    "occupied_usd": "0.017023165",
+    "retained_reservations": {},
+    "generations": 22,
+    "compacts": 0,
+    "outbound": 49,
+    "counted_input": 557863,
+    "stop_reason": null
+  },
+  "memory_settlement": {
+    "completed": 6
+  },
+  "measurements": {
+    "input_tokens": 450833,
+    "output_tokens": 17273,
+    "counts": 27,
+    "max_counted_input": 33676,
+    "generation_attempts": 22,
+    "compact_attempts": 0,
+    "roles": {
+      "A": {
+        "input_tokens": 450833,
+        "output_tokens": 17273
+      }
+    },
+    "A_compact_adoptions": []
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "question_id": "944d6a55921444f18190113da911a431",
+  "mode": "answer",
+  "fact_ids": [
+    "receiving"
+  ],
+  "reason": "實際追問進貨數量差異的後續處理、記錄與回覆者，receiving 可答；等候期間貨物的具體放置地點未載明，不能以一般上架流程代答。",
+  "subquestions": [
+    {
+      "quote": "通知採購後，這批貨實際怎麼處理？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "凍結事實有採購回覆補送或接受後按結果登記入庫，直接相關。"
+    },
+    {
+      "quote": "例如貨物放在哪裡",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "沒有差異貨物等候採購回覆時的放置位置或隔離方式。"
+    },
+    {
+      "quote": "收貨資料怎麼記錄",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "拍照及登記收貨異常表、依回覆結果登記入庫可回答記錄方式。"
+    },
+    {
+      "quote": "以及誰會告知後續怎麼辦？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "明載由採購回覆補送或接受，不從摘要推定主管決定拒收或退換貨。"
+    }
+  ]
+}

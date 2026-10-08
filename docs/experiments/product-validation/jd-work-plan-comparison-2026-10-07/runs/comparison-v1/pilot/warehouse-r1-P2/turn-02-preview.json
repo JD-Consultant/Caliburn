@@ -1,0 +1,38 @@
+{
+  "job_file_id": "f9507c7c-d5fb-4c76-9bd7-73bd0506c670",
+  "execution_id": "746a8494-8a3c-49fb-b1e5-0d198370eb82",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "執行物流中心的收貨驗收、貨品儲位與揀補、庫存盤點及退貨處理，並協助新人熟悉作業，以維持倉儲作業與庫存處理。"
+    },
+    "work": {
+      "revision_id": "0ec13673-903e-49fa-8f60-b544a767c57b",
+      "areas": [],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": [
+        {
+          "condition_id": "d87513e1-b8b5-4a9c-a376-82df7f2600bb",
+          "kind": "schedule_travel",
+          "text": "早上七點上班，週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "plan_preview": {
+    "plan": "## 目前焦點\n釐清收貨數量差異的查核、處理界線與交接。\n\n## 工作方向\n- 職務基本資料與工作時間：職稱、單位、匯報對象及班表資訊已整理入稿。\n- 收貨驗收：已知會比對採購單、送貨單與實收數量，並拍照通知採購；差異後續處理及完成交接方式待釐清。\n- 其他工作：已知上架、揀貨補貨、庫存盤點、客戶退貨、供應商退貨及帶新人，尚未深入本人做法與責任範圍。\n- 全稿核對：主要工作整理後核對涵蓋、依據及跨欄一致。"
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

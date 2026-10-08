@@ -1,0 +1,635 @@
+{
+  "stages": [
+    {
+      "stage": "live-01",
+      "rows": [
+        {
+          "arm": "old",
+          "case_id": "regroup_distinct_work",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "物流中心倉儲作業"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 7,
+            "revise_jd_profile": 1,
+            "revise_jd_item": 1,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 2,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "regroup_distinct_work",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "物流中心倉儲作業"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": true,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 7,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 0,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "correct_across_affected_fields",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "收貨與退貨管理"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": false,
+          "task_descriptions_unchanged": false,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 4,
+            "read_interview": 1,
+            "read_jd_changes": 3,
+            "revise_jd_item": 2,
+            "revise_jd_profile": 1,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 3,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "old",
+          "case_id": "correct_across_affected_fields",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "收貨與退貨管理"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": false,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 4,
+            "revise_jd_item": 2,
+            "create_jd_task": 1,
+            "revise_jd_profile": 1,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 4,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "old",
+          "case_id": "derive_and_link_capabilities",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "揀貨與核對"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": true,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 2
+          },
+          "jd_edit_calls": 0,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "derive_and_link_capabilities",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "揀貨與核對"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": true,
+          "needs_recheck": 0,
+          "tool_calls": {},
+          "jd_edit_calls": 0,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "probe_before_closure",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "倉庫作業"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": false,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 3,
+            "revise_jd_item": 1,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 1,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "old",
+          "case_id": "probe_before_closure",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "倉庫作業"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": false,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 1,
+          "tool_calls": {
+            "read_jd": 3,
+            "revise_jd_item": 2,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 2,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "old",
+          "case_id": "keep_coherent_single_area",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "出貨前核對"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 3,
+            "revise_jd_profile": 1,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 1,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "keep_coherent_single_area",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "出貨前核對"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": true,
+          "needs_recheck": 0,
+          "tool_calls": {},
+          "jd_edit_calls": 0,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "insufficient_without_forced_edit",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "網站頁面交付"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": true,
+          "needs_recheck": 0,
+          "tool_calls": {},
+          "jd_edit_calls": 0,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "old",
+          "case_id": "insufficient_without_forced_edit",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "網站頁面交付"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": true,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 1
+          },
+          "jd_edit_calls": 0,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "old",
+          "case_id": "group_nonwarehouse_work",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "客服部日常工作"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 3,
+            "request_memory_consolidation": 1,
+            "revise_jd_item": 2
+          },
+          "jd_edit_calls": 2,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "group_nonwarehouse_work",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "客服部日常工作"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 3,
+            "revise_jd_item": 2,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 2,
+          "rejected_call_codes": {}
+        }
+      ],
+      "accounting": {
+        "input_tokens": 614884,
+        "output_tokens": 26401,
+        "reasoning_tokens": 20314,
+        "cached_input_tokens": 560176,
+        "cache_write_input_tokens": 54558,
+        "total_tokens": 641285,
+        "outbound_calls": 100,
+        "count_calls": 50,
+        "generation_calls": 50,
+        "compaction_calls": 0,
+        "admitted_input_tokens": 614884,
+        "prior_usd": "0",
+        "batch_limit_usd": "0.10",
+        "cumulative_limit_usd": "2",
+        "count_estimated_usd": "0.0050",
+        "actual_estimated_usd": "0.025637010",
+        "pending_reserved_usd": "0",
+        "batch_occupied_usd": "0.030637010",
+        "cumulative_occupied_usd": "0.030637010",
+        "pending_request_sha256": null,
+        "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+        "compact_output_reserve_tokens": 128000,
+        "elapsed_seconds": 554.7737072999953,
+        "seconds_limit": 1200,
+        "stop_reason": null
+      },
+      "result_sha256": "a5742bccad0478cc9d8a7a33ec7513cb8554ef182807f3d385e591eff1468df2"
+    },
+    {
+      "stage": "followup-01",
+      "rows": [
+        {
+          "arm": "old",
+          "case_id": "derive_and_link_capabilities",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "揀貨與核對"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": true,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 2,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 0,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "derive_and_link_capabilities",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "揀貨與核對"
+          ],
+          "knowledge": [
+            "庫存先進先出原則"
+          ],
+          "skills": [
+            "貨品核對與差異查核紀錄"
+          ],
+          "task_links": 2,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 2,
+            "revise_jd_item": 2,
+            "create_jd_item": 2,
+            "revise_jd_profile": 1,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 5,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "group_nonwarehouse_work",
+          "areas_before": 1,
+          "areas_after": 2,
+          "area_titles": [
+            "客戶使用問題處理",
+            "客訴資訊整理與回報"
+          ],
+          "knowledge": [],
+          "skills": [
+            "客戶問題初步查核與轉介",
+            "客訴資訊分類與彙整"
+          ],
+          "task_links": 2,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 7,
+            "create_jd_item": 6,
+            "revise_jd_profile": 2,
+            "revise_jd_item": 4,
+            "move_jd_item": 2,
+            "delete_jd_item": 1
+          },
+          "jd_edit_calls": 15,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "old",
+          "case_id": "group_nonwarehouse_work",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "客服部日常工作"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 5,
+            "revise_jd_profile": 1,
+            "revise_jd_item": 2,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 3,
+          "rejected_call_codes": {}
+        }
+      ],
+      "accounting": {
+        "input_tokens": 314699,
+        "output_tokens": 11964,
+        "reasoning_tokens": 8520,
+        "cached_input_tokens": 289063,
+        "cache_write_input_tokens": 25564,
+        "total_tokens": 326663,
+        "outbound_calls": 48,
+        "count_calls": 24,
+        "generation_calls": 24,
+        "compaction_calls": 0,
+        "admitted_input_tokens": 314699,
+        "prior_usd": "0",
+        "batch_limit_usd": "0.069362990",
+        "cumulative_limit_usd": "2",
+        "count_estimated_usd": "0.0024",
+        "actual_estimated_usd": "0.012075330",
+        "pending_reserved_usd": "0",
+        "batch_occupied_usd": "0.014475330",
+        "cumulative_occupied_usd": "0.014475330",
+        "pending_request_sha256": null,
+        "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+        "compact_output_reserve_tokens": 128000,
+        "elapsed_seconds": 277.95903140000155,
+        "seconds_limit": 518,
+        "stop_reason": null
+      },
+      "result_sha256": "4c07a08888f640bdd3f678f20d9eac68b527c9e24b33a889e52e0fc290901c73"
+    },
+    {
+      "stage": "regression-01",
+      "rows": [
+        {
+          "arm": "old",
+          "case_id": "keep_coherent_single_area",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "出貨前核對"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 2,
+            "revise_jd_item": 1,
+            "request_memory_consolidation": 1
+          },
+          "jd_edit_calls": 1,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "keep_coherent_single_area",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "出貨前核對"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": false,
+          "formal_revision_unchanged": false,
+          "needs_recheck": 0,
+          "tool_calls": {
+            "read_jd": 2,
+            "revise_jd_item": 2
+          },
+          "jd_edit_calls": 2,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "new",
+          "case_id": "insufficient_without_forced_edit",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "網站頁面交付"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": true,
+          "needs_recheck": 0,
+          "tool_calls": {},
+          "jd_edit_calls": 0,
+          "rejected_call_codes": {}
+        },
+        {
+          "arm": "old",
+          "case_id": "insufficient_without_forced_edit",
+          "areas_before": 1,
+          "areas_after": 1,
+          "area_titles": [
+            "網站頁面交付"
+          ],
+          "knowledge": [],
+          "skills": [],
+          "task_links": 0,
+          "original_task_ids_retained": true,
+          "original_task_citations_retained": true,
+          "task_descriptions_unchanged": true,
+          "formal_revision_unchanged": true,
+          "needs_recheck": 0,
+          "tool_calls": {},
+          "jd_edit_calls": 0,
+          "rejected_call_codes": {}
+        }
+      ],
+      "accounting": {
+        "input_tokens": 142625,
+        "output_tokens": 4338,
+        "reasoning_tokens": 3526,
+        "cached_input_tokens": 137947,
+        "cache_write_input_tokens": 4642,
+        "total_tokens": 146963,
+        "outbound_calls": 24,
+        "count_calls": 12,
+        "generation_calls": 12,
+        "compaction_calls": 0,
+        "admitted_input_tokens": 142625,
+        "prior_usd": "0",
+        "batch_limit_usd": "0.054887660",
+        "cumulative_limit_usd": "2",
+        "count_estimated_usd": "0.0012",
+        "actual_estimated_usd": "0.004132320",
+        "pending_reserved_usd": "0",
+        "batch_occupied_usd": "0.005332320",
+        "cumulative_occupied_usd": "0.005332320",
+        "pending_request_sha256": null,
+        "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+        "compact_output_reserve_tokens": 128000,
+        "elapsed_seconds": 129.07215670000005,
+        "seconds_limit": 131,
+        "stop_reason": null
+      },
+      "result_sha256": "e15907ec43475dd5c94966aa1ed61d3e28e73716973ba9ee189105ad7a23b2dd"
+    }
+  ],
+  "completed_turns": 22,
+  "occupied_usd": "0.050444660",
+  "estimated_generation_usd": "0.041844660",
+  "count_estimate_usd": "0.0086",
+  "observed_usage": {
+    "input_tokens": 1072208,
+    "output_tokens": 42703,
+    "reasoning_tokens": 32360,
+    "cached_input_tokens": 987186,
+    "cache_write_input_tokens": 84764
+  }
+}

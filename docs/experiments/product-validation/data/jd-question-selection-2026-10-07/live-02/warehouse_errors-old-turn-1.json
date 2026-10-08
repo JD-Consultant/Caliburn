@@ -1,0 +1,17 @@
+{
+  "execution_id": "f4a9a60a-fad7-4f0e-aa91-8a50ba36e987",
+  "exchange": {
+    "employee_input": {
+      "source_id": "c9fa6cd5-f4e8-4ce4-bf91-f7fe8a23cbc1",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "正常做法、交接與目前工作範圍都說過了，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "9c72093d-3ffd-47e9-9b03-a63d834dd8c2",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "就目前這項工作而言，暫時不需要再追問。你已說明上架與登記的做法、品項不符時的處理、完成點，以及目前沒有其他周期性或支援職責。\n\n我已把成果、異常處理要求，以及與主管的通報和交接補進底稿。職稱、所屬單位和正式匯報關係目前尚未確認；主管接收通報或交接，並不直接代表正式匯報關係。若之後想起其他內容，或想補充基本資料，再告訴我即可。"
+    }
+  }
+}

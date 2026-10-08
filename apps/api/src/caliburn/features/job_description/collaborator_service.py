@@ -67,7 +67,7 @@ async def recover_collaborator_result(
     )
 
 
-def _apply_change(
+def apply_collaborator_change(
     collaborators: tuple[Collaborator, ...], change: CollaboratorChange
 ) -> tuple[tuple[Collaborator, ...], Collaborator | None]:
     """Return ordered membership and, only for changed text, one new fixed content revision."""
@@ -133,7 +133,7 @@ async def edit_collaborators(
     )
     if current.revision_id != command.expected_revision_id:
         raise StaleJdRevisionError("Read the current JD before submitting a new edit")
-    collaborators, new_content = _apply_change(current.collaborators, command.change)
+    collaborators, new_content = apply_collaborator_change(current.collaborators, command.change)
     result = current
     if collaborators != current.collaborators:
         if new_content is not None:

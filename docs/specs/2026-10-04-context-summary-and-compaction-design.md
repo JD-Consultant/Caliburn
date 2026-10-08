@@ -123,28 +123,9 @@ W → 新基底的可靠保存及採用仍沿[原採用交界](2026-09-27-shared
 
 下圖是**已確認但尚未實作的 Context 流程** ；完成、候選提交與 Memory 三個安全點仍由各生命週期文件維護。
 
-```mermaid
-flowchart TD
-    start[新 A Turn 或 B 角色本批首次進場] --> prepared{已保存可重用的輪前基底？}
-    prepared -->|有| base[承接同一基底]
-    prepared -->|無| threshold{歷史達 128K 或有適用意圖？}
-    threshold -->|否／無歷史| base
-    threshold -->|是| summary[一般 Responses 產生文字摘要 S]
-    summary --> saved[可靠保存及確認採用 S；不偽造 compaction item]
-    saved --> base
-    base --> initial[固定新工作資料；起始內容只追加一次]
-    initial --> model[容量准入；模型與工具迭代]
-    model --> step[完整 Step；原結果與候選位置一致]
-    step --> control{暫停、取消或完成？}
-    control -->|是| lifecycle[依既有生命週期；不新增壓縮]
-    control -->|否| insurance{下一完整請求達 160K？}
-    insurance -->|否| model
-    insurance -->|是| compact[原生 compact；全部 C 可靠採用]
-    compact --> role{目前角色}
-    role -->|A| model
-    role -->|B1／B2| maps[只追加授權的目前候選 map；保存此觀察]
-    maps --> model
-```
+![目標／未實作：輪前摘要與輪中原生壓縮](../diagrams/specs/2026-10-04-context-summary-and-compaction-design/context-summary-compaction.png)
+
+[圖源](../diagrams/specs/2026-10-04-context-summary-and-compaction-design/context-summary-compaction.mmd) · [SVG](../diagrams/specs/2026-10-04-context-summary-and-compaction-design/context-summary-compaction.svg)
 
 普通故障恢復沿原已保存位置，不從圖首重新初始化。保存／容量失敗的處置依上表及共用有界恢復，不因圖只畫正常路徑而省略。
 

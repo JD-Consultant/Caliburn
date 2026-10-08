@@ -1,0 +1,20 @@
+{
+  "employee_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+  "audit": {
+    "actual_question": "了解，「超重貨」的判定方式也先保留未知，不再追問；儲位由誰規劃同樣不作推定。\n\n接著了解揀貨：你通常收到什麼指示或資料，依據它確認要揀哪些品項和數量？",
+    "employee_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+    "fact_ids": [
+      "picking"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "picking"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉問揀貨的指示或資料，以及品項數量確認，picking 的出貨波次單與核對要求直接相關。前段上架未知摘要不觸發額外事實。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

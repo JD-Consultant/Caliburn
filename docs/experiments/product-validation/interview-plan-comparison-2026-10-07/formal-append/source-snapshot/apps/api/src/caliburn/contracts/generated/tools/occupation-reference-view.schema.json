@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OccupationReferenceView",
+  "description": "公開公版參考的完整已解析任務導覽；不是員工事實或完整度判定。",
+  "$ref": "occupation-reference-search-result.schema.json#/$defs/OccupationReference"
+}

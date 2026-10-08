@@ -1,0 +1,8 @@
+{
+  "question_id": "0dce9b05be934c72ab0f500aa500e63a",
+  "fact_ids": ["shelving"],
+  "mode": "answer",
+  "reason": "實際轉問上架工作步驟及完成狀態，shelving 固定事實直接提供儲位放貨、貼標、WMS 入庫及實物系統一致確認，也保留位置調整與搬運權限界線。未提供額外日期、貨品或新個案細節。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

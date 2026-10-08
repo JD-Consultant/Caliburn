@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SubmitInterviewInput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command_id", "text"],
+  "properties": {
+    "command_id": {"type": "string", "format": "uuid"},
+    "text": {"type": "string", "minLength": 1, "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"}
+  }
+}

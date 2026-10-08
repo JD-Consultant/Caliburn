@@ -1,0 +1,134 @@
+{
+  "arm": "old",
+  "case_id": "keep_coherent_single_area",
+  "job_file_id": "55d19472-65b2-492d-bd74-65872ed7c1f1",
+  "before": {
+    "profile": {
+      "revision_id": "6ed75e16-9c59-4ac0-b097-b5489687107d",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "確認待出貨品項與單據一致，回報未排除差異。"
+      }
+    },
+    "work": {
+      "revision_id": "6ed75e16-9c59-4ac0-b097-b5489687107d",
+      "areas": [
+        {
+          "area_id": "528a3d79-75d4-44f4-b92a-731956d6a552",
+          "title": "出貨前核對",
+          "scope_text": "條碼與單貨核對及同一工作中的差異回報。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "e1135245-cacb-4b0b-be6b-8f9def32a78d",
+          "area_id": "528a3d79-75d4-44f4-b92a-731956d6a552",
+          "title": "核對待出貨商品",
+          "description": "每日下午三點核對品項與數量；掃碼不符先重掃、核對標籤，仍不符記錄交主管。不負責揀貨、裝箱或換貨決策。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "6ed75e16-9c59-4ac0-b097-b5489687107d",
+      "references": [
+        {
+          "citation_id": "8bc79277-c326-44ce-8a73-e77b41546ba6",
+          "target_label": "任務：核對待出貨商品",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "e1135245-cacb-4b0b-be6b-8f9def32a78d",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "d07f600b-59c3-4e8d-b243-cdc994f82c96",
+      "exchange": {
+        "employee_input": {
+          "source_id": "8bcd254a-1e8f-44a5-b012-f1414f0369c3",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "對，都屬於同一次核對，沒有另外負責的工作。這份內容沒錯，今天先到這裡。"
+        },
+        "consultant_reply": {
+          "source_id": "636e34be-bedd-45d1-969b-60602da26b88",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "好的，今天先到這裡。職務說明書草稿已補上核對結果：待出貨品項與數量完成核對；仍不符的情況會記錄並交主管處理。也保留您確認的範圍：這是您目前唯一負責的工作，您不負責揀貨、裝箱或決定換貨。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "total_tokens": 0,
+    "outbound_calls": 0,
+    "count_calls": 0,
+    "generation_calls": 0,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 0,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.054887660",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0",
+    "actual_estimated_usd": "0",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0",
+    "cumulative_occupied_usd": "0",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 0.11821860000054585,
+    "seconds_limit": 131,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 55394,
+    "output_tokens": 1250,
+    "reasoning_tokens": 940,
+    "cached_input_tokens": 53968,
+    "cache_write_input_tokens": 1411,
+    "total_tokens": 56644,
+    "outbound_calls": 10,
+    "count_calls": 5,
+    "generation_calls": 5,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 55394,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.054887660",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0005",
+    "actual_estimated_usd": "0.001342555",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.001842555",
+    "cumulative_occupied_usd": "0.001842555",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 39.40987999999925,
+    "seconds_limit": 131,
+    "stop_reason": null
+  }
+}

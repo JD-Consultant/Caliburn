@@ -288,8 +288,16 @@ def test_restore_result_keeps_its_generation_after_candidate_advances(
     assert connection.execute(
         "SELECT candidate_generation_id, request_payload FROM jd_operations"
     ).fetchone() == (generation_id, payload)
-    with pytest.raises(psycopg.errors.ForeignKeyViolation):
+    with pytest.raises(
+        psycopg.errors.CheckViolation, match="Fixed JD revisions and original results are immutable"
+    ):
         connection.execute("DELETE FROM jd_candidates")
+    assert connection.execute("SELECT generation_id FROM jd_candidates").fetchone() == (
+        current_generation_id,
+    )
+    assert connection.execute(
+        "SELECT candidate_generation_id, request_payload FROM jd_operations"
+    ).fetchone() == (generation_id, payload)
 
 
 def test_read_candidate_refreshes_cached_position_without_locking_or_committing(

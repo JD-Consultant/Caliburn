@@ -1,0 +1,15 @@
+{
+  "command_id": "4966dee3-1147-4ae0-8e41-be011e3f9d29",
+  "expected_revision_id": "752c13ec-9599-437e-96b0-d1608266ac86",
+  "change": {
+    "action": "revise_task",
+    "task_id": "26979991-707e-4e99-bdc8-664de26bce8f",
+    "changes": [
+      {
+        "action": "set_field",
+        "field": "description",
+        "value": "逐箱點件，核對品項、數量、外包裝及送貨單，並負責貨品上架。核對採購單、送貨單與實收數量，拍照通知採購；拒收或退換貨由其他權責者決定。發現差異時登記收貨異常表；收到採購關於補送或接受的回覆後，依回覆結果登記入庫。不議價、不選供應商。"
+      }
+    ]
+  }
+}

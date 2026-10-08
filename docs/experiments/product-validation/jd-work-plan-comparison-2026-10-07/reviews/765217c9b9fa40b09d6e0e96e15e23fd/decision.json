@@ -1,0 +1,18 @@
+{
+  "question_id": "765217c9b9fa40b09d6e0e96e15e23fd",
+  "mode": "answer",
+  "fact_ids": [
+    "shelving"
+  ],
+  "reason": "直接詢問一般驗收後上架的儲位依據，shelving 提供依既定儲位及找組長調整的界線。",
+  "subquestions": [
+    {
+      "quote": "進貨驗收後，您通常依據什麼決定貨品放在哪個儲位？",
+      "mode": "answer",
+      "fact_ids": [
+        "shelving"
+      ],
+      "reason": "凍結事實明載按已規劃儲位放貨，放不下找組長調位置且不能自行改規則，直接回答儲位決定依據。"
+    }
+  ]
+}

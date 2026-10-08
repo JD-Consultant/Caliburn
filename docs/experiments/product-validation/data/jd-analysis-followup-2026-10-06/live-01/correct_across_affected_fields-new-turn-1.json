@@ -1,0 +1,17 @@
+{
+  "execution_id": "740e6f24-7440-4e65-9cb4-8f19e28cc0af",
+  "exchange": {
+    "employee_input": {
+      "source_id": "5782ec38-5b83-4dcd-a5d6-f7cb6329c039",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "前面供應商退貨那個我講不準。退不退是採購決定，我只照通知把貨備好、登記出貨，不是入庫。客戶退貨檢查跟入庫還是我做，其他收貨那些沒變。"
+    },
+    "consultant_reply": {
+      "source_id": "ef03f033-9cc6-4310-9eeb-7fd3ab3f3d0c",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "收到，我已修正目前草稿：供應商退貨是否退由採購決定，您依通知備貨並登記出貨；客戶退貨檢查與入庫仍由您負責，收貨工作維持原樣。\n\n客戶退貨通常會檢查哪些內容？如果發現數量、品項或貨況有問題，後續通常由誰決定怎麼處理？"
+    }
+  }
+}

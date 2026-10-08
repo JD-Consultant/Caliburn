@@ -1,0 +1,40 @@
+{
+  "employee_text": "我彙整講師可授課時間、教室容量和設備需求，排出課表草案，用共用行事曆查撞期，交主任確認後公布。遇到衝突先列替代時段與受影響課程，不能單方面換講師或縮短課程時數。",
+  "audit": {
+    "actual_question": "我先將「課務行政」、所屬成人教育中心、向教務主任報告，以及依目前工作歸納的職務目的寫入 JD 底稿。臨時缺課部分也會保留你已說明的界線：你通知主任和學員，但不決定代課人選。\n\n想先從課程排程了解你的實際分工：以最近一次排課為例，你通常會收到哪些資訊？若時段或需求有衝突，最後由誰決定？",
+    "employee_text": "我彙整講師可授課時間、教室容量和設備需求，排出課表草案，用共用行事曆查撞期，交主任確認後公布。遇到衝突先列替代時段與受影響課程，不能單方面換講師或縮短課程時數。",
+    "fact_ids": [
+      "scheduling"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "scheduling"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際追問課程排程輸入與衝突決策分工，scheduling 的講師時段、容量設備需求及主任確認直接相關。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "以最近一次排課為例，你通常會收到哪些資訊？",
+        "mode": "answer",
+        "fact_ids": [
+          "scheduling"
+        ],
+        "reason": "彙整講師可授課時間、教室容量與設備需求為排課輸入。"
+      },
+      {
+        "quote": "若時段或需求有衝突，最後由誰決定？",
+        "mode": "answer",
+        "fact_ids": [
+          "scheduling"
+        ],
+        "reason": "課表草案交主任確認，衝突先列替代時段及受影響課程且本人不能單方面換講師或減時數，直接回答權責。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

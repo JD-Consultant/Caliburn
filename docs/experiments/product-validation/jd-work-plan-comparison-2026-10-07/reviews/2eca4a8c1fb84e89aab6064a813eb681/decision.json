@@ -1,0 +1,20 @@
+{
+  "question_id": "2eca4a8c1fb84e89aab6064a813eb681",
+  "mode": "unknown",
+  "fact_ids": [],
+  "reason": "凍結事實只確認揀貨區不足時從備貨區補貨；本題要求判定所有補貨是否皆在揀貨時或另有独立安排，未有涵蓋範圍與時程資料。",
+  "subquestions": [
+    {
+      "quote": "補貨是否都發生在揀貨時",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "不能把已知的一種補貨觸發情況擴成所有補貨皆如此。"
+    },
+    {
+      "quote": "還是另有獨立的補貨安排？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "沒有獨立補貨安排是否存在的確定資料，保留未知。"
+    }
+  ]
+}

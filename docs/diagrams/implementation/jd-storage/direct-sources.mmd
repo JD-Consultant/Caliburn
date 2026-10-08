@@ -1,0 +1,9 @@
+erDiagram
+  direction TB
+  jd_revisions ||..o{ jd_candidates : current_revision
+  jd_revisions ||..o| job_descriptions : current_revision
+  jd_revisions ||--o{ jd_source_references : owns_citations
+  jd_revisions ||..o{ jd_source_references : reviewed_baseline
+  interview_texts |o..o{ jd_source_references : interview_source
+  memory_snapshots |o..o{ jd_source_references : memory_snapshot
+  memory_object_revisions |o..o{ jd_source_references : memory_revision

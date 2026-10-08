@@ -1,0 +1,17 @@
+{
+  "verification_time_utc": "2026-10-07 20:09:50 UTC",
+  "scope": "User requested one complete formal case per group; partial course case excluded because user stopped further testing before operator read blind conclusions.",
+  "quality_case_count": 2,
+  "quality_pair_count": 1,
+  "quality_lock_file": "blind-assessment/warehouse.lock.json",
+  "quality_lock_sha256": "153eeb0db7b8c544959e228e0c1bcf2c378ed083510c8201cf7df6d38d536a50",
+  "verified_file_hash_count": 22,
+  "mismatches": [],
+  "quality_outputs_preserved": true,
+  "pair": "W-A",
+  "mapping": {
+    "8b1991cd9ea84de28b92ab1342b99e15": "formal/warehouse-r1-P1",
+    "4d54caac92074ce18f5351b23b7caaf8": "formal/warehouse-r1-P2"
+  },
+  "order": "Reviewer independently locked both cases and pair, then notified operator without conclusions. Operator read conclusions only after that notification. Behavior/mechanism semantic audit started after quality lock; public opportunity inventory was separately locked before Plan inspection."
+}

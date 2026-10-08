@@ -1,0 +1,9 @@
+%%{init: {"flowchart": {"rankSpacing": 24, "nodeSpacing": 32, "wrappingWidth": 180}}}%%
+flowchart LR
+  person([操作者／受訪員工<br/>人員<br/>說明工作、核對與編修 JD])
+  app[Caliburn<br/>軟體系統<br/>透過訪談分析工作並保存 JD]
+  provider[OpenAI<br/>外部軟體系統<br/>提供模型推論與原生壓縮]
+  rag[公版 RAG<br/>外部軟體系統・選用<br/>檢索職位參考資料]
+  person -->|訪談、人工編修與匯出| app
+  app -->|請求模型分析與接續| provider
+  app -.->|明示啟用後按需查讀公版| rag

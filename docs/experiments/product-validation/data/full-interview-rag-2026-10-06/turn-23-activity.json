@@ -1,0 +1,1570 @@
+[
+  {
+    "at": 1791281683.6483262,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.6483283,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI\"}"
+  },
+  {
+    "at": 1791281683.6516733,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.6516743,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think\"}"
+  },
+  {
+    "at": 1791281683.675975,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.6759763,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I\"}"
+  },
+  {
+    "at": 1791281683.6795104,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.6795113,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could\"}"
+  },
+  {
+    "at": 1791281683.6829534,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.6829545,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create\"}"
+  },
+  {
+    "at": 1791281683.7204125,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.7204134,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a\"}"
+  },
+  {
+    "at": 1791281683.720482,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.7204826,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary\"}"
+  },
+  {
+    "at": 1791281683.732574,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.7325752,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and\"}"
+  },
+  {
+    "at": 1791281683.732742,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.732743,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask\"}"
+  },
+  {
+    "at": 1791281683.785335,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.7853365,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a\"}"
+  },
+  {
+    "at": 1791281683.7854354,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.785436,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more\"}"
+  },
+  {
+    "at": 1791281683.7854736,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.785474,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific\"}"
+  },
+  {
+    "at": 1791281683.7855859,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.7855866,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question\"}"
+  },
+  {
+    "at": 1791281683.7856355,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.7856362,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question.\"}"
+  },
+  {
+    "at": 1791281683.7856765,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.785677,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The\"}"
+  },
+  {
+    "at": 1791281683.7858493,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.78585,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user\"}"
+  },
+  {
+    "at": 1791281683.7859306,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.7859316,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned\"}"
+  },
+  {
+    "at": 1791281683.7859676,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.785968,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that\"}"
+  },
+  {
+    "at": 1791281683.7903242,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.790325,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature\"}"
+  },
+  {
+    "at": 1791281683.7959127,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.7959137,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks\"}"
+  },
+  {
+    "at": 1791281683.8012743,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.8012755,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't\"}"
+  },
+  {
+    "at": 1791281683.8212929,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.8212938,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count\"}"
+  },
+  {
+    "at": 1791281683.8331234,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.8331246,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as\"}"
+  },
+  {
+    "at": 1791281683.8361542,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.8361552,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their\"}"
+  },
+  {
+    "at": 1791281683.8604999,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.860501,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work\"}"
+  },
+  {
+    "at": 1791281683.872406,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.872407,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work,\"}"
+  },
+  {
+    "at": 1791281683.8760233,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.8760245,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which\"}"
+  },
+  {
+    "at": 1791281683.8761082,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.876109,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I\"}"
+  },
+  {
+    "at": 1791281683.876145,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.8761454,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need\"}"
+  },
+  {
+    "at": 1791281683.8761575,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.8761578,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to\"}"
+  },
+  {
+    "at": 1791281683.8812022,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.8812032,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect\"}"
+  },
+  {
+    "at": 1791281683.8899713,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.889972,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect.\"}"
+  },
+  {
+    "at": 1791281683.8960855,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.8960874,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've\"}"
+  },
+  {
+    "at": 1791281683.9019756,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9019763,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also\"}"
+  },
+  {
+    "at": 1791281683.9080727,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9080734,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared\"}"
+  },
+  {
+    "at": 1791281683.9208302,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9208317,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they\"}"
+  },
+  {
+    "at": 1791281683.9315953,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9315963,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find\"}"
+  },
+  {
+    "at": 1791281683.9392684,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9392693,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the\"}"
+  },
+  {
+    "at": 1791281683.9472742,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9472773,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process\"}"
+  },
+  {
+    "at": 1791281683.9559205,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9559214,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear\"}"
+  },
+  {
+    "at": 1791281683.967909,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9679108,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear,\"}"
+  },
+  {
+    "at": 1791281683.9755566,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9755583,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially\"}"
+  },
+  {
+    "at": 1791281683.9810872,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9810884,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding\"}"
+  },
+  {
+    "at": 1791281683.9887729,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9887743,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged\"}"
+  },
+  {
+    "at": 1791281683.9944203,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281683.9944215,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods\"}"
+  },
+  {
+    "at": 1791281684.001084,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0010853,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\"}"
+  },
+  {
+    "at": 1791281684.0064914,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0064938,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI\"}"
+  },
+  {
+    "at": 1791281684.0125127,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.012514,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could\"}"
+  },
+  {
+    "at": 1791281684.0295238,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0295255,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify\"}"
+  },
+  {
+    "at": 1791281684.0336375,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0336387,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether\"}"
+  },
+  {
+    "at": 1791281684.0392447,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0392454,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're\"}"
+  },
+  {
+    "at": 1791281684.0504878,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0504892,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible\"}"
+  },
+  {
+    "at": 1791281684.0534852,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0534859,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for\"}"
+  },
+  {
+    "at": 1791281684.0577872,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.057788,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isol\"}"
+  },
+  {
+    "at": 1791281684.0632222,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0632246,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating\"}"
+  },
+  {
+    "at": 1791281684.0756762,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0756774,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or\"}"
+  },
+  {
+    "at": 1791281684.0831099,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0831108,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting\"}"
+  },
+  {
+    "at": 1791281684.0883431,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.088344,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage\"}"
+  },
+  {
+    "at": 1791281684.0945363,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0945373,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or\"}"
+  },
+  {
+    "at": 1791281684.0994258,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.0994265,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if\"}"
+  },
+  {
+    "at": 1791281684.1048317,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.1048324,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's\"}"
+  },
+  {
+    "at": 1791281684.1182568,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.1182582,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled\"}"
+  },
+  {
+    "at": 1791281684.1371548,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.1371558,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by\"}"
+  },
+  {
+    "at": 1791281684.1474953,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.1474962,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA\"}"
+  },
+  {
+    "at": 1791281684.153369,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.1533713,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or\"}"
+  },
+  {
+    "at": 1791281684.1612315,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.161233,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone\"}"
+  },
+  {
+    "at": 1791281684.1644428,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.164444,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else\"}"
+  },
+  {
+    "at": 1791281684.1716013,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.1716027,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else.\"}"
+  },
+  {
+    "at": 1791281684.177174,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.177175,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They\"}"
+  },
+  {
+    "at": 1791281684.1851745,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.185176,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem\"}"
+  },
+  {
+    "at": 1791281684.193322,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.1933234,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure\"}"
+  },
+  {
+    "at": 1791281684.2007096,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.200711,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about\"}"
+  },
+  {
+    "at": 1791281684.2144732,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.2144742,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the\"}"
+  },
+  {
+    "at": 1791281684.224264,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.2242649,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps\"}"
+  },
+  {
+    "at": 1791281684.2312531,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.2312558,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved\"}"
+  },
+  {
+    "at": 1791281684.2343216,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.2343228,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved,\"}"
+  },
+  {
+    "at": 1791281684.2434072,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.2434084,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so\"}"
+  },
+  {
+    "at": 1791281684.2494786,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.2494798,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing\"}"
+  },
+  {
+    "at": 1791281684.2560496,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.2560506,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on\"}"
+  },
+  {
+    "at": 1791281684.2612984,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.2612991,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on damaged\"}"
+  },
+  {
+    "at": 1791281684.2743979,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.274399,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on damaged goods\"}"
+  },
+  {
+    "at": 1791281684.278365,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.2783659,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on damaged goods as\"}"
+  },
+  {
+    "at": 1791281684.279804,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.279805,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on damaged goods as the\"}"
+  },
+  {
+    "at": 1791281684.289472,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.289473,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on damaged goods as the next\"}"
+  },
+  {
+    "at": 1791281684.3059976,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.305999,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on damaged goods as the next topic\"}"
+  },
+  {
+    "at": 1791281684.3093476,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.3093486,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on damaged goods as the next topic makes\"}"
+  },
+  {
+    "at": 1791281684.319316,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.3193185,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on damaged goods as the next topic makes sense\"}"
+  },
+  {
+    "at": 1791281684.326146,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.3261468,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Clarifying responsibilities**\\n\\nI think I could create a summary and ask a more specific question. The user mentioned that temperature checks shouldn't count as their work, which I need to respect. They've also shared they find the process unclear, especially regarding damaged goods.\\n\\nI could clarify whether they're responsible for isolating or reporting damage or if that's handled by QA or someone else. They seem unsure about the steps involved, so focusing on damaged goods as the next topic makes sense.\"}"
+  },
+  {
+    "at": 1791281684.9111855,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.9111867,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI\"}"
+  },
+  {
+    "at": 1791281684.9112542,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.911255,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice\"}"
+  },
+  {
+    "at": 1791281684.92092,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.920921,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the\"}"
+  },
+  {
+    "at": 1791281684.9321418,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.9321432,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous\"}"
+  },
+  {
+    "at": 1791281684.9765255,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.9765265,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user\"}"
+  },
+  {
+    "at": 1791281684.9804475,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.9804485,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found\"}"
+  },
+  {
+    "at": 1791281684.9838135,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.9838147,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the\"}"
+  },
+  {
+    "at": 1791281684.9901686,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.9901695,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process\"}"
+  },
+  {
+    "at": 1791281684.9924874,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281684.9924881,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear\"}"
+  },
+  {
+    "at": 1791281685.0007727,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.000774,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear,\"}"
+  },
+  {
+    "at": 1791281685.00083,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.0008304,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so\"}"
+  },
+  {
+    "at": 1791281685.0052917,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.0052927,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I\"}"
+  },
+  {
+    "at": 1791281685.0179899,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.017993,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want\"}"
+  },
+  {
+    "at": 1791281685.0235856,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.0235865,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to\"}"
+  },
+  {
+    "at": 1791281685.0313938,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.0313947,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be\"}"
+  },
+  {
+    "at": 1791281685.0441582,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.04416,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful\"}"
+  },
+  {
+    "at": 1791281685.0509353,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.0509362,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not\"}"
+  },
+  {
+    "at": 1791281685.056833,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.0568337,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to\"}"
+  },
+  {
+    "at": 1791281685.0814703,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.0814714,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push\"}"
+  },
+  {
+    "at": 1791281685.083655,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.0836563,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too\"}"
+  },
+  {
+    "at": 1791281685.0926182,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.0926192,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard\"}"
+  },
+  {
+    "at": 1791281685.1025987,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.1025996,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard.\"}"
+  },
+  {
+    "at": 1791281685.1150174,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.1150188,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I\"}"
+  },
+  {
+    "at": 1791281685.1208048,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.1208062,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could\"}"
+  },
+  {
+    "at": 1791281685.1292028,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.129204,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask\"}"
+  },
+  {
+    "at": 1791281685.1370716,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.1370726,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally\"}"
+  },
+  {
+    "at": 1791281685.1493862,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.1493876,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if\"}"
+  },
+  {
+    "at": 1791281685.155415,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.1554158,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if,\"}"
+  },
+  {
+    "at": 1791281685.176933,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.1769364,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when\"}"
+  },
+  {
+    "at": 1791281685.1821055,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.182107,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged\"}"
+  },
+  {
+    "at": 1791281685.195217,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.195218,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods\"}"
+  },
+  {
+    "at": 1791281685.2024436,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.2024448,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are\"}"
+  },
+  {
+    "at": 1791281685.2110085,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.2110097,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found\"}"
+  },
+  {
+    "at": 1791281685.2218437,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.2218447,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in\"}"
+  },
+  {
+    "at": 1791281685.2314038,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.2314048,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the\"}"
+  },
+  {
+    "at": 1791281685.287223,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.2872245,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse\"}"
+  },
+  {
+    "at": 1791281685.2873375,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.287338,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (\"}"
+  },
+  {
+    "at": 1791281685.2873795,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.2873797,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not\"}"
+  },
+  {
+    "at": 1791281685.2873948,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.2873952,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer\"}"
+  },
+  {
+    "at": 1791281685.2874424,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.287443,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns\"}"
+  },
+  {
+    "at": 1791281685.2915044,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.291505,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns),\"}"
+  },
+  {
+    "at": 1791281685.3088093,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.3088105,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they\"}"
+  },
+  {
+    "at": 1791281685.3154793,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.31548,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally\"}"
+  },
+  {
+    "at": 1791281685.3265665,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.3265674,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle\"}"
+  },
+  {
+    "at": 1791281685.3421776,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.3421788,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that\"}"
+  },
+  {
+    "at": 1791281685.343808,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.3438091,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond\"}"
+  },
+  {
+    "at": 1791281685.3610008,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.3610032,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just\"}"
+  },
+  {
+    "at": 1791281685.368901,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.3689022,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting\"}"
+  },
+  {
+    "at": 1791281685.3762348,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.3762357,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting.\"}"
+  },
+  {
+    "at": 1791281685.3960369,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.3960383,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This\"}"
+  },
+  {
+    "at": 1791281685.4034176,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.4034185,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does\"}"
+  },
+  {
+    "at": 1791281685.410208,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.4102087,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate\"}"
+  },
+  {
+    "at": 1791281685.4179473,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.4179487,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to\"}"
+  },
+  {
+    "at": 1791281685.4291694,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.4291704,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their\"}"
+  },
+  {
+    "at": 1791281685.4427018,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.442703,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier\"}"
+  },
+  {
+    "at": 1791281685.4481094,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.4481103,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention\"}"
+  },
+  {
+    "at": 1791281685.464356,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.4643574,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of\"}"
+  },
+  {
+    "at": 1791281685.4644291,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.4644296,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage\"}"
+  },
+  {
+    "at": 1791281685.467562,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.4675627,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage.\"}"
+  },
+  {
+    "at": 1791281685.5022936,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.5022953,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever\"}"
+  },
+  {
+    "at": 1791281685.507025,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.507026,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever,\"}"
+  },
+  {
+    "at": 1791281685.5143259,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.514327,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there\"}"
+  },
+  {
+    "at": 1791281685.5362966,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.5362983,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s\"}"
+  },
+  {
+    "at": 1791281685.5470586,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.5470598,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a\"}"
+  },
+  {
+    "at": 1791281685.5568078,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.5568092,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance\"}"
+  },
+  {
+    "at": 1791281685.5569248,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.5569258,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they\"}"
+  },
+  {
+    "at": 1791281685.5574841,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.5574868,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might\"}"
+  },
+  {
+    "at": 1791281685.567758,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.567759,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just\"}"
+  },
+  {
+    "at": 1791281685.572996,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.5729969,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say\"}"
+  },
+  {
+    "at": 1791281685.5817187,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.58172,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they\"}"
+  },
+  {
+    "at": 1791281685.591758,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.5917597,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don\"}"
+  },
+  {
+    "at": 1791281685.6018908,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.601892,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t\"}"
+  },
+  {
+    "at": 1791281685.608281,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.6082819,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know\"}"
+  },
+  {
+    "at": 1791281685.6428988,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.6429002,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know,\"}"
+  },
+  {
+    "at": 1791281685.646556,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.646557,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and\"}"
+  },
+  {
+    "at": 1791281685.651253,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.6512542,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I\"}"
+  },
+  {
+    "at": 1791281685.6586971,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.6586986,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can\"}"
+  },
+  {
+    "at": 1791281685.6677558,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.667757,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure\"}"
+  },
+  {
+    "at": 1791281685.679104,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.6791053,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them\"}"
+  },
+  {
+    "at": 1791281685.6881013,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.688103,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that\"}"
+  },
+  {
+    "at": 1791281685.6950674,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.6950686,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it\"}"
+  },
+  {
+    "at": 1791281685.7023716,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.7023728,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s\"}"
+  },
+  {
+    "at": 1791281685.7163556,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.7163568,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay\"}"
+  },
+  {
+    "at": 1791281685.7247376,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.7247388,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to\"}"
+  },
+  {
+    "at": 1791281685.7314572,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.7314582,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave\"}"
+  },
+  {
+    "at": 1791281685.737135,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.7371361,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that\"}"
+  },
+  {
+    "at": 1791281685.7459478,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.745949,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown\"}"
+  },
+  {
+    "at": 1791281685.7524097,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.7524107,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown.\"}"
+  },
+  {
+    "at": 1791281685.7701974,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.7702012,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They\"}"
+  },
+  {
+    "at": 1791281685.7799737,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.779975,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously\"}"
+  },
+  {
+    "at": 1791281685.792748,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.79275,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned\"}"
+  },
+  {
+    "at": 1791281685.8100111,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.8100123,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions\"}"
+  },
+  {
+    "at": 1791281685.8207822,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.8207834,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without\"}"
+  },
+  {
+    "at": 1791281685.8308423,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.8308437,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification\"}"
+  },
+  {
+    "at": 1791281685.8400865,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.8400881,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on\"}"
+  },
+  {
+    "at": 1791281685.848281,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.848282,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss\"}"
+  },
+  {
+    "at": 1791281685.8596716,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.859673,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss,\"}"
+  },
+  {
+    "at": 1791281685.8737843,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.8737862,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so\"}"
+  },
+  {
+    "at": 1791281685.875833,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.8758342,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing\"}"
+  },
+  {
+    "at": 1791281685.890072,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.8900735,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing on\"}"
+  },
+  {
+    "at": 1791281685.9016304,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.9016323,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing on damaged\"}"
+  },
+  {
+    "at": 1791281685.9192233,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.9192245,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing on damaged goods\"}"
+  },
+  {
+    "at": 1791281685.9329967,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.9329984,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing on damaged goods seems\"}"
+  },
+  {
+    "at": 1791281685.9330885,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.9330893,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing on damaged goods seems like\"}"
+  },
+  {
+    "at": 1791281685.9486089,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.9486098,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing on damaged goods seems like a\"}"
+  },
+  {
+    "at": 1791281685.9552648,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.955266,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing on damaged goods seems like a good\"}"
+  },
+  {
+    "at": 1791281685.9630098,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.963011,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing on damaged goods seems like a good path\"}"
+  },
+  {
+    "at": 1791281685.9843602,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281685.9843614,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca104bb487d0a4fdf3149d16aa2b\",\"item_id\":\"rs_00933d1a394bb439016ac4ca12289c87d098855ebb1d1e0a1a\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Exploring handling of damaged goods**\\n\\nI notice the previous user found the process unclear, so I want to be careful not to push too hard. I could ask generally if, when damaged goods are found in the warehouse (not customer returns), they personally handle that beyond just reporting. This does relate to their earlier mention of damage. \\n\\nHowever, there’s a chance they might just say they don’t know, and I can reassure them that it’s okay to leave that unknown. They previously mentioned exceptions without clarification on loss, so focusing on damaged goods seems like a good path.\"}"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "execution_id": "e44be72c-ddab-4421-91b8-05dc7d7a8ddd",
+  "exchange": {
+    "employee_input": {
+      "source_id": "4554d42d-86f4-4b38-a4d8-2c0283eeaaeb",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "對，平常就是照這樣做。我不太會講什麼專業能力，就是對單、對貨，有問題先查再記下來給主管。"
+    },
+    "consultant_reply": {
+      "source_id": "aad6ef16-f056-4061-873d-acb41fbfb80f",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "這樣說就很清楚了，不需要替自己取「專業能力」的名稱；你實際怎麼做、遇到問題怎麼處理，才是整理工作的依據。\n\n我目前理解你會依出貨單核對品名和數量，按先入庫的批次先出；若實貨與系統不一致，會查進出貨紀錄和儲位、記下差異交主管確認，不自行改數量。\n\n想再了解揀貨做到哪個交接點：核對完出貨單後，你通常怎麼找到並取出貨品？取出後會交給誰，或還需要做哪些處理？"
+    }
+  }
+}

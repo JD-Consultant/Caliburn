@@ -1,0 +1,232 @@
+{
+  "arm": "old",
+  "case_id": "warehouse_load",
+  "job_file_id": "a3575541-3749-497d-bd9f-025950d68af1",
+  "before": {
+    "profile": {
+      "revision_id": "4df620bd-4219-4b2a-91ea-69fce8f1886c",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "完成收貨上架及指定盤點，維持貨物和入庫紀錄可追查。"
+      }
+    },
+    "work": {
+      "revision_id": "4df620bd-4219-4b2a-91ea-69fce8f1886c",
+      "areas": [
+        {
+          "area_id": "389cf73f-eb46-46cb-938d-beec1051423d",
+          "title": "庫存盤點",
+          "scope_text": "依日常、月底及年度盤點安排，清點指定品項或區域並將結果交主管。"
+        },
+        {
+          "area_id": "8d591cee-a82d-4630-bbad-8c1fec4f33c6",
+          "title": "收貨與入庫",
+          "scope_text": "核對到貨單據與實貨，依安排處理符合條件的貨物入庫；差異交由採購判定收貨或退貨。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "43bdee11-407f-47e1-ae8d-1ce287fb3755",
+          "area_id": "389cf73f-eb46-46cb-938d-beec1051423d",
+          "title": "配合庫存盤點",
+          "description": "下班前複點高異動商品；月底點本人區域，十二月配合財務全倉盤點，結果交主管。",
+          "outcomes": [
+            {
+              "detail_id": "2666b68f-0189-462f-a17f-df4786db8deb",
+              "text": "完成所負責品項或區域的清點，並將盤點結果交主管。"
+            }
+          ],
+          "requirements": []
+        },
+        {
+          "task_id": "d438422c-ecc4-457b-acb6-ee1ca228f2ef",
+          "area_id": "8d591cee-a82d-4630-bbad-8c1fec4f33c6",
+          "title": "收貨驗收與上架",
+          "description": "核對單據和實貨，差異拍照通知採購並回報主管，由採購決定收退；符合才依安排上架、貼標籤及登記。",
+          "outcomes": [
+            {
+              "detail_id": "e6ddec09-40cc-4c12-8b0e-68f7b852f413",
+              "text": "符合條件的貨物依安排完成上架、貼標籤及庫存系統登記。"
+            }
+          ],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "4df620bd-4219-4b2a-91ea-69fce8f1886c",
+      "references": [
+        {
+          "citation_id": "bc1243e9-4849-45f7-ab8b-3f5992aebd8d",
+          "target_label": "任務：收貨驗收與上架",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "d438422c-ecc4-457b-acb6-ee1ca228f2ef",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "00a0ac9f-1ab4-41a7-90d4-fdcc419ac304",
+          "target_label": "任務：配合庫存盤點",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "43bdee11-407f-47e1-ae8d-1ce287fb3755",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "f5863b6c-43e1-4427-a81f-99da5e69a755",
+          "target_label": "職責：庫存盤點",
+          "target": {
+            "kind": "area",
+            "field": null,
+            "item_id": "389cf73f-eb46-46cb-938d-beec1051423d",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "07bba219-e5ad-4bf8-adb4-eebcc092c670",
+          "target_label": "職責：收貨與入庫",
+          "target": {
+            "kind": "area",
+            "field": null,
+            "item_id": "8d591cee-a82d-4630-bbad-8c1fec4f33c6",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "204f1db5-4781-4ce4-847b-73e3394f9439",
+          "target_label": "任務：收貨驗收與上架 · 成果：符合條件的貨物依安排完成上架、貼標籤及庫存系統登記。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "e6ddec09-40cc-4c12-8b0e-68f7b852f413",
+            "task_id": "d438422c-ecc4-457b-acb6-ee1ca228f2ef"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "e021143e-f684-4616-9caf-622f36631acd",
+          "target_label": "任務：配合庫存盤點 · 成果：完成所負責品項或區域的清點，並將盤點結果交主管。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "2666b68f-0189-462f-a17f-df4786db8deb",
+            "task_id": "43bdee11-407f-47e1-ae8d-1ce287fb3755"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "919b3848-1992-4c2a-8c5d-70bc51ba260d",
+      "exchange": {
+        "employee_input": {
+          "source_id": "e651cd9f-0bda-4c56-9ef1-1a269eb74ee1",
+          "interview_sequence": 8,
+          "speaker": "employee",
+          "interview_text": "發現差異先通知採購和主管，有差異的貨先留著等決定，我不決定收退；再怎麼處理要等他們安排。我主要就是前面說的收貨上架和盤點，沒有其他工作。"
+        },
+        "consultant_reply": {
+          "source_id": "d3d482f9-8eeb-4429-a0c1-5d782d5a3c16",
+          "interview_sequence": 9,
+          "speaker": "consultant",
+          "interview_text": "明白，已把這項界線補進收貨工作：發現差異時先留置貨物、通知採購並回報主管，之後依採購與主管安排處理；收貨或退貨由採購決定。\n\n您目前主要負責的工作就以收貨上架和盤點為主，不必再勉強回想其他項目。若之後想到不同情況或發現底稿有不準確之處，再補充修正即可。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 407160,
+    "output_tokens": 14893,
+    "reasoning_tokens": 11947,
+    "cached_input_tokens": 387708,
+    "cache_write_input_tokens": 19377,
+    "total_tokens": 422053,
+    "outbound_calls": 54,
+    "count_calls": 29,
+    "generation_calls": 25,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 407160,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.065981670",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0029",
+    "actual_estimated_usd": "0.013753205",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.016653205",
+    "cumulative_occupied_usd": "0.016653205",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 222.65370269999403,
+    "seconds_limit": 645,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 491565,
+    "output_tokens": 17714,
+    "reasoning_tokens": 14245,
+    "cached_input_tokens": 467870,
+    "cache_write_input_tokens": 23605,
+    "total_tokens": 509279,
+    "outbound_calls": 65,
+    "count_calls": 35,
+    "generation_calls": 30,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 491565,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.065981670",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0035",
+    "actual_estimated_usd": "0.016495325",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.019995325",
+    "cumulative_occupied_usd": "0.019995325",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 270.24411359999795,
+    "seconds_limit": 645,
+    "stop_reason": null
+  }
+}

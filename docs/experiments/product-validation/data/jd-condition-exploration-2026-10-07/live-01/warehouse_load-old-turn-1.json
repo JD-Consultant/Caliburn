@@ -1,0 +1,17 @@
+{
+  "execution_id": "456c6d4b-003a-4247-8967-fdaad3a40d5c",
+  "exchange": {
+    "employee_input": {
+      "source_id": "e2116187-d1ff-4647-9103-623dc61acf56",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "平常收貨照這樣做，盤點的時間也說過了。我現在想不到其他工作，你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "d2011e82-2874-43af-9e80-e6d3f980bf46",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "不用勉強再想一項工作；目前已掌握收貨和不同周期盤點的主要內容。我先把底稿分成「收貨與入庫」及「庫存盤點」兩類，也補上已確認的工作結果。\n\n還有一個有助於釐清責任界線的細節：收貨發現差異、拍照通知採購並回報主管後，您還需要追蹤處理結果或暫放貨物嗎？還是通知後就交由採購決定，您不再跟進？"
+    }
+  }
+}

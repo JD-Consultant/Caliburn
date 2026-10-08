@@ -44,16 +44,9 @@
 
 下圖是分段＋rerank 的候選流程；整段及無 rerank 控制組見[本輪比較草稿](../experiments/2026-10-04-representative-occupation-top5/README.md)。使用者已指定本輪每員工最終取排名最高的五份；合併排序規則及參數執行前另固定，不能用事後評審分數挑前五。
 
-```mermaid
-flowchart TD
-  M[本輪固定的員工工作資料] --> Q[多個保留脈絡的工作查詢]
-  Q --> B[每個查詢各自廣蒐公版正文]
-  B --> R[每個查詢各自 rerank 保留候選]
-  R --> U[按固定公版來源合併去重 保留所有查詢關係]
-  U --> F[依事前合併排序取員工全域前五]
-  F --> V[職位整體參考導覽 名稱 概述 找到原因及定位]
-  V --> C[按來源讀完整已解析任務目錄]
-```
+![候選／未採納：各工作廣蒐、精搜與職位參考](../diagrams/specs/2026-10-04-occupation-overview-reference-retrieval-design/occupation-reference-retrieval.png)
+
+[圖源](../diagrams/specs/2026-10-04-occupation-overview-reference-retrieval-design/occupation-reference-retrieval.mmd) · [SVG](../diagrams/specs/2026-10-04-occupation-overview-reference-retrieval-design/occupation-reference-retrieval.svg)
 
 1. **各查詢廣蒐。** 取得相似工作正文的公版候選及原始排名／分數。
 2. **各查詢精搜。** reranker 比較該工作查詢與候選正文，各自保留名次額度。

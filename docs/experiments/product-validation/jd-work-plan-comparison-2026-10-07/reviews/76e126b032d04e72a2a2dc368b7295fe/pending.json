@@ -1,0 +1,236 @@
+{
+  "question_id": "76e126b032d04e72a2a2dc368b7295fe",
+  "review_kind": "employee_disclosure",
+  "profile": "warehouse",
+  "actual_question": "好，您是否輪值晚班先保留未知，不推測。\n\n目前底稿已涵蓋收貨驗收與 WMS 上架、揀貨與補貨、每週循環盤點及十二月年度盤點、客戶退貨與供應商退貨出庫、新人帶教、班別交接，以及冷藏區溫控。像是拒收與退貨條件、庫存調帳、冷藏貨出貨放行及新人上線核准等責任界線，也依您說明的決策權責整理了。\n\n補貨後是否登記移庫、旺季瓶頸回報對象、年度盤點的分區與表單細節，以及您是否輪值晚班或負責早晚兩次溫度檢查，目前都先保留未確認。您可以核對目前底稿：若有工作漏寫或哪段描述不準確，告訴我需要更正的部分即可。",
+  "disclosed": [
+    "annual-count",
+    "cold-storage",
+    "customer-returns",
+    "inventory-authority",
+    "inventory-partial",
+    "peak-season",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training",
+    "training-boundary"
+  ],
+  "open_gaps": [],
+  "seen_topics": [
+    "annual",
+    "conditions",
+    "customer-returns",
+    "inventory",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "picking",
+    "inventory-partial",
+    "training",
+    "inventory-authority",
+    "customer-returns",
+    "supplier-returns",
+    "training-boundary",
+    "shelving",
+    "shelving",
+    "peak-season",
+    "cold-storage",
+    "annual-count"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 2
+  },
+  "recent_employee_originals": [
+    "約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。"
+  ],
+  "private_facts": [
+    {
+      "id": "receiving",
+      "topic": "receiving",
+      "match": [
+        "進貨",
+        "收貨",
+        "驗收",
+        "採購單",
+        "數量差異",
+        "接到貨",
+        "收到貨",
+        "清點",
+        "送貨文件",
+        "核件數",
+        "記錄差異"
+      ],
+      "answer": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。"
+    },
+    {
+      "id": "shelving",
+      "topic": "shelving",
+      "match": [
+        "上架",
+        "儲位",
+        "入庫登記",
+        "標籤"
+      ],
+      "answer": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。"
+    },
+    {
+      "id": "picking",
+      "topic": "picking",
+      "match": [
+        "揀貨",
+        "補貨",
+        "出貨",
+        "配送",
+        "缺貨"
+      ],
+      "answer": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。"
+    },
+    {
+      "id": "inventory-partial",
+      "topic": "inventory",
+      "match": [
+        "盤點",
+        "庫存",
+        "帳實",
+        "帳差"
+      ],
+      "answer": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？",
+      "opens_gap": "inventory-authority",
+      "switch_to": "training"
+    },
+    {
+      "id": "inventory-authority",
+      "topic": "inventory",
+      "match": [
+        "盤點",
+        "庫存",
+        "調帳",
+        "批准",
+        "核准",
+        "帳差"
+      ],
+      "after_topic": "training",
+      "answer": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。",
+      "closes_gap": "inventory-authority"
+    },
+    {
+      "id": "customer-returns",
+      "topic": "customer-returns",
+      "match": [
+        "客戶退貨",
+        "退回",
+        "退貨入庫",
+        "退貨品"
+      ],
+      "answer": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。"
+    },
+    {
+      "id": "supplier-returns",
+      "topic": "supplier-returns",
+      "match": [
+        "供應商退貨",
+        "退供應商",
+        "採購退貨"
+      ],
+      "answer": "供應商退貨更精確是出庫：採購決定要退哪些貨，我按退貨單備貨、核數量、拍照、登記出庫並交承運商簽收，將簽收回給採購。我不辦供應商退貨入庫，也不決定退貨條件。",
+      "correction": true
+    },
+    {
+      "id": "training",
+      "topic": "training",
+      "match": [
+        "新人",
+        "帶人",
+        "教學",
+        "培訓",
+        "上線"
+      ],
+      "answer": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。"
+    },
+    {
+      "id": "training-boundary",
+      "topic": "training",
+      "match": [
+        "新人",
+        "上線",
+        "考核",
+        "授權",
+        "批准",
+        "主管"
+      ],
+      "requires": "training",
+      "answer": "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。",
+      "correction": true
+    },
+    {
+      "id": "cold-storage",
+      "topic": "conditions",
+      "match": [
+        "冷藏",
+        "特殊",
+        "環境",
+        "條件",
+        "溫度",
+        "不同貨",
+        "容易忽略"
+      ],
+      "answer": "約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。"
+    },
+    {
+      "id": "peak-season",
+      "topic": "conditions",
+      "match": [
+        "旺季",
+        "尖峰",
+        "忙",
+        "量大",
+        "特殊",
+        "不同情況",
+        "例外"
+      ],
+      "answer": "雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。"
+    },
+    {
+      "id": "annual-count",
+      "topic": "annual",
+      "match": [
+        "年度",
+        "一年",
+        "低頻",
+        "偶爾",
+        "季節",
+        "其他工作",
+        "整份",
+        "還有",
+        "每年",
+        "不定期"
+      ],
+      "answer": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。",
+      "unknown": true
+    },
+    {
+      "id": "requirements",
+      "topic": "requirements",
+      "match": [
+        "知識",
+        "技能",
+        "能力",
+        "學會",
+        "要求",
+        "困難",
+        "判斷依據"
+      ],
+      "answer": "要會看品項批號效期、理解先到期先出和隔離規則，熟悉 WMS 掃碼與入出庫紀錄，會用 Excel 比對差異，搬運要會看重量和安全動線。判斷貨品狀態靠規則和品保指示，不需要我有採購議價或財務調帳權限。"
+    }
+  ]
+}

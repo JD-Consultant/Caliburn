@@ -1,0 +1,13 @@
+{
+  "stage": "second-to-third",
+  "rule": "只回答第二段實際問到的目標面向；其他仍未問到私人面向的案例不補送。不得將未問出的答案強行注入以製造成功。",
+  "decisions": [
+    {
+      "case_id": "accounting_errors__old",
+      "arm": "old",
+      "answer_kind": "target_answer",
+      "question_quote": "如果發票、金額或申請單彼此對不上，通常你會怎麼處理、交給誰決定？",
+      "reason": "中立探索報支核對差錯的處理與決定權；用預先凍結的重複發票作為實際差錯例子回答。不算顧問已自行指出重複報支，而是詢問差錯面向後由員工揭露。"
+    }
+  ]
+}

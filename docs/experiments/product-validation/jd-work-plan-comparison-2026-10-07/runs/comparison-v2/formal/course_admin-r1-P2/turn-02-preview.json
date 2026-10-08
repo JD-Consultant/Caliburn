@@ -1,0 +1,32 @@
+{
+  "job_file_id": "b63bdf48-ac75-4f06-af36-94326ca5e724",
+  "execution_id": "4b2a2019-0de7-4214-8197-5bbecf02986e",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我彙整講師可授課時間、教室容量和設備需求，排出課表草案，用共用行事曆查撞期，交主任確認後公布。遇到衝突先列替代時段與受影響課程，不能單方面換講師或縮短課程時數。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "課務行政",
+      "organization_unit": "成人教育中心",
+      "reports_to": "教務主任",
+      "purpose": "透過課程排程、學員報名與收費資料、開課準備及課程紀錄管理，並處理相關課務申請與異動，支援成人教育課程順利辦理及學員課務服務。"
+    },
+    "work": {
+      "revision_id": "b0ae6be6-6482-41c8-b36d-3dadca061a51",
+      "areas": [],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    }
+  },
+  "plan_preview": {
+    "plan": "## 目前焦點\n釐清課程排程的本人分工、判斷與交接。\n\n## 工作方向\n- 課程排程、報名與收費資料、開課準備、出缺勤及結業資料：已知主要工作，待分辨各自範圍與成果。\n- 臨時缺課通知與代課安排：已知會通知主任及學員；代課人選由主任決定，待了解通知與後續交接。\n- 退費申請：已知會處理，待釐清本人核對、辦理及核准界線。\n- JD：待依訪談逐步整理職責分組、任務及必要要求；後續核對重要條件與涵蓋面向。"
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "execution_id": "286cb775-44b6-420f-a23a-f50c47e5f20b",
+  "exchange": {
+    "employee_input": {
+      "source_id": "d415092a-ad52-4dc8-82af-8816b6a94a32",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "我現在想不到其他的，平常大概都這樣。"
+    },
+    "consultant_reply": {
+      "source_id": "96b9cae9-36d9-41a6-a097-e62738e42149",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "了解，先以您目前想到的工作為範圍，不把還沒確認的內容當成您不負責。我已將庫存清點整理為「每日下班複點高異動商品，月底盤點本人負責的區域」；差異容許門檻仍未知，因此不把它寫成職責內容。\n\n想再具體了解揀貨：您通常依什麼資料或單據找商品？揀好後會交給誰，或還會做什麼核對？"
+    }
+  }
+}

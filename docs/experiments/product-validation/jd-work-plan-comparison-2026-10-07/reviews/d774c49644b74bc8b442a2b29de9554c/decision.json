@@ -1,0 +1,26 @@
+{
+  "question_id": "d774c49644b74bc8b442a2b29de9554c",
+  "mode": "answer",
+  "fact_ids": [
+    "scheduling"
+  ],
+  "reason": "實際追問課程排程輸入與衝突決策分工，scheduling 的講師時段、容量設備需求及主任確認直接相關。",
+  "subquestions": [
+    {
+      "quote": "以最近一次排課為例，你通常會收到哪些資訊？",
+      "mode": "answer",
+      "fact_ids": [
+        "scheduling"
+      ],
+      "reason": "彙整講師可授課時間、教室容量與設備需求為排課輸入。"
+    },
+    {
+      "quote": "若時段或需求有衝突，最後由誰決定？",
+      "mode": "answer",
+      "fact_ids": [
+        "scheduling"
+      ],
+      "reason": "課表草案交主任確認，衝突先列替代時段及受影響課程且本人不能單方面換講師或減時數，直接回答權責。"
+    }
+  ]
+}

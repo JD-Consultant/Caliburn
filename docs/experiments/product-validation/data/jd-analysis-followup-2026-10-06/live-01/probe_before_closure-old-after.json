@@ -1,0 +1,98 @@
+{
+  "profile": {
+    "revision_id": "38ac629d-345b-4eb7-9643-4bd029b091d4",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "支援倉庫收貨出貨及庫存核對。"
+    }
+  },
+  "work": {
+    "revision_id": "38ac629d-345b-4eb7-9643-4bd029b091d4",
+    "areas": [
+      {
+        "area_id": "ea3dacec-e47c-4388-912a-9ca294df47af",
+        "title": "倉庫作業",
+        "scope_text": "收貨、揀貨及庫存清點。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "692b3998-7e3e-4422-8af4-1eb94bbc8836",
+        "area_id": "ea3dacec-e47c-4388-912a-9ca294df47af",
+        "title": "核對收貨與揀貨",
+        "description": "核對單貨，數量不符記錄給主管，不自行改帳。",
+        "outcomes": [],
+        "requirements": [
+          {
+            "detail_id": "e4daaa44-2168-4dbc-b76b-5f0e96da3287",
+            "text": "發現數量不符時先記錄並交由主管處理，不自行改帳。"
+          }
+        ]
+      },
+      {
+        "task_id": "71aaa281-d206-43e8-b652-a5fa9f48bbf4",
+        "area_id": "ea3dacec-e47c-4388-912a-9ca294df47af",
+        "title": "執行庫存清點",
+        "description": "每日下班複點高異動商品，月底盤點本人負責的區域。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "38ac629d-345b-4eb7-9643-4bd029b091d4",
+    "references": [
+      {
+        "citation_id": "bb84e0ce-272a-4b4a-9e28-d77309ec2ef2",
+        "target_label": "任務：核對收貨與揀貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "692b3998-7e3e-4422-8af4-1eb94bbc8836",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "e249b8ee-6c4a-4714-8bd0-c9daee013ac7",
+        "target_label": "任務：執行庫存清點",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "71aaa281-d206-43e8-b652-a5fa9f48bbf4",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      },
+      {
+        "citation_id": "29e95bb3-afa6-4c79-bd14-4ccada199846",
+        "target_label": "任務：核對收貨與揀貨 · 要求：發現數量不符時先記錄並交由主管處理，不自行改帳。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "e4daaa44-2168-4dbc-b76b-5f0e96da3287",
+          "task_id": "692b3998-7e3e-4422-8af4-1eb94bbc8836"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

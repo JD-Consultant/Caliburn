@@ -1,5 +1,7 @@
 # C0 → C1 訪談 LLM 實驗計畫——先證明 Evidence-first，再決定架構
 
+> 時點說明：本文保留 2026-07-15 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 - 日期：2026-07-15
 - 狀態：**部分保留、部分被取代**。case/gold/runner/capture/eval 方法繼續有效；C1 在 v3 內增量實作與「先補 v3 provider trace」已於 2026-07-16 取消。
 - 上游研究：[`2026-07-15-evidence-first-stateful-workflow-reconstruction-research.md`](../../history.md#source-9a05e44a306accdb5cf4)
@@ -970,7 +972,7 @@ coder 還是 projection；若成功，也能證明收益不是模型、prompt、
 
 已完成第一輪 database inventory、保守 private export，以及 owner-confirmed test-data export。詳細
 稽核見
-[`real-candidate-audit-2026-07-15.md`](../../apps/api/evals/interview_v4/reports/real-candidate-audit-2026-07-15.md)，架構解讀見上游研究第 24 節。
+[`real-candidate-audit-2026-07-15.md`](../../history.md#source-8deeacb80e1581cd8d76)，架構解讀見上游研究第 24 節。
 
 ### 22.1 實際資料狀態
 

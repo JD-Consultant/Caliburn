@@ -1,0 +1,25 @@
+%% title: 歷史目標：Plan 候選與壓縮接續時序（當時未實作）
+%% legend: 實線實心箭頭：同步呼叫；虛線：返回原呼叫者的結果；時間由上而下。此圖保留原未知筆記設計期範圍。
+sequenceDiagram
+  participant A as 顧問 App
+  participant P as 規劃候選保存
+  participant R as 共用執行／checkpoint
+  participant M as 模型
+  A->>P: 同交易固定合法基底與原輸入 frontier
+  A->>R: 保存原 binding 與完整 initial request
+  R->>M: 原 request 含短筆記全文
+  M-->>R: 原生 output／plan diff／其他工具
+  R->>A: 逐筆 prepare，保存完整命令
+  A->>P: 核 writer／原位置，保存新正文與原結果
+  P-->>A: 原操作已確認的實際效果
+  A-->>R: 承接原結果，回傳工具實際效果
+  R->>R: 保存 call/result 與完整 Step
+  opt 需要輪中壓縮
+    R->>M: 原生 compaction
+    M-->>R: 完整原生 C
+    A->>P: 讀同 Turn 目前保存位置
+    A->>R: 先固定保存 plan item，再接 full C＋item
+    R->>R: 保存下一 request 並重新計數
+  end
+  A->>P: 本輪完成交易核最終 plan 位置
+  Note over A,P: completed＋正式輸入授跨輪資格；取消／失敗不授資格

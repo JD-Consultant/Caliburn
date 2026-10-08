@@ -1,0 +1,17 @@
+{
+  "execution_id": "67b1cf86-f3b3-425a-a3e0-4e76e63e4493",
+  "exchange": {
+    "employee_input": {
+      "source_id": "c3b47c94-89ef-48a5-937e-b5dee3f8c909",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "這個細節我目前說不清楚，也沒有其他能確認的資料。已說過的工作範圍仍一樣，其他事情可以試著說。"
+    },
+    "consultant_reply": {
+      "source_id": "9802feb2-033a-4f69-8240-da51dcbf9b24",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "我用已確認的工作做了查漏，沒有找到足以新增另一項工作的線索。搬運方式先保留未知，不會替你推定。\n\n還有一個收貨差異的紀錄細節尚未確認：除了拍照、保留標籤和單據，差異還需要另外登記在系統或表單嗎？若你也不清楚，我們就保留未知，不必猜。"
+    }
+  }
+}

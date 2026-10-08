@@ -232,20 +232,11 @@ App 加入的 map、訪談及交接資料使用 `user`，共通信任邊界見[c
 
 下圖描述**現行程式** ，只畫同檔案無在途批次時，已成功完成且帶有整理要求的 X Turn；有在途批次的承接另見下節。Turn 只決定要求資格，取材上界是該 Turn 最後使用者輸入的正式訪談序號，範圍依[本批定義](#本批與來源界線)及[來源讀取契約](2026-09-27-memory-read-and-source-navigation-contract.md#起始訪談範圍與前置語境)。已確認目標只替換輪前準備方式，不變更圖中的①②③及 B1 → B2 → 發布。背景整理的中斷與恢復見下一節。
 
-```mermaid
-flowchart TD
-    completed[A 已成功完成 X Turn，並已提出整理要求] --> start[安全點①：固定正式基準、訪談上界及候選起點]
-    start --> prep1[B1 本批首次準備：檢查門檻，必要才 compact 並採用]
-    prep1 --> b1[B1 只分析及維護工作情境候選]
-    b1 --> deps[安全點②：保存情境交接；形成差異及既有依賴]
-    deps --> prep2[B2 本批首次檢查門檻並準備；已有基底則直接接續]
-    prep2 --> handoff[App 追加 B1 情境變更資料；B2 可按需讀差異及導覽]
-    handoff --> b2[B2 分析工作理解：必查依賴及新相關理解]
-    b2 -->|本次交接分析完成| publish[Memory 業務：提交資格核對與原子發布]
-    b2 -->|無法完成| recovery[依異常規則恢復或停止；不冒稱發布]
-    publish -->|提交成功| done[安全點③：固定正式快照及來源進度生效]
-    publish -->|版本衝突或結果不明| recovery
-```
+![現行基本流程：B1／B2 整理與共同發布](../diagrams/specs/2026-09-25-b1-b2-information-gap-lifecycle/memory-publication-lifecycle.png)
+
+[圖源](../diagrams/specs/2026-09-25-b1-b2-information-gap-lifecycle/memory-publication-lifecycle.mmd) · [SVG](../diagrams/specs/2026-09-25-b1-b2-information-gap-lifecycle/memory-publication-lifecycle.svg)
+
+圖為現行單批整理的控制流程。起點要求 A 的 X Turn 已正式完成且提出整理要求；箭頭只表示控制先後，菱形區分分析與發布結果。恢復細節沿本章異常規則，不以此圖新增重試。
 
 圖例：實線表示控制／結果交接，①②③是業務安全點，不是每個 Graph node。每次 CRUD 仍在操作時保護權限、引用身分及原子性；圖中發布不新增語意 reviewer 或格式修補回圈。所有 Step 的中斷核對沿共用執行；完整安全點不代表只有這三處才能恢復。
 

@@ -1,0 +1,8 @@
+{
+  "migration": "0025_job_file_deletion",
+  "interview_plans_present": false,
+  "actual_error": "CheckViolation",
+  "message": "Fixed JD revisions and original results are immutable",
+  "original_result_retained": true,
+  "candidate_retained": true
+}

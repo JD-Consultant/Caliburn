@@ -1,0 +1,17 @@
+{
+  "execution_id": "f824f491-69f9-45e3-9052-7e2489ad9adf",
+  "exchange": {
+    "employee_input": {
+      "source_id": "6aecad54-b633-4a80-91c3-87d40bd576f1",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "工作條件、常見問題和忙不忙前面都說過了，確定沒有其他補充。"
+    },
+    "consultant_reply": {
+      "source_id": "0b5e1987-afed-415d-bf13-4a9dccb80fd9",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "已依前面提供的資訊更新底稿：訂單資料登錄與金額核對、缺漏時請同事補齊、發現錯誤先查原始資料並交主管決定更正；本人不核准訂單。也補上交主管確認的工作成果，並將固定辦公場所、全年工作量大致穩定等條件另列。\n\n目前職稱、所屬單位及直接匯報對象尚未確認，因此留空；把資料交給主管處理，不足以判定直接匯報關係。你已表示沒有其他補充，我先不再追問；若底稿有任何地方不符合實際工作，再告訴我即可。"
+    }
+  }
+}

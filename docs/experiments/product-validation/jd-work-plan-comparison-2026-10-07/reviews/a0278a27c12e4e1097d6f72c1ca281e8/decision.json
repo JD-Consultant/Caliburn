@@ -1,0 +1,32 @@
+{
+  "question_id": "a0278a27c12e4e1097d6f72c1ca281e8",
+  "mode": "answer",
+  "fact_ids": [
+    "inventory-partial"
+  ],
+  "reason": "實際轉問盤點方式、帳實差異處理與後續決定人，首次可披露 inventory-partial 並開啟暫時權責缺口；尚不能取得後續回訪答案。",
+  "subquestions": [
+    {
+      "quote": "您通常怎麼盤點？",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-partial"
+      ],
+      "reason": "每週循環盤點及查紀錄、複點流程直接相關。"
+    },
+    {
+      "quote": "如果實際數量和帳上不一致，您會怎麼處理",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-partial"
+      ],
+      "reason": "先查最近入出庫與移庫紀錄再複點，為已凍結的本人處理步驟。"
+    },
+    {
+      "quote": "或交給誰決定下一步？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "當前尚未披露 training，調帳及批准等後續權責暫時想不清楚，inventory-authority 條件未滿足。"
+    }
+  ]
+}

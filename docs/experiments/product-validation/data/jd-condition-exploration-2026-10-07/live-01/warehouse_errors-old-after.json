@@ -1,0 +1,55 @@
+{
+  "profile": {
+    "revision_id": "cbf2346a-73fa-47e9-8aa8-0f907f4c4e48",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依已確認的資料及儲位安排完成上架與入庫紀錄。"
+    }
+  },
+  "work": {
+    "revision_id": "cbf2346a-73fa-47e9-8aa8-0f907f4c4e48",
+    "areas": [
+      {
+        "area_id": "f657dc8e-5c14-49a3-af77-eaed8f245fee",
+        "title": "入庫與上架",
+        "scope_text": "品項確認、上架與登記。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "937705ee-50e5-4afc-9761-0dc34de8f613",
+        "area_id": "f657dc8e-5c14-49a3-af77-eaed8f245fee",
+        "title": "核對品項並上架",
+        "description": "上架前掃碼確認品項，依安排放貨、貼標籤並登記；不符先核對單據並通知主管，不自行改品項或決定儲位。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "cbf2346a-73fa-47e9-8aa8-0f907f4c4e48",
+    "references": [
+      {
+        "citation_id": "8a103376-b32e-4662-8d49-929341b950fe",
+        "target_label": "任務：核對品項並上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "937705ee-50e5-4afc-9761-0dc34de8f613",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

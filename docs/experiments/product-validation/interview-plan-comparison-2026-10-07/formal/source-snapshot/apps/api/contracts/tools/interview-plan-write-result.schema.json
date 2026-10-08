@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InterviewPlanWriteResult",
+  "description": "Reliable saved candidate text effects; not Turn adoption or analysis completion. The diff describes actual before/after text and is not executable V4A or an echoed request.",
+  "anyOf": [
+    {"$ref": "#/$defs/InterviewPlanUpdated"},
+    {"$ref": "#/$defs/InterviewPlanUnchanged"}
+  ],
+  "$defs": {
+    "InterviewPlanUpdated": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "diff"],
+      "properties": {
+        "status": {"type": "string", "const": "updated"},
+        "diff": {"type": "string", "minLength": 1}
+      }
+    },
+    "InterviewPlanUnchanged": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"type": "string", "const": "unchanged"}
+      }
+    }
+  }
+}

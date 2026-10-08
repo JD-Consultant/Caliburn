@@ -1,0 +1,138 @@
+{
+  "profile": {
+    "revision_id": "46877156-1715-4acb-8c77-9ccf01c83a24",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "負責日常收貨與客戶退貨檢查、入庫，並依採購決定備妥供應商退貨及登記出貨，以支援貨物流轉與相關紀錄管理。"
+    }
+  },
+  "work": {
+    "revision_id": "46877156-1715-4acb-8c77-9ccf01c83a24",
+    "areas": [
+      {
+        "area_id": "53d93e53-041b-4d09-be46-9d563da525e2",
+        "title": "收貨與退貨管理",
+        "scope_text": "涵蓋日常收貨、客戶退貨檢查與入庫，以及依採購通知辦理供應商退貨備貨與出貨登記。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "b10fed47-27bc-42d2-98ba-047b1bc06601",
+        "area_id": "53d93e53-041b-4d09-be46-9d563da525e2",
+        "title": "核對收貨差異",
+        "description": "每日處理約 15–20 張收貨單，數量不符時拍照、記錄並通知採購。",
+        "outcomes": [],
+        "requirements": []
+      },
+      {
+        "task_id": "bc9abdec-4ac1-44d1-89ea-1af56c858e6f",
+        "area_id": "53d93e53-041b-4d09-be46-9d563da525e2",
+        "title": "處理客戶退貨與供應商退貨出貨",
+        "description": "檢查客戶退貨並辦理入庫；供應商退貨是否退由採購決定，本人依通知備妥貨物並登記出貨。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "46877156-1715-4acb-8c77-9ccf01c83a24",
+    "references": [
+      {
+        "citation_id": "b1d9abea-3061-4010-b55e-d80280d5f686",
+        "target_label": "任務：核對收貨差異",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "b10fed47-27bc-42d2-98ba-047b1bc06601",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "dacbad30-562a-46b3-a1cd-a1e79b6f2334",
+        "target_label": "任務：處理客戶退貨與供應商退貨出貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "bc9abdec-4ac1-44d1-89ea-1af56c858e6f",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "31535fc1-6037-4bee-a498-fe610de29d32",
+        "target_label": "職責：收貨與退貨管理",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "53d93e53-041b-4d09-be46-9d563da525e2",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "48a6f1bc-7551-4c8e-97d9-02940efa9931",
+        "target_label": "職責：收貨與退貨管理",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "53d93e53-041b-4d09-be46-9d563da525e2",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "b2fdc824-6815-421c-ac27-304102115e5d",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "3f195028-e73d-4492-91e9-c42637f31ec3",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

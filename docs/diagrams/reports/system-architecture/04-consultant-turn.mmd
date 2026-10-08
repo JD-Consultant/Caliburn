@@ -1,0 +1,35 @@
+%% title: 現行時序：一輪顧問訪談的主成功路徑
+%% legend: 實線：呼叫；虛線：回傳；開放箭頭：通知。省略故障／取消；每次保存各有其交易邊界。
+sequenceDiagram
+    autonumber
+    participant U as 員工／UI
+    participant A as App／共用執行
+    participant L as OpenAI 模型
+    participant T as 業務工具
+    participant P as 保存機制
+    U->>A: 送出本次輸入
+    A->>P: 接受輸入、確認本輪資格
+    P-->>A: 輸入及准入結果已保存
+    A-->>U: 已接受；本輪尚未完成
+    A->>A: 必要的歷史準備；固定 Memory 與本輪 Context
+    loop 一個 Turn 中的多個 Step
+        A->>L: 原生接續視窗＋本輪資料／工具
+        L-->>A: 原生輸出項目（可能含文字、工具要求）
+        A->>P: 可靠保存模型結果與操作辨識
+        opt 有工具要求
+            loop 依序處理每個 tool call
+                A->>T: 受限操作（讀取／修改候選）
+                opt 有業務寫入
+                    T->>P: 保存原操作效果
+                end
+                T-->>A: 真實工具結果
+                A->>P: 保存工具配對與接續位置
+            end
+        end
+        A-)U: 通知公開中間訊息／候選預覽
+        A->>A: 完整 Step 邊界：控制與容量檢查
+    end
+    A->>P: 保存完整正式答覆並完成產品提交
+    Note over A,P: 訪談正式化＋JD 採用＋完成資格一致
+    P-->>A: 正式完成結果
+    A-)U: 通知已完成，可查回同一份結果

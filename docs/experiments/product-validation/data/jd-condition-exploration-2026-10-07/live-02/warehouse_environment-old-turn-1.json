@@ -1,0 +1,17 @@
+{
+  "execution_id": "c6728c99-a1c9-4ef4-a046-07f62c7c4a21",
+  "exchange": {
+    "employee_input": {
+      "source_id": "1a11db30-adf2-4ace-8362-8ae53c63d5af",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "我主要就是前面說的收貨、搬運上架和入庫紀錄，沒有另外負責揀貨、出貨或其他工作。目前想不到其他補充，你可以帶著我說。"
+    },
+    "consultant_reply": {
+      "source_id": "470bd71c-1807-4177-8198-880fa2932cdc",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "了解，目前確認您的主要工作就是收貨核對、搬運上架和入庫紀錄，沒有另外負責揀貨、出貨或其他工作。我已依此整理工作內容，並納入堆高機操作及持證要求。\n\n我想再帶您回想一個細節：**核對到貨品項和數量時，通常是對照哪份資料？**例如送貨單、採購單或系統中的到貨資料；如果依其他方式核對，也可以照實說。"
+    }
+  }
+}

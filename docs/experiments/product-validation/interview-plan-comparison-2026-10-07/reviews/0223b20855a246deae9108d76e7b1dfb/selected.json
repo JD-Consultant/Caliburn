@@ -1,0 +1,20 @@
+{
+  "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+  "audit": {
+    "actual_question": "我已把收貨驗收補充為逐箱點件、核對品項／數量／外包裝／送貨單，並記錄差異、通知採購，再依採購回覆登記入庫；也記下您不負責議價、選供應商或決定拒收，並補上與採購的交接。\n\n您提到的逐箱點件和核對項目，是每批收貨都會進行的例行驗收嗎？有差異時才拍照、填收貨異常表並通知採購，對嗎？",
+    "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+    "fact_ids": [
+      "receiving"
+    ],
+    "known_confirmation_ids": [
+      "receiving"
+    ],
+    "new_fact_ids": [],
+    "review_mode": "answer",
+    "review_reason": "實際確認已披露的例行收貨核對及發現差異時的拍照、異常表、採購通知，可重播 receiving 原事實。已知確認不能當成真正未知，也不另觸發隱藏主題。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

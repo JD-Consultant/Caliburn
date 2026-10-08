@@ -22,6 +22,7 @@ const active: ConsultantTurn = {
   input_text: '僅伺服器原輸入',
   allowed_controls: ['pause', 'cancel'],
   commentary: [],
+  plan_preview: null,
   candidate: null,
 };
 const update = {

@@ -1,0 +1,16 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "客戶退貨已整理為一項工作，記下依退貨單核對、拍照分類，以及無單或品項不符時隔離並交客服確認；待檢品交品保，可再上架品掃碼入庫。破損品後續處理不會先作推定。\n\n破損品隔離後，你還需要做哪些記錄或交接？後續由誰決定怎麼處理？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "實際追問破損客退品隔離之後的記錄、交接及處理決策。customer-returns 只明確確認破損隔離，沒有該分支後續；待檢交品保和一般分類記錄不能移植成破損品的處置權限或新步驟，整題無新的可答部分。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

@@ -1,0 +1,28 @@
+{
+  "completed_cases": [
+    "warehouse-r1-P1"
+  ],
+  "guard": {
+    "spent_usd": "0.341333835",
+    "occupied_usd": "0.366492710",
+    "retained_reservations": {
+      "9ac7fad2-d05b-4299-9aff-5d89f0141dae": "0.013296750",
+      "01e0648a-f46b-49ed-95b3-680b10a61693": "0.011862125"
+    },
+    "generations": 351,
+    "compacts": 1,
+    "outbound": 762,
+    "counted_input": 17328720,
+    "stop_reason": null
+  },
+  "all_scheduled_cases": [
+    "warehouse-r1-P1",
+    "warehouse-r1-P2",
+    "course_admin-r1-P1",
+    "course_admin-r1-P2",
+    "warehouse-r2-P2",
+    "warehouse-r2-P1",
+    "course_admin-r2-P2",
+    "course_admin-r2-P1"
+  ]
+}

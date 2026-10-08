@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InterviewPlan",
+  "description": "Complete saved consultant planning text. Null means no plan has been created; an empty string is deliberate empty text. Neither is a failure or interview completion result.",
+  "allOf": [{"$ref": "#/$defs/InterviewPlan"}],
+  "$defs": {
+    "InterviewPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan"],
+      "properties": {
+        "plan": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

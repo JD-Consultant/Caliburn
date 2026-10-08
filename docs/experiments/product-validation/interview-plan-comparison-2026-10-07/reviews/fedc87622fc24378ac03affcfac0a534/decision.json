@@ -1,0 +1,8 @@
+{
+  "question_id": "fedc87622fc24378ac03affcfac0a534",
+  "fact_ids": ["training", "training-boundary"],
+  "mode": "answer",
+  "reason": "本題問一般操作判斷依據及能否直接安排上線，training 中漏掃、錯批號、安全動線與檢核表的觀察內容可重播。training 已先前披露，本題責任再確認符合 training-boundary 條件；連同原流程提供更正，避免重播原判斷措辭而恢復錯誤批准權限。沒有問正式數字門檻，不另創標準。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

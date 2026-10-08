@@ -17,6 +17,7 @@ const turn = {
   input_text: '尚非正式的輸入',
   allowed_controls: ['cancel'],
   commentary: [],
+  plan_preview: null,
   candidate: null,
 };
 const clients: QueryClient[] = [];

@@ -1,0 +1,17 @@
+{
+  "execution_id": "eb242a5f-d687-4f40-94ef-5ae892208c99",
+  "exchange": {
+    "employee_input": {
+      "source_id": "b9821053-17a1-4ae5-b75f-1a45d4d62a7e",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "我現在想不到其他的，平常大概都這樣。"
+    },
+    "consultant_reply": {
+      "source_id": "a37bbcf9-03ab-49bd-937e-8c364734efb8",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "不用特別再想其他工作，我們可以從已知的項目逐步補清楚。目前已整理收貨核對與揀貨，以及每日複點高異動商品、月底盤點負責區域；數量不符時記錄交主管處理、不自行改帳，也已列入要求。差異容許門檻仍未知，先不臆測。\n\n先聊揀貨：你通常依什麼資訊找到要揀的商品和數量？例如紙本單、系統畫面、口頭指示，或其他方式。"
+    }
+  }
+}

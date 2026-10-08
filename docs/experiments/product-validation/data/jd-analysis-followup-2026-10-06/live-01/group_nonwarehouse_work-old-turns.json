@@ -1,0 +1,157 @@
+{
+  "arm": "old",
+  "case_id": "group_nonwarehouse_work",
+  "job_file_id": "f7bf4ac1-b62a-457f-9247-e406cc2f6a14",
+  "before": {
+    "profile": {
+      "revision_id": "bf2a963a-ed3a-46ca-a55c-1616439e0c29",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "回應客戶使用問題並整理服務資訊，協助追蹤處理與改善。"
+      }
+    },
+    "work": {
+      "revision_id": "bf2a963a-ed3a-46ca-a55c-1616439e0c29",
+      "areas": [
+        {
+          "area_id": "e7acbe69-5b54-4645-9b15-0a46146f1b62",
+          "title": "客服部日常工作",
+          "scope_text": "回應客戶問題及整理每週客訴資料。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "7e14aa7b-c0d5-4440-a8cd-c52a87e391e4",
+          "area_id": "e7acbe69-5b54-4645-9b15-0a46146f1b62",
+          "title": "回應客戶使用問題",
+          "description": "每天受理問題，核對訂單與操作紀錄；無法處理轉交技術同事，不決定退款。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "750136e5-fdec-4841-a901-4d1071a9fb57",
+          "area_id": "e7acbe69-5b54-4645-9b15-0a46146f1b62",
+          "title": "整理每週客訴資料",
+          "description": "每週五整理類型、件數和未結案清單給主管，由主管決定改善，不分派工作。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "bf2a963a-ed3a-46ca-a55c-1616439e0c29",
+      "references": [
+        {
+          "citation_id": "ddc256ff-6ff0-4c19-993c-260f56b8a590",
+          "target_label": "任務：回應客戶使用問題",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "7e14aa7b-c0d5-4440-a8cd-c52a87e391e4",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "66a922c0-9417-487e-a6ad-c0ffbb195ddc",
+          "target_label": "任務：整理每週客訴資料",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "750136e5-fdec-4841-a901-4d1071a9fb57",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "436554ce-f44c-474b-bb49-a9ebe5415204",
+      "exchange": {
+        "employee_input": {
+          "source_id": "94398291-ccef-4991-9b0e-c9ec3d843567",
+          "interview_sequence": 6,
+          "speaker": "employee",
+          "interview_text": "對，我做的就是這兩塊。每天那個是讓客人問題有人處理，每週那張是給主管看哪些問題常發生。沒有其他新的細節。"
+        },
+        "consultant_reply": {
+          "source_id": "5041712f-417a-465c-a11b-18d67aee34e1",
+          "interview_sequence": 7,
+          "speaker": "consultant",
+          "interview_text": "已依您的確認，在草稿中分別補上兩項工作的用途：日常客服讓客戶的使用問題有人處理；每週客訴彙整讓主管掌握較常發生的問題。原有的工作範圍與責任界線維持不變。\n\n若方便，平常查訂單、查看操作紀錄和整理客訴資料時，會用哪些系統或工具？不確定名稱的話，描述用途也可以。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 520175,
+    "output_tokens": 22829,
+    "reasoning_tokens": 17651,
+    "cached_input_tokens": 469599,
+    "cache_write_input_tokens": 50450,
+    "total_tokens": 543004,
+    "outbound_calls": 84,
+    "count_calls": 42,
+    "generation_calls": 42,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 520175,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0042",
+    "actual_estimated_usd": "0.022429340",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.026629340",
+    "cumulative_occupied_usd": "0.026629340",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 482.4329241000014,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 565218,
+    "output_tokens": 24425,
+    "reasoning_tokens": 18757,
+    "cached_input_tokens": 512483,
+    "cache_write_input_tokens": 52597,
+    "total_tokens": 589643,
+    "outbound_calls": 92,
+    "count_calls": 46,
+    "generation_calls": 46,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 565218,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0046",
+    "actual_estimated_usd": "0.023925755",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.028525755",
+    "cumulative_occupied_usd": "0.028525755",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 515.0643969000012,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

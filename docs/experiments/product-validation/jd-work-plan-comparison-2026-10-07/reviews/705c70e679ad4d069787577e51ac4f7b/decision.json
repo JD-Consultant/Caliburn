@@ -1,0 +1,34 @@
+{
+  "question_id": "705c70e679ad4d069787577e51ac4f7b",
+  "mode": "answer",
+  "fact_ids": [
+    "picking"
+  ],
+  "reason": "實際轉問一般揀貨啟動、依據資訊與本人工作終點，picking 凍結流程可回答。",
+  "subquestions": [
+    {
+      "quote": "通常什麼情況會開始揀貨？",
+      "mode": "answer",
+      "fact_ids": [
+        "picking"
+      ],
+      "reason": "依出貨波次單執行揀貨為相應工作啟動依據。"
+    },
+    {
+      "quote": "您會收到哪些資訊",
+      "mode": "answer",
+      "fact_ids": [
+        "picking"
+      ],
+      "reason": "出貨波次單與所核對品項、數量、批號、效期直接相關。"
+    },
+    {
+      "quote": "接著負責做到哪一步？",
+      "mode": "answer",
+      "fact_ids": [
+        "picking"
+      ],
+      "reason": "揀貨後交包裝區複核，截單前完成，異常交組長協調，提供本人責任與交接終點。"
+    }
+  ]
+}

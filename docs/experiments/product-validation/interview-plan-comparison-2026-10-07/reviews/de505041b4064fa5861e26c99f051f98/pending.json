@@ -1,0 +1,26 @@
+{
+  "question_id": "de505041b4064fa5861e26c99f051f98",
+  "profile": "warehouse",
+  "actual_question": "我先把職務名稱、所屬單位、匯報對象與班表，以及您提到的工作整理成四個範圍：收貨與倉儲、揀貨補貨與庫存、退貨、新人帶教。進貨數量不符時，您不負責決定拒收或退換貨，這個界線也已納入整理。\n\n想再釐清這類差異的後續：您核對單據、拍照通知採購後，這批貨通常會先怎麼處理？例如暫放等通知，或照常上架？您實際遇過的做法是什麼？",
+  "disclosed": [],
+  "open_gaps": [],
+  "seen_topics": [],
+  "refused_topics": [],
+  "disclosure_order": [],
+  "gap_opened_at": {},
+  "recent_employee_originals": [
+    "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。"
+  ],
+  "candidate": {
+    "actual_question": "想再釐清這類差異的後續：您核對單據、拍照通知採購後，這批貨通常會先怎麼處理？例如暫放等通知，或照常上架？您實際遇過的做法是什麼？",
+    "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+    "fact_id": "shelving",
+    "topic": "shelving",
+    "matched_cue": "上架",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": null,
+    "closes_gap": null,
+    "correction": false
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "question_id": "705c70e679ad4d069787577e51ac4f7b",
+  "employee_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+  "audit": {
+    "actual_question": "明白，儲位不一致時的處理先保留未知；之後沒有新線索，我不會重複追問。\n\n您提過揀貨工作。通常什麼情況會開始揀貨？您會收到哪些資訊，接著負責做到哪一步？",
+    "employee_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+    "fact_ids": [
+      "picking"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "picking"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉問一般揀貨啟動、依據資訊與本人工作終點，picking 凍結流程可回答。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "通常什麼情況會開始揀貨？",
+        "mode": "answer",
+        "fact_ids": [
+          "picking"
+        ],
+        "reason": "依出貨波次單執行揀貨為相應工作啟動依據。"
+      },
+      {
+        "quote": "您會收到哪些資訊",
+        "mode": "answer",
+        "fact_ids": [
+          "picking"
+        ],
+        "reason": "出貨波次單與所核對品項、數量、批號、效期直接相關。"
+      },
+      {
+        "quote": "接著負責做到哪一步？",
+        "mode": "answer",
+        "fact_ids": [
+          "picking"
+        ],
+        "reason": "揀貨後交包裝區複核，截單前完成，異常交組長協調，提供本人責任與交接終點。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

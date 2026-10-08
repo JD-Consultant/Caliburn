@@ -2,13 +2,52 @@
 
 import argparse
 import difflib
+import json
 import subprocess
 import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from urllib.parse import unquote, urlsplit
 
 API_ROOT = Path(__file__).resolve().parents[1]
 WEB_ROOT = API_ROOT.parent / "web"
+
+
+def stage_contract_schemas(
+    schemas: list[Path], directory: Path, *, contracts_root: Path
+) -> dict[Path, Path]:
+    """Stage trusted local references under one generator input base; never fetch URLs."""
+    if len({schema.name for schema in schemas}) != len(schemas):
+        raise ValueError("Canonical schemas must have unique filenames across families")
+    contracts_root = contracts_root.resolve()
+    known = {schema.resolve() for schema in schemas}
+    staged = {schema: directory / schema.name for schema in schemas}
+
+    def relocate(value: object, source: Path) -> object:
+        if isinstance(value, list):
+            return [relocate(item, source) for item in value]
+        if not isinstance(value, dict):
+            return value
+        result = {key: relocate(item, source) for key, item in value.items()}
+        reference = result.get("$ref")
+        if not isinstance(reference, str) or reference.startswith("#"):
+            return result
+        parsed = urlsplit(reference)
+        if parsed.scheme or parsed.netloc or parsed.query:
+            raise ValueError("Canonical contracts only permit local schema references")
+        target = (source.parent / unquote(parsed.path)).resolve()
+        if not target.is_relative_to(contracts_root) or target not in known:
+            raise ValueError("Schema references must resolve to a canonical contract")
+        result["$ref"] = target.name + ("#" + parsed.fragment if parsed.fragment else "")
+        return result
+
+    directory.mkdir(parents=True, exist_ok=True)
+    for schema, target in staged.items():
+        content = relocate(json.loads(schema.read_text(encoding="utf-8")), schema)
+        target.write_text(
+            json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+    return staged
 
 
 def generate(check: bool, schema_names: list[str] | None = None) -> bool:
@@ -18,12 +57,16 @@ def generate(check: bool, schema_names: list[str] | None = None) -> bool:
         for family in ("http", "tools")
         for schema in sorted((API_ROOT / "contracts" / family).glob("*.schema.json"))
     ]
+    all_schemas = schemas
     if schema_names is not None:
         available = {schema.name for schema in schemas}
         if unknown := set(schema_names) - available:
             raise ValueError(f"Unknown schemas: {sorted(unknown)}")
         schemas = [schema for schema in schemas if schema.name in schema_names]
     with TemporaryDirectory(prefix="caliburn-codegen-") as directory:
+        staged = stage_contract_schemas(
+            all_schemas, Path(directory) / "schemas", contracts_root=API_ROOT / "contracts"
+        )
         for schema in schemas:
             stem = schema.name.removesuffix(".schema.json")
             output_directory = Path("tools") if schema.parent.name == "tools" else Path()
@@ -35,7 +78,7 @@ def generate(check: bool, schema_names: list[str] | None = None) -> bool:
                     "-m",
                     "datamodel_code_generator",
                     "--input",
-                    str(schema),
+                    str(staged[schema]),
                     "--input-file-type",
                     "jsonschema",
                     "--no-allow-remote-refs",

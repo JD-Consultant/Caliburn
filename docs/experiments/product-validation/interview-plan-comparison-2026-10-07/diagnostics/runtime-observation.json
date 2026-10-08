@@ -1,0 +1,25 @@
+{
+  "python": "3.14.7 (main, Sep 24 2026, 17:57:14) [MSC v.1944 64 bit (AMD64)]",
+  "gil_enabled": true,
+  "jit": {
+    "is_available": false,
+    "is_enabled": false
+  },
+  "build_flags": {
+    "Py_DEBUG": 0,
+    "Py_GIL_DISABLED": 0,
+    "WITH_PYMALLOC": null,
+    "CONFIG_ARGS": null,
+    "PY_CFLAGS": null,
+    "PY_CFLAGS_NODIST": null
+  },
+  "flags": {
+    "debug": 0,
+    "optimize": 0,
+    "dev_mode": false,
+    "isolated": 0
+  },
+  "replay_sha256": "5e5cee97b15768a9c69ae38f89271a68df90ca15dc7dd494fd95bae55f1f3366",
+  "no_environment_dump": true,
+  "no_memory_dump": true
+}

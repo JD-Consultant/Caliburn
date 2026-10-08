@@ -1,0 +1,17 @@
+{
+  "execution_id": "a8da772e-a516-4c39-b78f-ccf11e7616bd",
+  "exchange": {
+    "employee_input": {
+      "source_id": "5dda88c5-2e89-422a-bbf2-3119273b1398",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "對，都屬於同一次核對，沒有另外負責的工作。這份內容沒錯，今天先到這裡。"
+    },
+    "consultant_reply": {
+      "source_id": "3be45040-5032-4013-a465-b5f222f69920",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "好的，今天先到這裡。已確認目前只有一項工作：每天下午三點依單核對出貨品項與數量；掃碼不符時先重掃、再核對標籤，仍有差異就記錄並交主管處理。您不負責揀貨、裝箱或決定換貨。\n\n我會保留這項工作及其職責範圍，下次再接著談。"
+    }
+  }
+}

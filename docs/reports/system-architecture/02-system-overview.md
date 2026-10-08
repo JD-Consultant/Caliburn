@@ -4,9 +4,11 @@
 
 ## 本機資料管理，外部模型推論
 
-![圖二：Caliburn 執行單元與外部服務](diagrams/02-system-boundary.png)
+![圖二：Caliburn 本機 Docker 基本模式部署](../../diagrams/architecture/delivery-and-operations/local-deployment.png)
 
-圖二的箭頭表示資料或請求往來，框線表示執行位置。Web、後端、PostgreSQL 與 PDF 渲染在本機運作；模型推論則由後端將組裝好的上下文（Context）送至 OpenAI。因此，本產品需要連網，訪談資料也可能隨模型請求外送。
+[圖源](../../diagrams/architecture/delivery-and-operations/local-deployment.mmd) · [SVG](../../diagrams/architecture/delivery-and-operations/local-deployment.svg)
+
+圖二由[正式部署視圖](../../architecture/delivery-and-operations.md#2-最小部署視角)生成。外框區分操作者電腦與 Docker 容器；矩形表示程序／外部系統，圓柱表示資料庫。箭頭只表示發起請求的方向，標明協定，省略回傳。PDF 是 App 內的受控功能，不是獨立服務。後端將組裝好的上下文（Context）送至 OpenAI，因此需要連網，訪談資料可能隨模型請求外送。
 
 圖中呈現未啟用公版參考的基本部署。明示設定後，後端另可透過 HTTP 查讀獨立 RAG 的公版資料；RAG 不由 JD App 自動啟動，也不成為預設依賴。這項可選路徑依 [ADR0080](../../adr/0080-opt-in-public-reference-agent-tools.md)，詳細分工見[第四章](04-agent-execution.md)。
 

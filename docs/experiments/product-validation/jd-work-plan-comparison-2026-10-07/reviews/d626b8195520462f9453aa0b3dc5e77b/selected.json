@@ -1,0 +1,32 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "我已把冷藏作業列為獨立工作：冷藏食品約佔兩成，作業區為 2–8°C，需穿防寒衣並每天早晚查看溫度表；超標時隔離受影響批次、記錄時間與溫度並通知主管和品保，是否能出貨由品保決定。年度全倉盤點也已另列為庫存工作，記下每年十二月配合財務，以及事前整理儲位和待處理單據。年度分區責任和財務表單細節則保留未知。\n\n您提到每天早晚都查看溫度表，這兩次都是由您本人負責嗎？還是會依班別分工？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "已知每天早晚看溫度表，但本題追問兩次是否一律由本人負責及是否按班別分工；凍結事實未提供個別班次覆蓋與責任分配，不能把一般頻率擴成普遍人員安排。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "這兩次都是由您本人負責嗎？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "現有事實不足以確認每天兩次皆由本人承擔。"
+      },
+      {
+        "quote": "還是會依班別分工？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "沒有冷藏溫度檢查的班別分工細節，保留未知。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

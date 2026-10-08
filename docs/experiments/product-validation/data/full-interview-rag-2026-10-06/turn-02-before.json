@@ -1,0 +1,127 @@
+{
+  "profile": {
+    "revision_id": "7e62bdc5-6b62-4685-82fb-7c485f4e6815",
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點及客戶與供應商退貨入庫，維持貨物流轉與庫存作業的準確，支援後續出貨及退貨處理。"
+    }
+  },
+  "work": {
+    "revision_id": "7e62bdc5-6b62-4685-82fb-7c485f4e6815",
+    "areas": [
+      {
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "物流中心倉儲與庫存作業",
+        "scope_text": "涵蓋收貨驗收、上架、揀貨補貨、庫存盤點，以及客戶與供應商退貨入庫。"
+      }
+    ],
+    "tasks": [],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": [
+      {
+        "condition_id": "9ad6366e-23f0-4716-aaf1-bbf465f0ca2b",
+        "kind": "schedule_travel",
+        "text": "早上七點上班，週一至週六輪休。"
+      }
+    ]
+  },
+  "sources": {
+    "revision_id": "7e62bdc5-6b62-4685-82fb-7c485f4e6815",
+    "references": [
+      {
+        "citation_id": "ca9e0d04-b465-4f09-adab-a2b308b51987",
+        "target_label": "職務名稱",
+        "target": {
+          "kind": "profile_field",
+          "field": "job_title",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f1c0c943-0599-4a78-a655-4a02637c17a5",
+        "target_label": "所屬單位",
+        "target": {
+          "kind": "profile_field",
+          "field": "organization_unit",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "20ed676b-9586-44c3-a60d-2ec5ef103e01",
+        "target_label": "直屬主管",
+        "target": {
+          "kind": "profile_field",
+          "field": "reports_to",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "7d1d9e22-fa14-4e5e-a78b-00e16587853a",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "1f08e729-293d-4b7b-a289-76e5ce93c5f7",
+        "target_label": "職責：物流中心倉儲與庫存作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "397406d7-5086-4c24-a4e5-8aa28dc7a587",
+        "target_label": "共通條件：早上七點上班，週一至週六輪休。",
+        "target": {
+          "kind": "condition",
+          "field": null,
+          "item_id": "9ad6366e-23f0-4716-aaf1-bbf465f0ca2b",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

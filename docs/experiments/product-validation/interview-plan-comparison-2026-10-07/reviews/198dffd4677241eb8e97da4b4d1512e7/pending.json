@@ -1,0 +1,26 @@
+{
+  "question_id": "198dffd4677241eb8e97da4b4d1512e7",
+  "profile": "warehouse",
+  "actual_question": "我先按你提供的內容整理了 JD 草稿的基本資料、職務目的和排班，也記下你會核對單據與實收數量、通知採購，但不決定拒收或退換貨。各項倉儲工作還會再依實際內容整理，不會把最近這次數量差異直接當成整項工作的全部流程。\n\n以平常收貨來說，除了數量，你還會檢查哪些項目？如果發現不符並通知採購，貨物通常先怎麼處理，之後由誰告訴你下一步怎麼做？",
+  "disclosed": [],
+  "open_gaps": [],
+  "seen_topics": [],
+  "refused_topics": [],
+  "disclosure_order": [],
+  "gap_opened_at": {},
+  "recent_employee_originals": [
+    "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。"
+  ],
+  "candidate": {
+    "actual_question": "以平常收貨來說，除了數量，你還會檢查哪些項目？如果發現不符並通知採購，貨物通常先怎麼處理，之後由誰告訴你下一步怎麼做？",
+    "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+    "fact_id": "receiving",
+    "topic": "receiving",
+    "matched_cue": "收貨",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": null,
+    "closes_gap": null,
+    "correction": false
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "question_id": "6557aec9716c4c5892f0ee3d148a41ce",
+  "mode": "answer",
+  "fact_ids": [
+    "training-boundary"
+  ],
+  "reason": "training 已正式披露，當下回訪本人判斷後到正式上線的程序與權責，與 training-boundary 直接相關，符合更正條件。",
+  "subquestions": [
+    {
+      "quote": "您判斷新人可以獨立上線後，接下來通常還有哪些步驟，才算正式上線？",
+      "mode": "answer",
+      "fact_ids": [
+        "training-boundary"
+      ],
+      "reason": "凍結更正有觀察後向組長回報、本人不批准、主管最終核准，能直接回答正式上線的後續步驟。"
+    }
+  ]
+}

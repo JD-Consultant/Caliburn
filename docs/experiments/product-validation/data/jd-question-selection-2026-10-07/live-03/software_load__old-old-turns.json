@@ -1,0 +1,508 @@
+{
+  "arm": "old",
+  "case_id": "software_load__old",
+  "job_file_id": "fc55a32b-8ca2-4838-aea7-ee65dbab5db4",
+  "before": {
+    "profile": {
+      "revision_id": "d276117f-12bb-4747-a93a-4a8334d428b4",
+      "profile": {
+        "job_title": "網站維護工程師",
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "持續處理已回報的網站前端問題，完成修正與驗證交接，讓客服取得處理結果並追蹤問題。"
+      }
+    },
+    "work": {
+      "revision_id": "d276117f-12bb-4747-a93a-4a8334d428b4",
+      "areas": [
+        {
+          "area_id": "66ac4250-e90e-47b4-a2b5-b16a6ceed8c8",
+          "title": "網站前端維護",
+          "scope_text": "重現、修正及回報前端問題，後端由同事負責。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "8f7ea47e-3236-4586-b312-4670d2717c50",
+          "area_id": "66ac4250-e90e-47b4-a2b5-b16a6ceed8c8",
+          "title": "處理前端問題單",
+          "description": "通常在辦公室透過問題單系統及版本控制，依客服提供的畫面、操作步驟與問題紀錄重現並修正本人負責的前端問題。無法重現時請客服補充缺少的操作資訊；判斷為後端問題時附上資料交同事處理。修正後由測試同事驗證，測試通過並將結果回報客服後才結束問題單；是否發布由產品主管決定。收到回報後十二小時內回覆初步判斷，不代表須於十二小時內修復。",
+          "outcomes": [
+            {
+              "detail_id": "a8c9bf81-26de-4b06-9042-5c8fa3a0eaef",
+              "text": "修正本人負責且可重現的前端問題，交由測試同事驗證，並在測試通過後回報客服，完成問題單處理。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "311f2ffd-e87c-4982-88d0-0b96539ed5d5",
+              "text": "收到問題回報後十二小時內回覆初步判斷；此時限不代表必須在十二小時內完成修復。問題單須待測試通過且結果回報客服後才結束；無法重現時先請客服補充操作資訊，後端問題交同事處理，不視為本人已修復。"
+            }
+          ]
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_id": "db527e42-108e-426a-af9e-6ffa12b500a2",
+          "kind": "skill",
+          "name": "前端問題重現與修正",
+          "description": "依問題單提供的操作資訊與紀錄重現前端問題，判斷是否屬於本人負責的前端範圍並完成修正；遇到無法重現或後端問題時，整理缺漏資訊或交接資料。"
+        }
+      ],
+      "task_links": [
+        {
+          "task_id": "8f7ea47e-3236-4586-b312-4670d2717c50",
+          "capability_id": "db527e42-108e-426a-af9e-6ffa12b500a2"
+        }
+      ],
+      "collaborators": [
+        {
+          "collaborator_id": "bab7214b-6461-4c23-add5-6a2a34f04f2a",
+          "name": "客服",
+          "scope_text": "提供問題畫面及操作步驟；若問題無法重現，依回覆補充缺少的操作資訊；收到修正結果回報後追蹤問題單。"
+        },
+        {
+          "collaborator_id": "f6adeba5-1459-4bac-abd0-43f85598404e",
+          "name": "後端同事",
+          "scope_text": "遇到判斷為後端的問題時，接收整理的資料並處理後端問題；本人不負責修正後端。"
+        },
+        {
+          "collaborator_id": "8cef3d68-dbe1-4b0c-b8b8-844b08b8ed2f",
+          "name": "測試同事",
+          "scope_text": "對修正後的前端問題進行測試驗證。"
+        },
+        {
+          "collaborator_id": "902fd897-dbe8-407a-8482-7853f5f4ab1c",
+          "name": "產品主管",
+          "scope_text": "決定修正內容是否發布；本人不承擔發布決策。"
+        }
+      ],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "d276117f-12bb-4747-a93a-4a8334d428b4",
+      "references": [
+        {
+          "citation_id": "a425161c-26cb-4fa1-90f1-c7a691b16a04",
+          "target_label": "任務：處理前端問題單",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "8f7ea47e-3236-4586-b312-4670d2717c50",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "6aab9909-0a24-403b-b6a7-3794788e2944",
+          "target_label": "任務：處理前端問題單",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "8f7ea47e-3236-4586-b312-4670d2717c50",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "26600109-7196-47f6-b585-47d86b2b55c9",
+          "target_label": "任務：處理前端問題單",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "8f7ea47e-3236-4586-b312-4670d2717c50",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "0fa6c03a-3913-4b49-97b6-d173e36ba001",
+          "target_label": "任務：處理前端問題單 · 成果：修正本人負責且可重現的前端問題，交由測試同事驗證，並在測試通過後回報客服，完成問題單處理。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "a8c9bf81-26de-4b06-9042-5c8fa3a0eaef",
+            "task_id": "8f7ea47e-3236-4586-b312-4670d2717c50"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "2c35f873-c9f5-49c6-8f18-f6336d9afc43",
+          "target_label": "任務：處理前端問題單 · 成果：修正本人負責且可重現的前端問題，交由測試同事驗證，並在測試通過後回報客服，完成問題單處理。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "a8c9bf81-26de-4b06-9042-5c8fa3a0eaef",
+            "task_id": "8f7ea47e-3236-4586-b312-4670d2717c50"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "9ebf397f-835e-4cd8-8cb8-9b3bf038b385",
+          "target_label": "任務：處理前端問題單 · 要求：收到問題回報後十二小時內回覆初步判斷；此時限不代表必須在十二小時內完成修復。問題單須待測試通過且結果回報客服後才結束；無法重現時先請客服補充操作資訊，後端問題交同事處理，不視為本人已修復。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "311f2ffd-e87c-4982-88d0-0b96539ed5d5",
+            "task_id": "8f7ea47e-3236-4586-b312-4670d2717c50"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "42b605bd-20a5-415c-803f-3e70177ede18",
+          "target_label": "任務：處理前端問題單 · 要求：收到問題回報後十二小時內回覆初步判斷；此時限不代表必須在十二小時內完成修復。問題單須待測試通過且結果回報客服後才結束；無法重現時先請客服補充操作資訊，後端問題交同事處理，不視為本人已修復。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "311f2ffd-e87c-4982-88d0-0b96539ed5d5",
+            "task_id": "8f7ea47e-3236-4586-b312-4670d2717c50"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "234d18d8-e40f-4b9f-8694-d24c207e88db",
+          "target_label": "職務名稱",
+          "target": {
+            "kind": "profile_field",
+            "field": "job_title",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "6f4b1300-0fbb-484c-a185-a7fba5a4d9e5",
+          "target_label": "技能：前端問題重現與修正",
+          "target": {
+            "kind": "capability",
+            "field": null,
+            "item_id": "db527e42-108e-426a-af9e-6ffa12b500a2",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "59102aa9-4dcb-4e9b-80b5-5a2f57d24827",
+          "target_label": "技能：前端問題重現與修正",
+          "target": {
+            "kind": "capability",
+            "field": null,
+            "item_id": "db527e42-108e-426a-af9e-6ffa12b500a2",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "acd4eb1d-ec86-4ffb-8193-f069723d5475",
+          "target_label": "協作：客服",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "bab7214b-6461-4c23-add5-6a2a34f04f2a",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "93d7e9b5-dd33-42d2-bfd6-8ce7686fc13f",
+          "target_label": "協作：客服",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "bab7214b-6461-4c23-add5-6a2a34f04f2a",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "4e73a6f7-5d66-4115-a054-d69a9bd4a535",
+          "target_label": "協作：客服",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "bab7214b-6461-4c23-add5-6a2a34f04f2a",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "272e4be7-58a7-4809-8586-b114d126ac9e",
+          "target_label": "協作：後端同事",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "f6adeba5-1459-4bac-abd0-43f85598404e",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "264bd4ec-4f6b-4435-b01a-8fcc36f1b96a",
+          "target_label": "協作：後端同事",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "f6adeba5-1459-4bac-abd0-43f85598404e",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "24eb8757-5f05-4e35-b826-b5574bb50109",
+          "target_label": "協作：測試同事",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "8cef3d68-dbe1-4b0c-b8b8-844b08b8ed2f",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "38034a5d-8cb1-489e-92c4-8e71966c3fbb",
+          "target_label": "協作：測試同事",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "8cef3d68-dbe1-4b0c-b8b8-844b08b8ed2f",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "783ad70c-60b5-4bc2-a399-a7ee9ae95993",
+          "target_label": "協作：產品主管",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "902fd897-dbe8-407a-8482-7853f5f4ab1c",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "eedea14c-65ac-4224-9868-c1279f69bd76",
+          "target_label": "任務：處理前端問題單 · 使用：前端問題重現與修正",
+          "target": {
+            "kind": "task_capability",
+            "field": null,
+            "item_id": "db527e42-108e-426a-af9e-6ffa12b500a2",
+            "task_id": "8f7ea47e-3236-4586-b312-4670d2717c50"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "f40f5d04-7ac0-4bdb-9445-2296a9c20916",
+          "target_label": "任務：處理前端問題單 · 使用：前端問題重現與修正",
+          "target": {
+            "kind": "task_capability",
+            "field": null,
+            "item_id": "db527e42-108e-426a-af9e-6ffa12b500a2",
+            "task_id": "8f7ea47e-3236-4586-b312-4670d2717c50"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "490b8803-0729-4cdd-b86e-2e8f71bbdc69",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "b7fa980e-3353-47cd-9883-cf830ef2c478",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "b3b631d4-e0e1-4616-a004-2287444f6dc9",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "base_case_id": "software_load",
+  "turns": [
+    {
+      "execution_id": "e600632e-122c-41bd-a893-e15d293426d9",
+      "exchange": {
+        "employee_input": {
+          "source_id": "776e7390-c4ce-4c17-89dc-b6581154bd5f",
+          "interview_sequence": 10,
+          "speaker": "employee",
+          "interview_text": "新版上線後問題單會集中進來，十二小時回覆初步判斷的要求不變。優先順序由產品主管安排，我不決定發布，也不承諾十二小時修好。"
+        },
+        "consultant_reply": {
+          "source_id": "fad9f023-00b6-4da7-918c-d80632c2d7d3",
+          "interview_sequence": 11,
+          "speaker": "consultant",
+          "interview_text": "收到，已把「新版上線後問題單會集中進來、由產品主管安排優先順序」補進底稿；十二小時內回覆初步判斷的要求不變，但不承諾十二小時內修好，也不負責決定是否發布。我也同步更新了產品主管的協作範圍，並保留原有的測試、客服回報及問題單結束條件。\n\n這項工作的範圍與重要要求目前已清楚；所屬單位和直接匯報對象仍可先留空，之後有需要再補。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 211240,
+    "output_tokens": 5903,
+    "reasoning_tokens": 4857,
+    "cached_input_tokens": 201319,
+    "cache_write_input_tokens": 9888,
+    "total_tokens": 217143,
+    "outbound_calls": 28,
+    "count_calls": 17,
+    "generation_calls": 11,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 211240,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.042744885",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0017",
+    "actual_estimated_usd": "0.006203990",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.007903990",
+    "cumulative_occupied_usd": "0.007903990",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 102.76672590000089,
+    "seconds_limit": 406,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 316328,
+    "output_tokens": 8628,
+    "reasoning_tokens": 6633,
+    "cached_input_tokens": 301059,
+    "cache_write_input_tokens": 15221,
+    "total_tokens": 324956,
+    "outbound_calls": 39,
+    "count_calls": 23,
+    "generation_calls": 16,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 316328,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.042744885",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0023",
+    "actual_estimated_usd": "0.009232015",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.011532015",
+    "cumulative_occupied_usd": "0.011532015",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 142.93561950000003,
+    "seconds_limit": 406,
+    "stop_reason": null
+  }
+}

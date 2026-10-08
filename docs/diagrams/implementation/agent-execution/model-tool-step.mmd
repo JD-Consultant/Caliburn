@@ -1,0 +1,19 @@
+%% legend: 膠囊：本圖起訖；矩形：處理；菱形：判斷；平行四邊形：資料交接；雙側線：子流程。
+%%{init: {"flowchart": {"wrappingWidth": 240, "nodeSpacing": 32, "rankSpacing": 32}}}%%
+flowchart TD
+  S([單一 Step 開始<br/>計數及容量已准入]) --> M[/外送固定 request<br/>接收完整 R 與 attempt/]
+  M --> SAVE[/saver 保存 R、attempt<br/>與操作 seed/]
+  SAVE --> BILL[依原 attempt 冪等結算]
+  BILL --> VALID[驗原回應協定、call 身分與上限]
+  VALID --> POSITION[核對原 calls 與已保存結果位置]
+  POSITION --> MORE{還有未配對的 call？}
+  MORE -->|有| PREP[[依原順序 prepare 工具<br/>§4.2 正文]]
+  PREP --> KIND{prepare 的結果？}
+  KIND -->|確定觀察或已知拒絕| RESULT[/保存原 call 的配對結果/]
+  KIND -->|待執行命令| CMD[/可靠保存 prepared command/]
+  CMD --> EXEC[[原業務核資格並執行或查回<br/>memory-tools §4／JD 工具契約]]
+  EXEC --> RESULT
+  RESULT --> POSITION
+  MORE -->|無| BUILD[核資格並組裝完整窗口<br/>步數加一；按原 R 分類 next_action]
+  BUILD --> STEP[/saver 保存完整 Step/]
+  STEP --> END([返回 Step 結果<br/>尚未正式提交產品資料])

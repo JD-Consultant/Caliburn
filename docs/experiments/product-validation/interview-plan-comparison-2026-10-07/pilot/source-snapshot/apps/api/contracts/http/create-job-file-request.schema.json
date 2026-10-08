@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CreateJobFileRequest",
+  "description": "One explicit creation command. Transport resends reuse command_id; a new file uses a new command.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command_id", "display_name", "employee_name"],
+  "properties": {
+    "command_id": {"type": "string", "format": "uuid"},
+    "display_name": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"},
+    "employee_name": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"}
+  }
+}

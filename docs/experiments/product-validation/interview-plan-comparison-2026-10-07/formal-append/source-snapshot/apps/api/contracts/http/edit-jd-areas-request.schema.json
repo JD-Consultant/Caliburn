@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EditJdAreasRequest",
+  "description": "One bounded responsibility-group edit from the observed formal base. Replay the same command if the result is uncertain.",
+  "type": "object", "additionalProperties": false,
+  "required": ["command_id", "expected_revision_id", "change"],
+  "properties": {
+    "command_id": {"type": "string", "format": "uuid"},
+    "expected_revision_id": {"type": "string", "format": "uuid"},
+    "change": {"oneOf": [
+      {"$ref": "#/$defs/CreateArea"}, {"$ref": "#/$defs/ReviseArea"},
+      {"$ref": "#/$defs/DeleteArea"}, {"$ref": "#/$defs/ReorderArea"}
+    ]}
+  },
+  "$defs": {
+    "NullableText": {"type": ["string", "null"], "minLength": 1, "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"},
+    "CreateArea": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "title", "scope_text"],
+      "properties": {
+        "action": {"const": "create_area"},
+        "title": {"$ref": "#/$defs/NullableText"}, "scope_text": {"$ref": "#/$defs/NullableText"}
+      }
+    },
+    "ReviseArea": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "area_id", "changes"],
+      "properties": {
+        "action": {"const": "revise_area"}, "area_id": {"type": "string", "format": "uuid"},
+        "changes": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"$ref": "#/$defs/AreaFieldChange"}}
+      }
+    },
+    "AreaFieldChange": {
+      "type": "object", "additionalProperties": false, "required": ["field", "value"],
+      "properties": {
+        "field": {"type": "string", "enum": ["title", "scope_text"]},
+        "value": {"$ref": "#/$defs/NullableText"}
+      }
+    },
+    "DeleteArea": {
+      "type": "object", "additionalProperties": false, "required": ["action", "area_id"],
+      "properties": {"action": {"const": "delete_area"}, "area_id": {"type": "string", "format": "uuid"}}
+    },
+    "ReorderArea": {
+      "type": "object", "additionalProperties": false, "required": ["action", "area_id", "before_area_id"],
+      "properties": {
+        "action": {"const": "reorder_area"}, "area_id": {"type": "string", "format": "uuid"},
+        "before_area_id": {"type": ["string", "null"], "format": "uuid", "description": "Place before this existing group; null means last. IDs select identity, never position."}
+      }
+    }
+  }
+}

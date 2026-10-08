@@ -1,0 +1,378 @@
+[
+  {
+    "at": 1791279209.9235308,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279209.923533,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解\"}"
+  },
+  {
+    "at": 1791279209.9256918,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279209.925693,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我\"}"
+  },
+  {
+    "at": 1791279209.9285173,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279209.928519,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不\"}"
+  },
+  {
+    "at": 1791279209.9308631,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279209.930864,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會\"}"
+  },
+  {
+    "at": 1791279209.933448,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279209.9334495,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把\"}"
+  },
+  {
+    "at": 1791279209.9358392,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279209.9358406,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀\"}"
+  },
+  {
+    "at": 1791279210.056713,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.056715,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨\"}"
+  },
+  {
+    "at": 1791279210.0567844,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0567849,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後\"}"
+  },
+  {
+    "at": 1791279210.0568407,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0568411,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已\"}"
+  },
+  {
+    "at": 1791279210.0570166,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0570178,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採\"}"
+  },
+  {
+    "at": 1791279210.057112,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0571127,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先\"}"
+  },
+  {
+    "at": 1791279210.0571702,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0571742,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進\"}"
+  },
+  {
+    "at": 1791279210.0572262,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0572267,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先\"}"
+  },
+  {
+    "at": 1791279210.0581965,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0581977,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出\"}"
+  },
+  {
+    "at": 1791279210.058274,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0582745,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；\"}"
+  },
+  {
+    "at": 1791279210.0584028,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0584035,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到\"}"
+  },
+  {
+    "at": 1791279210.0585284,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0585291,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品\"}"
+  },
+  {
+    "at": 1791279210.058826,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.058827,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低\"}"
+  },
+  {
+    "at": 1791279210.0589154,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.058916,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於\"}"
+  },
+  {
+    "at": 1791279210.0589757,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0589762,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全\"}"
+  },
+  {
+    "at": 1791279210.0590162,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0590167,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫\"}"
+  },
+  {
+    "at": 1791279210.0591483,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.059149,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存\"}"
+  },
+  {
+    "at": 1791279210.059231,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0592315,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時\"}"
+  },
+  {
+    "at": 1791279210.0631611,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0631623,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會\"}"
+  },
+  {
+    "at": 1791279210.0632427,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0632432,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知\"}"
+  },
+  {
+    "at": 1791279210.0633166,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.063317,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採\"}"
+  },
+  {
+    "at": 1791279210.063609,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.06361,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購\"}"
+  },
+  {
+    "at": 1791279210.0642152,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0642161,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補\"}"
+  },
+  {
+    "at": 1791279210.0642622,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0642626,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨\"}"
+  },
+  {
+    "at": 1791279210.0643153,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0643158,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我\"}"
+  },
+  {
+    "at": 1791279210.0643618,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0643623,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先\"}"
+  },
+  {
+    "at": 1791279210.0646193,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.06462,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認\"}"
+  },
+  {
+    "at": 1791279210.0785234,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.0785258,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現\"}"
+  },
+  {
+    "at": 1791279210.0904617,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.090463,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有\"}"
+  },
+  {
+    "at": 1791279210.106464,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.106466,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項\"}"
+  },
+  {
+    "at": 1791279210.1171875,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.1171887,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目\"}"
+  },
+  {
+    "at": 1791279210.1351528,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.1351542,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，\"}"
+  },
+  {
+    "at": 1791279210.1455345,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.1455357,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免\"}"
+  },
+  {
+    "at": 1791279210.1607685,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.1607711,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免把\"}"
+  },
+  {
+    "at": 1791279210.18268,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.182681,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免把這\"}"
+  },
+  {
+    "at": 1791279210.1827934,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.1827946,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免把這兩\"}"
+  },
+  {
+    "at": 1791279210.197596,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.1975977,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免把這兩類\"}"
+  },
+  {
+    "at": 1791279210.1976619,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.1976624,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免把這兩類工作\"}"
+  },
+  {
+    "at": 1791279210.1977193,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.1977198,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免把這兩類工作重\"}"
+  },
+  {
+    "at": 1791279210.1977334,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.1977339,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免把這兩類工作重複\"}"
+  },
+  {
+    "at": 1791279210.2188573,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.218858,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免把這兩類工作重複整理\"}"
+  },
+  {
+    "at": 1791279210.2189147,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791279210.218916,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"2589caee-d4fb-45fc-a5d8-73816d6b1267\",\"response_id\":\"resp_00933d1a394bb439016ac4c063dc1c87d0ab85d9602eb7994b\",\"message_id\":\"msg_00933d1a394bb439016ac4c06bb17887d0a277f4d1022eeaee\",\"text\":\"了解，我不會把揀貨後的交接寫成固定流程。你已說明揀貨依出貨單、採先進先出；看到商品低於安全庫存時會通知採購補貨。我先確認現有項目，避免把這兩類工作重複整理。\"}"
+  }
+]

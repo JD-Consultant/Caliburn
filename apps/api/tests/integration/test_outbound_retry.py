@@ -17,6 +17,7 @@ from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.adapters.logging import SafeJsonFormatter
 from caliburn.adapters.openai_responses import ResponseRequest, create_responses_client
 from caliburn.agent_execution.response_retries import ResponseRetryPolicy
 from caliburn.agent_execution.tool_steps import _build_response_step, run_response_step
@@ -43,6 +44,20 @@ from tests.fixtures.response_capacity import synthetic_response_runtime
 from tests.fixtures.response_transport import response_http_reply
 
 pytestmark = pytest.mark.postgres
+
+
+def model_failure_log(caplog):
+    diagnostics = [record for record in caplog.records if record.name == model_requests.__name__]
+    assert len(diagnostics) == 1
+    assert diagnostics[0].exc_info is None
+    rendered = SafeJsonFormatter().format(diagnostics[0])
+    for private_text in ("sensitive synthetic detail", "private employee text"):
+        assert private_text not in rendered
+        assert private_text not in caplog.text
+    payload = json.loads(rendered)
+    assert payload["event"] == "model.request_failed"
+    assert payload["level"] == "WARNING"
+    return payload
 
 
 @pytest.fixture
@@ -263,12 +278,9 @@ def test_count_and_compaction_share_one_retry_owner(
             assert usage.model_steps == 0
             assert usage.compactions == (1 if operation == "request_compaction" else 0)
             assert calls[0] == calls[1]
-            diagnostics = [r for r in caplog.records if r.name == model_requests.__name__]
-            assert len(diagnostics) == 1
-            message = diagnostics[0].getMessage()
-            assert "http_status=503" in message
-            assert "provider_code=rate_limit_exceeded" in message
-            assert "sensitive synthetic detail" not in caplog.text
+            diagnostic = model_failure_log(caplog)
+            assert diagnostic["http_status"] == 503
+            assert diagnostic["provider_code"] == "rate_limit_exceeded"
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())
@@ -305,16 +317,12 @@ def test_blocked_provider_failure_does_not_retry_on_reentry(
             assert len(attempts) == len(calls) == 1
             assert attempts[0].failure.retry_not_before is None
             assert "sensitive" not in repr(attempts)
-            diagnostics = [r for r in caplog.records if r.name == model_requests.__name__]
-            assert len(diagnostics) == 1
-            message = diagnostics[0].getMessage()
-            assert f"http_status={status}" in message
-            assert f"provider_code={code}" in message
-            assert f"request_id={request_id}" in message
-            assert f"attempt_id={attempts[0].attempt_id}" in message
-            assert f"execution_id={executor.writer.scope.execution_id}" in message
-            assert diagnostics[0].exc_info is None
-            assert "sensitive synthetic detail" not in caplog.text
+            diagnostic = model_failure_log(caplog)
+            assert diagnostic["http_status"] == status
+            assert diagnostic["provider_code"] == code
+            assert diagnostic["request_id"] == str(request_id)
+            assert diagnostic["attempt_id"] == str(attempts[0].attempt_id)
+            assert diagnostic["execution_id"] == str(executor.writer.scope.execution_id)
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())
@@ -714,13 +722,10 @@ def test_rate_limit_inside_a_stream_is_retried_and_recorded_as_a_rate_limit(
             failures = [a.failure for a in attempts if a.failure is not None]
             assert [f.failure_code for f in failures] == ["rate_limited"]
             assert failures[0].retry_not_before is not None
-            diagnostics = [r for r in caplog.records if r.name == model_requests.__name__]
-            assert len(diagnostics) == 1
-            message = diagnostics[0].getMessage()
-            assert "provider_code=rate_limit_exceeded" in message
-            assert "http_status=None" in message
-            assert f"request_id={request_id}" in message
-            assert diagnostics[0].exc_info is None
+            diagnostic = model_failure_log(caplog)
+            assert diagnostic["provider_code"] == "rate_limit_exceeded"
+            assert diagnostic["http_status"] is None
+            assert diagnostic["request_id"] == str(request_id)
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())
@@ -741,11 +746,8 @@ def test_unknown_error_inside_a_stream_stops_without_retry(
                 await executor.request_model(streaming_request(), uuid4(), 100)
             assert stopped.value.failure.kind.value == "response_protocol"
             assert len(calls) == 1
-            diagnostics = [r for r in caplog.records if r.name == model_requests.__name__]
-            assert len(diagnostics) == 1
-            assert "provider_code=None" in diagnostics[0].getMessage()
-            assert "private employee text" not in caplog.text
-            assert diagnostics[0].exc_info is None
+            diagnostic = model_failure_log(caplog)
+            assert diagnostic["provider_code"] is None
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
         runner.run(scenario())

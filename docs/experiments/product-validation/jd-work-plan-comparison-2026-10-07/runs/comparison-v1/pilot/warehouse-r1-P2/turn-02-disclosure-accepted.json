@@ -1,0 +1,39 @@
+{
+  "actual_question": "我先把「倉庫管理員」、所屬物流中心、匯報對象，以及您提到的工作時間整理進底稿。收貨差異部分也記下了：您會比對單據與實收數量、拍照通知採購，但不決定拒收或退換貨。\n\n您通知採購後，通常由誰決定後續怎麼處理？您這邊還會追蹤或記錄到什麼狀態，才算完成這次差異查核？",
+  "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+  "fact_ids": [
+    "receiving"
+  ],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [
+    "receiving"
+  ],
+  "review_mode": "answer",
+  "review_reason": "追問收貨數量差異通知採購後的處理權責與本人後續記錄，與收貨異常凍結事實直接相關。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": false,
+  "subquestions": [
+    {
+      "quote": "您通知採購後，通常由誰決定後續怎麼處理？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "凍結事實載明採購回覆補送或接受，本人依结果登記入庫且不決定拒收。"
+    },
+    {
+      "quote": "您這邊還會追蹤或記錄到什麼狀態，才算完成這次差異查核？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "有差異照片、收貨異常表與收到採購結果後登記入庫的本人後續工作，能回應查核後處理終點。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "0ad5051c-033b-44de-b96e-769a2845159c",
+  "accepted_source_id": "e29a4671-a24d-421f-ab4c-7bec56a51b60"
+}

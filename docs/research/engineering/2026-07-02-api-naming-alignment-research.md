@@ -1,5 +1,7 @@
 # API 命名對齊 — 研究(F3 / F4 / F7 / F5 落實前置)
 
+> 時點說明：本文保留 2026-07-02 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 > **類型**:研究紀錄(來源 + 診斷 + 選項 + 比對)。落實各自另開 ADR / plan。
 > **日期**:2026-07-02
 > **動機**:API review findings 的 **F3(indexer 自訂方法 camelCase)、F4(後端 noun/verb 混用)、
@@ -18,14 +20,14 @@
 |---|---|---|---|
 | `/tasks/batchGet` | **沒人**(producer-only) | ADR 0010 §後果、contract-2 研究「not currently called by api」 | **僅 indexer**(routes + 自身測試) |
 | `/tasks/findSimilar` | **沒人**(producer-only) | 同上 | **僅 indexer** |
-| `/tasks/search` | `HttpIndexerClient.search_tasks`(1 字串) | [knowledge_http.py:29](../../../apps/api/app/adapters/knowledge_http.py) | indexer routes + api client 1 行 |
-| `/occupations/search` | `HttpIndexerClient.search_occupations`(1 字串) | [knowledge_http.py:24](../../../apps/api/app/adapters/knowledge_http.py) | indexer routes + api client 1 行 |
+| `/tasks/search` | `HttpIndexerClient.search_tasks`(1 字串) | [knowledge_http.py:29](../../history.md#source-9659220033ae62204c36) | indexer routes + api client 1 行 |
+| `/occupations/search` | `HttpIndexerClient.search_occupations`(1 字串) | [knowledge_http.py:24](../../history.md#source-9659220033ae62204c36) | indexer routes + api client 1 行 |
 
 **兩個要點**:
 1. **`indexer-contract` 共用的是 pydantic model,不是 path**(ADR 0010:shared package、非 codegen/Pact)。
    → **改路徑不需動契約套件、不需版本 bump**;path 只存在於 indexer `routes.py` + `HttpIndexerClient` 字串。
 2. **web 不直接打 indexer**(web → api → indexer)。web 對 api 的呼叫**全集中在
-   [`apps/web/src/lib/api.ts`](../../../apps/web/src/lib/api.ts) 一個檔**(string 字面值)。
+   [`apps/web/src/lib/api.ts`](../../history.md#source-05408cd603593fad7785) 一個檔**(string 字面值)。
    → F4/F5(後端端點改名)的 web 破壞面 = 這一檔的幾個字串。
 
 **結論**:F3 幾乎是 indexer 內部整理(+ api client 2 行);F4/F5 動 api routes + `api.ts` 一檔。**無跨 repo、無契約版本問題。**

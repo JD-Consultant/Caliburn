@@ -1,0 +1,14 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "我想問的是**外箱破損或濕掉時**的處理方式：您看到這種情況後，會先做什麼、通知誰？最後由誰決定這批貨是否照常收下？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "實際問題明確要求外箱破損或受潮情境下的特定處置、通報與是否收下的裁決。一般收貨差異拍照、通知採購及入庫界線已披露；凍結 oracle 沒有這個特定情境的新細節，不能重播一般流程冒充回答，也不能套用客戶退貨隔離或冷藏溫度異常流程。保留此新細節未知，既有收貨事實不撤回。",
+    "omitted_subtopics": []
+  },
+  "actually_submitted": false
+}

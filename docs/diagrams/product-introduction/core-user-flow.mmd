@@ -1,0 +1,13 @@
+%% title: 現行基本流程：從員工描述到 JD 交付
+%% legend: 終端形：本圖起訖；矩形：處理；菱形：選擇；平行四邊形：資料輸入／輸出；箭頭：控制先後。
+%%{init: {"flowchart": {"rankSpacing": 28, "nodeSpacing": 32, "wrappingWidth": 220}}}%%
+flowchart TB
+  start([開始使用職務檔案]) --> file[建立職務檔案] -->|開始訪談| guide[顧問引導員工說明工作]
+  guide -->|回答、補充或更正| facts[釐清工作與責任]
+  facts --> enough{資料足夠嗎}
+  enough -->|足夠| draft[逐步編修 JD]
+  enough -->|仍有疑點| guide
+  draft --> next{使用者下一步}
+  next -->|回看並補充| guide
+  next -->|匯出目前正式稿| pdf[/PDF 職務說明書/]
+  pdf --> END([本次匯出完成])

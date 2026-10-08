@@ -1,0 +1,17 @@
+{
+  "execution_id": "a29c3558-18a2-4bf1-ad1e-4eeeeef78cb6",
+  "exchange": {
+    "employee_input": {
+      "source_id": "7b72c1e1-a34a-4f49-8da1-2aeac189a6c2",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "正常做法、交接與目前工作範圍都說過了，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "e9c1d420-7441-43c5-ac4f-89233124bad8",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "報支工作的內容已經足夠，不必再補充正常流程或交接細節。我已將核對、補件、送主管審核的成果與要求，以及你不負責核准和付款、在辦公室處理電子資料等界線整理進目前草稿。\n\n基本資料還缺所屬單位；你所在的部門或單位叫什麼？如果不確定，也可以先留空。"
+    }
+  }
+}

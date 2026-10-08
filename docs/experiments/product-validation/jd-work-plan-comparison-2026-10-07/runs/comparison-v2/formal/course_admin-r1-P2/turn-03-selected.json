@@ -1,0 +1,41 @@
+{
+  "question_id": "4ea9c776b6124c599e85367939b4c312",
+  "employee_text": "開課前兩天核名單、講師教材、教室鑰匙和投影設備，印點名表並寄開課通知。設備壞了先找總務，換教室須主任同意；開課當天提早半小時到場，確認老師和學員找到教室。",
+  "audit": {
+    "actual_question": "報名與收費資料也已整理入 JD：你核對報名資訊與資格、登錄系統，額滿時依登記順序安排候補；收費由出納處理，你核對收據號碼和系統狀態。資料缺漏請學員補齊，資格爭議交主任，且不擅自承諾保證開課。\n\n接著想了解開課準備：一門課確認要開班後，到正式上課前，你親自處理哪些事情？哪些部分會交由老師、主任或其他同事負責？",
+    "employee_text": "開課前兩天核名單、講師教材、教室鑰匙和投影設備，印點名表並寄開課通知。設備壞了先找總務，換教室須主任同意；開課當天提早半小時到場，確認老師和學員找到教室。",
+    "fact_ids": [
+      "preparation"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "preparation"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉問一般開課前準備與本人／他人的分工，preparation 的名單教材設備檢查、通知及異常轉交直接相關。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "一門課確認要開班後，到正式上課前，你親自處理哪些事情？",
+        "mode": "answer",
+        "fact_ids": [
+          "preparation"
+        ],
+        "reason": "開課前兩天核名單教材鑰匙設備、印點名表寄通知與當天提早到場，直接回答本人準備工作。"
+      },
+      {
+        "quote": "哪些部分會交由老師、主任或其他同事負責？",
+        "mode": "answer",
+        "fact_ids": [
+          "preparation"
+        ],
+        "reason": "講師教材為核對對象，設備故障找總務、換教室須主任同意，提供凍結的準備分工界線。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

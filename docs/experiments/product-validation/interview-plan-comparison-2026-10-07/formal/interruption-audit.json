@@ -1,0 +1,45 @@
+{
+  "audit_source": "post-crash reconstruction from immutable last admitted trace; no normal finally ran",
+  "guard": {
+    "spent_usd": "0.022429100",
+    "occupied_usd": "0.035725850",
+    "retained_reservations": {
+      "9ac7fad2-d05b-4299-9aff-5d89f0141dae": "0.013296750"
+    },
+    "generations": 36,
+    "compacts": 0,
+    "outbound": 77,
+    "counted_input": 765475,
+    "stop_reason": "native_process_crash_with_unknown_usage"
+  },
+  "admitted_attempts": 36,
+  "received_unique_attempts": 35,
+  "unknown_attempts": [
+    "9ac7fad2-d05b-4299-9aff-5d89f0141dae"
+  ],
+  "completed_cases": [],
+  "attempted_cases": [
+    "warehouse-r1-P1"
+  ],
+  "all_scheduled_cases": [
+    "warehouse-r1-P1",
+    "warehouse-r1-P2",
+    "course_admin-r1-P1",
+    "course_admin-r1-P2",
+    "warehouse-r2-P2",
+    "warehouse-r2-P1",
+    "course_admin-r2-P2",
+    "course_admin-r2-P1"
+  ],
+  "completed_turns": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "accepted_unfinished_turn": 6,
+  "closure_submitted": false,
+  "native_event_report_id": "b0160ee8-54cf-4960-b2a1-296b041d135c",
+  "no_memory_dump_read": true
+}

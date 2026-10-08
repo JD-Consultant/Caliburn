@@ -1,0 +1,8 @@
+{
+  "question_id": "dc62499518384893be5670b6253ae7db",
+  "fact_ids": ["training-boundary"],
+  "mode": "answer",
+  "reason": "實際包含操作觀察後向誰回報，可重播已披露的 training-boundary 組長回報與批准界線。特別指定拿錯批號或走進車道的當場處置沒有固定細節，不能把第一次漏掃的重做處理移植到不同情境，也不重播未帶更正的原 training 權限。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": ["若當場看到新人拿錯批號或走進車道，您會怎麼處理？"]
+}

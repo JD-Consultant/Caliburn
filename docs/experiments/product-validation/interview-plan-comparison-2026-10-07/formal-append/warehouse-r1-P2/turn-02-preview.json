@@ -1,0 +1,38 @@
+{
+  "job_file_id": "6f7c86c9-7a2d-43a4-8628-56b54e6bcb47",
+  "execution_id": "cda66002-a489-46bf-ab39-221b04169d1e",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「貨物通常先怎麼處理」，我目前沒有確定資料，請保留未知，不補猜。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心貨品收貨驗收、庫內存放與揀補、庫存盤點及退貨處理等倉儲工作，維持貨品與庫存作業順暢，並協助新人熟悉工作。"
+    },
+    "work": {
+      "revision_id": "4caa922a-f3f2-456b-9080-46ce0cfeaa80",
+      "areas": [],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": [
+        {
+          "condition_id": "6f48db95-7fa0-4919-b36b-110588639498",
+          "kind": "schedule_travel",
+          "text": "早上 7 點上班；週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "plan_preview": {
+    "plan": null
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

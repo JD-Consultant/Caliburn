@@ -1,0 +1,38 @@
+{
+  "job_file_id": "8c26c21b-56bf-4b64-9e35-0b5ad9d033e9",
+  "execution_id": "446cebec-6e85-43ad-80b3-9134720ee752",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「例如是否會再清點」、「主管的回覆」，我目前沒有確定資料，請保留未知，不補猜。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心收貨驗收、貨物上架與揀補、庫存盤點及退貨作業，維持貨物進出與庫存作業的銜接。"
+    },
+    "work": {
+      "revision_id": "ce685436-5e0a-4a00-9016-9c723582b969",
+      "areas": [],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": [
+        {
+          "condition_id": "0613c470-a63f-4a1d-9f27-2ca54ea88b61",
+          "kind": "schedule_travel",
+          "text": "工作時間為早上 7 點開始，週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "plan_preview": {
+    "plan": "## 目前焦點\n釐清收貨數量不符時，本人的查核範圍與後續交接。\n\n## 工作方向\n- 收貨驗收、上架：已知為主要工作；收貨差異處理正在釐清。\n- 揀貨補貨、庫存盤點：已知為主要工作，尚未深入本人做法與責任界線。\n- 客戶退貨、供應商退貨：已知由本人負責處理，兩類流程與決策界線尚未釐清。\n- 新人帶教：已知有此工作，尚未深入本人負責的內容。\n- 全稿核對：待主要工作整理後，核對職責分組、必要要求、依據與跨欄一致。"
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

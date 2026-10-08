@@ -1,0 +1,26 @@
+{
+  "question_id": "b48b42290074463697af0a12f83a5659",
+  "mode": "answer",
+  "fact_ids": [
+    "training"
+  ],
+  "reason": "轉問已表示想談的新人成教內容與操作判斷，training 可回應示範、跟做及現場觀察；尚無先前正式 training，不提前釋出更正。",
+  "subquestions": [
+    {
+      "quote": "最近一次帶新人時，請挑一項您教他做的工作，說說您怎麼帶",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "凍結帶教事實有掃碼、揀貨、安全動線的示範及跟做方式，直接相關。"
+    },
+    {
+      "quote": "以及如何判斷他是否能自己操作？",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "凍結事實有漏掃、批號與車道觀察及檢核表，能回應操作判斷；權限更正須在 training 先前正式披露後相關回訪。"
+    }
+  ]
+}

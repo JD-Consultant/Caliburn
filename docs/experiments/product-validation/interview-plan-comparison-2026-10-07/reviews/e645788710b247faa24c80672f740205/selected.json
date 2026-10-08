@@ -1,0 +1,16 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "了解，冷藏區連續作業時間或輪替規定目前保留未知。\n\n旺季出貨量約為平日兩倍時，您的工時或班別也會改變嗎？還是仍依原本的班別工作？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "實際問旺季個人工時或班別是否改變。peak-season 只有出貨量、波次調序、瓶頸回報與晚班交接，沒有旺季班表或加班規則；不能把晚班交接推成換班，也不能從初始一般班表推定旺季仍相同。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

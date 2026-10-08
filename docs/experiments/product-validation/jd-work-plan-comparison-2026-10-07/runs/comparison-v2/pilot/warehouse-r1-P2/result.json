@@ -1,0 +1,74 @@
+{
+  "file_id": "8c26c21b-56bf-4b64-9e35-0b5ad9d033e9",
+  "turns": [
+    {
+      "turn": 1,
+      "status": "completed",
+      "elapsed_seconds": 22.458183500013547
+    },
+    {
+      "turn": 2,
+      "status": "completed",
+      "elapsed_seconds": 38.78488059999654
+    },
+    {
+      "turn": 3,
+      "status": "completed",
+      "elapsed_seconds": 28.55488909999258
+    },
+    {
+      "turn": 4,
+      "status": "completed",
+      "elapsed_seconds": 32.56905610000831
+    },
+    {
+      "turn": 5,
+      "status": "completed",
+      "elapsed_seconds": 44.91621940000914
+    },
+    {
+      "turn": 6,
+      "status": "completed",
+      "elapsed_seconds": 146.69677499998943
+    }
+  ],
+  "stop": "common_bounded_closure",
+  "closure_submitted": true,
+  "driver_reminders": 0,
+  "missing_active_progress": false,
+  "natural_completion_verified": false,
+  "guard": {
+    "spent_usd": "0.104748280",
+    "occupied_usd": "0.104748280",
+    "retained_reservations": {},
+    "generations": 125,
+    "compacts": 0,
+    "outbound": 266,
+    "counted_input": 2918421,
+    "stop_reason": null,
+    "batch_deadline": null,
+    "limit_usd": "4.00"
+  },
+  "memory_settlement": {
+    "completed": 7
+  },
+  "measurements": {
+    "input_tokens": 800789,
+    "output_tokens": 31767,
+    "counts": 43,
+    "max_counted_input": 51620,
+    "generation_attempts": 38,
+    "compact_attempts": 0,
+    "roles": {
+      "A": {
+        "input_tokens": 732748,
+        "output_tokens": 26031
+      },
+      "Memory": {
+        "input_tokens": 68041,
+        "output_tokens": 5736
+      }
+    },
+    "A_compact_adoptions": []
+  }
+}

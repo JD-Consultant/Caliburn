@@ -1,0 +1,97 @@
+{
+  "job_file_id": "b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f",
+  "execution_id": "0d02a596-b1f9-4531-b638-8f6a02e94132",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我拿採購單跟送貨單，對實際到的品項和數量。對不起來就拍照，把差在哪裡告訴採購，再回報倉儲主管。我不能自己決定收不收，也不能自己退給供應商，後面由採購決定。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "執行物流中心的收貨驗收、上架、揀貨補貨、庫存盤點及退貨入庫，維持貨品與庫存作業順暢、資訊相符。"
+    },
+    "work": {
+      "revision_id": "74476bb8-14de-4291-a6a8-9a595d647a69",
+      "areas": [
+        {
+          "area_id": "6f12a177-6dd3-457e-ad12-2e70a2a9ebb8",
+          "title": "收貨與入庫",
+          "scope_text": "處理進貨的收貨驗收及貨品上架。"
+        },
+        {
+          "area_id": "211311ca-7992-4b66-a37f-b00e287e0873",
+          "title": "揀貨與補貨",
+          "scope_text": "執行倉庫揀貨及補貨作業。"
+        },
+        {
+          "area_id": "b3b3a1f6-9ac5-49ad-ba6a-4ce236c45912",
+          "title": "庫存管理",
+          "scope_text": "執行庫存盤點；進貨數量差異的查核範圍待進一步確認。"
+        },
+        {
+          "area_id": "804bccbb-2b42-4a24-84cc-69e3b684198d",
+          "title": "退貨處理",
+          "scope_text": "處理客戶退貨入庫及供應商退貨。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "7b0a705e-c2bb-4b93-b127-6af68b41f778",
+          "area_id": "6f12a177-6dd3-457e-ad12-2e70a2a9ebb8",
+          "title": "收貨驗收及上架",
+          "description": "執行進貨收貨驗收，並將貨品上架。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "3e2c0caa-1f76-4b19-bd2f-760bb6a5e753",
+          "area_id": "211311ca-7992-4b66-a37f-b00e287e0873",
+          "title": "揀貨與補貨",
+          "description": "執行倉庫揀貨及補貨作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "e3535c6f-2aac-4d99-a1e2-4ec8bb35c917",
+          "area_id": "b3b3a1f6-9ac5-49ad-ba6a-4ce236c45912",
+          "title": "庫存盤點",
+          "description": "執行庫存盤點。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "b0a19f08-b5ab-4b53-b0ff-720c0b9c5897",
+          "area_id": "804bccbb-2b42-4a24-84cc-69e3b684198d",
+          "title": "客戶退貨入庫",
+          "description": "處理客戶退貨入庫。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "b92656e6-f8f3-4347-9ee3-8cdc380b15e7",
+          "area_id": "804bccbb-2b42-4a24-84cc-69e3b684198d",
+          "title": "供應商退貨處理",
+          "description": "處理供應商退貨；具體作業方式及責任界線待確認。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": [
+        {
+          "condition_id": "8cf4933e-5987-4268-9261-97c2cd89d501",
+          "kind": "schedule_travel",
+          "text": "早上七點上班，週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

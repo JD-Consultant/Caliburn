@@ -1,0 +1,17 @@
+{
+  "execution_id": "39601400-07f0-48b4-ae74-42a769cf9678",
+  "exchange": {
+    "employee_input": {
+      "source_id": "487b3d69-7521-46aa-8951-50113da847a0",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "搬運跟上架平常就是這樣做，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "aa60f9af-2c21-4084-86f9-029bf13af7e7",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "你說的收貨核對、搬運上架和入庫紀錄已經清楚，不必再補同一段流程。\n\n接下來最有幫助的是了解，除了收貨上架，平常還有哪些工作會由你負責或常有人找你處理？想到哪些就說哪些；如果沒有其他，也可以直接告訴我。"
+    }
+  }
+}

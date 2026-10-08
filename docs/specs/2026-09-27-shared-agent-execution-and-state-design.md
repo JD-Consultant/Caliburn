@@ -24,31 +24,11 @@ A／B1／B2 共用模型與工具往返、State 保存、上下文壓縮及中�
 
 下圖是**現行原生壓縮接法的責任及持久交界** ，不是已定 Python class／資料表；一個框可由既有 node、業務呼叫或框架能力承接。新工作的定義分別是 A 新 Turn、B1／B2 所屬的新 Memory 批次，同階段恢復不算新工作。已確認目標的輪前摘要及 B 輪中導覽例外見[目標流程圖](2026-10-04-context-summary-and-compaction-design.md#目標流程圖)，不從下圖推定目標已實作。
 
-```mermaid
-flowchart TD
-  prepare{新工作的合法起始交界：需要 compact 嗎}
-  prepare -->|需要| compact[完整返回視窗可靠保存採用]
-  compact --> base[核對可重用的有效基底]
-  prepare -->|不需要| base
-  base --> bind[固定本工作基準；追加一次起始資料]
-  bind --> fit{實際請求容量及輸出預留可容納嗎}
-  fit -->|是| model[模型節點：呼叫 direct Responses SDK]
-  fit -->|否| capacity[保留恢復位置；依容量契約處理，不盲送]
-  model --> saved[完整原生輸出及原工具請求可靠保存]
-  saved --> hasTools{本次有工具請求嗎}
-  hasTools -->|有；依序執行| tools[工具節點：處理原請求；保存真實結果及相容候選]
-  hasTools -->|無| step
-  tools --> step[完整 Step 一致點：沒有未解工具結果]
-  step --> control{控制交界}
-  control -->|繼續| insurance{中途待送 context 達 160K 嗎}
-  insurance -->|否| fit
-  insurance -->|是| compactStep[完整輪中視窗 compact；可靠採用；不重加起始資料]
-  compactStep --> fit
-  control -->|A 暫停或取消| stop[進入控制處理；詳見狀態圖]
-  control -->|交付結果| completion[交給 A 完成流程或 Memory Parent]
-  completion -->|達到整輪或整批完成條件| publish[核對提交資格並原子提交；重入查原結果]
-  publish --> done[Graph 承接正式結果；產品才確認完成]
-```
+![現行基本流程：A／B1／B2 共用執行生命週期](../diagrams/specs/2026-09-27-shared-agent-execution-and-state-design/shared-execution-lifecycle.png)
+
+[圖源](../diagrams/specs/2026-09-27-shared-agent-execution-and-state-design/shared-execution-lifecycle.mmd) · [SVG](../diagrams/specs/2026-09-27-shared-agent-execution-and-state-design/shared-execution-lifecycle.svg)
+
+圖為現行共用執行與產品交接的控制概覽，箭頭表示控制先後；`completion` 之後由角色所屬的 A 完成流程或 Memory Parent 協調業務提交，不是共用 Graph 直接寫入所有領域。容量／控制失敗的細節沿本章對應契約，圖中省略重試分支。
 
 - 無需 compact 時沿用有效歷史，不呼叫 API。B1／B2 各自輪前準備只做一次，同階段恢復不重做；中途保險依 §6.3，目前門檻為 160K，不能再把「輪前 0 或 1 次」解讀成整批禁止中途 compact。僅輪前基底不隨取消回退，輪中結果屬當前可放棄工作。
 - Step：一次完整模型回應與其零至多個工具的確定結果。無工具時直接進控制交界；已知拒絕可形成工具結果，未知提交不能偽裝成失敗／無效果。工具並非固定一個，修改同一候選首選有序執行。
@@ -150,40 +130,13 @@ SDK client、資料庫連線、金鑰等執行依賴由 Runtime 注入，不序�
 
 ### 控制與故障的狀態視圖
 
-以下是 **A 的控制狀態圖** 。方框表示可觀察的工作狀態，箭頭標示狀態轉換的條件。「核對中」不准偷偷當作取消或失敗完成。Memory 沿同一原結果核對機制，但沒有使用者暫停／取消入口，其階段圖見背景生命週期。
+以下是 **A 的控制狀態圖**，起點的前置條件是新 Turn 已准入。沿 UML 狀態記法，圓角矩形表示狀態、實心圓表示起點、外圈包實心圓表示終點；轉移標籤採「事件 [成立條件]」，未使用轉移副作用。「核對中」不表示取消或失敗已完成。符號依據見[狀態圖研究](../research/engineering/2026-10-08-architecture-diagram-notation-and-documentation.md#34-狀態圖轉移描述狀態機不代替業務提交)。Memory 沿同一原結果核對機制，但沒有使用者暫停／取消入口，其階段圖見背景生命週期。
 
-```mermaid
-stateDiagram-v2
-  state "活躍 Turn（仍可接續或取消）" as Active {
-    [*] --> Running
-    state "執行中" as Running
-    state "暫停待收斂" as Pausing
-    state "已暫停" as Paused
-    Running --> Pausing: 暫停要求
-    Pausing --> Paused: 完整 Step 停妥
-    Paused --> Running: 續作同一 Turn
-  }
-  state "中斷／結果核對中" as Reconciling
-  state "取消待收斂" as Cancelling
-  state "已取消" as Cancelled
-  state "最終失敗並已放棄" as Failed
-  state "已正式完成" as Completed
-  [*] --> Active: 新 Turn 已准入
-  Active --> Reconciling: 中斷或結果不明
-  Reconciling --> Active: 原結果未完成；依原控制意圖恢復
-  Active --> Cancelling: 使用者取消
-  Reconciling --> Cancelling: 核對期間收到取消要求
-  Cancelling --> Cancelled: 放棄資格成立且候選收斂
-  Cancelling --> Completed: 查明正式完成已先成立
-  Reconciling --> Completed: 查明原正式結果已成立
-  Reconciling --> Failed: 不可續作且放棄已成立
-  Active --> Completed: 正式完成先成立
-  Completed --> [*]
-  Cancelled --> [*]
-  Failed --> [*]
-```
+![現行 UML 狀態：Turn 控制、故障與終局](../diagrams/specs/2026-09-27-shared-agent-execution-and-state-design/turn-control-states.png)
 
-已取消／最終失敗是舊工作終態，重送原文也要新准入；已暫停不是終態。恢復至 Active 表示依原控制意圖回執行／暫停待收斂／已暫停的原位置，不重新執行其圖中初始箭頭；已暫停不自行提交或發送模型。取消可在工具或模型在途時提出，不能把圖解成「先等下一個模型呼叫才接受取消」。App 先撤銷採用資格、核對並隔離遲到結果，才釋放同檔案寫入資格。成功／取消只允許一個正式結果；原結果尚未查清時，UI 顯示核對／處理中，不提前解鎖。
+[圖源](../diagrams/specs/2026-09-27-shared-agent-execution-and-state-design/turn-control-states.mmd) · [SVG](../diagrams/specs/2026-09-27-shared-agent-execution-and-state-design/turn-control-states.svg)
+
+已取消／最終失敗是舊工作終態，重送原文也要新准入；已暫停不是終態。圖中的三條恢復線依原持久控制意圖及停妥位置，分別回到執行／暫停待收斂／已暫停，沒有重走新 Turn 入口。這是概念控制狀態，並非每個節點都對應新的 DB status；實作由 `consultant_controls.py` 的原 interrupt 與 `pause_requested` 核對承接。已暫停不自行提交或發送模型。取消可在工具或模型在途時提出，不能把圖解成「先等下一個模型呼叫才接受取消」。App 先撤銷採用資格、核對並隔離遲到結果，才釋放同檔案寫入資格。成功／取消只允許一個正式結果；原結果尚未查清時，UI 顯示核對／處理中，不提前解鎖。
 
 ### A 暫停及取消
 

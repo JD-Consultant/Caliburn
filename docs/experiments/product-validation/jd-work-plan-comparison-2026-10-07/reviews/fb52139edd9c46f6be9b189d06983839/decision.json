@@ -1,0 +1,24 @@
+{
+  "question_id": "fb52139edd9c46f6be9b189d06983839",
+  "mode": "answer",
+  "fact_ids": [
+    "annual-count",
+    "cold-storage",
+    "peak-season",
+    "receiving"
+  ],
+  "reason": "最後明確要求核對剛整理的工作與責任界線，屬已知確認；重播本題實際列出的年度盤點、冷藏、旺季交接與收貨四項正式已知內容，不因整份 JD 或可能缺項釋出未問的新能力事實。",
+  "subquestions": [
+    {
+      "quote": "請您核對目前整份 JD：有沒有哪項工作或責任界線寫錯、漏掉，或需要再修正？",
+      "mode": "answer",
+      "fact_ids": [
+        "annual-count",
+        "cold-storage",
+        "peak-season",
+        "receiving"
+      ],
+      "reason": "依本題公開摘要核對四項已正式披露工作，可重播其固定原話及既有未知／權責界線；本題未詢問新的工作要求，不新增其他事實。"
+    }
+  ]
+}

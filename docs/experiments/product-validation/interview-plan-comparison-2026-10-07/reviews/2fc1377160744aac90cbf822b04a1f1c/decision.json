@@ -1,0 +1,8 @@
+{
+  "question_id": "2fc1377160744aac90cbf822b04a1f1c",
+  "fact_ids": ["receiving"],
+  "mode": "answer",
+  "reason": "本 fresh case 實際問收貨核對與差異通報是否為平常工作，以及通知採購後的跟進。receiving 逐箱核對、異常登記與採購回覆後依結果入庫的固定流程直接相關。前段職務摘要不觸發其他事實。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

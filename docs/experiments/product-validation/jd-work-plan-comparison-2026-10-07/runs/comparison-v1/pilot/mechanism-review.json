@@ -1,0 +1,118 @@
+{
+  "passed": false,
+  "plan_local_patch_verified": true,
+  "plan_next_turn_use_verified": true,
+  "plan_creation_verified": true,
+  "plan_formal_readback_verified": true,
+  "plan_tools_rejection_free": false,
+  "pilot_cases_complete": false,
+  "reviewed_by": "independent mechanism reviewer /root/plan_implementation_review",
+  "manifest_sha256": "67adcafb850faa136b9a16e123e21b3cebdf86e26eff5fbafd1c5a253bed8554",
+  "artifact_sha256": {
+    "warehouse-r1-P1/case.json": "aa4135b3a6c76a76934dbf56a40b9338b6e5b05d7e2abf83942f83d0530fde7e",
+    "warehouse-r1-P1/result.json": "cae38e687d506c1113791ff48c4633460a30a8ef3518ec5521077033571dca22",
+    "warehouse-r1-P1/formal-plan.json": "b7b31c136072e925eb4faccdfcdda24f780c7fdb851b0fe471f195c0006065fe",
+    "warehouse-r1-P1/plan-tool-audit.json": "8391c1c42d749a84e547d1112cec2845500d22aa32806d5833d0fd08aac19028",
+    "warehouse-r1-P1/provider-trace.jsonl": "d12feb3b44350caa5afffa49421ae4a66e7bfe5bce722997fd239f16e8d9b032",
+    "warehouse-r1-P2/case.json": "02e186c15b8d2202b777d2b43465dc5b16ecb32d01a8877daee42caa08058e8d",
+    "warehouse-r1-P2/initial-plan.json": "899363d85c7aa3afbef7b56ac53a453c1963230a6adb5f55e61754d6da3fab49",
+    "warehouse-r1-P2/provider-trace.jsonl": "b189cc992cdc8f5fc09ff3922fbb5970b371be9773d11c4c55beea7489adf155",
+    "warehouse-r1-P2/turn-01-input.json": "008638fdde94a7f5637a30e2e6de7c9ce70e7c438b957767cb2059dd86ea1a53",
+    "warehouse-r1-P2/turn-01-accepted.json": "16407d73f2e96012bd835e8ab6e493d818000c7d2364ecdf2aaec8abd5e359f7",
+    "warehouse-r1-P2/turn-01-result.json": "9cfa7e8ec3f4cdb4059dafb96e5f93c3dfe6a96b1933663da8904522db421261",
+    "warehouse-r1-P2/turn-02-input.json": "3e22d6aee955cac687540e32141182228d9469dfc2e2b66f06f9d7921602fb49",
+    "warehouse-r1-P2/turn-02-accepted.json": "232a1d2798836cdde5fdf0135cbba052ea8250c4ad1234f3bd9118eaeb6c023f",
+    "warehouse-r1-P2/turn-02-result.json": "33a756fbb677012b78f479b6b5c15bac279194164547a3cf0ca542ede089b9aa"
+  },
+  "failure_reasons": [
+    "P2 Turn 1 edit_interview_plan 兩次回 rejected/invalid_patch；依本批任何 Plan read/edit 拒絕即停止診斷的 gate，本 pilot 不通過。後來 updated 不抹除這兩筆拒絕。",
+    "主代理通知已在 P2 Turn 2 completed、等待下一匿名裁決時中斷 runner。P2 僅有兩輪正式結果，未形成場次 result.json、formal-plan.json 或 Memory settlement 終局；不是完整兩場各六輪 pilot。"
+  ],
+  "evidence": {
+    "P1": {
+      "result": "warehouse-r1-P1/result.json",
+      "completed_turns": 6,
+      "memory_settlement": {
+        "completed": 7
+      },
+      "formal_plan": null,
+      "plan_tool_rejections": 0
+    },
+    "P2_creation": {
+      "provider_call_line": 12,
+      "tool_output_line": 14,
+      "call_id": "call_rp9Fgd0pvgl2OWly9fYEldm9",
+      "tool_status": "updated",
+      "formal_readback": "warehouse-r1-P2/turn-01-result.json /plan/plan",
+      "check": "空正文重放該實際 diff，逐字等於 completed Turn 1 的正式 HTTP Plan 讀回。"
+    },
+    "P2_local_patch": {
+      "provider_call_line": 28,
+      "tool_output_line": 30,
+      "call_id": "call_ZWOpS1QeE1FOhKWqrQMlLqxj",
+      "tool_status": "updated",
+      "before": "warehouse-r1-P2/turn-01-result.json /plan/plan",
+      "after": "warehouse-r1-P2/turn-02-result.json /plan/plan",
+      "check": "對 Turn 1 正式正文重放實際兩個 hunk，逐字等於 Turn 2 正式 HTTP Plan 讀回。",
+      "unchanged_exact_lines": [
+        "- 職務基本資料與工作時間：職稱、單位、匯報對象及班表資訊已整理入稿。",
+        "- 其他工作：已知上架、揀貨補貨、庫存盤點、客戶退貨、供應商退貨及帶新人，尚未深入本人做法與責任範圍。",
+        "- 全稿核對：主要工作整理後核對涵蓋、依據及跨欄一致。"
+      ]
+    },
+    "P2_next_turn": {
+      "provider_trace_line": 18,
+      "attempt": "5295eb4d-3de1-4e40-b4a9-7dda42f1007d",
+      "input_item_index_zero_based": 22,
+      "check": "實際 Turn 2 首個 A generation request 同時含 Turn 2 員工原文，以及 data_kind=consultant_interview_plan 的完整 Plan；正文逐字等於 Turn 1 completed 的正式 Plan。"
+    },
+    "P2_rejections": [
+      {
+        "provider_call_line": 3,
+        "tool_output_line": 5,
+        "call_id": "call_8g7q5gZ9v80Z63brWOa1MQCQ",
+        "status": "rejected",
+        "code": "invalid_patch"
+      },
+      {
+        "provider_call_line": 9,
+        "tool_output_line": 11,
+        "call_id": "call_XwpiXvGfQzp18RP2OzdPPCYE",
+        "status": "rejected",
+        "code": "invalid_patch"
+      }
+    ],
+    "actual_arm_templates": {
+      "verified": true,
+      "A_generation_request_counts": {
+        "P1": 28,
+        "P2": 10
+      },
+      "P1_plan_context_absent": true
+    },
+    "P2_memory_settlement": {
+      "verified": false,
+      "reason": "未產生場次終局 result.json；provider 收到 Memory 回應不等於已完成正式 Memory 收尾。"
+    },
+    "interruption": {
+      "observed_completed_turns": 2,
+      "operator_report": "主代理已停止 session 76162，exit 1；當時 P2 Turn 2 completed 並等待下一裁決。",
+      "no_turn_03_input": true
+    }
+  },
+  "format_diagnosis": {
+    "actual_rejected_diff_tail": "+- 全稿核對：主要工作整理後核對涵蓋、依據及跨欄一致。\n+*** End of File",
+    "actual_successful_diff_tail": "+- 全稿核對：主要工作整理後核對涵蓋、依據及跨欄一致。\n*** End of File\n",
+    "outgoing_tool_description_location": "warehouse-r1-P2/provider-trace.jsonl line 2 /request/tools[name=edit_interview_plan]/description",
+    "outgoing_instruction": "空計畫建立以單獨一行 *** End of File 結尾；不是 @@ EOF、*** EOF 或 +EOF。",
+    "difference": "兩筆拒絕把 EOF 結束標記前面加了 +，令 parser 視為新增正文，hunk 因缺少原文 context 或明確 EOF 而拒絕。第三筆移除前綴後成功。工具 description 的建立範例本來已使用無 + 的結束標記；不是 wire 缺少建立能力。"
+  },
+  "limitations": [
+    "本 receipt 為未通過 pilot 的機制審查，不允許正式八場 gate。",
+    "P2 已成功建立、正式採用與局部修改非空 Plan；不能稱作全場空 Plan，不能從本中斷樣本判新策略無效。",
+    "兩場原件均未見 A /responses/compact admitted request，未形成 A within-Work C 情境；不宣稱壓後 Plan projection 已受本 pilot 驗證。",
+    "plan_next_turn_use_verified 僅指實際下一輪 request 已採用精確全文；不宣稱模型語意理解、品質增益或有效返回。",
+    "未讀匿名 reviews、未擔任披露裁決、未直接呼叫 provider、未啟停程序、未修改 frozen 來源。",
+    "累計 ledger 尚只反映 P1；帳務需由主代理對原 trace 完整核對。本 receipt 不重算或重設 ledger。"
+  ]
+}

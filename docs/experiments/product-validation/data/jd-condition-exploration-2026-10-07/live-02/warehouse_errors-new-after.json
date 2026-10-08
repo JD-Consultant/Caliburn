@@ -1,0 +1,156 @@
+{
+  "profile": {
+    "revision_id": "62a9d081-c783-4961-95a4-e3066dc5d81c",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依已確認的資料及儲位安排完成上架與入庫紀錄。"
+    }
+  },
+  "work": {
+    "revision_id": "62a9d081-c783-4961-95a4-e3066dc5d81c",
+    "areas": [
+      {
+        "area_id": "15f5de13-70aa-4e9b-92ed-c6439568e1d4",
+        "title": "入庫與上架",
+        "scope_text": "品項確認、上架與登記。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "66b59a2f-3c8a-466c-9c4b-cb05ce904728",
+        "area_id": "15f5de13-70aa-4e9b-92ed-c6439568e1d4",
+        "title": "核對品項、上架與入庫登記",
+        "description": "使用手持掃描器再次核對品項，依安排的儲位放貨、貼標籤並在庫存系統登記；不負責決定儲位。",
+        "outcomes": [
+          {
+            "detail_id": "8d67404c-72cd-41ab-9204-ace524fc2dfd",
+            "text": "貨品依安排放入儲位、貼妥標籤，並完成庫存系統的入庫登記。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "8c5ffd62-eea7-4acd-82ee-56a552e48933",
+            "text": "貨品放妥並完成入庫登記後，才算完成上架。"
+          },
+          {
+            "detail_id": "9f61f110-7c32-43d0-8272-f49b756cac4e",
+            "text": "掃描品項與到貨資料不符時，先停止作業、核對單據並通知主管；不自行更改品項。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [
+      {
+        "capability_id": "ff854201-e9bc-4532-8430-4f1239c9e2cc",
+        "kind": "skill",
+        "name": "品項掃碼核對與庫存登錄",
+        "description": "使用手持掃描器確認上架品項，並在庫存系統完成入庫登記。"
+      }
+    ],
+    "task_links": [
+      {
+        "task_id": "66b59a2f-3c8a-466c-9c4b-cb05ce904728",
+        "capability_id": "ff854201-e9bc-4532-8430-4f1239c9e2cc"
+      }
+    ],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "62a9d081-c783-4961-95a4-e3066dc5d81c",
+    "references": [
+      {
+        "citation_id": "8eebf504-4df0-46e5-8097-13acb28b6512",
+        "target_label": "任務：核對品項、上架與入庫登記",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "66b59a2f-3c8a-466c-9c4b-cb05ce904728",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      },
+      {
+        "citation_id": "c9e1f159-7706-487a-b5ce-2afe20f36c2f",
+        "target_label": "任務：核對品項、上架與入庫登記 · 成果：貨品依安排放入儲位、貼妥標籤，並完成庫存系統的入庫登記。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "8d67404c-72cd-41ab-9204-ace524fc2dfd",
+          "task_id": "66b59a2f-3c8a-466c-9c4b-cb05ce904728"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "e42542ae-afed-42dd-8d50-1eb20750766d",
+        "target_label": "任務：核對品項、上架與入庫登記 · 要求：貨品放妥並完成入庫登記後，才算完成上架。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "8c5ffd62-eea7-4acd-82ee-56a552e48933",
+          "task_id": "66b59a2f-3c8a-466c-9c4b-cb05ce904728"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "67db6d46-495b-4793-90f0-2064ba569b26",
+        "target_label": "任務：核對品項、上架與入庫登記 · 要求：掃描品項與到貨資料不符時，先停止作業、核對單據並通知主管；不自行更改品項。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "9f61f110-7c32-43d0-8272-f49b756cac4e",
+          "task_id": "66b59a2f-3c8a-466c-9c4b-cb05ce904728"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "4c9979d9-3ecc-4292-a841-47ae4880ff3d",
+        "target_label": "技能：品項掃碼核對與庫存登錄",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "ff854201-e9bc-4532-8430-4f1239c9e2cc",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "51033485-013c-4e7b-844f-d4b1556a6c5b",
+        "target_label": "任務：核對品項、上架與入庫登記 · 使用：品項掃碼核對與庫存登錄",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "ff854201-e9bc-4532-8430-4f1239c9e2cc",
+          "task_id": "66b59a2f-3c8a-466c-9c4b-cb05ce904728"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

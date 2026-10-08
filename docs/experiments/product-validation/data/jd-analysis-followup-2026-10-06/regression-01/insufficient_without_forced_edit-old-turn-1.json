@@ -1,0 +1,17 @@
+{
+  "execution_id": "0180117f-db70-498a-8cb1-80465f5f55c8",
+  "exchange": {
+    "employee_input": {
+      "source_id": "aa12063d-2307-4be4-8dbe-46fe80bc772d",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "有時候還會幫忙處理一些系統問題，不過我現在只想得到這樣，不確定該怎麼說。"
+    },
+    "consultant_reply": {
+      "source_id": "9a1cfcd8-67e0-4d06-b0d2-452d65b9206e",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "沒關係，不用先替這類工作取名稱。回想最近一次您幫忙處理的系統問題：當時出了什麼狀況，您本人做了什麼？"
+    }
+  }
+}

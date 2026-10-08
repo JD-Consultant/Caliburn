@@ -1,0 +1,8 @@
+{
+  "question_id": "7aeba37b51f049d382877e431ca34d1a",
+  "fact_ids": ["customer-returns"],
+  "mode": "answer",
+  "reason": "實際轉問客戶退回倉庫後的核對、處理分類、入庫與交接責任。customer-returns 固定流程包含依既定規則分類、無單或不符交客服、待檢交品保與不決定退款，直接相關；沒有問供應商退貨，不混入另一流程。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

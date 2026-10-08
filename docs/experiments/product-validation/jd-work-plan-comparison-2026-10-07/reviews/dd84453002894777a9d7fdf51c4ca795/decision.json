@@ -1,0 +1,26 @@
+{
+  "question_id": "dd84453002894777a9d7fdf51c4ca795",
+  "mode": "answer",
+  "fact_ids": [
+    "attendance"
+  ],
+  "reason": "實際询問出缺勤資料來源、記錄與後續用途／交接，attendance 的講師點名、系統輸入、時數門檻及證書名單直接相關。",
+  "subquestions": [
+    {
+      "quote": "以一堂課為例，你通常怎麼取得或記錄學員出缺勤？",
+      "mode": "answer",
+      "fact_ids": [
+        "attendance"
+      ],
+      "reason": "將講師回交點名資料輸入系統為凍結的資料來源與記錄方式。"
+    },
+    {
+      "quote": "這些資料後續會交給誰，或用於什麼作業？",
+      "mode": "answer",
+      "fact_ids": [
+        "attendance"
+      ],
+      "reason": "核出席時數與結業門檻、整理證書名單交主任確認，直接回答用途及交接。"
+    }
+  ]
+}

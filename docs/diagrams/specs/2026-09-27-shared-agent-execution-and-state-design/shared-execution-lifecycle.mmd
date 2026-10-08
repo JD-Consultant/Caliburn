@@ -1,0 +1,28 @@
+%% title: 現行基本流程：A／B1／B2 共用執行生命週期
+%% legend: 終端形：本圖起訖；矩形：處理；菱形：選擇；箭頭：控制先後；雙側線：既有子流程。交付段只示資格成立的路徑，失敗沿正文恢復。
+flowchart TD
+  start([新工作的合法起始交界]) --> prepare{需要 compact 嗎}
+  prepare -->|需要| compact[完整返回視窗可靠保存採用]
+  compact --> base[核對可重用的有效基底]
+  prepare -->|不需要| base
+  base --> bind[固定本工作基準；追加一次起始資料]
+  bind --> fitCheck[檢查下一完整請求容量與輸出預留]
+  fitCheck --> fit{可容納嗎}
+  fit -->|是| model[模型節點：呼叫 direct Responses SDK]
+  fit -->|否| capacity[[保留恢復位置；依容量契約處理，不盲送]]
+  capacity --> capacityEnd([交回既有容量處置])
+  model --> saved[完整原生輸出及原工具請求可靠保存]
+  saved --> hasTools{本次有工具請求嗎}
+  hasTools -->|有；依序執行| tools[工具節點：處理原請求；保存真實結果及相容候選]
+  hasTools -->|無| step
+  tools --> step[完整 Step 一致點：沒有未解工具結果]
+  step --> control{控制交界}
+  control -->|繼續| insurance{中途待送 context 達 160K 嗎}
+  insurance -->|否| fitCheck
+  insurance -->|是| compactStep[完整輪中視窗 compact；可靠採用；不重加起始資料]
+  compactStep --> fitCheck
+  control -->|A 暫停或取消| stop[[進入控制處理；詳見狀態圖]]
+  stop --> controlEnd([交回既有控制處置])
+  control -->|交付結果| completion[交給 A 完成流程或 Memory Parent]
+  completion -->|達到整輪或整批完成條件| publish[核對提交資格並原子提交；重入查原結果]
+  publish --> done([Graph 承接正式結果；產品才確認完成])

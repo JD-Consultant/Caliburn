@@ -1,0 +1,43 @@
+{
+  "question_id": "853c53c1e08e41c29a35aa4ef7fa10f3",
+  "employee_text": "約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。",
+  "audit": {
+    "actual_question": "好，旺季瓶頸回報對象先保留未確認，我不再追問這一點。\n\n目前已談到收貨與上架、揀貨補貨、盤點、客戶與供應商退貨、新人帶教和晚班交接。除了這些，還有沒有您固定會做，或偶爾但重要、我還沒問到的工作？",
+    "employee_text": "約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。",
+    "fact_ids": [
+      "cold-storage",
+      "annual-count"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "cold-storage",
+      "annual-count"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際廣度追問尚未談到的固定工作及偶爾重要工作；冷藏貨每日溫度檢查／異常處理與年度全倉盤點分別直接回應，年度責任與表單細節仍按原文保留不確定。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "除了這些，還有沒有您固定會做",
+        "mode": "answer",
+        "fact_ids": [
+          "cold-storage"
+        ],
+        "reason": "冷藏食品作業包含每天早晚看溫度表及超標隔離通報，是前述常規項目尚未談到的固定工作。"
+      },
+      {
+        "quote": "或偶爾但重要、我還沒問到的工作？",
+        "mode": "answer",
+        "fact_ids": [
+          "annual-count"
+        ],
+        "reason": "每年十二月全倉年度盤點為低頻但屬本人工作，符合本次明確廣度提問；不補未知分區責任或財務表單。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

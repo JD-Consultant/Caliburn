@@ -1,0 +1,17 @@
+{
+  "execution_id": "b994cd7d-2a67-4d7c-a3a2-4fc1e1df31dc",
+  "exchange": {
+    "employee_input": {
+      "source_id": "529f4d44-8760-487c-8386-b70c7497184d",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "這些都是我現在會做的工作。忙的時候比較多，平常也是這幾項，目前想不到新的補充。"
+    },
+    "consultant_reply": {
+      "source_id": "77de86af-3233-4ad0-9f29-25a7d8798f6a",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "已將目前的工作整理為四類：進貨驗收與上架、依單據揀貨、庫存盤點，以及退貨檢查與交接；職務目的也已按這些工作補入草稿。忙時工作量增加、但負責項目相同的情況已納入理解。職稱、所屬單位和匯報對象目前沒有足夠資訊，我不會自行推定。\n\n想再釐清進貨差異的處理界線：您通知採購後，差異商品通常由誰確認、暫放或安排後續？您會負責追蹤到確認完成嗎？"
+    }
+  }
+}

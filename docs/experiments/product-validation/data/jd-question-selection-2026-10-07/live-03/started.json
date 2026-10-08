@@ -1,0 +1,13 @@
+{
+  "authorization": "Same user-approved US$0.10 / 20 minute batch; no renewed allowance",
+  "budget_usd": "0.042744885",
+  "seconds": 406,
+  "parent_boundary": {
+    "deadline_utc": "2026-10-06T18:19:41.751624+00:00",
+    "prior_occupied_usd": "0.057255115",
+    "depth": 2,
+    "source_phase": "live-02",
+    "reason": "Frozen adaptive replies; same files/native history; original allowance"
+  },
+  "started_at": "2026-10-06T18:12:55.450281+00:00"
+}

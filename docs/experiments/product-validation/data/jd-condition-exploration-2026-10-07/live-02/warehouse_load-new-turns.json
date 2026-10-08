@@ -1,0 +1,157 @@
+{
+  "arm": "new",
+  "case_id": "warehouse_load",
+  "job_file_id": "5ab5324a-7d97-431e-a404-02683d5ae2c8",
+  "before": {
+    "profile": {
+      "revision_id": "694ac4c9-07de-47d9-8a98-e3d0164cbc6c",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "完成收貨上架及指定盤點，維持貨物和入庫紀錄可追查。"
+      }
+    },
+    "work": {
+      "revision_id": "694ac4c9-07de-47d9-8a98-e3d0164cbc6c",
+      "areas": [
+        {
+          "area_id": "5d2cecf7-68b2-4b50-a386-bdfa40bb895d",
+          "title": "收貨與庫存核對",
+          "scope_text": "收貨上架及依不同周期盤點。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "25a08c3d-ba16-44b5-834c-a5dcaae33883",
+          "area_id": "5d2cecf7-68b2-4b50-a386-bdfa40bb895d",
+          "title": "收貨驗收與上架",
+          "description": "核對單據和實貨，差異拍照通知採購並回報主管，由採購決定收退；符合才依安排上架、貼標籤及登記。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "f46ae730-5bef-4f5d-9664-715c16bfc0c4",
+          "area_id": "5d2cecf7-68b2-4b50-a386-bdfa40bb895d",
+          "title": "配合庫存盤點",
+          "description": "下班前複點高異動商品；月底點本人區域，十二月配合財務全倉盤點，結果交主管。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "694ac4c9-07de-47d9-8a98-e3d0164cbc6c",
+      "references": [
+        {
+          "citation_id": "f35f8de4-bb83-430f-8c1c-ad33664db677",
+          "target_label": "任務：收貨驗收與上架",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "25a08c3d-ba16-44b5-834c-a5dcaae33883",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "74176a07-0671-47ec-94f5-279e3e313403",
+          "target_label": "任務：配合庫存盤點",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "f46ae730-5bef-4f5d-9664-715c16bfc0c4",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "7d365df3-3e85-480f-92e1-16ec70cfdd01",
+      "exchange": {
+        "employee_input": {
+          "source_id": "4901a63b-af1b-43f4-a3e0-86f0ab9377d7",
+          "interview_sequence": 8,
+          "speaker": "employee",
+          "interview_text": "發現差異先通知採購和主管，有差異的貨先留著等決定，我不決定收退；再怎麼處理要等他們安排。我主要就是前面說的收貨上架和盤點，沒有其他工作。"
+        },
+        "consultant_reply": {
+          "source_id": "4caf0f5f-adb2-4db0-94fb-775adaec2cfb",
+          "interview_sequence": 9,
+          "speaker": "consultant",
+          "interview_text": "了解，您目前主要就是**收貨上架**和**依不同週期配合盤點**，沒有其他工作需要補列。我已在底稿中補上：差異貨先留置，收退由採購決定，後續依採購或主管安排；盤點結果交主管，且各項盤點並非每天都做。\n\n就目前的工作內容，不需要再為了補資料硬想其他項目。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 491565,
+    "output_tokens": 17714,
+    "reasoning_tokens": 14245,
+    "cached_input_tokens": 467870,
+    "cache_write_input_tokens": 23605,
+    "total_tokens": 509279,
+    "outbound_calls": 65,
+    "count_calls": 35,
+    "generation_calls": 30,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 491565,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.065981670",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0035",
+    "actual_estimated_usd": "0.016495325",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.019995325",
+    "cumulative_occupied_usd": "0.019995325",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 270.2452099000002,
+    "seconds_limit": 645,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 566396,
+    "output_tokens": 20590,
+    "reasoning_tokens": 16556,
+    "cached_input_tokens": 538341,
+    "cache_write_input_tokens": 27950,
+    "total_tokens": 586986,
+    "outbound_calls": 76,
+    "count_calls": 41,
+    "generation_calls": 35,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 566396,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.065981670",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0041",
+    "actual_estimated_usd": "0.019182660",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.023282660",
+    "cumulative_occupied_usd": "0.023282660",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 315.82114290000027,
+    "seconds_limit": 645,
+    "stop_reason": null
+  }
+}

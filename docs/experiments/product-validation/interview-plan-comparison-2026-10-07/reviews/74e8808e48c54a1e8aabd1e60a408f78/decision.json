@@ -1,0 +1,8 @@
+{
+  "question_id": "74e8808e48c54a1e8aabd1e60a408f78",
+  "fact_ids": [],
+  "mode": "unknown",
+  "reason": "實際問新人上線核准的主管是否就是平常匯報的倉儲主管。training-boundary 只確認最後由主管核准，沒有把該主管身份與初始匯報對象明確連結；不能借另一盤點流程的倉儲主管核准內容來填新人上線身份。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

@@ -1,0 +1,78 @@
+{
+  "profile": {
+    "revision_id": "70fe0d7e-d4d3-4129-b305-1c24e2bef204",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "支援倉庫收貨出貨及庫存核對。"
+    }
+  },
+  "work": {
+    "revision_id": "70fe0d7e-d4d3-4129-b305-1c24e2bef204",
+    "areas": [
+      {
+        "area_id": "f7f67b72-da0c-4806-b31b-cd688d7a3326",
+        "title": "倉庫作業",
+        "scope_text": "收貨、揀貨及庫存清點。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "7a578a89-3788-4012-919b-0c9be094ddf9",
+        "area_id": "f7f67b72-da0c-4806-b31b-cd688d7a3326",
+        "title": "核對收貨與揀貨",
+        "description": "核對單貨，數量不符記錄給主管，不自行改帳。",
+        "outcomes": [],
+        "requirements": []
+      },
+      {
+        "task_id": "7d00d44b-37ef-4693-99bb-c86702170781",
+        "area_id": "f7f67b72-da0c-4806-b31b-cd688d7a3326",
+        "title": "執行庫存清點",
+        "description": "每日下班複點高異動商品，並於月底盤點本人負責的區域。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "70fe0d7e-d4d3-4129-b305-1c24e2bef204",
+    "references": [
+      {
+        "citation_id": "2d69306c-1b22-46ce-9bc7-a10b2c4010c4",
+        "target_label": "任務：核對收貨與揀貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "7a578a89-3788-4012-919b-0c9be094ddf9",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "2cc361bf-e9d0-4a2d-8789-15ae6d97ac7f",
+        "target_label": "任務：執行庫存清點",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "7d00d44b-37ef-4693-99bb-c86702170781",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

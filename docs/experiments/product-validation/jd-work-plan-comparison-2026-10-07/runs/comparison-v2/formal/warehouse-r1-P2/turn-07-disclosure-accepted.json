@@ -1,0 +1,31 @@
+{
+  "actual_question": "我已把揀貨整理成獨立任務，包含依波次單核對品項、數量、批號和效期、必要時從備貨區補貨、異常交組長協調，以及在截單前交包裝區複核。\n\n您提到揀貨區不足時會補貨：補貨是否都發生在揀貨時，還是另有獨立的補貨安排？",
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "fact_ids": [],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [],
+  "review_mode": "unknown",
+  "review_reason": "凍結事實只確認揀貨區不足時從備貨區補貨；本題要求判定所有補貨是否皆在揀貨時或另有独立安排，未有涵蓋範圍與時程資料。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": false,
+  "subquestions": [
+    {
+      "quote": "補貨是否都發生在揀貨時",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "不能把已知的一種補貨觸發情況擴成所有補貨皆如此。"
+    },
+    {
+      "quote": "還是另有獨立的補貨安排？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "沒有獨立補貨安排是否存在的確定資料，保留未知。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "8c08970b-3312-4af6-bca6-5e683bf551c7",
+  "accepted_source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17"
+}

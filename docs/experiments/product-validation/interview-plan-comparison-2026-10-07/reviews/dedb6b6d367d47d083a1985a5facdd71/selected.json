@@ -1,0 +1,16 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "我已補上架流程：按規劃儲位放貨、貼品項與批號標籤、掃碼在 WMS 登記並確認實物與系統儲位一致；臨時放不下時找組長調整，不自行改規則。常溫貨使用棧板車，超重貨由有證照同事操作堆高機。進貨數量差異的查核則按主管交辦的情況描述，未寫成每批固定流程。\n\n除了揀貨區不足時從備貨區補貨，您還有固定或另行安排的補貨工作嗎？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "實際已排除先前 picking 中確認的揀貨區不足補貨，詢問是否另有固定或另行安排的補貨。oracle 沒有另一補貨工作的存在、安排或流程資料，不能重播舊補貨當新答案，也不能由未知推定不負責。這不是年度或其他工作的一般廣度提問。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

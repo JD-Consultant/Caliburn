@@ -1,0 +1,26 @@
+{
+  "question_id": "abe923ac17434cc79267be3f280f6c3c",
+  "mode": "answer",
+  "fact_ids": [
+    "registration"
+  ],
+  "reason": "問題限定新學員報名的核對、登錄與收費資訊作業，registration 直接相關；不是退費流程，不因收費字樣釋出 refund。",
+  "subquestions": [
+    {
+      "quote": "以一位新學員報名為例，你收到資料後會如何核對、登錄？",
+      "mode": "answer",
+      "fact_ids": [
+        "registration"
+      ],
+      "reason": "核姓名、聯絡方式、先修資格與名額，登錄系統及缺漏補件等直接回答。"
+    },
+    {
+      "quote": "收費資訊接著會交給誰或用於什麼作業？",
+      "mode": "answer",
+      "fact_ids": [
+        "registration"
+      ],
+      "reason": "凍結事實有出納處理收費、本人核對收據號碼與系統狀態，可回應收費資料用途及分工。"
+    }
+  ]
+}

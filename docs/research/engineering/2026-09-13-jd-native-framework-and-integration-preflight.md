@@ -1,5 +1,7 @@
 # JD App：框架能力證據與選型前置
 
+> 時點說明：本文保留 2026-09-13 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 - 查閱日：2026-09-13；Topic：JD-R002／DA-04、DA-07。
 - 目的：接欄位審核後，依產品需要與現行官方證據比較框架；已有程式僅提供現況及失敗案例，不以框架名稱、已安裝或沿用成本代替採用依據。
 - 效力：G2/G4 本案映射；本文初稿為選型前置。後續局部實作依 §1.3 路由，不能把初稿未施工狀態當最新結果。整體 G4 尚未閉合。
@@ -55,7 +57,7 @@ OpenAI／Anthropic共有「模型意圖→App執行→配對結果」原則；AW
 
 ## 3. 本地版本與免費開源界線
 
-唯讀核對指定隔離checkout的[Web manifest](../../.worktrees/analysis-only-agent/experiments/jd-editor/web/package.json)、[Web授權清單](../../.worktrees/analysis-only-agent/experiments/jd-editor/web/license-inventory.json)、[Python manifest](../../.worktrees/analysis-only-agent/experiments/analysis-agent/pyproject.toml)、[Python lock](../../.worktrees/analysis-only-agent/experiments/analysis-agent/uv.lock)及其已安裝METADATA。下列僅是舊實證使用的版本，**不是新方案的版本鎖定清單或選型優先序**。
+唯讀核對指定隔離checkout的[Web manifest](../../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-task6/source/experiments/jd-editor/web/package.json)、[Web授權清單](../../history.md#source-4f9069ebaed2cc5fd1ff)、[Python manifest](../../history.md#source-ed1d512fe6a25c184ffa)、[Python lock](../../history.md#source-09a380153a0b03d544e1)及其已安裝METADATA。下列僅是舊實證使用的版本，**不是新方案的版本鎖定清單或選型優先序**。
 
 | 既有元件 | 精確版本／授權與限制 |
 |---|---|

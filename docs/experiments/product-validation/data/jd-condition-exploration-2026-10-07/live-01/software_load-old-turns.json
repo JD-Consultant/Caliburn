@@ -1,0 +1,134 @@
+{
+  "arm": "old",
+  "case_id": "software_load",
+  "job_file_id": "dff663d5-80c0-4a8e-93d3-36050f76ff93",
+  "before": {
+    "profile": {
+      "revision_id": "2eb66441-3961-4c43-b05f-616e9b06ff54",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "處理已回報的網站前端問題，供測試驗證及客服追蹤。"
+      }
+    },
+    "work": {
+      "revision_id": "2eb66441-3961-4c43-b05f-616e9b06ff54",
+      "areas": [
+        {
+          "area_id": "c084482f-d9dc-45ed-b94d-a3259098d585",
+          "title": "網站前端維護",
+          "scope_text": "重現、修正及回報前端問題，後端由同事負責。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "541a5c3e-6ac3-477d-a56e-4eb04ce79aae",
+          "area_id": "c084482f-d9dc-45ed-b94d-a3259098d585",
+          "title": "處理前端問題單",
+          "description": "依客服資料重現並修正前端問題，十二小時內回覆初判而非保證修好；後端交同事，測試同事驗證、產品主管決定發布，結果回報客服。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "2eb66441-3961-4c43-b05f-616e9b06ff54",
+      "references": [
+        {
+          "citation_id": "c3f3ed8a-3576-4a9e-95a2-32e9d2598245",
+          "target_label": "任務：處理前端問題單",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "541a5c3e-6ac3-477d-a56e-4eb04ce79aae",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "795d8b7e-6286-4158-8ca8-d00f1e855b35",
+      "exchange": {
+        "employee_input": {
+          "source_id": "40ffc096-c39e-48af-bf71-60d36de1e1ac",
+          "interview_sequence": 6,
+          "speaker": "employee",
+          "interview_text": "平常的維護處理就是這樣，現在想不到其他工作。你還需要了解什麼嗎？"
+        },
+        "consultant_reply": {
+          "source_id": "938a0be2-3382-405c-adec-45afa017ee02",
+          "interview_sequence": 7,
+          "speaker": "consultant",
+          "interview_text": "目前不用勉強再想其他工作；主要維護流程已足以整理。我已把「十二小時內回覆初步判斷，不代表十二小時內修好」以及「測試通過並回報客服後才結束處理」等界線補進底稿。\n\n最值得再了解的是：問題重現後，你通常怎麼判斷是自己修前端，還是交給後端同事？可以說說你會看哪些線索，或舉最近一次的例子；如果一時想不到也沒關係。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 373398,
+    "output_tokens": 13983,
+    "reasoning_tokens": 10607,
+    "cached_input_tokens": 334911,
+    "cache_write_input_tokens": 38403,
+    "total_tokens": 387381,
+    "outbound_calls": 56,
+    "count_calls": 28,
+    "generation_calls": 28,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 373398,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0028",
+    "actual_estimated_usd": "0.015149385",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.017949385",
+    "cumulative_occupied_usd": "0.017949385",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 270.8001518000019,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 424310,
+    "output_tokens": 16185,
+    "reasoning_tokens": 12129,
+    "cached_input_tokens": 383157,
+    "cache_write_input_tokens": 41057,
+    "total_tokens": 440495,
+    "outbound_calls": 64,
+    "count_calls": 32,
+    "generation_calls": 32,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 424310,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0032",
+    "actual_estimated_usd": "0.017065795",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.020265795",
+    "cumulative_occupied_usd": "0.020265795",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 310.6085893999989,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdConditionsView",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "revision_id",
+    "conditions"
+  ],
+  "properties": {
+    "revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Condition"
+      }
+    }
+  },
+  "$defs": {
+    "Condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "condition_id",
+        "kind",
+        "text"
+      ],
+      "properties": {
+        "condition_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "work_environment",
+            "schedule_travel",
+            "shared_authority",
+            "shared_collaboration",
+            "qualification"
+          ]
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

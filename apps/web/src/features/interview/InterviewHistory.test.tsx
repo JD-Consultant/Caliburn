@@ -75,6 +75,7 @@ test('each historical consultant reply expands its own original turn without a b
           pause_requested: false,
           input_text: '不在此處重複呈現',
           allowed_controls: [],
+          plan_preview: null,
           candidate: null,
           commentary: [
             {

@@ -1,0 +1,33 @@
+{
+  "question_id": "a5f9a7d265f144f6b00e9e1563c8d828",
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "我已補上收貨驗收的逐箱核對項目、異常拍照與登記方式，以及依採購回覆辦理入庫的流程；也註明您不負責議價、選擇供應商或決定拒收。\n\n若採購回覆要補送，補送的貨到時，您會再核對哪些項目，並如何登記入庫？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "本題限定採購要求補送後的補送到貨情境；凍結事實僅有一般收貨核對與依採購結果登記入庫，未提供補送貨的再核對項目或具體登記方式，不以一般流程代答。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "若採購回覆要補送，補送的貨到時，您會再核對哪些項目",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "未提供補送貨到時是否沿用原收貨項目、另核差額或其他再次核對細節。"
+      },
+      {
+        "quote": "並如何登記入庫？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "問句延續補送到貨條件，凍結事實未說明補送與原到貨如何登記；一般 WMS 上架事實不能證明此特殊情境的登記方式。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

@@ -1,0 +1,55 @@
+{
+  "profile": {
+    "revision_id": "14a85689-643c-4597-b57c-a632463324ea",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依安排完成貨品上架及入庫紀錄。"
+    }
+  },
+  "work": {
+    "revision_id": "14a85689-643c-4597-b57c-a632463324ea",
+    "areas": [
+      {
+        "area_id": "f1c0192a-7ed8-4582-b7da-22aa8f46fa13",
+        "title": "上架與入庫",
+        "scope_text": "依安排放貨、貼標籤及登記，堆高機適用作業仍未知。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "527631eb-de53-4891-9eae-3dc8a7e1d488",
+        "area_id": "f1c0192a-7ed8-4582-b7da-22aa8f46fa13",
+        "title": "上架貨品並登記",
+        "description": "依安排上架、貼標籤與登記入庫；搬箱最重約十五公斤，堆高機操作需證照，但哪些作業使用仍未確認。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "14a85689-643c-4597-b57c-a632463324ea",
+    "references": [
+      {
+        "citation_id": "afa8f652-c1c4-4fae-ab0a-06a6119ae55e",
+        "target_label": "任務：上架貨品並登記",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "527631eb-de53-4891-9eae-3dc8a7e1d488",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

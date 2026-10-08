@@ -1,0 +1,17 @@
+{
+  "execution_id": "795d8b7e-6286-4158-8ca8-d00f1e855b35",
+  "exchange": {
+    "employee_input": {
+      "source_id": "40ffc096-c39e-48af-bf71-60d36de1e1ac",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "平常的維護處理就是這樣，現在想不到其他工作。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "938a0be2-3382-405c-adec-45afa017ee02",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "目前不用勉強再想其他工作；主要維護流程已足以整理。我已把「十二小時內回覆初步判斷，不代表十二小時內修好」以及「測試通過並回報客服後才結束處理」等界線補進底稿。\n\n最值得再了解的是：問題重現後，你通常怎麼判斷是自己修前端，還是交給後端同事？可以說說你會看哪些線索，或舉最近一次的例子；如果一時想不到也沒關係。"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "actual_question": "我已補上旺季揀貨要求：雙十一和春節前出貨量約為平日兩倍，依組長安排的急單與波次調整順序，先回報人力和缺貨瓶頸，但不省略批號、效期核對。晚班未完成波次、缺貨和隔離貨位置也已另列為交接工作，並記錄在交班表。\n\n旺季時，您先回報人力和缺貨瓶頸通常是向誰回報？",
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "fact_ids": [],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [],
+  "review_mode": "unknown",
+  "review_reason": "凍結旺季事實說先報人力與缺貨瓶頸，但未載明接收回報的人；組長排單或一般揀貨異常交組長，不能代替旺季瓶頸回報對象的明確資料。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": false,
+  "subquestions": [
+    {
+      "quote": "旺季時，您先回報人力和缺貨瓶頸通常是向誰回報？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "所問為特定回報對象，現有事實未確定，保留未知。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "7f6da149-a6f9-4426-a034-3d8c872ffc54",
+  "accepted_source_id": "a638b3bc-0e25-4149-a86d-a9f8b4c2f111"
+}

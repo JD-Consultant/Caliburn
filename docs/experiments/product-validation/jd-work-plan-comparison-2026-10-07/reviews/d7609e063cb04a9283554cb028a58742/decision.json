@@ -1,0 +1,18 @@
+{
+  "question_id": "d7609e063cb04a9283554cb028a58742",
+  "mode": "answer",
+  "fact_ids": [
+    "training-boundary"
+  ],
+  "reason": "training 已正式披露，現在明確回問新人獨立上線的決定與主管確認權責，符合 training-boundary 更正條件。",
+  "subquestions": [
+    {
+      "quote": "這個判斷由您直接決定，還是需要主管確認？",
+      "mode": "answer",
+      "fact_ids": [
+        "training-boundary"
+      ],
+      "reason": "直接核實先前自述的上線權限，可披露本人觀察回報、主管最終核准及錯誤再訓練界線。"
+    }
+  ]
+}

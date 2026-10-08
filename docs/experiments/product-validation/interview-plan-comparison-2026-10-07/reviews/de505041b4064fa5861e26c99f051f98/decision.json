@@ -1,0 +1,8 @@
+{
+  "question_id": "de505041b4064fa5861e26c99f051f98",
+  "fact_ids": ["receiving"],
+  "mode": "answer",
+  "reason": "實際問收貨數量差異通知採購後的處理；既定 receiving 可說明拍照登記、通知採購與採購回覆後才依結果入庫。等回覆期間實物暫放或先上架的做法沒有固定資料，不能拿一般 shelving 流程冒充。前段工作摘要不觸發其他事實。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": ["這批貨通常會先怎麼處理？例如暫放等通知，或照常上架？"]
+}

@@ -4,9 +4,11 @@
 
 ## 把「分析什麼」和「怎麼安全執行」分開
 
-![圖三：後端主要合作關係](diagrams/03-components.png)
+![圖三：後端主要靜態依賴](../../diagrams/implementation/code-organization/python-dependencies.png)
 
-圖三呈現模組間的主要合作關係，省略逐一的 Python import。流程層協調一輪訪談或一批整理；分析角色定義方法與可用工具；共用執行層處理模型請求、保存及接續；業務模組則判定修改是否有效、何時正式生效。模型透過工具使用這些能力，不直接執行 SQL。
+[圖源](../../diagrams/implementation/code-organization/python-dependencies.mmd) · [SVG](../../diagrams/implementation/code-organization/python-dependencies.svg)
+
+圖三由[程式組織的依賴圖](../../implementation/code-organization.md#2-依賴方向與可檢查限制)生成，箭頭表示主要允許的 Python import 方向，並非執行先後。流程層協調一輪訪談或一批整理；分析角色定義方法、工具及 Context，並使用共用執行層；業務模組判定修改是否有效、何時正式生效。共用執行層使用角色注入的工具，不反向 import 角色；執行時序另見下一章。
 
 例如 A 想新增「整理出席紀錄」任務：模型決定任務內容與來源；工具接收型別化參數；App 提供所在職務檔案、執行資格與候選位置；JD 業務模組執行修改。模型不需要猜資料庫 ID、快照版本或交易結果。
 

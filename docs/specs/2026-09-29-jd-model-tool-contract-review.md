@@ -135,6 +135,8 @@ JD 可直接依據已核對的有效訪談、A 當次輸入或本 Turn 固定已
 
 ### 4.3 兩類差異的按需入口
 
+**現行能力：** 人工／來源差異讀取已接入正式 A 工具，已有工程測試、[真模型來源差異比較](../experiments/product-validation/data/source-diff-eval-2026-10-02/README.md)及[人工編修／來源待核對驗證](../experiments/product-validation/data/full-interview-rag-2026-10-06/results.md)。本節維護比較與讀取契約；Changes 與 Plan 的元件分工沿[架構文件 §2.1](../architecture/system-boundaries.md#21-長任務的元件分工)。
+
 `read_jd_changes` 的根輸入選定為固定 `query` object，內含兩種有限分支；不增加既定 `read_jd` 的 views 或 map 欄位。兩端基準由 App 取得，模型不傳版本、時間戳、已讀游標或 refresh token。`source` **僅限 Memory 來源** ，不是通用歷史文字比較入口；不可變訪談原話沿共同 `read_interview` 讀取。
 
 | 查詢 | 最少模型選擇 | App 固定的比較範圍及回傳 |
@@ -160,9 +162,11 @@ JD 可直接依據已核對的有效訪談、A 當次輸入或本 Turn 固定已
 
 例：`{"query":{"kind":"source","citation_ref":"citation_18"}}` 只有在 citation_18 是合法 Memory 引用時才回兩端 Markdown。若它其實引用訪談 42，回 `rejected: source_kind_not_supported` 及「請以 read_interview 選取正式序號 42」；不是 `unchanged`，也不是來源被刪除。只讀舊固定來源的相關差異，仍不新增 Agent 的任意舊版 Memory 全文入口。
 
-人工概覽須在下一輪讓 A 辨認有受影響內容；它是既有改動提示的投影，**不改已確認 JD map，也不恢復起始預載 JD 導覽** 。詳細 Markdown 必須交代比較兩端與位置，不只列事件數。已刪項目可從人工比較的全部／區域範圍讀到，不要求先取得已不存在的 current `read_ref`；歷史位置不能送 writer。比較基底依上段正式完成位置，不以本輪 read 建立新進度。任一範圍超出完整交付容量時明示未完整，提供可縮小範圍；不靜默漏掉上限外事件、不新加 cursor。
+詳細 Markdown 必須交代比較兩端與位置，不只列事件數。已刪項目可從人工比較的全部／區域範圍讀到，不要求先取得已不存在的 current `read_ref`；歷史位置不能送 writer。比較基底依上段正式完成位置，不以本輪 read 建立新進度。任一範圍超出完整交付容量時明示未完整，提供可縮小範圍；不靜默漏掉上限外事件、不新加 cursor。
 
 同一 JD 同時有人改稿與來源換版時，兩個比較仍各自成立；A 應用目前 JD、新來源及必要原話重評。來源差異不包含人工改稿，人工差異不證明工作事實；讀兩種差異都無寫入效果。確認只透過所屬修訂入口，且只處理被指定的保留引用，不把整個 JD 或同批 Memory 全部刷新。
+
+**輪前提示（目標，尚未自動預載）：** 人工概覽須在下一輪讓 A 辨認有受影響內容；它是改動提示的投影，不改已確認 JD map，也不恢復起始預載 JD 導覽。此提示與已實作的按需比較分開，不列為 Plan 的施工或比較前提。
 
 ## 5. 模型可見結果與失敗
 

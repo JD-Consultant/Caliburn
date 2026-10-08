@@ -1,0 +1,13 @@
+%% title: 現行獨立 RAG：OCS PDF 至 JSON 資料處理流程
+%% legend: 終端形：本圖起訖；矩形：處理；菱形：選擇；平行四邊形：資料輸入／輸出；箭頭：控制先後。未支援版型及來源品質限制見責任文件。
+flowchart TD
+  START([開始處理本輪來源]) --> files[/讀入本輪來源清單與 PDF/] --> extract[抽取頁面、文字位置與表格<br/>保留單份抽取結果]
+  extract --> sections[定位章節與欄位]
+  sections --> content[各章節解析與跨頁組裝]
+  content --> candidate[組成 OCSDocument 候選與來源對照]
+  candidate --> verify[共用 schema 與來源完整性檢核]
+  verify --> result{檢核結果}
+  result -->|通過| output[/原子寫出正式 JSON/]
+  output --> END([本份轉換完成])
+  result -->|拒絕／無法判讀| report[/輸出問題報告與隔離的診斷候選/]
+  report --> REJECT([本份未交付正式 JSON])

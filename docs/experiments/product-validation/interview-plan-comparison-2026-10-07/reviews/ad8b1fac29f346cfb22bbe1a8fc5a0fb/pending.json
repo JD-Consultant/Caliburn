@@ -1,0 +1,37 @@
+{
+  "question_id": "ad8b1fac29f346cfb22bbe1a8fc5a0fb",
+  "profile": "warehouse",
+  "actual_question": "已把揀貨與補貨整理成一項工作：依出貨波次單揀貨、核對品項／數量／批號／效期，揀貨區不足時從備貨區補貨，並在截單前交包裝區複核。若系統有貨但儲位空置，先查移庫紀錄與前一波次，不擅自替換批號；異常交組長協調。\n\n接著想了解庫存盤點：您如何核對實際數量與系統庫存？若發現差異，通常怎麼記錄或通知？",
+  "disclosed": [
+    "picking",
+    "receiving"
+  ],
+  "open_gaps": [],
+  "seen_topics": [
+    "picking",
+    "receiving"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "picking"
+  ],
+  "gap_opened_at": {},
+  "recent_employee_originals": [
+    "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。",
+    "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「這批貨通常會先怎麼處理？例如暫放等通知，或照常上架？」，我目前沒有確定資料，請保留未知，不補猜。",
+    "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。"
+  ],
+  "candidate": {
+    "actual_question": "接著想了解庫存盤點：您如何核對實際數量與系統庫存？若發現差異，通常怎麼記錄或通知？",
+    "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？",
+    "fact_id": "inventory-partial",
+    "topic": "inventory",
+    "matched_cue": "盤點",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": "inventory-authority",
+    "closes_gap": null,
+    "correction": false
+  }
+}

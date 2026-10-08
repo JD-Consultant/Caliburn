@@ -1,0 +1,17 @@
+{
+  "execution_id": "2e44a9a5-0254-4971-bd0b-8891032c2a8e",
+  "exchange": {
+    "employee_input": {
+      "source_id": "1c60f38f-9a14-417c-ba32-62e68a79ef68",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "這個細節我目前說不清楚，也沒有其他能確認的資料。已說過的工作範圍仍一樣，其他事情可以試著說。"
+    },
+    "consultant_reply": {
+      "source_id": "18b5c7f2-78d3-464a-a06c-bb572a132b33",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "了解，證照目前是否已取得就先保留為未知，不會推定；已確認的工作範圍不變。\n\n還想了解一下工作量的變化：平常和忙碌時，收貨、搬運、上架的工作量或時間壓力有明顯差異嗎？不必提供精確數字，描述通常忙在哪裡即可。"
+    }
+  }
+}

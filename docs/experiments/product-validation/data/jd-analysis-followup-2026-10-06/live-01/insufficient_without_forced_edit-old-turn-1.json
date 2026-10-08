@@ -1,0 +1,17 @@
+{
+  "execution_id": "bf7ea2f2-8be7-4564-8458-4ae2f096ce42",
+  "exchange": {
+    "employee_input": {
+      "source_id": "33b34b5f-cc28-4551-a298-25bc6146545c",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "有時候還會幫忙處理一些系統問題，不過我現在只想得到這樣，不確定該怎麼說。"
+    },
+    "consultant_reply": {
+      "source_id": "f5e3b803-5f14-4907-9a35-4a23c197693d",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "目前已整理的工作是：每週依確認的設計稿實作網站頁面，設計變更由產品主管決定。系統問題的協助我先記下來，但還不急著推定具體責任。\n\n您記得最近一次處理的系統問題是什麼嗎？可以說說當時遇到什麼狀況，以及您實際做了什麼。"
+    }
+  }
+}

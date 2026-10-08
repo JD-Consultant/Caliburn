@@ -1,0 +1,40 @@
+{
+  "employee_text": "我核姓名、聯絡方式、先修資格和名額，登錄報名系統，額滿按登記順序候補；收費由出納處理，我核對收據號碼和系統狀態。資料缺漏請學員補，資格爭議交主任，不擅自承諾保證開課。",
+  "audit": {
+    "actual_question": "排課部分已整理入 JD，包含彙整講師、教室與設備條件、查核撞期、提出替代時段供主任確認，以及課表確認後公布；也保留你不能自行更換講師或縮短課程時數的界線。\n\n接著想了解報名與收費資料：以一位新學員報名為例，你收到資料後會如何核對、登錄？收費資訊接著會交給誰或用於什麼作業？",
+    "employee_text": "我核姓名、聯絡方式、先修資格和名額，登錄報名系統，額滿按登記順序候補；收費由出納處理，我核對收據號碼和系統狀態。資料缺漏請學員補，資格爭議交主任，不擅自承諾保證開課。",
+    "fact_ids": [
+      "registration"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "registration"
+    ],
+    "review_mode": "answer",
+    "review_reason": "問題限定新學員報名的核對、登錄與收費資訊作業，registration 直接相關；不是退費流程，不因收費字樣釋出 refund。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "以一位新學員報名為例，你收到資料後會如何核對、登錄？",
+        "mode": "answer",
+        "fact_ids": [
+          "registration"
+        ],
+        "reason": "核姓名、聯絡方式、先修資格與名額，登錄系統及缺漏補件等直接回答。"
+      },
+      {
+        "quote": "收費資訊接著會交給誰或用於什麼作業？",
+        "mode": "answer",
+        "fact_ids": [
+          "registration"
+        ],
+        "reason": "凍結事實有出納處理收費、本人核對收據號碼與系統狀態，可回應收費資料用途及分工。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

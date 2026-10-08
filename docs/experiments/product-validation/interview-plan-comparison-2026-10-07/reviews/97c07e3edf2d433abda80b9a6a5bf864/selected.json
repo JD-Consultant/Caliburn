@@ -1,0 +1,16 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "我已把冷藏區每日早晚查看溫度表、超標批次隔離與通報，以及品保決定是否放行的界線整理進底稿；旺季約兩倍出貨量時的急單調序、瓶頸回報和晚班交接也已補入。十二月配合全倉年度盤點與事前整理已記錄；分區責任和財務表單細節仍保留未知。\n\n溫度正常、在 2–8°C 範圍內時，早晚讀數也需要登記嗎？還是只有超標時才記錄時間和溫度？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "實際問正常溫度讀數是否也登記，或是否僅超標才記錄。cold-storage 已披露每日早晚查看及超標記時間溫度，但沒有正常讀數登記規則，也未聲稱只有超標才記錄，不能從未提到推定肯定或否定。前段年度與旺季摘要不触發新內容。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

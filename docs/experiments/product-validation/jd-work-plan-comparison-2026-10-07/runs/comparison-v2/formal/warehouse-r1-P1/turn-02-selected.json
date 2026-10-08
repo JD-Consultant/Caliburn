@@ -1,0 +1,33 @@
+{
+  "question_id": "75bc5c92f5ca42bbb5bca9211c9597cb",
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "了解。您是逐箱點件，核對品項、數量、外包裝和送貨單；發現差異時拍照、登記收貨異常表並通知採購，等採購回覆補送或接受後，再依結果登記入庫。我也記下您不議價、不選供應商，也不決定是否拒收。\n\n您提到會核對外包裝：如果發現包裝破損或異常，通常會怎麼處理？也會登記在收貨異常表並通知採購嗎？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "本題問外包裝破損或異常的特定處理與一般收貨異常流程是否同樣適用；凍結事實僅說核對外包裝與一般差異記錄，未明示破損處置及適用範圍，不能代為確認。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "如果發現包裝破損或異常，通常會怎麼處理？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "沒有包裝破損的隔離、留貨、退換或其他具體處置事實；一般收貨核對不能填補。"
+      },
+      {
+        "quote": "也會登記在收貨異常表並通知採購嗎？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "問題是確認特定破損情境是否沿用該流程，凍結材料未明確提供這項適用細節。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

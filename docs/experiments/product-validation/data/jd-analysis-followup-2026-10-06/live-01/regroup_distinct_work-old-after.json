@@ -1,0 +1,244 @@
+{
+  "profile": {
+    "revision_id": "a9b8fa90-f018-4f58-8b2c-ccac6d6c22a7",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "執行倉庫收貨驗收與上架、出貨揀貨、庫存盤點及退貨檢查與交接，支援物流中心貨物流轉與庫存管理。"
+    }
+  },
+  "work": {
+    "revision_id": "a9b8fa90-f018-4f58-8b2c-ccac6d6c22a7",
+    "areas": [
+      {
+        "area_id": "44ca140b-cced-470a-b266-31d272eec7fd",
+        "title": "物流中心倉儲作業",
+        "scope_text": "負責收貨上架、出貨揀貨、庫存盤點與退貨交接。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "27ecde0c-3615-409b-a430-ddba4c133931",
+        "area_id": "44ca140b-cced-470a-b266-31d272eec7fd",
+        "title": "驗收進貨與上架",
+        "description": "核對單據與實貨，記錄差異並通知採購，將已確認商品上架。",
+        "outcomes": [],
+        "requirements": []
+      },
+      {
+        "task_id": "d63a562f-fac1-4dfa-ba5c-13ecb8dd1cad",
+        "area_id": "44ca140b-cced-470a-b266-31d272eec7fd",
+        "title": "依單據揀貨",
+        "description": "依出貨單揀貨並掃碼核對品項，不符時停止並查原因。",
+        "outcomes": [],
+        "requirements": []
+      },
+      {
+        "task_id": "a9be986f-13b1-45a4-af6c-a702994fff8d",
+        "area_id": "44ca140b-cced-470a-b266-31d272eec7fd",
+        "title": "盤點庫存",
+        "description": "每日下班前複點高異動商品，月底盤本人區域；主管確認後才調整帳面。",
+        "outcomes": [],
+        "requirements": []
+      },
+      {
+        "task_id": "3ed2c22f-fcba-4568-908a-0fd0c1eb5559",
+        "area_id": "44ca140b-cced-470a-b266-31d272eec7fd",
+        "title": "處理退貨與交接",
+        "description": "檢查客戶退貨，正常品入庫，疑似瑕疵轉品保；依採購通知備妥供應商退貨並登記出貨，不決定退貨。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "a9b8fa90-f018-4f58-8b2c-ccac6d6c22a7",
+    "references": [
+      {
+        "citation_id": "8388cc35-6549-4540-b78b-e3cd85505422",
+        "target_label": "任務：驗收進貨與上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "27ecde0c-3615-409b-a430-ddba4c133931",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "c22be90f-82f0-496e-be69-a4cff46e16c4",
+        "target_label": "任務：依單據揀貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "d63a562f-fac1-4dfa-ba5c-13ecb8dd1cad",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "75e427fa-707d-4978-90b5-f5c6e0ac3eea",
+        "target_label": "任務：盤點庫存",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "a9be986f-13b1-45a4-af6c-a702994fff8d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "17f419e7-4b38-4ad4-871f-ba8866a3287a",
+        "target_label": "任務：處理退貨與交接",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "3ed2c22f-fcba-4568-908a-0fd0c1eb5559",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "844415b8-ea50-4e8b-9534-944d87384026",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "457b8387-cf2f-4498-bc1c-7b40dad68d17",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "b91198ab-c023-420b-b221-43bd12bfbaf9",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "2ae14d22-9f88-4ef4-ab38-c00d6fc3aa3b",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "6b07ce01-e1c6-4c75-abd7-22508131c5bb",
+        "target_label": "職責：物流中心倉儲作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "44ca140b-cced-470a-b266-31d272eec7fd",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "03485ecc-7206-41dd-a26a-f98c0c041124",
+        "target_label": "職責：物流中心倉儲作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "44ca140b-cced-470a-b266-31d272eec7fd",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "a52eac6b-235e-4935-a044-2176a79748ab",
+        "target_label": "職責：物流中心倉儲作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "44ca140b-cced-470a-b266-31d272eec7fd",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "45c3885c-0f8a-4146-9fc0-6988ca4a04fc",
+        "target_label": "職責：物流中心倉儲作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "44ca140b-cced-470a-b266-31d272eec7fd",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

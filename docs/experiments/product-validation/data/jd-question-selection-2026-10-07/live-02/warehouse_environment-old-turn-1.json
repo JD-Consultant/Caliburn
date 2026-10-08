@@ -1,0 +1,17 @@
+{
+  "execution_id": "6aacf1a7-52e3-4f29-a60a-baad074cc46c",
+  "exchange": {
+    "employee_input": {
+      "source_id": "ec7a5c0b-0590-4808-a5e2-019933adeab8",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "正常做法、交接與目前工作範圍都說過了，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "34d2fe61-09c7-4f63-b9a4-4f4ca757765b",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "目前不用再補其他工作類別；你已說明目前主要就是收貨、核對、搬運與上架，也交代了異常時的處理方式和責任界線。我已先把這些內容整理進底稿，並補上入庫成果、相關協作與所需能力。正式職稱沒有明確確認，所以暫時留白。\n\n只有一個細節想確認，避免把資格狀況寫錯：**你目前已取得堆高機操作證照了嗎？**"
+    }
+  }
+}

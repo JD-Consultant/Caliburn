@@ -63,15 +63,9 @@ JD-R002/C03；查閱日 **2026-09-09**；**共同基礎已獲 Owner 同意，G3�
 
 ## 4. LLM 使用 App 的整體循環
 
-```mermaid
-flowchart TD
-    A[使用者目標與目前可讀狀態] --> B[模型判斷下一步]
-    B --> C[依工具說明提出操作]
-    C --> D[App 執行與保存]
-    D --> E[回傳真實結果或錯誤]
-    E --> B
-    B --> F[完成說明或需要補充資訊]
-```
+![歷史研究：LLM 使用 App 的代表循環（2026-09-09）](../../diagrams/research/agent-systems/2026-09-09-llm-app-tool-use-and-document-editing-common-practices/app-tool-cycle.png)
+
+[圖源](../../diagrams/research/agent-systems/2026-09-09-llm-app-tool-use-and-document-editing-common-practices/app-tool-cycle.mmd) · [SVG](../../diagrams/research/agent-systems/2026-09-09-llm-app-tool-use-and-document-editing-common-practices/app-tool-cycle.svg)
 
 這是概念循環，不是六個 Agent。對自訂工具，底層 API 可以由應用接 loop，也可交 SDK 管理。對話接續與 App 實際狀態分開：繼續模型回應不會自行恢復一個已關閉的編輯器或瀏覽器。[OpenAI computer use：Preserve state and return observations](https://developers.openai.com/api/docs/guides/tools-computer-use)
 

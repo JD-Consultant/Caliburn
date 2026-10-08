@@ -1,0 +1,56 @@
+{
+  "question_id": "aec6ae37014547b59a19867dd3dacc6e",
+  "profile": "warehouse",
+  "actual_question": "好，破損品隔離後的記錄、交接與後續決定者仍保留未知，不作推測。\n\n接著了解供應商退貨：通常在什麼情況下開始？退回商品從你接手到交出去為止，你實際做哪些事，最後交給誰處理？",
+  "disclosed": [
+    "customer-returns",
+    "inventory-partial",
+    "picking",
+    "receiving",
+    "shelving",
+    "training",
+    "training-boundary"
+  ],
+  "open_gaps": [
+    "inventory-authority"
+  ],
+  "seen_topics": [
+    "customer-returns",
+    "inventory",
+    "picking",
+    "receiving",
+    "shelving",
+    "training"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "shelving",
+    "picking",
+    "inventory-partial",
+    "training",
+    "training",
+    "training-boundary",
+    "customer-returns"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 3
+  },
+  "recent_employee_originals": [
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。"
+  ],
+  "candidate": {
+    "actual_question": "接著了解供應商退貨：通常在什麼情況下開始？退回商品從你接手到交出去為止，你實際做哪些事，最後交給誰處理？",
+    "employee_text": "供應商退貨更精確是出庫：採購決定要退哪些貨，我按退貨單備貨、核數量、拍照、登記出庫並交承運商簽收，將簽收回給採購。我不辦供應商退貨入庫，也不決定退貨條件。",
+    "fact_id": "supplier-returns",
+    "topic": "supplier-returns",
+    "matched_cue": "供應商退貨",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": null,
+    "closes_gap": null,
+    "correction": true
+  }
+}

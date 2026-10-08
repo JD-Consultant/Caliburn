@@ -1,0 +1,20 @@
+{
+  "employee_text": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。",
+  "audit": {
+    "actual_question": "收到，收貨差異的流程和您不負責相關決策的界線，我會依您剛才說明的內容記錄，不再追問頻率。\n\n先了解客戶退貨：貨物退回倉庫後，您本人會處理哪些事情、做到哪一步交給誰？退回的貨品是否能重新入庫或要怎麼處理，由誰決定？",
+    "employee_text": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。",
+    "fact_ids": [
+      "customer-returns"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "customer-returns"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉問客戶退回倉庫後的核對、處理分類、入庫與交接責任。customer-returns 固定流程包含依既定規則分類、無單或不符交客服、待檢交品保與不決定退款，直接相關；沒有問供應商退貨，不混入另一流程。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

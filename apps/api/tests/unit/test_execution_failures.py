@@ -1,6 +1,7 @@
 """An unavailable settlement is not a successful rollback."""
 
 import asyncio
+import logging
 from uuid import uuid4
 
 import pytest
@@ -8,6 +9,43 @@ import pytest
 from caliburn.agent_execution.result_save_retries import ResultSaveCancelledError
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
 from caliburn.workflows.execution_failures import run_with_failure_boundary
+
+
+async def test_execution_boundary_exposes_scope_in_safe_log_context(caplog):
+    from caliburn.adapters.logging import SafeJsonFormatter
+
+    writer = ExecutionWriter(
+        ExecutionScope(uuid4(), uuid4(), ExecutionKind.CONSULTANT_TURN), uuid4()
+    )
+    output = []
+
+    class Capture(logging.Handler):
+        def emit(self, record):
+            output.append(SafeJsonFormatter().format(record))
+
+    logger = logging.getLogger("caliburn.test.execution")
+    handler = Capture()
+    logger.addHandler(handler)
+    caplog.set_level(logging.INFO)
+
+    async def work(current):
+        logger.info("test.execution")
+        return "finished"
+
+    async def settle(current, error):
+        pytest.fail("Successful work must not settle failure")
+
+    try:
+        assert (
+            await run_with_failure_boundary(writer, run=work, settle_failure=settle) == "finished"
+        )
+        logger.info("test.outside")
+    finally:
+        logger.removeHandler(handler)
+    assert str(writer.scope.execution_id) in output[0]
+    assert str(writer.scope.job_file_id) in output[0]
+    assert str(writer.writer_id) in output[0]
+    assert str(writer.scope.execution_id) not in output[1]
 
 
 async def test_settlement_failure_propagates_without_retrying_work():

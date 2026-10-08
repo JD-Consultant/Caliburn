@@ -41,6 +41,15 @@ async def read_execution(session: AsyncSession, scope: ExecutionScope) -> Execut
     return _project(record, scope)
 
 
+async def read_completed_consultant_execution_ids(
+    session: AsyncSession, job_file_id: UUID, execution_ids: tuple[UUID, ...]
+) -> frozenset[UUID]:
+    """Batch metadata qualification; reads never confer eligibility on another scope or kind."""
+    return await persistence.read_completed_consultant_execution_ids(
+        session, job_file_id, execution_ids
+    )
+
+
 async def list_active_consultants(session: AsyncSession) -> tuple[ExecutionInfo, ...]:
     """Discovery only: paused/terminal Turns and all Memory work are excluded."""
     return tuple(

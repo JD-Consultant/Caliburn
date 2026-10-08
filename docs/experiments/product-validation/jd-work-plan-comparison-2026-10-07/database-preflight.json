@@ -1,0 +1,7 @@
+{
+  "schema": "intplan_jdwork_preflight_e1c58a62",
+  "database": "127.0.0.1:55448/caliburn_workplan_test",
+  "credential_read": false,
+  "provider_calls": 0,
+  "manual_official_http_saved_and_read_back": true
+}

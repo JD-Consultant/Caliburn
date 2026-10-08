@@ -4,6 +4,8 @@
 - 依據：[系統責任](../architecture/system-boundaries.md)、[工程取捨](../architecture/design-decisions.md)、[開發規範](development-standard.md)。採模組化單體，不將每個業務模組拆成部署或套件。
 - 配套：[程式撰寫規範](coding-standard.md)定義函式／實例／Service、型別、錯誤、非同步與測試寫法；本頁保留目錄、依賴及共用命名責任。
 
+依問題跳讀：[目錄與資料責任](#1-目錄依業務責任組織機制集中在少數邊界)、[允許依賴及替換點](#2-依賴方向與可檢查限制)、[命名](#3-名稱要能表達身分時間與效果)。具體函式及 React 寫法直接讀[撰寫規範](coding-standard.md)，無須先通讀整棵目錄樹。
+
 ## 1. 目錄依業務責任組織，機制集中在少數邊界
 
 ```text
@@ -14,12 +16,14 @@ apps/
     src/caliburn/
       migrations/               # 隨套件交付的唯一 Alembic 歷史；不手改框架 checkpoint 表
       bootstrap.py              # 唯一組裝根：settings、DB、clients、services、graphs
+      app_composition.py        # 明示不可變組裝選項；SDK／checkpointer factory 的生命週期由 bootstrap 管理
       settings.py               # 啟動配置驗證；不在 import 時讀密鑰或啟動程序
       features/
         job_files/              # 檔案名稱、受訪者、隔離與建立
         interviews/             # 原輸入、正式序號、原文範圍與來源資格
         job_description/        # JD、候選、來源、差異、正式稿與撤回
-        work_memory/            # 候選三層、關係、交接差異、不可變發布快照
+        work_memory/            # 情境／理解候選、固定來源關係、交接差異、發布快照
+        interview_plans/        # 剩餘訪談／分析／JD 編修安排；不取代 Memory 或 Changes
         executions/             # 持久執行資格、取消／完成勝負與費用限制
       workflows/
         consultant_turn.py      # 跨模組 A 接受、完成、取消的協調
@@ -44,6 +48,7 @@ apps/
       contracts/generated/     # 生成 Python DTO，只有邊界可用
     tests/
       unit/ contracts/ integration/ journeys/ fixtures/
+    evaluations/                # 固定案例與候選入口，沿正式 App／HTTP 執行及保存診斷
   web/
     package.json
     src/
@@ -61,35 +66,39 @@ apps/
 
 Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位同一套件資源；不可由 `__file__` 向上猜 checkout 或另複製一份 migration。安裝成 wheel 後也必須能取得完整歷史。啟動仍只檢查版本，升級需明確執行；見[交付驗證](../history.md#source-25de60a3e4266687fd86)。
 
-`diagnostics` 是本機管理用的獨立讀取投影，不是新 feature authority。只由明示 CLI 使用；既有 Agent、workflow 與 HTTP 不依賴它。模組分為原生格式讀取（`checkpoints.py`）、純投影／遮蔽（`projection.py`）、診斷表定義（`persistence.py`）及一次性更新交易（`refresh.py`）。跨表 JOIN 放在 Alembic 版本化的唯讀 VIEW，不把各領域的寫入 SQL 搬出原 feature。副本只供排查，不用來恢復工作、判斷提交或提供模型 context；操作見 [runbook](../runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
+`diagnostics` 是本機管理用的獨立讀取投影，不是新 feature authority。由明示 CLI 或評測入口使用；既有 Agent、workflow 與 HTTP 不依賴它。模組分為原生格式讀取（`checkpoints.py`）、純投影／遮蔽（`projection.py`）、診斷表定義（`persistence.py`）、一次性更新交易（`refresh.py`）及唯讀查閱（`inspection.py`）。跨表 JOIN 放在 Alembic 版本化的唯讀 VIEW，不把各領域的寫入 SQL 搬出原 feature。副本只供排查，不用來恢復工作、判斷提交或提供模型 context；操作見 [runbook](../runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
 
 ## 2. 依賴方向與可檢查限制
 
-圖為**Python 靜態依賴規則** ；箭頭表示 import／呼叫方向，不是執行時序。組裝根可注入所有具體實作。
+圖為**現行後端的 Python 模組依賴視角**，採 [C4 notation](https://c4model.com/diagrams/notation)的元素種類、責任、技術及單向關係標示原則。矩形均為 Python 模組群組，實線箭頭由匯入方指向被匯入方，標籤說明允許匯入的用途。這些責任群組跨越多個程式檔，不是 C4 Component 層級或 UML Package 圖；箭頭也不表示呼叫先後。組裝根可注入所有具體實作，圖只列主要依賴，完整限制見下方規則及自動檢查。[圖面規範](documentation-standard.md#3-圖面種類與符號)維護表示法。
 
-```mermaid
-flowchart TD
-  bootstrap[bootstrap 組裝根] --> http[HTTP 邊界]
-  bootstrap --> roles[角色組裝與工具]
-  http --> workflows[跨領域 workflows]
-  roles --> workflows
-  roles --> services[各 feature service／queries]
-  roles --> execution[共用 agent_execution]
-  workflows --> services
-  services --> models[純 models／領域規則]
-  services --> storage[各 feature persistence]
-  storage --> database[共用 DB session／transaction]
-  execution --> provider[Responses／checkpointer adapter]
-```
+模組依**共同變更理由與資料責任**聚合：同一不變量、權限判斷及其修改集中在負責模組；可獨立變動的政策與外部 I/O 保留清楚邊界。高內聚、低耦合以「改一項行為需要理解及同步修改多少責任」檢查，不以檔案數、class 數或層數評分。
+
+<!-- diagram: python-dependencies -->
+
+![現行：2. 依賴方向與可檢查限制](../diagrams/implementation/code-organization/python-dependencies.png)
+
+[圖源](../diagrams/implementation/code-organization/python-dependencies.mmd) · [SVG](../diagrams/implementation/code-organization/python-dependencies.svg)
 
 1. `models.py` 不 import FastAPI、SQLAlchemy、LangGraph、OpenAI、生成 transport DTO 或別的 feature persistence。
 2. Router／模型工具是薄入口，轉型後呼叫同一業務 service；人工與 AI 不各寫一套 JD validator。UI 不自行裁決權限、正式成功、來源版本或 Memory 發布。
 3. `agent_execution` 不 import A／B1／B2 角色、JD 或 Memory ORM；由角色提供具名工具 handler 與起始資料。角色可依賴它，不能互相 import 私有 prompt／state。
-4. 跨 feature 協調放 workflows；讀別的領域走具體公開查詢／typed result，不直查別人的表。共享交易由 workflow 開啟，把同一 session 交給指定 service；內層不私自 commit。不是微服務，也不需要把同庫內呼叫變 HTTP。
-5. 需要替換外部 I/O 做測試時用窄 `Protocol`／callable；純 Python 少數消費者直接使用明確型別。不建每類一套抽象 factory、BaseRepository 或萬用 UnitOfWork 註冊表。
+4. 跨 feature 協調放 workflows；讀別的領域走具體公開查詢／typed result，不直查別人的私有表。需要跨域資格與排序一次完成的唯讀查詢，可由各 owner 公開具名 selectable，再由具名 workflow projection 組合；例如最新合法 Plan。查詢不取得寫入權、不新增結果權威，也不為一般呼叫建立通用查詢框架。共享交易由 workflow 開啟，把同一 session 交給指定 service；內層不私自 commit。不是微服務，也不需要把同庫內呼叫變 HTTP。
+5. 真正需要替換外部 I/O 或行為元件時用窄 `Protocol`／callable；純 Python 少數消費者直接使用明確型別。替換點由消費者需要的責任決定，不替每個 class 配 interface，也不為此建立每類一套抽象 factory、BaseRepository 或萬用 UnitOfWork 註冊表。
 6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。跨 feature 需要的畫面狀態不用 Effect 複製到上層 state：Turn 提示來自外部儲存（`useSyncExternalStore`），缺少提示時由 composer 查 current；頁面的唯讀 query 觀察者只訂閱同一份 cache，未知不可當閒置，不另發 GET／輪詢。feature 要在另一 feature 的項目旁放內容時，由 app 提供 render 函式（context），feature 不互相 import。詳見[介面 §1.6](interface-and-delivery.md#16-工作畫面組裝)。
 
 7. 層只向下 import：`adapters` ← `features` ← `workflows` ← `transport`／`agents` ← `bootstrap`；`agent_execution` 位於 `adapters` 之上，不 import `features`、`workflows`、`transport`、`agents`。`settings` 組合各 adapter 擁有的配置，adapter 不 import `settings`。B1／B2 的共用組裝 `agents/memory_analysis` 可被兩個角色使用，兩個角色之間不互相 import。這些以表格形式鎖在 `test_import_boundaries.py`，新增上行 import 會直接失敗。
+
+Prompt、Tool 與元件的持續對照沿上述邊界組裝：
+
+- 角色提供提示、工具與 Context 政策；組裝根提供元件及外部依賴。實際需要比較的變點須能明確替換，其他正式執行、權限、交易及取消流程共用。
+- 純 Prompt 比較只替換目標提示；Tool 可只改說明、schema、handler 或回傳，但四者須相容並明列必要連帶變動。整組能力消融另標比較範圍，不假稱單一變因。
+- 配置在組裝處決定，不複製整個 Agent、不靠全域可變設定切組，也不把試驗旗標散入領域規則。具名參數、插件、MCP adapter 或現成評測工具皆依實際替換、測試及維護成本選用；共同業務規則留在負責模組，不隨 transport 或工具平台複製。
+- 已保存的模型請求（captured request）與既有工作沿[執行接線](agent-execution.md)的原請求／工具及恢復契約；更新配置不能重建或改寫原請求。本節不另訂持久版本格式。
+
+現行顧問的 `ConsultantConfiguration` 保存提示區段、工具說明及 JD 讀取容量；`AppComposition` 在正式 `create_app` 注入配置、SDK client 與 checkpointer factory。比較入口先固定整批候選，再由相同值產生 manifest 與 runtime；不在 await 後重讀可變輸入。已捕捉的請求與工具容量沿原工作恢復，配置改變只影響尚未捕捉的新工作。新增實際變因時，在其負責模組擴充窄介面及反例，不把所有工具行為收進全域 registry。使用方式見 [evaluations](../../apps/api/evaluations/README.md)。
+
+以上是維護及審查判準，不表示所有可想像的變因已有設定開關。依據與取捨見[持續對照研究](../research/engineering/2026-10-08-agent-experimentability-and-observability.md)；介面／I/O／觀測寫法由[撰寫規範](coding-standard.md)維護，對照設計及驗收由[開發規範 §7–8](development-standard.md#7-分析方法prompttool-與-context-共同驗收)維護。
 
 lint import 限制與小型 AST／import 測試檢查層方向、前端 feature 隔離等規則。需要例外先說出實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴。驗證見[程式組織審查](../history.md#source-e980f8e50d0556586ed2)。
 
@@ -115,8 +124,8 @@ lint import 限制與小型 AST／import 測試檢查層方向、前端 feature 
 
 ## 4. 讓修改容易理解
 
-- 每個 module 一段短 docstring 說明模組責任／邊界；不逐行翻譯程式。解釋「為何不能這樣做」及恢復不變量，比重複型別更重要。
-- 公開介面／持久資料使用明確型別；`Any` 只容於隔離且驗證過的 provider／serializer 邊界。不要把 dict 層層傳進業務。
-- 業務結果使用有限型別分支；錯誤不得全部吞成空清單或 success。log 用 stable IDs、階段、錯誤類別，不直接 log 原話、prompt、opaque payload 或工具正文。
-- 模組超大先找職責混合，不用固定行數硬拆。通用 helper 只有真正相同語意與多個使用者才提取；相似形狀不代表相同業務。
+- 每個 module 以短 docstring 說明責任與邊界，讓讀者不必逐行推測模組用途。
+- 模組超大先找職責混合及共同變更理由，不用固定行數硬拆；若一次規則變更仍須同步修改多個模組，應重查責任及公開介面。通用 helper 只有真正相同語意與多個使用者才提取，相似形狀不代表相同業務。
 - 程式規則由 Ruff／mypy／TS／ESLint 驗；業務規則由測試驗。每次變更一起維護相應責任文件，不把所有說明塞進 AGENTS.md。
+
+介面與型別、錯誤、註解及 Log 的具體寫法集中在[撰寫規範](coding-standard.md)，本頁只維護模組責任與依賴。

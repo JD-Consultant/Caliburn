@@ -1,0 +1,32 @@
+{
+  "employee_text": "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。",
+  "audit": {
+    "actual_question": "已把供應商退貨更正為「退貨出庫」：退哪些貨由採購決定，您依退貨單備貨、核數量、拍照、登記出庫，交承運商簽收後把簽收資料回傳採購；您不辦理退貨入庫，也不決定退貨條件。我也把客戶退貨與供應商退貨的流程分別整理，避免混為一談。\n\n您帶新人時會判斷對方能否獨立上線；這個判斷由您直接決定，還是需要主管確認？",
+    "employee_text": "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。",
+    "fact_ids": [
+      "training-boundary"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "training-boundary"
+    ],
+    "review_mode": "answer",
+    "review_reason": "training 已正式披露，現在明確回問新人獨立上線的決定與主管確認權責，符合 training-boundary 更正條件。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "這個判斷由您直接決定，還是需要主管確認？",
+        "mode": "answer",
+        "fact_ids": [
+          "training-boundary"
+        ],
+        "reason": "直接核實先前自述的上線權限，可披露本人觀察回報、主管最終核准及錯誤再訓練界線。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

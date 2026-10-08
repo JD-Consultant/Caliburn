@@ -1,0 +1,32 @@
+{"iteration": 0, "sdk_responses": 1, "checkpoint_reads": 1}
+{"iteration": 10, "sdk_responses": 11, "checkpoint_reads": 11}
+{"iteration": 20, "sdk_responses": 21, "checkpoint_reads": 21}
+{"iteration": 30, "sdk_responses": 31, "checkpoint_reads": 31}
+{"iteration": 40, "sdk_responses": 41, "checkpoint_reads": 41}
+Exception ignored while closing generator <async_generator object BoundAsyncStream.__aiter__ at 0x0000028CFDE59B70>:
+Traceback (most recent call last):
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\langgraph\checkpoint\serde\jsonplus.py", line 284, in loads_typed
+    return ormsgpack.unpackb(
+ValueError: async generator already executing
+{"iteration": 50, "sdk_responses": 51, "checkpoint_reads": 51}
+Windows fatal exception: access violation
+
+Thread 0x00004ea4 [asyncio_0] (most recent call first):
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\selector_events.py", line 152 in _write_to_self
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\base_events.py", line 882 in call_soon_threadsafe
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\base_events.py", line 560 in _asyncgen_finalizer_hook
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\langgraph\checkpoint\serde\jsonplus.py", line 284 in loads_typed
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\langgraph\checkpoint\postgres\base.py", line 582 in _load_writes
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\concurrent\futures\thread.py", line 73 in run
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\concurrent\futures\thread.py", line 86 in run
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\concurrent\futures\thread.py", line 119 in _worker
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\threading.py", line 1024 in run
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\threading.py", line 1082 in _bootstrap_inner
+  File "S:\caliburn\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\threading.py", line 1044 in _bootstrap
+
+Current thread 0x00000c4c (most recent call first):
+  Garbage-collecting
+  <no Python frame>
+
+Current thread's C stack trace (most recent call first):
+  <cannot get C stack on this system>

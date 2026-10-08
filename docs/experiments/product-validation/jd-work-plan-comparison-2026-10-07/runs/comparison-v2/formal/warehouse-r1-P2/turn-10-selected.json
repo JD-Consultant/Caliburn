@@ -1,0 +1,49 @@
+{
+  "question_id": "3c1b974cc5f14d93bac66de5d09cd5ea",
+  "employee_text": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。",
+  "audit": {
+    "actual_question": "我已把盤點差異處理補進底稿：差異及查核資料記在盤點差異表交倉儲主管核准，再由主管交財務調帳；您不直接改庫存數量，結案前會核對更新後數量，找不到原因則留待查。\n\n接著談客戶退貨：最近一次處理時，您收到哪些資料或貨品、自己做了哪些事，最後交接給誰？",
+    "employee_text": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。",
+    "fact_ids": [
+      "customer-returns"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "customer-returns"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉問客戶退貨的接收依據、本人處理與交接，customer-returns 直接相關且可披露。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "您收到哪些資料或貨品",
+        "mode": "answer",
+        "fact_ids": [
+          "customer-returns"
+        ],
+        "reason": "客服退貨單及需核品項、數量、外觀的退回商品為已知輸入。"
+      },
+      {
+        "quote": "自己做了哪些事",
+        "mode": "answer",
+        "fact_ids": [
+          "customer-returns"
+        ],
+        "reason": "核對、拍照、按既定規則分類、隔離或掃碼入庫等本人步驟直接相關。"
+      },
+      {
+        "quote": "最後交接給誰？",
+        "mode": "answer",
+        "fact_ids": [
+          "customer-returns"
+        ],
+        "reason": "異常交客服確認、待檢交品保並留交接紀錄，直接回應交接對象。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

@@ -1,0 +1,17 @@
+{
+  "execution_id": "e431b621-5b0d-4d74-9658-28a533ad54a8",
+  "exchange": {
+    "employee_input": {
+      "source_id": "5bbc3fb0-19d7-4b93-85bd-804ddd828e58",
+      "interview_sequence": 12,
+      "speaker": "employee",
+      "interview_text": "有時候同一筆發票被送了兩次，我發現就先記下、請申請人確認，不會自己決定是哪筆不要；結果一起交主管。沒有固定件數。"
+    },
+    "consultant_reply": {
+      "source_id": "29742340-4710-4587-8e97-d5767c5cc367",
+      "interview_sequence": 13,
+      "speaker": "consultant",
+      "interview_text": "了解：偶爾會遇到同一張發票重複送件；你會記錄並請申請人確認，不自行決定剔除哪一筆，再將相關情況交主管。我已把這項例外處理補進同一項報支工作，沒有把件數推成固定數字或指標。\n\n另外，報支件數或補件工作量有沒有在某些時段明顯增加，或需要趕在特定期限前交主管？"
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EditJdTasksRequest",
+  "description": "One bounded manual task edit at an observed formal JD revision. Detail groups are independent; moving preserves task identity.",
+  "type": "object", "additionalProperties": false,
+  "required": ["command_id", "expected_revision_id", "change"],
+  "properties": {
+    "command_id": {"type": "string", "format": "uuid"},
+    "expected_revision_id": {"type": "string", "format": "uuid"},
+    "change": {"oneOf": [
+      {"$ref": "#/$defs/CreateTask"}, {"$ref": "#/$defs/ReviseTask"},
+      {"$ref": "#/$defs/MoveTask"}, {"$ref": "#/$defs/ReorderDetail"}, {"$ref": "#/$defs/DeleteTask"}
+    ]}
+  },
+  "$defs": {
+    "NullableText": {"type": ["string", "null"], "minLength": 1, "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"},
+    "Text": {"type": "string", "minLength": 1, "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"},
+    "CreateTask": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "area_id", "title", "description", "outcomes", "requirements"],
+      "properties": {
+        "action": {"const": "create_task"},
+        "area_id": {"type": ["string", "null"], "format": "uuid", "description": "Null means unassigned, not a fabricated responsibility group."},
+        "title": {"$ref": "#/$defs/NullableText"}, "description": {"$ref": "#/$defs/NullableText"},
+        "outcomes": {"type": "array", "items": {"$ref": "#/$defs/Text"}},
+        "requirements": {"type": "array", "items": {"$ref": "#/$defs/Text"}}
+      }
+    },
+    "TaskChange": {"oneOf": [
+      {"$ref": "#/$defs/SetField"}, {"$ref": "#/$defs/AddDetail"},
+      {"$ref": "#/$defs/ReviseDetail"}, {"$ref": "#/$defs/RemoveDetail"}
+    ]},
+    "SetField": {
+      "type": "object", "additionalProperties": false, "required": ["action", "field", "value"],
+      "properties": {
+        "action": {"const": "set_field"}, "field": {"type": "string", "enum": ["title", "description"]},
+        "value": {"$ref": "#/$defs/NullableText"}
+      }
+    },
+    "AddDetail": {
+      "type": "object", "additionalProperties": false, "required": ["action", "kind", "text"],
+      "properties": {
+        "action": {"const": "add_detail"}, "kind": {"type": "string", "enum": ["outcome", "requirement"]},
+        "text": {"$ref": "#/$defs/Text"}
+      }
+    },
+    "ReviseDetail": {
+      "type": "object", "additionalProperties": false, "required": ["action", "detail_id", "text"],
+      "properties": {
+        "action": {"const": "revise_detail"}, "detail_id": {"type": "string", "format": "uuid"},
+        "text": {"$ref": "#/$defs/Text"}
+      }
+    },
+    "RemoveDetail": {
+      "type": "object", "additionalProperties": false, "required": ["action", "detail_id"],
+      "properties": {"action": {"const": "remove_detail"}, "detail_id": {"type": "string", "format": "uuid"}}
+    },
+    "ReviseTask": {
+      "type": "object", "additionalProperties": false, "required": ["action", "task_id", "changes"],
+      "properties": {
+        "action": {"const": "revise_task"}, "task_id": {"type": "string", "format": "uuid"},
+        "changes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/TaskChange"}}
+      }
+    },
+    "MoveTask": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "task_id", "area_id", "before_task_id", "changes"],
+      "properties": {
+        "action": {"const": "move_task"}, "task_id": {"type": "string", "format": "uuid"},
+        "area_id": {"type": ["string", "null"], "format": "uuid"},
+        "before_task_id": {"type": ["string", "null"], "format": "uuid", "description": "Existing neighbour in the destination group; null means append."},
+        "changes": {"type": "array", "items": {"$ref": "#/$defs/TaskChange"}, "description": "Only this task's content adjustments required by the move; [] retains all content."}
+      }
+    },
+    "ReorderDetail": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "task_id", "detail_id", "before_detail_id"],
+      "properties": {
+        "action": {"const": "reorder_detail"}, "task_id": {"type": "string", "format": "uuid"},
+        "detail_id": {"type": "string", "format": "uuid"},
+        "before_detail_id": {"type": ["string", "null"], "format": "uuid", "description": "Same task and same kind only; null means last in its own group."}
+      }
+    },
+    "DeleteTask": {
+      "type": "object", "additionalProperties": false, "required": ["action", "task_id"],
+      "properties": {"action": {"const": "delete_task"}, "task_id": {"type": "string", "format": "uuid"}}
+    }
+  }
+}

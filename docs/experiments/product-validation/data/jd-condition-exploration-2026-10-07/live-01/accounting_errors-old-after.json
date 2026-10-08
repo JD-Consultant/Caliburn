@@ -1,0 +1,253 @@
+{
+  "profile": {
+    "revision_id": "9bfa419f-ec7f-42e6-8ec7-95dbc5b051cf",
+    "profile": {
+      "job_title": "帳務助理",
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "整理可核對的報支資料供主管審核與出納付款。"
+    }
+  },
+  "work": {
+    "revision_id": "9bfa419f-ec7f-42e6-8ec7-95dbc5b051cf",
+    "areas": [
+      {
+        "area_id": "f417e5f6-62db-4e48-a83c-0a0d5bbf82bf",
+        "title": "報支資料核對",
+        "scope_text": "資料核對、補件及清單交接，不含核准或付款。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "1b36682b-3e62-44d6-b67c-b4de8c314bb0",
+        "area_id": "f417e5f6-62db-4e48-a83c-0a0d5bbf82bf",
+        "title": "核對報支並整理送審清單",
+        "description": "核對發票、金額和申請單，缺件請申請人補齊；使用報支系統和試算表，清單交主管核准，由出納付款。",
+        "outcomes": [
+          {
+            "detail_id": "9bffe03e-b9c8-42d0-855f-fb47e7f9ea8e",
+            "text": "整理出可供主管審核的報支清單；核准後由出納付款。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "1e372b0b-72c1-4de4-b31e-06336f96e76d",
+            "text": "報支資料齊全且清單交主管後，即完成本人這段處理；不負責核准或付款。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [
+      {
+        "capability_id": "12bf63be-4218-4263-adaa-11eea107a692",
+        "kind": "skill",
+        "name": "報支資料核對與缺件追蹤",
+        "description": "比對發票、金額與申請單，登記資料缺漏並通知申請人補齊。"
+      }
+    ],
+    "task_links": [
+      {
+        "task_id": "1b36682b-3e62-44d6-b67c-b4de8c314bb0",
+        "capability_id": "12bf63be-4218-4263-adaa-11eea107a692"
+      }
+    ],
+    "collaborators": [
+      {
+        "collaborator_id": "f20fdc1e-9827-4c44-bb2c-8f6fbbecc139",
+        "name": "報支申請同事",
+        "scope_text": "提交報支資料；資料缺漏時依通知補齊。"
+      },
+      {
+        "collaborator_id": "c3e356c8-c832-409f-beda-21210b35f0a9",
+        "name": "主管",
+        "scope_text": "接收整理後的報支清單並核准；核准權限屬主管，不屬本人。"
+      }
+    ],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "9bfa419f-ec7f-42e6-8ec7-95dbc5b051cf",
+    "references": [
+      {
+        "citation_id": "bb01dfcd-54ca-4475-a658-922a1d4c6793",
+        "target_label": "任務：核對報支並整理送審清單",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "1b36682b-3e62-44d6-b67c-b4de8c314bb0",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "ff4f81ad-57c8-4f73-aceb-ba8c25dd7625",
+        "target_label": "職務名稱",
+        "target": {
+          "kind": "profile_field",
+          "field": "job_title",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "12c8cb8f-b359-45da-a1f5-4d235db2f67a",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "ccb40127-5478-48c6-ab7f-43cf12221ce6",
+        "target_label": "任務：核對報支並整理送審清單",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "1b36682b-3e62-44d6-b67c-b4de8c314bb0",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "8ba037e6-cc7d-446a-bc43-a4b157fc72f4",
+        "target_label": "任務：核對報支並整理送審清單 · 成果：整理出可供主管審核的報支清單；核准後由出納付款。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "9bffe03e-b9c8-42d0-855f-fb47e7f9ea8e",
+          "task_id": "1b36682b-3e62-44d6-b67c-b4de8c314bb0"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "c610e1c6-164c-4f28-9a2d-9d28a8aacf96",
+        "target_label": "任務：核對報支並整理送審清單 · 要求：報支資料齊全且清單交主管後，即完成本人這段處理；不負責核准或付款。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "1e372b0b-72c1-4de4-b31e-06336f96e76d",
+          "task_id": "1b36682b-3e62-44d6-b67c-b4de8c314bb0"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f7d51831-8019-4526-b63a-05617bc3362e",
+        "target_label": "任務：核對報支並整理送審清單 · 要求：報支資料齊全且清單交主管後，即完成本人這段處理；不負責核准或付款。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "1e372b0b-72c1-4de4-b31e-06336f96e76d",
+          "task_id": "1b36682b-3e62-44d6-b67c-b4de8c314bb0"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "3b3bee86-8360-4c30-bb8e-9a18a2f77807",
+        "target_label": "職責：報支資料核對",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "f417e5f6-62db-4e48-a83c-0a0d5bbf82bf",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "83926ed1-5b25-488f-a35b-f2d693fbae29",
+        "target_label": "協作：報支申請同事",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "f20fdc1e-9827-4c44-bb2c-8f6fbbecc139",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "8de63556-3c73-47fc-b167-c39050afcf48",
+        "target_label": "協作：主管",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "c3e356c8-c832-409f-beda-21210b35f0a9",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "558e00e9-41a5-4cbc-8ae9-63bf9e928930",
+        "target_label": "技能：報支資料核對與缺件追蹤",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "12bf63be-4218-4263-adaa-11eea107a692",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "15537c88-9263-4c82-b65c-00ba110d12b4",
+        "target_label": "任務：核對報支並整理送審清單 · 使用：報支資料核對與缺件追蹤",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "12bf63be-4218-4263-adaa-11eea107a692",
+          "task_id": "1b36682b-3e62-44d6-b67c-b4de8c314bb0"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

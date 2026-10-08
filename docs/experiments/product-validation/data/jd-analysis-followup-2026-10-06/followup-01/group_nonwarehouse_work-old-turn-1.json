@@ -1,0 +1,17 @@
+{
+  "execution_id": "24de0da7-2a99-4415-bf3a-effd925d278c",
+  "exchange": {
+    "employee_input": {
+      "source_id": "534a7a37-466b-4fd3-884c-25d87a66366c",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "對，我做的就是這兩塊。每天那個是讓客人問題有人處理，每週那張是給主管看哪些問題常發生。沒有其他新的細節。"
+    },
+    "consultant_reply": {
+      "source_id": "2d6c14cd-ede1-4fc1-b598-416302ea10b6",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "收到，依您確認目前主要就是這兩塊。我已先更新職務說明書草稿：日常受理客戶使用問題、查核訂單與操作紀錄，並保留不決定退款、需技術處理時轉交同事的界線；每週彙整客訴類型、件數與未結案清單，供主管掌握常見問題。也記下您不負責安排其他人的工作。\n\n想再釐清交接的責任界線：問題轉交技術同事後，您會繼續追蹤到客戶收到回覆或問題解決嗎？"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "execution_id": "e1b8c31c-842b-4fba-9355-e1553312ef36",
+  "exchange": {
+    "employee_input": {
+      "source_id": "f324e405-7fd3-4159-b16b-fdff1edd69c4",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "正常上架就是這些步驟，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "009b6aa3-2c47-4712-9559-43694f1fd7ce",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "上架的正常流程和異常時的處理方式已經清楚。為了確認目前工作的範圍，除了上架，您平常或特定時段還會負責哪些事嗎？例如收貨、揀貨、盤點、補貨或整理；如果沒有，也可以直接說沒有。"
+    }
+  }
+}

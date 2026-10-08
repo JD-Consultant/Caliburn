@@ -1,0 +1,1586 @@
+[
+  {
+    "at": 1791281778.9537594,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281778.9537637,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis\"}"
+  },
+  {
+    "at": 1791281778.9659708,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281778.965972,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is\"}"
+  },
+  {
+    "at": 1791281778.9855814,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281778.985583,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important\"}"
+  },
+  {
+    "at": 1791281778.987845,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281778.987846,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for\"}"
+  },
+  {
+    "at": 1791281778.998592,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281778.998593,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing\"}"
+  },
+  {
+    "at": 1791281778.998646,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281778.9986465,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job\"}"
+  },
+  {
+    "at": 1791281779.0482404,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.048243,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation\"}"
+  },
+  {
+    "at": 1791281779.0485523,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.0485537,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation.\"}"
+  },
+  {
+    "at": 1791281779.048664,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.048665,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I\"}"
+  },
+  {
+    "at": 1791281779.048766,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.0487666,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need\"}"
+  },
+  {
+    "at": 1791281779.103064,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.1030655,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to\"}"
+  },
+  {
+    "at": 1791281779.1031647,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.1031654,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be\"}"
+  },
+  {
+    "at": 1791281779.1032624,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.1032634,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful\"}"
+  },
+  {
+    "at": 1791281779.103319,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.10332,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about\"}"
+  },
+  {
+    "at": 1791281779.144467,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.1444688,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which\"}"
+  },
+  {
+    "at": 1791281779.1445382,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.1445386,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references\"}"
+  },
+  {
+    "at": 1791281779.1716378,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.1716394,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit\"}"
+  },
+  {
+    "at": 1791281779.1739683,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.1739697,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit.\"}"
+  },
+  {
+    "at": 1791281779.174045,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.1740458,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The\"}"
+  },
+  {
+    "at": 1791281779.2028167,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2028177,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role\"}"
+  },
+  {
+    "at": 1791281779.2047079,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2047086,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of\"}"
+  },
+  {
+    "at": 1791281779.204765,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2047663,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “\"}"
+  },
+  {
+    "at": 1791281779.2047784,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2047787,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold\"}"
+  },
+  {
+    "at": 1791281779.2288468,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2288482,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain\"}"
+  },
+  {
+    "at": 1791281779.244631,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2446325,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse\"}"
+  },
+  {
+    "at": 1791281779.2447054,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2447064,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics\"}"
+  },
+  {
+    "at": 1791281779.244727,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2447278,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff\"}"
+  },
+  {
+    "at": 1791281779.2626112,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2626128,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff”\"}"
+  },
+  {
+    "at": 1791281779.2727091,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2727106,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers\"}"
+  },
+  {
+    "at": 1791281779.272783,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.2727835,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving\"}"
+  },
+  {
+    "at": 1791281779.296624,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.296625,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving,\"}"
+  },
+  {
+    "at": 1791281779.3046665,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.3046677,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage\"}"
+  },
+  {
+    "at": 1791281779.3046837,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.3046849,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage,\"}"
+  },
+  {
+    "at": 1791281779.3160331,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.3160338,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking\"}"
+  },
+  {
+    "at": 1791281779.327776,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.3277774,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking,\"}"
+  },
+  {
+    "at": 1791281779.3315358,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.331537,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns\"}"
+  },
+  {
+    "at": 1791281779.3756094,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.3756106,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns,\"}"
+  },
+  {
+    "at": 1791281779.3874025,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.387404,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and\"}"
+  },
+  {
+    "at": 1791281779.423324,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.4233272,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some\"}"
+  },
+  {
+    "at": 1791281779.4573429,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.457345,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold\"}"
+  },
+  {
+    "at": 1791281779.4858444,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.4858458,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage\"}"
+  },
+  {
+    "at": 1791281779.5109034,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.5109043,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks\"}"
+  },
+  {
+    "at": 1791281779.540134,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.5401354,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks.\"}"
+  },
+  {
+    "at": 1791281779.5703857,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.5703871,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile\"}"
+  },
+  {
+    "at": 1791281779.5839336,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.5839353,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile,\"}"
+  },
+  {
+    "at": 1791281779.6002073,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.6002092,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “\"}"
+  },
+  {
+    "at": 1791281779.6089551,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.6089573,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “e\"}"
+  },
+  {
+    "at": 1791281779.6375234,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.637525,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce\"}"
+  },
+  {
+    "at": 1791281779.6448965,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.6448977,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics\"}"
+  },
+  {
+    "at": 1791281779.6591685,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.6591697,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center\"}"
+  },
+  {
+    "at": 1791281779.6812072,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.6812088,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker\"}"
+  },
+  {
+    "at": 1791281779.6870477,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.687049,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker”\"}"
+  },
+  {
+    "at": 1791281779.697668,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.6976693,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and\"}"
+  },
+  {
+    "at": 1791281779.708222,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.7082236,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “\"}"
+  },
+  {
+    "at": 1791281779.723965,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.72397,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse\"}"
+  },
+  {
+    "at": 1791281779.7315724,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.7315743,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant\"}"
+  },
+  {
+    "at": 1791281779.756033,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.7560349,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant”\"}"
+  },
+  {
+    "at": 1791281779.765755,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.7657561,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include\"}"
+  },
+  {
+    "at": 1791281779.8003938,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.8003955,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various\"}"
+  },
+  {
+    "at": 1791281779.819652,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.8196537,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities\"}"
+  },
+  {
+    "at": 1791281779.8197172,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.8197174,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like\"}"
+  },
+  {
+    "at": 1791281779.8215914,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.8215926,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving\"}"
+  },
+  {
+    "at": 1791281779.838484,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.8384857,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and\"}"
+  },
+  {
+    "at": 1791281779.847757,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.847758,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory\"}"
+  },
+  {
+    "at": 1791281779.8499823,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.8499858,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory.\"}"
+  },
+  {
+    "at": 1791281779.8757968,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.8757982,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I\"}"
+  },
+  {
+    "at": 1791281779.8823662,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.8823678,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think\"}"
+  },
+  {
+    "at": 1791281779.8969893,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.8969908,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I\"}"
+  },
+  {
+    "at": 1791281779.906901,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.9069023,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might\"}"
+  },
+  {
+    "at": 1791281779.9475815,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.9475832,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select\"}"
+  },
+  {
+    "at": 1791281779.9553342,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.9553356,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both\"}"
+  },
+  {
+    "at": 1791281779.9592888,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.95929,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"\"}"
+  },
+  {
+    "at": 1791281779.969012,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.969013,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold\"}"
+  },
+  {
+    "at": 1791281779.9867985,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281779.9868004,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain\"}"
+  },
+  {
+    "at": 1791281780.0010474,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.0010517,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse\"}"
+  },
+  {
+    "at": 1791281780.0078702,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.0078714,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics\"}"
+  },
+  {
+    "at": 1791281780.0461907,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.0461922,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\"}"
+  },
+  {
+    "at": 1791281780.0848198,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.084821,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\"\"}"
+  },
+  {
+    "at": 1791281780.084888,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.0848885,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and\"}"
+  },
+  {
+    "at": 1791281780.0849483,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.0849485,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"\"}"
+  },
+  {
+    "at": 1791281780.099327,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.0993283,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse\"}"
+  },
+  {
+    "at": 1791281780.099422,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.0994225,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\"}"
+  },
+  {
+    "at": 1791281780.121579,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.1215801,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\"\"}"
+  },
+  {
+    "at": 1791281780.121671,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.1216717,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to\"}"
+  },
+  {
+    "at": 1791281780.1438835,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.143885,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent\"}"
+  },
+  {
+    "at": 1791281780.1692228,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.1692243,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the\"}"
+  },
+  {
+    "at": 1791281780.2029486,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.2029502,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major\"}"
+  },
+  {
+    "at": 1791281780.2057185,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.2057197,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions\"}"
+  },
+  {
+    "at": 1791281780.2135222,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.2135231,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions,\"}"
+  },
+  {
+    "at": 1791281780.2350326,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.2350338,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but\"}"
+  },
+  {
+    "at": 1791281780.2446456,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.244647,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using\"}"
+  },
+  {
+    "at": 1791281780.2742057,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.2742069,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just\"}"
+  },
+  {
+    "at": 1791281780.2742693,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.27427,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"\"}"
+  },
+  {
+    "at": 1791281780.293417,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.293418,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse\"}"
+  },
+  {
+    "at": 1791281780.2962818,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.2962828,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse assistant\"}"
+  },
+  {
+    "at": 1791281780.2964373,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.2964387,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse assistant\\\"\"}"
+  },
+  {
+    "at": 1791281780.3082874,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.3082888,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse assistant\\\" might\"}"
+  },
+  {
+    "at": 1791281780.3083541,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.3083546,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse assistant\\\" might be\"}"
+  },
+  {
+    "at": 1791281780.3363485,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.3363497,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse assistant\\\" might be better\"}"
+  },
+  {
+    "at": 1791281780.36724,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.3672411,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse assistant\\\" might be better since\"}"
+  },
+  {
+    "at": 1791281780.3821058,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.3821082,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse assistant\\\" might be better since it's\"}"
+  },
+  {
+    "at": 1791281780.4056878,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.405689,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse assistant\\\" might be better since it's broader\"}"
+  },
+  {
+    "at": 1791281780.4089637,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.4089649,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Evaluating job documentation**\\n\\nThis is important for completing job documentation. I need to be careful about which references fit. The role of “cold-chain warehouse logistics staff” covers receiving, storage, picking, returns, and some cold storage tasks. Meanwhile, “ecommerce logistics center picker” and “warehouse assistant” include various responsibilities like receiving and inventory. I think I might select both \\\"cold-chain warehouse logistics personnel\\\" and \\\"warehouse assistant\\\" to represent the major functions, but using just \\\"warehouse assistant\\\" might be better since it's broader.\"}"
+  },
+  {
+    "at": 1791281780.8709335,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.870935,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe\"}"
+  },
+  {
+    "at": 1791281780.8710058,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.8710065,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool\"}"
+  },
+  {
+    "at": 1791281780.8722868,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.8722878,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests\"}"
+  },
+  {
+    "at": 1791281780.8845427,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.884544,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that\"}"
+  },
+  {
+    "at": 1791281780.8969612,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.8969624,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I\"}"
+  },
+  {
+    "at": 1791281780.8997169,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.8997176,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can\"}"
+  },
+  {
+    "at": 1791281780.9083955,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.9083965,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select\"}"
+  },
+  {
+    "at": 1791281780.9165905,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.9165912,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple\"}"
+  },
+  {
+    "at": 1791281780.931706,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.9317071,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references\"}"
+  },
+  {
+    "at": 1791281780.9422712,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.9422724,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to\"}"
+  },
+  {
+    "at": 1791281780.942292,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.9422925,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent\"}"
+  },
+  {
+    "at": 1791281780.9526885,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.9526896,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the\"}"
+  },
+  {
+    "at": 1791281780.961781,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281780.961782,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main\"}"
+  },
+  {
+    "at": 1791281781.0026114,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0026145,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work\"}"
+  },
+  {
+    "at": 1791281781.0028214,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0028222,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work,\"}"
+  },
+  {
+    "at": 1791281781.002873,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0028734,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but\"}"
+  },
+  {
+    "at": 1791281781.0029407,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.002941,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it\"}"
+  },
+  {
+    "at": 1791281781.0031486,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0031493,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clar\"}"
+  },
+  {
+    "at": 1791281781.003212,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0032122,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies\"}"
+  },
+  {
+    "at": 1791281781.0322716,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0322728,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that\"}"
+  },
+  {
+    "at": 1791281781.0323362,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0323365,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it\"}"
+  },
+  {
+    "at": 1791281781.032353,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0323532,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s\"}"
+  },
+  {
+    "at": 1791281781.0323656,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0323658,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not\"}"
+  },
+  {
+    "at": 1791281781.043239,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0432403,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about\"}"
+  },
+  {
+    "at": 1791281781.0498912,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0498967,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee\"}"
+  },
+  {
+    "at": 1791281781.0607276,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0607285,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles\"}"
+  },
+  {
+    "at": 1791281781.0623577,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0623589,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or\"}"
+  },
+  {
+    "at": 1791281781.0670238,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.0670252,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts\"}"
+  },
+  {
+    "at": 1791281781.07541,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.075411,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts.\"}"
+  },
+  {
+    "at": 1791281781.0837328,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.083734,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I\"}"
+  },
+  {
+    "at": 1791281781.1107805,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.1107817,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can\"}"
+  },
+  {
+    "at": 1791281781.1298163,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.1298184,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use\"}"
+  },
+  {
+    "at": 1791281781.1417198,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.141721,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more\"}"
+  },
+  {
+    "at": 1791281781.1505084,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.1505094,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than\"}"
+  },
+  {
+    "at": 1791281781.156517,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.1565182,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one\"}"
+  },
+  {
+    "at": 1791281781.1627712,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.1627722,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if\"}"
+  },
+  {
+    "at": 1791281781.1753185,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.17532,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they\"}"
+  },
+  {
+    "at": 1791281781.179649,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.17965,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit\"}"
+  },
+  {
+    "at": 1791281781.1926527,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.1926541,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit.\"}"
+  },
+  {
+    "at": 1791281781.1978343,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.1978352,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I\"}"
+  },
+  {
+    "at": 1791281781.2045627,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2045634,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven\"}"
+  },
+  {
+    "at": 1791281781.2180498,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2180514,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t\"}"
+  },
+  {
+    "at": 1791281781.2295141,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2295153,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored\"}"
+  },
+  {
+    "at": 1791281781.2417634,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2417645,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the\"}"
+  },
+  {
+    "at": 1791281781.2435231,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.243524,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed\"}"
+  },
+  {
+    "at": 1791281781.2543051,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.254306,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks\"}"
+  },
+  {
+    "at": 1791281781.261324,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2613254,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet\"}"
+  },
+  {
+    "at": 1791281781.2645104,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2645113,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet,\"}"
+  },
+  {
+    "at": 1791281781.2719235,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2719245,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just\"}"
+  },
+  {
+    "at": 1791281781.2766247,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2766256,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the\"}"
+  },
+  {
+    "at": 1791281781.284854,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2848551,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines\"}"
+  },
+  {
+    "at": 1791281781.2919877,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.2919905,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines.\"}"
+  },
+  {
+    "at": 1791281781.3008137,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.3008146,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It\"}"
+  },
+  {
+    "at": 1791281781.3281336,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.328135,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might\"}"
+  },
+  {
+    "at": 1791281781.3425472,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.3425484,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help\"}"
+  },
+  {
+    "at": 1791281781.3715427,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.371544,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to\"}"
+  },
+  {
+    "at": 1791281781.3935003,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.3935015,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look\"}"
+  },
+  {
+    "at": 1791281781.4191768,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.4191785,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into\"}"
+  },
+  {
+    "at": 1791281781.4237983,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.4238,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the\"}"
+  },
+  {
+    "at": 1791281781.4350874,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.4350889,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics\"}"
+  },
+  {
+    "at": 1791281781.443978,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.4439795,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of\"}"
+  },
+  {
+    "at": 1791281781.4556608,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.455662,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"\"}"
+  },
+  {
+    "at": 1791281781.458486,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.458487,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse\"}"
+  },
+  {
+    "at": 1791281781.464567,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.4645681,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\"}"
+  },
+  {
+    "at": 1791281781.4751053,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.4751062,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\"\"}"
+  },
+  {
+    "at": 1791281781.4823222,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.482323,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and\"}"
+  },
+  {
+    "at": 1791281781.484904,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.4849052,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"\"}"
+  },
+  {
+    "at": 1791281781.4982824,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.4982836,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold\"}"
+  },
+  {
+    "at": 1791281781.5059814,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5059824,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\"}"
+  },
+  {
+    "at": 1791281781.5117447,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5117457,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\"\"}"
+  },
+  {
+    "at": 1791281781.5274315,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5274327,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to\"}"
+  },
+  {
+    "at": 1791281781.5289953,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.528996,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see\"}"
+  },
+  {
+    "at": 1791281781.5404384,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5404398,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if\"}"
+  },
+  {
+    "at": 1791281781.5589428,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5589452,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other\"}"
+  },
+  {
+    "at": 1791281781.559089,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5590904,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories\"}"
+  },
+  {
+    "at": 1791281781.5599709,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5599716,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could\"}"
+  },
+  {
+    "at": 1791281781.5673637,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5673652,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply\"}"
+  },
+  {
+    "at": 1791281781.5779722,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5779736,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply.\"}"
+  },
+  {
+    "at": 1791281781.592758,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.5927596,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However\"}"
+  },
+  {
+    "at": 1791281781.6009135,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.6009147,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However,\"}"
+  },
+  {
+    "at": 1791281781.6269052,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.626907,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I\"}"
+  },
+  {
+    "at": 1791281781.6270177,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.6270187,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember\"}"
+  },
+  {
+    "at": 1791281781.627111,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.6271117,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the\"}"
+  },
+  {
+    "at": 1791281781.6327505,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.632752,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer\"}"
+  },
+  {
+    "at": 1791281781.647353,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.6473544,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's\"}"
+  },
+  {
+    "at": 1791281781.6594236,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.6594248,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction\"}"
+  },
+  {
+    "at": 1791281781.667557,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.6675582,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction is\"}"
+  },
+  {
+    "at": 1791281781.6765704,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.6765716,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction is to\"}"
+  },
+  {
+    "at": 1791281781.6819415,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.6819422,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction is to read\"}"
+  },
+  {
+    "at": 1791281781.6893485,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.6893494,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction is to read task\"}"
+  },
+  {
+    "at": 1791281781.7067683,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.7067697,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction is to read task details\"}"
+  },
+  {
+    "at": 1791281781.714039,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.7140403,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction is to read task details only\"}"
+  },
+  {
+    "at": 1791281781.7267876,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.7267888,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction is to read task details only if\"}"
+  },
+  {
+    "at": 1791281781.7299507,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.729952,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction is to read task details only if necessary\"}"
+  },
+  {
+    "at": 1791281781.7370298,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281781.7370312,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4ca6c819887d0a2867d48b8e5794e\",\"item_id\":\"rs_00933d1a394bb439016ac4ca71b75c87d0a5543e73527e7d1c\",\"output_index\":1,\"summary_index\":1,\"text\":\"**Clarifying tool usage**\\n\\nThe tool suggests that I can select multiple references to represent the main work, but it clarifies that it’s not about employee titles or facts. I can use more than one if they fit. I haven’t explored the detailed tasks yet, just the guidelines. It might help to look into the specifics of \\\"warehouse assistant\\\" and \\\"cold chain\\\" to see if other categories could apply. However, I remember the developer's instruction is to read task details only if necessary.\"}"
+  }
+]

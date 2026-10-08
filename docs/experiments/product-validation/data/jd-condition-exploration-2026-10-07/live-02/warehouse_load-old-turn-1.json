@@ -1,0 +1,17 @@
+{
+  "execution_id": "919b3848-1992-4c2a-8c5d-70bc51ba260d",
+  "exchange": {
+    "employee_input": {
+      "source_id": "e651cd9f-0bda-4c56-9ef1-1a269eb74ee1",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "發現差異先通知採購和主管，有差異的貨先留著等決定，我不決定收退；再怎麼處理要等他們安排。我主要就是前面說的收貨上架和盤點，沒有其他工作。"
+    },
+    "consultant_reply": {
+      "source_id": "d3d482f9-8eeb-4429-a0c1-5d782d5a3c16",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "明白，已把這項界線補進收貨工作：發現差異時先留置貨物、通知採購並回報主管，之後依採購與主管安排處理；收貨或退貨由採購決定。\n\n您目前主要負責的工作就以收貨上架和盤點為主，不必再勉強回想其他項目。若之後想到不同情況或發現底稿有不準確之處，再補充修正即可。"
+    }
+  }
+}

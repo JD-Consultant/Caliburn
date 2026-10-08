@@ -1,0 +1,8 @@
+{
+  "question_id": "0223b20855a246deae9108d76e7b1dfb",
+  "fact_ids": ["receiving"],
+  "mode": "answer",
+  "reason": "實際確認已披露的例行收貨核對及發現差異時的拍照、異常表、採購通知，可重播 receiving 原事實。已知確認不能當成真正未知，也不另觸發隱藏主題。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

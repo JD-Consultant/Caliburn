@@ -1,0 +1,17 @@
+{
+  "execution_id": "70f726cd-b15a-4013-bc79-70423a361183",
+  "exchange": {
+    "employee_input": {
+      "source_id": "e773b4a7-9e33-4cdc-8cad-f745c6f25b0b",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "對，平常就是照這樣做。我不太會講什麼專業能力，就是對單、對貨，有問題先查再記下來給主管。"
+    },
+    "consultant_reply": {
+      "source_id": "f8f97e80-6014-41c5-a445-8ae1c0d68edc",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "你不需要替自己貼上能力名稱。你說的「依出貨單核對、先查差異再記錄交主管、不自行改數量」，已經把揀貨核對的做法和責任界線說清楚；目前整理的工作內容也涵蓋了這些要點。\n\n揀好的貨接下來通常怎麼處理？例如包裝、放到待出貨區或交給其他同事，哪些步驟是你負責的？"
+    }
+  }
+}

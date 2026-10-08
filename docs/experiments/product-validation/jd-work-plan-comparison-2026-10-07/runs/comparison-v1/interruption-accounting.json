@@ -1,0 +1,1121 @@
+{
+  "status": "known text accounting reconstructed; interrupted pilot is not quality evidence",
+  "created_at": "2026-10-07T17:56:41.581296+00:00",
+  "source_manifest_sha256": "67adcafb850faa136b9a16e123e21b3cebdf86e26eff5fbafd1c5a253bed8554",
+  "pricing_basis": {
+    "model": "gpt-6-luna",
+    "source_revision": "openai-standard-2026-09-30",
+    "short_context": {
+      "input_usd_per_million": "0.10",
+      "cached_input_usd_per_million": "0.01",
+      "cache_write_usd_per_million": "0.125",
+      "output_usd_per_million": "0.50"
+    },
+    "long_context": {
+      "input_usd_per_million": "0.20",
+      "cached_input_usd_per_million": "0.02",
+      "cache_write_usd_per_million": "0.25",
+      "output_usd_per_million": "0.75"
+    },
+    "long_context_above_tokens": 272000
+  },
+  "independent_known_cost_usd": "0.040769275",
+  "known_cost_by_case_usd": {
+    "warehouse-r1-P1": "0.032509855",
+    "warehouse-r1-P2": "0.008259420"
+  },
+  "final_guard": {
+    "spent_usd": "0.040769275",
+    "occupied_usd": "0.040769275",
+    "retained_reservations": {},
+    "generations": 49,
+    "compacts": 0,
+    "outbound": 104,
+    "counted_input": 1077584,
+    "stop_reason": null,
+    "batch_deadline": null,
+    "limit_usd": "4.00"
+  },
+  "in_flight_admitted_attempts": [],
+  "unknown_usage_attempts": [],
+  "generation_admissions": 49,
+  "count_route_receipts": 55,
+  "raw_outbound_reconciliation": "55 successful count receipts + 49 admitted/received generations = 104; no compaction",
+  "stale_ledger_guard": {
+    "spent_usd": "0.032509855",
+    "occupied_usd": "0.032509855",
+    "retained_reservations": {},
+    "generations": 36,
+    "compacts": 0,
+    "outbound": 77,
+    "counted_input": 878074,
+    "stop_reason": null,
+    "batch_deadline": null,
+    "limit_usd": "4.00"
+  },
+  "latest_accounting_witness": {
+    "case": "warehouse-r1-P2",
+    "attempt": "7bab6858-972b-4629-aca1-a9d1f0b2ba53",
+    "event": "received",
+    "time": "2026-10-07T17:50:13.116171+00:00"
+  },
+  "remaining_research_limits": {
+    "limit_usd": "3.959230725",
+    "generations": 2551,
+    "outbound": 5896,
+    "counted_input": 148922416,
+    "compacts": 32
+  },
+  "operator_stop_context": "Root explicitly reported stopping the pilot at P2 Turn 2 review wait; this audit did not inspect or stop processes.",
+  "mechanical_failure": "P2 Turn 1 had two invalid_patch edit-interview-plan results before updated; no formal comparison may continue from this pilot.",
+  "limitations": [
+    "These are frozen text-token usage estimates, not a provider invoice.",
+    "Every journaled paid generation has a received valid usage record; logs cannot prove provider activity outside this guarded transport.",
+    "P2 final case result and Memory settlement are absent; latest Memory response requested create_work_situation, so formal Memory completion/adoption is not established.",
+    "Turn 2 result was captured before the last three Memory generations settled; its guard is not the final cumulative accounting.",
+    "No fresh input, replay or paid retry was performed by this audit.",
+    "Future fresh pilot must carry cost/counters under the same US$4 research cap and a new actual source manifest; preserve all original samples."
+  ],
+  "artifact_sha256": {
+    "manifest.json": "67adcafb850faa136b9a16e123e21b3cebdf86e26eff5fbafd1c5a253bed8554",
+    "ledger.json": "d3793679efff41f9cd8c159eab0b9bb60d3a6c0af3dcaeeb94ef2a2bb1778c0a",
+    "pilot/warehouse-r1-P1/provider-trace.jsonl": "d12feb3b44350caa5afffa49421ae4a66e7bfe5bce722997fd239f16e8d9b032",
+    "pilot/warehouse-r1-P2/provider-trace.jsonl": "b189cc992cdc8f5fc09ff3922fbb5970b371be9773d11c4c55beea7489adf155",
+    "pilot/warehouse-r1-P2/turn-01-result.json": "9cfa7e8ec3f4cdb4059dafb96e5f93c3dfe6a96b1933663da8904522db421261",
+    "pilot/warehouse-r1-P2/turn-02-result.json": "33a756fbb677012b78f479b6b5c15bac279194164547a3cf0ca542ede089b9aa",
+    "pilot/warehouse-r1-P2/turn-02-accepted.json": "232a1d2798836cdde5fdf0135cbba052ea8250c4ad1234f3bd9118eaeb6c023f",
+    "pilot/warehouse-r1-P2/turn-02-review-binding.json": "2d21530efbb97cc27f902ff3185b93a5920d7517cbb74f9b6b406f9b19c5e630"
+  },
+  "attempt_costs": [
+    {
+      "attempt": "40ed9065-b19e-48cf-a468-9a863ae3eac2",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:37:56.537246+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac68370635887d090fc5599bb1b48b4",
+      "cost_usd": "0.0014628",
+      "usage": {
+        "input_tokens": 10947,
+        "input_tokens_details": {
+          "cache_write_tokens": 10944,
+          "cached_tokens": 0
+        },
+        "output_tokens": 189,
+        "output_tokens_details": {
+          "reasoning_tokens": 108
+        },
+        "total_tokens": 11136
+      }
+    },
+    {
+      "attempt": "20948948-7ac3-4e16-a6e6-3dc52824b8f3",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:38:02.642193+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac68375f4f887d089523f830a86ec4f",
+      "cost_usd": "0.000330365",
+      "usage": {
+        "input_tokens": 11200,
+        "input_tokens_details": {
+          "cache_write_tokens": 253,
+          "cached_tokens": 10944
+        },
+        "output_tokens": 378,
+        "output_tokens_details": {
+          "reasoning_tokens": 245
+        },
+        "total_tokens": 11578
+      }
+    },
+    {
+      "attempt": "d78633b4-86ba-4f47-a671-92202fd16abf",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:38:13.592312+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac6837c0ac087d086c10999f7c604ff",
+      "cost_usd": "0.000655395",
+      "usage": {
+        "input_tokens": 11593,
+        "input_tokens_details": {
+          "cache_write_tokens": 393,
+          "cached_tokens": 11197
+        },
+        "output_tokens": 988,
+        "output_tokens_details": {
+          "reasoning_tokens": 634
+        },
+        "total_tokens": 12581
+      }
+    },
+    {
+      "attempt": "5b62f263-4975-4212-ac3c-6aa9b2953e34",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:38:25.344755+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac683875ddc87d097499e8f6f95e180",
+      "cost_usd": "0.0008517",
+      "usage": {
+        "input_tokens": 12697,
+        "input_tokens_details": {
+          "cache_write_tokens": 1104,
+          "cached_tokens": 11590
+        },
+        "output_tokens": 1195,
+        "output_tokens_details": {
+          "reasoning_tokens": 559
+        },
+        "total_tokens": 13892
+      }
+    },
+    {
+      "attempt": "2323125e-0d22-4251-8f6e-59a6ebcf98b0",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:38:32.219293+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac6839372b087d0893155bfbe0f3d00",
+      "cost_usd": "0.000465365",
+      "usage": {
+        "input_tokens": 14046,
+        "input_tokens_details": {
+          "cache_write_tokens": 1349,
+          "cached_tokens": 12694
+        },
+        "output_tokens": 339,
+        "output_tokens_details": {
+          "reasoning_tokens": 191
+        },
+        "total_tokens": 14385
+      }
+    },
+    {
+      "attempt": "8c0665f1-420b-46bb-bbf4-e052f5f6d23c",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:39:50.001514+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac683dfd6e487d08b586a9253796a91",
+      "cost_usd": "0.000562105",
+      "usage": {
+        "input_tokens": 14997,
+        "input_tokens_details": {
+          "cache_write_tokens": 951,
+          "cached_tokens": 14043
+        },
+        "output_tokens": 605,
+        "output_tokens_details": {
+          "reasoning_tokens": 494
+        },
+        "total_tokens": 15602
+      }
+    },
+    {
+      "attempt": "9e0d6254-c94a-465f-a199-f08adde80c2a",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:40:09.670932+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac683e7b64887d08c3a5cc1c95ac2fa",
+      "cost_usd": "0.00130524",
+      "usage": {
+        "input_tokens": 15785,
+        "input_tokens_details": {
+          "cache_write_tokens": 788,
+          "cached_tokens": 14994
+        },
+        "output_tokens": 2113,
+        "output_tokens_details": {
+          "reasoning_tokens": 1849
+        },
+        "total_tokens": 17898
+      }
+    },
+    {
+      "attempt": "7e20f28e-3238-4864-b7fd-7007878c744e",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:40:18.109660+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac683fbbc7887d085e9228b6d666734",
+      "cost_usd": "0.00069112",
+      "usage": {
+        "input_tokens": 17913,
+        "input_tokens_details": {
+          "cache_write_tokens": 2128,
+          "cached_tokens": 15782
+        },
+        "output_tokens": 534,
+        "output_tokens_details": {
+          "reasoning_tokens": 403
+        },
+        "total_tokens": 18447
+      }
+    },
+    {
+      "attempt": "10d01487-9922-44ef-a1c5-f2ba7351615e",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:41:14.105822+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac68435add487d0a72813eb4e3b329d",
+      "cost_usd": "0.00052315",
+      "usage": {
+        "input_tokens": 19307,
+        "input_tokens_details": {
+          "cache_write_tokens": 1394,
+          "cached_tokens": 17910
+        },
+        "output_tokens": 339,
+        "output_tokens_details": {
+          "reasoning_tokens": 188
+        },
+        "total_tokens": 19646
+      }
+    },
+    {
+      "attempt": "1fa6ec69-6f5c-4f13-9ed6-8107bb614b75",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:41:23.154834+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac6843ba19487d0b2e35366c3b09414",
+      "cost_usd": "0.00066759",
+      "usage": {
+        "input_tokens": 19809,
+        "input_tokens_details": {
+          "cache_write_tokens": 502,
+          "cached_tokens": 19304
+        },
+        "output_tokens": 823,
+        "output_tokens_details": {
+          "reasoning_tokens": 728
+        },
+        "total_tokens": 20632
+      }
+    },
+    {
+      "attempt": "610e9ec3-e1f0-4dab-aa58-574f34682882",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:41:27.772676+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac68444d91887d08d95706c368dcb68",
+      "cost_usd": "0.00042661",
+      "usage": {
+        "input_tokens": 20647,
+        "input_tokens_details": {
+          "cache_write_tokens": 838,
+          "cached_tokens": 19806
+        },
+        "output_tokens": 247,
+        "output_tokens_details": {
+          "reasoning_tokens": 149
+        },
+        "total_tokens": 20894
+      }
+    },
+    {
+      "attempt": "c60f55ea-badc-4eb7-be28-bcd5985b8277",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:42:29.123518+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac6847fddf487d0a93ed10c32b1a161",
+      "cost_usd": "0.00065399",
+      "usage": {
+        "input_tokens": 21981,
+        "input_tokens_details": {
+          "cache_write_tokens": 1334,
+          "cached_tokens": 20644
+        },
+        "output_tokens": 561,
+        "output_tokens_details": {
+          "reasoning_tokens": 459
+        },
+        "total_tokens": 22542
+      }
+    },
+    {
+      "attempt": "416eb5cb-1700-41ce-8754-d941c0a77a8d",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:42:40.883971+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac68486cb4087d09be2429d73ebbac4",
+      "cost_usd": "0.00086008",
+      "usage": {
+        "input_tokens": 22621,
+        "input_tokens_details": {
+          "cache_write_tokens": 640,
+          "cached_tokens": 21978
+        },
+        "output_tokens": 1120,
+        "output_tokens_details": {
+          "reasoning_tokens": 845
+        },
+        "total_tokens": 23741
+      }
+    },
+    {
+      "attempt": "79fec5f1-476b-4eae-93fe-825a685afba2",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:42:46.255902+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac6849289cc87d08229aeeb880ebeca",
+      "cost_usd": "0.00051773",
+      "usage": {
+        "input_tokens": 23775,
+        "input_tokens_details": {
+          "cache_write_tokens": 1154,
+          "cached_tokens": 22618
+        },
+        "output_tokens": 294,
+        "output_tokens_details": {
+          "reasoning_tokens": 234
+        },
+        "total_tokens": 24069
+      }
+    },
+    {
+      "attempt": "c534997d-fd3d-4565-9bf5-1c9a4dbed787",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:42:52.168452+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac68498df3487d0bbcc2e7101dfb353",
+      "cost_usd": "0.000459145",
+      "usage": {
+        "input_tokens": 24084,
+        "input_tokens_details": {
+          "cache_write_tokens": 309,
+          "cached_tokens": 23772
+        },
+        "output_tokens": 365,
+        "output_tokens_details": {
+          "reasoning_tokens": 227
+        },
+        "total_tokens": 24449
+      }
+    },
+    {
+      "attempt": "ad6f758b-1441-4732-a1f1-e84c409a2feb",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:43:39.809449+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac684c80fe887d0809dc8198578a4b8",
+      "cost_usd": "0.00060386",
+      "usage": {
+        "input_tokens": 25790,
+        "input_tokens_details": {
+          "cache_write_tokens": 1706,
+          "cached_tokens": 24081
+        },
+        "output_tokens": 299,
+        "output_tokens_details": {
+          "reasoning_tokens": 197
+        },
+        "total_tokens": 26089
+      }
+    },
+    {
+      "attempt": "31bd7517-c88a-4b03-a4ae-8e0e6a31b3b4",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:43:52.639384+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac684cd87d487d0878e8e0616e951ae",
+      "cost_usd": "0.000857295",
+      "usage": {
+        "input_tokens": 26223,
+        "input_tokens_details": {
+          "cache_write_tokens": 433,
+          "cached_tokens": 25787
+        },
+        "output_tokens": 1090,
+        "output_tokens_details": {
+          "reasoning_tokens": 1010
+        },
+        "total_tokens": 27313
+      }
+    },
+    {
+      "attempt": "c1bfb804-1fb5-445f-8311-47978561dccb",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:44:10.111615+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac684da82cc87d0b6d2297beba88ae9",
+      "cost_usd": "0.0014575",
+      "usage": {
+        "input_tokens": 27655,
+        "input_tokens_details": {
+          "cache_write_tokens": 1432,
+          "cached_tokens": 26220
+        },
+        "output_tokens": 2032,
+        "output_tokens_details": {
+          "reasoning_tokens": 1737
+        },
+        "total_tokens": 29687
+      }
+    },
+    {
+      "attempt": "0b1ea7ce-bb30-40cc-adeb-398f8b202a7c",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:44:28.019458+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac684ebf35487d0b10a0fa128018862",
+      "cost_usd": "0.001317695",
+      "usage": {
+        "input_tokens": 29702,
+        "input_tokens_details": {
+          "cache_write_tokens": 2047,
+          "cached_tokens": 27652
+        },
+        "output_tokens": 1570,
+        "output_tokens_details": {
+          "reasoning_tokens": 1451
+        },
+        "total_tokens": 31272
+      }
+    },
+    {
+      "attempt": "ae574e90-629e-4787-9e9d-5dec517ffffe",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:44:33.979600+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac684fdc4e087d0882e2fa6f239f0de",
+      "cost_usd": "0.00073704",
+      "usage": {
+        "input_tokens": 31288,
+        "input_tokens_details": {
+          "cache_write_tokens": 1586,
+          "cached_tokens": 29699
+        },
+        "output_tokens": 483,
+        "output_tokens_details": {
+          "reasoning_tokens": 242
+        },
+        "total_tokens": 31771
+      }
+    },
+    {
+      "attempt": "8484acaf-a092-47a7-b6e2-3b6d6c3ad77e",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:44:40.197315+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac68503f57087d086d4b2012eeceed4",
+      "cost_usd": "0.0005629",
+      "usage": {
+        "input_tokens": 31830,
+        "input_tokens_details": {
+          "cache_write_tokens": 542,
+          "cached_tokens": 31285
+        },
+        "output_tokens": 364,
+        "output_tokens_details": {
+          "reasoning_tokens": 262
+        },
+        "total_tokens": 32194
+      }
+    },
+    {
+      "attempt": "6529c013-6f51-4b97-ba1a-27e281d53353",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:44:51.738980+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac6850c492087d0a3607d7ba4d9a264",
+      "cost_usd": "0.00080157",
+      "usage": {
+        "input_tokens": 33726,
+        "input_tokens_details": {
+          "cache_write_tokens": 1896,
+          "cached_tokens": 31827
+        },
+        "output_tokens": 492,
+        "output_tokens_details": {
+          "reasoning_tokens": 407
+        },
+        "total_tokens": 34218
+      }
+    },
+    {
+      "attempt": "770e47d1-e7a7-4eea-b422-329530741e5b",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:45:19.507430+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac68515cf4887d0b52ed25a84864659",
+      "cost_usd": "0.00205403",
+      "usage": {
+        "input_tokens": 35286,
+        "input_tokens_details": {
+          "cache_write_tokens": 1560,
+          "cached_tokens": 33723
+        },
+        "output_tokens": 3043,
+        "output_tokens_details": {
+          "reasoning_tokens": 2932
+        },
+        "total_tokens": 38329
+      }
+    },
+    {
+      "attempt": "14ddc926-15d3-4290-bb94-52a05d7fd772",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:45:35.193008+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac68531430487d08bc8a4dd76aff14a",
+      "cost_usd": "0.001633255",
+      "usage": {
+        "input_tokens": 38951,
+        "input_tokens_details": {
+          "cache_write_tokens": 3665,
+          "cached_tokens": 35283
+        },
+        "output_tokens": 1644,
+        "output_tokens_details": {
+          "reasoning_tokens": 1542
+        },
+        "total_tokens": 40595
+      }
+    },
+    {
+      "attempt": "eb4441ae-d369-4a80-86c3-1ad750da1db0",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:46:00.207595+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac685410d6087d0ad45ff5fe4de974c",
+      "cost_usd": "0.002203405",
+      "usage": {
+        "input_tokens": 41324,
+        "input_tokens_details": {
+          "cache_write_tokens": 2373,
+          "cached_tokens": 38948
+        },
+        "output_tokens": 3034,
+        "output_tokens_details": {
+          "reasoning_tokens": 2443
+        },
+        "total_tokens": 44358
+      }
+    },
+    {
+      "attempt": "6f951bb4-d44c-4a45-93f7-efd4ae8225fb",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:46:08.195089+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac6855ac3b087d0bfd8f040eb52dc4b",
+      "cost_usd": "0.001037635",
+      "usage": {
+        "input_tokens": 44437,
+        "input_tokens_details": {
+          "cache_write_tokens": 3113,
+          "cached_tokens": 41321
+        },
+        "output_tokens": 470,
+        "output_tokens_details": {
+          "reasoning_tokens": 313
+        },
+        "total_tokens": 44907
+      }
+    },
+    {
+      "attempt": "c4c4b56f-f188-4a47-b321-6b8cf1ce71a1",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:46:12.415496+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac685623c6487d09b94af773e8ec49c",
+      "cost_usd": "0.00060114",
+      "usage": {
+        "input_tokens": 44969,
+        "input_tokens_details": {
+          "cache_write_tokens": 532,
+          "cached_tokens": 44434
+        },
+        "output_tokens": 180,
+        "output_tokens_details": {
+          "reasoning_tokens": 81
+        },
+        "total_tokens": 45149
+      }
+    },
+    {
+      "attempt": "4b42a56a-ca65-4ed2-b22e-b24bbd5cf79c",
+      "case": "warehouse-r1-P1",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:46:52.620663+00:00",
+      "response_id": "resp_0b0bf366b4c788ed016ac685663a0c87d0bbf3c7e8d65a43bb",
+      "cost_usd": "0.003246835",
+      "usage": {
+        "input_tokens": 46404,
+        "input_tokens_details": {
+          "cache_write_tokens": 1435,
+          "cached_tokens": 44966
+        },
+        "output_tokens": 5235,
+        "output_tokens_details": {
+          "reasoning_tokens": 3816
+        },
+        "total_tokens": 51639
+      }
+    },
+    {
+      "attempt": "1a4a86ab-2bcb-4279-9a58-18302b0d0a98",
+      "case": "warehouse-r1-P1",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:46:56.447858+00:00",
+      "response_id": "resp_02f45f7fe165a0af016ac6858f687887d089939d1c5789dde0",
+      "cost_usd": "0.00050955",
+      "usage": {
+        "input_tokens": 3925,
+        "input_tokens_details": {
+          "cache_write_tokens": 3922,
+          "cached_tokens": 0
+        },
+        "output_tokens": 38,
+        "output_tokens_details": {
+          "reasoning_tokens": 19
+        },
+        "total_tokens": 3963
+      }
+    },
+    {
+      "attempt": "fa9807d6-5233-44f0-a3a7-11e211b0bd1e",
+      "case": "warehouse-r1-P1",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:47:21.211156+00:00",
+      "response_id": "resp_02f45f7fe165a0af016ac68591962c87d0a5d8bb7312d3eb8f",
+      "cost_usd": "0.00139252",
+      "usage": {
+        "input_tokens": 3981,
+        "input_tokens_details": {
+          "cache_write_tokens": 56,
+          "cached_tokens": 3922
+        },
+        "output_tokens": 2692,
+        "output_tokens_details": {
+          "reasoning_tokens": 1261
+        },
+        "total_tokens": 6673
+      }
+    },
+    {
+      "attempt": "7ebce929-cd86-47b5-a795-1d7b93131dc9",
+      "case": "warehouse-r1-P1",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:47:23.383978+00:00",
+      "response_id": "resp_02f45f7fe165a0af016ac685aa6dd887d0ad9514a6d62039d3",
+      "cost_usd": "0.00039733",
+      "usage": {
+        "input_tokens": 6739,
+        "input_tokens_details": {
+          "cache_write_tokens": 2758,
+          "cached_tokens": 3978
+        },
+        "output_tokens": 25,
+        "output_tokens_details": {
+          "reasoning_tokens": 14
+        },
+        "total_tokens": 6764
+      }
+    },
+    {
+      "attempt": "636f50d1-7b38-450f-b6ca-3008f55d5e9f",
+      "case": "warehouse-r1-P1",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:47:26.024654+00:00",
+      "response_id": "resp_04caddc6f3fbedbe016ac685ac9cdc87d098a2972fa96a5b9f",
+      "cost_usd": "0.0006503",
+      "usage": {
+        "input_tokens": 4815,
+        "input_tokens_details": {
+          "cache_write_tokens": 4812,
+          "cached_tokens": 0
+        },
+        "output_tokens": 97,
+        "output_tokens_details": {
+          "reasoning_tokens": 46
+        },
+        "total_tokens": 4912
+      }
+    },
+    {
+      "attempt": "c9ca2c83-81b7-4802-9335-d1c670db1170",
+      "case": "warehouse-r1-P1",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:47:28.669035+00:00",
+      "response_id": "resp_04caddc6f3fbedbe016ac685af352087d086571ddbbe92be57",
+      "cost_usd": "0.000183545",
+      "usage": {
+        "input_tokens": 5256,
+        "input_tokens_details": {
+          "cache_write_tokens": 441,
+          "cached_tokens": 4812
+        },
+        "output_tokens": 160,
+        "output_tokens_details": {
+          "reasoning_tokens": 12
+        },
+        "total_tokens": 5416
+      }
+    },
+    {
+      "attempt": "4fd1adc9-4c8c-466c-ba7d-a7dc70f735da",
+      "case": "warehouse-r1-P1",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:47:32.205725+00:00",
+      "response_id": "resp_04caddc6f3fbedbe016ac685b1e34487d085b7c5d8b7f227c1",
+      "cost_usd": "0.00033458",
+      "usage": {
+        "input_tokens": 6826,
+        "input_tokens_details": {
+          "cache_write_tokens": 1570,
+          "cached_tokens": 5253
+        },
+        "output_tokens": 171,
+        "output_tokens_details": {
+          "reasoning_tokens": 134
+        },
+        "total_tokens": 6997
+      }
+    },
+    {
+      "attempt": "6494ae0e-5c7e-48a1-af3e-e9e6c92a77e9",
+      "case": "warehouse-r1-P1",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:47:50.252581+00:00",
+      "response_id": "resp_04caddc6f3fbedbe016ac685b56ab887d0bbf64f530954ac2a",
+      "cost_usd": "0.001155905",
+      "usage": {
+        "input_tokens": 7581,
+        "input_tokens_details": {
+          "cache_write_tokens": 755,
+          "cached_tokens": 6823
+        },
+        "output_tokens": 1986,
+        "output_tokens_details": {
+          "reasoning_tokens": 975
+        },
+        "total_tokens": 9567
+      }
+    },
+    {
+      "attempt": "169cb57d-6678-47aa-8943-c24b2d527379",
+      "case": "warehouse-r1-P1",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:47:52.263143+00:00",
+      "response_id": "resp_04caddc6f3fbedbe016ac685c782e087d0b5ce1fb7d6e22b6c",
+      "cost_usd": "0.00033958",
+      "usage": {
+        "input_tokens": 9585,
+        "input_tokens_details": {
+          "cache_write_tokens": 2004,
+          "cached_tokens": 7578
+        },
+        "output_tokens": 26,
+        "output_tokens_details": {
+          "reasoning_tokens": 15
+        },
+        "total_tokens": 9611
+      }
+    },
+    {
+      "attempt": "fa683193-4e02-41fe-a2d4-e8ebf7e1fd8a",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:48:03.021691+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac685cd331887d0a99001db079292fe",
+      "cost_usd": "0.001857925",
+      "usage": {
+        "input_tokens": 12496,
+        "input_tokens_details": {
+          "cache_write_tokens": 12493,
+          "cached_tokens": 0
+        },
+        "output_tokens": 592,
+        "output_tokens_details": {
+          "reasoning_tokens": 250
+        },
+        "total_tokens": 13088
+      }
+    },
+    {
+      "attempt": "aa4deb5e-a6e9-458e-ac0c-a2aa4e1dd098",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:48:10.482772+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac685d46eb487d0ab263de2fa742648",
+      "cost_usd": "0.000639605",
+      "usage": {
+        "input_tokens": 13799,
+        "input_tokens_details": {
+          "cache_write_tokens": 1303,
+          "cached_tokens": 12493
+        },
+        "output_tokens": 703,
+        "output_tokens_details": {
+          "reasoning_tokens": 418
+        },
+        "total_tokens": 14502
+      }
+    },
+    {
+      "attempt": "75f0c061-f5ae-4205-ae8c-f810627851a6",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:48:14.841251+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac685dc05e487d0b26a2923e00ff93f",
+      "cost_usd": "0.000402885",
+      "usage": {
+        "input_tokens": 14536,
+        "input_tokens_details": {
+          "cache_write_tokens": 737,
+          "cached_tokens": 13796
+        },
+        "output_tokens": 345,
+        "output_tokens_details": {
+          "reasoning_tokens": 125
+        },
+        "total_tokens": 14881
+      }
+    },
+    {
+      "attempt": "7dbede6c-5fe1-449c-bcdd-b9fcff59d947",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:48:22.044209+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac685e05a9487d0a8b243aaf1210eae",
+      "cost_usd": "0.00060738",
+      "usage": {
+        "input_tokens": 15530,
+        "input_tokens_details": {
+          "cache_write_tokens": 994,
+          "cached_tokens": 14533
+        },
+        "output_tokens": 675,
+        "output_tokens_details": {
+          "reasoning_tokens": 455
+        },
+        "total_tokens": 16205
+      }
+    },
+    {
+      "attempt": "ca35b644-66a1-40da-8bc6-dd3057f6d4b9",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:48:27.814533+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac685e7672087d0ab1c99b45b454564",
+      "cost_usd": "0.000447945",
+      "usage": {
+        "input_tokens": 16445,
+        "input_tokens_details": {
+          "cache_write_tokens": 915,
+          "cached_tokens": 15527
+        },
+        "output_tokens": 356,
+        "output_tokens_details": {
+          "reasoning_tokens": 232
+        },
+        "total_tokens": 16801
+      }
+    },
+    {
+      "attempt": "5295eb4d-3de1-4e40-b4a9-7dda42f1007d",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:49:32.356262+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac6861a7ce487d0905b1c655b520481",
+      "cost_usd": "0.00114997",
+      "usage": {
+        "input_tokens": 17551,
+        "input_tokens_details": {
+          "cache_write_tokens": 1106,
+          "cached_tokens": 16442
+        },
+        "output_tokens": 1694,
+        "output_tokens_details": {
+          "reasoning_tokens": 1541
+        },
+        "total_tokens": 19245
+      }
+    },
+    {
+      "attempt": "a6556d0e-aef2-4cb8-a116-cec7e27a913d",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:49:41.700416+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac6862dea3887d0b7ab555849a1d991",
+      "cost_usd": "0.000874405",
+      "usage": {
+        "input_tokens": 19440,
+        "input_tokens_details": {
+          "cache_write_tokens": 1889,
+          "cached_tokens": 17548
+        },
+        "output_tokens": 925,
+        "output_tokens_details": {
+          "reasoning_tokens": 708
+        },
+        "total_tokens": 20365
+      }
+    },
+    {
+      "attempt": "968c5b3f-d1f2-437e-86c8-8f4cdd0235b6",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:49:47.532678+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac68637b31887d0b5136f0d15fafea6",
+      "cost_usd": "0.000565795",
+      "usage": {
+        "input_tokens": 20405,
+        "input_tokens_details": {
+          "cache_write_tokens": 965,
+          "cached_tokens": 19437
+        },
+        "output_tokens": 501,
+        "output_tokens_details": {
+          "reasoning_tokens": 204
+        },
+        "total_tokens": 20906
+      }
+    },
+    {
+      "attempt": "24ca4207-bc83-4e61-98b8-bc4e52f3416e",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:49:54.084920+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac6863d41b887d08c78c8ceda0ca020",
+      "cost_usd": "0.00055057",
+      "usage": {
+        "input_tokens": 20927,
+        "input_tokens_details": {
+          "cache_write_tokens": 522,
+          "cached_tokens": 20402
+        },
+        "output_tokens": 562,
+        "output_tokens_details": {
+          "reasoning_tokens": 343
+        },
+        "total_tokens": 21489
+      }
+    },
+    {
+      "attempt": "ab8fdc36-eff3-4bff-8ef8-98872fdedd49",
+      "case": "warehouse-r1-P2",
+      "role": "A",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:49:58.359609+00:00",
+      "response_id": "resp_0a783ec86c45d250016ac686439a1087d09bd066e6084d155f",
+      "cost_usd": "0.000436415",
+      "usage": {
+        "input_tokens": 21842,
+        "input_tokens_details": {
+          "cache_write_tokens": 915,
+          "cached_tokens": 20924
+        },
+        "output_tokens": 225,
+        "output_tokens_details": {
+          "reasoning_tokens": 112
+        },
+        "total_tokens": 22067
+      }
+    },
+    {
+      "attempt": "d4cf0558-c7e8-474f-a240-eaad79fc81d8",
+      "case": "warehouse-r1-P2",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:50:02.142885+00:00",
+      "response_id": "resp_0891126105165432016ac686484f3487d08c155b1c0f0e4618",
+      "cost_usd": "0.00015153",
+      "usage": {
+        "input_tokens": 2985,
+        "input_tokens_details": {
+          "cache_write_tokens": 534,
+          "cached_tokens": 2448
+        },
+        "output_tokens": 120,
+        "output_tokens_details": {
+          "reasoning_tokens": 101
+        },
+        "total_tokens": 3105
+      }
+    },
+    {
+      "attempt": "4a5744b1-f431-470d-bd93-49e7f055e2e8",
+      "case": "warehouse-r1-P2",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:50:04.363478+00:00",
+      "response_id": "resp_0891126105165432016ac6864b4a9c87d083abac610d264b10",
+      "cost_usd": "0.00006287",
+      "usage": {
+        "input_tokens": 3123,
+        "input_tokens_details": {
+          "cache_write_tokens": 138,
+          "cached_tokens": 2982
+        },
+        "output_tokens": 31,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 3154
+      }
+    },
+    {
+      "attempt": "7bab6858-972b-4629-aca1-a9d1f0b2ba53",
+      "case": "warehouse-r1-P2",
+      "role": "Memory",
+      "endpoint": "/v1/responses",
+      "received_at": "2026-10-07T17:50:13.116171+00:00",
+      "response_id": "resp_0891126105165432016ac6864d7d9887d0987545f072a02be0",
+      "cost_usd": "0.000512125",
+      "usage": {
+        "input_tokens": 3628,
+        "input_tokens_details": {
+          "cache_write_tokens": 505,
+          "cached_tokens": 3120
+        },
+        "output_tokens": 835,
+        "output_tokens_details": {
+          "reasoning_tokens": 384
+        },
+        "total_tokens": 4463
+      }
+    }
+  ],
+  "minimal_carry_proposal": "Explicit --carry-from comparison-v1; verify immutable manifest/trace/report bytes; independently recompute settled usage and latest cumulative witness; reject unknown reserve, unmatched admission or mismatch; load final_guard before fresh pilot; retain one total research ledger for the new revision."
+}

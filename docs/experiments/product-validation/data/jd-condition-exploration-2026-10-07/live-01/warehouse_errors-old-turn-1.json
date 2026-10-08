@@ -1,0 +1,17 @@
+{
+  "execution_id": "d9fc2d1e-9666-4fb0-afad-619cf1610d5d",
+  "exchange": {
+    "employee_input": {
+      "source_id": "ae0e216d-7f1e-4b59-879b-8f18ce2973f7",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "正常上架就是這些步驟，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "76a7f193-3d5d-472c-a31c-58531d88194e",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "這段正常上架的內容已經足夠清楚，不必再補步驟：你依安排好的儲位放貨，掃碼確認品項、貼標並登記入庫；遇到品項不符時先停下核對單據，再通知主管，不自行更改。完成放貨和入庫登記後，這項工作就算完成。\n\n接下來我想了解其他工作：除了上架，平常或固定週期還有哪些事情會由你負責？例如收貨、揀貨、包裝出貨、盤點或退貨處理。你可以先說大家最常找你處理的另一件事；如果沒有，也可以直接告訴我。"
+    }
+  }
+}

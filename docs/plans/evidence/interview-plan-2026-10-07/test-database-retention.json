@@ -1,0 +1,11 @@
+{
+  "recorded_at_utc": "2026-10-06T22:43:10Z",
+  "container_name": "caliburn-intplan-postgres-20261007",
+  "container_id": "13cf811f4c8bf4ff395339fbdf89e6f444971d3fd718fddb84862c68580c07ee",
+  "auto_remove": false,
+  "database": "caliburn_intplan_test",
+  "purpose": "本次隔離測試與合成材料比較；正式原 checkpoint 留在原 owner 的 PostgreSQL。",
+  "volume_name": "56238cf531bf3ba2475eefe3eee556c6aee0a3b50c14debb6ef15c2258ef3faf",
+  "mount_destination": "/var/lib/postgresql",
+  "retention": "本次不移除 container、volume 或實驗 schema。停止自有程序仍保留 DB；不把公開轉錄或 compact item hashes 當成原 opaque checkpoint 的副本。"
+}

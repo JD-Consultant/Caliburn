@@ -1,0 +1,33 @@
+{
+  "question_id": "12bbc2f8d5f24b04bdf17cdb56a4c1f4",
+  "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+  "audit": {
+    "actual_question": "我已把上架流程補進底稿：依規劃儲位放貨、貼品項和批號標籤，以 WMS 掃碼登記並確認實物與系統儲位一致；位置不足時找組長調整，您不自行更改儲位規則。常溫貨使用棧板車，超重貨由持證同事操作堆高機。\n\n想再確認搬運範圍：常溫貨用棧板車時，通常是您親自推運貨品嗎？",
+    "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+    "fact_ids": [
+      "shelving"
+    ],
+    "known_confirmation_ids": [
+      "shelving"
+    ],
+    "new_fact_ids": [],
+    "review_mode": "answer",
+    "review_reason": "這是對已正式披露的本人上架搬運範圍作已知確認；原回答以本人工作為主語，常溫货用棧板車、超重貨請持證同事處理，可重播確認。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "常溫貨用棧板車時，通常是您親自推運貨品嗎？",
+        "mode": "answer",
+        "fact_ids": [
+          "shelving"
+        ],
+        "reason": "與先前本人敘述的常溫貨棧板車作業及超重貨交持證同事界線直接相關，屬已知工作範圍確認，不新增設備型號或操作規格。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

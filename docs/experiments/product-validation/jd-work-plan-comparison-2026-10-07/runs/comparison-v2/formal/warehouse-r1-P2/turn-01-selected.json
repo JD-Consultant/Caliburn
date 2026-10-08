@@ -1,0 +1,57 @@
+{
+  "question_id": "944d6a55921444f18190113da911a431",
+  "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「例如貨物放在哪裡」，我目前沒有確定資料，請保留未知，不補猜。",
+  "audit": {
+    "actual_question": "我先依您提供的資訊整理了職務基本資料與工作目的。收貨方面，已了解您會核對採購單、送貨單和實收數量，並拍照通知採購；拒收或退換貨由主管決定。\n\n通知採購後，這批貨實際怎麼處理？例如貨物放在哪裡、收貨資料怎麼記錄，以及誰會告知後續怎麼辦？",
+    "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「例如貨物放在哪裡」，我目前沒有確定資料，請保留未知，不補猜。",
+    "fact_ids": [
+      "receiving"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "receiving"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際追問進貨數量差異的後續處理、記錄與回覆者，receiving 可答；等候期間貨物的具體放置地點未載明，不能以一般上架流程代答。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [
+      "例如貨物放在哪裡"
+    ],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "通知採購後，這批貨實際怎麼處理？",
+        "mode": "answer",
+        "fact_ids": [
+          "receiving"
+        ],
+        "reason": "凍結事實有採購回覆補送或接受後按結果登記入庫，直接相關。"
+      },
+      {
+        "quote": "例如貨物放在哪裡",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "沒有差異貨物等候採購回覆時的放置位置或隔離方式。"
+      },
+      {
+        "quote": "收貨資料怎麼記錄",
+        "mode": "answer",
+        "fact_ids": [
+          "receiving"
+        ],
+        "reason": "拍照及登記收貨異常表、依回覆結果登記入庫可回答記錄方式。"
+      },
+      {
+        "quote": "以及誰會告知後續怎麼辦？",
+        "mode": "answer",
+        "fact_ids": [
+          "receiving"
+        ],
+        "reason": "明載由採購回覆補送或接受，不從摘要推定主管決定拒收或退換貨。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

@@ -1,0 +1,20 @@
+{
+  "completed_cases": [
+    "warehouse-r1-P1",
+    "warehouse-r1-P2"
+  ],
+  "guard": {
+    "spent_usd": "0.057428625",
+    "occupied_usd": "0.057428625",
+    "retained_reservations": {},
+    "generations": 80,
+    "compacts": 0,
+    "outbound": 175,
+    "counted_input": 1690141,
+    "stop_reason": "batch generation attempt limit reached"
+  },
+  "all_scheduled_cases": [
+    "warehouse-r1-P1",
+    "warehouse-r1-P2"
+  ]
+}

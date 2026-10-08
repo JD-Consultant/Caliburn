@@ -1,0 +1,17 @@
+{
+  "execution_id": "57eb21b0-9b38-4932-af78-747d7cf2b89a",
+  "exchange": {
+    "employee_input": {
+      "source_id": "942754e2-a0c0-4396-b8dc-bcb8d4855b0f",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "工作條件、常見問題和忙不忙前面都說過了，確定沒有其他補充。"
+    },
+    "consultant_reply": {
+      "source_id": "9e05923f-8021-4e72-a0f3-4e6acac46b46",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "了解，您前面已交代的工作條件、常見問題與工作量情況，我不再重問。\n\n我已依據訪談補整訂單登錄與核對任務，並列出完成後交主管的成果、資料缺漏及錯誤的處理界線，以及辦公場所與工作量條件；也補上同事和主管各自的交接角色。職稱、所屬單位及匯報對象尚未確認，先留白。本次訪談可先告一段落，之後若有遺漏或需要更正，再補充即可。"
+    }
+  }
+}

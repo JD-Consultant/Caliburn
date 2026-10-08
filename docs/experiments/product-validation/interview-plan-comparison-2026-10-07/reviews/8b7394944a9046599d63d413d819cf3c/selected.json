@@ -1,0 +1,20 @@
+{
+  "employee_text": "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。",
+  "audit": {
+    "actual_question": "我已把新人第一週的帶教流程整理進底稿：示範掃碼、揀貨與安全動線，讓新人跟著操作，當場檢查漏掃、錯批號及進入車道等情況並記入檢核表，再評估能否獨立上線。\n\n您做出的上線判斷，能直接決定新人獨立作業嗎？還是需要主管或組長再確認？",
+    "employee_text": "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。",
+    "fact_ids": [
+      "training-boundary"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "training-boundary"
+    ],
+    "review_mode": "answer",
+    "review_reason": "training 已實際披露，本題同題再確認員工能否直接批准獨立作業，符合 training-boundary 的責任追問條件，可提供觀察回報與主管核准的原更正事實。未問盤點差異，不帶 inventory-authority。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

@@ -1,0 +1,601 @@
+{
+  "profile": {
+    "revision_id": "8a4db044-0b5a-4ae1-94e7-73ce8ad2d21a",
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "執行物流中心的收貨驗收、上架、揀貨補貨、庫存盤點與退貨作業，維持倉儲與貨物流轉所需的庫存管理，並帶領新人熟悉工作。"
+    }
+  },
+  "work": {
+    "revision_id": "8a4db044-0b5a-4ae1-94e7-73ce8ad2d21a",
+    "areas": [
+      {
+        "area_id": "462b4119-4c62-414b-8a29-d824e14d2b3d",
+        "title": "收貨與倉儲作業",
+        "scope_text": "負責進貨驗收、差異登記與通知採購，並執行入庫及貨品上架；拒收或退換貨由有權責者決定。"
+      },
+      {
+        "area_id": "1c2db323-4f0a-4fe6-aac0-f56ecc9fb86e",
+        "title": "揀貨補貨與庫存管理",
+        "scope_text": "負責訂單揀貨、補貨及庫存盤點。"
+      },
+      {
+        "area_id": "e967d153-ffda-4656-bd2a-97c415cb7e89",
+        "title": "退貨作業",
+        "scope_text": "處理客戶退貨及供應商退貨。"
+      },
+      {
+        "area_id": "7100fb87-db5b-44f2-8526-adcce546df61",
+        "title": "新人帶教",
+        "scope_text": "負責新人第一週的掃碼、揀貨與安全動線示範、跟做觀察及檢核，並判斷是否可獨立上線。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "a084f7f5-a0c7-4728-9934-d7dd68e9531d",
+        "area_id": "462b4119-4c62-414b-8a29-d824e14d2b3d",
+        "title": "驗收進貨並處理差異",
+        "description": "逐箱驗收進貨；發現差異時對照單據與實收情況、登記並通知採購，依採購回覆的補送或接受結果登記入庫。",
+        "outcomes": [
+          {
+            "detail_id": "726e0009-8412-4cd0-a092-7b4ddd2cbb88",
+            "text": "進貨差異留有照片與收貨異常表紀錄供採購處理，並依採購回覆完成入庫登記。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "8625f514-30db-4423-82df-24e245b14ca4",
+            "text": "逐箱核對品項、數量、外包裝及送貨單；差異時對照採購單、送貨單與實收數量，拍照、登記收貨異常表並通知採購。"
+          },
+          {
+            "detail_id": "ec194409-ea3a-46b6-a2e2-0c2f90f0b2dd",
+            "text": "不負責議價、選供應商或決定拒收、退換貨。"
+          }
+        ]
+      },
+      {
+        "task_id": "0f9c5e26-4d60-4dd3-a690-88dcfa354c7e",
+        "area_id": "1c2db323-4f0a-4fe6-aac0-f56ecc9fb86e",
+        "title": "依波次單揀貨並補貨",
+        "description": "依出貨波次單揀貨，揀貨區不足時從備貨區補貨；完成後交包裝區複核。遇到系統庫存與儲位不符時查核相關紀錄，異常交組長協調。",
+        "outcomes": [
+          {
+            "detail_id": "f6bfe8f5-416d-4283-a909-e66aaaa846a6",
+            "text": "揀貨結果交包裝區複核，供後續出貨作業銜接。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "77f331a8-e4a7-4eab-a605-8b51adfb05df",
+            "text": "按出貨波次單揀貨，核對品項、數量、批號及效期，並於截單時間前完成。"
+          },
+          {
+            "detail_id": "409aab28-48e2-4d09-b8db-bfdd992f7c5b",
+            "text": "系統顯示有貨但儲位空置時，先查移庫紀錄及前一波次；不得擅自以其他批號替代，異常交組長協調。"
+          }
+        ]
+      },
+      {
+        "task_id": "3a55e753-b9bb-49c4-ba10-cd6b6997899d",
+        "area_id": "1c2db323-4f0a-4fe6-aac0-f56ecc9fb86e",
+        "title": "執行每週循環盤點",
+        "description": "每週進行循環盤點；發現差異時，先查最近的入庫、出庫及移庫紀錄，再複點。",
+        "outcomes": [],
+        "requirements": [
+          {
+            "detail_id": "39e8fc86-9813-459a-af9c-5f4d44b2e199",
+            "text": "循環盤點發現差異時，先查最近的入庫、出庫及移庫紀錄，再複點。"
+          }
+        ]
+      },
+      {
+        "task_id": "31498a30-4e87-4616-a8bd-0b64c24835a3",
+        "area_id": "7100fb87-db5b-44f2-8526-adcce546df61",
+        "title": "帶教新人並判斷上線準備度",
+        "description": "負責新進人員第一週的現場帶教與操作觀察，並判斷是否可獨立上線。",
+        "outcomes": [
+          {
+            "detail_id": "20a79b15-4fec-46c8-b4a4-74abd5c01356",
+            "text": "將新人操作表現記錄於帶教檢核表，作為判斷能否獨立上線的依據。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "3a071a0c-8834-42e1-9414-7799a3e47ec0",
+            "text": "第一週示範掃碼、揀貨與安全動線，再讓新人跟著操作；當場觀察是否漏掃、拿錯批號或走進車道，並記錄於帶教檢核表。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [
+      {
+        "capability_id": "99288f36-83df-4e7b-a419-7695d6594a82",
+        "kind": "skill",
+        "name": "現場帶教與操作評估",
+        "description": "透過現場示範、跟做觀察及檢核表記錄教導新人執行倉庫作業，並依操作表現判斷其能否獨立上線。"
+      }
+    ],
+    "task_links": [
+      {
+        "task_id": "31498a30-4e87-4616-a8bd-0b64c24835a3",
+        "capability_id": "99288f36-83df-4e7b-a419-7695d6594a82"
+      }
+    ],
+    "collaborators": [
+      {
+        "collaborator_id": "bbdc90df-60a6-4eb3-b66d-f3b945c86b50",
+        "name": "包裝區",
+        "scope_text": "接收完成的揀貨結果並進行複核。"
+      },
+      {
+        "collaborator_id": "5dcccb5a-2c54-4940-85af-abbd1efef3ac",
+        "name": "組長",
+        "scope_text": "接收揀貨異常並協調處理。"
+      }
+    ],
+    "conditions": [
+      {
+        "condition_id": "373523b8-26c9-4321-a40e-d1fda970547b",
+        "kind": "schedule_travel",
+        "text": "早上 7 點上班；週一至週六輪休。"
+      }
+    ]
+  },
+  "sources": {
+    "revision_id": "8a4db044-0b5a-4ae1-94e7-73ce8ad2d21a",
+    "references": [
+      {
+        "citation_id": "98b01340-95aa-42fe-beee-fa3532dd12da",
+        "target_label": "職責：收貨與倉儲作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "462b4119-4c62-414b-8a29-d824e14d2b3d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      },
+      {
+        "citation_id": "078929d4-8dc5-401e-88aa-2bc6d34cb691",
+        "target_label": "職責：揀貨補貨與庫存管理",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "1c2db323-4f0a-4fe6-aac0-f56ecc9fb86e",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "dc420684-987b-4b57-b4dc-a95fca4f4c1a",
+        "target_label": "職責：退貨作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "e967d153-ffda-4656-bd2a-97c415cb7e89",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "96242a66-6a95-4990-b6c4-41759f84d2e2",
+        "target_label": "職責：新人帶教",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "7100fb87-db5b-44f2-8526-adcce546df61",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      },
+      {
+        "citation_id": "e6b3181f-2b87-450a-862c-22e1f414f42d",
+        "target_label": "共通條件：早上 7 點上班；週一至週六輪休。",
+        "target": {
+          "kind": "condition",
+          "field": null,
+          "item_id": "373523b8-26c9-4321-a40e-d1fda970547b",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "c5d5f1cd-9bc6-4831-b108-fc5b6fea1fe1",
+        "target_label": "職責：收貨與倉儲作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "462b4119-4c62-414b-8a29-d824e14d2b3d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "1a3b999b-6477-43e4-a30c-945d39f4aac9",
+        "target_label": "任務：驗收進貨並處理差異",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "a084f7f5-a0c7-4728-9934-d7dd68e9531d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "1873a1a4-66df-425b-a694-931e19522753",
+        "target_label": "任務：驗收進貨並處理差異",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "a084f7f5-a0c7-4728-9934-d7dd68e9531d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "a5911d1a-6eb0-4220-88ac-34fe92505f68",
+        "target_label": "任務：驗收進貨並處理差異 · 成果：進貨差異留有照片與收貨異常表紀錄供採購處理，並依採購回覆完成入庫登記。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "726e0009-8412-4cd0-a092-7b4ddd2cbb88",
+          "task_id": "a084f7f5-a0c7-4728-9934-d7dd68e9531d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "fab71f80-523d-4b4a-a77a-c1806f0d0eb1",
+        "target_label": "任務：驗收進貨並處理差異 · 要求：逐箱核對品項、數量、外包裝及送貨單；差異時對照採購單、送貨單與實收數量，拍照、登記收貨異常表並通知採購。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "8625f514-30db-4423-82df-24e245b14ca4",
+          "task_id": "a084f7f5-a0c7-4728-9934-d7dd68e9531d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "cdd56fff-49a6-4a26-a8bb-f10e362319bc",
+        "target_label": "任務：驗收進貨並處理差異 · 要求：逐箱核對品項、數量、外包裝及送貨單；差異時對照採購單、送貨單與實收數量，拍照、登記收貨異常表並通知採購。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "8625f514-30db-4423-82df-24e245b14ca4",
+          "task_id": "a084f7f5-a0c7-4728-9934-d7dd68e9531d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "80aec530-7e61-4962-b755-b40f60a041c6",
+        "target_label": "任務：驗收進貨並處理差異 · 要求：不負責議價、選供應商或決定拒收、退換貨。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "ec194409-ea3a-46b6-a2e2-0c2f90f0b2dd",
+          "task_id": "a084f7f5-a0c7-4728-9934-d7dd68e9531d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "5b66aeab-2230-49bb-935b-da14d309f2c4",
+        "target_label": "任務：驗收進貨並處理差異 · 要求：不負責議價、選供應商或決定拒收、退換貨。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "ec194409-ea3a-46b6-a2e2-0c2f90f0b2dd",
+          "task_id": "a084f7f5-a0c7-4728-9934-d7dd68e9531d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "5d82992b-1055-4554-8e3d-c2f84d3edda6",
+        "target_label": "任務：依波次單揀貨並補貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "0f9c5e26-4d60-4dd3-a690-88dcfa354c7e",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "880cb021-bffd-44b7-8860-30c0b815ae08",
+        "target_label": "任務：依波次單揀貨並補貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "0f9c5e26-4d60-4dd3-a690-88dcfa354c7e",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "a5cb9fff-f789-411c-a3f3-073462ebc77a",
+        "target_label": "任務：依波次單揀貨並補貨 · 成果：揀貨結果交包裝區複核，供後續出貨作業銜接。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "f6bfe8f5-416d-4283-a909-e66aaaa846a6",
+          "task_id": "0f9c5e26-4d60-4dd3-a690-88dcfa354c7e"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "a6a7f2c9-b553-40df-9da5-89f0b1b1274a",
+        "target_label": "任務：依波次單揀貨並補貨 · 要求：按出貨波次單揀貨，核對品項、數量、批號及效期，並於截單時間前完成。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "77f331a8-e4a7-4eab-a605-8b51adfb05df",
+          "task_id": "0f9c5e26-4d60-4dd3-a690-88dcfa354c7e"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "2da39e2e-00ec-4462-8311-6892e87e904f",
+        "target_label": "任務：依波次單揀貨並補貨 · 要求：系統顯示有貨但儲位空置時，先查移庫紀錄及前一波次；不得擅自以其他批號替代，異常交組長協調。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "409aab28-48e2-4d09-b8db-bfdd992f7c5b",
+          "task_id": "0f9c5e26-4d60-4dd3-a690-88dcfa354c7e"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f1e1e865-953a-4bee-8fdb-9854c3524fa4",
+        "target_label": "協作：包裝區",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "bbdc90df-60a6-4eb3-b66d-f3b945c86b50",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f69f1a46-05eb-40b6-a1b1-5185c9213e90",
+        "target_label": "協作：組長",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "5dcccb5a-2c54-4940-85af-abbd1efef3ac",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "89dcfbc2-3572-4b16-ad6a-223be238361a",
+        "target_label": "任務：執行每週循環盤點",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "3a55e753-b9bb-49c4-ba10-cd6b6997899d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f372f7ee-6e1c-484d-b9f5-dbf999316e4d",
+        "target_label": "任務：執行每週循環盤點",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "3a55e753-b9bb-49c4-ba10-cd6b6997899d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "03d8871e-ed8e-4185-b6df-e57f84822862",
+        "target_label": "任務：執行每週循環盤點 · 要求：循環盤點發現差異時，先查最近的入庫、出庫及移庫紀錄，再複點。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "39e8fc86-9813-459a-af9c-5f4d44b2e199",
+          "task_id": "3a55e753-b9bb-49c4-ba10-cd6b6997899d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "5d637cfa-270e-46cc-93ea-745dad99a797",
+        "target_label": "職責：新人帶教",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "7100fb87-db5b-44f2-8526-adcce546df61",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "8b5c7173-b4c2-43bf-9f9e-1b84e0c53c7c",
+        "target_label": "任務：帶教新人並判斷上線準備度",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "31498a30-4e87-4616-a8bd-0b64c24835a3",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f6d0b718-c65c-489e-93a4-598f24a049fe",
+        "target_label": "任務：帶教新人並判斷上線準備度",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "31498a30-4e87-4616-a8bd-0b64c24835a3",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "68b67a01-2b09-44ce-9f7c-b3249598d983",
+        "target_label": "任務：帶教新人並判斷上線準備度 · 成果：將新人操作表現記錄於帶教檢核表，作為判斷能否獨立上線的依據。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "20a79b15-4fec-46c8-b4a4-74abd5c01356",
+          "task_id": "31498a30-4e87-4616-a8bd-0b64c24835a3"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "79ac72c5-1d8f-4d39-a871-22ed6a882450",
+        "target_label": "任務：帶教新人並判斷上線準備度 · 要求：第一週示範掃碼、揀貨與安全動線，再讓新人跟著操作；當場觀察是否漏掃、拿錯批號或走進車道，並記錄於帶教檢核表。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "3a071a0c-8834-42e1-9414-7799a3e47ec0",
+          "task_id": "31498a30-4e87-4616-a8bd-0b64c24835a3"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "ddfec14d-733b-4505-b7b8-06ab5a8f619f",
+        "target_label": "技能：現場帶教與操作評估",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "99288f36-83df-4e7b-a419-7695d6594a82",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "ee61d090-07f8-46af-b84f-4424ac687984",
+        "target_label": "任務：帶教新人並判斷上線準備度 · 使用：現場帶教與操作評估",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "99288f36-83df-4e7b-a419-7695d6594a82",
+          "task_id": "31498a30-4e87-4616-a8bd-0b64c24835a3"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "execution_id": "69b18c17-fd4c-4d01-8cb4-5822b312a933",
+  "exchange": {
+    "employee_input": {
+      "source_id": "10a24327-42c9-4c54-bee8-ca5eb8ea1c2d",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "這個細節我目前說不清楚，也沒有其他能確認的資料。已說過的工作範圍仍一樣，其他事情可以試著說。"
+    },
+    "consultant_reply": {
+      "source_id": "c13f6e84-ea53-4952-9fd5-285dfef6cc44",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "了解，搬運或設備的情況先保留未知，不會寫成「不需要」。\n\n另一個想確認的是盤點差異的處理：如果清點數量和系統紀錄對不上，您通常會怎麼做？後續由誰確認或處理？如果沒遇過或不清楚，也可以直接說。"
+    }
+  }
+}

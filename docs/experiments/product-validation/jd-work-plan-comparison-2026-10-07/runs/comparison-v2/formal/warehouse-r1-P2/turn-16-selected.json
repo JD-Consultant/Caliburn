@@ -1,0 +1,27 @@
+{
+  "question_id": "883cfdda04144432bfe37177b930ecce",
+  "employee_text": "可以依我已說過的工作範圍繼續訪談；我沒有新增事實。",
+  "audit": {
+    "actual_question": "收到。您再次確認的年度盤點、冷藏品溫控、旺季與晚班交接，以及收貨差異處理，都已依您說明的步驟與權限界線整理在目前草稿中；這次沒有新增或更正內容。\n\n若還有哪項職責寫錯或漏寫，請直接指出；若沒有，也可以回覆「沒有」。",
+    "employee_text": "可以依我已說過的工作範圍繼續訪談；我沒有新增事實。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "no_question",
+    "review_reason": "此輪明示沒有新增或更正内容，並以條件式邀請指出其他錯漏作收束，沒有新的具體工作提問或待核實命題；不因收束邀請补送隱藏事實。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": true,
+    "subquestions": [
+      {
+        "quote": "若還有哪項職責寫錯或漏寫，請直接指出；若沒有，也可以回覆「沒有」。",
+        "mode": "no_question",
+        "fact_ids": [],
+        "reason": "為摘要後的條件式收束邀請，不提供新的訪談問題；也不能替員工創作全面無遺漏的確認。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

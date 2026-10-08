@@ -1,7 +1,9 @@
 # Q019／MP-01：正常訪談的 Provider 契約核對
 
-> 2026-09-07 · **G2／受限G5完成，Provider接法尚未解決。**沒有關閉計數保護、降級原生推理、替換 Memory 或修改產品程式。真測結果只放[獨立回查／接口結果](../../.worktrees/analysis-only-agent/docs/specs/2026-09-07-recall-native-capability-results.md)。
-> 入口：[current decisions](../../current-decisions.md)。隔離程式基準 `82ac2266`；前段 [B1 校準結果](../../.worktrees/analysis-only-agent/docs/specs/2026-09-07-b1-attribution-calibration-results.md)只證明限定的記憶整理改善，不能替代實際訪談相容性驗收。
+> 時點說明：本文保留 2026-09-07 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
+> 2026-09-07 · **G2／受限G5完成，Provider接法尚未解決。**沒有關閉計數保護、降級原生推理、替換 Memory 或修改產品程式。真測結果只放[獨立回查／接口結果](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-recall-native-capability-results.md)。
+> 入口：[current decisions](../../current-decisions.md)。隔離程式基準 `82ac2266`；前段 [B1 校準結果](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-b1-attribution-calibration-results.md)只證明限定的記憶整理改善，不能替代實際訪談相容性驗收。
 
 ## 1. 本輪範圍
 
@@ -37,7 +39,7 @@ Owner已回覆「可以，依這個範圍測試」，核准一次小額驗證；
 
 - 本輪重跑隔離 `tests/test_context_budget.py`：**54 passed，8.87s**，1項既有 Starlette／AnyIO deprecation warning，exit0。它驗證 mock HTTP 下的計數／安全失敗接線，**不是 OpenRouter 真相容或正常訪談驗收**。
 - 只讀取 `.env` 的變數名稱確認設定來源，沒有顯示金鑰，也沒有把 OpenRouter key 送往 OpenAI 主機。沒有重啟／清空 Docker。
-- Owner確認後完成12次生成／**US$0.00411**，未加額度。原生item重送有證據，但有一次incomplete；壓縮未驗成；回查8步用盡無最終答案。數據／限制集中於[結果](../../.worktrees/analysis-only-agent/docs/specs/2026-09-07-recall-native-capability-results.md)，不在本頁另複製完整紀錄。
+- Owner確認後完成12次生成／**US$0.00411**，未加額度。原生item重送有證據，但有一次incomplete；壓縮未驗成；回查8步用盡無最終答案。數據／限制集中於[結果](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-recall-native-capability-results.md)，不在本頁另複製完整紀錄。
 - 未改產品程式。MP-01仍OPEN、完整 fresh-context Memory 回查仍OPEN。
 - **Next gate：**先確認是否有與原設計相符的OpenAI直連設定；只有OpenRouter時，明訂不同預算／壓縮接法再施工。記憶讀取提示的收斂候選見結果§4。不得再盲試或以54項通過將「正常訪談」標成完成。
 

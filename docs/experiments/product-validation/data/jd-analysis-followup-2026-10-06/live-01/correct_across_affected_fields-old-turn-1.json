@@ -1,0 +1,17 @@
+{
+  "execution_id": "83572623-987a-4941-9d6b-5a8a08964465",
+  "exchange": {
+    "employee_input": {
+      "source_id": "9a821e20-0781-456c-aa5c-2384e3ac51fb",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "前面供應商退貨那個我講不準。退不退是採購決定，我只照通知把貨備好、登記出貨，不是入庫。客戶退貨檢查跟入庫還是我做，其他收貨那些沒變。"
+    },
+    "consultant_reply": {
+      "source_id": "f794310f-73c7-4362-ab26-bbf0144dddce",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "已更正並調整草稿：客戶退貨由您檢查並辦理入庫；供應商退貨則由採購決定是否退回，您依通知備貨並登記出貨。每日收貨及數量不符時拍照、登記並通知採購的內容維持不變。\n\n收貨數量不符時，您通知採購後，貨物通常會怎麼處理？例如先收下或暫時隔離，等採購回覆後再處理？"
+    }
+  }
+}

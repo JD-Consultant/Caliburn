@@ -1,0 +1,47 @@
+{
+  "question_id": "cd7c8d2440164d7ab8f46fedfe7c3123",
+  "profile": "warehouse",
+  "actual_question": "我先記下每週循環盤點，以及差異時先查近期入庫、出庫和移庫紀錄再複點；調帳方式和批准人仍保留未知。\n\n依你的意思先談帶新人：最近一次帶新人時，你主要教哪項工作、怎麼示範或陪做？你怎麼判斷可以交給他自己做？",
+  "disclosed": [
+    "inventory-partial",
+    "picking",
+    "receiving",
+    "shelving"
+  ],
+  "open_gaps": [
+    "inventory-authority"
+  ],
+  "seen_topics": [
+    "inventory",
+    "picking",
+    "receiving",
+    "shelving"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "shelving",
+    "picking",
+    "inventory-partial"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 3
+  },
+  "recent_employee_originals": [
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+    "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？"
+  ],
+  "candidate": {
+    "actual_question": "依你的意思先談帶新人：最近一次帶新人時，你主要教哪項工作、怎麼示範或陪做？你怎麼判斷可以交給他自己做？",
+    "employee_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。",
+    "fact_id": "training",
+    "topic": "training",
+    "matched_cue": "新人",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": null,
+    "closes_gap": null,
+    "correction": false
+  }
+}

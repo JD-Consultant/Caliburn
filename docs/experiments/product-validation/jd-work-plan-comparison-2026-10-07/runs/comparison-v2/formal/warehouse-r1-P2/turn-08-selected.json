@@ -1,0 +1,42 @@
+{
+  "question_id": "d412f85e4a864db4a28c66f74bbb27a1",
+  "employee_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。",
+  "audit": {
+    "actual_question": "可以。我已把每週循環盤點、查近期入出庫與移庫紀錄後複點，整理成盤點任務；差異如何調帳及由誰批准，先保留未知。\n\n談談最近一次帶新人的情況：新人當時要學什麼，您做了哪些示範或指導？",
+    "employee_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。",
+    "fact_ids": [
+      "training"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "training"
+    ],
+    "review_mode": "answer",
+    "review_reason": "順著員工提出的換題意願，詢問帶新人時的學習內容與本人示範指導，training 直接相關且可首次披露。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "availability_cue": "剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。",
+    "subquestions": [
+      {
+        "quote": "新人當時要學什麼",
+        "mode": "answer",
+        "fact_ids": [
+          "training"
+        ],
+        "reason": "凍結事實提供掃碼、揀貨與安全動線的學習內容。"
+      },
+      {
+        "quote": "您做了哪些示範或指導？",
+        "mode": "answer",
+        "fact_ids": [
+          "training"
+        ],
+        "reason": "先示範再跟做、現場觀察並記檢核表，直接回應所問帶教方式。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

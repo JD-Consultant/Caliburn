@@ -1,0 +1,15 @@
+{"case": "warehouse-r1-P1", "turn": 1, "status": "completed", "seconds": 36.9, "spent_usd": "0.001932885"}
+{"review_pending": "de505041b4064fa5861e26c99f051f98", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\de505041b4064fa5861e26c99f051f98\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 2, "status": "completed", "seconds": 49.3, "spent_usd": "0.005255830"}
+{"review_pending": "85ffb7372ce046d6a1fcb3822dfbf40f", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\85ffb7372ce046d6a1fcb3822dfbf40f\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 3, "status": "completed", "seconds": 45.4, "spent_usd": "0.008138725"}
+{"review_pending": "ad8b1fac29f346cfb22bbe1a8fc5a0fb", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\ad8b1fac29f346cfb22bbe1a8fc5a0fb\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 4, "status": "completed", "seconds": 26.8, "spent_usd": "0.012296340"}
+{"review_pending": "b7b0793f1adf4d82ab698e19290f5503", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\b7b0793f1adf4d82ab698e19290f5503\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 5, "status": "completed", "seconds": 43.9, "spent_usd": "0.017643415"}
+{"review_pending": "e85fe79403464f4f86dfe87e03c05b9e", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\e85fe79403464f4f86dfe87e03c05b9e\\pending.json"}
+Exception ignored while closing generator <async_generator object BoundAsyncStream.__aiter__ at 0x000001F555596020>:
+Traceback (most recent call last):
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\langgraph\checkpoint\serde\jsonplus.py", line 284, in loads_typed
+    return ormsgpack.unpackb(
+ValueError: async generator already executing

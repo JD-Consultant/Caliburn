@@ -1,5 +1,7 @@
 # LLM provider interface 與 framework 選型研究
 
+> 時點說明：本文保留 2026-08-11 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 > **歷史選型研究，已被取代（2026-08-28）**：本文「不採 LangChain／LangGraph、保留薄自有 port」的結論已由 [Accepted ADR 0060](../../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 與後續 0061–0068 取代。下一版產品語意與施工以 [Proposed ADR 0071](../../adr/0071-revisable-work-understanding-context-and-review-provenance.md) 及 [2026-08-28 實作計畫](../../history.md#source-8523574df02a6b5d1d1e) 為準。本文只保留 provider capability／routing 研究脈絡，不得用來恢復舊 adapter-first 架構。
 
 - 日期：2026-08-11
@@ -123,8 +125,8 @@ retry/fallback 不應由低層 adapter 偷做，而由 application policy 明確
 
 本 repo 相關現況與既有決策：
 
-- [`apps/api/app/adapters/openrouter/openrouter.py`](../../apps/api/app/adapters/openrouter/openrouter.py)
-- [`apps/api/app/api/deps.py`](../../apps/api/app/api/deps.py)
-- [`docs/adr/0040-task-analysis-llm-architecture.md`](../adr/0040-task-analysis-llm-architecture.md)
+- [`apps/api/app/adapters/openrouter/openrouter.py`](../../history.md#source-eeb144c85ec5802a98ac)
+- [`apps/api/app/api/deps.py`](../../history.md#source-fd1b5b60fcab83e8eebc)
+- `docs/adr/0040-task-analysis-llm-architecture.md`（原研究所列路徑；目前檔案與所有可見 Git refs 均未找到此檔，不改指不同 ADR）
 - [`docs/specs/2026-07-31-job-analysis-openrouter-attribution-and-live-smoke-research.md`](../../history.md#source-c80673fda04fb06eaef0)
 - [`docs/contract-strategy.md`](../../contract-strategy.md)

@@ -1,0 +1,7 @@
+{
+  "question_id": "2ec5e4f6d2f745b1b8f66a5d63f76445",
+  "fact_ids": ["picking"],
+  "mode": "answer",
+  "reason": "實際問題明確轉向揀貨，詢問接到要求後的步驟與交付對象；picking 的波次單、品項數量批號效期核對、包裝區複核與異常協調直接相關且尚未披露。收貨補送只是待確認摘要，不補其未知細節，也不釋出其他未被詢問的工作。",
+  "omitted_subtopics": []
+}

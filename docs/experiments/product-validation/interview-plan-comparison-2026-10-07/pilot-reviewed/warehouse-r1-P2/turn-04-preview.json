@@ -1,0 +1,149 @@
+{
+  "job_file_id": "7f37bf62-7bd1-43f8-962f-7bcd42c0b8a3",
+  "execution_id": "256b976d-bcef-4205-bc35-9701c1cb922f",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "執行物流中心倉庫的收貨驗收、上架、揀貨補貨、庫存盤點及退貨作業，並帶領新人，支持倉庫日常貨物流轉與庫存管理。"
+    },
+    "work": {
+      "revision_id": "d295d888-b52d-40db-ad0e-51d01fc25fbb",
+      "areas": [
+        {
+          "area_id": "3856b57e-f8d4-48e4-9e59-8ef9eed2605d",
+          "title": "收貨驗收與上架",
+          "scope_text": "負責進貨收貨驗收及貨品上架作業。"
+        },
+        {
+          "area_id": "b2f54102-ae8b-4e6e-95bd-eaf0970cac11",
+          "title": "揀貨與補貨",
+          "scope_text": "負責倉庫揀貨及補貨作業。"
+        },
+        {
+          "area_id": "5ba05012-8c9c-4603-bc2a-df3b3cc2c68f",
+          "title": "庫存盤點",
+          "scope_text": "負責倉庫庫存盤點作業。"
+        },
+        {
+          "area_id": "db15a6f1-6901-4c83-b391-3f5f03d65a40",
+          "title": "客戶與供應商退貨",
+          "scope_text": "負責客戶退貨及供應商退貨作業。"
+        },
+        {
+          "area_id": "3b1bf368-9004-43fc-9be5-978eddcd49fb",
+          "title": "新人帶教",
+          "scope_text": "負責帶領倉庫新人。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "990e37af-ab4d-4859-8c86-4b721c2db861",
+          "area_id": "3856b57e-f8d4-48e4-9e59-8ef9eed2605d",
+          "title": "執行進貨收貨驗收與上架",
+          "description": "逐箱點件，核對品項、數量、外包裝及送貨單，並對照採購單與實收數量；發現差異時拍照、登記收貨異常表並通知採購。",
+          "outcomes": [
+            {
+              "detail_id": "0f899ad7-e25c-4171-af26-33dd24547664",
+              "text": "依採購對差異所回覆的補送或接受方式，按處理結果辦理入庫登記。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "af2119f6-c9f6-418d-9e14-35f439671f08",
+              "text": "進貨差異須依採購回覆處理後才登記入庫；本人不負責議價、選擇供應商或決定拒收。"
+            }
+          ]
+        },
+        {
+          "task_id": "ae7ebca0-7ca0-41d2-ba88-9bed0548d2c4",
+          "area_id": "b2f54102-ae8b-4e6e-95bd-eaf0970cac11",
+          "title": "執行揀貨",
+          "description": "負責倉庫揀貨作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "6907d97b-9cc6-48b2-8b56-2a1c4d8e3ccb",
+          "area_id": "b2f54102-ae8b-4e6e-95bd-eaf0970cac11",
+          "title": "執行補貨",
+          "description": "負責倉庫補貨作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "719d42f1-dc4c-440d-ac69-9c26df22171b",
+          "area_id": "5ba05012-8c9c-4603-bc2a-df3b3cc2c68f",
+          "title": "執行庫存盤點",
+          "description": "負責倉庫庫存盤點。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "2b2a506b-1964-438b-b5b3-55d8e9bcddd8",
+          "area_id": "db15a6f1-6901-4c83-b391-3f5f03d65a40",
+          "title": "處理客戶退貨",
+          "description": null,
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "ea1e37e5-6c0e-426c-8a01-08c4c5237746",
+          "area_id": "db15a6f1-6901-4c83-b391-3f5f03d65a40",
+          "title": "處理供應商退貨",
+          "description": null,
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "35577fc0-f585-4537-b9b8-2cc2ce90f15b",
+          "area_id": "3b1bf368-9004-43fc-9be5-978eddcd49fb",
+          "title": "帶領新人",
+          "description": null,
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_id": "c8051b13-f02d-49b0-a8e8-f6d26e22fb14",
+          "kind": "skill",
+          "name": "到貨核對與異常紀錄",
+          "description": "逐箱清點到貨，核對品項、數量、外包裝與收貨文件，辨識差異並以異常紀錄、照片通報。"
+        }
+      ],
+      "task_links": [
+        {
+          "task_id": "990e37af-ab4d-4859-8c86-4b721c2db861",
+          "capability_id": "c8051b13-f02d-49b0-a8e8-f6d26e22fb14"
+        }
+      ],
+      "collaborators": [
+        {
+          "collaborator_id": "c89cec32-5962-4da3-b9da-6d0905fcf45e",
+          "name": "採購",
+          "scope_text": "接收收貨差異的照片及異常登記，回覆補送或接受的處理方式；倉庫管理員依回覆辦理入庫登記，不負責議價或選擇供應商。"
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "0f450e5b-7d48-406d-9961-1d82fb383484",
+          "kind": "schedule_travel",
+          "text": "早上 7 點上班，週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "plan_preview": {
+    "plan": "焦點：揀貨；釐清揀貨資訊來源、本人作業步驟及交接對象。\n待探索：補貨、庫存盤點、客戶退貨、供應商退貨、新人帶教的實際做法及重要條件。\n必要線索：早上 7 點上班、週一至週六輪休；收貨逐箱核對品項、數量、外包裝及單據；差異拍照、登記異常表並通知採購，依採購回覆補送或接受後登記入庫。本人不議價、不選供應商，也不決定進貨是否拒收或退換貨。補送後的跟進與登記細節目前無其他確定資料，保留未知，無新線索不重問。"
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "phase": "pilot",
+  "processed": [
+    "warehouse-r1-P1"
+  ],
+  "scheduled": [
+    [
+      "warehouse",
+      "P1",
+      1
+    ],
+    [
+      "warehouse",
+      "P2",
+      1
+    ]
+  ],
+  "guard": {
+    "spent_usd": "0.032509855",
+    "occupied_usd": "0.032509855",
+    "retained_reservations": {},
+    "generations": 36,
+    "compacts": 0,
+    "outbound": 77,
+    "counted_input": 878074,
+    "stop_reason": null,
+    "batch_deadline": null,
+    "limit_usd": "4.00"
+  },
+  "manifest_sha256": "67adcafb850faa136b9a16e123e21b3cebdf86e26eff5fbafd1c5a253bed8554",
+  "artifact_sha256": {
+    "pilot/warehouse-r1-P1/provider-trace.jsonl": "d12feb3b44350caa5afffa49421ae4a66e7bfe5bce722997fd239f16e8d9b032",
+    "pilot/warehouse-r1-P1/result.json": "cae38e687d506c1113791ff48c4633460a30a8ef3518ec5521077033571dca22"
+  }
+}

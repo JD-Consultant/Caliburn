@@ -1,0 +1,60 @@
+{
+  "question_id": "d0062d530bf44b8a8f68538c1db6ebfe",
+  "profile": "warehouse",
+  "actual_question": "破損商品隔離後的處理方式，我會保留未知，不再追問。\n\n接著了解每週循環盤點本身，先不談您已說不清楚的調帳與核准：盤點哪些品項或儲位通常由誰安排？您把清點結果記在哪裡，完成後交給誰？",
+  "disclosed": [
+    "customer-returns",
+    "inventory-partial",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training",
+    "training-boundary"
+  ],
+  "open_gaps": [
+    "inventory-authority"
+  ],
+  "seen_topics": [
+    "customer-returns",
+    "inventory",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "receiving",
+    "customer-returns",
+    "supplier-returns",
+    "picking",
+    "inventory-partial",
+    "training",
+    "training-boundary",
+    "training-boundary",
+    "shelving"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 5
+  },
+  "recent_employee_originals": [
+    "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。"
+  ],
+  "candidate": {
+    "actual_question": "接著了解每週循環盤點本身，先不談您已說不清楚的調帳與核准：盤點哪些品項或儲位通常由誰安排？您把清點結果記在哪裡，完成後交給誰？",
+    "employee_text": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。",
+    "fact_id": "inventory-authority",
+    "topic": "inventory",
+    "matched_cue": "盤點",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": null,
+    "closes_gap": "inventory-authority",
+    "correction": false
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "question_id": "8b92b938e825490e9fb7f9f9792772d3",
+  "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？\n\n關於你問的「或交接？」，我目前沒有確定資料，請保留未知，不補猜。",
+  "audit": {
+    "actual_question": "已依您確認的內容整理收貨點收、驗收與差異處理：逐箱核對品項、數量、外包裝和送貨單；有差異時拍照、登記收貨異常表並通知採購；依採購回覆補送或接受後登記入庫。您不負責議價、選擇供應商或決定拒收。是否再清點、主管是否另有後續回覆，則照您的說明保留為未知。\n\n接著想了解庫存盤點：盤點時您通常負責哪些事情？如果發現實際數量和記錄不一致，您會怎麼處理或交接？",
+    "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？\n\n關於你問的「或交接？」，我目前沒有確定資料，請保留未知，不補猜。",
+    "fact_ids": [
+      "inventory-partial"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "inventory-partial"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉問庫存盤點本人工作及帳實差異處理，首次可披露循環盤點流程與暫時想不起的後續權責。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [
+      "或交接？"
+    ],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "盤點時您通常負責哪些事情？",
+        "mode": "answer",
+        "fact_ids": [
+          "inventory-partial"
+        ],
+        "reason": "每週循環盤點、查入出庫與移庫紀錄及複點直接相關。"
+      },
+      {
+        "quote": "如果發現實際數量和記錄不一致，您會怎麼處理",
+        "mode": "answer",
+        "fact_ids": [
+          "inventory-partial"
+        ],
+        "reason": "已提供帳實差異的本人初步查核流程。"
+      },
+      {
+        "quote": "或交接？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "後續調帳、批准與交接权責當前尚未想起；training 未正式披露，不取得 inventory-authority。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

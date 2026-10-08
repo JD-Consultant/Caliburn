@@ -1,0 +1,620 @@
+{
+  "query": "物流中心倉庫管理員，負責收貨驗收、上架、揀貨補貨、庫存盤點與客戶退貨入庫",
+  "elapsed_seconds": 2.185104363998107,
+  "search": {
+    "references": [
+      {
+        "reference": {
+          "reference_id": "f4529284-13a2-5dd2-b53c-12a600be24b1",
+          "source_sha256": "3f24e03bb5268dcc0e93c715389b26dd3c6982c0622300e0d5e222870c6a5336",
+          "source_file": "apps/pdf-to-json/data/json-checked-2026-10-04/冷鏈倉儲物流人員-職能基準.json",
+          "ocs_code": "RLM4323-004v1",
+          "title": "冷鏈倉儲物流人員",
+          "overview": "依訂單需求進行理貨、包裝，及協助倉庫貨物進出與管理，並確保所有作業過程中貨品皆能保存於適當的溫度環境。",
+          "catalog_scope": "all_parsed_task_groups",
+          "units": [
+            {
+              "unit_id": "u1",
+              "code": "T1",
+              "name": "貨物進倉管理",
+              "tasks": [
+                {
+                  "task_id": "u1-t1",
+                  "names": [
+                    {
+                      "code": "T1.1",
+                      "name": "進倉準備工作"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t2",
+                  "names": [
+                    {
+                      "code": "T1.2",
+                      "name": "清點進倉貨件"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t3",
+                  "names": [
+                    {
+                      "code": "T1.3",
+                      "name": "貨件進倉"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u2",
+              "code": "T2",
+              "name": "管理存貨",
+              "tasks": [
+                {
+                  "task_id": "u2-t1",
+                  "names": [
+                    {
+                      "code": "T2.1",
+                      "name": "存倉貨件管理"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t2",
+                  "names": [
+                    {
+                      "code": "T2.2",
+                      "name": "貨件盤點"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u3",
+              "code": "T3",
+              "name": "執行揀貨與出貨",
+              "tasks": [
+                {
+                  "task_id": "u3-t1",
+                  "names": [
+                    {
+                      "code": "T3.1",
+                      "name": "貨物揀集"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t2",
+                  "names": [
+                    {
+                      "code": "T3.2",
+                      "name": "出貨作業"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u4",
+              "code": "T4",
+              "name": "退貨商品驗收",
+              "tasks": [
+                {
+                  "task_id": "u4-t1",
+                  "names": [
+                    {
+                      "code": "T4.1",
+                      "name": "退貨商品驗收"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            }
+          ]
+        },
+        "retrieval_evidence": {
+          "document_cosine": 0.6726645,
+          "task_cosine": 0.71255827,
+          "matched_task_ids": [
+            "u1-t1",
+            "u1-t3"
+          ],
+          "overview_matched": true,
+          "task_applicability": "not_evaluated"
+        },
+        "rerank_logit": 2.2265625
+      },
+      {
+        "reference": {
+          "reference_id": "41732404-bba6-5778-9acb-ffebdaa5c856",
+          "source_sha256": "be018293e553db474a75ce24243b01f61c3cbee17181b70687971d2e011af5ce",
+          "source_file": "apps/pdf-to-json/data/json-checked-2026-10-04/倉管專員-職能基準.json",
+          "ocs_code": "MMP4321-002v4",
+          "title": "倉管專員",
+          "overview": "執行商品盤點、補貨、寄貨、出貨等倉儲管理作業。",
+          "catalog_scope": "all_parsed_task_groups",
+          "units": [
+            {
+              "unit_id": "u1",
+              "code": "T1",
+              "name": "依規範確認產品及庫存",
+              "tasks": [
+                {
+                  "task_id": "u1-t1",
+                  "names": [
+                    {
+                      "code": "T1.1",
+                      "name": "確認與分類產品"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t2",
+                  "names": [
+                    {
+                      "code": "T1.2",
+                      "name": "依指示放置產品位置"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t3",
+                  "names": [
+                    {
+                      "code": "T1.3",
+                      "name": "協助相關人員解決存貨識別與定位問題"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t4",
+                  "names": [
+                    {
+                      "code": "T1.4",
+                      "name": "確認存貨轉移的適當性"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u2",
+              "code": "T2",
+              "name": "管理資產與設施設備的安全",
+              "tasks": [
+                {
+                  "task_id": "u2-t1",
+                  "names": [
+                    {
+                      "code": "T2.1",
+                      "name": "規劃與評估安全需求"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t2",
+                  "names": [
+                    {
+                      "code": "T2.2",
+                      "name": "監控並評估安全計畫"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u3",
+              "code": "T3",
+              "name": "維護倉儲紀錄的文件",
+              "tasks": [
+                {
+                  "task_id": "u3-t1",
+                  "names": [
+                    {
+                      "code": "T3.1",
+                      "name": "確認使用者要求的資訊"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u3-t2",
+                  "names": [
+                    {
+                      "code": "T3.2",
+                      "name": "完成倉儲紀錄"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            }
+          ]
+        },
+        "retrieval_evidence": {
+          "document_cosine": 0.6543651,
+          "task_cosine": 0.7880151,
+          "matched_task_ids": [
+            "u1-t3",
+            "u1-t4"
+          ],
+          "overview_matched": true,
+          "task_applicability": "not_evaluated"
+        },
+        "rerank_logit": 0.133544921875
+      },
+      {
+        "reference": {
+          "reference_id": "1badbbcc-0f2e-5f90-91a8-85f2372f2a16",
+          "source_sha256": "f52da0fe689aec1cbdba866536345d46340cbde26dc3cdab08e6411853350eef",
+          "source_file": "apps/pdf-to-json/data/json-checked-2026-10-04/電商物流中心理貨員-職能基準.json",
+          "ocs_code": "RLM9330-001v1",
+          "title": "電商物流中心理貨員",
+          "overview": "依電商平台訂單需求進行撿貨、理貨、包裝、出貨作業，並協助倉庫貨物進出與管理。",
+          "catalog_scope": "all_parsed_task_groups",
+          "units": [
+            {
+              "unit_id": "u1",
+              "code": "T1",
+              "name": "貨品進倉",
+              "tasks": [
+                {
+                  "task_id": "u1-t1",
+                  "names": [
+                    {
+                      "code": "T1.1",
+                      "name": "貨品進倉點收前置作業"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t2",
+                  "names": [
+                    {
+                      "code": "T1.2",
+                      "name": "清點進倉貨物"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u1-t3",
+                  "names": [
+                    {
+                      "code": "T1.3",
+                      "name": "準備貨物進倉"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u2",
+              "code": "T2",
+              "name": "管理存貨",
+              "tasks": [
+                {
+                  "task_id": "u2-t1",
+                  "names": [
+                    {
+                      "code": "T2.1",
+                      "name": "貨物上架"
+                    }
+                  ],
+                  "competency_block_count": 1
+                },
+                {
+                  "task_id": "u2-t2",
+                  "names": [
+                    {
+                      "code": "T2.2",
+                      "name": "貨物盤點"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u3",
+              "code": "T3",
+              "name": "撿集出貨",
+              "tasks": [
+                {
+                  "task_id": "u3-t1",
+                  "names": [
+                    {
+                      "code": "T3.1",
+                      "name": "貨物撿集出貨"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            },
+            {
+              "unit_id": "u4",
+              "code": "T4",
+              "name": "處理瑕疵商品",
+              "tasks": [
+                {
+                  "task_id": "u4-t1",
+                  "names": [
+                    {
+                      "code": "T4.1",
+                      "name": "處理瑕疵商品"
+                    }
+                  ],
+                  "competency_block_count": 1
+                }
+              ]
+            }
+          ]
+        },
+        "retrieval_evidence": {
+          "document_cosine": 0.7012826,
+          "task_cosine": 0.75718856,
+          "matched_task_ids": [
+            "u2-t2",
+            "u2-t1"
+          ],
+          "overview_matched": true,
+          "task_applicability": "not_evaluated"
+        },
+        "rerank_logit": 0.12646484375
+      }
+    ],
+    "retrieval_policy": {
+      "preprocessing": "ocs_top_body_v1",
+      "candidate_limit_per_route": 20,
+      "candidate_count": 30,
+      "search": "exact_dense_cosine",
+      "fusion": "full_union_before_rerank",
+      "embedding_model": "BAAI/bge-m3",
+      "embedding_dimensions": 1024,
+      "reranker_model": "BAAI/bge-reranker-v2-m3",
+      "reranker_revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e"
+    }
+  },
+  "fixed_reads": [
+    {
+      "reference_id": "f4529284-13a2-5dd2-b53c-12a600be24b1",
+      "task": {
+        "reference_id": "f4529284-13a2-5dd2-b53c-12a600be24b1",
+        "source_sha256": "3f24e03bb5268dcc0e93c715389b26dd3c6982c0622300e0d5e222870c6a5336",
+        "task_id": "u1-t1",
+        "unit_id": "u1",
+        "names": [
+          {
+            "code": "T1.1",
+            "name": "進倉準備工作"
+          }
+        ],
+        "competency_blocks": [
+          {
+            "competency_level": 3,
+            "outputs": [
+              {
+                "code": "O1.1.1",
+                "name": "入庫(驗收)單"
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "使用倉儲管理系統,確認當日進倉之客戶、貨品、數量、時間與溫層。"
+              },
+              {
+                "code": "P1.1.2",
+                "text": "將當日進倉資料進行彙整,依照棧板/車次/碼頭/貨櫃/貨運公司等資訊整理成對應的入庫(驗收)單。"
+              },
+              {
+                "code": "P1.1.3",
+                "text": "將入庫(驗收)單依照對應的棧板/車次/碼頭/貨櫃/貨運公司,分發至各集貨區域。"
+              },
+              {
+                "code": "P1.1.4",
+                "text": "準備接收貨物所需的相關工具和設備,如溫度計、標記器、防凍衣、冷藏/冷凍車、倉庫內部系統登記用之電子設備等。"
+              }
+            ],
+            "knowledge": [
+              {
+                "code": "K01",
+                "name": "貨品管理原則"
+              },
+              {
+                "code": "K02",
+                "name": "物流進貨流程"
+              },
+              {
+                "code": "K03",
+                "name": "基礎冷鏈管理知識"
+              },
+              {
+                "code": "K04",
+                "name": "基礎溫度控制系統運作原理"
+              }
+            ],
+            "skills": [
+              {
+                "code": "S01",
+                "name": "倉儲管理系統操作"
+              },
+              {
+                "code": "S02",
+                "name": "文件彙整能力"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "reference_id": "41732404-bba6-5778-9acb-ffebdaa5c856",
+      "task": {
+        "reference_id": "41732404-bba6-5778-9acb-ffebdaa5c856",
+        "source_sha256": "be018293e553db474a75ce24243b01f61c3cbee17181b70687971d2e011af5ce",
+        "task_id": "u1-t1",
+        "unit_id": "u1",
+        "names": [
+          {
+            "code": "T1.1",
+            "name": "確認與分類產品"
+          }
+        ],
+        "competency_blocks": [
+          {
+            "competency_level": 3,
+            "outputs": [],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "依工作程序及規範,確認產品數量、重量。"
+              },
+              {
+                "code": "P1.1.2",
+                "text": "依工作程序及規範,進行產品分類。"
+              }
+            ],
+            "knowledge": [
+              {
+                "code": "K01",
+                "name": "中央及地方相關法規"
+              },
+              {
+                "code": "K02",
+                "name": "組織政策相關作業程序與規範"
+              },
+              {
+                "code": "K03",
+                "name": "產品庫存相關作業程序及規範"
+              },
+              {
+                "code": "K04",
+                "name": "存貨管理及處理程序與法規"
+              },
+              {
+                "code": "K05",
+                "name": "相關物料使用程序與規範"
+              }
+            ],
+            "skills": [
+              {
+                "code": "S01",
+                "name": "倉管設施設備的使用能力"
+              },
+              {
+                "code": "S02",
+                "name": "倉管設施設備的維護能力"
+              },
+              {
+                "code": "S03",
+                "name": "讀寫能力"
+              },
+              {
+                "code": "S04",
+                "name": "文書處理能力"
+              },
+              {
+                "code": "S05",
+                "name": "資訊科技設備使用能力"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "reference_id": "1badbbcc-0f2e-5f90-91a8-85f2372f2a16",
+      "task": {
+        "reference_id": "1badbbcc-0f2e-5f90-91a8-85f2372f2a16",
+        "source_sha256": "f52da0fe689aec1cbdba866536345d46340cbde26dc3cdab08e6411853350eef",
+        "task_id": "u1-t1",
+        "unit_id": "u1",
+        "names": [
+          {
+            "code": "T1.1",
+            "name": "貨品進倉點收前置作業"
+          }
+        ],
+        "competency_blocks": [
+          {
+            "competency_level": 2,
+            "outputs": [
+              {
+                "code": "O1.1.1",
+                "name": "進倉點貨單"
+              }
+            ],
+            "indicators": [
+              {
+                "code": "P1.1.1",
+                "text": "使用倉儲管理系統,查詢當日進倉貨品單,並確保資料的準確性。"
+              },
+              {
+                "code": "P1.1.2",
+                "text": "將當日進倉貨品單進行彙整,依照棧板/車次/貨運公司等資訊整理成對應的點貨單。"
+              },
+              {
+                "code": "P1.1.3",
+                "text": "列印整理好的點貨單,確認所對應的棧板並分類。"
+              },
+              {
+                "code": "P1.1.4",
+                "text": "將點貨單依照對應的棧板,分發至各集貨區域。"
+              }
+            ],
+            "knowledge": [
+              {
+                "code": "K01",
+                "name": "貨品管理原則"
+              },
+              {
+                "code": "K02",
+                "name": "物流進貨流程"
+              },
+              {
+                "code": "K03",
+                "name": "職業安全衛生法相關規範"
+              }
+            ],
+            "skills": [
+              {
+                "code": "S01",
+                "name": "倉儲管理系統操作"
+              },
+              {
+                "code": "S02",
+                "name": "文件彙整能力"
+              },
+              {
+                "code": "S03",
+                "name": "資訊科技應用能力"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "invalid_target_status": 404
+}

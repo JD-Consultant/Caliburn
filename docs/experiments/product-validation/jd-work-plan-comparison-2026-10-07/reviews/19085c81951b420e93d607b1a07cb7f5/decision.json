@@ -1,0 +1,26 @@
+{
+  "question_id": "19085c81951b420e93d607b1a07cb7f5",
+  "mode": "answer",
+  "fact_ids": [
+    "inventory-partial"
+  ],
+  "reason": "實際轉問通常的庫存盤點安排及本人工作，inventory-partial 的每週循環盤點與查核／複點流程直接相關，可首次披露。",
+  "subquestions": [
+    {
+      "quote": "通常盤點怎麼安排",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-partial"
+      ],
+      "reason": "每週循環盤點是凍結的日常盤點安排。"
+    },
+    {
+      "quote": "您本人實際會做哪些工作？",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-partial"
+      ],
+      "reason": "先查最近入出庫與移庫紀錄再複點，直接回應本人工作；原回答保留後續權責暫時缺口及換題意願。"
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "arm": "old",
+  "case_id": "warehouse_load",
+  "job_file_id": "c535989c-3594-4ee3-9f4c-8c677f23b7e0",
+  "before": {
+    "profile": {
+      "revision_id": "251e968c-c4bb-48f6-bc2f-bfc1f6ca1b41",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "完成收貨上架及指定盤點，維持貨物和入庫紀錄可追查。"
+      }
+    },
+    "work": {
+      "revision_id": "251e968c-c4bb-48f6-bc2f-bfc1f6ca1b41",
+      "areas": [
+        {
+          "area_id": "2a59ca47-a5b8-4984-afde-45f085fdb3db",
+          "title": "收貨與庫存核對",
+          "scope_text": "收貨上架及依不同周期盤點。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "88efcea4-c6b0-45c7-abc9-071ca470924e",
+          "area_id": "2a59ca47-a5b8-4984-afde-45f085fdb3db",
+          "title": "收貨驗收與上架",
+          "description": "核對單據和實貨，差異拍照通知採購並回報主管，由採購決定收退；符合才依安排上架、貼標籤及登記。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "8f4e6aeb-ee5c-4f99-9927-f84a6432484d",
+          "area_id": "2a59ca47-a5b8-4984-afde-45f085fdb3db",
+          "title": "配合庫存盤點",
+          "description": "下班前複點高異動商品；月底點本人區域，十二月配合財務全倉盤點，結果交主管。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "251e968c-c4bb-48f6-bc2f-bfc1f6ca1b41",
+      "references": [
+        {
+          "citation_id": "18219610-47bd-475c-a89a-f7910aac292d",
+          "target_label": "任務：收貨驗收與上架",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "88efcea4-c6b0-45c7-abc9-071ca470924e",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "368a2549-6295-431b-9be0-7e676d3b07c6",
+          "target_label": "任務：配合庫存盤點",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "8f4e6aeb-ee5c-4f99-9927-f84a6432484d",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "9cbb28c6-0357-4657-a8a2-bb8096975faa",
+      "exchange": {
+        "employee_input": {
+          "source_id": "3a1a65d4-03a3-4eaa-b742-808bd32de0f5",
+          "interview_sequence": 8,
+          "speaker": "employee",
+          "interview_text": "正常做法、差異分工和目前工作範圍都說過了，我現在想不到其他要補的。你還需要了解什麼嗎？"
+        },
+        "consultant_reply": {
+          "source_id": "d73e93d1-e789-4ea2-80be-bad6b8522e46",
+          "interview_sequence": 9,
+          "speaker": "consultant",
+          "interview_text": "主要工作範圍目前不用再補新的職責。我已先把收貨入庫與庫存盤點分開整理，並補上差異貨物的交接界線、不同盤點週期及相關協作對象。\n\n還有一項可能影響工作要求的細節想確認：上架搬運通常是手搬、用推車，還是操作設備？若涉及較重貨物或設備，有沒有需要遵守的限制或資格要求？"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 357160,
+    "output_tokens": 18309,
+    "reasoning_tokens": 13596,
+    "cached_input_tokens": 311251,
+    "cache_write_input_tokens": 45837,
+    "total_tokens": 375469,
+    "outbound_calls": 48,
+    "count_calls": 24,
+    "generation_calls": 24,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 357160,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0024",
+    "actual_estimated_usd": "0.018003835",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.020403835",
+    "cumulative_occupied_usd": "0.020403835",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 249.31954550000228,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 461838,
+    "output_tokens": 23561,
+    "reasoning_tokens": 17339,
+    "cached_input_tokens": 409862,
+    "cache_write_input_tokens": 51883,
+    "total_tokens": 485399,
+    "outbound_calls": 62,
+    "count_calls": 31,
+    "generation_calls": 31,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 461838,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0031",
+    "actual_estimated_usd": "0.022373795",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.025473795",
+    "cumulative_occupied_usd": "0.025473795",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 320.2138166000004,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

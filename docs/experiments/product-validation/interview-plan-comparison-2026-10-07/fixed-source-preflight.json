@@ -1,0 +1,22 @@
+{
+  "credential_read": false,
+  "provider_calls": 0,
+  "results": [
+    {
+      "case": "warehouse-r1-P1",
+      "revision_id": "cdf9c567-75b0-4229-b4e9-ccb7665b7c55",
+      "fixed_entries": 22,
+      "content_types": [
+        "interview"
+      ]
+    },
+    {
+      "case": "warehouse-r1-P2",
+      "revision_id": "3323cf20-b7c8-48a9-a9cc-9e489a9bf51b",
+      "fixed_entries": 28,
+      "content_types": [
+        "interview"
+      ]
+    }
+  ]
+}

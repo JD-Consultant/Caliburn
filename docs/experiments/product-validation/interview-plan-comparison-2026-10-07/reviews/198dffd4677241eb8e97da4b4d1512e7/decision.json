@@ -1,0 +1,8 @@
+{
+  "question_id": "198dffd4677241eb8e97da4b4d1512e7",
+  "fact_ids": ["receiving"],
+  "mode": "answer",
+  "reason": "這個 fresh case 實際問一般收貨核對項目與差異後誰回覆下一步，receiving 的品項、數量、外包裝、送貨單及採購回覆流程可答。差異貨物通知採購後、等回覆前的實物先處理方式沒有固定資料，不用一般 shelving 代答；不沿用其他 case 的已披露 state。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": ["貨物通常先怎麼處理"]
+}

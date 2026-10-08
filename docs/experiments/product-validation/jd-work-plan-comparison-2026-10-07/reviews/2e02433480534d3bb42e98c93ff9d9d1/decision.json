@@ -1,0 +1,26 @@
+{
+  "question_id": "2e02433480534d3bb42e98c93ff9d9d1",
+  "mode": "answer",
+  "fact_ids": [
+    "receiving"
+  ],
+  "reason": "追問收貨數量差異通知採購後的處理權責與本人後續記錄，與收貨異常凍結事實直接相關。",
+  "subquestions": [
+    {
+      "quote": "您通知採購後，通常由誰決定後續怎麼處理？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "凍結事實載明採購回覆補送或接受，本人依结果登記入庫且不決定拒收。"
+    },
+    {
+      "quote": "您這邊還會追蹤或記錄到什麼狀態，才算完成這次差異查核？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "有差異照片、收貨異常表與收到採購結果後登記入庫的本人後續工作，能回應查核後處理終點。"
+    }
+  ]
+}

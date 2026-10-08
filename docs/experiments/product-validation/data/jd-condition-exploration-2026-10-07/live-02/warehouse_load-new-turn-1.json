@@ -1,0 +1,17 @@
+{
+  "execution_id": "7d365df3-3e85-480f-92e1-16ec70cfdd01",
+  "exchange": {
+    "employee_input": {
+      "source_id": "4901a63b-af1b-43f4-a3e0-86f0ab9377d7",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "發現差異先通知採購和主管，有差異的貨先留著等決定，我不決定收退；再怎麼處理要等他們安排。我主要就是前面說的收貨上架和盤點，沒有其他工作。"
+    },
+    "consultant_reply": {
+      "source_id": "4caf0f5f-adb2-4db0-94fb-775adaec2cfb",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "了解，您目前主要就是**收貨上架**和**依不同週期配合盤點**，沒有其他工作需要補列。我已在底稿中補上：差異貨先留置，收退由採購決定，後續依採購或主管安排；盤點結果交主管，且各項盤點並非每天都做。\n\n就目前的工作內容，不需要再為了補資料硬想其他項目。"
+    }
+  }
+}

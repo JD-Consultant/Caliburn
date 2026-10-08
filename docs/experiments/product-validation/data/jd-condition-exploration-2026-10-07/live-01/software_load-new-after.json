@@ -1,0 +1,55 @@
+{
+  "profile": {
+    "revision_id": "90d36d23-2b8d-46cc-a2c8-cfa1de9f6e7d",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "處理已回報的網站前端問題，供測試驗證及客服追蹤。"
+    }
+  },
+  "work": {
+    "revision_id": "90d36d23-2b8d-46cc-a2c8-cfa1de9f6e7d",
+    "areas": [
+      {
+        "area_id": "cc8f1b92-fa31-408d-a7f8-fb97511cbe58",
+        "title": "網站前端維護",
+        "scope_text": "重現、修正及回報前端問題，後端由同事負責。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "a0206acc-8953-481e-8bde-886eca964719",
+        "area_id": "cc8f1b92-fa31-408d-a7f8-fb97511cbe58",
+        "title": "處理前端問題單",
+        "description": "依客服資料重現並修正前端問題，十二小時內回覆初判而非保證修好；後端交同事，測試同事驗證、產品主管決定發布，結果回報客服。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "90d36d23-2b8d-46cc-a2c8-cfa1de9f6e7d",
+    "references": [
+      {
+        "citation_id": "9311144e-f4bd-4c72-bbf5-6fc7ea8d4885",
+        "target_label": "任務：處理前端問題單",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "a0206acc-8953-481e-8bde-886eca964719",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

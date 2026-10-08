@@ -1,0 +1,78 @@
+{
+  "profile": {
+    "revision_id": "694ac4c9-07de-47d9-8a98-e3d0164cbc6c",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "完成收貨上架及指定盤點，維持貨物和入庫紀錄可追查。"
+    }
+  },
+  "work": {
+    "revision_id": "694ac4c9-07de-47d9-8a98-e3d0164cbc6c",
+    "areas": [
+      {
+        "area_id": "5d2cecf7-68b2-4b50-a386-bdfa40bb895d",
+        "title": "收貨與庫存核對",
+        "scope_text": "收貨上架及依不同周期盤點。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "25a08c3d-ba16-44b5-834c-a5dcaae33883",
+        "area_id": "5d2cecf7-68b2-4b50-a386-bdfa40bb895d",
+        "title": "收貨驗收與上架",
+        "description": "核對單據和實貨，差異拍照通知採購並回報主管，由採購決定收退；符合才依安排上架、貼標籤及登記。",
+        "outcomes": [],
+        "requirements": []
+      },
+      {
+        "task_id": "f46ae730-5bef-4f5d-9664-715c16bfc0c4",
+        "area_id": "5d2cecf7-68b2-4b50-a386-bdfa40bb895d",
+        "title": "配合庫存盤點",
+        "description": "下班前複點高異動商品；月底點本人區域，十二月配合財務全倉盤點，結果交主管。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "694ac4c9-07de-47d9-8a98-e3d0164cbc6c",
+    "references": [
+      {
+        "citation_id": "f35f8de4-bb83-430f-8c1c-ad33664db677",
+        "target_label": "任務：收貨驗收與上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "25a08c3d-ba16-44b5-834c-a5dcaae33883",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "74176a07-0671-47ec-94f5-279e3e313403",
+        "target_label": "任務：配合庫存盤點",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "f46ae730-5bef-4f5d-9664-715c16bfc0c4",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

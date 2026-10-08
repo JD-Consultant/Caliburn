@@ -1,0 +1,4897 @@
+{
+  "inventory_sha256": "40cf2d4f6bb4e0c9738b5c40808b63a7cbf4acab43224b57189072014e87e020",
+  "scope": "鎖定公開機會的有限過程稽核，不重評整份JD。",
+  "witnesses": {
+    "P1": {
+      "transcript": "formal/warehouse-r1-P1/formal-interviews.json",
+      "provider_trace": "formal/warehouse-r1-P1/provider-trace.jsonl",
+      "consultant_replies": [
+        {
+          "turn": 6,
+          "source_id": "bf31dbb4-99d7-4153-9560-0fec300dc225",
+          "interview_sequence": 13,
+          "text": "我已補上帶教內容：新人第一週由您示範掃碼、揀貨和安全動線，再跟著操作；您會現場檢查並記錄漏掃、批號錯誤或走進車道等情況，也會判斷新人能否獨立上線。\n\n您剛才說現在想起一些盤點後續，可以從複點後仍有差異時說起：您會把差異記在哪裡、交給誰？後續調帳由誰處理或批准？只說您現在確定的部分即可。"
+        },
+        {
+          "turn": 7,
+          "source_id": "cedd0821-2a27-400e-a16a-583ac91f1918",
+          "interview_sequence": 15,
+          "text": "盤點差異的流程已補進底稿：您把查核內容記在盤點差異表並交倉儲主管核准，由主管交財務調帳；您不直接修改庫存，並在結案前核對更新後的數量。若找不到原因，就保留待查。\n\n接著想了解客戶退貨。能否用最近一次為例，說說退貨送回後您實際處理哪些事，最後交給誰？"
+        },
+        {
+          "turn": 9,
+          "source_id": "a15b5203-9a6a-418d-a052-702bf06028f1",
+          "interview_sequence": 19,
+          "text": "已把供應商退貨更正為「退貨出庫」：退哪些貨由採購決定，您依退貨單備貨、核數量、拍照、登記出庫，交承運商簽收後把簽收資料回傳採購；您不辦理退貨入庫，也不決定退貨條件。我也把客戶退貨與供應商退貨的流程分別整理，避免混為一談。\n\n您帶新人時會判斷對方能否獨立上線；這個判斷由您直接決定，還是需要主管確認？"
+        },
+        {
+          "turn": 10,
+          "source_id": "93adf746-2ae0-4bc2-adec-811ad22d4f93",
+          "interview_sequence": 21,
+          "text": "我已把帶教權責修正為：您觀察新人操作並向組長回報；首次漏掃時讓新人重做並解釋原因，反覆出錯則由組長安排再訓練。新人能否獨立上線由主管核准，您不負責批准。\n\n接著想補清楚補貨流程：揀貨區不足時，您從備貨區補貨後，還需要掃碼或登記移庫嗎？如果需要，您負責到哪一步？"
+        },
+        {
+          "turn": 12,
+          "source_id": "af585d74-1c15-49ac-9c64-e4ac3b450608",
+          "interview_sequence": 25,
+          "text": "我已把上架流程補進底稿：依規劃儲位放貨、貼品項和批號標籤，以 WMS 掃碼登記並確認實物與系統儲位一致；位置不足時找組長調整，您不自行更改儲位規則。常溫貨使用棧板車，超重貨由持證同事操作堆高機。\n\n想再確認搬運範圍：常溫貨用棧板車時，通常是您親自推運貨品嗎？"
+        },
+        {
+          "turn": 14,
+          "source_id": "7ede7ce6-a7b0-42e7-9462-ff22236f28a3",
+          "interview_sequence": 29,
+          "text": "我已補上旺季揀貨要求：雙十一和春節前出貨量約為平日兩倍，依組長安排的急單與波次調整順序，先回報人力和缺貨瓶頸，但不省略批號、效期核對。晚班未完成波次、缺貨和隔離貨位置也已另列為交接工作，並記錄在交班表。\n\n旺季時，您先回報人力和缺貨瓶頸通常是向誰回報？"
+        },
+        {
+          "turn": 16,
+          "source_id": "073e4601-0ceb-4fd9-a4c4-6ce512ad22ee",
+          "interview_sequence": 33,
+          "text": "我已把冷藏作業列為獨立工作：冷藏食品約佔兩成，作業區為 2–8°C，需穿防寒衣並每天早晚查看溫度表；超標時隔離受影響批次、記錄時間與溫度並通知主管和品保，是否能出貨由品保決定。年度全倉盤點也已另列為庫存工作，記下每年十二月配合財務，以及事前整理儲位和待處理單據。年度分區責任和財務表單細節則保留未知。\n\n您提到每天早晚都查看溫度表，這兩次都是由您本人負責嗎？還是會依班別分工？"
+        },
+        {
+          "turn": 18,
+          "source_id": "ab16e303-46cd-48b9-89be-5e1d522d0be5",
+          "interview_sequence": 37,
+          "text": "好，您是否輪值晚班先保留未知，不推測。\n\n目前底稿已涵蓋收貨驗收與 WMS 上架、揀貨與補貨、每週循環盤點及十二月年度盤點、客戶退貨與供應商退貨出庫、新人帶教、班別交接，以及冷藏區溫控。像是拒收與退貨條件、庫存調帳、冷藏貨出貨放行及新人上線核准等責任界線，也依您說明的決策權責整理了。\n\n補貨後是否登記移庫、旺季瓶頸回報對象、年度盤點的分區與表單細節，以及您是否輪值晚班或負責早晚兩次溫度檢查，目前都先保留未確認。您可以核對目前底稿：若有工作漏寫或哪段描述不準確，告訴我需要更正的部分即可。"
+        },
+        {
+          "turn": 20,
+          "source_id": "6d5ed130-a662-4262-b3f1-c17c30b39b70",
+          "interview_sequence": 41,
+          "text": "本輪職務說明書已整理完成並提交。已核對職稱、單位、匯報關係、職務目的、六類職責、任務成果與要求、知識技能、協作對象及工時條件；並修正兩處避免推定：冷藏區每日早晚查看溫度表不等於兩次都由您負責，班別交接也不代表您必定輪值晚班。另補列揀貨後交包裝區複核的協作關係。\n\n## 職務基本資料\n\n- **職稱：**倉庫管理員\n- **單位：**物流中心\n- **匯報對象：**倉儲主管\n- **職務目的：**執行物流中心收貨、上架、揀貨補貨、盤點與退貨，並配合冷藏溫控、班別交接及新人帶教，維持貨物流轉與庫存作業的準確順暢。\n- **工時：**早上七點上班，週一到週六輪休。\n\n## 主要職責與工作\n\n1. **收貨與入庫：**逐箱核對品項、數量、外包裝及單據；差異拍照、登記異常表並通知採購，依採購回覆登記入庫。依規劃儲位上架、貼標並掃碼登記 WMS、核對實物與系統儲位；位置不足時請組長協調。本人不議價、不選供應商，也不決定拒收或退換貨。\n2. **揀貨、補貨與庫存：**依波次單揀貨，核對品項、數量、批號及效期，截單前交包裝區複核；揀貨區不足時從備貨區補貨。系統有貨但儲位空缺時查移庫及前一波次，不擅自換批號，異常交組長協調。雙十一及春節前出貨約為平日兩倍，依組長安排調整順序，但不省略批號、效期核對。每週循環盤點；差異查紀錄、複點並填表，交倉儲主管核准後由財務調帳，本人不直接改庫存，結案前核對更新數量；找不到原因則保留待查。每年十二月配合財務做全倉盤點，事前整理儲位及待處理單據。\n3. **退貨作業：**客戶退貨依客服退貨單核對、拍照並按既定規則分類；無單或商品不符時先隔離並交客服確認，可再上架商品掃碼入庫，待檢商品交品保並留存交接紀錄；本人不決定退款。供應商退貨僅辦理出庫：依採購退貨單備貨、核數、拍照、登記出庫，交承運商簽收並回傳採購；本人不決定退貨品項或條件，也不辦理供應商退貨入庫。\n4. **新人帶教：**新人第一週示範掃碼、揀貨及安全動線，觀察跟做並記錄檢核結果、向組長回報；首次漏掃時讓新人重做並解釋，反覆錯誤交組長安排再訓練。新人是否能獨立上線由主管核准。\n5. **班別交接：**整理未完成波次、缺貨及隔離貨位置，填寫交班表。\n6. **冷藏貨品溫控：**冷藏食品約佔全倉兩成，於 2–8°C 區作業並穿防寒衣；冷藏區溫度表每日早晚查看。超標時隔離受影響批次、記錄時間與溫度並通知主管及品保；能否出貨由品保決定，本人不自行放行。\n\n## 知識、技能與協作\n\n- **所需知識：**冷藏食品溫度與超標處置規則。\n- **主要技能：**核對進貨單據與實收數量、依規劃儲位上架並核對 WMS、依波次揀貨及查核儲位差異、查核盤點差異、示範並檢核新人操作、檢查分類客戶退貨、辦理供應商退貨出庫交接、監測冷藏溫度及處理超標批次。\n- **協作對象：**客服、品保、採購、承運商、組長、主管、持堆高機證照的同事、財務及包裝區；各自的確認、核准、複核或交接範圍已依實際分工列入底稿。\n\n## 尚未確認，未補猜\n\n- 收貨時發現外包裝破損或異常的具體處理方式。\n- 多項商品同時待補時的優先順序，以及補貨後是否需掃碼或登記移庫；您是否親自推棧板車也未確認。\n- 年度盤點的分區責任及財務表單細節。\n- 旺季人力與缺貨瓶頸通常向誰回報。\n- 冷藏區早、晚兩次溫度檢查由誰負責，是否按班別分工。\n- 班別交接與您早上七點上班、週一到週六輪休的關係，以及您是否輪值晚班。\n\n今天先到這裡；上述未確認項目已保留在職務說明書的整理範圍內，沒有當作已確認職責或要求。"
+        }
+      ],
+      "selected_calls": [
+        {
+          "turn": 6,
+          "name": "read_jd",
+          "call_id": "call_kQB0eTSezegvMWh0DBIGsn3G",
+          "received_trace_line": 136,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_13"
+          },
+          "result_trace_line": 138,
+          "result_prefix": "{\"read_ref\":\"task_13\",\"kind\":\"work_task\",\"title\":\"帶領新人\",\"description\":null,\"outcomes\":[],\"requirements\":[],\"required_knowledge\":[],\"required_skills\":[],\"supporting_sources\":[{\"cita"
+        },
+        {
+          "turn": 6,
+          "name": "read_jd_changes",
+          "call_id": "call_jJmgXCqpGPI7oYsBVhlJqKCb",
+          "received_trace_line": 139,
+          "arguments": {
+            "query": {
+              "kind": "manual",
+              "scope": {
+                "kind": "item",
+                "read_ref": "task_13"
+              }
+            }
+          },
+          "result_trace_line": 141,
+          "result_prefix": "## JD 人工差異\n比較：上一成功 A 正式 JD → 本 Turn 起點正式 JD。\n只讀；未確認內容，也未解除來源待核對。本 Turn 候選修改不在此範圍。\n本範圍人工操作：0\n沒有人工操作。\n### 淨差異\n淨差異：無。"
+        },
+        {
+          "turn": 6,
+          "name": "revise_jd_item",
+          "call_id": "call_G8JXMqA8l0PQJkqjPwMcqwis",
+          "received_trace_line": 142,
+          "arguments": {
+            "read_ref": "task_13",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "新人第一週示範掃碼、揀貨與安全動線，再讓新人跟著操作；現場觀察是否漏掃、拿錯批號或走進車道，記錄於帶教檢核表，並判斷新人能否獨立上線。"
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "在帶教檢核表記錄新人的作業與安全觀察，並形成其能否獨立上線的判斷。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "skill_66",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_35"
+              }
+            ]
+          },
+          "result_trace_line": 144,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 7,
+          "name": "read_jd",
+          "call_id": "call_Nj3lwtmlXbekyJ0uWy1P1wi5",
+          "received_trace_line": 173,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_10"
+          },
+          "result_trace_line": 175,
+          "result_prefix": "{\"read_ref\":\"task_10\",\"kind\":\"work_task\",\"title\":\"庫存盤點\",\"description\":\"進行庫存循環盤點；發現數量差異時，查最近的入庫、出庫與移庫紀錄，再複點。\",\"outcomes\":[],\"requirements\":[{\"read_ref\":\"requirement_65\",\"text\":\"每週進行"
+        },
+        {
+          "turn": 7,
+          "name": "revise_jd_item",
+          "call_id": "call_3tccTT760ukzCdVK4CQjtP4d",
+          "received_trace_line": 187,
+          "arguments": {
+            "read_ref": "task_10",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "每週進行循環盤點；差異時查近期入庫、出庫與移庫紀錄後複點，將差異、查過的單據及原因記在盤點差異表，交倉儲主管核准。主管交財務調帳後，於結案前核對更新後數量。"
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "完成盤點差異表並提交倉儲主管核准。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "財務調帳後，於結案前核對更新後的庫存數量。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "本人不直接更改庫存數量；由倉儲主管核准並交財務調帳。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "找不到差異原因時保留待查。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 191,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 7,
+          "name": "read_jd",
+          "call_id": "call_8a3h3CSaJm8ESidi7wql3UQ7",
+          "received_trace_line": 187,
+          "arguments": {
+            "view": "item",
+            "read_ref": "skill_60"
+          },
+          "result_trace_line": 191,
+          "result_prefix": "{\"read_ref\":\"skill_60\",\"kind\":\"skill\",\"name\":\"查核盤點差異\",\"description\":\"盤點數量不一致時，查閱近期入庫、出庫及移庫紀錄，並重新複點。\",\"used_by_tasks\":[{\"read_ref\":\"task_10\",\"title\":\"庫存盤點\",\"supporting_sources\":[{\"c"
+        },
+        {
+          "turn": 7,
+          "name": "read_jd",
+          "call_id": "call_rHuIQ08bMBpZLsGKvCD6NR9f",
+          "received_trace_line": 195,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_10"
+          },
+          "result_trace_line": 197,
+          "result_prefix": "{\"read_ref\":\"task_10\",\"kind\":\"work_task\",\"title\":\"庫存盤點\",\"description\":\"每週進行循環盤點；差異時查近期入庫、出庫與移庫紀錄後複點，將差異、查過的單據及原因記在盤點差異表，交倉儲主管核准。主管交財務調帳後，於結案前核對更新後數量。\",\"outcomes\":[{\"read_ref\":\"outc"
+        },
+        {
+          "turn": 7,
+          "name": "revise_jd_item",
+          "call_id": "call_ppw0WQkJztucRRE9crT25vlG",
+          "received_trace_line": 195,
+          "arguments": {
+            "read_ref": "skill_60",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "查閱近期入庫、出庫及移庫紀錄並複點，整理差異與查核資訊；財務調帳後核對更新數量。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 197,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 7,
+          "name": "revise_jd_item",
+          "call_id": "call_QPCgsIku2wGuLlJp1hhD9Nuv",
+          "received_trace_line": 198,
+          "arguments": {
+            "read_ref": "task_10",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_34"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_64"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_60"
+                },
+                "citation_ref": "citation_62"
+              }
+            ]
+          },
+          "result_trace_line": 200,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 9,
+          "name": "read_jd",
+          "call_id": "call_b1RBi1zU8iArua7xhIhOZQ1a",
+          "received_trace_line": 246,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_12"
+          },
+          "result_trace_line": 248,
+          "result_prefix": "{\"read_ref\":\"task_12\",\"kind\":\"work_task\",\"title\":\"處理供應商退貨\",\"description\":null,\"outcomes\":[],\"requirements\":[],\"required_knowledge\":[],\"required_skills\":[],\"supporting_sources\":[{\"c"
+        },
+        {
+          "turn": 9,
+          "name": "read_jd",
+          "call_id": "call_7UkgpoaA1CLMw6QTsCEt58y0",
+          "received_trace_line": 246,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_3"
+          },
+          "result_trace_line": 248,
+          "result_prefix": "{\"read_ref\":\"area_3\",\"kind\":\"responsibility_area\",\"title\":\"退貨作業\",\"scope_text\":\"處理客戶退貨及供應商退貨；拒收或退換貨決策權不在本人。\",\"supporting_sources\":[{\"citation_ref\":\"citation_40\",\"kind\":\"interview\",\""
+        },
+        {
+          "turn": 9,
+          "name": "read_jd",
+          "call_id": "call_ybeTe0ShtDK6SSbEXdLrwYc1",
+          "received_trace_line": 246,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_1"
+          },
+          "result_trace_line": 248,
+          "result_prefix": "{\"read_ref\":\"area_1\",\"kind\":\"responsibility_area\",\"title\":\"收貨與入庫\",\"scope_text\":\"負責進貨驗收及貨品上架；數量差異的查核與後續處置權限仍需釐清。\",\"supporting_sources\":[{\"citation_ref\":\"citation_30\",\"kind\":\"intervi"
+        },
+        {
+          "turn": 9,
+          "name": "read_jd",
+          "call_id": "call_iy1vcvwCSThKpF4mcX9Hvb25",
+          "received_trace_line": 246,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 248,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_83\",\"kind\":\"collaborator\",\"name\":\"客服\",\"scope_text\":\"客戶退貨無退貨單或商品與單據不符時，交客服確認。\",\"supporting_sources\":[{\"citation_ref\":\"citation_85\",\"kind\":\"interv"
+        },
+        {
+          "turn": 9,
+          "name": "read_jd_changes",
+          "call_id": "call_CDdg7DYyEufT1qAL8aiiYQlB",
+          "received_trace_line": 256,
+          "arguments": {
+            "query": {
+              "kind": "manual",
+              "scope": {
+                "kind": "item",
+                "read_ref": "task_12"
+              }
+            }
+          },
+          "result_trace_line": 258,
+          "result_prefix": "## JD 人工差異\n比較：上一成功 A 正式 JD → 本 Turn 起點正式 JD。\n只讀；未確認內容，也未解除來源待核對。本 Turn 候選修改不在此範圍。\n本範圍人工操作：0\n沒有人工操作。\n### 淨差異\n淨差異：無。"
+        },
+        {
+          "turn": 9,
+          "name": "read_jd_changes",
+          "call_id": "call_gZdwExqyAWytagEVQl3cZyAD",
+          "received_trace_line": 256,
+          "arguments": {
+            "query": {
+              "kind": "manual",
+              "scope": {
+                "kind": "item",
+                "read_ref": "area_3"
+              }
+            }
+          },
+          "result_trace_line": 258,
+          "result_prefix": "## JD 人工差異\n比較：上一成功 A 正式 JD → 本 Turn 起點正式 JD。\n只讀；未確認內容，也未解除來源待核對。本 Turn 候選修改不在此範圍。\n本範圍人工操作：0\n沒有人工操作。\n### 淨差異\n淨差異：無。"
+        },
+        {
+          "turn": 9,
+          "name": "read_jd_changes",
+          "call_id": "call_f17Kku22mqxzlYt099e2Xgc0",
+          "received_trace_line": 256,
+          "arguments": {
+            "query": {
+              "kind": "manual",
+              "scope": {
+                "kind": "item",
+                "read_ref": "area_1"
+              }
+            }
+          },
+          "result_trace_line": 258,
+          "result_prefix": "## JD 人工差異\n比較：上一成功 A 正式 JD → 本 Turn 起點正式 JD。\n只讀；未確認內容，也未解除來源待核對。本 Turn 候選修改不在此範圍。\n本範圍人工操作：0\n沒有人工操作。\n### 淨差異\n淨差異：無。"
+        },
+        {
+          "turn": 9,
+          "name": "create_jd_item",
+          "call_id": "call_pv6Qo75rj4UoXxUyXbsGYJRR",
+          "received_trace_line": 256,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "採購",
+              "scope_text": "決定供應商退貨品項，接收員工回傳的承運商簽收資料。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 258,
+          "result_prefix": "created · read_ref: collaborator_99"
+        },
+        {
+          "turn": 9,
+          "name": "create_jd_item",
+          "call_id": "call_sKeW7ldqHvAz1RgphgElKzXN",
+          "received_trace_line": 256,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "承運商",
+              "scope_text": "承接供應商退貨貨品並簽收。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 258,
+          "result_prefix": "created · read_ref: collaborator_100"
+        },
+        {
+          "turn": 9,
+          "name": "revise_jd_item",
+          "call_id": "call_gGPlY3DU80nvtauufn4Wmu8I",
+          "received_trace_line": 271,
+          "arguments": {
+            "read_ref": "task_12",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "title",
+                "value": "辦理供應商退貨出庫"
+              },
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "依採購退貨單備貨、核對數量，拍照並登記出庫；交承運商簽收後，將簽收資料回傳採購。供應商退貨由出庫端處理，不辦理退貨入庫；退貨品項由採購決定，本人不決定退貨條件。"
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "按退貨單備妥貨品、核對數量、拍照並登記出庫。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "將貨品交承運商簽收，並把簽收資料回傳採購。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "供應商退貨由本人辦理出庫，不辦理退貨入庫；退貨品項由採購決定，本人不決定退貨條件。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "skill_98",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_26"
+              }
+            ]
+          },
+          "result_trace_line": 273,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 9,
+          "name": "revise_jd_item",
+          "call_id": "call_jbw0P7fetIWhH5fi2zQcPtws",
+          "received_trace_line": 271,
+          "arguments": {
+            "read_ref": "area_3",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "涵蓋客戶退貨的檢查、分類、入庫、隔離與交接，以及依採購決定辦理供應商退貨出庫；本人不決定客戶退款或供應商退貨條件。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "interview",
+                  "interview_sequence": 16
+                }
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_40"
+              }
+            ]
+          },
+          "result_trace_line": 273,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 9,
+          "name": "revise_jd_item",
+          "call_id": "call_uFAMA57GE6500XK32PSVSJYr",
+          "received_trace_line": 271,
+          "arguments": {
+            "read_ref": "area_1",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "負責進貨驗收與上架；查核數量差異並通報採購，依採購回覆登記入庫；拒收或退換貨不由本人決定。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "interview",
+                  "interview_sequence": 4
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_30"
+              }
+            ]
+          },
+          "result_trace_line": 273,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 10,
+          "name": "read_jd",
+          "call_id": "call_AuZp3zIPblDcNqh8LEbiUbC5",
+          "received_trace_line": 305,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_13"
+          },
+          "result_trace_line": 309,
+          "result_prefix": "{\"read_ref\":\"task_13\",\"kind\":\"work_task\",\"title\":\"帶領新人\",\"description\":\"新人第一週示範掃碼、揀貨與安全動線，再讓新人跟著操作；現場觀察是否漏掃、拿錯批號或走進車道，記錄於帶教檢核表，並判斷新人能否獨立上線。\",\"outcomes\":[{\"read_ref\":\"outcome_81\",\"te"
+        },
+        {
+          "turn": 10,
+          "name": "read_jd",
+          "call_id": "call_tWGdVdIzyukjXPjZ9zqVmW2n",
+          "received_trace_line": 305,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_4"
+          },
+          "result_trace_line": 309,
+          "result_prefix": "{\"read_ref\":\"area_4\",\"kind\":\"responsibility_area\",\"title\":\"新人帶教\",\"scope_text\":\"帶領新人；具體教學內容與責任範圍待了解。\",\"supporting_sources\":[{\"citation_ref\":\"citation_24\",\"kind\":\"interview\",\"intervi"
+        },
+        {
+          "turn": 10,
+          "name": "read_jd",
+          "call_id": "call_MQ6XpcEYuBImx5p5soXUjwac",
+          "received_trace_line": 313,
+          "arguments": {
+            "view": "item",
+            "read_ref": "skill_66"
+          },
+          "result_trace_line": 316,
+          "result_prefix": "{\"read_ref\":\"skill_66\",\"kind\":\"skill\",\"name\":\"新人現場示範與操作檢核\",\"description\":\"示範倉庫作業並觀察新人跟做情形，辨識操作遺漏、批號錯誤及安全動線問題，記錄檢核結果。\",\"used_by_tasks\":[{\"read_ref\":\"task_13\",\"title\":\"帶領新人\",\"support"
+        },
+        {
+          "turn": 10,
+          "name": "read_jd",
+          "call_id": "call_XUBvbzAINmHgvYfk35vNBor1",
+          "received_trace_line": 313,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 316,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_83\",\"kind\":\"collaborator\",\"name\":\"客服\",\"scope_text\":\"客戶退貨無退貨單或商品與單據不符時，交客服確認。\",\"supporting_sources\":[{\"citation_ref\":\"citation_85\",\"kind\":\"interv"
+        },
+        {
+          "turn": 10,
+          "name": "revise_jd_item",
+          "call_id": "call_P4CncphpvtyZVtOh5DSzOiOQ",
+          "received_trace_line": 332,
+          "arguments": {
+            "read_ref": "task_13",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "新人第一週由本人示範掃碼、揀貨與安全動線，再讓新人跟著操作；現場觀察漏掃、拿錯批號或走進車道等情況，記在帶教檢核表並向組長回報。首次漏掃時讓新人重做並解釋原因；反覆錯誤則交組長安排再訓練。本人不批准新人獨立上線，最終由主管核准。"
+              },
+              {
+                "action": "remove_detail",
+                "detail_read_ref": "outcome_81"
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "將新人操作及安全觀察記在帶教檢核表，並向組長回報。",
+                "supporting_sources": [
+                  {
+                    "kind": "interview",
+                    "interview_sequence": 12
+                  },
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "反覆錯誤時交組長安排再訓練。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "新人是否可獨立上線由主管核准；本人不負責核准。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_77"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_66"
+                },
+                "citation_ref": "citation_76"
+              }
+            ]
+          },
+          "result_trace_line": 334,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 10,
+          "name": "revise_jd_item",
+          "call_id": "call_Q1nglRXnSWrmajdLQBIgxGys",
+          "received_trace_line": 332,
+          "arguments": {
+            "read_ref": "area_4",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "新人第一週由本人示範、帶做並記錄操作觀察，向組長回報；反覆錯誤由組長安排再訓練，新人是否能獨立上線由主管核准。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_24"
+              }
+            ]
+          },
+          "result_trace_line": 334,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 10,
+          "name": "revise_jd_item",
+          "call_id": "call_Cu1gY9rqd4qU94JO7W9qMn7q",
+          "received_trace_line": 332,
+          "arguments": {
+            "read_ref": "skill_66",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "示範倉庫作業並觀察新人跟做情形，記錄操作與安全風險，對首次漏掃安排重做並解釋原因；反覆錯誤回報組長安排再訓練。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 334,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 10,
+          "name": "create_jd_item",
+          "call_id": "call_L4A6jfimOZeCbUtvFnpZIvXz",
+          "received_trace_line": 332,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "組長",
+              "scope_text": "接收員工對新人操作情況的回報；新人反覆出錯時安排再訓練。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 334,
+          "result_prefix": "created · read_ref: collaborator_103"
+        },
+        {
+          "turn": 10,
+          "name": "create_jd_item",
+          "call_id": "call_sgnkpiSwF7WUcpnefdacZMMb",
+          "received_trace_line": 332,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "主管",
+              "scope_text": "核准新人是否可以獨立上線。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 334,
+          "result_prefix": "created · read_ref: collaborator_104"
+        },
+        {
+          "turn": 12,
+          "name": "read_jd",
+          "call_id": "call_mFYDUm68sas19PtZXEFPdXnY",
+          "received_trace_line": 384,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_7"
+          },
+          "result_trace_line": 386,
+          "result_prefix": "{\"read_ref\":\"task_7\",\"kind\":\"work_task\",\"title\":\"收貨驗收與上架\",\"description\":\"逐箱點件，核對品項、數量、外包裝及送貨單，並負責貨品上架。核對採購單、送貨單與實收數量，拍照通知採購；拒收或退換貨由其他權責者決定。發現差異時登記收貨異常表；收到採購關於補送或接受的回覆後，依回覆結果登記入庫。不議"
+        },
+        {
+          "turn": 12,
+          "name": "read_jd",
+          "call_id": "call_enPupiCwvaayRswUN9JeA3eH",
+          "received_trace_line": 384,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_1"
+          },
+          "result_trace_line": 386,
+          "result_prefix": "{\"read_ref\":\"area_1\",\"kind\":\"responsibility_area\",\"title\":\"收貨與入庫\",\"scope_text\":\"負責進貨驗收與上架；查核數量差異並通報採購，依採購回覆登記入庫；拒收或退換貨不由本人決定。\",\"supporting_sources\":[{\"citation_ref\":\"citation_30\",\""
+        },
+        {
+          "turn": 12,
+          "name": "read_jd",
+          "call_id": "call_2I324GDiMJhDEj9UnVYbvCtD",
+          "received_trace_line": 384,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 386,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_83\",\"kind\":\"collaborator\",\"name\":\"客服\",\"scope_text\":\"客戶退貨無退貨單或商品與單據不符時，交客服確認。\",\"supporting_sources\":[{\"citation_ref\":\"citation_85\",\"kind\":\"interv"
+        },
+        {
+          "turn": 12,
+          "name": "create_jd_item",
+          "call_id": "call_iU17HGENdsouo4Rhdzn4xOv6",
+          "received_trace_line": 387,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "持堆高機證照的同事",
+              "scope_text": "超重貨由持證同事操作堆高機搬運。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 389,
+          "result_prefix": "created · read_ref: collaborator_109"
+        },
+        {
+          "turn": 12,
+          "name": "revise_jd_item",
+          "call_id": "call_A6c0s1pGXtZO6dYw4okIX6Lq",
+          "received_trace_line": 390,
+          "arguments": {
+            "read_ref": "task_7",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "負責進貨驗收與上架。收貨時逐箱點件，核對品項、數量、外包裝、送貨單與採購單；差異拍照、登記收貨異常表並通知採購，收到採購關於補送或接受的回覆後，依結果登記入庫。上架時按已規劃儲位放貨、貼品項及批號標籤，掃碼於 WMS 登記入庫，並確認實物與系統儲位一致。臨時放不下時先找組長調位，不自行改儲位規則；常溫貨用棧板車，超重貨由有證照同事操作堆高機。本人不議價、不選供應商，也不決定拒收或退換貨。"
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "貨品依已規劃儲位上架並貼品項、批號標籤；以 WMS 掃碼登記入庫，確認實物與系統儲位一致。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "臨時無法放入已規劃儲位時，先由組長協調調整位置，不自行更改儲位規則。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "常溫貨以棧板車處理；超重貨由有證照同事操作堆高機。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "skill_108",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_14"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_29"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_6"
+                },
+                "citation_ref": "citation_16"
+              }
+            ]
+          },
+          "result_trace_line": 392,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 12,
+          "name": "revise_jd_item",
+          "call_id": "call_MvlsadTObz1DhjS3IXJ5LT0i",
+          "received_trace_line": 390,
+          "arguments": {
+            "read_ref": "collaborator_103",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "接收員工對新人操作情況的回報；新人反覆出錯時安排再訓練，臨時無法按規劃儲位上架時協調調整位置。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 392,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_UhrUFt27yhaTX5humenmamBj",
+          "received_trace_line": 444,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_8"
+          },
+          "result_trace_line": 447,
+          "result_prefix": "{\"read_ref\":\"task_8\",\"kind\":\"work_task\",\"title\":\"揀貨\",\"description\":\"依出貨波次單揀貨，核對品項、數量、批號及效期。若系統顯示有貨但儲位空缺，先查移庫與前一波次；不擅自拿其他批號替代，異常交組長協調。\",\"outcomes\":[{\"read_ref\":\"outcome_56\",\"text\":\""
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_cH38vRPx8JCoOhywT55r5kDc",
+          "received_trace_line": 444,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_103"
+          },
+          "result_trace_line": 447,
+          "result_prefix": "{\"read_ref\":\"collaborator_103\",\"kind\":\"collaborator\",\"name\":\"組長\",\"scope_text\":\"接收員工對新人操作情況的回報；新人反覆出錯時安排再訓練，臨時無法按規劃儲位上架時協調調整位置。\",\"supporting_sources\":[{\"citation_ref\":\"citation_107\""
+        },
+        {
+          "turn": 14,
+          "name": "read_jd_changes",
+          "call_id": "call_05dlJZg67X4p33Lgo6jfHuyk",
+          "received_trace_line": 448,
+          "arguments": {
+            "query": {
+              "kind": "manual",
+              "scope": {
+                "kind": "item",
+                "read_ref": "collaborator_103"
+              }
+            }
+          },
+          "result_trace_line": 450,
+          "result_prefix": "## JD 人工差異\n比較：上一成功 A 正式 JD → 本 Turn 起點正式 JD。\n只讀；未確認內容，也未解除來源待核對。本 Turn 候選修改不在此範圍。\n本範圍人工操作：0\n沒有人工操作。\n### 淨差異\n淨差異：無。"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_u6DZidRb0UTQVsD6t3cjwv98",
+          "received_trace_line": 448,
+          "arguments": {
+            "read_ref": "task_8",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "依出貨波次單揀貨，核對品項、數量、批號及效期。系統顯示有貨但儲位空缺時，先查移庫與前一波次；不擅自拿其他批號替代，異常交組長協調。雙十一及春節前出貨量約為平日兩倍；依組長安排的急單與波次調整揀貨順序，先回報人力與缺貨瓶頸。"
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "雙十一及春節前出貨量約為平日兩倍，調整揀貨順序時仍須完成批號與效期核對。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 450,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_h1dUZTaqit0FCn184ROrk2SD",
+          "received_trace_line": 448,
+          "arguments": {
+            "read_ref": "collaborator_103",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "安排出貨急單與波次；接收員工對新人操作情況的回報，新人反覆出錯時安排再訓練；臨時無法按規劃儲位上架時協調調整位置。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 450,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_3WPUXK3SwnSJrPJXH0pVHLaQ",
+          "received_trace_line": 451,
+          "arguments": {
+            "read_ref": "collaborator_103",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_107"
+              }
+            ]
+          },
+          "result_trace_line": 453,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 16,
+          "name": "read_jd",
+          "call_id": "call_lbMLuo5Bj9ynY3iqdpVSYvnB",
+          "received_trace_line": 503,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 505,
+          "result_prefix": "{\"profile\":{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"job_purpose_preview\":\"執行物流中心收貨驗收、上架、揀貨補貨、庫存盤點與退貨處理，並帶領新人，支援倉庫日常作業。\"},\"responsibility_areas\":[{\"read_"
+        },
+        {
+          "turn": 16,
+          "name": "read_jd",
+          "call_id": "call_KWgTcT8QHSyro3DPSK47RV3V",
+          "received_trace_line": 503,
+          "arguments": {
+            "view": "work_tasks",
+            "read_ref": "area_2"
+          },
+          "result_trace_line": 505,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"task_8\",\"kind\":\"work_task\",\"title\":\"揀貨\",\"description\":\"依出貨波次單揀貨，核對品項、數量、批號及效期。系統顯示有貨但儲位空缺時，先查移庫與前一波次；不擅自拿其他批號替代，異常交組長協調。雙十一及春節前出貨量約為平日兩倍；依組長安排的急單與波次調整揀貨順序，先回"
+        },
+        {
+          "turn": 16,
+          "name": "read_jd",
+          "call_id": "call_LiQSdX6Jx2C9kfMnAUxGz6sI",
+          "received_trace_line": 503,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 505,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_83\",\"kind\":\"collaborator\",\"name\":\"客服\",\"scope_text\":\"客戶退貨無退貨單或商品與單據不符時，交客服確認。\",\"supporting_sources\":[{\"citation_ref\":\"citation_85\",\"kind\":\"interv"
+        },
+        {
+          "turn": 16,
+          "name": "create_jd_item",
+          "call_id": "call_pvmv6RBB8Y65qPXUfh58RHCn",
+          "received_trace_line": 506,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "財務",
+              "scope_text": "每年十二月配合全倉年度盤點；盤點差異經倉儲主管核准後，由財務調帳。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 508,
+          "result_prefix": "created · read_ref: collaborator_151"
+        },
+        {
+          "turn": 16,
+          "name": "revise_jd_item",
+          "call_id": "call_WGSR19eEiqLqFNtWLCAvDZRg",
+          "received_trace_line": 506,
+          "arguments": {
+            "read_ref": "collaborator_84",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "處理待檢的客戶退貨；接收冷藏區溫度超標通報，決定受影響批次是否可以出貨。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 508,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 16,
+          "name": "revise_jd_item",
+          "call_id": "call_7acJ2pBgrtUykBbJRVNM7ywV",
+          "received_trace_line": 506,
+          "arguments": {
+            "read_ref": "collaborator_104",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "核准新人是否可以獨立上線；接收冷藏區溫度超標通報。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 508,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 16,
+          "name": "revise_jd_item",
+          "call_id": "call_31fbJX8eGlynAF1XtpZiLsKQ",
+          "received_trace_line": 512,
+          "arguments": {
+            "read_ref": "collaborator_151",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "每年十二月配合員工進行全倉年度盤點。"
+              }
+            ]
+          },
+          "result_trace_line": 514,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 18,
+          "name": "read_jd",
+          "call_id": "call_M3YdyUId9wVwc7Ua3zCRN5Os",
+          "received_trace_line": 572,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 575,
+          "result_prefix": "{\"profile\":{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"job_purpose_preview\":\"執行物流中心收貨驗收、上架、揀貨補貨、庫存盤點與退貨處理，並帶領新人，支援倉庫日常作業。\"},\"responsibility_areas\":[{\"read_"
+        },
+        {
+          "turn": 18,
+          "name": "read_jd",
+          "call_id": "call_Ezcxtl2p4IGtKlrsrmMrx3Ng",
+          "received_trace_line": 572,
+          "arguments": {
+            "view": "full",
+            "read_ref": null
+          },
+          "result_trace_line": 575,
+          "result_prefix": "# 職務說明書\n\n## 職務基本資料\n\n**職稱**\n\n倉庫管理員\n\n**組織單位**\n\n物流中心\n\n**匯報對象**\n\n倉儲主管\n\n## 職務目的\n\n執行物流中心收貨驗收、上架、揀貨補貨、庫存盤點與退貨處理，並帶領新人，支援倉庫日常作業。\n\n## 主要職責與工作任務\n\n### 職責 1：收貨與入庫\n\n負責進貨驗收與上架；查核數量差異並通報採購，依採購回覆登"
+        },
+        {
+          "turn": 18,
+          "name": "read_jd",
+          "call_id": "call_WZgC2jMEelZ6p65mheTZ3GGu",
+          "received_trace_line": 576,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_8"
+          },
+          "result_trace_line": 578,
+          "result_prefix": "{\"read_ref\":\"task_8\",\"kind\":\"work_task\",\"title\":\"揀貨\",\"description\":\"依出貨波次單揀貨，核對品項、數量、批號及效期。系統顯示有貨但儲位空缺時，先查移庫與前一波次；不擅自拿其他批號替代，異常交組長協調。雙十一及春節前出貨量約為平日兩倍；依組長安排的急單與波次調整揀貨順序，先回報人力與缺貨瓶頸。\""
+        },
+        {
+          "turn": 18,
+          "name": "read_jd",
+          "call_id": "call_TXzBQe1ouICTiJfHsWoFCTF1",
+          "received_trace_line": 576,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_103"
+          },
+          "result_trace_line": 578,
+          "result_prefix": "{\"read_ref\":\"collaborator_103\",\"kind\":\"collaborator\",\"name\":\"組長\",\"scope_text\":\"安排出貨急單與波次；接收員工對新人操作情況的回報，新人反覆出錯時安排再訓練；臨時無法按規劃儲位上架時協調調整位置。\",\"supporting_sources\":[{\"citation_ref\":\"cit"
+        },
+        {
+          "turn": 18,
+          "name": "read_jd",
+          "call_id": "call_bxkgWwKD9vyUe6iQ0aanU6By",
+          "received_trace_line": 576,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_153"
+          },
+          "result_trace_line": 578,
+          "result_prefix": "{\"read_ref\":\"task_153\",\"kind\":\"work_task\",\"title\":\"監測冷藏區溫度與處理異常\",\"description\":\"冷藏食品約佔全倉貨品兩成。於2–8°C區穿防寒衣作業，每天早晚查看溫度表；發現超標時隔離受影響批次，記錄時間與溫度並通知主管及品保。是否可出貨由品保決定，本人不自行放行。\",\"outcomes\":[{"
+        },
+        {
+          "turn": 18,
+          "name": "read_jd",
+          "call_id": "call_iX9gfZ11kSJPDQuZeMLW4n8y",
+          "received_trace_line": 576,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_152"
+          },
+          "result_trace_line": 578,
+          "result_prefix": "{\"read_ref\":\"task_152\",\"kind\":\"work_task\",\"title\":\"配合年度全倉盤點\",\"description\":\"每年十二月配合財務進行全倉年度盤點。\",\"outcomes\":[{\"read_ref\":\"outcome_165\",\"text\":\"年度盤點前整理儲位及待處理單據。\",\"supporting_sources\""
+        },
+        {
+          "turn": 18,
+          "name": "revise_jd_item",
+          "call_id": "call_jPYJYvC7MbSx482AYy19lxLB",
+          "received_trace_line": 579,
+          "arguments": {
+            "read_ref": "task_8",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_21"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_51"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_44"
+                },
+                "citation_ref": "citation_48"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_45"
+                },
+                "citation_ref": "citation_47"
+              }
+            ]
+          },
+          "result_trace_line": 581,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 18,
+          "name": "revise_jd_item",
+          "call_id": "call_dGQFGJvvpUJnLCBjyOhnFY83",
+          "received_trace_line": 579,
+          "arguments": {
+            "read_ref": "collaborator_103",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_110"
+              }
+            ]
+          },
+          "result_trace_line": 581,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 18,
+          "name": "revise_jd_item",
+          "call_id": "call_HfvISUDEq1f3QCpsLCZPvQ5u",
+          "received_trace_line": 582,
+          "arguments": {
+            "read_ref": "collaborator_151",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "每年十二月與倉庫端協作進行全倉年度盤點。"
+              }
+            ]
+          },
+          "result_trace_line": 584,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_fXsosiUiwhlpyb85aqLg1tBC",
+          "received_trace_line": 595,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 597,
+          "result_prefix": "{\"profile\":{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"job_purpose_preview\":\"執行物流中心收貨驗收、上架、揀貨補貨、庫存盤點與退貨處理，並帶領新人，支援倉庫日常作業。\"},\"responsibility_areas\":[{\"read_"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_p5dRNCPeyxjcos7Qb621IZbH",
+          "received_trace_line": 595,
+          "arguments": {
+            "view": "full",
+            "read_ref": null
+          },
+          "result_trace_line": 597,
+          "result_prefix": "# 職務說明書\n\n## 職務基本資料\n\n**職稱**\n\n倉庫管理員\n\n**組織單位**\n\n物流中心\n\n**匯報對象**\n\n倉儲主管\n\n## 職務目的\n\n執行物流中心收貨驗收、上架、揀貨補貨、庫存盤點與退貨處理，並帶領新人，支援倉庫日常作業。\n\n## 主要職責與工作任務\n\n### 職責 1：收貨與入庫\n\n負責進貨驗收與上架；查核數量差異並通報採購，依採購回覆登"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_5HFD8Rl46TAY6WsMcwybsbMG",
+          "received_trace_line": 598,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_153"
+          },
+          "result_trace_line": 600,
+          "result_prefix": "{\"read_ref\":\"task_153\",\"kind\":\"work_task\",\"title\":\"監測冷藏區溫度與處理異常\",\"description\":\"冷藏食品約佔全倉貨品兩成。於2–8°C區穿防寒衣作業，每天早晚查看溫度表；發現超標時隔離受影響批次，記錄時間與溫度並通知主管及品保。是否可出貨由品保決定，本人不自行放行。\",\"outcomes\":[{"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_u9wgobvOQJuB6yPJQNY06otO",
+          "received_trace_line": 598,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_143"
+          },
+          "result_trace_line": 600,
+          "result_prefix": "{\"read_ref\":\"task_143\",\"kind\":\"work_task\",\"title\":\"晚班交接與交班紀錄\",\"description\":\"晚班交接未完成波次、缺貨及隔離貨的位置，並填寫交班表。\",\"outcomes\":[{\"read_ref\":\"outcome_168\",\"text\":\"以交班表交接未完成波次、缺貨及隔離貨的位置資訊。\",\"s"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_7tgtS2b4NbBMtS1v58FKwpti",
+          "received_trace_line": 598,
+          "arguments": {
+            "view": "profile",
+            "read_ref": null
+          },
+          "result_trace_line": 600,
+          "result_prefix": "{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"purpose\":\"執行物流中心收貨驗收、上架、揀貨補貨、庫存盤點與退貨處理，並帶領新人，支援倉庫日常作業。\",\"supporting_sources\":{\"job_title\":[{\"citation_ref\":\"cit"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_VncsyeiqfzpKFynxUo1jR7OR",
+          "received_trace_line": 598,
+          "arguments": {
+            "view": "responsibility_areas",
+            "read_ref": null
+          },
+          "result_trace_line": 600,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"area_1\",\"kind\":\"responsibility_area\",\"title\":\"收貨與入庫\",\"scope_text\":\"負責進貨驗收與上架；查核數量差異並通報採購，依採購回覆登記入庫；拒收或退換貨不由本人決定。\",\"supporting_sources\":[{\"citation_ref\":\"cita"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_RDOhQu86F7Et2FgZ2EdzDehG",
+          "received_trace_line": 598,
+          "arguments": {
+            "view": "job_wide_conditions",
+            "read_ref": null
+          },
+          "result_trace_line": 600,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"condition_5\",\"kind\":\"job_wide_condition\",\"condition_kind\":\"schedule_travel\",\"text\":\"早上七點上班，週一到週六輪休。\",\"supporting_sources\":[{\"citation_ref\":\"citation_31\",\"kin"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_nqWg0aeU5SPYclX9wXdR5VS1",
+          "received_trace_line": 598,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_148"
+          },
+          "result_trace_line": 600,
+          "result_prefix": "{\"read_ref\":\"area_148\",\"kind\":\"responsibility_area\",\"title\":\"冷藏貨品溫控\",\"scope_text\":\"負責冷藏食品區每日早晚溫度檢查及超標批次隔離、記錄與通報；不自行放行冷藏貨品，能否出貨由品保決定。\",\"supporting_sources\":[{\"citation_ref\":\"citatio"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_t3sw0BwUIwqiU6L1otNGcyqL",
+          "received_trace_line": 598,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_142"
+          },
+          "result_trace_line": 600,
+          "result_prefix": "{\"read_ref\":\"area_142\",\"kind\":\"responsibility_area\",\"title\":\"班別交接\",\"scope_text\":\"於晚班交接未完成波次、缺貨與隔離貨的位置，並留下交班紀錄，銜接後續作業。\",\"supporting_sources\":[{\"citation_ref\":\"citation_170\",\"kind\":\""
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_y5DCJ9XBQ1MbXk7BawpOPcyS",
+          "received_trace_line": 601,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 603,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_83\",\"kind\":\"collaborator\",\"name\":\"客服\",\"scope_text\":\"客戶退貨無退貨單或商品與單據不符時，交客服確認。\",\"supporting_sources\":[{\"citation_ref\":\"citation_85\",\"kind\":\"interv"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd_changes",
+          "call_id": "call_jeVrgeekV3j7y10neWgDwVVU",
+          "received_trace_line": 604,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_86"
+            }
+          },
+          "result_trace_line": 606,
+          "result_prefix": "rejected: source_kind_not_supported；此引用是不可變訪談；請用 read_interview 讀正式序號 16。"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd_changes",
+          "call_id": "call_7KsHH2dilypsB2Sx6xVF5N7A",
+          "received_trace_line": 604,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_106"
+            }
+          },
+          "result_trace_line": 606,
+          "result_prefix": "rejected: source_kind_not_supported；此引用是不可變訪談；請用 read_interview 讀正式序號 20。"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd_changes",
+          "call_id": "call_Vo9S6Ar0775JXOFHUVOxUxef",
+          "received_trace_line": 604,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_173"
+            }
+          },
+          "result_trace_line": 606,
+          "result_prefix": "rejected: source_kind_not_supported；此引用是不可變訪談；請用 read_interview 讀正式序號 32。"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_GMBm2nmjIsqWbsbvR4uwCLyS",
+          "received_trace_line": 610,
+          "arguments": {
+            "read_ref": "task_153",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "冷藏食品約佔全倉貨品兩成，於 2–8°C 區作業並穿防寒衣；冷藏區每日早晚查看溫度表。超標時隔離受影響批次，記錄時間與溫度並通知主管及品保。能否出貨由品保決定，本人不自行放行。"
+              },
+              {
+                "action": "revise_detail",
+                "detail_read_ref": "requirement_162",
+                "text": "冷藏區溫度表每日早晚查看。"
+              }
+            ]
+          },
+          "result_trace_line": 612,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_q7b24GdM4PBOCXieS74oNeYj",
+          "received_trace_line": 610,
+          "arguments": {
+            "read_ref": "area_148",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "負責冷藏食品區溫度監測及超標處置；冷藏區每日早晚查看溫度表，超標時隔離受影響批次、記錄並通知主管及品保；本人不自行放行冷藏貨品，能否出貨由品保決定。"
+              }
+            ]
+          },
+          "result_trace_line": 612,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_YWaN7q39FqNuzTb9JiurjC73",
+          "received_trace_line": 610,
+          "arguments": {
+            "read_ref": "task_143",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "title",
+                "value": "班別交接與交班紀錄"
+              },
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "交接時整理未完成波次、缺貨及隔離貨的位置，並填寫交班表。"
+              }
+            ]
+          },
+          "result_trace_line": 612,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_Ehzjc9Z2gHnKvpI18Y09OM1u",
+          "received_trace_line": 610,
+          "arguments": {
+            "read_ref": "area_142",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "整理交接時未完成波次、缺貨與隔離貨的位置資訊，留下交班紀錄，以銜接後續作業。"
+              }
+            ]
+          },
+          "result_trace_line": 612,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 20,
+          "name": "create_jd_item",
+          "call_id": "call_MIpRtn9kyFSbg7GTknlayZbU",
+          "received_trace_line": 610,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "包裝區",
+              "scope_text": "接收揀貨完成的貨品進行複核。",
+              "supporting_sources": [
+                {
+                  "kind": "interview",
+                  "interview_sequence": 8
+                }
+              ]
+            }
+          },
+          "result_trace_line": 612,
+          "result_prefix": "created · read_ref: collaborator_174"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_1HNVhjXvrZf4wIeQVpTNI4AR",
+          "received_trace_line": 610,
+          "arguments": {
+            "read_ref": "collaborator_84",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_86"
+              }
+            ]
+          },
+          "result_trace_line": 612,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_t1r3aKL66E5Fkgcg9hElSPnt",
+          "received_trace_line": 610,
+          "arguments": {
+            "read_ref": "collaborator_104",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_106"
+              }
+            ]
+          },
+          "result_trace_line": 612,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_TTmF6dIaeJCcjQ8l51qQYGzf",
+          "received_trace_line": 610,
+          "arguments": {
+            "read_ref": "collaborator_151",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_173"
+              }
+            ]
+          },
+          "result_trace_line": 612,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_DwuamnVNFoYEXP2w44TY7Taf",
+          "received_trace_line": 613,
+          "arguments": {
+            "view": "full",
+            "read_ref": null
+          },
+          "result_trace_line": 615,
+          "result_prefix": "# 職務說明書\n\n## 職務基本資料\n\n**職稱**\n\n倉庫管理員\n\n**組織單位**\n\n物流中心\n\n**匯報對象**\n\n倉儲主管\n\n## 職務目的\n\n執行物流中心收貨驗收、上架、揀貨補貨、庫存盤點與退貨處理，並帶領新人，支援倉庫日常作業。\n\n## 主要職責與工作任務\n\n### 職責 1：收貨與入庫\n\n負責進貨驗收與上架；查核數量差異並通報採購，依採購回覆登"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_FjjL2wxadzwTa1DOr1kJcj7s",
+          "received_trace_line": 613,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_153"
+          },
+          "result_trace_line": 615,
+          "result_prefix": "{\"read_ref\":\"task_153\",\"kind\":\"work_task\",\"title\":\"監測冷藏區溫度與處理異常\",\"description\":\"冷藏食品約佔全倉貨品兩成，於 2–8°C 區作業並穿防寒衣；冷藏區每日早晚查看溫度表。超標時隔離受影響批次，記錄時間與溫度並通知主管及品保。能否出貨由品保決定，本人不自行放行。\",\"outcomes\""
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_5zrx1XmonY1nD1fgwRRIZC6B",
+          "received_trace_line": 613,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_143"
+          },
+          "result_trace_line": 615,
+          "result_prefix": "{\"read_ref\":\"task_143\",\"kind\":\"work_task\",\"title\":\"班別交接與交班紀錄\",\"description\":\"交接時整理未完成波次、缺貨及隔離貨的位置，並填寫交班表。\",\"outcomes\":[{\"read_ref\":\"outcome_168\",\"text\":\"以交班表交接未完成波次、缺貨及隔離貨的位置資訊。\",\""
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_JuQmiZTfmOGBrpdbrJrq8pnB",
+          "received_trace_line": 613,
+          "arguments": {
+            "view": "responsibility_areas",
+            "read_ref": null
+          },
+          "result_trace_line": 615,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"area_1\",\"kind\":\"responsibility_area\",\"title\":\"收貨與入庫\",\"scope_text\":\"負責進貨驗收與上架；查核數量差異並通報採購，依採購回覆登記入庫；拒收或退換貨不由本人決定。\",\"supporting_sources\":[{\"citation_ref\":\"cita"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_RJRkVCgRtNcs6aeu8jOWwQAZ",
+          "received_trace_line": 613,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 615,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_83\",\"kind\":\"collaborator\",\"name\":\"客服\",\"scope_text\":\"客戶退貨無退貨單或商品與單據不符時，交客服確認。\",\"supporting_sources\":[{\"citation_ref\":\"citation_85\",\"kind\":\"interv"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_qXPzDLS84C02qoS0gDrof4P7",
+          "received_trace_line": 613,
+          "arguments": {
+            "view": "required_knowledge",
+            "read_ref": null
+          },
+          "result_trace_line": 615,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"knowledge_149\",\"kind\":\"knowledge\",\"name\":\"冷藏食品溫度與超標處置規則\",\"description\":\"了解冷藏食品2–8°C作業範圍，以及溫度超標時隔離受影響批次、記錄時間與溫度並通報的要求；出貨放行由品保決定。\",\"used_by_tasks\":[{\"read_ref\""
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_rk6GhzUVDZj7N0xfY4xkXFjD",
+          "received_trace_line": 613,
+          "arguments": {
+            "view": "required_skills",
+            "read_ref": null
+          },
+          "result_trace_line": 615,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"skill_6\",\"kind\":\"skill\",\"name\":\"核對進貨單據與實收數量\",\"description\":\"逐箱點件，核對品項、數量、外包裝及送貨單，查核並指出進貨差異。\",\"used_by_tasks\":[{\"read_ref\":\"task_7\",\"title\":\"收貨驗收與上架\",\"support"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_V7ZKF3WqZ2mC4gr1g0ak44DU",
+          "received_trace_line": 613,
+          "arguments": {
+            "view": "job_wide_conditions",
+            "read_ref": null
+          },
+          "result_trace_line": 615,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"condition_5\",\"kind\":\"job_wide_condition\",\"condition_kind\":\"schedule_travel\",\"text\":\"早上七點上班，週一到週六輪休。\",\"supporting_sources\":[{\"citation_ref\":\"citation_31\",\"kin"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_BboKqebBp5gkJ2OHGhjCvx7y",
+          "received_trace_line": 616,
+          "arguments": {
+            "view": "work_tasks",
+            "read_ref": "area_1"
+          },
+          "result_trace_line": 618,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"task_7\",\"kind\":\"work_task\",\"title\":\"收貨驗收與上架\",\"description\":\"負責進貨驗收與上架。收貨時逐箱點件，核對品項、數量、外包裝、送貨單與採購單；差異拍照、登記收貨異常表並通知採購，收到採購關於補送或接受的回覆後，依結果登記入庫。上架時按已規劃儲位放貨、貼品項及批"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_ZQ6YIu7oHJ58QDX1ZChVxBYQ",
+          "received_trace_line": 616,
+          "arguments": {
+            "view": "work_tasks",
+            "read_ref": "area_2"
+          },
+          "result_trace_line": 618,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"task_8\",\"kind\":\"work_task\",\"title\":\"揀貨\",\"description\":\"依出貨波次單揀貨，核對品項、數量、批號及效期。系統顯示有貨但儲位空缺時，先查移庫與前一波次；不擅自拿其他批號替代，異常交組長協調。雙十一及春節前出貨量約為平日兩倍；依組長安排的急單與波次調整揀貨順序，先回"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_H9tCnKRimKhQn4T2b3si45Q9",
+          "received_trace_line": 616,
+          "arguments": {
+            "view": "work_tasks",
+            "read_ref": "area_3"
+          },
+          "result_trace_line": 618,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"task_11\",\"kind\":\"work_task\",\"title\":\"處理客戶退貨\",\"description\":\"依客服退貨單核對退回商品的品項、數量及外觀並拍照記錄，按既定規則分為可再上架、待檢或破損隔離。無退貨單或商品不符時先隔離並交客服確認；可再上架商品掃碼入庫，待檢商品交品保，並保留交接紀錄。不決定"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_aMP6r65xn04rykgocZLG48fj",
+          "received_trace_line": 616,
+          "arguments": {
+            "view": "work_tasks",
+            "read_ref": "area_4"
+          },
+          "result_trace_line": 618,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"task_13\",\"kind\":\"work_task\",\"title\":\"帶領新人\",\"description\":\"新人第一週由本人示範掃碼、揀貨與安全動線，再讓新人跟著操作；現場觀察漏掃、拿錯批號或走進車道等情況，記在帶教檢核表並向組長回報。首次漏掃時讓新人重做並解釋原因；反覆錯誤則交組長安排再訓練。本人不批准"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_PvAk6Xi5pxDHfwYCV0cBsmXv",
+          "received_trace_line": 616,
+          "arguments": {
+            "view": "work_tasks",
+            "read_ref": "area_142"
+          },
+          "result_trace_line": 618,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"task_143\",\"kind\":\"work_task\",\"title\":\"班別交接與交班紀錄\",\"description\":\"交接時整理未完成波次、缺貨及隔離貨的位置，並填寫交班表。\",\"outcomes\":[{\"read_ref\":\"outcome_168\",\"text\":\"以交班表交接未完成波次、缺貨及隔離"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_SacTM8NJp497ginr4zBdXG6o",
+          "received_trace_line": 616,
+          "arguments": {
+            "view": "work_tasks",
+            "read_ref": "area_148"
+          },
+          "result_trace_line": 618,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"task_153\",\"kind\":\"work_task\",\"title\":\"監測冷藏區溫度與處理異常\",\"description\":\"冷藏食品約佔全倉貨品兩成，於 2–8°C 區作業並穿防寒衣；冷藏區每日早晚查看溫度表。超標時隔離受影響批次，記錄時間與溫度並通知主管及品保。能否出貨由品保決定，本人不自行放行。\","
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_THqvl2U8HzSPVBZMauPSf4R0",
+          "received_trace_line": 619,
+          "arguments": {
+            "read_ref": "skill_150",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "冷藏區溫度表需每日早晚查看；超標時隔離受影響批次、記錄時間與溫度並通知主管及品保，不自行放行。"
+              }
+            ]
+          },
+          "result_trace_line": 621,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_U6iZKeToCDHn2SHqDY7b2ycP",
+          "received_trace_line": 622,
+          "arguments": {
+            "view": "item",
+            "read_ref": "skill_150"
+          },
+          "result_trace_line": 624,
+          "result_prefix": "{\"read_ref\":\"skill_150\",\"kind\":\"skill\",\"name\":\"監測冷藏區溫度並處理超標批次\",\"description\":\"冷藏區溫度表需每日早晚查看；超標時隔離受影響批次、記錄時間與溫度並通知主管及品保，不自行放行。\",\"used_by_tasks\":[{\"read_ref\":\"task_153\",\"title\":\"監測冷藏"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_PDcJuuTuFB77X6KgWYsoOjgs",
+          "received_trace_line": 622,
+          "arguments": {
+            "view": "item",
+            "read_ref": "knowledge_149"
+          },
+          "result_trace_line": 624,
+          "result_prefix": "{\"read_ref\":\"knowledge_149\",\"kind\":\"knowledge\",\"name\":\"冷藏食品溫度與超標處置規則\",\"description\":\"了解冷藏食品2–8°C作業範圍，以及溫度超標時隔離受影響批次、記錄時間與溫度並通報的要求；出貨放行由品保決定。\",\"used_by_tasks\":[{\"read_ref\":\"task_153"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_cE53wvdS4ZKpMnpzRjmuOAFA",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "task_153",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_158"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "detail",
+                  "detail_read_ref": "requirement_162"
+                },
+                "citation_ref": "citation_159"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "knowledge_149"
+                },
+                "citation_ref": "citation_157"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_150"
+                },
+                "citation_ref": "citation_155"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_hieaxdv5pzfFGLW6QT0I28uc",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "area_148",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_169"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_ynWYS13ZgSS6Usl3td9XoLoX",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "skill_150",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_177"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_8ZYroA1cX38RgmhnWgShY237",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "knowledge_149",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "knowledge_149"
+                },
+                "citation_ref": "citation_157"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "{\"status\":\"rejected\",\"code\":\"invalid_arguments\",\"message\":\"欄位、內容或來源選取不合法，本次未改。\",\"next_action\":\"依工具格式提交；各欄只改一次，來源選目前可見內容，不猜來源或引用代號。\"}"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_dNIBXHjJ9wHWTiAIzUgZtHXR",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "task_143",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_167"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_2y3kHim2zvcLBCsqjZDjWPom",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "area_142",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_170"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_3GP8PBLr4DMtKnV85M4qIF7H",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "skill_6",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_20"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_6SeUOKYVVNkvtetF33VmC8a2",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "skill_60",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_63"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_QuzdognyiwgFnl8WnTFeghHw",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "task_13",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_35"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_66"
+                },
+                "citation_ref": "citation_76"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_2AKiZjaVSwgxvNFU3fZYQLy7",
+          "received_trace_line": 625,
+          "arguments": {
+            "read_ref": "skill_66",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_79"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_115"
+              }
+            ]
+          },
+          "result_trace_line": 627,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_osK2EJB9r9ilpYhp6EZzlB6g",
+          "received_trace_line": 631,
+          "arguments": {
+            "view": "full",
+            "read_ref": null
+          },
+          "result_trace_line": 633,
+          "result_prefix": "# 職務說明書\n\n## 職務基本資料\n\n**職稱**\n\n倉庫管理員\n\n**組織單位**\n\n物流中心\n\n**匯報對象**\n\n倉儲主管\n\n## 職務目的\n\n執行物流中心收貨驗收、上架、揀貨補貨、庫存盤點與退貨處理，並帶領新人，支援倉庫日常作業。\n\n## 主要職責與工作任務\n\n### 職責 1：收貨與入庫\n\n負責進貨驗收與上架；查核數量差異並通報採購，依採購回覆登"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_nxjGWTxN39B63tc6RbUO1Zm5",
+          "received_trace_line": 637,
+          "arguments": {
+            "view": "profile",
+            "read_ref": null
+          },
+          "result_trace_line": 639,
+          "result_prefix": "{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"purpose\":\"執行物流中心收貨、上架、揀貨補貨、盤點與退貨，並配合冷藏溫控、班別交接及新人帶教，維持貨物流轉與庫存作業的準確順暢。\",\"supporting_sources\":{\"job_title\":[{\"cita"
+        }
+      ]
+    },
+    "P2": {
+      "transcript": "formal/warehouse-r1-P2/formal-interviews.json",
+      "provider_trace": "formal/warehouse-r1-P2/provider-trace.jsonl",
+      "consultant_replies": [
+        {
+          "turn": 1,
+          "source_id": "b7de5694-80c7-4433-aeae-de3a20cc8018",
+          "interview_sequence": 3,
+          "text": "我先依您提供的資訊整理了職務基本資料與工作目的。收貨方面，已了解您會核對採購單、送貨單和實收數量，並拍照通知採購；拒收或退換貨由主管決定。\n\n通知採購後，這批貨實際怎麼處理？例如貨物放在哪裡、收貨資料怎麼記錄，以及誰會告知後續怎麼辦？"
+        },
+        {
+          "turn": 8,
+          "source_id": "551f6219-444a-4b57-af13-8863d687bb67",
+          "interview_sequence": 17,
+          "text": "可以。我已把每週循環盤點、查近期入出庫與移庫紀錄後複點，整理成盤點任務；差異如何調帳及由誰批准，先保留未知。\n\n談談最近一次帶新人的情況：新人當時要學什麼，您做了哪些示範或指導？"
+        },
+        {
+          "turn": 9,
+          "source_id": "d64644b5-58f6-4360-bb5b-f9cb8ab5558a",
+          "interview_sequence": 19,
+          "text": "我已把新人第一週的示範、跟做觀察、帶教檢核表及您對其能否獨立上線的判斷整理進底稿；目前不把這項判斷寫成最終放行權。\n\n您想起盤點差異後的哪些細節？可以從複點仍有差異時說起：您會怎麼處理或交接，之後由誰調帳、誰批准？"
+        },
+        {
+          "turn": 10,
+          "source_id": "05e4ef0b-7f92-4c98-8a53-dd7284205a2a",
+          "interview_sequence": 21,
+          "text": "我已把盤點差異處理補進底稿：差異及查核資料記在盤點差異表交倉儲主管核准，再由主管交財務調帳；您不直接改庫存數量，結案前會核對更新後數量，找不到原因則留待查。\n\n接著談客戶退貨：最近一次處理時，您收到哪些資料或貨品、自己做了哪些事，最後交接給誰？"
+        },
+        {
+          "turn": 13,
+          "source_id": "9b706c04-3cc7-4087-a15d-cc623a7e68a6",
+          "interview_sequence": 27,
+          "text": "我已把供應商退貨整理成出庫任務，與客戶退貨驗收分開描述：採購決定退貨品項，您依單備貨、核量、拍照並登記出庫，交承運商簽收後把簽收資料回給採購。退貨原因保留未知，也記下您不辦供應商退貨入庫、不決定退貨條件。\n\n您判斷新人可以獨立上線後，接下來通常還有哪些步驟，才算正式上線？"
+        },
+        {
+          "turn": 14,
+          "source_id": "f7da099e-0827-4d98-90bc-f4af43dacc05",
+          "interview_sequence": 29,
+          "text": "收到，我已修正帶教權責：您觀察新人操作並向組長回報；首次漏掃時要求重做並說明，反覆錯誤時交組長安排再訓練；是否獨立上線由主管核准。\n\n目前底稿已涵蓋收貨驗收、上架、揀貨補貨、盤點、客戶及供應商退貨，以及新人帶教。除此之外，您還有固定週期、旺季或突發支援、交接收尾等工作嗎？若沒有，也可以直接說沒有。"
+        },
+        {
+          "turn": 15,
+          "source_id": "24c6945d-ff0a-4365-bb66-fdba23930409",
+          "interview_sequence": 31,
+          "text": "我已依您的補充更新目前 JD 草稿，新增了三部分：\n\n- **年度盤點**：每年 12 月配合財務做全倉盤點，盤前整理儲位與待處理單據。年度分區責任和財務表單細節仍不清楚，沒有推定成您的固定分工。\n- **冷藏品作業**：約兩成貨品為冷藏食品，相關作業在 2–8°C 區進行並穿防寒衣；每天早晚查看溫度表。超標時隔離受影響批次、記錄時間與溫度並通知主管和品保；是否可出貨由品保決定，您不自行放行。\n- **旺季與晚班交接**：雙十一及春節前出貨約為平日兩倍，依組長安排的急單與波次調整揀貨順序、回報人力及缺貨瓶頸，但仍核對批號與效期；晚班以交班表記錄未完波次、缺貨及隔離貨位置。\n\n也已將「本人不決定拒收或退換貨」明確寫在收貨差異任務中；先前說不清的細節仍保留未知。\n\n請您核對目前整份 JD：有沒有哪項工作或責任界線寫錯、漏掉，或需要再修正？"
+        },
+        {
+          "turn": 17,
+          "source_id": "f2d654d5-791e-445d-bc46-a6a775d29fd2",
+          "interview_sequence": 35,
+          "text": "一般沒有數量差異的貨到倉時，您從接到貨物或單據開始，通常怎麼完成驗收與收貨登記？登記後會交接給誰，或直接接著上架嗎？"
+        },
+        {
+          "turn": 18,
+          "source_id": "26eafdf5-a68c-4888-adfe-96e38269ff6f",
+          "interview_sequence": 37,
+          "text": "您先前提到早上七點上班，也提到晚班交接。您的班別通常是固定早班，還是也會輪值晚班？交班表是您值晚班時填寫，還是由您和晚班同事交接？"
+        },
+        {
+          "turn": 19,
+          "source_id": "9989bbc5-324a-4ef9-a832-33f2c421669a",
+          "interview_sequence": 39,
+          "text": "一般貨物到場時，您如何得知這批貨要收？採購單和送貨單通常由誰提供，還是您在貨到後才接手處理？"
+        },
+        {
+          "turn": 20,
+          "source_id": "870cf857-b83b-45c9-acfa-a5cc19042a5f",
+          "interview_sequence": 41,
+          "text": "已將目前確認的工作整理進職務說明書，並核對基本資料、職務目的、職責分組、任務、成果與要求、知識技能、協作對象及工作條件的一致性。另補上「超重貨由有證照同事操作堆高機」的協作關係，並確認有原話支持。\n\n目前 JD 涵蓋：進貨驗收與差異處理、上架與儲位管理、出貨揀貨及補貨、每週循環與年度盤點、新人帶教、客戶退貨、供應商退貨出庫，以及冷藏品溫度監測與異常處理；也納入旺季揀貨調序、晚班交接紀錄及已知的排班與冷藏作業條件。\n\n**仍未確認、因此沒有補猜的內容**包括：收貨到場通知及單據來源、收貨登記後的交接方式、差異貨物暫放位置及外包裝破損處理；實物與 WMS 儲位不符時的做法、是否另有揀貨以外的補貨安排、超重貨的具體標準；年度盤點的分區責任與財務表單細節；客退分類判準及隔離後續、供應商退貨的觸發原因；以及本人是否輪值晚班和交接對象。新人上線的最終核准者已記為主管；更細的評核標準沒有資料。\n\n今天先到這裡；上述未確認事項會保留為未知，不影響已確認內容的整理。"
+        }
+      ],
+      "selected_calls": [
+        {
+          "turn": 1,
+          "name": "read_jd",
+          "call_id": "call_mcPYwaRhebYlh8eKGQcld5pG",
+          "received_trace_line": 3,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 5,
+          "result_prefix": "{\"profile\":{\"job_title\":null,\"organization_unit\":null,\"reports_to\":null},\"responsibility_areas\":[],\"unassigned_work_tasks\":[],\"required_knowledge\":[],\"required_skills\":[],\"main_col"
+        },
+        {
+          "turn": 1,
+          "name": "edit_interview_plan",
+          "call_id": "call_sNPluc70LVyJTHmShlxUFw2o",
+          "received_trace_line": 3,
+          "arguments": {
+            "diff": "@@\n+## 目前焦點\n+釐清收貨驗收中數量不符時，本人核對、暫置與交接的做法及責任界線。\n+\n+## 工作方向\n+- 收貨驗收：已知會核對採購單、送貨單與實收數量，拍照通知採購；拒收或退換貨由主管決定。日常收貨流程及差異後續處理待釐清，充分後整理入稿。\n+- 其他已提及工作：上架、揀貨補貨、庫存盤點、客戶退貨、供應商退貨及新人帶教；目前僅有工作輪廓，尚待辨認本人分工與重要要求。\n+- 全稿整理與核對：依後續訪談補足已知工作，檢視分組、任務、依據及跨欄一致性。\n*** End of File"
+          },
+          "result_trace_line": 5,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -0,0 +1,7 @@\\n+## 目前焦點\\n+釐清收貨驗收中數量不符時，本人核對、暫置與交接的做法及責任界線。\\n+\\n+## 工作方向\\n+- 收貨驗收：已知會核對採購單、送貨單與實收數量，拍照通知採購；拒收或退換貨由主管決定"
+        },
+        {
+          "turn": 8,
+          "name": "read_jd",
+          "call_id": "call_13i70WFTyCLuOaHhOWbrB3r2",
+          "received_trace_line": 214,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 216,
+          "result_prefix": "{\"profile\":{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"job_purpose_preview\":\"負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點、退貨處理及新人帶教，維持倉儲作業與庫存管理。\"},\"responsibility_areas\":[{\"re"
+        },
+        {
+          "turn": 8,
+          "name": "edit_interview_plan",
+          "call_id": "call_VFVzThgbmUJAnF6ZIHKdBMch",
+          "received_trace_line": 214,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-了解庫存盤點的安排方式與您實際負責的工作。\n+了解近期新人帶教時，您教哪些工作、如何示範及負責到哪裡。\n@@\n - 上架：已整理依規劃儲位放貨、貼品項及批號標籤、掃碼於 WMS 登記入庫並核對儲位一致；臨時放不下時找組長調整，不自行更改儲位規則。常溫貨用棧板車，超重貨由有證照同事操作堆高機。任務已入稿；儲位不一致時的處理已詢問，員工目前無確定資料，無新線索不重問。\n - 揀貨：已整理依出貨波次單核對品項／數量／批號／效期、揀貨區不足時從備貨區補貨、系統有貨但儲位空缺時先查移庫及前一波次且不擅自替換批號，完成後交包裝區複核；須在截單前完成，異常交組長協調。任務及協作已入稿；是否另有獨立補貨安排已詢問，員工目前無確定資料，無新線索不重問。\n-- 其他已提及工作：庫存盤點、客戶退貨、供應商退貨及新人帶教；目前僅有工作輪廓，尚待辨認本人分工與重要要求。\n+- 庫存盤點：員工表示每週做循環盤點，先查近期入出庫與移庫紀錄，再複點；差異調帳方式及批准者尚不清楚，已表示目前想不起來，無新線索不重問。已知部分待入稿。\n+- 新人帶教：已知列為主要工作；依員工意願轉入近期帶教情境，內容及責任界線尚待釐清。\n+- 其他已提及工作：客戶退貨、供應商退貨；目前僅有工作輪廓，尚待辨認本人分工與重要要求。\n*** End Patch"
+          },
+          "result_trace_line": 216,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,9 +1,11 @@\\n ## 目前焦點\\n-了解庫存盤點的安排方式與您實際負責的工作。\\n+了解近期新人帶教時，您教哪些工作、如何示範及負責到哪裡。\\n \\n ## 工作方向\\n - 收貨驗收：已整理逐箱點件、核對品項／數量"
+        },
+        {
+          "turn": 8,
+          "name": "edit_interview_plan",
+          "call_id": "call_S0cEXTRMRAtb2fw7320vRpvf",
+          "received_trace_line": 223,
+          "arguments": {
+            "diff": "@@\n-- 庫存盤點：員工表示每週做循環盤點，先查近期入出庫與移庫紀錄，再複點；差異調帳方式及批准者尚不清楚，已表示目前想不起來，無新線索不重問。已知部分待入稿。\n-- 新人帶教：已知列為主要工作；依員工意願轉入近期帶教情境，內容及責任界線尚待釐清。\n+- 庫存盤點：已入稿每週循環盤點、先查近期入出庫與移庫紀錄並對差異複點；差異調帳方式及批准者尚不清楚，員工目前想不起來，無新線索不重問。\n+- 新人帶教：已知列為主要工作；員工希望先談最近帶新人的工作，教學內容、示範方式及責任界線待了解。\n*** End Patch"
+          },
+          "result_trace_line": 225,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -5,7 +5,7 @@\\n - 收貨驗收：已整理逐箱點件、核對品項／數量／外包裝及單據；差異以照片和收貨異常表記錄、通知採購，待採購回覆補送或接受後按結果登記入庫。員工不議價、不選供應商、不決定拒收。貨物暫放位置及外包裝破損時的處"
+        },
+        {
+          "turn": 9,
+          "name": "read_jd",
+          "call_id": "call_jUHwQo1sERFNWr8LqMZJbxAY",
+          "received_trace_line": 258,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 260,
+          "result_prefix": "{\"profile\":{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"job_purpose_preview\":\"負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點、退貨處理及新人帶教，維持倉儲作業與庫存管理。\"},\"responsibility_areas\":[{\"re"
+        },
+        {
+          "turn": 9,
+          "name": "edit_interview_plan",
+          "call_id": "call_VsOhKFwfrie6VobK1OFF17Pp",
+          "received_trace_line": 258,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-了解近期新人帶教時，您教哪些工作、如何示範及負責到哪裡。\n+接續釐清循環盤點複點後的差異處理與調帳／批准分工；員工主動表示想起部分細節。\n@@\n-- 庫存盤點：已入稿每週循環盤點、先查近期入出庫與移庫紀錄並對差異複點；差異調帳方式及批准者尚不清楚，員工目前想不起來，無新線索不重問。\n-- 新人帶教：已知列為主要工作；員工希望先談最近帶新人的工作，教學內容、示範方式及責任界線待了解。\n+- 庫存盤點：已入稿每週循環盤點、先查近期入出庫與移庫紀錄並對差異複點；員工主動表示現在想起部分後續細節，待接續釐清差異處理、調帳與批准分工。\n+- 新人帶教：已知第一週示範掃碼、揀貨及安全動線，再讓新人跟做並觀察漏掃、批號錯誤及進入車道情況，記錄於帶教檢核表，並判斷能否獨立上線；待整理入稿。判斷是否為最終放行仍未確認。\n*** End Patch"
+          },
+          "result_trace_line": 260,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,11 +1,11 @@\\n ## 目前焦點\\n-了解近期新人帶教時，您教哪些工作、如何示範及負責到哪裡。\\n+接續釐清循環盤點複點後的差異處理與調帳／批准分工；員工主動表示想起部分細節。\\n \\n ## 工作方向\\n - 收貨"
+        },
+        {
+          "turn": 9,
+          "name": "create_jd_item",
+          "call_id": "call_355acMjxsQIJr8rIzAoDavYs",
+          "received_trace_line": 261,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "新進人員",
+              "scope_text": "接受掃碼、揀貨及安全動線示範，跟著實作並接受現場觀察與帶教評估。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 263,
+          "result_prefix": "created · read_ref: collaborator_12"
+        },
+        {
+          "turn": 9,
+          "name": "edit_interview_plan",
+          "call_id": "call_xnuKqoWqTkgguPAbmdtjLKZj",
+          "received_trace_line": 267,
+          "arguments": {
+            "diff": "@@\n-- 新人帶教：已知第一週示範掃碼、揀貨及安全動線，再讓新人跟做並觀察漏掃、批號錯誤及進入車道情況，記錄於帶教檢核表，並判斷能否獨立上線；待整理入稿。判斷是否為最終放行仍未確認。\n+- 新人帶教：已入稿第一週示範掃碼、揀貨及安全動線，讓新人跟做並觀察漏掃、批號錯誤及進入車道情況，記錄於帶教檢核表，並判斷能否獨立上線；是否由本人作最終放行仍未確認。\n*** End Patch"
+          },
+          "result_trace_line": 272,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -6,6 +6,6 @@\\n - 上架：已整理依規劃儲位放貨、貼品項及批號標籤、掃碼於 WMS 登記入庫並核對儲位一致；臨時放不下時找組長調整，不自行更改儲位規則。常溫貨用棧板車，超重貨由有證照同事操作堆高機。任務已入稿；儲位不一致"
+        },
+        {
+          "turn": 10,
+          "name": "read_jd",
+          "call_id": "call_W2LX47xOsAlXrLYEGLWcvUlz",
+          "received_trace_line": 303,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_10"
+          },
+          "result_trace_line": 305,
+          "result_prefix": "{\"read_ref\":\"task_10\",\"kind\":\"work_task\",\"title\":\"執行每週循環盤點與差異複點\",\"description\":\"按循環盤點安排清點庫存，先查近期入庫、出庫及移庫紀錄；發現差異時再複點。\",\"outcomes\":[],\"requirements\":[{\"read_ref\":\"requirement_17\",\"te"
+        },
+        {
+          "turn": 10,
+          "name": "read_jd",
+          "call_id": "call_ktxTPCreVfegWrmJmQGvALn5",
+          "received_trace_line": 303,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 305,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_6\",\"kind\":\"collaborator\",\"name\":\"包裝區\",\"scope_text\":\"接收揀貨完成的貨品並複核。\",\"supporting_sources\":[{\"citation_ref\":\"citation_20\",\"kind\":\"interview\",\"inter"
+        },
+        {
+          "turn": 10,
+          "name": "edit_interview_plan",
+          "call_id": "call_4sjiebZVd79ibmBE5WmSPHmF",
+          "received_trace_line": 303,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-接續釐清循環盤點複點後的差異處理與調帳／批准分工；員工主動表示想起部分細節。\n+把新釐清的盤點差異記錄、核准、調帳與結案前核對規則補入 JD。\n@@\n-- 庫存盤點：已入稿每週循環盤點、先查近期入出庫與移庫紀錄並對差異複點；員工主動表示現在想起部分後續細節，待接續釐清差異處理、調帳與批准分工。\n+- 庫存盤點：已知每週循環盤點、先查近期入出庫與移庫紀錄並對差異複點；差異及查過的單據、原因記於盤點差異表交倉儲主管核准，再由主管交財務調帳。員工不直接改庫存數量，結案前核對更新後數量；找不到原因時保留待查。這些新增細節待補入並核對任務。\n*** End Patch"
+          },
+          "result_trace_line": 305,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,11 +1,11 @@\\n ## 目前焦點\\n-接續釐清循環盤點複點後的差異處理與調帳／批准分工；員工主動表示想起部分細節。\\n+把新釐清的盤點差異記錄、核准、調帳與結案前核對規則補入 JD。\\n \\n ## 工作方向\\n -"
+        },
+        {
+          "turn": 10,
+          "name": "revise_jd_item",
+          "call_id": "call_SSlf2PpS7ZsRxwjpSiEPkaLw",
+          "received_trace_line": 306,
+          "arguments": {
+            "read_ref": "task_10",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "每週執行循環盤點，先查近期入庫、出庫及移庫紀錄，發現差異時再複點；將差異、查過的單據及原因記錄於盤點差異表，交倉儲主管核准，再由主管交財務調帳。結案前核對更新後數量；找不到原因時保留待查。本人不直接更改庫存數量。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "將盤點差異、已查單據及原因記錄於盤點差異表，提交倉儲主管核准。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "結案前核對更新後的庫存數量；找不到原因的差異保留待查。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "盤點差異經倉儲主管核准後由主管交財務調帳；本人不直接修改庫存數量。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "結案前核對更新後數量；差異原因未明時保留待查。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              }
+            ]
+          },
+          "result_trace_line": 308,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 10,
+          "name": "create_jd_item",
+          "call_id": "call_93ac2uKAQHWFy1PP3b6L29FR",
+          "received_trace_line": 306,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "倉儲主管",
+              "scope_text": "核准員工提交的盤點差異表，並將核准的差異交財務調帳。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 308,
+          "result_prefix": "created · read_ref: collaborator_21"
+        },
+        {
+          "turn": 10,
+          "name": "edit_interview_plan",
+          "call_id": "call_ADAj8kVvbI5TGbXwYfdWDMxd",
+          "received_trace_line": 313,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-把新釐清的盤點差異記錄、核准、調帳與結案前核對規則補入 JD。\n+了解客戶退貨的處理流程、本人負責範圍與決策界線。\n@@\n-- 庫存盤點：已知每週循環盤點、先查近期入出庫與移庫紀錄並對差異複點；差異及查過的單據、原因記於盤點差異表交倉儲主管核准，再由主管交財務調帳。員工不直接改庫存數量，結案前核對更新後數量；找不到原因時保留待查。這些新增細節待補入並核對任務。\n-- 新人帶教：已入稿第一週示範掃碼、揀貨及安全動線，讓新人跟做並觀察漏掃、批號錯誤及進入車道情況，記錄於帶教檢核表，並判斷能否獨立上線；是否由本人作最終放行仍未確認。\n-- 其他已提及工作：客戶退貨、供應商退貨；目前僅有工作輪廓，尚待辨認本人分工與重要要求。\n+- 庫存盤點：已入稿每週循環盤點、近期異動紀錄查核與複點，以及差異表交主管核准、主管交財務調帳、結案前核對更新數量、原因不明留待查；員工不直接改庫存數量。\n+- 新人帶教：已入稿第一週示範掃碼、揀貨及安全動線，讓新人跟做並觀察漏掃、批號錯誤及進入車道情況，記錄於帶教檢核表，並判斷能否獨立上線；是否由本人作最終放行仍未確認。\n+- 客戶退貨、供應商退貨：已知列為主要工作，流程、分工與重要要求尚未探索；先了解客戶退貨。\n*** End Patch"
+          },
+          "result_trace_line": 315,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,11 +1,11 @@\\n ## 目前焦點\\n-把新釐清的盤點差異記錄、核准、調帳與結案前核對規則補入 JD。\\n+了解客戶退貨的處理流程、本人負責範圍與決策界線。\\n \\n ## 工作方向\\n - 收貨驗收：已整理逐箱點件、"
+        },
+        {
+          "turn": 13,
+          "name": "read_jd",
+          "call_id": "call_mIj9gi0eNloyfwqzBcE7gT8J",
+          "received_trace_line": 398,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_22"
+          },
+          "result_trace_line": 400,
+          "result_prefix": "{\"read_ref\":\"area_22\",\"kind\":\"responsibility_area\",\"title\":\"退貨處理\",\"scope_text\":\"處理客戶退貨的驗收、分流、入庫及交接。\",\"supporting_sources\":[{\"citation_ref\":\"citation_35\",\"kind\":\"interview\",\"intervi"
+        },
+        {
+          "turn": 13,
+          "name": "read_jd",
+          "call_id": "call_2wWXucdOMExc0Lah7eIF0v5J",
+          "received_trace_line": 398,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 400,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_6\",\"kind\":\"collaborator\",\"name\":\"包裝區\",\"scope_text\":\"接收揀貨完成的貨品並複核。\",\"supporting_sources\":[{\"citation_ref\":\"citation_20\",\"kind\":\"interview\",\"inter"
+        },
+        {
+          "turn": 13,
+          "name": "edit_interview_plan",
+          "call_id": "call_UfTHSQGexSwoYeopCkMaauqY",
+          "received_trace_line": 398,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-了解供應商退貨的觸發情況、本人處理步驟與交接／決策界線。\n+把供應商退貨的出庫作業及決策界線補入 JD，與客戶退貨驗收分開描述。\n@@\n-- 供應商退貨：已知列為主要工作，流程、分工與重要要求尚待了解。\n+- 供應商退貨：已釐清此處是出庫；採購決定退貨品項，員工依退貨單備貨、核對數量、拍照、登記出庫，交承運商簽收並將簽收資料回給採購。員工不辦供應商退貨入庫，也不決定退貨條件。退貨觸發原因已詢問，員工目前無確定資料，無新線索不重問；作業待入稿。\n*** End Patch"
+          },
+          "result_trace_line": 400,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,5 +1,5 @@\\n ## 目前焦點\\n-了解供應商退貨的觸發情況、本人處理步驟與交接／決策界線。\\n+把供應商退貨的出庫作業及決策界線補入 JD，與客戶退貨驗收分開描述。\\n \\n ## 工作方向\\n - 收貨驗收：已整理"
+        },
+        {
+          "turn": 13,
+          "name": "revise_jd_item",
+          "call_id": "call_YXnZAvVx1OU9FolhCNAeeUvJ",
+          "received_trace_line": 401,
+          "arguments": {
+            "read_ref": "area_22",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "處理客戶退貨的驗收、分流、入庫及交接，以及供應商退貨出庫與承運商交接。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 403,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 13,
+          "name": "create_jd_item",
+          "call_id": "call_86W3i0fAr8Jn7PCCqQukcYbO",
+          "received_trace_line": 401,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "採購",
+              "scope_text": "決定供應商退貨品項，並接收承運商簽收資料。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 403,
+          "result_prefix": "created · read_ref: collaborator_39"
+        },
+        {
+          "turn": 13,
+          "name": "create_jd_item",
+          "call_id": "call_qhDlf1brP7DA5pyzfRX8cIvr",
+          "received_trace_line": 401,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "承運商",
+              "scope_text": "承接供應商退貨貨品並簽收。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 403,
+          "result_prefix": "created · read_ref: collaborator_40"
+        },
+        {
+          "turn": 13,
+          "name": "edit_interview_plan",
+          "call_id": "call_nm3clOugkFy945Onws3iJ7KX",
+          "received_trace_line": 407,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-把供應商退貨的出庫作業及決策界線補入 JD，與客戶退貨驗收分開描述。\n+釐清新人能否獨立上線由誰作最終決定或放行。\n@@\n-- 新人帶教：已入稿第一週示範掃碼、揀貨及安全動線，讓新人跟做並觀察漏掃、批號錯誤及進入車道情況，記錄於帶教檢核表，並判斷能否獨立上線；是否由本人作最終放行仍未確認。\n+- 新人帶教：已入稿第一週示範掃碼、揀貨及安全動線，讓新人跟做並觀察漏掃、批號錯誤及進入車道情況，記錄於帶教檢核表，並判斷能否獨立上線；是否由本人作最終放行仍未確認，待釐清權責。\n@@\n-- 供應商退貨：已釐清此處是出庫；採購決定退貨品項，員工依退貨單備貨、核對數量、拍照、登記出庫，交承運商簽收並將簽收資料回給採購。員工不辦供應商退貨入庫，也不決定退貨條件。退貨觸發原因已詢問，員工目前無確定資料，無新線索不重問；作業待入稿。\n+- 供應商退貨：已整理為出庫任務；採購決定退貨品項，員工依退貨單備貨、核對數量、拍照、登記出庫，交承運商簽收並將簽收資料回給採購。員工不辦供應商退貨入庫，也不決定退貨條件。退貨觸發原因已詢問，員工目前無確定資料，無新線索不重問。\n*** End Patch"
+          },
+          "result_trace_line": 409,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,12 +1,12 @@\\n ## 目前焦點\\n-把供應商退貨的出庫作業及決策界線補入 JD，與客戶退貨驗收分開描述。\\n+釐清新人能否獨立上線由誰作最終決定或放行。\\n \\n ## 工作方向\\n - 收貨驗收：已整理逐箱點件、"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_0FtcCxoxHVLdyobmGuu4C3Nd",
+          "received_trace_line": 433,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_14"
+          },
+          "result_trace_line": 435,
+          "result_prefix": "{\"read_ref\":\"task_14\",\"kind\":\"work_task\",\"title\":\"帶教新人倉儲作業並評估獨立上線準備度\",\"description\":\"新人第一週示範掃碼、揀貨及安全動線，再讓新人跟著實作；當場觀察是否漏掃、拿錯批號或進入車道，記錄於帶教檢核表，並判斷能否獨立上線。\",\"outcomes\":[{\"read_ref\":\"out"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_PBftcPmDhWm7DqcvNYGxWrZu",
+          "received_trace_line": 433,
+          "arguments": {
+            "view": "item",
+            "read_ref": "skill_13"
+          },
+          "result_trace_line": 435,
+          "result_prefix": "{\"read_ref\":\"skill_13\",\"kind\":\"skill\",\"name\":\"倉儲作業帶教與現場評估\",\"description\":\"運用示範、跟做觀察及帶教檢核，辨識掃碼遺漏、批號錯誤或安全動線風險，評估新人是否能獨立上線。\",\"used_by_tasks\":[{\"read_ref\":\"task_14\",\"title\":\"帶教新人倉儲作業並評"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_U9ewaTFEdHMpX7gwMb6pIXmf",
+          "received_trace_line": 433,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_7"
+          },
+          "result_trace_line": 435,
+          "result_prefix": "{\"read_ref\":\"collaborator_7\",\"kind\":\"collaborator\",\"name\":\"組長\",\"scope_text\":\"協調揀貨異常。\",\"supporting_sources\":[{\"citation_ref\":\"citation_19\",\"kind\":\"interview\",\"interview_sequence\":12"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_cYrvV5JKWCjxs5NrwaO3Oo2g",
+          "received_trace_line": 433,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_21"
+          },
+          "result_trace_line": 435,
+          "result_prefix": "{\"read_ref\":\"collaborator_21\",\"kind\":\"collaborator\",\"name\":\"倉儲主管\",\"scope_text\":\"核准員工提交的盤點差異表，並將核准的差異交財務調帳。\",\"supporting_sources\":[{\"citation_ref\":\"citation_36\",\"kind\":\"interview\",\""
+        },
+        {
+          "turn": 14,
+          "name": "edit_interview_plan",
+          "call_id": "call_jY5LqiqLhDZrn21wcGnp2A5g",
+          "received_trace_line": 433,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-釐清新人能否獨立上線由誰作最終決定或放行。\n+修正新人帶教中的觀察、回報、再訓練與主管核准權責，並核對相關 JD 內容。\n@@\n-- 新人帶教：已入稿第一週示範掃碼、揀貨及安全動線，讓新人跟做並觀察漏掃、批號錯誤及進入車道情況，記錄於帶教檢核表，並判斷能否獨立上線；是否由本人作最終放行仍未確認，待釐清權責。\n+- 新人帶教：員工更正為本人觀察操作並向組長回報，不批准新人獨立上線；主管最後核准。第一次漏掃時要求新人重做並解釋原因；反覆錯誤時交組長安排再訓練。待修訂任務、能力文字及協作界線並核對引用。\n*** End Patch"
+          },
+          "result_trace_line": 435,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,12 +1,12 @@\\n ## 目前焦點\\n-釐清新人能否獨立上線由誰作最終決定或放行。\\n+修正新人帶教中的觀察、回報、再訓練與主管核准權責，並核對相關 JD 內容。\\n \\n ## 工作方向\\n - 收貨驗收：已整理逐箱"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_bvDTxMFd0SP3TioeAX4i0oDq",
+          "received_trace_line": 448,
+          "arguments": {
+            "read_ref": "task_14",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "新人第一週示範掃碼、揀貨及安全動線，再讓新人跟著實作；當場觀察漏掃、批號錯誤或進入車道情況，記錄於帶教檢核表，並向組長回報新人操作表現。首次漏掃時讓新人重做並解釋原因；反覆錯誤時交組長安排再訓練。本人不批准新人獨立上線，最後由主管核准。"
+              },
+              {
+                "action": "revise_detail",
+                "detail_read_ref": "outcome_48",
+                "text": "向組長回報新人是否具備獨立上線準備度的評估；最終由主管核准。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "detail",
+                  "detail_read_ref": "outcome_48"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "首次漏掃時讓新人重做並解釋原因；反覆錯誤時交組長安排再訓練。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "本人觀察操作並向組長回報；新人獨立上線最後由主管核准，本人不作核准。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_42"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "detail",
+                  "detail_read_ref": "outcome_48"
+                },
+                "citation_ref": "citation_45"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_13"
+                },
+                "citation_ref": "citation_43"
+              }
+            ]
+          },
+          "result_trace_line": 450,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_owfY5itrkwCzj66ZhaQwgGIn",
+          "received_trace_line": 448,
+          "arguments": {
+            "read_ref": "skill_13",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "示範並觀察新人操作，辨識漏掃、批號錯誤及安全動線問題，適時要求重做並說明，將新人表現回報組長，以供主管核准是否可獨立上線。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_50"
+              }
+            ]
+          },
+          "result_trace_line": 450,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_zL93wVId1aHUZTf3WzfYyek0",
+          "received_trace_line": 448,
+          "arguments": {
+            "read_ref": "collaborator_7",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "協調揀貨異常；接收新人操作回報，並於反覆錯誤時安排再訓練。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_19"
+              }
+            ]
+          },
+          "result_trace_line": 450,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_iPPWYyPinMxS3HvOWBdGFbqF",
+          "received_trace_line": 448,
+          "arguments": {
+            "read_ref": "collaborator_21",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "核准員工提交的盤點差異表並將核准差異交財務調帳；最後核准新人獨立上線。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_36"
+              }
+            ]
+          },
+          "result_trace_line": 450,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_E01emPSU0JKwdC6MWlxgqSQN",
+          "received_trace_line": 454,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 457,
+          "result_prefix": "{\"profile\":{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"job_purpose_preview\":\"負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點、退貨處理及新人帶教，維持倉儲作業與庫存管理。\"},\"responsibility_areas\":[{\"re"
+        },
+        {
+          "turn": 14,
+          "name": "edit_interview_plan",
+          "call_id": "call_r4Rmw65kaawzc3Dd6kdyElFo",
+          "received_trace_line": 454,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-修正新人帶教中的觀察、回報、再訓練與主管核准權責，並核對相關 JD 內容。\n+核對新人帶教更正已一致反映，並檢視職責分組、必要能力及共通工作條件是否有漏寫。\n@@\n-- 新人帶教：員工更正為本人觀察操作並向組長回報，不批准新人獨立上線；主管最後核准。第一次漏掃時要求新人重做並解釋原因；反覆錯誤時交組長安排再訓練。待修訂任務、能力文字及協作界線並核對引用。\n+- 新人帶教：已修訂為本人示範、觀察操作並向組長回報；首次漏掃時要求重做及解釋，反覆錯誤交組長安排再訓練；主管最後核准是否獨立上線。任務、能力及協作界線已修訂，跨欄與來源核對待整體檢視。\n@@\n - 全稿整理與核對：依後續訪談補足已知工作，檢視分組、任務、依據及跨欄一致性。\n*** End Patch"
+          },
+          "result_trace_line": 457,
+          "result_prefix": "{\"status\":\"rejected\",\"code\":\"invalid_patch\",\"message\":\"Each hunk needs an edit and source context or an explicit EOF\\n本次正文未改。\",\"next_action\":\"依下方正文 V4A 範例更正 diff 並對應目前正文；已知全文時不必為格式"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_Ni2XO2FsU9BV0HwySOCBmlgw",
+          "received_trace_line": 458,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_11"
+          },
+          "result_trace_line": 460,
+          "result_prefix": "{\"read_ref\":\"area_11\",\"kind\":\"responsibility_area\",\"title\":\"新人帶教與上線評估\",\"scope_text\":\"在新人第一週示範倉儲作業及安全動線，帶領跟做、觀察並記錄，判斷新人能否獨立上線。\",\"supporting_sources\":[{\"citation_ref\":\"citation_51\",\""
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_ZpBcb4v4I8baTiC1VSIbgNx2",
+          "received_trace_line": 458,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_14"
+          },
+          "result_trace_line": 460,
+          "result_prefix": "{\"read_ref\":\"task_14\",\"kind\":\"work_task\",\"title\":\"帶教新人倉儲作業並評估獨立上線準備度\",\"description\":\"新人第一週示範掃碼、揀貨及安全動線，再讓新人跟著實作；當場觀察漏掃、批號錯誤或進入車道情況，記錄於帶教檢核表，並向組長回報新人操作表現。首次漏掃時讓新人重做並解釋原因；反覆錯誤時交組長安排再"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_gE8Fe7KIzx55qt481AnnKKR0",
+          "received_trace_line": 458,
+          "arguments": {
+            "view": "item",
+            "read_ref": "skill_13"
+          },
+          "result_trace_line": 460,
+          "result_prefix": "{\"read_ref\":\"skill_13\",\"kind\":\"skill\",\"name\":\"倉儲作業帶教與現場評估\",\"description\":\"示範並觀察新人操作，辨識漏掃、批號錯誤及安全動線問題，適時要求重做並說明，將新人表現回報組長，以供主管核准是否可獨立上線。\",\"used_by_tasks\":[{\"read_ref\":\"task_14\",\"tit"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_FroCNPsSqNGOoD9Glpz5IBWv",
+          "received_trace_line": 458,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_7"
+          },
+          "result_trace_line": 460,
+          "result_prefix": "{\"read_ref\":\"collaborator_7\",\"kind\":\"collaborator\",\"name\":\"組長\",\"scope_text\":\"協調揀貨異常；接收新人操作回報，並於反覆錯誤時安排再訓練。\",\"supporting_sources\":[{\"citation_ref\":\"citation_19\",\"kind\":\"interview\",\""
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_4wDfyy2VnRFzYBCxUHr1KS9I",
+          "received_trace_line": 458,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_21"
+          },
+          "result_trace_line": 460,
+          "result_prefix": "{\"read_ref\":\"collaborator_21\",\"kind\":\"collaborator\",\"name\":\"倉儲主管\",\"scope_text\":\"核准員工提交的盤點差異表並將核准差異交財務調帳；最後核准新人獨立上線。\",\"supporting_sources\":[{\"citation_ref\":\"citation_36\",\"kind\":\"int"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_m0XD3OE4Q6zBx414D19Rmmo4",
+          "received_trace_line": 461,
+          "arguments": {
+            "read_ref": "area_11",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "title",
+                "value": "新人帶教與作業回報"
+              },
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "在新人第一週示範倉儲作業及安全動線，帶領跟做、觀察並向組長回報操作情況；新人能否獨立上線由主管核准。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_51"
+              }
+            ]
+          },
+          "result_trace_line": 463,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_igSgAd0PUiE3QkTjF7YpSCv6",
+          "received_trace_line": 461,
+          "arguments": {
+            "read_ref": "task_14",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "title",
+                "value": "帶教新人倉儲作業並回報現場表現"
+              },
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "新人第一週示範掃碼、揀貨及安全動線，再讓新人跟著實作；當場觀察漏掃、批號錯誤或進入車道情況，記錄於帶教檢核表，並向組長回報新人操作表現。首次漏掃時讓新人重做並解釋原因；反覆錯誤時交組長安排再訓練。新人能否獨立上線由主管最後核准。"
+              },
+              {
+                "action": "revise_detail",
+                "detail_read_ref": "outcome_48",
+                "text": "將新人操作情況回報組長；新人能否獨立上線由主管最後核准。"
+              },
+              {
+                "action": "remove_source",
+                "target": {
+                  "kind": "detail",
+                  "detail_read_ref": "outcome_48"
+                },
+                "citation_ref": "citation_45"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_42"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "detail",
+                  "detail_read_ref": "outcome_47"
+                },
+                "citation_ref": "citation_46"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "detail",
+                  "detail_read_ref": "outcome_48"
+                },
+                "citation_ref": "citation_55"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_13"
+                },
+                "citation_ref": "citation_43"
+              }
+            ]
+          },
+          "result_trace_line": 463,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_Lw5AgHeksgmy2U5RBqbXFc8o",
+          "received_trace_line": 461,
+          "arguments": {
+            "read_ref": "skill_13",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "name",
+                "value": "倉儲作業示範與新人帶教"
+              },
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "透過實際示範與跟做觀察教導新人，辨識漏掃、批號錯誤及安全動線問題，提供即時糾正並向組長回報操作情況。"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_50"
+              }
+            ]
+          },
+          "result_trace_line": 463,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "edit_interview_plan",
+          "call_id": "call_QtQRy5uV9sINqdsNjGevRcyC",
+          "received_trace_line": 464,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-修正新人帶教中的觀察、回報、再訓練與主管核准權責，並核對相關 JD 內容。\n+核對新人帶教權責修正已一致反映，並檢視職責分組、必要能力及共通工作條件是否有漏寫。\n \n ## 工作方向\n@@\n - 庫存盤點：已入稿每週循環盤點、近期異動紀錄查核與複點，以及差異表交主管核准、主管交財務調帳、結案前核對更新數量、原因不明留待查；員工不直接改庫存數量。\n-- 新人帶教：員工更正為本人觀察操作並向組長回報，不批准新人獨立上線；主管最後核准。第一次漏掃時要求新人重做並解釋原因；反覆錯誤時交組長安排再訓練。待修訂任務、能力文字及協作界線並核對引用。\n+- 新人帶教：已修訂為本人第一週示範掃碼、揀貨及安全動線，帶新人跟做、觀察並記錄於檢核表；首次漏掃時要求重做並解釋，反覆錯誤交組長安排再訓練，並向組長回報操作表現；是否可獨立上線由主管最後核准。任務、職責名稱、能力文字及協作界線已修訂並重評引用。\n*** End Patch"
+          },
+          "result_trace_line": 466,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,12 +1,12 @@\\n ## 目前焦點\\n-修正新人帶教中的觀察、回報、再訓練與主管核准權責，並核對相關 JD 內容。\\n+核對新人帶教權責修正已一致反映，並檢視職責分組、必要能力及共通工作條件是否有漏寫。\\n \\n ##"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_Vp2yoptFzJLUmRkkWjUDLzmW",
+          "received_trace_line": 470,
+          "arguments": {
+            "read_ref": "task_4",
+            "changes": [
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "skill_62",
+                "supporting_sources": [
+                  {
+                    "kind": "work_understanding",
+                    "target_title": "物流中心倉庫管理員的工作範圍與作業責任界線"
+                  }
+                ]
+              }
+            ]
+          },
+          "result_trace_line": 472,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_6FGY541LG4J08eetTn9zfqZ7",
+          "received_trace_line": 470,
+          "arguments": {
+            "read_ref": "task_8",
+            "changes": [
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "skill_63",
+                "supporting_sources": [
+                  {
+                    "kind": "work_understanding",
+                    "target_title": "物流中心倉庫管理員的工作範圍與作業責任界線"
+                  }
+                ]
+              },
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "skill_64",
+                "supporting_sources": [
+                  {
+                    "kind": "work_understanding",
+                    "target_title": "物流中心倉庫管理員的工作範圍與作業責任界線"
+                  }
+                ]
+              }
+            ]
+          },
+          "result_trace_line": 472,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_EdeEMEL7XNIW9P72mD0RegCU",
+          "received_trace_line": 470,
+          "arguments": {
+            "read_ref": "task_10",
+            "changes": [
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "skill_63",
+                "supporting_sources": [
+                  {
+                    "kind": "work_understanding",
+                    "target_title": "物流中心倉庫管理員的工作範圍與作業責任界線"
+                  }
+                ]
+              }
+            ]
+          },
+          "result_trace_line": 472,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_KXNQ6QlhOzN8XQMD9yWKSVnl",
+          "received_trace_line": 470,
+          "arguments": {
+            "read_ref": "task_14",
+            "changes": [
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "knowledge_61",
+                "supporting_sources": [
+                  {
+                    "kind": "work_understanding",
+                    "target_title": "物流中心倉庫管理員的工作範圍與作業責任界線"
+                  }
+                ]
+              }
+            ]
+          },
+          "result_trace_line": 472,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_m7pbD64cTh7wOiMvgADx06lB",
+          "received_trace_line": 473,
+          "arguments": {
+            "view": "full",
+            "read_ref": null
+          },
+          "result_trace_line": 475,
+          "result_prefix": "# 職務說明書\n\n## 職務基本資料\n\n**職稱**\n\n倉庫管理員\n\n**組織單位**\n\n物流中心\n\n**匯報對象**\n\n倉儲主管\n\n## 職務目的\n\n負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點、退貨處理及新人帶教，維持倉儲作業與庫存管理。\n\n## 主要職責與工作任務\n\n### 職責 1：進貨驗收與差異處理\n\n負責進貨清點及核對，登記、通報收貨異常，並"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_xuKrc1hyuVtqooObFVgYrUsl",
+          "received_trace_line": 473,
+          "arguments": {
+            "view": "required_knowledge",
+            "read_ref": null
+          },
+          "result_trace_line": 475,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"knowledge_61\",\"kind\":\"knowledge\",\"name\":\"倉內安全動線要求\",\"description\":\"了解作業區安全動線及車道限制，以示範安全路線並辨識誤入車道情況。\",\"used_by_tasks\":[{\"read_ref\":\"task_14\",\"title\":\"帶教新人倉儲作業並"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_X2YjDUQazlIcpXOWr6FpWMtb",
+          "received_trace_line": 473,
+          "arguments": {
+            "view": "required_skills",
+            "read_ref": null
+          },
+          "result_trace_line": 475,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"skill_13\",\"kind\":\"skill\",\"name\":\"倉儲作業示範與新人帶教\",\"description\":\"透過實際示範與跟做觀察教導新人，辨識漏掃、批號錯誤及安全動線問題，提供即時糾正並向組長回報操作情況。\",\"used_by_tasks\":[{\"read_ref\":\"task_14\",\"titl"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_QoFcNxzoqfvmhmj3Sx1A3wsd",
+          "received_trace_line": 473,
+          "arguments": {
+            "view": "job_wide_conditions",
+            "read_ref": null
+          },
+          "result_trace_line": 475,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"condition_65\",\"kind\":\"job_wide_condition\",\"condition_kind\":\"schedule_travel\",\"text\":\"早上七點上班，週一至週六輪休。\",\"supporting_sources\":[{\"citation_ref\":\"citation_75\",\"ki"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_rZYVITUKScVZbdOIIQAcR5Ds",
+          "received_trace_line": 473,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 475,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_6\",\"kind\":\"collaborator\",\"name\":\"包裝區\",\"scope_text\":\"接收揀貨完成的貨品並複核。\",\"supporting_sources\":[{\"citation_ref\":\"citation_20\",\"kind\":\"interview\",\"inter"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_4YQPScKRp4d0bEwLJinGUkzU",
+          "received_trace_line": 476,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_14"
+          },
+          "result_trace_line": 478,
+          "result_prefix": "{\"read_ref\":\"task_14\",\"kind\":\"work_task\",\"title\":\"帶教新人倉儲作業並回報現場表現\",\"description\":\"新人第一週示範掃碼、揀貨及安全動線，再讓新人跟著實作；當場觀察漏掃、批號錯誤或進入車道情況，記錄於帶教檢核表，並向組長回報新人操作表現。首次漏掃時讓新人重做並解釋原因；反覆錯誤時交組長安排再訓練。"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_rynTxHVfesAucczIiXI0DzqC",
+          "received_trace_line": 476,
+          "arguments": {
+            "view": "item",
+            "read_ref": "skill_13"
+          },
+          "result_trace_line": 478,
+          "result_prefix": "{\"read_ref\":\"skill_13\",\"kind\":\"skill\",\"name\":\"倉儲作業示範與新人帶教\",\"description\":\"透過實際示範與跟做觀察教導新人，辨識漏掃、批號錯誤及安全動線問題，提供即時糾正並向組長回報操作情況。\",\"used_by_tasks\":[{\"read_ref\":\"task_14\",\"title\":\"帶教新人倉儲"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd",
+          "call_id": "call_o59SgUtS2QeXNRQkXjUhX4dL",
+          "received_trace_line": 476,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_11"
+          },
+          "result_trace_line": 478,
+          "result_prefix": "{\"read_ref\":\"area_11\",\"kind\":\"responsibility_area\",\"title\":\"新人帶教與作業回報\",\"scope_text\":\"在新人第一週示範倉儲作業及安全動線，帶領跟做、觀察並向組長回報操作情況；新人能否獨立上線由主管核准。\",\"supporting_sources\":[{\"citation_ref\":\"cita"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_KsfiH225LOaCA6MvAsPbHudk",
+          "received_trace_line": 479,
+          "arguments": {
+            "read_ref": "task_14",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_53"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_13"
+                },
+                "citation_ref": "citation_43"
+              }
+            ]
+          },
+          "result_trace_line": 481,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 14,
+          "name": "revise_jd_item",
+          "call_id": "call_JixoIA0nudR3ItQkIaWsd7iu",
+          "received_trace_line": 479,
+          "arguments": {
+            "read_ref": "skill_13",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_58"
+              }
+            ]
+          },
+          "result_trace_line": 481,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 14,
+          "name": "read_jd_changes",
+          "call_id": "call_Jv6jtmV2T6rl27DFKsN3kM9I",
+          "received_trace_line": 482,
+          "arguments": {
+            "query": {
+              "kind": "manual",
+              "scope": {
+                "kind": "all"
+              }
+            }
+          },
+          "result_trace_line": 484,
+          "result_prefix": "## JD 人工差異\n比較：上一成功 A 正式 JD → 本 Turn 起點正式 JD。\n只讀；未確認內容，也未解除來源待核對。本 Turn 候選修改不在此範圍。\n本範圍人工操作：0\n沒有人工操作。\n### 淨差異\n淨差異：無。"
+        },
+        {
+          "turn": 14,
+          "name": "edit_interview_plan",
+          "call_id": "call_jQfnBTMT5Vx95Pv3bsauF5hz",
+          "received_trace_line": 485,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-核對新人帶教權責修正已一致反映，並檢視職責分組、必要能力及共通工作條件是否有漏寫。\n+確認是否還有未提及的固定週期、支援或重要收尾工作，再請員工核對主要職責與責任界線。\n@@\n - 供應商退貨：已整理為出庫任務；採購決定退貨品項，員工依退貨單備貨、核對數量、拍照、登記出庫，交承運商簽收並將簽收資料回給採購。員工不辦供應商退貨入庫，也不決定退貨條件。退貨觸發原因已詢問，員工目前無確定資料，無新線索不重問。\n-- 全稿整理與核對：依後續訪談補足已知工作，檢視分組、任務、依據及跨欄一致性。\n+- 全稿整理與核對：已通讀目前 JD，職責分組、任務、能力、協作及排班均已整理；待確認是否遺漏重要工作，再核對來源及跨欄一致性。\n*** End Patch"
+          },
+          "result_trace_line": 487,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,5 +1,5 @@\\n ## 目前焦點\\n-核對新人帶教權責修正已一致反映，並檢視職責分組、必要能力及共通工作條件是否有漏寫。\\n+確認是否還有未提及的固定週期、支援或重要收尾工作，再請員工核對主要職責與責任界線。\\n \\n "
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_T73Q33DcrRDcCXQITV9FvNwD",
+          "received_trace_line": 523,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 525,
+          "result_prefix": "{\"profile\":{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"job_purpose_preview\":\"負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點、退貨處理及新人帶教，維持倉儲作業與庫存管理。\"},\"responsibility_areas\":[{\"re"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_OVmHDmZRRUCBPvPeXqRiOjkK",
+          "received_trace_line": 526,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_8"
+          },
+          "result_trace_line": 528,
+          "result_prefix": "{\"read_ref\":\"task_8\",\"kind\":\"work_task\",\"title\":\"依出貨波次完成揀貨、必要補貨及交接\",\"description\":\"依出貨波次單揀貨，核對品項、數量、批號及效期；揀貨區不足時從備貨區補貨。系統顯示有貨但儲位空缺時，先查移庫情形及前一波次，不擅自以其他批號替代，異常交組長協調。完成後交包裝區複核。\",\"outc"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_jLcLAJdF2Wt57qQsPZtbJdgv",
+          "received_trace_line": 526,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_10"
+          },
+          "result_trace_line": 528,
+          "result_prefix": "{\"read_ref\":\"task_10\",\"kind\":\"work_task\",\"title\":\"執行每週循環盤點與差異複點\",\"description\":\"每週執行循環盤點，先查近期入庫、出庫及移庫紀錄，發現差異時再複點；將差異、查過的單據及原因記錄於盤點差異表，交倉儲主管核准，再由主管交財務調帳。結案前核對更新後數量；找不到原因時保留待查。本人不直接更"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_mDZmoy20QB2Y2IfTfw0mFPTy",
+          "received_trace_line": 526,
+          "arguments": {
+            "view": "job_wide_conditions",
+            "read_ref": null
+          },
+          "result_trace_line": 528,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"condition_65\",\"kind\":\"job_wide_condition\",\"condition_kind\":\"schedule_travel\",\"text\":\"早上七點上班，週一至週六輪休。\",\"supporting_sources\":[{\"citation_ref\":\"citation_75\",\"ki"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_S4DyPOmvu9zbSfc8WgVR1Mon",
+          "received_trace_line": 526,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_7"
+          },
+          "result_trace_line": 528,
+          "result_prefix": "{\"read_ref\":\"collaborator_7\",\"kind\":\"collaborator\",\"name\":\"組長\",\"scope_text\":\"協調揀貨異常；接收新人操作回報，並於反覆錯誤時安排再訓練。\",\"supporting_sources\":[{\"citation_ref\":\"citation_19\",\"kind\":\"interview\",\""
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_LRY4DGjbLCDwE4xKt133mmZr",
+          "received_trace_line": 529,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_9"
+          },
+          "result_trace_line": 531,
+          "result_prefix": "{\"read_ref\":\"area_9\",\"kind\":\"responsibility_area\",\"title\":\"庫存盤點與差異查核\",\"scope_text\":\"執行每週循環盤點，查閱近期入出庫及移庫紀錄，並對差異複點。\",\"supporting_sources\":[{\"citation_ref\":\"citation_108\",\"kind\":\"inte"
+        },
+        {
+          "turn": 15,
+          "name": "create_jd_item",
+          "call_id": "call_TMrw4CsX0lGO8jPFI4gYow1z",
+          "received_trace_line": 532,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "財務",
+              "scope_text": "配合每年 12 月的全倉年度盤點；盤前整理儲位及待處理單據。",
+              "supporting_sources": [
+                {
+                  "kind": "current_input"
+                }
+              ]
+            }
+          },
+          "result_trace_line": 534,
+          "result_prefix": "created · read_ref: collaborator_139"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_wyiAxJRP95QlYG3ICY6wnK3F",
+          "received_trace_line": 532,
+          "arguments": {
+            "read_ref": "task_8",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "依出貨波次單揀貨，核對品項、數量、批號及效期；揀貨區不足時從備貨區補貨。系統顯示有貨但儲位空缺時，先查移庫情形及前一波次，不擅自以其他批號替代，異常交組長協調。雙十一及春節前出貨約為平日兩倍，依組長安排的急單及波次調整揀貨順序，先回報人力與缺貨瓶頸，仍須完成批號及效期核對；完成後交包裝區複核。晚班交接時，在交班表記錄未完成波次、缺貨及隔離貨位置。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              },
+              {
+                "action": "add_detail",
+                "kind": "outcome",
+                "text": "晚班交班表記錄未完成波次、缺貨及隔離貨位置，供後續交接掌握。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "雙十一及春節前出貨約為平日兩倍；依組長安排的急單與波次調整揀貨順序，先回報人力及缺貨瓶頸，並保留批號、效期核對。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "add_detail",
+                "kind": "requirement",
+                "text": "晚班交接須以交班表記錄未完成波次、缺貨及隔離貨位置。",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              }
+            ]
+          },
+          "result_trace_line": 534,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_D3nD6r0LR1cnHiZvSzhz75gU",
+          "received_trace_line": 532,
+          "arguments": {
+            "read_ref": "area_9",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "執行每週循環盤點，並於每年 12 月配合財務進行全倉年度盤點；查閱近期入出庫及移庫紀錄、複點並處理盤點差異。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 534,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_dBQtrCc5gUUpgQDmj83crRLb",
+          "received_trace_line": 535,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_21"
+          },
+          "result_trace_line": 537,
+          "result_prefix": "{\"read_ref\":\"collaborator_21\",\"kind\":\"collaborator\",\"name\":\"倉儲主管\",\"scope_text\":\"核准員工提交的盤點差異表並將核准差異交財務調帳；最後核准新人獨立上線。\",\"supporting_sources\":[{\"citation_ref\":\"citation_36\",\"kind\":\"int"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_uWpwcQydvdKrkKtmXVADjwFe",
+          "received_trace_line": 535,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_24"
+          },
+          "result_trace_line": 537,
+          "result_prefix": "{\"read_ref\":\"collaborator_24\",\"kind\":\"collaborator\",\"name\":\"品保\",\"scope_text\":\"接收分類為待檢的客戶退貨商品。\",\"supporting_sources\":[{\"citation_ref\":\"citation_37\",\"kind\":\"interview\",\"interview_seq"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_oxJLuvtx7kEueOAszf5q5PIz",
+          "received_trace_line": 535,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_137"
+          },
+          "result_trace_line": 537,
+          "result_prefix": "{\"read_ref\":\"area_137\",\"kind\":\"responsibility_area\",\"title\":\"冷藏品溫度監測與異常處理\",\"scope_text\":\"配合冷藏食品作業區的溫度監測，對超標批次進行隔離、記錄並通報主管與品保；出貨放行由品保決定。\",\"supporting_sources\":[{\"citation_ref\":\"cita"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_9AAmplyfzve0ECOik1zMjCxg",
+          "received_trace_line": 535,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_140"
+          },
+          "result_trace_line": 537,
+          "result_prefix": "{\"read_ref\":\"task_140\",\"kind\":\"work_task\",\"title\":\"配合年度全倉盤點並整理盤前資料\",\"description\":\"每年 12 月配合財務進行全倉年度盤點，先整理儲位及待處理單據；年度分區責任與財務表單細節尚不清楚。\",\"outcomes\":[{\"read_ref\":\"outcome_146\",\"text\":"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_tTixYz7vDQepIK5ZdeLLZWOy",
+          "received_trace_line": 538,
+          "arguments": {
+            "read_ref": "collaborator_21",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "核准員工提交的盤點差異表並將核准差異交財務調帳；最後核准新人獨立上線；接收冷藏區溫度超標通報。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 540,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_DjiRlSTZT06wq4E9eatLEtLh",
+          "received_trace_line": 538,
+          "arguments": {
+            "read_ref": "collaborator_24",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "接收分類為待檢的客戶退貨商品；與主管一同接收冷藏區溫度超標通報，並由品保決定受影響批次是否可出貨。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 540,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_UhP8nG9OGm3GudMjRxnR2iay",
+          "received_trace_line": 538,
+          "arguments": {
+            "read_ref": "collaborator_139",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "每年 12 月配合進行全倉年度盤點；本人先整理儲位及待處理單據。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 540,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_lLG5RZHJVwRdU4GnJWlWqpjW",
+          "received_trace_line": 541,
+          "arguments": {
+            "read_ref": "task_141",
+            "changes": [
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "knowledge_148",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              },
+              {
+                "action": "set_capability",
+                "relationship": "link",
+                "capability_read_ref": "skill_149",
+                "supporting_sources": [
+                  {
+                    "kind": "current_input"
+                  }
+                ]
+              }
+            ]
+          },
+          "result_trace_line": 543,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_qgcxOs7Nz0hDFuha0Jj1kZKL",
+          "received_trace_line": 544,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_8"
+          },
+          "result_trace_line": 546,
+          "result_prefix": "{\"read_ref\":\"task_8\",\"kind\":\"work_task\",\"title\":\"依出貨波次完成揀貨、必要補貨及交接\",\"description\":\"依出貨波次單揀貨，核對品項、數量、批號及效期；揀貨區不足時從備貨區補貨。系統顯示有貨但儲位空缺時，先查移庫情形及前一波次，不擅自以其他批號替代，異常交組長協調。雙十一及春節前出貨約為平日兩倍，依"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_N6AtMvMYs2rT2T1scZMsuBzV",
+          "received_trace_line": 544,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_9"
+          },
+          "result_trace_line": 546,
+          "result_prefix": "{\"read_ref\":\"area_9\",\"kind\":\"responsibility_area\",\"title\":\"庫存盤點與差異查核\",\"scope_text\":\"執行每週循環盤點，並於每年 12 月配合財務進行全倉年度盤點；查閱近期入出庫及移庫紀錄、複點並處理盤點差異。\",\"supporting_sources\":[{\"citation_ref\":\"c"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_xba1z5OzIoYfwEaWCRJsoqK7",
+          "received_trace_line": 544,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_140"
+          },
+          "result_trace_line": 546,
+          "result_prefix": "{\"read_ref\":\"task_140\",\"kind\":\"work_task\",\"title\":\"配合年度全倉盤點並整理盤前資料\",\"description\":\"每年 12 月配合財務進行全倉年度盤點，先整理儲位及待處理單據；年度分區責任與財務表單細節尚不清楚。\",\"outcomes\":[{\"read_ref\":\"outcome_146\",\"text\":"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_oR6mN72Ird04OvXLc1eTZ0nI",
+          "received_trace_line": 544,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_141"
+          },
+          "result_trace_line": 546,
+          "result_prefix": "{\"read_ref\":\"task_141\",\"kind\":\"work_task\",\"title\":\"監測冷藏作業區溫度並處理超標批次\",\"description\":\"每日早晚查看溫度表；超標時隔離受影響批次，記錄時間與溫度並通知主管和品保。是否可以出貨由品保決定，本人不自行放行。\",\"outcomes\":[{\"read_ref\":\"outcome_164\""
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_0OpYyjVkW03NIK1YQh7001Eb",
+          "received_trace_line": 544,
+          "arguments": {
+            "view": "job_wide_conditions",
+            "read_ref": null
+          },
+          "result_trace_line": 546,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"condition_65\",\"kind\":\"job_wide_condition\",\"condition_kind\":\"schedule_travel\",\"text\":\"早上七點上班，週一至週六輪休。\",\"supporting_sources\":[{\"citation_ref\":\"citation_75\",\"ki"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_khRTG7uwo3W1aSdsUfV0etgS",
+          "received_trace_line": 544,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 546,
+          "result_prefix": "{\"profile\":{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"job_purpose_preview\":\"負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點、退貨處理及新人帶教，維持倉儲作業與庫存管理。\"},\"responsibility_areas\":[{\"re"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd_changes",
+          "call_id": "call_EEzBNLOtI43m0fy5whWM9cNf",
+          "received_trace_line": 547,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_70"
+            }
+          },
+          "result_trace_line": 549,
+          "result_prefix": "## JD 來源差異\n比較：此 JD 引用固定舊來源 → 本 Turn pinned Memory 的同一物件。\ncitation_ref: citation_70\n歷史名稱：物流中心倉庫管理員的工作範圍與作業責任界線\n可讀 target_title：物流中心倉庫管理員的工作範圍與作業責任界線\n只讀；未確認支持 JD，也未解除待核對。\ndescription"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd_changes",
+          "call_id": "call_yvJysVhhmYENkFWOhIrh3E7q",
+          "received_trace_line": 547,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_68"
+            }
+          },
+          "result_trace_line": 549,
+          "result_prefix": "## JD 來源差異\n比較：此 JD 引用固定舊來源 → 本 Turn pinned Memory 的同一物件。\ncitation_ref: citation_68\n歷史名稱：物流中心倉庫管理員的工作範圍與作業責任界線\n可讀 target_title：物流中心倉庫管理員的工作範圍與作業責任界線\n只讀；未確認支持 JD，也未解除待核對。\ndescription"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd_changes",
+          "call_id": "call_4DVa8p85K3zGyX3tgsaHjmLS",
+          "received_trace_line": 547,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_69"
+            }
+          },
+          "result_trace_line": 549,
+          "result_prefix": "## JD 來源差異\n比較：此 JD 引用固定舊來源 → 本 Turn pinned Memory 的同一物件。\ncitation_ref: citation_69\n歷史名稱：物流中心倉庫管理員的工作範圍與作業責任界線\n可讀 target_title：物流中心倉庫管理員的工作範圍與作業責任界線\n只讀；未確認支持 JD，也未解除待核對。\ndescription"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd_changes",
+          "call_id": "call_PgSVgPCjMWfawoNmYDRAjVgm",
+          "received_trace_line": 547,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_75"
+            }
+          },
+          "result_trace_line": 549,
+          "result_prefix": "## JD 來源差異\n比較：此 JD 引用固定舊來源 → 本 Turn pinned Memory 的同一物件。\ncitation_ref: citation_75\n歷史名稱：物流中心倉庫管理員的工作範圍與作業責任界線\n可讀 target_title：物流中心倉庫管理員的工作範圍與作業責任界線\n只讀；未確認支持 JD，也未解除待核對。\ndescription"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_9d6t5VCGVJfAJXXTb6mcz6k1",
+          "received_trace_line": 550,
+          "arguments": {
+            "view": "profile",
+            "read_ref": null
+          },
+          "result_trace_line": 552,
+          "result_prefix": "{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"purpose\":\"負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點、退貨處理及新人帶教，維持倉儲作業與庫存管理。\",\"supporting_sources\":{\"job_title\":[{\"citation_ref\":\""
+        },
+        {
+          "turn": 15,
+          "name": "edit_interview_plan",
+          "call_id": "call_Rd4vYpVsAzqLWZag5fhTktQY",
+          "received_trace_line": 553,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-確認是否還有未提及的固定週期、支援或重要收尾工作，再請員工核對主要職責與責任界線。\n+核對新增的年度盤點、冷藏品溫控及旺季／晚班交接是否已準確入稿，確認有無遺漏，再請員工核對主要職責與責任界線。\n@@\n-- 揀貨：已整理依出貨波次單核對品項／數量／批號／效期、揀貨區不足時從備貨區補貨、系統有貨但儲位空缺時先查移庫及前一波次且不擅自替代批號，完成後交包裝區複核；須在截單前完成，異常交組長協調。任務及協作已入稿；是否另有獨立補貨安排已詢問，員工目前無確定資料，無新線索不重問。\n-- 庫存盤點：已入稿每週循環盤點、近期異動紀錄查核與複點，以及差異表交主管核准、主管交財務調帳、結案前核對更新數量、原因不明留待查；員工不直接改庫存數量。\n+- 揀貨：已整理依出貨波次單核對品項／數量／批號／效期、揀貨區不足時從備貨區補貨、系統有貨但儲位空缺時先查移庫及前一波次且不擅自替代批號，完成後交包裝區複核；須在截單前完成，異常交組長協調。雙十一及春節前約平日兩倍出貨，依組長急單與波次調整順序、先報人力及缺貨瓶頸，仍不省略批號效期核對；晚班交班表記錄未完波次、缺貨及隔離貨位置。新增內容已入稿；是否另有獨立補貨安排已詢問，員工目前無確定資料，無新線索不重問。\n+- 庫存盤點：已入稿每週循環盤點、近期異動紀錄查核與複點，以及差異表交主管核准、主管交財務調帳、結案前核對更新數量、原因不明留待查；員工不直接改庫存數量。新增每年 12 月配合財務做全倉年度盤點，盤前整理儲位及待處理單據；年度分區責任與財務表單細節仍不清楚。\n@@\n - 供應商退貨：已整理為出庫任務；採購決定退貨品項，員工依退貨單備貨、核對數量、拍照、登記出庫，交承運商簽收並將簽收資料回給採購。員工不辦供應商退貨入庫，也不決定退貨條件。退貨觸發原因已詢問，員工目前無確定資料，無新線索不重問。\n-- 全稿整理與核對：已通讀目前 JD，職責分組、任務、能力、協作及排班均已整理；待確認是否遺漏重要工作，再核對來源及跨欄一致性。\n+- 冷藏品作業：新增冷藏食品約占兩成，於 2–8°C 區作業並穿防寒衣；每日早晚查看溫度，超標隔離受影響批次、記錄時間溫度並通知主管及品保，出貨由品保決定，員工不自行放行。職責、任務、條件與能力關聯已入稿。\n+- 全稿整理與核對：已通讀既有 JD 並整理職責、任務、能力、協作及排班；年度盤點、冷藏品溫控與旺季／晚班交接已入稿，待確認是否遺漏重要工作，再核對來源及跨欄一致性。\n"
+          },
+          "result_trace_line": 555,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,12 +1,13 @@\\n ## 目前焦點\\n-確認是否還有未提及的固定週期、支援或重要收尾工作，再請員工核對主要職責與責任界線。\\n+核對新增的年度盤點、冷藏品溫控及旺季／晚班交接是否已準確入稿，確認有無遺漏，再請員工核對主"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_RF6z2AupFIAaZ3HVcNiISy6R",
+          "received_trace_line": 559,
+          "arguments": {
+            "view": "item",
+            "read_ref": "skill_63"
+          },
+          "result_trace_line": 561,
+          "result_prefix": "{\"read_ref\":\"skill_63\",\"kind\":\"skill\",\"name\":\"庫存異動追查與差異核對\",\"description\":\"依作業情境查閱近期入出庫、移庫或波次資訊並複點，追查系統庫存與實物差異，整理資料依權責回報；盤點差異不直接改庫存，揀貨儲位空缺時不擅自更換批號。\",\"used_by_tasks\":[{\"read_ref\":\"ta"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_nNBhPYpctTyXiAJzGNfpE5WR",
+          "received_trace_line": 559,
+          "arguments": {
+            "view": "item",
+            "read_ref": "skill_64"
+          },
+          "result_trace_line": 561,
+          "result_prefix": "{\"read_ref\":\"skill_64\",\"kind\":\"skill\",\"name\":\"批號與效期核對\",\"description\":\"依出貨波次資訊核對品項、批號及效期；發現儲位缺貨時不擅自以其他批號替代。\",\"used_by_tasks\":[{\"read_ref\":\"task_8\",\"title\":\"依出貨波次完成揀貨、必要補貨及交接\",\"suppo"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_OZ2YcPSXrZ4psGYHR6ksflDb",
+          "received_trace_line": 559,
+          "arguments": {
+            "view": "profile",
+            "read_ref": null
+          },
+          "result_trace_line": 561,
+          "result_prefix": "{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"purpose\":\"負責物流中心貨品收貨驗收、上架、出貨揀貨補貨、庫存盤點、退貨處理、新人帶教及冷藏品溫度監測，維持貨品流轉、庫存管理與冷藏作業溫控。\",\"supporting_sources\":{\"job_title\":"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd_changes",
+          "call_id": "call_QrExb61hWDi6tdEyOZzefU6R",
+          "received_trace_line": 562,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_73"
+            }
+          },
+          "result_trace_line": 564,
+          "result_prefix": "## JD 來源差異\n比較：此 JD 引用固定舊來源 → 本 Turn pinned Memory 的同一物件。\ncitation_ref: citation_73\n歷史名稱：物流中心倉庫管理員的工作範圍與作業責任界線\n可讀 target_title：物流中心倉庫管理員的工作範圍與作業責任界線\n只讀；未確認支持 JD，也未解除待核對。\ndescription"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd_changes",
+          "call_id": "call_6ODv5P1XZ7J6KztZLcmruhUT",
+          "received_trace_line": 562,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_74"
+            }
+          },
+          "result_trace_line": 564,
+          "result_prefix": "## JD 來源差異\n比較：此 JD 引用固定舊來源 → 本 Turn pinned Memory 的同一物件。\ncitation_ref: citation_74\n歷史名稱：物流中心倉庫管理員的工作範圍與作業責任界線\n可讀 target_title：物流中心倉庫管理員的工作範圍與作業責任界線\n只讀；未確認支持 JD，也未解除待核對。\ndescription"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_r6vwNtrNWj3Wrq3ZKxIN5FAh",
+          "received_trace_line": 565,
+          "arguments": {
+            "read_ref": "task_8",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_63"
+                },
+                "citation_ref": "citation_70"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_64"
+                },
+                "citation_ref": "citation_68"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_97"
+              }
+            ]
+          },
+          "result_trace_line": 567,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_Kzgwl7uFD94Ur9lbNxk73E2C",
+          "received_trace_line": 565,
+          "arguments": {
+            "read_ref": "task_10",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "capability_relation",
+                  "capability_read_ref": "skill_63"
+                },
+                "citation_ref": "citation_69"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_16"
+              }
+            ]
+          },
+          "result_trace_line": 567,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_l6bxGig5vozuOzVgd99K9hMC",
+          "received_trace_line": 565,
+          "arguments": {
+            "read_ref": "area_9",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_108"
+              }
+            ]
+          },
+          "result_trace_line": 567,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_PP6xIEcKhImmtDoWviqVMeqh",
+          "received_trace_line": 565,
+          "arguments": {
+            "read_ref": "skill_63",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_73"
+              }
+            ]
+          },
+          "result_trace_line": 567,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_C0fWgXmPM8YHwq2uQqlXuT37",
+          "received_trace_line": 565,
+          "arguments": {
+            "read_ref": "skill_64",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_74"
+              }
+            ]
+          },
+          "result_trace_line": 567,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_5PgDH6ye4u0iaBVBeVysFWod",
+          "received_trace_line": 565,
+          "arguments": {
+            "read_ref": "condition_65",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_75"
+              }
+            ]
+          },
+          "result_trace_line": 567,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_2jiR4Y6w4kPakpqwLn6dfDiw",
+          "received_trace_line": 568,
+          "arguments": {
+            "read_ref": "task_140",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "每年 12 月配合財務進行全倉年度盤點，先整理儲位及待處理單據。"
+              }
+            ]
+          },
+          "result_trace_line": 570,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_FYjqkkmZGzoDr0a1RCEwoOBA",
+          "received_trace_line": 568,
+          "arguments": {
+            "read_ref": "area_9",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "執行每週循環盤點，查閱近期入出庫及移庫紀錄、複點並處理差異；每年 12 月配合財務進行全倉年度盤點，並整理盤前儲位及待處理單據。"
+              }
+            ]
+          },
+          "result_trace_line": 570,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_Aqic0HvAtNjVpxjLGiRKfNlV",
+          "received_trace_line": 571,
+          "arguments": {
+            "read_ref": "area_9",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "執行每週循環盤點，先查閱近期入出庫及移庫紀錄並複點；每年 12 月配合財務進行全倉年度盤點，盤前整理儲位及待處理單據。"
+              }
+            ]
+          },
+          "result_trace_line": 573,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_aGQ35lgPu8QLac2L18fpxB5Y",
+          "received_trace_line": 574,
+          "arguments": {
+            "view": "item",
+            "read_ref": "area_9"
+          },
+          "result_trace_line": 576,
+          "result_prefix": "{\"read_ref\":\"area_9\",\"kind\":\"responsibility_area\",\"title\":\"庫存盤點與差異查核\",\"scope_text\":\"執行每週循環盤點，先查閱近期入出庫及移庫紀錄並複點；每年 12 月配合財務進行全倉年度盤點，盤前整理儲位及待處理單據。\",\"supporting_sources\":[{\"citation_re"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_7JV889E3bmyJjg9ooVmE3ell",
+          "received_trace_line": 574,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_140"
+          },
+          "result_trace_line": 576,
+          "result_prefix": "{\"read_ref\":\"task_140\",\"kind\":\"work_task\",\"title\":\"配合年度全倉盤點並整理盤前資料\",\"description\":\"每年 12 月配合財務進行全倉年度盤點，先整理儲位及待處理單據。\",\"outcomes\":[{\"read_ref\":\"outcome_146\",\"text\":\"盤點前完成儲位與待處理單據整理，配"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_TQgZrSIoHBjjqqtEieZDWwhk",
+          "received_trace_line": 574,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_21"
+          },
+          "result_trace_line": 576,
+          "result_prefix": "{\"read_ref\":\"collaborator_21\",\"kind\":\"collaborator\",\"name\":\"倉儲主管\",\"scope_text\":\"核准員工提交的盤點差異表並將核准差異交財務調帳；最後核准新人獨立上線；接收冷藏區溫度超標通報。\",\"supporting_sources\":[{\"citation_ref\":\"citation_36\""
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_ON5ibuJvUp9IWhHjDTGKmDBZ",
+          "received_trace_line": 574,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_24"
+          },
+          "result_trace_line": 576,
+          "result_prefix": "{\"read_ref\":\"collaborator_24\",\"kind\":\"collaborator\",\"name\":\"品保\",\"scope_text\":\"接收分類為待檢的客戶退貨商品；與主管一同接收冷藏區溫度超標通報，並由品保決定受影響批次是否可出貨。\",\"supporting_sources\":[{\"citation_ref\":\"citation_37\""
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_3semJjGyRJII8AafgJGrALFc",
+          "received_trace_line": 574,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_139"
+          },
+          "result_trace_line": 576,
+          "result_prefix": "{\"read_ref\":\"collaborator_139\",\"kind\":\"collaborator\",\"name\":\"財務\",\"scope_text\":\"每年 12 月配合進行全倉年度盤點；本人先整理儲位及待處理單據。\",\"supporting_sources\":[{\"citation_ref\":\"citation_171\",\"kind\":\"curren"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_tSb0dA8m5x68szsz0sulOh68",
+          "received_trace_line": 574,
+          "arguments": {
+            "view": "profile",
+            "read_ref": null
+          },
+          "result_trace_line": 576,
+          "result_prefix": "{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"purpose\":\"負責物流中心貨品收貨驗收、上架、出貨揀貨補貨、庫存盤點、退貨處理、新人帶教及冷藏品溫度監測，維持貨品流轉、庫存管理與冷藏作業溫控。\",\"supporting_sources\":{\"job_title\":"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_2PhcY2aGMeAjv9ir6Uc6yH2z",
+          "received_trace_line": 580,
+          "arguments": {
+            "read_ref": "area_9",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_108"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_157"
+              }
+            ]
+          },
+          "result_trace_line": 582,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_MxGmkmzM5did7WFaS3BbPTEN",
+          "received_trace_line": 580,
+          "arguments": {
+            "read_ref": "task_140",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_144"
+              }
+            ]
+          },
+          "result_trace_line": 582,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_srNU9poJxYaj8V3Lqc9cbEE8",
+          "received_trace_line": 580,
+          "arguments": {
+            "read_ref": "collaborator_21",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_36"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_60"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_169"
+              }
+            ]
+          },
+          "result_trace_line": 582,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_z4Kp5cKLSNoZXxmX4oa6ZnCH",
+          "received_trace_line": 580,
+          "arguments": {
+            "read_ref": "collaborator_24",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_37"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_170"
+              }
+            ]
+          },
+          "result_trace_line": 582,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_IqHunAcd5FSVF7odsOwqvlIr",
+          "received_trace_line": 580,
+          "arguments": {
+            "read_ref": "collaborator_139",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_171"
+              }
+            ]
+          },
+          "result_trace_line": 582,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_DPLkAq0c6yobBSWwVY7kJ9dS",
+          "received_trace_line": 583,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_7"
+          },
+          "result_trace_line": 585,
+          "result_prefix": "{\"read_ref\":\"collaborator_7\",\"kind\":\"collaborator\",\"name\":\"組長\",\"scope_text\":\"協調揀貨異常；接收新人操作回報，並於反覆錯誤時安排再訓練。\",\"supporting_sources\":[{\"citation_ref\":\"citation_19\",\"kind\":\"interview\",\""
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_trZTeTA0JXPWcLmm9yc9jYM8",
+          "received_trace_line": 586,
+          "arguments": {
+            "read_ref": "collaborator_7",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "安排旺季的急單與出貨波次、協調揀貨異常；接收新人操作回報，並於反覆錯誤時安排再訓練。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "current_input"
+                }
+              }
+            ]
+          },
+          "result_trace_line": 588,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_AbCQoRhztDIswfVL9N1FWGBf",
+          "received_trace_line": 589,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_7"
+          },
+          "result_trace_line": 591,
+          "result_prefix": "{\"read_ref\":\"collaborator_7\",\"kind\":\"collaborator\",\"name\":\"組長\",\"scope_text\":\"安排旺季的急單與出貨波次、協調揀貨異常；接收新人操作回報，並於反覆錯誤時安排再訓練。\",\"supporting_sources\":[{\"citation_ref\":\"citation_19\",\"kind\":"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_sM13DLh4kbk1WRSfKlUk2jIl",
+          "received_trace_line": 595,
+          "arguments": {
+            "read_ref": "collaborator_7",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_19"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_59"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_172"
+              }
+            ]
+          },
+          "result_trace_line": 597,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_bBKWvWRDeSValsxESX3crBPm",
+          "received_trace_line": 598,
+          "arguments": {
+            "view": "full",
+            "read_ref": null
+          },
+          "result_trace_line": 600,
+          "result_prefix": "# 職務說明書\n\n## 職務基本資料\n\n**職稱**\n\n倉庫管理員\n\n**組織單位**\n\n物流中心\n\n**匯報對象**\n\n倉儲主管\n\n## 職務目的\n\n負責物流中心貨品收貨驗收、上架、出貨揀貨補貨、庫存盤點、退貨處理、新人帶教及冷藏品溫度監測，維持貨品流轉、庫存管理與冷藏作業溫控。\n\n## 主要職責與工作任務\n\n### 職責 1：進貨驗收與差異處理\n\n負責進"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_N01MIuvDhYrzf9yXB5nfAFqM",
+          "received_trace_line": 601,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_2"
+          },
+          "result_trace_line": 603,
+          "result_prefix": "{\"read_ref\":\"task_2\",\"kind\":\"work_task\",\"title\":\"驗收進貨並處理收貨異常\",\"description\":\"逐箱點件，核對品項、數量、外包裝及送貨單。核對採購單、送貨單與實收數量，拍照通知採購；拒收或退換貨由其他權責者決定。發現差異時登記收貨異常表；採購回覆需補送或接受後，按結果登記入庫。本人不議價、不選供應商。"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_x1JdxR1yyHNYmRJovE1ZUdBR",
+          "received_trace_line": 601,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_12"
+          },
+          "result_trace_line": 603,
+          "result_prefix": "{\"read_ref\":\"collaborator_12\",\"kind\":\"collaborator\",\"name\":\"新進人員\",\"scope_text\":\"接受掃碼、揀貨及安全動線示範，跟著實作並接受現場觀察與帶教評估。\",\"supporting_sources\":[{\"citation_ref\":\"citation_18\",\"kind\":\"interv"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd_changes",
+          "call_id": "call_yedABe2YvYIkdn1daDwnASVy",
+          "received_trace_line": 604,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_101"
+            }
+          },
+          "result_trace_line": 606,
+          "result_prefix": "## JD 來源差異\n比較：此 JD 引用固定舊來源 → 本 Turn pinned Memory 的同一物件。\ncitation_ref: citation_101\n歷史名稱：物流中心倉庫管理員的工作範圍與進貨差異處理界線\n可讀 target_title：物流中心倉庫管理員的工作範圍與作業責任界線\n只讀；未確認支持 JD，也未解除待核對。\ntitle：\n`"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd_changes",
+          "call_id": "call_rCAKnaq7pAJfIprYeRCQXt3Z",
+          "received_trace_line": 604,
+          "arguments": {
+            "query": {
+              "kind": "source",
+              "citation_ref": "citation_89"
+            }
+          },
+          "result_trace_line": 606,
+          "result_prefix": "## JD 來源差異\n比較：此 JD 引用固定舊來源 → 本 Turn pinned Memory 的同一物件。\ncitation_ref: citation_89\n歷史名稱：物流中心倉庫管理員的工作範圍與進貨差異處理界線\n可讀 target_title：物流中心倉庫管理員的工作範圍與作業責任界線\n只讀；未確認支持 JD，也未解除待核對。\ntitle：\n``"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_bLZW54Xwc3UF8DqwX93bQiXj",
+          "received_trace_line": 607,
+          "arguments": {
+            "read_ref": "task_2",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "description",
+                "value": "逐箱點件，核對品項、數量、外包裝及送貨單。核對採購單、送貨單與實收數量，發現差異時拍照並登記收貨異常表、通知採購；採購回覆需補送或接受後，按結果登記入庫。本人不決定拒收或退換貨，不議價、不選供應商。"
+              }
+            ]
+          },
+          "result_trace_line": 609,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_aOvnl4SQEAKD5U31tUgWMiIS",
+          "received_trace_line": 607,
+          "arguments": {
+            "read_ref": "collaborator_12",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "配合第一週掃碼、揀貨及安全動線示範並跟做，讓員工觀察操作情況；能否獨立上線由主管最後核准。"
+              },
+              {
+                "action": "add_source",
+                "target": {
+                  "kind": "item"
+                },
+                "source": {
+                  "kind": "interview",
+                  "interview_sequence": 28
+                }
+              }
+            ]
+          },
+          "result_trace_line": 609,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_eqn4XozKWIA1qRPt4eg7BR5n",
+          "received_trace_line": 607,
+          "arguments": {
+            "read_ref": "collaborator_139",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "每年 12 月與員工配合進行全倉年度盤點；員工先整理儲位及待處理單據。"
+              }
+            ]
+          },
+          "result_trace_line": 609,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_5uO4Upgp6W1ToLmNyQ5FeUFi",
+          "received_trace_line": 610,
+          "arguments": {
+            "view": "item",
+            "read_ref": "task_2"
+          },
+          "result_trace_line": 612,
+          "result_prefix": "{\"read_ref\":\"task_2\",\"kind\":\"work_task\",\"title\":\"驗收進貨並處理收貨異常\",\"description\":\"逐箱點件，核對品項、數量、外包裝及送貨單。核對採購單、送貨單與實收數量，發現差異時拍照並登記收貨異常表、通知採購；採購回覆需補送或接受後，按結果登記入庫。本人不決定拒收或退換貨，不議價、不選供應商。\",\"o"
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_XIoiR4uLBUAzlyjaQfFyjlDz",
+          "received_trace_line": 610,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_12"
+          },
+          "result_trace_line": 612,
+          "result_prefix": "{\"read_ref\":\"collaborator_12\",\"kind\":\"collaborator\",\"name\":\"新進人員\",\"scope_text\":\"配合第一週掃碼、揀貨及安全動線示範並跟做，讓員工觀察操作情況；能否獨立上線由主管最後核准。\",\"supporting_sources\":[{\"citation_ref\":\"citation_18\",\""
+        },
+        {
+          "turn": 15,
+          "name": "read_jd",
+          "call_id": "call_52BRlCQXxBMB0CzIQQ4cMxSG",
+          "received_trace_line": 610,
+          "arguments": {
+            "view": "item",
+            "read_ref": "collaborator_139"
+          },
+          "result_trace_line": 612,
+          "result_prefix": "{\"read_ref\":\"collaborator_139\",\"kind\":\"collaborator\",\"name\":\"財務\",\"scope_text\":\"每年 12 月與員工配合進行全倉年度盤點；員工先整理儲位及待處理單據。\",\"supporting_sources\":[{\"citation_ref\":\"citation_171\",\"kind\":\"cur"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_Q0nBmnWMneLkPmgcDdTp7ooE",
+          "received_trace_line": 613,
+          "arguments": {
+            "read_ref": "task_2",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_95"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_101"
+              },
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "detail",
+                  "detail_read_ref": "requirement_127"
+                },
+                "citation_ref": "citation_89"
+              }
+            ]
+          },
+          "result_trace_line": 615,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_xoLhHjNPJVF07QzuhJSKFlHu",
+          "received_trace_line": 613,
+          "arguments": {
+            "read_ref": "collaborator_12",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_18"
+              }
+            ]
+          },
+          "result_trace_line": 615,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "revise_jd_item",
+          "call_id": "call_F550IGsnXiefJy3D4zg2Jk1i",
+          "received_trace_line": 613,
+          "arguments": {
+            "read_ref": "collaborator_139",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_171"
+              }
+            ]
+          },
+          "result_trace_line": 615,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 15,
+          "name": "edit_interview_plan",
+          "call_id": "call_DJgn8vxaKfiNChZ5dlg8KqTN",
+          "received_trace_line": 616,
+          "arguments": {
+            "diff": "@@\n ## 目前焦點\n-核對新增的年度盤點、冷藏品溫控及旺季／晚班交接是否已準確入稿，確認有無遺漏，再請員工核對主要職責與責任界線。\n+請員工核對目前 JD 是否準確反映主要工作、本人責任界線及新增的年度盤點、冷藏品溫控與旺季／晚班交接，並確認有無遺漏。\n@@\n-- 全稿整理與核對：已通讀既有 JD 並整理職責、任務、能力、協作及排班；年度盤點、冷藏品溫控與旺季／晚班交接已入稿，待確認是否遺漏重要工作，再核對來源及跨欄一致性。\n+- 全稿整理與核對：已通讀目前 JD，並完成本輪新增工作及相關依據、職責、能力、協作與條件的核對；年度分區責任／財務表單細節仍未知，其他先前已詢問但無確定資料的例外仍保留未知。待員工核對整稿是否漏寫或有不符合實況之處，再依回覆修正。\n"
+          },
+          "result_trace_line": 618,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,5 +1,5 @@\\n ## 目前焦點\\n-核對新增的年度盤點、冷藏品溫控及旺季／晚班交接是否已準確入稿，確認有無遺漏，再請員工核對主要職責與責任界線。\\n+請員工核對目前 JD 是否準確反映主要工作、本人責任界線及新增的年度"
+        },
+        {
+          "turn": 17,
+          "name": "edit_interview_plan",
+          "call_id": "call_SHECyi70CFWc22paBHpYzvvE",
+          "received_trace_line": 660,
+          "arguments": {
+            "diff": "@@\n-## 目前焦點\n-請員工核對目前 JD 是否準確反映主要工作、本人責任界線及新增的年度盤點、冷藏品溫控與旺季／晚班交接，並確認有無遺漏。\n+## 目前焦點\n+釐清一般收貨從貨物到達到完成收貨登記的日常流程，並區分已知的數量差異處理。\n@@\n-- 收貨驗收：已整理逐箱點件、核對品項／數量／外包裝及單據；差異以照片和收貨異常表記錄、通知採購，待採購回覆補送或接受後按結果登記入庫。員工不議價、不選供應商、不決定拒收。貨物暫放位置及外包裝破損時的處理均未知；後者已詢問，員工目前沒有確定資料，無新線索不重問。\n+- 收貨驗收：已知逐箱點件並核對品項、數量、外包裝及送貨單；數量差異時拍照、登記收貨異常表並通知採購，待採購回覆補送或接受後依結果登記入庫。員工不議價、不選供應商，也不決定拒收或退換貨。一般每批貨到達後的日常流程、收貨登記與後續交接範圍尚待釐清；貨物暫放位置及外包裝破損時的處理已詢問且無確定資料，無新線索不重問。\n"
+          },
+          "result_trace_line": 662,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,8 +1,8 @@\\n ## 目前焦點\\n-請員工核對目前 JD 是否準確反映主要工作、本人責任界線及新增的年度盤點、冷藏品溫控與旺季／晚班交接，並確認有無遺漏。\\n+釐清一般收貨從貨物到達到完成收貨登記的日常流程，並區分已知"
+        },
+        {
+          "turn": 18,
+          "name": "edit_interview_plan",
+          "call_id": "call_IOgByRpL9M9K3VNPK3Z4tzYG",
+          "received_trace_line": 683,
+          "arguments": {
+            "diff": "@@\n-## 目前焦點\n-釐清一般收貨從貨物到達到完成收貨登記的日常流程，並區分已知的數量差異處理。\n+## 目前焦點\n+釐清晚班交接是否由本人輪值參與，以及相關班別安排。\n@@\n-- 收貨驗收：已知逐箱點件並核對品項、數量、外包裝及送貨單；數量差異時拍照、登記收貨異常表並通知採購，待採購回覆補送或接受後依結果登記入庫。員工不議價、不選供應商，也不決定拒收或退換貨。一般每批貨到達後的日常流程、收貨登記與後續交接範圍尚待釐清；貨物暫放位置及外包裝破損時的處理已詢問且無確定資料，無新線索不重問。\n+- 收貨驗收：已知逐箱點件並核對品項、數量、外包裝及送貨單；數量差異時拍照、登記收貨異常表並通知採購，待採購回覆補送或接受後依結果登記入庫。員工不議價、不選供應商，也不決定拒收或退換貨。收貨登記後交接給誰、是否直接接續上架尚未知；貨物暫放位置及外包裝破損時的處理已詢問且無確定資料，無新線索不重問。\n@@\n-- 揀貨：已整理依出貨波次單核對品項／數量／批號／效期、揀貨區不足時從備貨區補貨、系統有貨但儲位空缺時先查移庫及前一波次且不擅自替代批號，完成後交包裝區複核；須在截單前完成，異常交組長協調。雙十一及春節前約平日兩倍出貨，依組長急單與波次調整順序、先報人力及缺貨瓶頸，仍不省略批號效期核對；晚班交班表記錄未完波次、缺貨及隔離貨位置。新增內容已入稿；是否另有獨立補貨安排已詢問，員工目前無確定資料，無新線索不重問。\n+- 揀貨：已整理依出貨波次單核對品項／數量／批號／效期、揀貨區不足時從備貨區補貨、系統有貨但儲位空缺時先查移庫及前一波次且不擅自替代批號，完成後交包裝區複核；須在截單前完成，異常交組長協調。雙十一及春節前約平日兩倍出貨，依組長急單與波次調整順序、先報人力及缺貨瓶頸，仍不省略批號效期核對；晚班交班表記錄未完波次、缺貨及隔離貨位置，但員工本人是否輪值晚班、交接對象及班別安排尚未說明。是否另有獨立補貨安排已詢問，員工目前無確定資料，無新線索不重問。\n"
+          },
+          "result_trace_line": 685,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,10 +1,10 @@\\n ## 目前焦點\\n-釐清一般收貨從貨物到達到完成收貨登記的日常流程，並區分已知的數量差異處理。\\n+釐清晚班交接是否由本人輪值參與，以及相關班別安排。\\n \\n ## 工作方向\\n-- 收貨驗收：已"
+        },
+        {
+          "turn": 19,
+          "name": "edit_interview_plan",
+          "call_id": "call_KGO9Iy2KPqEdCLABv5eMNQ6L",
+          "received_trace_line": 690,
+          "arguments": {
+            "diff": "@@\n-## 目前焦點\n-釐清晚班交接是否由本人輪值參與，以及相關班別安排。\n+## 目前焦點\n+釐清收貨驗收的觸發方式，以及採購單、送貨單等收貨依據由誰提供。\n@@\n-- 收貨驗收：已知逐箱點件並核對品項、數量、外包裝及送貨單；數量差異時拍照、登記收貨異常表並通知採購，待採購回覆補送或接受後依結果登記入庫。員工不議價、不選供應商，也不決定拒收或退換貨。收貨登記後交接給誰、是否直接接續上架尚未知；貨物暫放位置及外包裝破損時的處理已詢問且無確定資料，無新線索不重問。\n+- 收貨驗收：已知逐箱點件並核對品項、數量、外包裝及送貨單；數量差異時拍照、登記收貨異常表並通知採購，待採購回覆補送或接受後依結果登記入庫。員工不議價、不選供應商，也不決定拒收或退換貨。貨物到場時的通知或單據來源尚待釐清；收貨登記後交接給誰、是否直接接續上架尚未知。貨物暫放位置及外包裝破損時的處理已詢問且無確定資料，無新線索不重問。\n@@\n-- 揀貨：已整理依出貨波次單核對品項／數量／批號／效期、揀貨區不足時從備貨區補貨、系統有貨但儲位空缺時先查移庫及前一波次且不擅自替代批號，完成後交包裝區複核；須在截單前完成，異常交組長協調。雙十一及春節前約平日兩倍出貨，依組長急單與波次調整順序、先報人力及缺貨瓶頸，仍不省略批號效期核對；晚班交班表記錄未完波次、缺貨及隔離貨位置，但員工本人是否輪值晚班、交接對象及班別安排尚未說明。是否另有獨立補貨安排已詢問，員工目前無確定資料，無新線索不重問。\n+- 揀貨：已整理依出貨波次單核對品項／數量／批號／效期、揀貨區不足時從備貨區補貨、系統有貨但儲位空缺時先查移庫及前一波次且不擅自替代批號，完成後交包裝區複核；須在截單前完成，異常交組長協調。雙十一及春節前約平日兩倍出貨，依組長急單與波次調整順序、先報人力及缺貨瓶頸，仍不省略批號效期核對；晚班交班表記錄未完波次、缺貨及隔離貨位置，員工本人是否輪值晚班及交接對象未知，已詢問且無新線索不重問。是否另有獨立補貨安排已詢問，員工目前無確定資料，無新線索不重問。\n"
+          },
+          "result_trace_line": 692,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,10 +1,10 @@\\n ## 目前焦點\\n-釐清晚班交接是否由本人輪值參與，以及相關班別安排。\\n+釐清收貨驗收的觸發方式，以及採購單、送貨單等收貨依據由誰提供。\\n \\n ## 工作方向\\n-- 收貨驗收：已知逐箱點件並"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_ZWPe4c0EyVXk2aXpoYp0Ckug",
+          "received_trace_line": 697,
+          "arguments": {
+            "view": "map",
+            "read_ref": null
+          },
+          "result_trace_line": 699,
+          "result_prefix": "{\"profile\":{\"job_title\":\"倉庫管理員\",\"organization_unit\":\"物流中心\",\"reports_to\":\"倉儲主管\",\"job_purpose_preview\":\"負責物流中心貨品收貨驗收、上架、出貨揀貨補貨、庫存盤點、退貨處理、新人帶教及冷藏品溫度監測，維持貨品流轉、庫存管理與冷藏作業溫控。\"},\"responsib"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_mxvXfgwAcozkvokhliNruwe7",
+          "received_trace_line": 700,
+          "arguments": {
+            "view": "full",
+            "read_ref": null
+          },
+          "result_trace_line": 702,
+          "result_prefix": "# 職務說明書\n\n## 職務基本資料\n\n**職稱**\n\n倉庫管理員\n\n**組織單位**\n\n物流中心\n\n**匯報對象**\n\n倉儲主管\n\n## 職務目的\n\n負責物流中心貨品收貨驗收、上架、出貨揀貨補貨、庫存盤點、退貨處理、新人帶教及冷藏品溫度監測，維持貨品流轉、庫存管理與冷藏作業溫控。\n\n## 主要職責與工作任務\n\n### 職責 1：進貨驗收與差異處理\n\n負責進"
+        },
+        {
+          "turn": 20,
+          "name": "create_jd_item",
+          "call_id": "call_aV6mP7vNY3uPNQHKXz3AAABd",
+          "received_trace_line": 703,
+          "arguments": {
+            "item": {
+              "kind": "collaborator",
+              "name": "有證照同事",
+              "scope_text": "超重貨由有證照同事操作堆高機；本人不自行操作該設備。",
+              "supporting_sources": [
+                {
+                  "kind": "interview",
+                  "interview_sequence": 8
+                }
+              ]
+            }
+          },
+          "result_trace_line": 705,
+          "result_prefix": "created · read_ref: collaborator_174"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_ZsHzm5xCtqbgCVBhX6c0mlw5",
+          "received_trace_line": 706,
+          "arguments": {
+            "read_ref": "collaborator_174",
+            "changes": [
+              {
+                "action": "set_field",
+                "field": "scope_text",
+                "value": "超重貨由有證照同事操作堆高機。"
+              }
+            ]
+          },
+          "result_trace_line": 708,
+          "result_prefix": "updated"
+        },
+        {
+          "turn": 20,
+          "name": "read_jd",
+          "call_id": "call_NgCFboaJpVMS06FZRYNuCuOX",
+          "received_trace_line": 709,
+          "arguments": {
+            "view": "main_collaborators",
+            "read_ref": null
+          },
+          "result_trace_line": 711,
+          "result_prefix": "{\"items\":[{\"read_ref\":\"collaborator_6\",\"kind\":\"collaborator\",\"name\":\"包裝區\",\"scope_text\":\"接收揀貨完成的貨品並複核。\",\"supporting_sources\":[{\"citation_ref\":\"citation_20\",\"kind\":\"interview\",\"inter"
+        },
+        {
+          "turn": 20,
+          "name": "revise_jd_item",
+          "call_id": "call_9WL5CjlYwOLs1Cp09CYLlhhY",
+          "received_trace_line": 715,
+          "arguments": {
+            "read_ref": "collaborator_174",
+            "changes": [
+              {
+                "action": "confirm_reference_alignment",
+                "target": {
+                  "kind": "item"
+                },
+                "citation_ref": "citation_175"
+              }
+            ]
+          },
+          "result_trace_line": 717,
+          "result_prefix": "aligned"
+        },
+        {
+          "turn": 20,
+          "name": "edit_interview_plan",
+          "call_id": "call_s5UE4DkXWk9BmRmk6e2Ly9nf",
+          "received_trace_line": 718,
+          "arguments": {
+            "diff": "@@\n-## 目前焦點\n-釐清收貨驗收的觸發方式，以及採購單、送貨單等收貨依據由誰提供。\n+## 目前焦點\n+本輪收束；目前已確認工作與 JD 各欄已核對，後續若繼續，可再釐清收貨開始通知及單據來源。\n@@\n-- 揀貨：已整理依出貨波次單核對品項／數量／批號／效期、揀貨區不足時從備貨區補貨、系統有貨但儲位空缺時先查移庫及前一波次且不擅自替代批號，完成後交包裝區複核；須在截單前完成，異常交組長協調。雙十一及春節前約平日兩倍出貨，依組長急單與波次調整順序、先報人力及缺貨瓶頸，仍不省略批號效期核對；晚班交班表記錄未完波次、缺貨及隔離貨位置，員工本人是否輪值晚班及交接對象未知，已詢問且無新線索不重問。是否另有獨立補貨安排已詢問，員工目前無確定資料，無新線索不重問。\n+- 揀貨：已整理依出貨波次單核對品項／數量／批號／效期、揀貨區不足時從備貨區補貨、系統有貨但儲位空缺時先查移庫及前一波次且不擅自替代批號，完成後交包裝區複核；須在截單前完成，異常交組長協調。雙十一及春節前約平日兩倍出貨，依組長急單與波次調整順序、先報人力及缺貨瓶頸，仍不省略批號效期核對；晚班交班表記錄未完波次、缺貨及隔離貨位置，員工本人是否輪值晚班及交接對象未知，已詢問且無新線索不重問。是否另有獨立補貨安排已詢問，員工目前無確定資料，無新線索不重問。\n@@\n-- 全稿整理與核對：已通讀目前 JD，並完成本輪新增工作及相關依據、職責、能力、協作與條件的核對；年度分區責任／財務表單細節仍未知，其他先前已詢問但無確定資料的例外仍保留未知。待員工核對整稿是否漏寫或有不符合實況之處，再依回覆修正。\n+- 全稿整理與核對：已通讀目前 JD，核對職務資料、目的、職責分組、任務、成果／要求、知識技能、協作與工作條件的一致性；補入有證照同事操作堆高機的協作並確認來源。已知工作已整理入稿；未知項目不補猜，包含收貨開始通知／採購單與送貨單來源及收貨後交接、本人是否輪值晚班與交接對象、年度盤點分區／財務表單，以及前述已詢問但無確定答案的例外。員工本輪先停止；後續再談時依其意願選擇尚待釐清項目。\n"
+          },
+          "result_trace_line": 720,
+          "result_prefix": "{\"status\":\"updated\",\"diff\":\"--- body_before\\n+++ body_after\\n@@ -1,5 +1,5 @@\\n ## 目前焦點\\n-釐清收貨驗收的觸發方式，以及採購單、送貨單等收貨依據由誰提供。\\n+本輪收束；目前已確認工作與 JD 各欄已核對，後續若繼續，可再釐清收貨開始通知及單據來源。\\n \\n ## 工作方"
+        }
+      ]
+    }
+  },
+  "dispositions": [
+    {
+      "opportunity_id": "receiving",
+      "finding": "兩組最終保住三方單據與本人不決定拒收退換貨；P2 T1回覆一度說由主管決定，當時原話不支持，最終已修正。破損流程未知未補猜。"
+    },
+    {
+      "opportunity_id": "shelving",
+      "finding": "兩組保存上架及設備分工；P2 T4已知持證同事，到T20才補協作欄；P1 T12同輪補。"
+    },
+    {
+      "opportunity_id": "picking",
+      "finding": "兩組保存批號效期與包裝複核；P1包裝區協作到T20才補，P2 T6已建。未觀察此整項已知工作持續遺失。"
+    },
+    {
+      "opportunity_id": "inventory-return",
+      "finding": "P1公開cue T6→A T6返回→T7答；P2公開cue T9→A T9返回→T10答。兩組看到公開線索即返回，不能單歸功Plan。P2 Plan未知→可返回→待入稿→已入稿可見。"
+    },
+    {
+      "opportunity_id": "training-correction",
+      "finding": "P1 T10、P2 T14更正後同輪改任務等成品；P2 Plan先留待修再縮為已修。最終均保主管核准。未形成跨輪中斷後回收已知未入稿。"
+    },
+    {
+      "opportunity_id": "customer-returns",
+      "finding": "兩組入稿分流及退款界線。P2分類判準答不出後不再追同題，未補猜未知規則。"
+    },
+    {
+      "opportunity_id": "supplier-correction",
+      "finding": "P1 T9、P2 T13改供應商退貨出庫並保採購／承運分工，與客戶退貨入庫區分；P2觸發原因保持未知。"
+    },
+    {
+      "opportunity_id": "manual-receiving",
+      "finding": "公開人工修訂由T10後生效。最終兩組均保三方單據核對及本人無拒收／退換決策權，未見Plan導致覆蓋人工稿。"
+    },
+    {
+      "opportunity_id": "conditions",
+      "finding": "兩組旺季／冷藏／交班入稿；P1 T17/T18答不出本人班別及兩次溫度責任後，T20收窄表述。P2晚班未知仍明說，未把未知說成不存在。"
+    },
+    {
+      "opportunity_id": "annual-unknown",
+      "finding": "P1 T16、P2 T15入稿十二月年度盤點及準備；未把分區／表單未知套成循環盤點全流程，未無新線索重問這兩項。"
+    },
+    {
+      "opportunity_id": "delivery",
+      "finding": "兩組T20尊重停止、明列未知。P2 T15 Plan已稱核對，T20才補持證同事協作，完成短句不保證跨欄無漏。沒有宣稱所有未知已清。"
+    }
+  ],
+  "unobserved": [
+    "明確拒答及本人重新開放拒答",
+    "已知未入稿遭跨輪打斷後靠Plan找回",
+    "人類效果或穩定成品收益",
+    "native C及精確投影由獨立機制稽核判定"
+  ],
+  "requestion_assessment": "未觀察無新線索反覆追問同一已明說答不出的命題。P2 T17部分重播一般收貨，但另問正常流程及登記後交接；T19改問到場通知與單據來源，不直接等同重問破損／暫放未知。P1 T13棧板車本人操作問句只得到一般上架重播，顧問仍保留未知。",
+  "professional_exploration": {
+    "public_basis": {
+      "P1": {
+        "batch_expiry_checks_turn": 4,
+        "equipment_split_turn": 12
+      },
+      "P2": {
+        "batch_expiry_checks_turn": 6,
+        "equipment_split_turn": 4
+      }
+    },
+    "observed": "兩組探索本人查核、權限及例外；P2客退分類問句、P1補貨順序問句都是實際工作判斷探索。未見直接追問批號效期原則、差異比對工具／方法或重量辨識。P2 T14讀 required_knowledge、required_skills 並提煉已有方法；Plan曾留必要能力查漏，最終沒有具體未探索專業方向。",
+    "hypothesis_only": "可研究計畫是否偏重已知成稿核對而少選專業探索；不能由oracle的FEFO／Excel／重量答案反推Agent當時應已知或已知未寫。",
+    "closure_boundary": "已知工作已整理入稿／已核對知識技能，限定在已知成稿，不直接等同宣稱所有工作完備或滿分。"
+  }
+}

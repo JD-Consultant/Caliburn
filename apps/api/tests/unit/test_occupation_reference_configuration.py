@@ -13,6 +13,7 @@ from caliburn import bootstrap
 from caliburn import settings as configuration
 from caliburn.adapters.database_settings import DatabaseSettings
 from caliburn.adapters.occupation_references import OccupationReferenceClient
+from caliburn.app_composition import AppComposition
 
 
 @pytest.fixture
@@ -118,7 +119,7 @@ def test_invalid_configured_environment_timeout_fails(isolated_environment, monk
 @pytest.fixture
 def runtime(monkeypatch):
     sdk = SimpleNamespace(close=AsyncMock())
-    monkeypatch.setattr(bootstrap, "create_responses_client", Mock(return_value=sdk))
+    composition = AppComposition(create_responses_client=Mock(return_value=sdk))
     consultant = Mock()
     situation = Mock()
     understanding = Mock()
@@ -145,6 +146,7 @@ def runtime(monkeypatch):
         supervisor=supervisor,
         model=configuration.ModelSettings(api_key="synthetic-never-sent"),
         saver=Mock(),
+        composition=composition,
     )
 
 
@@ -157,7 +159,12 @@ async def test_disabled_runtime_constructs_no_reference_client_and_leaves_memory
     monkeypatch.setattr(httpx2, "AsyncClient", client_factory)
     async with AsyncExitStack() as resources:
         await bootstrap._start_model_runtime(
-            runtime.app, runtime.model, runtime.database, runtime.saver, resources
+            runtime.app,
+            runtime.model,
+            runtime.database,
+            runtime.saver,
+            resources,
+            composition=runtime.composition,
         )
         assert runtime.consultant.call_args.kwargs.get("occupation_references") is None
         assert runtime.situation.call_args.kwargs.get("excluded_work_enabled", False) is False
@@ -201,6 +208,7 @@ async def test_enabled_runtime_binds_one_http_client_and_closes_it_on_every_exit
                 runtime.database,
                 runtime.saver,
                 resources,
+                composition=runtime.composition,
                 occupation_references=reference_settings,
             )
             assert not clients[0].is_closed
@@ -245,6 +253,6 @@ async def test_database_startup_forwards_the_explicit_reference_configuration(ru
     )
     async with AsyncExitStack() as resources:
         await bootstrap._start_database_runtime(
-            runtime.app, configured, runtime.database, resources
+            runtime.app, configured, runtime.database, resources, composition=runtime.composition
         )
     assert start_model.call_args.kwargs["occupation_references"] is reference_settings

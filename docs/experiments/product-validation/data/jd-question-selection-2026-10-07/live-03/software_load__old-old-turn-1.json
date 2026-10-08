@@ -1,0 +1,17 @@
+{
+  "execution_id": "e600632e-122c-41bd-a893-e15d293426d9",
+  "exchange": {
+    "employee_input": {
+      "source_id": "776e7390-c4ce-4c17-89dc-b6581154bd5f",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "新版上線後問題單會集中進來，十二小時回覆初步判斷的要求不變。優先順序由產品主管安排，我不決定發布，也不承諾十二小時修好。"
+    },
+    "consultant_reply": {
+      "source_id": "fad9f023-00b6-4da7-918c-d80632c2d7d3",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "收到，已把「新版上線後問題單會集中進來、由產品主管安排優先順序」補進底稿；十二小時內回覆初步判斷的要求不變，但不承諾十二小時內修好，也不負責決定是否發布。我也同步更新了產品主管的協作範圍，並保留原有的測試、客服回報及問題單結束條件。\n\n這項工作的範圍與重要要求目前已清楚；所屬單位和直接匯報對象仍可先留空，之後有需要再補。"
+    }
+  }
+}

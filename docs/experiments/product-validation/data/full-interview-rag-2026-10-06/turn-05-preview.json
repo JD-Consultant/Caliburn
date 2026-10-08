@@ -1,0 +1,86 @@
+{
+  "job_file_id": "71f92646-d2c1-41da-ab2e-fe991f5ad1c5",
+  "execution_id": "2b66bf37-022e-4914-b094-574dd20ad42a",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "每天快下班時，我會再點一次當天異動比較多的商品，不是每天全倉盤。月底才盤自己負責的整區，再給主管抽查；差異超過主管定的範圍要寫差異報告，但那個範圍多少我不知道。對了，我開頭說供應商退貨是我處理，講得不準：退不退由採購決定，我只把決定退的貨備好、登記出貨。客戶退貨檢查入庫還是我做，其他沒變。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點及客戶與供應商退貨入庫，維持貨物流轉與庫存作業的準確，支援後續出貨及退貨處理。"
+    },
+    "work": {
+      "revision_id": "13372a32-6bec-4a5e-8ffc-b9fcd82cd72c",
+      "areas": [
+        {
+          "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "title": "物流中心倉儲與庫存作業",
+          "scope_text": "涵蓋收貨驗收、上架、揀貨補貨、庫存盤點，以及客戶與供應商退貨入庫。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "9301a06b-657b-4284-852c-4ba3dfb0656a",
+          "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "title": "驗收進貨與上架入庫",
+          "description": "收貨時比對採購單、送貨單上的品項與實際收到的數量；核對無誤後，依已安排的儲位上架、貼標籤，並在庫存系統登記入庫。若發現數量不符，拍照並將差異告知採購。",
+          "outcomes": [
+            {
+              "detail_id": "e6559418-9858-42d4-b32e-62481f3f14c6",
+              "text": "提供採購差異情況及照片，供採購後續處理。"
+            },
+            {
+              "detail_id": "f93327b6-b480-4764-bb94-3d1c711e1407",
+              "text": "貨品依已安排的儲位上架並貼標籤，庫存系統完成入庫登記。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "ad77ce78-7f02-427f-af82-def3921f1409",
+              "text": "不自行決定拒收或退換貨；相關處理由採購決定。"
+            }
+          ]
+        },
+        {
+          "task_id": "421cdb20-0f0e-4fea-a788-f09aa160c7cf",
+          "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "title": "依出貨單揀貨",
+          "description": "依出貨單揀取貨品，依先進先出原則作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "4b64c267-f267-4ef5-8cab-098c1860640e",
+          "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "title": "依安全庫存狀況通知採購補貨",
+          "description": "看到商品低於安全庫存時，通知採購補貨。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [
+        {
+          "collaborator_id": "31b42c6b-6c7c-417c-8fe2-ca4589099916",
+          "name": "採購",
+          "scope_text": "進貨品項或數量不符時，提供差異情況及照片；商品低於安全庫存時通知採購補貨。拒收或退換貨由採購決定並處理。"
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "9ad6366e-23f0-4716-aaf1-bbf465f0ca2b",
+          "kind": "schedule_travel",
+          "text": "早上七點上班，週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

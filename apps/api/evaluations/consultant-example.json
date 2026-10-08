@@ -1,0 +1,15 @@
+{
+  "case": {
+    "name": "profile-save-synthetic",
+    "employee_name": "合成工程師",
+    "inputs": ["職稱：前端工程師；單位：產品開發部"],
+    "criteria": ["職稱與單位應沿正式工具保存，原始輸入可追溯；本模式不評模型品質。"]
+  },
+  "candidates": [
+    {"name": "current"},
+    {
+      "name": "read-description",
+      "tool_descriptions": {"read_jd": "讀取目前 JD，先用 map 定位；scope 由 App 綁定。"}
+    }
+  ]
+}

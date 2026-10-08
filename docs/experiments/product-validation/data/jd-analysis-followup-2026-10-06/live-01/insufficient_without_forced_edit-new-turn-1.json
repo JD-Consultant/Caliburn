@@ -1,0 +1,17 @@
+{
+  "execution_id": "c16eea60-c64f-4ee6-af5c-ad18bdfe53a4",
+  "exchange": {
+    "employee_input": {
+      "source_id": "9614626f-ef15-4584-8574-e14577b7e5de",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "有時候還會幫忙處理一些系統問題，不過我現在只想得到這樣，不確定該怎麼說。"
+    },
+    "consultant_reply": {
+      "source_id": "b6e413c9-5a76-408a-997a-7142b49a6cca",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "了解，除了依確認的設計稿實作網站頁面，偶爾也會協助處理系統問題；不確定怎麼概括沒關係。\n\n可以從最近一次想起來的例子說起：當時系統出了什麼狀況，您實際做了哪些處理？"
+    }
+  }
+}

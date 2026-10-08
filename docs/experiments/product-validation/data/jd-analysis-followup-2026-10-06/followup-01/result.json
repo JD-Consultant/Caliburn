@@ -1,0 +1,47 @@
+{
+  "completed": [
+    {
+      "arm": "old",
+      "case_id": "derive_and_link_capabilities"
+    },
+    {
+      "arm": "new",
+      "case_id": "derive_and_link_capabilities"
+    },
+    {
+      "arm": "new",
+      "case_id": "group_nonwarehouse_work"
+    },
+    {
+      "arm": "old",
+      "case_id": "group_nonwarehouse_work"
+    }
+  ],
+  "accounting": {
+    "input_tokens": 314699,
+    "output_tokens": 11964,
+    "reasoning_tokens": 8520,
+    "cached_input_tokens": 289063,
+    "cache_write_input_tokens": 25564,
+    "total_tokens": 326663,
+    "outbound_calls": 48,
+    "count_calls": 24,
+    "generation_calls": 24,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 314699,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.069362990",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0024",
+    "actual_estimated_usd": "0.012075330",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.014475330",
+    "cumulative_occupied_usd": "0.014475330",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 277.95903140000155,
+    "seconds_limit": 518,
+    "stop_reason": null
+  }
+}

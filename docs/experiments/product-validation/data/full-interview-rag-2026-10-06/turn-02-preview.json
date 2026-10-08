@@ -1,0 +1,41 @@
+{
+  "job_file_id": "71f92646-d2c1-41da-ab2e-fe991f5ad1c5",
+  "execution_id": "7984b8a3-3857-429e-ad46-471e9f162f12",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我先拿採購單和送貨單，比一下品項和實際收到的數量。對不上就拍照，把差在哪裡告訴採購。我不會自己決定拒收或退換貨，那個交給採購處理。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點及客戶與供應商退貨入庫，維持貨物流轉與庫存作業的準確，支援後續出貨及退貨處理。"
+    },
+    "work": {
+      "revision_id": "7e62bdc5-6b62-4685-82fb-7c485f4e6815",
+      "areas": [
+        {
+          "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "title": "物流中心倉儲與庫存作業",
+          "scope_text": "涵蓋收貨驗收、上架、揀貨補貨、庫存盤點，以及客戶與供應商退貨入庫。"
+        }
+      ],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": [
+        {
+          "condition_id": "9ad6366e-23f0-4716-aaf1-bbf465f0ca2b",
+          "kind": "schedule_travel",
+          "text": "早上七點上班，週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

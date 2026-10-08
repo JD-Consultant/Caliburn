@@ -1,0 +1,16 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "了解，正常溫度時是否也要登記讀數目前保留未知，不作推測。\n\n冷藏區作業除了穿防寒衣、每天早晚查看溫度表，是否還有規定每次可連續作業多久或需要輪替？若不清楚，也可以先保留未知。",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "實際問冷藏區連續作業時長或輪替規定，這些新細節不在 cold-storage 固定事實中。已知防寒衣與早晚查看是題目的前提，不是新可答部分；不從外部常識補規則，也不暗示後續重問能取得。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

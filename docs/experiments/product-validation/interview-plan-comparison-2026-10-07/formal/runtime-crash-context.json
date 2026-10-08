@@ -1,0 +1,15 @@
+{
+  "version": "3.14.7 (main, Sep 24 2026, 17:57:14) [MSC v.1944 64 bit (AMD64)]",
+  "gil_enabled": true,
+  "py_gil_disabled": 0,
+  "packages": {
+    "ormsgpack": "1.12.2",
+    "langgraph-checkpoint": "4.2.0",
+    "openai": "3.20.0",
+    "httpx2": "2.13.1",
+    "pydantic-core": "2.46.5",
+    "greenlet": "3.5.6",
+    "psycopg": "3.3.6",
+    "uvicorn": "0.54.0"
+  }
+}

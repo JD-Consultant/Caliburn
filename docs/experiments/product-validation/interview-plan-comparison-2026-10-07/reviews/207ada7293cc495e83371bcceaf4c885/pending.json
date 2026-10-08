@@ -1,0 +1,54 @@
+{
+  "question_id": "207ada7293cc495e83371bcceaf4c885",
+  "profile": "warehouse",
+  "actual_question": "收到。除了揀貨區不足時從備貨區補貨，其他補貨安排目前沒有確定資料，我會保留未知，不再追問。\n\n接著談客戶退貨：破損商品隔離後，您還需要做哪些事？後續交給哪個單位或由誰決定怎麼處理？",
+  "disclosed": [
+    "customer-returns",
+    "inventory-partial",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training",
+    "training-boundary"
+  ],
+  "open_gaps": [
+    "inventory-authority"
+  ],
+  "seen_topics": [
+    "customer-returns",
+    "inventory",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "receiving",
+    "customer-returns",
+    "supplier-returns",
+    "picking",
+    "inventory-partial",
+    "training",
+    "training-boundary",
+    "training-boundary",
+    "shelving"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 5
+  },
+  "recent_employee_originals": [
+    "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。\n\n關於你問的「若當場看到新人拿錯批號或走進車道，您會怎麼處理？」，我目前沒有確定資料，請保留未知，不補猜。",
+    "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。"
+  ],
+  "candidate": {
+    "actual_question": "接著談客戶退貨：破損商品隔離後，您還需要做哪些事？後續交給哪個單位或由誰決定怎麼處理？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分；若要釐清，可以具體問我實際做的步驟或責任。",
+    "fact_id": null,
+    "unmapped_or_already_answered": true
+  }
+}

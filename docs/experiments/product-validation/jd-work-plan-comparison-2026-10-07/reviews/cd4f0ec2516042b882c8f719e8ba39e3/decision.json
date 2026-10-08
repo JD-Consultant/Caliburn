@@ -1,0 +1,26 @@
+{
+  "question_id": "cd4f0ec2516042b882c8f719e8ba39e3",
+  "mode": "answer",
+  "fact_ids": [
+    "receiving"
+  ],
+  "reason": "詢問收貨差異通知後是否仍由本人追蹤、記錄及交接終點，receiving 直接提供採購回覆與本人登記入庫分工。",
+  "subquestions": [
+    {
+      "quote": "通知採購後，您通常還會追蹤回覆或補記系統、單據嗎？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "凍結事實有收貨異常表，及採購回覆補送或接受後按結果登記入庫，能回應是否仍有後續記錄工作。"
+    },
+    {
+      "quote": "還是交由採購或主管接手？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "可回答採購回覆處理結果而本人仍負責登記入庫；不把二選一式追問擴成未提供的主管核准權。"
+    }
+  ]
+}

@@ -12,7 +12,9 @@
 
 ## 一輪執行的時間順序
 
-![圖四：A 的模型與工具往返](diagrams/04-consultant-turn.png)
+![圖四：A 的模型與工具往返](../../diagrams/reports/system-architecture/04-consultant-turn.png)
+
+[圖源](../../diagrams/reports/system-architecture/04-consultant-turn.mmd) · [SVG](../../diagrams/reports/system-architecture/04-consultant-turn.svg)
 
 圖四標示正常執行中需要保存結果的位置。工具可以讀取資料或修改本輪工作稿，各次保存分別處理，不將整輪工作包在一筆長時間資料庫交易內。模型與工具的往返採用 [OpenAI Function calling](https://developers.openai.com/api/docs/guides/function-calling)；工作稿何時正式採用、訪談何時取得正式資格，則由 Caliburn 定義。
 

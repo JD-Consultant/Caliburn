@@ -1,0 +1,47 @@
+{
+  "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？\n\n關於你問的「如果實際數量和系統數量不一致，您通常會怎麼記錄」、「或交接？」，我目前沒有確定資料，請保留未知，不補猜。",
+  "audit": {
+    "actual_question": "我已把揀貨與補貨分開整理：揀貨依出貨波次單進行，核對品項、數量、批號和效期，並在截單前交包裝區複核；系統有貨但儲位空缺時，先查移庫與前一波次，不擅自換批號，異常交組長協調。揀貨區不足時，則從備貨區補貨。\n\n接著想了解庫存盤點：如果實際數量和系統數量不一致，您通常會怎麼記錄、查核或交接？",
+    "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？\n\n關於你問的「如果實際數量和系統數量不一致，您通常會怎麼記錄」、「或交接？」，我目前沒有確定資料，請保留未知，不補猜。",
+    "fact_ids": [
+      "inventory-partial"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "inventory-partial"
+    ],
+    "review_mode": "answer",
+    "review_reason": "盤點帳實差異的查核可首次披露 inventory-partial；差異記錄表與後續交接屬尚未想起的權責流程，不能提前取得 inventory-authority。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [
+      "如果實際數量和系統數量不一致，您通常會怎麼記錄",
+      "或交接？"
+    ],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "如果實際數量和系統數量不一致，您通常會怎麼記錄",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "當前可取得事實尚未提供如何記錄盤點差異；training 未披露，後續差異表流程不可提前提供。"
+      },
+      {
+        "quote": "查核",
+        "mode": "answer",
+        "fact_ids": [
+          "inventory-partial"
+        ],
+        "reason": "此子問延續庫存帳實差異，可回答先查最近入出庫與移庫紀錄、再複點，並保留原回答的暫時缺口與換題意願。"
+      },
+      {
+        "quote": "或交接？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "目前調帳、批准及後續交接權責尚未想起，不提前提供需回訪的 inventory-authority。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

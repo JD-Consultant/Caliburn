@@ -1,0 +1,10 @@
+{
+  "case": "course_admin-r1-P2",
+  "schema": "intplan_jdwork_formal_course_admin_r1_p2_f3c1ae",
+  "profile": "course_admin",
+  "group": "P2",
+  "repeat": 1,
+  "turn_limit": 20,
+  "controlled_mid_work": false,
+  "initial_public": "我在成人教育中心做課務行政，向教務主任報告。主要負責課程排程、學員報名與收費資料、開課準備、出缺勤和結業資料，也處理老師臨時缺課及學員退費申請。最近一位老師前一天說不能到，我先通知主任和學員；換誰來上課不是我自己決定。"
+}

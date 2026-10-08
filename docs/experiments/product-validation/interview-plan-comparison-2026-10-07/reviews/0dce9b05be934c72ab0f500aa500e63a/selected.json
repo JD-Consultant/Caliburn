@@ -1,0 +1,20 @@
+{
+  "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+  "audit": {
+    "actual_question": "收到。新人操作異常的處置方式目前未知，我會保留未知、不再追問；上線核准則依您的更正，記為由主管核准。\n\n接著談上架：請以最近一次上架為例，從您接到貨品或上架指示開始，說說您實際做了哪些步驟，以及做到什麼狀態算完成。",
+    "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+    "fact_ids": [
+      "shelving"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "shelving"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉問上架工作步驟及完成狀態，shelving 固定事實直接提供儲位放貨、貼標、WMS 入庫及實物系統一致確認，也保留位置調整與搬運權限界線。未提供額外日期、貨品或新個案細節。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

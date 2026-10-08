@@ -1,0 +1,14 @@
+{
+  "mode": "combined",
+  "python": "3.14.7 (main, Sep 24 2026, 17:57:14) [MSC v.1944 64 bit (AMD64)]",
+  "seconds": 75.26,
+  "iterations": 2000,
+  "sdk_responses": 2000,
+  "checkpoint_reads": 2000,
+  "key_read": false,
+  "provider_calls": 0,
+  "business_writes": 0,
+  "limits": "2000 iterations / <=120 seconds",
+  "limitation": "public terminal-envelope replay; opaque reasoning and original chunk timing unavailable",
+  "diagnostic_variant": "no-observed"
+}

@@ -13,6 +13,7 @@ from caliburn.features.work_memory.candidates import (
     require_layer_read,
 )
 from caliburn.features.work_memory.models import MemoryMapEntry, MemorySourceWindow
+from caliburn.features.work_memory.read_models import MemoryObjectMetadata
 from caliburn.features.work_memory.revision_service import read_fixed_revision
 from caliburn.features.work_memory.revisions import (
     MemoryLayer,
@@ -92,6 +93,36 @@ async def read_selected(
     return await read_fixed_revision(session, job_file_id=job_file_id, reference=reference)
 
 
+async def read_position_selection(
+    session: AsyncSession,
+    job_file_id: UUID,
+    position_id: UUID,
+    object_ids: tuple[UUID, ...],
+) -> dict[UUID, MemoryObjectMetadata]:
+    """在固定封存位置內取得有限物件標頭；位置不可讀時不回傳空結果。"""
+    selected = await position_persistence.read_position_selection(
+        session, job_file_id, position_id, object_ids
+    )
+    if selected is None:
+        raise MemoryCandidateStateError("The fixed candidate position is unavailable")
+    return {item.object_id: item for item in selected}
+
+
+async def read_position_object(
+    session: AsyncSession, job_file_id: UUID, position_id: UUID, object_id: UUID
+) -> MemoryObjectRevision:
+    """只讀一個選中的物件；正文沿既有封存版本 owner 取得。"""
+    selected = await read_position_selection(session, job_file_id, position_id, (object_id,))
+    item = selected.get(object_id)
+    if item is None:
+        raise MemoryRevisionNotFoundError("The object is not selected at this position")
+    return await read_fixed_revision(
+        session,
+        job_file_id=job_file_id,
+        reference=MemoryRevisionReference(item.object_id, item.revision_id),
+    )
+
+
 async def read_candidate_map(
     session: AsyncSession, stage: MemoryBatchPosition, layer: MemoryLayer
 ) -> tuple[MemoryMapEntry, ...]:
@@ -107,18 +138,33 @@ async def read_candidate_object(
 ) -> MemoryCandidateObject:
     require_layer_read(stage.phase, layer)
     record = await require_stage(session, stage)
-    # Capture one immutable position before resolving any reference. Never reread latest.
-    members = await read_members(session, stage.job_file_id, record.current_position_id)
-    revision = await read_selected(session, stage.job_file_id, members, object_id)
+    # 先固定一次位置，正文與來源導覽共用這個位置。
+    revision = await read_position_object(
+        session, stage.job_file_id, record.current_position_id, object_id
+    )
     if revision.layer != layer:
         raise MemoryRevisionNotFoundError("The object does not belong to the selected layer")
+    sources = (
+        await read_position_selection(
+            session,
+            stage.job_file_id,
+            record.current_position_id,
+            tuple(ref.object_id for ref in revision.work_situation_references),
+        )
+        if revision.work_situation_references
+        else {}
+    )
+    if len(sources) != len(revision.work_situation_references):
+        raise MemoryRevisionNotFoundError("A source binding is unavailable in the read view")
     return MemoryCandidateObject(
         revision.object_id,
         revision.revision_id,
         revision.layer,
         revision.content,
         revision.interview_references,
-        frozenset(members[ref.object_id] for ref in revision.work_situation_references),
+        frozenset(
+            MemoryRevisionReference(item.object_id, item.revision_id) for item in sources.values()
+        ),
     )
 
 
@@ -140,8 +186,7 @@ async def read_snapshot_object(
     session: AsyncSession, job_file_id: UUID, snapshot_id: UUID, object_id: UUID
 ) -> MemoryObjectRevision:
     snapshot = await read_snapshot(session, job_file_id, snapshot_id)
-    members = await read_members(session, job_file_id, snapshot.position_id)
-    return await read_selected(session, job_file_id, members, object_id)
+    return await read_position_object(session, job_file_id, snapshot.position_id, object_id)
 
 
 async def read_snapshot_map(

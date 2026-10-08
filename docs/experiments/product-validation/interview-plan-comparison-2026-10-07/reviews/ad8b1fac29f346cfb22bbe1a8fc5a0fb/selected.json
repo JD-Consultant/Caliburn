@@ -1,0 +1,20 @@
+{
+  "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？",
+  "audit": {
+    "actual_question": "已把揀貨與補貨整理成一項工作：依出貨波次單揀貨、核對品項／數量／批號／效期，揀貨區不足時從備貨區補貨，並在截單前交包裝區複核。若系統有貨但儲位空置，先查移庫紀錄與前一波次，不擅自替換批號；異常交組長協調。\n\n接著想了解庫存盤點：您如何核對實際數量與系統庫存？若發現差異，通常怎麼記錄或通知？",
+    "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？",
+    "fact_ids": [
+      "inventory-partial"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "inventory-partial"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際初問庫存盤點核對與差異處理，inventory-partial 提供查紀錄與複點並開啟未明權限缺口。尚未披露 training，不能提前提供 inventory-authority。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

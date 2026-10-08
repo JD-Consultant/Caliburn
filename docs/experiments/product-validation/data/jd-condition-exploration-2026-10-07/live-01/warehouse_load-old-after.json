@@ -1,0 +1,153 @@
+{
+  "profile": {
+    "revision_id": "4df620bd-4219-4b2a-91ea-69fce8f1886c",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "完成收貨上架及指定盤點，維持貨物和入庫紀錄可追查。"
+    }
+  },
+  "work": {
+    "revision_id": "4df620bd-4219-4b2a-91ea-69fce8f1886c",
+    "areas": [
+      {
+        "area_id": "389cf73f-eb46-46cb-938d-beec1051423d",
+        "title": "庫存盤點",
+        "scope_text": "依日常、月底及年度盤點安排，清點指定品項或區域並將結果交主管。"
+      },
+      {
+        "area_id": "8d591cee-a82d-4630-bbad-8c1fec4f33c6",
+        "title": "收貨與入庫",
+        "scope_text": "核對到貨單據與實貨，依安排處理符合條件的貨物入庫；差異交由採購判定收貨或退貨。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "43bdee11-407f-47e1-ae8d-1ce287fb3755",
+        "area_id": "389cf73f-eb46-46cb-938d-beec1051423d",
+        "title": "配合庫存盤點",
+        "description": "下班前複點高異動商品；月底點本人區域，十二月配合財務全倉盤點，結果交主管。",
+        "outcomes": [
+          {
+            "detail_id": "2666b68f-0189-462f-a17f-df4786db8deb",
+            "text": "完成所負責品項或區域的清點，並將盤點結果交主管。"
+          }
+        ],
+        "requirements": []
+      },
+      {
+        "task_id": "d438422c-ecc4-457b-acb6-ee1ca228f2ef",
+        "area_id": "8d591cee-a82d-4630-bbad-8c1fec4f33c6",
+        "title": "收貨驗收與上架",
+        "description": "核對單據和實貨，差異拍照通知採購並回報主管，由採購決定收退；符合才依安排上架、貼標籤及登記。",
+        "outcomes": [
+          {
+            "detail_id": "e6ddec09-40cc-4c12-8b0e-68f7b852f413",
+            "text": "符合條件的貨物依安排完成上架、貼標籤及庫存系統登記。"
+          }
+        ],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "4df620bd-4219-4b2a-91ea-69fce8f1886c",
+    "references": [
+      {
+        "citation_id": "bc1243e9-4849-45f7-ab8b-3f5992aebd8d",
+        "target_label": "任務：收貨驗收與上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "d438422c-ecc4-457b-acb6-ee1ca228f2ef",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "00a0ac9f-1ab4-41a7-90d4-fdcc419ac304",
+        "target_label": "任務：配合庫存盤點",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "43bdee11-407f-47e1-ae8d-1ce287fb3755",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f5863b6c-43e1-4427-a81f-99da5e69a755",
+        "target_label": "職責：庫存盤點",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "389cf73f-eb46-46cb-938d-beec1051423d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "07bba219-e5ad-4bf8-adb4-eebcc092c670",
+        "target_label": "職責：收貨與入庫",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "8d591cee-a82d-4630-bbad-8c1fec4f33c6",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "204f1db5-4781-4ce4-847b-73e3394f9439",
+        "target_label": "任務：收貨驗收與上架 · 成果：符合條件的貨物依安排完成上架、貼標籤及庫存系統登記。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "e6ddec09-40cc-4c12-8b0e-68f7b852f413",
+          "task_id": "d438422c-ecc4-457b-acb6-ee1ca228f2ef"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "e021143e-f684-4616-9caf-622f36631acd",
+        "target_label": "任務：配合庫存盤點 · 成果：完成所負責品項或區域的清點，並將盤點結果交主管。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "2666b68f-0189-462f-a17f-df4786db8deb",
+          "task_id": "43bdee11-407f-47e1-ae8d-1ce287fb3755"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

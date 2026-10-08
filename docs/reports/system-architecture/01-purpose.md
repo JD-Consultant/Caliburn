@@ -12,7 +12,9 @@ Caliburn 以 AI 引導訪談，協助員工說清楚工作，再用結構化編�
 
 ## 最短價值循環
 
-![圖一：訪談、釐清、編輯與回饋的價值循環](diagrams/01-value-loop.png)
+![圖一：訪談、釐清、編輯與回饋的價值循環](../../diagrams/architecture/README/product-activities.png)
+
+[圖源](../../diagrams/architecture/README/product-activities.mmd) · [SVG](../../diagrams/architecture/README/product-activities.svg)
 
 圖一呈現員工與顧問反覆合作的產品活動。顧問可以在同一輪同時補問、修稿與說明；資訊不足時繼續訪談，不要求每輪都修改 JD。這個循環不是固定 Graph 的節點順序，背景記憶也不必在每次編輯 JD 前先完成。
 

@@ -1,0 +1,167 @@
+{
+  "status": {
+    "job_file_id": "f9507c7c-d5fb-4c76-9bd7-73bd0506c670",
+    "execution_id": "c116e4ff-4851-42ca-88e0-ec8303824072",
+    "status": "completed",
+    "pause_requested": false,
+    "input_text": "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。",
+    "commentary": [
+      {
+        "response_id": "resp_0a783ec86c45d250016ac685cd331887d0a99001db079292fe",
+        "message_id": "msg_0a783ec86c45d250016ac685d1b96c87d0ab2ad3f76c8c356d",
+        "text": "我先把已確認的職務基本資料整理進底稿，並聚焦了解您提到的收貨差異如何查核與交接；其他日常工作先保留為後續方向，不會只憑工作名稱推定細節。"
+      }
+    ],
+    "candidate": null,
+    "plan_preview": null,
+    "allowed_controls": []
+  },
+  "elapsed_seconds": 34.77270010000211,
+  "interviews": {
+    "messages": [
+      {
+        "source_id": "0b1ea586-63bb-425d-ab77-ba0653048d73",
+        "interview_sequence": 1,
+        "speaker": "app",
+        "interview_text": "這裡會透過訪談，逐步理解您的實際工作並整理職務說明書。您不需要先學會撰寫，也不必一次說完；不確定的地方可以直接說明。\n\n請先說說您目前主要負責哪些工作？可以用自己的說法，從平常大家會找您處理的事情開始。",
+        "execution_id": null
+      },
+      {
+        "source_id": "bf4e200a-cf74-4d78-b368-c312992ead63",
+        "interview_sequence": 2,
+        "speaker": "employee",
+        "interview_text": "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。",
+        "execution_id": null
+      },
+      {
+        "source_id": "2526df31-adb5-4533-8324-bd4c2422f952",
+        "interview_sequence": 3,
+        "speaker": "consultant",
+        "interview_text": "我先把「倉庫管理員」、所屬物流中心、匯報對象，以及您提到的工作時間整理進底稿。收貨差異部分也記下了：您會比對單據與實收數量、拍照通知採購，但不決定拒收或退換貨。\n\n您通知採購後，通常由誰決定後續怎麼處理？您這邊還會追蹤或記錄到什麼狀態，才算完成這次差異查核？",
+        "execution_id": "c116e4ff-4851-42ca-88e0-ec8303824072"
+      }
+    ]
+  },
+  "formal_jd": {
+    "profile": {
+      "revision_id": "0ec13673-903e-49fa-8f60-b544a767c57b",
+      "profile": {
+        "job_title": "倉庫管理員",
+        "organization_unit": "物流中心",
+        "reports_to": "倉儲主管",
+        "purpose": "執行物流中心的收貨驗收、貨品儲位與揀補、庫存盤點及退貨處理，並協助新人熟悉作業，以維持倉儲作業與庫存處理。"
+      }
+    },
+    "work": {
+      "revision_id": "0ec13673-903e-49fa-8f60-b544a767c57b",
+      "areas": [],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": [
+        {
+          "condition_id": "d87513e1-b8b5-4a9c-a376-82df7f2600bb",
+          "kind": "schedule_travel",
+          "text": "早上七點上班，週一至週六輪休。"
+        }
+      ]
+    },
+    "sources": {
+      "revision_id": "0ec13673-903e-49fa-8f60-b544a767c57b",
+      "references": [
+        {
+          "citation_id": "4220f8b6-7892-4ebb-96f8-f1410156cd38",
+          "target_label": "職務名稱",
+          "target": {
+            "kind": "profile_field",
+            "field": "job_title",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "a8e513e6-a9ca-4bcf-9666-5d1b4b5e04f0",
+          "target_label": "所屬單位",
+          "target": {
+            "kind": "profile_field",
+            "field": "organization_unit",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "7c9d215b-dbdc-435d-92fc-c6f7663560db",
+          "target_label": "直屬主管",
+          "target": {
+            "kind": "profile_field",
+            "field": "reports_to",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "a6702521-b255-44fa-9fd8-8cca1dfb77ad",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "78262ae0-7a25-4780-add1-64f96b60bd02",
+          "target_label": "共通條件：早上七點上班，週一至週六輪休。",
+          "target": {
+            "kind": "condition",
+            "field": null,
+            "item_id": "d87513e1-b8b5-4a9c-a376-82df7f2600bb",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "plan": {
+    "job_file_id": "f9507c7c-d5fb-4c76-9bd7-73bd0506c670",
+    "plan": "## 目前焦點\n釐清收貨數量差異的查核、處理界線與交接。\n\n## 工作方向\n- 職務基本資料與工作時間：職稱、單位、匯報對象及班表資訊已整理入稿。\n- 收貨驗收：已知會比對採購單、送貨單與實收數量，並拍照通知採購；差異後續處理及完成交接方式待釐清。\n- 其他工作：已知上架、揀貨補貨、庫存盤點、客戶退貨、供應商退貨及帶新人，尚未深入本人做法與責任範圍。\n- 全稿核對：主要工作整理後核對涵蓋、依據及跨欄一致。"
+  },
+  "guard": {
+    "spent_usd": "0.036465595",
+    "occupied_usd": "0.036465595",
+    "retained_reservations": {},
+    "generations": 41,
+    "compacts": 0,
+    "outbound": 87,
+    "counted_input": 950880,
+    "stop_reason": null,
+    "batch_deadline": null,
+    "limit_usd": "4.00"
+  }
+}

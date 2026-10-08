@@ -1,0 +1,32 @@
+%% title: 現行 UML 物件圖：快照選用與修訂重用（合成示例）
+%% legend: 底線名稱 : 類別表示實例；實線表示選用或固定引用；色彩輔助區分類別。省略部分選用線。
+%% UML 2.5.1 §9.8.4：帶底線的 instance : Classifier 與具名實線 link。
+%% M1／M2 為已發布快照；實例名稱保留修訂與提示。省略可導航性及部分選用關係。
+%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 250, "nodeSpacing": 32, "rankSpacing": 42}}}%%
+flowchart TB
+    M1["<u>M1 : 已發布 Memory 快照</u>"]
+    M2["<u>M2 : 已發布 Memory 快照</u>"]
+    U1["<u>U1-r1 : 工作理解修訂</u>"]
+    U2["<u>U1-r2 : 工作理解修訂</u>"]
+    S1["<u>S1-r1（每日整理）<br/>: 工作情境修訂</u>"]
+    S2["<u>S1-r2（每日整理＋每季統計）<br/>: 工作情境修訂</u>"]
+    X["<u>S2-r1（未變，兩版重用）<br/>: 工作情境修訂</u>"]
+    I1["<u>I1（不可改寫） : 訪談原話</u>"]
+    I2["<u>I2（後來新增） : 訪談原話</u>"]
+    M1 ---|快照選用理解| U1
+    M1 ---|快照選用情境| S1
+    M1 ---|快照選用情境| X
+    M2 ---|快照選用理解| U2
+    M2 ---|快照選用情境| S2
+    M2 ---|快照重用情境| X
+    U1 ---|理解固定引用情境| S1
+    U2 ---|理解固定引用情境| S2
+    S1 ---|情境固定引用原話| I1
+    S2 ---|情境固定引用原話| I1
+    S2 ---|情境固定引用原話| I2
+    classDef snapshot fill:#dcfce7,stroke:#15803d,color:#14532d;
+    classDef revision fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e;
+    classDef original fill:#f1f5f9,stroke:#475569,color:#0f172a;
+    class M1,M2 snapshot;
+    class U1,U2,S1,S2,X revision;
+    class I1,I2 original;

@@ -90,6 +90,7 @@ def public_turn(response, *, status: str) -> dict:
         "allowed_controls",
         "commentary",
         "candidate",
+        "plan_preview",
     }
     assert body["status"] == status
     return body

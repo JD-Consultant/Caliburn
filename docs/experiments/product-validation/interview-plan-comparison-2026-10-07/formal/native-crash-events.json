@@ -1,0 +1,12 @@
+[
+  {
+    "TimeCreated": "2026-10-07T05:36:52.6407858+08:00",
+    "Id": 1001,
+    "Message": "錯誤容器 2104153292235594316，類型 4\r\n事件名稱: APPCRASH\r\n回應: 無法使用\r\nCab 識別碼: 0\r\n\r\n問題簽章:\r\nP1: python.exe\r\nP2: 3.14.7150.1013\r\nP3: 6ab564e0\r\nP4: python314.dll\r\nP5: 3.14.7150.1013\r\nP6: 6ab564c9\r\nP7: c0000005\r\nP8: 000000000009d1c6\r\nP9: \r\nP10: \r\n\r\n附加檔案:\r\n\\\\?\\C:\\ProgramData\\Microsoft\\Windows\\WER\\Temp\\WER.b1ace05d-7205-4cf8-a63c-6d5f7d62c04a.tmp.dmp\r\n\\\\?\\C:\\ProgramData\\Microsoft\\Windows\\WER\\Temp\\WER.9b0209a8-70d6-47e0-afb3-57faa1bd9f8f.tmp.WERInternalMetadata.xml\r\n\\\\?\\C:\\ProgramData\\Microsoft\\Windows\\WER\\Temp\\WER.6d7de280-337a-457e-bbb9-b8349fc70513.tmp.csv\r\n\\\\?\\C:\\ProgramData\\Microsoft\\Windows\\WER\\Temp\\WER.a78a1773-3389-4cf6-9de7-2586c0bbd12e.tmp.txt\r\n\\\\?\\C:\\ProgramData\\Microsoft\\Windows\\WER\\Temp\\WER.94859fc2-7a75-4e55-8a82-6dd752337559.tmp.xml\r\n\r\n這些檔案可能在這裡:\r\n\\\\?\\C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\AppCrash_python.exe_ba66262eb92c183a1c96e6e8547f979829be5526_a83efdc7_c7200e68-e04c-4eb2-bf2b-7cb62c71448e\r\n\r\n分析符號: \r\n重新檢查解決方案: 0\r\n報告識別碼: b0160ee8-54cf-4960-b2a1-296b041d135c\r\n報告狀態: 268435456\r\n雜湊化容器: d856714b440e67b77d33744560abda4c\r\nCab GUID: 0"
+  },
+  {
+    "TimeCreated": "2026-10-07T05:36:49.460928+08:00",
+    "Id": 1000,
+    "Message": "失敗的應用程式名稱： python.exe，版本： 3.14.7150.1013，時間戳記： 0x6ab564e0\r\n錯誤模組名稱： python314.dll， 版本： 3.14.7150.1013，時間戳記： 0x6ab564c9\r\n例外狀況代碼： 0xc0000005\r\n錯誤位移： 0x000000000009d1c6\r\n錯誤處理常式識別碼： 0x8CE0\r\n失敗的應用程式開始時間： 0x1DD55D9EA7BFD04\r\nFaulting 應用程式路徑： S:\\caliburn\\.research-tmp\\python\\cpython-3.14.7-windows-x86_64-none\\python.exe\r\nFaulting 模組路徑： S:\\caliburn\\.research-tmp\\python\\cpython-3.14.7-windows-x86_64-none\\python314.dll\r\nReport 識別碼： b0160ee8-54cf-4960-b2a1-296b041d135c\r\nFaulting 套件完整名稱： \r\nFaulting 套件相對應用程式識別碼： "
+  }
+]

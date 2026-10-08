@@ -1,0 +1,134 @@
+{
+  "arm": "old",
+  "case_id": "insufficient_without_forced_edit",
+  "job_file_id": "b0bb14e2-0731-44e9-b480-ed4604b909ce",
+  "before": {
+    "profile": {
+      "revision_id": "d7697cdd-8232-4c40-a7cf-3491741ec023",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "依已確認設計實作網站頁面。"
+      }
+    },
+    "work": {
+      "revision_id": "d7697cdd-8232-4c40-a7cf-3491741ec023",
+      "areas": [
+        {
+          "area_id": "1baa8234-cef7-4efc-a664-dcc836a36083",
+          "title": "網站頁面交付",
+          "scope_text": "依已確認設計實作頁面，不決定設計變更。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "ccff199c-86f9-4184-9e49-bed7896104cf",
+          "area_id": "1baa8234-cef7-4efc-a664-dcc836a36083",
+          "title": "實作網站頁面",
+          "description": "每週依確認設計稿完成頁面，設計變更由產品主管決定。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "d7697cdd-8232-4c40-a7cf-3491741ec023",
+      "references": [
+        {
+          "citation_id": "3a11626e-aa68-44fd-a04d-8b63a190b5c8",
+          "target_label": "任務：實作網站頁面",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "ccff199c-86f9-4184-9e49-bed7896104cf",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "0180117f-db70-498a-8cb1-80465f5f55c8",
+      "exchange": {
+        "employee_input": {
+          "source_id": "aa12063d-2307-4be4-8dbe-46fe80bc772d",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "有時候還會幫忙處理一些系統問題，不過我現在只想得到這樣，不確定該怎麼說。"
+        },
+        "consultant_reply": {
+          "source_id": "9a1cfcd8-67e0-4d06-b0d2-452d65b9206e",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "沒關係，不用先替這類工作取名稱。回想最近一次您幫忙處理的系統問題：當時出了什麼狀況，您本人做了什麼？"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 132312,
+    "output_tokens": 4060,
+    "reasoning_tokens": 3298,
+    "cached_input_tokens": 127637,
+    "cache_write_input_tokens": 4642,
+    "total_tokens": 136372,
+    "outbound_calls": 22,
+    "count_calls": 11,
+    "generation_calls": 11,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 132312,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.054887660",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0011",
+    "actual_estimated_usd": "0.003889920",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.004989920",
+    "cumulative_occupied_usd": "0.004989920",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 120.65197700000135,
+    "seconds_limit": 131,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 142625,
+    "output_tokens": 4338,
+    "reasoning_tokens": 3526,
+    "cached_input_tokens": 137947,
+    "cache_write_input_tokens": 4642,
+    "total_tokens": 146963,
+    "outbound_calls": 24,
+    "count_calls": 12,
+    "generation_calls": 12,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 142625,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.054887660",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0012",
+    "actual_estimated_usd": "0.004132320",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.005332320",
+    "cumulative_occupied_usd": "0.005332320",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 128.92442139999912,
+    "seconds_limit": 131,
+    "stop_reason": null
+  }
+}

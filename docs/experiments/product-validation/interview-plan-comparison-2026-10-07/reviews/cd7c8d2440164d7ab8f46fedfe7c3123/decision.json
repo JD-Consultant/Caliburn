@@ -1,0 +1,8 @@
+{
+  "question_id": "cd7c8d2440164d7ab8f46fedfe7c3123",
+  "fact_ids": ["training"],
+  "mode": "answer",
+  "reason": "實際按員工指定轉談新人帶教，問示範陪做與獨立操作確認，首次 training 可答。尚未先前披露 training，因此不提前給 training-boundary；盤點摘要不是調帳權限回訪。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

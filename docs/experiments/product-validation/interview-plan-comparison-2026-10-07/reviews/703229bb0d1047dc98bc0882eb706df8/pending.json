@@ -1,0 +1,26 @@
+{
+  "question_id": "703229bb0d1047dc98bc0882eb706df8",
+  "profile": "warehouse",
+  "actual_question": "我先記下您的職務是物流中心倉庫管理員，向倉儲主管報告；工作涵蓋收貨驗收、上架、揀貨補貨、盤點、退貨及帶領新人，班表則是早上七點上班、週一至週六輪休。\n\n這批進貨數量不符的處理也先記下來：您依主管交辦核對採購單、送貨單與實收數量，拍照通知採購；是否拒收或退換貨由主管決定。其他工作我先列為待補充細節。\n\n想先了解收貨驗收的平常流程：貨送到後，您通常從哪一步開始處理，到什麼情況算驗收完成？",
+  "disclosed": [],
+  "open_gaps": [],
+  "seen_topics": [],
+  "refused_topics": [],
+  "disclosure_order": [],
+  "gap_opened_at": {},
+  "recent_employee_originals": [
+    "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。"
+  ],
+  "candidate": {
+    "actual_question": "想先了解收貨驗收的平常流程：貨送到後，您通常從哪一步開始處理，到什麼情況算驗收完成？",
+    "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+    "fact_id": "receiving",
+    "topic": "receiving",
+    "matched_cue": "收貨",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": null,
+    "closes_gap": null,
+    "correction": false
+  }
+}

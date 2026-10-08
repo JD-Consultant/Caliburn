@@ -1,0 +1,20 @@
+{
+  "question_id": "fcf60b453eca4eddbab12d463bab73a9",
+  "mode": "unknown",
+  "fact_ids": [],
+  "reason": "本題專問補貨後是否掃碼／登記移庫及該處理終點；凍結 picking 僅說備貨區補貨，shelving 的入庫掃碼不能代答補貨移庫細節。",
+  "subquestions": [
+    {
+      "quote": "揀貨區不足時，您從備貨區補貨後，還需要掃碼或登記移庫嗎？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "未提供補貨後的掃碼或移庫登記要求，不由一般上架入庫流程推定。"
+    },
+    {
+      "quote": "如果需要，您負責到哪一步？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "條件承接未提供的補貨移庫記錄工作，沒有本人責任終點的確定資料。"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "question_id": "2cd01cdc620446bfb89f1ca0de0cf74c",
+  "fact_ids": ["inventory-partial"],
+  "mode": "answer",
+  "reason": "此 fresh case 初問盤點頻率與差異查核、回報及調整權限，inventory-partial 提供每週循環盤點與查紀錄複點，保留原權限缺口並轉談帶教。尚未開過 gap 且 training 未披露，不能提前給 inventory-authority；一般盤點頻率問句不等同年度或低頻工作廣度提問。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

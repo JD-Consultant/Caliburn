@@ -1,0 +1,17 @@
+{
+  "execution_id": "8926a595-bd95-4112-a85e-403b4f5c5b1f",
+  "exchange": {
+    "employee_input": {
+      "source_id": "f44b8909-4ada-4826-858f-8baaa321935b",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "對，我做的就是這兩塊。每天那個是讓客人問題有人處理，每週那張是給主管看哪些問題常發生。沒有其他新的細節。"
+    },
+    "consultant_reply": {
+      "source_id": "fdec9a61-0db4-489b-bdee-25e42da364bd",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "我已依確認內容整理底稿：把客戶使用問題處理與每週客訴資料整理分成兩項職責，補上各自的工作成果、必要技能及與技術同事、主管的交接界線。也填入所屬單位「客服部」；職稱與直接匯報關係目前先留白，沒有從週報對象推定匯報關係。\n\n若方便，請補充您的職稱，以及這位主管是否也是您的直接主管？"
+    }
+  }
+}

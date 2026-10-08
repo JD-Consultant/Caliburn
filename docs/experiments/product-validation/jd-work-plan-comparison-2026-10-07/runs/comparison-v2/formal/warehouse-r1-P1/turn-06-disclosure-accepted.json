@@ -1,0 +1,40 @@
+{
+  "actual_question": "我已把「每週循環盤點」以及差異時查近期入庫、出庫和移庫紀錄後複點，補進盤點工作；調帳方式和批准人仍保留未知。\n\n以您最近帶新人的情況為例，您實際會教新人哪些工作？通常做到什麼程度，您這段帶教才算告一段落？",
+  "employee_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。",
+  "fact_ids": [
+    "training"
+  ],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [
+    "training"
+  ],
+  "review_mode": "answer",
+  "review_reason": "明確依員工換題意願詢問帶教工作內容與進度判斷，training 可首次披露；權限更正尚未滿足先前披露條件。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": false,
+  "availability_cue": "剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。",
+  "subquestions": [
+    {
+      "quote": "以您最近帶新人的情況為例，您實際會教新人哪些工作？",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "凍結事實提供掃碼、揀貨與安全動線帶教內容。"
+    },
+    {
+      "quote": "通常做到什麼程度，您這段帶教才算告一段落？",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "凍結事實有新人跟做、觀察錯誤與檢核表，以及自述能否自己上線的判斷，可回應本人帶教進度界線。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "7120f578-a07e-426e-acd6-4c16774de2bc",
+  "accepted_source_id": "a20a2874-41a8-4c99-be1d-5a9451e68e85"
+}

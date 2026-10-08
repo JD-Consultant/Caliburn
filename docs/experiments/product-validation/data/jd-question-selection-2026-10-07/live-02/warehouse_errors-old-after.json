@@ -1,0 +1,248 @@
+{
+  "profile": {
+    "revision_id": "764b4354-14ae-4742-b156-8a5cc5ab0908",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依已確認的資料及儲位安排完成上架與入庫紀錄。"
+    }
+  },
+  "work": {
+    "revision_id": "764b4354-14ae-4742-b156-8a5cc5ab0908",
+    "areas": [
+      {
+        "area_id": "b3db430b-1b02-4fbe-9594-e05b91d4d0e5",
+        "title": "入庫與上架",
+        "scope_text": "品項確認、上架與登記。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773",
+        "area_id": "b3db430b-1b02-4fbe-9594-e05b91d4d0e5",
+        "title": "核對品項並上架",
+        "description": "上架前掃碼確認品項，依安排放貨、貼標籤並登記；不符先核對單據並通知主管，不自行改品項或決定儲位。",
+        "outcomes": [
+          {
+            "detail_id": "35e61459-d002-4344-bf54-780490e1b05a",
+            "text": "貨品依安排放入儲位，並在庫存系統完成貨品及數量登記；完成後交主管。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "c2461cdf-8d06-461e-bd7a-e35275b8768a",
+            "text": "掃描品項與到貨資料不符時，先停止作業並核對單據，再通知主管；不自行修改品項或決定儲位。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [
+      {
+        "capability_id": "aaf47043-e257-4480-87f3-d170b62ceca7",
+        "kind": "skill",
+        "name": "到貨品項核對與異常通報",
+        "description": "依掃描結果與到貨資料核對品項，發現不符時暫停作業、核對單據並通知主管。"
+      }
+    ],
+    "task_links": [
+      {
+        "task_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773",
+        "capability_id": "aaf47043-e257-4480-87f3-d170b62ceca7"
+      }
+    ],
+    "collaborators": [
+      {
+        "collaborator_id": "a07844d6-4687-49af-9ea8-aa9a8cdec78a",
+        "name": "主管",
+        "scope_text": "品項與到貨資料不符時接收通報；上架及入庫登記完成後接收交接。"
+      }
+    ],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "764b4354-14ae-4742-b156-8a5cc5ab0908",
+    "references": [
+      {
+        "citation_id": "0cd6a819-00e4-404b-8540-d62997675220",
+        "target_label": "任務：核對品項並上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "a4171d90-d1aa-420f-bdda-edff5311a902",
+        "target_label": "任務：核對品項並上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "0982be48-0d92-49ba-be6a-4dbfb2e6cf34",
+        "target_label": "任務：核對品項並上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "5862451c-9367-4d1e-982a-44cda588fdc6",
+        "target_label": "任務：核對品項並上架 · 成果：貨品依安排放入儲位，並在庫存系統完成貨品及數量登記；完成後交主管。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "35e61459-d002-4344-bf54-780490e1b05a",
+          "task_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "52ebb5d5-c0df-4b8e-b1c4-05b098e0b3d4",
+        "target_label": "任務：核對品項並上架 · 要求：掃描品項與到貨資料不符時，先停止作業並核對單據，再通知主管；不自行修改品項或決定儲位。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "c2461cdf-8d06-461e-bd7a-e35275b8768a",
+          "task_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "61a2fa79-4566-4348-9851-67110df41c10",
+        "target_label": "任務：核對品項並上架 · 要求：掃描品項與到貨資料不符時，先停止作業並核對單據，再通知主管；不自行修改品項或決定儲位。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "c2461cdf-8d06-461e-bd7a-e35275b8768a",
+          "task_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "27680686-9c74-4de8-bd8e-08e4355b726f",
+        "target_label": "技能：到貨品項核對與異常通報",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "aaf47043-e257-4480-87f3-d170b62ceca7",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f12720d0-303c-4e47-9188-ab72507e6aac",
+        "target_label": "技能：到貨品項核對與異常通報",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "aaf47043-e257-4480-87f3-d170b62ceca7",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "3f737a55-87b1-4e0b-a69a-44723bf9533f",
+        "target_label": "任務：核對品項並上架 · 使用：到貨品項核對與異常通報",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "aaf47043-e257-4480-87f3-d170b62ceca7",
+          "task_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f1a1e4ca-ad9e-40c5-a18a-dcabb95a060d",
+        "target_label": "任務：核對品項並上架 · 使用：到貨品項核對與異常通報",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "aaf47043-e257-4480-87f3-d170b62ceca7",
+          "task_id": "6dfb2876-0c13-4b6b-ad0e-8ede1f820773"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "59a79ed5-1aaa-45ce-94ee-10e8a5b8d12b",
+        "target_label": "協作：主管",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "a07844d6-4687-49af-9ea8-aa9a8cdec78a",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "30aa7774-bfa7-4e65-bbb9-f108c75e8a1e",
+        "target_label": "協作：主管",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "a07844d6-4687-49af-9ea8-aa9a8cdec78a",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

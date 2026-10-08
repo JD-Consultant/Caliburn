@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EditJdCapabilitiesRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command_id", "expected_revision_id", "change"],
+  "properties": {
+    "command_id": { "type": "string", "format": "uuid" },
+    "expected_revision_id": { "type": "string", "format": "uuid" },
+    "change": {
+      "oneOf": [
+        { "$ref": "#/$defs/CreateCapability" },
+        { "$ref": "#/$defs/ReviseCapability" },
+        { "$ref": "#/$defs/DeleteCapability" },
+        { "$ref": "#/$defs/ReorderCapability" },
+        { "$ref": "#/$defs/SetTaskCapability" },
+        { "$ref": "#/$defs/ReorderTaskCapability" }
+      ]
+    }
+  },
+  "$defs": {
+    "OptionalText": {
+      "type": ["string", "null"],
+      "pattern": "^(?![\\s\\S]*\\u0000)(?=[\\s\\S]*\\S)[\\s\\S]+$"
+    },
+    "CreateCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "kind", "name", "description"],
+      "properties": {
+        "action": { "const": "create_capability" },
+        "kind": { "enum": ["knowledge", "skill"] },
+        "name": { "$ref": "#/$defs/OptionalText" },
+        "description": { "$ref": "#/$defs/OptionalText" }
+      },
+      "anyOf": [
+        { "properties": { "name": { "type": "string" } } },
+        { "properties": { "description": { "type": "string" } } }
+      ]
+    },
+    "FieldChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "value"],
+      "properties": {
+        "field": { "enum": ["name", "description"] },
+        "value": { "$ref": "#/$defs/OptionalText" }
+      }
+    },
+    "ReviseCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "capability_id", "changes"],
+      "properties": {
+        "action": { "const": "revise_capability" },
+        "capability_id": { "type": "string", "format": "uuid" },
+        "changes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/FieldChange" }
+        }
+      }
+    },
+    "DeleteCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "capability_id"],
+      "properties": {
+        "action": { "const": "delete_capability" },
+        "capability_id": { "type": "string", "format": "uuid" }
+      }
+    },
+    "ReorderCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "capability_id", "before_capability_id"],
+      "properties": {
+        "action": { "const": "reorder_capability" },
+        "capability_id": { "type": "string", "format": "uuid" },
+        "before_capability_id": { "type": ["string", "null"], "format": "uuid" }
+      }
+    },
+    "SetTaskCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "task_id", "capability_id", "linked"],
+      "properties": {
+        "action": { "const": "set_task_capability" },
+        "task_id": { "type": "string", "format": "uuid" },
+        "capability_id": { "type": "string", "format": "uuid" },
+        "linked": { "type": "boolean" }
+      }
+    },
+    "ReorderTaskCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "task_id",
+        "capability_id",
+        "before_capability_id"
+      ],
+      "properties": {
+        "action": { "const": "reorder_task_capability" },
+        "task_id": { "type": "string", "format": "uuid" },
+        "capability_id": { "type": "string", "format": "uuid" },
+        "before_capability_id": { "type": ["string", "null"], "format": "uuid" }
+      }
+    }
+  }
+}

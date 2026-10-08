@@ -1,0 +1,24 @@
+%% title: 現行代表時序：背景發布與下一輪訪談交錯
+%% legend: 實線實心箭頭：同步呼叫；虛線：回傳；實線開放箭頭：非同步通知；時間由上而下。A 的固定 Memory 不隨背景發布換版。
+sequenceDiagram
+  actor User as 員工
+  participant App as App 協調與 A 執行
+  participant Domain as 訪談／JD 業務
+  participant B as Memory 背景工作
+  participant M as Memory 業務
+  User->>App: 輸入 a
+  App->>M: 選定當時已發布 M20
+  M-->>App: 固定 M20 的導覽與讀取範圍
+  App->>Domain: 按需修改本輪 JD 候選
+  Domain-->>App: 候選位置與可預覽內容
+  App-)User: 候選可預覽，尚未正式生效
+  App->>Domain: 完整答覆與本輪候選一同完成
+  Domain-->>App: 正式結果及已成立的整理要求
+  App-->>User: 正式答覆與 JD
+  App-)B: 喚醒背景調度；依正式要求固定訪談上界
+  Note over B,M: B1 整理情境，再交 B2；候選不外露
+  User->>App: 下一次輸入 b
+  App->>M: 此時仍選到 M20，固定至本 Turn 結束
+  B->>M: 完成本批分析，原子發布 M21
+  M-->>B: M21 與處理進度正式生效
+  Note over App,M: 正在處理 b 的 A 仍讀 M20；下個新 Turn 才選 M21

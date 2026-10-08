@@ -1,0 +1,113 @@
+{
+  "job_file_id": "6f7c86c9-7a2d-43a4-8628-56b54e6bcb47",
+  "execution_id": "64824ec7-b77e-41ea-afaf-5bd138f851b1",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心貨品收貨驗收、庫內存放與揀補、庫存盤點及退貨處理等倉儲工作，維持貨品與庫存作業順暢，並協助新人熟悉工作。"
+    },
+    "work": {
+      "revision_id": "fbd08f19-8b46-4ca8-8501-ed38cb3363d9",
+      "areas": [
+        {
+          "area_id": "e650a1ba-1d19-4a47-8e09-d908ce4d3edc",
+          "title": "收貨驗收與異常處理",
+          "scope_text": "執行進貨核對與收貨異常通報，並依採購回覆的處理結果登記入庫。"
+        },
+        {
+          "area_id": "5d25184f-903a-4116-979f-8a41e4bc8542",
+          "title": "上架與儲位管理",
+          "scope_text": "依既定儲位執行貨品上架並登記入庫，維持實物與 WMS 儲位資訊一致；儲位不足時請組長調整。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "388d3f1f-d59d-40fd-818e-4d2102cf817b",
+          "area_id": "e650a1ba-1d19-4a47-8e09-d908ce4d3edc",
+          "title": "驗收進貨並處理收貨差異",
+          "description": "逐箱點件，核對品項、數量、外包裝與送貨單；發現差異時拍照、登記收貨異常表並通知採購。採購回覆要補送或接受後，依處理結果登記入庫。",
+          "outcomes": [
+            {
+              "detail_id": "1fb183ec-376b-49bf-b275-0ac7f678f319",
+              "text": "收貨差異以照片及收貨異常表留存並通知採購，供後續處理。"
+            },
+            {
+              "detail_id": "608b96fb-d889-4a25-9583-3feffe414968",
+              "text": "依採購回覆的補送或接受結果完成入庫登記。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "8fc2f8ba-b5f0-4d39-9a18-c6d2e0c81201",
+              "text": "逐箱點件，並核對品項、數量、外包裝與送貨單。"
+            },
+            {
+              "detail_id": "8a85002a-2d7f-4afa-97f9-500d52c7f7ce",
+              "text": "不自行決定拒收或退換貨，也不議價或選擇供應商；須待採購回覆補送或接受後，才依其處理結果登記入庫。"
+            }
+          ]
+        },
+        {
+          "task_id": "b14b3306-df8c-495e-a1eb-d6bc99e5659d",
+          "area_id": "5d25184f-903a-4116-979f-8a41e4bc8542",
+          "title": "依規劃儲位上架並登記入庫",
+          "description": "依已規劃的儲位放置貨品、貼上品項與批號標籤，使用 WMS 掃碼登記入庫，並確認實物位置與系統儲位一致。臨時放不下時向組長尋求調整，不自行改儲位規則；常溫貨使用棧板車，超重貨請有操作證照的同事開堆高機。",
+          "outcomes": [
+            {
+              "detail_id": "53841b66-b01a-46bd-ab34-b642734f40c5",
+              "text": "貨品依規劃儲位完成上架、品項與批號標示及 WMS 入庫登記。"
+            },
+            {
+              "detail_id": "a59b5ba9-0241-4318-84d0-b380830aa4ab",
+              "text": "實物儲位與 WMS 登記的儲位保持一致。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "5bf39522-347c-45b7-bc86-68706b160d39",
+              "text": "遇臨時儲位放不下時，先找組長調整位置，不自行更改儲位規則。"
+            },
+            {
+              "detail_id": "ec43ed80-e4bb-42e3-8130-cc468183fe99",
+              "text": "常溫貨使用棧板車；超重貨由有操作證照的同事駕駛堆高機。"
+            }
+          ]
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [
+        {
+          "collaborator_id": "492295b4-1cdd-4ec2-a6ba-59dc0f55faf3",
+          "name": "組長",
+          "scope_text": "員工上架時遇暫時無法放置的情況，向組長尋求調整位置；員工不自行更改儲位規則。"
+        },
+        {
+          "collaborator_id": "157109af-7792-4a2a-b252-a355e65f0654",
+          "name": "具堆高機操作證照的同事",
+          "scope_text": "超重貨由有證照的同事操作堆高機。"
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "6f48db95-7fa0-4919-b36b-110588639498",
+          "kind": "schedule_travel",
+          "text": "早上 7 點上班；週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "plan_preview": {
+    "plan": null
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

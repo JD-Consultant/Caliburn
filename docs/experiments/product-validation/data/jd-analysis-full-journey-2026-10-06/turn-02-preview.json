@@ -1,0 +1,29 @@
+{
+  "job_file_id": "b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f",
+  "execution_id": "3d68811e-43f4-4dbb-80ab-5659def4d7df",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點和客戶退貨入庫。供應商退貨也是我在處理。最近有一批進貨數量對不起來，主管叫我去查。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": null
+    },
+    "work": {
+      "revision_id": "33a76aff-7874-4c86-b216-2d1a4e50ab41",
+      "areas": [],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    }
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

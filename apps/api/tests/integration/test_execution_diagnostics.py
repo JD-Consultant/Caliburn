@@ -1,5 +1,9 @@
 """Real saver payloads, transactional refresh and SQL browsing in a disposable PG schema."""
 
+import json
+import runpy
+import sys
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -8,11 +12,24 @@ from langgraph.checkpoint.postgres import PostgresSaver
 
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.diagnostics.refresh import refresh_diagnostics
+from tests.integration.test_memory_position_storage import (
+    batch_position as batch_position,
+)
+from tests.integration.test_memory_position_storage import (
+    execute,
+    insert_snapshot,
+)
+from tests.integration.test_memory_position_storage import (
+    published_snapshot as published_snapshot,
+)
+from tests.integration.test_memory_position_storage import (
+    window as window,
+)
 
 pytestmark = pytest.mark.postgres
 
 
-def seed(connection, *, kind="consultant_turn"):
+def seed(connection, *, kind="consultant_turn", status="completed"):
     job_id, execution_id = uuid4(), uuid4()
     connection.execute(
         "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
@@ -20,9 +37,8 @@ def seed(connection, *, kind="consultant_turn"):
         (job_id, uuid4()),
     )
     connection.execute(
-        "INSERT INTO executions (job_file_id,execution_id,kind,status) "
-        "VALUES (%s,%s,%s,'completed')",
-        (job_id, execution_id, kind),
+        "INSERT INTO executions (job_file_id,execution_id,kind,status) VALUES (%s,%s,%s,%s)",
+        (job_id, execution_id, kind, status),
     )
     return job_id, execution_id
 
@@ -35,6 +51,7 @@ def save_step(connection, job_id, execution_id, role="job_consultant", *, pendin
         thread += f":stage:{uuid4()}:{uuid4()}"
     checkpoint = empty_checkpoint()
     values = {
+        "request_id": uuid4(),
         "request_snapshot": {"model": "synthetic", "input": [{"role": "user", "content": "盤點"}]},
         "response_snapshot": {
             "id": "response_same",
@@ -62,7 +79,7 @@ def save_step(connection, job_id, execution_id, role="job_consultant", *, pendin
         "tool_results": [{"type": "function_call_output", "call_id": "call_2", "output": ""}],
     }
     checkpoint["channel_values"] = (
-        values if not pending else {"request_snapshot": values["request_snapshot"]}
+        values if not pending else {key: values[key] for key in ("request_id", "request_snapshot")}
     )
     checkpoint["channel_versions"] = {key: 1 for key in checkpoint["channel_values"]}
     config = saver.put(
@@ -74,7 +91,11 @@ def save_step(connection, job_id, execution_id, role="job_consultant", *, pendin
     if pending:
         saver.put_writes(
             config,
-            [(key, value) for key, value in values.items() if key != "request_snapshot"],
+            [
+                (key, value)
+                for key, value in values.items()
+                if key not in ("request_id", "request_snapshot")
+            ],
             "model-task",
         )
     return thread
@@ -110,6 +131,11 @@ def test_refresh_replaces_only_selected_file_and_views_preserve_results(
         "SELECT snapshot_at FROM diagnostic_execution_history WHERE execution_id=%s",
         (other_execution,),
     ).fetchone() == (None,)
+    assert connection.execute(
+        "SELECT saved_response_count,request_only_count FROM diagnostic_execution_history "
+        "WHERE execution_id=%s",
+        (other_execution,),
+    ).fetchone() == (None, None)
     assert connection.execute("SELECT count(*) FROM jd_operations").fetchone() == (0,)
 
 
@@ -119,7 +145,7 @@ def test_memory_roles_and_pending_writes_are_not_lost(database_settings, databas
         save_step(database_connection, job_id, execution_id, role, pending=True)
     assert refresh_diagnostics(database_settings, execution_id=execution_id) == 1
     assert database_connection.execute(
-        "SELECT role,source FROM diagnostic_model_steps ORDER BY role"
+        "SELECT role,response_source FROM diagnostic_model_steps ORDER BY role"
     ).fetchall() == [
         ("work_situation_analyst", "pending_write"),
         ("work_understanding_analyst", "pending_write"),
@@ -220,3 +246,177 @@ def test_overview_interview_text_uses_same_redaction_without_changing_originals(
     assert connection.execute(
         "SELECT interview_text FROM interview_texts WHERE source_id=%s", (input_id,)
     ).fetchone() == (original,)
+
+
+@pytest.mark.parametrize("status", ["failed", "cancelled"])
+def test_request_only_survives_refresh_and_does_not_count_as_saved_response(
+    database_settings, database_connection, status
+):
+    connection = database_connection
+    job_id, execution_id = seed(connection, status=status)
+    saver = PostgresSaver(connection, serde=create_graph_serializer())
+    saver.setup()
+    request_id = uuid4()
+    checkpoint = empty_checkpoint()
+    checkpoint["channel_values"] = {
+        "request_id": request_id,
+        "request_snapshot": {"model": "synthetic", "input": ["已保存但沒有回應"]},
+        "response_snapshot": {},
+    }
+    checkpoint["channel_versions"] = {key: 1 for key in checkpoint["channel_values"]}
+    config = saver.put(
+        {
+            "configurable": {
+                "thread_id": f"{job_id}:{execution_id}:job_consultant:completed_work",
+                "checkpoint_ns": "",
+            }
+        },
+        checkpoint,
+        {"source": "loop", "step": 0, "parents": {}},
+        checkpoint["channel_versions"],
+    )
+
+    refresh_diagnostics(database_settings, execution_id=execution_id)
+    assert connection.execute(
+        "SELECT request_id,response_state,response FROM diagnostic_model_steps"
+    ).fetchone() == (str(request_id), "request_only", None)
+    assert connection.execute(
+        "SELECT saved_response_count,request_only_count,status FROM diagnostic_execution_history"
+    ).fetchone() == (0, 1, status)
+
+    saver.put_writes(config, [("response_snapshot", {"id": "late", "output": []})], "model")
+    refresh_diagnostics(database_settings, execution_id=execution_id)
+    assert connection.execute("SELECT count(*) FROM diagnostic_model_steps").fetchone() == (1,)
+    assert connection.execute(
+        "SELECT saved_response_count,request_only_count FROM diagnostic_execution_history"
+    ).fetchone() == (1, 0)
+
+
+def test_original_initial_context_binding_is_visible_independently_of_subsequent_state(
+    database_settings, database_connection
+):
+    connection = database_connection
+    job_id, execution_id = seed(connection)
+    saver = PostgresSaver(connection, serde=create_graph_serializer())
+    saver.setup()
+    captured_binding = {"snapshot_id": str(uuid4()), "plan_base_revision_id": str(uuid4())}
+    checkpoint = empty_checkpoint()
+    checkpoint["channel_values"] = {
+        "binding": captured_binding,
+        "request_snapshot": {"input": ["當時已放入 Context 的導覽"], "authorization": "secret"},
+    }
+    checkpoint["channel_versions"] = {key: 1 for key in checkpoint["channel_values"]}
+    saver.put(
+        {
+            "configurable": {
+                "thread_id": f"{job_id}:{execution_id}:job_consultant:initial_context",
+                "checkpoint_ns": "",
+            }
+        },
+        checkpoint,
+        {"source": "loop", "step": 1, "parents": {}},
+        checkpoint["channel_versions"],
+    )
+    save_step(connection, job_id, execution_id)
+
+    refresh_diagnostics(database_settings, execution_id=execution_id)
+    initial, published = connection.execute(
+        "SELECT captured_initial_context,published_snapshot_ids FROM diagnostic_execution_history"
+    ).fetchone()
+    assert initial["binding"] == captured_binding
+    assert initial["request"]["authorization"] == "[redacted]"
+    assert initial["request"]["input"] == ["當時已放入 Context 的導覽"]
+    assert published is None
+    assert connection.execute("SELECT count(*) FROM diagnostic_model_steps").fetchone() == (1,)
+
+
+def test_past_binding_does_not_follow_the_current_published_memory_head(
+    database_settings, database_connection, window, batch_position, published_snapshot
+):
+    connection = database_connection
+    job_id, execution_id = window.job_file_id, uuid4()
+    connection.execute(
+        "INSERT INTO executions (job_file_id,execution_id,kind,status) "
+        "VALUES (%s,%s,'consultant_turn','completed')",
+        (job_id, execution_id),
+    )
+    saver = PostgresSaver(connection, serde=create_graph_serializer())
+    saver.setup()
+    checkpoint = empty_checkpoint()
+    checkpoint["channel_values"] = {
+        "request_snapshot": {"input": ["舊導覽"]},
+        "binding": {"snapshot_id": str(published_snapshot), "plan_base_revision_id": str(uuid4())},
+    }
+    checkpoint["channel_versions"] = {key: 1 for key in checkpoint["channel_values"]}
+    saver.put(
+        {
+            "configurable": {
+                "thread_id": f"{job_id}:{execution_id}:job_consultant:initial_context",
+                "checkpoint_ns": "",
+            }
+        },
+        checkpoint,
+        {"source": "loop", "step": 1, "parents": {}},
+        checkpoint["channel_versions"],
+    )
+    refresh_diagnostics(database_settings, execution_id=execution_id)
+    next_execution = uuid4()
+    connection.execute(
+        "INSERT INTO executions (execution_id,job_file_id,kind,status) "
+        "VALUES (%s,%s,'memory_batch','completed')",
+        (next_execution, job_id),
+    )
+    connection.execute(
+        "INSERT INTO memory_batches "
+        "(job_file_id,execution_id,base_snapshot_id,base_position_id,current_position_id,"
+        "generation_id,stage_id,phase,status,through_source_id,"
+        "covered_through_sequence,through_sequence) "
+        "SELECT job_file_id,%s,%s,base_position_id,current_position_id,"
+        "generation_id,stage_id,phase,"
+        "status,through_source_id,covered_through_sequence,through_sequence FROM memory_batches",
+        (next_execution, published_snapshot),
+    )
+    newer = execute(
+        database_settings,
+        lambda session: insert_snapshot(
+            session, window, next_execution, batch_position.position_id
+        ),
+    )
+    connection.execute(
+        "UPDATE memory_heads SET snapshot_id=%s WHERE job_file_id=%s", (newer, job_id)
+    )
+    refresh_diagnostics(database_settings, execution_id=execution_id)
+    captured, current = connection.execute(
+        "SELECT captured_initial_context,current_published_snapshot_id "
+        "FROM diagnostic_execution_history WHERE execution_id=%s",
+        (execution_id,),
+    ).fetchone()
+    assert captured["binding"]["snapshot_id"] == str(published_snapshot)
+    assert captured["request"]["input"] == ["舊導覽"]
+    assert current == newer
+
+
+def test_cli_show_reads_the_existing_copy_without_refresh_or_cross_file_leak(
+    database_settings, database_connection, monkeypatch, capsys
+):
+    connection = database_connection
+    job_id, execution_id = seed(connection)
+    other_job, other_execution = seed(connection)
+    save_step(connection, job_id, execution_id)
+    save_step(connection, other_job, other_execution)
+    refresh_diagnostics(database_settings, execution_id=execution_id)
+    before = connection.execute("SELECT snapshot_at FROM diagnostic_execution_snapshots").fetchone()
+    monkeypatch.setenv("CALIBURN_DATABASE_URL", database_settings.url)
+    monkeypatch.setenv("CALIBURN_DATABASE_SCHEMA", database_settings.schema)
+    script = Path(__file__).parents[2] / "scripts" / "refresh_execution_diagnostics.py"
+    monkeypatch.setattr(sys, "argv", [str(script), "--execution-id", str(execution_id), "--show"])
+    assert runpy.run_path(str(script))["main"]() == 0
+    [document] = json.loads(capsys.readouterr().out)
+    assert document["execution"]["execution_id"] == str(execution_id)
+    assert document["steps"][0]["request"]["input"][0]["content"] == "盤點"
+    assert "private" not in json.dumps(document)
+    assert str(other_execution) not in json.dumps(document)
+    assert (
+        connection.execute("SELECT snapshot_at FROM diagnostic_execution_snapshots").fetchone()
+        == before
+    )

@@ -7,16 +7,20 @@ import pytest
 from openai.types.responses import ResponseFunctionToolCall
 from pydantic import ValidationError
 
+from caliburn.adapters.openai_responses import ResponseRequest
+from caliburn.agents.job_consultant.interview_plan_context import has_interview_plan_tools
 from caliburn.agents.job_consultant.tools import (
     CONSULTANT_MEMORY_READ_NAMES,
     ConsultantTools,
     consultant_tool_definitions,
 )
+from caliburn.features.executions.models import ExecutionStateError
 from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.models import ProfileField, SetProfileField
 from caliburn.features.job_description.tasks import CreateTask
 from caliburn.transport.model_tools.context_compaction import ContextCompactionTools
 from caliburn.transport.model_tools.contracts import reject_tool_call
+from caliburn.transport.model_tools.interview_plans import InterviewPlanTools
 from caliburn.transport.model_tools.jd_changes import JdChangesTools
 from caliburn.transport.model_tools.jd_reads import JdReadTools
 from caliburn.transport.model_tools.jd_writes import JdWriteTools, PreparedJdWrite
@@ -150,7 +154,7 @@ def native_call(name: str, arguments: str = "{}") -> ResponseFunctionToolCall:
 def test_definitions_can_be_built_before_binding_and_match_the_bound_handlers(
     handlers: Handlers,
 ) -> None:
-    definitions = consultant_tool_definitions()
+    definitions = consultant_tool_definitions(interview_plans_enabled=False)
     assert tuple(item["name"] for item in definitions) == (
         "read_work_situation_map",
         "read_work_situation",
@@ -170,6 +174,112 @@ def test_definitions_can_be_built_before_binding_and_match_the_bound_handlers(
     )
     tools, _, _, _ = handlers
     assert definitions == tools.definitions()
+
+
+def test_new_consultant_template_advertises_minimal_plan_read_and_edit_tools() -> None:
+    definitions = {tool["name"]: tool for tool in consultant_tool_definitions()}
+    assert "read_interview_plan" in definitions
+    assert "edit_interview_plan" in definitions
+    assert definitions["read_interview_plan"]["parameters"]["properties"] == {}
+    edit = definitions["edit_interview_plan"]["parameters"]
+    assert set(edit["properties"]) == {"diff"}
+    assert edit["required"] == ["diff"]
+
+
+@pytest.fixture
+def captured_plan_request() -> ResponseRequest:
+    return ResponseRequest(
+        model="gpt-6-luna",
+        instructions="Captured plan capability contract",
+        input_items=[],
+        tools=consultant_tool_definitions(),
+        reasoning_effort="high",
+        max_output_tokens=64,
+    )
+
+
+def test_saved_plan_schema_accepts_original_bundle_and_annotation_changes(
+    captured_plan_request: ResponseRequest,
+) -> None:
+    assert has_interview_plan_tools(captured_plan_request) is True
+    snapshot = captured_plan_request.create_payload()
+    for tool in snapshot["tools"]:
+        if tool["name"] in {"read_interview_plan", "edit_interview_plan"}:
+            tool["description"] = "An original captured description"
+            tool["parameters"]["title"] = "An original captured title"
+            tool["parameters"]["description"] = "An original schema annotation"
+            if tool["name"] == "edit_interview_plan":
+                tool["parameters"]["properties"]["diff"]["description"] = "Original diff wording"
+    assert has_interview_plan_tools(ResponseRequest.from_snapshot(snapshot)) is True
+
+
+@pytest.mark.parametrize(
+    ("constraint", "saved_value"),
+    [
+        pytest.param("minLength", True, id="min-length-boolean"),
+        pytest.param("minLength", 1.0, id="min-length-float"),
+        pytest.param("maxLength", 16_000.0, id="max-length-float"),
+    ],
+)
+def test_saved_plan_schema_preserves_numeric_constraint_types(
+    captured_plan_request: ResponseRequest, constraint: str, saved_value: object
+) -> None:
+    snapshot = captured_plan_request.create_payload()
+    edit = next(tool for tool in snapshot["tools"] if tool["name"] == "edit_interview_plan")
+    edit["parameters"]["properties"]["diff"][constraint] = saved_value
+
+    with pytest.raises(ExecutionStateError, match="interview plan schema"):
+        has_interview_plan_tools(ResponseRequest.from_snapshot(snapshot))
+
+
+@pytest.mark.parametrize("tool_name", ["read_interview_plan", "edit_interview_plan"])
+@pytest.mark.parametrize("saved_value", [0, 0.0, "false", None])
+def test_saved_plan_schema_requires_boolean_additional_properties(
+    captured_plan_request: ResponseRequest, tool_name: str, saved_value: object
+) -> None:
+    snapshot = captured_plan_request.create_payload()
+    tool = next(tool for tool in snapshot["tools"] if tool["name"] == tool_name)
+    tool["parameters"]["additionalProperties"] = saved_value
+
+    with pytest.raises(ExecutionStateError, match="interview plan schema"):
+        has_interview_plan_tools(ResponseRequest.from_snapshot(snapshot))
+
+
+@pytest.mark.parametrize("tool_name", ["read_interview_plan", "edit_interview_plan"])
+@pytest.mark.parametrize("saved_value", [1, 1.0])
+def test_saved_plan_schema_requires_boolean_strict_mode(
+    captured_plan_request: ResponseRequest, tool_name: str, saved_value: object
+) -> None:
+    snapshot = captured_plan_request.create_payload()
+    tool = next(tool for tool in snapshot["tools"] if tool["name"] == tool_name)
+    tool["strict"] = saved_value
+
+    with pytest.raises(ExecutionStateError, match="interview plan schema"):
+        has_interview_plan_tools(ResponseRequest.from_snapshot(snapshot))
+
+
+@pytest.mark.parametrize(
+    ("tool_name", "on_diff", "constraint", "saved_value"),
+    [
+        pytest.param("read_interview_plan", False, "minProperties", 1, id="read-needs-property"),
+        pytest.param("edit_interview_plan", False, "maxProperties", 0, id="edit-forbids-property"),
+        pytest.param("edit_interview_plan", True, "pattern", "^allowed-only$", id="diff-pattern"),
+    ],
+)
+def test_saved_plan_schema_rejects_additional_assertions_that_change_tool_arguments(
+    captured_plan_request: ResponseRequest,
+    tool_name: str,
+    on_diff: bool,
+    constraint: str,
+    saved_value: object,
+) -> None:
+    snapshot = captured_plan_request.create_payload()
+    tool = next(tool for tool in snapshot["tools"] if tool["name"] == tool_name)
+    schema = tool["parameters"]["properties"]["diff"] if on_diff else tool["parameters"]
+    schema[constraint] = saved_value
+
+    with pytest.raises(ExecutionStateError, match="interview plan schema"):
+        has_interview_plan_tools(ResponseRequest.from_snapshot(snapshot))
 
 
 def test_advertises_existing_definitions_and_names_without_rewriting(handlers: Handlers) -> None:
@@ -281,6 +391,49 @@ async def test_unknown_tool_is_rejected_without_dispatching_any_handler(handlers
     rejected = json.loads(result)
     assert rejected["status"] == "rejected" and rejected["code"] == "scope_not_allowed"
     assert memory.calls == reads.calls == writes.calls == writes.executed == []
+
+
+class FakePlanTools(InterviewPlanTools):
+    def __init__(self) -> None:
+        self.calls = []
+        self.executed = []
+
+    async def invoke(self, name, arguments):
+        self.calls.append((name, arguments))
+        return '{"plan":null}'
+
+    async def prepare(self, name, arguments, operation_id):
+        self.calls.append((name, arguments, operation_id))
+        return {"kind": "interview_plan_edit", "operation_id": str(operation_id)}
+
+    async def execute(self, prepared):
+        self.executed.append(prepared)
+        return '{"status":"unchanged"}'
+
+
+async def test_plan_capability_dispatches_read_and_prepared_edit_without_jd_write(handlers):
+    tools, memory, reads, writes = handlers
+    plans = FakePlanTools()
+    tools.interview_plans = plans
+    assert await tools.prepare(native_call("read_interview_plan"), uuid4()) == '{"plan":null}'
+    operation_id = uuid4()
+    call = native_call("edit_interview_plan", '{"diff":"original"}')
+    prepared = await tools.prepare(call, operation_id)
+    assert plans.calls == [
+        ("read_interview_plan", "{}"),
+        ("edit_interview_plan", call.arguments, operation_id),
+    ]
+    assert plans.executed == []
+    assert await tools.execute(prepared) == '{"status":"unchanged"}'
+    assert plans.executed == [prepared]
+    assert memory.calls == reads.calls == writes.calls == writes.executed == []
+
+
+async def test_legacy_capability_cannot_execute_a_new_plan_command(handlers):
+    tools, _, _, writes = handlers
+    with pytest.raises(ValueError, match="does not permit interview plan edits"):
+        await tools.execute({"kind": "interview_plan_edit", "change": {}})
+    assert writes.executed == []
 
 
 @pytest.mark.parametrize(

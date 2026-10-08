@@ -1,0 +1,105 @@
+{
+  "profile": {
+    "revision_id": "1ef75bd2-c13d-471f-93f0-4e7b6b8fc350",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依已確認的資料及儲位安排完成上架與入庫紀錄。"
+    }
+  },
+  "work": {
+    "revision_id": "1ef75bd2-c13d-471f-93f0-4e7b6b8fc350",
+    "areas": [
+      {
+        "area_id": "f657dc8e-5c14-49a3-af77-eaed8f245fee",
+        "title": "入庫與上架",
+        "scope_text": "品項確認、上架與登記。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "937705ee-50e5-4afc-9761-0dc34de8f613",
+        "area_id": "f657dc8e-5c14-49a3-af77-eaed8f245fee",
+        "title": "核對品項並上架",
+        "description": "上架前掃碼確認品項，依安排放貨、貼標籤並登記；不符先核對單據並通知主管，不自行改品項或決定儲位。",
+        "outcomes": [
+          {
+            "detail_id": "c2696584-00a3-4a44-8b33-01163c7886ff",
+            "text": "貨物依安排的儲位完成上架，並完成庫存系統入庫登記。"
+          }
+        ],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "1ef75bd2-c13d-471f-93f0-4e7b6b8fc350",
+    "references": [
+      {
+        "citation_id": "8a103376-b32e-4662-8d49-929341b950fe",
+        "target_label": "任務：核對品項並上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "937705ee-50e5-4afc-9761-0dc34de8f613",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "ac26b99d-f27d-4f6f-acea-88044fef88f8",
+        "target_label": "任務：核對品項並上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "937705ee-50e5-4afc-9761-0dc34de8f613",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "a0206aef-aee8-41b0-9bd0-4ecdfd821b2e",
+        "target_label": "任務：核對品項並上架 · 成果：貨物依安排的儲位完成上架，並完成庫存系統入庫登記。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "c2696584-00a3-4a44-8b33-01163c7886ff",
+          "task_id": "937705ee-50e5-4afc-9761-0dc34de8f613"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "d7360a33-7a60-4a26-9869-5c408545d7b8",
+        "target_label": "任務：核對品項並上架 · 成果：貨物依安排的儲位完成上架，並完成庫存系統入庫登記。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "c2696584-00a3-4a44-8b33-01163c7886ff",
+          "task_id": "937705ee-50e5-4afc-9761-0dc34de8f613"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

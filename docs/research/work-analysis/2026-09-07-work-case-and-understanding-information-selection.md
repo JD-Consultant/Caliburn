@@ -1,8 +1,10 @@
 # 工作案例與工作理解：保留哪些資訊
 
+> 時點說明：本文保留 2026-09-07 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 2026-09-07 · LLM-Q019 · G2 資訊取捨研究；保留目的已獲 Owner 確認，以下細化是研究建議，不是新增 schema 或施工授權。
 
-**後續核准：**Owner已同意本篇內容取捨，授權既有隔離版局部優化與Luna／medium小額驗證；不改本篇為技術契約。施工／結果由[CT-06計畫](../../.worktrees/analysis-only-agent/docs/plans/2026-09-07-relevant-work-memory-calibration.md)與[決策入口](../../current-decisions.md)承接。下文「尚未改動」描述研究撰寫當時，不覆蓋後續驗證。
+**後續核准：**Owner已同意本篇內容取捨，授權既有隔離版局部優化與Luna／medium小額驗證；不改本篇為技術契約。施工／結果由[CT-06計畫](../../history.md#source-3148d8780437cdf6fd24)與[決策入口](../../current-decisions.md)承接。下文「尚未改動」描述研究撰寫當時，不覆蓋後續驗證。
 
 ## 1. 本輪範圍與既有結論
 
@@ -46,7 +48,7 @@ Owner 已確認「完整細節」指職務分析有用的資訊，不是逐字�
 | 哪些還不確定、後來改了什麼 | 未說清楚之處、更正適用哪個案例／條件及必要問答脈絡 | 目前成立的內容與影響後續理解的未知／矛盾；不把 AI 的假設寫成員工已確認 |
 | 如何回找 | 案例可辨識線索與既有原文定位 | 與相關詳記的可用引用；不把整理後文字冒充原句 |
 
-本地方法對照：[工作範圍訪談](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md)、[案例比較](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md)、[產出與專業](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md)。它們是本案方法內容，不是外部官方證據；本輪未改動。
+本地方法對照：[工作範圍訪談](../../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-task6/source/experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md)、[案例比較](../../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-task6/source/experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md)、[產出與專業](../../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-task6/source/experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md)。它們是本案方法內容，不是外部官方證據；本輪未改動。
 
 ## 4. 最容易做錯的取捨
 
@@ -79,5 +81,5 @@ Owner 已確認「完整細節」指職務分析有用的資訊，不是逐字�
 - **已確認目的：**完整保留職務分析有用的資訊，不追求保留所有瑣事或字數不減。
 - **研究建議：**以§3–4作為既有抽取、整併與即時修補提示的內容取捨依據。先檢查現有提示缺什麼，只補缺漏；不重造框架／Memory 架構、不加必填欄位，也不恢復逐案例建立 JD 的做法。
 - **效果界線：**來源支持這種取捨方向，不保證模型永不漏記。後續只需小量核對：工作相關事實／有意義差異仍在、舊的有效工作未被新案例洗掉、無關瑣事未膨脹正文、沒有從個案推成未確認通則。不因此建立大型 eval 系統。
-- **本輪實際變更：**只寫此研究與決策入口；未改 prompt／Skill／程式，未呼叫付費模型。[CT05-Q01 的背景發布待驗](../../.worktrees/analysis-only-agent/docs/specs/2026-09-07-incremental-memory-quality-calibration.md)保持 OPEN，本次研究不是該測試通過證明。
+- **本輪實際變更：**只寫此研究與決策入口；未改 prompt／Skill／程式，未呼叫付費模型。[CT05-Q01 的背景發布待驗](../../history.md#source-235b14e318cef84e7355)保持 OPEN，本次研究不是該測試通過證明。
 - **下一 gate：**Owner 審閱此內容取捨後，接回既有局部提示校準與未完驗收；不另開 Memory 架構討論。若發現某類被視為無關的資訊實際影響工作判斷／回查，再以具體案例修正，不為追求更多來源無限延長研究。

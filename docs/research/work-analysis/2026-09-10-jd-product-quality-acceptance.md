@@ -1,5 +1,7 @@
 # JD 成品：專業品質與員工驗收材料
 
+> 時點說明：本文保留 2026-09-10 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 2026-09-10；JD-R002／JD-R001-C06；成品總計畫 R1／R6 的 G4 驗收設計。**材料已備，P3 自然縱切、P6 未見職位與真人試用尚未執行。** 本文不授權付費請求，不改 Memory／runtime／模型設定，也不把研究判斷當 production authority。
 
 ## 1. 有效邊界與本輪問題
@@ -27,9 +29,9 @@
 
 ### 既有 CT49–51 的精確證據界線
 
-- [CT49](../../.worktrees/analysis-only-agent/docs/specs/2026-09-09-ct49-fixed-long-interview-results.md)：固定合成接案前端職位 11 輪、訪談／更正／Memory／回查；100 次正常請求加 15 次診斷回查。未生成 JD；兩次修補前景約 117／129 秒，另有導覽、重複、主體及代詞 minor。不是本案受雇前端 r2 的資料。
-- [CT50](../../.worktrees/analysis-only-agent/docs/specs/2026-09-09-ct50-tested-profile-results.md)：採用已測 high、前景 16 模型／15 工具；20 次真請求補驗服務續談與空近期 context reader。564 離線及 41 真 PG 是原報告證據，本文未重跑。不是新完整訪談或 JD 驗收。
-- [CT51](../../.worktrees/analysis-only-agent/docs/specs/2026-09-09-ct51-output-budget-results.md)：同 CT49 複本比較 8192／16384，共 35 次；未見截斷，因此維持 8192。回查仍有 minor 措辭外推；不是提高容量解決忠實度。
+- [CT49](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct49-fixed-long-interview-results.md)：固定合成接案前端職位 11 輪、訪談／更正／Memory／回查；100 次正常請求加 15 次診斷回查。未生成 JD；兩次修補前景約 117／129 秒，另有導覽、重複、主體及代詞 minor。不是本案受雇前端 r2 的資料。
+- [CT50](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct50-tested-profile-results.md)：採用已測 high、前景 16 模型／15 工具；20 次真請求補驗服務續談與空近期 context reader。564 離線及 41 真 PG 是原報告證據，本文未重跑。不是新完整訪談或 JD 驗收。
+- [CT51](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-09-ct51-output-budget-results.md)：同 CT49 複本比較 8192／16384，共 35 次；未見截斷，因此維持 8192。回查仍有 minor 措辭外推；不是提高容量解決忠實度。
 
 可沿用 runtime 與已採配置，不重做 Memory。固定 schema、原生編輯、PG、MockTransport、CT49–51 與 r2 樣稿各自只能證明所測部分，均不算 P3／P6 通過。
 

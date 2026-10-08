@@ -1,0 +1,71 @@
+{
+  "job_file_id": "6f7c86c9-7a2d-43a4-8628-56b54e6bcb47",
+  "execution_id": "7835a222-0b66-44de-a592-34832070f8c6",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。\n\n關於你問的「通常由誰安排貨品的存放位置？」，我目前沒有確定資料，請保留未知，不補猜。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心貨品收貨驗收、庫內存放與揀補、庫存盤點及退貨處理等倉儲工作，維持貨品與庫存作業順暢，並協助新人熟悉工作。"
+    },
+    "work": {
+      "revision_id": "db27252b-bd0e-4a39-a674-c056be753cea",
+      "areas": [
+        {
+          "area_id": "e650a1ba-1d19-4a47-8e09-d908ce4d3edc",
+          "title": "收貨驗收與異常處理",
+          "scope_text": "執行進貨核對與收貨異常通報，並依採購回覆的處理結果登記入庫。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "388d3f1f-d59d-40fd-818e-4d2102cf817b",
+          "area_id": "e650a1ba-1d19-4a47-8e09-d908ce4d3edc",
+          "title": "驗收進貨並處理收貨差異",
+          "description": "逐箱點件，核對品項、數量、外包裝與送貨單；發現差異時拍照、登記收貨異常表並通知採購。採購回覆要補送或接受後，依處理結果登記入庫。",
+          "outcomes": [
+            {
+              "detail_id": "1fb183ec-376b-49bf-b275-0ac7f678f319",
+              "text": "收貨差異以照片及收貨異常表留存並通知採購，供後續處理。"
+            },
+            {
+              "detail_id": "608b96fb-d889-4a25-9583-3feffe414968",
+              "text": "依採購回覆的補送或接受結果完成入庫登記。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "8fc2f8ba-b5f0-4d39-9a18-c6d2e0c81201",
+              "text": "逐箱點件，並核對品項、數量、外包裝與送貨單。"
+            },
+            {
+              "detail_id": "8a85002a-2d7f-4afa-97f9-500d52c7f7ce",
+              "text": "不自行決定拒收或退換貨，也不議價或選擇供應商；須待採購回覆補送或接受後，才依其處理結果登記入庫。"
+            }
+          ]
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": [
+        {
+          "condition_id": "6f48db95-7fa0-4919-b36b-110588639498",
+          "kind": "schedule_travel",
+          "text": "早上 7 點上班；週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "plan_preview": {
+    "plan": null
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

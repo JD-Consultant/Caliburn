@@ -1,0 +1,25 @@
+{"case": "warehouse-r1-P1", "turn": 1, "status": "completed", "seconds": 53.6, "spent_usd": "0.004266710"}
+{"review_pending": "703229bb0d1047dc98bc0882eb706df8", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\703229bb0d1047dc98bc0882eb706df8\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 2, "status": "completed", "seconds": 67.4, "spent_usd": "0.009003935"}
+{"review_pending": "b640e98e499f47e0a5496e7147b737aa", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\b640e98e499f47e0a5496e7147b737aa\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 3, "status": "completed", "seconds": 8.2, "spent_usd": "0.009577135"}
+{"review_pending": "d7a6c0edf6b94ddd8e9616cb932a5616", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\d7a6c0edf6b94ddd8e9616cb932a5616\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 4, "status": "completed", "seconds": 8.2, "spent_usd": "0.010130165"}
+{"review_pending": "f99a3b505c3d4310905dc803a82813b6", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\f99a3b505c3d4310905dc803a82813b6\\pending.json"}
+{"case": "warehouse-r1-P1", "turn": 5, "status": "completed", "seconds": 10.2, "spent_usd": "0.010883445"}
+{"case": "warehouse-r1-P1", "turn": 6, "status": "completed", "seconds": 75.8, "spent_usd": "0.017023165"}
+{"case": "warehouse-r1-P2", "turn": 1, "status": "completed", "seconds": 66.6, "spent_usd": "0.023119670"}
+{"review_pending": "a1228ca44e8d43789fcc15593e830e75", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\a1228ca44e8d43789fcc15593e830e75\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 2, "status": "completed", "seconds": 77.1, "spent_usd": "0.032101790"}
+{"review_pending": "7ea4cbf5f0164d209b75a37472d61312", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\7ea4cbf5f0164d209b75a37472d61312\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 3, "status": "completed", "seconds": 22.6, "spent_usd": "0.034046475"}
+{"review_pending": "2ec5e4f6d2f745b1b8f66a5d63f76445", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\2ec5e4f6d2f745b1b8f66a5d63f76445\\pending.json"}
+{"case": "warehouse-r1-P2", "turn": 4, "status": "completed", "seconds": 62.7, "spent_usd": "0.047845795"}
+{"review_pending": "9cbaf9d3561641238ce168b7f6019085", "path": "S:\\caliburn\\docs\\experiments\\product-validation\\interview-plan-comparison-2026-10-07\\reviews\\9cbaf9d3561641238ce168b7f6019085\\pending.json"}
+Exception ignored while closing generator <async_generator object BoundAsyncStream.__aiter__ at 0x00000264F68CBD30>:
+Traceback (most recent call last):
+  File "S:\caliburn\apps\api\.venv\Lib\site-packages\langgraph\checkpoint\serde\jsonplus.py", line 284, in loads_typed
+    return ormsgpack.unpackb(
+ValueError: async generator already executing
+Execution stopped; reconciling its terminal outcome
+{"case": "warehouse-r1-P2", "turn": 5, "status": "completed", "seconds": 16.5, "spent_usd": "0.057428625"}

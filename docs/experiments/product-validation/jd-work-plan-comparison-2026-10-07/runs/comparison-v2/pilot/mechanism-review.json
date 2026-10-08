@@ -1,0 +1,245 @@
+{
+  "passed": true,
+  "plan_created_verified": true,
+  "plan_local_patch_verified": true,
+  "plan_formal_readback_verified": true,
+  "plan_next_turn_use_verified": true,
+  "pilot_cases_complete": true,
+  "reviewed_by": "independent mechanism reviewer /root/plan_implementation_review",
+  "manifest_sha256": "dacbb5d73dc849f56e3caed51a870a10653faab46e4c608128e6cbad41d0277b",
+  "gate_revision": "recoverable-input-rejections-recorded-v2",
+  "artifact_sha256": {
+    "warehouse-r1-P1/case.json": "64674d692a26cf0adc993710312c727f4201dd3cecb4eba393f8743c76765799",
+    "warehouse-r1-P1/result.json": "5a39609b5508cd2060b7443c3ab9ef0be6b116472299cfdf4f40c50af796e3e4",
+    "warehouse-r1-P1/formal-plan.json": "253fc9fad5de94b76bbc1877a87f65824db9adeaa35160ce9232c0e2cc0621e8",
+    "warehouse-r1-P1/plan-tool-audit.json": "1a4d7ddc825681c8f7e063c9e0bbff5e0dbcd30b4920cae3baaf0946d73f3a7e",
+    "warehouse-r1-P1/provider-trace.jsonl": "72ce1a52b50414ea54da3235c86cc4083f50abec83d5e6e09e97abfc1727c7c4",
+    "warehouse-r1-P1/initial-plan.json": "253fc9fad5de94b76bbc1877a87f65824db9adeaa35160ce9232c0e2cc0621e8",
+    "warehouse-r1-P2/case.json": "6d1b06946c77b2da93833bdcb842acc745f2e219e2b3d038bbac909c9b9f3f1c",
+    "warehouse-r1-P2/result.json": "2dc3ed38dc2f0137a882afc4b852c907281c78295134768c795ef9937e480659",
+    "warehouse-r1-P2/formal-plan.json": "f123d30374d4c7e5ff224133c7ca93420a0ce2addde885953f2edf676a94ae4d",
+    "warehouse-r1-P2/plan-tool-audit.json": "da309b0391de67a402e7fdc461523c2c483e30259dccf6c8628346fdcae60225",
+    "warehouse-r1-P2/provider-trace.jsonl": "dde07fbd2c46e8b5083f7801d9c03aa362f36a18c30652ac5070bc18701438a7",
+    "warehouse-r1-P2/initial-plan.json": "dade7c195adbd7951693a664b389a6775329fe68983bb62ca9550356cf171b5b",
+    "warehouse-r1-P2/turn-01-result.json": "e212f541462366965f6ee5975faa7317fc0bada1fbf1e6baec37d1fcdcf2dcf6",
+    "warehouse-r1-P2/turn-01-input.json": "989c0bde6df3b1f4eace248e766d99d4d286cee09dba9208dde1f80564836a13",
+    "warehouse-r1-P2/turn-01-accepted.json": "8a16579e8cc5a087543e106b2a47590172dbf5932ce598cbfd58efc4cfd4597f",
+    "warehouse-r1-P2/turn-02-result.json": "7a0126bf4573464e9119118899186aec00f14f04769e29b42baa6bc1b4a38e9c",
+    "warehouse-r1-P2/turn-02-input.json": "03bfa41d63b0c0e2993601f04d1f86154d743f0165409869e97f14609797bf8f",
+    "warehouse-r1-P2/turn-02-accepted.json": "0038fb40b652be8b61f774d5515f2585084b30625bb30d599b7cf4087098c547",
+    "warehouse-r1-P2/turn-03-result.json": "083dcfe0662f231b3ff405785e096c9d24a6f79edc4a42dc3a702d15e1d921f1",
+    "warehouse-r1-P2/turn-03-input.json": "5c1ff1eb0a3f8ed15ace3932551d468bc8dd3bf07652f62567b2cbbd60376e5a",
+    "warehouse-r1-P2/turn-03-accepted.json": "12d1d3b84837915e4778440f677459a1f61caf2ae179aa188f26479bc7f7417e",
+    "warehouse-r1-P2/turn-04-result.json": "cf6f16889a86492108c03fa9d5965c27f7fb23f4804e71e8b3f2f223bd9077ab",
+    "warehouse-r1-P2/turn-04-input.json": "4afcd3d6af24747496ad0139afb16d884189fa322643e97f5973e66558d48de0",
+    "warehouse-r1-P2/turn-04-accepted.json": "d2b3fdc7ae02c98a85dd46fcb575b556b9b623efd0cbf658d859ab2c0ed9bbc7",
+    "warehouse-r1-P2/turn-05-result.json": "f067fe7458f4887286356f364aaf7d0e1e4f10730d2fb7b27310101aa6a756f1",
+    "warehouse-r1-P2/turn-05-input.json": "846c1340786b6df1da8e488b5a8f2ea4fa78f3958cfb5f53caea5da058beb0c5",
+    "warehouse-r1-P2/turn-05-accepted.json": "df2820cd565ae5826c5a7e7b5f7f0878569e611b216b8db35dfa074b0189dad4",
+    "warehouse-r1-P2/turn-06-result.json": "141f742ac39350937906747bc7381a64f11c7e36d38d059888d49232944c6e56",
+    "warehouse-r1-P2/turn-06-input.json": "d7b6522073d12dd0ccb9ad155601994980ca1c11f556a87ac48c0bb4a93e3fd9",
+    "warehouse-r1-P2/turn-06-accepted.json": "41b823481b10f6cb039fb8f33005cc373707e750430d29c53fd48baf38f8cc32"
+  },
+  "evidence": {
+    "cases": {
+      "P1": {
+        "completed_turns": 6,
+        "memory_settlement": {
+          "completed": 7
+        },
+        "A_generation_requests": 28,
+        "A_compact_admissions": 0,
+        "updated": 0,
+        "recoverable_rejected": 0,
+        "fatal_rejected": 0,
+        "read_calls": 0
+      },
+      "P2": {
+        "completed_turns": 6,
+        "memory_settlement": {
+          "completed": 7
+        },
+        "A_generation_requests": 27,
+        "A_compact_admissions": 0,
+        "updated": 6,
+        "recoverable_rejected": 0,
+        "fatal_rejected": 0,
+        "read_calls": 0
+      }
+    },
+    "P2_creation": {
+      "turn": 1,
+      "call_id": "call_qEsagJwVeTdWbHnDTKDjBvbf",
+      "call_line": 9,
+      "updated_output_line": 11,
+      "official_readback": "warehouse-r1-P2/turn-01-result.json /plan/plan",
+      "exact_replay_matches": true,
+      "unchanged_work_direction_lines": []
+    },
+    "P2_local_patch": {
+      "turn": 2,
+      "call_id": "call_CFIFW8rHei88x9WsSHbSQHz5",
+      "call_line": 22,
+      "updated_output_line": 24,
+      "official_readback": "warehouse-r1-P2/turn-02-result.json /plan/plan",
+      "exact_replay_matches": true,
+      "unchanged_work_direction_lines": [
+        "- 揀貨補貨、庫存盤點：已知為主要工作，尚未深入本人做法與責任界線。",
+        "- 客戶退貨、供應商退貨：已知由本人負責處理，兩類流程與決策界線尚未釐清。",
+        "- 新人帶教：已知有此工作，尚未深入本人負責的內容。",
+        "- 全稿核對：待主要工作整理後，核對職責分組、必要要求、依據與跨欄一致。"
+      ]
+    },
+    "P2_all_successful_patch_replays": [
+      {
+        "turn": 1,
+        "call_id": "call_qEsagJwVeTdWbHnDTKDjBvbf",
+        "call_line": 9,
+        "updated_output_line": 11,
+        "official_readback": "warehouse-r1-P2/turn-01-result.json /plan/plan",
+        "exact_replay_matches": true,
+        "unchanged_work_direction_lines": []
+      },
+      {
+        "turn": 2,
+        "call_id": "call_CFIFW8rHei88x9WsSHbSQHz5",
+        "call_line": 22,
+        "updated_output_line": 24,
+        "official_readback": "warehouse-r1-P2/turn-02-result.json /plan/plan",
+        "exact_replay_matches": true,
+        "unchanged_work_direction_lines": [
+          "- 揀貨補貨、庫存盤點：已知為主要工作，尚未深入本人做法與責任界線。",
+          "- 客戶退貨、供應商退貨：已知由本人負責處理，兩類流程與決策界線尚未釐清。",
+          "- 新人帶教：已知有此工作，尚未深入本人負責的內容。",
+          "- 全稿核對：待主要工作整理後，核對職責分組、必要要求、依據與跨欄一致。"
+        ]
+      },
+      {
+        "turn": 3,
+        "call_id": "call_zdh5a0VVXwPAveLgcGOnlWuN",
+        "call_line": 32,
+        "updated_output_line": 34,
+        "official_readback": "warehouse-r1-P2/turn-03-result.json /plan/plan",
+        "exact_replay_matches": true,
+        "unchanged_work_direction_lines": [
+          "- 收貨驗收、上架：收貨逐箱核對、差異登記通報及依採購回覆入庫已整理；是否再清點、主管是否另有後續回覆尚未確認，暫不推定。",
+          "- 客戶退貨、供應商退貨：已知由本人負責處理，兩類流程與決策界線尚未釐清。",
+          "- 全稿核對：待主要工作整理後，核對職責分組、必要要求、依據與跨欄一致。"
+        ]
+      },
+      {
+        "turn": 4,
+        "call_id": "call_IITqIr1SV8z13gIvunT8f68C",
+        "call_line": 42,
+        "updated_output_line": 44,
+        "official_readback": "warehouse-r1-P2/turn-04-result.json /plan/plan",
+        "exact_replay_matches": true,
+        "unchanged_work_direction_lines": [
+          "- 收貨驗收、上架：收貨逐箱核對、差異登記通報及依採購回覆入庫已整理；是否再清點、主管是否另有後續回覆尚未確認，暫不推定。",
+          "- 客戶退貨、供應商退貨：已知由本人負責處理，兩類流程與決策界線尚未釐清。",
+          "- 全稿核對：待主要工作整理後，核對職責分組、必要要求、依據與跨欄一致。"
+        ]
+      },
+      {
+        "turn": 5,
+        "call_id": "call_aEv2tXywqaC21fqtObsyrO48",
+        "call_line": 61,
+        "updated_output_line": 63,
+        "official_readback": "warehouse-r1-P2/turn-05-result.json /plan/plan",
+        "exact_replay_matches": true,
+        "unchanged_work_direction_lines": [
+          "- 收貨驗收、上架：收貨逐箱核對、差異登記通報及依採購回覆入庫已整理；是否再清點、主管是否另有後續回覆尚未確認，暫不推定。",
+          "- 新人帶教：第一週示範掃碼、揀貨與安全動線，再讓新人跟做；觀察漏掃、拿錯批號、進入車道並記錄於帶教檢核表，且由本人判斷能否獨立上線已整理。判斷標準待釐清。",
+          "- 全稿核對：待主要工作整理後，核對職責分組、必要要求、依據與跨欄一致。"
+        ]
+      },
+      {
+        "turn": 6,
+        "call_id": "call_8gsvnZWmo0CT7sOXiREuYxq1",
+        "call_line": 110,
+        "updated_output_line": 112,
+        "official_readback": "warehouse-r1-P2/turn-06-result.json /plan/plan",
+        "exact_replay_matches": true,
+        "unchanged_work_direction_lines": [
+          "- 收貨驗收、上架：收貨逐箱核對、差異登記通報及依採購回覆入庫已整理；是否再清點、主管是否另有後續回覆尚未確認，暫不推定。",
+          "- 新人帶教：第一週示範掃碼、揀貨與安全動線，再讓新人跟做；觀察漏掃、拿錯批號、進入車道並記錄於帶教檢核表，且由本人判斷能否獨立上線已整理。判斷標準待釐清。"
+        ]
+      }
+    ],
+    "P2_subsequent_turn_requests": [
+      {
+        "turn": 2,
+        "provider_trace_line": 15,
+        "attempt": "8a8a9c99-9265-41f8-8c1f-d181b4ff9c83",
+        "input_item_index_zero_based": 17,
+        "prior_formal_plan_exact_match": true,
+        "current_employee_input_exact_match": true
+      },
+      {
+        "turn": 3,
+        "provider_trace_line": 28,
+        "attempt": "55549a30-440f-4971-bba0-d0304ee5d84d",
+        "input_item_index_zero_based": 34,
+        "prior_formal_plan_exact_match": true,
+        "current_employee_input_exact_match": true
+      },
+      {
+        "turn": 4,
+        "provider_trace_line": 41,
+        "attempt": "f15833b8-3623-4122-beef-524130d68871",
+        "input_item_index_zero_based": 52,
+        "prior_formal_plan_exact_match": true,
+        "current_employee_input_exact_match": true
+      },
+      {
+        "turn": 5,
+        "provider_trace_line": 54,
+        "attempt": "b00cdb15-f6a4-4da7-bbfa-a0aeae147dc5",
+        "input_item_index_zero_based": 69,
+        "prior_formal_plan_exact_match": true,
+        "current_employee_input_exact_match": true
+      },
+      {
+        "turn": 6,
+        "provider_trace_line": 72,
+        "attempt": "5a9de35b-7145-47d8-b437-ce758ac4b6ff",
+        "input_item_index_zero_based": 89,
+        "prior_formal_plan_exact_match": true,
+        "current_employee_input_exact_match": true
+      }
+    ],
+    "final_readback": {
+      "path": "warehouse-r1-P2/formal-plan.json /plan",
+      "equals_turn_06_official_readback": true
+    },
+    "rejections": {
+      "P1": [],
+      "P2": [],
+      "recovery_evidence": "本 revision 兩組 Plan read/edit 均為 0 rejected，沒有需判定恢復的實際事件；不據此追改 v1 的兩次拒絕與 strict false。"
+    },
+    "accounting": {
+      "ledger_sha256": "3877574082ea6807ed5bf4a5cf69b022269cb9d1a12664b6e6ee2b9cfb92832a",
+      "cumulative_guard": {
+        "spent_usd": "0.104748280",
+        "occupied_usd": "0.104748280",
+        "retained_reservations": {},
+        "generations": 125,
+        "compacts": 0,
+        "outbound": 266,
+        "counted_input": 2918421,
+        "stop_reason": null,
+        "batch_deadline": null,
+        "limit_usd": "4.00"
+      },
+      "check": "以 frozen pricing 與全部 raw admissions/received/count 加 carry 起點重算，與 ledger 相同；unknown reserve 為 0。"
+    },
+    "frozen_source_and_arm_templates_verified": true
+  },
+  "limitations": [
+    "本 receipt 只准入 v2 formal 的機制 gate，不是模型品質或完整產品驗收。",
+    "兩組均未出現 A compact admission，未驗證 A within-Work C；不能以 pilot 名稱推定跨窗機制通過。",
+    "全文採用只證實下一 Turn 實際 request 包含前輪正式 Plan 精確全文，不推論模型語意理解、返回有效性或 JD 品質增益。",
+    "本 pilot 無 read_interview_plan 呼叫；正式讀回證據來自完成後的正式 HTTP Plan 結果，不聲稱已驗到模型主動使用 read 工具。",
+    "未讀 anonymous reviews 或品質盲評，未擔任披露裁決，未直接呼叫 provider、啟停程序或修改 frozen 內容。"
+  ]
+}

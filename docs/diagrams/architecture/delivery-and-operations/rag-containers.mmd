@@ -1,0 +1,11 @@
+flowchart LR
+  app[Caliburn<br/>外部軟體系統<br/>訪談與 JD 編修]
+  subgraph ragSystem[獨立公版 RAG・軟體系統邊界]
+    rag[公版查詢 API<br/>容器・Python／FastAPI<br/>檢索與讀取職位參考]
+    qdrant[(公版索引<br/>容器・Qdrant<br/>保存向量與來源資料)]
+    gpu[GPU 模型服務<br/>容器・Python／FastAPI／PyTorch<br/>嵌入與重排序]
+    rag -->|內網 HTTP：向量與來源查詢| qdrant
+    rag -->|內網 HTTP：嵌入與重排序| gpu
+  end
+  app -.->|內網 HTTP：按需公版查讀| rag
+  style ragSystem fill:none,stroke:#64748b,stroke-dasharray:5 5

@@ -1,0 +1,57 @@
+{
+  "question_id": "0dce9b05be934c72ab0f500aa500e63a",
+  "profile": "warehouse",
+  "actual_question": "收到。新人操作異常的處置方式目前未知，我會保留未知、不再追問；上線核准則依您的更正，記為由主管核准。\n\n接著談上架：請以最近一次上架為例，從您接到貨品或上架指示開始，說說您實際做了哪些步驟，以及做到什麼狀態算完成。",
+  "disclosed": [
+    "customer-returns",
+    "inventory-partial",
+    "picking",
+    "receiving",
+    "supplier-returns",
+    "training",
+    "training-boundary"
+  ],
+  "open_gaps": [
+    "inventory-authority"
+  ],
+  "seen_topics": [
+    "customer-returns",
+    "inventory",
+    "picking",
+    "receiving",
+    "supplier-returns",
+    "training"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "receiving",
+    "customer-returns",
+    "supplier-returns",
+    "picking",
+    "inventory-partial",
+    "training",
+    "training-boundary",
+    "training-boundary"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 5
+  },
+  "recent_employee_originals": [
+    "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。",
+    "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。",
+    "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。\n\n關於你問的「若當場看到新人拿錯批號或走進車道，您會怎麼處理？」，我目前沒有確定資料，請保留未知，不補猜。"
+  ],
+  "candidate": {
+    "actual_question": "接著談上架：請以最近一次上架為例，從您接到貨品或上架指示開始，說說您實際做了哪些步驟，以及做到什麼狀態算完成。",
+    "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+    "fact_id": "shelving",
+    "topic": "shelving",
+    "matched_cue": "上架",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": null,
+    "closes_gap": null,
+    "correction": false
+  }
+}

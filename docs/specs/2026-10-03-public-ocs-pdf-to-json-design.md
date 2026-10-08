@@ -64,19 +64,11 @@
 
 ## 4. 目標資料流與責任
 
-以下核心資料流已實作；方框表示本機函式與模組責任，不表示新增服務。來源清單目前固定檔名與雜湊；官方版本身分核對尚未實作。
+以下是已實作核心路徑的處理流程；矩形表示本機動作，平行四邊形表示輸入／輸出，菱形表示檢核結果，箭頭只表示控制先後。各動作沿既有函式與模組，不表示新增服務。來源清單目前固定檔名與雜湊；官方版本身分核對尚未實作。
 
-```mermaid
-flowchart TD
-  files[本輪來源清單與 PDF] --> extract[PDF 抽取：頁面／文字位置／表格]
-  extract --> snapshot[單份文件的抽取結果]
-  snapshot --> sections[章節與欄位定位]
-  sections --> content[各章節解析與跨頁組裝]
-  content --> candidate[OCSDocument 候選與來源對照]
-  candidate --> verify[共用 schema 與來源完整性檢核]
-  verify -->|通過| output[原子寫出正式 JSON]
-  verify -->|拒絕／無法判讀| report[問題報告與隔離的診斷候選]
-```
+![現行獨立 RAG：OCS PDF 至 JSON 資料處理流程](../diagrams/specs/2026-10-03-public-ocs-pdf-to-json-design/pdf-json-processing.png)
+
+[圖源](../diagrams/specs/2026-10-03-public-ocs-pdf-to-json-design/pdf-json-processing.mmd) · [SVG](../diagrams/specs/2026-10-03-public-ocs-pdf-to-json-design/pdf-json-processing.svg)
 
 ### 4.1 PDF 抽取
 

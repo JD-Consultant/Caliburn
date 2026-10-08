@@ -1,0 +1,13 @@
+{
+  "authorization": "本批原接續授權：限流就等待，US$0.30／60 分鐘不變。依鎖定 OpenAI SDK 的 AsyncStream 錯誤契約補齊實驗 observer，不改正式產品。",
+  "journal_sha256": "82c29af1d8b93bbb8f875b15a948e6cf9e5bcc4adb5e714f3096083fe3733184",
+  "started_at": "2026-10-06T09:30:26.085423+00:00",
+  "spent_usd": "0.078368515",
+  "retained_reservations": {
+    "f02d943d-77c7-473e-af85-e43f96e609f4": "0.015437625",
+    "830791b0-844c-4d1b-bbf6-1cc805095cee": "0.017251625",
+    "9877c2f8-fbef-4bc1-bb5c-f6157921528b": "0.019138875"
+  },
+  "failed_execution_id": "f032863c-8212-4813-9c5e-4c7e98c5483c",
+  "tests": "12 passed；SDK nested error 無 type 的反例先失敗後修正。未聲稱原限流免費，未知用量全額保留占用。"
+}

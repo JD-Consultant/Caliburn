@@ -1,0 +1,14 @@
+%% title: 歷史目標：未知筆記的最小使用流程（當時未實作）
+%% legend: 終端形：本段起訖；矩形：處理；菱形：條件；平行四邊形：資料。只畫完成取得採用資格的路徑，取消／失敗另依原契約。
+%%{init: {"flowchart": {"rankSpacing": 28, "nodeSpacing": 32, "wrappingWidth": 240}}}%%
+flowchart TB
+  START([新一輪開始]) --> input[/本輪回答與固定短筆記/]
+  input --> assess[結合 Memory 導覽及需要的 JD 判讀]
+  assess --> work[訪談／分析／有據編修]
+  work --> changed{短筆記有實質變動嗎}
+  changed -->|有| delta[合併 patch]
+  delta --> saved[保存候選與實際結果]
+  changed -->|無| response
+  saved --> response[形成本輪答覆並核完成資格]
+  response --> next[/下一輪可採用的合法基底/]
+  next --> END([本輪流程完成])

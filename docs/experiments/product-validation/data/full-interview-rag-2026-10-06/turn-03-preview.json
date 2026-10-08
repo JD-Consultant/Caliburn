@@ -1,0 +1,66 @@
+{
+  "job_file_id": "71f92646-d2c1-41da-ab2e-fe991f5ad1c5",
+  "execution_id": "4db04145-e900-4f14-bb56-ecb5e1bf4ae3",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我照規劃好的儲位把貨放上架、貼標籤，再到庫存系統登記入庫。儲位是先安排好的，我照著放；到底是誰排的，我說不準。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點及客戶與供應商退貨入庫，維持貨物流轉與庫存作業的準確，支援後續出貨及退貨處理。"
+    },
+    "work": {
+      "revision_id": "f240cc84-7d31-4c19-bc8d-01f2c62cc150",
+      "areas": [
+        {
+          "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "title": "物流中心倉儲與庫存作業",
+          "scope_text": "涵蓋收貨驗收、上架、揀貨補貨、庫存盤點，以及客戶與供應商退貨入庫。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "9301a06b-657b-4284-852c-4ba3dfb0656a",
+          "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "title": "核對進貨並回報數量差異",
+          "description": "收貨時比對採購單、送貨單上的品項與實際收到的數量；發現不符時拍照並將差異告知採購。",
+          "outcomes": [
+            {
+              "detail_id": "e6559418-9858-42d4-b32e-62481f3f14c6",
+              "text": "提供採購差異情況及照片，供採購後續處理。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "ad77ce78-7f02-427f-af82-def3921f1409",
+              "text": "不自行決定拒收或退換貨；相關處理由採購決定。"
+            }
+          ]
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [
+        {
+          "collaborator_id": "31b42c6b-6c7c-417c-8fe2-ca4589099916",
+          "name": "採購",
+          "scope_text": "收到進貨品項或數量差異時，提供差異情況與照片；拒收或退換貨由採購決定並處理。"
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "9ad6366e-23f0-4716-aaf1-bbf465f0ca2b",
+          "kind": "schedule_travel",
+          "text": "早上七點上班，週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

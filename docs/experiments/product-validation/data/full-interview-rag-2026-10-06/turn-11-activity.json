@@ -1,0 +1,330 @@
+[
+  {
+    "at": 1791279722.358653,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3586552,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while\"}"
+  },
+  {
+    "at": 1791279722.3587346,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3587353,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also\"}"
+  },
+  {
+    "at": 1791279722.358759,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3587594,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking\"}"
+  },
+  {
+    "at": 1791279722.3587701,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3587704,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether\"}"
+  },
+  {
+    "at": 1791279722.3588362,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.358837,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the\"}"
+  },
+  {
+    "at": 1791279722.3588734,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3588736,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results\"}"
+  },
+  {
+    "at": 1791279722.3588848,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.358885,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from\"}"
+  },
+  {
+    "at": 1791279722.3589375,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3589382,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily\"}"
+  },
+  {
+    "at": 1791279722.3589673,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3589678,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine\"}"
+  },
+  {
+    "at": 1791279722.3638008,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3638017,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts\"}"
+  },
+  {
+    "at": 1791279722.374566,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3745673,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have\"}"
+  },
+  {
+    "at": 1791279722.3877451,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.387746,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been\"}"
+  },
+  {
+    "at": 1791279722.390625,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.390626,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared\"}"
+  },
+  {
+    "at": 1791279722.399916,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.3999171,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with\"}"
+  },
+  {
+    "at": 1791279722.406028,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.406029,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the\"}"
+  },
+  {
+    "at": 1791279722.4134932,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.4134943,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor\"}"
+  },
+  {
+    "at": 1791279722.4221883,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.4221895,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor.\"}"
+  },
+  {
+    "at": 1791279722.429741,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.4297423,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's\"}"
+  },
+  {
+    "at": 1791279722.434548,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.434549,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important\"}"
+  },
+  {
+    "at": 1791279722.440346,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.440347,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to\"}"
+  },
+  {
+    "at": 1791279722.4486103,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.4486113,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep\"}"
+  },
+  {
+    "at": 1791279722.4621143,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.4621155,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things\"}"
+  },
+  {
+    "at": 1791279722.4621766,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.462177,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise\"}"
+  },
+  {
+    "at": 1791279722.4705536,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.4705546,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise,\"}"
+  },
+  {
+    "at": 1791279722.483893,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.4838948,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as\"}"
+  },
+  {
+    "at": 1791279722.4899151,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.4899163,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that\"}"
+  },
+  {
+    "at": 1791279722.4985719,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.4985728,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will\"}"
+  },
+  {
+    "at": 1791279722.5065181,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.5065193,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help\"}"
+  },
+  {
+    "at": 1791279722.5129583,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.5129592,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the\"}"
+  },
+  {
+    "at": 1791279722.5397983,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.5397992,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication\"}"
+  },
+  {
+    "at": 1791279722.5503924,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.5503936,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow\"}"
+  },
+  {
+    "at": 1791279722.5604017,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.5604029,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better\"}"
+  },
+  {
+    "at": 1791279722.5690463,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.5690477,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better.\"}"
+  },
+  {
+    "at": 1791279722.57989,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.579891,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better. Making\"}"
+  },
+  {
+    "at": 1791279722.587979,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.5879803,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better. Making sure\"}"
+  },
+  {
+    "at": 1791279722.594357,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.594358,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better. Making sure I\"}"
+  },
+  {
+    "at": 1791279722.601474,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.6014755,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better. Making sure I cover\"}"
+  },
+  {
+    "at": 1791279722.6057155,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.6057165,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better. Making sure I cover everything\"}"
+  },
+  {
+    "at": 1791279722.6209495,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.6209526,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better. Making sure I cover everything is\"}"
+  },
+  {
+    "at": 1791279722.627091,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.627092,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better. Making sure I cover everything is key\"}"
+  },
+  {
+    "at": 1791279722.6422725,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791279722.642274,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c260072887d08410c87154310ff7\",\"item_id\":\"rs_00933d1a394bb439016ac4c2694c5887d0a83e70f07165de6c\",\"output_index\":1,\"summary_index\":0,\"text\":\"**Deepening inventory records**\\n\\nI need to consider using a \\\"next question\\\" approach to enhance the daily inventory records; it feels like a useful gap to fill. I'll respond to the user while also asking whether the results from daily routine counts have been shared with the supervisor. It's important to keep things concise, as that will help the communication flow better. Making sure I cover everything is key!\"}"
+  }
+]

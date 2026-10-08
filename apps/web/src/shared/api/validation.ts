@@ -1,6 +1,9 @@
 /** Runtime guards use the same SSOT as generated types; no second field definitions. */
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import interviewPlanSchema from '../../../../api/contracts/tools/interview-plan.schema.json' with { type: 'json' };
+import interviewPlanViewSchema from '../../../../api/contracts/http/interview-plan-view.schema.json' with { type: 'json' };
+import type { InterviewPlanView } from './generated/interview-plan-view';
 import commentaryUpdateSchema from '../../../../api/contracts/http/commentary-update.schema.json' with { type: 'json' };
 import type { CommentaryUpdate } from './generated/commentary-update';
 import reasoningSummarySchema from '../../../../api/contracts/http/reasoning-summary.schema.json' with { type: 'json' };
@@ -46,6 +49,7 @@ import type { JdConditionsView } from './generated/jd-conditions-view';
 
 const validator = new Ajv2020();
 addFormats(validator);
+validator.addSchema(interviewPlanSchema, 'tools/interview-plan.schema.json');
 validator.addSchema(jdAreasSchema, 'jd-areas-view.schema.json');
 validator.addSchema(jdTasksSchema, 'jd-tasks-view.schema.json');
 validator.addSchema(jdCapabilitiesSchema, 'jd-capabilities-view.schema.json');
@@ -55,6 +59,7 @@ validator.addSchema(jdProfileSchema, 'jd-profile-view.schema.json');
 validator.addSchema(jdWorkSchema, 'jd-work-view.schema.json');
 validator.addSchema(consultantTurnSchema, 'consultant-turn.schema.json');
 
+export const isInterviewPlanView = validator.compile<InterviewPlanView>(interviewPlanViewSchema);
 export const isConsultantTurn = validator.compile<ConsultantTurn>(consultantTurnSchema);
 export const isCurrentConsultantTurn = validator.compile<CurrentConsultantTurn>(
   currentConsultantTurnSchema,

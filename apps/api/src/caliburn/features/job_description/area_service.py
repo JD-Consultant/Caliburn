@@ -65,7 +65,7 @@ async def recover_area_result(
     )
 
 
-def _apply_change(
+def apply_area_change(
     areas: tuple[ResponsibilityArea, ...], change: AreaChange
 ) -> tuple[tuple[ResponsibilityArea, ...], ResponsibilityArea | None]:
     """Return ordered membership and, only for changed text, one new fixed content revision."""
@@ -116,7 +116,7 @@ async def edit_areas(
     )
     if current.revision_id != command.expected_revision_id:
         raise StaleJdRevisionError("Read the current JD before submitting a new edit")
-    areas, new_content = _apply_change(current.areas, command.change)
+    areas, new_content = apply_area_change(current.areas, command.change)
     result = current
     if areas != current.areas:
         if new_content is not None:

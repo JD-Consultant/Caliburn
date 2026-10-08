@@ -1,0 +1,17 @@
+{
+  "execution_id": "d7ecc8f5-4c38-40c2-a206-0f1a659d4cd0",
+  "exchange": {
+    "employee_input": {
+      "source_id": "45c04f85-9458-4b63-abc3-861732e2f438",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "我主要就是前面說的收貨、搬運上架和入庫紀錄，沒有另外負責揀貨、出貨或其他工作。目前想不到其他補充，你可以帶著我說。"
+    },
+    "consultant_reply": {
+      "source_id": "d3a8f338-4043-498f-bf55-0e33c6a3ae1b",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "我先把收貨核對、依安排搬運上架及入庫登記整理進底稿，也記下數量不符時要拍照通知採購、由採購決定收退；搬運與堆高機的條件也已列入。揀貨和出貨則記為你不負責的工作。\n\n再確認一種可能的差異：如果核對時是「品項不符」而不是數量不符，你通常會怎麼處理？"
+    }
+  }
+}

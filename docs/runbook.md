@@ -225,6 +225,8 @@ pnpm dev      # 開發：後端 :8100 與 Vite :5173 同時前景啟動：http:/
 
 `pnpm start` 需要先 `pnpm build`；沒有建置會明確報錯，不自動建置或猜目錄。在原終端按 Ctrl+C 正常停止：後端先停止新准入、保存已取得的結果並停在可恢復邊界，再釋放資源；強制關閉仍依最後可靠位置恢復。重開後，進行中或暫停的訪談可由介面找回並續作；背景整理由系統依持久狀態自動承接。
 
+啟動器先用短命的 `uv run --locked` 同步既有專案環境並取得 Python 路徑，再直接啟動後端；自訂 `UV_PROJECT_ENVIRONMENT` 仍由 uv 處理。任一服務啟動失敗或退出時，啟動器會收尾自己持有的其他服務；不依程序名稱或埠號清理。Windows 訊號收尾有有限等待，逾時才強制停止自有程序樹，不能把強制停止當成在途工作已全部保存。
+
 隔離驗證時若前端使用第二個埠，可在**後端啟動前**設定 `CALIBURN_DEV_ORIGIN=http://127.0.0.1:5174`（只接受一個帶明確埠的 loopback HTTP origin），見[後端 README](../apps/api/README.md)。
 
 ## 更新已有安裝
@@ -267,8 +269,8 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 | 瀏覽器或 CLI 收到 403 | 精確 Host／Origin 檢查：只接受 `127.0.0.1`／`localhost`／`[::1]` 的 5173／8100（及明示的一個 dev origin） |
 | `GET /api/health` | 只表示程序存活，不表示資料庫或模型可用 |
 | 訪談失敗或結果不明 | 介面顯示安全的失敗原因，原輸入保留；技術診斷在後端 log（只含穩定 ID、階段、錯誤類別，不含原話或 payload） |
-| 一輪訪談很久沒有回應 | 多半是 OpenAI 帳戶的每分鐘 token 上限（TPM）在限流，後端 log 會出現 `Provider request failed: … failure=rate_limited`。系統會照服務建議的時間自動多等（沒有建議時 10 秒起、60 秒封頂），**不算失敗**，單輪最長等到工作期限（預設 30 分鐘）；可隨時取消該輪。TPM 200K 的帳戶上，一場 12 輪訪談約 6–25 分鐘；要更快請改用更高 TPM 的帳戶 |
-| 訪談或背景整理全部立刻失敗，後端 log 為 `failure=access_blocked … provider_code=credit_balance_exhausted` | OpenAI 帳戶儲值額度用完（HTTP 429，但不是限流）。系統不重試、原輸入保留、該次處理標為失敗；補額度後重新送出原輸入 |
+| 一輪訪談很久沒有回應 | 多半是 OpenAI 帳戶的每分鐘 token 上限（TPM）在限流，後端 log 會出現 `event=model.request_failed`、`failure_kind=rate_limited`。系統會照服務建議的時間自動多等（沒有建議時 10 秒起、60 秒封頂），**不算失敗**，單輪最長等到工作期限（預設 30 分鐘）；可隨時取消該輪。TPM 200K 的帳戶上，一場 12 輪訪談約 6–25 分鐘；要更快請改用更高 TPM 的帳戶 |
+| 訪談或背景整理全部立刻失敗，後端 log 為 `event=model.request_failed`、`failure_kind=access_blocked`、`provider_code=credit_balance_exhausted` | OpenAI 帳戶儲值額度用完（HTTP 429，但不是限流）。系統不重試、原輸入保留、該次處理標為失敗；補額度後重新送出原輸入 |
 | 資料庫剛重啟（或被外力中止）後，讀訪談狀態的端點回 500，`/api/health` 仍是 ok | **重啟後端**。leader 鎖與 checkpoint 連線各只持一條資料庫連線、不會自動重連，這是刻意的單一 leader 設計；重啟時系統會恢復已保存的進行中工作（能續作則續作，否則安全終止、原輸入保留，之後可重送） |
 
 ### 判讀 `pnpm app:status`
@@ -296,6 +298,8 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --job-file-id 職務檔案UUID
 # 只更新某一輪，改用：
 uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID
+# 不重新擷取，直接在終端查看該輪已有的診斷副本：
+uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID --show
 ```
 
 兩個範圍參數擇一；不用 API key。資料庫須已升級到目前 migration；若尚未升級，先沿[更新流程](#更新已有安裝)停止 App，再執行 `pnpm app:migrate`，不是每次查詢都遷移。沒有 execution 的既存空檔案回報 0 筆，找不到的 UUID 則報錯。若權限、migration、原生紀錄解碼或並行更新出錯，整次匯入回滾，原診斷副本仍保留。終端只印成功筆數或錯誤類別，避免洩露私人 payload。
@@ -304,8 +308,8 @@ DataGrip 展開 `caliburn → views`，可直接雙擊下列 VIEW，再用 `job_
 
 | VIEW | 每列代表什麼 | 主要欄位 |
 |---|---|---|
-| `diagnostic_execution_history` | 一輪 A 或一批 Memory（包含失敗／取消） | 檔案名稱、原輸入、正式答覆、正式序號、狀態、失敗嘗試、JD 候選狀態／修訂、已發布 Memory 快照 |
-| `diagnostic_model_steps` | 一份已保存的原模型回應，不等於業務 Step 已完成 | A／B1／B2 role、response_order、request（含 instructions、input、tools）、response（含輸出與 usage）、thread／checkpoint、snapshot_at |
+| `diagnostic_execution_history` | 一輪 A 或一批 Memory（包含失敗／取消） | 檔案名稱、原輸入、正式答覆、正式序號、狀態、失敗嘗試、JD 候選、`captured_initial_context`、目前 Memory head 及本批發布的快照 |
+| `diagnostic_model_steps` | 一份已保存的邏輯請求；可能尚無回應，不等於已外送或業務 Step 已完成 | role、request_id、response_state、response_order、request（instructions、input、tools）、response（輸出與 usage）、原請求及回應的 checkpoint／source、snapshot_at |
 | `diagnostic_tool_calls` | 上述回應的一次 function call | 工具名稱、原 arguments、call_id、對應 output、結果是否已保存 |
 
 例如整個檔案的操作：
@@ -325,7 +329,9 @@ WHERE execution_id = '換成執行UUID'::uuid
 ORDER BY response_order;
 ```
 
-`request` 就是保存的當時請求（敏感欄位已遮蔽），可在 DataGrip 展開 JSON 看 context、指引與工具說明。`response` 可看公開訊息、可讀推理摘要與原工具要求；舊模型沒有回傳摘要時不會補造。`response_order` 是本次擷取中已保存回應的觀察順序，不是重試次數，也不是跨程序精確時鐘。
+`request` 是保存的當時請求（敏感欄位已遮蔽），可展開 JSON 看 Context、指引與工具說明。`response_state=request_only` 表示尚未找到已保存回應，不能推定未外送；`recorded` 才有原回應。`response_order` 為相容保留的欄位名，表示邏輯請求的觀察順序，不是重試次數或跨程序精確時鐘。原請求與後續回應的 checkpoint／source 分列，避免用後來的回應時間冒充請求捕捉時間。
+
+`captured_initial_context` 保存原始 binding、request 及來源，可核當輪固定的 Memory／Plan 版本；`current_published_snapshot_id` 是查詢當下的 Memory head，`published_snapshot_ids` 是這次 execution 發布的快照，三者不能互換。Context 中有導覽或工具可用，不表示模型已讀過正文；實際讀取依工具呼叫及回傳查證。CLI `--show` 輸出同一份受控副本，包含工作正文，不能導入一般 Log 或提交 Git。
 
 要看本輪資料庫實際寫了什麼，再 JOIN 既有操作表；讀工具不一定有業務操作，一次工具也可能產生多筆操作：
 
@@ -343,13 +349,23 @@ ORDER BY o.created_at, o.command_id;
 
 **判讀界線：**
 
-- 總覽的業務狀態、正式訪談序號與嘗試統計是即時 JOIN；訪談文字、模型／工具正文均經遮蔽，是 `snapshot_at` 那次擷取。`snapshot_at IS NULL` 表示尚未匯入；有時間且回應數 0 表示該次未找到已保存回應。新進展須再次執行匯入命令，DataGrip Refresh 本身不會解碼新增 checkpoint。
+- 總覽的業務狀態、正式訪談序號與嘗試統計是即時 JOIN；模型／工具正文是 `snapshot_at` 那次擷取。`snapshot_at IS NULL` 表示尚未匯入，兩種計數也為 null；`saved_response_count` 只計已有回應，`request_only_count` 另計只有請求。新進展須再次執行匯入命令，DataGrip Refresh 本身不會解碼新增 checkpoint。
 - `recorded` 只表示取得工具回傳，內容仍可能是錯誤；`not_recorded` 表示未找到保存結果，不能推定未執行或失敗。正式效果仍由 JD／Memory 原結果判定。
 - 包含本 execution 各階段留下的原模型回應及 pending writes，可能含後來放棄的工作。不能把診斷項目當成正式訪談來源，或把模型回應 `completed` 當整輪成功。
 - 副本遮蔽 `encrypted_content`、已知憑證欄位及可辨識的 key 字串，**不是完整匿名化**。仍含原訪談與工作內容；不自動匯出、不提交 Git。DataGrip 可將核准的合成結果另存 JSON／CSV 供錄影或報告使用。一般 log 仍不含這些正文。
 - VIEW 沿用查詢者的資料庫權限；建議在 DataGrip 開啟唯讀連線。它不是跨使用者授權或資料隔離 API。
 
 設計取捨、測試及版本見 [T06 診斷查閱證據](history.md#source-6ac54c64f9ded4edcb9e)。
+
+### 一般 Log 與 HTTP 關聯
+
+正式 `pnpm dev`／`pnpm start` 的後端入口輸出一行一個 JSON 事件。`CALIBURN_LOG_LEVEL` 預設 `INFO`，可選 `DEBUG`、`INFO`、`WARNING`、`ERROR`、`CRITICAL`；提高等級細節也不輸出訪談正文、完整 URL、秘密或 exception 文字。直接呼叫低階 Uvicorn 工廠不會套用這份輸出配置。
+
+先用 `event`、`module`、`failure_kind` 判斷負責環節，再以 `job_file_id`、`execution_id`、`request_id`、`attempt_id` 查原業務／診斷紀錄。HTTP 回應的 `X-Request-ID` 對應 `http_request_id`，由伺服器產生；不採信傳入值，也不把它當業務命令身分。`execution.runner_returned` 只表示 runner 返回，正式完成仍查業務結果。
+
+`supervisor.monitor_failed` 表示背景監督迴圈中止，`supervisor.release_failed` 表示收尾釋放失敗；用 `execution_kind`、`operation`、`failure_kind` 定位。這些事件可能發生在尚未選定工作時，因此不捏造 execution ID，也不輸出原始例外正文。正常取消不記成監督失敗。
+
+輸出使用容量 1024 的非阻塞佇列，滿時捨棄新紀錄；後續可用事件會附累計 `logging_dropped_records`／`logging_output_failures`，不能把沒看到 Log 當作沒發生。正常關閉最多等待 1 秒排出；程序意外終止可能遺失尾端 Log，可靠結果沿 PostgreSQL／checkpoint 核對。原生終端不自動保存檔案；Docker 沿 Compose 的 local driver 輪替，每檔 10 MB、最多 3 檔。格式規範見[工程文件](implementation/coding-standard.md#72-log-的格式責任與查閱)，本輪驗證見[重構證據](plans/evidence/full-system-review-2026-10-08.md)。
 
 ## 資料庫與備份
 

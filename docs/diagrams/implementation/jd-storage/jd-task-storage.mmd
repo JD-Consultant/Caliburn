@@ -1,0 +1,31 @@
+%% diagram: jd-task-storage
+erDiagram
+  direction LR
+  jd_revisions ||--o{ jd_task_selections : selects_tasks
+  jd_area_selections |o..o{ jd_task_selections : optional_group_same_revision
+  jd_task_revisions ||..o{ jd_task_selections : reuses_fixed_content
+  jd_task_revisions ||--o{ jd_task_details : contains_ordered_details
+  jd_task_selections {
+    uuid job_file_id PK,FK
+    uuid revision_id PK,FK
+    uuid task_id PK,FK
+    uuid content_revision_id FK
+    uuid area_id FK "可空；未歸屬職責"
+    int position
+  }
+  jd_task_revisions {
+    uuid job_file_id PK,FK
+    uuid task_id PK
+    uuid content_revision_id PK
+    text title
+    text description
+  }
+  jd_task_details {
+    uuid job_file_id PK,FK
+    uuid task_id PK,FK
+    uuid content_revision_id PK,FK
+    uuid detail_id PK
+    text kind
+    text text
+    int position
+  }

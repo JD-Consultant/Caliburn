@@ -1,0 +1,24 @@
+{
+  "profile": {
+    "revision_id": "6908674a-b912-4451-b8de-9d58347cad78",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": null
+    }
+  },
+  "work": {
+    "revision_id": "6908674a-b912-4451-b8de-9d58347cad78",
+    "areas": [],
+    "tasks": [],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "6908674a-b912-4451-b8de-9d58347cad78",
+    "references": []
+  }
+}

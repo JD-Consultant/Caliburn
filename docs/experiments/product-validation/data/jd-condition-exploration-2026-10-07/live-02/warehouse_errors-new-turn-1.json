@@ -1,0 +1,17 @@
+{
+  "execution_id": "9cddbd1d-83a8-4f81-a7e3-79e7564508a5",
+  "exchange": {
+    "employee_input": {
+      "source_id": "6b36ae7b-e8f3-47cc-a422-d53586baf3d8",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "我主要就是照安排上架、貼標籤和登記入庫，沒有另外負責收貨、揀貨、出貨或盤點。目前想不到其他補充，你可以帶著我說。"
+    },
+    "consultant_reply": {
+      "source_id": "e1ee2947-3e0d-44f3-b8ae-f9b6a5eea208",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "我已把您確認的上架、貼標籤與入庫登記整理進職務草稿，也記下儲位由他人安排，以及品項不符時的處理方式；收貨、揀貨、出貨和盤點則不列為您的職責。\n\n再確認一個可能影響工作的情況：一天當中或旺季時，上架量會明顯增加嗎？如果會，工作安排或完成時間通常有什麼變化？掃描核對和入庫登記的做法會維持一樣嗎？"
+    }
+  }
+}

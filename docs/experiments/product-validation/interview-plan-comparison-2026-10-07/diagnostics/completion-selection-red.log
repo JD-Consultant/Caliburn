@@ -1,0 +1,155 @@
+FFF...FFFFF                                                              [100%]
+================================== FAILURES ===================================
+______ test_only_incomplete_and_unstarted_cases_remain_in_original_order ______
+
+    def test_only_incomplete_and_unstarted_cases_remain_in_original_order():
+        results = {
+            SCHEDULED[0]: completed(),
+            SCHEDULED[1]: completed(),
+            SCHEDULED[2]: completed(
+                closure_submitted=False,
+                turns=[{"turn": 11, "status": "failed"}],
+                stop="batch_resource_stop",
+            ),
+        }
+>       assert remaining_cases(results) == SCHEDULED[2:]
+E       AssertionError: assert ['warehouse-r...e-r2-P1', ...] == ['course_admi..._admin-r2-P1']
+E         
+E         At index 0 diff: 'warehouse-r1-P1' != 'course_admin-r1-P1'
+E         Left contains 2 more items, first extra item: 'course_admin-r2-P2'
+E         Use -v to get more diff
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:24: AssertionError
+__ test_memory_failure_and_quality_information_do_not_restart_completed_case __
+
+    def test_memory_failure_and_quality_information_do_not_restart_completed_case():
+        results = {
+            SCHEDULED[0]: completed(
+                memory_settlement={"failed": 1},
+                quality="unknown",
+                stop="batch_resource_stop",
+            )
+        }
+>       assert remaining_cases(results) == SCHEDULED[1:]
+E       AssertionError: assert ['warehouse-r...e-r2-P1', ...] == ['warehouse-r...n-r2-P2', ...]
+E         
+E         At index 0 diff: 'warehouse-r1-P1' != 'warehouse-r1-P2'
+E         Left contains one more item: 'course_admin-r2-P1'
+E         Use -v to get more diff
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:35: AssertionError
+_______________ test_all_unstarted_and_all_completed_boundaries _______________
+
+    def test_all_unstarted_and_all_completed_boundaries():
+        assert remaining_cases({}) == SCHEDULED
+>       assert remaining_cases({name: completed() for name in SCHEDULED}) == []
+E       AssertionError: assert ['warehouse-r...e-r2-P1', ...] == []
+E         
+E         Left contains 8 more items, first extra item: 'warehouse-r1-P1'
+E         Use -v to get more diff
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:40: AssertionError
+________________________ test_unknown_case_is_rejected ________________________
+
+    def test_unknown_case_is_rejected():
+>       with pytest.raises(ValueError, match="Unknown"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:56: Failed
+___________ test_ambiguous_completion_evidence_is_rejected[result0] ___________
+
+result = {}
+
+    @pytest.mark.parametrize(
+        "result",
+        [
+            {},
+            completed(closure_submitted=1),
+            completed(turns=[]),
+            completed(turns=[{"turn": 20}]),
+        ],
+    )
+    def test_ambiguous_completion_evidence_is_rejected(result):
+>       with pytest.raises(ValueError, match="completion evidence"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:70: Failed
+___________ test_ambiguous_completion_evidence_is_rejected[result1] ___________
+
+result = {'closure_submitted': 1, 'turns': [{'turn': 20, 'status': 'completed'}]}
+
+    @pytest.mark.parametrize(
+        "result",
+        [
+            {},
+            completed(closure_submitted=1),
+            completed(turns=[]),
+            completed(turns=[{"turn": 20}]),
+        ],
+    )
+    def test_ambiguous_completion_evidence_is_rejected(result):
+>       with pytest.raises(ValueError, match="completion evidence"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:70: Failed
+___________ test_ambiguous_completion_evidence_is_rejected[result2] ___________
+
+result = {'closure_submitted': True, 'turns': []}
+
+    @pytest.mark.parametrize(
+        "result",
+        [
+            {},
+            completed(closure_submitted=1),
+            completed(turns=[]),
+            completed(turns=[{"turn": 20}]),
+        ],
+    )
+    def test_ambiguous_completion_evidence_is_rejected(result):
+>       with pytest.raises(ValueError, match="completion evidence"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:70: Failed
+___________ test_ambiguous_completion_evidence_is_rejected[result3] ___________
+
+result = {'closure_submitted': True, 'turns': [{'turn': 20}]}
+
+    @pytest.mark.parametrize(
+        "result",
+        [
+            {},
+            completed(closure_submitted=1),
+            completed(turns=[]),
+            completed(turns=[{"turn": 20}]),
+        ],
+    )
+    def test_ambiguous_completion_evidence_is_rejected(result):
+>       with pytest.raises(ValueError, match="completion evidence"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:70: Failed
+============================== warnings summary ===============================
+.venv\Lib\site-packages\_pytest\cacheprovider.py:469
+  S:\caliburn\apps\api\.venv\Lib\site-packages\_pytest\cacheprovider.py:469: PytestCacheWarning: could not create cache path S:\caliburn\.pytest_cache\v\cache\nodeids: [WinError 183] 當檔案已存在時，無法建立該檔案。: 'S:\\caliburn\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:423
+  S:\caliburn\apps\api\.venv\Lib\site-packages\_pytest\cacheprovider.py:423: PytestCacheWarning: could not create cache path S:\caliburn\.pytest_cache\v\cache\lastfailed: [WinError 183] 當檔案已存在時，無法建立該檔案。: 'S:\\caliburn\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_only_incomplete_and_unstarted_cases_remain_in_original_order
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_memory_failure_and_quality_information_do_not_restart_completed_case
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_all_unstarted_and_all_completed_boundaries
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_unknown_case_is_rejected
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_ambiguous_completion_evidence_is_rejected[result0]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_ambiguous_completion_evidence_is_rejected[result1]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_ambiguous_completion_evidence_is_rejected[result2]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_ambiguous_completion_evidence_is_rejected[result3]
+8 failed, 3 passed, 2 warnings in 0.13s

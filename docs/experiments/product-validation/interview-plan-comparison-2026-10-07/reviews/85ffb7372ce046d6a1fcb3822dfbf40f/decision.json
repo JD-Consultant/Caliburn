@@ -1,0 +1,8 @@
+{
+  "question_id": "85ffb7372ce046d6a1fcb3822dfbf40f",
+  "fact_ids": ["picking"],
+  "mode": "answer",
+  "reason": "實際轉問揀貨的依據與完成後交接，picking 固定事實直接回答出貨波次單、品項批號效期核對與交包裝區複核。先前收貨摘要與保留未知不另觸發事實。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

@@ -1,0 +1,134 @@
+{
+  "arm": "old",
+  "case_id": "warehouse_errors",
+  "job_file_id": "1280a085-fdc1-4d63-8707-95e1d937ed19",
+  "before": {
+    "profile": {
+      "revision_id": "cbf2346a-73fa-47e9-8aa8-0f907f4c4e48",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "依已確認的資料及儲位安排完成上架與入庫紀錄。"
+      }
+    },
+    "work": {
+      "revision_id": "cbf2346a-73fa-47e9-8aa8-0f907f4c4e48",
+      "areas": [
+        {
+          "area_id": "f657dc8e-5c14-49a3-af77-eaed8f245fee",
+          "title": "入庫與上架",
+          "scope_text": "品項確認、上架與登記。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "937705ee-50e5-4afc-9761-0dc34de8f613",
+          "area_id": "f657dc8e-5c14-49a3-af77-eaed8f245fee",
+          "title": "核對品項並上架",
+          "description": "上架前掃碼確認品項，依安排放貨、貼標籤並登記；不符先核對單據並通知主管，不自行改品項或決定儲位。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "cbf2346a-73fa-47e9-8aa8-0f907f4c4e48",
+      "references": [
+        {
+          "citation_id": "8a103376-b32e-4662-8d49-929341b950fe",
+          "target_label": "任務：核對品項並上架",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "937705ee-50e5-4afc-9761-0dc34de8f613",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "9a6ee8e4-c287-458b-920b-2309e393f052",
+      "exchange": {
+        "employee_input": {
+          "source_id": "5f2294f8-92a2-48bb-84f9-fb5b2e5319d8",
+          "interview_sequence": 8,
+          "speaker": "employee",
+          "interview_text": "我主要就是照安排上架、貼標籤和登記入庫，沒有另外負責收貨、揀貨、出貨或盤點。目前想不到其他補充，你可以帶著我說。"
+        },
+        "consultant_reply": {
+          "source_id": "43c758e1-56e8-4b1b-827d-5f6e9bb957be",
+          "interview_sequence": 9,
+          "speaker": "consultant",
+          "interview_text": "了解。目前已確認的工作是依安排上架、貼標籤及登記入庫；品項不符時先核對單據並通知主管，不自行更改品項或決定儲位。我已把上架完成的結果補進目前底稿，也記下你不另外負責收貨、揀貨、出貨或盤點。\n\n我們換個角度回想：從開始工作到交班，除了逐批上架外，你還會固定做哪些準備、整理或收尾工作嗎？例如整理作業區、交接尚未上架的貨物；只要說實際會做的就好，如果沒有也可以直接說沒有。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 335062,
+    "output_tokens": 12118,
+    "reasoning_tokens": 9653,
+    "cached_input_tokens": 319541,
+    "cache_write_input_tokens": 15461,
+    "total_tokens": 347180,
+    "outbound_calls": 43,
+    "count_calls": 23,
+    "generation_calls": 20,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 335062,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.065981670",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0023",
+    "actual_estimated_usd": "0.011193035",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.013493035",
+    "cumulative_occupied_usd": "0.013493035",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 182.17819609999424,
+    "seconds_limit": 645,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 407160,
+    "output_tokens": 14893,
+    "reasoning_tokens": 11947,
+    "cached_input_tokens": 387708,
+    "cache_write_input_tokens": 19377,
+    "total_tokens": 422053,
+    "outbound_calls": 54,
+    "count_calls": 29,
+    "generation_calls": 25,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 407160,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.065981670",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0029",
+    "actual_estimated_usd": "0.013753205",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.016653205",
+    "cumulative_occupied_usd": "0.016653205",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 222.6527627999967,
+    "seconds_limit": 645,
+    "stop_reason": null
+  }
+}

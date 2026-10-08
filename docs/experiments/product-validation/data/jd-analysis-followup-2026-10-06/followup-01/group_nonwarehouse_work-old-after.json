@@ -1,0 +1,208 @@
+{
+  "profile": {
+    "revision_id": "a6f82381-3df7-4cc5-92bd-852a05d7bd50",
+    "profile": {
+      "job_title": null,
+      "organization_unit": "客服部",
+      "reports_to": null,
+      "purpose": "透過回應客戶使用問題、查核訂單與操作紀錄，並將需技術處理的問題轉交相關同事；另彙整客訴類型、件數及未結案件，協助客戶問題獲得處理並讓主管掌握常見問題。"
+    }
+  },
+  "work": {
+    "revision_id": "a6f82381-3df7-4cc5-92bd-852a05d7bd50",
+    "areas": [
+      {
+        "area_id": "94c671ef-29eb-411d-8b54-90f6fc8e9d2d",
+        "title": "客服部日常工作",
+        "scope_text": "回應客戶問題及整理每週客訴資料。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "2f2469c2-0efa-4544-85bd-3bbe4dba150d",
+        "area_id": "94c671ef-29eb-411d-8b54-90f6fc8e9d2d",
+        "title": "回應客戶使用問題",
+        "description": "每天受理問題，核對訂單與操作紀錄；無法處理轉交技術同事，不決定退款。",
+        "outcomes": [
+          {
+            "detail_id": "acfb874f-0748-4a97-b3f4-16adbc9b6c61",
+            "text": "客戶提出的使用問題獲得受理與處理；需要技術協助的問題轉交技術同事。"
+          }
+        ],
+        "requirements": []
+      },
+      {
+        "task_id": "6f271ac0-05a0-4de2-8bbc-70fb7902934d",
+        "area_id": "94c671ef-29eb-411d-8b54-90f6fc8e9d2d",
+        "title": "整理每週客訴資料",
+        "description": "每週五整理類型、件數和未結案清單給主管，由主管決定改善，不分派工作。",
+        "outcomes": [
+          {
+            "detail_id": "a0b9d447-e208-4bb8-9424-9a50ef2c232d",
+            "text": "主管可透過每週客訴類型、件數及未結案清單，掌握常見問題與未結案件。"
+          }
+        ],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "a6f82381-3df7-4cc5-92bd-852a05d7bd50",
+    "references": [
+      {
+        "citation_id": "bdbffcbf-4722-4ca3-9cd6-073573ae3974",
+        "target_label": "任務：回應客戶使用問題",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "2f2469c2-0efa-4544-85bd-3bbe4dba150d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "cf8d8561-d229-4f8a-9517-6657ca675457",
+        "target_label": "任務：整理每週客訴資料",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "6f271ac0-05a0-4de2-8bbc-70fb7902934d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "3e3f5c4f-130b-4b50-b214-4e06a80903ec",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "a067e9f2-3dfa-46d5-862b-4299ca0b61d2",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "78c7e182-9002-45a3-bfd5-de5903d4de2d",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "9eb22ee2-b43b-47d4-98bf-e02558fa625c",
+        "target_label": "所屬單位",
+        "target": {
+          "kind": "profile_field",
+          "field": "organization_unit",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "eea966af-887b-44dc-b538-ee8ee7841a13",
+        "target_label": "任務：回應客戶使用問題 · 成果：客戶提出的使用問題獲得受理與處理；需要技術協助的問題轉交技術同事。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "acfb874f-0748-4a97-b3f4-16adbc9b6c61",
+          "task_id": "2f2469c2-0efa-4544-85bd-3bbe4dba150d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "14219811-4d54-4706-a184-6f53cd0619bf",
+        "target_label": "任務：回應客戶使用問題 · 成果：客戶提出的使用問題獲得受理與處理；需要技術協助的問題轉交技術同事。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "acfb874f-0748-4a97-b3f4-16adbc9b6c61",
+          "task_id": "2f2469c2-0efa-4544-85bd-3bbe4dba150d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "42416112-c67b-48d8-8f49-edd4506128ac",
+        "target_label": "任務：整理每週客訴資料 · 成果：主管可透過每週客訴類型、件數及未結案清單，掌握常見問題與未結案件。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "a0b9d447-e208-4bb8-9424-9a50ef2c232d",
+          "task_id": "6f271ac0-05a0-4de2-8bbc-70fb7902934d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "519a876c-3f8c-4a65-821a-edf5980d6edd",
+        "target_label": "任務：整理每週客訴資料 · 成果：主管可透過每週客訴類型、件數及未結案清單，掌握常見問題與未結案件。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "a0b9d447-e208-4bb8-9424-9a50ef2c232d",
+          "task_id": "6f271ac0-05a0-4de2-8bbc-70fb7902934d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

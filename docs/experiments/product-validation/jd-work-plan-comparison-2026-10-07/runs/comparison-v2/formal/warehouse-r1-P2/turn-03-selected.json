@@ -1,0 +1,41 @@
+{
+  "question_id": "3d992a4fc48b457687b6a77b3f4067ef",
+  "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+  "audit": {
+    "actual_question": "明白，外包裝破損時的處理先保留為未知；若之後沒有新線索，我不會再追問同一點。\n\n談到上架，平常您會先收到什麼資訊或安排？接著您自己會怎麼把貨上架？",
+    "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+    "fact_ids": [
+      "shelving"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "shelving"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際改問一般上架的依據／安排及本人作法，shelving 的已規劃儲位、放貨貼標與 WMS 登記直接相關。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "平常您會先收到什麼資訊或安排？",
+        "mode": "answer",
+        "fact_ids": [
+          "shelving"
+        ],
+        "reason": "上架依據為已規劃儲位，臨時不足則找組長調位置，能回應所問既有安排。"
+      },
+      {
+        "quote": "接著您自己會怎麼把貨上架？",
+        "mode": "answer",
+        "fact_ids": [
+          "shelving"
+        ],
+        "reason": "按儲位放貨、貼品項批號標籤、掃碼入庫並核實儲位與搬運分工均為直接相關流程。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

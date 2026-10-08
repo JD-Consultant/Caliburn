@@ -1,0 +1,78 @@
+{
+  "frozen_files_verified": 369,
+  "resource_files_verified": 39,
+  "consultant_instructions_sha256": "baf54b3fffd897cc1891767985e5fb2e5aa78f5a69306f706d930e5b2b8fad23",
+  "role_counts": {
+    "A": {
+      "tools": {
+        "read_jd": 40,
+        "revise_jd_profile": 2,
+        "create_jd_item": 13,
+        "create_jd_task": 6,
+        "request_memory_consolidation": 9,
+        "revise_jd_item": 24,
+        "read_interview": 6,
+        "search_occupation_references": 1,
+        "read_occupation_reference": 2,
+        "read_work_understanding": 1
+      },
+      "usage": {
+        "input_tokens": 3958897,
+        "output_tokens": 71883
+      }
+    },
+    "Memory": {
+      "tools": {
+        "read_work_situation_map": 19,
+        "create_work_situation": 1,
+        "read_work_understanding_map": 9,
+        "read_work_situation": 18,
+        "read_interview": 18,
+        "create_work_understanding": 1,
+        "update_work_situation": 11,
+        "read_work_understanding": 9,
+        "update_work_understanding": 9,
+        "read_excluded_work": 10
+      },
+      "usage": {
+        "input_tokens": 1876281,
+        "output_tokens": 36534
+      }
+    }
+  },
+  "unique_tool_results": 207,
+  "rejected_calls": [
+    {
+      "call_id": "call_zfUwhis9l1Um58Ds03LjkKor",
+      "call": {
+        "time": "2026-10-06T14:53:27.532522+00:00",
+        "name": "revise_jd_item",
+        "arguments": "{\"read_ref\":\"task_6\",\"changes\":[{\"action\":\"set_field\",\"field\":\"description\",\"value\":\"執行進貨收貨驗收並將貨品上架；以採購單和送貨單核對實際到貨品項與數量。發現不符時拍照、告知採購並回報倉儲主管。\"},{\"action\":\"add_source\",\"target\":{\"kind\":\"item\"},\"source\":{\"kind\":\"current_input\"}},{\"action\":\"add_detail\",\"kind\":\"outcome\",\"text\":\"到貨差異資訊及照片提供採購與倉儲主管，供採購決定是否收貨或退回供應商。\",\"supporting_sources\":[{\"kind\":\"current_input\"}]},{\"action\":\"add_detail\",\"kind\":\"requirement\",\"text\":\"本人不自行決定是否收貨或退回供應商，後續由採購決定。\",\"supporting_sources\":[{\"kind\":\"current_input\"}]},{\"action\":\"add_source\",\"target\":{\"kind\":\"item\"},\"source\":{\"kind\":\"current_input\"}}]}"
+      },
+      "result": {
+        "status": "rejected",
+        "code": "invalid_arguments",
+        "message": "欄位、內容或來源選取不合法，本次未改。",
+        "next_action": "依工具格式提交；各欄只改一次，來源選目前可見內容，不猜來源或引用代號。"
+      }
+    }
+  ],
+  "max_counted_input_tokens": 117910,
+  "jd_at_turn": 19,
+  "jd_revision_id": "d6b002e1-8c7b-435c-864e-0fdd07ed6d75",
+  "areas": 4,
+  "tasks": 6,
+  "capabilities": {
+    "skill": 1,
+    "knowledge": 1
+  },
+  "task_links": 2,
+  "collaborators": 4,
+  "conditions": 3,
+  "current_sources": 58,
+  "source_kinds": {
+    "interview": 58
+  },
+  "pending_recheck": 1,
+  "scope": "Observable counts only; not a completeness score or causal comparison"
+}

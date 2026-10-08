@@ -1,0 +1,32 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "您先前提到早上七點上班，也提到晚班交接。您的班別通常是固定早班，還是也會輪值晚班？交班表是您值晚班時填寫，還是由您和晚班同事交接？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "現有七點上班與晚班交接內容不足以確定固定早班／輪晚班安排，也未提供交班表在何班別、由何方填寫的分工。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "您的班別通常是固定早班，還是也會輪值晚班？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "凍結事實未提供輪班制度或本人是否輪值晚班，不能由交接用語推定。"
+      },
+      {
+        "quote": "交班表是您值晚班時填寫，還是由您和晚班同事交接？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "交班表內容已知，但填寫時本人班別及交接方向未明示，保留未知。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

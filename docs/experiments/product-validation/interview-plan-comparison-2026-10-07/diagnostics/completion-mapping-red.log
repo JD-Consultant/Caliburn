@@ -1,0 +1,50 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_ test_non_mapping_completion_evidence_cannot_mean_all_cases_unstarted[results0] _
+
+results = []
+
+    @pytest.mark.parametrize("results", [[], "", None])
+    def test_non_mapping_completion_evidence_cannot_mean_all_cases_unstarted(results):
+>       with pytest.raises(ValueError, match="completion evidence"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:61: Failed
+___ test_non_mapping_completion_evidence_cannot_mean_all_cases_unstarted[] ____
+
+results = ''
+
+    @pytest.mark.parametrize("results", [[], "", None])
+    def test_non_mapping_completion_evidence_cannot_mean_all_cases_unstarted(results):
+>       with pytest.raises(ValueError, match="completion evidence"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:61: Failed
+_ test_non_mapping_completion_evidence_cannot_mean_all_cases_unstarted[None] __
+
+results = None
+
+    @pytest.mark.parametrize("results", [[], "", None])
+    def test_non_mapping_completion_evidence_cannot_mean_all_cases_unstarted(results):
+        with pytest.raises(ValueError, match="completion evidence"):
+>           remaining_cases(results)
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+results = None
+
+    def remaining_cases(results):
+        """Preserve completed bounded interviews without consulting their quality."""
+>       if set(results) - set(SCHEDULED):
+           ^^^^^^^^^^^^
+E       TypeError: 'NoneType' object is not iterable
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\completion_batch.py:64: TypeError
+=========================== short test summary info ===========================
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_non_mapping_completion_evidence_cannot_mean_all_cases_unstarted[results0]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_non_mapping_completion_evidence_cannot_mean_all_cases_unstarted[]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_non_mapping_completion_evidence_cannot_mean_all_cases_unstarted[None]
+3 failed, 30 deselected in 0.09s

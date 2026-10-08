@@ -1,0 +1,32 @@
+{
+  "question_id": "d77a92145aea404fa747a94c15b32f59",
+  "mode": "answer",
+  "fact_ids": [
+    "supplier-returns"
+  ],
+  "reason": "供應商退貨的本人流程與交接可披露 supplier-returns；最近一次退貨的具體起因未有凍結事實，不把採購決定貨品當成退貨原因。",
+  "subquestions": [
+    {
+      "quote": "最近一次處理時，退貨是因為什麼情況開始的？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "未提供最近一次退貨的原因或發生情況。"
+    },
+    {
+      "quote": "您本人做了哪些事",
+      "mode": "answer",
+      "fact_ids": [
+        "supplier-returns"
+      ],
+      "reason": "按採購退貨單備貨、核數量、拍照及登記出庫直接回答本人工作。"
+    },
+    {
+      "quote": "最後交接給誰？",
+      "mode": "answer",
+      "fact_ids": [
+        "supplier-returns"
+      ],
+      "reason": "交承運商簽收並回傳採購為凍結交接流程；同時保留供應商退貨是出庫的更正。"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "profile": {
+    "revision_id": "d7697cdd-8232-4c40-a7cf-3491741ec023",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依已確認設計實作網站頁面。"
+    }
+  },
+  "work": {
+    "revision_id": "d7697cdd-8232-4c40-a7cf-3491741ec023",
+    "areas": [
+      {
+        "area_id": "1baa8234-cef7-4efc-a664-dcc836a36083",
+        "title": "網站頁面交付",
+        "scope_text": "依已確認設計實作頁面，不決定設計變更。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "ccff199c-86f9-4184-9e49-bed7896104cf",
+        "area_id": "1baa8234-cef7-4efc-a664-dcc836a36083",
+        "title": "實作網站頁面",
+        "description": "每週依確認設計稿完成頁面，設計變更由產品主管決定。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "d7697cdd-8232-4c40-a7cf-3491741ec023",
+    "references": [
+      {
+        "citation_id": "3a11626e-aa68-44fd-a04d-8b63a190b5c8",
+        "target_label": "任務：實作網站頁面",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "ccff199c-86f9-4184-9e49-bed7896104cf",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

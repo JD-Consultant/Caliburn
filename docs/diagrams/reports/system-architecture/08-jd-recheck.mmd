@@ -1,0 +1,12 @@
+%% title: 現行基本流程：JD 局部來源核對
+%% legend: 終端形：本段起訖；矩形：動作；菱形：判斷；箭頭：控制先後。省略取消與提交故障。
+%%{init: {"flowchart": {"wrappingWidth": 280}}}%%
+flowchart TB
+    START([A 開始核對<br/>受影響的 JD 依據]) --> D[App 比較既有引用基準<br/>與本 Turn 固定 Memory 來源]
+    D --> A[A 按需讀 diff 與新版資料]
+    A --> Q{資訊足以核對？}
+    Q -->|不足| ASK[保留待核對<br/>依線索選擇追問或延後]
+    Q -->|足夠| EDIT[維持或調整 JD<br/>明確確認對應依據]
+    EDIT --> SAVE[本輪完成交易<br/>一併採用並保存新的核對基準]
+    SAVE --> END([本次核對已採用])
+    ASK --> WAIT([本次保留未釐清部分])

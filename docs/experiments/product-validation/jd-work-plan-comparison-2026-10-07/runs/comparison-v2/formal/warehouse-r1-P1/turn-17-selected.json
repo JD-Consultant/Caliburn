@@ -1,0 +1,33 @@
+{
+  "question_id": "fa4e6ef7558a44918d2e73c1ce3ba1dd",
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "好，早晚溫度查看是否都由您本人負責，先保留未確認，不作推測。\n\n您也提到「晚班交接」，而原先說早上七點上班。您本人會輪值晚班嗎？還是您在其他班別下班時，把未完成事項交給晚班同事？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "本題專問本人是否輪晚班或向晚班交接的班別身分；初始上班時間與旺季晚班交接內容沒有確定輪班及交接方向，不能推定。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "您本人會輪值晚班嗎？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "凍結事實只有早上七點上班與晚班交接事項，未提供本人輪值晚班安排。"
+      },
+      {
+        "quote": "還是您在其他班別下班時，把未完成事項交給晚班同事？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "晚班交接的發出／接收班別未明示，不能把交接內容當成其方向與本人班別的答案。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

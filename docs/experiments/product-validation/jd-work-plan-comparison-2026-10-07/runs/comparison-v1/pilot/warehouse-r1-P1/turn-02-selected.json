@@ -1,0 +1,41 @@
+{
+  "question_id": "0f20ab522a7b43179df113f8ce0274e8",
+  "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？\n\n關於你問的「並交接給誰？」，我目前沒有確定資料，請保留未知，不補猜。",
+  "audit": {
+    "actual_question": "已把收貨任務補上逐箱點件、核對品項／數量／外包裝、填寫收貨異常表與通知採購；也記下須等採購回覆後依結果登記入庫，以及您不議價、不選供應商、不決定拒收或退換貨。貨品在等待回覆期間如何放置，我會保留未知。\n\n接著想了解庫存盤點：如果實盤數量和帳面數量對不上，您通常會怎麼處理，並交接給誰？",
+    "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？\n\n關於你問的「並交接給誰？」，我目前沒有確定資料，請保留未知，不補猜。",
+    "fact_ids": [
+      "inventory-partial"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "inventory-partial"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉問盤點帳實差異，首次可披露循環盤點與複點流程；後續交接權責目前未想起，尚未符合回访答案條件。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [
+      "並交接給誰？"
+    ],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "如果實盤數量和帳面數量對不上，您通常會怎麼處理",
+        "mode": "answer",
+        "fact_ids": [
+          "inventory-partial"
+        ],
+        "reason": "直接詢問庫存差異處理，可披露先查入出庫、移庫紀錄及複點，也保留凍結回答中的暫時缺口及換題意願。"
+      },
+      {
+        "quote": "並交接給誰？",
+        "mode": "unknown",
+        "fact_ids": [],
+        "reason": "當前尚未披露 training，inventory-authority 不可取得；先保留目前未想起的後續交接權責。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

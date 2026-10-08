@@ -1,5 +1,7 @@
 # LLM 訪談式撰寫職務說明書 — 終局藍圖研究
 
+> 時點說明：本文保留 2026-07-02 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 > **類型**:研究紀錄(需求定義 + 現有地基 + 五軸權威研究 + 綜合方向)。**只研究、未改碼**;
 > 落實前各自開 ADR / plan。
 > **日期**:2026-07-02
@@ -26,11 +28,11 @@
 
 | 終局需求 | 現有對應物 | 檔案 |
 |---|---|---|
-| 粗描 → 檢索職類 → 彈選單 | `pick_profile`(search_occupations → **interrupt 候選** → 有序複選 → 落 DB) | [nodes.py](../../../apps/api/app/authoring/nodes.py) |
-| 深問工作細節 | `star → five_w2h → indicator` 逐任務 loop(**STAR + 5W2H**,interrupt 驅動;刻意單層) | [deep_nodes.py](../../../apps/api/app/authoring/deep_nodes.py)、[graph.py](../../../apps/api/app/authoring/graph.py) |
-| 公版反推 + 確認 | `extract_tasks`(自述+公版候選 → LLM 挑 id,**自創 id 丟棄**;額外提及 → custom 候選) | [extract_tasks.py](../../../apps/api/app/services/ai/extract_tasks.py) |
-| K/S/態度勾選 | `fetch_ksa_pool → curate_ks → curate_attitudes`(池內 interrupt 勾選) | [curate_nodes.py](../../../apps/api/app/authoring/curate_nodes.py) |
-| 人直接改文件 | D27 文件工作台(REST PATCH)+ `ai/*` proposal-apply | [documents.py](../../../apps/api/app/api/routes/documents.py) |
+| 粗描 → 檢索職類 → 彈選單 | `pick_profile`(search_occupations → **interrupt 候選** → 有序複選 → 落 DB) | [nodes.py](../../history.md#source-51677e4473c9a995d591) |
+| 深問工作細節 | `star → five_w2h → indicator` 逐任務 loop(**STAR + 5W2H**,interrupt 驅動;刻意單層) | [deep_nodes.py](../../history.md#source-44def228ee82f16a68f6)、[graph.py](../../history.md#source-1ba5ee3639e73ec94c16) |
+| 公版反推 + 確認 | `extract_tasks`(自述+公版候選 → LLM 挑 id,**自創 id 丟棄**;額外提及 → custom 候選) | [extract_tasks.py](../../history.md#source-4d4770b578b058b13ed9) |
+| K/S/態度勾選 | `fetch_ksa_pool → curate_ks → curate_attitudes`(池內 interrupt 勾選) | [curate_nodes.py](../../history.md#source-6b3178818acd5fae1fdf) |
+| 人直接改文件 | D27 文件工作台(REST PATCH)+ `ai/*` proposal-apply | [documents.py](../../history.md#source-ba942110b8bc0294b0b0) |
 | 溯源 | 文件 `_ref` provenance + 契約 `CitableItem.code/sources` | ADR 0011/0016 |
 
 **Gap**:訪談 graph(`/copilotkit`,`DocRepo.save` 寫新版本)與文件工作台(REST PATCH 就地更新 draft)

@@ -1,0 +1,180 @@
+{
+  "job_file_id": "8f61b13c-8560-45da-b287-0e7ea548db66",
+  "execution_id": "59cbe851-2c5b-43c5-a120-93af70a88b01",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "今天先到這裡。請把目前已確認的工作整理、保存成正式職務說明書，檢查各欄是否一致；尚未取得或說不清的內容請指出，不補猜，我沒有新增事實。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心收貨驗收、上架、揀貨補貨、庫存盤點及退貨處理，並帶領新人，維持倉務作業與庫存管理運作。"
+    },
+    "work": {
+      "revision_id": "b9917ad8-ca58-4da7-a81a-60903bd93f00",
+      "areas": [
+        {
+          "area_id": "73b22424-74c2-48bb-bdd3-8f661a7e8393",
+          "title": "收貨與入庫",
+          "scope_text": "負責進貨驗收及貨品上架。"
+        },
+        {
+          "area_id": "5ce52d51-877c-4d86-926c-29b163eeda96",
+          "title": "揀貨與補貨",
+          "scope_text": "負責倉內揀貨及補貨作業。"
+        },
+        {
+          "area_id": "ca0b9090-403c-4dd4-a12b-356a23ec705e",
+          "title": "庫存盤點",
+          "scope_text": "負責庫存盤點作業。"
+        },
+        {
+          "area_id": "ea0dc06d-f07a-423a-9de0-4a3c4489b605",
+          "title": "退貨處理",
+          "scope_text": "負責客戶退貨及供應商退貨作業。"
+        },
+        {
+          "area_id": "3970b139-ae4b-4fa1-a900-2a8eebd85a69",
+          "title": "新人帶教",
+          "scope_text": "負責帶領新人。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "28db387e-4055-4c23-8dd6-3e5e73dd31df",
+          "area_id": "73b22424-74c2-48bb-bdd3-8f661a7e8393",
+          "title": "進貨驗收與差異通報",
+          "description": "逐箱點件，核對品項、數量及外包裝與送貨單；發現差異時登記收貨異常表、拍照並通知採購。採購回覆要補送或接受後，依結果登記入庫。本人不議價、不選供應商，也不決定拒收或退換貨。",
+          "outcomes": [
+            {
+              "detail_id": "520954fb-1f61-4eea-8fc4-9168b6606004",
+              "text": "收貨異常登記於收貨異常表、拍照並通知採購；依採購回覆結果登記入庫。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "77212d0d-0c72-4fa7-a1d9-b4b31919e05c",
+              "text": "逐箱點件，核對品項、數量及外包裝與送貨單。"
+            }
+          ]
+        },
+        {
+          "task_id": "a49fa663-e0cb-4894-a37a-6e56c94ea3c8",
+          "area_id": "73b22424-74c2-48bb-bdd3-8f661a7e8393",
+          "title": "貨品上架",
+          "description": "執行貨品上架作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "46e704f1-d27c-403b-a44a-74e98abb66c5",
+          "area_id": "5ce52d51-877c-4d86-926c-29b163eeda96",
+          "title": "揀貨",
+          "description": "執行倉內揀貨作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "646941bb-21db-4013-a2d7-fdc06905f0c2",
+          "area_id": "5ce52d51-877c-4d86-926c-29b163eeda96",
+          "title": "補貨",
+          "description": "執行倉內補貨作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "512d629f-8764-49f7-8075-01f1f5cd638f",
+          "area_id": "ca0b9090-403c-4dd4-a12b-356a23ec705e",
+          "title": "庫存盤點",
+          "description": "每週執行循環盤點；發現差異時查最近入出庫及移庫紀錄後複點，再將差異、查過的單據及原因寫入盤點差異表，送倉儲主管核准。主管核准後交財務調帳；結案前核對更新後數量。原因未明時保留待查。本人不能直接修改庫存數量。",
+          "outcomes": [
+            {
+              "detail_id": "90ecfe2c-41d0-4ba0-9062-9c3739e0861a",
+              "text": "盤點差異有表單紀錄並送主管核准；原因未明者保留待查，財務調帳後由本人核對更新後數量。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "508c87f0-3624-469d-b75a-274ad041c3d5",
+              "text": "盤點差異須由倉儲主管核准並交財務調帳；本人不能直接修改庫存數量。"
+            }
+          ]
+        },
+        {
+          "task_id": "7aaf0419-d624-4bd3-aa20-41b4b24e2e6e",
+          "area_id": "ea0dc06d-f07a-423a-9de0-4a3c4489b605",
+          "title": "客戶退貨處理",
+          "description": "處理客戶退貨。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "923e56ee-85ed-4b34-b69d-76f3ce43205b",
+          "area_id": "ea0dc06d-f07a-423a-9de0-4a3c4489b605",
+          "title": "供應商退貨處理",
+          "description": "處理供應商退貨。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "29264405-6212-4dd6-852b-4a956c941d42",
+          "area_id": "3970b139-ae4b-4fa1-a900-2a8eebd85a69",
+          "title": "新人帶教",
+          "description": "新人第一週示範掃碼、揀貨與安全動線，再讓新人跟著操作；當場觀察是否漏掃、拿錯批號或走入車道，並記錄於帶教檢核表，據此判斷新人能否自己上線。",
+          "outcomes": [
+            {
+              "detail_id": "955e2778-58b4-4ab8-8dd2-715d50d3a273",
+              "text": "帶教檢核表記錄新人實作觀察，並形成其能否自己上線的判斷。"
+            }
+          ],
+          "requirements": []
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_id": "b410bc6f-c523-4991-a53e-b6a7b9fd47b7",
+          "kind": "skill",
+          "name": "新人作業示範與現場評估",
+          "description": "能示範倉務作業與安全動線，觀察新人實作、記錄問題，並判斷是否能自行上線。"
+        }
+      ],
+      "task_links": [
+        {
+          "task_id": "29264405-6212-4dd6-852b-4a956c941d42",
+          "capability_id": "b410bc6f-c523-4991-a53e-b6a7b9fd47b7"
+        }
+      ],
+      "collaborators": [
+        {
+          "collaborator_id": "5dfd120e-450f-48db-8dc6-9544c5c9c1e0",
+          "name": "採購",
+          "scope_text": "接收收貨差異資訊並回覆補送或接受等處理方式；倉庫管理員依回覆登記入庫，不負責議價、供應商選擇或決定拒收與退換貨。"
+        },
+        {
+          "collaborator_id": "835f460b-a474-4ad5-ab6a-8beb30a30c6e",
+          "name": "倉儲主管",
+          "scope_text": "核准盤點差異；核准後交財務調帳。"
+        },
+        {
+          "collaborator_id": "05d5e61d-e19a-4667-b154-695dc23f2d93",
+          "name": "財務",
+          "scope_text": "依倉儲主管核准的盤點差異辦理調帳。"
+        }
+      ],
+      "conditions": [
+        {
+          "condition_id": "d4097d1a-e833-4ee2-9558-2dbfbe694892",
+          "kind": "schedule_travel",
+          "text": "早上七點上班；週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "plan_preview": null,
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

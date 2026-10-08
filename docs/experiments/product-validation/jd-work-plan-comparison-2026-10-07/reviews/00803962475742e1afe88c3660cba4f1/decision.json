@@ -1,0 +1,18 @@
+{
+  "question_id": "00803962475742e1afe88c3660cba4f1",
+  "mode": "answer",
+  "fact_ids": [
+    "peak-season"
+  ],
+  "reason": "問題聚焦一年中特別繁忙時段及工作量／時序影響，peak-season 的雙十一與春節前出貨增量和波次順序直接相關；不是一般年度工作廣度提問。",
+  "subquestions": [
+    {
+      "quote": "一年中有沒有特別忙的時段，會明顯增加您的工作量或改變完成時限？",
+      "mode": "answer",
+      "fact_ids": [
+        "peak-season"
+      ],
+      "reason": "雙十一和春節前出貨約兩倍、依組長急單與波次調整順序並交班，能回答所問尖峰負荷與工作安排。"
+    }
+  ]
+}

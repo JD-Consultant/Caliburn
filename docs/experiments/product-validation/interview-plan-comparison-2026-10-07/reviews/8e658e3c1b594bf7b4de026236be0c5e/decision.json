@@ -1,0 +1,8 @@
+{
+  "question_id": "8e658e3c1b594bf7b4de026236be0c5e",
+  "fact_ids": [],
+  "mode": "no_question",
+  "reason": "實際內容是確認未知、摘要現有範圍、提示核對並提出收束，沒有新增具體提問。不能由未披露清單補題或釋出新事實，也不把無提問分類為真正未知；中性提醒或共同收束由 harness 依既定額度決定。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

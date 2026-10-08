@@ -1,0 +1,62 @@
+{
+  "question_id": "8e658e3c1b594bf7b4de026236be0c5e",
+  "profile": "warehouse",
+  "actual_question": "了解，旺季工時或班別是否改變目前也保留未知，不推定加班或排班方式。\n\n目前底稿已整理您提到的收貨與上架、揀貨補貨、每週及年度盤點、冷藏區巡查、兩類退貨和新人帶教，也納入旺季揀貨調序與晚班交接。年度盤點分區與表單細節，以及冷藏讀數記錄、作業輪替和旺季班別等未能確認的部分，都會保留未知；不會補猜。\n\n您可以先核對目前整理的工作範圍和責任界線。若沒有其他工作要補充或更正，這輪訪談可以先告一段落。",
+  "disclosed": [
+    "annual-count",
+    "cold-storage",
+    "customer-returns",
+    "inventory-authority",
+    "inventory-partial",
+    "peak-season",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training",
+    "training-boundary"
+  ],
+  "open_gaps": [],
+  "seen_topics": [
+    "annual",
+    "conditions",
+    "customer-returns",
+    "inventory",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "receiving",
+    "customer-returns",
+    "supplier-returns",
+    "picking",
+    "inventory-partial",
+    "training",
+    "training-boundary",
+    "training-boundary",
+    "shelving",
+    "inventory-authority",
+    "cold-storage",
+    "peak-season",
+    "annual-count"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 5
+  },
+  "recent_employee_originals": [
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。"
+  ],
+  "candidate": {
+    "actual_question": "您可以先核對目前整理的工作範圍和責任界線。若沒有其他工作要補充或更正，這輪訪談可以先告一段落。",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分；若要釐清，可以具體問我實際做的步驟或責任。",
+    "fact_id": null,
+    "unmapped_or_already_answered": true
+  }
+}

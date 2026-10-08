@@ -1,0 +1,8 @@
+{
+  "question_id": "e85fe79403464f4f86dfe87e03c05b9e",
+  "fact_ids": ["training-boundary"],
+  "mode": "answer",
+  "reason": "training 已實際披露，本題再確認未達要求後的安排與上線決定，符合同題責任追問，可披露 training-boundary 更正批准權限與再訓練處理。固定資料沒有檢核表正式通過標準，不由觀察項目推定。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": ["檢核表是否有明確的通過標準？"]
+}

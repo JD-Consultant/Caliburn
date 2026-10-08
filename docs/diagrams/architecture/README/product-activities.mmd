@@ -1,0 +1,12 @@
+flowchart LR
+  %% diagram: product-activities
+  start([開始]) --> open[開啟職務檔案]
+  open --> choice{操作者下一步？}
+  choice -->|訪談| interview[說明工作、釐清與分析]
+  interview --> review[回看回答與目前 JD]
+  choice -->|人工編修| edit[編輯 JD 並保存]
+  edit --> review
+  review --> choice
+  choice -->|匯出| pdf[/取得目前正式 JD 的 PDF/]
+  pdf --> choice
+  choice -->|本次結束| finish([結束本次使用])

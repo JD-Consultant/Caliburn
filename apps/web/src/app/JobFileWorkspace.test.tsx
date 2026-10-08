@@ -56,6 +56,7 @@ function turnBody(status: 'active' | 'paused' | 'cancelled') {
     input_text: '尚非正式的輸入',
     allowed_controls: live ? ['cancel'] : [],
     commentary: [],
+    plan_preview: null,
     candidate: live ? { profile: { ...profile.profile, job_title: '候選工程師' }, work } : null,
   };
 }

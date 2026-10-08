@@ -1,0 +1,308 @@
+{
+  "question_id": "a0360959e6c249a096ce59b09d34fc63",
+  "review_kind": "manual_jd_edit",
+  "current_jd": {
+    "revision_id": "752c13ec-9599-437e-96b0-d1608266ac86",
+    "areas": [
+      {
+        "area_id": "8a83b931-0347-4acb-976e-b8659aa74cb3",
+        "title": "收貨與入庫",
+        "scope_text": "負責進貨驗收與上架；查核數量差異並通報採購，依採購回覆登記入庫；拒收或退換貨不由本人決定。"
+      },
+      {
+        "area_id": "7c81b480-22ac-4b86-acbc-64f621d778b7",
+        "title": "揀貨、補貨與庫存",
+        "scope_text": "負責揀貨、補貨及庫存盤點作業。"
+      },
+      {
+        "area_id": "ca918d06-431d-479e-a3ff-785e860fa403",
+        "title": "退貨作業",
+        "scope_text": "涵蓋客戶退貨的檢查、分類、入庫、隔離與交接，以及依採購決定辦理供應商退貨出庫；本人不決定客戶退款或供應商退貨條件。"
+      },
+      {
+        "area_id": "3c4aac42-ac03-4427-a63a-540fb7725dfa",
+        "title": "新人帶教",
+        "scope_text": "新人第一週由本人示範、帶做並記錄操作觀察，向組長回報；反覆錯誤由組長安排再訓練，新人是否能獨立上線由主管核准。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "26979991-707e-4e99-bdc8-664de26bce8f",
+        "area_id": "8a83b931-0347-4acb-976e-b8659aa74cb3",
+        "title": "收貨驗收與上架",
+        "description": "逐箱點件，核對品項、數量、外包裝及送貨單，並負責貨品上架。發現差異時，拍照、登記收貨異常表並通知採購；收到採購關於補送或接受的回覆後，依回覆結果登記入庫。不議價、不選供應商，也不決定是否拒收。",
+        "outcomes": [
+          {
+            "detail_id": "25f8004a-47a1-4c17-b3ae-d942db497881",
+            "text": "進貨差異拍照佐證、登記於收貨異常表並通知採購。"
+          },
+          {
+            "detail_id": "1dcd078c-1b90-4699-af5b-0fe982dc1e66",
+            "text": "收到採購關於補送或接受的回覆後，依回覆結果登記入庫。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "ed2f6335-e8db-4cfa-808a-c433d41c92a8",
+            "text": "拒收或退換貨不由本人決定。"
+          },
+          {
+            "detail_id": "e5ffb8f8-0e7f-45b6-aab4-5014bfaa68e4",
+            "text": "不議價或選擇供應商。"
+          }
+        ]
+      },
+      {
+        "task_id": "eeb9c6c6-a478-44d8-b5dd-1fd6d46ffaf8",
+        "area_id": "7c81b480-22ac-4b86-acbc-64f621d778b7",
+        "title": "揀貨",
+        "description": "依出貨波次單揀貨，核對品項、數量、批號及效期。若系統顯示有貨但儲位空缺，先查移庫與前一波次；不擅自拿其他批號替代，異常交組長協調。",
+        "outcomes": [
+          {
+            "detail_id": "6ea3b099-422b-4f3a-a964-b29522ca7ed0",
+            "text": "揀貨完成後交包裝區複核。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "ba06e9b8-2a7e-41fb-8792-5f2e65236e2e",
+            "text": "須於截單時間前完成揀貨。"
+          },
+          {
+            "detail_id": "5fec1429-7a4e-4a55-ae71-07c5738cdd1e",
+            "text": "系統顯示有貨但儲位空缺時，不擅自拿其他批號替代，並將異常交組長協調。"
+          }
+        ]
+      },
+      {
+        "task_id": "e4c70b8a-6649-42d6-a468-8d8d2a1b0e43",
+        "area_id": "7c81b480-22ac-4b86-acbc-64f621d778b7",
+        "title": "補貨",
+        "description": "揀貨區不足時，從備貨區補貨。",
+        "outcomes": [
+          {
+            "detail_id": "badd3171-ef85-456e-bef6-f13bf2405dbe",
+            "text": "將備貨區貨品補至揀貨區，供揀貨作業使用。"
+          }
+        ],
+        "requirements": []
+      },
+      {
+        "task_id": "42de1695-45c6-4b94-8510-ebcecfc361b9",
+        "area_id": "7c81b480-22ac-4b86-acbc-64f621d778b7",
+        "title": "庫存盤點",
+        "description": "每週進行循環盤點；差異時查近期入庫、出庫與移庫紀錄後複點，將差異、查過的單據及原因記在盤點差異表，交倉儲主管核准。主管交財務調帳後，於結案前核對更新後數量。",
+        "outcomes": [
+          {
+            "detail_id": "6e310c28-ac17-4750-a976-623904d86540",
+            "text": "完成盤點差異表並提交倉儲主管核准。"
+          },
+          {
+            "detail_id": "4008e7ab-5c83-4b23-8a58-d857e9e07e94",
+            "text": "財務調帳後，於結案前核對更新後的庫存數量。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "c53332a8-cfcb-4b7f-87f9-f0aaf074d29b",
+            "text": "每週進行循環盤點。"
+          },
+          {
+            "detail_id": "6c37a531-e93a-4a87-a06b-1cf17ecd03b5",
+            "text": "本人不直接更改庫存數量；由倉儲主管核准並交財務調帳。"
+          },
+          {
+            "detail_id": "c13cc311-8eae-4484-ae00-be94102b2407",
+            "text": "找不到差異原因時保留待查。"
+          }
+        ]
+      },
+      {
+        "task_id": "fce7f387-fbe1-4776-b005-ce042e0c2c72",
+        "area_id": "ca918d06-431d-479e-a3ff-785e860fa403",
+        "title": "處理客戶退貨",
+        "description": "依客服退貨單核對退回商品的品項、數量及外觀並拍照記錄，按既定規則分為可再上架、待檢或破損隔離。無退貨單或商品不符時先隔離並交客服確認；可再上架商品掃碼入庫，待檢商品交品保，並保留交接紀錄。不決定退款。",
+        "outcomes": [
+          {
+            "detail_id": "3ca9cf52-bb6c-4501-be9b-ce03f7bf04cb",
+            "text": "拍照記錄退回商品的品項、數量及外觀檢查情形。"
+          },
+          {
+            "detail_id": "f29d9296-1c77-4f55-bf83-0295a57d4904",
+            "text": "可再上架商品掃碼入庫；待檢商品交品保並保留交接紀錄。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "f6cab52c-82c5-41d9-9f91-9f827f261904",
+            "text": "無退貨單或商品與單據不符時，先隔離並交客服確認。"
+          },
+          {
+            "detail_id": "7bb7c913-c6bc-4104-aaf8-86b772d748b3",
+            "text": "退款決策不由本人負責。"
+          }
+        ]
+      },
+      {
+        "task_id": "342cd879-bb9a-43c6-a7bf-2c1a63cae684",
+        "area_id": "ca918d06-431d-479e-a3ff-785e860fa403",
+        "title": "辦理供應商退貨出庫",
+        "description": "依採購退貨單備貨、核對數量，拍照並登記出庫；交承運商簽收後，將簽收資料回傳採購。供應商退貨由出庫端處理，不辦理退貨入庫；退貨品項由採購決定，本人不決定退貨條件。",
+        "outcomes": [
+          {
+            "detail_id": "8ca8ba1d-241f-47e8-94f6-5822e3183fb5",
+            "text": "按退貨單備妥貨品、核對數量、拍照並登記出庫。"
+          },
+          {
+            "detail_id": "168ea9a3-14d9-4896-aaf0-419dc0952796",
+            "text": "將貨品交承運商簽收，並把簽收資料回傳採購。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "d73bd573-f95f-446b-9abf-3bf47940033f",
+            "text": "供應商退貨由本人辦理出庫，不辦理退貨入庫；退貨品項由採購決定，本人不決定退貨條件。"
+          }
+        ]
+      },
+      {
+        "task_id": "d8d1eb9e-5856-4a42-a4bd-0e6bf26dedd7",
+        "area_id": "3c4aac42-ac03-4427-a63a-540fb7725dfa",
+        "title": "帶領新人",
+        "description": "新人第一週由本人示範掃碼、揀貨與安全動線，再讓新人跟著操作；現場觀察漏掃、拿錯批號或走進車道等情況，記在帶教檢核表並向組長回報。首次漏掃時讓新人重做並解釋原因；反覆錯誤則交組長安排再訓練。本人不批准新人獨立上線，最終由主管核准。",
+        "outcomes": [
+          {
+            "detail_id": "8df01f47-7bc0-4a81-8ee8-e6ef65ca4652",
+            "text": "將新人操作及安全觀察記在帶教檢核表，並向組長回報。"
+          },
+          {
+            "detail_id": "d09d11c8-4a38-4b1e-ae2b-14053bb20010",
+            "text": "反覆錯誤時交組長安排再訓練。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "705bbc83-7517-4cdc-9c92-e205a5afd55c",
+            "text": "新人是否可獨立上線由主管核准；本人不負責核准。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [
+      {
+        "capability_id": "44c9b4c0-e008-4adb-9dba-bdca894d709f",
+        "kind": "skill",
+        "name": "核對進貨單據與實收數量",
+        "description": "逐箱點件，核對品項、數量、外包裝及送貨單，查核並指出進貨差異。"
+      },
+      {
+        "capability_id": "296df85a-f542-4a87-8749-2d433735de6e",
+        "kind": "skill",
+        "name": "依波次單揀貨並核對貨品資訊",
+        "description": "依出貨波次單執行揀貨，核對品項、數量、批號及效期。"
+      },
+      {
+        "capability_id": "043807f6-7035-4506-b01e-9c1cbf9a4d1d",
+        "kind": "skill",
+        "name": "初步查核揀貨儲位差異",
+        "description": "系統顯示有貨但儲位空缺時，查核移庫與前一波次，並將異常交組長協調。"
+      },
+      {
+        "capability_id": "96e218c1-5c9b-4ad7-9516-04676bd2f890",
+        "kind": "skill",
+        "name": "查核盤點差異",
+        "description": "查閱近期入庫、出庫及移庫紀錄並複點，整理差異與查核資訊；財務調帳後核對更新數量。"
+      },
+      {
+        "capability_id": "805e937f-a077-4a09-9bc2-ed3a053bf4f8",
+        "kind": "skill",
+        "name": "新人現場示範與操作檢核",
+        "description": "示範倉庫作業並觀察新人跟做情形，記錄操作與安全風險，對首次漏掃安排重做並解釋原因；反覆錯誤回報組長安排再訓練。"
+      },
+      {
+        "capability_id": "7d55a145-04ea-479b-9794-cb9015d4d924",
+        "kind": "skill",
+        "name": "檢查並分類客戶退貨",
+        "description": "依客服退貨單核對品項、數量及外觀，按既定規則區分可再上架、待檢及破損隔離等情況。"
+      },
+      {
+        "capability_id": "8a1c53e2-956f-4f7d-92dd-143c153d2e4e",
+        "kind": "skill",
+        "name": "依供應商退貨單備貨與辦理出庫交接",
+        "description": "依退貨單備貨、核對數量、拍照並登記出庫，交承運商簽收後回傳簽收資料。"
+      }
+    ],
+    "task_links": [
+      {
+        "task_id": "26979991-707e-4e99-bdc8-664de26bce8f",
+        "capability_id": "44c9b4c0-e008-4adb-9dba-bdca894d709f"
+      },
+      {
+        "task_id": "342cd879-bb9a-43c6-a7bf-2c1a63cae684",
+        "capability_id": "8a1c53e2-956f-4f7d-92dd-143c153d2e4e"
+      },
+      {
+        "task_id": "42de1695-45c6-4b94-8510-ebcecfc361b9",
+        "capability_id": "96e218c1-5c9b-4ad7-9516-04676bd2f890"
+      },
+      {
+        "task_id": "d8d1eb9e-5856-4a42-a4bd-0e6bf26dedd7",
+        "capability_id": "805e937f-a077-4a09-9bc2-ed3a053bf4f8"
+      },
+      {
+        "task_id": "eeb9c6c6-a478-44d8-b5dd-1fd6d46ffaf8",
+        "capability_id": "296df85a-f542-4a87-8749-2d433735de6e"
+      },
+      {
+        "task_id": "eeb9c6c6-a478-44d8-b5dd-1fd6d46ffaf8",
+        "capability_id": "043807f6-7035-4506-b01e-9c1cbf9a4d1d"
+      },
+      {
+        "task_id": "fce7f387-fbe1-4776-b005-ce042e0c2c72",
+        "capability_id": "7d55a145-04ea-479b-9794-cb9015d4d924"
+      }
+    ],
+    "collaborators": [
+      {
+        "collaborator_id": "f2c1b203-b338-436a-b787-6c20ee363dd6",
+        "name": "客服",
+        "scope_text": "客戶退貨無退貨單或商品與單據不符時，交客服確認。"
+      },
+      {
+        "collaborator_id": "f2c43da2-8e9b-4d98-ab9e-c122ddb59639",
+        "name": "品保",
+        "scope_text": "將分類為待檢的客戶退貨交品保處理，並保留交接紀錄。"
+      },
+      {
+        "collaborator_id": "7034e159-a5de-4b0e-a128-17171ff5364b",
+        "name": "採購",
+        "scope_text": "決定供應商退貨品項，接收員工回傳的承運商簽收資料。"
+      },
+      {
+        "collaborator_id": "12f77ebe-2db2-4cec-91b6-8bbe1cbf17ce",
+        "name": "承運商",
+        "scope_text": "承接供應商退貨貨品並簽收。"
+      },
+      {
+        "collaborator_id": "ac57c648-7141-4329-ba1c-50077cd1ae58",
+        "name": "組長",
+        "scope_text": "接收員工對新人操作情況的回報；新人反覆出錯時安排再訓練。"
+      },
+      {
+        "collaborator_id": "66a9e0ec-fa93-4555-afbf-9ca787c24dc3",
+        "name": "主管",
+        "scope_text": "核准新人是否可以獨立上線。"
+      }
+    ],
+    "conditions": [
+      {
+        "condition_id": "d159f4fd-0f49-4340-b892-41dbcfa840d8",
+        "kind": "schedule_travel",
+        "text": "早上七點上班，週一到週六輪休。"
+      }
+    ]
+  },
+  "public_initial": "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。",
+  "required_text": "核對採購單、送貨單與實收數量，拍照通知採購；拒收或退換貨由其他權責者決定",
+  "instruction": "只按公开语意局部修订相應task，保留其他有效细節；等价no_op，无相應task可create。不得讀Plan、oracle、arm。"
+}

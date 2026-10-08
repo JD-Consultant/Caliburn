@@ -1,0 +1,26 @@
+{
+  "question_id": "056289b872f8401aaec18cd70bddd342",
+  "mode": "answer",
+  "fact_ids": [
+    "inventory-authority"
+  ],
+  "reason": "盤點暫時缺口後已正式披露 training 並送出可回訪線索，現在明確回訪複點後流程及調帳權責，符合 inventory-authority 條件；帶教句只是摘要，不觸發其更正。",
+  "subquestions": [
+    {
+      "quote": "請從複點後開始，說說接下來通常怎麼處理。",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "直接回訪複點後差異表、核准、調帳與結案核對流程。"
+    },
+    {
+      "quote": "若也記得調帳由誰處理或批准，可以一併說明",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "明確詢問可回憶的調帳執行與批准權責，凍結條件已滿足。"
+    }
+  ]
+}

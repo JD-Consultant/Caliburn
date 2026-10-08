@@ -1,0 +1,32 @@
+%% title: 現行 UML 狀態：Turn 控制、故障與終局
+%% legend: 圓角框：狀態；實心圓：起點；靶心：終態；轉移標籤表示事件及方括號內的條件。
+stateDiagram-v2
+  state "活躍 Turn（仍可接續或取消）" as Active {
+    state "執行中" as Running
+    state "暫停待收斂" as Pausing
+    state "已暫停" as Paused
+    [*] --> Running
+    Running --> Pausing: 暫停要求
+    Pausing --> Paused: 完整 Step 停妥
+    Paused --> Running: 續作同一 Turn
+  }
+  state "中斷／結果<br/>核對中" as Reconciling
+  state "取消待收斂" as Cancelling
+  state "已取消" as Cancelled
+  state "最終失敗<br/>並已放棄" as Failed
+  state "已正式完成" as Completed
+  [*] --> Active
+  Active --> Reconciling: 中斷或結果不明
+  Reconciling --> Running: 核對完成 [可接續且無未解除的暫停意圖]
+  Reconciling --> Pausing: 核對完成 [原暫停要求仍待停妥]
+  Reconciling --> Paused: 核對完成 [原暫停已停妥且尚未授權續作]
+  Active --> Cancelling: 使用者取消
+  Reconciling --> Cancelling: 核對期間收到取消要求
+  Cancelling --> Cancelled: 核對完成 [放棄資格成立且候選收斂]
+  Cancelling --> Completed: 核對完成 [正式完成已先成立]
+  Reconciling --> Completed: 核對完成 [原正式結果已成立]
+  Reconciling --> Failed: 核對完成 [不可續作且放棄已成立]
+  Active --> Completed: 正式完成先成立
+  Completed --> [*]
+  Cancelled --> [*]
+  Failed --> [*]

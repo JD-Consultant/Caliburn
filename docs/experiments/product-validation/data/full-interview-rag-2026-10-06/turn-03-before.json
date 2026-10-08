@@ -1,0 +1,212 @@
+{
+  "profile": {
+    "revision_id": "f240cc84-7d31-4c19-bc8d-01f2c62cc150",
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點及客戶與供應商退貨入庫，維持貨物流轉與庫存作業的準確，支援後續出貨及退貨處理。"
+    }
+  },
+  "work": {
+    "revision_id": "f240cc84-7d31-4c19-bc8d-01f2c62cc150",
+    "areas": [
+      {
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "物流中心倉儲與庫存作業",
+        "scope_text": "涵蓋收貨驗收、上架、揀貨補貨、庫存盤點，以及客戶與供應商退貨入庫。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "9301a06b-657b-4284-852c-4ba3dfb0656a",
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "核對進貨並回報數量差異",
+        "description": "收貨時比對採購單、送貨單上的品項與實際收到的數量；發現不符時拍照並將差異告知採購。",
+        "outcomes": [
+          {
+            "detail_id": "e6559418-9858-42d4-b32e-62481f3f14c6",
+            "text": "提供採購差異情況及照片，供採購後續處理。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "ad77ce78-7f02-427f-af82-def3921f1409",
+            "text": "不自行決定拒收或退換貨；相關處理由採購決定。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [
+      {
+        "collaborator_id": "31b42c6b-6c7c-417c-8fe2-ca4589099916",
+        "name": "採購",
+        "scope_text": "收到進貨品項或數量差異時，提供差異情況與照片；拒收或退換貨由採購決定並處理。"
+      }
+    ],
+    "conditions": [
+      {
+        "condition_id": "9ad6366e-23f0-4716-aaf1-bbf465f0ca2b",
+        "kind": "schedule_travel",
+        "text": "早上七點上班，週一至週六輪休。"
+      }
+    ]
+  },
+  "sources": {
+    "revision_id": "f240cc84-7d31-4c19-bc8d-01f2c62cc150",
+    "references": [
+      {
+        "citation_id": "ca9e0d04-b465-4f09-adab-a2b308b51987",
+        "target_label": "職務名稱",
+        "target": {
+          "kind": "profile_field",
+          "field": "job_title",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f1c0c943-0599-4a78-a655-4a02637c17a5",
+        "target_label": "所屬單位",
+        "target": {
+          "kind": "profile_field",
+          "field": "organization_unit",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "20ed676b-9586-44c3-a60d-2ec5ef103e01",
+        "target_label": "直屬主管",
+        "target": {
+          "kind": "profile_field",
+          "field": "reports_to",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "7d1d9e22-fa14-4e5e-a78b-00e16587853a",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "1f08e729-293d-4b7b-a289-76e5ce93c5f7",
+        "target_label": "職責：物流中心倉儲與庫存作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "397406d7-5086-4c24-a4e5-8aa28dc7a587",
+        "target_label": "共通條件：早上七點上班，週一至週六輪休。",
+        "target": {
+          "kind": "condition",
+          "field": null,
+          "item_id": "9ad6366e-23f0-4716-aaf1-bbf465f0ca2b",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "b4e28f3c-3617-4605-ad25-0065fdc2b20b",
+        "target_label": "任務：核對進貨並回報數量差異",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "9301a06b-657b-4284-852c-4ba3dfb0656a",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "8073af1c-a9c0-4e9f-b52e-6fef0c420821",
+        "target_label": "任務：核對進貨並回報數量差異 · 成果：提供採購差異情況及照片，供採購後續處理。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "e6559418-9858-42d4-b32e-62481f3f14c6",
+          "task_id": "9301a06b-657b-4284-852c-4ba3dfb0656a"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "8d2c209e-bae2-47c3-8f17-cda107d80219",
+        "target_label": "任務：核對進貨並回報數量差異 · 要求：不自行決定拒收或退換貨；相關處理由採購決定。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "ad77ce78-7f02-427f-af82-def3921f1409",
+          "task_id": "9301a06b-657b-4284-852c-4ba3dfb0656a"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "2752d2c1-3f44-4248-95cf-04a900db63ec",
+        "target_label": "協作：採購",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "31b42c6b-6c7c-417c-8fe2-ca4589099916",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

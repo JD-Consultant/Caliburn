@@ -1,0 +1,134 @@
+{
+  "arm": "old",
+  "case_id": "derive_and_link_capabilities",
+  "job_file_id": "28f10248-76c3-4f56-a64d-c7e63818e31f",
+  "before": {
+    "profile": {
+      "revision_id": "7587520c-ec06-43f8-a2ba-8ae383250dad",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "依訂單完成正確揀貨，維持庫存作業可追查。"
+      }
+    },
+    "work": {
+      "revision_id": "7587520c-ec06-43f8-a2ba-8ae383250dad",
+      "areas": [
+        {
+          "area_id": "90dfb584-aa12-4f5e-a084-27c736918685",
+          "title": "揀貨與核對",
+          "scope_text": "揀貨、核對品項及回報庫存差異。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "55690e6f-f26f-4288-b085-97716e0dac72",
+          "area_id": "90dfb584-aa12-4f5e-a084-27c736918685",
+          "title": "揀貨並核對庫存",
+          "description": "依出貨單核對品項及數量，先進先出；異常先比對進出貨與儲位，記錄交主管確認，不自行改帳。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "7587520c-ec06-43f8-a2ba-8ae383250dad",
+      "references": [
+        {
+          "citation_id": "d8133eca-933a-4383-929e-2de4e8eee967",
+          "target_label": "任務：揀貨並核對庫存",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "55690e6f-f26f-4288-b085-97716e0dac72",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "70f726cd-b15a-4013-bc79-70423a361183",
+      "exchange": {
+        "employee_input": {
+          "source_id": "e773b4a7-9e33-4cdc-8cad-f745c6f25b0b",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "對，平常就是照這樣做。我不太會講什麼專業能力，就是對單、對貨，有問題先查再記下來給主管。"
+        },
+        "consultant_reply": {
+          "source_id": "f8f97e80-6014-41c5-a445-8ae1c0d68edc",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "你不需要替自己貼上能力名稱。你說的「依出貨單核對、先查差異再記錄交主管、不自行改數量」，已經把揀貨核對的做法和責任界線說清楚；目前整理的工作內容也涵蓋了這些要點。\n\n揀好的貨接下來通常怎麼處理？例如包裝、放到待出貨區或交給其他同事，哪些步驟是你負責的？"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 277690,
+    "output_tokens": 14008,
+    "reasoning_tokens": 10838,
+    "cached_input_tokens": 237501,
+    "cache_write_input_tokens": 40126,
+    "total_tokens": 291698,
+    "outbound_calls": 42,
+    "count_calls": 21,
+    "generation_calls": 21,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 277690,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0021",
+    "actual_estimated_usd": "0.014401060",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.016501060",
+    "cumulative_occupied_usd": "0.016501060",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 274.634507499999,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 310038,
+    "output_tokens": 15064,
+    "reasoning_tokens": 11642,
+    "cached_input_tokens": 268694,
+    "cache_write_input_tokens": 41272,
+    "total_tokens": 325102,
+    "outbound_calls": 48,
+    "count_calls": 24,
+    "generation_calls": 24,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 310038,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0024",
+    "actual_estimated_usd": "0.015385140",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.017785140",
+    "cumulative_occupied_usd": "0.017785140",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 302.8992406999969,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

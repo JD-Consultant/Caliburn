@@ -1,0 +1,8 @@
+{
+  "question_id": "d0062d530bf44b8a8f68538c1db6ebfe",
+  "fact_ids": ["inventory-authority"],
+  "mode": "answer",
+  "reason": "inventory-authority gap 在 disclosure_order 第5項開啟，training 第6項已實際披露；本題真正回訪盤點的記錄與完成交接，符合相關回訪條件。原 authority 事實中的差異表、交主管與結案核對直接相關，放行依正向的記錄交接問題，並非因前段否定的調帳核准詞觸發。固定資料未說誰安排盤點品項或儲位，不推定排程權限。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": ["盤點哪些品項或儲位通常由誰安排？"]
+}

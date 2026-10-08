@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MemoryWriteResult",
+  "description": "App-produced successful candidate write results. This output is not a provider-strict arguments schema. Status-only branches do not echo inputs; updated branches report the actual title, description and effects, never publication, internal scope or an unknown save outcome.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/MemoryWriteStatusResult"
+    },
+    {
+      "$ref": "#/$defs/WorkSituationUpdatedResult"
+    },
+    {
+      "$ref": "#/$defs/WorkUnderstandingUpdatedResult"
+    }
+  ],
+  "$defs": {
+    "MemoryWriteStatusResult": {
+      "type": "object",
+      "description": "A reliably adopted creation/deletion or a confirmed absence of actual differences. Unknown save outcomes and rejections are not successful statuses.",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "created",
+            "deleted",
+            "unchanged"
+          ]
+        }
+      }
+    },
+    "MemoryTextAppliedChange": {
+      "type": "object",
+      "description": "The actual new value is already at the result root.",
+      "additionalProperties": false,
+      "required": [
+        "field"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "enum": [
+            "title",
+            "description"
+          ]
+        }
+      }
+    },
+    "MemoryBodyAppliedChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "diff"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "body"
+        },
+        "diff": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Observed difference formed from actual before/after body content, including the applied location and necessary context. Not an unconditional echo of requested hunks or another command."
+        }
+      }
+    },
+    "InterviewReferencesAdded": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "added"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "interview_references"
+        },
+        "added": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "InterviewReferencesRemoved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "removed"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "interview_references"
+        },
+        "removed": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "InterviewReferencesChanged": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "added",
+        "removed"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "interview_references"
+        },
+        "added": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "removed": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "WorkSituationReferencesAdded": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "added"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "work_situation_references"
+        },
+        "added": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "WorkSituationReferencesRemoved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "removed"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "work_situation_references"
+        },
+        "removed": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "WorkSituationReferencesChanged": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "added",
+        "removed"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "work_situation_references"
+        },
+        "added": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "removed": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "WorkSituationUpdatedResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "title",
+        "description",
+        "applied_changes"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "updated"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Actual title after the adopted update; use it for later selections."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Actual navigation description after the adopted update."
+        },
+        "applied_changes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "description": "Only actual changes in this layer. Omit unmodified fields and unchanged reference sides; never use empty arrays or null placeholders. No silent truncation.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MemoryTextAppliedChange"
+              },
+              {
+                "$ref": "#/$defs/MemoryBodyAppliedChange"
+              },
+              {
+                "$ref": "#/$defs/InterviewReferencesAdded"
+              },
+              {
+                "$ref": "#/$defs/InterviewReferencesRemoved"
+              },
+              {
+                "$ref": "#/$defs/InterviewReferencesChanged"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "WorkUnderstandingUpdatedResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "title",
+        "description",
+        "applied_changes"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "updated"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Actual title after the adopted update; use it for later selections."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Actual navigation description after the adopted update."
+        },
+        "applied_changes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "description": "Only actual changes in this layer. Omit unmodified fields and unchanged reference sides; never use empty arrays or null placeholders. No silent truncation.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MemoryTextAppliedChange"
+              },
+              {
+                "$ref": "#/$defs/MemoryBodyAppliedChange"
+              },
+              {
+                "$ref": "#/$defs/WorkSituationReferencesAdded"
+              },
+              {
+                "$ref": "#/$defs/WorkSituationReferencesRemoved"
+              },
+              {
+                "$ref": "#/$defs/WorkSituationReferencesChanged"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

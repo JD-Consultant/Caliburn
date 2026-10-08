@@ -1,0 +1,3831 @@
+{
+  "assessment_version": "warehouse-blind-v2-1",
+  "case_id": "4d54caac92074ce18f5351b23b7caaf8",
+  "role": "物流中心倉庫管理員",
+  "lock_status": "先獨立鎖定單案；配對另列，不據比較結果回改",
+  "blind_boundary": "僅指定匿名成品、公開原話、同 bundle 固定 revision 的可回查來源、新舊 rubric、三份指南及 oracle；未接觸組別、Plan、模型過程、營運或成本。oracle 僅標示重要未取得資訊。",
+  "overall_conclusion": "仍有重要缺口／錯誤",
+  "overall_reason": "正式 JD 已可辨認已取得的主要工作、重要低頻工作、冷藏與旺季條件、兩種退貨方向，以及盤點調帳和新人上線權限更正。必要專業尚未取得完整範圍：公開原話沒有先到期先出、Excel 比對差異與看重量判斷安全搬運的明確說明，因此成品沒有描述這些真實工作需要。它們會影響周轉、資料差異處理與搬運判斷，不只是措辭或欄位填滿問題；只能記為重要資訊尚未取得，不能拿 oracle 補作 JD 引文。其餘已取得內容整體有據，未見 material 無據主張。",
+  "usable_scope": "已形成能描述大多數已確認職務內容的正式成品；結論表示整份職務仍有重要專業範圍缺口，不表示尚無可用 JD。",
+  "observations": [
+    {
+      "id": "W01",
+      "checkpoint": "職位定位與工作安排",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "formal_jd.profile.profile",
+        "condition b2238a05-23f8-4f75-a5dc-aca405a8ea99"
+      ],
+      "public_sequences": [
+        2
+      ],
+      "finding": "保留物流中心倉庫管理員、倉儲主管、早七點及週一至週六輪休；職務目的符合已確認貨物流轉與倉儲責任。",
+      "impact": "沒有升格職位、捏造組織關係、工時長度或雇用門檻。",
+      "public_evidence": [
+        {
+          "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+          "interview_sequence": 2,
+          "quote": "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。"
+        }
+      ]
+    },
+    {
+      "id": "W02",
+      "checkpoint": "收貨驗收與人工改稿保留",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "task c17b1866-c259-46da-838a-70af731617bc",
+        "area 368a7fde-d2b1-43d3-a844-95dfcd84f14e"
+      ],
+      "public_sequences": [
+        2,
+        4,
+        32,
+        36
+      ],
+      "finding": "逐箱核品項、數量、外包裝、送貨單並核採購單與實收；差異照片、異常表與通知採購，待採購補送或接受回覆才登記入庫。拒收／退換貨、議價及選供應商均不屬本人決策。正式描述保留人工改稿所要求的核對與權責含義。",
+      "impact": "收貨責任、採購回覆條件與成果可辨認。人工編輯只核對保存文字，事實來自公開原話。未補造序號4未能確認的該批貨物放置地點，亦未補造序號36的登記後交接對象。",
+      "public_evidence": [
+        {
+          "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+          "interview_sequence": 2,
+          "quote": "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。"
+        },
+        {
+          "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+          "interview_sequence": 4,
+          "quote": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「例如貨物放在哪裡」，我目前沒有確定資料，請保留未知，不補猜。"
+        },
+        {
+          "source_id": "64614c36-5939-452b-8718-0aec74eb2145",
+          "interview_sequence": 32,
+          "quote": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。\n\n約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。\n\n我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。"
+        },
+        {
+          "source_id": "ca247afd-8cbc-4de8-a8c4-39b90c2b4197",
+          "interview_sequence": 36,
+          "quote": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。\n\n關於你問的「登記後會交接給誰，或直接接著上架嗎？」，我目前沒有確定資料，請保留未知，不補猜。"
+        }
+      ]
+    },
+    {
+      "id": "W03",
+      "checkpoint": "上架、儲位、WMS 與設備界線",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "task 70b9bb45-eb9f-4f60-8eac-203df6ae4d93",
+        "capability 4eb36e40-64af-43b7-8ef2-b6a5563ae71f",
+        "collaborator 8360b31d-b265-4a12-8c83-d904e9acef47"
+      ],
+      "public_sequences": [
+        8,
+        36
+      ],
+      "finding": "保留既定儲位、品項批號標籤、WMS 掃碼、帳實位置核對；放不下找組長、不自行改儲位規則；常溫棧板車、超重請持證同事開堆高機。",
+      "impact": "沒有把設備同事的證照變為本人資格，也沒有自行創設儲位決策權。",
+      "public_evidence": [
+        {
+          "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+          "interview_sequence": 8,
+          "quote": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。"
+        },
+        {
+          "source_id": "ca247afd-8cbc-4de8-a8c4-39b90c2b4197",
+          "interview_sequence": 36,
+          "quote": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。\n\n關於你問的「登記後會交接給誰，或直接接著上架嗎？」，我目前沒有確定資料，請保留未知，不補猜。"
+        }
+      ]
+    },
+    {
+      "id": "W04",
+      "checkpoint": "揀貨、補貨與儲位空缺判斷",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "task a24ba244-31f6-4d81-8aa5-60287bbde3e1",
+        "capability cadf0c27-1ff2-4f50-9729-f05260292def",
+        "capability 0d599aa3-5bb3-40a5-8ebe-d0c7f363c965"
+      ],
+      "public_sequences": [
+        12
+      ],
+      "finding": "按波次核品項數量批號效期、必要時由備貨區補貨、交包裝區複核；系統有貨而儲位空時查移庫及前波次、不擅換批號、異常交組長，截單前完成而未編時刻。",
+      "impact": "合併揀貨與必要補貨仍保留各自觸發和處理，不因合併或未另列獨立補貨安排判缺漏。",
+      "public_evidence": [
+        {
+          "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+          "interview_sequence": 12,
+          "quote": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。"
+        }
+      ]
+    },
+    {
+      "id": "W05",
+      "checkpoint": "週盤點、權限回訪與結案",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "task 90fe92a2-4e26-4db7-be0e-9058c5b72c4b",
+        "collaborator 6fa1efd3-a997-42e1-b075-a546bea67c3b",
+        "capability 0d599aa3-5bb3-40a5-8ebe-d0c7f363c965"
+      ],
+      "public_sequences": [
+        16,
+        20
+      ],
+      "finding": "每週盤點、查入出庫移庫並複點；差異、查過單據及原因表交倉儲主管核准、主管交財務調帳、本人不能改數量、结案核對更新數量與原因不明待查均有去處。",
+      "impact": "公開後補已解決早期調帳權限未知，成品沒有停留在只查與複點，也沒有把核准或調帳歸本人。",
+      "public_evidence": [
+        {
+          "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+          "interview_sequence": 16,
+          "quote": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？"
+        },
+        {
+          "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+          "interview_sequence": 20,
+          "quote": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。"
+        }
+      ]
+    },
+    {
+      "id": "W06",
+      "checkpoint": "客戶退貨",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "task fb34281f-f08c-4bc7-a766-ca98b105f96f",
+        "area 25666651-2a0f-4c5b-8697-3611ab27c1e0"
+      ],
+      "public_sequences": [
+        22
+      ],
+      "finding": "客服退貨單核品項數量外觀、照片、可再上架／待檢／破損隔離；無單不符先隔離交客服，可再上架掃碼入庫、待檢交品保、留交接，不決定退款。",
+      "impact": "分類結果和權限可辨認，沒有補訂原話未交代的細部分類門檻。",
+      "public_evidence": [
+        {
+          "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+          "interview_sequence": 22,
+          "quote": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。"
+        }
+      ]
+    },
+    {
+      "id": "W07",
+      "checkpoint": "供應商退貨更正與出庫",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "task 41d3644e-c076-4230-9719-6322056bb375",
+        "area 25666651-2a0f-4c5b-8697-3611ab27c1e0"
+      ],
+      "public_sequences": [
+        26
+      ],
+      "finding": "採購選退貨品項，本人備貨核數量拍照登記出庫、承運商簽收回採購；不辦供應商退貨入庫、不定條件。原話未知的最近一次退貨原因未被猜補。",
+      "impact": "與客戶退貨同組但方向明確區分；沒有為更正供應商出庫而刪掉客戶入庫。",
+      "public_evidence": [
+        {
+          "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+          "interview_sequence": 26,
+          "quote": "供應商退貨更精確是出庫：採購決定要退哪些貨，我按退貨單備貨、核數量、拍照、登記出庫並交承運商簽收，將簽收回給採購。我不辦供應商退貨入庫，也不決定退貨條件。\n\n關於你問的「最近一次處理時，退貨是因為什麼情況開始的？」，我目前沒有確定資料，請保留未知，不補猜。"
+        }
+      ]
+    },
+    {
+      "id": "W08",
+      "checkpoint": "新人帶教及上線核准更正",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "task 80cfdfd3-10a5-4cbc-b1c5-77026477b63f",
+        "area 0f0cc8e3-7154-4dfc-8708-fb02d26d8e8e",
+        "capability 8b36427a-186c-40e4-97e5-c52bb564d446",
+        "capability 8ae50afd-a8b5-4658-941d-88682e9e8d63"
+      ],
+      "public_sequences": [
+        18,
+        28
+      ],
+      "finding": "第一週示範掃碼揀貨安全動線、跟做觀察漏掃錯批號及車道、檢核表；觀察回報組長、主管最終批准上線；首次漏掃重做說明、反覆錯誤轉組長再訓練。",
+      "impact": "已用公開更正取代本人批准權，仍保留原有教學事實；安全動線知識由實際教學與檢核提煉，有工作用途。",
+      "public_evidence": [
+        {
+          "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+          "interview_sequence": 18,
+          "quote": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。"
+        },
+        {
+          "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+          "interview_sequence": 28,
+          "quote": "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。"
+        }
+      ]
+    },
+    {
+      "id": "W09",
+      "checkpoint": "冷藏條件及溫控異常",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "task 16ada73f-a573-4d22-9373-926c0f5eac04",
+        "condition 04bd0aa0-9def-48c7-b6d7-85f43c8f2d3a",
+        "capability 034a206d-e4d5-4024-b1a2-6711a764ee42"
+      ],
+      "public_sequences": [
+        30,
+        32
+      ],
+      "finding": "約兩成冷藏食品、2–8°C、防寒衣在工作條件中以『相關作業』限定；早晚查看、超標隔離、時間溫度記錄、主管品保通知及品保決定出貨在任務和要求明列。",
+      "impact": "分放工作條件與任務仍可組合辨識範圍，沒有把冷藏溫度套到全部貨物，亦未擅增放行權。",
+      "public_evidence": [
+        {
+          "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+          "interview_sequence": 30,
+          "quote": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。\n\n約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。"
+        },
+        {
+          "source_id": "64614c36-5939-452b-8718-0aec74eb2145",
+          "interview_sequence": 32,
+          "quote": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。\n\n約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。\n\n我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。"
+        }
+      ]
+    },
+    {
+      "id": "W10",
+      "checkpoint": "旺季負荷與晚班交接",
+      "status": "足以辨識",
+      "category": "已披露且正確成稿",
+      "material_gap": false,
+      "jd_locations": [
+        "task a24ba244-31f6-4d81-8aa5-60287bbde3e1 description/outcomes/requirements",
+        "collaborator 21e857c0-7d35-4fa5-91c8-6f42d1d24895"
+      ],
+      "public_sequences": [
+        30,
+        32
+      ],
+      "finding": "雙十一及春節前約兩倍量、組長排急單波次、回報人力缺貨瓶頸、不省批號效期核對；晚班交班表記錄未完波次、缺貨、隔離貨位置。",
+      "impact": "交班併入揀補貨任務仍保留晚班限定與交接內容，未因合併吞掉工作要求。",
+      "public_evidence": [
+        {
+          "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+          "interview_sequence": 30,
+          "quote": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。\n\n約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。"
+        },
+        {
+          "source_id": "64614c36-5939-452b-8718-0aec74eb2145",
+          "interview_sequence": 32,
+          "quote": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。\n\n約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。\n\n我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。"
+        }
+      ]
+    },
+    {
+      "id": "W11",
+      "checkpoint": "年度盤點與其他真未知",
+      "status": "足以辨識已確認部分",
+      "category": "已披露且正確成稿；真未知尚存",
+      "material_gap": false,
+      "jd_locations": [
+        "task 1470d24a-3b10-45b6-8de3-f64ac8e4d0d7",
+        "collaborator 4cfe47ed-2509-467c-bacf-341d151b6e22"
+      ],
+      "public_sequences": [
+        30,
+        32,
+        4,
+        26,
+        36
+      ],
+      "finding": "每年十二月配合財務全倉盘點、盤前整理儲位和待處理單據均保留；年度分區責任與財務表單細節仍說不清。其他明確未知包括單一進貨放置處、最近供應商退貨起因，以及入庫登記後交誰或是否接上架。JD 未捏造這些內容，也未明列未知。",
+      "impact": "未知限制成品可用範圍，但已知年度工作沒有因低頻被漏掉；不能把如實沒有補猜當成應由 AI 自造細節。",
+      "public_evidence": [
+        {
+          "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+          "interview_sequence": 30,
+          "quote": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。\n\n約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。"
+        },
+        {
+          "source_id": "64614c36-5939-452b-8718-0aec74eb2145",
+          "interview_sequence": 32,
+          "quote": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。\n\n約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。\n\n我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。"
+        },
+        {
+          "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+          "interview_sequence": 4,
+          "quote": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「例如貨物放在哪裡」，我目前沒有確定資料，請保留未知，不補猜。"
+        },
+        {
+          "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+          "interview_sequence": 26,
+          "quote": "供應商退貨更精確是出庫：採購決定要退哪些貨，我按退貨單備貨、核數量、拍照、登記出庫並交承運商簽收，將簽收回給採購。我不辦供應商退貨入庫，也不決定退貨條件。\n\n關於你問的「最近一次處理時，退貨是因為什麼情況開始的？」，我目前沒有確定資料，請保留未知，不補猜。"
+        },
+        {
+          "source_id": "ca247afd-8cbc-4de8-a8c4-39b90c2b4197",
+          "interview_sequence": 36,
+          "quote": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。\n\n關於你問的「登記後會交接給誰，或直接接著上架嗎？」，我目前沒有確定資料，請保留未知，不補猜。"
+        }
+      ]
+    },
+    {
+      "id": "W12",
+      "checkpoint": "必要專業範圍尚未取得",
+      "status": "部分且影響判讀",
+      "category": "重要工作資訊尚未取得",
+      "material_gap": true,
+      "jd_locations": [
+        "formal_jd.work.capabilities",
+        "task a24ba244-31f6-4d81-8aa5-60287bbde3e1",
+        "task 90fe92a2-4e26-4db7-be0e-9058c5b72c4b",
+        "task 70b9bb45-eb9f-4f60-8eac-203df6ae4d93"
+      ],
+      "public_sequences": [
+        8,
+        12,
+        18,
+        20,
+        22,
+        30
+      ],
+      "oracle_checkpoint_ids": [
+        "requirements"
+      ],
+      "finding": "WMS、庫存異動核對、批號效期、带教安全動線及溫控等已取得方法有適當表達；並非按技能條數或必填知識欄判斷。公開原話未取得先到期先出、Excel 比對差異、看重量與搬運安全方法的必要專業說明。核效期不等於已確認先到期先出，查紀錄不等於已確認 Excel。",
+      "impact": "讀者仍缺這份職位实际周轉原則、特定差異核對方法及重量判斷要求，會改變對接任專業範圍的理解。這屬重要資訊尚未取得，不能記成已披露未入稿，也不能作為 JD 應虛構內容的理由。",
+      "oracle_use_limit": "只以 oracle 確認未取得項目的工作重要性，不將其作正式事實來源。",
+      "public_evidence": [
+        {
+          "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+          "interview_sequence": 8,
+          "quote": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。"
+        },
+        {
+          "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+          "interview_sequence": 12,
+          "quote": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。"
+        },
+        {
+          "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+          "interview_sequence": 18,
+          "quote": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。"
+        },
+        {
+          "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+          "interview_sequence": 20,
+          "quote": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。"
+        },
+        {
+          "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+          "interview_sequence": 22,
+          "quote": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。"
+        },
+        {
+          "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+          "interview_sequence": 30,
+          "quote": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。\n\n約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。"
+        }
+      ]
+    },
+    {
+      "id": "W13",
+      "checkpoint": "固定來源、更新與逐欄支撐",
+      "status": "足以辨識並可回查",
+      "category": "公開來源支持",
+      "material_gap": false,
+      "jd_locations": [
+        "formal_jd.sources.references",
+        "fixed_source_contents.entries"
+      ],
+      "public_sequences": [
+        2,
+        4,
+        8,
+        12,
+        16,
+        18,
+        20,
+        22,
+        26,
+        28,
+        30
+      ],
+      "finding": "逐欄直接或沿固定來源鏈可回到支持該主張的員工原話。進貨職責的較早 citation c0a8d807-274a-4416-9181-725aebb43a7f 僅有最初查核通知，但同欄另有序號4的 citation 3a412c4d-4438-4a5c-9e93-0db0fe6f912a，足以支持異常表及依採購回覆入庫。帶教職責與任務另引用18及28；較早來源中的上線未知沒有覆蓋正式 JD 已取得的更正。",
+      "impact": "引用變更標示本身不是語意錯誤；評閱以固定內容實際支撐為準，不以引用數、來源層數或較新版本推定優劣。沒有發現 material 來源斷鏈或需用 oracle 才能支持的 JD 主張。",
+      "public_evidence": [
+        {
+          "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+          "interview_sequence": 2,
+          "quote": "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。"
+        },
+        {
+          "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+          "interview_sequence": 4,
+          "quote": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「例如貨物放在哪裡」，我目前沒有確定資料，請保留未知，不補猜。"
+        },
+        {
+          "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+          "interview_sequence": 8,
+          "quote": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。"
+        },
+        {
+          "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+          "interview_sequence": 12,
+          "quote": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。"
+        },
+        {
+          "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+          "interview_sequence": 16,
+          "quote": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？"
+        },
+        {
+          "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+          "interview_sequence": 18,
+          "quote": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。"
+        },
+        {
+          "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+          "interview_sequence": 20,
+          "quote": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。"
+        },
+        {
+          "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+          "interview_sequence": 22,
+          "quote": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。"
+        },
+        {
+          "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+          "interview_sequence": 26,
+          "quote": "供應商退貨更精確是出庫：採購決定要退哪些貨，我按退貨單備貨、核數量、拍照、登記出庫並交承運商簽收，將簽收回給採購。我不辦供應商退貨入庫，也不決定退貨條件。\n\n關於你問的「最近一次處理時，退貨是因為什麼情況開始的？」，我目前沒有確定資料，請保留未知，不補猜。"
+        },
+        {
+          "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+          "interview_sequence": 28,
+          "quote": "剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。"
+        },
+        {
+          "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+          "interview_sequence": 30,
+          "quote": "每年十二月還會配合財務做全倉年度盤點，先整理儲位和待處理單据。我現在說不清年度分區責任和財務表單細節，只能確認這是我工作的一部分。\n\n約兩成貨是冷藏食品，要在 2–8°C 區作業，穿防寒衣，每天早晚看溫度表。超標先把受影響批次隔離、記時間溫度並通知主管和品保；能不能出貨由品保決定，我不自行放行。\n\n雙十一和春節前出貨約平日兩倍，我依組長排的急單與波次調整揀貨順序，先報人力和缺貨瓶頸，不省掉批號效期核對；晚班交接未完波次、缺貨與隔離貨位置，留下交班表。"
+        }
+      ]
+    }
+  ],
+  "six_dimensions": [
+    {
+      "dimension": "重要工作廣度",
+      "finding": "主要日常、週期、低頻及條件性工作均有適當去處；必要專業仍有尚未取得的重要範圍。",
+      "observation_ids": [
+        "W01",
+        "W02",
+        "W03",
+        "W04",
+        "W05",
+        "W06",
+        "W07",
+        "W08",
+        "W09",
+        "W10",
+        "W11",
+        "W12"
+      ]
+    },
+    {
+      "dimension": "本人行動／判斷／責任邊界",
+      "finding": "查核、登記、分類、異常轉交與他人核准權可辨識；盤點及帶教更正已正確入稿。",
+      "observation_ids": [
+        "W02",
+        "W03",
+        "W04",
+        "W05",
+        "W06",
+        "W07",
+        "W08",
+        "W09"
+      ]
+    },
+    {
+      "dimension": "適用條件與更正",
+      "finding": "週盘、年度十二月、冷藏範圍、旺季量及晚班交接限制明確；未知未捏造，兩項更正未損其他有效工作。",
+      "observation_ids": [
+        "W05",
+        "W07",
+        "W08",
+        "W09",
+        "W10",
+        "W11"
+      ]
+    },
+    {
+      "dimension": "成果／交接／必要要求",
+      "finding": "照片、差異表、包裝複核、承運簽收、交班與溫控處置均有具體用途；缺口在尚未取得的周轉及核對專業。",
+      "observation_ids": [
+        "W02",
+        "W04",
+        "W05",
+        "W06",
+        "W07",
+        "W08",
+        "W09",
+        "W10",
+        "W12"
+      ]
+    },
+    {
+      "dimension": "無據內容與一致性",
+      "finding": "未見 material 無據 KPI、證照、學歷或他人權限移入；知識技能由已取得方法提煉，未知仍限制分析範圍。",
+      "observation_ids": [
+        "W01",
+        "W03",
+        "W05",
+        "W07",
+        "W08",
+        "W09",
+        "W11",
+        "W12"
+      ]
+    },
+    {
+      "dimension": "來源支持與可回查",
+      "finding": "直接原話與固定來源鏈均可查，舊有效事實與新更正分別有支撐；未用 latest 或 oracle 代替正式來源。",
+      "observation_ids": [
+        "W02",
+        "W05",
+        "W08",
+        "W13"
+      ]
+    }
+  ],
+  "classification_summary": {
+    "disclosed_but_not_correctly_drafted": [],
+    "important_not_acquired": [
+      "W12"
+    ],
+    "true_unknown_or_refusal": [
+      "W11；其他固定來源記載的局部未知不能擴為整項工作拒答。"
+    ],
+    "publicly_supported_but_later_correction_not_acquired": [],
+    "unsupported_or_wrong_material_claims": [],
+    "local_source_link_limitations": []
+  },
+  "grouping_judgment": "收貨／上架分組、揀補貨與晚班交接合併、週盤與年度盤點同職責但分任務均合理；以是否保留責任及條件判讀，不按拆合或篇幅判優劣。",
+  "pair_comparisons": [],
+  "pair_comparison_status": "本案完成獨立鎖定後才另列 W-A。",
+  "source_lock": {
+    "formal_revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+    "bundle_path": "S:\\caliburn\\docs\\experiments\\product-validation\\jd-work-plan-comparison-2026-10-07\\runs\\comparison-v2\\blind-input\\4d54caac92074ce18f5351b23b7caaf8.json",
+    "bundle_sha256": "5e228613aeeef717148675f1a304840516f730d3464d12670bf65fac27ecb56d",
+    "formal_jd_sha256": "b4880c7f940003783be57f76440a1d784cb3612a6270c44ddabdd360571ac72e",
+    "employee_originals_sha256": "09fbe966d5e1d32bf29b0ce03d7b33382042608d8a84f1d9c8de837f7a91a50b",
+    "fixed_source_contents_sha256": "0418f775d9ee80929690956ed2a2eb2ac5f1737306beeb325040e5d74e3967b2",
+    "public_manual_edit_sha256": "e9c2e6d1526ec6974c501863fe451d46bed86c3f8f43f2b6705fc5bc05faf03b",
+    "component_hash_method": "SHA-256 of UTF-8 without BOM; structured components use PowerShell ConvertTo-Json -Depth 100 -Compress in existing property order; source text hashes use exact parsed string.",
+    "criterion_and_guide_files": [
+      {
+        "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/blind-jd-rubric.md",
+        "sha256": "0a80b5fda821802d0de0f46384ae40ca9f16a5b875ceabac53abf43b9c456742"
+      },
+      {
+        "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/private_facts.json",
+        "sha256": "7455f4ac308e87ab4371a7f8c281890d44628ccf7c8aa0c3162e7be3ce8ac636"
+      },
+      {
+        "path": "docs/plans/evidence/interview-plan-2026-10-07/blind-jd-rubric.md",
+        "sha256": "13c14a856ba68b2ae9d2f325e1fe1266db987d2c64ea9cefb83d49a18423cec2"
+      },
+      {
+        "path": "docs/guides/2026-09-09-complete-work-analysis-guide.md",
+        "sha256": "a1f5bdac2d11ce1a11a045e47f96587299a64fdc99338e5d09eb550d5cbf7fe6"
+      },
+      {
+        "path": "docs/guides/2026-09-09-customized-jd-depth-and-interview-calibration.md",
+        "sha256": "46ed3a9944ba4502f7ce0c9fe2d02022a9c9468464069d3f095a91a3e74d8efc"
+      },
+      {
+        "path": "docs/guides/2026-09-09-jd-field-and-writing-guide.md",
+        "sha256": "78dc1527310d40040e0fd1c012b52be1bdefae369d7320cd679e35b94d5206cd"
+      }
+    ],
+    "employee_source_hashes": [
+      {
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "text_sha256": "522b177bcc27056f1f6d6cac1e195bf878d6ae369b0a2e48da597d49f145a06e"
+      },
+      {
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "text_sha256": "35bbacbb599771523fd40445f6daec254803562297027bc6bf4ebe78c8e53640"
+      },
+      {
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "text_sha256": "5876c4a4c137ca5620a69dba04a1fc08c351cde008bbe6f32d62eba35b2548d4"
+      },
+      {
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "text_sha256": "c8aa7a89971f9cb1b141ef6d7afe46a8b44565ddfbfb7c1c0b524e5f1b971534"
+      },
+      {
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "text_sha256": "5876c4a4c137ca5620a69dba04a1fc08c351cde008bbe6f32d62eba35b2548d4"
+      },
+      {
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "text_sha256": "113c6f14dd762020765a81139bd527d20257ca8f75dceac510ba16557b22b80c"
+      },
+      {
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "text_sha256": "5876c4a4c137ca5620a69dba04a1fc08c351cde008bbe6f32d62eba35b2548d4"
+      },
+      {
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "text_sha256": "e3378541a71c9e62cfe7dfd26c2565574d51b87d89948e1063d8a51082280499"
+      },
+      {
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "text_sha256": "97c7dcdf0520fb4198ec2dae0ad4267e7401caa9565615ff32d7a8d56260f69e"
+      },
+      {
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "text_sha256": "5ce2cdcd89116a8623b507e8bae5fb878d67d9e8b859a9c91d7bd5cb8329c516"
+      },
+      {
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "text_sha256": "7c3251db191e503a5f952da5ade9257a67694c1f3b61cd8dcbde0764ac6befc5"
+      },
+      {
+        "source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1",
+        "interview_sequence": 24,
+        "text_sha256": "5876c4a4c137ca5620a69dba04a1fc08c351cde008bbe6f32d62eba35b2548d4"
+      },
+      {
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "text_sha256": "a3719d9fef2a3949113d92d9e991ff87c6af5609439037b5344ad2ed21bdff0e"
+      },
+      {
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "text_sha256": "89df834a61dc2adb7ba4d89bc155cb3268efc31b6d92427f85d7e627c0798937"
+      },
+      {
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "text_sha256": "db943ef089ff2dac0cd3ee4171c891297c1097f5a7f1f0c84bd9ea7e13f480dc"
+      },
+      {
+        "source_id": "64614c36-5939-452b-8718-0aec74eb2145",
+        "interview_sequence": 32,
+        "text_sha256": "8de19d797f3771633d48d7829a625e9e874415f87728a322b21c0d6c37f02324"
+      },
+      {
+        "source_id": "e55b66f8-bd4f-4471-b748-448987cec807",
+        "interview_sequence": 34,
+        "text_sha256": "71f0eaf8329742daf899b3e946a31148b45724479e38ad7b7bad9929f8dceb71"
+      },
+      {
+        "source_id": "ca247afd-8cbc-4de8-a8c4-39b90c2b4197",
+        "interview_sequence": 36,
+        "text_sha256": "e800132d66efe0dbfb3d20993fa2ad56ac3ce41b7fa53f874d5cf929b38d40ce"
+      },
+      {
+        "source_id": "7b7eea4b-f19c-46ee-8ea4-e55490503fe8",
+        "interview_sequence": 38,
+        "text_sha256": "5876c4a4c137ca5620a69dba04a1fc08c351cde008bbe6f32d62eba35b2548d4"
+      },
+      {
+        "source_id": "745a9f2f-5527-4cf5-ad0f-2d3daefbb90f",
+        "interview_sequence": 40,
+        "text_sha256": "940569e6a7812ed2ef935a7033fee6682280ac02d125fa00dd82c7375e2451b6"
+      }
+    ],
+    "fixed_citation_audit": [
+      {
+        "citation_id": "1bbb3df3-502a-45a7-ab93-8e4b2411d80d",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "bf524188-cc90-406e-b979-3b5932edb54a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "f29bf6a9-2ad5-422c-abb9-9d4eddbf9c08",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "e7876ec9-ec23-4291-b019-f90ecacede8a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "c0a8d807-274a-4416-9181-725aebb43a7f",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "9c12337c649167a6e74b6d83a8295edfd6dbe57f07be0a3e8b5d5c684c7939d4"
+      },
+      {
+        "citation_id": "3a412c4d-4438-4a5c-9e93-0db0fe6f912a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "5f725b26-3403-4dc5-b8ab-f90f5bf63851",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "fd594120929bede2a85ac0b8e6f73edfd09d375479015f45f21fb783161a0139"
+      },
+      {
+        "citation_id": "f390eaa5-828a-4efc-9b5c-16e3e3a22217",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "47d37d66-417a-4790-b3db-583c0778887a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "7de2dc8b-5cce-411a-9bc8-7b7ad951fe17",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "fd594120929bede2a85ac0b8e6f73edfd09d375479015f45f21fb783161a0139"
+      },
+      {
+        "citation_id": "09ed93ca-f36b-4baa-b1ae-a206894d860d",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "4a5eb4f2-ea86-4989-acf0-c14fd1fd47b2",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "8494a305-56c3-4d2e-b70b-5034bd502e45",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "0dcb8045-f84a-4da0-9984-acf8b642f57c",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "f4fa54de-7639-4d1a-92e7-ac865bb990cc",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "3ca2d96d-be1f-40e7-a76f-1a87770e51a7",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "7ccb9ffd-01f2-4dfc-a843-07ed6fb7e9b4",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "f1e11c86-f030-4304-a74f-ae243b91aece",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "e309e2c5-a514-41a0-851a-1834ecc7a596",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "915ffcb9-dde3-4492-853c-b705336d53d4",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "6d446941-8a3e-47f1-a545-e7b481c85578",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "bf114f25-c315-4835-a19e-ac7913b58e9a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "57c1afa6-3f11-4896-a251-b1469cef96b4",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "4794923e-3782-4990-8d04-8f783540a13a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "2eda3cbe-01cf-43d7-bec2-a5aa5ec479f4",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "c4af2ffd-813d-4699-b704-90d43ed9b9ab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "396902ec-bf67-42bd-be29-a79bbbe20095",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "15cd212c-0b16-4e3d-9cf9-e7b5d3312f0f",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "0dc4ca1a-6938-4407-bd29-42d75d618fbd",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "5c9c6471-201f-4095-8d2d-0e11093d8d32",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "8e9af697-949b-4b8d-beeb-7c51c38f4ef5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "361658c5-04b3-46be-b95b-75f757c88caf",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "d8300223-050a-4453-81dd-b0b917b51e49",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "9f7dbc8d-0080-4b3a-a25c-8a4fc64ab60a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "7768522f-5982-4752-b06a-5e26ea02e2d4",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "de3536ba-494b-4ff4-ad85-a349cba1d3fe",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "459d3cfd-15d3-4aa4-91c1-fe6c4758ac45",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "057b6b71-30ed-4974-a3d7-ffd046f6949e",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "20cbec26-a419-4c8f-ac5e-135292cadee4",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "1b846e08-de21-4ca8-b5a3-2f15d8aa5824",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "0fa1054c-a295-4fe2-920f-1cd9aea89c46",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "c9378fb8-984a-4146-97ca-6a2eadc40ac2",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "83da5e90-48df-464b-b050-b27f527f5db3",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "4b09d207-e110-4a31-8bf8-38d9353b8f44",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "b26e18dd-4296-4372-8730-81fd0f9b4ed6",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "0325948d-aaf1-495b-95e1-238af8449040",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "6a827637-f4e2-442b-ba93-fc36f20e7560",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "cbf0904d-f358-4345-863c-6211015bf91b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "8098bfa6-f376-46ec-8216-1c65c1b862ff",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "800ea417-a7ed-4cf2-9e00-f99738fbcc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "19d72758-f4cf-4e9a-ae3f-ab0985ff5a13",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "fa7a7bd1-3792-4e2c-a744-e5ac224b4f15",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "c301e798-5a6d-44c7-90ad-ca9731613c87",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "894a0b82-ba38-430f-a4d7-a824b0a60b16",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "dfc27f9b-f380-48b4-bdb5-04dd9758efed",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "6918c4f8-0a35-4bcb-9ad1-c6d40375dc9c",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "184937e9-ca6c-429d-8844-70a54df5dda4",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "4c3fa45e-fa44-4eab-8fc3-4f66e00c04c8",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "content_sha256": "97d68a7a6323c052d090a9a8690d3066371c19c0e16767b3ece8586b2186e432"
+      },
+      {
+        "citation_id": "5d353022-e740-4bb2-ba57-9bad0737c0ab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "content_sha256": "97d68a7a6323c052d090a9a8690d3066371c19c0e16767b3ece8586b2186e432"
+      },
+      {
+        "citation_id": "55d17594-9135-4a7e-9fd8-be0e3a612df8",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "content_sha256": "97d68a7a6323c052d090a9a8690d3066371c19c0e16767b3ece8586b2186e432"
+      },
+      {
+        "citation_id": "35105f47-0cd8-438e-a5e7-b09cdfa0d08d",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "content_sha256": "97d68a7a6323c052d090a9a8690d3066371c19c0e16767b3ece8586b2186e432"
+      },
+      {
+        "citation_id": "5f6c0b38-b086-40c6-b25f-9bba25a82193",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "content_sha256": "97d68a7a6323c052d090a9a8690d3066371c19c0e16767b3ece8586b2186e432"
+      },
+      {
+        "citation_id": "e2867025-3504-4fd2-bd91-63e997751da9",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "content_sha256": "97d68a7a6323c052d090a9a8690d3066371c19c0e16767b3ece8586b2186e432"
+      },
+      {
+        "citation_id": "8ca46d5c-00e6-4f9c-9b0e-3a0f9b1d3873",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "content_sha256": "97d68a7a6323c052d090a9a8690d3066371c19c0e16767b3ece8586b2186e432"
+      },
+      {
+        "citation_id": "348297c9-0170-4089-9396-35809c6550f8",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "content_sha256": "97d68a7a6323c052d090a9a8690d3066371c19c0e16767b3ece8586b2186e432"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b4d8fa91ff2e36babf7f3d1b97a07e9c0c0c03f490949ad6e8fa4a2c7f76ac39"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b4d8fa91ff2e36babf7f3d1b97a07e9c0c0c03f490949ad6e8fa4a2c7f76ac39"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "fd594120929bede2a85ac0b8e6f73edfd09d375479015f45f21fb783161a0139"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "fd594120929bede2a85ac0b8e6f73edfd09d375479015f45f21fb783161a0139"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "fd594120929bede2a85ac0b8e6f73edfd09d375479015f45f21fb783161a0139"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b4d8fa91ff2e36babf7f3d1b97a07e9c0c0c03f490949ad6e8fa4a2c7f76ac39"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "fd594120929bede2a85ac0b8e6f73edfd09d375479015f45f21fb783161a0139"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "fd594120929bede2a85ac0b8e6f73edfd09d375479015f45f21fb783161a0139"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "fd594120929bede2a85ac0b8e6f73edfd09d375479015f45f21fb783161a0139"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "work_understanding",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b4d8fa91ff2e36babf7f3d1b97a07e9c0c0c03f490949ad6e8fa4a2c7f76ac39"
+      },
+      {
+        "citation_id": "944a3a9d-971a-431d-b16a-8cfc83e0b0f4",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "67f50f4a-af99-431e-a676-fbbd0a8d7719",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "5f942f53-98d7-4ef8-b901-a791c3e2a703",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "24a9e5cc-25c5-43ee-9b29-40532029acec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "80f70b18-78f5-411d-947c-5407001403f7",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "76a4c057-7350-49f1-8e59-c326b1248025",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "0935256b-9b19-41a3-a48f-dd45c20745e3",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "ba83f427-e782-43ef-82bd-4599a9c616ab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "44a02288-adc0-4d11-a06e-8663a8a9c932",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "37fa1046-5868-4fc9-bece-341b58710d46",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "555f761b-edec-4cba-8bc1-d69b6cb393c2",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "4f060edc-caec-4ab3-8138-18c9ec225ba0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "880c4cf2-f896-4a57-901b-2209d3bbf15d",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "31a3a010-a74e-4a5f-9808-da2a55704e74",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "99d46fe4-5b4e-4a2f-9e64-543f4df1ff36",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "f9f9d63c-0c45-4c33-bcc2-3538d054a20e",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "fef2357e-10ed-4914-af17-be484ff56267",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "3a9e0b7d-3e13-4c28-af41-78685c891b67",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "835411f4-a7e3-4ae8-b441-3edbaf1721bb",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "1a815cfb-bc1e-42af-aa51-0ab1432d85ae",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "b1e1e965-bfbf-4166-ac0d-a4515bc5f60c",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "0b19ca02-b30e-4748-86f7-a1810697750a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "6a402148-7891-4196-bfef-5b2109103ab2",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "b6a6722a-21bb-433f-8a36-733675549a72",
+        "interview_sequence": 30,
+        "content_sha256": "661f3e6daf5c0059f01c9803f3d036dba965ecf91c1ca166247405c52197f7ad"
+      },
+      {
+        "citation_id": "e4881e55-5450-4cc5-a76b-b8abdf80794f",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "7399730b-e2af-4478-b202-923862b3b663",
+        "interview_sequence": 28,
+        "content_sha256": "97d68a7a6323c052d090a9a8690d3066371c19c0e16767b3ece8586b2186e432"
+      },
+      {
+        "citation_id": "7e562500-f786-4b0c-9e7d-7582832622e7",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": null,
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "c0a8d807-274a-4416-9181-725aebb43a7f",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "2d8909b81912f6aedea7ceec298d37aa3252c47ecc8f145a6e02a3074687d1bb"
+      },
+      {
+        "citation_id": "c0a8d807-274a-4416-9181-725aebb43a7f",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "014925fcd68e4686f2a6b0e8fbfd1ff470db3f6904d687c641cc96085ae514ce"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b9d86c921aaca26508b7173635dc4da05437bc18fc130f6332310349be806bcb"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_811218f7c6cb4bc8adc8ecde55f1ba42",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "deca0f5daf4c142bae6c4a193f13d9f83d08bbc3048ab81a995d61af460e6c3c"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "4d76cfbb5dea5ca015da20d7a2c54cbc52f95eefdad0bcadb53888bf3b7ac8ca"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b9d86c921aaca26508b7173635dc4da05437bc18fc130f6332310349be806bcb"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_811218f7c6cb4bc8adc8ecde55f1ba42",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "deca0f5daf4c142bae6c4a193f13d9f83d08bbc3048ab81a995d61af460e6c3c"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "4d76cfbb5dea5ca015da20d7a2c54cbc52f95eefdad0bcadb53888bf3b7ac8ca"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "0ace2b8edf2fa4c129e98376bcc423d99f10504bb9f3442f6e69891e047a2ed1"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "444f5aff2bb314440b62cc547297b6809a4faf8b385e036106237d6db2fa4208"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "0ace2b8edf2fa4c129e98376bcc423d99f10504bb9f3442f6e69891e047a2ed1"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "444f5aff2bb314440b62cc547297b6809a4faf8b385e036106237d6db2fa4208"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b9d86c921aaca26508b7173635dc4da05437bc18fc130f6332310349be806bcb"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_811218f7c6cb4bc8adc8ecde55f1ba42",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "deca0f5daf4c142bae6c4a193f13d9f83d08bbc3048ab81a995d61af460e6c3c"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "4d76cfbb5dea5ca015da20d7a2c54cbc52f95eefdad0bcadb53888bf3b7ac8ca"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b9d86c921aaca26508b7173635dc4da05437bc18fc130f6332310349be806bcb"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_811218f7c6cb4bc8adc8ecde55f1ba42",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "deca0f5daf4c142bae6c4a193f13d9f83d08bbc3048ab81a995d61af460e6c3c"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "4d76cfbb5dea5ca015da20d7a2c54cbc52f95eefdad0bcadb53888bf3b7ac8ca"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b9d86c921aaca26508b7173635dc4da05437bc18fc130f6332310349be806bcb"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_811218f7c6cb4bc8adc8ecde55f1ba42",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "deca0f5daf4c142bae6c4a193f13d9f83d08bbc3048ab81a995d61af460e6c3c"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "4d76cfbb5dea5ca015da20d7a2c54cbc52f95eefdad0bcadb53888bf3b7ac8ca"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "0ace2b8edf2fa4c129e98376bcc423d99f10504bb9f3442f6e69891e047a2ed1"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "444f5aff2bb314440b62cc547297b6809a4faf8b385e036106237d6db2fa4208"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b9d86c921aaca26508b7173635dc4da05437bc18fc130f6332310349be806bcb"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_811218f7c6cb4bc8adc8ecde55f1ba42",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "deca0f5daf4c142bae6c4a193f13d9f83d08bbc3048ab81a995d61af460e6c3c"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "4d76cfbb5dea5ca015da20d7a2c54cbc52f95eefdad0bcadb53888bf3b7ac8ca"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b9d86c921aaca26508b7173635dc4da05437bc18fc130f6332310349be806bcb"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_811218f7c6cb4bc8adc8ecde55f1ba42",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "deca0f5daf4c142bae6c4a193f13d9f83d08bbc3048ab81a995d61af460e6c3c"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "4d76cfbb5dea5ca015da20d7a2c54cbc52f95eefdad0bcadb53888bf3b7ac8ca"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "b9d86c921aaca26508b7173635dc4da05437bc18fc130f6332310349be806bcb"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_811218f7c6cb4bc8adc8ecde55f1ba42",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "deca0f5daf4c142bae6c4a193f13d9f83d08bbc3048ab81a995d61af460e6c3c"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "4d76cfbb5dea5ca015da20d7a2c54cbc52f95eefdad0bcadb53888bf3b7ac8ca"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_5ab234acddc04ccaa011dee043b0fa9f",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "a43c99e6ef4c5a1864c0a7ef333f57a62626d5e4f4a2605172dcf1aa2fdc0559"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_652679bbb8e74868a01de0d23ad44cca",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "0ace2b8edf2fa4c129e98376bcc423d99f10504bb9f3442f6e69891e047a2ed1"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98896310bf1d4b9686e21923f80161e9",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "21a44d65da91e10fdedde3ed870561d60d23720c6524dcc89b67aa1c64cbeb8f"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_98cf5d8755cc45feb5f84764576e6e4d",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "e8ab09e285aced8d7418bb871314ab11aed0cc425b958bb2e7613f419bc382b7"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_c47c22688cdc48e393e681f42b7f70fc",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "444f5aff2bb314440b62cc547297b6809a4faf8b385e036106237d6db2fa4208"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_cbecf1ebf47e4afa948e6236152b0bcf",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "237864dfcaa3f10bd39d876380e99a8e4268ec6953305980a7bfebf29718a924"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "situation_ecc9d1e3a48e4293ba5de0d7831d81c2",
+        "kind": "work_situation",
+        "source_id": null,
+        "interview_sequence": null,
+        "content_sha256": "15fc60713490a9a8eef60be3115dfe664c85f64e180f93cf8654b507e474336b"
+      },
+      {
+        "citation_id": "c0a8d807-274a-4416-9181-725aebb43a7f",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_24",
+        "kind": "interview",
+        "source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1",
+        "interview_sequence": 24,
+        "content_sha256": "108bbbeddac001170dd46a3cf2cb6ec550c53b072597aa65906147b861312fb8"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_26",
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "804b17e3-b05c-4a96-acef-8bb74cef5ae0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_24",
+        "kind": "interview",
+        "source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1",
+        "interview_sequence": 24,
+        "content_sha256": "108bbbeddac001170dd46a3cf2cb6ec550c53b072597aa65906147b861312fb8"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_26",
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "3fa00279-64e4-418a-a71a-c3d24134211b",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "6b060886-015b-4c84-a07e-e77f8ac57a7a",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "436b9ff6-da98-4569-8660-a351a3f434b0",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_24",
+        "kind": "interview",
+        "source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1",
+        "interview_sequence": 24,
+        "content_sha256": "108bbbeddac001170dd46a3cf2cb6ec550c53b072597aa65906147b861312fb8"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_26",
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "83802138-5f3d-44e2-983d-dbfdb8df2cab",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_24",
+        "kind": "interview",
+        "source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1",
+        "interview_sequence": 24,
+        "content_sha256": "108bbbeddac001170dd46a3cf2cb6ec550c53b072597aa65906147b861312fb8"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_26",
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "e01786dc-f979-4ca6-9877-db02c97db4ec",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_24",
+        "kind": "interview",
+        "source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1",
+        "interview_sequence": 24,
+        "content_sha256": "108bbbeddac001170dd46a3cf2cb6ec550c53b072597aa65906147b861312fb8"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_26",
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "4d5c3bbc-d949-4764-a028-8593ecde3bb5",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "79fa950c-4cb9-47b9-bb6e-90c4a26b8eea",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_24",
+        "kind": "interview",
+        "source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1",
+        "interview_sequence": 24,
+        "content_sha256": "108bbbeddac001170dd46a3cf2cb6ec550c53b072597aa65906147b861312fb8"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_26",
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "3e696551-c38c-4ddc-a89d-0f97e66b9621",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_24",
+        "kind": "interview",
+        "source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1",
+        "interview_sequence": 24,
+        "content_sha256": "108bbbeddac001170dd46a3cf2cb6ec550c53b072597aa65906147b861312fb8"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_26",
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "0c0ac650-2c3c-439d-bc32-c1e50ce7ca35",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_24",
+        "kind": "interview",
+        "source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1",
+        "interview_sequence": 24,
+        "content_sha256": "108bbbeddac001170dd46a3cf2cb6ec550c53b072597aa65906147b861312fb8"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_26",
+        "kind": "interview",
+        "source_id": "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+        "interview_sequence": 26,
+        "content_sha256": "d8af20bb3e54fbbd5fc82d42231facde4bfba710ef53e0be02fe2141c21d8a80"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "391b8c2d-a65a-4585-a14b-3cfeda5bfc12",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_2",
+        "kind": "interview",
+        "source_id": "92f99f2a-760e-476a-ad08-59ecf3d534ef",
+        "interview_sequence": 2,
+        "content_sha256": "6194e2315782f2d02c82842ec27cfde306099e7eefb4a8aa5babc24e1eccd207"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_12",
+        "kind": "interview",
+        "source_id": "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+        "interview_sequence": 12,
+        "content_sha256": "88d8062b86377f1f3311ba6676388da84b6e269add62391e1239b6d59f46b47a"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_14",
+        "kind": "interview",
+        "source_id": "54823972-7b48-4d1f-9c61-79f8b0f11f17",
+        "interview_sequence": 14,
+        "content_sha256": "e001c7868625f7fd0ea33fafa22db1bd22ba6120d29584646bcd6c26a83fbbfb"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_22",
+        "kind": "interview",
+        "source_id": "771de84b-45f5-4f88-88d1-35abc52434e9",
+        "interview_sequence": 22,
+        "content_sha256": "a4b25d32c0b31b21b32ef39d523d116259d6a95ec116b45f3f646fb6544b6b93"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_4",
+        "kind": "interview",
+        "source_id": "c8c012c0-1f76-46df-b9f8-1f4dda523599",
+        "interview_sequence": 4,
+        "content_sha256": "1a137bed9da30cac2494eead9bc2e2f951307af65bb53e98a0f126e8c9957b6d"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_6",
+        "kind": "interview",
+        "source_id": "42811ab7-c7ac-4f9f-a44a-dfc8c804311c",
+        "interview_sequence": 6,
+        "content_sha256": "5454a4a48d24aa9214ade94266eecd460ae430966e687950ba983ebcf039aa60"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_8",
+        "kind": "interview",
+        "source_id": "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+        "interview_sequence": 8,
+        "content_sha256": "0879d0fc51ee7f1678e40de6d3dab2eed6937ee5e9418e84fc7db3a4d40199ab"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_10",
+        "kind": "interview",
+        "source_id": "3a6793b4-6658-4070-b5c0-518206a7eadc",
+        "interview_sequence": 10,
+        "content_sha256": "ba114c2b7f0d338e07d5e87e9b470e264ff624fe80841376d1da81e03eef2185"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_16",
+        "kind": "interview",
+        "source_id": "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+        "interview_sequence": 16,
+        "content_sha256": "b9e8313c427414f4adb98743dd91272ab6669003d80e2134a554971b28f7b643"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_18",
+        "kind": "interview",
+        "source_id": "60c989c1-706f-4c50-8b74-4192941dbd41",
+        "interview_sequence": 18,
+        "content_sha256": "69815d981ee92b577adfeedca0b2ef4ba98b518c4a48df041203b9b49e149978"
+      },
+      {
+        "citation_id": "36fd151f-3003-4057-819e-fec409862009",
+        "revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+        "source_ref": "interview_20",
+        "kind": "interview",
+        "source_id": "0cb40f0d-0083-413e-af6e-84ad08d8ea94",
+        "interview_sequence": 20,
+        "content_sha256": "c321d2c1b6a7e878bf030e0f8e35d8fb16b694da6ee970db86edb071254e5177"
+      }
+    ],
+    "fixed_source_match": "Every formal citation has one fixed root; all content source_ref links have exactly one target within the same citation; every fixed interview matches one public employee original exactly; all entries use the fixed formal revision."
+  }
+}

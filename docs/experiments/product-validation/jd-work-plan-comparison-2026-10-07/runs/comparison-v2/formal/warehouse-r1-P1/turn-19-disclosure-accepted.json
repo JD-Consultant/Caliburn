@@ -1,0 +1,25 @@
+{
+  "actual_question": "好，您是否輪值晚班先保留未知，不推測。\n\n目前底稿已涵蓋收貨驗收與 WMS 上架、揀貨與補貨、每週循環盤點及十二月年度盤點、客戶退貨與供應商退貨出庫、新人帶教、班別交接，以及冷藏區溫控。像是拒收與退貨條件、庫存調帳、冷藏貨出貨放行及新人上線核准等責任界線，也依您說明的決策權責整理了。\n\n補貨後是否登記移庫、旺季瓶頸回報對象、年度盤點的分區與表單細節，以及您是否輪值晚班或負責早晚兩次溫度檢查，目前都先保留未確認。您可以核對目前底稿：若有工作漏寫或哪段描述不準確，告訴我需要更正的部分即可。",
+  "employee_text": "可以依我已說過的工作範圍繼續訪談；我沒有新增事實。",
+  "fact_ids": [],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [],
+  "review_mode": "no_question",
+  "review_reason": "整段為已知工作與未知細節的收束摘要，最後只邀請核對底稿及視需要更正，沒有實際提出新的工作問題；不因摘要或隱藏缺項釋出事實。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": true,
+  "subquestions": [
+    {
+      "quote": "您可以核對目前底稿：若有工作漏寫或哪段描述不準確，告訴我需要更正的部分即可。",
+      "mode": "no_question",
+      "fact_ids": [],
+      "reason": "屬收束後的條件式核對邀請，未具體詢問新的工作內容、要求或相關已知確認。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "23fd386c-f3b2-4c14-835e-e2bda8e266bc",
+  "accepted_source_id": "c04ef325-a059-42a9-8a25-f5877f8d03fa"
+}

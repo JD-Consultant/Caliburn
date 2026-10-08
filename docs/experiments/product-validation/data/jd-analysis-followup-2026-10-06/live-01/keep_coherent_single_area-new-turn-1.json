@@ -1,0 +1,17 @@
+{
+  "execution_id": "ba1ea8e1-7943-4bc7-a934-66e6a278790f",
+  "exchange": {
+    "employee_input": {
+      "source_id": "f1a1301e-d378-4e05-8b74-7c5ad223ec3e",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "對，都屬於同一次核對，沒有另外負責的工作。這份內容沒錯，今天先到這裡。"
+    },
+    "consultant_reply": {
+      "source_id": "24dda367-4a9c-45bd-9abc-a7b9b70296e4",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "好，今天先到這裡。依你的確認，這些步驟都屬於同一項出貨前條碼核對工作，目前沒有其他負責的工作；揀貨、裝箱及決定換貨不在你的職責範圍內。之後若要繼續，我們再接著核對。"
+    }
+  }
+}

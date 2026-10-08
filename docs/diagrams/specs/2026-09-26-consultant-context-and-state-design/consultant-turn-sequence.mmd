@@ -1,0 +1,62 @@
+%% title: 現行時序：顧問 Context 與正常 Turn 生命週期
+%% legend: 實線實心箭頭：同步呼叫；虛線：回傳；實線開放箭頭：非同步通知；時間由上而下。輪前原生壓縮為現行接法；目標摘要另見正文。
+sequenceDiagram
+    actor E as 員工
+    participant R as App 顧問執行流程
+    participant D as 業務與保存責任
+    participant O as OpenAI Responses
+    E->>R: 本次員工輸入 I（尚無正式訪談序號）
+    R->>D: 保存員工原話，不等待顧問回答
+    D-->>R: 保存成功已確認
+    R-->>E: 原話已保存；不表示本輪工作已完成
+    Note over R,D: 024：本輪輸入未成為共享訪談；JD 修改先在本輪候選內
+    Note over R,O: 尚未將新員工輸入加入舊視窗；前 Turn 已結束
+    opt 達門檻，或 Agent 已決定主動壓縮
+        R->>O: compact：完整既有視窗，不含新輸入 I
+        O-->>R: 完整 compacted.output
+        R->>D: 可靠保存並採用完整返回視窗，辨認本次要求已完成
+        D-->>R: 027：Compaction 安全點成立；尚無新輪輸入
+        Note over R,O: 全部 items 成為有效基底；新 Turn 回退不撤銷此成果
+    end
+    R->>D: 取得本輪範圍及最新完整 Memory 基準
+    D-->>R: 已發布版本、涵蓋訪談序號 K、本輪前有效歷史上界 H
+    Note over R,D: 本 Turn 的 Memory 與近期範圍共用同一基準
+    R->>D: 取得同基準導覽及 K 之後至 H 的近期歷史與必要前問
+    D-->>R: 本輪資料；訪談保留角色、來源及順序
+    Note over R,O: 歷史或完整壓縮視窗 → user App 資料 → user 員工輸入 I
+    loop 本輪模型與工具迭代
+        R->>O: 完整當前視窗與 request 層設定
+        O-->>R: response items
+        R->>D: 可靠保存完整原生輸出及工具原請求
+        D-->>R: 已保存；才可派送有副作用的工具
+        Note over R,O: 完整原生輸出依序追加，歷史不覆寫
+        loop 依原順序處理本次回應的每個工具 call（可為零個）
+            R->>D: 經授權、驗證的讀取或操作
+            D-->>R: 讀取或候選修改的真實結果；不冒稱正式提交
+            Note over R,O: 按 call_id 配對並追加；交下一請求接續
+        end
+        Note over R,D: 每個 Step 的接續與候選一致可靠保存，才成立 Step 安全點
+        opt 已要求暫停
+            R-)E: 已停在 Step 安全點；等待繼續同一 Turn
+            E->>R: 繼續
+        end
+        opt 確實要繼續模型且達 160K
+            R->>O: standalone compact 當前完整視窗
+            O-->>R: 完整 compacted.output
+            R->>D: 可靠採用輪中基底，不重加本輪輸入或刷新 Memory
+        end
+    end
+    Note over R,E: 生成中可暫示片段，不等於完整正式答覆已保存
+    alt 已形成完整正式答覆
+        R->>D: 可靠保存答覆，確認本輪候選與有效訪談一致生效
+        Note over R,D: 短交易與原操作核對依資料／共用執行契約
+        alt 本輪完成結果已確認
+            D-->>R: 下一安全點成立；原答覆與正式結果可查回
+            R-->>E: 確認本輪完成；UI 斷線後讀取同一結果
+        else 完成結果未確認
+            R-->>E: 不承諾完成或回退；先核對原結果
+        end
+    else 尚無完整正式答覆
+        R-->>E: 說明未完成，與原話及業務操作結果分開呈現
+    end
+    Note over R,O: 完成路徑保留接續；取消路徑不承接。輪前壓縮為主；完整 Step 間依 160K 保險主動壓縮

@@ -1,0 +1,26 @@
+{
+  "question_id": "c88141b2962142ac9c19ef21506188a9",
+  "mode": "answer",
+  "fact_ids": [
+    "training"
+  ],
+  "reason": "明確依員工換題意願詢問帶教工作內容與進度判斷，training 可首次披露；權限更正尚未滿足先前披露條件。",
+  "subquestions": [
+    {
+      "quote": "以您最近帶新人的情況為例，您實際會教新人哪些工作？",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "凍結事實提供掃碼、揀貨與安全動線帶教內容。"
+    },
+    {
+      "quote": "通常做到什麼程度，您這段帶教才算告一段落？",
+      "mode": "answer",
+      "fact_ids": [
+        "training"
+      ],
+      "reason": "凍結事實有新人跟做、觀察錯誤與檢核表，以及自述能否自己上線的判斷，可回應本人帶教進度界線。"
+    }
+  ]
+}

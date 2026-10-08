@@ -1,0 +1,17 @@
+{
+  "execution_id": "39e7dd95-64f4-4fde-81e4-fec41492f5c0",
+  "exchange": {
+    "employee_input": {
+      "source_id": "29195e07-3c2b-4f9f-a223-10cbaa814af4",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "有時候還會幫忙處理一些系統問題，不過我現在只想得到這樣，不確定該怎麼說。"
+    },
+    "consultant_reply": {
+      "source_id": "c567e782-f2e6-4085-a6dd-af8567fe82be",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "了解，除了依設計稿實作頁面，偶爾也會協助處理系統問題。這部分先不用整理成正式說法；想到最近一次就好：當時遇到什麼狀況，你實際做了什麼？例如自己排查修復、提供資訊給其他人，或轉交給負責的人。"
+    }
+  }
+}

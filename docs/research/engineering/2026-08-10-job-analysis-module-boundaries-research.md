@@ -1,5 +1,7 @@
 # Job Analysis 完成後的模組邊界研究
 
+> 時點說明：本文保留 2026-08-10 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 - 日期：2026-08-10
 - 狀態：Research complete；實作前仍需 owner 核准設計
 - 範圍：現行 `apps/api`／`apps/web` 的 move-only 架構整理
@@ -16,7 +18,7 @@
 - [ADR 0057](../../adr/0057-current-only-runtime-and-data-boundary.md) 已把 `job_analysis` 提升為唯一現行 runtime；舊 runtime、contract、migration 與 app 已移除。
 - [ADR 0008](../../adr/0008-api-hexagonal-layering.md) 已確立依賴向內：pure core／ports → application → adapters／delivery，並以 composition root 接線。
 - [`docs/contract-strategy.md`](../../contract-strategy.md) 規定跨語言 contract 才放 `packages/`；domain／application 不直接依賴 transport DTO。
-- [`docs/design/task-analysis-engine.md`](../design/task-analysis-engine.md) 確立 `JobAnalysisState`、Current State、Journal、generation/read-set 與 authority commit 是共同真相；Task 與 OPKS 不能各自建立第二份 document store 或 generic proposal framework。
+- [`docs/design/task-analysis-engine.md`](../../history.md#source-eed51bc603c33d829c3e) 確立 `JobAnalysisState`、Current State、Journal、generation/read-set 與 authority commit 是共同真相；Task 與 OPKS 不能各自建立第二份 document store 或 generic proposal framework。
 
 ## 3. 權威資料的收斂
 

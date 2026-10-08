@@ -1,5 +1,7 @@
 # JD 顧問是否需要 LLM 工作區
 
+> 時點說明：本文保留 2026-09-12 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 - 日期：2026-09-12；Topic：JD-R002；G2 研究；§7 記後續受權裁決／G3 WORKING，未採用新子系統。
 - 問題：既有 Memory／Context 與可反覆修訂的關聯式 JD 之外，是否還需要模型可使用的工作區？
 - 範圍：現行本機單人、持續訪談、完整手動管理；不重新設計 Memory、不改正式 authority、不啟動模型實驗。
@@ -48,9 +50,9 @@ Owner 本輪「同意」接在未完整草稿的兩種意義說明之後。已�
 |---|---|
 | 保存原始問答並精確回查 | [Memory 設計 §1／4](../../history.md#source-7c28c9e58ce7f8268b9f)：Checkpointer 原始資料與逐層回查，隔離已實作 |
 | 保存案例詳記、目前工作理解、導覽及較新更正 | 同稿五產物／B1／B2／C；目前接口沿決策入口。未知也可保留，不能把臨時模型猜想直接變已確認內容 |
-| 壓縮後續談 | [runtime 設計](../../history.md#source-97506ed55d64022fadf0)、[隔離 context 原碼](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/context.py)：視窗與 canonical 原文分開；有損壓縮不保證語意完全保留 |
-| Memory 私有暫存修訂 | [consolidation_tools.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/consolidation_tools.py)：B2 已用官方 StateBackend／CompositeBackend 與私有 staging，多次讀写後發布；只准 knowledge／guide，並非任意 workspace |
-| 主顧問讀方法、改 Memory、操作 JD | [service.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/service.py)的 `_context` 及[方法資產說明](../../.worktrees/analysis-only-agent/experiments/analysis-agent/README.md)：按需只讀 Skill 資產，受控工具；未提供主顧問任意 scratch／shell／sandbox |
+| 壓縮後續談 | [runtime 設計](../../history.md#source-97506ed55d64022fadf0)、[隔離 context 原碼](../../history.md#source-a3bd5c14a291b48b615e)：視窗與 canonical 原文分開；有損壓縮不保證語意完全保留 |
+| Memory 私有暫存修訂 | [consolidation_tools.py](../../history.md#source-bd5a9230979d84b001d3)：B2 已用官方 StateBackend／CompositeBackend 與私有 staging，多次讀写後發布；只准 knowledge／guide，並非任意 workspace |
+| 主顧問讀方法、改 Memory、操作 JD | [service.py](../../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-core-review/source/experiments/analysis-agent/src/analysis_agent/service.py)的 `_context` 及[方法資產說明](../../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-task6/source/experiments/analysis-agent/README.md)：按需只讀 Skill 資產，受控工具；未提供主顧問任意 scratch／shell／sandbox |
 | JD 整組更正與真實保存結果 | 舊 Plate 核心已有隔離實證；[新 relational 業務稿 §2／5](../../history.md#source-9c763ce46135aaea81d3)規定完整候選、同次保存及反例，尚未施工；不是跨多工具的私有 JD 分支 |
 
 因此不能說本案完全沒有「工作區能力」；B2 已有明確用途的受控暫存。也不能反過來說它已覆蓋主顧問的任何試稿需求。

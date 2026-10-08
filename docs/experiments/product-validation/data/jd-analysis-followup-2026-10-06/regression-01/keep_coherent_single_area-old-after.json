@@ -1,0 +1,75 @@
+{
+  "profile": {
+    "revision_id": "ea65aae4-3cbc-4c78-aee6-b0228ff3fc3e",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "確認待出貨品項與單據一致，回報未排除差異。"
+    }
+  },
+  "work": {
+    "revision_id": "ea65aae4-3cbc-4c78-aee6-b0228ff3fc3e",
+    "areas": [
+      {
+        "area_id": "528a3d79-75d4-44f4-b92a-731956d6a552",
+        "title": "出貨前核對",
+        "scope_text": "條碼與單貨核對及同一工作中的差異回報。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "e1135245-cacb-4b0b-be6b-8f9def32a78d",
+        "area_id": "528a3d79-75d4-44f4-b92a-731956d6a552",
+        "title": "核對待出貨商品",
+        "description": "每日下午三點核對品項與數量；掃碼不符先重掃、核對標籤，仍不符記錄交主管。不負責揀貨、裝箱或換貨決策。",
+        "outcomes": [
+          {
+            "detail_id": "8c124cdf-f371-4658-a53a-6c68da4b39a5",
+            "text": "待出貨品項與數量完成核對；仍不符的情況有記錄並交主管處理。"
+          }
+        ],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "ea65aae4-3cbc-4c78-aee6-b0228ff3fc3e",
+    "references": [
+      {
+        "citation_id": "8bc79277-c326-44ce-8a73-e77b41546ba6",
+        "target_label": "任務：核對待出貨商品",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "e1135245-cacb-4b0b-be6b-8f9def32a78d",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "c1586bd9-471c-47c1-a70d-473deef261ec",
+        "target_label": "任務：核對待出貨商品 · 成果：待出貨品項與數量完成核對；仍不符的情況有記錄並交主管處理。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "8c124cdf-f371-4658-a53a-6c68da4b39a5",
+          "task_id": "e1135245-cacb-4b0b-be6b-8f9def32a78d"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

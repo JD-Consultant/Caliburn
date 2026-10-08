@@ -1,0 +1,12 @@
+{
+  "authorization": "使用者同意：都繼續，限流就等。沿用原 US$0.30／60 分鐘，保留未知用量預留，不修改正式產品。",
+  "journal_sha256": "93815710e8e0a08e7f763da3b519289f4a95fa818d747698a1529710344cbd12",
+  "started_at": "2026-10-06T09:30:26.085423+00:00",
+  "spent_usd": "0.048804705",
+  "retained_reservations": {
+    "f02d943d-77c7-473e-af85-e43f96e609f4": "0.015437625"
+  },
+  "confirmed_failure": "產品 outbound attempts 與 App log 確認 turn14 為 rate_limit_exceeded；其他已收 usage 照原定價結算。",
+  "failed_execution_id": "176230ef-4aa7-4a69-9803-371c9eda622b",
+  "continuation": "失敗 Turn 不可 resume；依產品公開 inputs 入口，以新 command 重送同一段員工文字。原失敗不是成功，不刪除任何紀錄。"
+}

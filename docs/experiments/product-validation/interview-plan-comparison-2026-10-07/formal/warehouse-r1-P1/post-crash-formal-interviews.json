@@ -1,0 +1,81 @@
+{
+  "messages": [
+    {
+      "source_id": "3bab1478-8ca4-4e0a-9262-dbd818c18aac",
+      "interview_sequence": 1,
+      "speaker": "app",
+      "interview_text": "這裡會透過訪談，逐步理解您的實際工作並整理職務說明書。您不需要先學會撰寫，也不必一次說完；不確定的地方可以直接說明。\n\n請先說說您目前主要負責哪些工作？可以用自己的說法，從平常大家會找您處理的事情開始。",
+      "execution_id": null
+    },
+    {
+      "source_id": "c425a3eb-18c2-4c36-9e86-3f0581390af0",
+      "interview_sequence": 2,
+      "speaker": "employee",
+      "interview_text": "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。",
+      "execution_id": null
+    },
+    {
+      "source_id": "d544cd33-8573-4916-a2f7-7db447d939aa",
+      "interview_sequence": 3,
+      "speaker": "consultant",
+      "interview_text": "我先把職務名稱、所屬單位、匯報對象與班表，以及您提到的工作整理成四個範圍：收貨與倉儲、揀貨補貨與庫存、退貨、新人帶教。進貨數量不符時，您不負責決定拒收或退換貨，這個界線也已納入整理。\n\n想再釐清這類差異的後續：您核對單據、拍照通知採購後，這批貨通常會先怎麼處理？例如暫放等通知，或照常上架？您實際遇過的做法是什麼？",
+      "execution_id": "2a988ca6-b052-45a8-a4d2-9db0c6191be2"
+    },
+    {
+      "source_id": "8b1cb06a-ec7b-431d-993a-917014deafb7",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「這批貨通常會先怎麼處理？例如暫放等通知，或照常上架？」，我目前沒有確定資料，請保留未知，不補猜。",
+      "execution_id": null
+    },
+    {
+      "source_id": "769317b3-7795-476b-a646-0fa5a6eb2ee2",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "已補上進貨驗收的做法：逐箱核對品項、數量、外包裝與單據；發現差異時拍照、登記收貨異常表並通知採購，依採購回覆的補送或接受結果登記入庫。您不負責議價、選供應商或決定拒收、退換貨，這些界線也已保留。\n\n差異貨物在等待採購回覆期間如何處理，我會照您的說明保留未知，不作推測。接著想了解揀貨：您通常依什麼資料或指示找貨，揀好後交給誰或放到哪裡？",
+      "execution_id": "f26ba9c5-f4b6-4485-8537-b83fd6a9c858"
+    },
+    {
+      "source_id": "0749bcd2-9b0d-44e5-b721-ee84f1f390b7",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+      "execution_id": null
+    },
+    {
+      "source_id": "f6e371cb-410b-4683-8c74-513c24d0d9a5",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "已把揀貨與補貨整理成一項工作：依出貨波次單揀貨、核對品項／數量／批號／效期，揀貨區不足時從備貨區補貨，並在截單前交包裝區複核。若系統有貨但儲位空置，先查移庫紀錄與前一波次，不擅自替換批號；異常交組長協調。\n\n接著想了解庫存盤點：您如何核對實際數量與系統庫存？若發現差異，通常怎麼記錄或通知？",
+      "execution_id": "bf691ffa-33b3-4c81-b962-ffdee034d63a"
+    },
+    {
+      "source_id": "17a6a153-4051-44b1-9b59-2940237f56d0",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？",
+      "execution_id": null
+    },
+    {
+      "source_id": "58307a0a-1c05-4d2b-8d7e-596874a06c76",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "可以，先談帶新人。每週循環盤點，以及發現差異時先查近期入出庫、移庫紀錄再複點，我已整理到盤點工作中；調帳方式和批准人仍保留未知。\n\n請想一個最近帶新人的例子：當時您帶他熟悉哪項工作？您實際怎麼教，或怎麼確認他已能自己做？",
+      "execution_id": "a73d3b38-8bfa-4a36-b4a0-0a5324accff4"
+    },
+    {
+      "source_id": "35a24ade-5a2b-4a31-b70d-b31205e8144d",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。",
+      "execution_id": null
+    },
+    {
+      "source_id": "ed265391-d61f-432e-8334-7132e3f1f2b8",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "已把新人第一週的帶教整理進底稿：示範掃碼、揀貨與安全動線，讓新人跟著操作，當場查看是否漏掃、拿錯批號或走進車道，並記在帶教檢核表；您也負責判斷新人能否獨立上線。\n\n檢核表是否有明確的通過標準？如果新人還沒達到要求，後續通常由誰安排再練或決定是否能上線？",
+      "execution_id": "41b66cd1-9780-4b5c-965c-1088da1fb549"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "employee_text": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。",
+  "audit": {
+    "actual_question": "已補上新人第一週的帶教內容：您示範掃碼、揀貨與安全動線，再讓新人跟做；您當場觀察漏掃、拿錯批號或走入車道，記在帶教檢核表，並判斷新人能否自己上線。\n\n您剛才說盤點後續想起了一些；請從複點後開始，說說接下來通常怎麼處理。若也記得調帳由誰處理或批准，可以一併說明；不確定的部分仍可保留未知。",
+    "employee_text": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。",
+    "fact_ids": [
+      "inventory-authority"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "inventory-authority"
+    ],
+    "review_mode": "answer",
+    "review_reason": "盤點暫時缺口後已正式披露 training 並送出可回訪線索，現在明確回訪複點後流程及調帳權責，符合 inventory-authority 條件；帶教句只是摘要，不觸發其更正。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "請從複點後開始，說說接下來通常怎麼處理。",
+        "mode": "answer",
+        "fact_ids": [
+          "inventory-authority"
+        ],
+        "reason": "直接回訪複點後差異表、核准、調帳與結案核對流程。"
+      },
+      {
+        "quote": "若也記得調帳由誰處理或批准，可以一併說明",
+        "mode": "answer",
+        "fact_ids": [
+          "inventory-authority"
+        ],
+        "reason": "明確詢問可回憶的調帳執行與批准權責，凍結條件已滿足。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

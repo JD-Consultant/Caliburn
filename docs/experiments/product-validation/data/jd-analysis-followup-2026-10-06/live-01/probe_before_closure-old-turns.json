@@ -1,0 +1,157 @@
+{
+  "arm": "old",
+  "case_id": "probe_before_closure",
+  "job_file_id": "e0960171-022d-47ae-8512-9421c2cc5813",
+  "before": {
+    "profile": {
+      "revision_id": "eb5e3a09-bd9d-48e3-a950-603b4d3e8969",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "支援倉庫收貨出貨及庫存核對。"
+      }
+    },
+    "work": {
+      "revision_id": "eb5e3a09-bd9d-48e3-a950-603b4d3e8969",
+      "areas": [
+        {
+          "area_id": "ea3dacec-e47c-4388-912a-9ca294df47af",
+          "title": "倉庫作業",
+          "scope_text": "收貨、揀貨及庫存清點。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "692b3998-7e3e-4422-8af4-1eb94bbc8836",
+          "area_id": "ea3dacec-e47c-4388-912a-9ca294df47af",
+          "title": "核對收貨與揀貨",
+          "description": "核對單貨，數量不符記錄給主管，不自行改帳。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "71aaa281-d206-43e8-b652-a5fa9f48bbf4",
+          "area_id": "ea3dacec-e47c-4388-912a-9ca294df47af",
+          "title": "執行庫存清點",
+          "description": "每日下班複點高異動商品，月底盤本人區域；差異容許門檻尚不清楚。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "eb5e3a09-bd9d-48e3-a950-603b4d3e8969",
+      "references": [
+        {
+          "citation_id": "bb84e0ce-272a-4b4a-9e28-d77309ec2ef2",
+          "target_label": "任務：核對收貨與揀貨",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "692b3998-7e3e-4422-8af4-1eb94bbc8836",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "e249b8ee-6c4a-4714-8bd0-c9daee013ac7",
+          "target_label": "任務：執行庫存清點",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "71aaa281-d206-43e8-b652-a5fa9f48bbf4",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "eb242a5f-d687-4f40-94ef-5ae892208c99",
+      "exchange": {
+        "employee_input": {
+          "source_id": "b9821053-17a1-4ae5-b75f-1a45d4d62a7e",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "我現在想不到其他的，平常大概都這樣。"
+        },
+        "consultant_reply": {
+          "source_id": "a37bbcf9-03ab-49bd-937e-8c364734efb8",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "不用特別再想其他工作，我們可以從已知的項目逐步補清楚。目前已整理收貨核對與揀貨，以及每日複點高異動商品、月底盤點負責區域；數量不符時記錄交主管處理、不自行改帳，也已列入要求。差異容許門檻仍未知，先不臆測。\n\n先聊揀貨：你通常依什麼資訊找到要揀的商品和數量？例如紙本單、系統畫面、口頭指示，或其他方式。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 386234,
+    "output_tokens": 17789,
+    "reasoning_tokens": 13810,
+    "cached_input_tokens": 341728,
+    "cache_write_input_tokens": 44416,
+    "total_tokens": 404023,
+    "outbound_calls": 60,
+    "count_calls": 30,
+    "generation_calls": 30,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 386234,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0030",
+    "actual_estimated_usd": "0.017872780",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.020872780",
+    "cumulative_occupied_usd": "0.020872780",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 361.505282099999,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 430483,
+    "output_tokens": 19540,
+    "reasoning_tokens": 15108,
+    "cached_input_tokens": 383895,
+    "cache_write_input_tokens": 46486,
+    "total_tokens": 450023,
+    "outbound_calls": 68,
+    "count_calls": 34,
+    "generation_calls": 34,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 430483,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0034",
+    "actual_estimated_usd": "0.019429900",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.022829900",
+    "cumulative_occupied_usd": "0.022829900",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 411.01627809999627,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

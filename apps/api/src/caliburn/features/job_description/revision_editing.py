@@ -62,6 +62,7 @@ async def record_edit(
     request_payload: object,
     candidate: JdCandidateScope | None,
     source_references: tuple[JdSourceReference, ...] | None = None,
+    result_payload: object | None = None,
 ) -> None:
     if result_revision_id != expected_revision_id:
         references = source_references
@@ -86,6 +87,7 @@ async def record_edit(
             expected_revision_id=expected_revision_id,
             result_revision_id=result_revision_id,
             request_payload=request_payload,
+            result_payload=result_payload,
             candidate_execution_id=candidate.execution_id if candidate else None,
             candidate_generation_id=candidate.generation_id if candidate else None,
         )

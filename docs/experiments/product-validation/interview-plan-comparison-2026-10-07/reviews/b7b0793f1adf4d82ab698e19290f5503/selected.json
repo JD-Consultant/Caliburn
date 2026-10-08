@@ -1,0 +1,20 @@
+{
+  "employee_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。",
+  "audit": {
+    "actual_question": "可以，先談帶新人。每週循環盤點，以及發現差異時先查近期入出庫、移庫紀錄再複點，我已整理到盤點工作中；調帳方式和批准人仍保留未知。\n\n請想一個最近帶新人的例子：當時您帶他熟悉哪項工作？您實際怎麼教，或怎麼確認他已能自己做？",
+    "employee_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。",
+    "fact_ids": [
+      "training"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "training"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉向員工指定的新人帶教，問所教工作、教法與確認獨立操作，training 固定事實可答。這是首次披露 training，不提前給 training-boundary；盤點摘要也不構成回訪。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

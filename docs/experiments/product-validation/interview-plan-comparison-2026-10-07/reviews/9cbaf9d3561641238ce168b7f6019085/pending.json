@@ -1,0 +1,31 @@
+{
+  "question_id": "9cbaf9d3561641238ce168b7f6019085",
+  "profile": "warehouse",
+  "actual_question": "我已把揀貨方式補入底稿：依出貨波次單揀貨，核對品項、數量、批號及效期，截單前完成後交包裝區複核；若系統有庫存但儲位空，先查移庫與前一波次，不自行更換批號，並交組長協調異常。\n\n你提到揀貨區不足時會從備貨區補貨。除了配合波次揀貨做這件事，你是否也會在其他情況下獨立補貨？",
+  "disclosed": [
+    "picking",
+    "receiving"
+  ],
+  "open_gaps": [],
+  "seen_topics": [
+    "picking",
+    "receiving"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "picking"
+  ],
+  "gap_opened_at": {},
+  "recent_employee_originals": [
+    "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。"
+  ],
+  "candidate": {
+    "actual_question": "除了配合波次揀貨做這件事，你是否也會在其他情況下獨立補貨？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分；若要釐清，可以具體問我實際做的步驟或責任。",
+    "fact_id": null,
+    "unmapped_or_already_answered": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "execution_id": "34e9d81b-f71c-4110-8d2a-086746a1de5a",
+  "exchange": {
+    "employee_input": {
+      "source_id": "4cab7b71-fa26-4052-bd26-3a0fc282d186",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "正常做法、交接與目前工作範圍都說過了，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "5c41a286-20df-462c-b9dc-3fd7a9b00496",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "目前主要工作與責任界線已足以整理，不需要再補其他工作。我已把收貨核對、異常交接、上架登記，以及搬運重量與堆高機證照要求整理進底稿。正式職稱和所屬單位尚未明確確認，我先不推定。\n\n有一點想確認：你目前已取得堆高機操作證照了嗎？如果還沒有，現在仍會操作堆高機，還是取得證照後才操作？"
+    }
+  }
+}

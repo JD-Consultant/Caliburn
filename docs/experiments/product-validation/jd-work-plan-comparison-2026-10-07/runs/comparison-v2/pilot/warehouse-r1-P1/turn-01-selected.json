@@ -1,0 +1,41 @@
+{
+  "question_id": "78004ca4cd004e2282256046f62b3e7f",
+  "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+  "audit": {
+    "actual_question": "我已先把職務名稱、所屬單位、匯報對象、主要工作分組及您提到的工時安排整理進底稿。進貨數量不符的處理方式目前先當作這次案例，不直接假定每次都完全相同；拒收或退換貨的決定權也會保留在您的責任範圍之外。\n\n這次您核對單據與實收數量、拍照通知採購後，通常還會追蹤採購的回覆或記錄差異嗎？後續由誰決定如何處理？",
+    "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+    "fact_ids": [
+      "receiving"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "receiving"
+    ],
+    "review_mode": "answer",
+    "review_reason": "直接追問收貨數量差異的後續記錄、採購回覆與處理權責，receiving 凍結事實可回答。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "這次您核對單據與實收數量、拍照通知採購後，通常還會追蹤採購的回覆或記錄差異嗎？",
+        "mode": "answer",
+        "fact_ids": [
+          "receiving"
+        ],
+        "reason": "收貨異常表與採購回覆後按結果登記入庫直接相關。"
+      },
+      {
+        "quote": "後續由誰決定如何處理？",
+        "mode": "answer",
+        "fact_ids": [
+          "receiving"
+        ],
+        "reason": "採購回覆補送或接受，本人不決定拒收，提供現有權責界線。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

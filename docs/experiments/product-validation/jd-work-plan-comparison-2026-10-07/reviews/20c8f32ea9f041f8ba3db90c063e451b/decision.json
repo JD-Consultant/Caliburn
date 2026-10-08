@@ -1,0 +1,26 @@
+{
+  "question_id": "20c8f32ea9f041f8ba3db90c063e451b",
+  "mode": "answer",
+  "fact_ids": [
+    "customer-returns"
+  ],
+  "reason": "實際轉問客戶退貨送回後的本人工作與最後交接，customer-returns 直接相關。",
+  "subquestions": [
+    {
+      "quote": "能否用最近一次為例，說說退貨送回後您實際處理哪些事",
+      "mode": "answer",
+      "fact_ids": [
+        "customer-returns"
+      ],
+      "reason": "凍結事實包含核客服退貨單、数量品項外觀、拍照、依規則分類與再上架處理。"
+    },
+    {
+      "quote": "最後交給誰？",
+      "mode": "answer",
+      "fact_ids": [
+        "customer-returns"
+      ],
+      "reason": "無單或不符交客服確認，待檢交品保並保留交接紀錄，直接回答相關交接。"
+    }
+  ]
+}

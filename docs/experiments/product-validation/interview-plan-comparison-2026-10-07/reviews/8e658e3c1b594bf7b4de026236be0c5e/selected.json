@@ -1,0 +1,16 @@
+{
+  "employee_text": "可以依我已說過的工作範圍繼續訪談；我沒有新增事實。",
+  "audit": {
+    "actual_question": "了解，旺季工時或班別是否改變目前也保留未知，不推定加班或排班方式。\n\n目前底稿已整理您提到的收貨與上架、揀貨補貨、每週及年度盤點、冷藏區巡查、兩類退貨和新人帶教，也納入旺季揀貨調序與晚班交接。年度盤點分區與表單細節，以及冷藏讀數記錄、作業輪替和旺季班別等未能確認的部分，都會保留未知；不會補猜。\n\n您可以先核對目前整理的工作範圍和責任界線。若沒有其他工作要補充或更正，這輪訪談可以先告一段落。",
+    "employee_text": "可以依我已說過的工作範圍繼續訪談；我沒有新增事實。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "no_question",
+    "review_reason": "實際內容是確認未知、摘要現有範圍、提示核對並提出收束，沒有新增具體提問。不能由未披露清單補題或釋出新事實，也不把無提問分類為真正未知；中性提醒或共同收束由 harness 依既定額度決定。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": true
+  },
+  "actually_submitted": false
+}

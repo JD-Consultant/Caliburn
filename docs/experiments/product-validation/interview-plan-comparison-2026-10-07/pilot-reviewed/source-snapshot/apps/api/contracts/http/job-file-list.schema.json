@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JobFileList",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["job_files"],
+  "properties": {
+    "job_files": {"type": "array", "items": {"$ref": "#/$defs/JobFile"}}
+  },
+  "$defs": {
+    "JobFile": {
+      "description": "User-facing metadata; names are labels, job_file_id is the isolation identity.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["job_file_id", "display_name", "name_revision", "employee_name", "created_at"],
+      "properties": {
+        "job_file_id": {"type": "string", "format": "uuid"},
+        "display_name": {"type": "string"},
+        "name_revision": {"type": "integer", "minimum": 1, "maximum": 9007199254740991, "description": "Opaque freshness counter for the display label, not a JD or Memory revision."},
+        "employee_name": {"type": "string"},
+        "created_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}

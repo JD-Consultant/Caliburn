@@ -1,0 +1,27 @@
+{
+  "question_id": "853c53c1e08e41c29a35aa4ef7fa10f3",
+  "mode": "answer",
+  "fact_ids": [
+    "cold-storage",
+    "annual-count"
+  ],
+  "reason": "實際廣度追問尚未談到的固定工作及偶爾重要工作；冷藏貨每日溫度檢查／異常處理與年度全倉盤點分別直接回應，年度責任與表單細節仍按原文保留不確定。",
+  "subquestions": [
+    {
+      "quote": "除了這些，還有沒有您固定會做",
+      "mode": "answer",
+      "fact_ids": [
+        "cold-storage"
+      ],
+      "reason": "冷藏食品作業包含每天早晚看溫度表及超標隔離通報，是前述常規項目尚未談到的固定工作。"
+    },
+    {
+      "quote": "或偶爾但重要、我還沒問到的工作？",
+      "mode": "answer",
+      "fact_ids": [
+        "annual-count"
+      ],
+      "reason": "每年十二月全倉年度盤點為低頻但屬本人工作，符合本次明確廣度提問；不補未知分區責任或財務表單。"
+    }
+  ]
+}

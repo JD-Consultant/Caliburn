@@ -1,0 +1,29 @@
+{
+  "question_id": "f99a3b505c3d4310905dc803a82813b6",
+  "profile": "warehouse",
+  "actual_question": "我想問的是**外箱破損或濕掉時**的處理方式：您看到這種情況後，會先做什麼、通知誰？最後由誰決定這批貨是否照常收下？",
+  "disclosed": [
+    "receiving"
+  ],
+  "open_gaps": [],
+  "seen_topics": [
+    "receiving"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "receiving"
+  ],
+  "gap_opened_at": {},
+  "recent_employee_originals": [
+    "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+    "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n其餘這次還沒說明，請保留，之後再具體問。",
+    "這個問題我還沒理解，請用實際工作步驟或責任再具體問一次。"
+  ],
+  "candidate": {
+    "actual_question": "我想問的是**外箱破損或濕掉時**的處理方式：您看到這種情況後，會先做什麼、通知誰？最後由誰決定這批貨是否照常收下？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分；若要釐清，可以具體問我實際做的步驟或責任。",
+    "fact_id": null,
+    "unmapped_or_already_answered": true
+  }
+}

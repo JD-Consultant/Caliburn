@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdSourceChangesView",
+  "description": "The cited JD target from its last review to the selected current formal revision, and the original source chain against latest published Memory. Reading neither confirms nor aligns references.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["revision_id", "citation_id", "jd_markdown", "source_markdown"],
+  "properties": {
+    "revision_id": {"type": "string", "format": "uuid"},
+    "citation_id": {"type": "string", "format": "uuid"},
+    "jd_markdown": {"type": "string"},
+    "source_markdown": {
+      "type": ["string", "null"],
+      "description": "The relevant fixed source-chain diff; null for immutable interview evidence."
+    }
+  }
+}

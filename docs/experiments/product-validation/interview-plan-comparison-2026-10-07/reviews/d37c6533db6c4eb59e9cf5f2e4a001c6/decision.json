@@ -1,0 +1,8 @@
+{
+  "question_id": "d37c6533db6c4eb59e9cf5f2e4a001c6",
+  "fact_ids": ["shelving"],
+  "mode": "answer",
+  "reason": "實際問依據什麼確認放貨位置，shelving 的已規劃儲位、標籤、WMS 登記與實物系統一致確認直接相關。一般存放位置最初由誰規劃沒有固定資料，臨時放不下找組長調整不代表組長必然安排全部儲位，不推定一般規劃權限。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": ["通常由誰安排貨品的存放位置？"]
+}

@@ -1,0 +1,17 @@
+{
+  "execution_id": "ec0881e4-0f1b-43bc-8ddd-7ccc3fb73861",
+  "exchange": {
+    "employee_input": {
+      "source_id": "79a5aec0-eba0-4e85-b765-3ec86cc42546",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "平常的維護處理就是這樣，現在想不到其他工作。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "aecfe915-2c45-450a-b600-789da858e5a5",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "目前已了解您主要處理客服回報的問題：重現後修自己負責的前端，後端問題交給同事；測試通過並回報客服才結束，收到回報後 12 小時內提供初步判斷。這些已足以整理主要工作的輪廓，不必另外想出新的工作。\n\n還有一個會影響責任範圍的細節想確認：如果照客服提供的步驟重現不出問題，或一時判斷不出是前端還是後端，您通常會怎麼處理？"
+    }
+  }
+}

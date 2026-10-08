@@ -4,25 +4,11 @@
 
 ## 一眼看懂
 
-下圖呈現資料與分析角色的關係。實線表示資料或結果的流向，虛線表示可選控制或按需讀取；箭頭不代表模型可直接操作資料庫。
+下圖是**現行概念資訊關係圖**：矩形為角色／服務，圓柱為保存資料，單向箭頭表示標示的資訊或操作意圖傳遞。它不表示執行順序、資料表外鍵或模型可直接操作資料庫；正式完成與背景交錯的時序見[核心生命週期](2026-09-29-core-value-loop-lifecycle.md)。
 
-```mermaid
-flowchart TD
-    A[A 職務顧問：訪談與 JD 候選] -->|答覆及本輪操作完成| commit[App 正式完成 A Turn]
-    commit -->|授予序號與使用資格| R[不可變的有效原始訪談]
-    commit -.若本輪提出整理要求.-> schedule[App 固定批次來源上界並調度]
-    R -->|限定範圍原話及必要前問| B1[B1 工作情境分析]
-    schedule -->|領取同檔案唯一批次| B1
-    B1 -->|交付情境候選與差異| B2[B2 工作理解分析]
-    B2 -->|本批分析完成| publish[Memory 業務：原子發布完整候選]
-    publish -->|固定物件及關係| M[不可變 Memory 發布快照]
-    M -->|供後續批次建立候選基底| schedule
-    M -.新 A Turn 選定一版；同輪不換版.-> A
-    R -.按需回查合法原話.-> A
-    commit -->|本輪 JD 及依據正式生效| J[正式 JD]
-    M -.可作 JD 的情境／理解依據.-> J
-    R -.可直接作 JD 依據.-> J
-```
+![現行概念資訊關係：訪談、Memory 與 JD](../diagrams/specs/2026-09-24-caliburn-layered-architecture-map/memory-information-relations.png)
+
+[圖源](../diagrams/specs/2026-09-24-caliburn-layered-architecture-map/memory-information-relations.mmd) · [SVG](../diagrams/specs/2026-09-24-caliburn-layered-architecture-map/memory-information-relations.svg)
 
 A 依訪談內容提出背景整理要求，只有該輪成功完成後才生效。未完成或已取消的輸入不供背景使用，A 也不必等待背景發布才編寫 JD。App 提供的正式開場依來源規則成立一次，不經一般 A Turn 完成流程。
 
@@ -81,19 +67,11 @@ A 可直接引用合格原話，或已發布的工作情境、工作理解。引
 
 下圖區分快照選用與固定引用。虛線表示快照選用，實線表示來源引用；同一方框是可重用的同一修訂，不是兩份內容相同的副本。
 
-```mermaid
-flowchart LR
-  m20[Memory M20] -.選用.-> u3[理解 U v3]
-  m20 -.選用.-> c7[情境 C v7]
-  m20 -.選用未變物件.-> d4[情境 D v4]
-  m21[Memory M21] -.選用.-> u4[理解 U v4]
-  m21 -.選用.-> c8[情境 C v8]
-  m21 -.重用未變修訂.-> d4
-  u3 -->|固定引用| c7
-  u4 -->|固定引用| c8
-  c7 -->|固定來源| raw[不可變訪談訊息]
-  c8 -->|固定來源| raw
-```
+![現行版本引用關係：快照選用與固定修訂（合成示例）](../diagrams/specs/2026-09-24-caliburn-layered-architecture-map/snapshot-revision-reuse.png)
+
+[圖源](../diagrams/specs/2026-09-24-caliburn-layered-architecture-map/snapshot-revision-reuse.mmd) · [SVG](../diagrams/specs/2026-09-24-caliburn-layered-architecture-map/snapshot-revision-reuse.svg)
+
+圖為現行快照的**概念選用與引用關係**；虛線由快照指向本版選用修訂，實線由修訂指向固定依據。這不是執行流程或完整 ER；M20／M21 是合成示例，不要求所有物件同版號。
 
 例中 U 正文即使沒變，只要引用由 C v7 改為 C v8，也形成 U v4。M20 的 U v3／C v7 保持不變，M21 的所有路徑則讀到 U v4／C v8。D 未改，可以跨快照重用；沒有被理解引用的情境也可存在。訪談層同樣屬於快照，圖只畫本例用到的來源。
 

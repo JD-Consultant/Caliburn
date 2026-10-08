@@ -1,0 +1,17 @@
+{
+  "execution_id": "5defdd74-4e2a-4844-afe1-2398b0878bbe",
+  "exchange": {
+    "employee_input": {
+      "source_id": "00fd0378-5a32-4858-8ec4-73f988afbed2",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "一般的報支就是照這樣核對和交出去，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "52254b7e-daa6-411a-bcce-b1faf7785051",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "一般報支這段已經足夠清楚，不需要再補細節。我已把核對發票、金額與申請單、追補缺件、整理清單交主管，以及您不負責核准或付款的界線整理到底稿中。\n\n還想確認一件事：**除了報支核對，您平常或每月、年底是否也會固定或偶爾處理其他帳務或行政工作？**例如整理憑證、對帳、月結或查帳支援；若沒有，也可以直接說沒有。"
+    }
+  }
+}

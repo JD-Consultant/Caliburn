@@ -1,0 +1,35 @@
+{
+  "completed": [
+    {
+      "arm": "old",
+      "case_id": "accounting_errors__old"
+    }
+  ],
+  "accounting": {
+    "input_tokens": 101447,
+    "output_tokens": 3966,
+    "reasoning_tokens": 3281,
+    "cached_input_tokens": 95725,
+    "cache_write_input_tokens": 5707,
+    "total_tokens": 105413,
+    "outbound_calls": 11,
+    "count_calls": 6,
+    "generation_calls": 5,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 101447,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.031212870",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0006",
+    "actual_estimated_usd": "0.003655125",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.004255125",
+    "cumulative_occupied_usd": "0.004255125",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 57.178363699997135,
+    "seconds_limit": 210,
+    "stop_reason": null
+  }
+}

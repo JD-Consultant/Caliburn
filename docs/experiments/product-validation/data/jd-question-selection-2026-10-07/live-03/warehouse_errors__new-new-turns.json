@@ -1,0 +1,235 @@
+{
+  "arm": "new",
+  "case_id": "warehouse_errors__new",
+  "job_file_id": "15de9335-2363-4bc0-a254-8de058146b96",
+  "before": {
+    "profile": {
+      "revision_id": "4c7932f1-668e-4fb5-8031-ed3d774ec16d",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "依已確認的資料及儲位安排完成上架與入庫紀錄。"
+      }
+    },
+    "work": {
+      "revision_id": "4c7932f1-668e-4fb5-8031-ed3d774ec16d",
+      "areas": [
+        {
+          "area_id": "bb6a33da-22f6-48c8-93bd-dbf02602fe0f",
+          "title": "入庫與上架",
+          "scope_text": "品項確認、上架與登記。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "c655ef41-8ba8-4dad-9580-e236caa8a2be",
+          "area_id": "bb6a33da-22f6-48c8-93bd-dbf02602fe0f",
+          "title": "核對品項並上架",
+          "description": "上架前掃碼確認品項，依安排放貨、貼標籤並登記；不符先核對單據並通知主管，不自行改品項或決定儲位。",
+          "outcomes": [
+            {
+              "detail_id": "868a8978-49e1-4c92-b8e1-d63f5c66d2ab",
+              "text": "按安排完成貨品上架，並在庫存系統登記貨品及數量；放妥並完成入庫登記後交主管。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "75e73912-01e2-4c32-b663-a6dbb486373b",
+              "text": "掃描品項與到貨資料不符時先停止，核對單據後通知主管；不自行修改品項或決定儲位。"
+            }
+          ]
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "4c7932f1-668e-4fb5-8031-ed3d774ec16d",
+      "references": [
+        {
+          "citation_id": "9fc96176-c7bf-4de5-9ab9-6f680c1d6066",
+          "target_label": "任務：核對品項並上架",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "c655ef41-8ba8-4dad-9580-e236caa8a2be",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "54f5769a-6c34-4919-9012-db0111680a97",
+          "target_label": "任務：核對品項並上架 · 成果：按安排完成貨品上架，並在庫存系統登記貨品及數量；放妥並完成入庫登記後交主管。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "868a8978-49e1-4c92-b8e1-d63f5c66d2ab",
+            "task_id": "c655ef41-8ba8-4dad-9580-e236caa8a2be"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "5a31d07b-2c19-4dd7-8816-933c0a7c8139",
+          "target_label": "任務：核對品項並上架 · 成果：按安排完成貨品上架，並在庫存系統登記貨品及數量；放妥並完成入庫登記後交主管。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "868a8978-49e1-4c92-b8e1-d63f5c66d2ab",
+            "task_id": "c655ef41-8ba8-4dad-9580-e236caa8a2be"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "b87c2433-a643-4ada-bdad-3324fcb8e2a1",
+          "target_label": "任務：核對品項並上架 · 成果：按安排完成貨品上架，並在庫存系統登記貨品及數量；放妥並完成入庫登記後交主管。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "868a8978-49e1-4c92-b8e1-d63f5c66d2ab",
+            "task_id": "c655ef41-8ba8-4dad-9580-e236caa8a2be"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "9282f401-ba7f-4d3e-ae89-b48046e1eab1",
+          "target_label": "任務：核對品項並上架 · 要求：掃描品項與到貨資料不符時先停止，核對單據後通知主管；不自行修改品項或決定儲位。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "75e73912-01e2-4c32-b663-a6dbb486373b",
+            "task_id": "c655ef41-8ba8-4dad-9580-e236caa8a2be"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "1a2b98a0-9627-45f5-855a-583796c9ec99",
+          "target_label": "任務：核對品項並上架 · 要求：掃描品項與到貨資料不符時先停止，核對單據後通知主管；不自行修改品項或決定儲位。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "75e73912-01e2-4c32-b663-a6dbb486373b",
+            "task_id": "c655ef41-8ba8-4dad-9580-e236caa8a2be"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "0e284e33-ab9a-4e37-8f8a-04d25f68afee",
+          "target_label": "任務：核對品項並上架 · 要求：掃描品項與到貨資料不符時先停止，核對單據後通知主管；不自行修改品項或決定儲位。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "75e73912-01e2-4c32-b663-a6dbb486373b",
+            "task_id": "c655ef41-8ba8-4dad-9580-e236caa8a2be"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "base_case_id": "warehouse_errors",
+  "turns": [
+    {
+      "execution_id": "e10253a8-3521-40ea-bb97-ee9759641c7c",
+      "exchange": {
+        "employee_input": {
+          "source_id": "b6fb13d2-8968-42b1-a279-7d9c6e44b117",
+          "interview_sequence": 10,
+          "speaker": "employee",
+          "interview_text": "這個細節我目前說不清楚，也沒有其他能確認的資料。已說過的工作範圍仍一樣，其他事情可以試著說。"
+        },
+        "consultant_reply": {
+          "source_id": "bc502d57-addc-47b9-b27a-70a14217feac",
+          "interview_sequence": 11,
+          "speaker": "consultant",
+          "interview_text": "了解，搬貨方式與體力要求目前先保留為未知，不會推定有或沒有特別要求；已確認的工作範圍不變。\n\n另一項可能影響工作要求的是工作量與時限：上架和登記通常是持續處理，還是會隨到貨量有忙閒差異？有沒有需要在特定時間內完成的要求？"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 42450,
+    "output_tokens": 1874,
+    "reasoning_tokens": 1687,
+    "cached_input_tokens": 39966,
+    "cache_write_input_tokens": 2478,
+    "total_tokens": 44324,
+    "outbound_calls": 6,
+    "count_calls": 4,
+    "generation_calls": 2,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 42450,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.042744885",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0004",
+    "actual_estimated_usd": "0.001647010",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.002047010",
+    "cumulative_occupied_usd": "0.002047010",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 26.632368799997494,
+    "seconds_limit": 406,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 58052,
+    "output_tokens": 2388,
+    "reasoning_tokens": 2105,
+    "cached_input_tokens": 54412,
+    "cache_write_input_tokens": 3631,
+    "total_tokens": 60440,
+    "outbound_calls": 9,
+    "count_calls": 6,
+    "generation_calls": 3,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 58052,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.042744885",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0006",
+    "actual_estimated_usd": "0.002192895",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.002792895",
+    "cumulative_occupied_usd": "0.002792895",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 36.15904700000101,
+    "seconds_limit": 406,
+    "stop_reason": null
+  }
+}

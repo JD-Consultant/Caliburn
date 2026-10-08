@@ -1,0 +1,17 @@
+{
+  "execution_id": "6156108e-5a3a-4cf3-bb76-e680b9e3a0e6",
+  "exchange": {
+    "employee_input": {
+      "source_id": "8df0de2c-fe2e-44f7-af2a-2ee2423a9352",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "搬運跟上架平常就是這樣做，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "14e60a8e-7762-4d51-bd28-b7e232e84c74",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "這段收貨、核對、搬運上架的做法已經清楚，不需要為這一段再勉強補充細節；我也已把異常時通知採購、上架與入庫完成條件，以及搬運和堆高機要求整理進底稿，並記下您在物流中心、向倉儲主管報告。\n\n接下來比較需要了解的是整體工作範圍：**除了收貨上架，您平常還會負責哪些事？**例如訂單揀貨或出貨、盤點、補貨，或處理庫存差異；如果主要就負責收貨上架，也可以直接告訴我。"
+    }
+  }
+}

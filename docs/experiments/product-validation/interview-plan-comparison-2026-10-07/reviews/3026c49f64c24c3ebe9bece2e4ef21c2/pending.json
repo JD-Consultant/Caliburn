@@ -1,0 +1,37 @@
+{
+  "question_id": "3026c49f64c24c3ebe9bece2e4ef21c2",
+  "profile": "warehouse",
+  "actual_question": "了解，「超重貨」的判定方式也先保留未知，不再追問；儲位由誰規劃同樣不作推定。\n\n接著了解揀貨：你通常收到什麼指示或資料，依據它確認要揀哪些品項和數量？",
+  "disclosed": [
+    "receiving",
+    "shelving"
+  ],
+  "open_gaps": [],
+  "seen_topics": [
+    "receiving",
+    "shelving"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "shelving"
+  ],
+  "gap_opened_at": {},
+  "recent_employee_originals": [
+    "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「貨物通常先怎麼處理」，我目前沒有確定資料，請保留未知，不補猜。",
+    "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。\n\n關於你問的「通常由誰安排貨品的存放位置？」，我目前沒有確定資料，請保留未知，不補猜。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。"
+  ],
+  "candidate": {
+    "actual_question": "接著了解揀貨：你通常收到什麼指示或資料，依據它確認要揀哪些品項和數量？",
+    "employee_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+    "fact_id": "picking",
+    "topic": "picking",
+    "matched_cue": "揀貨",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": null,
+    "closes_gap": null,
+    "correction": false
+  }
+}

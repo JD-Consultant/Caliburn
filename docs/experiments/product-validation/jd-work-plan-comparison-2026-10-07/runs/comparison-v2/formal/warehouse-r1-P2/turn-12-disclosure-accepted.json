@@ -1,0 +1,25 @@
+{
+  "actual_question": "我已把客戶退貨的核對、拍照分流、掃碼入庫及交接整理進底稿，並保留「退款不由您決定」的界線。\n\n您提到依既定規則分為可再上架、待檢或破損隔離；實際判斷時，會看哪些情況？",
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "fact_ids": [],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [],
+  "review_mode": "unknown",
+  "review_reason": "本題追問三類退貨分流規則的實際判斷情況；凍結事實只有核對項目、按既定規則分類與無單／不符先隔離，未提供可再上架、待檢及破損隔離的具體判準，不用一般流程或能力要求代答。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": false,
+  "subquestions": [
+    {
+      "quote": "您提到依既定規則分為可再上架、待檢或破損隔離；實際判斷時，會看哪些情況？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "所問的各分類實際適用條件與區分判準未載明，不能由分類名稱或一般外觀核對自行推導。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "d5d0a102-f17b-4a25-a62e-2ff0b1f73016",
+  "accepted_source_id": "5323f9aa-507e-40dc-8a94-97f800bb7ed1"
+}

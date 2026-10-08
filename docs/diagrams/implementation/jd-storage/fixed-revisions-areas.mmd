@@ -1,0 +1,48 @@
+erDiagram
+  direction LR
+  job_files ||--o| job_descriptions : owns
+  jd_revisions ||..o| job_descriptions : initial_revision
+  jd_revisions ||..o| job_descriptions : current_revision
+  jd_revisions ||..o{ jd_operations : expected_revision
+  jd_revisions ||..o{ jd_operations : result_revision
+  jd_revisions ||--o{ jd_area_selections : selects_ordered_areas
+  jd_area_revisions ||..o{ jd_area_selections : reuses_fixed_content
+  job_files {
+    uuid job_file_id PK
+  }
+  job_descriptions {
+    uuid job_file_id PK,FK
+    uuid initial_revision_id FK
+    uuid current_revision_id FK
+  }
+  jd_revisions {
+    uuid job_file_id PK,FK
+    uuid revision_id PK
+    uuid parent_revision_id FK
+    text job_title
+    text organization_unit
+    text reports_to
+    text purpose
+  }
+  jd_operations {
+    uuid job_file_id PK,FK
+    uuid command_id PK
+    uuid expected_revision_id FK
+    uuid result_revision_id FK
+    jsonb request_payload
+    jsonb result_payload
+  }
+  jd_area_revisions {
+    uuid job_file_id PK,FK
+    uuid area_id PK
+    uuid content_revision_id PK
+    text title
+    text scope_text
+  }
+  jd_area_selections {
+    uuid job_file_id PK,FK
+    uuid revision_id PK,FK
+    uuid area_id PK,FK
+    uuid content_revision_id FK
+    int position
+  }

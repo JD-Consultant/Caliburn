@@ -1,0 +1,17 @@
+{
+  "execution_id": "7145487c-2528-4139-9312-c474ffff908e",
+  "exchange": {
+    "employee_input": {
+      "source_id": "439a43a8-15e4-448d-9d73-ca0a1bd0ef7d",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "工作條件、常見問題和忙不忙前面都說過了，確定沒有其他補充。"
+    },
+    "consultant_reply": {
+      "source_id": "70825d98-2d77-4438-a574-aa28ff419c4c",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "了解，工作環境、常見問題和工作量情況都按前述內容保留，不再重問。我已先整理訂單登錄與金額核對、資料缺漏時請同事補齊、發現錯誤時先核對原資料並交主管決定更正方式，以及本人不負責核准訂單等內容；也補上相關協作對象與技能。\n\n為補齊基本資料，您目前的職稱、所屬單位，以及日常直接向誰匯報是什麼？不確定的部分可以先略過。"
+    }
+  }
+}

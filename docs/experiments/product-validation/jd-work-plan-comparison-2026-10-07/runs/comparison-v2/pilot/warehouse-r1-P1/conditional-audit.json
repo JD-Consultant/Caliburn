@@ -1,0 +1,218 @@
+{
+  "disclosed": [
+    "inventory-partial",
+    "receiving",
+    "training"
+  ],
+  "seen_topics": [
+    "inventory",
+    "receiving",
+    "training"
+  ],
+  "open_gaps": [
+    "inventory-authority"
+  ],
+  "refused_topics": [],
+  "audit": [
+    {
+      "actual_question": "我已先把職務名稱、所屬單位、匯報對象、主要工作分組及您提到的工時安排整理進底稿。進貨數量不符的處理方式目前先當作這次案例，不直接假定每次都完全相同；拒收或退換貨的決定權也會保留在您的責任範圍之外。\n\n這次您核對單據與實收數量、拍照通知採購後，通常還會追蹤採購的回覆或記錄差異嗎？後續由誰決定如何處理？",
+      "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+      "fact_ids": [
+        "receiving"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "receiving"
+      ],
+      "review_mode": "answer",
+      "review_reason": "直接追問收貨數量差異的後續記錄、採購回覆與處理權責，receiving 凍結事實可回答。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "subquestions": [
+        {
+          "quote": "這次您核對單據與實收數量、拍照通知採購後，通常還會追蹤採購的回覆或記錄差異嗎？",
+          "mode": "answer",
+          "fact_ids": [
+            "receiving"
+          ],
+          "reason": "收貨異常表與採購回覆後按結果登記入庫直接相關。"
+        },
+        {
+          "quote": "後續由誰決定如何處理？",
+          "mode": "answer",
+          "fact_ids": [
+            "receiving"
+          ],
+          "reason": "採購回覆補送或接受，本人不決定拒收，提供現有權責界線。"
+        }
+      ],
+      "refused_subquestions": [],
+      "clarify_subquestions": [],
+      "actually_submitted": true,
+      "command_id": "aac0bd68-22e9-4b6b-b607-0fe27f864ab5",
+      "accepted_source_id": "66d3120e-ce0a-43be-b5cf-7d24b08e7d12",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "66d3120e-ce0a-43be-b5cf-7d24b08e7d12"
+      ],
+      "formal_interview_sequence": 4
+    },
+    {
+      "actual_question": "我已補上收貨驗收的逐箱核對項目、異常拍照與登記方式，以及依採購回覆辦理入庫的流程；也註明您不負責議價、選擇供應商或決定拒收。\n\n若採購回覆要補送，補送的貨到時，您會再核對哪些項目，並如何登記入庫？",
+      "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+      "fact_ids": [],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [],
+      "review_mode": "unknown",
+      "review_reason": "本題限定採購要求補送後的補送到貨情境；凍結事實僅有一般收貨核對與依採購結果登記入庫，未提供補送貨的再核對項目或具體登記方式，不以一般流程代答。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "subquestions": [
+        {
+          "quote": "若採購回覆要補送，補送的貨到時，您會再核對哪些項目",
+          "mode": "unknown",
+          "fact_ids": [],
+          "reason": "未提供補送貨到時是否沿用原收貨項目、另核差額或其他再次核對細節。"
+        },
+        {
+          "quote": "並如何登記入庫？",
+          "mode": "unknown",
+          "fact_ids": [],
+          "reason": "問句延續補送到貨條件，凍結事實未說明補送與原到貨如何登記；一般 WMS 上架事實不能證明此特殊情境的登記方式。"
+        }
+      ],
+      "refused_subquestions": [],
+      "clarify_subquestions": [],
+      "actually_submitted": true,
+      "command_id": "1064faab-691e-47e3-8f7f-ecaef2513f25",
+      "accepted_source_id": "404d432c-2cc8-4e8f-b546-89091590690c",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "404d432c-2cc8-4e8f-b546-89091590690c"
+      ],
+      "formal_interview_sequence": 6
+    },
+    {
+      "actual_question": "了解，補送貨到後的查核與登記方式先保留為待確認，我不再追問這部分。\n\n我們先談庫存盤點：您通常怎麼盤點？如果實際數量和帳上不一致，您會怎麼處理，或交給誰決定下一步？",
+      "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？\n\n關於你問的「或交給誰決定下一步？」，我目前沒有確定資料，請保留未知，不補猜。",
+      "fact_ids": [
+        "inventory-partial"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "inventory-partial"
+      ],
+      "review_mode": "answer",
+      "review_reason": "實際轉問盤點方式、帳實差異處理與後續決定人，首次可披露 inventory-partial 並開啟暫時權責缺口；尚不能取得後續回訪答案。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [
+        "或交給誰決定下一步？"
+      ],
+      "driver_reminder": false,
+      "subquestions": [
+        {
+          "quote": "您通常怎麼盤點？",
+          "mode": "answer",
+          "fact_ids": [
+            "inventory-partial"
+          ],
+          "reason": "每週循環盤點及查紀錄、複點流程直接相關。"
+        },
+        {
+          "quote": "如果實際數量和帳上不一致，您會怎麼處理",
+          "mode": "answer",
+          "fact_ids": [
+            "inventory-partial"
+          ],
+          "reason": "先查最近入出庫與移庫紀錄再複點，為已凍結的本人處理步驟。"
+        },
+        {
+          "quote": "或交給誰決定下一步？",
+          "mode": "unknown",
+          "fact_ids": [],
+          "reason": "當前尚未披露 training，調帳及批准等後續權責暫時想不清楚，inventory-authority 條件未滿足。"
+        }
+      ],
+      "refused_subquestions": [],
+      "clarify_subquestions": [],
+      "actually_submitted": true,
+      "command_id": "65944b71-d67b-4a5f-ba23-fc8ea4476f52",
+      "accepted_source_id": "03eb43fc-4323-434a-94cd-a31b32fc4de1",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "03eb43fc-4323-434a-94cd-a31b32fc4de1"
+      ],
+      "formal_interview_sequence": 8
+    },
+    {
+      "actual_question": "我已補上每週循環盤點及您提到的查核順序；調帳方式與核准人仍保留未知，不作推測。\n\n就最近一次帶新人來說，他當時要學哪一項工作？您怎麼帶他做，又怎麼判斷這次帶教已完成？",
+      "employee_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。",
+      "fact_ids": [
+        "training"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "training"
+      ],
+      "review_mode": "answer",
+      "review_reason": "順著員工明示想談的最近帶新人工作，詢問學習項目、帶教方法與完成判斷，training 含相應內容；尚未正式披露 training，不提前更正權限。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "availability_cue": "剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。",
+      "subquestions": [
+        {
+          "quote": "就最近一次帶新人來說，他當時要學哪一項工作？",
+          "mode": "answer",
+          "fact_ids": [
+            "training"
+          ],
+          "reason": "凍結帶教內容包含掃碼、揀貨與安全動線。"
+        },
+        {
+          "quote": "您怎麼帶他做",
+          "mode": "answer",
+          "fact_ids": [
+            "training"
+          ],
+          "reason": "示範、讓新人跟做與現場觀察直接回應帶教方法。"
+        },
+        {
+          "quote": "又怎麼判斷這次帶教已完成？",
+          "mode": "answer",
+          "fact_ids": [
+            "training"
+          ],
+          "reason": "凍結回答提供漏掃、拿錯批號與車道操作的觀察、檢核表和自述能否上線判斷，與帶教完成判斷直接相關。"
+        }
+      ],
+      "refused_subquestions": [],
+      "clarify_subquestions": [],
+      "actually_submitted": true,
+      "command_id": "e8be447f-9225-4239-bbfe-e422e22d98c9",
+      "accepted_source_id": "36eee957-dfbe-466c-a1c7-fddfedc69fc4",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "36eee957-dfbe-466c-a1c7-fddfedc69fc4"
+      ],
+      "formal_interview_sequence": 10
+    }
+  ],
+  "disclosure_order": [
+    "receiving",
+    "inventory-partial",
+    "training"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 1
+  },
+  "visible_cues": [
+    {
+      "gap": "inventory-authority",
+      "text": "剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。",
+      "audit_index": 3
+    }
+  ]
+}

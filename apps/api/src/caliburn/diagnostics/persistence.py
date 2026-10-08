@@ -29,3 +29,4 @@ class DiagnosticExecutionSnapshot(Base):
     employee_input: Mapped[str | None] = mapped_column(Text)
     final_reply: Mapped[str | None] = mapped_column(Text)
     steps: Mapped[list[JsonValue]] = mapped_column(JSONB)
+    captured_initial_context: Mapped[dict[str, JsonValue] | None] = mapped_column(JSONB)

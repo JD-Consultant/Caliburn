@@ -1,0 +1,26 @@
+{
+  "question_id": "e94d1eae17b843b5a36dc5a3a66d02cd",
+  "mode": "answer",
+  "fact_ids": [
+    "inventory-authority"
+  ],
+  "reason": "training 已在盤點缺口後正式披露並帶出回訪線索，現在明確回問複點後的流程與責任，inventory-authority 條件滿足；帶教段為摘要，不觸發更正。",
+  "subquestions": [
+    {
+      "quote": "您剛才想起的盤點差異後續是什麼？",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "直接回訪先前已開啟且現有可見線索的盤點後續缺口。"
+    },
+    {
+      "quote": "可以從複點之後，接著由誰做什麼開始說",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "凍結回答包含差異表、主管核准、財務調帳與本人結案核對等责任分工。"
+    }
+  ]
+}

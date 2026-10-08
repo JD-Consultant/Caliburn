@@ -1,0 +1,16 @@
+{
+  "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+  "audit": {
+    "actual_question": "我已修正帶教工作草稿：你觀察並向組長回報，首次漏掃時讓新人重做並說明原因；若反覆出錯，由組長安排再訓練。新人能否獨立上線最後由主管核准，不由你批准。\n\n這位核准新人上線的主管，是你平常匯報的倉儲主管嗎，還是另一位主管？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "fact_ids": [],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [],
+    "review_mode": "unknown",
+    "review_reason": "實際問新人上線核准的主管是否就是平常匯報的倉儲主管。training-boundary 只確認最後由主管核准，沒有把該主管身份與初始匯報對象明確連結；不能借另一盤點流程的倉儲主管核准內容來填新人上線身份。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

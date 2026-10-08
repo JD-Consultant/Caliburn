@@ -1,0 +1,304 @@
+............FFFFFFFFFF                                                   [100%]
+================================== FAILURES ===================================
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change0] ___
+
+change = {'spent_usd': '-0.1'}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change1] ___
+
+change = {'occupied_usd': '0.25'}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change2] ___
+
+change = {'spent_usd': 'NaN'}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change3] ___
+
+change = {'generations': 249}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change4] ___
+
+change = {'generations': True}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change5] ___
+
+change = {'compacts': -1}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change6] ___
+
+change = {'outbound': 549}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change7] ___
+
+change = {'counted_input': 11999999}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change8] ___
+
+change = {'retained_reservations': {}, 'occupied_usd': '0.25'}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+___ test_contradictory_accounting_and_counter_rollback_fail_closed[change9] ___
+
+change = {'retained_reservations': {'original-unknown': '0.013'}, 'occupied_usd': '0.263'}
+
+    @pytest.mark.parametrize(
+        "change",
+        [
+            {"spent_usd": "-0.1"},
+            {"occupied_usd": "0.25"},
+            {"spent_usd": "NaN"},
+            {"generations": 249},
+            {"generations": True},
+            {"compacts": -1},
+            {"outbound": 549},
+            {"counted_input": 11999999},
+            {"retained_reservations": {}, "occupied_usd": "0.25"},
+            {
+                "retained_reservations": {"original-unknown": "0.013"},
+                "occupied_usd": "0.263",
+            },
+        ],
+    )
+    def test_contradictory_accounting_and_counter_rollback_fail_closed(change):
+        inherited = accounting()
+>       with pytest.raises(ValueError, match="accounting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py:112: Failed
+=========================== short test summary info ===========================
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change0]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change1]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change2]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change3]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change4]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change5]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change6]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change7]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change8]
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_completion_batch.py::test_contradictory_accounting_and_counter_rollback_fail_closed[change9]
+10 failed, 12 passed in 0.10s

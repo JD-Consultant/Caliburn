@@ -1,0 +1,134 @@
+{
+  "arm": "new",
+  "case_id": "confirmed_stable_conditions",
+  "job_file_id": "af9b8016-399b-409b-b70b-45373dfebad6",
+  "before": {
+    "profile": {
+      "revision_id": "70e1dc80-5490-4e17-aa38-299dd244615a",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "依已確認資料登錄及核對訂單，提供主管確認。"
+      }
+    },
+    "work": {
+      "revision_id": "70e1dc80-5490-4e17-aa38-299dd244615a",
+      "areas": [
+        {
+          "area_id": "9e332008-3f07-4533-92bb-05288d70b115",
+          "title": "訂單資料處理",
+          "scope_text": "資料登錄、金額核對與主管交接。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea",
+          "area_id": "9e332008-3f07-4533-92bb-05288d70b115",
+          "title": "登錄並核對訂單",
+          "description": "依同事確認資料登錄並核對金額；缺資料請同事補齊，錯誤先查原資料交主管決定更正，不核准訂單。固定辦公場所，全年工作量穩定、無特殊忙季或環境。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "70e1dc80-5490-4e17-aa38-299dd244615a",
+      "references": [
+        {
+          "citation_id": "ac814e79-ca7c-4524-89e2-6d5127992f5e",
+          "target_label": "任務：登錄並核對訂單",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "7145487c-2528-4139-9312-c474ffff908e",
+      "exchange": {
+        "employee_input": {
+          "source_id": "439a43a8-15e4-448d-9d73-ca0a1bd0ef7d",
+          "interview_sequence": 6,
+          "speaker": "employee",
+          "interview_text": "工作條件、常見問題和忙不忙前面都說過了，確定沒有其他補充。"
+        },
+        "consultant_reply": {
+          "source_id": "70825d98-2d77-4438-a574-aa28ff419c4c",
+          "interview_sequence": 7,
+          "speaker": "consultant",
+          "interview_text": "了解，工作環境、常見問題和工作量情況都按前述內容保留，不再重問。我已先整理訂單登錄與金額核對、資料缺漏時請同事補齊、發現錯誤時先核對原資料並交主管決定更正方式，以及本人不負責核准訂單等內容；也補上相關協作對象與技能。\n\n為補齊基本資料，您目前的職稱、所屬單位，以及日常直接向誰匯報是什麼？不確定的部分可以先略過。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 842250,
+    "output_tokens": 44243,
+    "reasoning_tokens": 32365,
+    "cached_input_tokens": 767109,
+    "cache_write_input_tokens": 74967,
+    "total_tokens": 886493,
+    "outbound_calls": 116,
+    "count_calls": 58,
+    "generation_calls": 58,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 842250,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0058",
+    "actual_estimated_usd": "0.039180865",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.044980865",
+    "cumulative_occupied_usd": "0.044980865",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 600.2734044999961,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 951471,
+    "output_tokens": 51118,
+    "reasoning_tokens": 37944,
+    "cached_input_tokens": 869018,
+    "cache_write_input_tokens": 82258,
+    "total_tokens": 1002589,
+    "outbound_calls": 130,
+    "count_calls": 65,
+    "generation_calls": 65,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 951471,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0065",
+    "actual_estimated_usd": "0.044550930",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.051050930",
+    "cumulative_occupied_usd": "0.051050930",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 680.5557019999978,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

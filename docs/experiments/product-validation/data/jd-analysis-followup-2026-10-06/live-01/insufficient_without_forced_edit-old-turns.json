@@ -1,0 +1,134 @@
+{
+  "arm": "old",
+  "case_id": "insufficient_without_forced_edit",
+  "job_file_id": "a9d40062-3cc1-4290-a054-b7ddb365afb0",
+  "before": {
+    "profile": {
+      "revision_id": "98ad2a41-eab6-4846-987c-3db435049ac2",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "依已確認設計實作網站頁面。"
+      }
+    },
+    "work": {
+      "revision_id": "98ad2a41-eab6-4846-987c-3db435049ac2",
+      "areas": [
+        {
+          "area_id": "97e9268e-0c7e-42c8-86f3-4efda5dc12e7",
+          "title": "網站頁面交付",
+          "scope_text": "依已確認設計實作頁面，不決定設計變更。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "19e9a050-5fbd-4d62-aed0-29f3ce114703",
+          "area_id": "97e9268e-0c7e-42c8-86f3-4efda5dc12e7",
+          "title": "實作網站頁面",
+          "description": "每週依確認設計稿完成頁面，設計變更由產品主管決定。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "98ad2a41-eab6-4846-987c-3db435049ac2",
+      "references": [
+        {
+          "citation_id": "036a3b69-07b7-49a4-b637-cf6f60ba8466",
+          "target_label": "任務：實作網站頁面",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "19e9a050-5fbd-4d62-aed0-29f3ce114703",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "bf7ea2f2-8be7-4564-8458-4ae2f096ce42",
+      "exchange": {
+        "employee_input": {
+          "source_id": "33b34b5f-cc28-4551-a298-25bc6146545c",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "有時候還會幫忙處理一些系統問題，不過我現在只想得到這樣，不確定該怎麼說。"
+        },
+        "consultant_reply": {
+          "source_id": "f5e3b803-5f14-4907-9a35-4a23c197693d",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "目前已整理的工作是：每週依確認的設計稿實作網站頁面，設計變更由產品主管決定。系統問題的協助我先記下來，但還不急著推定具體責任。\n\n您記得最近一次處理的系統問題是什麼嗎？可以說說當時遇到什麼狀況，以及您實際做了什麼。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 499055,
+    "output_tokens": 22211,
+    "reasoning_tokens": 17237,
+    "cached_input_tokens": 449289,
+    "cache_write_input_tokens": 49646,
+    "total_tokens": 521266,
+    "outbound_calls": 80,
+    "count_calls": 40,
+    "generation_calls": 40,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 499055,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0040",
+    "actual_estimated_usd": "0.021816140",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.025816140",
+    "cumulative_occupied_usd": "0.025816140",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 468.0050192999988,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 520175,
+    "output_tokens": 22829,
+    "reasoning_tokens": 17651,
+    "cached_input_tokens": 469599,
+    "cache_write_input_tokens": 50450,
+    "total_tokens": 543004,
+    "outbound_calls": 84,
+    "count_calls": 42,
+    "generation_calls": 42,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 520175,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0042",
+    "actual_estimated_usd": "0.022429340",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.026629340",
+    "cumulative_occupied_usd": "0.026629340",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 482.4320066,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "job_file_id": "8f61b13c-8560-45da-b287-0e7ea548db66",
+  "execution_id": "212a067a-487e-4ffe-ae49-a60184169960",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說盤點後面怎麼處理想不清楚，現在我想起一些了，可以再說明。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心收貨驗收、上架、揀貨補貨、庫存盤點及退貨處理，並帶領新人，維持倉務作業與庫存管理運作。"
+    },
+    "work": {
+      "revision_id": "b6efbd55-3f5c-4ea3-8976-ad5af7796046",
+      "areas": [
+        {
+          "area_id": "73b22424-74c2-48bb-bdd3-8f661a7e8393",
+          "title": "收貨與入庫",
+          "scope_text": "負責進貨驗收及貨品上架。"
+        },
+        {
+          "area_id": "5ce52d51-877c-4d86-926c-29b163eeda96",
+          "title": "揀貨與補貨",
+          "scope_text": "負責倉內揀貨及補貨作業。"
+        },
+        {
+          "area_id": "ca0b9090-403c-4dd4-a12b-356a23ec705e",
+          "title": "庫存盤點",
+          "scope_text": "負責庫存盤點作業。"
+        },
+        {
+          "area_id": "ea0dc06d-f07a-423a-9de0-4a3c4489b605",
+          "title": "退貨處理",
+          "scope_text": "負責客戶退貨及供應商退貨作業。"
+        },
+        {
+          "area_id": "3970b139-ae4b-4fa1-a900-2a8eebd85a69",
+          "title": "新人帶教",
+          "scope_text": "負責帶領新人。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "28db387e-4055-4c23-8dd6-3e5e73dd31df",
+          "area_id": "73b22424-74c2-48bb-bdd3-8f661a7e8393",
+          "title": "進貨驗收與差異通報",
+          "description": "逐箱點件，核對品項、數量及外包裝與送貨單；發現差異時登記收貨異常表、拍照並通知採購。採購回覆要補送或接受後，依結果登記入庫。本人不議價、不選供應商，也不決定拒收或退換貨。",
+          "outcomes": [
+            {
+              "detail_id": "520954fb-1f61-4eea-8fc4-9168b6606004",
+              "text": "收貨異常登記於收貨異常表、拍照並通知採購；依採購回覆結果登記入庫。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "77212d0d-0c72-4fa7-a1d9-b4b31919e05c",
+              "text": "逐箱點件，核對品項、數量及外包裝與送貨單。"
+            }
+          ]
+        },
+        {
+          "task_id": "a49fa663-e0cb-4894-a37a-6e56c94ea3c8",
+          "area_id": "73b22424-74c2-48bb-bdd3-8f661a7e8393",
+          "title": "貨品上架",
+          "description": "執行貨品上架作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "46e704f1-d27c-403b-a44a-74e98abb66c5",
+          "area_id": "5ce52d51-877c-4d86-926c-29b163eeda96",
+          "title": "揀貨",
+          "description": "執行倉內揀貨作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "646941bb-21db-4013-a2d7-fdc06905f0c2",
+          "area_id": "5ce52d51-877c-4d86-926c-29b163eeda96",
+          "title": "補貨",
+          "description": "執行倉內補貨作業。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "512d629f-8764-49f7-8075-01f1f5cd638f",
+          "area_id": "ca0b9090-403c-4dd4-a12b-356a23ec705e",
+          "title": "庫存盤點",
+          "description": "每週執行循環盤點；發現數量差異時，先查最近入出庫及移庫紀錄，再複點。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "7aaf0419-d624-4bd3-aa20-41b4b24e2e6e",
+          "area_id": "ea0dc06d-f07a-423a-9de0-4a3c4489b605",
+          "title": "客戶退貨處理",
+          "description": "處理客戶退貨。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "923e56ee-85ed-4b34-b69d-76f3ce43205b",
+          "area_id": "ea0dc06d-f07a-423a-9de0-4a3c4489b605",
+          "title": "供應商退貨處理",
+          "description": "處理供應商退貨。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "29264405-6212-4dd6-852b-4a956c941d42",
+          "area_id": "3970b139-ae4b-4fa1-a900-2a8eebd85a69",
+          "title": "新人帶教",
+          "description": "帶領新人。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": [
+        {
+          "condition_id": "d4097d1a-e833-4ee2-9558-2dbfbe694892",
+          "kind": "schedule_travel",
+          "text": "早上七點上班；週一至週六輪休。"
+        }
+      ]
+    }
+  },
+  "plan_preview": null,
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

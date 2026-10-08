@@ -1,0 +1,38 @@
+{
+  "question_id": "298b91f421e14c269784d8ed10fda8e9",
+  "mode": "answer",
+  "fact_ids": [
+    "receiving"
+  ],
+  "reason": "追問收貨差異通知後的本人後續處理，可提供採購回覆後登記入庫；通知後是否再次清點及主管回覆如何處理未有凍結細節。",
+  "subquestions": [
+    {
+      "quote": "通知採購後，您通常還會做哪些處理？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "採購回覆補送或接受後，本人按結果登記入庫，直接相關。"
+    },
+    {
+      "quote": "例如是否會再清點",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "凍結事實有初次逐箱點件，未載通知採購後是否再次清點，不能把初次清點當成再次清點。"
+    },
+    {
+      "quote": "或依採購、主管的回覆接著處理？",
+      "mode": "answer",
+      "fact_ids": [
+        "receiving"
+      ],
+      "reason": "可提供依採購回覆登記入庫的既有流程；不據此認定主管也回覆或核定拒收。"
+    },
+    {
+      "quote": "主管的回覆",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "題目並列主管回覆的處理途徑，但凍結收貨事實未提供此途徑與主管決定權。"
+    }
+  ]
+}

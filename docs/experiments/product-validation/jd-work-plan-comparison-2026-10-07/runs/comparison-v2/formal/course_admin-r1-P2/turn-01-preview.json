@@ -1,0 +1,32 @@
+{
+  "job_file_id": "b63bdf48-ac75-4f06-af36-94326ca5e724",
+  "execution_id": "8d044d19-3328-4143-9e38-8e4c8086c604",
+  "status": "active",
+  "pause_requested": false,
+  "input_text": "我在成人教育中心做課務行政，向教務主任報告。主要負責課程排程、學員報名與收費資料、開課準備、出缺勤和結業資料，也處理老師臨時缺課及學員退費申請。最近一位老師前一天說不能到，我先通知主任和學員；換誰來上課不是我自己決定。",
+  "commentary": [],
+  "candidate": {
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": null
+    },
+    "work": {
+      "revision_id": "7c1abefe-13be-4cf3-a1df-0d9289175ec2",
+      "areas": [],
+      "tasks": [],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    }
+  },
+  "plan_preview": {
+    "plan": null
+  },
+  "allowed_controls": [
+    "pause",
+    "cancel"
+  ]
+}

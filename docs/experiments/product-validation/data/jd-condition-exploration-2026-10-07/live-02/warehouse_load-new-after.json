@@ -1,0 +1,138 @@
+{
+  "profile": {
+    "revision_id": "7d84c817-641c-46d7-8bf7-9eef9188a3ff",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "完成收貨上架及指定盤點，維持貨物和入庫紀錄可追查。"
+    }
+  },
+  "work": {
+    "revision_id": "7d84c817-641c-46d7-8bf7-9eef9188a3ff",
+    "areas": [
+      {
+        "area_id": "5d2cecf7-68b2-4b50-a386-bdfa40bb895d",
+        "title": "收貨與庫存核對",
+        "scope_text": "收貨上架及依不同周期盤點。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "25a08c3d-ba16-44b5-834c-a5dcaae33883",
+        "area_id": "5d2cecf7-68b2-4b50-a386-bdfa40bb895d",
+        "title": "收貨驗收與上架",
+        "description": "核對單據和實貨，差異拍照通知採購並回報主管，由採購決定收退；符合才依安排上架、貼標籤及登記。",
+        "outcomes": [],
+        "requirements": [
+          {
+            "detail_id": "1f0da0a5-e0ed-4635-bace-d7b66a752326",
+            "text": "發現差異的貨物先留置等待決定；本人不決定收退，後續處理依採購或主管安排。"
+          }
+        ]
+      },
+      {
+        "task_id": "f46ae730-5bef-4f5d-9664-715c16bfc0c4",
+        "area_id": "5d2cecf7-68b2-4b50-a386-bdfa40bb895d",
+        "title": "配合庫存盤點",
+        "description": "下班前複點高異動商品；月底點本人區域，十二月配合財務全倉盤點，結果交主管。",
+        "outcomes": [
+          {
+            "detail_id": "661decb7-cdbd-4181-b887-ba0087701d55",
+            "text": "完成本人區域或分配範圍的盤點清點，並將結果交主管。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "4b1390e9-036e-4083-8a8b-0aa1065c1db5",
+            "text": "盤點依不同週期安排，並非每天都進行全部盤點。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "7d84c817-641c-46d7-8bf7-9eef9188a3ff",
+    "references": [
+      {
+        "citation_id": "f35f8de4-bb83-430f-8c1c-ad33664db677",
+        "target_label": "任務：收貨驗收與上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "25a08c3d-ba16-44b5-834c-a5dcaae33883",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "74176a07-0671-47ec-94f5-279e3e313403",
+        "target_label": "任務：配合庫存盤點",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "f46ae730-5bef-4f5d-9664-715c16bfc0c4",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "022f0f45-4195-4861-aec1-117cdfbac540",
+        "target_label": "任務：收貨驗收與上架 · 要求：發現差異的貨物先留置等待決定；本人不決定收退，後續處理依採購或主管安排。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "1f0da0a5-e0ed-4635-bace-d7b66a752326",
+          "task_id": "25a08c3d-ba16-44b5-834c-a5dcaae33883"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f891b8f7-3739-4547-ba90-8153800b5c4c",
+        "target_label": "任務：配合庫存盤點 · 成果：完成本人區域或分配範圍的盤點清點，並將結果交主管。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "661decb7-cdbd-4181-b887-ba0087701d55",
+          "task_id": "f46ae730-5bef-4f5d-9664-715c16bfc0c4"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "5fa5afb8-0f95-4815-a383-2ead72c680db",
+        "target_label": "任務：配合庫存盤點 · 要求：盤點依不同週期安排，並非每天都進行全部盤點。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "4b1390e9-036e-4083-8a8b-0aa1065c1db5",
+          "task_id": "f46ae730-5bef-4f5d-9664-715c16bfc0c4"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

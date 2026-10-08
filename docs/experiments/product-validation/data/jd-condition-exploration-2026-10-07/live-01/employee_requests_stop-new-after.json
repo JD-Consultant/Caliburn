@@ -1,0 +1,55 @@
+{
+  "profile": {
+    "revision_id": "b8b7e703-3bec-4b30-9ea6-871bd17c0972",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依安排上架並登記庫存，異常交主管處理。"
+    }
+  },
+  "work": {
+    "revision_id": "b8b7e703-3bec-4b30-9ea6-871bd17c0972",
+    "areas": [
+      {
+        "area_id": "c7fbb1b6-fc4d-44c9-83e9-f4d5f72f00b9",
+        "title": "上架與登記",
+        "scope_text": "照安排上架及異常交接。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "60d589b5-1944-4784-8c30-e6eeec409928",
+        "area_id": "c7fbb1b6-fc4d-44c9-83e9-f4d5f72f00b9",
+        "title": "上架並登記庫存",
+        "description": "照安排搬運、上架及登記，差異先通知主管，不自行更改儲位；搬箱最重約十五公斤。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "b8b7e703-3bec-4b30-9ea6-871bd17c0972",
+    "references": [
+      {
+        "citation_id": "963055cc-23a8-41e9-9dd5-d188e7d7629d",
+        "target_label": "任務：上架並登記庫存",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "60d589b5-1944-4784-8c30-e6eeec409928",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

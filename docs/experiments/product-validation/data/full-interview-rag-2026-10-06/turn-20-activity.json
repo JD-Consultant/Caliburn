@@ -1,0 +1,2226 @@
+[
+  {
+    "at": 1791281207.8136442,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.8136463,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解\"}"
+  },
+  {
+    "at": 1791281207.818118,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.8181195,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，\"}"
+  },
+  {
+    "at": 1791281207.8263125,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.8263137,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放\"}"
+  },
+  {
+    "at": 1791281207.8435109,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.8435123,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯\"}"
+  },
+  {
+    "at": 1791281207.847289,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.8472903,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲\"}"
+  },
+  {
+    "at": 1791281207.8534179,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.8534195,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位\"}"
+  },
+  {
+    "at": 1791281207.9437263,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9437284,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不\"}"
+  },
+  {
+    "at": 1791281207.9448512,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.944852,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會\"}"
+  },
+  {
+    "at": 1791281207.945266,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.945267,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替\"}"
+  },
+  {
+    "at": 1791281207.9454038,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.945405,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明\"}"
+  },
+  {
+    "at": 1791281207.9454558,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9454563,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大\"}"
+  },
+  {
+    "at": 1791281207.945882,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.945883,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分\"}"
+  },
+  {
+    "at": 1791281207.945963,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9459639,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日\"}"
+  },
+  {
+    "at": 1791281207.9462342,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9462352,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常\"}"
+  },
+  {
+    "at": 1791281207.9464762,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9464772,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作\"}"
+  },
+  {
+    "at": 1791281207.9466996,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9467008,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我\"}"
+  },
+  {
+    "at": 1791281207.9468114,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9468124,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接\"}"
+  },
+  {
+    "at": 1791281207.946855,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9468558,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著\"}"
+  },
+  {
+    "at": 1791281207.9470384,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9470391,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會\"}"
+  },
+  {
+    "at": 1791281207.9470832,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9470837,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用\"}"
+  },
+  {
+    "at": 1791281207.947128,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9471285,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這\"}"
+  },
+  {
+    "at": 1791281207.948526,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9485269,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些\"}"
+  },
+  {
+    "at": 1791281207.951911,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.951912,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已\"}"
+  },
+  {
+    "at": 1791281207.955884,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9558852,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認\"}"
+  },
+  {
+    "at": 1791281207.9559617,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.955962,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的\"}"
+  },
+  {
+    "at": 1791281207.9627545,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9627557,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範\"}"
+  },
+  {
+    "at": 1791281207.962819,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9628196,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍\"}"
+  },
+  {
+    "at": 1791281207.9628935,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.962894,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核\"}"
+  },
+  {
+    "at": 1791281207.963054,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9630547,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對\"}"
+  },
+  {
+    "at": 1791281207.9631052,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9631057,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否\"}"
+  },
+  {
+    "at": 1791281207.963152,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9631524,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有\"}"
+  },
+  {
+    "at": 1791281207.9632,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9632006,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易\"}"
+  },
+  {
+    "at": 1791281207.9633167,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9633186,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏\"}"
+  },
+  {
+    "at": 1791281207.9804451,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9804466,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的\"}"
+  },
+  {
+    "at": 1791281207.980702,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9807029,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同\"}"
+  },
+  {
+    "at": 1791281207.9807663,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9807668,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類\"}"
+  },
+  {
+    "at": 1791281207.9808338,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9808345,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作\"}"
+  },
+  {
+    "at": 1791281207.9808657,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9808662,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線\"}"
+  },
+  {
+    "at": 1791281207.9810743,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.981076,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索\"}"
+  },
+  {
+    "at": 1791281207.9811213,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9811218,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但\"}"
+  },
+  {
+    "at": 1791281207.9811347,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9811351,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不\"}"
+  },
+  {
+    "at": 1791281207.986576,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9865768,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會\"}"
+  },
+  {
+    "at": 1791281207.986624,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9866245,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把\"}"
+  },
+  {
+    "at": 1791281207.993887,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281207.9938886,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參\"}"
+  },
+  {
+    "at": 1791281208.006364,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.0063655,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考\"}"
+  },
+  {
+    "at": 1791281208.0178747,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.0178757,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考項\"}"
+  },
+  {
+    "at": 1791281208.076837,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.0768394,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考項目\"}"
+  },
+  {
+    "at": 1791281208.0769136,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.076914,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考項目直接\"}"
+  },
+  {
+    "at": 1791281208.076973,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.0769737,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考項目直接當\"}"
+  },
+  {
+    "at": 1791281208.0770237,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.0770242,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考項目直接當成\"}"
+  },
+  {
+    "at": 1791281208.077137,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.077138,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考項目直接當成你的\"}"
+  },
+  {
+    "at": 1791281208.0773795,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.0773807,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考項目直接當成你的職\"}"
+  },
+  {
+    "at": 1791281208.0774336,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.077434,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考項目直接當成你的職責\"}"
+  },
+  {
+    "at": 1791281208.0774875,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791281208.077488,
+    "line": "data: {\"job_file_id\":\"71f92646-d2c1-41da-ab2e-fe991f5ad1c5\",\"execution_id\":\"f032863c-8212-4813-9c5e-4c7e98c5483c\",\"response_id\":\"resp_00933d1a394bb439016ac4c833b0bc87d08b181fa59c0b62bb\",\"message_id\":\"msg_00933d1a394bb439016ac4c8399c5c87d080fae7d8b8f9590a\",\"text\":\"了解，放錯儲位後的重新安排方式仍不確定；我不會替你補流程。你已說明大部分日常工作，我接著會用這些已確認的工作範圍核對是否有容易漏提的同類工作線索，但不會把參考項目直接當成你的職責。\"}"
+  },
+  {
+    "at": 1791281222.472585,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.472588,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI\"}"
+  },
+  {
+    "at": 1791281222.4876003,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.4876018,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see\"}"
+  },
+  {
+    "at": 1791281222.488742,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.4887433,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that\"}"
+  },
+  {
+    "at": 1791281222.5403013,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.5403023,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my\"}"
+  },
+  {
+    "at": 1791281222.5470846,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.5470858,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search\"}"
+  },
+  {
+    "at": 1791281222.5479999,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.5480006,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned\"}"
+  },
+  {
+    "at": 1791281222.5786915,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.5786932,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five\"}"
+  },
+  {
+    "at": 1791281222.5838675,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.583869,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references\"}"
+  },
+  {
+    "at": 1791281222.5851398,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.585142,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references.\"}"
+  },
+  {
+    "at": 1791281222.6074185,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6074204,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I\"}"
+  },
+  {
+    "at": 1791281222.607532,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6075342,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need\"}"
+  },
+  {
+    "at": 1791281222.607639,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.60764,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to\"}"
+  },
+  {
+    "at": 1791281222.6077125,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.607713,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify\"}"
+  },
+  {
+    "at": 1791281222.6077676,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.607768,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the\"}"
+  },
+  {
+    "at": 1791281222.6078222,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6078227,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most\"}"
+  },
+  {
+    "at": 1791281222.6078527,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6078532,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant\"}"
+  },
+  {
+    "at": 1791281222.6140063,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6140075,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates\"}"
+  },
+  {
+    "at": 1791281222.6140869,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6140876,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates.\"}"
+  },
+  {
+    "at": 1791281222.6269853,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6269863,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For\"}"
+  },
+  {
+    "at": 1791281222.6293926,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6293936,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance\"}"
+  },
+  {
+    "at": 1791281222.6426358,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6426384,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance,\"}"
+  },
+  {
+    "at": 1791281222.645121,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6451218,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"\"}"
+  },
+  {
+    "at": 1791281222.6753528,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6753538,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電\"}"
+  },
+  {
+    "at": 1791281222.675423,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6754234,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商\"}"
+  },
+  {
+    "at": 1791281222.675496,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6754968,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流\"}"
+  },
+  {
+    "at": 1791281222.6755326,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6755328,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心\"}"
+  },
+  {
+    "at": 1791281222.6755457,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.675546,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理\"}"
+  },
+  {
+    "at": 1791281222.680938,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.680939,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨\"}"
+  },
+  {
+    "at": 1791281222.6869917,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.6869926,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\"}"
+  },
+  {
+    "at": 1791281222.702715,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7027164,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\"\"}"
+  },
+  {
+    "at": 1791281222.7214866,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7214878,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely\"}"
+  },
+  {
+    "at": 1791281222.7242672,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7242682,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers\"}"
+  },
+  {
+    "at": 1791281222.7302337,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7302477,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks\"}"
+  },
+  {
+    "at": 1791281222.7413971,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7413986,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like\"}"
+  },
+  {
+    "at": 1791281222.7715974,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7715988,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving\"}"
+  },
+  {
+    "at": 1791281222.7800205,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7800214,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving,\"}"
+  },
+  {
+    "at": 1791281222.7851443,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7851455,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking\"}"
+  },
+  {
+    "at": 1791281222.7889419,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.788943,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking,\"}"
+  },
+  {
+    "at": 1791281222.7985451,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7985468,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking\"}"
+  },
+  {
+    "at": 1791281222.7986133,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7986135,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking,\"}"
+  },
+  {
+    "at": 1791281222.7986314,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.7986317,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and\"}"
+  },
+  {
+    "at": 1791281222.8061876,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.806189,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling\"}"
+  },
+  {
+    "at": 1791281222.8204343,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.820436,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective\"}"
+  },
+  {
+    "at": 1791281222.8327096,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.8327112,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products\"}"
+  },
+  {
+    "at": 1791281222.8397756,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.839777,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products.\"}"
+  },
+  {
+    "at": 1791281222.8502386,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.8502398,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On\"}"
+  },
+  {
+    "at": 1791281222.8541875,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.8541896,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the\"}"
+  },
+  {
+    "at": 1791281222.8614314,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.8614326,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other\"}"
+  },
+  {
+    "at": 1791281222.878811,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.8788123,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand\"}"
+  },
+  {
+    "at": 1791281222.8788803,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.8788807,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand,\"}"
+  },
+  {
+    "at": 1791281222.8804274,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.8804283,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"\"}"
+  },
+  {
+    "at": 1791281222.8972907,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.8972921,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉\"}"
+  },
+  {
+    "at": 1791281222.8973784,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.8973794,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管\"}"
+  },
+  {
+    "at": 1791281222.90191,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.901911,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專\"}"
+  },
+  {
+    "at": 1791281222.908992,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.908993,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\"}"
+  },
+  {
+    "at": 1791281222.9152353,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.9152367,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\"\"}"
+  },
+  {
+    "at": 1791281222.9219105,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.9219117,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves\"}"
+  },
+  {
+    "at": 1791281222.923181,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.923182,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage\"}"
+  },
+  {
+    "at": 1791281222.9330194,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.9330206,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but\"}"
+  },
+  {
+    "at": 1791281222.9372272,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.9372282,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may\"}"
+  },
+  {
+    "at": 1791281222.9436526,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.9436538,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also\"}"
+  },
+  {
+    "at": 1791281222.9472466,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.9472473,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include\"}"
+  },
+  {
+    "at": 1791281222.9595895,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.9595916,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management\"}"
+  },
+  {
+    "at": 1791281222.9661472,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.9661481,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and\"}"
+  },
+  {
+    "at": 1791281222.9885855,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.988587,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety\"}"
+  },
+  {
+    "at": 1791281222.9886591,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.9886599,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety,\"}"
+  },
+  {
+    "at": 1791281222.991061,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281222.991062,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which\"}"
+  },
+  {
+    "at": 1791281223.0096083,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.0096097,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might\"}"
+  },
+  {
+    "at": 1791281223.0241385,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.02414,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not\"}"
+  },
+  {
+    "at": 1791281223.0242019,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.0242026,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit\"}"
+  },
+  {
+    "at": 1791281223.037457,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.0374582,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all\"}"
+  },
+  {
+    "at": 1791281223.045673,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.0456746,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities\"}"
+  },
+  {
+    "at": 1791281223.0477345,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.0477357,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities.\"}"
+  },
+  {
+    "at": 1791281223.057832,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.0578332,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I\"}"
+  },
+  {
+    "at": 1791281223.0776515,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.077653,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want\"}"
+  },
+  {
+    "at": 1791281223.092736,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.0927372,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to\"}"
+  },
+  {
+    "at": 1791281223.0928075,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.092808,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read\"}"
+  },
+  {
+    "at": 1791281223.092823,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.0928233,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the\"}"
+  },
+  {
+    "at": 1791281223.1001143,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1001158,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview\"}"
+  },
+  {
+    "at": 1791281223.1151412,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1151423,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and\"}"
+  },
+  {
+    "at": 1791281223.1192977,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1193006,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task\"}"
+  },
+  {
+    "at": 1791281223.1230776,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1230786,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists\"}"
+  },
+  {
+    "at": 1791281223.1305711,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1305723,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of\"}"
+  },
+  {
+    "at": 1791281223.1395652,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.139567,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the\"}"
+  },
+  {
+    "at": 1791281223.1396337,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1396341,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected\"}"
+  },
+  {
+    "at": 1791281223.13965,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1396503,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references\"}"
+  },
+  {
+    "at": 1791281223.1500618,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1500635,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to\"}"
+  },
+  {
+    "at": 1791281223.1502204,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1502218,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch\"}"
+  },
+  {
+    "at": 1791281223.1615632,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1615646,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any\"}"
+  },
+  {
+    "at": 1791281223.167941,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1679423,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions\"}"
+  },
+  {
+    "at": 1791281223.185345,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1853464,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and\"}"
+  },
+  {
+    "at": 1791281223.1854796,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1854806,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure\"}"
+  },
+  {
+    "at": 1791281223.195557,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1955585,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure I'm\"}"
+  },
+  {
+    "at": 1791281223.196886,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.1968868,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure I'm on\"}"
+  },
+  {
+    "at": 1791281223.199071,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.199072,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure I'm on point\"}"
+  },
+  {
+    "at": 1791281223.207201,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.2072022,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure I'm on point for\"}"
+  },
+  {
+    "at": 1791281223.2228994,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.2229004,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure I'm on point for the\"}"
+  },
+  {
+    "at": 1791281223.2346413,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.2346435,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure I'm on point for the user's\"}"
+  },
+  {
+    "at": 1791281223.2430022,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.2430034,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure I'm on point for the user's job\"}"
+  },
+  {
+    "at": 1791281223.252336,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.2523372,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure I'm on point for the user's job requirements\"}"
+  },
+  {
+    "at": 1791281223.257645,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.2576468,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Identifying job references**\\n\\nI see that my search returned five references. I need to identify the most relevant templates. For instance, \\\"電商物流中心理貨員\\\" likely covers tasks like receiving, stocking, picking, and handling defective products. On the other hand, \\\"倉管專員\\\" involves storage but may also include management and safety, which might not fit all responsibilities. I want to read the overview and task lists of the selected references to catch any omissions and ensure I'm on point for the user's job requirements.\"}"
+  },
+  {
+    "at": 1791281223.8777738,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.8777752,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI\"}"
+  },
+  {
+    "at": 1791281223.9122767,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.9122782,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m\"}"
+  },
+  {
+    "at": 1791281223.9123473,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.9123483,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering\"}"
+  },
+  {
+    "at": 1791281223.9805686,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.98057,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding\"}"
+  },
+  {
+    "at": 1791281223.9825892,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.98259,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"\"}"
+  },
+  {
+    "at": 1791281223.9950483,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281223.9950495,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉\"}"
+  },
+  {
+    "at": 1791281224.0024068,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0024083,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲\"}"
+  },
+  {
+    "at": 1791281224.0134232,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0134244,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\"}"
+  },
+  {
+    "at": 1791281224.013487,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0134876,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\"\"}"
+  },
+  {
+    "at": 1791281224.014533,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0145342,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to\"}"
+  },
+  {
+    "at": 1791281224.0146246,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.014625,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid\"}"
+  },
+  {
+    "at": 1791281224.014671,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0146713,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing\"}"
+  },
+  {
+    "at": 1791281224.0147123,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0147126,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in\"}"
+  },
+  {
+    "at": 1791281224.0233595,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0233607,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too\"}"
+  },
+  {
+    "at": 1791281224.040301,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0403023,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many\"}"
+  },
+  {
+    "at": 1791281224.051153,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0511541,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial\"}"
+  },
+  {
+    "at": 1791281224.077794,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0777955,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks\"}"
+  },
+  {
+    "at": 1791281224.098095,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.0980961,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks,\"}"
+  },
+  {
+    "at": 1791281224.1157498,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.1157515,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but\"}"
+  },
+  {
+    "at": 1791281224.136225,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.1362267,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I\"}"
+  },
+  {
+    "at": 1791281224.1680253,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.1680272,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll\"}"
+  },
+  {
+    "at": 1791281224.175023,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.1750257,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip\"}"
+  },
+  {
+    "at": 1791281224.1876044,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.187606,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that\"}"
+  },
+  {
+    "at": 1791281224.2010586,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.2010596,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for\"}"
+  },
+  {
+    "at": 1791281224.205323,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.205324,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now\"}"
+  },
+  {
+    "at": 1791281224.2195108,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.219512,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due\"}"
+  },
+  {
+    "at": 1791281224.2314217,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.231423,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to\"}"
+  },
+  {
+    "at": 1791281224.25476,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.2547615,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap\"}"
+  },
+  {
+    "at": 1791281224.2612002,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.2612014,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks\"}"
+  },
+  {
+    "at": 1791281224.2730196,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.273021,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks.\"}"
+  },
+  {
+    "at": 1791281224.2764819,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.2764828,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I\"}"
+  },
+  {
+    "at": 1791281224.2820315,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.282033,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan\"}"
+  },
+  {
+    "at": 1791281224.2916746,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.2916758,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to\"}"
+  },
+  {
+    "at": 1791281224.3020773,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.3020787,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read\"}"
+  },
+  {
+    "at": 1791281224.3127549,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.312756,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references\"}"
+  },
+  {
+    "at": 1791281224.325114,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.3251154,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1\"}"
+  },
+  {
+    "at": 1791281224.3324056,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.3324068,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and\"}"
+  },
+  {
+    "at": 1791281224.3517783,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.3517797,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4\"}"
+  },
+  {
+    "at": 1791281224.3581932,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.3581944,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for\"}"
+  },
+  {
+    "at": 1791281224.3713117,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.371313,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the\"}"
+  },
+  {
+    "at": 1791281224.3823097,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.3823109,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview\"}"
+  },
+  {
+    "at": 1791281224.3875737,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.3875747,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and\"}"
+  },
+  {
+    "at": 1791281224.3974292,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.397431,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete\"}"
+  },
+  {
+    "at": 1791281224.4063733,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.406375,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task\"}"
+  },
+  {
+    "at": 1791281224.4233623,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.4233637,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings\"}"
+  },
+  {
+    "at": 1791281224.427068,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.427072,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since\"}"
+  },
+  {
+    "at": 1791281224.4337053,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.4337065,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I\"}"
+  },
+  {
+    "at": 1791281224.433767,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.4337678,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can\"}"
+  },
+  {
+    "at": 1791281224.4480586,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.4480598,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use\"}"
+  },
+  {
+    "at": 1791281224.4592552,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.4592566,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple\"}"
+  },
+  {
+    "at": 1791281224.4614515,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.4614527,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools\"}"
+  },
+  {
+    "at": 1791281224.476817,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.476818,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently\"}"
+  },
+  {
+    "at": 1791281224.476884,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.4768844,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently.\"}"
+  },
+  {
+    "at": 1791281224.4843955,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.4843967,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm\"}"
+  },
+  {
+    "at": 1791281224.4988556,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.4988573,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also\"}"
+  },
+  {
+    "at": 1791281224.5017686,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.50177,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking\"}"
+  },
+  {
+    "at": 1791281224.5090988,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.5091002,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about\"}"
+  },
+  {
+    "at": 1791281224.5194278,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.519429,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including\"}"
+  },
+  {
+    "at": 1791281224.5293925,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.5293937,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"\"}"
+  },
+  {
+    "at": 1791281224.533953,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.5339544,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷\"}"
+  },
+  {
+    "at": 1791281224.5448096,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.5448108,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈\"}"
+  },
+  {
+    "at": 1791281224.5706754,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.570677,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉\"}"
+  },
+  {
+    "at": 1791281224.5784624,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.5784638,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲\"}"
+  },
+  {
+    "at": 1791281224.582627,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.582628,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流\"}"
+  },
+  {
+    "at": 1791281224.6161046,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.616106,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人\"}"
+  },
+  {
+    "at": 1791281224.6291795,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.629181,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\"}"
+  },
+  {
+    "at": 1791281224.6502242,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.6502256,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\"\"}"
+  },
+  {
+    "at": 1791281224.6637747,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.663776,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for\"}"
+  },
+  {
+    "at": 1791281224.6695523,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.669554,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold\"}"
+  },
+  {
+    "at": 1791281224.6774077,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.677409,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage\"}"
+  },
+  {
+    "at": 1791281224.703726,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7037277,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage,\"}"
+  },
+  {
+    "at": 1791281224.7093685,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7093697,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but\"}"
+  },
+  {
+    "at": 1791281224.7175126,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7175136,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that\"}"
+  },
+  {
+    "at": 1791281224.7196934,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7197194,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn\"}"
+  },
+  {
+    "at": 1791281224.7319052,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7319071,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t\"}"
+  },
+  {
+    "at": 1791281224.7319925,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7319932,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem\"}"
+  },
+  {
+    "at": 1791281224.7344952,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7344966,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary\"}"
+  },
+  {
+    "at": 1791281224.7435234,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7435246,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as\"}"
+  },
+  {
+    "at": 1791281224.7618194,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7618206,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it\"}"
+  },
+  {
+    "at": 1791281224.7664037,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.7664049,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s\"}"
+  },
+  {
+    "at": 1791281224.801356,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.8013573,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not\"}"
+  },
+  {
+    "at": 1791281224.821403,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.8214047,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their\"}"
+  },
+  {
+    "at": 1791281224.8245654,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.8245664,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main\"}"
+  },
+  {
+    "at": 1791281224.829094,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.829095,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job\"}"
+  },
+  {
+    "at": 1791281224.8291893,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.8291898,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job.\"}"
+  },
+  {
+    "at": 1791281224.8408659,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.840867,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll\"}"
+  },
+  {
+    "at": 1791281224.8474426,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.8474443,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use\"}"
+  },
+  {
+    "at": 1791281224.8759086,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.8759098,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings\"}"
+  },
+  {
+    "at": 1791281224.8857927,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.8857937,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as\"}"
+  },
+  {
+    "at": 1791281224.8911023,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.8911035,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts\"}"
+  },
+  {
+    "at": 1791281224.898454,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.8984559,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to\"}"
+  },
+  {
+    "at": 1791281224.9205277,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.9205287,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore\"}"
+  },
+  {
+    "at": 1791281224.9376209,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.9376223,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential\"}"
+  },
+  {
+    "at": 1791281224.9707236,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.970725,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks\"}"
+  },
+  {
+    "at": 1791281224.9794242,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.9794252,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the\"}"
+  },
+  {
+    "at": 1791281224.9816403,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.9816418,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user\"}"
+  },
+  {
+    "at": 1791281224.9838727,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.983874,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might\"}"
+  },
+  {
+    "at": 1791281224.990393,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281224.990394,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need\"}"
+  },
+  {
+    "at": 1791281225.0054703,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0054715,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need,\"}"
+  },
+  {
+    "at": 1791281225.0064325,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0064337,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like\"}"
+  },
+  {
+    "at": 1791281225.0082164,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0082173,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing\"}"
+  },
+  {
+    "at": 1791281225.0135279,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0135288,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and\"}"
+  },
+  {
+    "at": 1791281225.022191,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0221934,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping\"}"
+  },
+  {
+    "at": 1791281225.026527,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0265286,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping,\"}"
+  },
+  {
+    "at": 1791281225.0266006,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0266013,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while\"}"
+  },
+  {
+    "at": 1791281225.033687,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0336893,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring\"}"
+  },
+  {
+    "at": 1791281225.0474496,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0474505,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I\"}"
+  },
+  {
+    "at": 1791281225.0580783,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0580795,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don\"}"
+  },
+  {
+    "at": 1791281225.0735974,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0735986,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t\"}"
+  },
+  {
+    "at": 1791281225.0766077,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0766091,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply\"}"
+  },
+  {
+    "at": 1791281225.0839915,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0839925,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic\"}"
+  },
+  {
+    "at": 1791281225.0896387,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0896397,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards\"}"
+  },
+  {
+    "at": 1791281225.0903223,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0903232,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards.\"}"
+  },
+  {
+    "at": 1791281225.090395,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0903955,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm\"}"
+  },
+  {
+    "at": 1791281225.097629,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.0976305,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm ready\"}"
+  },
+  {
+    "at": 1791281225.1051884,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.1051898,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm ready to\"}"
+  },
+  {
+    "at": 1791281225.1138802,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.1138816,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm ready to dive\"}"
+  },
+  {
+    "at": 1791281225.1307678,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.1307695,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm ready to dive into\"}"
+  },
+  {
+    "at": 1791281225.1316745,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.131676,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm ready to dive into references\"}"
+  },
+  {
+    "at": 1791281225.1410942,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.1410954,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm ready to dive into references 1\"}"
+  },
+  {
+    "at": 1791281225.148407,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.1484084,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm ready to dive into references 1 and\"}"
+  },
+  {
+    "at": 1791281225.1750755,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.1750772,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm ready to dive into references 1 and 4\"}"
+  },
+  {
+    "at": 1791281225.175634,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791281225.1756349,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c84496e887d0a35fa04e0e5ba97a\",\"item_id\":\"rs_00933d1a394bb439016ac4c8462de487d08b1ae2b11dbf3d6b\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Refining job references**\\n\\nI’m considering adding \\\"倉儲主管\\\" to avoid mixing in too many managerial tasks, but I’ll skip that for now due to gap checks. I plan to read references 1 and 4 for the overview and complete task headings since I can use multiple tools independently. I'm also thinking about including \\\"冷鏈倉儲物流人員\\\" for cold storage, but that doesn’t seem necessary as it’s not their main job. I'll use headings as prompts to explore potential tasks the user might need, like packing and shipping, while ensuring I don’t imply generic standards. I'm ready to dive into references 1 and 4!\"}"
+  }
+]

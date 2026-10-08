@@ -1,0 +1,298 @@
+{
+  "arm": "old",
+  "case_id": "warehouse_environment",
+  "job_file_id": "234c587f-aba6-4e39-bfa0-9173eff74c31",
+  "before": {
+    "profile": {
+      "revision_id": "06ba075e-bede-436b-90a7-c3f56cb33f40",
+      "profile": {
+        "job_title": null,
+        "organization_unit": "物流中心",
+        "reports_to": "倉儲主管",
+        "purpose": "依已確認的到貨及儲位安排，完成收貨與上架並留下入庫紀錄。"
+      }
+    },
+    "work": {
+      "revision_id": "06ba075e-bede-436b-90a7-c3f56cb33f40",
+      "areas": [
+        {
+          "area_id": "b06410eb-c9f4-402e-a1af-af87851aba50",
+          "title": "收貨與上架",
+          "scope_text": "核對到貨、異常交接及依安排上架。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "79528e55-3433-49c7-bf71-2f374181b1fa",
+          "area_id": "b06410eb-c9f4-402e-a1af-af87851aba50",
+          "title": "搬運並上架貨品",
+          "description": "核對到貨後依安排搬運與上架，掃碼確認品項、貼標籤及登記入庫；自行搬箱最重約十五公斤，堆高機操作須有證照。",
+          "outcomes": [
+            {
+              "detail_id": "7d612dc8-377a-4018-8273-93d82a413865",
+              "text": "貨品依安排放入儲位並完成入庫系統紀錄，作為庫存入帳資訊。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "e49d0251-e7e7-450a-a173-374a3efb1a1f",
+              "text": "到貨品項與數量核對相符才上架；不符時拍照通知採購，收退由採購決定。"
+            },
+            {
+              "detail_id": "85583382-15cc-4498-8db9-9dcc467f4b0f",
+              "text": "上架前掃條碼確認品項並貼標籤；自行搬箱最重約十五公斤，操作堆高機須有操作證照。"
+            }
+          ]
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "06ba075e-bede-436b-90a7-c3f56cb33f40",
+      "references": [
+        {
+          "citation_id": "594f7351-debb-4ca7-ab70-ceaf71c7f7d6",
+          "target_label": "任務：搬運並上架貨品",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "79528e55-3433-49c7-bf71-2f374181b1fa",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "9fc5f304-11ae-4d49-914f-3c91db20852a",
+          "target_label": "任務：搬運並上架貨品",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "79528e55-3433-49c7-bf71-2f374181b1fa",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "9312e262-1e2e-4064-a007-14bed6ba829a",
+          "target_label": "任務：搬運並上架貨品 · 成果：貨品依安排放入儲位並完成入庫系統紀錄，作為庫存入帳資訊。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "7d612dc8-377a-4018-8273-93d82a413865",
+            "task_id": "79528e55-3433-49c7-bf71-2f374181b1fa"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "97eb6d69-b95d-47f0-8655-20725a8904d3",
+          "target_label": "任務：搬運並上架貨品 · 成果：貨品依安排放入儲位並完成入庫系統紀錄，作為庫存入帳資訊。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "7d612dc8-377a-4018-8273-93d82a413865",
+            "task_id": "79528e55-3433-49c7-bf71-2f374181b1fa"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "47f3c5a1-02ab-4c9c-9342-8cb26a910f4b",
+          "target_label": "任務：搬運並上架貨品 · 要求：到貨品項與數量核對相符才上架；不符時拍照通知採購，收退由採購決定。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "e49d0251-e7e7-450a-a173-374a3efb1a1f",
+            "task_id": "79528e55-3433-49c7-bf71-2f374181b1fa"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "5a8d5316-4af4-42cc-a8c7-bbdcb684fe10",
+          "target_label": "任務：搬運並上架貨品 · 要求：上架前掃條碼確認品項並貼標籤；自行搬箱最重約十五公斤，操作堆高機須有操作證照。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "85583382-15cc-4498-8db9-9dcc467f4b0f",
+            "task_id": "79528e55-3433-49c7-bf71-2f374181b1fa"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "a36a4b02-104b-4704-8e19-a6a782d14e06",
+          "target_label": "任務：搬運並上架貨品 · 要求：上架前掃條碼確認品項並貼標籤；自行搬箱最重約十五公斤，操作堆高機須有操作證照。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "85583382-15cc-4498-8db9-9dcc467f4b0f",
+            "task_id": "79528e55-3433-49c7-bf71-2f374181b1fa"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "e89cf711-faeb-4094-bc34-502222d1ec48",
+          "target_label": "所屬單位",
+          "target": {
+            "kind": "profile_field",
+            "field": "organization_unit",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "bc930b6c-20c2-4fbc-83c2-52f4726474ec",
+          "target_label": "直屬主管",
+          "target": {
+            "kind": "profile_field",
+            "field": "reports_to",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "97bcd3c7-43e4-4f6b-9e9f-8c4425f1a51d",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "660cc4d7-abfc-4143-810c-8a011f3b3645",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "c6728c99-a1c9-4ef4-a046-07f62c7c4a21",
+      "exchange": {
+        "employee_input": {
+          "source_id": "1a11db30-adf2-4ace-8362-8ae53c63d5af",
+          "interview_sequence": 8,
+          "speaker": "employee",
+          "interview_text": "我主要就是前面說的收貨、搬運上架和入庫紀錄，沒有另外負責揀貨、出貨或其他工作。目前想不到其他補充，你可以帶著我說。"
+        },
+        "consultant_reply": {
+          "source_id": "470bd71c-1807-4177-8198-880fa2932cdc",
+          "interview_sequence": 9,
+          "speaker": "consultant",
+          "interview_text": "了解，目前確認您的主要工作就是收貨核對、搬運上架和入庫紀錄，沒有另外負責揀貨、出貨或其他工作。我已依此整理工作內容，並納入堆高機操作及持證要求。\n\n我想再帶您回想一個細節：**核對到貨品項和數量時，通常是對照哪份資料？**例如送貨單、採購單或系統中的到貨資料；如果依其他方式核對，也可以照實說。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "total_tokens": 0,
+    "outbound_calls": 0,
+    "count_calls": 0,
+    "generation_calls": 0,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 0,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.065981670",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0",
+    "actual_estimated_usd": "0",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0",
+    "cumulative_occupied_usd": "0",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 0.13634089999686694,
+    "seconds_limit": 645,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 109978,
+    "output_tokens": 2734,
+    "reasoning_tokens": 2210,
+    "cached_input_tokens": 106048,
+    "cache_write_input_tokens": 3912,
+    "total_tokens": 112712,
+    "outbound_calls": 13,
+    "count_calls": 7,
+    "generation_calls": 6,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 109978,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.065981670",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0007",
+    "actual_estimated_usd": "0.002918280",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.003618280",
+    "cumulative_occupied_usd": "0.003618280",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 44.82151309999608,
+    "seconds_limit": 645,
+    "stop_reason": null
+  }
+}

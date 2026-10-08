@@ -1,0 +1,279 @@
+{
+  "disclosed": [
+    "customer-returns",
+    "inventory-partial",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training",
+    "training-boundary"
+  ],
+  "seen_topics": [
+    "customer-returns",
+    "inventory",
+    "picking",
+    "receiving",
+    "shelving",
+    "supplier-returns",
+    "training"
+  ],
+  "open_gaps": [
+    "inventory-authority"
+  ],
+  "refused_topics": [],
+  "audit": [
+    {
+      "actual_question": "我先按你提供的內容整理了 JD 草稿的基本資料、職務目的和排班，也記下你會核對單據與實收數量、通知採購，但不決定拒收或退換貨。各項倉儲工作還會再依實際內容整理，不會把最近這次數量差異直接當成整項工作的全部流程。\n\n以平常收貨來說，除了數量，你還會檢查哪些項目？如果發現不符並通知採購，貨物通常先怎麼處理，之後由誰告訴你下一步怎麼做？",
+      "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n關於你問的「貨物通常先怎麼處理」，我目前沒有確定資料，請保留未知，不補猜。",
+      "fact_ids": [
+        "receiving"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "receiving"
+      ],
+      "review_mode": "answer",
+      "review_reason": "這個 fresh case 實際問一般收貨核對項目與差異後誰回覆下一步，receiving 的品項、數量、外包裝、送貨單及採購回覆流程可答。差異貨物通知採購後、等回覆前的實物先處理方式沒有固定資料，不用一般 shelving 代答；不沿用其他 case 的已披露 state。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [
+        "貨物通常先怎麼處理"
+      ],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "f8aff504-ee64-4838-9098-dfdba7e8cbbe",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "7ff19b3e-ca45-4b05-a216-70854e1373f1"
+      ]
+    },
+    {
+      "actual_question": "收到，採購回覆前貨物如何處理會保留為未知，不會推測或重問。我已把逐箱核對、異常拍照登記並通知採購，以及依採購回覆處理入庫的內容整理進收貨工作草稿，也保留你不決定拒收或退換貨、不議價、不選供應商的界線。\n\n接著想了解上架：通常由誰安排貨品的存放位置？你自己依什麼資訊確認貨品該放在哪裡？",
+      "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。\n\n關於你問的「通常由誰安排貨品的存放位置？」，我目前沒有確定資料，請保留未知，不補猜。",
+      "fact_ids": [
+        "shelving"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "shelving"
+      ],
+      "review_mode": "answer",
+      "review_reason": "實際問依據什麼確認放貨位置，shelving 的已規劃儲位、標籤、WMS 登記與實物系統一致確認直接相關。一般存放位置最初由誰規劃沒有固定資料，臨時放不下找組長調整不代表組長必然安排全部儲位，不推定一般規劃權限。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [
+        "通常由誰安排貨品的存放位置？"
+      ],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "a8c37429-f477-4827-9be1-5a452f9211c9",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "7fbd20c1-ece2-476f-9d5f-6fc48f2a2120"
+      ]
+    },
+    {
+      "actual_question": "收到，儲位由誰規劃會保留為未知，不會推定。我已把上架、品項與批號標示、WMS 入庫登記、實物與系統儲位核對，以及儲位不足和搬運設備的責任界線，整理成獨立的上架工作草稿。\n\n你們如何判定「超重貨」？有明確的重量門檻或現場規定嗎？若目前不清楚，也可以保留未知。",
+      "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+      "fact_ids": [],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [],
+      "review_mode": "unknown",
+      "review_reason": "實際问超重貨的判定門檻或現場規定，shelving 只確認超重貨由有證照同事開堆高機，沒有重量數字或判定規則。requirements 的查看重量與安全動線也不提供該門檻，不用一般能力事實或外部規定代答。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "6da82d7c-8615-4589-8a31-f719ed55fbc3",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "b25f8ee6-045f-42a6-8b1d-567c66fee145"
+      ]
+    },
+    {
+      "actual_question": "了解，「超重貨」的判定方式也先保留未知，不再追問；儲位由誰規劃同樣不作推定。\n\n接著了解揀貨：你通常收到什麼指示或資料，依據它確認要揀哪些品項和數量？",
+      "employee_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+      "fact_ids": [
+        "picking"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "picking"
+      ],
+      "review_mode": "answer",
+      "review_reason": "實際轉問揀貨的指示或資料，以及品項數量確認，picking 的出貨波次單與核對要求直接相關。前段上架未知摘要不觸發額外事實。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "5c1de61d-3223-4ab1-a288-c2a012793a68",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "4a29ea7d-1078-4a84-96ea-6c63a26e64aa"
+      ]
+    },
+    {
+      "actual_question": "揀貨工作草稿已記下波次單核對、截單前完成、交包裝區複核，以及「系統有貨但儲位空」時的查核與交由組長協調；揀貨區不足時從備貨區補貨也另列一項。\n\n接著了解庫存盤點：你通常依什麼清單或系統資料核對實際庫存？如果數量對不上，你會怎麼處理，或交給誰處理？",
+      "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？",
+      "fact_ids": [
+        "inventory-partial"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "inventory-partial"
+      ],
+      "review_mode": "answer",
+      "review_reason": "此 fresh case 初問庫存盤點查核資料與數量差異處理，inventory-partial 的近期入出庫、移庫紀錄及複點直接相關，並保留原調帳權限缺口。training 尚未披露，不能提前提供 inventory-authority。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "084011b8-f880-4e52-a4c3-18191576e088",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "8d7ef09e-d2bd-443d-be14-4a6debd1aa9f"
+      ]
+    },
+    {
+      "actual_question": "我先記下每週循環盤點，以及差異時先查近期入庫、出庫和移庫紀錄再複點；調帳方式和批准人仍保留未知。\n\n依你的意思先談帶新人：最近一次帶新人時，你主要教哪項工作、怎麼示範或陪做？你怎麼判斷可以交給他自己做？",
+      "employee_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。",
+      "fact_ids": [
+        "training"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "training"
+      ],
+      "review_mode": "answer",
+      "review_reason": "實際按員工指定轉談新人帶教，問示範陪做與獨立操作確認，首次 training 可答。尚未先前披露 training，因此不提前給 training-boundary；盤點摘要不是調帳權限回訪。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "9c0772e5-f5b1-441c-a6ef-203234dd847d",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "cf4e318e-363f-46db-85c1-707537e8b82f"
+      ]
+    },
+    {
+      "actual_question": "我已把新人第一週的掃碼、揀貨與安全動線示範、跟做觀察，以及檢核表記錄整理成帶教工作；「能否自行上線」目前寫為你的評估責任，尚未推定為正式核准權。\n\n判斷新人能否自行上線時，你主要看哪些標準？你評估後可以直接安排上線，還是還需要其他人確認？",
+      "employee_text": "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。",
+      "fact_ids": [
+        "training",
+        "training-boundary"
+      ],
+      "known_confirmation_ids": [
+        "training"
+      ],
+      "new_fact_ids": [
+        "training-boundary"
+      ],
+      "review_mode": "answer",
+      "review_reason": "本題問一般操作判斷依據及能否直接安排上線，training 中漏掃、錯批號、安全動線與檢核表的觀察內容可重播。training 已先前披露，本題責任再確認符合 training-boundary 條件；連同原流程提供更正，避免重播原判斷措辭而恢復錯誤批准權限。沒有問正式數字門檻，不另創標準。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "c525548f-a97b-4e33-a9c3-95dcb77a2cd8",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "0c557e85-a80d-4c55-abe0-9d0800c11199"
+      ]
+    },
+    {
+      "actual_question": "我已修正帶教工作草稿：你觀察並向組長回報，首次漏掃時讓新人重做並說明原因；若反覆出錯，由組長安排再訓練。新人能否獨立上線最後由主管核准，不由你批准。\n\n這位核准新人上線的主管，是你平常匯報的倉儲主管嗎，還是另一位主管？",
+      "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+      "fact_ids": [],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [],
+      "review_mode": "unknown",
+      "review_reason": "實際問新人上線核准的主管是否就是平常匯報的倉儲主管。training-boundary 只確認最後由主管核准，沒有把該主管身份與初始匯報對象明確連結；不能借另一盤點流程的倉儲主管核准內容來填新人上線身份。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "24c6766b-313e-4bb8-8a83-044135284544",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "b25f8ee6-045f-42a6-8b1d-567c66fee145",
+        "338a6f20-e338-4696-83fc-36ef02d6691d"
+      ]
+    },
+    {
+      "actual_question": "好，核准新人上線的主管是否就是倉儲主管，先保留未知，不再追問。\n\n接著了解客戶退貨：退貨到倉庫後，你接手會做哪些檢查或記錄？之後會交給誰處理？",
+      "employee_text": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。",
+      "fact_ids": [
+        "customer-returns"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "customer-returns"
+      ],
+      "review_mode": "answer",
+      "review_reason": "實際轉問客戶退貨接手的檢查、記錄與交接，customer-returns 的退貨單核對、拍照分類及客服／品保交接直接相關。未問供應商退貨，不混入另一流程。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "909d0016-8e57-402d-a728-6b84ec3ee881",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "df014f9f-9dad-422a-b0bb-e810a94ea395"
+      ]
+    },
+    {
+      "actual_question": "客戶退貨已整理為一項工作，記下依退貨單核對、拍照分類，以及無單或品項不符時隔離並交客服確認；待檢品交品保，可再上架品掃碼入庫。破損品後續處理不會先作推定。\n\n破損品隔離後，你還需要做哪些記錄或交接？後續由誰決定怎麼處理？",
+      "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+      "fact_ids": [],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [],
+      "review_mode": "unknown",
+      "review_reason": "實際追問破損客退品隔離之後的記錄、交接及處理決策。customer-returns 只明確確認破損隔離，沒有該分支後續；待檢交品保和一般分類記錄不能移植成破損品的處置權限或新步驟，整題無新的可答部分。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "2c9affea-2120-4ccc-b931-c6116f91ceb5",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "b25f8ee6-045f-42a6-8b1d-567c66fee145",
+        "338a6f20-e338-4696-83fc-36ef02d6691d",
+        "5bd0bc5e-ded2-4d9a-b2fa-12be90a98ed4"
+      ]
+    },
+    {
+      "actual_question": "好，破損品隔離後的記錄、交接與後續決定者仍保留未知，不作推測。\n\n接著了解供應商退貨：通常在什麼情況下開始？退回商品從你接手到交出去為止，你實際做哪些事，最後交給誰處理？",
+      "employee_text": "供應商退貨更精確是出庫：採購決定要退哪些貨，我按退貨單備貨、核數量、拍照、登記出庫並交承運商簽收，將簽收回給採購。我不辦供應商退貨入庫，也不決定退貨條件。\n\n關於你問的「通常在什麼情況下開始？」，我目前沒有確定資料，請保留未知，不補猜。",
+      "fact_ids": [
+        "supplier-returns"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "supplier-returns"
+      ],
+      "review_mode": "answer",
+      "review_reason": "實際問供應商退貨接手至交出的流程與交接，supplier-returns 的採購决定、退貨單備貨、登記出庫、承運商簽收及回採購直接相關，也更正是出庫。通常引發該退貨的具體情況沒有固定資料，不借收貨差異或客戶退貨原因補猜。",
+      "omitted_subtopics": [],
+      "unknown_subtopics": [
+        "通常在什麼情況下開始？"
+      ],
+      "driver_reminder": false,
+      "actually_submitted": true,
+      "command_id": "05951d22-1db2-4f65-bcae-fd3bd3b8ee81"
+    }
+  ],
+  "disclosure_order": [
+    "receiving",
+    "shelving",
+    "picking",
+    "inventory-partial",
+    "training",
+    "training",
+    "training-boundary",
+    "customer-returns",
+    "supplier-returns"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 3
+  }
+}

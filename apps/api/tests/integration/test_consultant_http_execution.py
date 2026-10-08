@@ -9,6 +9,7 @@ import httpx2
 import pytest
 from fastapi.testclient import TestClient
 
+from caliburn.app_composition import AppComposition
 from caliburn.bootstrap import create_app
 from caliburn.settings import DatabaseSettings, ModelSettings, Settings
 from tests.fixtures.response_transport import response_http_reply
@@ -41,7 +42,7 @@ def test_unconfigured_model_does_not_accept_an_unrunnable_turn(database_settings
 
 
 def test_http_input_reaches_saved_formal_answer_and_reopens_without_model(
-    database_settings: DatabaseSettings, monkeypatch: pytest.MonkeyPatch
+    database_settings: DatabaseSettings,
 ) -> None:
     from caliburn.adapters.openai_responses import create_responses_client
 
@@ -71,14 +72,18 @@ def test_http_input_reaches_saved_formal_answer_and_reopens_without_model(
         )
         return response_http_reply(request, response)
 
-    def synthetic_client(**kwargs):
+    def synthetic_client(model):
         return create_responses_client(
-            **kwargs, http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond))
+            api_key=model.api_key,
+            timeout_seconds=model.request_timeout_seconds,
+            http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond)),
         )
 
-    monkeypatch.setattr("caliburn.bootstrap.create_responses_client", synthetic_client)
     with TestClient(
-        create_app(Settings(database=database_settings, model=ModelSettings(api_key="synthetic"))),
+        create_app(
+            Settings(database=database_settings, model=ModelSettings(api_key="synthetic")),
+            composition=AppComposition(create_responses_client=synthetic_client),
+        ),
         base_url="http://127.0.0.1:8100",
         headers={"Origin": "http://127.0.0.1:8100"},
         backend_options={"loop_factory": asyncio.SelectorEventLoop},
@@ -141,7 +146,7 @@ def test_http_input_reaches_saved_formal_answer_and_reopens_without_model(
 
 
 def test_known_provider_rejection_finishes_failed_without_formalizing_input(
-    database_settings: DatabaseSettings, monkeypatch: pytest.MonkeyPatch
+    database_settings: DatabaseSettings,
 ) -> None:
     from caliburn.adapters.openai_responses import create_responses_client
 
@@ -153,14 +158,18 @@ def test_known_provider_rejection_finishes_failed_without_formalizing_input(
             401, json={"error": {"message": "synthetic private detail", "type": "invalid_api_key"}}
         )
 
-    def synthetic_client(**kwargs):
+    def synthetic_client(model):
         return create_responses_client(
-            **kwargs, http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond))
+            api_key=model.api_key,
+            timeout_seconds=model.request_timeout_seconds,
+            http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond)),
         )
 
-    monkeypatch.setattr("caliburn.bootstrap.create_responses_client", synthetic_client)
     with TestClient(
-        create_app(Settings(database=database_settings, model=ModelSettings(api_key="synthetic"))),
+        create_app(
+            Settings(database=database_settings, model=ModelSettings(api_key="synthetic")),
+            composition=AppComposition(create_responses_client=synthetic_client),
+        ),
         base_url="http://127.0.0.1:8100",
         headers={"Origin": "http://127.0.0.1:8100"},
         backend_options={"loop_factory": asyncio.SelectorEventLoop},

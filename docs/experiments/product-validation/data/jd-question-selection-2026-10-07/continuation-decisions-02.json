@@ -1,0 +1,41 @@
+{
+  "stage": "first-to-second",
+  "rule": "只接續實際提出待答問題的檔案；沒有問題而已收尾者不強行補送。答案均取預先凍結 reply-policy，不揭露未被問到的私人事實。",
+  "decisions": [
+    {
+      "case_id": "warehouse_environment", "arm": "old", "answer_kind": "unknown",
+      "question_quote": "你目前已取得堆高機操作證照了嗎？",
+      "reason": "問的是資格取得狀態，不是場所／環境；人設未定取得狀態，保留未知，不給冷藏答案。"
+    },
+    {
+      "case_id": "warehouse_environment", "arm": "new", "answer_kind": "unknown",
+      "question_quote": "你目前已取得堆高機操作證照了嗎？如果還沒有，現在仍會操作堆高機，還是取得證照後才操作？",
+      "reason": "問資格與操作限制，是有價值的其他缺口；不是場所／環境，保留未知，不給冷藏答案。"
+    },
+    {
+      "case_id": "warehouse_errors", "arm": "new", "answer_kind": "unknown",
+      "question_quote": "上架時通常如何搬貨？需要手搬較重貨物或長時間站立嗎，還是主要使用搬運設備？",
+      "reason": "探索搬運／體力條件而非常見差錯；本案例沒有這些私人事實，保留未知，不注入錯儲位。舊版本案已停止追問，沒有接續。"
+    },
+    {
+      "case_id": "warehouse_load", "arm": "old", "answer_kind": "unknown",
+      "question_quote": "上架搬運通常是手搬、用推車，還是操作設備？若涉及較重貨物或設備，有沒有需要遵守的限制或資格要求？",
+      "reason": "問搬運方式及資格，不是負荷變化；該案例未定搬運私人條件，保留未知，不給促銷高峰答案。"
+    },
+    {
+      "case_id": "warehouse_load", "arm": "new", "answer_kind": "unknown",
+      "question_quote": "收貨或上架時，您需要親自搬運貨物或操作設備嗎？如果需要，工作上有什麼特別的限制或注意事項？",
+      "reason": "問本人搬運與設備限制，不是工作量或高峰；保留未知，不給促銷高峰答案。"
+    },
+    {
+      "case_id": "accounting_errors", "arm": "old", "answer_kind": "unknown",
+      "question_quote": "你所在的部門或單位叫什麼？如果不確定，也可以先留空。",
+      "reason": "只問基本資料，不是核對差錯；未定所屬單位，保留未知。新版本案僅邀請核對並提議告一段落，沒有繼續要求資訊，不補送。"
+    },
+    {
+      "case_id": "software_load", "arm": "old", "answer_kind": "target_answer",
+      "question_quote": "問題單量會不會有明顯高峰，進而影響你的處理安排或回覆時限？",
+      "reason": "實際詢問量與時間要求變化，可揭露預先凍結的新版上線後高峰、產品主管排序及十二小時初判界線。新版本案已收尾，沒有接續。"
+    }
+  ]
+}

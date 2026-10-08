@@ -1,0 +1,157 @@
+{
+  "arm": "new",
+  "case_id": "correct_across_affected_fields",
+  "job_file_id": "b3fa8f19-df3f-4268-ae58-923eea0fd3b6",
+  "before": {
+    "profile": {
+      "revision_id": "18775f94-45fd-4817-9c42-5604186a8d51",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "負責收貨及客戶與供應商退貨入庫，維持貨物和庫存紀錄正確。"
+      }
+    },
+    "work": {
+      "revision_id": "18775f94-45fd-4817-9c42-5604186a8d51",
+      "areas": [
+        {
+          "area_id": "53d93e53-041b-4d09-be46-9d563da525e2",
+          "title": "收貨與退貨管理",
+          "scope_text": "涵蓋每日收貨及客戶與供應商退貨入庫。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "b10fed47-27bc-42d2-98ba-047b1bc06601",
+          "area_id": "53d93e53-041b-4d09-be46-9d563da525e2",
+          "title": "核對收貨差異",
+          "description": "每日處理約 15–20 張收貨單，數量不符時拍照、記錄並通知採購。",
+          "outcomes": [],
+          "requirements": []
+        },
+        {
+          "task_id": "bc9abdec-4ac1-44d1-89ea-1af56c858e6f",
+          "area_id": "53d93e53-041b-4d09-be46-9d563da525e2",
+          "title": "處理退貨入庫",
+          "description": "辦理客戶及供應商退貨入庫。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "18775f94-45fd-4817-9c42-5604186a8d51",
+      "references": [
+        {
+          "citation_id": "b1d9abea-3061-4010-b55e-d80280d5f686",
+          "target_label": "任務：核對收貨差異",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "b10fed47-27bc-42d2-98ba-047b1bc06601",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "899d3fce-249f-43da-8156-bf0eab971501",
+          "target_label": "任務：處理退貨入庫",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "bc9abdec-4ac1-44d1-89ea-1af56c858e6f",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "740e6f24-7440-4e65-9cb4-8f19e28cc0af",
+      "exchange": {
+        "employee_input": {
+          "source_id": "5782ec38-5b83-4dcd-a5d6-f7cb6329c039",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "前面供應商退貨那個我講不準。退不退是採購決定，我只照通知把貨備好、登記出貨，不是入庫。客戶退貨檢查跟入庫還是我做，其他收貨那些沒變。"
+        },
+        "consultant_reply": {
+          "source_id": "ef03f033-9cc6-4310-9eeb-7fd3ab3f3d0c",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "收到，我已修正目前草稿：供應商退貨是否退由採購決定，您依通知備貨並登記出貨；客戶退貨檢查與入庫仍由您負責，收貨工作維持原樣。\n\n客戶退貨通常會檢查哪些內容？如果發現數量、品項或貨況有問題，後續通常由誰決定怎麼處理？"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 101446,
+    "output_tokens": 6039,
+    "reasoning_tokens": 4792,
+    "cached_input_tokens": 71768,
+    "cache_write_input_tokens": 29654,
+    "total_tokens": 107485,
+    "outbound_calls": 16,
+    "count_calls": 8,
+    "generation_calls": 8,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 101446,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0008",
+    "actual_estimated_usd": "0.007446330",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.008246330",
+    "cumulative_occupied_usd": "0.008246330",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 116.99039410000114,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 172689,
+    "output_tokens": 9403,
+    "reasoning_tokens": 7129,
+    "cached_input_tokens": 137668,
+    "cache_write_input_tokens": 34982,
+    "total_tokens": 182092,
+    "outbound_calls": 26,
+    "count_calls": 13,
+    "generation_calls": 13,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 172689,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0013",
+    "actual_estimated_usd": "0.010454830",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.011754830",
+    "cumulative_occupied_usd": "0.011754830",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 187.0189995999972,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

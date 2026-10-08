@@ -95,22 +95,9 @@ App 綁定固定問題、顯示範圍、公版位置、回答與必要補充；�
 
 ## 5. App 提供資料與選答，顧問接續分析
 
-```mermaid
-flowchart TD
-  M[本輪固定 Memory 與完整近期／當次原話] --> Q[檢索查詢與候選來源]
-  Q --> P[App 按範圍及處理結果組裝參考]
-  S[已保存參考處理結果及依據] --> D
-  M --> D[App 檢查可確定的來源變動]
-  D --> P
-  P --> A[顧問看精簡導覽 按需讀來源／細節]
-  M --> A
-  A --> E[要確認本人是否負責 App 呈現具體問題與選項]
-  E --> U[員工選答及補充 App 綁定原問題與答案]
-  U --> A
-  A --> R[顧問辨認新資訊影響 交付結論／局部重開／接續事項]
-  R --> T[App 沿完成 Turn 保存正式結果]
-  T --> S
-```
+![歷史候選：公版參考選答與進度資料流（2026-10-04）](../../diagrams/research/retrieval/2026-10-04-public-reference-progress-and-context-selection/reference-progress-flow.png)
+
+[圖源](../../diagrams/research/retrieval/2026-10-04-public-reference-progress-and-context-selection/reference-progress-flow.mmd) · [SVG](../../diagrams/research/retrieval/2026-10-04-public-reference-progress-and-context-selection/reference-progress-flow.svg)
 
 圖為候選 consumer，沒有改寫 Memory 整版發布及來源上界。員工選答是下一 Turn 的輸入，沿既有正式資格承接，不是在同一已結束 Turn 中無限循環。初搜／rerank 仍先確保涵蓋；進度投影不是第二次相似度門檻，選答也不證明其他篩選分析可以全省。
 

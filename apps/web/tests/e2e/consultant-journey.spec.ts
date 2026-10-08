@@ -1,13 +1,45 @@
-import { expect, test } from '@playwright/test';
+import { expect, test as base } from '@playwright/test';
 import type { APIRequestContext, Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import { isJdProfileView, isJobFile } from '../../src/shared/api/validation';
+import {
+  isConsultantTurn,
+  isCurrentConsultantTurn,
+  isJdProfileView,
+  isJobFile,
+} from '../../src/shared/api/validation';
 
 // These journeys run the real backend, PostgreSQL and UI against the scripted provider
 // (apps/api/tests/fixtures/scripted_backend.py). It is a synthetic double: it proves the
 // transport, control and reconnect behavior, not model quality or provider acceptance.
 const scriptUrl = process.env.CALIBURN_E2E_SCRIPT_URL;
+const test = base.extend<{ fileId: string }>({
+  fileId: async ({ request }, use) => {
+    await use(await createFile(request));
+  },
+});
 test.skip(!scriptUrl, 'Set CALIBURN_E2E_SCRIPT_URL to the scripted backend (see the README).');
+
+test.afterEach(async ({ request, fileId, baseURL }) => {
+  // 即使畫面斷言失敗，也只清理本測例的檔案；取消會一併停止掛起的模型請求。
+  // 釋放共用腳本許可可能喚醒其他工作，或讓下一測例略過原定的等待。
+  const response = await request.get(`/api/job-files/${fileId}/consultant-turns/current`);
+  expect(response.status()).toBe(200);
+  const current: unknown = await response.json();
+  if (!isCurrentConsultantTurn(current)) throw new Error('Invalid current consultant turn');
+  if (current.turn) {
+    if (!baseURL) throw new Error('Missing isolated test App URL');
+    const cancelled = await request.post(
+      `/api/job-files/${fileId}/consultant-turns/${current.turn.execution_id}/cancel`,
+      { headers: { Origin: new URL(baseURL).origin } },
+    );
+    expect(cancelled.status()).toBe(200);
+    const turn: unknown = await cancelled.json();
+    if (!isConsultantTurn(turn)) throw new Error('Invalid cancelled consultant turn');
+    // 查到工作後至取消前，該輪仍可能已完成。
+    expect(['completed', 'cancelled', 'failed']).toContain(turn.status);
+  }
+  await expect.poll(async () => (await scriptState(request)).waiting).toBe(0);
+});
 
 interface ScriptState {
   waiting: number;
@@ -73,9 +105,9 @@ function watchBrowserErrors(page: Page): string[] {
 
 test('一輪訪談：顧問把職稱與主管寫進 JD，答覆與 JD 重開後相同，變更與 PDF 可讀', async ({
   page,
+  fileId,
 }) => {
   const errors = watchBrowserErrors(page);
-  const fileId = await createFile(page.request);
   const started = (await scriptState(page.request)).responses;
   await page.goto(`/job-files/${fileId}`);
   await send(page, '職稱：前端工程師；主管：李主任');
@@ -127,9 +159,9 @@ test('一輪訪談：顧問把職稱與主管寫進 JD，答覆與 JD 重開後�
 test('處理中：即時公開訊息、JD 唯讀、重開與另一分頁找回同一處理，暫停停妥後續作，不重送輸入', async ({
   page,
   context,
+  fileId,
 }) => {
   const errors = watchBrowserErrors(page);
-  const fileId = await createFile(page.request);
   await page.goto(`/job-files/${fileId}`);
   await send(page, '請稍候 [[hold]]');
   await untilHeld(page.request);
@@ -171,38 +203,43 @@ test('處理中：即時公開訊息、JD 唯讀、重開與另一分頁找回�
   expect(errors).toEqual([]);
 });
 
-test('處理中取消：候選改動被丟棄，原輸入不列入正式訪談且可取回，正式 JD 不變', async ({ page }) => {
+test('處理中取消：候選改動被丟棄，原輸入不列入正式訪談且可取回，正式 JD 不變', async ({
+  page,
+  fileId,
+}) => {
   const errors = watchBrowserErrors(page);
-  const fileId = await createFile(page.request);
   await page.goto(`/job-files/${fileId}`);
-  await send(page, '職稱：不該保存的職稱 [[hold]]');
+  const input = '職稱：不該保存的職稱；[[hold]]';
+  await send(page, input);
   await untilHeld(page.request);
 
   // The consultant's edit exists only as a candidate; the formal JD and PDF stay formal.
   await expect(page.getByText('JD 候選預覽')).toBeVisible();
-  await expect(page.getByText('不該保存的職稱')).toBeVisible();
+  await expect(
+    page.getByRole('region', { name: 'JD 候選預覽' }).getByText('不該保存的職稱', { exact: true }),
+  ).toBeVisible();
   expect(await jobTitle(page.request, fileId)).toBeNull();
   expect((await page.request.get(`/api/job-files/${fileId}/jd/export.pdf`)).status()).toBe(200);
 
   await page.getByRole('button', { name: '取消處理' }).click();
-  await release(page.request);
   await expect(badge(page, '已取消')).toBeVisible();
   await expect(page.getByText('這次處理已取消，原輸入未列入正式訪談。')).toBeVisible();
-  await expect(page.getByText('不該保存的職稱')).toBeHidden();
+  await expect(page.getByRole('region', { name: 'JD 候選預覽' })).toHaveCount(0);
+  await expect(
+    page.getByRole('region', { name: 'JD 基本資料' }).getByText('不該保存的職稱', { exact: true }),
+  ).toHaveCount(0);
   expect(await jobTitle(page.request, fileId)).toBeNull();
 
   // The unformalized input can be taken back for editing; nothing was consumed.
   await page.getByRole('button', { name: '取回原文編輯' }).click();
-  await expect(page.getByRole('textbox', { name: '訪談內容' })).toHaveValue(
-    '職稱：不該保存的職稱 [[hold]]',
-  );
+  await expect(page.getByRole('textbox', { name: '訪談內容' })).toHaveValue(input);
   expect(errors).toEqual([]);
 });
 
 test('模型拒絕這次輸入：處理未完成、原輸入未列入正式訪談，之後可主動送出新輸入', async ({
   page,
+  fileId,
 }) => {
-  const fileId = await createFile(page.request);
   await page.goto(`/job-files/${fileId}`);
   await send(page, '這句會被拒絕 [[reject]]');
   await expect(badge(page, '未完成')).toBeVisible();

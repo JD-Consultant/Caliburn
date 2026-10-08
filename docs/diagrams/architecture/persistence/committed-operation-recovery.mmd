@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant E as 共用執行／工具接線
+  participant D as 業務工作流／交易協調
+  participant P as PostgreSQL 業務保存
+  participant C as LangGraph checkpointer
+  E->>D: 沿原操作身分修改候選
+  D->>P: 短交易：效果與原結果一起提交
+  P-->>D: 提交成立
+  D-->>E: 原操作結果
+  Note over E,C: 此處中斷；checkpoint 尚未接回結果
+  E->>D: 恢復後查回同一原操作
+  D->>P: 讀取原結果
+  P-->>D: 已保存的原結果
+  D-->>E: 原結果；不重新修改
+  E->>C: 補接工具結果與執行位置
+  C-->>E: 接續位置已保存

@@ -1,0 +1,17 @@
+{
+  "execution_id": "e606cc5c-17ad-4ddf-99ae-ea7658323f9b",
+  "exchange": {
+    "employee_input": {
+      "source_id": "7b4c6775-e569-4fa1-b7be-8a08fde291a8",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "對，平常就是照這樣做。我不太會講什麼專業能力，就是對單、對貨，有問題先查再記下來給主管。"
+    },
+    "consultant_reply": {
+      "source_id": "2ff379f2-b535-47eb-97f7-1d3e39a08dd9",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "了解，您不用替自己找專業能力名稱；「依出貨單核對、先查差異再記錄並交主管確認」已清楚表達您的實際做法。草稿中也已涵蓋這項揀貨工作，目前不需要重複新增。\n\n除了揀貨和核對差異，您平常還固定負責哪些事情？例如收貨上架、補貨、盤點、包裝或整理倉區；哪些是您實際會做的？"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "execution_id": "11992aec-7b24-489f-a371-ac7b9390e581",
+  "exchange": {
+    "employee_input": {
+      "source_id": "506c2d2c-6cdb-46d4-bd48-6600329e8884",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "今天累了，現在先結束，不要再問了。我之後想到再補。"
+    },
+    "consultant_reply": {
+      "source_id": "7e4e9df7-047c-4bda-8876-4e4f22321790",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "好的，今天先到這裡，不再提問。之後你想到時再補充就可以。\n\n目前已知：你依安排上架並登記；發現差異時通知主管，不自行更改儲位；平常也搬箱子，最重大約 15 公斤。這些內容先作為後續整理的起點。"
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UpdateWorkSituationArguments",
+  "description": "Revise one work situation in this batch's unpublished candidate. Short fields take complete new values; body takes V4A hunks; references take only the requested add/remove sides. Use at most one entry per field; omitted fields and reference members stay unchanged. The App binds the original object before any rename. All content and reference changes succeed or fail together, without publishing Memory. Invalid or ambiguous patches require corrected context, not an unchanged retry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "target_title",
+    "changes"
+  ],
+  "properties": {
+    "target_title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Select the current exact title from this layer's map, read or successful result. Preserve whitespace, case and Unicode. The App resolves identity and binds the candidate baseline; do not invent an ID or version."
+    },
+    "changes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "description": "Select only intended changes, with at most one entry per field. No null or empty reference-operation placeholders. Runtime/domain reject duplicate fields, blank content and identities selected on both sides; already-present additions are unchanged and removal must select an existing relationship.",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/MemoryTextChange"
+          },
+          {
+            "$ref": "#/$defs/MemoryBodyChange"
+          },
+          {
+            "$ref": "#/$defs/AddInterviewReferences"
+          },
+          {
+            "$ref": "#/$defs/RemoveInterviewReferences"
+          },
+          {
+            "$ref": "#/$defs/ChangeInterviewReferences"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "MemoryTextChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "value"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "enum": [
+            "title",
+            "description"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Complete nonblank new value for the selected short field. The domain validates content and same-layer title uniqueness."
+        }
+      }
+    },
+    "MemoryBodyChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "diff"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "body"
+        },
+        "diff": {
+          "type": "string",
+          "minLength": 1,
+          "description": "V4A body-update hunks with enough real context for one qualified location; no file paths, Add File or Delete File operations. The editor validates all hunks, uniqueness and resulting content."
+        }
+      }
+    },
+    "AddInterviewReferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "add"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "interview_references"
+        },
+        "add": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "description": "Select formal interview sequences already provided by the App. The domain checks source eligibility, job file and this batch's fixed upper bound; repeated selections are deduplicated by resolved identity."
+        }
+      }
+    },
+    "RemoveInterviewReferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "remove"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "interview_references"
+        },
+        "remove": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "description": "Select formal interview sequences already provided by the App. The domain checks source eligibility, job file and this batch's fixed upper bound; repeated selections are deduplicated by resolved identity."
+        }
+      }
+    },
+    "ChangeInterviewReferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "add",
+        "remove"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "const": "interview_references"
+        },
+        "add": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "description": "Select formal interview sequences already provided by the App. The domain checks source eligibility, job file and this batch's fixed upper bound; repeated selections are deduplicated by resolved identity."
+        },
+        "remove": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "description": "Select formal interview sequences already provided by the App. The domain checks source eligibility, job file and this batch's fixed upper bound; repeated selections are deduplicated by resolved identity."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "question_id": "8b92b938e825490e9fb7f9f9792772d3",
+  "mode": "answer",
+  "fact_ids": [
+    "inventory-partial"
+  ],
+  "reason": "實際轉問庫存盤點本人工作及帳實差異處理，首次可披露循環盤點流程與暫時想不起的後續權責。",
+  "subquestions": [
+    {
+      "quote": "盤點時您通常負責哪些事情？",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-partial"
+      ],
+      "reason": "每週循環盤點、查入出庫與移庫紀錄及複點直接相關。"
+    },
+    {
+      "quote": "如果發現實際數量和記錄不一致，您會怎麼處理",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-partial"
+      ],
+      "reason": "已提供帳實差異的本人初步查核流程。"
+    },
+    {
+      "quote": "或交接？",
+      "mode": "unknown",
+      "fact_ids": [],
+      "reason": "後續調帳、批准與交接权責當前尚未想起；training 未正式披露，不取得 inventory-authority。"
+    }
+  ]
+}

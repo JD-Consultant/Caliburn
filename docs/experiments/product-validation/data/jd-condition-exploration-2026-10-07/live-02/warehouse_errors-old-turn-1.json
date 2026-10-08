@@ -1,0 +1,17 @@
+{
+  "execution_id": "9a6ee8e4-c287-458b-920b-2309e393f052",
+  "exchange": {
+    "employee_input": {
+      "source_id": "5f2294f8-92a2-48bb-84f9-fb5b2e5319d8",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "我主要就是照安排上架、貼標籤和登記入庫，沒有另外負責收貨、揀貨、出貨或盤點。目前想不到其他補充，你可以帶著我說。"
+    },
+    "consultant_reply": {
+      "source_id": "43c758e1-56e8-4b1b-827d-5f6e9bb957be",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "了解。目前已確認的工作是依安排上架、貼標籤及登記入庫；品項不符時先核對單據並通知主管，不自行更改品項或決定儲位。我已把上架完成的結果補進目前底稿，也記下你不另外負責收貨、揀貨、出貨或盤點。\n\n我們換個角度回想：從開始工作到交班，除了逐批上架外，你還會固定做哪些準備、整理或收尾工作嗎？例如整理作業區、交接尚未上架的貨物；只要說實際會做的就好，如果沒有也可以直接說沒有。"
+    }
+  }
+}

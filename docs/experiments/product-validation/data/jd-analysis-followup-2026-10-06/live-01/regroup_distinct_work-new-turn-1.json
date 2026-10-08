@@ -1,0 +1,17 @@
+{
+  "execution_id": "25ab3b32-b58b-4d5f-ae1d-d9b4f3f23676",
+  "exchange": {
+    "employee_input": {
+      "source_id": "c27905dc-b0f7-4c22-95e5-65e533ccffa2",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "這些都是我現在會做的工作。忙的時候比較多，平常也是這幾項，目前想不到新的補充。"
+    },
+    "consultant_reply": {
+      "source_id": "b1f2ac16-a233-4fb3-b7e7-bad3529df512",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "了解，這四項都是您目前持續負責的工作，忙碌時工作量會增加，但平常負責的項目相同。底稿已按收貨上架、出貨揀貨、庫存盤點、退貨交接整理；這輪沒有新工作需要另外加入。\n\n想再釐清出貨異常時的責任範圍：最近一次掃碼發現品項不符，您查到原因後通常怎麼處理？如果無法自行排除，會交給誰接手？"
+    }
+  }
+}

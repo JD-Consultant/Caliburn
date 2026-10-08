@@ -1,0 +1,17 @@
+{
+  "execution_id": "7805b819-4612-4a37-a634-0d783c7fa4ca",
+  "exchange": {
+    "employee_input": {
+      "source_id": "1ca53a06-f0f4-4c75-a6f3-b5a60f73abdf",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "正常做法、交接與目前工作範圍都說過了，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "3d33abe6-4a51-4fc1-b3d0-ef04b26305c0",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "目前不需要再追問主要工作流程了，您已說明報支資料怎麼核對、缺件怎麼處理、何時交接，以及哪些事不由您負責。我已據此整理底稿：核對並補齊同事的報支資料，將清單連同原始資料交主管審核；核准由主管決定，付款由出納處理。職稱依您自述記為「帳務助理」；所屬單位和直接匯報對象尚未確認，先不推定。\n\n您可以先核對這段描述是否符合目前工作；若沒有需要更正或補充的地方，我們可以先告一段落。"
+    }
+  }
+}

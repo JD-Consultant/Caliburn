@@ -1,0 +1,17 @@
+{
+  "completed_cases": [],
+  "guard": {
+    "spent_usd": "0",
+    "occupied_usd": "0",
+    "retained_reservations": {},
+    "generations": 0,
+    "compacts": 0,
+    "outbound": 0,
+    "counted_input": 0,
+    "stop_reason": null
+  },
+  "all_scheduled_cases": [
+    "warehouse-r1-P1",
+    "warehouse-r1-P2"
+  ]
+}

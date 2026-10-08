@@ -1,0 +1,50 @@
+{
+  "question_id": "cbd5b314d8aa46ebbf319e161f98f091",
+  "profile": "warehouse",
+  "actual_question": "客戶退貨已整理為一項工作，記下依退貨單核對、拍照分類，以及無單或品項不符時隔離並交客服確認；待檢品交品保，可再上架品掃碼入庫。破損品後續處理不會先作推定。\n\n破損品隔離後，你還需要做哪些記錄或交接？後續由誰決定怎麼處理？",
+  "disclosed": [
+    "customer-returns",
+    "inventory-partial",
+    "picking",
+    "receiving",
+    "shelving",
+    "training",
+    "training-boundary"
+  ],
+  "open_gaps": [
+    "inventory-authority"
+  ],
+  "seen_topics": [
+    "customer-returns",
+    "inventory",
+    "picking",
+    "receiving",
+    "shelving",
+    "training"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "shelving",
+    "picking",
+    "inventory-partial",
+    "training",
+    "training",
+    "training-boundary",
+    "customer-returns"
+  ],
+  "gap_opened_at": {
+    "inventory-authority": 3
+  },
+  "recent_employee_originals": [
+    "新人第一週由我示範掃碼、揀貨與安全動線，再讓他跟著做，我當場看有沒有漏掃、拿錯批號或走進車道，記在帶教檢核表。我會判斷他能不能自己上線。\n\n剛才說我判斷上線要修正得精確一點：我觀察操作並向組長回報，不是我批准新人独立上線，最後由主管核准。第一次漏掃我讓他重做並解釋原因；反覆錯誤就交組長安排再訓練。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。"
+  ],
+  "candidate": {
+    "actual_question": "破損品隔離後，你還需要做哪些記錄或交接？後續由誰決定怎麼處理？",
+    "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分；若要釐清，可以具體問我實際做的步驟或責任。",
+    "fact_id": null,
+    "unmapped_or_already_answered": true
+  }
+}

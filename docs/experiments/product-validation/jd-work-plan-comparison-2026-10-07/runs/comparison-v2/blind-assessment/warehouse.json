@@ -1,0 +1,37 @@
+{
+  "assessment": "warehouse",
+  "blind_locked": true,
+  "completed_case_count": 2,
+  "cases": [
+    {
+      "case_id": "8b1991cd9ea84de28b92ab1342b99e15",
+      "json": "warehouse-8b1991cd9ea84de28b92ab1342b99e15.json",
+      "json_sha256": "1ae034ce089e5d3b437f269569a4183e9c197cc75c10b83fe3498cc7151cb1b0",
+      "markdown": "warehouse-8b1991cd9ea84de28b92ab1342b99e15.md",
+      "markdown_sha256": "f6137f0ef1543ce93d6f8debaf0c30f14a4f860148eca0f7aed04777cdebd0e6"
+    },
+    {
+      "case_id": "4d54caac92074ce18f5351b23b7caaf8",
+      "json": "warehouse-4d54caac92074ce18f5351b23b7caaf8.json",
+      "json_sha256": "f243d87cae3fb90b4d2429e0adb0ccbce363f6492a4f1abff6301221efbc6693",
+      "markdown": "warehouse-4d54caac92074ce18f5351b23b7caaf8.md",
+      "markdown_sha256": "c0f87531b0379b928753aaea8f5141f641f029695022ff8365bb993167f99d58"
+    }
+  ],
+  "pair_comparisons": [
+    {
+      "pair_id": "W-A",
+      "cases": [
+        "4d54caac92074ce18f5351b23b7caaf8",
+        "8b1991cd9ea84de28b92ab1342b99e15"
+      ],
+      "json": "warehouse-pair-W-A.json",
+      "json_sha256": "f438d480308f8896cc8854bf941eb9cc7221b78ab842a7b8b3b7f9f8f34251ef",
+      "markdown": "warehouse-pair-W-A.md",
+      "markdown_sha256": "fe1449ee16d9e612db78c6ab17ceac84ac919d0fa00cc14e9263375ca1068210"
+    }
+  ],
+  "note": "本次全部兩案與一配對已鎖定；所有逐案原件保留，不推論未執行場次。",
+  "completed_pair_count": 1,
+  "all_assigned_material_locked": true
+}

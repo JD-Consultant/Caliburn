@@ -1,0 +1,8 @@
+{
+  "question_id": "3026c49f64c24c3ebe9bece2e4ef21c2",
+  "fact_ids": ["picking"],
+  "mode": "answer",
+  "reason": "實際轉問揀貨的指示或資料，以及品項數量確認，picking 的出貨波次單與核對要求直接相關。前段上架未知摘要不觸發額外事實。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

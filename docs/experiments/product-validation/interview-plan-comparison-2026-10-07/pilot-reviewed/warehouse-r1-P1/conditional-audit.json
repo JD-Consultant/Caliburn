@@ -1,0 +1,91 @@
+{
+  "disclosed": [
+    "receiving"
+  ],
+  "seen_topics": [
+    "receiving"
+  ],
+  "open_gaps": [],
+  "refused_topics": [],
+  "audit": [
+    {
+      "actual_question": "我先記下您的職務是物流中心倉庫管理員，向倉儲主管報告；工作涵蓋收貨驗收、上架、揀貨補貨、盤點、退貨及帶領新人，班表則是早上七點上班、週一至週六輪休。\n\n這批進貨數量不符的處理也先記下來：您依主管交辦核對採購單、送貨單與實收數量，拍照通知採購；是否拒收或退換貨由主管決定。其他工作我先列為待補充細節。\n\n想先了解收貨驗收的平常流程：貨送到後，您通常從哪一步開始處理，到什麼情況算驗收完成？",
+      "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+      "fact_ids": [
+        "receiving"
+      ],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [
+        "receiving"
+      ],
+      "review_mode": "answer",
+      "review_reason": "實際問題只問平常收貨驗收的起點、處理步驟與完成條件；receiving 的逐箱核對、異常登記、採購回覆與入庫邊界直接相關且尚未披露。前段其他工作是已知輪廓摘要，不授權披露年度、盤點、退貨或帶新人細節。",
+      "omitted_subtopics": [],
+      "actually_submitted": true,
+      "command_id": "84d0de8e-1e3c-4cfa-aaec-00b63c7b6048",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "81d25cff-4aa3-4107-809f-2b66ab1d6746"
+      ]
+    },
+    {
+      "actual_question": "我已把例行收貨流程補進底稿：逐箱點件，核對品項、數量、外包裝和送貨單；有差異時拍照、登記收貨異常表並通知採購，依採購回覆補送或接受後再登記入庫。您不議價、不選供應商，也不決定是否拒收或退換貨的界線也一併保留。\n\n如果驗收時發現外包裝破損或受潮，您通常會怎麼處理？下一步由誰判斷？",
+      "employee_text": "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。\n\n其餘這次還沒說明，請保留，之後再具體問。",
+      "fact_ids": [
+        "receiving"
+      ],
+      "known_confirmation_ids": [
+        "receiving"
+      ],
+      "new_fact_ids": [],
+      "review_mode": "answer",
+      "review_reason": "驗收時發現外包裝異常仍屬收貨核對與差異通報；已披露 receiving 可確認拍照、異常登記、通知採購及依採購回覆入庫的既有界線。凍結事實沒有破損或受潮的特定處置與接受判準，不能借用客戶退貨隔離或冷藏溫度異常流程补出收貨細節。",
+      "omitted_subtopics": [
+        "外包裝破損或受潮的特定處置與接受判準"
+      ],
+      "actually_submitted": true,
+      "command_id": "6460761a-1ebb-4714-b3f8-5993f4c504ca",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "00df0d71-7188-42c2-9200-d64e2709d836"
+      ]
+    },
+    {
+      "actual_question": "收到，這次先不往下追問。您確認的收貨流程與職責界線維持不變；外包裝破損或受潮時的處理方式，以及其他尚未說明的工作細節，我會保留為待釐清，之後再具體詢問。",
+      "employee_text": "這個問題我還沒理解，請用實際工作步驟或責任再具體問一次。",
+      "fact_ids": [],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [],
+      "review_mode": "clarify",
+      "review_reason": "這段只有確認既有收貨內容與保留待釐清事項，並明說這次先不追問；沒有新的實際問題可供員工回答。依凍結政策，無問題的結論及其他工作摘要不得披露隱藏事實，使用固定澄清回覆且不新增任何 fact。",
+      "omitted_subtopics": [],
+      "actually_submitted": true,
+      "command_id": "51c63550-8a45-4d4f-9141-e4fbde418a69",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "38d0fd23-c1de-4f44-b0d6-63fadb964988"
+      ]
+    },
+    {
+      "actual_question": "我想問的是**外箱破損或濕掉時**的處理方式：您看到這種情況後，會先做什麼、通知誰？最後由誰決定這批貨是否照常收下？",
+      "employee_text": "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+      "fact_ids": [],
+      "known_confirmation_ids": [],
+      "new_fact_ids": [],
+      "review_mode": "unknown",
+      "review_reason": "實際問題明確要求外箱破損或受潮情境下的特定處置、通報與是否收下的裁決。一般收貨差異拍照、通知採購及入庫界線已披露；凍結 oracle 沒有這個特定情境的新細節，不能重播一般流程冒充回答，也不能套用客戶退貨隔離或冷藏溫度異常流程。保留此新細節未知，既有收貨事實不撤回。",
+      "omitted_subtopics": [],
+      "actually_submitted": true,
+      "command_id": "7bdb8f45-f845-4e06-895d-ac7f27a23664",
+      "formally_visible": true,
+      "formal_source_ids": [
+        "500853c7-00f3-4b79-a3e1-81c883cffe16"
+      ]
+    }
+  ],
+  "disclosure_order": [
+    "receiving",
+    "receiving"
+  ],
+  "gap_opened_at": {}
+}

@@ -1,0 +1,29 @@
+%% title: 現行 UML 物件圖：JD 與三層依據（合成示例）
+%% legend: 底線名稱 : 類別表示實例；實線表示具名關係；色彩輔助區分層次。可併用來源，不表示執行順序。
+%% UML 2.5.1 §9.8.4：帶底線的 instance : Classifier 與具名實線 link。
+%% 括號內容是合成實例的辨識提示，不宣告程式／資料表欄位。省略可導航性。
+%%{init: {"flowchart": {"htmlLabels": true, "wrappingWidth": 290, "nodeSpacing": 32, "rankSpacing": 42}}}%%
+flowchart TB
+    J["<u>任務甲（整理出席紀錄與統計）<br/>: JD 任務</u>"]
+    U["<u>理解甲（課程執行／資料管理）<br/>: 工作理解</u>"]
+    S1["<u>情境甲（出席紀錄彙整）<br/>: 工作情境</u>"]
+    S2["<u>情境乙（季報統計）<br/>: 工作情境</u>"]
+    S3["<u>情境丙（漏簽資料補登）<br/>: 工作情境</u>"]
+    I1["<u>對話 1（每個上課日整理簽到表）<br/>: 訪談對話</u>"]
+    I2["<u>對話 2（每季統計交主管）<br/>: 訪談對話</u>"]
+    I3["<u>對話 3（我會核對補簽申請）<br/>: 訪談對話</u>"]
+    I4["<u>對話 4（最近增加了主管複核）<br/>: 訪談對話</u>"]
+    J ---|任務引用理解| U
+    J ---|任務按需另引情境| S3
+    J ---|任務按需另引對話| I4
+    U ---|理解以情境為來源| S1
+    U ---|理解以情境為來源| S2
+    S1 ---|情境以對話為來源| I1
+    S2 ---|情境以對話為來源| I2
+    S3 ---|情境以對話為來源| I3
+    classDef source fill:#f1f5f9,stroke:#475569,color:#0f172a;
+    classDef memory fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e;
+    classDef product fill:#dcfce7,stroke:#15803d,color:#14532d;
+    class I1,I2,I3,I4 source;
+    class U,S1,S2,S3 memory;
+    class J product;

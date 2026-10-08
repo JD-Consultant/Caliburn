@@ -1,0 +1,17 @@
+{
+  "execution_id": "e10253a8-3521-40ea-bb97-ee9759641c7c",
+  "exchange": {
+    "employee_input": {
+      "source_id": "b6fb13d2-8968-42b1-a279-7d9c6e44b117",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "這個細節我目前說不清楚，也沒有其他能確認的資料。已說過的工作範圍仍一樣，其他事情可以試著說。"
+    },
+    "consultant_reply": {
+      "source_id": "bc502d57-addc-47b9-b27a-70a14217feac",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "了解，搬貨方式與體力要求目前先保留為未知，不會推定有或沒有特別要求；已確認的工作範圍不變。\n\n另一項可能影響工作要求的是工作量與時限：上架和登記通常是持續處理，還是會隨到貨量有忙閒差異？有沒有需要在特定時間內完成的要求？"
+    }
+  }
+}

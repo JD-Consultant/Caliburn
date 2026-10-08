@@ -1,0 +1,72 @@
+{
+  "phase": "formal",
+  "processed": [
+    "warehouse-r1-P1",
+    "warehouse-r1-P2"
+  ],
+  "scheduled": [
+    [
+      "warehouse",
+      "P1",
+      1
+    ],
+    [
+      "warehouse",
+      "P2",
+      1
+    ],
+    [
+      "course_admin",
+      "P2",
+      1
+    ],
+    [
+      "course_admin",
+      "P1",
+      1
+    ],
+    [
+      "warehouse",
+      "P2",
+      2
+    ],
+    [
+      "warehouse",
+      "P1",
+      2
+    ],
+    [
+      "course_admin",
+      "P1",
+      2
+    ],
+    [
+      "course_admin",
+      "P2",
+      2
+    ]
+  ],
+  "guard": {
+    "spent_usd": "0.688920595",
+    "occupied_usd": "0.688920595",
+    "retained_reservations": {},
+    "generations": 566,
+    "compacts": 3,
+    "outbound": 1227,
+    "counted_input": 31888096,
+    "stop_reason": null,
+    "batch_deadline": null,
+    "limit_usd": "4.00"
+  },
+  "manifest_sha256": "dacbb5d73dc849f56e3caed51a870a10653faab46e4c608128e6cbad41d0277b",
+  "artifact_sha256": {
+    "formal/warehouse-r1-P1/provider-trace.jsonl": "54987e017bf75890179eb8b8e17b8af431ae7d6739d4a2d5925c3ab2afe56e24",
+    "formal/warehouse-r1-P2/provider-trace.jsonl": "c457902a1c270b8b50a1300563f5dcd7ab7988f30a6cd923ba92bf07fe74f293",
+    "pilot/warehouse-r1-P1/provider-trace.jsonl": "72ce1a52b50414ea54da3235c86cc4083f50abec83d5e6e09e97abfc1727c7c4",
+    "pilot/warehouse-r1-P2/provider-trace.jsonl": "dde07fbd2c46e8b5083f7801d9c03aa362f36a18c30652ac5070bc18701438a7",
+    "formal/warehouse-r1-P1/result.json": "b8470ed19a8a375a4998d387d88f1b3c942980c3602210fdf218866352018c42",
+    "formal/warehouse-r1-P2/result.json": "22840dae9e4582175e6a5187c098f844252e763c461d0b2292e88742d4bfa4d2",
+    "pilot/warehouse-r1-P1/result.json": "5a39609b5508cd2060b7443c3ab9ef0be6b116472299cfdf4f40c50af796e3e4",
+    "pilot/warehouse-r1-P2/result.json": "2dc3ed38dc2f0137a882afc4b852c907281c78295134768c795ef9937e480659"
+  }
+}

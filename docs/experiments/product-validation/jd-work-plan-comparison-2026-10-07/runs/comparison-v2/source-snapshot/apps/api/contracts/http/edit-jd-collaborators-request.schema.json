@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "One bounded collaborator edit from the observed formal base. Replay the same command if the result is uncertain.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "command_id",
+    "expected_revision_id",
+    "change"
+  ],
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "expected_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "change": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/CreateCollaborator"
+        },
+        {
+          "$ref": "#/$defs/ReviseCollaborator"
+        },
+        {
+          "$ref": "#/$defs/DeleteCollaborator"
+        },
+        {
+          "$ref": "#/$defs/ReorderCollaborator"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "NullableText": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "pattern": "^[^\\u0000]*[^\\s\\u0000][^\\u0000]*$"
+    },
+    "CreateCollaborator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "name",
+        "scope_text"
+      ],
+      "properties": {
+        "action": {
+          "const": "create_collaborator"
+        },
+        "name": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "scope_text": {
+          "$ref": "#/$defs/NullableText"
+        }
+      }
+    },
+    "ReviseCollaborator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "collaborator_id",
+        "changes"
+      ],
+      "properties": {
+        "action": {
+          "const": "revise_collaborator"
+        },
+        "collaborator_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "changes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/CollaboratorFieldChange"
+          }
+        }
+      }
+    },
+    "CollaboratorFieldChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "value"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "enum": [
+            "name",
+            "scope_text"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/NullableText"
+        }
+      }
+    },
+    "DeleteCollaborator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "collaborator_id"
+      ],
+      "properties": {
+        "action": {
+          "const": "delete_collaborator"
+        },
+        "collaborator_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "ReorderCollaborator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "collaborator_id",
+        "before_collaborator_id"
+      ],
+      "properties": {
+        "action": {
+          "const": "reorder_collaborator"
+        },
+        "collaborator_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "before_collaborator_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid",
+          "description": "Place before this existing collaborator; null means last. IDs select identity, never position."
+        }
+      }
+    }
+  },
+  "title": "EditJdCollaboratorsRequest"
+}

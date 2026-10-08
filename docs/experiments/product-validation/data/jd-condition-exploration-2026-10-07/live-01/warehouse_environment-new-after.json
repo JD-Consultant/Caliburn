@@ -1,0 +1,55 @@
+{
+  "profile": {
+    "revision_id": "8451ebf6-a287-4877-91a5-04a8d27cd847",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依已確認的到貨及儲位安排，完成收貨與上架並留下入庫紀錄。"
+    }
+  },
+  "work": {
+    "revision_id": "8451ebf6-a287-4877-91a5-04a8d27cd847",
+    "areas": [
+      {
+        "area_id": "7888b58a-1dd1-4131-85fa-defa7074d0e6",
+        "title": "收貨與上架",
+        "scope_text": "核對到貨、異常交接及依安排上架。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "ab63b119-155e-4ada-adc6-bcd2c0b557ae",
+        "area_id": "7888b58a-1dd1-4131-85fa-defa7074d0e6",
+        "title": "搬運並上架貨品",
+        "description": "核對到貨後依安排搬運與上架，掃碼確認品項、貼標籤及登記入庫；自行搬箱最重約十五公斤，堆高機操作須有證照。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "8451ebf6-a287-4877-91a5-04a8d27cd847",
+    "references": [
+      {
+        "citation_id": "2c24be3b-2bf7-47ed-9ce2-cc009b30229a",
+        "target_label": "任務：搬運並上架貨品",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "ab63b119-155e-4ada-adc6-bcd2c0b557ae",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

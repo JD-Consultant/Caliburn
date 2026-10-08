@@ -13,6 +13,7 @@ const savedTurn = {
   pause_requested: false,
   input_text: '員工輸入',
   allowed_controls: [],
+  plan_preview: null,
   candidate: null,
   commentary: [{ response_id: 'r1', message_id: 'm1', text: '已讀取 JD。' }],
 };

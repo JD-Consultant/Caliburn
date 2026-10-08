@@ -1,0 +1,390 @@
+{
+  "arm": "old",
+  "case_id": "accounting_errors__old",
+  "job_file_id": "50e3cf47-e0d5-4161-89b1-90b7b838ef11",
+  "before": {
+    "profile": {
+      "revision_id": "38981ee0-895e-47b7-989f-d3be59d80e75",
+      "profile": {
+        "job_title": "帳務助理",
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "整理可核對的報支資料供主管審核與出納付款。"
+      }
+    },
+    "work": {
+      "revision_id": "38981ee0-895e-47b7-989f-d3be59d80e75",
+      "areas": [
+        {
+          "area_id": "352a73ab-57e8-4c54-8510-f3b5ca152e58",
+          "title": "報支資料核對",
+          "scope_text": "資料核對、補件及清單交接，不含核准或付款。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "19d0070e-5444-4671-9912-cc7f29ecb450",
+          "area_id": "352a73ab-57e8-4c54-8510-f3b5ca152e58",
+          "title": "核對報支並整理送審清單",
+          "description": "使用公司報支系統及試算表核對同事提交的發票、金額與申請單；登記缺件並請申請人補齊，將核對清單連同原始資料交主管審核。核准由主管決定，付款由出納處理，本人不負責核准或付款。",
+          "outcomes": [
+            {
+              "detail_id": "73f8d20c-062e-4566-ac92-99ad6d07795c",
+              "text": "形成資料齊全且附原始資料的報支清單，交主管審核，供後續核准與付款作業。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "d7ca0bfa-de10-4064-ae89-9d8165c12def",
+              "text": "發票、申請單與金額須相符；缺件須登記並請申請人補齊，資料齊全後連同原始資料送交主管。"
+            },
+            {
+              "detail_id": "0bb7853e-742c-48c2-a9d8-941ab2a042c1",
+              "text": "在辦公室處理電子資料，無外勤。"
+            }
+          ]
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [
+        {
+          "collaborator_id": "ef26714e-1d6e-456e-9dad-36cc3d4a80c0",
+          "name": "提出報支資料的同事",
+          "scope_text": "提交報支資料；資料缺件時依通知補齊。"
+        },
+        {
+          "collaborator_id": "1651dbc8-5def-4e56-b257-a7fc34596958",
+          "name": "主管",
+          "scope_text": "接收核對清單及原始資料並決定是否核准；本人不代為核准。"
+        },
+        {
+          "collaborator_id": "4482f7bd-dd45-46a5-8eea-cff24c6571e1",
+          "name": "出納",
+          "scope_text": "主管核准後負責付款；本人不負責付款。"
+        }
+      ],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "38981ee0-895e-47b7-989f-d3be59d80e75",
+      "references": [
+        {
+          "citation_id": "b3adaf41-cced-4d54-b611-a0f4b0c82e85",
+          "target_label": "任務：核對報支並整理送審清單",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "19d0070e-5444-4671-9912-cc7f29ecb450",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": true,
+          "jd_changed": true,
+          "source_changed": false
+        },
+        {
+          "citation_id": "d2218d5f-e6c6-47ba-9312-4de5f5518a20",
+          "target_label": "任務：核對報支並整理送審清單",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "19d0070e-5444-4671-9912-cc7f29ecb450",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "5a2f4391-c85b-449f-9c91-6e91b2335c26",
+          "target_label": "任務：核對報支並整理送審清單",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "19d0070e-5444-4671-9912-cc7f29ecb450",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "4fa19edd-d796-4854-8b25-33605ab8560c",
+          "target_label": "任務：核對報支並整理送審清單 · 成果：形成資料齊全且附原始資料的報支清單，交主管審核，供後續核准與付款作業。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "73f8d20c-062e-4566-ac92-99ad6d07795c",
+            "task_id": "19d0070e-5444-4671-9912-cc7f29ecb450"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "df730f6d-2883-4919-916a-86cc4c0c4c19",
+          "target_label": "任務：核對報支並整理送審清單 · 要求：發票、申請單與金額須相符；缺件須登記並請申請人補齊，資料齊全後連同原始資料送交主管。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "d7ca0bfa-de10-4064-ae89-9d8165c12def",
+            "task_id": "19d0070e-5444-4671-9912-cc7f29ecb450"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "ae70c6d7-8783-4b5e-9a2a-b7fd71fa724a",
+          "target_label": "任務：核對報支並整理送審清單 · 要求：發票、申請單與金額須相符；缺件須登記並請申請人補齊，資料齊全後連同原始資料送交主管。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "d7ca0bfa-de10-4064-ae89-9d8165c12def",
+            "task_id": "19d0070e-5444-4671-9912-cc7f29ecb450"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "e2437ccc-cffa-4966-87db-e80008a8c41a",
+          "target_label": "職務名稱",
+          "target": {
+            "kind": "profile_field",
+            "field": "job_title",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "5882594f-4901-429c-960b-9707154d7e16",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "608b5ef0-4688-437e-b277-6dbff90e890b",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "1e3fcaf5-7fdb-4e06-9090-d4d426fb7819",
+          "target_label": "協作：提出報支資料的同事",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "ef26714e-1d6e-456e-9dad-36cc3d4a80c0",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "f751ec32-3155-4b24-844f-1e0df5976ea4",
+          "target_label": "協作：提出報支資料的同事",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "ef26714e-1d6e-456e-9dad-36cc3d4a80c0",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "04dad963-1c78-4b20-ae16-c5d96ce5d8b8",
+          "target_label": "協作：主管",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "1651dbc8-5def-4e56-b257-a7fc34596958",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "1a0f7501-b1b4-40b6-b0d2-6e1e817932c2",
+          "target_label": "協作：主管",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "1651dbc8-5def-4e56-b257-a7fc34596958",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "2c46169d-b4d3-4390-ba73-22fd0a5459c6",
+          "target_label": "協作：出納",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "4482f7bd-dd45-46a5-8eea-cff24c6571e1",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "6c0c6292-cd67-4cf2-bcd3-490cd8cc5c4d",
+          "target_label": "協作：出納",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "4482f7bd-dd45-46a5-8eea-cff24c6571e1",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "702f5312-07d3-4b9d-8143-499bf753d746",
+          "target_label": "任務：核對報支並整理送審清單 · 要求：在辦公室處理電子資料，無外勤。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "0bb7853e-742c-48c2-a9d8-941ab2a042c1",
+            "task_id": "19d0070e-5444-4671-9912-cc7f29ecb450"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "base_case_id": "accounting_errors",
+  "turns": [
+    {
+      "execution_id": "307ffecb-8a57-4a13-989b-65fe9cd5b715",
+      "exchange": {
+        "employee_input": {
+          "source_id": "33220a83-7570-4607-8e30-0f743829317c",
+          "interview_sequence": 10,
+          "speaker": "employee",
+          "interview_text": "這個細節我目前說不清楚，也沒有其他能確認的資料。已說過的工作範圍仍一樣，其他事情可以試著說。"
+        },
+        "consultant_reply": {
+          "source_id": "1a37a847-2e45-4505-8f97-83c4ef6f0e6a",
+          "interview_sequence": 11,
+          "speaker": "consultant",
+          "interview_text": "了解，所屬單位目前留空，不會推測；已確認的工作範圍也會照原先內容保留。\n\n報支資料有一種情況還沒談到：如果發票、金額或申請單彼此對不上，通常你會怎麼處理、交給誰決定？如果沒遇過或不清楚，也可以直接說。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 194700,
+    "output_tokens": 5187,
+    "reasoning_tokens": 4234,
+    "cached_input_tokens": 185786,
+    "cache_write_input_tokens": 8884,
+    "total_tokens": 199887,
+    "outbound_calls": 25,
+    "count_calls": 15,
+    "generation_calls": 10,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 194700,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.042744885",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0015",
+    "actual_estimated_usd": "0.005564860",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.007064860",
+    "cumulative_occupied_usd": "0.007064860",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 91.005986199998,
+    "seconds_limit": 406,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 211240,
+    "output_tokens": 5903,
+    "reasoning_tokens": 4857,
+    "cached_input_tokens": 201319,
+    "cache_write_input_tokens": 9888,
+    "total_tokens": 217143,
+    "outbound_calls": 28,
+    "count_calls": 17,
+    "generation_calls": 11,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 211240,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.042744885",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0017",
+    "actual_estimated_usd": "0.006203990",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.007903990",
+    "cumulative_occupied_usd": "0.007903990",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 102.76536779999878,
+    "seconds_limit": 406,
+    "stop_reason": null
+  }
+}

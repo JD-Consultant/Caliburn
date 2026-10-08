@@ -1,0 +1,15 @@
+{
+  "command_id": "98e23b96-44fe-4038-b12d-57dceee3e916",
+  "expected_revision_id": "541d374d-5ced-45bf-afaa-f65724a4bb37",
+  "change": {
+    "action": "revise_task",
+    "task_id": "c17b1866-c259-46da-838a-70af731617bc",
+    "changes": [
+      {
+        "action": "set_field",
+        "field": "description",
+        "value": "逐箱點件，核對品項、數量、外包裝及送貨單。核對採購單、送貨單與實收數量，拍照通知採購；拒收或退換貨由其他權責者決定。發現差異時登記收貨異常表；採購回覆需補送或接受後，按結果登記入庫。本人不議價、不選供應商。"
+      }
+    ]
+  }
+}

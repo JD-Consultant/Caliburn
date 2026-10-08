@@ -1,0 +1,31 @@
+{
+  "actual_question": "好，我把補貨後是否掃碼或登記移庫保留為未確認，不替您補猜，也不再追問這個細節。\n\n我們換談上架：進貨驗收後，您通常依據什麼決定貨品放在哪個儲位？",
+  "employee_text": "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。",
+  "fact_ids": [
+    "shelving"
+  ],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [
+    "shelving"
+  ],
+  "review_mode": "answer",
+  "review_reason": "直接詢問一般驗收後上架的儲位依據，shelving 提供依既定儲位及找組長調整的界線。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": false,
+  "subquestions": [
+    {
+      "quote": "進貨驗收後，您通常依據什麼決定貨品放在哪個儲位？",
+      "mode": "answer",
+      "fact_ids": [
+        "shelving"
+      ],
+      "reason": "凍結事實明載按已規劃儲位放貨，放不下找組長調位置且不能自行改規則，直接回答儲位決定依據。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "9f42e15f-c630-439a-8a22-1b45e2d43e85",
+  "accepted_source_id": "a21eb957-63aa-48d6-87de-03690481a980"
+}

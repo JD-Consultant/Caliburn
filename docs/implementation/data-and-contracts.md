@@ -5,6 +5,8 @@
 
 本頁從人工與模型工具共用的業務入口開始，說明短交易、原操作結果、Memory 發布及 JD 完成如何接在一起。具體資料表與保存演算法由各保存文件維護，這裡說明它們必須共同遵守的接線規則。
 
+閱讀路徑：[共用用例](#1-一個-service一個正式結果兩種入口) → [交易與原操作](#2-sql交易責任) → [Memory](#3-memory可變工作稿與固定快照不是兩個相反模型)／[JD](#4-jd關聯式候選來源與正式完成) → [契約生成](#5-唯一契約來源及生成)／[遷移與恢復](#6-資料演進與恢復)。
+
 ## 1. 一個 service、一個正式結果，兩種入口
 
 人工 HTTP 與 Agent tool 各自轉譯輸入，呼叫同一領域用例，因此同一種修改遵循相同的業務規則。用例輸入包含 App 綁定的檔案／執行資格、解析後的內部目標、型別化修改與原操作辨識；模型不填這些執行值。
@@ -33,44 +35,41 @@ DB pool connection 與 Graph checkpointer connection 各自管理，不能假設
 
 ## 3. Memory：可變工作稿與固定快照不是兩個相反模型
 
-實作映射、選型及驗證限制維護於 [Memory 保存接線](memory-storage.md)；本節保留跨層規則，不複製資料表。
+Memory 領域模組擁有候選、固定修訂、快照及原操作。工具先把模型的標題定位轉成受限範圍內的穩定身分；workflow 協調執行資格，原操作重入沿用已固定命令。候選的動態綁定與發布後的固定引用由同一領域模組處理。
 
-候選的關係連 stable object ID；工具 title 先在有權的當前 layer map 精確解析，取得 ID 後才對該物件操作。改名先固定目標再改；同層有效 title 唯一，歷史／不同層不作同名限制。新命令使用重用名稱時選目前物件；**沒有「模型一定知道舊名」的保證，也不追加被否決的強制 read proof** 。原操作重入與歷史引用均維持原 identity。
+| 要修改的責任 | 維護位置 |
+|---|---|
+| 標題解析、A／B1／B2 可見基準、prepare／execute | [Memory 工具接線 §2–4](memory-tools.md#2-固定基準與候選最新位置) |
+| 候選位置、修訂重用、固定來源與 map 投影 | [Memory 保存 §2](memory-storage.md#2-保存表示固定修訂而非資料庫舊列) |
+| 來源、名稱、角色權限與全成全拒 | [Memory 保存 §3](memory-storage.md#3-交易與讀取邊界) |
+| B1 → B2 交接、引用固定化與原子發布 | [Memory 保存 §5](memory-storage.md#5-候選交接與發布接線) |
+| 正式歷史及候選的保留用途 | [保存架構 §6](../architecture/persistence.md#6-保留失效與清理) |
 
-候選每次有效操作有可恢復的位置；position 由不可變修訂選用實現，但只有 Memory 領域模組負責寫入。刪情境同次移除候選理解指向它的 bindings，不刪理解；歷史快照不變。B1 只能改情境；B2 只能改理解，讀目前固定交接的情境；權限在 service 再驗，不只藏 tool。
-
-發布演算法用固定候選位置，不讓 LLM 處理版本：
-
-1. 確認原發布操作、有效批次／階段及 B2 完成資格；這是權限與併發 gate，不是再請模型審格式。
-2. 固定本批正式訪談範圍，依有效候選選出所有情境。內容／來源未變的重用原修訂；變動建立新修訂。
-3. 將理解中的候選 bindings 解析成上步選定的情境修訂。即使理解文字未變，只要固定引用改變也建立新修訂。
-4. 在單一短提交邊界保存 Memory snapshot 的選用、固定關係、涵蓋邊界及原發布結果，再前移正式 head。
-
-凍結正文的大額純計算可先在交易外對固定位置完成，提交時再核位置／資格，不能用未鎖定的 latest 拼成快照。未變物件重用，改回舊文字仍是新修訂；不要求整版物件共用版號。來源集合可空，候選合法性每次操作即維護，不在發布時新增最少引用數。
-
-每個正式 snapshot 的 maps 都由其選用投影，任何路徑到同一物件均同修訂。所有已發布且供 A／JD 使用的可達資料保留；舊候選只按恢復／diff 需求保存，不實作 Git delta 或永久事件重播。B2 看的是當前候選＋交接 diff，不提供任意舊版全文工具，不要求逐筆 confirm_reference_alignment。
+發布前的大額純計算可在交易外對固定位置完成，提交時再核位置及資格。交易內由 workflow 協調快照、涵蓋邊界、原發布結果與正式 head 一起成立，不能以多次讀取 latest 拼成發布結果。具體選用及引用演算法由上述保存文件維護。
 
 ## 4. JD：關聯式候選、來源與正式完成
 
-JD 業務沿既定 profile／職責／任務／成果／要求／知識／技能／關係建立型別模型；schema 不從 Memory Markdown 或 UI widget 反推。欄位意義依[JD 指南](../guides/2026-09-09-jd-field-and-writing-guide.md)。舊 SQL／測例只供參考，沒有相容表名義務。
+JD 以 profile、職責、任務、成果、要求、知識、技能及關係建立型別模型，欄位意義沿[JD 指南](../guides/2026-09-09-jd-field-and-writing-guide.md)，schema 不從 Memory Markdown 或 UI widget 反推。舊 SQL／測例只供參考，沒有相容表名義務。人工及模型入口共用 JD 領域模組；模型工具寫入候選，A 完成交易才正式採用，不能借人工正式 API 提前寫入正式稿。
 
-人工端點／UI、固定修訂、原結果與候選使用同一 JD 領域模組；候選位置、分支回退、放棄與交易內採用見 [JD 保存接線 §3.1](jd-storage.md#31-本輪候選與可恢復位置)。模型工具寫入候選，A 完成交易才正式採用；人工正式 API 不作為 A 候選寫入入口。
+候選位置、分支回退與採用由 [JD 保存 §3.1](jd-storage.md#31-本輪候選與可恢復位置)維護；模型定位及來源解析見[工具接線 §3.2–3.3](jd-storage.md#32-模型導覽與既有物件定位)，差異與明確核對見[來源接線 §3.5](jd-storage.md#35-來源及人工改稿差異)。`read_ref`、`target_title`、`citation_ref` 各自解析不同責任所擁有的資料，不能靠同名猜測身分。跨層呼叫傳入固定基準，資料解析及合法性仍由各領域判斷。
 
-JD `read_ref` 解到本輪 JD identity／型別與合法內容基準；Memory `target_title` 解到本輪固定 snapshot 內 identity。existing `citation_ref` 解到 JD 自己保存的特定來源，不用同名猜舊來源。直接來源可選正式訪談、情境、理解或 current_input；pending current_input 僅在 A 完成交易取得正式來源資格。
+完成 A 由 [ConsultantCompletionWorkflow](../../apps/api/src/caliburn/workflows/consultant_completion.py)開啟同一短交易，協調[架構交易表](../architecture/persistence.md#3-交易邊界)所列參與者；Plan 以 `validate_final` 核對原位置，其後輪資格依共同完成結果成立，不另提交一份 Plan 正式 head。序號使用檔案內受交易保護的分配，不直接依會跳號的全域 sequence 保證取消不佔號。完整已公開中間訊息另按回看政策保留，無正式序號、不作依據。
 
-保留「來源修訂」與「核對時 JD 內容基底」兩種依據：來源沒換，但使用者改了該 JD 內容，原確認也不代表已核對新內容。待核對依當前 JD 與本輪可見來源推導，不建永久通知副本。
-
-- `read_jd_changes(manual)` 比上次成功 A 的正式 JD 到本輪起點，原人工操作可辨「改過又改回」；不是員工事實。
-- source diff 以 citation 固定舊來源到本輪 pinned Memory 同身分新來源，展開相關引用鏈變化；舊正文只作 diff 材料，不給任意歷史閱讀入口。
-- `confirm_reference_alignment` 只對指定 JD 依據與目前內容基底成立；讀 diff、更新文字、重加既存來源不能自動確認。刪除／同名新建不冒充同身分。
-
-完成 A 由 workflow 協調 **JD 候選、有效訪談與序號、完整正式答覆、current_input 來源解析、完成結果、背景要求上界** 同次提交。序號使用檔案內受交易保護的分配，不直接依會跳號的全域 sequence 保證取消不佔號。完整已公開中間訊息另按回看政策保留，無正式序號、不作依據。
-
-取消只使該輪候選／來源／後續寫入失效，回有效基底；不是把已提交的外部修改反向逐筆 undo。A 暫停／活躍時，人工 JD 寫由後端拒絕；正式完成後的 JD 撤回則是獨立條件命令，不撤回訪談／Memory。
+取消、人工寫入准入及完成後撤回是不同用例，依 [JD 保存](jd-storage.md)及[核心生命週期](../specs/2026-09-29-core-value-loop-lifecycle.md)的資格與交易執行；本頁不再展開其產品規則。
 
 ## 5. 唯一契約來源及生成
 
 `apps/api/contracts/http/` 保存跨語言 DTO，`contracts/tools/` 保存模型可見 schema。Schema 與描述按業務拆，不每參數一檔。鎖定 datamodel-code-generator 產 Python DTO，json-schema-to-typescript 產 TypeScript；OpenAPI 從 API 的生成型別形成，不再手寫 OpenAPI／TS／Pydantic 三份 shape。HTTP／tool 邊界仍做執行時驗證，TS 型別不代替它。[現行策略](../contract-strategy.md)的原則保持，路徑不同不接回退役 package。
+
+[`generate_contracts.py`](../../apps/api/scripts/generate_contracts.py)維護下列生成物；執行及檢查命令見 [API README](../../apps/api/README.md)。
+
+| 生成物 | 位置與用途 |
+|---|---|
+| Python DTO | `apps/api/src/caliburn/contracts/generated/`；工具型別位於其 `tools/` 子目錄 |
+| TypeScript 型別 | `apps/web/src/shared/api/generated/`；工具型別位於其 `tools/` 子目錄 |
+| 工具 schema 資源 | `apps/api/src/caliburn/contracts/generated/tools/*.schema.json`；供安裝後的工具定義讀取 |
+
+Web 使用同一份 HTTP schema 驗證回傳，再放入查詢快取，不手寫第二份資料 shape。
 
 模型 schema 與 HTTP 不強求相同：HTTP 需要保存／預覽狀態，tool 只回推理下一步所需資訊。模型 strict wire 是薄編譯邊界：有限 variants、required／additionalProperties 按 provider 子集，語意上未列 change 仍是保留，不把 null 當清空。生成後以真 SDK payload 驗，而非只測 Python class 建得出來。
 

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReadJdChangesArguments",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {"query": {"anyOf": [
+    {"$ref": "#/$defs/ManualQuery"}, {"$ref": "#/$defs/SourceQuery"}
+  ]}},
+  "required": ["query"],
+  "$defs": {
+    "ManualQuery": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "const": "manual"},
+        "scope": {"anyOf": [
+          {"$ref": "#/$defs/AllScope"}, {"$ref": "#/$defs/AreaScope"},
+          {"$ref": "#/$defs/ItemScope"}, {"$ref": "#/$defs/ProfileFieldScope"}
+        ]}
+      }, "required": ["kind", "scope"]
+    },
+    "SourceQuery": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "const": "source"},
+        "citation_ref": {"type": "string", "minLength": 1}
+      }, "required": ["kind", "citation_ref"]
+    },
+    "AllScope": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"kind": {"type": "string", "const": "all"}}, "required": ["kind"]
+    },
+    "AreaScope": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "const": "area"},
+        "view": {"type": "string", "enum": [
+          "profile", "responsibility_areas", "unassigned_work_tasks", "required_knowledge",
+          "required_skills", "main_collaborators", "job_wide_conditions"
+        ]}
+      }, "required": ["kind", "view"]
+    },
+    "ItemScope": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "const": "item"},
+        "read_ref": {"type": "string", "minLength": 1}
+      }, "required": ["kind", "read_ref"]
+    },
+    "ProfileFieldScope": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "const": "profile_field"},
+        "field": {"type": "string", "enum": ["job_title", "organization_unit", "reports_to", "purpose"]}
+      }, "required": ["kind", "field"]
+    }
+  }
+}

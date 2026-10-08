@@ -1,0 +1,313 @@
+{
+  "profile": {
+    "revision_id": "a9da10cc-4865-444e-903a-2e2e2c471207",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依已確認資料登錄及核對訂單，提供主管確認。"
+    }
+  },
+  "work": {
+    "revision_id": "a9da10cc-4865-444e-903a-2e2e2c471207",
+    "areas": [
+      {
+        "area_id": "9e332008-3f07-4533-92bb-05288d70b115",
+        "title": "訂單資料處理",
+        "scope_text": "資料登錄、金額核對與主管交接。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea",
+        "area_id": "9e332008-3f07-4533-92bb-05288d70b115",
+        "title": "登錄並核對訂單",
+        "description": "依同事已確認的訂單資料登錄系統並核對金額。",
+        "outcomes": [
+          {
+            "detail_id": "38f89706-3a6b-46c5-b68c-71dfc1a4c0ae",
+            "text": "完成登錄及金額核對的訂單資料交主管。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "7a0ef4dd-bcc3-440b-8667-232378965486",
+            "text": "登錄前使用同事已確認的資料；若原單缺資料，請同事補齊後再登錄。"
+          },
+          {
+            "detail_id": "f7e03ed7-ab23-45e4-83a8-cbb27f0017bd",
+            "text": "發現錯誤不得直接送出，先核對原資料並交主管決定更正方式；本人不核准訂單。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [
+      {
+        "capability_id": "b127b067-74c5-495a-988d-59d38dbc67b7",
+        "kind": "skill",
+        "name": "訂單資料登錄與金額核對",
+        "description": "依已確認的訂單資料完成登錄與金額核對，辨識資料缺漏或錯誤，並依責任分工請同事補資料或交主管處理。"
+      }
+    ],
+    "task_links": [
+      {
+        "task_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea",
+        "capability_id": "b127b067-74c5-495a-988d-59d38dbc67b7"
+      }
+    ],
+    "collaborators": [
+      {
+        "collaborator_id": "f404db9d-7a2d-4700-a30f-46f6902d80d9",
+        "name": "同事",
+        "scope_text": "提供已確認的訂單資料；資料缺漏時依要求補齊。"
+      },
+      {
+        "collaborator_id": "1a7f1380-c3bb-4635-a1b0-064ca7a12d3a",
+        "name": "主管",
+        "scope_text": "接收完成登錄與核對的訂單資料；訂單資料有錯誤時決定更正方式。"
+      }
+    ],
+    "conditions": [
+      {
+        "condition_id": "45ac5fc9-0ccc-4acc-b0d7-1d2f9f660e8e",
+        "kind": "work_environment",
+        "text": "固定在同一辦公室工作，沒有外勤或特殊環境要求。"
+      },
+      {
+        "condition_id": "e14bb273-9428-4335-904d-8865daf01a66",
+        "kind": "schedule_travel",
+        "text": "全年工作量大致相同，沒有特殊忙季，時限不會因此改變。"
+      }
+    ]
+  },
+  "sources": {
+    "revision_id": "a9da10cc-4865-444e-903a-2e2e2c471207",
+    "references": [
+      {
+        "citation_id": "ac814e79-ca7c-4524-89e2-6d5127992f5e",
+        "target_label": "任務：登錄並核對訂單",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      },
+      {
+        "citation_id": "c251acf4-31bd-4b90-847e-02ad7fe2928a",
+        "target_label": "任務：登錄並核對訂單",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      },
+      {
+        "citation_id": "9950c5c4-59ff-43eb-8076-9adf07acfdbd",
+        "target_label": "任務：登錄並核對訂單 · 成果：完成登錄及金額核對的訂單資料交主管。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "38f89706-3a6b-46c5-b68c-71dfc1a4c0ae",
+          "task_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "06eab27c-7422-4a08-a519-448b3866ebc9",
+        "target_label": "任務：登錄並核對訂單 · 要求：登錄前使用同事已確認的資料；若原單缺資料，請同事補齊後再登錄。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "7a0ef4dd-bcc3-440b-8667-232378965486",
+          "task_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "897c940b-7edf-426d-aeb0-8f0aed044d2f",
+        "target_label": "任務：登錄並核對訂單 · 要求：登錄前使用同事已確認的資料；若原單缺資料，請同事補齊後再登錄。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "7a0ef4dd-bcc3-440b-8667-232378965486",
+          "task_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "41f0c733-5110-4932-b183-1a7097ebc5d7",
+        "target_label": "任務：登錄並核對訂單 · 要求：發現錯誤不得直接送出，先核對原資料並交主管決定更正方式；本人不核准訂單。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "f7e03ed7-ab23-45e4-83a8-cbb27f0017bd",
+          "task_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "3f6b884f-205f-430e-8bb8-7dc15b847bdd",
+        "target_label": "共通條件：固定在同一辦公室工作，沒有外勤或特殊環境要求。",
+        "target": {
+          "kind": "condition",
+          "field": null,
+          "item_id": "45ac5fc9-0ccc-4acc-b0d7-1d2f9f660e8e",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "9e485b33-d82a-428f-b04c-1521ff89abaf",
+        "target_label": "共通條件：全年工作量大致相同，沒有特殊忙季，時限不會因此改變。",
+        "target": {
+          "kind": "condition",
+          "field": null,
+          "item_id": "e14bb273-9428-4335-904d-8865daf01a66",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "43ecf227-190a-4427-980a-91961bc64890",
+        "target_label": "技能：訂單資料登錄與金額核對",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "b127b067-74c5-495a-988d-59d38dbc67b7",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "1ab0ca3b-66e9-499c-8df1-74fbb4d359ce",
+        "target_label": "技能：訂單資料登錄與金額核對",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "b127b067-74c5-495a-988d-59d38dbc67b7",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "9fcfc40c-5d5f-46ce-82a8-c9befe37888a",
+        "target_label": "協作：同事",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "f404db9d-7a2d-4700-a30f-46f6902d80d9",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "66958926-8ba8-4d98-927d-3cd07887cd5f",
+        "target_label": "協作：同事",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "f404db9d-7a2d-4700-a30f-46f6902d80d9",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "065effd4-f5fa-422f-ac23-ecc79807d1c8",
+        "target_label": "協作：主管",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "1a7f1380-c3bb-4635-a1b0-064ca7a12d3a",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "a726eb81-9120-4c51-bd4d-34774b9d4070",
+        "target_label": "任務：登錄並核對訂單 · 使用：訂單資料登錄與金額核對",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "b127b067-74c5-495a-988d-59d38dbc67b7",
+          "task_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      },
+      {
+        "citation_id": "b8037257-521f-4996-a18d-e111c615bdb5",
+        "target_label": "任務：登錄並核對訂單 · 使用：訂單資料登錄與金額核對",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "b127b067-74c5-495a-988d-59d38dbc67b7",
+          "task_id": "4a844bea-01eb-4430-9cc3-51a3142cfdea"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      }
+    ]
+  }
+}

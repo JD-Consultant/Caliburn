@@ -1,0 +1,17 @@
+{
+  "execution_id": "9f1d2b8a-3eae-4143-9754-8b4c6ead6444",
+  "exchange": {
+    "employee_input": {
+      "source_id": "b741b3eb-d4b2-443d-8b65-416ad41b8910",
+      "interview_sequence": 8,
+      "speaker": "employee",
+      "interview_text": "正常做法、交接與目前工作範圍都說過了，我現在想不到其他要補的。你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "ebc8dc93-56f3-46cd-a09e-4e9eb7008260",
+      "interview_sequence": 9,
+      "speaker": "consultant",
+      "interview_text": "目前已足以整理主要工作：依安排上架、掃碼確認品項、貼標籤並登記庫存；遇到資料不符時先停下核對並通知主管，不自行更改品項或決定儲位；完成後交主管。\n\n若要再確認一項可能影響職務條件的內容：上架時通常如何搬貨？需要手搬較重貨物或長時間站立嗎，還是主要使用搬運設備？若沒有特別要求，也可以直接說沒有。"
+    }
+  }
+}

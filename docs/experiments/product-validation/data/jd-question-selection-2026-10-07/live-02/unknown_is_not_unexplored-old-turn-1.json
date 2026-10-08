@@ -1,0 +1,17 @@
+{
+  "execution_id": "59994089-0d26-435e-a390-b28a6d138bdb",
+  "exchange": {
+    "employee_input": {
+      "source_id": "5bc5ecd2-da04-4c59-8fcf-f58c9e3739fa",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "堆高機用在哪些作業我還是想不起來，不要再問這個了。其他事情我可以試著說。"
+    },
+    "consultant_reply": {
+      "source_id": "e81a410b-0e04-4567-a67a-ac5ce6b6e2d0",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "了解，堆高機用在哪些作業這個細節我不會再問；目前先保留為無法確認。\n\n想改問入庫時的處理方式：如果到貨的品項或數量和安排不一致，通常由誰確認，您會怎麼處理？"
+    }
+  }
+}

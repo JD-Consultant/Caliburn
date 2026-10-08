@@ -30,7 +30,9 @@ Caliburn 將前期探索與資料整理轉為可持續進行的 AI 引導訪談�
 
 在文件管理上，系統將職責、任務及所需能力建成可個別編輯、彼此關聯的資料，提供章節導覽、局部修改、來源回查及 PDF 匯出。訪談形成的資訊與文件內容因而能在同一套流程中銜接，將顧問作業的數位化由電子表格的編排，延伸至工作資料、分析依據與文件修訂的管理。
 
-![圖一 從員工描述到 JD 交付的產品流程](../system-architecture/diagrams/01-value-loop.png)
+![圖一 從員工描述到 JD 交付的產品流程](../../diagrams/architecture/README/product-activities.png)
+
+[圖源](../../diagrams/architecture/README/product-activities.mmd) · [SVG](../../diagrams/architecture/README/product-activities.svg)
 
 圖一：員工描述工作，顧問逐步釐清並編輯 JD，最後匯出文件；後續補充與更正可回到訪談，繼續修訂成果。
 
@@ -140,9 +142,11 @@ Caliburn 是本機 Web 應用程式。使用者透過瀏覽器訪談及編輯 JD
 
 現行產品供單一操作者管理多份資料隔離的職務檔案，清單可建立、改名及確認刪除。原生啟動與 JD App 專用 Docker Compose 使用同一份正式程式；Docker 將 App 與 PostgreSQL 分開執行，支援本機啟停及資料保存，不自動遷移既有資料。公版 RAG 維持獨立，只有明示設定後才接入參考工具。[本機交付](../../implementation/interface-and-delivery.md#42-docker-交付)、[公版可選接線](../../adr/0080-opt-in-public-reference-agent-tools.md)
 
-![圖三 Caliburn 的系統邊界與外部服務](../system-architecture/diagrams/02-system-boundary.png)
+![圖三 Caliburn 的本機 Docker 部署與外部服務](../../diagrams/architecture/delivery-and-operations/local-deployment.png)
 
-圖三：瀏覽器、後端及資料庫構成本機產品；模型推論透過外部服務完成，所需訪談資料由後端組裝後傳送。
+[圖源](../../diagrams/architecture/delivery-and-operations/local-deployment.mmd) · [SVG](../../diagrams/architecture/delivery-and-operations/local-deployment.svg)
+
+圖三：現行本機 Docker 基本模式。外框區分主機與容器，箭頭表示發起請求的方向及協定，省略回傳；PDF 由 App 內部產生。模型推論透過外部服務完成，所需訪談資料由後端組裝後傳送。圖由[正式部署視圖](../../architecture/delivery-and-operations.md#2-最小部署視角)生成。
 
 系統依工作目的劃分三個 Agent：
 
@@ -172,7 +176,9 @@ Caliburn 是本機 Web 應用程式。使用者透過瀏覽器訪談及編輯 JD
 
 JD 可以據此寫成適合交付的任務。顧問指引優先使用足以支持 JD 敘述的工作理解，沿其關係可回查情境及原話；尚未整理的資訊，或不宜透過工作理解引用的個別情境，也可直接作為依據。同一條鏈已涵蓋的各層，不必重複列成多筆來源。
 
-![圖四 訪談 情境 理解與 JD 的來源關係](../system-architecture/diagrams/05-evidence-layers.png)
+![圖四 訪談 情境 理解與 JD 的來源關係](../../diagrams/reports/system-architecture/05-evidence-layers.png)
+
+[圖源](../../diagrams/reports/system-architecture/05-evidence-layers.mmd) · [SVG](../../diagrams/reports/system-architecture/05-evidence-layers.svg)
 
 圖四：同一任務可以引用工作理解，並按需另引該鏈未涵蓋的情境或對話。箭頭表示依據關係，不代表每輪一定逐層重新生成，也不代表三種來源互斥。
 
@@ -192,7 +198,9 @@ JD 可以據此寫成適合交付的任務。顧問指引優先使用足以支�
 
 B2 完成本批整理後，App 發布整體快照。快照固定各層物件的修訂與關係，未變物件可以重用；不要求所有物件共用同一個版本號。對同一個物件，從同一快照的任何引用路徑讀取，都必須得到相同內容與下層引用。
 
-![圖五 Memory 快照固定物件修訂並重用未變內容](../system-architecture/diagrams/07-memory-snapshots.png)
+![圖五 Memory 快照固定物件修訂並重用未變內容](../../diagrams/reports/system-architecture/07-memory-snapshots.png)
+
+[圖源](../../diagrams/reports/system-architecture/07-memory-snapshots.mmd) · [SVG](../../diagrams/reports/system-architecture/07-memory-snapshots.svg)
 
 圖五：新版快照選用修改後的物件，也沿用未變的物件修訂；舊快照仍可查。可變工作稿使背景整理能反覆編輯，固定快照則讓顧問與 JD 的歷史依據不被後來修改覆蓋。
 
@@ -210,16 +218,11 @@ Caliburn 因此把 Context 組裝、工具說明、參數及回傳視為同一�
 
 模型執行採圖六的循環。一次回應可提出多個工具呼叫，由 App 依序處理，再把配對結果交回模型；模型可以據此繼續讀取、修正或形成最終輸出。A 的最終輸出面向員工，B1／B2 則回報本階段分析完成。分析完成與正式保存是不同步驟，實際生效由 App 處理。
 
-```mermaid
-flowchart TD
-    C["已保存的接續內容<br/>角色規則、參考資料與工具結果"] --> M["Agent 分析並選擇下一步"]
-    M -->|提出工具呼叫| T["App 檢查參數、權限與資料範圍"]
-    T --> R["執行並保存結果<br/>或回傳可修正的拒絕"]
-    R -->|追加原呼叫與配對結果| C
-    M -->|最終輸出| F["App 保存完整結果<br/>完成本輪或本階段"]
-```
+![現行基本流程：Agent 分析與工具循環（簡化）](../../diagrams/reports/project-report/report/agent-analysis-cycle.png)
 
-圖六：Agent 的分析—行動—觀察循環。模型選擇語意行動，App 執行並記錄實際效果；外層流程另外控制角色順序、取消與有界重試。工具結果是後續判斷的依據，模型說「已修改」本身不代表資料已提交。
+[圖源](../../diagrams/reports/project-report/report/agent-analysis-cycle.mmd) · [SVG](../../diagrams/reports/project-report/report/agent-analysis-cycle.svg)
+
+圖六：現行 Agent 分析與工具循環的簡化流程。矩形為動作、菱形為選擇、圓角為起訖，箭頭僅表示控制先後；省略取消、結果不明與故障分支。模型選擇語意行動，App 記錄實際效果並按角色契約判定完成；模型說「已修改」不代表已正式提交。完整控制及恢復沿[共用執行設計](../../specs/2026-09-27-shared-agent-execution-and-state-design.md)。
 
 #### 3.4.1 分開組裝工作規則與參考資料
 
@@ -298,7 +301,9 @@ JD 以可管理的欄位及關係保存，而不是把整份文件當成一個�
 
 圖七呈現一份 JD 修訂內的簡化關係。「任務選用」與「能力選用」分別指定本版採用的項目、固定內容修訂及順序；「任務能力關係」保存兩者的連結與任務內的能力順序。內容與使用關係分開，使調整用途或排序時可以重用未變的正文。
 
-![圖七 JD 任務與共用能力的資料關係](../system-architecture/diagrams/09-jd-relations.png)
+![圖七 JD 任務與共用能力的資料關係](../../diagrams/reports/system-architecture/09-jd-relations.png)
+
+[圖源](../../diagrams/reports/system-architecture/09-jd-relations.mmd) · [SVG](../../diagrams/reports/system-architecture/09-jd-relations.svg)
 
 圖七：現行 JD 資料模型的任務與共用能力關係。每筆使用關係連到同一職務檔案、同一 JD 修訂內的一項任務與一項能力；任務與能力都可以暫無連結。圖中省略職責歸屬、成果、要求與來源引用，核心資料表及約束見附錄 C。
 
@@ -1695,13 +1700,17 @@ App 側的搜尋、讀取、選用與排除工作工具另驗契約及 PostgreSQ
 
 兩圖共用同一份 `jd_revisions`，以 `job_file_id` 與 `revision_id` 共同識別一份固定 JD 修訂。圖中著重任務、能力及其選用關係；JD 修訂、職責選用的自身欄位，以及基本資料、來源引用與其他 JD 集合，另由保存文件查閱。
 
-![圖 C-1 JD 任務內容、選用與成果要求明細](../system-architecture/diagrams/10-jd-task-storage.png)
+![圖 C-1 JD 任務內容、選用與成果要求明細](../../diagrams/implementation/jd-storage/jd-task-storage.png)
 
-圖 C-1：任務選用指定本版採用的固定內容、可空的職責歸屬及順序；成果與要求明細連到同一任務內容修訂，依種類分別排序。[可放大的向量圖](../system-architecture/diagrams/10-jd-task-storage.svg)
+[圖源](../../diagrams/implementation/jd-storage/jd-task-storage.mmd) · [SVG](../../diagrams/implementation/jd-storage/jd-task-storage.svg)
 
-![圖 C-2 JD 共用能力定義、選用與任務使用關係](../system-architecture/diagrams/11-jd-capability-storage.png)
+圖 C-1：任務選用指定本版採用的固定內容、可空的職責歸屬及順序；成果與要求明細連到同一任務內容修訂，依種類分別排序。[可放大的向量圖](../../diagrams/implementation/jd-storage/jd-task-storage.svg)
 
-圖 C-2：知識／技能定義與任務使用關係分開保存；本版能力選用連到固定內容，再透過 `jd_task_capabilities` 與本版任務形成多對多關係。[可放大的向量圖](../system-architecture/diagrams/11-jd-capability-storage.svg)
+![圖 C-2 JD 共用能力定義、選用與任務使用關係](../../diagrams/implementation/jd-storage/jd-capability-storage.png)
+
+[圖源](../../diagrams/implementation/jd-storage/jd-capability-storage.mmd) · [SVG](../../diagrams/implementation/jd-storage/jd-capability-storage.svg)
+
+圖 C-2：知識／技能定義與任務使用關係分開保存；本版能力選用連到固定內容，再透過 `jd_task_capabilities` 與本版任務形成多對多關係。[可放大的向量圖](../../diagrams/implementation/jd-storage/jd-capability-storage.svg)
 
 任務與能力各有穩定身分，內容修訂表達其一次固定敘述，JD 修訂則選定使用哪一版內容及關係。概覽順序與每項任務內的能力順序分開保存，反向用途由同一組連結查詢，不另存一份關係副本。
 

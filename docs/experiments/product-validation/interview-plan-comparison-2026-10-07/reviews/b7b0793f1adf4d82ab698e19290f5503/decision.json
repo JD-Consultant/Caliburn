@@ -1,0 +1,8 @@
+{
+  "question_id": "b7b0793f1adf4d82ab698e19290f5503",
+  "fact_ids": ["training"],
+  "mode": "answer",
+  "reason": "實際轉向員工指定的新人帶教，問所教工作、教法與確認獨立操作，training 固定事實可答。這是首次披露 training，不提前給 training-boundary；盤點摘要也不構成回訪。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

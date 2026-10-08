@@ -1,0 +1,1490 @@
+[
+  {
+    "at": 1791280591.6284573,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.6284592,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI\"}"
+  },
+  {
+    "at": 1791280591.643746,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.643747,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need\"}"
+  },
+  {
+    "at": 1791280591.6540577,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.6540592,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to\"}"
+  },
+  {
+    "at": 1791280591.6641414,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.6641424,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond\"}"
+  },
+  {
+    "at": 1791280591.735198,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.735199,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to\"}"
+  },
+  {
+    "at": 1791280591.7598722,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.7598734,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the\"}"
+  },
+  {
+    "at": 1791280591.7665575,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.7665586,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user\"}"
+  },
+  {
+    "at": 1791280591.8009706,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.8009715,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and\"}"
+  },
+  {
+    "at": 1791280591.817017,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.8170185,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think\"}"
+  },
+  {
+    "at": 1791280591.8277347,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.8277361,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about\"}"
+  },
+  {
+    "at": 1791280591.8653102,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.8653111,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how\"}"
+  },
+  {
+    "at": 1791280591.875989,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.87599,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to\"}"
+  },
+  {
+    "at": 1791280591.892405,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.892406,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite\"}"
+  },
+  {
+    "at": 1791280591.9323292,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.9323301,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further\"}"
+  },
+  {
+    "at": 1791280591.9437652,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280591.943766,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion\"}"
+  },
+  {
+    "at": 1791280592.002948,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.0029495,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion.\"}"
+  },
+  {
+    "at": 1791280592.022024,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.0220256,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It\"}"
+  },
+  {
+    "at": 1791280592.0316002,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.0316014,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems\"}"
+  },
+  {
+    "at": 1791280592.0777206,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.077722,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like\"}"
+  },
+  {
+    "at": 1791280592.0871096,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.0871108,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I\"}"
+  },
+  {
+    "at": 1791280592.1176293,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.1176305,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should\"}"
+  },
+  {
+    "at": 1791280592.1287646,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.1287656,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus\"}"
+  },
+  {
+    "at": 1791280592.163075,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.1630762,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on\"}"
+  },
+  {
+    "at": 1791280592.1882746,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.188276,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my\"}"
+  },
+  {
+    "at": 1791280592.1918051,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.1918063,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main\"}"
+  },
+  {
+    "at": 1791280592.256927,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.256928,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks\"}"
+  },
+  {
+    "at": 1791280592.2949731,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.2949748,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without\"}"
+  },
+  {
+    "at": 1791280592.3093612,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.3093624,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding\"}"
+  },
+  {
+    "at": 1791280592.3693154,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.3693163,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant\"}"
+  },
+  {
+    "at": 1791280592.3782532,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.3782542,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links\"}"
+  },
+  {
+    "at": 1791280592.3899486,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.3899498,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links.\"}"
+  },
+  {
+    "at": 1791280592.4010696,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.4010706,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since\"}"
+  },
+  {
+    "at": 1791280592.4136124,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.4136143,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the\"}"
+  },
+  {
+    "at": 1791280592.425266,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.425267,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user\"}"
+  },
+  {
+    "at": 1791280592.4350863,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.435088,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked\"}"
+  },
+  {
+    "at": 1791280592.4459505,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.4459517,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for\"}"
+  },
+  {
+    "at": 1791280592.4546473,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.4546485,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification\"}"
+  },
+  {
+    "at": 1791280592.4966512,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.4966528,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification,\"}"
+  },
+  {
+    "at": 1791280592.5135734,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.5135775,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I\"}"
+  },
+  {
+    "at": 1791280592.5235665,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.523568,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could\"}"
+  },
+  {
+    "at": 1791280592.5339677,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.5339687,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire\"}"
+  },
+  {
+    "at": 1791280592.5647414,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.5647423,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about\"}"
+  },
+  {
+    "at": 1791280592.5910861,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.5910878,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any\"}"
+  },
+  {
+    "at": 1791280592.6105828,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.6105838,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked\"}"
+  },
+  {
+    "at": 1791280592.6358414,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.6358423,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects\"}"
+  },
+  {
+    "at": 1791280592.643648,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.6436489,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of\"}"
+  },
+  {
+    "at": 1791280592.6566267,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.656629,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their\"}"
+  },
+  {
+    "at": 1791280592.6698072,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.6698081,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily\"}"
+  },
+  {
+    "at": 1791280592.6793888,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.6793897,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work\"}"
+  },
+  {
+    "at": 1791280592.6919124,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.691914,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine\"}"
+  },
+  {
+    "at": 1791280592.7141154,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.7141166,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine.\"}"
+  },
+  {
+    "at": 1791280592.7179701,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.717971,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For\"}"
+  },
+  {
+    "at": 1791280592.7391858,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.7391872,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance\"}"
+  },
+  {
+    "at": 1791280592.7559917,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.7559936,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance,\"}"
+  },
+  {
+    "at": 1791280592.7685719,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.768574,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I\"}"
+  },
+  {
+    "at": 1791280592.7785847,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.778586,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might\"}"
+  },
+  {
+    "at": 1791280592.8221748,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.8221755,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask\"}"
+  },
+  {
+    "at": 1791280592.83311,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.8331108,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if\"}"
+  },
+  {
+    "at": 1791280592.8459399,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.845941,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there\"}"
+  },
+  {
+    "at": 1791280592.8550396,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.8550408,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are\"}"
+  },
+  {
+    "at": 1791280592.869909,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.86991,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific\"}"
+  },
+  {
+    "at": 1791280592.8865318,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.8865328,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup\"}"
+  },
+  {
+    "at": 1791280592.8977463,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.8977478,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or\"}"
+  },
+  {
+    "at": 1791280592.9058063,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.9058077,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment\"}"
+  },
+  {
+    "at": 1791280592.9444473,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.9444504,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance\"}"
+  },
+  {
+    "at": 1791280592.9590635,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.9590645,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks\"}"
+  },
+  {
+    "at": 1791280592.9703462,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.9703472,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they\"}"
+  },
+  {
+    "at": 1791280592.9905674,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280592.9905684,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly\"}"
+  },
+  {
+    "at": 1791280593.000278,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.000279,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform\"}"
+  },
+  {
+    "at": 1791280593.0164835,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.0164845,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at\"}"
+  },
+  {
+    "at": 1791280593.0325105,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.0325117,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the\"}"
+  },
+  {
+    "at": 1791280593.0495605,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.0495615,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end\"}"
+  },
+  {
+    "at": 1791280593.0600088,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.0600095,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of\"}"
+  },
+  {
+    "at": 1791280593.071674,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.071675,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their\"}"
+  },
+  {
+    "at": 1791280593.0799377,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.0799403,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift\"}"
+  },
+  {
+    "at": 1791280593.0924478,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.0924487,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift.\"}"
+  },
+  {
+    "at": 1791280593.1020534,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.1020544,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They\"}"
+  },
+  {
+    "at": 1791280593.1127324,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.1127338,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve\"}"
+  },
+  {
+    "at": 1791280593.12232,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.1223211,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown\"}"
+  },
+  {
+    "at": 1791280593.1471772,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.1471782,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness\"}"
+  },
+  {
+    "at": 1791280593.1826246,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.1826258,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to\"}"
+  },
+  {
+    "at": 1791280593.1936073,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.1936088,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing\"}"
+  },
+  {
+    "at": 1791280593.20347,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.2034712,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing,\"}"
+  },
+  {
+    "at": 1791280593.2152019,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.2152033,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so\"}"
+  },
+  {
+    "at": 1791280593.2242727,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.224274,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I\"}"
+  },
+  {
+    "at": 1791280593.2312555,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.2312565,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll\"}"
+  },
+  {
+    "at": 1791280593.2747061,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.2747085,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll prepare\"}"
+  },
+  {
+    "at": 1791280593.2834656,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.283467,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll prepare a\"}"
+  },
+  {
+    "at": 1791280593.3236403,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.3236415,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll prepare a direct\"}"
+  },
+  {
+    "at": 1791280593.3530843,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.3530862,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll prepare a direct question\"}"
+  },
+  {
+    "at": 1791280593.3607543,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.3607557,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll prepare a direct question focused\"}"
+  },
+  {
+    "at": 1791280593.4048417,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.4048433,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll prepare a direct question focused on\"}"
+  },
+  {
+    "at": 1791280593.4167106,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.4167116,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll prepare a direct question focused on their\"}"
+  },
+  {
+    "at": 1791280593.4272134,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.4272144,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll prepare a direct question focused on their routine\"}"
+  },
+  {
+    "at": 1791280593.4392104,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280593.439212,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Probing for clarity**\\n\\nI need to respond to the user and think about how to invite further discussion. It seems like I should focus on my main tasks without adding irrelevant links. Since the user asked for clarification, I could inquire about any overlooked aspects of their daily work routine. For instance, I might ask if there are specific cleanup or equipment maintenance tasks they regularly perform at the end of their shift. They’ve shown openness to probing, so I’ll prepare a direct question focused on their routine.\"}"
+  },
+  {
+    "at": 1791280594.0297258,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.0297267,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI\"}"
+  },
+  {
+    "at": 1791280594.0374377,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.0374386,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand\"}"
+  },
+  {
+    "at": 1791280594.0445747,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.0445757,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I\"}"
+  },
+  {
+    "at": 1791280594.0567262,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.0567274,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't\"}"
+  },
+  {
+    "at": 1791280594.0664735,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.0664744,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make\"}"
+  },
+  {
+    "at": 1791280594.0736396,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.073644,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions\"}"
+  },
+  {
+    "at": 1791280594.0831087,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.0831099,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about\"}"
+  },
+  {
+    "at": 1791280594.0909166,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.0909178,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the\"}"
+  },
+  {
+    "at": 1791280594.102661,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.1026618,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user\"}"
+  },
+  {
+    "at": 1791280594.1141684,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.1141696,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s\"}"
+  },
+  {
+    "at": 1791280594.1204026,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.1204038,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing\"}"
+  },
+  {
+    "at": 1791280594.1290667,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.1290677,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks\"}"
+  },
+  {
+    "at": 1791280594.1782827,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.1782837,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks,\"}"
+  },
+  {
+    "at": 1791280594.2030532,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2030544,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even\"}"
+  },
+  {
+    "at": 1791280594.2052786,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2052798,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though\"}"
+  },
+  {
+    "at": 1791280594.2053416,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2053423,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they\"}"
+  },
+  {
+    "at": 1791280594.2054,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2054002,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned\"}"
+  },
+  {
+    "at": 1791280594.2054348,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2054353,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a\"}"
+  },
+  {
+    "at": 1791280594.2054803,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.205481,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily\"}"
+  },
+  {
+    "at": 1791280594.211848,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2118487,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count\"}"
+  },
+  {
+    "at": 1791280594.2733266,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2733278,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before\"}"
+  },
+  {
+    "at": 1791280594.2754483,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2754498,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing\"}"
+  },
+  {
+    "at": 1791280594.277516,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2775168,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing.\"}"
+  },
+  {
+    "at": 1791280594.277572,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2775724,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It\"}"
+  },
+  {
+    "at": 1791280594.280422,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2804227,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might\"}"
+  },
+  {
+    "at": 1791280594.280481,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2804816,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be\"}"
+  },
+  {
+    "at": 1791280594.2907882,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.2907894,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful\"}"
+  },
+  {
+    "at": 1791280594.3000515,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.3000526,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to\"}"
+  },
+  {
+    "at": 1791280594.3072424,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.3072436,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore\"}"
+  },
+  {
+    "at": 1791280594.3145523,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.3145535,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other\"}"
+  },
+  {
+    "at": 1791280594.343909,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.3439107,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines\"}"
+  },
+  {
+    "at": 1791280594.34964,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.3496406,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as\"}"
+  },
+  {
+    "at": 1791280594.3794093,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.3794112,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well\"}"
+  },
+  {
+    "at": 1791280594.3888264,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.3888283,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well.\"}"
+  },
+  {
+    "at": 1791280594.3989744,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.3989754,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I\"}"
+  },
+  {
+    "at": 1791280594.4048893,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.4048905,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need\"}"
+  },
+  {
+    "at": 1791280594.411005,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.411006,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to\"}"
+  },
+  {
+    "at": 1791280594.425267,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.425269,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think\"}"
+  },
+  {
+    "at": 1791280594.453299,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.4533007,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about\"}"
+  },
+  {
+    "at": 1791280594.4669688,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.4669714,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the\"}"
+  },
+  {
+    "at": 1791280594.4896965,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.489698,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines\"}"
+  },
+  {
+    "at": 1791280594.4959598,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.4959612,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that\"}"
+  },
+  {
+    "at": 1791280594.5104034,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.5104048,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say\"}"
+  },
+  {
+    "at": 1791280594.5176823,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.5176835,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to\"}"
+  },
+  {
+    "at": 1791280594.5296123,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.5296133,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use\"}"
+  },
+  {
+    "at": 1791280594.5371294,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.5371308,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed\"}"
+  },
+  {
+    "at": 1791280594.546751,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.546752,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory\"}"
+  },
+  {
+    "at": 1791280594.561272,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.561273,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and\"}"
+  },
+  {
+    "at": 1791280594.5693507,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.5693517,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent\"}"
+  },
+  {
+    "at": 1791280594.5981617,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.5981627,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews\"}"
+  },
+  {
+    "at": 1791280594.6054688,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.6054697,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for\"}"
+  },
+  {
+    "at": 1791280594.624618,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.6246192,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this\"}"
+  },
+  {
+    "at": 1791280594.635449,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.6354501,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation\"}"
+  },
+  {
+    "at": 1791280594.6450477,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.6450484,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation.\"}"
+  },
+  {
+    "at": 1791280594.650817,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.6508183,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even\"}"
+  },
+  {
+    "at": 1791280594.6654334,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.6654346,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if\"}"
+  },
+  {
+    "at": 1791280594.6794572,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.6794586,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the\"}"
+  },
+  {
+    "at": 1791280594.699118,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.6991189,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory\"}"
+  },
+  {
+    "at": 1791280594.7055366,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.7055376,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is\"}"
+  },
+  {
+    "at": 1791280594.713187,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.7131894,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked\"}"
+  },
+  {
+    "at": 1791280594.7240934,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.7240946,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked,\"}"
+  },
+  {
+    "at": 1791280594.7305632,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.730564,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I\"}"
+  },
+  {
+    "at": 1791280594.7406237,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.7406244,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can\"}"
+  },
+  {
+    "at": 1791280594.7476397,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.7476408,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely\"}"
+  },
+  {
+    "at": 1791280594.7556665,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.7556674,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on\"}"
+  },
+  {
+    "at": 1791280594.7628984,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.7628996,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the\"}"
+  },
+  {
+    "at": 1791280594.7710574,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.7710583,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest\"}"
+  },
+  {
+    "at": 1791280594.7904613,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.7904625,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context\"}"
+  },
+  {
+    "at": 1791280594.794987,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.794988,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context.\"}"
+  },
+  {
+    "at": 1791280594.8258734,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.8258748,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I\"}"
+  },
+  {
+    "at": 1791280594.8377833,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.8377845,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll\"}"
+  },
+  {
+    "at": 1791280594.8649979,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.8649995,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take\"}"
+  },
+  {
+    "at": 1791280594.8701568,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.8701582,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that\"}"
+  },
+  {
+    "at": 1791280594.884184,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.884185,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into\"}"
+  },
+  {
+    "at": 1791280594.8920784,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.8920796,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account\"}"
+  },
+  {
+    "at": 1791280594.89983,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.8998308,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as\"}"
+  },
+  {
+    "at": 1791280594.913409,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.9134102,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I\"}"
+  },
+  {
+    "at": 1791280594.9218078,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.921809,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed\"}"
+  },
+  {
+    "at": 1791280594.9356189,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.9356198,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed,\"}"
+  },
+  {
+    "at": 1791280594.9434338,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.943435,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking\"}"
+  },
+  {
+    "at": 1791280594.9527338,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.9527347,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for\"}"
+  },
+  {
+    "at": 1791280594.964504,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.9645064,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a\"}"
+  },
+  {
+    "at": 1791280594.9723964,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.9723976,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a way\"}"
+  },
+  {
+    "at": 1791280594.9916234,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.9916246,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a way to\"}"
+  },
+  {
+    "at": 1791280594.9991605,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280594.999162,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a way to ask\"}"
+  },
+  {
+    "at": 1791280595.0114553,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280595.0114567,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a way to ask relevant\"}"
+  },
+  {
+    "at": 1791280595.0221717,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280595.022173,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a way to ask relevant questions\"}"
+  },
+  {
+    "at": 1791280595.0325427,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280595.0325444,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a way to ask relevant questions based\"}"
+  },
+  {
+    "at": 1791280595.0392544,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280595.0392556,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a way to ask relevant questions based on\"}"
+  },
+  {
+    "at": 1791280595.048032,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280595.048033,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a way to ask relevant questions based on that\"}"
+  },
+  {
+    "at": 1791280595.0599217,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791280595.0599232,
+    "line": "data: {\"response_id\":\"resp_00933d1a394bb439016ac4c5ccba7c87d09c268ddb36260e43\",\"item_id\":\"rs_00933d1a394bb439016ac4c5ce3c9087d0840bd211e3b1bc25\",\"output_index\":0,\"summary_index\":1,\"text\":\"**Considering memory use**\\n\\nI understand I shouldn't make assumptions about the user’s closing tasks, even though they mentioned a daily count before closing. It might be helpful to explore other routines as well. I need to think about the guidelines that say to use fixed memory and recent interviews for this conversation. Even if the memory is blocked, I can rely on the latest context. I’ll take that into account as I proceed, looking for a way to ask relevant questions based on that.\"}"
+  }
+]

@@ -1,5 +1,7 @@
 # 研究紀錄 — 多職類參考下的候選近重複:去重不是唯一解
 
+> 時點說明：本文保留 2026-07-02 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 - 日期:2026-07-02。狀態:研究完成,待與維護者討論(尚無 ADR/plan)。
 - 問題(維護者原話):「我們可以選多職位來當參考,所以可能有類似的工作項目、工作內容、OPKSA 等等,
   使用者會看到重複的選項、不知道怎麼選。不一定要用去重。」LLM(訪談引擎,ADR 0020)也要用到。
@@ -498,9 +500,9 @@ NeMo 示例 eps 0.01–0.001(≈cosine 0.99+)極端嚴格,與「寧嚴勿鬆」(
 
 ### 9.5 與知識包整合的設計定案(讀碼修正兩處)
 
-讀 [`knowledge_pack.py`](../../../apps/api/app/core/domain/knowledge_pack.py) /
-[`documents.py::get_knowledge_pack`](../../../apps/api/app/api/routes/documents.py) /
-[`pack.ts`](../../../apps/web/src/lib/pack.ts) 後定案:
+讀 [`knowledge_pack.py`](../../history.md#source-1cdc9dfc1ff324ee6844) /
+[`documents.py::get_knowledge_pack`](../../history.md#source-ba942110b8bc0294b0b0) /
+[`pack.ts`](../../history.md#source-3cfcd0e3fa406af5c282) 後定案:
 
 1. **輸入 = pack 池 rows**(ADR 0021 已按 kind 分 12 池、key 去重、srcs 累積)——工具零抽取;
    indexer 端 exact-collapse 降級為防禦性(只補 NFKC 級漏網)。

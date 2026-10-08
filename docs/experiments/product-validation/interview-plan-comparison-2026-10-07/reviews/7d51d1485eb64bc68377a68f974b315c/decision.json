@@ -1,0 +1,8 @@
+{
+  "question_id": "7d51d1485eb64bc68377a68f974b315c",
+  "fact_ids": ["cold-storage", "peak-season", "annual-count"],
+  "mode": "answer",
+  "reason": "實際廣度提問尚未談到的固定事項及特定情況工作，直接涵蓋冷藏作業與每日溫度查看、旺季波次和晚班交接，以及年度全倉盤點。這是正向的其他工作／特定情況問題，不是前段摘要或 hidden omission 觸發。三個相關固定 IDs 均可取得；年度表單與分區未知沿原字串保留，不補細節，也不披露未問的能力要求。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

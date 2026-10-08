@@ -1,0 +1,55 @@
+{
+  "profile": {
+    "revision_id": "c3f4619d-4587-4666-94ea-970623bad2d0",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "確認待出貨品項與單據一致，回報未排除差異。"
+    }
+  },
+  "work": {
+    "revision_id": "c3f4619d-4587-4666-94ea-970623bad2d0",
+    "areas": [
+      {
+        "area_id": "cd018bf2-47b7-443e-9537-8558c4ba6ca0",
+        "title": "出貨前核對",
+        "scope_text": "條碼與單貨核對及同一工作中的差異回報。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "308d6625-1d0e-4e2f-a53b-bc3d1cd90af9",
+        "area_id": "cd018bf2-47b7-443e-9537-8558c4ba6ca0",
+        "title": "核對待出貨商品",
+        "description": "每日下午三點核對品項與數量；掃碼不符先重掃、核對標籤，仍不符記錄交主管。不負責揀貨、裝箱或換貨決策。",
+        "outcomes": [],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "c3f4619d-4587-4666-94ea-970623bad2d0",
+    "references": [
+      {
+        "citation_id": "e96fdff5-3984-4240-b841-b4d701971eae",
+        "target_label": "任務：核對待出貨商品",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "308d6625-1d0e-4e2f-a53b-bc3d1cd90af9",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

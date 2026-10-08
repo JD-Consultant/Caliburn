@@ -17,6 +17,7 @@ const active = {
   input_text: '本輪尚未正式保存的原話',
   allowed_controls: ['pause', 'cancel'],
   commentary: [],
+  plan_preview: null,
   candidate: null,
 };
 const clients: QueryClient[] = [];

@@ -1,0 +1,47 @@
+{
+  "actual_question": "我已補上帶教內容：新人第一週由您示範掃碼、揀貨和安全動線，再跟著操作；您會現場檢查並記錄漏掃、批號錯誤或走進車道等情況，也會判斷新人能否獨立上線。\n\n您剛才說現在想起一些盤點後續，可以從複點後仍有差異時說起：您會把差異記在哪裡、交給誰？後續調帳由誰處理或批准？只說您現在確定的部分即可。",
+  "employee_text": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。",
+  "fact_ids": [
+    "inventory-authority"
+  ],
+  "known_confirmation_ids": [],
+  "new_fact_ids": [
+    "inventory-authority"
+  ],
+  "review_mode": "answer",
+  "review_reason": "training 已在盤點缺口之後正式披露並帶出可回訪線索，本題明確回访差異記錄、交接與調帳權責，符合 inventory-authority 條件。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": [],
+  "driver_reminder": false,
+  "subquestions": [
+    {
+      "quote": "您會把差異記在哪裡",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "直接詢問複點後差異記錄，可披露盤點差異表及單據、原因。"
+    },
+    {
+      "quote": "交給誰？",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "凍結事實明載交倉儲主管核准，為所問交接對象。"
+    },
+    {
+      "quote": "後續調帳由誰處理或批准？",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "明確回訪主管核准、財務調帳與本人不能直接改數量的權責。"
+    }
+  ],
+  "refused_subquestions": [],
+  "clarify_subquestions": [],
+  "actually_submitted": true,
+  "command_id": "e3550ac1-a498-4da2-b519-de7eb9cbe1f5",
+  "accepted_source_id": "97a464d8-5345-42bf-b232-ee2f64bf7ecc"
+}

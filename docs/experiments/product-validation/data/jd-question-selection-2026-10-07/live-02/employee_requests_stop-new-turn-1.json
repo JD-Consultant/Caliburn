@@ -1,0 +1,17 @@
+{
+  "execution_id": "91356794-2cad-48e1-9e33-2a4c8602465d",
+  "exchange": {
+    "employee_input": {
+      "source_id": "b3bd0c31-7f98-4343-8f63-698340993352",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "今天累了，現在先結束，不要再問了。我之後想到再補。"
+    },
+    "consultant_reply": {
+      "source_id": "ed17e1b1-db52-458a-a71e-b8388266b187",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "好的，今天先到這裡，不再提問。\n\n目前記下的工作是：依安排上架並登記；發現差異時通知主管，不自行更改儲位；平常也會搬箱，最重約 15 公斤。這只是目前掌握的部分，尚未整理成完整職務說明書。之後想到或有精神時，再從這裡接著補充即可。"
+    }
+  }
+}

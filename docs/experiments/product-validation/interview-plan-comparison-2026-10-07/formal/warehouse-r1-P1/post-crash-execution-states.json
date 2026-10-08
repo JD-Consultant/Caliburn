@@ -1,0 +1,21 @@
+{
+  "credential_read": false,
+  "provider_calls": 0,
+  "states": [
+    {
+      "kind": "memory_batch",
+      "status": "completed",
+      "count": 1
+    },
+    {
+      "kind": "consultant_turn",
+      "status": "completed",
+      "count": 5
+    },
+    {
+      "kind": "consultant_turn",
+      "status": "active",
+      "count": 1
+    }
+  ]
+}

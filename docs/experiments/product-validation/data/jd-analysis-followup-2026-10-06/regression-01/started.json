@@ -1,0 +1,13 @@
+{
+  "authorization": "Same user-approved US$0.10 / 20 minute batch; no renewed allowance",
+  "budget_usd": "0.054887660",
+  "seconds": 131,
+  "parent_boundary": {
+    "budget_usd": "0.054887660",
+    "seconds": 133,
+    "deadline_utc": "2026-10-06T14:19:55.583688+00:00",
+    "prior_occupied_usd": "0.045112340",
+    "reason": "Final regression of the unchanged final prompt on insufficient facts and coherent single work; same original authorization, no reset"
+  },
+  "started_at": "2026-10-06T14:17:44.060029+00:00"
+}

@@ -1,0 +1,30 @@
+{
+  "authorization": "使用者同意總上限 US$0.50／原截止不變，只接續未完成訪談；保留全部未知用量。",
+  "approved_total_limit_usd": "0.50",
+  "started_at": "2026-10-06T14:51:05.227478+00:00",
+  "approved_deadline_at": "2026-10-06T15:51:05.227478+00:00",
+  "journal_sha256": "29dea55ee5614491b7953db26d4d1ff915a15bd099c9643930dbbd9184392eaa",
+  "spent_usd": "0.130279455",
+  "retained_reservations": {
+    "6095f61c-c2bf-4b6a-ae69-4319c09ec7bc": "0.011600000",
+    "fe3feb98-34d0-43dc-852f-68d6666f03bb": "0.015088625",
+    "c82a9b31-ca2a-44f2-9c5a-77119ec05e12": "0.015088625",
+    "0cd5b094-d92d-42eb-969f-cb7b45d3675d": "0.015770000",
+    "31af6330-c207-4acf-9bfe-0e5ab8c96eeb": "0.016154625",
+    "7e48d920-7f10-4780-a060-625c8c837331": "0.012973875",
+    "419c19cc-a3d5-4e2e-9aed-7dbaa10f757d": "0.016341000",
+    "d676278c-9890-4e12-9775-4cb1ac62195a": "0.013277500",
+    "22702e1c-1c00-4edf-8074-9da14ec14da4": "0.016341000",
+    "fa1682bb-1f28-41fa-a363-c0b022acb1e3": "0.016341000",
+    "65266ba0-608e-4345-b6f6-6d5dd0b7267a": "0.017822000",
+    "31665a04-3a21-41c8-8fcf-983d33ec7c16": "0.015459750",
+    "1ea325c1-316c-428f-ac15-345335bd1365": "0.021932125",
+    "2e9889e2-d315-4f97-a114-da4cb0926d2f": "0.021932125",
+    "4cd3095f-ad03-4196-b0e4-98be55adfa7d": "0.021932125"
+  },
+  "occupied_usd": "0.378333830",
+  "failed_execution_id": "1eb464ae-7059-4e41-87a7-e57f995bb8bc",
+  "continued_input": "turn-18-input.json",
+  "intervening_manual_probe": "manual-delivery-probe.json",
+  "intervening_manual_change": "已確認的七點改為7點；不新增員工事實，須與自然訪談品質判讀分開。"
+}

@@ -1,0 +1,169 @@
+....FFFF                                                                 [100%]
+================================== FAILURES ===================================
+_____ test_constructor_delay_cannot_extend_the_original_absolute_deadline _____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000020DE287B820>
+
+    def test_constructor_delay_cannot_extend_the_original_absolute_deadline(monkeypatch):
+        import append_batch
+    
+        current = [100]
+        original = append_batch.BatchGuard
+    
+        def delayed(**kwargs):
+            current[0] += 120
+            return original(**kwargs)
+    
+        monkeypatch.setattr(append_batch, "BatchGuard", delayed)
+        guard = carried_guard(
+            PRIOR,
+            now=DEADLINE - timedelta(seconds=90),
+            clock=lambda: current[0],
+        )
+>       with pytest.raises(RuntimeError, match="deadline reached"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_guard.py:75: Failed
+_ test_early_terminal_close_finalizes_owned_original_iterator_and_preserves_bytes _
+
+    def test_early_terminal_close_finalizes_owned_original_iterator_and_preserves_bytes():
+        body, chunk = terminal()
+        observed = []
+        original = Original([chunk])
+        stream = Stream(original, observed.append)
+    
+        async def run():
+            iterator = stream.__aiter__()
+            try:
+                assert await anext(iterator) == chunk
+                await stream.aclose()
+                assert original.finalized == 1
+                assert original.closed == 1
+                assert observed == [body]
+            finally:
+                await iterator.aclose()
+    
+>       asyncio.run(run())
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_stream.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py:205: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py:128: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\base_events.py:720: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        iterator = stream.__aiter__()
+        try:
+            assert await anext(iterator) == chunk
+            await stream.aclose()
+>           assert original.finalized == 1
+E           assert 0 == 1
+E            +  where 0 = <test_append_stream.Original object at 0x0000020DE29D5E80>.finalized
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_stream.py:56: AssertionError
+_______ test_unknown_read_error_is_observed_once_even_if_close_repeats ________
+
+    def test_unknown_read_error_is_observed_once_even_if_close_repeats():
+        observed = []
+        original = Original([b"data: [DONE]\n\n"], read_error=True)
+        stream = Stream(original, observed.append)
+    
+        async def run():
+            iterator = stream.__aiter__()
+            await anext(iterator)
+            with pytest.raises(RuntimeError, match="read failed"):
+                await anext(iterator)
+            await stream.aclose()
+            await stream.aclose()
+            assert observed == [None]
+            assert original.closed == 1
+    
+>       asyncio.run(run())
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_stream.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py:205: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py:128: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\base_events.py:720: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        iterator = stream.__aiter__()
+        await anext(iterator)
+        with pytest.raises(RuntimeError, match="read failed"):
+            await anext(iterator)
+        await stream.aclose()
+        await stream.aclose()
+>       assert observed == [None]
+E       assert [None, None] == [None]
+E         
+E         Left contains one more item: None
+E         Use -v to get more diff
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_stream.py:77: AssertionError
+__ test_terminal_usage_survives_close_failure_without_unknown_reobservation ___
+
+    def test_terminal_usage_survives_close_failure_without_unknown_reobservation():
+        body, chunk = terminal()
+        observed = []
+        original = Original([chunk], close_error=True)
+        stream = Stream(original, observed.append)
+    
+        async def run():
+            iterator = stream.__aiter__()
+            try:
+                await anext(iterator)
+                with pytest.raises(RuntimeError, match="close failed"):
+                    await stream.aclose()
+                assert observed == [body]
+                assert original.finalized == 1
+            finally:
+                await iterator.aclose()
+    
+>       asyncio.run(run())
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_stream.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py:205: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\runners.py:128: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.research-tmp\python\cpython-3.14.7-windows-x86_64-none\Lib\asyncio\base_events.py:720: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        iterator = stream.__aiter__()
+        try:
+            await anext(iterator)
+            with pytest.raises(RuntimeError, match="close failed"):
+                await stream.aclose()
+            assert observed == [body]
+>           assert original.finalized == 1
+E           assert 0 == 1
+E            +  where 0 = <test_append_stream.Original object at 0x0000020DE29BEE90>.finalized
+
+..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_stream.py:96: AssertionError
+=========================== short test summary info ===========================
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_guard.py::test_constructor_delay_cannot_extend_the_original_absolute_deadline
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_stream.py::test_early_terminal_close_finalizes_owned_original_iterator_and_preserves_bytes
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_stream.py::test_unknown_read_error_is_observed_once_even_if_close_repeats
+FAILED ..\..\docs\experiments\product-validation\interview-plan-comparison-2026-10-07\diagnostics\test_append_stream.py::test_terminal_usage_survives_close_failure_without_unknown_reobservation
+4 failed, 4 passed in 1.97s

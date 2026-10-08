@@ -1,0 +1,41 @@
+{
+  "question_id": "e94d1eae17b843b5a36dc5a3a66d02cd",
+  "employee_text": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。",
+  "audit": {
+    "actual_question": "新人帶教內容已整理進目前 JD 草稿：第一週示範掃碼、揀貨和安全動線，再讓新人跟做；您觀察操作並填寫帶教檢核表，也負責判斷新人能否獨立上線。判斷標準目前尚未釐清。\n\n您剛才想起的盤點差異後續是什麼？可以從複點之後，接著由誰做什麼開始說；還不確定的部分仍保留未知。",
+    "employee_text": "回到盤點差異，我想到流程了：複點後我把差異、查過的單據和原因寫在盤點差異表，交倉儲主管核准；主管交財務調帳，我不能直接改庫存數量。結案前我核對更新後數量，若找不到原因保留待查。",
+    "fact_ids": [
+      "inventory-authority"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "inventory-authority"
+    ],
+    "review_mode": "answer",
+    "review_reason": "training 已在盤點缺口後正式披露並帶出回訪線索，現在明確回問複點後的流程與責任，inventory-authority 條件滿足；帶教段為摘要，不觸發更正。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false,
+    "subquestions": [
+      {
+        "quote": "您剛才想起的盤點差異後續是什麼？",
+        "mode": "answer",
+        "fact_ids": [
+          "inventory-authority"
+        ],
+        "reason": "直接回訪先前已開啟且現有可見線索的盤點後續缺口。"
+      },
+      {
+        "quote": "可以從複點之後，接著由誰做什麼開始說",
+        "mode": "answer",
+        "fact_ids": [
+          "inventory-authority"
+        ],
+        "reason": "凍結回答包含差異表、主管核准、財務調帳與本人結案核對等责任分工。"
+      }
+    ],
+    "refused_subquestions": [],
+    "clarify_subquestions": []
+  },
+  "actually_submitted": false
+}

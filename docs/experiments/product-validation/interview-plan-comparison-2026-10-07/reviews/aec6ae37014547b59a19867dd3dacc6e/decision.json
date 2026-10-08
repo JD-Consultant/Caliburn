@@ -1,0 +1,8 @@
+{
+  "question_id": "aec6ae37014547b59a19867dd3dacc6e",
+  "fact_ids": ["supplier-returns"],
+  "mode": "answer",
+  "reason": "實際問供應商退貨接手至交出的流程與交接，supplier-returns 的採購决定、退貨單備貨、登記出庫、承運商簽收及回採購直接相關，也更正是出庫。通常引發該退貨的具體情況沒有固定資料，不借收貨差異或客戶退貨原因補猜。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": ["通常在什麼情況下開始？"]
+}

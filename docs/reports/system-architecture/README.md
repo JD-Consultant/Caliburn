@@ -10,9 +10,9 @@ Caliburn 讓員工透過訪談描述實際工作，由 AI 顧問追問、分析�
 
 本報告描述團隊完成的本機產品 `apps/api`、`apps/web`。核心章節以 2026-10-02 的核對資料為基礎，本次整理至 2026-10-06，補入公版可選接線、職務檔案刪除、訪談控制、本機 Docker 交付及 JD 資料關係圖；各次實驗依原件標示版本與條件。產品尚未對外部署。
 
-既有合成訪談實驗完成 45 輪訪談、3 批 Memory 與 PDF 匯出；條件、發現與限制見[第七章](07-evaluation.md)。這些結果說明受測案例的流程與行為，分析品質須依各項評估分開判讀。
+受測合成訪談、Memory 及 PDF 匯出的條件、結果與限制見[第七章](07-evaluation.md)。本報告按上述日期解說系統，不作現行規則的第二份維護來源。
 
-現行狀態沿[目前決策](../../current-decisions.md)核對，詳細設計見[架構文件](../../target-architecture-map.md)。現行產品與舊架構的切換依 [ADR0079](../../adr/0079-target-rebuild-production-cutover.md)；實驗範圍與原件見[驗證範圍](../../architecture/verification.md)及[產品實驗](../../experiments/product-validation/README.md)。
+現行狀態沿[目前決策](../../current-decisions.md)核對，詳細設計見[架構文件](../../architecture/README.md)。現行產品與舊架構的切換依 [ADR0079](../../adr/0079-target-rebuild-production-cutover.md)；實驗範圍與原件見[驗證範圍](../../architecture/verification.md)及[產品實驗](../../experiments/product-validation/README.md)。
 
 ## 建議閱讀順序
 

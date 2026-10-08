@@ -1,0 +1,17 @@
+{
+  "execution_id": "aac77290-974d-4a90-a206-e21bbc04353c",
+  "exchange": {
+    "employee_input": {
+      "source_id": "8ed44700-fc17-4eee-9dad-08ac186da880",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "對，都屬於同一次核對，沒有另外負責的工作。這份內容沒錯，今天先到這裡。"
+    },
+    "consultant_reply": {
+      "source_id": "bb1632ad-e1be-47fb-899b-d33a8c1a6050",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "了解，今天先到這裡，不再追問。底稿目前整理為一項「出貨前核對」工作，並補上「依單」核對；掃碼不符時重掃、核對標籤，仍不符便記錄交主管處理，以及您不負責揀貨、裝箱或決定換貨的界線也都保留了。您確認目前沒有另外負責的工作；之後若想到需要補充或修正的地方，再告訴我即可。"
+    }
+  }
+}

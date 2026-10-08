@@ -1,0 +1,206 @@
+{
+  "pair_id": "W-A",
+  "cases": [
+    "4d54caac92074ce18f5351b23b7caaf8",
+    "8b1991cd9ea84de28b92ab1342b99e15"
+  ],
+  "order_meaning": "僅匿名 opaque 字典序，無組別意義",
+  "conclusion": "無可辨差異",
+  "scope": "依兩份已獨立鎖定的正式 JD 判讀，本組沒有足以改變主要工作範圍、權限、重要條件或實際用途的整體品質差異；不是文字、分組或引用安排完全相同，也不推論其他職位或後續場次。",
+  "reason": "兩份均正確涵蓋已取得的倉儲核心及重要低頻工作，盤點調帳與新人上線更正均有據入稿；也同樣尚未取得先到期先出、Excel 差異核對與重量判斷的必要專業。4d54 的晚班措辭及帶教職責引用較完整，但8b19已鎖判讀將這兩點限為非決定性差異；現有證據不足以據此判整份較好。沒有以任務數、篇幅、知識技能列數、來源層次或機制判優劣。",
+  "comparison_points": [
+    {
+      "dimension": "重要工作廣度",
+      "judgment": "重要範圍相當",
+      "evidence": "收貨上架、揀補貨、週盤點、客戶與供應商退貨、帶教、冷藏、旺季及年度盤點均有去處。年度工作由4d54 task 1470d24a-3b10-45b6-8de3-f64ac8e4d0d7、8b19 task 361d04c7-7e07-4932-9149-29bcecb8514a承載，兩者都保留十二月、財務、盤前儲位與單據，未編年度分區或表單。",
+      "public_source_ids": {
+        "4d54caac92074ce18f5351b23b7caaf8": [
+          "b6a6722a-21bb-433f-8a36-733675549a72"
+        ],
+        "8b1991cd9ea84de28b92ab1342b99e15": [
+          "41861427-1b78-4571-95b6-159bec8bd7d3"
+        ]
+      },
+      "locked_observations": [
+        "兩案 W01–W11"
+      ]
+    },
+    {
+      "dimension": "本人行動／判斷／責任邊界",
+      "judgment": "重要權限均正確",
+      "evidence": "4d54 task 90fe92a2-4e26-4db7-be0e-9058c5b72c4b 與8b19 task 42de1695-45c6-4b94-8510-ebcecfc361b9都寫明本人差異表、倉儲主管核准、財務調帳、本人不可直接改數量、結案核對及原因不明待查；沒有一方遺失已取得的後半段。",
+      "public_source_ids": {
+        "4d54caac92074ce18f5351b23b7caaf8": [
+          "9312c617-ae91-4713-8ed7-f7e6e7ad8cbf",
+          "0cb40f0d-0083-413e-af6e-84ad08d8ea94"
+        ],
+        "8b1991cd9ea84de28b92ab1342b99e15": [
+          "2bd25def-0400-4bbe-ae5b-120d7af90f46",
+          "97a464d8-5345-42bf-b232-ee2f64bf7ecc"
+        ]
+      },
+      "locked_observations": [
+        "兩案 W05"
+      ]
+    },
+    {
+      "dimension": "適用條件與更正",
+      "judgment": "重要更正均保留；一項小範圍措辭差異",
+      "evidence": "兩份帶教任務皆保留第一週示範與檢核，且以主管核准取代本人批准；供應商退貨均改為出庫，客戶退貨入庫仍保留。4d54 的揀補貨任務保留『晚班交接』，8b19 的獨立交班任務寫『交接時』；後者仍保留相同交班內容且沒有新增每日／所有班別義務，因此沿既鎖 W10 不把它升為 material 退步。",
+      "public_source_ids": {
+        "4d54caac92074ce18f5351b23b7caaf8": [
+          "60c989c1-706f-4c50-8b74-4192941dbd41",
+          "7399730b-e2af-4478-b202-923862b3b663",
+          "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+          "b6a6722a-21bb-433f-8a36-733675549a72"
+        ],
+        "8b1991cd9ea84de28b92ab1342b99e15": [
+          "a20a2874-41a8-4c99-be1d-5a9451e68e85",
+          "1e451c7d-a8ef-424b-b931-84995278ec48",
+          "8004724d-700c-4947-ac8f-590564bcf379",
+          "df3ca181-cfa0-49c6-b3c9-db17a66af9de"
+        ]
+      },
+      "locked_observations": [
+        "兩案 W07、W08、W10"
+      ]
+    },
+    {
+      "dimension": "成果／交接／必要要求",
+      "judgment": "主要交付相當，且有共同重要未取得資訊",
+      "evidence": "差異表、包裝複核、客退隔離／交品保、退供應商簽收回採購、溫度超標隔離與品保放行均可辨認。兩案 W12 都缺尚未公開取得的先到期先出、Excel 差異核對及重量判斷；此共同缺口不因一方技能列較多或另列安全動線知識而消失。",
+      "public_source_ids": {
+        "4d54caac92074ce18f5351b23b7caaf8": [
+          "d6d6649a-d796-4dd1-9e68-6158c3828adf",
+          "771de84b-45f5-4f88-88d1-35abc52434e9",
+          "11dcdb38-cb1e-4437-8b7a-c66e47223a1a",
+          "b6a6722a-21bb-433f-8a36-733675549a72"
+        ],
+        "8b1991cd9ea84de28b92ab1342b99e15": [
+          "4a65052b-da3c-47da-b5fd-e11ba5732b5f",
+          "2ae0255f-b501-4430-a300-1318ebae7c1c",
+          "8004724d-700c-4947-ac8f-590564bcf379",
+          "41861427-1b78-4571-95b6-159bec8bd7d3"
+        ]
+      },
+      "oracle_limit": "requirements 僅確認共同缺口的重要性，不作任一 JD 的公開事實來源。",
+      "locked_observations": [
+        "兩案 W04–W09、W12"
+      ]
+    },
+    {
+      "dimension": "無據內容與一致性",
+      "judgment": "未見決定性差異",
+      "evidence": "兩份均未將採購、財務、主管、品保或持堆高機證照同事的權限移給本人，未造時間 KPI、學歷或證照門檻。冷藏2–8°C與防寒衣由4d54的相關作業條件、8b19的冷藏任務分別承載，沒有因位置不同造成範圍遺失。",
+      "public_source_ids": {
+        "4d54caac92074ce18f5351b23b7caaf8": [
+          "ead68b78-6f3b-4d1d-a95e-083e038fb915",
+          "b6a6722a-21bb-433f-8a36-733675549a72"
+        ],
+        "8b1991cd9ea84de28b92ab1342b99e15": [
+          "a21eb957-63aa-48d6-87de-03690481a980",
+          "41861427-1b78-4571-95b6-159bec8bd7d3"
+        ]
+      },
+      "locked_observations": [
+        "兩案 W03、W05、W07–W09、W11–W12"
+      ]
+    },
+    {
+      "dimension": "來源支持與可回查",
+      "judgment": "兩案可回查；8b19 有一處非決定性欄位引用缺口",
+      "evidence": "4d54 固定引用與下層來源鏈可支持對應主張；8b19 的帶教職責直接引用2及20，少了支持第一週示範等內容的12，但同區任務有12及20，原話也完整可查。沿先鎖 W13 記為局部支撐鏈問題，非無據事實；不據來源形式、引用數或層數判整份品質。",
+      "public_source_ids": {
+        "4d54caac92074ce18f5351b23b7caaf8": [
+          "60c989c1-706f-4c50-8b74-4192941dbd41",
+          "7399730b-e2af-4478-b202-923862b3b663"
+        ],
+        "8b1991cd9ea84de28b92ab1342b99e15": [
+          "a20a2874-41a8-4c99-be1d-5a9451e68e85",
+          "1e451c7d-a8ef-424b-b931-84995278ec48"
+        ]
+      },
+      "locked_observations": [
+        "兩案 W13"
+      ]
+    }
+  ],
+  "constraints": [
+    "兩份單案原件不修改",
+    "零 provider",
+    "沒有解盲",
+    "不以成本、過程或機制評品質",
+    "本組限於兩份成品，無額外場次推論"
+  ],
+  "locked_source_cases": [
+    {
+      "case_id": "8b1991cd9ea84de28b92ab1342b99e15",
+      "case_json_sha256": "1ae034ce089e5d3b437f269569a4183e9c197cc75c10b83fe3498cc7151cb1b0",
+      "case_markdown_sha256": "f6137f0ef1543ce93d6f8debaf0c30f14a4f860148eca0f7aed04777cdebd0e6",
+      "bundle_path": "S:/caliburn/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/blind-input/8b1991cd9ea84de28b92ab1342b99e15.json",
+      "bundle_sha256": "9a0e00494a34e5f50da44b6b1289cd9213429d14d81abf384a38f2b96ca38326",
+      "formal_revision_id": "357aa1cd-36ee-4395-855b-729e8a7745df",
+      "criterion_and_guide_files": [
+        {
+          "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/blind-jd-rubric.md",
+          "sha256": "0a80b5fda821802d0de0f46384ae40ca9f16a5b875ceabac53abf43b9c456742"
+        },
+        {
+          "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/private_facts.json",
+          "sha256": "7455f4ac308e87ab4371a7f8c281890d44628ccf7c8aa0c3162e7be3ce8ac636"
+        },
+        {
+          "path": "docs/plans/evidence/interview-plan-2026-10-07/blind-jd-rubric.md",
+          "sha256": "13c14a856ba68b2ae9d2f325e1fe1266db987d2c64ea9cefb83d49a18423cec2"
+        },
+        {
+          "path": "docs/guides/2026-09-09-complete-work-analysis-guide.md",
+          "sha256": "a1f5bdac2d11ce1a11a045e47f96587299a64fdc99338e5d09eb550d5cbf7fe6"
+        },
+        {
+          "path": "docs/guides/2026-09-09-customized-jd-depth-and-interview-calibration.md",
+          "sha256": "46ed3a9944ba4502f7ce0c9fe2d02022a9c9468464069d3f095a91a3e74d8efc"
+        },
+        {
+          "path": "docs/guides/2026-09-09-jd-field-and-writing-guide.md",
+          "sha256": "78dc1527310d40040e0fd1c012b52be1bdefae369d7320cd679e35b94d5206cd"
+        }
+      ]
+    },
+    {
+      "case_id": "4d54caac92074ce18f5351b23b7caaf8",
+      "case_json_sha256": "f243d87cae3fb90b4d2429e0adb0ccbce363f6492a4f1abff6301221efbc6693",
+      "case_markdown_sha256": "c0f87531b0379b928753aaea8f5141f641f029695022ff8365bb993167f99d58",
+      "bundle_path": "S:\\caliburn\\docs\\experiments\\product-validation\\jd-work-plan-comparison-2026-10-07\\runs\\comparison-v2\\blind-input\\4d54caac92074ce18f5351b23b7caaf8.json",
+      "bundle_sha256": "5e228613aeeef717148675f1a304840516f730d3464d12670bf65fac27ecb56d",
+      "formal_revision_id": "d8383be3-c92a-43cc-b592-93b6d68e046c",
+      "criterion_and_guide_files": [
+        {
+          "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/blind-jd-rubric.md",
+          "sha256": "0a80b5fda821802d0de0f46384ae40ca9f16a5b875ceabac53abf43b9c456742"
+        },
+        {
+          "path": "docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/private_facts.json",
+          "sha256": "7455f4ac308e87ab4371a7f8c281890d44628ccf7c8aa0c3162e7be3ce8ac636"
+        },
+        {
+          "path": "docs/plans/evidence/interview-plan-2026-10-07/blind-jd-rubric.md",
+          "sha256": "13c14a856ba68b2ae9d2f325e1fe1266db987d2c64ea9cefb83d49a18423cec2"
+        },
+        {
+          "path": "docs/guides/2026-09-09-complete-work-analysis-guide.md",
+          "sha256": "a1f5bdac2d11ce1a11a045e47f96587299a64fdc99338e5d09eb550d5cbf7fe6"
+        },
+        {
+          "path": "docs/guides/2026-09-09-customized-jd-depth-and-interview-calibration.md",
+          "sha256": "46ed3a9944ba4502f7ce0c9fe2d02022a9c9468464069d3f095a91a3e74d8efc"
+        },
+        {
+          "path": "docs/guides/2026-09-09-jd-field-and-writing-guide.md",
+          "sha256": "78dc1527310d40040e0fd1c012b52be1bdefae369d7320cd679e35b94d5206cd"
+        }
+      ]
+    }
+  ],
+  "lock_status": "兩案獨立判讀已先鎖定；本配對與全部來源 hash 鎖定後完成，未解盲。"
+}

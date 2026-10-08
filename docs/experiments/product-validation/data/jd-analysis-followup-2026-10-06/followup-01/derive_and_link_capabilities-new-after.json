@@ -1,0 +1,297 @@
+{
+  "profile": {
+    "revision_id": "b53949a2-41af-49ee-86cb-896564537c14",
+    "profile": {
+      "job_title": "倉庫揀貨員",
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "依訂單完成正確揀貨，維持庫存作業可追查。"
+    }
+  },
+  "work": {
+    "revision_id": "b53949a2-41af-49ee-86cb-896564537c14",
+    "areas": [
+      {
+        "area_id": "0197c298-d9bf-46ce-9781-73c50ec10600",
+        "title": "揀貨與核對",
+        "scope_text": "揀貨、核對品項及回報庫存差異。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c",
+        "area_id": "0197c298-d9bf-46ce-9781-73c50ec10600",
+        "title": "揀貨並核對庫存",
+        "description": "依出貨單核對品項及數量，先進先出；異常先比對進出貨與儲位，記錄交主管確認，不自行改帳。",
+        "outcomes": [
+          {
+            "detail_id": "8bac546b-ea74-440d-b0a5-ef4f12bf7114",
+            "text": "完成依出貨單揀取並核對的貨品；如發現庫存差異，留下查核紀錄供主管確認。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "c2fe7d96-2397-405d-a537-368bd6c3860b",
+            "text": "依先進先出原則出貨；實貨與系統不一致時，先核對進出貨紀錄及儲位、記錄差異交主管確認，不自行更改數量。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [
+      {
+        "capability_id": "9dd73129-364e-4937-9bd2-bab406fb1ea9",
+        "kind": "knowledge",
+        "name": "庫存先進先出原則",
+        "description": "理解依入庫先後安排批次出貨的原則。"
+      },
+      {
+        "capability_id": "abcefc48-1d74-405e-b1fd-3348f92a4c4c",
+        "kind": "skill",
+        "name": "貨品核對與差異查核紀錄",
+        "description": "能依出貨單核對品名與數量；遇實貨與系統不一致時，比對進出貨紀錄及儲位並記錄差異，交主管確認。"
+      }
+    ],
+    "task_links": [
+      {
+        "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c",
+        "capability_id": "9dd73129-364e-4937-9bd2-bab406fb1ea9"
+      },
+      {
+        "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c",
+        "capability_id": "abcefc48-1d74-405e-b1fd-3348f92a4c4c"
+      }
+    ],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "b53949a2-41af-49ee-86cb-896564537c14",
+    "references": [
+      {
+        "citation_id": "5c622a88-f14d-4d46-95e1-fd8137072769",
+        "target_label": "任務：揀貨並核對庫存",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "ca33cd2e-b686-4ca0-b397-aa311269ad99",
+        "target_label": "任務：揀貨並核對庫存",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "ad21355e-16a9-404c-b2c9-eec515f25100",
+        "target_label": "任務：揀貨並核對庫存 · 成果：完成依出貨單揀取並核對的貨品；如發現庫存差異，留下查核紀錄供主管確認。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "8bac546b-ea74-440d-b0a5-ef4f12bf7114",
+          "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "caa7277b-22a4-4243-91d2-809a5b8c79e6",
+        "target_label": "任務：揀貨並核對庫存 · 成果：完成依出貨單揀取並核對的貨品；如發現庫存差異，留下查核紀錄供主管確認。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "8bac546b-ea74-440d-b0a5-ef4f12bf7114",
+          "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "5ec216c4-c9d9-448f-af14-df776a60ba9a",
+        "target_label": "任務：揀貨並核對庫存 · 要求：依先進先出原則出貨；實貨與系統不一致時，先核對進出貨紀錄及儲位、記錄差異交主管確認，不自行更改數量。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "c2fe7d96-2397-405d-a537-368bd6c3860b",
+          "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "eaffc8b2-0546-4d84-b75c-6e959d142721",
+        "target_label": "任務：揀貨並核對庫存 · 要求：依先進先出原則出貨；實貨與系統不一致時，先核對進出貨紀錄及儲位、記錄差異交主管確認，不自行更改數量。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "c2fe7d96-2397-405d-a537-368bd6c3860b",
+          "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "62af1a7d-b35f-474b-ae42-eec880b8b715",
+        "target_label": "知識：庫存先進先出原則",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "9dd73129-364e-4937-9bd2-bab406fb1ea9",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "984e40be-09a0-4fac-970b-6d349ad6fcef",
+        "target_label": "知識：庫存先進先出原則",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "9dd73129-364e-4937-9bd2-bab406fb1ea9",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "94278064-a6ab-4c56-a496-174a9d649e98",
+        "target_label": "技能：貨品核對與差異查核紀錄",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "abcefc48-1d74-405e-b1fd-3348f92a4c4c",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "c200be92-d9d8-4c54-bae1-8e8bdb3cb10d",
+        "target_label": "技能：貨品核對與差異查核紀錄",
+        "target": {
+          "kind": "capability",
+          "field": null,
+          "item_id": "abcefc48-1d74-405e-b1fd-3348f92a4c4c",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "091bc1a3-279c-4f44-8c51-b91b96c829ff",
+        "target_label": "任務：揀貨並核對庫存 · 使用：庫存先進先出原則",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "9dd73129-364e-4937-9bd2-bab406fb1ea9",
+          "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "de944afc-83b5-46c8-a85a-79eb3aae675e",
+        "target_label": "任務：揀貨並核對庫存 · 使用：庫存先進先出原則",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "9dd73129-364e-4937-9bd2-bab406fb1ea9",
+          "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "a8438094-4111-4cfc-ade8-cfa967713b16",
+        "target_label": "任務：揀貨並核對庫存 · 使用：貨品核對與差異查核紀錄",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "abcefc48-1d74-405e-b1fd-3348f92a4c4c",
+          "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "1e5e45a7-5765-4893-909e-91a783665feb",
+        "target_label": "任務：揀貨並核對庫存 · 使用：貨品核對與差異查核紀錄",
+        "target": {
+          "kind": "task_capability",
+          "field": null,
+          "item_id": "abcefc48-1d74-405e-b1fd-3348f92a4c4c",
+          "task_id": "9a6b40f8-9ccf-4b29-a9b0-880e9d49410c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "297ab3b2-2478-40f8-bf42-34ce76389a91",
+        "target_label": "職務名稱",
+        "target": {
+          "kind": "profile_field",
+          "field": "job_title",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

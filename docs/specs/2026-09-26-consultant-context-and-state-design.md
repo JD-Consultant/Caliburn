@@ -180,68 +180,9 @@
 
 下圖是**現行責任互動** ，不是部署圖、固定 middleware 排序或新服務清單。業務責任與執行責任可以在同一 App 後端實現。
 
-```mermaid
-sequenceDiagram
-    actor E as 員工
-    participant R as App 顧問執行流程
-    participant D as 業務與保存責任
-    participant O as OpenAI Responses
-    E->>R: 本次員工輸入 I（尚無正式訪談序號）
-    R->>D: 保存員工原話，不等待顧問回答
-    D-->>R: 保存成功已確認
-    R-->>E: 原話已保存；不表示本輪工作已完成
-    Note over R,D: 024：本輪輸入未成為共享訪談；JD 修改先在本輪候選內
-    Note over R,O: 尚未將新員工輸入加入舊視窗；前 Turn 已結束
-    opt 達門檻，或 Agent 已決定主動壓縮
-        R->>O: compact：完整既有視窗，不含新輸入 I
-        O-->>R: 完整 compacted.output
-        R->>D: 可靠保存並採用完整返回視窗，辨認本次要求已完成
-        D-->>R: 027：Compaction 安全點成立；尚無新輪輸入
-        Note over R,O: 全部 items 成為有效基底；新 Turn 回退不撤銷此成果
-    end
-    R->>D: 取得本輪範圍及最新完整 Memory 基準
-    D-->>R: 已發布版本、涵蓋訪談序號 K、本輪前有效歷史上界 H
-    Note over R,D: 本 Turn 的 Memory 與近期範圍共用同一基準
-    R->>D: 取得同基準導覽及 K 之後至 H 的近期歷史與必要前問
-    D-->>R: 本輪資料；訪談保留角色、來源及順序
-    Note over R,O: 歷史或完整壓縮視窗 → user App 資料 → user 員工輸入 I
-    loop 本輪模型與工具迭代
-        R->>O: 完整當前視窗與 request 層設定
-        O-->>R: response items
-        R->>D: 可靠保存完整原生輸出及工具原請求
-        D-->>R: 已保存；才可派送有副作用的工具
-        Note over R,O: 完整原生輸出依序追加，歷史不覆寫
-        opt 模型要求自有工具
-            R->>D: 經授權、驗證的讀取或操作
-            D-->>R: 讀取或候選修改的真實結果；不冒稱正式提交
-            Note over R,O: 按 call_id 配對並追加；交下一請求接續
-        end
-        Note over R,D: 每個 Step 的接續與候選一致可靠保存，才成立 Step 安全點
-        opt 已要求暫停
-            R-->>E: 已停在 Step 安全點；等待繼續同一 Turn
-            E->>R: 繼續
-        end
-        opt 確實要繼續模型且達 160K
-            R->>O: standalone compact 當前完整視窗
-            O-->>R: 完整 compacted.output
-            R->>D: 可靠採用輪中基底，不重加本輪輸入或刷新 Memory
-        end
-    end
-    Note over R,E: 生成中可暫示片段，不等於完整正式答覆已保存
-    alt 已形成完整正式答覆
-        R->>D: 可靠保存答覆，確認本輪候選與有效訪談一致生效
-        Note over R,D: 短交易與原操作核對依資料／共用執行契約
-        alt 本輪完成結果已確認
-            D-->>R: 下一安全點成立；原答覆與正式結果可查回
-            R-->>E: 確認本輪完成；UI 斷線後讀取同一結果
-        else 完成結果未確認
-            R-->>E: 不承諾完成或回退；先核對原結果
-        end
-    else 尚無完整正式答覆
-        R-->>E: 說明未完成，與原話及業務操作結果分開呈現
-    end
-    Note over R,O: 完成路徑保留接續；取消路徑不承接。輪前壓縮為主；完整 Step 間依 160K 保險主動壓縮
-```
+![現行時序：顧問 Context 與正常 Turn 生命週期](../diagrams/specs/2026-09-26-consultant-context-and-state-design/consultant-turn-sequence.png)
+
+[圖源](../diagrams/specs/2026-09-26-consultant-context-and-state-design/consultant-turn-sequence.mmd) · [SVG](../diagrams/specs/2026-09-26-consultant-context-and-state-design/consultant-turn-sequence.svg)
 
 
 ### 完成安全點與恢復範圍
@@ -269,32 +210,13 @@ sequenceDiagram
 
 唯一產品政策見 [025／026](../product-concept.md#上下文與分析接續)及 [027](../product-concept.md#上下文與分析接續)。每個 Step 都支援恢復；Step 對應 node／task、保存與還原候選由共用執行維護。**完成 Turn 點確認正式成果；Compaction 點保存新輸入前的接續基底；Step 點保存本輪工作進度。** 三者是不同的安全邊界，不要求三套保存元件。
 
-```mermaid
-flowchart TD
-    T[上一 Turn 完全結束] --> B[目前有效基底；不含新輪輸入]
-    B -->|準備新 Turn；含重試 a 或改送 b| K{依目前基底檢查門檻或尚未完成壓縮要求}
-    K -->|需要| C[壓縮完整舊視窗；可靠保存並確認採用：Compaction 安全點]
-    C -.更新有效基底及要求完成狀態.-> B
-    C --> I[新 Turn：取得新輪基準；追加 App 資料及員工輸入]
-    K -->|不需要| I
-    I --> S[執行本輪 Step]
-    S --> P[接續與候選一致可靠保存：Step 安全點]
-    P --> Q{後續行動}
-    Q -->|繼續分析| S
-    Q -->|已要求暫停| H[停妥；保留同輪 context、原導覽與候選]
-    H -->|使用者繼續| S
-    Q -->|收尾| F[依 024 完成提交與答覆保存]
-    F --> N[下一完成 Turn 安全點]
-    S -->|意外中斷| R{核對同輪已保存的回應、工具結果及候選}
-    R -->|本步可接續；不分 Step 編號| E[保留原輸入與基準；承接本步已保存結果]
-    E -->|依恢復政策允許續作| S
-    R -->|確無同輪可用恢復位置| X[放棄失敗輪輸入、分析與候選的有效接續]
-    X --> B
-    R -->|本步不可接續；已有完整 Step 點| H
-    H -->|取消整輪| X
-```
+![現行基本流程：Turn、Step 安全點與恢復](../diagrams/specs/2026-09-26-consultant-context-and-state-design/turn-step-recovery.png)
 
-圖中的實線是執行／恢復路徑，虛線只表示更新基底；不授權重開後自動執行模型。取消依 024 核對提交競爭與阻止遲到結果；已完成 Turn 就承接原結果。Step 1 與後續 Step 都先承接可核對的內部恢復紀錄；尚無完整 Step 不等於無法接續。只有確無可用的同輪恢復位置，或整輪已放棄，才回上一完成 Turn 的有效基底：保留已採用 C，不含失敗輪輸入。這時重試原文字或提交 b 才建立新 Turn、新基準；同輪恢復仍保留原輸入與綁定。原保存紀錄與去重／對帳證據不因退出有效接續就刪除，也不能成為其他 Agent 的有效來源。
+[圖源](../diagrams/specs/2026-09-26-consultant-context-and-state-design/turn-step-recovery.mmd) · [SVG](../diagrams/specs/2026-09-26-consultant-context-and-state-design/turn-step-recovery.svg)
+
+圖為現行跨 Turn 與完整 Step 的代表控制流程，實線箭頭只表示接續方向。壓縮採用的資料更新寫在動作內，不另畫成第二條控制回路；取消與正式完成的競爭仍沿[共用控制狀態](2026-09-27-shared-agent-execution-and-state-design.md#控制與故障的狀態視圖)，此圖不限制取消只能在已暫停時受理。
+
+圖中的實線是執行／恢復路徑，不授權重開後自動執行模型。取消依 024 核對提交競爭與阻止遲到結果；已完成 Turn 就承接原結果。Step 1 與後續 Step 都先承接可核對的內部恢復紀錄；尚無完整 Step 不等於無法接續。只有確無可用的同輪恢復位置，或整輪已放棄，才回上一完成 Turn 的有效基底：保留已採用 C，不含失敗輪輸入。這時重試原文字或提交 b 才建立新 Turn、新基準；同輪恢復仍保留原輸入與綁定。原保存紀錄與去重／對帳證據不因退出有效接續就刪除，也不能成為其他 Agent 的有效來源。
 
 **壓縮安全點的採用與重用：** 上圖 C 只有完整返回視窗可靠保存、採用已確認才成立；失敗或確認遺失依 §7.2 核對，不先追加新輪內容／推論。回退後 K 讀的是已採用基底及尚未完成的要求，不拿舊容量或歷史中已承接的 Agent 要求重新觸發；不用改寫歷史輸出。這是防止取消造成重複壓縮的產品接線要求，不是新增 registry／receipt，也不把壓縮視為免費。若結果確實未保存而遺失，不能承諾免重算；若採用後仍容量不足，也不能從圖推導無界反覆壓縮，處置仍依容量設計。
 

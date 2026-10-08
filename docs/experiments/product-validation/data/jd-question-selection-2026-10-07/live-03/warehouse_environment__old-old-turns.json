@@ -1,0 +1,557 @@
+{
+  "arm": "old",
+  "case_id": "warehouse_environment__old",
+  "job_file_id": "fadab065-8263-4861-94ca-571593834fc7",
+  "before": {
+    "profile": {
+      "revision_id": "cb28de27-6d80-49b0-a1ff-6a8ca4f4cb86",
+      "profile": {
+        "job_title": null,
+        "organization_unit": "物流中心",
+        "reports_to": "倉儲主管",
+        "purpose": "核對到貨並依安排完成貨品上架與入庫登記，及時回報差異，以維持入庫與庫存紀錄的正確性。"
+      }
+    },
+    "work": {
+      "revision_id": "cb28de27-6d80-49b0-a1ff-6a8ca4f4cb86",
+      "areas": [
+        {
+          "area_id": "bd3e9f29-08ed-44f4-b3e4-6e45db058016",
+          "title": "收貨與上架",
+          "scope_text": "收貨後核對採購單、送貨單及實貨；不符時停下查核並交主管與採購確認，依安排完成搬運、上架及入庫紀錄。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd",
+          "area_id": "bd3e9f29-08ed-44f4-b3e4-6e45db058016",
+          "title": "收貨核對、搬運與上架",
+          "description": "核對採購單、送貨單與實際到貨品項及數量；符合後依主管安排的儲位搬運上架，掃描條碼確認品項、貼標籤並在庫存系統登記。品項或數量不符時先停下、核對單據並拍照回報主管與採購，再依確認的安排處理；不自行決定收退。自行搬箱最重約十五公斤，亦操作堆高機。",
+          "outcomes": [
+            {
+              "detail_id": "6aaee997-37ad-40fe-98b2-2095de0a966a",
+              "text": "核對無誤的貨品依安排放入儲位，完成條碼確認、貼標及庫存系統入庫紀錄，作為收貨與上架完成的紀錄。"
+            }
+          ],
+          "requirements": [
+            {
+              "detail_id": "2038e60b-74e1-4c21-b7aa-bd68b7f697d1",
+              "text": "品項或數量不符時先停止後續上架，核對單據並拍照交主管與採購；依確認的安排處理，收退由採購決定，員工不自行決定。"
+            },
+            {
+              "detail_id": "1951fbb9-5e74-4872-bc04-ee5cb896db7f",
+              "text": "自行搬箱最重約十五公斤；操作堆高機須有操作證照，公司安排考照。"
+            }
+          ]
+        }
+      ],
+      "capabilities": [
+        {
+          "capability_id": "6b513413-11e5-4fd9-b1c7-889d291f0777",
+          "kind": "knowledge",
+          "name": "收貨單據與庫存入帳規則",
+          "description": "理解採購單、送貨單與實際到貨品項及數量的核對方式，以及條碼確認、標籤和庫存系統入庫紀錄的要求。"
+        },
+        {
+          "capability_id": "ce4dbba4-37f2-42df-9180-6dbb32eca418",
+          "kind": "skill",
+          "name": "到貨核對與入庫作業",
+          "description": "核對到貨品項與數量、辨識不符並停下查核及回報，依安排完成條碼確認、貼標與系統入庫登記。"
+        }
+      ],
+      "task_links": [
+        {
+          "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd",
+          "capability_id": "6b513413-11e5-4fd9-b1c7-889d291f0777"
+        },
+        {
+          "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd",
+          "capability_id": "ce4dbba4-37f2-42df-9180-6dbb32eca418"
+        }
+      ],
+      "collaborators": [
+        {
+          "collaborator_id": "8bc2acf8-064c-4d8b-b95f-31bfb507e9d5",
+          "name": "倉儲主管",
+          "scope_text": "依主管安排的儲位上架；到貨品項或數量不符時，核對單據、拍照並向主管及採購回報，再依確認的安排處理。"
+        },
+        {
+          "collaborator_id": "8b9af071-af79-4540-94b9-0e8c75a9486f",
+          "name": "採購",
+          "scope_text": "到貨品項或數量不符時接收核對結果及照片；收退由採購決定，員工依確認的安排處理，不自行決定收退。"
+        }
+      ],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "cb28de27-6d80-49b0-a1ff-6a8ca4f4cb86",
+      "references": [
+        {
+          "citation_id": "ed941f77-9b4f-4d63-8cf8-66d8c2623d26",
+          "target_label": "任務：收貨核對、搬運與上架",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "eb50a095-61c7-48b0-9ac0-ac7f0019498d",
+          "target_label": "知識：收貨單據與庫存入帳規則",
+          "target": {
+            "kind": "capability",
+            "field": null,
+            "item_id": "6b513413-11e5-4fd9-b1c7-889d291f0777",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "f5d9ad4e-be69-4233-88a1-e47744852b08",
+          "target_label": "知識：收貨單據與庫存入帳規則",
+          "target": {
+            "kind": "capability",
+            "field": null,
+            "item_id": "6b513413-11e5-4fd9-b1c7-889d291f0777",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "ad175522-8af1-4b26-99bc-89df45e723e0",
+          "target_label": "技能：到貨核對與入庫作業",
+          "target": {
+            "kind": "capability",
+            "field": null,
+            "item_id": "ce4dbba4-37f2-42df-9180-6dbb32eca418",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "0ca7aa5d-1de6-467d-bacd-f66fd51ed48c",
+          "target_label": "技能：到貨核對與入庫作業",
+          "target": {
+            "kind": "capability",
+            "field": null,
+            "item_id": "ce4dbba4-37f2-42df-9180-6dbb32eca418",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "b6825512-b092-41aa-b46b-562371c88dfd",
+          "target_label": "協作：倉儲主管",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "8bc2acf8-064c-4d8b-b95f-31bfb507e9d5",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "61fa4726-1265-4070-9250-e696ba0aac99",
+          "target_label": "協作：採購",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "8b9af071-af79-4540-94b9-0e8c75a9486f",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "7fc04eb2-1233-4f1e-bf7d-c17b8074cbf3",
+          "target_label": "協作：採購",
+          "target": {
+            "kind": "collaborator",
+            "field": null,
+            "item_id": "8b9af071-af79-4540-94b9-0e8c75a9486f",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "42e989a8-c790-4af0-a63f-f04c07fcdb29",
+          "target_label": "任務：收貨核對、搬運與上架 · 使用：收貨單據與庫存入帳規則",
+          "target": {
+            "kind": "task_capability",
+            "field": null,
+            "item_id": "6b513413-11e5-4fd9-b1c7-889d291f0777",
+            "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "b48fc439-9ea3-4dd2-97f1-51cdcd2af982",
+          "target_label": "任務：收貨核對、搬運與上架 · 使用：收貨單據與庫存入帳規則",
+          "target": {
+            "kind": "task_capability",
+            "field": null,
+            "item_id": "6b513413-11e5-4fd9-b1c7-889d291f0777",
+            "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "e89515de-0689-4cab-a8b2-90df750f81b0",
+          "target_label": "任務：收貨核對、搬運與上架 · 使用：到貨核對與入庫作業",
+          "target": {
+            "kind": "task_capability",
+            "field": null,
+            "item_id": "ce4dbba4-37f2-42df-9180-6dbb32eca418",
+            "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "bd5f3e5d-0d0c-4f35-add5-6afe4f08cfdc",
+          "target_label": "任務：收貨核對、搬運與上架 · 使用：到貨核對與入庫作業",
+          "target": {
+            "kind": "task_capability",
+            "field": null,
+            "item_id": "ce4dbba4-37f2-42df-9180-6dbb32eca418",
+            "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "f2b43107-15bd-4e7b-b57b-5437e0ebe802",
+          "target_label": "任務：收貨核對、搬運與上架",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "a2d13177-5ffc-47b1-bae0-d0454225c198",
+          "target_label": "任務：收貨核對、搬運與上架",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "7de71574-07c4-430b-a0ed-ef505f36adb9",
+          "target_label": "任務：收貨核對、搬運與上架 · 成果：核對無誤的貨品依安排放入儲位，完成條碼確認、貼標及庫存系統入庫紀錄，作為收貨與上架完成的紀錄。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "6aaee997-37ad-40fe-98b2-2095de0a966a",
+            "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "81db08e3-6233-4100-a029-3b68f20d7e62",
+          "target_label": "任務：收貨核對、搬運與上架 · 成果：核對無誤的貨品依安排放入儲位，完成條碼確認、貼標及庫存系統入庫紀錄，作為收貨與上架完成的紀錄。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "6aaee997-37ad-40fe-98b2-2095de0a966a",
+            "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "f8d28837-46cf-4956-9d7e-31229892c314",
+          "target_label": "任務：收貨核對、搬運與上架 · 要求：品項或數量不符時先停止後續上架，核對單據並拍照交主管與採購；依確認的安排處理，收退由採購決定，員工不自行決定。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "2038e60b-74e1-4c21-b7aa-bd68b7f697d1",
+            "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "5e951321-35a7-4127-b18c-d4f6378632a4",
+          "target_label": "任務：收貨核對、搬運與上架 · 要求：品項或數量不符時先停止後續上架，核對單據並拍照交主管與採購；依確認的安排處理，收退由採購決定，員工不自行決定。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "2038e60b-74e1-4c21-b7aa-bd68b7f697d1",
+            "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "f79417b1-b9cc-4093-9eac-0e69365aeb7e",
+          "target_label": "任務：收貨核對、搬運與上架 · 要求：自行搬箱最重約十五公斤；操作堆高機須有操作證照，公司安排考照。",
+          "target": {
+            "kind": "detail",
+            "field": null,
+            "item_id": "1951fbb9-5e74-4872-bc04-ee5cb896db7f",
+            "task_id": "4b4c2db1-e611-423e-b28a-61edbeee4bcd"
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "a4761dd6-a754-4472-825a-ca156e1f494f",
+          "target_label": "職責：收貨與上架",
+          "target": {
+            "kind": "area",
+            "field": null,
+            "item_id": "bd3e9f29-08ed-44f4-b3e4-6e45db058016",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "8c56ada4-163e-4bc7-9bd0-df6765dde1ab",
+          "target_label": "職責：收貨與上架",
+          "target": {
+            "kind": "area",
+            "field": null,
+            "item_id": "bd3e9f29-08ed-44f4-b3e4-6e45db058016",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "046e58f5-854f-4555-a3e0-2cb3cd36d16a",
+          "target_label": "所屬單位",
+          "target": {
+            "kind": "profile_field",
+            "field": "organization_unit",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "b4d8fda3-e586-46d1-b786-f9e86c9ff2c7",
+          "target_label": "直屬主管",
+          "target": {
+            "kind": "profile_field",
+            "field": "reports_to",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        },
+        {
+          "citation_id": "d68fb9e4-5007-4f7d-9cb2-34571456476f",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": true,
+          "jd_changed": true,
+          "source_changed": false
+        },
+        {
+          "citation_id": "aeafe743-eb64-49e5-8d24-8046108e196c",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 4 · 員工",
+          "needs_recheck": true,
+          "jd_changed": true,
+          "source_changed": false
+        },
+        {
+          "citation_id": "a35cd1d3-cf6e-4483-900f-b0867b65ac76",
+          "target_label": "職務目的",
+          "target": {
+            "kind": "profile_field",
+            "field": "purpose",
+            "item_id": null,
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 6 · 員工",
+          "needs_recheck": true,
+          "jd_changed": true,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "base_case_id": "warehouse_environment",
+  "turns": [
+    {
+      "execution_id": "96904105-cc42-4a91-88f4-92f55e4e9d9f",
+      "exchange": {
+        "employee_input": {
+          "source_id": "23a28f06-3a1a-48a0-b318-581a4e16b184",
+          "interview_sequence": 10,
+          "speaker": "employee",
+          "interview_text": "這個細節我目前說不清楚，也沒有其他能確認的資料。已說過的工作範圍仍一樣，其他事情可以試著說。"
+        },
+        "consultant_reply": {
+          "source_id": "b27e0194-0c61-4224-aac6-b9c050cd7778",
+          "interview_sequence": 11,
+          "speaker": "consultant",
+          "interview_text": "了解，堆高機證照目前是否已取得先留待確認，不會寫成已取得；已說明的工作範圍也維持不變。\n\n我想再查一個可能影響工作要求的面向：**一年中是否有到貨高峰，讓收貨、搬運或上架的工作量，或完成時限明顯改變？**"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "total_tokens": 0,
+    "outbound_calls": 0,
+    "count_calls": 0,
+    "generation_calls": 0,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 0,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.042744885",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0",
+    "actual_estimated_usd": "0",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0",
+    "cumulative_occupied_usd": "0",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 0.14358139999967534,
+    "seconds_limit": 406,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 20743,
+    "output_tokens": 1010,
+    "reasoning_tokens": 917,
+    "cached_input_tokens": 19612,
+    "cache_write_input_tokens": 1128,
+    "total_tokens": 21753,
+    "outbound_calls": 3,
+    "count_calls": 2,
+    "generation_calls": 1,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 20743,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.042744885",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0002",
+    "actual_estimated_usd": "0.000842420",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.001042420",
+    "cumulative_occupied_usd": "0.001042420",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 14.011813199998869,
+    "seconds_limit": 406,
+    "stop_reason": null
+  }
+}

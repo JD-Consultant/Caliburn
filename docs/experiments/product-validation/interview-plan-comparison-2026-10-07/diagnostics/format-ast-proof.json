@@ -1,0 +1,11 @@
+{
+  "before": {
+    "append_batch.py": "f24e9417bd4af8202987f09dfd2384778e05865c38ce75d2eb230c65bf9abaee",
+    "append_stream.py": "7d853b217d96959e6cf74ad644b4365122875d06d23a7f57370109c287683223"
+  },
+  "after": {
+    "append_batch.py": "f24e9417bd4af8202987f09dfd2384778e05865c38ce75d2eb230c65bf9abaee",
+    "append_stream.py": "7d853b217d96959e6cf74ad644b4365122875d06d23a7f57370109c287683223"
+  },
+  "only_new_append_source_formatted": true
+}

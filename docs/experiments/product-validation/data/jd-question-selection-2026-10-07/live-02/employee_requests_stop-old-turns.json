@@ -1,0 +1,134 @@
+{
+  "arm": "old",
+  "case_id": "employee_requests_stop",
+  "job_file_id": "1428f260-7ca9-4aff-aef2-7408ec5450e0",
+  "before": {
+    "profile": {
+      "revision_id": "8eb4a23a-405c-4bc6-9229-408688633a63",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "依安排上架並登記庫存，異常交主管處理。"
+      }
+    },
+    "work": {
+      "revision_id": "8eb4a23a-405c-4bc6-9229-408688633a63",
+      "areas": [
+        {
+          "area_id": "2d6a77b1-9d5c-43e6-b389-f75de7c1d8f7",
+          "title": "上架與登記",
+          "scope_text": "照安排上架及異常交接。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "28a1494b-06b6-48e0-a817-66c0b1c7c66e",
+          "area_id": "2d6a77b1-9d5c-43e6-b389-f75de7c1d8f7",
+          "title": "上架並登記庫存",
+          "description": "照安排搬運、上架及登記，差異先通知主管，不自行更改儲位；搬箱最重約十五公斤。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "8eb4a23a-405c-4bc6-9229-408688633a63",
+      "references": [
+        {
+          "citation_id": "befb5a06-cba6-4b20-a399-401d355d7c32",
+          "target_label": "任務：上架並登記庫存",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "28a1494b-06b6-48e0-a817-66c0b1c7c66e",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "5068a1a6-1aa4-45f9-bcfb-8ac6964e6bd9",
+      "exchange": {
+        "employee_input": {
+          "source_id": "8e131a1c-3e46-49cd-9b81-49f3ab77d87e",
+          "interview_sequence": 4,
+          "speaker": "employee",
+          "interview_text": "今天累了，現在先結束，不要再問了。我之後想到再補。"
+        },
+        "consultant_reply": {
+          "source_id": "54dd9389-beaa-4df7-a834-852e02ee0ca5",
+          "interview_sequence": 5,
+          "speaker": "consultant",
+          "interview_text": "好的，今天先到這裡，不再提問。\n\n目前已知您依安排上架並登記，發現差異時通知主管、不自行更改儲位；平時也會搬運箱子，最重約 15 公斤。之後想到其他工作或想補充時，再接著整理即可。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 1073152,
+    "output_tokens": 57025,
+    "reasoning_tokens": 42639,
+    "cached_input_tokens": 984112,
+    "cache_write_input_tokens": 88818,
+    "total_tokens": 1130177,
+    "outbound_calls": 148,
+    "count_calls": 74,
+    "generation_calls": 74,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 1073152,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0074",
+    "actual_estimated_usd": "0.049478070",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.056878070",
+    "cumulative_occupied_usd": "0.056878070",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 763.500460999996,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 1085141,
+    "output_tokens": 57270,
+    "reasoning_tokens": 42805,
+    "cached_input_tokens": 995799,
+    "cache_write_input_tokens": 89117,
+    "total_tokens": 1142411,
+    "outbound_calls": 150,
+    "count_calls": 75,
+    "generation_calls": 75,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 1085141,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0075",
+    "actual_estimated_usd": "0.049755115",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.057255115",
+    "cumulative_occupied_usd": "0.057255115",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 770.984343899996,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

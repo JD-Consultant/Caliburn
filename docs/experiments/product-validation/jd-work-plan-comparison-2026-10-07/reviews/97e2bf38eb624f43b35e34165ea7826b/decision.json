@@ -1,0 +1,34 @@
+{
+  "question_id": "97e2bf38eb624f43b35e34165ea7826b",
+  "mode": "answer",
+  "fact_ids": [
+    "inventory-authority"
+  ],
+  "reason": "盤點缺口後 training 已正式披露並帶出可見回訪線索，當下明確回訪複點後差異流程及調帳核准權責，符合 inventory-authority 條件；帶教權限段只是摘要。",
+  "subquestions": [
+    {
+      "quote": "您想起盤點差異後的哪些細節？",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "直接回訪已開啟且已有線索的盤點後續。"
+    },
+    {
+      "quote": "您會怎麼處理或交接",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "凍結事實包含差異表、單據原因與提交倉儲主管。"
+    },
+    {
+      "quote": "之後由誰調帳、誰批准？",
+      "mode": "answer",
+      "fact_ids": [
+        "inventory-authority"
+      ],
+      "reason": "主管核准並交財務調帳的責任分工可回答，本人不直接改庫存。"
+    }
+  ]
+}

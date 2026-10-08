@@ -1,0 +1,59 @@
+{
+  "completed": [
+    {
+      "arm": "old",
+      "case_id": "warehouse_environment__old"
+    },
+    {
+      "arm": "new",
+      "case_id": "warehouse_environment__new"
+    },
+    {
+      "arm": "new",
+      "case_id": "warehouse_errors__new"
+    },
+    {
+      "arm": "old",
+      "case_id": "warehouse_load__old"
+    },
+    {
+      "arm": "new",
+      "case_id": "warehouse_load__new"
+    },
+    {
+      "arm": "old",
+      "case_id": "accounting_errors__old"
+    },
+    {
+      "arm": "old",
+      "case_id": "software_load__old"
+    }
+  ],
+  "accounting": {
+    "input_tokens": 316328,
+    "output_tokens": 8628,
+    "reasoning_tokens": 6633,
+    "cached_input_tokens": 301059,
+    "cache_write_input_tokens": 15221,
+    "total_tokens": 324956,
+    "outbound_calls": 39,
+    "count_calls": 23,
+    "generation_calls": 16,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 316328,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.042744885",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0023",
+    "actual_estimated_usd": "0.009232015",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.011532015",
+    "cumulative_occupied_usd": "0.011532015",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 143.22733280000102,
+    "seconds_limit": 406,
+    "stop_reason": null
+  }
+}

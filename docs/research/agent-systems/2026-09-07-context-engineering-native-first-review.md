@@ -1,13 +1,15 @@
 # Q019／CT-02：原生優先的 Context 管理接續審閱
 
+> 時點說明：本文保留 2026-09-07 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 > 2026-09-07 · **Owner 已核准 CT-02 接法與隔離窄修（G7）；產品正常訪談尚待驗收。**
 > 入口：[current decisions](../../current-decisions.md)。本頁只持有 Context 接法取捨，不重寫 Memory ABC、訪談分析方法或 Provider 真測紀錄。
 
-**實作接續：**已完成核准的native/exact窄修，547項離線／PG通過，真服務入口三輪樣本成功。12次小額額度已用完；獨立Memory回查及真壓縮仍未驗成，不能把本頁設計核准當作全部效果通過。只看[最新短結果](../../.worktrees/analysis-only-agent/docs/specs/2026-09-07-native-context-normal-interview-results.md)取得用量、證據與剩餘問題；以下待核准文字是原研究沿革。
+**實作接續：**已完成核准的native/exact窄修，547項離線／PG通過，真服務入口三輪樣本成功。12次小額額度已用完；獨立Memory回查及真壓縮仍未驗成，不能把本頁設計核准當作全部效果通過。只看[最新短結果](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-native-context-normal-interview-results.md)取得用量、證據與剩餘問題；以下待核准文字是原研究沿革。
 
 ## 1. 本輪範圍與重開依據
 
-**接續核准：**Owner「同意，然後優化到可以正常訪談」，並更正是「正常訪談」而非擴大長訪談壓測。以下原始研究的「待核准」為沿革；推薦 CT-02 已核准，只改隔離版。真測另核准最多12次模型請求、US$0.10費用預留，達界線停止，不沿用先前已結束的額度。施工／實測結果由[窄修計畫](../../.worktrees/analysis-only-agent/docs/plans/2026-09-07-native-context-normal-interview.md)及其結果路由持有。
+**接續核准：**Owner「同意，然後優化到可以正常訪談」，並更正是「正常訪談」而非擴大長訪談壓測。以下原始研究的「待核准」為沿革；推薦 CT-02 已核准，只改隔離版。真測另核准最多12次模型請求、US$0.10費用預留，達界線停止，不沿用先前已結束的額度。施工／實測結果由[窄修計畫](../../history.md#source-7372f2896b10d161f8bd)及其結果路由持有。
 
 **底層補核：**Deep Agents 0.7.13 `FilesystemMiddleware._create_read_file_tool` 本身會呼叫 `_truncate_paginated_read`，使用設定的4000 token近似值作16000字元限制，按完整來源行重算續讀offset；即使未註冊middleware hooks也有這個tool內限制。grep亦有工具層格式化截量。保留官方工具，不因F4的待核項誤加第二套裁切。這仍不是完整request的精確token保證；單一極長來源行可能只能回大小警告，不能宣稱任意檔案已可完整續讀。
 
@@ -16,7 +18,7 @@
 - **有效約束：**隔離只分析版；保留原生 reasoning、canonical 訪談原文、ABC Memory 與既有工具／呼叫限制。不接 JD／production，不重新比較框架。
 - **重開原因：**實測 `/responses/input_tokens` 404 阻塞產品；Owner 詢問為何必須精確計數，並同意研究 OpenAI／Anthropic／框架的 Context Engineering。這是重審 CT-01 的接法，不是否定 Context 預算。
 - **唯一決策題：**是否將「每次生成前遠端精確計數」改為選用輔助，以原生壓縮、可控資料量、實際 usage 與安全失敗管理 Context？具體切換仍待核准。
-- **已讀路由：**[Provider 契約與真測入口](2026-09-07-analysis-provider-capability-review.md)、[CT-01 實作結果](../../.worktrees/analysis-only-agent/docs/specs/2026-09-07-context-budget-and-analysis-skills-results.md)、[既有原文／預算研究](2026-09-06-context-window-retention-and-budget-wiring-review.md)、[新版 Runtime 設計](../../history.md#source-97506ed55d64022fadf0)。不讀被 Owner 排除的 08-12 產品長稿。
+- **已讀路由：**[Provider 契約與真測入口](2026-09-07-analysis-provider-capability-review.md)、[CT-01 實作結果](../../experiments/historical/20260918-analysis-only-agent/reports/2026-09-07-context-budget-and-analysis-skills-results.md)、[既有原文／預算研究](2026-09-06-context-window-retention-and-budget-wiring-review.md)、[新版 Runtime 設計](../../history.md#source-97506ed55d64022fadf0)。不讀被 Owner 排除的 08-12 產品長稿。
 
 ## 2. 官方事實，不把 API 名稱當效果保證
 
@@ -36,9 +38,9 @@
 
 基準：隔離 worktree `analysis-only-agent`，HEAD `82ac2266058cfd2ff708ac83e937b24179f7b1cb`；本輪沒有修改 src/tests。已核對 lock：LangChain 1.4.0、langchain-core 1.6.2、langchain-openai 1.6.0、LangGraph 1.2.11、Deep Agents 0.7.13、OpenAI SDK 3.8.0。這是**實際安裝版本**，不是聲稱全部都是今日最新版本。
 
-1. **CT-02-F1／阻塞，已確認。**[budget.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/budget.py) 對最終 SDK body 做遠端 count；[api.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/api.py) 將它設為 A／B1／B2 每次生成的必要 hook。因此多一次 HTTP 往返及失敗點；是本案保守取捨，不是 LangChain 或 OpenAI 強制。不得把取消 count 就說成 gateway 原生壓縮已修復。
+1. **CT-02-F1／阻塞，已確認。**[budget.py](../../history.md#source-fc58414839bdada7f1fc) 對最終 SDK body 做遠端 count；[api.py](../../experiments/historical/20260918-analysis-only-agent/evidence/jd-editor-task6/source/experiments/analysis-agent/src/analysis_agent/api.py) 將它設為 A／B1／B2 每次生成的必要 hook。因此多一次 HTTP 往返及失敗點；是本案保守取捨，不是 LangChain 或 OpenAI 強制。不得把取消 count 就說成 gateway 原生壓縮已修復。
 2. **CT-02-F2／替代計數器限制，已確認。**本地 `langchain_openai/chat_models/base.py:2289–2388` 的 `get_num_tokens_from_messages` 明示忽略 tool schemas；`langchain_core/messages/utils.py:2244–2420` 的 `count_tokens_approximately(..., tools=...)` 可算工具，但仍是字元近似，部分未知 content 用 `repr` 長度。encrypted item 字串長度不等於服務端 rendered tokens；英文四字元近似也不能當中文上界。usage scaling 有 1–1.25 限制，不使它變成精確計數。舊研究中「公開計數方法有 tools 參數」不足以证明完整承接，須區分這兩個函式。
-3. **CT-02-F3／原文與模型視圖，已有正確分離，保留。**[context.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/context.py)／[runtime.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/runtime.py) 暫時選取 inline compaction 起點之後的內容，不寫回替換 canonical messages。不能把這個規則套到 standalone compact 的完整返回值。B1 經 [sources.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/sources.py)／[extraction.py](../../.worktrees/analysis-only-agent/experiments/analysis-agent/src/analysis_agent/extraction.py) 選完整結束回合；預設來源窗口 6000 字元、脈絡 1500，超大完整回合明確失敗，不截掉中間。字元界線是 I/O 規模控制，不是 token 精確保證。
+3. **CT-02-F3／原文與模型視圖，已有正確分離，保留。**[context.py](../../history.md#source-a3bd5c14a291b48b615e)／[runtime.py](../../history.md#source-6abca657a0ba0b1b8c2f) 暫時選取 inline compaction 起點之後的內容，不寫回替換 canonical messages。不能把這個規則套到 standalone compact 的完整返回值。B1 經 [sources.py](../../history.md#source-6cce82ed2a02688f99de)／[extraction.py](../../history.md#source-f72d424630e3d1dd2ecf) 選完整結束回合；預設來源窗口 6000 字元、脈絡 1500，超大完整回合明確失敗，不截掉中間。字元界線是 I/O 規模控制，不是 token 精確保證。
 4. **CT-02-F4／整體預算尚不能宣稱完成。**A 有導覽與按需讀取；B1 有來源分窗；但「回覆有分頁」不等於整個 request 已有界。仍須把固定規則、實際 tool schemas、已載入 Skill、導覽、工具回覆、近期訊息及原生 items 一起檢查。既有 `memory_tools.py` 只取 FilesystemMiddleware 的 tools，不能把 middleware 的 eviction 設定當作 hooks 已接線。下一窄修須核對實際輸出大小，不盲加另一套全域刪訊息機制。
 
 ## 4. 建議接法與框架責任（待核准）

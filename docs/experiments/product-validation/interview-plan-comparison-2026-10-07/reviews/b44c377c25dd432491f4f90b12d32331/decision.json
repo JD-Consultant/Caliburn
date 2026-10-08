@@ -1,0 +1,8 @@
+{
+  "question_id": "b44c377c25dd432491f4f90b12d32331",
+  "fact_ids": ["supplier-returns"],
+  "mode": "answer",
+  "reason": "實際問供應商退貨的操作、交接與決策，supplier-returns 提供採購決定退哪些貨、依退貨單備貨出庫、承運商簽收回採購，並更正不是退貨入庫。固定資料没有通常引發採購退貨決定的具體情況，不從客戶退貨或收貨差異推定原因。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": ["通常是什麼情況會啟動？"]
+}

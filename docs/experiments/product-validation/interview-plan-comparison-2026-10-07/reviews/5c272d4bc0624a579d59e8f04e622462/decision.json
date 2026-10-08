@@ -1,0 +1,8 @@
+{
+  "question_id": "5c272d4bc0624a579d59e8f04e622462",
+  "fact_ids": ["customer-returns"],
+  "mode": "answer",
+  "reason": "實際轉問客戶退貨接手的檢查、記錄與交接，customer-returns 的退貨單核對、拍照分類及客服／品保交接直接相關。未問供應商退貨，不混入另一流程。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

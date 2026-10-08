@@ -1,0 +1,615 @@
+{
+  "profile": {
+    "revision_id": "091d121c-033d-42c2-afd9-d4d7eae797f7",
+    "profile": {
+      "job_title": "倉庫管理員",
+      "organization_unit": "物流中心",
+      "reports_to": "倉儲主管",
+      "purpose": "負責物流中心的收貨驗收、上架、揀貨補貨、庫存盤點及客戶與供應商退貨入庫，維持貨物流轉與庫存作業的準確，支援後續出貨及退貨處理。"
+    }
+  },
+  "work": {
+    "revision_id": "091d121c-033d-42c2-afd9-d4d7eae797f7",
+    "areas": [
+      {
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "物流中心倉儲與庫存作業",
+        "scope_text": "涵蓋收貨驗收、上架、揀貨補貨、庫存盤點，以及客戶與供應商退貨入庫。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "9301a06b-657b-4284-852c-4ba3dfb0656a",
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "驗收進貨與上架入庫",
+        "description": "收貨時比對採購單、送貨單上的品項與實際收到的數量；核對無誤後，依已安排的儲位上架、貼標籤，並在庫存系統登記入庫。若發現數量不符，拍照並將差異告知採購。月底前後及促銷檔期前，進貨量常突然增加，可能來不及上架。",
+        "outcomes": [
+          {
+            "detail_id": "e6559418-9858-42d4-b32e-62481f3f14c6",
+            "text": "提供採購差異情況及照片，供採購後續處理。"
+          },
+          {
+            "detail_id": "f93327b6-b480-4764-bb94-3d1c711e1407",
+            "text": "貨品依已安排的儲位上架並貼標籤，庫存系統完成入庫登記。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "ad77ce78-7f02-427f-af82-def3921f1409",
+            "text": "不自行決定拒收或退換貨；相關處理由採購決定。"
+          }
+        ]
+      },
+      {
+        "task_id": "421cdb20-0f0e-4fea-a788-f09aa160c7cf",
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "依出貨單揀貨",
+        "description": "依出貨單揀取貨品，依先進先出原則作業。",
+        "outcomes": [],
+        "requirements": []
+      },
+      {
+        "task_id": "4b64c267-f267-4ef5-8cab-098c1860640e",
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "依安全庫存狀況通知採購補貨",
+        "description": "看到商品低於安全庫存時，通知採購補貨。",
+        "outcomes": [],
+        "requirements": []
+      },
+      {
+        "task_id": "3d7446e2-b254-4cc7-af7f-fe04a045f6a2",
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "執行日常與月底庫存盤點",
+        "description": "每天快下班時，盤點當天異動較多的商品，不作全倉盤點；月底盤點自己負責的整區。",
+        "outcomes": [
+          {
+            "detail_id": "ca0df9f7-3e43-481c-9500-96421e9cc2d3",
+            "text": "月底盤點結果提供主管抽查。"
+          },
+          {
+            "detail_id": "2e4391a5-d054-45f3-bfec-6c0905a4a0df",
+            "text": "庫存差異超過主管設定的範圍時，撰寫差異報告。"
+          }
+        ],
+        "requirements": []
+      },
+      {
+        "task_id": "403eb502-a060-46d2-a3d6-1adb850ed19c",
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "檢查並處理客戶退貨",
+        "description": "檢查客戶退貨的外觀與數量，辦理貨品放置及登記，包括入庫或送至待處理區；瑕疵品與否由品保判定。",
+        "outcomes": [
+          {
+            "detail_id": "465e431d-8f17-4ac0-9398-8a1ef593fbfa",
+            "text": "客戶退貨依檢查與後續處理需要完成入庫，或送至待處理區。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "316ea756-9d47-437f-a3d0-2bc739ed85e2",
+            "text": "瑕疵品與否由品保判定，倉庫不自行認定。"
+          }
+        ]
+      },
+      {
+        "task_id": "869cce12-1100-4841-8647-7ced17fb8ef5",
+        "area_id": "e6829426-7548-4967-9408-8b50dd36be25",
+        "title": "備妥供應商退貨並登記出貨",
+        "description": "依採購決定退回的貨品，將貨物備妥並登記出貨；是否退貨由採購決定。",
+        "outcomes": [
+          {
+            "detail_id": "6b1852fe-24f3-4129-b8f6-a4113262ba6c",
+            "text": "決定退回的供應商貨品完成備貨與出貨登記。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "dee8a423-8bf2-49ec-b354-7079ad8f8383",
+            "text": "是否退回由採購決定；本人負責備貨及登記出貨，不負責決定退貨。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [
+      {
+        "collaborator_id": "31b42c6b-6c7c-417c-8fe2-ca4589099916",
+        "name": "採購",
+        "scope_text": "進貨數量不符時，提供差異情況及照片給採購；進貨拒收或退換貨由採購決定。商品低於安全庫存時，通知採購補貨。供應商退貨由採購決定是否退回，決定退回後由你備妥貨品並登記出貨。"
+      },
+      {
+        "collaborator_id": "61b4f465-9075-4f4e-b939-7bc76de3702b",
+        "name": "品保",
+        "scope_text": "判定客戶退回商品是否為瑕疵品；倉庫檢查商品外觀與數量，依處理需要辦理入庫或送至待處理區，不自行認定瑕疵。"
+      }
+    ],
+    "conditions": [
+      {
+        "condition_id": "9ad6366e-23f0-4716-aaf1-bbf465f0ca2b",
+        "kind": "schedule_travel",
+        "text": "早上七點上班，週一至週六輪休。"
+      },
+      {
+        "condition_id": "7b4a6253-e2ea-43c2-bfa9-8ba84095d048",
+        "kind": "work_environment",
+        "text": "工作中常需搬運箱子，最重約十五公斤；有時需進出冷藏區。"
+      },
+      {
+        "condition_id": "0c3412fb-3076-4306-8351-50ff68135c21",
+        "kind": "qualification",
+        "text": "操作堆高機需具備操作證照；公司安排考照。"
+      }
+    ]
+  },
+  "sources": {
+    "revision_id": "091d121c-033d-42c2-afd9-d4d7eae797f7",
+    "references": [
+      {
+        "citation_id": "ca9e0d04-b465-4f09-adab-a2b308b51987",
+        "target_label": "職務名稱",
+        "target": {
+          "kind": "profile_field",
+          "field": "job_title",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f1c0c943-0599-4a78-a655-4a02637c17a5",
+        "target_label": "所屬單位",
+        "target": {
+          "kind": "profile_field",
+          "field": "organization_unit",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "20ed676b-9586-44c3-a60d-2ec5ef103e01",
+        "target_label": "直屬主管",
+        "target": {
+          "kind": "profile_field",
+          "field": "reports_to",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "7d1d9e22-fa14-4e5e-a78b-00e16587853a",
+        "target_label": "職務目的",
+        "target": {
+          "kind": "profile_field",
+          "field": "purpose",
+          "item_id": null,
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "1f08e729-293d-4b7b-a289-76e5ce93c5f7",
+        "target_label": "職責：物流中心倉儲與庫存作業",
+        "target": {
+          "kind": "area",
+          "field": null,
+          "item_id": "e6829426-7548-4967-9408-8b50dd36be25",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "397406d7-5086-4c24-a4e5-8aa28dc7a587",
+        "target_label": "共通條件：早上七點上班，週一至週六輪休。",
+        "target": {
+          "kind": "condition",
+          "field": null,
+          "item_id": "9ad6366e-23f0-4716-aaf1-bbf465f0ca2b",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "b4e28f3c-3617-4605-ad25-0065fdc2b20b",
+        "target_label": "任務：驗收進貨與上架入庫",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "9301a06b-657b-4284-852c-4ba3dfb0656a",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "8073af1c-a9c0-4e9f-b52e-6fef0c420821",
+        "target_label": "任務：驗收進貨與上架入庫 · 成果：提供採購差異情況及照片，供採購後續處理。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "e6559418-9858-42d4-b32e-62481f3f14c6",
+          "task_id": "9301a06b-657b-4284-852c-4ba3dfb0656a"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "8d2c209e-bae2-47c3-8f17-cda107d80219",
+        "target_label": "任務：驗收進貨與上架入庫 · 要求：不自行決定拒收或退換貨；相關處理由採購決定。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "ad77ce78-7f02-427f-af82-def3921f1409",
+          "task_id": "9301a06b-657b-4284-852c-4ba3dfb0656a"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "2752d2c1-3f44-4248-95cf-04a900db63ec",
+        "target_label": "協作：採購",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "31b42c6b-6c7c-417c-8fe2-ca4589099916",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "99fa4c48-7ab7-43cd-93aa-8fb37df76e1f",
+        "target_label": "任務：驗收進貨與上架入庫",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "9301a06b-657b-4284-852c-4ba3dfb0656a",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      },
+      {
+        "citation_id": "c5f94029-eca0-4623-a2d5-c81500f9feee",
+        "target_label": "任務：驗收進貨與上架入庫 · 成果：貨品依已安排的儲位上架並貼標籤，庫存系統完成入庫登記。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "f93327b6-b480-4764-bb94-3d1c711e1407",
+          "task_id": "9301a06b-657b-4284-852c-4ba3dfb0656a"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "97c0d24d-6706-4383-ae97-2507ee3bb51f",
+        "target_label": "任務：依出貨單揀貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "421cdb20-0f0e-4fea-a788-f09aa160c7cf",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "6136863c-e35f-437c-a767-d52afe007587",
+        "target_label": "任務：依安全庫存狀況通知採購補貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "4b64c267-f267-4ef5-8cab-098c1860640e",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "2197d213-c9b1-4b63-b9d5-548da4280cd7",
+        "target_label": "協作：採購",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "31b42c6b-6c7c-417c-8fe2-ca4589099916",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 8 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "d42d20bd-79d3-4242-8beb-accdbe23f709",
+        "target_label": "任務：執行日常與月底庫存盤點",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "3d7446e2-b254-4cc7-af7f-fe04a045f6a2",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "e7da166f-c2a5-4c28-99e7-4d7436d4c0dd",
+        "target_label": "任務：執行日常與月底庫存盤點 · 成果：月底盤點結果提供主管抽查。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "ca0df9f7-3e43-481c-9500-96421e9cc2d3",
+          "task_id": "3d7446e2-b254-4cc7-af7f-fe04a045f6a2"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "e0f1b125-e492-4cea-97e6-28d339acd707",
+        "target_label": "任務：執行日常與月底庫存盤點 · 成果：庫存差異超過主管設定的範圍時，撰寫差異報告。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "2e4391a5-d054-45f3-bfec-6c0905a4a0df",
+          "task_id": "3d7446e2-b254-4cc7-af7f-fe04a045f6a2"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "855da4ef-33ea-4bb3-8a50-0712217ee821",
+        "target_label": "任務：檢查並處理客戶退貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "403eb502-a060-46d2-a3d6-1adb850ed19c",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "d2008a31-7fba-4194-8aba-bdfe32fa46d1",
+        "target_label": "任務：備妥供應商退貨並登記出貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "869cce12-1100-4841-8647-7ced17fb8ef5",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "7007f889-c08a-4a7b-876c-6616bba37969",
+        "target_label": "任務：備妥供應商退貨並登記出貨 · 成果：決定退回的供應商貨品完成備貨與出貨登記。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "6b1852fe-24f3-4129-b8f6-a4113262ba6c",
+          "task_id": "869cce12-1100-4841-8647-7ced17fb8ef5"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f7eb6d81-3fee-4343-8635-81ea47fd9439",
+        "target_label": "任務：備妥供應商退貨並登記出貨 · 要求：是否退回由採購決定；本人負責備貨及登記出貨，不負責決定退貨。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "dee8a423-8bf2-49ec-b354-7079ad8f8383",
+          "task_id": "869cce12-1100-4841-8647-7ced17fb8ef5"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "977179b5-f597-4d45-abe9-de8b492e35f6",
+        "target_label": "協作：採購",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "31b42c6b-6c7c-417c-8fe2-ca4589099916",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 10 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "36a2c8d9-9d4b-467d-819c-37da133ce127",
+        "target_label": "任務：檢查並處理客戶退貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "403eb502-a060-46d2-a3d6-1adb850ed19c",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 12 · 員工",
+        "needs_recheck": true,
+        "jd_changed": true,
+        "source_changed": false
+      },
+      {
+        "citation_id": "37b80aa0-87f5-4e5e-ae9c-8402c0d73d46",
+        "target_label": "任務：檢查並處理客戶退貨 · 成果：客戶退貨依檢查與後續處理需要完成入庫，或送至待處理區。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "465e431d-8f17-4ac0-9398-8a1ef593fbfa",
+          "task_id": "403eb502-a060-46d2-a3d6-1adb850ed19c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 12 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "93d8df1a-70d8-4ee0-b19a-08fa67e0042c",
+        "target_label": "任務：檢查並處理客戶退貨 · 要求：瑕疵品與否由品保判定，倉庫不自行認定。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "316ea756-9d47-437f-a3d0-2bc739ed85e2",
+          "task_id": "403eb502-a060-46d2-a3d6-1adb850ed19c"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 12 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "27bd1aed-69fb-4bc3-9f8e-5fb3ffd53b88",
+        "target_label": "協作：品保",
+        "target": {
+          "kind": "collaborator",
+          "field": null,
+          "item_id": "61b4f465-9075-4f4e-b939-7bc76de3702b",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 12 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "d036097a-43f2-4cf1-9cb1-8c3b2ee3860a",
+        "target_label": "任務：檢查並處理客戶退貨",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "403eb502-a060-46d2-a3d6-1adb850ed19c",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 14 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "07cf9b6f-3bde-444c-b1ba-03ecc6723862",
+        "target_label": "共通條件：工作中常需搬運箱子，最重約十五公斤；有時需進出冷藏區。",
+        "target": {
+          "kind": "condition",
+          "field": null,
+          "item_id": "7b4a6253-e2ea-43c2-bfa9-8ba84095d048",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 18 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "2c2fff80-e0fe-4192-8105-e994d78ba530",
+        "target_label": "共通條件：操作堆高機需具備操作證照；公司安排考照。",
+        "target": {
+          "kind": "condition",
+          "field": null,
+          "item_id": "0c3412fb-3076-4306-8351-50ff68135c21",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 18 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "61697a29-5a90-433e-9ef9-dc1f2521034b",
+        "target_label": "任務：驗收進貨與上架入庫",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "9301a06b-657b-4284-852c-4ba3dfb0656a",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 26 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

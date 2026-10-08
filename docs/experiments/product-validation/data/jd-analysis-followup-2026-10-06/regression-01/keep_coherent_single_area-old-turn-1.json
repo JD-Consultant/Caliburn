@@ -1,0 +1,17 @@
+{
+  "execution_id": "d07f600b-59c3-4e8d-b243-cdc994f82c96",
+  "exchange": {
+    "employee_input": {
+      "source_id": "8bcd254a-1e8f-44a5-b012-f1414f0369c3",
+      "interview_sequence": 4,
+      "speaker": "employee",
+      "interview_text": "對，都屬於同一次核對，沒有另外負責的工作。這份內容沒錯，今天先到這裡。"
+    },
+    "consultant_reply": {
+      "source_id": "636e34be-bedd-45d1-969b-60602da26b88",
+      "interview_sequence": 5,
+      "speaker": "consultant",
+      "interview_text": "好的，今天先到這裡。職務說明書草稿已補上核對結果：待出貨品項與數量完成核對；仍不符的情況會記錄並交主管處理。也保留您確認的範圍：這是您目前唯一負責的工作，您不負責揀貨、裝箱或決定換貨。"
+    }
+  }
+}

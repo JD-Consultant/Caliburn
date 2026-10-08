@@ -1,0 +1,173 @@
+{
+  "profile": {
+    "revision_id": "e63afa38-2dd2-4f57-9e23-6176c49a88cc",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "完成收貨上架及指定盤點，維持貨物和入庫紀錄可追查。"
+    }
+  },
+  "work": {
+    "revision_id": "e63afa38-2dd2-4f57-9e23-6176c49a88cc",
+    "areas": [
+      {
+        "area_id": "e61ef74a-9e02-408b-9f9d-36710c4982f2",
+        "title": "收貨與庫存核對",
+        "scope_text": "收貨上架及依不同周期盤點。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "b424c3c7-e18f-4114-8e1a-e66ff7301743",
+        "area_id": "e61ef74a-9e02-408b-9f9d-36710c4982f2",
+        "title": "收貨驗收與上架",
+        "description": "核對單據和實貨，差異拍照通知採購並回報主管，由採購決定收退；符合才依安排上架、貼標籤及登記。",
+        "outcomes": [
+          {
+            "detail_id": "6c2ffa1a-36a7-4d96-91ae-4f71554067e8",
+            "text": "符合條件的貨物完成上架、貼標籤及庫存系統登記；有差異的貨物留在待確認狀態，供採購追蹤處理。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "12fb362e-e39f-414b-9844-50121c34bcb8",
+            "text": "發現差異時先將貨物放在待確認區並保留標籤與單據；收貨或退貨由採購決定，依確認結果執行，不自行調整庫存。"
+          }
+        ]
+      },
+      {
+        "task_id": "c3f777a1-0fa0-4204-9393-32f36451be84",
+        "area_id": "e61ef74a-9e02-408b-9f9d-36710c4982f2",
+        "title": "配合庫存盤點",
+        "description": "下班前複點高異動商品；月底點本人區域，十二月配合財務全倉盤點，結果交主管。",
+        "outcomes": [
+          {
+            "detail_id": "cb5d184d-a6db-44bb-8b5d-99ea6a1cf034",
+            "text": "完成本人負責範圍的盤點清點並將結果交主管。"
+          }
+        ],
+        "requirements": [
+          {
+            "detail_id": "ed7330b8-6f61-4692-94e9-a435618936b8",
+            "text": "平日下班前只複點異動多的品項；月底清點本人區域；每年十二月配合財務全倉盤點，清點分派範圍。這些周期工作並非每天都全部執行。"
+          }
+        ]
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "e63afa38-2dd2-4f57-9e23-6176c49a88cc",
+    "references": [
+      {
+        "citation_id": "965ebf6e-a8e2-4d72-bc10-1b2d0124c021",
+        "target_label": "任務：收貨驗收與上架",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "b424c3c7-e18f-4114-8e1a-e66ff7301743",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f74c000f-e373-462d-aac7-e7e17410b362",
+        "target_label": "任務：配合庫存盤點",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "c3f777a1-0fa0-4204-9393-32f36451be84",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "6040bae7-e4fe-4e5c-90c3-c8ef34f41cc8",
+        "target_label": "任務：收貨驗收與上架 · 成果：符合條件的貨物完成上架、貼標籤及庫存系統登記；有差異的貨物留在待確認狀態，供採購追蹤處理。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "6c2ffa1a-36a7-4d96-91ae-4f71554067e8",
+          "task_id": "b424c3c7-e18f-4114-8e1a-e66ff7301743"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "1e4ad06f-f520-4bd9-90ca-dd7113939bb6",
+        "target_label": "任務：收貨驗收與上架 · 成果：符合條件的貨物完成上架、貼標籤及庫存系統登記；有差異的貨物留在待確認狀態，供採購追蹤處理。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "6c2ffa1a-36a7-4d96-91ae-4f71554067e8",
+          "task_id": "b424c3c7-e18f-4114-8e1a-e66ff7301743"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "1f3c8a0f-73a0-4a78-92d6-fa19a8dcc122",
+        "target_label": "任務：收貨驗收與上架 · 要求：發現差異時先將貨物放在待確認區並保留標籤與單據；收貨或退貨由採購決定，依確認結果執行，不自行調整庫存。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "12fb362e-e39f-414b-9844-50121c34bcb8",
+          "task_id": "b424c3c7-e18f-4114-8e1a-e66ff7301743"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "f335081d-fbae-4027-bf1a-d2a66f07cb03",
+        "target_label": "任務：配合庫存盤點 · 成果：完成本人負責範圍的盤點清點並將結果交主管。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "cb5d184d-a6db-44bb-8b5d-99ea6a1cf034",
+          "task_id": "c3f777a1-0fa0-4204-9393-32f36451be84"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "365e1289-c0a4-4a81-ba1d-20986505ffb6",
+        "target_label": "任務：配合庫存盤點 · 要求：平日下班前只複點異動多的品項；月底清點本人區域；每年十二月配合財務全倉盤點，清點分派範圍。這些周期工作並非每天都全部執行。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "ed7330b8-6f61-4692-94e9-a435618936b8",
+          "task_id": "c3f777a1-0fa0-4204-9393-32f36451be84"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

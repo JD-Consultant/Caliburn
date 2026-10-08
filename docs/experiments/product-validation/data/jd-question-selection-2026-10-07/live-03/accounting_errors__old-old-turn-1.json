@@ -1,0 +1,17 @@
+{
+  "execution_id": "307ffecb-8a57-4a13-989b-65fe9cd5b715",
+  "exchange": {
+    "employee_input": {
+      "source_id": "33220a83-7570-4607-8e30-0f743829317c",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "這個細節我目前說不清楚，也沒有其他能確認的資料。已說過的工作範圍仍一樣，其他事情可以試著說。"
+    },
+    "consultant_reply": {
+      "source_id": "1a37a847-2e45-4505-8f97-83c4ef6f0e6a",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "了解，所屬單位目前留空，不會推測；已確認的工作範圍也會照原先內容保留。\n\n報支資料有一種情況還沒談到：如果發票、金額或申請單彼此對不上，通常你會怎麼處理、交給誰決定？如果沒遇過或不清楚，也可以直接說。"
+    }
+  }
+}

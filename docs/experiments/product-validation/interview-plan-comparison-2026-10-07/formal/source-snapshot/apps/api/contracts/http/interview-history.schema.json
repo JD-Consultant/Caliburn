@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InterviewHistory",
+  "description": "Only formal interview messages, ordered within the selected job file. Not execution progress or uncompleted inputs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["messages"],
+  "properties": {
+    "messages": {"type": "array", "items": {"$ref": "#/$defs/InterviewMessage"}}
+  },
+  "$defs": {
+    "InterviewMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "interview_sequence", "speaker", "interview_text", "execution_id"],
+      "properties": {
+        "source_id": {"type": "string", "format": "uuid"},
+        "interview_sequence": {"type": "integer", "minimum": 1},
+        "speaker": {"type": "string", "enum": ["app", "employee", "consultant"]},
+        "interview_text": {"type": "string", "minLength": 1},
+        "execution_id": {
+          "description": "The original consultant Turn for this formal reply, for scoped public commentary lookup. Null for App/employee messages or when no reply association exists. Navigation only; not a source or private context reference.",
+          "type": ["string", "null"],
+          "format": "uuid"
+        }
+      }
+    }
+  }
+}

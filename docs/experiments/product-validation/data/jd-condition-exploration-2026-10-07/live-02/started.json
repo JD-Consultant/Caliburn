@@ -1,0 +1,11 @@
+{
+  "authorization": "Same user-approved US$0.10 / 20 minute batch; no renewed allowance",
+  "budget_usd": "0.065981670",
+  "seconds": 645,
+  "parent_boundary": {
+    "deadline_utc": "2026-10-06T17:17:51.936282+00:00",
+    "prior_occupied_usd": "0.034018330",
+    "reason": "Posthoc scope/boundary clarification; same file/native history, no hidden answers, no new allowance"
+  },
+  "started_at": "2026-10-06T17:07:06.484713+00:00"
+}

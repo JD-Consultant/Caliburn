@@ -3,9 +3,11 @@
 - 狀態：**現行 Memory 模型工具接線** 。讀寫、角色與共用執行依下列責任協作；工具測試不取代真模型分析品質評估。驗證見[證據索引](../history.md#source-8e6fa902e6e1928b1f59)。
 - 語意權威：[讀取與來源回查](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[單物件更新](../specs/2026-09-27-memory-object-update-tool-contract.md)、[共同工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md)。本頁只說程式責任與接線，不另抄 JSON shape。
 
+本頁維護模型參數如何進入受限用例，以及實際結果如何回到原工具呼叫。讀取從[固定基準](#2-固定基準與候選最新位置)與[輸出投影](#3-模型可見資料與錯誤)開始；寫入從[準備及採用](#4-寫入準備採用與原結果接續)開始。資料交易見[Memory 保存](memory-storage.md)，正文解析與定位見[正文編輯](memory-body-editing.md)。
+
 ## 1. 契約與模組邊界
 
-`apps/api/contracts/tools/` 是模型輸入／輸出的唯一 schema 來源。既有生成器產 Python DTO、TypeScript 型別，並把原 schema 複製為 Python package resources，供安裝後的工具 definitions 使用；不是再從 Pydantic schema 反推 provider 契約。`--check` 同時檢查型別與資源副本，禁止手改生成檔。
+工具使用 `apps/api/contracts/tools/` 的 schema、生成 DTO 及安裝包內的唯讀 schema 資源；生成與 `--check` 依[資料與契約 §5](data-and-contracts.md#5-唯一契約來源及生成)。本頁只維護 Memory 工具如何消費這些生成物。
 
 模型工具由 `transport/model_tools/memory_reads.py` 提供，讀取流程如下：
 
@@ -57,11 +59,13 @@ App 綁定角色、原執行身分、可見基準、訪談上界
   → 確認成立後才回傳成功，保存並配回原 call
 ```
 
-準備過程無業務寫入。所有內容與引用使用同一個候選位置解析；參照由訪談序號／情境標題轉成穩定 ID。正文解析、模糊定位與實際 diff 是純運算，在釋放讀取 session 後以受控同步工作執行，不持有寫入交易等模型或做長文運算。候選在準備後已變動則Memory 候選服務拒絕過時命令，不能偷偷改採最新位置。
+### 準備命令與候選採用
 
-`PreparedMemoryToolCall` 是 **App 內部不可變待執行命令** ，不是模型參數、正式回執或另一份可編輯候選。包含套用後正文是為了固定原操作；可編輯工作稿仍由Memory 候選服務 保存。其可靠序列化、checkpoint 採用及程序接續由[共用執行](agent-execution.md#42-單一模型工具-step)承接。
+準備過程無業務寫入。所有內容與引用使用同一個候選位置解析；參照由訪談序號／情境標題轉成穩定 ID。正文解析、模糊定位與實際 diff 是純運算，在釋放讀取 session 後以受控同步工作執行，不持有寫入交易等模型或做長文運算。候選在準備後已變動，Memory 候選服務就拒絕過時命令，不能改採最新位置。
 
-原操作恢復必須重用已保存的 prepared command，不重新用舊標題呼叫 prepare。例如物件改名後舊名稱被另一物件使用，原命令仍指原身分；真正新操作才解析現在的同名物件。再次進入 execute 可以，但Memory 候選服務核對同一命令及提交結果，不能重複效果。
+`PreparedMemoryToolCall` 是 App 內部不可變的待執行命令，包含套用後正文以固定原操作；它不是模型參數、正式回執或第二份可編輯候選。可編輯工作稿仍由 Memory 候選服務保存，可靠序列化、checkpoint 採用及程序接續由[共用執行](agent-execution.md#42-單一模型工具-step)承接。
+
+原操作恢復必須重用已保存的 prepared command，不重新用舊標題呼叫 prepare。例如物件改名後舊名稱被另一物件使用，原命令仍指原身分；真正新操作才解析現在的同名物件。再次進入 execute 時，Memory 候選服務核對同一命令及提交結果，不能重複效果。
 
 ### 成功回傳與拒絕
 
@@ -78,4 +82,4 @@ App 綁定角色、原執行身分、可見基準、訪談上界
 
 驗證：[工具與候選交易](../history.md#source-99a88a33a07b25e8aa86)、[原生接續](../history.md#source-d76bfd79f21fb146c537)、[Memory 單向流程](../history.md#source-6fab8cfd2383817f94f3)。V4A 運算沿[正文編輯器](memory-body-editing.md)，不自行保存候選。
 
-Runtime 保存 prepared command、原生 `function_call_output` 與 `call_id` 配對；角色 runner 組裝固定 context、執行 B1／B2 並交接 diff。provider 接受格式、程式恢復與模型分析品質須分別驗證；不得由工具函式可呼叫推定模型會正確選取或引用。已知品質不足與未驗範圍見[驗證對照](verification-plan.md)。
+Runtime 保存 prepared command、原生 `function_call_output` 與 `call_id` 配對；角色 runner 組裝固定 context、執行 B1／B2 並交接 diff。provider 接受格式、程式恢復與模型分析品質須分別驗證；不得由工具函式可呼叫推定模型會正確選取或引用。測試責任見[驗證對照](verification-plan.md)，既有品質證據及未驗範圍見[架構驗證](../architecture/verification.md)。

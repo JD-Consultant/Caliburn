@@ -1,0 +1,134 @@
+{
+  "arm": "old",
+  "case_id": "accounting_errors",
+  "job_file_id": "50e3cf47-e0d5-4161-89b1-90b7b838ef11",
+  "before": {
+    "profile": {
+      "revision_id": "bee7abe9-4730-4383-9e13-c5dd11df5360",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "整理可核對的報支資料供主管審核與出納付款。"
+      }
+    },
+    "work": {
+      "revision_id": "bee7abe9-4730-4383-9e13-c5dd11df5360",
+      "areas": [
+        {
+          "area_id": "352a73ab-57e8-4c54-8510-f3b5ca152e58",
+          "title": "報支資料核對",
+          "scope_text": "資料核對、補件及清單交接，不含核准或付款。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "19d0070e-5444-4671-9912-cc7f29ecb450",
+          "area_id": "352a73ab-57e8-4c54-8510-f3b5ca152e58",
+          "title": "核對報支並整理送審清單",
+          "description": "核對發票、金額和申請單，缺件請申請人補齊；使用報支系統和試算表，清單交主管核准，由出納付款。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "bee7abe9-4730-4383-9e13-c5dd11df5360",
+      "references": [
+        {
+          "citation_id": "b3adaf41-cced-4d54-b611-a0f4b0c82e85",
+          "target_label": "任務：核對報支並整理送審清單",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "19d0070e-5444-4671-9912-cc7f29ecb450",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "a29c3558-18a2-4bf1-ad1e-4eeeeef78cb6",
+      "exchange": {
+        "employee_input": {
+          "source_id": "7b72c1e1-a34a-4f49-8da1-2aeac189a6c2",
+          "interview_sequence": 8,
+          "speaker": "employee",
+          "interview_text": "正常做法、交接與目前工作範圍都說過了，我現在想不到其他要補的。你還需要了解什麼嗎？"
+        },
+        "consultant_reply": {
+          "source_id": "e9c1d420-7441-43c5-ac4f-89233124bad8",
+          "interview_sequence": 9,
+          "speaker": "consultant",
+          "interview_text": "報支工作的內容已經足夠，不必再補充正常流程或交接細節。我已將核對、補件、送主管審核的成果與要求，以及你不負責核准和付款、在辦公室處理電子資料等界線整理進目前草稿。\n\n基本資料還缺所屬單位；你所在的部門或單位叫什麼？如果不確定，也可以先留空。"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 586344,
+    "output_tokens": 31011,
+    "reasoning_tokens": 22760,
+    "cached_input_tokens": 525662,
+    "cache_write_input_tokens": 60562,
+    "total_tokens": 617355,
+    "outbound_calls": 80,
+    "count_calls": 40,
+    "generation_calls": 40,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 586344,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0040",
+    "actual_estimated_usd": "0.028344370",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.032344370",
+    "cumulative_occupied_usd": "0.032344370",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 417.0685786000031,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 654796,
+    "output_tokens": 34050,
+    "reasoning_tokens": 24779,
+    "cached_input_tokens": 590253,
+    "cache_write_input_tokens": 64408,
+    "total_tokens": 688846,
+    "outbound_calls": 90,
+    "count_calls": 45,
+    "generation_calls": 45,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 654796,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0045",
+    "actual_estimated_usd": "0.030992030",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.035492030",
+    "cumulative_occupied_usd": "0.035492030",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 464.13052590000007,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

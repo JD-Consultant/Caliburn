@@ -1,0 +1,12 @@
+{
+  "authorization": "沿用本批原接續授權及 US$0.30／60 分鐘界線。02 恢復後尚未外送；因補上 error:null 反例與修正，再載入測試護欄。原件不覆寫。",
+  "journal_sha256": "d03ee90ac962d2ffea5f2a906508dbafb2e247646c3a904fe99a311786220795",
+  "started_at": "2026-10-06T09:30:26.085423+00:00",
+  "spent_usd": "0.064475415",
+  "retained_reservations": {
+    "f02d943d-77c7-473e-af85-e43f96e609f4": "0.015437625",
+    "830791b0-844c-4d1b-bbf6-1cc805095cee": "0.017251625"
+  },
+  "failed_execution_id": "cc175c68-80eb-4407-86e7-5e0bc99c0b0c",
+  "tests": "11 passed；新增串流 error 限流與正常 error:null 反例，皆先失敗後修正。正式產品不變。"
+}

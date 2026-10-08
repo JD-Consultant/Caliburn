@@ -1,0 +1,1586 @@
+[
+  {
+    "at": 1791298579.9699054,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298579.9699078,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解\"}"
+  },
+  {
+    "at": 1791298579.9728658,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298579.9728668,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，\"}"
+  },
+  {
+    "at": 1791298579.9747741,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298579.9747753,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客\"}"
+  },
+  {
+    "at": 1791298579.9765909,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298579.9765918,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶\"}"
+  },
+  {
+    "at": 1791298579.980984,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298579.9809852,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退\"}"
+  },
+  {
+    "at": 1791298579.983261,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298579.9832623,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨\"}"
+  },
+  {
+    "at": 1791298580.0953803,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.095382,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對\"}"
+  },
+  {
+    "at": 1791298580.0954468,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.095447,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再\"}"
+  },
+  {
+    "at": 1791298580.0972748,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.097276,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或\"}"
+  },
+  {
+    "at": 1791298580.097835,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.0978363,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫\"}"
+  },
+  {
+    "at": 1791298580.0982046,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.0982058,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放\"}"
+  },
+  {
+    "at": 1791298580.098266,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.0982666,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待\"}"
+  },
+  {
+    "at": 1791298580.0987997,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.0988007,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處\"}"
+  },
+  {
+    "at": 1791298580.0996666,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.0996675,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理\"}"
+  },
+  {
+    "at": 1791298580.099762,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.0997622,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區\"}"
+  },
+  {
+    "at": 1791298580.1004095,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1004107,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；\"}"
+  },
+  {
+    "at": 1791298580.1004858,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1004865,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕\"}"
+  },
+  {
+    "at": 1791298580.1053975,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1053984,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵\"}"
+  },
+  {
+    "at": 1791298580.1560469,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1560478,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判\"}"
+  },
+  {
+    "at": 1791298580.1638775,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1638784,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定\"}"
+  },
+  {
+    "at": 1791298580.1730814,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1730826,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則\"}"
+  },
+  {
+    "at": 1791298580.1884458,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1884468,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由\"}"
+  },
+  {
+    "at": 1791298580.1902337,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1902347,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品\"}"
+  },
+  {
+    "at": 1791298580.1902938,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1902943,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保\"}"
+  },
+  {
+    "at": 1791298580.191295,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.1912959,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負\"}"
+  },
+  {
+    "at": 1791298580.2082553,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2082562,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責\"}"
+  },
+  {
+    "at": 1791298580.2090547,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2090557,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我\"}"
+  },
+  {
+    "at": 1791298580.209159,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2091594,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先\"}"
+  },
+  {
+    "at": 1791298580.2092109,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2092113,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核\"}"
+  },
+  {
+    "at": 1791298580.2392962,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2392976,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對\"}"
+  },
+  {
+    "at": 1791298580.2482944,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.248295,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底\"}"
+  },
+  {
+    "at": 1791298580.254612,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2546132,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿\"}"
+  },
+  {
+    "at": 1791298580.257991,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2579947,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中\"}"
+  },
+  {
+    "at": 1791298580.260285,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2602856,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客\"}"
+  },
+  {
+    "at": 1791298580.2603378,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.260338,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶\"}"
+  },
+  {
+    "at": 1791298580.2736845,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2736857,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退\"}"
+  },
+  {
+    "at": 1791298580.2782488,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2782497,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨\"}"
+  },
+  {
+    "at": 1791298580.2783222,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2783227,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任\"}"
+  },
+  {
+    "at": 1791298580.27839,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.2783911,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務\"}"
+  },
+  {
+    "at": 1791298580.3139973,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.3139982,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再\"}"
+  },
+  {
+    "at": 1791298580.3246326,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.3246336,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把\"}"
+  },
+  {
+    "at": 1791298580.3345654,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.3345668,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作\"}"
+  },
+  {
+    "at": 1791298580.346246,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.3462474,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業\"}"
+  },
+  {
+    "at": 1791298580.3558593,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.3558605,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容\"}"
+  },
+  {
+    "at": 1791298580.3748996,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.374901,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容和\"}"
+  },
+  {
+    "at": 1791298580.3749921,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.3749928,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容和判\"}"
+  },
+  {
+    "at": 1791298580.3750308,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.3750317,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容和判定\"}"
+  },
+  {
+    "at": 1791298580.3750455,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.3750463,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容和判定界\"}"
+  },
+  {
+    "at": 1791298580.3840451,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.384046,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容和判定界線\"}"
+  },
+  {
+    "at": 1791298580.423349,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.4233506,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容和判定界線補\"}"
+  },
+  {
+    "at": 1791298580.4523263,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.452329,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容和判定界線補清\"}"
+  },
+  {
+    "at": 1791298580.4541678,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.4541686,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容和判定界線補清楚\"}"
+  },
+  {
+    "at": 1791298580.4542217,
+    "line": "event: commentary"
+  },
+  {
+    "at": 1791298580.4542224,
+    "line": "data: {\"job_file_id\":\"b544f6c1-ea66-4726-b1d1-38ed2e1c7f7f\",\"execution_id\":\"d26c848b-f0d9-4381-b231-30e72d45c076\",\"response_id\":\"resp_0b5b42315f39c6af016ac50c0a626887d0813494a7d96a25ec\",\"message_id\":\"msg_0b5b42315f39c6af016ac50c15ff6487d094722ee678c9bc65\",\"text\":\"了解，客戶退貨的流程有外觀檢查、數量核對，再視情況入庫或暫放待處理區；瑕疵判定則由品保負責。我先核對底稿中客戶退貨任務，再把作業內容和判定界線補清楚。\"}"
+  },
+  {
+    "at": 1791298599.3821084,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.3821094,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm\"}"
+  },
+  {
+    "at": 1791298599.3821733,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.3821754,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking\"}"
+  },
+  {
+    "at": 1791298599.388447,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.3884475,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of\"}"
+  },
+  {
+    "at": 1791298599.3942738,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.3942745,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating\"}"
+  },
+  {
+    "at": 1791298599.4020915,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.4020927,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a\"}"
+  },
+  {
+    "at": 1791298599.4064,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.406401,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator\"}"
+  },
+  {
+    "at": 1791298599.418738,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.4187393,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for\"}"
+  },
+  {
+    "at": 1791298599.4287205,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.4287214,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the\"}"
+  },
+  {
+    "at": 1791298599.4287763,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.4287767,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier\"}"
+  },
+  {
+    "at": 1791298599.5216937,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5216947,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound\"}"
+  },
+  {
+    "at": 1791298599.5217593,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5217597,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process\"}"
+  },
+  {
+    "at": 1791298599.521814,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5218163,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process.\"}"
+  },
+  {
+    "at": 1791298599.5218477,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.521848,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe\"}"
+  },
+  {
+    "at": 1791298599.5218596,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.52186,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for\"}"
+  },
+  {
+    "at": 1791298599.5218744,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5218747,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task\"}"
+  },
+  {
+    "at": 1791298599.52208,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5220811,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9\"}"
+  },
+  {
+    "at": 1791298599.5221283,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5221288,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9,\"}"
+  },
+  {
+    "at": 1791298599.52527,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5252707,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I\"}"
+  },
+  {
+    "at": 1791298599.5375686,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5375695,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should\"}"
+  },
+  {
+    "at": 1791298599.5423598,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5423605,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use\"}"
+  },
+  {
+    "at": 1791298599.5576053,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.557607,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the\"}"
+  },
+  {
+    "at": 1791298599.560507,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5605102,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description\"}"
+  },
+  {
+    "at": 1791298599.5714374,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5714383,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"\"}"
+  },
+  {
+    "at": 1791298599.5756652,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5756667,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依\"}"
+  },
+  {
+    "at": 1791298599.5934157,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.593417,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀\"}"
+  },
+  {
+    "at": 1791298599.5985382,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.5985394,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況\"}"
+  },
+  {
+    "at": 1791298599.6051254,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.6051264,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入\"}"
+  },
+  {
+    "at": 1791298599.6181142,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.6181154,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫\"}"
+  },
+  {
+    "at": 1791298599.625795,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.625796,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或\"}"
+  },
+  {
+    "at": 1791298599.6470947,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.6470969,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫\"}"
+  },
+  {
+    "at": 1791298599.6492722,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.6492734,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放\"}"
+  },
+  {
+    "at": 1791298599.65421,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.654211,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待\"}"
+  },
+  {
+    "at": 1791298599.6768305,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.6768315,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處\"}"
+  },
+  {
+    "at": 1791298599.6768925,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.6768935,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理\"}"
+  },
+  {
+    "at": 1791298599.6802223,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.680223,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\"}"
+  },
+  {
+    "at": 1791298599.705988,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.705989,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\"\"}"
+  },
+  {
+    "at": 1791298599.7228804,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.7228818,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without\"}"
+  },
+  {
+    "at": 1791298599.7466524,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.7466538,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting\"}"
+  },
+  {
+    "at": 1791298599.75297,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.752971,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into\"}"
+  },
+  {
+    "at": 1791298599.766451,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.7664526,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific\"}"
+  },
+  {
+    "at": 1791298599.7704878,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.7704887,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria\"}"
+  },
+  {
+    "at": 1791298599.7844212,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.7844224,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria.\"}"
+  },
+  {
+    "at": 1791298599.789352,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.7893527,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It\"}"
+  },
+  {
+    "at": 1791298599.8058167,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.8058176,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could\"}"
+  },
+  {
+    "at": 1791298599.8121884,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.812189,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify\"}"
+  },
+  {
+    "at": 1791298599.841898,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.8418996,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things\"}"
+  },
+  {
+    "at": 1791298599.8475204,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.8475215,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things!\"}"
+  },
+  {
+    "at": 1791298599.8788629,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.8788655,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I\"}"
+  },
+  {
+    "at": 1791298599.8788857,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.878886,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just\"}"
+  },
+  {
+    "at": 1791298599.8832927,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.8832934,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need\"}"
+  },
+  {
+    "at": 1791298599.8955412,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.8955426,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to\"}"
+  },
+  {
+    "at": 1791298599.8987103,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.8987112,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure\"}"
+  },
+  {
+    "at": 1791298599.9044874,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9044886,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that\"}"
+  },
+  {
+    "at": 1791298599.9149146,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9149156,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I\"}"
+  },
+  {
+    "at": 1791298599.9378724,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9378743,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly\"}"
+  },
+  {
+    "at": 1791298599.9421604,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9421616,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize\"}"
+  },
+  {
+    "at": 1791298599.9499533,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9499547,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the\"}"
+  },
+  {
+    "at": 1791298599.9554865,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.955488,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right\"}"
+  },
+  {
+    "at": 1791298599.9618468,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9618478,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool\"}"
+  },
+  {
+    "at": 1791298599.9671674,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9671683,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for\"}"
+  },
+  {
+    "at": 1791298599.9812956,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9812968,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this\"}"
+  },
+  {
+    "at": 1791298599.9832902,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.983291,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task\"}"
+  },
+  {
+    "at": 1791298599.986672,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9866729,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task.\"}"
+  },
+  {
+    "at": 1791298599.9962478,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298599.9962497,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I\"}"
+  },
+  {
+    "at": 1791298600.0093837,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0093846,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want\"}"
+  },
+  {
+    "at": 1791298600.0147364,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0147374,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything\"}"
+  },
+  {
+    "at": 1791298600.020167,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0201683,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to\"}"
+  },
+  {
+    "at": 1791298600.0402362,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0402374,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align\"}"
+  },
+  {
+    "at": 1791298600.0460465,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0460477,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly\"}"
+  },
+  {
+    "at": 1791298600.0529983,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0529997,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly for\"}"
+  },
+  {
+    "at": 1791298600.0608666,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0608678,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly for efficient\"}"
+  },
+  {
+    "at": 1791298600.0630875,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0630884,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly for efficient processing\"}"
+  },
+  {
+    "at": 1791298600.069598,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0695994,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly for efficient processing!\"}"
+  },
+  {
+    "at": 1791298600.0763886,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0763898,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly for efficient processing! Let's\"}"
+  },
+  {
+    "at": 1791298600.0864363,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.086438,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly for efficient processing! Let's get\"}"
+  },
+  {
+    "at": 1791298600.0944383,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.0944397,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly for efficient processing! Let's get this\"}"
+  },
+  {
+    "at": 1791298600.10631,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.106311,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly for efficient processing! Let's get this organized\"}"
+  },
+  {
+    "at": 1791298600.1177049,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298600.117706,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c1cf46087d0974c77145659f556\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c29007087d088ac49219e973c0f\",\"output_index\":2,\"summary_index\":0,\"text\":\"**Creating task for supplier collaboration**\\n\\nI'm thinking of creating a collaborator for the supplier's outbound process. Maybe for task 9, I should use the description \\\"依狀況入庫或暫放待處理區\\\" without getting into specific criteria. It could simplify things! I just need to ensure that I properly utilize the right tool for this task. I want everything to align smoothly for efficient processing! Let's get this organized.\"}"
+  },
+  {
+    "at": 1791298613.0216308,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.0216317,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI\"}"
+  },
+  {
+    "at": 1791298613.0216932,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.0216937,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need\"}"
+  },
+  {
+    "at": 1791298613.0238304,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.0238316,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to\"}"
+  },
+  {
+    "at": 1791298613.039571,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.039575,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm\"}"
+  },
+  {
+    "at": 1791298613.052297,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.052298,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that\"}"
+  },
+  {
+    "at": 1791298613.0653186,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.0653198,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the\"}"
+  },
+  {
+    "at": 1791298613.0727282,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.072729,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation\"}"
+  },
+  {
+    "at": 1791298613.0909288,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.09093,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding\"}"
+  },
+  {
+    "at": 1791298613.1034417,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.1034427,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the\"}"
+  },
+  {
+    "at": 1791298613.112504,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.1125047,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee\"}"
+  },
+  {
+    "at": 1791298613.1248715,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.1248724,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's\"}"
+  },
+  {
+    "at": 1791298613.133614,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.1336148,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial\"}"
+  },
+  {
+    "at": 1791298613.1546385,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.1546397,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task\"}"
+  },
+  {
+    "at": 1791298613.1608288,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.16083,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with\"}"
+  },
+  {
+    "at": 1791298613.1918838,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.1918848,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer\"}"
+  },
+  {
+    "at": 1791298613.2241285,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.2241292,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns\"}"
+  },
+  {
+    "at": 1791298613.2394514,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.2394524,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is\"}"
+  },
+  {
+    "at": 1791298613.2583458,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.258347,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate\"}"
+  },
+  {
+    "at": 1791298613.2842114,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.2842126,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate.\"}"
+  },
+  {
+    "at": 1791298613.3152485,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.3152492,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The\"}"
+  },
+  {
+    "at": 1791298613.3233955,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.3233967,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source\"}"
+  },
+  {
+    "at": 1791298613.3356981,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.335699,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes\"}"
+  },
+  {
+    "at": 1791298613.3448584,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.3448598,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details\"}"
+  },
+  {
+    "at": 1791298613.3536956,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.353699,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about\"}"
+  },
+  {
+    "at": 1791298613.364089,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.36409,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning\"}"
+  },
+  {
+    "at": 1791298613.3777044,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.3777056,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items\"}"
+  },
+  {
+    "at": 1791298613.3852422,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.3852432,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to\"}"
+  },
+  {
+    "at": 1791298613.3974605,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.3974617,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory\"}"
+  },
+  {
+    "at": 1791298613.4061403,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.4061418,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory,\"}"
+  },
+  {
+    "at": 1791298613.4187393,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.4187403,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which\"}"
+  },
+  {
+    "at": 1791298613.4312894,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.4312904,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we\"}"
+  },
+  {
+    "at": 1791298613.442125,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.442126,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve\"}"
+  },
+  {
+    "at": 1791298613.4501622,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.4501631,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed\"}"
+  },
+  {
+    "at": 1791298613.464757,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.4647582,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before\"}"
+  },
+  {
+    "at": 1791298613.4782097,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.4782112,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before.\"}"
+  },
+  {
+    "at": 1791298613.49223,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.4922311,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It\"}"
+  },
+  {
+    "at": 1791298613.504753,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.5047548,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels\"}"
+  },
+  {
+    "at": 1791298613.5311096,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.5311108,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good\"}"
+  },
+  {
+    "at": 1791298613.5473788,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.5473802,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to\"}"
+  },
+  {
+    "at": 1791298613.5575342,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.5575354,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double\"}"
+  },
+  {
+    "at": 1791298613.5671442,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.567145,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check\"}"
+  },
+  {
+    "at": 1791298613.5788243,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.5788255,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this\"}"
+  },
+  {
+    "at": 1791298613.58919,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.5891914,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to\"}"
+  },
+  {
+    "at": 1791298613.5988853,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.5988867,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure\"}"
+  },
+  {
+    "at": 1791298613.6237915,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.6237926,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything\"}"
+  },
+  {
+    "at": 1791298613.6463873,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.6463902,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns\"}"
+  },
+  {
+    "at": 1791298613.6684325,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.6684337,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns.\"}"
+  },
+  {
+    "at": 1791298613.6756682,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.6756694,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I\"}"
+  },
+  {
+    "at": 1791298613.6885936,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.688595,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll\"}"
+  },
+  {
+    "at": 1791298613.6998262,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.6998272,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make\"}"
+  },
+  {
+    "at": 1791298613.7114112,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.7114124,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a\"}"
+  },
+  {
+    "at": 1791298613.7229178,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.7229195,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call\"}"
+  },
+  {
+    "at": 1791298613.728549,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.7285504,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to\"}"
+  },
+  {
+    "at": 1791298613.7511613,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.7511625,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify\"}"
+  },
+  {
+    "at": 1791298613.763403,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.7634044,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and\"}"
+  },
+  {
+    "at": 1791298613.7778933,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.777895,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get\"}"
+  },
+  {
+    "at": 1791298613.790955,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.7909563,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that\"}"
+  },
+  {
+    "at": 1791298613.7991757,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.7991767,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed\"}"
+  },
+  {
+    "at": 1791298613.8092196,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.8092206,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed.\"}"
+  },
+  {
+    "at": 1791298613.8276227,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.8276236,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed. It's\"}"
+  },
+  {
+    "at": 1791298613.842341,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.842342,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed. It's important\"}"
+  },
+  {
+    "at": 1791298613.8686638,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.8686647,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed. It's important to\"}"
+  },
+  {
+    "at": 1791298613.8834026,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.8834035,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed. It's important to keep\"}"
+  },
+  {
+    "at": 1791298613.9037302,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.9037359,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed. It's important to keep the\"}"
+  },
+  {
+    "at": 1791298613.9262443,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.9262455,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed. It's important to keep the information\"}"
+  },
+  {
+    "at": 1791298613.9429262,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.9429271,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed. It's important to keep the information precise\"}"
+  },
+  {
+    "at": 1791298613.9527092,
+    "line": "event: reasoning_summary"
+  },
+  {
+    "at": 1791298613.9527102,
+    "line": "data: {\"response_id\":\"resp_0b5b42315f39c6af016ac50c34d26487d08e77b664f7755d5b\",\"item_id\":\"rs_0b5b42315f39c6af016ac50c36309c87d091c92371850d2aaa\",\"output_index\":0,\"summary_index\":0,\"text\":\"**Confirming citation accuracy**\\n\\nI need to confirm that the citation regarding the employee's initial task with customer returns is accurate. The source includes details about returning items to inventory, which we’ve reviewed before. It feels good to double-check this to ensure everything aligns. I’ll make a call to verify and get that confirmed. It's important to keep the information precise!\"}"
+  }
+]

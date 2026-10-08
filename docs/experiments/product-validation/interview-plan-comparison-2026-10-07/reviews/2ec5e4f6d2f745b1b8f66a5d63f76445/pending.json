@@ -1,0 +1,34 @@
+{
+  "question_id": "2ec5e4f6d2f745b1b8f66a5d63f76445",
+  "profile": "warehouse",
+  "actual_question": "好，補送後的跟進與登記細節先保留為未確認；你目前沒有其他確定資料，我不會反覆追問。\n\n我們先轉到揀貨。以最近一次揀貨為例，從接到要求到揀完交出去，你通常負責哪些步驟？貨最後交給誰，或放在哪裡？",
+  "disclosed": [
+    "receiving"
+  ],
+  "open_gaps": [],
+  "seen_topics": [
+    "receiving"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving"
+  ],
+  "gap_opened_at": {},
+  "recent_employee_originals": [
+    "我是物流中心的倉庫管理員，向倉儲主管報告，早上七點上班，週一到週六輪休。我主要負責收貨驗收、上架、揀貨補貨、庫存盤點、客戶退貨和供應商退貨，也會帶新人。最近一批進貨數量對不起來，主管叫我去查。我先對採購單、送貨單和實收數量，拍照通知採購；拒收或退換貨不是我決定。",
+    "我逐箱點件，把品項、數量、外包裝和送貨單核對。差異拍照並登記收貨異常表，通知採購；採購回覆要補送或接受後，我才按結果登記入庫。我不議價、不選供應商，也不決定拒收。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。"
+  ],
+  "candidate": {
+    "actual_question": "以最近一次揀貨為例，從接到要求到揀完交出去，你通常負責哪些步驟？貨最後交給誰，或放在哪裡？",
+    "employee_text": "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。",
+    "fact_id": "picking",
+    "topic": "picking",
+    "matched_cue": "揀貨",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": null,
+    "closes_gap": null,
+    "correction": false
+  }
+}

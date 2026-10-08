@@ -7,26 +7,17 @@
 
 ## 正常閉環：一則輸入如何變成可交付 JD 的一部分
 
-```mermaid
-flowchart TD
-  O[首次對話前：App 開場引導正式成立，訪談序號 1；後續 Turn 略過] --> U
-  U[員工提交本次輸入] --> S[App 可靠保存原輸入；暫不賦予正式訪談資格]
-  S --> A[職務顧問 A：固定本 Turn 的已發布 Memory 與近期來源邊界，按需讀原話／Memory／JD]
-  A --> Q{某個 JD 主題已有足夠且核對過的工作事實？}
-  Q -->|是| J[編修本 Turn 私有 JD 候選及依據]
-  Q -->|否| F[釐清未知、衝突或下一個工作主題]
-  J --> F
-  F --> R[形成完整答覆與本輪意圖；尚未正式完成]
-  R --> C[App 完成 A Turn：答覆、JD 候選與依據、有效訪談資格及完成結果一致生效]
-  C --> D[使用者回看正式答覆／目前 JD、必要時人工修訂或匯出目前 JD PDF]
-  C --> N[下一個 A Turn 開始時讀當時最新已發布 Memory]
-  C -->|若要求整理且同檔案無在途批次| B1[B1 依固定有效訪談上界整理工作情境候選]
-  B1 --> B2[B2 依交付情境及差異整理理解；期間 B1 不寫情境]
-  B2 --> P[App 整版原子發布 Memory、來源進度與發布結果]
-  P -.若先於下一個 A Turn 發布.-> N
-```
+![現行基本流程：輸入、釐清與 JD 正式採用](../diagrams/specs/2026-09-29-core-value-loop-lifecycle/core-value-loop.png)
 
-此圖的 O 只在**首次** 對話前成立一次；App 開場是真實、可回查的訪談第 1 則，不是模型 Turn 或員工工作事實。首輪輸入若取消，O 保留，該輸入不佔後續序號。其餘路徑表示**可選且可並行的業務工作** ，不是每輪都必須改 JD、要求背景整理或匯出；下一個 A Turn **不等待** 背景發布，開始時讀當時最新已發布 Memory，開始後不因背景發布而中途換版。同檔案若已有在途 Memory 批次，新要求在本輪成功後保留其截止點，待前批發布再處理，不混入圖中的在途 B1／B2。A 可直接依本輪已核對輸入形成 JD 候選，無須等 B1／B2 發布；正式引用於本輪完成時綁定有效訪談來源。A 的工具／模型 Step 可保存並恢復，但工具成功、串流片段、候選預覽均不等於整輪完成。完整答覆可靠保存後才可宣告完成；同一份 JD 在 A 執行或暫停期間不開放人工改稿。**圖中匯出位於完成後，只畫一般旅程；處理中仍可匯出，但只取最後已正式完成的 JD，不取畫面上的本輪候選預覽。** 候選成功完成後才改變後續 PDF；取消／失敗則不改變 PDF 的正式內容來源。這項產品邊界見[完成安全點與候選提交](../product-concept.md#保存正式資格與使用者控制)；其餘細節分屬[顧問生命週期](2026-09-26-consultant-context-and-state-design.md)、[Memory 生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md)及[JD 模型工具契約](2026-09-29-jd-model-tool-contract-review.md)。
+[圖源](../diagrams/specs/2026-09-29-core-value-loop-lifecycle/core-value-loop.mmd) · [SVG](../diagrams/specs/2026-09-29-core-value-loop-lifecycle/core-value-loop.svg)
+
+圖為現行單一 A Turn 的正常控制流程，箭頭只表示本輪先後；首次開場已在建立檔案時正式成立。使用者回看、人工編修、匯出及新一輪訪談不必依固定順序。已成立的整理要求由背景調度獨立處理，與下一輪 A 的交錯另見下方代表時序。
+
+App 開場只在首次對話前成立一次，是可回查的訪談第 1 則，不是模型 Turn 或員工工作事實。首輪輸入若取消，開場保留，該輸入不佔後續序號。改 JD、要求背景整理及匯出是可選的業務工作，不是每輪都必須執行。
+
+下一個 A Turn 不等待背景發布，開始時讀當時最新已發布 Memory，開始後不因背景發布而中途換版。同檔案若已有在途 Memory 批次，新要求在本輪成功後保留其截止點，待前批發布再處理，不混入在途 B1／B2。A 與背景整理可並行；A 可直接依本輪已核對輸入形成 JD 候選，無須等 B1／B2 發布，正式引用於本輪完成時綁定有效訪談來源。
+
+A 的工具／模型 Step 可保存並恢復，但工具成功、串流片段、候選預覽均不等於整輪完成。完整答覆可靠保存後才可宣告完成；同一份 JD 在 A 執行或暫停期間不開放人工改稿。處理中仍可匯出，但只取最後已正式完成的 JD，不取畫面上的本輪候選預覽。候選成功完成後才改變後續 PDF；取消／失敗則不改變 PDF 的正式內容來源。這項產品邊界見[完成安全點與候選提交](../product-concept.md#保存正式資格與使用者控制)；其餘細節分屬[顧問生命週期](2026-09-26-consultant-context-and-state-design.md)、[Memory 生命週期](2026-09-25-b1-b2-information-gap-lifecycle.md)及[JD 模型工具契約](2026-09-29-jd-model-tool-contract-review.md)。
 
 | 資料／結果 | 正式真相與生效界線 | 下游能否使用 |
 |---|---|---|
@@ -58,29 +49,11 @@ flowchart TD
 
 **代表時序。** 此例刻意讓下一個 A Turn 先於背景發布開始，用來驗證不等待與同輪固定基準；實線為呼叫／提交，虛線為回傳。參與者是責任，不是獨立服務。
 
-```mermaid
-sequenceDiagram
-  actor User as 員工
-  participant App as App 協調與 A 執行
-  participant Domain as 訪談／JD 業務
-  participant B as Memory 背景工作
-  participant M as Memory 業務
-  User->>App: 輸入 a
-  App->>M: 選定當時已發布 M20
-  M-->>App: 固定 M20 的導覽與讀取範圍
-  App->>Domain: 按需修改本輪 JD 候選
-  Domain-->>User: 可預覽，尚未正式生效
-  App->>Domain: 完整答覆與本輪候選一同完成
-  Domain-->>App: 正式結果及已成立的整理要求
-  App-->>User: 正式答覆與 JD
-  App->>B: 依正式要求啟動；固定訪談上界
-  Note over B,M: B1 整理情境，再交 B2；候選不外露
-  User->>App: 下一次輸入 b
-  App->>M: 此時仍選到 M20，固定至本 Turn 結束
-  B->>M: 完成本批分析，原子發布 M21
-  M-->>B: M21 與處理進度正式生效
-  Note over App,M: 正在處理 b 的 A 仍讀 M20；下個新 Turn 才選 M21
-```
+![現行代表時序：背景發布與下一輪訪談交錯](../diagrams/specs/2026-09-29-core-value-loop-lifecycle/memory-publication-interleaving.png)
+
+[圖源](../diagrams/specs/2026-09-29-core-value-loop-lifecycle/memory-publication-interleaving.mmd) · [SVG](../diagrams/specs/2026-09-29-core-value-loop-lifecycle/memory-publication-interleaving.svg)
+
+圖為現行正常交錯的一種情境；實線閉合箭頭是呼叫、虛線是回傳，開放箭頭是非同步喚醒。喚醒不取代 DB 中已成立的整理要求，背景調度也不阻塞下一次輸入；此圖省略輪內模型往返及故障恢復。
 
 若 M21 先於 b 的新 Turn 綁定完成，b 就選 M21；兩者都合法。不得組出 M20 導覽配 M21 的訪談邊界。恢復 b 也不是新 Turn，仍使用原已綁定版本。Memory 的正式發布不會自動更新 JD 的歷史依據。
 

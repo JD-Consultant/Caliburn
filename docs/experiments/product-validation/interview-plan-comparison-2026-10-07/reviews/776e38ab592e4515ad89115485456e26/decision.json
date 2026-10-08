@@ -1,0 +1,8 @@
+{
+  "question_id": "776e38ab592e4515ad89115485456e26",
+  "fact_ids": ["inventory-partial"],
+  "mode": "answer",
+  "reason": "此 fresh case 初問庫存盤點查核資料與數量差異處理，inventory-partial 的近期入出庫、移庫紀錄及複點直接相關，並保留原調帳權限缺口。training 尚未披露，不能提前提供 inventory-authority。",
+  "omitted_subtopics": [],
+  "unknown_subtopics": []
+}

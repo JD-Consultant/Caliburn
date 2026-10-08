@@ -26,7 +26,9 @@ A 不需要傳歷史版本參數，也不取得任意瀏覽完整舊 Memory 的�
 
 ## 「看過」和「已核對」是兩件事
 
-![圖八：JD 來源差異的核對流程](diagrams/08-jd-recheck.png)
+![圖八：JD 來源差異的核對流程](../../diagrams/reports/system-architecture/08-jd-recheck.png)
+
+[圖源](../../diagrams/reports/system-architecture/08-jd-recheck.mmd) · [SVG](../../diagrams/reports/system-architecture/08-jd-recheck.svg)
 
 圖八表示 JD 某部分的處理流程，不要求一輪把整份 JD 全部重新審核。A 在相關主題出現或準備編輯時閱讀差異、按需查新資料，判斷文字與依據是否仍成立；缺少事實就問員工，保留待核對。
 
@@ -36,11 +38,13 @@ A 不需要傳歷史版本參數，也不取得任意瀏覽完整舊 Memory 的�
 
 ## 任務與共用能力如何保存
 
-![圖九：同一 JD 修訂中的任務與共用能力關係](diagrams/09-jd-relations.png)
+![圖九：同一 JD 修訂中的任務與共用能力關係](../../diagrams/reports/system-architecture/09-jd-relations.png)
+
+[圖源](../../diagrams/reports/system-architecture/09-jd-relations.mmd) · [SVG](../../diagrams/reports/system-architecture/09-jd-relations.svg)
 
 圖九呈現同一職務檔案、同一 JD 修訂內的簡化關係。一項任務可使用多筆知識／技能定義，同一筆定義也可供多項任務使用；任務與能力都可以暫無連結。「選用」指定本版採用的固定內容與順序，使用關係另行保存，因此改排序或解除連結不必重寫能力正文。新稿改動不覆寫舊稿，也不跨檔案共用定義。
 
-更接近資料表的兩張現行 ER 圖為[任務內容、明細與歸屬](diagrams/10-jd-task-storage.png)及[共用能力與任務使用關係](diagrams/11-jd-capability-storage.png)，原圖分別出自[JD 保存 §2.2](../../implementation/jd-storage.md#22-任務內容獨立明細及歸屬)及 [§2.4](../../implementation/jd-storage.md#24-共用知識技能與任務使用關係)。兩圖未展開完整 JD 欄位與來源引用；複合外鍵、不可變與交易規則仍以保存文件及 DDL 為準。集中圖說見[專題報告附錄 C](../project-report/report.md#附錄-c-jd-資料關聯與保存約束)。
+更接近資料表的兩張現行 ER 圖為[任務內容、明細與歸屬](../../diagrams/implementation/jd-storage/jd-task-storage.png)及[共用能力與任務使用關係](../../diagrams/implementation/jd-storage/jd-capability-storage.png)，原圖分別出自[JD 保存 §2.2](../../implementation/jd-storage.md#22-任務內容獨立明細及歸屬)及 [§2.4](../../implementation/jd-storage.md#24-共用知識技能與任務使用關係)。兩圖未展開完整 JD 欄位與來源引用；複合外鍵、不可變與交易規則仍以保存文件及 DDL 為準。集中圖說見[專題報告附錄 C](../project-report/report.md#附錄-c-jd-資料關聯與保存約束)。
 
 ## 候選可以預覽，但完成前不是正式稿
 

@@ -1,5 +1,7 @@
 # AI 顧問對話連續性、工作理解與 Context 邊界研究
 
+> 時點說明：本文保留 2026-08-27 起的研究及後續補充，內文「目前／基線」依各段當時情境判讀。現行產品請讀[目前決策](../../current-decisions.md)；程式引用連到可取回的歷史版本，不保證含當時未提交修改。
+
 - 日期：2026-08-27；2026-08-29 依最新 JD 欄位裁決與 Claude／Codex／主流記憶框架研究完成第六輪重審
 - 狀態：產品原則、拒絕記憶決策、§15.4「不固定 continuation」成本原則、§15.6 compaction 邊界、§15.11–§15.12「具體案例 → 穩定工作模式 → JD」shape、§15.13「不另建可寫 WorkScope」、§15.14「質性 coverage／無假百分比」、§15.15「案例→模式最小關係／局部更正傳播」、§15.16「無 anchor 訊息的漸進式 Context recall」、§15.17「直接角色陳述／事件案例分流的歸納門檻」、§15.19「不另建 model-owned 訪談 Agenda」與 §15.20「模型只填語意、atomic tagged Tool、framework receipt」已形成目前基線；§15.21 的三種 Work Understanding 責任邊界、metadata ownership，以及 `WorkUnderstanding／WorkEpisode／OpenIssue` 暫定內部名稱已獲 Owner 可翻案的暫時同意；§16 已依 Codex 真實兩階段 memory pipeline、Claude index＋JIT memory 與 LangMem core manager 重開「是否以成熟框架替代自製 reconcile」的裁決，結論是現在做窄相容性／效果 spike、通過前不改 production authority；ADR 0071 仍為 Proposed
 - 範圍：跨輪對話連續性、未回答問題、工作理解、一般待釐清、「需要你的確認」、Focus、目前 JD／待審差異，以及每輪最小充分 Context
@@ -919,7 +921,7 @@ Pydantic AI V2＋Harness＋DBOS 因此不是「不成熟玩具」，而是可信
 
 > **已被後續裁決取代**：本節「每個工作 turn 固定先呼叫 understanding Tool」是較早推薦。Owner 已接受 §15.4 與 §15.20 的成本感知版本：只有 canonical Tool result 會影響本輪後續 JD 決定才 continuation；普通理解更新與可見文字不固定增加 model call。
 
-現行 code 有一個需修正的因果邊界：[run service](../../apps/api/app/consultant/run_service.py) 先讓 LangChain／Deep Agents agent 在同一 loop 直接編輯 Store-backed `/workspace`，agent final structured output 才交回理解／Gap／Focus effects；[interview reducer](../../apps/api/app/consultant/interview.py) 之後才把 verified understanding 寫進 checkpoint。這表示同輪 JD edit 可能早於它所依賴的新理解取得 canonical stable ID／revision。若新 review 必須引用 exact Work Understanding revision，不能只在事後補 metadata 假裝因果成立。
+現行 code 有一個需修正的因果邊界：[run service](../../history.md#source-eb2ce3b4c0a13fbe7bb6) 先讓 LangChain／Deep Agents agent 在同一 loop 直接編輯 Store-backed `/workspace`，agent final structured output 才交回理解／Gap／Focus effects；[interview reducer](../../history.md#source-3184e79cd26115a88f06) 之後才把 verified understanding 寫進 checkpoint。這表示同輪 JD edit 可能早於它所依賴的新理解取得 canonical stable ID／revision。若新 review 必須引用 exact Work Understanding revision，不能只在事後補 metadata 假裝因果成立。
 
 四個方案比較如下：
 

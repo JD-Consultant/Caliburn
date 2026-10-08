@@ -1,0 +1,13 @@
+{
+  "authorization": "沿用使用者本批接續授權：都繼續，限流就等。原 US$0.30／60 分鐘不變。",
+  "journal_sha256": "6fa75bc3c3cc408d872f2ffe9a83a5bcb4fd728ecdba9d86d28fbbb1ca6289fe",
+  "started_at": "2026-10-06T09:30:26.085423+00:00",
+  "spent_usd": "0.064475415",
+  "retained_reservations": {
+    "f02d943d-77c7-473e-af85-e43f96e609f4": "0.015437625",
+    "830791b0-844c-4d1b-bbf6-1cc805095cee": "0.017251625"
+  },
+  "confirmed_failure": "turn18 的產品紀錄分類為 rate_limit_exceeded、http_status=None。護欄未處理串流 error 事件；反例確認會將此事件誤記為未知終止。正式產品不變，未知用量不解除占用。",
+  "failed_execution_id": "cc175c68-80eb-4407-86e7-5e0bc99c0b0c",
+  "continuation": "原失败保存，以新 command 重送相同员工文字；不把失敗輸入算正式訪談。"
+}

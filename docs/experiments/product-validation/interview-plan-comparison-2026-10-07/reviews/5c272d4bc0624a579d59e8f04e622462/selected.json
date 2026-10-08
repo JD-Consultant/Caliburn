@@ -1,0 +1,20 @@
+{
+  "employee_text": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。",
+  "audit": {
+    "actual_question": "好，核准新人上線的主管是否就是倉儲主管，先保留未知，不再追問。\n\n接著了解客戶退貨：退貨到倉庫後，你接手會做哪些檢查或記錄？之後會交給誰處理？",
+    "employee_text": "我依客服退貨單核數量、品項和外觀，拍照記錄，按已定規則區分可再上架、待檢和破損隔離。無單或商品不符先隔離交客服確認；我不決定退款。可再上架的掃碼入庫，待檢的交品保，保留交接紀錄。",
+    "fact_ids": [
+      "customer-returns"
+    ],
+    "known_confirmation_ids": [],
+    "new_fact_ids": [
+      "customer-returns"
+    ],
+    "review_mode": "answer",
+    "review_reason": "實際轉問客戶退貨接手的檢查、記錄與交接，customer-returns 的退貨單核對、拍照分類及客服／品保交接直接相關。未問供應商退貨，不混入另一流程。",
+    "omitted_subtopics": [],
+    "unknown_subtopics": [],
+    "driver_reminder": false
+  },
+  "actually_submitted": false
+}

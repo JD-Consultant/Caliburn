@@ -1,0 +1,13 @@
+{
+  "mode": "streams",
+  "python": "3.14.7 (main, Sep 24 2026, 17:57:14) [MSC v.1944 64 bit (AMD64)]",
+  "seconds": 60.02,
+  "iterations": 1793,
+  "sdk_responses": 1793,
+  "checkpoint_reads": 0,
+  "key_read": false,
+  "provider_calls": 0,
+  "business_writes": 0,
+  "limits": "2000 iterations / <=120 seconds",
+  "limitation": "public terminal-envelope replay; opaque reasoning and original chunk timing unavailable"
+}

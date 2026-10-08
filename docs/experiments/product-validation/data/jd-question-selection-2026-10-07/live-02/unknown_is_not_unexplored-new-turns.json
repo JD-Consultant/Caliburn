@@ -1,0 +1,134 @@
+{
+  "arm": "new",
+  "case_id": "unknown_is_not_unexplored",
+  "job_file_id": "e64a6c96-e99f-4f89-90e3-b777452771d2",
+  "before": {
+    "profile": {
+      "revision_id": "005bb699-5376-46e0-a778-0867d49c53eb",
+      "profile": {
+        "job_title": null,
+        "organization_unit": null,
+        "reports_to": null,
+        "purpose": "依安排完成貨品上架及入庫紀錄。"
+      }
+    },
+    "work": {
+      "revision_id": "005bb699-5376-46e0-a778-0867d49c53eb",
+      "areas": [
+        {
+          "area_id": "246011dc-3e65-4e48-ae87-d85e13fef496",
+          "title": "上架與入庫",
+          "scope_text": "依安排放貨、貼標籤及登記，堆高機適用作業仍未知。"
+        }
+      ],
+      "tasks": [
+        {
+          "task_id": "420a27ed-c3c0-4889-8ad0-ae119063892d",
+          "area_id": "246011dc-3e65-4e48-ae87-d85e13fef496",
+          "title": "上架貨品並登記",
+          "description": "依安排上架、貼標籤與登記入庫；搬箱最重約十五公斤，堆高機操作需證照，但哪些作業使用仍未確認。",
+          "outcomes": [],
+          "requirements": []
+        }
+      ],
+      "capabilities": [],
+      "task_links": [],
+      "collaborators": [],
+      "conditions": []
+    },
+    "sources": {
+      "revision_id": "005bb699-5376-46e0-a778-0867d49c53eb",
+      "references": [
+        {
+          "citation_id": "8335f1bc-8c46-4b1d-937b-549f518e000b",
+          "target_label": "任務：上架貨品並登記",
+          "target": {
+            "kind": "task",
+            "field": null,
+            "item_id": "420a27ed-c3c0-4889-8ad0-ae119063892d",
+            "task_id": null
+          },
+          "source_kind": "interview",
+          "source_label": "訪談序號 2 · 員工",
+          "needs_recheck": false,
+          "jd_changed": false,
+          "source_changed": false
+        }
+      ]
+    }
+  },
+  "turns": [
+    {
+      "execution_id": "2c9db743-8b5e-485b-a9e6-3d38188cb59f",
+      "exchange": {
+        "employee_input": {
+          "source_id": "5b5c22aa-ec7b-41fe-8939-74482ec97f02",
+          "interview_sequence": 6,
+          "speaker": "employee",
+          "interview_text": "堆高機用在哪些作業我還是想不起來，不要再問這個了。其他事情我可以試著說。"
+        },
+        "consultant_reply": {
+          "source_id": "50c57e14-06a9-4190-a7ec-bf5b6c84927d",
+          "interview_sequence": 7,
+          "speaker": "consultant",
+          "interview_text": "好，我不再問堆高機用在哪些作業；這部分先保留為尚未確認。先談入庫登記：貨物到倉時，你通常依照哪些資料，把哪些內容登記下來？"
+        }
+      }
+    }
+  ],
+  "reference_calls": [],
+  "usage_before": {
+    "input_tokens": 1049216,
+    "output_tokens": 56336,
+    "reasoning_tokens": 42109,
+    "cached_input_tokens": 960880,
+    "cache_write_input_tokens": 88120,
+    "total_tokens": 1105552,
+    "outbound_calls": 144,
+    "count_calls": 72,
+    "generation_calls": 72,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 1049216,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0072",
+    "actual_estimated_usd": "0.048813400",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.056013400",
+    "cumulative_occupied_usd": "0.056013400",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 750.8948326000027,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  },
+  "usage_after": {
+    "input_tokens": 1061234,
+    "output_tokens": 56717,
+    "reasoning_tokens": 42432,
+    "cached_input_tokens": 972496,
+    "cache_write_input_tokens": 88519,
+    "total_tokens": 1117951,
+    "outbound_calls": 146,
+    "count_calls": 73,
+    "generation_calls": 73,
+    "compaction_calls": 0,
+    "admitted_input_tokens": 1061234,
+    "prior_usd": "0",
+    "batch_limit_usd": "0.10",
+    "cumulative_limit_usd": "2",
+    "count_estimated_usd": "0.0073",
+    "actual_estimated_usd": "0.049170235",
+    "pending_reserved_usd": "0",
+    "batch_occupied_usd": "0.056470235",
+    "cumulative_occupied_usd": "0.056470235",
+    "pending_request_sha256": null,
+    "cost_basis": "openai-standard-2026-09-30:text-token-estimate-v1:default:3f7fb47f7c555e0337ebedbc463c587f935eadd00b7433d5fb58fe14e67d03d2",
+    "compact_output_reserve_tokens": 128000,
+    "elapsed_seconds": 757.930374800002,
+    "seconds_limit": 1200,
+    "stop_reason": null
+  }
+}

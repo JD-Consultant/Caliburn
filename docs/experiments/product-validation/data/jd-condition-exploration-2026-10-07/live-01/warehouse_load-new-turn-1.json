@@ -1,0 +1,17 @@
+{
+  "execution_id": "3df027f0-820b-4244-aa47-47c81f03eb56",
+  "exchange": {
+    "employee_input": {
+      "source_id": "4bc139b7-004e-44ad-8c59-0ecf22eb0860",
+      "interview_sequence": 6,
+      "speaker": "employee",
+      "interview_text": "平常收貨照這樣做，盤點的時間也說過了。我現在想不到其他工作，你還需要了解什麼嗎？"
+    },
+    "consultant_reply": {
+      "source_id": "16e37681-bf55-4e1f-b3d1-bee5d12d0aca",
+      "interview_sequence": 7,
+      "speaker": "consultant",
+      "interview_text": "目前已掌握您平常收貨核對、發現差異時的回報方式，以及平日、月底和年度盤點的安排；不用為了補內容硬想其他工作。\n\n我還想釐清一個會影響責任範圍的例外：**收貨發現差異、採購還沒決定是否收下時，這批貨通常怎麼處理？您本人會做哪些事，哪些要等採購或主管決定？**若每次情況不同，或您不確定，也可以直接說。"
+    }
+  }
+}

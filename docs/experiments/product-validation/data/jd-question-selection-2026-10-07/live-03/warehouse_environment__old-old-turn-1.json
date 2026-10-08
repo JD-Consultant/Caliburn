@@ -1,0 +1,17 @@
+{
+  "execution_id": "96904105-cc42-4a91-88f4-92f55e4e9d9f",
+  "exchange": {
+    "employee_input": {
+      "source_id": "23a28f06-3a1a-48a0-b318-581a4e16b184",
+      "interview_sequence": 10,
+      "speaker": "employee",
+      "interview_text": "這個細節我目前說不清楚，也沒有其他能確認的資料。已說過的工作範圍仍一樣，其他事情可以試著說。"
+    },
+    "consultant_reply": {
+      "source_id": "b27e0194-0c61-4224-aac6-b9c050cd7778",
+      "interview_sequence": 11,
+      "speaker": "consultant",
+      "interview_text": "了解，堆高機證照目前是否已取得先留待確認，不會寫成已取得；已說明的工作範圍也維持不變。\n\n我想再查一個可能影響工作要求的面向：**一年中是否有到貨高峰，讓收貨、搬運或上架的工作量，或完成時限明顯改變？**"
+    }
+  }
+}

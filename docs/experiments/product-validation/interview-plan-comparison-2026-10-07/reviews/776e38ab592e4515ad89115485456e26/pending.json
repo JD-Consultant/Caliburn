@@ -1,0 +1,40 @@
+{
+  "question_id": "776e38ab592e4515ad89115485456e26",
+  "profile": "warehouse",
+  "actual_question": "揀貨工作草稿已記下波次單核對、截單前完成、交包裝區複核，以及「系統有貨但儲位空」時的查核與交由組長協調；揀貨區不足時從備貨區補貨也另列一項。\n\n接著了解庫存盤點：你通常依什麼清單或系統資料核對實際庫存？如果數量對不上，你會怎麼處理，或交給誰處理？",
+  "disclosed": [
+    "picking",
+    "receiving",
+    "shelving"
+  ],
+  "open_gaps": [],
+  "seen_topics": [
+    "picking",
+    "receiving",
+    "shelving"
+  ],
+  "refused_topics": [],
+  "disclosure_order": [
+    "receiving",
+    "shelving",
+    "picking"
+  ],
+  "gap_opened_at": {},
+  "recent_employee_originals": [
+    "我按已規劃的儲位放貨、貼品項批號標籤，掃碼在 WMS 登記入庫，並確認實物和系統儲位一致。臨時放不下時先找組長調位置，不能自己改儲位規則。常溫貨用棧板車，超重貨請有證照同事開堆高機。\n\n關於你問的「通常由誰安排貨品的存放位置？」，我目前沒有確定資料，請保留未知，不補猜。",
+    "這一題我目前沒有其他確定資料，請先保留說不清的部分。",
+    "我按出貨波次單揀貨，核品項、數量、批號和效期，交包裝區複核。揀貨區不足就从備貨區補貨；系統有貨而儲位空了，先查移庫與前一波次，不擅自拿別的批號替代。截單時間前完成，異常交組長協調。"
+  ],
+  "candidate": {
+    "actual_question": "接著了解庫存盤點：你通常依什麼清單或系統資料核對實際庫存？如果數量對不上，你會怎麼處理，或交給誰處理？",
+    "employee_text": "每週做循環盤點，我先查最近入出庫和移庫紀錄，再複點。差異最後怎麼調帳、誰批准，我現在想不清楚。可以先談我最近帶新人的工作嗎？",
+    "fact_id": "inventory-partial",
+    "topic": "inventory",
+    "matched_cue": "盤點",
+    "unknown": false,
+    "refused": false,
+    "opens_gap": "inventory-authority",
+    "closes_gap": null,
+    "correction": false
+  }
+}

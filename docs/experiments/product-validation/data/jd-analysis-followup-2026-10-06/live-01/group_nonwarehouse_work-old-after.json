@@ -1,0 +1,118 @@
+{
+  "profile": {
+    "revision_id": "e49ae351-9cc1-4f14-95e1-dd000313399f",
+    "profile": {
+      "job_title": null,
+      "organization_unit": null,
+      "reports_to": null,
+      "purpose": "回應客戶使用問題並整理服務資訊，協助追蹤處理與改善。"
+    }
+  },
+  "work": {
+    "revision_id": "e49ae351-9cc1-4f14-95e1-dd000313399f",
+    "areas": [
+      {
+        "area_id": "e7acbe69-5b54-4645-9b15-0a46146f1b62",
+        "title": "客服部日常工作",
+        "scope_text": "回應客戶問題及整理每週客訴資料。"
+      }
+    ],
+    "tasks": [
+      {
+        "task_id": "7e14aa7b-c0d5-4440-a8cd-c52a87e391e4",
+        "area_id": "e7acbe69-5b54-4645-9b15-0a46146f1b62",
+        "title": "回應客戶使用問題",
+        "description": "每天受理問題，核對訂單與操作紀錄；無法處理轉交技術同事，不決定退款。",
+        "outcomes": [
+          {
+            "detail_id": "2f141c3d-c4a8-42ba-8f66-1f8a4d69dec3",
+            "text": "讓客戶提出的使用問題有人處理。"
+          }
+        ],
+        "requirements": []
+      },
+      {
+        "task_id": "750136e5-fdec-4841-a901-4d1071a9fb57",
+        "area_id": "e7acbe69-5b54-4645-9b15-0a46146f1b62",
+        "title": "整理每週客訴資料",
+        "description": "每週五整理類型、件數和未結案清單給主管，由主管決定改善，不分派工作。",
+        "outcomes": [
+          {
+            "detail_id": "96d93dde-69ff-4762-ba26-169de52cb91c",
+            "text": "讓主管掌握哪些客訴問題較常發生。"
+          }
+        ],
+        "requirements": []
+      }
+    ],
+    "capabilities": [],
+    "task_links": [],
+    "collaborators": [],
+    "conditions": []
+  },
+  "sources": {
+    "revision_id": "e49ae351-9cc1-4f14-95e1-dd000313399f",
+    "references": [
+      {
+        "citation_id": "ddc256ff-6ff0-4c19-993c-260f56b8a590",
+        "target_label": "任務：回應客戶使用問題",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "7e14aa7b-c0d5-4440-a8cd-c52a87e391e4",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 2 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "66a922c0-9417-487e-a6ad-c0ffbb195ddc",
+        "target_label": "任務：整理每週客訴資料",
+        "target": {
+          "kind": "task",
+          "field": null,
+          "item_id": "750136e5-fdec-4841-a901-4d1071a9fb57",
+          "task_id": null
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 4 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "4894881c-2035-450e-8b16-8017f9b10cbb",
+        "target_label": "任務：回應客戶使用問題 · 成果：讓客戶提出的使用問題有人處理。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "2f141c3d-c4a8-42ba-8f66-1f8a4d69dec3",
+          "task_id": "7e14aa7b-c0d5-4440-a8cd-c52a87e391e4"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      },
+      {
+        "citation_id": "12c6f47c-be43-4fa1-a653-570f2d2579ea",
+        "target_label": "任務：整理每週客訴資料 · 成果：讓主管掌握哪些客訴問題較常發生。",
+        "target": {
+          "kind": "detail",
+          "field": null,
+          "item_id": "96d93dde-69ff-4762-ba26-169de52cb91c",
+          "task_id": "750136e5-fdec-4841-a901-4d1071a9fb57"
+        },
+        "source_kind": "interview",
+        "source_label": "訪談序號 6 · 員工",
+        "needs_recheck": false,
+        "jd_changed": false,
+        "source_changed": false
+      }
+    ]
+  }
+}

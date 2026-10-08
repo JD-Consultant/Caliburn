@@ -1,5 +1,7 @@
 # T5：整體回歸與效果比較的驗證界線
 
+本批保留原件收於[私人 ZIP](https://github.com/JD-Consultant/Caliburn-archives/releases/download/storage-2026-10-08/caliburn-selected-c-evidence-20261008.zip)；各原件的包內路徑見連結標題或下文。按需取回方式見[私人歷史材料與資料庫封存](../../../experiments/artifact-storage.md#私人歷史材料與資料庫封存)。
+
 日期：2026-10-07。責任依 [INTPLAN](../../../specs/2026-10-06-consultant-interview-planning-and-focus-design.md) 與[施工計畫](../../2026-10-07-interview-plan-implementation-and-comparison.md)。本頁記工程驗證；真 API 訪談、披露政策、費用與最終 JD 效果沿[比較原件](../../../experiments/product-validation/interview-plan-comparison-2026-10-07/protocol.md)，不由工程測試推定。
 
 ## 核心收尾結論
@@ -47,9 +49,9 @@ uv run --project apps/api --locked pytest apps/api/tests -q --import-mode=import
 
 三個完整 P2 的八次筆記編輯皆遭格式拒絕、正式筆記皆為 null；使用者要求先處理，舊付費批次已停止。修正只補工具 description 與 `invalid_patch`／`patch_context_not_found` 的具體 V4A 更正範例，沒有放入職務答案或放寬 parser。空筆記建立及局部替換保留其他未知的範例均經實際 prepare 驗證；既有 nullable／no-op／保存結果重播反例仍通過。
 
-缺少可執行說明的 1 個 Red 與格式／錯 anchor 提示的 4 個 Red 已轉 Green；受影響 unit／contracts **74 passed**、Ruff／format／該模組 mypy 通過。這是全套回歸之後的新窄命令，沒有把先前全套冒稱包含這次說明修正。真 API 短測先驗建立、局部更新與同筆記換窗承接；可用性通過後才恢復 JD 效果比較。[修正原件與命令](C:/Users/chenb/.codex/visualizations/2026/10/06/01a11182-e198-7652-87d2-d90d10463ed1/caliburn-intplan-comparison/operational-evidence/format-repair/repair-evidence.json)
+缺少可執行說明的 1 個 Red 與格式／錯 anchor 提示的 4 個 Red 已轉 Green；受影響 unit／contracts **74 passed**、Ruff／format／該模組 mypy 通過。這是全套回歸之後的新窄命令，沒有把先前全套冒稱包含這次說明修正。真 API 短測先驗建立、局部更新與同筆記換窗承接；可用性通過後才恢復 JD 效果比較。[修正原件與命令（私人 ZIP）](https://github.com/JD-Consultant/Caliburn-archives/releases/download/storage-2026-10-08/caliburn-selected-c-evidence-20261008.zip "包內：caliburn-intplan-comparison/operational-evidence/format-repair/repair-evidence.json")
 
-真 API 短測實際 **2 completed／3 edits updated／0 rejected**，兩輪正式筆記皆非空；局部 hunk 保留另一主題，後一輪保留其未釐清審核交接。工作中的完整 native C 與下一 A 採用同位置筆記已取得。該測試明確要求保留另一主題，只驗修正後可用性及精確承接，未判 JD 增益。[語意核對與原件索引](C:/Users/chenb/.codex/visualizations/2026/10/06/01a11182-e198-7652-87d2-d90d10463ed1/caliburn-intplan-comparison/note-tool-smoke/note-smoke-repair-20261007/semantic-receipt.json)
+真 API 短測實際 **2 completed／3 edits updated／0 rejected**，兩輪正式筆記皆非空；局部 hunk 保留另一主題，後一輪保留其未釐清審核交接。工作中的完整 native C 與下一 A 採用同位置筆記已取得。該測試明確要求保留另一主題，只驗修正後可用性及精確承接，未判 JD 增益。語意核對與原件索引（中間產物不再保存；歷史原路徑：`C:/Users/chenb/.codex/visualizations/2026/10/06/01a11182-e198-7652-87d2-d90d10463ed1/caliburn-intplan-comparison/note-tool-smoke/note-smoke-repair-20261007/semantic-receipt.json`）
 
 ## 正式首批中斷與實驗層修正
 

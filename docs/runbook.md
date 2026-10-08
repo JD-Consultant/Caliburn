@@ -369,11 +369,36 @@ ORDER BY o.created_at, o.command_id;
 
 ## 資料庫與備份
 
-**首版成品驗收不以備份／空庫還原為前置。**目前優先驗證既有 PostgreSQL／checkpoint 在一般中斷與重開後能查回已確認保存的訪談、JD 與進度；未送出的輸入或未保存草稿不保證意外關閉後找回。備份資訊供後續維護參考，不表示已完成完整還原端到端驗收：
+一個 PostgreSQL cluster 可包含多個 database，每個 database 再包含 schema；Caliburn 的同一 schema 可保存多份職務檔案。不要為每份訪談建立一套 PostgreSQL，也不要只憑容器名稱中的 `test`／`production` 判定資料用途。日常資料與測試資料使用明確分開的 database／連線；驗證用 schema 必須在測試資料庫中。
 
-- 備份整個資料庫（`pg_dump` 不要用 `-n` 只挑單一 schema）；關聯式資料與 checkpoint 表在同一 namespace，兩者屬同一資料範圍。
-- OpenAI key 不在備份內；在另一台電腦還原後須重新提供 key。瀏覽器 localStorage／sessionStorage 不是正式資料備份。
-- 不自動清資料、刪 volume 或重建資料庫；資料處置需先核對精確目標。
+| 資料用途 | 保存與收尾 |
+|---|---|
+| 日常訪談、JD 與工作進度 | 保留既有資料來源；操作前核對 App 實際連線、schema 及 volume。更新 App 不另建一份空庫當作遷移完成 |
+| 可重建的整合測試 | 保存 fixture、命令與必要結果，完成後只回收本次建立的 schema／容器／volume；中斷留下的資源另核對，不全域 prune |
+| 已結案研究實驗 | 保留足以支持結論的設定、輸入、結果、評分及必要 trace；已有 Git／遠端原件的不重複封存。只有還需重播保存狀態時才保留 database／checkpoint |
+
+需要保留資料庫時，使用 `pg_dump -Fc` 保存整個 database，不以 `-n` 只挑部分 schema；業務資料與 checkpoint 必須一起保存。多個 database 分別匯出，角色等 cluster 級資訊另用 `pg_dumpall --globals-only --no-role-passwords` 保存。OpenAI key 另行提供，角色密碼與本機設定不放入封存附件；瀏覽器 localStorage／sessionStorage 不作正式資料備份。相關工具契約見 [PostgreSQL 備份文件](https://www.postgresql.org/docs/18/backup.html)與 [pg_dumpall](https://www.postgresql.org/docs/18/app-pg-dumpall.html)。
+
+備份與來源資料比較使用同一快照，避免使用中的資料持續更新造成錯判。先在自有隔離環境還原，核對 schema／table、資料筆數與必要內容摘要，保存命令結果；`pg_restore --list` 只能檢查目錄，不能代替實際還原。移除舊資料前，再確認 App 沒有使用該目標、備份後未新增需保留資料、遠端下載雜湊相同。不能手動刪 WAL，或直接壓縮運作中的資料目錄代替一致性備份。
+
+資料庫備份及未公開材料放[私人封存庫](https://github.com/JD-Consultant/Caliburn-archives)，不放公開 repository 或其 Releases。取得備份後先核對清單中的 SHA-256，再在隔離 PostgreSQL 還原；不直接覆蓋日常資料庫。封存格式與取回方式見[原件保存規範](experiments/artifact-storage.md#私人歷史材料與資料庫封存)。
+
+已確認僅含合成測試資料、且所需研究原件已有保存的舊環境，可以依清理授權直接回收，不必為了清理再建立永久完整備份。清理記錄須指出保留證據的位置，以及不再保留舊 DB 重播能力的取捨。資料用途未明或仍供日常使用時不套用這項規則。
+
+首版驗收曾以中斷後重開查回資料為主；不把該歷史範圍解讀成已完成所有版本的備份還原驗收。未送出的輸入與未保存草稿不保證可恢復；每次維護只回報實際驗證的資料與版本。
+
+## 磁碟空間維護
+
+先盤點目錄容量及目前程序，再區分可重建快取、可還原副本、執行環境與正式資料。被 Git 忽略只代表不提交，不能據此刪除。
+
+- **實驗解壓副本**：沿[原件保存規範](experiments/artifact-storage.md#分析完成後釋放空間)核對後清理；gzip 與雜湊清單保留，分析前按需還原。
+- **工具快取**：確認沒有相關工具運作後，可清除有 `CACHEDIR.TAG` 的 mypy 快取。套件快取使用工具本身的維護命令，例如 [uv 的 cache prune](https://docs.astral.sh/uv/concepts/cache/#clearing-the-cache)；先核對快取位置與環境連結方式，避免誤刪執行環境依賴。
+- **本機歷史與執行環境**：`.research-tmp` 曾混放 Python、PostgreSQL、Chromium、資料庫與未提交封存材料，不能整包視為可刪快取。清理前查虛擬環境的 `pyvenv.cfg`、設定及程序路徑；即使資料庫已停止，也須沿上節備份與資料處置規則處理。
+- **Git 資料**：先用 `git count-objects -vH` 盤點並檢查完整性。保留正式 objects、packs 與復原資料；異常暫存檔須個別確認來源、使用狀態及可恢復性，不以整批刪除 `.git` 或改寫歷史作日常清理。
+
+新工作的暫存沿 `.tmp/` 放置；結束前將必要證據保存至責任文件指定位置，再核對清理範圍。長期執行環境與資料庫應有明確的保存位置，遷移時同步更新設定並驗證啟動，不直接移除目前使用的路徑。
+
+每批暫存使用能辨認用途的目錄，記錄來源、是否仍使用及收尾條件。已結案的研究保存結果與必要原件，依賴保留 lockfile／重建方式；除錯暫留的資料須有明確理由與下次清理條件。維護清單只記尚需處理的本機資源，完成後移除，不再累積第二份永久待辦。
 
 ## 驗證
 

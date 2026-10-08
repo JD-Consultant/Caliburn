@@ -1,5 +1,7 @@
 # 訪談筆記的語意忠實與重新定焦：2026-10-07 後續研究
 
+本批保留原件收於[私人 ZIP](https://github.com/JD-Consultant/Caliburn-archives/releases/download/storage-2026-10-08/caliburn-selected-c-evidence-20261008.zip)；各原件的包內路徑見連結標題或下文。按需取回方式見[私人歷史材料與資料庫封存](../../experiments/artifact-storage.md#私人歷史材料與資料庫封存)。
+
 > 時點說明：本文保留 2026-10-07 的候選研究與反例。現行 Plan 已依 ADR0082 接續，內容與保存契約見[JD 工作計畫](../../specs/jd-work-plan.md)；下文不作現行內容限定。
 
 狀態：**候選，未實作、未驗證**。本文件回應筆記實測反例，不新增產品決策或施工授權；正式權責沿 [ADR0081](../../adr/0081-consultant-interview-focus-and-unresolved-plan.md) 與[唯一設計](../../specs/2026-10-06-consultant-interview-planning-and-focus-design.md)。查閱日期：2026-10-07。
@@ -10,7 +12,7 @@
 
 ## 1 現有證據與已存在的要求
 
-[有效比較結果](../../experiments/product-validation/interview-plan-comparison-2026-10-07/results.md)包含兩種不同現象：倉儲 r1 的盤點調帳／核准未知一直保留，但沒有取得後續理解；倉儲 r2 則把「這套核對方式是否普遍適用」改寫成「數量差異發生頻率未知」。後者在換窗前，當輪對話與筆記已出現誤解；不是只有更新舊筆記才會出錯，也不能靠更精確的保存機制修正初始理解。當輪原件仍在本機 `C:/Users/chenb/.codex/visualizations/2026/10/06/01a11182-e198-7652-87d2-d90d10463ed1/caliburn-intplan-comparison/repaired-comparison/formal-repaired-v2/warehouse-r2-P2/turn-02-result.json`，未收進 repository；此處保留原定位，不將其他場次當作替代原件。
+[有效比較結果](../../experiments/product-validation/interview-plan-comparison-2026-10-07/results.md)包含兩種不同現象：倉儲 r1 的盤點調帳／核准未知一直保留，但沒有取得後續理解；倉儲 r2 則把「這套核對方式是否普遍適用」改寫成「數量差異發生頻率未知」。後者在換窗前，當輪對話與筆記已出現誤解；不是只有更新舊筆記才會出錯，也不能靠更精確的保存機制修正初始理解。當輪原件已收於[私人 ZIP](https://github.com/JD-Consultant/Caliburn-archives/releases/download/storage-2026-10-08/caliburn-selected-c-evidence-20261008.zip "包內：caliburn-intplan-comparison/repaired-comparison/formal-repaired-v2/warehouse-r2-P2/turn-02-result.json")，包內路徑為 `caliburn-intplan-comparison/repaired-comparison/formal-repaired-v2/warehouse-r2-P2/turn-02-result.json`；仍以該場次原件核對。
 
 必須分開判讀：**語意遺失**已有明確反例；**合理暫留未知**不應因沒重問而算失敗；**已有可用新線索卻忽略**才是另一種應追查的規劃問題，不能從筆記一直留著直接推論已發生。
 

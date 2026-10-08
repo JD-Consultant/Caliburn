@@ -1,5 +1,7 @@
 # 選問優先順序：隔離有限 probe 的接線與執行門檻
 
+本批保留原件收於[私人 ZIP](https://github.com/JD-Consultant/Caliburn-archives/releases/download/storage-2026-10-08/caliburn-selected-c-evidence-20261008.zip)；各原件的包內路徑見連結標題或下文。按需取回方式見[私人歷史材料與資料庫封存](../../../artifact-storage.md#私人歷史材料與資料庫封存)。
+
 本候選已完成離線 guard 與凍結路徑準備，沒有真 PG、API、provider 或分析品質結果。正式施測由主代理管理；須先鎖定原八場及四份品質判讀，再在原費用授權內執行。研究假設、唯一 315→471 bytes 替換及判讀沿[候選協議](2026-10-07-priority-candidate-protocol.md)。production、指南、原 harness 均未改。
 
 ## 接線與資料界線
@@ -69,7 +71,7 @@ apps/api/.venv/Scripts/python.exe -X utf8 -B docs/experiments/product-validation
 apps/api/.venv/Scripts/python.exe -X utf8 -B docs/experiments/product-validation/data/jd-question-selection-2026-10-07/priority-probe-run.py execute --name priority-probe-01
 ```
 
-所有產物根為 `C:/Users/chenb/.codex/visualizations/2026/10/06/01a11182-e198-7652-87d2-d90d10463ed1/caliburn-intplan-comparison/question-priority-probe`。回答者只讀 `priority-probe-01/review-input/*.json`，依中立問句語意選答，將下列新檔寫到 `decisions/<相同 opaque>.json`；文件要先完成再以原子 rename 發布，避免 runner 讀到半份 JSON。
+當時產物根為 `caliburn-intplan-comparison/question-priority-probe`；保留的正式批次與評閱原件見[私人 ZIP](https://github.com/JD-Consultant/Caliburn-archives/releases/download/storage-2026-10-08/caliburn-selected-c-evidence-20261008.zip "包內：caliburn-intplan-comparison/question-priority-probe/") 的同名目錄。回答者只讀 `priority-probe-01/review-input/*.json`，依中立問句語意選答，將下列新檔寫到 `decisions/<相同 opaque>.json`；文件要先完成再以原子 rename 發布，避免 runner 讀到半份 JSON。
 
 ```json
 {"question_quote":"完整原問句，不改字","answer_kind":"target_answer 或 normal_clarification 或 unknown 或 stop","reason":"判問句語意的具體理由","review_method":"semantic_review"}

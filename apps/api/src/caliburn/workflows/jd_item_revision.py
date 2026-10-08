@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from typing import Literal
-from uuid import UUID, uuid5
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -14,14 +14,13 @@ from caliburn.features.executions.models import (
 )
 from caliburn.features.job_description import (
     candidate_service,
+    compound_service,
     revision_editing,
     source_persistence,
-    work_queries,
 )
 from caliburn.features.job_description.areas import (
     AreaField,
     AreaFieldChange,
-    EditJdAreas,
     ResponsibilityArea,
     ReviseArea,
 )
@@ -30,7 +29,6 @@ from caliburn.features.job_description.capabilities import (
     Capability,
     CapabilityField,
     CapabilityFieldChange,
-    EditJdCapabilities,
     ReorderTaskCapability,
     ReviseCapability,
     SetTaskCapability,
@@ -40,15 +38,19 @@ from caliburn.features.job_description.collaborators import (
     Collaborator,
     CollaboratorField,
     CollaboratorFieldChange,
-    EditJdCollaborators,
     ReviseCollaborator,
+)
+from caliburn.features.job_description.compound_edits import (
+    AddedDetailSources,
+    BoundItemSources,
+    ItemContentRevision,
+    ReviseItemWithSources,
 )
 from caliburn.features.job_description.conditions import (
     ConditionFieldChange,
     ConditionKind,
     ConditionKindChange,
     ConditionTextChange,
-    EditJdConditions,
     JobCondition,
     ReviseCondition,
 )
@@ -61,14 +63,12 @@ from caliburn.features.job_description.sources import (
     JdSourceChange,
     JdSourceTarget,
     RemoveJdSource,
-    ReviseJdSources,
     SourceTargetKind,
     validate_source_changes,
 )
 from caliburn.features.job_description.tasks import (
     AddTaskDetail,
     DetailKind,
-    EditJdTasks,
     RemoveTaskDetail,
     ReviseTask,
     ReviseTaskDetail,
@@ -80,7 +80,6 @@ from caliburn.features.job_description.tasks import (
 )
 from caliburn.features.job_description.work_queries import JdWorkRevision
 from caliburn.features.job_files import service as job_files
-from caliburn.workflows.jd_candidates import JdCandidateEdit, apply_candidate_edit
 from caliburn.workflows.jd_sources import (
     JdSourceSelection,
     resolve_aligned_jd_source,
@@ -177,27 +176,12 @@ type ItemRevisionChange = (
     | ReorderItemCapability
     | ItemSourceIntent
 )
-type ItemContentRevision = (
-    ReviseArea | ReviseTask | ReviseCapability | ReviseCollaborator | ReviseCondition
-)
 
 
 @dataclass(frozen=True, slots=True)
 class ReviseItemInput:
     read_ref: str
     changes: tuple[ItemRevisionChange, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class BoundItemSources:
-    target: JdSourceTarget
-    changes: tuple[JdSourceChange, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class AddedDetailSources:
-    kind: DetailKind
-    sources: tuple[JdSource, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -316,52 +300,20 @@ class JdItemRevisionWorkflow:
             await job_files.lock_job_file(session, file_id)
             await executions.lock_active_writer(session, writer)
             await revision_editing.require_open_candidate(session, file_id, prepared.candidate)
-            revision = prepared.expected_revision_id
-            if prepared.content is not None:
-                revision = await apply_candidate_edit(
-                    session,
-                    file_id,
-                    prepared.candidate,
-                    _content_command(
-                        uuid5(prepared.command_id, "content"), revision, prepared.content
-                    ),
-                )
-            # New detail IDs come from the original owner's result, including on replay.
-            detail_sources = await _added_detail_sources(session, file_id, prepared, revision)
-            for index, change in enumerate(prepared.capabilities):
-                revision = await apply_candidate_edit(
-                    session,
-                    file_id,
-                    prepared.candidate,
-                    EditJdCapabilities(
-                        uuid5(prepared.command_id, f"capability:{index}"), revision, change
-                    ),
-                )
-            for index, group in enumerate((*prepared.sources, *detail_sources)):
-                revision = await apply_candidate_edit(
-                    session,
-                    file_id,
-                    prepared.candidate,
-                    ReviseJdSources(
-                        uuid5(prepared.command_id, f"source:{index}"),
-                        revision,
-                        group.target,
-                        group.changes,
-                    ),
-                )
-            if revision == prepared.expected_revision_id:
-                return "unchanged"
-            if (
-                prepared.content is None
-                and not prepared.capabilities
-                and all(
-                    isinstance(change, AlignJdSource)
-                    for group in prepared.sources
-                    for change in group.changes
-                )
-            ):
-                return "aligned"
-            return "updated"
+            result = await compound_service.apply_compound_edit(
+                session,
+                file_id,
+                ReviseItemWithSources(
+                    prepared.command_id,
+                    prepared.expected_revision_id,
+                    prepared.content,
+                    prepared.capabilities,
+                    prepared.sources,
+                    prepared.added_details,
+                ),
+                candidate=prepared.candidate,
+            )
+            return result.effect
 
 
 def _content_revision(
@@ -581,47 +533,3 @@ async def _sources(
     if sources:
         validate_source_changes(tuple(AddJdSource(source) for source in sources))
     return sources
-
-
-def _content_command(
-    command_id: UUID, revision: UUID, content: ItemContentRevision
-) -> JdCandidateEdit:
-    match content:
-        case ReviseArea():
-            return EditJdAreas(command_id, revision, content)
-        case ReviseTask():
-            return EditJdTasks(command_id, revision, content)
-        case ReviseCapability():
-            return EditJdCapabilities(command_id, revision, content)
-        case ReviseCollaborator():
-            return EditJdCollaborators(command_id, revision, content)
-        case ReviseCondition():
-            return EditJdConditions(command_id, revision, content)
-
-
-async def _added_detail_sources(
-    session: AsyncSession, file_id: UUID, prepared: PreparedItemRevision, content_revision: UUID
-) -> tuple[BoundItemSources, ...]:
-    if not prepared.added_details:
-        return ()
-    if not isinstance(prepared.content, ReviseTask):
-        raise TypeError("Added detail evidence requires a bound task revision")
-    before = await work_queries.read_work_at(session, file_id, prepared.expected_revision_id)
-    after = await work_queries.read_work_at(session, file_id, content_revision)
-    original = next(t for t in before.tasks if t.task_id == prepared.content.task_id)
-    revised = next(t for t in after.tasks if t.task_id == original.task_id)
-    previous_ids = {d.detail_id for d in original.details}
-    new = tuple(d for d in revised.details if d.detail_id not in previous_ids)
-    choices = tuple(
-        choice for kind in DetailKind for choice in prepared.added_details if choice.kind == kind
-    )
-    if len(new) != len(choices):
-        raise RuntimeError("Original detail result does not match its bound evidence")
-    return tuple(
-        BoundItemSources(
-            JdSourceTarget(SourceTargetKind.DETAIL, detail.detail_id, task_id=original.task_id),
-            tuple(AddJdSource(source) for source in choice.sources),
-        )
-        for detail, choice in zip(new, choices, strict=True)
-        if choice.sources
-    )

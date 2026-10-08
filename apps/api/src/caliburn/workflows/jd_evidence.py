@@ -22,7 +22,9 @@ from caliburn.features.job_description.sources import (
 from caliburn.features.job_description.work_queries import JdWorkRevision, read_work_at
 from caliburn.features.job_files.queries import read_job_file
 from caliburn.features.work_memory import candidate_queries as memory
+from caliburn.features.work_memory.candidates import MemorySnapshot
 from caliburn.features.work_memory.revisions import (
+    MemoryLayer,
     MemoryObjectRevision,
     MemoryRevisionNotFoundError,
 )
@@ -30,7 +32,7 @@ from caliburn.workflows.jd_source_queries import (
     JdSourceChanges,
     read_fixed_memory_source,
     read_memory_source_changes,
-    read_memory_source_titles,
+    read_memory_source_title_batch,
 )
 
 
@@ -109,6 +111,20 @@ class JdEvidenceWorkflow:
             snapshot = await memory.read_latest_snapshot(session, job_file_id)
             # A later frontier may grow, but cannot precede this already-published snapshot.
             frontier = await interviews.read_history_frontier(session, job_file_id)
+            memory_sources = tuple(
+                reference.source
+                for reference in references
+                if isinstance(reference.source, MemorySource)
+            )
+            if memory_sources and snapshot is None:
+                raise MemoryRevisionNotFoundError("Published comparison is unavailable")
+            memory_titles = await read_memory_source_title_batch(
+                session,
+                job_file_id=job_file_id,
+                sources=memory_sources,
+                snapshot_id=snapshot.snapshot_id if snapshot is not None else None,
+                interview_through_sequence=frontier,
+            )
             entries = []
             # Repeated citations share source reads for this fixed overview only.
             source_labels: dict[InterviewSource | MemorySource, tuple[str, bool]] = {}
@@ -123,18 +139,8 @@ class JdEvidenceWorkflow:
                         )
                         source_labels[source] = (interview_label(message), False)
                     else:
-                        if snapshot is None:
-                            raise MemoryRevisionNotFoundError("Published comparison is unavailable")
-                        # Publication fixes the situation chain in the root revision,
-                        # including a new revision for changed links with identical text.
-                        # Expand child bodies only when the user requests the actual diff.
-                        current, historical, changed = await read_memory_source_titles(
-                            session,
-                            job_file_id=job_file_id,
-                            source=source,
-                            snapshot_id=snapshot.snapshot_id,
-                            interview_through_sequence=frontier,
-                        )
+                        # 發布版固定情境來源鏈；概覽只批次讀標頭，diff 才展開正文。
+                        current, historical, changed = memory_titles[source]
                         # The label describes original evidence, not its current replacement.
                         original_label = historical or current
                         if original_label is None:
@@ -184,17 +190,17 @@ class JdEvidenceWorkflow:
             snapshot = await memory.read_snapshot(session, job_file_id, source.snapshot_id)
             scope = InterviewReadScope(job_file_id, snapshot.covered_through_sequence)
             if source_ref is None:
-                return await _memory_content(session, source, root, scope)
+                return await _memory_content(session, snapshot, root, scope)
             # Select children by fixed edges, never a caller-supplied arbitrary revision.
             revisions = [root]
             for link in sorted(root.work_situation_references, key=lambda item: item.object_id):
-                child = await memory.read_snapshot_object(
-                    session, job_file_id, source.snapshot_id, link.object_id
+                child = await memory.read_position_object(
+                    session, job_file_id, snapshot.position_id, link.object_id
                 )
                 if child.revision_id != link.revision_id:
                     raise MemoryRevisionNotFoundError("The fixed evidence chain is inconsistent")
                 if source_ref == f"situation_{child.object_id.hex}":
-                    return await _memory_content(session, source, child, scope)
+                    return await _memory_content(session, snapshot, child, scope)
                 revisions.append(child)
             source_ids = tuple(
                 dict.fromkeys(
@@ -297,19 +303,29 @@ async def _formal_reference(
 
 async def _memory_content(
     session: AsyncSession,
-    source: MemorySource,
+    snapshot: MemorySnapshot,
     revision: MemoryObjectRevision,
     scope: InterviewReadScope,
 ) -> MemoryEvidence:
     links = []
-    for reference in sorted(revision.work_situation_references, key=lambda item: item.object_id):
-        child = await memory.read_snapshot_object(
-            session, scope.job_file_id, source.snapshot_id, reference.object_id
+    sources = (
+        await memory.read_position_selection(
+            session,
+            scope.job_file_id,
+            snapshot.position_id,
+            tuple(reference.object_id for reference in revision.work_situation_references),
         )
-        if child.revision_id != reference.revision_id:
+        if revision.work_situation_references
+        else {}
+    )
+    for reference in sorted(revision.work_situation_references, key=lambda item: item.object_id):
+        child = sources.get(reference.object_id)
+        if child is None or (
+            child.revision_id != reference.revision_id or child.layer != MemoryLayer.WORK_SITUATION
+        ):
             raise MemoryRevisionNotFoundError("The fixed evidence chain is inconsistent")
         links.append(
-            EvidenceLink(f"situation_{child.object_id.hex}", "work_situation", child.content.title)
+            EvidenceLink(f"situation_{child.object_id.hex}", "work_situation", child.title)
         )
     if revision.interview_references:
         messages = await interviews.read_interview_sources(

@@ -1,0 +1,22 @@
+sequenceDiagram
+  participant UI as 訪談畫面
+  participant API as HTTP 查詢／SSE 接線
+  participant SDK as Responses typed stream
+  participant Run as 共用執行／原件保存
+  participant Hub as 暫態公開投影
+  UI->>API: 訂閱本 Turn 的活動 SSE
+  API->>Hub: 註冊限定範圍的訂閱
+  Run->>SDK: 呼叫 Responses 並消費串流
+  loop 本次回應的公開增量
+    SDK->>Hub: callback：投入公開文字／可讀推理摘要
+    Hub-->>SDK: 已處理暫態通知；不保證永久保存
+    Hub-)API: 通知限定範圍的訂閱者
+    API-)UI: SSE：暫時顯示，尚未保存
+  end
+  SDK-->>Run: 完整原生 Response，保留 phase
+  Run->>Run: 可靠保存，依原規則執行工具／下一 Step
+  UI->>API: GET 已保存公開內容與 Turn 狀態
+  API->>Run: 讀取原件投影與持久 Turn 狀態
+  Run-->>API: 已保存公開內容及原 Turn 狀態
+  API-->>UI: 可歷史回看；沒有正文亦可為合法結果
+  Note over Run,UI: 只有正式完成交易成立，才顯示最終答覆與已完成

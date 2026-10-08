@@ -1,0 +1,38 @@
+erDiagram
+  direction TB
+  job_files ||..o{ interview_texts : owns
+  interview_texts ||..o| formal_interviews : qualifies
+  interview_texts ||..o| interview_inputs : submitted_as
+  interview_inputs ||--o| interview_replies : receives
+  interview_texts ||..o| interview_replies : records_reply
+  job_files {
+    uuid job_file_id PK
+    uuid creation_command_id UK
+    text initial_display_name
+    text display_name
+    bigint name_revision
+    text employee_name
+    timestamptz created_at
+  }
+  interview_texts {
+    uuid source_id PK
+    uuid job_file_id FK
+    text speaker
+    text interview_text
+  }
+  formal_interviews {
+    uuid job_file_id PK,FK
+    int interview_sequence PK
+    uuid source_id FK,UK
+  }
+  interview_inputs {
+    uuid job_file_id PK,FK
+    uuid command_id PK
+    uuid source_id FK,UK
+    uuid execution_id FK,UK
+  }
+  interview_replies {
+    uuid job_file_id PK,FK
+    uuid execution_id PK,FK
+    uuid source_id FK,UK
+  }

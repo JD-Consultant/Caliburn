@@ -55,7 +55,7 @@ def test_0018_preserves_existing_revisions_and_operations(
             )
             connection.execute(insert, {**identities, "kind": "revise_profile"})
             before = {
-                table: connection.execute(text(f"SELECT * FROM {table}")).all()
+                table: connection.execute(text(f"SELECT * FROM {table}")).mappings().all()
                 for table in ("job_files", "jd_revisions", "job_descriptions", "jd_operations")
             }
             with pytest.raises(IntegrityError):
@@ -66,7 +66,12 @@ def test_0018_preserves_existing_revisions_and_operations(
             command.upgrade(config, "head")
             command.upgrade(config, "head")
             for table, rows in before.items():
-                assert connection.execute(text(f"SELECT * FROM {table}")).all() == rows
+                # 後續 migration 可加欄位，原有欄位及值仍必須逐一保留。
+                columns = ", ".join(rows[0].keys())
+                assert (
+                    connection.execute(text(f"SELECT {columns} FROM {table}")).mappings().all()
+                    == rows
+                )
             connection.execute(
                 insert, {**identities, "command": uuid4(), "kind": "undo_completed_turn"}
             )

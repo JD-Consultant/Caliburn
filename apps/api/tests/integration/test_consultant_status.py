@@ -101,6 +101,7 @@ def test_http_status_projects_only_public_fields_and_never_caches_input(client: 
         "input_text": "保持可回看的失敗輸入",
         "allowed_controls": [],
         "commentary": None,
+        "plan_preview": None,
         "candidate": None,
     }
     missing = client.get(f"/api/job-files/{uuid4()}/consultant-turns/{execution_id}")
@@ -177,6 +178,7 @@ def test_command_lookup_recovers_only_the_scoped_original_without_formalizing(
         "input_text": " 遺失回應後查回\n原文。 ",
         "allowed_controls": [],
         "commentary": None,
+        "plan_preview": None,
         "candidate": None,
     }
     for file_id, missing_command in ((file_ids[1], command_id), (file_ids[0], uuid4())):

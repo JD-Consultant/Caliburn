@@ -36,6 +36,7 @@ def test_backend_binding_is_explicit_and_never_trusts_proxy_headers(
     assert observed["port"] == 8100
     assert observed["loop"] == "asyncio:SelectorEventLoop"
     assert observed["proxy_headers"] is False
+    assert observed["log_config"] is None
 
 
 def test_backend_rejects_arbitrary_network_binding(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -8,7 +8,7 @@ from psycopg.types.json import Jsonb
 
 from caliburn.adapters.database_settings import DatabaseSettings
 from caliburn.diagnostics.checkpoints import read_checkpoint_records
-from caliburn.diagnostics.projection import collect_steps, redact
+from caliburn.diagnostics.projection import collect_initial_context, collect_steps, redact
 
 
 def refresh_diagnostics(
@@ -59,29 +59,27 @@ def refresh_diagnostics(
                     raise ValueError("Selected job file or execution not found")
                 return 0
             for file_id, run_id, status, employee_input, final_reply in rows:
-                records = read_checkpoint_records(
-                    connection, job_file_id=file_id, execution_id=run_id
+                records = sorted(
+                    read_checkpoint_records(connection, job_file_id=file_id, execution_id=run_id),
+                    key=lambda row: (
+                        row["checkpoint_time"],
+                        row["thread_id"],
+                        row["checkpoint_id"],
+                        row["source"] == "pending_write",
+                    ),
                 )
-                steps = collect_steps(
-                    sorted(
-                        records,
-                        key=lambda row: (
-                            row["checkpoint_time"],
-                            row["thread_id"],
-                            row["checkpoint_id"],
-                            row["source"] == "pending_write",
-                        ),
-                    )
-                )
+                steps = collect_steps(records)
+                initial_context = collect_initial_context(records)
                 connection.execute(
                     "INSERT INTO diagnostic_execution_snapshots "
                     "(job_file_id,execution_id,execution_status,snapshot_at,steps,"
-                    "employee_input,final_reply) "
-                    "VALUES (%s,%s,%s,transaction_timestamp(),%s,%s,%s) "
+                    "employee_input,final_reply,captured_initial_context) "
+                    "VALUES (%s,%s,%s,transaction_timestamp(),%s,%s,%s,%s) "
                     "ON CONFLICT (execution_id) DO UPDATE SET "
                     "execution_status=excluded.execution_status,snapshot_at=excluded.snapshot_at,"
                     "steps=excluded.steps,employee_input=excluded.employee_input,"
-                    "final_reply=excluded.final_reply",
+                    "final_reply=excluded.final_reply,"
+                    "captured_initial_context=excluded.captured_initial_context",
                     (
                         file_id,
                         run_id,
@@ -89,6 +87,7 @@ def refresh_diagnostics(
                         Jsonb(steps),
                         redact(employee_input),
                         redact(final_reply),
+                        Jsonb(initial_context) if initial_context is not None else None,
                     ),
                 )
             return len(rows)

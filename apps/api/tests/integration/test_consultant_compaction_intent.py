@@ -152,8 +152,12 @@ def test_requested_compaction_runs_next_turn_once_and_excludes_new_input(
     client.portal.call(run, accept("REPLACEMENT_INPUT"))
     assert len(compactions) == 1
     replacement = sent[-1]["input"]
-    assert len(replacement) == len(compacted_items) + 2
-    assert replacement[:-2] == compacted_items
+    assert len(replacement) == len(compacted_items) + 3
+    assert json.loads(replacement[-3]["content"]) == {
+        "data_kind": "consultant_interview_plan",
+        "plan": None,
+    }
+    assert replacement[:-3] == compacted_items
     assert replacement[-2]["role"] == "user"  # Fresh App data follows all retained items.
     assert replacement[-1] == {"role": "user", "content": "REPLACEMENT_INPUT"}
     assert "CANCELLED_INPUT" not in json.dumps(sent[-1]["input"])

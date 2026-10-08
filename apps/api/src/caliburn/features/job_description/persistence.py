@@ -102,7 +102,8 @@ class JdOperationRecord(Base):
         CheckConstraint(
             "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
             "'edit_collaborators', 'edit_conditions', 'restore_candidate', "
-            "'discard_candidate', 'adopt_candidate', 'edit_sources', 'undo_completed_turn')",
+            "'discard_candidate', 'adopt_candidate', 'edit_sources', 'undo_completed_turn', "
+            "'compound_edit')",
             name="kind",
         ),
         ForeignKeyConstraint(
@@ -128,6 +129,7 @@ class JdOperationRecord(Base):
     candidate_generation_id: Mapped[UUID | None]
     # Loaded JSON is untrusted until compared with the typed original command.
     request_payload: Mapped[object] = mapped_column(JSONB)
+    result_payload: Mapped[object | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -159,6 +161,20 @@ async def read_operation(
     session: AsyncSession, job_file_id: UUID, command_id: UUID
 ) -> JdOperationRecord | None:
     return await session.get(JdOperationRecord, (job_file_id, command_id))
+
+
+async def read_operations(
+    session: AsyncSession, job_file_id: UUID, command_ids: tuple[UUID, ...]
+) -> tuple[JdOperationRecord, ...]:
+    """批讀明確列舉的原操作；用於舊複合意圖的完整性核對，不推測交易時間。"""
+    return tuple(
+        await session.scalars(
+            select(JdOperationRecord).where(
+                JdOperationRecord.job_file_id == job_file_id,
+                JdOperationRecord.command_id.in_(command_ids),
+            )
+        )
+    )
 
 
 async def read_revision_interval(

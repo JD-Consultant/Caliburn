@@ -1,7 +1,7 @@
 """One model profile intent binds evidence once and applies all effects in one transaction."""
 
 from dataclasses import dataclass
-from uuid import UUID, uuid5
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -13,10 +13,15 @@ from caliburn.features.executions.models import (
 )
 from caliburn.features.job_description import (
     candidate_service,
+    compound_service,
     revision_editing,
     source_persistence,
 )
 from caliburn.features.job_description.candidates import JdCandidateScope
+from caliburn.features.job_description.compound_edits import (
+    BoundProfileSources,
+    ReviseProfileWithSources,
+)
 from caliburn.features.job_description.models import ProfileChange, ProfileField, ReviseJdProfile
 from caliburn.features.job_description.sources import (
     AddJdSource,
@@ -29,7 +34,6 @@ from caliburn.features.job_description.sources import (
     SourceTargetKind,
 )
 from caliburn.features.job_files import service as job_files
-from caliburn.workflows.jd_candidates import apply_candidate_edit
 from caliburn.workflows.jd_sources import (
     JdSourceSelection,
     resolve_aligned_jd_source,
@@ -57,12 +61,6 @@ class AlignProfileSource:
 
 
 type ProfileSourceIntent = AddProfileSource | RemoveProfileSource | AlignProfileSource
-
-
-@dataclass(frozen=True, slots=True)
-class BoundProfileSources:
-    field: ProfileField
-    changes: tuple[JdSourceChange, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -149,39 +147,19 @@ class JdProfileWriteWorkflow:
         if writer.scope.execution_id != prepared.candidate.execution_id:
             raise ExecutionStateError("This prepared edit belongs to a different Turn")
         async with self.sessions.begin() as session:
-            await job_files.lock_job_file(session, writer.scope.job_file_id)
+            file_id = writer.scope.job_file_id
+            await job_files.lock_job_file(session, file_id)
             await executions.lock_active_writer(session, writer)
-            await revision_editing.require_open_candidate(
-                session, writer.scope.job_file_id, prepared.candidate
+            await revision_editing.require_open_candidate(session, file_id, prepared.candidate)
+            result = await compound_service.apply_compound_edit(
+                session,
+                file_id,
+                ReviseProfileWithSources(
+                    prepared.command_id,
+                    prepared.expected_revision_id,
+                    prepared.changes,
+                    prepared.sources,
+                ),
+                candidate=prepared.candidate,
             )
-            revision = prepared.expected_revision_id
-            if prepared.changes:
-                revision = await apply_candidate_edit(
-                    session,
-                    writer.scope.job_file_id,
-                    prepared.candidate,
-                    ReviseJdProfile(
-                        uuid5(prepared.command_id, "profile_text"), revision, prepared.changes
-                    ),
-                )
-            for group in prepared.sources:
-                revision = await apply_candidate_edit(
-                    session,
-                    writer.scope.job_file_id,
-                    prepared.candidate,
-                    ReviseJdSources(
-                        uuid5(prepared.command_id, f"profile_source:{group.field}"),
-                        revision,
-                        JdSourceTarget(SourceTargetKind.PROFILE_FIELD, field=group.field),
-                        group.changes,
-                    ),
-                )
-            if revision == prepared.expected_revision_id:
-                return "unchanged"
-            if not prepared.changes and all(
-                isinstance(change, AlignJdSource)
-                for group in prepared.sources
-                for change in group.changes
-            ):
-                return "aligned"
-            return "updated"
+            return result.effect

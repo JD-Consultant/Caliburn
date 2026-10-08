@@ -53,6 +53,7 @@ function stubBackend(options: { discoveryNeverAnswers?: boolean } = {}): Posted[
       input_text: '上一輪的原話',
       allowed_controls: [],
       commentary: [],
+      plan_preview: null,
       candidate: null,
     };
     return Promise.resolve(Response.json(turn));

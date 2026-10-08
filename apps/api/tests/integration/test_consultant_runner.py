@@ -153,6 +153,32 @@ def test_native_model_tools_then_atomic_completion(
                 exchange = await runner.run(writer)
             finally:
                 await sdk.close()
+
+        # A different process has neither the original Runner nor its saver/client.
+        # Recovery must read the original complete checkpoints and exchange without IO
+        # to the provider, even if today's rollout no longer advertises plan tools.
+        def reject_remote(request):
+            pytest.fail("Completed recovery cannot send a provider request")
+
+        async with AsyncPostgresSaver.from_conn_string(
+            dsn, serde=create_graph_serializer()
+        ) as restored_saver:
+            restored_sdk = create_responses_client(
+                api_key="synthetic-never-used",
+                timeout_seconds=5,
+                http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(reject_remote)),
+            )
+            try:
+                fresh = ConsultantRunner(
+                    sessions,
+                    restored_saver,
+                    restored_sdk,
+                    ModelSettings(api_key="synthetic"),
+                    interview_plans_enabled=False,
+                )
+                assert await fresh.run(writer) == exchange
+            finally:
+                await restored_sdk.close()
         async with sessions() as session:
             assert (
                 await executions.read_execution(session, scope)

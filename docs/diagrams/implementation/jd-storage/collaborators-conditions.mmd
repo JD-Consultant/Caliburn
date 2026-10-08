@@ -1,0 +1,6 @@
+erDiagram
+  direction LR
+  jd_revisions ||--o{ jd_collaborator_selections : selects_ordered_collaborators
+  jd_collaborator_revisions ||..o{ jd_collaborator_selections : reuses_fixed_content
+  jd_revisions ||--o{ jd_condition_selections : selects_ordered_conditions
+  jd_condition_revisions ||..o{ jd_condition_selections : reuses_fixed_content

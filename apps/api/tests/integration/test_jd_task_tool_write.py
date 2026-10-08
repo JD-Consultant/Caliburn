@@ -3,6 +3,7 @@
 from collections.abc import Awaitable, Callable
 from uuid import UUID, uuid4
 
+import psycopg
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,6 +41,7 @@ def transact[T](client: TestClient, operation: Callable[[AsyncSession], Awaitabl
 
 def test_task_detail_and_capability_relation_have_separate_evidence_and_replay(
     client: TestClient,
+    database_connection: psycopg.Connection,
 ) -> None:
     file_id = UUID(
         client.post(
@@ -89,7 +91,14 @@ def test_task_detail_and_capability_relation_have_separate_evidence_and_replay(
         )
 
     prepared = client.portal.call(prepare)
+    before_count = database_connection.execute(
+        "SELECT count(*) FROM jd_revisions WHERE job_file_id = %s", (file_id,)
+    ).fetchone()[0]
     result = client.portal.call(workflow.execute, writer, prepared)
+    after_count = database_connection.execute(
+        "SELECT count(*) FROM jd_revisions WHERE job_file_id = %s", (file_id,)
+    ).fetchone()[0]
+    assert after_count - before_count == 1
     preview = client.portal.call(candidates.read, scope)
     assert len(preview.work.tasks) == 1
     task = preview.work.tasks[0]
@@ -107,5 +116,6 @@ def test_task_detail_and_capability_relation_have_separate_evidence_and_replay(
         SourceTargetKind.TASK_CAPABILITY,
     }
     assert all(not r.needs_review for r in references)
+    assert all(r.reviewed_revision_id == preview.position.revision_id for r in references)
     assert client.portal.call(workflow.execute, writer, prepared) == result
     assert client.portal.call(candidates.read, scope).position == preview.position

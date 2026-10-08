@@ -6,16 +6,18 @@ from sqlalchemy import (
     CheckConstraint,
     ForeignKey,
     ForeignKeyConstraint,
+    Select,
     Text,
     UniqueConstraint,
     func,
     select,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, aliased, mapped_column
 
 from caliburn.adapters.database import Base
 from caliburn.features.interviews.models import (
+    FormalExchangePosition,
     InterviewHistoryEntry,
     InterviewMessage,
     InterviewSpeaker,
@@ -136,6 +138,58 @@ async def read_formal_frontier(session: AsyncSession, job_file_id: UUID) -> int:
             )
         )
     ) or 0
+
+
+async def list_formal_exchange_positions(
+    session: AsyncSession, job_file_id: UUID, through_sequence: int
+) -> tuple[FormalExchangePosition, ...]:
+    """Select metadata only; pending inputs and incomplete/mismatched exchanges are excluded."""
+    rows = await session.execute(
+        formal_exchange_positions_projection(job_file_id, through_sequence).order_by(
+            "employee_input_sequence"
+        )
+    )
+    return tuple(FormalExchangePosition(execution_id, sequence) for execution_id, sequence in rows)
+
+
+def formal_exchange_positions_projection(
+    job_file_id: UUID, through_sequence: int
+) -> Select[UUID, int]:
+    """正式配對及員工輸入上界由訪談 owner 維護，供具名跨域讀取組合。"""
+    employee = aliased(FormalInterviewRecord)
+    reply = aliased(FormalInterviewRecord)
+    employee_text = aliased(InterviewTextRecord)
+    reply_text = aliased(InterviewTextRecord)
+    return (
+        select(
+            InterviewInputRecord.execution_id,
+            employee.interview_sequence.label("employee_input_sequence"),
+        )
+        .join(
+            InterviewReplyRecord,
+            (InterviewReplyRecord.job_file_id == InterviewInputRecord.job_file_id)
+            & (InterviewReplyRecord.execution_id == InterviewInputRecord.execution_id),
+        )
+        .join(
+            employee,
+            (employee.job_file_id == InterviewInputRecord.job_file_id)
+            & (employee.source_id == InterviewInputRecord.source_id),
+        )
+        .join(
+            reply,
+            (reply.job_file_id == InterviewReplyRecord.job_file_id)
+            & (reply.source_id == InterviewReplyRecord.source_id),
+        )
+        .join(employee_text, employee_text.source_id == employee.source_id)
+        .join(reply_text, reply_text.source_id == reply.source_id)
+        .where(
+            InterviewInputRecord.job_file_id == job_file_id,
+            employee.interview_sequence <= through_sequence,
+            reply.interview_sequence > employee.interview_sequence,
+            employee_text.speaker == InterviewSpeaker.EMPLOYEE.value,
+            reply_text.speaker == InterviewSpeaker.CONSULTANT.value,
+        )
+    )
 
 
 async def insert_formal_exchange(

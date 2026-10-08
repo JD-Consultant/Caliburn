@@ -2,11 +2,13 @@
 
 from uuid import UUID
 
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.interviews import persistence
 from caliburn.features.interviews.models import (
     AcceptedInterviewInput,
+    FormalExchangePosition,
     InterviewHistoryEntry,
     InterviewInputNotFoundError,
     InterviewMessage,
@@ -64,6 +66,22 @@ async def read_accepted_input(
 async def read_history_frontier(session: AsyncSession, job_file_id: UUID) -> int:
     """Caller pins this value once for A; Memory F comes from the triggering employee source."""
     return await persistence.read_formal_frontier(session, job_file_id)
+
+
+async def list_formal_exchange_positions(
+    session: AsyncSession, scope: InterviewReadScope
+) -> tuple[FormalExchangePosition, ...]:
+    """Public metadata boundary for matched formal exchanges within a fixed input frontier."""
+    return await persistence.list_formal_exchange_positions(
+        session, scope.job_file_id, scope.through_sequence
+    )
+
+
+def formal_exchange_positions_projection(scope: InterviewReadScope) -> Select[UUID, int]:
+    """只公開同職務、固定員工輸入上界內的正式 exchange 身分及排序序號。"""
+    return persistence.formal_exchange_positions_projection(
+        scope.job_file_id, scope.through_sequence
+    )
 
 
 def _check_sequence(scope: InterviewReadScope, sequence: int) -> None:

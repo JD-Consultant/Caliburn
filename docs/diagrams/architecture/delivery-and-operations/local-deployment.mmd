@@ -1,0 +1,20 @@
+flowchart LR
+  %% diagram: local-deployment
+  subgraph local[操作者電腦・部署節點]
+    subgraph browserNode[Web 瀏覽器・部署節點]
+      browser[Web 工作區<br/>容器實例・React<br/>訪談與 JD 編輯]
+    end
+    subgraph appContainer[app・部署節點・Docker 容器]
+      app[App 後端<br/>容器實例・FastAPI<br/>API 與背景分析<br/>Web 成品、PDF]
+    end
+    subgraph dbContainer[postgres・部署節點・Docker 容器]
+      db[(Caliburn 資料庫<br/>容器實例<br/>PostgreSQL<br/>業務資料<br/>執行 checkpoint)]
+    end
+    browser -->|loopback HTTP<br/>Web、命令與查詢<br/>SSE：訂閱公開進度| app
+    app -->|容器內網<br/>PostgreSQL protocol<br/>查詢與保存| db
+  end
+  app -->|HTTPS：模型請求| openai[OpenAI<br/>外部系統實例<br/>Responses API<br/>推論與原生壓縮]
+  style local fill:none,stroke:#64748b,stroke-dasharray:0
+  style browserNode fill:none,stroke:#64748b,stroke-dasharray:0
+  style appContainer fill:none,stroke:#64748b,stroke-dasharray:0
+  style dbContainer fill:none,stroke:#64748b,stroke-dasharray:0

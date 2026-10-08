@@ -1,0 +1,13 @@
+flowchart TD
+  F([開始：正式 head 為 R0]) --> S[建立候選：base R0、current R0]
+  S --> Q{本次候選操作}
+  Q -->|修改| E[短交易建立修訂並前移 current<br/>例如 R1 → R2]
+  Q -->|預覽| P[捕捉一次 current<br/>profile 與全部集合沿同一修訂讀取]
+  Q -->|恢復| R[恢復到本候選合法祖先<br/>更換 generation，拒絕舊分支遲到寫入]
+  E --> Q
+  P --> Q
+  R --> Q
+  Q -->|取消工作| D[共同交易：放棄候選並結束 execution]
+  Q -->|工作符合正式完成資格| A[共同交易：採用 current 為正式 head<br/>保存正式訪談及 Turn 完成]
+  D --> X([候選 discarded；正式 head 仍 R0])
+  A --> Y([候選 adopted；正式 head 選 current])

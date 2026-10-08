@@ -1,0 +1,25 @@
+%% legend: 膠囊：本圖起訖；矩形：處理；菱形：判斷；平行四邊形：資料交接；雙側線：子流程。
+%%{init: {"flowchart": {"wrappingWidth": 240, "nodeSpacing": 32, "rankSpacing": 32}}}%%
+flowchart TD
+  START([完整 Step 已保存]) --> HAS{本工作配置暫停控制？}
+  HAS -->|有| CHECK[核執行資格]
+  CHECK --> READ[/讀取已受理的暫停要求/]
+  READ --> SAVE[/保存 control_action/]
+  SAVE --> PAUSE{需要暫停？}
+  PAUSE -->|是| INT[執行原生 interrupt]
+  INT --> DURABLE[/saver 可靠保存 interrupt/]
+  DURABLE --> MARK[公開入口確認領域 PAUSED]
+  MARK --> PAUSED([返回：暫停])
+  HAS -->|無| ROUTE[取已保存的 next_action]
+  PAUSE -->|否| ROUTE
+  ROUTE --> FINAL{原 R 分類為 deliver_answer？}
+  FINAL -->|是| ACTIVE[公開入口核執行資格]
+  ACTIVE --> DONE([返回：角色結果])
+  FINAL -->|否| GUARD[下一請求前核執行資格]
+  GUARD --> LIMIT{尚有模型 Step 額度？}
+  LIMIT -->|有| CONTINUE([返回：可建立下一 request])
+  LIMIT -->|無| STOP([返回：步數耗盡])
+  RESUME([明確續作入口]) --> ID[/控制接線讀回原 interrupt_id/]
+  ID --> ACCEPT[[領域受理續作<br/>agent-supervision §2]]
+  ACCEPT --> COMMAND[以原 ID 重入 interrupt<br/>核續作值與執行資格]
+  COMMAND --> CHECK

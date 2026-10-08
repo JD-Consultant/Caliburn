@@ -17,7 +17,11 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from caliburn.features.executions import history
 from caliburn.features.executions import service as executions
-from caliburn.features.executions.history_models import AgentRole, ContextPosition
+from caliburn.features.executions.history_models import (
+    AgentRole,
+    ContextPosition,
+    HistoryConflictError,
+)
 from caliburn.features.executions.models import (
     ExecutionInfo,
     ExecutionKind,
@@ -25,7 +29,10 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
     ExecutionWriter,
 )
+from caliburn.features.interview_plans import service as interview_plans
+from caliburn.features.interview_plans.models import PlanPosition
 from caliburn.features.interviews import queries as interviews
+from caliburn.features.interviews import service as interview_service
 from caliburn.features.interviews.models import FormalInterviewExchange, InterviewReadScope
 from caliburn.features.job_description import candidate_service, source_persistence
 from caliburn.features.job_description.candidates import CandidateStateError, JdCandidatePosition
@@ -45,6 +52,7 @@ class ConsultantCompletionWorkflow:
         position: JdCandidatePosition,
         reply_text: str,
         context_position: ContextPosition,
+        plan_position: PlanPosition | None = None,
     ) -> FormalInterviewExchange:
         """Commit once or recover the exact original reply/JD/context; mismatched replays fail.
 
@@ -81,10 +89,57 @@ class ConsultantCompletionWorkflow:
                 position,
                 uuid5(writer.scope.execution_id, "consultant_completion.adopt_candidate"),
             )
+            await interview_plans.validate_final(
+                session,
+                writer.scope.job_file_id,
+                writer.scope.execution_id,
+                plan_position,
+            )
             # This owner finishes execution eligibility too. Its final pause/writer check
             # must be in this transaction so a competing control cannot leave half a result.
             await history.complete_context_histories(
                 session, writer, {AgentRole.JOB_CONSULTANT: context_position}
+            )
+            return exchange
+
+    async def recover_completed(
+        self,
+        writer: ExecutionWriter,
+        context_position: ContextPosition,
+        reply_text: str,
+        plan_position: PlanPosition | None,
+    ) -> FormalInterviewExchange:
+        """Recover only the already committed original outcome; caller verifies exact native final.
+
+        Native checkpoint reads occur outside this short transaction. Never turn an active
+        execution into completed here, or re-adopt JD/history heads advanced by later work.
+        """
+        _require_consultant(writer)
+        async with self.sessions.begin() as session:
+            await job_files.lock_job_file(session, writer.scope.job_file_id)
+            original = await executions.read_execution(session, writer.scope)
+            if original.status != ExecutionStatus.COMPLETED:
+                raise ExecutionStateError(
+                    "Only a completed consultant Turn has a recoverable result"
+                )
+            await executions.finish_execution(session, writer, ExecutionStatus.COMPLETED)
+            binding = await history.read_context_history(
+                session, writer.scope, AgentRole.JOB_CONSULTANT
+            )
+            if binding is None or binding.completed != context_position:
+                raise HistoryConflictError(
+                    "Recovery requires the original completed context position"
+                )
+            exchange = await interview_service.read_formal_exchange(
+                session,
+                job_file_id=writer.scope.job_file_id,
+                execution_id=writer.scope.execution_id,
+            )
+            if exchange is None:
+                raise ExecutionStateError("The completed Turn has no original formal exchange")
+            interview_service.require_same_reply(exchange, reply_text)
+            await interview_plans.validate_final(
+                session, writer.scope.job_file_id, writer.scope.execution_id, plan_position
             )
             return exchange
 

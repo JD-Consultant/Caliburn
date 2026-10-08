@@ -18,6 +18,7 @@ from caliburn.agent_execution.context_compaction import (
     HeldPreparationCount,
     bind_window_compaction,
 )
+from caliburn.agent_execution.context_windows import read_context_checkpoint
 from caliburn.agent_execution.response_steps import (
     inspect_response_step,
 )
@@ -26,13 +27,22 @@ from caliburn.agent_execution.tool_steps import (
     HeldModelResponse,
     PausedResponseLoop,
     ResponseStepRuntime,
+    read_completed_response_history,
     run_response_loop,
 )
-from caliburn.agents.job_consultant.context_binding import TurnContext, capture_turn_context
-from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
+from caliburn.agents.job_consultant.configuration import ConsultantConfiguration
+from caliburn.agents.job_consultant.context_binding import (
+    TurnContext,
+    capture_turn_context,
+    read_captured_turn_template,
+    read_saved_turn_context,
+)
+from caliburn.agents.job_consultant.interview_plan_context import has_interview_plan_tools
+from caliburn.agents.job_consultant.interview_plan_projection import bind_interview_plan_compaction
 from caliburn.agents.job_consultant.recent_preload import fit_recent_interview_preload
-from caliburn.agents.job_consultant.reference_instructions import OCCUPATION_REFERENCE_INSTRUCTIONS
 from caliburn.agents.job_consultant.tools import ConsultantTools, consultant_tool_definitions
+from caliburn.features.executions import history
+from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import (
     AgentRole,
     HistoryWindowKind,
@@ -41,11 +51,14 @@ from caliburn.features.executions.history_models import (
 from caliburn.features.executions.models import (
     ExecutionScope,
     ExecutionStateError,
+    ExecutionStatus,
     ExecutionWriter,
 )
+from caliburn.features.interview_plans.models import PlanStateError
 from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import ModelSettings
 from caliburn.transport.model_tools.context_compaction import ContextCompactionTools
+from caliburn.transport.model_tools.interview_plans import InterviewPlanTools
 from caliburn.transport.model_tools.jd_changes import JdChangesTools
 from caliburn.transport.model_tools.jd_reads import JdReadTools
 from caliburn.transport.model_tools.jd_writes import JdWriteTools
@@ -58,6 +71,7 @@ from caliburn.transport.model_tools.occupation_references import (
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.context_history import RoleContextHistory
 from caliburn.workflows.execution_controls import ConsultantExecutionControls
+from caliburn.workflows.interview_plans import InterviewPlanWorkflow
 from caliburn.workflows.jd_candidates import JdCandidateWorkflow
 from caliburn.workflows.jd_changes import JdChangesWorkflow
 from caliburn.workflows.jd_item_creation import JdItemCreationWorkflow
@@ -84,6 +98,8 @@ class ConsultantRunner:
     on_commentary: Callable[[ExecutionScope, PublicCommentaryUpdate], None] | None = None
     on_reasoning_summary: Callable[[ExecutionScope, PublicReasoningSummary], None] | None = None
     occupation_references: OccupationReferenceClient | None = None
+    interview_plans_enabled: bool = True
+    configuration: ConsultantConfiguration = ConsultantConfiguration()
 
     async def run(
         self,
@@ -102,6 +118,9 @@ class ConsultantRunner:
         role_history = RoleContextHistory(
             self.sessions, writer, AgentRole.JOB_CONSULTANT, self.checkpointer
         )
+        completed = await self._recover_completed(writer)
+        if completed is not None:
+            return completed
         preparation_thread = context_thread_id(
             writer.scope, AgentRole.JOB_CONSULTANT, HistoryWindowKind.PREPARED_HISTORY
         )
@@ -136,28 +155,15 @@ class ConsultantRunner:
             else None,
         )
         executor = model.executor
-        instructions = CONSULTANT_INSTRUCTIONS
-        if self.occupation_references is not None:
-            instructions += f"\n\n{OCCUPATION_REFERENCE_INSTRUCTIONS}"
-        history_template = ResponseRequest(
-            model=self.settings.model,
-            instructions=instructions,
-            input_items=[],
-            tools=consultant_tool_definitions(
-                occupation_references_enabled=self.occupation_references is not None,
-            ),
-            reasoning_effort=self.settings.reasoning_effort,
-            max_output_tokens=self.settings.max_output_tokens,
-            stream=commentary is not None,
-        )
         preparation_recovery = (
             recovery
             if isinstance(recovery, (HeldCompaction, HeldPreparationCount))
             and recovery.thread_id == preparation_thread
             else None
         )
+        captured_template = await read_captured_turn_template(self.checkpointer, writer.scope)
         history_template = await role_history.resolve_template(
-            history_template,
+            captured_template or (lambda: self._template(stream=commentary is not None)),
             recovery=preparation_recovery,
         )
         if _references_enabled(history_template) and self.occupation_references is None:
@@ -179,6 +185,7 @@ class ConsultantRunner:
             role_history,
             template=ResponseRequest.from_snapshot(turn_payload),
             prepared_history=prepared,
+            jd_read_max_result_characters=self.configuration.jd_read_max_result_characters,
         )
         tools = await self._tools(writer, context, role_history)
 
@@ -188,6 +195,8 @@ class ConsultantRunner:
             runtime=model.compaction,
             recovery=recovery,
         )
+        if context.plan_position is not None:
+            compact_window = bind_interview_plan_compaction(role_history, compact_window)
 
         runtime = ResponseStepRuntime(
             request_model=executor.request_model,
@@ -229,8 +238,39 @@ class ConsultantRunner:
         )
         position = await role_history.read_completed_position()
         candidate = await JdCandidateWorkflow(self.sessions).read(writer.scope)
+        plan = (
+            await InterviewPlanWorkflow(self.sessions).read_current(writer.scope)
+            if context.plan_position is not None
+            else None
+        )
+        if context.plan_position is not None and plan is None:
+            raise PlanStateError("The captured plan capability has no final candidate")
         return await ConsultantCompletionWorkflow(self.sessions).complete(
-            writer, candidate.position, reply, position
+            writer,
+            candidate.position,
+            reply,
+            position,
+            plan_position=plan.position if plan is not None else None,
+        )
+
+    def _template(self, *, stream: bool) -> ResponseRequest:
+        """只有沒有原生保存邊界的新回合，才組裝及驗證當前候選。"""
+        return ResponseRequest(
+            model=self.settings.model,
+            instructions=self.configuration.instructions(
+                interview_plans_enabled=self.interview_plans_enabled,
+                occupation_references_enabled=self.occupation_references is not None,
+            ),
+            input_items=[],
+            tools=self.configuration.describe_tools(
+                consultant_tool_definitions(
+                    occupation_references_enabled=self.occupation_references is not None,
+                    interview_plans_enabled=self.interview_plans_enabled,
+                )
+            ),
+            reasoning_effort=self.settings.reasoning_effort,
+            max_output_tokens=self.settings.max_output_tokens,
+            stream=stream,
         )
 
     async def _tools(
@@ -253,7 +293,11 @@ class ConsultantRunner:
             )
         return ConsultantTools(
             MemoryReadTools(MemoryReadWorkflow(self.sessions), context.memory_binding),
-            JdReadTools(JdReadWorkflow(self.sessions), context.memory_binding),
+            JdReadTools(
+                JdReadWorkflow(self.sessions),
+                context.memory_binding,
+                max_result_characters=context.jd_read_max_result_characters,
+            ),
             JdWriteTools(
                 JdProfileWriteWorkflow(self.sessions),
                 JdTaskWriteWorkflow(self.sessions),
@@ -272,6 +316,50 @@ class ConsultantRunner:
             MemoryConsolidationTools(MemoryConsolidationWorkflow(self.sessions), writer),
             ContextCompactionTools(role_history),
             occupation_references=references,
+            interview_plans=(
+                InterviewPlanTools(InterviewPlanWorkflow(self.sessions), writer)
+                if has_interview_plan_tools(context.request)
+                else None
+            ),
+        )
+
+    async def _recover_completed(self, writer: ExecutionWriter) -> FormalInterviewExchange | None:
+        """Read the original completed result; never reopen controls, tools, or live JD preview."""
+        async with self.sessions() as session:
+            execution = await executions.read_execution(session, writer.scope)
+            if execution.status != ExecutionStatus.COMPLETED:
+                return None
+            binding = await history.read_context_history(
+                session, writer.scope, AgentRole.JOB_CONSULTANT
+            )
+        if binding is None or binding.completed is None:
+            raise ExecutionStateError("The completed Turn has no original context binding")
+        position = binding.completed
+        await read_completed_response_history(
+            self.checkpointer, thread_id=position.thread_id, checkpoint_id=position.checkpoint_id
+        )
+        saved = await read_context_checkpoint(
+            self.checkpointer, thread_id=position.thread_id, checkpoint_id=position.checkpoint_id
+        )
+        original = await read_saved_turn_context(self.checkpointer, writer.scope)
+        step = inspect_response_step(
+            restore_response(saved.checkpoint["channel_values"]["response_snapshot"])
+        )
+        reply = "\n\n".join(
+            part.text if part.type == "output_text" else part.refusal
+            for message in step.messages
+            if message.phase == "final_answer"
+            for part in message.content
+        )
+        plan = (
+            await InterviewPlanWorkflow(self.sessions).read_current(writer.scope)
+            if original.plan_position is not None
+            else None
+        )
+        if original.plan_position is not None and plan is None:
+            raise PlanStateError("The completed Turn's original plan is unavailable")
+        return await ConsultantCompletionWorkflow(self.sessions).recover_completed(
+            writer, position, reply, plan.position if plan is not None else None
         )
 
 

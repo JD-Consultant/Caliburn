@@ -116,6 +116,7 @@ def test_reopened_native_history_exposes_only_public_commentary_in_original_orde
             "input_text",
             "allowed_controls",
             "candidate",
+            "plan_preview",
             "commentary",
         }
         assert body["pause_requested"] is False

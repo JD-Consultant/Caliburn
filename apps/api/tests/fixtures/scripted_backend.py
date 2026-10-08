@@ -10,13 +10,15 @@ Usage (from apps/api): python -m tests.fixtures.scripted_backend --port 8101
 
 import argparse
 from dataclasses import replace
-from typing import Any
 
 import httpx2
 import uvicorn
 from fastapi import FastAPI
+from openai import AsyncOpenAI
 
-from caliburn import bootstrap
+from caliburn.adapters.openai_responses import create_responses_client
+from caliburn.app_composition import AppComposition
+from caliburn.bootstrap import create_app
 from caliburn.settings import ModelSettings, Settings
 from tests.fixtures.scripted_model import ScriptedModel
 
@@ -25,17 +27,18 @@ SYNTHETIC_KEY = "synthetic-not-a-real-key"
 
 def create_scripted_app(settings: Settings, model: ScriptedModel) -> FastAPI:
     """Route the app's SDK client to the scripted model instead of the network."""
-    create_direct_client = bootstrap.create_responses_client
 
-    def create_scripted_client(*, api_key: str, timeout_seconds: float, **_unused: Any) -> Any:
-        return create_direct_client(
-            api_key=api_key,
-            timeout_seconds=timeout_seconds,
+    def create_scripted_client(configured: ModelSettings) -> AsyncOpenAI:
+        return create_responses_client(
+            api_key=configured.api_key,
+            timeout_seconds=configured.request_timeout_seconds,
             http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(model.handle)),
         )
 
-    bootstrap.create_responses_client = create_scripted_client
-    app = bootstrap.create_app(replace(settings, model=ModelSettings(api_key=SYNTHETIC_KEY)))
+    app = create_app(
+        replace(settings, model=ModelSettings(api_key=SYNTHETIC_KEY)),
+        composition=AppComposition(create_responses_client=create_scripted_client),
+    )
     app.include_router(model.control_router())
     return app
 

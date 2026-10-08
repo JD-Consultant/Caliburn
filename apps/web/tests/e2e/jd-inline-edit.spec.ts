@@ -98,8 +98,10 @@ test('點文字就地改一欄：Enter／Ctrl+Enter 各送一筆單欄命令，�
   expect(taskWrites).toHaveLength(2);
 
   // A list item by keyboard alone: focus its edit button, Enter opens it, Ctrl+Enter saves, focus comes back.
-  await renamed.getByRole('button', { name: '修改工作成果 1' }).focus();
-  await page.keyboard.press('Enter');
+  const editOutcome = renamed.getByRole('button', { name: '修改工作成果 1' });
+  await expect(editOutcome).toHaveAttribute('aria-disabled', 'false');
+  await editOutcome.focus();
+  await editOutcome.press('Enter');
   const outcome = page.getByRole('textbox', { name: '工作成果 1' });
   await expect(outcome).toBeFocused();
   await outcome.pressSequentially('（含驗收）');
@@ -184,6 +186,8 @@ test('窄螢幕：點文字就地編輯，儲存鈕在視窗內，整頁不橫�
   );
   await description.fill('窄螢幕改過的內容');
   await page.getByRole('button', { name: '儲存', exact: true }).click();
+  // 輸入器內也有相同文字；先確認保存流程已關閉草稿，再核正式結果。
+  await expect(description).toHaveCount(0);
   await expect(card.getByText('窄螢幕改過的內容')).toBeVisible();
   expect((await readWork(page.request, fileId)).tasks[0]?.description).toBe('窄螢幕改過的內容');
 });

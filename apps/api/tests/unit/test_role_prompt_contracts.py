@@ -10,6 +10,10 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 from caliburn.agents.job_consultant import runner as consultant_runner
 from caliburn.agents.job_consultant.instructions import CONSULTANT_INSTRUCTIONS
+from caliburn.agents.job_consultant.planning_instructions import (
+    FOCUS_INSTRUCTIONS,
+    INTERVIEW_PLAN_INSTRUCTIONS,
+)
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.job_consultant.tools import consultant_tool_definitions
 from caliburn.agents.memory_analysis import runner as analysis_runner
@@ -34,22 +38,29 @@ class CapturedPreparationError(Exception):
 
 
 @pytest.mark.parametrize(
-    ("runner_class", "instructions", "layer"),
+    ("runner_class", "instructions", "layer", "plans_enabled"),
     [
-        (ConsultantRunner, CONSULTANT_INSTRUCTIONS, None),
-        (WorkSituationAnalystRunner, SITUATION_INSTRUCTIONS, MemoryLayer.WORK_SITUATION),
+        (ConsultantRunner, CONSULTANT_INSTRUCTIONS, None, True),
+        (ConsultantRunner, CONSULTANT_INSTRUCTIONS, None, False),
+        (WorkSituationAnalystRunner, SITUATION_INSTRUCTIONS, MemoryLayer.WORK_SITUATION, False),
         (
             WorkUnderstandingAnalystRunner,
             UNDERSTANDING_INSTRUCTIONS,
             MemoryLayer.WORK_UNDERSTANDING,
+            False,
         ),
     ],
-    ids=["consultant", "work_situation", "work_understanding"],
+    ids=[
+        "consultant_with_plan",
+        "consultant_guidance_only",
+        "work_situation",
+        "work_understanding",
+    ],
 )
 @pytest.mark.asyncio
 @pytest.mark.parametrize("effort", [None, "low"], ids=["calibrated_default", "explicit_override"])
 async def test_real_role_assembly_passes_its_prompt_to_history_template(
-    runner_class, instructions, layer, effort, monkeypatch
+    runner_class, instructions, layer, plans_enabled, effort, monkeypatch
 ) -> None:
     async def capture(self, *, template, **kwargs):
         raise CapturedPreparationError(template.create_payload())
@@ -57,6 +68,7 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
     # Only database/history I/O is replaced. Actual role assembly and definitions run.
     monkeypatch.setattr(RoleContextHistory, "prepare_history", capture)
     monkeypatch.setattr(consultant_runner, "fix_execution_policy", AsyncMock())
+    monkeypatch.setattr(ConsultantRunner, "_recover_completed", AsyncMock(return_value=None))
     monkeypatch.setattr(analysis_runner, "fix_execution_policy", AsyncMock())
     monkeypatch.setattr(analysis_runner.executions, "lock_active_writer", AsyncMock())
     monkeypatch.setattr(analysis_runner.candidate_queries, "require_stage", AsyncMock())
@@ -73,7 +85,8 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
         if effort is None
         else ModelSettings(api_key="synthetic-never-sent", reasoning_effort=effort)
     )
-    runner = runner_class(sessions, InMemorySaver(), Mock(), settings)
+    runner_options = {"interview_plans_enabled": plans_enabled} if layer is None else {}
+    runner = runner_class(sessions, InMemorySaver(), Mock(), settings, **runner_options)
     with pytest.raises(CapturedPreparationError) as captured:
         if layer is None:
             await runner.run(writer)
@@ -84,11 +97,22 @@ async def test_real_role_assembly_passes_its_prompt_to_history_template(
             kwargs = {"situation_changes": []} if layer == MemoryLayer.WORK_UNDERSTANDING else {}
             await runner.run(writer, stage, **kwargs)
     payload = captured.value.payload
-    assert payload["instructions"] == instructions
+    expected = instructions
+    if layer is None:
+        expected += "\n\n" + FOCUS_INSTRUCTIONS
+        if plans_enabled:
+            expected += "\n\n" + INTERVIEW_PLAN_INSTRUCTIONS
+    assert payload["instructions"] == expected
     assert payload["reasoning"]["effort"] == ("high" if effort is None else "low")
     assert payload["input"] == []
     assert payload["tools"]
     assert all(definition["strict"] for definition in payload["tools"])
+    if layer is None:
+        names = {definition["name"] for definition in payload["tools"]}
+        assert ("read_interview_plan" in names) == plans_enabled
+        assert ("edit_interview_plan" in names) == plans_enabled
+        assert "read_interview_plan" not in FOCUS_INSTRUCTIONS
+        assert "edit_interview_plan" not in FOCUS_INSTRUCTIONS
     if layer == MemoryLayer.WORK_SITUATION:
         # Literal input contract at the real consumer boundary, not a quality grader.
         # Dropping either selection or anti-duplication guidance must be visible here.

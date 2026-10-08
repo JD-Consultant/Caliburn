@@ -94,7 +94,9 @@ test('強制色彩下，就地編輯的鍵盤焦點環與儲存鈕仍畫得出�
   await page.goto(`/job-files/${fileId}`);
 
   // The edit button is visually hidden, so its focus ring is drawn around the whole text: an outline.
-  await page.getByRole('button', { name: '修改任務名稱' }).focus();
+  const editTitle = page.getByRole('button', { name: '修改任務名稱' });
+  await expect(editTitle).toHaveAttribute('aria-disabled', 'false');
+  await editTitle.focus();
   const ringed = page.locator('.inline-text:has(> .inline-text__edit:focus-visible)');
   await expect(ringed).toHaveCount(1);
   expect((await paintedAround(ringed)).outline).toBe(true);

@@ -21,6 +21,13 @@ class AllowedControl(StrEnum):
     RESUME = "resume"
 
 
+class InterviewPlan(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    plan: StrictStr | None
+
+
 class PublicCommentary(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -186,6 +193,10 @@ class ConsultantTurn(BaseModel):
     candidate: CandidateJdPreview | None = Field(
         ...,
         description="A read-only candidate from one fixed revision, only while active or paused. Null also covers the interval before candidate initialization. Never the formal JD or PDF source.",
+    )
+    plan_preview: InterviewPlan | None = Field(
+        ...,
+        description="The complete current saved plan only while active or paused. Outer null means no preview capability or unavailable preview; an object preserves nullable or deliberately empty plan text. Terminal reads use the job file's adopted plan.",
     )
     allowed_controls: list[AllowedControl] = Field(
         ...,

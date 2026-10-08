@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant UI as 人工編輯畫面
+  participant API as JD 查詢
+  participant DB as 既有 JD 保存
+  UI->>API: GET 全部 JD 集合
+  API->>DB: 讀一次目前 head
+  DB-->>API: 固定修訂 R
+  API->>DB: 讀 R 的職責
+  DB-->>API: 職責集合
+  Note over DB: 即使另一請求此時發布 R2<br/>R 的選用與內容不變
+  API->>DB: 讀 R 的任務及明細
+  DB-->>API: 任務集合
+  API->>DB: 讀 R 的知識／技能與任務關係
+  DB-->>API: 共用定義及有序關係
+  API->>DB: 讀 R 的協作對象與共通條件
+  DB-->>API: 協作與條件集合
+  API-->>UI: R + 全部集合與關係

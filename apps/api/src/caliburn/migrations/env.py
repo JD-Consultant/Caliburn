@@ -12,6 +12,7 @@ from caliburn.features.executions.history_persistence import (
     ContextHistoryHeadRecord,
 )
 from caliburn.features.executions.persistence import ExecutionRecord
+from caliburn.features.interview_plans.persistence import PlanCandidateRecord, PlanOperationRecord
 from caliburn.features.interviews.persistence import (
     FormalInterviewRecord,
     InterviewInputRecord,
@@ -46,6 +47,8 @@ assert (
 )
 assert InterviewInputRecord.__table__ is target_metadata.tables[InterviewInputRecord.__tablename__]
 assert InterviewReplyRecord.__table__ is target_metadata.tables[InterviewReplyRecord.__tablename__]
+assert PlanCandidateRecord.__table__ is target_metadata.tables[PlanCandidateRecord.__tablename__]
+assert PlanOperationRecord.__table__ is target_metadata.tables[PlanOperationRecord.__tablename__]
 assert ExecutionRecord.__table__ is target_metadata.tables[ExecutionRecord.__tablename__]
 assert (
     ExecutionBudgetRecord.__table__ is target_metadata.tables[ExecutionBudgetRecord.__tablename__]

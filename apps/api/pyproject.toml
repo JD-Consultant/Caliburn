@@ -47,7 +47,8 @@ testpaths = ["tests/unit", "tests/contracts", "tests/integration"]
 # started from the repository root (the documented `pnpm test`) and not only from apps/api.
 pythonpath = ["."]
 asyncio_mode = "auto"
-addopts = "--strict-markers"
+# 不同測試層可沿受測責任同名；避免 prepend 模式把它們載入同一頂層 module。
+addopts = "--strict-markers --import-mode=importlib"
 markers = ["postgres: requires an explicitly configured isolated PostgreSQL database"]
 
 [tool.ruff]

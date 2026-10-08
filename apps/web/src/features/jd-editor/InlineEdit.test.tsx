@@ -349,6 +349,59 @@ test('a background refresh does not rebase the draft: the write carries the revi
   expect(server.writes()[0]).toMatchObject({ expected_revision_id: revision });
 });
 
+test('an untouched draft closes without writing after the displayed field changes in the background', async () => {
+  const server = stubServer();
+  const { client } = renderEditor();
+  await userEvent.click(await screen.findByRole('heading', { name: '實作網頁' }));
+  const field = await screen.findByRole('textbox', { name: '任務名稱' });
+  act(() => {
+    client.setQueryData(jdWorkQuery(fileId).queryKey, {
+      ...jd,
+      revision_id: '70000000-0000-4000-8000-000000000007',
+      tasks: jd.tasks.map((task) => ({ ...task, title: '背景新版任務' })),
+    });
+  });
+  expect(field).toHaveValue('實作網頁');
+  await userEvent.click(screen.getByRole('button', { name: '儲存' }));
+
+  expect(server.writes()).toHaveLength(0);
+  expect(screen.queryByRole('textbox', { name: '任務名稱' })).not.toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: '背景新版任務' })).toBeVisible();
+});
+
+test.each(['本機修改的任務', '背景新版任務'])(
+  'a changed draft %s retains its opening revision and handles conflict after a background field change',
+  async (draft) => {
+    const server = stubServer(() => Promise.resolve(Response.json({}, { status: 409 })));
+    const { client } = renderEditor();
+    await userEvent.click(await screen.findByRole('heading', { name: '實作網頁' }));
+    const field = await screen.findByRole('textbox', { name: '任務名稱' });
+    act(() => {
+      client.setQueryData(jdWorkQuery(fileId).queryKey, {
+        ...jd,
+        revision_id: '70000000-0000-4000-8000-000000000007',
+        tasks: jd.tasks.map((task) => ({ ...task, title: '背景新版任務' })),
+      });
+    });
+    await userEvent.clear(field);
+    await userEvent.type(field, draft);
+    await userEvent.click(screen.getByRole('button', { name: '儲存' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('修改未被接受');
+    expect(field).toHaveValue(draft);
+    expect(server.writes()).toEqual([
+      expect.objectContaining({
+        expected_revision_id: revision,
+        change: {
+          action: 'revise_task',
+          task_id: taskId,
+          changes: [{ action: 'set_field', field: 'title', value: draft }],
+        },
+      }),
+    ]);
+  },
+);
+
 test('a failed background refresh keeps the work draft, shows the error and blocks new writes until recovery', async () => {
   let current = jd;
   let readFails = false;

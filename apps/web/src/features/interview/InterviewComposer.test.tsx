@@ -18,6 +18,7 @@ const active = {
   input_text: input,
   allowed_controls: [],
   commentary: [],
+  plan_preview: null,
   candidate: null,
 };
 const clients: QueryClient[] = [];
@@ -88,7 +89,7 @@ test('uncertain acceptance preserves text and retries the same persisted command
   expect(readTurnHint(fileId)?.execution_id).toBe(executionId);
 });
 
-test('reload verifies the saved execution then refreshes formal history and JD on completion', async () => {
+test('reload verifies the saved execution and follows it to completion without resending', async () => {
   retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   let reads = 0;
   const fetch = vi
@@ -102,17 +103,9 @@ test('reload verifies the saved execution then refreshes formal history and JD o
       ),
     );
   vi.stubGlobal('fetch', fetch);
-  const { client } = renderComposer();
-  const invalidate = vi.spyOn(client, 'invalidateQueries');
+  renderComposer();
   expect(await screen.findByText(input)).toBeVisible();
   expect(await screen.findByText('這次訪談已完成並保存。', {}, { timeout: 3_000 })).toBeVisible();
-  await waitFor(() => {
-    expect(invalidate).toHaveBeenCalledWith({
-      queryKey: ['job-file', fileId, 'formal-interviews'],
-    });
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['jd-profile', fileId] });
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['jd-work', fileId] });
-  });
   expect(fetch.mock.calls.every(([, options]) => options?.method !== 'POST')).toBe(true);
 });
 

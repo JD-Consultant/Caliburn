@@ -55,24 +55,50 @@ def redact(value: Any) -> Any:
 
 
 def collect_steps(records: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Consume chronological checkpoint/pending-write observations, preserving first input."""
+    """依原請求身分合併觀察；只有已保存請求時也保留，不推定已外送。"""
     steps: dict[tuple[str, str], dict[str, Any]] = {}
     for record in records:
+        if record["thread_id"].endswith(":initial_context"):
+            continue
         values = record["values"]
         response = values.get("response_snapshot")
-        if not response:
+        request = values.get("request_snapshot")
+        request_id = values.get("request_id")
+        if not request and not response:
             continue
-        if not isinstance(response, dict) or not isinstance(response.get("id"), str):
+        if response and (not isinstance(response, dict) or not isinstance(response.get("id"), str)):
             raise ValueError("Invalid saved response snapshot")
-        key = (record["thread_id"], response["id"])
+        # 舊診斷輸入未帶 request_id 時沿用 response ID；不拿相同正文猜請求身分。
+        identity = (
+            f"request:{request_id}"
+            if request_id is not None
+            else f"response:{response['id']}"
+            if response
+            else f"checkpoint:{record['checkpoint_id']}"
+        )
+        key = (record["thread_id"], identity)
         if key not in steps:
             steps[key] = {
                 **{key: value for key, value in record.items() if key != "values"},
-                "request": deepcopy(values.get("request_snapshot")),
-                "response": deepcopy(response),
+                "request_id": request_id,
+                "request": deepcopy(request),
+                "response": None,
+                "response_state": "request_only",
                 "tool_results": {},
             }
         step = steps[key]
+        if not response:
+            continue
+        if step["response"] is None:
+            step.update(
+                response=deepcopy(response),
+                response_state="recorded",
+                response_checkpoint_id=record["checkpoint_id"],
+                response_checkpoint_time=record["checkpoint_time"],
+                response_source=record["source"],
+            )
+        elif step["response"] != response:
+            raise ValueError("Conflicting saved responses for one request")
         calls = {
             item["call_id"] for item in response["output"] if item.get("type") == "function_call"
         }
@@ -87,3 +113,38 @@ def collect_steps(records: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
                 raise ValueError("Conflicting saved tool results")
             step["tool_results"][call_id] = deepcopy(result["output"])
     return [redact(step) for step in steps.values()]
+
+
+def collect_initial_context(records: Iterable[dict[str, Any]]) -> dict[str, Any] | None:
+    """只查當時捕捉的綁定；可讀版本不代表工具實際讀過正文。"""
+    captured = None
+    for record in records:
+        if not record["thread_id"].endswith(":job_consultant:initial_context"):
+            continue
+        values = record["values"]
+        binding = values.get("binding")
+        request = values.get("request_snapshot")
+        if not binding or not request:
+            continue
+        if not isinstance(binding, dict) or not isinstance(request, dict):
+            raise ValueError("Invalid saved initial context")
+        tool_configuration = (
+            {"jd_read_max_result_characters": values["jd_read_max_result_characters"]}
+            if "jd_read_max_result_characters" in values
+            else None
+        )
+        if captured is not None:
+            if (
+                captured["binding"] != binding
+                or captured["request"] != request
+                or captured["tool_configuration"] != tool_configuration
+            ):
+                raise ValueError("Conflicting saved initial contexts")
+            continue
+        captured = {
+            **{key: value for key, value in record.items() if key != "values"},
+            "binding": deepcopy(binding),
+            "request": deepcopy(request),
+            "tool_configuration": deepcopy(tool_configuration),
+        }
+    return {key: redact(value) for key, value in captured.items()} if captured else None

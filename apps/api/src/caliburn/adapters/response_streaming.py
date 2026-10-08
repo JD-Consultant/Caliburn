@@ -98,7 +98,7 @@ class _CommentaryProjection:
             # Presentation is best effort. Never log observer text or exception payloads,
             # never await a slow reader, and never catch task cancellation here.
             self.callback = None
-            _LOG.warning("Public commentary observer disabled after failure")
+            _LOG.warning("commentary.observer_disabled")
 
 
 async def consume_response_stream(

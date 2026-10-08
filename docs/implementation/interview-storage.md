@@ -1,91 +1,34 @@
 # 職務檔案與訪談保存接線
 
-- 狀態：**現行職務檔案、訪談與准入保存接線** 。本頁說明原文、正式資格、原操作與短交易；A 的完整執行、控制及恢復見[Agent 執行](agent-execution.md)。驗證見[檔案與訪談](../history.md#source-2a993efd60b1a85e23d6)。
+- 狀態：**現行職務檔案、訪談與准入保存接線** 。本頁說明原文、正式資格、原操作與短交易；Graph 與原生接續見[Agent 執行](agent-execution.md)，啟停及控制見[程序監督](agent-supervision.md)。驗證見[檔案與訪談](../history.md#source-2a993efd60b1a85e23d6)。
 - 語意仍由[資料保存](../architecture/persistence.md)及[正式來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
 - 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/src/caliburn/migrations/versions/0001_job_files_and_interviews.py)。
+
+| 維護問題 | 閱讀位置 |
+|---|---|
+| 原文、正式序號與 execution 如何關聯？ | [資料關係](#1-原文正式資格與執行身分分開不複製原話)、[程式分責](#3-程式分責) |
+| 建檔與員工提交如何重送？何時授予正式資格？ | [建檔](#2-建立與重送)、[接受輸入](#6-輸入接受重送與新提交)、[准入](#7-准入與-writer-fencing-的實際界線)、[正式完成](#8-正式答覆與序號參與完成交易不自成完成-api) |
+| 模型來源與人的歷史回看如何查詢？ | [來源及歷史投影](#9-有界來源查詢與近期歷史投影) |
+| 名稱過期或整份刪除如何處理？ | [改名](#10-列表改名名稱新鮮度與原操作結果)、[刪除](#11-整份職務檔案刪除) |
+| 如何配置資料庫與追溯保存選型？ | [配置／遷移](#4-配置與遷移)、[機制取捨](#5-官方機制與本案取捨) |
 
 ## 1. 原文、正式資格與執行身分分開，不複製原話
 
 以下兩個視圖涵蓋職務檔案、訪談與准入的七張相關業務表；JD、Memory 與 Graph checkpoint 另有各自的保存責任。同名表是同一份資料，不是副本；拆圖避免多條跨層線遮住節點。
 
+以下均為現行局部 ER，欄位型別採簡寫，省略預設值、CHECK 與部分複合唯一約束；完整 DDL 以本頁所連 migration 為準。基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。`interview_replies` 引用 input 的 `(job_file_id, execution_id)` 唯一鍵並用作自身主鍵，故為識別關係；原文的 `source_id` 雖為必填 FK，未納入正式資格／輸入／答覆的主鍵。
+
 **原文與正式資格：**
 
-```mermaid
-erDiagram
-  direction TB
-  job_files ||--o{ interview_texts : owns
-  interview_texts ||--o| formal_interviews : qualifies
-  interview_texts ||--o| interview_inputs : submitted_as
-  interview_inputs ||--o| interview_replies : receives
-  interview_texts ||--o| interview_replies : records_reply
-  job_files {
-    uuid job_file_id PK
-    uuid creation_command_id UK
-    text initial_display_name
-    text display_name
-    bigint name_revision
-    text employee_name
-    timestamptz created_at
-  }
-  interview_texts {
-    uuid source_id PK
-    uuid job_file_id FK
-    text speaker
-    text interview_text
-  }
-  formal_interviews {
-    uuid job_file_id PK,FK
-    int interview_sequence PK
-    uuid source_id FK,UK
-  }
-  interview_inputs {
-    uuid job_file_id PK,FK
-    uuid command_id PK
-    uuid source_id FK,UK
-    uuid execution_id FK,UK
-  }
-  interview_replies {
-    uuid job_file_id PK,FK
-    uuid execution_id PK,FK
-    uuid source_id FK,UK
-  }
-```
+![現行：1. 原文、正式資格與執行身分分開，不複製原話—原文與正式資格](../diagrams/implementation/interview-storage/raw-text-formal-qualification.png)
 
-**檔案准入與改名結果：** 下圖補前圖 `interview_inputs.execution_id` 的同檔案複合外鍵；完整原文關係見前圖。
+[圖源](../diagrams/implementation/interview-storage/raw-text-formal-qualification.mmd) · [SVG](../diagrams/implementation/interview-storage/raw-text-formal-qualification.svg)
 
-```mermaid
-erDiagram
-  direction LR
-  job_files ||--o{ executions : admits
-  executions ||--o| interview_inputs : accepts
-  job_files ||--o{ job_file_renames : records_rename
-  job_files {
-    uuid job_file_id PK
-    text display_name
-    bigint name_revision
-  }
-  executions {
-    uuid execution_id PK
-    uuid job_file_id FK
-    text kind
-    text status
-    uuid writer_id
-    timestamptz created_at
-  }
-  interview_inputs {
-    uuid job_file_id PK,FK
-    uuid command_id PK
-    uuid source_id FK,UK
-    uuid execution_id FK,UK
-  }
-  job_file_renames {
-    uuid job_file_id PK,FK
-    uuid command_id PK
-    text display_name
-    bigint expected_name_revision
-    bigint name_revision
-  }
-```
+**檔案准入與改名結果：** 下圖為現行局部 ER，補前圖 `interview_inputs.execution_id` 的同檔案複合外鍵；完整原文關係見前圖。基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)；型別與欄位同樣簡化。`executions` 的 `(job_file_id, execution_id)` 複合唯一鍵供 input 引用，`execution_id` 未納入 input 的主鍵，因此是虛線關係。
+
+![現行：1. 原文、正式資格與執行身分分開，不複製原話—檔案准入與改名結果](../diagrams/implementation/interview-storage/execution-admission-renames.png)
+
+[圖源](../diagrams/implementation/interview-storage/execution-admission-renames.mmd) · [SVG](../diagrams/implementation/interview-storage/execution-admission-renames.svg)
 
 | 儲存 | 擁有的內容與身分 | 關係／約束 |
 |---|---|---|
@@ -129,7 +72,7 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 | `transport/http/job_files.py`、`interview_inputs.py` | 生成 DTO、HTTP 狀態及結果投影；不寫 SQL |
 | `bootstrap.py`／`adapters/database.py` | lifespan 組裝／關閉 engine、啟動檢查 migration head；不保存業務內容 |
 
-沒有 BaseRepository、通用 UnitOfWork 註冊器或每層一個抽象 interface。Service 以少量 module 函式實現；共用 session factory 的 workflow 才用小型實例。這是[程式撰寫規範](coding-standard.md)的實際應用，不以「每層一個 class」表示解耦。
+函式、workflow 實例及介面的使用沿[程式撰寫規範](coding-standard.md)；跨模組依賴沿[程式組織](code-organization.md)。本節只維護上述保存用例的實際分工。
 
 ## 4. 配置與遷移
 
@@ -140,8 +83,6 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 遷移與連線都固定同一 search path；migration 額外核對 `current_schema()`。版本表使用該 default schema，避免同時配置顯式 `version_table_schema` 後，autogenerate 將同一張表再次視為一般表。正式環境的帳號／權限與備份須按[操作手冊](../runbook.md)配置，不能由隔離測試推定任意部署皆安全。
 
 Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http/)；Python／TypeScript 皆由生成器產出。同檔共用型別用 `$defs`，不手抄生成欄位。具體回傳查 OpenAPI，不在本文件再抄一份 JSON。名稱目前 1–200 字、不全空白且無 PostgreSQL text 不接受的 NUL，作本機建立入口的有界驗證；同名不拒絕。
-
-歷史回看以 `read_public_interview_history` 投影正式資格、原文與既有 `interview_replies` 關係；歷史 HTTP 回應僅為正式顧問答覆附上 nullable `execution_id`，App／員工訊息為 null。UI 按需用檔案與 execution 定位既有 consultant-turns status 的公開 commentary，不另存中間訊息或暴露 checkpoint／私有 context。共用來源查詢與 `InterviewMessage` 不增加此定位，也不授予 commentary 正式序號或引用資格。實作與限制見 [T09 歷史定位證據](../history.md#source-758915af0b16b0e1a0ee)。
 
 ## 5. 官方機制與本案取捨
 
@@ -160,7 +101,7 @@ Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http/)；Python／Type
 - 原文寫入後交易失敗：原文、提交關係與准入一起回滾。不能只留下活躍 A 卻沒有其輸入，也不能留下可被背景取用的半套來源。
 - 正式訪談 API 始終只讀正式資格 JOIN 原文。可保存、可供原工作接續、可給其他 Agent 引用，是三種不同能力。
 
-HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervisor，由其核持久資格啟動／恢復 A。控制與完成沿[執行接線](agent-execution.md)，202 不代表 AI 已產生或正式保存答覆。
+HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervisor，由其核持久資格啟動／恢復 A。控制沿[程序監督](agent-supervision.md)，正式完成沿[候選採用](jd-storage.md#31-本輪候選與可恢復位置)；202 不代表 AI 已產生或正式保存答覆。
 
 ## 7. 准入與 writer fencing 的實際界線
 
@@ -174,7 +115,7 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 
 `pause_execution` 表示 runner 已到安全點；UI「要求暫停」先保存控制意圖，兩者分開。`finish_execution` 只改准入資格，由 A／Memory workflow 與所需業務效果一起提交。被取消／失敗來源的原文仍保留，不取得正式序號或模型可見歷史資格。
 
-控制意圖、supervisor、Graph 接續、候選回退及持久計量由[Agent 執行](agent-execution.md)協作。`writer_id` 僅提供 fencing，不能單獨證明程序已停止；請求逾時也不授權取代仍在執行的 writer。
+控制意圖與 supervisor 見[程序監督](agent-supervision.md)，Graph 接續與候選回退見[Agent 執行](agent-execution.md)，持久計量見[模型外送](model-requests.md)。`writer_id` 僅提供 fencing，不能單獨證明程序已停止；請求逾時也不授權取代仍在執行的 writer。
 
 官方依據：[PostgreSQL 列鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)與[部分唯一索引](https://www.postgresql.org/docs/current/indexes-partial.html)提供短交易競爭與限定集合的唯一性；狀態、作用域及恢復授權是本案契約，並非 PostgreSQL 替 App 判斷。未新增 scheduler、broker、lease 平台或第二份 Graph State。
 
@@ -187,13 +128,21 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 3. 由提交關係取得原員工來源，完整文字不再複製。以該檔案現有正式最大序號加一，分配員工及完整答覆兩個序號；分配受同一檔案列鎖保護，不使用 `nextval` 或奇偶推斷說話者。
 4. 同交易保存答覆原文、兩則正式資格與答覆—原提交關係；後續任何完成效果失敗，這些寫入一起回滾。下一次合法提交不消耗被回滾的序號。
 
-新增的關係只保存來源 ID，不另存答覆正文或建立通用 receipt。原交流返回員工／顧問的固定來源與序號；背景 F 由其中 `employee_input.interview_sequence` 取得，**不是** 顧問答覆或當下全檔最大序號。
+新增的關係只保存來源 ID，不另存答覆正文或建立通用 receipt。原交流返回員工／顧問的固定來源與序號；背景整理的固定取材上界由其中 `employee_input.interview_sequence` 取得，**不是** 顧問答覆或當下全檔最大序號。
 
 依據：[PostgreSQL sequence](https://www.postgresql.org/docs/current/functions-sequence.html)明示 `nextval` 不隨交易 abort 回收，不能提供無跳號序列；本案利用已需的檔案列鎖與短交易分配。這是正式序號的產品要求，不推廣成所有內部 ID 都要連號。
 
 驗證：[訪談交易](../history.md#source-2a993efd60b1a85e23d6)、[A 共同完成](../history.md#source-f5df4f496aad7b909036)、[程序恢復](../history.md#source-d4bb8d17c5639690aeb3)。測試層級各自成立，不由底層交易通過推定模型品質。
 
 ## 9. 有界來源查詢與近期歷史投影
+
+此處的 **frontier（上界）** 指正式訪談的序號上界；App 開始工作時固定其可讀上界，同工作恢復不擴大。下列符號沿[來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#起始訪談範圍與前置語境)，是閱讀記號，不是模型須填的參數：
+
+- **K**：本工作固定採用的已發布 Memory 所涵蓋的訪談上界；首次無 Memory 為 0。
+- **H**：A 開始前已成立的正式歷史上界，不含本次尚未正式編號的輸入。
+- **F**：B 批次的固定取材上界，取自觸發要求的 A Turn 成功完成後，其最後員工輸入的正式序號；不含後面的顧問答覆。
+
+例如 K=30、H=39，A 的近期歷史 `(K,H]` 就是正式序號 31–39，另加本次輸入；B 若固定 F=38，B1 必處理的是 31–38，不能加顧問答覆 39。補前問及按需回查仍沿來源契約，不改這些固定界線。
 
 [訪談 queries](../../apps/api/src/caliburn/features/interviews/queries.py)提供內部 typed 介面；不把 scope 放進模型可填參數，也不新增搜尋／第二套原話儲存：
 
@@ -207,7 +156,9 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 
 所有回傳保留固定 source ID、訪談序號、真實 speaker 及完整原文。`InterviewReadScope` 由 App 綁定，內含職務檔案與固定上界；這是值物件，不是權限憑證或新的資料保存模組。即使後面又有正式訪談，原 scope 不會擴張。直接指定訊息／範圍不補前問；近期投影才按來源契約補一則，沒有歷史時不捏造。查詢不按字數截斷或把 role 轉成新發話。
 
-A／B 的角色 workflow 從固定 Memory 取得 K，持久綁定 H／F；同工作恢復沿原範圍。模型可見投影與錯誤由[工具邊界](memory-tools.md)負責，完整請求容量由[共用執行](agent-execution.md)核對。來源查詢不自行刷新角色基準。
+A／B 的角色 workflow 從固定 Memory 取得 K，持久綁定 H／F；同工作恢復沿原範圍。模型可見投影與錯誤由[工具邊界](memory-tools.md)負責，完整請求容量由[模型外送](model-requests.md#4-固定請求計數與容量准入)核對。來源查詢不自行刷新角色基準。
+
+**人的公開歷史回看。** 歷史回看以 `read_public_interview_history` 投影正式資格、原文與既有 `interview_replies` 關係；歷史 HTTP 回應僅為正式顧問答覆附上 nullable `execution_id`，App／員工訊息為 null。UI 按需用檔案與 execution 定位既有 consultant-turns status 的公開 commentary，不另存中間訊息或暴露 checkpoint／私有 context。共用來源查詢與 `InterviewMessage` 不增加此定位，也不授予 commentary 正式序號或引用資格。實作與限制見 [T09 歷史定位證據](../history.md#source-758915af0b16b0e1a0ee)。
 
 ## 10. 列表改名：名稱新鮮度與原操作結果
 

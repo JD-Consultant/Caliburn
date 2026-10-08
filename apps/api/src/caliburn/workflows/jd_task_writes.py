@@ -1,7 +1,7 @@
 """A complete task and its direct evidence are one bounded, recoverable model operation."""
 
 from dataclasses import dataclass
-from uuid import UUID, uuid5
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -11,28 +11,30 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
     ExecutionWriter,
 )
-from caliburn.features.job_description import candidate_service, revision_editing, work_queries
+from caliburn.features.job_description import (
+    candidate_service,
+    compound_service,
+    revision_editing,
+)
 from caliburn.features.job_description.areas import ResponsibilityArea
 from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.capabilities import (
     Capability,
     CapabilityKind,
-    EditJdCapabilities,
-    SetTaskCapability,
+)
+from caliburn.features.job_description.compound_edits import (
+    BoundTaskCapability,
+    CreateTaskWithSources,
 )
 from caliburn.features.job_description.navigation import jd_read_ref, resolve_jd_read_ref
 from caliburn.features.job_description.sources import (
     AddJdSource,
     InvalidJdSourceError,
     JdSource,
-    JdSourceTarget,
-    ReviseJdSources,
-    SourceTargetKind,
     validate_source_changes,
 )
-from caliburn.features.job_description.tasks import CreateTask, EditJdTasks, WorkTask
+from caliburn.features.job_description.tasks import CreateTask
 from caliburn.features.job_files import service as job_files
-from caliburn.workflows.jd_candidates import apply_candidate_edit
 from caliburn.workflows.jd_sources import JdSourceSelection, resolve_jd_source
 from caliburn.workflows.memory_reads import PublishedMemoryRead
 
@@ -59,12 +61,6 @@ class CreateTaskInput:
     required_knowledge: tuple[TaskCapabilityInput, ...] = ()
     required_skills: tuple[TaskCapabilityInput, ...] = ()
     sources: tuple[JdSourceSelection, ...] = ()
-
-
-@dataclass(frozen=True, slots=True)
-class BoundTaskCapability:
-    capability_id: UUID
-    sources: tuple[JdSource, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,51 +148,21 @@ class JdTaskWriteWorkflow:
             await job_files.lock_job_file(session, file_id)
             await executions.lock_active_writer(session, writer)
             await revision_editing.require_open_candidate(session, file_id, prepared.candidate)
-            previous = await work_queries.read_work_at(
-                session, file_id, prepared.expected_revision_id
-            )
-            revision = await apply_candidate_edit(
+            result = await compound_service.apply_compound_edit(
                 session,
                 file_id,
-                prepared.candidate,
-                EditJdTasks(
-                    uuid5(prepared.command_id, "task"), prepared.expected_revision_id, prepared.task
+                CreateTaskWithSources(
+                    prepared.command_id,
+                    prepared.expected_revision_id,
+                    prepared.task,
+                    prepared.task_sources,
+                    prepared.detail_sources,
+                    prepared.capabilities,
                 ),
+                candidate=prepared.candidate,
             )
-            result = await work_queries.read_work_at(session, file_id, revision)
-            created = [
-                task
-                for task in result.tasks
-                if task.task_id not in {t.task_id for t in previous.tasks}
-            ]
-            if len(created) != 1:
-                raise RuntimeError("The original task operation must identify exactly one new task")
-            task = created[0]
-            for capability in prepared.capabilities:
-                revision = await apply_candidate_edit(
-                    session,
-                    file_id,
-                    prepared.candidate,
-                    EditJdCapabilities(
-                        uuid5(prepared.command_id, f"link:{capability.capability_id}"),
-                        revision,
-                        SetTaskCapability(task.task_id, capability.capability_id, True),
-                    ),
-                )
-            for index, (target, sources) in enumerate(_source_targets(task, prepared)):
-                if sources:
-                    revision = await apply_candidate_edit(
-                        session,
-                        file_id,
-                        prepared.candidate,
-                        ReviseJdSources(
-                            uuid5(prepared.command_id, f"source:{index}"),
-                            revision,
-                            target,
-                            tuple(AddJdSource(source) for source in sources),
-                        ),
-                    )
-            return f"created · read_ref: {jd_read_ref(task)}"
+            assert result.created_item is not None
+            return f"created · read_ref: {jd_read_ref(result.created_item)}"
 
 
 async def _resolve_sources(
@@ -207,38 +173,6 @@ async def _resolve_sources(
     sources = tuple(
         [await resolve_jd_source(session, binding, selection) for selection in selections]
     )
-    # Reuse the domain's identity/duplicate validation before executing the model intent.
     if sources:
         validate_source_changes(tuple(AddJdSource(source) for source in sources))
     return sources
-
-
-def _source_targets(
-    task: WorkTask,
-    prepared: PreparedTaskWrite,
-) -> tuple[tuple[JdSourceTarget, tuple[JdSource, ...]], ...]:
-    if len(task.details) != len(prepared.detail_sources):
-        raise RuntimeError("The original task details no longer match their bound evidence")
-    return (
-        (JdSourceTarget(SourceTargetKind.TASK, item_id=task.task_id), prepared.task_sources),
-        *(
-            (
-                JdSourceTarget(
-                    SourceTargetKind.DETAIL, item_id=detail.detail_id, task_id=task.task_id
-                ),
-                sources,
-            )
-            for detail, sources in zip(task.details, prepared.detail_sources, strict=True)
-        ),
-        *(
-            (
-                JdSourceTarget(
-                    SourceTargetKind.TASK_CAPABILITY,
-                    item_id=link.capability_id,
-                    task_id=task.task_id,
-                ),
-                link.sources,
-            )
-            for link in prepared.capabilities
-        ),
-    )

@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
 
 import pytest
+from langgraph.checkpoint.memory import InMemorySaver
 from openai.types.responses import ResponseFunctionToolCall
 
 from caliburn.adapters.openai_responses import ResponseRequest
@@ -281,11 +282,12 @@ async def test_saved_reference_request_with_missing_client_fails_before_history_
     )
     monkeypatch.setattr(consultant_runner_module, "RoleContextHistory", Mock(return_value=history))
     monkeypatch.setattr(consultant_runner_module, "fix_execution_policy", AsyncMock())
+    monkeypatch.setattr(ConsultantRunner, "_recover_completed", AsyncMock(return_value=None))
     model = Mock()
     model.executor.count_input = AsyncMock()
     model.executor.request_model = AsyncMock()
     monkeypatch.setattr(consultant_runner_module, "bind_model_runtime", Mock(return_value=model))
-    runner = ConsultantRunner(Mock(), Mock(), Mock(), ModelSettings(api_key="synthetic"))
+    runner = ConsultantRunner(Mock(), InMemorySaver(), Mock(), ModelSettings(api_key="synthetic"))
     with pytest.raises(ExecutionStateError):
         await runner.run(writer)
     history.resolve_template.assert_awaited_once()

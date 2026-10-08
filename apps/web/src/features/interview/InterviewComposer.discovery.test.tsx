@@ -19,6 +19,7 @@ const active = {
   input_text: '已受理的合成訪談',
   allowed_controls: ['pause', 'cancel'],
   commentary: [],
+  plan_preview: null,
   candidate: null,
 };
 const clients: QueryClient[] = [];

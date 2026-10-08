@@ -23,6 +23,7 @@ import {
 } from './interview-turn-api';
 import type { TurnHint } from './interview-turn-api';
 import { ConsultantTurnControls } from './ConsultantTurnControls';
+import { CompletedTurnRefresh } from './CompletedTurnRefresh';
 import { isSendKey } from './send-key';
 import { TurnLog } from './TurnLog';
 
@@ -63,7 +64,6 @@ function ComposerForFile({ jobFileId, aboveDock }: ComposerProps) {
   const retainedInput = pendingInput?.command_id === hint?.command_id ? pendingInput : null;
   const [message, setMessage] = useState(restored.error);
   const inFlight = useRef(false);
-  const refreshed = useRef<string | null>(null);
   const queryClient = useQueryClient();
   const recoveringCommand = hint && !hint.execution_id && !retainedInput ? hint.command_id : null;
   const recovery = useQuery(consultantTurnByCommandQuery(jobFileId, recoveringCommand));
@@ -99,18 +99,6 @@ function ComposerForFile({ jobFileId, aboveDock }: ComposerProps) {
       // The command hint already persists; another reload can resolve that same ID again.
     }
   }, [recoveringCommand, recovery.data, jobFileId]);
-
-  useEffect(() => {
-    if (verified?.status !== 'completed' || refreshed.current === verified.execution_id) return;
-    refreshed.current = verified.execution_id;
-    void Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['job-file', jobFileId, 'formal-interviews'] }),
-      queryClient.invalidateQueries({ queryKey: ['jd-profile', jobFileId] }),
-      queryClient.invalidateQueries({ queryKey: ['jd-work', jobFileId] }),
-    ]).catch(() => {
-      setMessage('訪談已保存，但畫面尚未更新。請重新開啟這份職務檔案。');
-    });
-  }, [verified?.status, verified?.execution_id, jobFileId, queryClient]);
 
   async function submit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -282,9 +270,12 @@ function ComposerForFile({ jobFileId, aboveDock }: ComposerProps) {
         {verified && (
           <>
             {verified.status === 'completed' ? (
-              <p role="status" className="dock-note">
-                {statusText.completed}
-              </p>
+              <>
+                <p role="status" className="dock-note">
+                  {statusText.completed}
+                </p>
+                <CompletedTurnRefresh key={verified.execution_id} jobFileId={jobFileId} />
+              </>
             ) : (
               <Alert severity={verified.status === 'failed' ? 'error' : 'info'}>
                 {verified.status === 'active' && verified.pause_requested

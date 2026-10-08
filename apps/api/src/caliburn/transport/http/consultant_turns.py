@@ -299,6 +299,9 @@ def turn_view(
                 "profile": asdict(status.candidate.profile),
                 "work": work_view(status.candidate.work).model_dump(mode="json"),
             },
+            "plan_preview": None
+            if status.plan_preview is None
+            else {"plan": status.plan_preview.body},
         }
     )
 

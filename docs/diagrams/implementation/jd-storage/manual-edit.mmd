@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant H as HTTP
+  participant W as JD 編輯工作流
+  participant D as 領域與 PostgreSQL
+  H->>W: 原命令、預期正式修訂、changes
+  W->>D: 開短交易，鎖本檔案，查原結果
+  alt 已提交且原內容一致
+    D-->>W: 原結果的固定修訂
+  else 新命令
+    W->>D: 核對無活躍／暫停 A、基底未過期
+    W->>D: 整批修改，保存新修訂／head／原結果
+  end
+  W->>D: COMMIT
+  D-->>W: 交易完成確認
+  W-->>H: 該命令結果
+  Note over H,D: 結果遺失以同命令核對<br/>需要目前內容另行 GET

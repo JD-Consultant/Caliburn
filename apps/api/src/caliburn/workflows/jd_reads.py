@@ -18,7 +18,7 @@ from caliburn.features.job_description.sources import (
     MemorySource,
 )
 from caliburn.workflows.jd_candidates import JdCandidateWorkflow
-from caliburn.workflows.jd_source_queries import read_memory_source_titles
+from caliburn.workflows.jd_source_queries import read_memory_source_title_batch
 from caliburn.workflows.memory_reads import PublishedMemoryRead
 
 
@@ -62,7 +62,17 @@ class JdReadWorkflow:
             )
             selected = tuple(reference for reference in references if reference.target in targets)
             sequences = await _interview_sequences(session, binding, selected)
-            memory_titles: dict[MemorySource, tuple[str | None, str | None, bool]] = {}
+            memory_titles = await read_memory_source_title_batch(
+                session,
+                job_file_id=binding.scope.job_file_id,
+                sources=tuple(
+                    reference.source
+                    for reference in selected
+                    if isinstance(reference.source, MemorySource)
+                ),
+                snapshot_id=binding.snapshot_id,
+                interview_through_sequence=binding.interview_through_sequence,
+            )
             readings = []
             for reference in selected:
                 source = reference.source
@@ -71,14 +81,6 @@ class JdReadWorkflow:
                         JdSourceReading(reference, interview_sequence=sequences[source])
                     )
                     continue
-                if source not in memory_titles:
-                    memory_titles[source] = await read_memory_source_titles(
-                        session,
-                        job_file_id=binding.scope.job_file_id,
-                        source=source,
-                        snapshot_id=binding.snapshot_id,
-                        interview_through_sequence=binding.interview_through_sequence,
-                    )
                 title, historical_title, changed = memory_titles[source]
                 readings.append(
                     JdSourceReading(

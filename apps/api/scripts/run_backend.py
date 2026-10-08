@@ -5,11 +5,14 @@ This does not migrate, erase, seed or start PostgreSQL, and does not switch prod
 """
 
 import argparse
+import logging
 from dataclasses import replace
+from importlib.metadata import version
 from pathlib import Path
 
 import uvicorn
 
+from caliburn.adapters.logging import configure_logging
 from caliburn.adapters.openai_credentials import read_openai_api_key
 from caliburn.bootstrap import create_app
 from caliburn.settings import ModelSettings, Settings
@@ -39,13 +42,30 @@ def main() -> None:
         )
     if configured.database is None:
         parser.error("Configure CALIBURN_DATABASE_URL for the isolated target database.")
-    uvicorn.run(
-        create_app(configured),
-        host=arguments.host,
-        port=arguments.port,
-        loop="asyncio:SelectorEventLoop",
-        proxy_headers=False,
+    try:
+        log_runtime = configure_logging()
+    except ValueError as error:
+        parser.error(str(error))
+    logger = logging.getLogger("caliburn.launcher")
+    logger.info(
+        "app.starting",
+        extra={
+            "app_version": version("caliburn-backend"),
+            "log_level": logging.getLevelName(logging.getLogger().level),
+        },
     )
+    try:
+        uvicorn.run(
+            create_app(configured),
+            host=arguments.host,
+            port=arguments.port,
+            loop="asyncio:SelectorEventLoop",
+            proxy_headers=False,
+            log_config=None,
+        )
+    finally:
+        logger.info("app.stopped")
+        log_runtime.close()
 
 
 if __name__ == "__main__":

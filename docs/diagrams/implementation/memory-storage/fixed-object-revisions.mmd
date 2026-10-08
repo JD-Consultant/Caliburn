@@ -1,0 +1,9 @@
+erDiagram
+  direction LR
+  memory_objects ||--o{ memory_bodies : owns_bodies
+  memory_objects ||--o{ memory_object_revisions : owns_revisions
+  memory_bodies ||..o{ memory_object_revisions : reuses_body
+  memory_object_revisions ||--o{ memory_interview_references : situation_sources
+  formal_interviews ||--o{ memory_interview_references : source_id_unique_key
+  memory_object_revisions ||--o{ memory_situation_references : understanding_sources
+  memory_object_revisions ||..o{ memory_situation_references : fixed_situation_revision

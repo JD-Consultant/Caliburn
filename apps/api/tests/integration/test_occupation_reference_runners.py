@@ -263,8 +263,10 @@ def test_committed_reference_command_recovers_or_stays_out_of_formal_state(
             )
             original_definitions = consultant_runner_module.consultant_tool_definitions
 
-            def captured_definitions(*, occupation_references_enabled=False):
-                definitions = original_definitions()
+            def captured_definitions(
+                *, occupation_references_enabled=False, interview_plans_enabled=True
+            ):
+                definitions = original_definitions(interview_plans_enabled=interview_plans_enabled)
                 if occupation_references_enabled:
                     definitions += occupation_reference_definitions(
                         write_result_format=result_format,

@@ -50,7 +50,7 @@ class RoleContextHistory:
 
     async def resolve_template(
         self,
-        template: ResponseRequest,
+        template: ResponseRequest | Callable[[], ResponseRequest],
         recovery: HeldCompaction | HeldPreparationCount | None = None,
     ) -> ResponseRequest:
         """Keep this role's original preparation settings across process/code reentry.
@@ -60,7 +60,8 @@ class RoleContextHistory:
         A held result requires the original saved request boundary: only the result may
         still be unsaved. This lookup neither adopts a window nor authorizes replay.
         """
-        if template.create_payload()["input"]:
+        # 恢復先讀原生請求；今日候選即使已關閉原工具，也不能搶先拒絕舊回合。
+        if isinstance(template, ResponseRequest) and template.create_payload()["input"]:
             raise ValueError("The role template must not include history or new-work input")
         thread_id = context_thread_id(
             self.writer.scope, self.role, HistoryWindowKind.PREPARED_HISTORY
@@ -77,7 +78,10 @@ class RoleContextHistory:
         if saved is None:
             if recovery is not None:
                 raise ValueError("The held result has no saved preparation boundary")
-            return template
+            current = template() if callable(template) else template
+            if current.create_payload()["input"]:
+                raise ValueError("The role template must not include history or new-work input")
+            return current
         else:
             values = saved.checkpoint["channel_values"]
             # Before the first expanded state, the native input checkpoint owns the

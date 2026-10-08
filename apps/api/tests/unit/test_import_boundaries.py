@@ -66,6 +66,8 @@ def violations(module: str, code: str) -> list[str]:
                 forbidden |= dependency[0] in {"sqlalchemy", "psycopg"}
             if len(source) > 1 and dependency[:1] == ["caliburn"] and len(dependency) > 1:
                 forbidden |= dependency[1] in ABOVE.get(source[1], ())
+                # 組裝選項與 bootstrap 同層，領域或 transport 不得反向匯入。
+                forbidden |= dependency[1] == "app_composition" and source[1] in ABOVE
             for group in ("features", "agents"):
                 if (
                     len(source) > 2
@@ -112,6 +114,11 @@ def violations(module: str, code: str) -> list[str]:
         ("caliburn.agent_execution.tool_steps", "from caliburn.workflows import model_requests"),
         ("caliburn.transport.http.jd", "from caliburn.agents.job_consultant import runner"),
         ("caliburn.transport.http.jd", "from caliburn import bootstrap"),
+        ("caliburn.features.job_description.service", "from caliburn import app_composition"),
+        (
+            "caliburn.agents.job_consultant.runner",
+            "from caliburn.app_composition import AppComposition",
+        ),
         # The common B1/B2 assembly is shared, but the two roles never reach each other.
         (
             "caliburn.agents.work_situation_analyst.runner",

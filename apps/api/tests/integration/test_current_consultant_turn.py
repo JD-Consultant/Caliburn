@@ -70,6 +70,7 @@ def test_admitted_turn_is_discoverable_before_writer_or_candidate_exists(
         "input_text": "已保存但尚未正式化的原始輸入",
         "allowed_controls": [],
         "commentary": [],
+        "plan_preview": None,
         "candidate": None,
     }
     execution = transact(client, lambda session: executions.read_execution(session, scope))

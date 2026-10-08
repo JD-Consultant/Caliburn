@@ -11,6 +11,7 @@ function turn(status: ConsultantTurn['status'], pauseRequested = false): Consult
     pause_requested: pauseRequested,
     input_text: '原輸入',
     commentary: [],
+    plan_preview: null,
     candidate: null,
     allowed_controls: [],
   };

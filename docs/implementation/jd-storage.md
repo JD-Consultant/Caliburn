@@ -1,7 +1,7 @@
 # JD 保存接線
 
 - 狀態：**現行 JD 保存、交易與讀寫接線** 。人工及模型編輯共用 JD 領域模組，候選在 A 完成交易才正式採用；來源回查、差異與條件撤回依下列契約運作。分析品質及未驗情境見[驗證對照](verification-plan.md)，不由機制測試推定品質達標。
-- 上位契約：[JD 欄位指南](../guides/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。驗證見 [JD 保存](../history.md#source-75f1da860cdd0bef826e)。
+- 上位契約：[JD 欄位指南](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。驗證見 [JD 保存](../history.md#source-75f1da860cdd0bef826e)。
 
 | 維護問題 | 閱讀位置 |
 |---|---|
@@ -55,7 +55,7 @@
 
 以下呈現固定修訂與職責的資料關係，其他集合在各節補充。`job_files` 是職務檔案表；圖的複合識別均含 `job_file_id`。簡化屬性保留具體鍵與已實作欄位，型別採簡寫，省略預設值、CHECK 及排序用的複合唯一約束；完整 DDL 以 [0005](../../apps/api/src/caliburn/migrations/versions/0005_jd_profile_revisions.py)及 [0006 migration](../../apps/api/src/caliburn/migrations/versions/0006_jd_area_selections.py)為準。
 
-圖為現行固定修訂與職責的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。省略各表重複的檔案 FK、修訂 parent 及後續章節的關係。檔案建立工作流會同時建立 JD；圖中 `0..1` 表示 FK／唯一約束本身的範圍。
+圖為現行固定修訂與職責的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。省略各表重複的檔案 FK、修訂 parent 及後續章節的關係。檔案建立工作流會同時建立 JD；圖中 `0..1` 表示 FK／唯一約束本身的範圍。
 
 ![現行：2. 固定修訂與目前正式頭](../diagrams/implementation/jd-storage/fixed-revisions-areas.png)
 
@@ -93,7 +93,7 @@ UUID 是身分，不表示時間大小；先後由父修訂與原操作表達。
 
 [圖源](../diagrams/implementation/jd-storage/jd-task-storage.mmd) · [SVG](../diagrams/implementation/jd-storage/jd-task-storage.svg)
 
-圖為現行任務與明細的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。欄位型別與約束同 §2 簡化；任務可不歸屬職責，故職責端是 `0..1`，不是任務端。固定內容的 `content_revision_id` 未納入選用表主鍵，重用關係為虛線；明細則以完整內容鍵作為自身主鍵的一部分。
+圖為現行任務與明細的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。欄位型別與約束同 §2 簡化；任務可不歸屬職責，故職責端是 `0..1`，不是任務端。固定內容的 `content_revision_id` 未納入選用表主鍵，重用關係為虛線；明細則以完整內容鍵作為自身主鍵的一部分。
 
 - `task_id` 是穩定身分，`content_revision_id` 固定標題、敘述及其兩組明細。`title`／`description` 至少一個有內容；成果／要求均可空集合，不要求湊成一對、不以空白占位。`detail_id` 在同任務中保持身分，供逐筆來源與操作精確定位。
 - 明細以關聯列保存，不塞 JSON 正文；`kind` 分 `outcome`／`requirement`，各自排序，不能跨組或跨任務移動。修文字或自身明細／明細順序才建立新任務內容修訂，複製的是**該任務的固定小型內容集合** ，不是所有任務／整份 JD。此為有界 aggregate 選擇；沒有提前建立每種明細各自的通用版本平台。
@@ -112,7 +112,7 @@ UUID 是身分，不表示時間大小；先後由父修訂與原操作表達。
 
 [圖源](../diagrams/implementation/jd-storage/revision-consistent-read.mmd) · [SVG](../diagrams/implementation/jd-storage/revision-consistent-read.svg)
 
-圖為現行人工查詢的 UML 時序圖；同步呼叫使用實線實心箭頭，回覆使用虛線箭頭，圖例沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。HTTP 與各次資料查詢都等待結果；固定 R 後的查詢不再重讀 head。
+圖為現行人工查詢的 UML 時序圖；同步呼叫使用實線實心箭頭，回覆使用虛線箭頭，圖例沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。HTTP 與各次資料查詢都等待結果；固定 R 後的查詢不再重讀 head。
 
 HTTP Schema 透過 [JSON Schema `$ref`](https://json-schema.org/understanding-json-schema/structuring)重用既有 Area／WorkTask／Capability／TaskLink／Collaborator／Condition 定義；官方 Python／TS 生成器及 Ajv 實測跨檔引用，不手抄第二份欄位規格。組合 transport 使用既有 projection 的 JSON 相容值（`model_dump(mode="json")`），不傳遞另一生成模組的 Enum 實例；非空集合的真 PG 測例覆蓋此邊界。此為人工 transport，並非模型的完整 JD／map 工具。
 
@@ -128,7 +128,7 @@ HTTP Schema 透過 [JSON Schema `$ref`](https://json-schema.org/understanding-js
 
 [圖源](../diagrams/implementation/jd-storage/jd-capability-storage.mmd) · [SVG](../diagrams/implementation/jd-storage/jd-capability-storage.svg)
 
-圖為現行共用能力與任務使用關係的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)，欄位型別與約束同 §2 簡化。關係表主鍵同時包含任務選用鍵與能力選用鍵，因此兩條使用關係都是識別關係；固定內容的重用仍是非識別關係。
+圖為現行共用能力與任務使用關係的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)，欄位型別與約束同 §2 簡化。關係表主鍵同時包含任務選用鍵與能力選用鍵，因此兩條使用關係都是識別關係；固定內容的重用仍是非識別關係。
 
 - 一筆定義可由多任務使用，也可暫無用途；`task_links` 是同一組關係的投影，可得任務使用的能力及能力的反向用途，不新增反向保存表。重複連結不增加第二條邊；解除不存在的連結為無效果命令，仍保存原操作結果。
 - 知識與技能各自呈現概覽順序；任務的知識與技能亦各自排序，**不是沿用概覽順序** 。目前儲存一個概覽 position 及每任務的關係 position，按 kind 篩選後得到各組順序；排序只重排同 kind 的位置，不改另一組相對順序。`before_capability_id` 必須在同組；null 表該組末尾。
@@ -149,7 +149,7 @@ HTTP Schema 透過 [JSON Schema `$ref`](https://json-schema.org/understanding-js
 
 [圖源](../diagrams/implementation/jd-storage/collaborators-conditions.mmd) · [SVG](../diagrams/implementation/jd-storage/collaborators-conditions.svg)
 
-圖為現行協作／條件的局部 ER，省略欄位與檔案 FK；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。不同 JD 修訂各有自己的選用與順序，可以指向同一份未改的固定內容；這些線不表示執行先後。
+圖為現行協作／條件的局部 ER，省略欄位與檔案 FK；基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。不同 JD 修訂各有自己的選用與順序，可以指向同一份未改的固定內容；這些線不表示執行先後。
 
 - 協作對象有穩定 `collaborator_id`；`name`／`scope_text` 至少一欄有意義，未知可 null。允許只記已知合作範圍，未填欄位不猜人名。修訂欄位未指定保留、明確 null 清空但不能清成無內容；順序屬選用，不是正文。
 - 共通條件有穩定 `condition_id`，以既定五種 `kind` 與非空 `text` 表達，沒有虛構 title。只涵蓋整個職務，不自動產生任務、成果或要求，也不把資格條件當成技能。
@@ -175,7 +175,7 @@ HTTP 的 `expected_revision_id` 是使用者畫面讀到的正式基底，`comma
 
 [圖源](../diagrams/implementation/jd-storage/manual-edit.mmd) · [SVG](../diagrams/implementation/jd-storage/manual-edit.svg)
 
-圖為現行人工編輯的 UML 時序圖；同步呼叫使用實線實心箭頭，回覆使用虛線箭頭，圖例沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。省略無內容的同步回覆與拒絕分支；圖中的後續操作均須等待前一呼叫完成，且 HTTP 成功回覆須等待 COMMIT 確認。
+圖為現行人工編輯的 UML 時序圖；同步呼叫使用實線實心箭頭，回覆使用虛線箭頭，圖例沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。省略無內容的同步回覆與拒絕分支；圖中的後續操作均須等待前一呼叫完成，且 HTTP 成功回覆須等待 COMMIT 確認。
 
 工作流先鎖檔案再查原結果。已有結果且 payload 一致就回原修訂，**不因目前已有 A 或更新稿而重新寫入** ；命令身分被拿來送不同內容則拒絕。新命令才核人工准入及 head。與 A 輸入准入共用檔案鎖順序，檢查和寫入在同一交易內；活躍／暫停 A 阻止新的人工 JD 修改，背景 Memory 不阻止。
 
@@ -191,7 +191,7 @@ HTTP 的 `expected_revision_id` 是使用者畫面讀到的正式基底，`comma
 
 [圖源](../diagrams/implementation/jd-storage/candidate-lifecycle.mmd) · [SVG](../diagrams/implementation/jd-storage/candidate-lifecycle.svg)
 
-圖為現行候選操作成功路徑的基本流程圖；形狀及控制箭頭沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。每次操作另核 writer、狀態與原結果，拒絕分支省略。回到菱形表示依下一個操作選擇分支，不是自動重試或每輪必跑全部操作；預覽、修改與恢復均不移動正式 head。
+圖為現行候選操作成功路徑的基本流程圖；形狀及控制箭頭沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。每次操作另核 writer、狀態與原結果，拒絕分支省略。回到菱形表示依下一個操作選擇分支，不是自動重試或每輪必跑全部操作；預覽、修改與恢復均不移動正式 head。
 
 - **修改** ：檔案列鎖 → 活躍 execution writer → open／generation／正式基底檢查 → 查原操作 → 同一套欄位修改 → 候選 current 與原操作一起提交。每次只持有短交易，不跨模型請求或暫停持鎖。人工正式修改沿既有准入；活躍／暫停 A 仍阻止人工寫入。
 - **讀取** ：正式查詢只沿正式 head。候選預覽只接受 active／paused 的 A execution，捕捉一次 current，再讀該固定修訂的 profile 及全部集合；不以多次 latest 拼接。候選 HTTP／UI 沿[介面接線](interface-and-delivery.md)，預覽不採用正式稿。
@@ -237,7 +237,7 @@ map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍
 
 [圖源](../diagrams/implementation/jd-storage/direct-sources.mmd) · [SVG](../diagrams/implementation/jd-storage/direct-sources.svg)
 
-圖為現行直接來源的局部 ER，省略欄位、候選基底及其他 FK；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。一筆引用依 `source_kind` 擇一使用訪談，或同時使用 Memory 快照與物件修訂；三條可空 FK 不表示可任意混用。候選與正式頭都指向固定 JD 修訂，正式採用的共同交易見 §3.1，不以 ER 線表示提交動作。
+圖為現行直接來源的局部 ER，省略欄位、候選基底及其他 FK；基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。一筆引用依 `source_kind` 擇一使用訪談，或同時使用 Memory 快照與物件修訂；三條可空 FK 不表示可任意混用。候選與正式頭都指向固定 JD 修訂，正式採用的共同交易見 §3.1，不以 ER 線表示提交動作。
 
 移動入口、差異、來源回查及條件撤回見 §3.4–3.8；候選 UI 見[介面接線](interface-and-delivery.md)。A 共同完成由 [consultant completion](../../apps/api/src/caliburn/workflows/consultant_completion.py)協調，不讓工具提交整輪；背景意圖等 A 正式完成才取得整理資格。
 

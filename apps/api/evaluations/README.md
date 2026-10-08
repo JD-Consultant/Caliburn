@@ -1,6 +1,6 @@
 # 顧問配置對照
 
-這個入口以固定案例比較候選 Prompt、Tool 說明、JD 讀取容量或 Plan 能力，使用正式 App、HTTP、Agent、工具及 PostgreSQL 保存。每個候選使用獨立 schema 與 SDK client；不複製 Agent，也不修改 module-global。工程責任見[程式組織](../../../docs/implementation/code-organization.md)，評測判準見[開發規範](../../../docs/implementation/development-standard.md#7-分析方法prompttool-與-context-共同驗收)。
+這個入口以固定案例比較候選 Prompt、Tool 說明、JD 讀取容量或 Plan 能力，使用正式 App、HTTP、Agent、工具及 PostgreSQL 保存。每個候選使用獨立 schema 與 SDK client；不複製 Agent，也不修改 module-global。工程責任見[程式組織](../../../docs/standards/code-organization.md)，評測判準見[開發規範](../../../docs/standards/development-standard.md#7-分析方法prompttool-與-context-共同驗收)。
 
 ## 先確認配置
 
@@ -42,7 +42,7 @@ uv run --locked python -m evaluations.consultant_comparison evaluations/consulta
 - 各候選的 `result.json`：完成狀態、正式訪談／JD／Plan，以及原始模型請求、工具參數／結果與捕捉綁定的診斷副本。
 - 失敗時的 `failure.json`：錯誤類別。原件保留，入口停止，不自動追加輸入或重跑。
 
-manifest 與 App 使用首次等待前固定的同一候選。實際發送內容仍以 result 的診斷為準；背景工作是否完成須查其狀態，不能由顧問 Turn 完成推定。診斷有正文，僅存放於授權的本機位置；真人測試的單次查閱沿 [runbook](../../../docs/runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)，不必建立另一套 UI。
+manifest 與 App 使用首次等待前固定的同一候選。實際發送內容仍以 result 的診斷為準；背景工作是否完成須查其狀態，不能由顧問 Turn 完成推定。診斷有正文，僅存放於授權的本機位置；真人測試的單次查閱沿 [runbook](../../../docs/operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)，不必建立另一套 UI。
 
 ## 使用真 provider
 

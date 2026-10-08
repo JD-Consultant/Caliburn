@@ -12,11 +12,11 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 | 工作 | 閱讀入口 |
 |---|---|
 | 查功能、狀態與責任 | 從[目前決策](docs/current-decisions.md)定位本題，再沿[文件導覽](docs/README.md)讀相關責任文件；局部修正限讀受影響範圍。 |
-| 討論架構或跨層變更 | 讀相關 ADR 與契約，依[決策流程](docs/decision-process.md)區分提案、採用與正式切換；[架構討論規範](docs/architecture-discussion-standard.md)提供方法，其細節仍為討論稿。 |
-| 規劃與實作 | 依[開發規範](docs/implementation/development-standard.md)及[計畫入口](docs/plans/README.md)拆解交付；模組邊界看[程式組織](docs/implementation/code-organization.md)，寫法看[程式規範](docs/implementation/coding-standard.md)，API／共用格式看[契約策略](docs/contract-strategy.md)。 |
+| 討論架構或跨層變更 | 讀相關 ADR 與契約，依[決策流程](docs/standards/decision-process.md)區分提案、採用與正式切換；[架構討論規範](docs/standards/architecture-discussion-standard.md)提供方法，其細節仍為討論稿。 |
+| 規劃與實作 | 依[開發規範](docs/standards/development-standard.md)及[計畫入口](docs/plans/README.md)拆解交付；模組邊界看[程式組織](docs/standards/code-organization.md)，寫法看[程式規範](docs/standards/coding-standard.md)，API／共用格式看[契約策略](docs/standards/contract-strategy.md)。 |
 | 設計測試或判讀結果 | 讀[驗證範圍](docs/architecture/verification.md)與相關測試；分析品質的比較沿[產品實驗](docs/experiments/product-validation/README.md)查受測條件及原件。 |
-| 維護文件或圖稿 | 依[文件與圖面規範](docs/implementation/documentation-standard.md)整理責任、敘述、引用與圖面；更新對應正文及入口。 |
-| 啟停、設定或操作資料 | 從 [runbook](docs/runbook.md)、[後端](apps/api/README.md)與[介面](apps/web/README.md)查操作方式與命令。 |
+| 維護文件或圖稿 | 依[文件與圖面規範](docs/standards/documentation-standard.md)整理責任、敘述、引用與圖面；更新對應正文及入口。 |
+| 啟停、設定或操作資料 | 從 [runbook](docs/operations/README.md)、[後端](apps/api/README.md)與[介面](apps/web/README.md)查操作方式與命令。 |
 
 ## 研究與判斷
 
@@ -42,4 +42,4 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 
 ## 指引維護
 
-根指引只保留跨任務適用的工作方法；局部規則放在適用範圍，詳細規範引用責任文件。更新時整合重複或衝突指令，移除已失效的限制及封存事項；歷史依[文件導覽](docs/README.md)查閱。維護依據見[代理指引規範](docs/implementation/documentation-standard.md#21-代理工作指引)。`CLAUDE.md` 只引用本檔。
+根指引只保留跨任務適用的工作方法；局部規則放在適用範圍，詳細規範與分析方法由[規範入口](docs/standards/README.md)查閱。更新時整合重複或衝突指令，移除已失效的限制及封存事項；歷史依[文件導覽](docs/README.md)查閱。維護依據見[代理指引規範](docs/standards/documentation-standard.md#21-代理工作指引)。`CLAUDE.md` 只引用本檔。

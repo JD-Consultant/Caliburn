@@ -11,7 +11,7 @@
 
 | 設計層次 | 設計依據 | 驗證方法與限制 |
 |---|---|---|
-| 問題與成功條件 | [產品概念](../product-concept.md)、[工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)與[寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md) | 以代表資料與 eval 檢驗效果；評分標準須有依據 |
+| 問題與成功條件 | [產品概念](../product/concepts.md)、[工作分析](../standards/work-analysis/2026-09-09-complete-work-analysis-guide.md)與[寫作指南](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md) | 以代表資料與 eval 檢驗效果；評分標準須有依據 |
 | 領域與資訊關係 | [系統邊界](system-boundaries.md)、Memory／JD 設計 | 核對三層資訊關係、來源資格與候選政策在讀寫操作中是否一致 |
 | 核心閉環與狀態 | [跨層生命週期](../specs/2026-09-29-core-value-loop-lifecycle.md)、A／B 流程、[共用執行](../specs/2026-09-27-shared-agent-execution-and-state-design.md) | 以最小案例驗證流程與節點的對應，以及控制操作之間的競爭；產品 Turn 不等同 Graph super-step |
 | 資料與證據 | [持久化](persistence.md)、Memory snapshot、JD 來源／diff | 以真實 PostgreSQL 驗證固定歷史、原子採用與原結果接續；每類資料由單一模組負責 |
@@ -81,8 +81,8 @@
 | 編號／目的 | 具體反例與預期行為 | 設計說明／證據層級 |
 |---|---|---|
 | V03 持續訪談 | 很早提到情境，後期更正頻率；A 可由導覽／原話取回細節，資訊不足先問，不拿舊結論蓋掉新原文 | 工作分析指南＋真模型自然長訪談 |
-| V25 顧問時間與學習負擔 | 不熟悉 JD 的員工不先上 JD 專業方法課、不親自代寫，由 AI 引導完成代表性工作訪談；記錄真人顧問投入、員工事前準備／學習、訪談與修正時間，連同事實正確性及主要工作涵蓋比較。不能只因真人投入下降就宣稱員工耗時也下降 | [產品痛點與價值](../product-concept.md#產品目標與價值)、實際使用者旅程與品質比較；未測 |
-| V26 Context 自主管理與工具效率 | 核對 A／B1／B2 在 SDK 發送邊界的實際 items、角色、範圍與順序符合 App 契約，框架未暗加歷史、裁切工具結果或另行摘要。以相同分析工作比較精簡工具輸入／回傳是否仍能正確定位、判斷與接續；同記 token、耗時、呼叫與錯誤，不只看字數 | [上下文技術核心](../product-concept.md#上下文與分析接續)、請求組裝／adapter 及[36 次模型子任務對照](../experiments/product-validation/data/design-comparisons-2026-10-04/README.md)：短定位減少 47.86% 輸入、兩組均 12／12 正確；按需讀取減少 93.77%，精確品質未持平，整體分析仍待比較 |
+| V25 顧問時間與學習負擔 | 不熟悉 JD 的員工不先上 JD 專業方法課、不親自代寫，由 AI 引導完成代表性工作訪談；記錄真人顧問投入、員工事前準備／學習、訪談與修正時間，連同事實正確性及主要工作涵蓋比較。不能只因真人投入下降就宣稱員工耗時也下降 | [產品痛點與價值](../product/concepts.md#產品目標與價值)、實際使用者旅程與品質比較；未測 |
+| V26 Context 自主管理與工具效率 | 核對 A／B1／B2 在 SDK 發送邊界的實際 items、角色、範圍與順序符合 App 契約，框架未暗加歷史、裁切工具結果或另行摘要。以相同分析工作比較精簡工具輸入／回傳是否仍能正確定位、判斷與接續；同記 token、耗時、呼叫與錯誤，不只看字數 | [上下文技術核心](../product/concepts.md#上下文與分析接續)、請求組裝／adapter 及[36 次模型子任務對照](../experiments/product-validation/data/design-comparisons-2026-10-04/README.md)：短定位減少 47.86% 輸入、兩組均 12／12 正確；按需讀取減少 93.77%，精確品質未持平，整體分析仍待比較 |
 
 ## 3. 驗證層級與證據門檻
 

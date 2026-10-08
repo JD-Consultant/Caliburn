@@ -12,7 +12,7 @@ Caliburn 採用模組化單體、PostgreSQL 與原生模型接續，讓訪談、
 
 ### 1.1 圖面種類與符號
 
-繪圖與文字的具體維護規則集中在[文件與圖面規範](../implementation/documentation-standard.md)。本章只說明架構取捨，不再維護第二套工程寫法。
+繪圖與文字的具體維護規則集中在[文件與圖面規範](../standards/documentation-standard.md)。本章只說明架構取捨，不再維護第二套工程寫法。
 
 ## 2. 程式邊界：模組化單體優先
 
@@ -64,6 +64,6 @@ App 仍可明確呼叫模型的原生能力。[OpenAI standalone compaction](htt
 
 ## 7. 保持架構範圍有限
 
-現行架構處理訪談、工作資訊累積、有據改稿與可靠保存。高內聚、低耦合、可讀、可測及可診斷是工程基線，各項實作都須遵守，不以能否直接提高 JD 品質作為前提。微服務、通用規則引擎及事件重播平台目前沒有必要用途；後續技術選擇依維護、測試與運作成本比較，不將現行未採用寫成永久禁令。工程與產品品質各自驗收，依[開發規範](../implementation/development-standard.md#31-依風險配置驗證與交付粒度)維護。
+現行架構處理訪談、工作資訊累積、有據改稿與可靠保存。高內聚、低耦合、可讀、可測及可診斷是工程基線，各項實作都須遵守，不以能否直接提高 JD 品質作為前提。微服務、通用規則引擎及事件重播平台目前沒有必要用途；後續技術選擇依維護、測試與運作成本比較，不將現行未採用寫成永久禁令。工程與產品品質各自驗收，依[開發規範](../standards/development-standard.md#31-依風險配置驗證與交付粒度)維護。
 
-現行產品不承接舊架構資料，背景見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。產品範圍見[產品概念](../product-concept.md)，測試結果見[驗證章節](verification.md)。
+現行產品不承接舊架構資料，背景見 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。產品範圍見[產品概念](../product/concepts.md)，測試結果見[驗證章節](verification.md)。

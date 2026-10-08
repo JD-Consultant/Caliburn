@@ -9,7 +9,7 @@
 - 本文件：如何準備、觀察、評分及解讀。沿既有 pytest、角色 runner、Memory parent 與資料 owner，不增加模型評測平台或產品契約。
 - [T14 evidence](../../../../../docs/history.md#source-d3293e9b28c75bbb6616)：本切片來源、實際檢查及未驗邊界；不另勾任務完成。
 
-內容責任仍是 [工作分析指南](../../../../../docs/guides/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](../../../../../docs/guides/2026-09-09-jd-field-and-writing-guide.md)、[訪談校準](../../../../../docs/guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)。oracle 的 `analysis`／`writing`／`interview` 數字對應這三份文件章節。本文不是第二份指南，也不以案例中的格式／件數定義所有職位。
+內容責任仍是 [工作分析指南](../../../../../docs/standards/work-analysis/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](../../../../../docs/standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)、[訪談校準](../../../../../docs/standards/work-analysis/2026-09-09-customized-jd-depth-and-interview-calibration.md)。oracle 的 `analysis`／`writing`／`interview` 數字對應這三份文件章節。本文不是第二份指南，也不以案例中的格式／件數定義所有職位。
 
 ## 案例各辨別什麼
 

@@ -1,19 +1,28 @@
 # 文件圖源與圖片
 
-受維護文件的圖源集中於此。正文引用同名 PNG，旁邊提供 `.mmd` 圖源及可放大的 SVG；相同圖直接共用一組圖片，不在報告或正文另抄來源。修改節點、形狀或連線時，只編輯 `.mmd` 再重繪。
+本目錄集中文件設計圖與產品截圖，供正文及報告共用。設計圖依責任文件分目錄，保存 `.mmd` 圖源、同名 PNG 與可放大的 SVG；產品截圖放在 `screenshots/`。已收在實驗目錄的圖片直接引用原件，不另存副本。
 
-產品權責、圖說及適用範圍仍由各責任文件維護；本頁只提供路由與重繪方式。圖名保留「現行」「目標／未實作」「候選」或「歷史」，集中存放不會改變狀態。符號定義依[文件與圖面規範](../implementation/documentation-standard.md#3-圖面種類與符號)。`archive/`、`experiments/`、`plans/evidence/` 及 ADR 的歷史正文／原件保留原位；產品截圖與實驗圖片也由原證據位置維護。
+產品權責、圖說及適用範圍仍由各責任文件維護；本頁只提供路由與重繪方式。圖名保留「現行」「目標／未實作」「候選」或「歷史」，截圖註明日期及受測範圍；集中存放不會改變狀態。符號定義依[文件與圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。`archive/`、`experiments/`、`plans/evidence/` 及 ADR 的歷史正文／原件保留原位。
+
+## 產品截圖
+
+| 圖片 | 日期、用途與來源 |
+|---|---|
+| [職務檔案清單](screenshots/job-file-list.jpg) | 2026-10-05，呈現改名與刪除入口；受測版本及限制見[刪除功能驗證](../experiments/product-validation/2026-10-05-job-file-deletion.md) |
+| [訪談、JD 與來源回查](../experiments/product-validation/data/inventory-demo-guided-20261003/interview-source.jpg) | 2026-10-03 庫存管理合成示例；根 README 與報告共用實驗原件 |
+
+截圖保留原始格式，不配 `.mmd` 或衍生 SVG，也不交由 Mermaid 重繪。
 
 ## 按責任文件查圖
 
 | 責任文件 | 圖面內容 | 圖源目錄 |
 |---|---|---|
-| [產品介紹](../product-introduction.md) | 使用者的核心流程 | [來源](product-introduction/) |
+| [產品介紹](../product/README.md) | 使用者的核心流程 | [來源](product/README/) |
 | [架構入口](../architecture/README.md) | 操作者主要流程 | [來源](architecture/README/) |
 | [系統邊界](../architecture/system-boundaries.md) | C4 情境、容器 | [來源](architecture/system-boundaries/) |
 | [保存與恢復](../architecture/persistence.md) | Plan 採用、已提交操作恢復 | [來源](architecture/persistence/) |
 | [交付與運作](../architecture/delivery-and-operations.md) | 部署、選用 RAG 容器 | [來源](architecture/delivery-and-operations/) |
-| [程式組織](../implementation/code-organization.md) | 模組依賴 | [來源](implementation/code-organization/) |
+| [程式組織](../standards/code-organization.md) | 模組依賴 | [來源](standards/code-organization/) |
 | [Agent 執行](../implementation/agent-execution.md) | 歷史、Step、迴圈、控制、準備、補存 | [來源](implementation/agent-execution/) |
 | [模型外送](../implementation/model-requests.md) | 請求與結算、預算、重試 | [來源](implementation/model-requests/) |
 | [訪談保存](../implementation/interview-storage.md) | 訪談及執行關係 | [來源](implementation/interview-storage/) |
@@ -44,7 +53,7 @@
 |---|---|
 | 01 操作者流程 | [PNG](architecture/README/product-activities.png) · [來源](architecture/README/product-activities.mmd) |
 | 02 本機部署 | [PNG](architecture/delivery-and-operations/local-deployment.png) · [來源](architecture/delivery-and-operations/local-deployment.mmd) |
-| 03 程式依賴 | [PNG](implementation/code-organization/python-dependencies.png) · [來源](implementation/code-organization/python-dependencies.mmd) |
+| 03 程式依賴 | [PNG](standards/code-organization/python-dependencies.png) · [來源](standards/code-organization/python-dependencies.mmd) |
 | 04 訪談執行 | [PNG](reports/system-architecture/04-consultant-turn.png) · [來源](reports/system-architecture/04-consultant-turn.mmd) |
 | 05 三層依據 | [PNG](reports/system-architecture/05-evidence-layers.png) · [來源](reports/system-architecture/05-evidence-layers.mmd) |
 | 06 背景整理 | [PNG](reports/system-architecture/06-memory-batch.png) · [來源](reports/system-architecture/06-memory-batch.mmd) |
@@ -67,7 +76,7 @@
 
 ## 編輯與重繪
 
-每組圖維持同名 `.mmd`、`.svg`、`.png`。產圖器遍歷受維護正文的圖片引用，核對中央圖源並依來源路徑去重；新增圖須同時接好責任正文的圖片與圖源連結。`%% title:` 提供獨立圖片的圖名與狀態，未提供時取責任正文的圖片 alt；`%% legend:` 提供必要圖例。既有 `%% diagram:` 只作唯一性檢查，不是產品 ID，也不需要再維護報告對應程式表。
+每組 Mermaid 設計圖維持同名 `.mmd`、`.svg`、`.png`。修改節點、形狀或連線時，只編輯 `.mmd` 再重繪。產圖器遍歷受維護正文的圖片引用，略過 `screenshots/`，核對中央圖源並依來源路徑去重；新增設計圖須同時接好責任正文的圖片與圖源連結。`%% title:` 提供獨立圖片的圖名與狀態，未提供時取責任正文的圖片 alt；`%% legend:` 提供必要圖例。既有 `%% diagram:` 只作唯一性檢查，不是產品 ID，也不需要再維護報告對應程式表。
 
 在 repository 根目錄執行；先依 Web README 安裝既有開發依賴。Mermaid 是文件工具，不加入產品執行依賴。
 

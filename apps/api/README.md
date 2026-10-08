@@ -2,7 +2,7 @@
 
 正式後端負責訪談、背景 Memory、JD 編輯、來源回查與 PDF 匯出。它以 FastAPI 單程序運行，使用 PostgreSQL 保存資料、LangGraph 官方 saver 保存執行狀態，並直連 OpenAI Responses。服務只綁定 loopback，不對外開放。
 
-本頁說明後端配置、API 與測試。日常啟動從專案根目錄的 `pnpm` 命令進入，步驟見[操作手冊](../../docs/runbook.md#快速開始)。正式範圍由 [ADR 0079](../../docs/adr/0079-target-rebuild-production-cutover.md)定義；哪些行為已驗證、結果支持到哪裡，見[驗證範圍](../../docs/architecture/verification.md)。
+本頁說明後端配置、API 與測試。首次使用完整 App 見[快速開始](../../docs/operations/getting-started.md)；後端開發沿[原生操作](../../docs/operations/native-development.md)。正式範圍由 [ADR 0079](../../docs/adr/0079-target-rebuild-production-cutover.md)定義；哪些行為已驗證、結果支持到哪裡，見[驗證範圍](../../docs/architecture/verification.md)。
 
 清單支援整份職務檔案刪除：`DELETE /api/job-files/{job_file_id}` 成功回 204，含所屬訪談、JD、Memory 與執行紀錄；有未結束工作時回 409 `job_file_busy`。不可復原，不影響其他檔案。更新既有安裝須先套用 `0025_job_file_deletion`；確認、歷史保護與 checkpoint 交易見[刪除規則](../../docs/implementation/interview-storage.md#11-整份職務檔案刪除)。
 
@@ -10,19 +10,11 @@
 
 ## 安裝與執行
 
-首次使用完整 App，從[操作手冊的快速開始](../../docs/runbook.md#快速開始)選擇 Docker 或原生方式。下方命令供原生後端開發；停止時在啟動的終端按 Ctrl+C，再次啟動沿用原資料庫與設定。
+首次使用完整 App，沿[快速開始](../../docs/operations/getting-started.md)使用 Docker。下方命令供原生後端開發；停止時在啟動的終端按 Ctrl+C，再次啟動沿用原資料庫與設定。
 
-從專案根目錄執行，使用 Python 3.14、uv 0.12.20 與根 `package.json` 指定的 Node／pnpm。先提供[資料庫設定](#目標資料庫初始化)，AI 與 PDF 設定見 [操作手冊](../../docs/runbook.md)。依賴由 `apps/api/uv.lock` 與根 `pnpm-lock.yaml` 固定。
+完整 App 的工具版本、依賴安裝、資料庫設定與首次初始化沿[原生開發](../../docs/operations/native-development.md)依序完成。AI 金鑰與 PDF 分別見[金鑰設定](../../docs/operations/native-development.md#ai-金鑰)及[PDF 匯出設定](../../docs/operations/native-development.md#pdf-匯出)。下方元件專用命令均從專案根目錄執行，依賴由 `apps/api/uv.lock` 與根 `pnpm-lock.yaml` 固定。
 
-```powershell
-uv sync --project apps/api --locked
-pnpm install --frozen-lockfile
-pnpm app:migrate
-pnpm build
-pnpm start        # 同源提供畫面與 API：http://127.0.0.1:8100/
-```
-
-開發前端時以 `pnpm dev` 取代 `pnpm start`，兩者不要同時執行。`pnpm app:status` 只診斷目前環境變數與資料庫；不讀 `apps/api/.env`、不套用啟動器的 Web 目錄、不啟動服務，詳細判讀見 [診斷](../../docs/runbook.md#診斷)。
+開發前端時以 `pnpm dev` 取代 `pnpm start`，兩者不要同時執行。`pnpm app:status` 只診斷目前環境變數與資料庫；不讀 `apps/api/.env`、不套用啟動器的 Web 目錄、不啟動服務，詳細判讀見 [診斷](../../docs/operations/README.md#診斷)。
 
 `pnpm start` 轉交下方的 `scripts/run_backend.py`。只有最低層診斷才直接執行 uvicorn：`uv run --project apps/api --locked uvicorn caliburn.bootstrap:create_app --factory --host 127.0.0.1 --port 8100 --loop asyncio:SelectorEventLoop`。這個入口不載入 `.env`，但已提供的環境變數（包括 key）仍生效。`GET /api/health` 回傳 `{"status":"ok"}` 只表示程序存活，不表示 DB／模型可用。應用不在 import 時讀取 `.env`。
 
@@ -42,7 +34,7 @@ uv run --project apps/api --locked python apps/api/scripts/run_backend.py --key-
 
 ### 使用建置後的同源畫面
 
-Docker 可直接包好同源 Web、後端、PDF 資源與 PostgreSQL；操作見 [runbook 的 Docker 操作](../../docs/runbook.md#docker-操作)。使用同一個後端入口，但容器明確指定 `--host 0.0.0.0`，主機只發布到 loopback；以下保留原生啟動方式。
+Docker 可直接包好同源 Web、後端、PDF 資源與 PostgreSQL；操作見 [runbook 的 Docker 操作](../../docs/operations/README.md#docker-操作)。使用同一個後端入口，但容器明確指定 `--host 0.0.0.0`，主機只發布到 loopback；以下保留原生啟動方式。
 
 正式交付形式。先沿上節設定資料庫，使用所定 Node／pnpm 與 Python 環境，從 repo root 執行（`pnpm build`＋`pnpm start` 已包含下列步驟與環境變數）：
 
@@ -71,7 +63,7 @@ uv run --project apps/api --locked alembic -c apps/api/alembic.ini check
 
 migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade head` 不重建原資料。應用啟動只檢查 migration head，不默默升級。未配置新 DB 時 health 仍可用、檔案 API 回 503；已配置但結構未初始化／不相符則啟動失敗。初始 schema 包含不可變原文，不提供破壞性 downgrade；需要資料處置應另行核對精確範圍。
 
-日常入口 `pnpm start`／`pnpm dev` 會要求資料庫設定；上述「未配置 DB 時 health 可用」只適用於直接啟動的最低層診斷入口。版本更新流程見[操作手冊](../../docs/runbook.md#更新已有安裝)。
+日常入口 `pnpm start`／`pnpm dev` 會要求資料庫設定；上述「未配置 DB 時 health 可用」只適用於直接啟動的最低層診斷入口。版本更新流程見[操作手冊](../../docs/operations/native-development.md#更新已有安裝)。
 
 **JD 模型短定位（0023）：**升級前讓執行中的工作停在安全點，停止原後端後，沿上述相同 DB／schema 設定執行 `pnpm app:migrate`，再 `pnpm start`。這只新增模型定位映射，不重建 JD 或改寫原模型歷史；新工具結果提供 `task_12`／`citation_18` 等短定位，舊 UUID 定位仍相容。映射由 App 自動發配，不能手動重排／重設序號／清表；前端 HTTP 仍使用原 UUID，無須為此重建前端。設計與驗證見 [JD 保存 §3.2](../../docs/implementation/jd-storage.md#32-模型導覽與既有物件定位)及 [T14 §8](../../docs/history.md#source-098e24f247a9411844be)。
 
@@ -94,7 +86,7 @@ $env:CALIBURN_OCCUPATION_REFERENCE_URL = 'http://127.0.0.1:8000'
 $env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
 ```
 
-未設 URL 就關閉；timeout 預設 30 秒，必須有限且大於零。原生啟動沿現有資料庫／金鑰設定與 `pnpm start`；若同時有其他 App 使用相同 DB，先依 runbook 避免同一 leader 的重複程序。Docker 可使用[公版參考模式](../../docs/runbook.md#含公版參考的-docker-模式)一併啟動獨立 RAG，延伸配置會設定 `http://ocs-indexer:8000`。若使用自有外部 RAG，則在 App `env_file` 加入上述設定，URL 必須容器可達；根 Compose 插值 `.env` 不等於容器環境。
+未設 URL 就關閉；timeout 預設 30 秒，必須有限且大於零。原生啟動沿現有資料庫／金鑰設定與 `pnpm start`；若同時有其他 App 使用相同 DB，先依 runbook 避免同一 leader 的重複程序。Docker 可使用[公版參考模式](../../docs/operations/rag.md#含公版參考的-docker-模式)一併啟動獨立 RAG，延伸配置會設定 `http://ocs-indexer:8000`。若使用自有外部 RAG，則在 App `env_file` 加入上述設定，URL 必須容器可達；根 Compose 插值 `.env` 不等於容器環境。
 
 顧問新增五工具，B1／B2 新增一個唯讀工具；角色已保存的 preparation／context／Step 繼續原工具清單，新設定只影響新的未綁定請求。關閉前先讓使用公版的 A Turn 完成；原請求需要 RAG 而 client 配置消失時會明確拒絕，不靜默換工具。RAG 下線回工具錯誤，不視為查無結果、不清 state。client 不使用系統代理、不跟隨重導，由 App 關閉。
 
@@ -173,8 +165,8 @@ SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG 
 
 ### 模型失敗診斷
 
-要在 DataGrip 直接 JOIN 查看某份檔案的 AI 輸入、工具與結果，使用按需 `scripts/refresh_execution_diagnostics.py`，再開啟 `diagnostic_execution_history`、`diagnostic_model_steps`、`diagnostic_tool_calls`。它不啟動模型，也不改原 checkpoint；完整命令、擷取新鮮度與敏感資料界線見 [runbook](../../docs/runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
+要在 DataGrip 直接 JOIN 查看某份檔案的 AI 輸入、工具與結果，使用按需 `scripts/refresh_execution_diagnostics.py`，再開啟 `diagnostic_execution_history`、`diagnostic_model_steps`、`diagnostic_tool_calls`。它不啟動模型，也不改原 checkpoint；完整命令、擷取新鮮度與敏感資料界線見 [runbook](../../docs/operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
 
-後端 logger `caliburn.workflows.model_requests` 以 JSONL 事件 `model.request_failed` 記錄實際外送失敗：操作、安全分類、HTTP status、白名單 provider code，以及 App 本地 execution／request／attempt ID。可依這些 ID 核對既有執行紀錄；它們不是可向 OpenAI 取回遺失回應的遠端 ID。`null` 表示未取得 HTTP status 或 code 不在白名單，不能據此推定沒有錯誤。正式啟動入口的輸出、等級及 HTTP 關聯見 [Log 操作](../../docs/runbook.md#一般-log-與-http-關聯)。
+後端 logger `caliburn.workflows.model_requests` 以 JSONL 事件 `model.request_failed` 記錄實際外送失敗：操作、安全分類、HTTP status、白名單 provider code，以及 App 本地 execution／request／attempt ID。可依這些 ID 核對既有執行紀錄；它們不是可向 OpenAI 取回遺失回應的遠端 ID。`null` 表示未取得 HTTP status 或 code 不在白名單，不能據此推定沒有錯誤。正式啟動入口的輸出、等級及 HTTP 關聯見 [Log 操作](../../docs/operations/README.md#一般-log-與-http-關聯)。
 
 此警告不代表故障已保存、重試／回滾已完成。正文沿受控診斷查閱，不開啟原始 HTTP body、opaque reasoning 或秘密日誌。既有接線沿革見 [T06 §23](../../docs/history.md#source-d76bfd79f21fb146c537)，本輪結構化輸出與查閱修正見[重構證據](../../docs/plans/evidence/full-system-review-2026-10-08.md)。

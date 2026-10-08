@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { EventEmitter } from "node:events";
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
@@ -46,8 +46,8 @@ for (const termination of ["backend_exits", "launcher_terminates", "launcher_int
     // uv 自己決定專案環境；離線執行不下載依賴，也不改成 exact sync。
     const env = { ...process.env, UV_OFFLINE: "1" };
     const pythonExecutable = await prepareBackendPython(root, { env });
-    await mkdir(path.join(root, ".research-tmp"), { recursive: true });
-    const directory = await mkdtemp(path.join(root, ".research-tmp", "launcher-owned-"));
+    await mkdir(path.join(root, ".tmp"), { recursive: true });
+    const directory = await mkdtemp(path.join(root, ".tmp", "launcher-owned-"));
     const pythonReady = path.join(directory, "python.json");
     const nodeReady = path.join(directory, "node.json");
     const probe = path.join(directory, "owned_service.py");
@@ -98,10 +98,11 @@ with socket.socket() as server:
     } finally {
       signals.emit("SIGTERM");
       await settled;
-      // 反例失敗也只清理這次握有的 PID；保留合成探針資料供查核。
+      // 反例失敗也只清理這次握有的 PID；失敗時保留合成探針資料供查核。
       for (const owned of [python, node]) {
         if (owned && isAlive(owned.pid)) process.kill(owned.pid, "SIGKILL");
       }
     }
+    await rm(directory, { recursive: true, force: true });
   });
 }

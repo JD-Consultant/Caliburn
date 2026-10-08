@@ -1,6 +1,6 @@
 # 程式設計與實作文件
 
-本目錄說明如何用程式落實既有產品契約：模組分工、資料與工具接線，以及開發規範。正式產品位於 `apps/api`、`apps/web`，權責依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。先確認要改的行為，再讀對應接線；不必循序讀完本目錄。
+本目錄說明如何用程式落實既有產品契約，維護當前技術選型、具體接線與驗證對照。正式產品位於 `apps/api`、`apps/web`，權責依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)。先確認要改的行為，再讀對應接線；工程工作、程式與文件寫法沿[規範入口](../standards/README.md)。
 
 圖面由獨立 `.mmd` 生成並在正文引用。各圖旁可直接開啟圖源；整體路由與重繪命令見[圖源索引](../diagrams/README.md)。
 
@@ -10,11 +10,8 @@
 |---|---|
 | 產品應達成什麼、哪些規則不能改 | [架構與責任文件](../architecture/README.md) |
 | 有效狀態、後續工作及施工範圍 | [目前決策](../current-decisions.md)、[計畫入口](../plans/README.md) |
-| 研究、SDD、TDD、審查與長任務接手 | [開發規範](development-standard.md)；接手方式見 [§10](development-standard.md#10-長任務goal-與工作上下文) |
+| 開發流程、模組組織、程式與文件寫法 | [開發與架構規範](../standards/README.md#開發與架構) |
 | 選哪些框架、為何、不選什麼 | [技術選型與機制驗證](technology-decisions.md) |
-| 模組、命名、依賴與 Prompt／Tool 替換 | [程式組織與命名](code-organization.md)；對照公平性沿[開發規範 §7](development-standard.md#7-分析方法prompttool-與-context-共同驗收) |
-| 前後端寫法、錯誤、測試與觀測 | [程式撰寫規範與實例](coding-standard.md)，含 [Log 格式與查閱](coding-standard.md#72-log-的格式責任與查閱)；依據見[全系統工程研究](../research/engineering/2026-10-08-full-stack-engineering-practices.md) |
-| 工程文件如何分工、拆合、敘述與繪圖 | [文件與圖面規範](documentation-standard.md) |
 
 ### 依改動範圍讀接線
 
@@ -36,7 +33,7 @@
 
 ## 文件維護責任
 
-產品效果、權責與規則由架構及契約文件維護；本目錄維護實現機制；任務表記錄施工範圍、依賴、驗收及證據。正式 JSON 格式由契約來源生成，各層引用同一來源，不重抄欄位或狀態機。
+產品效果、權責與詳細行為由架構及契約文件維護；工程規範與分析方法集中在 [standards](../standards/README.md)；本目錄維護當前選型、實現機制與驗證對照。任務表記錄施工範圍、依賴、驗收及證據。正式 JSON 格式由契約來源生成，各層引用同一來源，不重抄欄位或狀態機。
 
 需求改變先改原責任文件；只換實現機制時，更新接線及受影響任務／測試。完成狀態由任務表維護，研究、歷史及候選不能覆蓋最新有效契約。既有文件持續更新，只有需要獨立維護的主題才新增文件。
 

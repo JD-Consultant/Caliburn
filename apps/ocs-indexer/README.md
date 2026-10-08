@@ -24,7 +24,7 @@ OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HT
 
 ### 與 JD App 一起用 Docker 啟動
 
-使用根目錄的 `compose.jd-app.yaml` 加 `compose.jd-app.rag.yaml`，首次選版與建索引後可用 `pnpm docker:rag:up` 一起啟動 App、PostgreSQL、查詢 API、Qdrant 與 GPU 模型。停止用 `pnpm docker:rag:stop`。完整設定、來源唯讀掛載與搜尋檢查見[操作手冊](../../docs/runbook.md#含公版參考的-docker-模式)。
+使用根目錄的 `compose.jd-app.yaml` 加 `compose.jd-app.rag.yaml`，首次選版與建索引後可用 `pnpm docker:rag:up` 一起啟動 App、PostgreSQL、查詢 API、Qdrant 與 GPU 模型。停止用 `pnpm docker:rag:stop`。完整設定、來源唯讀掛載與搜尋檢查見[操作手冊](../../docs/operations/rag.md#含公版參考的-docker-模式)。
 
 RAG 仍是獨立服務，不移入 App。查詢 API 映像依本目錄的 lockfile 安裝 API extra 與兩個契約套件，不安裝 torch，也不包含 `.env`、測試或來源 JSON。容器只走內網，不接收 App 的金鑰。`Dockerfile.dockerignore` 限制可進入建置的檔案；服務以非 root 使用者執行，套件採非 editable 安裝，不依賴開發原始碼路徑。
 

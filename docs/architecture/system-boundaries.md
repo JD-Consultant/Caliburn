@@ -90,7 +90,7 @@ Memory 採單向 B1 → B2 → 發布，不回交 B1。B1 交接後不再修改�
 
 完成標記須綁定 App 的批次與交接身分，版號不由模型填寫；呼叫過 read 也不代表分析已完成。原生推理與工具結果支援分析接續，App State 保存執行事實，不要求每個 Step 額外撰寫分析筆記。
 
-三個角色採用相同的[工作分析方法](../guides/2026-09-09-complete-work-analysis-guide.md)，但產出不同。A 依[訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)與[JD 寫作方法](../guides/2026-09-09-jd-field-and-writing-guide.md)形成職務說明書；B1／B2 保存工作情境與理解，不預先寫成 JD 欄位。一次分析可以包含多次模型與工具往返。
+三個角色採用相同的[工作分析方法](../standards/work-analysis/2026-09-09-complete-work-analysis-guide.md)，但產出不同。A 依[訪談校準](../standards/work-analysis/2026-09-09-customized-jd-depth-and-interview-calibration.md)與[JD 寫作方法](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)形成職務說明書；B1／B2 保存工作情境與理解，不預先寫成 JD 欄位。一次分析可以包含多次模型與工具往返。
 
 ### 工作如何跨模組執行
 
@@ -111,7 +111,7 @@ Memory 採單向 B1 → B2 → 發布，不回交 B1。B1 交接後不再修改�
 | A → 公版 RAG → A | 已確認主要工作 query、固定公版定位、目錄或任務正文 | 只在啟用時查讀；不自動加入否認範圍，也不以相似度認定員工責任 |
 | 公版參考 state → A／B1／B2 | A 讀本輪選用及排除範圍；B1／B2 只讀其固定上界內有效的排除範圍 | 選用與否認不寫入 Memory；後輪更正不回流舊批次，取消／失敗候選不跨輪生效 |
 
-Plan、Changes 與 JD 的往來沿 [§2.1](#21-長任務的元件分工)；Web 重送／重連沿[互動狀態](delivery-and-operations.md#畫面api-與串流的狀態一致性)，業務提交沿[交易邊界](persistence.md#3-交易邊界)。Python 與 Web 的傳輸格式依[契約策略](../contract-strategy.md)從單一來源生成。
+Plan、Changes 與 JD 的往來沿 [§2.1](#21-長任務的元件分工)；Web 重送／重連沿[互動狀態](delivery-and-operations.md#畫面api-與串流的狀態一致性)，業務提交沿[交易邊界](persistence.md#3-交易邊界)。Python 與 Web 的傳輸格式依[契約策略](../standards/contract-strategy.md)從單一來源生成。
 
 ## 5. 模組之間的資料依賴
 

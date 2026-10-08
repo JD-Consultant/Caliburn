@@ -7,6 +7,8 @@ updated: 2026-07-04
 
 # ocs-indexer 管線內部 — ingest + 查詢(深文檔)
 
+本文描述既有 **profile／task 索引與 API**；其中 API／Web 知識包的消費方式保留舊產品脈絡。新公版參考採獨立 document／task 索引，操作見 [App README](../README.md#職位整體參考-api)，查詢與固定來源契約見[公版參考 API 設計](../../../docs/specs/2026-10-05-occupation-reference-api-design.md)。
+
 > **主讀者 = agent。** [`../README.md`](../README.md) 是「面」(端點 / codemap / payload schema);
 > 這份是「**內部怎麼跑 + 為什麼**」——動 `normalizer` / `builder` / payload / 查詢邏輯前先讀。
 > **living**:改管線的碼,同 commit 更新本檔。payload 欄位權威在 `ingestion/payloads.py`(pydantic)。
@@ -103,5 +105,5 @@ hybrid_search(level="profile"|"task", limit=top_k)
 - 面 / 端點 / payload schema:[`../README.md`](../README.md)。
 - ADR:[0003](../../../docs/adr/0003-indexer-stays-separate-service.md)(獨立服務)·[0009](../../../docs/adr/0009-embedding-version-manifest.md)(manifest / 相容)·[0010](../../../docs/adr/0010-indexer-contract-shared-package.md)(契約 #2)·[0012](../../../docs/adr/0012-embedding-as-a-service.md)(embedder 服務化)。
 - 來源 JSON 契約:[`apps/pdf-to-json/README.md`](../../pdf-to-json/README.md) §6.3;取用注意事項 [`docs/ocs-source-json.md`](../../../docs/history.md#source-342210e06cceeff43952)。
-- 下游消費(哪個端點餵哪個池):[`apps/api/README.md`](../../api/README.md) + [`docs/design/editor-knowledge-pack.md`](../../../docs/history.md#source-342210e06cceeff43952)。
-- 文檔怎麼寫:[`docs/README.md`](../../../docs/README.md)、[`docs/design/README.md`](../../../docs/design/README.md)。
+- 舊產品知識包消費沿革：[editor knowledge pack 歷史取回](../../../docs/history.md#source-342210e06cceeff43952)；現行 App 的可選 HTTP 接入見 [API README](../../api/README.md#公版參考工具的可選啟用)。
+- 文件維護：[文件導覽](../../../docs/README.md)、[文件與圖面規範](../../../docs/standards/documentation-standard.md)。

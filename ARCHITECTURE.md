@@ -37,10 +37,10 @@ PostgreSQL               OpenAI Responses API（經授權的工作資料；store
 - 本輪 JD 撤回只撤回該輪 JD 的效果，不撤回原始訪談、來源或 Memory。
 - OpenAI 金鑰僅供後端使用，不放入提示、工具、Web 建置檔、URL、紀錄或資料庫；未設定金鑰時，人工 JD 編輯仍可使用，AI 功能則明確顯示為停用。
 
-整體流程與各章閱讀入口見[架構導覽](docs/target-architecture-map.md)。模組之間的關係見[系統責任與資料流](docs/architecture/system-boundaries.md)，保存與恢復機制見[資料責任與交易](docs/architecture/persistence.md)。測試結果與適用範圍見[驗證與限制](docs/architecture/verification.md)。
+整體流程與各章閱讀入口見[架構導覽](docs/architecture/README.md)。模組之間的關係見[系統責任與資料流](docs/architecture/system-boundaries.md)，保存與恢復機制見[資料責任與交易](docs/architecture/persistence.md)。測試結果與適用範圍見[驗證與限制](docs/architecture/verification.md)。
 
-## 獨立的檢索研究
+## 獨立公版檢索
 
 `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract` 與 `packages/indexer-contract` 構成獨立 RAG 領域，分別處理公版轉換、索引、向量與 API 契約。
 
-依 [ADR0080](docs/adr/0080-opt-in-public-reference-agent-tools.md)，JD App 可在明示設定後透過 HTTP 查讀公版；RAG 不由 App 自動部署或啟動，也不保存員工訪談與 JD。選用公版及明確否認範圍由 App 自己保存，工具資格與跨輪規則沿原執行流程。啟停仍使用 `pnpm rag:*`，詳細分工見 [RAG 設計](docs/design/rag-pipeline.md)。
+依 [ADR0080](docs/adr/0080-opt-in-public-reference-agent-tools.md)，JD App 可在明示設定後透過 HTTP 查讀公版；RAG 不由 App 自動部署或啟動，也不保存員工訪談與 JD。選用公版及明確否認範圍由 App 自己保存，工具資格與跨輪規則沿原執行流程。啟停方式見 [RAG 操作](docs/operations/rag.md)，詳細分工見 [RAG 架構](docs/architecture/rag-pipeline.md)。

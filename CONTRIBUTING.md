@@ -12,9 +12,8 @@ apps/web/        React／TypeScript／MUI 介面
 docs/            ADR、研究、設計、計畫、證據與 runbook
 ```
 
-`experiments/jd-relational-app` 與 `packages/consultant-memory` 的程式已退役，只保留研究與沿革
-文件，不能接回 import 或啟動；退役範圍與取回方式見 ADR0079。RAG bounded context 仍保留，但與 JD
-App 隔離且只能明示啟用。
+舊 JD App 與套件已退役並移出工作樹，沿革與原件由[Git 歷史](docs/history.md#retired-packages-20261008)查閱。
+RAG 保留 `packages/indexer-contract`、`packages/ocs-contract` 兩套共用契約；與 JD App 隔離且只能明示啟用。
 
 ## 工具與安裝
 
@@ -31,7 +30,7 @@ uv sync --project apps/api --locked
 
 Node／TypeScript 使用根目錄唯一的 `pnpm-lock.yaml`；不要新增 npm lockfile。Python 使用
 `apps/api/uv.lock`。資料庫與 OpenAI key 只經明示的環境變數／`apps/api/.env` 的單一 key 設定，
-不由安裝或啟動偷偷建立、清除或搬移；步驟見 [runbook 的首次初始化](docs/runbook.md#第一次初始化)。
+不由安裝或啟動偷偷建立、清除或搬移；步驟見 [runbook 的首次初始化](docs/operations/README.md#第一次初始化)。
 
 ## 日常開發
 
@@ -49,11 +48,11 @@ pnpm start
 
 ## 程式規範
 
-層次與依賴方向、命名與寫法依[程式組織](docs/implementation/code-organization.md)與
-[程式撰寫規範](docs/implementation/coding-standard.md)：依賴只向下，模組以業務責任組織，Service
+層次與依賴方向、命名與寫法依[程式組織](docs/standards/code-organization.md)與
+[程式撰寫規範](docs/standards/coding-standard.md)：依賴只向下，模組以業務責任組織，Service
 是用例責任而非必須的 class 後綴，不為想像的未來泛化。層方向與前端 feature 互不 import 由
 `apps/api/tests/unit/test_import_boundaries.py` 與 `apps/web/eslint.config.js` 鎖定，違反會直接失敗。
-新功能依[開發規範](docs/implementation/development-standard.md)以行為反例先行（Red → Green → Refactor）。
+新功能依[開發規範](docs/standards/development-standard.md)以行為反例先行（Red → Green → Refactor）。
 
 ## 驗證與提交
 
@@ -72,11 +71,6 @@ pnpm check
 
 ## 隔離 RAG
 
-```powershell
-pnpm rag:up
-pnpm rag:dev
-pnpm rag:down
-```
-
-RAG 不在正式 JD App dependency graph。變更前讀
-[RAG 設計](docs/design/rag-pipeline.md)，不要把它接進 JD App composition root。
+JD App 不直接 import RAG 的 Python 套件，也不管理 RAG 服務的啟停。composition root 可依
+[ADR0080](docs/adr/0080-opt-in-public-reference-agent-tools.md)，在明示設定後建立 HTTP client。
+變更前讀 [RAG 架構](docs/architecture/rag-pipeline.md)；獨立啟動及公版 Docker 模式見 [RAG 操作](docs/operations/rag.md)。

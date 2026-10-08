@@ -23,8 +23,6 @@ pnpm-debug.log*
 .research-tmp/
 tmp/
 output/
-!apps/api/app/consultant/skills/output/
-!apps/api/app/consultant/skills/output/SKILL.md
 
 # editor / OS / local agent state
 .vscode/
@@ -44,9 +42,8 @@ Thumbs.db
 CLAUDE.local.md
 Codex.local.md
 
-# Local engineering scratch and service initialization state.
+# Local engineering scratch.
 .tmp/
-.qdrant-initialized
 
 # Large evidence is published as gzip; restored original files stay local.
 /docs/experiments/2026-10-04-public-chunk-retrieval/run-01/all-rankings.json

@@ -66,7 +66,7 @@ apps/
 
 Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位同一套件資源；不可由 `__file__` 向上猜 checkout 或另複製一份 migration。安裝成 wheel 後也必須能取得完整歷史。啟動仍只檢查版本，升級需明確執行；見[交付驗證](../history.md#source-25de60a3e4266687fd86)。
 
-`diagnostics` 是本機管理用的獨立讀取投影，不是新 feature authority。由明示 CLI 或評測入口使用；既有 Agent、workflow 與 HTTP 不依賴它。模組分為原生格式讀取（`checkpoints.py`）、純投影／遮蔽（`projection.py`）、診斷表定義（`persistence.py`）、一次性更新交易（`refresh.py`）及唯讀查閱（`inspection.py`）。跨表 JOIN 放在 Alembic 版本化的唯讀 VIEW，不把各領域的寫入 SQL 搬出原 feature。副本只供排查，不用來恢復工作、判斷提交或提供模型 context；操作見 [runbook](../runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
+`diagnostics` 是本機管理用的獨立讀取投影，不是新 feature authority。由明示 CLI 或評測入口使用；既有 Agent、workflow 與 HTTP 不依賴它。模組分為原生格式讀取（`checkpoints.py`）、純投影／遮蔽（`projection.py`）、診斷表定義（`persistence.py`）、一次性更新交易（`refresh.py`）及唯讀查閱（`inspection.py`）。跨表 JOIN 放在 Alembic 版本化的唯讀 VIEW，不把各領域的寫入 SQL 搬出原 feature。副本只供排查，不用來恢復工作、判斷提交或提供模型 context；操作見 [runbook](../operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄)。
 
 ## 2. 依賴方向與可檢查限制
 
@@ -76,16 +76,16 @@ Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位�
 
 <!-- diagram: python-dependencies -->
 
-![現行：2. 依賴方向與可檢查限制](../diagrams/implementation/code-organization/python-dependencies.png)
+![現行：2. 依賴方向與可檢查限制](../diagrams/standards/code-organization/python-dependencies.png)
 
-[圖源](../diagrams/implementation/code-organization/python-dependencies.mmd) · [SVG](../diagrams/implementation/code-organization/python-dependencies.svg)
+[圖源](../diagrams/standards/code-organization/python-dependencies.mmd) · [SVG](../diagrams/standards/code-organization/python-dependencies.svg)
 
 1. `models.py` 不 import FastAPI、SQLAlchemy、LangGraph、OpenAI、生成 transport DTO 或別的 feature persistence。
 2. Router／模型工具是薄入口，轉型後呼叫同一業務 service；人工與 AI 不各寫一套 JD validator。UI 不自行裁決權限、正式成功、來源版本或 Memory 發布。
 3. `agent_execution` 不 import A／B1／B2 角色、JD 或 Memory ORM；由角色提供具名工具 handler 與起始資料。角色可依賴它，不能互相 import 私有 prompt／state。
 4. 跨 feature 協調放 workflows；讀別的領域走具體公開查詢／typed result，不直查別人的私有表。需要跨域資格與排序一次完成的唯讀查詢，可由各 owner 公開具名 selectable，再由具名 workflow projection 組合；例如最新合法 Plan。查詢不取得寫入權、不新增結果權威，也不為一般呼叫建立通用查詢框架。共享交易由 workflow 開啟，把同一 session 交給指定 service；內層不私自 commit。不是微服務，也不需要把同庫內呼叫變 HTTP。
 5. 真正需要替換外部 I/O 或行為元件時用窄 `Protocol`／callable；純 Python 少數消費者直接使用明確型別。替換點由消費者需要的責任決定，不替每個 class 配 interface，也不為此建立每類一套抽象 factory、BaseRepository 或萬用 UnitOfWork 註冊表。
-6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。跨 feature 需要的畫面狀態不用 Effect 複製到上層 state：Turn 提示來自外部儲存（`useSyncExternalStore`），缺少提示時由 composer 查 current；頁面的唯讀 query 觀察者只訂閱同一份 cache，未知不可當閒置，不另發 GET／輪詢。feature 要在另一 feature 的項目旁放內容時，由 app 提供 render 函式（context），feature 不互相 import。詳見[介面 §1.6](interface-and-delivery.md#16-工作畫面組裝)。
+6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。跨 feature 需要的畫面狀態不用 Effect 複製到上層 state：Turn 提示來自外部儲存（`useSyncExternalStore`），缺少提示時由 composer 查 current；頁面的唯讀 query 觀察者只訂閱同一份 cache，未知不可當閒置，不另發 GET／輪詢。feature 要在另一 feature 的項目旁放內容時，由 app 提供 render 函式（context），feature 不互相 import。詳見[介面 §1.6](../implementation/interface-and-delivery.md#16-工作畫面組裝)。
 
 7. 層只向下 import：`adapters` ← `features` ← `workflows` ← `transport`／`agents` ← `bootstrap`；`agent_execution` 位於 `adapters` 之上，不 import `features`、`workflows`、`transport`、`agents`。`settings` 組合各 adapter 擁有的配置，adapter 不 import `settings`。B1／B2 的共用組裝 `agents/memory_analysis` 可被兩個角色使用，兩個角色之間不互相 import。這些以表格形式鎖在 `test_import_boundaries.py`，新增上行 import 會直接失敗。
 
@@ -94,7 +94,7 @@ Prompt、Tool 與元件的持續對照沿上述邊界組裝：
 - 角色提供提示、工具與 Context 政策；組裝根提供元件及外部依賴。實際需要比較的變點須能明確替換，其他正式執行、權限、交易及取消流程共用。
 - 純 Prompt 比較只替換目標提示；Tool 可只改說明、schema、handler 或回傳，但四者須相容並明列必要連帶變動。整組能力消融另標比較範圍，不假稱單一變因。
 - 配置在組裝處決定，不複製整個 Agent、不靠全域可變設定切組，也不把試驗旗標散入領域規則。具名參數、插件、MCP adapter 或現成評測工具皆依實際替換、測試及維護成本選用；共同業務規則留在負責模組，不隨 transport 或工具平台複製。
-- 已保存的模型請求（captured request）與既有工作沿[執行接線](agent-execution.md)的原請求／工具及恢復契約；更新配置不能重建或改寫原請求。本節不另訂持久版本格式。
+- 已保存的模型請求（captured request）與既有工作沿[執行接線](../implementation/agent-execution.md)的原請求／工具及恢復契約；更新配置不能重建或改寫原請求。本節不另訂持久版本格式。
 
 現行顧問的 `ConsultantConfiguration` 保存提示區段、工具說明及 JD 讀取容量；`AppComposition` 在正式 `create_app` 注入配置、SDK client 與 checkpointer factory。比較入口先固定整批候選，再由相同值產生 manifest 與 runtime；不在 await 後重讀可變輸入。已捕捉的請求與工具容量沿原工作恢復，配置改變只影響尚未捕捉的新工作。新增實際變因時，在其負責模組擴充窄介面及反例，不把所有工具行為收進全域 registry。使用方式見 [evaluations](../../apps/api/evaluations/README.md)。
 

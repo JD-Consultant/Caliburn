@@ -48,9 +48,9 @@ Caliburn 以本機 Web 提供訪談、JD 編輯與 PDF 匯出，後端管理模�
 
 App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景 B Graph；PostgreSQL 是獨立資料庫程序。PDF 由 App 內受控的 Chromium 子程序產生，再經既有 HTTP 連線下載，沒有獨立 PDF 服務。原生啟動使用相同程式與責任，只是不包在圖中的 App Docker 容器內。圖省略 PDF 子程序、資料 volume、健康檢查及管理連線，完整部署設定仍以 Compose 與 [App README](../../apps/api/README.md)為準。
 
-上圖為未啟用公版參考的最小部署。依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，App 可在明示配置 URL 後透過 HTTP 使用獨立 RAG；基本模式不啟動 RAG，App 程序也不管理容器。設定只影響尚未綁定的新請求，執行中的工作仍沿原工具與格式恢復。啟用方式見 [API README](../../apps/api/README.md#公版參考工具的可選啟用)，程序操作見 [runbook](../runbook.md#rag獨立服務非-jd-app-預設依賴)。
+上圖為未啟用公版參考的最小部署。依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，App 可在明示配置 URL 後透過 HTTP 使用獨立 RAG；基本模式不啟動 RAG，App 程序也不管理容器。設定只影響尚未綁定的新請求，執行中的工作仍沿原工具與格式恢復。啟用方式見 [API README](../../apps/api/README.md#公版參考工具的可選啟用)，程序操作見 [runbook](../operations/rag.md#獨立-rag-開發)。
 
-可原生啟動，也可用 `compose.jd-app.yaml`：一個 App 容器加一個 PostgreSQL 容器及資料 volume。兩者使用同一份程式、契約與持久資料機制，不是兩套產品。Docker 包含 PDF 瀏覽器與中文字型，主機入口只綁 loopback；既有資料不自動搬入。建置、安全與停止邊界見[交付接線 §4.2](../implementation/interface-and-delivery.md#42-docker-交付)，啟動與 DataGrip 設定見 [runbook](../runbook.md#docker-操作)。
+可原生啟動，也可用 `compose.jd-app.yaml`：一個 App 容器加一個 PostgreSQL 容器及資料 volume。兩者使用同一份程式、契約與持久資料機制，不是兩套產品。Docker 包含 PDF 瀏覽器與中文字型，主機入口只綁 loopback；既有資料不自動搬入。建置、安全與停止邊界見[交付接線 §4.2](../implementation/interface-and-delivery.md#42-docker-交付)，啟動與 DataGrip 設定見 [runbook](../operations/README.md#docker-操作)。
 
 需要公版參考時，在基本配置上加上 `compose.jd-app.rag.yaml`，於同一 project 啟動查詢 API、Qdrant 與 GPU 模型服務。各服務保持獨立；App 只在需要時透過 HTTP 查詢，不直接載入檢索套件或模型權重。
 
@@ -60,7 +60,7 @@ App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景
 
 [圖源](../diagrams/architecture/delivery-and-operations/rag-containers.mmd) · [SVG](../diagrams/architecture/delivery-and-operations/rag-containers.svg)
 
-兩種模式共用原 App 與資料庫，不建立副本。OpenAI key 只注入 App，RAG 不發布主機埠。索引由操作者一次性建立，啟動服務不會解析來源、建索引或清資料。App 的基本功能不必等待 RAG；公版查詢故障會回報錯誤，不當成沒有候選。切回基本模式須先讓已使用公版工具的工作完成，再於安全點改配置，避免執行中的工作失去依賴。操作與驗證範圍見[公版 Docker 模式](../runbook.md#含公版參考的-docker-模式)。
+兩種模式共用原 App 與資料庫，不建立副本。OpenAI key 只注入 App，RAG 不發布主機埠。索引由操作者一次性建立，啟動服務不會解析來源、建索引或清資料。App 的基本功能不必等待 RAG；公版查詢故障會回報錯誤，不當成沒有候選。切回基本模式須先讓已使用公版工具的工作完成，再於安全點改配置，避免執行中的工作失去依賴。操作與驗證範圍見[公版 Docker 模式](../operations/rag.md#含公版參考的-docker-模式)。
 
 多頁籤操作及同一檔案的重複提交，由後端檢查執行資格。同一操作者可管理多份檔案，各檔案的資料保持隔離；全域資源上限只限制執行量，不將不同職務檔案合併成同一模型對話。未來若需多個後端程序，須再驗證資料庫中的執行資格與重入機制，不能以程序內的鎖定保證跨程序安全。
 
@@ -103,9 +103,9 @@ App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景
 
 | 要了解的問題 | 責任文件 |
 |---|---|
-| 程式如何記錄事件、工具及可比較證據 | [觀測與 Log 規範](../implementation/coding-standard.md#71-讓執行證據可查可比較可驗證) |
-| 診斷讀取、遮蔽及副本由誰負責 | [程式組織](../implementation/code-organization.md#1-目錄依業務責任組織機制集中在少數邊界) |
-| 如何依原工作查 Context、工具及綁定 | [本機診斷操作](../runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄) |
+| 程式如何記錄事件、工具及可比較證據 | [觀測與 Log 規範](../standards/coding-standard.md#71-讓執行證據可查可比較可驗證) |
+| 診斷讀取、遮蔽及副本由誰負責 | [程式組織](../standards/code-organization.md#1-目錄依業務責任組織機制集中在少數邊界) |
+| 如何依原工作查 Context、工具及綁定 | [本機診斷操作](../operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄) |
 | 工程反例驗到哪裡 | [審查證據](../plans/evidence/full-system-review-2026-10-08.md) |
 
 現行尚未導入獨立 metrics／trace 平台。後續可依診斷、測試與維護收益比較現成方案，仍須保留正式資料權威、失敗處理及敏感內容的存取／外送界線；選型不等於已接入。候選與依據見[工程研究](../research/engineering/2026-10-08-full-stack-engineering-practices.md)。
@@ -118,4 +118,4 @@ App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景
 
 產品價值驗證看「員工能否只靠訪談得到涵蓋主要工作的精簡、高訊號 JD」及成本／時間，不以模型步數多、Memory 資料多或功能數量多代表成功。商業價格、客群規模及獲客成效仍待獨立驗證。
 
-延伸閱讀：[系統邊界](system-boundaries.md)、[後端說明](../../apps/api/README.md)、[Web 說明](../../apps/web/README.md)及[操作手冊](../runbook.md)。
+延伸閱讀：[系統邊界](system-boundaries.md)、[後端說明](../../apps/api/README.md)、[Web 說明](../../apps/web/README.md)及[操作手冊](../operations/README.md)。

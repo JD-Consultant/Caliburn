@@ -3,7 +3,8 @@ import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { checkDocuments, selectDocuments } from './check-docs.mjs';
 import { findDocuments, parseDocument } from './documentation.mjs';
 
@@ -92,4 +93,34 @@ test('discovers existing maintained files after a tracked page is deleted withou
   assert.equal((await checkDocuments(root, await findDocuments(root))).errors[0].reason, 'missing file');
   const result = await checkDocuments(root, ['docs/removed.md']);
   assert.equal(result.errors[0].reason, 'missing source file');
+});
+
+test('diagram inventory excludes PNG and SVG screenshots while retaining Mermaid sources', async t => {
+  const root = await fixture(t, {
+    'docs/README.md': '![設計](diagrams/architecture/flow.png)\n![截圖](diagrams/screenshots/product/list.png)\n![向量截圖](diagrams/screenshots/product/list.svg)\n',
+    'docs/diagrams/architecture/flow.mmd': 'flowchart TD\n A --> B\n',
+    'docs/diagrams/architecture/flow.png': 'generated diagram',
+    'docs/diagrams/screenshots/product/list.png': 'screenshot',
+    'docs/diagrams/screenshots/product/list.svg': '<svg></svg>',
+  });
+  execFileSync('git', ['init', '-q'], { cwd: root });
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('./render-doc-diagrams.mjs', import.meta.url)), '--list'],
+    { cwd: root, encoding: 'utf8', windowsHide: true });
+  assert.equal(result.status, 0, result.stderr);
+  const inventory = JSON.parse(result.stdout);
+  assert.equal(inventory.discovered, 1);
+  assert.deepEqual(inventory.diagrams.map(diagram => diagram.sourceFile), ['docs/diagrams/architecture/flow.mmd']);
+});
+
+test('diagram inventory still rejects a missing Mermaid source outside screenshots', async t => {
+  const root = await fixture(t, {
+    'docs/README.md': '![缺少圖源](diagrams/architecture/missing.png)\n',
+    'docs/diagrams/architecture/missing.png': 'diagram without source',
+  });
+  execFileSync('git', ['init', '-q'], { cwd: root });
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('./render-doc-diagrams.mjs', import.meta.url)), '--list'],
+    { cwd: root, encoding: 'utf8', windowsHide: true });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /ENOENT/);
+  assert.match(result.stderr, /missing\.mmd/);
 });

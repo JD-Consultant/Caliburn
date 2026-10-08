@@ -41,7 +41,7 @@
 
 [圖源](../diagrams/implementation/memory-storage/batch-publication.mmd) · [SVG](../diagrams/implementation/memory-storage/batch-publication.svg)
 
-圖為現行同批整理與發布的基本流程圖；形狀及控制箭頭沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。B1／B2 的雙側線矩形代表各自的 [Agent 執行子流程](agent-execution.md)，省略其模型／工具迴圈及恢復分支。固定修訂在候選修改時已可保存，並非等發布才建立。發布後，A 可固定快照讀取、JD 可保存當時依據，後續批次可重用未變修訂；三者不是本批必須依序執行的步驟。
+圖為現行同批整理與發布的基本流程圖；形狀及控制箭頭沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。B1／B2 的雙側線矩形代表各自的 [Agent 執行子流程](agent-execution.md)，省略其模型／工具迴圈及恢復分支。固定修訂在候選修改時已可保存，並非等發布才建立。發布後，A 可固定快照讀取、JD 可保存當時依據，後續批次可重用未變修訂；三者不是本批必須依序執行的步驟。
 
 保存拆清楚三種必要含意，不要求一種含意一張表或一個服務：
 
@@ -63,7 +63,7 @@ Migration `0011_memory_object_revisions` 與 `revision_persistence.py` 維護下
 
 [圖源](../diagrams/implementation/memory-storage/fixed-object-revisions.mmd) · [SVG](../diagrams/implementation/memory-storage/fixed-object-revisions.svg)
 
-圖為現行固定修訂的局部 ER；省略欄位、檔案及層別 FK。基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。`formal_interviews.source_id` 是唯一鍵並納入引用表主鍵，因此來源關係是實線；理解來源的 `source_revision_id` 則不在引用表主鍵中，同一理解修訂對同一情境身分只能選一版。
+圖為現行固定修訂的局部 ER；省略欄位、檔案及層別 FK。基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。`formal_interviews.source_id` 是唯一鍵並納入引用表主鍵，因此來源關係是實線；理解來源的 `source_revision_id` 則不在引用表主鍵中，同一理解修訂對同一情境身分只能選一版。
 
 - `revisions.py` 定義不依賴 ORM 的固定修訂值；`revision_service.py` 接收完整內部編輯結果及明確的原修訂，不是新增整文覆寫 tool。工具／候選服務仍須先綁定當前位置、目標 ID、角色與原操作。
 - 同正文的標題、描述或引用調整重用 `body_id`；內容與固定來源完全未變則沿用原修訂。正文改動後又改回，仍是新的修訂與正文列，不以相同文字冒充舊版本。未做跨歷史或跨物件內容去重。
@@ -79,7 +79,7 @@ Migration `0012_memory_candidates_snapshots` 重用 §2.1 的正文／固定修�
 
 [圖源](../diagrams/implementation/memory-storage/candidates-snapshots.mmd) · [SVG](../diagrams/implementation/memory-storage/candidates-snapshots.svg)
 
-圖為現行候選／發布的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)，省略欄位、position parent、檔案及訪談來源 FK。`memory_snapshots` 的 `(job_file_id, execution_id)` 唯一約束保證每批至多一份發布結果；此引用鍵不完整納入 snapshot 的主鍵，故發布關係是虛線。`memory_heads` 每檔案至多一列。基數表示資料庫約束，不表示全部 execution 都是 Memory 批次，也不表示每個候選位置都會發布。
+圖為現行候選／發布的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)，省略欄位、position parent、檔案及訪談來源 FK。`memory_snapshots` 的 `(job_file_id, execution_id)` 唯一約束保證每批至多一份發布結果；此引用鍵不完整納入 snapshot 的主鍵，故發布關係是虛線。`memory_heads` 每檔案至多一列。基數表示資料庫約束，不表示全部 execution 都是 Memory 批次，也不表示每個候選位置都會發布。
 
 | 責任 | 實作位置 | 保證／界線 |
 |---|---|---|

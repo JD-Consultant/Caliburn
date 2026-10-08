@@ -16,22 +16,22 @@
 
 ## 開發與檢查
 
-首次使用完整 App，從[操作手冊的快速開始](../../docs/runbook.md#快速開始)安裝及啟動。下方說明前端開發；使用 `pnpm dev` 時，在啟動的終端按 Ctrl+C 停止，重新提供所需後端環境設定後可再次啟動。
+首次使用完整 App，從[快速開始](../../docs/operations/getting-started.md)安裝及啟動。下方說明前端開發；使用 `pnpm dev` 時，在啟動的終端按 Ctrl+C 停止，重新提供所需後端環境設定後可再次啟動。
 
-介面行為與讀寫規則見[介面設計](../../docs/implementation/interface-and-delivery.md)，模組與程式寫法見[程式組織](../../docs/implementation/code-organization.md)及[撰寫規範](../../docs/implementation/coding-standard.md)。先前 UI 改版與來源功能的實測可從[歷史紀錄](../../docs/history.md#source-a75c36d876a672e0f607)與[來源驗證](../../docs/history.md#source-e93341e9711337954840)查閱；各次結果只支持當時受測範圍。
+介面行為與讀寫規則見[介面設計](../../docs/implementation/interface-and-delivery.md)，模組與程式寫法見[程式組織](../../docs/standards/code-organization.md)及[撰寫規範](../../docs/standards/coding-standard.md)。先前 UI 改版與來源功能的實測可從[歷史紀錄](../../docs/history.md#source-a75c36d876a672e0f607)與[來源驗證](../../docs/history.md#source-e93341e9711337954840)查閱；各次結果只支持當時受測範圍。
 
 正式 JD 來源按項目分組，各筆引用分別標示「JD 已修改」「來源已更新」或兩者；「查看差異」可按需展開 JD 內容與 Memory 來源的比較。JD 從該筆引用上次核對的修訂比較到目前正式稿，不限於上一輪；訪談原話不可改寫，因此只提供 JD 內容比較。查看不解除待核對。契約與驗證見[來源介面規範](../../docs/implementation/interface-and-delivery.md#31-正式-jd-來源的唯讀下鑽)與[T09 來源證據](../../docs/history.md#source-e93341e9711337954840)。新增差異欄位需前後端一起更新，開發程序須載入同一版契約；不放寬前端驗證去接受舊格式。
 
 顧問處理中可展開「推理摘要」，完成後從歷史回答的「處理紀錄」查看已保存摘要與處理過程；JD 查看／撤回按鈕另列，不顯示「JD 操作」標題。摘要與公開進度分開，不是完整內部思考，也不是可引用的正式訪談。前端只訂閱一條 `activity-stream`；重連／終態透過摘要 GET 補讀，不為回看而重跑模型。須搭配已提供這兩個入口的後端；錯誤不當成沒有摘要。接線與本輪驗證見 [T09 推理摘要](../../docs/history.md#source-9b7ba33984fa2002fb60)。
 
-從 repo root 使用 Node 24 及根 `packageManager` 指定的 pnpm：
+使用 `pnpm dev` 同時啟動前後端前，先依[原生開發](../../docs/operations/native-development.md)完成工具、資料庫與所需功能設定及首次初始化。以下從 repo root 使用 Node 24 及根 `packageManager` 指定的 pnpm：
 
 ```powershell
 pnpm install --frozen-lockfile
 pnpm dev      # 後端 :8100 與 Vite :5173 同時啟動（只開前端：pnpm --filter @caliburn/frontend dev）
 ```
 
-開發站固定 `127.0.0.1:5173`；`/api` 代理到 `127.0.0.1:8100`。後端啟動依[backend README](../api/README.md)。Ctrl+C 停止前景程序；不載入舊 Next.js 或 `.next` 生成物。
+開發站固定 `127.0.0.1:5173`；`/api` 代理到 `127.0.0.1:8100`。僅啟動前端時，後端另依[backend README](../api/README.md#後端入口pnpm-startpnpm-dev-所用)啟動。Ctrl+C 停止前景程序；不載入舊 Next.js 或 `.next` 生成物。
 
 不使用 Vite 的本機建置模式：先 `build`，再由後端以 `CALIBURN_WEB_BUILD_DIRECTORY` 指向此 App 的 `dist` 絕對目錄，同一個 loopback 8100 提供畫面與 API；根 `pnpm build`／`pnpm start` 已接好此流程，見[同源啟動說明](../api/README.md#使用建置後的同源畫面)。現有 `/`、`/job-files/:jobFileId` 可直接開啟及重新整理；新增頂層 UI 路由須同步後端的明確 fallback 前綴。
 

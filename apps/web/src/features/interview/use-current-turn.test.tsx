@@ -37,7 +37,7 @@ afterEach(() => {
 });
 
 test('observes the composer cache without fetching and follows the hint being cleared', async () => {
-  retainTurnHint(fileId, hint);
+  await retainTurnHint(fileId, hint);
   const fetch = vi.fn().mockResolvedValue(Response.json(turn));
   vi.stubGlobal('fetch', fetch);
   const { result } = renderHook(() => useCurrentTurn(fileId), { wrapper });
@@ -51,15 +51,15 @@ test('observes the composer cache without fetching and follows the hint being cl
   await waitFor(() => expect(result.current.turn?.status).toBe('active'));
   expect(result.current.isVerified).toBe(true);
 
-  act(() => {
-    clearTurnHint(fileId, hint.command_id);
+  await act(async () => {
+    await clearTurnHint(fileId, hint.command_id);
   });
   await waitFor(() => expect(result.current).toEqual({ turn: null, isVerified: false }));
   expect(fetch).toHaveBeenCalledTimes(1);
 });
 
-test('a hint still waiting for its execution id has nothing to verify and sends no request', () => {
-  retainTurnHint(fileId, { command_id: hint.command_id, execution_id: null });
+test('a hint still waiting for its execution id has nothing to verify and sends no request', async () => {
+  await retainTurnHint(fileId, { command_id: hint.command_id, execution_id: null });
   const fetch = vi.fn();
   vi.stubGlobal('fetch', fetch);
   const { result } = renderHook(() => useCurrentTurn(fileId), { wrapper });
@@ -68,7 +68,7 @@ test('a hint still waiting for its execution id has nothing to verify and sends 
 });
 
 test('an unreadable status is not reported as a Turn', async () => {
-  retainTurnHint(fileId, hint);
+  await retainTurnHint(fileId, hint);
   const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 503 }));
   vi.stubGlobal('fetch', fetch);
   const { result } = renderHook(() => useCurrentTurn(fileId), { wrapper });

@@ -5,7 +5,12 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 import type { ConsultantTurn } from '../../shared/api/generated/consultant-turn';
 import { interviewPlanQuery } from './interview-plan-api';
-import { consultantTurnQuery, retainTurnHint } from './interview-turn-api';
+import {
+  consultantTurnQuery,
+  retainTurnHint,
+  readTurnHint,
+  clearTurnHint,
+} from './interview-turn-api';
 import { useInterviewPlan } from './use-interview-plan';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
@@ -28,12 +33,15 @@ function turn(file: string, execution: string, status: ConsultantTurn['status'])
   };
 }
 
-function observe(queryClient: QueryClient, value: ConsultantTurn): void {
+async function observe(queryClient: QueryClient, value: ConsultantTurn): Promise<void> {
   queryClient.setQueryData(
     consultantTurnQuery(value.job_file_id, value.execution_id).queryKey,
     value,
   );
-  retainTurnHint(value.job_file_id, { command_id: nextId, execution_id: value.execution_id });
+  const previous = readTurnHint(value.job_file_id);
+  if (previous && previous.execution_id !== value.execution_id)
+    await clearTurnHint(value.job_file_id, previous.command_id);
+  await retainTurnHint(value.job_file_id, { command_id: nextId, execution_id: value.execution_id });
 }
 
 afterEach(() => {
@@ -49,7 +57,7 @@ test('terminal render stops the candidate while adopted GET is pending, and an o
     job_file_id: fileId,
     plan: '上一採用版',
   });
-  observe(client, turn(fileId, executionId, 'active'));
+  await observe(client, turn(fileId, executionId, 'active'));
   const calls: { resolve: (value: Response) => void }[] = [];
   vi.stubGlobal('fetch', () => new Promise<Response>((resolve) => calls.push({ resolve })));
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -65,21 +73,21 @@ test('terminal render stops the candidate while adopted GET is pending, and an o
     await Promise.resolve();
   });
 
-  act(() => observe(client, turn(fileId, executionId, 'completed')));
+  await act(async () => observe(client, turn(fileId, executionId, 'completed')));
   await waitFor(() => expect(calls).toHaveLength(2));
   expect(result.current.plan).toBe('上一採用版');
   expect(result.current.source).toBe('previous');
   const previousRefresh = calls[1];
   if (!previousRefresh) throw new Error('Expected previous terminal GET');
 
-  act(() => observe(client, turn(fileId, nextId, 'active')));
+  await act(async () => observe(client, turn(fileId, nextId, 'active')));
   await waitFor(() => expect(result.current.source).toBe('candidate'));
   await act(async () => {
     previousRefresh.resolve(Response.json({ job_file_id: fileId, plan: '前輪完成採用版' }));
     await Promise.resolve();
   });
   expect(result.current.source).toBe('candidate');
-  act(() => observe(client, turn(fileId, nextId, 'completed')));
+  await act(async () => observe(client, turn(fileId, nextId, 'completed')));
   await waitFor(() => expect(calls).toHaveLength(3));
   expect(result.current.source).toBe('previous');
   const nextRefresh = calls[2];
@@ -95,8 +103,8 @@ test('terminal render stops the candidate while adopted GET is pending, and an o
 test('switching files during terminal GET never exposes or confirms the earlier file result', async () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   clients.push(client);
-  observe(client, turn(fileId, executionId, 'cancelled'));
-  observe(client, turn(otherFileId, nextId, 'failed'));
+  await observe(client, turn(fileId, executionId, 'cancelled'));
+  await observe(client, turn(otherFileId, nextId, 'failed'));
   const calls: { path: string; resolve: (value: Response) => void }[] = [];
   vi.stubGlobal(
     'fetch',

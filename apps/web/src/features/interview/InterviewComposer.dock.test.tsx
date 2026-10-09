@@ -21,6 +21,7 @@ test('what the page puts above the dock is rendered inside the dock, which the p
   render(
     <QueryClientProvider client={client}>
       <InterviewComposer
+        refreshCompletedTurn={async () => {}}
         jobFileId={fileId}
         aboveDock={<button type="button">浮在輸入區上方</button>}
       />

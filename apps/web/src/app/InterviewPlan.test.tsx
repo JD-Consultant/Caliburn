@@ -70,7 +70,7 @@ test('a terminal refresh without adopted cache reports unavailable instead of in
   const terminal: ConsultantTurn = { ...active, status: 'completed' };
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   client.setQueryData(consultantTurnQuery(fileId, executionId).queryKey, terminal);
-  retainTurnHint(fileId, {
+  await retainTurnHint(fileId, {
     command_id: '30000000-0000-4000-8000-000000000003',
     execution_id: executionId,
   });
@@ -103,7 +103,7 @@ test.each(['active', 'paused'] as const)(
   async (status) => {
     const turn = { ...active, status, plan_preview: { plan: '' } };
     stubServer('原採用筆記', turn);
-    retainTurnHint(fileId, {
+    await retainTurnHint(fileId, {
       command_id: '30000000-0000-4000-8000-000000000003',
       execution_id: executionId,
     });
@@ -119,7 +119,7 @@ test.each(['completed', 'cancelled', 'failed'] as const)(
   'withdraws the candidate on %s and retries an unconfirmed adopted refresh',
   async (status) => {
     const state = stubServer('上一採用筆記', active);
-    retainTurnHint(fileId, {
+    await retainTurnHint(fileId, {
       command_id: '30000000-0000-4000-8000-000000000003',
       execution_id: executionId,
     });

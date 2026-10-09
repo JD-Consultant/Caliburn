@@ -1,3 +1,5 @@
+import { formalJdQueries } from './jd-queries';
+import { refreshQueries } from '../../shared/api/refresh-queries';
 /** A responsibility is added where it will appear (Things, Notion, Linear): a row at the end of the list becomes a field. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -25,7 +27,12 @@ function renderEditor(readOnly = false) {
   clients.push(client);
   return render(
     <QueryClientProvider client={client}>
-      <JdWorkEditor key={fileId} jobFileId={fileId} readOnly={readOnly} />
+      <JdWorkEditor
+        refresh={() => refreshQueries(client, formalJdQueries(fileId))}
+        key={fileId}
+        jobFileId={fileId}
+        readOnly={readOnly}
+      />
     </QueryClientProvider>,
   );
 }

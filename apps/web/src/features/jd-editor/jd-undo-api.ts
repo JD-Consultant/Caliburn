@@ -7,6 +7,6 @@ export function undoTurnJd(jobFileId: string, executionId: string): Promise<JdPr
   return requestJson(
     `/api/job-files/${encodeURIComponent(jobFileId)}/consultant-turns/${encodeURIComponent(executionId)}/undo-jd`,
     isJdProfileView,
-    { method: 'POST', cache: 'no-store' },
+    { method: 'POST', cache: 'no-store', correlation: { jobFileId, executionId } },
   );
 }

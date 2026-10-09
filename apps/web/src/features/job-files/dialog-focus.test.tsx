@@ -66,7 +66,6 @@ test('改名轉場完成不搶走使用者已選擇的返回按鈕焦點', () =>
         name_revision: 1,
       }}
       onClose={vi.fn()}
-      onRefresh={vi.fn()}
     />,
   );
   const back = screen.getByRole('button', { name: '返回清單' });

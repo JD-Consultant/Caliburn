@@ -31,17 +31,18 @@ function renderList() {
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   clients.push(client);
-  render(
+  const onDeleted = vi.fn<(jobFileId: string) => Promise<void>>().mockResolvedValue(undefined);
+  const view = render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
         <Routes>
-          <Route path="/" element={<JobFilesPage />} />
+          <Route path="/" element={<JobFilesPage onDeleted={onDeleted} />} />
           <Route path="/job-files/:jobFileId" element={<p>已進入職務檔案</p>} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,
   );
-  return client;
+  return { ...view, client, onDeleted };
 }
 
 async function openDelete() {
@@ -66,8 +67,7 @@ test('取消預設聚焦，確認清楚指出檔名與不可復原範圍；取�
   expect(transport).toHaveBeenCalledTimes(1);
 });
 
-test('收到204前保留列，成功重讀清單並只移除該檔快取及改名暫存', async () => {
-  let deleted = false;
+test('收到204前保留列與停用確認，成功只通知必要 callback 並收束對話框', async () => {
   let finishDelete: (response: Response) => void = () => {
     throw new Error('刪除尚未送出');
   };
@@ -80,64 +80,48 @@ test('收到204前保留列，成功重讀清單並只移除該檔快取及改�
       expect(options.credentials).toBe('same-origin');
       return deletionResponse;
     }
-    return Promise.resolve(Response.json({ job_files: deleted ? [other] : [target, other] }));
+    return Promise.resolve(Response.json({ job_files: [target, other] }));
   });
   vi.stubGlobal('fetch', transport);
-  const client = renderList();
-  const scopes = [
-    'job-file',
-    'jd-profile',
-    'jd-work',
-    'jd-source-content',
-    'jd-source-changes',
-    'consultant-turn',
-    'consultant-turn-by-command',
-    'current-consultant-turn',
-    'reasoning-summaries',
-    'turn-jd-changes',
-  ];
-  scopes.forEach((scope) => {
-    client.setQueryData([scope, target.job_file_id, 'detail'], 'target data');
-    client.setQueryData([scope, other.job_file_id, 'detail'], 'other data');
+  const { onDeleted } = renderList();
+  let completeCallback: () => void = () => {
+    throw new Error('Callback has not started');
+  };
+  const callbackCompletion = new Promise<void>((resolve) => {
+    completeCallback = resolve;
   });
-  sessionStorage.setItem(
-    `caliburn.pending-job-file-rename.${target.job_file_id}`,
-    'target command',
-  );
-  sessionStorage.setItem(`caliburn.pending-job-file-rename.${other.job_file_id}`, 'other command');
+  onDeleted.mockReturnValueOnce(callbackCompletion);
   const dialog = await openDelete();
   await userEvent.click(within(dialog).getByRole('button', { name: '永久刪除' }));
   expect(within(dialog).getByRole('button', { name: '取消' })).toBeDisabled();
   expect(
     screen.getByRole('link', { name: /開啟 庫存管理（合成員工甲/, hidden: true }),
   ).toBeInTheDocument();
-  expect(client.getQueryData(['jd-work', target.job_file_id, 'detail'])).toBe('target data');
-  deleted = true;
+  expect(onDeleted).not.toHaveBeenCalled();
   await act(async () => {
     finishDelete(new Response(null, { status: 204 }));
     await deletionResponse;
   });
-  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-  await waitFor(() =>
-    expect(screen.queryByRole('link', { name: /合成員工甲/ })).not.toBeInTheDocument(),
-  );
-  expect(screen.getByRole('link', { name: /合成員工乙/ })).toBeVisible();
-  scopes.forEach((scope) => {
-    expect(client.getQueryData([scope, target.job_file_id, 'detail'])).toBeUndefined();
-    expect(client.getQueryData([scope, other.job_file_id, 'detail'])).toBe('other data');
+  await waitFor(() => expect(onDeleted).toHaveBeenCalledExactlyOnceWith(target.job_file_id));
+  expect(dialog).toBeVisible();
+  expect(within(dialog).getByRole('button', { name: '正在刪除…' })).toBeDisabled();
+  await act(async () => {
+    completeCallback();
+    await callbackCompletion;
   });
-  expect(
-    sessionStorage.getItem(`caliburn.pending-job-file-rename.${target.job_file_id}`),
-  ).toBeNull();
-  expect(sessionStorage.getItem(`caliburn.pending-job-file-rename.${other.job_file_id}`)).toBe(
-    'other command',
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(onDeleted).toHaveBeenCalledExactlyOnceWith(target.job_file_id);
+  expect(screen.getByRole('link', { name: /合成員工甲/ })).toBeVisible();
+  expect(screen.getByRole('link', { name: /合成員工乙/ })).toBeVisible();
+  expect(transport.mock.calls.filter(([, options]) => options?.method !== 'DELETE')).toHaveLength(
+    1,
   );
   expect(transport.mock.calls.filter(([, options]) => options?.method === 'DELETE')).toHaveLength(
     1,
   );
 });
 
-test('409 job_file_busy 說明先完成或取消工作，保留檔案與快取', async () => {
+test('409 job_file_busy 說明先完成或取消工作，保留檔案且不通知刪除', async () => {
   vi.stubGlobal(
     'fetch',
     vi.fn((_url: string, options?: RequestInit) =>
@@ -148,15 +132,14 @@ test('409 job_file_busy 說明先完成或取消工作，保留檔案與快取',
       ),
     ),
   );
-  const client = renderList();
-  client.setQueryData(['jd-work', target.job_file_id], 'saved JD');
+  const { onDeleted } = renderList();
   const dialog = await openDelete();
   await userEvent.click(within(dialog).getByRole('button', { name: '永久刪除' }));
   expect(await within(dialog).findByRole('alert')).toHaveTextContent(
     /請先完成或取消顧問工作，或等候 Memory 整理結束，再刪除檔案。/,
   );
   expect(within(dialog).getByRole('alert')).toHaveTextContent(/顧問.*Memory/);
-  expect(client.getQueryData(['jd-work', target.job_file_id])).toBe('saved JD');
+  expect(onDeleted).not.toHaveBeenCalled();
   await userEvent.click(within(dialog).getByRole('button', { name: '取消' }));
   expect(await screen.findByRole('link', { name: /合成員工甲/ })).toBeVisible();
 });
@@ -173,14 +156,15 @@ test('網路結果不明不移除列，同一目標手動重試可接受不存�
     return Promise.resolve(Response.json({ job_files: attempts === 2 ? [] : [target] }));
   });
   vi.stubGlobal('fetch', transport);
-  renderList();
+  const { onDeleted } = renderList();
   const dialog = await openDelete();
   await userEvent.click(within(dialog).getByRole('button', { name: '永久刪除' }));
   expect(await within(dialog).findByRole('alert')).toHaveTextContent(/刪除結果尚未確認/);
   expect(attempts).toBe(1);
   expect(screen.getByRole('link', { name: /合成員工甲/, hidden: true })).toBeInTheDocument();
   await userEvent.click(within(dialog).getByRole('button', { name: /重試刪除/ }));
-  expect(await screen.findByRole('heading', { name: '尚無職務檔案' })).toBeVisible();
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(onDeleted).toHaveBeenCalledExactlyOnceWith(target.job_file_id);
   const deletes = transport.mock.calls.filter(([, options]) => options?.method === 'DELETE');
   expect(deletes.map(([url]) => url)).toEqual([
     `/api/job-files/${target.job_file_id}`,
@@ -205,7 +189,7 @@ test('503保留列，不顯示任意服務內部錯誤內容', async () => {
   renderList();
   const dialog = await openDelete();
   await userEvent.click(within(dialog).getByRole('button', { name: '永久刪除' }));
-  expect(await within(dialog).findByRole('alert')).toHaveTextContent(/暫時無法取得服務結果/);
+  expect(await within(dialog).findByRole('alert')).toHaveTextContent(/刪除結果尚未確認/);
   expect(dialog).not.toHaveTextContent('private diagnostics');
   await userEvent.click(within(dialog).getByRole('button', { name: '取消' }));
   expect(await screen.findByRole('link', { name: /合成員工甲/ })).toBeVisible();

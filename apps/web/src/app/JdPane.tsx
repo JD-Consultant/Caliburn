@@ -3,7 +3,7 @@
  * separate "AI layer" view; the formal draft (what PDF exports) stays one click away.
  */
 import { useCallback, useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, IconButton, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import type { Target } from '../shared/api/generated/jd-sources-view';
 import { DownloadIcon } from '../shared/ui/icons';
@@ -19,6 +19,7 @@ import { SourceBadge } from '../features/source-viewer/SourceBadge';
 import { jdSourcesQuery } from '../features/source-viewer/source-api';
 import { buildSourceIndex, targetKey } from '../features/source-viewer/source-index';
 import { SourceViewer } from '../features/source-viewer/SourceViewer';
+import { refreshFormalJd } from './workspace-refresh';
 
 type JdView = 'candidate' | 'formal';
 
@@ -31,11 +32,14 @@ export function JdPane({
   turn: ConsultantTurn | null;
   turnVerified: boolean;
 }) {
+  const cache = useQueryClient();
+  const refresh = useCallback(() => refreshFormalJd(cache, jobFileId), [cache, jobFileId]);
   const readOnly = !turnVerified || isJdReadOnlyDuring(turn);
   const candidate = readOnly ? (turn?.candidate ?? null) : null;
   const [view, setView] = useState<JdView>('candidate');
   const showCandidate = candidate !== null && view === 'candidate';
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [sourceTrigger, setSourceTrigger] = useState<HTMLButtonElement | null>(null);
   const [sourceFilter, setSourceFilter] = useState<readonly string[] | null>(null);
   const sources = useQuery(jdSourcesQuery(jobFileId));
   const sourceIndex = useMemo(() => buildSourceIndex(sources.data?.references), [sources.data]);
@@ -45,7 +49,8 @@ export function JdPane({
       return summary ? (
         <SourceBadge
           summary={summary}
-          onOpen={(citationIds) => {
+          onOpen={(citationIds, trigger) => {
+            setSourceTrigger(trigger);
             setSourceFilter(citationIds);
             setSourcesOpen(true);
           }}
@@ -68,7 +73,9 @@ export function JdPane({
           <SourceViewer
             jobFileId={jobFileId}
             open={sourcesOpen}
+            returnFocusTo={sourceTrigger}
             onOpenChange={(next) => {
+              setSourceTrigger(null);
               setSourcesOpen(next);
               if (!next) setSourceFilter(null);
             }}
@@ -129,8 +136,8 @@ export function JdPane({
               <div className="jd-sheet">
                 {/* One manual edit at a time across the basic data and the collections. */}
                 <EditSlots>
-                  <JdProfileEditor jobFileId={jobFileId} readOnly={readOnly} />
-                  <JdWorkEditor jobFileId={jobFileId} readOnly={readOnly} />
+                  <JdProfileEditor jobFileId={jobFileId} readOnly={readOnly} refresh={refresh} />
+                  <JdWorkEditor jobFileId={jobFileId} readOnly={readOnly} refresh={refresh} />
                 </EditSlots>
               </div>
             </SourceBadgeContext.Provider>

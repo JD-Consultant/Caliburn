@@ -1,5 +1,6 @@
+import { createAppQueryClient } from './query-client';
 /** Workspace behavior: JD read-only lock, Turn state badge and narrow-screen pane switching. */
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
@@ -32,7 +33,7 @@ const work = {
 const clients: QueryClient[] = [];
 
 function renderJobFile() {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const client = createAppQueryClient();
   clients.push(client);
   return {
     client,
@@ -74,7 +75,7 @@ test.each([true, false])(
   'JD locks and previews the active Turn, then reopens after cancel (local hint: %s)',
   async (hasHint) => {
     if (hasHint)
-      retainTurnHint(file.job_file_id, {
+      await retainTurnHint(file.job_file_id, {
         command_id: '60000000-0000-4000-8000-000000000006',
         execution_id: executionId,
       });
@@ -123,7 +124,7 @@ test.each([true, false])(
 );
 
 test('a paused Turn keeps the JD read-only and says why', async () => {
-  retainTurnHint(file.job_file_id, {
+  await retainTurnHint(file.job_file_id, {
     command_id: '60000000-0000-4000-8000-000000000006',
     execution_id: executionId,
   });

@@ -1,7 +1,7 @@
 /** Two panes that stay mounted; narrow screens switch with tabs so polling, SSE and drafts survive. */
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Tab, Tabs } from '@mui/material';
+import { Tab, Tabs, useMediaQuery } from '@mui/material';
 
 type PaneId = 'interview' | 'jd';
 
@@ -14,6 +14,7 @@ interface Props {
 
 export function WorkspaceLayout({ bar, banner, interview, document }: Props) {
   const [active, setActive] = useState<PaneId>('interview');
+  const narrow = useMediaQuery('(max-width: 899.95px)');
   return (
     <main className="workspace-root">
       {bar}
@@ -29,10 +30,24 @@ export function WorkspaceLayout({ bar, banner, interview, document }: Props) {
         <Tab value="jd" label="JD" id="tab-jd" aria-controls="pane-jd" />
       </Tabs>
       <div className="workspace" data-active-pane={active}>
-        <section id="pane-interview" className="pane pane--interview" aria-label="訪談區">
+        <section
+          id="pane-interview"
+          className="pane pane--interview"
+          role={narrow ? 'tabpanel' : 'region'}
+          aria-label={narrow ? undefined : '訪談區'}
+          aria-labelledby={narrow ? 'tab-interview' : undefined}
+          hidden={narrow && active !== 'interview'}
+        >
           {interview}
         </section>
-        <section id="pane-jd" className="pane pane--jd" aria-label="職務說明書區">
+        <section
+          id="pane-jd"
+          className="pane pane--jd"
+          role={narrow ? 'tabpanel' : 'region'}
+          aria-label={narrow ? undefined : '職務說明書區'}
+          aria-labelledby={narrow ? 'tab-jd' : undefined}
+          hidden={narrow && active !== 'jd'}
+        >
           {document}
         </section>
       </div>

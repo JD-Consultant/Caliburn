@@ -1,16 +1,21 @@
 /** Message log scrolls; the composer / Turn controls dock stays reachable at the bottom. */
 import { useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { InterviewComposer } from '../features/interview/InterviewComposer';
 import { InterviewHistory } from '../features/interview/InterviewHistory';
 import { InterviewPlan } from '../features/interview/InterviewPlan';
-import { consultantTurnQuery } from '../features/interview/interview-turn-api';
 import { SpeakerAvatar } from '../features/interview/SpeakerAvatar';
 import { UndoTurnJd } from '../features/jd-editor/UndoTurnJd';
 import { JumpToLatest } from '../shared/ui/JumpToLatest';
 import { useStickToBottom } from '../shared/ui/use-stick-to-bottom';
+import { refreshCompletedInterview, refreshUndoneJd } from './workspace-refresh';
 
 export function InterviewPane({ jobFileId }: { jobFileId: string }) {
   const queryClient = useQueryClient();
+  const refreshCompletedTurn = useCallback(
+    () => refreshCompletedInterview(queryClient, jobFileId),
+    [queryClient, jobFileId],
+  );
   const { ref: scroller, away, scrollToBottom } = useStickToBottom<HTMLDivElement>();
   return (
     <>
@@ -29,17 +34,13 @@ export function InterviewPane({ jobFileId }: { jobFileId: string }) {
               <UndoTurnJd
                 jobFileId={jobFileId}
                 executionId={executionId}
-                onUndone={() =>
-                  queryClient.invalidateQueries(
-                    { queryKey: consultantTurnQuery(jobFileId, executionId).queryKey, exact: true },
-                    { throwOnError: true },
-                  )
-                }
+                refresh={() => refreshUndoneJd(queryClient, jobFileId, executionId)}
               />
             )}
           />
           <InterviewComposer
             jobFileId={jobFileId}
+            refreshCompletedTurn={refreshCompletedTurn}
             aboveDock={away ? <JumpToLatest onClick={scrollToBottom} /> : null}
           />
         </div>

@@ -24,5 +24,6 @@ export function reviseJdProfile(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(command),
+    correlation: { jobFileId, commandId: command.command_id },
   });
 }

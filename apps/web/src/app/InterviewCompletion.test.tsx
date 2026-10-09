@@ -1,3 +1,4 @@
+import { refreshFormalJd, refreshCompletedInterview } from './workspace-refresh';
 import { StrictMode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
@@ -74,19 +75,22 @@ function renderWorkspace(strict: boolean) {
   const page = (
     <QueryClientProvider client={client}>
       <InterviewHistory jobFileId={fileId} />
-      <InterviewComposer jobFileId={fileId} />
-      <JdProfileEditor jobFileId={fileId} />
-      <JdWorkEditor jobFileId={fileId} />
+      <InterviewComposer
+        refreshCompletedTurn={() => refreshCompletedInterview(client, fileId)}
+        jobFileId={fileId}
+      />
+      <JdProfileEditor refresh={() => refreshFormalJd(client, fileId)} jobFileId={fileId} />
+      <JdWorkEditor refresh={() => refreshFormalJd(client, fileId)} jobFileId={fileId} />
     </QueryClientProvider>
   );
   render(strict ? <StrictMode>{page}</StrictMode> : page);
   return client;
 }
 
-beforeEach(() => {
+beforeEach(async () => {
   localStorage.clear();
   sessionStorage.clear();
-  retainTurnHint(fileId, { command_id: sourceId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: sourceId, execution_id: executionId });
 });
 afterEach(() => {
   clients.splice(0).forEach((client) => client.clear());

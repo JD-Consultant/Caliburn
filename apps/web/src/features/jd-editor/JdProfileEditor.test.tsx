@@ -1,3 +1,5 @@
+import { formalJdQueries } from './jd-queries';
+import { refreshQueries } from '../../shared/api/refresh-queries';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -31,7 +33,12 @@ function renderEditor(readOnly = false) {
     client,
     ...render(
       <QueryClientProvider client={client}>
-        <JdProfileEditor key={fileId} jobFileId={fileId} readOnly={readOnly} />
+        <JdProfileEditor
+          refresh={() => refreshQueries(client, formalJdQueries(fileId))}
+          key={fileId}
+          jobFileId={fileId}
+          readOnly={readOnly}
+        />
       </QueryClientProvider>,
     ),
   };
@@ -248,7 +255,9 @@ test('a background refresh does not replace the open editor’s draft or its rev
   const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>();
   fetch.mockImplementation((_path, options) =>
     Promise.resolve(
-      options?.method === 'POST' ? Response.json({}, { status: 409 }) : Response.json(current),
+      options?.method === 'POST'
+        ? Response.json({ detail: { code: 'jd_revision_stale' } }, { status: 409 })
+        : Response.json(current),
     ),
   );
   vi.stubGlobal('fetch', fetch);
@@ -272,7 +281,10 @@ test('a failed background refresh keeps the profile draft, shows the error and b
   let readFails = false;
   const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>();
   fetch.mockImplementation((_path, options) => {
-    if (options?.method === 'POST') return Promise.resolve(Response.json({}, { status: 409 }));
+    if (options?.method === 'POST')
+      return Promise.resolve(
+        Response.json({ detail: { code: 'jd_revision_stale' } }, { status: 409 }),
+      );
     return Promise.resolve(readFails ? Response.json({}, { status: 503 }) : Response.json(current));
   });
   vi.stubGlobal('fetch', fetch);

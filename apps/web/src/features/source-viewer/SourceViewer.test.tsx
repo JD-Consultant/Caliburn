@@ -122,6 +122,19 @@ test('formal sources load only when expanded and show their target and recheck s
   expect(fetch).toHaveBeenCalledTimes(1);
 });
 
+test('keyboard closing returns focus to the source disclosure', async () => {
+  serveSources();
+  renderViewer();
+  const trigger = screen.getByRole('button', { name: '正式 JD 來源（唯讀）' });
+  trigger.focus();
+  await userEvent.keyboard('{Enter}');
+  const close = await screen.findByRole('button', { name: '關閉來源面板' });
+  close.focus();
+  await userEvent.keyboard('{Enter}');
+  expect(trigger).toHaveFocus();
+  expect(trigger).toHaveAttribute('aria-expanded', 'false');
+});
+
 test('follows only returned source refs through root, child and role-numbered interview, with read-only changes', async () => {
   const { fetch } = serveSources();
   renderViewer();
@@ -215,11 +228,8 @@ test('switching files clears disclosure and selection even with the same revisio
   expect(screen.queryByRole('heading', { name: '原引用正文' })).not.toBeInTheDocument();
 });
 
-test.each([
-  ['jd-profile', fileId],
-  ['jd-profile', fileId, 'formal'],
-])(
-  'existing invalidation %j refreshes sources and discards selected details',
+test.each([['jd-sources'], ['jd-sources', fileId]])(
+  'source-owned invalidation %j refreshes sources and discards selected details',
   async (...queryKey) => {
     const { responses } = serveSources();
     const { client } = renderViewer();

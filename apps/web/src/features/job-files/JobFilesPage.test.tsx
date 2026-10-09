@@ -38,7 +38,7 @@ test('each row has a single link, a 24-hour minute-precision date and a rename b
   render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
-        <JobFilesPage />
+        <JobFilesPage onDeleted={vi.fn().mockResolvedValue(undefined)} />
       </MemoryRouter>
     </QueryClientProvider>,
   );

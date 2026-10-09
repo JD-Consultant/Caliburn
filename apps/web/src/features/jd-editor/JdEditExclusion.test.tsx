@@ -1,3 +1,5 @@
+import { formalJdQueries } from './jd-queries';
+import { refreshQueries } from '../../shared/api/refresh-queries';
 /** The basic data and the collections are two editors over one revision: only one edit may be open or unconfirmed. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -33,8 +35,14 @@ function renderBoth() {
   render(
     <QueryClientProvider client={client}>
       <EditSlots>
-        <JdProfileEditor jobFileId={fileId} />
-        <JdWorkEditor jobFileId={fileId} />
+        <JdProfileEditor
+          refresh={() => refreshQueries(client, formalJdQueries(fileId))}
+          jobFileId={fileId}
+        />
+        <JdWorkEditor
+          refresh={() => refreshQueries(client, formalJdQueries(fileId))}
+          jobFileId={fileId}
+        />
       </EditSlots>
     </QueryClientProvider>,
   );

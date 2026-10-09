@@ -1,7 +1,7 @@
 /** Job-file selection uses persistent identity; duplicate display names remain distinct. */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   Alert,
   Button,
@@ -24,8 +24,7 @@ import type { JobFile } from '../../shared/api/generated/job-file-list';
 import { CreateJobFileDialog } from './CreateJobFileDialog';
 import { DeleteJobFileDialog } from './DeleteJobFileDialog';
 import { RenameJobFileDialog } from './RenameJobFileDialog';
-import { jobFileQuery, jobFilesQuery } from './job-file-api';
-import { clearPendingRename } from './rename-command';
+import { jobFilesQuery } from './job-file-api';
 
 // "2026/09/29 18:00": 24-hour, no seconds. The default zh-TW form ("2026/9/29 下午6:00:00") wraps.
 const createdFormat = new Intl.DateTimeFormat('zh-TW', {
@@ -37,47 +36,38 @@ const createdFormat = new Intl.DateTimeFormat('zh-TW', {
   hourCycle: 'h23',
 });
 
-export function JobFilesPage() {
+export function JobFilesPage({ onDeleted }: { onDeleted: (jobFileId: string) => Promise<void> }) {
   const files = useQuery(jobFilesQuery);
-  const cache = useQueryClient();
   const navigate = useNavigate();
+  const createButton = useRef<HTMLButtonElement>(null);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const [isCreating, setIsCreating] = useState(false);
   const [renaming, setRenaming] = useState<JobFile | null>(null);
   const [deleting, setDeleting] = useState<JobFile | null>(null);
 
   function created(jobFileId: string): void {
+    if (!mounted.current) return;
     setIsCreating(false);
-    // Do not cache creation-time metadata as the latest metadata on a replay.
-    void cache.invalidateQueries({ queryKey: jobFilesQuery.queryKey });
     void navigate(`/job-files/${jobFileId}`);
   }
 
-  function refreshRenamedFile(): void {
-    if (renaming) {
-      void cache.invalidateQueries({
-        queryKey: jobFileQuery(renaming.job_file_id).queryKey,
-        exact: true,
-      });
-    }
-    setRenaming(null);
-    // Replayed results describe the original command, not necessarily today's name.
-    void cache.invalidateQueries({ queryKey: jobFilesQuery.queryKey });
-  }
-
-  async function refreshDeletedFile(jobFileId: string): Promise<void> {
-    // 現行檔案相關 query key 的第二段皆為 jobFileId；避免其他檔案或全域清單遭清除。
-    const scopedQueries = {
-      predicate: (query: { queryKey: readonly unknown[] }) => query.queryKey[1] === jobFileId,
-    };
-    await cache.cancelQueries(scopedQueries);
-    cache.removeQueries(scopedQueries);
-    try {
-      clearPendingRename(jobFileId);
-    } catch {
-      // 本機儲存不可用不改變後端已確認的刪除結果。
-    }
-    await cache.invalidateQueries({ queryKey: jobFilesQuery.queryKey });
+  async function deleted(jobFileId: string): Promise<void> {
+    await onDeleted(jobFileId);
+    if (!mounted.current) return;
     setDeleting(null);
+    // The deleted row's trigger no longer exists; wait until MUI releases its dialog focus trap.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (mounted.current && document.activeElement === document.body)
+          createButton.current?.focus();
+      });
+    });
   }
 
   return (
@@ -89,7 +79,12 @@ export function JobFilesPage() {
           </Typography>
           <p>以訪談理解工作，逐步形成有依據的職務說明書。</p>
         </div>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setIsCreating(true)}>
+        <Button
+          ref={createButton}
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setIsCreating(true)}
+        >
           建立職務檔案
         </Button>
       </div>
@@ -214,7 +209,6 @@ export function JobFilesPage() {
           key={renaming.job_file_id}
           file={renaming}
           onClose={() => setRenaming(null)}
-          onRefresh={refreshRenamedFile}
         />
       )}
       {deleting && (
@@ -222,7 +216,7 @@ export function JobFilesPage() {
           key={deleting.job_file_id}
           file={deleting}
           onClose={() => setDeleting(null)}
-          onDeleted={refreshDeletedFile}
+          onDeleted={deleted}
         />
       )}
     </Stack>

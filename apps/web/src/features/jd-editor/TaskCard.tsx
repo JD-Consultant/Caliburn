@@ -1,4 +1,5 @@
 /** One task with its outcomes, requirements and knowledge/skill links; intents go up unchanged. */
+import { useRef } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import type { Detail, JdWorkView, WorkTask } from '../../shared/api/generated/jd-work-view';
 import { IconAction } from '../../shared/ui/IconAction';
@@ -35,7 +36,8 @@ export function TaskCard({
   onDeleteDetail,
   onChange,
 }: TaskCardProps) {
-  const fold = useFold();
+  const article = useRef<HTMLElement>(null);
+  const fold = useFold(article);
   const { expanded } = fold;
   const name = task.title ?? '尚未命名的任務';
   const badge = useSourceBadge();
@@ -65,6 +67,7 @@ export function TaskCard({
   }
   return (
     <Box
+      ref={article}
       component="article"
       id={`jd-task-${task.task_id}`}
       aria-label={name}

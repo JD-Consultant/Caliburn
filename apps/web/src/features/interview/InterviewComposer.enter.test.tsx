@@ -66,7 +66,7 @@ function openComposer(): void {
   clients.push(client);
   render(
     <QueryClientProvider client={client}>
-      <InterviewComposer jobFileId={fileId} />
+      <InterviewComposer refreshCompletedTurn={async () => {}} jobFileId={fileId} />
     </QueryClientProvider>,
   );
 }
@@ -154,7 +154,7 @@ test('Enter on an empty draft asks for content exactly as the send button does',
 });
 
 test('Enter also sends the next answer after a completed turn, as a fresh command', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const posts = stubBackend();
   openComposer();
   await screen.findByText('這次訪談已完成並保存。');

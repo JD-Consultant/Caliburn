@@ -4,6 +4,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import type { InterviewPlanView } from '../../shared/api/generated/interview-plan-view';
 import { ApiError, requestJson } from '../../shared/api/http';
 import { isInterviewPlanView } from '../../shared/api/validation';
+import { refreshQueries } from '../../shared/api/refresh-queries';
 
 export function interviewPlanQuery(jobFileId: string) {
   return queryOptions({
@@ -45,12 +46,13 @@ export function refreshTerminalInterviewPlan(
   const query = interviewPlanQuery(jobFileId);
   const refresh = (async () => {
     try {
-      await queryClient.cancelQueries({ queryKey: query.queryKey, exact: true });
-      await queryClient.invalidateQueries({
-        queryKey: query.queryKey,
-        exact: true,
-        refetchType: 'none',
-      });
+      await refreshQueries(queryClient, [
+        {
+          queryKey: query.queryKey,
+          exact: true,
+          refetchType: 'none',
+        },
+      ]);
       return await queryClient.query({ ...query, staleTime: 0 });
     } finally {
       pending.delete(scope);

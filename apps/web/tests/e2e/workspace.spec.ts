@@ -135,9 +135,17 @@ test('左右並排、整頁不捲動、輸入區常駐；章節導覽、職責�
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('tab', { name: '訪談' }).click();
   await page.getByRole('textbox', { name: '訪談內容' }).fill('尚未送出的想法');
-  await expect(page.getByRole('region', { name: '職務說明書區' })).toBeHidden();
+  await expect(page.locator('#pane-jd')).toBeHidden();
+  await expect(page.getByRole('tabpanel', { name: '訪談' })).toHaveAttribute(
+    'aria-labelledby',
+    'tab-interview',
+  );
   await page.getByRole('tab', { name: 'JD' }).click();
-  await expect(page.getByRole('region', { name: '訪談區' })).toBeHidden();
+  await expect(page.locator('#pane-interview')).toBeHidden();
+  await expect(page.getByRole('tabpanel', { name: 'JD' })).toHaveAttribute(
+    'aria-labelledby',
+    'tab-jd',
+  );
   await expect(page.getByRole('heading', { name: 'JD 基本資料' })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('workspace-mobile.png') });
   await page.getByRole('tab', { name: '訪談' }).click();

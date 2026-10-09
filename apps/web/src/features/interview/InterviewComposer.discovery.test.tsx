@@ -41,7 +41,7 @@ function openComposer() {
     ...render(
       <QueryClientProvider client={client}>
         <PageObserver />
-        <InterviewComposer jobFileId={fileId} />
+        <InterviewComposer refreshCompletedTurn={async () => {}} jobFileId={fileId} />
       </QueryClientProvider>,
     ),
   };
@@ -125,7 +125,7 @@ test('failed discovery is not idle; explicit read-only retry can recover', async
 });
 
 test('a retained unknown command is resolved only by command, never erased by current=null', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: null });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: null });
   const fetch = vi.fn((path: string) =>
     Promise.resolve(
       path === `${baseUrl}/current`
@@ -143,7 +143,7 @@ test('a retained unknown command is resolved only by command, never erased by cu
 });
 
 test('follows another tab replacing a finished Turn hint without a second query owner', async () => {
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
   const nextId = '40000000-0000-4000-8000-000000000004';
   const fetch = vi.fn((path: string) =>
     Promise.resolve(

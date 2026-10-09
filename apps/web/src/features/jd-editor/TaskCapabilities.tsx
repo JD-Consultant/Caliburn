@@ -4,6 +4,7 @@ import type { Capability, JdWorkView } from '../../shared/api/generated/jd-work-
 import type { WorkIntent } from './jd-work-api';
 import { IconAction } from '../../shared/ui/IconAction';
 import { ArrowDownIcon, ArrowUpIcon, CloseIcon } from '../../shared/ui/icons';
+import { navigateJdLink } from './jd-navigation';
 
 interface Props {
   taskId: string;
@@ -68,6 +69,7 @@ export function TaskCapabilities({ taskId, baseline, disabled, onChange }: Props
               return (
                 <li key={item.capability_id} className="item">
                   <Link
+                    onClick={navigateJdLink}
                     href={`#jd-capability-${item.capability_id}`}
                     sx={{ overflowWrap: 'anywhere' }}
                   >

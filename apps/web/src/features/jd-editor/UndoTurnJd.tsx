@@ -1,6 +1,6 @@
 /** A conditional JD-only command; the server decides eligibility and preserves its original result. */
 import { useId, useRef, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import {
   Alert,
   Button,
@@ -12,56 +12,58 @@ import {
   Typography,
 } from '@mui/material';
 import { ApiError } from '../../shared/api/http';
-import { jdProfileQuery } from './jd-profile-api';
-import { jdWorkQuery } from './jd-work-api';
+import { reportDiagnostic } from '../../shared/diagnostics';
 import { undoTurnJd } from './jd-undo-api';
 import { TurnJdChanges } from './TurnJdChanges';
 
 interface Props {
   jobFileId: string;
   executionId: string;
-  onUndone: () => Promise<void>;
+  refresh: () => Promise<void>;
 }
 
-export function UndoTurnJd({ jobFileId, executionId, onUndone }: Props) {
+export function UndoTurnJd({ jobFileId, executionId, refresh }: Props) {
   const [open, setOpen] = useState(false);
   const [refreshFailed, setRefreshFailed] = useState(false);
   const titleId = useId();
   const inFlight = useRef(false);
-  const queryClient = useQueryClient();
   const undo = useMutation({
-    mutationFn: () => undoTurnJd(jobFileId, executionId),
+    mutationFn: async (): Promise<{ refreshFailed: boolean }> => {
+      await undoTurnJd(jobFileId, executionId);
+      // Read today's formal JD, not the historical result returned by an idempotent replay.
+      try {
+        await refresh();
+        return { refreshFailed: false };
+      } catch {
+        reportDiagnostic({ event: 'command_failure', kind: 'refresh', jobFileId, executionId });
+        return { refreshFailed: true };
+      }
+    },
     retry: false,
     networkMode: 'always',
   });
   const rejected =
-    undo.error instanceof ApiError && [404, 409, 422].includes(undo.error.status ?? 0);
+    undo.error instanceof ApiError &&
+    undo.error.status === 409 &&
+    [
+      'consultant_turn_active',
+      'jd_undo_unavailable',
+      'jd_undo_conflict',
+      'jd_command_conflict',
+    ].includes(undo.error.code ?? '');
 
   async function confirmUndo(): Promise<void> {
     if (inFlight.current || rejected) return;
     inFlight.current = true;
     try {
-      await undo.mutateAsync();
+      await undo.mutateAsync(undefined, {
+        onSuccess(result) {
+          setOpen(false);
+          setRefreshFailed(result.refreshFailed);
+        },
+      });
     } catch {
-      inFlight.current = false;
-      return;
-    }
-    setOpen(false);
-    // The operation's original result may predate later edits. Always read the current formal JD.
-    try {
-      await Promise.all([
-        queryClient.invalidateQueries(
-          { queryKey: jdProfileQuery(jobFileId).queryKey },
-          { throwOnError: true },
-        ),
-        queryClient.invalidateQueries(
-          { queryKey: jdWorkQuery(jobFileId).queryKey },
-          { throwOnError: true },
-        ),
-        onUndone(),
-      ]);
-    } catch {
-      setRefreshFailed(true);
+      // Only an unconfirmed POST reaches here; read failures preserve known acceptance.
     } finally {
       inFlight.current = false;
     }

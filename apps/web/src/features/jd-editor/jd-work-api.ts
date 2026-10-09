@@ -59,6 +59,7 @@ export async function editJdWork(jobFileId: string, command: WorkCommand): Promi
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(command.request),
+    correlation: { jobFileId, commandId: command.request.command_id },
   };
   const url = `/api/job-files/${encodeURIComponent(jobFileId)}/jd/${command.collection}`;
   switch (command.collection) {

@@ -1,9 +1,12 @@
-import { onlineManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { onlineManager, QueryClientProvider } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import { InterviewComposer } from './InterviewComposer';
-import { readTurnHint, retainTurnHint } from './interview-turn-api';
+import { InterviewComposer } from '../features/interview/InterviewComposer';
+import { readTurnHint, retainTurnHint } from '../features/interview/interview-turn-api';
+import { createAppQueryClient } from './query-client';
+import { refreshCompletedInterview } from './workspace-refresh';
 
 const fileId = '10000000-0000-4000-8000-000000000001';
 const executionId = '20000000-0000-4000-8000-000000000002';
@@ -29,21 +32,24 @@ function renderComposer() {
       ? Promise.resolve(Response.json({ turn: null }))
       : commandFetch(url, options),
   );
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const client = createAppQueryClient();
   clients.push(client);
   return {
     client,
     ...render(
       <QueryClientProvider client={client}>
-        <InterviewComposer jobFileId={fileId} />
+        <InterviewComposer
+          refreshCompletedTurn={() => refreshCompletedInterview(client, fileId)}
+          jobFileId={fileId}
+        />
       </QueryClientProvider>,
     ),
   };
 }
 
-beforeEach(() => {
+beforeEach(async () => {
   localStorage.clear();
-  retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
+  await retainTurnHint(fileId, { command_id: commandId, execution_id: executionId });
 });
 afterEach(() => {
   clients.splice(0).forEach((client) => client.clear());

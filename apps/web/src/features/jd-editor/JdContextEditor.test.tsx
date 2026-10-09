@@ -1,3 +1,5 @@
+import { formalJdQueries } from './jd-queries';
+import { refreshQueries } from '../../shared/api/refresh-queries';
 /** Only the new collection behavior is tested here; recovery uses the shared command owner. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -28,7 +30,10 @@ function renderEditor() {
   clients.push(client);
   return render(
     <QueryClientProvider client={client}>
-      <JdWorkEditor jobFileId={fileId} />
+      <JdWorkEditor
+        refresh={() => refreshQueries(client, formalJdQueries(fileId))}
+        jobFileId={fileId}
+      />
     </QueryClientProvider>,
   );
 }

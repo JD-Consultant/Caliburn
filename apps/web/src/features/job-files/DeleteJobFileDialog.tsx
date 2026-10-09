@@ -60,10 +60,8 @@ export function DeleteJobFileDialog({ file, onClose, onDeleted }: Props) {
           </Typography>
           {deletion.isError && (
             <Alert severity="error">
-              {deletion.error instanceof ApiError
-                ? deletion.error.code === 'job_file_busy'
-                  ? '請先完成或取消顧問工作，或等候 Memory 整理結束，再刪除檔案。'
-                  : deletion.error.message
+              {deletion.error instanceof ApiError && deletion.error.code === 'job_file_busy'
+                ? '請先完成或取消顧問工作，或等候 Memory 整理結束，再刪除檔案。'
                 : '刪除結果尚未確認，可能已完成刪除。請重試刪除同一份檔案以確認結果。'}
             </Alert>
           )}

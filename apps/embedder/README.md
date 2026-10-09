@@ -10,9 +10,20 @@ and the occupation-reference API also uses reranking.
 - `POST /rerank` `{query, documents: string[]}` → `{scores: float[], model, revision}`
 - `GET /health` → model identity, device and reranker load status.
 
-Runs only as a container (GPU). Built and started by `docker compose` (service `embedder`,
-`gpus: all`, port 8082→80). Embedding produces the same vectors as the former in-process embedder.
+Runs only as a Linux x86_64 container (GPU). Built and started by `docker compose`
+(service `embedder`, `gpus: all`). Standalone development publishes
+`127.0.0.1:8082` to container port 80; the formal App overlay uses the internal network.
+Embedding produces the same vectors as the former in-process embedder.
 See [embedding research](../../docs/research/retrieval/2026-06-29-embedder-service-bge-m3-research.md).
+
+Build inputs are declared in `pyproject.toml` and resolved in `uv.lock`. The Dockerfile
+pins the CUDA base and uv images by digest and installs Python 3.11.16 through uv's
+versioned Python download catalog. `uv sync --locked --no-dev --no-build` installs
+locked wheels; there is no separate pip resolution or source-build fallback. Torch
+and CUDA are chosen together, separately from the HTTP framework versions. The
+health check uses Python's standard library and does not require curl. Update the
+manifest, regenerate the lock with the pinned uv version, then verify the image;
+lock validation alone does not verify GPU inference or model quality.
 
 The independent occupation-reference API uses BGE-M3 weights
 `5617a9f61b028005a4858fdac845db406aefb181` and BGE-reranker-v2-m3 weights

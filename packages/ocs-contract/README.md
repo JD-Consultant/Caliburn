@@ -1,7 +1,7 @@
 # ocs-contract
 
 本套件定義 OCS 文件交換的型別與結構。唯一來源是 `schema/ocs-document.schema.json`；
-`src/ocs_contract/models.py` 與 `types/ocs-document.ts` 都由它生成，不可手改。
+`src/ocs_contract/models.py` 由它生成，不可手改。已無消費者的 TypeScript 產物與後處理鏈已移除。
 
 目前消費者是 `apps/pdf-to-json` 的輸出驗證與 `apps/ocs-indexer` 的 ingestion。
 它屬於獨立 RAG bounded context。正式 JD App 使用自己的 contract；已退役的 legacy Web 也不消費本套件。
@@ -11,9 +11,10 @@ pnpm --filter @caliburn/ocs-contract run codegen
 pnpm --filter @caliburn/ocs-contract run check-codegen
 ```
 
-`check-codegen` 會呼叫 `bash scripts/check-codegen.sh`。Windows PowerShell 環境須可使用 Git Bash／
-WSL Bash（或直接從 Bash 執行）；這不是原生 PowerShell script。
+兩個命令使用本套件鎖定的 Python 生成器，Windows PowerShell 與 POSIX 使用相同入口。
+`check-codegen` 只在暫存目錄生成，再比較 Python 正文（容許 checkout 的 LF／CRLF 差異）；
+一致、不一致及生成器失敗都不修改原檔或 Git index。不一致回非零，明確執行 `codegen` 才寫入。
 
-> **已知風險（2026-10-02 靜態查核，尚未修正）：**目前 `check-codegen` 先生成至 tracked 檔案，差異分支會執行 `git checkout --`，可能覆寫這兩份生成檔的未提交修改；它不是唯讀檢查。不要在含未保存修改的工作目錄執行。後續應改為暫存生成再比較，並驗證原工作檔不變；本次整理未執行此命令或修改腳本。
+檢查器回歸：`pnpm --filter @caliburn/ocs-contract test`，涵蓋原檔 bytes／mtime 保留及失敗情境。
 
-schema 變更後先執行 `codegen` 並檢查生成 diff；不要直接編輯 Python／TypeScript 生成檔。
+schema 變更後先執行 `codegen` 並檢查生成 diff；不要直接編輯 Python 生成檔。

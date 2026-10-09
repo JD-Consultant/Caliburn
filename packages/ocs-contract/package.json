@@ -2,18 +2,10 @@
   "name": "@caliburn/ocs-contract",
   "license": "MIT",
   "private": true,
-  "types": "./types/ocs-document.ts",
-  "exports": {
-    ".": { "types": "./types/ocs-document.ts" }
-  },
   "scripts": {
-    "codegen": "pnpm run codegen:py && pnpm run codegen:ts",
-    "codegen:py": "uv run datamodel-codegen --input schema/ocs-document.schema.json --input-file-type jsonschema --output src/ocs_contract/models.py --output-model-type pydantic_v2.BaseModel --use-standard-collections --use-union-operator --use-schema-description --target-python-version 3.11 --disable-timestamp",
-    "codegen:ts": "json2ts --input schema/ocs-document.schema.json --output types/ocs-document.ts && node scripts/strip-index-sig.mjs",
-    "check-codegen": "bash scripts/check-codegen.sh",
+    "codegen": "uv run --locked python scripts/generate_contract.py",
+    "check-codegen": "uv run --locked python scripts/generate_contract.py --check",
+    "test": "uv run --locked python -m unittest discover -s scripts -p test_*.py",
     "build": "echo \"no build\""
-  },
-  "devDependencies": {
-    "json-schema-to-typescript": "^15.0.0"
   }
 }

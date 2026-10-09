@@ -133,6 +133,21 @@ test("reference services do not publish ports or receive the App credential", ()
   assert.equal(config.services.embedder.gpus[0].count, -1);
 });
 
+test("standalone RAG publishes only explicit loopback ports", () => {
+  const config = JSON.parse(execFileSync("docker", [
+    "compose", "--env-file", ".env.jd-app.example", "-f", "docker-compose.yml",
+    "--profile", "rag", "config", "--format", "json",
+  ], { cwd: root, encoding: "utf8", timeout: 30_000 }));
+  const published = [];
+  for (const name of ["qdrant", "embedder"]) {
+    for (const port of config.services[name].ports) {
+      assert.equal(port.host_ip, "127.0.0.1", `${name}:${port.published}`);
+      published.push(port.published);
+    }
+  }
+  assert.deepEqual(published.sort(), ["6333", "6334", "8082"]);
+});
+
 test("isolated RAG builds do not replace a shared model image tag", () => {
   const production = resolveCompose({ rag: true });
   const isolated = resolveCompose({

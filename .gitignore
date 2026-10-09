@@ -84,3 +84,16 @@ Codex.local.md
 /docs/worktree-progress-map-2026-09-15.md
 /SETUP_COMPLETE.md
 /task-4-report.md
+
+# Local documentation workspace and previous private workflow locations.
+/docs-local/
+/docs/standards/development-standard.md
+/docs/standards/documentation-standard.md
+/docs/standards/decision-process.md
+/docs/standards/architecture-discussion-standard.md
+/docs/standards/work-analysis/
+/docs/implementation/development-standard.md
+/docs/implementation/documentation-standard.md
+/docs/decision-process.md
+/docs/architecture-discussion-standard.md
+/docs/guides/

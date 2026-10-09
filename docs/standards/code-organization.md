@@ -1,7 +1,7 @@
 # 程式組織、依賴方向與命名
 
 - 狀態：**現行程式組織與維護規範** 。目錄樹說明責任與依賴；實際路徑以程式及同題接線文件為準。
-- 依據：[系統責任](../architecture/system-boundaries.md)、[工程取捨](../architecture/design-decisions.md)、[開發規範](development-standard.md)。採模組化單體，不將每個業務模組拆成部署或套件。
+- 依據：[系統責任](../architecture/system-boundaries.md)、[工程取捨](../architecture/design-decisions.md)、[貢獻指南](../../CONTRIBUTING.md#驗證與提交)。採模組化單體，不將每個業務模組拆成部署或套件。
 - 配套：[程式撰寫規範](coding-standard.md)定義函式／實例／Service、型別、錯誤、非同步與測試寫法；本頁保留目錄、依賴及共用命名責任。
 
 依問題跳讀：[目錄與資料責任](#1-目錄依業務責任組織機制集中在少數邊界)、[允許依賴及替換點](#2-依賴方向與可檢查限制)、[命名](#3-名稱要能表達身分時間與效果)。具體函式及 React 寫法直接讀[撰寫規範](coding-standard.md)，無須先通讀整棵目錄樹。
@@ -70,7 +70,7 @@ Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位�
 
 ## 2. 依賴方向與可檢查限制
 
-圖為**現行後端的 Python 模組依賴視角**，採 [C4 notation](https://c4model.com/diagrams/notation)的元素種類、責任、技術及單向關係標示原則。矩形均為 Python 模組群組，實線箭頭由匯入方指向被匯入方，標籤說明允許匯入的用途。這些責任群組跨越多個程式檔，不是 C4 Component 層級或 UML Package 圖；箭頭也不表示呼叫先後。組裝根可注入所有具體實作，圖只列主要依賴，完整限制見下方規則及自動檢查。[圖面規範](documentation-standard.md#3-圖面種類與符號)維護表示法。
+圖為**現行後端的 Python 模組依賴視角**，採 [C4 notation](https://c4model.com/diagrams/notation)的元素種類、責任、技術及單向關係標示原則。矩形均為 Python 模組群組，實線箭頭由匯入方指向被匯入方，標籤說明允許匯入的用途。這些責任群組跨越多個程式檔，不是 C4 Component 層級或 UML Package 圖；箭頭也不表示呼叫先後。組裝根可注入所有具體實作，圖只列主要依賴，完整限制見下方規則及自動檢查。本圖表示法與來源已在本段交代，通用讀圖見[圖庫](../diagrams/README.md#讀圖約定)。
 
 模組依**共同變更理由與資料責任**聚合：同一不變量、權限判斷及其修改集中在負責模組；可獨立變動的政策與外部 I/O 保留清楚邊界。高內聚、低耦合以「改一項行為需要理解及同步修改多少責任」檢查，不以檔案數、class 數或層數評分。
 
@@ -99,7 +99,7 @@ Prompt、Tool 與元件的持續對照沿上述邊界組裝：
 
 現行顧問的 `ConsultantConfiguration` 保存提示區段、工具說明及 JD 讀取容量；`AppComposition` 在正式 `create_app` 注入配置、SDK client 與 checkpointer factory。比較入口先固定整批候選，再由相同值產生 manifest 與 runtime；不在 await 後重讀可變輸入。已捕捉的請求與工具容量沿原工作恢復，配置改變只影響尚未捕捉的新工作。新增實際變因時，在其負責模組擴充窄介面及反例，不把所有工具行為收進全域 registry。使用方式見 [evaluations](../../apps/api/evaluations/README.md)。
 
-以上是維護及審查判準，不表示所有可想像的變因已有設定開關。介面／I/O／觀測寫法由[撰寫規範](coding-standard.md)維護，對照設計及驗收由[開發規範 §7–8](development-standard.md#7-分析方法prompttool-與-context-共同驗收)維護。
+以上是維護及審查判準，不表示所有可想像的變因已有設定開關。介面／I/O／觀測寫法由[撰寫規範](coding-standard.md)維護，對照設計及驗收由[貢獻指南](../../CONTRIBUTING.md#模型品質比較)維護。
 
 後端使用 Import Linter／Grimp，前端使用 ESLint import 限制。後端 `test_import_boundaries.py` 用真實臨時 Python package 驗證 relative import、re-export、`TYPE_CHECKING`、拆分 persistence、間接 ORM 及合法 workflow；另核對 graph 包含全部產品模組，新增 `*_models`／`*_changes`／`*_persistence` 須有對應政策。拆分 persistence 由原 feature、跨域 workflow、離線 diagnostics 及 migration 使用，其他 feature 不能直接匯入。一般 package 明確提供 `__init__.py`，避免工具漏掃巢狀 namespace。需要例外先說出實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴；静態圖不保證動態匯入或業務責任已正確。驗證見程式組織審查。
 

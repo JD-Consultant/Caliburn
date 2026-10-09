@@ -90,7 +90,7 @@ Memory 採單向 B1 → B2 → 發布，不回交 B1。B1 交接後不再修改�
 
 完成標記須綁定 App 的批次與交接身分，版號不由模型填寫；呼叫過 read 也不代表分析已完成。原生推理與工具結果支援分析接續，App State 保存執行事實，不要求每個 Step 額外撰寫分析筆記。
 
-三個角色採用相同的[工作分析方法](../standards/work-analysis/2026-09-09-complete-work-analysis-guide.md)，但產出不同。A 依[訪談校準](../standards/work-analysis/2026-09-09-customized-jd-depth-and-interview-calibration.md)與[JD 寫作方法](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)形成職務說明書；B1／B2 保存工作情境與理解，不預先寫成 JD 欄位。一次分析可以包含多次模型與工具往返。
+三個角色依[產品內容判準](../product/concepts.md#內容判準)及各自正式提示分析，但產出不同。A 形成 JD；B1／B2 保存工作情境與理解，不預先寫成 JD 欄位。一次分析可包含多次模型與工具往返。
 
 ### 工作如何跨模組執行
 

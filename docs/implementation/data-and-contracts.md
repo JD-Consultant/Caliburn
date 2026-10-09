@@ -49,7 +49,7 @@ Memory 領域模組擁有候選、固定修訂、快照及原操作。工具先�
 
 ## 4. JD：關聯式候選、來源與正式完成
 
-JD 以 profile、職責、任務、成果、要求、知識、技能及關係建立型別模型，欄位意義沿[JD 指南](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)，schema 不從 Memory Markdown 或 UI widget 反推。舊 SQL／測例只供參考，沒有相容表名義務。人工及模型入口共用 JD 領域模組；模型工具寫入候選，A 完成交易才正式採用，不能借人工正式 API 提前寫入正式稿。
+JD 以 profile、職責、任務、成果、要求、知識、技能及關係建立型別模型，欄位意義沿[產品內容判準](../product/concepts.md#內容判準)，schema 不從 Memory Markdown 或 UI widget 反推。舊 SQL／測例只供參考，沒有相容表名義務。人工及模型入口共用 JD 領域模組；模型工具寫入候選，A 完成交易才正式採用，不能借人工正式 API 提前寫入正式稿。
 
 候選位置、分支回退與採用由 [JD 保存 §3.1](jd-storage.md#31-本輪候選與可恢復位置)維護；模型定位及來源解析見[工具接線 §3.2–3.3](jd-storage.md#32-模型導覽與既有物件定位)，差異與明確核對見[來源接線 §3.5](jd-storage.md#35-來源及人工改稿差異)。`read_ref`、`target_title`、`citation_ref` 各自解析不同責任所擁有的資料，不能靠同名猜測身分。跨層呼叫傳入固定基準，資料解析及合法性仍由各領域判斷。
 

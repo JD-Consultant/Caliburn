@@ -158,7 +158,7 @@ Promise 必須 await、return 或有明確錯誤處理；不要把 async 函式�
 
 ## 7. 測試、註解與抽象審查
 
-本節管測試程式與診斷的寫法；開發流程依[開發規範](development-standard.md)，測例覆蓋及執行層級依[驗證計畫](../implementation/verification-plan.md)。
+本節管測試程式與診斷的寫法；開發流程依[貢獻指南](../../CONTRIBUTING.md#驗證與提交)，測例覆蓋及執行層級依[驗證計畫](../implementation/verification-plan.md)。
 
 測試也遵守同一命名與可讀性：清楚 Arrange／Act／Assert，測可觀察行為，名稱說明情境與保證。Fixture 只提供本測例需要的資料，不建立全產品測試容器。表格測試適用相同規則的輸入變體，不把無關場景塞進一個多重 if 測試。
 
@@ -238,8 +238,8 @@ OpenTelemetry GenAI 欄位仍在 Development；本頁採觀測責任，不直接
 | 資料、交易與恢復 | 正式來源唯一、候選與採用可辨、競爭及結果不明沿原操作核對；診斷不參與業務裁決 | [資料接線](../implementation/data-and-contracts.md)、[保存架構](../architecture/persistence.md) |
 | 並行、取消與重試 | 資源有人關閉、工作有人收尾；取消語意不混淆、重試責任不疊乘、已發生效果不重做 | 本頁 §5、[執行接線](../implementation/agent-execution.md) |
 | 前端與跨層呈現 | 生成契約有 runtime 驗證；草稿、串流與正式結果分明，過時回應不跨檔案，內容安全呈現 | 本頁 §6、[介面與交付](../implementation/interface-and-delivery.md) |
-| 可測性、對照與觀測 | Prompt／Tool／元件在責任邊界替換，沿正式路徑驗證；可從實際輸入追到結果且證據不洩密 | 本頁 §4、§7、[開發規範](development-standard.md) |
-| 效能與持續維護 | I/O、交易、並行量與正文成本有界；依量測找瓶頸，避免重複計算／狀態及為未來泛化 | 本頁 §3–6、[開發規範 §3.1](development-standard.md#31-依風險配置驗證與交付粒度) |
+| 可測性、對照與觀測 | Prompt／Tool／元件在責任邊界替換，沿正式路徑驗證；可從實際輸入追到結果且證據不洩密 | 本頁 §4、§7、[貢獻指南](../../CONTRIBUTING.md#驗證與提交) |
+| 效能與持續維護 | I/O、交易、並行量與正文成本有界；依量測找瓶頸，避免重複計算／狀態及為未來泛化 | 本頁 §3–6、[貢獻指南](../../CONTRIBUTING.md#驗證與提交) |
 
 新增產品安全政策、狀態或跨層能力仍先維護其責任契約；不能藉本表擴充認證模型、另造 validator 或更動既有恢復資格。
 

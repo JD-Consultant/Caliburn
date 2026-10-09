@@ -8,28 +8,24 @@ import remarkGfm from 'remark-gfm';
 import GithubSlugger from 'github-slugger';
 
 const parser = unified().use(remarkParse).use(remarkGfm);
-const evidenceIndexes = new Set([
-  'docs/experiments/README.md', 'docs/experiments/artifact-storage.md',
-  'docs/experiments/product-validation/README.md', 'docs/experiments/engineering/README.md',
-]);
-
+/** Select from Git-visible files; ignored local records are outside the public inventory. */
 export function selectDocuments(files) {
-  return files.filter(file => file.startsWith('docs/') && file.endsWith('.md') &&
-    !file.startsWith('docs/archive/') &&
-    (!file.startsWith('docs/adr/') || file === 'docs/adr/README.md') &&
-    !file.startsWith('docs/plans/evidence/') &&
-    (!file.startsWith('docs/experiments/') || evidenceIndexes.has(file)));
+  return files.filter(file => file.toLowerCase().endsWith('.md'));
 }
 
-export async function findDocuments(root) {
-  const candidates = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z', '--', 'docs'],
+export async function findPublishedFiles(root) {
+  const candidates = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
     { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }).split('\0').filter(Boolean);
-  const files = selectDocuments([...new Set(candidates)]).sort();
+  const files = [...new Set(candidates)].sort();
   const existing = await Promise.all(files.map(async file => {
     try { return (await stat(path.resolve(root, file))).isFile(); }
     catch (error) { if (error.code === 'ENOENT' || error.code === 'ENOTDIR') return false; throw error; }
   }));
   return files.filter((_, index) => existing[index]);
+}
+
+export async function findDocuments(root) {
+  return selectDocuments(await findPublishedFiles(root));
 }
 
 function visit(node, action) {

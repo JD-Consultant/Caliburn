@@ -108,4 +108,4 @@ hybrid_search(level="profile"|"task", limit=top_k)
 - 架構：[RAG 服務邊界](../../../docs/architecture/rag-pipeline.md)；介面：[RAG 契約](../../../packages/indexer-contract/README.md)；模型：[embedder](../../embedder/README.md)。
 - 來源 JSON 契約:[`apps/pdf-to-json/README.md`](../../pdf-to-json/README.md) §6.3。
 - 現行 App 的可選 HTTP 接入見 [API README](../../api/README.md#公版參考工具的可選啟用)。
-- 文件維護：[文件導覽](../../../docs/README.md)、[文件與圖面規範](../../../docs/standards/documentation-standard.md)。
+- 文件維護：[文件導覽](../../../docs/README.md)、[文件維護](../../../CONTRIBUTING.md#文件維護)。

@@ -7,9 +7,9 @@
 - [cases.json](cases.json)：情境輸入與前置草稿；只有各例的 `input` 可交給既有流程作測試資料。`id`／`split`／`risks` 是評測 metadata，不傳模型。
 - [oracles.json](oracles.json)：**reviewer only**。有根據、必保留／不得斷言、A／B1／B2 各自正反例、hard failures 與允許的其他解法；絕不混進模型 context。
 - 本文件：如何準備、觀察、評分及解讀。沿既有 pytest、角色 runner、Memory parent 與資料 owner，不增加模型評測平台或產品契約。
-- T14 evidence：本切片來源、實際檢查及未驗邊界；不另勾任務完成。
+- 每批比較另保留實際版本、命令、結果及未驗邊界；本資料集本身不是驗收通過證據。
 
-內容責任仍是 [工作分析指南](../../../../../docs/standards/work-analysis/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](../../../../../docs/standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)、[訪談校準](../../../../../docs/standards/work-analysis/2026-09-09-customized-jd-depth-and-interview-calibration.md)。oracle 的 `analysis`／`writing`／`interview` 數字對應這三份文件章節。本文不是第二份指南，也不以案例中的格式／件數定義所有職位。
+內容判準由[產品概念](../../../../../docs/product/concepts.md#內容判準)維護，正式提示沿該頁角色入口查閱。oracle 的 analysis／writing／interview 數字保留當時方法來源的章節標識；執行及評分使用本文件的逐項判準、各例正反例與 hard_failures，不需取得內部原稿，也不以案例格式／件數定義所有職位。
 
 ## 案例各辨別什麼
 
@@ -35,7 +35,7 @@
 
 ## 準備與可見範圍：不要把 oracle 當角色輸入
 
-1. 每案例／trial 使用獨立測試職務檔案及專用測試 DB schema，沿既有 integration fixture 的清理與資格；不接 production。沒有本輪 provider manifest 就只跑離線測試。
+1. 每案例／trial 使用獨立測試職務檔案及專用測試 DB schema，沿既有 integration fixture 的清理與資格；不接 production。沒有本次明示授權的 provider manifest 就只跑離線測試。
 2. `formal_interview.sequence` 是合成歷史的定位，不是讓模型產生的 ID。用既有 interview／completion 測試機制建立前置狀態，保留說話者與問句；App 實際回傳的 identity／sequence 要建立對照，不能直接寫資料庫冒充成功訪談。
 3. `seed_work_situations` 是刻意提供的舊情境 fixture，參數沿既有 create-work-situation 契約；以既有候選／發布 owner 建立前置狀態。它們不是待評模型已產生的好結果。新舊矛盾由原話與更正判讀，不能假設種子永遠正確。
 4. `jd_draft` 是前置文件敘述，不是新增 API wire schema。沿現有 JD owner 建立有意義的項目／細節；標記 human 的項目用人工編輯路徑保留 pending。`source_sequences` 只描述它掛著哪些來源，**不保證內容受支持**；manual 案例特意掛了不支持核准權／KPI 的原話。
@@ -44,11 +44,11 @@
 7. 逐階段記錄：A 原回答＋實際 JD 候選／正式結果與來源；B1 情境正文／引用；B2 理解正文／情境關係及必要的 situation-only gap；parent 真正發布結果。只看最後答覆、Graph END 或 `complete` 不算已保存／發布。
 8. 若只單獨評 A 或 B1／B2，明示 seed 前置狀態及未觀察階段。不得以單角色案例宣稱整條旅程成功。各角色有多種合法工具路徑，不鎖 write 數、唯一序列或每例固定幾輪。
 
-現成接線範例在 `tests/integration/test_consultant_runner.py`、`test_memory_analysis_runners.py`、`test_memory_parent_roles.py`、`test_consultant_memory_http_journey.py`。這些既有 synthetic transport 測試是機制證據；換真 provider 必須另有 T16 manifest，不能把它們預寫的回應當自然品質成果。本切片沒有另寫 provider runner／retry／評測服務。
+現成接線範例在 `tests/integration/test_consultant_runner.py`、`test_memory_analysis_runners.py`、`test_memory_parent_roles.py`、`test_consultant_memory_http_journey.py`。這些既有 synthetic transport 測試是機制證據；換真 provider 必須另有本次授權、配置及費用界線，不能把它們預寫的回應當自然品質成果。本切片沒有另寫 provider runner／retry／評測服務。
 
 ## 人工 rubric：先判有沒有根據，再判寫得好不好
 
-`oracles.json` 的正反例是**工程代理依指南編寫的候選評分錨點**，不是人類專家已一致判定的 gold labels。後續由熟悉工作分析的人逐項檢查原話、實際產物及來源，必要時先修正有歧義的題目／版本，再評模型。
+`oracles.json` 的正反例是**工程代理依當時研究方法編寫的候選評分錨點**，不是人類專家已一致判定的 gold labels。後續由熟悉工作分析的人逐項檢查原話、實際產物及來源，必要時先修正有歧義的題目／版本，再評模型。
 
 每個適用維度標 `pass`／`partial`／`fail`；該階段沒執行或沒有足夠證據標 `not_observed`，不可當 pass。留一段可定位的原話與實際輸出／狀態作理由，不只給分數。
 
@@ -75,13 +75,13 @@
 - **不要只看任務本身：**每日／月底例還看共用協作對象正文、任務關係說明、全職位邊界及其他引用處。同一人不同情境有不同分工，不是自動矛盾；語意範圍清楚才可合併。
 - 至少抽取一個成功、一個失敗及有爭議案例，由第二位人工評者不看第一位 verdict 重評；保留分歧與依據，不讓模型自己宣告合格。尚無人工評者時結果標待評，不由本 rubric 作者冒充獨立人審。
 
-## 後續 T16／T17 的最小記錄
+## 真模型比較的必要記錄
 
 先固定資料版本、input／oracle／實際指引／tool definition 指紋，再依有效授權另訂模型、推理設定、每例 trial 數、總 count／generation／retry／compact／時間／費用上限及停止條件。不可拿這份 fixture 當新付費授權。
 
 每例保留 case id、trial、階段、資料及 prompt hash、App execution／revision 參考、公開對話及實際結果證據、各維度 verdict、hard failure、評者／分歧、工具錯誤、用量、成本與延遲。缺資料就標 unavailable；不保存／解讀 opaque reasoning，不輸出秘密。不新增另一個產品保存 owner。
 
-固定同一版本比較基準／候選；保留每次失敗及 `not_observed`，不要只報多次中的最佳一次。11 個 development 可用於調整；2 個保留候選一旦用來調 prompt 就改列 development，補真正未參與調整的案例。十三例只能揭露定向風險，不足以估計普遍成功率、節時 ROI 或代表全部職業；T01–T18 原 gates 與最終 Goal 不縮減。
+固定同一版本比較基準／候選；保留每次失敗及 `not_observed`，不要只報多次中的最佳一次。11 個 development 可用於調整；2 個保留候選一旦用來調 prompt 就改列 development，補真正未參與調整的案例。十三例只能揭露定向風險，不足以估計普遍成功率、節時 ROI 或代表全部職業；既定工程 gate 與本次完成條件不縮減。
 
 ## 官方評測建議如何採用
 
@@ -91,4 +91,4 @@
 - Anthropic 建議分清執行軌跡與最終成果、設正反方向案例、檢查 transcript，避免用唯一工具序列排除合法方案；模型 grader 需與人工校準。本案用來源與實際產物交叉核對，接受多種合法分組／路徑。[Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)
 - Anthropic 文件也強調明確、可量測、多面向成功條件與 edge cases；其較大量自動化評測建議不能被本資料集的少量候選錨點冒充達成。不聲稱官方替這些工作分析答案背書。[Define success criteria and build evaluations](https://platform.claude.com/docs/en/test-and-evaluate/develop-tests)
 
-官方提供的是評測方法，不決定 Caliburn 的 JD 內容或員工事實；上述角色規則與反例取自本案責任指南。
+官方提供的是評測方法，不決定 Caliburn 的 JD 內容或員工事實；上述角色規則與反例依本案產品內容判準及正式提示核對。

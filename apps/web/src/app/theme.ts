@@ -1,8 +1,7 @@
 /**
  * Single source of visual tokens. CSS reads them through `--cb-*` variables so the theme and
- * styles.css cannot drift. Direction, sources and measured values: docs/research/engineering/
- * 2026-10-02-web-ui-benchmark-and-direction.md ("warm paper" surfaces, hairline alpha borders,
- * very low layered shadows, CJK-first type). Spacing sits on a 4px grid.
+ * styles.css cannot drift. The visual direction uses warm paper surfaces, hairline alpha
+ * borders, very low layered shadows and CJK-first type. Spacing sits on a 4px grid.
  *
  * Alpha layers derive from one ink color, so borders and hover tints keep the same hue on any
  * surface (Linear, Geist and Notion all do this). Colors given to MUI use the comma syntax

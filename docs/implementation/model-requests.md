@@ -44,7 +44,7 @@ asyncio 機制，期限與原 attempt 的責任仍集中於 `ModelRequestExecuto
 
 [圖源](../diagrams/implementation/model-requests/request-generation-settlement.mmd) · [SVG](../diagrams/implementation/model-requests/request-generation-settlement.svg)
 
-圖為現行生成、保存與結算的基本流程圖，形狀及箭頭沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。雙側線矩形是另有定義的計數／准入子流程，平行四邊形是對 provider 的外送；已知 provider 故障及原件補存分見 [外送重試](#5-單一外送重試責任)、[原件補存的有限自動恢復](agent-execution.md#56-原件補存的有限自動恢復)。恢復線表示呼叫者再次接續，不表示本元件無限重試；沒有工具 call 的完整回應可直接交回完成路由。
+圖為現行生成、保存與結算的基本流程圖，形狀及箭頭沿[讀圖約定](../diagrams/README.md#讀圖約定)。雙側線矩形是另有定義的計數／准入子流程，平行四邊形是對 provider 的外送；已知 provider 故障及原件補存分見 [外送重試](#5-單一外送重試責任)、[原件補存的有限自動恢復](agent-execution.md#56-原件補存的有限自動恢復)。恢復線表示呼叫者再次接續，不表示本元件無限重試；沒有工具 call 的完整回應可直接交回完成路由。
 
 - 每個新 Step 的初始 checkpoint 固定 App 產生的 `request_id` 與 **實際 create payload** ，包括 model、instructions、tools、input、reasoning、輸出上限與串流設定。沒有另存初始 input 副本；`input_items` 僅在完成 Step 時形成後續窗口。`ResponseRequest.from_snapshot` 還原同一請求，拒絕不符固定直連政策的快照，不能用目前角色設定代替當時設定。這是恢復資料，不宣告永久保存所有請求。
 - `ModelRequestExecutor.request_model` 在既有 execution 鎖內查原 request 的 attempts，核固定費用依據並預留；交易確認完成後才發一次 HTTP。同一 request 有尚未核明的 attempt 時停止讓外層核對，不換 UUID 假裝首次呼叫；只有 [外送重試](#5-單一外送重試責任) 已確認的可重試故障才可新准入。已保存 R 由 Graph 直接接續，不再進此入口。完整 payload 以 canonical JSON 的 SHA-256 綁定，不拿 payload hash 當 logical request 身分。
@@ -64,7 +64,7 @@ asyncio 機制，期限與原 attempt 的責任仍集中於 `ModelRequestExecuto
 
 [圖源](../diagrams/implementation/model-requests/execution-budgets.mmd) · [SVG](../diagrams/implementation/model-requests/execution-budgets.svg)
 
-圖為現行 execution 額度的局部 ER；基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。保留具體鍵，省略其他 execution 關係及非關鍵欄位；型別採簡寫，`string`、`datetime`、`decimal` 分別對應 PostgreSQL `text`、`timestamptz`、`numeric(18,9)`，不是完整 DDL。一份 execution 至多綁定一份固定 budget，外送 attempt 的主鍵是 `(execution_id, attempt_id)`；兩條實線的引用鍵都完整納入子表主鍵。完整欄位及約束以 [0013 migration](../../apps/api/src/caliburn/migrations/versions/0013_execution_budgets.py)及[可空金額上限](../../apps/api/src/caliburn/migrations/versions/0019_optional_cost_limit.py)為準。
+圖為現行 execution 額度的局部 ER；基數、識別關係與鍵標記沿[讀圖約定](../diagrams/README.md#讀圖約定)。保留具體鍵，省略其他 execution 關係及非關鍵欄位；型別採簡寫，`string`、`datetime`、`decimal` 分別對應 PostgreSQL `text`、`timestamptz`、`numeric(18,9)`，不是完整 DDL。一份 execution 至多綁定一份固定 budget，外送 attempt 的主鍵是 `(execution_id, attempt_id)`；兩條實線的引用鍵都完整納入子表主鍵。完整欄位及約束以 [0013 migration](../../apps/api/src/caliburn/migrations/versions/0013_execution_budgets.py)及[可空金額上限](../../apps/api/src/caliburn/migrations/versions/0019_optional_cost_limit.py)為準。
 
 執行配置啟動時固定，由公開查詢恢復，不以啟動當下的新 deadline 覆蓋。`cost_basis` 是本工作經研究的計價依據定位，不允許未配置；公開費率見 [費率與 usage 估算](#6-固定費率與-usage-成本估算)；成本估算不保證等於帳戶實際帳單。B1／B2 使用同一 Memory batch scope，不各領一份可重置的預算。
 
@@ -106,7 +106,7 @@ count 接續只需原 `input_tokens` 與 App attempt 綁定，不將計數變成
 
 [圖源](../diagrams/implementation/model-requests/outbound-retry.mmd) · [SVG](../diagrams/implementation/model-requests/outbound-retry.svg)
 
-圖為現行 provider 外送的重試控制基本流程圖；形狀及控制箭頭沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。只有原 attempt 的故障已可靠保存、分類允許且仍有工作資格，才准入下一次外送；保存失敗與結果不明走核對或停止，不由此圖推定重送。
+圖為現行 provider 外送的重試控制基本流程圖；形狀及控制箭頭沿[讀圖約定](../diagrams/README.md#讀圖約定)。只有原 attempt 的故障已可靠保存、分類允許且仍有工作資格，才准入下一次外送；保存失敗與結果不明走核對或停止，不由此圖推定重送。
 
 - **原結果優先不變：** Graph 已保存的 R／C／count 直接接續；仍握有原件則走既有補存。此迴圈只 catch SDK 外送的 `APIError`，不包整個 Graph、不把保存／結算／工具錯誤當成 provider retry。成功收到完整結果後、交給 Graph 之前仍沒有 DB 操作。
 - **允許重試的證據：** 原本地 HTTP 呼叫已返回錯誤，分類為短暫服務或遠端結果未知，且安全故障記錄已提交。逾時仍可能已收費、曾遠端生成，但本機沒有完整 R；新推論是新 attempt，不冒充原結果。程序崩潰、准入 COMMIT 確認不明，或原失敗尚未可靠保存時仍維持 `Prior*AttemptError`，不靠不存在的遠端備份／時間到自動放行。

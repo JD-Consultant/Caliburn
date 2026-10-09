@@ -16,7 +16,7 @@
 
 以下兩個視圖涵蓋職務檔案、訪談與准入的七張相關業務表；JD、Memory 與 Graph checkpoint 另有各自的保存責任。同名表是同一份資料，不是副本；拆圖避免多條跨層線遮住節點。
 
-以下均為現行局部 ER，欄位型別採簡寫，省略預設值、CHECK 與部分複合唯一約束；完整 DDL 以本頁所連 migration 為準。基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)。`interview_replies` 引用 input 的 `(job_file_id, execution_id)` 唯一鍵並用作自身主鍵，故為識別關係；原文的 `source_id` 雖為必填 FK，未納入正式資格／輸入／答覆的主鍵。
+以下均為現行局部 ER，欄位型別採簡寫，省略預設值、CHECK 與部分複合唯一約束；完整 DDL 以本頁所連 migration 為準。基數、識別關係與鍵標記沿[讀圖約定](../diagrams/README.md#讀圖約定)。`interview_replies` 引用 input 的 `(job_file_id, execution_id)` 唯一鍵並用作自身主鍵，故為識別關係；原文的 `source_id` 雖為必填 FK，未納入正式資格／輸入／答覆的主鍵。
 
 **原文與正式資格：**
 
@@ -24,7 +24,7 @@
 
 [圖源](../diagrams/implementation/interview-storage/raw-text-formal-qualification.mmd) · [SVG](../diagrams/implementation/interview-storage/raw-text-formal-qualification.svg)
 
-**檔案准入與改名結果：** 下圖為現行局部 ER，補前圖 `interview_inputs.execution_id` 的同檔案複合外鍵；完整原文關係見前圖。基數、識別關係與鍵標記沿[中央圖面規範](../standards/documentation-standard.md#3-圖面種類與符號)；型別與欄位同樣簡化。`executions` 的 `(job_file_id, execution_id)` 複合唯一鍵供 input 引用，`execution_id` 未納入 input 的主鍵，因此是虛線關係。
+**檔案准入與改名結果：** 下圖為現行局部 ER，補前圖 `interview_inputs.execution_id` 的同檔案複合外鍵；完整原文關係見前圖。基數、識別關係與鍵標記沿[讀圖約定](../diagrams/README.md#讀圖約定)；型別與欄位同樣簡化。`executions` 的 `(job_file_id, execution_id)` 複合唯一鍵供 input 引用，`execution_id` 未納入 input 的主鍵，因此是虛線關係。
 
 ![現行：1. 原文、正式資格與執行身分分開，不複製原話—檔案准入與改名結果](../diagrams/implementation/interview-storage/execution-admission-renames.png)
 
@@ -56,7 +56,7 @@ App 開場在建立時取得序號 1。已接受員工輸入進原文與提交�
 - 開場寫入後發生錯誤：整個短交易回滾；檔案、原文與正式資格不留下半套。重送原命令可重新建立。
 - DB 斷線／COMMIT 確認遺失：相同命令可在連線恢復後核對原結果，不自行無限重試。跨程序恢復與未知提交的驗證範圍見恢復驗證。
 
-開場文字在建立時保存，來源標為 `app`；未呼叫模型，不把模板文字稱為顧問已完成一次推論。後續改模板不會改歷史原文。內容依[工作分析指南 §3](../standards/work-analysis/2026-09-09-complete-work-analysis-guide.md#3-如何訪談不變成冗長表單)從實際工作全貌開始，不要求員工先懂 JD，也不代填工作事實。
+開場文字在建立時保存，來源標為 `app`；未呼叫模型，不把模板文字稱為顧問已完成一次推論。後續改模板不會改歷史原文。內容依[產品內容判準](../product/concepts.md#內容判準)從實際工作全貌開始，不要求員工先懂 JD，也不代填工作事實。
 
 ## 3. 程式分責
 

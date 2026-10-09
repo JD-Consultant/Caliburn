@@ -10,7 +10,7 @@
 
 | 設計層次 | 設計依據 | 驗證方法與限制 |
 |---|---|---|
-| 問題與成功條件 | [產品概念](../product/concepts.md)、[工作分析](../standards/work-analysis/2026-09-09-complete-work-analysis-guide.md)與[寫作指南](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md) | 以代表資料與 eval 檢驗效果；評分標準須有依據 |
+| 問題與成功條件 | [產品概念](../product/concepts.md)、[產品內容判準](../product/concepts.md#內容判準) | 以代表資料與 eval 檢驗效果；評分標準須有依據 |
 | 領域與資訊關係 | [系統邊界](system-boundaries.md)、Memory／JD 設計 | 核對三層資訊關係、來源資格與候選政策在讀寫操作中是否一致 |
 | 核心閉環與狀態 | [正式採用與交易](persistence.md)、A／B 流程、[共用執行與恢復](../implementation/agent-execution.md) | 以最小案例驗證流程與節點的對應，以及控制操作之間的競爭；產品 Turn 不等同 Graph super-step |
 | 資料與證據 | [持久化](persistence.md)、Memory snapshot、JD 來源／diff | 以真實 PostgreSQL 驗證固定歷史、原子採用與原結果接續；每類資料由單一模組負責 |
@@ -109,6 +109,6 @@
 
 ## 5. 證據來源與適用範圍
 
-工程驗證由受測版本的程式與測試重現；[驗證責任](../implementation/verification-plan.md)列出 V、E、JDT 接縫及必要層級，元件 README 維護實際命令。比較 Prompt、Tool 或模型時，依[開發規範](../standards/development-standard.md#7-分析方法prompttool-與-context-共同驗收)固定案例、變因與判準。
+工程驗證由受測版本的程式與測試重現；[驗證責任](../implementation/verification-plan.md)列出 V、E、JDT 接縫及必要層級，元件 README 維護實際命令。比較 Prompt、Tool 或模型時，依[貢獻指南](../../CONTRIBUTING.md#模型品質比較)固定案例、變因與判準。
 
 每次交付記錄受測版本、實際命令、失敗、排除及未驗範圍。執行原件保留本機；公開文件保留責任與已知限制，不集中複製施工年表、逐案模型紀錄或測試數字。缺少公開原件時，不以本文推定某次品質結果可由新 checkout 重現。

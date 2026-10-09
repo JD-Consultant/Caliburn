@@ -22,7 +22,7 @@ Caliburn 是透過 AI 訪談協助員工撰寫職務說明書（JD）的本機 W
 
 JD 應以精簡文字涵蓋大部分實際工作與重要差異：做什麼、負責到哪裡、產生什麼結果、有哪些必要條件，以及需要什麼知識與技能。完整度不以篇幅衡量；缺乏依據時應追問或保留未知，不能為填滿表格而創造 KPI、職責或資格。
 
-內容判準依據專案已研究的[完整工作分析方法](../standards/work-analysis/2026-09-09-complete-work-analysis-guide.md)與[JD 寫作指南](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)，分析標準不由模型臨時決定。
+內容意義與分析界線由[產品概念](concepts.md#內容判準)維護，正式角色提示與工具契約沿該頁入口查閱。
 
 ## 從訪談到職務說明書
 

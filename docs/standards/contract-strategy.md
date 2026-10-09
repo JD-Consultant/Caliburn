@@ -26,7 +26,7 @@ JSON Schema 同時決定 wire 輸入的接受政策。HTTP 與模型工具先以
 
 保留的 RAG 有自己的跨語言契約 `packages/ocs-contract`，以 JSON Schema 生成目前 Python 消費者使用的 Pydantic model；無消費者的 TypeScript 產物已移除，生成檢查只在暫存目錄產生並比較，不更動工作檔或 Git index。生成檢查沿[該套件說明](../../packages/ocs-contract/README.md)。它不屬於正式 JD 產品的契約，App／Web 不 import 或消費它；RAG 的隔離邊界不因契約存在而改變。
 
-`experiments/jd-relational-app`、`packages/consultant-memory` 與 `packages/job-analysis-contract` 已退役並移出工作樹，沿革由Git 歷史取回，不作現行依賴，也不為已移除的 interview／job-authoring 接縫新增相容契約。
+`experiments/jd-relational-app`、`packages/consultant-memory` 與 `packages/job-analysis-contract` 已退役並移出工作樹，不作現行依賴，也不為已移除的 interview／job-authoring 接縫新增相容契約。
 
 ## 選擇判準
 
@@ -34,12 +34,11 @@ JSON Schema 同時決定 wire 輸入的接受政策。HTTP 與模型工具先以
 |---|---|
 | App 跨語言或對外的 JSON shape | JSON Schema 單一來源與生成型別；CI 驗證再生成無差異 |
 | 純 Python、同 repo、少數消費者的內部 port | 共用型別模組或明確 Protocol；不另建泛用契約套件 |
-| 未來出現外部或未知消費者 | 依決策流程研究版本與相容承諾，再評估 OpenAPI-first 或 consumer-driven contract |
+| 未來出現外部或未知消費者 | 先確認版本與相容承諾，再評估 OpenAPI-first 或 consumer-driven contract |
 
 ## 交付流程
 
 1. 確認受影響的介面、資料責任與既有 schema，沿責任文件維護契約；不另建重複規格。
-2. 改變權責、相容承諾或跨層契約的重大取捨，依[決策流程](decision-process.md)記錄 ADR；效果等價的局部修改沿既有規則處理。
-3. 依[開發規範](development-standard.md)拆出可驗證的行為切片，以反例先測，再修改 schema、生成器或消費端。提交依任務授權，不規定一項 task 只能有一個 commit。
-4. 依 [API README](../../apps/api/README.md)執行生成命令，核對 schema 與生成差異，再跑受影響的 API／Web 契約及行為測試；離線 SDK payload 通過不代表遠端模型已接受。
-5. 依受影響 App 的生成檢查、建置及差異檢查完成驗證；RAG 另沿其套件命令。純文件修改只核對內容、路由與一致性，不重跑無關產品測試。
+2. 改變權責、相容承諾或跨層契約時，依[變更範圍與審查](../../CONTRIBUTING.md#變更範圍與審查)確認有效決定及受影響責任，再以可驗證的行為切片修改 schema、生成器或消費端。
+3. 依 [API README](../../apps/api/README.md)執行生成命令，核對 schema 與生成差異，再跑受影響的 API／Web 契約及行為測試；離線 SDK payload 通過不代表遠端模型已接受。
+4. 依受影響 App 的生成檢查、建置及差異檢查完成驗證；RAG 另沿其套件命令。純文件修改只核對內容、路由與一致性，不重跑無關產品測試。

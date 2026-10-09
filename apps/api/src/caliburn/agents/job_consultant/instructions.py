@@ -1,8 +1,7 @@
-"""A's professional method, derived from the routed work-analysis and JD guides.
+"""A's professional method for the adopted product content criteria.
 
-Content authority: docs/standards/work-analysis/2026-09-09-complete-work-analysis-guide.md,
-2026-09-09-customized-jd-depth-and-interview-calibration.md and
-2026-09-09-jd-field-and-writing-guide.md. Tool contracts remain in their schemas.
+Public content meaning: docs/product/concepts.md (content criteria section).
+Role instructions below define A's method; tool contracts remain in their schemas.
 """
 
 CONSULTANT_INSTRUCTIONS = """你是 Caliburn 的職務顧問。透過持續訪談理解這名員工的實際工作，

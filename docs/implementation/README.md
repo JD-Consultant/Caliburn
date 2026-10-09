@@ -1,6 +1,6 @@
 # 程式設計與實作文件
 
-本目錄說明如何用程式落實既有產品契約，維護當前技術選型、具體接線與驗證對照。正式產品位於 `apps/api`、`apps/web`，整體責任見[架構](../architecture/README.md)。先確認要改的行為，再讀對應接線；工程工作、程式與文件寫法沿[規範入口](../standards/README.md)。
+本目錄說明如何用程式落實既有產品契約，維護當前技術選型、具體接線與驗證對照。正式產品位於 `apps/api`、`apps/web`，整體責任見[架構](../architecture/README.md)。先確認要改的行為，再讀對應接線；程式要求沿[規範入口](../standards/README.md)，修改及文件維護沿[貢獻指南](../../CONTRIBUTING.md)。
 
 圖面由獨立 `.mmd` 生成並在正文引用。各圖旁可直接開啟圖源；整體路由與重繪命令見[圖源索引](../diagrams/README.md)。
 
@@ -10,7 +10,7 @@
 |---|---|
 | 產品應達成什麼、哪些規則不能改 | [架構與責任文件](../architecture/README.md) |
 | 目前限制及驗證責任 | [驗證範圍](../architecture/verification.md) |
-| 開發流程、模組組織、程式與文件寫法 | [開發與架構規範](../standards/README.md#開發與架構) |
+| 模組、程式與契約要求 | [程式規範](../standards/README.md)；修改及驗證見[貢獻指南](../../CONTRIBUTING.md) |
 | 選哪些框架、為何、不選什麼 | [技術選型與機制驗證](technology-decisions.md) |
 
 ### 依改動範圍讀接線

@@ -1,5 +1,8 @@
+%% title: 現行：建檔收據、訪談原文與正式資格
+%% legend: ER；圈：零，短線：一，鳥足：多。實線：識別關係；虛線：非識別關係。
 erDiagram
   direction TB
+  job_files |o..o| job_file_creations : creation_result
   job_files ||..o{ interview_texts : owns
   interview_texts ||..o| formal_interviews : qualifies
   interview_texts ||..o| interview_inputs : submitted_as
@@ -7,12 +10,15 @@ erDiagram
   interview_texts ||..o| interview_replies : records_reply
   job_files {
     uuid job_file_id PK
-    uuid creation_command_id UK
     text initial_display_name
     text display_name
     bigint name_revision
     text employee_name
     timestamptz created_at
+  }
+  job_file_creations {
+    uuid command_id PK
+    uuid result_file_id FK,UK "可空；刪檔後為 NULL"
   }
   interview_texts {
     uuid source_id PK

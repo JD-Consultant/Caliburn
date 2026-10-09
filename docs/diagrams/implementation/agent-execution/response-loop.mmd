@@ -1,17 +1,18 @@
+%% title: 現行流程：有界模型與工具迴圈
 %% legend: 膠囊：本圖起訖；矩形：處理；菱形：判斷；平行四邊形：資料交接；雙側線：子流程。六角形：初始化。
 %%{init: {"flowchart": {"wrappingWidth": 280, "nodeSpacing": 32, "rankSpacing": 36}}}%%
 flowchart TD
   begin([新模型與工具迴圈]) --> I{{初始化 request、身分與限制}}
   I --> SAVE[/saver 保存初始 State/]
-  SAVE --> C[[固定請求計數與容量准入<br/>§5.2]]
+  SAVE --> C[[固定請求計數與容量准入<br/>模型外送 §4]]
   C --> Q{准入或容量錯誤結果？}
   Q -->|生成| R[[單一模型／工具 Step<br/>§4.2]]
-  Q -->|中途壓縮| CP[[完整 W → C 交接<br/>§5.3]]
+  Q -->|中途壓縮| CP[[完整 W → C 交接<br/>§5.1]]
   CP --> NC[組裝壓後 request<br/>不追加新輸入或 maps]
   NC --> NCS[/保存壓後 request/]
   NCS --> C
   Q -->|不可繼續| E([帶原因停止本次呼叫])
-  R --> CT[[完整 Step 後的控制與接續<br/>§4.7]]
+  R --> CT[[完整 Step 後的控制與接續<br/>§4.5]]
   CT --> NEXT{接續結果？}
   NEXT -->|暫停| PA([返回暫停結果<br/>等候另一次明確續作])
   NEXT -->|角色 final／拒絕| D([返回角色結果<br/>尚未正式提交])

@@ -1,3 +1,5 @@
+%% legend: 圈：零；短線：一；鳥足：多；實線：父鍵納入子表主鍵；PK／FK：主鍵／外鍵。
+%% title: 現行 ER：工作額度與外送紀錄
 erDiagram
     executions ||--o| execution_budgets : "固定工作限制"
     execution_budgets ||--o{ execution_outbound_attempts : "每次外送先預留"

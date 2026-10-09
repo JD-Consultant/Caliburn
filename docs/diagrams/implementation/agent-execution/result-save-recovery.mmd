@@ -1,3 +1,4 @@
+%% title: 現行流程：原件保存錯誤的有限補存
 %% legend: 膠囊：本圖起訖；矩形：處理；菱形：判斷；平行四邊形：資料交接；雙側線：子流程。
 %%{init: {"flowchart": {"wrappingWidth": 280, "nodeSpacing": 32, "rankSpacing": 36}}}%%
 flowchart TD
@@ -5,7 +6,7 @@ flowchart TD
   CLASSIFY --> G{持有完整 handoff、錯誤屬暫時性<br/>且仍有補存次數？}
   G -->|否| ERR[/交回錯誤與仍可取得的 handoff/]
   G -->|是| W[交易外有界退避]
-  W --> RESTORE[[原恢復入口<br/>§4.4／§5.3／§5.5]]
+  W --> RESTORE[[原恢復入口<br/>§4.3／§5.1／§5.2]]
   RESTORE --> RESULT{原入口結果？}
   RESULT -->|再次發生 typed 保存錯誤| CLASSIFY
   RESULT -->|其他錯誤／資格失效| ERR

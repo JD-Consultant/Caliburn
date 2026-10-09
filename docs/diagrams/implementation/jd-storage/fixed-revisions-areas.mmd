@@ -1,3 +1,5 @@
+%% title: 現行：JD 正式頭、固定修訂與職責選用
+%% legend: ER；圈：零，短線：一，鳥足：多。實線：識別關係；虛線：非識別關係。
 erDiagram
   direction LR
   job_files ||--o| job_descriptions : owns
@@ -30,7 +32,7 @@ erDiagram
     uuid expected_revision_id FK
     uuid result_revision_id FK
     jsonb request_payload
-    jsonb result_payload
+    jsonb result_payload "可空；複合操作結果"
   }
   jd_area_revisions {
     uuid job_file_id PK,FK

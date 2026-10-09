@@ -1,7 +1,9 @@
+%% title: 現行流程：單一模型與工具 Step
 %% legend: 膠囊：本圖起訖；矩形：處理；菱形：判斷；平行四邊形：資料交接；雙側線：子流程。
 %%{init: {"flowchart": {"wrappingWidth": 240, "nodeSpacing": 32, "rankSpacing": 32}}}%%
 flowchart TD
-  S([單一 Step 開始<br/>計數及容量已准入]) --> M[/外送固定 request<br/>接收完整 R 與 attempt/]
+  S([單一 Step 開始<br/>計數及容量已准入]) --> ADMIT[由模型外送 workflow<br/>核對並確認本次 attempt 准入]
+  ADMIT --> M[/外送固定 request<br/>接收完整 R 與 attempt/]
   M --> SAVE[/saver 保存 R、attempt<br/>與操作 seed/]
   SAVE --> BILL[依原 attempt 冪等結算]
   BILL --> VALID[驗原回應協定、call 身分與上限]

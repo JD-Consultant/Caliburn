@@ -2,7 +2,13 @@
 
 本頁供修改程式或自行管理 PostgreSQL 的開發者使用。只想使用產品，從[第一次使用](getting-started.md)採 Docker 路線即可，不必安裝本頁列出的開發工具。
 
-首次設定依序完成：[工具版本](#服務與版本) → [安裝依賴](#安裝依賴) → [資料庫](#資料庫設定) → [AI 金鑰](#ai-金鑰) → [PDF](#pdf-匯出) → [初始化](#第一次初始化) → [啟動](#日常啟動與停止)。更新與測試另見[更新已有安裝](#更新已有安裝)、[驗證](#驗證)。所有命令都在專案根目錄執行。
+首次設定依序完成：
+
+1. 核對[工具版本](#服務與版本)，並[安裝依賴](#安裝依賴)。
+2. 設定[資料庫](#資料庫設定)，按需準備 [AI 金鑰](#ai-金鑰)與 [PDF](#pdf-匯出)。
+3. 完成[初始化](#第一次初始化)，再[啟動 App](#日常啟動與停止)。
+
+更新與測試另見[更新已有安裝](#更新已有安裝)、[驗證](#驗證)。所有命令都在專案根目錄執行。
 
 ## 服務與版本
 
@@ -20,7 +26,9 @@
 
 不要按端口終止身分不明的程序；程式變更後在原前景終端正常停止再重啟。
 
-`pnpm start`／`pnpm dev` 收到正常停止通知後，最多等九十秒讓原生 checkpoint 與其他資源完成收尾。Windows Ctrl+C 已送到同一 console，啟動器先等待；啟動失敗等未能送正常通知的路徑明示強制清理。超過期限後只強制停止本次持有的程序樹，再等最多五秒確認退出。強制停止會提示結果可能未確認；重新開啟後沿原 execution ID 查詢，不把未收到結果當成未執行，也不自動重送模型請求。
+`pnpm start`／`pnpm dev` 收到正常停止通知後，最多等待九十秒，讓原生 checkpoint 與其他資源收尾。Windows Ctrl+C 已送到同一 console，啟動器會先等待；啟動失敗等未能送出正常通知的情況，則明示為強制清理。
+
+超過期限後，只強制停止本次持有的程序樹，再等最多五秒確認退出。強制停止時會提示結果可能尚未確認；重新開啟後，沿原 execution ID 查詢。未收到結果不代表未執行，也不會自動重送模型請求。
 
 ## 安裝依賴
 
@@ -54,7 +62,9 @@ PowerShell 的 `$env:…` 只對目前視窗及其啟動的程序有效。換新
 - 環境變數 `OPENAI_API_KEY`；
 - 或 `apps/api/.env`（已被 Git 忽略）內**唯一一行** `OPENAI_API_KEY=...`，`pnpm start`／`pnpm dev` 會自動以 `--key-file` 載入。
 
-key 不進 prompt、模型工具、Web bundle、URL、資料庫、checkpoint、一般 log 或 Git。檔案存在時，根啟動器以 `--key-file` 載入的 key 為準；不要同時保留兩份不同金鑰。`pnpm app:status` 不讀取此檔案，判讀方式見[診斷](README.md#判讀-pnpm-appstatus)。沒有 key 時人工 JD 仍可使用，AI 訪談明示停用，且不會自動 fallback。更換 key 後須重啟後端。
+key 不進 prompt、模型工具、Web bundle、URL、資料庫、checkpoint、一般 log 或 Git。檔案存在時，根啟動器以 `--key-file` 載入的 key 為準；不要同時保留兩份不同金鑰。更換 key 後須重啟後端。
+
+`pnpm app:status` 不讀取此檔案，判讀方式見[診斷](README.md#判讀-pnpm-appstatus)。沒有 key 時人工 JD 仍可使用，AI 訪談明示停用，且不會自動 fallback。
 
 注意：後端啟動時會續跑已接受但未完成的訪談與背景整理，這可能消耗模型額度；只想操作人工 JD 時不要提供 key。
 
@@ -88,7 +98,9 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 }
 ```
 
-`app:migrate` 建立 App 業務 schema 並升級到目前版本，可重跑。啟動只核對 migration head，不自動升級業務 schema、清資料或重建 volume；LangGraph 的 checkpoint 表則由官方 saver 在啟動時建立。`app:status` 的能力判讀見[操作手冊](README.md#判讀-pnpm-appstatus)，退出碼 0 不代表 AI 與 PDF 已經實際通過。
+`app:migrate` 建立 App 業務 schema 並升級到目前版本，可重跑。App 啟動時只核對 migration head，不自動升級業務 schema、清資料或重建 volume；LangGraph 的 checkpoint 表則由官方 saver 在啟動時建立。
+
+`app:status` 退出碼 0 不代表 AI 與 PDF 已經實際通過驗證，各項輸出的意義見[操作手冊](README.md#判讀-pnpm-appstatus)。
 
 ## 日常啟動與停止
 
@@ -101,7 +113,7 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 
 `pnpm start` 需要先 `pnpm build`；沒有建置會明確報錯，不自動建置或猜目錄。在原終端按 Ctrl+C 正常停止：後端先停止新准入、保存已取得的結果並停在可恢復邊界，再釋放資源；強制關閉仍依最後可靠位置恢復。重開後，進行中或暫停的訪談可由介面找回並續作；背景整理由系統依持久狀態自動承接。
 
-啟動器先用短命的 `uv run --locked` 同步既有專案環境並取得 Python 路徑，再直接啟動後端；自訂 `UV_PROJECT_ENVIRONMENT` 仍由 uv 處理。任一服務啟動失敗或退出時，啟動器會收尾自己持有的其他服務；不依程序名稱或埠號清理。Windows 訊號收尾有有限等待，逾時才強制停止自有程序樹，不能把強制停止當成在途工作已全部保存。
+啟動器先執行一次 `uv run --locked`，同步既有專案環境並取得 Python 路徑，再直接啟動後端；自訂 `UV_PROJECT_ENVIRONMENT` 仍由 uv 處理。任一服務啟動失敗或退出時，只收尾啟動器持有的其他服務，不依程序名稱或埠號清理。Windows 的等待及強制停止依前述[服務與版本](#服務與版本)說明；強制停止不代表在途工作已全部保存。
 
 隔離驗證時若前端使用第二個埠，可在**後端啟動前**設定 `CALIBURN_DEV_ORIGIN=http://127.0.0.1:5174`（只接受一個帶明確埠的 loopback HTTP origin），見[後端 README](../../apps/api/README.md)。
 

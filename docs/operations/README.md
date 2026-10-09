@@ -98,9 +98,31 @@ App 內部監聽 `0.0.0.0:8100`，主機只發布至 `127.0.0.1`；仍是本機�
 | 瀏覽器或 CLI 收到 403 | 精確 Host／Origin 檢查：只接受 `127.0.0.1`／`localhost`／`[::1]` 的 5173／8100（及明示的一個 dev origin） |
 | `GET /api/health` | 只表示程序存活，不表示資料庫或模型可用 |
 | 訪談失敗或結果不明 | 介面顯示安全的失敗原因，原輸入保留；技術診斷在後端 log（只含穩定 ID、階段、錯誤類別，不含原話或 payload） |
-| 一輪訪談很久沒有回應 | 多半是 OpenAI 帳戶的每分鐘 token 上限（TPM）在限流，後端 log 會出現 `event=model.request_failed`、`failure_kind=rate_limited`。系統會照服務建議的時間自動多等（沒有建議時 10 秒起、60 秒封頂），**不算失敗**，單輪最長等到工作期限（預設 30 分鐘）；可隨時取消該輪。TPM 200K 的帳戶上，一場 12 輪訪談約 6–25 分鐘；要更快請改用更高 TPM 的帳戶 |
-| 訪談或背景整理全部立刻失敗，後端 log 為 `event=model.request_failed`、`failure_kind=access_blocked`、`provider_code=credit_balance_exhausted` | OpenAI 帳戶儲值額度用完（HTTP 429，但不是限流）。系統不重試、原輸入保留、該次處理標為失敗；補額度後重新送出原輸入 |
-| 資料庫剛重啟（或被外力中止）後，讀訪談狀態的端點回 500，`/api/health` 仍是 ok | **重啟後端**。leader 鎖與 checkpoint 連線各只持一條資料庫連線、不會自動重連，這是刻意的單一 leader 設計；重啟時系統會恢復已保存的進行中工作（能續作則續作，否則安全終止、原輸入保留，之後可重送） |
+| 一輪訪談很久沒有回應 | 先查後端限流紀錄；等待與取消的判讀見下方 |
+| 訪談或背景整理全部立刻失敗 | 核對是否為帳戶額度用完；與限流的差異見下方 |
+| 資料庫剛重啟（或被外力中止）後，讀訪談狀態的端點回 500，`/api/health` 仍是 ok | **重啟後端**；連線與工作恢復的限制見下方 |
+
+### 訪談等待與限流
+
+訪談長時間沒有回應，多半是 OpenAI 帳戶的每分鐘 token 上限（TPM）在限流。後端 log 會出現 `event=model.request_failed`、`failure_kind=rate_limited`。
+
+系統按服務建議的時間自動等待；沒有建議時從 10 秒起、60 秒封頂。這段等待不算失敗，單輪最長等到工作期限（預設 30 分鐘），期間可隨時取消。
+
+TPM 200K 的帳戶上，一場 12 輪訪談約 6–25 分鐘；要更快，請改用更高 TPM 的帳戶。
+
+### 帳戶額度用完
+
+後端 log 出現下列欄位時，表示 OpenAI 儲值額度用完：
+
+- `event=model.request_failed`
+- `failure_kind=access_blocked`
+- `provider_code=credit_balance_exhausted`
+
+它也回 HTTP 429，但不是限流：系統不重試，會保留原輸入並將該次處理標為失敗。補足額度後再送出原輸入。
+
+### 資料庫重啟後
+
+leader 鎖與 checkpoint 各持有一條資料庫連線，不會自動重連，這是現行單一 leader 設計。重啟後端時，系統會查回已保存的進行中工作；能續作則續作，否則安全終止並保留原輸入，之後可重送。
 
 ### 初始化失敗
 
@@ -124,7 +146,13 @@ App 內部監聽 `0.0.0.0:8100`，主機只發布至 `127.0.0.1`；仍是本機�
 | Password | 根 `.env` 的 `CALIBURN_POSTGRES_PASSWORD` |
 | Schema | 勾選 `caliburn`，不是 `public` |
 
-建議另設唯讀連線。既有 AI 執行紀錄的查閱方式不變：先完成[原生開發依賴](native-development.md#安裝依賴)，再在該環境將 `CALIBURN_DATABASE_URL` 設為上述主機連線，沿下方[執行紀錄](#在-datagrip-查某個職務檔案的-ai-執行紀錄)執行 `apps/api/scripts/refresh_execution_diagnostics.py`，再從 DataGrip 查 VIEW。此開發診斷腳本不在執行映像中；不另造一份診斷來源。
+建議另設唯讀連線。查閱 AI 執行紀錄時，依序準備：
+
+1. 完成[原生開發依賴](native-development.md#安裝依賴)。
+2. 在該環境將 `CALIBURN_DATABASE_URL` 設為上述主機連線。
+3. 沿下方[執行紀錄](#在-datagrip-查某個職務檔案的-ai-執行紀錄)執行 `apps/api/scripts/refresh_execution_diagnostics.py`，再從 DataGrip 查 VIEW。
+
+此開發診斷腳本不在執行映像中；不另造一份診斷來源。
 
 ### 判讀 `pnpm app:status`
 
@@ -155,7 +183,13 @@ uv run --project apps/api --locked python apps/api/scripts/refresh_execution_dia
 uv run --project apps/api --locked python apps/api/scripts/refresh_execution_diagnostics.py --execution-id 執行UUID --show
 ```
 
-兩個範圍參數擇一；不用 API key。資料庫須已升級到目前 migration；若尚未升級，先沿[更新流程](#更新已有安裝)停妥 App 並升級資料庫，不是每次查詢都遷移。沒有 execution 的既存空檔案回報 0 筆，找不到的 UUID 則報錯。若權限、migration、原生紀錄解碼或並行更新出錯，整次匯入回滾，原診斷副本仍保留。終端只印成功筆數或錯誤類別，避免洩露私人 payload。
+兩個範圍參數擇一；不用 API key。資料庫須已升級到目前 migration；若尚未升級，先沿[更新流程](#更新已有安裝)停妥 App 並升級資料庫，不是每次查詢都遷移。
+
+匯入結果按以下方式判讀：
+
+- 沒有 execution 的既存空檔案回報 0 筆；找不到的 UUID 則報錯。
+- 權限、migration、原生紀錄解碼或並行更新出錯時，整次匯入回滾，原診斷副本仍保留。
+- 終端只印成功筆數或錯誤類別，避免洩露私人 payload。
 
 DataGrip 展開 `caliburn → views`，可直接雙擊下列 VIEW，再用 `job_file_id` 或 `execution_id` 篩選：
 
@@ -165,9 +199,11 @@ DataGrip 展開 `caliburn → views`，可直接雙擊下列 VIEW，再用 `job_
 | `diagnostic_model_steps` | 一份已保存的邏輯請求；可能尚無回應，不等於已外送或業務 Step 已完成 | role、request_id、response_state、response_order、request（instructions、input、tools）、response（輸出與 usage）、原請求及回應的 checkpoint／source、snapshot_at |
 | `diagnostic_tool_calls` | 上述回應的一次 function call | 工具名稱、原 arguments、call_id、可空的 operation_id、對應 output、結果是否已保存 |
 
-例如整個檔案的操作：
+`0029_diagnostic_tool_operations` 增加操作識別；需先沿既有更新流程套用 forward migration，再 refresh 診斷副本。投影只安全讀取原 response 的 UUID／null `operation_seed`，以既有 `uuid5(seed, call_id)` 規則計算。沒有 seed 的舊副本為 null，不按相同正文猜命令。
 
-`0029_diagnostic_tool_operations` 增加操作識別；需先沿既有更新流程套用 forward migration，再 refresh 診斷副本。投影只安全讀取原 response 的 UUID／null `operation_seed`，以既有 `uuid5(seed, call_id)` 規則計算，沒有 seed 的舊副本為 null，不按相同正文猜命令。`result_state=not_recorded` 只表示工具輸出未保存，仍可用 operation ID 查已提交的業務結果。複合 JD 命令以根 command ID 對應 `jd_operations.result_payload`；舊衍生操作依其既有修訂因果查閱。此 view 及 JSON metadata 是可重建診斷副本，不參與正式恢復或重送。
+`result_state=not_recorded` 只表示工具輸出未保存，仍可用 operation ID 查已提交的業務結果。複合 JD 命令以根 command ID 對應 `jd_operations.result_payload`；舊衍生操作依既有修訂因果查閱。這些 view 及 JSON metadata 是可重建的診斷副本，不參與正式恢復或重送。
+
+以下分別查整份檔案、單次執行的工具及模型請求：
 
 ```sql
 SELECT * FROM caliburn.diagnostic_execution_history
@@ -184,9 +220,23 @@ WHERE execution_id = '換成執行UUID'::uuid
 ORDER BY response_order;
 ```
 
-`request` 是保存的當時請求（敏感欄位已遮蔽），可展開 JSON 看 Context、指引與工具說明。`response_state=request_only` 表示尚未找到已保存回應，不能推定未外送；`recorded` 才有原回應。`response_order` 為相容保留的欄位名，表示邏輯請求的觀察順序，不是重試次數或跨程序精確時鐘。原請求與後續回應的 checkpoint／source 分列，避免用後來的回應時間冒充請求捕捉時間。
+#### 請求、回應與版本欄位
 
-`captured_initial_context` 保存原始 binding、request 及來源，可核當輪固定的 Memory／Plan 版本；`current_published_snapshot_id` 是查詢當下的 Memory head，`published_snapshot_ids` 是這次 execution 發布的快照，三者不能互換。Context 中有導覽或工具可用，不表示模型已讀過正文；實際讀取依工具呼叫及回傳查證。CLI `--show` 輸出同一份受控副本，包含工作正文，不能導入一般 Log 或提交 Git。
+`request` 是保存的當時請求（敏感欄位已遮蔽），可展開 JSON 看 Context、指引與工具說明。
+
+| 欄位或值 | 判讀方式 |
+|---|---|
+| `response_state=request_only` | 尚未找到已保存回應，不能推定未外送；`recorded` 才有原回應 |
+| `response_order` | 為相容保留的欄位名，表示邏輯請求的觀察順序；不是重試次數或跨程序精確時鐘 |
+| `captured_initial_context` | 保存原始 binding、request 及來源，可核當輪固定的 Memory／Plan 版本 |
+| `current_published_snapshot_id` | 查詢當下的 Memory head |
+| `published_snapshot_ids` | 這次 execution 發布的快照 |
+
+原請求與後續回應的 checkpoint／source 分列，避免用後來的回應時間冒充請求捕捉時間。三個 Context／快照欄位不能互換；Context 中有導覽或工具可用，也不表示模型已讀過正文，實際讀取依工具呼叫及回傳查證。
+
+CLI `--show` 輸出同一份受控副本，包含工作正文，不能導入一般 Log 或提交 Git。
+
+#### 查回業務寫入
 
 要看本輪資料庫實際寫了什麼，再 JOIN 既有操作表；讀工具不一定有業務操作，一次工具也可能產生多筆操作：
 
@@ -202,7 +252,7 @@ ORDER BY o.created_at, o.command_id;
 
 這個排列用於查閱，不宣稱同時間戳的 command_id 順序就是操作發生順序；修訂因果查 `expected_revision_id → result_revision_id`。`jd_candidate_status = adopted` 才表示本輪候選已採用；工具成功訊息本身不表示整輪已提交。
 
-**判讀界線：**
+#### 判讀界線
 
 - 總覽的業務狀態、正式訪談序號與嘗試統計是即時 JOIN；模型／工具正文是 `snapshot_at` 那次擷取。`snapshot_at IS NULL` 表示尚未匯入，兩種計數也為 null；`saved_response_count` 只計已有回應，`request_only_count` 另計只有請求。新進展須再次執行匯入命令，DataGrip Refresh 本身不會解碼新增 checkpoint。
 - `recorded` 只表示取得工具回傳，內容仍可能是錯誤；`not_recorded` 表示未找到保存結果，不能推定未執行或失敗。正式效果仍由 JD／Memory 原結果判定。
@@ -218,9 +268,15 @@ ORDER BY o.created_at, o.command_id;
 
 `supervisor.monitor_failed` 表示背景監督迴圈中止，`supervisor.release_failed` 表示收尾釋放失敗；用 `execution_kind`、`operation`、`failure_kind` 定位。這些事件可能發生在尚未選定工作時，因此不捏造 execution ID，也不輸出原始例外正文。正常取消不記成監督失敗。
 
-`memory.evidence_invalid` 表示某份檔案的 Memory 准入證據損毀；以 `job_file_id`、`execution_id`、`command_id` 及固定 `failure_kind` 查回原操作。execution 識別屬於該筆證據，不一律是 Memory batch，所以此事件不推測 `execution_kind`。該檔案暫不准入 Memory，其他檔案照常處理；相同證據持續異常不每秒重複記錄。重啟不會修好損毀資料。先依原件與正式關聯定位，再按資料操作授權處理；監督本身不改寫原件。證據修復後，既有唯讀探索與 claim 會重新核對，不能把這個恢復誤認為未知模型請求可以重送。完整邊界見[Memory 背景工作](../implementation/agent-supervision.md#5-memory-背景工作)。
+`memory.evidence_invalid` 表示某份檔案的 Memory 准入證據損毀；以 `job_file_id`、`execution_id`、`command_id` 及固定 `failure_kind` 查回原操作。execution 識別屬於該筆證據，不一定是 Memory batch，因此事件不推測 `execution_kind`。
 
-輸出使用容量 1024 的非阻塞佇列，滿時捨棄新紀錄；後續可用事件會附累計 `logging_dropped_records`／`logging_output_failures`，不能把沒看到 Log 當作沒發生。正常關閉最多等待 1 秒排出；程序意外終止可能遺失尾端 Log，可靠結果沿 PostgreSQL／checkpoint 核對。原生終端不自動保存檔案；Docker 沿 Compose 的 local driver 輪替，每檔 10 MB、最多 3 檔。格式規範見[工程文件](../standards/coding-standard.md#72-log-的格式責任與查閱)。
+該檔案暫不准入 Memory，其他檔案照常處理；同一證據持續異常時，不會每秒重複記錄。重啟不會修好損毀資料，須先依原件與正式關聯定位，再按資料操作授權處理；監督本身不改寫原件。證據修復後，唯讀探索與 claim 會重新核對，這不代表未知模型請求可以重送。完整邊界見[Memory 背景工作](../implementation/agent-supervision.md#5-memory-背景工作)。
+
+#### 日誌容量與保存
+
+輸出使用容量 1024 的非阻塞佇列，滿時捨棄新紀錄；後續可用事件會附累計 `logging_dropped_records`／`logging_output_failures`，不能把沒看到 Log 當作沒發生。
+
+正常關閉最多等待 1 秒排出；程序意外終止可能遺失尾端 Log，可靠結果沿 PostgreSQL／checkpoint 核對。原生終端不自動保存檔案；Docker 沿 Compose 的 local driver 輪替，每檔 10 MB、最多 3 檔。格式規範見[工程文件](../standards/coding-standard.md#72-log-的格式責任與查閱)。
 
 ## 資料庫與備份
 
@@ -232,11 +288,23 @@ ORDER BY o.created_at, o.command_id;
 | 可重建的整合測試 | 保存 fixture、命令與必要結果，完成後只回收本次建立的 schema／容器／volume；中斷留下的資源另核對，不全域 prune |
 | 已結案研究實驗 | 保留足以支持結論的設定、輸入、結果、評分及必要 trace；已有 Git／遠端原件的不重複封存。只有還需重播保存狀態時才保留 database／checkpoint |
 
-需要保留資料庫時，使用 `pg_dump -Fc` 保存整個 database，不以 `-n` 只挑部分 schema；業務資料與 checkpoint 必須一起保存。多個 database 分別匯出，角色等 cluster 級資訊另用 `pg_dumpall --globals-only --no-role-passwords` 保存。OpenAI key 另行提供，角色密碼與本機設定不放入封存附件；瀏覽器 localStorage／sessionStorage 不作正式資料備份。相關工具契約見 [PostgreSQL 備份文件](https://www.postgresql.org/docs/18/backup.html)與 [pg_dumpall](https://www.postgresql.org/docs/18/app-pg-dumpall.html)。
+### 備份範圍
 
-備份與來源資料比較使用同一快照，避免使用中的資料持續更新造成錯判。先在自有隔離環境還原，核對 schema／table、資料筆數與必要內容摘要，保存命令結果；`pg_restore --list` 只能檢查目錄，不能代替實際還原。移除舊資料前，再確認 App 沒有使用該目標、備份後未新增需保留資料、遠端下載雜湊相同。不能手動刪 WAL，或直接壓縮運作中的資料目錄代替一致性備份。
+- 使用 `pg_dump -Fc` 保存整個 database，不以 `-n` 只挑部分 schema；業務資料與 checkpoint 必須一起保存。
+- 多個 database 分別匯出。角色等 cluster 級資訊另用 `pg_dumpall --globals-only --no-role-passwords` 保存。
+- OpenAI key 另行提供，角色密碼與本機設定不放入封存附件；瀏覽器 localStorage／sessionStorage 不作正式資料備份。
+
+相關工具契約見 [PostgreSQL 備份文件](https://www.postgresql.org/docs/18/backup.html)與 [pg_dumpall](https://www.postgresql.org/docs/18/app-pg-dumpall.html)。
+
+### 還原核對與存放
+
+備份與來源資料比較使用同一快照，避免使用中的資料持續更新造成錯判。先在自有隔離環境還原，核對 schema／table、資料筆數與必要內容摘要，保存命令結果；`pg_restore --list` 只能檢查目錄，不能代替實際還原。
+
+移除舊資料前，再確認 App 沒有使用該目標、備份後未新增需保留資料、遠端下載雜湊相同。不能手動刪 WAL，或直接壓縮運作中的資料目錄代替一致性備份。
 
 資料庫備份及未公開材料使用另行授權的受控保存位置，不放公開 repository 或其 Releases。取得備份後先核對清單中的 SHA-256，再在隔離 PostgreSQL 還原；不直接覆蓋日常資料庫。備份須一併保存還原方式與所需版本。
+
+### 測試資料收尾與驗證界線
 
 已確認僅含合成測試資料、且所需研究原件已有保存的舊環境，可以依清理授權直接回收，不必為了清理再建立永久完整備份。清理記錄須指出保留證據的位置，以及不再保留舊 DB 重播能力的取捨。資料用途未明或仍供日常使用時不套用這項規則。
 
@@ -253,25 +321,3 @@ ORDER BY o.created_at, o.command_id;
 新工作的暫存沿 `.tmp/` 放置；結束前將必要證據保存至責任文件指定位置，再核對清理範圍。長期執行環境與資料庫應有明確的保存位置，遷移時同步更新設定並驗證啟動，不直接移除目前使用的路徑。
 
 每批暫存使用能辨認用途的目錄，記錄來源、是否仍使用及收尾條件。已結案的研究保存結果與必要原件，依賴保留 lockfile／重建方式；除錯暫留的資料須有明確理由與下次清理條件。維護清單只記尚需處理的本機資源，完成後移除，不再累積第二份永久待辦。
-
-## 其他操作入口
-
-<a id="快速開始"></a>
-<a id="首次啟動"></a>
-
-首次安裝與啟動已集中至[第一次使用](getting-started.md)。
-
-<a id="服務與版本"></a>
-<a id="安裝依賴"></a>
-<a id="第一次初始化"></a>
-<a id="ai-credential"></a>
-<a id="日常啟動與停止"></a>
-<a id="pdf-匯出"></a>
-<a id="驗證"></a>
-
-工具版本、安裝依賴、原生資料庫／AI／PDF 設定、開發啟停及測試見[原生開發](native-development.md)。
-
-<a id="含公版參考的-docker-模式"></a>
-<a id="rag獨立服務非-jd-app-預設依賴"></a>
-
-公版模式與獨立管線的操作見[公版參考與 RAG](rag.md)。本節保留舊連結的閱讀去向，完整步驟只在對應頁維護。

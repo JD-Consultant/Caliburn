@@ -127,7 +127,7 @@ $env:CALIBURN_PDF_FONT_PATH = 'C:/path/to/licensed/NotoSansTC-VF.ttf'
 
 ## 驗證
 
-產品不以預估美元金額攔截 A／B1／B2；`CALIBURN_TURN_MAX_COST_USD` 已退役。token 容量、壓縮門檻、呼叫／重試及時間限制仍有效。用量估算供診斷，不是 provider 帳單；付費驗證腳本須另以 manifest 設定有限預算，見[執行 §5.8](../../docs/implementation/agent-execution.md#58-產品與付費驗證的金額界線)。
+產品不以預估美元金額攔截 A／B1／B2；`CALIBURN_TURN_MAX_COST_USD` 已退役。token 容量、壓縮門檻、呼叫／重試及時間限制仍有效。用量估算供診斷，不是 provider 帳單；付費驗證腳本須另以 manifest 設定有限預算，見[模型外送 §7](../../docs/implementation/model-requests.md#7-產品與付費驗證的金額界線)。
 
 ### 測試與檢查
 

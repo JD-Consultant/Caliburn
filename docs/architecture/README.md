@@ -4,13 +4,21 @@ Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據�
 
 本頁先說明產品旅程，再按責任列出架構主題。需求與使用情境見[產品介紹](../product/README.md)。各主題正文維護現行規則，未驗效果由驗證章節說明。
 
-圖面在本文中閱讀；修改時由各圖旁的「圖源」連結進入獨立 Mermaid 檔。[圖源索引](../diagrams/README.md)集中提供查找與重繪方式。
+本文直接呈現圖面；修改時可從圖旁的「圖源」連結開啟獨立 Mermaid 檔。查找與重繪方式見[圖源索引](../diagrams/README.md)。
 
 ## 第一次閱讀
 
-先讀完本頁，再依序看[系統責任](system-boundaries.md)、[資料如何保存](persistence.md)及[互動與部署](delivery-and-operations.md)。這條路線先回答產品如何工作，再說明它怎麼運作；需要修改程式時，才進入[實作目錄](../implementation/README.md)。查單一功能可直接用下方索引，不必先讀歷史 ADR 或全部設計稿。
+先讀完本頁，再依序閱讀：
 
-一份**職務檔案**是一組彼此隔離的訪談、JD、工作記憶及工作計畫。文中的 **A** 是與員工對話、分析並編修 JD 的顧問角色；**B1** 在背景整理具體工作情境，**B2** 再整理工作理解，兩者的成果共同形成 Memory。它們是 AI 分工名稱，不表示三個獨立服務。
+1. [系統責任](system-boundaries.md)：理解產品流程與模組分工。
+2. [資料如何保存](persistence.md)：理解資料保存與正式採用。
+3. [互動與部署](delivery-and-operations.md)：理解畫面與程序如何協作。
+
+需要修改程式時，再進入[實作目錄](../implementation/README.md)。查單一功能可直接用下方索引，不必先讀歷史 ADR 或全部設計稿。
+
+一份**職務檔案**是一組彼此隔離的訪談、JD、工作記憶及工作計畫。
+
+文中的 **A** 是與員工對話、分析並編修 JD 的顧問角色；**B1** 在背景整理具體工作情境，**B2** 再整理工作理解，兩者的成果共同形成 Memory。它們是 AI 分工名稱，不表示三個獨立服務。
 
 | 讀到的名稱 | 先這樣理解；完整責任另見對應章節 |
 |---|---|
@@ -24,11 +32,9 @@ Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據�
 
 這些名稱的權限與彼此關係由[系統責任](system-boundaries.md)維護；保存、正式資格及恢復條件由[資料與交易](persistence.md)維護。
 
-<a id="一眼看懂產品邊界與主要能力"></a>
-
 ## 一眼看懂：操作者的主要流程
 
-**現行基本流程圖：操作者選擇下一步。** 終端形為起訖，矩形為操作，菱形為選擇，平行四邊形為輸出；箭頭表示操作順序，依[讀圖約定](../diagrams/README.md#讀圖約定)。背景整理不列為訪談的前置步驟，此圖也不指定 Agent 的工作順序。
+下圖呈現操作者選擇下一步的現行流程。箭頭表示操作順序；背景整理不列為訪談的前置步驟，也不指定 Agent 的工作順序。形狀與路徑匯合的含義見圖內圖例及[讀圖約定](../diagrams/README.md#讀圖約定)。
 
 <!-- diagram: product-activities -->
 
@@ -51,15 +57,15 @@ Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據�
 
 ### 依問題找圖與表
 
-圖表放在負責解釋該問題的文件，不在入口再複製一份。第一次閱讀先選「整體」欄；只有需要處理細節時，才進入執行、資料表或測試文件。
+圖表放在負責解釋該問題的文件，入口只提供索引。第一次閱讀先選「整體」欄，需要細節時再進入執行、資料表或測試文件。
 
 | 想先弄懂的問題 | 整體圖表 | 深入時再讀 |
 |---|---|---|
 | 誰使用產品，哪些部分在本機、哪些在外部？ | [系統情境與容器](system-boundaries.md#2-app-拆開後有哪些責任)、[部署圖](delivery-and-operations.md#2-最小部署視角) | [靜態程式依賴](../standards/code-organization.md#2-依賴方向與可檢查限制) |
-| 一次員工回答如何成為 JD 的一部分？ | [正式採用與交易](persistence.md) | [模型與工具 Step](../implementation/agent-execution.md#46-有界多-step-接續) |
+| 一次員工回答如何成為 JD 的一部分？ | [正式採用與交易](persistence.md) | [模型與工具 Step](../implementation/agent-execution.md#44-有界多-step-接續) |
 | 暫停、取消或中斷後怎麼辦？ | [共用執行與恢復](../implementation/agent-execution.md)、[提交後恢復時序](persistence.md#4-重試取消與執行恢復) | [外送重試流程](../implementation/model-requests.md#5-單一外送重試責任) |
 | 背景整理如何與下一輪訪談並行？ | [A／B1／B2 角色表](system-boundaries.md#3-ai-分析角色共用執行機制分別處理工作)、[正式採用與交易](persistence.md) | [Memory 保存關係](../implementation/memory-storage.md#2-保存表示固定修訂而非資料庫舊列) |
-| Plan 的本輪安排何時能供後輪接續？ | [Plan 採用流程](persistence.md#plan-從本輪候選到後輪可採用) | [Plan 保存與採用](persistence.md#plan-從本輪候選到後輪可採用) |
+| Plan 的本輪安排何時能供後輪接續？ | [Plan 採用流程](persistence.md#plan-從本輪候選到後輪可採用) | [正文修改機制](../implementation/memory-body-editing.md) |
 | 內容、版本及引用如何連在一起？ | [資料責任與固定修訂](persistence.md#1-業務資料與執行資料) | [訪談 ER](../implementation/interview-storage.md#1-原文正式資格與執行身分分開不複製原話)、[JD ER](../implementation/jd-storage.md#2-固定修訂與目前正式頭)、[Memory ER](../implementation/memory-storage.md#21-固定物件修訂) |
 | 如何知道畫面、模型與保存結果是否一致？ | [使用者操作表](delivery-and-operations.md#1-使用者看到的主要流程)、[診斷資料來源](delivery-and-operations.md#5-執行觀測與問題排查) | [SSE 時序](../implementation/interface-and-delivery.md#2-串流不是保存權威)、[驗證責任表](../implementation/verification-plan.md#1-分層測試不以-mock-冒充產品) |
 

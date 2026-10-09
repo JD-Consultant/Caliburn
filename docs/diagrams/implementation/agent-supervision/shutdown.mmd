@@ -1,0 +1,23 @@
+%% title: 現行時序：停止工作後才釋放共用資源
+%% legend: 開放箭頭：非同步啟動；實線實心箭頭：呼叫並等待；虛線箭頭：返回。省略各清理失敗路徑。
+sequenceDiagram
+    participant L as App lifespan
+    participant C as 清理 task
+    participant M as Memory supervisor
+    participant A as 顧問 supervisor
+    participant R as 其餘共用資源
+    L-)C: create_task：啟動收尾
+    L->>C: join_owned：等待清理完成
+    Note over L,C: 重複取消 lifespan 不取消這份清理 task
+    C->>M: close()
+    M->>M: 取消 monitor／runners 並等待退出
+    M-->>C: Memory 已停止
+    C->>A: close()
+    A->>A: 取消 monitor／runners 並等待退出
+    A->>M: before_leader_release：再次確認 close()
+    M-->>A: 原關閉 task 已完成
+    A->>A: 釋放 PG session 與 OS file lock
+    A-->>C: 共用領導資格已釋放
+    C->>R: 依 stack 順序關閉 CPU、客戶端、saver／PDF；最後 DB
+    R-->>C: 資源已釋放
+    C-->>L: 收尾完成

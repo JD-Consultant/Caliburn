@@ -1,8 +1,8 @@
 # 公版參考與 RAG 架構
 
-RAG 負責把公版職能基準轉成可搜尋、可回讀來源的參考資料。JD App 明示啟用 HTTP 查讀，公版用來找追問與查漏線索；員工實際負責的工作仍須由訪談確認。基本訪談、人工 JD 與 JD PDF 匯出不依賴 RAG。
+RAG 負責把公版職能基準轉成可搜尋、可回讀來源的參考資料。JD App 明示啟用後，可經 HTTP 查讀公版，尋找追問與查漏線索；員工實際負責的工作仍須由訪談確認。基本訪談、人工 JD 與 JD PDF 匯出不依賴 RAG。
 
-本頁維護元件分工、資料流及隔離邊界。啟停、設定、建索引與保存操作見 [RAG 操作手冊](../operations/rag.md)；端點與資料格式沿[公版參考 API](../../apps/ocs-indexer/README.md)。
+本頁維護元件分工、資料流及隔離邊界。啟停、設定、建索引與保存操作見 [RAG 操作手冊](../operations/rag.md)；端點與資料格式見[公版參考 API](../../apps/ocs-indexer/README.md)。
 
 ## 1. 元件與責任
 
@@ -19,10 +19,21 @@ RAG 負責把公版職能基準轉成可搜尋、可回讀來源的參考資料�
 
 ## 2. 資料如何流動
 
-1. **解析來源。** `pdf-to-json` 把 PDF 轉成 OCS JSON，正常輸出與拒絕診斷分開。解析結果與未支援版型由[PDF 轉換與來源檢核](../../apps/pdf-to-json/README.md)及批次補齊紀錄說明；有 JSON 不代表已逐字驗收原 PDF。
-2. **選版與建索引。** 操作者明示選定來源 JSON，以 `index-references` 建立獨立公版 collection，內含整份正文與任務／概述的檢索點。來源內容與 hash 固定公版身分，完整寫入後才發布就緒標記（ready manifest）。啟動服務不自動選版、解析或建索引。
-3. **搜尋與讀取。** indexer 透過模型服務計算向量與重排序，從 Qdrant 取得候選及固定來源。職位整體參考採兩路廣蒐、完整聯集重排序及公版去重；數量、評分含義與回傳格式只由[公版參考 API](../../apps/ocs-indexer/README.md)維護，不把控制初值稱為通用最佳參數。
-4. **訪談中使用。** App 經 HTTP 取得公版，顧問按需選用、讀取任務及保存員工明確否認的範圍。選用與排除資料由 App 保存，RAG 不判定 JD 已完成，也不把公版自動當成員工工作事實。角色權限與跨輪資格見[公版選用與否認資格](rag-pipeline.md#公版選用與明確否認的保存資格)。
+1. **解析來源。** `pdf-to-json` 把 PDF 轉成 OCS JSON，正常輸出與拒絕診斷分開。
+
+   解析結果與未支援版型由[PDF 轉換與來源檢核](../../apps/pdf-to-json/README.md)及批次補齊紀錄說明；有 JSON 不代表已逐字驗收原 PDF。
+
+2. **選版與建索引。** 操作者明示選定來源 JSON，以 `index-references` 建立獨立公版 collection，內含整份正文與任務／概述的檢索點。
+
+   來源內容與 hash 固定公版身分，完整寫入後才發布就緒標記（ready manifest）。啟動服務不自動選版、解析或建索引。
+
+3. **搜尋與讀取。** indexer 透過模型服務計算向量與重排序，從 Qdrant 取得候選及固定來源。
+
+   職位整體參考採兩路廣蒐、完整聯集重排序及公版去重；數量、評分含義與回傳格式只由[公版參考 API](../../apps/ocs-indexer/README.md)維護，不把控制初值稱為通用最佳參數。
+
+4. **訪談中使用。** App 經 HTTP 取得公版，顧問按需選用、讀取任務及保存員工明確否認的範圍。
+
+   選用與排除資料由 App 保存，RAG 不判定 JD 已完成，也不把公版自動當成員工工作事實。角色權限與跨輪資格見[公版選用與否認資格](rag-pipeline.md#公版選用與明確否認的保存資格)。
 
 線上查讀的服務關係重用[公版 RAG 容器圖](delivery-and-operations.md#2-最小部署視角)；該圖省略上述離線解析與建索引。既有 profile／task 管線仍保留自己的索引與 API，與職位整體參考的 collection 分開，實作見 [indexer 內部管線](../../apps/ocs-indexer/docs/pipeline.md)。
 
@@ -42,15 +53,24 @@ Docker 基本模式與公版模式共用 JD App 及 PostgreSQL；公版模式另
 ## 4. 與 JD App 的隔離及故障處理
 
 - **只經 HTTP 接入。** 正式 App 不 import `jd_ocs_indexer`、`jd_pdf_to_json`、`ocs_contract`、`indexer_contract` 或 embedder 程式。RAG 內部共用契約是預期依賴，不受 App 的套件隔離限制。
-- **由設定與部署啟用。** App 的 composition root 在配置 URL 時建立 HTTP client；未配置時不增加公版工具。服務由操作者啟動，App 程序不管理 GPU、Qdrant 或容器；工具設定只影響尚未綁定的新請求，既存工作沿原請求恢復，詳見 [API 啟用說明](../../apps/api/README.md#公版參考工具的可選啟用)。
+- **由設定與部署啟用。** 模型執行環境啟用且已配置公版 URL 時，App 的 composition root 建立 HTTP client；未配置 URL 時不增加公版工具。服務由操作者啟動，App 程序不管理 GPU、Qdrant 或容器；工具設定只影響尚未綁定的新請求，既存工作沿原請求恢復，詳見 [API 啟用說明](../../apps/api/README.md#公版參考工具的可選啟用)。
+- **連線範圍明示。** 獨立開發模式只把 Qdrant／模型服務發布到 loopback；正式 App 的公版 overlay 清除這些主機埠，由 Compose 內網連線。埠與部署差異見[部署視角](delivery-and-operations.md#2-最小部署視角)。
 - **資料各自保存。** 檢索服務不寫 JD App PostgreSQL。公版用於參考，不能直接複製成 Memory／JD 的員工工作事實；查詢正文與明確否認範圍的使用規則由公版工具契約維護。
 - **故障不能當查無資料。** 索引未 ready、模型身分不相容、無效模型回覆或連線失敗須回報錯誤，不以空結果代替，也不清除 App 已保存的選用資料。健康檢查不代替實際搜尋驗證。
 
 ### 公版選用與明確否認的保存資格
 
-公版選用與排除範圍是 App 的獨立資料用途。選用 null 表示尚未選擇，空集合表示目前沒有合適參考；select 以全集取代前次選用，但保留排除紀錄。排除只記員工明確否認的工作，未知、拒答及未回答不算否認；後續更正可以解除排除。公版選中或排除數量都不判定 JD 完成。
+公版選用與排除範圍是 App 的獨立資料用途。選用 null 表示尚未選擇，空集合表示目前沒有合適參考；select 以全集取代前次選用，但保留排除紀錄。
 
-A 的 current state 是本輪候選。跨輪或 B1／B2 查讀，只取同檔案 completed execution、匹配正式交換，且員工訊息序號不超過該工作固定 frontier F 的最新合格狀態；空集合仍覆蓋舊選擇，後輪更正不回流既有批次。已保存 request 保持原 captured 能力，不因新設定追補工具或 context。
+排除只記員工明確否認的工作，未知、拒答及未回答不算否認；後續更正可以解除排除。公版選中或排除數量都不判定 JD 完成。
+
+A 的 current state 是本輪候選。跨輪或 B1／B2 查讀時，只取同時符合以下條件的最新狀態：
+
+- 同一檔案的 completed execution。
+- 匹配正式交換。
+- 員工訊息序號不超過該工作固定 frontier F。
+
+空集合仍覆蓋舊選擇，後輪更正不回流既有批次。已保存 request 保持原 captured 能力，不因新設定追補工具或 context。
 
 候選、原操作與採用查詢由 [occupation_references feature](../../apps/api/src/caliburn/features/occupation_references/)及[讀取工作流](../../apps/api/src/caliburn/workflows/occupation_reference_reads.py)實作；模型工具 shape 沿[工具 Schema](../../apps/api/contracts/tools/)。
 

@@ -2,7 +2,7 @@
 
 Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據的職務說明書（JD）。本機 Web 工作區提供訪談與編輯，後端協調 AI 分析、業務規則及資料保存；背景 Memory 支援長訪談，來源關係讓人回查分析與 JD 的依據。
 
-本頁先說明產品旅程，再分成五個架構主題。需求與使用情境見[產品介紹](../product-introduction.md)；連貫的案例解說見[系統架構報告](../reports/system-architecture/README.md)。現行狀態與目標調整沿[目前決策](../current-decisions.md)核對。
+本頁先說明產品旅程，再分成五個架構主題。需求與使用情境見[產品介紹](../product-introduction.md)。現行狀態與目標調整沿[目前決策](../current-decisions.md)核對。
 
 圖面在本文中閱讀；修改時由各圖旁的「圖源」連結進入獨立 Mermaid 檔。[圖源索引](../diagrams/README.md)集中提供查找與重繪方式。
 

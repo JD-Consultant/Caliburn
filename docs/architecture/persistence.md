@@ -121,4 +121,4 @@ A 判斷需要整理時，先透過 `request_memory_consolidation` 保存整理�
 
 依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，公版來源由獨立 RAG 管理；App 只保存選用公版與員工明確否認的工作範圍，兩者不寫入 Memory／JD。取消或失敗的候選不得供下一輪採用，B1／B2 也只能讀其固定上界內有效的排除範圍。
 
-資料資格與格式以[公版 state 契約](../specs/2026-10-04-public-reference-completion-design.md)為準；角色設定、原請求恢復及讀寫接線見[執行接線](../implementation/agent-execution.md)。模型成功回傳是業務結果的精簡投影，不另成資料權威。故障注入與覆蓋範圍見[接線紀錄](../experiments/engineering/README.md#角色接線)。
+資料資格與格式以[公版 state 契約](../specs/2026-10-04-public-reference-completion-design.md)為準；角色設定、原請求恢復及讀寫接線見[執行接線](../implementation/agent-execution.md)。模型成功回傳是業務結果的精簡投影，不另成資料權威。

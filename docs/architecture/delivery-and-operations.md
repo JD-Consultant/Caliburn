@@ -106,9 +106,9 @@ App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景
 | 程式如何記錄事件、工具及可比較證據 | [觀測與 Log 規範](../implementation/coding-standard.md#71-讓執行證據可查可比較可驗證) |
 | 診斷讀取、遮蔽及副本由誰負責 | [程式組織](../implementation/code-organization.md#1-目錄依業務責任組織機制集中在少數邊界) |
 | 如何依原工作查 Context、工具及綁定 | [本機診斷操作](../runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄) |
-| 工程反例驗到哪裡 | [審查證據](../plans/evidence/full-system-review-2026-10-08.md) |
+| 工程反例驗到哪裡 | 審查證據 |
 
-現行尚未導入獨立 metrics／trace 平台。後續可依診斷、測試與維護收益比較現成方案，仍須保留正式資料權威、失敗處理及敏感內容的存取／外送界線；選型不等於已接入。候選與依據見[工程研究](../research/engineering/2026-10-08-full-stack-engineering-practices.md)。
+現行尚未導入獨立 metrics／trace 平台。後續可依診斷、測試與維護收益比較現成方案，仍須保留正式資料權威、失敗處理及敏感內容的存取／外送界線；選型不等於已接入。
 
 ## 6. 產品範圍與成效評估
 

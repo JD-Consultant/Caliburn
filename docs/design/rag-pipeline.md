@@ -98,7 +98,7 @@ Docker 公版模式使用 `compose.jd-app.rag.yaml`，以 `pnpm docker:rag:up` �
 ## 4. 資料落地位置
 
 下表保留原 corpus 與既有 profile／task 索引的位置及數量，不能當作本次已選版或已通過解析的統計。
-後續補齊結果見[JSON 補齊紀錄](../experiments/2026-10-04-ocs-json-repair/README.md)。
+後續補齊結果見JSON 補齊紀錄。
 
 | 資料 | 路徑 | 數量 |
 |---|---|---|
@@ -138,7 +138,7 @@ PostgreSQL；JD App 的資料庫也不由本 Compose 建立。
 - [ADR 0057](../adr/0057-current-only-runtime-and-data-boundary.md) — 歷史 Proposed 討論稿；Decision 5 記錄當時 RAG 保留＋隔離的取捨。
 - [`docs/specs/2026-08-11-rag-bounded-context-retention-design.md`](../specs/2026-08-11-rag-bounded-context-retention-design.md)
   — 恢復範圍、隔離原則與研究來源。
-- [`docs/plans/2026-08-11-rag-bounded-context-retention-plan.md`](../history.md#source-0f1ee13f53bc33d4050e)
+- 當時的內部紀錄
   — 逐 task 執行計畫與驗收條件。
 - [`apps/pdf-to-json/README.md`](../../apps/pdf-to-json/README.md)、
   [`apps/ocs-indexer/README.md`](../../apps/ocs-indexer/README.md)、

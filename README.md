@@ -40,9 +40,7 @@ Caliburn 在本機啟動後，透過瀏覽器操作。AI 訪談需要 OpenAI API
 ## 延伸閱讀
 
 - [產品介紹](docs/product-introduction.md)：使用情境、需求與產品價值。
-- [專題報告](docs/reports/project-report/report.md)：方法、實驗與成果。
-- [系統架構報告](docs/reports/system-architecture/README.md)：程式分工、資料保存與分析接續。
-- [文件導覽](docs/README.md)：開發、維護、研究與驗證資料。
+- [文件導覽](docs/README.md)：開發、架構、維護與驗證責任。
 
 ## 授權
 

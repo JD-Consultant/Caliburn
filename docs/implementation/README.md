@@ -9,11 +9,11 @@
 | 開始工作前要確認 | 閱讀入口 |
 |---|---|
 | 產品應達成什麼、哪些規則不能改 | [架構與責任文件](../architecture/README.md) |
-| 有效狀態、後續工作及施工範圍 | [目前決策](../current-decisions.md)、[計畫入口](../plans/README.md) |
+| 有效狀態、後續工作及施工範圍 | [目前決策](../current-decisions.md)、計畫入口 |
 | 研究、SDD、TDD、審查與長任務接手 | [開發規範](development-standard.md)；接手方式見 [§10](development-standard.md#10-長任務goal-與工作上下文) |
 | 選哪些框架、為何、不選什麼 | [技術選型與機制驗證](technology-decisions.md) |
 | 模組、命名、依賴與 Prompt／Tool 替換 | [程式組織與命名](code-organization.md)；對照公平性沿[開發規範 §7](development-standard.md#7-分析方法prompttool-與-context-共同驗收) |
-| 前後端寫法、錯誤、測試與觀測 | [程式撰寫規範與實例](coding-standard.md)，含 [Log 格式與查閱](coding-standard.md#72-log-的格式責任與查閱)；依據見[全系統工程研究](../research/engineering/2026-10-08-full-stack-engineering-practices.md) |
+| 前後端寫法、錯誤、測試與觀測 | [程式撰寫規範與實例](coding-standard.md)，含 [Log 格式與查閱](coding-standard.md#72-log-的格式責任與查閱)；依據見全系統工程研究 |
 | 工程文件如何分工、拆合、敘述與繪圖 | [文件與圖面規範](documentation-standard.md) |
 
 ### 依改動範圍讀接線
@@ -32,7 +32,7 @@
 | 工作畫面、JD 人工編輯、草稿與鍵盤互動如何接 | [Web 工作畫面](web-workspace.md) |
 | HTTP、公開串流、來源回查、PDF 及本機服務如何交付 | [介面與交付](interface-and-delivery.md) |
 
-驗證需求與測試層級看[驗證對照](verification-plan.md)；既有結果與尚未覆蓋範圍看[架構驗證](../architecture/verification.md)及[產品實驗](../experiments/product-validation/README.md)。最後核對相關程式與測試，任務摘要不能取代完整契約。
+驗證需求與測試層級看[驗證對照](verification-plan.md)；既有結果與尚未覆蓋範圍看[架構驗證](../architecture/verification.md)及產品實驗。最後核對相關程式與測試，任務摘要不能取代完整契約。
 
 ## 文件維護責任
 

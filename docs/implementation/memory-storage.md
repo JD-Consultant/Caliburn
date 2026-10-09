@@ -1,6 +1,6 @@
 # Memory 保存接線
 
-- 狀態：**現行 Memory 保存責任** 。候選、固定修訂、角色交接與背景發布依下列機制運作。最終失敗後，正式訪談再前進三輪才允許一次新批次；此解除政策仍待確認，且未在真長旅程自然觸發，見[Memory 背景調度](agent-supervision.md#5-memory-背景工作)。驗證見[保存](../history.md#source-8181e62e2e98ac941ed9)與[背景工作](../history.md#source-14d692c99a98b4e9954e)。
+- 狀態：**現行 Memory 保存責任** 。候選、固定修訂、角色交接與背景發布依下列機制運作。最終失敗後，正式訪談再前進三輪才允許一次新批次；此解除政策仍待確認，且未在真長旅程自然觸發，見[Memory 背景調度](agent-supervision.md#5-memory-背景工作)。驗證見保存與背景工作。
 - 上位責任：[資料保存 §2–4](../architecture/persistence.md#2-不可變修訂與發布快照)、[B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[內容與引用修改](../specs/2026-09-27-memory-object-update-tool-contract.md)、[title 解析](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#4-定位與權限界線)。接線總則見 [data-and-contracts §3](data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 
 | 維護問題 | 閱讀位置 |
@@ -143,4 +143,4 @@ Memory 領域模組不保存原生模型 request，也不提供全歷史模型�
 
 單次 read 先捕捉位置，再沿固定選用投影，避免 [Read Committed](https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED) 下多次 latest 查詢混入不同提交；並行工作各用[獨立 AsyncSession](https://docs.sqlalchemy.org/en/21/orm/extensions/asyncio.html#using-asyncsession-with-concurrent-tasks)。這些官方機制支持本案接法，具體 schema 仍是 Caliburn 的取捨。
 
-此接縫的行為驗證須涵蓋「候選看新／歷史看舊／發布成同一鏈」、刪除多個理解共用情境的全成全拒，以及改回舊字串、舊 writer／回退分支與發布確認遺失。驗證入口見[保存證據](../history.md#source-8181e62e2e98ac941ed9)。所有已發布快照與可達依據不自動清理；候選／checkpoint 保留依[資料保留政策](../architecture/persistence.md#6-保留失效與清理)。
+此接縫的行為驗證須涵蓋「候選看新／歷史看舊／發布成同一鏈」、刪除多個理解共用情境的全成全拒，以及改回舊字串、舊 writer／回退分支與發布確認遺失。所有已發布快照與可達依據不自動清理；候選／checkpoint 保留依[資料保留政策](../architecture/persistence.md#6-保留失效與清理)。

@@ -9,7 +9,7 @@ Caliburn 的正式產品是本機 Web AI 職務分析與職務說明書 App。�
 ```text
 apps/api/        Python 3.14／FastAPI／LangGraph／PostgreSQL 後端（A／B1／B2、JD、Memory、PDF）
 apps/web/        React／TypeScript／MUI 介面
-docs/            ADR、研究、設計、計畫、證據與 runbook
+docs/            ADR、架構、契約、開發規範與 runbook
 ```
 
 `experiments/jd-relational-app` 與 `packages/consultant-memory` 的程式已退役，只保留研究與沿革
@@ -67,8 +67,7 @@ pnpm check
 測試，以及契約生成核對與 production build。真 PostgreSQL、真瀏覽器及真模型驗收仍依各計畫明示執行
 （見[後端 README](apps/api/README.md#測試與檢查)）；離線綠燈不能冒充 provider 或 UI 證據。
 
-使用 Conventional Commits，一個可審工作單位一個 commit，不加工具署名。保留他人未提交內容；不要把研究、
-設計、實驗或結果文件當成舊程式刪除。未經 Owner 明確要求，不 push、merge、發布或執行付費模型驗證。
+使用 Conventional Commits，一個可審工作單位一個 commit，不加工具署名。保留他人未提交內容；研究、計畫、實驗原件與報告只留本機；公開提交保留程式、必要測試與架構／開發文件。未經 Owner 明確要求，不 push、merge、發布或執行付費模型驗證。
 
 ## 隔離 RAG
 

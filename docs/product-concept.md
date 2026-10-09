@@ -4,7 +4,6 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 
 產品設計圍繞三件事：把工作說清楚、持續累積可回查的工作資訊，以及形成有根據的 JD。本章定義產品中的資訊與成果界線；各模組如何實現這些概念，見[架構導覽](target-architecture-map.md)，實驗結果見[驗證與限制](architecture/verification.md)。
 
-
 ## 產品目標與價值
 
 產品要讓員工只需說明工作、回答必要的釐清問題，就能逐步取得忠於實際工作、涵蓋主要責任、精簡而高訊號的 JD。員工不必先學會 JD 專業方法，也不必親自代寫；人工編輯是可用能力，不是 AI 達成撰稿品質的必要前提。
@@ -18,7 +17,6 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 - JD 改動有可回查的依據，候選與正式結果清楚分開，已成立成果可靠保存；中斷時能依實際保存結果恢復或安全結束。
 
 成功不以欄位填滿、功能數量、模型步數或訪談越短判定。JD 品質、真人顧問投入、員工準備／學習時間、訪談及修正時間須分開衡量。
-
 
 ## 核心概念與資訊關係
 
@@ -36,7 +34,6 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 
 整理出的情境與理解不能覆蓋原話，人工 JD 修改也不自動成為訪談事實或反向改寫 Memory。各層都須保留時間與適用範圍，才能分辨目前職責、過去工作、他人責任與未來願望。
 
-
 ## 使用旅程
 
 這是代表性旅程，分析與編修可反覆進行，不要求固定輪數或每輪改稿。
@@ -47,13 +44,11 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 4. **回看與接續。** 使用者可查看 AI 改動、候選及來源，依狀態暫停、續作或取消顧問工作；長訪談可分次進行。
 5. **取得目前成果。** 隨時匯出目前正式 JD 為 PDF；需要時繼續訪談與修稿，不以匯出結束分析或宣告品質達標。
 
-
 ### JD 與成果界線
 
 人與 AI 編修同一份結構化 JD，但模型本輪改動先作候選，完整成功後才正式採用。畫面可預覽候選，PDF 只取目前正式稿，不含本輪未提交內容、受訪員工姓名或整份訪談／Memory。已完成輪的 JD 改動可在安全條件成立時撤回；撤回不刪訪談或 Memory，也不能覆蓋後續修改。
 
 「已正式保存」與「完整可交付」是不同判斷。長期品質目標是重要工作有適當表達、JD 各項主張有根據且不重複堆砌細節；若仍有會改變職責判斷的未知或衝突，就不能宣稱完整成品。專用全稿審核目前暫緩，匯出不表示已通過審核，也不新增隱含的審核流程或自動通過門檻。內容判準依[工作分析指南](guides/2026-09-09-complete-work-analysis-guide.md)與[JD 寫作指南](guides/2026-09-09-jd-field-and-writing-guide.md)。
-
 
 ## 保存、正式資格與使用者控制
 
@@ -65,9 +60,7 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 
 正式完成、暫停、取消與失敗有不同處理方式。各狀態的轉換見[核心生命週期](specs/2026-09-29-core-value-loop-lifecycle.md)，保存與恢復見[資料與交易](architecture/persistence.md)，畫面呈現見[互動與運作](architecture/delivery-and-operations.md)。
 
-
 ## 支援長訪談的能力
-
 
 ### 分層工作記憶
 
@@ -76,7 +69,6 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 已知部分可以保留，未知不能靠猜補；重要但暫時無法歸屬的工作線索不應沉沒。工作情境保留具體差異，工作理解保留適用範圍及有據認識，兩者都不是預先填好的 JD。線索保留與情境切分的真實品質仍須以不同職位核對，不能由資料格式合法推定。
 
 導覽、來源與差異幫助按需閱讀及重評，不代替語意分析。背景最終失敗時，顧問仍能使用已發布 Memory 與有效原話繼續訪談；舊 Memory 不會被誤標為已更新。完整流程與再整理政策見[背景生命週期](specs/2026-09-25-b1-b2-information-gap-lifecycle.md)。
-
 
 ### 上下文與分析接續
 
@@ -88,7 +80,6 @@ App 自主管理模型輸入與接續政策：選擇合法資料、固定當輪�
 
 工具的名稱、輸入及回傳也是上下文設計的一部分。App 管理已知的身分、範圍與版本，模型只填需要判斷的內容。精簡回傳仍保留定位、引用與實際操作結果，讓模型可以接著工作；token 減少只有在分析品質維持時才有意義。Context 組裝與壓縮見[顧問 Context](specs/2026-09-26-consultant-context-and-state-design.md)，Step 安全點與恢復見[共用執行](specs/2026-09-27-shared-agent-execution-and-state-design.md)。
 
-
 ## 現行範圍與非目標
 
 - 產品為單一操作者的本機 Web 應用，不提供多人協作、登入／ACL、多租戶、計費或雲端部署。訪談與 JD 可能含個人及企業資訊，外送與金鑰管理見[安全邊界](architecture/delivery-and-operations.md#4-信任與權限邊界)。
@@ -96,7 +87,6 @@ App 自主管理模型輸入與接續政策：選擇合法資料、固定當輪�
 - 不採 C 即時修補、固定雙向互審或沒有具體需求的通用規則／事件平台，不為每個 AI 角色建立獨立服務。
 - 不要求每輪整理 Memory、每輪改 JD、先完成背景整理才准改稿，或由員工代寫才能達到品質目標。
 - 不遷移舊架構資料，不接回退役程式。RAG 是獨立服務，JD App 不預設啟動或依賴它；依 [ADR0080](adr/0080-opt-in-public-reference-agent-tools.md)，明示設定後可用公版查讀工具輔助查漏。公版只作參考，不成為員工事實或自動完成門檻。
-
 
 ## 已知限制與成效驗證
 
@@ -109,13 +99,13 @@ App 自主管理模型輸入與接續政策：選擇合法資料、固定當輪�
 - 真人顧問投入、員工事前學習及實際訪談／修正時間的效果尚未驗證；不承諾固定節省比例或完成時限。
 - Memory 最終失敗後何時允許新批次，仍有待確認政策；資料庫重啟後的 App 恢復限制、PDF 文字複製／搜尋限制亦須依現行紀錄判讀。
 
-各項測試結果見[驗證與限制](architecture/verification.md)、[實驗發現](reports/experiment-findings.md)及[產品實驗資料](experiments/product-validation/README.md)。
+各項測試結果見[驗證與限制](architecture/verification.md)、實驗發現。
 
 ## 延伸閱讀
 
 | 主題 | 閱讀入口 |
 |---|---|
 | 如何訪談、分析完整工作及撰寫 JD | [工作分析](guides/2026-09-09-complete-work-analysis-guide.md)、[追問與深度校準](guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[JD 寫作](guides/2026-09-09-jd-field-and-writing-guide.md) |
-| 系統分工、資料流與分析流程 | [架構導覽](target-architecture-map.md)、[系統架構報告](reports/system-architecture/README.md) |
+| 系統分工、資料流與分析流程 | [架構導覽](target-architecture-map.md) |
 | 使用介面、安全及日常操作 | [互動與運作](architecture/delivery-and-operations.md)、[操作手冊](runbook.md) |
-| 測試結果、方法與原始資料 | [驗證與限制](architecture/verification.md)、[產品實驗資料](experiments/product-validation/README.md) |
+| 測試結果、方法與原始資料 | [驗證與限制](architecture/verification.md) |

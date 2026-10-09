@@ -9,8 +9,8 @@
 
 ## 歷史設計
 
-- [原 consultant runtime](../history.md#source-ac37cc49c94c6b310f5e)：ADR0060 時期設計已退役，供研究與報告追溯。
-- interview engine、editor knowledge pack 的退役通知已移出 checkout，見[Git 恢復對照](../history.md#source-342210e06cceeff43952)。
+- 原 consultant runtime：ADR0060 時期設計已退役，供研究與報告追溯。
+- interview engine、editor knowledge pack 的退役通知已移出 checkout，見Git 恢復對照。
 - [ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)只作舊產品沿革。
 
 歷史內容不作新施工規格，不據此恢復舊 route、hook、store、contract、writer、indexer 或 provider。變更維護對應有效責任文件及 App README。

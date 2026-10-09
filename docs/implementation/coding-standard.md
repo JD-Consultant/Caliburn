@@ -50,7 +50,6 @@
 ```python
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True, slots=True)
 class InterviewRange:
     start_sequence: int
@@ -61,7 +60,6 @@ class InterviewRange:
             raise ValueError("start_sequence must be positive")
         if self.end_sequence < self.start_sequence:
             raise ValueError("end_sequence must not precede start_sequence")
-
 
 def describe_interview_range(interview_range: InterviewRange) -> str:
     return f"訪談序號 {interview_range.start_sequence}–{interview_range.end_sequence}"
@@ -185,7 +183,7 @@ Docstring／註解解釋非顯然的範圍、單位、效果、失敗與原因�
 - 正文查閱權限、一般統計與外送目的地分開控管；啟用本機診斷不等於允許第三方 exporter 外送。敏感欄位遮蔽不代表整份訪談已匿名化。
 - 觀測寫法也須以反例驗證：成功、拒絕、取消／逾時、部分結果、重試關聯、跨職務隔離、憑證遮蔽與診斷失敗。另以「已知某份檔案、某輪出現異常」走查操作文件，確認能沿既有入口找到當時 Context、Memory、工具參數／結果及正式效果，查閱不觸發模型重跑或業務重送。測有無足夠證據辨認問題，不把每條 log 文案或每個內部 span 鎖成產品契約。
 
-依據及尚未驗證的取捨見[持續對照與可觀測性研究](../research/engineering/2026-10-08-agent-experimentability-and-observability.md)。OpenTelemetry GenAI 欄位仍在 Development；本頁採觀測責任，不直接引入其欄位或要求更換 SDK。
+OpenTelemetry GenAI 欄位仍在 Development；本頁採觀測責任，不直接引入其欄位或要求更換 SDK。
 
 ### 7.2 Log 的格式、責任與查閱
 
@@ -249,6 +247,6 @@ Docstring／註解解釋非顯然的範圍、單位、效果、失敗與原因�
 
 依據：[Ruff rules](https://docs.astral.sh/ruff/rules/)、[RUF006](https://docs.astral.sh/ruff/rules/asyncio-dangling-task/)、[typed linting](https://typescript-eslint.io/getting-started/typed-linting/)、[no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises/)、[switch exhaustiveness](https://typescript-eslint.io/rules/switch-exhaustiveness-check/)、[no-deprecated](https://typescript-eslint.io/rules/no-deprecated/)。這是目前工具鏈的有界增補，非要求換框架。
 
-`no-deprecated` 用於 `apps/web`，補足 TypeScript 不會對 `@deprecated` 報錯的檢查。使用方式與其餘型別 lint 規則相同；驗證見[規範稽核](../history.md#source-a75c36d876a672e0f607)。
+`no-deprecated` 用於 `apps/web`，補足 TypeScript 不會對 `@deprecated` 報錯的檢查。使用方式與其餘型別 lint 規則相同；驗證見規範稽核。
 
 規則依成熟工程規範、框架契約或可核對的維護／錯誤案例持續修訂，同步本頁、設定與必要回歸；工具設定變動用代表性反例核實檢查效果。規範能演進，但不能只為讓某個 patch 過關而關掉檢查；也不因此重啟整個專案的架構討論。

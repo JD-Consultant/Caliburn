@@ -13,5 +13,5 @@ remain historical; the optional reference integration does not restore retired c
 This is a pure Pydantic package, used by the producer as an editable **path dependency**
 (like `ocs-contract`). The producer keeps one typed contract, without a separate codegen or
 JSON-Schema workflow; the original design is recorded in
-[`docs/specs/2026-06-28-contract-2-indexer-query-api-research.md`](../../docs/research/retrieval/2026-06-28-contract-2-indexer-query-api-research.md)
+當時的內部紀錄
 and [ADR0010](../../docs/adr/0010-indexer-contract-shared-package.md).

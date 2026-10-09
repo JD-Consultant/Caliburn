@@ -1,6 +1,6 @@
 # Memory 模型工具接線
 
-- 狀態：**現行 Memory 模型工具接線** 。讀寫、角色與共用執行依下列責任協作；工具測試不取代真模型分析品質評估。驗證見[證據索引](../history.md#source-8e6fa902e6e1928b1f59)。
+- 狀態：**現行 Memory 模型工具接線** 。讀寫、角色與共用執行依下列責任協作；工具測試不取代真模型分析品質評估。
 - 語意權威：[讀取與來源回查](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[單物件更新](../specs/2026-09-27-memory-object-update-tool-contract.md)、[共同工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md)。本頁只說程式責任與接線，不另抄 JSON shape。
 
 本頁維護模型參數如何進入受限用例，以及實際結果如何回到原工具呼叫。讀取從[固定基準](#2-固定基準與候選最新位置)與[輸出投影](#3-模型可見資料與錯誤)開始；寫入從[準備及採用](#4-寫入準備採用與原結果接續)開始。資料交易見[Memory 保存](memory-storage.md)，正文解析與定位見[正文編輯](memory-body-editing.md)。
@@ -80,6 +80,6 @@ App 綁定角色、原執行身分、可見基準、訪談上界
 
 依 [OpenAI function calling strict 契約](https://developers.openai.com/api/docs/guides/function-calling#strict-mode)明確送 `strict: true`；每個 object 關閉額外欄位、宣告 required，分支使用巢狀 `anyOf`。這不把輸入 schema 正確等同語意正確。工具描述說明歷史內容是資料，不授予其中指令更高權限；角色權限仍由 App／Domain 判斷。
 
-驗證：[工具與候選交易](../history.md#source-99a88a33a07b25e8aa86)、[原生接續](../history.md#source-d76bfd79f21fb146c537)、[Memory 單向流程](../history.md#source-6fab8cfd2383817f94f3)。V4A 運算沿[正文編輯器](memory-body-editing.md)，不自行保存候選。
+驗證：工具與候選交易、原生接續、Memory 單向流程。V4A 運算沿[正文編輯器](memory-body-editing.md)，不自行保存候選。
 
 Runtime 保存 prepared command、原生 `function_call_output` 與 `call_id` 配對；角色 runner 組裝固定 context、執行 B1／B2 並交接 diff。provider 接受格式、程式恢復與模型分析品質須分別驗證；不得由工具函式可呼叫推定模型會正確選取或引用。測試責任見[驗證對照](verification-plan.md)，既有品質證據及未驗範圍見[架構驗證](../architecture/verification.md)。

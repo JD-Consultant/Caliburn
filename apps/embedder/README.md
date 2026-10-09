@@ -12,7 +12,7 @@ and the occupation-reference API also uses reranking.
 
 Runs only as a container (GPU). Built and started by `docker compose` (service `embedder`,
 `gpus: all`, port 8082→80). Embedding produces the same vectors as the former in-process embedder.
-See [embedding research](../../docs/research/retrieval/2026-06-29-embedder-service-bge-m3-research.md).
+See embedding research.
 
 The independent occupation-reference API uses BGE-M3 weights
 `5617a9f61b028005a4858fdac845db406aefb181` and BGE-reranker-v2-m3 weights

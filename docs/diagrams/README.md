@@ -2,7 +2,7 @@
 
 受維護文件的圖源集中於此。正文引用同名 PNG，旁邊提供 `.mmd` 圖源及可放大的 SVG；相同圖直接共用一組圖片，不在報告或正文另抄來源。修改節點、形狀或連線時，只編輯 `.mmd` 再重繪。
 
-產品權責、圖說及適用範圍仍由各責任文件維護；本頁只提供路由與重繪方式。圖名保留「現行」「目標／未實作」「候選」或「歷史」，集中存放不會改變狀態。符號定義依[文件與圖面規範](../implementation/documentation-standard.md#3-圖面種類與符號)。`archive/`、`experiments/`、`plans/evidence/` 及 ADR 的歷史正文／原件保留原位；產品截圖與實驗圖片也由原證據位置維護。
+產品權責、圖說及適用範圍仍由各責任文件維護；本頁只提供路由與重繪方式。圖名保留「現行」「目標／未實作」「候選」或「歷史」，集中存放不會改變狀態。符號定義依[文件與圖面規範](../implementation/documentation-standard.md#3-圖面種類與符號)。研究及報告專用圖只留本機，不列入公開圖庫。
 
 ## 按責任文件查圖
 
@@ -28,31 +28,11 @@
 | [OCS PDF 轉換](../specs/2026-10-03-public-ocs-pdf-to-json-design.md) | 獨立 RAG 的轉換流程 | [來源](specs/2026-10-03-public-ocs-pdf-to-json-design/) |
 | [Context 目標](../specs/2026-10-04-context-summary-and-compaction-design.md) | 未實作的輪前摘要／輪中壓縮 | [來源](specs/2026-10-04-context-summary-and-compaction-design/) |
 | [職位參考候選](../specs/2026-10-04-occupation-overview-reference-retrieval-design.md) | 廣蒐、精搜及查閱 | [來源](specs/2026-10-04-occupation-overview-reference-retrieval-design/) |
-| [兩種參考視角候選](../specs/2026-10-04-public-reference-retrieval-design.md) | 查詢與按需查閱 | [來源](specs/2026-10-04-public-reference-retrieval-design/) |
 | [Plan 設計沿革](../specs/2026-10-06-consultant-interview-planning-and-focus-design.md) | 原未知筆記流程與接續時序；現行契約另見該頁路由 | [歷史目標來源](specs/2026-10-06-consultant-interview-planning-and-focus-design/) |
-| [系統架構報告](../reports/system-architecture/README.md) | 報告專用的主成功路徑、合成物件及簡化 ER | [來源](reports/system-architecture/)；共用圖見[下表](#報告如何重用) |
-| [專題報告](../reports/project-report/report.md) | Agent 分析與工具循環簡圖 | [來源](reports/project-report/report/) |
-| [工具使用研究](../research/agent-systems/2026-09-09-llm-app-tool-use-and-document-editing-common-practices.md) | 2026-09-09 的代表循環 | [歷史研究來源](research/agent-systems/2026-09-09-llm-app-tool-use-and-document-editing-common-practices/) |
-| [公版處理進度研究](../research/retrieval/2026-10-04-public-reference-progress-and-context-selection.md) | 選答及進度資料流 | [歷史候選來源](research/retrieval/2026-10-04-public-reference-progress-and-context-selection/) |
-| [長訪談規劃研究](../research/work-analysis/2026-10-06-long-interview-planning-and-focus-research.md) | 訪談焦點及查漏流程 | [歷史候選來源](research/work-analysis/2026-10-06-long-interview-planning-and-focus-research/) |
 
-## 報告如何重用
+## 圖面重用
 
-同一張圖的圖號與敘事圖說留在各報告，圖片及圖源只維護一次。下表的編號延續原報告圖稿識別，不是所有文件共用的圖號。
-
-| 原報告圖稿 | 唯一圖源與圖片 |
-|---|---|
-| 01 操作者流程 | [PNG](architecture/README/product-activities.png) · [來源](architecture/README/product-activities.mmd) |
-| 02 本機部署 | [PNG](architecture/delivery-and-operations/local-deployment.png) · [來源](architecture/delivery-and-operations/local-deployment.mmd) |
-| 03 程式依賴 | [PNG](implementation/code-organization/python-dependencies.png) · [來源](implementation/code-organization/python-dependencies.mmd) |
-| 04 訪談執行 | [PNG](reports/system-architecture/04-consultant-turn.png) · [來源](reports/system-architecture/04-consultant-turn.mmd) |
-| 05 三層依據 | [PNG](reports/system-architecture/05-evidence-layers.png) · [來源](reports/system-architecture/05-evidence-layers.mmd) |
-| 06 背景整理 | [PNG](reports/system-architecture/06-memory-batch.png) · [來源](reports/system-architecture/06-memory-batch.mmd) |
-| 07 Memory 快照 | [PNG](reports/system-architecture/07-memory-snapshots.png) · [來源](reports/system-architecture/07-memory-snapshots.mmd) |
-| 08 JD 核對 | [PNG](reports/system-architecture/08-jd-recheck.png) · [來源](reports/system-architecture/08-jd-recheck.mmd) |
-| 09 JD 概念關聯 | [PNG](reports/system-architecture/09-jd-relations.png) · [來源](reports/system-architecture/09-jd-relations.mmd) |
-| 10 JD 任務保存 | [PNG](implementation/jd-storage/jd-task-storage.png) · [來源](implementation/jd-storage/jd-task-storage.mmd) |
-| 11 JD 能力保存 | [PNG](implementation/jd-storage/jd-capability-storage.png) · [來源](implementation/jd-storage/jd-capability-storage.mmd) |
+同一張公開架構圖只維護一份圖源，引用方補充適用範圍；私人報告及研究的專用圖不納入公開清單。
 
 ## Agent 六張流程圖
 

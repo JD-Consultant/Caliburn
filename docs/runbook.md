@@ -162,7 +162,7 @@ App 經 `http://ocs-indexer:8000` 查詢；RAG 三個服務不發布主機連接
 
 更新完整模式時，在安全點停止 App／RAG，備份 PostgreSQL 與 Qdrant，再明示建置 `app ocs-indexer embedder`；如需 migration，沿基本模式的一次性命令完成，最後啟動完整模式。更新程式不覆寫索引；來源或模型身分變動時，另建新 collection 並重新做搜尋檢查。
 
-設定解析、鎖定安裝與 API 回歸結果見 [公版 Docker 驗證](experiments/engineering/2026-10-06-docker-rag-startup.md)。真容器與 GPU 的已驗／未驗範圍在該頁分開記錄。
+設定解析、鎖定安裝、API 回歸及真容器／GPU 測試須分開記錄受測條件，不以設定檢查推定 GPU 執行已通過。驗證範圍見[實作驗證](implementation/verification-plan.md)。
 
 ### DataGrip 與診斷
 
@@ -175,7 +175,7 @@ App 經 `http://ocs-indexer:8000` 查詢；RAG 三個服務不發布主機連接
 
 建議另設唯讀連線。既有 AI 執行紀錄的查閱方式不變：在原生開發環境將 `CALIBURN_DATABASE_URL` 設為上述主機連線，沿下方[執行紀錄](#在-datagrip-查某個職務檔案的-ai-執行紀錄)執行 `apps/api/scripts/refresh_execution_diagnostics.py`，再從 DataGrip 查 VIEW。此開發診斷腳本不在執行映像中；不另造一份診斷來源。
 
-配置、PDF、資料保存及已驗範圍見 [Docker 交付驗證](experiments/product-validation/2026-10-03-docker-delivery.md)。
+配置、PDF 與資料保存的責任及限制見[介面與交付](implementation/interface-and-delivery.md#42-docker-交付)。
 
 ## 安裝依賴
 
@@ -243,7 +243,7 @@ pnpm build
 pnpm start
 ```
 
-不要因為 migration 或分支更新失敗就重建資料庫、刪 volume 或強制覆蓋工作。`git pull` 拒絕快轉時先核對本機差異；歷史修正的提交對照見[歷史查閱](history.md)。更新 Playwright 套件後，還需按下節重新安裝對應瀏覽器。
+不要因為 migration 或分支更新失敗就重建資料庫、刪 volume 或強制覆蓋工作。`git pull` 拒絕快轉時先核對本機差異。更新 Playwright 套件後，還需按下節重新安裝對應瀏覽器。
 
 ## PDF 匯出
 
@@ -255,7 +255,7 @@ uv run --project apps/api --locked python -m playwright install chromium --only-
 # 或指定與已鎖 Playwright 相容的 Chromium：$env:CALIBURN_PDF_CHROMIUM_PATH = '...\chrome.exe'
 ```
 
-PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部分字型的文字複製／搜尋會出現部首字元（已知限制，見 [T13](history.md#source-409f20a1c297740aed7d)）。
+PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部分字型的文字複製／搜尋會出現部首字元（已知限制）。
 
 字型必須使用實際可讀的檔案，下載方式見 [Noto CJK 官方指南](https://github.com/notofonts/noto-cjk/blob/main/Sans/README.md)。如果安裝瀏覽器時自訂了 `PLAYWRIGHT_BROWSERS_PATH`，後端啟動時也要提供相同值。新的終端需重新提供字型與自訂瀏覽器路徑；設定完成後重啟後端才生效。
 
@@ -355,8 +355,6 @@ ORDER BY o.created_at, o.command_id;
 - 副本遮蔽 `encrypted_content`、已知憑證欄位及可辨識的 key 字串，**不是完整匿名化**。仍含原訪談與工作內容；不自動匯出、不提交 Git。DataGrip 可將核准的合成結果另存 JSON／CSV 供錄影或報告使用。一般 log 仍不含這些正文。
 - VIEW 沿用查詢者的資料庫權限；建議在 DataGrip 開啟唯讀連線。它不是跨使用者授權或資料隔離 API。
 
-設計取捨、測試及版本見 [T06 診斷查閱證據](history.md#source-6ac54c64f9ded4edcb9e)。
-
 ### 一般 Log 與 HTTP 關聯
 
 正式 `pnpm dev`／`pnpm start` 的後端入口輸出一行一個 JSON 事件。`CALIBURN_LOG_LEVEL` 預設 `INFO`，可選 `DEBUG`、`INFO`、`WARNING`、`ERROR`、`CRITICAL`；提高等級細節也不輸出訪談正文、完整 URL、秘密或 exception 文字。直接呼叫低階 Uvicorn 工廠不會套用這份輸出配置。
@@ -365,7 +363,7 @@ ORDER BY o.created_at, o.command_id;
 
 `supervisor.monitor_failed` 表示背景監督迴圈中止，`supervisor.release_failed` 表示收尾釋放失敗；用 `execution_kind`、`operation`、`failure_kind` 定位。這些事件可能發生在尚未選定工作時，因此不捏造 execution ID，也不輸出原始例外正文。正常取消不記成監督失敗。
 
-輸出使用容量 1024 的非阻塞佇列，滿時捨棄新紀錄；後續可用事件會附累計 `logging_dropped_records`／`logging_output_failures`，不能把沒看到 Log 當作沒發生。正常關閉最多等待 1 秒排出；程序意外終止可能遺失尾端 Log，可靠結果沿 PostgreSQL／checkpoint 核對。原生終端不自動保存檔案；Docker 沿 Compose 的 local driver 輪替，每檔 10 MB、最多 3 檔。格式規範見[工程文件](implementation/coding-standard.md#72-log-的格式責任與查閱)，本輪驗證見[重構證據](plans/evidence/full-system-review-2026-10-08.md)。
+輸出使用容量 1024 的非阻塞佇列，滿時捨棄新紀錄；後續可用事件會附累計 `logging_dropped_records`／`logging_output_failures`，不能把沒看到 Log 當作沒發生。正常關閉最多等待 1 秒排出；程序意外終止可能遺失尾端 Log，可靠結果沿 PostgreSQL／checkpoint 核對。原生終端不自動保存檔案；Docker 沿 Compose 的 local driver 輪替，每檔 10 MB、最多 3 檔。格式規範見[工程文件](implementation/coding-standard.md#72-log-的格式責任與查閱)。
 
 ## 資料庫與備份
 
@@ -375,13 +373,13 @@ ORDER BY o.created_at, o.command_id;
 |---|---|
 | 日常訪談、JD 與工作進度 | 保留既有資料來源；操作前核對 App 實際連線、schema 及 volume。更新 App 不另建一份空庫當作遷移完成 |
 | 可重建的整合測試 | 保存 fixture、命令與必要結果，完成後只回收本次建立的 schema／容器／volume；中斷留下的資源另核對，不全域 prune |
-| 已結案研究實驗 | 保留足以支持結論的設定、輸入、結果、評分及必要 trace；已有 Git／遠端原件的不重複封存。只有還需重播保存狀態時才保留 database／checkpoint |
+| 已結案研究實驗 | 在受控本機位置保留足以支持結論的設定、輸入、結果、評分及必要 trace；已有完整原件的不重複封存。只有還需重播保存狀態時才保留 database／checkpoint |
 
 需要保留資料庫時，使用 `pg_dump -Fc` 保存整個 database，不以 `-n` 只挑部分 schema；業務資料與 checkpoint 必須一起保存。多個 database 分別匯出，角色等 cluster 級資訊另用 `pg_dumpall --globals-only --no-role-passwords` 保存。OpenAI key 另行提供，角色密碼與本機設定不放入封存附件；瀏覽器 localStorage／sessionStorage 不作正式資料備份。相關工具契約見 [PostgreSQL 備份文件](https://www.postgresql.org/docs/18/backup.html)與 [pg_dumpall](https://www.postgresql.org/docs/18/app-pg-dumpall.html)。
 
-備份與來源資料比較使用同一快照，避免使用中的資料持續更新造成錯判。先在自有隔離環境還原，核對 schema／table、資料筆數與必要內容摘要，保存命令結果；`pg_restore --list` 只能檢查目錄，不能代替實際還原。移除舊資料前，再確認 App 沒有使用該目標、備份後未新增需保留資料、遠端下載雜湊相同。不能手動刪 WAL，或直接壓縮運作中的資料目錄代替一致性備份。
+備份與來源資料比較使用同一快照，避免使用中的資料持續更新造成錯判。先在自有隔離環境還原，核對 schema／table、資料筆數與必要內容摘要，保存命令結果；`pg_restore --list` 只能檢查目錄，不能代替實際還原。移除舊資料前，再確認 App 沒有使用該目標、備份後未新增需保留資料、備份副本的雜湊相同。不能手動刪 WAL，或直接壓縮運作中的資料目錄代替一致性備份。
 
-資料庫備份及未公開材料放[私人封存庫](https://github.com/JD-Consultant/Caliburn-archives)，不放公開 repository 或其 Releases。取得備份後先核對清單中的 SHA-256，再在隔離 PostgreSQL 還原；不直接覆蓋日常資料庫。封存格式與取回方式見[原件保存規範](experiments/artifact-storage.md#私人歷史材料與資料庫封存)。
+資料庫備份及未公開材料存放在受控本機位置，不放公開 repository 或其 Releases。需要異地備份或對外傳送時，另行確認目的地、資料範圍及授權。備份記錄來源、格式、建立時間與 SHA-256；還原前核對雜湊，再在隔離 PostgreSQL 驗證，不直接覆蓋日常資料庫。
 
 已確認僅含合成測試資料、且所需研究原件已有保存的舊環境，可以依清理授權直接回收，不必為了清理再建立永久完整備份。清理記錄須指出保留證據的位置，以及不再保留舊 DB 重播能力的取捨。資料用途未明或仍供日常使用時不套用這項規則。
 
@@ -391,7 +389,7 @@ ORDER BY o.created_at, o.command_id;
 
 先盤點目錄容量及目前程序，再區分可重建快取、可還原副本、執行環境與正式資料。被 Git 忽略只代表不提交，不能據此刪除。
 
-- **實驗解壓副本**：沿[原件保存規範](experiments/artifact-storage.md#分析完成後釋放空間)核對後清理；gzip 與雜湊清單保留，分析前按需還原。
+- **實驗解壓副本**：先確認本機原件、雜湊及還原方式完整，再依清理授權移除可重建副本；仍需支持結論的原件保留。
 - **工具快取**：確認沒有相關工具運作後，可清除有 `CACHEDIR.TAG` 的 mypy 快取。套件快取使用工具本身的維護命令，例如 [uv 的 cache prune](https://docs.astral.sh/uv/concepts/cache/#clearing-the-cache)；先核對快取位置與環境連結方式，避免誤刪執行環境依賴。
 - **本機歷史與執行環境**：`.research-tmp` 曾混放 Python、PostgreSQL、Chromium、資料庫與未提交封存材料，不能整包視為可刪快取。清理前查虛擬環境的 `pyvenv.cfg`、設定及程序路徑；即使資料庫已停止，也須沿上節備份與資料處置規則處理。
 - **Git 資料**：先用 `git count-objects -vH` 盤點並檢查完整性。保留正式 objects、packs 與復原資料；異常暫存檔須個別確認來源、使用狀態及可恢復性，不以整批刪除 `.git` 或改寫歷史作日常清理。

@@ -21,7 +21,7 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 
 [useProfileCommand](../../apps/web/src/features/jd-editor/useProfileCommand.ts)與 [useWorkCommand](../../apps/web/src/features/jd-editor/useWorkCommand.ts)是薄 adapter，各以一個 port 提供儲存鍵、型別檢查、POST、重讀及兩句提示，差異不另長成兩套恢復流程。
 
-採用 [React 的 state／key 生命週期](https://react.dev/learn/preserving-and-resetting-state)及 [TanStack Query 的 mutation invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)。以上原命令／基底保護是本案契約，不是 React／cache 自動提供交易原子性。沿用既有 HTTP 驗證，不新增全域表單 store 或雙寫保存服務。實測見 [T03 evidence §4](../history.md#source-75f1da860cdd0bef826e)；職責／任務見 [§2](#2-職責與任務的人工編輯)、知識／技能見 [§3](#3-共用知識技能及任務關係的人工編輯)、協作／條件見 [§4](#4-協作對象與共通條件的人工編輯)、候選與來源見 [§5](#5-工作畫面組裝) 及 [介面 §3](interface-and-delivery.md#3-顯示與來源)。
+採用 [React 的 state／key 生命週期](https://react.dev/learn/preserving-and-resetting-state)及 [TanStack Query 的 mutation invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)。以上原命令／基底保護是本案契約，不是 React／cache 自動提供交易原子性。沿用既有 HTTP 驗證，不新增全域表單 store 或雙寫保存服務。職責／任務見 [§2](#2-職責與任務的人工編輯)、知識／技能見 [§3](#3-共用知識技能及任務關係的人工編輯)、協作／條件見 [§4](#4-協作對象與共通條件的人工編輯)、候選與來源見 [§5](#5-工作畫面組裝) 及 [介面 §3](interface-and-delivery.md#3-顯示與來源)。
 
 ## 2. 職責與任務的人工編輯
 
@@ -36,7 +36,7 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 - 收到合法成功結果但本分頁清理失敗，明說「修改已保存、暫存未清除」，保留原命令供後續確認，不誤報後端保存未知。清除分頁資料的限制仍沿 [§1](#1-基本資料編輯的讀取基底與恢復)。
 - 儲存按鈕放 Dialog 固定底部，長表單內容可捲動。轉場完成才設定初始焦點；若使用者已在表單欄位／按鈕操作，不搶焦點。此窄 helper 不取消框架的 focus trap。
 
-沿用 [§1](#1-基本資料編輯的讀取基底與恢復) 的 React／TanStack 官方契約及 MUI 原生表單與 [Dialog](https://mui.com/material-ui/react-dialog/)；保存、新鮮度與原結果辨識由既有業務責任實現，非 UI cache 的保證。相應實測與限制見 [T03 §7](../history.md#source-75f1da860cdd0bef826e)。
+沿用 [§1](#1-基本資料編輯的讀取基底與恢復) 的 React／TanStack 官方契約及 MUI 原生表單與 [Dialog](https://mui.com/material-ui/react-dialog/)；保存、新鮮度與原結果辨識由既有業務責任實現，非 UI cache 的保證。
 
 ## 3. 共用知識／技能及任務關係的人工編輯
 
@@ -48,7 +48,7 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 - 使用中的共用定義顯示相關任務及刪除限制；先解除所有用途才能刪定義，後端仍為最終約束。刪任務保留共用定義，刪職責不丟失任務關係。
 - 定義與關係命令共用 [§2](#2-職責與任務的人工編輯) 的原基底、待確認／重開及 cache 失效邊界；原命令結果再度取得也不覆寫目前新稿。profile／集合互相刷新，沒有獨立 `/capabilities` latest 拼接或樂觀宣告保存。
 
-研究核對 [MUI Select](https://mui.com/material-ui/react-select/) 的標籤／受控選取及 [§1](#1-基本資料編輯的讀取基底與恢復) 的 React／Query 契約；目前用既有元件即可，不為局部選取新增搜尋或表單框架。資料准入、原子性與重送由後端領域模組負責，不由 MUI 判定。桌面／390px、共享修改及實際丟失回應的證據見 [T03 §9](../history.md#source-75f1da860cdd0bef826e)。
+研究核對 [MUI Select](https://mui.com/material-ui/react-select/) 的標籤／受控選取及 [§1](#1-基本資料編輯的讀取基底與恢復) 的 React／Query 契約；目前用既有元件即可，不為局部選取新增搜尋或表單框架。資料准入、原子性與重送由後端領域模組負責，不由 MUI 判定。
 
 ## 4. 協作對象與共通條件的人工編輯
 
@@ -59,11 +59,11 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 - 刪除需確認，只移除目前選用，歷史仍保留。新集合從同版 `/jd/work` 取得；未知結果重開後沿原請求確認，確認成功再 GET 目前稿，不將舊結果寫回 cache。
 - 回傳 schema 及 TypeScript 由同一份來源生成；顯示分組／文案是 UI 投影，不另存第二份 server state。既有草稿不因背景查詢改基底。
 
-採用 [React state 原則](https://react.dev/learn/choosing-the-state-structure)、[TanStack invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)、[MUI Select](https://mui.com/material-ui/react-select/)；目前元件足以承接，無需新表單／分類框架。這些來源支持 state／呈現機制，交易、固定歷史與原命令保證仍由 JD 領域模組及編輯工作流承接。驗證與限制見 [T03 第九切片](../history.md#source-75f1da860cdd0bef826e)。
+採用 [React state 原則](https://react.dev/learn/choosing-the-state-structure)、[TanStack invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)、[MUI Select](https://mui.com/material-ui/react-select/)；目前元件足以承接，無需新表單／分類框架。這些來源支持 state／呈現機制，交易、固定歷史與原命令保證仍由 JD 領域模組及編輯工作流承接。
 
 ## 5. 工作畫面組裝
 
-證據、設計依據與已驗／未驗範圍見 [T09 UI 改版證據](../history.md#source-072687957bc7ca22325b)。本節維護畫面行為；視覺數值由 [`theme.ts`](../../apps/web/src/app/theme.ts)與 [`styles.css`](../../apps/web/src/app/styles.css)維護。
+本節維護畫面行為；視覺數值由 [`theme.ts`](../../apps/web/src/app/theme.ts)與 [`styles.css`](../../apps/web/src/app/styles.css)維護。
 
 ### 版面、狀態與資料呈現
 
@@ -94,22 +94,22 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 
 ### 訪談、樣式與多分頁
 
-- **視覺系統與聊天室**：設計方向與選型依據見[研究紀錄](../research/engineering/2026-10-02-web-ui-benchmark-and-direction.md)，實測結果見[視覺改版證據](../history.md#source-a75c36d876a672e0f607)。職務檔案頁由檔案頂欄（`FileBar`）兼任頁首；清單頁用全域頁首（`AppHeader`）。訪談欄採 Cloudscape 的窄版聊天模式，員工與顧問同側排列，以頭像及名稱辨識。訪談採與右側 JD 一致的白底閱讀欄：員工原話旁加細線，不用大面積色塊；顧問正文直接排在頁面上，頭像淡化；App 開場同側排列並降低強調。頭像字樣由 [SpeakerAvatar](../../apps/web/src/features/interview/SpeakerAvatar.tsx)統一。標頭不顯示正式訪談序號；來源回查仍保留後端提供的序號與說話者標籤。
+- **視覺系統與聊天室**：職務檔案頁由檔案頂欄（`FileBar`）兼任頁首；清單頁用全域頁首（`AppHeader`）。訪談欄採 Cloudscape 的窄版聊天模式，員工與顧問同側排列，以頭像及名稱辨識。訪談採與右側 JD 一致的白底閱讀欄：員工原話旁加細線，不用大面積色塊；顧問正文直接排在頁面上，頭像淡化；App 開場同側排列並降低強調。頭像字樣由 [SpeakerAvatar](../../apps/web/src/features/interview/SpeakerAvatar.tsx)統一。標頭不顯示正式訪談序號；來源回查仍保留後端提供的序號與說話者標籤。
 - **這一輪與歷史回覆**：[TurnLog](../../apps/web/src/features/interview/TurnLog.tsx)呈現尚未正式的員工原輸入（虛線框、「尚非正式訪談」）與顧問處理內容（推理摘要、過程及輸入中的圓點）。暫停、取消、失敗仍歸在顧問名下；`InterviewComposer` 負責提交與恢復，不接管串流排版。確認完成後，底部不再保留摘要或過程入口，統一從正式顧問回覆的「處理紀錄」按需展開。歷史尚未載入或讀取失敗時，由歷史區顯示載入狀態或提供重讀，不另造底部備用紀錄；Composer 不觀察歷史快取來決定是否顯示完成紀錄。
 - **閱讀與樣式邊界**：「匯出目前已正式保存的版本，不包含本輪候選預覽。」常駐可見。MUI 樣式放入 CSS Layer，一般 CSS 不以加大優先權覆蓋 MUI。中文行寬以 `em` 限制，字型自架（Inter＋Noto Sans TC），不對外連線。聊天室繼續沿用既有色彩、字級、焦點與高對比規則，不建立另一套主題。
 - **不變**：所有命令識別／原命令恢復、版本衝突、待確認命令、跨職務檔案 query key 隔離、公開訊息非正式來源等規則不因版面改變；重排時以既有測試的「角色＋名稱」為護欄，標題、按鈕名稱與 region 名稱視同契約。
 
-**多分頁的最小支援：** 保留一般多分頁開啟，各頁向原 API 讀取，hint 訂閱沿上表接線；不新增全 App 單分頁鎖、即時協作、草稿同步或跨頁 Query cache 廣播。畫面可能短暫落後，最終仍由後端同檔 A 排他、人工寫入資格及 JD 修訂條件拒絕過期寫入，不能靜默以新版基底重送。這不是跨瀏覽器單一視窗承諾；相關取捨、官方依據與驗證見[發現入口證據](../history.md#source-c8ea469844e955e1447b)。
+**多分頁的最小支援：** 保留一般多分頁開啟，各頁向原 API 讀取，hint 訂閱沿上表接線；不新增全 App 單分頁鎖、即時協作、草稿同步或跨頁 Query cache 廣播。畫面可能短暫落後，最終仍由後端同檔 A 排他、人工寫入資格及 JD 修訂條件拒絕過期寫入，不能靜默以新版基底重送。這不是跨瀏覽器單一視窗承諾。
 
 ## 6. 逐欄就地編輯
 
-既有文字點一下就地改一欄；新增任務、知識／技能、協作對象及條件用表單，新增職責使用就地列；搬移用選單，成果／要求用「+」與 ×。每次儲存或操作都是單筆命令：集合使用 [§2](#2-職責與任務的人工編輯) 的 `WorkCommand`，基本資料使用 [§1](#1-基本資料編輯的讀取基底與恢復) 的 profile 命令。設計依據見[視覺基準研究](../research/engineering/2026-10-02-web-ui-benchmark-and-direction.md)。
+既有文字點一下就地改一欄；新增任務、知識／技能、協作對象及條件用表單，新增職責使用就地列；搬移用選單，成果／要求用「+」與 ×。每次儲存或操作都是單筆命令：集合使用 [§2](#2-職責與任務的人工編輯) 的 `WorkCommand`，基本資料使用 [§1](#1-基本資料編輯的讀取基底與恢復) 的 profile 命令。
 
 ### 編輯範圍與操作
 
 可逐欄編輯的文字包括 JD 基本資料四欄（職務名稱、所屬單位／工作範圍、匯報關係、職務目的；送 profile 命令，四欄都可清空）、職責名稱／範圍、任務名稱／工作內容、每項成果／要求、知識與技能名稱／說明、協作對象名稱／範圍，以及共通條件內容。
 
-**新增職責**：職責清單末端的「新增職責」就地變成名稱欄位，只送名稱，範圍之後在原處補，沒有對話框（先例與核對程度見[研究 §14](../research/engineering/2026-10-02-web-ui-benchmark-and-direction.md#14-基本資料新增職責區塊收合與聊天室2026-10-03)）。
+**新增職責**：職責清單末端的「新增職責」就地變成名稱欄位，只送名稱，範圍之後在原處補，沒有對話框。
 
 新增任務、知識／技能、協作對象與條件仍使用表單，以填寫多欄或選擇分類、所屬職責。條件分類與任務歸屬由「移到…」選單處理；成果／要求的新增與移除則使用「+」與 ×。
 
@@ -166,4 +166,4 @@ profile 與 `WorkCommand` 共用 [usePendingCommand](../../apps/web/src/features
 - 移除成果／要求須先確認，沒有 Undo。搬移後項目離開原處，目前沒有「已移到…」提示。
 - 輸入法僅以 Chromium CDP 模擬驗證，未以真實注音輸入法逐瀏覽器測試。
 
-驗證：[逐欄就地編輯](../history.md#source-a75c36d876a672e0f607)、[基本資料與畫面](../history.md#source-a75c36d876a672e0f607)。
+驗證：逐欄就地編輯、基本資料與畫面。

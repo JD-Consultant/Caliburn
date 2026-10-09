@@ -1,6 +1,6 @@
 # 職務檔案與訪談保存接線
 
-- 狀態：**現行職務檔案、訪談與准入保存接線** 。本頁說明原文、正式資格、原操作與短交易；Graph 與原生接續見[Agent 執行](agent-execution.md)，啟停及控制見[程序監督](agent-supervision.md)。驗證見[檔案與訪談](../history.md#source-2a993efd60b1a85e23d6)。
+- 狀態：**現行職務檔案、訪談與准入保存接線** 。本頁說明原文、正式資格、原操作與短交易；Graph 與原生接續見[Agent 執行](agent-execution.md)，啟停及控制見[程序監督](agent-supervision.md)。驗證範圍見[實作驗證](verification-plan.md)。
 - 語意仍由[資料保存](../architecture/persistence.md)及[正式來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
 - 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/src/caliburn/migrations/versions/0001_job_files_and_interviews.py)。
 
@@ -52,7 +52,7 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 - 同一命令、不同輸入：拒絕；不能悄悄把這次輸入套在原檔案。
 - 同一命令原結果：用建立時名稱、受訪者、身分與時間重建 typed result；目前名稱已改也不冒充原結果。初始建立資料受不可變保護；**不為這個小命令另建通用收據平台** 。
 - 開場寫入後發生錯誤：整個短交易回滾；檔案、原文與正式資格不留下半套。重送原命令可重新建立。
-- DB 斷線／COMMIT 確認遺失：相同命令可在連線恢復後核對原結果，不自行無限重試。跨程序恢復與未知提交的驗證範圍見[恢復驗證](../history.md#source-d4bb8d17c5639690aeb3)。
+- DB 斷線／COMMIT 確認遺失：相同命令可在連線恢復後核對原結果，不自行無限重試。跨程序恢復與未知提交須使用隔離資料庫與程序驗證。
 
 開場文字在建立時保存，來源標為 `app`；未呼叫模型，不把模板文字稱為顧問已完成一次推論。後續改模板不會改歷史原文。內容依[工作分析指南 §3](../guides/2026-09-09-complete-work-analysis-guide.md#3-如何訪談不變成冗長表單)從實際工作全貌開始，不要求員工先懂 JD，也不代填工作事實。
 
@@ -132,7 +132,7 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 
 依據：[PostgreSQL sequence](https://www.postgresql.org/docs/current/functions-sequence.html)明示 `nextval` 不隨交易 abort 回收，不能提供無跳號序列；本案利用已需的檔案列鎖與短交易分配。這是正式序號的產品要求，不推廣成所有內部 ID 都要連號。
 
-驗證：[訪談交易](../history.md#source-2a993efd60b1a85e23d6)、[A 共同完成](../history.md#source-f5df4f496aad7b909036)、[程序恢復](../history.md#source-d4bb8d17c5639690aeb3)。測試層級各自成立，不由底層交易通過推定模型品質。
+驗證：訪談交易、A 共同完成、程序恢復。測試層級各自成立，不由底層交易通過推定模型品質。
 
 ## 9. 有界來源查詢與近期歷史投影
 
@@ -158,7 +158,7 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 
 A／B 的角色 workflow 從固定 Memory 取得 K，持久綁定 H／F；同工作恢復沿原範圍。模型可見投影與錯誤由[工具邊界](memory-tools.md)負責，完整請求容量由[模型外送](model-requests.md#4-固定請求計數與容量准入)核對。來源查詢不自行刷新角色基準。
 
-**人的公開歷史回看。** 歷史回看以 `read_public_interview_history` 投影正式資格、原文與既有 `interview_replies` 關係；歷史 HTTP 回應僅為正式顧問答覆附上 nullable `execution_id`，App／員工訊息為 null。UI 按需用檔案與 execution 定位既有 consultant-turns status 的公開 commentary，不另存中間訊息或暴露 checkpoint／私有 context。共用來源查詢與 `InterviewMessage` 不增加此定位，也不授予 commentary 正式序號或引用資格。實作與限制見 [T09 歷史定位證據](../history.md#source-758915af0b16b0e1a0ee)。
+**人的公開歷史回看。** 歷史回看以 `read_public_interview_history` 投影正式資格、原文與既有 `interview_replies` 關係；歷史 HTTP 回應僅為正式顧問答覆附上 nullable `execution_id`，App／員工訊息為 null。UI 按需用檔案與 execution 定位既有 consultant-turns status 的公開 commentary，不另存中間訊息或暴露 checkpoint／私有 context。共用來源查詢與 `InterviewMessage` 不增加此定位，也不授予 commentary 正式序號或引用資格。
 
 ## 10. 列表改名：名稱新鮮度與原操作結果
 
@@ -187,4 +187,4 @@ A／B 的角色 workflow 從固定 Memory 取得 K，持久綁定 H／F；同工
 - 原生寫入另由 `JobFilePostgresSaver` 保護：`aput`／`aput_writes` 在官方寫入連線的同一交易內，先取得所屬檔案的 `FOR KEY SHARE` 鎖。刪除根列的排他鎖與它互斥；已開始的保存先完成，刪除才清理，刪除先成立則後到的保存拒絕。取消或重複取消不能提早釋放保存交易。這不改寫框架表、不另存 checkpoint，也不把模型等待放進交易。
 - 必須透過上述 HTTP／workflow 刪除；手動 SQL 刪根記錄不會代為呼叫原生 Saver。刪除不操作 OpenAI、不刪容器或 volume，也不影響其他檔案及隔離實驗資料庫。
 
-機制依據為 PostgreSQL 的[外鍵 cascade](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)、[trigger 條件](https://www.postgresql.org/docs/current/sql-createtrigger.html)與[列鎖互斥](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)，原生 Saver 的刪除與連線行為亦核對鎖定版本原碼。確認、錯誤及重讀行為見[介面讀寫邊界](interface-and-delivery.md#11-讀寫邊界)；測試方法與結果見[刪除驗證](../experiments/product-validation/2026-10-05-job-file-deletion.md)。
+機制依據為 PostgreSQL 的[外鍵 cascade](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)、[trigger 條件](https://www.postgresql.org/docs/current/sql-createtrigger.html)與[列鎖互斥](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)，原生 Saver 的刪除與連線行為亦核對鎖定版本原碼。確認、錯誤及重讀行為見[介面讀寫邊界](interface-and-delivery.md#11-讀寫邊界)。

@@ -1,9 +1,9 @@
-/** Offline Markdown file/anchor checks; frozen evidence is checked only when explicitly selected. */
+/** Offline Markdown file/anchor checks; default targets must belong to the public Git inventory. */
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { findDocuments, parseDocument } from './documentation.mjs';
+import { findPublishedFiles, parseDocument, selectDocuments } from './documentation.mjs';
 export { selectDocuments } from './documentation.mjs';
 
 function isInside(root, target) {
@@ -11,8 +11,17 @@ function isInside(root, target) {
   return !path.isAbsolute(relative) && relative !== '..' && !relative.startsWith(`..${path.sep}`);
 }
 
-export async function checkDocuments(root, files) {
+export async function checkDocuments(root, files, { publishedFiles } = {}) {
   root = path.resolve(root);
+  const published = publishedFiles === undefined ? undefined :
+    new Set(publishedFiles.map(file => path.resolve(root, file)));
+  const publicDirectories = new Set();
+  for (const file of published ?? []) {
+    for (let directory = path.dirname(file); isInside(root, directory); directory = path.dirname(directory)) {
+      publicDirectories.add(directory);
+      if (directory === root) break;
+    }
+  }
   const cache = new Map();
   const errors = [];
   let links = 0;
@@ -46,7 +55,9 @@ export async function checkDocuments(root, files) {
         if (!isInside(root, resolved)) reason = 'outside repository';
         else {
           const info = await stat(resolved);
-          if (anchor && info.isFile() && path.extname(resolved).toLowerCase() === '.md' &&
+          if (published && !(info.isDirectory() ? publicDirectories.has(resolved) : published.has(resolved))) {
+            reason = 'not a public file or directory';
+          } else if (anchor && info.isFile() && path.extname(resolved).toLowerCase() === '.md' &&
               !(await document(resolved)).anchors.has(anchor)) reason = 'missing anchor';
         }
       } catch (error) {
@@ -65,9 +76,10 @@ async function main() {
     options: { json: { type: 'boolean' }, list: { type: 'boolean' } }, allowPositionals: true,
   });
   const root = fileURLToPath(new URL('../', import.meta.url));
-  const files = positionals.length ? positionals.map(file => path.relative(root, path.resolve(file)).split(path.sep).join('/')) : await findDocuments(root);
+  const publishedFiles = positionals.length ? undefined : await findPublishedFiles(root);
+  const files = positionals.length ? positionals.map(file => path.relative(root, path.resolve(file)).split(path.sep).join('/')) : selectDocuments(publishedFiles);
   if (values.list) { console.log(files.join('\n')); return; }
-  const result = await checkDocuments(root, files);
+  const result = await checkDocuments(root, files, { publishedFiles });
   if (values.json) console.log(JSON.stringify(result, null, 2));
   else {
     for (const error of result.errors) console.error(`${error.file}:${error.line}: ${error.reason}: ${error.target}`);

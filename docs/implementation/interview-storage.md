@@ -16,7 +16,7 @@
 
 以下兩個視圖涵蓋職務檔案、訪談與准入的七張相關業務表；JD、Memory 與 Graph checkpoint 另有各自的保存責任。同名表是同一份資料，不是副本；拆圖避免多條跨層線遮住節點。
 
-以下均為現行局部 ER，欄位型別採簡寫，省略預設值、CHECK 與部分複合唯一約束；完整 DDL 以本頁所連 migration 為準。基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)。`interview_replies` 引用 input 的 `(job_file_id, execution_id)` 唯一鍵並用作自身主鍵，故為識別關係；原文的 `source_id` 雖為必填 FK，未納入正式資格／輸入／答覆的主鍵。
+以下均為現行局部 ER，欄位型別採簡寫，省略預設值、CHECK 與部分複合唯一約束；完整 DDL 以本頁所連 migration 為準。基數、識別關係與鍵標記沿[讀圖約定](../diagrams/README.md#讀圖約定)。`interview_replies` 引用 input 的 `(job_file_id, execution_id)` 唯一鍵並用作自身主鍵，故為識別關係；原文的 `source_id` 雖為必填 FK，未納入正式資格／輸入／答覆的主鍵。
 
 **原文與正式資格：**
 
@@ -24,7 +24,7 @@
 
 [圖源](../diagrams/implementation/interview-storage/raw-text-formal-qualification.mmd) · [SVG](../diagrams/implementation/interview-storage/raw-text-formal-qualification.svg)
 
-**檔案准入與改名結果：** 下圖為現行局部 ER，補前圖 `interview_inputs.execution_id` 的同檔案複合外鍵；完整原文關係見前圖。基數、識別關係與鍵標記沿[中央圖面規範](documentation-standard.md#3-圖面種類與符號)；型別與欄位同樣簡化。`executions` 的 `(job_file_id, execution_id)` 複合唯一鍵供 input 引用，`execution_id` 未納入 input 的主鍵，因此是虛線關係。
+**檔案准入與改名結果：** 下圖為現行局部 ER，補前圖 `interview_inputs.execution_id` 的同檔案複合外鍵；完整原文關係見前圖。基數、識別關係與鍵標記沿[讀圖約定](../diagrams/README.md#讀圖約定)；型別與欄位同樣簡化。`executions` 的 `(job_file_id, execution_id)` 複合唯一鍵供 input 引用，`execution_id` 未納入 input 的主鍵，因此是虛線關係。
 
 ![現行：1. 原文、正式資格與執行身分分開，不複製原話—檔案准入與改名結果](../diagrams/implementation/interview-storage/execution-admission-renames.png)
 
@@ -54,7 +54,7 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 - 開場寫入後發生錯誤：整個短交易回滾；檔案、原文與正式資格不留下半套。重送原命令可重新建立。
 - DB 斷線／COMMIT 確認遺失：相同命令可在連線恢復後核對原結果，不自行無限重試。跨程序恢復與未知提交須使用隔離資料庫與程序驗證。
 
-開場文字在建立時保存，來源標為 `app`；未呼叫模型，不把模板文字稱為顧問已完成一次推論。後續改模板不會改歷史原文。內容依[工作分析指南 §3](../guides/2026-09-09-complete-work-analysis-guide.md#3-如何訪談不變成冗長表單)從實際工作全貌開始，不要求員工先懂 JD，也不代填工作事實。
+開場文字在建立時保存，來源標為 `app`；未呼叫模型，不把模板文字稱為顧問已完成一次推論。後續改模板不會改歷史原文。內容依[產品內容判準](../product-concept.md#內容判準)從實際工作全貌開始，不要求員工先懂 JD，也不代填工作事實。
 
 ## 3. 程式分責
 
@@ -72,7 +72,7 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 | `transport/http/job_files.py`、`interview_inputs.py` | 生成 DTO、HTTP 狀態及結果投影；不寫 SQL |
 | `bootstrap.py`／`adapters/database.py` | lifespan 組裝／關閉 engine、啟動檢查 migration head；不保存業務內容 |
 
-函式、workflow 實例及介面的使用沿[程式撰寫規範](coding-standard.md)；跨模組依賴沿[程式組織](code-organization.md)。本節只維護上述保存用例的實際分工。
+函式、workflow 實例及介面的使用沿[程式撰寫規範](../standards/coding-standard.md)；跨模組依賴沿[程式組織](../standards/code-organization.md)。本節只維護上述保存用例的實際分工。
 
 ## 4. 配置與遷移
 
@@ -82,7 +82,7 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 
 遷移與連線都固定同一 search path；migration 額外核對 `current_schema()`。版本表使用該 default schema，避免同時配置顯式 `version_table_schema` 後，autogenerate 將同一張表再次視為一般表。正式環境的帳號／權限與備份須按[操作手冊](../runbook.md)配置，不能由隔離測試推定任意部署皆安全。
 
-Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http/)；Python／TypeScript 皆由生成器產出。同檔共用型別用 `$defs`，不手抄生成欄位。具體回傳查 OpenAPI，不在本文件再抄一份 JSON。名稱目前 1–200 字、不全空白且無 PostgreSQL text 不接受的 NUL，作本機建立入口的有界驗證；同名不拒絕。
+Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http)；Python／TypeScript 皆由生成器產出。同檔共用型別用 `$defs`，不手抄生成欄位。具體回傳查 OpenAPI，不在本文件再抄一份 JSON。名稱目前 1–200 字、不全空白且無 PostgreSQL text 不接受的 NUL，作本機建立入口的有界驗證；同名不拒絕。
 
 ## 5. 官方機制與本案取捨
 

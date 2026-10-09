@@ -1,6 +1,6 @@
 # pdf-to-json — OCS PDF → 結構化 JSON(ETL)
 
-將官方職能基準（OCS/iCAP）**PDF** 轉成結構化 **JSON**，供 [`apps/ocs-indexer`](../ocs-indexer/) 建立公版參考索引。
+將官方職能基準（OCS/iCAP）**PDF** 轉成結構化 **JSON**，供 [`apps/ocs-indexer`](../ocs-indexer) 建立公版參考索引。
 這是「解析」bounded context 的離線 CLI 工具，沒有伺服器或使用者狀態。
 
 > **閱讀方式：**上半說明如何執行、轉換流程與程式位置；**下半 §1–10 定義 OCS 來源 JSON 的欄位語意契約**。

@@ -10,11 +10,11 @@
 
 | 設計層次 | 設計依據 | 驗證方法與限制 |
 |---|---|---|
-| 問題與成功條件 | [產品概念](../product-concept.md)、[工作分析](../guides/2026-09-09-complete-work-analysis-guide.md)與[寫作指南](../guides/2026-09-09-jd-field-and-writing-guide.md) | 以代表資料與 eval 檢驗效果；評分標準須有依據 |
+| 問題與成功條件 | [產品概念](../product-concept.md)、[產品內容判準](../product-concept.md#內容判準) | 以代表資料與 eval 檢驗效果；評分標準須有依據 |
 | 領域與資訊關係 | [系統邊界](system-boundaries.md)、Memory／JD 設計 | 核對三層資訊關係、來源資格與候選政策在讀寫操作中是否一致 |
 | 核心閉環與狀態 | [正式採用與交易](persistence.md)、A／B 流程、[共用執行與恢復](../implementation/agent-execution.md) | 以最小案例驗證流程與節點的對應，以及控制操作之間的競爭；產品 Turn 不等同 Graph super-step |
 | 資料與證據 | [持久化](persistence.md)、Memory snapshot、JD 來源／diff | 以真實 PostgreSQL 驗證固定歷史、原子採用與原結果接續；每類資料由單一模組負責 |
-| 介面與工具 | [模型工具的共同邊界](../contract-strategy.md#模型工具的共同邊界)、Memory read／CRUD、JD 契約 | strict wire 的生成與解析、模型使用率／錯誤率、Web 互動；模型參數不包含 App 已知的範圍與操作身分 |
+| 介面與工具 | [模型工具的共同邊界](../standards/contract-strategy.md#模型工具的共同邊界)、Memory read／CRUD、JD 契約 | strict wire 的生成與解析、模型使用率／錯誤率、Web 互動；模型參數不包含 App 已知的範圍與操作身分 |
 | 運作、安全與成本 | [日常運作](delivery-and-operations.md)、[設計取捨](design-decisions.md) | 固定依賴版本下的故障注入、秘密／跨檔案測試；數值來自量測 |
 | 成效與商業驗證 | 核心可用性、長訪談品質、耗時／成本 | 評估本機完整使用流程。營收、定價、獲客與跨組織 SaaS 不在現行產品範圍 |
 

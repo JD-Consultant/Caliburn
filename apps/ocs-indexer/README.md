@@ -1,6 +1,6 @@
 # ocs-indexer — OCS 知識索引與查詢服務
 
-將 [`apps/pdf-to-json`](../pdf-to-json/) 產出的 OCS（職能基準）JSON 建成 Qdrant 索引，
+將 [`apps/pdf-to-json`](../pdf-to-json) 產出的 OCS（職能基準）JSON 建成 Qdrant 索引，
 透過 **無狀態查詢 HTTP API**（:8000）提供公版候選資料。職位整體參考使用獨立的
 document／task 索引；既有 profile／task 索引與介面保留原語意。
 
@@ -15,7 +15,7 @@ OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HT
                                                 查詢 client ◄── 無狀態 API(:8000) ◄──┘
 ```
 
-- **模型在獨立 GPU 容器：**BGE-M3（dense 1024d + sparse）由 [`apps/embedder`](../embedder/)
+- **模型在獨立 GPU 容器：**BGE-M3（dense 1024d + sparse）由 [`apps/embedder`](../embedder)
   提供（`POST /embed`），indexer 只作 HTTP client。不在 indexer 安裝 torch；
   原 Windows 行程內執行曾有 segfault。
 - **Qdrant 由本 app 管理：**其他服務經查詢 API 取資料，不直接存取 collection。
@@ -151,7 +151,7 @@ embed 字串只放 ChunkRecord.text) → HTTP embed(batch) → QdrantWriter.upse
 
 ## Query API reference(:8000)
 
-**request/response schema 權威 = [`packages/indexer-contract`](../../packages/indexer-contract/)**
+**request/response schema 權威 = [`packages/indexer-contract`](../../packages/indexer-contract)**
 (共用 Pydantic)；自訂方法採 AIP-136 `:verb`。互動式 OpenAPI:`/docs`。
 預設綁 `127.0.0.1`、無 auth(對外請加反向代理;`create_app()` 是擴充點)。
 

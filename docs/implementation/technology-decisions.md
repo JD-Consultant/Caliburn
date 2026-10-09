@@ -1,7 +1,7 @@
 # 技術選型與機制驗證
 
 - 狀態：**現行技術選型與驗證依據** 。實際安裝版本由 lockfile 管理；本頁保留選型理由、相容性與後續調整條件。
-- 邊界：基線為 PostgreSQL、LangGraph＋OpenAI direct Responses。機制調整須有具體證據並同步契約與測試；涉及產品效果、來源權責或恢復保證的變更依[決策流程](../decision-process.md)處理，不由歷史施工授權推定。
+- 邊界：基線為 PostgreSQL、LangGraph＋OpenAI direct Responses。機制調整須有具體證據並同步契約與測試；涉及產品效果、來源權責或恢復保證的變更依[貢獻指南](../../CONTRIBUTING.md#變更範圍與審查)處理，不由歷史施工授權推定。
 
 本頁維護工具選擇、相容性及配置調整的判準。先查[工具鏈](#1-首選工具鏈)，變更前核[機制風險](#2-有具體風險的機制先驗再擴大)；目前限制值見[運作參數](#3-運作參數不是無限值也不是已核准費用)，選型邊界見[未採用項目](#4-明確不採用)。產品層的架構理由見[設計取捨](../architecture/design-decisions.md)。
 
@@ -26,7 +26,7 @@
 |---|---|---|
 | Web | React＋TypeScript strict＋Vite；React Router 僅管理路由；TanStack Query 管 server state | 本機 SPA 無 SEO／SSR 需求；相比 Next.js 不引入第二套 server action／業務層。React 官方列出這些成熟選項，**不是聲稱官方首選所有專案用 SPA** 。[React](https://react.dev/learn/build-a-react-app-from-scratch)、[Vite](https://vite.dev/guide/) |
 | UI 元件 | MUI Core；原生受控欄位 | 使用既有表單、Dialog、鍵盤可操作元件，不從底層重造 widget；不選付費 Data Grid 或全文富文字編輯器，JD 是分欄編輯。[MUI](https://mui.com/material-ui/getting-started/) |
-| 跨語言契約 | JSON Schema SSOT；datamodel-code-generator 產 Python，json-schema-to-typescript 產 TS；FastAPI 再產 OpenAPI | 兩個鎖定生成器讀同一 schema，不是兩份規格。前者不產 TS；型別生成也不代替執行時驗證。[Python 生成器](https://datamodel-code-generator.koxudaxi.dev/)、[TS 生成器](https://github.com/bcherny/json-schema-to-typescript)、[契約策略](../contract-strategy.md) |
+| 跨語言契約 | JSON Schema SSOT；datamodel-code-generator 產 Python，json-schema-to-typescript 產 TS；FastAPI 再產 OpenAPI | 兩個鎖定生成器讀同一 schema，不是兩份規格。前者不產 TS；型別生成也不代替執行時驗證。[Python 生成器](https://datamodel-code-generator.koxudaxi.dev/)、[TS 生成器](https://github.com/bcherny/json-schema-to-typescript)、[契約策略](../standards/contract-strategy.md) |
 | PDF | Python Playwright＋Chromium；受控 HTML／print CSS 模板 | 後端從正式 JD 投影，固定字型、禁止遠端資源與腳本；可用瀏覽器版面測試驗證。代價是 Chromium 體積與字型安裝；不把瀏覽器列印對話框當匯出完成。[官方 page.pdf](https://playwright.dev/python/docs/api/class-page#page-pdf) |
 
 ### 測試與靜態品質
@@ -75,7 +75,7 @@ A／B1／B2 的輪前與輪中留量門檻、時點及回退依[共用執行與�
 
 ## 4. 明確不採用
 
-首版基線未選用微服務、Redis／Kafka／Celery、向量搜尋、Git／event-sourcing 版本框架、通用 rule engine、第二套 LangChain／Agents SDK loop、全域前端 Redux 狀態或每層一個 package。這是目前選型，不是永久技術禁令；MCP、插件、觀測／評測平台或不同框架可依實際收益重新比較，也不因候選平台內部使用某套件就一律排除。成熟度、整合、測試、查閱及運維成本一起評估，方法依[開發規範](development-standard.md#31-依風險配置驗證與交付粒度)。
+首版基線未選用微服務、Redis／Kafka／Celery、向量搜尋、Git／event-sourcing 版本框架、通用 rule engine、第二套 LangChain／Agents SDK loop、全域前端 Redux 狀態或每層一個 package。這是目前選型，不是永久技術禁令；MCP、插件、觀測／評測平台或不同框架可依實際收益重新比較，也不因候選平台內部使用某套件就一律排除。成熟度、整合、測試、查閱及運維成本一起評估，方法依[貢獻指南](../../CONTRIBUTING.md#驗證與提交)。
 
 模型不取得直接寫 SQL 的權力；資料 scope、正式保存及採用由 App 負責。這屬產品權威與安全契約，不能因更換框架或工具 transport 而繞過。
 

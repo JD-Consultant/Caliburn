@@ -103,8 +103,8 @@ App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景
 
 | 要了解的問題 | 責任文件 |
 |---|---|
-| 程式如何記錄事件、工具及可比較證據 | [觀測與 Log 規範](../implementation/coding-standard.md#71-讓執行證據可查可比較可驗證) |
-| 診斷讀取、遮蔽及副本由誰負責 | [程式組織](../implementation/code-organization.md#1-目錄依業務責任組織機制集中在少數邊界) |
+| 程式如何記錄事件、工具及可比較證據 | [觀測與 Log 規範](../standards/coding-standard.md#71-讓執行證據可查可比較可驗證) |
+| 診斷讀取、遮蔽及副本由誰負責 | [程式組織](../standards/code-organization.md#1-目錄依業務責任組織機制集中在少數邊界) |
 | 如何依原工作查 Context、工具及綁定 | [本機診斷操作](../runbook.md#在-datagrip-查某個職務檔案的-ai-執行紀錄) |
 | 工程反例驗到哪裡 | 審查證據 |
 

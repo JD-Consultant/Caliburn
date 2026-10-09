@@ -1,6 +1,6 @@
 # 顧問配置對照
 
-這個入口以固定案例比較候選 Prompt、Tool 說明、JD 讀取容量或 Plan 能力，使用正式 App、HTTP、Agent、工具及 PostgreSQL 保存。每個候選使用獨立 schema 與 SDK client；不複製 Agent，也不修改 module-global。工程責任見[程式組織](../../../docs/implementation/code-organization.md)，評測判準見[開發規範](../../../docs/implementation/development-standard.md#7-分析方法prompttool-與-context-共同驗收)。
+這個入口以固定案例比較候選 Prompt、Tool 說明、JD 讀取容量或 Plan 能力，使用正式 App、HTTP、Agent、工具及 PostgreSQL 保存。每個候選使用獨立 schema 與 SDK client；不複製 Agent，也不修改 module-global。工程責任見[程式組織](../../../docs/standards/code-organization.md)，評測判準見[貢獻指南](../../../CONTRIBUTING.md#模型品質比較)。
 
 ## 先確認配置
 

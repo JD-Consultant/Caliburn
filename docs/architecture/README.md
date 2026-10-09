@@ -28,7 +28,7 @@ Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據�
 
 ## 一眼看懂：操作者的主要流程
 
-**現行基本流程圖：操作者選擇下一步。** 終端形為起訖，矩形為操作，菱形為選擇，平行四邊形為輸出；箭頭表示操作順序，依[基本流程圖規範](../implementation/documentation-standard.md#3-圖面種類與符號)。背景整理不列為訪談的前置步驟，此圖也不指定 Agent 的工作順序。
+**現行基本流程圖：操作者選擇下一步。** 終端形為起訖，矩形為操作，菱形為選擇，平行四邊形為輸出；箭頭表示操作順序，依[讀圖約定](../diagrams/README.md#讀圖約定)。背景整理不列為訪談的前置步驟，此圖也不指定 Agent 的工作順序。
 
 <!-- diagram: product-activities -->
 
@@ -54,7 +54,7 @@ Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據�
 
 | 想先弄懂的問題 | 整體圖表 | 深入時再讀 |
 |---|---|---|
-| 誰使用產品，哪些部分在本機、哪些在外部？ | [系統情境與容器](system-boundaries.md#2-app-拆開後有哪些責任)、[部署圖](delivery-and-operations.md#2-最小部署視角) | [靜態程式依賴](../implementation/code-organization.md#2-依賴方向與可檢查限制) |
+| 誰使用產品，哪些部分在本機、哪些在外部？ | [系統情境與容器](system-boundaries.md#2-app-拆開後有哪些責任)、[部署圖](delivery-and-operations.md#2-最小部署視角) | [靜態程式依賴](../standards/code-organization.md#2-依賴方向與可檢查限制) |
 | 一次員工回答如何成為 JD 的一部分？ | [正式採用與交易](persistence.md) | [模型與工具 Step](../implementation/agent-execution.md#46-有界多-step-接續) |
 | 暫停、取消或中斷後怎麼辦？ | [共用執行與恢復](../implementation/agent-execution.md)、[提交後恢復時序](persistence.md#4-重試取消與執行恢復) | [外送重試流程](../implementation/model-requests.md#5-單一外送重試責任) |
 | 背景整理如何與下一輪訪談並行？ | [A／B1／B2 角色表](system-boundaries.md#3-ai-分析角色共用執行機制分別處理工作)、[正式採用與交易](persistence.md) | [Memory 保存關係](../implementation/memory-storage.md#2-保存表示固定修訂而非資料庫舊列) |
@@ -66,13 +66,13 @@ Caliburn 透過持續訪談，把員工分散的工作資訊整理成有依據�
 
 ## 架構與實作的維護分工
 
-本目錄保留系統責任、資料權威、跨層生命週期與設計取捨。`implementation/` 記錄程式如何落實這些規則；`specs/` 維護詳細行為及工具契約。修改同一規則時只改其責任文件，其他層保留必要摘要與連結。
+本目錄保留系統責任、資料權威、跨層生命週期與設計取捨。[實作](../implementation/README.md)記錄具體接線及詳細行為；[程式規範](../standards/README.md)維護模組、寫法及契約策略。正式 JSON 格式由程式中的唯一 Schema 維護。修改同一規則時只改其責任文件，其他層保留必要摘要與連結。
 
 | 要改的內容 | 維護位置 | 另一層如何承接 |
 |---|---|---|
 | 模組責任、來源資格、候選與正式資料的界線 | 本目錄及連到的詳細契約 | 實作文件引用規則，說明負責模組與驗證方式 |
 | SQL、schema、固定修訂的保存表示、程式組裝、恢復演算法 | [實作接線](../implementation/README.md) | 架構只交代保證與限制，不複寫表格、欄位或步驟 |
-| 命名、撰寫、測試與文件繪圖規範 | [工程規範](../implementation/README.md) | 架構依規範呈現設計，不再訂第二套寫法 |
+| 模組、命名、撰寫、測試與契約策略 | [程式規範](../standards/README.md)；文件維護見[貢獻指南](../../CONTRIBUTING.md#文件維護) | 架構及實作引用適用規則 |
 | 驗證結果、已知限制與原件 | [驗證範圍](verification.md)及其證據 | 實作驗證文件只維護測試責任及方法，不另抄通過清單 |
 | 安裝、設定、命令及排錯操作 | [runbook](../runbook.md)與 App README | 架構說明運作邊界，實作說明接線，各自連到操作來源 |
 

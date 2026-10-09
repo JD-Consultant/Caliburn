@@ -18,7 +18,7 @@
 
 首次使用完整 App，從[操作手冊的快速開始](../../docs/runbook.md#快速開始)安裝及啟動。下方說明前端開發；使用 `pnpm dev` 時，在啟動的終端按 Ctrl+C 停止，重新提供所需後端環境設定後可再次啟動。
 
-介面行為與讀寫規則見[介面設計](../../docs/implementation/interface-and-delivery.md)，模組與程式寫法見[程式組織](../../docs/implementation/code-organization.md)及[撰寫規範](../../docs/implementation/coding-standard.md)。UI 與來源功能的執行原件只在本機保存；各次結果只支持當時受測範圍，不能由文件改版推定目前全部情境已通過。
+介面行為與讀寫規則見[介面設計](../../docs/implementation/interface-and-delivery.md)，模組與程式寫法見[程式組織](../../docs/standards/code-organization.md)及[撰寫規範](../../docs/standards/coding-standard.md)。UI 與來源功能的執行原件只在本機保存；各次結果只支持當時受測範圍，不能由文件改版推定目前全部情境已通過。
 
 正式 JD 來源按項目分組，各筆引用分別標示「JD 已修改」「來源已更新」或兩者；「查看差異」可按需展開 JD 內容與 Memory 來源的比較。JD 從該筆引用上次核對的修訂比較到目前正式稿，不限於上一輪；訪談原話不可改寫，因此只提供 JD 內容比較。查看不解除待核對。契約與驗證見[來源介面規範](../../docs/implementation/interface-and-delivery.md#31-正式-jd-來源的唯讀下鑽)。新增差異欄位需前後端一起更新，開發程序須載入同一版契約；不放寬前端驗證去接受舊格式。
 

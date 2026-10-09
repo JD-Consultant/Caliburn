@@ -1,7 +1,7 @@
 # 程式組織、依賴方向與命名
 
 - 狀態：**現行程式組織與維護規範** 。目錄樹說明責任與依賴；實際路徑以程式及同題接線文件為準。
-- 依據：[系統責任](../architecture/system-boundaries.md)、[工程取捨](../architecture/design-decisions.md)、[開發規範](development-standard.md)。採模組化單體，不將每個業務模組拆成部署或套件。
+- 依據：[系統責任](../architecture/system-boundaries.md)、[工程取捨](../architecture/design-decisions.md)、[貢獻指南](../../CONTRIBUTING.md#驗證與提交)。採模組化單體，不將每個業務模組拆成部署或套件。
 - 配套：[程式撰寫規範](coding-standard.md)定義函式／實例／Service、型別、錯誤、非同步與測試寫法；本頁保留目錄、依賴及共用命名責任。
 
 依問題跳讀：[目錄與資料責任](#1-目錄依業務責任組織機制集中在少數邊界)、[允許依賴及替換點](#2-依賴方向與可檢查限制)、[命名](#3-名稱要能表達身分時間與效果)。具體函式及 React 寫法直接讀[撰寫規範](coding-standard.md)，無須先通讀整棵目錄樹。
@@ -70,7 +70,7 @@ Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位�
 
 ## 2. 依賴方向與可檢查限制
 
-圖為**現行後端的 Python 模組依賴視角**，採 [C4 notation](https://c4model.com/diagrams/notation)的元素種類、責任、技術及單向關係標示原則。矩形均為 Python 模組群組，實線箭頭由匯入方指向被匯入方，標籤說明允許匯入的用途。這些責任群組跨越多個程式檔，不是 C4 Component 層級或 UML Package 圖；箭頭也不表示呼叫先後。組裝根可注入所有具體實作，圖只列主要依賴，完整限制見下方規則及自動檢查。[圖面規範](documentation-standard.md#3-圖面種類與符號)維護表示法。
+圖為**現行後端的 Python 模組依賴視角**，採 [C4 notation](https://c4model.com/diagrams/notation)的元素種類、責任、技術及單向關係標示原則。矩形均為 Python 模組群組，實線箭頭由匯入方指向被匯入方，標籤說明允許匯入的用途。這些責任群組跨越多個程式檔，不是 C4 Component 層級或 UML Package 圖；箭頭也不表示呼叫先後。組裝根可注入所有具體實作，圖只列主要依賴，完整限制見下方規則及自動檢查。本圖表示法與來源已在本段交代，通用讀圖見[圖庫](../diagrams/README.md#讀圖約定)。
 
 模組依**共同變更理由與資料責任**聚合：同一不變量、權限判斷及其修改集中在負責模組；可獨立變動的政策與外部 I/O 保留清楚邊界。高內聚、低耦合以「改一項行為需要理解及同步修改多少責任」檢查，不以檔案數、class 數或層數評分。
 
@@ -85,7 +85,7 @@ Alembic 的 CLI 配置與啟動版本檢查均以 `caliburn:migrations` 定位�
 3. `agent_execution` 不 import A／B1／B2 角色、JD 或 Memory ORM；由角色提供具名工具 handler 與起始資料。角色可依賴它，不能互相 import 私有 prompt／state。
 4. 跨 feature 協調放 workflows；讀別的領域走具體公開查詢／typed result，不直查別人的私有表。需要跨域資格與排序一次完成的唯讀查詢，可由各 owner 公開具名 selectable，再由具名 workflow projection 組合；例如最新合法 Plan。查詢不取得寫入權、不新增結果權威，也不為一般呼叫建立通用查詢框架。共享交易由 workflow 開啟，把同一 session 交給指定 service；內層不私自 commit。不是微服務，也不需要把同庫內呼叫變 HTTP。
 5. 真正需要替換外部 I/O 或行為元件時用窄 `Protocol`／callable；純 Python 少數消費者直接使用明確型別。替換點由消費者需要的責任決定，不替每個 class 配 interface，也不為此建立每類一套抽象 factory、BaseRepository 或萬用 UnitOfWork 註冊表。
-6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。跨 feature 需要的畫面狀態不用 Effect 複製到上層 state：Turn 提示來自外部儲存（`useSyncExternalStore`），缺少提示時由 composer 查 current；頁面的唯讀 query 觀察者只訂閱同一份 cache，未知不可當閒置，不另發 GET／輪詢。feature 要在另一 feature 的項目旁放內容時，由 app 提供 render 函式（context），feature 不互相 import。詳見[介面 §1.6](interface-and-delivery.md#16-工作畫面組裝)。
+6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。跨 feature 需要的畫面狀態不用 Effect 複製到上層 state：Turn 提示來自外部儲存（`useSyncExternalStore`），缺少提示時由 composer 查 current；頁面的唯讀 query 觀察者只訂閱同一份 cache，未知不可當閒置，不另發 GET／輪詢。feature 要在另一 feature 的項目旁放內容時，由 app 提供 render 函式（context），feature 不互相 import。詳見[介面 §1.6](../implementation/interface-and-delivery.md#16-工作畫面組裝)。
 
 7. 層只向下 import：`adapters` ← `features` ← `workflows` ← `transport`／`agents` ← `bootstrap`；`agent_execution` 位於 `adapters` 之上，不 import `features`、`workflows`、`transport`、`agents`。`settings` 組合各 adapter 擁有的配置，adapter 不 import `settings`。B1／B2 的共用組裝 `agents/memory_analysis` 可被兩個角色使用，兩個角色之間不互相 import。這些以表格形式鎖在 `test_import_boundaries.py`，新增上行 import 會直接失敗。
 
@@ -94,11 +94,11 @@ Prompt、Tool 與元件的持續對照沿上述邊界組裝：
 - 角色提供提示、工具與 Context 政策；組裝根提供元件及外部依賴。實際需要比較的變點須能明確替換，其他正式執行、權限、交易及取消流程共用。
 - 純 Prompt 比較只替換目標提示；Tool 可只改說明、schema、handler 或回傳，但四者須相容並明列必要連帶變動。整組能力消融另標比較範圍，不假稱單一變因。
 - 配置在組裝處決定，不複製整個 Agent、不靠全域可變設定切組，也不把試驗旗標散入領域規則。具名參數、插件、MCP adapter 或現成評測工具皆依實際替換、測試及維護成本選用；共同業務規則留在負責模組，不隨 transport 或工具平台複製。
-- 已保存的模型請求（captured request）與既有工作沿[執行接線](agent-execution.md)的原請求／工具及恢復契約；更新配置不能重建或改寫原請求。本節不另訂持久版本格式。
+- 已保存的模型請求（captured request）與既有工作沿[執行接線](../implementation/agent-execution.md)的原請求／工具及恢復契約；更新配置不能重建或改寫原請求。本節不另訂持久版本格式。
 
 現行顧問的 `ConsultantConfiguration` 保存提示區段、工具說明及 JD 讀取容量；`AppComposition` 在正式 `create_app` 注入配置、SDK client 與 checkpointer factory。比較入口先固定整批候選，再由相同值產生 manifest 與 runtime；不在 await 後重讀可變輸入。已捕捉的請求與工具容量沿原工作恢復，配置改變只影響尚未捕捉的新工作。新增實際變因時，在其負責模組擴充窄介面及反例，不把所有工具行為收進全域 registry。使用方式見 [evaluations](../../apps/api/evaluations/README.md)。
 
-以上是維護及審查判準，不表示所有可想像的變因已有設定開關。介面／I/O／觀測寫法由[撰寫規範](coding-standard.md)維護，對照設計及驗收由[開發規範 §7–8](development-standard.md#7-分析方法prompttool-與-context-共同驗收)維護。
+以上是維護及審查判準，不表示所有可想像的變因已有設定開關。介面／I/O／觀測寫法由[撰寫規範](coding-standard.md)維護，對照設計及驗收由[貢獻指南](../../CONTRIBUTING.md#模型品質比較)維護。
 
 lint import 限制與小型 AST／import 測試檢查層方向、前端 feature 隔離等規則。需要例外先說出實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴。驗證見程式組織審查。
 

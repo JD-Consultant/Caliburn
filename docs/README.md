@@ -8,9 +8,9 @@
 |---|---|
 | 第一次了解產品與系統 | [產品介紹](product-introduction.md) → [架構導覽](architecture/README.md) |
 | 啟動、操作或排查問題 | [操作手冊](runbook.md)；元件設定、開發及測試另查[後端 README](../apps/api/README.md)與[前端 README](../apps/web/README.md) |
-| 修改程式、Prompt、Tool 或 Context | [實作規範](implementation/README.md) → 受影響的責任正文 |
+| 修改程式、Prompt、Tool 或 Context | [貢獻指南](../CONTRIBUTING.md) → [程式規範](standards/README.md)及受影響的責任正文 |
 | 查現行規則與設計取捨 | [架構與現行責任](architecture/README.md) → 責任正文；現行理由查 [現行設計取捨](architecture/design-decisions.md) |
-| 改善訪談與 JD 分析方法 | [工作分析與 JD 指南](guides/README.md) |
+| 查訪談、工作分析及 JD 的已採用內容要求 | [產品內容判準](product-concept.md#內容判準)與正式角色提示 |
 
 ## 文件由誰維護
 
@@ -18,10 +18,11 @@
 |---|---|
 | [產品概念](product-concept.md) | 產品目標、資訊關係與非目標 |
 | [架構](architecture/README.md) | 模組責任、資料流、生命週期、保存與運作邊界 |
-| [實作](implementation/README.md) | 模組接線、命名、寫法、工程機制與測試方法 |
+| [程式規範](standards/README.md) | 模組組織、程式寫法、資源、測試、Log 及契約策略 |
+| [實作](implementation/README.md) | 具體程式接線、工程機制與測試責任 |
 | [操作](runbook.md) | 安裝、啟停、備份與排錯；App README 補元件設定與測試 |
 
-維護方式依[文件與圖面規範](implementation/documentation-standard.md)，正式取捨依[決策流程](decision-process.md)。ADR、設計稿、決策登記、研究底稿、施工計畫、實驗原件及報告只留本機，不隨公開 repository 或其歷史發布。公開文件直接維護必要契約、官方來源與限制。
+修改、驗證及文件維護見[貢獻指南](../CONTRIBUTING.md)。公開文件直接保留必要契約、官方來源與已知限制；研究、內部流程、決策及工作原件只留本機，新 checkout 不依賴私人檔案。
 
 ## Repo 的其他目錄
 

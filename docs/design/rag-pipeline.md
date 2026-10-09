@@ -50,8 +50,8 @@ BGE-reranker-v2-m3 配對評分，模型權重留在 GPU 容器，不進正式 A
 | [`apps/pdf-to-json/`](../../apps/pdf-to-json/README.md) | PDF → OCS JSON 解析／轉換（`jd-convert` CLI），純離線批次、無狀態 | 是（`@caliburn/pdf-to-json`） | Python，per-app `uv` |
 | [`apps/ocs-indexer/`](../../apps/ocs-indexer/README.md) | OCS JSON → Qdrant 索引：`index-references` 建新公版參考索引，`jd-ocs-indexer index` 保留既有索引；無狀態 API 由 `jd-ocs-indexer serve` 提供（:8000） | 是（`@caliburn/ocs-indexer`） | Python，per-app `uv` |
 | [`apps/embedder/`](../../apps/embedder/README.md) | BGE-M3 dense+sparse embedding 與 BGE-reranker-v2-m3 配對評分（`POST /embed`、`POST /rerank`、`GET /health`），GPU container | 否——沒有 `package.json`，只有 Dockerfile | Docker only |
-| [`packages/ocs-contract/`](../../packages/ocs-contract/) | OCS JSON schema／生成的 Pydantic model／TypeScript type；`pdf-to-json` 與 `ocs-indexer` 共用 | 是（`@caliburn/ocs-contract`） | Python + codegen，per-app `uv`／pnpm scripts |
-| [`packages/indexer-contract/`](../../packages/indexer-contract/) | indexer 查詢 API 的 Pydantic wire model，供 producer 驗證 request／response，包含新公版參考 API 的格式 | 否——沒有 `package.json`，Python-only | Python，per-app `uv` |
+| [`packages/ocs-contract/`](../../packages/ocs-contract) | OCS JSON schema／生成的 Pydantic model／TypeScript type；`pdf-to-json` 與 `ocs-indexer` 共用 | 是（`@caliburn/ocs-contract`） | Python + codegen，per-app `uv`／pnpm scripts |
+| [`packages/indexer-contract/`](../../packages/indexer-contract) | indexer 查詢 API 的 Pydantic wire model，供 producer 驗證 request／response，包含新公版參考 API 的格式 | 否——沒有 `package.json`，Python-only | Python，per-app `uv` |
 
 `ocs-contract`／`indexer-contract` 都以 `tool.uv.sources` path dependency（相對路徑、editable）供
 `pdf-to-json`／`ocs-indexer` 使用，不是發佈到 registry 的套件。正式 App 不直接依賴這些 Python 套件，
@@ -134,7 +134,7 @@ App 分開保存選用公版及員工明確否認的工作範圍。選用值 `nu
 
 工具能力、格式與指引依原 captured request 接續；新設定不追補舊訪談或舊批次，已啟用的原請求缺少 client 時明確拒絕。原命令與結果沿既有 prepared／execute 及操作查回，不能因恢復而重選公版。
 
-保存接線見[公版 workflow](../../apps/api/src/caliburn/workflows/occupation_references.py)與[固定 state 讀取](../../apps/api/src/caliburn/workflows/occupation_reference_reads.py)，wire 由[工具 Schema](../../apps/api/contracts/tools/)維護。
+保存接線見[公版 workflow](../../apps/api/src/caliburn/workflows/occupation_references.py)與[固定 state 讀取](../../apps/api/src/caliburn/workflows/occupation_reference_reads.py)，wire 由[工具 Schema](../../apps/api/contracts/tools)維護。
 
 ## 6. 相關文件
 

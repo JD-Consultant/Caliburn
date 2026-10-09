@@ -2,24 +2,37 @@
 
 受維護文件的圖源集中於此。正文引用同名 PNG，旁邊提供 `.mmd` 圖源及可放大的 SVG；相同圖直接共用一組圖片，不在報告或正文另抄來源。修改節點、形狀或連線時，只編輯 `.mmd` 再重繪。
 
-產品權責、圖說及適用範圍仍由各責任文件維護；本頁只提供路由與重繪方式。圖名保留「現行」「目標／未實作」「候選」或「歷史」，集中存放不會改變狀態。符號定義依[文件與圖面規範](../implementation/documentation-standard.md#3-圖面種類與符號)。研究及報告專用圖只留本機，不列入公開圖庫。
+產品權責、圖說及適用範圍仍由各責任文件維護；本頁只提供路由與重繪方式。圖名保留「現行」「目標／未實作」「候選」或「歷史」，集中存放不會改變狀態。現有符號的閱讀方式見[讀圖約定](#讀圖約定)。研究及報告專用圖只留本機，不列入公開圖庫。
+
+## 讀圖約定
+
+各圖的範圍、狀態、省略與產品含義以其圖說為準。下表解釋現有公開圖的符號，方便對照正文；不藉圖種推導新元件、部署或產品保證。
+
+| 圖種 | 現有圖如何閱讀與核對 |
+|---|---|
+| 系統、容器、部署及模組關係 | 按圖例辨認元素種類、邊界、技術及具名單向關係；C4 容器不等於 Docker 容器，模組圖不表示呼叫順序。依 [C4 notation](https://c4model.com/diagrams/notation) |
+| 基本流程 | 終端形表示局部起訖，矩形是處理，菱形是互斥分支，平行四邊形是跨邊界資料交接，兩側雙線矩形是另有定義的子流程，六角形是初始化／準備；箭頭表示控制順序，暫停與後續接續須有明確條件。依 [Microsoft 流程圖](https://support.microsoft.com/en-us/visio/create-a-basic-flowchart-in-visio)及 [Mermaid 形狀](https://mermaid.js.org/syntax/flowchart.html) |
+| 時序及狀態 | 同步訊息是實線實心箭頭、非同步是開放箭頭、reply 是虛線；狀態轉移分事件、條件與效果。圖中終態只屬該圖，不代表業務正式完成。依 [UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF) §17.4.4、§14.2.4 及 [Mermaid 時序](https://mermaid.js.org/syntax/sequenceDiagram.html)／[狀態](https://mermaid.js.org/syntax/stateDiagram.html) |
+| ER | 圈是零、短線是一、鳥足是多，兩端各讀最小／最大基數；實線識別關係表示父鍵參與子表主鍵，虛線是非識別關係。PK／FK／UK 分別為主鍵／外鍵／唯一鍵，複合約束看圖說與 DDL；線不表示提交順序。依 [Mermaid ER](https://mermaid.js.org/syntax/entityRelationshipDiagram.html) |
+
+同一設計圖只維護一份可編輯來源，正文嵌入 PNG 並附圖源／SVG。更新時核對語意與正文、解析渲染、中文／裁切／箭線／圖例及引用同步；能渲染不證明符號或產品契約正確。截圖與既有來源素材保留原格式與位元組，搬移核對雜湊及來源說明。
 
 ## 按責任文件查圖
 
 | 責任文件 | 圖面內容 | 圖源目錄 |
 |---|---|---|
-| [產品介紹](../product-introduction.md) | 使用者的核心流程 | [來源](product-introduction/) |
-| [架構入口](../architecture/README.md) | 操作者主要流程 | [來源](architecture/README/) |
-| [系統邊界](../architecture/system-boundaries.md) | C4 情境、容器 | [來源](architecture/system-boundaries/) |
-| [保存與恢復](../architecture/persistence.md) | Plan 採用、已提交操作恢復 | [來源](architecture/persistence/) |
-| [交付與運作](../architecture/delivery-and-operations.md) | 部署、選用 RAG 容器 | [來源](architecture/delivery-and-operations/) |
-| [程式組織](../implementation/code-organization.md) | 模組依賴 | [來源](implementation/code-organization/) |
-| [Agent 執行](../implementation/agent-execution.md) | 歷史、Step、迴圈、控制、準備、補存 | [來源](implementation/agent-execution/) |
-| [模型外送](../implementation/model-requests.md) | 請求與結算、預算、重試 | [來源](implementation/model-requests/) |
-| [訪談保存](../implementation/interview-storage.md) | 訪談及執行關係 | [來源](implementation/interview-storage/) |
-| [Memory 保存](../implementation/memory-storage.md) | 批次發布、修訂、候選與快照 | [來源](implementation/memory-storage/) |
-| [JD 保存](../implementation/jd-storage.md) | 資料關係、修訂讀取、人工編輯、候選 | [來源](implementation/jd-storage/) |
-| [介面與交付](../implementation/interface-and-delivery.md) | 命令重送、串流、來源查詢 | [來源](implementation/interface-and-delivery/) |
+| [產品介紹](../product-introduction.md) | 使用者的核心流程 | [來源](product-introduction) |
+| [架構入口](../architecture/README.md) | 操作者主要流程 | [來源](architecture/README) |
+| [系統邊界](../architecture/system-boundaries.md) | C4 情境、容器 | [來源](architecture/system-boundaries) |
+| [保存與恢復](../architecture/persistence.md) | Plan 採用、已提交操作恢復 | [來源](architecture/persistence) |
+| [交付與運作](../architecture/delivery-and-operations.md) | 部署、選用 RAG 容器 | [來源](architecture/delivery-and-operations) |
+| [程式組織](../standards/code-organization.md) | 模組依賴 | [來源](implementation/code-organization) |
+| [Agent 執行](../implementation/agent-execution.md) | 歷史、Step、迴圈、控制、準備、補存 | [來源](implementation/agent-execution) |
+| [模型外送](../implementation/model-requests.md) | 請求與結算、預算、重試 | [來源](implementation/model-requests) |
+| [訪談保存](../implementation/interview-storage.md) | 訪談及執行關係 | [來源](implementation/interview-storage) |
+| [Memory 保存](../implementation/memory-storage.md) | 批次發布、修訂、候選與快照 | [來源](implementation/memory-storage) |
+| [JD 保存](../implementation/jd-storage.md) | 資料關係、修訂讀取、人工編輯、候選 | [來源](implementation/jd-storage) |
+| [介面與交付](../implementation/interface-and-delivery.md) | 命令重送、串流、來源查詢 | [來源](implementation/interface-and-delivery) |
 
 ## 圖面重用
 

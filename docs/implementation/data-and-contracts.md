@@ -49,7 +49,7 @@ Memory 領域模組擁有候選、固定修訂、快照及原操作。工具先�
 
 ## 4. JD：關聯式候選、來源與正式完成
 
-JD 以 profile、職責、任務、成果、要求、知識、技能及關係建立型別模型，欄位意義沿[JD 指南](../guides/2026-09-09-jd-field-and-writing-guide.md)，schema 不從 Memory Markdown 或 UI widget 反推。舊 SQL／測例只供參考，沒有相容表名義務。人工及模型入口共用 JD 領域模組；模型工具寫入候選，A 完成交易才正式採用，不能借人工正式 API 提前寫入正式稿。
+JD 以 profile、職責、任務、成果、要求、知識、技能及關係建立型別模型，欄位意義沿[產品內容判準](../product-concept.md#內容判準)，schema 不從 Memory Markdown 或 UI widget 反推。舊 SQL／測例只供參考，沒有相容表名義務。人工及模型入口共用 JD 領域模組；模型工具寫入候選，A 完成交易才正式採用，不能借人工正式 API 提前寫入正式稿。
 
 候選位置、分支回退與採用由 [JD 保存 §3.1](jd-storage.md#31-本輪候選與可恢復位置)維護；模型定位及來源解析見[工具接線 §3.2–3.3](jd-storage.md#32-模型導覽與既有物件定位)，差異與明確核對見[來源接線 §3.5](jd-storage.md#35-來源及人工改稿差異)。`read_ref`、`target_title`、`citation_ref` 各自解析不同責任所擁有的資料，不能靠同名猜測身分。跨層呼叫傳入固定基準，資料解析及合法性仍由各領域判斷。
 
@@ -59,7 +59,7 @@ JD 以 profile、職責、任務、成果、要求、知識、技能及關係建
 
 ## 5. 唯一契約來源及生成
 
-`apps/api/contracts/http/` 保存跨語言 DTO，`contracts/tools/` 保存模型可見 schema。Schema 與描述按業務拆，不每參數一檔。鎖定 datamodel-code-generator 產 Python DTO，json-schema-to-typescript 產 TypeScript；OpenAPI 從 API 的生成型別形成，不再手寫 OpenAPI／TS／Pydantic 三份 shape。HTTP／tool 邊界仍做執行時驗證，TS 型別不代替它。[現行策略](../contract-strategy.md)的原則保持，路徑不同不接回退役 package。
+`apps/api/contracts/http/` 保存跨語言 DTO，`contracts/tools/` 保存模型可見 schema。Schema 與描述按業務拆，不每參數一檔。鎖定 datamodel-code-generator 產 Python DTO，json-schema-to-typescript 產 TypeScript；OpenAPI 從 API 的生成型別形成，不再手寫 OpenAPI／TS／Pydantic 三份 shape。HTTP／tool 邊界仍做執行時驗證，TS 型別不代替它。[現行策略](../standards/contract-strategy.md)的原則保持，路徑不同不接回退役 package。
 
 [`generate_contracts.py`](../../apps/api/scripts/generate_contracts.py)維護下列生成物；執行及檢查命令見 [API README](../../apps/api/README.md)。
 

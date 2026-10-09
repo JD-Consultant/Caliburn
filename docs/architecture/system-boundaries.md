@@ -43,7 +43,7 @@ Caliburn 把使用者互動、AI 分析、業務資料與執行恢復分開處�
 | 公版參考業務 | App 保存選用及否認範圍，獨立 RAG 提供公版查讀；B1／B2 只讀有效排除範圍 | [公版選用與否認資格](../design/rag-pipeline.md#公版選用與明確否認的保存資格) |
 | AI 執行 | 原生模型接續、Step、控制與恢復；checkpoint 不代表 JD／Memory 已正式成立 | [共用執行與恢復](../implementation/agent-execution.md) |
 | 執行快照保存 | LangGraph checkpointer 將執行位置存入 PostgreSQL，供原工作恢復；不判定業務完成 | [Agent 執行](../implementation/agent-execution.md#1-執行圖與業務資格分開) |
-| 角色工具與模型接線 | 將模型意圖轉為授權用例，將真結果轉成模型輸出；範圍及操作身分由 App 注入 | [模型工具的共同邊界](../contract-strategy.md#模型工具的共同邊界) |
+| 角色工具與模型接線 | 將模型意圖轉為授權用例，將真結果轉成模型輸出；範圍及操作身分由 App 注入 | [模型工具的共同邊界](../standards/contract-strategy.md#模型工具的共同邊界) |
 | 持久化接線 | 交易、約束、隔離及原結果回查；不判斷工作語意、不跨模型呼叫持有交易 | [資料與交易](persistence.md) |
 | PDF 投影 | 固定正式 JD 後產生唯讀輸出，候選與 PDF 都不能反向成為正式 JD | [交付](delivery-and-operations.md) |
 
@@ -90,7 +90,7 @@ Memory 採單向 B1 → B2 → 發布，不回交 B1。B1 交接後不再修改�
 
 完成標記須綁定 App 的批次與交接身分，版號不由模型填寫；呼叫過 read 也不代表分析已完成。原生推理與工具結果支援分析接續，App State 保存執行事實，不要求每個 Step 額外撰寫分析筆記。
 
-三個角色採用相同的[工作分析方法](../guides/2026-09-09-complete-work-analysis-guide.md)，但產出不同。A 依[訪談校準](../guides/2026-09-09-customized-jd-depth-and-interview-calibration.md)與[JD 寫作方法](../guides/2026-09-09-jd-field-and-writing-guide.md)形成職務說明書；B1／B2 保存工作情境與理解，不預先寫成 JD 欄位。一次分析可以包含多次模型與工具往返。
+三個角色依[產品內容判準](../product-concept.md#內容判準)及各自正式提示分析，但產出不同。A 形成 JD；B1／B2 保存工作情境與理解，不預先寫成 JD 欄位。一次分析可包含多次模型與工具往返。
 
 ### 工作如何跨模組執行
 
@@ -98,7 +98,7 @@ Memory 採單向 B1 → B2 → 發布，不回交 B1。B1 交接後不再修改�
 
 - [正式採用與交易](persistence.md)說明輸入准入、A 完成及 Memory 整理要求；[模型 Context 與接續](../implementation/agent-execution.md)說明輪前準備、資料綁定與同輪接續。
 - [Memory 單向調度](../implementation/agent-supervision.md)說明候選、固定交接與發布；資訊不足或矛盾須如實保留，不靠回交或猜補處理。
-- [模型工具的共同邊界](../contract-strategy.md#模型工具的共同邊界)、[共用執行與恢復](../implementation/agent-execution.md)及[資料保存](persistence.md)分別維護授權派送、控制接續與原操作核對。
+- [模型工具的共同邊界](../standards/contract-strategy.md#模型工具的共同邊界)、[共用執行與恢復](../implementation/agent-execution.md)及[資料保存](persistence.md)分別維護授權派送、控制接續與原操作核對。
 
 ## 4. 跨邊界只傳必要的資訊
 
@@ -111,7 +111,7 @@ Memory 採單向 B1 → B2 → 發布，不回交 B1。B1 交接後不再修改�
 | A → 公版 RAG → A | 已確認主要工作 query、固定公版定位、目錄或任務正文 | 只在啟用時查讀；不自動加入否認範圍，也不以相似度認定員工責任 |
 | 公版參考 state → A／B1／B2 | A 讀本輪選用及排除範圍；B1／B2 只讀其固定上界內有效的排除範圍 | 選用與否認不寫入 Memory；後輪更正不回流舊批次，取消／失敗候選不跨輪生效 |
 
-Plan、Changes 與 JD 的往來沿 [§2.1](#21-長任務的元件分工)；Web 重送／重連沿[互動狀態](delivery-and-operations.md#畫面api-與串流的狀態一致性)，業務提交沿[交易邊界](persistence.md#3-交易邊界)。Python 與 Web 的傳輸格式依[契約策略](../contract-strategy.md)從單一來源生成。
+Plan、Changes 與 JD 的往來沿 [§2.1](#21-長任務的元件分工)；Web 重送／重連沿[互動狀態](delivery-and-operations.md#畫面api-與串流的狀態一致性)，業務提交沿[交易邊界](persistence.md#3-交易邊界)。Python 與 Web 的傳輸格式依[契約策略](../standards/contract-strategy.md)從單一來源生成。
 
 ## 5. 模組之間的資料依賴
 

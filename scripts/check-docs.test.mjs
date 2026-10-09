@@ -59,17 +59,13 @@ test('rejects links outside the repository instead of reading host files', async
   assert.equal(result.errors[0].reason, 'outside repository');
 });
 
-test('default scope excludes frozen records but retains their maintained indexes', () => {
+test('selects Markdown across public root, component and documentation paths', () => {
   assert.deepEqual(selectDocuments([
-    'docs/README.md', 'docs/architecture/persistence.md', 'docs/adr/README.md',
-    'docs/adr/0001-original.md', 'docs/archive/a.md',
-    'docs/experiments/README.md', 'docs/experiments/product-validation/README.md',
-    'docs/experiments/engineering/README.md', 'docs/experiments/case/source-snapshot/a.md',
-    'docs/research/engineering/study.md', 'docs/plans/evidence/frozen.md',
+    'README.md', 'AGENTS.md', 'CONTRIBUTING.md', 'apps/api/README.md',
+    'packages/ocs-contract/README.md', 'docs/README.md', 'docs/diagrams/flow.png',
   ]), [
-    'docs/README.md', 'docs/architecture/persistence.md', 'docs/adr/README.md',
-    'docs/experiments/README.md', 'docs/experiments/product-validation/README.md',
-    'docs/experiments/engineering/README.md', 'docs/research/engineering/study.md',
+    'README.md', 'AGENTS.md', 'CONTRIBUTING.md', 'apps/api/README.md',
+    'packages/ocs-contract/README.md', 'docs/README.md',
   ]);
 });
 
@@ -83,7 +79,8 @@ test('discovers real images with titles and references, excluding fenced example
 test('discovers existing maintained files after a tracked page is deleted without staging', async t => {
   const root = await fixture(t, {
     'docs/README.md': '# 文件\n[舊頁](removed.md)', 'docs/removed.md': '# 刪除頁',
-    'docs/plans/evidence/frozen.md': '```mermaid\nflowchart TD\n A --> B\n```',
+    '.gitignore': 'docs-local/\n',
+    'docs-local/evidence/frozen.md': '```mermaid\nflowchart TD\n A --> B\n```',
   });
   execFileSync('git', ['init', '-q'], { cwd: root });
   execFileSync('git', ['add', 'docs'], { cwd: root });
@@ -92,4 +89,48 @@ test('discovers existing maintained files after a tracked page is deleted withou
   assert.equal((await checkDocuments(root, await findDocuments(root))).errors[0].reason, 'missing file');
   const result = await checkDocuments(root, ['docs/removed.md']);
   assert.equal(result.errors[0].reason, 'missing source file');
+});
+
+
+test('default discovery reports broken root and component links, including untracked public pages', async t => {
+  const root = await fixture(t, {
+    '.gitignore': 'docs-local/\n',
+    'README.md': '[missing](root-missing.md)\n',
+    'apps/api/README.md': '[missing](component-missing.md)\n',
+    'docs-local/private.md': '[ignored](does-not-exist.md)\n',
+  });
+  execFileSync('git', ['init', '-q'], { cwd: root });
+  execFileSync('git', ['add', 'README.md', '.gitignore'], { cwd: root });
+  const files = await findDocuments(root);
+  assert.deepEqual(files, ['README.md', 'apps/api/README.md']);
+  const result = await checkDocuments(root, files);
+  assert.deepEqual(result.errors.map(error => error.file), ['README.md', 'apps/api/README.md']);
+});
+
+test('public checking rejects ignored targets that exist and accepts public directories', async t => {
+  const root = await fixture(t, {
+    '.gitignore': 'docs-local/\n',
+    'README.md': '[private](docs-local/private.md#內容) [private directory](docs-local/) [public directory](apps/api/)\n',
+    'apps/api/README.md': '# API\n',
+    'docs-local/private.md': '# 內容\n',
+  });
+  execFileSync('git', ['init', '-q'], { cwd: root });
+  const publishedFiles = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+    { cwd: root, encoding: 'utf8' }).split('\0').filter(Boolean);
+  const result = await checkDocuments(root, ['README.md'], { publishedFiles });
+  assert.deepEqual(result.errors.map(error => [error.target, error.reason]), [
+    ['docs-local/private.md#內容', 'not a public file or directory'],
+    ['docs-local/', 'not a public file or directory'],
+  ]);
+});
+
+test('explicit local checking preserves access to ignored local targets', async t => {
+  const root = await fixture(t, {
+    '.gitignore': 'docs-local/\n',
+    'docs-local/README.md': '[private](private.md#內容)\n',
+    'docs-local/private.md': '# 內容\n',
+  });
+  execFileSync('git', ['init', '-q'], { cwd: root });
+  const result = await checkDocuments(root, ['docs-local/README.md']);
+  assert.deepEqual(result.errors, []);
 });

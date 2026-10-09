@@ -6,7 +6,7 @@
 
 ## 1. 基本資料編輯的讀取基底與恢復
 
-[JD feature](../../apps/web/src/features/jd-editor/JdProfileEditor.tsx)讀取正式 profile；四欄文意沿 [JD 指南](../guides/2026-09-09-jd-field-and-writing-guide.md)，不含檔案名稱／員工姓名。後端交易與固定修訂由 [JD 保存](jd-storage.md)負責；此處只描述畫面接線，不另維護 wire schema。
+[JD feature](../../apps/web/src/features/jd-editor/JdProfileEditor.tsx)讀取正式 profile；四欄文意沿 [產品內容判準](../product-concept.md#內容判準)，不含檔案名稱／員工姓名。後端交易與固定修訂由 [JD 保存](jd-storage.md)負責；此處只描述畫面接線，不另維護 wire schema。
 
 四欄與其他文字一樣點一下就地逐欄修改（[§6](#6-逐欄就地編輯)），每個欄位各自捕捉讀取基底並套用以下保存保護：
 

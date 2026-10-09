@@ -10,11 +10,11 @@
 |---|---|
 | 產品應達成什麼、哪些規則不能改 | [架構與責任文件](../architecture/README.md) |
 | 目前限制與驗證責任 | [驗證範圍](../architecture/verification.md) |
-| 研究、SDD、TDD、審查與長任務接手 | [開發規範](development-standard.md)；接手方式見 [§10](development-standard.md#10-長任務goal-與工作上下文) |
+| 修改範圍、驗證及提交 | [貢獻指南](../../CONTRIBUTING.md) |
 | 選哪些框架、為何、不選什麼 | [技術選型與機制驗證](technology-decisions.md) |
-| 模組、命名、依賴與 Prompt／Tool 替換 | [程式組織與命名](code-organization.md)；對照公平性沿[開發規範 §7](development-standard.md#7-分析方法prompttool-與-context-共同驗收) |
-| 前後端寫法、錯誤、測試與觀測 | [程式撰寫規範與實例](coding-standard.md)，含 [Log 格式與查閱](coding-standard.md#72-log-的格式責任與查閱) |
-| 工程文件如何分工、拆合、敘述與繪圖 | [文件與圖面規範](documentation-standard.md) |
+| 模組、命名、依賴與 Prompt／Tool 替換 | [程式組織與命名](../standards/code-organization.md)；對照公平性沿[貢獻指南](../../CONTRIBUTING.md#模型品質比較) |
+| 前後端寫法、錯誤、測試與觀測 | [程式撰寫規範與實例](../standards/coding-standard.md)，含 [Log 格式與查閱](../standards/coding-standard.md#72-log-的格式責任與查閱) |
+| 文件如何分工及檢查 | [文件維護](../../CONTRIBUTING.md#文件維護)與[圖庫](../diagrams/README.md) |
 
 ### 依改動範圍讀接線
 

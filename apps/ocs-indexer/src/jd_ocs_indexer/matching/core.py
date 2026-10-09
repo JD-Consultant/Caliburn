@@ -1,7 +1,7 @@
-"""相似比對核心 — 純函式(零 I/O)。ADR 0022;spec docs/specs/2026-07-04-similarity-matching-v1-spec.md。
+"""相似比對核心 — 純函式(零 I/O)。端點與維護方式見 apps/ocs-indexer/README.md。
 
 分帶 = Fellegi-Sunter 三區;分群 = 貪婪星型(成員與中心直連 ≥θ_high,SKOS closeMatch
-非遞移紅線——絕不做連通分量)。改門檻 = 改 THRESHOLDS + 跑校準腳本留紀錄(docs/specs/)。
+非遞移紅線——絕不做連通分量)。改門檻 = 改 THRESHOLDS + 跑校準腳本，結果留在本機紀錄。
 """
 from __future__ import annotations
 
@@ -9,10 +9,10 @@ import re
 import unicodedata
 from typing import Callable, Optional
 
-# per-kind {θ_high, θ_low}(spec §2;實驗出處 = dedup 研究 §9.4;絕對值只對本池×bge-m3 有效)
+# per-kind {θ_high, θ_low}(絕對值只對原受測池×bge-m3 有效，不能當通用品質門檻)
 THRESHOLDS: dict[str, tuple[float, float]] = {
     "task": (0.95, 0.80),
-    "unit": (0.95, 0.80),      # 未經實驗,暫比照 task;校準乾淨才接 UI(spec §2)
+    "unit": (0.95, 0.80),      # 未經實驗,暫比照 task;經校準驗證才接 UI
     "knowledge": (0.85, 0.65),
     "skill": (0.85, 0.65),
     "output": (0.85, 0.65),

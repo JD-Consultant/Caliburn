@@ -1,7 +1,7 @@
 # 職務檔案與訪談保存接線
 
 - 狀態：**現行職務檔案、訪談與准入保存接線** 。本頁說明原文、正式資格、原操作與短交易；Graph 與原生接續見[Agent 執行](agent-execution.md)，啟停及控制見[程序監督](agent-supervision.md)。驗證見檔案與訪談。
-- 語意仍由[資料保存](../architecture/persistence.md)及[正式來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
+- 語意仍由[資料保存](../architecture/persistence.md)及[Memory 選讀與來源](memory-tools.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
 - 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/src/caliburn/migrations/versions/0001_job_files_and_interviews.py)。
 
 | 維護問題 | 閱讀位置 |
@@ -47,7 +47,7 @@ App 開場在建立時取得序號 1。已接受員工輸入進原文與提交�
 
 ## 2. 建立與重送
 
-依 [ADR0085](../adr/0085-creation-command-lifetime.md)採用獨立建檔收據。HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.service` 保留命令收據並建立檔案 → 新建時保存 App 開場、正式序號 1 及初始 JD → 一起 COMMIT → 返回結果。
+依 [建檔命令與刪除邊界](../architecture/persistence.md#6-保留失效與清理)採用獨立建檔收據。HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.service` 保留命令收據並建立檔案 → 新建時保存 App 開場、正式序號 1 及初始 JD → 一起 COMMIT → 返回結果。
 
 - 同一建立命令併發重送：收據 unique＋`INSERT … ON CONFLICT DO NOTHING` 排除重複建立。其後以一條 receipt LEFT JOIN root 查詢取得全部原結果欄位；純重播不取得額外列鎖。
 - 結果仍存在、同一命令不同輸入：拒絕；不能悄悄把這次輸入套在原檔案。
@@ -138,7 +138,7 @@ HTTP 202 **只證明輸入與准入已保存** ；bootstrap 喚醒本機 supervi
 
 ## 9. 有界來源查詢與近期歷史投影
 
-此處的 **frontier（上界）** 指正式訪談的序號上界；App 開始工作時固定其可讀上界，同工作恢復不擴大。下列符號沿[來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#起始訪談範圍與前置語境)，是閱讀記號，不是模型須填的參數：
+此處的 **frontier（上界）** 指正式訪談的序號上界；App 開始工作時固定其可讀上界，同工作恢復不擴大。下列符號沿[Memory 選讀與來源](memory-tools.md)，是閱讀記號，不是模型須填的參數：
 
 - **K**：本工作固定採用的已發布 Memory 所涵蓋的訪談上界；首次無 Memory 為 0。
 - **H**：A 開始前已成立的正式歷史上界，不含本次尚未正式編號的輸入。
@@ -179,7 +179,7 @@ A／B 的角色 workflow 從固定 Memory 取得 K，持久綁定 H／F；同工
 
 使用者在清單確認後，`DELETE /api/job-files/{job_file_id}` 移除整份職務檔案及其訪談、JD、Memory、引用與執行紀錄。成功回 HTTP 204，沒有 JSON 正文；目標已不存在也回 204，因此回應遺失時可重送同一個檔案 ID。這不是隱藏清單或軟刪除，不提供 Undo。
 
-建檔收據的結果 FK 在同一刪除交易設 NULL，只永久保留隨機命令 UUID，拒絕晚到的原建檔重送；不保留原檔案身分或內容。此最小例外沿 [ADR0085](../adr/0085-creation-command-lifetime.md)，刪除失敗或回滾不產生已刪終態。
+建檔收據的結果 FK 在同一刪除交易設 NULL，只永久保留隨機命令 UUID，拒絕晚到的原建檔重送；不保留原檔案身分或內容。此最小例外沿 [建檔命令與刪除邊界](../architecture/persistence.md#6-保留失效與清理)，刪除失敗或回滾不產生已刪終態。
 
 `JobFileWorkflow.delete` 先鎖住既有顧問與 Memory 執行管理程序的派送入口，再在短交易中取得職務檔案列鎖，檢查是否有 active／paused 的執行，刪除根記錄及該檔案的原生 checkpoint。任一同檔案的執行還在運作或收尾，或資料庫仍有未結束工作時，回 HTTP 409，公開錯誤碼為 `job_file_busy`，不刪任何資料。即使取消或完成狀態已提交，也必須等原執行真正退出後再刪除。
 

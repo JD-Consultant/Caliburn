@@ -7,12 +7,12 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 ## 任務與閱讀入口
 
 - 開始時確認要回答的問題、工作範圍與完成條件。研究／審查交付有依據的建議，診斷交付可驗證的原因，實作依已授權範圍完成變更與驗收。
-- 依任務讀取相關文件、程式與測試。現行程式與實測說明現況，正式權責沿已採用 ADR 與相應契約核對；發現落差時先核對適用範圍與接續決策，再提出修正。
+- 依任務讀取相關文件、程式與測試。現行程式與實測說明現況，正式權責沿公開架構、實作說明與程式契約核對；重大改向另核本次任務提供的本機決策紀錄；發現落差時先核對適用範圍與接續決策，再提出修正。
 
 | 工作 | 閱讀入口 |
 |---|---|
-| 查功能、狀態與責任 | 從[目前決策](docs/current-decisions.md)定位本題，再沿[文件導覽](docs/README.md)讀相關責任文件；局部修正限讀受影響範圍。 |
-| 討論架構或跨層變更 | 讀相關 ADR 與契約，依[決策流程](docs/standards/decision-process.md)區分提案、採用與正式切換；[架構討論規範](docs/standards/architecture-discussion-standard.md)提供方法，其細節仍為討論稿。 |
+| 查功能、狀態與責任 | 從[架構與現行責任](docs/architecture/README.md)定位本題，再沿[文件導覽](docs/README.md)讀相關責任文件；局部修正限讀受影響範圍。 |
+| 討論架構或跨層變更 | 讀受影響的架構、介面與保存規則，依[決策流程](docs/standards/decision-process.md)區分提案、採用與正式切換；[架構討論規範](docs/standards/architecture-discussion-standard.md)提供方法，其細節仍為討論稿。 |
 | 規劃與實作 | 依[開發規範](docs/standards/development-standard.md)拆解交付；模組邊界看[程式組織](docs/standards/code-organization.md)，寫法看[程式規範](docs/standards/coding-standard.md)，API／共用格式看[契約策略](docs/standards/contract-strategy.md)。 |
 | 設計測試或判讀結果 | 讀[驗證範圍](docs/architecture/verification.md)、[驗證責任](docs/implementation/verification-plan.md)與相關測試；模型品質結論須核對該次授權比較的設定、結果及限制。 |
 | 維護文件或圖稿 | 依[文件與圖面規範](docs/standards/documentation-standard.md)整理責任、敘述、引用與圖面；更新對應正文及入口。 |
@@ -39,8 +39,8 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 - 長任務維護當前目標、剩餘工作、依賴與驗收條件。可獨立的研究、實作或審查，依效益委派子代理，交代範圍、產出與檢查方式；主代理負責整合及核對相互影響。插入問題處理後接回未完成的主線。
 - 使用者明確指示優先於本檔及 Skill 的工作慣例，仍遵守系統與工具安全界線。若 Skill 使工作暫停或改向，指出檔案、具體規則及影響，區分明文要求與自行判斷。
 - 金鑰不得輸出或提交。真模型與其他有成本的外送依本次有效授權、資料範圍及費用界線執行；清除資料、重建 volume、merge、push、發布與對外傳送須有相應授權。只停止已確認身分的自有程序。
-- 公開 repository 只保存程式、必要測試及產品／架構／開發文件。研究底稿、施工計畫、執行證據、實驗原件及報告只留本機；公開說明保留必要結論、官方來源及限制，不依賴私人檔案或把它們改名後重新提交。
+- 公開 repository 只保存程式、必要測試及產品／架構／開發文件。ADR、設計稿、決策登記、研究底稿、施工計畫、執行證據、實驗原件及報告只留本機；公開說明保留必要結論、官方來源及限制，不依賴私人檔案或把它們改名後重新提交。
 
 ## 指引維護
 
-根指引只保留跨任務適用的工作方法；局部規則放在適用範圍，詳細規範與分析方法由[規範入口](docs/standards/README.md)查閱。更新時整合重複或衝突指令，移除已失效的限制及封存事項；歷史依[文件導覽](docs/README.md)查閱。維護依據見[代理指引規範](docs/standards/documentation-standard.md#21-代理工作指引)。`CLAUDE.md` 只引用本檔。
+根指引只保留跨任務適用的工作方法；局部規則放在適用範圍，詳細規範與分析方法由[規範入口](docs/standards/README.md)查閱。更新時整合重複或衝突指令，移除已失效的限制及封存事項；公開責任文件由[文件導覽](docs/README.md)查閱。維護依據見[代理指引規範](docs/standards/documentation-standard.md#21-代理工作指引)。`CLAUDE.md` 只引用本檔。

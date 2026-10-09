@@ -1,7 +1,7 @@
 # 業務、資料及契約接線
 
 - 狀態：**現行業務、資料及契約的接線原則** 。具體保存分別由[訪談](interview-storage.md)、[JD](jd-storage.md)及[Memory](memory-storage.md)文件說明；正式 DDL 與生成契約由程式維護。
-- 語意權威：[資料保存與交易](../architecture/persistence.md)、[Memory 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[JD 工具](../specs/2026-09-29-jd-model-tool-contract-review.md)。本頁只說接線方式。
+- 語意權威：[資料保存與交易](../architecture/persistence.md)、[Memory 單向調度](agent-supervision.md)、[JD 工具與保存](jd-storage.md)。本頁只說接線方式。
 
 本頁從人工與模型工具共用的業務入口開始，說明短交易、原操作結果、Memory 發布及 JD 完成如何接在一起。具體資料表與保存演算法由各保存文件維護，這裡說明它們必須共同遵守的接線規則。
 
@@ -55,7 +55,7 @@ JD 以 profile、職責、任務、成果、要求、知識、技能及關係建
 
 完成 A 由 [ConsultantCompletionWorkflow](../../apps/api/src/caliburn/workflows/consultant_completion.py)開啟同一短交易，協調[架構交易表](../architecture/persistence.md#3-交易邊界)所列參與者；Plan 以 `validate_final` 核對原位置，其後輪資格依共同完成結果成立，不另提交一份 Plan 正式 head。序號使用檔案內受交易保護的分配，不直接依會跳號的全域 sequence 保證取消不佔號。完整已公開中間訊息另按回看政策保留，無正式序號、不作依據。
 
-取消、人工寫入准入及完成後撤回是不同用例，依 [JD 保存](jd-storage.md)及[核心生命週期](../specs/2026-09-29-core-value-loop-lifecycle.md)的資格與交易執行；本頁不再展開其產品規則。
+取消、人工寫入准入及完成後撤回是不同用例，依 [JD 保存](jd-storage.md)及[正式採用與交易](../architecture/persistence.md)的資格與交易執行；本頁不再展開其產品規則。
 
 ## 5. 唯一契約來源及生成
 
@@ -72,7 +72,7 @@ JD 以 profile、職責、任務、成果、要求、知識、技能及關係建
 
 Web 使用同一份 HTTP schema 驗證回傳，再放入查詢快取，不手寫第二份資料 shape。
 
-依 [ADR0084](../adr/0084-canonical-wire-admission.md)，HTTP request body 經 FastAPI 的 `Annotated[DTO, canonical_body(DTO)]` 接縫；Tool JSON 經 `contracts.validation.parse_contract(DTO, arguments)`。兩者由 `Draft202012Validator` 與 `FormatChecker` 對 canonical 原始值先驗證，通過後才呼叫 `model_validate(..., strict=False)`。因此 `StrictInt` 生成欄位可轉換 schema 合法的 `1.0`，布林、字串與額外欄位仍由 schema 拒絕；不手改 DTO 或逐欄新增 validator。HTTP 的型別／OpenAPI 仍沿原 DTO，領域規則與角色 scope 仍留在原責任模組。
+依 [canonical 契約政策](../standards/contract-strategy.md)，HTTP request body 經 FastAPI 的 `Annotated[DTO, canonical_body(DTO)]` 接縫；Tool JSON 經 `contracts.validation.parse_contract(DTO, arguments)`。兩者由 `Draft202012Validator` 與 `FormatChecker` 對 canonical 原始值先驗證，通過後才呼叫 `model_validate(..., strict=False)`。因此 `StrictInt` 生成欄位可轉換 schema 合法的 `1.0`，布林、字串與額外欄位仍由 schema 拒絕；不手改 DTO 或逐欄新增 validator。HTTP 的型別／OpenAPI 仍沿原 DTO，領域規則與角色 scope 仍留在原責任模組。
 
 runtime guard 由 `importlib.resources` 讀取包資源，官方 `referencing.Registry` 只登錄包內 schema，未配置任何外部 retriever。`jsonschema[format-nongpl]` 是鎖版正式相依；所有 canonical format 都必須有已安裝 checker，缺少時失敗，不靜默略過。驗證錯誤只保留安全種類與 schema 路徑，不轉送 validator 的輸入正文、message 或 cause；Tool 繼續回原本的可行修正指引。schema 已接受、DTO 卻無法表示時屬內部契約錯誤，以安全 `RuntimeError` 中止，不能冒充使用者參數錯誤。Python 用 `FormatChecker.checks`、Web 在唯一 `shared/api/schema-policy.ts` factory 用 Ajv `addFormat` 接上標準 UUID 表示檢查，排除套件額外容許的 URN 或多餘連字號。各 feature 仍擁有其 schema 與編譯後 guard，不各自重建接受政策，也不讓 shared 反向依賴 feature。
 

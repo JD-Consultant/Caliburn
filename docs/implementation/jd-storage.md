@@ -1,7 +1,7 @@
 # JD 保存接線
 
 - 狀態：**現行 JD 保存、交易與讀寫接線** 。人工及模型編輯共用 JD 領域模組，候選在 A 完成交易才正式採用；來源回查、差異與條件撤回依下列契約運作。分析品質及未驗情境見[驗證對照](verification-plan.md)，不由機制測試推定品質達標。
-- 上位契約：[JD 欄位指南](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。驗證見 JD 保存。
+- 內容規則見[JD 欄位指南](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)，跨領域接線見[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。本頁維護候選、提交與工具的保存責任。
 
 | 維護問題 | 閱讀位置 |
 |---|---|
@@ -207,7 +207,7 @@ HTTP 的 `expected_revision_id` 是使用者畫面讀到的正式基底，`comma
 
 ### 3.2 模型導覽與既有物件定位
 
-map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍依 [A context §3.2](../specs/2026-09-26-consultant-context-and-state-design.md#32-jd-導覽的按需定位)，wire 格式只在 [JD map schema](../../apps/api/contracts/tools/jd-map.schema.json)維護；Python／TypeScript DTO 由既有生成器產生，不另手寫一份。
+map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍依 [模型 Context 與接續](agent-execution.md)，wire 格式只在 [JD map schema](../../apps/api/contracts/tools/jd-map.schema.json)維護；Python／TypeScript DTO 由既有生成器產生，不另手寫一份。
 
 讀取沿 §3.1 已捕捉的候選位置，將同一修訂的 profile／work 交給 [map projector](../../apps/api/src/caliburn/transport/model_tools/jd_navigation.py)。它無 IO、不改資料、不讓 LLM 另寫摘要；保留全部項目、順序、職責內任務與未歸屬任務，以及成果／要求數量。只有契約明定的 preview 欄位取既有正文前綴，截短加省略號；目前初值為 120 個 Unicode code point，可由呼叫方配置，是工程初值而非已通過模型品質的最佳長度。K／S／協作不多附描述。尚未填妥的名稱保留 `null`，不造名稱、不隱藏合法但未完成的 JD 項目。
 
@@ -217,7 +217,7 @@ map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍
 - **並行與恢復：** 沿 PostgreSQL Identity、唯一約束與 `ON CONFLICT DO NOTHING` 處理競爭，不另造計數器或鎖管理器。既有映射重讀不寫入；新增映射使用獨立短交易，不跨模型呼叫持鎖。JD 建立已提交但映射保存失敗時，錯誤交既有 Runtime；重入先承接原業務操作結果，再取得同一映射，不建立第二個物件。映射必須提交後才交給模型。
 - **定位與隔離：** 模型工具入口只接受本檔案已配置的短定位，拒絕 canonical UUID passthrough；內部 prepared command 仍保存 canonical 身分並沿原 resolver 恢復。跨檔案、錯類型、未知短定位均拒絕。JSON 只轉換明定定位欄位，Markdown diff 只格式化程式產生的定位，不對正文做全域字串替換。來源核對語意、Memory `target_title`、HTTP／UI UUID 不變。
 
-驗證：短定位。程式與 migration 已有離線／真 PG 證據；示範服務是否已升級需依[目前決策](../current-decisions.md)核對。短定位不等於 Luna 的來源選擇或核對品質已改善。
+程式與 migration 已有離線／真 PG 證據；示範服務是否已升級，須核對實際部署版本及 migration 狀態。短定位不等於 Luna 的來源選擇或核對品質已改善。
 
 這裡共用既有資料與固定修訂讀取，不新增 map 保存、索引資料庫或消息投影流程；map 不預載到每輪 context。真 PG 反例涵蓋候選可見而正式稿未變、刪職責保留未歸屬任務、跨檔案定位拒絕及終態 execution 不再取得候選導覽基底。
 

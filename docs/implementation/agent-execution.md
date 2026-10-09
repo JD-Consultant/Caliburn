@@ -1,14 +1,14 @@
 # Agent 原生接續與可恢復接線
 
-- 狀態：**現行共用執行接線** 。A／B1／B2 共用原生接續、Step 控制與恢復；產品生命週期依[共用執行契約](../specs/2026-09-27-shared-agent-execution-and-state-design.md)。驗證見[架構驗證](../architecture/verification.md)與產品實驗；機制接通不等於所有恢復分支或模型品質已驗。
+- 狀態：**現行共用執行接線** 。A／B1／B2 共用原生接續、Step 控制與恢復。驗證見[架構驗證](../architecture/verification.md)；機制接通不等於所有恢復分支或模型品質已驗。
 - 驗證分假模型供應端＋真實 checkpoint 保存／PostgreSQL、有界真模型及產品旅程。新驗證依當次有效授權進行，不把模型自述或推理摘要當驗收證據。
-- 已確認但未實作的調整：[輪前 App 摘要、輪中原生壓縮](../specs/2026-10-04-context-summary-and-compaction-design.md)。本文仍記載現行原生接線；目標須調整輪前結果型別／採用及 B 輪中候選導覽投影，不能只換 Prompt 就宣稱完成。摘要 Prompt 待討論，未改下面的現行節點、工具 wire 或驗證結論。
+- 已確認但未實作的調整：[驗證範圍與限制](../architecture/verification.md)。本文仍記載現行原生接線；目標須調整輪前結果型別／採用及 B 輪中候選導覽投影，不能只換 Prompt 就宣稱完成。摘要 Prompt 待討論，未改下面的現行節點、工具 wire 或驗證結論。
 
 本頁維護原生窗口、模型與工具 Step、壓縮採用及原件補存。[模型外送、容量與費用](model-requests.md)及[程序監督、控制與背景調度](agent-supervision.md)分頁維護，原章節保留連結入口。
 
-**Graph** 是 LangGraph 的執行流程；**State** 是流程承接的進度與恢復資料；**saver／checkpointer** 是保存 checkpoint（執行快照）的框架介面。業務模組判定資料能否正式採用，Graph 保存可接續的位置；恢復時兩者共同核對，責任沿[共用執行契約](../specs/2026-09-27-shared-agent-execution-and-state-design.md#21-原生-graph-的保存交界)。
+**Graph** 是 LangGraph 的執行流程；**State** 是流程承接的進度與恢復資料；**saver／checkpointer** 是保存 checkpoint（執行快照）的框架介面。業務模組判定資料能否正式採用，Graph 保存可接續的位置；恢復時兩者共同核對。
 
-後文的 **R** 指一次完整模型回應，**W** 指完整有效接續視窗（可含先前壓縮結果），**C** 指原生壓縮返回的完整 `compacted.output`；W → C 表示壓縮前後的視窗交接。保存與採用條件沿[原生接續的恢復契約](../specs/2026-09-26-consultant-context-and-state-design.md#72-保存與恢復)，不把 C 當成單一文字摘要。
+後文的 **R** 指一次完整模型回應，**W** 指完整有效接續視窗（可含先前壓縮結果），**C** 指原生壓縮返回的完整 `compacted.output`；W → C 表示壓縮前後的視窗交接。不把 C 當成單一文字摘要。
 
 本頁各圖表達**控制順序**。膠囊形是該圖的進入／退出；矩形是處理；菱形是分支；平行四邊形標出 provider、saver 或呼叫方的資料交接；兩側雙線矩形是另處已定義的子流程，框內附章節位置。初始化使用六角形。圖中的保存動作不是資料庫實體，因此不畫成圓柱；子流程分圖也不表示程式另建 Graph／thread。分類依[圖面規範](../standards/documentation-standard.md#32-在-mermaid-中落實並核對)。
 
@@ -23,7 +23,7 @@
 
 `agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；角色 runner 經 bootstrap 接上相同 SDK、官方 saver 及持久預算。各角色提供 instructions、允許工具、起始資料 projector 及結束結果轉譯，共用模型與工具的執行迴圈。
 
-Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。本節節點表描述責任切點，不要求程式恰好採同名 node；實際接線與驗證分見 [本機 A 監督](agent-supervision.md#1-本機-a-supervisor)、[Memory 背景調度](agent-supervision.md#5-memory-背景工作) 及相關 evidence。
+Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。本節節點表描述責任切點，不要求程式恰好採同名 node；實際接線與驗證分見 [本機 A 監督](agent-supervision.md#1-本機-a-supervisor)、[Memory 背景調度](agent-supervision.md#5-memory-背景工作) 。
 
 責任切點如下，節點名稱是工程名稱，不是對模型公開的新工具：
 
@@ -66,11 +66,11 @@ B1／B2 各自保留私有歷史；同一階段中斷後沿原 thread 接續，�
 - 同工作故障：用最新可靠位置正常 resume，不指定舊 checkpoint 做 time-travel replay；有 interrupt 才用 `Command(resume=...)`。
 - 有意回退到較早安全點：先使較晚工作資格失效，核對領域位置與 context 相容，再建立可執行分支；不能直接對舊 checkpoint invoke 並假設副作用會自動撤銷。
 - A 取消：後續新輸入從合法輪前基底與正式資料開始；重試 a 在模型眼中仍是新輸入。
-- Memory 回退：①是 B1 開始前的固定基準與候選起點，②是 B1 完成、B2 開始前的交接快照（[安全點定義](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md#候選操作快照與三個安全點)）。候選與各角色窗口一起回該位置；同批保留對應已採用輪前 compact，不重做它。中途較晚 compact 不跨越回退點。
+- Memory 回退：①是 B1 開始前的固定基準與候選起點，②是 B1 完成、B2 開始前的交接快照（[Memory 單向調度](agent-supervision.md)）。候選與各角色窗口一起回該位置；同批保留對應已採用輪前 compact，不重做它。中途較晚 compact 不跨越回退點。
 
 跨工作接續與回退的驗證對應 E02／E08–E11，見[驗證對照](verification-plan.md)。調整 thread 組織仍須維持相同資格與回退保證，不增加第二套恢復引擎。
 
-顧問工作計畫的產品用途及內容沿 [Plan 現行契約](../specs/jd-work-plan.md)；本頁維護它與原生歷史的三個接縫：
+顧問工作計畫的產品用途及內容沿 [Plan 保存與採用](../architecture/persistence.md#plan-從本輪候選到後輪可採用)；本頁維護它與原生歷史的三個接縫：
 
 - 共同 `FOCUS_INSTRUCTIONS` 提供訪談推進方法，Plan 專屬指引及 read／edit 工具維護同份 Markdown 的焦點、工作方向與剩餘訪談／分析／JD 整理工作。原捕捉工具能力決定 v1／v2，新輪固定原基底；舊 captured request 保留原指令與能力。
 - 輪中 native C 沿共用流程保存與核帳後，A 的私有 `plan_projection` Graph 固定精確 C 位置與一個原計畫 item，父 request 採用完整 C＋該 item。
@@ -106,7 +106,7 @@ Memory stage thread 的固定格式由 `features/executions/history_models.py` �
 - `complete_context_histories` 由產品協調方在**同一正式完成交易** 中呼叫：A 採用一個角色；Memory 同時採用 B1／B2，不容許只完成一邊。它核各自的原準備基底並由執行資格模組完成 execution；JD、正式訪談及 Memory 發布不在此重寫。產品協調方仍須先驗真實 Graph 完成及相應業務資格。
 - COMMIT 確認遺失時重交原完成位置，只核對原結果，不倒轉後來已前進的歷史。取消、暫停要求及被替換 writer 不得採用晚到內容；取消不刪 saver 原件，但那些原件不再具備跨工作採用資格。
 
-依據：[LangGraph 官方 checkpoint／歷史查詢](https://docs.langchain.com/oss/python/langgraph/checkpointers)區分完整 checkpoint 與 pending writes；[PostgreSQL 行鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)提供短交易序列化。跨工作採用、角色隔離及取消保留準備基底是 Caliburn 的產品取捨，不是框架自動保證。證據與未驗範圍見 T06 §15。
+依據：[LangGraph 官方 checkpoint／歷史查詢](https://docs.langchain.com/oss/python/langgraph/checkpointers)區分完整 checkpoint 與 pending writes；[PostgreSQL 行鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)提供短交易序列化。跨工作採用、角色隔離及取消保留準備基底是 Caliburn 的產品取捨，不是框架自動保證。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。
 
 ## 4. Requests 與工具
 
@@ -229,13 +229,13 @@ checkpoint 與 pending writes 同時失敗時，`astream` 不保證能交出 nod
 
 **控制調度邊界：** 已離開完整 Step 控制點、準備／計數或外送期間又收到要求、領域續作已提交但 `Command` 尚未完成，以及 final 交出後與正式提交競爭，均由 [A 控制協調](agent-supervision.md#2-a-pausecancelresume-控制) 的控制 workflow 依持久意圖及原 interrupt／完成結果收斂。普通重開不是新的續作授權；pending pause 的完成拒絕也不是 Turn 最終失敗。`resume_execution` 是內部受控操作，HTTP 不直接讓 UI 提供 writer 或 interrupt ID。
 
-依據：[LangGraph interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts) 的 durable pause、原 thread／interrupt ID 與節點重跑契約，以及[狀態更新的 node successor 語意](https://docs.langchain.com/oss/python/langgraph/use-time-travel#from-a-specific-node)；沿既有 PostgreSQL 行鎖／原子提交。框架提供機制，產品的完整 Step 與 final 優先順序是本案已確認語意。實測及未驗邊界見 T06 §11。
+依據：[LangGraph interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts) 的 durable pause、原 thread／interrupt ID 與節點重跑契約，以及[狀態更新的 node successor 語意](https://docs.langchain.com/oss/python/langgraph/use-time-travel#from-a-specific-node)；沿既有 PostgreSQL 行鎖／原子提交。框架提供機制，產品的完整 Step 與 final 優先順序是本案已確認語意。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。
 
 ## 5. 容量、重試與恢復不是同一政策
 
 外送前的計數、准入與 provider 重試由[模型外送](model-requests.md)負責；本節處理 Graph 的窗口準備、採用及原件補存。已保存完整 R 時，恢復不新增模型呼叫；工具已提交、checkpoint 尚缺結果時，先查原操作，再接回同一 call。
 
-A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮政策](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與中途保險)。達中途門檻先處理 pause／cancel／final，只有將發下一請求才 compact。完整 C 採用確認前保留舊基底；採用後附既有已保存後綴，不重貼 employee input／maps，也不反覆壓縮同一個尚未增長且仍超量的窗口。
+A／B1／B2 輪前門檻為 128K，中途門檻為 160K。達中途門檻先處理 pause／cancel／final，只有將發下一請求才 compact。完整 C 採用確認前保留舊基底；採用後附既有已保存後綴，不重貼 employee input／maps，也不反覆壓縮同一個尚未增長且仍超量的窗口。
 
 ### 5.1 工作額度保存
 
@@ -260,7 +260,7 @@ A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮�
 
 **目前限制：** 只對已計數且仍符合完整 create 容量的 W 作保守 compact 准入，不承諾能搶救任意超長輸入；壓後重新核完整 create。輪前準備、pause、取消基底與最終收尾分由 [跨工作的合法歷史選用](#31-跨工作的合法歷史選用)、[完整 Step 暫停與原生續作](#47-完整-step-暫停與原生續作)、[輪前歷史準備元件](#55-輪前歷史準備元件)、[本機 A 監督](agent-supervision.md#1-本機-a-supervisor) 負責；B1／B2 壓縮後完成發布仍有未驗範圍，見[驗證對照](verification-plan.md)。
 
-依據： [OpenAI standalone compact](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)、核本機 OpenAI 3.20.0 compact 參數及 SDK construct 實作；借鑑 [LangGraph 私有 State 的明確輸入輸出轉換](https://docs.langchain.com/oss/python/langgraph/use-subgraphs)及[持久執行](https://docs.langchain.com/oss/python/langgraph/persistence)。子圖以明確 thread 固定一次壓縮身分，是本案機制取捨；不是新增一份產品歷史。實測範圍見 T06 §10。
+依據： [OpenAI standalone compact](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)、核本機 OpenAI 3.20.0 compact 參數及 SDK construct 實作；借鑑 [LangGraph 私有 State 的明確輸入輸出轉換](https://docs.langchain.com/oss/python/langgraph/use-subgraphs)及[持久執行](https://docs.langchain.com/oss/python/langgraph/persistence)。子圖以明確 thread 固定一次壓縮身分，是本案機制取捨；不是新增一份產品歷史。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。
 
 ### 5.4 單一外送重試責任
 
@@ -284,7 +284,7 @@ A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮�
 
 **產品接線邊界：** 元件不自行選擇可跨取消採用的 checkpoint；[跨工作的合法歷史選用](#31-跨工作的合法歷史選用) 的 executions 執行歷史模組管理合法基底。角色 runner 固定 maps／來源、只追加一次本工作資料，Memory workflow 協調候選與各角色歷史安全點；恢復不能繞過原 writer guard。
 
-依據：[OpenAI standalone compaction 的完整窗口接續](https://developers.openai.com/api/docs/guides/compaction#user-journey-for-standalone-compaction)及 [LangGraph checkpoint／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)。框架負責保存執行結果，128K／角色準備時點與取消效果是 Caliburn 已確認政策，不稱為供應商共同規定。驗證層級及限制見 T06 §14。
+依據：[OpenAI standalone compaction 的完整窗口接續](https://developers.openai.com/api/docs/guides/compaction#user-journey-for-standalone-compaction)及 [LangGraph checkpoint／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)。框架負責保存執行結果，128K／角色準備時點與取消效果是 Caliburn 已確認政策，不稱為供應商共同規定。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。
 
 #### 5.5.1 A 要求下一輪壓縮
 
@@ -295,7 +295,7 @@ A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮�
 - 本輪中途保險壓縮不抹除這個已保存的意圖，也不因此在本輪立即執行額外壓縮。仍由下一輪準備元件處理完整合法歷史；新 App 資料與員工輸入在完整 C 採用後才追加。
 - 若已採用的基底是 prepared history，代表上一個準備交界已成立，重用該基底，不向前追溯舊要求再壓一次。這也涵蓋準備完成後取消、改用新輸入；不要求永久清除歷史要求欄位來表示消耗。
 
-這是既定「Agent 按需要求＋輪前門檻」的角色接線，不改 128K／160K／B 的門檻，也不新增 B1／B2 的工具。完整窗口契約依 [OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)；成功／取消資格是 Caliburn 的產品取捨，不是供應商保證。實測與限制見 T08 §9。既有安裝須先依 runbook 執行 Alembic upgrade；App 不偷偷遷移正在使用的資料庫。
+這是既定「Agent 按需要求＋輪前門檻」的角色接線，不改 128K／160K／B 的門檻，也不新增 B1／B2 的工具。完整窗口契約依 [OpenAI standalone compaction](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)；成功／取消資格是 Caliburn 的產品取捨，不是供應商保證。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。既有安裝須先依 runbook 執行 Alembic upgrade；App 不偷偷遷移正在使用的資料庫。
 
 ### 5.6 原件補存的有限自動恢復
 
@@ -315,7 +315,7 @@ A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮�
 - **等待中取消仍交回原件：** Tenacity backoff 收到 task cancellation 時，拋 `ResultSaveCancelledError`（仍是 `asyncio.CancelledError`），其 `save_error` 保留原 typed save error 與 `.recovery`；不吞取消、不 `uncancel`、不重送 provider。直接呼叫方須在傳遞取消前承接需要的原件；不能假設 TaskGroup 或再次 await 已取消 task 仍會替它保留這個 handoff。等待結束就清除等待層的暫存參照，後續節點被取消不能帶回已失效的舊補存資料。這只是程序內交接，未授權恢復被取消的業務工作。
 - **能力界線：** 補存無法救回已隨程序遺失且未持久保存的 R／C／count；未明外送、業務 COMMIT 核對與最終收尾分別由執行資格、相應領域模組及 [最外層失敗收尾](agent-supervision.md#3-最外層失敗收尾) 的失敗收尾流程處理。程序內原件不是跨程序備份。
 
-依據：[LangGraph node retry](https://docs.langchain.com/oss/python/langgraph/use-graph-api#add-retry-policies)針對節點執行，不替本案持有原結果與 saver 交接；[Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)要求故障分類、有限嘗試與單一責任；[Tenacity](https://tenacity.readthedocs.io/en/latest/)提供既有異步退避；[Psycopg SQLSTATE](https://www.psycopg.org/psycopg3/docs/api/errors.html)提供機器可判斷原因。具體分類、初值及原件接線是 Caliburn 取捨，不宣稱業界一致採此數字。證據見 T06 §16。
+依據：[LangGraph node retry](https://docs.langchain.com/oss/python/langgraph/use-graph-api#add-retry-policies)針對節點執行，不替本案持有原結果與 saver 交接；[Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)要求故障分類、有限嘗試與單一責任；[Tenacity](https://tenacity.readthedocs.io/en/latest/)提供既有異步退避；[Psycopg SQLSTATE](https://www.psycopg.org/psycopg3/docs/api/errors.html)提供機器可判斷原因。具體分類、初值及原件接線是 Caliburn 取捨，不宣稱業界一致採此數字。驗證方法及未覆蓋分支見[驗證對照](verification-plan.md)。
 
 取消交接沿 [Python task cancellation](https://docs.python.org/3/library/asyncio-task.html#task-cancellation) 的傳遞語意及 [Tenacity 公開 sleep hook](https://tenacity.readthedocs.io/en/latest/api.html#tenacity.AsyncRetrying)，不是攔截整個 Graph 的 `BaseException` 或另建結果儲存。
 
@@ -329,7 +329,7 @@ A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮�
 
 ### 5.9 首請求超量的近期訪談縮減
 
-產品規則見[顧問 context 規格「超量組裝」](../specs/2026-09-26-consultant-context-and-state-design.md#開始一輪)：正常仍完整預載近期訪談，只有完整資料使首個請求無法容納才例外。本節只記共用迴圈與 A 的接線，不重述規則。
+正常完整預載近期訪談；只有完整資料使首個請求無法容納時才進入下述例外。
 
 - **共用迴圈只多一條有界路由。** `check_capacity` 對超過硬上限（`allowed_input_tokens = min(max_input, context_window − max_output)`，由 `request_capacity.py` 單一計算）的精確 count 丟出 `RequestOverCapacityError`（仍是 `RequestCapacityError`）。僅當**尚無完成 Step** 、runtime 提供 `fit_first_request`，且已縮減少於 `MAX_FIRST_REQUEST_FITS`（3）次時，改走 `fit_first_request → count_input → check_capacity`；其餘情況與先前相同：B1／B2 不提供回呼、中途 Step 的原生歷史與工具結果不由 loop 縮短、160K compact 路徑不變。每次縮減換新 request ID 並重新精確 count，已縮減次數存於 State（`first_request_fits`）；耗盡仍超量就以容量受阻結束，不生成。
 - **縮減由顧問近期訪談投影的純函式處理。** `agents/job_consultant/recent_preload.py` 只讀已保存 request 與 count，不查 DB、時間或模型；同輸入得同輸出，crash 後節點重跑不需 Held 交接，也不改任何業務資料。回傳完整替換 input items，loop 不知道訪談結構。
@@ -338,7 +338,7 @@ A／B1／B2 輪前 128K、中途 160K 的輸入與採用次序依[共用壓縮�
 
 容量例外由 App 明示未預載範圍，請求固定 `truncation="disabled"`，不交由伺服器靜默截斷。按需回讀參考 [just-in-time context](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)；這是設計依據，不是模型必然正確回讀的保證。
 
-**限制與未驗：** 單一員工輸入、工具結果或固定部分（指引、工具、原生歷史、導覽）本身超量不屬此例外，仍回報容量受阻。尚未由真模型證明 A 看到 `not_preloaded` 會實際回讀；此縮減分支也未完成真實 count／容量旅程驗證。驗證見近期訪談預載。
+**限制與未驗：** 單一員工輸入、工具結果或固定部分（指引、工具、原生歷史、導覽）本身超量不屬此例外，仍回報容量受阻。尚未由真模型證明 A 看到 `not_preloaded` 會實際回讀；此縮減分支也未完成真實 count／容量旅程驗證。驗證範圍見[架構驗證](../architecture/verification.md)。
 
 ## 6. 本機 A Supervisor
 

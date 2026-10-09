@@ -4,15 +4,23 @@
 
 ## 現行規則
 
-正式產品為 `apps/api` 與 `apps/web`，依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)維護 App 自有契約。JSON Schema 是 App 跨語言傳輸格式的唯一來源；HTTP DTO 與模型工具按各自用途投影，不強制使用相同 envelope。型別與對外格式沿生成鏈維護，避免人工修改多份 shape。
+正式產品為 `apps/api` 與 `apps/web`，維護 App 自有契約。JSON Schema 是 App 跨語言傳輸格式的唯一來源；HTTP DTO 與模型工具按各自用途投影，不強制使用相同 envelope。型別與對外格式沿生成鏈維護，避免人工修改多份 shape。
 
 API 的領域與用例模組不直接依賴 transport DTO；傳輸層負責 DTO 與內部型別的轉換。Python 內部 port 使用明確型別或 Protocol，不因共用而另建泛用契約套件。模型原生 Responses items 沿 SDK 接續契約保存，不套入 App 自製的訊息 schema；App schema 的額外欄位限制不應套用到原生接續 metadata。
 
-依 [ADR0084](../adr/0084-canonical-wire-admission.md)，JSON Schema 同時決定 wire 輸入的接受政策。HTTP 與模型工具先以 canonical schema 驗證原 JSON，再以生成 DTO 轉成 Python 型別；DTO 的預設 strict／coercion 行為不另訂輸入規格。JSON 數學整數包含 `1.0`，不包含布林或字串；`uuid` 採 JSON Schema 2020-12 §7.3.5 的連字號形式，容許十六進位大小寫，不接受 compact 或 URN 拼法。Web 的 Ajv 使用同一份 schema 與相同 UUID 格式政策。[JSON Schema](https://json-schema.org/draft/2020-12/json-schema-validation)
+JSON Schema 同時決定 wire 輸入的接受政策。HTTP 與模型工具先以 canonical schema 驗證原 JSON，再以生成 DTO 轉成 Python 型別；DTO 的預設 strict／coercion 行為不另訂輸入規格。JSON 數學整數包含 `1.0`，不包含布林或字串；`uuid` 採 JSON Schema 2020-12 §7.3.5 的連字號形式，容許十六進位大小寫，不接受 compact 或 URN 拼法。Web 的 Ajv 使用同一份 schema 與相同 UUID 格式政策。[JSON Schema](https://json-schema.org/draft/2020-12/json-schema-validation)
 
 現有 wire 整數都是序號、索引或計數，canonical 統一將上限明訂為 `9007199254740991`，既有較小上限仍保留。這是本案跨 Python／JavaScript 精確表示的契約政策，沿 [RFC 8259 §6](https://www.rfc-editor.org/rfc/rfc8259#section-6) 的互通範圍；JSON 本身不禁止更大的數字，內部 DB 型別也不因此改變。新增不同用途的數值時須先決定其表示契約。
 
 文字是否非空沿現有領域的 Python 3.14 `str.strip()`／`str.isspace()` 語意：Unicode 分類 `Zs` 或 bidirectional class `WS/B/S` 視為空白；U+FEFF 不屬此集合。canonical pattern 明列碼點，不用各語言不同的 `\s` 推定同義；須禁止 NUL 的欄位也在同一 pattern 表達，保留原文字而不自動 trim。這是 Caliburn 的業務政策，不是所有產品通用的 Unicode 清理規則。[Python 字串規格](https://docs.python.org/3.14/library/stdtypes.html#str.isspace)
+
+同一份 Schema 生成的 DTO，不保證不同語言的驗證器有相同接受集合。入站先核 canonical 規則，避免用逐欄 overrides 再維護第二份接受政策；生成 DTO 負責內部表示，業務權限仍由領域判定。
+
+## 模型工具的共同邊界
+
+工具提供具名業務操作，模型只填分析所需參數；檔案、執行、版本、來源範圍與權限由 App 綁定。工具輸入 shape 合法不等於具備寫入資格，業務驗證與原子提交仍在 owner。
+
+確定拒絕須回安全原因及合法下一步，例如重新讀取目標或修正參數；結果未知時先依原操作查回，不換新識別、重套 patch 或猜測已回滾。原 call ID 配對與業務冪等是不同責任。具體 wire 由 [HTTP／Tool Schema](../../apps/api/contracts/)維護，接線見[資料與契約](../implementation/data-and-contracts.md)。
 
 ## 隔離與歷史範圍
 

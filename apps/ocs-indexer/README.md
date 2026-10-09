@@ -5,7 +5,7 @@
 document／task 索引；既有 profile／task 索引與介面保留原語意。
 
 本 app 是「檢索」bounded context，負責結構化候選池及語意搜尋，不保存對話、LLM 或使用者狀態。
-RAG 服務須明示啟動；JD App 可依 [ADR0080](../../docs/adr/0080-opt-in-public-reference-agent-tools.md)配置 HTTP consumer，不成為 App 預設啟動依賴。
+RAG 服務須明示啟動；JD App 可依 [公版明示接線](../../docs/architecture/rag-pipeline.md)配置 HTTP consumer，不成為 App 預設啟動依賴。
 
 下圖為既有 profile／task 索引的資料流；新公版參考索引的使用方式見[職位整體參考 API](#職位整體參考-api)。
 
@@ -16,7 +16,7 @@ OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HT
 ```
 
 - **模型在獨立 GPU 容器：**BGE-M3（dense 1024d + sparse）由 [`apps/embedder`](../embedder/)
-  提供（`POST /embed`），indexer 只作 HTTP client。依 ADR 0012，不在 indexer 安裝 torch；
+  提供（`POST /embed`），indexer 只作 HTTP client。不在 indexer 安裝 torch；
   原 Windows 行程內執行曾有 segfault。
 - **Qdrant 由本 app 管理：**其他服務經查詢 API 取資料，不直接存取 collection。
 
@@ -32,7 +32,7 @@ RAG 仍是獨立服務，不移入 App。查詢 API 映像依本目錄的 lockfi
 
 ### 職位整體參考 API
 
-2026-10-05 已實作；JD App 可選 consumer 依 [ADR0080](../../docs/adr/0080-opt-in-public-reference-agent-tools.md) 明示啟用，獨立服務權責不變。
+2026-10-05 已實作；JD App 可選 consumer 依 [公版明示接線](../../docs/architecture/rag-pipeline.md) 明示啟用，獨立服務權責不變。
 
 輸入員工實際工作文字，取得最多五份去重公版及**完整已解析任務目錄**。
 顧問自行判斷是否適用；本服務不保存員工確認進度，也不判定 JD 完成。
@@ -69,8 +69,7 @@ manifest。原始 UTF-8 JSON 與 hash 綁定 `reference_id`，讀取不代換成
 未 ready／不相容 409、無效模型回覆 502、連線失敗 503，不將故障當空結果。
 
 契約權威：[`indexer_contract/references.py`](../../packages/indexer-contract/src/indexer_contract/references.py)。
-設計及證據：[`API 設計`](../../docs/specs/2026-10-05-occupation-reference-api-design.md)、
-施工及驗證。
+App 的接入與保存責任見[公版明示接線](../../docs/architecture/rag-pipeline.md)。
 
 ### 既有 profile／task API
 
@@ -84,7 +83,7 @@ uv run --all-extras pytest -q
 
 `.env`(見 `.env.example`):`QDRANT_URL`(預設 `http://localhost:6333`)、`QDRANT_COLLECTION`
 (預設 **`ocs_v4`**)、`EMBEDDER_URL`(預設 `http://localhost:8082`)、`OCS_SOURCE_ROOT`、
-`INDEX_BATCH_SIZE`。換 embedding provider / 維度 → **建新 collection,不混用**(ADR 0009)。
+`INDEX_BATCH_SIZE`。換 embedding provider / 維度 → **建新 collection,不混用**。
 
 ## 為什麼是 profile + task 兩種點
 
@@ -113,7 +112,7 @@ uv run --all-extras pytest -q
   `competency_blocks[]`(巢狀:`competency_level` + `indicators(P)/outputs(O)/knowledge(K)/skills(S)`)、
   `source_file`。
 - **manifest point**(保留 id 一點):`chunk_level="_manifest"` + embedding 身分
-  (provider/model/dim/revision)。查詢前 `assert_compatible` 驗證,不相容 → 409(ADR 0009)。
+  (provider/model/dim/revision)。查詢前 `assert_compatible` 驗證,不相容 → 409。
 - point id = `uuid5(NAMESPACE, chunk_key)`;**URN**(`ocs:{code}`、`ocs:{code}:T:{task_code}`…)
   查詢時由 payload 組出、不落庫(`api/urn.py`)。
 
@@ -146,28 +145,28 @@ embed 字串只放 ChunkRecord.text) → HTTP embed(batch) → QdrantWriter.upse
 |---|---|
 | request schema 違規 | 422 |
 | 未知 `ocs_code` | 404 |
-| 索引 embedding 與查詢端不相容(ADR 0009) | 409 |
+| 索引 embedding 與查詢端不相容 | 409 |
 | Qdrant 回錯 / 連不上 | 502 / 503 |
 | `GET /healthz` degraded(模型/Qdrant 任一不可用) | 503 |
 
 ## Query API reference(:8000)
 
 **request/response schema 權威 = [`packages/indexer-contract`](../../packages/indexer-contract/)**
-(共用 pydantic,ADR 0010);自訂方法用 AIP-136 `:verb`(ADR 0019)。互動式 OpenAPI:`/docs`。
+(共用 Pydantic)；自訂方法採 AIP-136 `:verb`。互動式 OpenAPI:`/docs`。
 預設綁 `127.0.0.1`、無 auth(對外請加反向代理;`create_app()` 是擴充點)。
 
 | Method | Path | 用途 |
 |---|---|---|
 | POST | `/occupations:search` | 自然語言 → 職類 hits(`{query, top_k}`) |
 | POST | `/tasks:search` | 自然語言 → 任務 hits |
-| POST | `/tasks:batchGet` | point id 批次取回(缺失 id 靜默略過——刻意偏離 AIP-231,ADR 0019) |
-| POST | `/items:match` | **相似比對**(ADR 0022):池進(`{kind, items:[{id,text,sources}]}`)→ `{groups, possible_matches, config}` 出。六步確定性管線(清洗→NFKC 收斂→嵌入→跨來源 cosine→FS 三區分帶→星型分群);per-kind 門檻在 [`matching/core.py`](src/jd_ocs_indexer/matching/core.py) `THRESHOLDS`(改門檻=跑 [`scripts/calibrate_match.py`](scripts/calibrate_match.py) 留紀錄)。錯誤:>500 項→413、kind 不認得→422、embedder 掛→503(body 含 `code`) |
+| POST | `/tasks:batchGet` | point id 批次取回(缺失 id 靜默略過——刻意偏離 AIP-231) |
+| POST | `/items:match` | **相似比對**:池進(`{kind, items:[{id,text,sources}]}`)→ `{groups, possible_matches, config}` 出。六步確定性管線(清洗→NFKC 收斂→嵌入→跨來源 cosine→FS 三區分帶→星型分群);per-kind 門檻在 [`matching/core.py`](src/jd_ocs_indexer/matching/core.py) `THRESHOLDS`(改門檻=跑 [`scripts/calibrate_match.py`](scripts/calibrate_match.py) 留紀錄)。錯誤:>500 項→413、kind 不認得→422、embedder 掛→503(body 含 `code`) |
 | GET | `/occupations/{ocs_code}` | 職類官方 metadata(表頭池原料) |
 | GET | `/occupations/{ocs_code}/tasks` | unit→task 結構(任務候選原料) |
 | GET | `/occupations/{ocs_code}/competencies` | K/S/O/P/A 能力池(多來源 CitableItem) |
 | GET | `/healthz`、`/stats` | 基礎連線檢查（含可取得的 `index_model`）、點數統計；不代表公版索引 ready |
 
-這組 profile／task API 的歷史消費端設計保留在 Git 與研究文件。若要新增它的正式 JD App 用途，須另經現行決策流程，不能直接復活舊 `apps/api` 接點；ADR0080 已接入的是上方獨立的職位整體參考 API。
+正式 JD App 接入的是上方職位整體參考 API。既有 profile／task API 不自動成為 App 能力；新增用途須另核資料責任、契約與驗收。
 
 ## Codemap
 
@@ -187,12 +186,12 @@ src/jd_ocs_indexer/
   validation/             # stats、smoke_query、search(build_filter + dense/hybrid RRF,CLI+API 共用)
   api/                    # 查詢 API(extra):schemas、service(無狀態編排,可 fake 測)、
                           #   routes(threadpool + embed lock)、app(create_app factory)、urn.py
-  matching/               # 相似比對(ADR 0022):core.py(純規則:門檻/清洗/分帶/星型)、
+  matching/               # 相似比對:core.py(純規則:門檻/清洗/分帶/星型)、
                           #   service.py(管線:collapse→embed→score→組回應;不碰 Qdrant)
 ```
 
 另有 `scripts/calibrate_match.py`(app 根):門檻校準,與生產共用 `matching` 的
-collapse/score_pairs(校準即生產);輸出留 `docs/specs/` 當校準紀錄。
+collapse/score_pairs(校準即生產);校準輸出在任務指定的本機位置保存，採用的門檻與適用條件同步維護於程式與公開說明。
 
 ## CLI reference
 
@@ -208,15 +207,14 @@ collapse/score_pairs(校準即生產);輸出留 `docs/specs/` 當校準紀錄。
 | `smoke-query` | 索引驗證(原始輸出,格式不保證穩定) |
 | `serve [--host] [--port]` | 起查詢 API |
 
+相似比對保留所有原項目，只提供分組與可能相似提示；星型群的成員須各自直接達到與中心的門檻，不以傳遞連通性擴群。既有門檻只反映原語料、模型與校準條件，換資料或模型須重驗，不能當通用相似度標準。
+
 ## 指路
 
 **內部管線深文檔(改 ingest / 查詢邏輯前先讀):[`docs/pipeline.md`](docs/pipeline.md)** —— normalizer lockstep、
 builder embed 字串、RRF hybrid、competencies 去重、manifest 相容的「內部怎麼跑 + 為什麼」。
 
-ADR [0003](../../docs/adr/0003-indexer-stays-separate-service.md)(獨立服務)·
-[0009](../../docs/adr/0009-embedding-version-manifest.md)(manifest)·
-[0010](../../docs/adr/0010-indexer-contract-shared-package.md)(契約 #2)·
-[0012](../../docs/adr/0012-embedding-as-a-service.md)(embedder 服務化)·
-[0019](../../docs/adr/0019-api-naming-alignment.md)(命名)·
+架構見[獨立 RAG 責任](../../docs/architecture/rag-pipeline.md)，型別見[indexer-contract](../../packages/indexer-contract/README.md)。
+
 [來源 JSON 欄位契約](../pdf-to-json/README.md#6-field-contract)與 [OCS JSON Schema](../../packages/ocs-contract/schema/ocs-document.schema.json)·
-embedder 細節:當時的內部紀錄。
+模型服務見[embedder README](../embedder/README.md)。

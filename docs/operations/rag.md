@@ -85,6 +85,6 @@ Indexer 自建的 embedding、rerank 與 Qdrant HTTP client 使用明示目的�
 | 啟動本機查詢 API 開發程序 | `pnpm rag:dev` |
 | 停止 Qdrant 與 embedder 容器 | `pnpm rag:down`；本機開發程序在原終端按 Ctrl+C |
 
-依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，App 可透過明示 URL 使用公版參考 HTTP 工具；未配置時不建立 client，不自動啟動上述服務。上列命令供獨立開發；若要 App 與 RAG 一起啟動，使用[公版 Docker 模式](#含公版參考的-docker-模式)，不用另執行 `rag:dev`。啟用及執行中請求的設定邊界見 [API README](../../apps/api/README.md#公版參考工具的可選啟用)。有人正在測試時，不為啟用工具重啟共用程序、改既有 `.env`、更新正式 schema 或清索引。
+依 [公版明示接線](../architecture/rag-pipeline.md)，App 可透過明示 URL 使用公版參考 HTTP 工具；未配置時不建立 client，不自動啟動上述服務。上列命令供獨立開發；若要 App 與 RAG 一起啟動，使用[公版 Docker 模式](#含公版參考的-docker-模式)，不用另執行 `rag:dev`。啟用及執行中請求的設定邊界見 [API README](../../apps/api/README.md#公版參考工具的可選啟用)。有人正在測試時，不為啟用工具重啟共用程序、改既有 `.env`、更新正式 schema 或清索引。
 
 解析與索引的本機命令、設定及測試分別由 [pdf-to-json README](../../apps/pdf-to-json/README.md)、[indexer README](../../apps/ocs-indexer/README.md)維護，模型服務見 [embedder README](../../apps/embedder/README.md)。服務分工與資料保存邊界見 [RAG 架構](../architecture/rag-pipeline.md)。

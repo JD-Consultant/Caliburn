@@ -15,7 +15,7 @@ Caliburn 使用 PostgreSQL 保存訪談、JD 和 Memory，使用 LangGraph check
 | 職務檔案、原始輸入、正式訪談 | 訪談業務；原文可靠保存，取消不授正式來源資格，正式序號與角色固定 | PostgreSQL 業務保存。模型接續可帶同一文字，但不得變成另一份可修改原文 |
 | JD 正式稿、候選、依據、改動結果 | JD 業務；候選可預覽／恢復，完成才正式採用，歷史依據可回查 | PostgreSQL 業務保存。UI、工具與 PDF 由其投影，不另存可編輯全文副本 |
 | Memory 候選、物件修訂、發布快照 | Memory 業務；同批共用工作稿，正式快照不可變 | PostgreSQL 業務保存。B1／B2 checkpoint 保存候選位置／操作參照，不另維護第二份全文候選 |
-| JD 工作計畫 Plan | Plan 業務；本輪安排可修改，只有 Turn 完成且正式訪談成立，才可供後輪採用 | 正文與原操作結果由業務保存，工具及 UI 讀同份資料。接續全文、空值與保存格式沿 [Plan 保存與接續契約](../specs/jd-work-plan.md#5-保存與模型接續) |
+| JD 工作計畫 Plan | Plan 業務；本輪安排可修改，只有 Turn 完成且正式訪談成立，才可供後輪採用 | 正文與原操作結果由業務保存，工具及 UI 讀同份資料。接續全文、空值與保存格式沿 [Plan 保存與採用](persistence.md#plan-從本輪候選到後輪可採用) |
 | 原生模型接續、執行位置、控制狀態 | 執行責任；完整 items／配對、原基準與可恢復邊界 | LangGraph 持久 checkpointer。歷史查詢用框架介面；按需產生的診斷副本不作恢復或業務權威 |
 | 公開中間訊息、可讀推理摘要、已完成答覆 | 公開交流與完成判定責任；已保存的公開內容可回看，正式答覆可靠保存 | 正式答覆在 A 完成交易成為訪談原文；中間訊息與可讀摘要由 checkpoint 中已保存的完整原生回應投影，不另建摘要表、不授訪談序號。只公開允許的正文與順序，原始內部推理及加密接續資料不公開 |
 | 原業務操作結果 | 執行原操作的資料模組；能確認操作是否已成立及當時結果 | 與操作效果在同一次短交易保存；工具回傳依此產生模型可見的結果，不另存一份可能與原結果矛盾的紀錄 |
@@ -33,9 +33,9 @@ Caliburn 使用 PostgreSQL 保存訪談、JD 和 Memory，使用 LangGraph check
 2. **物件修訂** ：標題、描述、正文或固定下層引用改變，即形成新修訂。歷史修訂不可覆寫；改回舊文字仍是後來的新修訂。
 3. **Memory 發布快照** ：選定訪談範圍、情境／理解各物件的固定修訂及完整固定關係。所有路徑到同一物件都得到同一修訂；各物件不必共用相同數字版號。
 
-候選是可修改的工作區，正式快照則固定採用的修訂與引用。候選修改不得回寫歷史發布快照或 JD 當時的依據。名稱、權限、刪除與關係合法性在每次操作檢查，具體規則沿[Memory 更新契約](../specs/2026-09-27-memory-object-update-tool-contract.md)，不在發布時另增一套模型審核。
+候選是可修改的工作區，正式快照則固定採用的修訂與引用。候選修改不得回寫歷史發布快照或 JD 當時的依據。名稱、權限、刪除與關係合法性在每次操作檢查，具體規則沿[Memory 工具與寫入](../implementation/memory-tools.md)，不在發布時另增一套模型審核。
 
-發布時，App 將合法的工作區保存為固定版本。即使工作理解的正文未變，只要其下層固定引用改變，也須建立新修訂。版本由 App 管理，不要求 B2 自行填寫；目前交接階段的分析是否完成，仍由 B2 判斷。詳見[Memory 操作與安全點](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)。
+發布時，App 將合法的工作區保存為固定版本。即使工作理解的正文未變，只要其下層固定引用改變，也須建立新修訂。版本由 App 管理，不要求 B2 自行填寫；目前交接階段的分析是否完成，仍由 B2 判斷。詳見[Memory 單向調度](../implementation/agent-supervision.md)。
 
 保存採**只為改變的物件建立修訂、未變修訂跨快照重用**。快照保存選用與關係，不複製全部正文。資料表與固定引用的實現見[Memory 保存 §2](../implementation/memory-storage.md#2-保存表示固定修訂而非資料庫舊列)，替代方案的取捨見[設計取捨 §3](design-decisions.md#3-保存明確業務候選與不可變正式修訂不以事件重播作唯一真相)。
 
@@ -63,7 +63,11 @@ Caliburn 使用 PostgreSQL 保存訪談、JD 和 Memory，使用 LangGraph check
 
 [圖源](../diagrams/architecture/persistence/plan-adoption.mmd) · [SVG](../diagrams/architecture/persistence/plan-adoption.svg)
 
-未修改或空 Plan 也沿相同完成邊界處理。後輪由已完成的執行及正式訪談資格查得可用 Plan，不另複製「正式正文」；具體接線見 [Plan 保存與採用接線](../specs/jd-work-plan.md#54-讀取交易與跨輪採用資格)。
+新 Turn 捕捉初始 Context 時，在同一短交易固定 Memory、訪談上界與 Plan 基底；候選 current 可以修改，並不立即取得後輪採用資格。查後輪基底時，只從同一檔案、completed execution、相符正式交換，且員工訊息序號不超過固定 frontier F 的候選中選最新一筆；本輪不因後來完成的工作變更基底。
+
+null 表示尚未建立，空字串表示刻意清空，兩者不得被較舊的非空正文蓋回。A 共同完成交易核對最終 Plan 位置後才授跨輪資格；取消或失敗不採用。原操作成功則查回原正文與位置，未知提交先核原結果，不能重套 patch。工具與 UI 讀同份正文，沒有另一份可編輯正式 Plan。
+
+保存與讀取由 [Plan feature](../../apps/api/src/caliburn/features/interview_plans/)、[採用查詢](../../apps/api/src/caliburn/workflows/interview_plan_queries.py)及[工作流](../../apps/api/src/caliburn/workflows/interview_plans.py)負責。
 
 ## 4. 重試、取消與執行恢復
 
@@ -75,7 +79,7 @@ Caliburn 使用 PostgreSQL 保存訪談、JD 和 Memory，使用 LangGraph check
 
 [圖源](../diagrams/architecture/persistence/committed-operation-recovery.mmd) · [SVG](../diagrams/architecture/persistence/committed-operation-recovery.svg)
 
-這些保存交界亦適用於已確認但尚未實作的[輪前文字摘要目標](../specs/2026-10-04-context-summary-and-compaction-design.md#5-保存取消與安全點不變)：輪前基底可由現行原生壓縮回傳的視窗，換成可靠採用的 App 文字摘要，仍由既有執行保存及有效位置管理，不新增摘要資料庫。較早回退基底、正式來源及公開回看不得因活躍 Context 被濃縮而提前清理。
+較早回退基底、正式來源及公開回看不得因活躍 Context 被濃縮而提前清理。
 
 - **原操作身分** 由 App 配置並在重入時沿用；同身分不同有效負載拒絕。模型 `call_id` 只負責工具配對，不自行承擔跨重試業務去重語意。
 - **結果不明先查原操作** ；查詢失敗不等於沒提交。已成功可再次進入工具接回原結果，不再次產生效果，也不拿目前 JD 冒充當時結果。
@@ -113,7 +117,9 @@ A 判斷需要整理時，先透過 `request_memory_consolidation` 保存整理�
 
 上述保留規則適用於仍存在的職務檔案。使用者可在清單確認刪除整份檔案；其訪談原文、JD、Memory、來源關係及執行紀錄一起移除，不提供復原。有執行中、暫停或仍在收尾的顧問工作，或進行中、仍在收尾的 Memory 整理時，不能刪除。這項操作不允許單獨改寫或清除正式原文，也不影響其他檔案；確認與交易細節見[職務檔案刪除](../implementation/interview-storage.md#11-整份職務檔案刪除)。
 
-建檔命令與其結果有不同生命週期：依 [ADR0085](../adr/0085-creation-command-lifetime.md)，刪檔後只保留隨機命令 UUID 與已刪終態，不保留 file ID、內容或摘要；晚到原命令不能再次建立。此最小命令紀錄由職務檔案 owner 管理，並非保留一份可恢復的檔案。
+建檔命令與其結果有不同生命週期：刪檔後只保留隨機命令 UUID 與已刪終態，不保留 file ID、內容或摘要；晚到原命令不能再次建立。此最小命令紀錄由職務檔案 owner 管理，並非保留一份可恢復的檔案。
+
+現行命令沒有有效期限，因此以永久最小 UUID 維持晚到重送不重建的承諾。若要採 TTL，必須一起定義過期 token 的拒絕協定；容量或保存上限需求改變時才重新比較，不能只清收據。這是本案取捨，[AWS 冪等 API](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)提供 caller token、原子保存及晚到請求的設計依據，沒有替所有服務指定永久期限。
 
 目前不承諾備份／跨機還原，不代表資料可只存在 UI。Schema migration 維護現行資料結構，**不遷移舊架構資料** 。
 
@@ -121,6 +127,6 @@ A 判斷需要整理時，先透過 `request_memory_consolidation` 保存整理�
 
 ## 7. 公版參考工具的保存與可選接線
 
-依 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md)，公版來源由獨立 RAG 管理；App 只保存選用公版與員工明確否認的工作範圍，兩者不寫入 Memory／JD。取消或失敗的候選不得供下一輪採用，B1／B2 也只能讀其固定上界內有效的排除範圍。
+依 [公版明示接線](rag-pipeline.md)，公版來源由獨立 RAG 管理；App 只保存選用公版與員工明確否認的工作範圍，兩者不寫入 Memory／JD。取消或失敗的候選不得供下一輪採用，B1／B2 也只能讀其固定上界內有效的排除範圍。
 
-資料資格與格式以[公版 state 契約](../specs/2026-10-04-public-reference-completion-design.md)為準；角色設定、原請求恢復及讀寫接線見[執行接線](../implementation/agent-execution.md)。模型成功回傳是業務結果的精簡投影，不另成資料權威。
+資料資格與格式以[公版選用與否認資格](rag-pipeline.md#公版選用與明確否認的保存資格)為準；角色設定、原請求恢復及讀寫接線見[執行接線](../implementation/agent-execution.md)。模型成功回傳是業務結果的精簡投影，不另成資料權威。

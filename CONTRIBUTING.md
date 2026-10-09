@@ -1,8 +1,8 @@
 # Caliburn 開發指南
 
 Caliburn 的正式產品是本機 Web AI 職務分析與職務說明書 App。現行權責由
-[ADR0079](docs/adr/0079-target-rebuild-production-cutover.md)決定；
-開始修改前先讀[目前決策](docs/current-decisions.md)與相關設計文件，不從歷史目錄猜現況。
+[正式產品與選型](docs/architecture/design-decisions.md)決定；
+開始修改前先讀[架構與現行責任](docs/architecture/README.md)與相關設計文件，不從歷史目錄猜現況。
 
 ## 正式結構
 
@@ -72,5 +72,5 @@ pnpm check
 ## 隔離 RAG
 
 JD App 不直接 import RAG 的 Python 套件，也不管理 RAG 服務的啟停。composition root 可依
-[ADR0080](docs/adr/0080-opt-in-public-reference-agent-tools.md)，在明示設定後建立 HTTP client。
+[公版明示接線](docs/architecture/rag-pipeline.md)，在明示設定後建立 HTTP client。
 變更前讀 [RAG 架構](docs/architecture/rag-pipeline.md)；獨立啟動及公版 Docker 模式見 [RAG 操作](docs/operations/rag.md)。

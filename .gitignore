@@ -56,6 +56,7 @@ Thumbs.db
 /apps/pdf-to-json/SETUP_COMPLETE.md
 
 # personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
+/AGENTS.override.md
 CLAUDE.local.md
 Codex.local.md
 

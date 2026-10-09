@@ -1,10 +1,13 @@
 """Own engines and short sessions, not feature SQL or business decisions."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
 from sqlalchemy import MetaData
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from caliburn.adapters.database_settings import DatabaseSettings
@@ -24,6 +27,21 @@ class Base(DeclarativeBase):
 
 class DatabaseSchemaError(RuntimeError):
     """The selected target namespace has not reached the required migration head."""
+
+
+@asynccontextmanager
+async def consistent_read_session(
+    sessions: async_sessionmaker[AsyncSession],
+) -> AsyncIterator[AsyncSession]:
+    """Pin multi-query projections before their first SELECT; release before CPU or I/O."""
+    async with sessions.begin() as session:
+        await session.connection(
+            execution_options={
+                "isolation_level": "REPEATABLE READ",
+                "postgresql_readonly": True,
+            }
+        )
+        yield session
 
 
 def migration_config() -> Config:

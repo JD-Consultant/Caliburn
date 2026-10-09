@@ -37,6 +37,7 @@ from caliburn.contracts.generated.tools.select_occupation_references_arguments i
 from caliburn.contracts.generated.tools.update_excluded_work_arguments import (
     UpdateExcludedWorkArguments,
 )
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.executions.models import (
     ExecutionKind,
     ExecutionNotFoundError,
@@ -63,9 +64,6 @@ class _PreparedChange(TypedDict):
 
 _PREPARED_CHANGE = TypeAdapter(_PreparedChange)
 _JSON_OBJECT = TypeAdapter(dict[str, object])
-type ReferenceWriteResultFormat = Literal["state", "status"]
-# This exact output contract is captured with the native tool definition. Old requests
-# lack it and retain their full-state result; do not infer the format from current settings.
 _WRITE_RESULT_DESCRIPTION = '成功只回 {"status":"updated"}；需要完整 state 時再按需讀取。'
 type _ReadArguments = (
     SearchOccupationReferencesArguments
@@ -112,19 +110,13 @@ _DESCRIPTIONS = {
 }
 
 
-def occupation_reference_definitions(
-    *, write_result_format: ReferenceWriteResultFormat = "status"
-) -> list[FunctionToolParam]:
+def occupation_reference_definitions() -> list[FunctionToolParam]:
     """Make definitions inspectable without a network client or execution."""
     return [
         function_definition(
             name,
             description
-            + (
-                _WRITE_RESULT_DESCRIPTION
-                if write_result_format == "status" and name in OccupationReferenceTools.write_names
-                else ""
-            ),
+            + (_WRITE_RESULT_DESCRIPTION if name in OccupationReferenceTools.write_names else ""),
             f"{name.replace('_', '-')}-arguments",
         )
         for name, description in _DESCRIPTIONS.items()
@@ -149,22 +141,18 @@ class OccupationReferenceTools:
         writer: ExecutionWriter,
         *,
         max_result_characters: int = 1_000_000,
-        write_result_format: ReferenceWriteResultFormat = "status",
     ) -> None:
         if writer.scope.kind != ExecutionKind.CONSULTANT_TURN:
             raise ExecutionStateError("Reference tools require a consultant Turn")
         if max_result_characters < 1:
             raise ValueError("Tool result character limit must be positive")
-        if write_result_format not in ("state", "status"):
-            raise ValueError("Unknown occupation reference write result format")
         self.workflow = workflow
         self.client = client
         self.writer = writer
         self.max_result_characters = max_result_characters
-        self.write_result_format = write_result_format
 
     def definitions(self) -> list[FunctionToolParam]:
-        return occupation_reference_definitions(write_result_format=self.write_result_format)
+        return occupation_reference_definitions()
 
     async def invoke(self, name: str, arguments: str) -> str:
         if name not in self.read_names:
@@ -172,11 +160,11 @@ class OccupationReferenceTools:
         parsed: _ReadArguments
         try:
             if name == "search_occupation_references":
-                parsed = SearchOccupationReferencesArguments.model_validate_json(arguments)
+                parsed = parse_contract(SearchOccupationReferencesArguments, arguments)
             elif name == "read_occupation_reference":
-                parsed = ReadOccupationReferenceArguments.model_validate_json(arguments)
+                parsed = parse_contract(ReadOccupationReferenceArguments, arguments)
             else:
-                parsed = ReadOccupationReferenceStateArguments.model_validate_json(arguments)
+                parsed = parse_contract(ReadOccupationReferenceStateArguments, arguments)
         except ValidationError:
             return _invalid_arguments(name)
         try:
@@ -218,14 +206,14 @@ class OccupationReferenceTools:
             return _scope_rejection()
         try:
             if name == "select_occupation_references":
-                selection = SelectOccupationReferencesArguments.model_validate_json(arguments)
+                selection = parse_contract(SelectOccupationReferencesArguments, arguments)
                 change = await self.workflow.prepare_select(
                     self.writer,
                     tuple(reference.root for reference in selection.reference_ids),
                     operation_id,
                 )
             else:
-                excluded = UpdateExcludedWorkArguments.model_validate_json(arguments)
+                excluded = parse_contract(UpdateExcludedWorkArguments, arguments)
                 change = await self.workflow.prepare_excluded_work(
                     self.writer,
                     tuple(item.root for item in excluded.add),
@@ -253,33 +241,10 @@ class OccupationReferenceTools:
         ):
             raise ValueError("A saved reference change belongs to another execution")
         try:
-            result = await self.workflow.execute(self.writer, change)
+            await self.workflow.execute(self.writer, change)
         except _EXPECTED_FAILURES as error:
             return _rejection(error)
-        state = ReferenceStateView.model_validate(result)
-        if self.write_result_format == "state":
-            return state.model_dump_json()
         return OccupationReferenceWriteResult(status="updated").model_dump_json()
-
-
-def occupation_reference_write_result_format(
-    definitions: list[FunctionToolParam],
-) -> ReferenceWriteResultFormat:
-    """Resolve the output contract from this Turn's original captured tool definitions."""
-    writes = [tool for tool in definitions if tool["name"] in OccupationReferenceTools.write_names]
-    if len(writes) != len(OccupationReferenceTools.write_names) or {
-        tool["name"] for tool in writes
-    } != set(OccupationReferenceTools.write_names):
-        raise ExecutionStateError("The saved Turn lacks its reference write result contracts")
-    formats: set[ReferenceWriteResultFormat] = {
-        "status" if _WRITE_RESULT_DESCRIPTION in (tool.get("description") or "") else "state"
-        for tool in writes
-    }
-    if len(formats) != 1:
-        raise ExecutionStateError(
-            "The saved Turn has inconsistent reference write result contracts"
-        )
-    return formats.pop()
 
 
 _INVALID_ARGUMENT_FEEDBACK = {

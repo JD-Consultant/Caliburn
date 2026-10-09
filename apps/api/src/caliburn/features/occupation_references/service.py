@@ -65,14 +65,6 @@ async def read_candidate(
     return await _candidate_position(session, candidate)
 
 
-async def list_candidates(
-    session: AsyncSession, job_file_id: UUID
-) -> tuple[ReferenceStatePosition, ...]:
-    """List owned candidates only; the workflow resolves terminal/formal qualification."""
-    candidates = await persistence.list_candidates(session, job_file_id)
-    return tuple([await _candidate_position(session, candidate) for candidate in candidates])
-
-
 async def apply_state(
     session: AsyncSession,
     job_file_id: UUID,

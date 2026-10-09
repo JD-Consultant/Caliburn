@@ -31,6 +31,7 @@ from caliburn.features.executions.history_models import (
 from caliburn.features.executions.models import ExecutionStatus, ExecutionWriter
 from caliburn.settings import DatabaseSettings
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_context import ConsultantContextWorkflow
 from caliburn.workflows.context_history import RoleContextHistory
 from tests.fixtures.response_capacity import synthetic_capacity_limits
 from tests.integration.test_occupation_reference_workflow import new_writer
@@ -111,7 +112,10 @@ def test_saved_template_survives_upgrade_before_or_after_adoption_and_before_con
             assert restored.create_payload() == old.create_payload()
             prepared = await prepare(rebuilt, restored)
             context = await capture_turn_context(
-                rebuilt, template=restored, prepared_history=prepared
+                rebuilt,
+                data=ConsultantContextWorkflow(client.app.state.database.sessions),
+                template=restored,
+                prepared_history=prepared,
             )
             payload = context.request.create_payload()
             assert payload["instructions"] == "Original role instructions"
@@ -214,7 +218,7 @@ def test_reused_prepared_base_cannot_accept_unverified_handoff_instructions_or_t
     async def prepare_cancelled() -> None:
         async with saved_history(client, database_settings, cancelled) as work:
             await prepare(work, original)
-            await ConsultantCompletionWorkflow(work.sessions).stop(
+            await ConsultantCompletionWorkflow(client.app.state.database.sessions).stop(
                 cancelled, ExecutionStatus.CANCELLED
             )
 
@@ -225,7 +229,7 @@ def test_reused_prepared_base_cannot_accept_unverified_handoff_instructions_or_t
     async def scenario() -> None:
         async with saved_history(client, database_settings, replacement) as work:
             prepared = await prepare(work, current)
-            async with work.sessions() as session:
+            async with client.app.state.database.sessions() as session:
                 binding = await history.read_context_history(session, replacement.scope, work.role)
             assert binding is not None and binding.prepared is not None
             assert binding.prepared.thread_id == context_thread_id(
@@ -267,7 +271,12 @@ def test_reused_prepared_base_cannot_accept_unverified_handoff_instructions_or_t
             else:
                 raise AssertionError("A reused base accepted unverified instructions and tools")
             resolved = await work.resolve_template(current)
-            context = await capture_turn_context(work, template=resolved, prepared_history=prepared)
+            context = await capture_turn_context(
+                work,
+                data=ConsultantContextWorkflow(client.app.state.database.sessions),
+                template=resolved,
+                prepared_history=prepared,
+            )
             actual = context.request.create_payload()
             assert actual["instructions"] == "Current legitimate instructions"
             assert [item["name"] for item in actual["tools"]] == ["current_read"]

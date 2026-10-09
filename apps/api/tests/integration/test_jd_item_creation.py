@@ -19,12 +19,12 @@ from caliburn.features.executions.models import (
 from caliburn.features.interviews import queries as interviews
 from caliburn.features.interviews.models import InterviewScopeError
 from caliburn.features.job_description import source_persistence, work_queries
-from caliburn.features.job_description.areas import CreateArea
+from caliburn.features.job_description.areas import CreateArea, ResponsibilityArea
 from caliburn.features.job_description.capabilities import CapabilityKind, CreateCapability
 from caliburn.features.job_description.collaborators import CreateCollaborator
 from caliburn.features.job_description.conditions import ConditionKind, CreateCondition
 from caliburn.features.job_description.models import JdCommandConflictError, StaleJdRevisionError
-from caliburn.features.job_description.navigation import resolve_jd_read_ref
+from caliburn.features.job_description.navigation import jd_read_ref, resolve_jd_read_ref
 from caliburn.features.job_description.sources import (
     InterviewSource,
     InvalidJdSourceError,
@@ -121,7 +121,7 @@ def test_item_and_own_source_are_private_and_replay_original_after_later_create(
     prepared = client.portal.call(prepare)
     first_result = client.portal.call(workflow.execute, writer, prepared)
     first = client.portal.call(candidates.read, writer.scope)
-    first_ref = first_result.removeprefix("created · read_ref: ")
+    first_ref = jd_read_ref(first_result.created_item)
     assert first_ref.startswith(ref_prefix)
     original = resolve_jd_read_ref(first.work, first_ref)
     references = transact(
@@ -163,9 +163,7 @@ def test_item_and_own_source_are_private_and_replay_original_after_later_create(
         if original in group
     )
     assert collection[0] == original
-    assert collection[1] == resolve_jd_read_ref(
-        latest.work, later_result.removeprefix("created · read_ref: ")
-    )
+    assert collection[1] == resolve_jd_read_ref(latest.work, jd_read_ref(later_result.created_item))
     assert client.portal.call(workflow.execute, writer, prepared) == first_result
     assert client.portal.call(candidates.read, writer.scope) == latest
     with pytest.raises(JdCommandConflictError):
@@ -206,7 +204,7 @@ def test_source_write_exception_rolls_back_content_sources_and_original_operatio
             client.portal.call(workflow.execute, writer, prepared)
     assert client.portal.call(candidates.read, writer.scope) == before
     result = client.portal.call(workflow.execute, writer, prepared)
-    assert result.startswith("created · read_ref: area_")
+    assert result.effect == "created" and isinstance(result.created_item, ResponsibilityArea)
     assert len(client.portal.call(candidates.read, writer.scope).work.areas) == 1
 
 
@@ -240,7 +238,7 @@ def test_cancel_and_replaced_writer_cannot_create_or_replay_a_candidate_item(
         client.portal.call(workflow.execute, writer, prepared)
     assert client.portal.call(candidates.read, writer.scope) == before
     result = client.portal.call(workflow.execute, replacement, prepared)
-    assert result.startswith("created · read_ref: area_")
+    assert result.effect == "created" and isinstance(result.created_item, ResponsibilityArea)
     completion = ConsultantCompletionWorkflow(sessions)
     client.portal.call(completion.stop, replacement, ExecutionStatus.CANCELLED)
     with pytest.raises(ExecutionStateError):
@@ -297,7 +295,7 @@ def test_created_area_and_shared_skill_refs_work_with_existing_task_creation(
 
     async def create(item: ItemCreation):
         prepared = await items.prepare(binding, command_id=uuid4(), intent=CreateItemInput(item))
-        return (await items.execute(writer, prepared)).removeprefix("created · read_ref: ")
+        return jd_read_ref((await items.execute(writer, prepared)).created_item)
 
     area_ref = client.portal.call(create, CreateArea("網站交付", None))
     skill_ref = client.portal.call(create, CreateCapability(CapabilityKind.SKILL, "介面實作", None))
@@ -318,6 +316,6 @@ def test_created_area_and_shared_skill_refs_work_with_existing_task_creation(
     result = client.portal.call(create_task)
     preview = client.portal.call(JdCandidateWorkflow(sessions).read, writer.scope)
     assert len(preview.work.areas) == len(preview.work.capabilities) == len(preview.work.tasks) == 1
-    assert result.startswith("created · read_ref: task_")
+    assert result.effect == "created" and result.created_item == preview.work.tasks[0]
     assert preview.work.tasks[0].area_id == preview.work.areas[0].area_id
     assert preview.work.task_links[0].capability_id == preview.work.capabilities[0].capability_id

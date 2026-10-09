@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdTasksView",
+  "description": "Tasks at one fixed formal JD revision. Unassigned first, then responsibility groups in their order; each task and detail group preserves its own order.",
+  "type": "object", "additionalProperties": false, "required": ["revision_id", "tasks"],
+  "properties": {
+    "revision_id": {"type": "string", "format": "uuid"},
+    "tasks": {"type": "array", "items": {"$ref": "#/$defs/WorkTask"}}
+  },
+  "$defs": {
+    "WorkTask": {
+      "type": "object", "additionalProperties": false,
+      "required": ["task_id", "area_id", "title", "description", "outcomes", "requirements"],
+      "properties": {
+        "task_id": {"type": "string", "format": "uuid"},
+        "area_id": {"type": ["string", "null"], "format": "uuid"},
+        "title": {"type": ["string", "null"]}, "description": {"type": ["string", "null"]},
+        "outcomes": {"type": "array", "items": {"$ref": "#/$defs/Detail"}},
+        "requirements": {"type": "array", "items": {"$ref": "#/$defs/Detail"}}
+      }
+    },
+    "Detail": {
+      "type": "object", "additionalProperties": false, "required": ["detail_id", "text"],
+      "properties": {"detail_id": {"type": "string", "format": "uuid"}, "text": {"type": "string"}}
+    }
+  }
+}

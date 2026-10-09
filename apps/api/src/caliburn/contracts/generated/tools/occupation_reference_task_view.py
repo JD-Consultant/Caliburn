@@ -20,7 +20,7 @@ class ReferenceTaskSummary(BaseModel):
     )
     task_id: StrictStr
     names: list[ReferenceTaskName]
-    competency_block_count: StrictInt = Field(..., ge=0)
+    competency_block_count: StrictInt = Field(..., ge=0, le=9007199254740991)
 
 
 class ReferenceUnit(BaseModel):
@@ -67,7 +67,7 @@ class ReferenceCompetencyBlock(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    competency_level: StrictInt | None
+    competency_level: StrictInt | None = Field(..., le=9007199254740991)
     outputs: list[NamedContent]
     indicators: list[Indicator]
     knowledge: list[NamedContent]

@@ -6,6 +6,7 @@ from openai.types.responses import FunctionToolParam
 from pydantic import ValidationError
 
 from caliburn.contracts.generated.tools.delete_jd_item_arguments import DeleteJdItemArguments
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.executions.models import (
     ExecutionNotFoundError,
     ExecutionStateError,
@@ -35,9 +36,9 @@ from caliburn.transport.model_tools.jd_item_creation_wire import parse_item_crea
 from caliburn.transport.model_tools.jd_item_movement_wire import parse_item_movement
 from caliburn.transport.model_tools.jd_item_revision_wire import parse_item_revision
 from caliburn.transport.model_tools.jd_reference_fields import (
-    encode_jd_write_result,
     resolve_jd_arguments,
 )
+from caliburn.transport.model_tools.jd_write_rendering import JdWriteResult, render_jd_write_result
 from caliburn.transport.model_tools.jd_write_wire import parse_profile_write, parse_task_write
 from caliburn.workflows.jd_item_creation import JdItemCreationWorkflow, PreparedItemCreation
 from caliburn.workflows.jd_item_deletion import JdItemDeletionWorkflow, PreparedItemDeletion
@@ -219,7 +220,7 @@ class JdWriteTools:
                     self.binding, command_id=command_id, intent=parse_item_revision(arguments)
                 )
             if name == "delete_jd_item":
-                selected = DeleteJdItemArguments.model_validate_json(arguments)
+                selected = parse_contract(DeleteJdItemArguments, arguments)
                 return await self.deletions.prepare(
                     self.binding, command_id=command_id, read_ref=selected.read_ref
                 )
@@ -267,22 +268,21 @@ class JdWriteTools:
 
     async def execute(self, prepared: PreparedJdWrite) -> str:
         # Infrastructure/commit uncertainty propagates to the shared Runtime, not to the model.
+        result: JdWriteResult
         try:
             if isinstance(prepared, PreparedProfileWrite):
-                return await self.profile.execute(self.writer, prepared)
-            if isinstance(prepared, PreparedItemCreation):
-                return await encode_jd_write_result(
-                    self.references, await self.creations.execute(self.writer, prepared)
-                )
-            if isinstance(prepared, PreparedItemRevision):
-                return await self.revisions.execute(self.writer, prepared)
-            if isinstance(prepared, PreparedItemDeletion):
-                return await self.deletions.execute(self.writer, prepared)
-            if isinstance(prepared, PreparedItemMovement):
-                return await self.movements.execute(self.writer, prepared)
-            return await encode_jd_write_result(
-                self.references, await self.tasks.execute(self.writer, prepared)
-            )
+                result = await self.profile.execute(self.writer, prepared)
+            elif isinstance(prepared, PreparedItemCreation):
+                result = await self.creations.execute(self.writer, prepared)
+            elif isinstance(prepared, PreparedItemRevision):
+                result = await self.revisions.execute(self.writer, prepared)
+            elif isinstance(prepared, PreparedItemDeletion):
+                result = await self.deletions.execute(self.writer, prepared)
+            elif isinstance(prepared, PreparedItemMovement):
+                result = await self.movements.execute(self.writer, prepared)
+            else:
+                result = await self.tasks.execute(self.writer, prepared)
+            return await render_jd_write_result(self.references, result)
         except _INVALID_ARGUMENTS:
             return _invalid_arguments()
         except CapabilityInUseError:

@@ -34,10 +34,8 @@ from caliburn.features.job_description.compound_edits import (
     JdEditEffect,
     ReviseProfileWithSources,
 )
-from caliburn.features.job_description.compound_legacy import recover_legacy_compound
 from caliburn.features.job_description.conditions import JobCondition
 from caliburn.features.job_description.models import (
-    JdCommandConflictError,
     JdProfileRevision,
     StaleJdRevisionError,
 )
@@ -89,12 +87,12 @@ async def apply_compound_edit(
         session, job_file_id, command.command_id, candidate
     )
     if original is not None:
-        if (
-            original.kind != "compound_edit"
-            or original.expected_revision_id != command.expected_revision_id
-            or original.request_payload != payload
-        ):
-            raise JdCommandConflictError("command_id was used with different compound JD intent")
+        revision_editing.require_matching_edit_intent(
+            original,
+            kind="compound_edit",
+            expected_revision_id=command.expected_revision_id,
+            request_payload=payload,
+        )
         metadata = original.result_payload
         if not isinstance(metadata, dict) or metadata.get("effect") not in {
             "created",
@@ -118,9 +116,6 @@ async def apply_compound_edit(
                 raise RuntimeError("Compound creation cannot return a standalone detail")
             created = item
         return JdCompoundEditResult(original.result_revision_id, effect, created)
-    legacy = await recover_legacy_compound(session, job_file_id, command, candidate=candidate)
-    if legacy is not None:
-        return legacy
     current = await revision_editing.read_edit_revision(session, job_file_id, candidate)
     if current != command.expected_revision_id:
         raise StaleJdRevisionError("Read the current JD before submitting a new edit")

@@ -5,8 +5,13 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.database import consistent_read_session
 from caliburn.features.interviews import queries as interviews
-from caliburn.features.interviews.models import InterviewMessage, InterviewReadScope
+from caliburn.features.interviews.models import (
+    InterviewMessage,
+    InterviewReadScope,
+    InterviewSourceHeader,
+)
 from caliburn.features.job_description import persistence as jd
 from caliburn.features.job_description import source_persistence
 from caliburn.features.job_description.change_queries import read_change_snapshot
@@ -19,7 +24,8 @@ from caliburn.features.job_description.sources import (
     MemorySource,
     SourceTargetKind,
 )
-from caliburn.features.job_description.work_queries import JdWorkRevision, read_work_at
+from caliburn.features.job_description.work_models import JdWorkRevision
+from caliburn.features.job_description.work_queries import read_work_at
 from caliburn.features.job_files.queries import read_job_file
 from caliburn.features.work_memory import candidate_queries as memory
 from caliburn.features.work_memory.candidates import MemorySnapshot
@@ -90,7 +96,7 @@ class JdEvidenceChanges:
 SPEAKER_LABELS = {"app": "系統開場", "employee": "員工", "consultant": "顧問"}
 
 
-def interview_label(message: InterviewMessage) -> str:
+def interview_label(message: InterviewMessage | InterviewSourceHeader) -> str:
     return f"訪談序號 {message.interview_sequence} · {SPEAKER_LABELS[message.speaker]}"
 
 
@@ -99,7 +105,7 @@ class JdEvidenceWorkflow:
         self.sessions = sessions
 
     async def read_overview(self, job_file_id: UUID) -> EvidenceOverview:
-        async with self.sessions() as session:
+        async with consistent_read_session(self.sessions) as session:
             await read_job_file(session, job_file_id)
             document = await jd.read_document(session, job_file_id)
             revision_id = document.current_revision_id
@@ -125,20 +131,30 @@ class JdEvidenceWorkflow:
                 snapshot_id=snapshot.snapshot_id if snapshot is not None else None,
                 interview_through_sequence=frontier,
             )
+            interview_ids = tuple(
+                dict.fromkeys(
+                    reference.source.source_id
+                    for reference in references
+                    if isinstance(reference.source, InterviewSource)
+                )
+            )
+            interview_headers = (
+                await interviews.read_interview_source_headers(
+                    session, InterviewReadScope(job_file_id, frontier), source_ids=interview_ids
+                )
+                if interview_ids
+                else ()
+            )
             entries = []
             # Repeated citations share source reads for this fixed overview only.
-            source_labels: dict[InterviewSource | MemorySource, tuple[str, bool]] = {}
+            source_labels: dict[InterviewSource | MemorySource, tuple[str, bool]] = {
+                InterviewSource(header.source_id): (interview_label(header), False)
+                for header in interview_headers
+            }
             for reference in references:
                 source = reference.source
                 if source not in source_labels:
-                    if isinstance(source, InterviewSource):
-                        (message,) = await interviews.read_interview_sources(
-                            session,
-                            InterviewReadScope(job_file_id, frontier),
-                            source_ids=(source.source_id,),
-                        )
-                        source_labels[source] = (interview_label(message), False)
-                    else:
+                    if isinstance(source, MemorySource):
                         # 發布版固定情境來源鏈；概覽只批次讀標頭，diff 才展開正文。
                         current, historical, changed = memory_titles[source]
                         # The label describes original evidence, not its current replacement.
@@ -170,7 +186,7 @@ class JdEvidenceWorkflow:
         citation_id: UUID,
         source_ref: str | None = None,
     ) -> MemoryEvidence | InterviewMessage:
-        async with self.sessions() as session:
+        async with consistent_read_session(self.sessions) as session:
             reference, frontier = await _formal_reference(
                 session, job_file_id, revision_id, citation_id
             )
@@ -222,7 +238,7 @@ class JdEvidenceWorkflow:
     async def read_changes(
         self, job_file_id: UUID, revision_id: UUID, citation_id: UUID
     ) -> JdEvidenceChanges:
-        async with self.sessions() as session:
+        async with consistent_read_session(self.sessions) as session:
             snapshot = await memory.read_latest_snapshot(session, job_file_id)
             reference, frontier = await _formal_reference(
                 session, job_file_id, revision_id, citation_id
@@ -231,7 +247,7 @@ class JdEvidenceWorkflow:
                 session, job_file_id, revision_id, reference
             )
             if isinstance(reference.source, InterviewSource):
-                await interviews.read_interview_sources(
+                await interviews.read_interview_source_headers(
                     session,
                     InterviewReadScope(job_file_id, frontier),
                     source_ids=(reference.source.source_id,),
@@ -328,7 +344,7 @@ async def _memory_content(
             EvidenceLink(f"situation_{child.object_id.hex}", "work_situation", child.title)
         )
     if revision.interview_references:
-        messages = await interviews.read_interview_sources(
+        messages = await interviews.read_interview_source_headers(
             session, scope, source_ids=tuple(revision.interview_references)
         )
         links.extend(

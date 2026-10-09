@@ -2,7 +2,7 @@
 
 import json
 import logging
-from asyncio import CancelledError, sleep
+from asyncio import CancelledError, get_running_loop, sleep, timeout_at
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import timedelta
@@ -157,6 +157,12 @@ class _RetryNotReadyError(Exception):
 
 
 @dataclass(frozen=True, slots=True)
+class _OutboundAdmission:
+    attempt_id: UUID
+    deadline: float
+
+
+@dataclass(frozen=True, slots=True)
 class ModelRequestExecutor:
     sessions: async_sessionmaker[AsyncSession]
     writer: ExecutionWriter
@@ -253,7 +259,7 @@ class ModelRequestExecutor:
         unrecoverable: tuple[OutboundAttempt, ...] = ()
         while True:
             try:
-                attempt_id = await self._reserve_request(
+                admission = await self._reserve_request(
                     request_id, kind, payload, reservation, unrecoverable=unrecoverable
                 )
             except PriorOutboundAttemptError as prior:
@@ -281,12 +287,30 @@ class ModelRequestExecutor:
                 # the persisted timestamp, not this process's timer, authorizes sending.
                 await sleep(min(delay.seconds, 1.0))
                 continue
+            attempt_id = admission.attempt_id
+            if get_running_loop().time() >= admission.deadline:
+                raise BudgetExceededError(BudgetLimit.DEADLINE)
+            network_wait = timeout_at(admission.deadline)
+            cancelled_original: Response | None = None
             try:
-                response = await send()
-            except ResponseStreamCancelledError as error:
-                raise ReceivedModelResponseCancelledError(
-                    ReceivedModelResponse(error.response, attempt_id)
-                ) from None
+                async with network_wait:
+                    try:
+                        response = await send()
+                    except ResponseStreamCancelledError as error:
+                        # Exit the timeout context normally before propagating this
+                        # typed cancellation. Its CancelledError -> TimeoutError
+                        # translation would otherwise hide the complete original R.
+                        cancelled_original = error.response
+                if cancelled_original is not None:
+                    raise ReceivedModelResponseCancelledError(
+                        ReceivedModelResponse(cancelled_original, attempt_id)
+                    ) from None
+            except TimeoutError:
+                if network_wait.expired():
+                    # An elapsed local deadline says nothing about the remote result.
+                    # Keep the existing attempt unresolved; never enter provider retry.
+                    raise BudgetExceededError(BudgetLimit.DEADLINE) from None
+                raise
             except ResponseStreamCleanupError as error:
                 raise ReceivedModelResponseError(
                     ReceivedModelResponse(error.response, attempt_id)
@@ -352,7 +376,7 @@ class ModelRequestExecutor:
         reservation: Decimal,
         *,
         unrecoverable: tuple[OutboundAttempt, ...] = (),
-    ) -> UUID:
+    ) -> _OutboundAdmission:
         payload = json.dumps(
             request_payload,
             sort_keys=True,
@@ -406,11 +430,17 @@ class ModelRequestExecutor:
                 attempt_id=attempt_id,
                 reserved_cost_usd=reservation,
             )
+            # Translate the fixed DB deadline once to the event loop's clock. Starting
+            # the measurement before the DB read is conservative about query latency;
+            # commit time also consumes the remaining allowance, without wall-clock skew.
+            observed_at = get_running_loop().time()
+            now = await budgets.read_execution_time(session, self.writer.scope)
+            deadline = observed_at + max(0.0, (policy.deadline_at - now).total_seconds())
         # This line is reached only after COMMIT acknowledgement. Lost acknowledgement
         # raises above; the saved request ID lets recovery find the reservation, not resend.
         if not admission.created:
             raise prior_error("An existing admission does not permit another send")
-        return attempt_id
+        return _OutboundAdmission(attempt_id, deadline)
 
     async def account_response(self, received: ReceivedModelResponse) -> None:
         """Settle the original attempt even if its writer is no longer eligible to adopt R."""

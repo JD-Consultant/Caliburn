@@ -159,7 +159,7 @@ async def unknown_failure(
         writer = await admit(db)
         await supervisor.start()
         await asyncio.wait_for(first_failed.wait(), 3)
-        assert supervisor.failures[writer.scope] is unknown
+        assert supervisor.failures[writer.scope].error_type == type(unknown).__name__
         assert supervisor.stopped_reason(writer.scope) == "runner_failed"
         newcomer = await admit(db)
         supervisor.notify(writer.scope)

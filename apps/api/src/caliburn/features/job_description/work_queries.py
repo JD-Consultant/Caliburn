@@ -1,6 +1,5 @@
 """Pin a formal revision once before reading related JD collections and links."""
 
-from dataclasses import dataclass
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,22 +12,7 @@ from caliburn.features.job_description import (
     persistence,
     task_persistence,
 )
-from caliburn.features.job_description.areas import ResponsibilityArea
-from caliburn.features.job_description.capabilities import Capability, TaskCapabilityLink
-from caliburn.features.job_description.collaborators import Collaborator
-from caliburn.features.job_description.conditions import JobCondition
-from caliburn.features.job_description.tasks import WorkTask
-
-
-@dataclass(frozen=True, slots=True)
-class JdWorkRevision:
-    revision_id: UUID
-    areas: tuple[ResponsibilityArea, ...]
-    tasks: tuple[WorkTask, ...]
-    capabilities: tuple[Capability, ...]
-    task_links: tuple[TaskCapabilityLink, ...]
-    collaborators: tuple[Collaborator, ...]
-    conditions: tuple[JobCondition, ...]
+from caliburn.features.job_description.work_models import JdWorkRevision
 
 
 async def read_work(session: AsyncSession, job_file_id: UUID) -> JdWorkRevision:

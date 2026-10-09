@@ -2,8 +2,8 @@
 
 import pytest
 
+from caliburn.adapters.body_matching import BodyEditError, BodyMatchPolicy
 from caliburn.features.work_memory.body_edits import apply_body_diff
-from caliburn.features.work_memory.body_matching import BodyEditError, BodyMatchPolicy
 
 
 def test_fuzzy_context_preserves_actual_chinese_text_and_mixed_line_endings() -> None:

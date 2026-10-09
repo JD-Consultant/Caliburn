@@ -44,6 +44,7 @@ from caliburn.features.job_description.compound_edits import (
     AddedDetailSources,
     BoundItemSources,
     ItemContentRevision,
+    JdCompoundEditResult,
     ReviseItemWithSources,
 )
 from caliburn.features.job_description.conditions import (
@@ -78,7 +79,7 @@ from caliburn.features.job_description.tasks import (
     TaskField,
     WorkTask,
 )
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.features.job_files import service as job_files
 from caliburn.workflows.jd_sources import (
     JdSourceSelection,
@@ -292,7 +293,9 @@ class JdItemRevisionWorkflow:
                 tuple(added_details),
             )
 
-    async def execute(self, writer: ExecutionWriter, prepared: PreparedItemRevision) -> str:
+    async def execute(
+        self, writer: ExecutionWriter, prepared: PreparedItemRevision
+    ) -> JdCompoundEditResult:
         if writer.scope.execution_id != prepared.candidate.execution_id:
             raise ExecutionStateError("This prepared edit belongs to a different Turn")
         async with self.sessions.begin() as session:
@@ -313,7 +316,7 @@ class JdItemRevisionWorkflow:
                 ),
                 candidate=prepared.candidate,
             )
-            return result.effect
+            return result
 
 
 def _content_revision(

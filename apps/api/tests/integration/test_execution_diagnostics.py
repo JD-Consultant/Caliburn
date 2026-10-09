@@ -32,9 +32,9 @@ pytestmark = pytest.mark.postgres
 def seed(connection, *, kind="consultant_turn", status="completed"):
     job_id, execution_id = uuid4(), uuid4()
     connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'合成測試','合成測試','測試員工')",
-        (job_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'合成測試','合成測試','測試員工')",
+        (job_id,),
     )
     connection.execute(
         "INSERT INTO executions (job_file_id,execution_id,kind,status) VALUES (%s,%s,%s,%s)",
@@ -420,3 +420,235 @@ def test_cli_show_reads_the_existing_copy_without_refresh_or_cross_file_leak(
         connection.execute("SELECT snapshot_at FROM diagnostic_execution_snapshots").fetchone()
         == before
     )
+
+
+def test_operation_ids_survive_missing_outputs_and_legacy_stays_unknown(
+    database_settings, database_connection
+):
+    from uuid import uuid5
+
+    connection = database_connection
+    job_id, execution_id = seed(connection)
+    saver = PostgresSaver(connection, serde=create_graph_serializer())
+    saver.setup()
+    operation_seed = uuid4()
+    thread = f"{job_id}:{execution_id}:job_consultant:completed_work"
+    checkpoint = empty_checkpoint()
+    checkpoint["channel_values"] = {
+        "request_id": uuid4(),
+        "request_snapshot": {"model": "synthetic", "input": ["committed but no output"]},
+        "operation_seed": operation_seed,
+        "response_snapshot": {
+            "id": "trusted-response",
+            "output": [
+                {
+                    "type": "function_call",
+                    "call_id": call_id,
+                    "name": "revise_jd",
+                    "arguments": "{}",
+                }
+                for call_id in ("call-a", "call-b")
+            ],
+        },
+        "tool_results": [],
+    }
+    checkpoint["channel_versions"] = {key: 1 for key in checkpoint["channel_values"]}
+    saver.put(
+        {"configurable": {"thread_id": thread, "checkpoint_ns": ""}},
+        checkpoint,
+        {"source": "loop", "step": 0, "parents": {}},
+        checkpoint["channel_versions"],
+    )
+    refresh_diagnostics(database_settings, execution_id=execution_id)
+    assert connection.execute(
+        "SELECT call_id,result_state,tool_output,operation_id FROM diagnostic_tool_calls "
+        "WHERE execution_id=%s ORDER BY output_index",
+        (execution_id,),
+    ).fetchall() == [
+        ("call-a", "not_recorded", None, uuid5(operation_seed, "call-a")),
+        ("call-b", "not_recorded", None, uuid5(operation_seed, "call-b")),
+    ]
+    legacy_job, legacy_execution = seed(connection)
+    save_step(connection, legacy_job, legacy_execution)
+    refresh_diagnostics(database_settings, execution_id=legacy_execution)
+    assert connection.execute(
+        "SELECT operation_id FROM diagnostic_tool_calls WHERE execution_id=%s",
+        (legacy_execution,),
+    ).fetchall() == [(None,), (None,)]
+
+
+def test_committed_compound_root_is_queryable_without_a_saved_tool_output(
+    client, database_settings, database_connection
+):
+    from uuid import UUID, uuid5
+
+    from caliburn.features.executions import service as executions
+    from caliburn.features.executions.models import ExecutionKind, ExecutionScope
+    from caliburn.features.job_description.models import ProfileField, SetProfileField
+    from caliburn.workflows.jd_candidates import JdCandidateWorkflow
+    from caliburn.workflows.jd_profile_writes import AddProfileSource, JdProfileWriteWorkflow
+    from caliburn.workflows.jd_sources import CurrentInputSourceSelection
+    from caliburn.workflows.memory_reads import PublishedMemoryRead
+
+    created = client.post(
+        "/api/job-files",
+        json={
+            "command_id": str(uuid4()),
+            "display_name": "複合操作診斷",
+            "employee_name": "合成人員",
+        },
+    ).json()
+    file_id = UUID(created["job_file_id"])
+    accepted = client.post(
+        f"/api/job-files/{file_id}/inputs",
+        json={"command_id": str(uuid4()), "text": "我的職稱是網站工程師。"},
+    ).json()
+    scope = ExecutionScope(file_id, UUID(accepted["execution_id"]), ExecutionKind.CONSULTANT_TURN)
+    sessions = client.app.state.database.sessions
+    workflow = JdProfileWriteWorkflow(sessions)
+    operation_seed = uuid4()
+    root_id = uuid5(operation_seed, "compound-call")
+
+    async def prepare():
+        async with sessions.begin() as session:
+            writer = await executions.claim_writer(session, scope, writer_id=uuid4())
+        await JdCandidateWorkflow(sessions).start(writer)
+        prepared = await workflow.prepare(
+            PublishedMemoryRead(scope, None, 1),
+            command_id=root_id,
+            changes=(SetProfileField(ProfileField.JOB_TITLE, "網站工程師"),),
+            sources=(AddProfileSource(ProfileField.JOB_TITLE, CurrentInputSourceSelection()),),
+        )
+        return writer, prepared
+
+    writer, prepared = client.portal.call(prepare)
+    client.portal.call(workflow.execute, writer, prepared)
+    saver = PostgresSaver(database_connection, serde=create_graph_serializer())
+    saver.setup()
+    checkpoint = empty_checkpoint()
+    checkpoint["channel_values"] = {
+        "request_id": uuid4(),
+        "request_snapshot": {"model": "synthetic", "input": []},
+        "operation_seed": operation_seed,
+        "response_snapshot": {
+            "id": "compound-response",
+            "output": [
+                {
+                    "type": "function_call",
+                    "call_id": "compound-call",
+                    "name": "revise_jd_profile",
+                    "arguments": "{}",
+                }
+            ],
+        },
+        "tool_results": [],
+    }
+    checkpoint["channel_versions"] = {key: 1 for key in checkpoint["channel_values"]}
+    saver.put(
+        {
+            "configurable": {
+                "thread_id": (
+                    f"{writer.scope.job_file_id}:{writer.scope.execution_id}"
+                    ":job_consultant:completed_work"
+                ),
+                "checkpoint_ns": "",
+            }
+        },
+        checkpoint,
+        {"source": "loop", "step": 0, "parents": {}},
+        checkpoint["channel_versions"],
+    )
+    refresh_diagnostics(database_settings, execution_id=writer.scope.execution_id)
+    row = database_connection.execute(
+        "SELECT t.operation_id,t.result_state,t.tool_output,o.kind,o.result_payload "
+        "FROM diagnostic_tool_calls t JOIN jd_operations o "
+        "ON o.job_file_id=t.job_file_id AND o.candidate_execution_id=t.execution_id "
+        "AND o.command_id=t.operation_id WHERE t.execution_id=%s",
+        (writer.scope.execution_id,),
+    ).fetchone()
+    assert row[:4] == (root_id, "not_recorded", None, "compound_edit")
+    assert row[4]["effect"] == "updated"
+    assert "created_item" not in row[4]
+
+
+def test_native_null_seed_and_unrelated_custom_channel_do_not_break_safe_refresh(
+    database_settings, database_connection
+):
+    connection = database_connection
+    job_id, execution_id = seed(connection)
+    thread = save_step(connection, job_id, execution_id)
+    connection.execute(
+        "INSERT INTO checkpoint_blobs(thread_id,checkpoint_ns,channel,version,type,blob) "
+        "VALUES (%s,'','prepared_tool','custom-version','pickle',%s),"
+        "(%s,'','operation_seed','null-version','null',%s)",
+        (thread, b"never-deserialize-custom", thread, b""),
+    )
+    connection.execute(
+        "UPDATE checkpoints SET checkpoint=jsonb_set(checkpoint,'{channel_versions}', "
+        "(checkpoint->'channel_versions') || %s::jsonb) WHERE thread_id=%s",
+        (json.dumps({"prepared_tool": "custom-version", "operation_seed": "null-version"}), thread),
+    )
+    assert refresh_diagnostics(database_settings, execution_id=execution_id) == 1
+    assert connection.execute(
+        "SELECT operation_id FROM diagnostic_tool_calls WHERE execution_id=%s",
+        (execution_id,),
+    ).fetchall() == [(None,), (None,)]
+
+
+def test_pending_response_carries_its_own_operation_seed(database_settings, database_connection):
+    from uuid import uuid5
+
+    connection = database_connection
+    job_id, execution_id = seed(connection)
+    saver = PostgresSaver(connection, serde=create_graph_serializer())
+    saver.setup()
+    operation_seed = uuid4()
+    checkpoint = empty_checkpoint()
+    checkpoint["channel_values"] = {
+        "request_id": uuid4(),
+        "request_snapshot": {"model": "synthetic", "input": []},
+        "operation_seed": None,
+        "response_snapshot": {},
+    }
+    checkpoint["channel_versions"] = {key: 1 for key in checkpoint["channel_values"]}
+    config = saver.put(
+        {
+            "configurable": {
+                "thread_id": f"{job_id}:{execution_id}:job_consultant:completed_work",
+                "checkpoint_ns": "",
+            }
+        },
+        checkpoint,
+        {"source": "loop", "step": 0, "parents": {}},
+        checkpoint["channel_versions"],
+    )
+    saver.put_writes(
+        config,
+        [
+            (
+                "response_snapshot",
+                {
+                    "id": "pending-response",
+                    "output": [
+                        {
+                            "type": "function_call",
+                            "call_id": "pending-call",
+                            "name": "revise_jd",
+                            "arguments": "{}",
+                        }
+                    ],
+                },
+            ),
+            ("operation_seed", operation_seed),
+        ],
+        "model-response",
+    )
+    refresh_diagnostics(database_settings, execution_id=execution_id)
+    assert connection.execute(
+        "SELECT call_id,operation_id,result_state FROM diagnostic_tool_calls WHERE execution_id=%s",
+        (execution_id,),
+    ).fetchone() == ("pending-call", uuid5(operation_seed, "pending-call"), "not_recorded")
+    assert connection.execute(
+        "SELECT response_source FROM diagnostic_model_steps WHERE execution_id=%s",
+        (execution_id,),
+    ).fetchone() == ("pending_write",)

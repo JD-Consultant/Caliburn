@@ -10,10 +10,10 @@ import pytest
 from alembic import command
 from fastapi.testclient import TestClient
 from psycopg import sql
-from psycopg.conninfo import conninfo_to_dict
 from sqlalchemy import create_engine
 
 from caliburn.adapters.database import migration_config
+from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.bootstrap import create_app
 from caliburn.settings import DatabaseSettings, Settings
 from caliburn.transport.http.interview_inputs import get_consultant_dispatch
@@ -24,11 +24,7 @@ def empty_database_settings() -> Iterator[DatabaseSettings]:
     dsn = os.environ.get("CALIBURN_TEST_DATABASE_URL")
     if not dsn:
         pytest.skip("Set CALIBURN_TEST_DATABASE_URL to an isolated local database ending in _test")
-    info = conninfo_to_dict(dsn)
-    if info.get("host") not in {"127.0.0.1", "localhost", "::1"} or not info.get(
-        "dbname", ""
-    ).endswith("_test"):
-        pytest.fail("Integration tests require an explicit loopback test database")
+    require_isolated_test_database(dsn, environment=os.environ)
     schema = "t02_" + uuid4().hex
     settings = DatabaseSettings(url=dsn, schema=schema)
     with psycopg.connect(dsn, autocommit=True) as connection:

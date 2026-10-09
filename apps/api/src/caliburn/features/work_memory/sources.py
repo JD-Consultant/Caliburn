@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.interviews import queries as interviews
 from caliburn.features.interviews.models import (
-    InterviewMessage,
     InterviewReadScope,
+    InterviewSourceHeader,
     InterviewSpeaker,
     RecentInterviews,
 )
@@ -33,7 +33,7 @@ async def bind_memory_source_window(
     # not this max sequence, which also includes final replies and later turns.
     frontier = await interviews.read_history_frontier(session, job_file_id)
     scope = InterviewReadScope(job_file_id, frontier)
-    (endpoint,) = await interviews.read_interview_sources(
+    (endpoint,) = await interviews.read_interview_source_headers(
         session, scope, source_ids=(through_source_id,)
     )
     if endpoint.speaker != InterviewSpeaker.EMPLOYEE:
@@ -62,16 +62,14 @@ async def read_required_interviews(
     )
 
 
-async def read_reference_sources(
+async def read_reference_headers(
     session: AsyncSession, window: MemorySourceWindow, *, source_ids: frozenset[UUID]
-) -> tuple[InterviewMessage, ...]:
+) -> tuple[InterviewSourceHeader, ...]:
     """Validate identity references against formal membership, file and fixed upper bound."""
     if not source_ids:
         return ()
-    return tuple(
-        await interviews.read_interview_sources(
-            session,
-            InterviewReadScope(window.job_file_id, window.through_sequence),
-            source_ids=tuple(source_ids),
-        )
+    return await interviews.read_interview_source_headers(
+        session,
+        InterviewReadScope(window.job_file_id, window.through_sequence),
+        source_ids=tuple(source_ids),
     )

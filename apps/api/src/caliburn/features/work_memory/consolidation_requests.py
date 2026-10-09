@@ -7,12 +7,10 @@ Caller holds the job-file lock for changes and owns the transaction.
 
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.interviews import queries as interviews
 from caliburn.features.work_memory import batch_persistence, candidate_operations
-from caliburn.features.work_memory.batch_models import MemoryConsolidationIntent
 from caliburn.features.work_memory.candidates import MemoryCommandConflictError
 
 # A final failure blocks new batches until the interview has advanced this far past the
@@ -31,6 +29,8 @@ async def record_operation(
     payload: dict[str, object],
     result: dict[str, object],
 ) -> dict[str, object]:
+    if kind in {"consolidation_intent", "batch_failure"}:
+        raise ValueError("Scheduling evidence requires its typed recorder")
     original = await candidate_operations.recover(
         session, job_file_id, execution_id, command_id, kind, payload
     )
@@ -50,50 +50,120 @@ async def record_operation(
     return result
 
 
-async def list_intents(
-    session: AsyncSession, job_file_id: UUID | None = None
-) -> tuple[MemoryConsolidationIntent, ...]:
-    statement = select(batch_persistence.MemoryOperationRecord).where(
-        batch_persistence.MemoryOperationRecord.kind == "consolidation_intent"
-    )
-    if job_file_id is not None:
-        statement = statement.where(
-            batch_persistence.MemoryOperationRecord.job_file_id == job_file_id
-        )
-    records = await session.scalars(statement)
-    return tuple(
-        MemoryConsolidationIntent(
-            row.job_file_id,
-            row.execution_id,
-            candidate_operations.stored_uuid(_payload(row.result_payload), "source_id"),
-        )
-        for row in records
-    )
-
-
-async def read_block(session: AsyncSession, job_file_id: UUID) -> str | None:
-    """The reason of a final failure still in force, or None when a new batch may start."""
-    records = await session.scalars(
-        select(batch_persistence.MemoryOperationRecord).where(
-            batch_persistence.MemoryOperationRecord.job_file_id == job_file_id,
-            batch_persistence.MemoryOperationRecord.kind == "batch_failure",
+async def record_intent(
+    session: AsyncSession,
+    *,
+    job_file_id: UUID,
+    execution_id: UUID,
+    command_id: UUID,
+    source_id: UUID,
+) -> UUID:
+    """Persist the original input before A completes; same command retains its kind."""
+    original = await batch_persistence.read_operation(session, job_file_id, command_id)
+    if original is not None:
+        if (
+            original.execution_id != execution_id
+            or original.kind != "consolidation_intent"
+            or original.intent_source_id != source_id
+        ):
+            raise MemoryCommandConflictError("command_id was used for another Memory operation")
+        return source_id
+    session.add(
+        batch_persistence.MemoryOperationRecord(
+            job_file_id=job_file_id,
+            execution_id=execution_id,
+            command_id=command_id,
+            kind="consolidation_intent",
+            intent_source_id=source_id,
         )
     )
-    for row in records:
-        failure = _payload(row.result_payload)
-        if not await _interview_advanced(session, job_file_id, failure):
-            return candidate_operations.stored_text(failure, "reason")
-    return None
+    await session.flush()
+    return source_id
 
 
-async def _interview_advanced(
-    session: AsyncSession, job_file_id: UUID, failure: dict[str, object]
-) -> bool:
-    recorded = failure.get("formal_frontier")
-    if type(recorded) is not int:
-        return False  # An older failure recorded no frontier and never releases by itself.
-    frontier = await interviews.read_history_frontier(session, job_file_id)
-    return frontier - recorded >= RETRY_AFTER_NEW_MESSAGES
+async def recover_failure(
+    session: AsyncSession,
+    *,
+    job_file_id: UUID,
+    execution_id: UUID,
+    command_id: UUID,
+    reason: str,
+) -> int | None:
+    """Replay the first observation, even after the formal interview has advanced."""
+    original = await batch_persistence.read_operation(session, job_file_id, command_id)
+    if original is None:
+        return None
+    if (
+        original.execution_id != execution_id
+        or original.kind != "batch_failure"
+        or original.failure_reason != reason
+        or original.failure_frontier is None
+    ):
+        raise MemoryCommandConflictError("command_id was used for another Memory operation")
+    return original.failure_frontier
+
+
+async def record_failure(
+    session: AsyncSession,
+    *,
+    job_file_id: UUID,
+    execution_id: UUID,
+    command_id: UUID,
+    reason: str,
+    frontier: int,
+) -> int:
+    if not reason or len(reason) > 100 or type(frontier) is not int or frontier < 0:
+        raise ValueError("A failure requires a short reason and nonnegative formal frontier")
+    original = await recover_failure(
+        session,
+        job_file_id=job_file_id,
+        execution_id=execution_id,
+        command_id=command_id,
+        reason=reason,
+    )
+    if original is not None:
+        return original
+    session.add(
+        batch_persistence.MemoryOperationRecord(
+            job_file_id=job_file_id,
+            execution_id=execution_id,
+            command_id=command_id,
+            kind="batch_failure",
+            failure_reason=reason,
+            failure_frontier=frontier,
+        )
+    )
+    await session.flush()
+    return frontier
+
+
+def intents_projection(job_file_id: UUID | None = None) -> Select[UUID, UUID, UUID, UUID | None]:
+    record = batch_persistence.MemoryOperationRecord
+    statement = select(
+        record.job_file_id, record.execution_id, record.command_id, record.intent_source_id
+    ).where(record.kind == "consolidation_intent")
+    return statement.where(record.job_file_id == job_file_id) if job_file_id else statement
+
+
+def failures_projection(
+    job_file_id: UUID | None = None,
+) -> Select[UUID, UUID, UUID, str | None, int | None]:
+    record = batch_persistence.MemoryOperationRecord
+    statement = select(
+        record.job_file_id,
+        record.execution_id,
+        record.command_id,
+        record.failure_reason,
+        record.failure_frontier,
+    ).where(record.kind == "batch_failure")
+    return statement.where(record.job_file_id == job_file_id) if job_file_id else statement
+
+
+def published_coverage_projection() -> Select[UUID, int]:
+    return select(
+        batch_persistence.MemoryHeadRecord.job_file_id,
+        batch_persistence.MemorySnapshotRecord.covered_through_sequence,
+    ).join(batch_persistence.MemorySnapshotRecord)
 
 
 async def list_stage_results(

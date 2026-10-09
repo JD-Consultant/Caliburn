@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, replace
 
-from caliburn.features.job_description.area_service import apply_area_change
+from caliburn.features.job_description.area_changes import apply_area_change
 from caliburn.features.job_description.areas import CreateArea, ResponsibilityArea, ReviseArea
 from caliburn.features.job_description.capabilities import (
     Capability,
@@ -11,7 +11,7 @@ from caliburn.features.job_description.capabilities import (
     SetTaskCapability,
 )
 from caliburn.features.job_description.capability_changes import apply_capability_change
-from caliburn.features.job_description.collaborator_service import apply_collaborator_change
+from caliburn.features.job_description.collaborator_changes import apply_collaborator_change
 from caliburn.features.job_description.collaborators import (
     Collaborator,
     CreateCollaborator,
@@ -48,7 +48,7 @@ from caliburn.features.job_description.sources import (
 )
 from caliburn.features.job_description.task_changes import apply_task_edit
 from caliburn.features.job_description.tasks import CreateTask, DetailKind, ReviseTask, WorkTask
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 
 
 @dataclass(frozen=True, slots=True)

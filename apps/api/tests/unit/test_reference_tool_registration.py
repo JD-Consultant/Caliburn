@@ -9,8 +9,13 @@ import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 from openai.types.responses import ResponseFunctionToolCall
 
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agents.job_consultant import runner as consultant_runner_module
+from caliburn.agents.job_consultant.configuration import (
+    ConsultantConfiguration,
+    ToolDescriptionOverride,
+)
 from caliburn.agents.job_consultant.context_binding import TurnContext
 from caliburn.agents.job_consultant.runner import ConsultantRunner
 from caliburn.agents.job_consultant.tools import ConsultantTools, consultant_tool_definitions
@@ -223,9 +228,7 @@ async def test_reference_enabled_saved_request_starts_candidate_before_exposing_
     assert set(OccupationReferenceTools.names) <= set(tools.names)
 
 
-@pytest.mark.parametrize("result_format", ["state", "status"])
-async def test_write_handler_uses_the_captured_requests_original_result_format(
-    result_format,
+async def test_write_handler_preserves_the_captured_request(
     monkeypatch,
 ):
     workflow = Mock(start=AsyncMock())
@@ -238,7 +241,7 @@ async def test_write_handler_uses_the_captured_requests_original_result_format(
     saved = request(
         [
             *consultant_tool_definitions(),
-            *occupation_reference_definitions(write_result_format=result_format),
+            *occupation_reference_definitions(),
         ]
     )
     original_payload = saved.create_payload()
@@ -250,26 +253,42 @@ async def test_write_handler_uses_the_captured_requests_original_result_format(
         occupation_references=Mock(),
     )
     tools = await runner._tools(writer, replace(context, request=saved), Mock())
-    assert tools.occupation_references.write_result_format == result_format
+    assert tools.occupation_references is not None
     assert saved.create_payload() == original_payload
 
 
-async def test_mixed_saved_write_contracts_reject_before_candidate_initialization(monkeypatch):
-    factory = Mock(return_value=Mock(start=AsyncMock()))
-    monkeypatch.setattr(consultant_runner_module, "OccupationReferenceWorkflow", factory)
+@pytest.mark.parametrize(
+    "names",
+    [
+        ("update_excluded_work",),
+        ("select_occupation_references", "update_excluded_work"),
+    ],
+)
+async def test_candidate_descriptions_keep_status_handlers_for_new_captured_requests(
+    names, monkeypatch
+):
+    workflow = Mock(start=AsyncMock())
+    monkeypatch.setattr(
+        consultant_runner_module,
+        "OccupationReferenceWorkflow",
+        Mock(return_value=workflow),
+    )
     writer, context = consultant_context(True)
-    saved_tools = context.request.create_payload()["tools"]
-    saved_tools[-1] = occupation_reference_definitions(write_result_format="state")[-1]
     runner = ConsultantRunner(
         Mock(),
         Mock(),
         Mock(),
         ModelSettings(api_key="synthetic"),
         occupation_references=Mock(),
+        configuration=ConsultantConfiguration(
+            tool_descriptions=tuple(ToolDescriptionOverride(name, "候選寫入說明") for name in names)
+        ),
     )
-    with pytest.raises(ExecutionStateError):
-        await runner._tools(writer, replace(context, request=request(saved_tools)), Mock())
-    factory.assert_not_called()
+    saved = runner._template(stream=False)
+    original_payload = saved.create_payload()
+    tools = await runner._tools(writer, replace(context, request=saved), Mock())
+    assert tools.occupation_references is not None
+    assert saved.create_payload() == original_payload
 
 
 async def test_saved_reference_request_with_missing_client_fails_before_history_model_work(
@@ -368,6 +387,7 @@ def test_memory_handlers_follow_saved_request_instead_of_today_enable_flag(
         Mock(),
         ModelSettings(api_key="synthetic"),
         excluded_work_enabled=configured,
+        cpu=MemoryCpu(),
     )
     tools = runner._tools(writer, binding, saved_request)
     assert ("read_excluded_work" in tools.names) is saved_enabled
@@ -392,7 +412,12 @@ async def test_public_memory_runner_forwards_explicit_enablement_to_shared_runne
     factory = Mock(return_value=shared)
     monkeypatch.setattr(module, "MemoryAnalysisRunner", factory)
     public = runner_type(
-        Mock(), Mock(), Mock(), ModelSettings(api_key="synthetic"), excluded_work_enabled=True
+        Mock(),
+        Mock(),
+        Mock(),
+        ModelSettings(api_key="synthetic"),
+        cpu=MemoryCpu(),
+        excluded_work_enabled=True,
     )
     writer = ExecutionWriter(ExecutionScope(uuid4(), uuid4(), ExecutionKind.MEMORY_BATCH), uuid4())
     stage = MemoryBatchPosition(
@@ -410,5 +435,6 @@ async def test_public_memory_runner_forwards_explicit_enablement_to_shared_runne
         public.checkpointer,
         public.client,
         public.settings,
+        public.cpu,
         excluded_work_enabled=True,
     )

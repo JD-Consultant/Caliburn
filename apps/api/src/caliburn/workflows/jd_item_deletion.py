@@ -30,6 +30,7 @@ from caliburn.features.job_description.conditions import (
     EditJdConditions,
     JobCondition,
 )
+from caliburn.features.job_description.item_results import JdItemDeletionResult
 from caliburn.features.job_description.navigation import resolve_jd_read_ref
 from caliburn.features.job_description.sources import InvalidJdSourceError
 from caliburn.features.job_description.tasks import DeleteTask, EditJdTasks, WorkTask
@@ -46,7 +47,7 @@ type DeletionCommand = (
 class PreparedItemDeletion:
     candidate: JdCandidateScope
     command: DeletionCommand
-    result_message: str
+    detached_task_count: int
 
 
 class JdItemDeletionWorkflow:
@@ -67,13 +68,13 @@ class JdItemDeletionWorkflow:
             target = resolve_jd_read_ref(preview.work, read_ref)
             revision = preview.position.revision_id
             command: DeletionCommand
-            message = "deleted"
+            detached_task_count = 0
             match target:
                 case ResponsibilityArea():
                     command = EditJdAreas(command_id, revision, DeleteArea(target.area_id))
-                    count = sum(task.area_id == target.area_id for task in preview.work.tasks)
-                    if count:
-                        message += f" · {count} 項任務保留並轉為未歸屬"
+                    detached_task_count = sum(
+                        task.area_id == target.area_id for task in preview.work.tasks
+                    )
                 case WorkTask():
                     command = EditJdTasks(command_id, revision, DeleteTask(target.task_id))
                 case Capability():
@@ -99,9 +100,11 @@ class JdItemDeletionWorkflow:
                     raise InvalidJdSourceError(
                         "Remove task details through revise_jd_item on their task"
                     )
-            return PreparedItemDeletion(preview.position.scope, command, message)
+            return PreparedItemDeletion(preview.position.scope, command, detached_task_count)
 
-    async def execute(self, writer: ExecutionWriter, prepared: PreparedItemDeletion) -> str:
+    async def execute(
+        self, writer: ExecutionWriter, prepared: PreparedItemDeletion
+    ) -> JdItemDeletionResult:
         if writer.scope.execution_id != prepared.candidate.execution_id:
             raise ExecutionStateError("This prepared edit belongs to a different Turn")
         async with self.sessions.begin() as session:
@@ -109,5 +112,7 @@ class JdItemDeletionWorkflow:
             await job_files.lock_job_file(session, file_id)
             await executions.lock_active_writer(session, writer)
             await revision_editing.require_open_candidate(session, file_id, prepared.candidate)
-            await apply_candidate_edit(session, file_id, prepared.candidate, prepared.command)
-            return prepared.result_message
+            revision = await apply_candidate_edit(
+                session, file_id, prepared.candidate, prepared.command
+            )
+            return JdItemDeletionResult(revision, prepared.detached_task_count)

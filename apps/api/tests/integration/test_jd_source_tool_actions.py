@@ -11,6 +11,7 @@ from caliburn.features.job_description import source_persistence
 from caliburn.features.job_description.capabilities import EditJdCapabilities, SetTaskCapability
 from caliburn.features.job_description.navigation import jd_read_ref
 from caliburn.features.job_description.sources import InterviewSource, SourceTargetKind
+from caliburn.transport.model_tools.jd_reference_fields import map_jd_reference_fields
 from caliburn.transport.model_tools.jd_write_checkpoint import restore_jd_write, snapshot_jd_write
 from caliburn.transport.model_tools.jd_writes import JdWriteTools
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
@@ -21,8 +22,8 @@ from caliburn.workflows.jd_item_revision import JdItemRevisionWorkflow
 from caliburn.workflows.jd_profile_writes import JdProfileWriteWorkflow
 from caliburn.workflows.jd_task_writes import JdTaskWriteWorkflow
 from caliburn.workflows.memory_reads import PublishedMemoryRead
+from tests.fixtures.consultant_turn import transact
 from tests.integration.test_jd_item_revision import setup_item
-from tests.integration.test_jd_source_edits import transact
 
 pytestmark = pytest.mark.postgres
 
@@ -42,7 +43,17 @@ def source_tools(client, writer, binding=None):
 
 
 def prepare(client, tools, name, payload):
-    result = client.portal.call(tools.prepare, name, json.dumps(payload), uuid4())
+    canonical = set()
+
+    def collect(ref):
+        if len(ref.rsplit("_", 1)[-1]) == 32:
+            canonical.add(ref)
+        return ref
+
+    map_jd_reference_fields(payload, collect)
+    aliases = client.portal.call(tools.references.assign, canonical)
+    model_payload = map_jd_reference_fields(payload, lambda ref: aliases.get(ref, ref))
+    result = client.portal.call(tools.prepare, name, json.dumps(model_payload), uuid4())
     assert not isinstance(result, str), result
     return restore_jd_write(snapshot_jd_write(result))
 

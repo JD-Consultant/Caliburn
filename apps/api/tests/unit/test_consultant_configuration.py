@@ -1,5 +1,6 @@
 """候選提示及工具說明可獨立組裝，不改共享模板或正式工具契約。"""
 
+from copy import deepcopy
 from dataclasses import FrozenInstanceError, replace
 
 import pytest
@@ -72,13 +73,45 @@ def test_tool_variant_cannot_silently_target_a_missing_or_duplicate_tool():
         config.describe_tools(consultant_tool_definitions(interview_plans_enabled=False))
 
 
-def test_tool_description_override_preserves_every_other_contract_field():
+@pytest.mark.parametrize(
+    "description",
+    [
+        "候選讀取說明",
+        '候選讀取說明。成功只回 {"status":"updated"}；需要完整 state 時再按需讀取。',
+    ],
+)
+def test_tool_description_override_preserves_every_other_contract_field(description):
     original = consultant_tool_definitions()
     config = ConsultantConfiguration(
-        tool_descriptions=(ToolDescriptionOverride("read_jd", "候選讀取說明"),)
+        tool_descriptions=(ToolDescriptionOverride("read_jd", description),)
     )
     changed = config.describe_tools(original)
     for before, after in zip(original, changed, strict=True):
         assert after == (
-            {**before, "description": "候選讀取說明"} if before["name"] == "read_jd" else before
+            {**before, "description": description} if before["name"] == "read_jd" else before
         )
+
+
+@pytest.mark.parametrize(
+    "names",
+    [
+        ("update_excluded_work",),
+        ("select_occupation_references", "update_excluded_work"),
+    ],
+)
+def test_reference_description_overrides_preserve_status_result_contract(names):
+    original = consultant_tool_definitions(occupation_references_enabled=True)
+    baseline = deepcopy(original)
+    config = ConsultantConfiguration(
+        tool_descriptions=tuple(ToolDescriptionOverride(name, "候選寫入說明") for name in names),
+    )
+    changed = config.describe_tools(original)
+    assert original == baseline
+    for before, after in zip(original, changed, strict=True):
+        if before["name"] in names:
+            assert after["description"] == "候選寫入說明"
+            assert {key: value for key, value in before.items() if key != "description"} == {
+                key: value for key, value in after.items() if key != "description"
+            }
+        else:
+            assert after == before

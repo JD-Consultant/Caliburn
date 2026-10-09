@@ -102,7 +102,7 @@ def test_task_detail_and_capability_relation_have_separate_evidence_and_replay(
     preview = client.portal.call(candidates.read, scope)
     assert len(preview.work.tasks) == 1
     task = preview.work.tasks[0]
-    assert result == f"created · read_ref: {jd_read_ref(task)}"
+    assert result.effect == "created" and result.created_item == task
     assert len(preview.work.task_links) == 1
     references = transact(
         client,

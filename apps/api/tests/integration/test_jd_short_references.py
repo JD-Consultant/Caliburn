@@ -86,8 +86,11 @@ def test_short_map_item_citation_roundtrip_preserves_original_identity(client: T
     ) in {"aligned", "unchanged"}
     after = client.portal.call(candidates.read, writer.scope)
     assert after.work.tasks[0].task_id == before.work.tasks[0].task_id
-    # Old native histories may still contain UUID locators; do not rewrite them.
-    assert read(client, reader, "item", jd_read_ref(before.work.tasks[0])) == current
+    # Model inputs use issued short locators; canonical identities stay internal.
+    assert (
+        read(client, reader, "item", jd_read_ref(before.work.tasks[0]))["code"]
+        == "target_not_found"
+    )
 
 
 def test_short_locator_cannot_cross_file_or_retarget_after_deletion(client: TestClient):
@@ -257,3 +260,93 @@ def test_nested_locators_move_and_link_without_rewriting_text(client):
         "supporting_sources": [],
     }
     assert detail["required_skills"][0]["read_ref"] == skill_ref
+
+
+@pytest.mark.parametrize("operation", ["delete_jd_item", "move_jd_item"])
+def test_lifecycle_facts_survive_commit_before_output_and_later_edit(
+    client, monkeypatch, operation
+):
+    writer, candidates, _ = setup_item(client)
+    tools = source_tools(client, writer)
+    reader = reader_for(client, writer)
+    task_ref = read(client, reader)["unassigned_work_tasks"][0]["read_ref"]
+    created = invoke(
+        client,
+        tools,
+        "create_jd_item",
+        {
+            "item": {
+                "kind": "responsibility_area",
+                "title": "盤點",
+                "scope_text": None,
+                "supporting_sources": [],
+            }
+        },
+    )
+    area_ref = created.split(": ")[1]
+    assert (
+        invoke(
+            client,
+            tools,
+            "move_jd_item",
+            {
+                "read_ref": task_ref,
+                "destination": {"kind": "task_parent", "parent_read_ref": area_ref},
+                "position": {"kind": "last"},
+                "content_changes": [],
+            },
+        )
+        == "moved"
+    )
+    arguments = (
+        {"read_ref": area_ref}
+        if operation == "delete_jd_item"
+        else {
+            "read_ref": task_ref,
+            "destination": {"kind": "task_parent", "parent_read_ref": None},
+            "position": {"kind": "last"},
+            "content_changes": [],
+        }
+    )
+    prepared = client.portal.call(tools.prepare, operation, json.dumps(arguments), uuid4())
+    assert not isinstance(prepared, str)
+    saved = snapshot_jd_write(prepared)
+    payload = json.loads(saved["payload"])
+    assert "result_message" not in payload
+    assert payload.get("detached_task_count", payload.get("detached_from_area")) == 1
+    workflow = tools.deletions if operation == "delete_jd_item" else tools.movements
+    execute = workflow.execute
+
+    async def committed_without_output(writer, command):
+        await execute(writer, command)
+        raise ConnectionError("synthetic interruption after lifecycle commit")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(workflow, "execute", committed_without_output)
+        with pytest.raises(ConnectionError, match="after lifecycle commit"):
+            client.portal.call(tools.execute, restore_jd_write(saved))
+    committed = client.portal.call(candidates.read, writer.scope)
+    assert committed.work.tasks[0].area_id is None
+    assert (
+        invoke(
+            client,
+            tools,
+            "revise_jd_profile",
+            {
+                "changes": [
+                    {"action": "set_field", "field": "job_title", "value": "後續編輯"},
+                ]
+            },
+        )
+        == "updated"
+    )
+    later = client.portal.call(candidates.read, writer.scope)
+    fresh_tools = source_tools(client, writer)
+    expected = (
+        "deleted · 1 項任務保留並轉為未歸屬"
+        if operation == "delete_jd_item"
+        else "moved · 原所屬職責已解除，任務現在未歸屬"
+    )
+    assert client.portal.call(fresh_tools.execute, restore_jd_write(saved)) == expected
+    assert client.portal.call(fresh_tools.execute, restore_jd_write(saved)) == expected
+    assert client.portal.call(candidates.read, writer.scope) == later

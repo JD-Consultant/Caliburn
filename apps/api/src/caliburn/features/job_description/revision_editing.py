@@ -51,6 +51,22 @@ async def read_edit_operation(
     return operation
 
 
+def require_matching_edit_intent(
+    operation: persistence.JdOperationRecord,
+    *,
+    kind: str,
+    expected_revision_id: UUID,
+    request_payload: object,
+) -> None:
+    """Qualify a complete replay intent after the caller's file/candidate scope lookup."""
+    if (
+        operation.kind != kind
+        or operation.expected_revision_id != expected_revision_id
+        or operation.request_payload != request_payload
+    ):
+        raise JdCommandConflictError("command_id was already used with different JD intent")
+
+
 async def record_edit(
     session: AsyncSession,
     job_file_id: UUID,

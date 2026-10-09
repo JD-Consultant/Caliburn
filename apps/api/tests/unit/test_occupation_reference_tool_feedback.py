@@ -6,11 +6,8 @@ from uuid import uuid4
 import pytest
 
 from caliburn.adapters.occupation_references import ReferenceClientError
-from caliburn.features.executions.models import ExecutionStateError
 from caliburn.transport.model_tools.occupation_references import (
-    OccupationReferenceTools,
     occupation_reference_definitions,
-    occupation_reference_write_result_format,
 )
 from tests.unit.test_occupation_reference_tools import bound_tools
 
@@ -94,46 +91,3 @@ async def test_successful_large_write_returns_a_bounded_receipt_without_losing_s
     # Full state remains available through the read tool and its honest capacity refusal.
     read = json.loads(await tools.invoke("read_occupation_reference_state", "{}"))
     assert read["code"] == "read_limit_exceeded"
-
-
-@pytest.mark.parametrize("result_format", ["state", "status"])
-def test_original_tool_definitions_determine_write_result_format(result_format):
-    original = occupation_reference_definitions(write_result_format=result_format)
-    assert occupation_reference_write_result_format(original) == result_format
-
-
-@pytest.mark.parametrize("malformation", ["mixed", "missing", "duplicate"])
-def test_incomplete_or_inconsistent_original_output_contracts_fail_closed(malformation):
-    original = occupation_reference_definitions()
-    if malformation == "mixed":
-        original[-1] = occupation_reference_definitions(write_result_format="state")[-1]
-    elif malformation == "missing":
-        original.pop()
-    else:
-        original[-1] = original[-2].copy()
-    with pytest.raises(ExecutionStateError):
-        occupation_reference_write_result_format(original)
-
-
-async def test_legacy_execution_preserves_full_state_result_and_original_saved_command():
-    tools, workflow, client = bound_tools()
-    tools = OccupationReferenceTools(
-        workflow,
-        client,
-        tools.writer,
-        max_result_characters=64,
-        write_result_format="state",
-    )
-    scope = "正式環境部署由維運團隊負責；" * 100
-    workflow.projected_state = {"selected_reference_ids": None, "excluded_work": [scope]}
-    prepared = await tools.prepare(
-        "update_excluded_work",
-        json.dumps({"add": [scope], "remove": []}),
-        uuid4(),
-    )
-    original = json.loads(json.dumps(prepared))
-    result = await tools.execute(original)
-    assert json.loads(result) == workflow.projected_state
-    assert original == prepared
-    assert len(result) > 64
-    assert client.calls == []

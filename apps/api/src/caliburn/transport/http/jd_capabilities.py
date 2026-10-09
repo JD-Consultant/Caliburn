@@ -1,15 +1,15 @@
 """Manual shared knowledge/skill edits; wire types do not own JD rules."""
 
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
 
 from caliburn.contracts.generated import edit_jd_capabilities_request as wire
 from caliburn.contracts.generated import jd_capabilities_view as view
-from caliburn.features.executions.models import ExecutionBusyError
 from caliburn.features.job_description import capabilities
-from caliburn.features.job_description.models import JdCommandConflictError, StaleJdRevisionError
 from caliburn.features.job_files.models import JobFileNotFoundError
+from caliburn.transport.http.contracts import canonical_body
 from caliburn.transport.http.jd_dependencies import JdEditing
 
 router = APIRouter(prefix="/api/job-files/{job_file_id}/jd", tags=["job-description"])
@@ -89,7 +89,7 @@ async def read_capabilities(job_file_id: UUID, workflow: JdEditing) -> view.JdCa
 @router.post("/capabilities", response_model=view.JdCapabilitiesView)
 async def edit_capabilities(
     job_file_id: UUID,
-    body: wire.EditJdCapabilitiesRequest,
+    body: Annotated[wire.EditJdCapabilitiesRequest, canonical_body(wire.EditJdCapabilitiesRequest)],
     workflow: JdEditing,
 ) -> view.JdCapabilitiesView:
     try:
@@ -109,9 +109,3 @@ async def edit_capabilities(
         ) from error
     except capabilities.CapabilityInUseError as error:
         raise HTTPException(status_code=409, detail={"code": "capability_in_use"}) from error
-    except JdCommandConflictError as error:
-        raise HTTPException(status_code=409, detail={"code": "jd_command_conflict"}) from error
-    except StaleJdRevisionError as error:
-        raise HTTPException(status_code=409, detail={"code": "jd_revision_stale"}) from error
-    except ExecutionBusyError as error:
-        raise HTTPException(status_code=409, detail={"code": "consultant_turn_active"}) from error

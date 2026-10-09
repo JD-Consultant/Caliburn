@@ -41,7 +41,8 @@ from caliburn.workflows.jd_item_revision import (
 )
 from caliburn.workflows.jd_sources import CurrentInputSourceSelection
 from caliburn.workflows.memory_reads import PublishedMemoryRead
-from tests.integration.test_jd_source_edits import start, transact
+from tests.fixtures.consultant_turn import start_consultant_turn as start
+from tests.fixtures.consultant_turn import transact
 
 pytestmark = pytest.mark.postgres
 
@@ -118,7 +119,7 @@ def test_task_revision_preserves_identity_precise_evidence_and_original_replay(c
         ),
     )
     after = client.portal.call(candidates.read, writer.scope)
-    assert result == "updated"
+    assert result.effect == "updated"
     revised = after.work.tasks[0]
     assert revised.task_id == task.task_id
     assert revised.description == "新描述"
@@ -270,7 +271,7 @@ def test_other_item_families_route_to_existing_owners_and_detail_delete_is_local
                 ),
             ),
         )
-        assert result == "updated"
+        assert result.effect == "updated"
     after = client.portal.call(candidates.read, writer.scope)
     assert after.work.areas[0].area_id == work.areas[0].area_id
     assert after.work.areas[0].scope_text == "新職責範圍"

@@ -21,6 +21,7 @@ class HistoricalInterviewMessage(BaseModel):
         ...,
         description="Fixed formal sequence within the job file; smaller means earlier speech. Not a result index, source ID or agent turn.",
         ge=1,
+        le=9007199254740991,
     )
     speaker: Speaker = Field(
         ...,

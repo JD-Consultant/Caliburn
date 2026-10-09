@@ -66,12 +66,20 @@ def test_0018_preserves_existing_revisions_and_operations(
             command.upgrade(config, "head")
             command.upgrade(config, "head")
             for table, rows in before.items():
-                # 後續 migration 可加欄位，原有欄位及值仍必須逐一保留。
+                # 0030 moves creation identity into the independently retained receipt.
+                if table == "job_files":
+                    rows = [
+                        {key: value for key, value in row.items() if key != "creation_command_id"}
+                        for row in rows
+                    ]
                 columns = ", ".join(rows[0].keys())
                 assert (
                     connection.execute(text(f"SELECT {columns} FROM {table}")).mappings().all()
                     == rows
                 )
+            assert connection.execute(
+                text("SELECT command_id,result_file_id FROM job_file_creations")
+            ).all() == [(identities["command"], identities["file"])]
             connection.execute(
                 insert, {**identities, "command": uuid4(), "kind": "undo_completed_turn"}
             )

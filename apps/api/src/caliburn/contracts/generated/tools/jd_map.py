@@ -21,8 +21,8 @@ class JdTaskMap(BaseModel):
     read_ref: StrictStr = Field(..., min_length=1)
     title: StrictStr | None
     work_preview: StrictStr | None = None
-    outcome_count: StrictInt = Field(..., ge=0)
-    requirement_count: StrictInt = Field(..., ge=0)
+    outcome_count: StrictInt = Field(..., ge=0, le=9007199254740991)
+    requirement_count: StrictInt = Field(..., ge=0, le=9007199254740991)
 
 
 class JdAreaMap(BaseModel):

@@ -7,7 +7,7 @@ from caliburn.features.job_description.capabilities import Capability
 from caliburn.features.job_description.collaborators import Collaborator
 from caliburn.features.job_description.conditions import JobCondition
 from caliburn.features.job_description.tasks import TaskDetail, WorkTask
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 
 type JdReadTarget = (
     ResponsibilityArea | WorkTask | TaskDetail | Capability | Collaborator | JobCondition

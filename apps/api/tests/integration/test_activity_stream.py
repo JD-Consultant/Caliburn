@@ -13,7 +13,7 @@ from starlette.types import Message, Scope
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 from caliburn.features.interviews.models import SubmitInterviewInput
-from caliburn.workflows.consultant_commentary import ConsultantCommentaryHub
+from caliburn.workflows.consultant_activity import ConsultantActivityHub, PublicCommentaryUpdate
 
 pytestmark = pytest.mark.postgres
 
@@ -38,13 +38,13 @@ def test_stream_sends_only_scoped_public_text_and_disconnect_does_not_stop_execu
 
     async def scenario() -> None:
         # Use the real bootstrap-owned instance, not a replacement hiding a missing wire.
-        hub = client.app.state.consultant_commentary_hub
-        assert isinstance(hub, ConsultantCommentaryHub)
+        hub = client.app.state.consultant_activity_hub
+        assert isinstance(hub, ConsultantActivityHub)
         accepted = await client.app.state.interview_input_workflow.accept(
             SubmitInterviewInput(file_id, uuid4(), "SSE input"),
         )
         execution_id = accepted.accepted.execution_id
-        path = f"/api/job-files/{file_id}/consultant-turns/{execution_id}/commentary-stream"
+        path = f"/api/job-files/{file_id}/consultant-turns/{execution_id}/activity-stream"
         disconnected = asyncio.Event()
         messages: list[Message] = []
         first_request = True
@@ -60,8 +60,18 @@ def test_stream_sends_only_scoped_public_text_and_disconnect_does_not_stop_execu
         async def send(message: Message) -> None:
             messages.append(message)
             if message["type"] == "http.response.start":
-                hub.publish(uuid4(), execution_id, "secret", "secret", "wrong file")
-                hub.publish(file_id, execution_id, "r-public", "m-public", "累積\n公開全文")
+                hub.publish(
+                    uuid4(),
+                    execution_id,
+                    PublicCommentaryUpdate(uuid4(), execution_id, "secret", "secret", "wrong file"),
+                )
+                hub.publish(
+                    file_id,
+                    execution_id,
+                    PublicCommentaryUpdate(
+                        file_id, execution_id, "r-public", "m-public", "累積\n公開全文"
+                    ),
+                )
             if message["type"] == "http.response.body" and message.get("body"):
                 disconnected.set()
 
@@ -116,7 +126,7 @@ def test_stream_sends_only_scoped_public_text_and_disconnect_does_not_stop_execu
             ) as http:
                 full = await http.get(path)
                 assert full.status_code == 503
-                assert full.json() == {"detail": {"code": "commentary_stream_capacity"}}
+                assert full.json() == {"detail": {"code": "activity_stream_capacity"}}
         status = await client.app.state.consultant_status_workflow.read(file_id, execution_id)
         assert status.status == ExecutionStatus.ACTIVE
 
@@ -127,8 +137,8 @@ def test_stream_checks_original_file_and_operation_family_before_subscribing(
     client: TestClient,
 ) -> None:
     # Exercise the missing-dependency branch even after main wires the normal hub.
-    if hasattr(client.app.state, "consultant_commentary_hub"):
-        del client.app.state.consultant_commentary_hub
+    if hasattr(client.app.state, "consultant_activity_hub"):
+        del client.app.state.consultant_activity_hub
     file_id, other_file = create_file(client), create_file(client)
 
     async def accept() -> tuple[UUID, UUID]:
@@ -143,15 +153,15 @@ def test_stream_checks_original_file_and_operation_family_before_subscribing(
     execution_id, memory_id = client.portal.call(accept)
     for job_file, execution in ((other_file, execution_id), (file_id, memory_id)):
         response = client.get(
-            f"/api/job-files/{job_file}/consultant-turns/{execution}/commentary-stream",
+            f"/api/job-files/{job_file}/consultant-turns/{execution}/activity-stream",
         )
         assert response.status_code == 404
         assert response.json() == {"detail": {"code": "consultant_turn_not_found"}}
     response = client.get(
-        f"/api/job-files/{file_id}/consultant-turns/{execution_id}/commentary-stream",
+        f"/api/job-files/{file_id}/consultant-turns/{execution_id}/activity-stream",
     )
     assert response.status_code == 503
-    assert response.json() == {"detail": {"code": "commentary_stream_not_configured"}}
+    assert response.json() == {"detail": {"code": "activity_stream_not_configured"}}
 
     async def cancel() -> None:
         scope = ExecutionScope(file_id, execution_id, ExecutionKind.CONSULTANT_TURN)
@@ -161,7 +171,7 @@ def test_stream_checks_original_file_and_operation_family_before_subscribing(
 
     client.portal.call(cancel)
     terminal = client.get(
-        f"/api/job-files/{file_id}/consultant-turns/{execution_id}/commentary-stream",
+        f"/api/job-files/{file_id}/consultant-turns/{execution_id}/activity-stream",
     )
     assert terminal.status_code == 204
     assert terminal.content == b""

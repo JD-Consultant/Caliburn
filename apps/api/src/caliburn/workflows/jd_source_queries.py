@@ -219,7 +219,7 @@ async def _source_change(
     async def sequences(value: MemoryObjectRevision | None) -> tuple[int, ...]:
         if value is None or not value.interview_references:
             return ()
-        selected = await interviews.read_interview_sources(
+        selected = await interviews.read_interview_source_headers(
             session,
             InterviewReadScope(job_file_id, interview_through_sequence),
             source_ids=tuple(value.interview_references),

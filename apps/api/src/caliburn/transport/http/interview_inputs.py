@@ -14,6 +14,7 @@ from caliburn.features.executions.models import ExecutionBusyError, ExecutionKin
 from caliburn.features.interviews.models import InputCommandConflictError
 from caliburn.features.interviews.models import SubmitInterviewInput as InputCommand
 from caliburn.features.job_files.models import JobFileNotFoundError
+from caliburn.transport.http.contracts import canonical_body
 from caliburn.workflows.consultant_supervisor import ConsultantSupervisor
 from caliburn.workflows.interview_inputs import InterviewInputWorkflow
 
@@ -60,7 +61,7 @@ ConsultantDispatch = Annotated[
 )
 async def submit_interview_input(
     job_file_id: UUID,
-    body: SubmitInterviewInput,
+    body: Annotated[SubmitInterviewInput, canonical_body(SubmitInterviewInput)],
     response: Response,
     workflow: InterviewInputs,
     dispatch: ConsultantDispatch,

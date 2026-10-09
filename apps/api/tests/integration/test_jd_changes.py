@@ -39,6 +39,7 @@ from caliburn.workflows.jd_candidates import JdCandidateWorkflow
 from caliburn.workflows.jd_changes import JdChangesWorkflow, UnsupportedJdSourceKindError
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import PublishedMemoryRead
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn, transact
 
 pytestmark = pytest.mark.postgres
@@ -91,7 +92,9 @@ def test_source_diff_is_pinned_same_identity_with_related_changes_and_no_alignme
                 reference_ids=frozenset({situation.object_id}),
             ),
         )
-        old_snapshot = await memory.publish(writer, understanding.position, uuid4())
+        old_snapshot = await publish_memory_owner_fixture(
+            memory.sessions, writer, understanding.position, uuid4()
+        )
         writer, stage = await batch(1)
         changed = await memory.edit(
             writer,
@@ -104,7 +107,7 @@ def test_source_diff_is_pinned_same_identity_with_related_changes_and_no_alignme
             ),
         )
         phase = await memory.handoff(writer, changed.position, uuid4())
-        pinned = await memory.publish(writer, phase, uuid4())
+        pinned = await publish_memory_owner_fixture(memory.sessions, writer, phase, uuid4())
         return old_snapshot, pinned, situation.object_id, understanding.object_id, batch
 
     # Keep the async batch closure on the TestClient portal's single event loop.
@@ -197,7 +200,9 @@ def test_source_diff_is_pinned_same_identity_with_related_changes_and_no_alignme
                 MemoryContent("庫存管理", "全新理解", "同名理解也不得替代舊身分。"),
             ),
         )
-        return await memory.publish(writer, recreated_understanding.position, uuid4())
+        return await publish_memory_owner_fixture(
+            memory.sessions, writer, recreated_understanding.position, uuid4()
+        )
 
     late = client.portal.call(late_publication)
     assert client.portal.call(reader.read_source, binding, citation) == result

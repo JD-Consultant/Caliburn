@@ -82,7 +82,8 @@ def test_area_delete_preserves_tasks_replays_original_and_rejects_used_capabilit
         preview = await candidate.read(scope)
         assert not preview.work.areas
         assert preview.work.tasks[0].area_id is None
-        assert "1" in result and "未歸屬" in result
+        assert result.detached_task_count == 1
+        assert result.revision_id == preview.position.revision_id
         assert await deletion.execute(writer, prepared) == result
         assert (await candidate.read(scope)).position == preview.position
 

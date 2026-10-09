@@ -106,3 +106,57 @@ with socket.socket() as server:
     await rm(directory, { recursive: true, force: true });
   });
 }
+
+test("a real POSIX descendant ignoring SIGTERM is forced after its group leader exits", {
+  skip: process.platform === "win32" ? "Requires native POSIX process groups" : false,
+}, async () => {
+  await mkdir(path.join(root, ".tmp"), { recursive: true });
+  const directory = await mkdtemp(path.join(root, ".tmp", "launcher-posix-owned-"));
+  const readyFile = path.join(directory, "descendant.json");
+  const ignoredFile = path.join(directory, "ignored.json");
+  const descendantProgram = [
+    "const fs = require('node:fs');",
+    "process.on('SIGTERM', () => fs.writeFileSync(process.argv[2], '{}'));",
+    "fs.writeFileSync(process.argv[1], JSON.stringify({pid: process.pid}));",
+    "setInterval(() => {}, 1000);",
+  ].join(" ");
+  const leaderProgram = [
+    "const {spawn} = require('node:child_process');",
+    "const child = spawn(process.execPath, ['-e', process.argv[1], process.argv[2], process.argv[3]], {stdio:'ignore'});",
+    "child.unref(); setInterval(() => {}, 1000);",
+  ].join(" ");
+  const signals = new EventEmitter();
+  const warnings = [];
+  let leader, descendant;
+  const running = runAppProcesses([{
+    command: process.execPath, args: ["-e", leaderProgram, descendantProgram, readyFile, ignoredFile],
+  }], {
+    cwd: root, signals, shutdownTimeoutMs: 150, forcedShutdownTimeoutMs: 2_000,
+    warn: (message) => warnings.push(message),
+    start: (invocation) => {
+      leader = spawn(invocation.command, invocation.args, {stdio: "ignore", detached: true});
+      return leader;
+    },
+  });
+  const settled = running.then((result) => ({result}), (error) => ({error}));
+  try {
+    descendant = await readReady(readyFile);
+    assert.equal(isAlive(descendant.pid), true);
+    leader.kill("SIGTERM");
+    const {error} = await settled;
+    if (error) throw error;
+    await assertStopped(descendant.pid);
+    assert.deepEqual(await readReady(ignoredFile), {});
+    assert.equal(warnings.length, 1);
+    assert.match(warnings[0], /normal shutdown deadline expired/u);
+  } finally {
+    // 只清理這次 spawn 建立的群組；ESRCH 代表它已正常消失。
+    if (leader?.pid) {
+      try { process.kill(-leader.pid, "SIGKILL"); }
+      catch (error) { if (error.code !== "ESRCH") throw error; }
+    }
+    signals.emit("SIGTERM");
+    await settled;
+  }
+  await rm(directory, {recursive: true, force: true});
+});

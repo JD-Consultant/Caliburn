@@ -20,6 +20,15 @@ class InterviewMessage:
 
 
 @dataclass(frozen=True, slots=True)
+class InterviewSourceHeader:
+    """Formal source identity and position, without loading the original interview text."""
+
+    source_id: UUID
+    interview_sequence: int
+    speaker: InterviewSpeaker
+
+
+@dataclass(frozen=True, slots=True)
 class InterviewHistoryEntry:
     """UI history navigation, separate from the shared formal-source message."""
 

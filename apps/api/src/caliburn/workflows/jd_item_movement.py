@@ -38,6 +38,7 @@ from caliburn.features.job_description.conditions import (
     JobCondition,
     ReorderCondition,
 )
+from caliburn.features.job_description.item_results import JdItemMovementResult
 from caliburn.features.job_description.navigation import (
     JdReadTarget,
     jd_read_ref,
@@ -56,7 +57,7 @@ from caliburn.features.job_description.tasks import (
     TaskField,
     WorkTask,
 )
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.features.job_files import service as job_files
 from caliburn.workflows.jd_candidates import apply_candidate_edit
 from caliburn.workflows.memory_reads import PublishedMemoryRead
@@ -123,7 +124,7 @@ class PreparedItemMovement:
     expected_revision_id: UUID
     movement: ItemMovement
     area_revisions: tuple[ReviseArea, ...]
-    result_message: str
+    detached_from_area: bool
 
 
 class JdItemMovementWorkflow:
@@ -147,24 +148,24 @@ class JdItemMovementWorkflow:
             )
             target = resolve_jd_read_ref(preview.work, intent.read_ref)
             movement, areas = _movement(preview.work, target, intent)
-            message = "moved"
-            if (
+            detached_from_area = (
                 isinstance(target, WorkTask)
                 and isinstance(movement, MoveTask)
                 and target.area_id is not None
                 and movement.area_id is None
-            ):
-                message += " · 原所屬職責已解除，任務現在未歸屬"
+            )
             return PreparedItemMovement(
                 command_id,
                 preview.position.scope,
                 preview.position.revision_id,
                 movement,
                 areas,
-                message,
+                detached_from_area,
             )
 
-    async def execute(self, writer: ExecutionWriter, prepared: PreparedItemMovement) -> str:
+    async def execute(
+        self, writer: ExecutionWriter, prepared: PreparedItemMovement
+    ) -> JdItemMovementResult:
         """Apply related commands in one transaction; replay never rewinds the live candidate."""
         if (
             writer.scope.kind != ExecutionKind.CONSULTANT_TURN
@@ -193,10 +194,10 @@ class JdItemMovementWorkflow:
                     prepared.candidate,
                     EditJdAreas(uuid5(prepared.command_id, f"area:{index}"), revision, area),
                 )
-            return (
-                "unchanged"
-                if revision == prepared.expected_revision_id
-                else prepared.result_message
+            return JdItemMovementResult(
+                revision,
+                "unchanged" if revision == prepared.expected_revision_id else "moved",
+                prepared.detached_from_area,
             )
 
 

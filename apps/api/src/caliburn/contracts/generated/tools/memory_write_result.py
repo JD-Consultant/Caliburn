@@ -45,7 +45,7 @@ class MemoryBodyAppliedChange(BaseModel):
 
 
 class AddedItem(RootModel[StrictInt]):
-    root: StrictInt = Field(..., ge=1)
+    root: StrictInt = Field(..., ge=1, le=9007199254740991)
 
 
 class InterviewReferencesAdded(BaseModel):
@@ -57,7 +57,7 @@ class InterviewReferencesAdded(BaseModel):
 
 
 class RemovedItem(RootModel[StrictInt]):
-    root: StrictInt = Field(..., ge=1)
+    root: StrictInt = Field(..., ge=1, le=9007199254740991)
 
 
 class InterviewReferencesRemoved(BaseModel):

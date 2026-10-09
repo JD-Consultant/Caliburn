@@ -6,7 +6,7 @@ from caliburn.features.job_description.capabilities import Capability, Capabilit
 from caliburn.features.job_description.conditions import ConditionKind
 from caliburn.features.job_description.models import JdProfile
 from caliburn.features.job_description.tasks import DetailKind, WorkTask
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 
 _CAPABILITY_LABELS = {
     CapabilityKind.KNOWLEDGE: "知識",

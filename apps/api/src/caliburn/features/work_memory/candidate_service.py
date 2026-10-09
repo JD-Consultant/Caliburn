@@ -23,15 +23,19 @@ from caliburn.features.work_memory.changes import (
     apply_reference_changes,
     require_unique_title,
 )
-from caliburn.features.work_memory.models import InvalidMemoryChangeError, MemoryContent
-from caliburn.features.work_memory.revision_service import write_object_revision
+from caliburn.features.work_memory.models import MemoryContent
+from caliburn.features.work_memory.revision_service import (
+    read_fixed_headers,
+    rebind_understanding_sources,
+    write_object_revision,
+)
 from caliburn.features.work_memory.revisions import (
     MemoryLayer,
     MemoryObjectRevision,
     MemoryRevisionNotFoundError,
     MemoryRevisionReference,
 )
-from caliburn.features.work_memory.sources import bind_memory_source_window, read_reference_sources
+from caliburn.features.work_memory.sources import bind_memory_source_window, read_reference_headers
 
 
 async def start_candidate(
@@ -205,7 +209,7 @@ async def _revise_object(
     if command.reference_changes is not None:
         added = command.reference_changes.add
         if prior.layer == MemoryLayer.WORK_SITUATION:
-            await read_reference_sources(session, queries.source_window(record), source_ids=added)
+            await read_reference_headers(session, queries.source_window(record), source_ids=added)
             allowed = added
         else:
             allowed = frozenset(members)
@@ -231,13 +235,12 @@ async def _write_revision(
     require_unique_title(previous.object_id if previous is not None else uuid4(), content, entries)
     refs: frozenset[MemoryRevisionReference] = frozenset()
     if layer == MemoryLayer.WORK_UNDERSTANDING:
-        selected = []
-        for identity in sorted(source_ids):
-            situation = await queries.read_selected(session, record.job_file_id, members, identity)
-            if situation.layer != MemoryLayer.WORK_SITUATION:
-                raise InvalidMemoryChangeError("Understanding bindings require work situations")
-            selected.append(_reference(situation))
-        refs = frozenset(selected)
+        if not source_ids <= members.keys():
+            raise MemoryRevisionNotFoundError(
+                "A selected Memory source is absent from the position"
+            )
+        # The revision owner validates all fixed source headers/layers/windows in one set.
+        refs = frozenset(members[identity] for identity in source_ids)
     return await write_object_revision(
         session,
         queries.source_window(record),
@@ -259,24 +262,20 @@ async def _remove_object(
     if target.layer != MemoryLayer.WORK_SITUATION:
         return
     # Deterministic binding removal, not B1 interpreting or receiving understanding content.
-    for reference in tuple(members.values()):
-        dependent = await queries.read_selected(
-            session, record.job_file_id, members, reference.object_id
-        )
+    headers = await read_fixed_headers(
+        session, job_file_id=record.job_file_id, references=frozenset(members.values())
+    )
+    bindings = {}
+    for reference, dependent in headers.items():
         retained = frozenset(
             ref for ref in dependent.work_situation_references if ref.object_id != target.object_id
         )
         if retained == dependent.work_situation_references:
             continue
-        revised = await write_object_revision(
-            session,
-            queries.source_window(record),
-            layer=dependent.layer,
-            content=dependent.content,
-            previous=reference,
-            work_situation_references=retained,
-        )
-        members[revised.object_id] = _reference(revised)
+        bindings[reference] = retained
+    members.update(
+        await rebind_understanding_sources(session, queries.source_window(record), bindings)
+    )
 
 
 def _reference(revision: MemoryObjectRevision) -> MemoryRevisionReference:

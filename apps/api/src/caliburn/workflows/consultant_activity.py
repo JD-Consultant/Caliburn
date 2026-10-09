@@ -1,10 +1,20 @@
-"""One live channel for both allowlisted public text kinds; legacy commentary stays compatible."""
+"""One bounded live channel for both allowlisted public text kinds."""
 
+from dataclasses import dataclass, field
 from uuid import UUID
 
 from caliburn.adapters.reasoning_summaries import PublicReasoningSummary
-from caliburn.workflows.consultant_commentary import PublicCommentaryUpdate
 from caliburn.workflows.public_text_stream import BoundedPublicTextHub
+
+
+@dataclass(frozen=True, slots=True)
+class PublicCommentaryUpdate:
+    job_file_id: UUID
+    execution_id: UUID
+    response_id: str
+    message_id: str
+    text: str = field(repr=False)
+
 
 type PublicActivityUpdate = PublicReasoningSummary | PublicCommentaryUpdate
 

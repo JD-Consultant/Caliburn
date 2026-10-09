@@ -129,10 +129,6 @@ def test_candidates_reopen_original_state_and_keep_file_scope(client: TestClient
     changed = apply(client, writer, first, uuid4(), OccupationReferenceState(()))
     assert read(client, writer) == changed
     assert read(client, other) is None
-    listed = transact(
-        client, writer, lambda session: service.list_candidates(session, writer.scope.job_file_id)
-    )
-    assert listed == (changed,)
     assert start(client, other).state.selected_reference_ids is None
 
 

@@ -1,6 +1,7 @@
 """Generated create_jd_item variants translate to existing domain create values."""
 
 from caliburn.contracts.generated.tools import create_jd_item_arguments as wire
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.job_description.areas import CreateArea
 from caliburn.features.job_description.capabilities import CapabilityKind, CreateCapability
 from caliburn.features.job_description.collaborators import CreateCollaborator
@@ -16,7 +17,7 @@ from caliburn.workflows.jd_sources import (
 
 
 def parse_item_creation(arguments: str) -> CreateItemInput:
-    item = wire.CreateJdItemArguments.model_validate_json(arguments).item
+    item = parse_contract(wire.CreateJdItemArguments, arguments).item
     creation: ItemCreation
     if isinstance(item, wire.ResponsibilityAreaItem):
         creation = CreateArea(item.title, item.scope_text)

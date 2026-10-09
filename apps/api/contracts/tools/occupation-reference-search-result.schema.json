@@ -52,7 +52,7 @@
           }
         },
         "competency_block_count": {
-          "type": "integer",
+          "type": "integer", "maximum": 9007199254740991,
           "minimum": 0
         }
       },

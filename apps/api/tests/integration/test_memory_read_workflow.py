@@ -44,6 +44,7 @@ from caliburn.workflows.memory_reads import (
     MemoryReadWorkflow,
     PublishedMemoryRead,
 )
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 
 pytestmark = pytest.mark.postgres
 SITUATION = MemoryLayer.WORK_SITUATION
@@ -66,9 +67,9 @@ def execute[T](settings: DatabaseSettings, operation: Callable[[Database], Await
 def source(database_connection: psycopg.Connection) -> tuple[UUID, UUID]:
     file_id, source_id = uuid4(), uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'讀取','讀取','合成人員')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'讀取','讀取','合成人員')",
+        (file_id,),
     )
     for sequence, message_id, speaker, text in [
         (1, uuid4(), "app", "請描述工作。"),
@@ -154,7 +155,9 @@ def test_navigation_follows_candidate_identity_but_consultant_stays_on_published
                 frozenset({case.object_id}),
             ),
         )
-        first = await workflow.publish(writer, understanding.position, uuid4())
+        first = await publish_memory_owner_fixture(
+            workflow.sessions, writer, understanding.position, uuid4()
+        )
         advisor = await consultant(database, source[0])
         pinned = PublishedMemoryRead(advisor.scope, first.snapshot_id, 4)
         reads = MemoryReadWorkflow(database.sessions)
@@ -186,7 +189,7 @@ def test_navigation_follows_candidate_identity_but_consultant_stays_on_published
         assert [item.title for item in latest_read.work_situation_references] == ["月末盤點"]
         assert (await reads.read_object(current, SITUATION, "盤點")).content.body == "另一個物件"
         assert (await reads.read_object(current, SITUATION, "月末盤點")).content.body == "新版正文"
-        await workflow.publish(writer, stage_b2, uuid4())
+        await publish_memory_owner_fixture(workflow.sessions, writer, stage_b2, uuid4())
         assert await reads.read_object(pinned, UNDERSTANDING, "管理") == old_read
         assert (await reads.read_object(pinned, SITUATION, "盤點")).content.body == "舊正文"
         with pytest.raises(MemoryTargetNotFoundError):
@@ -240,7 +243,7 @@ def test_absent_pinned_snapshot_stays_empty_and_cancelled_turn_cannot_read(
             CreateMemoryObject(uuid4(), stage, SITUATION, MemoryContent("盤點", "庫存", "正文")),
         )
         stage_b2 = await workflow.handoff(writer, created.position, uuid4())
-        await workflow.publish(writer, stage_b2, uuid4())
+        await publish_memory_owner_fixture(workflow.sessions, writer, stage_b2, uuid4())
         assert await reads.read_map(pinned, SITUATION) == ()
         with pytest.raises(MemoryTargetNotFoundError):
             await reads.read_object(pinned, SITUATION, "盤點")

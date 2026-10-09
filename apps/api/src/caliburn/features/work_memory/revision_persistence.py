@@ -14,15 +14,15 @@ from sqlalchemy import (
     false,
     func,
     select,
+    tuple_,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
-from caliburn.features.work_memory.models import MemoryContent
 from caliburn.features.work_memory.revisions import (
     MemoryLayer,
-    MemoryObjectRevision,
+    MemoryRevisionHeader,
     MemoryRevisionReference,
 )
 
@@ -201,24 +201,29 @@ async def insert_body(
     await session.flush()
 
 
-async def insert_revision(
-    session: AsyncSession, job_file_id: UUID, revision: MemoryObjectRevision
+async def insert_revisions(
+    session: AsyncSession, job_file_id: UUID, revisions: tuple[MemoryRevisionHeader, ...]
 ) -> None:
-    """Assemble and seal an existing object's revision; the caller owns the transaction.
+    """Assemble and seal fixed revisions in three flush phases within the caller's transaction.
 
     Object/body creation or reuse is the caller's decision. Sealing fixes the stored
     content and references; it neither publishes Memory nor confirms B2 analysis.
     """
-    record = MemoryObjectRevisionRecord(
-        job_file_id=job_file_id,
-        object_id=revision.object_id,
-        revision_id=revision.revision_id,
-        body_id=revision.body_id,
-        title=revision.content.title,
-        description=revision.content.description,
-        is_sealed=False,
-    )
-    session.add(record)
+    if not revisions:
+        return
+    records = [
+        MemoryObjectRevisionRecord(
+            job_file_id=job_file_id,
+            object_id=revision.object_id,
+            revision_id=revision.revision_id,
+            body_id=revision.body_id,
+            title=revision.title,
+            description=revision.description,
+            is_sealed=False,
+        )
+        for revision in revisions
+    ]
+    session.add_all(records)
     await session.flush()
     session.add_all(
         [
@@ -228,6 +233,7 @@ async def insert_revision(
                 revision_id=revision.revision_id,
                 source_id=source_id,
             )
+            for revision in revisions
             for source_id in sorted(revision.interview_references)
         ]
     )
@@ -240,23 +246,27 @@ async def insert_revision(
                 source_object_id=source.object_id,
                 source_revision_id=source.revision_id,
             )
+            for revision in revisions
             for source in sorted(revision.work_situation_references)
         ]
     )
     await session.flush()
-    record.is_sealed = True
+    for record in records:
+        record.is_sealed = True
     await session.flush()
 
 
-async def read_revision(
-    session: AsyncSession, job_file_id: UUID, object_id: UUID, revision_id: UUID
-) -> MemoryObjectRevision | None:
-    """Return a complete fixed revision; an unsealed header is not readable content."""
-    row = (
+async def read_revision_headers(
+    session: AsyncSession, job_file_id: UUID, references: frozenset[MemoryRevisionReference]
+) -> dict[MemoryRevisionReference, MemoryRevisionHeader]:
+    """Read sealed fixed headers and both reference sets without loading bodies."""
+    if not references:
+        return {}
+    keys = [(ref.object_id, ref.revision_id) for ref in sorted(references)]
+    rows = (
         await session.execute(
-            select(MemoryObjectRevisionRecord, MemoryBodyRecord.body, MemoryObjectRecord.layer)
+            select(MemoryObjectRevisionRecord, MemoryObjectRecord.layer)
             .select_from(MemoryObjectRevisionRecord)
-            .join(MemoryBodyRecord)
             .join(
                 MemoryObjectRecord,
                 (MemoryObjectRecord.job_file_id == MemoryObjectRevisionRecord.job_file_id)
@@ -264,41 +274,85 @@ async def read_revision(
             )
             .where(
                 MemoryObjectRevisionRecord.job_file_id == job_file_id,
-                MemoryObjectRevisionRecord.object_id == object_id,
-                MemoryObjectRevisionRecord.revision_id == revision_id,
+                tuple_(
+                    MemoryObjectRevisionRecord.object_id, MemoryObjectRevisionRecord.revision_id
+                ).in_(keys),
                 MemoryObjectRevisionRecord.is_sealed.is_(True),
             )
         )
-    ).one_or_none()
-    if row is None:
-        return None
-    record, body, layer = row
-    interview_sources = await session.scalars(
-        select(MemoryInterviewReferenceRecord.source_id).where(
+    ).all()
+    interview_rows = await session.execute(
+        select(
+            MemoryInterviewReferenceRecord.object_id,
+            MemoryInterviewReferenceRecord.revision_id,
+            MemoryInterviewReferenceRecord.source_id,
+        ).where(
             MemoryInterviewReferenceRecord.job_file_id == job_file_id,
-            MemoryInterviewReferenceRecord.object_id == object_id,
-            MemoryInterviewReferenceRecord.revision_id == revision_id,
+            tuple_(
+                MemoryInterviewReferenceRecord.object_id, MemoryInterviewReferenceRecord.revision_id
+            ).in_(keys),
         )
     )
-    situation_sources = await session.execute(
+    situation_rows = await session.execute(
         select(
+            MemorySituationReferenceRecord.object_id,
+            MemorySituationReferenceRecord.revision_id,
             MemorySituationReferenceRecord.source_object_id,
             MemorySituationReferenceRecord.source_revision_id,
         ).where(
             MemorySituationReferenceRecord.job_file_id == job_file_id,
-            MemorySituationReferenceRecord.object_id == object_id,
-            MemorySituationReferenceRecord.revision_id == revision_id,
+            tuple_(
+                MemorySituationReferenceRecord.object_id, MemorySituationReferenceRecord.revision_id
+            ).in_(keys),
         )
     )
-    return MemoryObjectRevision(
-        object_id=record.object_id,
-        revision_id=record.revision_id,
-        body_id=record.body_id,
-        layer=MemoryLayer(layer),
-        content=MemoryContent(title=record.title, description=record.description, body=body),
-        interview_references=frozenset(interview_sources),
-        work_situation_references=frozenset(
+    interviews: dict[MemoryRevisionReference, set[UUID]] = {}
+    situations: dict[MemoryRevisionReference, set[MemoryRevisionReference]] = {}
+    for object_id, revision_id, source_id in interview_rows:
+        interviews.setdefault(MemoryRevisionReference(object_id, revision_id), set()).add(source_id)
+    for object_id, revision_id, source_object_id, source_revision_id in situation_rows:
+        situations.setdefault(MemoryRevisionReference(object_id, revision_id), set()).add(
             MemoryRevisionReference(source_object_id, source_revision_id)
-            for source_object_id, source_revision_id in situation_sources
-        ),
+        )
+    result = {}
+    for record, layer in rows:
+        ref = MemoryRevisionReference(record.object_id, record.revision_id)
+        result[ref] = MemoryRevisionHeader(
+            record.object_id,
+            record.revision_id,
+            record.body_id,
+            MemoryLayer(layer),
+            record.title,
+            record.description,
+            frozenset(interviews.get(ref, ())),
+            frozenset(situations.get(ref, ())),
+        )
+    return result
+
+
+async def read_revision_bodies(
+    session: AsyncSession, job_file_id: UUID, references: frozenset[MemoryRevisionReference]
+) -> dict[MemoryRevisionReference, str]:
+    """Only fetch Markdown for the selected fixed revisions, never the whole position."""
+    if not references:
+        return {}
+    rows = await session.execute(
+        select(
+            MemoryObjectRevisionRecord.object_id,
+            MemoryObjectRevisionRecord.revision_id,
+            MemoryBodyRecord.body,
+        )
+        .select_from(MemoryObjectRevisionRecord)
+        .join(MemoryBodyRecord)
+        .where(
+            MemoryObjectRevisionRecord.job_file_id == job_file_id,
+            MemoryObjectRevisionRecord.is_sealed.is_(True),
+            tuple_(
+                MemoryObjectRevisionRecord.object_id, MemoryObjectRevisionRecord.revision_id
+            ).in_([(ref.object_id, ref.revision_id) for ref in sorted(references)]),
+        )
     )
+    return {
+        MemoryRevisionReference(object_id, revision_id): body
+        for object_id, revision_id, body in rows
+    }

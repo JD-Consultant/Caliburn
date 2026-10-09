@@ -13,6 +13,10 @@ class CreationCommandConflictError(ValueError):
     """A creation command has already been used with different input."""
 
 
+class JobFileCreationDeletedError(LookupError):
+    """This command succeeded earlier, but its result has since been deleted."""
+
+
 class RenameCommandConflictError(ValueError):
     """A rename command has already been used with different input."""
 

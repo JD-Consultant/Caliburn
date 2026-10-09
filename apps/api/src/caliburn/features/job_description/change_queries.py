@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from caliburn.features.job_description import candidate_persistence, persistence, source_persistence
 from caliburn.features.job_description.models import JdProfile, ProfileField
 from caliburn.features.job_description.sources import JdSourceReference
-from caliburn.features.job_description.work_queries import JdWorkRevision, read_work_at
+from caliburn.features.job_description.work_models import JdWorkRevision
+from caliburn.features.job_description.work_queries import read_work_at
 
 
 class JdChangeHistoryUnavailableError(LookupError):

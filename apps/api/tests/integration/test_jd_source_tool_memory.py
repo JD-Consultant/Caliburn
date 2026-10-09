@@ -26,6 +26,7 @@ from caliburn.workflows.jd_changes import JdChangesWorkflow
 from caliburn.workflows.jd_reads import JdReadWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import PublishedMemoryRead
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn, transact
 from tests.integration.test_jd_source_tool_actions import invoke, prepare, references, source_tools
 
@@ -77,7 +78,9 @@ def test_alignment_uses_pinned_revision_and_rejects_later_same_title_replacement
             ),
         )
         return (
-            await memory.publish(writer, understanding.position, uuid4()),
+            await publish_memory_owner_fixture(
+                memory.sessions, writer, understanding.position, uuid4()
+            ),
             situation.object_id,
             understanding.object_id,
         )
@@ -138,7 +141,9 @@ def test_alignment_uses_pinned_revision_and_rejects_later_same_title_replacement
                 MemoryContentChanges(body="維持季度庫存。"),
             ),
         )
-        return await memory.publish(writer, understanding.position, uuid4())
+        return await publish_memory_owner_fixture(
+            memory.sessions, writer, understanding.position, uuid4()
+        )
 
     pinned = client.portal.call(pinned_snapshot)
     turn = start_turn(client, file_id=file_id)
@@ -226,7 +231,9 @@ def test_alignment_uses_pinned_revision_and_rejects_later_same_title_replacement
                 MemoryContent("庫存管理", "同名新理解", "不能替代原理解。"),
             ),
         )
-        return await memory.publish(writer, recreated_understanding.position, uuid4())
+        return await publish_memory_owner_fixture(
+            memory.sessions, writer, recreated_understanding.position, uuid4()
+        )
 
     latest = client.portal.call(later_snapshot)
     assert client.portal.call(tools.execute, prepared) == "aligned"

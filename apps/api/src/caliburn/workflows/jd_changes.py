@@ -6,6 +6,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.database import consistent_read_session
 from caliburn.features.executions import history
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import AgentRole
@@ -96,7 +97,7 @@ class JdChangesWorkflow:
         manual_jd_start_revision_id: UUID,
         scope: ManualChangeScope,
     ) -> JdManualChanges:
-        async with self.sessions() as session:
+        async with consistent_read_session(self.sessions) as session:
             await _require_read(session, binding)
             file_id = binding.scope.job_file_id
             candidate = await candidate_service.read_position(
@@ -131,7 +132,7 @@ class JdChangesWorkflow:
             return JdManualChanges(interval, snapshots, scope)
 
     async def read_source(self, binding: PublishedMemoryRead, citation_ref: str) -> JdSourceChanges:
-        async with self.sessions() as session:
+        async with consistent_read_session(self.sessions) as session:
             await _require_read(session, binding)
             file_id = binding.scope.job_file_id
             candidate = await candidate_service.read_position(
@@ -143,14 +144,14 @@ class JdChangesWorkflow:
             reference = resolve_jd_citation_ref(references, citation_ref)
             source = reference.source
             if isinstance(source, InterviewSource):
-                current = await interviews.read_execution_input(
+                current_id = await interviews.read_execution_input_source_id(
                     session, job_file_id=file_id, execution_id=binding.scope.execution_id
                 )
-                if source.source_id == current.source_id:
+                if source.source_id == current_id:
                     raise UnsupportedJdSourceKindError(
                         "此引用是 current_input；請使用本輪已提供的原話，不製造歷史序號。"
                     )
-                formal = await interviews.read_interview_sources(
+                formal = await interviews.read_interview_source_headers(
                     session,
                     InterviewReadScope(file_id, binding.interview_through_sequence),
                     source_ids=(source.source_id,),

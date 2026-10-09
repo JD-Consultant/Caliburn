@@ -20,6 +20,7 @@ from caliburn.features.job_description import (
 from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.compound_edits import (
     BoundProfileSources,
+    JdCompoundEditResult,
     ReviseProfileWithSources,
 )
 from caliburn.features.job_description.models import ProfileChange, ProfileField, ReviseJdProfile
@@ -143,7 +144,9 @@ class JdProfileWriteWorkflow:
                 command_id, position.scope, position.revision_id, changes, bound
             )
 
-    async def execute(self, writer: ExecutionWriter, prepared: PreparedProfileWrite) -> str:
+    async def execute(
+        self, writer: ExecutionWriter, prepared: PreparedProfileWrite
+    ) -> JdCompoundEditResult:
         if writer.scope.execution_id != prepared.candidate.execution_id:
             raise ExecutionStateError("This prepared edit belongs to a different Turn")
         async with self.sessions.begin() as session:
@@ -162,4 +165,4 @@ class JdProfileWriteWorkflow:
                 ),
                 candidate=prepared.candidate,
             )
-            return result.effect
+            return result

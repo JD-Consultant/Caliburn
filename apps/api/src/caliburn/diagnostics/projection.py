@@ -8,26 +8,21 @@ import re
 from collections.abc import Iterable
 from copy import deepcopy
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid5
 
-ROLES = {"job_consultant", "work_situation_analyst", "work_understanding_analyst"}
+from caliburn.features.executions.history_models import AgentRole, parse_stage_thread_id
+
 SENSITIVE_FIELDS = {"encrypted_content", "api_key", "openai_api_key", "authorization", "password"}
 
 
 def role_for_thread(thread_id: str, prefix: str) -> str | None:
     if not thread_id.startswith(prefix):
         return None
-    parts = thread_id[len(prefix) :].split(":")
-    if len(parts) not in (2, 5) or parts[0] not in ROLES or parts[1] != "completed_work":
+    stage = parse_stage_thread_id(thread_id)
+    root = stage.root_thread_id if stage is not None else thread_id
+    parts = root[len(prefix) :].split(":")
+    if len(parts) != 2 or parts[0] not in AgentRole or parts[1] != "completed_work":
         return None
-    if len(parts) == 5:
-        if parts[2] != "stage":
-            return None
-        try:
-            UUID(parts[3])
-            UUID(parts[4])
-        except ValueError:
-            return None
     return parts[0]
 
 
@@ -85,6 +80,7 @@ def collect_steps(records: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
                 "response": None,
                 "response_state": "request_only",
                 "tool_results": {},
+                "metadata": {"operation_seed": None, "tool_operation_ids": {}},
             }
         step = steps[key]
         if not response:
@@ -101,6 +97,20 @@ def collect_steps(records: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
             raise ValueError("Conflicting saved responses for one request")
         calls = {
             item["call_id"] for item in response["output"] if item.get("type") == "function_call"
+        }
+        raw_seed = values.get("operation_seed")
+        seed = UUID(str(raw_seed)) if raw_seed is not None else None
+        metadata = step["metadata"]
+        if seed is not None:
+            if metadata["operation_seed"] not in {None, str(seed)}:
+                raise ValueError("Conflicting operation seeds for one response")
+            metadata["operation_seed"] = str(seed)
+        # Only observations carrying this response qualify; a request-only observation
+        # may still carry the preceding Step's seed and must never supply this identity.
+        response_seed = metadata["operation_seed"]
+        metadata["tool_operation_ids"] = {
+            call_id: str(uuid5(UUID(response_seed), call_id)) if response_seed else None
+            for call_id in calls
         }
         for result in values.get("tool_results", []):
             call_id = result["call_id"]

@@ -10,7 +10,9 @@ from uuid import uuid4
 import psycopg
 import pytest
 from psycopg import sql
-from psycopg.conninfo import conninfo_to_dict, make_conninfo
+from psycopg.conninfo import make_conninfo
+
+from caliburn.adapters.database_settings import require_isolated_test_database
 
 
 @pytest.mark.postgres
@@ -30,11 +32,7 @@ def test_native_items_survive_process_restart_without_reexecuting_saved_node(
     dsn = os.environ.get("CALIBURN_TEST_DATABASE_URL")
     if not dsn:
         pytest.skip("Set CALIBURN_TEST_DATABASE_URL to an isolated local database ending in _test")
-    info = conninfo_to_dict(dsn)
-    if info.get("host") not in {"127.0.0.1", "localhost", "::1"} or not info.get(
-        "dbname", ""
-    ).endswith("_test"):
-        pytest.fail("The persistence probe requires an explicit loopback test database")
+    require_isolated_test_database(dsn, environment=os.environ)
     schema = "t01_" + uuid4().hex
     worker = Path(__file__).parents[1] / "fixtures" / worker_name
     with psycopg.connect(dsn, autocommit=True) as conn:

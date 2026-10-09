@@ -29,8 +29,7 @@ class JdModelReferences:
 
     async def resolve(self, model_refs: Collection[str]) -> dict[str, str]:
         """Translate known aliases; existing JD workflows still enforce current scope/target."""
-        legacy = {ref: ref for ref in model_refs if _CANONICAL.fullmatch(ref)}
-        requested = set(model_refs) - legacy.keys()
+        requested = set(model_refs)
         numbers = []
         for ref in requested:
             match = _SHORT.fullmatch(ref)
@@ -38,9 +37,9 @@ class JdModelReferences:
                 raise JdReadTargetNotFoundError("Unknown JD model reference")
             numbers.append(int(match[1]))
         if not numbers:
-            return legacy
+            return {}
         async with self.sessions() as session:
             resolved = await persistence.read_references(session, self.job_file_id, numbers)
         if not requested <= resolved.keys():
             raise JdReadTargetNotFoundError("No matching JD model reference in this file")
-        return {**legacy, **resolved}
+        return resolved

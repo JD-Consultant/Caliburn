@@ -11,6 +11,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.adapters.occupation_references import OccupationReferenceClient
 from caliburn.adapters.openai_responses import create_responses_client
 from caliburn.agents.job_consultant import runner as consultant_runner_module
@@ -34,6 +35,7 @@ from caliburn.transport.model_tools.occupation_references import (
 )
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from tests.fixtures.response_loop import response_at
 from tests.integration.test_occupation_reference_workflow import new_writer
 from tests.unit.test_occupation_reference_client import (
     REFERENCE_ID,
@@ -41,7 +43,6 @@ from tests.unit.test_occupation_reference_client import (
     search_payload,
     task_payload,
 )
-from tests.unit.test_response_loop import response_at
 
 pytestmark = pytest.mark.postgres
 
@@ -190,12 +191,12 @@ def test_enabled_consultant_persists_references_and_both_memory_roles_read_only(
             stage = await candidates.start(memory_writer, exchange.employee_input.source_id)
             assert stage is not None
             b1 = WorkSituationAnalystRunner(
-                sessions, saver, sdk, settings, excluded_work_enabled=True
+                sessions, saver, sdk, settings, excluded_work_enabled=True, cpu=MemoryCpu()
             )
             first = await b1.run(memory_writer, stage)
             second_stage = await candidates.handoff(memory_writer, first.stage, uuid4())
             b2 = WorkUnderstandingAnalystRunner(
-                sessions, saver, sdk, settings, excluded_work_enabled=True
+                sessions, saver, sdk, settings, excluded_work_enabled=True, cpu=MemoryCpu()
             )
             await b2.run(memory_writer, second_stage, situation_changes=[])
             for index in (2, 4):
@@ -231,9 +232,9 @@ def test_enabled_consultant_persists_references_and_both_memory_roles_read_only(
 
 
 @pytest.mark.parametrize("outcome", ["resume", "cancel", "fail"])
-@pytest.mark.parametrize("result_format", ["state", "status"])
+@pytest.mark.parametrize("description", ["候選工具說明", "直接保存這次已確認的參考选择"])
 def test_committed_reference_command_recovers_or_stays_out_of_formal_state(
-    client, database_settings, monkeypatch, outcome, result_format
+    client, database_settings, monkeypatch, outcome, description
 ):
     writer = new_writer(client)
     script = ScriptedModel([(initial_calls(), None), ([], "已確認。")])
@@ -268,12 +269,13 @@ def test_committed_reference_command_recovers_or_stays_out_of_formal_state(
             ):
                 definitions = original_definitions(interview_plans_enabled=interview_plans_enabled)
                 if occupation_references_enabled:
-                    definitions += occupation_reference_definitions(
-                        write_result_format=result_format,
-                    )
+                    references = occupation_reference_definitions()
+                    for definition in references:
+                        definition["description"] = description
+                    definitions += references
                 return definitions
 
-            # Resume with today's definitions after capturing either historical contract.
+            # Resume with today's descriptions after capturing this new request's wording.
             with monkeypatch.context() as patch:
                 patch.setattr(
                     consultant_runner_module,
@@ -300,17 +302,9 @@ def test_committed_reference_command_recovers_or_stays_out_of_formal_state(
                 assert script.sent[1]["tools"] == script.sent[0]["tools"]
                 # Selection finished and its native output was saved before interruption.
                 # Today's handler must not reproject that historical output.
-                expected_selection = (
-                    {"selected_reference_ids": [REFERENCE_ID], "excluded_work": []}
-                    if result_format == "state"
-                    else {"status": "updated"}
-                )
+                expected_selection = {"status": "updated"}
                 assert observations(script.sent[1])[2] == expected_selection
-                expected_write = (
-                    {"selected_reference_ids": [REFERENCE_ID], "excluded_work": [EXCLUSION]}
-                    if result_format == "state"
-                    else {"status": "updated"}
-                )
+                expected_write = {"status": "updated"}
                 assert observations(script.sent[1])[-2] == expected_write
                 assert observations(script.sent[1])[-1]["excluded_work"] == [EXCLUSION]
             else:

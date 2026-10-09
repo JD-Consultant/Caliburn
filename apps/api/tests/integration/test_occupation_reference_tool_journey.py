@@ -26,10 +26,8 @@ from tests.unit.test_occupation_reference_client import (
 pytestmark = pytest.mark.postgres
 
 
-@pytest.mark.parametrize("result_format", ["state", "status"])
 def test_reference_tools_persist_excluded_work_replay_and_keep_search_input_separate(
     client: TestClient,
-    result_format,
 ) -> None:
     writer = new_writer(client)
     sessions = client.app.state.database.sessions
@@ -65,7 +63,6 @@ def test_reference_tools_persist_excluded_work_replay_and_keep_search_input_sepa
                 workflow,
                 provider,
                 writer,
-                write_result_format=result_format,
             )
             assert json.loads(await tools.invoke("read_occupation_reference_state", "{}")) == {
                 "selected_reference_ids": None,
@@ -112,9 +109,7 @@ def test_reference_tools_persist_excluded_work_replay_and_keep_search_input_sepa
             assert isinstance(prepared, dict)
             selection = json.loads(json.dumps(prepared))
             selected_result = await tools.execute(selection)
-            assert json.loads(selected_result) == (
-                selected_state if result_format == "state" else {"status": "updated"}
-            )
+            assert json.loads(selected_result) == ({"status": "updated"})
             assert json.loads(await tools.invoke("read_occupation_reference_state", "{}")) == (
                 selected_state
             )
@@ -132,9 +127,7 @@ def test_reference_tools_persist_excluded_work_replay_and_keep_search_input_sepa
             assert isinstance(prepared_exclusion, dict)
             exclusion = json.loads(json.dumps(prepared_exclusion))
             excluded_result = await tools.execute(exclusion)
-            assert json.loads(excluded_result) == (
-                excluded_state if result_format == "state" else {"status": "updated"}
-            )
+            assert json.loads(excluded_result) == ({"status": "updated"})
             assert json.loads(await tools.invoke("read_occupation_reference_state", "{}")) == (
                 excluded_state
             )
@@ -179,7 +172,6 @@ def test_reference_tools_persist_excluded_work_replay_and_keep_search_input_sepa
                 workflow,
                 provider,
                 writer,
-                write_result_format=result_format,
             )
             # Original selection replay cannot discard a later exclusion or requery RAG.
             assert await tools.execute(json.loads(json.dumps(selection))) == selected_result
@@ -204,7 +196,6 @@ def test_reference_tools_persist_excluded_work_replay_and_keep_search_input_sepa
                 workflow,
                 provider,
                 next_writer,
-                write_result_format=result_format,
             )
             expected = {
                 "selected_reference_ids": [REFERENCE_ID],
@@ -238,9 +229,7 @@ def test_reference_tools_persist_excluded_work_replay_and_keep_search_input_sepa
             )
             assert isinstance(removal, dict)
             result = await tools.execute(json.loads(json.dumps(removal)))
-            assert json.loads(result) == (
-                selected_state if result_format == "state" else {"status": "updated"}
-            )
+            assert json.loads(result) == ({"status": "updated"})
             assert json.loads(await tools.invoke("read_occupation_reference_state", "{}")) == (
                 selected_state
             )

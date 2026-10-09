@@ -65,7 +65,7 @@ migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade h
 
 日常入口 `pnpm start`／`pnpm dev` 會要求資料庫設定；上述「未配置 DB 時 health 可用」只適用於直接啟動的最低層診斷入口。版本更新流程見[操作手冊](../../docs/operations/native-development.md#更新已有安裝)。
 
-**JD 模型短定位（0023）：**升級前讓執行中的工作停在安全點，停止原後端後，沿上述相同 DB／schema 設定執行 `pnpm app:migrate`，再 `pnpm start`。這只新增模型定位映射，不重建 JD 或改寫原模型歷史；新工具結果提供 `task_12`／`citation_18` 等短定位，舊 UUID 定位仍相容。映射由 App 自動發配，不能手動重排／重設序號／清表；前端 HTTP 仍使用原 UUID，無須為此重建前端。設計與驗證見 [JD 保存 §3.2](../../docs/implementation/jd-storage.md#32-模型導覽與既有物件定位)及 [T14 §8](../../docs/history.md#source-098e24f247a9411844be)。
+**JD 模型短定位（0023）：**升級前讓執行中的工作停在安全點，停止原後端後，沿上述相同 DB／schema 設定執行 `pnpm app:migrate`，再 `pnpm start`。0023 新增模型定位映射，不重建 JD 或改寫原模型歷史。目前模型入口只接受 App 已配發的 `task_12`／`citation_18` 等短定位，拒絕模型直接傳入 UUID；prepared facts 的內部 canonical 身分保持。映射由 App 自動發配，不能手動重排／重設序號／清表；前端 HTTP 仍使用原 UUID，無須為此重建前端。設計與驗證見 [JD 保存 §3.2](../../docs/implementation/jd-storage.md#32-模型導覽與既有物件定位)及 [T14 §8](../../docs/history.md#source-098e24f247a9411844be)。
 
 完整 migration 位於 `src/caliburn/migrations` 並隨 Python wheel 交付；CLI 與程式都用 Alembic 的 `caliburn:migrations` 套件資源定位，不依賴 checkout 的相對路徑。非 editable 安裝可使用 `uv sync --project apps/api --locked --no-editable`，後續 `uv run` 也帶 `--no-editable`，避免重新同步成開發模式。2026-10-01 已驗新 venv／實際 wheel、空測試 schema、同源建置、人工 JD 保存與重啟，續驗已補同機 PDF；不是另一台電腦、模型品質或正式切換全部通過，見[證據](../../docs/history.md#source-25de60a3e4266687fd86)。
 
@@ -141,9 +141,11 @@ uv run --project apps/api --locked mypy --config-file apps/api/pyproject.toml ap
 uv run --project apps/api --locked python apps/api/scripts/generate_contracts.py --check
 ```
 
-修改 `contracts/http/*.schema.json` 或 `contracts/tools/*.schema.json` 後，執行相同生成命令但不帶 `--check`。標準生成器產 Python／TS；tools 另生成包內原 schema 資源，供工具 definitions 讀取。禁止手改 `generated/` 的型別或 JSON。Python enum 成員使用大寫以避免與 `str.title` 等內建方法撞名；wire 值不改。App schema 與模型原生輸出是不同邊界：前者拒絕額外欄位，後者保留 SDK 原生項目及未知 metadata。
+修改 `contracts/http/*.schema.json` 或 `contracts/tools/*.schema.json` 後，執行相同生成命令但不帶 `--check`。標準生成器產 Python／TS、HTTP／tools 包內原 schema 與 root DTO 資源索引，供 runtime guard／工具 definitions 讀取；`--check` 一起核對。HTTP 與 Tool 先驗 canonical JSON，再轉生成 DTO；整數、UUID 與 Unicode 判空政策見[契約策略](../../docs/standards/contract-strategy.md)。禁止手改 `generated/` 的型別或 JSON。Python enum 成員使用大寫以避免與 `str.title` 等內建方法撞名；wire 值不改。App schema 與模型原生輸出是不同邊界：前者拒絕額外欄位，後者保留 SDK 原生項目及未知 metadata。
 
 真 PostgreSQL 測試只接受**明確指定、loopback、名稱以 `_test` 結尾的隔離資料庫**；缺環境變數會 skip，不代表通過。測試建立隨機 schema，完成後只清理自己新建的 schema，不刪 DB。
+
+PG fixture、獨立程序 worker、scripted backend 與 evaluation 共用 `require_isolated_test_database`，在建立連線前以 psycopg parser 核對實際 host／dbname。DSN 的 `hostaddr`／`service` 與環境 `PGHOSTADDR`／`PGSERVICE`／`PGSERVICEFILE` 會被拒絕，避免連線被重新導向；錯誤不輸出連線字串。此限制屬測試入口政策，不改正式 App 的資料庫配置能力。
 
 ```powershell
 # 使用自行建立的空白測試 DB，不填既有產品 DB 或真實員工資料。

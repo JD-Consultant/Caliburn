@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from typing import Literal
 
 from caliburn.adapters.body_edits import describe_body_change as describe_body_change
+from caliburn.adapters.body_matching import BodyMatchPolicy
 from caliburn.features.work_memory.body_edits import (
     DEFAULT_BODY_MATCH_POLICY,
     apply_body_diff,
 )
-from caliburn.features.work_memory.body_matching import BodyMatchPolicy
 from caliburn.features.work_memory.candidates import MemoryEdit
 from caliburn.features.work_memory.edit_intents import (
     InterviewReferenceChange,

@@ -18,7 +18,7 @@ from caliburn.features.job_description.source_persistence import read_source_ref
 from caliburn.features.job_description.sources import InterviewSource
 from caliburn.settings import DatabaseSettings
 from tests.fixtures.consultant_crash_worker import ORIGINAL_REPLY
-from tests.integration.test_jd_source_edits import start
+from tests.fixtures.consultant_turn import start_consultant_turn as start
 
 pytestmark = pytest.mark.postgres
 

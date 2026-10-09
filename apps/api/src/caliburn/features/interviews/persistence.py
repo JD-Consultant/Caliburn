@@ -4,8 +4,10 @@ from uuid import UUID
 
 from sqlalchemy import (
     CheckConstraint,
+    ColumnElement,
     ForeignKey,
     ForeignKeyConstraint,
+    ScalarSelect,
     Select,
     Text,
     UniqueConstraint,
@@ -20,6 +22,7 @@ from caliburn.features.interviews.models import (
     FormalExchangePosition,
     InterviewHistoryEntry,
     InterviewMessage,
+    InterviewSourceHeader,
     InterviewSpeaker,
 )
 
@@ -60,6 +63,9 @@ class FormalInterviewRecord(Base):
 class InterviewInputRecord(Base):
     __tablename__ = "interview_inputs"
     __table_args__ = (
+        UniqueConstraint(
+            "job_file_id", "execution_id", "source_id", name="uq_interview_inputs_execution_source"
+        ),
         ForeignKeyConstraint(
             ["job_file_id", "source_id"],
             ["interview_texts.job_file_id", "interview_texts.source_id"],
@@ -81,6 +87,15 @@ class InterviewInputRecord(Base):
     command_id: Mapped[UUID] = mapped_column(primary_key=True)
     source_id: Mapped[UUID] = mapped_column()
     execution_id: Mapped[UUID] = mapped_column()
+
+
+def accepted_input_positions_projection(
+    job_file_id: UUID | None = None,
+) -> Select[UUID, UUID, UUID]:
+    """Original input identities, including pending inputs, without loading their text."""
+    record = InterviewInputRecord
+    statement = select(record.job_file_id, record.execution_id, record.source_id)
+    return statement.where(record.job_file_id == job_file_id) if job_file_id else statement
 
 
 class InterviewReplyRecord(Base):
@@ -119,6 +134,18 @@ async def read_execution_input(
     ).one_or_none()
 
 
+async def read_execution_input_source_id(
+    session: AsyncSession, *, job_file_id: UUID, execution_id: UUID
+) -> UUID | None:
+    """Resolve accepted input identity without transferring the original body."""
+    return await session.scalar(
+        select(InterviewInputRecord.source_id).where(
+            InterviewInputRecord.job_file_id == job_file_id,
+            InterviewInputRecord.execution_id == execution_id,
+        )
+    )
+
+
 async def read_reply_source_id(
     session: AsyncSession, *, job_file_id: UUID, execution_id: UUID
 ) -> UUID | None:
@@ -130,14 +157,21 @@ async def read_reply_source_id(
     )
 
 
-async def read_formal_frontier(session: AsyncSession, job_file_id: UUID) -> int:
+def formal_frontier_of(job_file_id: UUID | ColumnElement[UUID]) -> ScalarSelect[int]:
+    """Highest formal interview sequence of one file (0 when none), looked up by its key.
+
+    Given an outer column this is a correlated scalar: it runs once per outer row through the
+    (job_file_id, interview_sequence) primary key, so rows that never appear cost nothing.
+    """
     return (
-        await session.scalar(
-            select(func.max(FormalInterviewRecord.interview_sequence)).where(
-                FormalInterviewRecord.job_file_id == job_file_id
-            )
-        )
-    ) or 0
+        select(func.coalesce(func.max(FormalInterviewRecord.interview_sequence), 0))
+        .where(FormalInterviewRecord.job_file_id == job_file_id)
+        .scalar_subquery()
+    )
+
+
+async def read_formal_frontier(session: AsyncSession, job_file_id: UUID) -> int:
+    return (await session.execute(select(formal_frontier_of(job_file_id)))).scalar_one()
 
 
 async def list_formal_exchange_positions(
@@ -153,7 +187,7 @@ async def list_formal_exchange_positions(
 
 
 def formal_exchange_positions_projection(
-    job_file_id: UUID, through_sequence: int
+    job_file_id: UUID | None, through_sequence: int | None
 ) -> Select[UUID, int]:
     """正式配對及員工輸入上界由訪談 owner 維護，供具名跨域讀取組合。"""
     employee = aliased(FormalInterviewRecord)
@@ -183,12 +217,25 @@ def formal_exchange_positions_projection(
         .join(employee_text, employee_text.source_id == employee.source_id)
         .join(reply_text, reply_text.source_id == reply.source_id)
         .where(
-            InterviewInputRecord.job_file_id == job_file_id,
-            employee.interview_sequence <= through_sequence,
+            *([InterviewInputRecord.job_file_id == job_file_id] if job_file_id else []),
+            *(
+                [employee.interview_sequence <= through_sequence]
+                if through_sequence is not None
+                else []
+            ),
             reply.interview_sequence > employee.interview_sequence,
             employee_text.speaker == InterviewSpeaker.EMPLOYEE.value,
             reply_text.speaker == InterviewSpeaker.CONSULTANT.value,
         )
+    )
+
+
+def consolidation_exchange_positions_projection(
+    job_file_id: UUID | None = None,
+) -> Select[UUID, int, UUID, UUID]:
+    """Matched formal source metadata, without loading interview bodies."""
+    return formal_exchange_positions_projection(job_file_id, None).add_columns(
+        InterviewInputRecord.job_file_id, InterviewInputRecord.source_id
     )
 
 
@@ -294,6 +341,29 @@ async def insert_opening(
         FormalInterviewRecord(job_file_id=job_file_id, interview_sequence=1, source_id=source_id)
     )
     await session.flush()
+
+
+async def list_formal_source_headers(
+    session: AsyncSession, job_file_id: UUID, through_sequence: int, source_ids: tuple[UUID, ...]
+) -> tuple[InterviewSourceHeader, ...]:
+    rows = await session.execute(
+        select(
+            FormalInterviewRecord.source_id,
+            FormalInterviewRecord.interview_sequence,
+            InterviewTextRecord.speaker,
+        )
+        .join(InterviewTextRecord)
+        .where(
+            FormalInterviewRecord.job_file_id == job_file_id,
+            FormalInterviewRecord.interview_sequence <= through_sequence,
+            FormalInterviewRecord.source_id.in_(source_ids),
+        )
+        .order_by(FormalInterviewRecord.interview_sequence)
+    )
+    return tuple(
+        InterviewSourceHeader(source_id, sequence, InterviewSpeaker(speaker))
+        for source_id, sequence, speaker in rows
+    )
 
 
 async def list_formal_interviews(

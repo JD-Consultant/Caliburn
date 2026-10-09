@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field, RootModel, StrictInt, StrictS
 
 
 class InterviewReference(RootModel[StrictInt]):
-    root: StrictInt = Field(..., ge=1)
+    root: StrictInt = Field(..., ge=1, le=9007199254740991)
 
 
 class WorkSituationView(BaseModel):

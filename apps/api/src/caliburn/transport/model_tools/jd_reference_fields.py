@@ -62,12 +62,3 @@ async def encode_jd_payload(references: JdModelReferences, payload: JsonValue) -
         separators=(",", ":"),
         allow_nan=False,
     )
-
-
-async def encode_jd_write_result(references: JdModelReferences, result: str) -> str:
-    prefix = "created · read_ref: "
-    if not result.startswith(prefix):
-        return result
-    canonical = result.removeprefix(prefix)
-    assigned = await references.assign((canonical,))
-    return prefix + assigned[canonical]

@@ -11,6 +11,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from openai.types.responses import Response, ResponseFunctionToolCall
 from response_capacity import synthetic_response_runtime
 
+from caliburn.adapters.database_settings import require_isolated_test_database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import response_input_items
@@ -22,6 +23,7 @@ from caliburn.agent_execution.tool_steps import (
 
 
 async def run(mode: str, thread_id: str) -> None:
+    require_isolated_test_database(os.environ["CALIBURN_TEST_DATABASE_URL"], environment=os.environ)
     first = Response.model_validate_json(
         Path(__file__).with_name("native-response.json").read_text(encoding="utf-8")
     )

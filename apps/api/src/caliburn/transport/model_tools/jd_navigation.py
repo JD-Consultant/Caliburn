@@ -14,7 +14,7 @@ from caliburn.features.job_description.capabilities import CapabilityKind
 from caliburn.features.job_description.models import JdProfile
 from caliburn.features.job_description.navigation import jd_read_ref
 from caliburn.features.job_description.tasks import DetailKind, WorkTask
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 
 
 def project_jd_map(

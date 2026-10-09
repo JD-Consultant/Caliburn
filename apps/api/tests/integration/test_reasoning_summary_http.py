@@ -16,8 +16,8 @@ from caliburn.features.executions.history_models import (
 )
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 from caliburn.features.interviews.models import SubmitInterviewInput
-from caliburn.workflows.consultant_commentary import PublicCommentaryUpdate
-from tests.integration.test_commentary_stream import create_file
+from caliburn.workflows.consultant_activity import PublicCommentaryUpdate
+from tests.integration.test_activity_stream import create_file
 from tests.unit.test_reasoning_summaries import summary_response
 
 pytestmark = pytest.mark.postgres

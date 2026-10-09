@@ -98,7 +98,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "integer",
+            "type": "integer", "maximum": 9007199254740991,
             "minimum": 1
           },
           "description": "Select formal interview sequences already provided by the App. The domain checks source eligibility, job file and this batch's fixed upper bound; repeated selections are deduplicated by resolved identity."
@@ -121,7 +121,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "integer",
+            "type": "integer", "maximum": 9007199254740991,
             "minimum": 1
           },
           "description": "Select formal interview sequences already provided by the App. The domain checks source eligibility, job file and this batch's fixed upper bound; repeated selections are deduplicated by resolved identity."
@@ -145,7 +145,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "integer",
+            "type": "integer", "maximum": 9007199254740991,
             "minimum": 1
           },
           "description": "Select formal interview sequences already provided by the App. The domain checks source eligibility, job file and this batch's fixed upper bound; repeated selections are deduplicated by resolved identity."
@@ -154,7 +154,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "integer",
+            "type": "integer", "maximum": 9007199254740991,
             "minimum": 1
           },
           "description": "Select formal interview sequences already provided by the App. The domain checks source eligibility, job file and this batch's fixed upper bound; repeated selections are deduplicated by resolved identity."

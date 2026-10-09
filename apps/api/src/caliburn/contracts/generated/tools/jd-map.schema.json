@@ -32,8 +32,8 @@
         "read_ref": {"type": "string", "minLength": 1},
         "title": {"type": ["string", "null"]},
         "work_preview": {"type": "string"},
-        "outcome_count": {"type": "integer", "minimum": 0},
-        "requirement_count": {"type": "integer", "minimum": 0}
+        "outcome_count": {"type": "integer", "maximum": 9007199254740991, "minimum": 0},
+        "requirement_count": {"type": "integer", "maximum": 9007199254740991, "minimum": 0}
       }
     },
     "JdAreaMap": {

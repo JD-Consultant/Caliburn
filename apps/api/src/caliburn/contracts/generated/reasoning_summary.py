@@ -10,6 +10,6 @@ class ReasoningSummary(BaseModel):
     )
     response_id: StrictStr = Field(..., min_length=1)
     item_id: StrictStr = Field(..., min_length=1)
-    output_index: StrictInt = Field(..., ge=0)
-    summary_index: StrictInt = Field(..., ge=0)
+    output_index: StrictInt = Field(..., ge=0, le=9007199254740991)
+    summary_index: StrictInt = Field(..., ge=0, le=9007199254740991)
     text: StrictStr = Field(..., min_length=1)

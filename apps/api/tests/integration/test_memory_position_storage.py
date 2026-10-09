@@ -44,9 +44,9 @@ def execute[T](settings: DatabaseSettings, operation: Callable[[AsyncSession], A
 def seed_file(connection: psycopg.Connection) -> MemorySourceWindow:
     file_id, source_id = uuid4(), uuid4()
     connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'Memory','Memory','合成員工')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'Memory','Memory','合成員工')",
+        (file_id,),
     )
     for sequence, role, identity in ((1, "app", uuid4()), (2, "employee", source_id)):
         connection.execute(

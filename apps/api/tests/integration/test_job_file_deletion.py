@@ -38,6 +38,7 @@ from caliburn.workflows.execution_failures import run_with_failure_boundary
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
 from caliburn.workflows.memory_supervisor import MemorySupervisor
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.integration.test_consultant_completion import complete, start_turn
 from tests.integration.test_execution_diagnostics import save_step
 
@@ -94,7 +95,7 @@ def test_delete_removes_history_and_jd_without_touching_another_file(
                 reference_ids=frozenset({situation.object_id}),
             ),
         )
-        await memory.publish(writer, understanding.position, uuid4())
+        await publish_memory_owner_fixture(memory.sessions, writer, understanding.position, uuid4())
 
     client.portal.call(publish_memory)
     save_step(database_connection, UUID(removed), turn.writer.scope.execution_id, pending=True)
@@ -149,6 +150,9 @@ def test_busy_file_cannot_be_deleted(
         database_connection.execute("DELETE FROM job_files WHERE job_file_id=%s", (file_id,))
     assert client.get(f"/api/job-files/{file_id}").status_code == 200
     assert len(client.get(f"/api/job-files/{file_id}/interviews").json()["messages"]) == 1
+    assert database_connection.execute(
+        "SELECT count(*) FROM job_file_creations WHERE result_file_id=%s", (file_id,)
+    ).fetchone() == (1,)
 
 
 def test_individual_originals_still_cannot_be_deleted(
@@ -306,6 +310,9 @@ def test_checkpoint_failure_rolls_back_business_and_native_deletion(
     monkeypatch.setattr(job_file_workflows, "delete_job_file_checkpoints", fail_after_native_delete)
     with pytest.raises(RuntimeError, match="before deletion commit"):
         client.delete(f"/api/job-files/{file_id}")
+    assert database_connection.execute(
+        "SELECT count(*) FROM job_file_creations WHERE result_file_id=%s", (file_id,)
+    ).fetchone() == (1,)
     assert client.get(f"/api/job-files/{file_id}").status_code == 200
     assert len(client.get(f"/api/job-files/{file_id}/interviews").json()["messages"]) == 1
     for table in ("checkpoints", "checkpoint_blobs", "checkpoint_writes"):
@@ -407,7 +414,9 @@ def test_terminal_runner_must_finish_checkpoint_cleanup_before_file_deletion(
                         )
                         candidates = MemoryCandidateWorkflow(database.sessions)
                         stage = await candidates.handoff(writer, work.position, uuid4())
-                        await candidates.publish(writer, stage, uuid4())
+                        await publish_memory_owner_fixture(
+                            candidates.sessions, writer, stage, uuid4()
+                        )
                     else:
                         async with database.sessions.begin() as session:
                             await executions.finish_execution(session, writer, outcome)

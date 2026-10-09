@@ -7,6 +7,7 @@ from openai import AsyncOpenAI
 from pydantic import JsonValue
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.agents.memory_analysis.runner import MemoryAnalysisRunner
 from caliburn.agents.work_understanding_analyst.instructions import UNDERSTANDING_INSTRUCTIONS
 from caliburn.features.executions.history_models import AgentRole
@@ -22,6 +23,7 @@ class WorkUnderstandingAnalystRunner:
     checkpointer: BaseCheckpointSaver[str]
     client: AsyncOpenAI
     settings: ModelSettings
+    cpu: MemoryCpu
     excluded_work_enabled: bool = False
 
     async def run(
@@ -37,6 +39,7 @@ class WorkUnderstandingAnalystRunner:
             self.checkpointer,
             self.client,
             self.settings,
+            self.cpu,
             excluded_work_enabled=self.excluded_work_enabled,
         ).run(
             writer,

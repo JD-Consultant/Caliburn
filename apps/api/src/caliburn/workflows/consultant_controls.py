@@ -77,6 +77,8 @@ class ConsultantControlWorkflow:
                 )
         if result.status == ExecutionStatus.CANCELLED:
             await self.supervisor.stop_runner(scope)
+        if not self.supervisor.has_runner(scope):
+            self.supervisor.release_terminal_result(scope)
         return result
 
     async def resume(self, scope: ExecutionScope) -> ExecutionInfo:

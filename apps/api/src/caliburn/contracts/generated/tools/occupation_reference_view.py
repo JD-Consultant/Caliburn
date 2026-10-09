@@ -20,7 +20,7 @@ class ReferenceTaskSummary(BaseModel):
     )
     task_id: StrictStr
     names: list[ReferenceTaskName]
-    competency_block_count: StrictInt = Field(..., ge=0)
+    competency_block_count: StrictInt = Field(..., ge=0, le=9007199254740991)
 
 
 class ReferenceUnit(BaseModel):

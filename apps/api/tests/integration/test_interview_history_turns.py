@@ -17,8 +17,8 @@ from caliburn.settings import DatabaseSettings
 from caliburn.transport.http.consultant_turns import get_consultant_status_workflow
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.consultant_status import ConsultantStatusWorkflow
+from tests.fixtures.response_loop import response_at
 from tests.integration.test_consultant_completion import complete, start_turn, transact
-from tests.unit.test_response_loop import response_at
 
 pytestmark = pytest.mark.postgres
 

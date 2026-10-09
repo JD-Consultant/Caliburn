@@ -6,6 +6,7 @@ from uuid import uuid4
 import pytest
 
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionWriter
+from caliburn.features.work_memory.consolidation_models import MemoryConsolidationIntent
 from caliburn.transport.model_tools.memory_consolidation import MemoryConsolidationTools
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
 
@@ -16,7 +17,7 @@ class RecordingRequests(MemoryConsolidationWorkflow):
 
     async def request(self, writer, command_id):
         self.commands.append((writer, command_id))
-        return {"message": "本輪成功完成後整理。"}
+        return MemoryConsolidationIntent(uuid4())
 
 
 def bound_tools():
@@ -35,7 +36,7 @@ async def test_prepared_intent_executes_only_after_checkpoint_with_same_app_iden
     assert requests.commands == []
     restored = json.loads(json.dumps(prepared))
     result = await tool.execute(restored)
-    assert json.loads(result) == {"message": "本輪成功完成後整理。"}
+    assert json.loads(result) == {"message": "已記錄整理要求；本輪成功完成後由系統處理。"}
     assert requests.commands == [(writer, operation_id)]
 
 

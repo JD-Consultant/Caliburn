@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
-from caliburn.features.job_files.models import CreateJobFile, RenameJobFile
+from caliburn.features.job_files.models import CreateJobFile, JobFile, RenameJobFile
 
 
 class JobFileRecord(Base):
@@ -37,12 +37,25 @@ class JobFileRecord(Base):
     )
 
     job_file_id: Mapped[UUID] = mapped_column(primary_key=True)
-    creation_command_id: Mapped[UUID] = mapped_column(unique=True)
     initial_display_name: Mapped[str] = mapped_column(Text)
     display_name: Mapped[str] = mapped_column(Text)
     name_revision: Mapped[int] = mapped_column(BigInteger, server_default="1")
     employee_name: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class JobFileCreationRecord(Base):
+    """A permanent command fence; deleting the result removes its only resource link."""
+
+    __tablename__ = "job_file_creations"
+
+    command_id: Mapped[UUID] = mapped_column(primary_key=True)
+    result_file_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey(
+            "job_files.job_file_id", ondelete="SET NULL", deferrable=True, initially="DEFERRED"
+        ),
+        unique=True,
+    )
 
 
 class JobFileRenameRecord(Base):
@@ -101,27 +114,51 @@ async def apply_rename(
 
 
 async def insert_job_file(session: AsyncSession, command: CreateJobFile) -> JobFileRecord | None:
+    job_file_id = uuid4()
+    reserved = await session.scalar(
+        insert(JobFileCreationRecord)
+        .values(command_id=command.command_id, result_file_id=job_file_id)
+        .on_conflict_do_nothing(index_elements=[JobFileCreationRecord.command_id])
+        .returning(JobFileCreationRecord.command_id)
+    )
+    if reserved is None:
+        return None
     statement = (
         insert(JobFileRecord)
         .values(
-            job_file_id=uuid4(),
-            creation_command_id=command.command_id,
+            job_file_id=job_file_id,
             initial_display_name=command.display_name,
             display_name=command.display_name,
             employee_name=command.employee_name,
         )
-        .on_conflict_do_nothing(index_elements=[JobFileRecord.creation_command_id])
         .returning(JobFileRecord)
     )
     return (await session.scalars(statement)).one_or_none()
 
 
-async def read_creation(session: AsyncSession, command_id: UUID) -> JobFileRecord:
-    return (
-        await session.scalars(
-            select(JobFileRecord).where(JobFileRecord.creation_command_id == command_id)
+async def read_creation(session: AsyncSession, command_id: UUID) -> JobFile | None:
+    # One statement snapshot sees either the complete live result or its tombstone.
+    # Column projection avoids previously cached ORM state; replay acquires no row locks.
+    row = (
+        await session.execute(
+            select(
+                JobFileCreationRecord.result_file_id,
+                JobFileRecord.job_file_id,
+                JobFileRecord.initial_display_name,
+                JobFileRecord.employee_name,
+                JobFileRecord.created_at,
+            )
+            .outerjoin(
+                JobFileRecord, JobFileRecord.job_file_id == JobFileCreationRecord.result_file_id
+            )
+            .where(JobFileCreationRecord.command_id == command_id)
         )
     ).one()
+    if row.result_file_id is None:
+        return None
+    if row.job_file_id is None:
+        raise RuntimeError("Live creation receipt has no job file")
+    return JobFile(row.job_file_id, row.initial_display_name, 1, row.employee_name, row.created_at)
 
 
 async def read_job_file(session: AsyncSession, job_file_id: UUID) -> JobFileRecord | None:

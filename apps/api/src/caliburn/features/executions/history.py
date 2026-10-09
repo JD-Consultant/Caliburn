@@ -14,6 +14,8 @@ from caliburn.features.executions.history_models import (
     HistoryConflictError,
     HistoryWindowKind,
     context_thread_id,
+    parse_stage_thread_id,
+    stage_thread_id,
 )
 from caliburn.features.executions.models import (
     ExecutionKind,
@@ -243,16 +245,13 @@ def _belongs_to_completed_role(scope: ExecutionScope, role: AgentRole, thread_id
     root = context_thread_id(scope, role, HistoryWindowKind.COMPLETED_WORK)
     if thread_id == root:
         return True
-    prefix = f"{root}:stage:"
-    if scope.kind != ExecutionKind.MEMORY_BATCH or not thread_id.startswith(prefix):
-        return False
-    parts = thread_id.removeprefix(prefix).split(":")
-    if len(parts) != 2:
-        return False
-    try:
-        return all(str(UUID(value)) == value for value in parts)
-    except ValueError:
-        return False
+    stage = parse_stage_thread_id(thread_id)
+    return (
+        scope.kind == ExecutionKind.MEMORY_BATCH
+        and stage is not None
+        and stage.root_thread_id == root
+        and stage_thread_id(root, stage.generation_id, stage.stage_id) == thread_id
+    )
 
 
 def _required_roles(kind: ExecutionKind) -> tuple[AgentRole, ...]:

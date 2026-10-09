@@ -24,8 +24,8 @@ from caliburn.features.interviews.models import FormalInterviewExchange
 from caliburn.settings import ModelSettings
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
 from caliburn.workflows.consultant_controls import run_consultant_with_controls
-from tests.integration.test_jd_source_edits import start
-from tests.unit.test_response_loop import response_at
+from tests.fixtures.consultant_turn import start_consultant_turn as start
+from tests.fixtures.response_loop import response_at
 from tests.unit.test_result_save_retries import TransientResultFault
 
 pytestmark = pytest.mark.postgres

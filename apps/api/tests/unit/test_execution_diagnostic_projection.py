@@ -160,3 +160,65 @@ def test_initial_context_keeps_actual_tool_configuration_and_rejects_conflicting
     conflicting["values"]["jd_read_max_result_characters"] = 60
     with pytest.raises(ValueError, match="Conflicting"):
         projection.collect_initial_context([captured, conflicting])
+
+
+def test_response_operation_seed_distinguishes_calls_without_saved_outputs():
+    from uuid import uuid4, uuid5
+
+    seed = uuid4()
+    saved = record()
+    saved["values"]["operation_seed"] = str(seed)
+    step = collect_steps([saved])[0]
+    assert step["metadata"]["operation_seed"] == str(seed)
+    assert step["metadata"]["tool_operation_ids"] == {
+        "c1": str(uuid5(seed, "c1")),
+        "c2": str(uuid5(seed, "c2")),
+    }
+    assert step["tool_results"] == {}
+
+
+def test_request_only_seed_cannot_be_used_for_a_different_response():
+    from uuid import uuid4, uuid5
+
+    before, response = record(), record()
+    before["values"].update(request_id="same", response_snapshot={}, operation_seed=str(uuid4()))
+    seed = uuid4()
+    response["values"].update(request_id="same", operation_seed=str(seed))
+    step = collect_steps([before, response])[0]
+    assert step["metadata"]["tool_operation_ids"]["c1"] == str(uuid5(seed, "c1"))
+
+
+def test_legacy_response_keeps_unknown_operation_ids():
+    assert collect_steps([record()])[0]["metadata"] == {
+        "operation_seed": None,
+        "tool_operation_ids": {"c1": None, "c2": None},
+    }
+
+
+def test_conflicting_seed_for_same_response_rejects_projection():
+    from uuid import uuid4
+
+    first, second = record(), record()
+    first["values"]["operation_seed"] = str(uuid4())
+    second["values"]["operation_seed"] = str(uuid4())
+    with pytest.raises(ValueError, match="Conflicting"):
+        collect_steps([first, second])
+
+
+def test_diagnostic_decoder_allows_only_known_uuid_identity_channels():
+    from uuid import UUID
+
+    from caliburn.adapters.graph_checkpointer import create_graph_serializer
+    from caliburn.diagnostics.checkpoints import _decode
+
+    serializer = create_graph_serializer()
+    value = UUID("00000000-0000-4000-8000-000000000001")
+    kind, blob = serializer.dumps_typed(value)
+    assert _decode(serializer, kind, blob, "operation_seed") == str(value)
+    assert _decode(serializer, kind, blob, "request_id") == str(value)
+    with pytest.raises(ValueError, match="decode"):
+        _decode(serializer, kind, blob, "tool_results")
+    with pytest.raises(ValueError, match="encoding"):
+        _decode(serializer, "pickle", b"not-executed", "operation_seed")
+    kind, blob = serializer.dumps_typed(None)
+    assert _decode(serializer, kind, blob, "operation_seed") is None

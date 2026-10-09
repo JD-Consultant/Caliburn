@@ -1,6 +1,7 @@
 """The canonical two-query wire contains model choices, never revision coordinates."""
 
 from caliburn.contracts.generated.tools import read_jd_changes_arguments as wire
+from caliburn.contracts.validation import parse_contract
 from caliburn.features.job_description.models import ProfileField
 from caliburn.workflows.jd_changes import (
     AllManualChanges,
@@ -16,7 +17,7 @@ from caliburn.workflows.jd_changes import (
 
 
 def parse_jd_changes(arguments: str) -> JdChangeQuery:
-    query = wire.ReadJdChangesArguments.model_validate_json(arguments).query
+    query = parse_contract(wire.ReadJdChangesArguments, arguments).query
     if isinstance(query, wire.SourceQuery):
         if not query.citation_ref.strip():
             raise ValueError("Choose a citation_ref")

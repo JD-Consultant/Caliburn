@@ -84,7 +84,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "integer",
+            "type": "integer", "maximum": 9007199254740991,
             "minimum": 1
           }
         }
@@ -106,7 +106,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "integer",
+            "type": "integer", "maximum": 9007199254740991,
             "minimum": 1
           }
         }
@@ -129,7 +129,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "integer",
+            "type": "integer", "maximum": 9007199254740991,
             "minimum": 1
           }
         },
@@ -137,7 +137,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "integer",
+            "type": "integer", "maximum": 9007199254740991,
             "minimum": 1
           }
         }

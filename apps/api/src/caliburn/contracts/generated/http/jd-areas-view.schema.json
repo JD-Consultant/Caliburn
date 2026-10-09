@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdAreasView",
+  "description": "Ordered responsibility groups in one fixed formal JD revision; tasks are not expanded here.",
+  "type": "object", "additionalProperties": false,
+  "required": ["revision_id", "areas"],
+  "properties": {
+    "revision_id": {"type": "string", "format": "uuid"},
+    "areas": {"type": "array", "items": {"$ref": "#/$defs/Area"}}
+  },
+  "$defs": {
+    "Area": {
+      "type": "object", "additionalProperties": false,
+      "required": ["area_id", "title", "scope_text"],
+      "properties": {
+        "area_id": {"type": "string", "format": "uuid"},
+        "title": {"type": ["string", "null"]},
+        "scope_text": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

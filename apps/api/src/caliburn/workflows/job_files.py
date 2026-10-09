@@ -74,10 +74,15 @@ class JobFileWorkflow:
                 try:
                     await job_file_service.lock_job_file(session, job_file_id)
                 except JobFileNotFoundError:
-                    return
-                await execution_service.require_file_deletion_allowed(session, job_file_id)
-                await job_file_service.delete_job_file(session, job_file_id)
-                await delete_job_file_checkpoints(session, job_file_id)
+                    pass  # A repeated confirmed deletion also releases local remnants.
+                else:
+                    await execution_service.require_file_deletion_allowed(session, job_file_id)
+                    await job_file_service.delete_job_file(session, job_file_id)
+                    await delete_job_file_checkpoints(session, job_file_id)
+            if self.consultant_supervisor is not None:
+                self.consultant_supervisor.forget_deleted_file(job_file_id)
+            if self.memory_supervisor is not None:
+                self.memory_supervisor.forget_deleted_file(job_file_id)
 
     async def read_interviews(self, job_file_id: UUID) -> list[InterviewHistoryEntry]:
         async with self.sessions() as session:

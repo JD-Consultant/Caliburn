@@ -18,7 +18,7 @@ from caliburn.features.job_description.sources import (
     SourceTargetKind,
 )
 from caliburn.features.job_description.tasks import DetailKind, TaskDetail, WorkTask
-from caliburn.features.job_description.work_queries import JdWorkRevision
+from caliburn.features.job_description.work_models import JdWorkRevision
 from caliburn.workflows.jd_reads import JdSourceReading
 
 

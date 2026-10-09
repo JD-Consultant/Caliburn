@@ -9,11 +9,9 @@ from pydantic import BaseModel, ConfigDict, Field, RootModel, StrictBool, Strict
 
 
 class OptionalText(RootModel[StrictStr | None]):
-    model_config = ConfigDict(
-        regex_engine="python-re",
-    )
     root: StrictStr | None = Field(
-        ..., pattern="^(?![\\s\\S]*\\u0000)(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        ...,
+        pattern="^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$",
     )
 
 
@@ -25,12 +23,12 @@ class Kind(Enum):
 class CreateCapability1(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
-        regex_engine="python-re",
     )
     action: Literal["create_capability"]
     kind: Kind
     name: StrictStr = Field(
-        ..., pattern="^(?![\\s\\S]*\\u0000)(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        ...,
+        pattern="^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$",
     )
     description: OptionalText | None
 
@@ -38,13 +36,13 @@ class CreateCapability1(BaseModel):
 class CreateCapability2(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
-        regex_engine="python-re",
     )
     action: Literal["create_capability"]
     kind: Kind
     name: OptionalText | None
     description: StrictStr = Field(
-        ..., pattern="^(?![\\s\\S]*\\u0000)(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        ...,
+        pattern="^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$",
     )
 
 

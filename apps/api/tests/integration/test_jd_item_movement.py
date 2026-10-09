@@ -56,7 +56,8 @@ from caliburn.workflows.jd_item_movement import (
     TaskParentDestination,
 )
 from caliburn.workflows.memory_reads import PublishedMemoryRead
-from tests.integration.test_jd_source_edits import start, transact
+from tests.fixtures.consultant_turn import start_consultant_turn as start
+from tests.fixtures.consultant_turn import transact
 
 pytestmark = pytest.mark.postgres
 
@@ -163,7 +164,7 @@ def test_task_move_preserves_ids_sources_formal_head_and_replay(client: TestClie
             ItemPosition("after", jd_read_ref(first)),
         ),
     )
-    assert client.portal.call(workflow.execute, writer, prepared) == "moved"
+    assert client.portal.call(workflow.execute, writer, prepared).effect == "moved"
     after = client.portal.call(candidates.read, writer.scope)
     assert [t.task_id for t in after.work.tasks] == [first.task_id, task.task_id, last.task_id]
     moved = after.work.tasks[1]
@@ -185,13 +186,13 @@ def test_task_move_preserves_ids_sources_formal_head_and_replay(client: TestClie
             ItemPosition("first"),
         ),
     )
-    assert "未歸屬" in client.portal.call(workflow.execute, writer, unassign)
+    assert client.portal.call(workflow.execute, writer, unassign).detached_from_area
     latest = client.portal.call(candidates.read, writer.scope)
     assert latest.work.tasks[0].area_id is None
     checkpoint = TypeAdapter(type(prepared))
     restored = checkpoint.validate_json(checkpoint.dump_json(prepared), strict=True)
     assert restored == prepared
-    assert client.portal.call(workflow.execute, writer, restored) == "moved"
+    assert client.portal.call(workflow.execute, writer, restored).effect == "moved"
     assert client.portal.call(candidates.read, writer.scope) == latest
 
 
@@ -215,7 +216,7 @@ def test_cross_parent_content_is_atomic_and_replay_does_not_add_details_twice(cl
             ),
         ),
     )
-    assert client.portal.call(workflow.execute, writer, prepared) == "moved"
+    assert client.portal.call(workflow.execute, writer, prepared).effect == "moved"
     after = client.portal.call(candidates.read, writer.scope)
     revised = next(t for t in after.work.tasks if t.task_id == task.task_id)
     assert revised.description == "必要限制保留在任務"
@@ -225,7 +226,7 @@ def test_cross_parent_content_is_atomic_and_replay_does_not_add_details_twice(cl
     assert after.work.areas[0].scope_text == "原職責新範圍"
     assert after.work.areas[1].scope_text == "目的職責新範圍"
     assert len(source_refs(client, writer, after)) == 3
-    assert client.portal.call(workflow.execute, writer, prepared) == "moved"
+    assert client.portal.call(workflow.execute, writer, prepared).effect == "moved"
     assert client.portal.call(candidates.read, writer.scope) == after
 
 
@@ -330,10 +331,10 @@ def test_late_area_rejection_rolls_back_move_content_and_receipts(client: TestCl
             ReviseArea(destination.area_id, (AreaFieldChange(AreaField.SCOPE_TEXT, "有效範圍"),)),
         ),
     )
-    assert client.portal.call(workflow.execute, writer, fixed) == "moved"
+    assert client.portal.call(workflow.execute, writer, fixed).effect == "moved"
     after = client.portal.call(candidates.read, writer.scope)
     assert len(next(t for t in after.work.tasks if t.task_id == task.task_id).details) == 4
-    assert client.portal.call(workflow.execute, writer, fixed) == "moved"
+    assert client.portal.call(workflow.execute, writer, fixed).effect == "moved"
     assert client.portal.call(candidates.read, writer.scope) == after
 
 
@@ -382,7 +383,7 @@ def test_each_collection_reorders_only_its_own_group(client: TestClient, kind: s
             ItemPosition("before", jd_read_ref(original[0])),
         ),
     )
-    assert client.portal.call(workflow.execute, writer, prepared) == "moved"
+    assert client.portal.call(workflow.execute, writer, prepared).effect == "moved"
     after = client.portal.call(candidates.read, writer.scope)
     assert collection(after.work) == (original[-1], *original[:-1])
     unchanged_refs = source_refs(client, writer, before)
@@ -399,5 +400,5 @@ def test_each_collection_reorders_only_its_own_group(client: TestClient, kind: s
             ItemPosition("first"),
         ),
     )
-    assert client.portal.call(workflow.execute, writer, no_op) == "unchanged"
+    assert client.portal.call(workflow.execute, writer, no_op).effect == "unchanged"
     assert client.portal.call(candidates.read, writer.scope) == after

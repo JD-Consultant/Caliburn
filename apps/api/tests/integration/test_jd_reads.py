@@ -49,6 +49,7 @@ from caliburn.workflows.jd_candidates import JdCandidateWorkflow
 from caliburn.workflows.jd_reads import JdReadWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import PublishedMemoryRead
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 
 pytestmark = pytest.mark.postgres
 
@@ -192,7 +193,8 @@ def test_current_candidate_sources_are_scoped_and_reads_do_not_formalize_or_alig
         == "source_not_available"
     )
     preview = client.portal.call(reader.read_candidate, binding)
-    area_ref = jd_read_ref(preview.work.areas[0])
+    canonical_area = jd_read_ref(preview.work.areas[0])
+    area_ref = client.portal.call(tools.references.assign, (canonical_area,))[canonical_area]
     assert (
         json.loads(
             client.portal.call(
@@ -331,7 +333,9 @@ def test_memory_citations_keep_fixed_identity_after_rename_removal_and_late_publ
                 MemoryContent("理解", "理解導覽", "理解完整正文"),
             ),
         )
-        old_snapshot = await memory.publish(first_writer, understanding.position, uuid4())
+        old_snapshot = await publish_memory_owner_fixture(
+            memory.sessions, first_writer, understanding.position, uuid4()
+        )
 
         next_writer, stage = await start_batch(source_ids[1])
         renamed = await memory.edit(
@@ -360,7 +364,9 @@ def test_memory_citations_keep_fixed_identity_after_rename_removal_and_late_publ
             ),
         )
         phase = await memory.handoff(next_writer, replacement.position, uuid4())
-        pinned_snapshot = await memory.publish(next_writer, phase, uuid4())
+        pinned_snapshot = await publish_memory_owner_fixture(
+            memory.sessions, next_writer, phase, uuid4()
+        )
 
         scope = ExecutionScope(file_id, uuid4(), ExecutionKind.CONSULTANT_TURN)
         async with sessions.begin() as session:
@@ -433,7 +439,7 @@ def test_memory_citations_keep_fixed_identity_after_rename_removal_and_late_publ
             ),
         )
         phase = await memory.handoff(late_writer, late.position, uuid4())
-        await memory.publish(late_writer, phase, uuid4())
+        await publish_memory_owner_fixture(memory.sessions, late_writer, phase, uuid4())
 
         async with sessions() as session:
             before = await source_persistence.read_source_references(

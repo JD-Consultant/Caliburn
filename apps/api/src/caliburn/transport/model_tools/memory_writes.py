@@ -6,6 +6,7 @@ from uuid import UUID
 from openai.types.responses import FunctionToolParam
 from pydantic import ValidationError
 
+from caliburn.adapters.body_matching import BodyEditError
 from caliburn.features.executions.models import (
     ExecutionNotFoundError,
     ExecutionStateError,
@@ -16,7 +17,6 @@ from caliburn.features.interviews.models import (
     InterviewSourceNotAvailableError,
     InvalidInterviewSelectionError,
 )
-from caliburn.features.work_memory.body_matching import BodyEditError
 from caliburn.features.work_memory.candidates import (
     MemoryCandidateStateError,
     MemoryEdit,

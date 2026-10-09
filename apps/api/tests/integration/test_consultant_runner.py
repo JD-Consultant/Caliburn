@@ -18,7 +18,7 @@ from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope, ExecutionStatus
 from caliburn.features.job_description.source_persistence import read_source_references
 from caliburn.settings import DatabaseSettings, ModelSettings
-from tests.unit.test_response_loop import response_at
+from tests.fixtures.response_loop import response_at
 from tests.unit.test_response_streaming import WireStream
 
 pytestmark = pytest.mark.postgres

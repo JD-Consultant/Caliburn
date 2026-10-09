@@ -31,7 +31,7 @@ from caliburn.features.executions.models import ExecutionWriter
 
 @dataclass(frozen=True, slots=True)
 class RoleContextHistory:
-    sessions: async_sessionmaker[AsyncSession]
+    _sessions: async_sessionmaker[AsyncSession]
     writer: ExecutionWriter
     role: AgentRole
     checkpointer: BaseCheckpointSaver[str]
@@ -41,11 +41,11 @@ class RoleContextHistory:
         return context_thread_id(self.writer.scope, self.role, HistoryWindowKind.COMPLETED_WORK)
 
     async def ensure_active(self) -> None:
-        async with self.sessions.begin() as session:
+        async with self._sessions.begin() as session:
             await service.lock_active_writer(session, self.writer)
 
     async def request_compaction(self) -> None:
-        async with self.sessions.begin() as session:
+        async with self._sessions.begin() as session:
             await history.request_context_compaction(session, self.writer, self.role)
 
     async def resolve_template(
@@ -121,7 +121,7 @@ class RoleContextHistory:
             raise ValueError("The history template must not include new-work input or maps")
         if self.role == AgentRole.JOB_CONSULTANT and threshold_tokens != 128_000:
             raise ValueError("Consultant history preparation uses the confirmed 128K threshold")
-        async with self.sessions.begin() as session:
+        async with self._sessions.begin() as session:
             binding = await history.bind_context_history(session, self.writer, self.role)
             if binding.prepared is None and binding.base is not None:
                 compact_requested = (
@@ -162,13 +162,13 @@ class RoleContextHistory:
             )
         # Saver I/O is finished. Only references cross this short business transaction.
         # If acknowledgement is lost, the original binding decides the next entry.
-        async with self.sessions.begin() as session:
+        async with self._sessions.begin() as session:
             await history.adopt_prepared_context(session, self.writer, self.role, position)
         return items
 
     async def read_completed_position(self) -> ContextPosition:
         await self.ensure_active()
-        async with self.sessions.begin() as session:
+        async with self._sessions.begin() as session:
             binding = await history.read_context_history(session, self.writer.scope, self.role)
             if binding is None or binding.prepared is None:
                 raise ValueError("Completed work requires its adopted preparation boundary")

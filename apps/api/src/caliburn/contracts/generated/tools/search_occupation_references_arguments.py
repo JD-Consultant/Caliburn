@@ -13,5 +13,5 @@ class SearchOccupationReferencesArguments(BaseModel):
         description="只描述員工已確認實際負責的主要工作，保留必要脈絡；排除顧問問題、未做或尚未確認的工作。",
         max_length=12000,
         min_length=1,
-        pattern="\\S",
+        pattern="[^\\u0009-\\u000d\\u001c-\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000]",
     )

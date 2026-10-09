@@ -131,7 +131,7 @@ def test_profile_text_and_current_input_evidence_are_one_recoverable_effect(
         client, lambda s: read_source_references(s, file_id, changed.position.revision_id)
     )
     assert len(sources) == 1 and not sources[0].needs_review
-    assert client.portal.call(workflow.execute, writer, prepared) == "updated"
+    assert client.portal.call(workflow.execute, writer, prepared).effect == "updated"
     assert client.portal.call(candidates.read, scope).position == changed.position
     with pytest.raises(InvalidJdSourceError):
         client.portal.call(lambda: prepare("不能留下的變更", missing=True))

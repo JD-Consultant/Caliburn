@@ -1,0 +1,1 @@
+"""Generated HTTP contract models."""

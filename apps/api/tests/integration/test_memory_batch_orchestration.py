@@ -8,6 +8,7 @@ import pytest
 from pydantic import JsonValue
 
 from caliburn.adapters.database import Database
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.features.executions import history
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.history_models import (
@@ -114,16 +115,16 @@ def test_intent_requires_success_and_frontier_is_employee_not_reply(
         assert await requests.request(cancelled, command) == await requests.request(
             cancelled, command
         )
-        assert await requests.discover() == ()
+        assert (await requests.discover()).ready_file_ids == ()
         async with database.sessions.begin() as session:
             await executions.finish_execution(session, cancelled, ExecutionStatus.CANCELLED)
-        assert await requests.discover() == ()
+        assert (await requests.discover()).ready_file_ids == ()
         successful = await start_turn(database, cancelled.scope.job_file_id)
         await requests.request(successful, uuid4())
         await complete_turn(database, successful)
         # No completion hook/wakeup is necessary to recover a persisted intent.
         restarted = MemoryConsolidationWorkflow(database.sessions)
-        pending = await restarted.discover()
+        pending = (await restarted.discover()).ready_file_ids
         assert len(pending) == 1
         work = await restarted.claim(pending[0], writer_id=uuid4())
         assert work is not None
@@ -152,7 +153,9 @@ def test_parent_publishes_once_and_coalesces_next_frontier(
         turn = await start_turn(database)
         await requests.request(turn, uuid4())
         await complete_turn(database, turn)
-        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        work = await requests.claim(
+            (await requests.discover()).ready_file_ids[0], writer_id=uuid4()
+        )
         assert work is not None
         for _ in range(2):
             later = await start_turn(database, turn.scope.job_file_id)
@@ -192,12 +195,12 @@ def test_parent_publishes_once_and_coalesces_next_frontier(
                 await role_context(database, writer, stage),
             )
 
-        parent = MemoryBatchWorkflow(database.sessions, run_role=run_role)
+        parent = MemoryBatchWorkflow(database.sessions, run_role=run_role, cpu=MemoryCpu())
         published = await parent.run(work.writer)
         assert published is not None and published.covered_through_sequence == 2
         assert await parent.run(work.writer) == published
         assert calls == [MemoryLayer.WORK_SITUATION, MemoryLayer.WORK_UNDERSTANDING]
-        pending = await requests.discover()
+        pending = (await requests.discover()).ready_file_ids
         next_work = await requests.claim(pending[0], writer_id=uuid4())
         assert next_work is not None
         assert next_work.source_window.covered_through_sequence == 2
@@ -217,14 +220,16 @@ def test_final_failure_blocks_until_the_interview_has_advanced(
         file_id = turn.scope.job_file_id
         await requests.request(turn, uuid4())
         await complete_turn(database, turn)
-        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        work = await requests.claim(
+            (await requests.discover()).ready_file_ids[0], writer_id=uuid4()
+        )
         assert work is not None
         await requests.fail(work.writer, reason="quota_exhausted")
         # One more request and exchange is a notification, not a changed condition.
         later = await start_turn(database, file_id)
         await requests.request(later, uuid4())
         await complete_turn(database, later)
-        assert await requests.discover() == ()
+        assert (await requests.discover()).ready_file_ids == ()
         assert await requests.failure_reason(file_id) == "quota_exhausted"
         assert (
             await MemoryCandidateWorkflow(database.sessions).read_latest_snapshot(file_id) is None
@@ -233,50 +238,39 @@ def test_final_failure_blocks_until_the_interview_has_advanced(
         for _ in range(2):
             await complete_turn(database, await start_turn(database, file_id))
         assert await requests.failure_reason(file_id) is None
-        next_work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        next_work = await requests.claim(
+            (await requests.discover()).ready_file_ids[0], writer_id=uuid4()
+        )
         assert next_work is not None
         assert next_work.source_window.covered_through_sequence == 0
         assert next_work.source_window.through_sequence == 4
         # A retry that fails again blocks again, measured from its own failure.
         await requests.fail(next_work.writer, reason="transient_service")
-        assert await requests.discover() == ()
+        assert (await requests.discover()).ready_file_ids == ()
         assert await requests.failure_reason(file_id) == "transient_service"
 
     execute(database_settings, scenario)
 
 
-def test_a_failure_recorded_before_the_frontier_was_kept_stays_blocked(
-    database_settings: DatabaseSettings,
-) -> None:
-    """Older rows have no recorded frontier; they never release on their own."""
+def test_failure_without_typed_frontier_is_rejected(database_settings: DatabaseSettings) -> None:
+    """The retired legacy fallback is replaced by a mandatory typed frontier."""
+    from sqlalchemy.exc import IntegrityError
+
+    from caliburn.features.work_memory.batch_persistence import MemoryOperationRecord
 
     async def scenario(database: Database) -> None:
-        from caliburn.features.work_memory import batch_persistence, consolidation_requests
-        from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
-
-        requests = MemoryConsolidationWorkflow(database.sessions)
         turn = await start_turn(database)
-        file_id = turn.scope.job_file_id
-        await requests.request(turn, uuid4())
-        await complete_turn(database, turn)
-        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
-        assert work is not None
-        async with database.sessions.begin() as session:
-            session.add(
-                batch_persistence.MemoryOperationRecord(
-                    job_file_id=file_id,
-                    execution_id=work.writer.scope.execution_id,
-                    command_id=uuid4(),
-                    kind="batch_failure",
-                    request_payload={"reason": "legacy"},
-                    result_payload={"reason": "legacy"},
+        with pytest.raises(IntegrityError, match="evidence_shape"):
+            async with database.sessions.begin() as session:
+                session.add(
+                    MemoryOperationRecord(
+                        job_file_id=turn.scope.job_file_id,
+                        execution_id=turn.scope.execution_id,
+                        command_id=uuid4(),
+                        kind="batch_failure",
+                        failure_reason="synthetic",
+                    )
                 )
-            )
-        for _ in range(4):
-            await complete_turn(database, await start_turn(database, file_id))
-        async with database.sessions() as session:
-            assert await consolidation_requests.read_block(session, file_id) == "legacy"
-        assert await requests.discover() == ()
 
     execute(database_settings, scenario)
 
@@ -296,7 +290,9 @@ def test_reentry_after_b1_handoff_skips_b1_and_preserves_work(
         turn = await start_turn(database)
         await requests.request(turn, uuid4())
         await complete_turn(database, turn)
-        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        work = await requests.claim(
+            (await requests.discover()).ready_file_ids[0], writer_id=uuid4()
+        )
         assert work is not None
         calls: list[MemoryLayer] = []
         interrupted = False
@@ -319,13 +315,17 @@ def test_reentry_after_b1_handoff_skips_b1_and_preserves_work(
             )
 
         with pytest.raises(ConnectionError):
-            await MemoryBatchWorkflow(database.sessions, run_role=role).run(work.writer)
+            await MemoryBatchWorkflow(database.sessions, run_role=role, cpu=MemoryCpu()).run(
+                work.writer
+            )
         resumed = await requests.claim(turn.scope.job_file_id, writer_id=uuid4())
         assert resumed is not None and resumed.position.phase == MemoryLayer.WORK_UNDERSTANDING
-        result = await MemoryBatchWorkflow(database.sessions, run_role=role).run(resumed.writer)
+        result = await MemoryBatchWorkflow(database.sessions, run_role=role, cpu=MemoryCpu()).run(
+            resumed.writer
+        )
         assert result.covered_through_sequence == 2
         assert calls.count(MemoryLayer.WORK_SITUATION) == 1
-        assert await requests.discover() == ()
+        assert (await requests.discover()).ready_file_ids == ()
 
     execute(database_settings, scenario)
 
@@ -345,7 +345,9 @@ def test_b2_can_publish_understanding_with_explicit_unknown_without_rework(
         turn = await start_turn(database)
         await requests.request(turn, uuid4())
         await complete_turn(database, turn)
-        work = await requests.claim((await requests.discover())[0], writer_id=uuid4())
+        work = await requests.claim(
+            (await requests.discover()).ready_file_ids[0], writer_id=uuid4()
+        )
         assert work is not None
         candidates = MemoryCandidateWorkflow(database.sessions)
         calls: list[MemoryLayer] = []
@@ -374,7 +376,9 @@ def test_b2_can_publish_understanding_with_explicit_unknown_without_rework(
                 understanding_id = edited.object_id
             return MemoryAnalysisResult(stage, AnalysisComplete(status="complete"), context)
 
-        result = await MemoryBatchWorkflow(database.sessions, run_role=role).run(work.writer)
+        result = await MemoryBatchWorkflow(database.sessions, run_role=role, cpu=MemoryCpu()).run(
+            work.writer
+        )
         assert result.covered_through_sequence == 2
         assert calls == [MemoryLayer.WORK_SITUATION, MemoryLayer.WORK_UNDERSTANDING]
         assert understanding_id is not None

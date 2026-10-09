@@ -8,6 +8,7 @@ from pydantic import ConfigDict, TypeAdapter, ValidationError, with_config
 from caliburn.contracts.generated.tools.request_context_compaction_arguments import (
     RequestContextCompactionArguments,
 )
+from caliburn.contracts.validation import parse_contract
 from caliburn.transport.model_tools.contracts import function_definition, reject_tool_call
 from caliburn.workflows.context_history import RoleContextHistory
 
@@ -47,7 +48,7 @@ class ContextCompactionTools:
 
     def prepare(self, arguments: str) -> str | dict[str, object]:
         try:
-            RequestContextCompactionArguments.model_validate_json(arguments)
+            parse_contract(RequestContextCompactionArguments, arguments)
         except ValidationError:
             return reject_tool_call(
                 "invalid_arguments",

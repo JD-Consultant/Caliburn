@@ -7,6 +7,7 @@ from uuid import uuid5
 from pydantic import JsonValue
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.memory_cpu import MemoryCpu
 from caliburn.agent_execution.request_capacity import RequestCapacityError
 from caliburn.agent_execution.response_steps import (
     IncompleteModelResponseError,
@@ -21,6 +22,7 @@ from caliburn.features.executions.history_models import (
     ContextPosition,
     HistoryWindowKind,
     context_thread_id,
+    stage_thread_id,
 )
 from caliburn.features.executions.models import (
     ExecutionStateError,
@@ -40,6 +42,7 @@ from caliburn.features.work_memory.candidates import (
     MemorySnapshot,
 )
 from caliburn.features.work_memory.revisions import MemoryLayer
+from caliburn.features.work_memory.stage_changes import build_situation_handoff_changes
 from caliburn.workflows.memory_analysis.results import (
     AnalysisComplete,
     AnalysisOutcomeError,
@@ -48,7 +51,7 @@ from caliburn.workflows.memory_analysis.results import (
     parse_outcome,
 )
 from caliburn.workflows.memory_consolidation import MemoryConsolidationWorkflow
-from caliburn.workflows.memory_stage_changes import read_situation_handoff_changes
+from caliburn.workflows.memory_stage_changes import read_situation_handoff_snapshot
 from caliburn.workflows.model_requests import ModelRequestFailedError
 
 
@@ -77,9 +80,11 @@ class MemoryBatchWorkflow:
         sessions: async_sessionmaker[AsyncSession],
         *,
         run_role: MemoryRoleRunner,
+        cpu: MemoryCpu,
     ) -> None:
         self.sessions = sessions
         self.run_role = run_role
+        self.cpu = cpu
         self.requests = MemoryConsolidationWorkflow(sessions)
 
     async def settle_failure(self, writer: ExecutionWriter, error: Exception) -> None:
@@ -128,11 +133,16 @@ class MemoryBatchWorkflow:
                 )
                 for record in records:
                     parse_outcome(json.dumps(record.get("outcome")))
-                changes = (
-                    await read_situation_handoff_changes(session, work.position)
+                handoff_snapshot = (
+                    await read_situation_handoff_snapshot(session, work.position)
                     if work.position.phase == MemoryLayer.WORK_UNDERSTANDING
                     else None
                 )
+            changes = (
+                await self.cpu.run(build_situation_handoff_changes, handoff_snapshot)
+                if handoff_snapshot is not None
+                else None
+            )
             result = await self.run_role(
                 writer,
                 work.position,
@@ -222,7 +232,7 @@ def _require_context(
     writer: ExecutionWriter, role: AgentRole, stage: MemoryBatchPosition, position: ContextPosition
 ) -> None:
     root = context_thread_id(writer.scope, role, HistoryWindowKind.COMPLETED_WORK)
-    expected = f"{root}:stage:{stage.generation_id}:{stage.stage_id}"
+    expected = stage_thread_id(root, stage.generation_id, stage.stage_id)
     if position.kind != HistoryWindowKind.COMPLETED_WORK or position.thread_id != expected:
         raise MemoryCandidateStateError("Analysis completion requires this role's saved context")
 

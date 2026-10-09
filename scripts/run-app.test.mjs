@@ -100,7 +100,7 @@ test("forces an unresponsive child after the graceful deadline", async () => {
   const signals = new EventEmitter();
   const attempts = [];
   const running = runAppProcesses([{}], {
-    signals, shutdownTimeoutMs: 5, start: () => child,
+    signals, platform: "linux", shutdownTimeoutMs: 5, start: () => child,
     stop: (owned, force = false) => {
       attempts.push(force);
       if (force) owned.kill();
@@ -109,6 +109,71 @@ test("forces an unresponsive child after the graceful deadline", async () => {
   signals.emit("SIGTERM");
   await running;
   assert.deepEqual(attempts, [false, true]);
+});
+
+test("Windows Ctrl+C gives checkpoint cleanup 90 seconds before forcing", async (context) => {
+  context.mock.timers.enable({ apis: ["setTimeout"] });
+  const child = childProcess();
+  const signals = new EventEmitter();
+  const attempts = [];
+  const warnings = [];
+  const running = runAppProcesses([{}], {
+    platform: "win32", signals, start: () => child,
+    warn: (message) => warnings.push(message),
+    stop: (owned, force) => { attempts.push(force); owned.kill(); },
+  });
+  signals.emit("SIGINT");
+  await new Promise((resolve) => setImmediate(resolve));
+  context.mock.timers.tick(5_001);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(attempts, [], "the original five-second cutoff must not force cleanup");
+  context.mock.timers.tick(84_999);
+  await running;
+  assert.deepEqual(attempts, [true]);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /execution ID/u);
+});
+
+test("Windows normal console closure needs no taskkill", async () => {
+  const child = childProcess();
+  const signals = new EventEmitter();
+  const attempts = [];
+  const running = runAppProcesses([{}], {
+    platform: "win32", signals, start: () => child,
+    stop: (_owned, force) => attempts.push(force),
+  });
+  signals.emit("SIGINT");
+  child.signalCode = "SIGINT";
+  child.emit("close", null, "SIGINT");
+  await running;
+  assert.deepEqual(attempts, []);
+});
+
+test("Windows startup failures are explicitly forced, without a fictitious graceful signal", async () => {
+  const child = childProcess();
+  const attempts = [];
+  const warnings = [];
+  let starts = 0;
+  await assert.rejects(runAppProcesses([{}, {}], {
+    platform: "win32", warn: (message) => warnings.push(message),
+    start: () => { if (starts++ === 0) return child; throw new Error("spawn rejected"); },
+    stop: (owned, force) => { attempts.push(force); owned.kill(); },
+  }), /spawn rejected/u);
+  assert.deepEqual(attempts, [true]);
+  assert.match(warnings[0], /normal shutdown signal/u);
+});
+
+test("POSIX cleans an owned process group even when its wrapper has already exited", async () => {
+  const wrapper = childProcess();
+  const attempts = [];
+  const running = runAppProcesses([{}], {
+    platform: "linux", start: () => wrapper,
+    stop: (owned, force) => attempts.push({ owned, force }),
+  });
+  wrapper.exitCode = 1;
+  wrapper.emit("close", 1, null);
+  assert.deepEqual(await running, { code: 1, signal: null });
+  assert.deepEqual(attempts, [{ owned: wrapper, force: false }]);
 });
 
 test("cleanup failure does not skip other children or hide the spawn error", async () => {
@@ -244,4 +309,98 @@ test("runs the frontend dev server by pnpm executable or through Node for script
     command: process.execPath,
     args: ["C:\\tools\\pnpm.mjs", ...args],
   });
+});
+
+test("POSIX waits for an owned group after its leader closes and forces descendants at deadline", async () => {
+  const wrapper = childProcess();
+  const attempts = [];
+  const warnings = [];
+  let groupAlive = true;
+  const running = runAppProcesses([{}], {
+    platform: "linux", start: () => wrapper,
+    shutdownTimeoutMs: 5, forcedShutdownTimeoutMs: 5,
+    isProcessGroupAlive: (owned) => {
+      assert.equal(owned, wrapper);
+      return groupAlive;
+    },
+    warn: (message) => warnings.push(message),
+    stop: (owned, force) => {
+      attempts.push({ owned, force });
+      if (force) groupAlive = false;
+    },
+  });
+  wrapper.exitCode = 0;
+  wrapper.emit("close", 0, null);
+  await running;
+  assert.deepEqual(attempts, [{ owned: wrapper, force: false }, { owned: wrapper, force: true }]);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /normal shutdown deadline expired/u);
+});
+
+test("POSIX normal shutdown waits for the owned group to disappear without forcing", async () => {
+  const wrapper = childProcess();
+  const attempts = [];
+  let groupAlive = true;
+  const running = runAppProcesses([{}], {
+    platform: "linux", start: () => wrapper,
+    shutdownTimeoutMs: 100, forcedShutdownTimeoutMs: 5,
+    isProcessGroupAlive: () => groupAlive,
+    stop: (_owned, force) => { attempts.push(force); },
+  });
+  wrapper.exitCode = 0;
+  wrapper.emit("close", 0, null);
+  let settled = false;
+  running.then(() => { settled = true; });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(settled, false, "a closed leader is not proof that descendants have stopped");
+  groupAlive = false;
+  await running;
+  assert.deepEqual(attempts, [false]);
+});
+
+test("POSIX rejects cleanup when the owned group survives the forced confirmation deadline", async () => {
+  const wrapper = childProcess();
+  const attempts = [];
+  const running = runAppProcesses([{}], {
+    platform: "linux", start: () => wrapper,
+    shutdownTimeoutMs: 5, forcedShutdownTimeoutMs: 5,
+    isProcessGroupAlive: () => true,
+    warn: () => {}, stop: (_owned, force) => { attempts.push(force); },
+  });
+  wrapper.exitCode = 0;
+  wrapper.emit("close", 0, null);
+  await assert.rejects(running, (error) => {
+    assert.ok(error instanceof AggregateError);
+    assert.match(error.errors[0].message, /shutdown deadline/u);
+    return true;
+  });
+  assert.deepEqual(attempts, [false, true]);
+});
+
+test("POSIX keeps the default 90-second grace and five-second forced confirmation for living groups", async (context) => {
+  context.mock.timers.enable({ apis: ["setTimeout"] });
+  const wrapper = childProcess();
+  const attempts = [];
+  const running = runAppProcesses([{}], {
+    platform: "linux", start: () => wrapper,
+    isProcessGroupAlive: () => true,
+    warn: () => {}, stop: (_owned, force) => { attempts.push(force); },
+  });
+  const settled = running.then(() => ({ resolved: true }), (error) => ({ error }));
+  wrapper.exitCode = 0;
+  wrapper.emit("close", 0, null);
+  await new Promise((resolve) => setImmediate(resolve));
+  context.mock.timers.tick(89_999);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(attempts, [false]);
+  context.mock.timers.tick(1);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(attempts, [false, true]);
+  let finished = false;
+  settled.then(() => { finished = true; });
+  context.mock.timers.tick(4_999);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(finished, false);
+  context.mock.timers.tick(1);
+  assert.ok((await settled).error instanceof AggregateError);
 });

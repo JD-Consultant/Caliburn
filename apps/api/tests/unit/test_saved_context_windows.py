@@ -15,8 +15,8 @@ from caliburn.agent_execution.tool_steps import (
     read_completed_response_history,
     run_response_loop,
 )
+from tests.fixtures.response_loop import LoopProbe, initial_request, response_at
 from tests.unit.test_context_preparation import PreparationProbe
-from tests.unit.test_response_loop import LoopProbe, initial_request, response_at
 from tests.unit.test_response_pause import PauseProbe
 
 

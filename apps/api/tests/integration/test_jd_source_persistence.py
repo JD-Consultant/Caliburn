@@ -32,6 +32,7 @@ from caliburn.features.work_memory.revision_service import write_object_revision
 from caliburn.features.work_memory.revisions import MemoryLayer, MemoryRevisionReference
 from caliburn.settings import DatabaseSettings
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 
 pytestmark = pytest.mark.postgres
 
@@ -59,9 +60,9 @@ class SourceFile:
 def seed_file(connection: psycopg.Connection) -> SourceFile:
     file = SourceFile(uuid4(), uuid4(), uuid4(), uuid4())
     connection.execute(
-        "INSERT INTO job_files (job_file_id,creation_command_id,initial_display_name,"
-        "display_name,employee_name) VALUES (%s,%s,'來源保存','來源保存','合成人')",
-        (file.file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id,initial_display_name,"
+        "display_name,employee_name) VALUES (%s,'來源保存','來源保存','合成人')",
+        (file.file_id,),
     )
     connection.execute(
         "INSERT INTO jd_revisions (job_file_id,revision_id) VALUES (%s,%s)",
@@ -117,7 +118,9 @@ async def publish_sources(database: Database, file: SourceFile) -> tuple[MemoryS
             uuid4(), position, MemoryLayer.WORK_UNDERSTANDING, MemoryContent("同名", "理解", "正文")
         ),
     )
-    snapshot = await workflow.publish(writer, understanding.position, uuid4())
+    snapshot = await publish_memory_owner_fixture(
+        workflow.sessions, writer, understanding.position, uuid4()
+    )
     sources = []
     for layer, object_id in (
         (MemorySourceLayer.WORK_SITUATION, situation.object_id),

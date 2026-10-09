@@ -38,22 +38,24 @@ from caliburn.features.work_memory.models import MemoryContent
 from caliburn.features.work_memory.revisions import MemoryLayer
 from caliburn.settings import DatabaseSettings
 from caliburn.workflows.consultant_completion import ConsultantCompletionWorkflow
+from caliburn.workflows.consultant_context import ConsultantContextWorkflow
 from caliburn.workflows.context_history import RoleContextHistory
 from caliburn.workflows.interview_inputs import InterviewInputWorkflow
 from caliburn.workflows.jd_candidates import JdCandidateWorkflow
 from caliburn.workflows.job_files import JobFileWorkflow
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import MemoryReadWorkflow
+from tests.fixtures.memory_owner import publish_memory_owner_fixture
 from tests.fixtures.response_capacity import synthetic_capacity_limits
+from tests.fixtures.response_loop import LoopProbe, response_at
 from tests.integration.test_compaction_accounting import runner as runner
 from tests.unit.test_context_preparation import PreparationProbe
-from tests.unit.test_response_loop import LoopProbe, response_at
 
 pytestmark = pytest.mark.postgres
 
 
 def test_unresolved_memory_failure_is_reference_data_not_a_model_instruction(
-    database_settings: DatabaseSettings, runner: asyncio.Runner, monkeypatch: pytest.MonkeyPatch
+    database_settings: DatabaseSettings, runner: asyncio.Runner
 ) -> None:
     async def scenario() -> None:
         database = Database(database_settings)
@@ -63,18 +65,22 @@ def test_unresolved_memory_failure_is_reference_data_not_a_model_instruction(
         try:
             writer = await start(database, "繼續描述庫存工作")
 
-            async def failure(session, file_id):
-                assert file_id == writer.scope.job_file_id
-                return "quota_exhausted"
-
-            monkeypatch.setattr(consolidation_requests, "read_block", failure)
+            async with database.sessions.begin() as session:
+                await consolidation_requests.record_failure(
+                    session,
+                    job_file_id=writer.scope.job_file_id,
+                    execution_id=writer.scope.execution_id,
+                    command_id=uuid4(),
+                    reason="quota_exhausted",
+                    frontier=1,
+                )
             async with AsyncPostgresSaver.from_conn_string(dsn) as saver:
                 saver.serde = create_graph_serializer()
                 await saver.setup()
                 work = RoleContextHistory(
                     database.sessions, writer, AgentRole.JOB_CONSULTANT, saver
                 )
-                result = await capture(work, PreparationProbe())
+                result = await capture(database, work, PreparationProbe())
                 request = result.request.create_payload()
                 data = json.loads(request["input"][-2]["content"])
                 assert data["memory_consolidation"]["failure_reason"] == "quota_exhausted"
@@ -128,7 +134,10 @@ async def start(
 
 
 async def capture(
-    work: RoleContextHistory, probe: PreparationProbe, instructions: str = "fixed synthetic role"
+    database: Database,
+    work: RoleContextHistory,
+    probe: PreparationProbe,
+    instructions: str = "fixed synthetic role",
 ) -> TurnContext:
     role_template = template(instructions)
     prepared = await work.prepare_history(
@@ -143,7 +152,12 @@ async def capture(
             synthetic_capacity_limits(),
         ),
     )
-    return await capture_turn_context(work, template=role_template, prepared_history=prepared)
+    return await capture_turn_context(
+        work,
+        data=ConsultantContextWorkflow(database.sessions),
+        template=role_template,
+        prepared_history=prepared,
+    )
 
 
 def test_initial_request_separates_raw_input_and_hidden_binding_without_jd_map(
@@ -163,7 +177,7 @@ def test_initial_request_separates_raw_input_and_hidden_binding_without_jd_map(
                 work = RoleContextHistory(
                     database.sessions, writer, AgentRole.JOB_CONSULTANT, saver
                 )
-                result = await capture(work, PreparationProbe())
+                result = await capture(database, work, PreparationProbe())
                 payload = result.request.create_payload()
                 assert payload["instructions"] == "fixed synthetic role"
                 assert payload["tools"][0]["name"] == "read_synthetic"
@@ -221,9 +235,14 @@ def test_missing_preparation_does_not_persist_an_invalid_initial_request(
                     database.sessions, writer, AgentRole.JOB_CONSULTANT, saver
                 )
                 with pytest.raises(ValueError, match="Adopt role history preparation"):
-                    await capture_turn_context(work, template=template(), prepared_history=[])
+                    await capture_turn_context(
+                        work,
+                        data=ConsultantContextWorkflow(database.sessions),
+                        template=template(),
+                        prepared_history=[],
+                    )
                 assert [saved async for saved in saver.alist(None)] == []
-                result = await capture(work, PreparationProbe())
+                result = await capture(database, work, PreparationProbe())
                 assert len(result.request.create_payload()["input"]) == 2
         finally:
             await database.close()
@@ -231,8 +250,8 @@ def test_missing_preparation_does_not_persist_an_invalid_initial_request(
     runner.run(scenario())
 
 
-async def finish_seed(work: RoleContextHistory, ordinal: int) -> UUID:
-    context = await capture(work, PreparationProbe())
+async def finish_seed(database: Database, work: RoleContextHistory, ordinal: int) -> UUID:
+    context = await capture(database, work, PreparationProbe())
     response = response_at(ordinal, final=True)
     await run_response_loop(
         work.checkpointer,
@@ -243,7 +262,7 @@ async def finish_seed(work: RoleContextHistory, ordinal: int) -> UUID:
         max_model_steps=2,
     )
     completed = await work.read_completed_position()
-    exchange = await ConsultantCompletionWorkflow(work.sessions).complete(
+    exchange = await ConsultantCompletionWorkflow(database.sessions).complete(
         work.writer,
         context.candidate_position,
         response.output_text,
@@ -273,7 +292,7 @@ async def publish_memory(
         ),
     )
     handed = await workflow.handoff(writer, created.position, uuid4())
-    return await workflow.publish(writer, handed, uuid4())
+    return await publish_memory_owner_fixture(workflow.sessions, writer, handed, uuid4())
 
 
 def test_reconnect_restores_exact_request_and_bindings_after_memory_and_candidate_advance(
@@ -293,18 +312,18 @@ def test_reconnect_restores_exact_request_and_bindings_after_memory_and_candidat
                 first = await start(database, "每月盤點。")
                 role = AgentRole.JOB_CONSULTANT
                 first_source = await finish_seed(
-                    RoleContextHistory(database.sessions, first, role, saver), 1
+                    database, RoleContextHistory(database.sessions, first, role, saver), 1
                 )
                 second = await start(database, "每季也要補貨。", first.scope.job_file_id)
                 second_source = await finish_seed(
-                    RoleContextHistory(database.sessions, second, role, saver), 2
+                    database, RoleContextHistory(database.sessions, second, role, saver), 2
                 )
                 published = await publish_memory(
                     database, first.scope.job_file_id, first_source, "月盤點"
                 )
                 writer = await start(database, "本輪員工原話", first.scope.job_file_id)
                 work = RoleContextHistory(database.sessions, writer, role, saver)
-                original = await capture(work, PreparationProbe())
+                original = await capture(database, work, PreparationProbe())
                 payload = original.request.create_payload()
                 data = json.loads(payload["input"][-2]["content"])
                 assert data["work_situation_map"]["items"] == [
@@ -349,6 +368,7 @@ def test_reconnect_restores_exact_request_and_bindings_after_memory_and_candidat
                     patch.setattr(interviews, "read_execution_input", unexpected_read)
                     resumed = await capture_turn_context(
                         work,
+                        data=ConsultantContextWorkflow(database.sessions),
                         template=template("changed settings must not replace original"),
                         prepared_history=[{"role": "user", "content": "not the original prefix"}],
                     )
@@ -364,7 +384,12 @@ def test_reconnect_restores_exact_request_and_bindings_after_memory_and_candidat
                 ] == ["月盤點"]
                 mutated = resumed.request.create_payload()
                 mutated["input"].clear()
-                again = await capture_turn_context(work, template=template(), prepared_history=[])
+                again = await capture_turn_context(
+                    work,
+                    data=ConsultantContextWorkflow(database.sessions),
+                    template=template(),
+                    prepared_history=[],
+                )
                 assert again.request.create_payload() == payload
         finally:
             await database.close()
@@ -404,7 +429,7 @@ def test_capture_commit_ack_loss_recovers_saved_request_without_refresh(
                 with monkeypatch.context() as patch:
                     patch.setattr(saver, "aput", lose_ack)
                     with pytest.raises(OSError, match="ACK lost"):
-                        await capture(work, PreparationProbe())
+                        await capture(database, work, PreparationProbe())
                 assert lost_payload is not None
             async with AsyncPostgresSaver.from_conn_string(dsn) as saver:
                 saver.serde = create_graph_serializer()
@@ -412,7 +437,10 @@ def test_capture_commit_ack_loss_recovers_saved_request_without_refresh(
                     database.sessions, writer, AgentRole.JOB_CONSULTANT, saver
                 )
                 resumed = await capture_turn_context(
-                    work, template=template("new settings"), prepared_history=[]
+                    work,
+                    data=ConsultantContextWorkflow(database.sessions),
+                    template=template("new settings"),
+                    prepared_history=[],
                 )
                 assert resumed.request.create_payload() == lost_payload
                 assert len(resumed.request.create_payload()["input"]) == 2
@@ -424,16 +452,26 @@ def test_capture_commit_ack_loss_recovers_saved_request_without_refresh(
                         replaces_writer_id=writer.writer_id,
                     )
                 with pytest.raises(StaleWriterError):
-                    await capture_turn_context(work, template=template(), prepared_history=[])
+                    await capture_turn_context(
+                        work,
+                        data=ConsultantContextWorkflow(database.sessions),
+                        template=template(),
+                        prepared_history=[],
+                    )
                 work = replace(work, writer=replacement)
                 await ConsultantCompletionWorkflow(database.sessions).stop(
                     replacement, ExecutionStatus.CANCELLED
                 )
                 with pytest.raises(ExecutionStateError):
-                    await capture_turn_context(work, template=template(), prepared_history=[])
+                    await capture_turn_context(
+                        work,
+                        data=ConsultantContextWorkflow(database.sessions),
+                        template=template(),
+                        prepared_history=[],
+                    )
                 other = await start(database, "取消後的新輸入", writer.scope.job_file_id)
                 other_work = replace(work, writer=other)
-                fresh = await capture(other_work, PreparationProbe())
+                fresh = await capture(database, other_work, PreparationProbe())
                 assert len(fresh.request.create_payload()["input"]) == 2
                 assert fresh.request.create_payload()["input"][-1]["content"] == "取消後的新輸入"
                 assert "原請求只能追加一次" not in json.dumps(
@@ -462,18 +500,22 @@ def test_oversized_recent_interviews_shrink_to_the_newest_and_the_rest_stays_rea
                 role = AgentRole.JOB_CONSULTANT
                 first = await start(database, "每月盤點時，我先核對系統庫存。" + "甲" * 3_000)
                 file_id = first.scope.job_file_id
-                await finish_seed(RoleContextHistory(database.sessions, first, role, saver), 1)
+                await finish_seed(
+                    database, RoleContextHistory(database.sessions, first, role, saver), 1
+                )
                 for ordinal, text in enumerate(
                     ("每季補貨要看安全庫存。" + "乙" * 3_000, "年底清點倉庫。" + "丙" * 3_000),
                     start=2,
                 ):
                     seeded = await start(database, text, file_id)
                     await finish_seed(
-                        RoleContextHistory(database.sessions, seeded, role, saver), ordinal
+                        database,
+                        RoleContextHistory(database.sessions, seeded, role, saver),
+                        ordinal,
                     )
                 writer = await start(database, "另一個也一樣。", file_id)
                 work = RoleContextHistory(database.sessions, writer, role, saver)
-                context = await capture(work, PreparationProbe())
+                context = await capture(database, work, PreparationProbe())
                 full = json.loads(context.request.create_payload()["input"][-2]["content"])
                 everything = full["historical_interview"]["messages"]
                 assert [message["interview_sequence"] for message in everything] == list(

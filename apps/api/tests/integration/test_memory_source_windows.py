@@ -43,9 +43,9 @@ def add_source(connection: psycopg.Connection, file_id: UUID, role: str, sequenc
 def history(database_connection: psycopg.Connection) -> History:
     file_id = uuid4()
     database_connection.execute(
-        "INSERT INTO job_files (job_file_id, creation_command_id, initial_display_name, "
-        "display_name, employee_name) VALUES (%s,%s,'Memory','Memory','合成员工')",
-        (file_id, uuid4()),
+        "INSERT INTO job_files (job_file_id, initial_display_name, "
+        "display_name, employee_name) VALUES (%s,'Memory','Memory','合成员工')",
+        (file_id,),
     )
     # Deliberately not an odd/even speaker convention; formal membership is authoritative.
     roles = ("app", "employee", "consultant", "consultant", "employee", "consultant")
@@ -114,7 +114,7 @@ def test_new_work_and_older_reference_scope_are_distinct(
     assert [message.interview_sequence for message in required.messages] == [3, 4, 5]
     referenced = query(
         database_settings,
-        lambda s: sources.read_reference_sources(
+        lambda s: sources.read_reference_headers(
             s, window, source_ids=frozenset({history.source_ids[0], history.source_ids[1]})
         ),
     )
@@ -122,7 +122,7 @@ def test_new_work_and_older_reference_scope_are_distinct(
     assert (
         query(
             database_settings,
-            lambda s: sources.read_reference_sources(s, window, source_ids=frozenset()),
+            lambda s: sources.read_reference_headers(s, window, source_ids=frozenset()),
         )
         == ()
     )
@@ -186,7 +186,7 @@ def test_references_reject_formal_but_outside_batch_reply(
     with pytest.raises(InterviewReadError):
         query(
             database_settings,
-            lambda s: sources.read_reference_sources(
+            lambda s: sources.read_reference_headers(
                 s, window, source_ids=frozenset({history.source_ids[0], history.source_ids[5]})
             ),
         )

@@ -4,10 +4,11 @@ from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.database import consistent_read_session
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionStateError, ExecutionStatus
 from caliburn.features.interviews import queries as interviews
-from caliburn.features.interviews.models import InterviewInputNotFoundError, InterviewReadScope
+from caliburn.features.interviews.models import InterviewReadScope
 from caliburn.features.job_description import source_persistence
 from caliburn.features.job_description.candidate_service import JdCandidatePreview
 from caliburn.features.job_description.navigation import JdReadTargetNotFoundError
@@ -53,7 +54,7 @@ class JdReadWorkflow:
         """
         if candidate.position.scope.execution_id != binding.scope.execution_id:
             raise ExecutionStateError("The candidate belongs to a different Turn")
-        async with self.sessions() as session:
+        async with consistent_read_session(self.sessions) as session:
             execution = await executions.read_execution(session, binding.scope)
             if execution.status not in (ExecutionStatus.ACTIVE, ExecutionStatus.PAUSED):
                 raise ExecutionStateError("This Turn no longer has a readable JD candidate")
@@ -103,17 +104,12 @@ async def _interview_sequences(
     )
     if not selected:
         return {}
-    try:
-        original = await interviews.read_execution_input(
-            session, job_file_id=binding.scope.job_file_id, execution_id=binding.scope.execution_id
-        )
-    except InterviewInputNotFoundError:
-        # Formal references do not require this Turn to have a pending input.
-        original = None
-    current_id = original.source_id if original is not None else None
+    current_id = await interviews.read_execution_input_source_id(
+        session, job_file_id=binding.scope.job_file_id, execution_id=binding.scope.execution_id
+    )
     formal_ids = tuple(source.source_id for source in selected if source.source_id != current_id)
     messages = (
-        await interviews.read_interview_sources(
+        await interviews.read_interview_source_headers(
             session,
             InterviewReadScope(binding.scope.job_file_id, binding.interview_through_sequence),
             source_ids=formal_ids,

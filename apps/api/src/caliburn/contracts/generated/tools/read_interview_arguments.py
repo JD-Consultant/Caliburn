@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, RootModel, StrictInt
 
 
 class Sequence(RootModel[StrictInt]):
-    root: StrictInt = Field(..., ge=1)
+    root: StrictInt = Field(..., ge=1, le=9007199254740991)
 
 
 class InterviewMessagesQuery(BaseModel):
@@ -31,11 +31,13 @@ class InterviewRangeQuery(BaseModel):
         ...,
         description="First included formal sequence. Must not exceed end_sequence; the domain validates the ordering.",
         ge=1,
+        le=9007199254740991,
     )
     end_sequence: StrictInt = Field(
         ...,
         description="Last included formal sequence. Return every eligible message in the closed interval, subject to the App-bound scope.",
         ge=1,
+        le=9007199254740991,
     )
 
 

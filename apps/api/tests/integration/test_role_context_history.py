@@ -23,10 +23,10 @@ from caliburn.features.executions.models import (
 from caliburn.settings import DatabaseSettings
 from caliburn.workflows.context_history import RoleContextHistory
 from tests.fixtures.response_capacity import synthetic_capacity_limits
+from tests.fixtures.response_loop import LoopProbe, initial_request, response_at
 from tests.integration.test_compaction_accounting import file_id as file_id
 from tests.integration.test_compaction_accounting import runner as runner
 from tests.unit.test_context_preparation import PreparationProbe
-from tests.unit.test_response_loop import LoopProbe, initial_request, response_at
 
 pytestmark = pytest.mark.postgres
 

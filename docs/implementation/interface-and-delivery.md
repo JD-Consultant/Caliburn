@@ -1,6 +1,6 @@
 # 介面、公開訊息與本機交付
 
-- 狀態：**現行介面、公開訊息與交付契約** 。正式產品切換依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)，各次 UI、串流、來源、PDF 及恢復驗證見[證據索引](../history.md#source-8e6fa902e6e1928b1f59)。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
+- 狀態：**現行介面、公開訊息與交付契約** 。正式產品切換依 [ADR0079](../adr/0079-target-rebuild-production-cutover.md)，各次 UI、串流、來源、PDF 及恢復上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
 
 本頁維護 HTTP 命令、公開串流、來源回查、PDF 與本機交付的接線。JD 人工編輯與工作畫面的元件、草稿、收合及鍵盤操作，由 [Web 工作畫面](web-workspace.md)維護；正式保存與權限由業務模組判定。
 
@@ -20,7 +20,7 @@ UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修�
 
 ### 1.1 讀寫邊界
 
-[App](../../apps/web/src/app/App.tsx)只組裝路由；[檔案 feature](../../apps/web/src/features/job-files/JobFilesPage.tsx)管建立／清單，[訪談 feature](../../apps/web/src/features/interview/InterviewHistory.tsx)只呈現正式歷史。檔案 ID 進 URL 與 query key，同名標籤不混成同一份資料；切換不保留另一檔案的 placeholder。HTTP 回傳先由 Ajv 驗證同一份 `apps/api/contracts/http` schema，再進 Query cache；TS 型別仍由該 schema 生成，不新增手寫 wire 規格。員工與 App 訊息的原文以轉義文字顯示，保留換行，不當 HTML 執行；顧問訊息只在畫面上以安全 Markdown 格式化（`ChatMarkdown`：原始 HTML 仍以文字顯示、連結不導覽、圖片不載入；保存的文字與來源回查的原文不變，決定與依據見[視覺改版證據](../history.md#source-a75c36d876a672e0f607)）。
+[App](../../apps/web/src/app/App.tsx)只組裝路由；[檔案 feature](../../apps/web/src/features/job-files/JobFilesPage.tsx)管建立／清單，[訪談 feature](../../apps/web/src/features/interview/InterviewHistory.tsx)只呈現正式歷史。檔案 ID 進 URL 與 query key，同名標籤不混成同一份資料；切換不保留另一檔案的 placeholder。HTTP 回傳先由 Ajv 驗證同一份 `apps/api/contracts/http` schema，再進 Query cache；TS 型別仍由該 schema 生成，不新增手寫 wire 規格。員工與 App 訊息的原文以轉義文字顯示，保留換行，不當 HTML 執行；顧問訊息只在畫面上以安全 Markdown 格式化（`ChatMarkdown`：原始 HTML 仍以文字顯示、連結不導覽、圖片不載入；保存的文字與來源回查的原文不變）。
 
 **現行時序圖：建立命令結果未確認時的重送。** 參與者依序為畫面、本分頁暫存、HTTP／工作流與資料庫；實線為呼叫，虛線為回傳，`alt` 區分成功確認與結果不明。暫存只保留原命令，正式結果由後端判定。
 
@@ -46,7 +46,7 @@ UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修�
 
 框架依據：[React Router 路由](https://reactrouter.com/start/declarative/installation)、[Query key 必須包含查詢變數](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)、[Ajv 型別守衛](https://ajv.js.org/guide/typescript.html)。本案關閉隱含 query／mutation retry，由 UI 明確重讀／確認；不把 cache 當正式資料。MUI 9 已移除 system props 與 `disableEscapeKeyDown`，使用 `sx` 及受控 `onClose`；焦點在 transition `onEntered` 後定位，保留框架焦點陷阱及關閉恢復，不移除 StrictMode。[MUI migration](https://mui.com/material-ui/migration/upgrade-to-v9/)
 
-驗證：[檔案 UI](../history.md#source-2a993efd60b1a85e23d6)。目前 Ajv 在 runtime 編譯 schema；standalone codegen、嚴格 CSP 相容性及整體 bundle 效能未由此證明。安全限制不能因驗證器需求而默默放寬。
+驗證：檔案 UI。目前 Ajv 在 runtime 編譯 schema；standalone codegen、嚴格 CSP 相容性及整體 bundle 效能未由此證明。安全限制不能因驗證器需求而默默放寬。
 
 ### 1.2 基本資料編輯的讀取基底與恢復
 
@@ -78,9 +78,9 @@ UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修�
 
 前端缺少本機識別時用此入口發現工作，再沿同一 execution 的既有查詢／控制接續；找到後停止 discovery，保留原 execution 至終態，不因 `/current` 後來變空而丟掉結果。查詢中允許輸入局部草稿，但未確認閒置前不送出；查詢失敗明示錯誤與唯讀重查，不吞成 null。回應須通過同一 schema 及檔案身分核對。
 
-已保存的未知原命令優先沿 by-command 核對，不能以 current 空結果證明它從未被接受；不為找回畫面重送原輸入或另造 command ID。頁面徽章、候選與 JD 唯讀狀態維持同一 query cache，沒有另一份 state 或第二個輪詢。契約與分層驗證見[發現入口證據](../history.md#source-c8ea469844e955e1447b)。
+已保存的未知原命令優先沿 by-command 核對，不能以 current 空結果證明它從未被接受；不為找回畫面重送原輸入或另造 command ID。頁面徽章、候選與 JD 唯讀狀態維持同一 query cache，沒有另一份 state 或第二個輪詢。
 
-**完成後接著輸入：** 原 Turn 經狀態查詢確認為 `completed` 後，直接顯示空白輸入框，不要求再點「開始下一次訪談」。顯示表單不啟動模型、不重送原話；使用者按送出時才建立新 command。原完成識別保留到送出時再替換，若已被另一頁換成不同的待確認識別，不得覆蓋。送出事件將原文交給待確認請求並清空下一則草稿；結果不明時保留原 command 與文字供核對，明確未受理則還原為可編輯草稿。即使由另一頁查明同一請求已完成，也不得再把原請求當成下一則輸入。狀態重查不清空使用者正在寫的下一則草稿。取消或失敗仍由使用者選「取回原文編輯／開始下一次訪談」後重查 current；暫停、活動中及未知狀態不開放另送。完成提示用低強調文字，錯誤與待確認仍明示。此規則不改後端准入及保存契約，驗證見[視覺改版證據 §15](../history.md#source-a75c36d876a672e0f607)。
+**完成後接著輸入：** 原 Turn 經狀態查詢確認為 `completed` 後，直接顯示空白輸入框，不要求再點「開始下一次訪談」。顯示表單不啟動模型、不重送原話；使用者按送出時才建立新 command。原完成識別保留到送出時再替換，若已被另一頁換成不同的待確認識別，不得覆蓋。送出事件將原文交給待確認請求並清空下一則草稿；結果不明時保留原 command 與文字供核對，明確未受理則還原為可編輯草稿。即使由另一頁查明同一請求已完成，也不得再把原請求當成下一則輸入。狀態重查不清空使用者正在寫的下一則草稿。取消或失敗仍由使用者選「取回原文編輯／開始下一次訪談」後重查 current；暫停、活動中及未知狀態不開放另送。完成提示用低強調文字，錯誤與待確認仍明示。此規則不改後端准入及保存契約。
 
 訪談 hint 的保留、execution ID 回填與清除統一經過以檔案 ID 命名的 Web Lock。鎖內重新讀取儲存並核對 command；晚到 ACK／查詢不能覆寫另一命令或重建已清除 hint。等待鎖最多五秒，送出防重入在等待前設定；同一 mutation pending 從保留 hint 起停用輸入及送出，保護事件捕捉的原文。鎖內只操作儲存，釋放後再核取消、掛載及刪除狀態才送 HTTP。鎖或儲存失敗保留文字並明示未送出，解除忙碌後可繼續編輯；HTTP 結果未知及已知受理的 ACK 保存失敗仍依各自的恢復語意處理。不支援 Web Locks 時保留查詢，阻止新訪談送出。確認刪除會先同步取消本分頁排隊中的保留操作，再清理儲存，避免 React 卸載前的舊提交重建 hint。這是瀏覽器的短期協調，正式受理與冪等仍由後端判定。依據：[W3C Web Locks](https://www.w3.org/TR/web-locks/)。
 
@@ -88,7 +88,7 @@ UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修�
 
 `useInterviewInput` 集中訪談送出、原請求重試、提示及局部草稿的清除／還原；它沿 keyed Composer 的生命週期，沒有共享草稿 store。Composer 保留 current／by-command／Turn 查詢、准入判斷與呈現。訪談只保存識別、使用跨分頁鎖的協議與人工編修不同，因此留在 interview feature，不以模式旗標套入人工命令 hook。
 
-完整公開 commentary 從原生 checkpoint／pending writes 投影；status polling 呈現候選與控制，歷史回答透過原 execution 定位按需回看。即時文字沿 direct Responses typed stream → 有界程序內投影 → 同源 SSE → UI；沒有訊息時明示空，不編造進度。驗證：[provider 串流](../history.md#source-caf2f3430699b78cd2b7)、[傳輸](../history.md#source-8c70f5667c1a6cb7f93f)、[UI](../history.md#source-bfa2c9aaeee3741277e2)。
+完整公開 commentary 從原生 checkpoint／pending writes 投影；status polling 呈現候選與控制，歷史回答透過原 execution 定位按需回看。即時文字沿 direct Responses typed stream → 有界程序內投影 → 同源 SSE → UI；沒有訊息時明示空，不編造進度。驗證：provider 串流、傳輸、UI。
 
 `useConsultantActivityStream` 擁有 source、計時器與自己發起的恢復 GET。CLOSED 先查原 Turn；只有 active 才重建串流，paused／終態／404 停止並刷新保存摘要，未知錯誤不得當成完成。初次確認後最多三次恢復動作，間隔 1／2／4 秒；短暫 OPEN 不重設額度，連續 OPEN 十秒或新 scope 才重設。卸載、換檔及刪除會中止自己的 GET 並釋放資源，不取消其他 caller 已開始的 Query。達上限保留斷線提示，既有狀態查詢繼續提供正式结果，不送新的 POST。EventSource error 不提供 status，不能直接分辨 503／204，須沿受控 GET 確認。
 
@@ -104,7 +104,7 @@ UI 依後端狀態呈現可用操作。A 執行中或暫停時，人工 JD 修�
 
 SSE 可丟的暫態進度與必須保留的公開歷史分開，**不為每個事件另造永久事件表** 。中間完整訊息若從 checkpoint 投影後需獨立保留，僅保存必要公開文字與原 item identity；compaction 不刪歷史回看承諾。
 
-**歷史讀取不依賴模型配置：** 只要原 DB／checkpointer 可讀，App 重啟後即使沒有模型金鑰，也應沿原 execution 投影已保存的公開訊息。composition root 在 DB lifespan 接通既有 saver；模型 client、supervisor 與新執行仍由模型配置控制。不是重跑模型或新增歷史副本；無模型的新輸入仍拒絕。修正與有界驗證見 [T17 續驗](../history.md#source-98d840caa9eed7fb2840)。
+**歷史讀取不依賴模型配置：** 只要原 DB／checkpointer 可讀，App 重啟後即使沒有模型金鑰，也應沿原 execution 投影已保存的公開訊息。composition root 在 DB lifespan 接通既有 saver；模型 client、supervisor 與新執行仍由模型配置控制。不是重跑模型或新增歷史副本；無模型的新輸入仍拒絕。修正與有界驗證見 T17 續驗。
 
 公開進度只取明示 `assistant`／`commentary` 的訊息；依 response／message 身分送累積文字，phase 取自 item 而非猜測 delta。另可公開 provider 明示的可讀推理摘要，接線見 §2.1；不公開 raw reasoning。最終答覆仍等正式 Turn 完成保存後呈現，不以串流終止、訊息 completed 或 Response completed 宣告完成。新 A 請求啟用串流；恢復既有 request 保留原 transport 設定。未啟用的 B 角色不因共用能力自動變成公開串流。
 
@@ -130,7 +130,7 @@ SSE 可丟的暫態進度與必須保留的公開歷史分開，**不為每個�
 
 UI 沿既有暖白紙面與可收合處理紀錄呈現「推理摘要」與「處理過程」，和正式答覆分開。畫面不重複顯示「非正式訪談、不可引用」等工程性警語；正式來源資格仍由 App 保證，不靠 UI 文案限制。保留「尚未保存」、空內容與讀取失敗等狀態提示。處理中及暫停時預設展開；取消或失敗後留在原處並收合，完成後則改由歷史正式回答提供收合入口。摘要正文沿 `ChatMarkdown` 安全呈現，長字串可換行。空陣列顯示沒有已保存摘要；讀取失敗提供單獨重讀，不以空白冒充成功。HTTP 404 只有在公開錯誤碼為 `job_file_not_found` 時，才顯示職務檔案不存在；其他資源或路由找不到時使用一般讀取錯誤，不誤稱整份檔案遺失。上述文案調整不改變摘要的性質、來源資格或原生 items 的接續與壓縮規則。
 
-歷史正式回答只提供一個「處理紀錄」入口。展開並確認原 Turn 已完成後，依序呈現可獨立收合的「推理摘要」「處理過程」，以及獨立排列的 JD 查看／撤回按鈕，不另顯示「JD 操作」標題；兩個內容區預設收合，操作按鈕不混在過程文字中。未提供 JD 操作時不顯示空區塊。只有展開外層才查原 Turn 與已保存摘要，內層收合不卸載內容、不重跑模型；歷史不輪詢。沿用原生 `details`／`summary` 和既有 disclosure 樣式，無自訂鍵盤事件或新套件。接線、反例及已驗／未驗層級見 [T09 推理摘要](../history.md#source-9b7ba33984fa2002fb60)。
+歷史正式回答只提供一個「處理紀錄」入口。展開並確認原 Turn 已完成後，依序呈現可獨立收合的「推理摘要」「處理過程」，以及獨立排列的 JD 查看／撤回按鈕，不另顯示「JD 操作」標題；兩個內容區預設收合，操作按鈕不混在過程文字中。未提供 JD 操作時不顯示空區塊。只有展開外層才查原 Turn 與已保存摘要，內層收合不卸載內容、不重跑模型；歷史不輪詢。沿用原生 `details`／`summary` 和既有 disclosure 樣式，無自訂鍵盤事件或新套件。接線、反例及已驗／未驗層級見 T09 推理摘要。
 
 ## 3. 顯示與來源
 
@@ -153,7 +153,7 @@ JD 顯示正式稿；A 活躍時可即時預覽該 Turn 候選，明示未完成
 - **JD 內容變更** ：從該筆引用上次核對的正式 JD 修訂，比到目前選定正式稿的同一目標；不是上一輪起點，也不展開無關項目。改過又改回可顯示無淨內容差異，但不解除待核對。
 - **來源變更** ：原引用的固定來源鏈比到讀取時最新已發布 Memory；與 JD 的核對基準分開。不可變的訪談原話沒有這個區塊，但仍可查看引用它的 JD 項目變更。
 
-**面板結構：** 抽屜標頭放標題與快速動作——返回（只在看一筆來源時）、重新讀取、關閉，三者皆為圖示鈕（Fluent drawer：標題、返回與重新整理等快速動作、關閉）；本體一次只顯示一層：**列表** 或**一筆來源** ，避免詳情落在長列表可見範圍外。列表每列是 action list 項目（Primer ActionList：前置圖示、標籤、尾端箭頭，整列可點）；待核對的原因與次要動作「查看差異」放在標籤下方。一筆來源先寫「引用於」哪個 JD 項目、來源標題與待核對原因；有待核對時出現「來源正文／差異」兩個分頁（同一物件的兩種檢視），列上的「查看差異」直接開差異頁、不先讀正文；訪談原話以引文呈現。從列表進入時焦點落在標題，返回時回到原來那一列。差異文字中的 `diff` 區塊逐行上色並保留 +／− 記號，不靠顏色（見[視覺證據 §12](../history.md#source-a75c36d876a672e0f607)）。
+**面板結構：** 抽屜標頭放標題與快速動作——返回（只在看一筆來源時）、重新讀取、關閉，三者皆為圖示鈕（Fluent drawer：標題、返回與重新整理等快速動作、關閉）；本體一次只顯示一層：**列表** 或**一筆來源** ，避免詳情落在長列表可見範圍外。列表每列是 action list 項目（Primer ActionList：前置圖示、標籤、尾端箭頭，整列可點）；待核對的原因與次要動作「查看差異」放在標籤下方。一筆來源先寫「引用於」哪個 JD 項目、來源標題與待核對原因；有待核對時出現「來源正文／差異」兩個分頁（同一物件的兩種檢視），列上的「查看差異」直接開差異頁、不先讀正文；訪談原話以引文呈現。從列表進入時焦點落在標題，返回時回到原來那一列。差異文字中的 `diff` 區塊逐行上色並保留 +／− 記號，不靠顏色。
 
 程式責任：`SourceViewer` 組抽屜與選取（選取綁定在該次列表讀取，由 `source-selection` 管理，重讀即清除），`SourceReferenceList` 負責分組及列呈現，`SourceDetails` 負責固定正文下鑽，`SourceChanges` 負責兩類比較的按需展示；`source-labels` 與 `SourceKindIcon` 讓列與詳情共用同一組字與圖示。使用既有 Query cache 與視覺 token，不另建 server state 副本或差異 store。兩類比較沿同一 citation GET 取得；分頁與下鑽只改呈現，不新增查詢或確認操作。
 
@@ -169,7 +169,7 @@ Query key 帶職務檔案、正式 JD 修訂、引用及子來源用途；切檔
 
 正文和差異使用 `react-markdown` 的安全 React 呈現，不啟用 raw HTML；來源內容中的連結／圖片不作外部導覽或遠端載入，真正下鑽只經 App 提供的來源按鈕。長 diff 區可水平捲動，不撐破頁面。資料結構由後端 canonical schema 同時生成 Python／TS，UI 驗證後才採用；不手刻另一套契約。
 
-依據：[TanStack Query keys](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)、[react-markdown security](https://github.com/remarkjs/react-markdown#security)、[FastAPI response model](https://fastapi.tiangolo.com/tutorial/response-model/)。框架提供查詢／呈現機制；原引用資格、固定鏈與正式／候選隔離由 Caliburn 的[來源責任](jd-storage.md#37-人的正式來源回查)維護。驗證見[來源回查](../history.md#source-e93341e9711337954840)。
+依據：[TanStack Query keys](https://tanstack.com/query/latest/docs/framework/react/guides/query-keys)、[react-markdown security](https://github.com/remarkjs/react-markdown#security)、[FastAPI response model](https://fastapi.tiangolo.com/tutorial/response-model/)。框架提供查詢／呈現機制；原引用資格、固定鏈與正式／候選隔離由 Caliburn 的[來源責任](jd-storage.md#37-人的正式來源回查)維護。驗證見來源回查。
 
 ### 3.2 完成後查看這輪 JD 變更
 
@@ -180,7 +180,7 @@ Query key 帶職務檔案、正式 JD 修訂、引用及子來源用途；切檔
 - UI query key 含職務檔案與 execution；完整結果由同一 canonical schema 驗證並核對 execution。查詢失敗明示、提供重新讀取，不假裝無差異；不輪詢、不把 server data 複製到另一份 state。
 - 沿共用 `SafeMarkdown` 禁 active HTML／URL／遠端圖片；後端 fenced diff 保住正文中的反引號。GET 無寫入副作用，回 no-store；查看不解除待核對，也不決定是否允許撤回。撤回仍由 JD 撤回工作流檢查當前資格。
 
-本檢視不呼叫模型或另外保存 diff；不提供候選即時差異或任意逐筆歷史來源瀏覽。接線、官方依據與已驗／未驗見 [T09 本輪變更證據](../history.md#source-24e6ee7fac44adc1a9f9)。
+本檢視不呼叫模型或另外保存 diff；不提供候選即時差異或任意逐筆歷史來源瀏覽。
 
 ## 4. PDF 與程序
 
@@ -196,9 +196,9 @@ Python Playwright 的 Chromium revision 跟套件鎖定，瀏覽器測試用 Pla
 
 直接使用鎖定 FastAPI 的 [`frontend()`](https://fastapi.tiangolo.com/tutorial/frontend/)：根路徑提供實際建置檔案、不做全域 SPA fallback；只在現有 UI 的 `/job-files` 前綴啟用 HTML 導覽 fallback。一般 API 優先，未知 `/api/*` 與根 `/assets/*` 不回首頁冒充成功；未匹配的非 HTML 讀取及寫入也不靠 fallback 成功。未來增加 UI 路由前綴時，在組裝根同步這個明確範圍，不複製另一套檔案路由器。建置目錄或 `index.html` 缺失時，框架在建立 App 時拒絕。
 
-既有 Host／Origin middleware 繼續包住 API 與前端，主機入口維持 loopback 與單程序；沒有新增 CORS、nginx、前端 server 或背景程序。JS／CSS、條件式讀取及路徑界線由框架處理，不自寫靜態檔案 helper。啟動方式見 [backend README](../../apps/api/README.md#使用建置後的同源畫面)，證據與未驗範圍見 [同源交付驗證](../history.md#source-25de60a3e4266687fd86)。
+既有 Host／Origin middleware 繼續包住 API 與前端，主機入口維持 loopback 與單程序；沒有新增 CORS、nginx、前端 server 或背景程序。JS／CSS、條件式讀取及路徑界線由框架處理，不自寫靜態檔案 helper。啟動方式見 [backend README](../../apps/api/README.md#使用建置後的同源畫面)。
 
-**Windows 執行邊界：** psycopg async／官方 saver 使用 Selector loop，啟動以顯式 `loop_factory`／Uvicorn `--loop asyncio:SelectorEventLoop` 配置，不使用棄用的全域 policy。[PDF renderer](../../apps/api/src/caliburn/adapters/pdf_renderer.py)使用單一受控執行緒，在其中建立 Proactor loop，並於同一執行緒建立、使用與關閉 Playwright／Chromium；不跨 loop 共用 instance。渲染至多一件、無隱含佇列，呼叫取消或逾時不提前釋放仍在清理的 renderer；關閉 App 時等待其收尾。[Playwright 官方相容性](https://playwright.dev/python/docs/library#incompatible-with-selectoreventloop-of-asyncio-on-windows)說明 driver subprocess 的 Proactor 需求。驗證見[PDF](../history.md#source-409f20a1c297740aed7d)；部分字型的 PDF 複製／搜尋文字層限制仍保留。
+**Windows 執行邊界：** psycopg async／官方 saver 使用 Selector loop，啟動以顯式 `loop_factory`／Uvicorn `--loop asyncio:SelectorEventLoop` 配置，不使用棄用的全域 policy。[PDF renderer](../../apps/api/src/caliburn/adapters/pdf_renderer.py)使用單一受控執行緒，在其中建立 Proactor loop，並於同一執行緒建立、使用與關閉 Playwright／Chromium；不跨 loop 共用 instance。渲染至多一件、無隱含佇列，呼叫取消或逾時不提前釋放仍在清理的 renderer；關閉 App 時等待其收尾。[Playwright 官方相容性](https://playwright.dev/python/docs/library#incompatible-with-selectoreventloop-of-asyncio-on-windows)說明 driver subprocess 的 Proactor 需求。驗證見PDF；部分字型的 PDF 複製／搜尋文字層限制仍保留。
 
 ### 4.2 Docker 交付
 
@@ -208,7 +208,7 @@ Python Playwright 的 Chromium revision 跟套件鎖定，瀏覽器測試用 Pla
 
 PostgreSQL 的 named volume 掛於 18 版要求的 `/var/lib/postgresql`。業務與 checkpoint 保存在同一資料庫；App 容器沒有第二份持久資料。初始化和升級由明確的一次性 Alembic 命令處理，不藏在日常啟動器裡。OpenAI key 在執行時注入後端環境，不作 build argument 或映像檔案。此配置不搬移既有資料，也不提供遠端公開部署。
 
-Windows 的明確初始化入口為 [`setup-docker.ps1`](../../scripts/setup-docker.ps1)。它檢查 Docker／Compose、準備首次設定，再依序建置 App、等待 PostgreSQL、執行 Alembic、啟動 App；任一步失敗即停止後續操作。設定解讀與 project／volume 身分由 Compose 解析，腳本不另建配置格式。既有 `.env` 保留原樣；App 仍在運行，或已有資料 volume 卻遺失設定時，先停止初始化並指出處理方式。更新須先停妥及備份，再明確重跑此入口；普通 `up` 不執行 migration。首次操作見[首次使用](../operations/getting-started.md)，工程驗證與限制見[本輪紀錄](../plans/2026-10-08-first-run-simplification.md)。
+Windows 的明確初始化入口為 [`setup-docker.ps1`](../../scripts/setup-docker.ps1)。它檢查 Docker／Compose、準備首次設定，再依序建置 App、等待 PostgreSQL、執行 Alembic、啟動 App；任一步失敗即停止後續操作。設定解讀與 project／volume 身分由 Compose 解析，腳本不另建配置格式。既有 `.env` 保留原樣；App 仍在運行，或已有資料 volume 卻遺失設定時，先停止初始化並指出處理方式。更新須先停妥及備份，再明確重跑此入口；普通 `up` 不執行 migration。首次操作見[首次使用](../operations/getting-started.md)。
 
 公版參考使用可選延伸檔 `compose.jd-app.rag.yaml`。它透過 Compose `extends` 重用獨立 RAG 的 Qdrant／GPU 配置，取消主機埠，加入非 root、唯讀的查詢 API 容器。GPU 的固定映像 tag 也在延伸檔中清除；App／API／GPU 映像由 Compose 按 project 命名，避免隔離建置覆蓋其他 project 使用的映像。
 
@@ -216,9 +216,9 @@ API 依 `apps/ocs-indexer/uv.lock` 安裝自身與兩個本地契約套件，採
 
 API、indexer、PDF 轉換器及兩個 Python 契約套件使用同一個 uv build backend。各專案根的 `build-system` 與 uv build constraints 固定 backend 版本和發布 artifact hashes；path dependency 的 build 設定不能替代 consumer 根的限制。封裝驗收以隔離 PEP 517 建置、wheel 資源逐檔比對、安裝後契約與 migration 載入為準。embedder 另有自己的 `pyproject.toml`／`uv.lock`、Python 版本及 CUDA wheel index，Docker 固定基底／uv digest，以 `--no-build` 拒絕未鎖建置環境的 runtime source build；具體操作由 [embedder README](../../apps/embedder/README.md)維護。
 
-查詢 API 等待 Qdrant 與模型通過健康檢查；App 的啟動相依仍只有 PostgreSQL。`--wait` 與 `/healthz` 不檢查公版索引是否就緒，首次使用仍須選版、建索引並實際搜尋。索引與模型身分由既有查詢流程核對，不另加啟動驗證器。RAG 服務持續運行，工具按需使用；不掛 Docker socket，也不在第一次查詢時才啟動容器。配置不自動選版或遷移資料。操作見 [公版 Docker 模式](../operations/rag.md#含公版參考的-docker-模式)，本次驗證見[工程紀錄](../experiments/engineering/2026-10-06-docker-rag-startup.md)。
+查詢 API 等待 Qdrant 與模型通過健康檢查；App 的啟動相依仍只有 PostgreSQL。`--wait` 與 `/healthz` 不檢查公版索引是否就緒，首次使用仍須選版、建索引並實際搜尋。索引與模型身分由既有查詢流程核對，不另加啟動驗證器。RAG 服務持續運行，工具按需使用；不掛 Docker socket，也不在第一次查詢時才啟動容器。配置不自動選版或遷移資料。操作見 [公版 Docker 模式](../operations/rag.md#含公版參考的-docker-模式)。
 
-依據：[uv Docker](https://docs.astral.sh/uv/guides/integration/docker/)、[Playwright Docker](https://playwright.dev/python/docs/docker)、[Compose 啟動相依](https://docs.docker.com/compose/how-tos/startup-order/)、[服務配置重用](https://docs.docker.com/compose/how-tos/multiple-compose-files/extends/)、[Compose 覆寫規則](https://docs.docker.com/reference/compose-file/merge/)、[PostgreSQL 官方映像](https://hub.docker.com/_/postgres)。版本沿用專案 lockfile，App 與查詢 API 映像基底及字型來源固定 digest／checksum；GPU 配置沿既有 RAG Dockerfile。操作由 [runbook](../operations/README.md#docker-操作)維護，實測與限制見 [Docker 交付驗證](../experiments/product-validation/2026-10-03-docker-delivery.md)。
+依據：[uv Docker](https://docs.astral.sh/uv/guides/integration/docker/)、[Playwright Docker](https://playwright.dev/python/docs/docker)、[Compose 啟動相依](https://docs.docker.com/compose/how-tos/startup-order/)、[服務配置重用](https://docs.docker.com/compose/how-tos/multiple-compose-files/extends/)、[Compose 覆寫規則](https://docs.docker.com/reference/compose-file/merge/)、[PostgreSQL 官方映像](https://hub.docker.com/_/postgres)。版本沿用專案 lockfile，App 與查詢 API 映像基底及字型來源固定 digest／checksum；GPU 配置沿既有 RAG Dockerfile。操作由 [runbook](../operations/README.md#docker-操作)維護；建置成功不代表目標環境的 PDF、資料保存及模型流程已驗收。
 
 ## 5. 安全與操作邊界
 
@@ -226,7 +226,7 @@ API、indexer、PDF 轉換器及兩個 Python 契約套件使用同一個 uv bui
 
 正式 HTTP middleware 對 HTML 附加 `Content-Security-Policy: frame-ancestors 'none'`，與既有 CSP 共同生效；Vite 透過 `server.headers` 使用同一 framing 政策。阻止 App 被別的頁面嵌入，不新增 frame-busting JavaScript 或鬆綁 Host／Origin。
 
-開發 proxy 必須保留瀏覽器原 Origin／Fetch Metadata，不用改寫成受信任值來通過檢查。隔離前端使用不同埠時，由該後端啟動配置明確增加一個精確 loopback Origin；不接受 wildcard、任意 local port 或從請求推導新增信任。配置、ASGI 與真 Vite 回歸見 [T15 HTTP 證據](../history.md#source-0e25c675694e9744582f)。
+開發 proxy 必須保留瀏覽器原 Origin／Fetch Metadata，不用改寫成受信任值來通過檢查。隔離前端使用不同埠時，由該後端啟動配置明確增加一個精確 loopback Origin；不接受 wildcard、任意 local port 或從請求推導新增信任。
 
 正式產品使用明確配置的 DB namespace、模型憑證及啟動環境；不得從退役產品設定推定可沿用的資料或 provider。啟停、初始化與遷移依 [backend README](../../apps/api/README.md)、[frontend README](../../apps/web/README.md)及 [runbook](../operations/README.md)。沒有舊資料遷移不等於授權刪除 DB、volume 或秘密；資料處置須有明確範圍及授權。
 

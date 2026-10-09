@@ -1,6 +1,6 @@
 # Memory 正文編輯接線
 
-- 狀態：**現行 Memory 正文編輯機制**。2026-10-07 依 [ADR0081](../adr/0081-consultant-interview-focus-and-unresolved-plan.md)將純核心移至 `adapters/body_edits.py`／`body_matching.py`，Plan 重用同一解析／唯一定位／套用機制。2026-10-09 移除 Memory 的純 matcher 轉送入口，caller 直接使用共同核心；`work_memory/body_edits.py` 保留 Memory 非空正文政策，App 筆記用途則允許空正文。純運算、模型工具與候選交易分責；共用執行與角色接線見 [Agent 執行](agent-execution.md)。驗證見[原切片證據](../plans/evidence/interview-plan-2026-10-07/t1-tools.md)、[責任重構](../plans/evidence/system-quality-domain-2026-10-09.md)及[正文與工具驗證](../history.md#source-99a88a33a07b25e8aa86)。
+- 狀態：**現行 Memory 正文編輯機制**。2026-10-07 依 [ADR0081](../adr/0081-consultant-interview-focus-and-unresolved-plan.md)將純核心移至 `adapters/body_edits.py`／`body_matching.py`，Plan 重用同一解析／唯一定位／套用機制。2026-10-09 移除 Memory 的純 matcher 轉送入口，caller 直接使用共同核心；`work_memory/body_edits.py` 保留 Memory 非空正文政策，App 筆記用途則允許空正文。純運算、模型工具與候選交易分責；共用執行與角色接線見 [Agent 執行](agent-execution.md)。
 - 產品契約：[單物件更新](../specs/2026-09-27-memory-object-update-tool-contract.md)、[共同工具規範](../specs/2026-09-27-agent-tool-contract-design-research.md)。本頁只決定既有 V4A 能力的解析、定位與套用機制，不重定產品效果或資料保存責任。
 
 閱讀路徑：[採用來源](#1-重用來源與有限補強) → [語法與定位](#2-語法與唯一定位) → [套用與容量](#3-套用錯誤與容量) → [接縫驗證](#4-接縫及驗證層級)。純編輯核心處理一份正文；角色權限、工具回傳與候選交易由各自的接線文件維護。
@@ -11,7 +11,7 @@
 
 [OpenAI 官方契約](https://developers.openai.com/api/docs/guides/tools-apply-patch)由執行方解讀 V4A。官方 helper 提供 section／chunk 解析，但不承諾多處匹配拒絕，亦不是 Memory Domain。保留其成熟語法算法，不安裝 Agents SDK runner；來源 commit、SHA-256、MIT 聲明及本地差異見 [第三方註記](../../apps/api/THIRD_PARTY_NOTICES.md)。
 
-[RapidFuzz Levenshtein](https://rapidfuzz.github.io/RapidFuzz/Usage/distance/Levenshtein.html)負責文字相似度，鎖定 3.14.6（MIT）。候選枚舉、唯一政策與保存不是套件保證。先前 [contextual hunk 探針](../experiments/legacy-evidence/2026-09-27-memory-fuzzy-edit/README.md)只作案例參考，不將實驗程式或「精確優先」搬成正式規則。
+[RapidFuzz Levenshtein](https://rapidfuzz.github.io/RapidFuzz/Usage/distance/Levenshtein.html)負責文字相似度，鎖定 3.14.6（MIT）。候選枚舉、唯一政策與保存不是套件保證。先前 contextual hunk 探針只作案例參考，不將實驗程式或「精確優先」搬成正式規則。
 
 選定流程：
 

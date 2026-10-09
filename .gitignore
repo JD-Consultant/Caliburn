@@ -34,9 +34,24 @@ Thumbs.db
 .worktrees/
 .superpowers/
 
-# Local historical/editorial archives are not part of the published repository.
-# Reusable research, report figures and reproducible experiment data live outside this directory.
+# Private engineering records remain on this machine, outside published Git history.
 /docs/archive/
+/docs/plans/
+/docs/research/
+/docs/experiments/
+/docs/reports/
+/docs/diagrams/reports/
+/docs/diagrams/research/
+/docs/diagrams/specs/2026-10-04-public-reference-retrieval-design/
+/docs/history.md
+/docs/history-commit-map.csv
+/docs/specs/evidence/
+/docs/specs/2026-10-04-public-reference-retrieval-design.md
+/docs/superpowers/plans/
+/experiments/
+/scratch/
+/apps/ocs-indexer/docs/plans/
+/apps/pdf-to-json/SETUP_COMPLETE.md
 
 # personal, local-only agent notes (shared orientation lives in the tracked CLAUDE.md / AGENTS.md)
 CLAUDE.local.md
@@ -44,21 +59,3 @@ Codex.local.md
 
 # Local engineering scratch.
 .tmp/
-
-# Large evidence is published as gzip; restored original files stay local.
-/docs/experiments/2026-10-04-public-chunk-retrieval/run-01/all-rankings.json
-/docs/experiments/2026-10-04-query-chunk-cross-retrieval/run-01/all-rankings.json
-/docs/experiments/2026-10-04-retrieval-input-boundaries/prepared.json
-/docs/experiments/2026-10-04-retrieval-reference-views/sources.jsonl
-/docs/experiments/2026-10-05-b1-dual-route-retrieval/run-01/all-rankings.json
-/docs/experiments/2026-10-05-memory-public-unit-retrieval/run-01/all-rankings.json
-/docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-02/trace.jsonl
-/docs/experiments/product-validation/data/compaction-long-interview-2026-10-04/main-03/trace.jsonl
-/docs/experiments/product-validation/data/full-interview-rag-2026-10-06/provider-trace.jsonl
-/docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P1/checkpoint-witness.jsonl
-/docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P1/provider-trace.jsonl
-/docs/experiments/product-validation/interview-plan-comparison-2026-10-07/formal-append/warehouse-r1-P2/checkpoint-witness.jsonl
-/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P1/checkpoint-witness.jsonl
-/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P1/provider-trace.jsonl
-/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P2/checkpoint-witness.jsonl
-/docs/experiments/product-validation/jd-work-plan-comparison-2026-10-07/runs/comparison-v2/formal/warehouse-r1-P2/provider-trace.jsonl

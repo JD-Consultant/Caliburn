@@ -1,13 +1,13 @@
 # T14 小型工作分析品質資料集 v3
 
-這是 **13 個全合成案例的評測素材與待人工校準 rubric**，不是模型通過紀錄。11 個 development、2 個 holdout_candidate；保留候選未用來調整 prompt，但編寫者已看過，不能稱盲測、獨立樣本或代表真實流量。v1 的九例未改 prompt；v2 新增兩例並小幅澄清 B1 背景取捨指引，當時只有離線契約驗證。v3 將真模型旅程發現的跨輪來源選擇問題縮小為兩個回歸素材；原旅程、候選對照與實際保存結果見 [T17 證據](../../../../../docs/history.md#source-98d840caa9eed7fb2840)，不等於這十三例皆已跑模型或通過。
+這是 **13 個全合成案例的評測素材與待人工校準 rubric**，不是模型通過紀錄。11 個 development、2 個 holdout_candidate；保留候選未用來調整 prompt，但編寫者已看過，不能稱盲測、獨立樣本或代表真實流量。v1 的九例未改 prompt；v2 新增兩例並小幅澄清 B1 背景取捨指引，當時只有離線契約驗證。v3 將真模型旅程發現的跨輪來源選擇問題縮小為兩個回歸素材；原旅程、候選對照與實際保存結果見 T17 證據，不等於這十三例皆已跑模型或通過。
 
 ## 文件與責任
 
 - [cases.json](cases.json)：情境輸入與前置草稿；只有各例的 `input` 可交給既有流程作測試資料。`id`／`split`／`risks` 是評測 metadata，不傳模型。
 - [oracles.json](oracles.json)：**reviewer only**。有根據、必保留／不得斷言、A／B1／B2 各自正反例、hard failures 與允許的其他解法；絕不混進模型 context。
 - 本文件：如何準備、觀察、評分及解讀。沿既有 pytest、角色 runner、Memory parent 與資料 owner，不增加模型評測平台或產品契約。
-- [T14 evidence](../../../../../docs/history.md#source-d3293e9b28c75bbb6616)：本切片來源、實際檢查及未驗邊界；不另勾任務完成。
+- T14 evidence：本切片來源、實際檢查及未驗邊界；不另勾任務完成。
 
 內容責任仍是 [工作分析指南](../../../../../docs/standards/work-analysis/2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](../../../../../docs/standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)、[訪談校準](../../../../../docs/standards/work-analysis/2026-09-09-customized-jd-depth-and-interview-calibration.md)。oracle 的 `analysis`／`writing`／`interview` 數字對應這三份文件章節。本文不是第二份指南，也不以案例中的格式／件數定義所有職位。
 

@@ -19,7 +19,7 @@ RAG 負責把公版職能基準轉成可搜尋、可回讀來源的參考資料�
 
 ## 2. 資料如何流動
 
-1. **解析來源。** `pdf-to-json` 把 PDF 轉成 OCS JSON，正常輸出與拒絕診斷分開。解析結果與未支援版型由[PDF → JSON 契約](../specs/2026-10-03-public-ocs-pdf-to-json-design.md)及[批次補齊紀錄](../experiments/2026-10-04-ocs-json-repair/README.md)說明；有 JSON 不代表已逐字驗收原 PDF。
+1. **解析來源。** `pdf-to-json` 把 PDF 轉成 OCS JSON，正常輸出與拒絕診斷分開。解析結果與未支援版型由[PDF → JSON 契約](../specs/2026-10-03-public-ocs-pdf-to-json-design.md)及批次補齊紀錄說明；有 JSON 不代表已逐字驗收原 PDF。
 2. **選版與建索引。** 操作者明示選定來源 JSON，以 `index-references` 建立獨立公版 collection，內含整份正文與任務／概述的檢索點。來源內容與 hash 固定公版身分，完整寫入後才發布就緒標記（ready manifest）。啟動服務不自動選版、解析或建索引。
 3. **搜尋與讀取。** indexer 透過模型服務計算向量與重排序，從 Qdrant 取得候選及固定來源。職位整體參考採兩路廣蒐、完整聯集重排序及公版去重；數量、評分含義與回傳格式只由[API 契約](../specs/2026-10-05-occupation-reference-api-design.md)維護，不把控制初值稱為通用最佳參數。
 4. **訪談中使用。** App 經 HTTP 取得公版，顧問按需選用、讀取任務及保存員工明確否認的範圍。選用與排除資料由 App 保存，RAG 不判定 JD 已完成，也不把公版自動當成員工工作事實。角色權限與跨輪資格見[公版工具契約](../specs/2026-10-04-public-reference-completion-design.md)。
@@ -55,6 +55,6 @@ Docker 基本模式與公版模式共用 JD App 及 PostgreSQL；公版模式另
 | 模型服務與 GPU 部署 | [embedder README](../../apps/embedder/README.md) |
 | 顧問工具、公版選用及排除資料 | [公版工具契約](../specs/2026-10-04-public-reference-completion-design.md)與 [ADR0080](../adr/0080-opt-in-public-reference-agent-tools.md) |
 | 啟停、選版、建索引及更新保存 | [RAG 操作手冊](../operations/rag.md) |
-| 品質候選、未決問題及實驗 | [目前決策](../current-decisions.md#獨立-rag-與公版參考)與[檢索實驗](../experiments/README.md#檢索與資料處理) |
+| 品質候選、未決問題及實驗 | [目前決策](../current-decisions.md#獨立-rag-與公版參考)與檢索實驗 |
 
-早期保留與隔離的理由見 [2026-08-11 設計](../specs/2026-08-11-rag-bounded-context-retention-design.md)及 Proposed [ADR0057](../adr/0057-current-only-runtime-and-data-boundary.md)；當時未接消費端的描述不代表現況。其他退役設計由[歷史索引](../history.md)取回，不在架構頁重抄舊管線與 corpus 統計。
+早期保留與隔離的理由見 [2026-08-11 設計](../specs/2026-08-11-rag-bounded-context-retention-design.md)及 Proposed [ADR0057](../adr/0057-current-only-runtime-and-data-boundary.md)；當時未接消費端的描述不代表現況。

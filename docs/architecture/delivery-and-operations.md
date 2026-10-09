@@ -85,7 +85,7 @@ App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景
 - API key 僅供後端使用，不進 prompt、模型工具、Web bundle、URL、提交或一般 log；取用與保存使用平台適合的秘密保存方式，不自造加密演算法。
 - 訪談與 JD 可能含個人／企業資訊。只有模型處理所需資料按核准設定送供應商，外送目的與範圍有紀錄；`store=false` 不代表供應商的所有資料保留與稽核都為零。
 
-安全設計參考：[OWASP prompt injection prevention](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html)、[secrets management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)。這些支持最小權限、資料／指令區分與秘密管理；本產品角色矩陣是 Caliburn 取捨。拒絕路徑的實測範圍見[反例矩陣](verification.md)及其證據。
+安全設計參考：[OWASP prompt injection prevention](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html)、[secrets management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)。這些支持最小權限、資料／指令區分與秘密管理；本產品角色矩陣是 Caliburn 取捨。拒絕路徑的實測範圍見[反例矩陣](verification.md)。
 
 ## 5. 執行觀測與問題排查
 
@@ -106,9 +106,9 @@ App 以 FastAPI 單程序同源提供建置後的 Web，內部協調 A 與背景
 | 程式如何記錄事件、工具及可比較證據 | [觀測與 Log 規範](../standards/coding-standard.md#71-讓執行證據可查可比較可驗證) |
 | 診斷讀取、遮蔽及副本由誰負責 | [程式組織](../standards/code-organization.md#1-目錄依業務責任組織機制集中在少數邊界) |
 | 如何依原工作查 Context、工具及綁定 | [本機診斷操作](../operations/README.md#在-datagrip-查某個職務檔案的-ai-執行紀錄) |
-| 工程反例驗到哪裡 | [審查證據](../plans/evidence/full-system-review-2026-10-08.md) |
+| 如何驗證工程反例 | [驗證責任與測試入口](../implementation/verification-plan.md) |
 
-現行尚未導入獨立 metrics／trace 平台。後續可依診斷、測試與維護收益比較現成方案，仍須保留正式資料權威、失敗處理及敏感內容的存取／外送界線；選型不等於已接入。候選與依據見[工程研究](../research/engineering/2026-10-08-full-stack-engineering-practices.md)。
+現行尚未導入獨立 metrics／trace 平台。後續可依診斷、測試與維護收益比較現成方案，仍須保留正式資料權威、失敗處理及敏感內容的存取／外送界線；選型不等於已接入。
 
 ## 6. 產品範圍與成效評估
 

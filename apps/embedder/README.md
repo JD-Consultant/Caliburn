@@ -14,7 +14,7 @@ Runs only as a Linux x86_64 container (GPU). Built and started by `docker compos
 (service `embedder`, `gpus: all`). Standalone development publishes
 `127.0.0.1:8082` to container port 80; the formal App overlay uses the internal network.
 Embedding produces the same vectors as the former in-process embedder.
-See [embedding research](../../docs/research/retrieval/2026-06-29-embedder-service-bge-m3-research.md).
+See embedding research.
 
 Build inputs are declared in `pyproject.toml` and resolved in `uv.lock`. The Dockerfile
 pins the CUDA base and uv images by digest and installs Python 3.11.16 through uv's

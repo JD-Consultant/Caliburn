@@ -20,9 +20,7 @@ Caliburn 是本機 Web AI 職務分析工具。員工用自己的話說明工作
 
 ## 使用流程
 
-![Caliburn 實際介面：訪談、職務說明書與來源回查](docs/experiments/product-validation/data/inventory-demo-guided-20261003/interview-source.jpg)
 
-庫存管理示例：左側進行訪談，右側查看 JD，並可展開來源核對內容依據。
 
 1. **建立職務檔案。** 為這份工作建立獨立的訪談與 JD。
 2. **說明實際工作。** 描述日常工作、案件或具體情境，依顧問追問補充細節。
@@ -40,9 +38,8 @@ Caliburn 是本機 Web AI 職務分析工具。員工用自己的話說明工作
 ## 延伸閱讀
 
 - [產品介紹](docs/product/README.md)：使用情境、需求與產品價值。
-- [專題報告](docs/reports/project-report/report.md)：方法、實驗與成果。
-- [系統架構報告](docs/reports/system-architecture/README.md)：程式分工、資料保存與分析接續。
-- [文件導覽](docs/README.md)：開發、維護、研究與驗證資料。
+- [架構導覽](docs/architecture/README.md)：程式分工、資料保存與分析接續。
+- [文件導覽](docs/README.md)：開發、維護與驗證責任。
 
 ## 授權
 

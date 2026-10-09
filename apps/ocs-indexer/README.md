@@ -70,7 +70,7 @@ manifest。原始 UTF-8 JSON 與 hash 綁定 `reference_id`，讀取不代換成
 
 契約權威：[`indexer_contract/references.py`](../../packages/indexer-contract/src/indexer_contract/references.py)。
 設計及證據：[`API 設計`](../../docs/specs/2026-10-05-occupation-reference-api-design.md)、
-[`施工及驗證`](../../docs/experiments/engineering/README.md#公版參考-api)。
+施工及驗證。
 
 ### 既有 profile／task API
 
@@ -219,4 +219,4 @@ ADR [0003](../../docs/adr/0003-indexer-stays-separate-service.md)(獨立服務)�
 [0012](../../docs/adr/0012-embedding-as-a-service.md)(embedder 服務化)·
 [0019](../../docs/adr/0019-api-naming-alignment.md)(命名)·
 [來源 JSON 欄位契約](../pdf-to-json/README.md#6-field-contract)與 [OCS JSON Schema](../../packages/ocs-contract/schema/ocs-document.schema.json)·
-embedder 細節:[`docs/specs/2026-06-29-embedder-service-bge-m3-research.md`](../../docs/research/retrieval/2026-06-29-embedder-service-bge-m3-research.md)。
+embedder 細節:當時的內部紀錄。

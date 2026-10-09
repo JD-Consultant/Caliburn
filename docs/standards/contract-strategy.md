@@ -18,7 +18,7 @@ API 的領域與用例模組不直接依賴 transport DTO；傳輸層負責 DTO 
 
 保留的 RAG 有自己的跨語言契約 `packages/ocs-contract`，以 JSON Schema 生成目前 Python 消費者使用的 Pydantic model；無消費者的 TypeScript 產物已移除，生成檢查只在暫存目錄產生並比較，不更動工作檔或 Git index。生成檢查沿[該套件說明](../../packages/ocs-contract/README.md)。它不屬於正式 JD 產品的契約，App／Web 不 import 或消費它；RAG 的隔離邊界不因契約存在而改變。
 
-`experiments/jd-relational-app`、`packages/consultant-memory` 與 `packages/job-analysis-contract` 已退役並移出工作樹，沿革由[Git 歷史](../history.md#retired-packages-20261008)取回，不作現行依賴，也不為已移除的 interview／job-authoring 接縫新增相容契約。
+`experiments/jd-relational-app`、`packages/consultant-memory` 與 `packages/job-analysis-contract` 已退役並移出工作樹，沿革由Git 歷史取回，不作現行依賴，也不為已移除的 interview／job-authoring 接縫新增相容契約。
 
 ## 選擇判準
 

@@ -69,7 +69,7 @@ if ($LASTEXITCODE -ne 0) { throw '瀏覽器安裝失敗，請查明原因後再�
 # 或指定與已鎖 Playwright 相容的 Chromium：$env:CALIBURN_PDF_CHROMIUM_PATH = '...\chrome.exe'
 ```
 
-PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部分字型的文字複製／搜尋會出現部首字元（已知限制，見 [T13](../history.md#source-409f20a1c297740aed7d)）。
+PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部分字型的文字複製／搜尋會出現部首字元（已知限制，見 T13）。
 
 字型必須使用實際可讀的檔案，下載方式見 [Noto CJK 官方指南](https://github.com/notofonts/noto-cjk/blob/main/Sans/README.md)。如果安裝瀏覽器時自訂了 `PLAYWRIGHT_BROWSERS_PATH`，後端啟動時也要提供相同值。換新終端後，在啟動前重新提供字型與自訂瀏覽器路徑；已啟動時須重啟才生效。
 
@@ -125,7 +125,7 @@ PDF 只匯出正式 JD、不含候選與員工姓名；畫面中文正確，部�
 }
 ```
 
-不要因為 migration 或分支更新失敗就重建資料庫、刪 volume 或強制覆蓋工作。`git pull` 拒絕快轉時先核對本機差異；歷史修正的提交對照見[歷史查閱](../history.md)。更新 Playwright 套件後，還需按[PDF 匯出](#pdf-匯出)重新安裝對應瀏覽器，然後依[日常啟動](#日常啟動與停止)啟動。
+不要因為 migration 或分支更新失敗就重建資料庫、刪 volume 或強制覆蓋工作。`git pull` 拒絕快轉時先核對本機差異；歷史修正的提交對照見歷史查閱。更新 Playwright 套件後，還需按[PDF 匯出](#pdf-匯出)重新安裝對應瀏覽器，然後依[日常啟動](#日常啟動與停止)啟動。
 
 ## 驗證
 
@@ -140,4 +140,4 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://測試帳號:密碼@127.0.0.1:54
 uv run --project apps/api --locked pytest apps/api/tests -m postgres -q
 ```
 
-測試各自建立並回收隨機 schema，不碰既有資料。真 PostgreSQL、真瀏覽器與真模型結果分開記錄；離線測試不能代替 provider 或 UI 證據。付費驗證腳本須依 manifest 明示的有限預算執行（見各任務證據）。Windows 受限 token 可能讓暫存目錄權限出現 `WinError 5`，不得為測試變綠而放寬安全限制。
+測試各自建立並回收隨機 schema，不碰既有資料。真 PostgreSQL、真瀏覽器與真模型結果分開記錄；離線測試不能代替 provider 或 UI 證據。付費驗證腳本須依 manifest 明示的有限預算執行。Windows 受限 token 可能讓暫存目錄權限出現 `WinError 5`，不得為測試變綠而放寬安全限制。

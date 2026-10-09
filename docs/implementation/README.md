@@ -9,7 +9,7 @@
 | 開始工作前要確認 | 閱讀入口 |
 |---|---|
 | 產品應達成什麼、哪些規則不能改 | [架構與責任文件](../architecture/README.md) |
-| 有效狀態、後續工作及施工範圍 | [目前決策](../current-decisions.md)、[計畫入口](../plans/README.md) |
+| 有效狀態、後續工作及施工範圍 | [目前決策](../current-decisions.md) |
 | 開發流程、模組組織、程式與文件寫法 | [開發與架構規範](../standards/README.md#開發與架構) |
 | 選哪些框架、為何、不選什麼 | [技術選型與機制驗證](technology-decisions.md) |
 
@@ -29,7 +29,7 @@
 | 工作畫面、JD 人工編輯、草稿與鍵盤互動如何接 | [Web 工作畫面](web-workspace.md) |
 | HTTP、公開串流、來源回查、PDF 及本機服務如何交付 | [介面與交付](interface-and-delivery.md) |
 
-驗證需求與測試層級看[驗證對照](verification-plan.md)；既有結果與尚未覆蓋範圍看[架構驗證](../architecture/verification.md)及[產品實驗](../experiments/product-validation/README.md)。最後核對相關程式與測試，任務摘要不能取代完整契約。
+驗證需求與測試層級看[驗證對照](verification-plan.md)；既有結果與尚未覆蓋範圍看[架構驗證](../architecture/verification.md)。最後核對相關程式與測試，任務摘要不能取代完整契約。
 
 ## 文件維護責任
 

@@ -1,7 +1,7 @@
 # JD 保存接線
 
 - 狀態：**現行 JD 保存、交易與讀寫接線** 。人工及模型編輯共用 JD 領域模組，候選在 A 完成交易才正式採用；來源回查、差異與條件撤回依下列契約運作。分析品質及未驗情境見[驗證對照](verification-plan.md)，不由機制測試推定品質達標。
-- 上位契約：[JD 欄位指南](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。驗證見 [JD 保存](../history.md#source-75f1da860cdd0bef826e)。
+- 上位契約：[JD 欄位指南](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。驗證見 JD 保存。
 
 | 維護問題 | 閱讀位置 |
 |---|---|
@@ -181,7 +181,7 @@ HTTP 的 `expected_revision_id` 是使用者畫面讀到的正式基底，`comma
 
 工作流先鎖檔案再查原結果。已有結果且 payload 一致就回原修訂，**不因目前已有 A 或更新稿而重新寫入** ；命令身分被拿來送不同內容則拒絕。新命令才核人工准入及 head。與 A 輸入准入共用檔案鎖順序，檢查和寫入在同一交易內；活躍／暫停 A 阻止新的人工 JD 修改，背景 Memory 不阻止。
 
-所有變更、新修訂、head 與原操作同次提交；中途例外全退。例：命令 P 產生 R2，後來另一命令產生 R3，重送 P 仍回 R2，GET 則回 R3。沒有在此新增未知 COMMIT 的自動 retry loop，也不能用 GET 的 R3 冒充 P 的結果。程序故障與 COMMIT 確認遺失的驗證範圍見[恢復驗證](../history.md#source-d4bb8d17c5639690aeb3)。
+所有變更、新修訂、head 與原操作同次提交；中途例外全退。例：命令 P 產生 R2，後來另一命令產生 R3，重送 P 仍回 R2，GET 則回 R3。沒有在此新增未知 COMMIT 的自動 retry loop，也不能用 GET 的 R3 冒充 P 的結果。程序故障與 COMMIT 確認遺失的驗證範圍見恢復驗證。
 
 ### 3.1 本輪候選與可恢復位置
 
@@ -203,7 +203,7 @@ HTTP 的 `expected_revision_id` 是使用者畫面讀到的正式基底，`comma
 - **放棄** ：關閉本候選，保留固定修訂與原結果；不是倒轉正式修改。暫停可讀不可編輯，仍可取消；A workflow 以同一短交易把放棄與 execution 終態一起提交。目前工作流的單項 discard 僅內部底層能力，不提供假 Turn 取消端點。
 - **採用** ：`adopt_candidate_jd` 是不 commit 的參與者，要求原 writer 與候選位置仍有效，再讓正式 head 選 current、關閉候選並保存原結果。已提交採用可取回原結果，不重新取得寫入資格；不能把 cancelled／failed 當成功。A 完成 workflow 把 JD、正式輸入／完整答覆、current_input 依據、背景要求資格與 execution 完成接入同一交易。
 
-驗證：[候選保存](../history.md#source-75f1da860cdd0bef826e)、[A 完成交易](../history.md#source-f5df4f496aad7b909036)、[程序恢復](../history.md#source-d4bb8d17c5639690aeb3)。候選歷史目前不自動清理；這不代表已有完整永久保留或清理策略。
+驗證：候選保存、A 完成交易、程序恢復。候選歷史目前不自動清理；這不代表已有完整永久保留或清理策略。
 
 ### 3.2 模型導覽與既有物件定位
 
@@ -217,7 +217,7 @@ map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍
 - **並行與恢復：** 沿 PostgreSQL Identity、唯一約束與 `ON CONFLICT DO NOTHING` 處理競爭，不另造計數器或鎖管理器。既有映射重讀不寫入；新增映射使用獨立短交易，不跨模型呼叫持鎖。JD 建立已提交但映射保存失敗時，錯誤交既有 Runtime；重入先承接原業務操作結果，再取得同一映射，不建立第二個物件。映射必須提交後才交給模型。
 - **定位與隔離：** 模型工具入口只接受本檔案已配置的短定位，拒絕 canonical UUID passthrough；內部 prepared command 仍保存 canonical 身分並沿原 resolver 恢復。跨檔案、錯類型、未知短定位均拒絕。JSON 只轉換明定定位欄位，Markdown diff 只格式化程式產生的定位，不對正文做全域字串替換。來源核對語意、Memory `target_title`、HTTP／UI UUID 不變。
 
-驗證：[短定位](../history.md#source-098e24f247a9411844be)。程式與 migration 已有離線／真 PG 證據；示範服務是否已升級需依[目前決策](../current-decisions.md)核對。短定位不等於 Luna 的來源選擇或核對品質已改善。
+驗證：短定位。程式與 migration 已有離線／真 PG 證據；示範服務是否已升級需依[目前決策](../current-decisions.md)核對。短定位不等於 Luna 的來源選擇或核對品質已改善。
 
 這裡共用既有資料與固定修訂讀取，不新增 map 保存、索引資料庫或消息投影流程；map 不預載到每輪 context。真 PG 反例涵蓋候選可見而正式稿未變、刪職責保留未歸屬任務、跨檔案定位拒絕及終態 execution 不再取得候選導覽基底。
 
@@ -251,7 +251,7 @@ map 與完整 `read_jd` 使用 App 配發的短定位。模型導覽的欄位仍
 
 workflow 的結果保留型別：刪除回原結果修訂與解除歸屬的任務數，移動回原結果修訂、效果及是否解除歸屬。prepared value 保存恢復所需 facts，不保存供程式解析的中文回覆。[工具 renderer](../../apps/api/src/caliburn/transport/model_tools/jd_write_rendering.py)唯一負責短 ID 配置與模型文字，文案變動不改變去重／恢復規則；配置短 ID 失敗後可沿已提交原結果重新呈現。
 
-重入用原 operation 的結果，不用目前最新稿替代原結果。成功只回精簡狀態／新定位，模型已有的全文不重複回送。可修正的語意參數錯誤回工具拒絕；DB／提交結果不明及失效 writer 不吞成一般參數錯誤。`0028` 的資料與回復相容驗證見[本輪重構證據](../plans/evidence/full-system-review-2026-10-08.md)。
+重入用原 operation 的結果，不用目前最新稿替代原結果。成功只回精簡狀態／新定位，模型已有的全文不重複回送。可修正的語意參數錯誤回工具拒絕；DB／提交結果不明及失效 writer 不吞成一般參數錯誤。
 
 刪職責保留任務並转未歸屬；刪任務保留共用 K/S。仍被任務使用的 K/S 先拒絕並指引處理關係。修訂與刪除都保留其他項目及正式稿；只有整輪成功保存才採用候選。schema 仍為 `contracts/tools/` 唯一 wire 權威，不在此手抄參數。
 
@@ -259,11 +259,11 @@ workflow 的結果保留型別：刪除回原結果修訂與解除歸屬的任�
 
 ### 3.5 來源及人工改稿差異
 
-`read_jd_changes` 沿 [差異 workflow](../../apps/api/src/caliburn/workflows/jd_changes.py) 組合JD／Memory／執行歷史模組 的只讀結果。來源比較該筆固定舊依據與本 Turn 的固定 Memory，展開相關引用鏈差異；人工比較上一個成功 Turn 的已採用 JD 與本輪起點，保留改回、no-op 與來源資格變化。不把取消當完成、不以同名接替舊物件、不給模型任意歷史全文入口，讀取不解除待核對。回傳沿既定 Markdown／有界拒絕契約，沒有第二份 diff 儲存。研究與反例見 [T07 差異證據](../history.md#source-db886c63271a8ce0ecdc)。
+`read_jd_changes` 沿 [差異 workflow](../../apps/api/src/caliburn/workflows/jd_changes.py) 組合JD／Memory／執行歷史模組 的只讀結果。來源比較該筆固定舊依據與本 Turn 的固定 Memory，展開相關引用鏈差異；人工比較上一個成功 Turn 的已採用 JD 與本輪起點，保留改回、no-op 與來源資格變化。不把取消當完成、不以同名接替舊物件、不給模型任意歷史全文入口，讀取不解除待核對。回傳沿既定 Markdown／有界拒絕契約，沒有第二份 diff 儲存。
 
 ### 3.6 完成後的 JD 條件撤回
 
-[撤回 workflow](../../apps/api/src/caliburn/workflows/jd_undo.py) 先鎖原職務檔案，核對 completed Turn、原操作及人工准入。只在正式 JD 仍等於該輪採用修訂時，沿原輪前資料建立新的正式修訂；不倒轉訪談、Memory 或 context。後續有人工／AI 修改即拒絕，不推測反向合併。重送承接原撤回結果、不覆蓋後續新稿，UI 再讀目前正式稿。沿既有 JD operation，不另造 undo ledger；[T13 證據](../history.md#source-02ac4f0a1baf460f67ab)列出競爭／確認遺失及遷移反例。
+[撤回 workflow](../../apps/api/src/caliburn/workflows/jd_undo.py) 先鎖原職務檔案，核對 completed Turn、原操作及人工准入。只在正式 JD 仍等於該輪採用修訂時，沿原輪前資料建立新的正式修訂；不倒轉訪談、Memory 或 context。後續有人工／AI 修改即拒絕，不推測反向合併。重送承接原撤回結果、不覆蓋後續新稿，UI 再讀目前正式稿。沿既有 JD operation，不另造 undo ledger；T13 證據列出競爭／確認遺失及遷移反例。
 
 ### 3.7 人的正式來源回查
 
@@ -276,7 +276,7 @@ workflow 的結果保留型別：刪除回原結果修訂與解除歸屬的任�
 - 查詢先選 Memory 基準，再取得有效訪談上界，避免並行發布時用較早上界驗證較新快照。鏈路依物件與固定修訂辨認，不用標題匹配。比較正文改回原樣但修訂不同時，仍明示修訂變化；沒有淨文字差異不能當成已核對。
 - 閱讀、展開差異、重新載入都沒有寫入；不解除 `needs_review`、不變更原引用或其已核對 JD 基底。來源損壞／不再可讀需明示錯誤，不偽裝為空列表或無差異。
 
-HTTP 型別由 `contracts/http/jd-sources-view.schema.json`、`jd-source-content-view.schema.json`、`jd-source-changes-view.schema.json`生成，不手寫第二份 wire 契約。沒有新表、遷移、來源版本參數或確認工具；UI 呈現與實測見[介面 §3.1](interface-and-delivery.md#31-正式-jd-來源的唯讀下鑽)及 [T09 來源回查證據](../history.md#source-e93341e9711337954840)。
+HTTP 型別由 `contracts/http/jd-sources-view.schema.json`、`jd-source-content-view.schema.json`、`jd-source-changes-view.schema.json`生成，不手寫第二份 wire 契約。沒有新表、遷移、來源版本參數或確認工具；UI 呈現與實測見[介面 §3.1](interface-and-delivery.md#31-正式-jd-來源的唯讀下鑽)。
 
 ### 3.8 完成 Turn 的 JD 變更檢視
 
@@ -311,4 +311,4 @@ A 使用 §3.1 候選，正式人工 HTTP 使用正式 head；A 完成時再與�
 - [Pydantic serialization](https://docs.pydantic.dev/latest/concepts/serialization/)：預設 Python dump 可保留 Python 型別，`mode="json"` 轉為 JSON 相容值。跨生成契約組合時使用後者，避免相同 wire enum 值卻不同 Python class 的驗證失敗；不關閉 validator 或改生成檔。
 - [Azure CQRS](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs)：查詢可返回 DTO／投影，基本形式可以共用同一資料庫，並不要求另一套儲存或 event sourcing。本案只借讀取投影與修改分責，JD map 直接用既有固定修訂；不是引入獨立 CQRS 平台，也不是主張所有查詢均需此模式。
 
-上述是官方機制；**固定修訂、職責內容／選用分離與重送順序是 Caliburn 的有界實現選擇** ，不是聲稱所有大廠都用此 schema。沒有新增套件或框架，真 PG 證據見任務紀錄。
+上述是官方機制；**固定修訂、職責內容／選用分離與重送順序是 Caliburn 的有界實現選擇** ，不是聲稱所有大廠都用此 schema。沒有新增套件或框架。

@@ -30,7 +30,7 @@ uv run python -m jd_pdf_to_json.cli batch path\to\pdf_folder -o path\to\json_fol
 
 本輪補齊結果位於 `data/json-checked-2026-10-04/`，診斷與差異位於相鄰的
 `data/json-checked-2026-10-04.diagnostics/`。原有 indexer JSON 保留；通過解析檢核不代表已確認官方最新版本。
-執行結果、驗證範圍及待處理文件見[補齊紀錄](../../docs/experiments/2026-10-04-ocs-json-repair/README.md)。
+執行結果、驗證範圍及待處理文件見補齊紀錄。
 本輪 815 份寫出新 JSON、53 份拒絕、40 份歷史檔排除；拒絕文件不在新正常輸出中。
 
 ## CLI 使用方法
@@ -512,6 +512,5 @@ PDF 末頁「說明與補充事項」分為兩個子區塊：
 
 - 系統範圍：根 [`ARCHITECTURE.md`](../../ARCHITECTURE.md)；公版資料流見 [RAG 管線](../../docs/architecture/rag-pipeline.md)，本工具採 Pipes-and-Filters，程式位置見本頁 Codemap。
 - 來源欄位語意：[§6 Field Contract](#6-field-contract)；結構與生成規則：[ocs-contract](../../packages/ocs-contract/README.md)。
-- transformer 拆解研究:[`docs/specs/2026-06-28-pdf-to-json-transformer-decomposition-research.md`](../../docs/research/retrieval/2026-06-28-pdf-to-json-transformer-decomposition-research.md)。
 - 下游：[ocs-indexer](../ocs-indexer/README.md)(索引消費本輸出)；機器契約見 [OCS JSON Schema](../../packages/ocs-contract/schema/ocs-document.schema.json)，不是 JD 著作契約。
-- 初始設計與建置沿革：[ARCHITECTURE.md](ARCHITECTURE.md)、[SETUP_COMPLETE.md](SETUP_COMPLETE.md)；已標為歷史，不作現行施工入口。
+- 設計分工：[ARCHITECTURE.md](ARCHITECTURE.md)；實際命令與支援範圍以本頁為準。

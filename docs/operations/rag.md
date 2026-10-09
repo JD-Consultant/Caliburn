@@ -71,7 +71,7 @@ Indexer 自建的 embedding、rerank 與 Qdrant HTTP client 使用明示目的�
 
 這裡不使用基本模式的初始化腳本，以免提前啟動未帶公版設定的 App。更新程式不覆寫索引；來源或模型身分變動時，另建新 collection 並重新做搜尋檢查。
 
-設定解析、鎖定安裝與 API 回歸結果見 [公版 Docker 驗證](../experiments/engineering/2026-10-06-docker-rag-startup.md)。真容器與 GPU 的已驗／未驗範圍在該頁分開記錄。
+設定解析、鎖定安裝與 API 回歸結果見 公版 Docker 驗證。真容器與 GPU 的已驗／未驗範圍在該頁分開記錄。
 
 ## 獨立 RAG 開發
 

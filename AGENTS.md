@@ -13,8 +13,8 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 |---|---|
 | 查功能、狀態與責任 | 從[目前決策](docs/current-decisions.md)定位本題，再沿[文件導覽](docs/README.md)讀相關責任文件；局部修正限讀受影響範圍。 |
 | 討論架構或跨層變更 | 讀相關 ADR 與契約，依[決策流程](docs/standards/decision-process.md)區分提案、採用與正式切換；[架構討論規範](docs/standards/architecture-discussion-standard.md)提供方法，其細節仍為討論稿。 |
-| 規劃與實作 | 依[開發規範](docs/standards/development-standard.md)及[計畫入口](docs/plans/README.md)拆解交付；模組邊界看[程式組織](docs/standards/code-organization.md)，寫法看[程式規範](docs/standards/coding-standard.md)，API／共用格式看[契約策略](docs/standards/contract-strategy.md)。 |
-| 設計測試或判讀結果 | 讀[驗證範圍](docs/architecture/verification.md)與相關測試；分析品質的比較沿[產品實驗](docs/experiments/product-validation/README.md)查受測條件及原件。 |
+| 規劃與實作 | 依[開發規範](docs/standards/development-standard.md)拆解交付；模組邊界看[程式組織](docs/standards/code-organization.md)，寫法看[程式規範](docs/standards/coding-standard.md)，API／共用格式看[契約策略](docs/standards/contract-strategy.md)。 |
+| 設計測試或判讀結果 | 讀[驗證範圍](docs/architecture/verification.md)、[驗證責任](docs/implementation/verification-plan.md)與相關測試；模型品質結論須核對該次授權比較的設定、結果及限制。 |
 | 維護文件或圖稿 | 依[文件與圖面規範](docs/standards/documentation-standard.md)整理責任、敘述、引用與圖面；更新對應正文及入口。 |
 | 啟停、設定或操作資料 | 從 [runbook](docs/operations/README.md)、[後端](apps/api/README.md)與[介面](apps/web/README.md)查操作方式與命令。 |
 
@@ -39,6 +39,7 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 - 長任務維護當前目標、剩餘工作、依賴與驗收條件。可獨立的研究、實作或審查，依效益委派子代理，交代範圍、產出與檢查方式；主代理負責整合及核對相互影響。插入問題處理後接回未完成的主線。
 - 使用者明確指示優先於本檔及 Skill 的工作慣例，仍遵守系統與工具安全界線。若 Skill 使工作暫停或改向，指出檔案、具體規則及影響，區分明文要求與自行判斷。
 - 金鑰不得輸出或提交。真模型與其他有成本的外送依本次有效授權、資料範圍及費用界線執行；清除資料、重建 volume、merge、push、發布與對外傳送須有相應授權。只停止已確認身分的自有程序。
+- 公開 repository 只保存程式、必要測試及產品／架構／開發文件。研究底稿、施工計畫、執行證據、實驗原件及報告只留本機；公開說明保留必要結論、官方來源及限制，不依賴私人檔案或把它們改名後重新提交。
 
 ## 指引維護
 

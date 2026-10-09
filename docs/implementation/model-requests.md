@@ -15,7 +15,7 @@
 - Count 和 compact 也只外送一次，不降級成猜測計數／本地摘要；compact 返回完整 SDK C，沒有在 adapter 自行採用。鎖定 SDK 的 standalone compact **沒有 `max_output_tokens`** ，不能用 create 的輸出上限當其費用上界。
 - `adapters/openai_failures.py` 區分遠端結果不明、暫時服務問題、權限／額度阻塞、容量、請求與回應協定問題；不複製可能含原話／秘密的 error body 到 State 或 UI。分類不等於已准許重試，更不代表該次免費。
 
-adapter 支援固定 request 指定的串流與非串流傳輸；A 新請求使用串流，公開投影見[介面 §2](interface-and-delivery.md#2-串流不是保存權威)。持久額度、原結果採用及 Retry-After 由後續各節負責。驗證見[直連傳輸](../history.md#source-d76bfd79f21fb146c537)與[串流](../history.md#source-caf2f3430699b78cd2b7)；SDK MockTransport 不等於遠端接受。依據：[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[錯誤分類](https://developers.openai.com/api/docs/guides/error-codes)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)。
+adapter 支援固定 request 指定的串流與非串流傳輸；A 新請求使用串流，公開投影見[介面 §2](interface-and-delivery.md#2-串流不是保存權威)。持久額度、原結果採用及 Retry-After 由後續各節負責。驗證見直連傳輸與串流；SDK MockTransport 不等於遠端接受。依據：[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[錯誤分類](https://developers.openai.com/api/docs/guides/error-codes)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)。
 
 **[ADR0083](../adr/0083-execution-deadline-in-flight.md) 的在途等待政策：** execution 固定 deadline 同時限制新外送准入、重試等待及
 在途 create／count／compact 網路等待。先在既有准入交易內讀 DB 時鐘，將固定 deadline 的
@@ -52,7 +52,7 @@ asyncio 機制，期限與原 attempt 的責任仍集中於 `ModelRequestExecuto
 - `ModelRequestAccounting` 使用與原 budget 相同的 `cost_basis`、預留及觀察成本計算；`workflows/model_runtime.py` 從固定模型配置組裝。費率見 [費率與 usage 估算](#6-固定費率與-usage-成本估算)，產品與付費評測的未知 usage 處理見 [產品與評測金額界線](#7-產品與付費驗證的金額界線)；成本估算不等於帳單驗證。
 - 結算與採用分開：一般晚到 R、已保存 R 的取消後重入，以及已驗證 Held 補存期間取消，都可核對原 attempt 記費；仍不能派工具、採用新 context 或交付正式結果。Held 在進結算節點時釋放「尚未保存」責任，不把結算故障誤報為模型保存故障。取消恰好發生在 `aupdate_state` 補存期間時，使用剛補存的原件結算，不看過時的補存前查詢值。
 
-驗證：[固定請求與保存後計量](../history.md#source-d76bfd79f21fb146c537)。依據：[LangGraph sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)、[OpenAI 原件接續](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)；此安全交界不承諾 provider 與 PostgreSQL 共同原子提交。
+驗證：固定請求與保存後計量。依據：[LangGraph sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)、[OpenAI 原件接續](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)；此安全交界不承諾 provider 與 PostgreSQL 共同原子提交。
 
 ## 3. 工作額度保存
 
@@ -75,7 +75,7 @@ asyncio 機制，期限與原 attempt 的責任仍集中於 `ModelRequestExecuto
 - 取消／writer 更換只停止新的准入與採用，不刪已發生的記帳。晚到結果仍可結算原 attempt，但記帳函式不恢復執行、不採用 R／C、不准派工具。沒有新外送時，讀原結果不受已耗盡額度阻擋。
 - SQL 禁止改寫／刪除固定 budget，禁止清除／改寫 attempt 身分與已知成本；不存另一份可失同步的計數器。FK 及 scope 查詢維持檔案隔離，成本採固定精度 Decimal，不用 float。
 
-驗證：[持久工作額度](../history.md#source-d76bfd79f21fb146c537)。設計依[PostgreSQL 行鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)及[單一重試責任](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)；原准入結果不等於重送許可。compact 預留不是硬性帳單上限。
+驗證：持久工作額度。設計依[PostgreSQL 行鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)及[單一重試責任](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)；原准入結果不等於重送許可。compact 預留不是硬性帳單上限。
 
 ## 4. 固定請求計數與容量准入
 
@@ -92,9 +92,9 @@ asyncio 機制，期限與原 attempt 的責任仍集中於 `ModelRequestExecuto
 - 遠端 count 也須先在原工作額度預留，短交易提交確認後才 HTTP；不增加模型 Step 數。不配置正數 `token_count_reservation_usd` 就拒絕 count。計數回應沒有計費 usage，故目前保留未知預留、不假定免費；該行政預留不是 provider 的硬帳單上限。沒有第二份計數器／收據。
 - 完成至少一個 Step 後的下一請求達 160K，進 [完整 C 保存、採用與中途接續](agent-execution.md#53-完整-c-保存採用與中途接續) 的明確 compact 接縫；尚未配置接縫則回報 `CompactionRequiredError`，保留原窗口、不發生成。首請求不受此中途門檻誤擋；合法 final／步數已耗盡不額外發 count。輪前 128K、pause 與取消相容基底分由 [跨工作的合法歷史選用](agent-execution.md#31-跨工作的合法歷史選用)、[完整 Step 暫停與原生續作](agent-execution.md#47-完整-step-暫停與原生續作)、[輪前歷史準備元件](agent-execution.md#55-輪前歷史準備元件)、[A 控制協調](agent-supervision.md#2-a-pausecancelresume-控制) 承接。
 
-依據：[OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting) 與[工作額度控制範例](https://developers.openai.com/cookbook/articles/per_run_spending_controller_responses_api)。本案採 exact payload、未知費用不歸零及 reasoning 不重算，持久准入仍由 executions 模組透過 PostgreSQL 短交易處理。provider／容量驗證見[計數驗證](../history.md#source-d76bfd79f21fb146c537)及[容量驗證](../history.md#source-6d2d7ab4abfedbf8416e)，實際帳單未由此核實。
+依據：[OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting) 與[工作額度控制範例](https://developers.openai.com/cookbook/articles/per_run_spending_controller_responses_api)。本案採 exact payload、未知費用不歸零及 reasoning 不重算，持久准入仍由 executions 模組透過 PostgreSQL 短交易處理。provider／容量驗證見計數驗證及容量驗證，實際帳單未由此核實。
 
-count 接續只需原 `input_tokens` 與 App attempt 綁定，不將計數變成模型 output item 或虛構 usage。沿 `count_input → check_capacity` sync 邊界補存，不另建節點、資料表或計數服務；驗證見[原計數補存](../history.md#source-d76bfd79f21fb146c537)。
+count 接續只需原 `input_tokens` 與 App attempt 綁定，不將計數變成模型 output item 或虛構 usage。沿 `count_input → check_capacity` sync 邊界補存，不另建節點、資料表或計數服務；驗證見原計數補存。
 
 ## 5. 單一外送重試責任
 
@@ -110,10 +110,10 @@ count 接續只需原 `input_tokens` 與 App attempt 綁定，不將計數變成
 
 - **原結果優先不變：** Graph 已保存的 R／C／count 直接接續；仍握有原件則走既有補存。此迴圈只 catch SDK 外送的 `APIError`，不包整個 Graph、不把保存／結算／工具錯誤當成 provider retry。成功收到完整結果後、交給 Graph 之前仍沒有 DB 操作。
 - **允許重試的證據：** 原本地 HTTP 呼叫已返回錯誤，分類為短暫服務或遠端結果未知，且安全故障記錄已提交。逾時仍可能已收費、曾遠端生成，但本機沒有完整 R；新推論是新 attempt，不冒充原結果。程序崩潰、准入 COMMIT 確認不明，或原失敗尚未可靠保存時仍維持 `Prior*AttemptError`，不靠不存在的遠端備份／時間到自動放行。
-- **串流錯誤分類：** HTTP 200 後的錯誤事件沿同一分類器處理。`rate_limit_exceeded`／`slow_down` 歸 `rate_limited`；`server_error`、`server_is_overloaded`、`service_unavailable` 歸暫時服務問題。沒有明確可重試代碼則停止，不猜測。沒有 header 的串流錯誤使用對應的 capped backoff。驗證見[串流錯誤](../history.md#source-d76bfd79f21fb146c537)與[限流等待](../history.md#source-d76bfd79f21fb146c537)。
+- **串流錯誤分類：** HTTP 200 後的錯誤事件沿同一分類器處理。`rate_limit_exceeded`／`slow_down` 歸 `rate_limited`；`server_error`、`server_is_overloaded`、`service_unavailable` 歸暫時服務問題。沒有明確可重試代碼則停止，不猜測。沒有 header 的串流錯誤使用對應的 capped backoff。驗證見串流錯誤與限流等待。
 - migration `0015_outbound_failures` 只在既有 attempt 增加 `failure_code`、`retry_not_before`。不保存 error body、prompt、token、模型輸出或另造 Graph cursor。故障原件不可覆寫／清除，重入相同結果冪等；晚到故障可記錄，但不恢復被取消的工作。報告成本仍獨立，不因失敗釋放未知預留。
 - **錯誤出口也須安全：** 停止重試時拋 `ModelRequestFailedError`，只攜帶安全分類、可取得的 HTTP status 與白名單 provider code，不把 SDK 原始 error 傳給 Graph 持久保存。保存失敗／取消仍保留本地錯誤型別、停止外送，抑制供應商例外鏈進入標準 traceback；取消不能被吞掉或當成 provider retry。這不宣稱任意第三方 tracing 的 frame locals 安全；不得啟用未經遮罩的原文／憑證紀錄。
-- **最小診斷：** create／count／compact 的共用外送邊界，在每次實際捕捉 `APIError` 時用既有 Python logger 記一則警告：操作種類、安全分類、HTTP status、白名單 code，以及 App 的 execution／request／attempt ID。串流錯誤沒有 HTTP status 就記 `None`；未知 code 也記 `None`，不輸出 exception、body、headers、輸入或 opaque reasoning。這則紀錄在故障保存之前，只證明捕捉到例外，**不是** 已保存、已回滾或已重試的回執；恢復仍查既有業務紀錄。不新增資料表／副本／重試責任，也不追補已遺失的舊原因。驗證見 [T06 §23](../history.md#source-d76bfd79f21fb146c537)。
+- **最小診斷：** create／count／compact 的共用外送邊界，在每次實際捕捉 `APIError` 時用既有 Python logger 記一則警告：操作種類、安全分類、HTTP status、白名單 code，以及 App 的 execution／request／attempt ID。串流錯誤沒有 HTTP status 就記 `None`；未知 code 也記 `None`，不輸出 exception、body、headers、輸入或 opaque reasoning。這則紀錄在故障保存之前，只證明捕捉到例外，**不是** 已保存、已回滾或已重試的回執；恢復仍查既有業務紀錄。不新增資料表／副本／重試責任，也不追補已遺失的舊原因。驗證見 T06 §23。
 - **尊重服務端等待：** 支援 `retry-after-ms`、秒數及 HTTP-date；有效長等待不截短到本機 backoff 上限。無有效 header 才作 capped exponential backoff，普通暫時故障預設 2 秒起、30 秒封頂，再乘 0.75–1 的 jitter；非限流 attempts 每請求預設最多 8 次。實際工作限制從原 budget 讀取；不可表示的超大等待明確停止，不退回短等待。
 - **限流採等待政策：** HTTP 429 或串流的 `rate_limit_exceeded`／`slow_down` 分為 `rate_limited`，保存最早重試時間。有 `Retry-After` 就照做，沒有則預設 10 秒起、60 秒封頂，再乘 0.75–1 的 jitter。限流 attempt 不占每請求的非限流次數上限，仍占工作外送總數並受 deadline 限制；預設總數 512、工作時限 1,800 秒，以[ModelSettings](../../apps/api/src/caliburn/settings.py)為準。等待中持續核對 writer、取消與時限，完整 Step 的暫停規則不變。
 - 最早重試時間用 DB clock 計算並保存；重開不重新抽 jitter／縮短舊等待。等待在交易外，每至多一秒重核 writer、取消與 deadline。等待前沿 executions 原准入規則核成本與總次數，已耗盡就立即停止；共用 `check_outbound_capacity()` 只檢查、不產生外送許可，等待結束仍須新 attempt 確認提交。Retry-After 已超過工作期限直接停止，額度不足不擴費。同 request 指紋不可換；新 attempt 不增加模型邏輯 Step／compact 次數，但外送次數及成本逐次計。
@@ -121,7 +121,7 @@ count 接續只需原 `input_tokens` 與 App attempt 綁定，不將計數變成
 
 依據：[OpenAI 錯誤與 Retry-After 指引](https://developers.openai.com/api/docs/guides/error-codes#python-library-error-types)、核本機 SDK 3.20.0 header／jitter 原碼；借鑑 [Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)的單一責任、分類及整體交易考量。未直接啟用 SDK／LangGraph／通用 decorator，是因它們的隱含 attempts 不承接本案持久費用准入；純等待計算不需要新依賴。這是本案接線，不聲稱業界共同採同一資料表。
 
-**恢復限制：** 沒有可靠失敗紀錄的 attempt 不具備重送資格。程序原件遺失時，由 [最外層失敗收尾](agent-supervision.md#3-最外層失敗收尾) 的 A／Memory 完成工作流核對正式結果並安全收尾，不自動再推論；手上仍有原件才走 [原件補存的有限自動恢復](agent-execution.md#56-原件補存的有限自動恢復) 的有限補存。驗證見[外送重試](../history.md#source-d76bfd79f21fb146c537)。
+**恢復限制：** 沒有可靠失敗紀錄的 attempt 不具備重送資格。程序原件遺失時，由 [最外層失敗收尾](agent-supervision.md#3-最外層失敗收尾) 的 A／Memory 完成工作流核對正式結果並安全收尾，不自動再推論；手上仍有原件才走 [原件補存的有限自動恢復](agent-execution.md#56-原件補存的有限自動恢復) 的有限補存。驗證見外送重試。
 
 ## 6. 固定費率與 usage 成本估算
 
@@ -139,7 +139,7 @@ count 接續只需原 `input_tokens` 與 App attempt 綁定，不將計數變成
 
 `reported_cost_usd` 是依 usage 及固定規則計算的成本估算，**不是 provider 確認帳單或硬性帳單上限** 。區域、合約、其他模態／內建工具及其他服務 tier 不在此配置支援範圍；算術與 provider wire 驗證不能核實帳戶最終帳單。
 
-依據：[官方 pricing](https://developers.openai.com/api/docs/pricing)、[cache read／write 算式](https://developers.openai.com/api/docs/guides/prompt-caching#monitor-cache-performance)、[Compact default tier 與回傳契約](https://developers.openai.com/api/reference/python/resources/responses/methods/compact)、[input token count](https://developers.openai.com/api/docs/guides/token-counting)。官方定義費率／usage，本案選擇固定配置、九位向上捨入及未知預留。實測見 [T06 §17](../history.md#source-d76bfd79f21fb146c537)。
+依據：[官方 pricing](https://developers.openai.com/api/docs/pricing)、[cache read／write 算式](https://developers.openai.com/api/docs/guides/prompt-caching#monitor-cache-performance)、[Compact default tier 與回傳契約](https://developers.openai.com/api/reference/python/resources/responses/methods/compact)、[input token count](https://developers.openai.com/api/docs/guides/token-counting)。官方定義費率／usage，本案選擇固定配置、九位向上捨入及未知預留。實測見 T06 §17。
 
 ## 7. 產品與付費驗證的金額界線
 
@@ -152,4 +152,4 @@ count 接續只需原 `input_tokens` 與 App attempt 綁定，不將計數變成
 - 原 R 還原時，僅計費 `usage` 以 SDK `ResponseUsage.model_construct()` 保留其實際收到／缺省的欄位；其餘 envelope／output 仍走 `Response.model_validate()`，工具與 phase 仍由原執行檢查。這與 SDK 3.20.0 接收部分明細的行為一致，不為缺欄補零、不修改保存原件、不將整個回應改成無驗證還原。C 已沿既有原生還原與完整 output window 檢查，不另加一套序列化。
 - 記錄的金額不是 OpenAI 帳單；供應商金鑰／實際帳戶額度失敗仍依原錯誤分類停止無效重試。沒有產品金額 gate 不等於 API 免費或工程測試可無限外送。
 
-官方機制：使用 [Alembic `alter_column(nullable=True)`](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.alter_column)與 [SQLAlchemy nullable mapping](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#mapped-column-derives-the-datatype-and-nullability-from-the-mapped-annotation)，不手改舊 migration／另造配置引擎；完整 request 計數沿 [OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting)。這是產品決策，不宣稱供應商要求取消費用 gate。驗證與限制見 [T06 §19](../history.md#source-d76bfd79f21fb146c537)。
+官方機制：使用 [Alembic `alter_column(nullable=True)`](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.alter_column)與 [SQLAlchemy nullable mapping](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#mapped-column-derives-the-datatype-and-nullability-from-the-mapped-annotation)，不手改舊 migration／另造配置引擎；完整 request 計數沿 [OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting)。這是產品決策，不宣稱供應商要求取消費用 gate。驗證與限制見 T06 §19。

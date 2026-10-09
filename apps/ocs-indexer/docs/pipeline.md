@@ -104,6 +104,6 @@ hybrid_search(level="profile"|"task", limit=top_k)
 
 - 面 / 端點 / payload schema:[`../README.md`](../README.md)。
 - ADR:[0003](../../../docs/adr/0003-indexer-stays-separate-service.md)(獨立服務)·[0009](../../../docs/adr/0009-embedding-version-manifest.md)(manifest / 相容)·[0010](../../../docs/adr/0010-indexer-contract-shared-package.md)(契約 #2)·[0012](../../../docs/adr/0012-embedding-as-a-service.md)(embedder 服務化)。
-- 來源 JSON 契約:[`apps/pdf-to-json/README.md`](../../pdf-to-json/README.md) §6.3;取用注意事項 [`docs/ocs-source-json.md`](../../../docs/history.md#source-342210e06cceeff43952)。
-- 舊產品知識包消費沿革：[editor knowledge pack 歷史取回](../../../docs/history.md#source-342210e06cceeff43952)；現行 App 的可選 HTTP 接入見 [API README](../../api/README.md#公版參考工具的可選啟用)。
+- 來源 JSON 契約:[`apps/pdf-to-json/README.md`](../../pdf-to-json/README.md) §6.3;取用注意事項 當時的內部紀錄。
+- 舊產品知識包消費沿革：editor knowledge pack 歷史取回；現行 App 的可選 HTTP 接入見 [API README](../../api/README.md#公版參考工具的可選啟用)。
 - 文件維護：[文件導覽](../../../docs/README.md)、[文件與圖面規範](../../../docs/standards/documentation-standard.md)。

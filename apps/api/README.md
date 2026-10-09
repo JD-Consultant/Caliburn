@@ -20,7 +20,7 @@
 
 預設精確信任本機 5173／8100 Origin。隔離測試若使用第二個前端埠，可在**該後端啟動前**指定 `CALIBURN_DEV_ORIGIN=http://127.0.0.1:5174`；只接受一個帶明確埠的 HTTP loopback Origin（`127.0.0.1`、`localhost` 或 `[::1]`），非法配置在啟動前拒絕，不放寬其他埠、Host 或 cross-site 防護。前端 proxy 必須保留原始 Origin，具體隔離啟動見[前端 README](../web/README.md#合成資料瀏覽器驗收)。這不是對外部署／認證方案。
 
-Windows 的 psycopg async 不支援預設 Proactor loop，因此明確使用 Python／Uvicorn 支援的 Selector factory，而非已棄用的全域 event-loop policy。PDF renderer 使用獨立的瀏覽器執行環境；Windows 中文短／長版及同機獨立 wheel／新 PDF 資源已有驗證，不能據此推論跨平台結果，見[介面交付](../../docs/implementation/interface-and-delivery.md#4-pdf-與程序)及 [PDF 驗證紀錄](../../docs/history.md#source-25de60a3e4266687fd86)。
+Windows 的 psycopg async 不支援預設 Proactor loop，因此明確使用 Python／Uvicorn 支援的 Selector factory，而非已棄用的全域 event-loop policy。PDF renderer 使用獨立的瀏覽器執行環境；Windows 中文短／長版及同機獨立 wheel／新 PDF 資源已有驗證，不能據此推論跨平台結果，見[介面交付](../../docs/implementation/interface-and-delivery.md#4-pdf-與程序)及 PDF 驗證紀錄。
 
 ### 後端入口（`pnpm start`／`pnpm dev` 所用）
 
@@ -46,7 +46,7 @@ uv run --project apps/api --locked python apps/api/scripts/run_backend.py --key-
 
 開啟 `http://127.0.0.1:8100`，不需另外啟動 Vite；職務頁可以直接開啟或重新整理。只使用人工 JD 時省略 `--key-file` 並勿設定 `OPENAI_API_KEY`。PDF 字型／Chromium 仍依下節配置；靜態入口不會代為建庫、遷移或提供模型憑證。
 
-只指定可信的**公開建置目錄**，不要指向 repo、原始碼或秘密目錄；缺目錄／`index.html` 會啟動失敗。未設定此變數時維持 API-only。既有程序不會自動切換；先確認身分再停止自己啟動的程序，勿為此中斷別人的 Demo。更換建置時重新啟動自有服務，不使用 `vite preview` 作交付 server。接線與驗證界線見[交付預備證據](../../docs/history.md#source-25de60a3e4266687fd86)。
+只指定可信的**公開建置目錄**，不要指向 repo、原始碼或秘密目錄；缺目錄／`index.html` 會啟動失敗。未設定此變數時維持 API-only。既有程序不會自動切換；先確認身分再停止自己啟動的程序，勿為此中斷別人的 Demo。更換建置時重新啟動自有服務，不使用 `vite preview` 作交付 server。
 
 ## 資料庫設定
 
@@ -65,13 +65,13 @@ migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade h
 
 日常入口 `pnpm start`／`pnpm dev` 會要求資料庫設定；上述「未配置 DB 時 health 可用」只適用於直接啟動的最低層診斷入口。版本更新流程見[操作手冊](../../docs/operations/native-development.md#更新已有安裝)。
 
-**JD 模型短定位（0023）：**升級前讓執行中的工作停在安全點，停止原後端後，沿上述相同 DB／schema 設定執行 `pnpm app:migrate`，再 `pnpm start`。0023 新增模型定位映射，不重建 JD 或改寫原模型歷史。目前模型入口只接受 App 已配發的 `task_12`／`citation_18` 等短定位，拒絕模型直接傳入 UUID；prepared facts 的內部 canonical 身分保持。映射由 App 自動發配，不能手動重排／重設序號／清表；前端 HTTP 仍使用原 UUID，無須為此重建前端。設計與驗證見 [JD 保存 §3.2](../../docs/implementation/jd-storage.md#32-模型導覽與既有物件定位)及 [T14 §8](../../docs/history.md#source-098e24f247a9411844be)。
+**JD 模型短定位（0023）：**升級前讓執行中的工作停在安全點，停止原後端後，沿上述相同 DB／schema 設定執行 `pnpm app:migrate`，再 `pnpm start`。0023 新增模型定位映射，不重建 JD 或改寫原模型歷史。目前模型入口只接受 App 已配發的 `task_12`／`citation_18` 等短定位，拒絕模型直接傳入 UUID；prepared facts 的內部 canonical 身分保持。映射由 App 自動發配，不能手動重排／重設序號／清表；前端 HTTP 仍使用原 UUID，無須為此重建前端。設計與驗證見 [JD 保存 §3.2](../../docs/implementation/jd-storage.md#32-模型導覽與既有物件定位)及 T14 §8。
 
-完整 migration 位於 `src/caliburn/migrations` 並隨 Python wheel 交付；CLI 與程式都用 Alembic 的 `caliburn:migrations` 套件資源定位，不依賴 checkout 的相對路徑。非 editable 安裝可使用 `uv sync --project apps/api --locked --no-editable`，後續 `uv run` 也帶 `--no-editable`，避免重新同步成開發模式。2026-10-01 已驗新 venv／實際 wheel、空測試 schema、同源建置、人工 JD 保存與重啟，續驗已補同機 PDF；不是另一台電腦、模型品質或正式切換全部通過，見[證據](../../docs/history.md#source-25de60a3e4266687fd86)。
+完整 migration 位於 `src/caliburn/migrations` 並隨 Python wheel 交付；CLI 與程式都用 Alembic 的 `caliburn:migrations` 套件資源定位，不依賴 checkout 的相對路徑。非 editable 安裝可使用 `uv sync --project apps/api --locked --no-editable`，後續 `uv run` 也帶 `--no-editable`，避免重新同步成開發模式。封裝、同源交付及產品行為須在目標安裝環境分別驗證。
 
 ## API 與執行紀錄
 
-**公版參考工具（可選接線）：**`OccupationReferenceTools` 已可接入顧問 runner；未配置時維持原工具清單，不建立 RAG HTTP client。沒有新增 App HTTP 路由。模型 schema 位於 `contracts/tools/`；綁定、prepare／execute 與生效資格見[工具契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型)，[驗證紀錄](../../docs/experiments/engineering/README.md#角色接線)記錄驗證。`0024` 新增此 feature 的兩張表，本輪只套用隔離測試 schema，既有安裝仍循上述 `pnpm app:migrate` 流程。
+**公版參考工具（可選接線）：**`OccupationReferenceTools` 已可接入顧問 runner；未配置時維持原工具清單，不建立 RAG HTTP client。沒有新增 App HTTP 路由。模型 schema 位於 `contracts/tools/`；綁定、prepare／execute 與生效資格見[工具契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#工具與保存契約未接模型)，驗證紀錄記錄驗證。`0024` 新增此 feature 的兩張表，本輪只套用隔離測試 schema，既有安裝仍循上述 `pnpm app:migrate` 流程。
 
 **Memory 排除範圍讀取：**啟用後 B1／B2 只增加 `read_excluded_work({})`，只回 `excluded_work`，沿現有 `MemoryReadBinding` 固定訪談上界與 stage 資格；不需 RAG HTTP client、不複製 Memory、不給選公版或寫入能力。schema、使用方式及時序反例見[唯讀契約](../../docs/specs/2026-10-04-public-reference-completion-design.md#memory-的排除範圍唯讀入口未接模型)。
 
@@ -90,9 +90,9 @@ $env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
 
 顧問新增五工具，B1／B2 新增一個唯讀工具；角色已保存的 preparation／context／Step 繼續原工具清單，新設定只影響新的未綁定請求。關閉前先讓使用公版的 A Turn 完成；原請求需要 RAG 而 client 配置消失時會明確拒絕，不靜默換工具。RAG 下線回工具錯誤，不視為查無結果、不清 state。client 不使用系統代理、不跟隨重導，由 App 關閉。
 
-**找回進行中的訪談：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 可依職務檔案找回進行中／暫停的 A，不需瀏覽器先保存 execution／command ID；回傳 `{"turn": <既有公開狀態>}` 或明確 `{"turn": null}`，未知檔案 404。不啟動／恢復模型、不返回 Memory 或終態歷史。狀態也可經 `/consultant-turns/{execution_id}` 或 `/consultant-turns/by-command/{command_id}` 重取；驗證見[原始紀錄](../../docs/history.md#source-c8ea469844e955e1447b)。
+**找回進行中的訪談：**`GET /api/job-files/{job_file_id}/consultant-turns/current` 可依職務檔案找回進行中／暫停的 A，不需瀏覽器先保存 execution／command ID；回傳 `{"turn": <既有公開狀態>}` 或明確 `{"turn": null}`，未知檔案 404。不啟動／恢復模型、不返回 Memory 或終態歷史。狀態也可經 `/consultant-turns/{execution_id}` 或 `/consultant-turns/by-command/{command_id}` 重取。
 
-**離線回看：**只要原 DB 可用，即使未配置模型，也可透過既有 PostgreSQL checkpointer 讀取已保存的公開中間訊息；不建立模型 client、不啟動執行 supervisor。`POST /inputs` 只在模型與 supervisor 就緒時接受新工作；沒有模型設定時回 `503 model_not_configured`，既有命令仍可查回原結果，不為回看而重跑模型。驗證見 [T17 紀錄](../../docs/history.md#source-98d840caa9eed7fb2840)。
+**離線回看：**只要原 DB 可用，即使未配置模型，也可透過既有 PostgreSQL checkpointer 讀取已保存的公開中間訊息；不建立模型 client、不啟動執行 supervisor。`POST /inputs` 只在模型與 supervisor 就緒時接受新工作；沒有模型設定時回 `503 model_not_configured`，既有命令仍可查回原結果，不為回看而重跑模型。
 
 下列入口涵蓋職務檔案、正式訪談與人工 JD 編輯。讀取入口提供目前資料或固定修訂；修改入口沿命令與讀取基底處理重送及衝突。具體 DTO 由 `/openapi.json` 與 `contracts/http/` 生成：
 
@@ -107,8 +107,8 @@ $env:CALIBURN_OCCUPATION_REFERENCE_REQUEST_TIMEOUT_SECONDS = '30'
 - `GET /api/job-files/{job_file_id}/jd/capabilities`：同一固定修訂的共用知識／技能定義與有序 `task_links`；正文不在任務內複製。`POST` 同路徑以 `change.action` 增修刪定義、概覽排序、連結／解除任務或排序任務關係。仍被使用的定義刪除回 409 `capability_in_use`；刪任務保留定義。知識與技能不能跨類排序或改類別，命令／基底／准入沿原規則；原結果按原修訂回讀。完整形狀以 `edit-jd-capabilities-request.schema.json` 為準。模型經 JD 工具編輯候選，不直接使用此人工編輯端點。
 - `GET /api/job-files/{job_file_id}/jd/work`：供人工 UI 組合讀取同一固定修訂的職責、任務及明細、知識／技能與任務關係、協作對象與共通條件；先固定 head，重用既有投影，不另存資料。各集合的獨立 GET 不承諾跨請求相同修訂；需要一個集合編輯畫面基底時使用此入口。
 - `GET/POST /api/job-files/{job_file_id}/jd/collaborators`：主要協作對象的固定集合及新增、局部修訂、排序、刪除。名稱／合作範圍至少一欄有內容；未指定保留、null 清空不能清成空項。`GET/POST .../jd/conditions`：全職務共通條件，五類各自排序；明確修訂分類保留身分並放目的類末尾，不自動套到任務。兩者沿同一 JD 命令／基底／准入與歷史規則，完整 shape 依 `contracts/http/`；已接人工 UI 與同版 `/jd/work`，不是模型候選入口。
-- `GET /api/job-files/{job_file_id}/interview-plan`：只讀正式 frontier 採用的顧問工作計畫，回 `{job_file_id, plan}`；未建立為 null，刻意清空保留空字串，讀取不可用不冒充空值。active／paused 的同 Turn 候選沿原 status `plan_preview` 投影，終局不供候選。資料權責、原能力及恢復契約見 [INTPLAN](../../docs/specs/2026-10-06-consultant-interview-planning-and-focus-design.md)；現行內容用途見 [Plan §10](../../docs/specs/2026-10-06-consultant-interview-planning-and-focus-design.md#10-jd-工作計畫內容與用法)；[本次工程證據](../../docs/plans/evidence/jd-work-plan-2026-10-08.md)與已完成的有限真模型比較分開；該比較未呈現可辨整體增益，原 wire／保存／恢復保持。
-- `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，原命令重送回原接受結果／200；不同內容重用命令或已有其他 A 回 409。提交後 supervisor 執行既有 runner；未配置模型回 503，不接受無法執行的工作。取消後重新提交須用新命令；不提供任意正式化 API。驗證見 [A 執行紀錄](../../docs/history.md#source-f5df4f496aad7b909036)。
+- `GET /api/job-files/{job_file_id}/interview-plan`：只讀正式 frontier 採用的顧問工作計畫，回 `{job_file_id, plan}`；未建立為 null，刻意清空保留空字串，讀取不可用不冒充空值。active／paused 的同 Turn 候選沿原 status `plan_preview` 投影，終局不供候選。資料權責、原能力及恢復契約見 [INTPLAN](../../docs/specs/2026-10-06-consultant-interview-planning-and-focus-design.md)；現行內容用途見 [Plan §10](../../docs/specs/2026-10-06-consultant-interview-planning-and-focus-design.md#10-jd-工作計畫內容與用法)。
+- `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，原命令重送回原接受結果／200；不同內容重用命令或已有其他 A 回 409。提交後 supervisor 執行既有 runner；未配置模型回 503，不接受無法執行的工作。取消後重新提交須用新命令；不提供任意正式化 API。
 
 ### PDF 執行依賴
 
@@ -123,7 +123,7 @@ $env:CALIBURN_PDF_FONT_PATH = 'C:/path/to/licensed/NotoSansTC-VF.ttf'
 
 可選 `CALIBURN_PDF_CHROMIUM_PATH` 指定與已鎖 Playwright 相容的 Chromium **執行檔**；未指定時使用 Playwright 已安裝的瀏覽器。若安裝時自訂 `PLAYWRIGHT_BROWSERS_PATH`，啟動後端時也保留同一值。下載失敗先依官方文件檢查網路／代理與版本，不改用任意系統瀏覽器冒充已驗環境、不關閉 TLS 檢查。
 
-配置須在啟動後端前提供。`GET /api/job-files/{id}/jd/export.pdf` 固定讀正式 JD，候選不匯出；缺配置明確回 503，不下載空檔。實際驗證與文字抽取限制見 [PDF 紀錄](../../docs/history.md#source-409f20a1c297740aed7d)及[驗證範圍](../../docs/architecture/verification.md)。
+配置須在啟動後端前提供。`GET /api/job-files/{id}/jd/export.pdf` 固定讀正式 JD，候選不匯出；缺配置明確回 503，不下載空檔。實際驗證與文字抽取限制見 [驗證範圍](../../docs/architecture/verification.md)。
 
 ## 驗證
 
@@ -153,9 +153,9 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://測試帳號:測試密碼@127.0.
 uv run --project apps/api --locked pytest apps/api/tests/integration -m postgres -q
 ```
 
-SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG probe 只驗框架原生字典及既存 node 接續，不能替代 T06／T12 的業務副作用、取消與故障驗收。真 API 測試必須另外依[有界授權](../../docs/history.md#source-ee8cbce8eb3c303d1765)執行。
+SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG probe 只驗框架原生字典及既存 node 接續，不能替代 T06／T12 的業務副作用、取消與故障驗收。真 API 測試必須另外依有界授權執行。
 
-長訪談評測由 `scripts/simulate_interview.py` 明示啟動，不在測試或 App 啟動時自動執行。已診斷的中斷可保留原輸出路徑及旅程參數，以 `--resume-job-file`、`--resume-execution`、原絕對 `--deadline` 接續；先核對並等待指定原執行，只有已確認終止才依原旅程的重送政策處理，不因查詢失敗自行重送。完整參數見 `--help`，批准範圍、費用／時間與實際結果見 [T17 續跑修訂 A2](../../docs/history.md#source-98d840caa9eed7fb2840)。`.progress.jsonl` 與 `.events.jsonl` 是評測證據，不能代替產品的正式訪談／執行保存。
+長訪談評測由 `scripts/simulate_interview.py` 明示啟動，不在測試或 App 啟動時自動執行。已診斷的中斷可保留原輸出路徑及旅程參數，以 `--resume-job-file`、`--resume-execution`、原絕對 `--deadline` 接續；先核對並等待指定原執行，只有已確認終止才依原旅程的重送政策處理，不因查詢失敗自行重送。完整參數見 `--help`，每次執行另行確認授權資料、費用與時間範圍。`.progress.jsonl` 與 `.events.jsonl` 是評測證據，不能代替產品的正式訪談／執行保存。
 
 ### 顧問推理摘要
 
@@ -171,4 +171,4 @@ SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG 
 
 後端 logger `caliburn.workflows.model_requests` 以 JSONL 事件 `model.request_failed` 記錄實際外送失敗：操作、安全分類、HTTP status、白名單 provider code，以及 App 本地 execution／request／attempt ID。可依這些 ID 核對既有執行紀錄；它們不是可向 OpenAI 取回遺失回應的遠端 ID。`null` 表示未取得 HTTP status 或 code 不在白名單，不能據此推定沒有錯誤。正式啟動入口的輸出、等級及 HTTP 關聯見 [Log 操作](../../docs/operations/README.md#一般-log-與-http-關聯)。
 
-此警告不代表故障已保存、重試／回滾已完成。正文沿受控診斷查閱，不開啟原始 HTTP body、opaque reasoning 或秘密日誌。既有接線沿革見 [T06 §23](../../docs/history.md#source-d76bfd79f21fb146c537)，本輪結構化輸出與查閱修正見[重構證據](../../docs/plans/evidence/full-system-review-2026-10-08.md)。
+此警告不代表故障已保存、重試／回滾已完成。正文沿受控診斷查閱，不開啟原始 HTTP body、opaque reasoning 或秘密日誌。

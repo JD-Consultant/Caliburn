@@ -99,13 +99,13 @@ App 自主管理模型輸入與接續政策：選擇合法資料、固定當輪�
 - 真人顧問投入、員工事前學習及實際訪談／修正時間的效果尚未驗證；不承諾固定節省比例或完成時限。
 - Memory 最終失敗後何時允許新批次，仍有待確認政策；資料庫重啟後的 App 恢復限制、PDF 文字複製／搜尋限制亦須依現行紀錄判讀。
 
-各項測試結果見[驗證與限制](../architecture/verification.md)、[實驗發現](../reports/experiment-findings.md)及[產品實驗資料](../experiments/product-validation/README.md)。
+各項測試結果見[驗證與限制](../architecture/verification.md)、實驗發現。
 
 ## 延伸閱讀
 
 | 主題 | 閱讀入口 |
 |---|---|
 | 如何訪談、分析完整工作及撰寫 JD | [工作分析](../standards/work-analysis/2026-09-09-complete-work-analysis-guide.md)、[追問與深度校準](../standards/work-analysis/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[JD 寫作](../standards/work-analysis/2026-09-09-jd-field-and-writing-guide.md) |
-| 系統分工、資料流與分析流程 | [架構導覽](../architecture/README.md)、[系統架構報告](../reports/system-architecture/README.md) |
+| 系統分工、資料流與分析流程 | [架構導覽](../architecture/README.md) |
 | 使用介面、安全及日常操作 | [互動與運作](../architecture/delivery-and-operations.md)、[操作手冊](../operations/README.md) |
-| 測試結果、方法與原始資料 | [驗證與限制](../architecture/verification.md)、[產品實驗資料](../experiments/product-validation/README.md) |
+| 測試結果、方法與原始資料 | [驗證與限制](../architecture/verification.md) |

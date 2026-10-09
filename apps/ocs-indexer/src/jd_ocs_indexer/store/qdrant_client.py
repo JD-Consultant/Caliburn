@@ -37,4 +37,9 @@ def make_client(
         api_key=api_key,
         timeout=timeout,
         prefer_grpc=False,
+        trust_env=False,
+        # The SDK's background version probe creates a separate HTTP client that
+        # ignores trust_env and can forward API keys to an ambient proxy.
+        # Deployment pins the server/client pair; all runtime I/O uses this client.
+        check_compatibility=False,
     )

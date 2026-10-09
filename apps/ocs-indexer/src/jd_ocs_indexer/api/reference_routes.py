@@ -29,7 +29,7 @@ from jd_ocs_indexer.references.source import PREPROCESSING, ReferenceDocument
 router = APIRouter(tags=["occupation-references"])
 
 
-def get_reference_search(request: Request) -> ReferenceSearch | None:
+async def get_reference_search(request: Request) -> ReferenceSearch | None:
     service = request.app.state.reference_search
     if service is not None and not isinstance(service, ReferenceSearch):
         raise RuntimeError("invalid reference search dependency")
@@ -96,8 +96,7 @@ async def search_occupation_references(
     service = require_reference_search(service)
 
     def search() -> ReferenceSearchResponse:
-        with request.app.state.embed_lock:
-            result = service.search(body.query, limit=body.limit)
+        result = service.search(body.query, limit=body.limit)
         return ReferenceSearchResponse(
             references=[
                 OccupationReferenceHit(
@@ -123,7 +122,7 @@ async def search_occupation_references(
             ),
         )
 
-    return await run_in_threadpool(search)
+    return await request.app.state.retrieval.run(search)
 
 
 @router.get(

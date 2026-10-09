@@ -56,7 +56,9 @@ class HttpEmbedder:
     ) -> None:
         self._base = base_url.rstrip("/")
         self._owns_client = client is None
-        self._client = client or httpx.Client(base_url=self._base, timeout=timeout_s)
+        self._client = client or httpx.Client(
+            base_url=self._base, timeout=timeout_s, trust_env=False
+        )
 
     def close(self) -> None:
         if self._owns_client:

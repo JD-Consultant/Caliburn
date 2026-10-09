@@ -1,0 +1,270 @@
+# Dependency policies: docs/standards/code-organization.md section 2.
+# Import Linter owns import resolution; TYPE_CHECKING remains part of the graph.
+[importlinter]
+root_package = caliburn
+include_external_packages = True
+exclude_type_checking_imports = False
+
+[importlinter:contract:adapters-direction]
+name = adapters: dependencies point toward owned lower layers
+type = forbidden
+source_modules =
+	caliburn.adapters
+forbidden_modules =
+	caliburn.features
+	caliburn.agent_execution
+	caliburn.workflows
+	caliburn.transport
+	caliburn.agents
+	caliburn.settings
+	caliburn.bootstrap
+
+[importlinter:contract:features-direction]
+name = features: dependencies point toward owned lower layers
+type = forbidden
+source_modules =
+	caliburn.features
+forbidden_modules =
+	caliburn.workflows
+	caliburn.transport
+	caliburn.contracts
+	caliburn.agents
+	caliburn.bootstrap
+
+[importlinter:contract:agent_execution-direction]
+name = agent_execution: dependencies point toward owned lower layers
+type = forbidden
+source_modules =
+	caliburn.agent_execution
+forbidden_modules =
+	caliburn.features
+	caliburn.workflows
+	caliburn.transport
+	caliburn.agents
+	caliburn.bootstrap
+
+[importlinter:contract:workflows-direction]
+name = workflows: dependencies point toward owned lower layers
+type = forbidden
+source_modules =
+	caliburn.workflows
+forbidden_modules =
+	caliburn.transport
+	caliburn.contracts
+	caliburn.agents
+	caliburn.bootstrap
+
+[importlinter:contract:transport-direction]
+name = transport: dependencies point toward owned lower layers
+type = forbidden
+source_modules =
+	caliburn.transport
+forbidden_modules =
+	caliburn.agents
+	caliburn.bootstrap
+
+[importlinter:contract:agents-direction]
+name = agents: dependencies point toward owned lower layers
+type = forbidden
+source_modules =
+	caliburn.agents
+forbidden_modules =
+	caliburn.bootstrap
+
+[importlinter:contract:composition-is-external]
+name = Product layers do not import composition options or offline diagnostics
+type = forbidden
+source_modules =
+	caliburn.adapters
+	caliburn.features
+	caliburn.agent_execution
+	caliburn.workflows
+	caliburn.transport
+	caliburn.agents
+forbidden_modules =
+	caliburn.app_composition
+	caliburn.diagnostics
+
+[importlinter:contract:retired-packages]
+name = Retired standalone authorities cannot re-enter the App
+type = forbidden
+source_modules =
+	caliburn
+forbidden_modules =
+	jd_relational
+	caliburn_memory
+
+[importlinter:contract:transport-no-sql]
+name = Transport delegates persistence through workflows or feature APIs
+type = forbidden
+source_modules =
+	caliburn.transport
+forbidden_modules =
+	sqlalchemy
+	psycopg
+allow_indirect_imports = True
+
+[importlinter:contract:executions-persistence]
+name = executions: persistence belongs to its feature
+type = protected
+protected_modules =
+	caliburn.features.executions.budget_persistence
+	caliburn.features.executions.history_persistence
+	caliburn.features.executions.persistence
+allowed_importers =
+	caliburn.features.executions
+	caliburn.workflows
+	caliburn.diagnostics
+	caliburn.migrations
+
+[importlinter:contract:interview_plans-persistence]
+name = interview_plans: persistence belongs to its feature
+type = protected
+protected_modules =
+	caliburn.features.interview_plans.persistence
+allowed_importers =
+	caliburn.features.interview_plans
+	caliburn.workflows
+	caliburn.diagnostics
+	caliburn.migrations
+
+[importlinter:contract:interviews-persistence]
+name = interviews: persistence belongs to its feature
+type = protected
+protected_modules =
+	caliburn.features.interviews.persistence
+allowed_importers =
+	caliburn.features.interviews
+	caliburn.workflows
+	caliburn.diagnostics
+	caliburn.migrations
+
+[importlinter:contract:job_description-persistence]
+name = job_description: persistence belongs to its feature
+type = protected
+protected_modules =
+	caliburn.features.job_description.area_persistence
+	caliburn.features.job_description.candidate_persistence
+	caliburn.features.job_description.capability_persistence
+	caliburn.features.job_description.collaborator_persistence
+	caliburn.features.job_description.condition_persistence
+	caliburn.features.job_description.model_reference_persistence
+	caliburn.features.job_description.persistence
+	caliburn.features.job_description.source_persistence
+	caliburn.features.job_description.task_persistence
+allowed_importers =
+	caliburn.features.job_description
+	caliburn.workflows
+	caliburn.diagnostics
+	caliburn.migrations
+
+[importlinter:contract:job_files-persistence]
+name = job_files: persistence belongs to its feature
+type = protected
+protected_modules =
+	caliburn.features.job_files.persistence
+allowed_importers =
+	caliburn.features.job_files
+	caliburn.workflows
+	caliburn.diagnostics
+	caliburn.migrations
+
+[importlinter:contract:occupation_references-persistence]
+name = occupation_references: persistence belongs to its feature
+type = protected
+protected_modules =
+	caliburn.features.occupation_references.persistence
+allowed_importers =
+	caliburn.features.occupation_references
+	caliburn.workflows
+	caliburn.diagnostics
+	caliburn.migrations
+
+[importlinter:contract:work_memory-persistence]
+name = work_memory: persistence belongs to its feature
+type = protected
+protected_modules =
+	caliburn.features.work_memory.batch_persistence
+	caliburn.features.work_memory.position_persistence
+	caliburn.features.work_memory.revision_persistence
+allowed_importers =
+	caliburn.features.work_memory
+	caliburn.workflows
+	caliburn.diagnostics
+	caliburn.migrations
+
+[importlinter:contract:job_consultant-role]
+name = job_consultant: roles cannot depend on another role
+type = forbidden
+source_modules =
+	caliburn.agents.job_consultant
+forbidden_modules =
+	caliburn.agents.work_situation_analyst
+	caliburn.agents.work_understanding_analyst
+
+[importlinter:contract:memory_analysis-role]
+name = memory_analysis: roles cannot depend on another role
+type = forbidden
+source_modules =
+	caliburn.agents.memory_analysis
+forbidden_modules =
+	caliburn.agents.job_consultant
+	caliburn.agents.work_situation_analyst
+	caliburn.agents.work_understanding_analyst
+
+[importlinter:contract:work_situation_analyst-role]
+name = work_situation_analyst: roles cannot depend on another role
+type = forbidden
+source_modules =
+	caliburn.agents.work_situation_analyst
+forbidden_modules =
+	caliburn.agents.job_consultant
+	caliburn.agents.work_understanding_analyst
+
+[importlinter:contract:work_understanding_analyst-role]
+name = work_understanding_analyst: roles cannot depend on another role
+type = forbidden
+source_modules =
+	caliburn.agents.work_understanding_analyst
+forbidden_modules =
+	caliburn.agents.job_consultant
+	caliburn.agents.work_situation_analyst
+
+[importlinter:contract:pure-domain]
+name = Domain values and transformations have no transitive I/O dependency
+type = forbidden
+source_modules =
+	caliburn.features.executions.budget_models
+	caliburn.features.executions.history_models
+	caliburn.features.executions.models
+	caliburn.features.interview_plans.models
+	caliburn.features.interviews.models
+	caliburn.features.job_description.area_changes
+	caliburn.features.job_description.areas
+	caliburn.features.job_description.candidates
+	caliburn.features.job_description.capability_changes
+	caliburn.features.job_description.collaborator_changes
+	caliburn.features.job_description.compound_changes
+	caliburn.features.job_description.condition_changes
+	caliburn.features.job_description.item_results
+	caliburn.features.job_description.models
+	caliburn.features.job_description.source_changes
+	caliburn.features.job_description.task_changes
+	caliburn.features.job_description.tasks
+	caliburn.features.job_description.work_models
+	caliburn.features.job_files.models
+	caliburn.features.occupation_references.models
+	caliburn.features.work_memory.batch_models
+	caliburn.features.work_memory.candidates
+	caliburn.features.work_memory.changes
+	caliburn.features.work_memory.consolidation_models
+	caliburn.features.work_memory.models
+	caliburn.features.work_memory.read_models
+	caliburn.features.work_memory.revisions
+	caliburn.features.work_memory.stage_changes
+forbidden_modules =
+	fastapi
+	sqlalchemy
+	psycopg
+	langgraph
+	openai
